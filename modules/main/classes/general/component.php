@@ -15,8 +15,6 @@ class CBitrixComponent
 	private $__templateName = "";
 	public $__templatePage = "";
 
-	private static $__componentCounter = 0;
-	private $__currentCounter = 0;
 	/** @var CBitrixComponentTemplate */
 	public $__template = null;
 
@@ -47,11 +45,16 @@ class CBitrixComponent
 
 	private $__view = array();
 
+	private static $__componentCounter = array();
+	private $__currentCounter = 0;
 	private $__editButtons = array();
 	private static $__classes_map = array();
 	private $classOfComponent = "";
 	private $randomSequence = null;
 	private $frameMode = true;
+
+	/** @var  \Bitrix\Main\HttpRequest */
+	protected $request;
 
 	/**
 	 * Event called from includeComponent before component execution.
@@ -93,7 +96,6 @@ class CBitrixComponent
 	 */
 	public function __construct($component = null)
 	{
-		self::$__componentCounter++;
 		if(is_object($component) && ($component instanceof cbitrixcomponent))
 		{
 			$this->__name = $component->__name;
@@ -117,10 +119,12 @@ class CBitrixComponent
 			$this->__children_js = $component->__children_js;
 			$this->__children_epilogs = $component->__children_epilogs;
 			$this->__view = $component->__view;
+			$this->__currentCounter = $component->__currentCounter;
 			$this->__editButtons = $component->__editButtons;
 			$this->classOfComponent = $component->classOfComponent;
 		}
-		$this->__currentCounter = self::$__componentCounter;
+
+		$this->request = \Bitrix\Main\Context::getCurrent()->getRequest();
 	}
 	/**
 	 * Function returns component name in form bitrix:component.name
@@ -349,6 +353,13 @@ class CBitrixComponent
 			}
 		}
 
+		if (!isset(self::$__componentCounter[$componentName]))
+			self::$__componentCounter[$componentName] = 1;
+		else
+			self::$__componentCounter[$componentName]++;
+
+		$this->__currentCounter = self::$__componentCounter[$componentName];
+
 		$this->__name = $componentName;
 		$this->__relativePath = $path2Comp;
 		$this->__path = $componentPath;
@@ -404,40 +415,21 @@ class CBitrixComponent
 	 */
 	final public function includeComponentLang($relativePath = "", $lang = false)
 	{
-		static $messCache = array();
-
 		if (!$this->__bInited)
 			return null;
 
 		if ($relativePath == "")
 			$relativePath = "component.php";
 
-		if ($lang === false)
-			$lang = LANGUAGE_ID;
+		$path = $_SERVER["DOCUMENT_ROOT"].$this->__path."/".$relativePath;
 
-		$path = $this->__path."/lang/".$lang."/".$relativePath;
-		if (!isset($messCache[$path]))
+		if($lang === false)
 		{
-			$messCache[$path] = array();
-
-			$langSubst = LangSubst($lang);
-			if ($lang <> $langSubst)
-			{
-				$fname = $_SERVER["DOCUMENT_ROOT"].$this->__path."/lang/".$langSubst."/".$relativePath;
-				if (file_exists($fname))
-					$messCache[$path] = __IncludeLang($fname, true, true);
-			}
-
-			$fname = $_SERVER["DOCUMENT_ROOT"].$path;
-			if (file_exists($fname))
-				$messCache[$path] = __IncludeLang($fname, true, true) + $messCache[$path];
+			\Bitrix\Main\Localization\Loc::loadMessages($path);
 		}
-
-		if (isset($messCache[$path]))
+		else
 		{
-			global $MESS;
-			foreach($messCache[$path] as $id => $message)
-				$MESS[$id] = $message;
+			\Bitrix\Main\Localization\Loc::loadLanguageFile($path, $lang);
 		}
 	}
 	/**
@@ -508,39 +500,25 @@ class CBitrixComponent
 		{
 			/** @var CBitrixComponent $component  */
 			$component = new $this->classOfComponent($this);
+			$component->onIncludeComponentLang();
 			$component->arParams = $component->onPrepareComponentParams($arParams);
 			$component->__prepareComponentParams($component->arParams);
-			$component->onIncludeComponentLang();
 			$result = $component->executeComponent();
 			$this->__arIncludeAreaIcons = $component->__arIncludeAreaIcons;
 			$frameMode = $component->frameMode;
 		}
 		else
 		{
+			$this->includeComponentLang();
 			$this->__prepareComponentParams($arParams);
 			$this->arParams = $arParams;
-			$this->includeComponentLang();
 			$result = $this->__IncludeComponent();
 			$frameMode = $this->frameMode;
 		}
 
 		if (!$frameMode)
 		{
-			$staticHtmlCache = \Bitrix\Main\Data\StaticHtmlCache::getInstance();
-			$staticHtmlCache->markNonCacheable();
-			if (
-				defined("BX_COMPOSITE_DEBUG")
-				&& defined("USE_HTML_STATIC_CACHE")
-				&& USE_HTML_STATIC_CACHE == true
-			)
-			{
-				AddMessage2Log(
-					"Component: ".$this->__name."\n".
-					"Request URI: ".$_SERVER["REQUEST_URI"]."\n".
-					"Script: ".(isset($_SERVER["REAL_FILE_PATH"]) ? $_SERVER["REAL_FILE_PATH"] : $_SERVER["SCRIPT_NAME"]),
-					"composite"
-				);
-			}
+			\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($this->__name);
 		}
 
 		return $result;
@@ -763,6 +741,15 @@ class CBitrixComponent
 						{
 							\Bitrix\Main\Page\FrameHelper::applyCachedData($frameState);
 						}
+					}
+
+					if (array_key_exists("frameMode", $templateCachedData) && $templateCachedData["frameMode"] === false)
+					{
+						$context = isset($templateCachedData["frameModeCtx"])
+									? "(from component cache) ".$templateCachedData["frameModeCtx"]
+									: $this->__name." - a cached template set frameMode=false";
+
+						\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($context);
 					}
 				}
 
@@ -1302,16 +1289,9 @@ class CBitrixComponent
 	 */
 	public function randString($length = 6)
 	{
-		static $counters = array();
 		if (!$this->randomSequence)
 		{
-			if (!isset($counters[$this->__name]))
-				$counters[$this->__name] = 1;
-			else
-				$counters[$this->__name]++;
-
-			$seed = $this->__name."|".$counters[$this->__name];
-
+			$seed = $this->__name."|".self::$__componentCounter[$this->__name];
 			$this->randomSequence = new \Bitrix\Main\Type\RandomSequence($seed);
 		}
 		return $this->randomSequence->randString($length);

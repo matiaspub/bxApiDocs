@@ -36,7 +36,7 @@ class CAllSaleDelivery
 				"ITEMS" => $arOrder["BASKET_ITEMS"]
 			);
 
-			$arDeliveryPrice = CSaleDeliveryHandler::CalculateFull($delivery[0], $delivery[1], $arOrderTmpDel, $arOrder["CURRENCY"]);
+			$arDeliveryPrice = CSaleDeliveryHandler::CalculateFull($delivery[0], $delivery[1], $arOrderTmpDel, $arOrder["CURRENCY"],$arOrder["LID"]);
 
 			if ($arDeliveryPrice["RESULT"] == "ERROR")
 				$arErrors[] = array("CODE" => "CALCULATE", "TEXT" => $arDeliveryPrice["TEXT"]);
@@ -75,7 +75,7 @@ class CAllSaleDelivery
 			{
 				$arDim = unserialize($arBasketItem["~DIMENSIONS"]);
 				$arBasketItem["DIMENSIONS"] = $arDim;
-				unset($arBasketItems["~DIMENSIONS"]);
+				unset($arBasketItem["~DIMENSIONS"]);
 			}
 			else
 				$arDim = $arBasketItem["DIMENSIONS"];
@@ -117,7 +117,7 @@ class CAllSaleDelivery
 					$arResult[$arDeliveryService["SID"]] = array(
 						"SID" => $arDeliveryService["SID"],
 						"TITLE" => $arDeliveryService["NAME"],
-						"DESCRIPTION" => $arDeliveryService["DESCRIPTION"],
+						"DESCRIPTION" => $arDeliveryService["~DESCRIPTION"],
 						"PROFILES" => array(),
 					);
 				}
@@ -126,7 +126,7 @@ class CAllSaleDelivery
 					"ID" => $arDeliveryService["SID"].":".$profileId,
 					"SID" => $profileId,
 					"TITLE" => $arDeliveryProfile["TITLE"],
-					"DESCRIPTION" => $arDeliveryProfile["DESCRIPTION"],
+					"DESCRIPTION" => $arDeliveryProfile["~DESCRIPTION"],
 					"FIELD_NAME" => "DELIVERY_ID",
 				);
 

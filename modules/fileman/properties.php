@@ -1626,7 +1626,7 @@ function ChangeOrLeaveFile<?= $id?>(bChange)
 		"ALLOW_SWF" => "N",
 		"LOGO_POSITION" => "none"
 		),
-		false,
+		$APPLICATION->getCurrentIncludedComponent(),
 		array('HIDE_ICONS' => 'Y')
 ); ?>
 </div>

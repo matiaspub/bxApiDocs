@@ -5,7 +5,7 @@ http://www.kazpost.kz/downloads/urlic/%D0%A2%D0%B0%D1%80%D0%B8%D1%84%D1%8B%20%D0
 ********************************************************************************/
 CModule::IncludeModule('sale');
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_kaz_post.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_kaz_post.php');
 
 class CDeliveryKazPost
 {
@@ -153,7 +153,7 @@ class CDeliveryKazPost
 
 		$totalPrice = 0;
 
-		$shopLocationId = CSaleHelper::getShopLocationId();
+		$shopLocationId = CSaleHelper::getShopLocationId(SITE_ID);
 		$arShopLocation = CSaleLocation::GetByID($shopLocationId);
 		$arLocationTo = CSaleLocation::GetByID($arOrder['LOCATION_TO']);
 

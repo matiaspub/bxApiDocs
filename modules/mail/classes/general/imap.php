@@ -1,8 +1,6 @@
 <?php
 
-global $MESS;
-include(GetLangFileName($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/mail/lang/", "/classes/general/imap.php"));
-
+IncludeModuleLangFile(__FILE__);
 
 class CMailImap
 {

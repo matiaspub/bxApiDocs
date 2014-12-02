@@ -14,7 +14,7 @@ function GetDefaultProlog($title)
 {
 	return "<"."?\n".
 		"require(\$_SERVER[\"DOCUMENT_ROOT\"].\"/bitrix/modules/main/include/prolog_before.php\");\n".
-		"\$APPLICATION->SetTitle(\"".$title."\");\n".
+		"\$APPLICATION->SetTitle(\"".EscapePHPString($title)."\");\n".
 		"require(\$_SERVER[\"DOCUMENT_ROOT\"].\"/bitrix/modules/main/include/prolog_after.php\");\n".
 		"?".">\n";
 }
@@ -31,14 +31,26 @@ function PathToWF($text, $DOCUMENT_ID)
 
 function convert_image($img="",$query="",$param="")
 {
-	$query = htmlspecialcharsback($query);
-	parse_str($query);
-	return stripslashes($img.$fname.$param);
+	if (is_array($img))
+	{
+		$param = $img[3];
+		$query = $img[2];
+		$img   = $img[1];
+	}
+	else
+	{
+		$param = stripslashes($param);
+		$query = stripslashes($query);
+		$img   = stripslashes($img);
+	}
+	$params = array();
+	parse_str(htmlspecialcharsback($query), $params);
+	return $img.$params['fname'].$param;
 }
 
 function WFToPath($text)
 {
-	return preg_replace("'(<img[^>]+?src\\s*=\\s*[\"\'])/bitrix/admin/workflow_get_file.php\\?([^>]+)([\"\'][^>]*>)'ie", "convert_image('\\1','\\2','\\3')", $text);
+	return preg_replace_callback("'(<img[^>]+?src\\s*=\\s*[\"\'])/bitrix/admin/workflow_get_file.php\\?([^>]+)([\"\'][^>]*>)'i", "convert_image", $text);
 }
 
 function SavePreviewContent($abs_path, $strContent)

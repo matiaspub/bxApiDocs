@@ -8,7 +8,7 @@ namespace Bitrix\Iblock\Template\Entity;
 
 class SectionProperty extends Base
 {
-	protected $iblock_id = 0;
+	protected $iblockId = 0;
 
 	/**
 	 * @param integer $id Iblock section identifier.
@@ -27,7 +27,7 @@ class SectionProperty extends Base
 	 */
 	public function setIblockId($iblockId)
 	{
-		$this->iblock_id = intval($iblockId);
+		$this->iblockId = intval($iblockId);
 	}
 
 	/**
@@ -42,7 +42,7 @@ class SectionProperty extends Base
 		parent::setFields($fields);
 		if (
 			is_array($this->fields)
-			&& $this->iblock_id > 0
+			&& $this->iblockId > 0
 		)
 		{
 			foreach ($this->fields as $id => $value)
@@ -68,10 +68,10 @@ class SectionProperty extends Base
 		/** @global \CUserTypeManager $USER_FIELD_MANAGER */
 		global $USER_FIELD_MANAGER;
 
-		if (!isset($this->fields) && $this->iblock_id > 0)
+		if (!isset($this->fields) && $this->iblockId > 0)
 		{
 			$userFields = $USER_FIELD_MANAGER->getUserFields(
-				"IBLOCK_".$this->iblock_id."_SECTION",
+				"IBLOCK_".$this->iblockId."_SECTION",
 				$this->id
 			);
 			foreach ($userFields as $id => $uf)

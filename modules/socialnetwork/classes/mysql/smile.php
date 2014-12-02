@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети.
+ * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети.</body> </html>
  *
  *
  *

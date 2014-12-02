@@ -9,7 +9,7 @@ class Json
 {
 	const JSON_ERROR_UNKNOWN = -1;
 
-	static public function encode($data, $options = null)
+	public static function encode($data, $options = null)
 	{
 		if (!Application::getInstance()->isUtfMode())
 		{
@@ -28,7 +28,7 @@ class Json
 		return $res;
 	}
 
-	static public function decode($data)
+	public static function decode($data)
 	{
 		$res = json_decode($data, true);
 
@@ -63,7 +63,17 @@ class Json
 		$e = json_last_error();
 		if($e != JSON_ERROR_NONE)
 		{
-			self::throwException($e);
+			if (function_exists('json_last_error_msg'))
+			{
+				// Must be available on PHP >= 5.5.0
+				$message = sprintf('%s [%d]', json_last_error_msg(), $e);
+			}
+			else
+			{
+				$message = $e;
+			}
+
+			self::throwException($message);
 		}
 	}
 

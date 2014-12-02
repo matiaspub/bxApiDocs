@@ -1,7 +1,10 @@
 <?
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
+
 
 /**
- * Данный класс используется в файле <b>.parameters.php</b> компонентов модуля <b>Торговый каталог</b>.
+ * Данный класс используется в файле <b>.parameters.php</b> компонентов модуля <b>Торговый каталог</b>.</body> </html>
  *
  *
  *
@@ -30,7 +33,7 @@ class CCatalogIBlockParameters
 	public static function GetCatalogSortFields()
 	{
 		return array(
-			'CATALOG_AVAILABLE' => GetMessage('IBLOCK_SORT_FIELDS_CATALOG_AVAILABLE')
+			'CATALOG_AVAILABLE' => Loc::getMessage('IBLOCK_SORT_FIELDS_CATALOG_AVAILABLE')
 		);
 	}
 }

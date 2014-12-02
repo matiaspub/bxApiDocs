@@ -167,7 +167,7 @@ class UrlRewriter
 			"SORT" => isset($arFields["SORT"]) ? intval($arFields["SORT"]) : self::DEFAULT_SORT,
 		);
 
-		uasort($arUrlRewrite, array("UrlRewriter", "recordsCompare"));
+		uasort($arUrlRewrite, array('\Bitrix\Main\UrlRewriter', "recordsCompare"));
 
 		static::saveRules($siteId, $arUrlRewrite);
 	}
@@ -194,7 +194,7 @@ class UrlRewriter
 				$arUrlRewrite[$key]["SORT"] = intval($arFields["SORT"]);
 		}
 
-		uasort($arUrlRewrite, array("UrlRewriter", "recordsCompare"));
+		uasort($arUrlRewrite, array('\Bitrix\Main\UrlRewriter', "recordsCompare"));
 
 		static::saveRules($siteId, $arUrlRewrite);
 		Application::resetAccelerator();
@@ -211,7 +211,7 @@ class UrlRewriter
 		foreach ($arResultKeys as $key)
 			unset($arUrlRewrite[$key]);
 
-		uasort($arUrlRewrite, array("UrlRewriter", "recordsCompare"));
+		uasort($arUrlRewrite, array('\Bitrix\Main\UrlRewriter', "recordsCompare"));
 
 		static::saveRules($siteId, $arUrlRewrite);
 		Application::resetAccelerator();
@@ -422,21 +422,23 @@ class UrlRewriter
 		$arComponents = \PHPParser::parseScript($fileSrc);
 		for ($i = 0, $cnt = count($arComponents); $i < $cnt; $i++)
 		{
+			$sef = (is_array($arComponents[$i]["DATA"]["PARAMS"]) && $arComponents[$i]["DATA"]["PARAMS"]["SEF_MODE"] == "Y");
+
 			Component\ParametersTable::add(
 				array(
 					'SITE_ID' => $siteId,
 					'COMPONENT_NAME' => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
 					'TEMPLATE_NAME' => $arComponents[$i]["DATA"]["TEMPLATE_NAME"],
 					'REAL_PATH' => $path,
-					'SEF_MODE' => ($arComponents[$i]["DATA"]["PARAMS"]["SEF_MODE"] == "Y") ? Component\ParametersTable::SEF_MODE : Component\ParametersTable::NOT_SEF_MODE,
-					'SEF_FOLDER' => ($arComponents[$i]["DATA"]["PARAMS"]["SEF_MODE"] == "Y") ? $arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"] : null,
+					'SEF_MODE' => ($sef? Component\ParametersTable::SEF_MODE : Component\ParametersTable::NOT_SEF_MODE),
+					'SEF_FOLDER' => ($sef? $arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"] : null),
 					'START_CHAR' => $arComponents[$i]["START"],
 					'END_CHAR' => $arComponents[$i]["END"],
 					'PARAMETERS' => serialize($arComponents[$i]["DATA"]["PARAMS"]),
 				)
 			);
 
-			if ($arComponents[$i]["DATA"]["PARAMS"]["SEF_MODE"] == "Y")
+			if ($sef)
 			{
 				$arFields = array(
 					"CONDITION" => "#^".$arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"]."#",

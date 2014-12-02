@@ -5,28 +5,28 @@ class CALLSaleProduct
 {
 	public static $arProductIblockInfoCache = array();
 
-	static function GetProductSkuProps($ID, $IBLOCK_ID = '')
+	static function GetProductSkuProps($ID, $IBLOCK_ID = '', $getExt = false)
 	{
+		$getExt = ($getExt === true);
 		$arSkuProps = array();
-		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		$ID = (int)$ID;
+		$IBLOCK_ID = (int)$IBLOCK_ID;
+		if ($ID > 0 && \Bitrix\Main\Loader::includeModule('catalog'))
 		{
+			$filter = array('ID' => $ID, 'ACTIVE' => 'Y');
+			if ($IBLOCK_ID > 0)
+				$filter['IBLOCK_ID'] = $IBLOCK_ID;
 			$res = CIBlockElement::GetList(
 				array(),
-				array(
-					"ID" => $ID,
-					"ACTIVE" => "Y",
-				),
+				$filter,
 				false,
 				false,
-				array(
-					"ID",
-					"IBLOCK_ID",
-				)
+				array("ID", "IBLOCK_ID")
 			);
 			$arElement = $res->Fetch();
 			if ($arElement)
 			{
-				$arElement['ID'] = intval($arElement['ID']);
+				$arElement['ID'] = (int)$arElement['ID'];
 				$arParent = CCatalogSku::GetProductInfo($ID, $arElement["IBLOCK_ID"]);
 				if ($arParent)
 				{
@@ -74,7 +74,19 @@ class CALLSaleProduct
 								{
 									$mxValues = $displayProperty["DISPLAY_VALUE"];
 								}
-								$arSkuProps[$prop["NAME"]] = strip_tags(is_array($mxValues) ? implode("/ ", $mxValues) : $mxValues);
+								if ($getExt)
+								{
+									$arSkuProps[$prop["ID"]] = array(
+										'ID' => $prop["ID"],
+										'CODE' => $prop['CODE'],
+										'NAME' => $prop["NAME"],
+										'VALUE' => strip_tags(is_array($mxValues) ? implode("/ ", $mxValues) : $mxValues)
+									);
+								}
+								else
+								{
+									$arSkuProps[$prop["NAME"]] = strip_tags(is_array($mxValues) ? implode("/ ", $mxValues) : $mxValues);
+								}
 							}
 						}
 						unset($prop);

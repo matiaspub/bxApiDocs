@@ -431,10 +431,10 @@
 				$id = $DB->Insert(
 						'b_operation',
 						$arFields,
-		 				"",		// $error_position
-		 				false,	// $debug
-		 				"",		// $exist_id
-		 				false	// don't ignore errors, due to the bug in Database::Insert (it don't checks Query return status)
+						"",		// $error_position
+						false,	// $debug
+						"",		// $exist_id
+						false	// don't ignore errors, due to the bug in Database::Insert (it don't checks Query return status)
 					);
 
 				if ($id === false)
@@ -504,10 +504,10 @@
 				$taskId = $DB->Insert(
 					'b_task',
 					$arFields,
-		 			"",		// $error_position
-		 			false,	// $debug
-		 			"",		// $exist_id
-		 			false	// don't ignore errors, due to the bug in Database::Insert (it don't checks Query return status)
+					"",		// $error_position
+					false,	// $debug
+					"",		// $exist_id
+					false	// don't ignore errors, due to the bug in Database::Insert (it don't checks Query return status)
 					);
 
 				if ($taskId === false)
@@ -953,7 +953,7 @@
 				++self::$items_processed;
 
 				// This function throws exception CLearnInstall201203ConvertDBTimeOut, if it's low time left.
-	 			self::avoidTimeout();
+				self::avoidTimeout();
 			}
 		}
 
@@ -986,7 +986,7 @@
 			$rc = $DB->Query (
 				"DELETE FROM b_learn_lesson_edges 
 				WHERE SOURCE_NODE = '" . $parentNodeId . "'
-				   AND TARGET_NODE = '" . $childNodeId . "'", 
+					AND TARGET_NODE = '" . $childNodeId . "'", 
 				$ignore_errors = true);
 
 			if ($rc === false)
@@ -1087,30 +1087,30 @@
 				$rc = $DB->Update ('b_learn_course', 
 					array ('LINKED_LESSON_ID' => $id_of_new_lesson), 
 					"WHERE ID = '" . ($arCourses['ID'] + 0) . "'",
-	 				$error_position = "",
-	 				$debug = false,
-	 				$ignore_errors = true
-	 			);
+					$error_position = "",
+					$debug = false,
+					$ignore_errors = true
+				);
 
-	 			if ($rc === false)
-	 				throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
+				if ($rc === false)
+					throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
 
 				// Mark this course as processed
 				$rc = $DB->Update('b_learn_course', 
 					array ('JOURNAL_STATUS' => self::JOURNAL_STATUS_COURSE_LINKED), 
 					"WHERE ID = '" . ($arCourses['ID'] + 0) . "'",
-	 				$error_position = "",
-	 				$debug = false,
-	 				$ignore_errors = true
-	 			);
+					$error_position = "",
+					$debug = false,
+					$ignore_errors = true
+				);
 
-	 			if ($rc === false)
-	 				throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
+				if ($rc === false)
+					throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
 
-	 			++self::$items_processed;
+				++self::$items_processed;
 
 				// This function throws exception CLearnInstall201203ConvertDBTimeOut, if it's low time left.
-	 			self::avoidTimeout();
+				self::avoidTimeout();
 			}
 		}
 
@@ -1213,28 +1213,28 @@
 					QUESTIONS_FROM_ID = " . ($id_of_new_lesson + 0)
 					. " WHERE QUESTIONS_FROM = 'H' 
 						AND QUESTIONS_FROM_ID = '" . ($arChapter['ID'] + 0) . "'",
-	 				$ignore_errors = true
-	 			);
+					$ignore_errors = true
+				);
 
-	 			if ($rc === false)
-	 				throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
+				if ($rc === false)
+					throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
 
 				// Mark this chapter as processed
 				$rc = $DB->Update('b_learn_chapter', 
 					array ('JOURNAL_STATUS' => self::JOURNAL_STATUS_CHAPTER_COPIED), 
 					"WHERE ID = '" . ($arChapter['ID'] + 0) . "'",
-	 				$error_position = "",
-	 				$debug = false,
-	 				$ignore_errors = true
-	 			);
+					$error_position = "",
+					$debug = false,
+					$ignore_errors = true
+				);
 
-	 			if ($rc === false)
-	 				throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
+				if ($rc === false)
+					throw new CLearnInstall201203ConvertDBException('EA_SQLERROR');
 
 				++self::$items_processed;
 
 				// This function throws exception CLearnInstall201203ConvertDBTimeOut, if it's low time left.
-	 			self::avoidTimeout();
+				self::avoidTimeout();
 			}
 		}
 
@@ -1339,7 +1339,7 @@
 		 */
 		public static function _IsAlreadyConverted()
 		{
-			$rc = COption::GetOptionString(self::MODULE_ID, self::OPTION_ID, self::STATUS_INSTALL_NEVER_START, $site = '');
+			$rc = (string) COption::GetOptionString(self::MODULE_ID, self::OPTION_ID, self::STATUS_INSTALL_NEVER_START, $site = '');
 
 			if ($rc === self::STATUS_INSTALL_NEVER_START)
 			{
@@ -1499,12 +1499,12 @@
 
 				$other_sql_skip_errors[] = "
 					CREATE TABLE b_learn_exceptions_log (
-					  DATE_REGISTERED datetime NOT NULL,
-					  CODE int(11) NOT NULL,
-					  MESSAGE text NOT NULL,
-					  FFILE text NOT NULL,
-					  LINE int(11) NOT NULL,
-					  BACKTRACE text NOT NULL
+						DATE_REGISTERED datetime NOT NULL,
+						CODE int(11) NOT NULL,
+						MESSAGE text NOT NULL,
+						FFILE text NOT NULL,
+						LINE int(11) NOT NULL,
+						BACKTRACE text NOT NULL
 					)";
 			}
 			elseif ($dbtype === 'mssql')
@@ -1556,12 +1556,12 @@
 
 				$other_sql_skip_errors[] = "
 					CREATE TABLE B_LEARN_EXCEPTIONS_LOG (
-					  DATE_REGISTERED DATETIME NOT NULL DEFAULT GETDATE(),
-					  CODE INT NOT NULL,
-					  MESSAGE TEXT NOT NULL,
-					  FFILE TEXT NOT NULL,
-					  LINE INT NOT NULL,
-					  BACKTRACE TEXT NOT NULL
+						DATE_REGISTERED DATETIME NOT NULL DEFAULT GETDATE(),
+						CODE INT NOT NULL,
+						MESSAGE TEXT NOT NULL,
+						FFILE TEXT NOT NULL,
+						LINE INT NOT NULL,
+						BACKTRACE TEXT NOT NULL
 					)";
 
 				/*
@@ -1573,10 +1573,10 @@
 				WHERE parent_object_id = object_id('b_learn_lesson')
 				AND type = 'D'
 				AND parent_column_id = (
-				  select column_id 
-				  from sys.columns 
-				  where object_id = object_id('b_learn_lesson')
-				  and name = 'COURSE_ID'
+					select column_id 
+					from sys.columns 
+					where object_id = object_id('b_learn_lesson')
+					and name = 'COURSE_ID'
 				)
 
 				-- create alter table command as string and run it
@@ -1634,12 +1634,12 @@
 
 				$other_sql_skip_errors[] = "
 				CREATE TABLE b_learn_exceptions_log (
-				  DATE_REGISTERED DATE DEFAULT SYSDATE NOT NULL,
-				  CODE NUMBER(11) NOT NULL,
-				  MESSAGE CLOB NOT NULL,
-				  FFILE CLOB NOT NULL,
-				  LINE NUMBER(11) NOT NULL,
-				  BACKTRACE CLOB NOT NULL
+					DATE_REGISTERED DATE DEFAULT SYSDATE NOT NULL,
+					CODE NUMBER(11) NOT NULL,
+					MESSAGE CLOB NOT NULL,
+					FFILE CLOB NOT NULL,
+					LINE NUMBER(11) NOT NULL,
+					BACKTRACE CLOB NOT NULL
 				)";
 
 				$other_sql_skip_errors[] = "

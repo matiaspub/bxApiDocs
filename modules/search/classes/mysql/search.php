@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/s
 
 
 /**
- * Класс для индексирования сайта и осуществления поиска по индексу
+ * Класс для индексирования сайта и осуществления поиска по индексу</body> </html>
  *
  *
  *

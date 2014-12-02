@@ -82,7 +82,7 @@ class CUserTypeBoolean
 
 	public static function GetEditFormHTML($arUserField, $arHtmlControl)
 	{
-		if($arUserField["ENTITY_VALUE_ID"] !== null && $arUserField["ENTITY_VALUE_ID"]<1)
+		if($arUserField["ENTITY_VALUE_ID"]<1)
 			$arHtmlControl["VALUE"] = intval($arUserField["SETTINGS"]["DEFAULT_VALUE"]);
 		switch($arUserField["SETTINGS"]["DISPLAY"])
 		{
@@ -103,7 +103,7 @@ class CUserTypeBoolean
 				$arHtmlControl["VALIGN"] = "middle";
 				return '
 					<input type="hidden" value="0" name="'.$arHtmlControl["NAME"].'">
-					<input type="checkbox" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').'>
+					<input type="checkbox" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').' id="'.$arHtmlControl["NAME"].'">
 				';
 		}
 	}

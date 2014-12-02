@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CCatalogStore</b> - класс для работы со складами.
+ * <b>CCatalogStore</b> - класс для работы со складами.</body> </html>
  *
  *
  *
@@ -184,9 +184,10 @@ class CAllCatalogStore
 
 		if(!empty($strUpdate))
 		{
-			$strSql = "UPDATE b_catalog_store SET ".$strUpdate." WHERE ID = ".$id." ";
+			$strSql = "update b_catalog_store set ".$strUpdate." where ID = ".$id;
 			if(!$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__))
 				return false;
+			CCatalogStoreControlUtil::clearStoreName($id);
 		}
 		if($bNeedConversion)
 		{
@@ -236,20 +237,21 @@ class CAllCatalogStore
 				return false;
 			}
 
-			$dbDocs = $DB->Query("SELECT ID FROM b_catalog_docs_element WHERE STORE_FROM = ".$id." OR STORE_TO = ".$id." ", true);
+			$dbDocs = $DB->Query("select ID from b_catalog_docs_element where STORE_FROM = ".$id." or STORE_TO = ".$id, true);
 			if($bStoreHaveDocs = $dbDocs->Fetch())
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CS_STORE_HAVE_DOCS"));
 				return false;
 			}
 
-			$DB->Query("DELETE FROM b_catalog_store_product WHERE STORE_ID = ".$id." ", true);
-			$DB->Query("DELETE FROM b_catalog_store WHERE ID = ".$id." ", true);
+			$DB->Query("delete from b_catalog_store_product where STORE_ID = ".$id, true);
+			$DB->Query("delete from b_catalog_store where ID = ".$id, true);
 
 			foreach(GetModuleEvents("catalog", "OnCatalogStoreDelete", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($id));
 
 			self::recalculateStoreBalances($id);
+			CCatalogStoreControlUtil::clearStoreName($id);
 			return true;
 		}
 		return false;
@@ -266,7 +268,7 @@ class CAllCatalogStore
 		$dbStoreProduct = CCatalogStoreProduct::GetList(array(), array("STORE_ID" => $id, "!AMOUNT" => 0), false, false, array("PRODUCT_ID", "AMOUNT"));
 		while($arStoreProduct = $dbStoreProduct->Fetch())
 		{
-			$dbAmount = $DB->Query("SELECT SUM(SP.AMOUNT) as SUM, CP.QUANTITY_RESERVED as RESERVED, CS.ACTIVE FROM b_catalog_store_product SP INNER JOIN b_catalog_product CP ON SP.PRODUCT_ID = CP.ID INNER JOIN b_catalog_store CS ON SP.STORE_ID = CS.ID WHERE SP.PRODUCT_ID = ".$arStoreProduct['PRODUCT_ID']." AND CS.ACTIVE = 'Y' GROUP BY QUANTITY_RESERVED, ACTIVE ", true);
+			$dbAmount = $DB->Query("select SUM(SP.AMOUNT) as SUM, CP.QUANTITY_RESERVED as RESERVED, CS.ACTIVE FROM b_catalog_store_product SP inner join b_catalog_product CP on SP.PRODUCT_ID = CP.ID inner join b_catalog_store CS on SP.STORE_ID = CS.ID where SP.PRODUCT_ID = ".$arStoreProduct['PRODUCT_ID']." and CS.ACTIVE = 'Y' group by QUANTITY_RESERVED, ACTIVE", true);
 			if($arAmount = $dbAmount->Fetch())
 			{
 				$arFields["QUANTITY"] = doubleval($arAmount["SUM"] - $arAmount["RESERVED"]);

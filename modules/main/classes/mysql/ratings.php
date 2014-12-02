@@ -768,7 +768,7 @@ class CRatings extends CAllRatings
 				{
 					$arFileTmp = CFile::ResizeImageGet(
 						$row["PERSONAL_PHOTO"],
-						array('width' => 21, 'height' => 21),
+						array('width' => 58, 'height' => 58),
 						BX_RESIZE_IMAGE_EXACT,
 						false
 					);
@@ -823,7 +823,7 @@ class CRatings extends CAllRatings
 					{
 						$arFileTmp = CFile::ResizeImageGet(
 							$arUser["PERSONAL_PHOTO"],
-							array("width" => 21, "height" => 21),
+							array("width" => 58, "height" => 58),
 							BX_RESIZE_IMAGE_EXACT,
 							false
 						);

@@ -20,7 +20,9 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			}
 		}
 
-		if (strlen($arFields["EVENT_ID"]) > 0)
+		if (
+			$bSetSource 
+			&& strlen($arFields["EVENT_ID"]) > 0)
 		{
 			$arCommentEvent = CSocNetLogTools::FindLogCommentEventByID($arFields["EVENT_ID"]);
 			if (
@@ -35,8 +37,12 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 		$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetLogCommentAdd");
 		while ($arEvent = $db_events->Fetch())
+		{
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
+			{
 				return false;
+			}
+		}
 
 		if ($bSetSource)
 		{
@@ -94,6 +100,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 				}
 			}
 			else
+			{
 				$strMessage =
 				(
 					array_key_exists("ERROR", $arSource) && strlen($arSource["ERROR"]) > 0
@@ -104,10 +111,25 @@ class CSocNetLogComments extends CAllSocNetLogComments
 								: ""
 						)
 				);
+			}
 		}
 
 		if (!CSocNetLogComments::CheckFields("ADD", $arFields))
 		{
+			if ($e = $GLOBALS["APPLICATION"]->GetException())
+			{
+				$errorMessage = $e->GetString();
+			}
+			if (strlen($errorMessage) <= 0)
+			{
+				$errorMessage = GetMessage("SONET_GLC_ERROR_CHECKFIELDS_FAILED");
+			}
+
+			return array(
+				"ID" => false,
+				"MESSAGE" => $errorMessage
+			);
+
 			return false;
 		}
 
@@ -230,7 +252,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			return false;
 	}
 
-	public static function Update($ID, $arFields)
+	public static function Update($ID, $arFields, $bSetSource = false)
 	{
 		global $DB;
 
@@ -239,6 +261,46 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_LC_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
 			return false;
+		}
+
+		if ($bSetSource)
+		{
+			if (strlen($arFields["EVENT_ID"]) > 0)
+			{
+				$arCommentEvent = CSocNetLogTools::FindLogCommentEventByID($arFields["EVENT_ID"]);
+				if (
+					!$arCommentEvent
+					|| !array_key_exists("UPDATE_CALLBACK", $arCommentEvent)
+					|| !is_callable($arCommentEvent["UPDATE_CALLBACK"])
+				)
+				{
+					$bSetSource = false;
+				}
+			}
+
+			if (
+				!isset($arFields["SOURCE_ID"])
+				|| !isset($arFields["LOG_ID"])
+			)
+			{
+				$rsRes = CSocNetLogComments::GetList(
+					array(),
+					array("ID" => $ID),
+					false,
+					false,
+					array("LOG_ID", "SOURCE_ID")
+				);
+				if ($arRes = $rsRes->Fetch())
+				{
+					$arFields["SOURCE_ID"] = $arRes["SOURCE_ID"];
+					$arFields["LOG_ID"] = $arRes["LOG_ID"];
+				}
+			}
+			
+			if (!isset($arFields["SOURCE_ID"]))
+			{
+				$bSetSource = false;
+			}
 		}
 
 		$arFields1 = array();
@@ -251,33 +313,125 @@ class CSocNetLogComments extends CAllSocNetLogComments
 			}
 		}
 
+		if ($bSetSource)
+		{
+			$arSource = CSocNetLogComments::SetSource($arFields, "UPDATE");
+
+			if (
+				isset($arSource["NO_SOURCE"]) 
+				&& $arSource["NO_SOURCE"] == "Y"
+			)
+			{
+				$bSetSource = false;
+			}
+			elseif (
+				is_array($arSource)
+				&& (
+					isset($arSource["ERROR"])
+					&& !empty($arSource["ERROR"])
+				)
+			)
+			{
+				return array(
+					"ID" => false,
+					"MESSAGE" => $arSource["ERROR"]
+				);
+			}
+			else
+			{
+				if (
+					isset($arSource["MESSAGE"]) 
+					&& strlen($arSource["MESSAGE"]) > 0
+				)
+				{
+					$arFields["MESSAGE"] = $arSource["MESSAGE"];
+				}
+
+				if (
+					isset($arSource["TEXT_MESSAGE"]) 
+					&& strlen($arSource["TEXT_MESSAGE"]) > 0
+				)
+				{
+					$arFields["TEXT_MESSAGE"] = $arSource["TEXT_MESSAGE"];
+				}
+
+				if (
+					isset($arSource["UF"]) 
+					&& isset($arSource["UF"]["FILE"])
+				)
+				{
+					if (!is_array($arSource["UF"]["FILE"]))
+					{
+						$arSource["UF"]["FILE"] = array($arSource["UF"]["FILE"]);
+					}
+
+					$arFields["UF_SONET_COM_FILE"] = $arSource["UF"]["FILE"];
+				}
+
+				if (
+					isset($arSource["UF"]) 
+					&& isset($arSource["UF"]["DOC"])
+				)
+				{
+					if (!is_array($arSource["UF"]["DOC"]))
+					{
+						$arSource["UF"]["DOC"] = array($arSource["UF"]["DOC"]);
+					}
+
+					$arFields["UF_SONET_COM_DOC"] = $arSource["UF"]["DOC"];
+				}
+			}
+		}
+
 		if (!CSocNetLogComments::CheckFields("UPDATE", $arFields, $ID))
+		{
 			return false;
+		}
 
-		$strUpdate = $DB->PrepareUpdate("b_sonet_log_comment", $arFields);
-
-		foreach ($arFields1 as $key => $value)
+		if (
+			!$bSetSource
+			|| (
+				is_array($arSource)
+				&& (
+					!isset($arSource["ERROR"])
+					|| empty($arSource["ERROR"])
+				)
+			)
+		)
 		{
+			$strUpdate = $DB->PrepareUpdate("b_sonet_log_comment", $arFields);
+
+			foreach ($arFields1 as $key => $value)
+			{
+				if (strlen($strUpdate) > 0)
+					$strUpdate .= ", ";
+				$strUpdate .= $key."=".$value." ";
+			}
+
 			if (strlen($strUpdate) > 0)
-				$strUpdate .= ", ";
-			$strUpdate .= $key."=".$value." ";
-		}
+			{
+				$strSql =
+					"UPDATE b_sonet_log_comment SET ".
+					"	".$strUpdate." ".
+					"WHERE ID = ".$ID." ";
+				$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		if (strlen($strUpdate) > 0)
+				$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields);
+
+				if(defined("BX_COMP_MANAGED_CACHE"))
+				{
+					$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);
+				}
+			}
+			elseif (!$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields))
+			{
+				$ID = False;
+			}
+		}
+		else
 		{
-			$strSql =
-				"UPDATE b_sonet_log_comment SET ".
-				"	".$strUpdate." ".
-				"WHERE ID = ".$ID." ";
-			$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields);
-
-			if(defined("BX_COMP_MANAGED_CACHE"))
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);
-		}
-		elseif (!$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_COMMENT", $ID, $arFields))
 			$ID = False;
+		}
 
 		return $ID;
 	}
@@ -288,6 +442,8 @@ class CSocNetLogComments extends CAllSocNetLogComments
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arParams = array())
 	{
 		global $DB, $arSocNetAllowedEntityTypes, $USER, $USER_FIELD_MANAGER;
+
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("SONET_COMMENT", "LC.ID");
@@ -439,7 +595,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 			if (!array_key_exists("MY_ENTITIES", $arParams))
 			{
-				foreach($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"] as $entity_type_tmp => $arEntityTypeTmp)
+				foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
 					if (
 						array_key_exists("HAS_MY", $arEntityTypeTmp)
 						&& $arEntityTypeTmp["HAS_MY"] == "Y"
@@ -675,7 +831,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 
 public static 	function OnBlogDelete($blog_id)
 	{
-		return $GLOBALS["DB"]->Query("DELETE SLC FROM b_sonet_log_comment SLC INNER JOIN b_blog_comment BC ON SLC.SOURCE_ID = BC.ID AND BC.BLOG_ID = ".intval($blog_id)." WHERE SLC.EVENT_ID = 'blog_comment_micro' OR SLC.EVENT_ID = 'blog_comment'", true);	
+		return $GLOBALS["DB"]->Query("DELETE SLC FROM b_sonet_log_comment SLC INNER JOIN b_blog_comment BC ON SLC.SOURCE_ID = BC.ID AND BC.BLOG_ID = ".intval($blog_id)." WHERE SLC.EVENT_ID = 'blog_comment_micro' OR SLC.EVENT_ID = 'blog_comment'", true);
 	}
 }
 ?>

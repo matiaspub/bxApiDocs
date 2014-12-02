@@ -9,6 +9,7 @@ class CIBlockPropertyDirectory
 {
 	protected static $arFullCache = array();
 	protected static $arItemCache = array();
+	protected static $directoryMap = array();
 
 	/**
 	 * @return array
@@ -22,9 +23,10 @@ class CIBlockPropertyDirectory
 			'GetSettingsHTML' => array(__CLASS__, 'GetSettingsHTML'),
 			'GetPropertyFieldHtml' => array(__CLASS__, 'GetPropertyFieldHtml'),
 			'GetPropertyFieldHtmlMulty' => array(__CLASS__, 'GetPropertyFieldHtmlMulty'),
-			'PrepareSettings' =>array(__CLASS__, 'PrepareSettings'),
-			'GetAdminListViewHTML' =>array(__CLASS__, 'GetAdminListViewHTML'),
-			'GetPublicViewHTML' =>array(__CLASS__, 'GetPublicViewHTML')
+			'PrepareSettings' => array(__CLASS__, 'PrepareSettings'),
+			'GetAdminListViewHTML' => array(__CLASS__, 'GetAdminListViewHTML'),
+			'GetPublicViewHTML' => array(__CLASS__, 'GetPublicViewHTML'),
+			'GetAdminFilterHTML' => array(__CLASS__, 'GetAdminFilterHTML')
 		);
 	}
 
@@ -82,6 +84,9 @@ class CIBlockPropertyDirectory
 	 */
 	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
+		$iblockID = 0;
+		if (isset($arProperty['IBLOCK_ID']))
+			$iblockID = (int)$arProperty['IBLOCK_ID'];
 		CJSCore::Init(array('translit'));
 		$settings = CIBlockPropertyDirectory::PrepareSettings($arProperty);
 		$arPropertyFields = array(
@@ -112,138 +117,166 @@ class CIBlockPropertyDirectory
 		$directoryName = GetMessage("HIBLOCK_PROP_DIRECTORY_NEW_NAME");
 		$directoryMore = GetMessage("HIBLOCK_PROP_DIRECTORY_MORE");
 		return <<<"HIBSELECT"
-	<script type="text/javascript">
-	function getTableHead()
-	{
-		BX('hlb_directory_table').innerHTML = '<tr class="heading"><td></td><td>$headingName</td><td>$headingSort</td><td>$headingXmlId</td><td>$headingFile</td><td>$headingLink</td><td>$headingDef</td><td>$headingDescription</td><td>$headingFullDescription</td></tr>';
-	}
+<script type="text/javascript">
+function getTableHead()
+{
+	BX('hlb_directory_table').innerHTML = '<tr class="heading"><td></td><td>$headingName</td><td>$headingSort</td><td>$headingXmlId</td><td>$headingFile</td><td>$headingLink</td><td>$headingDef</td><td>$headingDescription</td><td>$headingFullDescription</td></tr>';
+}
 
-	function getDirectoryTableRow(addNew)
+function getDirectoryTableRow(addNew)
+{
+	addNew = (addNew === 'row' ? 'row' : 'full');
+	var obSelectHLBlock = BX('hlb_directory_table_id');
+	if (!!obSelectHLBlock)
 	{
-		var obSelectHLBlock = BX('hlb_directory_table_id');
-		if (!!obSelectHLBlock)
+		var rowNumber = parseInt(BX('hlb_directory_row_number').value, 10);
+		if (BX('IB_MAX_ROWS_COUNT'))
+			rowNumber = parseInt(BX('IB_MAX_ROWS_COUNT').value, 10);
+		if (isNaN(rowNumber))
+			rowNumber = 0;
+		var hlBlock = (-1 < obSelectHLBlock.selectedIndex ? obSelectHLBlock.options[obSelectHLBlock.selectedIndex].value : '');
+		var selectHLBlockValue = hlBlock;
+
+		if (addNew === 'full')
 		{
-			var rowNumber = BX('hlb_directory_row_number').value;
-			if(BX('IB_MAX_ROWS_COUNT'))
-				rowNumber = BX('IB_MAX_ROWS_COUNT').value;
-			var hlBlock = (-1 < obSelectHLBlock.selectedIndex ? obSelectHLBlock.options[obSelectHLBlock.selectedIndex].value : '');
-			var selectHLBlockValue = hlBlock;
-
-			if(addNew != 1)
-				getTableHead();
-			else
-				hlBlock = '';
-
 			if (selectHLBlockValue == '-1')
 			{
+				getTableHead();
 				BX('hlb_directory_table_tr').style.display = 'table-row';
-				BX('hlb_directory_table_button').style.display = 'table-row';
 				BX('hlb_directory_title_tr').style.display = 'table-row';
 				BX('hlb_directory_table_name').style.display = 'table-row';
 				BX('hlb_directory_table_name').disabled = false;
 
-				var query_data = {
-					'method': 'POST',
-					'dataType': 'json',
-					'timeout': 90,
-					'url': '/bitrix/admin/highloadblock_directory_ajax.php?rowNumber=' + rowNumber + '&sessid=' + BX.bitrix_sessid(),
-					'data':  BX.ajax.prepareData(),
-					'onsuccess': BX.delegate(function(data) {
-						BX('hlb_directory_table').innerHTML += data;
-						BX('hlb_directory_row_number').value = Number(BX('hlb_directory_row_number').value) + 1;
-						if(BX('IB_MAX_ROWS_COUNT'))
-							BX('IB_MAX_ROWS_COUNT').value = Number(BX('IB_MAX_ROWS_COUNT').value) + 1;
-					}),
-					'onfailure': BX.delegate(function(data) {
-					})
-				};
-				return BX.ajax(query_data);
+				addNew = 'row';
+				rowNumber = 0;
 			}
 			else
 			{
 				BX('hlb_directory_table_name').disabled = true;
 				BX('hlb_directory_title_tr').style.display = 'none';
-				var query_data = {
-					'method': 'POST',
-					'dataType': 'json',
-					'timeout': 90,
-					'url': '/bitrix/admin/highloadblock_directory_ajax.php?rowNumber=' + rowNumber + '&hlBlock=' + hlBlock + '&sessid=' + BX.bitrix_sessid(),
-					'data':  BX.ajax.prepareData(),
-					'onsuccess': BX.delegate(function(data) {
-						if(addNew == 1)
-							BX('hlb_directory_table').appendChild(BX.create('tr', {html: data}));
-						else
-							BX('hlb_directory_table').innerHTML += data;
-						BX('hlb_directory_row_number').value = Number(BX('hlb_directory_row_number').value) + 1;
+
+				BX.ajax.post(
+					'/bitrix/admin/highloadblock_directory_ajax.php',
+					{
+						lang: BX.message('LANGUAGE_ID'),
+						sessid: BX.bitrix_sessid(),
+						hlBlock: hlBlock,
+						rowNumber: rowNumber,
+						getTitle: 'Y',
+						IBLOCK_ID: '{$iblockID}'
+					},
+					BX.delegate(function(result) {
+						BX('hlb_directory_table').innerHTML = result;
+						BX('hlb_directory_row_number').value = parseInt(BX('hlb_directory_row_number').value, 10) + 1;
 						if(BX('IB_MAX_ROWS_COUNT'))
-							BX('IB_MAX_ROWS_COUNT').value = Number(BX('IB_MAX_ROWS_COUNT').value) + 1;
-					}),
-					'onfailure': BX.delegate(function(data) {
+							BX('IB_MAX_ROWS_COUNT').value = parseInt(BX('IB_MAX_ROWS_COUNT').value, 10) + 1;
 					})
-				};
-				return BX.ajax(query_data);
+				);
+
 			}
 		}
-		return '';
-	}
-	function getDirectoryTableHead(e)
-	{
-		e.value = BX.translit(e.value, {
-			'max_len' : 35,
-			'change_case' : 'L',
-			'replace_space' : '',
-			'replace_other' : '',
-			'delete_repeat_replace' : true
-		});
-
-		var obSelectHLBlock = BX('hlb_directory_table_id');
-		if (!!obSelectHLBlock)
+		if (addNew === 'row')
 		{
-			if (-1 < obSelectHLBlock.selectedIndex && '-1' == obSelectHLBlock.options[obSelectHLBlock.selectedIndex].value)
-			{
-				BX('hlb_directory_table_id_hidden').disabled = false;
-				BX('hlb_directory_table_id_hidden').value = 'b_'+BX('hlb_directory_table_name').value;
-			}
+			BX.ajax.loadJSON(
+				'/bitrix/admin/highloadblock_directory_ajax.php',
+				{
+					lang: BX.message('LANGUAGE_ID'),
+					sessid: BX.bitrix_sessid(),
+					hlBlock: hlBlock,
+					rowNumber: rowNumber,
+					addEmptyRow: 'Y',
+					IBLOCK_ID: '{$iblockID}'
+				},
+				BX.delegate(function(result) {
+					var obRow = null,
+						obTable = BX('hlb_directory_table'),
+						i = '',
+						obCell = null,
+						rowNumber = 0;
+
+					if (!!obTable && 'object' === typeof result)
+					{
+						rowNumber = parseInt(BX('hlb_directory_row_number').value, 10);
+						if (!!BX('IB_MAX_ROWS_COUNT'))
+							rowNumber = parseInt(BX('IB_MAX_ROWS_COUNT').value, 10);
+						if (isNaN(rowNumber))
+							rowNumber = 0;
+						obRow = obTable.insertRow(obTable.rows.length);
+						obRow.id = 'hlbl_property_tr_'+rowNumber;
+						for (i in result)
+						{
+							obCell = obRow.insertCell(-1);
+							BX.adjust(obCell, { style: result[i].style, html: result[i].html });
+						}
+						BX('hlb_directory_row_number').value = rowNumber + 1;
+						if(BX('IB_MAX_ROWS_COUNT'))
+							BX('IB_MAX_ROWS_COUNT').value = rowNumber + 1;
+					}
+				})
+			);
 		}
 	}
+}
+function getDirectoryTableHead(e)
+{
+	e.value = BX.translit(e.value, {
+		'max_len' : 35,
+		'change_case' : 'L',
+		'replace_space' : '',
+		'replace_other' : '',
+		'delete_repeat_replace' : true
+	});
 
-	</script>
-	<tr>
-		<td>{$selectDir}:</td>
-		<td>
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[TABLE_NAME]" disabled id="hlb_directory_table_id_hidden">
-			<select name="{$strHTMLControlName["NAME"]}[TABLE_NAME]" id="hlb_directory_table_id" onchange="getDirectoryTableRow();"/>
-				$cellOption
-			</select>
-		</td>
-	</tr>
-	<tr id="hlb_directory_title_tr" class="adm-detail-required-field">
-		<td>$directoryName</td>
-		<td><input type="text" name="HLB_NEW_TITLE" size="30" id="hlb_directory_table_name" onblur="getDirectoryTableHead(this);"></td>
-	</tr>
-	<tr id="hlb_directory_table_tr">
-		<td colspan="2" style="text-align: center;">
-			<table class="internal" id="hlb_directory_table" style="margin: 0 auto;">
-				<script type="text/javascript">getDirectoryTableRow();</script>
-			</table>
-		</td>
-	</tr>
-	<tr>
-		<td colspan="2" style="text-align: center;">
-			<input type="hidden" value="0" id="hlb_directory_row_number">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_NAME]" value="{$headingName}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_SORT]" value="{$headingSort}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_XML_ID]" value="{$headingXmlId}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_FILE]" value="{$headingFile}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_LINK]" value="{$headingLink}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_DEF]" value="{$headingDef}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_DESCRIPTION]" value="{$headingDescription}">
-			<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_FULL_DESCRIPTION]" value="{$headingFullDescription}">
-			<div style="width: 100%; text-align: center; margin: 10px 0;">
-			<input type="button" value="{$directoryMore}" onclick="getDirectoryTableRow(1)" id="hlb_directory_table_button" class="adm-btn-big">
-			</div>
-		</td>
-	</tr>
+	var obSelectHLBlock = BX('hlb_directory_table_id');
+	if (!!obSelectHLBlock)
+	{
+		if (-1 < obSelectHLBlock.selectedIndex && '-1' == obSelectHLBlock.options[obSelectHLBlock.selectedIndex].value)
+		{
+			BX('hlb_directory_table_id_hidden').disabled = false;
+			BX('hlb_directory_table_id_hidden').value = 'b_'+BX('hlb_directory_table_name').value;
+		}
+	}
+}
+
+</script>
+<tr>
+	<td>{$selectDir}:</td>
+	<td>
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[TABLE_NAME]" disabled id="hlb_directory_table_id_hidden">
+		<select name="{$strHTMLControlName["NAME"]}[TABLE_NAME]" id="hlb_directory_table_id" onchange="getDirectoryTableRow('full');"/>
+			$cellOption
+		</select>
+	</td>
+</tr>
+<tr id="hlb_directory_title_tr" class="adm-detail-required-field">
+	<td>$directoryName</td>
+	<td>
+		<input type="hidden" value="0" id="hlb_directory_row_number">
+		<input type="text" name="HLB_NEW_TITLE" size="30" id="hlb_directory_table_name" onblur="getDirectoryTableHead(this);">
+	</td>
+</tr>
+<tr id="hlb_directory_table_tr">
+	<td colspan="2" style="text-align: center;">
+		<table class="internal" id="hlb_directory_table" style="margin: 0 auto;">
+			<script type="text/javascript">getDirectoryTableRow('full');</script>
+		</table>
+	</td>
+</tr>
+<tr>
+	<td colspan="2" style="text-align: center;">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_NAME]" value="{$headingName}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_SORT]" value="{$headingSort}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_XML_ID]" value="{$headingXmlId}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_FILE]" value="{$headingFile}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_LINK]" value="{$headingLink}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_DEF]" value="{$headingDef}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_DESCRIPTION]" value="{$headingDescription}">
+		<input type="hidden" name="{$strHTMLControlName["NAME"]}[LANG][UF_FULL_DESCRIPTION]" value="{$headingFullDescription}">
+		<div style="width: 100%; text-align: center; margin: 10px 0;">
+		<input type="button" value="{$directoryMore}" onclick="getDirectoryTableRow('row');" id="hlb_directory_table_button" class="adm-btn-big">
+		</div>
+	</td>
+</tr>
 HIBSELECT;
 	}
 
@@ -384,10 +417,35 @@ HIBSELECT;
 			if (isset($hlblock['ID']))
 			{
 				$entity = HL\HighloadBlockTable::compileEntity($hlblock);
-				$entity_data_class = $entity->getDataClass();
-				$rsData = $entity_data_class::getList($listDescr);
+				$entityDataClass = $entity->getDataClass();
+				if (!isset(self::$directoryMap[$tableName]))
+				{
+					self::$directoryMap[$tableName] = $entityDataClass::getEntity()->getFields();
+				}
+
+				if (!isset(self::$directoryMap[$tableName]['UF_XML_ID']))
+				{
+					return $arResult;
+				}
+
+				$nameExist = isset(self::$directoryMap[$tableName]['UF_NAME']);
+				if (!$nameExist)
+					$listDescr['select'] = array('UF_XML_ID', 'ID');
+				$sortExist = isset(self::$directoryMap[$tableName]['UF_SORT']);
+				$listDescr['order'] = array();
+				if ($sortExist)
+					$listDescr['order']['UF_SORT'] = 'ASC';
+				if ($nameExist)
+					$listDescr['order']['UF_NAME'] = 'ASC';
+				else
+					$listDescr['order']['UF_XML_ID'] = 'ASC';
+				$listDescr['order']['ID'] = 'ASC';
+
+				$rsData = $entityDataClass::getList($listDescr);
 				while($arData = $rsData->fetch())
 				{
+					if (!$nameExist)
+						$arData['UF_NAME'] = $arData['UF_XML_ID'];
 					$arResult[] = $arData;
 				}
 			}
@@ -472,6 +530,28 @@ HIBSELECT;
 				return htmlspecialcharsbx(self::$arItemCache[$tableName][$value['VALUE']]['UF_NAME']);
 		}
 		return '';
+	}
+
+	public static function GetAdminFilterHTML($arProperty, $strHTMLControlName)
+	{
+		$lAdmin = new CAdminList($strHTMLControlName["TABLE_ID"]);
+		$lAdmin->InitFilter(array($strHTMLControlName["VALUE"]));
+		$filterValue = $GLOBALS[$strHTMLControlName["VALUE"]];
+
+		if(isset($filterValue) && is_array($filterValue))
+			$values = $filterValue;
+		else
+			$values = array();
+
+		$settings = CIBlockPropertyDirectory::PrepareSettings($arProperty);
+		$size = ($settings["size"] > 1 ? ' size="'.$settings["size"].'"' : '');
+		$width = ($settings["width"] > 0 ? ' style="width:'.$settings["width"].'px"' : '');
+
+		$options = CIBlockPropertyDirectory::GetOptionsHtml($arProperty, $values);
+		$html = '<select name="'.$strHTMLControlName["VALUE"].'[]"'.$size.$width.' multiple>';
+		$html .= $options;
+		$html .= '</select>';
+		return  $html;
 	}
 }
 ?>

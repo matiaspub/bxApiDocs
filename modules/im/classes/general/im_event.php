@@ -26,7 +26,8 @@ class CIMEvent
 
 	public static function OnAddRatingVote($id, $arParams)
 	{
-		if (CModule::IncludeModule("socialnetwork"))
+		$bSocialnetworkInstalled = CModule::IncludeModule("socialnetwork");
+		if ($bSocialnetworkInstalled)
 		{
 			$followValue = CSocNetLogFollow::GetExactValueByRating(
 				intval($arParams["OWNER_ID"]),
@@ -34,14 +35,25 @@ class CIMEvent
 				intval($arParams["ENTITY_ID"])
 			);
 			if ($followValue === "N")
+			{
 				return false;
+			}
 		}
-		if ($arParams['ENTITY_TYPE_ID'] == 'LOG_COMMENT')
+
+		if ($arParams['ENTITY_TYPE_ID'] == 'LOG_COMMENT') // no source
 		{
 			if ($arComment = CSocNetLogComments::GetByID($arParams['ENTITY_ID']))
 			{
-				if ($arComment['USER_ID'] == $arParams['USER_ID'])
+				preg_match_all("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/ies".BX_UTF_PCRE_MODIFIER, $arComment["TEXT_MESSAGE"], $arMention);
+				if(!empty($arMention))
+				{
+					$arMentionedUserID = $arMention[1];
+				}
+
+				if ($arComment['USER_ID'] == $arParams['USER_ID'] && empty($arMentionedUserID))
+				{
 					return false;
+				}
 
 				$arEventTmp = CSocNetLogTools::FindLogCommentEventByID($arComment["EVENT_ID"]);
 				if (
@@ -50,17 +62,20 @@ class CIMEvent
 					&& array_key_exists("METHOD_FORMAT", $arEventTmp)
 				)
 				{
-					$arFIELDS_FORMATTED = call_user_func(array($arEventTmp["CLASS_FORMAT"], $arEventTmp["METHOD_FORMAT"]), $arComment, array());
+					$arFIELDS_FORMATTED = call_user_func(array($arEventTmp["CLASS_FORMAT"], $arEventTmp["METHOD_FORMAT"]), $arComment, array("IM" => "Y"));
 
 					$CCTP = new CTextParser();
 					$CCTP->MaxStringLen = 200;
 					$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+
 					$arComment["MESSAGE"] = $CCTP->convertText($arFIELDS_FORMATTED["EVENT_FORMATTED"]["MESSAGE"]);
 				}
 
 				$arParams["ENTITY_TITLE"] = strip_tags(str_replace(array("<br>","<br/>","<br />", "#BR#"), Array(" "," ", " ", " "), htmlspecialcharsback($arComment["MESSAGE"])));
 
-				if (CModule::IncludeModule("extranet"))
+				$bExtranetInstalled = CModule::IncludeModule("extranet");
+
+				if ($bExtranetInstalled)
 				{
 					$arSites = array();
 					$extranet_site_id = CExtranet::GetExtranetSiteID();
@@ -73,150 +88,21 @@ class CIMEvent
 							"SERVER_NAME" => (strlen(trim($arSite["SERVER_NAME"])) > 0 ? $arSite["SERVER_NAME"] : COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]))
 						);
 					}
-
-					$bExtranetUser = false;
-					if ($arSites[$extranet_site_id])
-					{
-						$bExtranetUser = true;
-						$rsUser = CUser::GetByID(intval($arComment['USER_ID']));
-						if ($arUser = $rsUser->Fetch())
-							if (intval($arUser["UF_DEPARTMENT"][0]) > 0)
-								$bExtranetUser = false;
-					}
-
-					$user_site_id = ($bExtranetUser ? $extranet_site_id : $intranet_site_id);
-
-					if (in_array($arComment["ENTITY_TYPE"], array("CRMLEAD", "CRMCONTACT", "CRMCOMPANY", "CRMDEAL")))
-					{
-						$arParams["ENTITY_LINK"] = $arSites[$user_site_id]['DIR']."crm/stream?log_id=#log_id#";
-					}
-					else
-					{
-						$arParams["ENTITY_LINK"] = COption::GetOptionString("socialnetwork", "log_entry_page", SITE_DIR."company/personal/log/#log_id#/", $user_site_id);
-					}
-
-					$arParams["ENTITY_LINK"] = str_replace("#log_id#", $arComment["LOG_ID"], $arParams["ENTITY_LINK"]);
-					$arParams["ENTITY_LINK"] .= (strpos($arParams["ENTITY_LINK"], "?") !== false ? "&" : "?")."commentId=".$arComment["ID"]."#com".$arComment["ID"];
-					$arParams["ENTITY_LINK"] = (CMain::IsHTTPS() ? "https" : "http")."://".$arSites[$user_site_id]['SERVER_NAME'].$arParams["ENTITY_LINK"];
 				}
-				else
+
+				if ($arComment['USER_ID'] != $arParams['USER_ID'])				
 				{
-					if (in_array($arComment["ENTITY_TYPE"], array("CRMLEAD", "CRMCONTACT", "CRMCOMPANY", "CRMDEAL")))
-					{
-						$arParams["ENTITY_LINK"] = SITE_DIR."crm/stream?log_id=#log_id#";
-					}
-					else
-					{
-						$arParams["ENTITY_LINK"] = COption::GetOptionString("socialnetwork", "log_entry_page", SITE_DIR."company/personal/log/#log_id#/", SITE_ID);
-					}
-
-					$arParams["ENTITY_LINK"] = str_replace("#log_id#", $arComment["LOG_ID"], $arParams["ENTITY_LINK"]);
-					$arParams["ENTITY_LINK"] .= (strpos($arParams["ENTITY_LINK"], "?") !== false ? "&" : "?")."commentId=".$arComment["ID"]."#com".$arComment["ID"];
-
-					if (defined('SITE_SERVER_NAME') && strlen(SITE_SERVER_NAME) > 0)
-						$SiteServerName = SITE_SERVER_NAME;
-					else
-						$SiteServerName = COption::GetOptionString("main", "server_name", $_SERVER['SERVER_NAME']);
-
-					if (strlen($SiteServerName) > 0)
-						$arParams['ENTITY_LINK'] = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName.$arParams['ENTITY_LINK'];
-				}				
-
-				$arMessageFields = array(
-					"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
-					"TO_USER_ID" => intval($arComment['USER_ID']),
-					"FROM_USER_ID" => intval($arParams['USER_ID']),
-					"NOTIFY_TYPE" => IM_NOTIFY_FROM,
-					"NOTIFY_MODULE" => "main",
-					"NOTIFY_EVENT" => "rating_vote",
-					"NOTIFY_TAG" => "RATING|".($arParams['VALUE'] >= 0?"":"DL|").$arParams['ENTITY_TYPE_ID']."|".$arParams['ENTITY_ID'],
-					"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
-					"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
-				);
-				CIMNotify::Add($arMessageFields);
-			}
-		}
-		else
-		{
-			if ($arParams['OWNER_ID'] == $arParams['USER_ID'])
-				return false;
-
-			if (!CModule::IncludeModule("search") || BX_SEARCH_VERSION <= 1)
-				return false;
-
-			$CSI = new CSearchItem;
-			
-			$arFSearch = Array('=ENTITY_TYPE_ID' => $arParams['ENTITY_TYPE_ID'], '=ENTITY_ID' => $arParams['ENTITY_ID']);
-			if(defined("SITE_ID") && strlen(SITE_ID) > 0)
-				$arFSearch["=SITE_ID"] = SITE_ID;
-
-			$res = $CSI->GetList(Array(), $arFSearch, Array('URL', 'TITLE', 'BODY', 'PARAM1'));
-			if ($arItem = $res->GetNext(true, false))
-			{
-				$arParams["ENTITY_LINK"] = $arItem['URL'];
-				$arParams["ENTITY_PARAM"] = $arItem['PARAM1'];
-				$arParams["ENTITY_TITLE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['TITLE']))));
-				$arParams["ENTITY_MESSAGE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['BODY']))));
-
-				if ((strlen($arParams["ENTITY_TITLE"]) > 0 || strlen($arParams["ENTITY_MESSAGE"]) > 0 ) && strlen($arParams["ENTITY_LINK"]) > 0)
-				{
-					if (CModule::IncludeModule("extranet"))
-					{
-						$arSites = array();
-						$extranet_site_id = CExtranet::GetExtranetSiteID();
-						$intranet_site_id = CSite::GetDefSite();
-						$dbSite = CSite::GetList($by="sort", $order="desc", array("ACTIVE" => "Y"));
-						while($arSite = $dbSite->Fetch())
-						{
-							$arSites[$arSite["ID"]] = array(
-								"DIR" => (strlen(trim($arSite["DIR"])) > 0 ? $arSite["DIR"] : "/"),
-								"SERVER_NAME" => (strlen(trim($arSite["SERVER_NAME"])) > 0 ? $arSite["SERVER_NAME"] : COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]))
-							);
-						}
-
-						$bExtranetUser = false;
-						if ($arSites[$extranet_site_id])
-						{
-							$bExtranetUser = true;
-							$rsUser = CUser::GetByID(intval($arParams['OWNER_ID']));
-							if ($arUser = $rsUser->Fetch())
-								if (intval($arUser["UF_DEPARTMENT"][0]) > 0)
-									$bExtranetUser = false;
-						}
-
-						if ($bExtranetUser)
-						{
-							$link = $arParams['ENTITY_LINK'];
-							if (substr($link, 0, strlen($arSites[$extranet_site_id]['DIR'])) == $arSites[$extranet_site_id]['DIR'])
-								$link = substr($link, strlen($arSites[$extranet_site_id]['DIR']));
-
-							$SiteServerName = $arSites[$extranet_site_id]['SERVER_NAME'].$arSites[$extranet_site_id]['DIR'].ltrim($link, "/");
-						}
-						else
-						{
-							$link = $arParams['ENTITY_LINK'];
-							if (substr($link, 0, strlen($arSites[$intranet_site_id]['DIR'])) == $arSites[$intranet_site_id]['DIR'])
-								$link = substr($link, strlen($arSites[$intranet_site_id]['DIR']));
-
-							$SiteServerName = $arSites[$intranet_site_id]['SERVER_NAME'].$arSites[$intranet_site_id]['DIR'].ltrim($link, "/");
-						}
-
-						$arParams['ENTITY_LINK'] = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName;
-					}
-					else
-					{
-						if (defined('SITE_SERVER_NAME') && strlen(SITE_SERVER_NAME) > 0)
-							$SiteServerName = SITE_SERVER_NAME;
-						else
-							$SiteServerName = COption::GetOptionString("main", "server_name", $_SERVER['SERVER_NAME']);
-
-						if (strlen($SiteServerName) > 0)
-							$arParams['ENTITY_LINK'] = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName.$arParams['ENTITY_LINK'];
-					}
+					$arParams['ENTITY_LINK'] = self::GetMessageRatingLogCommentURL(
+						$arComment,
+						intval($arComment['USER_ID']),
+						$arSites,
+						$intranet_site_id,
+						$extranet_site_id
+					);
 
 					$arMessageFields = array(
 						"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
-						"TO_USER_ID" => intval($arParams['OWNER_ID']),
+						"TO_USER_ID" => intval($arComment['USER_ID']),
 						"FROM_USER_ID" => intval($arParams['USER_ID']),
 						"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 						"NOTIFY_MODULE" => "main",
@@ -226,6 +112,221 @@ class CIMEvent
 						"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
 					);
 					CIMNotify::Add($arMessageFields);
+				}
+
+				if (
+					!empty($arMentionedUserID)
+					&& is_array($arMentionedUserID)
+				)
+				{
+					$arParams["MENTION"] = true; // for self::GetMessageRatingVote()
+
+					foreach ($arMentionedUserID as $mentioned_user_id)
+					{
+						if (
+							$mentioned_user_id != $arParams['USER_ID']
+							&& CSocNetLogRights::CheckForUserOnly($arComment["LOG_ID"], $mentioned_user_id)
+						)
+						{
+							$arParams['ENTITY_LINK'] = self::GetMessageRatingLogCommentURL(
+								$arComment,
+								intval($mentioned_user_id), 
+								$arSites, 
+								$intranet_site_id,
+								$extranet_site_id
+							);
+
+							$arMessageFields = array(
+								"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+								"TO_USER_ID" => intval($mentioned_user_id),
+								"FROM_USER_ID" => intval($arParams['USER_ID']),
+								"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+								"NOTIFY_MODULE" => "main",
+								"NOTIFY_EVENT" => "rating_vote",
+								"NOTIFY_TAG" => "RATING|".($arParams['VALUE'] >= 0?"":"DL|").$arParams['ENTITY_TYPE_ID']."|".$arParams['ENTITY_ID'],
+								"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
+								"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
+							);
+
+							CIMNotify::Add($arMessageFields);
+						}
+					}
+				}
+			}
+		}
+		else // with source
+		{
+			if (
+				!CModule::IncludeModule("search") 
+				|| BX_SEARCH_VERSION <= 1
+			)
+			{
+				return false;
+			}
+
+			$CSI = new CSearchItem;
+			
+			$arFSearch = Array('=ENTITY_TYPE_ID' => $arParams['ENTITY_TYPE_ID'], '=ENTITY_ID' => $arParams['ENTITY_ID']);
+			if (
+				defined("SITE_ID") 
+				&& strlen(SITE_ID) > 0
+			)
+			{
+				$arFSearch["=SITE_ID"] = SITE_ID;
+			}
+
+			$res = $CSI->GetList(Array(), $arFSearch, Array('ID', 'URL', 'TITLE', 'BODY', 'PARAM1'));
+			if ($arItem = $res->GetNext(true, false))
+			{
+				// notify mentioned users
+				$arSearchItemParams = CSearch::GetContentItemParams($arItem['ID'], 'mentioned_user_id');
+				if (
+					is_array($arSearchItemParams)
+					&& array_key_exists('mentioned_user_id', $arSearchItemParams)
+					&& is_array($arSearchItemParams['mentioned_user_id'])
+				)
+				{
+					$arMentionedUserID = $arSearchItemParams['mentioned_user_id'];
+				}
+
+				// send to author
+				if (
+					$arParams['OWNER_ID'] != $arParams['USER_ID']
+					|| $arMentionedUserID
+				)
+				{
+					$arParams["ENTITY_LINK"] = $arItem['URL'];
+					$arParams["ENTITY_PARAM"] = $arItem['PARAM1'];
+					$arParams["ENTITY_TITLE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['TITLE']))));
+					$arParams["ENTITY_MESSAGE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['BODY']))));
+
+					if (
+						(
+							strlen($arParams["ENTITY_TITLE"]) > 0 
+							|| strlen($arParams["ENTITY_MESSAGE"]) > 0
+						) 
+						&& strlen($arParams["ENTITY_LINK"]) > 0
+					)
+					{
+						$originalLink = $arParams["ENTITY_LINK"];
+
+						$bExtranetInstalled = CModule::IncludeModule("extranet");
+						if ($bExtranetInstalled)
+						{
+							$arSites = array();
+							$extranet_site_id = CExtranet::GetExtranetSiteID();
+							$intranet_site_id = CSite::GetDefSite();
+							$dbSite = CSite::GetList($by="sort", $order="desc", array("ACTIVE" => "Y"));
+							while($arSite = $dbSite->Fetch())
+							{
+								$arSites[$arSite["ID"]] = array(
+									"DIR" => (strlen(trim($arSite["DIR"])) > 0 ? $arSite["DIR"] : "/"),
+									"SERVER_NAME" => (strlen(trim($arSite["SERVER_NAME"])) > 0 ? $arSite["SERVER_NAME"] : COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]))
+								);
+							}
+						}
+
+						if ($arParams['OWNER_ID'] != $arParams['USER_ID'])
+						{
+							$arParams['ENTITY_LINK'] = self::GetMessageRatingEntityURL(
+								$originalLink, 
+								intval($arParams['OWNER_ID']), 
+								$arSites, 
+								$intranet_site_id,
+								$extranet_site_id
+							);
+
+							$arMessageFields = array(
+								"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+								"TO_USER_ID" => intval($arParams['OWNER_ID']),
+								"FROM_USER_ID" => intval($arParams['USER_ID']),
+								"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+								"NOTIFY_MODULE" => "main",
+								"NOTIFY_EVENT" => "rating_vote",
+								"NOTIFY_TAG" => "RATING|".($arParams['VALUE'] >= 0?"":"DL|").$arParams['ENTITY_TYPE_ID']."|".$arParams['ENTITY_ID'],
+								"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
+								"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
+							);
+							CIMNotify::Add($arMessageFields);
+						}
+
+						if (
+							is_array($arMentionedUserID)
+							&& $bSocialnetworkInstalled
+						)
+						{
+							if (in_array($arParams['ENTITY_TYPE_ID'], array("BLOG_COMMENT", "FORUM_POST")))
+							{
+								$rsLogComment = CSocNetLogComments::GetList(
+									array(),
+									array(
+										"RATING_TYPE_ID" => $arParams['ENTITY_TYPE_ID'],
+										"RATING_ENTITY_ID" =>  $arParams['ENTITY_ID']
+									),
+									false,
+									false,
+									array("LOG_ID")
+								);
+								if ($arLogComment = $rsLogComment->Fetch())
+								{
+									$log_id = $arLogComment["LOG_ID"];
+								}
+							}
+							elseif (in_array($arParams['ENTITY_TYPE_ID'], array("BLOG_POST")))
+							{
+								$rsLog = CSocNetLog::GetList(
+									array(),
+									array(
+										"RATING_TYPE_ID" => $arParams['ENTITY_TYPE_ID'],
+										"RATING_ENTITY_ID" =>  $arParams['ENTITY_ID']
+									),
+									false,
+									false,
+									array("ID")
+								);
+								if ($arLog = $rsLog->Fetch())
+								{
+									$log_id = $arLog["ID"];
+								}
+							}
+
+							if (intval($log_id) > 0)
+							{
+								$arParams["MENTION"] = true; // for self::GetMessageRatingVote()
+
+								foreach ($arMentionedUserID as $mentioned_user_id)
+								{
+									if (
+										$mentioned_user_id != $arParams['USER_ID']
+										&& CSocNetLogRights::CheckForUserOnly($log_id, $mentioned_user_id)
+									)
+									{
+										$arParams['ENTITY_LINK'] = self::GetMessageRatingEntityURL(
+											$originalLink, 
+											intval($mentioned_user_id), 
+											$arSites, 
+											$intranet_site_id,
+											$extranet_site_id
+										);
+
+										$arMessageFields = array(
+											"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+											"TO_USER_ID" => intval($mentioned_user_id),
+											"FROM_USER_ID" => intval($arParams['USER_ID']),
+											"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+											"NOTIFY_MODULE" => "main",
+											"NOTIFY_EVENT" => "rating_vote",
+											"NOTIFY_TAG" => "RATING|".($arParams['VALUE'] >= 0?"":"DL|").$arParams['ENTITY_TYPE_ID']."|".$arParams['ENTITY_ID'],
+											"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
+											"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
+										);
+
+										CIMNotify::Add($arMessageFields);
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -240,7 +341,10 @@ class CIMEvent
 	{
 		$like = $arParams['VALUE'] >= 0? '_LIKE': '_DISLIKE';
 
-		if ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST' || $arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
+		if (
+			$arParams['ENTITY_TYPE_ID'] == 'FORUM_POST' 
+			|| $arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT'
+		)
 		{
 			$dot = strlen($arParams["ENTITY_MESSAGE"])>=200? '...': '';
 			$arParams["ENTITY_MESSAGE"] = substr($arParams["ENTITY_MESSAGE"], 0, 199).$dot;
@@ -254,13 +358,21 @@ class CIMEvent
 		if ($bForMail)
 		{
 			if ($arParams['ENTITY_TYPE_ID'] == 'BLOG_POST')
-				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_BLOG_POST'.$like).' ('.$arParams['ENTITY_LINK'].')');
+			{
+				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_BLOG_POST'.($arParams['MENTION'] ? '_MENTION' : '').$like).' ('.$arParams['ENTITY_LINK'].')');
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like).' ('.$arParams['ENTITY_LINK'].')');
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_TOPIC')
+			{
 				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_FORUM_TOPIC'.$like).' ('.$arParams['ENTITY_LINK'].')');
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like).' ('.$arParams['ENTITY_LINK'].')');
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'library')
 				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_FILE'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'photos')
@@ -271,20 +383,30 @@ class CIMEvent
 					$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_PHOTO'.$like).' ('.$arParams['ENTITY_LINK'].')');
 			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'LOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.$like).' ('.$arParams['ENTITY_LINK'].')');
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '', ''), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like).' ('.$arParams['ENTITY_LINK'].')');
+			}
 			else
 				$message = str_replace('#LINK#', $arParams["ENTITY_TITLE"], GetMessage('IM_EVENT_RATING_ELSE'.$like).strlen($arParams['ENTITY_LINK'])>0?' ('.$arParams['ENTITY_LINK'].')': '');
 		}
 		else
 		{
 			if ($arParams['ENTITY_TYPE_ID'] == 'BLOG_POST')
-				$message = str_replace('#LINK#', '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>', GetMessage('IM_EVENT_RATING_BLOG_POST'.$like));
+			{
+				$message = str_replace('#LINK#', '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>', GetMessage('IM_EVENT_RATING_BLOG_POST'.($arParams['MENTION'] ? '_MENTION' : '').$like));
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like));
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_TOPIC')
+			{
 				$message = str_replace('#LINK#', '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>', GetMessage('IM_EVENT_RATING_FORUM_TOPIC'.$like));
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'FORUM_POST')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_MESSAGE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like));
+			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'library')
 				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_FILE'.$like));
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'IBLOCK_ELEMENT' && $arParams['ENTITY_PARAM'] == 'photos')
@@ -295,7 +417,9 @@ class CIMEvent
 					$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_PHOTO'.$like));
 			}
 			elseif ($arParams['ENTITY_TYPE_ID'] == 'LOG_COMMENT')
-				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.$like));
+			{
+				$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_TITLE"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_COMMENT'.($arParams['MENTION'] ? '_MENTION' : '').$like));
+			}
 			else
 				$message = str_replace('#LINK#', strlen($arParams['ENTITY_LINK'])>0?'<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>': '<i>'.$arParams["ENTITY_TITLE"].'</i>', GetMessage('IM_EVENT_RATING_ELSE'.$like));
 
@@ -303,6 +427,122 @@ class CIMEvent
 
 		return $message;
 	}
+	
+	private static function GetMessageRatingEntityURL($url, $user_id = false, $arSites = false, $intranet_site_id = false, $extranet_site_id = false)
+	{
+		if (
+			is_array($arSites)
+			&& intval($user_id) > 0
+			&& strlen($extranet_site_id) > 0
+			&& strlen($intranet_site_id) > 0
+		)
+		{
+			$bExtranetUser = false;
+			if ($arSites[$extranet_site_id])
+			{
+				$bExtranetUser = true;
+				$rsUser = CUser::GetByID(intval($user_id));
+				if ($arUser = $rsUser->Fetch())
+				{
+					if (intval($arUser["UF_DEPARTMENT"][0]) > 0)
+					{
+						$bExtranetUser = false;
+					}
+				}
+			}
+
+			if ($bExtranetUser)
+			{
+				$link = $url;
+				if (substr($link, 0, strlen($arSites[$extranet_site_id]['DIR'])) == $arSites[$extranet_site_id]['DIR'])
+				{
+					$link = substr($link, strlen($arSites[$extranet_site_id]['DIR']));
+				}
+
+				$SiteServerName = $arSites[$extranet_site_id]['SERVER_NAME'].$arSites[$extranet_site_id]['DIR'].ltrim($link, "/");
+			}
+			else
+			{
+				$link = $url;
+				if (substr($link, 0, strlen($arSites[$intranet_site_id]['DIR'])) == $arSites[$intranet_site_id]['DIR'])
+				{
+					$link = substr($link, strlen($arSites[$intranet_site_id]['DIR']));
+				}
+
+				$SiteServerName = $arSites[$intranet_site_id]['SERVER_NAME'].$arSites[$intranet_site_id]['DIR'].ltrim($link, "/");
+			}
+
+			$url = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName;
+		}
+		else
+		{
+			$SiteServerName = (defined('SITE_SERVER_NAME') && strlen(SITE_SERVER_NAME) > 0 ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", $_SERVER['SERVER_NAME']));
+			if (strlen($SiteServerName) > 0)
+			{
+				$url = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName.$url;
+			}
+		}
+
+		return $url;
+	}
+	
+	private static function GetMessageRatingLogCommentURL($arComment, $user_id = false, $arSites = false, $intranet_site_id = false, $extranet_site_id = false)
+	{
+		$url = false;
+		
+		if (
+			!is_array($arComment)
+			|| !isset($arComment["ENTITY_TYPE"]) || strlen($arComment["ENTITY_TYPE"]) <= 0
+			|| !isset($arComment["ID"]) || intval($arComment["ID"]) <= 0
+			|| !isset($arComment["LOG_ID"]) || intval($arComment["LOG_ID"]) <= 0
+		)
+		{
+			return false;
+		}
+
+		if (
+			is_array($arSites)
+			&& intval($user_id) > 0
+			&& strlen($extranet_site_id) > 0
+			&& strlen($intranet_site_id) > 0
+		)
+		{
+			$bExtranetUser = false;
+			if ($arSites[$extranet_site_id])
+			{
+				$bExtranetUser = true;
+				$rsUser = CUser::GetByID($user_id);
+				if ($arUser = $rsUser->Fetch())
+				{
+					if (intval($arUser["UF_DEPARTMENT"][0]) > 0)
+					{
+						$bExtranetUser = false;
+					}
+				}
+			}
+
+			$user_site_id = ($bExtranetUser ? $extranet_site_id : $intranet_site_id);
+
+			$url = (in_array($arComment["ENTITY_TYPE"], array("CRMLEAD", "CRMCONTACT", "CRMCOMPANY", "CRMDEAL")) ? $arSites[$user_site_id]["DIR"]."crm/stream?log_id=#log_id#" : COption::GetOptionString("socialnetwork", "log_entry_page", $arSites[$user_site_id]["DIR"]."company/personal/log/#log_id#/", $user_site_id));
+			$url = str_replace("#log_id#", $arComment["LOG_ID"], $url);
+			$url .= (strpos($url, "?") !== false ? "&" : "?")."commentId=".$arComment["ID"]."#com".$arComment["ID"];
+			$url = (CMain::IsHTTPS() ? "https" : "http")."://".$arSites[$user_site_id]['SERVER_NAME'].$url;
+		}
+		else
+		{
+			$url = (in_array($arComment["ENTITY_TYPE"], array("CRMLEAD", "CRMCONTACT", "CRMCOMPANY", "CRMDEAL")) ? SITE_DIR."crm/stream?log_id=#log_id#" : COption::GetOptionString("socialnetwork", "log_entry_page", SITE_DIR."company/personal/log/#log_id#/", SITE_ID));
+			$url = str_replace("#log_id#", $arComment["LOG_ID"], $url);
+			$url .= (strpos($url, "?") !== false ? "&" : "?")."commentId=".$arComment["ID"]."#com".$arComment["ID"];
+
+			$SiteServerName = (defined('SITE_SERVER_NAME') && strlen(SITE_SERVER_NAME) > 0 ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", $_SERVER['SERVER_NAME']));
+			if (strlen($SiteServerName) > 0)
+			{
+				$url = (CMain::IsHTTPS() ? "https" : "http")."://".$SiteServerName.$url;
+			}
+		}
+
+		return $url;
+	}	
 
 	public static function OnUserDelete($ID)
 	{
@@ -360,4 +600,23 @@ class CIMEvent
 	}
 }
 
+class DesktopApplication extends Bitrix\Main\Authentication\Application
+{
+	protected $validUrls = array(
+		"/desktop_app/",
+		"/bitrix/tools/disk/",
+		"/bitrix/services/disk/index.php"
+	);
+
+	public static function OnApplicationsBuildList()
+	{
+		return array(
+			"ID" => "desktop",
+			"NAME" => GetMessage('DESKTOP_APPLICATION_NAME'),
+			"DESCRIPTION" => GetMessage("DESKTOP_APPLICATION_DESC"),
+			"SORT" => 2100,
+			"CLASS" => "DesktopApplication",
+		);
+	}
+}
 ?>

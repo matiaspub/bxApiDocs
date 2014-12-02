@@ -7,6 +7,7 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\SystemException;
 
 /**
  * Expr field is to describe dynamic fields by expression, e.g. we have PRICE_USD field and need to count price in EUR
@@ -46,9 +47,6 @@ class ExpressionField extends Field
 
 	protected $hasSubquery;
 
-	protected $options;
-
-
 	protected static
 		$aggrFunctionsMYSQL = array('AVG', 'BIT_AND', 'BIT_OR', 'BIT_XOR', 'COUNT',
 			'GROUP_CONCAT', 'MAX', 'MIN', 'STD', 'STDDEV_POP', 'STDDEV_SAMP',
@@ -72,27 +70,36 @@ class ExpressionField extends Field
 		),
 		$aggrFunctions;
 
-
-
-	public function __construct($name, $dataType, Base $entity, $expression, $parameters = array())
+	/**
+	 * All fields in exression should be placed as %s (or as another placeholder for sprintf),
+	 * and the real field names being carrying in $buildFrom array (= args for sprintf)
+	 *
+	 * @param string            $name
+	 * @param string            $expression
+	 * @param array|string|null $buildFrom
+	 * @param array             $parameters
+	 */
+	public function __construct($name, $expression, $buildFrom = null, $parameters = array())
 	{
-		parent::__construct($name, $dataType, $entity, $parameters);
-
-		$this->buildFrom = $expression;
-		$this->expression = array_shift($this->buildFrom);
-
-		unset($parameters['expression']);
-		$this->valueField = $this->entity->initializeField($name, $parameters);
-
-		if (!($this->valueField instanceof ScalarField))
+		if (!isset($parameters['data_type']))
 		{
-			throw new \Exception('expression field can only be a scalar type.');
+			$parameters['data_type'] = 'string';
 		}
 
-		if (isset($parameters['options']))
+		parent::__construct($name, $parameters);
+
+		$this->expression = $expression;
+
+		if (!is_array($buildFrom) && $buildFrom !== null)
 		{
-			$this->options = $parameters['options'];
+			$buildFrom = array($buildFrom);
 		}
+		elseif ($buildFrom === null)
+		{
+			$buildFrom = array();
+		}
+
+		$this->buildFrom = $buildFrom;
 	}
 
 	public function __call($name, $arguments)
@@ -100,9 +107,19 @@ class ExpressionField extends Field
 		return call_user_func_array(array($this->valueField, $name), $arguments);
 	}
 
-	public function validateValue($value, $row, Result $result)
+	public function setEntity(Base $entity)
 	{
-		return $this->valueField->validateValue($value, $row, $result);
+		parent::setEntity($entity);
+
+		$parameters = $this->initialParameters;
+
+		unset($parameters['expression']);
+		$this->valueField = $this->entity->initializeField($this->name, $parameters);
+
+		if (!($this->valueField instanceof ScalarField))
+		{
+			throw new SystemException('expression field can only be a scalar type.');
+		}
 	}
 
 	public function getExpression()
@@ -167,19 +184,25 @@ class ExpressionField extends Field
 
 			foreach ($this->buildFrom as $elem)
 			{
-				$this->buildFromChains[] = QueryChain::getChainByDefinition($this->entity, $elem);
+				// validate if build from scalar or expression
+				$chain = QueryChain::getChainByDefinition($this->entity, $elem);
+				$field = $chain->getLastElement()->getValue();
+
+				if ($field instanceof ScalarField || $field instanceof ExpressionField)
+				{
+					$this->buildFromChains[] = $chain;
+				}
+				else
+				{
+					throw new SystemException(sprintf(
+						'Expected ScalarField or ExpressionField in `%s` build_from, but `%s` was given.',
+						$this->name, is_object($field) ? get_class($field).':'.$field->getName() : gettype($field)
+					));
+				}
 			}
 		}
 
 		return $this->buildFromChains;
-	}
-
-	/**
-	 * @return array|null
-	 */
-	public function getOptions()
-	{
-		return $this->options;
 	}
 
 	public static function checkAggregation($expression)
@@ -192,27 +215,110 @@ class ExpressionField extends Field
 		}
 
 		// should remove subqueries from expression here: EXISTS(..(..)..), (SELECT ..(..)..)
+		$expression = static::removeSubqueries($expression);
 
-		if (preg_match('/(?:^|[^a-z0-9_])EXISTS\s*\(/', $expression))
-		{
-			return false;
-		}
-		else
-		{
-			preg_match_all('/(?:^|[^a-z0-9_])(?<!SELECT\s\s)('.join('|', self::$aggrFunctions).')[\s\(]+/i', $expression, $matches);
+		// then check for aggr functions
+		preg_match_all('/(?:^|[^a-z0-9_])('.join('|', self::$aggrFunctions).')[\s\(]+/i', $expression, $matches);
 
-			return $matches[1];
-		}
+		return isset($matches[1]) ? $matches[1] : null;
 	}
 
 	public static function checkSubquery($expression)
 	{
-		return (preg_match('/(?:^|[^a-z0-9_])EXISTS\s*\(/', $expression) || preg_match('/(?:^|[^a-z0-9_])\(\s*SELECT/', $expression));
+		return (preg_match('/(?:^|[^a-zA-Z0-9_])EXISTS\s*\(/i', $expression) || preg_match('/(?:^|[^a-zA_Z0-9_])\(\s*SELECT/i', $expression));
+	}
+
+	public static function removeSubqueries($expression)
+	{
+		// remove double slashes
+		$expression = str_replace('\\\\\\\\', '', $expression);
+
+		// remove strings
+		$expression = static::removeStrings('"', $expression);
+		$expression = static::removeStrings("'", $expression);
+
+		// remove subqueries' bodies
+		$clear = static::removeSubqueryBody($expression);
+
+		while ($clear !== $expression)
+		{
+			$expression = $clear;
+			$clear = static::removeSubqueryBody($expression);
+		}
+
+		return $clear;
+	}
+
+	protected static function removeStrings($quote, $expression)
+	{
+		// remove escaped quotes
+		$expression = str_replace('\\' . $quote, '', $expression);
+
+		// remove quoted strings
+		$expression = preg_replace('/' . $quote . '.*?' . $quote . '/', '', $expression);
+
+		return $expression;
+	}
+
+	protected static function removeSubqueryBody($query)
+	{
+		$subqPattern = '\(\s*SELECT\s+';
+
+		$matches = null;
+		preg_match('/' . $subqPattern . '/i', $query, $matches);
+
+		if (!empty($matches))
+		{
+			$substring = $matches[0];
+
+			$subqPosition = strpos($query, $substring);
+			$subqStartPosition = $subqPosition + strlen($substring);
+
+			$bracketsCount = 1;
+			$currentPosition = $subqStartPosition;
+
+			// until initial bracket is closed
+			while ($bracketsCount > 0)
+			{
+				$symbol = substr($query, $currentPosition, 1);
+
+				if ($symbol == '')
+				{
+					// end of string
+					break;
+				}
+
+				if ($symbol == '(')
+				{
+					$bracketsCount++;
+				}
+				elseif ($symbol == ')')
+				{
+					$bracketsCount--;
+				}
+
+				$currentPosition++;
+			}
+
+			$query = substr($query, 0, $subqPosition) . substr($query, $currentPosition);
+		}
+
+		return $query;
+	}
+
+	/**
+	 * @deprecated
+	 * @return null|string
+	 */
+	public function getDataType()
+	{
+		return $this->valueField->getDataType();
 	}
 
 	public function __clone()
 	{
 		$this->buildFromChains = null;
+		$this->fullExpression = null;
 	}
 }
 

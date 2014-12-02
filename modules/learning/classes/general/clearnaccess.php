@@ -172,11 +172,14 @@ class CLearnAccess implements ILearnAccessInterface
 
 
 	// prevent wakeup
-	static private function __wakeup()
+	private function __wakeup()
 	{
 	}
 
-
+	/**
+	 * @param $in_userId
+	 * @return CLearnAccess
+	 */
 	public static function GetInstance($in_userId)
 	{
 		$userId = self::StrictlyCastToInteger ($in_userId);
@@ -213,7 +216,7 @@ class CLearnAccess implements ILearnAccessInterface
 	}
 
 
-	public static function GetNameForTask ($taskId)
+	public static function GetNameForTask($taskId)
 	{
 		global $DB, $MESS;
 
@@ -234,10 +237,7 @@ class CLearnAccess implements ILearnAccessInterface
 
 		$nameUpperCase = strtoupper($row['NAME']);
 
-		if (isset($MESS['TASK_NAME_' . $nameUpperCase]))
-			return ($MESS['TASK_NAME_' . $nameUpperCase]);
-		else
-			return ($nameUpperCase);
+		return CTask::GetLangTitle($nameUpperCase, "learning");
 	}
 
 
@@ -268,22 +268,15 @@ class CLearnAccess implements ILearnAccessInterface
 		while ($row = $rc->Fetch())
 		{
 			$nameUpperCase = strtoupper($row['NAME']);
-			$descrUpperCase = strtoupper($row['DESCRIPTION']);
 
 			$arPossibleRights[$row['ID']] = array(
 				'name'              => $row['NAME'],
-				'name_human'        => $nameUpperCase,
+				'name_human'        => CTask::GetLangTitle($nameUpperCase, "learning"),
 				'sys'               => $row['SYS'],
 				'description'       => $row['DESCRIPTION'],
-				'description_human' => $descrUpperCase,
+				'description_human' => CTask::GetLangDescription($nameUpperCase, "", "learning"),
 				'binding'           => $row['BINDING']
-				);
-
-			if (isset($MESS['TASK_NAME_' . $nameUpperCase]))
-				$arPossibleRights[$row['ID']]['name_human'] = $MESS['TASK_NAME_' . $nameUpperCase];
-
-			if (isset($MESS['TASK_DESC_' . $descrUpperCase]))
-				$arPossibleRights[$row['ID']]['description_human'] = $MESS['TASK_DESC_' . $descrUpperCase];
+			);
 		}
 
 		return ($arPossibleRights);
@@ -661,7 +654,7 @@ class CLearnAccess implements ILearnAccessInterface
 	{
 		static $cacheArIds = array();
 
-		$lessonId = self::StrictlyCastToInteger($in_lessonId);
+		$lessonId = intval($in_lessonId);
 
 		$cacheKey = 'k' . $in_bitmaskOperations;
 
@@ -669,9 +662,13 @@ class CLearnAccess implements ILearnAccessInterface
 			$cacheArIds[$cacheKey] = $this->GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache);
 
 		if (in_array($lessonId, $cacheArIds[$cacheKey]))
+		{
 			return (true);
+		}
 		else
+		{
 			return (false);
+		}
 	}
 
 

@@ -7,7 +7,7 @@ class CBXVirtualIoFileSystem
 
 	const directionEncode = 1;
 	const directionDecode = 2;
-	const invalidChars = "\\/:*?\"'<>|~#";
+	const invalidChars = "\\/:*?\"'<>|~#&;";
 
 	private $arErrors = array();
 
@@ -250,7 +250,12 @@ class CBXVirtualIoFileSystem
 
 	public static function RandomizeInvalidFilename($filename)
 	{
-		return preg_replace("#([\x01-\x1F".preg_quote(self::invalidChars, "#")."])#e", "chr(rand(97, 122))", $filename);
+		return preg_replace_callback("#([\x01-\x1F".preg_quote(self::invalidChars, "#")."])#", 'CBXVirtualIoFileSystem::getRandomChar', $filename);
+	}
+
+	public static function getRandomChar()
+	{
+		return chr(rand(97, 122));
 	}
 
 	static public function DirectoryExists($path)
@@ -765,4 +770,3 @@ class CBXVirtualDirectoryFileSystem
 		$this->arErrors = array();
 	}
 }
-?>

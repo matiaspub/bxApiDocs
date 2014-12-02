@@ -70,6 +70,10 @@ class CAllEvent
 	*/
 	public static function SendImmediate($event, $lid, $arFields, $Duplicate = "Y", $message_id="")
 	{
+		foreach(GetModuleEvents("main", "OnBeforeEventAdd", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array(&$event, &$lid, &$arFields, &$message_id)) === false)
+				return false;
+
 		$flds = "";
 		if(is_array($arFields))
 		{
@@ -172,7 +176,7 @@ class CAllEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
-	* </li></ul> </h<a name="examples"></a>
+	* </li></ul> <a name="examples"></a>
 	*
 	*
 	* @static
@@ -425,7 +429,7 @@ class CAllEvent
 		while($db_mail_result_array = $db_mail_result->Fetch())
 		{
 			$rsMail = $DB->Query("
-				SELECT ID, SUBJECT, MESSAGE, EMAIL_FROM, EMAIL_TO, BODY_TYPE, BCC, CC, REPLY_TO, IN_REPLY_TO, PRIORITY, FIELD1_NAME, FIELD1_VALUE, FIELD2_NAME, FIELD2_VALUE
+				SELECT ID, EVENT_NAME, SUBJECT, MESSAGE, EMAIL_FROM, EMAIL_TO, BODY_TYPE, BCC, CC, REPLY_TO, IN_REPLY_TO, PRIORITY, FIELD1_NAME, FIELD1_VALUE, FIELD2_NAME, FIELD2_VALUE
 				FROM b_event_message M
 				WHERE M.ID = ".intval($db_mail_result_array["ID"])."
 			");
@@ -446,7 +450,12 @@ class CAllEvent
 				$arFields = $ar + CAllEvent::GetSiteFieldsArray(false);
 
 			foreach (GetModuleEvents("main", "OnBeforeEventSend", true) as $event)
-				ExecuteModuleEventEx($event, array(&$arFields, &$db_mail_result_array));
+			{
+				if(ExecuteModuleEventEx($event, array(&$arFields, &$db_mail_result_array)) === false)
+				{
+					continue 2;
+				}
+			}
 
 			$arMailFields = array();
 			$arMailFields["From"] = CAllEvent::ReplaceTemplate($db_mail_result_array["EMAIL_FROM"], $arFields);
@@ -896,7 +905,7 @@ class CAllEventMessage
 	*
 	*
 	*
-	* @param int $id  ID шаблона.
+	* @param int $id  ID шаблона.</bo
 	*
 	*
 	*
@@ -950,7 +959,7 @@ class CAllEventMessage
 	*
 	*
 	*
-	* @param int $id  ID шаблона.
+	* @param int $id  ID шаблона.</bo
 	*
 	*
 	*
@@ -1212,6 +1221,56 @@ class CEventType
 		return false;
 	}
 
+	
+	/**
+	* <p>Изменяет параметры типа почтового события. Возвращается объект класса CDBResult. При возникновении ошибки функция вернет <i>false</i>, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
+	*
+	*
+	*
+	*
+	* @param array $ID  Массив значений ID почтовых событий, которые нужно изменить. В
+	* массиве допустимо использовать: <ul> <li> <b>ID</b> - идентификатор типа
+	* почтового события</li> <li> <b>LID</b> - язык интерфейса</li> <li> <b>EVENT_NAME</b> -
+	* идентификатор почтового события </li> </ul>
+	*
+	*
+	*
+	* @param array $fields  Массив значений <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">полей</a> вида
+	* array("поле"=&gt;"значение" [, ...]). В качестве "полей" допустимо
+	* использовать: <ul> <li> <b>LID</b> - язык интерфейса</li> <li> <b>EVENT_NAME</b> -
+	* идентификатор типа почтового события </li> <li> <b>NAME</b> - заголовок
+	* типа почтового события </li> <li> <b>DESCRIPTION</b> - описание задающее поля
+	* типа почтового события </li> </ul>
+	*
+	*
+	*
+	* @return CDBResult 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arType = array( 
+	*     "SORT" =&gt; $_POST["SORT"], 
+	*     "NAME" =&gt; $_POST["NAME"], 
+	*     "DESCRIPTION" =&gt; $_POST["DESCRIPTION"], 
+	*     "LID" =&gt; $_POST["LID"], 
+	*     "EVENT_NAME" =&gt; $_POST["EVENT_NAME"], 
+	* ); 
+	* CEventType::Update(array("ID" =&gt; $_POST["ID"]), $arType);
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/index.php">Поля типа
+	* почтового события</a> </li> </ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventtype/update.php
+	* @author Bitrix
+	*/
 	public static function Update($arID = array(), $arFields = array())
 	{
 		global $DB;
@@ -1495,11 +1554,11 @@ class CEventType
 	*
 	*
 	*
-	* @param string $type_id  Идентификатор типа почтового события.
+	* @param string $ID  Идентификатор типа почтового события.
 	*
 	*
 	*
-	* @param string $site_id  Идентификатор сайта.
+	* @param string $LID  Идентификатор языка. </htm
 	*
 	*
 	*

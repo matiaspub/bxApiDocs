@@ -198,7 +198,10 @@ class SitemapIblock
 				if(
 					$arguments[0]["ID"] > 0
 					&& $arguments[0]['IBLOCK_ID'] > 0
-					&& $arguments[0]['ACTIVE'] == 'Y'
+					&& (
+						!isset($arguments[0]['ACTIVE'])
+						|| $arguments[0]['ACTIVE'] == 'Y'
+					)
 				)
 				{
 					// we recieve array reference here

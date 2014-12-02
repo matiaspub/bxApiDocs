@@ -61,7 +61,9 @@ class CSocNetLogDestination
 			$arLastSelected = array_reverse(CUtil::JsObjectToPhp($arLastSelected['sonetgroups']));
 		}
 		else
+		{
 			$arLastSelected = array();
+		}
 
 		$count = 0;
 		$arSocnetGroups = Array();
@@ -117,6 +119,14 @@ class CSocNetLogDestination
 			"department_relation" => array(),
 			"department_relation_head" => array(),
 		);
+		
+		if (
+			isset($arParams["DEPARTMENT_ID"])
+			&& intval($arParams["DEPARTMENT_ID"]) > 0
+		)
+		{
+			$department_id = intval($arParams["DEPARTMENT_ID"]);
+		}
 
 		if($bIntranetEnable)
 		{
@@ -131,7 +141,7 @@ class CSocNetLogDestination
 					else
 						$ttl = 600;
 
-					$cache_id = 'sonet_structure_new4_'.$iblock_id;
+					$cache_id = 'sonet_structure_new4_'.$iblock_id.(intval($department_id) > 0 ? "_".$department_id : "");
 					$obCache = new CPHPCache;
 					$cache_dir = '/sonet/structure';
 
@@ -142,12 +152,38 @@ class CSocNetLogDestination
 					else
 					{
 						CModule::IncludeModule('iblock');
+
 						if(defined("BX_COMP_MANAGED_CACHE"))
+						{
 							$CACHE_MANAGER->StartTagCache($cache_dir);
+						}
+
+						$arFilter = array(
+							"IBLOCK_ID" => $iblock_id,
+							"ACTIVE" => "Y"
+						);
+
+						if (intval($department_id) > 0)
+						{
+							$rsSectionDepartment = CIBlockSection::GetList(
+								array(), 
+								array(
+									"ID" => intval($department_id)
+								),
+								false, 
+								array("ID", "LEFT_MARGIN", "RIGHT_MARGIN")
+							);
+
+							if ($arSectionDepartment = $rsSectionDepartment->Fetch())
+							{
+								$arFilter[">=LEFT_MARGIN"] = $arSectionDepartment["LEFT_MARGIN"];
+								$arFilter["<=RIGHT_MARGIN"] = $arSectionDepartment["RIGHT_MARGIN"];
+							}
+						}
 
 						$dbRes = CIBlockSection::GetList(
 							array("left_margin"=>"asc"),
-							array("IBLOCK_ID"=>$iblock_id),
+							$arFilter,
 							false,
 							array("ID", "IBLOCK_SECTION_ID", "NAME")
 						);
@@ -175,11 +211,16 @@ class CSocNetLogDestination
 			}
 		}
 
-		if (!empty( $result["department"]) && !isset($arParams["LAZY_LOAD"]))
+		if (
+			!empty( $result["department"]) 
+			&& !isset($arParams["LAZY_LOAD"])
+		)
 		{
-			$result["department_relation"] = self::GetTreeList('DR0', $result["department"], true);
+			$result["department_relation"] = self::GetTreeList('DR'.(intval($department_id) > 0 ? $department_id : 0), $result["department"], true);
 			if (intval($arParams["HEAD_DEPT"]) > 0)
+			{
 				$result["department_relation_head"] = self::GetTreeList('DR'.intval($arParams["HEAD_DEPT"]), $result["department"], true);
+			}
 		}
 
 		return $result;
@@ -407,6 +448,7 @@ class CSocNetLogDestination
 						'name' => $sName,
 						'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
 						'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION'] ? $arUser['PERSONAL_PROFESSION'] : '&nbsp;'),
+						'isExtranet' => (isset($GLOBALS["arExtranetUserID"]) && is_array($GLOBALS["arExtranetUserID"]) && in_array($arUser["ID"], $GLOBALS["arExtranetUserID"]) ? "Y" : "N")
 					);
 					if (defined("BX_COMP_MANAGED_CACHE"))
 						$GLOBALS["CACHE_MANAGER"]->RegisterTag("USER_NAME_".IntVal($arUser["ID"]));
@@ -499,18 +541,11 @@ class CSocNetLogDestination
 		return $GLOBALS["SOCNET_LOG_DESTINATION"]["GetGratMedalUsers"][$userId];
 	}
 
-	public static function SearchUsers($search, $nameTemplate = "", $bSelf = true, $bEmployeesOnly = false, $bExtranetOnly = false)
+	public static function SearchUsers($search, $nameTemplate = "", $bSelf = true, $bEmployeesOnly = false, $bExtranetOnly = false, $departmentId = false)
 	{
 		CUtil::JSPostUnescape();
 
-		$bIntranetEnable = IsModuleInstalled('intranet');
-		$bExtranetEnable = IsModuleInstalled('extranet');
-		$bBitrix24Enable = IsModuleInstalled('bitrix24');
-
 		$arUsers = array();
-		$arTmpUsers = array();
-		$arExtranetTestUsers = array();
-
 		$search = trim($search);
 		if (
 			strlen($search) <= 0
@@ -520,9 +555,26 @@ class CSocNetLogDestination
 			return $arUsers;
 		}
 
+		$bIntranetEnable = IsModuleInstalled('intranet');
+		$bExtranetEnable = CModule::IncludeModule('extranet');
+		$bBitrix24Enable = IsModuleInstalled('bitrix24');
+		$bExtranetUser = ($bExtranetEnable && !CExtranet::IsIntranetUser());
+		$current_user_id = intval($GLOBALS["USER"]->GetID());
+
+		if ($bExtranetEnable)
+		{
+			CSocNetTools::InitGlobalExtranetArrays();
+		}
+
 		$arFilter = array(
-			"ACTIVE" => "Y",
-			"NAME_SEARCH" => $search,
+			array(
+				'LOGIC' => 'OR',
+				'%NAME' => preg_split('/\s+/', trim($search)),
+				'%LAST_NAME' => preg_split('/\s+/', trim($search)),
+				'%EMAIL' => $search,
+				'%LOGIN' => $search,
+			),
+			'ACTIVE' => 'Y'
 		);
 
 		if (
@@ -537,105 +589,78 @@ class CSocNetLogDestination
 			$arFilter["UF_DEPARTMENT"] = false;
 		}
 
-		$arExtParams = Array(
-			"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "WORK_POSITION", "PERSONAL_PROFESSION", "IS_ONLINE"),
-			"NAV_PARAMS" => Array("nTopCount" => 20)
-		);
+		if(
+			$bIntranetEnable
+			&& $bExtranetEnable
+			&& (
+				$bExtranetUser
+				|| !$bEmployeesOnly
+			)
+		)
+		{
+			$arFilteredUserIDs = CExtranet::GetMyGroupsUsersSimple(CExtranet::GetExtranetSiteID());
+
+			if ($bExtranetUser)
+			{
+				$arFilter["ID"] = array_merge(array($current_user_id), $arFilteredUserIDs);
+			}
+			else
+			{
+				$arFilter[] = array(
+					'LOGIC' => 'OR',
+					'!UF_DEPARTMENT' => false,
+					'ID' => array_merge(array($current_user_id), $arFilteredUserIDs)
+				);
+			}
+		}
+
+		$arSelect = array("ID", "NAME", "LAST_NAME", "SECOND_NAME", "EMAIL", "LOGIN", "WORK_POSITION", "PERSONAL_PROFESSION", "PERSONAL_PHOTO", "PERSONAL_GENDER");
 		if ($bIntranetEnable)
 		{
-			$arExtParams['SELECT'] = array('UF_DEPARTMENT');
+			$arSelect[] = 'UF_DEPARTMENT';
 		}
-		$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc', 'IS_ONLINE'=>'desc')), ($dummy=''), $arFilter, $arExtParams);
-		while ($arUser = $dbUsers->GetNext())
+
+		if (intval($departmentId) > 0)
+		{
+			$acc = new CAccess;
+		}
+
+		$rsUser = \Bitrix\Main\UserTable::getList(array(
+			'order' => array(
+				'LAST_NAME' => 'ASC'
+			),
+			'filter' => $arFilter,
+			'select' => $arSelect,
+			'limit' => 20,
+			'data_doubling' => false
+		));
+
+		while ($arUser = $rsUser->fetch())
 		{
 			if (
 				!$bSelf
-				&& is_object($GLOBALS["USER"])
-				&& $GLOBALS["USER"]->GetID() == $arUser['ID']
+				&& $current_user_id == $arUser['ID']
 			)
 			{
 				continue;
 			}
 
-			$arTmpUsers[$arUser["ID"]] = $arUser;
-			if(
-				$bIntranetEnable
-				&& $bExtranetEnable
-				&& !$bEmployeesOnly
-				&& (
-					!is_array($arUser["UF_DEPARTMENT"])
-					|| empty($arUser["UF_DEPARTMENT"])
-				)
-			)
+			if (is_object($acc))
 			{
-				$arExtranetTestUsers[$arUser["ID"]] = $arUser["ID"];
-			}
-		}
+				$acc->UpdateCodes(array("USER_ID" => $arUser["ID"]));
 
-		if (
-			!empty($arExtranetTestUsers)
-			&& CModule::IncludeModule('extranet')
-			&& CExtranet::IsIntranetUser()
-		)
-		{
-			global $USER;
-			$arUserSocNetGroups	= Array();
-			$rsGroups = CSocNetUserToGroup::GetList(
-				array("GROUP_NAME" => "ASC"),
-				array(
-					"USER_ID" => intval($USER->GetID()),
-					"<=ROLE" => SONET_ROLES_USER,
-					"GROUP_SITE_ID" => SITE_ID,
-					"GROUP_ACTIVE" => "Y",
-					"!GROUP_CLOSED" => "Y"
-				),
-				false,
-				array("nPageSize" => 500, "bDescPageNumbering" => false),
-				array("ID", "GROUP_ID")
-			);
-			while($arGroup = $rsGroups->Fetch())
-			{
-				$arUserSocNetGroups[] = $arGroup["GROUP_ID"];
-			}
-
-			if (count($arUserSocNetGroups) > 0)
-			{
-				$dbUsersInGroup = CSocNetUserToGroup::GetList(
-					array(),
-					array(
-						"GROUP_ID" => $arUserSocNetGroups,
-						"<=ROLE" => SONET_ROLES_USER,
-						"USER_ACTIVE" => "Y"
-					),
-					false,
-					false,
-					array("ID", "USER_ID", "GROUP_ID")
+				$arUserGroupCode = CAccess::GetUserCodesArray(
+					$arUser["ID"], 
+					array("PROVIDER_ID" => "intranet")
 				);
-				while ($ar = $dbUsersInGroup->GetNext(true, false))
-				{
-					$arSelect[$ar["USER_ID"]] = $ar["USER_ID"];
-				}
 
-				foreach ($arExtranetTestUsers as $userId)
+				if (!in_array("DR".intval($departmentId), $arUserGroupCode))
 				{
-					if (!isset($arSelect[$userId]))
-					{
-						unset($arTmpUsers[$userId]);
-					}
+					continue;
 				}
 			}
-			else
-			{
-				foreach ($arExtranetTestUsers as $userId)
-				{
-					unset($arTmpUsers[$userId]);
-				}
-			}
-		}
 
-		foreach ($arTmpUsers as $arUser)
-		{
-			$sName = CUser::FormatName(empty($nameTemplate) ? CSite::GetNameFormat(false) : $nameTemplate, $arUser, true, false);
+			$sName = CUser::FormatName(empty($nameTemplate) ? CSite::GetNameFormat(false) : $nameTemplate, $arUser, true, false);			
 
 			$arFileTmp = CFile::ResizeImageGet(
 				$arUser["PERSONAL_PHOTO"],
@@ -649,9 +674,19 @@ class CSocNetLogDestination
 				'entityId' => $arUser["ID"],
 				'name' => $sName,
 				'avatar' => empty($arFileTmp['src'])? '': $arFileTmp['src'],
-				'desc' => $arUser['WORK_POSITION'] ? $arUser['WORK_POSITION'] : ($arUser['PERSONAL_PROFESSION']?$arUser['PERSONAL_PROFESSION']:'&nbsp;'),
+				'desc' => (
+					$arUser['WORK_POSITION'] 
+						? $arUser['WORK_POSITION'] 
+						: (
+							$arUser['PERSONAL_PROFESSION']
+								? $arUser['PERSONAL_PROFESSION']
+								: '&nbsp;'
+						)
+				),
+				'isExtranet' => (isset($GLOBALS["arExtranetUserID"]) && is_array($GLOBALS["arExtranetUserID"]) && in_array($arUser["ID"], $GLOBALS["arExtranetUserID"]) ? "Y" : "N")
 			);
 		}
+
 		return $arUsers;
 	}
 
@@ -795,6 +830,95 @@ class CSocNetLogDestination
 				if (!$arGroupsActive[$group["id"]] || !$arGroupsPerms[$group["id"]])
 					unset($arGroups[$key]);
 		}
+	}
+
+	public static function GetDestinationUsers($arCodes, $bFetchUsers = false)
+	{
+		global $DB;
+		$arUsers = array();
+
+		$arCodes2 = array();
+		if (!$bFetchUsers)
+		{
+			foreach($arCodes as $code)
+			{
+				if (substr($code, 0, 1) === 'U' && $code !== 'UA')
+				{
+					$id = intVal(substr($code, 1));
+					if($id > 0)
+					{
+						$arUsers[] = $id;
+						continue;
+					}
+				}
+
+				if (substr($code, 0, 2) === 'SG')
+					$arCodes2[] = $code.'_K';
+				$arCodes2[] = $code;
+			}
+			$bUnique = count($arCodes2) > 0 && count($arUsers) > 0;
+		}
+		else
+		{
+			foreach($arCodes as $code)
+			{
+				if (substr($code, 0, 2) === 'SG')
+					$arCodes2[] = $code.'_K';
+				$arCodes2[] = $code;
+			}
+			$bUnique = false;
+		}
+
+		$obUserFieldsSql = new CUserTypeSQL();
+		$obUserFieldsSql->SetEntity("USER", "USER_ID");
+		$obUserFieldsSql->SetFilter(array(
+			"!UF_DEPARTMENT" => false
+		));
+
+		$where = $obUserFieldsSql->GetFilter();
+		$join = $obUserFieldsSql->GetJoin("UA.USER_ID");
+
+		$strCodes = in_array('UA', $arCodes2) ? "'G2'" : "'".join("','", $arCodes2)."'";
+
+		if ($bFetchUsers)
+		{
+			$strSql = "SELECT DISTINCT UA.USER_ID, U.LOGIN, U.NAME, U.LAST_NAME, U.SECOND_NAME, U.EMAIL, U.PERSONAL_PHOTO, U.WORK_POSITION ".
+				"FROM b_user_access UA
+				INNER JOIN b_user U ON (U.ID=UA.USER_ID)".
+				$join.
+				" WHERE ACCESS_CODE in (".$strCodes.") AND ".$where;
+		}
+		else
+		{
+			$strSql = "SELECT DISTINCT USER_ID ".
+				"FROM b_user_access UA ".
+				$join.
+				" WHERE ACCESS_CODE in (".$strCodes.") AND ".$where;
+		}
+
+		$res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+		if ($bFetchUsers)
+		{
+			while($ar = $res->Fetch())
+			{
+				if ($ar > 0)
+					$arUsers[] = $ar;
+			}
+		}
+		else
+		{
+			while($ar = $res->Fetch())
+			{
+				if($ar['USER_ID'] > 0)
+					$arUsers[] = $ar['USER_ID'];
+			}
+		}
+
+		if ($bUnique)
+			$arUsers = array_unique($arUsers);
+
+		return $arUsers;
 	}
 }
 ?>

@@ -29,7 +29,8 @@ class HostRestriction
 	const ACTION_STOP = 'stop';
 
 	private $optionPrefix = 'restriction_hosts_';
-	private $cacheId = 'security_restriction_hosts';
+	private $cacheInitPath = 'security';
+	private $cacheId = 'restriction_hosts';
 	private $cacheTtl = 31536000; //one year
 	private $action = 'stop';
 	private $actionOptions = array();
@@ -42,6 +43,9 @@ class HostRestriction
 	private $validationRegExp = null;
 	private $isActive = null;
 
+	/**
+	 * Handler for system event "OnPageStart", does nothing in CLI mode because it does not make sense
+	 */
 	public static function onPageStart()
 	{
 		if (\CSecuritySystemInformation::isCliMode())
@@ -61,7 +65,10 @@ class HostRestriction
 	}
 
 	/**
-	 * @param string $host
+	 * The main method that checks the current host, logging and starting action
+	 *
+	 * @param string $host Requested host for checking.
+	 * @return $this
 	 */
 	public function process($host = null)
 	{
@@ -69,18 +76,21 @@ class HostRestriction
 			$host = $this->getTargetHost();
 
 		if ($this->isValidHost($host))
-			return;
+			return $this;
 
 		if ($this->isLogNeeded)
 			$this->log($host);
 
 		$this->doActions();
 
+		return $this;
 	}
 
 	/**
-	 * @param string $host
-	 * @return bool
+	 * Checking host by host restriction policy
+	 *
+	 * @param string $host Host for checking.
+	 * @return bool Return true for valid (allowed) host.
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
 	public function isValidHost($host)
@@ -99,6 +109,7 @@ class HostRestriction
 	{
 		return array(
 			'hosts' => $this->hosts,
+			'current_host' => $this->getTargetHost(),
 			'action' => $this->action,
 			'action_options' => $this->actionOptions,
 			'logging' => $this->isLogNeeded,
@@ -107,7 +118,14 @@ class HostRestriction
 	}
 
 	/**
-	 * @param array $properties
+	 * Set various properties for host checking, now support:
+	 *  - hosts: a string with allowed hosts (wild card supported, e.g.: *.example.com) {@see setHosts}
+	 *  - action: a string with action for unallowed host {@see validActions}
+	 *  - action_options: array with some options for action {@see setAction}
+	 *  - logging: bool, set true if need logging unallowed host {@see setLogging}
+	 *  - active: bool, set true if automatic checking on every request needed
+	 *
+	 * @param array $properties See above.
 	 * @throws \Bitrix\Main\ArgumentOutOfRangeException
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @throws \Bitrix\Main\ArgumentNullException
@@ -163,15 +181,17 @@ class HostRestriction
 	}
 
 	/**
-	 * @param string $action
-	 * @param array $options
+	 * Set action performed while checking
+	 *
+	 * @param string $action Some action, now supported: redirect and stop.
+	 * @param array $options Some options for action, so far supported only host for redirect in redirect action.
 	 * @return $this
 	 * @throws \Bitrix\Security\LogicException
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @throws \Bitrix\Main\ArgumentNullException
 	 * @throws \Bitrix\Main\ArgumentOutOfRangeException
 	 */
-	public function setAction($action, $options = array())
+	public function setAction($action, array $options = array())
 	{
 		if (!$action)
 			throw new ArgumentNullException('action');
@@ -185,13 +205,10 @@ class HostRestriction
 		if ($action === self::ACTION_REDIRECT)
 		{
 			if (!isset($options['host']) || !$options['host'])
-			{
 				throw new LogicException('options[host] not present', 'SECURITY_HOSTS_EMPTY_HOST_ACTION');
-			}
 
-			if (!preg_match('~^https?://~', $options['host']))
+			if (!preg_match('#^https?://#', $options['host']))
 				throw new LogicException('invalid redirecting host present in options[host]', 'SECURITY_HOSTS_INVALID_HOST_ACTION');
-
 		}
 
 
@@ -210,7 +227,9 @@ class HostRestriction
 	}
 
 	/**
-	 * @param bool $isLogNeeded
+	 * Activate or deactivate logging on unallowed host requested
+	 *
+	 * @param bool $isLogNeeded Set true if need logging unallowed host.
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
@@ -220,6 +239,7 @@ class HostRestriction
 			throw new ArgumentTypeException('isLogNeeded', 'bool');
 
 		$this->isLogNeeded = $isLogNeeded;
+
 		return $this;
 	}
 
@@ -235,7 +255,9 @@ class HostRestriction
 	}
 
 	/**
-	 * @param bool $isActive
+	 * Activate or deactivate automatic checking
+	 *
+	 * @param bool $isActive Set true for enable checking on every request.
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @return $this
 	 */
@@ -245,6 +267,7 @@ class HostRestriction
 			throw new ArgumentTypeException('isActive', 'bool');
 
 		$this->isActive = $isActive;
+
 		return $this;
 	}
 
@@ -257,8 +280,10 @@ class HostRestriction
 	}
 
 	/**
-	 * @param string $hosts
-	 * @param bool $ignoreChecking
+	 * Set allowed hosts
+	 *
+	 * @param string $hosts Allowed hosts (wild card supported, e.g.: *.example.com).
+	 * @param bool $ignoreChecking Set false for disable host validating before set.
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @throws LogicException
 	 * @return $this
@@ -272,10 +297,14 @@ class HostRestriction
 			$this->checkNewHosts($hosts);
 
 		$this->hosts = $hosts;
+
 		return $this;
 	}
 
 	/**
+	 * Return regular expressions (based on hosts) for checking.
+	 * Note: regular expression is cached for performance improvement and auto cleared after saving {@see save}
+	 *
 	 * @return string
 	 */
 	public function getValidationRegExp()
@@ -284,7 +313,7 @@ class HostRestriction
 			return $this->validationRegExp;
 
 		$cache = Data\Cache::createInstance();
-		if($cache->initCache($this->cacheTtl, $this->cacheId) )
+		if($cache->initCache($this->cacheTtl, $this->cacheId, $this->cacheInitPath) )
 		{
 			$this->validationRegExp = $cache->getVars();
 		}
@@ -298,6 +327,11 @@ class HostRestriction
 		return $this->validationRegExp;
 	}
 
+	/**
+	 * Save all properties, enable automatic checking and clear cache if needed
+	 *
+	 * @return $this
+	 */
 	public function save()
 	{
 		Config\Option::set('security', $this->optionPrefix.'hosts', $this->hosts, '');
@@ -318,10 +352,14 @@ class HostRestriction
 					->unRegisterEventHandler('main', 'OnPageStart', 'security', get_class($this), 'onPageStart');
 			}
 		}
-		Data\Cache::createInstance()->clean($this->cacheId);
+		Data\Cache::createInstance()->clean($this->cacheId, $this->cacheInitPath);
+
+		return $this;
 	}
 
 	/**
+	 * Return true if HostRestriction already handled on system event "OnPageStart"
+	 *
 	 * @return bool
 	 */
 	protected function isBound()
@@ -338,6 +376,8 @@ class HostRestriction
 	}
 
 	/**
+	 * Return requested host for checking
+	 *
 	 * @return string
 	 */
 	protected function getTargetHost()
@@ -350,7 +390,9 @@ class HostRestriction
 	}
 
 	/**
-	 * @param string $host
+	 * Logging current host by event manager
+	 *
+	 * @param string $host Requested host.
 	 * @return bool
 	 */
 	protected function log($host)
@@ -358,6 +400,11 @@ class HostRestriction
 		return \CSecurityEvent::getInstance()->doLog('SECURITY', 'SECURITY_HOST_RESTRICTION', 'HTTP_HOST', $host);
 	}
 
+	/**
+	 * Perform some actions when requested host is not allowed by host restriction policy
+	 *
+	 * @return $this
+	 */
 	protected function doActions()
 	{
 		switch($this->action)
@@ -373,10 +420,14 @@ class HostRestriction
 			default:
 				trigger_error('Unknown action', E_USER_WARNING);
 		}
+
+		return $this;
 	}
 
 	/**
-	 * @param string $hosts
+	 * Generates regular expression obtained from hosts
+	 *
+	 * @param string $hosts Allowed hosts (wild card supported, e.g.: *.example.com).
 	 * @return string
 	 */
 	protected function genValidationRegExp($hosts)
@@ -389,10 +440,12 @@ class HostRestriction
 			$hosts
 		);
 
-		return "#^\s*($hosts)(:\d+)?\s*$#i";
+		return "#^\s*($hosts)(:\d+)?\s*$#iD";
 	}
 
 	/**
+	 * Checks the host to detect logical errors (eg blocking the current host)
+	 *
 	 * @param string $hosts
 	 * @return $this
 	 * @throws \Bitrix\Security\LogicException

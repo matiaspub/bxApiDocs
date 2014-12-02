@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CReferer</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтах</a>.
+ * <b>CReferer</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтах</a>.</body> </html>
  *
  *
  *

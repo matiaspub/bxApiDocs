@@ -72,7 +72,7 @@ class OldPage extends \Bitrix\Main\Page
 	}
 
 
-public static 	public function init()
+public static function init()
 	{
 		//language independed classes
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/punycode.php");
@@ -231,7 +231,7 @@ public static 	public function init()
 		$GLOBALS["arCustomTemplateEngines"] = array();
 	}
 
-public static 	public function authorizeUser()
+public static function authorizeUser()
 	{
 		// раскомментировать когда уберем из CurrentUser вызовы USER
 		//$GLOBALS["USER"] = new \CUser;

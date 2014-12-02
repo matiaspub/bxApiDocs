@@ -7,11 +7,11 @@
  */
 namespace Bitrix\Seo;
 
-use Bitrix\Main;
-use Bitrix\Main\Entity;
-use Bitrix\Main\Localization\Loc;
+use \Bitrix\Main;
+use \Bitrix\Main\Entity;
+use \Bitrix\Main\Localization\Loc;
 
-Loc::loadMessages('/bitrix/modules/seo/admin/sitemap_edit.php');
+Loc::loadMessages(__FILE__);
 
 // Table with settings
 class SitemapTable extends Entity\DataManager
@@ -53,7 +53,7 @@ class SitemapTable extends Entity\DataManager
 			'NAME' => array(
 				'data_type' => 'string',
 				'required' => true,
-				'title' => Loc::getMessage('SITEMAP_NAME'),
+				'title' => Loc::getMessage('SITEMAP_NAME_TITLE'),
 			),
 			'DATE_RUN' => array(
 				'data_type' => 'datetime',

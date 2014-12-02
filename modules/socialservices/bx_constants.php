@@ -1,5 +1,10 @@
 <?
 /**
+ * B24NETWORK_URL
+ */
+define('B24NETWORK_URL', 'https://www.bitrix24.net');
+
+/**
  * SOCSERV_AUTHORISATION_ERROR
  */
 define('SOCSERV_AUTHORISATION_ERROR', 1);

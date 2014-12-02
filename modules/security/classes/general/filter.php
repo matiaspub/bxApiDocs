@@ -14,6 +14,11 @@ class CSecurityFilter
 	/** @var \Bitrix\Main\Context $context */
 	private $context = null;
 	private $splittingChar = '';
+	protected $defaultAuditors = array(
+		array('type' => 'XSS', 'class' => 'Bitrix\Security\Filter\Auditor\Xss'),
+		array('type' => 'SQL', 'class' => 'Bitrix\Security\Filter\Auditor\Sql'),
+		array('type' => 'PHP', 'class' => 'Bitrix\Security\Filter\Auditor\Path')
+	);
 
 	public function __construct($customOptions = array(), $char = "")
 	{
@@ -226,11 +231,7 @@ class CSecurityFilter
 
 	protected function process()
 	{
-		$auditors = array(
-			'XSS' => new Filter\Auditor\Xss($this->splittingChar),
-			'SQL' => new Filter\Auditor\Sql($this->splittingChar),
-			'PHP' => new Filter\Auditor\Path($this->splittingChar)
-		);
+		$auditors = $this->getAuditorInstances();
 		$this->requestFilter->setAuditors($auditors);
 		$this->serverFilter->setAuditors($auditors);
 		$this->getHttpRequest()->addFilter($this->requestFilter);
@@ -250,6 +251,32 @@ class CSecurityFilter
 
 			$this->doPostProcessActions();
 		}
+	}
+
+	protected function getAuditors()
+	{
+		$wafConfig = \Bitrix\Main\Config\Configuration::getValue("waf");
+		if (is_array($wafConfig) && isset($wafConfig['auditors']))
+			return $wafConfig['auditors'];
+
+		return $this->defaultAuditors;
+	}
+
+	protected function getAuditorInstances()
+	{
+		$auditors = $this->getAuditors();
+		$result = array();
+		foreach($auditors as $auditor)
+		{
+			if (isset($auditor['file']))
+			{
+				include_once $auditor['file'];
+			}
+
+			$class = $auditor['class'];
+			$result[$auditor['type']] = new $class($this->splittingChar);
+		}
+		return $result;
 	}
 
 	protected function overrideSuperGlobals()
@@ -413,25 +440,30 @@ class CSecurityFilter
 	}
 
 	/**
-	 * @param string $pType
+	 * @param string $type
 	 * @return array
 	 */
-	protected static function getSuperGlobalArray($pType)
+	protected static function getSuperGlobalArray($type)
 	{
-		switch($pType)
+		switch($type)
 		{
+			case "g":
 			case "G":
 				return $_GET;
 			break;
+			case "p":
 			case "P":
 				return $_POST;
 			break;
+			case "c":
 			case "C":
 				return $_COOKIE;
 			break;
+			case "s":
 			case "S":
 				return $_SERVER;
 			break;
+			case "e":
 			case "E":
 				return $_ENV;
 			break;
@@ -441,11 +473,22 @@ class CSecurityFilter
 		}
 	}
 
+	protected static function getRequestOrder()
+	{
+		$result = ini_get("request_order");
+
+		if (!$result)
+			$result = ini_get("variables_order");
+
+		if (!$result)
+			$result = self::DEFAULT_REQUEST_ORDER;
+
+		return $result;
+	}
+
 	protected static function reconstructRequest()
 	{
-		$systemOrder = ini_get("request_order");
-		if(empty($systemOrder))
-			$systemOrder = self::DEFAULT_REQUEST_ORDER;
+		$systemOrder = static::getRequestOrder();
 
 		$_REQUEST = self::getSuperGlobalArray($systemOrder[0]);
 		for($i = 1, $count = strlen($systemOrder); $i < $count; $i ++)

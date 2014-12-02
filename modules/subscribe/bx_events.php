@@ -65,6 +65,68 @@ class _CEventsSubscribe {
 	 */
 	public static function BeforePostingSendMail($arFields){}
 
+	/**
+	 * при удалении сообщения.</body>
+	 * </htm
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * subscribe::UnInstallDB<br><br>
+	 */
+	public static function OnEventMessageDelete(){}
+
+	/**
+	 * перед удалением подписки.
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::Delete<br><br>
+	 */
+	public static function OnBeforeSubscriptionDelete(){}
+
+	/**
+	 * после удаления подписки.
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::Delete<br><br>
+	 */
+	public static function OnAfterSubscriptionDelete(){}
+
+	/**
+	 * при обновлении подписки.
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::CheckFields<br><br>
+	 */
+	public static function OnStartSubscriptionUpdate(){}
+
+	/**
+	 * перед обновлением подписки.
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::CheckFields<br><br>
+	 */
+	public static function OnBeforeSubscriptionUpdate(){}
+
+	/**
+	 * при добавлении подписки.
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::CheckFields<br><br>
+	 */
+	public static function OnStartSubscriptionAdd(){}
+
+	/**
+	 * перед добавлением подписки.
+	 * 
+	 * 
+	 * <i>Вызывается в методе:</i><br>
+	 * CSubscriptionGeneral::CheckFields<br><br>
+	 */
+	public static function OnBeforeSubscriptionAdd(){}
+
 
 }
 ?>

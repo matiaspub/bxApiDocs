@@ -8,14 +8,22 @@ class CIBlockPropertyTopicID
 			"PROPERTY_TYPE"		=>"S",
 			"USER_TYPE"		=>"TopicID",
 			"DESCRIPTION"		=> GetMessage("IBLOCK_PROP_TOPICID_DESC"),
-			"GetPropertyFieldHtml"	=>array("CIBlockPropertyTopicID","GetPropertyFieldHtml"),
-			"GetAdminListViewHTML"	=>array("CIBlockPropertyTopicID","GetAdminListViewHTML"),
+			"GetPropertyFieldHtml"	=>array(__CLASS__,"GetPropertyFieldHtml"),
+			"GetAdminListViewHTML"	=>array(__CLASS__,"GetAdminListViewHTML"),
 			//optional handlers
-			"ConvertToDB"		=>array("CIBlockPropertyTopicID","ConvertToDB"),
-			"ConvertFromDB"		=>array("CIBlockPropertyTopicID","ConvertFromDB"),
+			"ConvertToDB"		=>array(__CLASS__,"ConvertToDB"),
+			"ConvertFromDB"		=>array(__CLASS__,"ConvertFromDB"),
+			"GetSettingsHTML" => array(__CLASS__,"GetSettingsHTML"),
 		);
 	}
 
+	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	{
+		$arPropertyFields = array(
+			"HIDE" => array("SEARCHABLE", "WITH_DESCRIPTION", "ROW_COUNT", "COL_COUNT"),
+		);
+		return '';
+	}
 	//PARAMETERS:
 	//$arProperty - b_iblock_property.*
 	//$value - array("VALUE","DESCRIPTION") -- here comes HTML form value

@@ -1,17 +1,84 @@
 <?
-##############################################
-# Bitrix Site Manager                        #
-# Copyright (c) 2002-2007 Bitrix             #
-# http://www.bitrixsoft.com                  #
-# mailto:admin@bitrixsoft.com                #
-##############################################
-
-global $MESS;
-include(GetLangFileName($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/mail/lang/", "/classes/general/mail.php"));
+IncludeModuleLangFile(__FILE__);
 
 global $BX_MAIL_ERRORs, $B_MAIL_MAX_ALLOWED;
 $BX_MAIL_ERRORs = Array();
 $B_MAIL_MAX_ALLOWED = false;
+
+class CMail
+{
+	const ERR_DEFAULT = 1;
+	const ERR_DB      = 2;
+
+	const ERR_API_DEFAULT            = 101;
+	const ERR_API_DENIED             = 102;
+	const ERR_API_DOMAINLIST_EMPTY   = 103;
+	const ERR_API_NAME_OCCUPIED      = 104;
+	const ERR_API_USER_NOTFOUND      = 105;
+	const ERR_API_EMPTY_DOMAIN       = 106;
+	const ERR_API_EMPTY_NAME         = 107;
+	const ERR_API_EMPTY_PASSWORD     = 108;
+	const ERR_API_SHORT_PASSWORD     = 109;
+	const ERR_API_BAD_NAME           = 110;
+	const ERR_API_BAD_PASSWORD       = 111;
+	const ERR_API_PASSWORD_LIKELOGIN = 112;
+	const ERR_API_LONG_NAME          = 113;
+	const ERR_API_LONG_PASSWORD      = 114;
+	const ERR_API_OP_DENIED          = 115;
+
+	const ERR_API_DOMAIN_OCCUPIED    = 201;
+	const ERR_API_BAD_DOMAIN         = 202;
+	const ERR_API_PROHIBITED_DOMAIN  = 203;
+
+	const F_DOMAIN_LOGO = 1;
+	const F_DOMAIN_REG  = 2;
+
+	public static function getErrorMessage($code)
+	{
+		switch ($code)
+		{
+			case self::ERR_DB:
+				return GetMessage('MAIL_ERR_DB');
+			case self::ERR_API_DEFAULT:
+				return GetMessage('MAIL_ERR_API_DEFAULT');
+			case self::ERR_API_DENIED:
+				return GetMessage('MAIL_ERR_API_DENIED');
+			case self::ERR_API_NAME_OCCUPIED:
+				return GetMessage('MAIL_ERR_API_NAME_OCCUPIED');
+			case self::ERR_API_USER_NOTFOUND:
+				return GetMessage('MAIL_ERR_API_USER_NOTFOUND');
+			case self::ERR_API_EMPTY_DOMAIN:
+				return GetMessage('MAIL_ERR_API_EMPTY_DOMAIN');
+			case self::ERR_API_EMPTY_NAME:
+				return GetMessage('MAIL_ERR_API_EMPTY_NAME');
+			case self::ERR_API_EMPTY_PASSWORD:
+				return GetMessage('MAIL_ERR_API_EMPTY_PASSWORD');
+			case self::ERR_API_SHORT_PASSWORD:
+				return GetMessage('MAIL_ERR_API_SHORT_PASSWORD');
+			case self::ERR_API_BAD_NAME:
+				return GetMessage('MAIL_ERR_API_BAD_NAME');
+			case self::ERR_API_BAD_PASSWORD:
+				return GetMessage('MAIL_ERR_API_BAD_PASSWORD');
+			case self::ERR_API_PASSWORD_LIKELOGIN:
+				return GetMessage('MAIL_ERR_API_PASSWORD_LIKELOGIN');
+			case self::ERR_API_LONG_NAME:
+				return GetMessage('MAIL_ERR_API_LONG_NAME');
+			case self::ERR_API_LONG_PASSWORD:
+				return GetMessage('MAIL_ERR_API_LONG_PASSWORD');
+			case self::ERR_API_OP_DENIED:
+				return GetMessage('MAIL_ERR_API_OP_DENIED');
+			case self::ERR_API_DOMAIN_OCCUPIED:
+				return GetMessage('MAIL_ERR_API_DOMAIN_OCCUPIED');
+			case self::ERR_API_BAD_DOMAIN:
+				return GetMessage('MAIL_ERR_API_BAD_DOMAIN');
+			case self::ERR_API_PROHIBITED_DOMAIN:
+				return GetMessage('MAIL_ERR_API_PROHIBITED_DOMAIN');
+			default:
+				return GetMessage('MAIL_ERR_DEFAULT');
+		}
+	}
+
+}
 
 class CMailError
 {
@@ -24,7 +91,7 @@ class CMailError
 	public static function SetError($ID, $TITLE="", $DESC="")
 	{
 		global $BX_MAIL_ERRORs;
-		$BX_MAIL_ERRORs[] = Array("ID"=>$ID, "TITLE"=>$TITLE, "DESCRIPTION"=>$DESC);
+		$BX_MAIL_ERRORs[] = array("ID"=>$ID, "TITLE"=>$TITLE, "DESCRIPTION"=>$DESC);
 		return false;
 	}
 
@@ -48,7 +115,8 @@ class CMailError
 		$str = "";
 		foreach($BX_MAIL_ERRORs as $err)
 		{
-			if($str!="")$str.=$delim;
+			if ($str!="")
+				$str .= $delim;
 			$str.=$err["TITLE"];
 		}
 		return $str;
@@ -92,6 +160,10 @@ class CAllMailBox
 	var $last_result = true;
 	var $response = "";
 	var $response_body = "";
+	public $mailbox_id = 0;
+	public $new_mess_count = 0;
+	public $deleted_mess_count = 0;
+
 
 	public static function GetList($arOrder=Array(), $arFilter=Array())
 	{
@@ -112,10 +184,18 @@ class CAllMailBox
 			if (strlen($val)<=0) continue;
 			$key = strtoupper($filter_keys[$i]);
 
+			$strNegative = false;
 			if (substr($key, 0, 1) == '!')
 			{
 				$key = substr($key, 1);
 				$strNegative = 'Y';
+			}
+
+			$strExact = false;
+			if (substr($key, 0, 1) == '=')
+			{
+				$key = substr($key, 1);
+				$strExact = 'Y';
 			}
 
 			switch ($key)
@@ -136,7 +216,7 @@ class CAllMailBox
 				case 'DESCRIPTION':
 				case 'DOMAINS':
 				case 'SERVER_TYPE':
-					$arSqlSearch[] = GetFilterQuery('MB.'.$key, ($strNegative == 'Y' ? '~' : '').$val);
+					$arSqlSearch[] = GetFilterQuery('MB.'.$key, ($strNegative == 'Y' ? '~' : '').$val, $strExact == 'Y' ? 'N' : 'Y');
 					break;
 				case 'SERVICE_ID':
 				case 'USER_ID':
@@ -211,12 +291,9 @@ class CAllMailBox
 
 	public static function GetByID($ID)
 	{
-		global $DB;
 		return CMailBox::GetList(Array(), Array("ID"=>$ID));
 	}
 
-	/*********************************************************************
-	*********************************************************************/
 	public static function CheckMail($mailbox_id = false)
 	{
 		global $DB;
@@ -233,16 +310,18 @@ class CAllMailBox
 				$mbx[] = $ar["ID"];
 		}
 		else
+		{
 			$mbx[] = $mailbox_id;
+		}
 
 		$bNoErrors = true;
-		for($i = 0, $n = count($mbx); $i < $n; $i++)
+		foreach($mbx as $mailboxId)
 		{
 			$mb = new CMailbox();
-			if(!$mb->Connect($mbx[$i]))
+			if(!$mb->Connect($mailboxId))
 			{
 				$bNoErrors = false;
-				CMailError::SetError("ERR_CHECK_MAIL", GetMessage("MAIL_CL_ERR_CHECK_MAIL")." ".$ar["NAME"].".", "");
+				CMailError::SetError("ERR_CHECK_MAIL", GetMessage("MAIL_CL_ERR_CHECK_MAIL")." (mailbox id: ".$mailboxId.").", "");
 			}
 		}
 
@@ -284,8 +363,8 @@ class CAllMailBox
 
 	public static function CheckFields($arFields, $ID=false)
 	{
-		$err_cnt = CMailError::ErrCount();
-		$arMsg = Array();
+		global $APPLICATION;
+		$arMsg = array();
 
 		if (is_set($arFields, 'NAME') && strlen($arFields['NAME']) < 1)
 		{
@@ -293,7 +372,7 @@ class CAllMailBox
 			$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_NAME').'"');
 		}
 
-		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap')) && is_set($arFields, 'LOGIN') && strlen($arFields['LOGIN']) < 1)
+		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'imap', 'controller', 'domain', 'crdomain')) && is_set($arFields, 'LOGIN') && strlen($arFields['LOGIN']) < 1)
 		{
 			CMailError::SetError('B_MAIL_ERR_LOGIN', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
 			$arMsg[] = array('id' => 'LOGIN', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LOGIN').'"');
@@ -311,13 +390,13 @@ class CAllMailBox
 			$arMsg[] = array('id' => 'LINK', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_LINK').'"');
 		}
 
-		if (strtolower($arFields['SERVER_TYPE']) == 'imap' && is_set($arFields, 'USER_ID') && strlen($arFields['USER_ID']) < 1)
+		if (in_array(strtolower($arFields['SERVER_TYPE']), array('imap', 'controller', 'domain', 'crdomain')) && is_set($arFields, 'USER_ID') && strlen($arFields['USER_ID']) < 1)
 		{
 			CMailError::SetError('B_MAIL_ERR_USER_ID', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
 			$arMsg[] = array('id' => 'USER_ID', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_USER_ID').'"');
 		}
 
-		if (is_set($arFields, 'SERVER') && strlen($arFields['SERVER']) < 1)
+		if (in_array(strtolower($arFields['SERVER_TYPE']), array('pop3', 'smtp', 'imap')) && is_set($arFields, 'SERVER') && strlen($arFields['SERVER']) < 1)
 		{
 			CMailError::SetError('B_MAIL_ERR_SERVER_NAME', GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
 			$arMsg[] = array('id' => 'SERVER', 'text' => GetMessage('MAIL_CL_ERR_NAME').' "'.GetMessage('MAIL_CL_SERVER').'"');
@@ -374,7 +453,7 @@ class CAllMailBox
 		if (!empty($arMsg))
 		{
 			$e = new CAdminException($arMsg);
-			$GLOBALS['APPLICATION']->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 
@@ -398,7 +477,7 @@ class CAllMailBox
 		if($arFields["USE_TLS"]!="Y")
 			$arFields["USE_TLS"]="N";
 
-		if (!in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap")))
+		if (!in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap", "controller", "domain", "crdomain")))
 			$arFields["SERVER_TYPE"] = "pop3";
 
 		if(!CMailBox::CheckFields($arFields))
@@ -415,7 +494,7 @@ class CAllMailBox
 			CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$arFields['LID'], false, $arFields['USER_ID']);
 		}
 
-		$ID = CDatabase::Add("b_mail_mailbox", $arFields);
+		$ID = $DB->Add("b_mail_mailbox", $arFields);
 
 		if(intval($arFields["PERIOD_CHECK"])>0 && $arFields["SERVER_TYPE"]=="pop3")
 			CAgent::AddAgent("CMailbox::CheckMailAgent(".$ID.");", "mail", "N", intval($arFields["PERIOD_CHECK"])*60);
@@ -444,7 +523,7 @@ class CAllMailBox
 		if(is_set($arFields, "USE_TLS") && $arFields["USE_TLS"]!="Y")
 			$arFields["USE_TLS"]="N";
 
-		if (is_set($arFields, "SERVER_TYPE") && !in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap")))
+		if (is_set($arFields, "SERVER_TYPE") && !in_array($arFields["SERVER_TYPE"], array("pop3", "smtp", "imap", "controller", "domain", "crdomain")))
 			$arFields["SERVER_TYPE"] = "pop3";
 
 		if(!CMailBox::CheckFields($arFields, $ID))
@@ -471,10 +550,10 @@ class CAllMailBox
 					$newSiteId = isset($arFields['LID']) ? $arFields['LID'] : $mbox['LID'];
 
 					CUserOptions::SetOption('global', 'last_mail_check_'.$newSiteId, 0, false, $newUserId);
+					CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$newSiteId, false, $newUserId);
 				}
 
 				CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$mbox['LID'], false, $mbox['USER_ID']);
-				CUserOptions::DeleteOption('global', 'last_mail_check_success_'.$newSiteId, false, $newUserId);
 			}
 
 			if ($mbox['USER_ID'] != 0 || isset($arFields['USER_ID']) && $arFields['USER_ID'] != 0)
@@ -755,6 +834,7 @@ class CAllMailBox
 		if($this->mess_count>0)
 		{
 			$this->mess_size = $arStat[2];
+			$arLIST = array();
 
 			if($arMAILBOX_PARAMS["MAX_MSG_SIZE"]>0)
 			{
@@ -764,7 +844,6 @@ class CAllMailBox
 				$list = $this->GetResponseBody();
 				preg_match_all("'([0-9]+)[ ]+?(.+)'", $list, $arLIST_temp, PREG_SET_ORDER);
 
-				$arLIST = Array();
 				for($i = 0, $n = count($arLIST_temp); $i < $n; $i++)
 					$arLIST[IntVal($arLIST_temp[$i][1])] = IntVal($arLIST_temp[$i][2]);
 			}
@@ -776,36 +855,31 @@ class CAllMailBox
 			$uidl = $this->GetResponseBody();
 			preg_match_all("'([0-9]+)[ ]+?(.+)'", $uidl, $arUIDL_temp, PREG_SET_ORDER);
 
-			$arStrIDs = array();
 			$arUIDL = array();
 			$cnt = count($arUIDL_temp);
-			for($i=0; $i<$cnt; $i++)
-			{
-				$msguid = md5($arUIDL_temp[$i][2]);
-				$arUIDL[$msguid] = $arUIDL_temp[$i][1];
-				$arStrIDs[floor($i / 1000)] .= ", '".$DB->ForSQL($msguid)."'";
-			}
+			for ($i = 0; $i < $cnt; $i++)
+				$arUIDL[md5($arUIDL_temp[$i][2])] = $arUIDL_temp[$i][1];
 
-
-			if(count($arUIDL) > 0)
+			$arOldUIDL = array();
+			if (count($arUIDL) > 0)
 			{
-				$cnt = count($arStrIDs);
-				for ($i = 0; $i < $cnt; ++$i)
+				$strSql = 'SELECT ID FROM b_mail_message_uid WHERE MAILBOX_ID = ' . $mailbox_id;
+				$db_res = $DB->query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+				while ($ar_res = $db_res->fetch())
 				{
-					$ids = 'ID IN ('.substr($arStrIDs[$i], 2).')';
-
-					$strSql = "SELECT ID FROM b_mail_message_uid WHERE MAILBOX_ID=".$mailbox_id." AND ($ids)";
-					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					while($ar_res = $db_res->Fetch())
-						UnSet($arUIDL[$ar_res["ID"]]);
-
-					$strSql = "UPDATE b_mail_message_uid SET SESSION_ID = '".$session_id."' WHERE MAILBOX_ID=".$mailbox_id." AND ($ids)";
-					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if (isset($arUIDL[$ar_res['ID']]))
+						unset($arUIDL[$ar_res['ID']]);
+					else
+						$arOldUIDL[] = $ar_res['ID'];
 				}
 			}
 
-			$strSql = "DELETE FROM b_mail_message_uid WHERE MAILBOX_ID=".$mailbox_id." AND SESSION_ID <> '".$session_id."'";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			while (count($arOldUIDL) > 0)
+			{
+				$ids = "'" . join("','", array_splice($arOldUIDL, 0, 1000)) . "'";
+				$strSql = 'DELETE FROM b_mail_message_uid WHERE MAILBOX_ID = ' . $mailbox_id . ' AND ID IN (' . $ids . ')';
+				$DB->query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			}
 
 			$this->new_mess_count = 0;
 			$this->deleted_mess_count = 0;
@@ -849,16 +923,6 @@ class CAllMailBox
 		$message_id = CMailMessage::AddMessage($mailbox_id, $message, $this->charset);
 		if($message_id>0)
 		{
-			/*
-			$arFields = array(
-				"ID"			=> "'".$DB->ForSql($msguid)."'",
-				"MAILBOX_ID"	=> intval($mailbox_id),
-				"SESSION_ID"	=> "'".$DB->ForSql($session_id)."'",
-				"DATE_INSERT"	=> $DB->GetNowFunction(),
-				"MESSAGE_ID"	=> $message_id
-				);
-			$DB->Insert("b_mail_message_uid", $arFields, "File: ".__FILE__."<br>Line: ".__LINE__);
-			*/
 			$strSql = "INSERT INTO b_mail_message_uid(ID, MAILBOX_ID, SESSION_ID, DATE_INSERT, MESSAGE_ID) VALUES('".$DB->ForSql($msguid)."', ".IntVal($mailbox_id).", '".$DB->ForSql($session_id)."', ".$DB->GetNowFunction().", ".IntVal($message_id).")";
 			$DB->Query($strSql);
 
@@ -886,6 +950,7 @@ class CMailHeader
 	var $strHeader = "";
 	var $bMultipart = false;
 	var $content_type, $boundary, $charset, $filename, $MultipartType="mixed";
+	public $content_id = '';
 
 	public static function ConvertHeader($encoding, $type, $str, $charset)
 	{
@@ -903,13 +968,19 @@ class CMailHeader
 	{
 		while(preg_match('/(=\?[^?]+\?(Q|B)\?[^?]*\?=)(\s)+=\?/i', $str))
 			$str = preg_replace('/(=\?[^?]+\?(Q|B)\?[^?]*\?=)(\s)+=\?/i', '\1=?', $str);
-		if(!preg_match("'=\?(.*)\?(B|Q)\?(.*)\?='ie", $str))
+		if(!preg_match("'=\?(.*)\?(B|Q)\?(.*)\?='i", $str))
 		{
 			if(strlen($charset_document)>0 && $charset_document!=$charset_to)
 				$str = CMailUtil::ConvertCharset($str, $charset_document, $charset_to);
 		}
 		else
-			$str = preg_replace("'=\?(.*?)\?(B|Q)\?(.*?)\?='ie", "CMailHeader::ConvertHeader('\\1', '\\2', '\\3', '".AddSlashes($charset_to)."')", $str);
+		{
+			$str = preg_replace_callback(
+				"'=\?(.*?)\?(B|Q)\?(.*?)\?='i",
+				create_function('$m', "return CMailHeader::ConvertHeader(\$m[1], \$m[2], \$m[3], '".AddSlashes($charset_to)."');"),
+				$str
+			);
+		}
 
 		return $str;
 	}
@@ -970,8 +1041,8 @@ class CMailHeader
 		if(strpos(strtolower($this->content_type), "multipart/") === 0)
 		{
 			$this->bMultipart = true;
-			if(!preg_match("'boundary=(.+);'i", $full_content_type, $res))
-				preg_match("'boundary=(.+)'i", $full_content_type, $res);
+			if (!preg_match("'boundary\s*=(.+);'i", $full_content_type, $res))
+				preg_match("'boundary\s*=(.+)'i", $full_content_type, $res);
 
 			$this->boundary = trim($res[1], '"');
 			if($p = strpos($this->content_type, "/"))
@@ -1224,160 +1295,144 @@ class CAllMailMessage
 		return $h;
 	}
 
+	private static function decodeMessageBody($header, $body, $charset)
+	{
+		$encoding = strtolower($header->GetHeader('CONTENT-TRANSFER-ENCODING'));
+
+		if ($encoding == 'base64')
+			$body = base64_decode($body);
+		elseif ($encoding == 'quoted-printable')
+			$body = quoted_printable_decode($body);
+		elseif ($encoding == 'x-uue')
+			$body = CMailUtil::uue_decode($body);
+
+		$content_type = strtolower($header->content_type);
+		if ((strpos($content_type, 'plain') !== false || strpos($content_type, 'html') !== false || strpos($content_type, 'text') !== false) && strpos($content_type, 'x-vcard') === false)
+			$body = CMailUtil::ConvertCharset($body, $header->charset, $charset);
+
+		return array(
+			'CONTENT-TYPE' => $content_type,
+			'CONTENT-ID'   => $header->content_id,
+			'BODY'         => $body,
+			'FILENAME'     => $header->filename
+		);
+	}
+
+	private static function parseMessage($message, $charset)
+	{
+		$headerP = strpos($message, "\r\n\r\n");
+
+		$rawHeader = substr($message, 0, $headerP);
+		$body      = substr($message, $headerP+4);
+
+		$header = CMailMessage::ParseHeader($rawHeader, $charset);
+
+		$htmlBody = '';
+		$textBody = '';
+
+		$parts = array();
+
+		if ($header->IsMultipart())
+		{
+			$startB = "\r\n--" . $header->GetBoundary() . "\r\n";
+			$endB   = "\r\n--" . $header->GetBoundary() . "--\r\n";
+
+			$startP = strpos($message, $startB)+strlen($startB);
+			$endP   = strpos($message, $endB);
+
+			$data = substr($message, $startP, $endP-$startP);
+
+			$isHtml = false;
+			$rawParts = preg_split("/\r\n--".preg_quote($header->GetBoundary(), '/')."\r\n/s", $data);
+			$tmpParts = array();
+			foreach ($rawParts as $part)
+			{
+				if (substr($part, 0, 2) == "\r\n")
+					$part = "\r\n" . $part;
+
+				list(, $subHtml, $subText, $subParts) = CMailMessage::parseMessage($part, $charset);
+
+				if ($subHtml)
+					$isHtml = true;
+
+				if ($subText)
+					$tmpParts[] = array($subHtml, $subText);
+
+				$parts = array_merge($parts, $subParts);
+			}
+
+			if (strtolower($header->MultipartType()) == 'alternative')
+			{
+				foreach ($tmpParts as $part)
+				{
+					if ($part[0])
+					{
+						if (!$textBody || $htmlBody && (strlen($htmlBody) < strlen($part[0])))
+						{
+							$htmlBody = $part[0];
+							$textBody = $part[1];
+						}
+					}
+					else
+					{
+						if (!$textBody || strlen($textBody) < strlen($part[1]))
+						{
+							$htmlBody = '';
+							$textBody = $part[1];
+						}
+					}
+				}
+			}
+			else
+			{
+				foreach ($tmpParts as $part)
+				{
+					if ($textBody)
+						$textBody .= "\r\n\r\n";
+					$textBody .= $part[1];
+
+					if ($isHtml)
+					{
+						if ($htmlBody)
+							$htmlBody .= "\r\n\r\n";
+
+						$htmlBody .= $part[0] ?: $part[1];
+					}
+				}
+			}
+		}
+		else
+		{
+			$bodyPart = CMailMessage::decodeMessageBody($header, $body, $charset);
+
+			if (!$bodyPart['FILENAME'] && strpos(strtolower($bodyPart['CONTENT-TYPE']), 'text/') === 0)
+			{
+				if (strtolower($bodyPart['CONTENT-TYPE']) == 'text/html')
+				{
+					$htmlBody = $bodyPart['BODY'];
+					$textBody = htmlToTxt($bodyPart['BODY']);
+				}
+				else
+				{
+					$textBody = $bodyPart['BODY'];
+				}
+			}
+			else
+			{
+				$parts[] = $bodyPart;
+			}
+		}
+
+		return array($header, $htmlBody, $textBody, $parts);
+	}
+
 	public static function AddMessage($mailbox_id, $message, $charset)
 	{
 		global $DB;
 
-		// replace all /n -> /r/n
-		//$message = str_replace("\r\n", "\n", $message);
-		//$message = str_replace("\n", "\r\n", $message);
+		list($obHeader, $message_body_html, $message_body, $arMessageParts) = CMailMessage::parseMessage($message, $charset);
 
-		$header_pos = strpos($message, "\r\n\r\n");
-
-		// spliting message to header and body
-		$message_header = substr($message, 0, $header_pos);
-		$message_body = substr($message, $header_pos+4);
-		$message_body_html = false;
-
-		// parsing header and convert
-		$arMessageParts = Array();
-		$obHeader = CMailMessage::ParseHeader($message_header, $charset);
-
-		if($obHeader->IsMultipart())
-		{
-			//echo 'obHeader="<pre>';print_r($obHeader);echo '/obHeader</pre>';
-			$arMessagePartsTmp = preg_split("/".preg_quote("--".$obHeader->GetBoundary(), "/")."(--|\r\n)/s", $message_body);
-
-			$message_body = "";
-			for($i = 0, $n = count($arMessagePartsTmp); $i < $n; $i++)
-			{
-				if(strlen($arMessagePartsTmp[$i])<=0)
-					continue;
-
-				$message_part = $arMessagePartsTmp[$i];
-				if(substr($message_part, 0, 2)=="\r\n")
-					$message_part = "\r\n".$message_part;
-
-				$p = strpos($message_part, "\r\n\r\n");
-
-				$message_part_header = substr($message_part, 0, $p);
-				if(strlen(trim($message_part_header))<=0 && $n > 1)
-					continue;
-
-				$message_part_body = substr($message_part, $p+4);
-				if(strlen(trim($message_part_body))<=0)
-					continue;
-
-				$obMPHeader = CMailMessage::ParseHeader($message_part_header, $charset);
-				if(strtolower($obHeader->MultipartType()) == "alternative" && $obMPHeader->IsMultipart()/* && $obHeader->MultipartType() != "mixed"*/)
-					continue;
-
-				if(
-					//(strtolower($obMPHeader->MultipartType()) == "related" && $obHeader->MultipartType() == "mixed") ||
-					(strtolower($obMPHeader->MultipartType()) == "alternative" && $obMPHeader->IsMultipart())
-				)
-				{
-					$arMessagePartsRelTmp = preg_split("/".preg_quote("--".$obMPHeader->GetBoundary(), "/")."(--|\r\n)/s", $message_part_body);
-					$bFound = false;
-					$obMPHeaderHTML = false;
-					for($j = 0, $num = count($arMessagePartsRelTmp); $j < $num; $j++)
-					{
-						if(strlen(trim($arMessagePartsRelTmp[$j]))<=0)
-							continue;
-
-						$p = strpos($arMessagePartsRelTmp[$j], "\r\n\r\n");
-						$message_part_rel_header = substr($arMessagePartsRelTmp[$j], 0, $p);
-						$message_part_rel_body = substr($arMessagePartsRelTmp[$j], $p+4);
-
-						$obMPRelHeader = CMailMessage::ParseHeader($message_part_rel_header, $charset);
-						$rel_content_type = strtolower($obMPRelHeader->content_type);
-						if($rel_content_type=="text/plain")
-						{
-							$bFound = true;
-							$obMPHeader = $obMPRelHeader;
-							$message_part_body = $message_part_rel_body;
-							break;
-						}
-						elseif($rel_content_type=="text/html" && !is_object($obMPHeaderHTML))
-						{
-							$obMPHeaderHTML = $obMPRelHeader;
-							$message_part_body_html = $message_part_rel_body;
-						}
-					} // for($j=0; $j<count($arMessagePartsRelTmp); $j++)
-
-					if(!$bFound && is_object($obMPHeaderHTML))
-					{
-						$obMPHeader = $obMPHeaderHTML;
-						$message_part_body = HTMLToTxt($message_part_body_html);
-						$bFound = true;
-					}
-				} // if(strtolower($obMPHeader->MultipartType() ...
-				$content_type = strtolower($obMPHeader->content_type);
-				//print_r($obMPHeader);
-				$encoding = strtolower($obMPHeader->GetHeader("CONTENT-TRANSFER-ENCODING"));
-				if($encoding=="base64")
-					$message_part_body = base64_decode($message_part_body);
-				elseif($encoding=="quoted-printable")
-					$message_part_body = quoted_printable_decode($message_part_body);
-				elseif($encoding=="x-uue")
-					$message_part_body = CMailUtil::uue_decode($message_part_body); //?
-
-				$msg_charset = $obMPHeader->charset;
-				$filename = $obMPHeader->filename;
-
-				if((strpos($content_type, "plain")!==false || strpos($content_type, "html")!==false || strpos($content_type, "text")!==false) && strpos($content_type, "x-vcard")===false)
-					$message_part_body_converted = CMailUtil::ConvertCharset($message_part_body, $msg_charset, $charset);
-				else
-					$message_part_body_converted = $message_part_body;
-
-				$arMessageParts[] = Array(
-					"CONTENT-TYPE"	=>	$content_type,
-					"CONTENT-ID"	=>	$obMPHeader->content_id,
-					"CHARSET"	=>	$charset,
-					"BODY"		=>	$message_part_body_converted,
-					"FILENAME"	=>	$filename
-				);
-			} //for($i=0; $i<count($arMessagePartsTmp); $i++)
-
-			for($i = 0, $n = count($arMessageParts); $i < $n; $i++)
-			{
-				if(strlen($arMessageParts[$i]["FILENAME"])<=0 && strpos(strtolower($arMessageParts[$i]["CONTENT-TYPE"]), "text/")===0)
-				{
-					if(strtolower($arMessageParts[$i]["CONTENT-TYPE"])=="text/html")
-					{
-						$message_body_html = $arMessageParts[$i]["BODY"];
-						$message_body = HTMLToTxt($arMessageParts[$i]["BODY"]);
-					}
-					else
-						$message_body = $arMessageParts[$i]["BODY"];
-
-					unset($arMessageParts[$i]);
-					break;
-				}
-			}
-			//print_r($arMessageParts);
-		}
-		else //if($obHeader->IsMultipart())
-		{
-			$encoding = strtolower($obHeader->GetHeader("CONTENT-TRANSFER-ENCODING"));
-
-			if($encoding=="base64")
-				$message_body = base64_decode($message_body);
-			elseif($encoding=="quoted-printable")
-				$message_body = quoted_printable_decode($message_body);
-			elseif($encoding=="x-uue")
-				$message_body = CMailUtil::uue_decode($message_body); //?
-
-			$message_body = CMailUtil::ConvertCharset($message_body, $obHeader->charset, $charset);
-
-			if(strtolower($obHeader->content_type)=="text/html")
-			{
-				$message_body_html = $message_body;
-				$message_body = HTMLToTxt($message_body);
-			}
-		} //if($obHeader->IsMultipart())
-
-		$arFields = Array(
+		$arFields = array(
 			"MAILBOX_ID" => $mailbox_id,
 			"HEADER" => $obHeader->strHeader,
 			"FIELD_DATE_ORIGINAL" => $obHeader->GetHeader("DATE"),
@@ -1392,9 +1447,8 @@ class CAllMailMessage
 			"FIELD_PRIORITY" => IntVal($obHeader->GetHeader("X-PRIORITY")),
 			"MESSAGE_SIZE" => strlen($message),
 			"SUBJECT" => $obHeader->GetHeader("SUBJECT"),
-			"BODY" => RTrim($message_body)
-			);
-		//print_r($arMessageParts);	print_r($arFields); die();
+			"BODY" => rtrim($message_body)
+		);
 
 		if(COption::GetOptionString("mail", "save_src", B_MAIL_SAVE_SRC)=="Y")
 			$arFields["FULL_TEXT"] = $message;
@@ -1447,20 +1501,20 @@ class CAllMailMessage
 				} // foreach($arMessageParts as $part)
 			}
 
-			CMailFilter::FilterMessage($MESSAGE_ID, "R");
+			$arFields['ID'] = $MESSAGE_ID;
+			CMailFilter::Filter($arFields, "R");
 
 			return $MESSAGE_ID;
 		}
 		else
-			CMailLog::AddMessage(
-				Array(
-					"MAILBOX_ID"=>$mailbox_id,
-					"STATUS_GOOD"=>"N",
-					"LOG_TYPE"=>"NEW_MESSAGE",
-					"MESSAGE"=>"Big message size, check mysql max_allow_packet."
-					)
-				);
-
+		{
+			CMailLog::AddMessage(array(
+				"MAILBOX_ID"=>$mailbox_id,
+				"STATUS_GOOD"=>"N",
+				"LOG_TYPE"=>"NEW_MESSAGE",
+				"MESSAGE"=>"Big message size, check mysql max_allow_packet."
+			));
+		}
 	}
 
 	public static function Add($arFields)
@@ -1512,13 +1566,14 @@ class CAllMailMessage
 	public static function Delete($id)
 	{
 		global $DB;
-		$id = IntVal($id);
+		$id = intval($id);
+
 		$strSql = "DELETE FROM b_mail_msg_attachment WHERE MESSAGE_ID=".$id;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$strSql = "DELETE FROM b_mail_message WHERE ID=".$id;
-		//echo $strSql;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
 		return true;
 	}
 
@@ -1584,11 +1639,8 @@ class CMailAttachment
 				"FROM b_mail_msg_attachment MA ";
 
 		$arSqlSearch = Array();
-		$filter_keys = array_keys($arFilter);
-		for($i = 0, $n = count($filter_keys); $i < $n; $i++)
+		foreach ($arFilter as $key => $val)
 		{
-			$key = $filter_keys[$i];
-			$val = $arFilter[$key];
 			$res = CMailUtil::MkOperationFilter($key);
 			$key = strtoupper($res["FIELD"]);
 			$cOperationType = $res["OPERATION"];
@@ -1710,7 +1762,7 @@ class CAllMailUtil
 			return $GLOBALS['APPLICATION']->ConvertCharset($str, $from, $to);
 
 
-		if($from=='windows-1251')
+		if($from=='windows-1251' || $from=='cp1251')
 			$from = 'w';
 		elseif(strpos($from, 'koi8')===0)
 			$from = 'k';
@@ -1721,7 +1773,7 @@ class CAllMailUtil
 		else
 			$from = '';
 
-		if($to=='windows-1251')
+		if($to=='windows-1251' || $to=='cp1251')
 			$to = 'w';
 		elseif(strpos($to, 'koi8')===0)
 			$to = 'k';
@@ -1948,6 +2000,7 @@ class CAllMailUtil
 
 	public static function Decrypt($str, $key=false)
 	{
+		$res = '';
 		if($key===false)
 			$key = COption::GetOptionString("main", "pwdhashadd", "");
 		$key1 = CMailUtil::BinMD5($key);
@@ -1965,6 +2018,7 @@ class CAllMailUtil
 
 	public static function Crypt($str, $key=false)
 	{
+		$res = '';
 		if($key===false)
 			$key = COption::GetOptionString("main", "pwdhashadd", "");
 		$key1 = CMailUtil::BinMD5($key);
@@ -2117,6 +2171,8 @@ class CMailFilter
 				break;
 			case "MAILBOX_NAME":
 				$arSqlOrder[] = " MB.NAME ".$order." ";
+				$arSqlOrder[] = " MF.ID ".$order." ";
+				break;
 			default:
 				$arSqlOrder[] = " MF.ID ".$order." ";
 			}
@@ -2336,7 +2392,7 @@ class CMailFilter
 				FROM b_mail_filter f LEFT JOIN b_mail_filter_cond c ON f.ID = c.FILTER_ID
 				WHERE (f.MAILBOX_ID = ".$MAILBOX_ID." OR MAILBOX_ID IS NULL)
 					AND f.ACTIVE = 'Y'
-					AND f.PARENT_FILTER_ID ".($PARENT_FILTER_ID>0?"=".$PARENT_FILTER_ID:" IS NULL ").
+					AND (f.PARENT_FILTER_ID = " . ($PARENT_FILTER_ID > 0 ? $PARENT_FILTER_ID : "'' OR f.PARENT_FILTER_ID IS NULL") . ")" .
 					$strSqlAdd."
 				ORDER BY f.SORT, f.ID";
 
@@ -2665,6 +2721,7 @@ class CMailFilter
 
 	public static function RecalcSpamRating()
 	{
+		global $DB;
 		$res = $DB->Query("SELECT ID, FOR_SPAM_TEST FROM b_mail_message WHERE SPAM_LAST_RESULT<>'N'");
 		while($arr = $res->Fetch())
 		{
@@ -3073,6 +3130,10 @@ class CMailLog
 	public static function AddMessage($arFields)
 	{
 		global $DB;
+
+		if (COption::getOptionString('mail', 'disable_log', 'N') == 'Y')
+			return;
+
 		$arFields["~DATE_INSERT"] = $DB->GetNowFunction();
 		if(array_key_exists('MESSAGE', $arFields))
 			$arFields['MESSAGE'] = strval(substr($arFields['MESSAGE'], 0, 255));

@@ -1537,7 +1537,7 @@ function ConvertDateTime($datetime, $to_format=false, $from_site=false, $bSearch
  * echo "Вчера: ".<b>ConvertTimeStamp</b>(time()-86400);
  * echo "Позавчера: ".<b>ConvertTimeStamp</b>(time()-(86400*2));
  * ?&gt;
- * 
+ * </htm
  * &lt;?
  * echo <b>ConvertTimeStamp</b>(mktime(0, 0, 0, 10, 25, 2003), "SHORT", "ru"); // 25.10.2003
  * ?&gt;
@@ -1703,7 +1703,7 @@ function convertTimeToMilitary ($strTime, $fromFormat = 'H:MI T', $toFormat = 'H
  *
  * <h4>Example</h4> 
  * <pre>
- * Примечанияtimestampnow&lt;?<br>$rsUser = CUser::GetList($by, $order, array(<br>  "ID_EQUAL_EXACT" =&gt; $USER-&gt;GetID()<br>));<br>if($arUser = $rsUser-&gt;Fetch())<br>{<br>  echo "Зарегистрирован на сайте: ",FormatDate("Q", MakeTimeStamp($arUser["DATE_REGISTER"])),".";<br>}<br>?&gt;
+ * Примечания</bodtimestampnow&lt;?<br>$rsUser = CUser::GetList($by, $order, array(<br>  "ID_EQUAL_EXACT" =&gt; $USER-&gt;GetID()<br>));<br>if($arUser = $rsUser-&gt;Fetch())<br>{<br>  echo "Зарегистрирован на сайте: ",FormatDate("Q", MakeTimeStamp($arUser["DATE_REGISTER"])),".";<br>}<br>?&gt;
  * </pre>
  *
  *
@@ -2648,7 +2648,7 @@ function GetRandomCode($len=8)
  *
  *
  *
- * @param string $text  Исходная строка. </h
+ * @param string $text  Исходная строка.
  *
  *
  *
@@ -2843,7 +2843,7 @@ function TrimEx($str,$symbol,$side="both")
  *
  *
  *
- * @param string $text  Исходная строка. </h
+ * @param string $text  Исходная строка.
  *
  *
  *
@@ -2878,7 +2878,7 @@ function utf8win1251($s)
  *
  *
  *
- * @param string $text  Исходная строка. </h
+ * @param string $text  Исходная строка.
  *
  *
  *
@@ -2946,7 +2946,7 @@ function ToUpper($str, $lang = false)
  *
  *
  *
- * @param string $text  Исходная строка. </h
+ * @param string $text  Исходная строка.
  *
  *
  *
@@ -3010,20 +3010,202 @@ function ToLower($str, $lang = false)
 /**********************************
 Конвертация текста для EMail
 **********************************/
+class CConvertorsPregReplaceHelper
+{
+	private $codeMessage = "";
+public 	function __construct($codeMessage = "")
+	{
+		$this->codeMessage = $codeMessage;
+	}
+
+public function convertCodeTagForEmail($match)
+	{
+		$text = is_array($match)? $match[2]: $match;
+		if ($text == '')
+			return '';
+
+		$text = str_replace(array("<",">"), array("&lt;","&gt;"), $text);
+		$text = preg_replace("#^(.*?)$#", "   \\1", $text);
+
+		$s1 = "--------------- ".$this->codeMessage." -------------------";
+		$s2 = str_repeat("-", strlen($s1));
+		$text = "\n\n>".$s1."\n".$text."\n>".$s2."\n\n";
+
+		return $text;
+	}
+
+	private $quoteOpened = 0;
+	private $quoteClosed = 0;
+	private $quoteError  = 0;
+	public function checkQuoteError()
+	{
+		return (($this->quoteOpened == $this->quoteClosed) && ($this->quoteError == 0));
+	}
+
+	private $quoteTableClass = "";
+	private $quoteHeadClass  = "";
+	private $quoteBodyClass  = "";
+	public function setQuoteClasses($tableClass, $headClass, $bodyClass)
+	{
+		$this->quoteTableClass = $tableClass;
+		$this->quoteHeadClass  = $headClass;
+		$this->quoteBodyClass  = $bodyClass;
+	}
+
+public function convertOpenQuoteTag($match)
+	{
+		$this->quoteOpened++;
+		return "<table class='".$this->quoteTableClass."' width='95%' border='0' cellpadding='3' cellspacing='1'><tr><td class='".$this->quoteHeadClass."'>".GetMessage("MAIN_QUOTE")."</td></tr><tr><td class='".$this->quoteBodyClass."'>";
+	}
+
+public function convertCloseQuoteTag()
+	{
+		if ($this->quoteOpened == 0)
+		{
+			$this->quoteError++;
+			return '';
+		}
+		$this->quoteClosed++;
+		return "</td></tr></table>";
+	}
+
+public function convertQuoteTag($match)
+	{
+		$this->quoteOpened = 0;
+		$this->quoteClosed = 0;
+		$this->quoteError  = 0;
+
+		$str = $match[0];
+		$str = preg_replace_callback("#\\[quote\\]#i",  array($this, "convertOpenQuoteTag"),  $str);
+		$str = preg_replace_callback("#\\[/quote\\]#i", array($this, "convertCloseQuoteTag"), $str);
+
+		if ($this->checkQuoteError())
+			return $str;
+		else
+			return $match[0];
+	}
+
+	public static function extractUrl($match)
+	{
+		return extract_url(str_replace('@', chr(11), $match[1]));
+	}
+
+	private $linkClass  = "";
+	public function setLinkClass($linkClass)
+	{
+		$this->linkClass = $linkClass;
+	}
+
+	private $linkTarget  = "_self";
+public function setLinkTarget($linkTarget)
+	{
+		$this->linkTarget = $linkTarget;
+	}
+
+	private $event1 = "";
+	private $event2 = "";
+	private $event3 = "";
+	public function setEvents($event1="", $event2="", $event3="")
+	{
+		$this->event1 = $event1;
+		$this->event2 = $event2;
+		$this->event3 = $event3;
+	}
+
+	private $script  = "/bitrix/redirect.php";
+public function setScript($script)
+	{
+		$this->script = $script;
+	}
+
+	function convertToMailTo($match)
+	{
+		$s = $match[1];
+		$s = "<a class=\"".$this->linkClass."\" href=\"mailto:".delete_special_symbols($s)."\" title=\"".GetMessage("MAIN_MAILTO")."\">".$s."</a>";
+		return $s;
+	}
+
+public 	function convertToHref($match)
+	{
+		$url = $match[1];
+		$goto = $url;
+		if ($this->event1 != "" || $this->event2 != "")
+		{
+			$goto = $this->script.
+				"?event1=".urlencode($this->event1).
+				"&event2=".urlencode($this->event2).
+				"&event3=".urlencode($this->event3).
+				"&goto=".urlencode($this->goto);
+		}
+		$target = $this->linkTarget == '_self'? '': ' target="'.$this->linkTarget.'"';
+
+		$s = "<a class=\"".$this->linkClass."\" href=\"".delete_special_symbols($goto)."\"".$target.">".$url."</a>";
+		return $s;
+	}
+
+	private $codeTableClass = "";
+	private $codeHeadClass  = "";
+	private $codeBodyClass  = "";
+	private $codeTextClass  = "";
+public function setCodeClasses($tableClass, $headClass, $bodyClass, $textAreaClass)
+	{
+		$this->codeTableClass = $tableClass;
+		$this->codeHeadClass  = $headClass;
+		$this->codeBodyClass  = $bodyClass;
+		$this->codeTextClass  = $textAreaClass;
+	}
+
+public static 	function convertCodeTagForHtmlBefore($text = "")
+	{
+		if (is_array($text))
+			$text = $text[2];
+		if ($text == '')
+			return '';
+
+		$text = str_replace(chr(2), "", $text);
+		$text = str_replace("\n", chr(4), $text);
+		$text = str_replace("\r", chr(5), $text);
+		$text = str_replace(" ", chr(6), $text);
+		$text = str_replace("\t", chr(7), $text);
+		$text = str_replace("http", "!http!", $text);
+		$text = str_replace("https", "!https!", $text);
+		$text = str_replace("ftp", "!ftp!", $text);
+		$text = str_replace("@", "!@!", $text);
+
+		$text = str_replace(Array("[","]"), array(chr(16), chr(17)), $text);
+
+		$return = "[code]".$text."[/code]";
+
+		return $return;
+	}
+
+public 	function convertCodeTagForHtmlAfter($text = "")
+	{
+		if (is_array($text))
+			$text = $text[1];
+		if ($text == '')
+			return '';
+
+		$code_mess = GetMessage("MAIN_CODE");
+		$text = str_replace("!http!", "http", $text);
+		$text = str_replace("!https!", "https", $text);
+		$text = str_replace("!ftp!", "ftp", $text);
+		$text = str_replace("!@!", "@", $text);
+
+		$return = "<table class='".$this->codeTableClass."'><tr><td class='".$this->codeHeadClass."'>$code_mess</td></tr><tr><td class='".$this->codeBodyClass."'><textarea class='".$this->codeTextClass."' contentEditable=false cols=60 rows=15 wrap=virtual>$text</textarea></td></tr></table>";
+
+		return $return;
+	}
+
+}
+
 function convert_code_tag_for_email($text="", $arMsg=array())
 {
 	if ($text == '')
 		return '';
 
-	$text = stripslashes($text);
-	$text = preg_replace("#<#", "&lt;", $text);
-	$text = preg_replace("#>#", "&gt;", $text);
-	$text = preg_replace("#^(.*?)$#", "   \\1", $text);
-
-	$s1 = "--------------- ".$arMsg["MAIN_CODE_S"]." -------------------";
-	$s2 = str_repeat("-", strlen($s1));
-	$text = "\n\n>".$s1."\n".$text."\n>".$s2."\n\n";
-	return $text;
+	$helper = new CConvertorsPregReplaceHelper($arMsg["MAIN_CODE_S"]);
+	return $helper->convertCodeTagForEmail($text);
 }
 
 function PrepareTxtForEmail($text, $lang=false, $convert_url_tag=true, $convert_image_tag=true)
@@ -3036,9 +3218,10 @@ function PrepareTxtForEmail($text, $lang=false, $convert_url_tag=true, $convert_
 		$lang = LANGUAGE_ID;
 
 	$arMsg = IncludeModuleLangFile(__FILE__, $lang, true);
+	$helper = new CConvertorsPregReplaceHelper($arMsg["MAIN_CODE_S"]);
 
 	$text = preg_replace("#<code(\\s+[^>]*>|>)(.+?)</code(\\s+[^>]*>|>)#is", "[code]\\2[/code]", $text);
-	$text = preg_replace("#\\[code(\\s+[^\\]]*\\]|\\])(.+?)\\[/code(\\s+[^\\]]*\\]|\\])#ies", "convert_code_tag_for_email('\\2', \$arMsg)", $text);
+	$text = preg_replace_callback("#\\[code(\\s+[^\\]]*\\]|\\])(.+?)\\[/code(\\s+[^\\]]*\\]|\\])#is", array($helper, "convertCodeTagForEmail"), $text);
 
 	$text = preg_replace("/^(\r|\n)+?(.*)$/", "\\2", $text);
 	$text = preg_replace("#<b>(.+?)</b>#is", "\\1", $text);
@@ -3113,40 +3296,17 @@ function delete_special_symbols($text, $replace="")
 
 function convert_code_tag_for_html_before($text = "")
 {
-	if ($text == '')
-		return '';
-	$text = stripslashes($text);
-	$text = str_replace(chr(2), "", $text);
-	$text = str_replace("\n", chr(4), $text);
-	$text = str_replace("\r", chr(5), $text);
-	$text = str_replace(" ", chr(6), $text);
-	$text = str_replace("\t", chr(7), $text);
-	$text = str_replace("http", "!http!", $text);
-	$text = str_replace("https", "!https!", $text);
-	$text = str_replace("ftp", "!ftp!", $text);
-	$text = str_replace("@", "!@!", $text);
-
-	$text = str_replace(Array("[","]"), Array(chr(16), chr(17)), $text);
-
-	$return = "[code]".$text."[/code]";
-
-	return $return;
+	$helper = new CConvertorsPregReplaceHelper("");
+	return $helper->convertCodeTagForHtmlBefore(stripslashes($text));
 }
 
 function convert_code_tag_for_html_after($text = "", $code_table_class, $code_head_class, $code_body_class, $code_textarea_class)
 {
 	if ($text == '')
 		return '';
-	$text = stripslashes($text);
-	$code_mess = GetMessage("MAIN_CODE");
-	$text = str_replace("!http!", "http", $text);
-	$text = str_replace("!https!", "https", $text);
-	$text = str_replace("!ftp!", "ftp", $text);
-	$text = str_replace("!@!", "@", $text);
-
-	$return = "<table class='$code_table_class'><tr><td class='$code_head_class'>$code_mess</td></tr><tr><td class='$code_body_class'><textarea class='$code_textarea_class' contentEditable=false cols=60 rows=15 wrap=virtual>$text</textarea></td></tr></table>";
-
-	return $return;
+	$helper = new CConvertorsPregReplaceHelper("");
+	$helper->setCodeClasses($code_table_class, $code_head_class, $code_body_class, $code_textarea_class);
+	return $helper->convertCodeTagForHtmlAfter(stripslashes($text));
 }
 
 function convert_open_quote_tag($quote_table_class, $quote_head_class, $quote_body_class)
@@ -3174,10 +3334,12 @@ function convert_quote_tag($text="", $quote_table_class, $quote_head_class, $quo
 	if ($text == '')
 		return '';
 	$text = stripslashes($text);
+	$helper = new CConvertorsPregReplaceHelper("");
+	$helper->setQuoteClasses($quote_table_class, $quote_head_class, $quote_body_class);
 	$txt = $text;
-	$txt = preg_replace("#\\[quote\\]#ie", "convert_open_quote_tag('".CUtil::addslashes($quote_table_class)."', '".CUtil::addslashes($quote_head_class)."', '".CUtil::addslashes($quote_body_class)."')", $txt);
-	$txt = preg_replace("#\\[/quote\\]#ie", "convert_close_quote_tag()", $txt);
-	if (($QUOTE_OPENED==$QUOTE_CLOSED) && ($QUOTE_ERROR==0))
+	$txt = preg_replace_callback("#\\[quote\\]#i",  array($helper, "convertOpenQuoteTag"),  $txt);
+	$txt = preg_replace_callback("#\\[/quote\\]#i", array($helper, "convertCloseQuoteTag"), $txt);
+	if ($helper->checkQuoteError())
 	{
 		return $txt;
 	}
@@ -3367,7 +3529,6 @@ function convert_to_mailto($s, $link_class="")
  * 
  * <br><b>Результат:</b>
  * 
- * 
  * текст текст текст текст &lt;br&gt;
  * текст текст текст текст &lt;br&gt;
  * длиннноесловодлиннн оеслово&lt;br&gt;
@@ -3464,32 +3625,29 @@ function convert_to_mailto($s, $link_class="")
  * @author Bitrix
  */
 function TxtToHTML(
-	$str,										// текст для преобразования
-	$bMakeUrls				= true,				// true - преобразовавыть URL в <a href="URL">URL</a>
-	$iMaxStringLen			= 0,				// максимальная длина фразы без пробелов или символов перевода каретки
-	$QUOTE_ENABLED			= "N",				// Y - преобразовать <QUOTE>...</QUOTE> в рамку цитаты
-	$NOT_CONVERT_AMPERSAND	= "Y",				// Y - не преобразовывать символ "&" в "&amp;"
-	$CODE_ENABLED			= "N",				// Y - преобразовать <CODE>...</CODE> в readonly textarea
-	$BIU_ENABLED			= "N",				// Y - преобразовать <B>...</B> и т.д. в соответствующие HTML тэги
-	$quote_table_class		= "quotetable",		// css класс на таблицу цитаты
-	$quote_head_class		= "tdquotehead",	// css класс на первую TD таблицы цитаты
-	$quote_body_class		= "tdquote",		// css класс на вторую TD таблицы цитаты
-	$code_table_class		= "codetable",		// css класс на таблицу кода
-	$code_head_class		= "tdcodehead",		// css класс на первую TD таблицы кода
-	$code_body_class		= "tdcodebody",		// css класс на вторую TD таблицы кода
-	$code_textarea_class	= "codetextarea",	// css класс на textarea в таблице кода
-	$link_class				= "txttohtmllink",	// css класс на ссылках
-	$arUrlEvent				= array(),			// массив в нем если заданы ключи EVENT1, EVENT2, EVENT3 то ссылки будут через
-												// $arUrlEvent["SCRIPT"] (по умолчанию равен "/bitrix/redirect.php")
-	$link_target			= "_self"			// tagret открытия страницы
-	)
+	$str,                                    // текст для преобразования
+	$bMakeUrls             = true,           // true - преобразовавыть URL в <a href="URL">URL</a>
+	$iMaxStringLen         = 0,              // максимальная длина фразы без пробелов или символов перевода каретки
+	$QUOTE_ENABLED         = "N",            // Y - преобразовать <QUOTE>...</QUOTE> в рамку цитаты
+	$NOT_CONVERT_AMPERSAND = "Y",            // Y - не преобразовывать символ "&" в "&amp;"
+	$CODE_ENABLED          = "N",            // Y - преобразовать <CODE>...</CODE> в readonly textarea
+	$BIU_ENABLED           = "N",            // Y - преобразовать <B>...</B> и т.д. в соответствующие HTML тэги
+	$quote_table_class     = "quotetable",   // css класс на таблицу цитаты
+	$quote_head_class      = "tdquotehead",  // css класс на первую TD таблицы цитаты
+	$quote_body_class      = "tdquote",      // css класс на вторую TD таблицы цитаты
+	$code_table_class      = "codetable",    // css класс на таблицу кода
+	$code_head_class       = "tdcodehead",   // css класс на первую TD таблицы кода
+	$code_body_class       = "tdcodebody",   // css класс на вторую TD таблицы кода
+	$code_textarea_class   = "codetextarea", // css класс на textarea в таблице кода
+	$link_class            = "txttohtmllink",// css класс на ссылках
+	$arUrlEvent            = array(),        // массив в нем если заданы ключи EVENT1, EVENT2, EVENT3 то ссылки будут через $arUrlEvent["SCRIPT"] (по умолчанию равен "/bitrix/redirect.php")
+	$link_target           = "_self"         // tagret открытия страницы
+)
 {
 	global $QUOTE_ERROR, $QUOTE_OPENED, $QUOTE_CLOSED;
 	$QUOTE_ERROR = $QUOTE_OPENED = $QUOTE_CLOSED = 0;
 
 	$str = delete_special_symbols($str);
-
-	//echo "\n<br>=====================\n<br><pre>".htmlspecialcharsbx($str)."</pre>\n<br>=======================\n<br>";
 
 	// вставим спецсимвол chr(2) там где в дальнейшем необходимо вставить пробел
 	if($iMaxStringLen>0)
@@ -3507,8 +3665,9 @@ function TxtToHTML(
 	// \r => chr(5)
 	if ($CODE_ENABLED=="Y")
 	{
+		$helper = new CConvertorsPregReplaceHelper("");
 		$str = preg_replace("#<code(\\s+[^>]*>|>)(.+?)</code(\\s+[^>]*>|>)#is", "[code]\\2[/code]", $str);
-		$str = preg_replace("#\\[code(\\s+[^\\]]*\\]|\\])(.+?)\\[/code(\\s+[^\\]]*\\]|\\])#ies", "convert_code_tag_for_html_before('\\2')", $str);
+		$str = preg_replace_callback("#\\[code(\\s+[^\\]]*\\]|\\])(.+?)\\[/code(\\s+[^\\]]*\\]|\\])#is", array($helper, "convertCodeTagForHtmlBefore"), $str);
 	}
 
 	// <b>...</b> => [b]...[/b]
@@ -3526,7 +3685,7 @@ function TxtToHTML(
 	if($bMakeUrls)
 	{
 		//hide @ from next regexp with chr(11)
-		$str = preg_replace("#((http|https|ftp):\\/\\/[a-z:@,.'/\\#\\%=~\\&?*+\\[\\]_0-9\x01-\x08-]+)#ies", "extract_url(str_replace('@', chr(11), '\\1'))", $str);
+		$str = preg_replace_callback("#((http|https|ftp):\\/\\/[a-z:@,.'/\\#\\%=~\\&?*+\\[\\]_0-9\x01-\x08-]+)#is", array("CConvertorsPregReplaceHelper", "extractUrl"), $str);
 		$str = preg_replace("#(([=_\\.'0-9a-z+~\x01-\x08-]+)@[_0-9a-z\x01-\x08-.]+\\.[a-z]{2,10})#is", chr(3)."\\1".chr(3), $str);
 		//replace back to @
 		$str = str_replace(chr(11), '@', $str);
@@ -3542,12 +3701,15 @@ function TxtToHTML(
 	// chr(3).E-Mail.chr(3) => <a href="mailto:E-Mail">E-Mail</a>
 	if($bMakeUrls)
 	{
-		$event1 = $arUrlEvent["EVENT1"];
-		$event2 = $arUrlEvent["EVENT2"];
-		$event3 = $arUrlEvent["EVENT3"];
 		$script = $arUrlEvent["SCRIPT"];
-		$str = preg_replace("#\x01([^\n\x01]+?)/\x01#ies", "convert_to_href('\\1', '".CUtil::addslashes($link_class)."', '".CUtil::addslashes($event1)."', '".CUtil::addslashes($event2)."', '".CUtil::addslashes($event3)."', '".CUtil::addslashes($script)."', '".CUtil::addslashes($link_target)."')", $str);
-		$str = preg_replace("#\x03([^\n\x03]+?)\x03#ies", "convert_to_mailto('\\1', '".CUtil::addslashes($link_class)."')", $str);
+		$helper = new CConvertorsPregReplaceHelper("");
+		$helper->setLinkClass($link_class);
+		$helper->setLinkTarget($link_target);
+		$helper->setEvents($arUrlEvent["EVENT1"], $arUrlEvent["EVENT2"], $arUrlEvent["EVENT3"]);
+		if (strlen($script))
+			$helper->setScript($script);
+		$str = preg_replace_callback("#\x01([^\n\x01]+?)/\x01#is", array($helper, "convertToHref"), $str);
+		$str = preg_replace_callback("#\x03([^\n\x03]+?)\x03#is", array($helper, "convertToMailTo"), $str);
 	}
 
 	$str = str_replace("\r\n", "\n", $str);
@@ -3561,14 +3723,20 @@ function TxtToHTML(
 
 	// [quote]...[/quote] => <table>...</table>
 	if ($QUOTE_ENABLED=="Y")
-		$str = preg_replace("#(\\[quote(.*?)\\](.*)\\[/quote(.*?)\\])#ies", "convert_quote_tag('\\1', '".CUtil::addslashes($quote_table_class)."', '".CUtil::addslashes($quote_head_class)."', '".CUtil::addslashes($quote_body_class)."')", $str);
+	{
+		$helper = new CConvertorsPregReplaceHelper("");
+		$helper->setQuoteClasses($quote_table_class, $quote_head_class, $quote_body_class);
+		$str = preg_replace_callback("#(\\[quote(.*?)\\](.*)\\[/quote(.*?)\\])#is", array($helper, "convertQuoteTag"), $str);
+	}
 
 	// [code]...[/code] => <textarea>...</textarea>
 	// chr(4) => \n
 	// chr(5) => \r
 	if ($CODE_ENABLED=="Y")
 	{
-		$str = preg_replace("#\\[code\\](.*?)\\[/code\\]#ies", "convert_code_tag_for_html_after('\\1', '".CUtil::addslashes($code_table_class)."', '".CUtil::addslashes($code_head_class)."', '".CUtil::addslashes($code_body_class)."', '".CUtil::addslashes($code_textarea_class)."')", $str);
+		$helper = new CConvertorsPregReplaceHelper("");
+		$helper->setCodeClasses($code_table_class, $code_head_class, $code_body_class, $code_textarea_class);
+		$str = preg_replace_callback("#\\[code\\](.*?)\\[/code\\]#is", array($helper, "convertCodeTagForHtmlAfter"), $str);
 		$str = str_replace(chr(4), "\n", $str);
 		$str = str_replace(chr(5), "\r", $str);
 		$str = str_replace(chr(6), " ", $str);
@@ -3636,8 +3804,7 @@ Convertation of HTML to text
  * <pre>
  * Вызов:</b&lt;?<br>$str = '<br>&lt;table&gt;<br>  &lt;tr&gt;<br>    &lt;td valign=top&gt;&lt;b&gt;&lt;a href="/ru/products/sitemanager/editions/business.php"&gt;Бизнес&lt;/a&gt;<br>  - &lt;/B&gt;полная версия продукта для управления интернет-магазином, интеграция <br>  с "1С:Торговля и Склад", поддержка дилерских сетей.&lt;BR&gt;&lt;FONT class=smalltext&gt;&lt;b&gt;$1699&lt;/B&gt;<br>  (MySQL-версия)&lt;br&gt;&lt;b&gt;$24500&lt;/b&gt; <br>  (Oracle-версия)&lt;/font&gt;&lt;/td&gt;<br>  &lt;/tr&gt;<br>&lt;/table&gt;<br>&lt;ul&gt;<br>  &lt;li&gt;Пункт 1&lt;/li&gt;<br>  &lt;li&gt;Пункт 2&lt;/li&gt;<br>  &lt;li&gt;Пункт 3&lt;/li&gt;<br>&lt;/ul&gt;<br>';<br>echo <b>HTMLToTxt</b>($str, "http://www.bitrix.ru");<br>?&gt;
  * 
- * Результат:
- * Бизнес [ http://www.bitrix.ru/ru/products/sitemanager/editions/business.php ] <br>- полная версия продукта для управления интернет-магазином, интеграция с <br>"1С:Торговля и Склад", поддержка дилерских сетей.<br>$1699(MySQL-версия)<br>$24500 (Oracle-версия)     <br><br><br>- Пункт 1 <br>- Пункт 2 <br>- Пункт 3
+ * Результат:Бизнес [ http://www.bitrix.ru/ru/products/sitemanager/editions/business.php ] <br>- полная версия продукта для управления интернет-магазином, интеграция с <br>"1С:Торговля и Склад", поддержка дилерских сетей.<br>$1699(MySQL-версия)<br>$24500 (Oracle-версия)     <br><br><br>- Пункт 1 <br>- Пункт 2 <br>- Пункт 3
  * </pre>
  *
  *
@@ -4523,11 +4690,38 @@ function GetPagePath($page=false, $get_index_page=null)
 		$sPath .= GetDirectoryIndex($sPath);
 	}
 
-	static $aSearch = array("<", ">", "\"", "'", "%", "\r", "\n", "\t");
-	static $aReplace = array("&lt;", "&gt;", "&quot;", "&#039;", "%25", "%0d", "%0a", "%09");
+	$sPath = Rel2Abs("/", $sPath);
+
+	static $aSearch = array("<", ">", "\"", "'", "%", "\r", "\n", "\t", "\\");
+	static $aReplace = array("&lt;", "&gt;", "&quot;", "&#039;", "%25", "%0d", "%0a", "%09", "%5C");
 	$sPath = str_replace($aSearch, $aReplace, $sPath);
 
-	return Rel2Abs("/", $sPath);
+	return $sPath;
+}
+
+function GetRequestUri()
+{
+	$uriPath = "/".ltrim($_SERVER["REQUEST_URI"], "/");
+	if (($index = strpos($uriPath, "?")) !== false)
+	{
+		$uriPath = substr($uriPath, 0, $index);
+	}
+
+	if (defined("BX_DISABLE_INDEX_PAGE") && BX_DISABLE_INDEX_PAGE === true)
+	{
+		if (substr($uriPath, -10) === "/index.php")
+		{
+			$uriPath = substr($uriPath, 0, -9);
+		}
+	}
+
+	$queryString = DeleteParam(array("bxrand", "SEF_APPLICATION_CUR_PAGE_URL"));
+	if ($queryString != "")
+	{
+		$uriPath = $uriPath."?".$queryString;
+	}
+
+	return $uriPath;
 }
 
 //light version of GetPagePath() for menu links
@@ -4646,7 +4840,7 @@ function bxstrrpos($haystack, $needle)
  *
  *
  *
- * @param string $rel_path  Относительный путь.
+ * @param string $rel_path  Относительный путь. </ht
  *
  *
  *
@@ -4753,7 +4947,8 @@ function GetMessageJS($name, $aReplace=false)
  *
  *
  *
- * @param string $name  Код сообщения.
+ * @param string $name  Код сообщения. Код должен быть уникальным в рамках всего
+ * продукта.
  *
  *
  *
@@ -4771,7 +4966,6 @@ function GetMessageJS($name, $aReplace=false)
  * IncludeTemplateLangFile(__FILE__);
  * echo <b>GetMessage</b>("SOME_MESSAGE_CODE");
  * ?&gt;<b>Замена языковой фразы по шаблону</b>
- * 
  * 
  * $MESS["ERROR_MODULE_NOT_FOUND"] = "Ошибка: модуль #MODULE# не найден"
  * 
@@ -4797,13 +4991,13 @@ function GetMessageJS($name, $aReplace=false)
  * @link http://dev.1c-bitrix.ru/api_help/main/functions/localization/getmessage.php
  * @author Bitrix
  */
-function GetMessage($name, $aReplace=false)
+function GetMessage($name, $aReplace=null)
 {
 	global $MESS;
 	if(isset($MESS[$name]))
 	{
 		$s = $MESS[$name];
-		if($aReplace!==false && is_array($aReplace))
+		if($aReplace!==null && is_array($aReplace))
 			foreach($aReplace as $search=>$replace)
 				$s = str_replace($search, $replace, $s);
 		return $s;
@@ -4811,6 +5005,9 @@ function GetMessage($name, $aReplace=false)
 	return \Bitrix\Main\Localization\Loc::getMessage($name, $aReplace);
 }
 
+/**
+ * @deprecated
+ */
 function HasMessage($name)
 {
 	global $MESS;
@@ -4847,6 +5044,9 @@ function GetLangFileName($before, $after, $lang=false)
 	return $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module."/lang/".$lang.$path.$after;
 }
 
+/**
+ * @deprecated Use \Bitrix\Main\Localization\Loc
+ */
 function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
 {
 	global $ALL_LANG_FILES;
@@ -4886,6 +5086,9 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
 		return true;
 }
 
+/**
+ * @deprecated Use \Bitrix\Main\Localization\Loc
+ */
 
 /**
  * <p>Предназначена для подключения языковых файлов для скриптов лежащих в каталоге текущего шаблона сайта. Как правило используется в [link=89637]компонентах[/link], либо в прологе и/или эпилоге сайта.</p> <p>Алгоритм поиска языкового файла: </p> <ol> <li>Сначала языковой файл будет искаться в каталоге <br><br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Если файл не найден, он будет искаться в каталоге <br><br><b>/bitrix/templates/.default/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Затем если файл не найден, он будет искаться дистрибутиве модуля, т.е. в каталоге <br><br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> </ol> <p>В общем случае, под "<i>относительный путь к скрипту</i>", понимается путь к файлу относительно каталога <b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b>.</p> <p>В частном случае, при подключении компонент, под "<i>относительный путь к скрипту</i>", понимается путь для подключения компонента передаваемый в функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> в качестве первого параметра.</p>
@@ -5086,14 +5289,11 @@ function IncludeTemplateLangFile($filepath, $lang=false)
  */
 function IncludeModuleLangFile($filepath, $lang=false, $bReturnArray=false)
 {
-//	if (!defined("SKIP_LAZY_LANGUAGE_LOAD") || SKIP_LAZY_LANGUAGE_LOAD !== true)
-//	{
-//		if($lang === false && $bReturnArray === false)
-//		{
-//			\Bitrix\Main\Localization\Loc::loadMessages($filepath);
-//			return true;
-//		}
-//	}
+	if($lang === false && $bReturnArray === false)
+	{
+		\Bitrix\Main\Localization\Loc::loadMessages($filepath);
+		return true;
+	}
 
 	$filepath = rtrim(preg_replace("'[\\\\/]+'", "/", $filepath), "/ ");
 	$module_path = "/modules/";
@@ -5143,6 +5343,9 @@ function IncludeModuleLangFile($filepath, $lang=false, $bReturnArray=false)
 	return true;
 }
 
+/**
+ * @deprecated Use \Bitrix\Main\Localization\Loc
+ */
 function LangSubst($lang)
 {
 	static $arSubst = array('ua'=>'ru', 'kz'=>'ru', 'ru'=>'ru');
@@ -5824,6 +6027,7 @@ function LocalRedirect($url, $skip_security_check=false, $status="302 Found")
 
 	if(!$bExternal)
 	{
+		$APPLICATION->HoldSpreadCookieHTML(true);
 		//store cookies for next hit (see CMain::GetSpreadCookieHTML())
 		$APPLICATION->StoreCookies();
 
@@ -6069,7 +6273,6 @@ function GetWhoisLink($ip, $class='')
  * &lt;?
  * if (<b>IsIE</b>()) echo "Вы пользуетесь MS Internet Explorer";
  * ?&gt;
- * </h
  * </pre>
  *
  *
@@ -6641,7 +6844,7 @@ function ShowNote($strNote, $cls="notetext")
  *
  *
  *
- * @param string $message  Строка сообщения. </h
+ * @param string $message  Строка сообщения.
  *
  *
  *
@@ -6870,6 +7073,27 @@ function ClearVars($prefix="str_")
 			unset($GLOBALS[$key]);
 }
 
+
+/**
+ * <p>Округляет сверху значение $value до $prec знаков после запятой.</p>
+ *
+ *
+ *
+ *
+ * @param valu $e  Округляемое значение
+ *
+ *
+ *
+ * @param pre $c = 0 Число знаков запятой, до которых происходит округление.
+ *
+ *
+ *
+ * @return function 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/functions/other/roundex.php
+ * @author Bitrix
+ */
 function roundEx($value, $prec=0)
 {
 	$eps = 1.00/pow(10, $prec+4);
@@ -6925,9 +7149,18 @@ function bitrix_sessid_get($varname='sessid')
 	return $varname."=".bitrix_sessid();
 }
 
-function bitrix_sessid_post($varname='sessid')
+function bitrix_sessid_post($varname='sessid', $returnInvocations=false)
 {
-	return '<input type="hidden" name="'.$varname.'" id="'.$varname.'" value="'.bitrix_sessid().'" />';
+	static $invocations = 0;
+	if ($returnInvocations)
+	{
+		return $invocations;
+	}
+
+	$id = $invocations ? $varname.'_'.$invocations : $varname;
+	$invocations++;
+
+	return '<input type="hidden" name="'.$varname.'" id="'.$id.'" value="'.bitrix_sessid().'" />';
 }
 
 function print_url($strUrl, $strText, $sParams="")
@@ -6953,6 +7186,7 @@ class CJSCore
 	private static $arCurrentlyLoadedExt = array();
 
 	private static $bInited = false;
+	private static $compositeMode = false;
 
 	/*
 	ex: CJSCore::RegisterExt('timeman', array(
@@ -7127,7 +7361,7 @@ class CJSCore
 	* @link http://dev.1c-bitrix.ru/api_help/main/js_lib/my_extension/index.php
 	* @author Bitrix
 	*/
-	public static 	public static function RegisterExt($name, $arPaths)
+	public static function RegisterExt($name, $arPaths)
 	{
 		if(isset($arPaths['use']))
 		{
@@ -7160,7 +7394,7 @@ class CJSCore
 	*
 	*
 	*
-	* @param f $x  Запускает анимацию. </htm
+	* @param f $x  Запускает анимацию. </ht
 	*
 	*
 	*
@@ -7250,55 +7484,51 @@ class CJSCore
 		return $bReturn ? $ret : true;
 	}
 
-static 	public static function GetCoreMessagesScript()
+public static function GetCoreMessagesScript($compositeMode = false)
 	{
-		static $first = true;
-		if ($first)
-		{
-			$first = false;
-			return self::_loadLang('', true, self::GetCoreMessages());
-		}
-		else
-		{
-			return '';
-		}
+		return self::_loadLang("", true, self::GetCoreMessages($compositeMode));
 	}
 
-public static 	public static function GetCoreMessages()
+public static function GetCoreMessages($compositeMode = false)
 	{
-		global $USER;
-
-		$userId = "";
-		$autoTimeZone = "N";
-		if (is_object($USER))
-		{
-			$autoTimeZone = trim($USER->GetParam("AUTO_TIME_ZONE"));
-			if ($USER->GetID() > 0)
-			{
-				$userId = $USER->GetID();
-			}
-		}
-
 		$arMessages = array(
 			"LANGUAGE_ID" => LANGUAGE_ID,
 			"FORMAT_DATE" => FORMAT_DATE,
 			"FORMAT_DATETIME" => FORMAT_DATETIME,
 			"COOKIE_PREFIX" => COption::GetOptionString("main", "cookie_name", "BITRIX_SM"),
-			"USER_ID" => $userId,
-			"SERVER_TIME" => time(),
 			"SERVER_TZ_OFFSET" => date("Z"),
-			"USER_TZ_OFFSET" => CTimeZone::GetOffset(),
-			"USER_TZ_AUTO" => $autoTimeZone == "N" ? "N": "Y",
-			"bitrix_sessid" => bitrix_sessid(),
 		);
 
 		if (!defined("ADMIN_SECTION") || ADMIN_SECTION !== true)
+		{
 			$arMessages["SITE_ID"] = SITE_ID;
+		}
+
+		if (!$compositeMode)
+		{
+			global $USER;
+			$userId = "";
+			$autoTimeZone = "N";
+			if (is_object($USER))
+			{
+				$autoTimeZone = trim($USER->GetParam("AUTO_TIME_ZONE"));
+				if ($USER->GetID() > 0)
+				{
+					$userId = $USER->GetID();
+				}
+			}
+
+			$arMessages["USER_ID"] = $userId;
+			$arMessages["SERVER_TIME"] = time();
+			$arMessages["USER_TZ_OFFSET"] = CTimeZone::GetOffset();
+			$arMessages["USER_TZ_AUTO"] = $autoTimeZone == "N" ? "N": "Y";
+			$arMessages["bitrix_sessid"] = bitrix_sessid();
+		}
 
 		return $arMessages;
 	}
 
-public static 	public static function GetHTML($arExt)
+public static function GetHTML($arExt)
 	{
 		$tmp = self::$arCurrentlyLoadedExt;
 		self::$arCurrentlyLoadedExt = array();
@@ -7307,7 +7537,7 @@ public static 	public static function GetHTML($arExt)
 		return $res;
 	}
 
-	public static public static function GetScriptsList()
+	public static function GetScriptsList()
 	{
 		$scriptsList = array();
 		foreach(self::$arCurrentlyLoadedExt as $ext=>$q)
@@ -7318,7 +7548,7 @@ public static 	public static function GetHTML($arExt)
 		return $scriptsList;
 	}
 
-public static 	private function _loadExt($ext, $bReturn)
+private function _loadExt($ext, $bReturn)
 	{
 		$ret = '';
 
@@ -7359,7 +7589,7 @@ public static 	private function _loadExt($ext, $bReturn)
 		return $ret;
 	}
 
-public static 	public static function ShowTimer($params)
+public static function ShowTimer($params)
 	{
 		$id = $params['id'] ? $params['id'] : 'timer_'.RandString(7);
 
@@ -7380,23 +7610,23 @@ public static 	public static function ShowTimer($params)
 		return $res;
 	}
 
-public static 	public static function IsExtRegistered($ext)
+public static function IsExtRegistered($ext)
 	{
 		$ext = preg_replace('/[^a-z0-9_]/i', '', $ext);
 		return is_array(self::$arRegisteredExt[$ext]);
 	}
 
-	ppublic static ublic static function getExtInfo($ext)
+	public static function getExtInfo($ext)
 	{
 		return self::$arRegisteredExt[$ext];
 	}
 
-public static 	private function _RegisterStandardExt()
+private static function _RegisterStandardExt()
 	{
 		require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/main/jscore.php');
 	}
 
-public static 	private static function _loadJS($js, $bReturn)
+public static function _loadJS($js, $bReturn)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -7473,7 +7703,7 @@ public static 	private static function _loadJS($js, $bReturn)
 		return $jsMsg;
 	}
 
-public static 	private static function _loadCSS($css, $bReturn)
+private static function _loadCSS($css, $bReturn)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -7502,7 +7732,7 @@ public static 	private static function _loadCSS($css, $bReturn)
 
 class CUtil
 {
-public static 	public static function addslashes($s)
+public static function addslashes($s)
 	{
 		static $aSearch = array("\\", "\"", "'");
 		static $aReplace = array("\\\\", '\\"', "\\'");
@@ -7534,7 +7764,7 @@ public static 	public static function addslashes($s)
 		return $html;
 	}
 
-	public static public static function JSEscape($s)
+public static function JSEscape($s)
 	{
 		static $aSearch = array("\xe2\x80\xa9", "\\", "'", "\"", "\r\n", "\r", "\n", "\xe2\x80\xa8", "*/", "</");
 		static $aReplace = array(" ", "\\\\", "\\'", '\\"', "\n", "\n", "\\n", "\\n", "*\\/", "<\\/");
@@ -7542,66 +7772,69 @@ public static 	public static function addslashes($s)
 		return $val;
 	}
 
-public static 	public static function JSUrlEscape($s)
+public static function JSUrlEscape($s)
 	{
 		static $aSearch = array("%27", "%5C", "%0A", "%0D", "%", "&#039;", "&#39;", "&#x27;", "&apos;");
 		static $aReplace = array("\\'", "\\\\", "\\n", "\\r", "%25", "\\'", "\\'", "\\'", "\\'");
 		return str_replace($aSearch, $aReplace, $s);
 	}
 
-public static 	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
+public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
 	{
 		static $aSearch = array("\r", "\n");
-
 		$bExtType = !!$bExtType;
 
-		if(is_array($arData))
+		switch(gettype($arData))
 		{
+		case "string":
+			if(preg_match("#['\"\\n\\r<\\\\\x80]#", $arData))
+				return "'".CUtil::JSEscape($arData)."'";
+			else
+				return "'".$arData."'";
+		case "array":
 			$i = -1;
 			$j = -1;
-			if (!empty($arData))
+			foreach($arData as $j => $temp)
 			{
-				foreach($arData as $j => $temp)
-				{
-					$i++;
-					if ($j !== $i)
-						break;
-				}
+				$i++;
+				if ($j !== $i)
+					break;
 			}
 
 			if($j === $i)
 			{
 				foreach($arData as $key => $value)
 				{
-
-					if(is_string($value))
+					switch(gettype($value))
 					{
+					case "string":
 						if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
 							$arData[$key] = "'".CUtil::JSEscape($value)."'";
 						else
 							$arData[$key] = "'".$value."'";
-					}
-					elseif(is_bool($value))
-					{
+						break;
+					case "array":
+						$arData[$key] = CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
+						break;
+					case "boolean":
 						if($value === true)
 							$arData[$key] = 'true';
 						else
 							$arData[$key] = 'false';
-					}
-					elseif(is_array($value))
-					{
-						$arData[$key] = CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
-					}
-					elseif ($bExtType && (is_int($value) || is_float($value)))
-					{
-						$arData[$key] = $value;
-					}
-					else
-					{
+						break;
+					case "integer":
+					case "double":
+						if ($bExtType)
+						{
+							$arData[$key] = $value;
+							break;
+						}
+					default:
 						if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
 							$arData[$key] = "'".CUtil::JSEscape($value)."'";
 						else
 							$arData[$key] = "'".$value."'";
+						break;
 					}
 				}
 				return '['.implode(',', $arData).']';
@@ -7625,53 +7858,52 @@ public static 	public static function PhpToJSObject($arData, $bWS = false, $bSki
 				else
 					$res .= "'".$key."':";
 
-				if(is_string($value))
+				switch(gettype($value))
 				{
+				case "string":
 					if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
 						$res .= "'".CUtil::JSEscape($value)."'";
 					else
 						$res .= "'".$value."'";
-				}
-				elseif(is_bool($value))
-				{
+					break;
+				case "array":
+					$res .= CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
+					break;
+				case "boolean":
 					if($value === true)
 						$res .= 'true';
 					else
 						$res .= 'false';
-				}
-				elseif(is_array($value))
-				{
-					$res .= CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
-				}
-				elseif ($bExtType && (is_int($value) || is_float($value)))
-				{
-					$res .= $value;
-				}
-				else
-				{
+					break;
+				case "integer":
+				case "double":
+					if ($bExtType)
+					{
+						$res .= $value;
+						break;
+					}
+				default:
 					if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
 						$res .= "'".CUtil::JSEscape($value)."'";
 					else
 						$res .= "'".$value."'";
+					break;
 				}
 			}
 			$res .= ($bWS ? "\n" : '').'}';
-
 			return $res;
-		}
-		elseif(is_bool($arData))
-		{
+		case "boolean":
 			if($arData === true)
 				return 'true';
 			else
 				return 'false';
-		}
-		elseif ($bExtType && (is_int($arData) || is_float($arData)))
-		{
-			return $arData;
-		}
-		else
-		{
+		case "integer":
+		case "double":
+			if ($bExtType)
+			{
+				return $arData;
+			}
+		default:
 			if(preg_match("#['\"\\n\\r<\\\\\x80]#", $arData))
 				return "'".CUtil::JSEscape($arData)."'";
 			else
@@ -7680,7 +7912,7 @@ public static 	public static function PhpToJSObject($arData, $bWS = false, $bSki
 	}
 
 	//$data must be in LANG_CHARSET encoding
-public static 	public static function JsObjectToPhp($data, $bSkipNative=false)
+public static function JsObjectToPhp($data, $bSkipNative=false)
 	{
 		$arResult = array();
 
@@ -7892,19 +8124,19 @@ public static 	public static function JsObjectToPhp($data, $bSkipNative=false)
 		return $arResult;
 	}
 
-public static 	public static function DecodeUtf16($ch)
+public static function DecodeUtf16($ch)
 	{
 		$res = chr(hexdec($ch[2])).chr(hexdec($ch[1]));
 		return CharsetConverter::ConvertCharset($res, "UTF-16", LANG_CHARSET);
 	}
 
-public static 	public static function JSPostUnescape()
+	public static function JSPostUnescape()
 	{
 		CUtil::decodeURIComponent($_POST);
 		CUtil::decodeURIComponent($_REQUEST);
 	}
 
-	public static public static function decodeURIComponent(&$item)
+	public static function decodeURIComponent(&$item)
 	{
 		if(defined("BX_UTF"))
 		{
@@ -7923,40 +8155,43 @@ public static 	public static function JSPostUnescape()
 		}
 	}
 
-public static 	public static function DetectUTF8($string)
+public static function DetectUTF8($string)
 	{
 		//http://mail.nl.linux.org/linux-utf8/1999-09/msg00110.html
-		$arBytes = array();
-		if(preg_match_all("/(%[0-9A-F]{2})/i", $string, $match))
+
+		if(preg_match_all("/(?:%)([0-9A-F]{2})/i", $string, $match))
 		{
-			foreach($match[1] as $hex)
-				$arBytes[] = hexdec(substr($hex, 1));
-		}
-		else
-		{
-			for($i=0, $n=CUtil::BinStrlen($string); $i<$n; $i++)
-				$arBytes[] = ord($string[$i]);
+			$string = pack("H*", strtr(implode('', $match[1]), 'abcdef', 'ABCDEF'));
 		}
 
+		//valid UTF-8 octet sequences
+		//0xxxxxxx
+		//110xxxxx 10xxxxxx
+		//1110xxxx 10xxxxxx 10xxxxxx
+		//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+		$prevBits8and7 = 0;
 		$is_utf = 0;
-		foreach($arBytes as $i => $byte)
+		foreach(unpack("C*", $string) as $byte)
 		{
-			if( ($byte & 0xC0) == 0x80 )
+			$hiBits8and7 = $byte & 0xC0;
+			if ($hiBits8and7 == 0x80)
 			{
-				if( ($i > 0) && (($arBytes[$i-1] & 0xC0) == 0xC0) )
+				if ($prevBits8and7 == 0xC0)
 					$is_utf++;
-				elseif( ($i > 0) && (($arBytes[$i-1] & 0x80) == 0x00) )
+				elseif (($prevBits8and7 & 0x80) == 0x00)
 					$is_utf--;
 			}
-			elseif( ($i > 0) && (($arBytes[$i-1] & 0xC0) == 0xC0) )
+			elseif ($prevBits8and7 == 0xC0)
 			{
 					$is_utf--;
 			}
+			$prevBits8and7 = $hiBits8and7;
 		}
-		return $is_utf > 0;
+		return ($is_utf > 0);
 	}
 
-public static 	public static function ConvertToLangCharset($string)
+public static function ConvertToLangCharset($string)
 	{
 		$bUTF = CUtil::DetectUTF8($string);
 
@@ -7978,7 +8213,36 @@ public static 	public static function ConvertToLangCharset($string)
 		return $string;
 	}
 
-public static 	public static function GetAdditionalFileURL($file, $bSkipCheck=false)
+
+	/**
+	* <p>Функция возвращает url к файлу с указанием метки версии файла, для его автоматического обновления на клиентской стороны. Метка формируется на основании даты изменения файла и его размера.</p>
+	*
+	*
+	*
+	*
+	* @param fil $e  путь к файлу
+	*
+	*
+	*
+	* @param bSkipChec $k = false При установке в true не проверяет наличие файла и не формирует
+	* метку. Результат в этом случае равен $file. По умолчанию false.
+	*
+	*
+	*
+	* @return result_type 
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;link href="&lt;?=CUtil::GetAdditionalFileURL('/bitrix/templates/new/some.css');?&gt;" type="text/css" rel="stylesheet" / &gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cutil/getadditionalfileurl.php
+	* @author Bitrix
+	*/
+	public static function GetAdditionalFileURL($file, $bSkipCheck=false)
 	{
 		$filePath = $_SERVER['DOCUMENT_ROOT'].$file;
 		if($bSkipCheck || file_exists($filePath))
@@ -7987,12 +8251,12 @@ public static 	public static function GetAdditionalFileURL($file, $bSkipCheck=fa
 			return $file;
 	}
 
-public static 	public static function InitJSCore($arExt = array(), $bReturn = false)
+public static function InitJSCore($arExt = array(), $bReturn = false)
 	{
 		return CJSCore::Init($arExt, $bReturn);
 	}
 
-	public static public static function GetPopupSize($resize_id, $arDefaults = array())
+public static function GetPopupSize($resize_id, $arDefaults = array())
 	{
 		if ($resize_id)
 		{
@@ -8009,7 +8273,7 @@ public static 	public static function InitJSCore($arExt = array(), $bReturn = fa
 			return false;
 	}
 
-public static 	public static function GetPopupOptions($wnd_id)
+public static function GetPopupOptions($wnd_id)
 	{
 		if ($wnd_id)
 		{
@@ -8019,10 +8283,12 @@ public static 	public static function GetPopupOptions($wnd_id)
 			);
 		}
 		else
+		{
 			return false;
+		}
 	}
 
-public static 	public static function SetPopupOptions($wnd_id, $arOptions)
+	public static function SetPopupOptions($wnd_id, $arOptions)
 	{
 		if ($wnd_id)
 		{
@@ -8034,7 +8300,6 @@ public static 	public static function SetPopupOptions($wnd_id, $arOptions)
 		}
 	}
 
-	pu
 	/**
 	* <p>Функция для транслитерации строки текста.</p> <p><b>Примечание</b>: возможное примечание.</p>
 	*
@@ -8079,7 +8344,7 @@ public static 	public static function SetPopupOptions($wnd_id, $arOptions)
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cutil/translit.php
 	* @author Bitrix
 	*/
-	public static blic static function translit($str, $lang, $params = array())
+	public static function translit($str, $lang, $params = array())
 	{
 		static $search = array();
 
@@ -8164,12 +8429,12 @@ public static 	public static function SetPopupOptions($wnd_id, $arOptions)
 		return $str_new;
 	}
 
-public static 	public static function BinStrlen($buf)
+public static function BinStrlen($buf)
 	{
 		return (function_exists('mb_strlen')? mb_strlen($buf, 'latin1') : strlen($buf));
 	}
 
-public 	public static function BinSubstr($buf, $start)
+public static function BinSubstr($buf, $start)
 	{
 		$length = (func_num_args() > 2? func_get_arg(2) : self::BinStrlen($buf));
 		return (function_exists('mb_substr')? mb_substr($buf, $start, $length, 'latin1') : substr($buf, $start, $length));
@@ -8181,7 +8446,7 @@ public 	public static function BinSubstr($buf, $start)
 	* @return int
 	*
 	*/
-public static 	public static function Unformat($str)
+public static function Unformat($str)
 	{
 		$str = strtolower($str);
 		$res = intval($str);
@@ -8203,7 +8468,7 @@ public static 	public static function Unformat($str)
 	 * @return void
 	 *
 	 */
-public 	public static function AdjustPcreBacktrackLimit($val)
+public static function AdjustPcreBacktrackLimit($val)
 	{
 		$val = intval($val);
 		if($val <=0 )
@@ -8223,14 +8488,14 @@ class CHTTP
 	var $fp = null;
 	var $headers = array();
 	var $cookies = array();
-	var $http_timeout = 120;
+	var $http_timeout = 30;
 	var $user_agent;
 	var $follow_redirect = false;
 	var $errno;
 	var $errstr;
 	var $additional_headers = array();
 
-	private $redirectMax = 20;
+	private $redirectMax = 5;
 	private $redirectsMade = 0;
 	private static $lastSetStatus = "";
 
@@ -8319,7 +8584,7 @@ public 	function Post($url, $arPostData)
 		return false;
 	}
 
-public 	function PrepareData($arPostData, $prefix = '')
+	public function PrepareData($arPostData, $prefix = '')
 	{
 		$str = '';
 
@@ -8355,11 +8620,13 @@ public 	function PrepareData($arPostData, $prefix = '')
 	/**
 	 * @deprecated Use Bitrix\Main\Web\HttpClient
 	 */
-	public function HTTPQuery($method, $url, $postdata = '')
+public 	function HTTPQuery($method, $url, $postdata = '')
 	{
 		$arUrl = false;
 		if(is_resource($this->fp))
 			$file_pos = ftell($this->fp);
+
+		$this->redirectsMade = 0;
 
 		while (true)
 		{
@@ -8523,7 +8790,7 @@ public static 	function SetAuthBasic($user, $pass)
 	/**
 	 * @deprecated Use Bitrix\Main\Web\Uri
 	 */
-	public public function ParseURL($url, $arUrlOld = false)
+	public function ParseURL($url, $arUrlOld = false)
 	{
 		$arUrl = parse_url($url);
 
@@ -8617,12 +8884,12 @@ public static 	function SetAuthBasic($user, $pass)
 		}
 	}
 
-public static 	public function setFollowRedirect($follow)
+public static function setFollowRedirect($follow)
 	{
 		$this->follow_redirect = $follow;
 	}
 
-public static 	public function setRedirectMax($n)
+public static function setRedirectMax($n)
 	{
 		$this->redirectMax = $n;
 	}
@@ -8630,7 +8897,7 @@ public static 	public function setRedirectMax($n)
 	/**
 	 * @deprecated Use Bitrix\Main\Web\HttpClient
 	 */
-	public static public static function sGet($url, $follow_redirect = false) //static get
+	public static function sGet($url, $follow_redirect = false) //static get
 	{
 		$ob = new CHTTP();
 		$ob->setFollowRedirect($follow_redirect);
@@ -8665,7 +8932,7 @@ public static 	function SetAdditionalHeaders($arHeader=array())
 	 * @param int $httpTimeout
 	 * @return bool|string
 	 */
-public static 	public static function sGetHeader($url, $arHeader = array(), $httpTimeout = 0)
+public static function sGetHeader($url, $arHeader = array(), $httpTimeout = 0)
 	{
 		$httpTimeout = intval($httpTimeout);
 		$ob = new CHTTP();
@@ -8686,7 +8953,7 @@ public static 	public static function sGetHeader($url, $arHeader = array(), $htt
 	 * @param int $http_timeout
 	 * @return bool|string
 	 */
-public static 	public static function sPostHeader($url, $arPostData, $arHeader = array(), $http_timeout = 0)
+public static function sPostHeader($url, $arPostData, $arHeader = array(), $http_timeout = 0)
 	{
 		$http_timeout = intval($http_timeout);
 		$ob = new CHTTP();
@@ -8697,7 +8964,7 @@ public static 	public static function sPostHeader($url, $arPostData, $arHeader =
 		return $ob->Post($url, $arPostData);
 	}
 
-public static 	public static function SetStatus($status)
+public static function SetStatus($status)
 	{
 		$bCgi = (stristr(php_sapi_name(), "cgi") !== false);
 		if($bCgi && (!defined("BX_HTTP_STATUS") || BX_HTTP_STATUS == false))
@@ -8707,12 +8974,12 @@ public static 	public static function SetStatus($status)
 		self::$lastSetStatus = $status;
 	}
 
-public static 	public static function GetLastStatus()
+public static function GetLastStatus()
 	{
 		return self::$lastSetStatus;
 	}
 
-public static 	public static function SetAuthHeader($bDigestEnabled=true)
+public static function SetAuthHeader($bDigestEnabled=true)
 	{
 		self::SetStatus('401 Unauthorized');
 
@@ -8731,7 +8998,7 @@ public static 	public static function SetAuthHeader($bDigestEnabled=true)
 		}
 	}
 
-public static 	public static function ParseAuthRequest()
+public static function ParseAuthRequest()
 	{
 		$sDigest = '';
 
@@ -8787,7 +9054,7 @@ public static 	public static function ParseAuthRequest()
 		return false;
 	}
 
-public static 	public static function ParseDigest($sDigest)
+public static function ParseDigest($sDigest)
 	{
 		$data = array();
 		$needed_parts = array('nonce'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
@@ -8805,7 +9072,7 @@ public static 	public static function ParseDigest($sDigest)
 		return ($needed_parts? false : $data);
 	}
 
-public static 	public static function urlAddParams($url, $add_params, $options = array())
+public static function urlAddParams($url, $add_params, $options = array())
 	{
 		if(count($add_params))
 		{
@@ -8842,7 +9109,7 @@ public static 	public static function urlAddParams($url, $add_params, $options =
 		return $url;
 	}
 
-public static 	public static function urlDeleteParams($url, $delete_params, $options = array())
+public static function urlDeleteParams($url, $delete_params, $options = array())
 	{
 		$url_parts = explode("?", $url, 2);
 		if(count($url_parts) == 2 && strlen($url_parts[1]) > 0)
@@ -8883,7 +9150,7 @@ public static 	public static function urlDeleteParams($url, $delete_params, $opt
 		return $url;
 	}
 
-public static 	public static function urnEncode($str, $charset = false)
+public static function urnEncode($str, $charset = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -8910,7 +9177,7 @@ public static 	public static function urnEncode($str, $charset = false)
 		return $result;
 	}
 
-public static 	public static function urnDecode($str, $charset = false)
+public static function urnDecode($str, $charset = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -8938,7 +9205,7 @@ public static 	public static function urnDecode($str, $charset = false)
 	}
 
 	// search for /../ and ulrencoded /../
-public static 	public static function isPathTraversalUri($uri)
+public static function isPathTraversalUri($uri)
 	{
 		if (($pos = strpos($uri, "?")) !== false)
 			$uri = substr($uri, 0, $pos);
@@ -9145,8 +9412,10 @@ function UnEscapePHPString($str)
 
 function CheckSerializedData($str, $max_depth = 200)
 {
-	if(preg_match('/O\\:\\d/', $str)) // serialized objects
+	if(preg_match('/[OC]\\:\\+{0,1}\\d/', $str)) // serialized objects
+	{
 		return false;
+	}
 
 	// check max depth in PHP 5.3.0 and earlier
 	if(!version_compare(phpversion(),"5.3.0",">"))
@@ -9167,8 +9436,11 @@ function CheckSerializedData($str, $max_depth = 200)
 		}
 
 		return $cnt <= $max_depth;
-	} else
+	}
+	else
+	{
 		return true;
+	}
 }
 
 function NormalizePhone($number, $minLength = 10)

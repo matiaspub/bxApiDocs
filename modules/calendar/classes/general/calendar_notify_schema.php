@@ -23,6 +23,9 @@ class CCalendarNotifySchema
 				"info" => Array(
 					"NAME" => GetMessage('EC_NS_INFO'),
 				),
+				"event_comment" => Array(
+					"NAME" => GetMessage('EC_NS_EVENT_COMMENT'),
+				),
 			),
 		);
 	}

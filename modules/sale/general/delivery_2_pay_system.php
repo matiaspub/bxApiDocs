@@ -22,18 +22,9 @@ class CSaleDelivery2PaySystem
 					case "PAYSYSTEM_ID":
 						$arSqlSearch[] = $key."=".intval($val);
 						break;
-					case "=PAYSYSTEM_ID":
-						$arSqlSearch[] = "PAYSYSTEM_ID=".intval($val);
-						break;
-					case "=DELIVERY_ID":
-						$arSqlSearch[] = "DELIVERY_ID=".intval($val);
-						break;
-					case "=DELIVERY_PROFILE_ID":
-						$arSqlSearch[] = "DELIVERY_PROFILE_ID=".intval($val);
-						break;
 					case "DELIVERY_ID":
 					case "DELIVERY_PROFILE_ID":
-						$arSqlSearch[] = GetFilterQuery($key, $val);
+						$arSqlSearch[] = GetFilterQuery($key, $val, "N");
 						break;
 				}
 			}
@@ -137,10 +128,10 @@ class CSaleDelivery2PaySystem
 
 		$arAddedRecords = array();
 
-		$arFilterFields["=DELIVERY_ID"] = $ID;
+		$arFilterFields["DELIVERY_ID"] = $ID;
 
 		if(isset($arFields["DELIVERY_PROFILE_ID"]))
-			$arFilterFields["=DELIVERY_PROFILE_ID"] = $arFields["DELIVERY_PROFILE_ID"];
+			$arFilterFields["DELIVERY_PROFILE_ID"] = $arFields["DELIVERY_PROFILE_ID"];
 
 		self::Delete($arFilterFields);
 

@@ -788,7 +788,7 @@ function GetUserProfileLink($user_id, $title)
 		}
 
 		if($arUsersCache[$user_id])
-			return '[<a href="user_edit.php?lang='.LANGUAGE_ID.'&ID='.$user_id.'" title="'.$title.'">'.$user_id."</a>]&nbsp;(".$arUsersCache[$user_id]["LOGIN"].") ".$arUsersCache[$user_id]["NAME"]." ".$arUsersCache[$user_id]["LAST_NAME"];
+			return '[<a href="user_edit.php?lang='.LANGUAGE_ID.'&ID='.$user_id.'" title="'.$title.'">'.$user_id."</a>]&nbsp;(".htmlspecialcharsex($arUsersCache[$user_id]["LOGIN"]).") ".htmlspecialcharsex($arUsersCache[$user_id]["NAME"]." ".$arUsersCache[$user_id]["LAST_NAME"]);
 	}
 	return '';
 }

@@ -1077,7 +1077,7 @@ class CSecurityIPRule
 						if(defined("ADMIN_SECTION") && ADMIN_SECTION===true)
 							$bMatch = $arRule["ADMIN_SECTION"] == "Y";
 						else
-							$bMatch = (strlen($arRule["SITE_ID"]) <= 0) || ($arRule["SITE_ID"] = SITE_ID);
+							$bMatch = (!$arRule["SITE_ID"] || $arRule["SITE_ID"] == SITE_ID);
 					}
 					else
 					{

@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/
 
 
 /**
- * <b>CTicketDictionary</b> - класс для работы со справочником обращений.
+ * <b>CTicketDictionary</b> - класс для работы со справочником обращений.</body> </html>
  *
  *
  *

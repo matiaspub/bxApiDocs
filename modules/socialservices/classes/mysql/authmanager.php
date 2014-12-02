@@ -4,7 +4,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialservices/classes/g
 class CSocServAuthDB
 	extends CSocServAuth
 {
-
 	static function Add($arFields)
 	{
 		global $DB;
@@ -28,6 +27,7 @@ class CSocServAuthDB
 		$cache_dir = '/bx/socserv_ar_user';
 		$obCache->Clean($cache_id, $cache_dir);
 
+		$arFields['ID'] = $lastId;
 		foreach(GetModuleEvents("socialservices", "OnAfterSocServUserAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
@@ -39,7 +39,7 @@ class CSocServAuthDB
 		global $DB;
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "LOGIN", "NAME", "LAST_NAME", "EMAIL", "PERSONAL_PHOTO",
-				"EXTERNAL_AUTH_ID", "USER_ID", "XML_ID", "CAN_DELETE", "PERSONAL_WWW", "PERMISSIONS", "OATOKEN", "OASECRET", "REFRESH_TOKEN", "ACTIVE", "SEND_ACTIVITY", "OATOKEN_EXPIRES");
+				"EXTERNAL_AUTH_ID", "USER_ID", "XML_ID", "CAN_DELETE", "PERSONAL_WWW", "PERMISSIONS", "OATOKEN", "OASECRET", "REFRESH_TOKEN", "ACTIVE", "SEND_ACTIVITY", "OATOKEN_EXPIRES", "INITIALIZED");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "SU.ID", "TYPE" => "int"),
@@ -60,7 +60,9 @@ class CSocServAuthDB
 			"SEND_ACTIVITY" => array("FIELD" => "SU.SEND_ACTIVITY", "TYPE" => "char"),
 			"SITE_ID" => array("FIELD" => "SU.SITE_ID", "TYPE" => "string"),
 			"OATOKEN_EXPIRES" => array("FIELD" => "SU.OATOKEN_EXPIRES", "TYPE" => "int"),
-			"ACTIVE" => array("FIELD" => "BU.ACTIVE", "TYPE" => "char", "FROM" => "RIGHT JOIN b_user BU ON (SU.USER_ID = BU.ID)"),
+			"INITIALIZED" => array("FIELD" => "SU.INITIALIZED", "TYPE" => "char"),
+			"ACTIVE" => array("FIELD" => "BU.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_user BU ON (SU.USER_ID
+			 = BU.ID)"),
 		);
 		$arSqls = CGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);

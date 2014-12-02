@@ -62,12 +62,12 @@ define('B_PROLOG_INCLUDED', true);
 /**
  * Текущая версия главного модуля.
  */
-define('SM_VERSION', "14.5.0");
+define('SM_VERSION', "15.0.2");
 
 /**
  * Дата выпуска текущей версии главного модуля.
  */
-define('SM_VERSION_DATE', "2014-04-10 12:30:00");
+define('SM_VERSION_DATE', "2014-11-13 14:40:00");
 
 /**
  * Если необходимо подключать пролог административной части, то значение данной константы - "true".
@@ -142,7 +142,7 @@ define('STATISTIC_ONLY', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("NO_KEEP_STATISTIC", true);</pre>
- *        	
+ *
  */
 define('NO_KEEP_STATISTIC', true);
 
@@ -348,11 +348,6 @@ define('CRYPT_MODE_ECB', 0);
 define('CRYPT_MODE_CBC', 1);
 
 /**
- * BX_B_FILE_DIALOG_SCRIPT_LOADED
- */
-define('BX_B_FILE_DIALOG_SCRIPT_LOADED', true);
-
-/**
  * BX_SPREAD_SITES
  */
 define('BX_SPREAD_SITES', 2);
@@ -386,6 +381,11 @@ define('BX_AUTH_FORM', true);
  * BX_BUFFER_USED
  */
 define('BX_BUFFER_USED', true);
+
+/**
+ * BX_BUFFER_SHUTDOWN
+ */
+define('BX_BUFFER_SHUTDOWN', true);
 
 /**
  * BX_FORK_AGENTS_AND_EVENTS_FUNCTION_STARTED
@@ -661,6 +661,11 @@ define('LANG_ADMIN_LID', $arLang["LANGUAGE_ID"]);
  * BX_STARTED
  */
 define('BX_STARTED', true);
+
+/**
+ * BX_SKIP_SESSION_EXPAND
+ */
+define('BX_SKIP_SESSION_EXPAND', true);
 
 /**
  * LICENSE_KEY

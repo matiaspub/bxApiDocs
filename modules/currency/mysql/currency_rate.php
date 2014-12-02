@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/currency/general/currenc
 
 
 /**
- * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.
+ * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.</body> </html>
  *
  *
  *
@@ -27,7 +27,7 @@ class CCurrencyRates extends CAllCurrencyRates
 	*
 	*
 	*
-	* @param string $curFrom  Исходная валюта. </h
+	* @param string $curFrom  Исходная валюта.
 	*
 	*
 	*
@@ -85,7 +85,7 @@ class CCurrencyRates extends CAllCurrencyRates
 	*
 	*
 	*
-	* @param string $curFrom  Исходная валюта. </h
+	* @param string $curFrom  Исходная валюта.
 	*
 	*
 	*

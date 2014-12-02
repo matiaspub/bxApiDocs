@@ -8,7 +8,7 @@ Files:
 
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_russianpost.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_russianpost.php');
 
 // define('DELIVERY_RUSSIANPOST_WRITE_LOG', 0); // flag 'write to log'. use CDeliveryRUSSIANPOST::__WriteToLog() for logging.
 // define('DELIVERY_RUSSIANPOST_CACHE_LIFETIME', 2592000); // cache lifetime - 30 days (60*60*24*30)

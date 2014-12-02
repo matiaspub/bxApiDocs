@@ -9,19 +9,6 @@ IncludeModuleLangFile(__FILE__);
 /**********************************************************************/
 /************** POINTS ************************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumPoints</b> - класс для работы со званиями (статусами пользователей) форума.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/index.php
- * @author Bitrix
- */
 class CAllForumPoints
 {
 	//---------------> Points insert, update, delete
@@ -119,28 +106,6 @@ class CAllForumPoints
 		return true;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры звания с кодом ID на значения, указанные в массиве arFields.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код звания.
-	*
-	*
-	*
-	* @param array $arFields  Массив новых значений параметров звания.
-	*
-	*
-	*
-	* @return int <p>Функция возвращает код изменяемого звания или false в случае
-	* ошибки.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -169,23 +134,6 @@ class CAllForumPoints
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Удаляет звание (рейтинг) с кодом ID из системы званий форума. </p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код звания для удаления.
-	*
-	*
-	*
-	* @return bool <p>Возвращает True.</p><h4> </h4
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -197,60 +145,6 @@ class CAllForumPoints
 		return true;
 	}
 
-	
-	/**
-	* <p>Возвращает звания форума, которые удовлетворяют фильтру arFilter, упорядоченные в соответствии с порядком arOrder </p>
-	*
-	*
-	*
-	*
-	* @param array $arrayarOrder = array("MIN_POINTS"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
-	* массив, в котором ключами являются названия параметров звания, а
-	* значениями - направления сортировки.</p> <p>Допустимые параметры
-	* звания для сортировки:<br><b>ID</b> - код звания<br><b>CODE</b> - мнемонический
-	* код<br><b> VOTES</b> - количество голосов при голосовании<br><b>MIN_POINTS</b> -
-	* количество баллов, которые нужны для достижения этого звания</p>
-	*
-	*
-	*
-	* @param array $arrayarFilter = array() <p>Фильтр на возвращаемые звания; представляет собой
-	* ассоциативный массив, в котором ключами являются названия
-	* параметров звания, а значениями - условия на эти параметры.</p>
-	* <p>Допустимые параметры звания для фильтрации:<br><b>ID</b> - код
-	* звания<br><b>CODE</b> - мнемонический код<br><b>MIN_POINTS</b> - количество
-	* баллов, которые нужны для достижения этого звания.</p>
-	*
-	*
-	*
-	* @return CDBResult <p>Возвращяется объект класса CDBResult, каждая запись которого
-	* представляет собой массив с ключами</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код звания.</td> </tr> <tr>
-	* <td>MIN_POINTS</td> <td>Количество баллов, необходимое для получения этого
-	* звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td> </tr> <tr> <td>VOTES</td>
-	* <td>Количество голосов, которое имеет пользователь с этим
-	* званием.</td> </tr> </table> <p> </p<a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* // Сортировка по количеству голосов по убыванию
-	* // при равном количестве голосов сортировка по ID по возрастанию
-	* $arOrder = array("VOTES"=&gt;"DESC", "ID"=&gt;"ASC");
-	* // Фильтр указывает, что нужно выбирать только те звания
-	* // для получения которых нужно как минимум 50 баллов
-	* $arFilter = array("&gt;=MIN_POINTS"=&gt;50);
-	* $db_res = CForumPoints::GetList($arOrder, $arFilter);
-	* while ($ar_res = $db_res-&gt;Fetch())
-	* {
-	*    echo $ar_res["ID"]."-".$ar_res["VOTES"]."&lt;br&gt;";
-	* }
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = array("MIN_POINTS"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -315,63 +209,6 @@ class CAllForumPoints
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	
-	/**
-	* <p>Возвращает звания форума, которые удовлетворяют фильтру arFilter, упорядоченные в соответствии с порядком arOrder</p>
-	*
-	*
-	*
-	*
-	* @param array $arrayarOrder = array("MIN_POINTS"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
-	* массив, в котором ключами являются названия параметров звания, а
-	* значениями - направления сортировки.</p> <p>Допустимые параметры
-	* звания для сортировки:<br><b>ID</b> - код звания<br><b>CODE</b> - мнемонический
-	* код<br><b>VOTES</b> - количество голосов при голосовании<br><b>MIN_POINTS</b> -
-	* количество баллов, которые нужны для достижения этого звания</p>
-	*
-	*
-	*
-	* @param array $arrayarFilter = array() <p>Фильтр на возвращаемые звания; представляет собой
-	* ассоциативный массив, в котором ключами являются названия
-	* параметров звания, а значениями - условия на эти параметры.</p>
-	* <p>Допустимые параметры звания для фильтрации:<br><b>LID</b> - код языка
-	* (должен присутствовать в фильтре) <br><b>ID</b> - код звания<br><b>CODE</b> -
-	* мнемонический код<br><b>MIN_POINTS</b> - количество баллов, которые нужны
-	* для достижения этого звания.</p>
-	*
-	*
-	*
-	* @return CDBResult <p>Возвращается объект класса CDBResult, каждая запись которого
-	* представляет собой массив с ключами</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код звания.</td> </tr> <tr>
-	* <td>MIN_POINTS</td> <td>Количество баллов, необходимое для получения этого
-	* звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td> </tr> <tr> <td>VOTES</td>
-	* <td>Количество голосов, которое имеет пользователь с этим
-	* званием.</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr> <td>NAME</td> <td>Название
-	* звания на языке LID </td> </tr> </table> <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* // Сортировка по количеству голосов по убыванию
-	* // при равном количестве голосов сортировка по ID по возрастанию
-	* $arOrder = array("VOTES"=&gt;"DESC", "ID"=&gt;"ASC");
-	* 
-	* // Фильтр указывает, что нужно выбирать только те звания
-	* // для получения которых нужно как минимум 50 баллов
-	* $arFilter = array("LID"=&gt;"ru", "&gt;=MIN_POINTS"=&gt;50);
-	* $db_res = CForumPoints::GetList($arOrder, $arFilter);
-	* while ($ar_res = $db_res-&gt;Fetch())
-	* {
-	*     echo $ar_res["NAME"]."-".$ar_res["VOTES"]."&lt;br&gt;";
-	* }
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getlistex.php
-	* @author Bitrix
-	*/
 	public static function GetListEx($arOrder = array("MIN_POINTS"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -445,39 +282,6 @@ class CAllForumPoints
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров звания (рейтинга) форума по его коду </p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код звания.
-	*
-	*
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами</p> <table class="tnormal"
-	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	* звания.</td> </tr> <tr> <td>MIN_POINTS</td> <td>Количество баллов, необходимое для
-	* получения этого звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td>
-	* </tr> <tr> <td>VOTES</td> <td>Количество голосов, которое имеет пользователь с
-	* этим званием.</td> </tr> </table> <p>  </p<a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* 
-	* $ar_res = CForumPoints::GetByID(3);
-	* echo "Пользователь с этим званием может отдать ".$ar_res["VOTES"]." голос(ов)";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -496,43 +300,6 @@ class CAllForumPoints
 		return False;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров звания (рейтинга) форума по его коду включая языкозависимые параметры.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код звания.
-	*
-	*
-	*
-	* @param string $strLang  Код языка.
-	*
-	*
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами</p> <table class="tnormal"
-	* width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	* звания.</td> </tr> <tr> <td>MIN_POINTS</td> <td>Количество баллов, необходимое для
-	* получения этого звания.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код.</td>
-	* </tr> <tr> <td>VOTES</td> <td>Количество голосов, которое имеет пользователь с
-	* этим званием.</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr> <td>NAME</td>
-	* <td>Название звания на языке LID.</td> </tr> </tbody></table> <p></p><a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $ar_res = CForumPoints::GetByIDEx(3, "ru");
-	* echo "Пользователи со званием ".$ar_res["NAME"]." могут отдать ".$ar_res["VOTES"]." голосов";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getbyidex.php
-	* @author Bitrix
-	*/
 	public static function GetByIDEx($ID, $strLang)
 	{
 		global $DB;
@@ -552,40 +319,6 @@ class CAllForumPoints
 		return False;
 	}
 
-	
-	/**
-	* <p>Возвращает массив языкозависимых параметров звания (рейтинга) форума по его коду.</p>
-	*
-	*
-	*
-	*
-	* @param int $POINTS_ID  Код звания.
-	*
-	*
-	*
-	* @param string $strLang  Код языка.
-	*
-	*
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами.</p> <table class="tnormal"
-	* width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>POINTS_ID</td>
-	* <td>Код звания.</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr> <td>NAME</td>
-	* <td>Название звания на языке LID. </td> </tr> </tbody></table> <p></p><a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $ar_res = CForumPoints::GetLangByID(3, "ru");
-	* echo "Звание с кодом ".$ar_res["POINTS_ID"]." на русском языке называется ".$ar_res["NAME"]."";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getlangbyid.php
-	* @author Bitrix
-	*/
 	public static function GetLangByID($POINTS_ID, $strLang)
 	{
 		global $DB;
@@ -688,27 +421,6 @@ class CAllForumPoints2Post
 	}
 
 	// User points is not recount.
-	
-	/**
-	* <p>Изменяет параметры записи с кодом ID в таблице соответствий между количеством сообщений пользователя на форуме и количеством баллов за одно сообщение на значения, указанные в массиве arFields.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код изменяемой записи. </htm
-	*
-	*
-	*
-	* @param array $arFields  Массив новых значений параметров записи.
-	*
-	*
-	*
-	* @return int <p>Функция возвращает код записи или false в случае ошибки.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -725,23 +437,6 @@ class CAllForumPoints2Post
 	}
 
 	// User points is not recount.
-	
-	/**
-	* <p>Удаляет запись с кодом ID из таблицы соответствий между количеством сообщений пользователя на форуме и количеством баллов за одно сообщение.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код записи.
-	*
-	*
-	*
-	* @return bool <p>Функция возвращает значение True.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -752,47 +447,6 @@ class CAllForumPoints2Post
 		return true;
 	}
 
-	
-	/**
-	* <p>Возвращает записи в таблице соответствий между количеством сообщений пользователя на форуме и количеством балов за одно сообщение, которые удовлетворяют фильтру arFilter, упорядоченные в соответствии с порядком arOrder.</p>
-	*
-	*
-	*
-	*
-	* @param array $arrayarOrder = array("MIN_NUM_POSTS"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
-	* массив, в котором ключами являются названия параметров записи, а
-	* значениями - направления сортировки.</p> <p>Допустимые параметры
-	* записи для сортировки: <br><b>ID</b> - код записи <br><b>MIN_NUM_POSTS</b> -
-	* количество сообщений, которое пользователь должен написать на
-	* форуме для получения этого количества балов за одно сообщение
-	* <br><b>POINTS_PER_POST</b> - Количество балов за одно сообщение <br></p>
-	*
-	*
-	*
-	* @param array $arrayarFilter = array() <p>Фильтр на возвращаемые записи; представляет собой
-	* ассоциативный массив, в котором ключами являются названия
-	* параметров записи, а значениями - условия на эти параметры.</p>
-	* <p>Допустимые параметры записи для фильтрации: <br><b>ID</b> - код записи
-	* <br><b>MIN_NUM_POSTS</b> - количество сообщений, которое пользователь должен
-	* написать на форуме для получения этого количества балов за одно
-	* сообщение.</p>
-	*
-	*
-	*
-	* @return CDBResult <p>Возвращяется объект класса CDBResult, каждая запись которого
-	* представляет собой массив с ключами.</p> <table class="tnormal" width="100%"><tbody> <tr>
-	* <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код записи.</td> </tr> <tr>
-	* <td>MIN_NUM_POSTS</td> <td>количество сообщений, которое пользователь должен
-	* написать на форуме для получения этого количества балов за одно
-	* сообщение.</td> </tr> <tr> <td>POINTS_PER_POST</td> <td>Количество балов за одно
-	* сообщение. Может иметь как целое значение, так и дробное: <br> 2 - два
-	* бала за каждое сообщение <br> 0.1 - одна десятая бала за каждое
-	* сообщение.</td> </tr> </tbody></table> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = array("MIN_NUM_POSTS"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -851,30 +505,6 @@ class CAllForumPoints2Post
 		return $db_res;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров записи в таблицу соответствий между количеством сообщений пользователя на форуме и количеством балов за одно сообщение по ее коду.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код записи.
-	*
-	*
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами.</p> <table class="tnormal"
-	* width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	* записи.</td> </tr> <tr> <td>MIN_NUM_POSTS</td> <td>Количество сообщений, которое
-	* пользователь должен написать на форуме для получения этого
-	* количества балов за одно сообщение.</td> </tr> <tr> <td>POINTS_PER_POST</td>
-	* <td>Количество балов за одно сообщение. Может иметь как целое
-	* значение, так и дробное: <br> 2 - два бала за каждое сообщение <br> 0.1 -
-	* одна десятая бала за каждое сообщение.</td> </tr> </tbody></table> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -928,47 +558,6 @@ class CAllForumUserPoints
 		return True;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры голосования пользователя с кодом FROM_USER_ID за пользователя с кодом TO_USER_ID на значения, указанные в массиве arFields.</p>
-	*
-	*
-	*
-	*
-	* @param int $FROM_USER_ID  Пользователь, который голосовал.
-	*
-	*
-	*
-	* @param int $TO_USER_ID  Пользователь, за которого голосовали.
-	*
-	*
-	*
-	* @param array $arFields  Массив новых значений параметров голосования.
-	*
-	*
-	*
-	* @return bool <p>Возвращает True в случае успешного изменения параметров
-	* голосования и False - в противном случае.</p> <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Изменим количество голосов, отданных текущим пользователем
-	* // за пользователя с кодом $UID на 53
-	* $arFields = array("POINTS" =&gt; 53);
-	* if (CForumUserPoints::Update($USER-&gt;GetID(), $UID, $arFields))
-	*    echo "Голосования успешно изменено";
-	* else
-	*    echo "Ошибка изменения голосования";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/update.php
-	* @author Bitrix
-	*/
 	public static function Update($FROM_USER_ID, $TO_USER_ID, $arFields)
 	{
 		global $DB;
@@ -1011,28 +600,6 @@ class CAllForumUserPoints
 		return true;
 	}
 
-	
-	/**
-	* <p>Функция удаляет из голосования голоса, отданные пользователем с кодом FROM_USER_ID пользователю с кодом TO_USER_ID.</p>
-	*
-	*
-	*
-	*
-	* @param int $FROM_USER_ID  Код пользователя, отдавшего голос.
-	*
-	*
-	*
-	* @param int $TO_USER_ID  Код пользователя, которому был отдан голос.
-	*
-	*
-	*
-	* @return bool <p>Функция возвращает True в случае успешного удаления и False - в
-	* случае ошибки.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($FROM_USER_ID, $TO_USER_ID)
 	{
 		global $DB;
@@ -1063,44 +630,6 @@ class CAllForumUserPoints
 		return true;
 	}
 
-	
-	/**
-	* <p>Возвращает голосования за посетителей форума, которые удовлетворяют фильтру arFilter, упорядоченные в соответствии с порядком arOrder.</p>
-	*
-	*
-	*
-	*
-	* @param array $arrayarOrder = array("TO_USER_ID"=>"ASC") <p>Порядок сортировки записей; представляет собой ассоциативный
-	* массив, в котором ключами являются названия параметров
-	* голосования, а значениями - направления сортировки.</p>
-	* <p>Допустимые параметры голосования для сортировки: <br><b>FROM_USER_ID</b> -
-	* код голосовавшего посетителя <br><b>TO_USER_ID</b> - код посетителя, за
-	* которого голосовали <br><b>POINTS</b> - количество отданных голосов
-	* <br><b>DATE_UPDATE</b> - дата последнего изменения записи </p>
-	*
-	*
-	*
-	* @param array $arrayarFilter = array() <p>Фильтр на возвращаемые голосования; представляет собой
-	* ассоциативный массив, в котором ключами являются названия
-	* параметров голосования, а значениями - условия на эти
-	* параметры.</p> <p>Допустимые параметры голосования для фильтрации:
-	* <br><b>FROM_USER_ID</b> - код голосовавшего посетителя <br><b>TO_USER_ID</b> - код
-	* посетителя, за которого голосовали</p>
-	*
-	*
-	*
-	* @return CDBResult <p>Возвращяется объект класса CDBResult, каждая запись которого
-	* представляет собой массив с ключами.</p> <table class="tnormal" width="100%"><tbody> <tr>
-	* <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>FROM_USER_ID</td> <td>Код
-	* пользователя, который отдал голос.</td> </tr> <tr> <td>TO_USER_ID</td> <td>Код
-	* пользователя, за которого отдали голос.</td> </tr> <tr> <td>POINTS</td>
-	* <td>Количество отданных голосов.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата
-	* последнего изменения записи.</td> </tr> </tbody></table> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = array("TO_USER_ID"=>"ASC"), $arFilter = array())
 	{
 		global $DB;
@@ -1158,47 +687,6 @@ class CAllForumUserPoints
 		return $db_res;
 	}
 
-	
-	/**
-	* <p>Функция возвращает массив параметров голосования пользователя с кодом FROM_USER_ID за пользователя с кодом TO_USER_ID.</p>
-	*
-	*
-	*
-	*
-	* @param int $FROM_USER_ID  Код пользователя, который отдал голос.
-	*
-	*
-	*
-	* @param int $TO_USER_ID  Код пользователя, за которого отдали голос.
-	*
-	*
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами.</p> <table class="tnormal"
-	* width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>FROM_USER_ID</td>
-	* <td>Код пользователя, который отдал голос.</td> </tr> <tr> <td>TO_USER_ID</td>
-	* <td>Код пользователя, за которого отдали голос.</td> </tr> <tr> <td>POINTS</td>
-	* <td>Количество отданных голосов.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата
-	* последнего изменения записи.</td> </tr> </tbody></table> <p></p><a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Выведем, сколько голосов отдал текущий пользователь 
-	* // за пользователя с кодом $AID
-	* $arUserPoints = CForumUserPoints::GetByID($USER-&gt;GetID(), $AID);
-	* if ($arUserPoints)
-	* {
-	*    echo "Вы отдали за этого пользователя ".$arUserPoints["POINTS"]. " голосов";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($FROM_USER_ID, $TO_USER_ID)
 	{
 		global $DB;

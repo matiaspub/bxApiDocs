@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.
+ * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.</body> </html>
  *
  *
  *

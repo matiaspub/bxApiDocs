@@ -450,6 +450,18 @@ class CBlogSearch
 							}
 						}
 
+						// get mentions and grats
+						$arMentionedUserID = CBlogPost::GetMentionedUserID($ar);
+
+						if (!empty($arMentionedUserID))
+						{
+							if (!isset($Result["PARAMS"]))
+							{
+								$Result["PARAMS"] = array();
+							}
+							$Result["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
+						}
+
 						if(IntVal($ar["SLID"]) <= 0)
 						{
 							$arAllow = array("HTML" => "N", "ANCHOR" => "N", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "TABLE" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "N", "VIDEO" => "N");
@@ -621,10 +633,14 @@ class CBlogSearch
 				{
 					$arSp = CBlogComment::GetSocNetCommentPerms($ar["POST_ID"]);
 					if(is_array($arSp))
+					{
 						$Result["PERMISSIONS"] = $arSp;
+					}
 
 					if(!in_array("U".$ar["AUTHOR_ID"], $Result["PERMISSIONS"]))
-							$Result["PERMISSIONS"][] = "U".$ar["AUTHOR_ID"];
+					{
+						$Result["PERMISSIONS"][] = "U".$ar["AUTHOR_ID"];
+					}
 
 					if(is_array($arSp))
 					{
@@ -634,8 +650,13 @@ class CBlogSearch
 							if(strpos($perm, "SG") !== false)
 							{
 								$sgIdTmp = str_replace("SG", "", substr($perm, 0, strpos($perm, "_")));
-								if(!in_array($sgIdTmp, $sgId) && IntVal($sgIdTmp) > 0)
+								if (
+									!in_array($sgIdTmp, $sgId) 
+									&& IntVal($sgIdTmp) > 0
+								)
+								{
 									$sgId[] = $sgIdTmp;
+								}
 							}
 						}
 
@@ -647,8 +668,20 @@ class CBlogSearch
 							);
 						}
 					}
+
+					// get mentions
+					$arMentionedUserID = CBlogComment::GetMentionedUserID($ar);
+
+					if (!empty($arMentionedUserID))
+					{
+						if (!isset($Result["PARAMS"]))
+						{
+							$Result["PARAMS"] = array();
+						}
+						$Result["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
+					}
 				}
-				
+
 				if(strlen($ar["TITLE"]) <= 0)
 				{
 					$Result["TITLE"] = substr($Result["BODY"], 0, 100);

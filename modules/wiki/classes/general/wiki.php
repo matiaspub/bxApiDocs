@@ -1255,60 +1255,6 @@ class CWiki
 	 * @param int $ID
 	 * @return array
 	 */
-	
-	/**
-	* <p>Возвращает Wiki-страницу по фильтру arFilter.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Идентификатор Wiki-страницы
-	*
-	*
-	*
-	* @param array $arFilter  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php">GetList</a>
-	*
-	*
-	*
-	* @return array <p>Возвращается массив, содержащий поля со значениями: </p> <table
-	* width="100%" class="tnormal"><tbody> <tr> <th width="15%">Параметр</th> <th>Описание</th> </tr> <tr>
-	* <td>NAME</td> <td>наименование страницы</td> </tr> <tr> <td>DETAIL_TEXT_TYPE</td> <td>тип
-	* содержимого страницы</td> </tr> <tr> <td>DETAIL_TEXT</td> <td>текст содержимого
-	* страницы</td> </tr> <tr> <td>IMAGES</td> <td>массив изображений страницы</td> </tr>
-	* <tr> <td>SECTIONS</td> <td>массив категорий страницы</td> </tr> <tr> <td>TAGS</td>
-	* <td>массив тэгов страницы</td> </tr> </tbody></table>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?<br>
-	* // Получим Wiki-страницу с идентификатором 13 инфо.блока с идентификатором 2
-	* $ID = 13;
-	* $arFilter = array(
-	* 	'ACTIVE' =&gt; 'Y',
-	* 	'CHECK_PERMISSIONS' =&gt; 'N',
-	* 	'IBLOCK_ID' =&gt; 2
-	* );
-	* $arElement = CWiki::GetElementById($ID, $arFilter);
-	* if ($arElement == false)
-	* 	echo 'Страница не найдена.';
-	* <br>?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementByName.php">CWiki::GetElementByName</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php">CWikiParser::Parse</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementById.php
-	* @author Bitrix
-	*/
 	public static function GetElementById($ID, $arFilter)
 	{
 		global $arParams;

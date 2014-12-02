@@ -32,12 +32,13 @@ class CVote extends CAllVote
 
 	public static function GetActiveVoteID($CHANNEL_ID)
 	{
+		global $DB;
 		$CHANNEL_ID = intval($CHANNEL_ID);
 		if ($CHANNEL_ID > 0)
 		{
 			if (!array_key_exists($CHANNEL_ID, $GLOBALS["VOTE_CACHE"]["CHANNEL"]))
 			{
-				$db_res = $GLOBALS["DB"]->Query("SELECT MAX(V.ID) AS ACTIVE_VOTE_ID ".
+				$db_res = $DB->Query("SELECT MAX(V.ID) AS ACTIVE_VOTE_ID ".
 					" FROM b_vote V ".
 					" WHERE V.CHANNEL_ID=".intval($CHANNEL_ID)." AND V.ACTIVE = 'Y' AND ".
 					" NOW() >= V.DATE_START AND V.DATE_END >= NOW()");
@@ -104,9 +105,7 @@ class CVote extends CAllVote
 		global $DB;
 		$err_mess = (CVote::err_mess())."<br>Function: GetList<br>Line: ";
 		$arSqlSearch = array();
-		$strSqlSearch = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
-		$sSubFilter = "";
 		foreach ($arFilter as $key => $val)
 		{
 			if (empty($val) || (is_string($val) && $val === "NOT_REF")): 
@@ -216,7 +215,6 @@ class CVote extends CAllVote
 	public static function GetListEx($arOrder = array(), $arFilter = array())
 	{
 		global $DB;
-		$err_mess = (CVote::err_mess())."<br>Function: GetList<br>Line: ";
 		$arSqlSearch = array();
 		$arOrder = (is_array($arOrder) ? $arOrder : array());
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
@@ -239,9 +237,8 @@ class CVote extends CAllVote
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
 								$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".implode(",", $val)."))";
-							}
 						}
 					}
 					$arSqlSearch[] = $str;
@@ -303,6 +300,7 @@ class CVote extends CAllVote
 		$arSqlSearch = array();
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
 		$params = (is_array($params) ? $params : array());
+		$left_join = "";
 
 		foreach ($arFilter as $key => $val)
 		{
@@ -323,7 +321,8 @@ class CVote extends CAllVote
 						$arr = array();
 						foreach ($val as $v):
 							$v = trim($v);
-							if (!empty($v)) {
+							if (!empty($v))
+							{
 								$arr[] = GetFilterQuery("C.SYMBOLIC_NAME", $v, $match);
 							}
 						endforeach;
@@ -428,4 +427,3 @@ class CVote extends CAllVote
 		return $result[$ResultType];
 	}
 }
-?>

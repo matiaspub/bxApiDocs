@@ -7,7 +7,9 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\DB\SqlExpression;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\SystemException;
 
 /**
  * Base entity field class
@@ -17,45 +19,83 @@ use Bitrix\Main\Localization\Loc;
 abstract class Field
 {
 	/** @var string */
-	protected
-		$name,
-		$dataType;
+	protected $name;
 
-	/**
-	 * @var string
-	 */
+	/** @var string */
+	protected $dataType;
+
+	/** @var array */
+	protected $initialParameters;
+
+	/** @var string */
 	protected $title;
 
-	/**
-	 * @var null|callback
-	 */
+	/** @var null|callback */
 	protected $validation = null;
 
-	/**
-	 * @var null|callback[]|Validator\Base[]
-	 */
+	/** @var null|callback[]|Validator\Base[] */
 	protected $validators = null;
+
+	/** @var array|callback[]|Validator\Base[] */
+	protected $additionalValidators = array();
+
+	/** @var null|callback */
+	protected $fetchDataModification = null;
+
+	/** @var null|callback[] */
+	protected $fetchDataModifiers;
+
+	/** @var null|callback[] */
+	protected $additionalFetchDataModifiers = array();
+
+	/** @var null|callback */
+	protected $saveDataModification = null;
+
+	/** @var null|callback[] */
+	protected $saveDataModifiers;
+
+	/** @var null|callback[] */
+	protected $additionalSaveDataModifiers = array();
+
+	/** @var bool */
+	protected $isSerialized = false;
+
+	/** @var Field */
+	protected $parentField;
 
 	/** @var Base */
 	protected $entity;
 
 	/**
+	 * @deprecated
+	 * @var array
+	 */
+	protected static $oldDataTypes = array(
+		'float' => 'Bitrix\Main\Entity\FloatField',
+		'string' => 'Bitrix\Main\Entity\StringField',
+		'text' => 'Bitrix\Main\Entity\TextField',
+		'datetime' => 'Bitrix\Main\Entity\DatetimeField',
+		'date' => 'Bitrix\Main\Entity\DateField',
+		'integer' => 'Bitrix\Main\Entity\IntegerField',
+		'enum' => 'Bitrix\Main\Entity\EnumField',
+		'boolean' => 'Bitrix\Main\Entity\BooleanField'
+	);
+
+	/**
 	 * @param string      $name
-	 * @param string      $dataType    scalar type or class name
-	 * @param Base        $entity
 	 * @param array       $parameters
 	 * @throws \Exception
 	 */
-	public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $parameters = array())
 	{
 		if (!strlen($name))
 		{
-			throw new \Exception('Field name required');
+			throw new SystemException('Field name required');
 		}
 
 		$this->name = $name;
-		$this->dataType = $dataType;
-		$this->entity = $entity;
+		$this->dataType = null;
+		$this->initialParameters = $parameters;
 
 		if (isset($parameters['title']))
 		{
@@ -65,25 +105,49 @@ abstract class Field
 		// validation
 		if (isset($parameters['validation']))
 		{
-			if (!is_callable($parameters['validation']))
-			{
-				throw new \Exception(sprintf(
-					'Validation for "%s" field of "%s" entity should be a callback',
-					$this->name, $this->entity->getDataClass()
-				));
-			}
-
 			$this->validation = $parameters['validation'];
 		}
+
+		// fetch data modifiers
+		if (isset($parameters['fetch_data_modification']))
+		{
+			$this->fetchDataModification = $parameters['fetch_data_modification'];
+		}
+
+		// save data modifiers
+		if (isset($parameters['save_data_modification']))
+		{
+			$this->saveDataModification = $parameters['save_data_modification'];
+		}
+
+		if (!empty($parameters['serialized']))
+		{
+			$this->setSerialized();
+		}
+	}
+
+	public function setEntity(Base $entity)
+	{
+		if ($this->entity !== null)
+		{
+			throw new SystemException(sprintf('Field "%s" already has entity', $this->name));
+		}
+
+		$this->entity = $entity;
 	}
 
 	public function validateValue($value, $primary, $row, Result $result)
 	{
+		if ($value instanceof SqlExpression)
+		{
+			return;
+		}
+
 		$validators = $this->getValidators();
 
 		foreach ($validators as $validator)
 		{
-			if (is_object($validator))
+			if ($validator instanceof IValidator)
 			{
 				$vResult = $validator->validate($value, $primary, $row, $this);
 			}
@@ -94,10 +158,28 @@ abstract class Field
 
 			if ($vResult !== true)
 			{
-				$result->addError(new FieldError($this, $vResult, FieldError::INVALID_VALUE));
-				break;
+				if ($vResult instanceof EntityError)
+				{
+					$result->addError($vResult);
+				}
+				else
+				{
+					$result->addError(new FieldError($this, $vResult, FieldError::INVALID_VALUE));
+				}
 			}
 		}
+	}
+
+	public function modifyValueBeforeSave($value, $data)
+	{
+		$modifiers = $this->getSaveDataModifiers();
+
+		foreach ($modifiers as $modifier)
+		{
+			$value = call_user_func_array($modifier, array($value, $data));
+		}
+
+		return $value;
 	}
 
 	/**
@@ -108,7 +190,7 @@ abstract class Field
 	{
 		if ($this->validators === null)
 		{
-			$validators = array();
+			$this->validators = array();
 
 			if ($this->validation !== null)
 			{
@@ -116,28 +198,196 @@ abstract class Field
 
 				if (!is_array($validators))
 				{
-					throw new \Exception(sprintf(
+					throw new SystemException(sprintf(
 						'Validation for %s field of %s entity should return array of validators',
 						$this->name, $this->entity->getDataClass()
 					));
 				}
 
-				foreach ($validators as $k => $validator)
+				foreach ($validators as $validator)
 				{
-					if (!($validator instanceof Validator\Base) && !is_callable($validator))
-					{
-						throw new \Exception(sprintf(
-							'Validator "%s" of "%s" field of "%s" entity should be a Validator\Base or callback',
-							$k, $this->name, $this->entity->getDataClass()
-						));
-					}
+					$this->appendValidator($validator);
 				}
 			}
 
-			$this->validators = $validators;
+			foreach ($this->additionalValidators as $validator)
+			{
+				$this->appendValidator($validator);
+			}
 		}
 
 		return $this->validators;
+	}
+
+	/**
+	 * @param Validator\Base|callable $validator
+	 */
+	public function addValidator($validator)
+	{
+		// append only when not null. and when is null - delay it
+		if ($this->validators === null)
+		{
+			$this->additionalValidators[] = $validator;
+		}
+		else
+		{
+			$this->appendValidator($validator);
+		}
+	}
+
+	/**
+	 * @param Validator\Base|callable $validator
+	 * @throws \Exception
+	 */
+	protected function appendValidator($validator)
+	{
+		if (!($validator instanceof Validator\Base) && !is_callable($validator))
+		{
+			throw new SystemException(sprintf(
+				'Validators of "%s" field of "%s" entity should be a Validator\Base or callback',
+				$this->name, $this->entity->getDataClass()
+			));
+		}
+
+		$this->validators[] = $validator;
+	}
+
+	public function getFetchDataModifiers()
+	{
+		if ($this->fetchDataModifiers === null)
+		{
+			$this->fetchDataModifiers = array();
+
+			if ($this->fetchDataModification !== null)
+			{
+				$modifiers = call_user_func($this->fetchDataModification);
+
+				if (!is_array($modifiers))
+				{
+					throw new SystemException(sprintf(
+						'Fetch Data Modification for %s field of %s entity should return array of modifiers (callbacks)',
+						$this->name, $this->entity->getDataClass()
+					));
+				}
+
+				foreach ($modifiers as $modifier)
+				{
+					$this->appendFetchDataModifier($modifier);
+				}
+			}
+
+			foreach ($this->additionalFetchDataModifiers as $modifier)
+			{
+				$this->appendFetchDataModifier($modifier);
+			}
+		}
+
+		return $this->fetchDataModifiers;
+	}
+
+	public function addFetchDataModifier($modifier)
+	{
+		// append only when not null. and when is null - delay it
+		if ($this->fetchDataModifiers === null)
+		{
+			$this->additionalFetchDataModifiers[] = $modifier;
+		}
+		else
+		{
+			$this->appendFetchDataModifier($modifier);
+		}
+	}
+
+	protected function appendFetchDataModifier($modifier)
+	{
+		if (!is_callable($modifier))
+		{
+			throw new SystemException(sprintf(
+				'Modifier of "%s" field of "%s" entity should be a callback',
+				$this->name, $this->entity->getDataClass()
+			));
+		}
+
+		$this->fetchDataModifiers[] = $modifier;
+	}
+
+	public function getSaveDataModifiers()
+	{
+		if ($this->saveDataModifiers === null)
+		{
+			$this->saveDataModifiers = array();
+
+			if ($this->saveDataModification !== null)
+			{
+				$modifiers = call_user_func($this->saveDataModification);
+
+				if (!is_array($modifiers))
+				{
+					throw new SystemException(sprintf(
+						'Save Data Modification for %s field of %s entity should return array of modifiers (callbacks)',
+						$this->name, $this->entity->getDataClass()
+					));
+				}
+
+				foreach ($modifiers as $modifier)
+				{
+					$this->appendSaveDataModifier($modifier);
+				}
+			}
+
+			foreach ($this->additionalSaveDataModifiers as $modifier)
+			{
+				$this->appendSaveDataModifier($modifier);
+			}
+		}
+
+		return $this->saveDataModifiers;
+	}
+
+	public function addSaveDataModifier($modifier)
+	{
+		// append only when not null. and when is null - delay it
+		if ($this->saveDataModifiers === null)
+		{
+			$this->additionalSaveDataModifiers[] = $modifier;
+		}
+		else
+		{
+			$this->appendSaveDataModifier($modifier);
+		}
+	}
+
+	protected function appendSaveDataModifier($modifier)
+	{
+		if (!is_callable($modifier))
+		{
+			throw new SystemException(sprintf(
+				'Save modifier of "%s" field of "%s" entity should be a callback',
+				$this->name, $this->entity->getDataClass()
+			));
+		}
+
+		$this->saveDataModifiers[] = $modifier;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isSerialized()
+	{
+		return !empty($this->isSerialized);
+	}
+
+	public function setSerialized()
+	{
+		if (!$this->isSerialized)
+		{
+			$this->isSerialized = true;
+
+			// add save- and fetch modifiers
+			$this->addSaveDataModifier(array($this, 'serialize'));
+			$this->addFetchDataModifier(array($this, 'unserialize'));
+		}
 	}
 
 	public function getName()
@@ -160,9 +410,69 @@ abstract class Field
 		return $this->title = $this->name;
 	}
 
+	/**
+	 * @param \Bitrix\Main\Entity\Field $parentField
+	 */
+	public function setParentField(Field $parentField)
+	{
+		$this->parentField = $parentField;
+	}
+
+	/**
+	 * @return \Bitrix\Main\Entity\Field
+	 */
+	public function getParentField()
+	{
+		return $this->parentField;
+	}
+
+	/**
+	 * @deprecated
+	 * @return null|string
+	 */
 	public function getDataType()
 	{
+		if (empty($this->dataType))
+		{
+			return static::getOldDataTypeByField($this);
+		}
+
 		return $this->dataType;
+	}
+
+	/**
+	 * @deprecated
+	 * @param $class
+	 *
+	 * @return bool
+	 */
+	public static function getOldDataTypeByClass($class)
+	{
+		$map = array_flip(static::$oldDataTypes);
+
+		return isset($map[$class]) ? $map[$class] : 'string';
+	}
+
+	/**
+	 * @deprecated
+	 * @param Field $field
+	 *
+	 * @return bool
+	 */
+	public static function getOldDataTypeByField(Field $field)
+	{
+		return static::getOldDataTypeByClass(get_class($field));
+	}
+
+	/**
+	 * @deprecated
+	 * @param $dateType
+	 *
+	 * @return bool
+	 */
+	public static function getClassByOldDataType($dateType)
+	{
+		return isset(static::$oldDataTypes[$dateType]) ? '\\'.static::$oldDataTypes[$dateType] : false;
 	}
 
 	public function getEntity()
@@ -173,5 +483,20 @@ abstract class Field
 	public function getLangCode()
 	{
 		return $this->getEntity()->getLangCode().'_'.$this->getName().'_FIELD';
+	}
+
+	static public function serialize($value)
+	{
+		if (!is_string($value))
+		{
+			$value = serialize($value);
+		}
+
+		return $value;
+	}
+
+	static public function unserialize($value)
+	{
+		return unserialize($value) ?: array();
 	}
 }

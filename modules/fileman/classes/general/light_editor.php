@@ -57,7 +57,6 @@ class CLightHTMLEditor // LHE
 			$jsMsg = "<script bxrunfirst>LHE_MESS = window.LHE_MESS = ".CUtil::PhpToJSObject($this->messOld)."; (window.BX||top.BX).message(".CUtil::PhpToJSObject($this->mess, false).");</script>";
 
 			$APPLICATION->AddLangJS($jsMsg);
-
 		}
 
 		$this->bAutorized = is_object($USER) && $USER->IsAuthorized();

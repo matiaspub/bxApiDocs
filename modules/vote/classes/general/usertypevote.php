@@ -22,7 +22,8 @@ class CUserTypeVote extends CUserTypeInteger
 
 	static public function OnBeforePostUserFieldUpdate($ENTITY_ID, $ID, $arFields)
 	{
-		$arUserFields = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields($ENTITY_ID, $ID, LANGUAGE_ID);
+		global $USER_FIELD_MANAGER;
+		$arUserFields = $USER_FIELD_MANAGER->GetUserFields($ENTITY_ID, $ID, LANGUAGE_ID);
 		if (is_array($arUserFields) && !empty($arUserFields))
 		{
 			$arUserFields = array_intersect_key($arUserFields, $arFields);
@@ -45,7 +46,7 @@ class CUserTypeVote extends CUserTypeInteger
 	 */
 	public static function PrepareSettings($arUserField)
 	{
-		$arUserField["SETTINGS"] = (is_array($arUserField["SETTINGS"]) ? $arUserField["SETTINGS"] : @unserialise($arUserField["SETTINGS"]));
+		$arUserField["SETTINGS"] = (is_array($arUserField["SETTINGS"]) ? $arUserField["SETTINGS"] : @unserialize($arUserField["SETTINGS"]));
 		$arUserField["SETTINGS"] = (is_array($arUserField["SETTINGS"]) ? $arUserField["SETTINGS"] : array());
 		$tmp = array("CHANNEL_ID" => intval($arUserField["SETTINGS"]["CHANNEL_ID"]));
 
@@ -60,9 +61,8 @@ class CUserTypeVote extends CUserTypeInteger
 		if (is_array($arUserField["SETTINGS"]["UNIQUE"]))
 		{
 			$uniqType = 0;
-			foreach ($arUserField["SETTINGS"]["UNIQUE"] as $z){
+			foreach ($arUserField["SETTINGS"]["UNIQUE"] as $z)
 				$uniqType |= $z;
-			}
 			$uniqType += 5;
 		}
 
@@ -83,11 +83,12 @@ class CUserTypeVote extends CUserTypeInteger
 		$arSettings = is_array($arSettings) ? $arSettings : array($arSettings);
 		if (array_key_exists("CHANNEL_ID", $arSettings))
 		{
-			if (empty($arSettings["CHANNEL_ID"]) && CModule::IncludeModule("vote"))
+			$arSettings["CHANNEL_ID"] = intval($arSettings["CHANNEL_ID"]);
+			if ($arSettings["CHANNEL_ID"] <= 0 && CModule::IncludeModule("vote"))
 			{
 				$db_res = CVoteChannel::GetList($by = "ID", $order = "ASC",
 					array("SYMBOLIC_NAME" => $arSettings["CHANNEL_SYMBOLIC_NAME"], "SYMBOLIC_NAME_EXACT_MATCH" => "Y"), $is_filtered);
-				if (!($db_res && ($arChannel = $db_res->Fetch())))
+				if (!($db_res && ($arChannel = $db_res->Fetch()) && !!$arChannel))
 				{
 					$res = array(
 						"TITLE" => $arSettings["CHANNEL_TITLE"],
@@ -98,8 +99,10 @@ class CUserTypeVote extends CUserTypeInteger
 						"VOTE_SINGLE" => "N",
 						"USE_CAPTCHA" => $arSettings["CHANNEL_USE_CAPTCHA"],
 						"SITE" => array(),
-						"GROUP_ID" => array());
-					$db_res = CSite::GetList(($by="sort"), ($order="asc"));
+						"GROUP_ID" => array()
+					);
+					$by = "sort"; $order = "asc";
+					$db_res = CSite::GetList($by, $order);
 					while ($site = $db_res->GetNext())
 						$res["SITE"][] = $site["ID"];
 					$db_res = CGroup::GetList($by = "sort", $order = "asc", Array("ADMIN" => "N"));
@@ -108,7 +111,8 @@ class CUserTypeVote extends CUserTypeInteger
 					$res["GROUP_ID"] = (is_array($arSettings["GROUP_ID"]) ? array_intersect_key($arSettings["GROUP_ID"], $res["GROUP_ID"]) : $res["GROUP_ID"]);
 					$channelId = CVoteChannel::Add($res);
 				}
-				else {
+				else
+				{
 					$channelId = $arChannel["ID"];
 				}
 
@@ -120,9 +124,10 @@ class CUserTypeVote extends CUserTypeInteger
 					return false;
 			}
 			$uniqType = $arSettings["UNIQUE"];
-			if (is_array($arSettings["UNIQUE"])) {
-				foreach ( $arSettings["UNIQUE"] as $res) {
-					$uniqType |= $res; }
+			if (is_array($arSettings["UNIQUE"]))
+			{
+				foreach ( $arSettings["UNIQUE"] as $res)
+					$uniqType |= $res;
 				$uniqType += 5;
 			}
 
@@ -135,6 +140,7 @@ class CUserTypeVote extends CUserTypeInteger
 			$arParams["SHOW_FILTER"] = "N";
 			$arParams["IS_SEARCHABLE"] = "N";
 		}
+		return true;
 	}
 
 	/**
@@ -151,7 +157,8 @@ class CUserTypeVote extends CUserTypeInteger
 		$value = "";
 		if($bVarsFromForm)
 			$value = $GLOBALS[$arHtmlControl["NAME"]]["CHANNEL_ID"];
-		elseif(is_array($arUserField)){
+		elseif(is_array($arUserField))
+		{
 			$value = $arUserField["SETTINGS"]["CHANNEL_ID"];
 			$GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] = $arUserField["SETTINGS"]["NOTIFY"];
 		}
@@ -182,7 +189,7 @@ class CUserTypeVote extends CUserTypeInteger
 			)?><a style="margin-left: 1em;" href="" rel="/bitrix/admin/vote_channel_edit.php?ID=#id#" <?
 			?>onmousedown="this.href=this.rel.replace('#id#',this.previousSibling.value);"><?=GetMessage("V_CHANNEL_ID_EDIT")?></a></td>
 	</tr>
-	<tbody id="channel_create" style="<?if ($value != "add") {?>display:none;<?}?>">
+	<tbody id="channel_create" style="<?if ($value != "add"): ?>display:none;<? endif; ?>">
 	<tr class="adm-detail-required-field">
 		<td class="adm-detail-content-cell-l" width="40%"><?=GetMessage("V_CHANNEL_ID_TITLE")?></td>
 		<td class="adm-detail-content-cell-r" width="60%"><input type="text" name="<?=$arHtmlControl["NAME"]?>[CHANNEL_TITLE]" <?
@@ -196,7 +203,7 @@ class CUserTypeVote extends CUserTypeInteger
 	<tr>
 		<td class="adm-detail-content-cell-l">&nbsp;</td>
 		<td class="adm-detail-content-cell-r"><input type="checkbox" name="<?=$arHtmlControl["NAME"]?>[CHANNEL_USE_CAPTCHA]" <?
-			?>id="CHANNEL_USE_CAPTCHA" <?if ($GLOBALS[$arHtmlControl["NAME"]]["CHANNEL_USE_CAPTCHA"] == "Y"){?> checked <?}
+			?>id="CHANNEL_USE_CAPTCHA" <?if ($GLOBALS[$arHtmlControl["NAME"]]["CHANNEL_USE_CAPTCHA"] == "Y"): ?> checked <? endif;
 			?>value="Y" /> <label for="CHANNEL_USE_CAPTCHA"><?=GetMessage("V_CHANNEL_ID_USE_CAPTCHA")?></label></td>
 	</tr><?
 	$db_res = CGroup::GetList($by = "sort", $order = "asc", Array("ADMIN" => "N"));
@@ -227,9 +234,10 @@ class CUserTypeVote extends CUserTypeInteger
 		else
 		{
 			$uniqType = ($arUserField["SETTINGS"]["UNIQUE"] ? $arUserField["SETTINGS"]["UNIQUE"] : 13);
-			if (is_array($arUserField["SETTINGS"]["UNIQUE"])) {
-				foreach ( $arUserField["SETTINGS"]["UNIQUE"] as $res) {
-					$uniqType |= $res; }
+			if (is_array($arUserField["SETTINGS"]["UNIQUE"]))
+			{
+				foreach ( $arUserField["SETTINGS"]["UNIQUE"] as $res)
+					$uniqType |= $res;
 				$uniqType += 5;
 			}
 			$uniqType -=5;
@@ -259,12 +267,12 @@ function __utch(show)
 			$GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] = (
 				$GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] != "I" && $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] != "Y" ?
 					"N" : $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"]);
-			if (IsModuleInstalled("im")){?>
+			if (IsModuleInstalled("im")): ?>
 				<?=InputType("radio", $arHtmlControl["NAME"]."[NOTIFY]", "I", $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"], false, GetMessage("VOTE_NOTIFY_IM"))?><br /><?
-			} else {
+			else:
 				$GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] = ($GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"] == "I" ?
 					"N" : $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"]);
-			}?>
+			endif; ?>
 			<?=InputType("radio", $arHtmlControl["NAME"]."[NOTIFY]", "Y", $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"], false, GetMessage("VOTE_NOTIFY_EMAIL"))?><br />
 			<?=InputType("radio", $arHtmlControl["NAME"]."[NOTIFY]", "N", $GLOBALS[$arHtmlControl["NAME"]]["NOTIFY"], false, GetMessage("VOTE_NOTIFY_N"))?><?
 			?></td>
@@ -272,10 +280,10 @@ function __utch(show)
 	<tr>
 		<td class="adm-detail-content-cell-l adm-detail-valign-top"><?=GetMessage("V_UNIQUE")?></td>
 		<td class="adm-detail-content-cell-r">
-			<? if (IsModuleInstalled('statistic')) { ?>
+			<? if (IsModuleInstalled('statistic')): ?>
 			<input type="checkbox" name="<?=$arHtmlControl["NAME"]?>[UNIQUE][]" id="UNIQUE_TYPE_SESSION" value="1" <?=($uniqType & 1)?" checked":""?> />
 			<label for="UNIQUE_TYPE_SESSION"><?=GetMessage("V_UNIQUE_SESSION")?></label><br />
-			<? } ?>
+			<? endif; ?>
 			<input type="checkbox" name="<?=$arHtmlControl["NAME"]?>[UNIQUE][]" id="UNIQUE_TYPE_COOKIE" value="2" <?=($uniqType & 2)?" checked":""?> />
 			<label for="UNIQUE_TYPE_COOKIE"><?=GetMessage("V_UNIQUE_COOKIE_ONLY")?></label><br />
 			<input type="checkbox" name="<?=$arHtmlControl["NAME"]?>[UNIQUE][]" id="UNIQUE_TYPE_IP" onclick="__utch()" value="4" <?
@@ -350,20 +358,26 @@ BX.ready(function(){
 			$arVoteQuestions = array();
 			$arQuestions = is_array($arData["QUESTIONS"]) ? $arData["QUESTIONS"] : array();
 
-			if (!$arVote["ID"]) {
+			if (!$arVote["ID"])
+			{
 				$arVote["DATE_START"] = GetTime(CVote::GetNowTime(), "FULL");
-			} else {
+			}
+			else
+			{
 				$db_res = CVoteQuestion::GetListEx(array("ID" => "ASC"),
 					array("CHANNEL_ID" => $arVote["CHANNEL_ID"], "VOTE_ID" => $arVote["ID"]));
-				if ($db_res && $res = $db_res->Fetch()) {
+				if ($db_res && $res = $db_res->Fetch())
+				{
 					do {
 						$arVoteQuestions[$res["ID"]] = $res + array("ANSWERS" => array());
 					} while ($res = $db_res->Fetch());
 				}
-				if (!empty($arVoteQuestions)) {
+				if (!empty($arVoteQuestions))
+				{
 					$db_res = CVoteAnswer::GetListEx(array("ID" => "ASC"),
 						array("CHANNEL_ID" => $arVote["CHANNEL_ID"], "VOTE_ID" => $arVote["ID"]));
-					if ($db_res && $res = $db_res->Fetch()) {
+					if ($db_res && $res = $db_res->Fetch())
+					{
 						do {
 							if (is_set($arVoteQuestions, $res["QUESTION_ID"]))
 								$arVoteQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ID"]] = $res;
@@ -377,6 +391,7 @@ BX.ready(function(){
 				$res = array(
 					"ID" => (array_key_exists($arQuestion["ID"], $arVoteQuestions) ? $arQuestion["ID"] : false),
 					"QUESTION" => trim($arQuestion["QUESTION"]),
+					"QUESTION_TYPE" => trim($arQuestion["QUESTION_TYPE"]),
 					"MULTI" => ($arQuestion["MULTI"] == "Y" ? "Y" : "N"),
 					"ANSWERS" => array());
 
@@ -386,22 +401,26 @@ BX.ready(function(){
 				$arVoteAnswers = ($res["ID"] > 0 ? $arVoteQuestions[$res["ID"]]["ANSWERS"] : array());
 				foreach ($arQuestion["ANSWERS"] as $arAnswer)
 				{
-
 					$resa = array(
 						"ID" => (array_key_exists($arAnswer["ID"], $arVoteAnswers) ? $arAnswer["ID"] : false),
 						"MESSAGE" => trim($arAnswer["MESSAGE"]),
+						"MESSAGE_TYPE" => trim($arAnswer["MESSAGE_TYPE"]),
 						"FIELD_TYPE" => ($res["MULTI"] == "Y" ? 1 : 0));
 
-					if (empty($resa["MESSAGE"])){ continue; }
-					if (!!$resa["ID"]) { unset($arVoteAnswers[$resa["ID"]]); }
+					if (empty($resa["MESSAGE"]))
+						continue;
+					if (!!$resa["ID"])
+						unset($arVoteAnswers[$resa["ID"]]);
 
 					$res["ANSWERS"][] = $resa;
 				}
-				foreach ($arVoteAnswers as $arAnswer) {
-					$res["ANSWERS"][] = array_merge($arAnswer, array("DEL" => "Y")); }
+				foreach ($arVoteAnswers as $arAnswer)
+					$res["ANSWERS"][] = array_merge($arAnswer, array("DEL" => "Y"));
 
-				if (empty($res["ANSWERS"]) && empty($res["QUESTION"]) && !$res["ID"]) { continue; }
-				if (!!$res["ID"]) { unset($arVoteQuestions[$res["ID"]]); }
+				if (empty($res["ANSWERS"]) && empty($res["QUESTION"]) && !$res["ID"])
+					continue;
+				if (!!$res["ID"])
+					unset($arVoteQuestions[$res["ID"]]);
 
 				$arVote["QUESTIONS"][] = $res;
 			}
@@ -491,7 +510,8 @@ BX.ready(function(){
 		if($arHtmlControl["VALUE"] > 0)
 		{
 			$db_res = CVote::GetByIDEx($arHtmlControl["VALUE"]);
-			if ($db_res && ($arVote = $db_res->GetNext())){
+			if ($db_res && ($arVote = $db_res->GetNext()))
+			{
 				if ($arVote["LAMP"] == "yellow")
 					$arVote["LAMP"] = ($arVote["ID"] == CVote::GetActiveVoteId($arVote["CHANNEL_ID"]) ? "green" : "red");
 				$return = "<div class=\"lamp-red\" title=\"".($arVote["ACTIVE"] != 'Y' ? GetMessage("VOTE_NOT_ACTIVE") : GetMessage("VOTE_ACTIVE_RED_LAMP"))."\"  style=\"display:inline-block;\"></div>";

@@ -16,10 +16,19 @@ abstract class FileEntry
 
 	public abstract function getContents();
 	public abstract function putContents($data);
-	public abstract function getFileSize();
+	public abstract function getSize();
 	public abstract function isWritable();
 	public abstract function isReadable();
 	public abstract function readFile();
+
+	/**
+	 * @deprecated Use getSize() instead
+	 * @return mixed
+	 */
+	public function getFileSize()
+	{
+		return $this->getSize();
+	}
 
 	static public function isDirectory()
 	{

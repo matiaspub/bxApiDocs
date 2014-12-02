@@ -28,9 +28,15 @@ class Path
 			(!defined('PHP_OS'))
 			|| (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN')
 		)
-			$filters['#[.\\\/\x20\x22\x3c\x3e\x5c]{30,}#'] = ' X ';
+		{
+			$slashes = '\\\/\x20\x22\x3c\x3e\x5c';
+		}
 		else
-			$filters['#(\.[\\\/]+){30,}#'] = ' X ';
+		{
+			$slashes = '\\\/';
+		}
+
+		$filters['#(?:\.['.$slashes.']+){30,}#'] = ' X ';
 
 		$result = array(
 			'search' => array_keys($filters),

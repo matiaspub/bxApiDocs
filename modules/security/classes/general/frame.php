@@ -105,7 +105,7 @@ class CSecurityFrameMask
 		return $res;
 	}
 
-	public static function Check($site_id, $uri)
+	public static function Check($siteId, $uri)
 	{
 		global $DB, $CACHE_MANAGER;
 		$bFound = false;
@@ -143,9 +143,13 @@ class CSecurityFrameMask
 				}
 			}
 
-			if(!$bFound && array_key_exists($site_id, $arMasks))
+			if(
+				!$bFound
+				&& $siteId
+				&& isset($arMasks[$siteId])
+			)
 			{
-				foreach($arMasks[$site_id] as $mask)
+				foreach($arMasks[$siteId] as $mask)
 				{
 					if(preg_match("#^".$mask."$#", $uri))
 					{
@@ -158,14 +162,21 @@ class CSecurityFrameMask
 		}
 		else
 		{
-			$rs = $DB->Query("
+			$sql = "
 				SELECT m.*
 				FROM
 					b_sec_frame_mask m
 				WHERE
 					(m.SITE_ID IS NULL AND '".$DB->ForSQL($uri)."' like m.LIKE_MASK)
-					OR (m.SITE_ID = '".$DB->ForSQL($site_id)."' AND '".$DB->ForSQL($uri)."' like m.LIKE_MASK)
-			");
+			";
+			if ($siteId)
+			{
+				$sql .= "
+				OR (m.SITE_ID = '".$DB->ForSQL($siteId)."' AND '".$DB->ForSQL($uri)."' like m.LIKE_MASK)
+				";
+			}
+
+			$rs = $DB->Query($sql);
 			if($rs->Fetch())
 				$bFound = true;
 		}

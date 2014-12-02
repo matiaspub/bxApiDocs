@@ -34,6 +34,11 @@ class CAllSaleOrder
 	static function DoCalculateOrder($siteId, $userId, $arShoppingCart, $personTypeId, $arOrderPropsValues,
 		$deliveryId, $paySystemId, $arOptions, &$arErrors, &$arWarnings)
 	{
+		if(!is_array($arOptions))
+		{
+			$arOptions = array();
+		}
+
 		$siteId = trim($siteId);
 		if (empty($siteId))
 		{
@@ -59,15 +64,21 @@ class CAllSaleOrder
 
 		foreach ($arShoppingCart as &$arItem)
 		{
-			if (CSaleBasketHelper::isSetParent($arItem))
+			if (CSaleBasketHelper::isSetParent($arItem) && isset($arParentWeight[$arItem["SET_PARENT_ID"]]))
 				$arItem["WEIGHT"] = $arParentWeight[$arItem["SET_PARENT_ID"]]["WEIGHT"];
 		}
 		unset($arItem);
 
+		$currency = isset($arOptions['CURRENCY']) && is_string($arOptions['CURRENCY']) ? $arOptions['CURRENCY'] : '';
+		if($currency === '')
+		{
+			$currency = CSaleLang::GetLangCurrency($siteId);
+		}
+
 		$arOrder = array(
 			"ORDER_PRICE" => 0,
 			"ORDER_WEIGHT" => 0,
-			"CURRENCY" => CSaleLang::GetLangCurrency($siteId),
+			"CURRENCY" => $currency,
 			"WEIGHT_UNIT" => htmlspecialcharsbx(COption::GetOptionString('sale', 'weight_unit', false, $siteId)),
 			"WEIGHT_KOEF" => htmlspecialcharsbx(COption::GetOptionString('sale', 'weight_koef', 1, $siteId)),
 			"BASKET_ITEMS" => $arShoppingCart,
@@ -182,13 +193,13 @@ class CAllSaleOrder
 			{
 				if (array_key_exists('CUSTOM_PRICE', $arItem) && $arItem['CUSTOM_PRICE'] == 'Y')
 				{
-					$arItem['DISCOUNT_PRICE'] = $arItem['DEFAULT_PRICE'] - $arShoppingCartItem['PRICE'];
+					$arItem['DISCOUNT_PRICE'] = $arItem['DEFAULT_PRICE'] - $arItem['PRICE'];
 
 					if ($arItem['DISCOUNT_PRICE'] < 0)
 						$arItem['DISCOUNT_PRICE'] = 0;
 
 					if (doubleval($arItem['DEFAULT_PRICE']) > 0)
-						$arItem['DISCOUNT_PRICE_PERCENT'] = $arShoppingCartItem['DISCOUNT_PRICE'] * 100 / $arItem['DEFAULT_PRICE'];
+						$arItem['DISCOUNT_PRICE_PERCENT'] = $arItem['DISCOUNT_PRICE'] * 100 / $arItem['DEFAULT_PRICE'];
 					else
 						$arItem['DISCOUNT_PRICE_PERCENT'] = 0;
 
@@ -223,11 +234,58 @@ class CAllSaleOrder
 	*
 	*
 	*/
+	
+	/**
+	* <p>Метод выполняет сохранение данных заказа: данных по уменьшению/увеличению количества, штрих-кодов, свойств заказа и данных по налогам.</p>
+	*
+	*
+	*
+	*
+	* @param array &$arOrder  Массив данных по заказу (все параметры, атрибуты, свойства,
+	* корзина). Является ссылкой на исходные параметры.
+	*
+	*
+	*
+	* @param array $arAdditionalFields  Массив с дополнительными параметрами заказа. Это данные, которых
+	* либо нет в <b>arOrder</b>, либо их требуется заменить для изменения
+	* логики работы метода.
+	*
+	*
+	*
+	* @param int $orderId  Идентификатор заказа (если заказ уже был создан ранее).
+	*
+	*
+	*
+	* @param array &$arErrors  Массив с текстами ошибок (общий массив на весь цикл заказа).
+	* Является ссылкой на исходные параметры.
+	*
+	*
+	*
+	* @param array $arCoupons  Массив скидочных купонов.
+	*
+	*
+	*
+	* @param int $arStoreBarcodeOrderFormData  Массив штрих-кодов. </h
+	*
+	*
+	*
+	* @param bool $bSaveBarcodes  Флаг (<i>true/false</i>) добавления новых штрих-кодов.
+	*
+	*
+	*
+	* @return int <p>Возвращается идентификатор заказа или <i>null</i> в случае ошибки.</p>
+	* <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/dosaveorder.php
+	* @author Bitrix
+	*/
 	public static function DoSaveOrder(&$arOrder, $arAdditionalFields, $orderId, &$arErrors, $arCoupons = array(), $arStoreBarcodeOrderFormData = array(), $bSaveBarcodes = false)
 	{
 		global $APPLICATION, $DB;
 
 		$orderId = intval($orderId);
+		$isNew = ($orderId == 0);
 
 		$arFields = array(
 			"LID" => $arOrder["SITE_ID"],
@@ -278,6 +336,9 @@ class CAllSaleOrder
 		CSaleBasket::DoSaveOrderBasket($orderId, $arOrder["SITE_ID"], $arOrder["USER_ID"], $arOrder["BASKET_ITEMS"], $arErrors, $arCoupons, $arStoreBarcodeOrderFormData, $bSaveBarcodes);
 		CSaleTax::DoSaveOrderTax($orderId, $arOrder["TAX_LIST"], $arErrors);
 		CSaleOrderProps::DoSaveOrderProps($orderId, $arOrder["PERSON_TYPE_ID"], $arOrder["ORDER_PROP"], $arErrors);
+
+		foreach(GetModuleEvents("sale", "OnOrderSave", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($orderId, $arFields, $arOrder, $isNew));
 
 /*
 			// mail message
@@ -1754,7 +1815,7 @@ class CAllSaleOrder
 	*
 	*
 	*
-	* @param bool $bPay = True[ Должен быть равен 0. </htm
+	* @param bool $bPay = True[ Должен быть равен 0. </ht
 	*
 	*
 	*

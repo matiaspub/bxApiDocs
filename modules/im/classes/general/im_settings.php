@@ -12,8 +12,12 @@ class CIMSettings
 	const PRIVACY_CHAT = 'privacyChat';
 	const PRIVACY_CALL = 'privacyCall';
 	const PRIVACY_SEARCH = 'privacySearch';
+	const PRIVACY_PROFILE = 'privacyProfile';
 	const PRIVACY_RESULT_ALL = 'all';
 	const PRIVACY_RESULT_CONTACT = 'contact';
+	const PRIVACY_RESULT_NOBODY = 'nobody';
+
+	const STATUS = 'status';
 
 	public static function Get($userId = false)
 	{
@@ -50,7 +54,11 @@ class CIMSettings
 		if ($userId == 0)
 			$userId = $USER->GetId();
 
-		
+		if (isset($value[self::STATUS]))
+		{
+			CIMStatus::Set($userId, Array('STATUS' => $value[self::STATUS]));
+		}
+
 		$arDefault = self::GetDefaultSettings($type);
 		foreach ($value as $key => $val)
 		{
@@ -64,7 +72,9 @@ class CIMSettings
 		CUserOptions::SetOption('IM', $type, $value, false, $userId);
 
 		if (isset($value[self::PRIVACY_SEARCH]))
+		{
 			$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => $value[self::PRIVACY_SEARCH]));
+		}
 
 		self::ClearCache($userId);
 
@@ -76,7 +86,7 @@ class CIMSettings
 		if (!in_array($type, Array(self::SETTINGS, self::NOTIFY)))
 			return false;
 
-		global $USER;
+		global $USER, $USER_FIELD_MANAGER;
 		$userId = intval($userId);
 		if ($userId == 0)
 			$userId = $USER->GetId();
@@ -85,13 +95,26 @@ class CIMSettings
 		foreach ($value as $key => $val)
 			$arSettings[$key] = $val;
 
+		if (isset($value[self::STATUS]))
+		{
+			CIMStatus::Set($userId, Array('STATUS' => $value[self::STATUS]));
+		}
+
 		$arDefault = self::GetDefaultSettings($type);
 		foreach ($arSettings as $key => $val)
 		{
 			if (isset($arDefault[$key]) && $arDefault[$key] == $val)
-				unset($arSettings[$key]);
+			{
+				if ($key == self::PRIVACY_SEARCH)
+					$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => ''));
+				unset($value[$key]);
+			}
 		}
 		CUserOptions::SetOption('IM', $type, $arSettings, false, $userId);
+		if (isset($value[self::PRIVACY_SEARCH]))
+		{
+			$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => $value[self::PRIVACY_SEARCH]));
+		}
 
 		self::ClearCache($userId);
 
@@ -157,6 +180,7 @@ class CIMSettings
 				'viewGroup' => COption::GetOptionString("im", "view_group"),
 				'enableSound' => true,
 				'sendByEnter' => COption::GetOptionString("im", "send_by_enter"),
+				'correctText' => COption::GetOptionString("im", "correct_text"),
 				'panelPositionHorizontal' => COption::GetOptionString("im", "panel_position_horizontal"),
 				'panelPositionVertical' => COption::GetOptionString("im", "panel_position_vertical"),
 				'loadLastMessage' => COption::GetOptionString("im", "load_last_message"),
@@ -170,6 +194,7 @@ class CIMSettings
 				'privacyChat' => COption::GetOptionString("im", "privacy_chat"),
 				'privacyCall' => COption::GetOptionString("im", "privacy_call"),
 				'privacySearch' => COption::GetOptionString("im", "privacy_search"),
+				'privacyProfile' => COption::GetOptionString("im", "privacy_profile"),
 			);
 		}
 		elseif ($type == self::NOTIFY)
@@ -200,7 +225,7 @@ class CIMSettings
 			{
 				if ($key == 'status')
 				{
-					$arValues[$key] = in_array($value[$key], Array('online', 'offline', 'dnd', 'na'))? $value[$key]: $default;
+					$arValues[$key] = in_array($value[$key], Array('online', 'dnd', 'away'))? $value[$key]: $default;
 				}
 				else if ($key == 'panelPositionHorizontal')
 				{
@@ -217,6 +242,10 @@ class CIMSettings
 				else if (in_array($key, Array('privacyMessage', 'privacyChat', 'privacyCall', 'privacySearch')))
 				{
 					$arValues[$key] = in_array($value[$key], Array(self::PRIVACY_RESULT_ALL, self::PRIVACY_RESULT_CONTACT))? $value[$key]: $default;
+				}
+				else if (in_array($key, Array('privacyProfile')))
+				{
+					$arValues[$key] = in_array($value[$key], Array(self::PRIVACY_RESULT_ALL, self::PRIVACY_RESULT_CONTACT, self::PRIVACY_RESULT_NOBODY))? $value[$key]: $default;
 				}
 				else if ($key == 'sendByEnter' && $value[$key] === 'Y') // for legacy
 				{

@@ -425,10 +425,15 @@ class CComponentUtil
 			return 0;
 	}
 
+	/**
+	 * @param string $componentName
+	 * @param array $arCurrentValues Don't change the name! It's used in the .parameters.php file.
+	 * @param array $templateProperties
+	 * @return array|bool
+	 */
 	public static function GetComponentProps($componentName, $arCurrentValues = array(), $templateProperties = array())
 	{
 		$arComponentParameters = array();
-
 		$componentName = trim($componentName);
 		if (strlen($componentName) <= 0)
 			return false;
@@ -447,199 +452,277 @@ class CComponentUtil
 		{
 			CComponentUtil::__IncludeLang($componentPath, ".parameters.php");
 
-			$arComponentParameters = array();
 			include($_SERVER["DOCUMENT_ROOT"].$componentPath."/.parameters.php");
+		}
 
-			if (!array_key_exists("PARAMETERS", $arComponentParameters) || !is_array($arComponentParameters["PARAMETERS"]))
-				return false;
-
-			if ($templateProperties && is_array($templateProperties))
-			{
+		if ($templateProperties && is_array($templateProperties))
+		{
+			if(is_array($arComponentParameters["PARAMETERS"]))
 				$arComponentParameters["PARAMETERS"] = array_merge ($arComponentParameters["PARAMETERS"], $templateProperties);
-			}
+			else
+				$arComponentParameters["PARAMETERS"] = $templateProperties;
+		}
 
-			if (!array_key_exists("GROUPS", $arComponentParameters) || !is_array($arComponentParameters["GROUPS"]))
-				$arComponentParameters["GROUPS"] = array();
+		if (!array_key_exists("PARAMETERS", $arComponentParameters) || !is_array($arComponentParameters["PARAMETERS"]))
+			return false;
 
-			$arParamKeys = array_keys($arComponentParameters["GROUPS"]);
-			for ($i = 0, $cnt = count($arParamKeys); $i < $cnt; $i++)
+		if (!array_key_exists("GROUPS", $arComponentParameters) || !is_array($arComponentParameters["GROUPS"]))
+			$arComponentParameters["GROUPS"] = array();
+
+		$arParamKeys = array_keys($arComponentParameters["GROUPS"]);
+		for ($i = 0, $cnt = count($arParamKeys); $i < $cnt; $i++)
+		{
+			if (!IsSet($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"]))
+				$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = 1000+$i;
+			$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = IntVal($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"]);
+			if ($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] <= 0)
+				$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = 1000+$i;
+		}
+
+		$arParamKeys = array_keys($arComponentParameters["PARAMETERS"]);
+		for ($i = 0, $cnt = count($arParamKeys); $i < $cnt; $i++)
+		{
+			if ($arParamKeys[$i] == "SET_TITLE")
 			{
-				if (!IsSet($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"]))
-					$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = 1000+$i;
-				$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = IntVal($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"]);
-				if ($arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] <= 0)
-					$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = 1000+$i;
-			}
+				$arComponentParameters["GROUPS"]["ADDITIONAL_SETTINGS"] = array(
+					"NAME" => GetMessage("COMP_GROUP_ADDITIONAL_SETTINGS"),
+					"SORT" => 700
+				);
 
-			$arParamKeys = array_keys($arComponentParameters["PARAMETERS"]);
-			for ($i = 0, $cnt = count($arParamKeys); $i < $cnt; $i++)
+				$arComponentParameters["PARAMETERS"]["SET_TITLE"] = array(
+					"PARENT" => "ADDITIONAL_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_SET_TITLE"),
+					"TYPE" => "CHECKBOX",
+					"DEFAULT" => "Y",
+					"ADDITIONAL_VALUES" => "N"
+				);
+			}
+			elseif ($arParamKeys[$i] == "CACHE_TIME")
 			{
-				if ($arParamKeys[$i] == "SET_TITLE")
+				$arComponentParameters["GROUPS"]["CACHE_SETTINGS"] = array(
+					"NAME" => GetMessage("COMP_GROUP_CACHE_SETTINGS"),
+					"SORT" => 600
+				);
+
+				$arSavedParams = $arComponentParameters["PARAMETERS"];
+				$arComponentParameters["PARAMETERS"] = array();
+				foreach ($arSavedParams as $keyTmp => $valueTmp)
+				{
+					if ($keyTmp == "CACHE_TIME")
+					{
+						$arComponentParameters["PARAMETERS"]["CACHE_TYPE"] = array(
+							"PARENT" => "CACHE_SETTINGS",
+							"NAME" => GetMessage("COMP_PROP_CACHE_TYPE"),
+							"TYPE" => "LIST",
+							"VALUES" => array("A" => GetMessage("COMP_PROP_CACHE_TYPE_AUTO")." ".GetMessage("COMP_PARAM_CACHE_MAN"), "Y" => GetMessage("COMP_PROP_CACHE_TYPE_YES"), "N" => GetMessage("COMP_PROP_CACHE_TYPE_NO")),
+							"DEFAULT" => "A",
+							"ADDITIONAL_VALUES" => "N"
+						);
+						$arComponentParameters["PARAMETERS"]["CACHE_TIME"] = array(
+							"PARENT" => "CACHE_SETTINGS",
+							"NAME" => GetMessage("COMP_PROP_CACHE_TIME"),
+							"TYPE" => "STRING",
+							"MULTIPLE" => "N",
+							"DEFAULT" => IntVal($arSavedParams["CACHE_TIME"]["DEFAULT"]),
+							"COLS" => 5
+						);
+						$arComponentParameters["PARAMETERS"]["CACHE_NOTES"] = array(
+							"PARENT" => "CACHE_SETTINGS",
+							"TYPE" => "CUSTOM",
+							"JS_FILE" => "/bitrix/js/main/comp_props.js",
+							"JS_EVENT" => "BxShowComponentNotes",
+							"JS_DATA" => GetMessage("COMP_PROP_CACHE_NOTE", array(
+								"#LANG#" => LANGUAGE_ID,
+								"#AUTO_MODE#" => (COption::GetOptionString("main", "component_cache_on", "Y") == "Y"? GetMessage("COMP_PARAM_CACHE_AUTO_ON"):GetMessage("COMP_PARAM_CACHE_AUTO_OFF")),
+								"#MANAGED_MODE#" =>(defined("BX_COMP_MANAGED_CACHE")? GetMessage("COMP_PARAM_CACHE_MANAGED_ON"):GetMessage("COMP_PARAM_CACHE_MANAGED_OFF")),
+							)),
+						);
+					}
+					else
+					{
+						$arComponentParameters["PARAMETERS"][$keyTmp] = $valueTmp;
+					}
+				}
+			}
+			elseif ($arParamKeys[$i] == "SEF_MODE")
+			{
+				$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
+					"NAME" => GetMessage("COMP_GROUP_SEF_MODE"),
+					"SORT" => 500
+				);
+
+				$arSEFModeSettings = $arComponentParameters["PARAMETERS"]["SEF_MODE"];
+
+				$arComponentParameters["PARAMETERS"]["SEF_MODE"] = array(
+					"PARENT" => "SEF_MODE",
+					"NAME" => GetMessage("COMP_PROP_SEF_MODE"),
+					"TYPE" => "CHECKBOX",
+					/*"VALUES" => array("N" => GetMessage("COMP_PROP_SEF_MODE_NO"), "Y" => GetMessage("COMP_PROP_SEF_MODE_YES")),*/
+					"DEFAULT" => "N",
+					"ADDITIONAL_VALUES" => "N"
+				);
+				$arComponentParameters["PARAMETERS"]["SEF_FOLDER"] = array(
+					"PARENT" => "SEF_MODE",
+					"NAME" => GetMessage("COMP_PROP_SEF_FOLDER"),
+					"TYPE" => "STRING",
+					"MULTIPLE" => "N",
+					"DEFAULT" => "",
+					"COLS" => 30
+				);
+
+				if (is_array($arSEFModeSettings) && count($arSEFModeSettings) > 0)
+				{
+					foreach ($arSEFModeSettings as $templateKey => $arTemplateValue)
+					{
+						$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey] = array(
+							"PARENT" => "SEF_MODE",
+							"NAME" => $arTemplateValue["NAME"],
+							"TYPE" => "STRING",
+							"MULTIPLE" => "N",
+							"DEFAULT" => $arTemplateValue["DEFAULT"],
+							"HIDDEN" => $arTemplateValue["HIDDEN"],
+							"COLS" => 50,
+							"VARIABLES" => array(),
+						);
+
+						$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
+						if (is_array($arVariableAliasesSettings) && count($arVariableAliasesSettings) > 0)
+						{
+							foreach ($arTemplateValue["VARIABLES"] as $variable)
+								$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey]["VARIABLES"]["#".$variable."#"] = $arVariableAliasesSettings[$variable]["NAME"];
+						}
+					}
+				}
+			}
+			elseif ($arParamKeys[$i] == "VARIABLE_ALIASES")
+			{
+				$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
+					"NAME" => GetMessage("COMP_GROUP_SEF_MODE"),
+					"SORT" => 500
+				);
+
+				$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
+
+				unset($arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"]);
+
+				foreach ($arVariableAliasesSettings as $aliaseKey => $arAliaseValue)
+				{
+					$arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES_".$aliaseKey] = array(
+						"PARENT" => "SEF_MODE",
+						"NAME" => $arAliaseValue["NAME"],
+						"TYPE" => "STRING",
+						"MULTIPLE" => "N",
+						"DEFAULT" => $aliaseKey,
+						"COLS" => 20,
+					);
+				}
+			}
+			elseif (IsSet($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"]) && strlen($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"]) > 0)
+			{
+				if ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "URL_TEMPLATES")
+				{
+					$arComponentParameters["GROUPS"]["URL_TEMPLATES"] = array(
+						"NAME" => GetMessage("COMP_GROUP_URL_TEMPLATES"),
+						"SORT" => 400
+					);
+				}
+				elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "VISUAL")
+				{
+					$arComponentParameters["GROUPS"]["VISUAL"] = array(
+						"NAME" => GetMessage("COMP_GROUP_VISUAL"),
+						"SORT" => 300
+					);
+				}
+				elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "DATA_SOURCE")
+				{
+					$arComponentParameters["GROUPS"]["DATA_SOURCE"] = array(
+						"NAME" => GetMessage("COMP_GROUP_DATA_SOURCE"),
+						"SORT" => 200
+					);
+				}
+				elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "BASE")
+				{
+					$arComponentParameters["GROUPS"]["BASE"] = array(
+						"NAME" => GetMessage("COMP_GROUP_BASE"),
+						"SORT" => 100
+					);
+				}
+				elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "ADDITIONAL_SETTINGS")
 				{
 					$arComponentParameters["GROUPS"]["ADDITIONAL_SETTINGS"] = array(
 						"NAME" => GetMessage("COMP_GROUP_ADDITIONAL_SETTINGS"),
 						"SORT" => 700
 					);
-
-					$arComponentParameters["PARAMETERS"]["SET_TITLE"] = array(
-						"PARENT" => "ADDITIONAL_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_SET_TITLE"),
-						"TYPE" => "CHECKBOX",
-						"DEFAULT" => "Y",
-						"ADDITIONAL_VALUES" => "N"
-					);
 				}
-				elseif ($arParamKeys[$i] == "CACHE_TIME")
+			}
+			elseif ($arParamKeys[$i] == "AJAX_MODE")
+			{
+				$arComponentParameters["GROUPS"]["AJAX_SETTINGS"] = array(
+					"NAME" => GetMessage("COMP_GROUP_AJAX_SETTINGS"),
+					"SORT" => 550
+				);
+
+				$arComponentParameters["PARAMETERS"]["AJAX_MODE"] = array(
+					"PARENT" => "AJAX_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_AJAX_MODE"),
+					"TYPE" => "CHECKBOX",
+					"DEFAULT" => "N",
+					"ADDITIONAL_VALUES" => "N"
+				);
+
+				// $arComponentParameters["PARAMETERS"]["AJAX_OPTION_SHADOW"] = array(
+					// "PARENT" => "AJAX_SETTINGS",
+					// "NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_SHADOW"),
+					// "TYPE" => "CHECKBOX",
+					// "MULTIPLE" => "N",
+					// "DEFAULT" => "Y",
+					// "ADDITIONAL_VALUES" => "N"
+				// );
+
+				$arComponentParameters["PARAMETERS"]["AJAX_OPTION_JUMP"] = array(
+					"PARENT" => "AJAX_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_JUMP"),
+					"TYPE" => "CHECKBOX",
+					"MULTIPLE" => "N",
+					"DEFAULT" => "N",
+					"ADDITIONAL_VALUES" => "N"
+				);
+
+				$arComponentParameters["PARAMETERS"]["AJAX_OPTION_STYLE"] = array(
+					"PARENT" => "AJAX_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_STYLE"),
+					"TYPE" => "CHECKBOX",
+					"MULTIPLE" => "N",
+					"DEFAULT" => "Y",
+					"ADDITIONAL_VALUES" => "N"
+				);
+
+				$arComponentParameters["PARAMETERS"]["AJAX_OPTION_HISTORY"] = array(
+					"PARENT" => "AJAX_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_HISTORY"),
+					"TYPE" => "CHECKBOX",
+					"MULTIPLE" => "N",
+					"DEFAULT" => "N",
+					"ADDITIONAL_VALUES" => "N"
+				);
+
+				$arComponentParameters["PARAMETERS"]["AJAX_OPTION_ADDITIONAL"] = array(
+					"PARENT" => "AJAX_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_ADDITIONAL"),
+					"TYPE" => "STRING",
+					"HIDDEN" => "Y",
+					"MULTIPLE" => "N",
+					"DEFAULT" => "",
+					"ADDITIONAL_VALUES" => "N"
+				);
+			}
+			else
+			{
+				$parent = $arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"];
+				if (!isset($parent) || !isset($arComponentParameters["GROUPS"][$parent]))
 				{
-					$arComponentParameters["GROUPS"]["CACHE_SETTINGS"] = array(
-						"NAME" => GetMessage("COMP_GROUP_CACHE_SETTINGS"),
-						"SORT" => 600
-					);
-
-					$arSavedParams = $arComponentParameters["PARAMETERS"];
-					$arComponentParameters["PARAMETERS"] = array();
-					foreach ($arSavedParams as $keyTmp => $valueTmp)
-					{
-						if ($keyTmp == "CACHE_TIME")
-						{
-							$arComponentParameters["PARAMETERS"]["CACHE_TYPE"] = array(
-								"PARENT" => "CACHE_SETTINGS",
-								"NAME" => GetMessage("COMP_PROP_CACHE_TYPE"),
-								"TYPE" => "LIST",
-								"VALUES" => array("A" => GetMessage("COMP_PROP_CACHE_TYPE_AUTO")." ".GetMessage("COMP_PARAM_CACHE_MAN"), "Y" => GetMessage("COMP_PROP_CACHE_TYPE_YES"), "N" => GetMessage("COMP_PROP_CACHE_TYPE_NO")),
-								"DEFAULT" => "A",
-								"ADDITIONAL_VALUES" => "N"
-							);
-							$arComponentParameters["PARAMETERS"]["CACHE_TIME"] = array(
-								"PARENT" => "CACHE_SETTINGS",
-								"NAME" => GetMessage("COMP_PROP_CACHE_TIME"),
-								"TYPE" => "STRING",
-								"MULTIPLE" => "N",
-								"DEFAULT" => IntVal($arSavedParams["CACHE_TIME"]["DEFAULT"]),
-								"COLS" => 5
-							);
-							$arComponentParameters["PARAMETERS"]["CACHE_NOTES"] = array(
-								"PARENT" => "CACHE_SETTINGS",
-								"TYPE" => "CUSTOM",
-								"JS_FILE" => "/bitrix/js/main/comp_props.js",
-								"JS_EVENT" => "BxShowComponentNotes",
-								"JS_DATA" => GetMessage("COMP_PROP_CACHE_NOTE", array(
-									"#LANG#" => LANGUAGE_ID,
-									"#AUTO_MODE#" => (COption::GetOptionString("main", "component_cache_on", "Y") == "Y"? GetMessage("COMP_PARAM_CACHE_AUTO_ON"):GetMessage("COMP_PARAM_CACHE_AUTO_OFF")),
-									"#MANAGED_MODE#" =>(defined("BX_COMP_MANAGED_CACHE")? GetMessage("COMP_PARAM_CACHE_MANAGED_ON"):GetMessage("COMP_PARAM_CACHE_MANAGED_OFF")),
-								)),
-							);
-						}
-						else
-						{
-							$arComponentParameters["PARAMETERS"][$keyTmp] = $valueTmp;
-						}
-					}
-				}
-				elseif ($arParamKeys[$i] == "SEF_MODE")
-				{
-					$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
-						"NAME" => GetMessage("COMP_GROUP_SEF_MODE"),
-						"SORT" => 500
-					);
-
-					$arSEFModeSettings = $arComponentParameters["PARAMETERS"]["SEF_MODE"];
-
-					$arComponentParameters["PARAMETERS"]["SEF_MODE"] = array(
-						"PARENT" => "SEF_MODE",
-						"NAME" => GetMessage("COMP_PROP_SEF_MODE"),
-						"TYPE" => "CHECKBOX",
-						/*"VALUES" => array("N" => GetMessage("COMP_PROP_SEF_MODE_NO"), "Y" => GetMessage("COMP_PROP_SEF_MODE_YES")),*/
-						"DEFAULT" => "N",
-						"ADDITIONAL_VALUES" => "N"
-					);
-					$arComponentParameters["PARAMETERS"]["SEF_FOLDER"] = array(
-						"PARENT" => "SEF_MODE",
-						"NAME" => GetMessage("COMP_PROP_SEF_FOLDER"),
-						"TYPE" => "STRING",
-						"MULTIPLE" => "N",
-						"DEFAULT" => "",
-						"COLS" => 30
-					);
-
-					if (is_array($arSEFModeSettings) && count($arSEFModeSettings) > 0)
-					{
-						foreach ($arSEFModeSettings as $templateKey => $arTemplateValue)
-						{
-							$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey] = array(
-								"PARENT" => "SEF_MODE",
-								"NAME" => $arTemplateValue["NAME"],
-								"TYPE" => "STRING",
-								"MULTIPLE" => "N",
-								"DEFAULT" => $arTemplateValue["DEFAULT"],
-								"HIDDEN" => $arTemplateValue["HIDDEN"],
-								"COLS" => 50,
-								"VARIABLES" => array(),
-							);
-
-							$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
-							if (is_array($arVariableAliasesSettings) && count($arVariableAliasesSettings) > 0)
-							{
-								foreach ($arTemplateValue["VARIABLES"] as $variable)
-									$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey]["VARIABLES"]["#".$variable."#"] = $arVariableAliasesSettings[$variable]["NAME"];
-							}
-						}
-					}
-				}
-				elseif ($arParamKeys[$i] == "VARIABLE_ALIASES")
-				{
-					$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
-						"NAME" => GetMessage("COMP_GROUP_SEF_MODE"),
-						"SORT" => 500
-					);
-
-					$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
-
-					unset($arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"]);
-
-					foreach ($arVariableAliasesSettings as $aliaseKey => $arAliaseValue)
-					{
-						$arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES_".$aliaseKey] = array(
-							"PARENT" => "SEF_MODE",
-							"NAME" => $arAliaseValue["NAME"],
-							"TYPE" => "STRING",
-							"MULTIPLE" => "N",
-							"DEFAULT" => $aliaseKey,
-							"COLS" => 20,
-						);
-					}
-				}
-				elseif (IsSet($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"]) && strlen($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"]) > 0)
-				{
-					if ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "URL_TEMPLATES")
-					{
-						$arComponentParameters["GROUPS"]["URL_TEMPLATES"] = array(
-							"NAME" => GetMessage("COMP_GROUP_URL_TEMPLATES"),
-							"SORT" => 400
-						);
-					}
-					elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "VISUAL")
-					{
-						$arComponentParameters["GROUPS"]["VISUAL"] = array(
-							"NAME" => GetMessage("COMP_GROUP_VISUAL"),
-							"SORT" => 300
-						);
-					}
-					elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "DATA_SOURCE")
-					{
-						$arComponentParameters["GROUPS"]["DATA_SOURCE"] = array(
-							"NAME" => GetMessage("COMP_GROUP_DATA_SOURCE"),
-							"SORT" => 200
-						);
-					}
-					elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "BASE")
-					{
-						$arComponentParameters["GROUPS"]["BASE"] = array(
-							"NAME" => GetMessage("COMP_GROUP_BASE"),
-							"SORT" => 100
-						);
-					}
-					elseif ($arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] == "ADDITIONAL_SETTINGS")
+					$arComponentParameters["PARAMETERS"][$arParamKeys[$i]]["PARENT"] = "ADDITIONAL_SETTINGS";
+					if (!isset($arComponentParameters["GROUPS"]["ADDITIONAL_SETTINGS"]))
 					{
 						$arComponentParameters["GROUPS"]["ADDITIONAL_SETTINGS"] = array(
 							"NAME" => GetMessage("COMP_GROUP_ADDITIONAL_SETTINGS"),
@@ -647,129 +730,76 @@ class CComponentUtil
 						);
 					}
 				}
-				elseif ($arParamKeys[$i] == "AJAX_MODE")
-				{
-					$arComponentParameters["GROUPS"]["AJAX_SETTINGS"] = array(
-						"NAME" => GetMessage("COMP_GROUP_AJAX_SETTINGS"),
-						"SORT" => 550
-					);
-
-					$arComponentParameters["PARAMETERS"]["AJAX_MODE"] = array(
-						"PARENT" => "AJAX_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_AJAX_MODE"),
-						"TYPE" => "CHECKBOX",
-						"DEFAULT" => "N",
-						"ADDITIONAL_VALUES" => "N"
-					);
-
-					// $arComponentParameters["PARAMETERS"]["AJAX_OPTION_SHADOW"] = array(
-						// "PARENT" => "AJAX_SETTINGS",
-						// "NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_SHADOW"),
-						// "TYPE" => "CHECKBOX",
-						// "MULTIPLE" => "N",
-						// "DEFAULT" => "Y",
-						// "ADDITIONAL_VALUES" => "N"
-					// );
-
-					$arComponentParameters["PARAMETERS"]["AJAX_OPTION_JUMP"] = array(
-						"PARENT" => "AJAX_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_JUMP"),
-						"TYPE" => "CHECKBOX",
-						"MULTIPLE" => "N",
-						"DEFAULT" => "N",
-						"ADDITIONAL_VALUES" => "N"
-					);
-
-					$arComponentParameters["PARAMETERS"]["AJAX_OPTION_STYLE"] = array(
-						"PARENT" => "AJAX_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_STYLE"),
-						"TYPE" => "CHECKBOX",
-						"MULTIPLE" => "N",
-						"DEFAULT" => "Y",
-						"ADDITIONAL_VALUES" => "N"
-					);
-
-					$arComponentParameters["PARAMETERS"]["AJAX_OPTION_HISTORY"] = array(
-						"PARENT" => "AJAX_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_HISTORY"),
-						"TYPE" => "CHECKBOX",
-						"MULTIPLE" => "N",
-						"DEFAULT" => "N",
-						"ADDITIONAL_VALUES" => "N"
-					);
-
-					$arComponentParameters["PARAMETERS"]["AJAX_OPTION_ADDITIONAL"] = array(
-						"PARENT" => "AJAX_SETTINGS",
-						"NAME" => GetMessage("COMP_PROP_AJAX_OPTIONS_ADDITIONAL"),
-						"TYPE" => "STRING",
-						"HIDDEN" => "Y",
-						"MULTIPLE" => "N",
-						"DEFAULT" => "",
-						"ADDITIONAL_VALUES" => "N"
-					);
-				}
 			}
+		}
 
-			if(
-				(CPageOption::GetOptionString("main","tips_creation","no")=="allowed")
-				&& (strpos($componentPath, "/forum")!==false)
-			)
+		if(
+			(CPageOption::GetOptionString("main","tips_creation","no")=="allowed")
+			&& (strpos($componentPath, "/forum")!==false)
+		)
+		{
+			//Create directories
+			$help_lang_path = $_SERVER["DOCUMENT_ROOT"].$componentPath."/lang";
+			if(!file_exists($help_lang_path))
+				mkdir($help_lang_path);
+			$help_lang_path .= "/ru";
+			if(!file_exists($help_lang_path))
+				mkdir($help_lang_path);
+			$help_lang_path .= "/help";
+			if(!file_exists($help_lang_path))
+				mkdir($help_lang_path);
+			if(is_dir($help_lang_path))
 			{
-				//Create directories
-				$help_lang_path = $_SERVER["DOCUMENT_ROOT"].$componentPath."/lang";
-				if(!file_exists($help_lang_path))
-					mkdir($help_lang_path);
-				$help_lang_path .= "/ru";
-				if(!file_exists($help_lang_path))
-					mkdir($help_lang_path);
-				$help_lang_path .= "/help";
-				if(!file_exists($help_lang_path))
-					mkdir($help_lang_path);
-				if(is_dir($help_lang_path))
+				//Create files if none exists
+				$lang_filename = $help_lang_path."/.tooltips.php";
+				if(!file_exists($lang_filename))
 				{
-					//Create files if none exists
-					$lang_filename = $help_lang_path."/.tooltips.php";
-					if(!file_exists($lang_filename))
-					{
-						$handle=fopen($lang_filename, "w");
-						fwrite($handle, "<?\n?>");
-						fclose($handle);
-					}
-					$handle=fopen($lang_filename, "r");
-					$lang_contents = fread($handle, filesize($lang_filename));
+					$handle=fopen($lang_filename, "w");
+					fwrite($handle, "<?\n?>");
 					fclose($handle);
-					$lang_file_modified = false;
-					//Bug fix
-					if(strpos($lang_contents, "\$MESS['")!==false)
+				}
+				$handle=fopen($lang_filename, "r");
+				$lang_contents = fread($handle, filesize($lang_filename));
+				fclose($handle);
+				$lang_file_modified = false;
+				//Bug fix
+				if(strpos($lang_contents, "\$MESS['")!==false)
+				{
+					$lang_contents = str_replace("\$MESS['", "\$MESS ['", $lang_contents);
+					$lang_file_modified = true;
+				}
+				//Check out parameters
+				foreach($arComponentParameters["PARAMETERS"] as $strName=>$arParameter)
+				{
+					if(strpos($lang_contents, "\$MESS ['${strName}_TIP'] = ")===false)
 					{
-						$lang_contents = str_replace("\$MESS['", "\$MESS ['", $lang_contents);
+						$lang_contents = str_replace("?>", "\$MESS ['${strName}_TIP'] = \"".str_replace("\$", "\\\$", str_replace('"','\\"',$arParameter["NAME"]))."\";\n?>", $lang_contents);
 						$lang_file_modified = true;
 					}
-					//Check out parameters
-					foreach($arComponentParameters["PARAMETERS"] as $strName=>$arParameter)
-					{
-						if(strpos($lang_contents, "\$MESS ['${strName}_TIP'] = ")===false)
-						{
-							$lang_contents = str_replace("?>", "\$MESS ['${strName}_TIP'] = \"".str_replace("\$", "\\\$", str_replace('"','\\"',$arParameter["NAME"]))."\";\n?>", $lang_contents);
-							$lang_file_modified = true;
-						}
-					}
-					//Save the result of the work
-					if($lang_file_modified)
-					{
-						$handle=fopen($lang_filename, "w");
-						fwrite($handle, $lang_contents);
-						fclose($handle);
-					}
 				}
-				reset($arComponentParameters["PARAMETERS"]);
+				//Save the result of the work
+				if($lang_file_modified)
+				{
+					$handle=fopen($lang_filename, "w");
+					fwrite($handle, $lang_contents);
+					fclose($handle);
+				}
 			}
-			uasort($arComponentParameters["GROUPS"], array("CComponentUtil", "__GroupParamsCompare"));
+			reset($arComponentParameters["PARAMETERS"]);
 		}
+		uasort($arComponentParameters["GROUPS"], array("CComponentUtil", "__GroupParamsCompare"));
+
 
 		return $arComponentParameters;
 	}
 
+	/**
+	 * @param string $componentName
+	 * @param string $templateName
+	 * @param string $siteTemplate
+	 * @param array $arCurrentValues Don't change the name! It's used in the .parameters.php file.
+	 * @return array
+	 */
 	public static function GetTemplateProps($componentName, $templateName, $siteTemplate = "", $arCurrentValues = array())
 	{
 		$arTemplateParameters = array();

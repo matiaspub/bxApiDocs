@@ -1,12 +1,12 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-if(!defined("START_EXEC_TIME"))
+//if(!defined("START_EXEC_TIME"))
 	// define("START_EXEC_TIME", getmicrotime());
 
 
 /**
- * Класс для индексирования сайта и осуществления поиска по индексу
+ * Класс для индексирования сайта и осуществления поиска по индексу</body> </html>
  *
  *
  *
@@ -857,11 +857,16 @@ class CAllSearch extends CDBResult
 		static $arSite = array();
 
 		$r = parent::Fetch();
+
+		if ($r && $this->formatter)
+		{
+			$r = $this->formatter->format($r);
+			if (!$r)
+				return $this->Fetch();
+		}
+
 		if ($r)
 		{
-			if ($this->formatter)
-				$r = $this->formatter->format($r);
-
 			$site_id = $r["SITE_ID"];
 			if(!isset($arSite[$site_id]))
 			{
@@ -2635,6 +2640,36 @@ class CAllSearch extends CDBResult
 
 		foreach($arToInsert as $sql)
 			$DB->Query($sql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+	}
+
+	public static function GetContentItemParams($index_id, $param_name = false)
+	{
+		$DB = CDatabase::GetModuleConnection('search');
+		$index_id = intval($index_id);
+
+		if ($index_id <= 0)
+		{
+			return false;
+		}
+
+		$arResult = array();
+
+		$rs = $DB->Query("
+			SELECT PARAM_NAME, PARAM_VALUE
+			FROM b_search_content_param
+			WHERE SEARCH_CONTENT_ID = ".$index_id."
+			".($param_name && strlen($param_name) > 0 ? " AND PARAM_NAME = '".$DB->ForSQL($param_name)."'" : "")."
+		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			if (!isset($ar["PARAM_NAME"], $arResult))
+			{
+				$arResult[$ar["PARAM_NAME"]] = array();
+			}
+			$arResult[$ar["PARAM_NAME"]][] = $ar["PARAM_VALUE"];
+		}
+
+		return $arResult;
 	}
 
 	public static function stddev($arValues)

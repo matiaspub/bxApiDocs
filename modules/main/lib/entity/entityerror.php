@@ -10,13 +10,13 @@ namespace Bitrix\Main\Entity;
 
 class EntityError
 {
-	/** @var int */
+	/** @var string */
 	protected $code;
 
 	/** @var string */
 	protected $message;
 
-	public function __construct($message, $code=0)
+	public function __construct($message, $code='BX_ERROR')
 	{
 		$this->message = $message;
 		$this->code = $code;

@@ -2,57 +2,56 @@
 
 abstract class CPushMessage
 {
-	protected $_aDeviceTokens = array();
-	protected $_sText;
-	protected $_nBadge;
-	protected $_sSound;
-	protected $_nExpiryValue = 7200;
+	protected $deviceTokens = array();
+	protected $text;
+	protected $badge;
+	protected $sound = "default";
+	protected $expiryValue = 7200;
 
-	protected $_mCustomIdentifier;
-	protected $_sTitle;
-	public $_sound;
-	public $_aCustomProperties = array();
+	protected $customIdentifier;
+	protected $title;
+	public $customProperties = array();
 
 	public function addRecipient($sDeviceToken)
 	{
-		$this->_aDeviceTokens[] = $sDeviceToken;
+		$this->deviceTokens[] = $sDeviceToken;
 	}
 
 	public function getRecipient($nRecipient = 0)
 	{
-		if (!isset($this->_aDeviceTokens[$nRecipient]))
+		if (!isset($this->deviceTokens[$nRecipient]))
 		{
 			throw new Exception(
 				"No recipient at index '{$nRecipient}'"
 			);
 		}
 
-		return $this->_aDeviceTokens[$nRecipient];
+		return $this->deviceTokens[$nRecipient];
 	}
 
 	public function getRecipients()
 	{
-		return $this->_aDeviceTokens;
+		return $this->deviceTokens;
 	}
 
 	public function setText($sText)
 	{
-		$this->_sText = str_replace("\n", " ", $sText);
+		$this->text = str_replace("\n", " ", $sText);
 	}
 
 	public function getText()
 	{
-		return $this->_sText;
+		return $this->text;
 	}
 
 	public function setTitle($sTitle)
 	{
-		$this->_sTitle = $sTitle;
+		$this->title = $sTitle;
 	}
 
 	public function getTitle()
 	{
-		return $this->_sTitle;
+		return $this->title;
 	}
 
 	public function setBadge($nBadge)
@@ -63,60 +62,60 @@ abstract class CPushMessage
 				"Invalid badge number '{$nBadge}'"
 			);
 		}
-		$this->_nBadge = $nBadge;
+		$this->badge = $nBadge;
 	}
 
 	public function getBadge()
 	{
-		return $this->_nBadge;
+		return $this->badge;
 	}
 
 	public function setSound($sSound = 'default')
 	{
-		$this->_sSound = $sSound;
+		$this->sound = $sSound;
 	}
 
 	public function getSound()
 	{
-		return $this->_sSound;
+		return $this->sound;
 	}
 
 	public function setCustomProperty($sName, $mValue)
 	{
-		$this->_aCustomProperties[trim($sName)] = $mValue;
+		$this->customProperties[trim($sName)] = $mValue;
 	}
 
 	public function getCustomProperty($sName)
 	{
-		if (!array_key_exists($sName, $this->_aCustomProperties))
+		if (!array_key_exists($sName, $this->customProperties))
 		{
 			throw new Exception(
 				"No property exists with the specified name '{$sName}'."
 			);
 		}
 
-		return $this->_aCustomProperties[$sName];
+		return $this->customProperties[$sName];
 	}
 
 	public function setExpiry($nExpiryValue)
 	{
 		if (is_int($nExpiryValue))
-			$this->_nExpiryValue = $nExpiryValue;
+			$this->expiryValue = $nExpiryValue;
 	}
 
 	public function getExpiry()
 	{
-		return $this->_nExpiryValue;
+		return $this->expiryValue;
 	}
 
 	public function setCustomIdentifier($mCustomIdentifier)
 	{
-		$this->_mCustomIdentifier = $mCustomIdentifier;
+		$this->customIdentifier = $mCustomIdentifier;
 	}
 
 	public function getCustomIdentifier()
 	{
-		return $this->_mCustomIdentifier;
+		return $this->customIdentifier;
 	}
 
 	abstract function getBatch();

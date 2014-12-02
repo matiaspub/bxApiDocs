@@ -6,7 +6,7 @@ class CSecurityEvent
 
 	private $isDBEngineActive = false;
 	private $isSyslogEngineActive = false;
-	private $syslogFacility = "";
+	private $syslogFacility = 0;
 	private $syslogPriority = "";
 	private $isFileEngineActive = false;
 	private $filePath = "";
@@ -57,7 +57,7 @@ class CSecurityEvent
 		$savedInDB = $savedInFile = $savedInSyslog = false;
 		if ($this->isDBEngineActive)
 		{
-			$savedInDB = CEventLog::log($severity, $auditType, "security", $itemName, base64_encode($itemDescription));
+			$savedInDB = CEventLog::log($severity, $auditType, "security", $itemName, $itemDescription);
 		}
 		$message = "";
 		if ($this->isSyslogEngineActive)
@@ -70,6 +70,7 @@ class CSecurityEvent
 			if (!$message)
 				$message = $this->messageFormatter->format($auditType, $itemName, $itemDescription);
 
+			$message = static::sanitizeMessage($message);
 			$message .= "\n";
 			$savedInFile = file_put_contents($this->filePath, $message, FILE_APPEND) > 0;
 		}
@@ -202,7 +203,7 @@ class CSecurityEvent
 		if (self::isRunOnWin())
 			$this->syslogFacility = LOG_USER;
 		else
-			$this->syslogFacility = COption::getOptionString("security", "security_event_syslog_facility");
+			$this->syslogFacility = (int) COption::getOptionString("security", "security_event_syslog_facility");
 
 		$this->syslogPriority = COption::getOptionString("security", "security_event_syslog_priority");
 		openlog("Bitrix WAF", LOG_ODELAY, $this->syslogFacility);
@@ -214,6 +215,15 @@ class CSecurityEvent
 	private static function isRunOnWin()
 	{
 		return (strtoupper(substr(PHP_OS, 0, 3)) === "WIN");
+	}
+
+	/**
+	 * @param string $message
+	 * @return string mixed
+	 */
+	private static function sanitizeMessage($message)
+	{
+		return str_replace(array("\r", "\n"), array("\\r", "\\n"), $message);
 	}
 
 	private function __clone() {}

@@ -188,26 +188,35 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
 	if (empty($GLOBALS["VOTE_CACHE_VOTING"][$VOTE_ID]))
 	{
 		$db_res = CVote::GetByIDEx($VOTE_ID);
-		if (!($db_res && $arVote = $db_res->GetNext())){
-			return false;}
+		if (!($db_res && $arVote = $db_res->GetNext()))
+		{
+			return false;
+		}
 
-		foreach ($arVote as $key => $res) {
-			if (strpos($key, "CHANNEL_") === 0) {
+		foreach ($arVote as $key => $res)
+		{
+			if (strpos($key, "CHANNEL_") === 0)
+			{
 				$arChannel[substr($key, 8)] = $res;
-			} elseif (strpos($key, "~CHANNEL_") === 0) {
+			}
+			elseif (strpos($key, "~CHANNEL_") === 0)
+			{
 				$arChannel["~".substr($key, 9)] = $res;
 			}
 		}
-
-		$db_res = CVoteQuestion::GetList($VOTE_ID, ($by="s_c_sort"), ($order="asc"), array("ACTIVE" => "Y"), $is_filtered);
-		while ($res = $db_res->GetNext()) {
+		$by = "s_c_sort"; $order = "asc";
+		$db_res = CVoteQuestion::GetList($VOTE_ID, $by, $order, array("ACTIVE" => "Y"), $is_filtered);
+		while ($res = $db_res->GetNext())
+		{
 			$arQuestions[$res["ID"]] = $res + array("ANSWERS" => array());
 		}
-		if (!empty($arQuestions)) {
+		if (!empty($arQuestions))
+		{
 			$db_res = CVoteAnswer::GetListEx(
-				array("S_C_SORT" => "ASC"),
+				array("C_SORT" => "ASC"),
 				array("VOTE_ID" => $VOTE_ID, "ACTIVE" => "Y", "@QUESTION_ID" => array_keys($arQuestions)));
-			while ($res = $db_res->GetNext()) {
+			while ($res = $db_res->GetNext())
+			{
 				$arQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ID"]] = $res;
 
 				$arAnswers[$res["QUESTION_ID"]][] = $res;
@@ -238,9 +247,11 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
 			{
 				do
 				{
-					if (isset($arQuestions[$res["QUESTION_ID"]]) && is_array($arQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ANSWER_ID"]]) && is_array($res)) {
+					if (isset($arQuestions[$res["QUESTION_ID"]]) && is_array($arQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ANSWER_ID"]]) && is_array($res))
+					{
 						$arQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ANSWER_ID"]] += $res;
-						if ($event_id > 0 && !empty($res["RESTORED_ANSWER_ID"])) {
+						if ($event_id > 0 && !empty($res["RESTORED_ANSWER_ID"]))
+						{
 							switch ($arQuestions[$res["QUESTION_ID"]]["ANSWERS"][$res["ANSWER_ID"]]["FIELD_TYPE"]):
 								case 0: // radio
 								case 2: // dropdown list
@@ -414,6 +425,7 @@ function GetCurrentVote($GROUP_SID, $site_id=SITE_ID, $access=1)
  */
 function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
 {
+	$VOTE_ID = 0;
 	$z = CVoteChannel::GetList($by, $order, array("SID"=>$GROUP_SID, "SID_EXACT_MATCH"=>"Y", "SITE"=>$site_id, "ACTIVE"=>"Y"), $is_filtered);
 	if ($zr = $z->Fetch())
 	{
@@ -580,13 +592,16 @@ function GetVoteList($GROUP_SID = "", $params = array(), $site_id = SITE_ID)
 	if (is_array($GROUP_SID) && !empty($GROUP_SID))
 	{
 		$arr = array();
-		foreach ($GROUP_SID as $v) {
+		foreach ($GROUP_SID as $v)
+		{
 			if (!empty($v))
 				$arr[] = $v;
 		}
 		if (!empty($arr))
 			$arFilter["CHANNEL"] = $arr;
-	} elseif (!empty($GROUP_SID)) {
+	}
+	elseif (!empty($GROUP_SID))
+	{
 		$arFilter["CHANNEL"] = $GROUP_SID;
 	}
 	$z = CVote::GetPublicList($arFilter, $strSqlOrder, $params);
@@ -596,6 +611,7 @@ function GetVoteList($GROUP_SID = "", $params = array(), $site_id = SITE_ID)
 // return true if user already vote on this vote
 function IsUserVoted($PUBLIC_VOTE_ID)
 {
+	global $USER, $APPLICATION;
 	$PUBLIC_VOTE_ID = intval($PUBLIC_VOTE_ID);
 
 	if ($PUBLIC_VOTE_ID <= 0)
@@ -604,8 +620,8 @@ function IsUserVoted($PUBLIC_VOTE_ID)
 	$res = CVote::GetByID($PUBLIC_VOTE_ID);
 	if($res && ($arVote = $res->GetNext(true, false)))
 	{
-		$VOTE_USER_ID = intval($GLOBALS["APPLICATION"]->get_cookie("VOTE_USER_ID"));
-		$res = CVote::UserAlreadyVote($arVote["ID"], $VOTE_USER_ID, $arVote["UNIQUE_TYPE"], $arVote["KEEP_IP_SEC"], $GLOBALS["USER"]->GetID());
+		$VOTE_USER_ID = intval($APPLICATION->get_cookie("VOTE_USER_ID"));
+		$res = CVote::UserAlreadyVote($arVote["ID"], $VOTE_USER_ID, $arVote["UNIQUE_TYPE"], $arVote["KEEP_IP_SEC"], $USER->GetID());
 		return ($res != false);
 	}
 
@@ -701,8 +717,9 @@ function GetAnyAccessibleVote($site_id=SITE_ID, $channel_id=null)
 /*******************************************************************/
 function GetTemplateList($type="SV", $path="xxx")
 {
-	global $DOCUMENT_ROOT;
-	if ($path=="xxx") 
+	$arReferenceId = array();
+	$arReference = array();
+	if ($path=="xxx")
 	{
 		if ($type=="SV")
 			$path = COption::GetOptionString("vote", "VOTE_TEMPLATE_PATH");
@@ -711,24 +728,23 @@ function GetTemplateList($type="SV", $path="xxx")
 		elseif ($type=="RQ")
 			$path = COption::GetOptionString("vote", "VOTE_TEMPLATE_PATH_QUESTION");
 	}
-	$arr = array();
 	if (is_dir($_SERVER["DOCUMENT_ROOT"].$path))
 	{
-	$handle=@opendir($_SERVER["DOCUMENT_ROOT"].$path);
-	if($handle)
-	{
-		while (false!==($fname = readdir($handle))) 
+		$handle=@opendir($_SERVER["DOCUMENT_ROOT"].$path);
+		if($handle)
 		{
-			if (is_file($_SERVER["DOCUMENT_ROOT"].$path.$fname) && $fname!="." && $fname!="..")
+			while (false!==($fname = readdir($handle)))
 			{
-				$arReferenceId[] = $fname;
-				$arReference[] = $fname;
+				if (is_file($_SERVER["DOCUMENT_ROOT"].$path.$fname) && $fname!="." && $fname!="..")
+				{
+					$arReferenceId[] = $fname;
+					$arReference[] = $fname;
+				}
 			}
+			closedir($handle);
 		}
-		closedir($handle);
 	}
-	}
-	$arr = array("reference"=>$arReference,"reference_id"=>$arReferenceId);
+	$arr = array("reference" => $arReference,"reference_id" => $arReferenceId);
 	return $arr;
 }
 
@@ -883,7 +899,7 @@ function ShowCurrentVoteResults($GROUP_SID, $site_id=SITE_ID)
  */
 function ShowVote($VOTE_ID, $template1="")
 {
-	global $MESS, $VOTING_LAMP, $VOTING_OK, $USER_ALREADY_VOTE, $USER_GROUP_PERMISSION, $DOCUMENT_ROOT, $APPLICATION;
+	global $VOTING_LAMP, $VOTING_OK, $USER_ALREADY_VOTE, $USER_GROUP_PERMISSION, $APPLICATION;
 
 	$VOTING_LAMP = ($VOTING_LAMP == "green") ? $VOTING_LAMP : "red";
 	$VOTING_OK = ($VOTING_OK == "Y") ? $VOTING_OK : "N";
@@ -902,7 +918,7 @@ function ShowVote($VOTE_ID, $template1="")
 		{
 			$template = (strlen($arVote["TEMPLATE"])<=0) ? "default.php" : $arVote["TEMPLATE"];
 			require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/vote/include.php");
-			@include_once (GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/lang/", "/".$template));
+			IncludeModuleLangFile(__FILE__);
 			$path = COption::GetOptionString("vote", "VOTE_TEMPLATE_PATH");
 			if (strlen($template1)>0) $template = $template1;
 
@@ -911,22 +927,19 @@ function ShowVote($VOTE_ID, $template1="")
 				$arIcons = Array();
 				if (CModule::IncludeModule("fileman"))
 				{
-					$arIcons[] =
-							Array(						
+					$arIcons[] = Array(
 								"URL" => "/bitrix/admin/fileman_file_edit.php?lang=".LANGUAGE_ID."&site=".SITE_ID."&full_src=Y&path=". urlencode($path.$template),
 								"SRC" => "/bitrix/images/vote/panel/edit_template.gif",
 								"ALT" => GetMessage("VOTE_PUBLIC_ICON_TEMPLATE")
 							);
 					$arrUrl = parse_url($_SERVER["REQUEST_URI"]);
-					$arIcons[] =
-							Array(						
+					$arIcons[] = Array(
 								"URL" => "/bitrix/admin/fileman_file_edit.php?lang=".LANGUAGE_ID."&site=".SITE_ID."&full_src=Y&path=". urlencode($arrUrl["path"]),
 								"SRC" => "/bitrix/images/vote/panel/edit_file.gif",
 								"ALT" => GetMessage("VOTE_PUBLIC_ICON_HANDLER")
 							);
 				}
-				$arIcons[] =
-						Array(						
+				$arIcons[] = Array(
 							"URL" => "/bitrix/admin/vote_edit.php?lang=".LANGUAGE_ID."&ID=".$VOTE_ID,
 							"SRC" => "/bitrix/images/vote/panel/edit_vote.gif",
 							"ALT" => GetMessage("VOTE_PUBLIC_ICON_SETTINGS")
@@ -985,7 +998,7 @@ function ShowVote($VOTE_ID, $template1="")
  */
 function ShowVoteResults($VOTE_ID, $template1="")
 {
-	global $MESS, $VOTING_LAMP, $VOTING_OK, $USER_ALREADY_VOTE, $USER_GROUP_PERMISSION, $DOCUMENT_ROOT, $APPLICATION;
+	global $APPLICATION;
 	$VOTE_ID = GetVoteDataByID($VOTE_ID, $arChannel, $arVote, $arQuestions, $arAnswers, $arDropDown, $arMultiSelect, $arGroupAnswers, "Y");
 	if (intval($VOTE_ID)>0)
 	{
@@ -999,7 +1012,7 @@ function ShowVoteResults($VOTE_ID, $template1="")
 		{
 			$template = (strlen($arVote["RESULT_TEMPLATE"])<=0) ? "default.php" : $arVote["RESULT_TEMPLATE"];
 			require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/vote/include.php");
-			@include_once (GetLangFileName($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/lang/", "/".$template));
+			IncludeModuleLangFile(__FILE__);
 			$path = COption::GetOptionString("vote", "VOTE_TEMPLATE_PATH_VOTE");
 			if (strlen($template1)>0) $template = $template1;
 			if ($APPLICATION->GetShowIncludeAreas())
@@ -1091,4 +1104,3 @@ function GetNextColor(&$color, &$current_color, $total, $start_color="0000CC", $
 	}
 	$current_color = $color;
 }
-?>

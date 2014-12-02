@@ -17,6 +17,11 @@ if (!CCatalog::IsUserExists())
 }
 
 CCatalogDiscountSave::Disable();
+CCatalogDiscountCoupon::ClearCoupon();
+if ($USER->IsAuthorized())
+{
+	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
+}
 
 if (!function_exists("yandex_replace_special"))
 {
@@ -63,11 +68,14 @@ $strAll.= "<shop>\n";
 $strAll.= "<name>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</name>\n";
 $strAll.= "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n";
 $strAll.= "<url>http://".htmlspecialcharsbx(COption::GetOptionString("main", "server_name", ""))."</url>\n";
+$strAll.= "<platform>1C-Bitrix</platform>\n";
 
 //*****************************************//
 
 $arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH');
-$db_acc = CCurrency::GetList(($by="sort"), ($order="asc"));
+$by="sort";
+$order="asc";
+$db_acc = CCurrency::GetList($by, $order);
 $strTmp = "<currencies>\n";
 while ($arAcc = $db_acc->Fetch())
 {
@@ -143,7 +151,9 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 		$cnt++;
 		if (!array_key_exists($arAcc['LID'], $arSiteServers))
 		{
-			$rsSite = CSite::GetList(($b="sort"), ($o="asc"), array("LID" => $arAcc["LID"]));
+			$b="sort";
+			$o="asc";
+			$rsSite = CSite::GetList($b, $o, array("LID" => $arAcc["LID"]));
 			if($arSite = $rsSite->Fetch())
 				$arAcc["SERVER_NAME"] = $arSite["SERVER_NAME"];
 			if(strlen($arAcc["SERVER_NAME"])<=0 && defined("SITE_SERVER_NAME"))
@@ -191,7 +201,8 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 			array(2), // anonymous
 			'N',
 			array(),
-			$arIBlock['LID']
+			$arIBlock['LID'],
+			array()
 		))
 		{
 			$minPrice = $arPrice['DISCOUNT_PRICE'];
@@ -267,7 +278,7 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 			}
 		}
 
-		$strTmpOff.= "<name>".yandex_text2xml($arAcc["NAME"], true)."</name>\n";
+		$strTmpOff.= "<name>".yandex_text2xml($arAcc["~NAME"], true)."</name>\n";
 		$strTmpOff.=
 			"<description>".
 			yandex_text2xml(TruncateText(

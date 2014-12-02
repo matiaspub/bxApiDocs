@@ -121,28 +121,28 @@ class Helper
 	 *
 	 * @param \Bitrix\Iblock\InheritedProperty\BaseTemplate $ipropTemplates Templates to lookup.
 	 * @param string $templateName Name of the template to choose from $ipropTemplates.
-	 * @param array $arFields Array contains fields for processing the template.
-	 * @param array $arFile Array contains information about file in format of $_FILES.
+	 * @param array $fields Array contains fields for processing the template.
+	 * @param array $file Array contains information about file in format of $_FILES.
 	 *
 	 * @return string
 	 */
 	public static function makeFileName(
 		\Bitrix\Iblock\InheritedProperty\BaseTemplate $ipropTemplates,
 		$templateName,
-		array $arFields,
-		array $arFile
+		array $fields,
+		array $file
 	)
 	{
-		if (preg_match("/^(.+)(\\.[a-zA-Z0-9]+)\$/", $arFile["name"], $fileName))
+		if (preg_match("/^(.+)(\\.[a-zA-Z0-9]+)\$/", $file["name"], $fileName))
 		{
-			if (!isset($arFields["IPROPERTY_TEMPLATES"]) || $arFields["IPROPERTY_TEMPLATES"][$templateName] == "")
+			if (!isset($fields["IPROPERTY_TEMPLATES"]) || $fields["IPROPERTY_TEMPLATES"][$templateName] == "")
 			{
 				$templates = $ipropTemplates->findTemplates();
 				$TEMPLATE = $templates[$templateName]["TEMPLATE"];
 			}
 			else
 			{
-				$TEMPLATE = $arFields["IPROPERTY_TEMPLATES"][$templateName];
+				$TEMPLATE = $fields["IPROPERTY_TEMPLATES"][$templateName];
 			}
 
 			if ($TEMPLATE != "")
@@ -152,7 +152,7 @@ class Helper
 				{
 					$values = $ipropTemplates->getValuesEntity();
 					$entity = $values->createTemplateEntity();
-					$entity->setFields($arFields);
+					$entity->setFields($fields);
 					return \Bitrix\Iblock\Template\Engine::process($entity, $TEMPLATE).$fileName[2];
 				}
 				elseif ($modifiers != "")
@@ -165,6 +165,6 @@ class Helper
 				}
 			}
 		}
-		return $arFile["name"];
+		return $file["name"];
 	}
 }

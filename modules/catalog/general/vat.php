@@ -1,9 +1,10 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
 
 
 /**
- * <b>CCatalogVat</b> - класс для работы со ставками НДС.
+ * <b>CCatalogVat</b> - класс для работы со ставками НДС.</body> </html>
  *
  *
  *
@@ -76,7 +77,7 @@ class CAllCatalogVat
 		if ('INSERT' == $ACTION)
 			$ACTION = 'ADD';
 
-		if (array_key_exists('SORT', $arFields))
+		if (isset($arFields['SORT']))
 		{
 			$arFields['C_SORT'] = $arFields['SORT'];
 			unset($arFields['SORT']);
@@ -89,21 +90,21 @@ class CAllCatalogVat
 
 		if ('ADD' == $ACTION)
 		{
-			if (!array_key_exists('NAME', $arFields))
+			if (!isset($arFields['NAME']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'NAME', "text" => GetMessage('CVAT_ERROR_BAD_NAME'));
+				$arMsg[] = array('id' => 'NAME', "text" => Loc::getMessage('CVAT_ERROR_BAD_NAME'));
 			}
-			if (!array_key_exists('RATE', $arFields))
+			if (!isset($arFields['RATE']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'RATE', "text" => GetMessage('CVAT_ERROR_BAD_RATE'));
+				$arMsg[] = array('id' => 'RATE', "text" => Loc::getMessage('CVAT_ERROR_BAD_RATE'));
 			}
-			if (!array_key_exists('C_SORT', $arFields))
+			if (!isset($arFields['C_SORT']))
 			{
 				$arFields['C_SORT'] = 100;
 			}
-			if (!array_key_exists('ACTIVE', $arFields))
+			if (!isset($arFields['ACTIVE']))
 			{
 				$arFields['ACTIVE'] = 'Y';
 			}
@@ -117,24 +118,16 @@ class CAllCatalogVat
 				if ('' == $arFields['NAME'])
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'NAME', "text" => GetMessage('CVAT_ERROR_BAD_NAME'));
+					$arMsg[] = array('id' => 'NAME', "text" => Loc::getMessage('CVAT_ERROR_BAD_NAME'));
 				}
 			}
 			if (array_key_exists('RATE', $arFields))
 			{
-				if ('' == $arFields['RATE'])
+				$arFields['RATE'] = doubleval($arFields['RATE']);
+				if (0 > $arFields['RATE'] || 100 < $arFields['RATE'])
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'RATE', "text" => GetMessage('CVAT_ERROR_BAD_RATE'));
-				}
-				else
-				{
-					$arFields['RATE'] = doubleval($arFields['RATE']);
-					if (0 > $arFields['RATE'] || 100 < $arFields['RATE'])
-					{
-						$boolResult = false;
-						$arMsg[] = array('id' => 'RATE', "text" => GetMessage('CVAT_ERROR_BAD_RATE'));
-					}
+					$arMsg[] = array('id' => 'RATE', "text" => Loc::getMessage('CVAT_ERROR_BAD_RATE'));
 				}
 			}
 			if (array_key_exists('C_SORT', $arFields))
@@ -147,7 +140,7 @@ class CAllCatalogVat
 			}
 			if (array_key_exists('ACTIVE', $arFields))
 			{
-				$arFields['ACTIVE'] = ('Y' == $arFields['ACTIVE'] ? 'Y' : 'N');
+				$arFields['ACTIVE'] = ($arFields['ACTIVE'] == 'Y' ? 'Y' : 'N');
 			}
 		}
 
@@ -292,7 +285,7 @@ class CAllCatalogVat
 	*/
 	public static function Set($arFields)
 	{
-		if (array_key_exists('ID', $arFields) && 0 < intval($arFields['ID']))
+		if (isset($arFields['ID']) && intval($arFields['ID']) > 0)
 		{
 			return CCatalogVat::Update($arFields['ID'], $arFields);
 		}

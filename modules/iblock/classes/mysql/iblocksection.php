@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.
+ * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.</body> </html>
  *
  *
  *
@@ -28,7 +28,7 @@ class CIBlockSection extends CAllIBlockSection
 	* <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> by1, ... </i> - поле сортировки, может
 	* принимать значения: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код
 	* родительской группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> -
-	* мнемонический код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
+	* символьный код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
 	* <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина вложенности
 	* (начинается с 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
 	* времени создания группы;</li> <li> <b>created_by</b> - по идентификатору
@@ -49,19 +49,21 @@ class CIBlockSection extends CAllIBlockSection
 	* поле</i> может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по
 	* активности (Y|N);</li> <li> <b>GLOBAL_ACTIVE</b> - фильтр по активности, учитывая
 	* активность вышележащих разделов (Y|N);</li> <li> <b>NAME</b> - по названию
-	* (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по мнемоническому
-	* коду (по шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему
-	* коду (по шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя
-	* (если указать false, то будут возвращены корневые разделы);</li> <li>
+	* (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по символьному коду (по
+	* шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему коду (по
+	* шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя (если
+	* указать false, то будут возвращены корневые разделы);</li> <li>
 	* <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li> <li> <b>LEFT_BORDER</b>,
-	* <b> RIGHT_BORDER</b> - по левой и правой границе (поля <b>LEFT_MARGIN</b> и
-	* <b>RIGHT_MARGIN</b>, см. примечание №2);</li> <li> <b>LEFT_MARGIN</b>, <b>RIGHT_MARGIN</b> - по
-	* положению в дереве;</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
+	* <b> RIGHT_BORDER</b> - по левой и правой границе (используется, когда
+	* необходимо выбрать некий диапазон разделов, см. <a href="#ex4">пример
+	* №4</a>);</li> <li> <b>LEFT_MARGIN</b>, <b>RIGHT_MARGIN</b> - по положению в дереве
+	* (используется, когда необходима выборка дерева подразделов, см. <a
+	* href="#ex4">пример №4</a>);</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
 	* по коду родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> -
 	* по активности родительского информационного блока;</li> <li>
 	* <b>IBLOCK_NAME</b> - по названию информационного блока (по шаблону [%_]);</li>
 	* <li> <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
-	* <b>IBLOCK_CODE </b><i> - </i>по мнемоническому коду информационного блока (по
+	* <b>IBLOCK_CODE </b><i> - </i>по символьному коду информационного блока (по
 	* шаблону [%_]);</li> <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему коду
 	* информационного блока (по шаблону [%_]);</li> <li> <span style="font-weight: bold;
 	* ">TIMESTAMP_X</span> - по времени последнего изменения;</li> <li> <span style="font-weight:
@@ -98,9 +100,9 @@ class CIBlockSection extends CAllIBlockSection
 	*
 	*
 	* @param array $Select = Array() Массив для выборки. <ul> <li> <b>ID</b> - ID группы информационного
-	* блока.</li> <li> <b>CODE</b> - Мнемонический идентификатор.</li> <li> <b>EXTERNAL_ID
-	* или XML_ID</b> - Внешний код.</li> <li> <b>IBLOCK_ID</b> - ID информационного блока.
-	* </li> <li> <b>IBLOCK_SECTION_ID</b> - ID группы родителя, если не задан то группа
+	* блока.</li> <li> <b>CODE</b> - Символьный идентификатор.</li> <li> <b>EXTERNAL_ID или
+	* XML_ID</b> - Внешний код.</li> <li> <b>IBLOCK_ID</b> - ID информационного блока. </li>
+	* <li> <b>IBLOCK_SECTION_ID</b> - ID группы родителя, если не задан то группа
 	* корневая. </li> <li> <b>TIMESTAMP_X</b> - Дата последнего изменения параметров
 	* группы. </li> <li> <b>SORT</b> - Порядок сортировки (среди групп внутри
 	* одной группы-родителя).</li> <li> <b>NAME</b> - Наименование группы.</li> <li>
@@ -152,13 +154,13 @@ class CIBlockSection extends CAllIBlockSection
 	* информационном блоке. </p>
 	*
 	*
-	* <h4>Example</h4> 
+	* <h4>Example</h4>
 	* <pre>
 	* &lt;?<br>$arIBTYPE = CIBlockType::GetByIDLang($type, LANGUAGE_ID);<br>if($arIBTYPE!==false)<br>{<br>  // выборка только активных разделов из инфоблока $IBLOCK_ID, в которых есть элементы <br>  // со значением свойства SRC, начинающееся с https://<br>  $arFilter = Array('IBLOCK_ID'=&gt;$IBLOCK_ID, 'GLOBAL_ACTIVE'=&gt;'Y', 'PROPERTY'=&gt;Array('SRC'=&gt;'https://%'));<br>  $db_list = CIBlockSection::GetList(Array($by=&gt;$order), $arFilter, true);<br>  $db_list-&gt;NavStart(20);<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>  while($ar_result = $db_list-&gt;GetNext())<br>  {<br>    echo $ar_result['ID'].' '.$ar_result['NAME'].': '.$ar_result['ELEMENT_CNT'].'&lt;br&gt;';<br>  }<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>}<br>?&gt;<br>
-	* 
-	* 
-	* 
-	* //пример выборки дерева подразделов для раздела 
+	*
+	*
+	*
+	* //пример выборки дерева подразделов для раздела
 	* $rsParentSection = CIBlockSection::GetByID(ID_необходимой_секции);
 	* if ($arParentSection = $rsParentSection-&gt;GetNext())
 	* {
@@ -169,16 +171,16 @@ class CIBlockSection extends CAllIBlockSection
 	*        // получаем подразделы
 	*    }
 	* }
-	* 
-	* 
-	* 
-	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле 
-	* 
-	* &lt;? 
+	*
+	*
+	*
+	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле
+	*
+	* &lt;?
 	* //внутри цикла построения меню
 	* $uf_iblock_id = 1; //ID инфоблока
 	* $uf_name = Array("UF_PAGE_LINK"); //пользовательское поле UF_PAGE_LINK
-	* 
+	*
 	* preg_match('/\?ID=([0-9]+)\&amp;?/i', $arItem["LINK"], $matches); //SEF отключен, поэтому спокойно берем SECTION_ID из ссылки по шаблону ID=#SECTION_ID#
 	* $uf_section_id = $matches[1];
 	* if(CModule::IncludeModule("iblock")): //подключаем модуль инфоблок для работы с классом CIBlockSection
@@ -190,11 +192,36 @@ class CIBlockSection extends CAllIBlockSection
 	*    endif;
 	* endif;
 	* ?&gt;
+	*
+	*
+	*
+	* //рассмотрим разницу использования фильтра по LEFT_MARGIN, RIGHT_MARGIN и LEFT_BORDER, RIGHT_BORDER
+	* //допустим, что у некоторого раздела LEFT_MARGIN (значение в базе) = 10, RIGHT_MARGIN (значение в базе) = 40
+	*
+	* //в первом примере кода будет выбран как сам раздел, так и все его подразделы,
+	* //поскольку всегда LEFT_MARGIN раздела-потомка &gt; LEFT_MARGIN раздела-родителя
+	* //и RIGHT_MARGIN раздела-потомка &lt; RIGHT_MARGIN раздела-родителя
+	*
+	* $arFilter = array('IBLOCK_ID' =&gt; 10, 'LEFT_MARGIN' =&gt; 10, 'RIGHT_MARGIN' =&gt; 40);
+	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
+	* while ($arSction = $rsSections-&gt;Fetch())
+	* {
+	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&amp;ltbr&gt;';
+	* }
+	*
+	* //во втором примере кода будет возвращена только одна запись - сам раздел
+	*
+	* $arFilter = array('IBLOCK_ID' =&gt; 10, 'LEFT_BORDER' =&gt; 10, 'RIGHT_BORDER' =&gt; 40);
+	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
+	* while ($arSction = $rsSections-&gt;Fetch())
+	* {
+	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&lt;br&gt;';
+	* }
 	* </pre>
 	*
 	*
 	*
-	* <h4>See Also</h4> 
+	* <h4>See Also</h4>
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
 	* информационного блока </a> </li> </ul> <a name="examples"></a>

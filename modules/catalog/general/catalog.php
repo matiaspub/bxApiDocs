@@ -18,6 +18,7 @@ Loc::loadMessages(__FILE__);
 class CAllCatalog
 {
 	protected static $arCatalogCache = array();
+	protected static $catalogVatCache = array();
 
 	
 	/**
@@ -113,7 +114,7 @@ class CAllCatalog
 		$arMsg = array();
 		$boolResult = true;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		$arCatalog = false;
 		if (0 < $ID)
 			$arCatalog = CCatalog::GetByID($ID);
@@ -135,14 +136,14 @@ class CAllCatalog
 					$arMsg[] = array('id' => 'IBLOCK_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_IBLOCK_ID_FIELD_ABSENT'));
 					$boolResult = false;
 				}
-				elseif(0 >= intval($arFields['IBLOCK_ID']))
+				elseif((int)$arFields['IBLOCK_ID'] <= 0)
 				{
 					$arMsg[] = array('id' => 'IBLOCK_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_IBLOCK_ID_INVALID'));
 					$boolResult = false;
 				}
 				else
 				{
-					$arFields['IBLOCK_ID'] = intval($arFields['IBLOCK_ID']);
+					$arFields['IBLOCK_ID'] = (int)$arFields['IBLOCK_ID'];
 					$rsIBlocks = CIBlock::GetByID($arFields['IBLOCK_ID']);
 					if (!($arIBlock = $rsIBlocks->Fetch()))
 					{
@@ -174,15 +175,15 @@ class CAllCatalog
 				{
 					$arFields["PRODUCT_IBLOCK_ID"] = 0;
 				}
-				elseif (0 > intval($arFields["PRODUCT_IBLOCK_ID"]))
+				elseif (0 > (int)$arFields["PRODUCT_IBLOCK_ID"])
 				{
 					$arMsg[] = array('id' => 'PRODUCT_IBLOCK_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_PRODUCT_ID_INVALID'));
 					$arFields["PRODUCT_IBLOCK_ID"] = 0;
 					$boolResult = false;
 				}
-				elseif (0 < intval($arFields["PRODUCT_IBLOCK_ID"]))
+				elseif (0 < (int)$arFields["PRODUCT_IBLOCK_ID"])
 				{
-					$arFields["PRODUCT_IBLOCK_ID"] = intval($arFields["PRODUCT_IBLOCK_ID"]);
+					$arFields["PRODUCT_IBLOCK_ID"] = (int)$arFields["PRODUCT_IBLOCK_ID"];
 					$rsIBlocks = CIBlock::GetByID($arFields['PRODUCT_IBLOCK_ID']);
 					if (!($arIBlock = $rsIBlocks->Fetch()))
 					{
@@ -209,7 +210,7 @@ class CAllCatalog
 				{
 					$arFields["SKU_PROPERTY_ID"] = 0;
 				}
-				elseif (0 > intval($arFields["SKU_PROPERTY_ID"]))
+				elseif (0 > (int)$arFields["SKU_PROPERTY_ID"])
 				{
 					$arMsg[] = array('id' => 'SKU_PROPERTY_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_SKU_PROP_ID_INVALID'));
 					$arFields["SKU_PROPERTY_ID"] = 0;
@@ -217,7 +218,7 @@ class CAllCatalog
 				}
 				else
 				{
-					$arFields["SKU_PROPERTY_ID"] = intval($arFields["SKU_PROPERTY_ID"]);
+					$arFields["SKU_PROPERTY_ID"] = (int)$arFields["SKU_PROPERTY_ID"];
 				}
 
 				if ((0 < $arFields["PRODUCT_IBLOCK_ID"]) && (0 == $arFields['SKU_PROPERTY_ID']))
@@ -260,15 +261,15 @@ class CAllCatalog
 				{
 					if (is_set($arFields, 'PRODUCT_IBLOCK_ID'))
 					{
-						if (0 > intval($arFields["PRODUCT_IBLOCK_ID"]))
+						if (0 > (int)$arFields["PRODUCT_IBLOCK_ID"])
 						{
 							$arMsg[] = array('id' => 'PRODUCT_IBLOCK_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_PRODUCT_ID_INVALID'));
 							$arFields["PRODUCT_IBLOCK_ID"] = 0;
 							$boolResult = false;
 						}
-						elseif (0 < intval($arFields["PRODUCT_IBLOCK_ID"]))
+						elseif (0 < (int)$arFields["PRODUCT_IBLOCK_ID"])
 						{
-							$arFields["PRODUCT_IBLOCK_ID"] = intval($arFields["PRODUCT_IBLOCK_ID"]);
+							$arFields["PRODUCT_IBLOCK_ID"] = (int)$arFields["PRODUCT_IBLOCK_ID"];
 							$rsIBlocks = CIBlock::GetByID($arFields['PRODUCT_IBLOCK_ID']);
 							if (!($arIBlock = $rsIBlocks->Fetch()))
 							{
@@ -299,7 +300,7 @@ class CAllCatalog
 
 					if (is_set($arFields, 'SKU_PROPERTY_ID'))
 					{
-						if (0 > intval($arFields["SKU_PROPERTY_ID"]))
+						if (0 > (int)$arFields["SKU_PROPERTY_ID"])
 						{
 							$arMsg[] = array('id' => 'SKU_PROPERTY_ID', "text" => Loc::getMessage('BT_MOD_CATALOG_ERR_SKU_PROP_ID_INVALID'));
 							$arFields["SKU_PROPERTY_ID"] = 0;
@@ -307,7 +308,7 @@ class CAllCatalog
 						}
 						else
 						{
-							$arFields["SKU_PROPERTY_ID"] = intval($arFields["SKU_PROPERTY_ID"]);
+							$arFields["SKU_PROPERTY_ID"] = (int)$arFields["SKU_PROPERTY_ID"];
 						}
 					}
 					if (is_set($arFields, 'PRODUCT_IBLOCK_ID') && is_set($arFields, 'SKU_PROPERTY_ID'))
@@ -408,8 +409,8 @@ class CAllCatalog
 	{
 		global $DB;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		if (isset(self::$arCatalogCache[$ID]))
@@ -701,7 +702,7 @@ class CAllCatalog
 						{
 							if ($arFields[$key]["TYPE"] == "int")
 							{
-								array_walk($vals, create_function("&\$item", "\$item=intval(\$item);"));
+								array_walk($vals, create_function("&\$item", "\$item=(int)\$item;"));
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
@@ -712,7 +713,7 @@ class CAllCatalog
 							}
 							elseif ($arFields[$key]["TYPE"] == "double")
 							{
-								array_walk($vals, create_function("&\$item", "\$item=DoubleVal(\$item);"));
+								array_walk($vals, create_function("&\$item", "\$item=(float)\$item;"));
 								$vals = array_unique($vals);
 								$val = implode(",", $vals);
 
@@ -775,10 +776,10 @@ class CAllCatalog
 							{
 								if ($arFields[$key]["TYPE"] == "int")
 								{
-									if ((intval($val) == 0) && (strpos($strOperation, "=") !== false))
+									if ((int)$val == 0 && strpos($strOperation, "=") !== false)
 										$arSqlSearch_tmp[] = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
 									else
-										$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".intval($val)." )";
+										$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".(int)$val." )";
 								}
 								elseif ($arFields[$key]["TYPE"] == "double")
 								{
@@ -1144,10 +1145,10 @@ class CAllCatalog
 
 						if ($arFields[$key]["TYPE"] == "int")
 						{
-							if ((intval($val) == 0) && (strpos($strOperation, "=") !== false))
+							if ((int)$val == 0 && strpos($strOperation, "=") !== false)
 								$arSqlSearch_tmp1 = "(".$arFields[$key]["FIELD"]." IS ".(($strNegative == "Y") ? "NOT " : "")."NULL) ".(($strNegative == "Y") ? "AND" : "OR")." ".(($strNegative == "Y") ? "NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." 0)";
 							else
-								$arSqlSearch_tmp1 = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".intval($val)." )";
+								$arSqlSearch_tmp1 = (($strNegative == "Y") ? " ".$arFields[$key]["FIELD"]." IS NULL OR NOT " : "")."(".$arFields[$key]["FIELD"]." ".$strOperation." ".(int)$val." )";
 						}
 						elseif ($arFields[$key]["TYPE"] == "double")
 						{
@@ -1460,7 +1461,7 @@ class CAllCatalog
 	static public function Update($ID, $arFields)
 	{
 		global $DB;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if (array_key_exists('OFFERS', $arFields))
 			unset($arFields['OFFERS']);
 
@@ -1481,6 +1482,10 @@ class CAllCatalog
 					global $CATALOG_CATALOG_CACHE;
 					$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
 				}
+			}
+			if (isset(self::$catalogVatCache[$ID]))
+			{
+				unset(self::$catalogVatCache[$ID]);
 			}
 		}
 		CCatalogSKU::ClearCache();
@@ -1508,9 +1513,8 @@ class CAllCatalog
 	static public function Delete($ID)
 	{
 		global $DB;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 
-		$bCanDelete = true;
 		foreach(GetModuleEvents("catalog", "OnBeforeCatalogDelete", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array($ID))===false)
@@ -1523,7 +1527,6 @@ class CAllCatalog
 		}
 
 		$bSuccess = true;
-
 		$dbRes = CIBlockElement::GetList(array(), array("IBLOCK_ID" => $ID));
 		while ($arRes = $dbRes->Fetch())
 		{
@@ -1536,11 +1539,15 @@ class CAllCatalog
 			if (isset(self::$arCatalogCache[$ID]))
 			{
 				unset(self::$arCatalogCache[$ID]);
-				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+				if (defined('CATALOG_GLOBAL_VARS') && CATALOG_GLOBAL_VARS == 'Y')
 				{
 					global $CATALOG_CATALOG_CACHE;
 					$CATALOG_CATALOG_CACHE = self::$arCatalogCache;
 				}
+			}
+			if (isset(self::$catalogVatCache[$ID]))
+			{
+				unset(self::$catalogVatCache[$ID]);
 			}
 			CCatalogSKU::ClearCache();
 			CCatalogProduct::ClearCache();
@@ -1579,7 +1586,7 @@ class CAllCatalog
 		}
 
 		global $pPERIOD;
-		$pPERIOD = intval(COption::GetOptionString("catalog", "yandex_xml_period", "24"))*60*60;
+		$pPERIOD = (int)COption::GetOptionString("catalog", "yandex_xml_period", "24")*60*60;
 		return "CCatalog::PreGenerateXML(\"".$xml_type."\");";
 	}
 
@@ -1606,10 +1613,10 @@ class CAllCatalog
 		global $APPLICATION;
 		global $DB;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if (0 < $ID)
 		{
-			$intIBlockID = intval(CIBlockElement::GetIBlockByID($ID));
+			$intIBlockID = (int)CIBlockElement::GetIBlockByID($ID);
 			if (0 < $intIBlockID)
 			{
 				$arCatalog = CCatalogSKU::GetInfoByProductIBlock($intIBlockID);
@@ -1652,7 +1659,7 @@ class CAllCatalog
 
 		$arMsg = array();
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if (0 >= $ID)
 			return true;
 		$arCatalog = CCatalogSKU::GetInfoByIBlock($ID);
@@ -1696,7 +1703,7 @@ class CAllCatalog
 	{
 		global $APPLICATION;
 
-		$intPropertyID = intval($intPropertyID);
+		$intPropertyID = (int)$intPropertyID;
 		if (0 >= $intPropertyID)
 			return true;
 		$arSkuInfo = CCatalogSKU::GetInfoByLinkProperty($intPropertyID);
@@ -1767,7 +1774,7 @@ class CAllCatalog
 		$arMsg = array();
 		$boolResult = true;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if (0 >= $ID)
 		{
 			$arMsg[] = array('id' => 'PRODUCT_IBLOCK_ID','text' => Loc::getMessage('BT_MOD_CATALOG_ERR_PRODUCT_ID_INVALID'));
@@ -1785,7 +1792,7 @@ class CAllCatalog
 			);
 			if ($arCatalog = $rsCatalog->Fetch())
 			{
-				$arCatalog['IBLOCK_ID'] = intval($arCatalog['IBLOCK_ID']);
+				$arCatalog['IBLOCK_ID'] = (int)$arCatalog['IBLOCK_ID'];
 				$arFields = array(
 					'PRODUCT_IBLOCK_ID' => 0,
 					'SKU_PROPERTY_ID' => 0,
@@ -1819,13 +1826,13 @@ class CAllCatalog
 
 		$intSKUPropID = 0;
 		$ibp = new CIBlockProperty();
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if (0 >= $ID)
 		{
 			$arMsg[] = array('id' => 'PRODUCT_IBLOCK_ID', 'text' => Loc::getMessage('BT_MOD_CATALOG_ERR_PRODUCT_ID_INVALID'));
 			$boolResult = false;
 		}
-		$SKUID = intval($SKUID);
+		$SKUID = (int)$SKUID;
 		if (0 >= $SKUID)
 		{
 			$arMsg[] = array('id' => 'OFFERS_IBLOCK_ID', 'text' => Loc::getMessage('BT_MOD_CATALOG_ERR_OFFERS_ID_INVALID'));
@@ -1926,6 +1933,12 @@ class CAllCatalog
 		global $USER;
 
 		return (isset($USER) && $USER instanceof CUser);
+	}
+
+	public static function clearCache()
+	{
+		self::$arCatalogCache = array();
+		self::$catalogVatCache = array();
 	}
 }
 ?>

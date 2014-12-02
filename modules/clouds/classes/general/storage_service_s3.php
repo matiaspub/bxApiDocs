@@ -14,6 +14,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	protected $result = '';
 	protected $new_end_point = '';
 	protected $_public = true;
+	protected $location = '';
 	/**
 	 * @return int
 	*/
@@ -179,6 +180,17 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		);
 	}
 	/**
+	 * @param string $location
+	 * @return void
+	 **/
+	public function SetLocation($location)
+	{
+		if ($location)
+			$this->location = "s3-".$location;
+		else
+			$this->location = "";
+	}
+	/**
 	 * @param array[string]string $arSettings
 	 * @param string $verb
 	 * @param string $bucket
@@ -213,6 +225,10 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		$RequestURI = $file_name;
 
 		$obRequest = new CHTTP;
+		if (isset($additional_headers["option-file-result"]))
+		{
+			$obRequest->fp = $additional_headers["option-file-result"];
+		}
 
 		foreach($this->SignRequest($arSettings, $verb, $bucket, $file_name, $ContentType, $additional_headers) as $key => $value)
 			$obRequest->additional_headers[$key] = $value;
@@ -223,10 +239,14 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 
 		if(
 			$this->new_end_point != ""
-			&& preg_match('#^(http|https)://'.preg_quote($bucket, '#').'(.+)/#', $this->new_end_point, $match) > 0
+			&& preg_match('#^(http|https)://'.preg_quote($bucket, '#').'(.+?)/#', $this->new_end_point, $match) > 0
 		)
 		{
-			$host = $match[2];
+			$host = $bucket.$match[2];
+		}
+		elseif ($this->location)
+		{
+			$host = $bucket.".".$this->location.".amazonaws.com";
 		}
 		else
 		{
@@ -248,7 +268,10 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 
 		if($obRequest->status == 200)
 		{
-			if(isset($additional_headers["option-raw-result"]))
+			if(
+				isset($additional_headers["option-raw-result"])
+				|| isset($additional_headers["option--result"])
+			)
 			{
 				return $obRequest->result;
 			}
@@ -340,6 +363,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		else
 			$content = '';
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'PUT',
@@ -377,6 +401,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 			return true;
 		}
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'DELETE',
@@ -405,6 +430,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	{
 		global $APPLICATION;
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'GET',
@@ -499,6 +525,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 		$filePath = CCloudUtil::URLEncode($filePath, "UTF-8");
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'HEAD',
@@ -541,6 +568,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		$additional_headers["x-amz-copy-source"] = CCloudUtil::URLEncode("/".$arBucket["BUCKET"]."/".($arBucket["PREFIX"]? $arBucket["PREFIX"]."/": "").($arFile["SUBDIR"]? $arFile["SUBDIR"]."/": "").$arFile["FILE_NAME"], "UTF-8");
 		$additional_headers["Content-Type"] = $arFile["CONTENT_TYPE"];
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'PUT',
@@ -581,6 +609,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 		$filePath = CCloudUtil::URLEncode($filePath, "UTF-8");
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'DELETE',
@@ -617,6 +646,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		$additional_headers["Content-Type"] = $arFile["type"];
 		$additional_headers["Content-Length"] = (array_key_exists("content", $arFile)? CUtil::BinStrlen($arFile["content"]): filesize($arFile["tmp_name"]));
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'PUT',
@@ -663,6 +693,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 		$filePath = $APPLICATION->ConvertCharset($filePath, LANG_CHARSET, "UTF-8");
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$marker = '';
 		while(true)
 		{
@@ -747,6 +778,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 			$additional_headers["x-amz-acl"] = "public-read";
 		$additional_headers["Content-Type"] = $ContentType;
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'POST',
@@ -800,6 +832,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 		$filePath = CCloudUtil::URLEncode($filePath, "UTF-8");
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'PUT',
@@ -834,6 +867,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		foreach($NS["Parts"] as $PartNumber => $ETag)
 			$data .= "<Part><PartNumber>".($PartNumber+1)."</PartNumber><ETag>".$ETag."</ETag></Part>\n";
 
+		$this->SetLocation($arBucket["LOCATION"]);
 		$response = $this->SendRequest(
 			$arBucket["SETTINGS"],
 			'POST',

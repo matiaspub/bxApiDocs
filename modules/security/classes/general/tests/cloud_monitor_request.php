@@ -21,22 +21,27 @@ class CSecurityCloudMonitorRequest
 	private static $validActions = array("check", "get_results");
 	protected $response = array();
 	protected $checkingToken = "";
+	protected $protocolVersion = 2;
 
-	public function __construct($action, $token = "")
+	public function __construct($action, $protocolVersion, $token = "")
 	{
 		if(!in_array($action, self::$validActions))
 			return null;
 
 		$this->checkingToken = $token;
 		$this->response = $this->receiveData($action);
+		$this->protocolVersion = $protocolVersion;
 	}
 
 	/**
 	 * @param string $checkingToken
+	 * @return $this
 	 */
 	public function setCheckingToken($checkingToken)
 	{
 		$this->checkingToken = $checkingToken;
+
+		return $this;
 	}
 
 	/**
@@ -133,10 +138,10 @@ class CSecurityCloudMonitorRequest
 	/**
 	 * Generate payload for request to Bitrix
 	 * @param string $action - "check" or "receive_results"
-	 * @param bool $collectSystemInformation
+	 * @param bool $collectInformation
 	 * @return string
 	 */
-	protected function getPayload($action = "check", $collectSystemInformation = true)
+	protected function getPayload($action = "check", $collectInformation = true)
 	{
 		if(!in_array($action, self::$validActions))
 			return false;
@@ -146,10 +151,16 @@ class CSecurityCloudMonitorRequest
 				"host"   => self::getHostName(),
 				"lang"   => LANGUAGE_ID,
 				"license_key" => self::getLicenseKey(),
-				"testing_token" => $this->checkingToken
+				"testing_token" => $this->checkingToken,
+				"version" => $this->protocolVersion
 			);
-		if($collectSystemInformation || $action === "check")
+
+		if($collectInformation || $action === "check")
+		{
 			$payload["system_information"] = base64_encode(serialize(self::getSystemInformation()));
+			$payload["additional_information"] = base64_encode(serialize(self::getAdditionalInformation()));
+		}
+
 		return $payload;
 	}
 
@@ -165,6 +176,7 @@ class CSecurityCloudMonitorRequest
 		$result = json_decode($response, true);
 		if(!defined("BX_UTF"))
 			$result = $APPLICATION->ConvertCharsetArray($result, "UTF-8", LANG_CHARSET);
+
 		return $result;
 	}
 
@@ -225,6 +237,17 @@ class CSecurityCloudMonitorRequest
 	protected static function getSystemInformation()
 	{
 		return CSecuritySystemInformation::getSystemInformation();
+	}
+
+	/**
+	 * Return additional information, such as P&P or LDAP server information
+	 *
+	 * @since 14.5.4
+	 * @return array
+	 */
+	protected static function getAdditionalInformation()
+	{
+		return CSecuritySystemInformation::getAdditionalInformation();
 	}
 
 	/**

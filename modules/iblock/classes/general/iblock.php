@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlock</b> - класс для работы с информационными блоками
+ * <b>CIBlock</b> - класс для работы с информационными блоками</body> </html>
  *
  *
  *
@@ -1564,9 +1564,9 @@ class CAllIBlock
 		if(!$DB->Query("DELETE FROM b_iblock WHERE ID=".$ID, false, $err_mess.__LINE__))
 			return false;
 
-		$DB->Query("DROP TABLE b_iblock_element_prop_s".$ID, true, $err_mess.__LINE__);
-		$DB->Query("DROP TABLE b_iblock_element_prop_m".$ID, true, $err_mess.__LINE__);
-		$DB->Query("DROP SEQUENCE sq_b_iblock_element_prop_m".$ID, true, $err_mess.__LINE__);
+		$DB->DDL("DROP TABLE b_iblock_element_prop_s".$ID, true, $err_mess.__LINE__);
+		$DB->DDL("DROP TABLE b_iblock_element_prop_m".$ID, true, $err_mess.__LINE__);
+		$DB->DDL("DROP SEQUENCE sq_b_iblock_element_prop_m".$ID, true, $err_mess.__LINE__);
 
 		CIBlock::CleanCache($ID);
 
@@ -2225,7 +2225,7 @@ REQ
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockfields">Поля элемента</a> </li>
-	* </ul> </h<br>
+	* </ul> <br>
 	*
 	*
 	* @static
@@ -3544,7 +3544,7 @@ REQ
 							$BODY .= CSearch::KillTags(
 								call_user_func_array($UserType["GetSearchContent"],
 									array(
-										$arProperties['ID'],
+										$arProperties,
 										array("VALUE" => $arProperties["VALUE"]),
 										array(),
 									)
@@ -3556,7 +3556,7 @@ REQ
 							$BODY .= CSearch::KillTags(
 								call_user_func_array($UserType["GetPublicViewHTML"],
 									array(
-										$arProperties['ID'],
+										$arProperties,
 										array("VALUE" => $arProperties["VALUE"]),
 										array(),
 									)
@@ -3721,7 +3721,7 @@ REQ
 	*
 	*
 	*
-	* @return int <p>Целое число.</p> <p> <br></p>
+	* @return int <p>Целое число.</p><p> <br></p>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetElementCount.php
@@ -3821,6 +3821,26 @@ REQ
 		if(!is_array($orig))
 			return GetMessage("IBLOCK_BAD_FILE_NOT_PICTURE");
 
+		$width_orig = $orig[0];
+		$height_orig = $orig[1];
+
+		$orientation = 0;
+		$exifData = array();
+		$image_type = $orig[2];
+		if($image_type == IMAGETYPE_JPEG)
+		{
+			$exifData = CFile::ExtractImageExif($file);
+			if ($exifData  && isset($exifData['Orientation']))
+			{
+				$orientation = $exifData['Orientation'];
+				if ($orientation >= 5 && $orientation <= 8)
+				{
+					$width_orig = $orig[1];
+					$height_orig = $orig[0];
+				}
+			}
+		}
+
 		if(($width > 0 && $orig[0] > $width) || ($height > 0 && $orig[1] > $height))
 		{
 			if($arFile["COPY_FILE"] == "Y")
@@ -3834,9 +3854,6 @@ REQ
 				else
 					return GetMessage("IBLOCK_BAD_FILE_NOT_FOUND");
 			}
-
-			$width_orig = $orig[0];
-			$height_orig = $orig[1];
 
 			if($width <= 0)
 				$width = $width_orig;
@@ -3855,7 +3872,26 @@ REQ
 
 			$image_type = $orig[2];
 			if($image_type == IMAGETYPE_JPEG)
+			{
 				$image = imagecreatefromjpeg($file);
+				if ($orientation > 1)
+				{
+					if ($orientation == 7 || $orientation == 8)
+						$image = imagerotate($image, 90, null);
+					elseif ($orientation == 3 || $orientation == 4)
+						$image = imagerotate($image, 180, null);
+					elseif ($orientation == 5 || $orientation == 6)
+						$image = imagerotate($image, 270, null);
+
+					if (
+						$orientation == 2 || $orientation == 7
+						|| $orientation == 4 || $orientation == 5
+					)
+					{
+						CFile::ImageFlipHorizontal($image);
+					}
+				}
+			}
 			elseif($image_type == IMAGETYPE_GIF)
 				$image = imagecreatefromgif($file);
 			elseif($image_type == IMAGETYPE_PNG)
@@ -3953,6 +3989,29 @@ REQ
 
 		case IMAGETYPE_JPEG:
 			$picture = imagecreatefromjpeg($filePath);
+			$orientation = 0;
+			$exifData = CFile::ExtractImageExif($filePath);
+			if ($exifData && isset($exifData['Orientation']))
+			{
+				$orientation = $exifData['Orientation'];
+			}
+			if ($orientation > 1)
+			{
+				if ($orientation == 7 || $orientation == 8)
+					$picture = imagerotate($picture, 90, null);
+				elseif ($orientation == 3 || $orientation == 4)
+					$picture = imagerotate($picture, 180, null);
+				elseif ($orientation == 5 || $orientation == 6)
+					$picture = imagerotate($picture, 270, null);
+
+				if (
+					$orientation == 2 || $orientation == 7
+					|| $orientation == 4 || $orientation == 5
+				)
+				{
+					CFile::ImageFlipHorizontal($picture);
+				}
+			}
 			$bHasAlpha = false;
 			break;
 
@@ -4101,6 +4160,19 @@ REQ
 		return $url.$strAdd;
 	}
 
+	public static function GetAdminSubElementEditLink($IBLOCK_ID, $ELEMENT_ID, $SUBELEMENT_ID, $arParams = array(), $strAdd = '', $absoluteUrl = false)
+	{
+		$absoluteUrl = ($absoluteUrl === true);
+		$url = ($absoluteUrl ? '/bitrix/admin/' : '').'iblock_subelement_edit.php?IBLOCK_ID='.(int)$IBLOCK_ID.'&type='.urlencode(CIBlock::GetArrayByID($IBLOCK_ID, 'IBLOCK_TYPE_ID'));
+		$url .= '&PRODUCT_ID='.(int)$ELEMENT_ID.'&ID='.(int)$SUBELEMENT_ID.'&lang='.LANGUAGE_ID;
+
+		foreach ($arParams as $name => $value)
+			if (isset($value))
+				$url.= '&'.urlencode($name).'='.urlencode($value);
+
+		return $url.$strAdd;
+	}
+
 	public static function GetAdminElementListLink($IBLOCK_ID, $arParams = array(), $strAdd = "")
 	{
 		if (defined("CATALOG_PRODUCT") && !array_key_exists("menu", $arParams))
@@ -4178,7 +4250,7 @@ REQ
 			&& $ar["UNIQUE"] == "Y"
 			&& !$DB->IndexExists("b_iblock_element", array("IBLOCK_ID", "CODE"))
 		)
-			$DB->Query("create index ix_iblock_element_code on b_iblock_element (IBLOCK_ID, CODE)");
+			$DB->DDL("create index ix_iblock_element_code on b_iblock_element (IBLOCK_ID, CODE)");
 
 		$ar = $arIBlock["FIELDS"]["SECTION_CODE"]["DEFAULT_VALUE"];
 		if (
@@ -4186,7 +4258,7 @@ REQ
 			&& $ar["UNIQUE"] == "Y"
 			&& !$DB->IndexExists("b_iblock_section", array("IBLOCK_ID", "CODE"))
 		)
-			$DB->Query("create index ix_iblock_section_code on b_iblock_section (IBLOCK_ID, CODE)");
+			$DB->DDL("create index ix_iblock_section_code on b_iblock_section (IBLOCK_ID, CODE)");
 	}
 
 

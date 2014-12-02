@@ -91,6 +91,23 @@ class CSaleBasketHelper
 			return 1;
 	}
 
+
+	public static function cmpBySort($array1, $array2)
+	{
+		if (!isset($array1["SORT"])
+			|| !isset($array2["SORT"])
+			|| ($array1["SORT"] < $array2["SORT"]))
+			return -1;
+
+		if ($array1["SORT"] > $array2["SORT"])
+			return 1;
+
+		if ($array1["SORT"] == $array2["SORT"])
+			return 0;
+	}
+
+
+
 	public static function filterFields($field)
 	{
 		if ($field === false || $field === null)
@@ -99,6 +116,70 @@ class CSaleBasketHelper
 		}
 
 		return true;
+	}
+
+	/**
+	 * resorting of elements in the parent
+	 * @param $basketItems
+	 * @param bool $setIndexAsId
+	 * @return array
+	 */
+	public static function reSortItems($basketItems, $setIndexAsId = false)
+	{
+		$basketItemsTmp = $basketItems;
+		$parentItems = array();
+		$parentItemFound = false;
+		foreach ($basketItemsTmp as $basketItemKey => $basketItem)
+		{
+			if (CSaleBasketHelper::isSetParent($basketItem) || CSaleBasketHelper::isSetItem($basketItem))
+			{
+				$parentItemFound = true;
+				if (!array_key_exists($basketItem['SET_PARENT_ID'], $parentItems))
+				{
+					$parentItems[$basketItem['SET_PARENT_ID']] = array();
+				}
+
+				if (CSaleBasketHelper::isSetItem($basketItem))
+				{
+					$parentItems[$basketItem['SET_PARENT_ID']][] = $basketItem;
+					unset($basketItemsTmp[$basketItemKey]);
+				}
+			}
+		}
+
+		if ($parentItemFound === true && !empty($basketItemsTmp) && is_array($basketItemsTmp)
+			&& !empty($parentItems) && is_array($parentItems))
+		{
+			$basketItems = array();
+			foreach ($basketItemsTmp as $basketItem)
+			{
+				if ($setIndexAsId === true)
+				{
+					$basketItems[$basketItem['ID']] = $basketItem;
+				}
+				else
+				{
+					$basketItems[] = $basketItem;
+				}
+
+				if (array_key_exists($basketItem['ID'], $parentItems))
+				{
+					foreach ($parentItems[$basketItem['ID']] as $childItem)
+					{
+						if ($setIndexAsId === true)
+						{
+							$basketItems[$childItem['ID']] = $childItem;
+						}
+						else
+						{
+							$basketItems[] = $childItem;
+						}
+					}
+				}
+			}
+		}
+
+		return $basketItems;
 	}
 
 }

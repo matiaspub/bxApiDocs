@@ -34,7 +34,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код.");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код.");
 	 *             return false;
 	 *         }
 	 *     }
@@ -142,7 +142,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код. (ID:".$arFields["ID"].")");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код. (ID:".$arFields["ID"].")");
 	 *             return false;
 	 *         }
 	 *     }
@@ -340,7 +340,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код.");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код.");
 	 *             return false;
 	 *         }
 	 *     }
@@ -449,7 +449,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код. (ID:".$arFields["ID"].")");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код. (ID:".$arFields["ID"].")");
 	 *             return false;
 	 *         }
 	 *     }
@@ -643,7 +643,7 @@ class _CEventsIblock {
 	 *         {
 	 *             global $APPLICATION;
 	 *             $aMsg = array();
-	 *             $aMsg[] = array("id"=&gt;"CODE", "text"=&gt;"Введите мнемонический код.");
+	 *             $aMsg[] = array("id"=&gt;"CODE", "text"=&gt;"Введите символьный код.");
 	 *             $e = new CAdminException($aMsg);
 	 *             $APPLICATION-&gt;throwException($e);
 	 *             return false;
@@ -754,7 +754,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код. (ID:".$arFields["ID"].")");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код. (ID:".$arFields["ID"].")");
 	 *             return false;
 	 *         }
 	 *     }
@@ -923,7 +923,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код.");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код.");
 	 *             return false;
 	 *         }
 	 *     }
@@ -1132,7 +1132,7 @@ class _CEventsIblock {
 	 *         if(strlen($arFields["CODE"])&lt;=0)
 	 *         {
 	 *             global $APPLICATION;
-	 *             $APPLICATION-&gt;throwException("Введите мнемонический код. (ID:".$arFields["ID"].")");
+	 *             $APPLICATION-&gt;throwException("Введите символьный код. (ID:".$arFields["ID"].")");
 	 *             return false;
 	 *         }
 	 *     }
@@ -1246,7 +1246,7 @@ class _CEventsIblock {
 	 *
 	 *
 	 *
-	 * @param int $ID  ID удаляемого элемента.
+	 * @param int $ID  ID удаляемого элемента. </htm
 	 *
 	 *
 	 *

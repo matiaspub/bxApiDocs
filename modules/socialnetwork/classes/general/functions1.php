@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.
+ * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.</body> </html>
  *
  *
  *
@@ -73,7 +73,7 @@ class CSocNetTextParser
 	*
 	*
 	*
-	* @param string $text  Исходное сообщение. </htm
+	* @param string $text  Исходное сообщение. </ht
 	*
 	*
 	*
@@ -345,6 +345,8 @@ class CSocNetTextParser
 
 	public static function killAllTags($text)
 	{
+		if (method_exists("CTextParser", "clearAllTags"))
+			return CTextParser::clearAllTags($text);
 		$text = strip_tags($text);
 		$text = preg_replace("#<(/?)quote(.*?)>#is", "", $text);
 		$text = preg_replace("#<(/?)code(.*?)>#is", "", $text);

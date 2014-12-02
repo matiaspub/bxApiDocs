@@ -23,7 +23,7 @@ class CAllSaleOrderPropsGroup
 	*
 	*
 	*
-	* @param int $ID  Код группы заказов.
+	* @param int $ID  Код группы заказов. </ht
 	*
 	*
 	*
@@ -102,7 +102,7 @@ class CAllSaleOrderPropsGroup
 	*
 	*
 	*
-	* @param int $ID  Код группы заказов.
+	* @param int $ID  Код группы заказов. </ht
 	*
 	*
 	*
@@ -146,7 +146,7 @@ class CAllSaleOrderPropsGroup
 	*
 	*
 	*
-	* @param int $ID  Код группы свойств.
+	* @param int $ID  Код группы свойств. </ht
 	*
 	*
 	*

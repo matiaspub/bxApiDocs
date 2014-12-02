@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockResult</b> - вспомогательный класс для работы с объектами результатов выборок, наследуется от класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> и содержит все его параметры и методы. Объекты данного класса возвращают функции: <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getbyid.php">GetByID</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php">GetIBlockElementList</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">GetIBlockElementListEx</a>. Использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
+ * <b>CIBlockResult</b> - вспомогательный класс для работы с объектами результатов выборок, наследуется от класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> и содержит все его параметры и методы. Объекты данного класса возвращают функции: <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getbyid.php">GetByID</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php">GetIBlockElementList</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">GetIBlockElementListEx</a>. Использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. </body> </html>
  *
  *
  *
@@ -59,7 +59,7 @@ class CIBlockResult extends CDBResult
 	*
 	*
 	*
-	* @return void <p>Ничего.</p></bo
+	* @return void <p>Ничего.</p></b
 	*
 	*
 	* <h4>Example</h4> 

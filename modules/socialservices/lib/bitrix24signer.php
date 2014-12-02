@@ -24,4 +24,26 @@ class Bitrix24Signer
 		$encodedValue = parent::unsign($signedValue, $salt);
 		return Json::decode(base64_decode($encodedValue));
 	}
+
+	/**
+	 * Return encoded signature
+	 *
+	 * @param string $value
+	 * @return mixed
+	 */
+	protected function encodeSignature($value)
+	{
+		return base64_encode($value);
+	}
+
+	/**
+	 * Return decoded signature
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	protected function decodeSignature($value)
+	{
+		return base64_decode($value);
+	}
 }

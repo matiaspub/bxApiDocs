@@ -17,35 +17,35 @@ class CSocServTwitter extends CSocServAuth
 	static public function GetFormHtml($arParams)
 	{
 		$phrase = ($arParams["FOR_INTRANET"]) ? GetMessage("socserv_tw_note_intranet") : GetMessage("socserv_tw_note");
-		$url = $GLOBALS['APPLICATION']->GetCurPageParam('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "current_fieldset"));
+
+		$url = $GLOBALS['APPLICATION']->GetCurPageParam('ncc=1&auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"].(isset($arParams['BACKURL']) ? "&backurl=".urlencode($arParams['BACKURL']) : ''), array("logout", "auth_service_error", "auth_service_id", "current_fieldset", "ncc"));
+
 		if($arParams["FOR_INTRANET"])
 			return array("ON_CLICK" => 'onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 800, 450)"');
 		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 800, 450)" class="bx-ss-button twitter-button"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
-
 	}
 
 	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
-		$bSuccess = 1;
 
-		$appID = trim(self::GetOption("twitter_key"));
-		$appSecret = trim(self::GetOption("twitter_secret"));
+		$bSuccess = false;
 
 		if(!isset($_REQUEST["oauth_token"]) || $_REQUEST["oauth_token"] == '')
 		{
-			$tw = new CTwitterInterface($appID, $appSecret);
+			$tw = new CTwitterInterface();
 			$callback = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
-			//$callback = 'http://algerman.sam:6448/script.php?auth_service_id='.self::ID;
+
 			if($tw->GetRequestToken($callback))
+			{
 				$tw->RedirectAuthUrl();
+			}
 		}
 		elseif(CSocServAuthManager::CheckUniqueKey())
 		{
-			$tw = new CTwitterInterface($appID, $appSecret, $_REQUEST["oauth_token"], $_REQUEST["oauth_verifier"]);
+			$tw = new CTwitterInterface(false, false, $_REQUEST["oauth_token"], $_REQUEST["oauth_verifier"]);
 			if(($arResult = $tw->GetAccessToken()) !== false && $arResult["user_id"] <> '')
 			{
-
 				$twUser = $tw->GetUserInfo($arResult["user_id"]);
 
 				$first_name = $last_name = "";
@@ -65,8 +65,14 @@ class CSocServTwitter extends CSocServAuth
 					'LAST_NAME'=> $last_name,
 				);
 				if(isset($twUser["profile_image_url"]) && self::CheckPhotoURI($twUser["profile_image_url"]))
+				{
+					$twUser["profile_image_url"] = preg_replace("/_normal\./i", ".", $twUser["profile_image_url"]);
 					if ($arPic = CFile::MakeFileArray($twUser["profile_image_url"]))
+					{
 						$arFields["PERSONAL_PHOTO"] = $arPic;
+					}
+				}
+
 				$arFields["PERSONAL_WWW"] = "https://twitter.com/".$arResult["screen_name"];
 				if(strlen(SITE_ID) > 0)
 					$arFields["SITE_ID"] = SITE_ID;
@@ -76,22 +82,34 @@ class CSocServTwitter extends CSocServAuth
 						COption::SetOptionString('socialservices', 'last_twit_id', $twUser["status"]["id_str"]);
 				}
 
-				$bSuccess = $this->AuthorizeUser($arFields);
+				$authError = $this->AuthorizeUser($arFields);
+				$bSuccess = $authError === true;
 			}
 		}
 
-		$aRemove = array("logout", "auth_service_error", "auth_service_id", "oauth_token", "oauth_verifier", "check_key", "current_fieldset");
-		$url = $GLOBALS['APPLICATION']->GetCurPageParam(($bSuccess === true ? '' : 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
-		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
-			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
-		echo '
+		if($bSuccess)
+		{
+			CSocServUtil::checkOAuthProxyParams();
+
+			$aRemove = array("logout", "auth_service_error", "auth_service_id", "oauth_token", "oauth_verifier", "check_key", "current_fieldset", "ncc");
+
+			$url = isset($_REQUEST['backurl']) ? $_REQUEST['backurl'] : $GLOBALS['APPLICATION']->GetCurPageParam(($bSuccess === true ? '' : 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
+			if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
+				$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
+			echo '
 <script type="text/javascript">
 if(window.opener)
 	window.opener.location = \''.CUtil::JSEscape($url).'\';
 window.close();
 </script>
 ';
-		die();
+			die();
+		}
+		else
+		{
+			// some error occured
+
+		}
 	}
 
 	static public function GetUserMessage($socServUserArray, $sinceId = '1')
@@ -116,6 +134,57 @@ window.close();
 			$result = $tw->SearchByHash($hash, $socServUserArray, $sinceId);
 		}
 		return $result;
+	}
+
+	static public function getFriendsList($limit, &$next)
+	{
+		global $USER;
+
+		$tw = new CTwitterInterface();
+		$userId = self::TwitterUserId($USER->GetID());
+
+		if($userId > 0)
+		{
+			$res = $tw->getUserFriends($userId, $limit, $next);
+
+			if(is_array($res) && is_array($res['users']))
+			{
+				foreach($res['users'] as $key => $contact)
+				{
+					$res['users'][$key]['uid'] = $contact['id_str'];
+					$res['users'][$key]['url'] = "https://twitter.com/".$contact["screen_name"];
+					$res['users'][$key]['first_name'] = $contact['name'];
+
+					if($contact['profile_image_url'])
+					{
+						$res['users'][$key]['picture'] = CMain::IsHTTPS()
+							? $contact['profile_image_url_https']
+							: $contact['profile_image_url'];
+						$res['users'][$key]['picture'] = preg_replace("/_normal\./i", ".",
+							$res['users'][$key]['picture']);
+					}
+				}
+
+				return $res['users'];
+			}
+		}
+
+		return false;
+	}
+
+	public static function sendMessage($uid, $message)
+	{
+		global $USER;
+
+		$tw = new CTwitterInterface();
+		$userId = self::TwitterUserId($USER->GetID());
+
+		if($userId > 0)
+		{
+			$res = $tw->sendMessage($userId, $uid, $message);
+		}
+
+		return $res;
 	}
 
 	static public function TwitterUserId($userId)
@@ -146,6 +215,8 @@ class CTwitterInterface
 	const API_URL = "https://api.twitter.com/1.1/users/show.json";
 	const POST_URL = "https://api.twitter.com/1.1/statuses/update.json";
 	const SEARCH_URL = "https://api.twitter.com/1.1/search/tweets.json";
+	const FRIENDS_URL = "https://api.twitter.com/1.1/friends/list.json";
+	const MESSAGE_URL = "https://api.twitter.com/1.1/direct_messages/new.json";
 
 	protected $appID;
 	protected $appSecret;
@@ -154,17 +225,32 @@ class CTwitterInterface
 	protected $tokenSecret = false;
 	protected $oauthArray;
 
-	public function __construct($appID, $appSecret, $token = false, $tokenVerifier = false, $tokenSecret = false)
+	public function __construct($appID = false, $appSecret = false, $token = false, $tokenVerifier = false, $tokenSecret = false)
 	{
+		if($appID === false)
+		{
+			$appID = trim(CSocServTwitter::GetOption("twitter_key"));
+		}
+
+		if($appSecret === false)
+		{
+			$appSecret = trim(CSocServTwitter::GetOption("twitter_secret"));
+		}
+
 		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
+
 		$this->token = $token;
 		$this->tokenVerifier = $tokenVerifier;
 		if($this->token && isset($_SESSION["twitter_token_secret"]))
+		{
 			$this->tokenSecret = $_SESSION["twitter_token_secret"];
+		}
 		if($this->token && $tokenSecret)
+		{
 			$this->tokenSecret = $tokenSecret;
+		}
 	}
 
 	protected function GetDefParams()
@@ -187,6 +273,7 @@ class CTwitterInterface
 		));
 
 		$arParams["oauth_signature"] = $this->BuildSignature($this->GetSignatureString($arParams, self::REQUEST_URL));
+
 		$result = CHTTP::sPostHeader(self::REQUEST_URL, $arParams, array(), $this->httpTimeout);
 		parse_str($result, $arResult);
 		if(isset($arResult["oauth_token"]) && $arResult["oauth_token"] <> '')
@@ -203,7 +290,8 @@ class CTwitterInterface
 	{
 		if(!$this->token)
 			return false;
-		LocalRedirect(self::AUTH_URL."?oauth_token=".urlencode($this->token).'&check_key='.$_SESSION["UNIQUE_KEY"], true);
+
+		LocalRedirect(self::AUTH_URL."?oauth_token=".urlencode($this->token).'&check_key='.$_SESSION["UNIQUE_KEY"]/*."&state=".urlencode($state)*/, true);
 	}
 
 	public function GetAccessToken()
@@ -249,7 +337,95 @@ class CTwitterInterface
 		return CUtil::JsObjectToPhp($result);
 	}
 
-	private function SetOauthKeys($socServUserId)
+	public function getUserFriends($user_id, $limit, &$next)
+	{
+		if($limit === 0)
+		{
+			$limit = 100;
+		}
+
+		if(empty($next))
+		{
+			$next = '-1';
+		}
+
+		$this->SetOauthKeys($user_id);
+
+		$arParams = array_merge($this->GetDefParams(), array(
+			"oauth_token" => $this->token,
+			"cursor" => $next,
+			"skip_status" => "true",
+			"include_user_entities" => "false",
+		));
+
+		$url = self::FRIENDS_URL.'?cursor='.urlencode($next).'&skip_status=true&include_user_entities=false';
+
+		if($limit > 0)
+		{
+			$arParams["count"] = intval($limit);
+			$url .= '&count='.$arParams["count"];
+		}
+
+		$arParams["oauth_signature"] = urlencode($this->BuildSignature($this->GetSignatureString($arParams, self::FRIENDS_URL)));
+
+		$arHeaders = array(
+			"Authorization" => 'OAuth oauth_consumer_key="'.$arParams["oauth_consumer_key"].'", oauth_nonce="'.$arParams["oauth_nonce"].'", oauth_signature="'.$arParams["oauth_signature"].'", oauth_signature_method="HMAC-SHA1", oauth_timestamp="'.$arParams["oauth_timestamp"].'", oauth_token="'.$this->token.'", oauth_version="1.0"',
+			"Content-type" => "application/x-www-form-urlencoded",
+		);
+		$result = CHTTP::sGetHeader($url, $arHeaders, $this->httpTimeout);
+
+		if(!defined("BX_UTF"))
+		{
+			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
+		}
+
+		$res = CUtil::JsObjectToPhp($result);
+
+		$next = $res['next_cursor_str'];
+		if($next == '0')
+		{
+			$next = '';
+		}
+
+		return $res;
+	}
+
+	public function sendMessage($user_id, $uid, $message)
+	{
+		$this->SetOauthKeys($user_id);
+
+		if($this->access_token === false)
+			return false;
+
+		$message = CharsetConverter::ConvertCharset($message, LANG_CHARSET, "utf-8");
+
+		$arParams = array_merge($this->GetDefParams(), array(
+			"oauth_token" => $this->token,
+			"user_id" => $uid,
+			"text" => $message,
+		));
+
+		$arParams["oauth_signature"] = urlencode($this->BuildSignature($this->GetSignatureString($arParams, self::MESSAGE_URL)));
+
+		$arHeaders = array(
+			"Authorization" => 'OAuth oauth_consumer_key="'.$arParams["oauth_consumer_key"].'", oauth_nonce="'.$arParams["oauth_nonce"].'", oauth_signature="'.$arParams["oauth_signature"].'", oauth_signature_method="HMAC-SHA1", oauth_timestamp="'.$arParams["oauth_timestamp"].'", oauth_token="'.$this->token.'", oauth_version="1.0"',
+		);
+
+		$arPost = array(
+			"user_id" => $uid,
+			"text" => $message,
+		);
+
+		$ob = new \Bitrix\Main\Web\HttpClient();
+		foreach($arHeaders as $header => $value)
+		{
+			$ob->setHeader($header, $value);
+		}
+
+		return $ob->post(self::MESSAGE_URL, $arPost);
+	}
+
+	public function SetOauthKeys($socServUserId)
 	{
 		$dbSocservUser = CSocServAuthDB::GetList(array(), array('ID' => $socServUserId), false, false, array("OATOKEN", "OASECRET"));
 		while($arOauth = $dbSocservUser->Fetch())
@@ -306,7 +482,6 @@ class CTwitterInterface
 
 	private function GetAllPages($arResult)
 	{
-
 		static $arTwits = array();
 		if(!isset($arResult["search_metadata"]["next_results"]))
 			return $arTwits;
@@ -415,7 +590,7 @@ class CTwitterInterface
 	protected function GetSignatureString($arParams, $url)
 	{
 		$typeRequest = "POST";
-		if($url === self::API_URL || $url === self::SEARCH_URL)
+		if($url === self::API_URL || $url === self::SEARCH_URL || $url == self::FRIENDS_URL)
 			$typeRequest = "GET";
 		if(array_key_exists('oauth_signature', $arParams))
 			unset($arParams['oauth_signature']);

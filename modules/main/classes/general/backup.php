@@ -199,9 +199,9 @@ public static 	function skipMask($abs_path)
 		}
 	}
 
-	public static function GetArcName($prefix = '')
+public static 	function GetArcName($prefix = '')
 	{
-		$arc_name = DOCUMENT_ROOT.BX_ROOT."/backup/".date("Ymd_His");
+		$arc_name = DOCUMENT_ROOT.BX_ROOT."/backup/".$prefix.date("Ymd_His");
 
 		$k = IntOption('dump_file_kernel');
 		$p = IntOption('dump_file_public');
@@ -472,12 +472,12 @@ public 	function __construct()
 	{
 	}
 
-	fupublic nction ProcessDirBefore($f)
+	public function ProcessDirBefore($f)
 	{
 		return true;
 	}
 
-	funpublic static ction ProcessDirAfter($f)
+	public static function ProcessDirAfter($f)
 	{
 		return true;
 	}
@@ -696,7 +696,7 @@ public static 	function getEncryptKey()
 		return $LICENSE_KEY;
 	}
 
-public static 	static function Set($strName, $strVal)
+public static function Set($strName, $strVal)
 	{
 		if (!self::Init())
 			return false;
@@ -705,7 +705,7 @@ public static 	static function Set($strName, $strVal)
 		return COption::SetOptionString('main', $strName, base64_encode($temporary_cache));
 	}
 
-public static 	static function Get($strName)
+public static function Get($strName)
 	{
 		if (!self::Init())
 			return false;
@@ -1300,7 +1300,7 @@ public 	function close()
 		clearstatcache();
 	}
 
-	fpublic unction getNextName($file = '')
+	public function getNextName($file = '')
 	{
 		if (!$file)
 			$file = $this->file;
@@ -1321,7 +1321,7 @@ public 	function close()
 		return $c;
 	}
 
-	funpublic ction checksum($s)
+	public function checksum($s)
 	{
 		$chars = count_chars(self::substr($s,0,148).'        '.self::substr($s,156,356));
 		$sum = 0;

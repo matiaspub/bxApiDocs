@@ -9,7 +9,7 @@ namespace Bitrix\Iblock\Template\Entity;
 class ElementSkuProperty extends Base
 {
 	protected $ids = null;
-	protected $iblock_id = 0;
+	protected $iblockId = 0;
 	protected $properties = array();
 
 	/**
@@ -30,7 +30,7 @@ class ElementSkuProperty extends Base
 	 */
 	public function setIblockId($iblockId)
 	{
-		$this->iblock_id = intval($iblockId);
+		$this->iblockId = intval($iblockId);
 	}
 
 	/**
@@ -41,7 +41,7 @@ class ElementSkuProperty extends Base
 	 */
 	protected function loadFromDatabase()
 	{
-		if (!isset($this->fields) && $this->iblock_id > 0 && is_array($this->ids))
+		if (!isset($this->fields) && $this->iblockId > 0 && is_array($this->ids))
 		{
 			$this->fields = array();
 			foreach($this->ids as $id)
@@ -49,7 +49,7 @@ class ElementSkuProperty extends Base
 				if ($id > 0)
 				{
 					$propertyList = \CIBlockElement::getProperty(
-						$this->iblock_id,
+						$this->iblockId,
 						$id,
 						array("sort" => "asc"),
 						array("EMPTY" => "N")

@@ -7,10 +7,12 @@
 // define('PUBLIC_AJAX_MODE', true);
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_before.php");
+
 if(!$USER->CanDoOperation('fileman_view_file_structure'))
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
 
 IncludeModuleLangFile(__FILE__);
+
 echo '<!--BX_FD_LOAD_OK-->';
 
 if (!check_bitrix_sessid())

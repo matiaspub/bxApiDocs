@@ -11,14 +11,16 @@ use Bitrix\Main\Config\Option;
  */
 class Signer
 {
-	/** @var \Bitrix\Main\Security\Sign\SigningAlgorithm */
+	/** @var \Bitrix\Main\Security\Sign\SigningAlgorithm Signing algorithm */
 	protected $algorithm = null;
 	protected $separator = '.';
-	/** @var string */
+	/** @var string Secret key */
 	protected $key = null;
 
 	/**
-	 * @param SigningAlgorithm $algorithm
+	 * Creates new Signer object. If you want use your own signing algorithm - you can this
+	 *
+	 * @param SigningAlgorithm $algorithm Custom signing algorithm.
 	 */
 	public function __construct(SigningAlgorithm $algorithm = null)
 	{
@@ -29,7 +31,9 @@ class Signer
 	}
 
 	/**
-	 * @param string $value
+	 * Set key for singing
+	 *
+	 * @param string $value Key.
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
@@ -43,6 +47,8 @@ class Signer
 	}
 
 	/**
+	 * Return separator, used for packing/unpacking
+	 *
 	 * @return string
 	 */
 	public function getSeparator()
@@ -51,7 +57,9 @@ class Signer
 	}
 
 	/**
-	 * @param string $value
+	 * Set separator, used for packing/unpacking
+	 *
+	 * @param string $value Separator.
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
@@ -65,8 +73,10 @@ class Signer
 	}
 
 	/**
-	 * @param string $value
-	 * @param string|null $salt
+	 * Return message signature provided by hashing algorithm
+	 *
+	 * @param string $value Message.
+	 * @param string|null $salt Salt.
 	 * @return string
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
@@ -77,20 +87,24 @@ class Signer
 
 		$key = $this->getKey($salt);
 		$signature = $this->algorithm->getSignature($value, $key);
-		return base64_encode($signature);
+		$signature = $this->encodeSignature($signature);
+		return $signature;
 	}
 
 	/**
+	 * Sign message, return string in format "{message}{separator}{signature}"
+	 *
 	 * Simple example:
 	 * <code>
-	 * //test.salted_sign_hash
-	 * echo (new Signer)->sign('test', 'my_salt');
-	 * //test.sign_hash
-	 * echo (new Signer)->sign('test');
+	 *  // If salt needed
+	 *  $foo = (new Signer)->sign('test', 'my_salt');
+	 *
+	 *  // Otherwise
+	 *  $bar = (new Signer)->sign('test');
 	 * </code>
 	 *
-	 * @param string $value
-	 * @param string|null $salt
+	 * @param string $value Message for signing.
+	 * @param string|null $salt Salt, if needed.
 	 * @return string
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
@@ -99,46 +113,57 @@ class Signer
 		if (!is_string($value))
 			throw new ArgumentTypeException('value', 'string');
 
-		return $value.$this->separator.$this->getSignature($value, $salt);
+		$signature = $this->getSignature($value, $salt);
+		return $this->pack(array($value, $signature));
 	}
 
 	/**
+	 * Check message signature and return original message.
+	 *
 	 * Simple example:
 	 * <code>
-	 * $signer = new Signer;
-	 * $signedValue = $signer->sign('test');
-	 * echo $signer->unsign($signedValue);
-	 * //output 'test'
-	 * echo $signer->unsign('test');
-	 * //throw BadSignatureException with message 'Separator not found in value'
-	 * echo $signer->unsign('test.invalid_sign');
-	 * //throw BadSignatureException with message 'Signature does not match'
-	 * echo $signer->unsign($signedValue, 'invalid_salt');
+	 *  $signer = new Signer;
+	 *
+	 *  // Sing message
+	 *  $signedValue = $signer->sign('test');
+	 *
+	 *  // Get original message with checking
+	 *  echo $signer->unsign($signedValue);
+	 *  // Output: 'test'
+	 *
+	 *  // Try to unsigning not signed value
+	 *  echo $signer->unsign('test');
+	 *  //throw BadSignatureException with message 'Separator not found in value'
+	 *
+	 *  // Or with invalid sign
+	 *  echo $signer->unsign('test.invalid_sign');
+	 *
+	 *  // Or invalid salt
+	 *  //throw BadSignatureException with message 'Signature does not match'
+	 *  echo $signer->unsign($signedValue, 'invalid_salt');
+	 *
 	 * </code>
 	 *
-	 * @param string $signedValue
-	 * @param string|null $salt
+	 * @param string $signedValue Signed value, must be in format "{message}{separator}{signature}".
+	 * @param string|null $salt Salt, if used while signing.
 	 * @return string
 	 * @throws BadSignatureException
 	 */
 	public function unsign($signedValue, $salt = null)
 	{
-		if (strpos($signedValue, $this->separator) === false)
-			throw new BadSignatureException('Separator not found in value');
-
-		$pos = strrpos($signedValue, $this->separator);
-		$value = substr($signedValue, 0, $pos);
-		$sig = substr($signedValue, $pos + 1);
-		if (!$this->verifySignature($value, $sig, $salt))
+		list($value, $signature) = $this->unpack($signedValue);
+		if (!$this->verifySignature($value, $signature, $salt))
 			throw new BadSignatureException('Signature does not match');
 
 		return $value;
 	}
 
 	/**
-	 * @param string $signedValue
-	 * @param string|null $salt
-	 * @return bool
+	 * Simply validation of message signature
+	 *
+	 * @param string $signedValue Signed value, must be in format "{message}{separator}{signature}".
+	 * @param string|null $salt Salt, if used while signing.
+	 * @return bool True if OK, otherwise - false.
 	 */
 	public function validate($signedValue, $salt = null)
 	{
@@ -154,24 +179,34 @@ class Signer
 	}
 
 	/**
-	 * @param string $value
-	 * @param string $sig
-	 * @param string|null $salt
+	 * Verify message signature provided by hashing algorithm
+	 *
+	 * @param string $value Message.
+	 * @param string $sig Signature.
+	 * @param string|null $salt Salt, if used while signing.
 	 * @return bool
 	 */
 	protected function verifySignature($value, $sig, $salt = null)
 	{
 		$key = $this->getKey($salt);
-		$signature = base64_decode($sig);
+		$signature = $this->decodeSignature($sig);
 		return $this->algorithm->verify($value, $key, $signature);
 	}
 
 	/**
-	 * @param string|null $salt
+	 * Return salted key for singing.
+	 * If key was set by setKey - use it
+	 * Otherwise - used default (if default key does not exists - automatically generate it)
+	 *
+	 * @param string|null $salt Salt, if needed.
+	 * @throws BadSignatureException
 	 * @return string
 	 */
 	protected function getKey($salt = null)
 	{
+		if ($salt !== null && !preg_match('#^[a-zA-Z0-9_.-]{3,50}$#D', $salt))
+			throw new BadSignatureException('Malformed salt, only [a-zA-Z0-9_.-]{3,50} characters are acceptable');
+
 		if ($this->key !== null)
 			$key = $this->key;
 		else
@@ -181,6 +216,8 @@ class Signer
 	}
 
 	/**
+	 * Return default (system) key for signing or generate if it does not exists
+	 *
 	 * @return string
 	 */
 	protected function getDefaultKey()
@@ -197,5 +234,86 @@ class Signer
 		}
 
 		return $defaultKey;
+	}
+
+
+	/**
+	 * Pack array values to single string:
+	 * pack(['test', 'all', 'values']) -> 'test.all.values'
+	 *
+	 * @param array $values Values for packing.
+	 * @return string
+	 */
+	protected function pack(array $values)
+	{
+		return join($this->separator, $values);
+	}
+
+	/**
+	 * Unpack values from string (something like rsplit).
+	 * Simple example for separator ".":
+	 * <code>
+	 *  // Unpack all values:
+	 *  unpack('test.all.values', 0) -> ['test', 'all', 'values']
+	 *
+	 *  // Unpack 2 values (by default). First element containing the rest of string.
+	 *  unpack('test.all.values') -> ['test.all', 'values']
+	 *
+	 *  // Exception if separator is missing
+	 *  unpack('test.all values', 3) -> throws BadSignatureException
+	 * </code>
+	 *
+	 * @param string $value String for unpacking.
+	 * @param int $limit If $limit === 0 - unpack all values, default - 2.
+	 * @return array
+	 * @throws BadSignatureException
+	 */
+	protected function unpack($value, $limit = 2)
+	{
+		// Some kind of optimization
+		if ($limit === 0)
+		{
+			if (strpos($value, $this->separator) === false)
+				throw new BadSignatureException('Separator not found in value');
+
+			return explode($this->separator, $value);
+		}
+
+		$result = array();
+		while(--$limit > 0)
+		{
+			$pos = bxstrrpos($value, $this->separator);
+			if ($pos === false)
+				throw new BadSignatureException('Separator not found in value');
+
+			$result[] = \CUtil::BinSubstr($value, $pos + 1);
+			$value = \CUtil::BinSubstr($value, 0, $pos);
+		}
+		$result[] = $value;
+
+		return array_reverse($result);
+	}
+
+	/**
+	 * Return encoded signature
+	 *
+	 * @param string $value Signature in binary representation
+	 * @return string Encoded signature
+	 */
+	protected function encodeSignature($value)
+	{
+		return bin2hex($value);
+	}
+
+	/**
+	 * Return decoded signature
+	 *
+	 * @param string $value Encoded signature
+	 * @return string Signature in binary representation
+	 */
+	protected function decodeSignature($value)
+	{
+		// ToDo: use hex2bin instead pack for PHP > 5.4.0
+		return pack('H*', $value);
 	}
 }

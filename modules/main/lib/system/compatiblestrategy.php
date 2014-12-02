@@ -83,7 +83,7 @@ class CompatibleStrategy
 		FormDecode();
 	}
 
-public static 	public function initializeBasicKernel()
+public static function initializeBasicKernel()
 	{
 		//language independed classes
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/punycode.php");
@@ -253,7 +253,7 @@ public static 	public function initializeBasicKernel()
 		$GLOBALS["arCustomTemplateEngines"] = array();
 	}
 
-public static 	public function authenticateUser()
+public static function authenticateUser()
 	{
 		/** @var $context \Bitrix\Main\HttpContext */
 		//$context = \Bitrix\Main\Application::getInstance()->getContext();
@@ -364,17 +364,17 @@ public static 	public function authenticateUser()
 		}
 	}
 
-public static 	public function initializeContext()
+public static function initializeContext()
 	{
 		$GLOBALS["MESS"] = array();
 		$GLOBALS["ALL_LANG_FILES"] = array();
 	}
 
-public static 	public function initializeExtendedKernel()
+public static function initializeExtendedKernel()
 	{
 	}
 
-public static 	public function createDatabaseConnection()
+public static function createDatabaseConnection()
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		//read database connection parameters require_once
@@ -449,11 +449,11 @@ public static 	public function createDatabaseConnection()
 		}
 	}
 
-public static 	public function authorizeUser()
+public static function authorizeUser()
 	{
 	}
 
-public static 	public function postInitialize()
+public static function postInitialize()
 	{
 	}
 }

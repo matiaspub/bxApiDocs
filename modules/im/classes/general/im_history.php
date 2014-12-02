@@ -62,8 +62,11 @@ class CIMHistory
 			CTimeZone::Enable();
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+		$chatId = 0;
 		$arMessages = Array();
+		$arMessageId = Array();
 		$arUnreadMessage = Array();
+		$arMessageFiles = Array();
 		$arUsers = Array();
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
@@ -85,6 +88,7 @@ class CIMHistory
 
 			$arMessages[$arRes['ID']] = Array(
 				'id' => $arRes['ID'],
+				'chatId' => $arRes['CHAT_ID'],
 				'senderId' => $arRes['FROM_USER_ID'],
 				'recipientId' => $arRes['TO_USER_ID'],
 				'date' => $arRes['DATE_CREATE'],
@@ -92,8 +96,26 @@ class CIMHistory
 			);
 
 			$arUsers[$convId][] = $arRes['ID'];
+			$arMessageId[] = $arRes['ID'];
+			$chatId = $arRes['CHAT_ID'];
 		}
-		return Array('message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $arUsers);
+
+		$params = CIMMessageParam::Get($arMessageId);
+		$arFiles = Array();
+		foreach ($params as $messageId => $param)
+		{
+			$arMessages[$messageId]['params'] = $param;
+			if (isset($param['FILE_ID']))
+			{
+				foreach ($param['FILE_ID'] as $fileId)
+				{
+					$arFiles[$fileId] = $fileId;
+				}
+			}
+		}
+		$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+
+		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $arUsers, 'files' => $arMessageFiles);
 	}
 
 	public function GetMoreMessage($pageId, $toUserId, $fromUserId = false, $bTimeZone = true)
@@ -127,8 +149,11 @@ class CIMHistory
 		$res_cnt = $res_cnt->Fetch();
 		$cnt = $res_cnt["CNT"];
 
+		$chatId = 0;
 		$arMessages = Array();
+		$arMessageId = Array();
 		$arUnreadMessage = Array();
+		$arMessageFiles = Array();
 		$arUsers = Array();
 		if ($cnt > 0 && ceil($cnt/20) >= $iNumPage)
 		{
@@ -177,6 +202,7 @@ class CIMHistory
 				}
 				$arMessages[$arRes['ID']] = Array(
 					'id' => $arRes['ID'],
+					'chatId' => $arRes['CHAT_ID'],
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
 					'date' => $arRes['DATE_CREATE'],
@@ -184,17 +210,33 @@ class CIMHistory
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 				$arUsers[$convId][] = $arRes['ID'];
+				$arMessageId[] = $arRes['ID'];
+				$chatId = $arRes['CHAT_ID'];
 			}
+
+			$params = CIMMessageParam::Get($arMessageId);
+			$arFiles = Array();
+			foreach ($params as $messageId => $param)
+			{
+				$arMessages[$messageId]['params'] = $param;
+				if (isset($param['FILE_ID']))
+				{
+					foreach ($param['FILE_ID'] as $fileId)
+					{
+						$arFiles[$fileId] = $fileId;
+					}
+				}
+			}
+			$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
 		}
 
-		return Array('message' => $arMessages, 'usersMessage' => $arUsers);
+		return Array('chatId' => $chatId, 'message' => $arMessages, 'usersMessage' => $arUsers, 'files' => $arMessageFiles);
 	}
 
 	public static function RemoveMessage($messageId)
 	{
 		global $DB;
 
-		// function for future
 		return false;
 	}
 
@@ -306,8 +348,10 @@ class CIMHistory
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$arMessages = Array();
+		$arMessageId = Array();
 		$arUnreadMessage = Array();
 		$usersMessage = Array();
+
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
 		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
@@ -315,6 +359,7 @@ class CIMHistory
 		{
 			$arMessages[$arRes['ID']] = Array(
 				'id' => $arRes['ID'],
+				'chatId' => $arRes['CHAT_ID'],
 				'senderId' => $arRes['AUTHOR_ID'],
 				'recipientId' => $arRes['CHAT_ID'],
 				'date' => $arRes['DATE_CREATE'],
@@ -322,8 +367,24 @@ class CIMHistory
 			);
 
 			$usersMessage[$arRes['CHAT_ID']][] = $arRes['ID'];
+			$arMessageId[] = $arRes['ID'];
 		}
-		return Array('message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $usersMessage);
+		$params = CIMMessageParam::Get($arMessageId);
+		$arFiles = Array();
+		foreach ($params as $messageId => $param)
+		{
+			$arMessages[$messageId]['params'] = $param;
+			if (isset($param['FILE_ID']))
+			{
+				foreach ($param['FILE_ID'] as $fileId)
+				{
+					$arFiles[$fileId] = $fileId;
+				}
+			}
+		}
+		$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+
+		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $usersMessage, 'files' => $arMessageFiles);
 	}
 
 	public function GetMoreChatMessage($pageId, $chatId, $bTimeZone = true)
@@ -347,6 +408,8 @@ class CIMHistory
 		$cnt = $res_cnt["CNT"];
 
 		$arMessages = Array();
+		$arMessageFiles = Array();
+		$arMessageId = Array();
 		$usersMessage = Array();
 		if ($cnt > 0 && ceil($cnt/20) >= $iNumPage)
 		{
@@ -376,6 +439,7 @@ class CIMHistory
 			{
 				$arMessages[$arRes['ID']] = Array(
 					'id' => $arRes['ID'],
+					'chatId' => $arRes['CHAT_ID'],
 					'senderId' => $arRes['AUTHOR_ID'],
 					'recipientId' => $arRes['CHAT_ID'],
 					'date' => $arRes['DATE_CREATE'],
@@ -384,10 +448,26 @@ class CIMHistory
 				);
 
 				$usersMessage[$arRes['CHAT_ID']][] = $arRes['ID'];
+				$arMessageId[] = $arRes['ID'];
 			}
+
+			$params = CIMMessageParam::Get($arMessageId);
+			$arFiles = Array();
+			foreach ($params as $messageId => $param)
+			{
+				$arMessages[$messageId]['params'] = $param;
+				if (isset($param['FILE_ID']))
+				{
+					foreach ($param['FILE_ID'] as $fileId)
+					{
+						$arFiles[$fileId] = $fileId;
+					}
+				}
+			}
+			$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
 		}
 
-		return Array('message' => $arMessages, 'usersMessage' => $usersMessage);
+		return Array('chatId' => $chatId, 'message' => $arMessages, 'usersMessage' => $usersMessage, 'files' => $arMessageFiles);
 	}
 }
 ?>

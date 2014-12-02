@@ -10,6 +10,8 @@ class CSocNetLog extends CAllSocNetLog
 	{
 		global $DB;
 
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
 		$arFields1 = array();
 		foreach ($arFields as $key => $value)
 		{
@@ -72,14 +74,21 @@ class CSocNetLog extends CAllSocNetLog
 				$ID > 0 
 				&& intval($arFields["USER_ID"]) > 0
 				&& strlen($arFields["ENTITY_TYPE"]) > 0
-				&& array_key_exists($arFields["ENTITY_TYPE"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"])
-				&& is_array($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arFields["ENTITY_TYPE"]])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arFields["ENTITY_TYPE"]]["USE_CB_FILTER"] == "Y"
+				&& array_key_exists($arFields["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypesDesc)
+				&& is_array($arSocNetAllowedSubscribeEntityTypesDesc[$arFields["ENTITY_TYPE"]])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$arFields["ENTITY_TYPE"]]["USE_CB_FILTER"] == "Y"
 			)
+			{
 				CSocNetLogFollow::Set($arFields["USER_ID"], "L".$ID, "Y");
+			}
 
-			if ($ID > 0 && $bSendEvent)
+			if (
+				$ID > 0 
+				&& $bSendEvent
+			)
+			{
 				CSocNetLog::SendEvent($ID, "SONET_NEW_EVENT");
+			}
 
 			if ($ID > 0 && !empty($arSiteID))
 			{
@@ -209,6 +218,8 @@ class CSocNetLog extends CAllSocNetLog
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arParams = array())
 	{
 		global $DB, $arSocNetAllowedEntityTypes, $USER, $USER_FIELD_MANAGER;
+
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("SONET_LOG", "L.ID");
@@ -375,7 +386,7 @@ class CSocNetLog extends CAllSocNetLog
 		)
 		{
 			$arCBFilterEntityType = array();
-			foreach($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"] as $entity_type_tmp => $arEntityTypeTmp)
+			foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
 				if (
 					array_key_exists("USE_CB_FILTER", $arEntityTypeTmp)
 					&& $arEntityTypeTmp["USE_CB_FILTER"] == "Y"
@@ -486,7 +497,7 @@ class CSocNetLog extends CAllSocNetLog
 				&& !array_key_exists("MY_ENTITIES", $arParams)
 			)
 			{
-				foreach($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"] as $entity_type_tmp => $arEntityTypeTmp)
+				foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
 					if (
 						array_key_exists("HAS_MY", $arEntityTypeTmp)
 						&& $arEntityTypeTmp["HAS_MY"] == "Y"

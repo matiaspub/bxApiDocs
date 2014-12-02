@@ -1,79 +1,67 @@
 <?php
 namespace Bitrix\Main\DB;
 
-use Bitrix\Main\Type;
-
 class MysqlResult extends Result
 {
-	private $resultFields = array();
+	/** @var \Bitrix\Main\Entity\ScalarField[]  */
+	protected $resultFields = null;
 
+	/**
+	 * @param resource $result Database-specific query result.
+	 * @param Connection $dbConnection Connection object.
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery Helps to collect debug information.
+	 */
 	static public function __construct($result, Connection $dbConnection, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		parent::__construct($result, $dbConnection, $trackerQuery);
 	}
 
-	protected function convertDataFromDb($value, $fieldType)
-	{
-		switch ($fieldType)
-		{
-			case 'timestamp':
-			case 'datetime':
-				if($value !== null)
-				{
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-				break;
-			case 'date':
-				if($value !== null)
-				{
-					$value = new Type\Date($value, "Y-m-d");
-				}
-				break;
-			default:
-				break;
-		}
-
-		return $value;
-	}
-
+	/**
+	 * Returns the number of rows in the result.
+	 *
+	 * @return integer
+	 */
 	public function getSelectedRowsCount()
 	{
 		return mysql_num_rows($this->resource);
 	}
 
-	public function getFieldsCount()
+	/**
+	 * Returns an array of fields according to columns in the result.
+	 *
+	 * @return \Bitrix\Main\Entity\ScalarField[]
+	 */
+	public function getFields()
 	{
-		return mysql_num_fields($this->resource);
-	}
-
-	public function getFieldName($column)
-	{
-		return mysql_field_name($this->resource, $column);
-	}
-
-	protected function getErrorMessage()
-	{
-		return sprintf("[%s] %s", mysql_errno($this->connection->getResource()), mysql_error($this->connection->getResource()));
-	}
-
-	public function getResultFields()
-	{
-		if (empty($this->resultFields))
+		if ($this->resultFields == null)
 		{
-			$numFields = mysql_num_fields($this->resource);
-			for ($i = 0; $i < $numFields; $i++)
+			$this->resultFields = array();
+			if (is_resource($this->resource))
 			{
-				$this->resultFields[$i] = array(
-					"name" => mysql_field_name($this->resource, $i),
-					"type" => mysql_field_type($this->resource, $i),
-				);
+				$numFields = mysql_num_fields($this->resource);
+				if ($numFields > 0 && $this->connection)
+				{
+					$helper = $this->connection->getSqlHelper();
+					for ($i = 0; $i < $numFields; $i++)
+					{
+						$name = strtoupper(mysql_field_name($this->resource, $i));
+						$type = mysql_field_type($this->resource, $i);
+
+						$this->resultFields[$name] = $helper->getFieldByColumnType($name, $type);
+					}
+				}
 			}
 		}
 		return $this->resultFields;
 	}
 
+	/**
+	 * Returns next result row or false.
+	 *
+	 * @return array|false
+	 */
 	protected function fetchRowInternal()
 	{
-		return mysql_fetch_row($this->resource);
+		return mysql_fetch_assoc($this->resource);
 	}
 }

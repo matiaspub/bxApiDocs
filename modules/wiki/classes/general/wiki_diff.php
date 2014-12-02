@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiDiff</b> - Класс сравнения вики-страниц.
+ * <b>CWikiDiff</b> - Класс сравнения вики-страниц.</body> </html>
  *
  *
  *
@@ -112,7 +112,7 @@ class CWikiDiff
 	*
 	*
 	*
-	* @param string $X  Страница исходная. </ht
+	* @param string $X  Страница исходная. </h
 	*
 	*
 	*

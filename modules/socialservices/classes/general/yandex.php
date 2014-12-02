@@ -156,8 +156,6 @@ class CYandexOAuthInterface
 			"Authorization" => "Basic ".base64_encode($this->appID.':'.$this->appSecret)
 		), $this->httpTimeout);
 
-		echo $result;
-
 		$this->arResult = CUtil::JsObjectToPhp($result);
 
 		if(isset($this->arResult["access_token"]) && $this->arResult["access_token"] <> '')

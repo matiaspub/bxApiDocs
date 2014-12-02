@@ -29,22 +29,22 @@ class CAppleMessage extends CPushMessage
 	{
 		$aPayload[self::APPLE_RESERVED_NAMESPACE] = array();
 
-		if (isset($this->_sText))
+		if (isset($this->text))
 		{
-			$aPayload[self::APPLE_RESERVED_NAMESPACE]['alert'] = (string)$this->_sText;
+			$aPayload[self::APPLE_RESERVED_NAMESPACE]['alert'] = (string)$this->text;
 		}
-		if (isset($this->_nBadge) && $this->_nBadge >= 0)
+		if (isset($this->badge) && $this->badge >= 0)
 		{
-			$aPayload[self::APPLE_RESERVED_NAMESPACE]['badge'] = (int)$this->_nBadge;
+			$aPayload[self::APPLE_RESERVED_NAMESPACE]['badge'] = (int)$this->badge;
 		}
-		if (isset($this->_sSound) && strlen($this->_sSound) > 0)
+		if (isset($this->sound) && strlen($this->sound) > 0)
 		{
-			$aPayload[self::APPLE_RESERVED_NAMESPACE]['sound'] = (string)$this->_sSound;
+			$aPayload[self::APPLE_RESERVED_NAMESPACE]['sound'] = (string)$this->sound;
 		}
 
-		if (is_array($this->_aCustomProperties))
+		if (is_array($this->customProperties))
 		{
-			foreach ($this->_aCustomProperties as $sPropertyName => $mPropertyValue)
+			foreach ($this->customProperties as $sPropertyName => $mPropertyValue)
 			{
 				$aPayload[$sPropertyName] = $mPropertyValue;
 			}
@@ -66,10 +66,10 @@ class CAppleMessage extends CPushMessage
 		{
 			if ($this->_bAutoAdjustLongPayload)
 			{
-				$nMaxTextLen = $nTextLen = CUtil::BinStrlen($this->_sText) - ($nJSONPayloadLen - self::PAYLOAD_MAXIMUM_SIZE);
+				$nMaxTextLen = $nTextLen = CUtil::BinStrlen($this->text) - ($nJSONPayloadLen - self::PAYLOAD_MAXIMUM_SIZE);
 				if ($nMaxTextLen > 0)
 				{
-					while (CUtil::BinStrlen($this->_sText = CUtil::BinSubstr($this->_sText, 0, --$nTextLen)) > $nMaxTextLen) ;
+					while (CUtil::BinStrlen($this->text = CUtil::BinSubstr($this->text, 0, --$nTextLen)) > $nMaxTextLen) ;
 
 					return $this->getPayload();
 				}

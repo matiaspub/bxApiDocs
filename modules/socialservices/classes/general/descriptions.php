@@ -9,6 +9,12 @@ class CSocServDescription
 
 		return array(
 			array(
+				"ID" => "Bitrix24Net",
+				"CLASS" => "CSocServBitrix24Net",
+				"NAME" => GetMessage("socserv_bitrix24net_name"),
+				"ICON" => "bitrix24",
+			),
+			array(
 				"ID" => "Facebook",
 				"CLASS" => "CSocServFacebook",
 				"NAME" => "Facebook",
@@ -73,6 +79,12 @@ class CSocServDescription
 				"ID" => "GoogleOAuth",
 				"CLASS" => "CSocServGoogleOAuth",
 				"NAME" => "Google",
+				"ICON" => "google",
+			),
+			array(
+				"ID" => "GooglePlusOAuth",
+				"CLASS" => "CSocServGooglePlusOAuth",
+				"NAME" => "Google+",
 				"ICON" => "google",
 			),
 			array(

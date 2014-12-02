@@ -14,6 +14,9 @@ class CListFile
 	private $_width = 0;
 	private $_height = 0;
 
+	/** @var $_counter int  */
+	private static $_counter = 0;
+
 	public function __construct($list_id, $section_id, $element_id, $field_id, $file_id)
 	{
 		$this->_list_id = intval($list_id);
@@ -37,22 +40,74 @@ class CListFile
 			$this->_socnet_group_id = intval($socnet_group_id);
 	}
 
-	public function GetInfoHTML()
+	public function GetInfoHTML($params = array())
 	{
 		$html = '';
 
 		if(is_array($this->_file))
 		{
-			$html .= GetMessage('FILE_TEXT').': '.htmlspecialcharsex($this->_file["FILE_NAME"]);
-
 			$intWidth = $this->_width;
 			$intHeight = $this->_height;
-			if($intWidth > 0 && $intHeight > 0)
+			$img_src = '';
+			$divId = '';
+			if(isset($params['url_template']) && $intWidth > 0 && $intHeight > 0)
 			{
-				$html .= '<br>'.GetMessage('FILE_WIDTH').': '.$intWidth;
-				$html .= '<br>'.GetMessage('FILE_HEIGHT').': '.$intHeight;
+				$img_src = $this->GetImgSrc(array('url_template' => $params['url_template']));
+				if ($img_src)
+				{
+					CUtil::InitJSCore(array("viewer"));
+					self::$_counter++;
+					$divId = 'lists-image-info-'.self::$_counter;
+				}
 			}
-			$html .= '<br>'.GetMessage('FILE_SIZE').': '.CFile::FormatSize($this->_file['FILE_SIZE']);
+
+			if ($divId)
+			{
+				$html .= '<div id="'.$divId.'">';
+			}
+			else
+			{
+				$html .= '<div>';
+			}
+
+			if (isset($params['view']) && $params['view'] == 'short')
+			{
+				$info = $this->_file["FILE_NAME"].' (';
+				if($intWidth > 0 && $intHeight > 0)
+				{
+					$info .= $intWidth.'x'.$intHeight.', ';
+				}
+				$info .= CFile::FormatSize($this->_file['FILE_SIZE']).')';
+
+				if ($divId)
+					$html .= GetMessage('FILE_TEXT').': <span style="cursor:pointer" data-bx-viewer="image" data-bx-src="'.htmlspecialcharsbx($img_src).'">'.htmlspecialcharsex($info).'</span>';
+				else
+					$html .= GetMessage('FILE_TEXT').': '.htmlspecialcharsex($info);
+
+			}
+			else
+			{
+				if ($divId)
+					$html .= GetMessage('FILE_TEXT').': <span style="cursor:pointer" data-bx-viewer="image" data-bx-src="'.htmlspecialcharsbx($img_src).'">'.htmlspecialcharsex($this->_file["FILE_NAME"]).'</span>';
+				else
+					$html .= GetMessage('FILE_TEXT').': '.htmlspecialcharsex($this->_file["FILE_NAME"]);
+
+				if($intWidth > 0 && $intHeight > 0)
+				{
+					$html .= '<br>'.GetMessage('FILE_WIDTH').': '.$intWidth;
+					$html .= '<br>'.GetMessage('FILE_HEIGHT').': '.$intHeight;
+				}
+				$html .= '<br>'.GetMessage('FILE_SIZE').': '.CFile::FormatSize($this->_file['FILE_SIZE']);
+			}
+
+			if ($divId)
+			{
+				$html .= '</div><script>BX.ready(function(){BX.viewElementBind("'.$divId.'");});</script>';
+			}
+			else
+			{
+				$html .= '</div>';
+			}
 		}
 
 		return $html;
@@ -79,7 +134,12 @@ class CListFile
 		if(is_array($this->_file))
 		{
 			if($show_info)
-				$strReturn .= '<br>'.$this->GetInfoHTML();
+			{
+				$strReturn .= $this->GetInfoHTML(array(
+						'url_template' => $params['url_template'],
+						'view' => 'short',
+					));
+			}
 
 			$p = strpos($input_name, "[");
 			if($p > 0)
@@ -87,8 +147,8 @@ class CListFile
 			else
 				$del_name = $input_name."_del";
 
-			$strReturn .= '<br><input type="checkbox" name="'.htmlspecialcharsbx($del_name).'" value="Y" id="'.htmlspecialcharsbx($del_name).'" />';
-			$strReturn .= ' <label for="'.htmlspecialcharsbx($del_name).'">'.GetMessage('FILE_DELETE').'</label>';
+			$strReturn .= '<input type="checkbox" name="'.htmlspecialcharsbx($del_name).'" value="Y" id="'.htmlspecialcharsbx($del_name).'" />';
+			$strReturn .= ' <label for="'.htmlspecialcharsbx($del_name).'">'.GetMessage('FILE_DELETE').'</label><br>';
 		}
 
 		return $strReturn;
@@ -97,15 +157,22 @@ class CListFile
 	public function GetImgSrc($params = array())
 	{
 		if(is_array($params) && isset($params['url_template']) && (strlen($params['url_template']) > 0))
-			return str_replace(
+		{
+			$result = str_replace(
 				array('#list_id#', '#section_id#', '#element_id#', '#field_id#', '#file_id#', '#group_id#'),
 				array($this->_list_id, $this->_section_id, $this->_element_id, $this->_field_id, $this->_file_id, $this->_socnet_group_id),
 				$params['url_template']
 			);
+			return CHTTP::urlAddParams($result, array("ncc" => "y"));
+		}
 		elseif(is_array($this->_file))
+		{
 			return $this->_file['SRC'];
+		}
 		else
+		{
 			return '';
+		}
 
 	}
 	public function GetImgHtml($params = array())

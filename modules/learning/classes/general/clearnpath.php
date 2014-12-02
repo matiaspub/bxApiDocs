@@ -108,9 +108,8 @@ class CLearnPath implements ILearnPath
 				|| ( ! is_int($lessonId + 0) )
 			)
 			{
-				throw new LearnException(
-					'lesson id must be integer', 
-					LearnException::EXC_ERR_ALL_PARAMS);
+				$this->arPath = array();
+				return;
 			}
 
 			$this->arPath[] = (int) ($lessonId);
@@ -121,7 +120,6 @@ class CLearnPath implements ILearnPath
 	{
 		$this->_SetPath ($arPath);
 	}
-
 
 	// returns true if $str is path with two or more elements
 	static public function IsUrlencodedPath ($str)
@@ -137,22 +135,21 @@ class CLearnPath implements ILearnPath
 
 	public function ImportUrlencoded($str)
 	{
+		$this->arPath = array();
+
 		$tmp = urldecode($str);
 		if (strlen($tmp) == 0)
 		{
-			$this->arPath = array();
 			return;
 		}
 
 		$arPath = explode(self::DELIMITER, $tmp);
 		if ( ! is_array($arPath) )
 		{
-			throw new LearnException('', 
-				LearnException::EXC_ERR_ALL_PARAMS 
-				| LearnException::EXC_ERR_LP_BROKEN_PATH);
+			return;
 		}
 
-		$this->arPath = $arPath;
+		$this->_SetPath($arPath);
 	}
 
 	public function GetPathAsArray()

@@ -159,7 +159,7 @@ class CPHPCache
 	* >Кеширование</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/output.php">CPHPCache::Output</a></li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -241,7 +241,7 @@ class CPHPCache
 	* >Кеширование</a> </li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
-	* </ul> <a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -314,7 +314,7 @@ class CPHPCache
 	* >Кеширование</a> </li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a></li>
-	* </ul> <a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -425,7 +425,7 @@ class CPHPCache
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a> </li> <li>
 	* <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -526,7 +526,7 @@ class CPHPCache
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a> </li>
-	* </ul> <a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -579,7 +579,7 @@ class CPHPCache
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -686,7 +686,7 @@ class CPageCache
 	* >Кеширование</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/output.php">CPageCache::Output</a></li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
-	* </li> </ul> <br><br>
+	* </li> </ul><br><br>
 	*
 	*
 	* @static
@@ -769,7 +769,7 @@ class CPageCache
 	* >Кеширование</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a></li>
-	* </ul> <br><br>
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -847,7 +847,7 @@ class CPageCache
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/enddatacache.php">CPageCache::EndDataCache</a> </li>
 	* <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstringforcache.php">CDBResult::NavStringForCache</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -920,7 +920,7 @@ class CPageCache
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1005,7 +1005,7 @@ class CPageCache
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxclearcache.php">BXClearCache</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*

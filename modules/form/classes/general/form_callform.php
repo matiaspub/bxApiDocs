@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>.
+ * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>.</body> </html>
  *
  *
  *
@@ -75,7 +75,7 @@ public static 	function err_mess()
 	*
 	*
 	*
-	* @param int $form_id  ID формы.
+	* @param int $form_id  ID формы.</b
 	*
 	*
 	*
@@ -516,7 +516,7 @@ public static 	function GetPermissionList($get_default="Y")
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*
@@ -1746,7 +1746,6 @@ public static 	function GetUrlField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 		return "<input type=\"password\" ".$PARAM." name=\"form_password_".$FIELD_NAME."\" value=\"".htmlspecialcharsbx($VALUE)."\" size=\"".$SIZE."\" />";
 	}
 
-	f
 	/**
 	* <p>Если массив, переданный в параметре <i>form_values,</i> инициализирован (например, в момент редактирования <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, выбранного среди группы ответов типа "dropdown" на вопрос, символьный идентификатор которого указан в параметре <i>question_sid</i>.</p> <p>Если массив, переданный в параметре <i>form_values,</i> не инициализирован (например, в момент создания нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>), то функция вернет ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> выбранного по умолчанию. Поиск ответа по умолчанию осуществляется среди группы ответов, задаваемых в параметре <i>answer_list,</i> посредством поиска строки "checked" в <nobr><i>answer_list</i>["param"][i]</nobr>; если такая строка будет найдена, то функция вернет ID данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> (хранимый в <nobr><i>answer_list</i>["reference_id"][i]</nobr>).</p>
 	*
@@ -1871,7 +1870,7 @@ public static 	function GetUrlField($FIELD_NAME, $VALUE="", $SIZE="", $PARAM="")
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownvalue.php
 	* @author Bitrix
 	*/
-	public static unction GetDropDownValue($FIELD_NAME, $arDropDown, $arrVALUES=false)
+	public static function GetDropDownValue($FIELD_NAME, $arDropDown, $arrVALUES=false)
 	{
 		$fname = "form_dropdown_".$FIELD_NAME;
 		if (is_array($arrVALUES) && isset($arrVALUES[$fname]))
@@ -3799,7 +3798,7 @@ public static 	function __check_PushError(&$container, $MESSAGE, $key = false)
 	*
 	*
 	*
-	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
+	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
 	*
 	*
 	*
@@ -4719,7 +4718,7 @@ public static 	function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
 	*
 	*
 	*
-	* @param int $form_id  ID формы.
+	* @param int $form_id  ID формы.</b
 	*
 	*
 	*
@@ -4862,7 +4861,7 @@ public static 	function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*
@@ -4983,7 +4982,7 @@ public static 	function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*
@@ -5105,7 +5104,7 @@ public static 	function CheckFields($arFields, $FORM_ID, $CHECK_RIGHTS="Y")
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul> </h<a
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/set.php">CForm::Set</a> <br> </li> </ul> <a
 	* name="examples"></a>
 	*
 	*
@@ -5299,7 +5298,7 @@ http://#SERVER_NAME#/bitrix/admin/form_result_view.php?lang=".$arrSiteLang[$sid]
 	 * @param string $tpl
 	 * @return bool
 	 */
-	funpublic static ction isFieldInTemplate($FIELD_SID, $tpl)
+	public static function isFieldInTemplate($FIELD_SID, $tpl)
 	{
 		$check_str1 = '$FORM->ShowInput(\''.$FIELD_SID.'\')';
 		$check_str2 = '$FORM->ShowInput("'.$FIELD_SID.'")';

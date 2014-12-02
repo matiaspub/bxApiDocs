@@ -274,17 +274,19 @@ class CAllTest
 		{
 			unset($arFields["ID"]);
 
-			$arBinds=Array(
-				"DESCRIPTION"=>$arFields["DESCRIPTION"]
+			$arBinds = array(
+				"DESCRIPTION" => $arFields["DESCRIPTION"]
 			);
 
-			CLearnHelper::FireEvent('OnBeforeTestUpdate', $arFields);
+			foreach(GetModuleEvents('learning', 'OnBeforeTestUpdate', true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($arFields, $ID));
 
 			$strUpdate = $DB->PrepareUpdate("b_learn_test", $arFields, "learning");
 			$strSql = "UPDATE b_learn_test SET ".$strUpdate." WHERE ID=".$ID;
 			$DB->QueryBind($strSql, $arBinds, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			CLearnHelper::FireEvent('OnAfterTestUpdate', $arFields);
+			foreach(GetModuleEvents('learning', 'OnAfterTestUpdate', true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($arFields, $ID));
 
 			return true;
 		}
@@ -532,13 +534,12 @@ class CAllTest
 
 		$oPermParser = new CLearnParsePermissionsFromFilter ($arFilter);
 
-		$arSqlSearch = CTest::GetFilter($arFilter);
+		$arSqlSearch = array_filter(CTest::GetFilter($arFilter));
 
 		$strSqlSearch = "";
-		for($i=0; $i<count($arSqlSearch); $i++)
-			if(strlen($arSqlSearch[$i])>0)
-				$strSqlSearch .= " AND ".$arSqlSearch[$i]." ";
 
+		if ( ! empty($arSqlSearch) )
+			$strSqlSearch .= ' AND ' . implode(' AND ', $arSqlSearch) . ' ';
 
 		$strSql = 
 			"SELECT COUNT(*) as CNT 
@@ -805,15 +806,9 @@ class CAllTest
 
 		$strSqlOrder = "";
 		DelDuplicateSort($arSqlOrder);
-		for ($i=0; $i<count($arSqlOrder); $i++)
-		{
-			if($i==0)
-				$strSqlOrder = " ORDER BY ";
-			else
-				$strSqlOrder .= ",";
 
-			$strSqlOrder .= $arSqlOrder[$i];
-		}
+		if ( ! empty($arSqlOrder) )
+			$strSqlOrder .= ' ORDER BY ' . implode(', ', $arSqlOrder) . ' ';
 
 		$strSql .= $strSqlOrder;
 

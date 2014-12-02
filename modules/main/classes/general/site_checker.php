@@ -27,10 +27,22 @@ class CSiteCheckerTest
 		{
 			if (!preg_match('/^[a-z0-9\.\-]+$/i', $this->host)) // cyrillic domain hack
 			{
-				$converter = new CBXPunycode(defined('BX_UTF') && BX_UTF === true ? 'UTF-8' : 'windows-1251');
-				$host = $converter->Encode($this->host);
-				if (!preg_match('#--p1ai$#', $host)) // trying to guess
-					$host = $converter->Encode(CharsetConverter::ConvertCharset($this->host, 'utf-8', 'windows-1251'));
+				$host = $this->host;
+				$host0 = CharsetConverter::ConvertCharset($host, 'utf8', 'cp1251');
+				if (preg_match("/[\xC0-\xFF]/",$host0))
+				{
+					// utf-8;
+					if (!defined('BX_UTF') && BX_UTF !== true)
+						$host = $host0;
+				}
+				elseif (preg_match("/[\xC0-\xFF]/",$host))
+				{
+					// windows-1251
+					if (defined('BX_UTF') && BX_UTF === true)
+						$host = CharsetConverter::ConvertCharset($host, 'cp1251', 'utf8');
+				}
+				$converter = new CBXPunycode();
+				$host = $converter->Encode($host);
 				$this->host = $host;
 			}
 		}
@@ -89,6 +101,7 @@ class CSiteCheckerTest
 
 		$arGroupName[16] = GetMessage('SC_GR_EXTENDED');
 		$arTestGroup[16] = array(
+			array('check_dbconn_settings' => GetMessage('SC_T_DBCONN_SETTINGS')),
 			array('check_dbconn' => GetMessage('SC_T_DBCONN')),
 			array('check_bx_crontab' => GetMessage("MAIN_SC_AGENTS_CRON")),
 			array('check_session_ua' => GetMessage('SC_T_SESS_UA')),
@@ -596,7 +609,7 @@ class CSiteCheckerTest
 		$compression = IsModuleInstalled('compression');
 		$strRes = GetHttpResponse($res, $strRequest, $strHeaders);
 
-		if (preg_match('#gzip|deflate#mi', $strHeaders) && strlen($strRes) < 64 * 1024) // comression not supported by server
+		if (preg_match('#gzip|deflate#mi', $strHeaders) && CUtil::BinStrlen($strRes) < 64 * 1024) // comression not supported by server
 			return $compression ? $this->Result(false, GetMessage("MAIN_SC_ENABLED")) : $this->Result(true, GetMessage("MAIN_SC_ENABLED_MOD"));
 		else
 			return $compression ? $this->Result(false, GetMessage("MAIN_SC_COMP_DISABLED")) : $this->Result(false, GetMessage("MAIN_SC_COMP_DISABLED_MOD"));
@@ -676,9 +689,37 @@ class CSiteCheckerTest
 		$strRequest.= "\r\n";
 
 		$retVal = false;
+		if (IsModuleInstalled('security'))
+		{
+			$file = COption::GetOptionString("security", "ipcheck_disable_file", "");
+			COption::SetOptionString("security", "ipcheck_disable_file", $this->LogFile);
+		}
 		if ($res = $this->ConnectToHost())
-			return IsHttpResponseSuccess($res, $strRequest);
-		return $retVal ? GetMessage("MAIN_SC_ABS") : false;
+			$retVal = IsHttpResponseSuccess($res, $strRequest);
+		if (IsModuleInstalled('security'))
+			COption::SetOptionString("security", "ipcheck_disable_file", $file);
+		return $retVal;
+	}
+
+	public function check_dbconn_settings()
+	{
+		global $DB;
+
+		$conn = Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection();
+		if ($DB->DBHost == $conn->getHost() && $DB->DBLogin == $conn->getLogin() && $DB->DBName == $conn->getDatabase())
+			return true;
+
+		echo "/bitrix/php_interface/dbconn.php\n".
+		'$DBHost = "'.$DB->DBHost."\"\n".
+		'$DBLogin = "'.$DB->DBLogin."\"\n".
+		'$DBName = "'.$DB->DBName."\"\n".
+		"\n".
+		"/bitrix/.settings.php\n".
+		'host = "'.$conn->getHost()."\"\n".
+		'login = "'.$conn->getLogin()."\"\n".
+		'database = "'.$conn->getDatabase()."\"\n";
+
+		return $this->Result(false, GetMessage('SC_ERR_CONN_DIFFER'));
 	}
 
 	public function check_upload($big = false, $raw = false)
@@ -1110,6 +1151,9 @@ class CSiteCheckerTest
 			'Host: '.$sub_domain."\r\n\r\n";
 		fwrite($res, $strRequest);
 		fclose($res);
+
+		if ($retVal == true && COption::GetOptionString('main', 'session_expand', 'Y') <> 'N' && (!defined("BX_SKIP_SESSION_EXPAND") || BX_SKIP_SESSION_EXPAND === false))
+			return $this->Result(null, GetMessage('MAIN_SC_WARN_EXPAND_SESSION'));
 	
 		return $retVal;
 	}
@@ -1873,10 +1917,10 @@ class CSiteCheckerTest
 			$res0 = $DB->Query('SHOW CREATE TABLE `' . $table . '`');
 			$f0 = $res0->Fetch();
 
-			if (preg_match('/DEFAULT CHARSET=([^ ]+)/i', $f0['Create Table'], $regs))
+			if (preg_match('/DEFAULT CHARSET=([a-z0-9\-_]+)/i', $f0['Create Table'], $regs))
 			{
 				$t_charset = $regs[1];
-				if (preg_match('/COLLATE=([^ ]+)/i', $f0['Create Table'], $regs))
+				if (preg_match('/COLLATE=([a-z0-9\-_]+)/i', $f0['Create Table'], $regs))
 					$t_collation = $regs[1];
 				else
 				{
@@ -2040,6 +2084,25 @@ class CSiteCheckerTest
 						$table = $regs[3];
 						if (preg_match('#^site_checker_#', $table))
 							continue;
+						$rs = $DB->Query('SHOW TABLES LIKE "'.$table.'"');
+						if (!$rs->Fetch())
+						{
+							if ($this->fix_mode)
+							{
+								if (!$DB->Query($sql, true))
+									return $this->Result(false, 'Mysql Query Error: '.$sql.' ['.$DB->db_Error.']');
+							}
+							else
+							{
+								$strError .= GetMessage('SC_ERR_NO_TABLE', array('#TABLE#' => $table))."<br>";
+								$_SESSION['FixQueryList'][] = $sql;
+								$this->arTestVars['iError']++;
+								$this->arTestVars['iErrorAutoFix']++;
+								$this->arTestVars['cntNoTables']++;
+								continue;
+							}
+						}
+
 						$arTables[$table] = $sql;
 						$tmp_table = 'site_checker_'.$table;
 						$DB->Query('DROP TABLE IF EXISTS `'.$tmp_table.'`');
@@ -2048,12 +2111,16 @@ class CSiteCheckerTest
 					elseif (preg_match('#^(ALTER TABLE)( )?`?([a-z0-9_]+)`?(.*);?$#mis',$sql,$regs))
 					{
 						$table = $regs[3];
+						if (!$arTables[$table])
+							continue;
 						$tmp_table = 'site_checker_'.$table;
 						$DB->Query($regs[1].' `'.$tmp_table.'`'.$regs[4]);
 					}
 					elseif (preg_match('#^INSERT INTO *`?([a-z0-9_]+)`?[^\(]*\(?([^)]*)\)?[^V]*VALUES[^\(]*\((.+)\);?$#mis',$sql,$regs))
 					{
 						$table = $regs[1];
+						if (!$arTables[$table])
+							continue;
 						$tmp_table = 'site_checker_'.$table;
 
 						if ($regs[2])
@@ -2099,7 +2166,7 @@ class CSiteCheckerTest
 							{
 								if ($this->fix_mode)
 								{
-									if (!$DB->Query($sql))
+									if (!$DB->Query($sql, true))
 										return $this->Result(false, 'Mysql Query Error: '.$sql.' ['.$DB->db_Error.']');
 								}
 								else
@@ -2119,25 +2186,6 @@ class CSiteCheckerTest
 
 				foreach($arTables as $table => $sql)
 				{
-					$rs = $DB->Query('SHOW TABLES LIKE "'.$table.'"');
-					if (!$rs->Fetch())
-					{
-						if ($this->fix_mode)
-						{
-							if (!$DB->Query($sql))
-								return $this->Result(false, 'Mysql Query Error: '.$sql.' ['.$DB->db_Error.']');
-						}
-						else
-						{
-							$strError .= GetMessage('SC_ERR_NO_TABLE', array('#TABLE#' => $table))."<br>";
-							$_SESSION['FixQueryList'][] = $sql;
-							$this->arTestVars['iError']++;
-							$this->arTestVars['iErrorAutoFix']++;
-							$this->arTestVars['cntNoTables']++;
-						}
-						continue;
-					}
-
 					$tmp_table = 'site_checker_'.$table;
 					$arColumns = array();
 					$rs = $DB->Query('SHOW COLUMNS FROM `'.$table.'`');
@@ -2618,7 +2666,7 @@ function InitPureDB()
 			return false;
 		}
 	}
-	global $DB;
+	global $DB, $DBType, $DBDebug, $DBDebugToFile, $DBHost, $DBName, $DBLogin, $DBPassword, $DBSQLServerType;
 
 	/**
 	 * Defined in dbconn.php
@@ -2668,7 +2716,7 @@ function TableFieldConstruct($f0)
 
 function TableFieldCanBeAltered($f, $f_tmp)
 {
-	if ($f['Type'] == $f_tmp['Type'] || defined('SITE_CHECKER_FORCE_REPAIR') && SITE_CHECKER_FORCE_REPAIR === true)
+	if ($f['Type'] == str_replace('long', '', $f_tmp['Type']) || defined('SITE_CHECKER_FORCE_REPAIR') && SITE_CHECKER_FORCE_REPAIR === true)
 		return true;
 	if (
 		preg_match('#^([a-z]+)\(([0-9]+)\)(.*)$#i',$f['Type'],$regs)
@@ -2694,11 +2742,11 @@ function PrintHTTP($strRequest, $strHeaders, $strRes)
 {
 	echo 
 	"== Request ==\n".
-	$strRequest.
+	(($l = CUtil::BinStrlen($strRequest)) > 1000 ? CUtil::BinSubstr($strRequest, 0, 1000).' ... ('.$l.' bytes)' : $strRequest)."\n".
 	"== Response ==\n".
-	$strHeaders.
+	$strHeaders."\n".
 	"== Body ==\n".
-	(($l = CUtil::BinStrlen($strRes)) > 1000 ? CUtil::BinSubstr($strRes, 0, 1000).' ... ('.$l.' bytes)' : $strRes).
+	(($l = CUtil::BinStrlen($strRes)) > 1000 ? CUtil::BinSubstr($strRes, 0, 1000).' ... ('.$l.' bytes)' : $strRes)."\n".
 	"==========\n";
 }
 

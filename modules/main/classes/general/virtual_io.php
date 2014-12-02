@@ -154,7 +154,7 @@ class CBXVirtualIo
 	*
 	*
 	*
-	* @param array $string  Относительный путь
+	* @param array $string  Относительный путь </ht
 	*
 	*
 	*
@@ -187,7 +187,7 @@ class CBXVirtualIo
 	*
 	*
 	*
-	* @param string $relativePath  Относительный путь
+	* @param string $relativePath  Относительный путь </ht
 	*
 	*
 	*
@@ -573,7 +573,7 @@ class CBXVirtualIo
 	*
 	*
 	*
-	* @param string $target  Путь к целевой папке. </htm
+	* @param string $target  Путь к целевой папке. </ht
 	*
 	*
 	*

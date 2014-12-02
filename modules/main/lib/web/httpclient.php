@@ -161,6 +161,8 @@ class HttpClient
 			$postData = http_build_query($postData, "", "&");
 		}
 
+		$this->redirectCount = 0;
+
 		while(true)
 		{
 			//Only absoluteURI is accepted
@@ -262,7 +264,7 @@ class HttpClient
 		$this->redirect = ($value? true : false);
 		if($max !== null)
 		{
-			$this->redirectMax = intval($value);
+			$this->redirectMax = intval($max);
 		}
 	}
 
@@ -511,7 +513,7 @@ class HttpClient
 
 		if(!is_resource($postData) && ($method == self::HTTP_POST || $method == self::HTTP_PUT))
 		{
-			if($this->requestHeaders->get("Content-Type") === null)
+			if($method <> self::HTTP_PUT && $this->requestHeaders->get("Content-Type") === null)
 			{
 				$contentType = "application/x-www-form-urlencoded";
 				if($this->requestCharset <> '')
@@ -585,7 +587,7 @@ class HttpClient
 			{
 				/*
 				chunk = chunk-size [ chunk-extension ] CRLF
-				        chunk-data CRLF
+						chunk-data CRLF
 				chunk-size = 1*HEX
 				chunk-extension = *( ";" chunk-ext-name [ "=" chunk-ext-val ] )
 				*/

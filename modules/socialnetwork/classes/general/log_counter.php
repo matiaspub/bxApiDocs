@@ -17,6 +17,8 @@ class CAllSocNetLogCounter
 		if (intval($log_id) <= 0)
 			return false;
 
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
 		$bGroupCounters = ($type === "group");
 /*
 		$bForAllAccess = (
@@ -45,8 +47,10 @@ class CAllSocNetLogCounter
 			$log_user_id = $arLogComment["LOG_USER_ID"];
 		}
 
-		if (!in_array($entity_type, $GLOBALS["arSocNetAllowedSubscribeEntityTypes"]))
+		if (!in_array($entity_type, CSocNetAllowed::GetAllowedEntityTypes()))
+		{
 			return false;
+		}
 
 		if (intval($entity_id) <= 0)
 			return false;
@@ -57,18 +61,22 @@ class CAllSocNetLogCounter
 		if (!$arOfEntities)
 		{
 			if (
-				array_key_exists($entity_type, $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"])
-				&& array_key_exists("HAS_MY", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["HAS_MY"] == "Y"
-				&& array_key_exists("CLASS_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& array_key_exists("METHOD_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["CLASS_OF"]) > 0
-				&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["METHOD_OF"]) > 0
-				&& method_exists($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["METHOD_OF"])
+				array_key_exists($entity_type, $arSocNetAllowedSubscribeEntityTypesDesc)
+				&& array_key_exists("HAS_MY", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["HAS_MY"] == "Y"
+				&& array_key_exists("CLASS_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& array_key_exists("METHOD_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["CLASS_OF"]) > 0
+				&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["METHOD_OF"]) > 0
+				&& method_exists($arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["METHOD_OF"])
 			)
-				$arOfEntities = call_user_func(array($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["METHOD_OF"]), $entity_id);
+			{
+				$arOfEntities = call_user_func(array($arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["METHOD_OF"]), $entity_id);
+			}
 			else
+			{
 				$arOfEntities = array();
+			}
 		}
 
 		if (
@@ -160,8 +168,8 @@ class CAllSocNetLogCounter
 				(
 					$type == "LC"
 					||
-					(	array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]) 
-						&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y" 
+					(	array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]) 
+						&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y" 
 					)
 				)
 				&& intval($created_by_id) > 0 
@@ -259,8 +267,8 @@ class CAllSocNetLogCounter
 					)";
 
 			if (
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+				array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 				&& intval($created_by_id) > 0
 			)
 			{
@@ -310,8 +318,8 @@ class CAllSocNetLogCounter
 				)";
 
 			if (
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+				array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 				&& intval($created_by_id) > 0
 			)
 			{
@@ -359,8 +367,8 @@ class CAllSocNetLogCounter
 					)";
 
 			if (
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+				array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 				&& intval($created_by_id) > 0
 			)
 			{
@@ -411,8 +419,8 @@ class CAllSocNetLogCounter
 						AND ";
 
 			if (
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+				array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 				&& intval($created_by_id) > 0
 			)
 			{
@@ -593,8 +601,8 @@ class CAllSocNetLogCounter
 							)";
 
 			if (
-				array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-				&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+				array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+				&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 				&& intval($created_by_id) > 0
 			)
 				$strSQL .="

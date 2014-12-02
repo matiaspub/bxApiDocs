@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CSearcherHit</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитах поисковых систем</a> (проиндекированных страниц).
+ * <b>CSearcherHit</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитах поисковых систем</a> (проиндекированных страниц).</body> </html>
  *
  *
  *

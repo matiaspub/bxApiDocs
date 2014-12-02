@@ -4,21 +4,38 @@ class CSecuritySystemInformation
 {
 	/**
 	 * Return system information, such as php version
+	 *
 	 * @return array
 	 */
 	public static function getSystemInformation()
 	{
 		$systemInformation = array(
-			"php" => self::getPhpInfo(),
-			"db" => self::getDbInfo(),
-			"memcache" => self::getMemCacheInfo(),
-			"environment" => self::getEnvironmentInfo()
+			'php' => static::getPhpInfo(),
+			'db' => static::getDbInfo(),
+			'memcache' => static::getMemCacheInfo(),
+			'environment' => static::getEnvironmentInfo()
 		);
 		return $systemInformation;
 	}
 
 	/**
+	 * Return additional information, such as P&P or LDAP server information
+	 *
+	 * @since 14.5.4
+	 * @return array
+	 */
+	public static function getAdditionalInformation()
+	{
+		$additionalInformation = array(
+			'pulling' => static::getPullingInfo(),
+			'sites' => static::getSites()
+		);
+		return $additionalInformation;
+	}
+
+	/**
 	 * Return current domain name (in puny code for cyrillic domain)
+	 *
 	 * @return string
 	 */
 	public static function getCurrentHost()
@@ -48,18 +65,73 @@ class CSecuritySystemInformation
 	}
 
 	/**
+	 * Return all sites (and domains) on current kernel
+	 *
+	 * @since 14.5.4
+	 * @return array
+	 */
+	protected static function getSites()
+	{
+		$result = array();
+		$dbSites = CSite::GetList($b = 'sort', $o = 'asc', array('ACTIVE' => 'Y'));
+		while ($arSite = $dbSites->Fetch())
+		{
+			$domains = explode("\n", str_replace("\r", "\n", $arSite["DOMAINS"]));
+			$domains = array_filter($domains);
+			$result[] = array(
+				'ID' => $arSite['ID'],
+				'DOMAINS' => $domains
+			);
+		}
+
+		return $result;
+	}
+
+
+	/**
+	 * Return some information about P&P, such as publish url
+	 *
+	 * @since 14.5.4
+	 * @return array
+	 */
+	protected static function getPullingInfo()
+	{
+		$result = array(
+			'enabled' => CModule::IncludeModule('pull') && CPullOptions::ModuleEnable()
+		);
+		if ($result['enabled'])
+		{
+			$result['nginx_used'] = CPullOptions::GetQueueServerStatus();
+			if ($result['nginx_used'])
+			{
+				$result['server_protocol'] = CPullOptions::GetQueueServerVersion();
+				$result['publish_url'] = CPullOptions::GetPublishUrl();
+
+				$result['pulling_url'] = CPullOptions::GetListenUrl();
+				$result['pulling_url_secure'] = CPullOptions::GetListenSecureUrl();
+
+				$result['websocket_url'] = CPullOptions::GetWebSocketUrl();
+				$result['websocket_url_secure'] = CPullOptions::GetWebSocketSecureUrl();
+			}
+		}
+		return $result;
+	}
+
+	/**
 	 * Return information about environment, such as BitrixVM version
+	 *
 	 * @return array
 	 */
 	protected static function getEnvironmentInfo()
 	{
 		return array(
-			"vm_version" => self::getBitrixVMVersion()
+			"vm_version" => static::getBitrixVMVersion()
 		);
 	}
 
 	/**
 	 * Return BitrixVM version
+	 *
 	 * @return string
 	 */
 	protected static function getBitrixVMVersion()
@@ -72,6 +144,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about php configuration
+	 *
 	 * @return array
 	 */
 	protected static function getPhpInfo()
@@ -86,6 +159,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about DB configuration
+	 *
 	 * @return array
 	 */
 	protected static function getDbInfo()
@@ -94,15 +168,17 @@ class CSecuritySystemInformation
 		$result = array(
 			"type"    => $DB->type,
 			"version" => $DB->GetVersion(),
-			"hosts"   => self::getDBHosts()
+			"hosts"   => static::getDBHosts()
 		);
 		return $result;
 	}
 
 	/**
+	 * Return used memcache SID (with cluster support)
+	 *
 	 * @return string
 	 */
-	protected static function getMemCacheSID()
+	protected static function getMemcacheSID()
 	{
 		$result = "";
 		if(defined("BX_MEMCACHE_CLUSTER"))
@@ -115,6 +191,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about memcached from cluster module
+	 *
 	 * @return array
 	 */
 	protected static function getMemCacheInfoFromCluster()
@@ -138,6 +215,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about memcached from Bitrix constants (in dbconn.php)
+	 *
 	 * @return array
 	 */
 	protected static function getMemCacheInfoFromConstants()
@@ -161,12 +239,13 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return memcached hosts
+	 *
 	 * @return array
 	 */
 	protected static function getMemCachedHosts()
 	{
-		$clusterMemcache = self::getMemCacheInfoFromCluster();
-		$nativeMemcache = self::getMemCacheInfoFromConstants();
+		$clusterMemcache = static::getMemCacheInfoFromCluster();
+		$nativeMemcache = static::getMemCacheInfoFromConstants();
 		if(!empty($clusterMemcache) || !empty($nativeMemcache))
 		{
 			return array_merge($clusterMemcache, $nativeMemcache);
@@ -179,16 +258,17 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return summary information about memcached
+	 *
 	 * @return array
 	 */
 	protected static function getMemCacheInfo()
 	{
-		$memcacheHosts = self::getMemCachedHosts();
+		$memcacheHosts = static::getMemCachedHosts();
 		if(!empty($memcacheHosts))
 		{
 			return array(
 				"hosts" => $memcacheHosts,
-				"sid" => self::getMemCacheSID()
+				"sid" => static::getMemcacheSID()
 			);
 		}
 		else
@@ -202,8 +282,8 @@ class CSecuritySystemInformation
 	 */
 	protected static function getDBHosts()
 	{
-		$cluserDB = self::getDBHostsFromCluster();
-		$nativeDB = self::getDBHostsFromConstants();
+		$cluserDB = static::getDBHostsFromCluster();
+		$nativeDB = static::getDBHostsFromConstants();
 		if(!empty($nativeDB) || !empty($cluserDB))
 		{
 			return array_merge($nativeDB, $cluserDB);
@@ -216,6 +296,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about DB from cluster module
+	 *
 	 * @return array
 	 */
 	protected static function getDBHostsFromCluster()
@@ -234,7 +315,8 @@ class CSecuritySystemInformation
 					"DB_HOST"
 				)
 			);
-			while($clusterDBServer = $clusterDBs->Fetch()) {
+			while($clusterDBServer = $clusterDBs->Fetch())
+			{
 				$result[] = array(
 					"host" => $clusterDBServer["DB_HOST"]
 				);
@@ -245,6 +327,7 @@ class CSecuritySystemInformation
 
 	/**
 	 * Return information about DB from Bitrix constants (in dbconn.php)
+	 *
 	 * @return array
 	 */
 	protected static function getDBHostsFromConstants()

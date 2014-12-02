@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 30);
+// define("IM_REVISION", 42);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
@@ -19,6 +19,8 @@ IncludeModuleLangFile(__FILE__);
 // define("IM_CALL_VIDEO", 1);
 // define("IM_CALL_AUDIO", 2);
 
+// define("IM_MAIL_SKIP", '#SKIP#');
+
 // define("IM_CALL_STATUS_NONE", 0);
 // define("IM_CALL_STATUS_WAIT", 1);
 // define("IM_CALL_STATUS_ANSWER", 2);
@@ -29,7 +31,6 @@ IncludeModuleLangFile(__FILE__);
 // define("IM_CALL_END_TIMEOUT", 'waitTimeout');
 // define("IM_CALL_END_ACCESS", 'errorAccess');
 // define("IM_CALL_END_OFFLINE", 'errorOffline');
-
 
 // define("IM_SPEED_NOTIFY", 1);
 // define("IM_SPEED_MESSAGE", 2);
@@ -50,20 +51,27 @@ CModule::AddAutoloadClasses(
 		"CIMContactList" => "classes/".$DBType."/im_contact_list.php",
 		"CIMChat" => "classes/general/im_chat.php",
 		"CIMMessage" => "classes/general/im_message.php",
+		"CIMMessageParam" => "classes/general/im_message_param.php",
 		"CIMHistory" => "classes/general/im_history.php",
 		"CIMEvent" => "classes/general/im_event.php",
 		"CIMCall" => "classes/general/im_call.php",
 		"CIMMail" => "classes/general/im_mail.php",
 		"CIMConvert" => "classes/general/im_convert.php",
+		"CIMHint" => "classes/general/im_hint.php",
 		"CIMTableSchema" => "classes/general/im_table_schema.php",
 		"CIMNotifySchema" => "classes/general/im_notify_schema.php",
 		"CIMRestService" => "classes/general/im_rest.php",
+		"DesktopApplication" => "classes/general/im_event.php",
+		"CIMStatus" => "classes/general/im_status.php",
+		"CIMDisk" => "classes/general/im_disk.php",
 	)
 );
 
-$jsCoreRel = array('popup', 'ajax', 'fx', 'ls', 'date', 'json', 'webrtc');
-if (CModule::IncludeModule('voximplant'))
+$jsCoreRel = array('popup', 'ajax', 'fx', 'ls', 'date', 'json', 'webrtc', 'uploader', 'canvas');
+if (IsModuleInstalled('voximplant'))
 	$jsCoreRel[] = 'voximplant';
+if (IsModuleInstalled('disk'))
+	$jsCoreRel[] = 'file_dialog';
 
 CJSCore::RegisterExt('im', array(
 	'js' => '/bitrix/js/im/im.js',
@@ -76,6 +84,6 @@ CJSCore::RegisterExt('desktop', array(
 	'js' => '/bitrix/js/im/desktop.js',
 	'css' => '/bitrix/js/im/css/desktop.css',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_desktop.php',
-	'rel' => array('popup', 'ajax', 'fx', 'ls', 'date', 'json')
+	'rel' => array('popup', 'ajax', 'fx', 'ls', 'date', 'json'),
 ));
 ?>

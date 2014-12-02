@@ -15,19 +15,14 @@ class CSecurityEnvironmentTest
 {
 	const MIN_UID = 100;
 	const MIN_GID = 100;
-	const SYSTEM_TMP_DIR = "/tmp";
 
 	protected $internalName = "EnvironmentTest";
 	protected $tests = array(
 		"sessionDir" => array(
-			"method" => "checkPhpSessionDir",
-			"base_message_key" => "SECURITY_SITE_CHECKER_SESSION",
-			"critical" => CSecurityCriticalLevel::HIGHT
+			"method" => "checkPhpSessionDir"
 		),
 		"collectivePhpSession" => array(
-			"method" => "checkCollectivePhpSession",
-			"base_message_key" => "SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
-			"critical" => CSecurityCriticalLevel::HIGHT
+			"method" => "checkCollectivePhpSession"
 		),
 		"uploadScriptExecution" => array(
 			"method" => "checkUploadScriptExecution"
@@ -51,51 +46,41 @@ class CSecurityEnvironmentTest
 	protected function checkUploadScriptExecution()
 	{
 		$baseMessageKey = "SECURITY_SITE_CHECKER_UPLOAD_EXECUTABLE";
-		if(self::isHtaccessOverrided())
-		{
-			$isHtaccessOverrided = true;
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_HTACCESS", CSecurityCriticalLevel::LOW);
-		}
-		else
-		{
-			$isHtaccessOverrided = false;
-		}
 
+		$isHtaccessOverrided = false;
+// ToDo: fix and enable later
+//		if(self::isHtaccessOverrided())
+//		{
+//			$isHtaccessOverrided = true;
+//			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_HTACCESS", CSecurityCriticalLevel::LOW);
+//		}
 
+		$isPhpExecutable = false;
 		$uniqueString = randString(20);
 		if(self::isScriptExecutable("test.php", "<?php echo '{$uniqueString}'; ?>", $uniqueString))
 		{
 			$isPhpExecutable = true;
 			$this->addUnformattedDetailError($baseMessageKey."_PHP", CSecurityCriticalLevel::LOW);
 		}
-		else
-		{
-			$isPhpExecutable = false;
-		}
 
-
+		$isPhpDoubleExtensionExecutable = false;
 		if(!$isPhpExecutable && self::isScriptExecutable("test.php.any", "<?php echo '{$uniqueString}'; ?>", $uniqueString))
 		{
 			$isPhpDoubleExtensionExecutable = true;
 			$this->addUnformattedDetailError($baseMessageKey."_PHP_DOUBLE", CSecurityCriticalLevel::LOW);
 		}
-		else
-		{
-			$isPhpDoubleExtensionExecutable = false;
-		}
 
-
+		$isPythonCgiExecutable = false;
 		if(self::isScriptExecutable("test.py", "print 'Content-type:text/html\\r\\n\\r\\n{$uniqueString}'", $uniqueString))
 		{
 			$isPythonCgiExecutable = true;
 			$this->addUnformattedDetailError($baseMessageKey."_PY", CSecurityCriticalLevel::LOW);
 		}
-		else
-		{
-			$isPythonCgiExecutable = false;
-		}
 
-		return !($isPhpExecutable || $isPhpDoubleExtensionExecutable || $isHtaccessOverrided || $isPythonCgiExecutable);
+		if ($isPhpExecutable || $isPhpDoubleExtensionExecutable || $isHtaccessOverrided || $isPythonCgiExecutable)
+			return self::STATUS_FAILED;
+		else
+			return self::STATUS_PASSED;
 	}
 
 	/**
@@ -113,14 +98,14 @@ Body:----------ru--
 ----------ru--
 
 ";
-		$result = true;
+
 		if(self::isScriptExecutable("test.var.jpg", $testFileContent, $testingText))
 		{
-			$result = false;
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_UPLOAD_NEGOTIATION", CSecurityCriticalLevel::MIDDLE);
+			return self::STATUS_FAILED;
 		}
 
-		return $result;
+		return self::STATUS_PASSED;
 	}
 
 	/**
@@ -129,29 +114,36 @@ Body:----------ru--
 	 */
 	protected function isHtaccessOverrided()
 	{
-		$uploadPathTestFile = self::getUploadDir().'test/test.php';
-		$uploadPathHtaccessFile = self::getUploadDir().'test/.htaccess';
+		$uploadDir = self::getUploadDir();
+		$uploadPathTestFile = $uploadDir.'test/test.php';
+		$uploadPathHtaccessFile = $uploadDir.'test/.htaccess';
+		$uploadPathTestUri = $uploadDir.'test/test_notexist.php';
+
 		if(!CheckDirPath($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile))
 			return false;
 
 		$testingText = "testing text here...";
+		$htaccessText = <<<HTACCESS
+ErrorDocument 404 ${uploadPathTestFile}
+
+<IfModule mod_rewrite.c>
+	RewriteEngine Off
+</IfModule>
+HTACCESS;
+
 		$result = false;
-		if(@file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile, $testingText))
+		if(file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile, $testingText))
 		{
-			$response = self::doRequestToLocalhost($uploadPathTestFile);
-			if($response && $response == $testingText)
+			if(file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPathHtaccessFile, $htaccessText))
 			{
-				if(@file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPathHtaccessFile, "Deny from All"))
+				$response = self::doRequestToLocalhost($uploadPathTestUri);
+				if($response && $response == $testingText)
 				{
-					$response = self::doRequestToLocalhost($uploadPathTestFile);
-					if($response && $response != $testingText)
-					{
-						$result = true;
-					}
-					@unlink($_SERVER['DOCUMENT_ROOT'].$uploadPathHtaccessFile);
+					$result = true;
 				}
+				unlink($_SERVER['DOCUMENT_ROOT'].$uploadPathHtaccessFile);
 			}
-			@unlink($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile);
+			unlink($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile);
 		}
 		return $result;
 	}
@@ -172,7 +164,8 @@ Body:----------ru--
 	protected static function getCurrentHost()
 	{
 		$host = $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : 'localhost';
-		return CBXPunycode::ToASCII($host, $arErrors);
+		$errors = array();
+		return CBXPunycode::ToASCII($host, $errors);
 	}
 
 	/**
@@ -213,7 +206,7 @@ Body:----------ru--
 			return false;
 
 		$result = false;
-		if(@file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPath, $pText))
+		if(file_put_contents($_SERVER['DOCUMENT_ROOT'].$uploadPath, $pText))
 		{
 			$response = self::doRequestToLocalhost($uploadPath);
 			if($response)
@@ -223,7 +216,7 @@ Body:----------ru--
 					$result = true;
 				}
 			}
-			@unlink($_SERVER['DOCUMENT_ROOT'].$uploadPath);
+			unlink($_SERVER['DOCUMENT_ROOT'].$uploadPath);
 		}
 		return $result;
 	}
@@ -285,52 +278,73 @@ Body:----------ru--
 	}
 
 	/**
-	 * Check session file
-	 * @param string $pFileName
-	 * @return bool
-	 */
-	protected function isStrangeSessionFile($pFileName)
-	{
-		$currentUID = self::getCurrentUID();
-		if($currentUID != fileowner($pFileName))
-			return true;
-
-		if(is_readable($pFileName))
-		{
-			if(strpos(file_get_contents($pFileName), self::getSessionUniqID()) === false)
-				return true;
-		}
-		return false;
-	}
-
-	/**
 	 * Check session files collective usage, e.g. several owners in the same session directory
 	 * @return bool
 	 */
 	protected function checkCollectivePhpSession()
 	{
 		if(self::isRunOnWin())
-			return true;
+			return self::STATUS_PASSED;
 
 		if(COption::GetOptionString("security", "session") == "Y")
-			return true;
+			return self::STATUS_PASSED;
 
 		if(ini_get("session.save_handler") != "files")
-			return true;
+			return self::STATUS_PASSED;
 
 		$tmpDir = self::getTmpDir("session.save_path");
 		if(!$tmpDir)
-			return true;
+			return self::STATUS_PASSED;
 
-
+		$additionalInfo = "";
+		$isFailed = false;
+		$currentUID = self::getCurrentUID();
+		$sessionSign = self::getSessionUniqID();
 		foreach (glob($tmpDir."/sess_*", GLOB_NOSORT) as $fileName)
 		{
-			if(self::isStrangeSessionFile($fileName))
+
+			if($currentUID !== null)
 			{
-				return false;
+				$fileOwner = fileowner($fileName);
+				if($currentUID != $fileOwner)
+				{
+					$additionalInfo = getMessage("SECURITY_SITE_CHECKER_COLLECTIVE_SESSION_ADDITIONAL_OWNER", array(
+						"#FILE#" => $fileName,
+						"#FILE_ONWER#" => $fileOwner,
+						"#CURRENT_OWNER#" => $currentUID,
+					));
+					$isFailed = true;
+					break;
+				}
+			}
+
+			if(is_readable($fileName))
+			{
+				$fileContent = file_get_contents($fileName);
+				if (strpos($fileContent, $sessionSign) === false)
+				{
+					$additionalInfo = getMessage("SECURITY_SITE_CHECKER_COLLECTIVE_SESSION_ADDITIONAL_SIGN", array(
+						"#FILE#" => $fileName,
+						"#FILE_CONTENT#" => htmlspecialcharsbx(substr($fileContent, 0, 1024)),
+						"#SIGN#" => $sessionSign
+					));
+					$isFailed = true;
+					break;
+				}
 			}
 		}
-		return true;
+
+		if($isFailed)
+		{
+			$this->addUnformattedDetailError(
+				"SECURITY_SITE_CHECKER_COLLECTIVE_SESSION",
+				CSecurityCriticalLevel::HIGHT,
+				$additionalInfo
+			);
+			return self::STATUS_FAILED;
+		}
+
+		return self::STATUS_PASSED;
 	}
 
 	/**
@@ -340,37 +354,44 @@ Body:----------ru--
 	protected function checkPhpSessionDir()
 	{
 		if (self::isRunOnWin())
-			return true;
+			return self::STATUS_PASSED;
 
 		if (COption::GetOptionString("security", "session") == "Y")
-			return true;
+			return self::STATUS_PASSED;
 
 		if (ini_get("session.save_handler") != "files")
-			return true;
+			return self::STATUS_PASSED;
 
 		$tmpDir = self::getTmpDir("session.save_path");
 		if (!$tmpDir)
-			return true;
-
-		if ($tmpDir === self::SYSTEM_TMP_DIR)
-			return false;
+			return self::STATUS_PASSED;
 
 		$dir = $tmpDir;
 		while ($dir && $dir != '/')
 		{
 			$perms = static::getFilePerm($dir);
 			if (($perms & 0x0001) === 0)
-				return true;
+				return self::STATUS_PASSED;
 
 			$dir = dirname($dir);
 		}
 
-		return false;
+		$this->addUnformattedDetailError(
+			"SECURITY_SITE_CHECKER_SESSION_DIR",
+			CSecurityCriticalLevel::HIGHT,
+			getMessage("SECURITY_SITE_CHECKER_SESSION_DIR_ADDITIONAL", array(
+				"#DIR#" => $tmpDir,
+				"#PERMS#" => self::formatFilePermissions(static::getFilePerm($tmpDir)),
+			))
+		);
+
+		return self::STATUS_FAILED;
 	}
 
 	/**
 	 * Return current system user ID
-	 * @return bool|int
+	 *
+	 * @return int|null
 	 */
 	protected static function getCurrentUID()
 	{
@@ -384,13 +405,14 @@ Body:----------ru--
 		}
 		else
 		{
-			return false;
+			return null;
 		}
 	}
 
 	/**
 	 * Return current system user group ID
-	 * @return bool|int
+	 *
+	 * @return int|null
 	 */
 	protected static function getCurrentGID()
 	{
@@ -404,12 +426,13 @@ Body:----------ru--
 		}
 		else
 		{
-			return false;
+			return null;
 		}
 	}
 
 	/**
 	 * Check minimal UID and GID
+	 *
 	 * @param int $pMinUid
 	 * @param int $pMinGid
 	 * @return bool
@@ -421,12 +444,80 @@ Body:----------ru--
 
 		$result = true;
 		$uid = self::getCurrentUID();
-		if($uid !== false && $uid < $pMinUid)
+		if($uid !== null && $uid < $pMinUid)
 			$result = false;
 		$gid = self::getCurrentGID();
-		if($gid !== false && $gid < $pMinGid)
+		if($gid !== null && $gid < $pMinGid)
 			$result = false;
 		return $result;
 	}
 
+	protected static function formatFilePermissions($perms)
+	{
+		// http://www.php.net/manual/en/function.fileperms.php
+
+		if (($perms & 0xC000) == 0xC000)
+		{
+			// Socket
+			$info = 's';
+		}
+		elseif (($perms & 0xA000) == 0xA000)
+		{
+			// Symbolic Link
+			$info = 'l';
+		}
+		elseif (($perms & 0x8000) == 0x8000)
+		{
+			// Regular
+			$info = '-';
+		}
+		elseif (($perms & 0x6000) == 0x6000)
+		{
+			// Block special
+			$info = 'b';
+		}
+		elseif (($perms & 0x4000) == 0x4000)
+		{
+			// Directory
+			$info = 'd';
+		}
+		elseif (($perms & 0x2000) == 0x2000)
+		{
+			// Character special
+			$info = 'c';
+		}
+		elseif (($perms & 0x1000) == 0x1000)
+		{
+			// FIFO pipe
+			$info = 'p';
+		}
+		else
+		{
+			// Unknown
+			$info = 'u';
+		}
+
+		// Owner
+		$info .= (($perms & 0x0100) ? 'r' : '-');
+		$info .= (($perms & 0x0080) ? 'w' : '-');
+		$info .= (($perms & 0x0040) ?
+			(($perms & 0x0800) ? 's' : 'x' ) :
+			(($perms & 0x0800) ? 'S' : '-'));
+
+		// Group
+		$info .= (($perms & 0x0020) ? 'r' : '-');
+		$info .= (($perms & 0x0010) ? 'w' : '-');
+		$info .= (($perms & 0x0008) ?
+			(($perms & 0x0400) ? 's' : 'x' ) :
+			(($perms & 0x0400) ? 'S' : '-'));
+
+		// World
+		$info .= (($perms & 0x0004) ? 'r' : '-');
+		$info .= (($perms & 0x0002) ? 'w' : '-');
+		$info .= (($perms & 0x0001) ?
+			(($perms & 0x0200) ? 't' : 'x' ) :
+			(($perms & 0x0200) ? 'T' : '-'));
+
+		return $info;
+	}
 }

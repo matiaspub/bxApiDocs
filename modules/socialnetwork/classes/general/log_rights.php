@@ -1,7 +1,7 @@
 <?
 class CSocNetLogRights
 {
-	public static function Add($LOG_ID, $GROUP_CODE)
+	public static function Add($LOG_ID, $GROUP_CODE, $bShare = false)
 	{
 		global $DB;
 
@@ -24,7 +24,96 @@ class CSocNetLogRights
 			));
 
 			if (preg_match('/^U(\d+)$/', $GROUP_CODE, $matches))
+			{
 				CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
+			}
+			elseif (
+				$bShare 
+				&& preg_match('/^SG(\d+)$/', $GROUP_CODE, $matches)
+			)
+			{
+				// get all members who unfollow and set'em unfollow from the date
+
+				$arUserIDToCheck = array();
+				$arUserFollow = array();
+
+				$rsGroupMembers = CSocNetUserToGroup::GetList(
+					array(),
+					array(
+						"GROUP_ID" => $matches[1],
+						"USER_ACTIVE" => "Y",
+						"<=ROLE" => SONET_ROLES_USER
+					),
+					false,
+					false,
+					array("USER_ID")
+				);
+
+				while ($arGroupMembers = $rsGroupMembers->Fetch())
+				{
+					$arUserIDToCheck[] = $arGroupMembers["USER_ID"];
+				}
+
+				if (!empty($arUserIDToCheck))
+				{
+					$arUserIDFollowDefault = array(
+						"Y" => array(),
+						"N" => array()
+					);
+					$arUserIDAlreadySaved = array();
+					$default_follow_type = COption::GetOptionString("socialnetwork", "follow_default_type", "Y");
+
+					$rsFollow = CSocNetLogFollow::GetList(
+						array(
+							"USER_ID" => $arUserIDToCheck, 
+							"CODE" => "**"
+						),
+						array("USER_ID", "TYPE")
+					);
+					while($arFollow = $rsFollow->Fetch())
+					{
+						$arUserIDFollowDefault[$arFollow["TYPE"]][] = $arFollow["USER_ID"];
+					}
+
+					$rsFollow = CSocNetLogFollow::GetList(
+						array(
+							"USER_ID" => $arUserIDToCheck, 
+							"CODE" => "L".$LOG_ID
+						),
+						array("USER_ID")
+					);
+					while($arFollow = $rsFollow->Fetch())
+					{
+						$arUserIDAlreadySaved[] = $arFollow["USER_ID"];
+					}
+
+					foreach($arUserIDToCheck as $iUserID)
+					{
+						// for them who not followed by default and not already saved follow/unfollow for the log entry
+						if (
+							!in_array($iUserID, $arUserIDAlreadySaved)
+							&& (
+								(
+									$default_follow_type == "N" 
+									&& !in_array($iUserID, $arUserIDFollowDefault["Y"])
+								)
+								|| (
+									$default_follow_type == "Y" 
+									&& in_array($iUserID, $arUserIDFollowDefault["N"])
+								)
+							)
+						)
+						{
+							CSocNetLogFollow::Add(
+								$iUserID, 
+								"L".$LOG_ID, 
+								"N", 
+								ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID)
+							);
+						}
+					}
+				}
+			}
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".intval($LOG_ID));
@@ -261,7 +350,7 @@ class CSocNetLogRights
 	public static function CheckForUserAll($logID)
 	{
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
-			WHERE
+			WHERE 
 			SLR.LOG_ID = ".intval($logID)." 
 			AND (
 				(SLR.GROUP_CODE = 'AU') 

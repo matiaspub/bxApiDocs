@@ -23,7 +23,7 @@ class Logger
 	 * @param $description
 	 * @return bool
 	 */
-	static public function addRecord($level, $auditType, $itemId, $description)
+	public static function addRecord($level, $auditType, $itemId, $description)
 	{
 		if($level == self::LOG_LEVEL_ERROR)
 			$severity = "ERROR";
@@ -48,7 +48,7 @@ class Logger
 	/**
 	 * @return array
 	 */
-	static public function onEventLogGetAuditTypes()
+	public static function onEventLogGetAuditTypes()
 	{
 		return array(
 			"SCALE_ACTION_STARTED" => "[SCALE_ACTION_STARTED] ".Loc::getMessage("SCALE_ACTION_EVENT_LOG_TYPE_ACTION_STARTED"),
@@ -56,6 +56,7 @@ class Logger
 			"SCALE_ACTION_ERROR" => "[SCALE_ACTION_ERROR] ".Loc::getMessage("SCALE_ACTION_EVENT_LOG_TYPE_ACTION_ERROR"),
 			"SCALE_ACTION_OUTPUT" => "[SCALE_ACTION_OUTPUT] ".Loc::getMessage("SCALE_ACTION_EVENT_LOG_TYPE_ACTION_OUTPUT"),
 			"SCALE_ACTION_CHECK_STATE" => "[SCALE_ACTION_CHECK_STATE] ".Loc::getMessage("SCALE_ACTION_EVENT_LOG_TYPE_ACTION_CHECK_STATE"),
+			"SCALE_PROVIDER_SEND_ORDER" => "[SCALE_PROVIDER_SEND_ORDER] ".Loc::getMessage("SCALE_ACTION_EVENT_LOG_TYPE_PROVIDER_SEND_ORDER")
 		);
 	}
 }

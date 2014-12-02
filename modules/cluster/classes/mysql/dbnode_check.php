@@ -500,11 +500,11 @@ class CClusterDBNodeCheck extends CAllClusterDBNodeCheck
 		$arTestSQL = array(
 			0 => "drop table b_cluster_test",
 			"sql_create" => "create table b_cluster_test(column1 int)",
-			"sql_insert" => "insert into b_cluster_test (column1) values ('test1')",
+			"sql_insert" => "insert into b_cluster_test (column1) values (1)",
 			"sql_select" => "select * from b_cluster_test",
-			"sql_update" => "update b_cluster_test set column1='test2' where column1='test1'",
-			"sql_delete" => "delete from b_cluster_test where column1='test2'",
-			"sql_drop" => "drop table b_cluster_test",
+			"sql_update" => "update b_cluster_test set column1=2 where column1=1",
+			"sql_delete" => "delete from b_cluster_test where column1=2",
+			"sql_drop"   => "drop table b_cluster_test",
 		);
 		$is_ok = true;
 		$sql_erorrs_list = "";

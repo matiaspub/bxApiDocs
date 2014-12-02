@@ -1,4 +1,5 @@
 <?
+use Bitrix\Main\Loader;
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/product.php");
 
 class CSaleProduct extends CALLSaleProduct
@@ -9,59 +10,76 @@ class CSaleProduct extends CALLSaleProduct
 	 * @param int $ID - product id (sku ID or parent product ID are also supported)
 	 * @param int $minCNT - number of times products should have been ordered to be returned in the result
 	 * @param int $limit - serialized data saved in the database for the record of this type
+	 * @param boolean $getParentOnly - return only parent product ID
 	 * @return dbres
 	 */
-	public static function GetProductList($ID, $minCNT, $limit)
+	public static function GetProductList($ID, $minCNT, $limit, $getParentOnly = false)
 	{
-		$ID = intval($ID);
-		$limit = intval($limit);
-		$minCNT = intval($minCNT);
-		$intIBlockID = 0;
-		$notInStr = "";
-
-		if ($ID <= 0)
-			return false;
-
 		global $DB;
 
-		$inStr = $ID;
+		$ID = (int)$ID;
+		if ($ID <= 0)
+			return false;
+		$limit = (int)$limit;
+		if ($limit < 0)
+			$limit = 0;
+		$minCNT = (int)$minCNT;
+		if ($minCNT < 0)
+			$minCNT = 0;
 
-		if (CModule::IncludeModule("catalog") && (CModule::IncludeModule("iblock")))
+		$getParentOnly = ($getParentOnly === true);
+
+		$elementInclude = array($ID);
+		$elementExclude = array();
+
+		if (Loader::includeModule('catalog'))
 		{
-			$intIBlockID = intval(CIBlockElement::GetIBlockByID($ID));
+			$intIBlockID = (int)CIBlockElement::GetIBlockByID($ID);
+			if ($intIBlockID == 0)
+				return false;
 
-			if (CCatalogSKU::IsExistOffers($ID, $intIBlockID)) // parent product is supplied. search for its sku
+			$skuInfo = CCatalogSKU::GetInfoByProductIBlock($intIBlockID);
+			if (!empty($skuInfo))
 			{
-				$arOffers = CIBlockPriceTools::GetOffersArray($intIBlockID, $ID, array("ID" => "DESC"),	array("ID"), array(), 0, array(), 1);
-
-				$arSkuId = array();
-				foreach ($arOffers as $arOffer)
-					$arSkuId[] = $arOffer["ID"];
-
-				if (count($arSkuId) > 0)
+				$itemsIterator = CIBlockElement::GetList(
+					array(),
+					array('IBLOCK_ID' => $skuInfo['IBLOCK_ID'], 'PROPERTY_'.$skuInfo['SKU_PROPERTY_ID'] => $ID),
+					false,
+					false,
+					array('ID', 'IBLOCK_ID', 'PROPERTY_'.$skuInfo['SKU_PROPERTY_ID'])
+				);
+				while ($item = $itemsIterator->Fetch())
 				{
-					$notInStr = implode(",", $arSkuId);
-					$inStr = $notInStr.",".$ID;
+					$item['ID'] = (int)$item['ID'];
+					$elementInclude[] = $item['ID'];
+					$elementExclude[] = $item['ID'];
 				}
 			}
 		}
 
-		$strSql = "SELECT * FROM b_sale_product2product WHERE PRODUCT_ID IN (".$inStr.")";
-
-		if (strlen($notInStr) > 0)
-			$strSql .= " AND PARENT_PRODUCT_ID NOT IN (".$notInStr.")";
-
-		if ($minCNT > 0)
-			$strSql .= " AND CNT >= ".$DB->ForSQL($minCNT)." ";
-
-		$strSql .= " ORDER BY CNT DESC, PRODUCT_ID ASC";
-
-		if ($limit > 0)
-			$strSql .= " LIMIT ".$limit;
-
-		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		return $dbRes;
+		if ($getParentOnly)
+		{
+			$strSql = "select PARENT_PRODUCT_ID from b_sale_product2product where PRODUCT_ID IN (".implode(',', $elementInclude).")";
+			if (!empty($elementExclude))
+				$strSql .= " and PARENT_PRODUCT_ID not in (".implode(',', $elementExclude).")";
+			if ($minCNT > 0)
+				$strSql .= " and CNT >= ".$minCNT;
+			$strSql .= ' group by PARENT_PRODUCT_ID';
+			if ($limit > 0)
+				$strSql .= " limit ".$limit;
+		}
+		else
+		{
+			$strSql = "select * from b_sale_product2product where PRODUCT_ID in (".implode(',', $elementInclude).")";
+			if (!empty($elementExclude))
+				$strSql .= " and PARENT_PRODUCT_ID not in (".implode(',', $elementExclude).")";
+			if ($minCNT > 0)
+				$strSql .= " and CNT >= ".$minCNT;
+			$strSql .= " order by CNT desc, PRODUCT_ID asc";
+			if ($limit > 0)
+				$strSql .= " limit ".$limit;
+		}
+		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
 	public static function GetBestSellerList($by = "AMOUNT", $arFilter = Array(), $arOrderFilter = Array(), $limit = 0)
@@ -72,8 +90,8 @@ class CSaleProduct extends CALLSaleProduct
 		if($by == "QUANTITY")
 			$byQuantity = true;
 
-		$arJoin = Array();
-		$arWhere = Array();
+		$arJoin = array();
+		$arWhere = array();
 		$orderFilter = "";
 		$i = 1;
 
@@ -139,10 +157,11 @@ class CSaleProduct extends CALLSaleProduct
 			"DEDUCTED" => array("FIELD_NAME" => "O.DEDUCTED", "FIELD_TYPE" => "string"),
 			"DATE_DEDUCTED" => array("FIELD_NAME" => "O.DATE_DEDUCTED", "FIELD_TYPE" => "datetime"),
 		);
-		if(is_array($arOrderFilter) && count($arOrderFilter) > 0)
+		if (!empty($arOrderFilter) && is_array($arOrderFilter))
 		{
 			$sqlWhere = new CSQLWhere;
-			$sqlWhere->SetFields($arFields, $arJ);
+			$sqlWhere->SetFields($arFields);
+			$arJ = array();
 			$orderFilter = $sqlWhere->GetQueryEx($arOrderFilter, $arJ);
 		}
 
@@ -155,7 +174,7 @@ class CSaleProduct extends CALLSaleProduct
 
 		foreach($arJoin as $v)
 			$strSql .= $v."\n";
-		if(strlen($orderFilter) > 0)
+		if ($orderFilter != '')
 			$strSql .= "INNER JOIN b_sale_order O ON (b.ORDER_ID = O.ID) \n";
 
 		$strSql .= "WHERE \n".
@@ -164,7 +183,7 @@ class CSaleProduct extends CALLSaleProduct
 		foreach($arWhere as $v)
 			$strSql .= $v."\n";
 
-		if(strlen($orderFilter) > 0)
+		if ($orderFilter != '')
 			$strSql .= " AND ".$orderFilter."\n";
 
 		$strSql .= " GROUP BY b.PRODUCT_ID, ifnull(b.CATALOG_XML_ID, ''), b.PRODUCT_XML_ID, b.CURRENCY \n";

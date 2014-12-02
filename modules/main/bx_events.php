@@ -261,7 +261,7 @@ class _CEventsMain {
 	 *
 	 *
 	 * @param object &$list  Ссылка на объект класса <a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminlist/index.php">CAdminList</a>.
+	 * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminlist/index.php">CAdminList</a>. </htm
 	 *
 	 *
 	 *
@@ -379,7 +379,7 @@ class _CEventsMain {
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
-	 * </ul></bod<a name="examples"></a>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -416,7 +416,7 @@ class _CEventsMain {
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
-	 * </ul></bod<a name="examples"></a>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -759,7 +759,7 @@ class _CEventsMain {
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a> <br> </li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" > </a> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a><a
-	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul></bod<a
+	 * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
 	 *
@@ -1143,7 +1143,7 @@ class _CEventsMain {
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
-	 * </ul></bod<a name="examples"></a>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -1249,7 +1249,7 @@ class _CEventsMain {
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
 	 * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
-	 * </ul></bod<a name="examples"></a>
+	 * </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -2145,7 +2145,7 @@ class _CEventsMain {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
-	 * ></a>События</li> </ul></bod<a name="examples"></a>
+	 * ></a>События</li> </ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -2595,199 +2595,6 @@ class _CEventsMain {
 	 * @author Bitrix
 	 */
 	public static function OnUserLoginExternal(&$arParams){}
-
-	/**
-	 * <p>Функция добавляет обработчик события <b>DOM-структура доступна для записи</b>. Более короткий вариант – <code>BX(Function handler)</code>.</p> <a name="example"></a>
-	 *
-	 *
-	 *
-	 *
-	 * @param Function $handler  
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;?
-	 * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
-	 * $APPLICATION-&gt;SetTitle("События");
-	 *    CJSCore::Init();
-	 * ?&gt;
-	 * &lt;a href="http://1c-bitrix.ru" class="css_bind" data-param="HELLO" &gt;click Me&lt;/a&gt;
-	 * &lt;div class="css_bind" data-param="HELLO2"&gt;click Me2&lt;/div&gt;
-	 * 
-	 * &lt;script&gt;
-	 * BX.ready(function(){
-	 *    var param1 = ' global Hello';
-	 *    BX.bindDelegate(
-	 *       document.body, 'click', {className: 'css_bind' },
-	 *       function(e){
-	 *          if(!e)
-	 *             e = window.event;
-	 *          
-	 *          alert(this.getAttribute('data-param')+param1);
-	 *          return BX.PreventDefault(e);
-	 *       }
-	 *    );
-	 * });
-	 * &lt;/script&gt;
-	 * &lt;?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?&gt;</bod
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_ready.php
-	 * @author Bitrix
-	 */
-	public static function BX.ready($handler){}
-
-	/**
-	 * <p>Функция устанавливает функцию <b>handler</b> в качестве обработчика события <b>event</b> элемента <b>el</b>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param Objec $t  
-	 *
-	 *
-	 *
-	 * @param DOMNode $el  
-	 *
-	 *
-	 *
-	 * @param String $event  
-	 *
-	 *
-	 *
-	 * @param Function $handler  
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * BX.bind(BX('test'), 'click', function() {alert('click!')})
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_bind.php
-	 * @author Bitrix
-	 */
-	public static function BX.bind($t, $el, $event, $handler){}
-
-	/**
-	 * <p>Функция снимает обработчик <b>handler</b> события <b>event</b> элемента <b>el</b>.</p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @param DOMNode $el  
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_unbind.php
-	 * @author Bitrix
-	 */
-	public static function BX.unbind($el){}
-
-	/**
-	 * <p>Функция снимает все зарегистрированные обработчики событий с элемента <b>el</b> (или вообще все зарегистрированные обработчики событий, если параметр отсутствует).</p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @param e $l  
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_unbindall.php
-	 * @author Bitrix
-	 */
-	public static function BX.unbindAll($l){}
-
-	/**
-	 * <pre class="syntax">Function <b>BX.delegate(</b>  Function func,  Object context <b>);</b></pre> <p>Две родственных функции, генерирующих «функцию-делегата», которая будет вызывать требуемую функцию в нужном контексте. Это может использоваться, например, для назначения метода какого-либо объекта в качестве обработчика события с сохранением контекста объекта.</p> <p>Отличие между функциями в том, что <b>BX.proxy</b> при повторном вызове с теми же параметрами вернет не новую функцию-делегата, а ссылку на сгенерированную до этого функцию, что может быть полезно, например, если требуется отменить конкретный обработчик события. </p> <p><b>Примечание</b>: BX.delegate - аналог <a href="http://api.jquery.com/jQuery.proxy/" >jQuery.proxy</a>.</p>
-	 *
-	 *
-	 *
-	 *
-	 * @param Function $func  
-	 *
-	 *
-	 *
-	 * @param Object $context  
-	 *
-	 *
-	 *
-	 * @return Function 
-	 *
-	 *
-	 * <h4>Example</h4> 
-	 * <pre>
-	 * &lt;script type="text/javascript"&gt;
-	 * function MyClass()
-	 * {
-	 *     this.prop = 1;
-	 *     BX.bind(BX('link'), 'click', BX.proxy(this.handler, this));
-	 * }
-	 * 
-	 * MyClass.prototype.handler = function()
-	 * {
-	 *     alert(this.prop);
-	 *     BX.unbind(BX('link'), 'click', BX.proxy(this.handler, this));
-	 * }
-	 * 
-	 * BX.ready(function(){ new MyClass(); });
-	 * &lt;/script&gt;
-	 * &lt;a href="javascript:void(0)" id="link"&gt;Click Me&lt;/a&gt;
-	 * function MyClass(){}
-	 * MyClass.prototype.handler = function(){}
-	 * 
-	 * var ob = new MyClass();
-	 * alert(BX.delegate(ob.handler, ob) == BX.delegate(ob.handler, ob)); // false
-	 * alert(BX.proxy(ob.handler, ob) == BX.proxy(ob.handler, ob)); // true
-	 * </pre>
-	 *
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_proxy.php
-	 * @author Bitrix
-	 */
-	public static function BX.proxy/BX.delegate($func, $context){}
-
-	/**
-	 * <pre class="syntax">void <b>BX.allowEvent(</b>  DOMNode element,  string event <b>);</b></pre> <p>Два метода, позволяющих временно отключить и включить обработку конкретного события в конкретном элементе. Пока что отключаются только обработчики, назначенные через <code>element['on' + event]</code>.</p> <br><br>
-	 *
-	 *
-	 *
-	 *
-	 * @param DOMNode $element  
-	 *
-	 *
-	 *
-	 * @param string $event  
-	 *
-	 *
-	 *
-	 * @return void 
-	 *
-	 * @static
-	 * @link http://dev.1c-bitrix.ru/api_help/main/js_lib/kernel/events/bx_denyevent.php
-	 * @author Bitrix
-	 */
-	public static function BX.denyEvent/BX.allowEvent($element, $event){}
 
 	/**
 	 * Аналогично дополнительной обработке onsuccess.

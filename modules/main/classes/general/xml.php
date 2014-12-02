@@ -802,7 +802,7 @@ class CXMLFileStream
 	 * @return void
 	 *
 	 */
-public 	public function registerNodeHandler($nodePath, $callableHandler)
+public function registerNodeHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -822,7 +822,7 @@ public 	public function registerNodeHandler($nodePath, $callableHandler)
 	 * @return void
 	 *
 	 */
-public 	public function registerElementHandler($nodePath, $callableHandler)
+public function registerElementHandler($nodePath, $callableHandler)
 	{
 		if (is_callable($callableHandler))
 		{
@@ -841,7 +841,7 @@ public 	public function registerElementHandler($nodePath, $callableHandler)
 	 * @return bool
 	 *
 	 */
-	public public function openFile($filePath)
+	public function openFile($filePath)
 	{
 		$this->fileHandler = null;
 
@@ -875,7 +875,7 @@ public 	public function registerElementHandler($nodePath, $callableHandler)
 	 * @return bool
 	 *
 	 */
-public 	public function endOfFile()
+public function endOfFile()
 	{
 		if ($this->fileHandler === null)
 			return true;
@@ -888,7 +888,7 @@ public 	public function endOfFile()
 	 * @return array[int]string
 	 *
 	 */
-public 	public function getPosition()
+public function getPosition()
 	{
 		$this->xmlPosition = array();
 		foreach($this->elementStack as $i => $elementName)
@@ -908,7 +908,7 @@ public 	public function getPosition()
 	 * @return void
 	 *
 	 */
-public 	public function setPosition($position)
+public function setPosition($position)
 	{
 		if(is_array($position))
 		{
@@ -926,7 +926,7 @@ public 	public function setPosition($position)
 	 * @return bool
 	 *
 	 */
-public 	public function findNext()
+public function findNext()
 	{
 		$bMB = defined("BX_UTF");
 		$cs = $this->fileCharset;
@@ -978,7 +978,7 @@ public 	public function findNext()
 	 * @return bool
 	 *
 	 */
-public 	private function getXmlChunk($bMB = false)
+private function getXmlChunk($bMB = false)
 	{
 		if($this->bufPosition >= $this->bufLen)
 		{
@@ -1129,7 +1129,7 @@ public 	private function getXmlChunk($bMB = false)
 	 * @return void
 	 *
 	 */
-public 	private function endElement($xmlChunk)
+private function endElement($xmlChunk)
 	{
 		$elementName = array_pop($this->elementStack);
 		$elementPosition  = array_pop($this->positionStack);
@@ -1159,7 +1159,7 @@ public 	private function endElement($xmlChunk)
 	 * @param int $endPosition
 	 * @return CDataXML|false
 	 */
-public 	private function readXml($startPosition, $endPosition)
+private function readXml($startPosition, $endPosition)
 	{
 		$xmlChunk = $this->readFilePart($startPosition, $endPosition);
 		if ($xmlChunk && $this->fileCharset)
@@ -1182,7 +1182,7 @@ public 	private function readXml($startPosition, $endPosition)
 	 * @param int $endPosition
 	 * @return CDataXML|false
 	 */
-public 	public function readFilePart($startPosition, $endPosition)
+public function readFilePart($startPosition, $endPosition)
 	{
 		$savedPosition = ftell($this->fileHandler);
 		fseek($this->fileHandler, $startPosition);

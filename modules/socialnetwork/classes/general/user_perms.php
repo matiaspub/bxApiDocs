@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.
+ * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.</body> </html>
  *
  *
  *
@@ -243,7 +243,7 @@ class CAllSocNetUserPerms
 	*
 	*
 	*
-	* @param string $operation  Операция.
+	* @param string $operation  Операция.</bod
 	*
 	*
 	*
@@ -339,7 +339,7 @@ class CAllSocNetUserPerms
 	*
 	*
 	*
-	* @param string $operation  Операция.
+	* @param string $operation  Операция.</bod
 	*
 	*
 	*
@@ -525,35 +525,19 @@ class CAllSocNetUserPerms
 			if ($arReturn["IsCurrentUser"])
 			{
 				if ($USER->CanDoOperation('edit_own_profile'))
-					$arReturn["Operations"]["modifyuser_main"] = true;
-			}
-			elseif($USER->CanDoOperation('edit_all_users'))
-				$arReturn["Operations"]["modifyuser_main"] = true;				
-			elseif($USER->CanDoOperation('edit_subordinate_users'))
-			{
-				$arUserGroups = CUser::GetUserGroup($userID);
-
-				if (array_key_exists("SONET_SUBORD_GROUPS_BY_USER_ID", $GLOBALS) && !array_key_exists("SONET_ALLOW_FRIENDS_CACHE", $_REQUEST))
-					$arUserSubordinateGroups = $GLOBALS["SONET_SUBORD_GROUPS_BY_USER_ID"][$currentUserID];
-				else
 				{
-					$arUserSubordinateGroups = Array(2);
-					$arUserGroups_u = CUser::GetUserGroup($currentUserID);
-					for ($j = 0,$len = count($arUserGroups_u); $j < $len; $j++)
-					{
-						$arSubordinateGroups = CGroup::GetSubordinateGroups($arUserGroups_u[$j]);
-						$arUserSubordinateGroups = array_merge ($arUserSubordinateGroups, $arSubordinateGroups);
-					}
-					$arUserSubordinateGroups = array_unique($arUserSubordinateGroups);
-
-					if (!array_key_exists("SONET_SUBORD_GROUPS_BY_USER_ID", $GLOBALS))
-						$GLOBALS["SONET_SUBORD_GROUPS_BY_USER_ID"] = array();
-
-					$GLOBALS["SONET_SUBORD_GROUPS_BY_USER_ID"][$currentUserID] = $arUserSubordinateGroups;
+					$arReturn["Operations"]["modifyuser_main"] = true;
 				}
-
-				if (count(array_diff($arUserGroups, $arUserSubordinateGroups)) <= 0)
-					$arReturn["Operations"]["modifyuser_main"] = true;						
+			}
+			elseif (
+				$USER->CanDoOperation('edit_all_users')
+				|| (
+					$USER->CanDoOperation('edit_subordinate_users')
+					&& count(array_diff(CUser::GetUserGroup($userID), CSocNetTools::GetSubordinateGroups($currentUserID))) <= 0
+				)
+			)
+			{
+				$arReturn["Operations"]["modifyuser_main"] = true;				
 			}
 		}
 		
@@ -571,7 +555,7 @@ class CAllSocNetUserPerms
 	*
 	*
 	*
-	* @param string $feature  Название функционала. </htm
+	* @param string $feature  Название функционала. </ht
 	*
 	*
 	*

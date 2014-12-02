@@ -18,7 +18,7 @@ Loc::loadMessages(__FILE__);
  * <li> SORT int optional default 500
  * <li> CODE string(50) optional
  * <li> DEFAULT_VALUE string optional
- * <li> PROPERTY_TYPE enum ('S', 'N', 'F', 'E' or 'G') optional default 'S'
+ * <li> PROPERTY_TYPE enum ('S', 'N', 'L', 'F', 'E' or 'G') optional default 'S'
  * <li> ROW_COUNT int optional default 1
  * <li> COL_COUNT int optional default 30
  * <li> LIST_TYPE enum ('C' or 'L') optional default 'L'
@@ -53,6 +53,7 @@ class PropertyTable extends Entity\DataManager
 	const TYPE_FILE = 'F';
 	const TYPE_ELEMENT = 'E';
 	const TYPE_SECTION = 'G';
+	const TYPE_LIST = 'L';
 
 	/**
 	 * Returns path to the file which contains definition of the class.
@@ -121,7 +122,7 @@ class PropertyTable extends Entity\DataManager
 			),
 			'PROPERTY_TYPE' => array(
 				'data_type' => 'enum',
-				'values' => array(self::TYPE_STRING, self::TYPE_NUMBER, self::TYPE_FILE, self::TYPE_ELEMENT, self::TYPE_SECTION),
+				'values' => array(self::TYPE_STRING, self::TYPE_NUMBER, self::TYPE_FILE, self::TYPE_ELEMENT, self::TYPE_SECTION, self::TYPE_LIST),
 				'title' => Loc::getMessage('IBLOCK_PROPERTY_ENTITY_PROPERTY_TYPE_FIELD'),
 			),
 			'ROW_COUNT' => array(

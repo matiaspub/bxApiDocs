@@ -1,7 +1,9 @@
 <?
 $module_id = 'catalog';
 
+use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Currency\CurrencyTable;
 
 // define('CATALOG_NEW_OFFERS_IBLOCK_NEED','-1');
 
@@ -9,7 +11,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 {
 	$bReadOnly = !$USER->CanDoOperation('catalog_settings');
 
-	\Bitrix\Main\Loader::includeModule('catalog');
+	Loader::includeModule('catalog');
 	Loc::loadMessages(__FILE__);
 
 	$saleIsInstalled = \Bitrix\Main\ModuleManager::isModuleInstalled('sale');
@@ -72,7 +74,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 				}
 				if ($boolExpPath)
 				{
-					if ('W' > $APPLICATION->GetFileAccessPermission($val))
+					if ($APPLICATION->GetFileAccessPermission($val) < 'W')
 						$boolExpPath = false;
 				}
 
@@ -111,7 +113,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 		}
 		COption::SetOptionString('catalog','yandex_agent_file', $strYandexAgent,Loc::getMessage("CAT_AGENT_FILE"));
 
-		$num_catalog_levels = intval(isset($_POST['num_catalog_levels']) ? $_POST['num_catalog_levels'] : 3);
+		$num_catalog_levels = (isset($_POST['num_catalog_levels']) ? (int)$_POST['num_catalog_levels'] : 3);
 		if (0 >= $num_catalog_levels)
 			$num_catalog_levels = 3;
 		COption::SetOptionInt("catalog", "num_catalog_levels", $num_catalog_levels);
@@ -322,7 +324,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 		while ($arOneIBlock = $rsIBlocks->Fetch())
 		{
 			// Current info
-			$arOneIBlock['ID'] = intval($arOneIBlock['ID']);
+			$arOneIBlock['ID'] = (int)$arOneIBlock['ID'];
 			$arIBlockItem = array();
 			$arIBlockSitesList = array();
 			$rsIBlockSites = CIBlock::GetSite($arOneIBlock['ID']);
@@ -357,10 +359,10 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 		);
 		while ($arCatalog = $rsCatalogs->Fetch())
 		{
-			$arCatalog['IBLOCK_ID'] = intval($arCatalog['IBLOCK_ID']);
-			$arCatalog['PRODUCT_IBLOCK_ID'] = intval($arCatalog['PRODUCT_IBLOCK_ID']);
-			$arCatalog['SKU_PROPERTY_ID'] = intval($arCatalog['SKU_PROPERTY_ID']);
-			$arCatalog['VAT_ID'] = intval($arCatalog['VAT_ID']);
+			$arCatalog['IBLOCK_ID'] = (int)$arCatalog['IBLOCK_ID'];
+			$arCatalog['PRODUCT_IBLOCK_ID'] = (int)$arCatalog['PRODUCT_IBLOCK_ID'];
+			$arCatalog['SKU_PROPERTY_ID'] = (int)$arCatalog['SKU_PROPERTY_ID'];
+			$arCatalog['VAT_ID'] = (int)$arCatalog['VAT_ID'];
 
 			$arCatalogList[$arCatalog['IBLOCK_ID']] = $arCatalog;
 
@@ -380,7 +382,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 			$is_cat = ((${"IS_CATALOG_".$arOneIBlock["ID"]}=="Y") ? "Y" : "N" );
 			$is_cont = ((${"IS_CONTENT_".$arOneIBlock["ID"]}!="Y") ? "N" : "Y" );
 			$yan_exp = ((${"YANDEX_EXPORT_".$arOneIBlock["ID"]}!="Y") ? "N" : "Y" );
-			$cat_vat = intval(${"VAT_ID_".$arOneIBlock["ID"]});
+			$cat_vat = (int)${"VAT_ID_".$arOneIBlock["ID"]};
 
 			$offer_name = trim(${"OFFERS_NAME_".$arOneIBlock["ID"]});
 			$offer_type = trim(${"OFFERS_TYPE_".$arOneIBlock["ID"]});
@@ -1010,7 +1012,7 @@ if ($USER->CanDoOperation('catalog_read') || $USER->CanDoOperation('catalog_sett
 		if ($bNeedAgent)
 		{
 			$yandexPeriod = (int)COption::GetOptionInt('catalog', 'yandex_xml_period');
-			CAgent::AddAgent('CCatalog::PreGenerateXML("yandex");', 'catalog', "N", intval(COption::GetOptionString("catalog", "yandex_xml_period", "24"))*3600);
+			CAgent::AddAgent('CCatalog::PreGenerateXML("yandex");', 'catalog', "N", (int)COption::GetOptionString("catalog", "yandex_xml_period", "24")*3600);
 		}
 	}
 
@@ -1228,7 +1230,7 @@ if ($saleIsInstalled)
 			<?echo Loc::getMessage("CAT_RESERVATION_CLEAR_PERIOD")?>
 		</td>
 		<td>
-			<input type="text" size="10" value="<?=intval(COption::GetOptionString("sale", "product_reserve_clear_period", "0"))?>" name="product_reserve_clear_period" />
+			<input type="text" size="10" value="<?=(int)COption::GetOptionString("sale", "product_reserve_clear_period", "0"); ?>" name="product_reserve_clear_period" />
 		</td>
 	</tr>
 	<tr>
@@ -1411,68 +1413,107 @@ $viewedPeriod = (int)COption::GetOptionInt('catalog', 'viewed_period');
 	<tr>
 		<td width="40%" valign="top"><?echo Loc::getMessage("CO_PAR_DPP_CSV") ?></td>
 		<td width="60%" valign="top">
-			<?
-			$strVal = COption::GetOptionString("catalog", "allowed_product_fields", $defCatalogAvailProdFields.",".$defCatalogAvailPriceFields);
-			$arVal = explode(",", $strVal);
-			$arCatalogAvailProdFields_tmp = array_merge($arCatalogAvailProdFields, $arCatalogAvailPriceFields);
-			?>
-			<select name="allowed_product_fields[]" multiple size="8">
-				<?for ($i = 0, $intCount = count($arCatalogAvailProdFields_tmp); $i < $intCount; $i++):?>
-					<option value="<?echo $arCatalogAvailProdFields_tmp[$i]["value"] ?>"<?if (in_array($arCatalogAvailProdFields_tmp[$i]["value"], $arVal)) echo " selected";?>><?echo $arCatalogAvailProdFields_tmp[$i]["name"]; ?></option>
-				<?endfor;?>
-			</select>
+	<?
+	$arVal = array();
+	$strVal = trim(COption::GetOptionString('catalog', 'allowed_product_fields'));
+	if ($strVal != '')
+	{
+		$arVal = array_fill_keys(explode(',', $strVal), true);
+	}
+	$productFields = array_merge(
+		CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT),
+		CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG)
+	);
+	?><select name="allowed_product_fields[]" multiple size="8"><?
+	foreach ($productFields as &$oneField)
+	{
+		?><option value="<? echo htmlspecialcharsbx($oneField['value']); ?>"<? echo (isset($arVal[$oneField['value']]) ? ' selected' : ''); ?>><? echo htmlspecialcharsex($oneField['name']); ?></option><?
+	}
+	if (isset($oneField))
+		unset($oneField);
+	unset($productFields);
+	?></select>
 		</td>
 	</tr>
 	<tr>
 		<td width="40%" valign="top"><? echo Loc::getMessage("CO_AVAIL_PRICE_FIELDS"); ?></td>
 		<td width="60%" valign="top">
-			<?
-			$strVal = COption::GetOptionString("catalog", "allowed_price_fields", $defCatalogAvailValueFields);
-			$arVal = explode(",", $strVal);
-			?>
-			<select name="allowed_price_fields[]" multiple size="3">
-				<?for ($i = 0, $intCount = count($arCatalogAvailValueFields); $i < $intCount; $i++):?>
-					<option value="<?echo $arCatalogAvailValueFields[$i]["value"] ?>"<?if (in_array($arCatalogAvailValueFields[$i]["value"], $arVal)) echo " selected";?>><?echo $arCatalogAvailValueFields[$i]["name"]; ?></option>
-				<?endfor;?>
-			</select>
+	<?
+	$arVal = array();
+	$strVal = COption::GetOptionString('catalog', 'allowed_price_fields');
+	if ($strVal != '')
+	{
+		$arVal = array_fill_keys(explode(',', $strVal), true);
+	}
+	$priceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+	?><select name="allowed_price_fields[]" multiple size="3"><?
+	foreach ($priceFields as &$oneField)
+	{
+		?><option value="<? echo htmlspecialcharsbx($oneField['value']); ?>"<? echo (isset($arVal[$oneField['value']]) ? ' selected' : ''); ?>><? echo htmlspecialcharsex($oneField['name']); ?></option><?
+	}
+	if (isset($oneField))
+		unset($oneField);
+	unset($priceFields);
+	?></select>
 		</td>
 	</tr>
 	<tr>
 		<td width="40%"><?echo Loc::getMessage("CAT_NUM_CATALOG_LEVELS");?></td>
 		<td width="60%"><?
-			$strVal = COption::GetOptionString("catalog", "num_catalog_levels", "3");
-			?><input type="text" size="5" maxlength="5" value="<?echo htmlspecialcharsbx($strVal)?>" name="num_catalog_levels"></td>
+			$strVal = COption::GetOptionString('catalog', 'num_catalog_levels');
+			?><input type="text" size="5" maxlength="5" value="<? echo htmlspecialcharsbx($strVal); ?>" name="num_catalog_levels">
+		</td>
 	</tr>
 	<tr>
 		<td width="40%" valign="top"><?echo Loc::getMessage("CO_PAR_DPG_CSV") ?></td>
-		<td width="60%" valign="top"><?
-			$strVal = COption::GetOptionString("catalog", "allowed_group_fields", $defCatalogAvailGroupFields);
-			$arVal = explode(",", $strVal);
-			?>
-			<select name="allowed_group_fields[]" multiple size="9">
-				<?for ($i = 0, $intCount = count($arCatalogAvailGroupFields); $i < $intCount; $i++):?>
-					<option value="<?echo $arCatalogAvailGroupFields[$i]["value"] ?>"<?if (in_array($arCatalogAvailGroupFields[$i]["value"], $arVal)) echo " selected";?>><?echo $arCatalogAvailGroupFields[$i]["name"]; ?></option>
-				<?endfor;?>
-			</select></td>
+		<td width="60%" valign="top">
+	<?
+	$arVal = array();
+	$strVal = COption::GetOptionString('catalog', 'allowed_group_fields');
+	if ($strVal != '')
+	{
+		$arVal = array_fill_keys(explode(',', $strVal), true);
+	}
+	$sectionFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+	?><select name="allowed_group_fields[]" multiple size="9"><?
+	foreach ($sectionFields as &$oneField)
+	{
+		?><option value="<? echo htmlspecialcharsbx($oneField['value']); ?>"<? echo (isset($arVal[$oneField['value']]) ? ' selected' : ''); ?>><? echo htmlspecialcharsex($oneField['name']); ?></option><?
+	}
+	if (isset($oneField))
+		unset($oneField);
+	unset($sectionFields);
+	?></select>
+		</td>
 	</tr>
 	<tr>
 		<td width="40%" valign="top"><?echo Loc::getMessage("CO_PAR_DV1_CSV")?></td>
 		<td width="60%" valign="top">
-			<?
-			$strVal = COption::GetOptionString("catalog", "allowed_currencies", $defCatalogAvailCurrencies);
-			$arVal = explode(",", $strVal);
-			$by1="sort";
-			$order1="asc";
-			$lcur = CCurrency::GetList($by1, $order1);
-			?>
-			<select name="allowed_currencies[]" multiple size="5">
-				<?while ($lcur_res = $lcur->Fetch()):?>
-					<option value="<?echo htmlspecialcharsbx($lcur_res["CURRENCY"]) ?>"<?if (in_array($lcur_res["CURRENCY"], $arVal)) echo " selected";?>><?echo htmlspecialcharsex($lcur_res["CURRENCY"].(!empty($lcur_res['FULL_NAME']) ? ' ('.$lcur_res['FULL_NAME'].')' : '')); ?></option>
-				<?endwhile;?>
-			</select>
+	<?
+	$arVal = array();
+	$strVal = COption::GetOptionString('catalog', 'allowed_currencies');
+	if ($strVal != '')
+	{
+		$arVal = array_fill_keys(explode(',', $strVal), true);
+	}
+	?><select name="allowed_currencies[]" multiple size="5"><?
+	$currencyIterator = CurrencyTable::getList(array(
+		'select' => array('CURRENCY', 'LANG_FORMAT.FULL_NAME'),
+		'filter' => array('LANG_FORMAT.LID' => LANGUAGE_ID),
+		'order' => array('SORT' => 'ASC', 'CURRENCY' => 'ASC')
+	));
+	while ($currency = $currencyIterator->fetch())
+	{
+		$currency['FULL_NAME'] = (string)$currency['CURRENCY_CURRENCY_LANG_FORMAT_FULL_NAME'];
+		?><option value="<? echo $currency["CURRENCY"]; ?>"<? echo (isset($arVal[$currency["CURRENCY"]]) ? ' selected' : ''); ?>><?
+		echo $currency['CURRENCY'];
+		if ($currency['FULL_NAME'] != '')
+			echo ' ('.htmlspecialcharsex($currency['FULL_NAME']).')'; ?></option><?
+	}
+	unset($currency, $currencyIterator);
+	?></select>
 		</td>
 	</tr>
-
 <?
 	$tabControl->BeginNextTab();
 	$arVATRef = CatalogGetVATArray(array(), true);
@@ -1488,7 +1529,7 @@ $viewedPeriod = (int)COption::GetOptionInt('catalog', 'viewed_period');
 	$rsIBlocks = CIBlock::GetList(array('IBLOCK_TYPE' => 'ASC','ID' => 'ASC'));
 	while ($arIBlock = $rsIBlocks->Fetch())
 	{
-		$arIBlock['ID'] = intval($arIBlock['ID']);
+		$arIBlock['ID'] = (int)$arIBlock['ID'];
 		if (!isset($arIBlockSitesList[$arIBlock['ID']]))
 		{
 			$arLIDList = array();
@@ -1536,10 +1577,10 @@ $viewedPeriod = (int)COption::GetOptionInt('catalog', 'viewed_period');
 	);
 	while ($arOneCatalog = $rsCatalogs->Fetch())
 	{
-		$arOneCatalog['IBLOCK_ID'] = intval($arOneCatalog['IBLOCK_ID']);
-		$arOneCatalog['VAT_ID'] = intval($arOneCatalog['VAT_ID']);
-		$arOneCatalog['PRODUCT_IBLOCK_ID'] = intval($arOneCatalog['PRODUCT_IBLOCK_ID']);
-		$arOneCatalog['SKU_PROPERTY_ID'] = intval($arOneCatalog['SKU_PROPERTY_ID']);
+		$arOneCatalog['IBLOCK_ID'] = (int)$arOneCatalog['IBLOCK_ID'];
+		$arOneCatalog['VAT_ID'] = (int)$arOneCatalog['VAT_ID'];
+		$arOneCatalog['PRODUCT_IBLOCK_ID'] = (int)$arOneCatalog['PRODUCT_IBLOCK_ID'];
+		$arOneCatalog['SKU_PROPERTY_ID'] = (int)$arOneCatalog['SKU_PROPERTY_ID'];
 
 		if (!CBXFeatures::IsFeatureEnabled('SaleRecurring') && 'Y' == $arOneCatalog['SUBSCRIPTION'])
 		{
@@ -1718,7 +1759,7 @@ function change_offers_ibtype(obj,ID)
 							}
 						}
 					}
-					?><option value="<? echo intval($value['ID']); ?>"<? echo ($value['ID'] == $res['OFFERS_IBLOCK_ID'] ? ' selected' : ''); ?>><? echo $value['FULL_NAME']; ?></option><?
+					?><option value="<? echo (int)$value['ID']; ?>"<? echo ($value['ID'] == $res['OFFERS_IBLOCK_ID'] ? ' selected' : ''); ?>><? echo $value['FULL_NAME']; ?></option><?
 				}
 				if (isset($value))
 					unset($value);
@@ -1763,7 +1804,7 @@ function change_offers_ibtype(obj,ID)
 			$dbUserGroups = CGroup::GetList(($b="c_sort"), ($o="asc"), array("ANONYMOUS" => "N"));
 			while ($arUserGroups = $dbUserGroups->Fetch())
 			{
-				$arUserGroups["ID"] = intval($arUserGroups["ID"]);
+				$arUserGroups["ID"] = (int)$arUserGroups["ID"];
 				if ($arUserGroups["ID"] == 2)
 					continue;
 			?>
@@ -1797,6 +1838,7 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 <?
 	$aTabs = array(
 		array("DIV" => "fedit2", "TAB" => Loc::getMessage("COP_TAB2_AGENT"), "ICON" => "catalog_settings", "TITLE" => Loc::getMessage("COP_TAB2_AGENT_TITLE")),
+		array("DIV" => "fedit4", "TAB" => Loc::getMessage("COP_TAB_RECALC"), "ICON" => "catalog_settings", "TITLE" => Loc::getMessage("COP_TAB_RECALC_TITLE")),
 	);
 	if ($strUseStoreControl === 'N' && !empty($arCatalogList))
 	{
@@ -1813,14 +1855,24 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 		{
 			iblockId = BX("catalogs_store_id").value;
 		}
-		var storeId = BX("stores_id").value;
 		var dateURL = {
-			'sessid': BX.bitrix_sessid(),
-			'iblockId': iblockId,
-			'action': action,
-			'storeId': storeId,
-			'elId': el.id
+			sessid: BX.bitrix_sessid(),
+			iblockId: iblockId,
+			action: action,
+			elId: el.id
 		};
+		if (action === 'clearStore')
+		{
+			var obStore = BX('stores_id');
+			if (!!obStore)
+			{
+				dateURL.storeId = obStore.value;
+			}
+			else
+			{
+				return;
+			}
+		}
 		el.disabled = true;
 		el.bxwaiter = (waiter_parent || document.body).appendChild(BX.create('DIV', {
 			props: {className: 'adm-btn-load-img'},
@@ -1856,13 +1908,13 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 <?
 	}
 
-	$tabControl = new CAdminTabControl("tabControl2", $aTabs, true, true);
+	$systemTabControl = new CAdminTabControl("tabControl2", $aTabs, true, true);
 
-	$tabControl->Begin();
-	$tabControl->BeginNextTab();
+	$systemTabControl->Begin();
+	$systemTabControl->BeginNextTab();
 ?><tr><td align="left"><?
 	$arAgentInfo = false;
-	$rsAgents = CAgent::GetList(array(),array('MODULE_ID' => 'catalog','NAME' => "CCatalog::PreGenerateXML(\"yandex\");"));
+	$rsAgents = CAgent::GetList(array(),array('MODULE_ID' => 'catalog','NAME' => 'CCatalog::PreGenerateXML("yandex");'));
 	if ($arAgent = $rsAgents->Fetch())
 	{
 		$arAgentInfo = $arAgent;
@@ -1903,7 +1955,20 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 ?><a href="/bitrix/admin/event_log.php?lang=<? echo LANGUAGE_ID; ?>&set_filter=Y<? echo CCatalogEvent::GetYandexAgentFilter(); ?>"><? echo Loc::getMessage('CAT_AGENT_EVENT_LOG_SHOW_ERROR')?></a>
 </td></tr>
 <?
-	if($strUseStoreControl === 'N' && !empty($arCatalogList))
+	$systemTabControl->BeginNextTab();
+?><tr><td align="left">
+	<h4 style="margin-top: 0;"><? echo Loc::getMessage('CAT_PROC_REINDEX_DISCOUNT'); ?></h4>
+	<input class="adm-btn-save" type="button" id="discount_reindex" value="<? echo Loc::getMessage('CAT_PROC_REINDEX_DISCOUNT_BTN'); ?>">
+	<p><? echo Loc::getMessage('CAT_PROC_REINDEX_DISCOUNT_ALERT'); ?></p><?
+	if (CBXFeatures::IsFeatureEnabled('CatCompleteSet'))
+	{
+	?><h4><? echo Loc::getMessage('CAT_PROC_REINDEX_SETS_AVAILABLE'); ?></h4>
+	<input class="adm-btn-save" type="button" id="sets_reindex" value="<? echo Loc::getMessage('CAT_PROC_REINDEX_SETS_AVAILABLE_BTN'); ?>">
+	<p><? echo Loc::getMessage('CAT_PROC_REINDEX_SETS_AVAILABLE_ALERT'); ?></p><?
+	}
+	?>
+</td></tr><?
+	if ($strUseStoreControl === 'N' && !empty($arCatalogList))
 	{
 		$userListID = array();
 		$strQuantityUser = '';
@@ -1913,17 +1978,17 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 		$strClearQuantityReservedDate = '';
 		$strClearStoreDate = '';
 
-		$clearQuantityUser = intval(COption::GetOptionInt('catalog', 'clear_quantity_user'));
+		$clearQuantityUser = (int)COption::GetOptionInt('catalog', 'clear_quantity_user');
 		if (0 > $clearQuantityUser)
 			$clearQuantityUser = 0;
 		$userListID[$clearQuantityUser] = true;
 
-		$clearQuantityReservedUser = intval(COption::GetOptionInt('catalog', 'clear_reserved_quantity_user'));
+		$clearQuantityReservedUser = (int)COption::GetOptionInt('catalog', 'clear_reserved_quantity_user');
 		if (0 > $clearQuantityReservedUser)
 			$clearQuantityReservedUser = 0;
 		$userListID[$clearQuantityReservedUser] = true;
 
-		$clearStoreUser = intval(COption::GetOptionInt('catalog', 'clear_store_user'));
+		$clearStoreUser = (int)COption::GetOptionInt('catalog', 'clear_store_user');
 		if (0 > $clearStoreUser)
 			$clearStoreUser = 0;
 		$userListID[$clearStoreUser] = true;
@@ -1949,7 +2014,7 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 			);
 			while ($arOneUser = $rsUsers->Fetch())
 			{
-				$arOneUser['ID'] = intval($arOneUser['ID']);
+				$arOneUser['ID'] = (int)$arOneUser['ID'];
 				$arUserList[$arOneUser['ID']] = '<a href="/bitrix/admin/user_edit.php?lang='.LANGUAGE_ID.'&ID='.$arOneUser['ID'].'">'.CUser::FormatName($strNameFormat, $arOneUser).'</a>';
 			}
 			if (isset($arUserList[$clearQuantityUser]))
@@ -1975,7 +2040,7 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 			$arStores[] = $arStore;
 		}
 
-		$tabControl->BeginNextTab();
+		$systemTabControl->BeginNextTab();
 	?>
 	<tr>
 		<td><?= Loc::getMessage("CAT_SELECT_CATALOG") ?>:</td>
@@ -2074,6 +2139,70 @@ BX.hint_replace(BX('hint_reservation'), '<? echo Loc::getMessage('CAT_ENABLE_RES
 <?
 		}
 	}
-	$tabControl->End();
+	$systemTabControl->End();
+?>
+<script type="text/javascript">
+function showDiscountReindex()
+{
+	var obDiscount, params;
+
+	params = {
+		bxpublic: 'Y',
+		sessid: BX.bitrix_sessid()
+	};
+
+	var obBtn = {
+		title: '<? echo CUtil::JSEscape(Loc::getMessage('CAT_POPUP_WINDOW_CLOSE_BTN')) ?>',
+		id: 'close',
+		name: 'close',
+		action: function () {
+			this.parentWindow.Close();
+		}
+	};
+
+	obDiscount = new BX.CAdminDialog({
+		'content_url': '/bitrix/admin/cat_discount_convert.php?lang=<? echo LANGUAGE_ID; ?>&format=Y',
+		'content_post': params,
+		'draggable': true,
+		'resizable': true,
+		'buttons': [obBtn]
+	});
+	obDiscount.Show();
+	return false;
+}
+function showSetsAvailableReindex()
+{
+	var obWindow, params;
+
+	params = {
+		bxpublic: 'Y',
+		sessid: BX.bitrix_sessid()
+	};
+
+	var obBtn = {
+		title: '<? echo CUtil::JSEscape(Loc::getMessage('CAT_POPUP_WINDOW_CLOSE_BTN')) ?>',
+		id: 'close',
+		name: 'close',
+		action: function () {
+			this.parentWindow.Close();
+		}
+	};
+
+	obWindow = new BX.CAdminDialog({
+		'content_url': '/bitrix/tools/catalog/sets_available.php?lang=<? echo LANGUAGE_ID; ?>',
+		'content_post': params,
+		'draggable': true,
+		'resizable': true,
+		'buttons': [obBtn]
+	});
+	obWindow.Show();
+	return false;
+}
+BX.ready(function(){
+	BX.bind(BX('discount_reindex'), 'click', showDiscountReindex);
+	BX.bind(BX('sets_reindex'), 'click', showSetsAvailableReindex);
+});
+</script>
+<?
 }
 ?>

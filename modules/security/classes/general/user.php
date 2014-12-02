@@ -1,172 +1,46 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use \Bitrix\Security\Mfa\Otp;
+use Bitrix\Security\Mfa\OtpException;
+
+/**
+ * @deprecated use \Bitrix\Security\Mfa\Otp
+ */
 class CSecurityUser
 {
 	const BX_SECURITY_SYNC_WINDOW = 15000;
 
+	/** @var \Bitrix\Security\Mfa\Otp[]*/
+	protected static $cacheOtp = array();
+
+	/**
+	 * @param int $userId
+	 * @return Otp
+	 */
+	public static function getCachedOtp($userId)
+	{
+		if (!isset(static::$cacheOtp[$userId]))
+		{
+			static::$cacheOtp[$userId] = Otp::getByUser($userId);
+		}
+
+		return static::$cacheOtp[$userId];
+	}
 	/**
 	 * @param array $arParams
 	 * @return bool
 	 */
-	public static function onBeforeUserLogin($arParams)
+	public static function onBeforeUserLogin(&$arParams)
 	{
-		/**
-		* @global CMain $APPLICATION
-		* @global CDataBase $DB
-		*/
-		global $DB, $APPLICATION;
-		$userId = self::getUserIdForLogin($arParams["LOGIN"]);
-		$userInfo = self::getSecurityUserInfo($userId, true);
-		if(!$userId || !$userInfo)
+		//compatibility with old forms
+		if (
+			$arParams['PASSWORD_ORIGINAL'] === 'Y'
+			&& preg_match('/(\d{6})$/D', $arParams["PASSWORD"], $arMatch)
+		)
 		{
-			//user not found or not use OTP
-			return true;
+			$arParams['OTP'] = $arMatch[1];
 		}
-
-		$isSuccess = false;
-		if(preg_match("/(\\d{6})$/", $arParams["PASSWORD"], $arMatch))
-		{
-			$bin_secret = pack('H*', $userInfo["SECRET"]);
-			$sync = $arMatch[1];
-			$cnt = intval($userInfo["COUNTER"])+1;
-			$window = COption::GetOptionInt("security", "hotp_user_window");
-
-			$i = 0;
-			while($i < $window)
-			{
-				if(CSecurityUser::HOTP($bin_secret, $cnt) == $sync)
-				{
-					$isSuccess = true;
-					$arParams["PASSWORD"] = substr($arParams["PASSWORD"], 0, -6);
-					$DB->Query("UPDATE b_sec_user SET COUNTER = ".$cnt." WHERE USER_ID = ".$userId);
-					break;
-				}
-				$cnt++;
-				$i++;
-			}
-		}
-
-		if(!$isSuccess)
-		{
-			$APPLICATION->ThrowException(GetMessage("WRONG_LOGIN"));
-			return false;
-		}
-
+		
 		return true;
-	}
-
-	/**
-	 * @param int $pUserId
-	 * @param bool $pActiveOnly
-	 * @return bool|array
-	 */
-	public static function getSecurityUserInfo($pUserId, $pActiveOnly = false)
-	{
-		/**	 @global CDataBase $DB */
-		global $DB;
-		$queryWhere = "USER_ID = ".intval($pUserId);
-		if($pActiveOnly)
-			$queryWhere .= " AND ACTIVE='Y'";
-
-		$rsKey = $DB->Query("SELECT * from b_sec_user WHERE ".$queryWhere);
-		$arKey = $rsKey->Fetch();
-		return $arKey;
-	}
-
-	/**
-	 * @param string $pLogin
-	 * @return int
-	 */
-	protected static function getUserIdForLogin($pLogin)
-	{
-		$selectedFields = array("ID");
-		$filter = array("LOGIN_EQUAL_EXACT" => $pLogin, "EXTERNAL_AUTH_ID" => "");
-		$dbUser = CUser::GetList($by = 'ID', $order = 'ASC', $filter, array("FIELDS" => $selectedFields));
-		$userId = 0;
-		if($dbUser)
-		{
-			$userInfo = $dbUser->Fetch();
-			$userId = $userInfo["ID"];
-		}
-		return $userId;
-	}
-
-	/**
-	 * @param int $pUserId
-	 * @return bool|CDBResult
-	 */
-	public static function deactivate($pUserId)
-	{
-		/** @global CDataBase $DB */
-		global $DB;
-		$res = $DB->Query("
-			UPDATE b_sec_user SET ACTIVE = 'N'
-			WHERE USER_ID = ".intval($pUserId)."
-		");
-		return $res;
-	}
-
-	/**
-	 * @param int $pUserId
-	 * @return bool|CDBResult
-	 */
-	public static function delete($pUserId)
-	{
-		/** @global CDataBase $DB */
-		global $DB;
-		$res = $DB->Query("
-			DELETE FROM b_sec_user
-			WHERE USER_ID = ".intval($pUserId)."
-		");
-		return $res;
-	}
-
-	/**
-	 * @param string $pBinSecret
-	 * @param string $pSync1
-	 * @param string $pSync2
-	 * @param array $pMessages
-	 * @return int
-	 */
-	public static function getSyncCounter($pBinSecret, $pSync1, $pSync2, &$pMessages)
-	{
-		if(CSecurityUser::HOTP($pBinSecret, 0) === false)
-		{
-			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR2"));
-			return 0;
-		}
-
-		if(!$pSync1)
-			$pMessages[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_EMPTY"));
-		elseif(!preg_match("/^\d{6}$/", $pSync1))
-			$pMessages[] = array("id"=>"security_SYNC1", "text" => GetMessage("SECURITY_USER_ERROR_PASS1_INVALID"));
-
-		if(!$pSync2)
-			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_EMPTY"));
-		elseif(!preg_match("/^\d{6}$/", $pSync2))
-			$pMessages[] = array("id"=>"security_SYNC2", "text" => GetMessage("SECURITY_USER_ERROR_PASS2_INVALID"));
-
-		$cnt = 0;
-		for($i = 0; $i < self::BX_SECURITY_SYNC_WINDOW; $i++)
-		{
-			if(
-				CSecurityUser::HOTP($pBinSecret, $cnt) == $pSync1
-				&& CSecurityUser::HOTP($pBinSecret, $cnt+1) == $pSync2
-			)
-			{
-				$cnt++;
-				break;
-			}
-			$cnt++;
-		}
-
-		if($i == self::BX_SECURITY_SYNC_WINDOW)
-		{
-			$pMessages[] = array("id"=>"security_SECRET", "text" => GetMessage("SECURITY_USER_ERROR_SYNC_ERROR"));
-			$cnt = 0;
-		}
-
-		return $cnt;
 	}
 
 	/**
@@ -175,147 +49,108 @@ class CSecurityUser
 	 */
 	public static function update($arFields)
 	{
-		/**
-		 * @global CMain $APPLICATION
-		 * @global CDataBase $DB
-		 */
-		global $DB, $APPLICATION;
-		$aMsg = array();
+		global $USER;
+		$userId = intval($arFields['USER_ID']);
+		$result = null;
 
-		$USER_ID = intval($arFields["USER_ID"]);
-		if($USER_ID)
+		if (!$userId)
+			return true;
+
+		$otp = Otp::getByUser($userId);
+		$canAdminOtp =
+			!Otp::isMandatoryUsing() && $userId == $USER->GetID()
+			|| $USER->CanDoOperation('security_edit_user_otp')
+		;
+
+		try
 		{
-			if($arFields["ACTIVE"]!=="Y")
+			if (
+				$arFields['ACTIVE'] !== 'Y'
+				&& $otp->isActivated()
+			)
 			{
-				CSecurityUser::deactivate($USER_ID);
+				if ($canAdminOtp)
+				{
+					$otp->deactivate();
+					return true;
+				}
+				return false;
 			}
-			else
+
+			if (
+				$arFields['DEACTIVATE_UNTIL'] > 0
+				&& $otp->isActivated()
+			)
 			{
-				$secret = substr(trim($arFields["SECRET"]), 0, 64);
-				if(strlen($secret) <= 0)
+				if ($canAdminOtp)
 				{
-					CSecurityUser::delete($USER_ID);
+					$otp->deactivate((int) $arFields['DEACTIVATE_UNTIL']);
+					return true;
 				}
-				else
-				{
-					$arKey = self::getSecurityUserInfo($USER_ID);
-					if($arKey && ($arKey["SECRET"] == $secret))
-						$cnt = intval($arKey["COUNTER"]);
-					else
-						$cnt = 0;
-
-					$sync1 = trim($arFields["SYNC1"]);
-					$sync2 = trim($arFields["SYNC2"]);
-
-					if($sync1 || $sync2)
-					{
-						$bin_secret = pack('H*', $secret);
-						$cnt = CSecurityUser::getSyncCounter($bin_secret, $sync1, $sync2, $aMsg);
-					}
-
-					if($arKey)
-					{
-						$DB->Query("
-							UPDATE b_sec_user SET
-								ACTIVE = 'Y',
-								SECRET = '".$DB->ForSQL($secret)."',
-								COUNTER = ".$cnt."
-							WHERE USER_ID = ".$USER_ID."
-						");
-					}
-					else
-					{
-						$DB->Query("
-							INSERT INTO b_sec_user (
-								USER_ID, ACTIVE, SECRET, COUNTER
-							) VALUES (
-								".$USER_ID.", 'Y', '".$DB->ForSQL($secret)."', ".$cnt.")
-						");
-					}
-				}
+				return false;
 			}
+
+			$secret = substr(trim($arFields['SECRET']), 0, 64);
+			if (!$secret)
+			{
+				if ($canAdminOtp)
+				{
+					$otp->delete();
+					return true;
+				}
+				return false;
+			}
+
+			if ($otp->getHexSecret() != $secret)
+			{
+				// We want to connect new device
+				$binarySecret = pack('H*', $secret);
+				$otp->regenerate($binarySecret);
+			}
+			if ($arFields['TYPE'])
+			{
+				$otp->setType($arFields['TYPE']);
+			}
+
+			$sync1 = trim($arFields['SYNC1']);
+			$sync2 = trim($arFields['SYNC2']);
+
+			if ($sync1 || $sync2)
+			{
+				$otp->syncParameters($sync1, $sync2);
+			}
+
+			$otp
+				->setActive(true)
+				->save();
 		}
-
-		if(count($aMsg) > 0)
+		catch (OtpException $e)
 		{
-			$e = new CAdminException($aMsg);
-			$APPLICATION->ThrowException($e);
+			/** @global CMain $APPLICATION */
+			global $APPLICATION;
+			$ex = array();
+			$ex[] = array(
+				'id' => 'security_otp',
+				'text' => $e->getMessage()
+			);
+
+			$APPLICATION->ThrowException(
+				new CAdminException($ex)
+			);
 			return false;
 		}
-		return true;
 
+		return true;
 	}
 
 	/**
-	 * @param $pId
+	 * @param $userId
 	 * @return bool
 	 */
-	public static function onUserDelete($pId)
+	public static function onUserDelete($userId)
 	{
-		/** @global CDataBase $DB */
-		global $DB;
-		$DB->Query("DELETE from b_sec_user WHERE USER_ID = ".intval($pId));
+		\Bitrix\Security\Mfa\UserTable::delete($userId);
 		return true;
-	}
-
-	/**
-	 * @param $pData
-	 * @param $pKey
-	 * @return string
-	 */
-	protected static function hmacsha1($pData, $pKey)
-	{
-		if(function_exists("hash_hmac"))
-			return hash_hmac("sha1", $pData, $pKey);
-
-		if(strlen($pKey)>64)
-			$pKey=pack('H*', sha1($pKey));
-
-		$pKey = str_pad($pKey, 64, chr(0x00));
-		$ipad = str_repeat(chr(0x36), 64);
-		$opad = str_repeat(chr(0x5c), 64);
-		$hmac = pack('H*', sha1(($pKey^$opad).pack('H*', sha1(($pKey^$ipad).$pData))));
-		return bin2hex($hmac);
-	}
-
-	/**
-	 * @param $pData
-	 * @param $pKey
-	 * @return bool|string
-	 */
-	protected static function hmacsha256($pData, $pKey)
-	{
-		if(function_exists("hash_hmac"))
-			return hash_hmac("sha256", $pData, $pKey);
-		else
-			return false;
-	}
-
-	/**
-	 * @param $pSecret
-	 * @param $pCount
-	 * @param int $pDigits
-	 * @return bool|int
-	 */
-	protected static function HOTP($pSecret, $pCount, $pDigits = 6)
-	{
-		if(CUtil::BinStrlen($pSecret) <= 25)
-			$sha_hash = self::hmacsha1(pack("NN", 0, $pCount), $pSecret);
-		else
-			$sha_hash = self::hmacsha256(pack("NN", 0, $pCount), $pSecret);
-
-		if($sha_hash !== false)
-		{
-			$dwOffset = hexdec(substr($sha_hash, -1, 1));
-			$dbc1 = hexdec(substr($sha_hash, $dwOffset * 2, 8 ));
-			$dbc2 = $dbc1 & 0x7fffffff;
-			$hotp = $dbc2 % pow(10, $pDigits);
-			return str_pad($hotp, $pDigits, "0", STR_PAD_LEFT);
-		}
-		else
-		{
-			return false;
-		}
 	}
 
 	/**
@@ -343,14 +178,25 @@ class CSecurityUser
 	 */
 	public static function setActive($pActive = false)
 	{
+		$otpRecheckAgent = 'Bitrix\Security\Mfa\OtpEvents::onRecheckDeactivate();';
 		if($pActive)
 		{
 			if(!CSecurityUser::isActive())
 			{
 				RegisterModuleDependences("main", "OnBeforeUserLogin", "security", "CSecurityUser", "OnBeforeUserLogin", "100");
+				RegisterModuleDependences("main", "OnAfterUserLogout", "security", "CSecurityUser", "OnAfterUserLogout", "100");
+				CAgent::RemoveAgent($otpRecheckAgent, "security");
+				CAgent::Add(array(
+					"NAME" => $otpRecheckAgent,
+					"MODULE_ID" => "security",
+					"ACTIVE" => "Y",
+					"AGENT_INTERVAL" => 3600,
+					"IS_PERIOD" => "N"
+				));
 				$f = fopen($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/options_user_settings.php", "w");
 				fwrite($f, "<?include(\$_SERVER[\"DOCUMENT_ROOT\"].\"/bitrix/modules/security/options_user_settings_1.php\");?>");
 				fclose($f);
+				COption::SetOptionString('security', 'otp_enabled', 'Y');
 			}
 		}
 		else
@@ -358,9 +204,186 @@ class CSecurityUser
 			if(CSecurityUser::isActive())
 			{
 				UnRegisterModuleDependences("main", "OnBeforeUserLogin", "security", "CSecurityUser", "OnBeforeUserLogin");
+				UnRegisterModuleDependences("main", "OnAfterUserLogout", "security", "CSecurityUser", "OnAfterUserLogout");
+				CAgent::RemoveAgent($otpRecheckAgent, "security");
 				unlink($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/security/options_user_settings.php");
+				COption::SetOptionString('security', 'otp_enabled', 'N');
 			}
 		}
 	}
 
+	public static function OnAfterUserLogout()
+	{
+		/** @global \CMain $APPLICATION */
+		global $APPLICATION;
+
+		$APPLICATION->set_cookie(Otp::SKIP_COOKIE, '', false, '/', false, false, true, false, true);
+
+		// Clear deferred params
+		Otp::setDeferredParams(null);
+	}
+
+	public static function IsOtpMandatory()
+	{
+		$isOtpMandatory = Otp::isMandatoryUsing();
+		return ($isOtpMandatory ? true : false);
+	}
+
+	public static function IsUserOtpActive($userId)
+	{
+		if (!intval($userId))
+			return false;
+
+		$otp = static::getCachedOtp($userId);
+		return ($otp->isActivated() ? true : false);
+	}
+
+	public static function IsUserSkipMandatoryRights($userId)
+	{
+		if (!intval($userId))
+			return false;
+
+		if (!static::IsOtpMandatory())
+			return true;
+
+		$otp = static::getCachedOtp($userId);
+		return $otp->canSkipMandatoryByRights();
+	}
+
+	public static function IsUserOtpExist($userId)
+	{
+		if (!intval($userId))
+			return false;
+
+		$otp = static::getCachedOtp($userId);
+		return ($otp->isInitialized() ? true : false);
+	}
+
+	public static function DeactivateUserOtp($userId, $days = 0)
+	{
+		/** @global CUser $USER */
+		global $USER;
+
+		if (!intval($userId))
+			return false;
+
+		$isOtpMandatory = self::IsOtpMandatory();
+
+		if (
+			!$isOtpMandatory && $userId == $USER->GetID()
+			|| $USER->CanDoOperation('security_edit_user_otp')
+		)
+		{
+			$otp = static::getCachedOtp($userId);
+			try
+			{
+				$otp->deactivate($days);
+				return true;
+			}
+			catch (OtpException $e)
+			{
+				return false;
+			}
+
+		}
+
+		return false;
+	}
+
+	public static function DeferUserOtp($userId, $days = 0)
+	{
+		/** @global CUser $USER */
+		global $USER;
+
+		if (!intval($userId))
+			return false;
+
+		$isOtpMandatory = self::IsOtpMandatory();
+
+		if (
+			$isOtpMandatory
+			&& $USER->CanDoOperation('security_edit_user_otp')
+		)
+		{
+			$otp = static::getCachedOtp($userId);
+			try
+			{
+				$otp->defer($days);
+				return true;
+			}
+			catch (OtpException $e)
+			{
+				return false;
+			}
+
+		}
+
+		return false;
+	}
+
+	public static function ActivateUserOtp($userId)
+	{
+		/** @global CUser $USER */
+		global $USER;
+
+		if (!intval($userId))
+			return false;
+
+		if (
+			$userId == $USER->GetID()
+			|| $USER->CanDoOperation('security_edit_user_otp')
+		)
+		{
+			$otp = static::getCachedOtp($userId);
+			try
+			{
+				$otp->activate();
+				return true;
+			}
+			catch (OtpException $e)
+			{
+				return false;
+			}
+		}
+
+		return false;
+	}
+
+	public static function GetDeactivateUntil($userId)
+	{
+		/** @global CUser $USER */
+		global $USER;
+
+		if (!intval($userId))
+			return false;
+
+		if (
+			$userId == $USER->GetID()
+			|| $USER->CanDoOperation('security_edit_user_otp')
+		)
+		{
+			$otp = static::getCachedOtp($userId);
+			return	$otp->getDeactivateUntil();
+		}
+
+		return false;
+	}
+
+	public static function GetInitialDate($userId)
+	{
+		/** @global CUser $USER */
+		global $USER;
+
+		if (!intval($userId))
+			return false;
+
+		$otp = static::getCachedOtp($userId);
+		if ($otp->isActivated())
+		{
+			$datetime = $otp->getInitialDate();
+			return $datetime;
+		}
+
+		return false;
+	}
 }

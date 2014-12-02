@@ -9,7 +9,7 @@ class CUserTypeFile
 			"USER_TYPE_ID" => "file",
 			"CLASS_NAME" => "CUserTypeFile",
 			"DESCRIPTION" => GetMessage("USER_TYPE_FILE_DESCRIPTION"),
-			"BASE_TYPE" => "file",
+			"BASE_TYPE" => "file"
 		);
 	}
 

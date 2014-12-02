@@ -88,7 +88,7 @@ class CBPDocument
 	* @param mixed $documentId - код документа в виде массива array(модуль, сущность, код_документа_в_модуле). Если новый документ, то null.
 	* @return array - массив рабочих потоков и шаблонов.
 	*/
-public static 	public static function GetDocumentStates($documentType, $documentId = null)
+public static function GetDocumentStates($documentType, $documentId = null)
 	{
 		$arDocumentStates = array();
 
@@ -116,7 +116,7 @@ public static 	public static function GetDocumentStates($documentType, $document
 		return $arDocumentState;
 	}
 
-public static 	public static function MergeDocuments($firstDocumentId, $secondDocumentId)
+public static function MergeDocuments($firstDocumentId, $secondDocumentId)
 	{
 		CBPStateService::MergeStates($firstDocumentId, $secondDocumentId);
 		CBPHistoryService::MergeHistory($firstDocumentId, $secondDocumentId);
@@ -130,7 +130,7 @@ public static 	public static function MergeDocuments($firstDocumentId, $secondDo
 	* @param array $arState - состояние рабочего потока.
 	* @return array - массив событий вида array(array("NAME" => событие, "TITLE" => название_события), ...).
 	*/
-public static 	public static function GetAllowableEvents($userId, $arGroups, $arState)
+public static function GetAllowableEvents($userId, $arGroups, $arState)
 	{
 		if (!is_array($arState))
 			throw new Exception("arState");
@@ -164,7 +164,7 @@ public static 	public static function GetAllowableEvents($userId, $arGroups, $ar
 		return $arResult;
 	}
 
-public static 	public static function AddDocumentToHistory($parameterDocumentId, $name, $userId)
+public static function AddDocumentToHistory($parameterDocumentId, $name, $userId)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -217,7 +217,7 @@ public static 	public static function AddDocumentToHistory($parameterDocumentId,
 	* @param array $arStates - массив состояний рабочих потоков документа.
 	* @return mixed - массив доступных операций или null.
 	*/
-public static 	public static function GetAllowableOperations($userId, $arGroups, $arStates)
+public static function GetAllowableOperations($userId, $arGroups, $arStates)
 	{
 		if (!is_array($arStates))
 			throw new Exception("arStates");
@@ -273,7 +273,7 @@ public static 	public static function GetAllowableOperations($userId, $arGroups,
 	* @param array $arStates - массив состояний рабочих потоков документа.
 	* @return bool
 	*/
-public static 	public static function CanOperate($operation, $userId, $arGroups, $arStates)
+public static function CanOperate($operation, $userId, $arGroups, $arStates)
 	{
 		$operation = trim($operation);
 		if (strlen($operation) <= 0)
@@ -295,7 +295,7 @@ public static 	public static function CanOperate($operation, $userId, $arGroups,
 	* @param array $arErrors - массив ошибок, которые произошли при запуске рабочего потока в виде array(array("code" => код_ошибки, "message" => сообщение, "file" => путь_к_файлу), ...).
 	* @return string - код запущенного рабочего потока.
 	*/
-public static 	public static function StartWorkflow($workflowTemplateId, $documentId, $arParameters, &$arErrors)
+public static function StartWorkflow($workflowTemplateId, $documentId, $arParameters, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -333,7 +333,7 @@ public static 	public static function StartWorkflow($workflowTemplateId, $docume
 	* @param array $arParameters - массив параметров запуска рабочего потока.
 	* @param array $arErrors - массив ошибок, которые произошли при запуске рабочего потока в виде array(array("code" => код_ошибки, "message" => сообщение, "file" => путь_к_файлу), ...).
 	*/
-	public static public static function AutoStartWorkflows($documentType, $autoExecute, $documentId, $arParameters, &$arErrors)
+public static function AutoStartWorkflows($documentType, $autoExecute, $documentId, $arParameters, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -378,7 +378,7 @@ public static 	public static function StartWorkflow($workflowTemplateId, $docume
 	*
 	*
 	*
-	* @param string $workflowId  Код рабочего потока </ht
+	* @param string $workflowId  Код рабочего потока </h
 	*
 	*
 	*
@@ -416,7 +416,7 @@ public static 	public static function StartWorkflow($workflowTemplateId, $docume
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/SendExternalEvent.php
 	* @author Bitrix
 	*/
-	public static 	public function SendExternalEvent($workflowId, $workflowEvent, $arParameters, &$arErrors)
+	public static function SendExternalEvent($workflowId, $workflowEvent, $arParameters, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -441,7 +441,7 @@ public static 	public static function StartWorkflow($workflowTemplateId, $docume
 	* @param array $documentId - код документа в виде массива array(модуль, сущность, код_документа_в_модуле).
 	* @param array $arErrors - массив ошибок, которые произошли при остановке рабочего потока в виде array(array("code" => код_ошибки, "message" => сообщение, "file" => путь_к_файлу), ...).
 	*/
-public static 	public static function TerminateWorkflow($workflowId, $documentId, &$arErrors)
+public static function TerminateWorkflow($workflowId, $documentId, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -473,7 +473,7 @@ public static 	public static function TerminateWorkflow($workflowId, $documentId
 	* @param array $documentId - код документа в виде массива array(модуль, сущность, код_документа_в_модуле).
 	* @param array $arErrors - массив ошибок, которые произошли при удалении в виде array(array("code" => код_ошибки, "message" => сообщение, "file" => путь_к_файлу), ...).
 	*/
-	ppublic static ublic static function OnDocumentDelete($documentId, &$arErrors)
+	public static function OnDocumentDelete($documentId, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -491,7 +491,7 @@ public static 	public static function TerminateWorkflow($workflowId, $documentId
 		CBPHistoryService::DeleteByDocument($documentId);
 	}
 
-public static 	public static function PostTaskForm($arTask, $userId, $arRequest, &$arErrors, $userName = "")
+public static function PostTaskForm($arTask, $userId, $arRequest, &$arErrors, $userName = "")
 	{
 		return CBPActivity::CallStaticMethod(
 			$arTask["ACTIVITY"],
@@ -506,7 +506,7 @@ public static 	public static function PostTaskForm($arTask, $userId, $arRequest,
 		);
 	}
 
-public static 	public static function ShowTaskForm($arTask, $userId, $userName = "", $arRequest = null)
+public static function ShowTaskForm($arTask, $userId, $userName = "", $arRequest = null)
 	{
 		return CBPActivity::CallStaticMethod(
 			$arTask["ACTIVITY"],
@@ -528,7 +528,7 @@ public static 	public static function ShowTaskForm($arTask, $userId, $userName =
 	* @param array $arErrors - массив ошибок, которые произошли при выполнении в виде array(array("code" => код_ошибки, "message" => сообщение, "parameter" => название_параметра, "file" => путь_к_файлу), ...).
 	* @return array - массив корректных значений параметров запуска рабочего потока в виде array(код_параметра => значение, ...)
 	*/
-public static 	public static function StartWorkflowParametersValidate($templateId, $arWorkflowParameters, $documentType, &$arErrors)
+public static function StartWorkflowParametersValidate($templateId, $arWorkflowParameters, $documentType, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -598,7 +598,7 @@ public static 	public static function StartWorkflowParametersValidate($templateI
 	* @param string $formName - название формы, в которой выводится форма сбора значений.
 	* @param bool $bVarsFromForm - равно false в случае первого открытия формы, иначе - true.
 	*/
-public static 	public static function StartWorkflowParametersShow($templateId, $arWorkflowParameters, $formName, $bVarsFromForm, $documentType = null)
+public static function StartWorkflowParametersShow($templateId, $arWorkflowParameters, $formName, $bVarsFromForm, $documentType = null)
 	{
 		$templateId = intval($templateId);
 		if ($templateId <= 0)
@@ -656,7 +656,7 @@ public static 	public static function StartWorkflowParametersShow($templateId, $
 		}
 	}
 
-	public static public static function AddShowParameterInit($module, $type, $document_type, $entity = "")
+	public static function AddShowParameterInit($module, $type, $document_type, $entity = "")
 	{
 		CUtil::InitJSCore(array("window", "ajax"));
 ?>
@@ -740,7 +740,7 @@ function BPAShowSelector(id, type, mode, arCurValues)
 <?
 	}
 
-public static 	public static function ShowParameterField($type, $name, $values, $arParams = Array())
+public static function ShowParameterField($type, $name, $values, $arParams = Array())
 	{
 		/*
 		"string" => "Строка",
@@ -801,7 +801,7 @@ public static 	public static function ShowParameterField($type, $name, $values, 
 		return $s;
 	}
 
-public static 	public static function _ReplaceTaskURL($str, $documentType)
+public static function _ReplaceTaskURL($str, $documentType)
 	{
 		return str_replace(
 			Array('#HTTP_HOST#', '#TASK_URL#'),
@@ -810,7 +810,7 @@ public static 	public static function _ReplaceTaskURL($str, $documentType)
 			);
 	}
 
-public static 	public static function AddDefaultWorkflowTemplates($documentType, $additionalModuleId = null)
+public static function AddDefaultWorkflowTemplates($documentType, $additionalModuleId = null)
 	{
 		if (!empty($additionalModuleId))
 		{
@@ -888,7 +888,7 @@ public static 	public static function AddDefaultWorkflowTemplates($documentType,
 	* @param array $documentType - код типа документа в виде массива array(модуль, сущность, код_типа_документа_в_модуле).
 	* @return array - массив шаблонов рабочих потоков.
 	*/
-public static 	public static function GetWorkflowTemplatesForDocumentType($documentType)
+public static function GetWorkflowTemplatesForDocumentType($documentType)
 	{
 		$arResult = array();
 
@@ -935,7 +935,7 @@ public static 	public static function GetWorkflowTemplatesForDocumentType($docum
 		return $arResult;
 	}
 
-public static 	public static function GetNumberOfWorkflowTemplatesForDocumentType($documentType)
+public static function GetNumberOfWorkflowTemplatesForDocumentType($documentType)
 	{
 		$n = CBPWorkflowTemplateLoader::GetList(
 			array(),
@@ -987,7 +987,7 @@ public static 	public static function GetNumberOfWorkflowTemplatesForDocumentTyp
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/DeleteWorkflowTemplate.php
 	* @author Bitrix
 	*/
-	public static 	public static function DeleteWorkflowTemplate($id, $documentType, &$arErrors)
+	public static function DeleteWorkflowTemplate($id, $documentType, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -1031,7 +1031,6 @@ public static 	public static function GetNumberOfWorkflowTemplatesForDocumentTyp
 	* @param array $arFields - массив новых значений параметров шаблона рабочего потока.
 	* @param array $arErrors - массив ошибок, которые произошли при выполнении в виде array(array("code" => код_ошибки, "message" => сообщение, "file" => путь_к_файлу), ...).
 	*/
-	p
 	/**
 	* <p>Метод изменяет параметры шаблона бизнес-процесса.</p>
 	*
@@ -1070,7 +1069,7 @@ public static 	public static function GetNumberOfWorkflowTemplatesForDocumentTyp
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/UpdateWorkflowTemplate.php
 	* @author Bitrix
 	*/
-	ublic static function UpdateWorkflowTemplate($id, $documentType, $arFields, &$arErrors)
+	public static function UpdateWorkflowTemplate($id, $documentType, $arFields, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -1115,7 +1114,7 @@ public static 	public static function GetNumberOfWorkflowTemplatesForDocumentTyp
 	* @param array $arParameters - ассициативный массив вспомогательных параметров. Используется для того, чтобы не рассчитывать заново те вычисляемые значения, которые уже известны на момент вызова метода. Стандартными являются ключи массива DocumentStates - массив состояний рабочих потоков данного документа, WorkflowId - код рабочего потока (если требуется проверить операцию на одном рабочем потоке). Массив может быть дополнен другими произвольными ключами.
 	* @return bool
 	*/
-public static 	public static function CanUserOperateDocument($operation, $userId, $parameterDocumentId, $arParameters = array())
+public static function CanUserOperateDocument($operation, $userId, $parameterDocumentId, $arParameters = array())
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -1137,7 +1136,7 @@ public static 	public static function CanUserOperateDocument($operation, $userId
 	* @param array $arParameters - ассициативный массив вспомогательных параметров. Используется для того, чтобы не рассчитывать заново те вычисляемые значения, которые уже известны на момент вызова метода. Стандартными являются ключи массива DocumentStates - массив состояний рабочих потоков данного документа, WorkflowId - код рабочего потока (если требуется проверить операцию на одном рабочем потоке). Массив может быть дополнен другими произвольными ключами.
 	* @return bool
 	*/
-public static 	public static function CanUserOperateDocumentType($operation, $userId, $parameterDocumentType, $arParameters = array())
+public static function CanUserOperateDocumentType($operation, $userId, $parameterDocumentType, $arParameters = array())
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
@@ -1156,7 +1155,7 @@ public static 	public static function CanUserOperateDocumentType($operation, $us
 	* @param array $parameterDocumentId - код документа в виде массива array(модуль, сущность, код_документа_в_модуле).
 	* @return string - ссылка на страницу документа в административной части.
 	*/
-public static 	public static function GetDocumentAdminPage($parameterDocumentId)
+public static function GetDocumentAdminPage($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -1185,7 +1184,7 @@ public static 	public static function GetDocumentAdminPage($parameterDocumentId)
 	* @param string $workflowId - код рабочего потока.
 	* @return array - массив заданий.
 	*/
-public static 	public static function GetUserTasksForWorkflow($userId, $workflowId)
+public static function GetUserTasksForWorkflow($userId, $workflowId)
 	{
 		$userId = intval($userId);
 		if ($userId <= 0)
@@ -1210,18 +1209,18 @@ public static 	public static function GetUserTasksForWorkflow($userId, $workflow
 		return $arResult;
 	}
 
-public static 	public static function PrepareFileForHistory($documentId, $fileId, $historyIndex)
+public static function PrepareFileForHistory($documentId, $fileId, $historyIndex)
 	{
 		return CBPHistoryService::PrepareFileForHistory($documentId, $fileId, $historyIndex);
 	}
 
-public static 	public static function IsAdmin()
+public static function IsAdmin()
 	{
 		global $APPLICATION;
 		return ($APPLICATION->GetGroupRight("bizproc") >= "W");
 	}
 
-public static 	public static function GetDocumentFromHistory($historyId, &$arErrors)
+public static function GetDocumentFromHistory($historyId, &$arErrors)
 	{
 		$arErrors = array();
 
@@ -1243,7 +1242,7 @@ public static 	public static function GetDocumentFromHistory($historyId, &$arErr
 		}
 	}
 
-public static 	public static function GetAllowableUserGroups($parameterDocumentType)
+public static function GetAllowableUserGroups($parameterDocumentType)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
@@ -1262,7 +1261,7 @@ public static 	public static function GetAllowableUserGroups($parameterDocumentT
 		return array();
 	}
 
-public static 	public static function IsExpression($value)
+public static function IsExpression($value)
 	{
 		return is_string($value) && (preg_match('/^\s*=/', $value) === 1 || preg_match('/^\{=[a-z0-9_]+:[a-z0-9_]+\}$/i', $value) === 1);
 	}

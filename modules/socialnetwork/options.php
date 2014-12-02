@@ -6,19 +6,23 @@ CJSCore::Init(array("access"));
 $SONET_RIGHT = $APPLICATION->GetGroupRight($module_id);
 if ($SONET_RIGHT>="R") :
 
-global $MESS;
-include(GetLangFileName($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/main/lang/", "/options.php"));
-include(GetLangFileName($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/lang/", "/options.php"));
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/main/options.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/main/admin/settings.php');
+IncludeModuleLangFile(__FILE__);
 
-include_once($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/include.php");
+include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/include.php");
 
 if ($REQUEST_METHOD=="GET" && strlen($RestoreDefaults)>0 && $SONET_RIGHT=="W" && check_bitrix_sessid())
 {
 	COption::RemoveOption("socialnetwork");
 	$z = CGroup::GetList($v1="id",$v2="asc", array("ACTIVE" => "Y", "ADMIN" => "N"));
 	while($zr = $z->Fetch())
+	{
 		$APPLICATION->DelGroupRight($module_id, array($zr["ID"]));
+	}
 }
+
+$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 
 $arUserPermsVar = array(
 	SONET_RELATIONS_TYPE_NONE => GetMessage("SONET_PVU_NONE"),
@@ -41,13 +45,8 @@ $bIntranet = IsModuleInstalled('intranet');
 $arFeatures = array(
 	"forum" => GetMessage("SONET_FEATURE_FORUM"),
 	"blog" => GetMessage("SONET_FEATURE_BLOG"),
-//	"microblog" => GetMessage("SONET_FEATURE_MICROBLOG"),
 	"photo" => GetMessage("SONET_FEATURE_PHOTO"),
 );
-
-
-if (IsModuleInstalled('intranet'))
-	$bIntranet = true;
 
 $arTooltipFields = array(
 	"LOGIN" => GetMessage("SONET_FIELD_LOGIN"),
@@ -107,6 +106,7 @@ while ($res = $db_res->GetNext())
 	$arRatings[$res["ID"]] = "[ ".$res["ID"]." ] ".$res["NAME"];
 
 if ($bIntranet)
+{
 	$arTooltipFieldsDefault = array(
 		"EMAIL",
 		"WORK_PHONE",
@@ -115,7 +115,9 @@ if ($bIntranet)
 		"WORK_COMPANY",
 		"WORK_POSITION",
 	);
+}
 else
+{
 	$arTooltipFieldsDefault = array(
 		"PERSONAL_ICQ",
 		"PERSONAL_BIRTHDAY",
@@ -124,34 +126,42 @@ else
 		"WORK_COMPANY",
 		"WORK_POSITION"
 	);
+}
 
 if ($bIntranet)
+{
 	$arTooltipPropertiesDefault = array(
 		"UF_DEPARTMENT",
 		"UF_PHONE_INNER",
 		"UF_SKYPE",
 	);
+}
 else
+{
 	$arTooltipPropertiesDefault = array(
 		"UF_SKYPE",
 	);
+}
 
 $arTooltipFieldsDefault = serialize($arTooltipFieldsDefault);
 $arTooltipPropertiesDefault = serialize($arTooltipPropertiesDefault);
 
 if ($bIntranet)
 {
-//	$arFeatures["files"] = GetMessage("SONET_FEATURE_FILES");
 	$arFeatures["tasks"] = GetMessage("SONET_FEATURE_TASKS");
 }
 
 $bCalendar = ((IsModuleInstalled("calendar") || $bIntranet)	&& CBXFeatures::IsFeatureEditable("calendar"));
 
 if ($bCalendar)
+{
 	$arFeatures["calendar"] = GetMessage("SONET_FEATURE_CALENDAR");
+}
 
 if (IsModuleInstalled('search'))
+{
 	$arFeatures["search"] = GetMessage("SONET_FEATURE_SEARCH");
+}
 
 if (!function_exists('set_valign'))
 {
@@ -191,23 +201,25 @@ $arAllOptionsUsers = array(
 	array("default_user_viewfriends", GetMessage("SONET_USER_OPERATIONS_viewfriends"), SONET_RELATIONS_TYPE_ALL, Array("select_user_perm")),
 	array("default_user_viewgroups", GetMessage("SONET_USER_OPERATIONS_viewgroups"), SONET_RELATIONS_TYPE_ALL, Array("select_user_perm")),
 	array("default_user_viewprofile", GetMessage("SONET_USER_OPERATIONS_viewprofile"), SONET_RELATIONS_TYPE_ALL, Array("select_user_perm")),
-	array("allow_forum_user", GetMessage("SONET_ALLOW_FORUM_USER"), "Y", Array("checkbox")),
-	//array("allow_blog_user", GetMessage("SONET_ALLOW_BLOG_USER"), "Y", Array("checkbox")),
-	//array("allow_microblog_user", GetMessage("SONET_ALLOW_MICROBLOG_USER"), "Y", Array("checkbox")),
-	array("allow_photo_user", GetMessage("SONET_ALLOW_PHOTO_USER"), "Y", Array("checkbox")),
+	array("allow_forum_user", GetMessage("SONET_ALLOW_FORUM_USER"), "Y", Array("checkbox"), "showHideTab", "opt_user_feature_forum"),
+	array("allow_photo_user", GetMessage("SONET_ALLOW_PHOTO_USER"), "Y", Array("checkbox"), "showHideTab", "opt_user_feature_photo"),
 );
 
 if ($bIntranet)
 {
-	$arAllOptionsUsers[] = array("allow_files_user", GetMessage("SONET_ALLOW_FILES_USER"), "Y", Array("checkbox"));
-	$arAllOptionsUsers[] = array("allow_tasks_user", GetMessage("SONET_ALLOW_TASKS_USER"), "Y", Array("checkbox"));
+	$arAllOptionsUsers[] = array("allow_files_user", GetMessage("SONET_ALLOW_FILES_USER"), "Y", Array("checkbox"), "showHideTab", "opt_user_feature_files");
+	$arAllOptionsUsers[] = array("allow_tasks_user", GetMessage("SONET_ALLOW_TASKS_USER"), "Y", Array("checkbox"), "showHideTab", "opt_user_feature_tasks");
 }
 
 if ($bCalendar)
-	$arAllOptionsUsers[] = array("allow_calendar_user", GetMessage("SONET_ALLOW_CALENDAR_USER"), "Y", Array("checkbox"));
+{
+	$arAllOptionsUsers[] = array("allow_calendar_user", GetMessage("SONET_ALLOW_CALENDAR_USER"), "Y", Array("checkbox"), "showHideTab", "opt_user_feature_calendar");
+}
 
 if (IsModuleInstalled('search'))
-	$arAllOptionsUsers[] = array("allow_search_user", GetMessage("SONET_ALLOW_SEARCH_USER"), "N", Array("checkbox"));
+{
+	$arAllOptionsUsers[] = array("allow_search_user", GetMessage("SONET_ALLOW_SEARCH_USER"), "N", Array("checkbox"), "showHideTab", "opt_user_feature_search");
+}
 
 $arAllOptionsUsersBlocks = array();
 
@@ -251,7 +263,9 @@ if ($bCalendar)
 }
 
 if (IsModuleInstalled('search'))
+{
 	$arAllOptionsUsersBlocks["search"][] = array("default_search_operation_view_user", GetMessage("SONET_SEARCH_OPERATION_VIEW_USER"), SONET_RELATIONS_TYPE_ALL, Array("select_user"));
+}
 
 $arAllOptionsUsersGender = array();
 $arAllOptionsUsersGender["male"][] = array("default_user_picture_male", GetMessage("SONET_USER_PICTURE"), false, Array("image"));
@@ -259,23 +273,26 @@ $arAllOptionsUsersGender["female"][] = array("default_user_picture_female", GetM
 $arAllOptionsUsersGender["unknown"][] = array("default_user_picture_unknown", GetMessage("SONET_USER_PICTURE"), false, Array("image"));
 
 $arAllOptionsGroups = array(
-	array("allow_forum_group", GetMessage("SONET_ALLOW_FORUM_GROUP"), "Y", Array("checkbox")),
-	array("allow_blog_group", GetMessage("SONET_ALLOW_BLOG_GROUP"), "Y", Array("checkbox")),
-	//array("allow_microblog_group", GetMessage("SONET_ALLOW_MICROBLOG_GROUP"), "Y", Array("checkbox")),
-	array("allow_photo_group", GetMessage("SONET_ALLOW_PHOTO_GROUP"), "Y", Array("checkbox")),
+	array("allow_forum_group", GetMessage("SONET_ALLOW_FORUM_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_forum"),
+	array("allow_blog_group", GetMessage("SONET_ALLOW_BLOG_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_blog"),
+	array("allow_photo_group", GetMessage("SONET_ALLOW_PHOTO_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_photo"),
 );
 
 if ($bIntranet)
 {
-	$arAllOptionsGroups[] = array("allow_files_group", GetMessage("SONET_ALLOW_FILES_GROUP"), "Y", Array("checkbox"));
-	$arAllOptionsGroups[] = array("allow_tasks_group", GetMessage("SONET_ALLOW_TASKS_GROUP"), "Y", Array("checkbox"));
+	$arAllOptionsGroups[] = array("allow_files_group", GetMessage("SONET_ALLOW_FILES_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_files");
+	$arAllOptionsGroups[] = array("allow_tasks_group", GetMessage("SONET_ALLOW_TASKS_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_tasks");
 }
 
 if ($bCalendar)
-	$arAllOptionsGroups[] = array("allow_calendar_group", GetMessage("SONET_ALLOW_CALENDAR_GROUP"), "Y", Array("checkbox"));
+{
+	$arAllOptionsGroups[] = array("allow_calendar_group", GetMessage("SONET_ALLOW_CALENDAR_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_calendar");
+}
 
 if (IsModuleInstalled('search'))
-	$arAllOptionsGroups[] = array("allow_search_group", GetMessage("SONET_ALLOW_SEARCH_GROUP"), "Y", Array("checkbox"));
+{
+	$arAllOptionsGroups[] = array("allow_search_group", GetMessage("SONET_ALLOW_SEARCH_GROUP"), "Y", Array("checkbox"), "showHideTab", "opt_group_feature_search");
+}
 
 $arAllOptionsGroupsBlocks = array();
 
@@ -342,7 +359,12 @@ $arAllOptionsGroupsGender = array();
 $arAllOptionsGroupsGender[] = array("default_group_picture", GetMessage("SONET_GROUP_PICTURE"), false, Array("image"));
 
 $strWarning = "";
-if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_bitrix_sessid())
+if (
+	$REQUEST_METHOD == "POST" 
+	&& strlen($Update) > 0 
+	&& $SONET_RIGHT == "W" 
+	&& check_bitrix_sessid()
+)
 {
 	$tmp_count = count($arAllOptionsCommon);
 	for ($i = 0; $i < $tmp_count; $i++)
@@ -413,7 +435,6 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 					$bFriendsEnabledForAnySite = true;
 				}
 			}
-
 		}
 
 		$tmp_count = count($arAllOptionsUsers);
@@ -654,6 +675,8 @@ if ($REQUEST_METHOD=="POST" && strlen($Update)>0 && $SONET_RIGHT=="W" && check_b
 		if (!CBXFeatures::IsFeatureEnabled("Calendar"))
 			CBXFeatures::SetFeatureEnabled("Calendar", true, false);
 	}
+
+	CBitrixComponent::clearComponentCache("bitrix:menu");
 }
 
 if (strlen($strWarning) > 0)
@@ -685,14 +708,19 @@ $aSiteTabs = array();
 $dbSites = CSite::GetList(($b = ""), ($o = ""), array("ACTIVE" => "Y"));
 while ($arSite = $dbSites->Fetch())
 {
-
 	$aSiteTabs[] = array("DIV" => "opt_site_".$arSite["ID"], "TAB" => '['.$arSite["ID"].'] '.htmlspecialcharsbx($arSite["NAME"]), 'TITLE' => GetMessage('SONET_OPTIONS_FOR_SITE').' ['.$arSite["ID"].'] '.htmlspecialcharsbx($arSite["NAME"]));
 
 	$aSubTabs = array();
 	foreach ($arFeatures as $key => $value)
 	{
-		$aSubTabs[] = array("DIV" => "opt_user_feature_".$key."_".$arSite["ID"], "TAB" => $value, 'TITLE' => GetMessage('SONET_SUBTAB_USER_TITLE_FEATURE').' "'.$value.'"');
+		$aSubTabs[] = array(
+			"DIV" => "opt_user_feature_".$key."_".$arSite["ID"],
+			"TAB" => $value,
+			"TITLE" => GetMessage("SONET_SUBTAB_USER_TITLE_FEATURE").' "'.$value.'"',
+			"VISIBLE" => (COption::GetOptionString("socialnetwork", "allow_".$key."_user", "Y", $arSite["ID"]) == "Y")
+		);
 	}
+
 	$arChildTabControlUser[$arSite["ID"]] = new CAdminViewTabControl("childTabControlUser_".$arSite["ID"], $aSubTabs);
 
 	$aSubTabsGender = array(
@@ -706,7 +734,12 @@ while ($arSite = $dbSites->Fetch())
 	$aSubTabs = array();
 	foreach ($arFeatures as $key => $value)
 	{
-		$aSubTabs[] = array("DIV" => "opt_group_feature_".$key."_".$arSite["ID"], "TAB" => $value, 'TITLE' => GetMessage('SONET_SUBTAB_GROUP_TITLE_FEATURE').' "'.$value.'"');
+		$aSubTabs[] = array(
+			"DIV" => "opt_group_feature_".$key."_".$arSite["ID"],
+			"TAB" => $value,
+			"TITLE" => GetMessage('SONET_SUBTAB_GROUP_TITLE_FEATURE').' "'.$value.'"',
+			"VISIBLE" => (COption::GetOptionString("socialnetwork", "allow_".$key."_group", "Y", $arSite["ID"]) == "Y")
+		);
 	}
 	$arChildTabControlGroup[$arSite["ID"]] = new CAdminViewTabControl("childTabControlGroup_".$arSite["ID"], $aSubTabs);
 }
@@ -746,6 +779,21 @@ $tabControl->Begin();
 		endfor;
 		?>
 		document.getElementById(id+'_Propery').style.display='';
+	}
+	
+	function showHideTab(obTabControl, contentId)
+	{
+		if (BX('view_tab_' + contentId))
+		{
+			if (BX('view_tab_' + contentId).style.display != 'none')
+			{
+				obTabControl.DisableTab(contentId);
+			}
+			else
+			{
+				obTabControl.EnableTab(contentId);
+			}
+		}
 	}
 </script>
 
@@ -1005,7 +1053,8 @@ $tabControl->BeginNextTab();
 				<td colspan="2"><?=GetMessage("SONET_4_USERS")?></td>
 			</tr><?
 			$tmp_count = count($arAllOptionsUsers);
-			for ($i = 0; $i < $tmp_count; $i++):
+			for ($i = 0; $i < $tmp_count; $i++)
+			{
 				$Option = $arAllOptionsUsers[$i];
 
 				$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
@@ -1013,27 +1062,39 @@ $tabControl->BeginNextTab();
 				?><tr>
 					<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 						if ($type[0]=="checkbox")
+						{
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
+						}
 						else
+						{
 							echo $Option[1];
-						?>:</td>
-						<td width="60%" align="left">
-							<?if($type[0]=="checkbox"):?>
-								<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
-						<?elseif($type[0]=="text"):?>
-							<input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>">
-						<?elseif($type[0]=="textarea"):?>
-							<textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?echo htmlspecialcharsbx($val)?></textarea>
-						<?elseif($type[0]=="select_user_perm"):?>
-							<select name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>">
-							<? foreach ($arUserPermsVar as $key => $value):
+						}
+					?>:</td>
+					<td width="60%" align="left"><?
+						if($type[0]=="checkbox")
+						{
+							?><input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?=($val == "Y" ? " checked" : "")?> <?=(isset($Option[4]) && $Option[4] == 'showHideTab' ? ' onclick="showHideTab(childTabControlUser_'.$siteList[$j]["ID"].', \''.$Option[5].'_'.$siteList[$j]["ID"].'\');"' : '')?>><?
+						}
+						elseif($type[0]=="text")
+						{
+							?><input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?
+						}
+						elseif($type[0]=="textarea")
+						{
+							?><textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?echo htmlspecialcharsbx($val)?></textarea><?
+						}
+						elseif($type[0]=="select_user_perm")
+						{
+							?><select name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?
+							foreach ($arUserPermsVar as $key => $value)
+							{
 								?><option value="<?=$key?>" <?=($key == $val ? "selected" : "")?>><?=$value?></option><?
-							endforeach; ?>
-							</select>
-						<?endif?>
-					</td>
+							}
+							?></select><?
+						}
+					?></td>
 				</tr><?
-			endfor;
+			}
 			?><tr>
 				<td colspan="2"><?
 				$arChildTabControlUser[$siteList[$j]["ID"]]->Begin();
@@ -1071,9 +1132,9 @@ $tabControl->BeginNextTab();
 											$operation = $matches[1];
 
 											if (
-												is_array($GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation])
-												&& (!array_key_exists("restricted", $GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation])
-												|| !in_array($permvar_key, $GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation]["restricted"][SONET_ENTITY_USER]))
+												is_array($arSocNetFeaturesSettings[$feature]["operations"][$operation])
+												&& (!array_key_exists("restricted", $arSocNetFeaturesSettings[$feature]["operations"][$operation])
+												|| !in_array($permvar_key, $arSocNetFeaturesSettings[$feature]["operations"][$operation]["restricted"][SONET_ENTITY_USER]))
 											):
 												?><option value="<?= $permvar_key ?>"<?= ($permvar_key == $val) ? " selected" : "" ?>><?= $permvar_value ?></option><?
 											endif;
@@ -1136,19 +1197,28 @@ $tabControl->BeginNextTab();
 				?><tr>
 					<td <?=set_valign($type[0], $type[1])?> width="40%"><?
 						if ($type[0]=="checkbox")
+						{
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
+						}
 						else
+						{
 							echo $Option[1];
+						}
 					?>:</td>
-					<td width="60%">
-						<?if($type[0]=="checkbox"):?>
-							<input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?if($val=="Y")echo" checked";?>>
-						<?elseif($type[0]=="text"):?>
-							<input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>">
-						<?elseif($type[0]=="textarea"):?>
-							<textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?echo htmlspecialcharsbx($val)?></textarea>
-						<?endif?>
-					</td>
+					<td width="60%"><?
+						if($type[0]=="checkbox")
+						{
+							?><input type="checkbox" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" id="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>" value="Y"<?=($val == "Y" ? " checked" : "")?> <?=(isset($Option[4]) && $Option[4] == 'showHideTab' ? ' onclick="showHideTab(childTabControlGroup_'.$siteList[$j]["ID"].', \''.$Option[5].'_'.$siteList[$j]["ID"].'\');"' : '')?>><?
+						}
+						elseif($type[0]=="text")
+						{
+							?><input type="text" size="<?echo $type[1]?>" value="<?echo htmlspecialcharsbx($val)?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?
+						}
+						elseif($type[0]=="textarea")
+						{
+							?><textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?echo htmlspecialcharsbx($val)?></textarea><?
+						}
+					?></td>
 				</tr><?
 			endfor;
 			?><tr>
@@ -1189,9 +1259,9 @@ $tabControl->BeginNextTab();
 											$operation = $matches[1];
 
 											if (
-												is_array($GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation])
-												&& (!array_key_exists("restricted", $GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation])
-												|| !in_array($permvar_key, $GLOBALS["arSocNetFeaturesSettings"][$feature]["operations"][$operation]["restricted"][SONET_ENTITY_GROUP]))
+												is_array($arSocNetFeaturesSettings[$feature]["operations"][$operation])
+												&& (!array_key_exists("restricted", $arSocNetFeaturesSettings[$feature]["operations"][$operation])
+												|| !in_array($permvar_key, $arSocNetFeaturesSettings[$feature]["operations"][$operation]["restricted"][SONET_ENTITY_GROUP]))
 											):
 												?><option value="<?= $permvar_key ?>"<?= ($permvar_key == $val) ? " selected" : "" ?>><?= $permvar_value ?></option><?
 											endif;

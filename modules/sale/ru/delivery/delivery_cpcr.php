@@ -9,7 +9,7 @@ cpcr/locations.php - list of cpcr ids for countries.
 
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_cpcr.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_cpcr.php');
 
 // define('DELIVERY_CPCR_WRITE_LOG', 0); // flag 'write to log'. use CDeliveryCPCR::__WriteToLog() for logging.
 // define('DELIVERY_CPCR_CACHE_LIFETIME', 2592000); // cache lifetime - 30 days (60*60*24*30)

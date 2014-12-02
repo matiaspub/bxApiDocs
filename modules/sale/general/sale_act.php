@@ -1,13 +1,21 @@
 <?
-if (!CModule::IncludeModule('catalog'))
+use Bitrix\Main\Loader;
+use Bitrix\Main\Localization\Loc;
+
+if (!Loader::includeModule('catalog'))
 {
 	return;
 }
 
-IncludeModuleLangFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
 class CSaleDiscountActionApply
 {
+	const VALUE_TYPE_FIX = 'F';
+	const VALUE_TYPE_PERCENT = 'P';
+	const VALUE_TYPE_SUMM = 'S';
+
+	private static $resetFields = array("DISCOUNT_PRICE", "PRICE", "VAT_VALUE", "PRICE_DEFAULT");
 	public static function ClearBasket($row)
 	{
 		return (
@@ -17,17 +25,26 @@ class CSaleDiscountActionApply
 		);
 	}
 
-	public static function ApplyDelivery(&$arOrder, $dblValue, $strUnit)
+	public static function ApplyDelivery(&$arOrder, $dblValue, $strUnit, $extMode = false)
 	{
+		$strUnit = (string)$strUnit;
+		if ($strUnit != self::VALUE_TYPE_PERCENT && $strUnit != self::VALUE_TYPE_FIX)
+			return;
 		if (isset($arOrder['PRICE_DELIVERY']))
 		{
+			$extMode = ($extMode === true);
 			$dblValue = doubleval($dblValue);
-			if ('P' == $strUnit)
+			if ($strUnit == self::VALUE_TYPE_PERCENT)
 			{
 				$dblValue = $arOrder['PRICE_DELIVERY']*($dblValue/100);
 			}
 			$dblResult = $arOrder['PRICE_DELIVERY'] + $dblValue;
-			if (0 <= $dblResult)
+			if ($extMode && $dblResult < 0)
+			{
+				$dblResult = 0;
+				$dblValue = $arOrder['PRICE_DELIVERY'];
+			}
+			if ($dblResult >= 0)
 			{
 				if (!isset($arOrder['PRICE_DELIVERY_DIFF']))
 					$arOrder['PRICE_DELIVERY_DIFF'] = 0;
@@ -47,8 +64,9 @@ class CSaleDiscountActionApply
 				$arClearBasket = array_filter($arDiscountBasket, 'CSaleDiscountActionApply::ClearBasket');
 				if (!empty($arClearBasket))
 				{
+					$strUnit = (string)$strUnit;
 					$dblValue = doubleval($dblValue);
-					if ('S' == $strUnit)
+					if ($strUnit == self::VALUE_TYPE_SUMM)
 					{
 						$dblSumm = 0.0;
 						foreach ($arClearBasket as &$arOneRow)
@@ -65,19 +83,19 @@ class CSaleDiscountActionApply
 						{
 							$dblValue = 0.0;
 						}
-						$strUnit = 'P';
+						$strUnit = self::VALUE_TYPE_PERCENT;
 					}
-					if (0 != $dblValue)
+					if ($dblValue != 0)
 					{
 						foreach ($arClearBasket as $key => $arOneRow)
 						{
 							$dblCurValue = $dblValue;
-							if ('P' == $strUnit)
+							if ($strUnit == self::VALUE_TYPE_PERCENT)
 							{
 								$dblCurValue = $arOneRow['PRICE']*($dblValue/100);
 							}
 							$dblResult = $arOneRow['PRICE'] + $dblCurValue;
-							if (0 <= $dblResult)
+							if ($dblResult >= 0)
 							{
 								$arOneRow['PRICE'] = $dblResult;
 								if (array_key_exists('PRICE_DEFAULT', $arOneRow))
@@ -98,6 +116,19 @@ class CSaleDiscountActionApply
 									$dblVatRate = doubleval($arOneRow["VAT_RATE"]);
 									if (0 < $dblVatRate)
 										$arOneRow["VAT_VALUE"] = (($arOneRow["PRICE"] / ($dblVatRate + 1)) * $dblVatRate);
+								}
+
+								if (isset(self::$resetFields) && !empty(self::$resetFields) && is_array(self::$resetFields))
+								{
+									foreach (self::$resetFields as $fieldName)
+									{
+										if (array_key_exists($fieldName, $arOneRow)
+											&& !is_array($arOneRow[$fieldName])
+											&& (string) $fieldName != "")
+										{
+											$arOneRow["~".$fieldName] = $arOneRow[$fieldName];
+										}
+									}
 								}
 								$arOrder['BASKET_ITEMS'][$key] = $arOneRow;
 							}
@@ -175,7 +206,7 @@ class CSaleActionCtrlGroup extends CGlobalCondCtrlGroup
 			'defaultText' => '',
 			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
 			'control' => array(
-				GetMessage('BT_SALE_ACT_GROUP_GLOBAL_PREFIX')
+				Loc::getMessage('BT_SALE_ACT_GROUP_GLOBAL_PREFIX')
 			)
 		);
 
@@ -267,11 +298,11 @@ class CSaleActionCtrlAction extends CGlobalCondCtrlGroup
 			'logic' => array(
 				array(
 					'style' => 'condition-logic-and',
-					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_AND')
+					'message' => Loc::getMessage('BT_SALE_ACT_GROUP_LOGIC_AND')
 				),
 				array(
 					'style' => 'condition-logic-or',
-					'message' => GetMessage('BT_SALE_ACT_GROUP_LOGIC_OR')
+					'message' => Loc::getMessage('BT_SALE_ACT_GROUP_LOGIC_OR')
 				)
 			)
 		);
@@ -318,11 +349,11 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 		$arResult = array(
 			'controlId' => static::GetControlID(),
 			'group' => false,
-			'label' => GetMessage('BT_SALE_ACT_DELIVERY_LABEL'),
-			'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_DEF_TEXT'),
+			'label' => Loc::getMessage('BT_SALE_ACT_DELIVERY_LABEL'),
+			'defaultText' => Loc::getMessage('BT_SALE_ACT_DELIVERY_DEF_TEXT'),
 			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
 			'control' => array(
-				GetMessage('BT_SALE_ACT_DELIVERY_GROUP_PRODUCT_PREFIX'),
+				Loc::getMessage('BT_SALE_ACT_DELIVERY_GROUP_PRODUCT_PREFIX'),
 				$arAtoms['Type'],
 				$arAtoms['Value'],
 				$arAtoms['Unit']
@@ -347,10 +378,11 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 					'name' => 'extra',
 					'type' => 'select',
 					'values' => array(
-						'Discount' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DISCOUNT'),
-						'Extra' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_EXTRA')
+						'Discount' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DISCOUNT'),
+						'DiscountZero' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DISCOUNT_ZERO'),
+						'Extra' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_EXTRA'),
 					),
-					'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DEF'),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_TYPE_DEF'),
 					'defaultValue' => 'Discount',
 					'first_option' => '...'
 				),
@@ -381,10 +413,10 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 					'name' => 'extra_unit',
 					'type' => 'select',
 					'values' => array(
-						'Perc' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_PERCENT'),
-						'Cur' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_CUR')
+						'Perc' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_PERCENT'),
+						'Cur' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_CUR')
 					),
-					'defaultText' => GetMessage('BT_SALE_ACT_DELIVERY_SELECT_UNIT_DEF'),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_DELIVERY_SELECT_UNIT_DEF'),
 					'defaultValue' => 'Perc',
 					'first_option' => '...'
 				),
@@ -419,7 +451,6 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
 		$mxResult = '';
-		$boolError = false;
 
 		if (is_string($arControl))
 		{
@@ -437,8 +468,9 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 		{
 			$arOneCondition['Value'] = doubleval($arOneCondition['Value']);
 			$dblVal = ('Extra' == $arOneCondition['Type'] ? $arOneCondition['Value'] : -$arOneCondition['Value']);
-			$strUnit = ('Cur' == $arOneCondition['Unit'] ? 'F' : 'P');
-			$mxResult = 'CSaleDiscountActionApply::ApplyDelivery('.$arParams['ORDER'].', '.$dblVal.', "'.$strUnit.'");';
+			$strUnit = ('Cur' == $arOneCondition['Unit'] ? CSaleDiscountActionApply::VALUE_TYPE_FIX : CSaleDiscountActionApply::VALUE_TYPE_PERCENT);
+			$extMode = ('DiscountZero' == $arOneCondition['Type'] && $arOneCondition['Unit'] == 'Cur' ? 'true' : 'false');
+			$mxResult = 'CSaleDiscountActionApply::ApplyDelivery('.$arParams['ORDER'].', '.$dblVal.', "'.$strUnit.'", '.$extMode.');';
 		}
 
 		return $mxResult;
@@ -488,21 +520,21 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 		return array(
 			'controlId' => static::GetControlID(),
 			'group' => true,
-			'label' => GetMessage('BT_SALE_ACT_GROUP_BASKET_LABEL'),
-			'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_DEF_TEXT'),
+			'label' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_LABEL'),
+			'defaultText' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_DEF_TEXT'),
 			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
 			'visual' => static::GetVisual(),
 			'control' => array(
-				GetMessage('BT_SALE_ACT_GROUP_BASKET_PREFIX'),
+				Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_PREFIX'),
 				$arAtoms['Type'],
 				$arAtoms['Value'],
 				$arAtoms['Unit'],
-				GetMessage('BT_SALE_ACT_GROUP_BASKET_DESCR'),
+				Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_DESCR'),
 				$arAtoms['All']
 			),
 			'mess' => array(
-				'ADD_CONTROL' => GetMessage('BT_SALE_SUBACT_ADD_CONTROL'),
-				'SELECT_CONTROL' => GetMessage('BT_SALE_SUBACT_SELECT_CONTROL')
+				'ADD_CONTROL' => Loc::getMessage('BT_SALE_SUBACT_ADD_CONTROL'),
+				'SELECT_CONTROL' => Loc::getMessage('BT_SALE_SUBACT_SELECT_CONTROL')
 			)
 		);
 	}
@@ -527,10 +559,10 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 					'name' => 'extra',
 					'type' => 'select',
 					'values' => array(
-						'Discount' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DISCOUNT'),
-						'Extra' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_EXTRA')
+						'Discount' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DISCOUNT'),
+						'Extra' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_EXTRA')
 					),
-					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DEF'),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_TYPE_DEF'),
 					'defaultValue' => 'Discount',
 					'first_option' => '...'
 				),
@@ -561,11 +593,11 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 					'name' => 'extra_unit',
 					'type' => 'select',
 					'values' => array(
-						'Perc' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_PERCENT'),
-						'CurEach' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_EACH'),
-						'CurAll' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_ALL')
+						'Perc' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_PERCENT'),
+						'CurEach' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_EACH'),
+						'CurAll' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_CUR_ALL')
 					),
-					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_UNIT_DEF'),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_UNIT_DEF'),
 					'defaultValue' => 'Perc',
 					'first_option' => '...'
 				),
@@ -583,10 +615,10 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 					'name' => 'aggregator',
 					'type' => 'select',
 					'values' => array(
-						'AND' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ALL'),
-						'OR' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ANY')
+						'AND' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ALL'),
+						'OR' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_ANY')
 					),
-					'defaultText' => GetMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_DEF'),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_GROUP_BASKET_SELECT_DEF'),
 					'defaultValue' => 'AND',
 					'first_option' => '...'
 				),
@@ -627,14 +659,14 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 		{
 			$arOneCondition['Value'] = doubleval($arOneCondition['Value']);
 			$dblVal = ('Extra' == $arOneCondition['Type'] ? $arOneCondition['Value'] : -$arOneCondition['Value']);
-			$strUnit = 'P';
+			$strUnit = CSaleDiscountActionApply::VALUE_TYPE_PERCENT;
 			if ('CurEach' == $arOneCondition['Unit'])
 			{
-				$strUnit = 'F';
+				$strUnit = CSaleDiscountActionApply::VALUE_TYPE_FIX;
 			}
 			elseif ('CurAll' == $arOneCondition['Unit'])
 			{
-				$strUnit = 'S';
+				$strUnit = CSaleDiscountActionApply::VALUE_TYPE_SUMM;
 			}
 
 			if (!empty($arSubs))
@@ -688,7 +720,7 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 		$arResult = array(
 			'controlgroup' => true,
 			'group' =>  false,
-			'label' => GetMessage('BT_MOD_SALE_ACT_GROUP_BASKET_FIELDS_LABEL'),
+			'label' => Loc::getMessage('BT_MOD_SALE_ACT_GROUP_BASKET_FIELDS_LABEL'),
 			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
 			'children' => array()
 		);
@@ -709,7 +741,7 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 					static::GetValueAtom($arOneControl['JS_VALUE'])
 				)
 			);
-			if ('CondBsktFldPrice' == $arOneControl['ID'])
+			if ($arOneControl['ID'] == 'CondBsktFldPrice' || $arOneControl['ID'] == 'CondBsktFldSumm')
 			{
 				$boolCurrency = false;
 				if (static::$boolInit)
@@ -729,12 +761,15 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 						}
 					}
 				}
+				if (!$boolCurrency)
+					$arOne = array();
 			}
 			elseif ('CondBsktFldWeight' == $arOneControl['ID'])
 			{
-				$arOne['control'][] = GetMessage('BT_MOD_SALE_ACT_MESS_WEIGHT_UNIT');
+				$arOne['control'][] = Loc::getMessage('BT_MOD_SALE_ACT_MESS_WEIGHT_UNIT');
 			}
-			$arResult['children'][] = $arOne;
+			if (!empty($arOne))
+				$arResult['children'][] = $arOne;
 		}
 		if (isset($arOneControl))
 			unset($arOneControl);
@@ -751,8 +786,8 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'FIELD_TYPE' => 'int',
 				'MULTIPLE' => 'N',
 				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_PREFIX'),
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_PRODUCT_ID_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_PRODUCT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
 					'type' => 'popup',
@@ -775,13 +810,38 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'FIELD_LENGTH' => 255,
 				'MULTIPLE' => 'N',
 				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_PREFIX'),
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_PRODUCT_NAME_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_PRODUCT_NAME_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
 				'JS_VALUE' => array(
 					'type' => 'input'
 				),
 				'PHP_VALUE' => ''
+			),
+			'CondBsktFldSumm' => array(
+				'ID' => 'CondBsktFldSumm',
+				'FIELD' => array(
+					'PRICE',
+					'QUANTITY'
+				),
+				'FIELD_TYPE' => 'double',
+				'MULTIPLE' => 'N',
+				'GROUP' => 'N',
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_SUMM_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_SUMM_EXT_PREFIX'),
+				'LOGIC' => static::GetLogic(
+						array(
+							BT_COND_LOGIC_EQ,
+							BT_COND_LOGIC_NOT_EQ,
+							BT_COND_LOGIC_GR,
+							BT_COND_LOGIC_LS,
+							BT_COND_LOGIC_EGR,
+							BT_COND_LOGIC_ELS
+						)
+					),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				)
 			),
 			'CondBsktFldPrice' => array(
 				'ID' => 'CondBsktFldPrice',
@@ -789,8 +849,8 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'FIELD_TYPE' => 'double',
 				'MULTIPLE' => 'N',
 				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_PRICE_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_PRICE_PREFIX'),
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_PRICE_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_PRICE_EXT_PREFIX'),
 				'LOGIC' => static::GetLogic(
 					array(
 						BT_COND_LOGIC_EQ,
@@ -811,8 +871,8 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'FIELD_TYPE' => 'double',
 				'MULTIPLE' => 'N',
 				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_QUANTITY_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_QUANTITY_PREFIX'),
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_QUANTITY_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_QUANTITY_EXT_PREFIX'),
 				'LOGIC' => static::GetLogic(
 					array(
 						BT_COND_LOGIC_EQ,
@@ -833,8 +893,8 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 				'FIELD_TYPE' => 'double',
 				'MULTIPLE' => 'N',
 				'GROUP' => 'N',
-				'LABEL' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_WEIGHT_LABEL'),
-				'PREFIX' => GetMessage('BT_MOD_SALE_ACT_BASKET_ROW_WEIGHT_PREFIX'),
+				'LABEL' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_WEIGHT_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_SALE_ACT_BASKET_ROW_WEIGHT_EXT_PREFIX'),
 				'LOGIC' => static::GetLogic(
 					array(
 						BT_COND_LOGIC_EQ,
@@ -868,7 +928,6 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
 		$strResult = '';
-		$boolError = false;
 
 		if (is_string($arControl))
 		{
@@ -879,10 +938,7 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 		if (!$boolError)
 		{
 			$arValues = static::Check($arOneCondition, $arOneCondition, $arControl, false);
-			if (false === $arValues)
-			{
-				$boolError = true;
-			}
+			$boolError = (false === $arValues);
 		}
 
 		if (!$boolError)
@@ -894,24 +950,43 @@ class CSaleActionCondCtrlBasketFields extends CSaleActionCtrlComplex
 			}
 			else
 			{
-				$strField = $arParams['BASKET_ROW'].'[\''.$arControl['FIELD'].'\']';
+				$multyField = is_array($arControl['FIELD']);
+				$issetField = '';
+				$valueField = '';
+				if ($multyField)
+				{
+					$fieldsList = array();
+					foreach ($arControl['FIELD'] as &$oneField)
+					{
+						$fieldsList[] = $arParams['BASKET_ROW'].'[\''.$oneField.'\']';
+					}
+					unset($oneField);
+					$issetField = implode(') && isset (', $fieldsList);
+					$valueField = implode('*',$fieldsList);
+					unset($fieldsList);
+				}
+				else
+				{
+					$issetField = $arParams['BASKET_ROW'].'[\''.$arControl['FIELD'].'\']';
+					$valueField = $issetField;
+				}
 				switch ($arControl['FIELD_TYPE'])
 				{
 					case 'int':
 					case 'double':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($valueField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
 						break;
 					case 'char':
 					case 'string':
 					case 'text':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
+						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($valueField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
 						break;
 					case 'date':
 					case 'datetime':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($valueField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
 						break;
 				}
-				$strResult = 'isset('.$strField.') && '.$strResult;
+				$strResult = 'isset('.$issetField.') && '.$strResult;
 			}
 		}
 
@@ -943,6 +1018,8 @@ class CSaleActionTree extends CGlobalCondTree
 	{
 		$strFinal = '';
 		$this->arExecuteFunc = array();
+		$this->usedModules = array();
+		$this->usedExtFiles = array();
 		if (!$this->boolError)
 		{
 			$strResult = '';
@@ -979,7 +1056,6 @@ class CSaleActionTree extends CGlobalCondTree
 	public function GenerateLevel(&$arLevel, $arParams, $boolFirst = false)
 	{
 		$arResult = array();
-		$boolError = false;
 		$boolFirst = (true === $boolFirst);
 		if (empty($arLevel) || !is_array($arLevel))
 		{
@@ -1042,6 +1118,38 @@ class CSaleActionTree extends CGlobalCondTree
 						return false;
 					}
 					$arResult[] = $strEval;
+					if (isset($arOneControl['MODULE_ID']) && !empty($arOneControl['MODULE_ID']))
+					{
+						if (is_array($arOneControl['MODULE_ID']))
+						{
+							foreach ($arOneControl['MODULE_ID'] as &$oneModuleID)
+							{
+								if ($oneModuleID != $this->arEvents['CONTROLS']['MODULE_ID'])
+									$this->usedModules[$oneModuleID] = true;
+							}
+							unset($oneModuleID);
+						}
+						else
+						{
+							if ($arOneControl['MODULE_ID'] != $this->arEvents['CONTROLS']['MODULE_ID'])
+								$this->usedModules[$arOneControl['MODULE_ID']] = true;
+						}
+					}
+					if (isset($arOneControl['EXT_FILE']) && !empty($arOneControl['EXT_FILE']))
+					{
+						if (is_array($arOneControl['EXT_FILE']))
+						{
+							foreach ($arOneControl['EXT_FILE'] as &$oneExtFile)
+							{
+								$this->usedExtFiles[$oneExtFile] = true;
+							}
+							unset($oneExtFile);
+						}
+						else
+						{
+							$this->usedExtFiles[$arOneControl['EXT_FILE']] = true;
+						}
+					}
 				}
 			}
 			$intRowNum++;
@@ -1100,6 +1208,38 @@ class CSaleActionTree extends CGlobalCondTree
 							return false;
 						}
 						$arResult[] = $strEval;
+						if (isset($arOneControl['MODULE_ID']) && !empty($arOneControl['MODULE_ID']))
+						{
+							if (is_array($arOneControl['MODULE_ID']))
+							{
+								foreach ($arOneControl['MODULE_ID'] as &$oneModuleID)
+								{
+									if ($oneModuleID != $this->arEvents['CONTROLS']['MODULE_ID'])
+										$this->usedModules[$oneModuleID] = true;
+								}
+								unset($oneModuleID);
+							}
+							else
+							{
+								if ($arOneControl['MODULE_ID'] != $this->arEvents['CONTROLS']['MODULE_ID'])
+									$this->usedModules[$arOneControl['MODULE_ID']] = true;
+							}
+						}
+						if (isset($arOneControl['EXT_FILE']) && !empty($arOneControl['EXT_FILE']))
+						{
+							if (is_array($arOneControl['EXT_FILE']))
+							{
+								foreach ($arOneControl['EXT_FILE'] as &$oneExtFile)
+								{
+									$this->usedExtFiles[$oneExtFile] = true;
+								}
+								unset($oneExtFile);
+							}
+							else
+							{
+								$this->usedExtFiles[$arOneControl['EXT_FILE']] = true;
+							}
+						}
 					}
 				}
 				$intRowNum++;

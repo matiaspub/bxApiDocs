@@ -1,4 +1,5 @@
-<?
+<?php
+
 function perfmonErrorHandler($errno, $errstr, $errfile, $errline)
 {
 	global $perfmonErrors;
@@ -9,23 +10,23 @@ function perfmonErrorHandler($errno, $errstr, $errfile, $errline)
 	);
 	$uni_file_name = str_replace("\\", "/", substr($errfile, strlen($_SERVER["DOCUMENT_ROOT"].BX_ROOT)));
 	$bRecord = false;
-	switch($errno)
+	switch ($errno)
 	{
-		case E_WARNING:
+	case E_WARNING:
+		$bRecord = true;
+		break;
+	case E_NOTICE:
+		if (
+			(strpos($errstr, "Undefined index:") === false)
+			&& (strpos($errstr, "Undefined offset:") === false)
+			&& !array_key_exists($uni_file_name.":".$errline, $arExclude)
+		)
 			$bRecord = true;
-			break;
-		case E_NOTICE:
-			if(
-				(strpos($errstr, "Undefined index:") === false)
-				&& (strpos($errstr, "Undefined offset:") === false)
-				&& !array_key_exists($uni_file_name.":".$errline, $arExclude)
-			)
-				$bRecord = true;
-			break;
-		default:
-			break;
+		break;
+	default:
+		break;
 	}
-	if($bRecord)
+	if ($bRecord)
 	{
 		$perfmonErrors[] = array(
 			"ERRNO" => $errno,
@@ -38,18 +39,19 @@ function perfmonErrorHandler($errno, $errstr, $errfile, $errline)
 	return false;
 }
 
-class CAllPerfomanceKeeper
+class CPerfomanceKeeper
 {
 	public static function OnPageStart()
 	{
-		if(!defined("PERFMON_STOP"))
+		if (!defined("PERFMON_STOP"))
 		{
 			$end_time = COption::GetOptionInt("perfmon", "end_time");
-			if(time() > $end_time)
+			if (time() > $end_time)
 			{
 				CPerfomanceKeeper::SetActive(false);
-				if(COption::GetOptionString("perfmon", "total_mark_value", "") == "measure");
-					COption::SetOptionString("perfmon", "total_mark_value", "calc");
+				if (COption::GetOptionString("perfmon", "total_mark_value", "") == "measure")
+					;
+				COption::SetOptionString("perfmon", "total_mark_value", "calc");
 			}
 			else
 			{
@@ -57,10 +59,10 @@ class CAllPerfomanceKeeper
 
 				global $perfmonErrors;
 				$perfmonErrors = array();
-				if(COption::GetOptionString("perfmon", "warning_log") === "Y")
+				if (COption::GetOptionString("perfmon", "warning_log") === "Y")
 					set_error_handler("perfmonErrorHandler");
 
-				register_shutdown_function(array("CAllPerfomanceKeeper", "writeToDatabase"));
+				register_shutdown_function(array("CPerfomanceKeeper", "writeToDatabase"));
 			}
 		}
 	}
@@ -89,13 +91,13 @@ class CAllPerfomanceKeeper
 
 	public static function OnEpilog()
 	{
-		if(defined("PERFMON_STARTED"))
+		if (defined("PERFMON_STARTED"))
 			self::restoreDebugMode();
 	}
 
 	public static function OnBeforeAfterEpilog()
 	{
-		if(defined("PERFMON_STARTED"))
+		if (defined("PERFMON_STARTED"))
 		{
 			global $DB;
 			$DB->ShowSqlStat = true;
@@ -104,7 +106,7 @@ class CAllPerfomanceKeeper
 
 	public static function OnAfterAfterEpilog()
 	{
-		if(defined("PERFMON_STARTED"))
+		if (defined("PERFMON_STARTED"))
 		{
 			self::restoreDebugMode();
 		}
@@ -115,39 +117,61 @@ class CAllPerfomanceKeeper
 		$START_EXEC_CURRENT_TIME = microtime();
 
 		global $DB, $APPLICATION;
+		$application = \Bitrix\Main\Application::getInstance();
+		$connection  = $application->getConnection();
+
+		$connection->stopTracker();
 		$DB->ShowSqlStat = false;
+		$arQueryDebug = $connection->getTracker()->getQueries();
+		$arIncludeDebug = $APPLICATION->arIncludeDebug;
 
 		$cache_log = COption::GetOptionString("perfmon", "cache_log") === "Y";
+		$large_cache_log = COption::GetOptionString("perfmon", "large_cache_log") === "Y";
+		$large_cache_size = floatval(COption::GetOptionString("perfmon", "large_cache_size")) * 1024;
 		$sql_log = COption::GetOptionString("perfmon", "sql_log") === "Y";
 		$slow_sql_log = COption::GetOptionString("perfmon", "slow_sql_log") === "Y";
 		$slow_sql_time = floatval(COption::GetOptionString("perfmon", "slow_sql_time"));
-		$addHit = false;
 
 		if ($slow_sql_log)
-			self::removeQueries($slow_sql_time, $cache_log);
+		{
+			self::removeQueries($arQueryDebug, $arIncludeDebug, $slow_sql_time, $cache_log);
+		}
 
 		$query_count = 0;
 		$query_time = 0.0;
 		if ($sql_log)
-			self::countQueries($query_count, $query_time);
+		{
+			self::countQueries($query_count, $query_time, $arQueryDebug, $arIncludeDebug);
+		}
 
 		$comps_count = 0;
 		$comps_time = 0.0;
 		if ($sql_log || $cache_log)
-			self::countComponents($comps_count, $comps_time);
+		{
+			self::countComponents($comps_count, $comps_time, $arIncludeDebug);
+		}
 
 		$cache_count = array();
+		/** @var \Bitrix\Main\Diag\CacheTracker $arCacheDebug */
+		$arCacheDebug = null;
 		if ($cache_log)
 		{
 			$arCacheDebug = \Bitrix\Main\Diag\CacheTracker::getCacheTracking();
+
+			if ($large_cache_log)
+				self::removeCaches($large_cache_size, $arCacheDebug, $arIncludeDebug);
+
 			self::countCache($arCacheDebug, $cache_count);
-			foreach ($APPLICATION->arIncludeDebug as $ar)
-				self::countCache($ar["CACHE"], $cache_count);
+			foreach ($arIncludeDebug as $ar)
+			{
+				if (array_key_exists("REL_PATH", $ar))
+					self::countCache($ar["CACHE"], $cache_count);
+			}
 		}
 
-		if($_SERVER["SCRIPT_NAME"] == "/bitrix/urlrewrite.php" && isset($_SERVER["REAL_FILE_PATH"]))
+		if ($_SERVER["SCRIPT_NAME"] == "/bitrix/urlrewrite.php" && isset($_SERVER["REAL_FILE_PATH"]))
 			$SCRIPT_NAME = $_SERVER["REAL_FILE_PATH"];
-		elseif($_SERVER["SCRIPT_NAME"] == "/404.php" && isset($_SERVER["REAL_FILE_PATH"]))
+		elseif ($_SERVER["SCRIPT_NAME"] == "/404.php" && isset($_SERVER["REAL_FILE_PATH"]))
 			$SCRIPT_NAME = $_SERVER["REAL_FILE_PATH"];
 		else
 			$SCRIPT_NAME = $_SERVER["SCRIPT_NAME"];
@@ -162,7 +186,7 @@ class CAllPerfomanceKeeper
 			"REQUEST_URI" => $_SERVER["REQUEST_URI"],
 			"INCLUDED_FILES" => function_exists("get_included_files")? count(get_included_files()): false,
 			"MEMORY_PEAK_USAGE" => function_exists("memory_get_peak_usage")? memory_get_peak_usage(): false,
-			"CACHE_TYPE" => COption::GetOptionString("main", "component_cache_on", "Y")=="Y"? "Y": "N",
+			"CACHE_TYPE" => COption::GetOptionString("main", "component_cache_on", "Y") == "Y"? "Y": "N",
 			"~CACHE_SIZE" => intval($GLOBALS["CACHE_STAT_BYTES"]),
 			"~CACHE_COUNT_R" => intval($cache_count["R"]),
 			"~CACHE_COUNT_W" => intval($cache_count["W"]),
@@ -176,28 +200,31 @@ class CAllPerfomanceKeeper
 		);
 		CPerfomanceKeeper::SetPageTimes($START_EXEC_CURRENT_TIME, $arFields);
 
-		if($query_count || $comps_count || $cache_log)
+		if ($query_count || $comps_count || $cache_count)
 			$HIT_ID = $DB->Add("b_perf_hit", $arFields);
 		else
 			$HIT_ID = false;
 
 		$NN = 0;
-		if($HIT_ID && $cache_log)
+		if ($HIT_ID && $cache_log)
 		{
 			self::saveCaches($HIT_ID, false, $arCacheDebug, $NN);
 		}
 
 		$MM = 0;
-		if($HIT_ID && $sql_log)
+		if ($HIT_ID && $sql_log)
 		{
-			if (is_array($DB->arQueryDebug))
-				self::saveQueries($HIT_ID, false, $DB->arQueryDebug, $MM);
+			if (is_array($arQueryDebug))
+				self::saveQueries($HIT_ID, false, $arQueryDebug, $MM);
 		}
 
-		if($HIT_ID && ($sql_log || $cache_log))
+		if ($HIT_ID && ($sql_log || $cache_log))
 		{
-			foreach($APPLICATION->arIncludeDebug as $ii => $ar)
+			foreach ($arIncludeDebug as $ii => $ar)
 			{
+				if (!array_key_exists("REL_PATH", $ar))
+					continue;
+
 				$cache_count = array();
 				if ($cache_log)
 					self::countCache($ar["CACHE"], $cache_count);
@@ -226,12 +253,12 @@ class CAllPerfomanceKeeper
 		}
 
 		global $perfmonErrors;
-		if($HIT_ID && (count($perfmonErrors) > 0))
+		if ($HIT_ID && (count($perfmonErrors) > 0))
 		{
-			foreach($perfmonErrors as $arError)
+			foreach ($perfmonErrors as $arError)
 			{
 				$arError["HIT_ID"] = $HIT_ID;
-				$ERR_ID = $DB->Add("b_perf_error", $arError);
+				$DB->Add("b_perf_error", $arError);
 			}
 		}
 	}
@@ -241,7 +268,7 @@ class CAllPerfomanceKeeper
 		list($usec, $sec) = explode(" ", $START_EXEC_CURRENT_TIME);
 		$CURRENT_TIME = $sec + $usec;
 
-		if(defined("START_EXEC_PROLOG_BEFORE_1"))
+		if (defined("START_EXEC_PROLOG_BEFORE_1"))
 		{
 			list($usec, $sec) = explode(" ", START_EXEC_PROLOG_BEFORE_1);
 			$PROLOG_BEFORE_1 = $sec + $usec;
@@ -259,7 +286,20 @@ class CAllPerfomanceKeeper
 				$arFields["~AGENTS_TIME"] = 0;
 			}
 
-			if(defined("START_EXEC_PROLOG_AFTER_1"))
+			if (defined("START_EXEC_EVENTS_1") && defined("START_EXEC_EVENTS_2"))
+			{
+				list($usec, $sec) = explode(" ", START_EXEC_EVENTS_2);
+				$EVENTS_2 = $sec + $usec;
+				list($usec, $sec) = explode(" ", START_EXEC_EVENTS_1);
+				$EVENTS_1 = $sec + $usec;
+				$arFields["~EVENTS_TIME"] = $EVENTS_2 - $EVENTS_1;
+			}
+			else
+			{
+				$arFields["~EVENTS_TIME"] = 0;
+			}
+
+			if (defined("START_EXEC_PROLOG_AFTER_1"))
 			{
 				list($usec, $sec) = explode(" ", START_EXEC_PROLOG_AFTER_1);
 				$PROLOG_AFTER_1 = $sec + $usec;
@@ -281,29 +321,12 @@ class CAllPerfomanceKeeper
 					list($usec, $sec) = explode(" ", START_EXEC_EPILOG_AFTER_1);
 					$EPILOG_AFTER_1 = $sec + $usec;
 					$arFields["~EPILOG_BEFORE_TIME"] = $EPILOG_AFTER_1 - $EPILOG_BEFORE_1;
+					$arFields["~EPILOG_AFTER_TIME"] = $CURRENT_TIME - $EPILOG_AFTER_1 - $arFields["~EVENTS_TIME"];
 				}
 				else
 				{
 					$arFields["~EPILOG_BEFORE_TIME"] = 0;
 				}
-			}
-
-			if (defined("START_EXEC_EVENTS_1") && defined("START_EXEC_EVENTS_2"))
-			{
-				list($usec, $sec) = explode(" ", START_EXEC_EVENTS_2);
-				$EVENTS_2 = $sec + $usec;
-				list($usec, $sec) = explode(" ", START_EXEC_EVENTS_1);
-				$EVENTS_1 = $sec + $usec;
-				$arFields["~EVENTS_TIME"] = $EVENTS_2 - $EVENTS_1;
-			}
-			else
-			{
-				$arFields["~EVENTS_TIME"] = 0;
-			}
-
-			if(defined("START_EXEC_PROLOG_AFTER_1"))
-			{
-				$arFields["~EPILOG_AFTER_TIME"] = $CURRENT_TIME - $EPILOG_AFTER_1 - $arFields["~EVENTS_TIME"];
 
 				$arFields["~EPILOG_TIME"] = $CURRENT_TIME - $EPILOG_BEFORE_1;
 			}
@@ -316,83 +339,134 @@ class CAllPerfomanceKeeper
 		}
 	}
 
-	public static function removeQueries($slow_sql_time, $preserveComponents = false)
+	public static function removeQueries(&$arQueryDebug, &$arIncludeDebug, $slow_sql_time, $preserveComponents = false)
 	{
-		global $DB, $APPLICATION;
-
-		if (is_array($DB->arQueryDebug))
+		if (is_array($arQueryDebug))
 		{
-			foreach($DB->arQueryDebug as $i => $arQueryInfo)
+			foreach ($arQueryDebug as $i => $arQueryInfo)
 			{
-				if($arQueryInfo["TIME"] < $slow_sql_time)
-					unset($DB->arQueryDebug[$i]);
+				if ($arQueryInfo["TIME"] < $slow_sql_time)
+					unset($arQueryDebug[$i]);
 			}
 		}
 
-		if (is_array($APPLICATION->arIncludeDebug))
+		if (is_array($arIncludeDebug))
 		{
-			foreach($APPLICATION->arIncludeDebug as $i => $ar)
+			foreach ($arIncludeDebug as $i => $ar)
 			{
-				foreach($ar["QUERIES"] as $N => $arQueryInfo)
+				if (array_key_exists("REL_PATH", $ar) && is_array($ar["QUERIES"]))
 				{
-					if($arQueryInfo["TIME"] < $slow_sql_time)
-						unset($APPLICATION->arIncludeDebug[$i]["QUERIES"][$N]);
-				}
-			}
+					foreach ($ar["QUERIES"] as $N => $arQueryInfo)
+					{
+						if ($arQueryInfo["TIME"] < $slow_sql_time)
+							unset($arIncludeDebug[$i]["QUERIES"][$N]);
+					}
 
-			if (!$preserveComponents)
-			{
-				if (empty($APPLICATION->arIncludeDebug[$i]["QUERIES"]))
+					if (!$preserveComponents)
+					{
+						if (empty($arIncludeDebug[$i]["QUERIES"]))
+						{
+							unset($arIncludeDebug[$i]);
+						}
+					}
+				}
+				else
 				{
-					unset($APPLICATION->arIncludeDebug[$i]);
+					if (!$preserveComponents)
+					{
+						unset($arIncludeDebug[$i]);
+					}
 				}
 			}
 		}
 	}
 
-	public static function countQueries(&$query_count, &$query_time)
+	public static function countQueries(&$query_count, &$query_time, $arQueryDebug, $arIncludeDebug)
 	{
-		global $DB, $APPLICATION;
-
 		$query_count = 0;
 		$query_time = 0.0;
 
-		if (is_array($DB->arQueryDebug))
+		if (is_array($arQueryDebug))
 		{
-			foreach($DB->arQueryDebug as $i => $arQueryInfo)
+			foreach ($arQueryDebug as $arQueryInfo)
 			{
 				$query_count++;
 				$query_time += $arQueryInfo["TIME"];
 			}
 		}
 
-		if ($query_time <= 0)
+		foreach ($arIncludeDebug as $ar)
 		{
-			$query_count = intval($DB->cntQuery);
-			$query_time  = $DB->timeQuery > 0.0? $DB->timeQuery: 0.0;
-		}
-
-		foreach($APPLICATION->arIncludeDebug as $i => $ar)
-		{
-			foreach($ar["QUERIES"] as $N => $arQueryInfo)
+			if (array_key_exists("REL_PATH", $ar) && is_array($ar["QUERIES"]))
 			{
-				$query_count++;
-				$query_time += $arQueryInfo["TIME"];
+				foreach ($ar["QUERIES"] as $arQueryInfo)
+				{
+					$query_count++;
+					$query_time += $arQueryInfo["TIME"];
+				}
 			}
 		}
 	}
 
-	public static function countComponents(&$comps_count, &$comps_time)
+	public static function countComponents(&$comps_count, &$comps_time, $arIncludeDebug)
 	{
-		global $APPLICATION;
-
 		$comps_count = 0;
 		$comps_time = 0.0;
 
-		foreach($APPLICATION->arIncludeDebug as $i => $ar)
+		foreach ($arIncludeDebug as $ar)
 		{
-			$comps_count++;
-			$comps_time += $ar["TIME"];
+			if (array_key_exists("REL_PATH", $ar))
+			{
+				$comps_count++;
+				$comps_time += $ar["TIME"];
+			}
+		}
+	}
+
+	public static function removeCaches($large_cache_size, &$arCacheDebug, &$arIncludeDebug)
+	{
+		if (is_array($arCacheDebug))
+		{
+			foreach ($arCacheDebug as $i => $arCacheInfo)
+			{
+				if (
+					(
+						$arCacheInfo["cache_size"] > 0
+						&& $arCacheInfo["cache_size"] < $large_cache_size
+					) || (
+						$arCacheInfo["operation"] != "W"
+						&& $arCacheInfo["operation"] != "R"
+					)
+				)
+				{
+					unset($arCacheDebug[$i]);
+				}
+			}
+		}
+
+		if (is_array($arIncludeDebug))
+		{
+			foreach ($arIncludeDebug as $i => $ar)
+			{
+				if (array_key_exists("REL_PATH", $ar) && isset($ar["CACHE"]) && is_array($ar["CACHE"]))
+				{
+					foreach ($ar["CACHE"] as $N => $arCacheInfo)
+					{
+						if (
+							(
+								$arCacheInfo["cache_size"] > 0
+								&& $arCacheInfo["cache_size"] < $large_cache_size
+							) || (
+								$arCacheInfo["operation"] != "W"
+								&& $arCacheInfo["operation"] != "R"
+							)
+						)
+						{
+							unset($arIncludeDebug[$i]["CACHE"][$N]);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -400,7 +474,7 @@ class CAllPerfomanceKeeper
 	{
 		if (is_array($arCacheDebug))
 		{
-			foreach($arCacheDebug as $i => $arCacheInfo)
+			foreach ($arCacheDebug as $i => $arCacheInfo)
 				$cache_count[$arCacheInfo["operation"]]++;
 		}
 	}
@@ -409,19 +483,19 @@ class CAllPerfomanceKeeper
 	{
 		$module_id = false;
 		$comp_id = false;
-		foreach($trace as $i => $arCallInfo)
+		foreach ($trace as $i => $arCallInfo)
 		{
-			if(array_key_exists("file", $arCallInfo))
+			if (array_key_exists("file", $arCallInfo))
 			{
 				$file = strtolower(str_replace("\\", "/", $arCallInfo["file"]));
 
-				if(
+				if (
 					!$module_id
 					&& !preg_match("/\\/(database|cache|managedcache)\\.php\$/", $file)
 				)
 				{
 					$match = array();
-					if(preg_match("#.*/bitrix/modules/(.+?)/#", $file, $match))
+					if (preg_match("#.*/bitrix/modules/(.+?)/#", $file, $match))
 					{
 						$module_id = $match[1];
 					}
@@ -436,7 +510,7 @@ class CAllPerfomanceKeeper
 					$comp_id = $match[1].":".$match[2];
 				}
 
-				if($module_id && $comp_id)
+				if ($module_id && $comp_id)
 					break;
 			}
 		}
@@ -446,7 +520,7 @@ class CAllPerfomanceKeeper
 	{
 		global $DB;
 
-		foreach($arQueryDebug as $i => $arQueryInfo)
+		foreach ($arQueryDebug as $arQueryInfo)
 		{
 			self::findCaller($arQueryInfo["TRACE"], $module_id, $comp_id);
 
@@ -462,10 +536,10 @@ class CAllPerfomanceKeeper
 			);
 			$SQL_ID = $DB->Add("b_perf_sql", $arFields, array("SQL_TEXT"));
 
-			if($SQL_ID && COption::GetOptionString("perfmon", "sql_backtrace") === "Y")
+			if ($SQL_ID && COption::GetOptionString("perfmon", "sql_backtrace") === "Y")
 			{
 				$pl = strlen(rtrim($_SERVER["DOCUMENT_ROOT"], "/"));
-				foreach($arQueryInfo["TRACE"] as $i => $arCallInfo)
+				foreach ($arQueryInfo["TRACE"] as $i => $arCallInfo)
 				{
 					$DB->Add("b_perf_sql_backtrace", array(
 						"ID" => 1,
@@ -485,7 +559,7 @@ class CAllPerfomanceKeeper
 	{
 		global $DB;
 
-		foreach($arCacheDebug as $i => $arCacheInfo)
+		foreach ($arCacheDebug as $i => $arCacheInfo)
 		{
 			self::findCaller($arCacheInfo["TRACE"], $module_id, $comp_id);
 
@@ -502,16 +576,16 @@ class CAllPerfomanceKeeper
 				"FILE_NAME" => $arCacheInfo["filename"],
 				"FILE_PATH" => $arCacheInfo["path"],
 			);
-			$SQL_ID = $DB->Add("b_perf_cache", $arFields, array("SQL_TEXT"));
+			$DB->Add("b_perf_cache", $arFields, array("SQL_TEXT"));
 		}
 	}
 
 	public static function IsActive()
 	{
 		$bActive = false;
-		foreach(GetModuleEvents("main", "OnPageStart", true) as $arEvent)
+		foreach (GetModuleEvents("main", "OnPageStart", true) as $arEvent)
 		{
-			if($arEvent["TO_MODULE_ID"] == "perfmon")
+			if ($arEvent["TO_MODULE_ID"] == "perfmon")
 			{
 				$bActive = true;
 				break;
@@ -522,9 +596,9 @@ class CAllPerfomanceKeeper
 
 	public static function SetActive($bActive = false, $end_time = 0)
 	{
-		if($bActive)
+		if ($bActive)
 		{
-			if(!CPerfomanceKeeper::IsActive())
+			if (!CPerfomanceKeeper::IsActive())
 			{
 				RegisterModuleDependences("main", "OnPageStart", "perfmon", "CPerfomanceKeeper", "OnPageStart", "1");
 				RegisterModuleDependences("main", "OnEpilog", "perfmon", "CPerfomanceKeeper", "OnEpilog", "1000");
@@ -536,7 +610,7 @@ class CAllPerfomanceKeeper
 		}
 		else
 		{
-			if(CPerfomanceKeeper::IsActive())
+			if (CPerfomanceKeeper::IsActive())
 			{
 				UnRegisterModuleDependences("main", "OnPageStart", "perfmon", "CPerfomanceKeeper", "OnPageStart");
 				UnRegisterModuleDependences("main", "OnEpilog", "perfmon", "CPerfomanceKeeper", "OnEpilog");
@@ -547,4 +621,3 @@ class CAllPerfomanceKeeper
 		}
 	}
 }
-?>

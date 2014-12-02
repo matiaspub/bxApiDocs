@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/vat.php"
 
 
 /**
- * <b>CCatalogVat</b> - класс для работы со ставками НДС.
+ * <b>CCatalogVat</b> - класс для работы со ставками НДС.</body> </html>
  *
  *
  *

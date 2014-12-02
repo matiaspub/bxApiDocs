@@ -239,11 +239,29 @@ class CSubscriptionGeneral
 		global $DB;
 		$ID = intval($ID);
 
+		foreach (GetModuleEvents("subscribe", "OnBeforeSubscriptionDelete", true) as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array($ID)) === false)
+			{
+				return false;
+			}
+		}
+
 		$DB->StartTransaction();
 
-		if($DB->Query("DELETE FROM b_subscription_rubric WHERE SUBSCRIPTION_ID='".$ID."'", false, "File: ".__FILE__."<br>Line: ".__LINE__) &&
-		($res = $DB->Query("DELETE FROM b_subscription WHERE ID='".$ID."' ", false, "File: ".__FILE__."<br>Line: ".__LINE__)))
+		$res = $DB->Query("DELETE FROM b_subscription_rubric WHERE SUBSCRIPTION_ID='".$ID."'", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		if ($res)
 		{
+			$res = $DB->Query("DELETE FROM b_subscription WHERE ID='".$ID."' ", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+
+		if ($res)
+		{
+			foreach (GetModuleEvents("subscribe", "OnAfterSubscriptionDelete", true) as $arEvent)
+			{
+				ExecuteModuleEventEx($arEvent, array($ID));
+			}
+
 			$DB->Commit();
 			return $res;
 		}
@@ -253,12 +271,31 @@ class CSubscriptionGeneral
 	}
 
 	//check fields before writing
-	public function CheckFields($arFields, $ID)
+	public function CheckFields($arFields, $ID, $SITE_ID=SITE_ID)
 	{
-		global $DB;
+		global $DB, $APPLICATION;
 
+		$APPLICATION->ResetException();
 		$this->LAST_ERROR = "";
 		$aMsg = array();
+		if($ID > 0)
+		{
+			$arFields["ID"] = $ID;
+		}
+
+		if ($ID > 0)
+			$db_events = GetModuleEvents("subscribe", "OnStartSubscriptionUpdate", true);
+		else
+			$db_events = GetModuleEvents("subscribe", "OnStartSubscriptionAdd", true);
+
+		foreach($db_events as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array(&$arFields, $SITE_ID)) === false)
+			{
+				break;
+			}
+		}
+
 
 		if(is_set($arFields, "EMAIL"))
 		{
@@ -283,13 +320,42 @@ class CSubscriptionGeneral
 			}
 		}
 
+		if ($ID > 0)
+			$db_events = GetModuleEvents("subscribe", "OnBeforeSubscriptionUpdate", true);
+		else
+			$db_events = GetModuleEvents("subscribe", "OnBeforeSubscriptionAdd", true);
+
+		foreach($db_events as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array(&$arFields, $SITE_ID)) === false)
+			{
+				$err = $APPLICATION->GetException();
+				if ($err)
+				{
+					$aMsg[] = array("id"=>"", "text"=>$err->GetString());
+					$APPLICATION->ResetException();
+				}
+				else
+				{
+					$aMsg[] = array("id"=>"", "text"=>"Unknown error.");
+				}
+				break;
+			}
+		}
+
+		if($ID > 0)
+		{
+			unset($arFields["ID"]);
+		}
+
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException($aMsg);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			$this->LAST_ERROR = $e->GetString();
 			return false;
 		}
+
 		return true;
 	}
 
@@ -359,7 +425,7 @@ class CSubscriptionGeneral
 	{
 		global $DB;
 
-		if(!$this->CheckFields($arFields, 0))
+		if(!$this->CheckFields($arFields, 0, $SITE_ID))
 			return false;
 
 		if(array_key_exists("USER_ID", $arFields) && (intval($arFields["USER_ID"]) <= 0))
@@ -381,6 +447,7 @@ class CSubscriptionGeneral
 			if($arFields["SEND_CONFIRM"] <> "N")
 				$this->ConfirmEvent($ID, $SITE_ID);
 		}
+
 		return $ID;
 	}
 
@@ -391,7 +458,7 @@ class CSubscriptionGeneral
 		$ID = intval($ID);
 		$this->LAST_MESSAGE = "";
 
-		if(!$this->CheckFields($arFields, $ID))
+		if(!$this->CheckFields($arFields, $ID, $SITE_ID))
 			return false;
 
 		if(array_key_exists("USER_ID", $arFields) && (intval($arFields["USER_ID"]) <= 0))

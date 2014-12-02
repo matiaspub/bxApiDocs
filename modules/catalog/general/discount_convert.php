@@ -1,5 +1,7 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class CCatalogDiscountConvert
 {
@@ -19,12 +21,12 @@ class CCatalogDiscountConvert
 
 	public static function InitStep()
 	{
-		if ('' == self::$strSessID)
+		if (self::$strSessID == '')
 			self::$strSessID = 'DC'.time();
-		if (array_key_exists(self::$strSessID, $_SESSION) && is_array($_SESSION[self::$strSessID]))
+		if (isset($_SESSION[self::$strSessID]) && is_array($_SESSION[self::$strSessID]))
 		{
-			if (isset($_SESSION[self::$strSessID]['ERRORS_COUNT']) && 0 < intval($_SESSION[self::$strSessID]['ERRORS_COUNT']))
-				self::$intErrors = intval($_SESSION[self::$strSessID]['ERRORS_COUNT']);
+			if (isset($_SESSION[self::$strSessID]['ERRORS_COUNT']) && (int)$_SESSION[self::$strSessID]['ERRORS_COUNT'] > 0)
+				self::$intErrors = (int)$_SESSION[self::$strSessID]['ERRORS_COUNT'];
 			if (isset($_SESSION[self::$strSessID]['ERRORS']) && is_array($_SESSION[self::$strSessID]['ERRORS']))
 				self::$arErrors = $_SESSION[self::$strSessID]['ERRORS'];
 		}
@@ -32,11 +34,11 @@ class CCatalogDiscountConvert
 
 	public static function SaveStep()
 	{
-		if ('' == self::$strSessID)
+		if (self::$strSessID == '')
 			self::$strSessID = 'DC'.time();
-		if (!array_key_exists(self::$strSessID, $_SESSION) || !is_array($_SESSION[self::$strSessID]))
+		if (!isset($_SESSION[self::$strSessID]) || !is_array($_SESSION[self::$strSessID]))
 			$_SESSION[self::$strSessID] = array();
-		if (0 < self::$intErrors)
+		if (self::$intErrors > 0)
 		{
 			$_SESSION[self::$strSessID]['ERRORS_COUNT'] = self::$intErrors;
 		}
@@ -59,8 +61,8 @@ class CCatalogDiscountConvert
 
 		self::InitStep();
 
-		$intStep = intval($intStep);
-		if (0 >= $intStep)
+		$intStep = (int)$intStep;
+		if ($intStep <= 0)
 			$intStep = 100;
 		$startConvertTime = getmicrotime();
 
@@ -93,28 +95,31 @@ class CCatalogDiscountConvert
 		$rsDiscounts = CCatalogDiscount::GetList(
 			array('ID' => 'ASC'),
 			array(
-				'TYPE' => DISCOUNT_TYPE_STANDART,
-				'VERSION' => CATALOG_DISCOUNT_OLD_VERSION
+				'TYPE' => CCatalogDiscount::ENTITY_ID,
+				'VERSION' => CCatalogDiscount::OLD_FORMAT
 			),
 			false,
 			array('nTopCount' => $intStep),
-			array('ID', 'MODIFIED_BY', 'TIMESTAMP_X', 'NAME')
+			array('ID', 'MODIFIED_BY', 'TIMESTAMP_X', 'NAME', 'ACTIVE')
 		);
 		while ($arDiscount = $rsDiscounts->Fetch())
 		{
 			$boolActive = true;
 			$arSrcEntity = array();
 
-			$arFields = array();
-			$arFields['MODIFIED_BY'] = $arDiscount['MODIFIED_BY'];
+			$arFields = array(
+				'MODIFIED_BY' => $arDiscount['MODIFIED_BY'],
+				'ACTIVE' => $arDiscount['ACTIVE']
+			);
+
 			$arPriceTypes = array();
 			$arUserGroups = array();
 
 			$rsPriceTypes = $DB->Query(str_replace('#ID#', $arDiscount['ID'], $strQueryPriceTypes), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arPrice = $rsPriceTypes->Fetch())
 			{
-				$arPrice['CATALOG_GROUP_ID'] = intval($arPrice['CATALOG_GROUP_ID']);
-				if (0 < $arPrice['CATALOG_GROUP_ID'])
+				$arPrice['CATALOG_GROUP_ID'] = (int)$arPrice['CATALOG_GROUP_ID'];
+				if ($arPrice['CATALOG_GROUP_ID'] > 0)
 					$arPriceTypes[] = $arPrice['CATALOG_GROUP_ID'];
 			}
 			if (!empty($arPriceTypes))
@@ -129,8 +134,8 @@ class CCatalogDiscountConvert
 			$rsUserGroups = $DB->Query(str_replace('#ID#', $arDiscount['ID'], $strQueryUserGroups), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arGroup = $rsUserGroups->Fetch())
 			{
-				$arGroup['GROUP_ID'] = intval($arGroup['GROUP_ID']);
-				if (0 < $arGroup['GROUP_ID'])
+				$arGroup['GROUP_ID'] = (int)$arGroup['GROUP_ID'];
+				if ($arGroup['GROUP_ID'] > 0)
 					$arUserGroups[] = $arGroup['GROUP_ID'];
 			}
 			if (!empty($arUserGroups))
@@ -165,11 +170,11 @@ class CCatalogDiscountConvert
 			{
 				$boolEmpty = false;
 				$arSrcList[] = $arIBlock['IBLOCK_ID'];
-				$arIBlock['IBLOCK_ID'] = intval($arIBlock['IBLOCK_ID']);
-				if (0 < $arIBlock['IBLOCK_ID'])
+				$arIBlock['IBLOCK_ID'] = (int)$arIBlock['IBLOCK_ID'];
+				if ($arIBlock['IBLOCK_ID'] > 0)
 				{
 					$strName = CIBlock::GetArrayByID($arIBlock['IBLOCK_ID'], 'NAME');
-					if (false !== $strName && !is_null($strName))
+					if ($strName !== false && $strName !== null)
 					{
 						$arIBlockList[] = $arIBlock['IBLOCK_ID'];
 					}
@@ -185,7 +190,7 @@ class CCatalogDiscountConvert
 				if (!$boolEmpty)
 				{
 					$boolActive = false;
-					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), GetMessage('BT_MOD_CAT_DSC_CONV_ENTITY_IBLOCK_ERR'));
+					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), Loc::getMessage('BT_MOD_CAT_DSC_CONV_ENTITY_IBLOCK_ERR'));
 				}
 			}
 
@@ -196,8 +201,8 @@ class CCatalogDiscountConvert
 			{
 				$boolEmpty = false;
 				$arSrcList[] = $arSection['SECTION_ID'];
-				$arSection['SECTION_ID'] = intval($arSection['SECTION_ID']);
-				if (0 < $arSection['SECTION_ID'])
+				$arSection['SECTION_ID'] = (int)$arSection['SECTION_ID'];
+				if ($arSection['SECTION_ID'] > 0)
 					$arSectionList[] = $arSection['SECTION_ID'];
 			}
 			if (!empty($arSectionList))
@@ -207,7 +212,7 @@ class CCatalogDiscountConvert
 				$arCheckResult = array();
 				while ($arSection = $rsSections->Fetch())
 				{
-					$arCheckResult[] = intval($arSection['ID']);
+					$arCheckResult[] = (int)$arSection['ID'];
 				}
 				if (!empty($arCheckResult))
 				{
@@ -225,7 +230,7 @@ class CCatalogDiscountConvert
 				if (!$boolEmpty)
 				{
 					$boolActive = false;
-					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), GetMessage('BT_MOD_CAT_DSC_CONV_ENTITY_SECTION_ERR'));
+					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), Loc::getMessage('BT_MOD_CAT_DSC_CONV_ENTITY_SECTION_ERR'));
 				}
 			}
 
@@ -236,8 +241,8 @@ class CCatalogDiscountConvert
 			{
 				$boolEmpty = false;
 				$arSrcList[] = $arElement['PRODUCT_ID'];
-				$arElement['PRODUCT_ID'] = intval($arElement['PRODUCT_ID']);
-				if (0 < $arElement['PRODUCT_ID'])
+				$arElement['PRODUCT_ID'] = (int)$arElement['PRODUCT_ID'];
+				if ($arElement['PRODUCT_ID'] > 0)
 					$arElementList[] = $arElement['PRODUCT_ID'];
 			}
 			if (!empty($arElementList))
@@ -247,7 +252,7 @@ class CCatalogDiscountConvert
 				$arCheckResult = array();
 				while ($arItem = $rsItems->Fetch())
 				{
-					$arCheckResult[] = intval($arItem['ID']);
+					$arCheckResult[] = (int)$arItem['ID'];
 				}
 				if (!empty($arCheckResult))
 				{
@@ -265,7 +270,7 @@ class CCatalogDiscountConvert
 				if (!$boolEmpty)
 				{
 					$boolActive = false;
-					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), GetMessage('BT_MOD_CAT_DSC_CONV_ENTITY_ELEMENT_ERR'));
+					$arSrcEntity[] = str_replace('#IDS#', implode(', ', $arSrcList), Loc::getMessage('BT_MOD_CAT_DSC_CONV_ENTITY_ELEMENT_ERR'));
 				}
 			}
 
@@ -434,7 +439,7 @@ class CCatalogDiscountConvert
 				self::$arErrors[] = array(
 					'ID' => $arDiscount['ID'],
 					'NAME' => $arDiscount['NAME'],
-					'ERROR' => GetMessage('BT_MOD_CAT_DSC_CONV_INACTIVE').' '.implode('; ', $arSrcEntity),
+					'ERROR' => Loc::getMessage('BT_MOD_CAT_DSC_CONV_INACTIVE').' '.implode('; ', $arSrcEntity),
 				);
 			}
 
@@ -448,7 +453,7 @@ class CCatalogDiscountConvert
 					$strError = $ex->GetString();
 				}
 				if (empty($strError))
-					$strError = GetMessage('BT_MOD_CAT_DSC_FORMAT_ERR');
+					$strError = Loc::getMessage('BT_MOD_CAT_DSC_FORMAT_ERR');
 				self::$arErrors[] = array(
 					'ID' => $arDiscount['ID'],
 					'NAME' => $arDiscount['NAME'],
@@ -461,7 +466,7 @@ class CCatalogDiscountConvert
 				$strUpdate = $DB->PrepareUpdate($strTableName, $arTimeFields);
 				if (!empty($strUpdate))
 				{
-					$strQuery = "UPDATE ".$strTableName." SET ".$strUpdate." WHERE ID = ".$arDiscount['ID']." AND TYPE = ".DISCOUNT_TYPE_STANDART;
+					$strQuery = "UPDATE ".$strTableName." SET ".$strUpdate." WHERE ID = ".$arDiscount['ID']." AND TYPE = ".CCatalogDiscount::ENTITY_ID;
 					$DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				}
 
@@ -491,8 +496,8 @@ class CCatalogDiscountConvert
 
 		self::InitStep();
 
-		$intStep = intval($intStep);
-		if (0 >= $intStep)
+		$intStep = (int)$intStep;
+		if ($intStep <= 0)
 			$intStep = 20;
 		$startConvertTime = getmicrotime();
 
@@ -517,7 +522,7 @@ class CCatalogDiscountConvert
 			return false;
 		}
 
-		if (0 >= self::$intLastConvertID)
+		if (self::$intLastConvertID <= 0)
 			self::$intLastConvertID = CCatalogDiscountConvertTmp::GetLastID();
 
 		CTimeZone::Disable();
@@ -528,12 +533,12 @@ class CCatalogDiscountConvert
 			array('ID' => 'ASC'),
 			array(
 				'>ID' => self::$intLastConvertID,
-				'TYPE' => DISCOUNT_TYPE_STANDART,
-				'VERSION' => CATALOG_DISCOUNT_NEW_VERSION
+				'TYPE' => CCatalogDiscount::ENTITY_ID,
+				'VERSION' => CCatalogDiscount::CURRENT_FORMAT
 			),
 			false,
 			array('nTopCount' => $intStep),
-			array('ID', 'MODIFIED_BY', 'TIMESTAMP_X', 'CONDITIONS', 'NAME')
+			array('ID', 'MODIFIED_BY', 'TIMESTAMP_X', 'CONDITIONS', 'NAME', 'ACTIVE')
 		);
 		while ($arDiscount = $rsDiscounts->Fetch())
 		{
@@ -551,10 +556,11 @@ class CCatalogDiscountConvert
 				self::$intLastConvertID = $arDiscount['ID'];
 				continue;
 			}
-			$arFields = array();
-			$arFields['MODIFIED_BY'] = $arDiscount['MODIFIED_BY'];
-
-			$arFields['CONDITIONS'] = $arDiscount['CONDITIONS'];
+			$arFields = array(
+				'MODIFIED_BY' => $arDiscount['MODIFIED_BY'],
+				'CONDITIONS' => $arDiscount['CONDITIONS'],
+				'ACTIVE' => $arDiscount['ACTIVE']
+			);
 
 			$mxRes = $obDiscount->Update($arDiscount['ID'], $arFields);
 			if (!$mxRes)
@@ -566,7 +572,7 @@ class CCatalogDiscountConvert
 					$strError = $ex->GetString();
 				}
 				if (empty($strError))
-					$strError = GetMessage('BT_MOD_CAT_DSC_FORMAT_ERR');
+					$strError = Loc::getMessage('BT_MOD_CAT_DSC_FORMAT_ERR');
 				self::$arErrors[] = array(
 					'ID' => $arDiscount['ID'],
 					'NAME' => $arDiscount['NAME'],
@@ -587,7 +593,7 @@ class CCatalogDiscountConvert
 				$strUpdate = $DB->PrepareUpdate($strTableName, $arTimeFields);
 				if (!empty($strUpdate))
 				{
-					$strQuery = "UPDATE ".$strTableName." SET ".$strUpdate." WHERE ID = ".$arDiscount['ID']." AND TYPE = ".DISCOUNT_TYPE_STANDART;
+					$strQuery = "UPDATE ".$strTableName." SET ".$strUpdate." WHERE ID = ".$arDiscount['ID']." AND TYPE = ".CCatalogDiscount::ENTITY_ID;
 					$DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				}
 				if (!CCatalogDiscountConvertTmp::SetID($arDiscount['ID']))
@@ -625,13 +631,13 @@ class CCatalogDiscountConvert
 		switch(ToUpper($DBType))
 		{
 			case 'MYSQL':
-				$strSql = "SELECT COUNT(*) CNT FROM b_catalog_discount WHERE TYPE=".DISCOUNT_TYPE_STANDART." AND VERSION=".CATALOG_DISCOUNT_OLD_VERSION;
+				$strSql = "SELECT COUNT(*) CNT FROM b_catalog_discount WHERE TYPE=".CCatalogDiscount::ENTITY_ID." AND VERSION=".CCatalogDiscount::OLD_FORMAT;
 				break;
 			case 'MSSQL':
-				$strSql = "SELECT COUNT(*) CNT FROM B_CATALOG_DISCOUNT WHERE TYPE=".DISCOUNT_TYPE_STANDART." AND VERSION=".CATALOG_DISCOUNT_OLD_VERSION;
+				$strSql = "SELECT COUNT(*) CNT FROM B_CATALOG_DISCOUNT WHERE TYPE=".CCatalogDiscount::ENTITY_ID." AND VERSION=".CCatalogDiscount::OLD_FORMAT;
 				break;
 			case 'ORACLE':
-				$strSql = "SELECT COUNT(*) CNT FROM B_CATALOG_DISCOUNT WHERE TYPE=".DISCOUNT_TYPE_STANDART." AND VERSION=".CATALOG_DISCOUNT_OLD_VERSION;
+				$strSql = "SELECT COUNT(*) CNT FROM B_CATALOG_DISCOUNT WHERE TYPE=".CCatalogDiscount::ENTITY_ID." AND VERSION=".CCatalogDiscount::OLD_FORMAT;
 				break;
 		}
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -639,7 +645,7 @@ class CCatalogDiscountConvert
 			return 0;
 
 		if ($row = $res->Fetch())
-			return intval($row['CNT']);
+			return (int)$row['CNT'];
 	}
 
 	public static function GetCountFormat()

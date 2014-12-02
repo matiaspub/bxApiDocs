@@ -1165,6 +1165,26 @@ class CAdminSubForm extends CAdminForm
 		}
 	}
 
+	public static function ShowSettings()
+	{
+		/** @noinspection PhpUnusedLocalVariableInspection */
+		/** @global CMain $APPLICATION */
+		global $APPLICATION, $USER;
+
+		$APPLICATION->RestartBuffer();
+
+		require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_js.php");
+
+		$adminFormParams = array(
+			'tabPrefix' => 'csubedit'
+		);
+		require($_SERVER['DOCUMENT_ROOT']."/bitrix/modules/main/interface/settings_admin_form.php");
+
+		require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin_js.php");
+
+		die();
+	}
+
 	public function GetListUrl($boolFull = false)
 	{
 		return $this->strListUrl.(true == $boolFull && '' != $this->strListUrlParams ? '?'.$this->strListUrlParams : '');
@@ -1488,37 +1508,22 @@ class CAdminSubResult extends CAdminResult
 		parent::NavStart($nPageSize, $bShowAll, $iNumPage);
 	}
 
-	public static function GetNavSize($table_id=false, $nPageSize=20, $list_url)
+	/**
+	 * @param bool|string $table_id
+	 * @param int|array $nPageSize
+	 * @param string $list_url
+	 * @return int
+	 */
+	public static function GetNavSize($table_id=false, $nPageSize=20, $list_url = '')
 	{
-		$bSess = (CPageOption::GetOptionString("main", "nav_page_in_session", "Y")=="Y");
-		if($bSess)
+		$list_url = (string)$list_url;
+		if ($list_url != '')
 		{
-			if(is_array($nPageSize))
-				$sNavID = $nPageSize["sNavID"];
-			$unique = md5((isset($sNavID)? $sNavID : $list_url));
+			if (!is_array($nPageSize))
+				$nPageSize = array('nPageSize' => $nPageSize);
+			$nPageSize['sNavID'] = $list_url;
 		}
-
-		if(isset($_REQUEST["SIZEN_".($GLOBALS["NavNum"]+1)]))
-		{
-			$nSize = intval($_REQUEST["SIZEN_".($GLOBALS["NavNum"]+1)]);
-			if($bSess)
-				$_SESSION["NAV_PAGE_SIZE"][$unique] = $nSize;
-		}
-		elseif($bSess && isset($_SESSION["NAV_PAGE_SIZE"][$unique]))
-		{
-			$nSize = $_SESSION["NAV_PAGE_SIZE"][$unique];
-		}
-		else
-		{
-			$aOptions = array();
-			if($table_id)
-				$aOptions = CUserOptions::GetOption("list", $table_id);
-			if(intval($aOptions["page_size"]) > 0)
-				$nSize = intval($aOptions["page_size"]);
-			else
-				$nSize = (is_array($nPageSize)? $nPageSize["nPageSize"]:$nPageSize);
-		}
-		return $nSize;
+		return parent::GetNavSize($table_id, $nPageSize);
 	}
 
 	public function GetNavPrint($title, $show_allways=true, $StyleText="", $template_path=false, $arDeleteParam=false)

@@ -8,10 +8,10 @@ namespace Bitrix\Iblock\Template\Entity;
 
 class ElementProperty extends Base
 {
-	protected $iblock_id = 0;
+	protected $iblockId = 0;
 	protected $properties = array();
-	protected $element_link_properties = array();
-	protected $section_link_properties = array();
+	protected $elementLinkProperties = array();
+	protected $sectionLinkProperties = array();
 	/**
 	 * @param integer $id Iblock element identifier.
 	 */
@@ -29,7 +29,7 @@ class ElementProperty extends Base
 	 */
 	public function setIblockId($iblockId)
 	{
-		$this->iblock_id = intval($iblockId);
+		$this->iblockId = intval($iblockId);
 	}
 
 	/**
@@ -43,17 +43,17 @@ class ElementProperty extends Base
 	{
 		if ($this->loadFromDatabase())
 		{
-			if (isset($this->element_link_properties[$entity]))
+			if (isset($this->elementLinkProperties[$entity]))
 			{
-				if (!is_object($this->element_link_properties[$entity]))
-					$this->element_link_properties[$entity] = new Element($this->element_link_properties[$entity]);
-				return $this->element_link_properties[$entity];
+				if (!is_object($this->elementLinkProperties[$entity]))
+					$this->elementLinkProperties[$entity] = new Element($this->elementLinkProperties[$entity]);
+				return $this->elementLinkProperties[$entity];
 			}
-			elseif (isset($this->section_link_properties[$entity]))
+			elseif (isset($this->sectionLinkProperties[$entity]))
 			{
-				if (!is_object($this->section_link_properties[$entity]))
-					$this->section_link_properties[$entity] = new Element($this->section_link_properties[$entity]);
-				return $this->section_link_properties[$entity];
+				if (!is_object($this->sectionLinkProperties[$entity]))
+					$this->sectionLinkProperties[$entity] = new Element($this->sectionLinkProperties[$entity]);
+				return $this->sectionLinkProperties[$entity];
 			}
 		}
 		return parent::resolve($entity);
@@ -71,13 +71,13 @@ class ElementProperty extends Base
 		parent::setFields($fields);
 		if (
 			is_array($this->fields)
-			&& $this->iblock_id > 0
+			&& $this->iblockId > 0
 		)
 		{
 			$properties = array();
 			$propertyList = \Bitrix\Iblock\PropertyTable::getList(array(
 				"select" => array("*"),
-				"filter" => array("=IBLOCK_ID" => $this->iblock_id),
+				"filter" => array("=IBLOCK_ID" => $this->iblockId),
 			));
 			while ($row = $propertyList->fetch())
 			{
@@ -134,12 +134,12 @@ class ElementProperty extends Base
 					{
 						if ($propertyValues instanceof Element)
 						{
-							$this->element_link_properties[$fieldCode] = $propertyValues;
+							$this->elementLinkProperties[$fieldCode] = $propertyValues;
 							$value = $propertyValues->getField("name");
 						}
 						elseif (is_numeric($propertyValues))
 						{
-							$this->element_link_properties[$fieldCode] = $propertyValues;
+							$this->elementLinkProperties[$fieldCode] = $propertyValues;
 							$value = new ElementPropertyElement($propertyValues);
 						}
 						else
@@ -151,12 +151,12 @@ class ElementProperty extends Base
 					{
 						if ($propertyValues instanceof Section)
 						{
-							$this->section_link_properties[$fieldCode] = $propertyValues;
+							$this->sectionLinkProperties[$fieldCode] = $propertyValues;
 							$value = $propertyValues->getField("name");
 						}
 						elseif (is_numeric($propertyValues))
 						{
-							$this->section_link_properties[$fieldCode] = $propertyValues;
+							$this->sectionLinkProperties[$fieldCode] = $propertyValues;
 							$value = new ElementPropertySection($propertyValues);
 						}
 						else
@@ -195,13 +195,13 @@ class ElementProperty extends Base
 	 */
 	protected function loadFromDatabase()
 	{
-		if (!isset($this->fields) && $this->iblock_id > 0)
+		if (!isset($this->fields) && $this->iblockId > 0)
 		{
 			$this->fields = array();
 			$this->fieldMap = array();
 
 			$propertyList = \CIBlockElement::getProperty(
-				$this->iblock_id,
+				$this->iblockId,
 				$this->id,
 				array("sort" => "asc"),
 				array("EMPTY" => "N")
@@ -214,16 +214,16 @@ class ElementProperty extends Base
 				}
 				elseif ($property["PROPERTY_TYPE"] === "E")
 				{
-					$this->element_link_properties[$property["ID"]] = $property["VALUE"];
+					$this->elementLinkProperties[$property["ID"]] = $property["VALUE"];
 					if ($property["CODE"] != "")
-						$this->element_link_properties[strtolower($property["CODE"])] = $property["VALUE"];
+						$this->elementLinkProperties[strtolower($property["CODE"])] = $property["VALUE"];
 					$value = new ElementPropertyElement($property["VALUE"]);
 				}
 				elseif ($property["PROPERTY_TYPE"] === "G")
 				{
-					$this->section_link_properties[$property["ID"]] = $property["VALUE"];
+					$this->sectionLinkProperties[$property["ID"]] = $property["VALUE"];
 					if ($property["CODE"] != "")
-						$this->section_link_properties[strtolower($property["CODE"])] = $property["VALUE"];
+						$this->sectionLinkProperties[strtolower($property["CODE"])] = $property["VALUE"];
 					$value = new ElementPropertySection($property["VALUE"]);
 				}
 				else

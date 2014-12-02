@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CRubric</b> - класс для работы с рубриками подписки.
+ * <b>CRubric</b> - класс для работы с рубриками подписки.</body> </html>
  *
  *
  *

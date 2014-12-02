@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CPerfomanceMeasure
@@ -6,35 +6,33 @@ class CPerfomanceMeasure
 	public static function GetPHPCPUMark()
 	{
 		$res = array();
-		for($j = 0; $j < 4; $j++)
+		for ($j = 0; $j < 4; $j++)
 		{
-			$N1 = 0;
-			$N2 = 0;
-
 			$s1 = getmicrotime();
-			for($i = 0; $i < 1000000; $i++)
+			for ($i = 0; $i < 1000000; $i++)
 			{
 			}
 			$e1 = getmicrotime();
 			$N1 = $e1 - $s1;
 
 			$s2 = getmicrotime();
-			for($i = 0; $i < 1000000; $i++)
+			for ($i = 0; $i < 1000000; $i++)
 			{
 				//This is one op
-				$k++;$k--;
-				$k++;$k--;
+				$k++;
+				$k--;
+				$k++;
+				$k--;
 			}
 			$e2 = getmicrotime();
 			$N2 = $e2 - $s2;
 
-
-			if($N2 > $N1)
+			if ($N2 > $N1)
 				$res[] = 1 / ($N2 - $N1);
 		}
 
-		if(count($res))
-			return array_sum($res)/doubleval(count($res));
+		if (count($res))
+			return array_sum($res) / doubleval(count($res));
 		else
 			return 0;
 	}
@@ -42,16 +40,13 @@ class CPerfomanceMeasure
 	public static function GetPHPFilesMark()
 	{
 		$res = array();
-		$file_name = $_SERVER["DOCUMENT_ROOT"]."/".COption::GetOptionString("main","upload_dir","/upload/"). "/perfmon#i#.php";
+		$file_name = $_SERVER["DOCUMENT_ROOT"]."/".COption::GetOptionString("main", "upload_dir", "/upload/")."/perfmon#i#.php";
 		$content = "<?\$s='".str_repeat("x", 1024)."';?><?/*".str_repeat("y", 1024)."*/?><?\$r='".str_repeat("z", 1024)."';?>";
 
-		for($j = 0; $j < 4; $j++)
+		for ($j = 0; $j < 4; $j++)
 		{
-			$N1 = 0;
-			$N2 = 0;
-
 			$s1 = getmicrotime();
-			for($i = 0; $i < 100; $i++)
+			for ($i = 0; $i < 100; $i++)
 			{
 				$fn = str_replace("#i#", $i, $file_name);
 			}
@@ -59,7 +54,7 @@ class CPerfomanceMeasure
 			$N1 = $e1 - $s1;
 
 			$s2 = getmicrotime();
-			for($i = 0; $i < 100; $i++)
+			for ($i = 0; $i < 100; $i++)
 			{
 				//This is one op
 				$fn = str_replace("#i#", $i, $file_name);
@@ -72,20 +67,18 @@ class CPerfomanceMeasure
 			$e2 = getmicrotime();
 			$N2 = $e2 - $s2;
 
-
-			if($N2 > $N1)
+			if ($N2 > $N1)
 				$res[] = 100 / ($N2 - $N1);
 		}
 
-		if(count($res))
-			return array_sum($res)/doubleval(count($res));
+		if (count($res))
+			return array_sum($res) / doubleval(count($res));
 		else
 			return 0;
 	}
 
 	public static function GetPHPMailMark()
 	{
-		$res = array();
 		$addr = "hosting_test@bitrix.ru";
 		$subj = "Bitrix server test";
 		$body = "This is test message. Delete it.";
@@ -103,7 +96,7 @@ class CPerfomanceMeasure
 		global $DB;
 
 		$res = array();
-		switch($type)
+		switch ($type)
 		{
 		case "read":
 			$strSql = "select * from b_perf_test WHERE ID = #i#";
@@ -119,13 +112,10 @@ class CPerfomanceMeasure
 			$bFetch = false;
 		}
 
-		for($j = 0; $j < 4; $j++)
+		for ($j = 0; $j < 4; $j++)
 		{
-			$N1 = 0;
-			$N2 = 0;
-
 			$s1 = getmicrotime();
-			for($i = 0; $i < 100; $i++)
+			for ($i = 0; $i < 100; $i++)
 			{
 				$sql = str_replace("#i#", $i, $strSql);
 			}
@@ -133,41 +123,40 @@ class CPerfomanceMeasure
 			$N1 = $e1 - $s1;
 
 			$s2 = getmicrotime();
-			for($i = 0; $i < 100; $i++)
+			for ($i = 0; $i < 100; $i++)
 			{
 				//This is one op
 				$sql = str_replace("#i#", $i, $strSql);
 				$rs = $DB->Query($sql);
-				if($bFetch)
+				if ($bFetch)
 					$rs->Fetch();
 			}
 			$e2 = getmicrotime();
 			$N2 = $e2 - $s2;
 
-
-			if($N2 > $N1)
+			if ($N2 > $N1)
 				$res[] = 100 / ($N2 - $N1);
 		}
 
-		if(count($res))
-			return array_sum($res)/doubleval(count($res));
+		if (count($res))
+			return array_sum($res) / doubleval(count($res));
 		else
 			return 0;
 	}
 
 	public static function GetAccelerator()
 	{
-		if(function_exists('accelerator_reset'))
+		if (function_exists('accelerator_reset'))
 			return new CPerfAccelZend;
-		elseif(extension_loaded('apc') && !extension_loaded('apcu'))
+		elseif (extension_loaded('apc') && !extension_loaded('apcu'))
 			return new CPerfAccelAPC;
-		elseif(extension_loaded('eAccelerator'))
+		elseif (extension_loaded('eAccelerator'))
 			return new CPerfAccelEAccel;
-		elseif(extension_loaded('xcache'))
+		elseif (extension_loaded('xcache'))
 			return new CPerfAccelXCache;
-		elseif(extension_loaded('wincache'))
+		elseif (extension_loaded('wincache'))
 			return new CPerfAccelWinCache;
-		elseif(extension_loaded('Zend OPcache'))
+		elseif (extension_loaded('Zend OPcache'))
 			return new CPerfAccelZendOpCache;
 		else
 			return false;
@@ -184,7 +173,7 @@ class CPerfAccel
 	public $memory_used;
 	public $cache_limit;
 
-	public function __construct($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit=-1)
+	public function __construct($enabled, $cache_ttl, $max_file_size, $check_mtime, $memory_total, $memory_used, $cache_limit = -1)
 	{
 		$this->enabled = $enabled;
 		$this->cache_ttl = $cache_ttl;
@@ -195,37 +184,42 @@ class CPerfAccel
 		$this->cache_limit = $cache_limit;
 	}
 
+	public static function GetParams()
+	{
+		return array();
+	}
+
 	public function IsWorking()
 	{
-		if(!$this->enabled)
+		if (!$this->enabled)
 			return false;
 
-		if($this->cache_ttl == 0)
+		if ($this->cache_ttl == 0)
 			return false;
 
-		if($this->max_file_size >= 0)
+		if ($this->max_file_size >= 0)
 		{
-			if($this->max_file_size < 4*1024*1024)
+			if ($this->max_file_size < 4 * 1024 * 1024)
 				return false;
 		}
 
-		if(!$this->check_mtime)
+		if (!$this->check_mtime)
 			return false;
 
-		if($this->memory_used >= 0)
+		if ($this->memory_used >= 0)
 		{
 			//Check for 10% free
-			if(($this->memory_used / $this->memory_total) > 0.9)
+			if (($this->memory_used / $this->memory_total) > 0.9)
 				return false;
 		}
 		else
 		{
 			//Or at least 40M total when no used memory stat available
-			if($this->memory_total < 40*1024*1024)
+			if ($this->memory_total < 40 * 1024 * 1024)
 				return false;
 		}
 
-		if($this->cache_limit == 0)
+		if ($this->cache_limit == 0)
 			return false;
 
 		return true;
@@ -237,65 +231,67 @@ class CPerfAccel
 
 		$arParams = $this->GetParams();
 
-		if(array_key_exists("enabled", $arParams))
+		if (array_key_exists("enabled", $arParams))
 		{
 			$is_ok = $this->enabled;
-			foreach($arParams["enabled"] as $ar)
+			foreach ($arParams["enabled"] as $ar)
 			{
-				if(!isset($ar["IS_OK"]))
+				if (!isset($ar["IS_OK"]))
 					$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
 
-		if(array_key_exists("cache_ttl", $arParams))
+		if (array_key_exists("cache_ttl", $arParams))
 		{
-			$is_ok =  $this->cache_ttl != 0;
-			foreach($arParams["cache_ttl"] as $ar)
+			$is_ok = $this->cache_ttl != 0;
+			foreach ($arParams["cache_ttl"] as $ar)
 			{
-				if(!isset($ar["IS_OK"]))
+				if (!isset($ar["IS_OK"]))
 					$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
 
-		if(array_key_exists("max_file_size", $arParams) && $this->max_file_size >= 0)
+		if (array_key_exists("max_file_size", $arParams) && $this->max_file_size >= 0)
 		{
-			$is_ok = $this->max_file_size >= 4*1024*1024;
-			foreach($arParams["max_file_size"] as $ar)
+			$is_ok = $this->max_file_size >= 4 * 1024 * 1024;
+			foreach ($arParams["max_file_size"] as $ar)
 			{
 				$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
 
-		if(array_key_exists("check_mtime", $arParams))
+		if (array_key_exists("check_mtime", $arParams))
 		{
 			$is_ok = $this->check_mtime;
-			foreach($arParams["check_mtime"] as $ar)
+			foreach ($arParams["check_mtime"] as $ar)
 			{
 				$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
 
-		if(array_key_exists("memory_pct", $arParams) && $this->memory_used >= 0)
+		if (array_key_exists("memory_pct", $arParams) && $this->memory_used >= 0)
 		{
-			if($this->memory_total > 0)
+			if ($this->memory_total > 0)
 			{
 				//Check for 10% free
 				$is_ok = ($this->memory_used / $this->memory_total) <= 0.9;
-				foreach($arParams["memory_pct"] as $ar)
+				foreach ($arParams["memory_pct"] as $ar)
 					$arResult[] = array(
 						"PARAMETER" => $ar["PARAMETER"],
-						"VALUE" => GetMessage("PERFMON_MEASURE_MEMORY_USAGE", array("#percent#"=>number_format(($this->memory_used / $this->memory_total)*100, 2))),
+						"VALUE" => GetMessage("PERFMON_MEASURE_MEMORY_USAGE", array(
+							"#percent#" => number_format(($this->memory_used / $this->memory_total) * 100, 2)
+						)),
 						"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_CACHE_REC"),
 						"IS_OK" => $is_ok,
 					);
 			}
 			else
 			{
-				foreach($arParams["memory_pct"] as $ar)
+				foreach ($arParams["memory_pct"] as $ar)
 					$arResult[] = array(
 						"PARAMETER" => $ar["PARAMETER"],
 						"VALUE" => "",
@@ -304,21 +300,21 @@ class CPerfAccel
 					);
 			}
 		}
-		elseif(array_key_exists("memory_abs", $arParams))
+		elseif (array_key_exists("memory_abs", $arParams))
 		{
 			//Or at least 40M total when no used memory stat available
-			$is_ok = $this->memory_total >= 40*1024*1024;
-			foreach($arParams["memory_abs"] as $ar)
+			$is_ok = $this->memory_total >= 40 * 1024 * 1024;
+			foreach ($arParams["memory_abs"] as $ar)
 			{
 				$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
 			}
 		}
 
-		if(array_key_exists("cache_limit", $arParams))
+		if (array_key_exists("cache_limit", $arParams))
 		{
-			$is_ok =  $this->cache_limit != 0;
-			foreach($arParams["cache_limit"] as $ar)
+			$is_ok = $this->cache_limit != 0;
+			foreach ($arParams["cache_limit"] as $ar)
 			{
 				$ar["IS_OK"] = $is_ok;
 				$arResult[] = $ar;
@@ -333,12 +329,12 @@ class CPerfAccel
 		$str = strtolower($str);
 		$res = intval($str);
 		$suffix = substr($str, -1);
-		if($suffix == "k")
+		if ($suffix == "k")
 			$res *= 1024;
-		elseif($suffix == "m")
+		elseif ($suffix == "m")
 			$res *= 1048576;
-		elseif($suffix == "g")
-			$res *= 1048576*1024;
+		elseif ($suffix == "g")
+			$res *= 1048576 * 1024;
 		return $res;
 	}
 }
@@ -348,14 +344,14 @@ class CPerfAccelZend extends CPerfAccel
 	public static function __construct()
 	{
 		$zend_enable = ini_get('zend_optimizerplus.enable');
-		$zend_mtime  = ini_get('zend_optimizerplus.validate_timestamps');
+		$zend_mtime = ini_get('zend_optimizerplus.validate_timestamps');
 
 		parent::__construct(
 			strtolower($zend_enable) == "on" || $zend_enable == "1",
 			-1,
 			-1,
 			strtolower($zend_mtime) == "on" || $zend_mtime == "1",
-			intval(ini_get('zend_optimizerplus.memory_consumption'))*1024*1024,
+			intval(ini_get('zend_optimizerplus.memory_consumption')) * 1024 * 1024,
 			-1
 		);
 	}
@@ -364,7 +360,7 @@ class CPerfAccelZend extends CPerfAccel
 	{
 		$arResult = parent::GetRecommendations();
 
-		if(function_exists('accelerator_get_status'))
+		if (function_exists('accelerator_get_status'))
 		{
 			$is_ok = is_array(accelerator_get_status());
 
@@ -417,9 +413,9 @@ class CPerfAccelAPC extends CPerfAccel
 	public function __construct()
 	{
 		$apc_enabled = strtolower(ini_get('apc.enabled'));
-		$this->is_enabled = !($apc_enabled=="0" || $apc_enabled=="off");
+		$this->is_enabled = !($apc_enabled == "0" || $apc_enabled == "off");
 		$apc_cache_by_default = strtolower(ini_get('apc.cache_by_default'));
-		$this->is_cache_by_default = !($apc_cache_by_default=="0" || $apc_cache_by_default=="off");
+		$this->is_cache_by_default = !($apc_cache_by_default == "0" || $apc_cache_by_default == "off");
 		$apc_stat = strtolower(ini_get('apc.stat'));
 		$this->num_files_hint = intval(ini_get('apc.num_files_hint'));
 		$this->user_entries_hint = intval(ini_get('apc.user_entries_hint'));
@@ -430,7 +426,7 @@ class CPerfAccelAPC extends CPerfAccel
 			$this->is_enabled && $this->is_cache_by_default,
 			intval(ini_get('apc.ttl')),
 			static::unformat(ini_get('apc.max_file_size')),
-			!($apc_stat=="0" || $apc_stat=="off"),
+			!($apc_stat == "0" || $apc_stat == "off"),
 			$memory["seg_size"],
 			$memory["seg_size"] - $memory["avail_mem"]
 		);
@@ -456,13 +452,13 @@ class CPerfAccelAPC extends CPerfAccel
 					"PARAMETER" => 'apc.num_files_hint',
 					"VALUE" => ini_get('apc.num_files_hint'),
 					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_ZERO_OR_GREATER_THAN_REC", array("#value#" => "20000")),
-					"IS_OK" => $this->num_files_hint==0 || $this->num_files_hint>=20000,
+					"IS_OK" => $this->num_files_hint == 0 || $this->num_files_hint >= 20000,
 				),
 				array(
 					"PARAMETER" => 'apc.user_entries_hint',
 					"VALUE" => ini_get('apc.user_entries_hint'),
 					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_ZERO_OR_GREATER_THAN_REC", array("#value#" => "20000")),
-					"IS_OK" => $this->user_entries_hint==0 || $this->user_entries_hint>=20000,
+					"IS_OK" => $this->user_entries_hint == 0 || $this->user_entries_hint >= 20000,
 				),
 			),
 			"cache_ttl" => array(
@@ -470,7 +466,7 @@ class CPerfAccelAPC extends CPerfAccel
 					"PARAMETER" => 'apc.ttl',
 					"VALUE" => ini_get('apc.ttl'),
 					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_EQUAL_OR_GREATER_THAN_REC", array("#value#" => 86400)),
-					"IS_OK" => ini_get('apc.ttl')>=86400,
+					"IS_OK" => ini_get('apc.ttl') >= 86400,
 				),
 			),
 			"max_file_size" => array(
@@ -502,15 +498,15 @@ class CPerfAccelEAccel extends CPerfAccel
 {
 	public static function __construct()
 	{
-		if(function_exists("eaccelerator_info"))
+		if (function_exists("eaccelerator_info"))
 			$memory = eaccelerator_info();
 		else
 			$memory = array(
-				"memorySize" => intval(ini_get('eaccelerator.shm_size'))*1024*1024,
+				"memorySize" => intval(ini_get('eaccelerator.shm_size')) * 1024 * 1024,
 				"memoryAllocated" => -1,
 			);
 
-		if(\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
+		if (\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
 			$cache_limit = intval(ini_get('eaccelerator.shm_max'));
 		else
 			$cache_limit = -1;
@@ -558,7 +554,7 @@ class CPerfAccelEAccel extends CPerfAccel
 				),
 			),
 		);
-		if(\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
+		if (\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
 		{
 			$res["cache_limit"] = array(
 				array(
@@ -582,7 +578,7 @@ class CPerfAccelXCache extends CPerfAccel
 			ini_get('xcache.cacher') != "0",
 			intval(ini_get('xcache.ttl')),
 			-1,
-			!($xcache_stat=="0" || strtolower($xcache_stat)=="off"),
+			!($xcache_stat == "0" || strtolower($xcache_stat) == "off"),
 			static::unformat(ini_get('xcache.size')),
 			-1
 		);
@@ -631,7 +627,7 @@ class CPerfAccelWinCache extends CPerfAccel
 		$memory = wincache_ocache_meminfo();
 
 		parent::__construct(
-			!($wincache_enabled=="0" || strtolower($wincache_enabled)=="off"),
+			!($wincache_enabled == "0" || strtolower($wincache_enabled) == "off"),
 			-1,
 			-1,
 			true, //Because there is no way to turn on check file mtime we'll assume it's ok
@@ -666,7 +662,7 @@ class CPerfAccelZendOpCache extends CPerfAccel
 	public static function __construct()
 	{
 		$memory = array(
-			"memorySize" => intval(ini_get('opcache.memory_consumption'))*1024*1024,
+			"memorySize" => intval(ini_get('opcache.memory_consumption')) * 1024 * 1024,
 			"memoryAllocated" => -1,
 		);
 
@@ -716,5 +712,3 @@ class CPerfAccelZendOpCache extends CPerfAccel
 		return $res;
 	}
 }
-
-?>

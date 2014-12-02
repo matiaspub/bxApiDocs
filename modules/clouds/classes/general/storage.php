@@ -912,7 +912,7 @@ class CCloudStorage
 
 	public static function OnFileSave(&$arFile, $strFileName, $strSavePath, $bForceMD5 = false, $bSkipExt = false)
 	{
-		if(!$arFile["tmp_name"] && !$arFile["content"])
+		if(!$arFile["tmp_name"] && !array_key_exists("content", $arFile))
 			return false;
 
 		if(array_key_exists("bucket", $arFile))
@@ -929,6 +929,18 @@ class CCloudStorage
 		$copySize = false;
 		$subDir = "";
 		$filePath = "";
+
+		if(array_key_exists("content", $arFile))
+		{
+			$arFile["tmp_name"] = CTempFile::GetFileName($arFile["name"]);
+			CheckDirPath($arFile["tmp_name"]);
+			$fp = fopen($arFile["tmp_name"], "ab");
+			if($fp)
+			{
+				fwrite($fp, $arFile["content"]);
+				fclose($fp);
+			}
+		}
 
 		if(array_key_exists("bucket", $arFile))
 		{
@@ -992,6 +1004,23 @@ class CCloudStorage
 			}
 			else
 			{
+				$imgArray = CFile::GetImageSize($arFile["tmp_name"], true, false);
+				if(is_array($imgArray) && $imgArray[2] == IMAGETYPE_JPEG)
+				{
+					$exifData = CFile::ExtractImageExif($arFile["tmp_name"]);
+					if ($exifData  && isset($exifData['Orientation']))
+					{
+						$properlyOriented = CFile::ImageHandleOrientation($exifData['Orientation'], $arFile["tmp_name"]);
+						if ($properlyOriented)
+						{
+							$jpgQuality = intval(COption::GetOptionString('main', 'image_resize_quality', '95'));
+							if($jpgQuality <= 0 || $jpgQuality > 100)
+								$jpgQuality = 95;
+							imagejpeg($properlyOriented, $arFile["tmp_name"], $jpgQuality);
+						}
+					}
+				}
+
 				if(!$bucket->SaveFile($filePath, $arFile))
 					return false;
 			}
@@ -1000,32 +1029,14 @@ class CCloudStorage
 		$arFile["HANDLER_ID"] = $bucket->ID;
 		$arFile["SUBDIR"] = $subDir;
 		$arFile["FILE_NAME"] = $newName;
+		$arFile["WIDTH"] = 0;
+		$arFile["HEIGHT"] = 0;
 
 		if(array_key_exists("bucket", $arFile))
 		{
 			$arFile["WIDTH"] = $arFile["width"];
 			$arFile["HEIGHT"] = $arFile["height"];
 			$arFile["size"] = $arFile["file_size"];
-		}
-		elseif(array_key_exists("content", $arFile))
-		{
-			$tmp_name = CTempFile::GetFileName();
-			CheckDirPath($tmp_name);
-			$fp = fopen($tmp_name, "ab");
-			if($fp)
-			{
-				if(fwrite($fp, $arFile["content"]))
-				{
-					$bucket->IncFileCounter(filesize($tmp_name));
-					$imgArray = CFile::GetImageSize($tmp_name);
-					if(is_array($imgArray))
-					{
-						$arFile["WIDTH"] = $imgArray[0];
-						$arFile["HEIGHT"] = $imgArray[1];
-					}
-				}
-				fclose($fp);
-			}
 		}
 		elseif ($copySize !== false)
 		{
@@ -1035,7 +1046,8 @@ class CCloudStorage
 		else
 		{
 			$bucket->IncFileCounter(filesize($arFile["tmp_name"]));
-			$imgArray = CFile::GetImageSize($arFile["tmp_name"]);
+			$flashEnabled = !CFile::IsImage($arFile["ORIGINAL_NAME"], $arFile["type"]);
+			$imgArray = CFile::GetImageSize($arFile["tmp_name"], true, $flashEnabled);
 			if(is_array($imgArray))
 			{
 				$arFile["WIDTH"] = $imgArray[0];

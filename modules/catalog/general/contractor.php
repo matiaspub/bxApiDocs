@@ -1,5 +1,6 @@
 <?php
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
 
 class CAllCatalogContractor
 {
@@ -9,12 +10,12 @@ class CAllCatalogContractor
 
 		if($personType == CONTRACTOR_JURIDICAL && is_set($arFields, "COMPANY") && $arFields["COMPANY"] == '')
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CC_EMPTY_COMPANY"));
+			$GLOBALS["APPLICATION"]->ThrowException(Loc::getMessage("CC_EMPTY_COMPANY"));
 			return false;
 		}
 		if (((($action == 'ADD' || is_set($arFields, "PERSON_NAME")) && strlen($arFields["PERSON_NAME"]) <= 0) && $personType == CONTRACTOR_INDIVIDUAL))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CC_WRONG_PERSON_LASTNAME"));
+			$GLOBALS["APPLICATION"]->ThrowException(Loc::getMessage("CC_WRONG_PERSON_LASTNAME"));
 			return false;
 		}
 		if (($action == 'UPDATE') && is_set($arFields, "ID"))
@@ -58,7 +59,7 @@ class CAllCatalogContractor
 			$dbDocument = CCatalogDocs::getList(array(), array("CONTRACTOR_ID" => $id));
 			if($arDocument = $dbDocument->Fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CC_CONTRACTOR_HAVE_DOCS"));
+				$GLOBALS["APPLICATION"]->ThrowException(Loc::getMessage("CC_CONTRACTOR_HAVE_DOCS"));
 				return false;
 			}
 

@@ -111,10 +111,10 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* покупателя.</td> </tr> <tr> <td>TYPE</td> <td>Тип свойства заказа.</td> </tr> <tr>
 	* <td>SORT</td> <td>Индекс сортировки свойства заказа.</td> </tr> <tr> <td>VARIANT_NAME</td>
 	* <td>Название варианта значения свойства заказа со значением из
-	* профиля покупателя.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	* свойства заказа.</td> </tr> </table> <p>Если в качестве параметра arGroupBy
-	* передается пустой массив, то функция вернет число записей,
-	* удовлетворяющих фильтру.</p> <a name="examples"></a>
+	* профиля покупателя.</td> </tr> <tr> <td>CODE</td> <td>Символьный код свойства
+	* заказа.</td> </tr> </table> <p>Если в качестве параметра arGroupBy передается
+	* пустой массив, то функция вернет число записей, удовлетворяющих
+	* фильтру.</p> <a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 
@@ -312,7 +312,6 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* );
 	* CSaleOrderUserPropsValue::Add($arFields);
 	* ?&gt;
-	* </htm
 	* </pre>
 	*
 	*

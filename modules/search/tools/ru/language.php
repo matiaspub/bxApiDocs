@@ -14,7 +14,7 @@ class CSearchLanguageRu extends CSearchLanguage
 				"РЇР§РЎРњР?РўР¬Р‘Р® "
 		);
 	}
-	fpublic static unction GetBigrammLetterFreq()
+	public static function GetBigrammLetterFreq()
 	{
 		return array(
 		//            Р°    Р±    РІ    Рі    Рґ    Рµ    Р¶    Р·    Рё    Р№    Рє    Р»    Рј    РЅ    Рѕ    Рї    СЂ    СЃ    С‚    Сѓ    С„    С…    С†    С‡    С€    С‰    С‹    СЊ    СЌ    СЋ    СЏ    СЉ    С‘

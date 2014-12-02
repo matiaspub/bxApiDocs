@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>.
+ * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>.</body> </html>
  *
  *
  *

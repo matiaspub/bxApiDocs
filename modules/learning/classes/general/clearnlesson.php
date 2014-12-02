@@ -179,7 +179,7 @@ interface ILearnLesson
 	 * 
 	 * $rc = ClassName::GetList($arOrder, $arFilter);
 	 * while (($data = $rc->Fetch()) !== false)
-	 *    var_dump ($data);
+	 *    var _dump ($data);
 	 * 
 	 * @throws LearnException with error bit set EXC_ERR_ALL_PARAMS 
 	 * @return CDBResult each element of which can contains 
@@ -224,7 +224,7 @@ interface ILearnLesson
 	 * @example
 	 * <?php
 	 * $arParents = ThisClass::ListImmediateNeighbours (1);
-	 * var_dump ($arParents);
+	 * var _dump ($arParents);
 	 * ?>
 	 *
 	 * output:
@@ -869,9 +869,6 @@ class CLearnLesson implements ILearnLesson
 		list ($root_lesson_id, $simulate, $check_permissions, $user_id) = 
 			self::_funcDelete_ParseOptions($in_data);
 
-		if ($check_permissions)
-			$oAccess = CLearnAccess::GetInstance($user_id);
-
 		// list of lessons, which are candidates to be removed
 		$arCandidatesToRemove = array();
 
@@ -895,7 +892,6 @@ class CLearnLesson implements ILearnLesson
 		$arCandidatesToRemove[$root_lesson_id] = array();
 
 		// Withdraw lessons, which has ancestors not among candidates to be removed
-		$lessonsWithdrawn = 1;	// for ensure do { ... } while logic
 		do
 		{
 			$lessonsWithdrawn = 0;	// count of withdrawn lessons
@@ -936,6 +932,26 @@ class CLearnLesson implements ILearnLesson
 			{
 				if ($e->GetCode() === LearnException::EXC_ERR_LL_UNREMOVABLE_CL)
 					;	// course cannot be removed - ignore this error
+				elseif ($e->GetCode() === LearnException::EXC_ERR_ALL_ACCESS_DENIED)
+				{
+					// if lesson not exists - ignore error (lesson to be deleted is already removed)
+					$rsLesson = self::GetListUni(
+						array(),
+						array('LESSON_ID' => $lesson_id, 'CHECK_PERMISSIONS' => 'N'),
+						array('LESSON_ID'),
+						self::GET_LIST_ALL
+					);
+
+					if ( ! $rsLesson->fetch() )
+					{
+						;	// ignore this situation, it's OK
+					}
+					else
+					{
+						// bubble exception
+						throw new LearnException ($e->GetMessage(), $e->GetCode());
+					}
+				}
 				else
 				{
 					// bubble exception
@@ -1376,6 +1392,10 @@ class CLearnLesson implements ILearnLesson
 		self::_EnsureArgsStrictlyCastableToIntegers ($courseId);
 
 		$linkedLessonId = CCourse::CourseGetLinkedLesson ($courseId);
+		if ($linkedLessonId === false)
+		{
+			return false;
+		}
 
 		// Check certificates (if exists => forbid removing course)
 		$certificate = CCertification::GetList(Array(), Array("COURSE_ID" => $courseId, 'CHECK_PERMISSIONS' => 'N'));
@@ -1526,6 +1546,7 @@ class CLearnLesson implements ILearnLesson
 			'lesson_id'        => 'TL.ID',
 			'site_id'          => 'TL.ID',			// hack for compatibility with courses in shared lists
 			'name'             => 'TL.NAME',
+			'code'             => 'TL.CODE',
 			'active'           => 'TL.ACTIVE',
 			'created'          => 'TL.DATE_CREATE',	// 'created' was in previous code, perhaps for back compatibility
 			'date_create'      => 'TL.DATE_CREATE',

@@ -7,7 +7,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/advertising/classes/gene
 
 
 /**
- * Класс для работы с рекламными контрактами.
+ * Класс для работы с рекламными контрактами.</body> </html>
  *
  *
  *
@@ -430,7 +430,7 @@ public static 	function err_mess()
 
 
 /**
- * Класс для работы с рекламными баннерами.
+ * Класс для работы с рекламными баннерами.</body> </html>
  *
  *
  *
@@ -649,7 +649,7 @@ public static 	function Add($arFields)
 	* 	echo "&lt;pre&gt;"; print_r($arBanner); echo "&lt;/pre&gt;";
 	* }
 	* ?&gt;
-	* 
+	* </bo
 	* &lt;?
 	* Array
 	* (
@@ -1464,7 +1464,7 @@ public static 	function GetDynamicList_SQL($strSqlSearch)
 
 
 /**
- * Класс для работы с типами баннеров.
+ * Класс для работы с типами баннеров.</body> </html>
  *
  *
  *

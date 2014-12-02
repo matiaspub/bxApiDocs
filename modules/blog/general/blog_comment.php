@@ -786,5 +786,60 @@ class CAllBlogComment
 
 		return $perms;
 	}
+
+	public static function GetMentionedUserID($arFields)
+	{
+		$arMentionedUserID = array();
+								
+		if (isset($arFields["POST_TEXT"]))
+		{
+			preg_match_all("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER, $arFields["POST_TEXT"], $arMention);
+			if (!empty($arMention))
+			{
+				$arMentionedUserID = array_merge($arMentionedUserID, $arMention[1]);
+			}
+		}
+
+		return $arMentionedUserID;
+	}
+
+	public static function AddLiveComment($commentId = 0, $path = "")
+	{
+		if(IntVal($commentId) <= 0)
+			return;
+		if(CModule::IncludeModule("pull") && CPullOptions::GetNginxStatus())
+		{
+			if($arComment = CBlogComment::GetByID($commentId))
+			{
+				if(strlen($path) <= 0 && strlen($arComment["PATH"]) > 0)
+					$path = CComponentEngine::MakePathFromTemplate($arComment["PATH"], array("post_id"   =>$arComment["POST_ID"], "comment_id"=>$arComment["ID"]));
+				if(strlen($path) <= 0)
+				{
+					$arPost = CBlogPost::GetByID($arComment["POST_ID"]);
+					$path = $path = CComponentEngine::MakePathFromTemplate($arPost["PATH"], array("post_id"   =>$arComment["POST_ID"], "comment_id"=>$arComment["ID"]))."?commentId=".$arComment["ID"];
+				}
+
+				CPullWatch::AddToStack("UNICOMMENTSBLOG_".$arComment["POST_ID"],
+					array(
+						'module_id'	=> "unicomments",
+						'command'	=> "comment",
+						'params'	=> Array(
+							"AUTHOR_ID"		=> $arComment["AUTHOR_ID"],
+							"ID"			=> $arComment["ID"],
+							"POST_ID"		=> $arComment["POST_ID"],
+							"TS"			=> time(),
+							"ACTION"		=> "REPLY",
+							"URL"			=> array(
+								"LINK" => $path,
+							),
+							"ENTITY_XML_ID"	=> "BLOG_".$arComment["POST_ID"],
+							"APPROVED"		=> "Y",
+							"NEED_REQUEST"	=> "Y",
+						),
+					)
+				);
+			}
+		}
+	}
 }
 ?>

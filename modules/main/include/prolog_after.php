@@ -83,25 +83,9 @@ if($_GET['bx_template_preview_mode'] == 'Y' && $USER->CanDoOperation('edit_other
 }
 else
 {
+	\Bitrix\Main\Page\Asset::getInstance()->startTarget('TEMPLATE');
 	include_once($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/header.php");
-
-	if($APPLICATION->IsCSSOptimized())
-	{
-		$arCSS = $APPLICATION->GetCSSArray();
-		$arCSSKeys = array_keys($arCSS);
-		$cntCSSKeys = count($arCSS);
-		$APPLICATION->SetHeaderLastCSS($arCSSKeys[$cntCSSKeys-1]);
-		unset($arCSS, $arCSSKeys);
-	}
-
-	if($APPLICATION->IsJSOptimized())
-	{
-		$arScripts = array_unique($APPLICATION->arHeadScripts);
-		$arJsKeys = array_keys($arScripts);
-		$cntJsKeys = count($arScripts);
-		$APPLICATION->SetHeaderLastJS($arJsKeys[$cntJsKeys-1]);
-		unset($arScripts, $arJsKeys);
-	}
+	\Bitrix\Main\Page\Asset::getInstance()->startTarget('PAGE');
 }
 
 /* Draw edit menu for whole content */

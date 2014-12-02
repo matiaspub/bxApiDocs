@@ -19,6 +19,11 @@ if (!CCatalog::IsUserExists())
 }
 
 CCatalogDiscountSave::Disable();
+CCatalogDiscountCoupon::ClearCoupon();
+if ($USER->IsAuthorized())
+{
+	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
+}
 
 $arYandexFields = array('vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'description', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
 
@@ -57,161 +62,222 @@ if (!function_exists("yandex_text2xml"))
 
 if (!function_exists('yandex_get_value'))
 {
-	function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserTypeFormat)
-	{
-		$strProperty = '';
-		$bParam = substr($param, 0, 6) == 'PARAM_';
-		if (isset($arProperties[$PROPERTY]) && !empty($arProperties[$PROPERTY]))
-		{
-			$PROPERTY_CODE = $arProperties[$PROPERTY]['CODE'];
-			$arProperty = (
-				isset($arOffer['PROPERTIES'][$PROPERTY_CODE])
-				? $arOffer['PROPERTIES'][$PROPERTY_CODE]
-				: $arOffer['PROPERTIES'][$PROPERTY]
-			);
+function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserTypeFormat)
+{
+	global $iblockServerName;
 
-			$value = '';
-			$description = '';
-			switch ($arProperties[$PROPERTY]['PROPERTY_TYPE'])
-			{
-				case 'USER_TYPE':
-					if (!empty($arProperty['VALUE']))
+	$strProperty = '';
+	$bParam = (strncmp($param, 'PARAM_', 6) == 0);
+	if (isset($arProperties[$PROPERTY]) && !empty($arProperties[$PROPERTY]))
+	{
+		$PROPERTY_CODE = $arProperties[$PROPERTY]['CODE'];
+		$arProperty = (
+			isset($arOffer['PROPERTIES'][$PROPERTY_CODE])
+			? $arOffer['PROPERTIES'][$PROPERTY_CODE]
+			: $arOffer['PROPERTIES'][$PROPERTY]
+		);
+
+		$value = '';
+		$description = '';
+		switch ($arProperties[$PROPERTY]['PROPERTY_TYPE'])
+		{
+			case 'USER_TYPE':
+				if ($arProperty['MULTIPLE'] == 'Y')
+				{
+					if (!empty($arProperty['~VALUE']))
 					{
-						if (is_array($arProperty['VALUE']))
+						$arValues = array();
+						foreach($arProperty["~VALUE"] as $oneValue)
 						{
-							$arValues = array();
-							foreach($arProperty["VALUE"] as $oneValue)
+							$isArray = is_array($oneValue);
+							if (
+								($isArray && !empty($oneValue))
+								|| (!$isArray && $oneValue != '')
+							)
 							{
 								$arValues[] = call_user_func_array($arUserTypeFormat[$PROPERTY],
 									array(
 										$arProperty,
 										array("VALUE" => $oneValue),
 										array('MODE' => 'SIMPLE_TEXT'),
-									));
-							}
-							$value = implode(', ', $arValues);
-						}
-						else
-						{
-							$value = call_user_func_array($arUserTypeFormat[$PROPERTY],
-								array(
-									$arProperty,
-									array("VALUE" => $arProperty["VALUE"]),
-									array('MODE' => 'SIMPLE_TEXT'),
-								));
-						}
-					}
-					break;
-				case 'E':
-					if (!empty($arProperty['VALUE']))
-					{
-						$arCheckValue = array();
-						if (!is_array($arProperty['VALUE']))
-						{
-							$arProperty['VALUE'] = intval($arProperty['VALUE']);
-							if (0 < $arProperty['VALUE'])
-								$arCheckValue[] = $arProperty['VALUE'];
-						}
-						else
-						{
-							foreach ($arProperty['VALUE'] as &$intValue)
-							{
-								$intValue = intval($intValue);
-								if (0 < $intValue)
-									$arCheckValue[] = $intValue;
-							}
-							if (isset($intValue))
-								unset($intValue);
-						}
-						if (!empty($arCheckValue))
-						{
-							$dbRes = CIBlockElement::GetList(array(), array('IBLOCK_ID' => $arProperties[$PROPERTY]['LINK_IBLOCK_ID'], 'ID' => $arCheckValue), false, false, array('NAME'));
-							while ($arRes = $dbRes->Fetch())
-							{
-								$value .= ($value ? ', ' : '').$arRes['NAME'];
+									)
+								);
 							}
 						}
-					}
-					break;
-				case 'G':
-					if (!empty($arProperty['VALUE']))
-					{
-						$arCheckValue = array();
-						if (!is_array($arProperty['VALUE']))
-						{
-							$arProperty['VALUE'] = intval($arProperty['VALUE']);
-							if (0 < $arProperty['VALUE'])
-								$arCheckValue[] = $arProperty['VALUE'];
-						}
-						else
-						{
-							foreach ($arProperty['VALUE'] as &$intValue)
-							{
-								$intValue = intval($intValue);
-								if (0 < $intValue)
-									$arCheckValue[] = $intValue;
-							}
-							if (isset($intValue))
-								unset($intValue);
-						}
-						if (!empty($arCheckValue))
-						{
-							$dbRes = CIBlockSection::GetList(array(), array('IBLOCK_ID' => $arProperty['LINK_IBLOCK_ID'], 'ID' => $arCheckValue), false, array('NAME'));
-							while ($arRes = $dbRes->Fetch())
-							{
-								$value .= ($value ? ', ' : '').$arRes['NAME'];
-							}
-						}
-					}
-					break;
-				case 'L':
-					if (!empty($arProperty['VALUE']))
-					{
-						if (is_array($arProperty['VALUE']))
-							$value .= implode(', ', $arProperty['VALUE']);
-						else
-							$value .= $arProperty['VALUE'];
-					}
-					break;
-				default:
-					if ($bParam && $arProperty['WITH_DESCRIPTION'] == 'Y')
-					{
-						$description = $arProperty['DESCRIPTION'];
-						$value = $arProperty['VALUE'];
-					}
-					else
-					{
-						$value = is_array($arProperty['VALUE']) ? implode(', ', $arProperty['VALUE']) : $arProperty['VALUE'];
-					}
-			}
-
-			// !!!! check multiple properties and properties like CML2_ATTRIBUTES
-
-			if ($bParam)
-			{
-				if (is_array($description))
-				{
-					foreach ($value as $key => $val)
-					{
-						$strProperty .= $strProperty ? "\n" : "";
-						$strProperty .= '<param name="'.yandex_text2xml($description[$key], true).'">'.yandex_text2xml($val, true).'</param>';
+						$value = implode(', ', $arValues);
 					}
 				}
 				else
 				{
-					$strProperty .= '<param name="'.yandex_text2xml($arProperties[$PROPERTY]['NAME'], true).'">'.yandex_text2xml($value, true).'</param>';
+					$isArray = is_array($arProperty['~VALUE']);
+					if (
+						($isArray && !empty($arProperty['~VALUE']))
+						|| (!$isArray && $arProperty['~VALUE'] != '')
+					)
+					{
+						$value = call_user_func_array($arUserTypeFormat[$PROPERTY],
+							array(
+								$arProperty,
+								array("VALUE" => $arProperty["~VALUE"]),
+								array('MODE' => 'SIMPLE_TEXT'),
+							)
+						);
+					}
+				}
+				break;
+			case 'E':
+				if (!empty($arProperty['VALUE']))
+				{
+					$arCheckValue = array();
+					if (!is_array($arProperty['VALUE']))
+					{
+						$arProperty['VALUE'] = (int)$arProperty['VALUE'];
+						if (0 < $arProperty['VALUE'])
+							$arCheckValue[] = $arProperty['VALUE'];
+					}
+					else
+					{
+						foreach ($arProperty['VALUE'] as &$intValue)
+						{
+							$intValue = (int)$intValue;
+							if (0 < $intValue)
+								$arCheckValue[] = $intValue;
+						}
+						if (isset($intValue))
+							unset($intValue);
+					}
+					if (!empty($arCheckValue))
+					{
+						$dbRes = CIBlockElement::GetList(array(), array('IBLOCK_ID' => $arProperties[$PROPERTY]['LINK_IBLOCK_ID'], 'ID' => $arCheckValue), false, false, array('NAME'));
+						while ($arRes = $dbRes->Fetch())
+						{
+							$value .= ($value ? ', ' : '').$arRes['NAME'];
+						}
+					}
+				}
+				break;
+			case 'G':
+				if (!empty($arProperty['VALUE']))
+				{
+					$arCheckValue = array();
+					if (!is_array($arProperty['VALUE']))
+					{
+						$arProperty['VALUE'] = (int)$arProperty['VALUE'];
+						if (0 < $arProperty['VALUE'])
+							$arCheckValue[] = $arProperty['VALUE'];
+					}
+					else
+					{
+						foreach ($arProperty['VALUE'] as &$intValue)
+						{
+							$intValue = (int)$intValue;
+							if (0 < $intValue)
+								$arCheckValue[] = $intValue;
+						}
+						if (isset($intValue))
+							unset($intValue);
+					}
+					if (!empty($arCheckValue))
+					{
+						$dbRes = CIBlockSection::GetList(array(), array('IBLOCK_ID' => $arProperty['LINK_IBLOCK_ID'], 'ID' => $arCheckValue), false, array('NAME'));
+						while ($arRes = $dbRes->Fetch())
+						{
+							$value .= ($value ? ', ' : '').$arRes['NAME'];
+						}
+					}
+				}
+				break;
+			case 'L':
+				if (!empty($arProperty['VALUE']))
+				{
+					if (is_array($arProperty['VALUE']))
+						$value .= implode(', ', $arProperty['VALUE']);
+					else
+						$value .= $arProperty['VALUE'];
+				}
+				break;
+			case 'F':
+				if (!empty($arProperty['VALUE']))
+				{
+					if (is_array($arProperty['VALUE']))
+					{
+						foreach ($arProperty['VALUE'] as &$intValue)
+						{
+							$intValue = (int)$intValue;
+							if ($intValue > 0)
+							{
+								if ($ar_file = CFile::GetFileArray($intValue))
+								{
+									if(substr($ar_file["SRC"], 0, 1) == "/")
+										$strFile = "http://".$iblockServerName.implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
+									elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
+										$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+									else
+										$strFile = $ar_file["SRC"];
+									$value .= ($value ? ', ' : '').$strFile;
+								}
+							}
+						}
+						if (isset($intValue))
+							unset($intValue);
+					}
+					else
+					{
+						$arProperty['VALUE'] = (int)$arProperty['VALUE'];
+						if ($arProperty['VALUE'] > 0)
+						{
+							if ($ar_file = CFile::GetFileArray($arProperty['VALUE']))
+							{
+								if(substr($ar_file["SRC"], 0, 1) == "/")
+									$strFile = "http://".$iblockServerName.implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
+								elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
+									$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+								else
+									$strFile = $ar_file["SRC"];
+								$value = $strFile;
+							}
+						}
+					}
+				}
+				break;
+			default:
+				if ($bParam && $arProperty['WITH_DESCRIPTION'] == 'Y')
+				{
+					$description = $arProperty['DESCRIPTION'];
+					$value = $arProperty['VALUE'];
+				}
+				else
+				{
+					$value = is_array($arProperty['VALUE']) ? implode(', ', $arProperty['VALUE']) : $arProperty['VALUE'];
+				}
+		}
+
+		// !!!! check multiple properties and properties like CML2_ATTRIBUTES
+
+		if ($bParam)
+		{
+			if (is_array($description))
+			{
+				foreach ($value as $key => $val)
+				{
+					$strProperty .= $strProperty ? "\n" : "";
+					$strProperty .= '<param name="'.yandex_text2xml($description[$key], true).'">'.yandex_text2xml($val, true).'</param>';
 				}
 			}
 			else
 			{
-				$param_h = yandex_text2xml($param, true);
-				$strProperty .= '<'.$param_h.'>'.yandex_text2xml($value, true).'</'.$param_h.'>';
+				$strProperty .= '<param name="'.yandex_text2xml($arProperties[$PROPERTY]['NAME'], true).'">'.yandex_text2xml($value, true).'</param>';
 			}
 		}
-
-		return $strProperty;
-		//if (is_callable(array($arParams["arUserField"]["USER_TYPE"]['CLASS_NAME'], 'getlist')))
+		else
+		{
+			$param_h = yandex_text2xml($param, true);
+			$strProperty .= '<'.$param_h.'>'.yandex_text2xml($value, true).'</'.$param_h.'>';
+		}
 	}
+
+	return $strProperty;
+}
 }
 
 $arRunErrors = array();
@@ -222,7 +288,7 @@ if ($XML_DATA && CheckSerializedData($XML_DATA))
 	if (!is_array($XML_DATA)) $XML_DATA = array();
 }
 
-$IBLOCK_ID = intval($IBLOCK_ID);
+$IBLOCK_ID = (int)$IBLOCK_ID;
 $db_iblock = CIBlock::GetByID($IBLOCK_ID);
 if (!($ar_iblock = $db_iblock->Fetch()))
 {
@@ -257,14 +323,20 @@ else
 	}
 	$ar_iblock['PROPERTY'] = array();
 	$rsProps = CIBlockProperty::GetList(
-		array(),
+		array('SORT' => 'ASC', 'NAME' => 'ASC'),
 		array('IBLOCK_ID' => $IBLOCK_ID, 'ACTIVE' => 'Y', 'CHECK_PERMISSIONS' => 'N')
 	);
 	while ($arProp = $rsProps->Fetch())
 	{
+		$arProp['ID'] = (int)$arProp['ID'];
+		$arProp['USER_TYPE'] = (string)$arProp['USER_TYPE'];
+		$arProp['CODE'] = (string)$arProp['CODE'];
 		$ar_iblock['PROPERTY'][$arProp['ID']] = $arProp;
 	}
 }
+
+global $iblockServerName;
+$iblockServerName = $ar_iblock["SERVER_NAME"];
 
 $arProperties = array();
 if (isset($ar_iblock['PROPERTY']))
@@ -306,18 +378,21 @@ else
 		{
 			$boolOffers = true;
 			$rsProps = CIBlockProperty::GetList(
-				array(),
-				array('IBLOCK_ID' => $intOfferIBlockID,'ACTIVE' => 'Y', 'CHECK_PERMISSIONS' => 'N')
+				array('SORT' => 'ASC', 'NAME' => 'ASC'),
+				array('IBLOCK_ID' => $intOfferIBlockID, 'ACTIVE' => 'Y', 'CHECK_PERMISSIONS' => 'N')
 			);
 			while ($arProp = $rsProps->Fetch())
 			{
+				$arProp['ID'] = (int)$arProp['ID'];
 				if ($arOffers['SKU_PROPERTY_ID'] != $arProp['ID'])
 				{
+					$arProp['USER_TYPE'] = (string)$arProp['USER_TYPE'];
+					$arProp['CODE'] = (string)$arProp['CODE'];
 					$ar_iblock['OFFERS_PROPERTY'][$arProp['ID']] = $arProp;
 					$arProperties[$arProp['ID']] = $arProp;
-					if (in_array($arProp['PROPERTY_TYPE'],$arSelectedPropTypes))
+					if (in_array($arProp['PROPERTY_TYPE'], $arSelectedPropTypes))
 						$arSelectOfferProps[] = $arProp['ID'];
-					if (strlen($arProp['CODE']) > 0)
+					if ($arProp['CODE'] !== '')
 					{
 						foreach ($ar_iblock['PROPERTY'] as &$arMainProp)
 						{
@@ -387,11 +462,12 @@ else
 $arUserTypeFormat = array();
 foreach($arProperties as $key => $arProperty)
 {
+	$arProperty["USER_TYPE"] = (string)$arProperty["USER_TYPE"];
 	$arUserTypeFormat[$arProperty["ID"]] = false;
-	if (strlen($arProperty["USER_TYPE"]))
+	if ($arProperty["USER_TYPE"] !== '')
 	{
 		$arUserType = CIBlockProperty::GetUserType($arProperty["USER_TYPE"]);
-		if (array_key_exists("GetPublicViewHTML", $arUserType))
+		if (isset($arUserType["GetPublicViewHTML"]))
 		{
 			$arUserTypeFormat[$arProperty["ID"]] = $arUserType["GetPublicViewHTML"];
 			$arProperties[$key]['PROPERTY_TYPE'] = 'USER_TYPE';
@@ -401,7 +477,7 @@ foreach($arProperties as $key => $arProperty)
 
 if (empty($arRunErrors))
 {
-	$bAllSections = False;
+	$bAllSections = false;
 	$arSections = array();
 	if (is_array($V))
 	{
@@ -409,18 +485,18 @@ if (empty($arRunErrors))
 		{
 			if (trim($value)=="0")
 			{
-				$bAllSections = True;
+				$bAllSections = true;
 				break;
 			}
-
-			if (intval($value)>0)
+			$value = (int)$value;
+			if ($value > 0)
 			{
-				$arSections[] = intval($value);
+				$arSections[] = $value;
 			}
 		}
 	}
 
-	if (!$bAllSections && count($arSections)<=0)
+	if (!$bAllSections && empty($arSections))
 	{
 		$arRunErrors[] = GetMessage('YANDEX_ERR_NO_SECTION_LIST');
 	}
@@ -428,7 +504,7 @@ if (empty($arRunErrors))
 
 if (!empty($XML_DATA['PRICE']))
 {
-	if (intval($XML_DATA['PRICE']) > 0)
+	if ((int)$XML_DATA['PRICE'] > 0)
 	{
 		$rsCatalogGroups = CCatalogGroup::GetGroupsList(array('CATALOG_GROUP_ID' => $XML_DATA['PRICE'],'GROUP_ID' => 2));
 		if (!($arCatalogGroup = $rsCatalogGroups->Fetch()))
@@ -499,6 +575,7 @@ if (empty($arRunErrors))
 
 	@fwrite($fp, "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n");
 	@fwrite($fp, "<url>http://".htmlspecialcharsbx($ar_iblock['SERVER_NAME'])."</url>\n");
+	@fwrite($fp, "<platform>1C-Bitrix</platform>\n");
 
 	$strTmp = "<currencies>\n";
 
@@ -545,71 +622,77 @@ if (empty($arRunErrors))
 	//*****************************************//
 	$intMaxSectionID = 0;
 
-	$strTmpCat = "";
-	$strTmpOff = "";
+	$strTmpCat = '';
+	$strTmpOff = '';
 
+	$arSectionIDs = array();
 	$arAvailGroups = array();
 	if (!$bAllSections)
 	{
 		for ($i = 0, $intSectionsCount = count($arSections); $i < $intSectionsCount; $i++)
 		{
 			$filter_tmp = $filter;
-			$db_res = CIBlockSection::GetNavChain($IBLOCK_ID, $arSections[$i]);
+			$sectionIterator = CIBlockSection::GetNavChain($IBLOCK_ID, $arSections[$i], array('ID', 'IBLOCK_SECTION_ID', 'NAME', 'LEFT_MARGIN', 'RIGHT_MARGIN'));
 			$curLEFT_MARGIN = 0;
 			$curRIGHT_MARGIN = 0;
-			while ($ar_res = $db_res->Fetch())
+			while ($section = $sectionIterator->Fetch())
 			{
-				$curLEFT_MARGIN = intval($ar_res["LEFT_MARGIN"]);
-				$curRIGHT_MARGIN = intval($ar_res["RIGHT_MARGIN"]);
-				$arAvailGroups[$ar_res["ID"]] = array(
-					"ID" => intval($ar_res["ID"]),
-					"IBLOCK_SECTION_ID" => intval($ar_res["IBLOCK_SECTION_ID"]),
-					"NAME" => $ar_res["NAME"]
-					);
-				if ($intMaxSectionID < $ar_res["ID"])
-					$intMaxSectionID = $ar_res["ID"];
+				$section['ID'] = (int)$section['ID'];
+				$section['IBLOCK_SECTION_ID'] = (int)$section['IBLOCK_SECTION_ID'];
+				if ($arSections[$i] == $section['ID'])
+				{
+					$curLEFT_MARGIN = (int)$section['LEFT_MARGIN'];
+					$curRIGHT_MARGIN = (int)$section['RIGHT_MARGIN'];
+					$arSectionIDs[] = $section['ID'];
+				}
+				$arAvailGroups[$section['ID']] = array(
+					'ID' => $section['ID'],
+					'IBLOCK_SECTION_ID' => $section['IBLOCK_SECTION_ID'],
+					'NAME' => $section['NAME']
+				);
+				if ($intMaxSectionID < $section['ID'])
+					$intMaxSectionID = $section['ID'];
 			}
+			unset($section, $sectionIterator);
 
-			$filter = Array("IBLOCK_ID"=>$IBLOCK_ID, ">LEFT_MARGIN"=>$curLEFT_MARGIN, "<RIGHT_MARGIN"=>$curRIGHT_MARGIN, "ACTIVE"=>"Y", "IBLOCK_ACTIVE"=>"Y", "GLOBAL_ACTIVE"=>"Y");
-			$db_res = CIBlockSection::GetList(array("left_margin"=>"asc"), $filter);
-			while ($ar_res = $db_res->Fetch())
+			$filter = array("IBLOCK_ID"=>$IBLOCK_ID, ">LEFT_MARGIN"=>$curLEFT_MARGIN, "<RIGHT_MARGIN"=>$curRIGHT_MARGIN, "ACTIVE"=>"Y", "IBLOCK_ACTIVE"=>"Y", "GLOBAL_ACTIVE"=>"Y");
+			$sectionIterator = CIBlockSection::GetList(array("LEFT_MARGIN"=>"ASC"), $filter, false, array('ID', 'IBLOCK_SECTION_ID', 'NAME'));
+			while ($section = $sectionIterator->Fetch())
 			{
-				$arAvailGroups[$ar_res["ID"]] = array(
-					"ID" => intval($ar_res["ID"]),
-					"IBLOCK_SECTION_ID" => intval($ar_res["IBLOCK_SECTION_ID"]),
-					"NAME" => $ar_res["NAME"]
-					);
-				if ($intMaxSectionID < $ar_res["ID"])
-					$intMaxSectionID = $ar_res["ID"];
+				$section["ID"] = (int)$section["ID"];
+				$section["IBLOCK_SECTION_ID"] = (int)$section["IBLOCK_SECTION_ID"];
+				$arSectionIDs[] = $section["ID"];
+				$arAvailGroups[$section["ID"]] = $section;
+				if ($intMaxSectionID < $section["ID"])
+					$intMaxSectionID = $section["ID"];
 			}
+			unset($section, $sectionIterator);
 		}
 	}
 	else
 	{
-		$filter = Array("IBLOCK_ID"=>$IBLOCK_ID, "ACTIVE"=>"Y", "IBLOCK_ACTIVE"=>"Y", "GLOBAL_ACTIVE"=>"Y");
-		$db_res = CIBlockSection::GetList(array("left_margin"=>"asc"), $filter);
-		while ($ar_res = $db_res->Fetch())
+		$filter = array("IBLOCK_ID"=>$IBLOCK_ID, "ACTIVE"=>"Y", "IBLOCK_ACTIVE"=>"Y", "GLOBAL_ACTIVE"=>"Y");
+		$sectionIterator = CIBlockSection::GetList(array("LEFT_MARGIN"=>"ASC"), $filter, false, array('ID', 'IBLOCK_SECTION_ID', 'NAME'));
+		while ($section = $sectionIterator->Fetch())
 		{
-			$arAvailGroups[$ar_res["ID"]] = array(
-				"ID" => intval($ar_res["ID"]),
-				"IBLOCK_SECTION_ID" => intval($ar_res["IBLOCK_SECTION_ID"]),
-				"NAME" => $ar_res["NAME"]
-				);
-			if ($intMaxSectionID < $ar_res["ID"])
-					$intMaxSectionID = $ar_res["ID"];
+			$section["ID"] = (int)$section["ID"];
+			$section["IBLOCK_SECTION_ID"] = (int)$section["IBLOCK_SECTION_ID"];
+			$arAvailGroups[$section["ID"]] = $section;
+			if ($intMaxSectionID < $section["ID"])
+				$intMaxSectionID = $section["ID"];
 		}
+		unset($section, $sectionIterator);
+
+		if (!empty($arAvailGroups))
+			$arSectionIDs = array_keys($arAvailGroups);
 	}
 
-	$arSectionIDs = array();
 	foreach ($arAvailGroups as &$value)
 	{
-		$strTmpCat.= "<category id=\"".$value["ID"]."\"".(intval($value["IBLOCK_SECTION_ID"])>0?" parentId=\"".$value["IBLOCK_SECTION_ID"]."\"":"").">".yandex_text2xml($value["NAME"], true)."</category>\n";
+		$strTmpCat.= '<category id="'.$value['ID'].'"'.($value['IBLOCK_SECTION_ID'] > 0 ? ' parentId="'.$value['IBLOCK_SECTION_ID'].'"' : '').'>'.yandex_text2xml($value['NAME'], true).'</category>'."\n";
 	}
 	if (isset($value))
 		unset($value);
-
-	if (!empty($arAvailGroups))
-		$arSectionIDs = array_keys($arAvailGroups);
 
 	$intMaxSectionID += 100000000;
 
@@ -712,7 +795,8 @@ if (empty($arRunErrors))
 						array(2), // anonymous
 						'N',
 						array($arPrice),
-						$ar_iblock['LID']
+						$ar_iblock['LID'],
+						array()
 					))
 					{
 						$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
@@ -730,7 +814,8 @@ if (empty($arRunErrors))
 					array(2), // anonymous
 					'N',
 					array(),
-					$ar_iblock['LID']
+					$ar_iblock['LID'],
+					array()
 				))
 				{
 					$minPrice = $arPrice['DISCOUNT_PRICE'];
@@ -748,13 +833,13 @@ if (empty($arRunErrors))
 			$db_res1 = CIBlockElement::GetElementGroups($arAcc["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 			while ($ar_res1 = $db_res1->Fetch())
 			{
-				if (0 < intval($ar_res1['ADDITIONAL_PROPERTY_ID']))
+				if (0 < (int)$ar_res1['ADDITIONAL_PROPERTY_ID'])
 					continue;
 				$boolCurrentSections = true;
-				if (in_array(intval($ar_res1["ID"]), $arSectionIDs))
+				if (in_array((int)$ar_res1["ID"], $arSectionIDs))
 				{
 					$strTmpOff_tmp.= "<categoryId>".$ar_res1["ID"]."</categoryId>\n";
-					$bNoActiveGroup = False;
+					$bNoActiveGroup = false;
 
 				}
 			}
@@ -787,10 +872,11 @@ if (empty($arRunErrors))
 
 			$strTmpOff.= $strTmpOff_tmp;
 
-			if (intval($arAcc["DETAIL_PICTURE"])>0 || intval($arAcc["PREVIEW_PICTURE"])>0)
+			$arAcc["DETAIL_PICTURE"] = (int)$arAcc["DETAIL_PICTURE"];
+			$arAcc["PREVIEW_PICTURE"] = (int)$arAcc["PREVIEW_PICTURE"];
+			if ($arAcc["DETAIL_PICTURE"] > 0 || $arAcc["PREVIEW_PICTURE"] > 0)
 			{
-				$pictNo = intval($arAcc["DETAIL_PICTURE"]);
-				if ($pictNo<=0) $pictNo = intval($arAcc["PREVIEW_PICTURE"]);
+				$pictNo = ($arAcc["DETAIL_PICTURE"] > 0 ? $arAcc["DETAIL_PICTURE"] : $arAcc["PREVIEW_PICTURE"]);
 
 				if ($ar_file = CFile::GetFileArray($pictNo))
 				{
@@ -813,7 +899,7 @@ if (empty($arRunErrors))
 					if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 						continue;
 
-					$strTmpOff .= "<name>".yandex_text2xml($arAcc["NAME"], true)."</name>\n";
+					$strTmpOff .= "<name>".yandex_text2xml($arAcc["~NAME"], true)."</name>\n";
 					break;
 				case 'description':
 					$strTmpOff .=
@@ -849,7 +935,7 @@ if (empty($arRunErrors))
 							$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
 						)
 
-						$strTmpOff.= "<".$key.">".yandex_text2xml($arAcc["NAME"], true)."</".$key.">\n";
+						$strTmpOff.= "<".$key.">".yandex_text2xml($arAcc["~NAME"], true)."</".$key.">\n";
 					}
 					else
 					{
@@ -968,11 +1054,11 @@ if (empty($arRunErrors))
 			$rsSections = CIBlockElement::GetElementGroups($arItem["ID"], false, array('ID', 'ADDITIONAL_PROPERTY_ID'));
 			while ($arSection = $rsSections->Fetch())
 			{
-				if (0 < intval($arSection['ADDITIONAL_PROPERTY_ID']))
+				if (0 < (int)$arSection['ADDITIONAL_PROPERTY_ID'])
 					continue;
-				$arSection["ID"] = intval($arSection["ID"]);
+				$arSection['ID'] = (int)$arSection['ID'];
 				$boolCurrentSections = true;
-				if (in_array($arSection["ID"], $arSectionIDs))
+				if (in_array($arSection['ID'], $arSectionIDs))
 				{
 					$strSections .= "<categoryId>".$arSection["ID"]."</categoryId>\n";
 					$boolNoActiveSections = false;
@@ -992,11 +1078,11 @@ if (empty($arRunErrors))
 			$arItem['YANDEX_CATEGORY'] = $strSections;
 
 			$strFile = '';
-			if (intval($arItem["DETAIL_PICTURE"])>0 || intval($arItem["PREVIEW_PICTURE"])>0)
+			$arItem["DETAIL_PICTURE"] = (int)$arItem["DETAIL_PICTURE"];
+			$arItem["PREVIEW_PICTURE"] = (int)$arItem["PREVIEW_PICTURE"];
+			if ($arItem["DETAIL_PICTURE"] > 0 || $arItem["PREVIEW_PICTURE"] > 0)
 			{
-				$pictNo = intval($arItem["DETAIL_PICTURE"]);
-				if ($pictNo <= 0)
-					$pictNo = intval($arItem["PREVIEW_PICTURE"]);
+				$pictNo = ($arItem["DETAIL_PICTURE"] > 0 ? $arItem["DETAIL_PICTURE"] : $arItem["PREVIEW_PICTURE"]);
 
 				if ($ar_file = CFile::GetFileArray($pictNo))
 				{
@@ -1080,7 +1166,8 @@ if (empty($arRunErrors))
 								array(2),
 								'N',
 								array($arPrice),
-								$arOfferIBlock['LID']
+								$arOfferIBlock['LID'],
+								array()
 							))
 							{
 								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
@@ -1098,7 +1185,8 @@ if (empty($arRunErrors))
 							array(2), // anonymous
 							'N',
 							array(),
-							$arOfferIBlock['LID']
+							$arOfferIBlock['LID'],
+							array()
 						))
 						{
 							$minPrice = $arPrice['DISCOUNT_PRICE'];
@@ -1203,11 +1291,11 @@ if (empty($arRunErrors))
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
 
 					$strFile = '';
-					if (intval($arOfferItem["DETAIL_PICTURE"])>0 || intval($arOfferItem["PREVIEW_PICTURE"])>0)
+					$arOfferItem["DETAIL_PICTURE"] = (int)$arOfferItem["DETAIL_PICTURE"];
+					$arOfferItem["PREVIEW_PICTURE"] = (int)$arOfferItem["PREVIEW_PICTURE"];
+					if ($arOfferItem["DETAIL_PICTURE"] > 0 || $arOfferItem["PREVIEW_PICTURE"] > 0)
 					{
-						$pictNo = intval($arOfferItem["DETAIL_PICTURE"]);
-						if ($pictNo<=0)
-							$pictNo = intval($arOfferItem["PREVIEW_PICTURE"]);
+						$pictNo = ($arOfferItem["DETAIL_PICTURE"] > 0 ? $arOfferItem["DETAIL_PICTURE"] : $arOfferItem["PREVIEW_PICTURE"]);
 
 						if ($ar_file = CFile::GetFileArray($pictNo))
 						{
@@ -1233,7 +1321,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 								continue;
 
-							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["NAME"], true)."</name>\n";
+							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["~NAME"], true)."</name>\n";
 							break;
 						case 'description':
 							$strOfferYandex .= "<description>";
@@ -1275,7 +1363,7 @@ if (empty($arRunErrors))
 									||
 									$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
 								)
-								$strOfferYandex .= "<".$key.">".yandex_text2xml($arOfferItem["NAME"], true)."</".$key.">\n";
+								$strOfferYandex .= "<".$key.">".yandex_text2xml($arOfferItem["~NAME"], true)."</".$key.">\n";
 							}
 							else
 							{
@@ -1394,7 +1482,8 @@ if (empty($arRunErrors))
 								array(2),
 								'N',
 								array($arPrice),
-								$arOfferIBlock['LID']
+								$arOfferIBlock['LID'],
+								array()
 							))
 							{
 								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
@@ -1413,7 +1502,8 @@ if (empty($arRunErrors))
 							array(2), // anonymous
 							'N',
 							array(),
-							$arOfferIBlock['LID']
+							$arOfferIBlock['LID'],
+							array()
 						))
 						{
 							$minPrice = $arPrice['DISCOUNT_PRICE'];
@@ -1447,11 +1537,11 @@ if (empty($arRunErrors))
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
 
 					$strFile = '';
-					if (intval($arOfferItem["DETAIL_PICTURE"])>0 || intval($arOfferItem["PREVIEW_PICTURE"])>0)
+					$arOfferItem["DETAIL_PICTURE"] = (int)$arOfferItem["DETAIL_PICTURE"];
+					$arOfferItem["PREVIEW_PICTURE"] = (int)$arOfferItem["PREVIEW_PICTURE"];
+					if ($arOfferItem["DETAIL_PICTURE"] > 0 || $arOfferItem["PREVIEW_PICTURE"] > 0)
 					{
-						$pictNo = intval($arOfferItem["DETAIL_PICTURE"]);
-						if ($pictNo<=0)
-							$pictNo = intval($arOfferItem["PREVIEW_PICTURE"]);
+						$pictNo = ($arOfferItem["DETAIL_PICTURE"] > 0 ? $arOfferItem["DETAIL_PICTURE"] : $arOfferItem["PREVIEW_PICTURE"]);
 
 						if ($ar_file = CFile::GetFileArray($pictNo))
 						{
@@ -1477,7 +1567,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 								continue;
 
-							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["NAME"], true)."</name>\n";
+							$strOfferYandex .= "<name>".yandex_text2xml($arOfferItem["~NAME"], true)."</name>\n";
 							break;
 						case 'description':
 							$strOfferYandex .= "<description>";
@@ -1519,7 +1609,7 @@ if (empty($arRunErrors))
 									||
 									$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
 								)
-								$strOfferYandex .= "<".$key.">".yandex_text2xml($arOfferItem["NAME"], true)."</".$key.">\n";
+								$strOfferYandex .= "<".$key.">".yandex_text2xml($arOfferItem["~NAME"], true)."</".$key.">\n";
 							}
 							else
 							{
@@ -1629,7 +1719,8 @@ if (empty($arRunErrors))
 							array(2),
 							'N',
 							array($arPrice),
-							$ar_iblock['LID']
+							$ar_iblock['LID'],
+							array()
 						))
 						{
 							$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
@@ -1647,7 +1738,8 @@ if (empty($arRunErrors))
 						array(2), // anonymous
 						'N',
 						array(),
-						$ar_iblock['LID']
+						$ar_iblock['LID'],
+						array()
 					))
 					{
 						$minPrice = $arPrice['DISCOUNT_PRICE'];
@@ -1705,7 +1797,7 @@ if (empty($arRunErrors))
 						if (is_array($XML_DATA) && ($XML_DATA['TYPE'] == 'vendor.model' || $XML_DATA['TYPE'] == 'artist.title'))
 							continue;
 
-						$strValue = "<name>".yandex_text2xml($arItem["NAME"], true)."</name>\n";
+						$strValue = "<name>".yandex_text2xml($arItem["~NAME"], true)."</name>\n";
 						break;
 					case 'description':
 						$strValue =
@@ -1741,7 +1833,7 @@ if (empty($arRunErrors))
 								$key == 'title' && $XML_DATA['TYPE'] == 'artist.title'
 							)
 
-							$strValue = "<".$key.">".yandex_text2xml($arItem["NAME"], true)."</".$key.">\n";
+							$strValue = "<".$key.">".yandex_text2xml($arItem["~NAME"], true)."</".$key.">\n";
 						}
 						else
 						{
@@ -1764,7 +1856,8 @@ if (empty($arRunErrors))
 					// no break here
 
 					default:
-						if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
+						//if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
+						if (isset($XML_DATA['XML_DATA'][$key]))
 						{
 							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
 							if ('' != $strValue)

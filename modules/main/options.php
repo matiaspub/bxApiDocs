@@ -14,7 +14,6 @@
  */
 
 IncludeModuleLangFile(__FILE__);
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/admin/task_description.php");
 
 if(!$USER->CanDoOperation('view_other_settings') && !$USER->CanDoOperation('edit_other_settings'))
 	$APPLICATION->AuthForm(GetMessage("ACCESS_DENIED"));
@@ -84,7 +83,6 @@ $arAllOptions = array(
 		Array("ALLOW_SPREAD_COOKIE", GetMessage("MAIN_OPTION_ALLOW_SPREAD_COOKIE"), "Y", Array("checkbox", "Y")),
 		Array("header_200", GetMessage("HEADER_200"), "N", Array("checkbox", "Y")),
 		Array("error_reporting", GetMessage("MAIN_ERROR_REPORTING"), E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE, Array("selectbox", Array(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE=>GetMessage("MAIN_OPTION_ERROR1"), E_ALL^E_NOTICE=>GetMessage("MAIN_OPTION_ERROR2"), 0=>GetMessage("MAIN_OPTION_ERROR3")))),
-		Array("templates_visual_editor", GetMessage("main_options_use_editor"), "N", Array("checkbox", "Y")),
 		Array("use_hot_keys", GetMessage("main_options_use_hot_keys"), "Y", Array("checkbox", "Y")),
 		Array("smile_set_id", GetMessage("main_options_smile_set_id"), 0, Array("selectbox", $arSmileSet)),
 
@@ -139,7 +137,6 @@ $arAllOptions = array(
 		Array("use_secure_password_cookies", GetMessage("MAIN_OPTION_USE_SECURE_PASSWORD_COOKIE"), "N", Array("checkbox", "Y")),
 		Array("auth_multisite", GetMessage("MAIN_OPTION_AUTH_TO_ALL_DOM"), "N", Array("checkbox", "Y")),
 		Array("allow_socserv_authorization", GetMessage("MAIN_OPTION_SOCSERV_AUTH"), "Y", Array("checkbox", "Y")),
-		Array("auth_comp2", GetMessage("MAIN_OPTION_AUTH_COMP2"), "N", Array("checkbox", "Y")),
 		Array("use_digest_auth", GetMessage("MAIN_OPT_HTTP_DIGEST"), "N", Array("checkbox", "Y")),
 		Array("note"=>GetMessage("MAIN_OPT_DIGEST_NOTE")),
 		Array("custom_register_page", GetMessage("MAIN_OPT_REGISTER_PAGE"), "", Array("text", 40)),
@@ -182,6 +179,15 @@ if(CTimeZone::Possible())
 else
 {
 	$arAllOptions["main"][] = array('note'=>GetMessage("MAIN_OPT_TIME_ZONE_NOTE"));
+}
+
+if (\Bitrix\Main\Analytics\SiteSpeed::isLicenseAccepted())
+{
+	$arAllOptions["main"][] = GetMessage("MAIN_SITE_SPEED_SETTINGS");
+	$arAllOptions["main"][] = array("gather_user_stat", GetMessage("MAIN_GATHER_USER_STAT"), "Y", Array("checkbox", "Y"));
+
+	$arAllOptions["main"][] = GetMessage("MAIN_CATALOG_STAT_SETTINGS");
+	$arAllOptions["main"][] = array("gather_catalog_stat", GetMessage("MAIN_GATHER_CATALOG_STAT"), "Y", Array("checkbox", "Y"));
 }
 
 $arAllOptions["main"][] = GetMessage("main_options_map");
@@ -268,6 +274,7 @@ $arAllOptions["auth"][] = GetMessage("MAIN_REGISTRATION_OPTIONS");
 $arAllOptions["auth"][] = Array("new_user_registration", GetMessage("MAIN_REGISTER"), "Y", Array("checkbox", "Y"));
 $arAllOptions["auth"][] = Array("captcha_registration", GetMessage("MAIN_OPTION_FNAME_CAPTCHA"), "N", Array("checkbox", "Y"));
 $arAllOptions["auth"][] = Array("new_user_registration_def_group", GetMessage("MAIN_REGISTER_GROUP"), "", Array("multiselectbox", $groups));
+$arAllOptions["auth"][] = Array("new_user_email_required", GetMessage("MAIN_OPTION_EMAIL_REQUIRED"), "Y", Array("checkbox", "Y", 'onclick="BxReqEmail(this)"'));
 $arAllOptions["auth"][] = Array("new_user_registration_email_confirmation", GetMessage("MAIN_REGISTER_EMAIL_CONFIRMATION", array("#EMAIL_TEMPLATES_URL#" => "/bitrix/admin/message_admin.php?lang=".LANGUAGE_ID."&set_filter=Y&find_type_id=NEW_USER_CONFIRM")), "N", Array("checkbox", "Y"));
 $arAllOptions["auth"][] = Array("new_user_registration_cleanup_days", GetMessage("MAIN_REGISTER_CLEANUP_DAYS"), "7", Array("text", 5));
 $arAllOptions["auth"][] = Array("new_user_email_uniq_check", GetMessage("MAIN_REGISTER_EMAIL_UNIQ_CHECK").($bEmailIndex? "<br>".GetMessage("MAIN_REGISTER_EMAIL_INDEX_WARNING"): ""), "N", Array("checkbox", "Y"));
@@ -341,7 +348,6 @@ if($_SERVER["REQUEST_METHOD"]=="POST" && strlen($_POST["Update"])>0 && ($USER->C
 		if($arOption[0] === "new_user_email_uniq_check")
 			$arAllOptions["auth"][$i][1] = GetMessage("MAIN_REGISTER_EMAIL_UNIQ_CHECK").($bEmailIndex? "<br>".GetMessage("MAIN_REGISTER_EMAIL_INDEX_WARNING"): "");
 
-	// установка прав групп
 	$module_id = "main";
 	COption::SetOptionString($module_id, "GROUP_DEFAULT_TASK", $GROUP_DEFAULT_TASK, "Task for groups by default");
 	$letter = ($l = CTask::GetLetter($GROUP_DEFAULT_TASK)) ? $l : 'D';
@@ -394,8 +400,6 @@ function ShowParamsHTMLByArray($arParams)
 {
 	foreach($arParams as $Option)
 	{
-		if($Option[0] == "templates_visual_editor" && defined("BX_DISABLE_TEMPLATE_EDITOR") && BX_DISABLE_TEMPLATE_EDITOR == true)
-			continue;
 		__AdmSettingsDrawRow("main", $Option);
 	}
 }
@@ -650,42 +654,50 @@ BX.ready(function(){
 <input type="hidden" name="back_url_settings" value="<?echo htmlspecialcharsbx($_REQUEST["back_url_settings"])?>">
 <?$tabControl->End();?>
 </form>
+
+<script type="text/javascript">
+function BxReqEmail(input)
+{
+	BX("new_user_registration_email_confirmation").disabled = !input.checked;
+}
+BX.ready(function(){BxReqEmail(BX("new_user_email_required"));});
+</script>
 <?
 $message = null;
 
 if(
 	!IsModuleInstalled("controller")
 	&& $_SERVER["REQUEST_METHOD"] == "POST"
-	&& (strlen($controller_join) > 0 || strlen($controller_remove) > 0 || strlen($controller_save_proxy) > 0)
+	&& ($_POST["controller_join"] <> '' || $_POST["controller_remove"] <> '' || $_POST["controller_save_proxy"] <> '')
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
 )
 {
-	COption::SetOptionString("main", "controller_proxy_url", $controller_proxy_url);
-	COption::SetOptionString("main", "controller_proxy_port", $controller_proxy_port);
-	COption::SetOptionString("main", "controller_proxy_user", $controller_proxy_user);
-	COption::SetOptionString("main", "controller_proxy_password", $controller_proxy_password);
+	COption::SetOptionString("main", "controller_proxy_url", $_POST["controller_proxy_url"]);
+	COption::SetOptionString("main", "controller_proxy_port", $_POST["controller_proxy_port"]);
+	COption::SetOptionString("main", "controller_proxy_user", $_POST["controller_proxy_user"]);
+	COption::SetOptionString("main", "controller_proxy_password", $_POST["controller_proxy_password"]);
 }
 
 if(
 	!IsModuleInstalled("controller")
 	&& $_SERVER["REQUEST_METHOD"] == "POST"
-	&& (strlen($controller_join) > 0 && strlen($controller_save_proxy) <= 0)
+	&& ($_POST["controller_join"] <> '' && $_POST["controller_save_proxy"] == '')
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
 	&& COption::GetOptionString("main", "controller_member", "N") != "Y"
 )
 {
-	if($controller_url <> '')
+	if($_POST["controller_url"] <> '')
 	{
-		if(strlen($controller_login)<=0 || strlen($controller_password)<=0)
+		if($_POST["controller_login"] == '' || $_POST["controller_password"] == '')
 		{
-			list($member_id, $member_secret_id, $ticket_id) = CControllerClient::InitTicket($controller_url);
-			LocalRedirect($controller_url."/bitrix/admin/controller_member_edit.php?lang=".LANGUAGE_ID.'&URL='.urlencode($site_url).'&NAME='.urlencode($site_name).'&MEMBER_ID='.$member_id.'&SECRET_ID='.$member_secret_id.'&TICKET_ID='.$ticket_id.'&back_url='.urlencode(($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
+			list($member_id, $member_secret_id, $ticket_id) = CControllerClient::InitTicket($_POST["controller_url"]);
+			LocalRedirect($_POST["controller_url"]."/bitrix/admin/controller_member_edit.php?lang=".LANGUAGE_ID.'&URL='.urlencode($_POST["site_url"]).'&NAME='.urlencode($_POST["site_name"]).'&MEMBER_ID='.$member_id.'&SECRET_ID='.$member_secret_id.'&TICKET_ID='.$ticket_id.'&back_url='.urlencode(($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
 		}
 		else
 		{
-			if(!CControllerClient::JoinToController($controller_url, $controller_login, $controller_password, $site_url, false, $site_name))
+			if(!CControllerClient::JoinToController($_POST["controller_url"], $_POST["controller_login"], $_POST["controller_password"], $_POST["site_url"], false, $_POST["site_name"]))
 			{
 				if ($e = $APPLICATION->GetException())
 					$message = new CAdminMessage(GetMessage("MAIN_ERROR_SAVING"), $e);
@@ -702,20 +714,20 @@ $bControllerRemoveError = false;
 if(
 	!IsModuleInstalled("controller")
 	&& $_SERVER["REQUEST_METHOD"] == "POST"
-	&& (strlen($controller_remove) > 0 && strlen($controller_save_proxy) <= 0)
+	&& ($_POST["controller_remove"] <> '' && $_POST["controller_save_proxy"] == '')
 	&& $USER->IsAdmin()
 	&& check_bitrix_sessid()
 	&& COption::GetOptionString("main", "controller_member", "N") == "Y"
 )
 {
 	$controller_url = COption::GetOptionString("main", "controller_url", "");
-	if(strlen($controller_login)<=0 || strlen($controller_password)<=0)
+	if($_POST["controller_login"] == '' || $_POST["controller_password"] == '')
 	{
 		LocalRedirect($controller_url."/bitrix/admin/controller_member_edit.php?lang=".LANGUAGE_ID.'&act=unregister&member_id='.urlencode(COption::GetOptionString("main", "controller_member_id", "")).'&back_url='.urlencode(($APPLICATION->IsHTTPS()?"https://":"http://").$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']));
 	}
 	else
 	{
-		if(!CControllerClient::RemoveFromController($controller_login, $controller_password))
+		if(!CControllerClient::RemoveFromController($_POST["controller_login"], $_POST["controller_password"]))
 		{
 			if($_REQUEST['remove_anywhere'] == 'Y')
 			{
@@ -806,26 +818,26 @@ if(COption::GetOptionString("main", "controller_member", "N")!="Y"):
 	</script>
 	<tr class="adm-detail-required-field">
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_URL")?></td>
-		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($controller_url);?>" name="controller_url" id="controller_url"></td>
+		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["controller_url"]);?>" name="controller_url" id="controller_url"></td>
 	</tr>
 	<tr class="heading">
 		<td colspan="2"><b><?echo GetMessage("MAIN_OPTION_CONTROLLER_ADDIT_SECT")?></b></td>
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_ADM_LOGIN")?></td>
-		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($controller_login);?>" name="controller_login" id="controller_login"></td>
+		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["controller_login"]);?>" name="controller_login" id="controller_login"></td>
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_ADM_PASSWORD")?></td>
-		<td><input type="password" size="30" maxlength="255" value="<?=htmlspecialcharsbx($controller_password);?>" name="controller_password" id="controller_password"></td>
+		<td><input type="password" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["controller_password"]);?>" name="controller_password" id="controller_password"></td>
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_SITENAME")?></td>
-		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($site_name);?>" name="site_name" id="site_name"></td>
+		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["site_name"]);?>" name="site_name" id="site_name"></td>
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_SITEURL")?></td>
-		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($site_url);?>" name="site_url" id="site_url"></td>
+		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["site_url"]);?>" name="site_url" id="site_url"></td>
 	</tr>
 	<tr>
 		<td>&nbsp;</td>
@@ -863,11 +875,11 @@ if(COption::GetOptionString("main", "controller_member", "N")!="Y"):
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_ADM_LOGIN")?></td>
-		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($controller_login);?>" name="controller_login" id="controller_login"></td>
+		<td><input type="text" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["controller_login"]);?>" name="controller_login" id="controller_login"></td>
 	</tr>
 	<tr>
 		<td><?echo GetMessage("MAIN_OPTION_CONTROLLER_ADM_PASSWORD")?></td>
-		<td><input type="password" size="30" maxlength="255" value="<?=htmlspecialcharsbx($controller_password);?>" name="controller_password" id="controller_password"></td>
+		<td><input type="password" size="30" maxlength="255" value="<?=htmlspecialcharsbx($_POST["controller_password"]);?>" name="controller_password" id="controller_password"></td>
 	</tr>
 <?endif; //if(COption::GetOptionString("main", "controller_member", "N")!="Y"?>
 	<tr class="heading">

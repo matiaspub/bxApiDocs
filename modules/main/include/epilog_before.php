@@ -39,7 +39,13 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 			"ICON"=>"bx-context-toolbar-edit-icon",
 			"URL"=> 'javascript:'.$APPLICATION->GetPopupLink(Array(
 				"URL"=> "/bitrix/admin/public_file_edit.php?bxpublic=Y&lang=".LANGUAGE_ID."&path=".$encCurrentFilePath."&site=".SITE_ID."&back_url=".$encUri."&templateID=".$encSiteTemplateId,
-				"PARAMS"=>array("width"=>770, "height"=>470))
+				"PARAMS"=>array(
+					"width" => 770,
+					"height" => 470,
+					"dialog_type" => 'EDITOR',
+					"min_width" => 700,
+					"min_height" => 400
+				))
 			),
 			"DEFAULT"=>true,
 			"MENU" => array
@@ -93,6 +99,8 @@ if($USER->IsAuthorized())
 	}
 }
 */
+
+\Bitrix\Main\Page\Asset::getInstance()->startTarget('TEMPLATE');
 $sPreviewFile = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/tmp/templates/__bx_preview/footer.php";
 if(
 	isset($_GET['bx_template_preview_mode'])
@@ -105,23 +113,5 @@ if(
 }
 else
 {
-	if($APPLICATION->IsCSSOptimized())
-	{
-		$arCSS = $APPLICATION->GetCSSArray();
-		$arCSSKeys = array_keys($arCSS);
-		$cntCSSKeys = count($arCSS);
-		$APPLICATION->SetWorkAreaLastCss($arCSSKeys[$cntCSSKeys-1]);
-		unset($arCSS, $arCSSKeys);
-	}
-
-	if($APPLICATION->IsJSOptimized())
-	{
-		$arScripts = array_unique($APPLICATION->arHeadScripts);
-		$arJsKeys = array_keys($arScripts);
-		$cntJsKeys = count($arScripts);
-		$APPLICATION->SetWorkAreaLastJs($arJsKeys[$cntJsKeys-1]);
-		unset($arCSS, $arCSSKeys);
-	}
-
 	include_once($_SERVER["DOCUMENT_ROOT"].SITE_TEMPLATE_PATH."/footer.php");
 }

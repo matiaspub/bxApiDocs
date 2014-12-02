@@ -67,18 +67,13 @@ class CSalePaySystemPrePayment
 			$imgSrc = "//www.paypal.com/de_DE/i/btn/btn_xpressCheckout.gif";
 		else
 			$imgSrc = "//www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif";
-		return "
-		<form action=\"".POST_FORM_ACTION_URI."\" method=\"post\" name=\"paypal\">
-			<input type=\"hidden\" name=\"paypal\" value=\"Y\">
-			<input style=\"padding-top:7px;\" type=\"image\" name=\"paypalbutton\" value=\"".GetMessage("PPL_BUTTON")."\" src=\"".$imgSrc."\">
-		</form>";
+		return "<input style=\"padding-top:7px;\" type=\"image\" name=\"paypalbutton\" value=\"".GetMessage("PPL_BUTTON")."\" src=\"".$imgSrc."\">";
 	}
 
 	public function BasketButtonAction($orderData = array())
 	{
 		global $APPLICATION;
-
-		if(strlen($_POST["paypalbutton"]) > 0 || $_POST["paypal"] == "Y")
+		if(strlen($_POST["paypalbutton"]) > 0)
 		{
 			$url = "https://api-3t.".$this->domain."paypal.com/nvp";
 

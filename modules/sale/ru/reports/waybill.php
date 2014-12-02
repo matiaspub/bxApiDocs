@@ -172,6 +172,12 @@ border-top:none;padding:0cm 2.0pt 0cm 2.0pt;height:9.0pt'>
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
 		echo $arOrderProps["F_ADDRESS"];
+
+	if (strval($arOrderProps["PHONE"]) != "")
+	{
+		echo ", С‚РµР»РµС„РѕРЅ: ".$arOrderProps["PHONE"];
+	}
+
 }
 else
 {
@@ -183,6 +189,11 @@ else
 	if (strlen($arParams["BUYER_INN"])>0) echo " Р?РќРќ/РљРџРџ: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
 
 	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", Рі. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", СЂ/СЃ ".$arParams["BUYER_RSCH"]." РІ ".$arParams["BUYER_RSCH_BANK"]." Рі. ".$arParams["BUYER_RSCH_CITY"].", Рє/СЃ ".$arParams["BUYER_KSCH"].", Р‘Р?Рљ ".$arParams["BUYER_BIK"];
+
+	if (strval($arParams["BUYER_PHONE"]) != "")
+	{
+		echo ", С‚РµР»РµС„РѕРЅ: ".$arParams["BUYER_PHONE"];
+	}
 
 }?></p>
 <p class=Normal style='margin:0cm;margin-bottom:.0001pt;line-height:normal'>&nbsp;</p>
@@ -256,6 +267,11 @@ if(empty($arParams))
 		echo ", ".$arOrderProps["F_ADDRESS"];
 	elseif(strlen($arOrderProps["F_ADDRESS"])>0)
 		echo $arOrderProps["F_ADDRESS"];
+
+	if (strval($arOrderProps["PHONE"]) != "")
+	{
+		echo ", С‚РµР»РµС„РѕРЅ: ".$arOrderProps["PHONE"];
+	}
 }
 else
 {
@@ -267,6 +283,12 @@ else
 	if (strlen($arParams["BUYER_INN"])>0) echo " Р?РќРќ/РљРџРџ: ".$arParams["BUYER_INN"]." / ".$arParams["BUYER_KPP"];
 
 	echo ", ".$arParams["BUYER_COUNTRY"].", ".$arParams["BUYER_INDEX"].", Рі. ".$arParams["BUYER_CITY"].", ".$arParams["BUYER_ADDRESS"].", СЂ/СЃ ".$arParams["BUYER_RSCH"]." РІ ".$arParams["BUYER_RSCH_BANK"]." Рі. ".$arParams["BUYER_RSCH_CITY"].", Рє/СЃ ".$arParams["BUYER_KSCH"].", Р‘Р?Рљ ".$arParams["BUYER_BIK"];
+
+	if (strval($arParams["BUYER_PHONE"]) != "")
+	{
+		echo ", С‚РµР»РµС„РѕРЅ: ".$arParams["BUYER_PHONE"];
+	}
+
 
 }?></span></p>
 <p class=Normal style='margin-top:1.0pt;margin-right:0cm;margin-bottom:0cm;
@@ -1530,4 +1552,6 @@ margin-left:0cm;margin-bottom:.0001pt;line-height:133%'>&nbsp;</p>
 
 </div>
 
+</body>
 
+</html>

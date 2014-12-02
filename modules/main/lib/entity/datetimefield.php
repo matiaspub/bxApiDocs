@@ -13,6 +13,10 @@ namespace Bitrix\Main\Entity;
  * @package bitrix
  * @subpackage main
  */
-class DatetimeField extends ScalarField
+class DatetimeField extends DateField
 {
+	static public function __construct($name, $parameters = array())
+	{
+		ScalarField::__construct($name, $parameters);
+	}
 }

@@ -35,7 +35,7 @@ class CCourseImport
 
 
 	// List of fields, writable to unilessons
-	protected $arLessonWritableFields = array('NAME', 'CODE', 
+	protected $arLessonWritableFields = array('NAME', 'ACTIVE', 'CODE',
 		'PREVIEW_PICTURE', 'PREVIEW_TEXT', 'PREVIEW_TEXT_TYPE',
 		'DETAIL_PICTURE', 'DETAIL_TEXT', 'DETAIL_TEXT_TYPE',
 		'LAUNCH', 'KEYWORDS');
@@ -206,7 +206,7 @@ class CCourseImport
 		{
 			$arFields = Array(
 				"NAME" => $TITLE,
-				"LESSON_ID" => $PARENT_ID
+				"LESSON_ID" => $linkToParentLessonId
 			);
 
 			$cl = new CLQuestion;
@@ -268,7 +268,9 @@ class CCourseImport
 					}
 
 					if (is_set($arData["#"]["response_lid"][0]["@"], "rcardinality"))
-						switch ($arData["#"]["response_lid"][0]["@"]["rcardinality"]) {
+					{
+						switch ($arData["#"]["response_lid"][0]["@"]["rcardinality"])
+						{
 							case "Multiple":
 								$arQ["QUESTION_TYPE"] = 'M';
 								break;
@@ -282,6 +284,7 @@ class CCourseImport
 								$arQ["QUESTION_TYPE"] = 'S';
 								break;
 						}
+					}
 
 					if (is_set($arResp["#"]["respcondition"][0]["#"], "setvar"))
 						$arQ["POINT"] = $arResp["#"]["respcondition"][0]["#"]["setvar"][0]['#'];
@@ -380,6 +383,7 @@ class CCourseImport
 		}
 		else
 		{
+			$bProhibitPublish = false;
 			// properties (in context of parent) by default
 			$arProperties = array('SORT' => 500);
 
@@ -398,6 +402,14 @@ class CCourseImport
 				unset ($arFields['SORT']);
 			}
 
+			if (isset($arFields['META_PUBLISH_PROHIBITED']))
+			{
+				if ($arFields['META_PUBLISH_PROHIBITED'] === 'Y')
+					$bProhibitPublish = true;
+
+				unset($arFields['META_PUBLISH_PROHIBITED']);
+			}
+
 			// unset fields, that are absent in unilesson
 			$arUnilessonFields = $arFields;
 			$arFieldsNames = array_keys($arUnilessonFields);
@@ -408,10 +420,14 @@ class CCourseImport
 			}
 
 			$ID = CLearnLesson::Add (
-				$arUnilessonFields, 
+				$arUnilessonFields,
 				false, 			// is it course? - No, it isn't.
 				$linkToParentLessonId, 
-				$arProperties);
+				$arProperties
+			);
+
+			if ($bProhibitPublish && ($ID > 0))
+				CLearnLesson::PublishProhibitionSetTo($ID, $linkToParentLessonId, $bProhibitPublish);
 		}
 
 		if ($ID > 0)

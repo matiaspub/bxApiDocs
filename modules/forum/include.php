@@ -30,9 +30,8 @@ if (!is_array($arNameStatuses) || empty($arNameStatuses)):
 		$arNameStatuses[LANGUAGE_ID] = $name;
 	else:
 		foreach ($name as $k => $v):
-			if(empty($arNameStatuses[LANGUAGE_ID][$k])):
-				$arNameStatuses[LANGUAGE_ID][$k] = $v;
-			endif;
+			$n = trim($arNameStatuses[LANGUAGE_ID][$k]);
+			$arNameStatuses[LANGUAGE_ID][$k] = (empty($n) ? $v : $n);
 		endforeach;
 	endif;
 endif;
@@ -208,55 +207,22 @@ function ForumUnsubscribeNewMessages($FID, $TID, &$strErrorMessage, &$strOKMessa
 			if (!CForumSubscribe::CanUserDeleteSubscribe($res['ID'], $USER->GetUserGroupArray(), $USER->GetID()))
 				$arError[] = GetMessage("FORUM_SUB_ERR_PERMS");
 			else
-				$subid = CForumSubscribe::Delete($res["ID"]);
+				CForumSubscribe::Delete($res["ID"]);
 		}
 		else
 			$arError[] = GetMessage("FORUM_SUB_ERR_UNSUBSCR");
 	}
 
 	if (!empty($arError))
-		$strErrorMessage .= implode(".\n",$arError);
-	if (!empty($arError))
-		$strOKMessage .= implode(".\n",$arNote);
+		$strErrorMessage .= implode(".\n", $arError);
+	if (!empty($arNote))
+		$strOKMessage .= implode(".\n", $arNote);
 	if (empty($arError))
 		return True;
 	else
 		return False;
 }
 
-
-/**
- * <p>Подписывает текущего посетителя на новые сообщения темы <i>TID</i>, если она задана. Иначе подписывает на новые сообщения всего форума <i>FID</i>. В переменную, передаваемую в параметре <i>strErrorMessage</i> дописывает ошибки, которые произошли при подписке. В переменную, передаваемую в параметре <i>strOKMessage</i> дописывает сообщения об успехах, которые произошли при подписке.</p>
- *
- *
- *
- *
- * @param int $FID  Код форума, на сообщения которого подписывается текущий
- * пользователь.
- *
- *
- *
- * @param int $TID  Код темы. Если задан, то происходит подписка только на новые
- * сообщения этой темы.
- *
- *
- *
- * @param &string $strErrorMessage  Переменная, в которую функция дописывает сообщения об ошибках,
- * которые произошли при подписке.
- *
- *
- *
- * @param &string $strOKMessage  Переменная, в которую функция дописывает сообщения об успехах,
- * которые произошли при подписке.
- *
- *
- *
- * @return bool <br><br>
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forumsubscribenewmessages.php
- * @author Bitrix
- */
 function ForumSubscribeNewMessages($FID, $TID, &$strErrorMessage, &$strOKMessage, $NEW_TOPIC_ONLY = "N", $strSite = false, $SOCNET_GROUP_ID = false)
 {
 	global $USER;
@@ -357,70 +323,6 @@ function ForumGetRealIP()
 	return ($ip ? $ip : $_SERVER['REMOTE_ADDR']);
 }
 
-
-/**
- * <p>Добавляет или изменяет сообщение (и возможно тему) форума. В переменную, передаваемую в параметре <i>strErrorMessage</i> дописывает ошибки, которые произошли при работе функции. В переменную, передаваемую в параметре <i>strOKMessage</i> дописывает сообщения об успехах, которые произошли при работе функции.</p> <p><b>Примечание</b>. Функция использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до ее подключения.</p>
- *
- *
- *
- *
- * @param string $MESSAGE_TYPE  Тип работы функции. Может принимать следующие значения: NEW -
- * создание новой темы и добавление в нее сообщения, EDIT - изменение
- * сообщения (и темы, если на это есть права), REPLY - новое сообщение в
- * существующую тему.
- *
- *
- *
- * @param int $FID  Код форума, в который добавляется новая тема. Актуален для типа
- * работы NEW, в остальных случаях восстанавливается из кода темы.
- *
- *
- *
- * @param int $TID  Код темы, в которую добавляется сообщение. Актуален для типа
- * работы REPLY, в остальных случаях восстанавливается из кода
- * сообщения. Для добавления новой темы должен быть равен 0.
- *
- *
- *
- * @param int $MID  Код сообщения, которое необходимо изменить. Актуален для типа
- * работы EDIT. В остальных случаях должен быть равен 0.
- *
- *
- *
- * @param array $arFieldsG  Массив параметров сообщения и темы. Должен содержать следующие
- * ключи<br> POST_MESSAGE - тело сообщения,<br> TITLE - заголовок темы (если NEW или
- * EDIT и разрешено изменение темы),<br> AUTHOR_NAME - имя автора сообщения,<br>
- * DESCRIPTION - описание темы (если NEW или EDIT и разрешено изменение
- * темы),<br> ICON_ID - иконка темы (если NEW или EDIT и разрешено изменение
- * темы),<br> USE_SMILES - разрешено заменять смайлики на их графические
- * изображения,<br> ATTACH_IMG - присоединенный файл - массив со структурой
- * элементов массива $_FILES
- *
- *
- *
- * @param &string $strErrorMessage  Переменная, в которую функция дописывает сообщения об ошибках,
- * которые произошли при ее работе.
- *
- *
- *
- * @param &string $strOKMessage  Переменная, в которую функция дописывает сообщения об успехах,
- * которые произошли при ее работе.
- *
- *
- *
- * @param int $iFileSize  Максимальный размер загружаемых файлов в байтах. Не обязательный
- * параметр, по умолчанию равен 50000 (байт).
- *
- *
- *
- * @return int <p>Следует помнить, что внутри функции используется глобальная
- * переменная <b>$USER</b>. То есть, сообщение запишется в базу от
- * текущего авторизованного пользователя.</p> <br><br>
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php
- * @author Bitrix
- */
 function ForumAddMessage(
 	$MESSAGE_TYPE, $FID, $TID, $MID, $arFieldsG, &$strErrorMessage, &$strOKMessage, $iFileSize = false,
 	$captcha_word = "", $captcha_sid = 0, $captcha_code = "")
@@ -878,11 +780,11 @@ function ForumAddMessage(
 			if (defined("ADMIN_SECTION") && ADMIN_SECTION===true)
 			{
 				$arForumSiteCode_tmp = array_keys($arForumSite_tmp);
-				$F_EVENT3 = CForumNew::PreparePath2Message($arForumSite_tmp[$arForumSiteCode_tmp[0]], array("FORUM_ID"=>$FID, "TOPIC_ID"=>$TID, "MESSAGE_ID"=>$MID));
+				$F_EVENT3 = CForumNew::PreparePath2Message((empty($arForumSite_tmp[$arForumSiteCode_tmp[0]]) ? '' : $arForumSite_tmp[$arForumSiteCode_tmp[0]]), array("FORUM_ID"=>$FID, "TOPIC_ID"=>$TID, "MESSAGE_ID"=>$MID));
 			}
 			else
 			{
-				$F_EVENT3 = CForumNew::PreparePath2Message($arForumSite_tmp[SITE_ID], array("FORUM_ID"=>$FID, "TOPIC_ID"=>$TID, "MESSAGE_ID"=>$MID));
+				$F_EVENT3 = CForumNew::PreparePath2Message((empty($arForumSite_tmp[SITE_ID]) ? '' : $arForumSite_tmp[SITE_ID]), array("FORUM_ID"=>$FID, "TOPIC_ID"=>$TID, "MESSAGE_ID"=>$MID));
 			}
 		}
 		CStatistics::Set_Event($F_EVENT1, $F_EVENT2, $F_EVENT3);
@@ -921,43 +823,6 @@ function ForumAddMessage(
 	return false;
 }
 
-
-/**
- * <p>Публикует или скрывает сообщение с кодом <i>MID</i>. В переменную, передаваемую в параметре <i>strErrorMessage</i> дописывает ошибки, которые произошли при работе функции. В переменную, передаваемую в параметре <i>strOKMessage</i> дописывает сообщения об успехах, которые произошли при работе функции.</p>
- *
- *
- *
- *
- * @param int $message  Код сообщения для публикации или скрытия. <br><b>Примечание</b>: До
- * версии 7.0.0 параметр назывался <b>MID</b>.
- *
- *
- *
- * @param char(1) $TYPE  Возможные значения: "SHOW" - публиковать сообщение, "HIDE" - скрыть
- * сообщение.
- *
- *
- *
- * @param array $arAddParams = Array() Переменная, в которую функция дописывает сообщения об ошибках,
- * которые произошли при подписке.
- *
- *
- *
- * @param &string $strErrorMessage  Переменная, в которую функция дописывает сообщения об успехах,
- * которые произошли при подписке.
- *
- *
- *
- * @param &string $strOKMessage  Массив добавления параметров.
- *
- *
- *
- * @return bool <br><br>
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/functions/forummoderatemessage.php
- * @author Bitrix
- */
 function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage, $arAddParams = array())
 {
 	global $USER;
@@ -1738,7 +1603,7 @@ function ForumPrintSmilesList($num_cols, $strLang = false, $strPath2Icons = fals
 	$num_cols = intVal($num_cols);
 	$num_cols = $num_cols > 0 ? $num_cols : 3;
 	$strLang = ($strLang === false ? LANGUAGE_ID : $strLang);
-	$strPath2Icons = ($strPath2Icons === false ? "/bitrix/images/forum/smile/" : $strPath2Icons);
+	$strPath2Icons = (empty($strPath2Icons)? "/bitrix/images/forum/smile/" : $strPath2Icons);
 	$arSmile = CForumSmile::GetByType("S", $strLang);
 
 	$res_str = "";
@@ -2086,7 +1951,7 @@ function ForumGetUserForumStatus($userID = false, $perm = false, $arAdditionalPa
 	$arStatuses = array(
 		"guest" => array("guest", $GLOBALS["FORUM_STATUS_NAME"]["guest"]),
 		"user" => array("user", $GLOBALS["FORUM_STATUS_NAME"]["user"]),
-		"Q" => array("moderator", "NAME" => $GLOBALS["FORUM_STATUS_NAME"]["moderator"]),
+		"Q" => array("moderator", $GLOBALS["FORUM_STATUS_NAME"]["moderator"]),
 		"U" => array("editor", $GLOBALS["FORUM_STATUS_NAME"]["editor"]),
 		"Y" => array("administrator", $GLOBALS["FORUM_STATUS_NAME"]["administrator"])
 	);

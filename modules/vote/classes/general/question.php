@@ -48,7 +48,6 @@ class CAllVoteQuestion
 					"id" => "QUESTION",
 					"text" => GetMessage("VOTE_FORGOT_QUESTION"));
 			endif;
-			$arFields["QUESTION"] = substr($arFields["QUESTION"], 0, 2000);
 		}
 		if (is_set($arFields, "IMAGE_ID") && strLen($arFields["IMAGE_ID"]["name"]) <= 0 && strLen($arFields["IMAGE_ID"]["del"]) <= 0)
 		{
@@ -68,17 +67,17 @@ class CAllVoteQuestion
 			endif;
 		}
 
-		if (is_set($arFields, "ACTIVE") || $ACTION == "ADD") { $arFields["ACTIVE"] = ($arFields["ACTIVE"] == "N" ? "N" : "Y"); }
+		if (is_set($arFields, "ACTIVE") || $ACTION == "ADD") $arFields["ACTIVE"] = ($arFields["ACTIVE"] == "N" ? "N" : "Y");
 		unset($arFields["TIMESTAMP_X"]);
-		if (is_set($arFields, "C_SORT") || $ACTION == "ADD") { $arFields["C_SORT"] = (intVal($arFields["C_SORT"]) > 0 ? intVal($arFields["C_SORT"]) : 100); }
-		if (is_set($arFields, "COUNTER") || $ACTION == "ADD") { $arFields["COUNTER"] = intVal($arFields["COUNTER"]); }
-		if (is_set($arFields, "QUESTION_TYPE") || $ACTION == "ADD") { $arFields["QUESTION_TYPE"] = ($arFields["QUESTION_TYPE"] == "html" ? "html" : "text"); }
-		if (is_set($arFields, "DIAGRAM") || $ACTION == "ADD") { $arFields["DIAGRAM"] = ($arFields["DIAGRAM"] == "N" ? "N" : "Y"); }
+		if (is_set($arFields, "C_SORT") || $ACTION == "ADD") $arFields["C_SORT"] = (intVal($arFields["C_SORT"]) > 0 ? intVal($arFields["C_SORT"]) : 100);
+		if (is_set($arFields, "COUNTER") || $ACTION == "ADD") $arFields["COUNTER"] = intVal($arFields["COUNTER"]);
+		if (is_set($arFields, "QUESTION_TYPE") || $ACTION == "ADD") $arFields["QUESTION_TYPE"] = ($arFields["QUESTION_TYPE"] == "html" ? "html" : "text");
+		if (is_set($arFields, "DIAGRAM") || $ACTION == "ADD") $arFields["DIAGRAM"] = ($arFields["DIAGRAM"] == "N" ? "N" : "Y");
 		if (is_set($arFields, "DIAGRAM_TYPE") && (empty($arFields["DIAGRAM_TYPE"]) || in_array($arFields["DIAGRAM_TYPE"], GetVoteDiagramArray()))):
 			$arFields["DIAGRAM_TYPE"] = VOTE_DEFAULT_DIAGRAM_TYPE;
 		endif;
-		if (is_set($arFields, "TEMPLATE")) { $arFields["TEMPLATE"] = substr(trim($arFields["TEMPLATE"]), 0, 255); }
-		if (is_set($arFields, "TEMPLATE_NEW")) { $arFields["TEMPLATE_NEW"] = substr(trim($arFields["TEMPLATE_NEW"]), 0, 255); }
+		if (is_set($arFields, "TEMPLATE")) $arFields["TEMPLATE"] = substr(trim($arFields["TEMPLATE"]), 0, 255);
+		if (is_set($arFields, "TEMPLATE_NEW")) $arFields["TEMPLATE_NEW"] = substr(trim($arFields["TEMPLATE_NEW"]), 0, 255);
 
 		if ((is_set($arFields, "TEMPLATE") ||is_set($arFields, "TEMPLATE_NEW")) &&
 			COption::GetOptionString("vote", "VOTE_COMPATIBLE_OLD_TEMPLATE", "Y") == "Y")
@@ -92,8 +91,9 @@ class CAllVoteQuestion
 
 		if(!empty($aMsg))
 		{
+			global $APPLICATION;
 			$e = new CAdminException(array_reverse($aMsg));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 		return true;
@@ -101,17 +101,15 @@ class CAllVoteQuestion
 
 	public static function Add($arFields, $strUploadDir = false)
 	{
-		global $DB,$CACHE_MANAGER;
-		$arBinds = array();
+		global $DB;
 		$strUploadDir = ($strUploadDir === false ? "vote" : $strUploadDir);
 
 		if (!CVoteQuestion::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeVoteQuestionAdd *******************/
-		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionAdd", true) as $arEvent) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionAdd", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
-		}
 /***************** /Event ******************************************/
 		if (empty($arFields))
 			return false;
@@ -128,34 +126,35 @@ class CAllVoteQuestion
 
 		CFile::SaveForDB($arFields, "IMAGE_ID", $strUploadDir);
 
-		$arFields["~TIMESTAMP_X"] = $DB->GetNowFunction();
-		$arBinds["QUESTION"] = $arFields["QUESTION"];
+		if ($DB->type == "ORACLE")
+			$arFields["ID"] = $DB->NextID("SQ_B_VOTE_QUESTION");
 
-		$ID = $DB->Add("b_vote_question", $arFields/*, $arBinds*/);
+		$arInsert = $DB->PrepareInsert("b_vote_question", $arFields);
+
+		$DB->QueryBind("INSERT INTO b_vote_question (".$arInsert[0].", TIMESTAMP_X) VALUES(".$arInsert[1].", ".$DB->GetNowFunction().")", array("QUESTION" => $arFields["QUESTION"]), false);
+		$ID = intval($DB->type == "ORACLE" ? $arFields["ID"] : $DB->LastID());
 
 /***************** Event onAfterVoteQuestionAdd ********************/
 		foreach (GetModuleEvents("vote", "onAfterVoteQuestionAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
-
 /***************** /Event ******************************************/
 		return $ID;
 	}
 
 	public static function Update($ID, $arFields, $strUploadDir = false)
 	{
-		global $DB,$CACHE_MANAGER;
+		global $DB;
 		$arBinds = array();
 		$err_mess = (CAllVoteQuestion::err_mess())."<br>Function: Update<br>Line: ";
 		$strUploadDir = ($strUploadDir === false ? "vote" : $strUploadDir);
-		$ID = intVal($ID);
 
+		$ID = intVal($ID);
 		if ($ID <= 0 || !CVoteQuestion::CheckFields("UPDATE", $arFields, $ID))
 			return false;
 /***************** Event onBeforeVoteQuestionUpdate ****************/
-		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionUpdate", true) as $arEvent) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionUpdate", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields)) === false)
 				return false;
-		}
 /***************** /Event ******************************************/
 		if (empty($arFields))
 			return false;
@@ -177,11 +176,8 @@ class CAllVoteQuestion
 		if (is_set($arFields, "QUESTION"))
 			$arBinds["QUESTION"] = $arFields["QUESTION"];
 
-		if (!empty($strUpdate)):
-			$strSql = "UPDATE b_vote_question SET ".$strUpdate." WHERE ID=".$ID;
-			/*$DB->QueryBind($strSql, $arBinds);*/
-			$DB->Query($strSql, false, $err_mess);
-		endif;
+		if (!empty($strUpdate))
+			$DB->QueryBind("UPDATE b_vote_question SET ".$strUpdate." WHERE ID=".$ID, $arBinds, false, $err_mess);
 
 		unset($GLOBALS["VOTE_CACHE"]["QUESTION"][$ID]);
 /***************** Event onAfterVoteQuestionUpdate *****************/
@@ -191,10 +187,8 @@ class CAllVoteQuestion
 		return $ID;
 	}
 
-
 	public static function Copy($ID, $newVoteID)
 	{
-		$err_mess = (CAllVoteQuestion::err_mess())."<br>Function: Copy<br>Line: ";
 		$ID = intVal($ID);
 		if ($ID <= 0)
 			return false;
@@ -211,11 +205,10 @@ class CAllVoteQuestion
 			return false;
 		$state = true;
 		$rAnswers = CVoteAnswer::GetList($ID);
-		while ($arAnswer = $rAnswers->GetNext())
+		while ($arAnswer = $rAnswers->Fetch())
 		{
 			$arAnswer['QUESTION_ID'] = $newQuestionID;
 			unset($arAnswer['ID']);
-			unset($arAnswer['~ID']);
 			$state = $state && (CVoteAnswer::Add($arAnswer) !== false);
 		}
 		if (!$state) return $state;
@@ -237,7 +230,6 @@ class CAllVoteQuestion
 
 	public static function GetByID($ID)
 	{
-		global $DB;
 		$ID = intval($ID);
 		$res = false;
 		if ($ID <= 0):
@@ -249,7 +241,7 @@ class CAllVoteQuestion
 		if (!array_key_exists($ID, $GLOBALS["VOTE_CACHE"]["QUESTION"]))
 		{
 			$db_res = CVoteQuestion::GetList(0, $by, $order, array("ID" => $ID), $is_filtered);
-			if ($db_res) { $res = $db_res->Fetch(); }
+			if ($db_res) $res = $db_res->Fetch();
 			$GLOBALS["VOTE_CACHE"]["QUESTION"][$ID] = $res;
 		}
 		$db_res = new CDBResult;
@@ -264,9 +256,6 @@ class CAllVoteQuestion
 
 		$VOTE_ID = intval($VOTE_ID);
 		$arSqlSearch = array();
-		$strSqlSearch = "";
-		$strSqlOrder = "";
-
 		$arFilter = (is_array($arFilter) ? $arFilter : array($arFilter));
 
 		foreach ($arFilter as $key => $val)
@@ -303,7 +292,7 @@ class CAllVoteQuestion
 		$by1 = strtoupper(strpos($by, "s_") === 0 ? substr($by, 2) : $by);
 		$order = ($order != "desc" ? "asc" : "desc");
 		$order1 = strtoupper($order);
-		if (in_array($by1, array("ID", "TIMESTAMP_X", "ACTIVE", "DIAGRAM", "C_SORT", "QUESTION", "REQUIRED"))):
+		if (in_array($by1, array("ID", "TIMESTAMP_X", "ACTIVE", "DIAGRAM", "C_SORT", "REQUIRED"))):
 			$strSqlOrder = "Q.".$by1." ".$order1;
 		else:
 			$by = "s_c_sort";
@@ -325,7 +314,6 @@ class CAllVoteQuestion
 
 	public static function GetListEx($arOrder = array("ID" => "ASC"), $arFilter=array())
 	{
-		$err_mess = (CAllVoteQuestion::err_mess())."<br>Function: GetListEx<br>Line: ";
 		global $DB;
 
 		$arSqlSearch = array();
@@ -354,7 +342,8 @@ class CAllVoteQuestion
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
+							{
 								$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".implode(",", $val)."))";
 							}
 						}
@@ -381,14 +370,10 @@ class CAllVoteQuestion
 		foreach ($arOrder as $by => $order)
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
+			$by = ($by == "ACTIVE" ? $by : "ID");
 			if ($order!="ASC") $order = "DESC";
-			if ($by == "ID") $arSqlOrder[] = " VQ.ID ".$order." ";
-			elseif ($by == "ACTIVE") $arSqlOrder[] = " VQ.ACTIVE ".$order." ";
-			else
-			{
-				$arSqlOrder[] = " VQ.ID ".$order." ";
-				$by = "ID";
-			}
+			if ($by == "ACTIVE") $arSqlOrder[] = " VQ.ACTIVE ".$order." ";
+			else $arSqlOrder[] = " VQ.ID ".$order." ";
 		}
 		DelDuplicateSort($arSqlOrder);
 		if (count($arSqlOrder) > 0)
@@ -406,17 +391,15 @@ class CAllVoteQuestion
 
 	public static function Delete($ID, $VOTE_ID = false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		$err_mess = (CVoteQuestion::err_mess())."<br>Function: Delete<br>Line: ";
 /***************** Event onBeforeVoteQuestionDelete ****************/
-		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionDelete", true) as $arEvent) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteQuestionDelete", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$VOTE_ID)) === false)
 				return false;
-		}
 /***************** /Event ******************************************/
-		if (!CVoteAnswer::Delete(false, $ID, $VOTE_ID)):
+		if (!CVoteAnswer::Delete(false, $ID, $VOTE_ID))
 			return false;
-		endif;
 
 		$ID = (intVal($ID) > 0 ? intVal($ID) : false);
 		$VOTE_ID = (intVal($VOTE_ID) > 0 ? intVal($VOTE_ID) : false);
@@ -431,7 +414,7 @@ class CAllVoteQuestion
 		$DB->StartTransaction();
 		$strSql = "SELECT IMAGE_ID FROM b_vote_question WHERE ID IN (".$strSqlID.") AND IMAGE_ID > 0";
 		$z = $DB->Query($strSql, false, $err_mess.__LINE__);
-		while ($zr = $z->Fetch()) { CFile::Delete($zr["IMAGE_ID"]); }
+		while ($zr = $z->Fetch()) CFile::Delete($zr["IMAGE_ID"]);
 
 		// drop question events
 		if (!$DB->Query("DELETE FROM b_vote_event_question WHERE QUESTION_ID IN (".$strSqlID.")", false, $err_mess.__LINE__)):
@@ -504,6 +487,27 @@ class CAllVoteQuestion
 			unset($GLOBALS["VOTE_CACHE"]["QUESTION"][$ID]);
 /***************** Cleaning cache/**********************************/
 		return true;
+	}
+
+	public static function setActive($ID, $activate = true)
+	{
+		$ID = intval($ID);
+		if ($ID <= 0)
+			return false;
+		$activate = (!!$activate);
+/***************** Event onBeforeVoteQuestionUpdate ****************/
+		foreach (GetModuleEvents("vote", "onVoteQuestionActivate", true) as $arEvent)
+			if (ExecuteModuleEventEx($arEvent, array($ID, $activate)) === false)
+				return false;
+/***************** /Event ******************************************/
+
+		global $DB;
+		$err_mess = (CAllVoteQuestion::err_mess())."<br>Function: activate<br>Line: ";
+		$strUpdate = $DB->PrepareUpdate("b_vote_question", array("ACTIVE" => ($activate ? "Y" : "N"), "~TIMESTAMP_X" => $DB->GetNowFunction()));
+		$DB->QueryBind("UPDATE b_vote_question SET ".$strUpdate." WHERE ID=".$ID, array(), false, $err_mess);
+		unset($GLOBALS["VOTE_CACHE"]["QUESTION"][$ID]);
+
+		return $ID;
 	}
 }
 ?>

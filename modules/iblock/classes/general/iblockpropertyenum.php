@@ -13,7 +13,7 @@ class CIBlockPropertyEnumResult extends CDBResult
 }
 
 /**
- * <b>CIBlockPropertyEnum</b> - класс для работы со вариантами значений свойств типа "список".
+ * <b>CIBlockPropertyEnum</b> - класс для работы со вариантами значений свойств типа "список".</body> </html>
  *
  *
  *
@@ -40,7 +40,7 @@ class CIBlockPropertyEnum
 	* варианта; </li> <li> <i>xml_id </i>или <i>external_id</i> - внешний код варианта
 	* значения; </li> <li> <i> def </i>- по признаку "значение по умолчанию"; </li> <li>
 	* <i>property_id</i> - код свойства; </li> <li> <i>property_sort</i> - индекс сортировки
-	* свойства; </li> <li> <i>property_code</i> - мнемонический код свойства;</li> </ul> <i>
+	* свойства; </li> <li> <i>property_code</i> - символьный код свойства;</li> </ul> <i>
 	* order</i> - порядок сортировки, может принимать значения: <br><ul> <li>
 	* <i>asc</i> - по возрастанию; </li> <li> <i>desc</i> - по убыванию; </li> </ul>
 	*
@@ -52,10 +52,10 @@ class CIBlockPropertyEnum
 	* свойства; </li> <li> <i>SORT</i> - по индексу сортировки варианта свойства;
 	* </li> <li> <i>DEF</i> - по параметру "значение по умолчанию" (Y|N); </li> <li>
 	* <i>XML_ID</i> - по внешнему коду(по шаблону [%_]); </li> <li> <i>EXTERNAL_ID</i> - по
-	* внешнему коду; </li> <li> <i>CODE</i> - по мнемоническому коду свойства (по
-	* шаблону [%_]); </li> <li> <i>PROPERTY_ID</i> - по числовому или мнемоническому
-	* коду свойства; </li> <li> <i>IBLOCK_ID</i> - фильтр по коду информационного
-	* блока, которому принадлежит свойство; </li> </ul> Необязательное. По
+	* внешнему коду; </li> <li> <i>CODE</i> - по символьному коду свойства (по
+	* шаблону [%_]); </li> <li> <i>PROPERTY_ID</i> - по числовому или символьному коду
+	* свойства; </li> <li> <i>IBLOCK_ID</i> - фильтр по коду информационного блока,
+	* которому принадлежит свойство; </li> </ul> Необязательное. По
 	* умолчанию записи не фильтруются.
 	*
 	*
@@ -404,23 +404,31 @@ class CIBlockPropertyEnum
 	{
 		global $DB, $CACHE_MANAGER;
 		static $BX_IBLOCK_ENUM_CACHE = array();
+		static $bucket_size = null;
 
-		$ID=intval($ID);
-
-		if(!array_key_exists($ID, $BX_IBLOCK_ENUM_CACHE))
+		if ($bucket_size === null)
 		{
-			if(CACHED_b_iblock_property_enum===false)
+			$bucket_size = intval(CACHED_b_iblock_property_enum_bucket_size);
+			if ($bucket_size <= 0)
+				$bucket_size = 10;
+		}
+
+		$ID = intval($ID);
+		$bucket = intval($ID/$bucket_size);
+
+		if (
+			!isset($BX_IBLOCK_ENUM_CACHE[$bucket])
+			|| !array_key_exists($ID, $BX_IBLOCK_ENUM_CACHE[$bucket])
+		)
+		{
+			if (CACHED_b_iblock_property_enum === false)
 			{
 				$rs = $DB->Query("SELECT * from b_iblock_property_enum WHERE ID=".$ID);
-				$BX_IBLOCK_ENUM_CACHE[$ID] = $rs->Fetch();
+				$BX_IBLOCK_ENUM_CACHE[$bucket][$ID] = $rs->Fetch();
 			}
-			else
+			elseif (!isset($BX_IBLOCK_ENUM_CACHE[$bucket]))
 			{
-				$bucket_size = intval(CACHED_b_iblock_property_enum_bucket_size);
-				if($bucket_size<=0) $bucket_size = 10;
-
-				$bucket = intval($ID/$bucket_size);
-				if($CACHE_MANAGER->Read(CACHED_b_iblock_property_enum, $cache_id="b_iblock_property_enum".$bucket, "b_iblock_property_enum"))
+				if ($CACHE_MANAGER->Read(CACHED_b_iblock_property_enum, $cache_id="b_iblock_property_enum".$bucket, "b_iblock_property_enum"))
 				{
 					$arEnums = $CACHE_MANAGER->Get($cache_id);
 				}
@@ -433,21 +441,16 @@ class CIBlockPropertyEnum
 						WHERE ID between ".($bucket*$bucket_size)." AND ".(($bucket+1)*$bucket_size-1)
 					);
 					while($ar = $rs->Fetch())
-						$arEnums[$ar["ID"]]=$ar;
+					{
+						$arEnums[$ar["ID"]] = $ar;
+					}
 					$CACHE_MANAGER->Set($cache_id, $arEnums);
 				}
-				$max = ($bucket+1)*$bucket_size;
-				for($i=$bucket*$bucket_size;$i<$max;$i++)
-				{
-					if(array_key_exists($i, $arEnums))
-						$BX_IBLOCK_ENUM_CACHE[$i]=$arEnums[$i];
-					else
-						$BX_IBLOCK_ENUM_CACHE[$i]=false;
-				}
+				$BX_IBLOCK_ENUM_CACHE[$bucket] = $arEnums;
 			}
 		}
 
-		return $BX_IBLOCK_ENUM_CACHE[$ID];
+		return $BX_IBLOCK_ENUM_CACHE[$bucket][$ID];
 	}
 }
 ?>

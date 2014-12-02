@@ -17,13 +17,14 @@ class CAllVoteAnswer
 	
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
+		global $APPLICATION;
 		$aMsg = array();
-		$ID = intVal($ID);
+		$ID = intval($ID);
 		$ACTION = ($ID > 0 && $ACTION == "UPDATE" ? "UPDATE" : "ADD");
-		
+
 		unset($arFields["ID"]);
 		if (is_set($arFields, "QUESTION_ID") || $ACTION == "ADD"):
-			$arFields["QUESTION_ID"] = intVal($arFields["QUESTION_ID"]);
+			$arFields["QUESTION_ID"] = intval($arFields["QUESTION_ID"]);
 			if ($arFields["QUESTION_ID"] <= 0):
 				$aMsg[] = array(
 					"id" => "QUESTION_ID", 
@@ -39,24 +40,23 @@ class CAllVoteAnswer
 					"id" => "MESSAGE", 
 					"text" => GetMessage("VOTE_FORGOT_MESSAGE"));
 			endif;
-			$arFields["MESSAGE"] = substr($arFields["MESSAGE"], 0, 2000);
 		endif;
 		
-		if (is_set($arFields, "ACTIVE") || $ACTION == "ADD") { $arFields["ACTIVE"] = ($arFields["ACTIVE"] == "N" ? "N" : "Y"); }
+		if (is_set($arFields, "ACTIVE") || $ACTION == "ADD") $arFields["ACTIVE"] = ($arFields["ACTIVE"] == "N" ? "N" : "Y");
 		unset($arFields["TIMESTAMP_X"]);
-		if (is_set($arFields, "C_SORT") || $ACTION == "ADD") { $arFields["C_SORT"] = (intVal($arFields["C_SORT"]) > 0 ? intVal($arFields["C_SORT"]) : 100); }
-		if (is_set($arFields, "COUNTER") || $ACTION == "ADD") { $arFields["COUNTER"] = intVal($arFields["COUNTER"]); }
-		if (is_set($arFields, "FIELD_TYPE") || $ACTION == "ADD") { $arFields["FIELD_TYPE"] = intVal($arFields["FIELD_TYPE"]); }
-		if (is_set($arFields, "FIELD_WIDTH") || $ACTION == "ADD") { $arFields["FIELD_WIDTH"] = intVal($arFields["FIELD_WIDTH"]); }
-		if (is_set($arFields, "FIELD_HEIGHT") || $ACTION == "ADD") { $arFields["FIELD_HEIGHT"] = intVal($arFields["FIELD_HEIGHT"]); }
+		if (is_set($arFields, "C_SORT") || $ACTION == "ADD") $arFields["C_SORT"] = (intval($arFields["C_SORT"]) > 0 ? intval($arFields["C_SORT"]) : 100);
+		if (is_set($arFields, "COUNTER") || $ACTION == "ADD") $arFields["COUNTER"] = intval($arFields["COUNTER"]);
+		if (is_set($arFields, "FIELD_TYPE") || $ACTION == "ADD") $arFields["FIELD_TYPE"] = intval($arFields["FIELD_TYPE"]);
+		if (is_set($arFields, "FIELD_WIDTH") || $ACTION == "ADD") $arFields["FIELD_WIDTH"] = intval($arFields["FIELD_WIDTH"]);
+		if (is_set($arFields, "FIELD_HEIGHT") || $ACTION == "ADD") $arFields["FIELD_HEIGHT"] = intval($arFields["FIELD_HEIGHT"]);
 		
-		if (is_set($arFields, "FIELD_PARAM") || $ACTION == "ADD") { $arFields["FIELD_PARAM"] = substr(trim($arFields["FIELD_PARAM"]), 0, 255); }
-		if (is_set($arFields, "COLOR") || $ACTION == "ADD") { $arFields["COLOR"] = substr(trim($arFields["COLOR"]), 0, 7); }
+		if (is_set($arFields, "FIELD_PARAM") || $ACTION == "ADD") $arFields["FIELD_PARAM"] = substr(trim($arFields["FIELD_PARAM"]), 0, 255);
+		if (is_set($arFields, "COLOR") || $ACTION == "ADD") $arFields["COLOR"] = substr(trim($arFields["COLOR"]), 0, 7);
 		
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException(array_reverse($aMsg));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
 		return true;
@@ -64,9 +64,8 @@ class CAllVoteAnswer
 
 	public static function Add($arFields)
 	{
-		global $DB, $CACHE_MANAGER;
-		$arBinds = array();
-		
+		global $DB;
+
 		if (!CVoteAnswer::CheckFields("ADD", $arFields))
 			return false;
 /***************** Event onBeforeVoteAnswerAdd *********************/
@@ -76,11 +75,14 @@ class CAllVoteAnswer
 /***************** /Event ******************************************/
 		if (empty($arFields))
 			return false;
-		
-		$arFields["~TIMESTAMP_X"] = $DB->GetNowFunction();
-		$arBinds["MESSAGE"] = $arFields["MESSAGE"];
 
-		$ID = $DB->Add("b_vote_answer", $arFields, $arBinds);
+		if ($DB->type == "ORACLE")
+			$arFields["ID"] = $DB->NextID("SQ_B_VOTE_ANSWER");
+
+		$arInsert = $DB->PrepareInsert("b_vote_answer", $arFields);
+
+		$DB->QueryBind("INSERT INTO b_vote_answer (".$arInsert[0].", TIMESTAMP_X) VALUES(".$arInsert[1].", ".$DB->GetNowFunction().")", array("MESSAGE" => $arFields["MESSAGE"]), false);
+		$ID = intval($DB->type == "ORACLE" ? $arFields["ID"] : $DB->LastID());
 
 /***************** Event onAfterVoteAnswerAdd **********************/
 		foreach (GetModuleEvents("vote", "onAfterVoteAnswerAdd", true) as $arEvent)
@@ -91,9 +93,9 @@ class CAllVoteAnswer
 
 	public static function Update($ID, $arFields)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		$arBinds = array();
-		$ID = intVal($ID);
+		$ID = intval($ID);
 		$err_mess = (self::err_mess())."<br>Function: Update<br>Line: ";
 
 		if ($ID <= 0 || !CVoteAnswer::CheckFields("UPDATE", $arFields, $ID))
@@ -110,11 +112,11 @@ class CAllVoteAnswer
 		$strUpdate = $DB->PrepareUpdate("b_vote_answer", $arFields);
 		if (is_set($arFields, "MESSAGE"))
 			$arBinds["MESSAGE"] = $arFields["MESSAGE"];
-		
+
 		if (!empty($strUpdate)):
 			$strSql = "UPDATE b_vote_answer SET ".$strUpdate." WHERE ID=".$ID;
-/*			$DB->QueryBind($strSql, $arBinds);*/
-			$DB->Query($strSql, false, $err_mess);
+			$DB->QueryBind($strSql, $arBinds, false, $err_mess);
+//			$DB->Query($strSql, false, $err_mess);
 			endif;
 /***************** Event onAfterVoteAnswerUpdate *******************/
 		foreach (GetModuleEvents("vote", "onAfterVoteAnswerUpdate", true) as $arEvent)
@@ -125,19 +127,19 @@ class CAllVoteAnswer
 
 	public static function Delete($ID, $QUESTION_ID = false, $VOTE_ID = false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: Delete<br>Line: ";
 /***************** Event onBeforeVoteAnswerDelete ******************/
-		foreach (GetModuleEvents("vote", "onBeforeVoteAnswerDelete", true) as $arEvent) {
+		foreach (GetModuleEvents("vote", "onBeforeVoteAnswerDelete", true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array(&$ID, &$QUESTION_ID, &$VOTE_ID)) === false)
-				return false;}
+				return false;
+		}
 /***************** /Event ******************************************/
 
-		$ID = (intVal($ID) > 0 ? intVal($ID) : false);
-		$QUESTION_ID = (intVal($QUESTION_ID) > 0 ? intVal($QUESTION_ID) : false);
-		$VOTE_ID = (intVal($VOTE_ID) > 0 ? intVal($VOTE_ID) : false);
-		$strSqlEventAnswer = "";
-		$strSqlAnswer = "";
+		$ID = (intval($ID) > 0 ? intval($ID) : false);
+		$QUESTION_ID = (intval($QUESTION_ID) > 0 ? intval($QUESTION_ID) : false);
+		$VOTE_ID = (intval($VOTE_ID) > 0 ? intval($VOTE_ID) : false);
 		if ($ID != false):
 			$strSqlEventAnswer = "DELETE FROM b_vote_event_answer WHERE ANSWER_ID=".$ID;
 			$strSqlAnswer = "DELETE FROM b_vote_answer WHERE ID=".$ID;
@@ -167,11 +169,9 @@ class CAllVoteAnswer
 
 	public static function GetList($QUESTION_ID, $by="s_c_sort", $order="asc", $arFilter=array(), $arAddParams = array())
 	{
-		$err_mess = (self::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB;
 		$QUESTION_ID = intval($QUESTION_ID);
 		$arSqlSearch = Array();
-		$strSqlSearch = "";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
 		foreach ($arFilter as $key => $val)
 		{
@@ -197,13 +197,10 @@ class CAllVoteAnswer
 		}
 		
 		$order = ($order!="desc" ? "asc" : "desc");
+		$by = (($by == "s_id" || $by == "s_counter") ? $by : "s_c_sort");
 		if ($by == "s_id")				$strSqlOrder = " ORDER BY A.ID";
 		elseif ($by == "s_counter")		$strSqlOrder = " ORDER BY A.COUNTER";
-		else 
-		{
-			$by = "s_c_sort";
-			$strSqlOrder = " ORDER BY A.C_SORT";
-		}
+		else							$strSqlOrder = " ORDER BY A.C_SORT";
 		$strSqlOrder .= " ".$order;
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
 		$strSqlFrom = "FROM b_vote_answer A WHERE ".$strSqlSearch." and A.QUESTION_ID=".$QUESTION_ID."";
@@ -230,9 +227,8 @@ class CAllVoteAnswer
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	public static function GetListEx($arOrder = array("ID" => "ASC"), $arFilter=array(), $arAddParams = array())
+	public static function GetListEx($arOrder = array("ID" => "ASC"), $arFilter=array())
 	{
-		$err_mess = (self::err_mess())."<br>Function: GetListEx<br>Line: ";
 		global $DB;
 		
 		$arSqlSearch = Array();
@@ -241,7 +237,7 @@ class CAllVoteAnswer
 		$strSqlOrder = "";
 
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
-		$arAddParams = (is_array($arAddParams) ? $arAddParams : array());
+
 		foreach ($arFilter as $key => $val)
 		{
 			if ($val === "NOT_REF")
@@ -258,11 +254,12 @@ class CAllVoteAnswer
 					$str = ($strNegative=="Y"?"NOT":"")."(VA.".$key." IS NULL OR VA.".$key."<=0)";
 					if (!empty($val))
 					{
-						$str = ($strNegative=="Y"?" VA.".$key." IS NULL OR NOT ":"")."(VA.".$key." ".$strOperation." ".intVal($val).")";
+						$str = ($strNegative=="Y"?" VA.".$key." IS NULL OR NOT ":"")."(VA.".$key." ".$strOperation." ".intval($val).")";
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
+							{
 								$str = ($strNegative=="Y"?" NOT ":"")."(VA.".$key." IN (".implode(",", $val)."))";
 							}
 						}
@@ -273,11 +270,12 @@ class CAllVoteAnswer
 					$str = ($strNegative=="Y"?"NOT":"")."(VQ.".$key." IS NULL OR VQ.".$key."<=0)";
 					if (!empty($val))
 					{
-						$str = ($strNegative=="Y"?" VQ.".$key." IS NULL OR NOT ":"")."(VQ.".$key." ".$strOperation." ".intVal($val).")";
+						$str = ($strNegative=="Y"?" VQ.".$key." IS NULL OR NOT ":"")."(VQ.".$key." ".$strOperation." ".intval($val).")";
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
+							{
 								$str = ($strNegative=="Y"?" NOT ":"")."(VQ.".$key." IN (".implode(",", $val)."))";
 							}
 						}
@@ -288,11 +286,12 @@ class CAllVoteAnswer
 					$str = ($strNegative=="Y"?"NOT":"")."(V.".$key." IS NULL OR V.".$key."<=0)";
 					if (!empty($val))
 					{
-						$str = ($strNegative=="Y"?" V.".$key." IS NULL OR NOT ":"")."(V.".$key." ".$strOperation." ".intVal($val).")";
+						$str = ($strNegative=="Y"?" V.".$key." IS NULL OR NOT ":"")."(V.".$key." ".$strOperation." ".intval($val).")";
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
+							{
 								$str = ($strNegative=="Y"?" NOT ":"")."(V.".$key." IN (".implode(",", $val)."))";
 							}
 						}
@@ -313,14 +312,13 @@ class CAllVoteAnswer
 		foreach ($arOrder as $by => $order)
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
+			$by = (in_array($by, array("ACTIVE", "QUESTION_ID", "C_SORT", "COUNTER")) ? $by : "ID");
 			if ($order!="ASC") $order = "DESC";
-			if ($by == "ID") $arSqlOrder[] = " VA.ID ".$order." ";
-			elseif ($by == "ACTIVE") $arSqlOrder[] = " VA.ACTIVE ".$order." ";
-			else
-			{
-				$arSqlOrder[] = " VA.ID ".$order." ";
-				$by = "ID";
-			}
+			if ($by == "ACTIVE") $arSqlOrder[] = " VA.ACTIVE ".$order." ";
+			elseif ($by == "QUESTION_ID") $arSqlOrder[] = " VA.QUESTION_ID ".$order." ";
+			elseif ($by == "C_SORT") $arSqlOrder[] = " VA.C_SORT ".$order." ";
+			elseif ($by == "COUNTER") $arSqlOrder[] = " VA.COUNTER ".$order." ";
+			else $arSqlOrder[] = " VA.ID ".$order." ";
 		}
 		DelDuplicateSort($arSqlOrder); 
 		if (count($arSqlOrder) > 0)
@@ -341,24 +339,20 @@ class CAllVoteAnswer
 		$err_mess = (self::err_mess())."<br>Function: GetGroupAnswers<br>Line: ";
 		global $DB;
 		$ANSWER_ID = intval($ANSWER_ID);
-		$strSql = "
-			SELECT
-				A.MESSAGE,
-				count(A.ID) as COUNTER
-			FROM
-				b_vote_event_answer A,
-				b_vote_event_question Q,
-				b_vote_event E
-			WHERE
-				A.ANSWER_ID = '$ANSWER_ID'
-			and Q.ID = A.EVENT_QUESTION_ID
-			and E.ID = Q.EVENT_ID
-			and E.VALID = 'Y'
-			GROUP BY A.MESSAGE
-			ORDER BY COUNTER desc
-			";
+		$strSql =
+		"SELECT A.MESSAGE, count(A.ID) as COUNTER ".
+		"FROM
+			b_vote_event_answer A,
+			b_vote_event_question Q,
+			b_vote_event E
+		WHERE
+			A.ANSWER_ID = '$ANSWER_ID'
+		and Q.ID = A.EVENT_QUESTION_ID
+		and E.ID = Q.EVENT_ID
+		and E.VALID = 'Y'
+		GROUP BY A.MESSAGE
+		ORDER BY COUNTER desc";
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 		return $res;
 	}
 }
-?>

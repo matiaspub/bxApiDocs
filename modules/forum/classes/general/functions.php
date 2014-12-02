@@ -8,25 +8,12 @@
 IncludeModuleLangFile(__FILE__);
 function Error($error)
 {
-	global $MESS, $DOCUMENT_ROOT;
+	global $MESS;
 	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/lang/".LANGUAGE_ID."/errors.php");
 	$msg = $MESS[$error["MSG"]];
 	echo "Error: ".$msg;
 }
 
-
-/**
- * <b>forumTextParser</b> - класс, предназначенный для форматирования сообщений форума. Этот класс - потомок класса TextParser, с расширениями для парсинга файлов и спойлеров. Осуществляет замену спецсимволов и заказных тегов на реальные HTML- теги, обработку ссылок, отображение смайлов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/forumtextparser/index.php
- * @author Bitrix
- */
 class forumTextParser extends CTextParser
 {
 	/* @deprecated */ var $image_params = array();
@@ -172,51 +159,6 @@ class forumTextParser extends CTextParser
 		return $result;
 	}
 
-	
-	/**
-	* <p>Функция форматирования текста.</p>
-	*
-	*
-	*
-	*
-	* @param string $text  Исходное сообщение. </htm
-	*
-	*
-	*
-	* @param array $arAllow = array() Массив параметров для форматирования сообщения, со значениями
-	* <i>Y</i> или <i>N</i>: <ul> <li> <code>HTML</code> - в тексте могут содержаться любые
-	* HTML теги, </li> <li> <code>ANCHOR</code> - разрешен тег &lt;a&gt;, </li> <li> <code>BIU</code> -
-	* разрешены теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <code>IMG</code> - разрешен тег
-	* &lt;img&gt;, </li> <li> <code>QUOTE</code> - разрешен тег цитирования &lt;quote&gt;, </li> <li>
-	* <code>CODE</code> - разрешен тег показа кода &lt;code&gt;, </li> <li> <code>FONT</code> -
-	* разрешен тег &lt;font&gt;, </li> <li> <code>LIST</code> - разрешены теги &lt;ul&gt;, &lt;li&gt;,
-	* </li> <li> <code>SMILES</code> - показ смайликов в виде картинок, </li> <li>
-	* <code>NL2BR</code> - заменять переводы каретки на тег &lt;br&gt; при разрешении
-	* принимать любые HTML теги, </li> <li> <code>VIDEO</code> - разрешена вставка
-	* видео, </li> <li> <code>UPLOAD</code> - разрешена загрузка файлов, </li> <li>
-	* <code>TABLE</code> - разрешены таблицы, </li> <li> <code>ALIGN</code> - разрешено
-	* выравнивание текста.</li> </ul>
-	*
-	*
-	*
-	* @param typ $e = "html" Тип текста. Необязательный. По умолчанию html.
-	*
-	*
-	*
-	* @param arFile $s = false массив файлов, которые надо распарсить в тексте. Должно быть либо
-	* в виде массива ID файлов <code>array(fileID10, fileID12, fileID14)</code>, либо в виде
-	* массива <code>array(fileID10 =&gt; array about file, ....)</code> для преобразования
-	* bb-кодов типа [FILE ID=fileID10] в соответствующее представление файлов, в
-	* зависимости от типа текста и файла.
-	*
-	*
-	*
-	* @return string 
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/forumtextparser/convert.php
-	* @author Bitrix
-	*/
 	public function convert($text, $allow = array(), $type = "html", $arFiles = false)
 	{
 		$text = str_replace(array("\013", "\014"), "", $text);
@@ -261,6 +203,7 @@ class forumTextParser extends CTextParser
 
 	public function ParserSpoiler(&$text, &$obj)
 	{
+		$matches = array();
 		if (method_exists($obj, "convert_spoiler_tag") && preg_match("/\[(cut|spoiler)/is".BX_UTF_PCRE_MODIFIER, $text, $matches))
 		{
 			$text = preg_replace(
@@ -272,6 +215,7 @@ class forumTextParser extends CTextParser
 					"\001\\2\002",
 					"\003"),
 				$text);
+			$arMatches = array();
 			while (preg_match("/(\001([^\002]*)\002([^\001\002\003]+)\003)/ies".BX_UTF_PCRE_MODIFIER, $text, $arMatches))
 				$text = preg_replace("/(\001([^\002]*)\002([^\001\002\003]+)\003)/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_spoiler_tag('\\3', '\\2')", $text);
 			$text = preg_replace(
@@ -304,7 +248,7 @@ class forumTextParser extends CTextParser
 		{
 			$anchor_id = RandString(8);
 			return
-				'<a class="blog-p-user-name" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->userPath,
+				'<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->userPath,
 					array(
 						"user_id" => $userId,
 						"USER_ID" => $userId,
@@ -361,20 +305,11 @@ class forumTextParser extends CTextParser
 
 	public function convert_image_tag($url = "", $params="")
 	{
-		static $bShowedScript = false;
 		$url = trim($url);
-		if (empty($url)) return;
+		if (empty($url)) return "";
 		$type = (strtolower($this->type) == "rss" ? "rss" : "html");
-		$extension = "";
-		$urlforcheck = (strpos($url, "?") !== false ? substr($url, 0, strpos($url, "?")) : $url);
-		if (preg_match("/^.*\.(\S+)$/".BX_UTF_PCRE_MODIFIER, $urlforcheck, $matches))
-			$extension = preg_quote(strtolower($matches[1]), "/");
 
-		$bErrorIMG = (!$extension);
-		if (!$bErrorIMG && !preg_match("/$extension(\||\$)/".BX_UTF_PCRE_MODIFIER, $this->AllowImgExt))
-			$bErrorIMG = True;
-		if (!$bErrorIMG && !preg_match("/^(http|https|ftp|\/)/i".BX_UTF_PCRE_MODIFIER, $url))
-			$bErrorIMG = True;
+		$bErrorIMG = !preg_match("/^(http|https|ftp|\/)/i".BX_UTF_PCRE_MODIFIER, $url);
 
 		$url = str_replace(array("<", ">", "\""), array("%3C", "%3E", "%22"), $url);
 		// to secure from XSS [img]http://ya.ru/[url]http://onmouseover=prompt(/XSS/)//[/url].jpg[/img]
@@ -554,19 +489,6 @@ class forumTextParser extends CTextParser
 }
 
 //===========================
-
-/**
- * <b>textParser</b> - класс, предназначенный для форматирования сообщений форума. Осуществляет замену спецсимволов и заказных тегов на реальные HTML- теги, обработку ссылок, отображение смайлов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/textparser/index.php
- * @author Bitrix
- */
 class textParser // deprecated
 {
 	var $smiles = array();
@@ -646,142 +568,6 @@ class textParser // deprecated
 		$this->path_to_smile = $pathToSmile;
 	}
 
-	
-	/**
-	* <p>Функция форматирования текста.</p> <p></p>
-	*
-	*
-	*
-	*
-	* @param string $text  Форматируемое сообщение.
-	*
-	*
-	*
-	* @param array $arAllow = array("HTML" Массив параметров форматирования сообщения. Имеет структуру,
-	* идентичную массиву ALLOW - переменной класса <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/index.php">CForum</a>. Содержит
-	* следующие параметры, которые могут принимать значения <i>Y</i> и
-	* <i>N</i>: <ul> <li> <code>HTML</code> - в тексте могут содержаться любые HTML теги,
-	* </li> <li> <code>ANCHOR</code> - разрешен тег &lt;a&gt;, </li> <li> <code>BIU</code> - разрешены
-	* теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <code>IMG</code> - разрешен тег &lt;img&gt;, </li> <li>
-	* <code>QUOTE</code> - разрешен тег цитирования &lt;quote&gt;, </li> <li> <code>CODE</code> -
-	* разрешен тег показа кода &lt;code&gt;, </li> <li> <code>FONT</code> - разрешен тег
-	* &lt;font&gt;, </li> <li> <code>LIST</code> - разрешены теги &lt;ul&gt;, &lt;li&gt;, </li> <li>
-	* <code>SMILES</code> - показ смайликов в виде картинок, </li> <li> <code>NL2BR</code> -
-	* заменять переводы каретки на тег &lt;br&gt; при разрешении принимать
-	* любые HTML теги. </li> <li> <code>VIDEO</code> - показ видео </li> </ul>
-	*
-	*
-	*
-	* @param  $N  Тип текста. Необязательный. По умолчанию html.
-	*
-	*
-	*
-	* @param ANCHO $R  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param BI $U  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param IM $G  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param QUOT $E  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param COD $E  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param FON $T  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param LIS $T  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param SMILE $S  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param NL2B $R  
-	*
-	*
-	*
-	* @param  $N  
-	*
-	*
-	*
-	* @param VIDE $O  
-	*
-	*
-	*
-	* @param  $Y  
-	*
-	*
-	*
-	* @param typ $e = "html" 
-	*
-	*
-	*
-	* @return string 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $parser = new textParser();  // создаем экземпляр класса textParser
-	* $arAllow = $Forum-&gt;ALLOW;    // заполняем массив параметров форматирования
-	*                              // из массива переменной-члена класса CForum, 
-	*                              // эти два массива имеют идентичную структуру
-	* $arAllow["SMILES"] = "N";    // переопределяем (запрещаем) показ смайликов 
-	*                              // в виде картинок
-	* echo $parser-&gt;convert($strMessage, $arAllow);  // форматируем и выводим сообщение
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/textparser/convert.php
-	* @author Bitrix
-	*/
 	public function convert($text, $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y"), $type = "html")
 	{
 		global $DB;
@@ -1116,11 +902,13 @@ class textParser // deprecated
 
 	public static function killAllTags($text)
 	{
+		if (method_exists("CTextParser", "clearAllTags"))
+			return CTextParser::clearAllTags($text);
 		$text = strip_tags($text);
 		$text = preg_replace(
 			array(
-				"/\<(\/?)(quote|code|font|color|video)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
-				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
+				"/\<(\/?)(quote|code|font|color|video|disk)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
+				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|disk)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER),
 			"",
 			$text);
 		return $text;

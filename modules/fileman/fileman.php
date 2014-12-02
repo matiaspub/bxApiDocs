@@ -1032,6 +1032,7 @@ class CFileMan
 
 	public static function ShowTypeSelector($params)
 	{
+		global $USER;
 		$useEditor3 = COption::GetOptionString('fileman', "use_editor_3", "N") == "Y";
 		$name = $params['name'];
 		$key = isset($params['key']) ? $params['key'] : '';
@@ -1042,13 +1043,13 @@ class CFileMan
 
 		if ($textType == 'html')
 		{
-			$curType = CUserOptions::GetOption('fileman', "type_selector_".$name.$key, false);
+			$curType = CUserOptions::GetOption('html_editor', "type_selector_".$name.$key, false, $USER->GetId());
+			$curType = $curType['type'];
 			if ($curType && in_array($curType, array('html', 'editor')))
 			{
 				$textType = $curType;
 			}
 		}
-
 		$ch = "checked=\"checked\"";
 		?>
 		<div class="bx-ed-type-selector">
@@ -1074,12 +1075,14 @@ class CFileMan
 					return setTimeout(function(){onChangeInputType(editorName);}, 100);
 				}
 			}
+
 			BX.ready(function()
 			{
 				var
 					pOptText = BX("<?= $bxid?>_text"),
 					pOptHtml = BX("<?= $bxid?>_html"),
 					pOptEditor = BX("<?= $bxid?>_editor");
+
 				if (pOptText)
 				{
 					BX.bind(pOptText, 'click', function(){onChangeInputType('<?= $name?>');});
@@ -1094,6 +1097,7 @@ class CFileMan
 				}
 			});
 		</script>
+
 		<?if ($useEditor3):?>
 		<script>
 			BX.ready(function()
@@ -1110,6 +1114,14 @@ class CFileMan
 						curType = 'html';
 					}
 
+					// Save choice
+					<?if ($params['bSave']):?>
+					if (bSave !== false)
+					{
+						BX.userOptions.save('html_editor', 'type_selector_<?= $name.$key?>', 'type', curType);
+					}
+					<?endif;?>
+
 					<?if (isset($params['externalFuncName']) && $params['externalFuncName']):?>
 					var func = window['<?= $params['externalFuncName']?>'];
 					if (func && typeof func == 'function')
@@ -1121,26 +1133,33 @@ class CFileMan
 					var
 						editorName = '<?= $name?>',
 						textarea = BX("bxed_<?= $name?>"),
-						show = pOptEditor.checked && textarea.style.display != "none",
-						editor = window.BXHtmlEditor.Get('<?= $name?>');
+						show = pOptEditor.checked /*&& textarea.style.display != "none"*/,
+						editor = window.BXHtmlEditor.Get('<?= $name?>'),
+						textareaValue = textarea.value || '';
+
 
 					if (editor && editor.Check())
 					{
 						if(show)
 						{
+							editor.SetContent(textareaValue, true);
 							editor.Show();
-							editor.SetContent(textarea.value, true);
 							textarea.style.display = "none";
 						}
 						else
 						{
+							if (editor.IsShown())
+								editor.SaveContent();
 							editor.Hide();
 							textarea.style.display = "";
-							editor.SaveContent();
 						}
 					}
 					else if(show)
 					{
+						BX.addCustomEvent(window.BXHtmlEditor, "OnEditorCreated", function(editor)
+						{
+							editor.SetContent(textareaValue, true);
+						});
 						window.BXHtmlEditor.Show(false, editorName);
 						textarea.style.display = "none";
 					}
@@ -1385,7 +1404,7 @@ class CFileMan
 				'height' => $arParams["height"],
 				'content' => $content,
 				'bAllowPhp' => !$arParams["bWithoutPHP"] && $USER->CanDoOperation('edit_php'),
-				"limitPhpAccess" => $arParams["light_mode"],
+				"limitPhpAccess" => $arParams["limit_php_access"],
 				"display" => $arParams['bDisplay']
 			));
 			return;
@@ -1402,9 +1421,6 @@ class CFileMan
 		$arParams["ar_entities"] = COption::GetOptionString("fileman", "ar_entities", 'umlya,greek,other');
 		if ($arParams["ar_entities"] == 'none')
 			$arParams["ar_entities"] = '';
-
-		if(!isset($arParams["spellCheckFirstClient"]))
-			$arParams["spellCheckFirstClient"] = COption::GetOptionString("fileman", "spell_check_first_client", "Y");
 
 		if(!isset($arParams["usePspell"]))
 			$arParams["usePspell"] = COption::GetOptionString("fileman", "use_pspell", "N");
@@ -1468,7 +1484,6 @@ class CFileMan
 					limit_php_access = <?= $arParams["limit_php_access"] ? 'true' : 'false'?>,
 					lca = <?= $lca == 'Y' ? 'true' : 'false'?>,
 					lightMode = <?= $arParams["light_mode"] ? 'true' : 'false'?>,
-					spellcheck_js_v = "<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/admin/htmleditor2/spellcheck.js')?>",
 					BX_PERSONAL_ROOT = "<?=BX_PERSONAL_ROOT?>";
 
 				window.limit_php_access = top.limit_php_access = limit_php_access;
@@ -1753,6 +1768,8 @@ class CFileMan
 
 		$arResult["STYLES"] = preg_replace("/\r\n/", " ", $arResult["STYLES"]);
 		$arResult["STYLES"] = preg_replace("/\n/", " ", $arResult["STYLES"]);
+
+		$arResult["SITE_TEMPLATE_PATH"] =  getLocalPath('templates/'.$templateID, BX_PERSONAL_ROOT);
 
 		return $arResult;
 	}

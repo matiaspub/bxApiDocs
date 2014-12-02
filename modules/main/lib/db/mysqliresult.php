@@ -1,89 +1,69 @@
 <?php
 namespace Bitrix\Main\DB;
 
-use Bitrix\Main\Type;
-
 class MysqliResult extends Result
 {
-	private $resultFields = array();
+	/** @var \mysqli_result */
+	protected $resource;
 
+	/** @var \Bitrix\Main\Entity\ScalarField[]  */
+	private $resultFields = null;
+
+	/**
+	 * @param resource $result Database-specific query result.
+	 * @param Connection $dbConnection Connection object.
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery Helps to collect debug information.
+	 */
 	static public function __construct($result, Connection $dbConnection = null, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		parent::__construct($result, $dbConnection, $trackerQuery);
 	}
 
-	protected function convertDataFromDb($value, $fieldType)
-	{
-		switch ($fieldType)
-		{
-			case MYSQLI_TYPE_DATETIME:
-			case MYSQLI_TYPE_TIMESTAMP:
-				if($value !== null)
-				{
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-				break;
-			case MYSQLI_TYPE_DATE:
-				if($value !== null)
-				{
-					$value = new Type\Date($value, "Y-m-d");
-				}
-				break;
-			default:
-				break;
-		}
-
-		return $value;
-	}
-
+	/**
+	 * Returns the number of rows in the result.
+	 *
+	 * @return integer
+	 */
 	public function getSelectedRowsCount()
 	{
-		/** @var $r \mysqli_result */
-		$r = $this->resource;
-
-		return $r->num_rows;
+		return $this->resource->num_rows;
 	}
 
-	public function getFieldsCount()
+	/**
+	 * Returns an array of fields according to columns in the result.
+	 *
+	 * @return \Bitrix\Main\Entity\ScalarField[]
+	 */
+	public function getFields()
 	{
-		$con = $this->connection->getResource();
-		/** @var $con \mysqli */
-
-		return $con->field_count;
-	}
-
-	public function getFieldName($column)
-	{
-		/** @var $r \mysqli_result */
-		$r = $this->resource;
-
-		return $r->fetch_field_direct($column);
-	}
-
-	public function getResultFields()
-	{
-		if (empty($this->resultFields))
+		if ($this->resultFields == null)
 		{
-			/** @var $r \mysqli_result */
-			$r = $this->resource;
-			$resultFields = $r->fetch_fields();
 			$this->resultFields = array();
-			foreach ($resultFields as $key => $value)
+			if (is_object($this->resource))
 			{
-				$this->resultFields[$key] = array(
-					"name" => $resultFields[$key]->name,
-					"type" => $resultFields[$key]->type,
-				);
+				$fields = $this->resource->fetch_fields();
+				if ($fields && $this->connection)
+				{
+					$helper = $this->connection->getSqlHelper();
+					foreach ($fields as $field)
+					{
+						$name = strtoupper($field->name);
+						$this->resultFields[$name] = $helper->getFieldByColumnType($name, $field->type);
+					}
+				}
 			}
 		}
 
 		return $this->resultFields;
 	}
 
+	/**
+	 * Returns next result row or false.
+	 *
+	 * @return array|false
+	 */
 	protected function fetchRowInternal()
 	{
-		/** @var $r \mysqli_result */
-		$r = $this->resource;
-		return $r->fetch_row();
+		return $this->resource->fetch_assoc();
 	}
 }

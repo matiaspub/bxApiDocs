@@ -50,7 +50,7 @@ class File
 			: file_put_contents($this->getPhysicalPath(), $data);
 	}
 
-	public function getFileSize()
+	public function getSize()
 	{
 		if (!$this->isExists())
 			throw new FileNotFoundException($this->originalPath);
@@ -128,6 +128,18 @@ class File
 			return unlink($this->getPhysicalPath());
 
 		return true;
+	}
+
+	public function getContentType()
+	{
+		if (!$this->isExists())
+			throw new FileNotFoundException($this->originalPath);
+
+		$finfo = \finfo_open(FILEINFO_MIME_TYPE);
+		$contentType = \finfo_file($finfo, $this->getPath());
+		\finfo_close($finfo);
+
+		return $contentType;
 	}
 
 	public static function isFileExists($path)

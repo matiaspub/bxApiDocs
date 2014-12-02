@@ -65,7 +65,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  ID веб-формы.
+	 * @param int $WEB_FORM_ID  ID веб-формы.</bod
 	 *
 	 *
 	 *
@@ -122,7 +122,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  ID веб-формы.
+	 * @param int $WEB_FORM_ID  ID веб-формы.</bod
 	 *
 	 *
 	 *
@@ -173,7 +173,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
+	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
 	 *
 	 *
 	 *
@@ -221,7 +221,7 @@ class _CEventsForm {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultupdate.php">Событие
-	 * "onAfterResultUpdate"</a> </li></ul></bod<a name="examples"></a>
+	 * "onAfterResultUpdate"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -236,7 +236,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
+	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
 	 *
 	 *
 	 *
@@ -289,7 +289,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
+	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
 	 *
 	 *
 	 *
@@ -334,7 +334,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
+	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
 	 *
 	 *
 	 *
@@ -378,7 +378,7 @@ class _CEventsForm {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultstatuschange.php">Событие
-	 * "onAfterResultStatusChange"</a> </li></ul></bod<a name="examples"></a>
+	 * "onAfterResultStatusChange"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -393,7 +393,7 @@ class _CEventsForm {
 	 *
 	 *
 	 *
-	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
+	 * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
 	 *
 	 *
 	 *
@@ -437,7 +437,7 @@ class _CEventsForm {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onbeforeresultstatuschange.php">Событие
-	 * "onBeforeResultStatusChange"</a> </li></ul></bod<a name="examples"></a>
+	 * "onBeforeResultStatusChange"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

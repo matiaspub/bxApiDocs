@@ -41,7 +41,7 @@ class CSecurityPhpConfigurationTest
 			"method" => "isPhpConfVarOn",
 			"params" => array("session.cookie_httponly"),
 			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_HTTPONLY",
-			"critical" => CSecurityCriticalLevel::HIGHT
+			"critical" => CSecurityCriticalLevel::MIDDLE
 		),
 		"cookieOnly" => array(
 			"method" => "isPhpConfVarOn",
@@ -54,6 +54,19 @@ class CSecurityPhpConfigurationTest
 			"params" => array(),
 			"base_message_key" => "SECURITY_SITE_CHECKER_PHP_MBSTRING_SUBSTITUTE",
 			"critical" => CSecurityCriticalLevel::HIGHT
+		),
+		// ToDo: need compatibility with PHP < 5.4.0?
+		"zendMultibyte" => array(
+			"method" => "isPhpConfVarOff",
+			"params" => array("zend.multibyte"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_ZEND_MULTIBYTE_ENABLED",
+			"critical" => CSecurityCriticalLevel::HIGHT
+		),
+		"displayErrors" => array(
+			"method" => "isPhpConfVarOff",
+			"params" => array("display_errors"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_DISPLAY_ERRORS",
+			"critical" => CSecurityCriticalLevel::LOW
 		),
 	);
 
@@ -71,14 +84,14 @@ class CSecurityPhpConfigurationTest
 		if(self::isRunOnWin() && version_compare(phpversion(),"5.3.3","<"))
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_LOW_PHP_VERSION_ENTROPY", CSecurityCriticalLevel::MIDDLE);
-			return false;
+			return self::STATUS_FAILED;
 		}
 		elseif(!self::checkPhpEntropyConfigs())
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_PHP_ENTROPY", CSecurityCriticalLevel::MIDDLE);
-			return false;
+			return self::STATUS_FAILED;
 		}
-		return true;
+		return self::STATUS_PASSED;
 	}
 
 	/**
@@ -88,14 +101,22 @@ class CSecurityPhpConfigurationTest
 	{
 		$entropyFile = ini_get("session.entropy_file");
 		$entropyLength = ini_get("session.entropy_length");
-		if(in_array($entropyFile, array("/dev/random", "/dev/urandom"), true))
+
+		if(!in_array($entropyFile, array("/dev/random", "/dev/urandom"), true))
 		{
-			if($entropyLength >= 128 || self::isRunOnWin())
-			{
-				return true;
-			}
+			return self::STATUS_FAILED;
 		}
-		return false;
+
+		if(self::isRunOnWin() && !$entropyLength)
+		{
+			return self::STATUS_FAILED;
+		}
+		elseif ($entropyLength < 128)
+		{
+			return self::STATUS_FAILED;
+		}
+
+		return self::STATUS_PASSED;
 	}
 
 	/**
@@ -103,10 +124,10 @@ class CSecurityPhpConfigurationTest
 	 */
 	protected function checkMbstringSubstitute()
 	{
-		return (bool) (
-			!extension_loaded('mbstring')
-			|| $this->isPhpConfVarNotEquals('mbstring.substitute_character', 'none')
-		);
+		if (extension_loaded('mbstring') && $this->isPhpConfVarEquals('mbstring.substitute_character', 'none'))
+			return self::STATUS_FAILED;
+
+		return self::STATUS_PASSED;
 	}
 
 	/**

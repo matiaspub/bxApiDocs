@@ -3,6 +3,7 @@
 abstract class CPushService
 {
 	protected $allowEmptyMessage = true;
+	const DEFAULT_EXPIRY = 14400;
 
 	protected function getBatchWithModifier($appMessages = Array(), $modifier = "")
 	{
@@ -41,9 +42,14 @@ abstract class CPushService
 					$message->setText($text);
 					$message->setTitle($messages[$mess]["TITLE"]);
 					if (strlen($text) > 0)
-						$message->setSound();
+					{
+						if(strlen($messages[$mess]["SOUND"])>0)
+							$message->setSound($messages[$mess]["SOUND"]);
+					}
 					else
+					{
 						$message->setSound('');
+					}
 
 					if ($messages[$mess]["PARAMS"])
 					{
@@ -54,13 +60,30 @@ abstract class CPushService
 					}
 
 					$message->setCustomProperty('target', md5($messages[$mess]["USER_ID"] . CMain::GetServerUniqID()));
-					$message->setExpiry(14400);
+
+					if(array_key_exists("EXPIRY", $messages[$mess]))
+					{
+						$expiry = $messages[$mess]["EXPIRY"];
+						if ($expiry === 0 || $expiry === "0")
+						{
+							$message->setExpiry(0);
+						}
+						else
+						{
+							$message->setExpiry((intval($expiry)>0)
+													? intval($expiry)
+													:self::DEFAULT_EXPIRY
+							);
+						}
+					}
+
 					$badge = intval($messages[$mess]["BADGE"]);
 					if (array_key_exists("BADGE", $messages[$mess]) && $badge >= 0)
 						$message->setBadge($badge);
 
 					if (strlen($batch) > 0)
 						$batch .= ";";
+
 					$batch .= $message->getBatch();
 					$mess++;
 				}

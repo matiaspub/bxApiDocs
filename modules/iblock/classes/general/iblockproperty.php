@@ -5,7 +5,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlockProperty</b> - класс для работы со свойствами информационных разделов.
+ * <b>CIBlockProperty</b> - класс для работы со свойствами информационных разделов.</body> </html>
  *
  *
  *
@@ -44,36 +44,36 @@ class CAllIBlockProperty
 	* параметр фильтра не принимает массивы. <i>Фильтруемое поле</i>
 	* может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по активности
 	* (Y|N);</li> <li> <b>ID</b> - по ID свойства, только число;</li> <li> <b>CODE</b> - по
-	* мнемоническому коду (по шаблону [%_]), только строка;</li> <li> <b>NAME</b> -
-	* по названию свойства (по шаблону [%_]);</li> <li> <b>EXTERNAL_ID</b> или <b>XML_ID </b>-
-	* по внешнему коду(по шаблону [%_]). Возможно использование
-	* отрицания, указав <i>!EXTERNAL_ID</i>;</li> <li> <b>PROPERTY_TYPE</b> - по типу свойства:
-	* <ul> <li> <b>S</b> - строка</li> <li> <b>N</b> - число</li> <li> <b>L</b> - список</li> <li> <b>F</b> -
-	* файл</li> <li> <b>G</b> - привязка к разделу</li> <li> <b>E</b> - привязка к
-	* элементу</li> </ul> </li> <li> <b>USER_TYPE</b> - по пользовательскому типу
-	* свойства; <ul> <li> <b>UserID</b> - Привязка к пользователю</li> <li> <b>DateTime</b> -
-	* Дата/Время</li> <li> <b>EList</b> - Привязка к элементам в виде списка</li> <li>
-	* <b>FileMan</b> - Привязка к файлу (на сервере)</li> <li> <b>map_yandex</b> - Привязка к
-	* Яndex.Карте</li> <li> <b>HTML</b> - HTML/текст</li> <li> <b>map_google</b> - Привязка к карте
-	* Google Maps</li> <li> <b>ElementXmlID</b> - Привязка к элементам по XML_ID</li> <li> <b>Sequence</b>
-	* - Счетчик</li> <li> <b>EAutocomplete</b> - Привязка к элементам с
-	* автозаполнением</li> <li> <b>SKU</b> - Привязка к товарам (SKU)</li> <li> <b>video</b> -
-	* Видео</li> <li> <b>TopicID</b> - Привязка к теме форума</li> </ul> Кроме того,
-	* можно использовать идентификаторы пользовательских типов
-	* свойств инфоблока, добавленных сторонними модулями. </li> <li>
-	* <b>SEARCHABLE</b> - по признаку участия значения свойства в поиске (Y|N); </li>
-	* <li> <b>FILTRABLE</b> - по признаку участия свойства в фильре на странице
-	* списка элементов (Y|N);</li> <li> <b>VERSION</b> - по флагу хранения значений
-	* свойств элементов инфоблока;</li> <li> <b>MIN_PERMISSION</b> - фильтр по правам
-	* доступа, по умолчанию принимает <i>R</i> (уровень доступа
-	* <i>Чтение</i>);</li> <li> <b>CHECK_PERMISSIONS</b> - если установлено значение "N", то
-	* проверки прав не происходит; <br> </li> <li> <b>IBLOCK_ID</b> - по коду
-	* информационного блока, которому принадлежит свойство;</li> <li>
-	* <b>IBLOCK_CODE</b> - по мнемоническому коду информационного блока,
-	* которому принадлежит свойство;</li> <li> <b>LINK_IBLOCK_ID</b> - по коду
-	* связанного информационного блока (может быть указан для свойств
-	* типа "E" и "G");</li> </ul> Необязательное. По умолчанию записи не
-	* фильтруются.
+	* символьному коду (по шаблону [%_]), только строка;</li> <li> <b>NAME</b> - по
+	* названию свойства (по шаблону [%_]);</li> <li> <b>EXTERNAL_ID</b> или <b>XML_ID </b>- по
+	* внешнему коду(по шаблону [%_]). Возможно использование отрицания,
+	* указав <i>!EXTERNAL_ID</i>;</li> <li> <b>PROPERTY_TYPE</b> - по типу свойства: <ul> <li> <b>S</b> -
+	* строка</li> <li> <b>N</b> - число</li> <li> <b>L</b> - список</li> <li> <b>F</b> - файл</li> <li>
+	* <b>G</b> - привязка к разделу</li> <li> <b>E</b> - привязка к элементу</li> </ul> </li>
+	* <li> <b>USER_TYPE</b> - по пользовательскому типу свойства; <ul> <li> <b>UserID</b> -
+	* Привязка к пользователю</li> <li> <b>DateTime</b> - Дата/Время</li> <li> <b>EList</b> -
+	* Привязка к элементам в виде списка</li> <li> <b>FileMan</b> - Привязка к
+	* файлу (на сервере)</li> <li> <b>map_yandex</b> - Привязка к Яndex.Карте</li> <li>
+	* <b>HTML</b> - HTML/текст</li> <li> <b>map_google</b> - Привязка к карте Google Maps</li> <li>
+	* <b>ElementXmlID</b> - Привязка к элементам по XML_ID</li> <li> <b>Sequence</b> - Счетчик</li>
+	* <li> <b>EAutocomplete</b> - Привязка к элементам с автозаполнением</li> <li>
+	* <b>SKU</b> - Привязка к товарам (SKU)</li> <li> <b>video</b> - Видео</li> <li> <b>TopicID</b> -
+	* Привязка к теме форума</li> </ul> Кроме того, можно использовать
+	* идентификаторы пользовательских типов свойств инфоблока,
+	* добавленных сторонними модулями. </li> <li> <b>SEARCHABLE</b> - по признаку
+	* участия значения свойства в поиске (Y|N); </li> <li> <b>FILTRABLE</b> - по
+	* признаку участия свойства в фильре на странице списка элементов
+	* (Y|N);</li> <li> <b>VERSION</b> - по флагу хранения значений свойств элементов
+	* инфоблока;</li> <li> <b>MIN_PERMISSION</b> - фильтр по правам доступа, по
+	* умолчанию принимает <i>R</i> (уровень доступа <i>Чтение</i>);</li> <li>
+	* <b>CHECK_PERMISSIONS</b> - если установлено значение "N", то проверки прав не
+	* происходит; <br> </li> <li> <b>IBLOCK_ID</b> - по коду информационного блока,
+	* которому принадлежит свойство;</li> <li> <b>IBLOCK_CODE</b> - по символьному
+	* коду информационного блока, которому принадлежит свойство;</li> <li>
+	* <b>LINK_IBLOCK_ID</b> - по коду связанного информационного блока (может
+	* быть указан для свойств типа "E" и "G");</li> <li> <b>MULTIPLE</b> - Проверка на
+	* множественность. по умолчанию N.</li> </ul> Необязательное. По
+	* умолчанию записи не фильтруются.
 	*
 	*
 	*
@@ -147,10 +147,10 @@ class CAllIBlockProperty
 				break;
 			case "PROPERTY_TYPE":
 				$ar = explode(":", $val);
-				if(count($ar) == 2)
+				if (count($ar) == 2)
 				{
 					$val = $ar[0];
-					$arSqlSearch[] = "BP.USER_TYPE = '".$val[1]."'";
+					$arSqlSearch[] = "BP.USER_TYPE = '".$ar[1]."'";
 				}
 				$arSqlSearch[] = "BP.".$key." = '".$val."'";
 				break;
@@ -161,7 +161,7 @@ class CAllIBlockProperty
 			case "IBLOCK_ID":
 			case "LINK_IBLOCK_ID":
 			case "VERSION":
-				$arSqlSearch[] = "BP.".$key." = ".intval($val);
+				$arSqlSearch[] = "BP.".$key." = ".(int)$val;
 				break;
 			case "IBLOCK_CODE":
 				$arSqlSearch[] = "UPPER(B.CODE) = UPPER('".$val."')";
@@ -296,8 +296,10 @@ class CAllIBlockProperty
 				return false;
 			$arSql = CIBlockProperty::DropColumnSQL("b_iblock_element_prop_s".$arProperty["IBLOCK_ID"], array("PROPERTY_".$ID,"DESCRIPTION_".$ID));
 			foreach($arSql as $strSql)
-				if(!$DB->Query($strSql))
+			{
+				if(!$DB->DDL($strSql))
 					return false;
+			}
 		}
 		else
 		{
@@ -695,7 +697,7 @@ class CAllIBlockProperty
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php
 	* @author Bitrix
 	*/
-	public function Update($ID, $arFields)
+	public function Update($ID, $arFields, $bCheckDescription = false)
 	{
 		global $DB;
 		$ID = IntVal($ID);
@@ -716,7 +718,7 @@ class CAllIBlockProperty
 			$Result = false;
 			$arFields["RESULT_MESSAGE"] = &$this->LAST_ERROR;
 		}
-		elseif(!$this->_Update($ID, $arFields))
+		elseif(!$this->_Update($ID, $arFields, $bCheckDescription))
 		{
 			$Result = false;
 			$arFields["RESULT_MESSAGE"] = &$this->LAST_ERROR;
@@ -815,27 +817,27 @@ class CAllIBlockProperty
 	*
 	*
 	*
-	* @param mixed $ID  Числовой или мнемонический код свойства.
+	* @param mixed $ID  Числовой или символьный код свойства.
 	*
 	*
 	*
-	* @param int $IBLOCK_ID = false Код информационного блока. Используется для уточнения свойства
-	* если его <i>ID</i> задано мнемоническим кодом и с таким мнемоническим
-	* кодом свойства присутствует в нескольких информационных блоках.
+	* @param int $IBLOCK_ID = false Код информационного блока. Используется для уточнения свойства,
+	* если его <i>ID</i> задано символьным кодом и с таким символьным кодом
+	* свойства присутствует в нескольких информационных блоках.
 	*
 	*
 	*
-	* @param string $IBLOCK_CODE = false Мнемонический код информационного блока. Используется для
-	* уточнения свойства если его <i>ID</i> задано мнемоническим кодом и с
-	* таким мнемоническим кодом свойства присутствует в нескольких
+	* @param string $IBLOCK_CODE = false Символьный код информационного блока. Используется для
+	* уточнения свойства, если его <i>ID</i> задано Символьным кодом и с
+	* таким символьным кодом свойства присутствует в нескольких
 	* информационных блоках.
 	*
 	*
 	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><h4>Примечание</h4>
-	* <p>Если заданы оба значения <i>IBLOCK_ID</i> и <i>IBLOCK_CODE</i>, то будет
-	* производиться попытка найти свойство в одном из них (логика
-	* "или").</p>
+	* @return CDBResult <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><h4>Примечание</h4><p>Если
+	* заданы оба значения <i>IBLOCK_ID</i> и <i>IBLOCK_CODE</i>, то будет производиться
+	* попытка найти свойство в одном из них (логика "или").</p>
 	*
 	*
 	* <h4>Example</h4> 
@@ -992,7 +994,7 @@ class CAllIBlockProperty
 	*
 	*
 	*
-	* @param mixed $PROP_ID  Числовой или мнемонический код свойства.
+	* @param mixed $PROP_ID  Числовой или символьный код свойства.
 	*
 	*
 	*

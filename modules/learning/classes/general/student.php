@@ -72,7 +72,7 @@ class CStudent
 	*
 	*
 	*
-	* @return int <p>Случайное число.</p> </h
+	* @return int <p>Случайное число.</p>
 	*
 	*
 	* <h4>Example</h4> 

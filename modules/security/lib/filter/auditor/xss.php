@@ -151,7 +151,7 @@ class Xss
 
 			"=" => array(
 				'search' => array(
-					"/([\W]s{$_M}t{$_M})(y{$_M}l{$_M}e{$_WS_OPT}\=)
+					"/{$_Al}(s{$_M}t{$_M})(y{$_M}l{$_M}e{$_WS_OPT}\=)
 						(?!\\s*
 							(?P<quot>\"|&quot;|')
 							(\\s*[a-z-]+\\s*:\\s*(([0-9a-z\\s%,.#!\-'\"\\/]+|&quot;)*|rgb\\s*\\([0-9,\\s]+\\))\\s*(?:!important)?;?)*
@@ -159,7 +159,7 @@ class Xss
 							(?P=quot)
 						)
 					/xis",
-					"/(f{$_M}o{$_M}r{$_M})(m{$_M}a{$_M}c{$_M}t{$_M}i{$_M}o{$_M}n{$_WS_OPT}=)/is",
+					"/{$_Al}(f{$_M}o{$_M}r{$_M})(m{$_M}a{$_M}c{$_M}t{$_M}i{$_M}o{$_M}n{$_WS_OPT}=)/is",
 					"/{$_Al}(o{$_M}n{$_M})(([a-z]{$_M}){3,}{$_WS_OPT}=)/is"
 				),
 				'replace' => $replacePattern

@@ -502,7 +502,10 @@ class CAllTicketSLA
 		else
 		{
 			// sla for this user
-			$groupJoin = "(UG.USER_ID = $userID OR UG.GROUP_ID = 2)";
+			$groupJoin = "((UG.USER_ID = $userID ";
+			$groupJoin .= " AND ((UG.DATE_ACTIVE_FROM IS NULL) OR (UG.DATE_ACTIVE_FROM <= ".$DB->CurrentTimeFunction().")) ";
+			$groupJoin .= " AND ((UG.DATE_ACTIVE_TO IS NULL) OR (UG.DATE_ACTIVE_TO >= ".$DB->CurrentTimeFunction().")) ";
+			$groupJoin .= ") OR UG.GROUP_ID = 2)";
 		}
 
 		$strSql = "

@@ -38,7 +38,7 @@ function TagsShowScript()
  *
  *
  *
- * @param string $sName  Имя элемента управления html.
+ * @param string $sName  Имя элемента управления html. </htm
  *
  *
  *

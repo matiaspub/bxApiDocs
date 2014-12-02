@@ -253,7 +253,7 @@ class CIBlockPropertySectionAutoComplete extends CIBlockPropertyElementAutoCompl
 				style="margin-top: 5px;"
 				value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
 				title="<? echo Loc::getMessage('BT_UT_SAUTOCOMPLETE_MESS_NEW_ELEMENT_DESCR'); ?>"
-				onclick="jsUtils.OpenWindow('<? echo CIBlock::GetAdminSectionEditLink(
+				onclick="jsUtils.OpenWindow('<? echo '/bitrix/admin/'.CIBlock::GetAdminSectionEditLink(
 					$arProperty["LINK_IBLOCK_ID"],
 					null,
 					array(
@@ -361,7 +361,7 @@ class CIBlockPropertySectionAutoComplete extends CIBlockPropertyElementAutoCompl
 				style="margin-top: 5px;"
 				value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
 				title="<? echo Loc::getMessage('BT_UT_SAUTOCOMPLETE_MESS_NEW_ELEMENT_DESCR'); ?>"
-				onclick="jsUtils.OpenWindow('<? echo CIBlock::GetAdminSectionEditLink(
+				onclick="jsUtils.OpenWindow('<? echo '/bitrix/admin/'.CIBlock::GetAdminSectionEditLink(
 					$arProperty["LINK_IBLOCK_ID"],
 					null,
 					array(
@@ -384,7 +384,7 @@ class CIBlockPropertySectionAutoComplete extends CIBlockPropertyElementAutoCompl
 		$mxResult = self::GetPropertyValue($arProperty,$arValue);
 		if (is_array($mxResult))
 		{
-			$strResult = $mxResult['NAME'].' [<a href="'.
+			$strResult = $mxResult['NAME'].' [<a href="/bitrix/admin/'.
 				CIBlock::GetAdminSectionEditLink(
 					$mxResult['IBLOCK_ID'],
 					$mxResult['ID'],
@@ -592,9 +592,7 @@ class CIBlockPropertySectionAutoComplete extends CIBlockPropertyElementAutoCompl
 				'TYPE' => 'SECTION',
 			), null, array("HIDE_ICONS" => "Y")
 		);
-		?>?><input
-			style="float: left; margin-right: 10px;"
-			type="button" value="<? echo Loc::getMessage('BT_UT_SAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
+		?><input style="float: left; margin-right: 10px;" type="button" value="<? echo Loc::getMessage('BT_UT_SAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
 			title="<? echo Loc::getMessage('BT_UT_SAUTOCOMPLETE_MESS_SEARCH_ELEMENT_MULTI_DESCR'); ?>"
 			onclick="jsUtils.OpenWindow('/bitrix/admin/iblock_section_search.php?lang=<? echo LANGUAGE_ID; ?>&IBLOCK_ID=<? echo $arProperty["LINK_IBLOCK_ID"]; ?>&m=Y&n=&k=&lookup=<? echo 'jsMLI_'.$control_id; ?>', 900, 600);"
 		>

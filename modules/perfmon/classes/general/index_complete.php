@@ -1,29 +1,30 @@
-<?
+<?php
+
 class CPerfomanceIndexComplete
 {
 	public static function GetList($arFilter = array(), $arOrder = array())
 	{
 		global $DB;
 
-		if(!is_array($arOrder))
+		if (!is_array($arOrder))
 			$arOrder = array();
-		if(count($arOrder) < 1)
+		if (count($arOrder) < 1)
 			$arOrder = array(
 				"TABLE_NAME" => "ASC",
 			);
 
 		$arQueryOrder = array();
-		foreach($arOrder as $strColumn => $strDirection)
+		foreach ($arOrder as $strColumn => $strDirection)
 		{
 			$strColumn = strtoupper($strColumn);
-			$strDirection = strtoupper($strDirection)=="ASC"? "ASC": "DESC";
-			switch($strColumn)
+			$strDirection = strtoupper($strDirection) == "ASC"? "ASC": "DESC";
+			switch ($strColumn)
 			{
-				case "ID":
-				case "TABLE_NAME":
-					$arSelect[] = $strColumn;
-					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					break;
+			case "ID":
+			case "TABLE_NAME":
+				$arSelect[] = $strColumn;
+				$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				break;
 			}
 		}
 
@@ -38,10 +39,7 @@ class CPerfomanceIndexComplete
 			),
 		));
 
-		if(count($arQuerySelect) < 1)
-			$arQuerySelect = array("ID"=>"s.ID");
-
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
 		$strQueryWhere = $obQueryWhere->GetQuery($arFilter);
 
@@ -67,13 +65,13 @@ class CPerfomanceIndexComplete
 	{
 		global $DB;
 		$ID = intval($ID);
-		$res = $DB->Query("DELETE FROM b_perf_index_complete WHERE ID = ".$ID);
+		$DB->Query("DELETE FROM b_perf_index_complete WHERE ID = ".$ID);
 	}
 
 	public static function DeleteByTableName($table, $columns)
 	{
 		global $DB;
-		$rs = $DB->Query("
+		$DB->Query("
 			delete
 			from b_perf_index_complete
 			where TABLE_NAME = '".$DB->ForSQL($table)."'
@@ -94,4 +92,3 @@ class CPerfomanceIndexComplete
 		return is_array($rs->Fetch());
 	}
 }
-?>

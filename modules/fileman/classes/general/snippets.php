@@ -472,7 +472,6 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		$currentPath = $params['new'] ? '' : CFileMan::SecurePathVar($params['current_path']);
 		$path = CFileMan::SecurePathVar($params['path']);
 		$template = CFileMan::SecurePathVar($params['template']);
-		//$site = $params['site'];
 		$code = $params['code'];
 		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
 		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
@@ -503,6 +502,13 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 			}
 		}
 		$key = ($path === '' ? '' : $path.'/').$fileName;
+
+		if (!$io->ValidatePathString($snippetPath.'/'.$fileName) ||
+			IsFileUnsafe($snippetPath.'/'.$fileName) ||
+			HasScriptExtension($snippetPath.'/'.$fileName))
+		{
+			return false;
+		}
 
 		// 1. Save new snippet with new content
 		if ($code)
@@ -570,6 +576,14 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
 
 		$io = CBXVirtualIo::GetInstance();
+
+		if (!$io->ValidatePathString($snippetPath) ||
+			IsFileUnsafe($snippetPath) ||
+			HasScriptExtension($snippetPath))
+		{
+			return false;
+		}
+
 		//Delete snippet file
 		if($io->FileExists($snippetPath))
 		{

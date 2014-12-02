@@ -6,6 +6,7 @@ $_SERVER["DOCUMENT_ROOT"] = "#DOCUMENT_ROOT#";
 // define("NOT_CHECK_PERMISSIONS",true);
 // define("BX_CAT_CRON", true);
 // define('NO_AGENT_CHECK', true);
+// define('SITE_ID', 's1'); // your site ID - need for language ID
 $DOCUMENT_ROOT = $_SERVER["DOCUMENT_ROOT"];
 
 $profile_id = $argv[1];
@@ -47,6 +48,30 @@ if (CModule::IncludeModule("catalog"))
 			$intSetupVarsCount = extract($arSetupVars, EXTR_SKIP);
 		}
 	}
+
+	global $arCatalogAvailProdFields;
+	$arCatalogAvailProdFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT);
+	global $arCatalogAvailPriceFields;
+	$arCatalogAvailPriceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG);
+	global $arCatalogAvailValueFields;
+	$arCatalogAvailValueFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+	global $arCatalogAvailQuantityFields;
+	$arCatalogAvailQuantityFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+	global $arCatalogAvailGroupFields;
+	$arCatalogAvailGroupFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+
+	global $defCatalogAvailProdFields;
+	$defCatalogAvailProdFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_ELEMENT);
+	global $defCatalogAvailPriceFields;
+	$defCatalogAvailPriceFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CATALOG);
+	global $defCatalogAvailValueFields;
+	$defCatalogAvailValueFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE);
+	global $defCatalogAvailQuantityFields;
+	$defCatalogAvailQuantityFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+	global $defCatalogAvailGroupFields;
+	$defCatalogAvailGroupFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_SECTION);
+	global $defCatalogAvailCurrencies;
+	$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
 
 	CCatalogDiscountSave::Disable();
 	include($_SERVER["DOCUMENT_ROOT"].$strFile);

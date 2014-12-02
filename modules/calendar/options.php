@@ -125,7 +125,7 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 			'pathes' => $_REQUEST['pathes'],
 			'dep_manager_sub' => isset($_REQUEST['dep_manager_sub']),
 
-			'forum_id' =>  isset($_REQUEST['calendar_forum_id']),
+			'forum_id' => intVal($_REQUEST['calendar_forum_id']),
 			//'comment_allow_edit' =>  isset($_REQUEST['calendar_comment_allow_edit']),
 			//'comment_allow_remove' =>  isset($_REQUEST['calendar_comment_allow_remove']),
 			//'max_upload_files_in_comments' =>  isset($_REQUEST['calendar_max_upload_files_in_comments'])
@@ -360,6 +360,7 @@ BX.ready(function(){
 		<td>
 			<select id="cal_rm_iblock_id" name="rm_iblock_id">
 <?if ($SET['rm_iblock_id']):?>
+	<option value=""><?= GetMessage('CAL_NOT_SET')?></option>
 	<?foreach ($arIB[$SET['rm_iblock_type']] as $iblock_id => $iblock):?>
 		<option value="<?= $iblock_id?>"<? if($iblock_id == $SET['rm_iblock_id']){echo ' selected="selected"';}?>><?= $iblock?></option>
 	<?endforeach;?>
@@ -375,6 +376,7 @@ BX.ready(function(){
 		<td>
 			<select id="cal_vr_iblock_id" name="vr_iblock_id"">
 <?if ($SET['vr_iblock_id']):?>
+	<option value=""><?= GetMessage('CAL_NOT_SET')?></option>
 	<?foreach ($arIB[$SET['rm_iblock_type']] as $iblock_id => $iblock):?>
 		<option value="<?= $iblock_id?>"<? if($iblock_id == $SET['vr_iblock_id']){echo ' selected="selected"';}?>><?= $iblock?></option>
 	<?endforeach;?>
@@ -394,7 +396,7 @@ BX.ready(function(){
 		<td>
 			<select name="calendar_forum_id">
 				<option value="0">&nbsp;</option>
-				<? foreach ($arForums as $key => $value):?>
+				<?foreach ($arForums as $key => $value):?>
 					<option value="<?= $key ?>"<?= $SET['forum_id'] == $key ? " selected" : "" ?>><?=  $value?></option>
 				<? endforeach?>
 			</select>

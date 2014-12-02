@@ -1,17 +1,28 @@
 <?
+use Bitrix\Main\Loader;
+
 global $DB;
 $strDBType = strtolower($DB->type);
 
-CModule::AddAutoloadClasses(
-	"currency",
+Loader::registerAutoLoadClasses(
+	'currency',
 	array(
-		"CCurrency" => $strDBType."/currency.php",
-		"CCurrencyLang" => $strDBType."/currency_lang.php",
-		"CCurrencyRates" => $strDBType."/currency_rate.php",
+		'CCurrency' => $strDBType.'/currency.php',
+		'CCurrencyLang' => $strDBType.'/currency_lang.php',
+		'CCurrencyRates' => $strDBType.'/currency_rate.php',
+		'Bitrix\Currency\CurrencyTable' => 'lib/currency.php',
+		'Bitrix\Currency\CurrencyLangTable' => 'lib/currencylang.php',
+		'Bitrix\Currency\CurrencyRateTable' => 'lib/currencyrate.php'
 	)
 );
 
-// define("CURRENCY_CACHE_DEFAULT_TIME", 10800);
+$jsCurrencyDescr = array(
+	'js' => '/bitrix/js/currency/core_currency.js',
+	'rel' => array('core')
+);
+CJSCore::RegisterExt('currency', $jsCurrencyDescr);
+
+// define('CURRENCY_CACHE_DEFAULT_TIME', 10800);
 
 // define('CURRENCY_ISO_STANDART_URL', 'http://www.iso.org/iso/home/standards/currency_codes.htm');
 
@@ -21,7 +32,7 @@ CModule::AddAutoloadClasses(
 */
 
 /**
- * <p>Функция форматирует цену <i>price</i> в соответствии с правилами форматирования для валюты <i>currency</i> на текущем языке. Причем, если функция вызывается в административном разделе, то дополнительно будет проведена очистка шаблона от тегов и скриптов. Если же функция вызывается в публичной части, то будет задействован параметр <i>HIDE_ZERO</i>, который отвечает за скрытие незначащих нулей в дробной части.</p>
+ * <p>Функция форматирует цену <i>price</i> в соответствии с правилами форматирования для валюты <i>currency</i> на текущем языке. Причем, если функция вызывается в административном разделе, то дополнительно будет проведена очистка шаблона от тегов и скриптов. Если же функция вызывается в публичной части, то будет задействован параметр <i>HIDE_ZERO</i>, который отвечает за скрытие незначащих нулей в дробной части.</p> <p>Вместо этой устаревшей функции рекомендуется использовать новую функцию <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/currencyformat.php">CurrencyFormat</a> класса <b>CCurrencyLang</b></p>
  *
  *
  *
@@ -72,7 +83,7 @@ function CurrencyFormat($price, $currency)
 */
 
 /**
- * <p>Функция форматирует цену <i>price</i> в соответствии с настройками валюты <i>currency</i> для текущего языка без использования шаблона.</p>
+ * <p>Функция форматирует цену <i>price</i> в соответствии с настройками валюты <i>currency</i> для текущего языка без использования шаблона.</p> <p>Вместо этой устаревшей функции рекомендуется использовать новую функцию <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/currencyformat.php">CurrencyFormat</a> класса <b>CCurrencyLang</b></p>
  *
  *
  *

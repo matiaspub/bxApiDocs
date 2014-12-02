@@ -20,7 +20,13 @@ class EventResult
 		$this->parameters = $parameters;
 	}
 
+	/** @deprecated Use getType() */
 	public function getResultType()
+	{
+		return $this->getType();
+	}
+
+	public function getType()
 	{
 		return $this->type;
 	}
@@ -39,6 +45,4 @@ class EventResult
 	{
 		return $this->parameters;
 	}
-
-	//public function copyParametersToArray($ar)
 }

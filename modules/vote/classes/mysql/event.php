@@ -17,8 +17,8 @@ class CVoteEvent extends CAllVoteEvent
 
 	public static function GetUserAnswerStat($arSort = array(), $arFilter = array(), $arParams = array())
 	{
-		global $DB;
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: GetUserAnswerStat<br>Line: ";
+		global $DB, $USER;
+		$err_mess = (self::err_mess())."<br>Function: GetUserAnswerStat<br>Line: ";
 		$arFilter = (is_array($arFilter) ? $arFilter : array());
 		if (!is_array($arSort) && $arSort > 0)
 		{
@@ -70,7 +70,8 @@ class CVoteEvent extends CAllVoteEvent
 						if ($strOperation == "IN")
 						{
 							$val = array_unique(array_map("intval", (is_array($val) ? $val : explode(",", $val))), SORT_NUMERIC);
-							if (!empty($val)) {
+							if (!empty($val))
+							{
 								$str = ($strNegative=="Y"?" NOT ":"")."(".$key." IN (".implode(",", $val)."))";
 							}
 						}
@@ -92,7 +93,7 @@ class CVoteEvent extends CAllVoteEvent
 					break;
 				case "BGETVOTERS":
 					$arSqlSearch[] = "VU.AUTH_USER_ID > 0";
-					$arFilter["bGetVoters"] = intval($val === "Y" ? $GLOBALS["USER"]->GetID() : $val);
+					$arFilter["bGetVoters"] = intval($val === "Y" ? $USER->GetID() : $val);
 					break;
 				case "BGETEVENTRESULTS":
 					$arFilter["bGetEventResults"] = intval($arFilter["bGetEventResults"]);
@@ -128,7 +129,7 @@ class CVoteEvent extends CAllVoteEvent
 				" LEFT JOIN b_vote_user VU ON (VU.ID = VE.VOTE_USER_ID)".
 				" WHERE 1=1 ".$strSqlSearch.
 				" GROUP BY VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID".$strSqlGroup.") VEG";
-			$db_res = $GLOBALS["DB"]->Query($strSql);
+			$db_res = $DB->Query($strSql);
 			if ($db_res && ($res = $db_res->Fetch()))
 			{
 				$strSql = "SELECT VEQ.QUESTION_ID, VEA.ANSWER_ID, VU.AUTH_USER_ID, COUNT(DISTINCT VEA.ID) as COUNTER, \n\t".
@@ -156,4 +157,3 @@ class CVoteEvent extends CAllVoteEvent
 		return $db_res;
 	}
 }
-?>

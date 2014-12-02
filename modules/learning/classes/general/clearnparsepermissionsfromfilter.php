@@ -155,4 +155,24 @@ class CLearnParsePermissionsFromFilter
 			self::$availableLessons[$loggedUserId][] = (int) $lessonId;
 		}
 	}
+
+
+	public static function isRegisteredAsAvailableCourse($lessonId)
+	{
+		global $USER;
+
+		$isRegistered = false;
+
+		if (is_object($USER) && method_exists($USER, 'GetID'))
+		{
+			$loggedUserId = (int) $USER->GetID();
+
+			if (isset(self::$availableLessons[$loggedUserId]) && is_array(self::$availableLessons[$loggedUserId]))
+			{
+				$isRegistered = in_array($lessonId, self::$availableLessons[$loggedUserId]);
+			}
+		}
+
+		return ($isRegistered);
+	}
 }

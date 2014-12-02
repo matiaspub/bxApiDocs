@@ -8,24 +8,38 @@
 
 class PHPParser
 {
+	protected static $arAllStr;
+
 	public static function ReplString($str, $arAllStr)
 	{
+		self::$arAllStr = $arAllStr;
+
 		if(preg_match("'^\x01([0-9]+)\x02$'s", $str))
 		{
-			return preg_replace("'\x01([0-9]+)\x02'es", "\$arAllStr['\\1']", $str);
+			return preg_replace_callback("'\x01([0-9]+)\x02's", "PHPParser::getString", $str);
 		}
 		if(strval(floatval($str)) == $str)
 		{
-			return preg_replace("'\x01([0-9]+)\x02'es", "'\"'.\$arAllStr['\\1'].'\"'", $str);
+			return preg_replace_callback("'\x01([0-9]+)\x02's", "PHPParser::getQuotedString", $str);
 		}
-		elseif($str=="")
+		elseif($str == "")
 		{
 			return "";
 		}
 		else
 		{
-			return "={".preg_replace("'\x01([0-9]+)\x02'es", "'\"'.\$arAllStr['\\1'].'\"'", $str)."}";
+			return "={".preg_replace_callback("'\x01([0-9]+)\x02's", "PHPParser::getQuotedString", $str)."}";
 		}
+	}
+
+	public static function getString($matches)
+	{
+		return self::$arAllStr[$matches[1]];
+	}
+
+	public static function getQuotedString($matches)
+	{
+		return '"'.self::$arAllStr[$matches[1]].'"';
 	}
 
 	public static function GetParams($params)
@@ -443,7 +457,7 @@ class PHPParser
 				{
 					$arAllStr[] = $string_tmp;
 					$string_tmp = "";
-					$new_str .= Chr(1).(Count($arAllStr) - 1).Chr(2);
+					$new_str .= chr(1).(count($arAllStr) - 1).chr(2);
 				}
 
 				//comment
@@ -512,8 +526,8 @@ class PHPParser
 				$var_name = "";
 			}
 
-			$func_name = preg_replace("'\x01([0-9]+)\x02'es", "\$arAllStr['\\1']", $func_name);
-			$func_name = preg_replace("'\\\$GLOBALS\\[(.+?)\\]'s", "\$\\1", $func_name);
+			self::$arAllStr = $arAllStr;
+			$func_name = preg_replace_callback("'\x01([0-9]+)\x02's", "PHPParser::getString", $func_name);
 
 			switch (strtoupper($func_name))
 			{
@@ -689,24 +703,24 @@ public static 	function PreparePHP($str)
 		for($j=1; $j<=$i; $j++)
 			$res = str_replace($un."|$j|", str_repeat("\t", intval(($max-$lngth[$j]+7)/8)), $res);
 
-		return Trim($res, " \t,\r\n");
+		return trim($res, " \t,\r\n");
 	}
 
 
-	public static function ReturnPHPStrRec($arVal, $level, $comm="")
+public static 	function ReturnPHPStrRec($arVal, $level, $comm="")
 	{
 		$result = "";
-		$pref = str_repeat("\t", $level);
+		$pref = str_repeat("\t", $level+1);
 		if (is_array($arVal))
 		{
-			$result .= "array(".(($level==1) ? $comm : "")."\r\n";
+			$result .= "array(".(($level==1) ? $comm : "")."\n";
 			foreach ($arVal as $key => $value)
-				$result .= $pref."\t".((IntVal($key)."|" == $key."|") ? $key : PHPParser::PreparePHP($key))." => ".PHPParser::ReturnPHPStrRec($value, $level + 1);
-			$result .= $pref."),\r\n";
+				$result .= $pref."\t".((intval($key)."|" == $key."|") ? $key : PHPParser::PreparePHP($key))." => ".PHPParser::ReturnPHPStrRec($value, $level + 1);
+			$result .= $pref."),\n";
 		}
 		else
 		{
-			$result .= PHPParser::PreparePHP($arVal).",".(($level==1) ? $comm : "")."\r\n";
+			$result .= PHPParser::PreparePHP($arVal).",".(($level==1) ? $comm : "")."\n";
 		}
 		return $result;
 	}
@@ -715,17 +729,14 @@ public static 	function PreparePHP($str)
 public static 	function ReturnPHPStr2($arVals, $arParams=array())
 	{
 		$res = "";
-		$i = 0;
-
 		foreach($arVals as $key => $val)
 		{
-			$i++;
-			$comm = (strlen($arParams[$key]["NAME"])>0? "\t// ".$arParams[$key]["NAME"]:"");
-			$res .= "\t\"".EscapePHPString($key)."\" => ";
+			$res .= "\t\t\"".EscapePHPString($key)."\" => ";
+			$comm = ($arParams[$key]["NAME"] <> ''? "\t// ".$arParams[$key]["NAME"] : "");
 			$res .= PHPParser::ReturnPHPStrRec($val, 1, $comm);
 		}
 
-		return Trim($res, " \t,\r\n");
+		return trim($res, " \t,\r\n");
 	}
 
 public static 	function FindComponent($component_name, $filesrc, $src_line)

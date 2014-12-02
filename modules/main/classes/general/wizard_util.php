@@ -1,7 +1,6 @@
-<?
+<?php
 class CWizardUtil
 {
-
 	public static function GetRepositoryPath()
 	{
 		return BX_ROOT."/wizards";
@@ -25,8 +24,8 @@ class CWizardUtil
 
 	public static function GetWizardList($filterNamespace = false, $bLoadFromModules = false)
 	{
-		$arWizards = Array();
-		$arLoadedWizards = Array();
+		$arWizards = array();
+		$arLoadedWizards = array();
 
 		$wizardPath = $_SERVER["DOCUMENT_ROOT"].CWizardUtil::GetRepositoryPath();
 
@@ -52,9 +51,9 @@ class CWizardUtil
 					if (file_exists(($fname = $wizardPath."/".$dirName."/lang/".LANGUAGE_ID."/.description.php")))
 						__IncludeLang($fname, false, true);
 
-					$arWizardDescription = Array();
+					$arWizardDescription = array();
 					include($wizardPath."/".$dirName."/.description.php");
-					$arWizards[] = Array("ID" => $dirName) + $arWizardDescription;
+					$arWizards[] = array("ID" => $dirName) + $arWizardDescription;
 					$arLoadedWizards[] = $dirName;
 				}
 				else
@@ -82,9 +81,9 @@ class CWizardUtil
 								if (file_exists(($fname = $pathToWizard."/lang/".LANGUAGE_ID."/.description.php")))
 									__IncludeLang($fname, false, true);
 
-								$arWizardDescription = Array();
+								$arWizardDescription = array();
 								include($pathToWizard."/.description.php");
-								$arWizards[] = Array("ID" => $dirName.":".$file) + $arWizardDescription;
+								$arWizards[] = array("ID" => $dirName.":".$file) + $arWizardDescription;
 								$arLoadedWizards[] = $dirName.":".$file;
 							}
 						}
@@ -143,9 +142,9 @@ class CWizardUtil
 										if (file_exists(($fname = $pathToWizard."/lang/".LANGUAGE_ID."/.description.php")))
 											__IncludeLang($fname, false, true);
 
-										$arWizardDescription = Array();
+										$arWizardDescription = array();
 										include($pathToWizard."/.description.php");
-										$arWizards[] = Array("ID" => $moduleName.":".$dirName.":".$file) + $arWizardDescription;
+										$arWizards[] = array("ID" => $moduleName.":".$dirName.":".$file) + $arWizardDescription;
 										$arLoadedWizards[] = $dirName.":".$file;
 									}
 								}
@@ -235,14 +234,13 @@ class CWizardUtil
 		$content = @fread($handle, filesize($filePath));
 		@fclose($handle);
 
-		$handle = false;
-		if (!$handle = @fopen($filePath, "wb"))
+		if (!($handle = @fopen($filePath, "wb")))
 			return;
 
 		if (flock($handle, LOCK_EX))
 		{
-			$arSearch = Array();
-			$arValue = Array();
+			$arSearch = array();
+			$arValue = array();
 
 			foreach ($arReplace as $search => $replace)
 			{
@@ -295,22 +293,17 @@ class CWizardUtil
 					$content = @fread($handleFile, filesize($filePath."/".$file));
 					@fclose($handleFile);
 
-					$handleFile = false;
-					if (!$handleFile = @fopen($filePath."/".$file, "wb"))
+					if (!($handleFile = @fopen($filePath."/".$file, "wb")))
 						continue;
 
 					if (flock($handleFile, LOCK_EX))
 					{
-						$arSearch = Array();
-						$arValue = Array();
+						$arSearch = array();
+						$arValue = array();
 
 						foreach ($arReplace as $search => $replace)
 						{
-							if ($skipSharp)
-								$arSearch[] = $search;
-							else
-								$arSearch[] = "#".$search."#";
-
+							$arSearch[] = "#".$search."#";
 							$arValue[] = $replace;
 						}
 
@@ -350,7 +343,7 @@ class CWizardUtil
 	{
 		$arModules = array();
 
-		$arModules["main"] = Array(
+		$arModules["main"] = array(
 			"MODULE_ID" => "main",
 			"MODULE_NAME" => GetMessage("MAIN_WIZARD_MAIN_MODULE_NAME"),
 			"MODULE_DESCRIPTION" => GetMessage("MAIN_WIZARD_MAIN_MODULE_DESC"),
@@ -366,7 +359,6 @@ class CWizardUtil
 			{
 				if(is_dir($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$dir) && $dir!="." && $dir!="..")
 				{
-					$module_dir = $_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/".$dir;
 					if($info = CModule::CreateModuleObject($dir))
 					{
 						$arModules[$dir]["MODULE_ID"] = $info->MODULE_ID;
@@ -396,7 +388,7 @@ class CWizardUtil
 		if ($maxWidth <= 0 || $maxHeight <= 0)
 			return false;
 
-		list($sourceWidth, $sourceHeight, $type, $attr) = @getimagesize($sourcePath);
+		list($sourceWidth, $sourceHeight, $type) = @getimagesize($sourcePath);
 
 		//Image type
 		if ($type == 1)
@@ -464,7 +456,4 @@ class CWizardUtil
 		return $success;
 
 	}
-
 }
-
-?>

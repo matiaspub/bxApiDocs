@@ -110,7 +110,7 @@ class CSaleOrder extends CAllSaleOrder
 	*/
 	public static function Add($arFields)
 	{
-		global $DB, $USER_FIELD_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
 
 		$arFields1 = array();
 		foreach ($arFields as $key => $value)
@@ -173,6 +173,12 @@ class CSaleOrder extends CAllSaleOrder
 
 		foreach(GetModuleEvents("sale", "OnOrderAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
+
+		if(defined("CACHED_b_sale_order"))
+		{
+			$CACHE_MANAGER->Read(CACHED_b_sale_order, "sale_orders");
+			$CACHE_MANAGER->SetImmediate("sale_orders", true);
+		}
 
 		return $ID;
 	}
@@ -412,7 +418,7 @@ class CSaleOrder extends CAllSaleOrder
 	*
 	*
 	*
-	* @param array $arFilter = Аrray() Массив, в соответствии с которым фильтруются записи заказов.
+	* @param array $arFilter = Array() Массив, в соответствии с которым фильтруются записи заказов.
 	* Массив имеет вид: <pre class="syntax">array(
 	* "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
 	* "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
@@ -448,8 +454,8 @@ class CSaleOrder extends CAllSaleOrder
 	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет. <p>Чтобы задать временной
 	* интервал при получении заказов, можно использовать в фильтре
-	* ключи DATE_FROM, DATE_TO для фильтрации по дате изменения и DATE_INSERT_FROM,
-	* DATE_INSERT_TO для даты добавления.</p>
+	* ключи DATE_UPDATE_FROM, DATE_UPDATE_TO для фильтрации по дате изменения и DATE_FROM,
+	* DATE_TO для фильтрации по дате добавления заказа.</p>
 	*
 	*
 	*

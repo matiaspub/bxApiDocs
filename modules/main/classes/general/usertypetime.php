@@ -1,6 +1,9 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+use Bitrix\Main;
+use Bitrix\Main\Type;
+
 class CUserTypeDateTime
 {
 	public static function GetUserTypeDescription()
@@ -120,18 +123,94 @@ class CUserTypeDateTime
 	public static function CheckFields($arUserField, $value)
 	{
 		$aMsg = array();
-		if(is_string($value) && !empty($value) && !CheckDateTime($value))
+		$value = (string)$value;
+		if ($value != "")
 		{
-			$aMsg[] = array(
-				"id" => $arUserField["FIELD_NAME"],
-				"text" => GetMessage("USER_TYPE_DT_ERROR",
-					array(
-						"#FIELD_NAME#"=>($arUserField["EDIT_FORM_LABEL"] <> ''? $arUserField["EDIT_FORM_LABEL"] : $arUserField["FIELD_NAME"]),
-					)
-				),
-			);
+			try
+			{
+				Type\DateTime::createFromUserTime($value);
+			}
+			catch (Main\ObjectException $e)
+			{
+				$aMsg[] = array(
+					"id" => $arUserField["FIELD_NAME"],
+					"text" => GetMessage("USER_TYPE_DT_ERROR",
+						array(
+							"#FIELD_NAME#"=>($arUserField["EDIT_FORM_LABEL"] <> ''? $arUserField["EDIT_FORM_LABEL"] : $arUserField["FIELD_NAME"]),
+						)
+					),
+				);
+			}
 		}
 		return $aMsg;
+	}
+
+	/**
+	 * Returns string time in user timezone
+	 *
+	 * @param $userfield
+	 * @param $fetched
+	 *
+	 * @return string
+	 */
+	static public function onAfterFetch($userfield, $fetched)
+	{
+		$value = $fetched['VALUE'];
+
+		if ($userfield['MULTIPLE'] == 'Y' && !($value instanceof Type\DateTime))
+		{
+			//Invalid value
+			if (strlen($value) <= 1)
+			{
+				//will be ignored by the caller
+				return null;
+			}
+
+			try
+			{
+				//try new independent datetime format
+				$value = new Type\DateTime($value, \Bitrix\Main\UserFieldTable::MULTIPLE_DATETIME_FORMAT);
+			}
+			catch (Main\ObjectException $e)
+			{
+				//try site format
+				try
+				{
+					$value = new Type\DateTime($value);
+				}
+				catch (Main\ObjectException $e)
+				{
+					//try short format
+					$value = Type\DateTime::createFromUserTime($value);
+				}
+			}
+		}
+		elseif (!($value instanceof Type\DateTime))
+		{
+			// is not necessary, $value is a valid string already
+			//$value = Type\DateTime::createFromUserTime($value);
+		}
+
+		return (string) $value;
+	}
+
+
+	/**
+	 * Returns  time object in server timezone
+	 *
+	 * @param $userfield
+	 * @param $value
+	 *
+	 * @return Type\DateTime|string
+	 */
+	static public function onBeforeSave($userfield, $value)
+	{
+		if (strlen($value) && !($value instanceof Type\DateTime))
+		{
+			$value = Type\DateTime::createFromUserTime($value);
+		}
+
+		return $value;
 	}
 }
 ?>

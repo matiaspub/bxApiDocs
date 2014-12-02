@@ -146,7 +146,7 @@ class Server
 			$this->values["REDIRECT_STATUS"] = $redirectStatus;
 	}
 
-	public function transferUri($url, $queryString)
+	public function transferUri($url, $queryString = "")
 	{
 		$this->values["REAL_FILE_PATH"] = $url;
 		if ($queryString != "")

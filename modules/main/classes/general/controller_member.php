@@ -157,14 +157,14 @@ class CControllerClient
 		return false;
 	}
 
-public static 	function OnAfterUserLogin(&$arParams)
+	public static 	function OnAfterUserLogin(&$arParams)
 	{
 		global $USER;
 		if($arParams["CONTROLLER_ADMIN"] === "Y")
 			$USER->SetControllerAdmin();
 	}
 
-public static 	function UpdateUser($arFields = Array(), $FORMAT_DATE = false, $FORMAT_DATETIME = false)
+	public static 	function UpdateUser($arFields = Array(), $FORMAT_DATE = false, $FORMAT_DATETIME = false)
 	{
 		global $DB;
 
@@ -247,7 +247,7 @@ public static 	function UpdateUser($arFields = Array(), $FORMAT_DATE = false, $F
 		return $USER_ID;
 	}
 
-public static 	function AuthorizeAdmin($arParams = Array())
+	public static 	function AuthorizeAdmin($arParams = Array())
 	{
 		global $USER;
 		$ADMIN_ID = 0;
@@ -272,7 +272,7 @@ public static 	function AuthorizeAdmin($arParams = Array())
 		return false;
 	}
 
-public static 	function AuthorizeUser($arParams = Array())
+	public static 	function AuthorizeUser($arParams = Array())
 	{
 		global $USER;
 
@@ -286,7 +286,7 @@ public static 	function AuthorizeUser($arParams = Array())
 		return false;
 	}
 
-public static 	function OnExternalAuthList()
+	public static 	function OnExternalAuthList()
 	{
 		$arResult = Array(
 				Array(
@@ -298,7 +298,7 @@ public static 	function OnExternalAuthList()
 		return $arResult;
 	}
 
-	fpublic static unction PrepareUserInfo($arUser)
+	public static function PrepareUserInfo($arUser)
 	{
 		$arFields = array(
 			"ID",
@@ -384,7 +384,7 @@ public static 	function OnExternalAuthList()
 		return array($member_id, $member_secret_id, $ticket_id);
 	}
 
-public static 	function JoinToControllerEx($controller_url, $controller_login, $controller_password, $arMemberParams = Array())
+	public static 	function JoinToControllerEx($controller_url, $controller_login, $controller_password, $arMemberParams = Array())
 	{
 		if(COption::GetOptionString("main", "controller_member", "N")=="Y")
 			return false;
@@ -430,7 +430,7 @@ public static 	function JoinToControllerEx($controller_url, $controller_login, $
 		return true;
 	}
 
-public static 	function JoinToController($controller_url, $controller_login, $controller_password, $site_url = false, $controller_group = false, $site_name = false, $bSharedKernel = false)
+	public static 	function JoinToController($controller_url, $controller_login, $controller_password, $site_url = false, $controller_group = false, $site_name = false, $bSharedKernel = false)
 	{
 		$arMemberParams = Array(
 				"URL" => $site_url,
@@ -443,7 +443,7 @@ public static 	function JoinToController($controller_url, $controller_login, $co
 	}
 
 
-public static 	function RemoveFromController($controller_login, $controller_password)
+	public static 	function RemoveFromController($controller_login, $controller_password)
 	{
 		if(COption::GetOptionString("main", "controller_member", "N")!="Y")
 			return false;
@@ -470,7 +470,7 @@ public static 	function RemoveFromController($controller_login, $controller_pass
 		return true;
 	}
 
-public static 	function UpdateCounters()
+	public static 	function UpdateCounters()
 	{
 		if(COption::GetOptionString("main", "controller_member", "N") != "Y")
 		{
@@ -491,7 +491,7 @@ public static 	function UpdateCounters()
 		}
 	}
 
-public static 	function ExecuteEvent($eventName, $arParams = array())
+	public static 	function ExecuteEvent($eventName, $arParams = array())
 	{
 		if(COption::GetOptionString("main", "controller_member", "N") != "Y")
 		{
@@ -514,7 +514,7 @@ public static 	function ExecuteEvent($eventName, $arParams = array())
 		}
 	}
 
-public static 	function Unlink()
+	public static 	function Unlink()
 	{
 		$disconnect_command = COption::GetOptionString("main", "~controller_disconnect_command", "");
 		if(strlen($disconnect_command)>0)
@@ -531,13 +531,13 @@ public static 	function Unlink()
 		return $arCachedData;
 	}
 
-public static 	function SetBackup($arBackup)
+	public static 	function SetBackup($arBackup)
 	{
 		COption::SetOptionString("main", "~controller_backup", serialize($arBackup));
 		CControllerClient::GetBackup(true);
 	}
 
-public static 	function SetOptionString($module_id, $option_id, $value)
+	public static 	function SetOptionString($module_id, $option_id, $value)
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(!is_set($arBackup["options"][$module_id], $option_id))
@@ -548,7 +548,7 @@ public static 	function SetOptionString($module_id, $option_id, $value)
 		COption::SetOptionString($module_id, $option_id, $value);
 	}
 
-public static 	function RestoreOption($module_id, $option_id)
+	public static 	function RestoreOption($module_id, $option_id)
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(is_set($arBackup["options"][$module_id], $option_id))
@@ -561,7 +561,7 @@ public static 	function RestoreOption($module_id, $option_id)
 		return false;
 	}
 
-public static 	function SetModules($arModules)
+	public static 	function SetModules($arModules)
 	{
 		$arInstalled = Array();
 		$arm = CModule::_GetCache();
@@ -593,7 +593,7 @@ public static 	function SetModules($arModules)
 		return true;
 	}
 
-public static 	function RestoreModules()
+	public static 	function RestoreModules()
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(isset($arBackup["modules"]))
@@ -627,7 +627,7 @@ public static 	function RestoreModules()
 			CControllerClient::SetBackup($arBackup);
 		}
 	}
-public static 	function RestoreGroupSecurity($group_code, $arModules)
+	public static 	function RestoreGroupSecurity($group_code, $arModules)
 	{
 		$arBackup = CControllerClient::GetBackup();
 
@@ -651,7 +651,7 @@ public static 	function RestoreGroupSecurity($group_code, $arModules)
 		CControllerClient::SetBackup($arBackup);
 	}
 
-public static 	function SetTaskSecurity($task_id, $module_id, $arOperations, $letter = '')
+	public static 	function SetTaskSecurity($task_id, $module_id, $arOperations, $letter = '')
 	{
 		$ID = 0;
 		$dbr_task = CTask::GetList(Array(), Array('NAME'=>$task_id, 'MODULE_ID'=>$module_id, "BINDING" => 'module'));
@@ -1225,7 +1225,7 @@ public 	function ParseResult($result)
 	///////////////////////////////////////
 
 	// возвращает отформатированную строку ответа в формате понятном для приема на сервере, с подписью
-public 	function GetResponseBody($log = false)
+	function GetResponseBody($log = false)
 	{
 		$result = "status=".urlencode($this->status).
 			"&text=".urlencode($this->text).
@@ -1238,9 +1238,6 @@ public 	function GetResponseBody($log = false)
 
 		$this->Sign();
 		$result .= "&hash=".urlencode($this->hash);
-
-		if(defined($this->debug_const) && constant($this->debug_const)===true)
-			$result .= "&hash_orig=".urlencode($this->status."|".$this->text."|".serialize($this->arParameters)."|".$this->secret_id);
 
 		if($log)
 			$this->Debug("We send errored response back:\r\nPacket:\r\n".serialize($this)."\r\n".$result."\r\n");

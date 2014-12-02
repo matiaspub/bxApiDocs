@@ -1,10 +1,11 @@
-<?
+<?php
+
 class CPerfomanceTableList extends CDBResult
 {
 	public static function GetList($bFull = true)
 	{
 		global $DB;
-		if($bFull)
+		if ($bFull)
 			$rsTables = $DB->Query("show table status");
 		else
 			$rsTables = $DB->Query("show tables from `".$DB->ForSQL($DB->DBName)."`");
@@ -15,9 +16,9 @@ class CPerfomanceTableList extends CDBResult
 	{
 		global $DB;
 		$ar = parent::Fetch();
-		if($ar)
+		if ($ar)
 		{
-			if(isset($ar["Tables_in_".$DB->DBName]))
+			if (isset($ar["Tables_in_".$DB->DBName]))
 				$ar = array(
 					"TABLE_NAME" => $ar["Tables_in_".$DB->DBName],
 					"ENGINE_TYPE" => "",
@@ -27,7 +28,7 @@ class CPerfomanceTableList extends CDBResult
 			else
 				$ar = array(
 					"TABLE_NAME" => $ar["Name"],
-					"ENGINE_TYPE" => $ar["Comment"]==="VIEW"? "VIEW": $ar["Engine"],
+					"ENGINE_TYPE" => $ar["Comment"] === "VIEW"? "VIEW": $ar["Engine"],
 					"NUM_ROWS" => $ar["Rows"],
 					"BYTES" => $ar["Data_length"],
 				);
@@ -38,8 +39,6 @@ class CPerfomanceTableList extends CDBResult
 
 class CPerfomanceTable extends CAllPerfomanceTable
 {
-	var $TABLE_NAME;
-
 	public function Init($TABLE_NAME)
 	{
 		$this->TABLE_NAME = $TABLE_NAME;
@@ -47,16 +46,18 @@ class CPerfomanceTable extends CAllPerfomanceTable
 
 	public function IsExists($TABLE_NAME = false)
 	{
-		if($TABLE_NAME===false)
-			$TABLE_NAME = $this->TABLE_NAME;
-		if(strlen($TABLE_NAME) <= 0)
-			return false;
 		global $DB;
+
+		if ($TABLE_NAME === false)
+			$TABLE_NAME = $this->TABLE_NAME;
+		if (strlen($TABLE_NAME) <= 0)
+			return false;
+
 		$strSql = "
 			SHOW TABLES LIKE '".$DB->ForSQL($TABLE_NAME)."'
 		";
 		$rs = $DB->Query($strSql);
-		if($rs->Fetch())
+		if ($rs->Fetch())
 			return true;
 		else
 			return false;
@@ -64,23 +65,27 @@ class CPerfomanceTable extends CAllPerfomanceTable
 
 	public function GetIndexes($TABLE_NAME = false)
 	{
+		global $DB;
 		static $cache = array();
 
-		if($TABLE_NAME===false)
+		if ($TABLE_NAME === false)
 			$TABLE_NAME = $this->TABLE_NAME;
+		if (strlen($TABLE_NAME) <= 0)
+			return array();
 
-		if(!array_key_exists($TABLE_NAME, $cache))
+		if (!array_key_exists($TABLE_NAME, $cache))
 		{
-			global $DB;
-
 			$strSql = "
 				SHOW INDEXES FROM `".$DB->ForSQL($TABLE_NAME)."`
 			";
-			$rs = $DB->Query($strSql);
 			$arResult = array();
-			while($ar = $rs->Fetch())
+			$rsInd = $DB->Query($strSql, true);
+			if ($rsInd)
 			{
-				$arResult[$ar["Key_name"]][$ar["Seq_in_index"]] = $ar["Column_name"];
+				while ($arInd = $rsInd->Fetch())
+				{
+					$arResult[$arInd["Key_name"]][$arInd["Seq_in_index"]] = $arInd["Column_name"];
+				}
 			}
 			$cache[$TABLE_NAME] = $arResult;
 		}
@@ -90,24 +95,28 @@ class CPerfomanceTable extends CAllPerfomanceTable
 
 	public function GetUniqueIndexes($TABLE_NAME = false)
 	{
+		global $DB;
 		static $cache = array();
 
-		if($TABLE_NAME===false)
+		if ($TABLE_NAME === false)
 			$TABLE_NAME = $this->TABLE_NAME;
+		if (strlen($TABLE_NAME) <= 0)
+			return array();
 
-		if(!array_key_exists($TABLE_NAME, $cache))
+		if (!array_key_exists($TABLE_NAME, $cache))
 		{
-			global $DB;
-
 			$strSql = "
 				SHOW INDEXES FROM `".$DB->ForSQL($TABLE_NAME)."`
 			";
-			$rs = $DB->Query($strSql);
 			$arResult = array();
-			while($ar = $rs->Fetch())
+			$rsInd = $DB->Query($strSql, true);
+			if ($rsInd)
 			{
-				if(!$ar["Non_unique"])
-					$arResult[$ar["Key_name"]][$ar["Seq_in_index"]] = $ar["Column_name"];
+				while ($arInd = $rsInd->Fetch())
+				{
+					if (!$arInd["Non_unique"])
+						$arResult[$arInd["Key_name"]][$arInd["Seq_in_index"]] = $arInd["Column_name"];
+				}
 			}
 			$cache[$TABLE_NAME] = $arResult;
 		}
@@ -119,10 +128,12 @@ class CPerfomanceTable extends CAllPerfomanceTable
 	{
 		static $cache = array();
 
-		if($TABLE_NAME===false)
+		if ($TABLE_NAME === false)
 			$TABLE_NAME = $this->TABLE_NAME;
+		if (strlen($TABLE_NAME) <= 0)
+			return false;
 
-		if(!array_key_exists($TABLE_NAME, $cache))
+		if (!array_key_exists($TABLE_NAME, $cache))
 		{
 			global $DB;
 
@@ -132,11 +143,11 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			$rs = $DB->Query($strSql);
 			$arResult = array();
 			$arResultExt = array();
-			while($ar = $rs->Fetch())
+			while ($ar = $rs->Fetch())
 			{
 				$canSort = true;
 				$match = array();
-				if(preg_match("/^(varchar|char)\\((\\d+)\\)/", $ar["Type"], $match))
+				if (preg_match("/^(varchar|char)\\((\\d+)\\)/", $ar["Type"], $match))
 				{
 					$ar["DATA_TYPE"] = "string";
 					$ar["DATA_LENGTH"] = $match[2];
@@ -145,33 +156,33 @@ class CPerfomanceTable extends CAllPerfomanceTable
 					else
 						$ar["ORM_DATA_TYPE"] = "string";
 				}
-				elseif(preg_match("/^(varchar|char)/", $ar["Type"]))
+				elseif (preg_match("/^(varchar|char)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "string";
 					$ar["ORM_DATA_TYPE"] = "string";
 				}
-				elseif(preg_match("/^(text|longtext|mediumtext)/", $ar["Type"]))
+				elseif (preg_match("/^(text|longtext|mediumtext)/", $ar["Type"]))
 				{
 					$canSort = false;
 					$ar["DATA_TYPE"] = "string";
 					$ar["ORM_DATA_TYPE"] = "text";
 				}
-				elseif(preg_match("/^(datetime|timestamp)/", $ar["Type"]))
+				elseif (preg_match("/^(datetime|timestamp)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "datetime";
 					$ar["ORM_DATA_TYPE"] = "datetime";
 				}
-				elseif(preg_match("/^(date)/", $ar["Type"]))
+				elseif (preg_match("/^(date)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "date";
 					$ar["ORM_DATA_TYPE"] = "date";
 				}
-				elseif(preg_match("/^(int|smallint|bigint)/", $ar["Type"]))
+				elseif (preg_match("/^(int|smallint|bigint|tinyint)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "int";
 					$ar["ORM_DATA_TYPE"] = "integer";
 				}
-				elseif(preg_match("/^(float|double)/", $ar["Type"]))
+				elseif (preg_match("/^(float|double|decimal)/", $ar["Type"]))
 				{
 					$ar["DATA_TYPE"] = "double";
 					$ar["ORM_DATA_TYPE"] = "float";
@@ -197,91 +208,14 @@ class CPerfomanceTable extends CAllPerfomanceTable
 			$cache[$TABLE_NAME] = array($arResult, $arResultExt);
 		}
 
-		if($bExtended)
+		if ($bExtended)
 			return $cache[$TABLE_NAME][1];
 		else
 			return $cache[$TABLE_NAME][0];
 	}
-
-	public static function NavQuery($arNavParams, $arQuerySelect, $strTableName, $strQueryWhere, $arQueryOrder)
-	{
-		global $DB;
-		if(IntVal($arNavParams["nTopCount"]) <= 0)
-		{
-			$strSql = "
-				SELECT
-					count(1) C
-				FROM
-					".$strTableName." t
-			";
-			if($strQueryWhere)
-			{
-				$strSql .= "
-					WHERE
-					".$strQueryWhere."
-				";
-			}
-			$res_cnt = $DB->Query($strSql);
-			$res_cnt = $res_cnt->Fetch();
-			$cnt = $res_cnt["C"];
-
-			$strSql = "
-				SELECT
-				".implode(", ", $arQuerySelect)."
-				FROM
-					".$strTableName." t
-			";
-			if($strQueryWhere)
-			{
-				$strSql .= "
-					WHERE
-					".$strQueryWhere."
-				";
-			}
-			if(count($arQueryOrder) > 0)
-			{
-				$strSql .= "
-					ORDER BY
-					".implode(", ", $arQueryOrder)."
-				";
-			}
-
-			$res = new CDBResult();
-			$res->NavQuery($strSql, $cnt, $arNavParams);
-
-			return $res;
-		}
-		else
-		{
-			$strSql = "
-				SELECT
-				".implode(", ", $arQuerySelect)."
-				FROM
-					".$strTableName." t
-			";
-			if($strQueryWhere)
-			{
-				$strSql .= "
-					WHERE
-					".$strQueryWhere."
-				";
-			}
-			if(count($arQueryOrder) > 0)
-			{
-				$strSql .= "
-					ORDER BY
-					".implode(", ", $arQueryOrder)."
-				";
-			}
-			$strSql = $strSql." LIMIT ".IntVal($arNavParams["nTopCount"]);
-			return $DB->Query($strSql);
-		}
-	}
-
 
 	public static function escapeColumn($column)
 	{
 		return "`".$column."`";
 	}
 }
-?>

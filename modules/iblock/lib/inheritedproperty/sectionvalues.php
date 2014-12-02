@@ -8,16 +8,16 @@ namespace Bitrix\Iblock\InheritedProperty;
 
 class SectionValues extends BaseValues
 {
-	protected $section_id = 0;
+	protected $sectionId = 0;
 
 	/**
-	 * @param integer $iblock_id Iblock identifier.
-	 * @param integer $section_id Section identifier.
+	 * @param integer $iblockId Iblock identifier.
+	 * @param integer $sectionId Section identifier.
 	 */
-	public function __construct($iblock_id, $section_id)
+	public function __construct($iblockId, $sectionId)
 	{
-		parent::__construct($iblock_id);
-		$this->section_id = intval($section_id);
+		parent::__construct($iblockId);
+		$this->sectionId = intval($sectionId);
 	}
 
 	/**
@@ -47,7 +47,7 @@ class SectionValues extends BaseValues
 	 */
 	public function getId()
 	{
-		return $this->section_id;
+		return $this->sectionId;
 	}
 
 	/**
@@ -57,7 +57,7 @@ class SectionValues extends BaseValues
 	 */
 	public function  createTemplateEntity()
 	{
-		return new \Bitrix\Iblock\Template\Entity\Section($this->section_id);
+		return new \Bitrix\Iblock\Template\Entity\Section($this->sectionId);
 	}
 
 	/**
@@ -71,13 +71,13 @@ class SectionValues extends BaseValues
 		$parents = array();
 		$sectionList = \Bitrix\Iblock\SectionTable::getList(array(
 			"select" => array("IBLOCK_SECTION_ID"),
-			"filter" => array("=ID" => $this->section_id),
+			"filter" => array("=ID" => $this->sectionId),
 		));
 		$section = $sectionList->fetch();
 		if ($section && $section["IBLOCK_SECTION_ID"] > 0)
-			$parents[] = new SectionValues($this->iblock_id, $section["IBLOCK_SECTION_ID"]);
+			$parents[] = new SectionValues($this->iblockId, $section["IBLOCK_SECTION_ID"]);
 		else
-			$parents[] = new IblockValues($this->iblock_id);
+			$parents[] = new IblockValues($this->iblockId);
 		return $parents;
 	}
 
@@ -105,8 +105,8 @@ class SectionValues extends BaseValues
 					b_iblock_section_iprop IP
 					INNER JOIN b_iblock_iproperty P ON P.ID = IP.IPROP_ID
 				WHERE
-					IP.IBLOCK_ID = ".$this->iblock_id."
-					AND IP.SECTION_ID = ".$this->section_id."
+					IP.IBLOCK_ID = ".$this->iblockId."
+					AND IP.SECTION_ID = ".$this->sectionId."
 			");
 
 			while ($row = $query->fetch())
@@ -120,8 +120,8 @@ class SectionValues extends BaseValues
 				foreach ($result as $row)
 				{
 					$connection->add("b_iblock_section_iprop", array(
-						"IBLOCK_ID" => $this->iblock_id,
-						"SECTION_ID" => $this->section_id,
+						"IBLOCK_ID" => $this->iblockId,
+						"SECTION_ID" => $this->sectionId,
 						"IPROP_ID" => $row["ID"],
 						"VALUE" => $row["VALUE"],
 					));
@@ -141,30 +141,30 @@ class SectionValues extends BaseValues
 		$connection = \Bitrix\Main\Application::getConnection();
 		$sectionList = \Bitrix\Iblock\SectionTable::getList(array(
 			"select" => array("LEFT_MARGIN", "RIGHT_MARGIN"),
-			"filter" => array("=ID" => $this->section_id),
+			"filter" => array("=ID" => $this->sectionId),
 		));
 		$section = $sectionList->fetch();
 		if ($section)
 		{
 			$connection->query("
 				DELETE FROM b_iblock_element_iprop
-				WHERE IBLOCK_ID = ".$this->iblock_id."
+				WHERE IBLOCK_ID = ".$this->iblockId."
 				AND ELEMENT_ID in (
 					SELECT BSE.IBLOCK_ELEMENT_ID
 					FROM b_iblock_section_element BSE
 					INNER JOIN b_iblock_section BS ON BSE.IBLOCK_SECTION_ID = BS.ID AND BSE.ADDITIONAL_PROPERTY_ID IS NULL
-					WHERE BS.IBLOCK_ID = ".$this->iblock_id."
+					WHERE BS.IBLOCK_ID = ".$this->iblockId."
 					AND BS.LEFT_MARGIN <= ".$section["RIGHT_MARGIN"]."
 					AND BS.RIGHT_MARGIN >= ".$section["LEFT_MARGIN"]."
 				)
 			");
 			$connection->query("
 				DELETE FROM b_iblock_section_iprop
-				WHERE IBLOCK_ID = ".$this->iblock_id."
+				WHERE IBLOCK_ID = ".$this->iblockId."
 				AND SECTION_ID in (
 					SELECT BS.ID
 					FROM b_iblock_section BS
-					WHERE BS.IBLOCK_ID = ".$this->iblock_id."
+					WHERE BS.IBLOCK_ID = ".$this->iblockId."
 					AND BS.LEFT_MARGIN <= ".$section["RIGHT_MARGIN"]."
 					AND BS.RIGHT_MARGIN >= ".$section["LEFT_MARGIN"]."
 				)

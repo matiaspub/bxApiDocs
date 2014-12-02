@@ -59,8 +59,8 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* в фильтр строке в соответствии с языком запросов.</li> </ul> В
 	* качестве "название_поляX" может стоять любое поле заказов.<br><br>
 	* Пример фильтра: <pre class="syntax">array("~CODE" =&gt; "SH*")</pre> Этот фильтр означает
-	* "выбрать все записи, в которых значение в поле CODE (мнемонический
-	* код свойства) начинается с SH".<br><br> Значение по умолчанию - пустой
+	* "выбрать все записи, в которых значение в поле CODE (символьный код
+	* свойства) начинается с SH".<br><br> Значение по умолчанию - пустой
 	* массив array() - означает, что результат отфильтрован не будет.
 	*
 	*
@@ -102,9 +102,9 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* <td>Код значения свойства заказа.</td> </tr> <tr> <td>ORDER_ID</td> <td>Код
 	* заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код свойства.</td> </tr> <tr> <td>NAME</td>
 	* <td>Название свойства.</td> </tr> <tr> <td>VALUE</td> <td>Значение свойства.</td> </tr>
-	* <tr> <td>CODE</td> <td>Мнемонический код свойства.</td> </tr> </table> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
-	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
+	* <tr> <td>CODE</td> <td>Символьный код свойства.</td> </tr> </table> <p>Если в качестве
+	* параметра arGroupBy передается пустой массив, то функция вернет число
+	* записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 
@@ -296,7 +296,7 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* <li> <b>ORDER_ID</b> - код заказа (обязательное);</li> <li> <b>ORDER_PROPS_ID</b> - код
 	* свойства (обязательное);</li> <li> <b>NAME</b> - название свойства
 	* (обязательное);</li> <li> <b>VALUE</b> - значение свойства;</li> <li> <b>CODE</b> -
-	* мнемонический код свойства.</li> </ul>
+	* символьный код свойства.</li> </ul>
 	*
 	*
 	*
@@ -381,7 +381,7 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* заказа.</td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td>
 	* <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название свойства
 	* заказа (привязанное к значению) </td> </tr> <tr> <td>VALUE</td> <td>Значение
-	* свойства заказа.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код свойства
+	* свойства заказа.</td> </tr> <tr> <td>CODE</td> <td>Символьный код свойства
 	* заказа.</td> </tr> <tr> <td>PROPERTY_NAME</td> <td>Название свойства заказа.</td> </tr> <tr>
 	* <td>TYPE</td> <td>Тип свойства заказа.</td> </tr> <tr> <td>PROPS_GROUP_ID</td> <td>Код группы
 	* свойств заказа.</td> </tr> <tr> <td>GROUP_NAME</td> <td>Название группы свойств

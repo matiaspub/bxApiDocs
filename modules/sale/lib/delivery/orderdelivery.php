@@ -3,6 +3,7 @@ namespace Bitrix\Sale\Delivery;
 
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
+
 Loc::loadMessages(__FILE__);
 
 /**
@@ -22,11 +23,6 @@ Loc::loadMessages(__FILE__);
 
 class OrderDeliveryTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_sale_order_delivery';

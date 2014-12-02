@@ -6,7 +6,7 @@ http://www.russianpost.ru/rp/servise/ru/home/postuslug/bookpostandparcel/local#p
 ********************************************************************************/
 CModule::IncludeModule('sale');
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_rus_post.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_rus_post.php');
 
 // define('DELIVERY_RP_CSV_PATH', $_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/sale/ru/delivery/rus_post'); //where we can found csv files
 

@@ -3,11 +3,20 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage main
- * @copyright 2001-2013 Bitrix
+ * @copyright 2001-2014 Bitrix
  */
 
-class CAllDatabase
+use Bitrix\Main;
+use Bitrix\Main\Data\ConnectionPool;
+
+abstract class CAllDatabase
 {
+	var $DBName;
+	var $DBHost;
+	var $DBLogin;
+	var $DBPassword;
+	var $bConnected;
+
 	var $db_Conn;
 	var $debug;
 	var $DebugToFile;
@@ -16,29 +25,52 @@ class CAllDatabase
 	var $db_ErrorSQL;
 	var $result;
 	var $type;
-	var $arQueryDebug=array();
 
 	static $arNodes = array();
-	var $column_cache = Array();
+	var $column_cache = array();
 	var $bModuleConnection;
 	var $bNodeConnection;
 	var $node_id;
-	var $bMasterOnly = 0;
 	/** @var CDatabase */
 	var $obSlave = null;
+
+	/**
+	 * @var integer
+	 * @deprecated Use \Bitrix\Main\Application::getConnection()->getTracker()->getCounter();
+	 **/
 	var $cntQuery = 0;
-	var $timeQuery = 0;
+	/**
+	 * @var float
+	 * @deprecated Use \Bitrix\Main\Application::getConnection()->getTracker()->getTime();
+	 **/
+	var $timeQuery = 0.0;
+	/**
+	 * @var \Bitrix\Main\Diag\SqlTrackerQuery[]
+	 * @deprecated Use \Bitrix\Main\Application::getConnection()->getTracker()->getQueries();
+	 **/
+	var $arQueryDebug = array();
+	/**
+	 * @var \Bitrix\Main\Diag\SqlTracker
+	 */
+	public $sqlTracker = null;
 
-	public function StartUsingMasterOnly()
+	public static function StartUsingMasterOnly()
 	{
-		$this->bMasterOnly++;
+		Main\Application::getInstance()->getConnectionPool()->useMasterOnly(true);
 	}
 
-	public function StopUsingMasterOnly()
+	public static function StopUsingMasterOnly()
 	{
-		$this->bMasterOnly--;
+		Main\Application::getInstance()->getConnectionPool()->useMasterOnly(false);
 	}
 
+	/**
+	 * @param string $node_id
+	 * @param boolean $bIgnoreErrors
+	 * @param boolean $bCheckStatus
+	 *
+	 * @return boolean|CDatabase
+	 */
 	public static function GetDBNodeConnection($node_id, $bIgnoreErrors = false, $bCheckStatus = true)
 	{
 		global $DB;
@@ -72,11 +104,12 @@ class CAllDatabase
 				$node_DB->DebugToFile = $DB->DebugToFile;
 				$node_DB->bNodeConnection = true;
 				$node_DB->node_id = $node_id;
-				if($node_DB->Connect($node["DB_HOST"], $node["DB_NAME"], $node["DB_LOGIN"], $node["DB_PASSWORD"]))
+
+				if($node_DB->Connect($node["DB_HOST"], $node["DB_NAME"], $node["DB_LOGIN"], $node["DB_PASSWORD"], "node".$node_id))
 				{
 					if(defined("DELAY_DB_CONNECT") && DELAY_DB_CONNECT===true)
 					{
-						if($node_DB->DoConnect())
+						if($node_DB->DoConnect("node".$node_id))
 							$node["DB"] = $node_DB;
 					}
 					else
@@ -104,6 +137,14 @@ class CAllDatabase
 		}
 	}
 
+	/**
+	 * Returns module database connection.
+	 * Can be used only if module supports sharding.
+	 *
+	 * @param string $module_id
+	 * @param bool $bModuleInclude
+	 * @return bool|CDatabase
+	 */
 	public static function GetModuleConnection($module_id, $bModuleInclude = false)
 	{
 		$node_id = COption::GetOptionString($module_id, "dbnode_id", "N");
@@ -145,7 +186,7 @@ class CAllDatabase
 	*
 	*
 	*
-	* @param string $host  Сервер (хост) базы данных.
+	* @param string $host  Сервер (хост) базы данных. </ht
 	*
 	*
 	*
@@ -193,10 +234,95 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php
 	* @author Bitrix
 	*/
-	public static function Connect($DBHost, $DBName, $DBLogin, $DBPassword)
+	abstract function Connect($DBHost, $DBName, $DBLogin, $DBPassword);
+
+	abstract function ConnectInternal();
+
+	public function DoConnect($connectionName = "")
 	{
-		//is extended
-		return false;
+		if($this->bConnected)
+			return true;
+
+		$app = Main\Application::getInstance();
+		if ($app != null)
+		{
+			$con = $app->getConnection($connectionName);
+			if (
+				$con
+				&& $con->isConnected()
+				&& ($con instanceof Bitrix\Main\DB\Connection)
+				&& ($this->DBHost == $con->getHost())
+				&& ($this->DBLogin == $con->getLogin())
+				&& ($this->DBName == $con->getDatabase())
+			)
+			{
+				$this->db_Conn = $con->getResource();
+				$this->bConnected = true;
+				$this->sqlTracker = null;
+				$this->cntQuery = 0;
+				$this->timeQuery = 0;
+				$this->arQueryDebug = array();
+
+				return true;
+			}
+		}
+
+		if(!$this->ConnectInternal())
+		{
+			return false;
+		}
+
+		$this->bConnected = true;
+		$this->sqlTracker = null;
+		$this->cntQuery = 0;
+		$this->timeQuery = 0;
+		$this->arQueryDebug = array();
+
+		/** @noinspection PhpUnusedLocalVariableInspection */
+		global $DB, $USER, $APPLICATION;
+		if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/after_connect.php"))
+			include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/after_connect.php");
+
+		if ($app != null)
+		{
+			$con = $app->getConnection($connectionName);
+			if(!$con && $this->bNodeConnection)
+			{
+				//create a node connection in the new kernel
+				$pool = $app->getConnectionPool();
+				$parameters = array(
+					'host' => $this->DBHost,
+					'database' => $this->DBName,
+					'login' => $this->DBLogin,
+					'password' => $this->DBPassword,
+				);
+				$con = $pool->cloneConnection(ConnectionPool::DEFAULT_CONNECTION_NAME, $connectionName, $parameters);
+				$con->setNodeId($this->node_id);
+			}
+			if (
+				$con
+				&& !$con->isConnected()
+				&& ($con instanceof Bitrix\Main\DB\Connection)
+				&& ($this->DBHost == $con->getHost())
+				&& ($this->DBLogin == $con->getLogin())
+				&& ($this->DBName == $con->getDatabase())
+			)
+			{
+				$con->setConnectionResourceNoDemand($this->db_Conn);
+			}
+		}
+
+		return true;
+	}
+
+	public function startSqlTracker()
+	{
+		if (!$this->sqlTracker)
+		{
+			$app = Main\Application::getInstance();
+			$this->sqlTracker = $app->getConnection()->startTracker();
+		}
+		return $this->sqlTracker;
 	}
 
 	public static function GetNowFunction()
@@ -264,10 +390,7 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php
 	* @author Bitrix
 	*/
-	public static function DateToCharFunction($strFieldName, $strType="FULL")
-	{
-		//is extended
-	}
+	abstract function DateToCharFunction($strFieldName, $strType="FULL");
 
 	
 	/**
@@ -330,15 +453,9 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php
 	* @author Bitrix
 	*/
-	public static function CharToDateFunction($strValue, $strType="FULL")
-	{
-		//is extended
-	}
+	abstract function CharToDateFunction($strValue, $strType="FULL");
 
-	static function Concat()
-	{
-		//is extended
-	}
+	abstract function Concat();
 
 	public static function Substr($str, $from, $length = null)
 	{
@@ -353,15 +470,9 @@ class CAllDatabase
 		return $sql.')';
 	}
 
-	public static function IsNull($expression, $result)
-	{
-		//is extended
-	}
+	abstract function IsNull($expression, $result);
 
-	public static function Length($field)
-	{
-		//is extended
-	}
+	abstract function Length($field);
 
 	public static function ToChar($expr, $len=0)
 	{
@@ -442,7 +553,6 @@ class CAllDatabase
 			$f = str_replace("YYYY", "Y", $format);		// 1999
 			$f = str_replace("MMMM", "F", $f);		// January - December
 			$f = str_replace("MM", "m", $f);		// 01 - 12
-	//		$f = str_replace("M", "M", $f);			// Jan - Dec
 			$old_f = $f = str_replace("DD", "d", $f);	// 01 - 31
 			$f = str_replace("HH", "H", $f);		// 00 - 24
 			if ($old_f === $f)
@@ -485,7 +595,7 @@ class CAllDatabase
 	*
 	*
 	*
-	* @param S $S  Минуты (00 - 59)
+	* @param S $S  Минуты (00 - 59)</b
 	*
 	*
 	*
@@ -706,6 +816,11 @@ class CAllDatabase
 		return $strResult;
 	}
 
+	/**
+	 * @param string $strSql
+	 * @param bool $bIgnoreErrors
+	 * @return CDBResult
+	 */
 	
 	/**
 	* <p>Функция выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения функция возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то функция вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то функция прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь функцией <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p>
@@ -788,11 +903,7 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
 	* @author Bitrix
 	*/
-	public static function Query($strSql, $bIgnoreErrors=false)
-	{
-		//is extended
-		return null;
-	}
+	abstract function Query($strSql, $bIgnoreErrors=false);
 
 	//query with CLOB
 	
@@ -876,13 +987,12 @@ class CAllDatabase
 	*/
 	public function QueryBind($strSql, $arBinds, $bIgnoreErrors=false)
 	{
-		//is extended
 		return $this->Query($strSql, $bIgnoreErrors);
 	}
 
-	public static function QueryLong($strSql, $bIgnoreErrors = false)
+	public function QueryLong($strSql, $bIgnoreErrors = false)
 	{
-		return null;
+		return $this->Query($strSql, $bIgnoreErrors);
 	}
 
 	
@@ -892,7 +1002,7 @@ class CAllDatabase
 	*
 	*
 	*
-	* @param string $value  Исходная строка. </h
+	* @param string $value  Исходная строка.
 	*
 	*
 	*
@@ -933,10 +1043,7 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/forsql.php
 	* @author Bitrix
 	*/
-	public static function ForSql($strValue, $iMaxLength=0)
-	{
-		//is extended
-	}
+	abstract function ForSql($strValue, $iMaxLength=0);
 
 	
 	/**
@@ -996,10 +1103,7 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareinsert.php
 	* @author Bitrix
 	*/
-	public static function PrepareInsert($strTableName, $arFields)
-	{
-		//is extended
-	}
+	abstract function PrepareInsert($strTableName, $arFields);
 
 	
 	/**
@@ -1064,10 +1168,7 @@ class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/prepareupdate.php
 	* @author Bitrix
 	*/
-	public static function PrepareUpdate($strTableName, $arFields)
-	{
-		//is extended
-	}
+	abstract function PrepareUpdate($strTableName, $arFields);
 
 	
 	/**
@@ -1144,7 +1245,7 @@ class CAllDatabase
 		$ret = array();
 		$str = "";
 
-		do/**/
+		do
 		{
 			if(preg_match("%^(.*?)(['\"`#]|--|".$delimiter.")%is", $strSql, $match))
 			{
@@ -1366,78 +1467,25 @@ class CAllDatabase
 	{
 		$this->cntQuery++;
 		$this->timeQuery += $exec_time;
-
-		if (defined("BX_NO_SQL_BACKTRACE"))
-		{
-			$trace = false;
-		}
-		else
-		{
-			$trace = array();
-			foreach(Bitrix\Main\Diag\Helper::getBackTrace(8) as $i => $tr)
-			{
-				if ($i > 0)
-				{
-					$args = array();
-					if (is_array($tr["args"]))
-					{
-						foreach ($tr["args"] as $k1 => $v1)
-						{
-							if (is_array($v1))
-							{
-								foreach ($v1 as $k2 => $v2)
-								{
-									if (is_scalar($v2))
-										$args[$k1][$k2] = $v2;
-									elseif (is_object($v2))
-										$args[$k1][$k2] = get_class($v2);
-									else
-										$args[$k1][$k2] = gettype($v2);
-								}
-							}
-							else
-							{
-								if (is_scalar($v1))
-									$args[$k1] = $v1;
-								elseif (is_object($v1))
-									$args[$k1] = get_class($v1);
-								else
-									$args[$k1] = gettype($v1);
-							}
-						}
-					}
-
-					$trace[] = array(
-						"file" => $tr["file"],
-						"line" => $tr["line"],
-						"class" => $tr["class"],
-						"type" => $tr["type"],
-						"function" => $tr["function"],
-						"args" => $args,
-					);
-				}
-				if ($i == 7)
-					break;
-			}
-		}
-
-		$this->arQueryDebug[] = array(
-			"QUERY" => $strSql,
-			"TIME" => $exec_time,
-			"TRACE" => $trace,
-			"BX_STATE" => $GLOBALS["BX_STATE"],
-			"NODE_ID" => $node_id,
-		);
+		$this->arQueryDebug[] = $this->startSqlTracker()->getNewTrackerQuery()
+			->setSql($strSql)
+			->setTime($exec_time)
+			->setTrace(defined("BX_NO_SQL_BACKTRACE")? null: Main\Diag\Helper::getBackTrace(8, null, 2))
+			->setState($GLOBALS["BX_STATE"])
+			->setNode($node_id)
+		;
 	}
 
 	public function addDebugTime($index, $exec_time)
 	{
-		if (isset($this->arQueryDebug[$index]))
-			$this->arQueryDebug[$index]["TIME"] += $exec_time;
+		if ($this->arQueryDebug[$index])
+		{
+			$this->arQueryDebug[$index]->addTime($exec_time);
+		}
 	}
 }
 
-class CAllDBResult
+abstract class CAllDBResult
 {
 	var $result;
 	var $arResult;
@@ -1459,7 +1507,9 @@ class CAllDBResult
 	var $arGetNextCache = false;
 	var $bDescPageNumbering = false;
 	/** @var array */
-	var $arUserMultyFields = false;
+	var $arUserFields = false;
+	var $usedUserFields = false;
+	/** @var array */
 	var $SqlTraceIndex = false;
 	/** @var CDatabase */
 	var $DB;
@@ -1467,7 +1517,7 @@ class CAllDBResult
 	var $is_filtered = false;
 	var $nStartPage = 0;
 	var $nEndPage = 0;
-	/** @var \Bitrix\Main\DB\Result */
+	/** @var Main\DB\Result */
 	var $resultObject = null;
 
 	/** @param CDBResult $res */
@@ -1498,13 +1548,13 @@ class CAllDBResult
 			$this->bDescPageNumbering = $res->bDescPageNumbering;
 			$this->SqlTraceIndex = $res->SqlTraceIndex;
 			$this->DB = $res->DB;
-			$this->arUserMultyFields = $res->arUserMultyFields;
+			$this->arUserFields = $res->arUserFields;
 		}
-		elseif($obj && $res instanceof \Bitrix\Main\DB\ArrayResult)
+		elseif($obj && $res instanceof Main\DB\ArrayResult)
 		{
 			$this->InitFromArray($res->getResource());
 		}
-		elseif($obj && $res instanceof \Bitrix\Main\DB\Result)
+		elseif($obj && $res instanceof Main\DB\Result)
 		{
 			$this->result = $res->getResource();
 			$this->resultObject = $res;
@@ -1547,13 +1597,10 @@ class CAllDBResult
 			'arGetNextCache',
 			'bDescPageNumbering',
 			'arUserMultyFields',
-			//'SqlTraceIndex',
-			//'DB',
 		);
 	}
 
 	/**
-	 * @abstract
 	 * @return array
 	 */
 	
@@ -1587,19 +1634,12 @@ class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
 	* @author Bitrix
 	*/
-	public static function Fetch()
-	{
-		return array();
-	}
+	abstract function Fetch();
 
 	/**
-	 * @abstract
 	 * @return array
 	 */
-	protected function FetchInternal()
-	{
-		return array();
-	}
+	abstract protected function FetchInternal();
 
 	
 	/**
@@ -1624,7 +1664,6 @@ class CAllDBResult
 	*     echo $rsBanners-&gt;NavPrint("Баннеры");
 	* endif;
 	* ?&gt;
-	* </ht
 	* </pre>
 	*
 	*
@@ -1639,9 +1678,7 @@ class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
 	* @author Bitrix
 	*/
-	public static function SelectedRowsCount()
-	{
-	}
+	abstract function SelectedRowsCount();
 
 	
 	/**
@@ -1697,9 +1734,7 @@ class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
 	* @author Bitrix
 	*/
-	public static function AffectedRowsCount()
-	{
-	}
+	abstract function AffectedRowsCount();
 
 	
 	/**
@@ -1736,9 +1771,7 @@ class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
 	* @author Bitrix
 	*/
-	public static function FieldsCount()
-	{
-	}
+	abstract function FieldsCount();
 
 	
 	/**
@@ -1779,9 +1812,7 @@ class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
 	* @author Bitrix
 	*/
-	static function FieldName($iCol)
-	{
-	}
+	abstract function FieldName($iCol);
 
 	public function NavContinue()
 	{
@@ -2537,7 +2568,6 @@ class CAllDBResult
 	* endwhile;
 	* echo $rsBanners-&gt;NavPrint("Баннеры");
 	* ?&gt;
-	* </ht
 	* </pre>
 	*
 	*
@@ -2605,9 +2635,7 @@ class CAllDBResult
 		}
 	}
 
-	public static function DBNavStart()
-	{
-	}
+	abstract function DBNavStart();
 
 	
 	/**
@@ -2731,7 +2759,6 @@ class CAllDBResult
 	* endwhile;
 	* echo $rsBanners-&gt;NavPrint("Баннеры");
 	* ?&gt;
-	* </ht
 	* </pre>
 	*
 	*
@@ -2814,7 +2841,7 @@ class CAllDBResult
 	*
 	*
 	*
-	* @param templateNam $e = "" Название шаблона </h
+	* @param templateNam $e = "" Название шаблона
 	*
 	*
 	*
@@ -2899,13 +2926,64 @@ class CAllDBResult
 
 	public function SetUserFields($arUserFields)
 	{
-		$this->arUserMultyFields = array();
-		if(is_array($arUserFields))
-			foreach($arUserFields as $FIELD_NAME=>$arUserField)
-				if($arUserField["MULTIPLE"]=="Y")
-					$this->arUserMultyFields[$FIELD_NAME] = true;
-		if(count($this->arUserMultyFields)<1)
-			$this->arUserMultyFields = false;
+		if (is_array($arUserFields))
+		{
+			$this->arUserFields = $arUserFields;
+			$this->usedUserFields = false;
+		}
+		else
+		{
+			$this->arUserFields = false;
+			$this->usedUserFields = false;
+		}
 	}
 
+	protected function AfterFetch(&$res)
+	{
+		global $USER_FIELD_MANAGER;
+
+		if($this->arUserFields)
+		{
+			//Cache actual user fields on first fetch
+			if ($this->usedUserFields === false)
+			{
+				$this->usedUserFields = array();
+				foreach($this->arUserFields as $userField)
+				{
+					if (array_key_exists($userField['FIELD_NAME'], $res))
+						$this->usedUserFields[] = $userField;
+				}
+			}
+			// We need to call OnAfterFetch for each user field
+			foreach($this->usedUserFields as $userField)
+			{
+				$name = $userField['FIELD_NAME'];
+				if ($userField['MULTIPLE'] === 'Y')
+				{
+					if (substr($res[$name], 0, 1) !== 'a' && $res[$name] > 0)
+					{
+						$res[$name] = $USER_FIELD_MANAGER->LoadMultipleValues($userField, $res[$name]);
+					}
+					else
+					{
+						$res[$name] = unserialize($res[$name]);
+					}
+					$res[$name] = $USER_FIELD_MANAGER->OnAfterFetch($userField, $res[$name]);
+				}
+				else
+				{
+					$res[$name] = $USER_FIELD_MANAGER->OnAfterFetch($userField, $res[$name]);
+				}
+			}
+		}
+
+		if ($this->arReplacedAliases)
+		{
+			foreach($this->arReplacedAliases as $tech => $human)
+			{
+				$res[$human] = $res[$tech];
+				unset($res[$tech]);
+			}
+		}
+	}
 }

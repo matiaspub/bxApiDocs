@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.
+ * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.</body> </html>
  *
  *
  *
@@ -145,6 +145,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arFields["GROUP_ID"]);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$arFields["USER_ID"]);
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 			}
 		}
 
@@ -253,6 +254,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arUser2GroupOld["GROUP_ID"]);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$arUser2GroupOld["USER_ID"]);
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 			}
 		}
 		else

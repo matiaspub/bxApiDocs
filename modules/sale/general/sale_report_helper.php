@@ -62,7 +62,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			unset($i, $row, $result);
 
 			// Initializing list of statuses of orders.
-			$result = Bitrix\Sale\StatusTable::getList(array(
+			$result = Bitrix\Sale\StatusLangTable::getList(array(
 				'select' => array('STATUS_ID', 'NAME'),
 				'filter' => array('=LID' => LANGUAGE_ID)
 			));
@@ -733,9 +733,9 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";s:5:"alias";'.
 						's:9:"xxxxxxxxx";s:4:"aggr";s:12:"GROUP_CONCAT";s:8:"grouping";b:1;}i:8;'.
 						'a:2:{s:4:"name";s:15:"NAME_WITH_IDENT";s:8:"grouping";b:1;}i:25;a:3:{s:4:"name";'.
-						's:61:"StoreProduct:SALE_PRODUCT.ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE";s:5:"alias";'.
+						's:35:"ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE";s:5:"alias";'.
 						's:6:"xxxxxx";s:17:"grouping_subtotal";b:1;}i:26;a:3:{s:4:"name";'.
-						's:61:"StoreProduct:SALE_PRODUCT.EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE";'.
+						's:35:"EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE";'.
 						's:5:"alias";s:6:"xxxxxx";s:17:"grouping_subtotal";b:1;}i:23;a:3:{s:4:"name";'.
 						's:32:"StoreProduct:SALE_PRODUCT.AMOUNT";s:5:"alias";s:16:"xxxxxxxx xxxxxxx";'.
 						's:17:"grouping_subtotal";b:1;}i:11;a:1:{s:4:"name";s:22:"PRICE_IN_SITE_CURRENCY";'.
@@ -1188,10 +1188,10 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'Bitrix\Main\User' => array(
+			'\Bitrix\Main\User' => array(
 				'EQUAL'
 			),
-			'Bitrix\Main\Group' => array(
+			'\Bitrix\Main\Group' => array(
 				'EQUAL'
 			)
 		));
@@ -1265,7 +1265,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 	public static function fillFilterReferenceColumn(&$filterElement, Entity\ReferenceField $field)
 	{
-		if ($field->GetDataType() == 'Bitrix\Main\User')
+		if ($field->getRefEntityName() == '\Bitrix\Main\User')
 		{
 			// USER
 			if ($filterElement['value'])
@@ -1288,7 +1288,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 				$filterElement['value'] = array('id' => '');
 			}
 		}
-		else if ($field->GetDataType() == 'Bitrix\Main\Group')
+		else if ($field->getRefEntityName() == '\Bitrix\Main\Group')
 		{
 			// GROUP
 			if ($filterElement['value'])
@@ -1346,7 +1346,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
-		if ($cInfo['field']->GetDataType() !== 'float' )    // skip base rounding
+		/** @var Bitrix\Main\Entity\Field[] $cInfo */
+		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -1702,7 +1703,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 	{
 		return array_merge(parent::getCompareVariations(), array(
 			// Order
-			'Bitrix\Sale\Status' => array(
+			'\Bitrix\Sale\StatusLang' => array(
 				'EQUAL',
 				'NOT_EQUAL'
 			),
@@ -1727,10 +1728,10 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'Bitrix\Main\User' => array(
+			'\Bitrix\Main\User' => array(
 				'EQUAL'
 			),
-			'Bitrix\Main\Group' => array(
+			'\Bitrix\Main\Group' => array(
 				'EQUAL'
 			)
 		));
@@ -1775,7 +1776,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 
 	public static function fillFilterReferenceColumn(&$filterElement, Entity\ReferenceField $field)
 	{
-		if ($field->GetDataType() == 'Bitrix\Main\User')
+		if ($field->getRefEntityName() == '\Bitrix\Main\User')
 		{
 			// USER
 			if ($filterElement['value'])
@@ -1798,7 +1799,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 				$filterElement['value'] = array('id' => '');
 			}
 		}
-		else if ($field->GetDataType() == 'Bitrix\Main\Group')
+		else if ($field->getRefEntityName() == '\Bitrix\Main\Group')
 		{
 			// GROUP
 			if ($filterElement['value'])
@@ -1972,7 +1973,8 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
-		if ($cInfo['field']->GetDataType() !== 'float' )    // skip base rounding
+		/** @var Bitrix\Main\Entity\Field[] $cInfo */
+		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -2411,10 +2413,6 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'ORDER.PERSON_TYPE_ID' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
 			// Basket
 			'PRODUCT.GoodsSection:PRODUCT.SECT' => array(
 				'EQUAL'/*,
@@ -2424,10 +2422,10 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'Bitrix\Main\User' => array(
+			'\Bitrix\Main\User' => array(
 				'EQUAL'
 			),
-			'Bitrix\Main\Group' => array(
+			'\Bitrix\Main\Group' => array(
 				'EQUAL'
 			)
 		));
@@ -2586,7 +2584,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 
 	public static function fillFilterReferenceColumn(&$filterElement, Entity\ReferenceField $field)
 	{
-		if ($field->GetDataType() == 'Bitrix\Main\User')
+		if ($field->getRefEntityName() == '\Bitrix\Main\User')
 		{
 			// USER
 			if ($filterElement['value'])
@@ -2609,7 +2607,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				$filterElement['value'] = array('id' => '');
 			}
 		}
-		else if ($field->GetDataType() == 'Bitrix\Main\Group')
+		else if ($field->getRefEntityName() == '\Bitrix\Main\Group')
 		{
 			// GROUP
 			if ($filterElement['value'])
@@ -2667,7 +2665,8 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
-		if ($cInfo['field']->GetDataType() !== 'float' )    // skip base rounding
+		/** @var Bitrix\Main\Entity\Field[] $cInfo */
+		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -2917,8 +2916,8 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 		'QUANTITY',
 		'SALED_PRODUCTS_IN_PERIOD_BY_SHOP',
 		'ARRIVED_PRODUCTS_IN_PERIOD_BY_SHOP',
-		'SALE_PRODUCT_ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE',
-		'SALE_PRODUCT_EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE',
+		'ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE',
+		'EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE',
 		'STORE_PRODUCT_SALE_PRODUCT_AMOUNT'
 	);
 
@@ -2976,6 +2975,8 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 			'CONVERSION',
 			'SALED_PRODUCTS_IN_PERIOD_BY_SHOP',
 			'ARRIVED_PRODUCTS_IN_PERIOD_BY_SHOP',
+			'ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE',
+			'EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE',
 			'IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION' => array(
 				'ID',
 				'NAME'
@@ -2987,11 +2988,120 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 				'STORE.DESCRIPTION',
 				'STORE.PHONE',
 				'STORE.SCHEDULE',
-				'ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE',
-				'EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE',
 				'AMOUNT'
 			)
 		);
+	}
+
+	public static function setRuntimeFields(\Bitrix\Main\Entity\Base $entity, $sqlTimeInterval)
+	{
+		global $DB;
+
+		$entity->addField(array(
+			'data_type' => 'integer',
+			'expression' => array(
+				'(SELECT  SUM(1) FROM b_catalog_product, b_sale_viewed_product WHERE %s = b_sale_viewed_product.PRODUCT_ID
+				AND b_catalog_product.ID = b_sale_viewed_product.PRODUCT_ID
+				AND b_sale_viewed_product.DATE_VISIT '.$sqlTimeInterval.' AND b_sale_viewed_product.LID = \''.$DB->ForSql(self::getDefaultSiteId()).'\')', 'ID'
+			)
+		), 'VIEWS_IN_PERIOD_BY_SHOP');
+
+		$entity->addField(array(
+			'data_type' => 'integer',
+			'expression' => array(
+				'(SELECT  COUNT(DISTINCT b_sale_order.ID)
+				FROM b_catalog_product
+					INNER JOIN b_sale_basket ON b_catalog_product.ID = b_sale_basket.PRODUCT_ID
+					INNER JOIN b_sale_order ON b_sale_basket.ORDER_ID = b_sale_order.ID
+				WHERE
+						b_catalog_product.ID = %s
+					AND b_sale_order.PAYED = \'Y\'
+					AND b_sale_order.DATE_INSERT '.$sqlTimeInterval.'
+					AND b_sale_basket.LID = \''.$DB->ForSql(self::getDefaultSiteId()).'\')', 'ID'
+			)
+		), 'ORDERS_IN_PERIOD_BY_SHOP');
+
+		$entity->addField(array(
+			'data_type' => 'integer',
+			'expression' => array(
+				$DB->isNull('(SELECT  SUM(b_sale_basket.QUANTITY)
+							FROM b_sale_basket
+								INNER JOIN b_sale_order ON b_sale_basket.ORDER_ID = b_sale_order.ID
+							WHERE b_sale_basket.PRODUCT_ID = %s
+								AND b_sale_order.PAYED = \'Y\'
+								AND b_sale_order.DEDUCTED = \'Y\'
+								AND b_sale_order.DATE_INSERT '.$sqlTimeInterval.'
+								AND b_sale_basket.LID = \''.$DB->ForSql(self::getDefaultSiteId()).'\')', 0).'+'.
+				$DB->isNull('(SELECT  SUM(b_catalog_docs_element.AMOUNT)
+							FROM b_catalog_store_docs
+								INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
+							WHERE b_catalog_store_docs.DOC_TYPE = \'D\'
+								AND b_catalog_store_docs.STATUS = \'Y\'
+								AND b_catalog_store_docs.DATE_DOCUMENT '.$sqlTimeInterval.'
+								AND b_catalog_docs_element.ELEMENT_ID = %s)', 0),
+				'ID', 'ID'
+			)
+		), 'SALED_PRODUCTS_IN_PERIOD_BY_SHOP');
+
+		$entity->addField(array(
+			'data_type' => 'float',
+			'expression' => array(
+				'(SELECT  SUM(b_catalog_docs_element.AMOUNT)
+					FROM b_catalog_store_docs
+					INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
+					WHERE b_catalog_store_docs.DOC_TYPE in (\'A\', \'R\')
+						AND b_catalog_store_docs.STATUS = \'Y\'
+						AND b_catalog_store_docs.DATE_DOCUMENT '.$sqlTimeInterval.'
+						AND b_catalog_docs_element.ELEMENT_ID = %s)', 'ID'
+			)
+		), 'ARRIVED_PRODUCTS_IN_PERIOD_BY_SHOP');
+
+		$entity->addField(array(
+			'data_type' => 'float',
+			'expression' => array(
+				'(SELECT  SUM(b_catalog_docs_element.AMOUNT)
+					FROM b_catalog_store_docs
+					INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
+					WHERE b_catalog_store_docs.DOC_TYPE in (\'A\', \'M\', \'R\')
+						AND b_catalog_store_docs.STATUS = \'Y\'
+						AND b_catalog_store_docs.DATE_DOCUMENT '.$sqlTimeInterval.'
+						AND b_catalog_docs_element.STORE_TO = %s
+						AND b_catalog_docs_element.ELEMENT_ID = %s)', 'StoreProduct:SALE_PRODUCT.STORE_ID', 'ID'
+			)
+		), 'ARRIVED_PRODUCTS_IN_PERIOD_BY_STORE');
+
+		$entity->addField(array(
+			'data_type' => 'integer',
+			'expression' => array(
+				$DB->isNull('(SELECT  SUM(b_sale_store_barcode.QUANTITY)
+							FROM b_sale_store_barcode
+								INNER JOIN b_sale_basket ON b_sale_store_barcode.BASKET_ID = b_sale_basket.ID
+								INNER JOIN b_sale_order ON b_sale_basket.ORDER_ID = b_sale_order.ID
+							WHERE b_sale_store_barcode.STORE_ID = %s
+								AND b_sale_basket.PRODUCT_ID = %s
+								AND b_sale_order.PAYED = \'Y\'
+								AND b_sale_order.DEDUCTED = \'Y\'
+								AND b_sale_order.DATE_INSERT '.$sqlTimeInterval.'
+								AND b_sale_basket.LID = \''.$DB->ForSql(self::getDefaultSiteId()).'\')', 0).'+'.
+				$DB->isNull('(SELECT  SUM(b_catalog_docs_element.AMOUNT)
+							FROM b_catalog_store_docs
+								INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
+							WHERE b_catalog_store_docs.DOC_TYPE in (\'M\', \'D\')
+								AND b_catalog_store_docs.STATUS = \'Y\'
+								AND b_catalog_store_docs.DATE_DOCUMENT '.$sqlTimeInterval.'
+								AND b_catalog_docs_element.STORE_FROM = %s
+								AND b_catalog_docs_element.ELEMENT_ID = %s)', 0),
+				'StoreProduct:SALE_PRODUCT.STORE_ID', 'ID', 'StoreProduct:SALE_PRODUCT.STORE_ID', 'ID'
+			)
+		), 'EXPENSE_PRODUCTS_IN_PERIOD_BY_STORE');
+
+		$entity->addField(array(
+			'data_type' => 'float',
+			'expression' => array(
+				'100 * CASE WHEN %s IS NULL OR %s = 0 THEN NULL ELSE %s / %s END',
+				'VIEWS_IN_PERIOD_BY_SHOP', 'VIEWS_IN_PERIOD_BY_SHOP', 'ORDERS_IN_PERIOD_BY_SHOP', 'VIEWS_IN_PERIOD_BY_SHOP'
+			)
+		), 'CONVERSION');
 	}
 
 	public static function getDefaultColumns()
@@ -3224,9 +3334,6 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 			}
 		}
 
-		// Site option
-		$options['RT_SITE_FILTER'] = '= \''.$DB->ForSql(self::getDefaultSiteId()).'\'';
-
 		if (self::$currentIblockFilter['value'])
 		{
 			$filter[] = array(
@@ -3283,7 +3390,8 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
-		if ($cInfo['field']->GetDataType() !== 'float' )    // skip base rounding
+		/** @var Bitrix\Main\Entity\Field[] $cInfo */
+		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}

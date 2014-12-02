@@ -21,7 +21,7 @@ class CAllSaleTax
 		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
 			return;
 
-		if (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"] != "Y")
+		if (!$arOrder["USE_VAT"])
 		{
 			if (!array_key_exists("TAX_EXEMPT", $arOrder))
 			{
@@ -74,25 +74,15 @@ class CAllSaleTax
 					);
 
 					foreach ($arOrder["TAX_LIST"] as &$arTax)
-					{
 						$arTax["VALUE_MONEY"] += $arTax["TAX_VAL"];
-
-						if ($arTax["IS_IN_PRICE"]=="Y")
-						{
-							$arTax["VALUE_FORMATED"] = " (".(($arTax["IS_PERCENT"]=="Y")?"".DoubleVal($arTax["VALUE"])."%, ":" ").GetMessage("SOA_VAT_INCLUDED").")";
-						}
-						elseif ($arTax["IS_PERCENT"]=="Y")
-						{
-							$arTax["VALUE_FORMATED"] = " (".DoubleVal($arTax["VALUE"])."%)";
-						}
-
-						if ($arTax["IS_IN_PRICE"] != "Y")
-							$arOrder["TAX_PRICE"] += roundEx($arTax["VALUE_MONEY"], SALE_VALUE_PRECISION);
-
-					}
 					unset($arTax);
 				}
 
+				foreach ($arOrder["TAX_LIST"] as $arTax)
+				{
+					if ($arTax["IS_IN_PRICE"] != "Y")
+						$arOrder["TAX_PRICE"] += roundEx($arTax["VALUE_MONEY"], SALE_VALUE_PRECISION);
+				}
 			}
 		}
 		else
@@ -307,7 +297,7 @@ class CAllSaleTax
 	* являются названия параметров, а значениями - соответствующие
 	* значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> <li> <b>NAME</b>
 	* - название налога;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li> <b>CODE</b> -
-	* мнемонический код.</li> </ul>
+	* символьный код.</li> </ul>
 	*
 	*
 	*
@@ -382,10 +372,9 @@ class CAllSaleTax
 	* @return array <p>Возвращается ассоциативный массив параметров налога с
 	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
 	* </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr> <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td>
-	* <td>Название налога.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	* налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание налога.</td> </tr> <tr>
-	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> </table> <p>  </p<a
-	* name="examples"></a>
+	* <td>Название налога.</td> </tr> <tr> <td>CODE</td> <td>Символьный код налога.</td>
+	* </tr> <tr> <td>DESCRIPTION</td> <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
+	* последнего изменения записи.</td> </tr> </table> <p>  </p<a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 
@@ -437,7 +426,7 @@ class CAllSaleTax
 	* осуществляется сортировка, а значениями - направления
 	* сортировки.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название
 	* налога;</li> <li> <b>ID</b> - код налога;</li> <li> <b>LID</b> - сайт;</li> <li> <b>CODE</b> -
-	* мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
+	* символьный код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
 	* изменения записи.</li> </ul>
 	*
 	*
@@ -445,7 +434,7 @@ class CAllSaleTax
 	* @param array $arrayarFilter = Array() Ассоциативный массив для фильтрации налогов. Ключами являются
 	* названия фильтруемых параметров, а значениями - условия на
 	* значения.<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код налога;</li> <li>
-	* <b>LID</b> - сайт;</li> <li> <b>CODE</b> - мнемонический код налога.</li> </ul>
+	* <b>LID</b> - сайт;</li> <li> <b>CODE</b> - символьный код налога.</li> </ul>
 	*
 	*
 	*
@@ -453,9 +442,9 @@ class CAllSaleTax
 	* массивы параметров налогов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
 	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr>
 	* <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
-	* <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
-	* <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего
-	* изменения записи.</td> </tr> </table> <br><br>
+	* <td>CODE</td> <td>Символьный код налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание
+	* налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего изменения
+	* записи.</td> </tr> </table> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getlist.726e1309.php

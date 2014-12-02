@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/discount
 
 
 /**
- * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.
+ * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.</body> </html>
  *
  *
  *
@@ -438,10 +438,31 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* @return CDBResult <p>Метод возвращает объект класса CDBResult.</p>
 	*
 	*
+	* <h4>Example</h4> 
+	* <pre>
+	* if (CModule::IncludeModule("catalog"))
+	* { 
+	*    $arFilter = array('COUPON' =&gt; 'CP-R8RFW-5YGGPZJ'); 
+	*    $dbCoupon = CCatalogDiscountCoupon::GetList (array(), $arFilter); 
+	*    if($arCoupon = $dbCoupon-&gt;Fetch()) 
+	*    { 
+	*        echo "&lt;pre&gt;"; 
+	*        print_r($arCoupon); 
+	*        echo "&lt;/pre&gt;"; 
+	*    } 
+	*    else
+	*    { 
+	*        echo "купона нет"; 
+	*    } 
+	* }
+	* </pre>
+	*
+	*
+	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getbyid.php">CCatalogDiscountCoupon::GetByID</a></li>
-	* </ul> </ht<br><br>
+	* </ul> </ht
 	*
 	*
 	* @static

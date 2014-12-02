@@ -183,7 +183,7 @@ class CAllSaleUserAccount
 		{
 			if ($arUserAccount["LOCKED"] == "Y")
 			{
-				if (!($dateLocked = MakeTimeStamp($arUserAccount["DATE_LOCKED"], CSite::GetDateFormat("FULL", SITE_ID)))) 
+				if (!($dateLocked = MakeTimeStamp($arUserAccount["DATE_LOCKED"], CSite::GetDateFormat("FULL", SITE_ID))))
 					$dateLocked = mktime(0, 0, 0, 1, 1, 1990);
 			}
 
@@ -356,7 +356,7 @@ class CAllSaleUserAccount
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного снятия денег с
 	* внутреннего счета пользователя и <i>false</i> в случае невозможности
-	* снять указанную сумму.</p> <h4> Примечание</h4> <p>Деньги снимаются
+	* снять указанную сумму.</p> <h4> Примечание</h4><p>Деньги снимаются
 	* только со счета той же валюты, которая передается параметром в
 	* метод. Счета пользователя в другой валюте не затрагиваются.</p> <a
 	* name="examples"></a>
@@ -739,7 +739,7 @@ class CAllSaleUserAccount
 	*
 	*
 	* @return int <p>Метод возвращает код пользовательского счета или <i>false</i> в
-	* случае ошибки.</p> <h4>Замечания</h4></bod<p>Деньги снимаются только со
+	* случае ошибки.</p> <h4>Замечания</h4><p>Деньги снимаются только со
 	* счета той же валюты, которая передается параметром в метод. Счета
 	* пользователя в другой валюте не затрагиваются.</p> <p>Если счета в
 	* данной валюте раньше у пользователя не было, то он автоматически
@@ -791,35 +791,34 @@ class CAllSaleUserAccount
 	*/
 	public static function UpdateAccount($userID, $sum, $currency, $description = "", $orderID = 0, $notes = "")
 	{
-		global $DB;
+		global $DB, $APPLICATION;
 
-		$userID = IntVal($userID);
+		$userID = (int)$userID;
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGU_EMPTYID"), "EMPTY_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SKGU_EMPTYID"), "EMPTY_USER_ID");
 			return False;
 		}
 		$dbUser = CUser::GetByID($userID);
 		if (!$dbUser->Fetch())
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $userID, GetMessage("SKGU_NO_USER")), "ERROR_NO_USER_ID");
+			$APPLICATION->ThrowException(str_replace("#ID#", $userID, GetMessage("SKGU_NO_USER")), "ERROR_NO_USER_ID");
 			return False;
 		}
 
-		$sum = str_replace(",", ".", $sum);
-		$sum = DoubleVal($sum);
+		$sum = (float)str_replace(",", ".", $sum);
 
-		$currency = Trim($currency);
-		if (strlen($currency) <= 0)
+		$currency = trim($currency);
+		if ($currency === '')
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGU_EMPTY_CUR"), "EMPTY_CURRENCY");
+			$APPLICATION->ThrowException(GetMessage("SKGU_EMPTY_CUR"), "EMPTY_CURRENCY");
 			return False;
 		}
 
-		$orderID = IntVal($orderID);
+		$orderID = (int)$orderID;
 		if (!CSaleUserAccount::Lock($userID, $currency))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGU_ACCOUNT_NOT_WORK"), "ACCOUNT_NOT_LOCKED");
+			$APPLICATION->ThrowException(GetMessage("SKGU_ACCOUNT_NOT_WORK"), "ACCOUNT_NOT_LOCKED");
 			return False;
 		}
 
@@ -850,6 +849,9 @@ class CAllSaleUserAccount
 
 		if ($result)
 		{
+			if (isset($GLOBALS["SALE_USER_ACCOUNT"]["SALE_USER_ACCOUNT_CACHE_".$userID."_".$currency]))
+				unset($GLOBALS["SALE_USER_ACCOUNT"]["SALE_USER_ACCOUNT_CACHE_".$userID."_".$currency]);
+
 			$arFields = array(
 					"USER_ID" => $userID,
 					"TRANSACT_DATE" => date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL", SITE_ID))),

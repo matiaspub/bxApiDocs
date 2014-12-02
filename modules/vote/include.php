@@ -26,8 +26,8 @@ $_SESSION["VOTE"]["VOTES"] = (is_array($_SESSION["VOTE"]["VOTES"]) ? $_SESSION["
 CModule::AddAutoloadClasses("vote", array(
 	"CVoteAnswer" => "classes/".strtolower($DB->type)."/answer.php",
 	"CVoteEvent" => "classes/".strtolower($DB->type)."/event.php",
-	"CVoteQuestion" => "classes/".strtolower($DB->type)."/question.php", 
-	"CVoteUser" => "classes/".strtolower($DB->type)."/user.php", 
+	"CVoteQuestion" => "classes/".strtolower($DB->type)."/question.php",
+	"CVoteUser" => "classes/".strtolower($DB->type)."/user.php",
 	"CVote" => "classes/".strtolower($DB->type)."/vote.php",
 	"CVoteCacheManager" => "classes/general/functions.php",
 	"CUserTypeVote" => "classes/general/usertypevote.php",
@@ -56,8 +56,8 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 	$arFieldsVote = array(
 		"CHANNEL_ID" => $CHANNEL_ID,
 		"AUTHOR_ID" => $GLOBALS["USER"]->GetID(),
-		"UNIQUE_TYPE" => $params["UNIQUE_TYPE"], 
-		"DELAY" => $params["DELAY"], 
+		"UNIQUE_TYPE" => $params["UNIQUE_TYPE"],
+		"DELAY" => $params["DELAY"],
 		"DESCRIPTION_TYPE" => $params["DELAY_TYPE"]);
 	if (!empty($arFields["DATE_START"]))
 		$arFieldsVote["DATE_START"] = $arFields["DATE_START"];
@@ -75,17 +75,17 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 	if (!CVote::CheckFields("UPDATE", $arFieldsVote)):
 		$e = $GLOBALS['APPLICATION']->GetException();
 		$aMsg[] = array(
-			"id" => "VOTE_ID", 
+			"id" => "VOTE_ID",
 			"text" => $e->GetString());
 	elseif (intval($VOTE_ID) > 0):
 		$db_res = CVote::GetByID($VOTE_ID);
 		if (!($db_res && $res = $db_res->Fetch())):
 			$aMsg[] = array(
-				"id" => "VOTE_ID", 
+				"id" => "VOTE_ID",
 				"text" => GetMessage("VOTE_VOTE_NOT_FOUND", array("#ID#", $VOTE_ID)));
 		elseif ($res["CHANNEL_ID"] != $CHANNEL_ID):
 			$aMsg[] = array(
-				"id" => "CHANNEL_ID", 
+				"id" => "CHANNEL_ID",
 				"text" => GetMessage("VOTE_CHANNEL_ID_ERR"));
 		else:
 			$arVote = $res;
@@ -123,6 +123,7 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 			$arQuestion = array(
 				"ID" => $arQuestion["ID"] > 0 && is_set($arQuestions, $arQuestion["ID"]) ? $arQuestion["ID"] : false,
 				"QUESTION" => trim($arQuestion["QUESTION"]),
+				"QUESTION_TYPE" => trim($arQuestion["QUESTION_TYPE"]),
 				"ANSWERS" => (is_array($arQuestion["ANSWERS"]) ? $arQuestion["ANSWERS"] : array()));
 
 			$arAnswers = ($arQuestion["ID"] > 0 ? $arQuestions[$arQuestion["ID"]]["ANSWERS"] : array());
@@ -134,8 +135,10 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 				{
 					$arQuestion["ANSWERS"][$keya] = array(
 						"MESSAGE" => $arAnswer["MESSAGE"],
+						"MESSAGE_TYPE" => $arAnswer["MESSAGE_TYPE"],
 						"FIELD_TYPE" => $arAnswer["FIELD_TYPE"]);
-					if ($arAnswer["ID"] > 0 && is_set($arAnswers, $arAnswer["ID"])) {
+					if ($arAnswer["ID"] > 0 && is_set($arAnswers, $arAnswer["ID"]))
+					{
 						$arQuestion["ANSWERS"][$keya]["ID"] = $arAnswer["ID"];
 						unset($arAnswers[$arAnswer["ID"]]);
 					}
@@ -145,7 +148,8 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 
 		if ($arQuestion["DEL"] == "Y" || empty($arQuestion["QUESTION"]) || empty($arQuestion["ANSWERS"]))
 		{
-			if ($arQuestion["DEL"] != "Y" && !(empty($arQuestion["QUESTION"]) && empty($arQuestion["ANSWERS"]))) {
+			if ($arQuestion["DEL"] != "Y" && !(empty($arQuestion["QUESTION"]) && empty($arQuestion["ANSWERS"])))
+			{
 				$aMsg[] = array(
 					"id" => "QUESTION_".$key,
 					"text" => (empty($arQuestion["QUESTION"]) ?
@@ -154,14 +158,21 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 			}
 			continue;
 		}
-		if ($arQuestion["ID"] > 0) {
+		if ($arQuestion["ID"] > 0)
+		{
 			unset($arQuestions[$arQuestion["ID"]]);
-			foreach($arAnswers as $arAnswer) { $arQuestion["ANSWERS"][] = ($arAnswer + array("DEL" => "Y")); }
+			foreach($arAnswers as $arAnswer)
+			{
+				$arQuestion["ANSWERS"][] = ($arAnswer + array("DEL" => "Y"));
+			}
 		}
 		$iQuestions++;
 		$arFieldsQuestions[$key] = $arQuestion;
 	}
-	foreach ($arQuestions as $arQuestion) { $arFieldsQuestions[] = ($arQuestion + array("DEL" => "Y")); }
+	foreach ($arQuestions as $arQuestion)
+	{
+		$arFieldsQuestions[] = ($arQuestion + array("DEL" => "Y"));
+	}
 
 	if (!empty($aMsg)):
 		$e = new CAdminException(array_reverse($aMsg));
@@ -179,21 +190,24 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 		$q = reset($arFieldsQuestions);
 		$arFieldsVote["TITLE"] = null;
 		do {
-			if ($q["DEL"] != "Y") {
+			if ($q["DEL"] != "Y")
+			{
 				$arFieldsVote["TITLE"] = $q["QUESTION"];
 				break;
 			}
 		} while ($q = next($arFieldsQuestions));
 		reset($arFieldsQuestions);
 	}
-	if (empty($arVote)) {
+	if (empty($arVote))
+	{
 		$arFieldsVote["UNIQUE_TYPE"] = $params["UNIQUE_TYPE"];
 		$arFieldsVote["DELAY"] = $params["DELAY"];
 		$arFieldsVote["DELAY_TYPE"] = $params["DELAY_TYPE"];
 
 		$arVote["ID"] = intval(CVote::Add($arFieldsVote));
 	}
-	else {
+	else
+	{
 		CVote::Update($VOTE_ID, $arFieldsVote);
 	}
 
@@ -247,75 +261,80 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 		}
 	}
 
-	if (intVal($arVote["ID"]) <= 0) {
+	if (intVal($arVote["ID"]) <= 0)
+	{
 		return false;
 	}
-	elseif ($iQuestions <= 0) {
+	elseif ($iQuestions <= 0)
+	{
 		CVote::Delete($arVote["ID"]);
 		return 0;
 	}
 	return $arVote["ID"];
 /************** Actions/********************************************/
 /*	$arFields = array(
-		"ID" => 345, 
-		"TITLE" => "test", 
-		"...", 
+		"ID" => 345,
+		"TITLE" => "test",
+		"...",
 		"QUESTIONS" => array(
 			array(
-				"ID" => 348, 
-				"QUESTION" => "test", 
+				"ID" => 348,
+				"QUESTION" => "test",
 				"ANSWERS" => array(
 					array(
-						"ID" => 340, 
-						"MESSAGE" => "test"), 
+						"ID" => 340,
+						"MESSAGE" => "test"),
 					array(
-						"ID" => 0, 
-						"MESSAGE" => "test"), 
+						"ID" => 0,
+						"MESSAGE" => "test"),
 					array(
 						"ID" => 350,
-						"DEL" => "Y",  
+						"DEL" => "Y",
 						"MESSAGE" => "test")
 					)
-				), 
+				),
 			array(
-				"ID" => 351, 
-				"DEL" => "Y", 
-				"QUESTION" => "test", 
+				"ID" => 351,
+				"DEL" => "Y",
+				"QUESTION" => "test",
 				"ANSWERS" => array(
 					array(
-						"ID" => 0, 
-						"MESSAGE" => "test"), 
+						"ID" => 0,
+						"MESSAGE" => "test"),
 					array(
 						"ID" => 478,
-						"DEL" => "Y",  
+						"DEL" => "Y",
 						"MESSAGE" => "test")
 					)
-				), 
+				),
 			array(
-				"ID" => 0, 
-				"QUESTION" => "test", 
+				"ID" => 0,
+				"QUESTION" => "test",
 				"ANSWERS" => array(
 					array(
-						"ID" => 0, 
-						"MESSAGE" => "test"), 
+						"ID" => 0,
+						"MESSAGE" => "test"),
 					)
-				), 
+				),
 			)
 		);
 */
-	
-	
+
+
 }
 
 function VoteIsUserVoteForVote($VOTE_ID, $USER_ID = 0)
 {
-	if (!empty($VOTE_ID)) {
+	if (!empty($VOTE_ID))
+	{
 		$res = (is_array($_SESSION["VOTE_ARRAY"]) && in_array($VOTE_ID, $_SESSION["VOTE_ARRAY"]));
-		if (!$res) {
+		if (!$res)
+		{
 			$_SESSION["VOTE"] = (is_array($_SESSION["VOTE"]) ? $_SESSION["VOTE"] : array());
 			$_SESSION["VOTE"]["VOTES"] = (is_array($_SESSION["VOTE"]["VOTES"]) ? $_SESSION["VOTE"]["VOTES"] : array());
 
-			if (!in_array($VOTE_ID, $_SESSION["VOTE"]["VOTES"])) {
+			if (!in_array($VOTE_ID, $_SESSION["VOTE"]["VOTES"]))
+			{
 				$_SESSION["VOTE"]["VOTES"][$VOTE_ID] = false;
 
 				$USER_ID = intval($USER_ID);
@@ -323,7 +342,8 @@ function VoteIsUserVoteForVote($VOTE_ID, $USER_ID = 0)
 				$arFilter = array();
 				if ($USER_ID > 0)
 					$arFilter["USER_ID"] = $USER_ID;
-				else {
+				else
+				{
 					$voteUserID = ($_SESSION["VOTE_USER_ID"] ? $_SESSION["VOTE_USER_ID"] : intval($GLOBALS["APPLICATION"]->get_cookie("VOTE_USER_ID")));
 					if ($voteUserID > 0)
 						$arFilter["VOTE_USER"] = ($_SESSION["VOTE_USER_ID"] ? $_SESSION["VOTE_USER_ID"] : $GLOBALS["APPLICATION"]->get_cookie("VOTE_USER_ID"));

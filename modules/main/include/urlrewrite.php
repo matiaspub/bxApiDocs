@@ -35,11 +35,19 @@ require_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/dbconn.p
 
 // define("BX_URLREWRITE", true);
 
-$requestUri = urldecode($_SERVER["REQUEST_URI"]);
+$foundQMark = strpos($_SERVER["REQUEST_URI"], "?");
+$requestUriWithoutParams = ($foundQMark !== false? substr($_SERVER["REQUEST_URI"], 0, $foundQMark) : $_SERVER["REQUEST_URI"]);
+$requestParams = ($foundQMark !== false? substr($_SERVER["REQUEST_URI"], $foundQMark) : "");
 
-$bUTF = (!defined("BX_UTF") && CUtil::DetectUTF8($_SERVER["REQUEST_URI"]));
-if($bUTF)
-	$requestUri = CharsetConverter::ConvertCharset($requestUri, "utf-8", (defined("BX_DEFAULT_CHARSET")? BX_DEFAULT_CHARSET : "windows-1251"));
+//decode only filename, not parameters
+$requestPage = urldecode($requestUriWithoutParams);
+
+if(!defined("BX_UTF") && CUtil::DetectUTF8($_SERVER["REQUEST_URI"]))
+{
+	$requestPage = CharsetConverter::ConvertCharset($requestPage, "utf-8", (defined("BX_DEFAULT_CHARSET")? BX_DEFAULT_CHARSET : "windows-1251"));
+}
+
+$requestUri = $requestPage.$requestParams;
 
 include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/virtual_io.php");
 $io = CBXVirtualIo::GetInstance();
@@ -48,7 +56,7 @@ $arUrlRewrite = array();
 if(file_exists($_SERVER['DOCUMENT_ROOT']."/urlrewrite.php"))
 	include($_SERVER['DOCUMENT_ROOT']."/urlrewrite.php");
 
-if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' || isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
+if((isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404') || isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
 {
 	if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' && !isset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
 	{
@@ -56,14 +64,11 @@ if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' ||
 	}
 	else
 	{
-		$foundQMark = strpos($_SERVER["REQUEST_URI"], "?");
-		$requestUriWithoutParams = ($foundQMark !== false ? substr($_SERVER["REQUEST_URI"], 0, $foundQMark) : $_SERVER["REQUEST_URI"]);
-
-		$url = $requestUri = $_SERVER["REQUEST_URI"] = $REQUEST_URI = ((is_array($_GET["SEF_APPLICATION_CUR_PAGE_URL"])) ? '' : $_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
+		$url = $requestUri = $_SERVER["REQUEST_URI"] = $REQUEST_URI = ((is_array($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))? '' : $_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
 		unset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
 	}
 
-	if(($pos=strpos($url, "?"))!==false)
+	if(($pos = strpos($url, "?")) !== false)
 	{
 		$params = substr($url, $pos+1);
 		if ($params !== false && $params !== "")
@@ -94,11 +99,9 @@ if(isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404' ||
 	}
 
 	$HTTP_GET_VARS = $_GET;
-	$sUrlPath = GetPagePath();
-	$strNavQueryString = DeleteParam(array("bxrand", "bxref", "SEF_APPLICATION_CUR_PAGE_URL"));
-	if($strNavQueryString != "")
-		$sUrlPath = $sUrlPath."?".$strNavQueryString;
-	// define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/bitrix/urlrewrite.php?SEF_APPLICATION_CUR_PAGE_URL=".urlencode($sUrlPath)));
+
+	$uriPath = GetRequestUri();
+	// define("POST_FORM_ACTION_URI", htmlspecialcharsbx("/bitrix/urlrewrite.php?SEF_APPLICATION_CUR_PAGE_URL=".urlencode($uriPath)));
 }
 
 if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
@@ -135,10 +138,10 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 
 			$urlTmp = strtolower(ltrim($url, "/\\"));
 			$urlTmp = str_replace(".", "", $urlTmp);
-			$bxUrlTmp = substr($urlTmp, 0, 16);
-			$urlTmp = substr($urlTmp, 0, 7);
+			$urlTmp7 = substr($urlTmp, 0, 7);
 
-			if (($urlTmp == "upload/" || ($urlTmp == "bitrix/" && $bxUrlTmp != "bitrix/services/")))
+			if (($urlTmp7 == "upload/"
+				|| ($urlTmp7 == "bitrix/" && substr($urlTmp, 0, 16) != "bitrix/services/" && substr($urlTmp, 0, 18) != "bitrix/groupdavphp")))
 				continue;
 
 			$ext = strtolower(GetFileExtension($url));
@@ -164,4 +167,3 @@ if(strpos($requestUri, "/bitrix/admin/") === 0)
 }
 
 // define("BX_CHECK_SHORT_URI", true);
-?>

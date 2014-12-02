@@ -4,38 +4,8 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/po
 /**********************************************************************/
 /************** POINTS ************************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumPoints</b> - класс для работы со званиями (статусами пользователей) форума.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/index.php
- * @author Bitrix
- */
 class CForumPoints extends CAllForumPoints
 {
-	
-	/**
-	* <p>Функция добавляет новое звание (рейтинг) в систему званий форума.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив атрибутов звания.
-	*
-	*
-	*
-	* @return int <p>Код добавленного звания или false в случае ошибки. </p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/cforumpoints__add.f30c517c.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -63,24 +33,6 @@ class CForumPoints extends CAllForumPoints
 /**********************************************************************/
 class CForumPoints2Post extends CAllForumPoints2Post
 {
-	
-	/**
-	* <p>Функция добавляет новую запись в таблицу соответствий между количеством сообщений пользователя на форуме и количеством баллов за одно сообщение.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив параметров записи.
-	*
-	*
-	*
-	* @return int <p>Функция возвращает код вставленной записи или false в случае
-	* ошибки.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -102,44 +54,6 @@ class CForumPoints2Post extends CAllForumPoints2Post
 /**********************************************************************/
 class CForumUserPoints extends CAllForumUserPoints
 {
-	
-	/**
-	* <p>Функция добавляет новую запись в таблицу голосований за посетителей форума.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Ассоциативный массив значений параметров записи.
-	*
-	*
-	*
-	* @return bool <p>Функция возвращает код добаленной записи или false в случае
-	* ошибки.</p> <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Текущий пользователь отдает пользователю с кодом $UID 10 голосов
-	* 
-	* $arFields = array(
-	*    "POINTS" =&gt; 10,
-	*    "FROM_USER_ID" =&gt; $USER-&gt;GetID(),
-	*    "TO_USER_ID" =&gt; $UID
-	* );
-	* 
-	* if (CForumUserPoints::Add($arFields))
-	*    echo "Голоса успешно отданы";
-	* else
-	*    echo "Ошибка голосования";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;

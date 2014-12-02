@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.
+ * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.</body> </html>
  *
  *
  *
@@ -53,8 +53,8 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	*     "FIRST_USER_ID" =&gt; 11111,
 	*     "SECOND_USER_ID" =&gt; 22222,
 	*     "RELATION" =&gt; SONET_RELATIONS_FRIEND,
-	*     "DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
-	*     "DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*     "=DATE_CREATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
+	*     "=DATE_UPDATE" =&gt; $GLOBALS["DB"]-&gt;CurrentTimeFunction(),
 	*     "MESSAGE" =&gt; 'Test',
 	*     "INITIATED_BY" =&gt; "S",
 	* );
@@ -325,7 +325,6 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 			"ID" => Array("FIELD" => "UR.ID", "TYPE" => "int"),
 			"FIRST_USER_ID" => Array("FIELD" => "UR.FIRST_USER_ID", "TYPE" => "int"),
 			"SECOND_USER_ID" => Array("FIELD" => "UR.SECOND_USER_ID", "TYPE" => "int"),
-			"USER_ID" => Array("FIELD" => "UR.FIRST_USER_ID, UR.SECOND_USER_ID", "TYPE" => "int", "WHERE_ONLY" => "Y", "WHERE" => array("CSocNetUserRelations", "PrepareSection4Where")),
 			"RELATION" => Array("FIELD" => "UR.RELATION", "TYPE" => "string"),
 			"DATE_CREATE" => Array("FIELD" => "UR.DATE_CREATE", "TYPE" => "datetime"),
 			"DATE_UPDATE" => Array("FIELD" => "UR.DATE_UPDATE", "TYPE" => "datetime"),
@@ -360,20 +359,80 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 			$arFilter["SECOND_USER_IS_ACTIVE"] = "Y";
 		}
 		
+		if (
+			(
+				array_key_exists("USER_ID", $arFilter) 
+				&& intval($arFilter["USER_ID"]) > 0
+			)
+			|| (
+				array_key_exists("!USER_ID", $arFilter) 
+				&& intval($arFilter["!USER_ID"]) > 0
+			)
+		)
+		{
+			$key = (array_key_exists("USER_ID", $arFilter) ? "USER_ID" : "!USER_ID");
+
+			$filterVal = $arFilter[$key];
+			unset($arFilter[$key]);
+
+			$arFilter2 = $arFilter;
+
+			if ($key == "USER_ID")
+			{
+				$arFilter2["SECOND_USER_ID"] = $filterVal;
+			}
+			else
+			{
+				$arFilter2["!SECOND_USER_ID"] = $filterVal;
+			}
+
+			$arSqls2 = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter2, $arGroupBy, $arSelectFields);
+
+			if ($key == "USER_ID")
+			{
+				$arFilter["FIRST_USER_ID"] = $filterVal;
+			}
+			else
+			{
+				$arFilter["!FIRST_USER_ID"] = $filterVal;
+			}
+		}
+
 		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if (is_array($arGroupBy) && count($arGroupBy)==0)
+		if (
+			is_array($arGroupBy) 
+			&& count($arGroupBy) == 0
+		)
 		{
 			$strSql =
 				"SELECT ".$arSqls["SELECT"]." ".
 				"FROM b_sonet_user_relations UR ".
 				"	".$arSqls["FROM"]." ";
 			if (strlen($arSqls["WHERE"]) > 0)
+			{
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+			}
+
+			if (
+				$arSqls2 
+				&& strlen($arSqls2["WHERE"]) > 0
+			)
+			{
+				$strSql .=
+					"UNION ".
+					"SELECT ".$arSqls["SELECT"]." ".
+					"FROM b_sonet_user_relations UR ".
+					"	".$arSqls["FROM"]." ".
+					"WHERE ".$arSqls2["WHERE"]." ";
+			}
+
 			if (strlen($arSqls["GROUPBY"]) > 0)
+			{
 				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+			}
 
 			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
 
@@ -384,17 +443,43 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 				return False;
 		}
 
-
 		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
 			"FROM b_sonet_user_relations UR ".
 			"	".$arSqls["FROM"]." ";
 		if (strlen($arSqls["WHERE"]) > 0)
+		{
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-		if (strlen($arSqls["GROUPBY"]) > 0)
-			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+		}
 		if (strlen($arSqls["ORDERBY"]) > 0)
+		{
 			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
+		}
+
+		if (
+			$arSqls2 
+			&& strlen($arSqls2["WHERE"]) > 0
+		)
+		{
+			$strSql = "(".$strSql.") ";
+			$strSql .=
+				"UNION (".
+				"SELECT ".$arSqls["SELECT"]." ".
+				"FROM b_sonet_user_relations UR ".
+				"	".$arSqls["FROM"]." ".
+				"WHERE ".$arSqls2["WHERE"]." ";
+
+			if (strlen($arSqls2["ORDERBY"]) > 0)
+			{
+				$strSql .= "ORDER BY ".$arSqls2["ORDERBY"]." ";
+			}
+			$strSql .= ") ";			
+		}
+
+		if (strlen($arSqls["GROUPBY"]) > 0)
+		{
+			$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+		}
 
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) <= 0)
 		{
@@ -439,15 +524,6 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		}
 
 		return $dbRes;
-	}
-
-public static 	function PrepareSection4Where($val, $key, $operation, $negative, $field, &$arField, &$arFilter)
-	{
-		$val = IntVal($val);
-		if ($val <= 0)
-			return False;
-
-		return (($negative == "Y") ? "NOT " : "")."(UR.FIRST_USER_ID ".$operation." ".$val." OR UR.SECOND_USER_ID ".$operation." ".$val.")";
 	}
 
 

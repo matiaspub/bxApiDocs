@@ -3,19 +3,6 @@ IncludeModuleLangFile(__FILE__);
 /**********************************************************************/
 /************** FORUM TOPIC *******************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumTopic</b> - класс для работы с темами форумов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/index.php
- * @author Bitrix
- */
 class CAllForumTopic
 {
 	public static function CanUserViewTopic($TID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
@@ -38,67 +25,6 @@ class CAllForumTopic
 		return false;
 	}
 
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новую тему в форум <i>FID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $FID  Код форума, в который пользователь хочет добавить тему.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом <code>$USER-&gt;GetUserGroupArray()</code>.
-	*
-	*
-	*
-	* @param int $iUserID = 0 Код пользователя. Для текущего пользователя он возвращается
-	* методом <code>$USER-&gt;GetID()</code>.
-	*
-	*
-	*
-	* @param bool $arForum = false Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
-	* проверяются права самого форума, а идет доверие только этому
-	* параметру. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return bool <p>Возвращает True, если пользователь имеет все права на добавление
-	* темы. В противном случае возвращается значение false.</p>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if (CForumTopic::CanUserAddTopic($FID, 
-	*                                  $USER-&gt;GetUserGroupArray(), 
-	*                                  $USER-&gt;GetID()))
-	* {
-	* 	echo "You can add topic!";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CForumTopic::CanUserUpdateTopic</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php
-	* @author Bitrix
-	*/
 	public static function CanUserAddTopic($FID, $arUserGroups, $iUserID = 0, $arForum = false, $ExternalPermission = false)
 	{
 		if (!$arForum || (!is_array($arForum)) || (intVal($arForum["ID"]) != intVal($FID)))
@@ -122,60 +48,6 @@ class CAllForumTopic
 		return false;
 	}
 
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить тему с кодом <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код темы, которую пользователь хочет изменить.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом <code>$USER-&gt;GetUserGroupArray()</code>.
-	*
-	*
-	*
-	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	* методом <code>$USER-&gt;GetID()</code>.
-	*
-	*
-	*
-	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
-	* проверяются права самого форума, а идет доверие только этому
-	* параметру. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return bool 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if (CForumTopic::CanUserUpdateTopic($ID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	* {
-	* 	echo "You can modify this topic!";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php
-	* @author Bitrix
-	*/
 	public static function CanUserUpdateTopic($TID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$TID = intVal($TID);
@@ -393,56 +265,6 @@ class CAllForumTopic
 		return True;
 	}
 
-	
-	/**
-	* <p>Создает новую тему с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной темы.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">списке
-	* полей темы</a>. Обязательные поля должны быть заполнены.
-	*
-	*
-	*
-	* @return int <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // для добавления перемещенной темы:
-	* 
-	* CForumTopic::Add(array('TITLE'=&gt;$title,
-	*  'STATE'=&gt;"L",
-	*  'USER_START_ID'=&gt;$USER-&gt;GetID(),
-	*  'USER_START_NAME'=&gt;$USER-&gt;GetLogin(),
-	*  'LAST_POSTER_NAME'=&gt;$USER-&gt;GetLogin(),
-	*  'START_DATE'=&gt;date("Y-m-d H:i:s",time()),
-	*  'FORUM_ID'=&gt;intval($val),
-	*  'TOPIC_ID'=&gt;$TID,
-	*   ));
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
-	* <li>Перед добавлением темы следует проверить возможность
-	* добавления методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuseraddtopic.php">CForumTopic::CanUserAddTopic</a>
-	* </li> <li>Для добавления и изменения сообщения и темы рекомендуется
-	* пользоваться высокоуровневой функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -544,59 +366,6 @@ class CAllForumTopic
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующей темы с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой темы.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код темы, параметры которой необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">списке
-	* полей темы</a>.
-	*
-	*
-	*
-	* @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
-	* темы не будут автоматически обсчитаны статистические данные. Это
-	* ускоряет работу функции, но создает логические ошибки в данных.
-	* Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return int <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Для того, чтобы прикрепить тему, ставим SORT=100.
-	* 
-	* CForumTopic::Update($TOPIC_ID,Array("SORT" =&gt;100))
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
-	* <li>Перед изменением темы следует проверить возможность изменения
-	* методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CanUserUpdateTopic</a> </li>
-	* <li>Для добавления и изменения сообщения и темы можно
-	* воспользоваться высокоуровневой функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields, $skip_counts = False)
 	{
 		global $DB;
@@ -792,46 +561,6 @@ class CAllForumTopic
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Функция переносит тему с кодом <b>TID</b> в форум с кодом <b>FID</b>. </p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
-	*
-	*
-	* @param int $TID  Код темы, которую необходимо перенести.
-	*
-	*
-	*
-	* @param int $FID  Код форума, в который необходимо перенести тему.
-	*
-	*
-	*
-	* @return bool <p>Функция возвращает True в случае успешного переноса и False - в
-	* противном случае </p> <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Если тема не переносится в другой форум, значит есть какие-либо ошибки, которые можно найти: 
-	* 
-	* $strErrorMessage = "";
-	* if (CForumTopic::MoveTopic2Forum($topics, $arParams["newFID"], $_REQUEST["leaveLink"])):
-	*    print_r("Good!");
-	* elseif ($GLOBALS['APPLICATION']-&gt;GetException()):
-	*    $err = $GLOBALS['APPLICATION']-&gt;GetException();
-	*    $strErrorMessage = $err-&gt;GetString();
-	*    ShowError($strErrorMessage);
-	* endif;
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/cforumtopic.movetopic2forum.php
-	* @author Bitrix
-	*/
 	public static function MoveTopic2Forum($TID, $FID, $leaveLink = "N")
 	{
 		global $DB;
@@ -961,31 +690,6 @@ class CAllForumTopic
 		return true;
 	}
 
-	
-	/**
-	* <p>Удаляет тему с кодом <i>ID</i>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код темы, которую необходимо удалить.
-	*
-	*
-	*
-	* @return bool 
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li>Перед удалением темы следует проверить возможность удаления
-	* методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserdeletetopic.php">CForumTopic::CanUserDeleteTopic</a>
-	* </li></ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -1044,46 +748,6 @@ class CAllForumTopic
 		return true;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров темы по ее коду <i>ID</i>. Результаты вызова функции кешируются, поэтому повторные вызовы метода для одной и той же темы не требуют дополнительного обращения к базе данных (при условии, что кеш не сбросился в результате изменения параметров темы).</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код темы.</bod
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив параметров. </h
-	*
-	*
-	*
-	* @return array 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arTopic = CForumTopic::GetByID($TID);
-	* if ($arTopic)
-	* {
-	*   $FID = IntVal($arTopic["FORUM_ID"]);
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -1135,49 +799,6 @@ class CAllForumTopic
 		return False;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров темы, а так же сопутствующие параметры, по ее коду <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код темы.</bod
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив параметров. </h
-	*
-	*
-	*
-	* @return array 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Распечатаем на экран все возвращаемые параметры темы
-	* $arTopic = CForumTopic::GetByIDEx($TID);
-	* if ($arTopic)
-	* {
-	*   echo "&lt;pre&gt;";
-	*   print_r($arTopic);
-	*   echo "&lt;/pre&gt;";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li></ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/getbyidex.php
-	* @author Bitrix
-	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -1270,61 +891,6 @@ class CAllForumTopic
 		return false;
 	}
 
-	
-	/**
-	* <p>Функция для темы с кодом TID возвращает коды предыдущей и следующей тем (соседних тем) форума в сортировке по дате последнего сообщения (стандартная сортировка) с учётом прав на доступ групп пользователей arUserGroups.</p>
-	*
-	*
-	*
-	*
-	* @param int $TID  Код темы, соседей которой необходимо получить.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив кодов групп пользователей для учета прав на доступ. Обычно
-	* годы групп, которым принадлежит текущий пользователь.
-	*
-	*
-	*
-	* @return array <p>Функция возвращает массив из двух элементов, первым из которых
-	* является код предадущей темы, а вторым - следующей. Если
-	* какого-либо из соседей для данной темы не существует, то вместо
-	* кода соответствующего соседа возвращается значение 0. </p> <a
-	* name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Выведем ссылки на соседние темы для темы TID с учётом прав 
-	* // текущего пользователя
-	* 
-	* list($iPREV_TOPIC, $iNEXT_TOPIC) = 
-	*     CForumTopic::GetNeighboringTopics($TID, 
-	*                                       $USER-&gt;GetUserGroupArray());
-	* 
-	* if ($iPREV_TOPIC &gt; 0)
-	*    echo "&lt;a href=\"read.php?FID=".$FID."&amp;TID=".$iPREV_TOPIC."\"&gt;";
-	* echo "Предыдущая тема";
-	* 
-	* if ($iPREV_TOPIC &gt; 0)
-	*    echo "&lt;/a&gt;";
-	* echo " | ";
-	* 
-	* if ($iNEXT_TOPIC &gt; 0)
-	*    echo "&lt;a href=\"read.php?FID=".$FID."&amp;TID=".$iNEXT_TOPIC."\"&gt;";
-	* echo "Следующая тема";
-	* 
-	* if ($iNEXT_TOPIC &gt; 0)
-	*    echo "&lt;/a&gt;";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/cforumtopic.getneighboringtopics.php
-	* @author Bitrix
-	*/
 	public static function GetNeighboringTopics($TID, $arUserGroups) // out-of-date function
 	{
 		$TID = intVal($TID);
@@ -1472,18 +1038,42 @@ class CAllForumTopic
 
 				$USER_ID = intVal($USER->GetID());
 
-				$Fields = array("USER_ID" => $USER_ID, "LAST_VISIT" => $DB->GetNowFunction(),
-					"FORUM_ID" => $arTopic["FORUM_ID"], "TOPIC_ID" => $ID);
+				$Fields = array(
+					"USER_ID" => $USER_ID,
+					"LAST_VISIT" => $DB->GetNowFunction(),
+					"FORUM_ID" => $arTopic["FORUM_ID"],
+					"TOPIC_ID" => $ID
+				);
 
-				if (intVal($LastVisit) > 0):
-					$Fields["LAST_VISIT"] = $DB->CharToDateFunction($DB->ForSql(Date(
-						CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL")), $LastVisit)), "FULL");
-				endif;
-				$rows = $DB->Update("b_forum_user_topic", $Fields, "WHERE (TOPIC_ID=".$ID." AND USER_ID=".$USER_ID.")", "File: ".__FILE__."<br>Line: ".__LINE__);
-				if (intVal($rows)<=0)
-					return $DB->Insert("b_forum_user_topic", $Fields, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if (intval($LastVisit) > 0)
+				{
+					$Fields["LAST_VISIT"] = $DB->CharToDateFunction($DB->ForSql(Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL")), $LastVisit)), "FULL");
+				}
+
+				if ($DB->type == "MYSQL")
+				{
+					$ar1 = $ar2 = $ar3 = array();
+					foreach ($Fields as $field => $value)
+					{
+						$f = "`".$field."`";
+						$v = (strlen($value)<=0 ? "''" : $value);
+						$ar1[] = $f;
+						$ar2[] = $v;
+						if ($field != "USER_ID" && $field != "TOPIC_ID")
+							$ar3[] = $f." = ".$v;
+					}
+					$strSql = "INSERT INTO b_forum_user_topic (".implode(", ", $ar1).") VALUES(".implode(", ", $ar2).") ON DUPLICATE KEY UPDATE ".implode(", ", $ar3);
+					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				}
 				else
-					return true;
+				{
+					$rows = $DB->Update("b_forum_user_topic", $Fields, "WHERE (TOPIC_ID=".$ID." AND USER_ID=".$USER_ID.")", "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($rows <= 0)
+					{
+						$DB->Insert("b_forum_user_topic", $Fields, "File: ".__FILE__."<br>Line: ".__LINE__);
+					}
+				}
+				return true;
 			}
 		}
 		elseif ($USER->IsAuthorized())

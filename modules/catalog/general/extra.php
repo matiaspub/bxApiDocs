@@ -1,5 +1,6 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
 
 
 /**
@@ -25,7 +26,7 @@ class CAllExtra
 
 	
 	/**
-	* <p>Функция возвращает параметры наценки по ее коду ID </p>
+	* <p>Функция возвращает параметры наценки по ее коду ID. Если указанной наценки не найдено, вернет <i>false</i>. </p>
 	*
 	*
 	*
@@ -78,7 +79,7 @@ class CAllExtra
 	*
 	*
 	*
-	* @param string $sValue  Начальное значение. </htm
+	* @param string $sValue  Начальное значение. </h
 	*
 	*
 	*
@@ -288,7 +289,7 @@ class CAllExtra
 		$ID = intval($ID);
 		if ('UPDATE' == $strAction && 0 >= $ID)
 		{
-			$arMsg[] = array('id' => 'ID', 'text' => GetMessage('CAT_EXTRA_ERR_UPDATE_NOT_ID'));
+			$arMsg[] = array('id' => 'ID', 'text' => Loc::getMessage('CAT_EXTRA_ERR_UPDATE_NOT_ID'));
 			$boolResult = false;
 		}
 		if (array_key_exists('ID', $arFields))
@@ -300,12 +301,12 @@ class CAllExtra
 		{
 			if (!array_key_exists('NAME', $arFields))
 			{
-				$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('CAT_EXTRA_ERROR_NONAME'));
+				$arMsg[] = array('id' => 'NAME', 'text' => Loc::getMessage('CAT_EXTRA_ERROR_NONAME'));
 				$boolResult = false;
 			}
 			if (!array_key_exists('PERCENTAGE', $arFields))
 			{
-				$arMsg[] = array('id' => 'PERCENTAGE', 'text' => GetMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
+				$arMsg[] = array('id' => 'PERCENTAGE', 'text' => Loc::getMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
 				$boolResult = false;
 			}
 		}
@@ -317,7 +318,7 @@ class CAllExtra
 				$arFields["NAME"] = trim($arFields["NAME"]);
 				if ('' == $arFields["NAME"])
 				{
-					$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('CAT_EXTRA_ERROR_NONAME'));
+					$arMsg[] = array('id' => 'NAME', 'text' => Loc::getMessage('CAT_EXTRA_ERROR_NONAME'));
 					$boolResult = false;
 				}
 			}
@@ -326,7 +327,7 @@ class CAllExtra
 				$arFields["PERCENTAGE"] = trim($arFields["PERCENTAGE"]);
 				if ('' == $arFields["PERCENTAGE"])
 				{
-					$arMsg[] = array('id' => 'PERCENTAGE', 'text' => GetMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
+					$arMsg[] = array('id' => 'PERCENTAGE', 'text' => Loc::getMessage('CAT_EXTRA_ERROR_NOPERCENTAGE'));
 					$boolResult = false;
 				}
 				else

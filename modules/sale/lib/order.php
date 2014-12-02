@@ -8,14 +8,12 @@
 namespace Bitrix\Sale;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class OrderTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_sale_order';
@@ -106,7 +104,7 @@ class OrderTable extends Entity\DataManager
 				'data_type' => 'string'
 			),
 			'STATUS' => array(
-				'data_type' => 'Status',
+				'data_type' => 'StatusLang',
 				'reference' => array(
 					'=this.STATUS_ID' => 'ref.STATUS_ID',
 					'=ref.LID' => array('?', LANGUAGE_ID)

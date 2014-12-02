@@ -1,13 +1,14 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
 
 class CCatalogEvent
 {
 	public static function GetAuditTypes()
 	{
 		return array(
-			"CAT_YAND_AGENT" => "[CAT_YAND_AGENT] ".GetMessage("CAT_YAND_AGENT"),
-			"CAT_YAND_FILE" => "[CAT_YAND_FILE] ".GetMessage('CAT_YAND_FILE'),
+			"CAT_YAND_AGENT" => "[CAT_YAND_AGENT] ".Loc::getMessage("CAT_YAND_AGENT"),
+			"CAT_YAND_FILE" => "[CAT_YAND_FILE] ".Loc::getMessage('CAT_YAND_FILE'),
 		);
 	}
 

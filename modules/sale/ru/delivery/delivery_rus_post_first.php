@@ -7,7 +7,7 @@ http://www.russianpost.ru/rp/servise/ru/home/postuslug/1class/1class_tariffs
 ********************************************************************************/
 CModule::IncludeModule('sale');
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_rus_post_first.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_rus_post_first.php');
 
 // define('DELIVERY_RPF_CSV_PATH', $_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/sale/ru/delivery/rus_post_first'); //where we can found csv files
 

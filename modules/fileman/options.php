@@ -3,7 +3,6 @@ $module_id = "fileman";
 $dicsRelPath = '/bitrix/modules/fileman/dictionaries';
 $gzDicsRelPath = BX_PERSONAL_ROOT.'/tmp/dics';
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/fileman/include.php");
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/admin/task_description.php");
 
 CUtil::InitJSCore();
 
@@ -76,119 +75,115 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 
 		// LCA - limit component access
 		COption::SetOptionString($module_id, "use_lca", ($use_lca == 'Y' ? 'Y' : 'N'));
-
-		// ******** Spell ********
-		COption::SetOptionString($module_id, "spell_check_first_client", (isset($_POST['spell_check_first_client']) ? 'Y' : 'N'));
-		if (isset($_POST['use_pspell']))
-			COption::SetOptionString($module_id, "use_pspell", "Y");
-		else
-			COption::SetOptionString($module_id, "use_pspell", "N");
-
-
-		if (isset($_POST['user_dics_path']) && $_POST['user_dics_path']!='')
-			COption::SetOptionString($module_id, "user_dics_path", $_POST['user_dics_path']);
-		else
-			COption::SetOptionString($module_id, "user_dics_path","/bitrix/modules/fileman/u_dics");
-
-
-		if (isset($_POST['use_separeted_dics']))
-			COption::SetOptionString($module_id, "use_separeted_dics", "Y");
-		else
-			COption::SetOptionString($module_id, "use_separeted_dics", "N");
-
-		COption::SetOptionString($module_id, "use_custom_spell", "N");
-
-
-		//Handle dictionary loading
-		if (isset($_POST['dic_lang']) && isset($_FILES['dic_aff']) && isset($_FILES['dic_base']) && $_FILES['dic_aff']['name'] != '' && 	$_FILES['dic_base']['name'] != '')
-		{
-			$dic_lang = $_POST['dic_lang'];
-			if (isValidLang($dic_lang))
-			{
-				$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang;
-				$dics_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang.'/dics';
-
-				if (!file_exists($lang_dir))
-					mkdir($lang_dir, BX_DIR_PERMISSIONS);
-
-				$source=$_FILES['dic_base']['tmp_name'];
-				$target = $lang_dir.'/'.$dic_lang.'.dic';
-				if (file_exists($target))
-					unlink ($target);
-				move_uploaded_file($source, $target);
-
-				$source=$_FILES['dic_aff']['tmp_name'];
-				$target = $lang_dir.'/'.$dic_lang.'.aff';
-				if (file_exists($target))
-					unlink ($target);
-				move_uploaded_file($source, $target);
-
-				if (!file_exists($dics_dir))
-					mkdir($dics_dir, BX_DIR_PERMISSIONS);
-				COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "N");
-			}
-		}
-
-		//Handle dictionary removing
-		if (isset($_POST['del_dic']))
-		{
-			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['del_dic'];
-			if (file_exists($lang_dir) && is_dir($lang_dir))
-			{
-				$dicDir = dir($lang_dir);
-				while (false !== ($entry = $dicDir->read()))
-				{
-					$entry_path = $dicDir->path.'/'.$entry;
-					if (is_dir($entry_path) && $entry=='dics')
-					{
-						//Removing files from 'dics' directory
-						$dicsDir = dir($entry_path);
-						while (false !== ($dic = $dicsDir->read()))
-						{
-							$dic_path = $dicsDir->path.'/'.$dic;
-							if (is_file($dic_path))
-								unlink ($dic_path);
-						}
-						$dicsDir->close();
-						//removing 'dics' directory
-						rmdir($entry_path);
-					}
-					elseif (is_file($entry_path))
-					{
-						unlink ($entry_path);
-					}
-				}
-				$dicDir->close();
-				rmdir($lang_dir);
-			}
-		}
-
-		//Handle dictionary indexing
-		if (isset($_POST['index_dic']))
-		{
-			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['index_dic'];
-			if (file_exists($lang_dir) && is_dir($lang_dir))
-			{
-				$dicsDir = dir($lang_dir.'/dics');
-				while (false !== ($dic = $dicsDir->read()))
-				{
-					$dic_path = $dicsDir->path.'/'.$dic;
-					if (is_file($dic_path))
-						unlink ($dic_path);
-				}
-				$dicsDir->close();
-
-				require($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/fileman/admin/spell_createDictionary.php');
-
-				$CD = new createDictionary();
-				$lang = $_POST['index_dic'];
-				$CD->init($lang,$lang_dir);
-				if ($CD->create())
-					COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "Y");
-			}
-		}
-		// ******** Spell END ********
 	}
+
+	// ******** Spell ********
+	COption::SetOptionString($module_id, "use_pspell", isset($_POST['use_pspell'])? "Y" : "N");
+
+	if (isset($_POST['user_dics_path']) && $_POST['user_dics_path']!='')
+		COption::SetOptionString($module_id, "user_dics_path", $_POST['user_dics_path']);
+	else
+		COption::SetOptionString($module_id, "user_dics_path","/bitrix/modules/fileman/u_dics");
+
+
+	if (isset($_POST['use_separeted_dics']))
+		COption::SetOptionString($module_id, "use_separeted_dics", "Y");
+	else
+		COption::SetOptionString($module_id, "use_separeted_dics", "N");
+
+	COption::SetOptionString($module_id, "use_custom_spell", "N");
+
+
+	//Handle dictionary loading
+	if (isset($_POST['dic_lang']) && isset($_FILES['dic_aff']) && isset($_FILES['dic_base']) && $_FILES['dic_aff']['name'] != '' && 	$_FILES['dic_base']['name'] != '')
+	{
+		$dic_lang = $_POST['dic_lang'];
+		if (isValidLang($dic_lang))
+		{
+			$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang;
+			$dics_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$dic_lang.'/dics';
+
+			if (!file_exists($lang_dir))
+				mkdir($lang_dir, BX_DIR_PERMISSIONS);
+
+			$source=$_FILES['dic_base']['tmp_name'];
+			$target = $lang_dir.'/'.$dic_lang.'.dic';
+			if (file_exists($target))
+				unlink ($target);
+			move_uploaded_file($source, $target);
+
+			$source=$_FILES['dic_aff']['tmp_name'];
+			$target = $lang_dir.'/'.$dic_lang.'.aff';
+			if (file_exists($target))
+				unlink ($target);
+			move_uploaded_file($source, $target);
+
+			if (!file_exists($dics_dir))
+				mkdir($dics_dir, BX_DIR_PERMISSIONS);
+			COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "N");
+		}
+	}
+
+	//Handle dictionary removing
+	if (isset($_POST['del_dic']))
+	{
+		$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['del_dic'];
+		if (file_exists($lang_dir) && is_dir($lang_dir))
+		{
+			$dicDir = dir($lang_dir);
+			while (false !== ($entry = $dicDir->read()))
+			{
+				$entry_path = $dicDir->path.'/'.$entry;
+				if (is_dir($entry_path) && $entry=='dics')
+				{
+					//Removing files from 'dics' directory
+					$dicsDir = dir($entry_path);
+					while (false !== ($dic = $dicsDir->read()))
+					{
+						$dic_path = $dicsDir->path.'/'.$dic;
+						if (is_file($dic_path))
+							unlink ($dic_path);
+					}
+					$dicsDir->close();
+					//removing 'dics' directory
+					rmdir($entry_path);
+				}
+				elseif (is_file($entry_path))
+				{
+					unlink ($entry_path);
+				}
+			}
+			$dicDir->close();
+			rmdir($lang_dir);
+		}
+	}
+
+	//Handle dictionary indexing
+	if (isset($_POST['index_dic']))
+	{
+		$lang_dir = $_SERVER['DOCUMENT_ROOT'].$dicsRelPath.'/'.$_POST['index_dic'];
+		if (file_exists($lang_dir) && is_dir($lang_dir))
+		{
+			$dicsDir = dir($lang_dir.'/dics');
+			while (false !== ($dic = $dicsDir->read()))
+			{
+				$dic_path = $dicsDir->path.'/'.$dic;
+				if (is_file($dic_path))
+					unlink ($dic_path);
+			}
+			$dicsDir->close();
+
+			require($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/fileman/admin/spell_createDictionary.php');
+
+			$CD = new createDictionary();
+			$lang = $_POST['index_dic'];
+			$CD->init($lang,$lang_dir);
+			if ($CD->create())
+				COption::SetOptionString($module_id, $dic_lang."_dic_indexed", "Y");
+		}
+	}
+	// ******** Spell END ********
+
 
 	//Entities
 	COption::SetOptionString($module_id, "ar_entities", count($ar_entities) <= 0 ? 'none' : implode(',',$ar_entities));
@@ -1391,21 +1386,14 @@ new BXButtonConfig();
 			</table>
 		</td>
 	</tr>
-<? if (!$useEditor3):?>
+<? if ($useEditor3):?>
 	<tr class="heading">
 		<td colspan="2"><? echo GetMessage("FILEMAN_OPTION_SPELL_SET");?></td>
-	</tr>
-	<tr>
-		<td width="50%"><label for="spell_check_first_client"><?echo GetMessage("FILEMAN_OPTION_FIRST_SPELL_CLIENT");?></label></td>
-		<td>
-			<input type="checkbox" name="spell_check_first_client" id="spell_check_first_client" value="Y" <?echo (COption::GetOptionString($module_id, "spell_check_first_client", "Y")=="Y") ? 'checked' : '';?>>
-		</td>
 	</tr>
 
 	<?
 	if (function_exists('pspell_config_create')):
 		$use_pspell_checked = (COption::GetOptionString($module_id, "use_pspell", "Y")=="Y") ? "checked" : "";
-
 	?>
 	<tr>
 		<td valign="top"><label for="use_pspell"><?echo GetMessage("FILEMAN_OPTION_USE_PSPELL");?></label><br>
@@ -1439,8 +1427,8 @@ new BXButtonConfig();
 			<?echo GetMessage("FILEMAN_OPTION_NOT_INSTALLED");?>
 		</td>
 	</tr>
-	<?endif;?>
-<? endif; //!$useEditor3?>
+	<?endif; // function_exists('pspell_config_create')?>
+<? endif; //$useEditor3?>
 
 <?
 /* MEDIALIB TAB*/

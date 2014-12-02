@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>.
+ * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>.</body> </html>
  *
  *
  *
@@ -117,7 +117,7 @@ class CUserOnline
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/users_online.php">Отчет "Кто на сайте"</a>
-	* </li> </ul> </htm<a name="examples"></a>
+	* </li> </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static

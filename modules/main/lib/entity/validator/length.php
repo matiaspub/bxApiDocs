@@ -72,7 +72,16 @@ class Length extends Base
 		parent::__construct();
 	}
 
-
+	/**
+	 * Checks minimum and/or maximum length (as string) of the value.
+	 * Returns true if check was successful or string with error text otherwise.
+	 *
+	 * @param mixed $value Value to check.
+	 * @param array $primary Has no use in this function.
+	 * @param array $row  Has no use in this function.
+	 * @param Entity\Field $field Field metadata.
+	 * @return boolean|string
+	 */
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
 		if ($this->min !== null)
@@ -94,5 +103,27 @@ class Length extends Base
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns minimum allowed length.
+	 * null if not set.
+	 *
+	 * @return integer|null
+	 */
+	public function getMin()
+	{
+		return $this->min;
+	}
+
+	/**
+	 * Returns maximum allowed length.
+	 * null if not set.
+	 *
+	 * @return integer|null
+	 */
+	public function getMax()
+	{
+		return $this->max;
 	}
 }

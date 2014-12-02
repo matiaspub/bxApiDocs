@@ -12,8 +12,10 @@ class BadSignatureException
 	extends SystemException
 {
 	/**
-	 * @param string $message
-	 * @param \Exception $previous
+	 * Creates new exception object for signing purposes.
+	 *
+	 * @param string $message Message.
+	 * @param \Exception $previous Previous exception.
 	 */
 	static public function __construct($message = "", \Exception $previous = null)
 	{

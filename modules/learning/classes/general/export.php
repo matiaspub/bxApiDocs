@@ -23,13 +23,13 @@ class CCoursePackage
 	var $arSite = Array();
 	var $arItems = Array();
 	var $arResources = Array();
-	var $RefID = 2;
+	var $RefID = 1;
 	var $strItems = "";
 	var $strResourses = "";
 	var $arDraftFields = Array("detail_text", "preview_text", "description");
 	var $arPicture = Array("detail_picture", "preview_picture", "file_id");
 	var $arDate = Array("active_from", "active_to", "timestamp_x", "date_create");
-
+	private $replacingResId;
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
@@ -140,7 +140,7 @@ class CCoursePackage
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes= $res->Fetch())
 		{
-			$r = $this->RefID++;
+			$r = ++$this->RefID;
 			$this->arItems[$r] = $this->_CreateContent("TES", $arRes, $r);
 			$this->strItems .= '<item identifier="TES'.$r.'" identifierref="RES'.$r.'"><title>'.htmlspecialcharsbx($arRes["NAME"]).'</title>';
 
@@ -150,8 +150,8 @@ class CCoursePackage
 				);
 			while ($arMarksRes= $marksRes->Fetch())
 			{
-				$r = $this->RefID++;
-				$this->arItems[$r] = $this->CreateTMK($arMarksRes, $r);				
+				$r = ++$this->RefID;
+				$this->arItems[$r] = $this->CreateTMK($arMarksRes, $r);
 				$this->strItems .= '<item identifier="TMK'.$r.'" identifierref="RES'.$r.'">'
 					. '<title>' . htmlspecialcharsbx($arMarksRes['MARK'] . ' (' . $arMarksRes['DESCRIPTION'] . ')') . '</title>'
 					. '</item>';
@@ -338,8 +338,12 @@ class CCoursePackage
 	*/
 	public function CreateManifest()
 	{
+		global $DB;
+
 		if (strlen($this->LAST_ERROR)>0)
 			return false;
+
+		$this->createQuestionItems($this->arCourse["LESSON_ID"]);
 
 		$strManifest = "<"."?xml version=\"1.0\" encoding=\"".$this->charset."\"?".">\n";
 		$strManifest .= '<manifest xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2" identifier="toc1">';
@@ -357,8 +361,6 @@ class CCoursePackage
 
 		return $strManifest;
 	}
-
-
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	public function _GetCourseContent($parentLessonId, $DEPTH_LEVEL = 1)
@@ -381,22 +383,19 @@ class CCoursePackage
 			else
 				$itemType = 'LES';
 
-			$r = $this->RefID++;
+			if (CLearnLesson::IsPublishProhibited($arRes['LESSON_ID'], $parentLessonId))
+				$arRes['META_PUBLISH_PROHIBITED'] = 'Y';
+			else
+				$arRes['META_PUBLISH_PROHIBITED'] = 'N';
+
+			$r = ++$this->RefID;
 			$this->arItems[$r] = $this->_CreateContent($itemType, $arRes, $r);
 			$this->strItems .= '<item identifier="' . $itemType . $r . '" identifierref="RES'.$r.'"><title>'.htmlspecialcharsbx($arRes["NAME"]).'</title>';
 			$this->strResourses  .= '<resource identifier="RES'.$r.'" type="webcontent" href="res'.$r.'.xml">'.$this->_GetResourceFiles($r).'</resource>';
 
-			$strSql = "SELECT * FROM b_learn_question WHERE LESSON_ID=".$arRes["ID"]." ORDER BY SORT ASC ";
-			$q = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			while ($arQRes = $q->Fetch())
-			{
-				$r = $this->RefID++;
-				$this->arItems[$r] = $this->CreateQTI($arQRes, $r);
-				$this->strItems .= '<item identifier="QUE'.$r.'" identifierref="RES'.$r.'"><title>'.htmlspecialcharsbx($arQRes["NAME"]).'</title></item>';
-				$this->strResourses  .= '<resource identifier="RES'.$r.'" type="imsqti_xmlv1p1" href="res'.$r.'.xml">'.$this->_GetResourceFiles($r).'</resource>';
-			}
+			$this->createQuestionItems($arRes["ID"]);
 
-			// Load content recursively for chapters			
+			// Load content recursively for chapters
 			if ($arRes['IS_CHILDS'] == '1')
 				$this->_GetCourseContent($arRes["ID"], $DEPTH_LEVEL+1);
 
@@ -422,7 +421,7 @@ class CCoursePackage
 			$str .= "<".$key.">";
 			if (in_array($key, $this->arDraftFields) && strlen($val) > 0)
 			{
-				$str .= "<![CDATA[".$this->_ReplaceImages($val,1)."]]>";
+				$str .= "<![CDATA[".$this->_ReplaceImages($val, 1)."]]>";
 			}
 			elseif (in_array($key, $this->arDate) && strlen($val) > 0)
 			{
@@ -432,7 +431,7 @@ class CCoursePackage
 			{
 				$src = CFile::GetPath($val);
 				$ext = GetFileExtension($src);
-				$this->arResources[$res_id][] = Array("DB" => $val, "SRC"=>$src, "ID"=>$val.".".$ext);
+				$this->arResources[1][] = Array("DB" => $val, "SRC"=>$src, "ID"=>$val.".".$ext);
 				$str .= $val.".".$ext;
 
 				$rs = CFile::GetByID($val);
@@ -456,7 +455,6 @@ class CCoursePackage
 		return $str;
 	}
 
-
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	public function _GetResourceFiles($res_id)
 	{
@@ -470,7 +468,6 @@ class CCoursePackage
 				$str .= '<file href="resources/res'.$res_id.'/'.$arFile["ID"].'" />';
 		return $str;
 	}
-
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	public function _CreateContent($TYPE, $arParams, $res_id)
@@ -490,7 +487,7 @@ class CCoursePackage
 			$str .= "<".$key.">";
 			if (in_array($key, $this->arDraftFields) && strlen($val) > 0)
 			{
-				$str .= "<![CDATA[".$this->_ReplaceImages($val,$res_id)."]]>";
+				$str .= "<![CDATA[".$this->_ReplaceImages($val, $res_id)."]]>";
 			}
 			elseif (in_array($key, $this->arPicture) && strlen($val) > 0)
 			{
@@ -524,33 +521,43 @@ class CCoursePackage
 		return $str;
 	}
 
-
 	// 2012-04-18 Checked/modified for compatibility with new data model
-	public function _replace_img($m0, $m1,$m2,$m3,$m4, $m5, $res_id)
+	public function _replace_img($matches)
 	{
-		$src = $m3;
+		$src = $matches[3];
 		if($src <> "" && is_file($_SERVER["DOCUMENT_ROOT"].$src))
 		{
 			$dest = basename($src);
-			//$uid = uniqid();
 			$uid = RandString(5);
-			$this->arResources[$res_id][] = Array("SRC"=>$src,  "ID"=>$uid.".".$dest);
-			return stripslashes($m1.$m2."cid:resources/res".$res_id."/".$uid.".".$dest.$m4.$m5);
-		}
-		return stripslashes($m0);
-	}
 
+			$res_id = 1;
+			$this->arResources[$this->replacingResId][] = array("SRC"=>$src, "ID"=> $uid.".".$dest);
+			return stripslashes($matches[1].$matches[2]."cid:resources/res".$this->replacingResId."/".$uid.".".$dest.$matches[4].$matches[5]);
+		}
+		return stripslashes($matches[0]);
+	}
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	public function _ReplaceImages($text, $res_id)
 	{
-		return preg_replace(
-			"/(<.+?src\s*=\s*)([\"']?)(.*?)(\\2)(.*?>)/ise",
-			"\$this->_replace_img('\\0', '\\1', '\\2', '\\3', '\\4', '\\5', " . (int) $res_id . ")",
-			$text
-		);
+		$this->replacingResId = $res_id;
+		return preg_replace_callback("/(<.+?src\\s*=\\s*)([\"']?)(.*?)(\\2)(.*?>)/is", array($this, "_replace_img"), $text);
 	}
 
+	private function createQuestionItems($lessonId)
+	{
+		global $DB;
+
+		$strSql = "SELECT * FROM b_learn_question WHERE LESSON_ID=".$lessonId." ORDER BY SORT ASC ";
+		$q = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while ($arQRes = $q->Fetch())
+		{
+			$r = ++$this->RefID;
+			$this->arItems[$r] = $this->CreateQTI($arQRes, $r);
+			$this->strItems .= '<item identifier="QUE'.$r.'" identifierref="RES'.$r.'"><title>'.htmlspecialcharsbx($arQRes["NAME"]).'</title></item>';
+			$this->strResourses  .= '<resource identifier="RES'.$r.'" type="imsqti_xmlv1p1" href="res'.$r.'.xml">'.$this->_GetResourceFiles($r).'</resource>';
+		}
+	}
 
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	public function CreateQTI($arParams, $res_id = 1)
@@ -580,7 +587,8 @@ class CCoursePackage
 		}
 
 		$str .= "</material>";
-		switch ($arParams["QUESTION_TYPE"]) {
+		switch ($arParams["QUESTION_TYPE"])
+		{
 			case "M":
 				$qType = 'Multiple';
 				break;
@@ -619,7 +627,9 @@ class CCoursePackage
 		$str .= "<bitrix>";
 		$str .= "<description>";
 		if (strlen($arParams["DESCRIPTION"])>0)
-			$str .= "<![CDATA[".$this->_ReplaceImages($arParams["DESCRIPTION"],$res_id)."]]>";
+		{
+			$str .= "<![CDATA[".$this->_ReplaceImages($arParams["DESCRIPTION"], $res_id)."]]>";
+		}
 		$str .= "</description>";
 
 		$str .= "<description_type>".$arParams["DESCRIPTION_TYPE"]."</description_type>";
@@ -633,7 +643,6 @@ class CCoursePackage
 
 		return $str;
 	}
-
 
 	public function CreateTMK($arParams, $res_id = 1)
 	{

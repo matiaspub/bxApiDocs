@@ -20,6 +20,11 @@ if (!CCatalog::IsUserExists())
 }
 
 CCatalogDiscountSave::Disable();
+CCatalogDiscountCoupon::ClearCoupon();
+if ($USER->IsAuthorized())
+{
+	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
+}
 
 function yandex_replace_special($arg)
 {
@@ -102,8 +107,11 @@ if (strlen($strExportErrorMessage)<=0)
 	@fwrite($fp, "<name>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</name>\n");
 	@fwrite($fp, "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n");
 	@fwrite($fp, "<url>http://".htmlspecialcharsbx(strlen($SETUP_SERVER_NAME) > 0 ? $SETUP_SERVER_NAME : COption::GetOptionString("main", "server_name", ""))."</url>\n");
+	@fwrite($fp, "<platform>1C-Bitrix</platform>\n");
 
-	$db_acc = CCurrency::GetList(($by="sort"), ($order="asc"));
+	$by="sort";
+	$order="asc";
+	$db_acc = CCurrency::GetList($by, $order);
 	$strTmp = "<currencies>\n";
 	$arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'KZT');
 	while ($arAcc = $db_acc->Fetch())
@@ -164,7 +172,9 @@ if (strlen($strExportErrorMessage)<=0)
 				{
 					if (!array_key_exists($arAcc['LID'], $arSiteServers))
 					{
-						$rsSite = CSite::GetList(($b="sort"), ($o="asc"), array("LID" => $arAcc["LID"]));
+						$b="sort";
+						$o="asc";
+						$rsSite = CSite::GetList($b, $o, array("LID" => $arAcc["LID"]));
 						if($arSite = $rsSite->Fetch())
 							$arAcc["SERVER_NAME"] = $arSite["SERVER_NAME"];
 						if(strlen($arAcc["SERVER_NAME"])<=0 && defined("SITE_SERVER_NAME"))
@@ -274,7 +284,7 @@ if (strlen($strExportErrorMessage)<=0)
 					}
 				}
 
-				$strTmpOff.= "<name>".yandex_text2xml($arAcc["NAME"], true)."</name>\n";
+				$strTmpOff.= "<name>".yandex_text2xml($arAcc["~NAME"], true)."</name>\n";
 				$strTmpOff.=
 					"<description>".
 					yandex_text2xml(TruncateText(

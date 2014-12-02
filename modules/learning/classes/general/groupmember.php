@@ -106,7 +106,7 @@ class CLearningGroupMember
 		}
 
 		if (!sizeof($arSqlSelect))
-			$arSqlSelect = 'LGM.USER_ID AS USER_ID';
+			$arSqlSelect[] = 'LGM.USER_ID AS USER_ID';
 
 		$arSqlSearch = self::getFilter($arFilter);
 
@@ -116,6 +116,7 @@ class CLearningGroupMember
 				U.LAST_NAME AS MEMBER_LAST_NAME,
 				U.SECOND_NAME AS MEMBER_SECOND_NAME,
 				U.LOGIN AS MEMBER_LOGIN,
+				U.EMAIL AS MEMBER_EMAIL,
 				" . implode(",\n", $arSqlSelect);
 
 		$strFrom = "
@@ -289,7 +290,7 @@ class CLearningGroupMember
 			}
 		}
 
-		return $arSqlSearch;
+		return array_filter($arSqlSearch);
 	}
 
 

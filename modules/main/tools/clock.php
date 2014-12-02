@@ -20,9 +20,10 @@ class CClock
 
 	public static function Show($arParams)
 	{
+		global $APPLICATION;
 
 		CClock::Init($arParams);
-		$GLOBALS['APPLICATION']->AddHeadScript('/bitrix/js/main/utils.js');
+		$APPLICATION->AddHeadScript('/bitrix/js/main/utils.js');
 
 		// Show input
 		switch ($arParams['view'])
@@ -77,8 +78,6 @@ class CClock
 
 		//Init JS and append CSS
 		?><script>
-		BX.loadCSS("/bitrix/themes/.default/clock.css");
-
 		function bxLoadClock_<?=$arParams['inputId']?>(callback)
 		{
 			<?if($arParams['view'] != 'inline'):?>
@@ -97,7 +96,13 @@ class CClock
 				else
 				{
 					window.bClockLoading = true;
-					return BX.loadScript(['<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/clock.js")?>'], function() {bxLoadClock_<?=$arParams['inputId']?>(callback)});
+					return BX.load(
+						[
+							'<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/clock.js")?>',
+							'<?=CUtil::GetAdditionalFileURL("/bitrix/themes/.default/clock.css")?>'
+						],
+						function() {bxLoadClock_<?=$arParams['inputId']?>(callback)}
+					);
 				}
 			}
 

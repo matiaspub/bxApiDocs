@@ -529,7 +529,7 @@ public function AddFont($family, $style='', $file='', $uni=false)
 			$s.='$desc='.var_export($desc,true).";\n";
 			$s.='$up='.$up.";\n";
 			$s.='$ut='.$ut.";\n";
-			$s.='$ttffile=\''.$ttffile."';\n";
+			$s.='$ttffile=dirname(__FILE__).\'/'.$file."';\n";
 			$s.='$originalsize='.$originalsize.";\n";
 			$s.='$fontkey=\''.$fontkey."';\n";
 			$s.="?>";

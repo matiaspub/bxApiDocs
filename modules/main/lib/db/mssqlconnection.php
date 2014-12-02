@@ -1,35 +1,61 @@
 <?php
 namespace Bitrix\Main\DB;
 
+use Bitrix\Main\ArgumentException;
+use Bitrix\Main\Diag;
+use Bitrix\Main\Entity;
+
+/**
+ * Class MssqlConnection
+ *
+ * Class for MS SQL database connections.
+ * @package Bitrix\Main\DB
+ */
 class MssqlConnection extends Connection
 {
+	/**********************************************************
+	 * SqlHelper
+	 **********************************************************/
+
 	/**
-	 * @return SqlHelper
+	 * @return \Bitrix\Main\Db\SqlHelper
 	 */
 	protected function createSqlHelper()
 	{
 		return new MssqlSqlHelper($this);
 	}
 
+	/***********************************************************
+	 * Connection and disconnection
+	 ***********************************************************/
+
+	/**
+	 * Establishes a connection to the database.
+	 * Includes php_interface/after_connect_d7.php on success.
+	 * Throws exception on failure.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\DB\ConnectionException
+	 */
 	protected function connectInternal()
 	{
 		if ($this->isConnected)
 			return;
 
 		$connectionInfo = array(
-			"UID" => $this->dbLogin,
-			"PWD" => $this->dbPassword,
-			"Database" => $this->dbName,
+			"UID" => $this->login,
+			"PWD" => $this->password,
+			"Database" => $this->database,
 			"ReturnDatesAsStrings" => true,
 			/*"CharacterSet" => "utf-8",*/
 		);
 
-		if (($this->dbOptions & self::PERSISTENT) != 0)
+		if (($this->options & self::PERSISTENT) != 0)
 			$connectionInfo["ConnectionPooling"] = true;
 		else
 			$connectionInfo["ConnectionPooling"] = false;
 
-		$connection = sqlsrv_connect($this->dbHost, $connectionInfo);
+		$connection = sqlsrv_connect($this->host, $connectionInfo);
 
 		if (!$connection)
 			throw new ConnectionException('MS Sql connect error', $this->getErrorMessage());
@@ -38,13 +64,22 @@ class MssqlConnection extends Connection
 		$this->isConnected = true;
 
 		// hide cautions
-		sqlsrv_configure ("WarningsReturnAsErrors", 0);
+		sqlsrv_configure("WarningsReturnAsErrors", 0);
 
+		/** @noinspection PhpUnusedLocalVariableInspection */
 		global $DB, $USER, $APPLICATION;
 		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
+		{
 			include($fn);
+		}
 	}
 
+	/**
+	 * Disconnects from the database.
+	 * Does nothing if there was no connection established.
+	 *
+	 * @return void
+	 */
 	protected function disconnectInternal()
 	{
 		if (!$this->isConnected)
@@ -54,26 +89,30 @@ class MssqlConnection extends Connection
 		sqlsrv_close($this->resource);
 	}
 
+	/*********************************************************
+	 * Query
+	 *********************************************************/
+
 	/**
-	 * @param $sql
-	 * @param array|null $arBinds
-	 * @param $offset
-	 * @param $limit
-	 * @param \Bitrix\Main\Diag\SqlTrackerQuery|null $trackerQuery
-	 * @return mixed
-	 * @throws SqlException|\Bitrix\Main\ArgumentException
+	 * Executes a query against connected database.
+	 * Rises SqlQueryException on any database error.
+	 * <p>
+	 * When object $trackerQuery passed then calls its startQuery and finishQuery
+	 * methods before and after query execution.
+	 *
+	 * @param string                            $sql Sql query.
+	 * @param array                             $binds Array of binds.
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery Debug collector object.
+	 *
+	 * @return resource
+	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
-	protected function queryInternal($sql, array $arBinds = null, $offset = 0, $limit = 0, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
+	protected function queryInternal($sql, array $binds = null, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		$this->connectInternal();
 
-		if($limit > 0)
-		{
-			$sql = $this->getSqlHelper()->getTopSql($sql, $limit, $offset);
-		}
-
 		if ($trackerQuery != null)
-			$trackerQuery->startQuery($sql, $arBinds);
+			$trackerQuery->startQuery($sql, $binds);
 
 		$result = sqlsrv_query($this->resource, $sql, array(), array("Scrollable" => 'forward'));
 
@@ -89,28 +128,43 @@ class MssqlConnection extends Connection
 	}
 
 	/**
-	 * @param $result
-	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery
+	 * Returns database depended result of the query.
+	 *
+	 * @param resource $result Result of internal query function.
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery Debug collector object.
+	 *
 	 * @return Result
 	 */
-	protected function createDbResult($result, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
+	protected function createResult($result, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		return new MssqlResult($result, $this, $trackerQuery);
 	}
 
-	public function getIdentity($name = "")
+	/**
+	 * @return integer
+	 */
+	public function getInsertedId()
 	{
 		return $this->queryScalar("SELECT @@IDENTITY as ID");
 	}
 
+	/**
+	 * Returns affected rows count from last executed query.
+	 *
+	 * @return integer
+	 */
 	public function getAffectedRowsCount()
 	{
 		return sqlsrv_rows_affected($this->lastQueryResult);
 	}
 
-	/*********************************************************
-	 * DDL
-	 *********************************************************/
+	/**
+	 * Checks if a table exists.
+	 *
+	 * @param string $tableName The table name.
+	 *
+	 * @return boolean
+	 */
 	public function isTableExists($tableName)
 	{
 		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
@@ -127,14 +181,35 @@ class MssqlConnection extends Connection
 		return ($result > 0);
 	}
 
-	public function isIndexExists($tableName, array $arColumns)
+	/**
+	 * Checks if an index exists.
+	 * Actual columns in the index may differ from requested.
+	 * $columns may present an "prefix" of actual index columns.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array  $columns An array of columns in the index.
+	 *
+	 * @return boolean
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
+	public function isIndexExists($tableName, array $columns)
 	{
-		return $this->getIndexName($tableName, $arColumns) !== null;
+		return $this->getIndexName($tableName, $columns) !== null;
 	}
 
-	public function getIndexName($tableName, array $arColumns, $strict = false)
+	/**
+	 * Returns the name of an index.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array $columns An array of columns in the index.
+	 * @param bool $strict The flag indicating that the columns in the index must exactly match the columns in the $arColumns parameter.
+	 *
+	 * @return string|null Name of the index or null if the index doesn't exist.
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
+	public function getIndexName($tableName, array $columns, $strict = false)
 	{
-		if (!is_array($arColumns) || count($arColumns) <= 0)
+		if (!is_array($columns) || count($columns) <= 0)
 			return null;
 
 		//2005
@@ -149,70 +224,165 @@ class MssqlConnection extends Connection
 			"   LEFT JOIN sysindexes si ON si.indid = s.indid AND si.id = s.id ".
 			"WHERE o.name = UPPER('".$this->getSqlHelper()->forSql($tableName)."')");
 
-		$arIndexes = array();
+		$indexes = array();
 		while ($ar = $rs->fetch())
-			$arIndexes[$ar["index_name"]][$ar["key_ordinal"] - 1] = $ar["column_name"];
-
-		$strColumns = implode(",", $arColumns);
-		foreach ($arIndexes as $key => $keyColumn)
 		{
-			ksort($keyColumn);
-			$strKeyColumns = implode(",", $keyColumn);
+			$indexes[$ar["index_name"]][$ar["key_ordinal"] - 1] = $ar["column_name"];
+		}
+
+		$columnsList = implode(",", $columns);
+		foreach ($indexes as $indexName => $indexColumns)
+		{
+			ksort($indexColumns);
+			$indexColumnList = implode(",", $indexColumns);
 			if ($strict)
 			{
-				if ($strKeyColumns === $strColumns)
-					return $key;
+				if ($indexColumnList === $columnsList)
+					return $indexName;
 			}
 			else
 			{
-				if (substr($strKeyColumns, 0, strlen($strColumns)) === $strColumns)
-					return $key;
+				if (substr($indexColumnList, 0, strlen($columnsList)) === $columnsList)
+					return $indexName;
 			}
 		}
 
 		return null;
 	}
 
+	/**
+	 * Returns fields objects according to the columns of a table.
+	 * Table must exists.
+	 *
+	 * @param string $tableName The table name.
+	 *
+	 * @return Entity\ScalarField[] An array of objects with columns information.
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function getTableFields($tableName)
 	{
-		if (!array_key_exists($tableName, $this->tableColumnsCache))
+		if (!isset($this->tableColumnsCache[$tableName]))
 		{
-			$this->tableColumnsCache[$tableName] = array();
-			$strSql =
-				"SELECT * ".
-				"FROM INFORMATION_SCHEMA.COLUMNS ".
-				"WHERE TABLE_NAME = '".$this->getSqlHelper()->forSql($tableName)."'";
-			$rs = $this->query($strSql);
-			while ($ar = $rs->fetch())
-			{
-				$ar["NAME"] = $ar["COLUMN_NAME"];
-				$ar["TYPE"] = $ar["DATA_TYPE"];
-				$this->tableColumnsCache[$tableName][$ar["COLUMN_NAME"]] = $ar;
-			}
+			$this->connectInternal();
+
+			$query = $this->queryInternal("SELECT TOP 0 * FROM ".$this->getSqlHelper()->quote($tableName));
+
+			$result = $this->createResult($query);
+
+			$this->tableColumnsCache[$tableName] = $result->getFields();
 		}
 		return $this->tableColumnsCache[$tableName];
 	}
 
+	/**
+	 * @param string $tableName Name of the new table.
+	 * @param \Bitrix\Main\Entity\ScalarField[] $fields Array with columns descriptions.
+	 * @param string[] $primary Array with primary key column names.
+	 * @param string[] $autoincrement Which columns will be auto incremented ones.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\ArgumentException
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
+	public function createTable($tableName, $fields, $primary = array(), $autoincrement = array())
+	{
+		$sql = 'CREATE TABLE '.$this->getSqlHelper()->quote($tableName).' (';
+		$sqlFields = array();
+
+		foreach ($fields as $columnName => $field)
+		{
+			if (!($field instanceof Entity\ScalarField))
+			{
+				throw new ArgumentException(sprintf(
+					'Field `%s` should be an Entity\ScalarField instance', $columnName
+				));
+			}
+
+			$sqlFields[] = $this->getSqlHelper()->quote($columnName)
+				. ' ' . $this->getSqlHelper()->getColumnTypeByField($field)
+				. ' NOT NULL'
+				. (in_array($columnName, $autoincrement, true) ? ' IDENTITY (1, 1)' : '')
+			;
+		}
+
+		$sql .= join(', ', $sqlFields);
+
+		if (!empty($primary))
+		{
+			foreach ($primary as &$primaryColumn)
+			{
+				$primaryColumn = $this->getSqlHelper()->quote($primaryColumn);
+			}
+
+			$sql .= ', PRIMARY KEY('.join(', ', $primary).')';
+		}
+
+		$sql .= ')';
+
+		$this->query($sql);
+	}
+
+	/**
+	 * Renames the table. Renamed table must exists and new name must not be occupied by any database object.
+	 *
+	 * @param string $currentName Old name of the table.
+	 * @param string $newName New name of the table.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function renameTable($currentName, $newName)
 	{
 		$this->query('EXEC sp_rename '.$this->getSqlHelper()->quote($currentName).', '.$this->getSqlHelper()->quote($newName));
 	}
 
+	/**
+	 * Drops the table.
+	 *
+	 * @param string $tableName Name of the table to be dropped.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
+	public function dropTable($tableName)
+	{
+		$this->query('DROP TABLE '.$this->getSqlHelper()->quote($tableName));
+	}
+
 	/*********************************************************
 	 * Transaction
 	 *********************************************************/
+
+	/**
+	 * Starts new database transaction.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function startTransaction()
 	{
 		$this->connectInternal();
 		sqlsrv_begin_transaction($this->resource);
 	}
 
+	/**
+	 * Commits started database transaction.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function commitTransaction()
 	{
 		$this->connectInternal();
 		sqlsrv_commit($this->resource);
 	}
 
+	/**
+	 * Rollbacks started database transaction.
+	 *
+	 * @return void
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function rollbackTransaction()
 	{
 		$this->connectInternal();
@@ -222,11 +392,30 @@ class MssqlConnection extends Connection
 	/*********************************************************
 	 * Type, version, cache, etc.
 	 *********************************************************/
+
+	/**
+	 * Returns database type.
+	 * <ul>
+	 * <li> mssql
+	 * </ul>
+	 *
+	 * @return string
+	 * @see \Bitrix\Main\DB\Connection::getType
+	 */
 	static public function getType()
 	{
 		return "mssql";
 	}
 
+	/**
+	 * Returns connected database version.
+	 * Version presented in array of two elements.
+	 * - First (with index 0) is database version.
+	 * - Second (with index 1) is true when light/express version of database is used.
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\Db\SqlQueryException
+	 */
 	public function getVersion()
 	{
 		if ($this->version == null)
@@ -244,14 +433,18 @@ class MssqlConnection extends Connection
 		return array($this->version, $this->versionExpress);
 	}
 
+	/**
+	 * Returns error message of last failed database operation.
+	 *
+	 * @return string
+	 */
 	protected function getErrorMessage()
 	{
 		$errors = "";
-
-		$arErrors = sqlsrv_errors(SQLSRV_ERR_ERRORS);
-		foreach ($arErrors as $error)
+		foreach (sqlsrv_errors(SQLSRV_ERR_ERRORS) as $error)
+		{
 			$errors .= "SQLSTATE: ".$error['SQLSTATE'].";"." code: ".$error['code']."; message: ".$error[ 'message']."\n";
-
+		}
 		return $errors;
 	}
 }

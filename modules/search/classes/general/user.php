@@ -99,15 +99,21 @@ class CSearchUser
 			FROM b_search_user_right
 			WHERE USER_ID = ".$this->_user_id."
 		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		$arGroupsToCheck = array_flip($arGroups);
 		while ($dbCode = $dbCodes->Fetch())
 		{
-			if (!in_array($dbCode["GROUP_CODE"], $arGroups))
+			if (!array_key_exists($dbCode["GROUP_CODE"], $arGroupsToCheck))
 			{
 				$DB->Query("
 					DELETE FROM b_search_user_right
 					WHERE USER_ID = ".$this->_user_id."
 					AND GROUP_CODE = '".$DB->ForSQL($dbCode["GROUP_CODE"])."'
 				", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+			else
+			{
+				unset($arGroups[$arGroupsToCheck[$dbCode["GROUP_CODE"]]]);
 			}
 		}
 		$this->AddGroups($arGroups);

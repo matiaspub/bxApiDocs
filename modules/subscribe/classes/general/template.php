@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CPostingTemplate</b> - класс для работы с шаблонами генерации выпусков подписки.
+ * <b>CPostingTemplate</b> - класс для работы с шаблонами генерации выпусков подписки.</body> </html>
  *
  *
  *

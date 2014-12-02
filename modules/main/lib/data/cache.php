@@ -211,7 +211,7 @@ class Cache
 		return false;
 	}
 
-	private function getPath($uniqueString)
+	public static function getPath($uniqueString)
 	{
 		$un = md5($uniqueString);
 		return substr($un, 0, 2)."/".$un.".php";
@@ -322,9 +322,6 @@ class Cache
 		}
 
 		if ($TTL <= 0)
-			return true;
-
-		if ($this->shouldClearCache())
 			return true;
 
 		ob_start();

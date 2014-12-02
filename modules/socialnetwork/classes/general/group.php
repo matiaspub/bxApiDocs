@@ -5,7 +5,7 @@ $GLOBALS["SONET_GROUP_CACHE"] = array();
 
 
 /**
- * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.
+ * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.</body> </html>
  *
  *
  *
@@ -277,6 +277,7 @@ class CAllSocNetGroup
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$ID);
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
 			}

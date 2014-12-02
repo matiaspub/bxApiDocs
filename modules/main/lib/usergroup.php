@@ -8,14 +8,12 @@
 namespace Bitrix\Main;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class UserGroupTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_user_group';

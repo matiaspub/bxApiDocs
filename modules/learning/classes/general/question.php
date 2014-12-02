@@ -188,6 +188,9 @@ class CLQuestion
 			if ($ID)
 				$USER_FIELD_MANAGER->Update('LEARNING_QUESTIONS', $ID, $arFields);
 
+			foreach(GetModuleEvents('learning', 'OnAfterQuestionAdd', true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+
 			return $ID;
 		}
 
@@ -311,6 +314,9 @@ class CLQuestion
 				$DB->QueryBind($strSql, $arBinds, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 
+			foreach(GetModuleEvents('learning', 'OnAfterQuestionUpdate', true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+
 			return true;
 		}
 		return false;
@@ -418,6 +424,9 @@ class CLQuestion
 			'ITEM_ID'       => 'Q #' . $ID,
 			'DESCRIPTION'   => 'question removed'
 		));
+
+		foreach(GetModuleEvents('learning', 'OnAfterQuestionDelete', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($ID, $arQuestion));
 
 		return true;
 	}

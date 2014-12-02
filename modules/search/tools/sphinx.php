@@ -131,7 +131,6 @@ class CSearchSphinx extends CSearchFullText
 
 			if (!empty($missed))
 			{
-				
 				$APPLICATION->ThrowException(GetMessage("SEARCH_SPHINX_NO_FIELDS", array("#FIELD_LIST#" => implode(", ", $missed))));
 				return false;
 			}
@@ -205,7 +204,7 @@ class CSearchSphinx extends CSearchFullText
 			) VALUES (
 				$ID
 				,'".$this->Escape($arFields["TITLE"])."'
-				,'".$this->Escape($arFields["BODY"])."'
+				,'".$this->Escape($arFields["BODY"]."\r\n".$arFields["TAGS"])."'
 				,".sprintf("%u", crc32($arFields["MODULE_ID"]))."
 				,'".$this->Escape($arFields["MODULE_ID"])."'
 				,".sprintf("%u", crc32($arFields["ITEM_ID"]))."
@@ -715,7 +714,7 @@ class CSearchSphinx extends CSearchFullText
 		}
 	}
 
-	public static function getRowFormatter()
+	public function getRowFormatter()
 	{
 		return new CSearchSphinxFormatter($this);
 	}
@@ -767,9 +766,18 @@ class CSearchSphinx extends CSearchFullText
 					if (!empty($val))
 					{
 						$s = "";
-						foreach ($val as $i => $v)
-							$s .= ($i? " or ": "")."param1_id = ".sprintf("%u", crc32($v));
-						$arWhere[] = "($s)";
+						if ($inSelect)
+						{
+							foreach ($val as $i => $v)
+								$s .= ",".sprintf("%u", crc32($v));
+							$arWhere[] = "in(param1_id $s)";
+						}
+						else
+						{
+							foreach ($val as $i => $v)
+								$s .= ($i? " or ": "")."param1_id = ".sprintf("%u", crc32($v));
+							$arWhere[] = "($s)";
+						}
 					}
 				}
 				else
@@ -790,9 +798,18 @@ class CSearchSphinx extends CSearchFullText
 					if (!empty($val))
 					{
 						$s = "";
-						foreach ($val as $i => $v)
-							$s .= ($i? " or ": "")."param2_id = ".sprintf("%u", crc32($v));
-						$arWhere[] = "($s)";
+						if ($inSelect)
+						{
+							foreach ($val as $i => $v)
+								$s .= ",".sprintf("%u", crc32($v));
+							$arWhere[] = "in(param2_id $s)";
+						}
+						else
+						{
+							foreach ($val as $i => $v)
+								$s .= ($i? " or ": "")."param2_id = ".sprintf("%u", crc32($v));
+							$arWhere[] = "($s)";
+						}
 					}
 				}
 				else

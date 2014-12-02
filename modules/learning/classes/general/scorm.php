@@ -146,11 +146,12 @@ class CCourseSCORM
 
 		if ($PARENT_ID === 0)
 		{
-			$linkToParentLessonId = CCourse::CourseGetLinkedLesson (
-				$this->COURSE_ID);
+			$linkToParentLessonId = CCourse::CourseGetLinkedLesson ($this->COURSE_ID);
 		}
 		else
+		{
 			$linkToParentLessonId = (int) $PARENT_ID;
+		}
 
 		if ($TYPE == "LES")
 		{
@@ -167,7 +168,9 @@ class CCourseSCORM
 			);
 		}
 		else
+		{
 			return $PARENT_ID;
+		}
 
 		// properties (in context of parent) by default
 		$arProperties = array('SORT' => 500);

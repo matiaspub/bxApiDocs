@@ -39,7 +39,6 @@ class _CEventsSeo {
 	 * } 
 	 *  
 	 * addEventHandler('seo', 'OnSeoCountersGetList', 'MyOnSeoCountersGetList');
-	 * </ht
 	 * </pre>
 	 *
 	 *

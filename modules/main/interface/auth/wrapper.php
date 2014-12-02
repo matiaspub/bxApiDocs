@@ -9,14 +9,16 @@
 /**
  * Bitrix vars
  * @global CMain $APPLICATION
- * @param string $inc_file From CMain::AuthForm()
- * @param array $arAuthResult From CMain::AuthForm()
+ * @var string $inc_file From CMain::AuthForm()
+ * @var array $arAuthResult From CMain::AuthForm()
+ * @var string $sLinks From prolog_auth_admin.php
+ * @var string $sCopyright From prolog_auth_admin.php
  */
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
 IncludeModuleLangFile(__FILE__);
 
-$arFormsList = array("authorize", "forgot_password", "change_password");
+$arFormsList = array("authorize", "forgot_password", "change_password", "otp");
 if (!in_array($inc_file, $arFormsList))
 	$inc_file = $arFormsList[0];
 
@@ -46,6 +48,9 @@ function dump_post_var($vname, $vvalue, $var_stack=array())
 	}
 }
 
+//last login from cookie
+$last_login = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_LOGIN"};
+
 if (isset($_REQUEST['bxsender']))
 {
 	if ($_REQUEST['bxsender'] != 'core_autosave')
@@ -64,7 +69,7 @@ if ($arAuthResult && defined('ADMIN_SECTION_LOAD_AUTH') && ADMIN_SECTION_LOAD_AU
 $post_data = '';
 foreach($_POST as $vname=>$vvalue)
 {
-	if($vname=="USER_LOGIN" || $vname=="USER_PASSWORD")
+	if($vname=="USER_LOGIN" || $vname=="USER_PASSWORD" || $vname=="USER_OTP")
 		continue;
 	$post_data .= ($post_data == '' ? '' : '&').dump_post_var($vname, $vvalue);
 }
@@ -176,4 +181,3 @@ if ($arAuthResult)
 	$bOnHit = true;
 	include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/auth/wrapper_auth_result.php");
 }
-?>

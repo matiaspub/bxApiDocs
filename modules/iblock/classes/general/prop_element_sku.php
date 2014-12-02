@@ -1,5 +1,5 @@
 <?
-use Bitrix\Main\Localization\Loc as Loc;
+use Bitrix\Main\Localization\Loc;
 Loc::loadMessages(__FILE__);
 
 // define('BT_UT_SKU_CODE','SKU');

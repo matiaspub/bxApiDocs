@@ -790,7 +790,10 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 								$id_ = $id.'bxec_week_day_'.$i;?>
 								<input id="<?=$id_?>" type="checkbox" value="<?= $week_days[$i][2]?>">
 								<label for="<?=$id_?>" title="<?=$week_days[$i][0]?>"><?=$week_days[$i][1]?></label>
-								<?if($i == 2){echo '<br>';}?>
+								<?if($i == 2)
+								{
+									echo '<br>';
+								}?>
 							<?endfor;?>
 						</span>
 					</span>
@@ -889,6 +892,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 
 		$event['FROM_WEEK_DAY'] = FormatDate('D', $event['DT_FROM_TS']);
 		$event['FROM_MONTH_DAY'] = FormatDate('j', $event['DT_FROM_TS']);
+		$event['FROM_MONTH'] = FormatDate('n', $event['DT_FROM_TS']);
 
 		$arHost = CCalendar::GetUser($event['MEETING_HOST'], true);
 		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost);
@@ -974,7 +978,8 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 					<?= CCalendar::GetFromToHtml($event['DT_FROM_TS'], $event['DT_TO_TS'], $event['DT_SKIP_TIME'] == 'Y', $event['DT_LENGTH']);?>
 				</td>
 			</tr>
-			<?if ($event['RRULE'] !== ''):?>
+			<?
+			if ($event['RRULE']):?>
 				<?
 				$event['RRULE'] = CCalendarEvent::ParseRRULE($event['RRULE']);
 				switch ($event['RRULE']['FREQ'])
@@ -986,7 +991,6 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 							$repeatHTML = GetMessage('EC_RRULE_EVERY_DAY_1', array('#DAY#' => $event['RRULE']['INTERVAL']));
 						break;
 					case 'WEEKLY':
-
 						$daysList = array();
 						foreach ($event['RRULE']['BYDAY'] as $day)
 							$daysList[] = GetMessage('EC_'.$day);
@@ -1004,15 +1008,17 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 						break;
 					case 'YEARLY':
 						if ($event['RRULE']['INTERVAL'] == 1)
-							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR', array('#DAY#' => 0, '#MONTH#' => 0));
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR', array('#DAY#' => $event['FROM_MONTH_DAY'], '#MONTH#' => $event['FROM_MONTH']));
 						else
-							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR_1', array('#YEAR#' => $event['RRULE']['INTERVAL'], '#DAY#' => 0, '#MONTH#' => 0));
+							$repeatHTML = GetMessage('EC_RRULE_EVERY_YEAR_1', array('#YEAR#' => $event['RRULE']['INTERVAL'], '#DAY#' => $event['FROM_MONTH_DAY'], '#MONTH#' => $event['FROM_MONTH']));
 						break;
 				}
 
 				$repeatHTML .= '<br>'.GetMessage('EC_RRULE_FROM', array('#FROM_DATE#' => FormatDate(CCalendar::DFormat(false), $event['~DT_FROM_TS'])));
 				if (date('dmY', $event['RRULE']['UNTIL']) != '01012038')
+				{
 					$repeatHTML .= ' '.GetMessage('EC_RRULE_UNTIL', array('#UNTIL_DATE#' => FormatDate(CCalendar::DFormat(false), $event['RRULE']['UNTIL'])));
+				}
 				?>
 			<tr>
 				<td class="bx-cal-view-text-cell-l"><?=GetMessage('EC_T_REPEAT')?>:</td>
@@ -1086,7 +1092,8 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 						{
 							$dest = $arDest[$i];
 							?><span class="bx-cal-att-dest-block"><?= $dest['TITLE']?></span><?
-							if ($i < count($arDest) - 1){echo ', ';}
+							if ($i < count($arDest) - 1)
+								echo ', ';
 						}
 						?>
 					</div>
@@ -1225,7 +1232,9 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 				"ENTITY_XML_ID" => "EVENT_".$event['ID'], //
 				"PERMISSION" => $permission, //
 				"URL_TEMPLATES_PROFILE_VIEW" => $set['path_to_user'],
-				"SHOW_RATING" => "Y"
+				"SHOW_RATING" => "Y",
+				"SHOW_LINK_TO_MESSAGE" => "N",
+				"BIND_VIEWER" => "Y"
 			),
 			false,
 			array('HIDE_ICONS' => 'Y')
@@ -1505,13 +1514,13 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		<span  class="bxec-field-val-2">
 			<select id="<?=$id?>work_time_start">
 					<?foreach($arWorTimeList as $key => $val):?>
-						<option value="<?= $key?>" <? if ($work_time_start == $key){echo ' selected="selected" ';}?>><?= $val?></option>
+						<option value="<?= $key?>"><?= $val?></option>
 					<?endforeach;?>
 				</select>
 				&mdash;
 				<select id="<?=$id?>work_time_end">
 					<?foreach($arWorTimeList as $key => $val):?>
-						<option value="<?= $key?>" <? if ($work_time_end == $key){echo ' selected="selected" ';}?>><?= $val?></option>
+						<option value="<?= $key?>"><?= $val?></option>
 					<?endforeach;?>
 				</select>
 		</span>
@@ -1626,7 +1635,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		<div id="bxec_mobile_iphone_all<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ALL_HELP', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
 		<div id="bxec_mobile_iphone_one<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ONE_HELP', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
 		<a id="bxec_mob_link_mac_<?=$id?>" class="bxec-mobile-link bxec-link-hidden" href="javascript: void(0)"><div class="bxec-iconkit bxec-arrow"></div><?= GetMessage('EC_MOBILE_MAC_OS');?></a>
-		<div id="bxec_mobile_mac_cont<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_MAC', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
+		<div id="bxec_mobile_mac_cont<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_MAC_1', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
 		<a id="bxec_mob_link_bird_<?=$id?>" class="bxec-mobile-link bxec-link-hidden" href="javascript: void(0)"><div class="bxec-iconkit bxec-arrow"></div><?= GetMessage('EC_MOBILE_SUNBIRD');?></a>
 		<div id="bxec_mobile_sunbird_all<?=$id?>" style="display: none;"><?= GetMessage("EC_MOBILE_HELP_SUNBIRD_ALL_HELP")?></div>
 		<div id="bxec_mobile_sunbird_one<?=$id?>" style="display: none;"><?= GetMessage("EC_MOBILE_HELP_SUNBIRD_ONE_HELP")?></div>
@@ -1889,6 +1898,8 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 
 	public static function __ShowAttendeesDestinationHtml($Params = array())
 	{
+		CSocNetTools::InitGlobalExtranetArrays();
+
 		$id = $Params['id'];
 		$DESTINATION = CCalendar::GetSocNetDestination(false, $Params['event']['ATTENDEES_CODES']);
 		?>
@@ -1902,6 +1913,17 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 					</span>
 					<a href="#" class="feed-add-destination-link" id="event-grid-dest-add-link"></a>
 					<script>
+						<?
+						if (is_array($GLOBALS["arExtranetGroupID"]))
+						{
+							?>
+							if (typeof window['arExtranetGroupID'] == 'undefined')
+							{
+								window['arExtranetGroupID'] = <?=CUtil::PhpToJSObject($GLOBALS["arExtranetGroupID"])?>;
+							}
+							<?
+						}
+						?>
 						BX.message({
 							'BX_FPD_LINK_1':'<?=GetMessageJS("EC_DESTINATION_1")?>',
 							'BX_FPD_LINK_2':'<?=GetMessageJS("EC_DESTINATION_2")?>'

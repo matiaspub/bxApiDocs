@@ -563,12 +563,16 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 		if (array_key_exists('PREVIEW_PICTURE', $arFields))
 		{
 			// remove this field, if nothing to do
-			if ( (strlen($arFields['PREVIEW_PICTURE']['name']) == 0)
-				&& (strlen($arFields['PREVIEW_PICTURE']['del']) == 0)
-				&& (
-					( ! isset($arFields['PREVIEW_PICTURE']['description']) )
-					|| (strlen($arFields['PREVIEW_PICTURE']['description']) == 0)
-				)
+			if (!is_array($arFields['PREVIEW_PICTURE']))
+			{
+				unset($arFields['PREVIEW_PICTURE']);
+			}
+			else if (
+				(!array_key_exists('name', $arFields['PREVIEW_PICTURE']) || strlen($arFields['PREVIEW_PICTURE']['name']) == 0)
+				&&
+				(!array_key_exists('del', $arFields['PREVIEW_PICTURE']) || strlen($arFields['PREVIEW_PICTURE']['del']) == 0)
+				&&
+				(!isset($arFields['PREVIEW_PICTURE']['description']) || strlen($arFields['PREVIEW_PICTURE']['description']) == 0)
 			)
 			{
 				unset($arFields['PREVIEW_PICTURE']);
@@ -601,12 +605,16 @@ abstract class CLearnGraphNode implements ILearnGraphNode
 		if (array_key_exists('DETAIL_PICTURE', $arFields))
 		{
 			// remove this field, if nothing to do
-			if ( (strlen($arFields['DETAIL_PICTURE']['name']) == 0)
-				&& (strlen($arFields['DETAIL_PICTURE']['del']) == 0)
-				&& (
-					( ! isset($arFields['DETAIL_PICTURE']['description']) )
-					|| (strlen($arFields['DETAIL_PICTURE']['description']) == 0)
-				)
+			if (!is_array($arFields['DETAIL_PICTURE']))
+			{
+				unset($arFields['DETAIL_PICTURE']);
+			}
+			elseif (
+				(!array_key_exists('name', $arFields['DETAIL_PICTURE']) || strlen($arFields['DETAIL_PICTURE']['name']) == 0)
+				&&
+				(!array_key_exists('del', $arFields['DETAIL_PICTURE']) || strlen($arFields['DETAIL_PICTURE']['del']) == 0)
+				&&
+				(!isset($arFields['DETAIL_PICTURE']['description']) || strlen($arFields['DETAIL_PICTURE']['description']) == 0)
 			)
 			{
 				unset($arFields['DETAIL_PICTURE']);

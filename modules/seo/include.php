@@ -247,5 +247,147 @@ class CSeoEventHandlers
 <?
 		}
 	}
+
+	public static function OnBeforeHTMLEditorScriptRuns()
+	{
+		if (COption::GetOptionString('main', 'vendor', '') == '1c_bitrix')
+		{
+?>
+<script>
+	;(function(){
+		var originalTextWnd = null;
+		var originalTextBtn = new BX.CWindowButton({
+			title: '<?=GetMessageJS('SEO_UNIQUE_TEXT_YANDEX_SUBMIT')?>',
+			className: 'adm-btn-save',
+			action: function()
+			{
+				var content = document.forms.seo_original_text_form.original_text.value;
+				var domain = document.forms.seo_original_text_form.domain.options[document.forms.seo_original_text_form.domain.selectedIndex].value;
+				if(content.length < <?=\Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MIN_LENGTH?>)
+				{
+					alert('<?=GetMessageJS('SEO_YANDEX_ORIGINAL_TEXT_TOO_SHORT', array('#NUM#' => \Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MIN_LENGTH))?>');
+				}
+				else if(content.length > <?=\Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MAX_LENGTH?>)
+				{
+					alert('<?=GetMessageJS('SEO_YANDEX_ORIGINAL_TEXT_TOO_LONG', array('#NUM#' => \Bitrix\Seo\Engine\Yandex::ORIGINAL_TEXT_MAX_LENGTH))?>');
+				}
+				else
+				{
+					originalTextBtn.disable();
+					BX.ajax({
+						method: 'POST',
+						dataType: 'json',
+						url: '/bitrix/tools/seo_yandex.php',
+						data: {
+							action: 'original_text',
+							domain: domain,
+							dir: '/',
+							original_text: content,
+							sessid: BX.bitrix_sessid()
+						},
+						onsuccess: function(res)
+						{
+							originalTextBtn.enable();
+							if(!!res.error)
+							{
+								alert(BX.util.strip_tags(res.error));
+							}
+							else
+							{
+								BX('seo_original_text_form_form').style.display = 'none';
+								BX('seo_original_text_form_ok').style.display = 'block';
+
+								originalTextBtn.btn.disabled = true;
+
+								originalTextWnd.adjustSizeEx();
+								BX.defer(originalTextWnd.adjustPos, originalTextWnd)();
+							}
+						}
+					});
+				}
+			}
+		});
+
+		var originalTextHandler = function(editor)
+		{
+			if(!originalTextWnd)
+			{
+				BX.showWait();
+				BX.ajax.get(
+					'/bitrix/tools/seo_yandex.php?get=original_text_form&sessid=' + BX.bitrix_sessid(),
+					BX.delegate(function(res)
+					{
+						BX.closeWait();
+						originalTextWnd = new BX.CDialog({
+							content: res,
+							resizable: false,
+							width: 750,
+							height: 550,
+							title: '<?=GetMessageJS('SEO_UNIQUE_TEXT_YANDEX')?>',
+							buttons: [
+								originalTextBtn
+							]
+						});
+						originalTextHandler.apply(this, [editor]);
+					}, this)
+				);
+			}
+			else if(!!document.forms.seo_original_text_form)
+			{
+				var content = BX.util.strip_tags(
+					editor.GetContent()
+						.replace(/<\?(.|[\r\n])*?\?>/g, '')
+						.replace(/#PHP[^#]*#/ig, '')
+				);
+
+				originalTextWnd.Show();
+
+				document.forms.seo_original_text_form.original_text.value = content;
+				BX('seo_original_text_form_form').style.display = 'block';
+				BX('seo_original_text_form_ok').style.display = 'none';
+
+				originalTextWnd.adjustSizeEx();
+				originalTextBtn.enable();
+				originalTextBtn.btn.disabled = false;
+				BX.defer(originalTextWnd.adjustPos, originalTextWnd)();
+			}
+			else
+			{
+				originalTextWnd.Show();
+				originalTextBtn.btn.disabled = true;
+			}
+		};
+
+		function applyForEditor(editor)
+		{
+			editor.AddButton(
+				{
+					id : 'SeoUniqText',
+					src : '/bitrix/panel/seo/images/icon_editor_toolbar_2.png',
+					name : '<?=CUtil::JSEscape(GetMessage('SEO_UNIQUE_TEXT_YANDEX'))?>',
+					codeEditorMode : true,
+					handler : function(){originalTextHandler(editor);},
+					toolbarSort: 305
+				}
+			);
+		}
+
+		if (window.BXHtmlEditor && window.BXHtmlEditor.editors)
+		{
+			for (var id in window.BXHtmlEditor.editors)
+			{
+				if (window.BXHtmlEditor.editors.hasOwnProperty(id))
+				{
+					applyForEditor(window.BXHtmlEditor.Get(id))
+				}
+			}
+		}
+
+		BX.addCustomEvent(window.BXHtmlEditor, "OnBeforeEditorInited", applyForEditor);
+	})();
+</script>
+		<?
+		}
+	}
 }
 ?>

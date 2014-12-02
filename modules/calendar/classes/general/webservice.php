@@ -184,13 +184,12 @@ class CCalendarWebService extends IWebService
 		$bAllDay = $event['DT_SKIP_TIME'] == 'Y' ? 1 : 0;
 
 		$TZBias = intval(date('Z'));
-		$TZBiasStart = intval(date('Z', $ts_start));
+		$localTime = new DateTime();
+		$TZBiasStart = $localTime->getOffset();
 
 		$duration = $event['DT_LENGTH'];
 		if ($bAllDay)
 			$duration -= 20;
-
-		//$duration = $bRecurrent ? $event['DT_LENGTH'] : ($ts_finish - $ts_start);
 
 		if (!$bAllDay || defined('OLD_OUTLOOK_VERSION'))
 		{
@@ -237,7 +236,6 @@ class CCalendarWebService extends IWebService
 		//$obRow->setAttribute('ows_EndDate', $this->__makeDateTime(((false && $bRecurrent) ? $ts_start + $event['DT_LENGTH'] : $ts_finish) + ($bAllDay ? 86340 : 0)));
 		//$obRow->setAttribute('ows_EndDate', $this->__makeDateTime(($bRecurrent ? $ts_start + $event['DT_LENGTH'] : $ts_finish) - ($bAllDay ? 20 : 0)));
 
-
 		$obRow->setAttribute('ows_fAllDayEvent', $bAllDay);
 
 		/* Recurrence */
@@ -264,7 +262,6 @@ class CCalendarWebService extends IWebService
 
 			$tz_data .= '</timeZoneRule>';
 			$obRow->setAttribute('ows_XMLTZone', $tz_data);
-			//$obRow->setAttribute('ows_TimeZone', 7);
 
 			$recurence_data = '';
 			$recurence_data .= '<recurrence>';
@@ -296,16 +293,17 @@ class CCalendarWebService extends IWebService
 			$recurence_data .= '</repeat>';
 
 			if (date('Y', $ts_finish) == '2038' || date('Y', $ts_finish) == '2037')
+			{
 				$recurence_data .= '<repeatForever>FALSE</repeatForever>';
+			}
 			else
+			{
 				$recurence_data .= '<windowEnd>'.$this->__makeDateTime($ts_finish).'</windowEnd>';
+			}
 
 			$recurence_data .= '</rule>';
 			$recurence_data .= '</recurrence>';
 			$obRow->setAttribute('ows_RecurrenceData', $recurence_data);
-
-			//$obRow->setAttribute('ows_Duration', $event['DT_LENGTH'] + ($bAllDay ? 86340 : 0));
-			//$obRow->setAttribute('ows_Duration', $event['DT_LENGTH'] - ($bAllDay ? 20 : 0));
 			$obRow->setAttribute('ows_Duration', $duration);
 		}
 		else

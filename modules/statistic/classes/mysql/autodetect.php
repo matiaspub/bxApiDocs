@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>.
+ * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>.</body> </html>
  *
  *
  *
@@ -149,8 +149,6 @@ class CAutoDetect
 		}
 
 		$strSqlSearch = GetFilterSqlSearch($arSqlSearch);
-		$strSql = "SET OPTION SQL_BIG_SELECTS=1";
-		$DB->Query($strSql, false, $err_mess.__LINE__);
 
 		$strSql = "
 			SELECT

@@ -24,7 +24,7 @@ class Encoding
 		if ($string == '')
 			return '';
 
-		if (extension_loaded("mbstring"))
+		if (extension_loaded("mbstring") && mb_encoding_aliases($charsetFrom) && mb_encoding_aliases($charsetTo))
 		{
 			//For UTF-16 we have to detect the order of bytes
 			//Default for mbstring extension is Big endian
@@ -356,7 +356,8 @@ class Encoding
 			if(!$arConvertTable)
 				return false;
 
-			$stringLength = (extension_loaded("mbstring") ? mb_strlen($sourceString, $charsetFrom) : strlen($sourceString));
+			$stringLength = function_exists('mb_strlen') ? mb_strlen($sourceString, '8bit') : strlen($sourceString);
+
 			for ($i = 0; $i < $stringLength; $i++)
 			{
 				$hexChar = strtoupper(dechex(ord($sourceString[$i])));

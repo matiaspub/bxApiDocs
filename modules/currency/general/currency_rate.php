@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.
+ * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.</body> </html>
  *
  *
  *
@@ -194,7 +194,6 @@ class CAllCurrencyRates
 	public static function Add($arFields)
 	{
 		global $DB;
-		global $CACHE_MANAGER;
 		global $APPLICATION;
 		global $stackCacheManager;
 
@@ -224,8 +223,8 @@ class CAllCurrencyRates
 
 			$ID = $DB->Add("b_catalog_currency_rate", $arFields);
 
-			if (defined("BX_COMP_MANAGED_CACHE"))
-				$CACHE_MANAGER->ClearByTag("currency_id_".$arFields["CURRENCY"]);
+			CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
+			CCurrency::clearTagCache($arFields['CURRENCY']);
 
 			foreach (GetModuleEvents("currency", "OnCurrencyRateAdd", true) as $arEvent)
 			{
@@ -268,11 +267,12 @@ class CAllCurrencyRates
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
-		global $CACHE_MANAGER;
 		global $APPLICATION;
 		global $stackCacheManager;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
+		if ($ID <= 0)
+			return false;
 		$arMsg = array();
 
 		foreach (GetModuleEvents("currency", "OnBeforeCurrencyRateUpdate", true) as $arEvent)
@@ -302,9 +302,8 @@ class CAllCurrencyRates
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 				$stackCacheManager->Clear("currency_rate");
-
-				if (defined("BX_COMP_MANAGED_CACHE"))
-					$CACHE_MANAGER->ClearByTag("currency_id_".$arFields["CURRENCY"]);
+				CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
+				CCurrency::clearTagCache($arFields['CURRENCY']);
 			}
 			foreach (GetModuleEvents("currency", "OnCurrencyRateUpdate", true) as $arEvent)
 			{
@@ -336,15 +335,12 @@ class CAllCurrencyRates
 	public static function Delete($ID)
 	{
 		global $DB;
-		global $CACHE_MANAGER;
 		global $stackCacheManager;
 		global $APPLICATION;
 
-		$arMsg = array();
+		$ID = (int)$ID;
 
-		$ID = intval($ID);
-
-		if (0 >= $ID)
+		if ($ID <= 0)
 			return false;
 
 		foreach(GetModuleEvents("currency", "OnBeforeCurrencyRateDelete", true) as $arEvent)
@@ -366,9 +362,8 @@ class CAllCurrencyRates
 
 		$strSql = "DELETE FROM b_catalog_currency_rate WHERE ID = ".$ID;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		if (defined("BX_COMP_MANAGED_CACHE"))
-			$CACHE_MANAGER->ClearByTag("currency_id_".$arFields['CURRENCY']);
+		CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
+		CCurrency::clearTagCache($arFields['CURRENCY']);
 
 		foreach(GetModuleEvents("currency", "OnCurrencyRateDelete", true) as $arEvent)
 		{
@@ -406,8 +401,8 @@ class CAllCurrencyRates
 	{
 		global $DB;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 		$strSql = "SELECT C.*, ".$DB->DateToCharFunction("C.DATE_RATE", "SHORT")." as DATE_RATE FROM b_catalog_currency_rate C WHERE ID = ".$ID;
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -482,20 +477,22 @@ class CAllCurrencyRates
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__getlist.37245cb2.php
 	* @author Bitrix
 	*/
-	public static function GetList(&$by, &$order, $arFilter=Array())
+	public static function GetList(&$by, &$order, $arFilter=array())
 	{
-		global $DB, $DBType;
-		$arSqlSearch = Array();
+		global $DB;
+
+		$mysqlEdition = strtolower($DB->type) === 'mysql';
+		$arSqlSearch = array();
 
 		if(!is_array($arFilter))
-			$filter_keys = Array();
+			$filter_keys = array();
 		else
 			$filter_keys = array_keys($arFilter);
 
-		for($i=0, $intCount = count($filter_keys); $i < $intCount; $i++)
+		for ($i=0, $intCount = count($filter_keys); $i < $intCount; $i++)
 		{
-			$val = $DB->ForSql($arFilter[$filter_keys[$i]]);
-			if (strlen($val)<=0) continue;
+			$val = (string)$DB->ForSql($arFilter[$filter_keys[$i]]);
+			if ($val === '') continue;
 
 			$key = $filter_keys[$i];
 			if ($key[0]=="!")
@@ -512,7 +509,7 @@ class CAllCurrencyRates
 				$arSqlSearch[] = "C.CURRENCY = '".$val."'";
 				break;
 			case "DATE_RATE":
-				$arSqlSearch[] = "(C.DATE_RATE ".($bInvert?"<":">=")." ".($DBType == "mysql"?"CAST(":"").$DB->CharToDateFunction($DB->ForSql($val), "SHORT").($DBType == "mysql"?" AS DATE)":"")."".($bInvert?"":" OR C.DATE_RATE IS NULL").")";
+				$arSqlSearch[] = "(C.DATE_RATE ".($bInvert?"<":">=")." ".($mysqlEdition ? "CAST(" : "" ).$DB->CharToDateFunction($DB->ForSql($val), "SHORT").($mysqlEdition ? " AS DATE)" : "" ).($bInvert?"":" OR C.DATE_RATE IS NULL").")";
 				break;
 			}
 		}
@@ -528,9 +525,7 @@ class CAllCurrencyRates
 			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
 		}
 
-		$strSql =
-			"SELECT C.ID, C.CURRENCY, C.RATE_CNT, C.RATE, ".$DB->DateToCharFunction("C.DATE_RATE", "SHORT")." as DATE_RATE ".
-			"FROM b_catalog_currency_rate C ".
+		$strSql = "SELECT C.ID, C.CURRENCY, C.RATE_CNT, C.RATE, ".$DB->DateToCharFunction("C.DATE_RATE", "SHORT")." as DATE_RATE FROM b_catalog_currency_rate C ".
 			$strSqlSearch;
 
 		if (strtolower($by) == "curr") $strSqlOrder = " ORDER BY C.CURRENCY ";
@@ -556,10 +551,13 @@ class CAllCurrencyRates
 	{
 		global $stackCacheManager;
 
-		if(strlen($curFrom) <= 0 || strlen($curTo) <= 0)
+		$curFrom = (string)$curFrom;
+		$curTo = (string)$curTo;
+		if($curFrom === '' || $curTo === '')
 			return 0;
 
-		if (strlen($valDate) <= 0)
+		$valDate = (string)$valDate;
+		if ($valDate === '')
 			$valDate = date("Y-m-d");
 		list($dpYear, $dpMonth, $dpDay) = explode("-", $valDate, 3);
 		$dpDay += 1;
@@ -575,26 +573,25 @@ class CAllCurrencyRates
 
 		if (defined("CURRENCY_SKIP_CACHE") && CURRENCY_SKIP_CACHE)
 		{
-			$cacheTime = 0;
-			if($res = $this->_get_last_rates($valDate, $curFrom))
+			if ($res = $this->_get_last_rates($valDate, $curFrom))
 			{
-				$curFromRate = doubleval($res["RATE"]);
-				$curFromRateCnt = intval($res["RATE_CNT"]);
+				$curFromRate = (float)$res["RATE"];
+				$curFromRateCnt = (int)$res["RATE_CNT"];
 				if ($curFromRate <= 0)
 				{
-					$curFromRate = doubleval($res["AMOUNT"]);
-					$curFromRateCnt = intval($res["AMOUNT_CNT"]);
+					$curFromRate = (float)$res["AMOUNT"];
+					$curFromRateCnt = (int)$res["AMOUNT_CNT"];
 				}
 			}
 
-			if($res = $this->_get_last_rates($valDate, $curTo))
+			if ($res = $this->_get_last_rates($valDate, $curTo))
 			{
-				$curToRate = doubleval($res["RATE"]);
-				$curToRateCnt = intval($res["RATE_CNT"]);
+				$curToRate = (float)$res["RATE"];
+				$curToRateCnt = (int)$res["RATE_CNT"];
 				if ($curToRate <= 0)
 				{
-					$curToRate = doubleval($res["AMOUNT"]);
-					$curToRateCnt = intval($res["AMOUNT_CNT"]);
+					$curToRate = (float)$res["AMOUNT"];
+					$curToRateCnt = (int)$res["AMOUNT_CNT"];
 				}
 			}
 		}
@@ -602,7 +599,7 @@ class CAllCurrencyRates
 		{
 			$cacheTime = CURRENCY_CACHE_DEFAULT_TIME;
 			if (defined("CURRENCY_CACHE_TIME"))
-				$cacheTime = IntVal(CURRENCY_CACHE_TIME);
+				$cacheTime = (int)CURRENCY_CACHE_TIME;
 
 			$strCacheKey = "C_R_".$valDate."_".$curFrom."_".$curTo;
 
@@ -619,25 +616,25 @@ class CAllCurrencyRates
 			}
 			else
 			{
-				if($res = $this->_get_last_rates($valDate, $curFrom))
+				if ($res = $this->_get_last_rates($valDate, $curFrom))
 				{
-					$curFromRate = doubleval($res["RATE"]);
-					$curFromRateCnt = intval($res["RATE_CNT"]);
+					$curFromRate = (float)$res["RATE"];
+					$curFromRateCnt = (int)$res["RATE_CNT"];
 					if ($curFromRate <= 0)
 					{
-						$curFromRate = doubleval($res["AMOUNT"]);
-						$curFromRateCnt = intval($res["AMOUNT_CNT"]);
+						$curFromRate = (float)$res["AMOUNT"];
+						$curFromRateCnt = (int)$res["AMOUNT_CNT"];
 					}
 				}
 
-				if($res = $this->_get_last_rates($valDate, $curTo))
+				if ($res = $this->_get_last_rates($valDate, $curTo))
 				{
-					$curToRate = doubleval($res["RATE"]);
-					$curToRateCnt = intval($res["RATE_CNT"]);
+					$curToRate = (float)$res["RATE"];
+					$curToRateCnt = (int)$res["RATE_CNT"];
 					if ($curToRate <= 0)
 					{
-						$curToRate = doubleval($res["AMOUNT"]);
-						$curToRateCnt = intval($res["AMOUNT_CNT"]);
+						$curToRate = (float)$res["AMOUNT"];
+						$curToRateCnt = (int)$res["AMOUNT_CNT"];
 					}
 				}
 
@@ -655,7 +652,7 @@ class CAllCurrencyRates
 		if($curFromRate == 0 || $curToRateCnt == 0 || $curToRate == 0 || $curFromRateCnt == 0)
 			return 0;
 
-		return DoubleVal($curFromRate*$curToRateCnt/$curToRate/$curFromRateCnt);
+		return $curFromRate*$curToRateCnt/$curToRate/$curFromRateCnt;
 	}
 }
 ?>

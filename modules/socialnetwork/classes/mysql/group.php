@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.
+ * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.</body> </html>
  *
  *
  *
@@ -34,29 +34,47 @@ class CSocNetGroup extends CAllSocNetGroup
 		}
 
 		if (!CSocNetGroup::CheckFields("ADD", $arFields))
+		{
 			return false;
+		}
 		else
 		{
 			$arSiteID = array();
 			if(array_key_exists("SITE_ID", $arFields))
 			{
 				if(is_array($arFields["SITE_ID"]))
+				{
 					foreach($arFields["SITE_ID"] as $site_id)
+					{
 						$arSiteID[$site_id] = $DB->ForSQL($site_id);
+					}
+				}
 				else
+				{
 					$arSiteID[$arFields["SITE_ID"]] = $DB->ForSQL($arFields["SITE_ID"]);
+				}
 			}
 		}
 
 		if(empty($arSiteID))
+		{
 			unset($arFields["SITE_ID"]);
+		}
 		else
+		{
 			$arFields["SITE_ID"] = end($arSiteID);
+		}
 
+		$arFields["SITE_ID_FULL"] = $arSiteID;
 		$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetGroupAdd");
 		while ($arEvent = $db_events->Fetch())
-			if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
+		{
+			if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+			{
 				return false;
+			}
+		}
+		unset($arFields["SITE_ID_FULL"]);		
 
 		if (
 			array_key_exists("IMAGE_ID", $arFields)
@@ -372,9 +390,12 @@ class CSocNetGroup extends CAllSocNetGroup
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
 				if ($bClearCommonTag)
+				{
 					$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
+				}
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$ID);
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 			}
 
 			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_GROUP", $ID, $arFields);

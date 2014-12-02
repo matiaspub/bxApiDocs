@@ -23,8 +23,8 @@ class Sql
 	protected function getFilters()
 	{
 		$sqlStart = '(?<![a-z0-9_-])';
-		$sqlEnd = '(?![a-z0-9_])';
-		$sqlSpace = "(?:[\\x00-\\x20\(\)\'\"\`*@\+\-\.~\\\ed!\d]|(?:\\/\\*.*?\\*\\/)|(?:\\/\\*!\d*)|(?:\\*\\/)|(?:#[^\\n]*[\\n]+))+";
+		$sqlEnd = '(?![a-z_])';
+		$sqlSpace = "(?:[\\x00-\\x20\(\)\'\"\`*@\+\-\.~\\\ed!\d{}]|(?:\\/\\*.*?\\*\\/)|(?:\\/\\*!\d*)|(?:\\*\\/)|(?:#[^\\n]*[\\n]+))+";
 		$sqlFunctionsSpace="[\\x00-\\x20]*";
 		$sqlSplitTo2 = $this->getSplittingString(2);
 		$sqlSplitTo3 = $this->getSplittingString(3);

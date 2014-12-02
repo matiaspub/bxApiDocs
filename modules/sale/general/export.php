@@ -66,13 +66,14 @@ class CAllSaleExport
 		return False;
 	}
 
-	public static function ExportOrders2Xml($arFilter = Array(), $nTopCount = 0, $currency = "", $crmMode = false, $time_limit = 0, $version = false)
+	public static function ExportOrders2Xml($arFilter = Array(), $nTopCount = 0, $currency = "", $crmMode = false, $time_limit = 0, $version = false, $arOptions = Array())
 	{
 		global $DB;
 		$count = false;
-		if(IntVal($nTopCount)>0)
+		if(IntVal($nTopCount) > 0)
 			$count = Array("nTopCount" => $nTopCount);
 		$bNewVersion = (strlen($version) > 0);
+		$bExportFromCrm = (isset($arOptions["EXPORT_FROM_CRM"]) && $arOptions["EXPORT_FROM_CRM"] === "Y");
 
 		if(IntVal($time_limit) > 0)
 		{
@@ -82,8 +83,21 @@ class CAllSaleExport
 			else
 				$end_time = time() + 365*24*3600; // One year
 
-			if(IntVal($_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"]) > 0)
-				$arFilter["<ID"] = $_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"];
+			//$version
+			$lastOrderPrefix = "LAST_ORDER_ID";
+			if($crmMode)
+			{
+				$lastOrderPrefix = md5(serialize($arFilter));
+				if(!empty($_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) && IntVal($nTopCount) > 0)
+					$count["nTopCount"] = $count["nTopCount"]+count($_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]);
+			}
+			else
+			{
+				if(IntVal($_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) > 0)
+				{
+					$arFilter["<ID"] = $_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix];
+				}
+			}
 		}
 
 		$arResultStat = array(
@@ -167,25 +181,35 @@ class CAllSaleExport
 		if ($crmMode)
 			$arOrder = array("DATE_UPDATE" => "ASC");
 
-		$dbOrderList = CSaleOrder::GetList(
-			$arOrder,
-			$arFilter,
-			false,
-			$count,
-			array(
-				"ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED",
-				"EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID",
-				"PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE",
-				"SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION",
-				"ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE",
-				"COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "ACCOUNT_NUMBER", "SUM_PAID", "DELIVERY_DOC_DATE", "DELIVERY_DOC_NUM", "TRACKING_NUMBER", "STORE_ID",
-				"ID_1C", "VERSION",
-			)
+		$arSelect = array(
+			"ID", "LID", "PERSON_TYPE_ID", "PAYED", "DATE_PAYED", "EMP_PAYED_ID", "CANCELED", "DATE_CANCELED",
+			"EMP_CANCELED_ID", "REASON_CANCELED", "STATUS_ID", "DATE_STATUS", "PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE", "EMP_STATUS_ID",
+			"PRICE_DELIVERY", "ALLOW_DELIVERY", "DATE_ALLOW_DELIVERY", "EMP_ALLOW_DELIVERY_ID", "PRICE", "CURRENCY", "DISCOUNT_VALUE",
+			"SUM_PAID", "USER_ID", "PAY_SYSTEM_ID", "DELIVERY_ID", "DATE_INSERT", "DATE_INSERT_FORMAT", "DATE_UPDATE", "USER_DESCRIPTION",
+			"ADDITIONAL_INFO", "PS_STATUS", "PS_STATUS_CODE", "PS_STATUS_DESCRIPTION", "PS_STATUS_MESSAGE", "PS_SUM", "PS_CURRENCY", "PS_RESPONSE_DATE",
+			"COMMENTS", "TAX_VALUE", "STAT_GID", "RECURRING_ID", "ACCOUNT_NUMBER", "SUM_PAID", "DELIVERY_DOC_DATE", "DELIVERY_DOC_NUM", "TRACKING_NUMBER", "STORE_ID",
+			"ID_1C", "VERSION",
 		);
+
+		$bCrmModuleIncluded = false;
+		if ($bExportFromCrm)
+		{
+			$arSelect[] = "UF_COMPANY_ID";
+			$arSelect[] = "UF_CONTACT_ID";
+			if (IsModuleInstalled("crm") && CModule::IncludeModule("crm"))
+				$bCrmModuleIncluded = true;
+		}
+
+		$dbOrderList = CSaleOrder::GetList($arOrder, $arFilter, false, $count, $arSelect);
+
 		while($arOrder = $dbOrderList->Fetch())
 		{
 			if ($crmMode)
+			{			
+				if($bNewVersion && is_array($_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) && in_array($arOrder["ID"], $_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) && empty($arFilter["ID"]))
+					continue;
 				ob_start();
+			}
 
 			$arResultStat["ORDERS"]++;
 
@@ -198,6 +222,70 @@ class CAllSaleExport
 				$dbUser = CUser::GetByID($arOrder["USER_ID"]);
 				if ($arUser = $dbUser->Fetch())
 					$arProp["USER"] = $arUser;
+			}
+			if ($bExportFromCrm)
+			{
+				$arProp["CRM"] = array();
+				$companyID = isset($arOrder["UF_COMPANY_ID"]) ? intval($arOrder["UF_COMPANY_ID"]) : 0;
+				$contactID = isset($arOrder["UF_CONTACT_ID"]) ? intval($arOrder["UF_CONTACT_ID"]) : 0;
+				if ($companyID > 0)
+				{
+					$arProp["CRM"]["CLIENT_ID"] = "CRMCO".$companyID;
+				}
+				else
+				{
+					$arProp["CRM"]["CLIENT_ID"] = "CRMC".$contactID;
+				}
+
+				$clientInfo = array(
+					"LOGIN" => "",
+					"NAME" => "",
+					"LAST_NAME" => "",
+					"SECOND_NAME" => ""
+				);
+
+				if ($bCrmModuleIncluded)
+				{
+					if ($companyID > 0)
+					{
+						$arCompanyFilter = array('=ID' => $companyID);
+						$dbCompany = CCrmCompany::GetListEx(
+							array(), $arCompanyFilter, false, array("nTopCount" => 1),
+							array("TITLE")
+						);
+						$arCompany = $dbCompany->Fetch();
+						unset($dbCompany, $arCompanyFilter);
+						if (is_array($arCompany))
+						{
+							if (isset($arCompany["TITLE"]))
+								$clientInfo["NAME"] = $arCompany["TITLE"];
+						}
+						unset($arCompany);
+					}
+					else if ($contactID > 0)
+					{
+						$arContactFilter = array('=ID' => $contactID);
+						$dbContact = CCrmContact::GetListEx(
+							array(), $arContactFilter, false, array("nTopCount" => 1),
+							array("NAME", "LAST_NAME", "SECOND_NAME")
+						);
+						$arContact = $dbContact->Fetch();
+						unset($dbContact, $arContactFilter);
+						if (is_array($arContact))
+						{
+							if (isset($arContact["NAME"]))
+								$clientInfo["NAME"] = $arContact["NAME"];
+							if (isset($arContact["LAST_NAME"]))
+								$clientInfo["LAST_NAME"] = $arContact["LAST_NAME"];
+							if (isset($arContact["SECOND_NAME"]))
+								$clientInfo["SECOND_NAME"] = $arContact["SECOND_NAME"];
+						}
+						unset($arContact);
+					}
+				}
+
+				$arProp["CRM"]["CLIENT"] = $clientInfo;
+				unset($clientInfo);
 			}
 			if(IntVal($arOrder["PAY_SYSTEM_ID"]) > 0)
 				$arProp["ORDER"]["PAY_SYSTEM_NAME"] = $paySystems[$arOrder["PAY_SYSTEM_ID"]];
@@ -310,7 +398,10 @@ class CAllSaleExport
 					?><DateUpdate><?=$DB->FormatDate($arOrder["DATE_UPDATE"], $dateFormat, "YYYY-MM-DD HH:MI:SS");?></DateUpdate><?
 				}
 
-				$deliveryAdr = CSaleExport::ExportContragents($arOrder, $arProp, $agent, $arResultStat, $bNewVersion);
+				$deliveryAdr = CSaleExport::ExportContragents(
+					$arOrder, $arProp, $agent, $arResultStat, $bNewVersion,
+					$bExportFromCrm ? array("EXPORT_FROM_CRM" => "Y") : array()
+				);
 				?>
 				<<?=GetMessage("SALE_EXPORT_TIME")?>><?=$DB->FormatDate($arOrder["DATE_INSERT_FORMAT"], $dateFormat, "HH:MI:SS");?></<?=GetMessage("SALE_EXPORT_TIME")?>>
 				<<?=GetMessage("SALE_EXPORT_COMMENTS")?>><?=htmlspecialcharsbx($arOrder["COMMENTS"])?></<?=GetMessage("SALE_EXPORT_COMMENTS")?>>
@@ -421,7 +512,7 @@ class CAllSaleExport
 								$arBasket["MEASURE_CODE"] = 796;
 							?>
 							<<?=GetMessage("SALE_EXPORT_UNIT")?>>
-								<<?=GetMessage("SALE_EXPORT_CODE")?>><?=$arBasket["MEASURE_CODE"]?>></<?=GetMessage("SALE_EXPORT_CODE")?>>
+								<<?=GetMessage("SALE_EXPORT_CODE")?>><?=$arBasket["MEASURE_CODE"]?></<?=GetMessage("SALE_EXPORT_CODE")?>>
 								<<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>><?=htmlspecialcharsbx($arMeasures[$arBasket["MEASURE_CODE"]])?></<?=GetMessage("SALE_EXPORT_FULL_NAME_UNIT")?>>
 							</<?=GetMessage("SALE_EXPORT_UNIT")?>>
 							<<?=GetMessage("SALE_EXPORT_KOEF")?>>1</<?=GetMessage("SALE_EXPORT_KOEF")?>>
@@ -714,10 +805,14 @@ class CAllSaleExport
 				$c = ob_get_clean();
 				$c = CharsetConverter::ConvertCharset($c, $arCharSets[$arOrder["LID"]], "utf-8");
 				echo $c;
+				$_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix][] = $arOrder["ID"];
+			}
+			else
+			{
+				$_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix] = $arOrder["ID"];
 			}
 
-			$_SESSION["BX_CML2_EXPORT"]["LAST_ORDER_ID"] = $arOrder["ID"];
-			if(time() > $end_time)
+			if(IntVal($time_limit) > 0 && time() > $end_time)
 			{
 				break;
 			}
@@ -800,12 +895,17 @@ class CAllSaleExport
 		return true;
 	}
 
-	public static function ExportContragents($arOrder = array(), $arProp = array(), $agent = array(), &$arResultStat, $bNewVersion = false)
+	public static function ExportContragents($arOrder = array(), $arProp = array(), $agent = array(), &$arResultStat, $bNewVersion = false, $arOptions = array())
 	{
+		$bExportFromCrm = (isset($arOptions["EXPORT_FROM_CRM"]) && $arOptions["EXPORT_FROM_CRM"] === "Y");
 		?>
 		<<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
-			<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>>
-				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>>
+			<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>><?
+		if ($bExportFromCrm): ?>
+				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arProp["CRM"]["CLIENT_ID"]."#".$arProp["CRM"]["CLIENT"]["LOGIN"]."#".$arProp["CRM"]["CLIENT"]["LAST_NAME"]." ".$arProp["CRM"]["CLIENT"]["NAME"]." ".$arProp["CRM"]["CLIENT"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>><?
+		else: ?>
+				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>><?
+		endif; ?>
 				<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["AGENT_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
 				<?
 				$deliveryAdr = $agent["ADDRESS_FULL"];

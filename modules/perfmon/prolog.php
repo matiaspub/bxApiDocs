@@ -1,11 +1,11 @@
 <?
-if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/geshi/geshi.php"))
+if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/geshi/geshi.php"))
 	require_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/geshi/geshi.php");
 
-function perfmon_NumberFormat($num, $dec=2, $html=true)
+function perfmon_NumberFormat($num, $dec = 2, $html = true)
 {
 	$str = number_format($num, $dec, ".", " ");
-	if($html)
+	if ($html)
 		return str_replace(" ", "&nbsp;", $str);
 	else
 		return $str;
@@ -15,6 +15,7 @@ class CAdminListColumn
 {
 	public $id = "";
 	public $info = array();
+
 	public function __construct($id, $info)
 	{
 		$this->id = $id;
@@ -40,6 +41,7 @@ class CAdminListColumn
 class CAdminListColumnList extends CAdminListColumn
 {
 	public $list = array();
+
 	public function __construct($id, $info, array $list = array())
 	{
 		parent::__construct($id, $info);
@@ -63,7 +65,7 @@ class CAdminListColumnList extends CAdminListColumn
 			"reference" => array(),
 			"reference_id" => array(),
 		);
-		foreach($this->list as $key => $value)
+		foreach ($this->list as $key => $value)
 		{
 			$arr["reference"][] = $value;
 			$arr["reference_id"][] = $key;
@@ -85,7 +87,7 @@ class CAdminListColumnNumber extends CAdminListColumn
 
 	public function getRowView($arRes)
 	{
-		if($_REQUEST["mode"] == "excel")
+		if ($_REQUEST["mode"] == "excel")
 			return number_format($arRes[$this->id], $this->precision, ".", "");
 		else
 			return str_replace(" ", "&nbsp;", number_format($arRes[$this->id], $this->precision, ".", " "));
@@ -102,6 +104,12 @@ class CAdminListPage
 	protected $data = null;
 	protected $columns = array();
 
+	/**
+	 * @param string $pageTitle
+	 * @param string $sTableID
+	 * @param boolean|array[] $arSort
+	 * @param string $navLabel
+	 */
 	public function __construct($pageTitle, $sTableID, $arSort = false, $navLabel = "")
 	{
 		$this->pageTitle = $pageTitle;
@@ -151,7 +159,7 @@ class CAdminListPage
 					&& $find_type == $column->info["find_type"]
 				)
 				{
-					
+
 					$arFilter[$column->info["filter_key"]] = $find;
 				}
 				elseif (
@@ -163,9 +171,9 @@ class CAdminListPage
 			}
 		}
 
-		foreach($arFilter as $key => $value)
+		foreach ($arFilter as $key => $value)
 		{
-			if($value == "")
+			if ($value == "")
 				unset($arFilter[$key]);
 		}
 
@@ -175,7 +183,7 @@ class CAdminListPage
 	public function getHeaders()
 	{
 		$arHeaders = array();
-		foreach($this->columns as $column)
+		foreach ($this->columns as $column)
 		{
 			$arHeaders[] = array(
 				"id" => $column->id,
@@ -191,10 +199,10 @@ class CAdminListPage
 	public function getSelectedFields()
 	{
 		$arSelectedFields = $this->list->GetVisibleHeaderColumns();
-		if(!is_array($arSelectedFields) || empty($arSelectedFields))
+		if (!is_array($arSelectedFields) || empty($arSelectedFields))
 		{
 			$arSelectedFields = array();
-			foreach($this->columns as $column)
+			foreach ($this->columns as $column)
 			{
 				if ($column->info["default"])
 					$arSelectedFields[] = $column->id;
@@ -236,7 +244,7 @@ class CAdminListPage
 		);
 		$listFilter = array();
 		$filterRows = array();
-		foreach($this->columns as $column)
+		foreach ($this->columns as $column)
 		{
 			if (isset($column->info["filter"]))
 			{
@@ -253,32 +261,36 @@ class CAdminListPage
 		{
 			$this->filter = new CAdminFilter($this->sTableID."_filter", $listFilter);
 			?>
-			<form name="find_form" method="get" action="<?echo $APPLICATION->GetCurPage();?>">
-			<?$this->filter->Begin();?>
-			<?if (!empty($findFilter["reference"])):?>
-				<tr>
-					<td><b><?=GetMessage("PERFMON_HIT_FIND")?>:</b></td>
-					<td><input type="text" size="25" name="find" value="<?echo htmlspecialcharsbx($find)?>"><?echo SelectBoxFromArray("find_type", $findFilter, $find_type, "", "");?></td>
-				</tr>
-			<?endif;?>
-			<?
-			foreach($this->columns as $column)
-			{
-				if (isset($column->info["filter"]))
+			<form name="find_form" method="get" action="<? echo $APPLICATION->GetCurPage(); ?>">
+				<? $this->filter->Begin(); ?>
+				<? if (!empty($findFilter["reference"])): ?>
+					<tr>
+						<td><b><?=GetMessage("PERFMON_HIT_FIND")?>:</b></td>
+						<td><input
+							type="text" size="25" name="find"
+							value="<? echo htmlspecialcharsbx($find) ?>"><? echo SelectBoxFromArray("find_type", $findFilter, $find_type, "", ""); ?>
+						</td>
+					</tr>
+				<? endif; ?>
+				<?
+				foreach ($this->columns as $column)
 				{
-					?><tr>
-						<td><?echo $column->info["content"]?></td>
-						<td><?echo $column->getFilterInput()?></td>
-					</tr><?
+					if (isset($column->info["filter"]))
+					{
+						?>
+						<tr>
+						<td><? echo $column->info["content"] ?></td>
+						<td><? echo $column->getFilterInput() ?></td>
+						</tr><?
+					}
 				}
-			}
-			$this->filter->Buttons(array(
-				"table_id" => $this->sTableID,
-				"url" => $APPLICATION->GetCurPage(),
-				"form" => "find_form",
-			));
-			$this->filter->End();
-			?>
+				$this->filter->Buttons(array(
+					"table_id" => $this->sTableID,
+					"url" => $APPLICATION->GetCurPage(),
+					"form" => "find_form",
+				));
+				$this->filter->End();
+				?>
 			</form>
 		<?
 		}
@@ -298,7 +310,7 @@ class CAdminListPage
 		$this->list->NavText($this->data->GetNavPrint($this->navLabel));
 
 		$i = 0;
-		while($arRes = $this->data->NavNext(true, "f_"))
+		while ($arRes = $this->data->NavNext(true, "f_"))
 		{
 			$row = $this->list->AddRow(++$i, $arRes);
 			foreach ($select as $fieldId)
@@ -320,10 +332,12 @@ class CAdminListPage
 		$this->list->AddAdminContextMenu($this->getContextMenu());
 		$this->list->CheckListMode();
 		$APPLICATION->SetTitle($this->pageTitle);
-		global $adminPage, $adminMenu, $adminChain, $USER;
+		global /** @noinspection PhpUnusedLocalVariableInspection */
+		$adminPage, $adminMenu, $adminChain, $USER;
 		require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_admin_after.php");
 		$this->displayFilter();
 		$this->list->DisplayList();
 	}
 }
+
 ?>

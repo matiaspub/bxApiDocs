@@ -24,8 +24,8 @@ class _CEventsIm {
 	public static function OnAfterContactListGetList(){}
 
 	/**
-	 * после удаления сообщения
-	 * 
+	 * после удаления сообщения</body>
+	 * </html
 	 * 
 	 * <i>Вызывается в методе:</i><br>
 	 * CIMMessage::Delete<br><br>
@@ -43,7 +43,6 @@ class _CEventsIm {
 
 	/**
 	 * после добавления сообщения
-	 * 
 	 * 
 	 * <i>Вызывается в методе:</i><br>
 	 * CIMMessenger::Add<br><br>

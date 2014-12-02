@@ -6,8 +6,9 @@ class CSocNetForumComments
 	public static function FindLogEventIDByForumEntityID($forumEntityType)
 	{
 		$event_id = false;
+		$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
 
-		foreach ($GLOBALS["arSocNetLogEvents"] as $event_id_tmp => $arEventTmp)
+		foreach ($arSocNetLogEvents as $event_id_tmp => $arEventTmp)
 		{
 			if (
 				array_key_exists("FORUM_COMMENT_ENTITY", $arEventTmp)
@@ -19,7 +20,8 @@ class CSocNetForumComments
 			}
 		}
 
-		foreach ($GLOBALS["arSocNetFeaturesSettings"] as $feature_tmp => $arFeature)
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
+		foreach ($arSocNetFeaturesSettings as $feature_tmp => $arFeature)
 		{
 			if (array_key_exists("subscribe_events", $arFeature))
 			{

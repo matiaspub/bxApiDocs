@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.
+ * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.</body> </html>
  *
  *
  *
@@ -487,7 +487,7 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	* )
 	* 
 	* Параметры функции
-	* </htm
+	* </ht
 	* <tr>
 	* <th width="15%">Параметр</th>
 	* 	<th>Описание</th>
@@ -661,7 +661,7 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*
@@ -2945,7 +2945,7 @@ AND RA.USER_FILE_HASH = '".$DB->ForSql($HASH, 255)."'
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*

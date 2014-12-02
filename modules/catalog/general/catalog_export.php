@@ -463,8 +463,8 @@ class CAllCatalogExport
 	{
 		global $DB;
 
-		$profile_id = intval($profile_id);
-		if ($profile_id<=0) return false;
+		$profile_id = (int)$profile_id;
+		if ($profile_id <= 0) return false;
 
 		$ar_profile = CCatalogExport::GetByID($profile_id);
 		if ((!$ar_profile) || ('Y' == $ar_profile['NEED_EDIT']))
@@ -490,6 +490,30 @@ class CAllCatalogExport
 				$intSetupVarsCount = extract($arSetupVars, EXTR_SKIP);
 			}
 		}
+
+		global $arCatalogAvailProdFields;
+		$arCatalogAvailProdFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT);
+		global $arCatalogAvailPriceFields;
+		$arCatalogAvailPriceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG);
+		global $arCatalogAvailValueFields;
+		$arCatalogAvailValueFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+		global $arCatalogAvailQuantityFields;
+		$arCatalogAvailQuantityFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+		global $arCatalogAvailGroupFields;
+		$arCatalogAvailGroupFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+
+		global $defCatalogAvailProdFields;
+		$defCatalogAvailProdFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_ELEMENT);
+		global $defCatalogAvailPriceFields;
+		$defCatalogAvailPriceFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CATALOG);
+		global $defCatalogAvailValueFields;
+		$defCatalogAvailValueFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE);
+		global $defCatalogAvailQuantityFields;
+		$defCatalogAvailQuantityFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+		global $defCatalogAvailGroupFields;
+		$defCatalogAvailGroupFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_SECTION);
+		global $defCatalogAvailCurrencies;
+		$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
 
 		CCatalogDiscountSave::Disable();
 		include($_SERVER["DOCUMENT_ROOT"].$strFile);

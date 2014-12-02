@@ -1138,7 +1138,7 @@ public static 	function GetList($arOrder = array("SORT" => "ASC"), $arFilter = a
 		return array($dbTasksList1, $dbTasksList);
 	}
 
-public static 	private function PrepareUserForPrint($value)
+private function PrepareUserForPrint($value)
 	{
 		$arReturn = array();
 
@@ -1162,7 +1162,7 @@ public static 	private function PrepareUserForPrint($value)
 		return (is_array($value) ? $arReturn : ((count($arReturn) > 0) ? $arReturn[0] : ""));
 	}
 
-public static 	private function PrepareSectionForPrint($value, $iblockId = 0)
+private function PrepareSectionForPrint($value, $iblockId = 0)
 	{
 		if ($iblockId <= 0)
 			$iblockId = COption::GetOptionInt("intranet", "iblock_tasks", 0);
@@ -1195,7 +1195,7 @@ public static 	private function PrepareSectionForPrint($value, $iblockId = 0)
 	* @param string $documentId - код документа.
 	* @return string - ссылка на страницу документа в административной части.
 	*/
-	public static public function GetDocumentAdminPage($documentId)
+	public static function GetDocumentAdminPage($documentId)
 	{
 		return null;
 
@@ -1216,7 +1216,7 @@ public static 	private function PrepareSectionForPrint($value, $iblockId = 0)
 		return null;
 	}
 
-public static 	public function GetDocument($documentId)
+public static function GetDocument($documentId)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -1330,7 +1330,7 @@ public static 	public function GetDocument($documentId)
 		return $arResult;
 	}
 
-public static 	public function GetDocumentType($documentId)
+public static function GetDocumentType($documentId)
 	{
 		if (substr($documentId, 0, strlen("type_")) == "type_")
 			return $documentId;
@@ -1347,7 +1347,7 @@ public static 	public function GetDocumentType($documentId)
 		return "type_".$arResult["IBLOCK_ID"];
 	}
 
-public static 	public function GetDocumentFields($documentType)
+public static function GetDocumentFields($documentType)
 	{
 		$v = substr($documentType, strlen("type_"));
 		if (intval($v)."!" != $v."!")
@@ -1599,7 +1599,7 @@ public static 	public function GetDocumentFields($documentType)
 		return $arResult;
 	}
 
-public static 	public function GetDocumentFieldTypes($documentType)
+public static function GetDocumentFieldTypes($documentType)
 	{
 		$v = substr($documentType, strlen("type_"));
 		if (intval($v)."!" != $v."!")
@@ -1644,7 +1644,7 @@ public static 	public function GetDocumentFieldTypes($documentType)
 		return $arResult;
 	}
 
-public static 	public function AddDocumentField($documentType, $arFields)
+public static function AddDocumentField($documentType, $arFields)
 	{
 		$iblockId = intval(substr($documentType, strlen("type_")));
 		if ($iblockId <= 0)
@@ -1727,7 +1727,7 @@ public static 	public function AddDocumentField($documentType, $arFields)
 		return "PROPERTY_".$arFields["code"];
 	}
 
-public static 	public function UpdateDocument($documentId, $arFields)
+public static function UpdateDocument($documentId, $arFields)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -1839,7 +1839,7 @@ public static 	public function UpdateDocument($documentId, $arFields)
 		}
 	}
 
-public static 	public function CreateDocument($parentDocumentId, $arFields)
+public static function CreateDocument($parentDocumentId, $arFields)
 	{
 		if (!array_key_exists("IBLOCK_ID", $arFields) || intval($arFields["IBLOCK_ID"]) <= 0)
 			throw new Exception("IBlock ID is not found");
@@ -1939,13 +1939,13 @@ public static 	public function CreateDocument($parentDocumentId, $arFields)
 	}
 
 	// array("read" => "Ета чтение", "write" => "Ета запысь")
-	public static public function GetAllowableOperations($documentType)
+	public static function GetAllowableOperations($documentType)
 	{
 		return array("read" => GetMessage("BPVDX_OP_READ"), "create" => GetMessage("BPVDX_OP_CREATE")/*, "admin" => GetMessage("BPVDX_OP_ADMIN")*/);
 	}
 
 	// array("1" => "Админы", 2 => "Гости", 3 => ..., "Author" => "Афтар")
-public static 	public function GetAllowableUserGroups($documentType)
+public static function GetAllowableUserGroups($documentType)
 	{
 		$documentType = trim($documentType);
 		if (strlen($documentType) <= 0)
@@ -1970,7 +1970,7 @@ public static 	public function GetAllowableUserGroups($documentType)
 		return $arResult;
 	}
 
-	public static public function GetUsersFromUserGroup($group, $documentId)
+	public static function GetUsersFromUserGroup($group, $documentId)
 	{
 		if (strtolower($group) == "author")
 		{
@@ -1998,7 +1998,7 @@ public static 	public function GetAllowableUserGroups($documentType)
 		return $arResult;
 	}
 
-public static 	public function GetJSFunctionsForFields($documentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
+public static function GetJSFunctionsForFields($documentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
 	{
 		$iblockId = intval(substr($documentType, strlen("type_")));
 		if ($iblockId <= 0)
@@ -2211,7 +2211,7 @@ public static 	function GetFieldValuePrintable($documentId, $fieldName, $fieldTy
 		return self::GetFieldInputValuePrintable($documentType, $arFieldType, $fieldValue);
 	}
 
-public static 	public function SetPermissions($documentId, $workflowId, $arPermissions, $bRewrite = true)
+public static function SetPermissions($documentId, $workflowId, $arPermissions, $bRewrite = true)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -2220,7 +2220,7 @@ public static 	public function SetPermissions($documentId, $workflowId, $arPermi
 
 	}
 
-public static 	public function OnAfterIBlockElementDelete($arFields)
+public static function OnAfterIBlockElementDelete($arFields)
 	{
 		CBPDocument::OnDocumentDelete(array("bizproc", "CBPVirtualDocument", $arFields["ID"]), $arErrorsTmp);
 	}

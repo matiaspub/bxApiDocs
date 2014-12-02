@@ -24,7 +24,7 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	*
 	*
 	*
-	* @param int $ID  Код счета.
+	* @param int $ID  Код счета.</bod
 	*
 	*
 	*
@@ -34,7 +34,7 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	* счете;</li> <li> <b>CURRENCY</b> - валюта;</li> <li> <b>NOTES</b> - текстовое описание;</li>
 	* <li> <b>LOCKED</b> - флаг заблокированности счета;</li> <li> <b>TIMESTAMP_X</b> - дата
 	* последнего изменения;</li> <li> <b>DATE_LOCKED</b> - дата блокировки счета.</li>
-	* </ul> <h4> <b>Примечание</b> </h4> <p>Результат выполнения функции
+	* </ul> <h4> <b>Примечание</b> </h4><p>Результат выполнения функции
 	* кешируется в рамках страницы, поэтому повторный вызов функции на
 	* одной странице не влечет за собой дополнительных обращений к
 	* базе данных.</p> <a name="examples"></a>
@@ -105,7 +105,7 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	* счете;</li> <li> <b> CURRENCY</b> - валюта;</li> <li> <b> NOTES</b> - текстовое
 	* описание;</li> <li> <b> LOCKED</b> - флаг заблокированности счета;</li> <li> <b>
 	* TIMESTAMP_X</b> - дата последнего изменения;</li> <li> <b> DATE_LOCKED</b> - дата
-	* блокировки счета.</li> </ul> <h4> <b>Примечание</b> </h4> <p>Результат
+	* блокировки счета.</li> </ul> <h4> <b>Примечание</b> </h4><p>Результат
 	* выполнения функции кешируется в рамках страницы, поэтому
 	* повторный вызов функции на одной странице не влечет за собой
 	* дополнительных обращений к базе данных.</p> <a name="examples"></a>
@@ -501,7 +501,7 @@ class CSaleUserAccount extends CAllSaleUserAccount
 	*
 	*
 	*
-	* @param int $ID  Код изменяемого счета.
+	* @param int $ID  Код изменяемого счета. </htm
 	*
 	*
 	*

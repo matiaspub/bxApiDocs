@@ -45,9 +45,14 @@ define('BX_PULL_SKIP_WEBSOCKET', true);
 define('BX_PULL_SKIP_INIT', true);
 
 /**
- * BX_PULL_MOBILE
+ * NOT_CHECK_FILE_PERMISSIONS
  */
-define('BX_PULL_MOBILE', true);
+define('NOT_CHECK_FILE_PERMISSIONS', true);
+
+/**
+ * BX_MOBILE_LOG
+ */
+define('BX_MOBILE_LOG', true);
 
 
 ?>

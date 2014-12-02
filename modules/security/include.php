@@ -44,5 +44,3 @@ CModule::AddAutoloadClasses(
 		"CSecurityJsonHelper" => "classes/general/json.php",
 	)
 );
-
-?>

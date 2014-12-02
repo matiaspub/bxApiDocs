@@ -82,7 +82,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* сортировка. Значениями являются направления сортировки.<br><br>
 	* Допустимые ключи: <ul> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>ID</b>
 	* - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li> <li> <b>CODE</b> -
-	* мнемонический код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
+	* символьный код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
 	* изменения параметров ставки;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
 	* ставки;</li> <li> <b>NAME</b> - название налога;</li> <li> <b>PERSON_TYPE_ID</b> - тип
 	* плательщика ставки;</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли ставка
@@ -95,8 +95,8 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* налогов. Ключами являются названия фильтруемых параметров
 	* ставки налога, а значениями - условия на значения.<br><br> Допустимые
 	* ключи: <ul> <li> <b>ID</b> - код ставки налога;</li> <li> <b>LID</b> - сайт налога;</li>
-	* <li> <b>CODE</b> - мнемонический код налога;</li> <li> <b>TAX_ID</b> - код налога;</li>
-	* <li> <b>PERSON_TYPE_ID</b> - тип плательщика ставки налога; </li> <li> <b>IS_IN_PRICE</b> -
+	* <li> <b>CODE</b> - символьный код налога;</li> <li> <b>TAX_ID</b> - код налога;</li> <li>
+	* <b>PERSON_TYPE_ID</b> - тип плательщика ставки налога; </li> <li> <b>IS_IN_PRICE</b> -
 	* флаг (Y/N) входит ли налог в цену;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
 	* ставки налога;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>LOCATION</b>
 	* - код местоположения, в котором действует ставка.</li> </ul>
@@ -113,9 +113,9 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* цену.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr>
 	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи.</td> </tr> <tr> <td>LID</td>
 	* <td>Сайт налога.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
-	* <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr> <td>DESCRIPTION</td>
-	* <td>Описание налога.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности
-	* ставки.</td> </tr> </table> <a name="examples"></a>
+	* <td>CODE</td> <td>Символьный код налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание
+	* налога.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности ставки.</td> </tr> </table>
+	* <a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 

@@ -23,7 +23,7 @@ class CEvent extends CAllEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовая система</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a> </li> </ul> </h<br><br>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a> </li> </ul> <br><br>
 	*
 	*
 	* @static

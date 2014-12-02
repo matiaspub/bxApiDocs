@@ -52,6 +52,7 @@ $arClasses = array(
 	"CIBlockSectionRights" => "classes/general/iblock_rights.php",
 	"CIBlockElementRights" => "classes/general/iblock_rights.php",
 	"CIBlockRightsStorage" => "classes/general/iblock_rights.php",
+	"CIBlockPropertyTools" => "classes/general/iblockproptools.php",
 	"Bitrix\\Iblock\\IblockTable" => "lib/iblock.php",
 	"Bitrix\\Iblock\\ElementTable" => "lib/element.php",
 	"Bitrix\\Iblock\\SectionElementTable" => "lib/sectionelement.php",
@@ -507,8 +508,8 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * детальному описанию (можно искать по шаблону [%_]); </li> <li>
  * <b>SEARCHABLE_CONTENT</b> - по содержимому для поиска. Включает в себя
  * название, описание для анонса и детальное описание (можно искать
- * по шаблону [%_]); </li> <li> <b>CODE</b> - по мнемоническому идентификатору
- * (можно искать по шаблону [%_]); </li> <li> <b>SORT</b> - по сортировке; </li> <li>
+ * по шаблону [%_]); </li> <li> <b>CODE</b> - по символьному идентификатору (можно
+ * искать по шаблону [%_]); </li> <li> <b>SORT</b> - по сортировке; </li> <li>
  * <b>EXTERNAL_ID</b> - по внешнему коду (можно искать по шаблону [%_]); </li> <li>
  * <b>TIMESTAMP_X</b> - по времени изменения; </li> <li> <b>DATE_CREATE</b> - по времени
  * создания; </li> <li> <b>DATE_ACTIVE_FROM</b> - по дате начала активности; </li> <li>
@@ -516,23 +517,22 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * непустое значение задействует фильтр по датам активности
  * (<i>DATE_ACTIVE_FROM</i> и <i>DATE_ACTIVE_TO</i>). Если значение не установлено (<i>""</i>),
  * фильтрация по датам активности не производится; </li> <li> <b>IBLOCK_ID</b> -
- * по коду информационного блока; </li> <li> <b>IBLOCK_CODE</b> - по
- * мнемоническому коду информационного блока (можно искать по
- * шаблону [%_]); </li> <li> <b>IBLOCK_LID</b> - по языку (можно искать по шаблону [%_]);
- * </li> <li> <b>IBLOCK_TYPE</b> - по типу блока (можно искать по шаблону [%_]); </li> <li>
- * <b>IBLOCK_ACTIVE</b> - по активности блока (можно искать по шаблону [%_]); </li>
- * <li> <b>SECTION_ID</b> - по родительскому разделу; </li> <li> <b>PROPERTY_&lt;код
- * свойства&gt;</b> - фильтр по значениям свойств (можно искать по
- * шаблону [%_]), для свойств типа "список", поиск будет осуществляться
- * не по значению перечисления, а по его идентификатору; </li> <li>
- * <b>PROPERTY_&lt;код свойства&gt;_VALUE</b> - фильтр по значениям списка для
- * свойств типа "список" (можно искать по шаблону [%_]), поиск будет
- * осуществляться по строковому значению списка, а не по
- * идентификатору; </li> <li> <b>CATALOG_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю
- * <i>CATALOG_FIELD </i>из цены типа <i>PRICE_TYPE </i>(ID типа цены), где <i>CATALOG_FIELD
- * </i>может быть: <i>PRICE </i>- цена, <i>CURRENCY </i>- валюта. </li> </ul>Все
- * фильтруемые поля (кроме <i>SECTION_ID </i>и <i>ACTIVE_DATE</i>)<i> </i>могут
- * содержать перед названием <a
+ * по коду информационного блока; </li> <li> <b>IBLOCK_CODE</b> - по символьному
+ * коду информационного блока (можно искать по шаблону [%_]); </li> <li>
+ * <b>IBLOCK_LID</b> - по языку (можно искать по шаблону [%_]); </li> <li> <b>IBLOCK_TYPE</b> -
+ * по типу блока (можно искать по шаблону [%_]); </li> <li> <b>IBLOCK_ACTIVE</b> - по
+ * активности блока (можно искать по шаблону [%_]); </li> <li> <b>SECTION_ID</b> - по
+ * родительскому разделу; </li> <li> <b>PROPERTY_&lt;код свойства&gt;</b> - фильтр
+ * по значениям свойств (можно искать по шаблону [%_]), для свойств
+ * типа "список", поиск будет осуществляться не по значению
+ * перечисления, а по его идентификатору; </li> <li> <b>PROPERTY_&lt;код
+ * свойства&gt;_VALUE</b> - фильтр по значениям списка для свойств типа
+ * "список" (можно искать по шаблону [%_]), поиск будет осуществляться
+ * по строковому значению списка, а не по идентификатору; </li> <li>
+ * <b>CATALOG_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю <i>CATALOG_FIELD </i>из цены типа
+ * <i>PRICE_TYPE </i>(ID типа цены), где <i>CATALOG_FIELD </i>может быть: <i>PRICE </i>- цена,
+ * <i>CURRENCY </i>- валюта. </li> </ul>Все фильтруемые поля (кроме <i>SECTION_ID </i>и
+ * <i>ACTIVE_DATE</i>)<i> </i>могут содержать перед названием <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
  * фильтра</a>, а поля <i>SECTION_ID </i>и <i>ACTIVE_DATE </i>могут содержать перед
  * названием тип проверки фильтра "!" - не равно.<br><br><i>Значения
@@ -549,9 +549,10 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> с активными
  * элементами (у которых установлен флаг "Активен", выполняется
  * условие периода активности и находящиеся в активных
- * информационных блоках для текущего сайта).</p> <h4>Примечание</h4>
- * <p>При работе с результатом рекомендуется применять метод класса
- * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
+ * информационных блоках для текущего сайта).</p>
+ * <h4>Примечание</h4><p>При работе с результатом рекомендуется
+ * применять метод класса <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>, результатом
  * которого будет массив с полями элемента информационного блока.
  * Все поля при этом будут преобразованы в "HTML безопасный" вид, а в
@@ -663,7 +664,7 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * &lt;Список&gt;" )</pre> </td> </tr> </tbody></table> <p> Если заданным параметрам не
  * найден элемент, функция вернет <i>false</i>. <br> Выборка элемента
  * происходит только из активных элементов инфоблока, неактивный
- * элемент выбран быть не может. </p> <h4>Примечание</h4> <p> Все
+ * элемент выбран быть не может. </p> <h4>Примечание</h4><p> Все
  * возвращаемые поля преобразованы в "HTML безопасный" вид, а в полях
  * (LIST_PAGE_URL - списка элементов и DETAIL_PAGE_URL - детального просмотра) с
  * шаблонами URL-ов к страницам будут заменены параметры

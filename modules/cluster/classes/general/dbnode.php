@@ -333,7 +333,7 @@ class CAllClusterDBNode
 		return $DB->Query($strSql, false, '', array('fixed_connection'=>true));
 	}
 
-	static public function getServerList()
+	public static function getServerList()
 	{
 		global $DB;
 		$result = array();

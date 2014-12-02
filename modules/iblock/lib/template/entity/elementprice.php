@@ -66,10 +66,10 @@ class ElementPrice extends Base
 			$this->fields = array();
 			while ($priceInfo = $pricesList->fetch())
 			{
-				$price_id = $priceInfo["CATALOG_GROUP_ID"];
+				$priceId = $priceInfo["CATALOG_GROUP_ID"];
 				$price = \FormatCurrency($priceInfo["PRICE"], $priceInfo["CURRENCY"]);
-				$this->addField($price_id, $price_id, $price);
-				$this->addField($priceInfo["CATALOG_GROUP_CODE"], $price_id, $price);
+				$this->addField($priceId, $priceId, $price);
+				$this->addField($priceInfo["CATALOG_GROUP_CODE"], $priceId, $price);
 			}
 		}
 		return is_array($this->fields);

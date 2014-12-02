@@ -84,6 +84,69 @@ class CSocServAuthManager
 		return $aServ;
 	}
 
+	static public function GetProfileUrl($service, $uid, $arService = false)
+	{
+		if(isset(self::$arAuthServices[$service]))
+		{
+			if(!is_array($arService))
+			{
+				$dbSocservUser = \CSocServAuthDB::getList(
+					array(),
+					array(
+						'USER_ID' => $GLOBALS['USER']->GetID(),
+						'EXTERNAL_AUTH_ID' => $service,
+					)
+				);
+				$arService = $dbSocservUser->fetch();
+			}
+
+			if(
+				is_array($arService)
+				&& self::$arAuthServices[$service]["__active"] === true
+				&& self::$arAuthServices[$service]["DISABLED"] !== true
+			)
+			{
+				$cl = new self::$arAuthServices[$service]["CLASS"];
+				if(is_callable(array($cl, "getProfileUrl")))
+				{
+					return $cl->getProfileUrl($uid);
+				}
+			}
+		}
+
+		return false;
+	}
+
+	static public function GetFriendsList($service, $limit, &$next)
+	{
+		if(isset(self::$arAuthServices[$service]))
+		{
+			$dbSocservUser = \CSocServAuthDB::getList(
+				array(),
+				array(
+					'USER_ID' => $GLOBALS['USER']->GetID(),
+					'EXTERNAL_AUTH_ID' => $service,
+				)
+			);
+			$arService = $dbSocservUser->fetch();
+
+			if(
+				is_array($arService)
+				&& self::$arAuthServices[$service]["__active"] === true
+				&& self::$arAuthServices[$service]["DISABLED"] !== true
+			)
+			{
+				$cl = new self::$arAuthServices[$service]["CLASS"];
+				if(is_callable(array($cl, "getFriendsList")))
+				{
+					return $cl->getFriendsList($limit, $next);
+				}
+			}
+		}
+
+		return false;
+	}
+
 	static public function GetSettings()
 	{
 		$arOptions = array();
@@ -101,7 +164,7 @@ class CSocServAuthManager
 		return $arOptions;
 	}
 
-	static public function Authorize($service_id)
+	static public function Authorize($service_id, $arParams = array())
 	{
 		if($service_id === 'Bitrix24OAuth')
 		{
@@ -114,7 +177,10 @@ class CSocServAuthManager
 			{
 				$cl = new $service["CLASS"];
 				if(is_callable(array($cl, "Authorize")))
-					return call_user_func_array(array($cl, "Authorize"), array());
+				{
+					return call_user_func_array(array($cl, "Authorize"), array
+						($arParams));
+				}
 			}
 		}
 
@@ -134,6 +200,16 @@ class CSocServAuthManager
 		return '';
 	}
 
+	public static function GetUniqueKey()
+	{
+		if(!isset($_SESSION["UNIQUE_KEY"]))
+		{
+			self::SetUniqueKey();
+		}
+
+		return $_SESSION["UNIQUE_KEY"];
+	}
+
 	public static function SetUniqueKey()
 	{
 		if(!isset($_SESSION["UNIQUE_KEY"]))
@@ -151,6 +227,7 @@ class CSocServAuthManager
 		}
 		if(!isset($_REQUEST['check_key']) && isset($_REQUEST['backurl']))
 			InitURLParam($_REQUEST['backurl']);
+
 		if($_SESSION["UNIQUE_KEY"] <> '' && ($_REQUEST['check_key'] === $_SESSION["UNIQUE_KEY"]))
 		{
 			if($bUnset)
@@ -558,9 +635,9 @@ class CSocServAuthManager
 		$counter++;
 		if($counter >= 20)
 		{
-			$oldLastId = COption::GetOptionString('socialservices', 'last_twit_id', '1');
-			if((strlen($lastTwitId) > strlen($oldLastId)) && $oldLastId[0] != 9)
-				$lastTwitId = substr($lastTwitId, 1);
+			// $oldLastId = COption::GetOptionString('socialservices', 'last_twit_id', '1');
+			// if((strlen($lastTwitId) > strlen($oldLastId)) && $oldLastId[0] != 9)
+			// 	$lastTwitId = substr($lastTwitId, 1);
 			COption::SetOptionString('socialservices', 'last_twit_id', $lastTwitId);
 			$counter = 1;
 		}
@@ -670,7 +747,6 @@ class CSocServAuthManager
 
 		return $result;
 	}
-
 }
 
 //base class for auth services
@@ -685,27 +761,42 @@ class CSocServAuth
 
 	protected function CheckFields($action, &$arFields)
 	{
-		if(isset($arFields["EXTERNAL_AUTH_ID"]) && strlen($arFields["EXTERNAL_AUTH_ID"])<=0)
-			return false;
-		if(isset($arFields["SITE_ID"]) && strlen($arFields["SITE_ID"])<=0)
-			$arFields["SITE_ID"] = SITE_ID;
-		if(!isset($arFields["USER_ID"]))
-			$arFields["USER_ID"] = $GLOBALS["USER"]->GetID();
+		if($action === 'ADD')
+		{
+			if(isset($arFields["EXTERNAL_AUTH_ID"]) && strlen($arFields["EXTERNAL_AUTH_ID"])<=0)
+			{
+				return false;
+			}
+
+			if(isset($arFields["SITE_ID"]) && strlen($arFields["SITE_ID"])<=0)
+			{
+				$arFields["SITE_ID"] = SITE_ID;
+			}
+
+			if(!isset($arFields["USER_ID"]))
+			{
+				$arFields["USER_ID"] = $GLOBALS["USER"]->GetID();
+			}
+
+			$dbCheck = CSocServAuthDB::GetList(array(), array("USER_ID" => $arFields["USER_ID"], "EXTERNAL_AUTH_ID" => $arFields["EXTERNAL_AUTH_ID"]), false, false, array("ID"));
+			if($dbCheck->Fetch())
+			{
+				return false;
+			}
+		}
+
 		if(is_set($arFields, "PERSONAL_PHOTO"))
 		{
 			$res = CFile::CheckImageFile($arFields["PERSONAL_PHOTO"]);
 			if(strlen($res)>0)
+			{
 				unset($arFields["PERSONAL_PHOTO"]);
+			}
 			else
 			{
 				$arFields["PERSONAL_PHOTO"]["MODULE_ID"] = "socialservices";
 				CFile::SaveForDB($arFields, "PERSONAL_PHOTO", "socialservices");
 			}
-		}
-		$dbCheck = CSocServAuthDB::GetList(array(), array("USER_ID" => $arFields["USER_ID"], "EXTERNAL_AUTH_ID" => $arFields["EXTERNAL_AUTH_ID"]), false, false, array("ID"));
-		if($dbCheck->Fetch())
-		{
-			return false;
 		}
 
 		return true;
@@ -715,9 +806,27 @@ class CSocServAuth
 	{
 		global $DB;
 		$id = intval($id);
-		if($id <= 0 || !self::CheckFields('UPDATE', $arFields))
+
+		if($id <= 0)
+		{
 			return false;
+		}
+
+		foreach(GetModuleEvents("socialservices", "OnBeforeSocServUserUpdate", true) as $arEvent)
+		{
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+			{
+				return false;
+			}
+		}
+
+		if(!self::CheckFields('UPDATE', $arFields))
+		{
+			return false;
+		}
+
 		$strUpdate = $DB->PrepareUpdate("b_socialservices_user", $arFields);
+
 		$strSql = "UPDATE b_socialservices_user SET ".$strUpdate." WHERE ID = ".$id." ";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -726,6 +835,7 @@ class CSocServAuth
 		$cache_dir = '/bx/socserv_ar_user';
 		$obCache->Clean($cache_id, $cache_dir);
 
+		$arFields['ID'] = $id;
 		foreach(GetModuleEvents("socialservices", "OnAfterSocServUserUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
@@ -885,8 +995,50 @@ class CSocServAuth
 		return COption::GetOptionString("socialservices", $opt.self::$settingsSuffix);
 	}
 
+	public static function getGroupsDenyAuth()
+	{
+		return explode(',', (\COption::GetOptionString("socialservices", "group_deny_auth", "")));
+	}
+
+	public static function getGroupsDenySplit()
+	{
+		return explode(',', (\COption::GetOptionString("socialservices", "group_deny_split", "")));
+	}
+
+	public static function setGroupsDenyAuth($value)
+	{
+		\COption::SetOptionString('socialservices', 'group_deny_auth', is_array($value) ? implode(',', $value) : '');
+	}
+
+	public static function setGroupsDenySplit($value)
+	{
+		\COption::SetOptionString('socialservices', 'group_deny_split', is_array($value) ? implode(',', $value) : '');
+	}
+
+	public static function isSplitDenied($arGroups = null)
+	{
+		global $USER;
+
+		if($arGroups === null)
+		{
+			return $USER->IsAuthorized()
+				&& count(array_intersect(self::getGroupsDenySplit(), $USER->GetUserGroupArray())) > 0;
+		}
+		else
+		{
+			return count(array_intersect(self::getGroupsDenySplit(), $arGroups)) > 0;
+		}
+	}
+
+	public static function isAuthDenied($arGroups)
+	{
+		return count(array_intersect(self::getGroupsDenyAuth(), $arGroups)) > 0;
+	}
+
 	static public function AuthorizeUser($arFields)
 	{
+		global $USER;
+
 		if(!isset($arFields['XML_ID']) || $arFields['XML_ID'] == '')
 			return false;
 		if(!isset($arFields['EXTERNAL_AUTH_ID']) || $arFields['EXTERNAL_AUTH_ID'] == '')
@@ -901,92 +1053,223 @@ class CSocServAuth
 			$arOAuthKeys["OATOKEN_EXPIRES"] = $arFields["OATOKEN_EXPIRES"];
 
 		$errorCode = SOCSERV_AUTHORISATION_ERROR;
-		$dbSocUser = CSocServAuthDB::GetList(array(), array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']), false, false, array("ID", "USER_ID", "ACTIVE"));
 
-		if($GLOBALS["USER"]->IsAuthorized() && $GLOBALS["USER"]->GetID())
+		$dbSocUser = CSocServAuthDB::GetList(
+			array(),
+			array(
+				'XML_ID'=>$arFields['XML_ID'],
+				'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']
+			), false, false, array("ID", "USER_ID", "ACTIVE")
+		);
+		$arUser = $dbSocUser->Fetch();
+
+		if($USER->IsAuthorized())
 		{
-			$id = CSocServAuthDB::Add($arFields);
-
-			if($id && $_SESSION["OAUTH_DATA"] && is_array($_SESSION["OAUTH_DATA"]))
+			if(!self::isSplitDenied())
 			{
-				CSocServAuthDB::Update($id, $_SESSION["OAUTH_DATA"]);
-				unset($_SESSION["OAUTH_DATA"]);
-			}
-			elseif(!$id && !empty($arOAuthKeys))
-			{
-				if($arUser = $dbSocUser->Fetch())
+				if(!$arUser)
 				{
-					CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
+					$id = CSocServAuthDB::Add($arFields);
 				}
+				else
+				{
+					$id = $arUser['ID'];
+
+					// socservice link split
+					if($arUser['USER_ID'] != $USER->GetID())
+					{
+						$dbRes = CSocServAuthDB::GetList(
+							array(),
+							array(
+								'USER_ID'=>$USER->GetID(),
+								'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']
+							), false, false, array("ID")
+						);
+						if($dbRes->Fetch())
+						{
+							return SOCSERV_AUTHORISATION_ERROR;
+						}
+						else
+						{
+							$arOAuthKeys['USER_ID'] = $USER->GetID();
+							$arOAuthKeys['CAN_DELETE'] = 'Y';
+						}
+					}
+				}
+
+				if($_SESSION["OAUTH_DATA"] && is_array($_SESSION["OAUTH_DATA"]))
+				{
+					$arOAuthKeys = array_merge($arOAuthKeys, $_SESSION['OAUTH_DATA']);
+					unset($_SESSION["OAUTH_DATA"]);
+				}
+
+				CSocServAuthDB::Update($id, $arOAuthKeys);
+			}
+			else
+			{
+				return SOCSERV_REGISTRATION_DENY;
 			}
 		}
 		else
 		{
-			$dbUsersOld = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-			$dbUsersNew = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+			$entryId = 0;
+			$USER_ID = 0;
 
-			if($arUser = $dbSocUser->Fetch())
+			if($arUser)
 			{
+				$entryId = $arUser['ID'];
 				if($arUser["ACTIVE"] === 'Y')
-					$USER_ID = $arUser["USER_ID"];
-				if(!empty($arOAuthKeys))
-					CSocServAuthDB::Update($arUser["ID"], $arOAuthKeys);
-			}
-			elseif($arUser = $dbUsersOld->Fetch())
-			{
-				$USER_ID = $arUser["ID"];
-			}
-			elseif($arUser = $dbUsersNew->Fetch())
-			{
-				$USER_ID = $arUser["ID"];
-			}
-			elseif(COption::GetOptionString("main", "new_user_registration", "N") == "Y")
-			{
-				$arFields['PASSWORD'] = randString(30); //not necessary but...
-				$arFields['LID'] = SITE_ID;
-
-				$def_group = COption::GetOptionString('main', 'new_user_registration_def_group', '');
-				if($def_group <> '')
-					$arFields['GROUP_ID'] = explode(',', $def_group);
-
-				$arFieldsUser = $arFields;
-				$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
-				if(!($USER_ID = $GLOBALS["USER"]->Add($arFieldsUser)))
-					return SOCSERV_AUTHORISATION_ERROR;
-				$arFields['CAN_DELETE'] = 'N';
-				$arFields['USER_ID'] = $USER_ID;
-				$id = CSocServAuthDB::Add($arFields);
-				if($id && $_SESSION["OAUTH_DATA"] && is_array($_SESSION["OAUTH_DATA"]))
 				{
-					CSocServAuth::Update($id, $_SESSION["OAUTH_DATA"]);
-					unset($_SESSION["OAUTH_DATA"]);
+					$USER_ID = $arUser["USER_ID"];
 				}
-				unset($arFields['CAN_DELETE']);
 			}
-			elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
-				$errorCode = SOCSERV_REGISTRATION_DENY;
-
-			if(isset($USER_ID) && $USER_ID > 0)
-				$GLOBALS["USER"]->Authorize($USER_ID);
 			else
-				return $errorCode;
+			{
+				// check for user with old socialservices linking system (socservice ID in user's EXTERNAL_AUTH_ID)
+				$dbUsersOld = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+				$arUser = $dbUsersOld->Fetch();
+				if($arUser)
+				{
+					$USER_ID = $arUser["ID"];
+				}
+				else
+				{
+					// theoretically possible situation with abandoned external user w/o b_socialservices_user entry
+					$dbUsersNew = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+					$arUser = $dbUsersNew->Fetch();
 
-			//it can be redirect after authorization, so no spreading. Store cookies in the session for next hit
+					if($arUser)
+					{
+						$USER_ID = $arUser["ID"];
+					}
+					elseif(COption::GetOptionString("main", "new_user_registration", "N") == "Y")
+					{
+						$arFields['PASSWORD'] = randString(30); //not necessary but...
+						$arFields['LID'] = SITE_ID;
+
+						$def_group = COption::GetOptionString('main', 'new_user_registration_def_group', '');
+						if($def_group <> '')
+						{
+							$arFields['GROUP_ID'] = explode(',', $def_group);
+						}
+
+						if(!empty($arFields['GROUP_ID']) && self::isAuthDenied($arFields['GROUP_ID']))
+						{
+							$errorCode = SOCSERV_REGISTRATION_DENY;
+						}
+						else
+						{
+							$arFieldsUser = $arFields;
+							$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
+
+							$USER_ID = $USER->Add($arFieldsUser);
+							if($USER_ID <= 0)
+							{
+								$errorCode = SOCSERV_AUTHORISATION_ERROR;
+							}
+						}
+					}
+					elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
+					{
+						$errorCode = SOCSERV_REGISTRATION_DENY;
+					}
+
+					$arFields['CAN_DELETE'] = 'N';
+
+				}
+			}
+
+			if(isset($_SESSION["OAUTH_DATA"]) && is_array($_SESSION["OAUTH_DATA"]))
+			{
+				foreach ($_SESSION['OAUTH_DATA'] as $key => $value)
+				{
+					$arFields[$key] = $value;
+				}
+				unset($_SESSION["OAUTH_DATA"]);
+			}
+
+			if($USER_ID > 0)
+			{
+				$arGroups = $USER->GetUserGroup($USER_ID);
+				if(self::isAuthDenied($arGroups))
+				{
+					return SOCSERV_AUTHORISATION_ERROR;
+				}
+
+				if($entryId > 0)
+				{
+					CSocServAuthDB::Update($entryId, $arFields);
+				}
+				else
+				{
+					$arFields['USER_ID'] = $USER_ID;
+					CSocServAuthDB::Add($arFields);
+				}
+
+				$USER->AuthorizeWithOtp($USER_ID);
+			}
+			else
+			{
+				return $errorCode;
+			}
+
+			// possible redirect after authorization, so no spreading. Store cookies in the session for next hit
 			$GLOBALS['APPLICATION']->StoreCookies();
 		}
 
 		return true;
+	}
+
+	public static function OnFindExternalUser($login)
+	{
+		global $DB;
+
+		$res = $DB->Query("
+SELECT bsu.USER_ID
+FROM b_socialservices_user bsu
+LEFT JOIN b_user bu ON bsu.USER_ID=bu.ID
+WHERE bsu.LOGIN='".$DB->ForSql($login)."' AND bu.ACTIVE='Y'
+");
+		if(($user = $res->Fetch()))
+		{
+			return $user["USER_ID"];
+		}
+		return 0;
 	}
 }
 
 //some repetitive functionality
 class CSocServUtil
 {
-	public static function GetCurUrl($addParam="", $removeParam=false)
+	const OAUTH_PACK_PARAM = "oauth_proxy_params";
+	private static $oAuthParams = array("redirect_uri", "client_id", "scope", "response_type", "state");
+
+	public static function GetCurUrl($addParam="", $removeParam=false, $checkOAuthProxy=true)
 	{
 		$arRemove = array("logout", "auth_service_error", "auth_service_id", "MUL_MODE", "SEF_APPLICATION_CUR_PAGE_URL");
+
 		if($removeParam !== false)
+		{
 			$arRemove = array_merge($arRemove, $removeParam);
+		}
+
+		if($checkOAuthProxy !== false)
+		{
+			$proxyString = "";
+			foreach(self::$oAuthParams as $param)
+			{
+				if(isset($_GET[$param]))
+				{
+					$arRemove[] = $param;
+					$proxyString .= ($proxyString == "" ? "" : "&").urlencode($param)."=".urlencode($_GET[$param]);
+				}
+			}
+
+			if($proxyString != "")
+			{
+				$addParam .= ($addParam == "" ? "" : "&").self::packOAuthProxyString($proxyString);
+			}
+		}
 		return self::ServerName().$GLOBALS['APPLICATION']->GetCurPageParam($addParam, $arRemove);
 	}
 
@@ -996,6 +1279,34 @@ class CSocServUtil
 		$port = ($_SERVER['SERVER_PORT'] > 0 && $_SERVER['SERVER_PORT'] <> 80 && $_SERVER['SERVER_PORT'] <> 443? ':'.$_SERVER['SERVER_PORT']:'');
 
 		return $protocol.'://'.$_SERVER['SERVER_NAME'].$port;
+	}
+
+	public static function packOAuthProxyString($proxyString)
+	{
+		return self::OAUTH_PACK_PARAM."=".urlencode(base64_encode($proxyString));
+	}
+
+	public static function checkOAuthProxyParams()
+	{
+		if(isset($_REQUEST[self::OAUTH_PACK_PARAM]) && strlen($_REQUEST[self::OAUTH_PACK_PARAM]) > 0)
+		{
+			$proxyString = base64_decode($_REQUEST[self::OAUTH_PACK_PARAM]);
+			if(strlen($proxyString) > 0)
+			{
+				$arVars = array();
+				parse_str($proxyString, $arVars);
+				foreach(self::$oAuthParams as $param)
+				{
+					if(isset($arVars[$param]))
+					{
+						$_GET[$param] = $_REQUEST[$param] = $arVars[$param];
+					}
+				}
+			}
+
+			unset($_REQUEST[self::OAUTH_PACK_PARAM]);
+			unset($_GET[self::OAUTH_PACK_PARAM]);
+		}
 	}
 }
 

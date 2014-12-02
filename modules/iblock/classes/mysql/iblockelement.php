@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков.
+ * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков. </body> </html>
  *
  *
  *
@@ -262,9 +262,9 @@ class CIBlockElement extends CAllIBlockElement
 	* style="font-weight: bold;">date_active_from</span> - начало периода действия элемента;
 	* </li> <li> <b>active_to</b> или <span style="font-weight: bold;">date_active_to</span> - окончание
 	* периода действия элемента; </li> <li> <b>status</b> - код статуса элемента в
-	* документообороте; </li> <li> <b>code</b> - мнемонический код элемента; </li>
-	* <li> <b>iblock_id</b> - числовой код информационного блока; </li> <li> <b>modified_by</b>
-	* - код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
+	* документообороте; </li> <li> <b>code</b> - символьный код элемента; </li> <li>
+	* <b>iblock_id</b> - числовой код информационного блока; </li> <li> <b>modified_by</b> -
+	* код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
 	* активности элемента; </li> <li> <i>show_counter </i>- количество показов
 	* элемента (учитывается функцией <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
@@ -281,43 +281,45 @@ class CIBlockElement extends CAllIBlockElement
 	* bold;">created_date</span> - дата создания без учета времени;</li> <li> <span
 	* style="font-weight: bold;">cnt</span> - количество элементов (только при заданной
 	* группировке); <br> </li> <li> <b>property_&lt;PROPERTY_CODE&gt;</b> - по значению свойства
-	* с числовым или мнемоническим кодом <i>PROPERTY_CODE</i> (например, PROPERTY_123
-	* или PROPERTY_NEWS_SOURCE); </li> <li> <b>propertysort_&lt;PROPERTY_CODE&gt;</b> - по индексу
-	* сортировки варианта значения свойства. Только для свойств типа
-	* "Список" ; </li> <li> <b>catalog_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю CATALOG_FIELD
-	* (может быть PRICE - цена или CURRENCY - валюта) из цены с типом <i>PRICE_TYPE</i>
-	* (например, catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <b>CATALOG_QUANTITY</b> - общее
-	* количество товара;</li> <li> <b>CATALOG_WEIGHT</b> - вес товара;</li> <li>
-	* <b>CATALOG_AVAILABLE</b> - признак доступности к покупке (Y|N). Товар считается
-	* недоступным, если его количество меньше либо равно нулю, включен
-	* количественный учет и запрещена покупка при нулевом
-	* количестве.</li> <li> <span style="font-weight: bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> -
-	* по значению поля элемента указанного в качестве привязки. PROPERTY_CODE
-	* - мнемонический или символьный код свойства типа привязка к
-	* элементам. FIELD может принимать значения:</li> <ul> <li>ID <br> </li> <li>TIMESTAMP_X
-	* <br> </li> <li>MODIFIED_BY <br> </li> <li>CREATED <br> </li> <li>CREATED_DATE <br> </li> <li>CREATED_BY <br> </li>
-	* <li>IBLOCK_ID <br> </li> <li>ACTIVE <br> </li> <li>ACTIVE_FROM <br> </li> <li>ACTIVE_TO <br> </li> <li>SORT <br> </li>
-	* <li>NAME <br> </li> <li>SHOW_COUNTER <br> </li> <li>SHOW_COUNTER_START <br> </li> <li>CODE <br> </li> <li>TAGS <br>
-	* </li> <li>XML_ID <br> </li> <li>STATUS </li> </ul> <li> <span style="font-weight:
+	* с числовым или символьным кодом <i>PROPERTY_CODE</i> (например, PROPERTY_123 или
+	* PROPERTY_NEWS_SOURCE); </li> <li> <b>propertysort_&lt;PROPERTY_CODE&gt;</b> - по индексу сортировки
+	* варианта значения свойства. Только для свойств типа "Список" ; </li>
+	* <li> <b>catalog_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю CATALOG_FIELD (может быть PRICE -
+	* цена или CURRENCY - валюта) из цены с типом <i>PRICE_TYPE</i> (например,
+	* catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <b>IBLOCK_SECTION_ID</b> - ID раздела;</li> <li>
+	* <b>CATALOG_QUANTITY</b> - общее количество товара;</li> <li> <b>CATALOG_WEIGHT</b> - вес
+	* товара;</li> <li> <b>CATALOG_AVAILABLE</b> - признак доступности к покупке (Y|N).
+	* Товар считается недоступным, если его количество меньше либо
+	* равно нулю, включен количественный учет и запрещена покупка при
+	* нулевом количестве.</li> <li> <span style="font-weight:
+	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - по значению поля элемента
+	* указанного в качестве привязки. PROPERTY_CODE - символьный код свойства
+	* типа привязка к элементам. FIELD может принимать значения:</li> <ul> <li>ID
+	* <br> </li> <li>TIMESTAMP_X <br> </li> <li>MODIFIED_BY <br> </li> <li>CREATED <br> </li> <li>CREATED_DATE <br> </li>
+	* <li>CREATED_BY <br> </li> <li>IBLOCK_ID <br> </li> <li>ACTIVE <br> </li> <li>ACTIVE_FROM <br> </li> <li>ACTIVE_TO <br>
+	* </li> <li>SORT <br> </li> <li>NAME <br> </li> <li>SHOW_COUNTER <br> </li> <li>SHOW_COUNTER_START <br> </li> <li>CODE
+	* <br> </li> <li>TAGS <br> </li> <li>XML_ID <br> </li> <li>STATUS </li> </ul> <li> <span style="font-weight:
 	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.PROPERTY_&lt;</span><span style="font-weight: bold;">PROPERTY_CODE2</span><span
 	* style="font-weight: bold;">&gt;</span> - по значению свойства элемента указанного в
-	* качестве привязки. PROPERTY_CODE - мнемонический или символьный код
-	* свойства типа привязки к элементам. PROPERTY_CODE2- код свойства
-	* связанных элементов. </li> <li> <b>HAS_PREVIEW_PICTURE</b> и <b>HAS_DETAIL_PICTURE</b> -
-	* сортировка по наличию и отсутствию картинок.</li> <li> <b>order</b> -
-	* порядок сортировки, пишется без пробелов, может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <span style="font-weight:
-	* bold;">nulls,asc</span> - по возрастанию с пустыми значениями в начале
-	* выборки;</li> <li> <span style="font-weight: bold;">asc,nulls</span> - по возрастанию с
-	* пустыми значениями в конце выборки;</li> <li> <b>desc</b> - по убыванию;</li>
-	* <li> <span style="font-weight: bold;">nulls,desc</span> - по убыванию с пустыми значениями
-	* в начале выборки;</li> <li> <span style="font-weight: bold;">desc,nulls</span> - по убыванию с
-	* пустыми значениями в конце выборки; <br> </li> </ul> Необязательный. По
+	* качестве привязки. PROPERTY_CODE - символьный код свойства типа
+	* привязки к элементам. PROPERTY_CODE2- код свойства связанных элементов.
+	* </li> <li> <b>HAS_PREVIEW_PICTURE</b> и <b>HAS_DETAIL_PICTURE</b> - сортировка по наличию и
+	* отсутствию картинок.</li> <li> <b>order</b> - порядок сортировки, пишется
+	* без пробелов, может принимать значения: <ul> <li> <b>asc</b> - по
+	* возрастанию;</li> <li> <span style="font-weight: bold;">nulls,asc</span> - по возрастанию с
+	* пустыми значениями в начале выборки;</li> <li> <span style="font-weight:
+	* bold;">asc,nulls</span> - по возрастанию с пустыми значениями в конце
+	* выборки;</li> <li> <b>desc</b> - по убыванию;</li> <li> <span style="font-weight:
+	* bold;">nulls,desc</span> - по убыванию с пустыми значениями в начале
+	* выборки;</li> <li> <span style="font-weight: bold;">desc,nulls</span> - по убыванию с пустыми
+	* значениями в конце выборки; <br> </li> </ul> Необязательный. По
 	* умолчанию равен <i>Array("sort"=&gt;"asc")</i> </li> </ul> <br><b>Примечание:</b> если
 	* задать разным свойствам одинаковый символьный код, но в разном
 	* регистре, то при работе сортировки по одному из свойств (например,
 	* PROPERTY_rating) будет возникать ошибочная ситуация (элементы в списке
-	* задублируются, сортировки не будет).
+	* задублируются, сортировки не будет). <br> Примечание 2: указанные
+	* поля сортировки автоматически добавляются в arGroupBy (если он задан)
+	* и arSelectFields.
 	*
 	*
 	*
@@ -329,7 +331,7 @@ class CIBlockElement extends CAllIBlockElement
 	* выводит все элементы без учета их состояния (фильтр <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>);</li> <li> <b>NAME</b> - по
 	* названию (фильтр <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>);
-	* </li> <li> <b>CODE</b> - по мнемоническому идентификатору (фильтр <a
+	* </li> <li> <b>CODE</b> - по символьному идентификатору (фильтр <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>TAGS</b> - по
 	* тегам (фильтр <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li>
 	* <li> <b>XML_ID</b> или<b> EXTERNAL_ID</b> - по внешнему коду (фильтр <a
@@ -395,9 +397,9 @@ class CIBlockElement extends CAllIBlockElement
 	* идентификаторов, чтобы сделать выборку из элементов нескольких
 	* инфоблоков: <br><pre class="syntax">$arFilter = array("IBLOCK_ID" =&gt; array(1, 2, 3), ...);</pre> Для
 	* инфоблоков 2.0 такая выборка будет работать только в том случае,
-	* если в ней не запрашиваются свойства элементов.<br><br> </li> <li>
-	* <b>IBLOCK_CODE</b> - по мнемоническому коду информационного блока (фильтр
-	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_SITE_ID</b>
+	* если в ней не запрашиваются свойства элементов. <br><br> </li> <li>
+	* <b>IBLOCK_CODE</b> - по символьному коду информационного блока (фильтр <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>IBLOCK_SITE_ID</b>
 	* или <span style="font-weight: bold;">IBLOCK_LID</span> или <span style="font-weight: bold;">SITE_ID</span> или
 	* <span style="font-weight: bold;">LID</span> - по сайту (фильтр <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>IBLOCK_TYPE</b>
@@ -411,7 +413,7 @@ class CIBlockElement extends CAllIBlockElement
 	* Значением фильтра может быть и массив. В этом случае будут
 	* выбраны элементы привязанные хотя бы к одному из разделов
 	* указанных в фильтре. Возможно указание отрицания "!". В этом случае
-	* условие будет инвертировано;</li> <li> <b>SECTION_CODE</b> - по мнемоническому
+	* условие будет инвертировано;</li> <li> <b>SECTION_CODE</b> - по символьному
 	* коду родительской группы. Аналогично SECTION_ID; <br> </li> <li>
 	* <b>INCLUDE_SUBSECTIONS</b> - если задан фильтр по родительским группам
 	* <b>SECTION_ID</b>, то будут также выбраны элементы находящиеся в
@@ -454,7 +456,7 @@ class CIBlockElement extends CAllIBlockElement
 	* что элемент ещё ни разу не был опубликован (Y|N); </li> <li> <b>WF_LOCK_STATUS</b> -
 	* статус заблокированности элемента в документооборте (red|green|yellow);
 	* </li> <li> <b>PROPERTY_&lt;PROPERTY_CODE</b><b>&gt;</b> - фильтр по значениям свойств, где
-	* PROPERTY_CODE - код свойства или мнемонический код. Для свойств типа
+	* PROPERTY_CODE - код свойства или символьный код. Для свойств типа
 	* "Список", "Число", "Привязка к элементам" и "Привязка к разделам"  -
 	* фильтр <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>. Для прочих -
 	* фильтр <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>; </li> <li> <b
@@ -466,12 +468,12 @@ class CIBlockElement extends CAllIBlockElement
 	* <i>CATALOG_FIELD</i> из цены типа <i>PRICE_TYPE</i> (ID типа цены), где <i>CATALOG_FIELD</i>
 	* может быть: PRICE - цена, CURRENCY - валюта.</li> <li> <span style="font-weight:
 	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - фильтр по значениям полей
-	* связанных элементов. , где PROPERTY_CODE - ID или мнемонический код
-	* свойства привязки, а FIELD - поле указанного в привязке элемента. FIELD
-	* может принимать следующие значения: ACTIVE, DETAIL_TEXT_TYPE, PREVIEW_TEXT_TYPE,
-	* EXTERNAL_ID, NAME, XML_ID, TMP_ID, DETAIL_TEXT, SEARCHABLE_CONTENT, PREVIEW_TEXT, CODE, TAGS, WF_COMMENTS, ID,
-	* SHOW_COUNTER, WF_PARENT_ELEMENT_ID, WF_STATUS_ID, SORT, CREATED_BY, PREVIEW_PICTURE, DETAIL_PICTURE, IBLOCK_ID,
-	* TIMESTAMP_X, DATE_CREATE, SHOW_COUNTER_START, DATE_ACTIVE_FROM, DATE_ACTIVE_TO, ACTIVE_FROM, ACTIVE_TO, ACTIVE_DATE,
+	* связанных элементов. , где PROPERTY_CODE - ID или символьный код свойства
+	* привязки, а FIELD - поле указанного в привязке элемента. FIELD может
+	* принимать следующие значения: ACTIVE, DETAIL_TEXT_TYPE, PREVIEW_TEXT_TYPE, EXTERNAL_ID, NAME,
+	* XML_ID, TMP_ID, DETAIL_TEXT, SEARCHABLE_CONTENT, PREVIEW_TEXT, CODE, TAGS, WF_COMMENTS, ID, SHOW_COUNTER,
+	* WF_PARENT_ELEMENT_ID, WF_STATUS_ID, SORT, CREATED_BY, PREVIEW_PICTURE, DETAIL_PICTURE, IBLOCK_ID, TIMESTAMP_X,
+	* DATE_CREATE, SHOW_COUNTER_START, DATE_ACTIVE_FROM, DATE_ACTIVE_TO, ACTIVE_FROM, ACTIVE_TO, ACTIVE_DATE,
 	* DATE_MODIFY_FROM, DATE_MODIFY_TO, MODIFIED_USER_ID, MODIFIED_BY, CREATED_USER_ID, CREATED_BY. Правила
 	* фильтров идентичны тем, которые описаны выше.</li> </ul> Перед
 	* названием фильтруемого поля можно указать тип проверки фильтра:
@@ -500,9 +502,9 @@ class CIBlockElement extends CAllIBlockElement
 	* массив, то функция вернет количество элементов CNT по фильтру.
 	* Группировать можно по полям элемента, а также по значениям его
 	* свойств. Для этого в качестве одного из полей группировки
-	* необходимо указать <i>PROPERTY_&lt;PROPERTY_CODE&gt;</i>, где PROPERTY_CODE - код
-	* свойства или мнемонический код. <br> Необязательное. По умолчанию
-	* false - записи не группируются.
+	* необходимо указать <i>PROPERTY_&lt;PROPERTY_CODE&gt;</i>, где PROPERTY_CODE - ID или
+	* символьный код свойства. <br> Необязательное. По умолчанию false -
+	* записи не группируются.
 	*
 	*
 	*
@@ -536,7 +538,7 @@ class CIBlockElement extends CAllIBlockElement
 	* должно быть использованы поля IBLOCK_ID и ID, иначе не будет работать
 	* корректно. Кроме того, также  в качестве одного из полей
 	* необходимо указать <i>PROPERTY_&lt;PROPERTY_CODE&gt;</i>, где PROPERTY_CODE - ID или
-	* мнемонический код (задается в верхнем регистре, даже если в
+	* символьный код (задается в верхнем регистре, даже если в
 	* определении свойств инфоблока он указан в нижнем регистре). В
 	* результате будет выведены значения свойств элемента в виде полей
 	* <i>PROPERTY_&lt;PROPERTY_CODE&gt;_VALUE</i> - значение; <i>PROPERTY_&lt;PROPERTY_CODE&gt;_ID</i> - код
@@ -547,17 +549,17 @@ class CIBlockElement extends CAllIBlockElement
 	* PRICE_CODE - ID типа цены. <br> Так же есть возможность выбрать поля
 	* элементов по значениям свойства типа "Привязка к элементам". Для
 	* этого необходимо указать  <i>PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</i>, где
-	* PROPERTY_CODE - ID или мнемонический код свойства привязки, а FIELD - поле
+	* PROPERTY_CODE - ID или символьный код свойства привязки, а FIELD - поле
 	* указанного в привязке элемента. См. ниже "Поля связанных
 	* элементов для сортировки". <br> Можно выбрать и значения свойств
 	* элементов по значениям свойства типа "Привязка к элементам". Для
 	* этого необходимо указать 
 	* <i>PROPERTY_&lt;PROPERTY_CODE&gt;.</i><i>PROPERTY_&lt;PROPERTY_CODE2&gt;</i>, где PROPERTY_CODE - ID или
-	* мнемонический код свойства привязки, а PROPERTY_CODE2 - свойство
-	* указанного в привязке элемента. <br><br> По умолчанию выводить все
-	* поля. Значения параметра игнорируются, если используется
-	* параметр группировки <i>arGroupBy</i>. <br><br><b>Примечание 1</b>: если в
-	* массиве используются свойство, являющееся множественным, то для
+	* символьный код свойства привязки, а PROPERTY_CODE2 - свойство указанного
+	* в привязке элемента. <br><br> По умолчанию выводить все поля.
+	* Значения параметра игнорируются, если используется параметр
+	* группировки <i>arGroupBy</i>. <br><br><b>Примечание 1</b>: если в массиве
+	* используются свойство, являющееся множественным, то для
 	* элементов, где используются несколько значений этого свойства,
 	* будет возвращено несколько записей вместо одной. Для решения
 	* этой проблемы инфоблоки нужно перевести в <a
@@ -604,16 +606,31 @@ class CIBlockElement extends CAllIBlockElement
 	* ?&gt;
 	* 
 	* 
-	* &lt;?<br>// выборка активных элементов из информационного блока $yvalue, <br>// у которых установлено значение свойства с мнемоническим кодом SRC <br>// и дата начала автивности старше 1 января 2003 года<br>// выбранные элементы будут сгруппированы по дате активности<br>$arFilter = Array(<br>   "IBLOCK_ID"=&gt;IntVal($yvalue), <br>   "&gt;DATE_ACTIVE_FROM"=&gt;date($DB-&gt;DateFormatToPHP(CLang::GetDateFormat("SHORT")), mktime(0,0,0,1,1,2003)), <br>   "ACTIVE"=&gt;"Y", <br>   "!PROPERTY_SRC"=&gt;false<br>   );<br>$res = CIBlockElement::GetList(Array("SORT"=&gt;"ASC", "PROPERTY_PRIORITY"=&gt;"ASC"), $arFilter, Array("DATE_ACTIVE_FROM"));<br>while($ar_fields = $res-&gt;GetNext())<br>{<br>  echo $ar_fields["DATE_ACTIVE_FROM"].": ".$ar_fields["CNT"]."&lt;br&gt;";<br>}<br>?&gt;
+	* &lt;?
+	* // выборка активных элементов из информационного блока $yvalue, 
+	* // у которых установлено значение свойства с символьным кодом SRC 
+	* // и дата начала автивности старше 1 января 2003 года
+	* // выбранные элементы будут сгруппированы по дате активности
+	* $arFilter = Array(
+	*  "IBLOCK_ID"=&gt;IntVal($yvalue), 
+	*  "&gt;DATE_ACTIVE_FROM"=&gt;date($DB-&gt;DateFormatToPHP(CLang::GetDateFormat("SHORT")), mktime(0,0,0,1,1,2003)), 
+	*  "ACTIVE"=&gt;"Y", 
+	*  "!PROPERTY_SRC"=&gt;false
+	*  );
+	* $res = CIBlockElement::GetList(Array("SORT"=&gt;"ASC", "PROPERTY_PRIORITY"=&gt;"ASC"), $arFilter, Array("DATE_ACTIVE_FROM"));
+	* while($ar_fields = $res-&gt;GetNext())
+	* {
+	*  echo $ar_fields["DATE_ACTIVE_FROM"].": ".$ar_fields["CNT"]."&lt;br&gt;";
+	* }
+	* ?&gt; 
 	* 
 	* //вывод архива из просроченных элементов (news.list) 
-	* $arFilter = array (
+	* $arFilter = array(
 	*    "IBLOCK_ID" =&gt; $arResult["ID"],
 	*    "IBLOCK_LID" =&gt; SITE_ID,
 	*    "ACTIVE" =&gt; "Y",
 	*    "CHECK_PERMISSIONS" =&gt; "Y", //сильно грузит систему, но проверяет права
-	*    "!DATE_ACTIVE_TO" =&gt; "NULL",
-	*    "<date_active_to date>DateFormatToPHP(CLang::GetDateFormat("SHORT"))), ); </date_active_to>"&gt;
+	*    "<date_active_to> DateFormatToPHP(CLang::GetDateFormat("SHORT")), ); </date_active_to>"&gt;
 	* 
 	* //выборка элементов инфоблока, чтобы в возвращаемом результате находилось 5 случайных элементов
 	* $rs = CIBlockElement::GetList (
@@ -703,7 +720,7 @@ class CIBlockElement extends CAllIBlockElement
 	*
 	* <h4>See Also</h4> 
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов</a></li> </h<br><a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов</a></li> <br><a
 	* name="examples"></a>
 	*
 	*
@@ -711,7 +728,7 @@ class CIBlockElement extends CAllIBlockElement
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php
 	* @author Bitrix
 	*/
-	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $arGroupBy=false, $arNavStartParams=false, $arSelectFields=Array())
+	public static function GetList($arOrder=array("SORT"=>"ASC"), $arFilter=array(), $arGroupBy=false, $arNavStartParams=false, $arSelectFields=array())
 	{
 		/*
 		Filter combinations:
@@ -1241,7 +1258,7 @@ class CIBlockElement extends CAllIBlockElement
 	* и дополнительно может содержать поле "PROPERTY_VALUES" - массив со всеми
 	* значениями свойств элемента в виде массива Array("код
 	* свойства"=&gt;"значение свойства"). Где <br> "код свойства" - числовой
-	* или мнемонический код свойства, <br> "значение свойства" - одиночное
+	* или символьный код свойства, <br> "значение свойства" - одиночное
 	* значение, либо массив значений (если свойство множественное). <br>
 	* Если массив<i> PROPERTY_VALUES</i> задан, то он должен содержать полный
 	* набор значений свойств для данного элемента, т.е. если в нем будет
@@ -1300,7 +1317,6 @@ class CIBlockElement extends CAllIBlockElement
 	* 
 	* Менять параметр IBLOCK_ID нельзя.
 	* 
-	* 
 	* $PROP[tables] = array("VALUE" =&gt; array("TYPE" =&gt;"HTML","TEXT" =&gt; $matches[0])); 
 	* 
 	* $PROP[tables] = array("VALUE" =&gt; array("TYPE" =&gt;"TEXT","TEXT" =&gt; $matches[0])); 
@@ -1326,7 +1342,7 @@ class CIBlockElement extends CAllIBlockElement
 	public function Update($ID, $arFields, $bWorkFlow=false, $bUpdateSearch=true, $bResizePictures=false, $bCheckDiskQuota=true)
 	{
 		global $DB, $USER;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 
 		$db_element = CIBlockElement::GetList(array(), array("ID"=>$ID, "SHOW_HISTORY"=>"Y"), false, false,
 			array(
@@ -1379,7 +1395,7 @@ class CIBlockElement extends CAllIBlockElement
 
 			$arFields["WF_PARENT_ELEMENT_ID"] = $ID;
 
-			if(!array_key_exists("PROPERTY_VALUES", $arFields) || !is_array($arFields["PROPERTY_VALUES"]))
+			if(!isset($arFields["PROPERTY_VALUES"]) || !is_array($arFields["PROPERTY_VALUES"]))
 				$arFields["PROPERTY_VALUES"] = array();
 
 			$bFieldProps = array();
@@ -1457,11 +1473,12 @@ class CIBlockElement extends CAllIBlockElement
 					$ar_wf_element["IBLOCK_SECTION"][] = $arSection["ID"];
 			}
 
-			unset($ar_wf_element["DATE_ACTIVE_FROM"]);
-			unset($ar_wf_element["DATE_ACTIVE_TO"]);
-			unset($ar_wf_element["EXTERNAL_ID"]);
-			unset($ar_wf_element["TIMESTAMP_X"]);
-			unset($ar_wf_element["ID"]);
+			unset($ar_wf_element["DATE_ACTIVE_FROM"],
+				$ar_wf_element["DATE_ACTIVE_TO"],
+				$ar_wf_element["EXTERNAL_ID"],
+				$ar_wf_element["TIMESTAMP_X"],
+				$ar_wf_element["ID"]
+			);
 
 			$arFields = $arFields + $ar_wf_element;
 		}
@@ -1719,7 +1736,7 @@ class CIBlockElement extends CAllIBlockElement
 		}
 
 		$ipropTemplates = new \Bitrix\Iblock\InheritedProperty\ElementTemplates($ar_element["IBLOCK_ID"], $ar_element["ID"]);
-		if(array_key_exists("PREVIEW_PICTURE", $arFields) && is_array($arFields["PREVIEW_PICTURE"]))
+		if(isset($arFields["PREVIEW_PICTURE"]) && is_array($arFields["PREVIEW_PICTURE"]))
 		{
 			if(
 				strlen($arFields["PREVIEW_PICTURE"]["name"])<=0
@@ -1742,7 +1759,7 @@ class CIBlockElement extends CAllIBlockElement
 			}
 		}
 
-		if(array_key_exists("DETAIL_PICTURE", $arFields) && is_array($arFields["DETAIL_PICTURE"]))
+		if(isset($arFields["DETAIL_PICTURE"]) && is_array($arFields["DETAIL_PICTURE"]))
 		{
 			if(
 				strlen($arFields["DETAIL_PICTURE"]["name"])<=0
@@ -1957,7 +1974,7 @@ class CIBlockElement extends CAllIBlockElement
 				else
 					$arFields["DETAIL_PICTURE"] = $ar_new_element["DETAIL_PICTURE"];
 
-				if(is_array($arFields["PROPERTY_VALUES"]) && count($arFields["PROPERTY_VALUES"]) > 0)
+				if(is_array($arFields["PROPERTY_VALUES"]) && !empty($arFields["PROPERTY_VALUES"]))
 				{
 					$i = 0;
 					$db_prop = CIBlockProperty::GetList(array(), array(
@@ -2011,29 +2028,27 @@ class CIBlockElement extends CAllIBlockElement
 					CFile::SaveForDB($arFields, "DETAIL_PICTURE", "iblock");
 			}
 
-			UnSet($arFields["IBLOCK_ID"]);
-			UnSet($arFields["WF_NEW"]);
-			UnSet($arFields["IBLOCK_SECTION_ID"]);
+			unset($arFields["IBLOCK_ID"], $arFields["WF_NEW"], $arFields["IBLOCK_SECTION_ID"]);
 
 			$bTimeStampNA = false;
 			if(is_set($arFields, "TIMESTAMP_X") && ($arFields["TIMESTAMP_X"] === NULL || $arFields["TIMESTAMP_X"]===false))
 			{
 				$bTimeStampNA = true;
-				UnSet($arFields["TIMESTAMP_X"]);
+				unset($arFields["TIMESTAMP_X"]);
 			}
 
 			$strUpdate = $DB->PrepareUpdate("b_iblock_element", $arFields, "iblock");
 
-			if(strlen($strUpdate)>0)
+			if(!empty($strUpdate))
 				$strUpdate .= ", ";
 
 			$strSql = "UPDATE b_iblock_element SET ".$strUpdate.($bTimeStampNA?"TIMESTAMP_X=TIMESTAMP_X":"TIMESTAMP_X=now()")." WHERE ID=".$ID;
 			$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 			if(
-				array_key_exists("PROPERTY_VALUES", $arFields)
+				isset($arFields["PROPERTY_VALUES"])
 				&& is_array($arFields["PROPERTY_VALUES"])
-				&& count($arFields["PROPERTY_VALUES"]) > 0
+				&& !empty($arFields["PROPERTY_VALUES"])
 			)
 				CIBlockElement::SetPropertyValues($ID, $ar_element["IBLOCK_ID"], $arFields["PROPERTY_VALUES"]);
 
@@ -2175,8 +2190,8 @@ class CIBlockElement extends CAllIBlockElement
 	* (множественное) для заданного элемента. <br> Если <i>PROPERTY_CODE</i> равен
 	* <i>false</i>, то <i>PROPERTY_VALUES</i> должен быть вида Array("код
 	* свойства1"=&gt;"значения свойства1", ....), где "код свойства" - числовой
-	* или мнемонический код свойства, "значения свойства" - одно или
-	* массив всех значений свойства (множественное). При этом массив
+	* или символьный код свойства, "значения свойства" - одно или массив
+	* всех значений свойства (множественное). При этом массив
 	* <i>PROPERTY_VALUES</i> должен содержать полный набор значений свойств для
 	* данного элемента, т.е. если в нем будет остутствовать одно из
 	* свойств, то все его значения для данного элемента будут удалены.
@@ -2212,7 +2227,7 @@ class CIBlockElement extends CAllIBlockElement
 	* CIBlockElement::SetPropertyValues ( $PRODUCT_ID, $IBLOCK_ID, array("VALUE"=&gt;$prop_value,"DESCRIPTION"=&gt;$prop_description), $property_name ); 
 	* 
 	* CIBlockElement::SetPropertyValuesEx(ELEMENT_ID, IBLOCK_ID, array(PROPERTY_ID =&gt; Array ("VALUE" =&gt; array("del" =&gt; "Y")))); 
-	* Если требуется обновить всю карточку товара, включая свойства со значениями множественного типа (вместе с их описанием), то это можно сделать одним вызовом Update. Следует добавить описание (DESCRIPTION) к значениям (VALUE) свойств множественного типа, в PROPERTY_VALUES прописать числовой или мнемонический код свойства (множественного типа) и присвоить массив со значениями типа: 
+	* Если требуется обновить всю карточку товара, включая свойства со значениями множественного типа (вместе с их описанием), то это можно сделать одним вызовом Update. Следует добавить описание (DESCRIPTION) к значениям (VALUE) свойств множественного типа, в PROPERTY_VALUES прописать числовой или символьный код свойства (множественного типа) и присвоить массив со значениями типа: 
 	* 
 	* 
 	* $arrFields = Array( 
@@ -2367,9 +2382,10 @@ class CIBlockElement extends CAllIBlockElement
 				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 				{
 					$strSql = "
-						UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-						SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-						WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+						UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+						SET PROPERTY_".$prop["ID"]."=NULL
+						".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+						WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 					";
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				}
@@ -2424,9 +2440,10 @@ class CIBlockElement extends CAllIBlockElement
 				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 				{
 					$strSql = "
-						UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-						SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-						WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+						UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+						SET PROPERTY_".$prop["ID"]."=NULL
+						".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+						WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 					";
 					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				}
@@ -2451,7 +2468,7 @@ class CIBlockElement extends CAllIBlockElement
 							,b_iblock_section S
 						SET
 							E.PROPERTY_".$prop["ID"]."=S.ID
-							,DESCRIPTION_".$prop["ID"]."=null
+							".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
 						WHERE
 							E.IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 							AND P.ID=".$prop["ID"]."
@@ -2544,11 +2561,11 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
 									SET
 										PROPERTY_".$prop["ID"]."=null
-										,DESCRIPTION_".$prop["ID"]."=null
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
+										".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
 							}
 							else
 							{
@@ -2558,9 +2575,10 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2574,7 +2592,7 @@ class CIBlockElement extends CAllIBlockElement
 								$strSql = "
 									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
 									SET PROPERTY_".$prop["ID"]."='".$DB->ForSql($val)."'
-									,DESCRIPTION_".$prop["ID"]."=".($val_desc!==false?"'".$DB->ForSQL($val_desc, 255)."'":"null")."
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
 									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
 							}
 							else
@@ -2590,9 +2608,10 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2641,7 +2660,7 @@ class CIBlockElement extends CAllIBlockElement
 								$strSql = "
 									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
 									SET PROPERTY_".$prop["ID"]."=null
-									,DESCRIPTION_".$prop["ID"]."=null
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
 									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
 							}
 							else
@@ -2653,9 +2672,10 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2676,7 +2696,7 @@ class CIBlockElement extends CAllIBlockElement
 								$strSql = "
 									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
 									SET PROPERTY_".$prop["ID"]."='".intval($val)."'
-									".($val_desc!==false ? ",DESCRIPTION_".$prop["ID"]."='".$DB->ForSql($val_desc, 255)."'" : "")."
+									".($val_desc!==false? self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc): "")."
 									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
 							}
 							else
@@ -2693,9 +2713,10 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2704,27 +2725,31 @@ class CIBlockElement extends CAllIBlockElement
 						{
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
 							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET DESCRIPTION_".$prop["ID"]."='".$DB->ForSql($val_desc, 255)."'
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
+								if (self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"]))
+								{
+									$DB->Query("
+										UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+										SET DESCRIPTION_".$prop["ID"]."='".$DB->ForSql($val_desc, 255)."'
+										WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									");
+								}
 							}
 							else
 							{
-								$strSql = "
+								$DB->Query("
 									UPDATE ".$strTable."
 									SET DESCRIPTION='".$DB->ForSql($val_desc, 255)."'
 									WHERE ID=".$res["ID"]."
-								";
+								");
 							}
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2799,9 +2824,10 @@ class CIBlockElement extends CAllIBlockElement
 							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 							{
 								$strSql = "
-									UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-									WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]."=NULL
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 								";
 								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 							}
@@ -2820,11 +2846,11 @@ class CIBlockElement extends CAllIBlockElement
 						if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
 						{
 							$strSql = "
-								UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+								UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
 								SET
 									PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
-									,DESCRIPTION_".$prop["ID"]."=".($val_desc!==false?"'".$DB->ForSQL($val_desc, 255)."'":"null")."
-								WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
+								WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
 						}
 						else
 						{
@@ -2844,9 +2870,10 @@ class CIBlockElement extends CAllIBlockElement
 						if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 						{
 							$strSql = "
-								UPDATE	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-								SET	PROPERTY_".$prop["ID"]."=NULL, DESCRIPTION_".$prop["ID"]."=NULL
-								WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+								UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+								SET PROPERTY_".$prop["ID"]."=NULL
+								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+								WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
 							";
 							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 						}

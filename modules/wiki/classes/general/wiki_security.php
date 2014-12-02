@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов.
+ * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов.</body> </html>
  *
  *
  *
@@ -278,7 +278,7 @@ class CWikiSecurity
 	*
 	*
 	*
-	* @param string &$str  Содержимое Wiki-страницы
+	* @param string &$str  Содержимое Wiki-страницы </ht
 	*
 	*
 	*

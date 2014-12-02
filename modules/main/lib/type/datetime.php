@@ -3,6 +3,7 @@ namespace Bitrix\Main\Type;
 
 use Bitrix\Main;
 use Bitrix\Main\Context;
+use Bitrix\Main\DB;
 
 class DateTime extends Date
 {

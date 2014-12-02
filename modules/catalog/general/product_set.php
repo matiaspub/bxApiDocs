@@ -7,22 +7,38 @@ class CCatalogProductSetAll
 	const TYPE_GROUP = 2;
 
 	protected static $arErrors = array();
-	protected static $intDisableShowErrors = 0;
+	protected static $disableShowErrors = 0;
 	protected static $disableCheckProduct = false;
+	protected static $recalculateSet = 0;
 
 	public static function enableShowErrors()
 	{
-		self::$intDisableShowErrors++;
+		self::$disableShowErrors++;
 	}
 
 	public static function disableShowErrors()
 	{
-		self::$intDisableShowErrors--;
+		self::$disableShowErrors--;
 	}
 
 	public static function isEnabledShowErrors()
 	{
-		return (0 <= self::$intDisableShowErrors);
+		return (self::$disableShowErrors >= 0);
+	}
+
+	public static function enableRecalculateSet()
+	{
+		self::$recalculateSet++;
+	}
+
+	public static function disableRecalculateSet()
+	{
+		self::$recalculateSet--;
+	}
+
+	public static function isEnabledRecalculateSet()
+	{
+		return (self::$recalculateSet >= 0);
 	}
 
 	public static function getErrors()
@@ -66,7 +82,7 @@ class CCatalogProductSetAll
 		$boolCheck = ('UPDATE' != $strAction ? self::checkFieldsToAdd($arFields, 'TEST' == $strAction) : self::checkFieldsToUpdate($intID, $arFields));
 		if (!$boolCheck || !empty(self::$arErrors))
 		{
-			if (0 <= self::$intDisableShowErrors)
+			if (self::$disableShowErrors >= 0)
 			{
 				global $APPLICATION;
 				$obError = new CAdminException(self::$arErrors);
@@ -105,8 +121,8 @@ class CCatalogProductSetAll
 
 	static public function canCreateSetByProduct($intProductID, $intSetType)
 	{
-		$intProductID = intval($intProductID);
-		if (0 >= $intProductID)
+		$intProductID = (int)$intProductID;
+		if ($intProductID <= 0)
 			return false;
 
 		if (self::isProductInSet($intProductID, $intSetType))
@@ -133,6 +149,33 @@ class CCatalogProductSetAll
 		return true;
 	}
 
+	static public function recalculateSetsByProduct($product)
+	{
+
+	}
+
+	static public function recalculateSet($setID, $productID = 0)
+	{
+		$setID = (int)$setID;
+		$productID = (int)$productID;
+		if ($setID > 0)
+		{
+			if ($productID > 0)
+			{
+				$setParams = self::createSetItemsParamsFromUpdate($setID, false);
+			}
+			else
+			{
+				$extSetParams = self::createSetItemsParamsFromUpdate($setID, true);
+				$productID = $extSetParams['ITEM_ID'];
+				$setParams = $extSetParams['ITEMS'];
+				unset($extSetParams);
+			}
+			self::fillSetItemsParams($setParams);
+			self::calculateSetParams($productID, $setParams);
+		}
+	}
+
 	protected function checkFieldsToAdd(&$arFields, $boolCheckNew = false)
 	{
 		global $DB;
@@ -142,8 +185,8 @@ class CCatalogProductSetAll
 
 		$intCurrentUser = 0;
 		if (CCatalog::IsUserExists())
-			$intCurrentUser = intval($USER->GetID());
-		if (0 >= $intCurrentUser)
+			$intCurrentUser = (int)$USER->GetID();
+		if ($intCurrentUser <= 0)
 			$intCurrentUser = false;
 
 		$strTimeFunc = $DB->GetNowFunction();
@@ -157,7 +200,7 @@ class CCatalogProductSetAll
 
 		if (empty(self::$arErrors))
 		{
-			$arFields['ITEM_ID'] = intval($arFields['ITEM_ID']);
+			$arFields['ITEM_ID'] = (int)$arFields['ITEM_ID'];
 			if (!$boolCheckNew)
 			{
 				if (0 >= $arFields['ITEM_ID'])
@@ -169,7 +212,7 @@ class CCatalogProductSetAll
 					self::$arErrors[] = array('id' => 'ITEM_ID', 'text' => GetMessage('BT_CAT_SET_ERR_PRODUCT_ID_IS_BAD'));
 			}
 
-			$arFields['TYPE'] = intval($arFields['TYPE']);
+			$arFields['TYPE'] = (int)$arFields['TYPE'];
 			if (self::TYPE_SET != $arFields['TYPE'] && self::TYPE_GROUP != $arFields['TYPE'])
 				self::$arErrors[] = array('id' => 'TYPE', 'text' => GetMessage('BT_CAT_SET_ERR_TYPE_IS_BAD'));
 
@@ -194,7 +237,7 @@ class CCatalogProductSetAll
 				if (empty($arOneItem) || !is_array($arOneItem))
 					continue;
 				$arOneItem = array_merge($arDefItem, $arOneItem);
-				$arOneItem['ITEM_ID'] = intval($arOneItem['ITEM_ID']);
+				$arOneItem['ITEM_ID'] = (int)$arOneItem['ITEM_ID'];
 				if (0 >= $arOneItem['ITEM_ID'])
 					continue;
 				if (isset($arProductInSet[$arOneItem['ITEM_ID']]))
@@ -203,15 +246,22 @@ class CCatalogProductSetAll
 					continue;
 				}
 				$arProductInSet[$arOneItem['ITEM_ID']] = true;
+				$arOneItem['QUANTITY'] = doubleval($arOneItem['QUANTITY']);
+				if (0 >= $arOneItem['QUANTITY'])
+				{
+					self::$arErrors[] = array(
+						'id' => 'QUANTITY',
+						'text' => (
+							self::TYPE_SET == $arFields['TYPE']
+							? GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_IS_BAD')
+							: GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_GROUP_IS_BAD')
+						)
+					);
+					continue;
+				}
 				if (self::TYPE_SET == $arFields['TYPE'])
 				{
-					$arOneItem['QUANTITY'] = doubleval($arOneItem['QUANTITY']);
-					if (0 >= $arOneItem['QUANTITY'])
-					{
-						self::$arErrors[] = array('id' => 'QUANTITY', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_IS_BAD'));
-						continue;
-					}
-					$arOneItem['MEASURE'] = intval($arOneItem['MEASURE']);
+					$arOneItem['MEASURE'] = (int)$arOneItem['MEASURE'];
 					if (0 > $arOneItem['MEASURE'])
 						$arOneItem['MEASURE'] = 0;
 
@@ -228,7 +278,6 @@ class CCatalogProductSetAll
 				}
 				else
 				{
-					$arOneItem['QUANTITY'] = false;
 					$arOneItem['MEASURE'] = false;
 					$arOneItem['DISCOUNT_PERCENT'] = false;
 				}
@@ -275,7 +324,7 @@ class CCatalogProductSetAll
 		if (empty(self::$arErrors))
 		{
 			$arFields['ACTIVE'] = ('N' != $arFields['ACTIVE'] ? 'Y' : 'N');
-			$arFields['SORT'] = intval($arFields['SORT']);
+			$arFields['SORT'] = (int)$arFields['SORT'];
 			if (0 >= $arFields['SORT'])
 					$arFields['SORT'] = 100;
 
@@ -283,10 +332,10 @@ class CCatalogProductSetAll
 			$arFields['OWNER_ID'] = $arFields['ITEM_ID'];
 			$arFields['~DATE_CREATE'] = $strTimeFunc;
 			$arFields['~TIMESTAMP_X'] = $strTimeFunc;
-			$arFields['CREATED_BY'] = (!array_key_exists('CREATED_BY', $arFields) ? 0 : intval($arFields['CREATED_BY']));
+			$arFields['CREATED_BY'] = (!array_key_exists('CREATED_BY', $arFields) ? 0 : (int)$arFields['CREATED_BY']);
 			if (0 >= $arFields['CREATED_BY'])
 				$arFields['CREATED_BY'] = $intCurrentUser;
-			$arFields['MODIFIED_BY'] = (!array_key_exists('MODIFIED_BY', $arFields) ? 0 : intval($arFields['MODIFIED_BY']));
+			$arFields['MODIFIED_BY'] = (!array_key_exists('MODIFIED_BY', $arFields) ? 0 : (int)$arFields['MODIFIED_BY']);
 			if (0 >= $arFields['MODIFIED_BY'])
 				$arFields['MODIFIED_BY'] = $intCurrentUser;
 
@@ -302,8 +351,8 @@ class CCatalogProductSetAll
 
 		$intCurrentUser = 0;
 		if (CCatalog::IsUserExists())
-			$intCurrentUser = intval($USER->GetID());
-		if (0 >= $intCurrentUser)
+			$intCurrentUser = (int)$USER->GetID();
+		if ($intCurrentUser <= 0)
 			$intCurrentUser = false;
 
 		$strTimeFunc = $DB->GetNowFunction();
@@ -314,8 +363,8 @@ class CCatalogProductSetAll
 		$dblDiscountPercent = 0;
 		$boolItems = false;
 
-		$intID = intval($intID);
-		if (0 >= $intID)
+		$intID = (int)$intID;
+		if ($intID <= 0)
 			self::$arErrors[] = array('id' => 'ID', 'text' => GetMessage('BT_CAT_SET_ERR_ID_IS_BAD'));
 
 		if (empty(self::$arErrors))
@@ -331,13 +380,13 @@ class CCatalogProductSetAll
 				$arFields['ACTIVE'] = ('N' != $arFields['ACTIVE'] ? 'Y' : 'N');
 			if (array_key_exists('SORT', $arFields))
 			{
-				$arFields['SORT'] = intval($arFields['SORT']);
-				if (0 >= $arFields['SORT'])
+				$arFields['SORT'] = (int)$arFields['SORT'];
+				if ($arFields['SORT'] <= 0)
 					$arFields['SORT'] = 100;
 			}
 
-			$arFields['MODIFIED_BY'] = (!array_key_exists('MODIFIED_BY', $arFields) ? 0 : intval($arFields['MODIFIED_BY']));
-			if (0 >= $arFields['MODIFIED_BY'])
+			$arFields['MODIFIED_BY'] = (!array_key_exists('MODIFIED_BY', $arFields) ? 0 : (int)$arFields['MODIFIED_BY']);
+			if ($arFields['MODIFIED_BY'] <= 0)
 				$arFields['MODIFIED_BY'] = $intCurrentUser;
 
 			$arFields['~TIMESTAMP_X'] = $strTimeFunc;
@@ -364,8 +413,8 @@ class CCatalogProductSetAll
 							unset($arOneItem['ID']);
 						if (!array_key_exists('ITEM_ID', $arOneItem))
 							continue;
-						$arOneItem['ITEM_ID'] = intval($arOneItem['ITEM_ID']);
-						if (0 >= $arOneItem['ITEM_ID'])
+						$arOneItem['ITEM_ID'] = (int)$arOneItem['ITEM_ID'];
+						if ($arOneItem['ITEM_ID'] <= 0)
 							continue;
 						if (isset($arProductInSet[$arOneItem['ITEM_ID']]))
 						{
@@ -384,25 +433,32 @@ class CCatalogProductSetAll
 						}
 						if (array_key_exists('SORT', $arOneItem))
 						{
-							$arOneItem['SORT'] = intval($arOneItem['SORT']);
-							if (0 >= $arOneItem['SORT'])
+							$arOneItem['SORT'] = (int)$arOneItem['SORT'];
+							if ($arOneItem['SORT'] <= 0)
 								$arOneItem['SORT'] = 100;
+						}
+						if (array_key_exists('QUANTITY', $arOneItem))
+						{
+							$arOneItem['QUANTITY'] = doubleval($arOneItem['QUANTITY']);
+							if (0 >= $arOneItem['QUANTITY'])
+							{
+								self::$arErrors[] = array(
+									'id' => 'QUANTITY',
+									'text' => (
+										self::TYPE_SET == $arFields['TYPE']
+										? GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_IS_BAD')
+										: GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_GROUP_IS_BAD')
+									)
+								);
+								continue;
+							}
 						}
 						if (self::TYPE_SET == $arCurrent['TYPE'])
 						{
-							if (array_key_exists('QUANTITY', $arOneItem))
-							{
-								$arOneItem['QUANTITY'] = doubleval($arOneItem['QUANTITY']);
-								if (0 >= $arOneItem['QUANTITY'])
-								{
-									self::$arErrors[] = array('id' => 'QUANTITY', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_QUANTITY_IS_BAD'));
-									continue;
-								}
-							}
 							if (array_key_exists('MEASURE', $arOneItem))
 							{
-								$arOneItem['MEASURE'] = intval($arOneItem['MEASURE']);
-								if (0 > $arOneItem['MEASURE'])
+								$arOneItem['MEASURE'] = (int)$arOneItem['MEASURE'];
+								if ($arOneItem['MEASURE'] < 0)
 									$arOneItem['MEASURE'] = 0;
 							}
 							if (array_key_exists('DISCOUNT_PERCENT', $arOneItem))
@@ -509,8 +565,9 @@ class CCatalogProductSetAll
 			return array(
 				'TYPE' => self::TYPE_GROUP,
 				'SET_ID' => 0,
-				'ACTIVE' => '',
 				'ITEM_ID' => 0,
+				'ACTIVE' => '',
+				'QUANTITY' => 0,
 				'SORT' => 0,
 				'ITEMS' => array()
 			);
@@ -549,12 +606,12 @@ class CCatalogProductSetAll
 
 	protected function setItemFieldsForUpdate(&$arFields, $arCurrent)
 	{
-		$strActive = (array_key_exists('ACTIVE', $arFields) ? $arFields['ACTIVE'] : $arCurrent['ACTIVE']);
+		$strActive = (isset($arFields['ACTIVE']) ? $arFields['ACTIVE'] : $arCurrent['ACTIVE']);
 
-		if (self::TYPE_GROUP == $intSetType)
+		if (self::TYPE_GROUP == $arCurrent['TYPE'])
 		{
 			$arClear = array(
-				'CREATED_BY', 'TYPE', 'SET_ID', 'OWNER_ID', 'ITEM_ID', 'QUANTITY', 'MEASURE', 'DISCOUNT_PERCENT'
+				'CREATED_BY', 'TYPE', 'SET_ID', 'OWNER_ID', 'ITEM_ID', 'MEASURE', 'DISCOUNT_PERCENT'
 			);
 		}
 		else
@@ -596,10 +653,12 @@ class CCatalogProductSetAll
 
 	protected function clearFieldsForUpdate(&$arFields, $intSetType)
 	{
-		$intSetType = intval($intSetType);
+		$intSetType = (int)$intSetType;
 		$arClear = array(
-			'TYPE', 'SET_ID', 'ITEM_ID', 'OWNER_ID', 'CREATED_BY', 'QUANTITY', 'MEASURE', 'DISCOUNT_PERCENT'
+			'TYPE', 'SET_ID', 'ITEM_ID', 'OWNER_ID', 'CREATED_BY', 'MEASURE', 'DISCOUNT_PERCENT'
 		);
+		if ($intSetType == self::TYPE_SET)
+			$arClear[] = 'QUANTITY';
 		foreach ($arClear as &$strKey)
 		{
 			if (array_key_exists($strKey, $arFields))
@@ -654,6 +713,57 @@ class CCatalogProductSetAll
 		}
 		unset($arOneItem);
 		return $mxResult;
+	}
+
+	protected function calculateSetParams($productID, $items)
+	{
+		return false;
+	}
+
+	protected function fillSetItemsParams(&$items)
+	{
+		$productIterator = CCatalogProduct::GetList(
+			array(),
+			array('=ID' => array_keys($items)),
+			false,
+			false,
+			array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'WEIGHT')
+		);
+		while ($product = $productIterator->Fetch())
+		{
+			$product['ID'] = (int)$product['ID'];
+			if (isset($items[$product['ID']]))
+			{
+				$items[$product['ID']] = array_merge($items[$product['ID']], $product);
+			}
+		}
+	}
+
+	protected function createSetItemsParamsFromAdd($items)
+	{
+		$result = array();
+		foreach ($items as &$oneItem)
+		{
+			$oneItem['ITEM_ID'] = (int)$oneItem['ITEM_ID'];
+			$result[$oneItem['ITEM_ID']] = array(
+				'QUANTITY_IN_SET' => $oneItem['QUANTITY']
+			);
+		}
+		unset($oneItem);
+		return $result;
+	}
+
+	protected function createSetItemsParamsFromUpdate($setID, $getProductID = false)
+	{
+		return array();
+	}
+
+	protected static function isTracedItem($item)
+	{
+		return (
+			isset($item['QUANTITY_TRACE']) && $item['QUANTITY_TRACE'] === 'Y'
+			&& isset($item['CAN_BUY_ZERO']) && $item['CAN_BUY_ZERO'] === 'N'
+		);
 	}
 }
 ?>

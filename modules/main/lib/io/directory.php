@@ -127,10 +127,17 @@ class Directory
 		return fileperms($this->getPhysicalPath());
 	}
 
+	/**
+	 * @param $path
+	 *
+	 * @return Directory
+	 */
 	public static function createDirectory($path)
 	{
 		$dir = new self($path);
 		$dir->create();
+
+		return $dir;
 	}
 
 	public static function deleteDirectory($path)

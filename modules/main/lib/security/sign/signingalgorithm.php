@@ -11,8 +11,10 @@ use Bitrix\Main\NotImplementedException;
 abstract class SigningAlgorithm
 {
 	/**
-	 * @param string $value
-	 * @param string $key
+	 * Return message signature
+	 *
+	 * @param string $value Message.
+	 * @param string $key Secret password.
 	 * @return string
 	 * @throws \Bitrix\Main\NotImplementedException
 	 */
@@ -22,9 +24,11 @@ abstract class SigningAlgorithm
 	}
 
 	/**
-	 * @param string $value
-	 * @param string $key
-	 * @param string $sig
+	 * Verify message signature
+	 *
+	 * @param string $value Message.
+	 * @param string $key Secret password used while signing.
+	 * @param string $sig Message signature.
 	 * @return bool
 	 */
 	public function verify($value, $key, $sig)

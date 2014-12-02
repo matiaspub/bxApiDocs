@@ -155,7 +155,7 @@ class CSocNetLogRestService extends IRestService
 
 		if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
 		{
-			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+			$arFilter['CHECK_PERMISSIONS'] = $GLOBALS["USER"]->GetID();
 		}
 
 		$dbRes = CSocNetGroup::GetList(array(), $arFilter);
@@ -201,7 +201,7 @@ class CSocNetLogRestService extends IRestService
 
 		if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
 		{
-			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+			$arFilter['CHECK_PERMISSIONS'] = $GLOBALS["USER"]->GetID();
 		}
 
 		$dbRes = CSocNetGroup::GetList(array(), $arFilter);
@@ -244,7 +244,7 @@ class CSocNetLogRestService extends IRestService
 		$arFilter = self::checkGroupFilter($arFields['FILTER']);
 		if ($arFields['IS_ADMIN'] != 'Y')
 		{
-			$arFilter['CHECK_PERMISSIONS'] = 'Y';
+			$arFilter['CHECK_PERMISSIONS'] = $GLOBALS["USER"]->GetID();
 		}
 
 		$result = array();
@@ -299,7 +299,7 @@ class CSocNetLogRestService extends IRestService
 
 			if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
 			{
-				$arFilter['CHECK_PERMISSIONS'] = 'Y';
+				$arFilter['CHECK_PERMISSIONS'] = $GLOBALS["USER"]->GetID();
 			}
 
 			$dbRes = CSocNetGroup::GetList(array(), $arFilter);
@@ -391,7 +391,7 @@ class CSocNetLogRestService extends IRestService
 
 		$dbRes = CSocNetGroup::GetList(array(), array(
 			"ID" => $groupID,
-			"CHECK_PERMISSIONS" => "Y"
+			"CHECK_PERMISSIONS" => $GLOBALS["USER"]->GetID()
 		));
 		$arGroup = $dbRes->Fetch();
 		if(is_array($arGroup))
@@ -431,7 +431,7 @@ class CSocNetLogRestService extends IRestService
 
 	public static function getGroupFeatureAccess($arFields)
 	{
-		global $arSocNetFeaturesSettings;
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 
 		$groupID = intval($arFields["GROUP_ID"]);
 		$feature = trim($arFields["FEATURE"]);

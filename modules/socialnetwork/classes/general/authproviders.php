@@ -351,20 +351,17 @@ class CSocNetUserAuthProvider extends CAuthProvider
 				$DB->Query("INSERT INTO b_user_access (USER_ID, PROVIDER_ID, ACCESS_CODE) VALUES 
 					(".$friendID.", '".$DB->ForSQL($this->id)."', 'SU".$USER_ID."_".SONET_RELATIONS_TYPE_FRIENDS."')");
 
-				$arFriends2Exist = array();
-				$dbRes = $DB->Query("SELECT USER_ID FROM b_user_access WHERE PROVIDER_ID = '".$DB->ForSQL($this->id)."' AND ACCESS_CODE = 'SU".$USER_ID."_".SONET_RELATIONS_TYPE_FRIENDS2."'");
-				while ($arRes = $dbRes->Fetch())
-					$arFriends2Exist[] = $arRes["USER_ID"];
-
 				$dbFriends2 = CSocNetUserRelations::GetRelatedUsers($friendID, SONET_RELATIONS_FRIEND);
 				while ($arFriends2 = $dbFriends2->Fetch())
 				{
 					$friendID2 = (($friendID == $arFriends2["FIRST_USER_ID"]) ? $arFriends2["SECOND_USER_ID"] : $arFriends2["FIRST_USER_ID"]);
-					if ($friendID2 != $USER_ID && !in_array($friendID2, $arFriends2Exist))
+					if ($friendID2 != $USER_ID)
+					{
 						$DB->Query("INSERT INTO b_user_access (USER_ID, PROVIDER_ID, ACCESS_CODE) VALUES 
 							(".$friendID2.", '".$DB->ForSQL($this->id)."', 'SU".$USER_ID."_".SONET_RELATIONS_TYPE_FRIENDS2."')");
+					}
 				}
-			}	
+			}
 		}
 	}
 }

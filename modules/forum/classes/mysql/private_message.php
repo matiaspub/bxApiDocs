@@ -1,19 +1,6 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/private_message.php");
 
-
-/**
- * <b>CForumPrivateMessage</b> - класс для работы с приватными сообщениями.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/index.php
- * @author Bitrix
- */
 class CForumPrivateMessage extends CAllForumPrivateMessage
 {
 	public static function GetListEx($arOrder = Array("ID"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
@@ -168,19 +155,6 @@ class CForumPrivateMessage extends CAllForumPrivateMessage
 	}
 }
 
-
-/**
- * <b>CForumPMFolder</b> - класс для работы папками пользователя.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/index.php
- * @author Bitrix
- */
 class CForumPMFolder extends CAllForumPMFolder
 {
 	// 

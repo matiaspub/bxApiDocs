@@ -5,8 +5,9 @@
  * @subpackage main
  * @copyright 2001-2013 Bitrix
  */
+use Bitrix\Main\Localization\Loc;
 
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/agent.php");
+Loc::loadMessages(__FILE__);
 
 class CAllAgent
 {
@@ -173,18 +174,19 @@ class CAllAgent
 		$active = "Y", // is the agent active or not
 		$next_exec = "", // first execution time
 		$sort = 100, // order
-		$user_id = false // user
+		$user_id = false, // user
+		$existError = true // return error, if agent already exist
 	)
 	{
 		global $DB, $APPLICATION;
 
 		$z = $DB->Query("
-			SELECT 'x'
+			SELECT ID
 			FROM b_agent
 			WHERE NAME = '".$DB->ForSql($name, 2000)."'
-			AND USER_ID".($user_id? " = ".intval($user_id): " IS NULL")
+			AND USER_ID".($user_id? " = ".(int)$user_id: " IS NULL")
 		);
-		if (!$z->Fetch())
+		if (!($agent = $z->Fetch()))
 		{
 			$arFields = array(
 				"MODULE_ID" => $module,
@@ -195,7 +197,8 @@ class CAllAgent
 				"IS_PERIOD" => $period,
 				"USER_ID" => $user_id,
 			);
-			if (strlen($next_exec) > 0)
+			$next_exec = (string)$next_exec;
+			if ($next_exec != '')
 				$arFields["NEXT_EXEC"] = $next_exec;
 
 			$ID = CAgent::Add($arFields);
@@ -203,11 +206,17 @@ class CAllAgent
 		}
 		else
 		{
+			if (!$existError)
+				return $agent['ID'];
+
 			$e = new CAdminException(array(
 				array(
 					"id" => "agent_exist",
-					"text" => GetMessage("MAIN_AGENT_ERROR_EXIST"),
-				),
+					"text" => ($user_id
+						? Loc::getMessage("MAIN_AGENT_ERROR_EXIST_FOR_USER", array('#AGENT#' => $name, '#USER_ID#' => $user_id))
+						: Loc::getMessage("MAIN_AGENT_ERROR_EXIST_EXT", array('#AGENT#' => $name))
+					)
+				)
 			));
 			$APPLICATION->throwException($e);
 			return false;
@@ -289,7 +298,7 @@ class CAllAgent
 	{
 		global $DB;
 
-		if (strlen(trim($module)) <= 0)
+		if (trim($module) == '')
 			$module = "AND (MODULE_ID is null or ".$DB->Length("MODULE_ID")." = 0)";
 		else
 			$module = "AND MODULE_ID = '".$DB->ForSql($module, 50)."'";
@@ -298,7 +307,7 @@ class CAllAgent
 				DELETE FROM b_agent
 				WHERE NAME = '".$DB->ForSql($name, 2000)."'
 				".$module."
-				AND  USER_ID".($user_id ? " = ".intval($user_id) : " IS NULL");
+				AND  USER_ID".($user_id ? " = ".(int)$user_id : " IS NULL");
 
 		$DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 	}
@@ -439,17 +448,17 @@ class CAllAgent
 		$arSqlOrder = array();
 
 		$arOFields = array(
-				"ID" => "A.ID",
-				"ACTIVE" => "A.ACTIVE",
-				"IS_PERIOD" => "A.IS_PERIOD",
-				"NAME" => "A.NAME",
-				"MODULE_ID" => "A.MODULE_ID",
-				"USER_ID" => "A.USER_ID",
-				"LAST_EXEC" => "A.LAST_EXEC",
-				"AGENT_INTERVAL" => "A.AGENT_INTERVAL",
-				"NEXT_EXEC" => "A.NEXT_EXEC",
-				"SORT" => "A.SORT"
-			);
+			"ID" => "A.ID",
+			"ACTIVE" => "A.ACTIVE",
+			"IS_PERIOD" => "A.IS_PERIOD",
+			"NAME" => "A.NAME",
+			"MODULE_ID" => "A.MODULE_ID",
+			"USER_ID" => "A.USER_ID",
+			"LAST_EXEC" => "A.LAST_EXEC",
+			"AGENT_INTERVAL" => "A.AGENT_INTERVAL",
+			"NEXT_EXEC" => "A.NEXT_EXEC",
+			"SORT" => "A.SORT"
+		);
 
 		if(!is_array($arFilter))
 			$filter_keys = array();
@@ -466,7 +475,7 @@ class CAllAgent
 			switch($key)
 			{
 				case "ID":
-					$arSqlSearch[] = "A.ID=".IntVal($val);
+					$arSqlSearch[] = "A.ID=".(int)$val;
 					break;
 				case "ACTIVE":
 					$t_val = strtoupper($val);
@@ -480,6 +489,9 @@ class CAllAgent
 					break;
 				case "NAME":
 					$arSqlSearch[] = "A.NAME LIKE '".$DB->ForSQLLike($val)."'";
+					break;
+				case "=NAME":
+					$arSqlSearch[] = "A.NAME = '".$DB->ForSQL($val)."'";
 					break;
 				case "MODULE_ID":
 					$arSqlSearch[] = "A.MODULE_ID = '".$DB->ForSQL($val)."'";
@@ -510,7 +522,7 @@ class CAllAgent
 		{
 			$by = strtoupper($by);
 			$order = strtoupper($order);
-			if (array_key_exists($by, $arOFields))
+			if (isset($arOFields[$by]))
 			{
 				if ($order != "ASC")
 					$order = "DESC".($DB->type=="ORACLE" ? " NULLS LAST" : "");
@@ -541,7 +553,7 @@ class CAllAgent
 		$errMsg = array();
 
 		if(!$ign_name && (!is_set($arFields, "NAME") || strlen(trim($arFields["NAME"])) <= 2))
-			$errMsg[] = array("id" => "NAME", "text" => GetMessage("MAIN_AGENT_ERROR_NAME"));
+			$errMsg[] = array("id" => "NAME", "text" => Loc::getMessage("MAIN_AGENT_ERROR_NAME"));
 
 		if(
 			array_key_exists("NEXT_EXEC", $arFields)
@@ -551,7 +563,7 @@ class CAllAgent
 			)
 		)
 		{
-			$errMsg[] = array("id" => "NEXT_EXEC", "text" => GetMessage("MAIN_AGENT_ERROR_NEXT_EXEC"));
+			$errMsg[] = array("id" => "NEXT_EXEC", "text" => Loc::getMessage("MAIN_AGENT_ERROR_NEXT_EXEC"));
 		}
 
 		if(
@@ -560,7 +572,7 @@ class CAllAgent
 			&& !$DB->IsDate($arFields["DATE_CHECK"], false, LANG, "FULL")
 		)
 		{
-			$errMsg[] = array("id" => "DATE_CHECK", "text" => GetMessage("MAIN_AGENT_ERROR_DATE_CHECK"));
+			$errMsg[] = array("id" => "DATE_CHECK", "text" => Loc::getMessage("MAIN_AGENT_ERROR_DATE_CHECK"));
 		}
 
 		if(
@@ -569,14 +581,14 @@ class CAllAgent
 			&& !$DB->IsDate($arFields["LAST_EXEC"], false, LANG, "FULL")
 		)
 		{
-			$errMsg[] = array("id" => "LAST_EXEC", "text" => GetMessage("MAIN_AGENT_ERROR_LAST_EXEC"));
+			$errMsg[] = array("id" => "LAST_EXEC", "text" => Loc::getMessage("MAIN_AGENT_ERROR_LAST_EXEC"));
 		}
 
 		if($arFields["MODULE_ID"] <> '')
 			if(!IsModuleInstalled($arFields["MODULE_ID"]))
-				$errMsg[] = array("id" => "MODULE_ID", "text" => GetMessage("MAIN_AGENT_ERROR_MODULE"));
+				$errMsg[] = array("id" => "MODULE_ID", "text" => Loc::getMessage("MAIN_AGENT_ERROR_MODULE"));
 
-		if(count($errMsg)>0)
+		if(!empty($errMsg))
 		{
 			$e = new CAdminException($errMsg);
 			$APPLICATION->ThrowException($e);

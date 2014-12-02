@@ -11,10 +11,10 @@ namespace Bitrix\Main\DB;
 use Bitrix\Main\Application;
 
 /**
- * Class description
- * @package bitrix
- * @subpackage main
- */ 
+ * Class SqlExpression
+ *
+ * @package Bitrix\Main\DB
+ */
 class SqlExpression
 {
 	/** @var string */
@@ -27,13 +27,19 @@ class SqlExpression
 
 	protected $i;
 
+	/**
+	 * @param string $expression Sql expression.
+	 * @param string,... $args Substitutes.
+	 *
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
 	public function __construct()
 	{
 		$args = func_get_args();
 
 		if (!isset($args[0]))
 		{
-			throw new \Exception('No pattern has been found for SqlExpression');
+			throw new \Bitrix\Main\ArgumentException('No pattern has been found for SqlExpression');
 		}
 
 		$this->expression = $args[0];
@@ -44,6 +50,11 @@ class SqlExpression
 		}
 	}
 
+	/**
+	 * Returns $expression with replaced placeholders.
+	 *
+	 * @return string
+	 */
 	public function compile()
 	{
 		$this->i = -1;
@@ -68,10 +79,17 @@ class SqlExpression
 
 			$parts = str_replace('\\?', '?', $parts);
 
-			return join('\\', $parts);
+			return implode('\\', $parts);
 		}
 	}
 
+	/**
+	 * Used by compile method to replace placeholders with values.
+	 *
+	 * @param array $matches Matches found by preg_replace.
+	 *
+	 * @return string
+	 */
 	protected function execPlaceholders($matches)
 	{
 		$sqlHelper = Application::getConnection()->getSqlHelper();

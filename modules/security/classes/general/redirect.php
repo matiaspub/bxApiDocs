@@ -5,6 +5,8 @@ class CSecurityRedirect
 {
 	public static function BeforeLocalRedirect(&$url, $skip_security_check)
 	{
+		// ToDo: refactoring candidate
+
 		//This define will be used on buffer end handler
 		if(!defined("BX_SECURITY_LOCAL_REDIRECT"))
 			// define("BX_SECURITY_LOCAL_REDIRECT", true);
@@ -50,27 +52,31 @@ class CSecurityRedirect
 				$arSite = false;
 			}
 
-			if($arSite)
+			if($arSite && $arSite["SERVER_NAME"])
 			{
-				if($arMatch[2] === $arSite["SERVER_NAME"])
+				$bSkipCheck = $arMatch[2] === $arSite["SERVER_NAME"];
+			}
+			elseif($arSite && $arSite["DOMAINS"])
+			{
+				$arDomains = explode("\n", str_replace("\r", "\n", $arSite["DOMAINS"]));
+				foreach($arDomains as $domain)
 				{
-					$bSkipCheck = true;
-				}
-				elseif($arSite["DOMAINS"])
-				{
-					$arDomains = explode("\n", str_replace("\r", "\n", $arSite["DOMAINS"]));
-					foreach($arDomains as $domain)
+					$domain = trim($domain, " \t\n\r");
+					if(strlen($domain) > 0)
 					{
-						$domain = trim($domain, " \t\n\r");
-						if(strlen($domain) > 0)
+						if($domain === substr($arMatch[2], -strlen($domain)))
 						{
-							if($domain === substr($arMatch[2], -strlen($domain)))
-							{
-								$bSkipCheck = true;
-								break;
-							}
+							$bSkipCheck = true;
+							break;
 						}
 					}
+				}
+			}
+			elseif($host = COption::GetOptionString("main", "server_name", ""))
+			{
+				if($arMatch[2] === $host)
+				{
+					$bSkipCheck = true;
 				}
 			}
 		}

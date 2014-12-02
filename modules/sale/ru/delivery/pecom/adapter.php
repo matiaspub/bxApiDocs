@@ -15,7 +15,7 @@ class Adapter
 			"inn" => $arConfig["INN"]["VALUE"],
 			"city" => static::getFilialAndCity($arConfig["CITY_DELIVERY"]["VALUE"]),
 			"title" => $arConfig["NAME"]["VALUE"],
-	        "phone" => $arConfig["PHONE"]["VALUE"],
+			"phone" => $arConfig["PHONE"]["VALUE"],
 		);
 
 		$inn = "";
@@ -142,6 +142,10 @@ class Adapter
 	public static function mapLocation($locationId, $cleanCache = false)
 	{
 		$cityName = static::getCityNameFromLocationId($locationId);
+
+		if(!$cityName)
+			return array();
+
 		$ttl = 2592000;
 		$cacheId = "SaleDeliveryPecomMapLocations".$locationId;
 		$data = array();

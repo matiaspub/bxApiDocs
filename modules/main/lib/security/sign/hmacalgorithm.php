@@ -13,10 +13,13 @@ class HmacAlgorithm
 	extends SigningAlgorithm
 {
 	// ToDo: need option here?
+	// Default hashing algorithm used by HMAC
 	protected $hashAlgorithm = 'sha256';
 
 	/**
-	 * @param string $hashAlgorithm
+	 * Set hashing algorithm for using in HMAC
+	 *
+	 * @param string $hashAlgorithm Hashing algorithm. See registered algorithms in hash_algos().
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentOutOfRangeException
 	 */
@@ -30,6 +33,8 @@ class HmacAlgorithm
 	}
 
 	/**
+	 * Return currently used hashing algorithm
+	 *
 	 * @return string
 	 */
 	public function getHashAlgorithm()
@@ -38,8 +43,10 @@ class HmacAlgorithm
 	}
 
 	/**
-	 * @param string $value
-	 * @param string $key
+	 * Return message signature
+	 *
+	 * @param string $value Message.
+	 * @param string $key Secret password for HMAC.
 	 * @return string
 	 */
 	public function getSignature($value, $key)
@@ -48,9 +55,11 @@ class HmacAlgorithm
 	}
 
 	/**
-	 * @param string $value
-	 * @param string $key
-	 * @param string $sig
+	 * Verify message signature
+	 *
+	 * @param string $value Message.
+	 * @param string $key Secret password used while signing.
+	 * @param string $sig Message signature password for HMAC.
 	 * @return bool
 	 */
 	public function verify($value, $key, $sig)
@@ -69,8 +78,8 @@ class HmacAlgorithm
 	 * timing information useful to an attacker attempting to iteratively guess
 	 * the unknown string (e.g. password).
 	 *
-	 * @param string $expected
-	 * @param string $actual
+	 * @param string $expected Expected string (e.g. generated signature).
+	 * @param string $actual Actual string (e.g. signature received from user).
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @return bool
 	 */

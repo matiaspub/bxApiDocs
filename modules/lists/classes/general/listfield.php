@@ -3,10 +3,15 @@ IncludeModuleLangFile(__FILE__);
 
 abstract class CListField
 {
+	/** @var int */
 	protected $_iblock_id;
+	/** @var  string */
 	protected $_field_id;
+	/** @var  string */
 	protected $_label;
+	/** @var CListFieldType */
 	protected $_type;
+	/** @var int */
 	protected $_sort;
 
 	private static $prop_cache = array();
@@ -242,7 +247,7 @@ class CListElementField extends CListField
 		$this->_sort = intval($sort);
 	}
 
-	//This is only backward compat method
+	//This is only backward compatibility method
 	public function GetArray()
 	{
 		return array(
@@ -260,6 +265,8 @@ class CListElementField extends CListField
 
 	public function Delete()
 	{
+		/** @global CStackCacheManager $stackCacheManager */
+		global $stackCacheManager;
 		if($this->_iblock_field["IS_REQUIRED"] == "Y")
 		{
 			if($this->_iblock_id > 0)
@@ -267,7 +274,7 @@ class CListElementField extends CListField
 				$arIBlockFields = CIBlock::GetArrayByID($this->_iblock_id, "FIELDS");
 				$arIBlockFields[$this->_field_id]["IS_REQUIRED"] = "N";
 				CIBlock::SetFields($this->_iblock_id, $arIBlockFields);
-				$GLOBALS["stackCacheManager"]->Clear("b_iblock");
+				$stackCacheManager->Clear("b_iblock");
 			}
 			$this->_iblock_field["IS_REQUIRED"] = "N";
 		}
@@ -278,6 +285,8 @@ class CListElementField extends CListField
 
 	public function Update($arFields)
 	{
+		/** @global CStackCacheManager $stackCacheManager */
+		global $stackCacheManager;
 		if(isset($arFields["TYPE"]))
 			$newType = $arFields["TYPE"];
 		else
@@ -288,7 +297,7 @@ class CListElementField extends CListField
 			$arIBlockFields = CIBlock::GetArrayByID($this->_iblock_id, "FIELDS");
 			$arIBlockFields[$newType] = $arFields;
 			CIBlock::SetFields($this->_iblock_id, $arIBlockFields);
-			$GLOBALS["stackCacheManager"]->Clear("b_iblock");
+			$stackCacheManager->Clear("b_iblock");
 
 			if($newType != $this->GetTypeID())
 				$this->Delete();
@@ -301,12 +310,14 @@ class CListElementField extends CListField
 
 	static public function Add($iblock_id, $arFields)
 	{
+		/** @global CStackCacheManager $stackCacheManager */
+		global $stackCacheManager;
 		if($iblock_id > 0)
 		{
 			$arIBlockFields = CIBlock::GetArrayByID($iblock_id, "FIELDS");
 			$arIBlockFields[$arFields["TYPE"]] = $arFields;
 			CIBlock::SetFields($iblock_id, $arIBlockFields);
-			$GLOBALS["stackCacheManager"]->Clear("b_iblock");
+			$stackCacheManager->Clear("b_iblock");
 		}
 		return new CListElementField($iblock_id, $arFields["TYPE"], $arFields["NAME"], $arFields["SORT"]);
 	}
@@ -384,7 +395,7 @@ class CListPropertyField extends CListField
 		}
 	}
 
-	//This is only backward compat method
+	//This is only backward compatibility method
 	public function GetArray()
 	{
 		if(is_array($this->_property))
@@ -401,6 +412,8 @@ class CListPropertyField extends CListField
 				"CODE" => $this->_property["CODE"],
 				"ID" => $this->_property["ID"],
 				"LINK_IBLOCK_ID" => $this->_property["LINK_IBLOCK_ID"],
+				"ROW_COUNT" =>  $this->_property["ROW_COUNT"],
+				"COL_COUNT" =>  $this->_property["COL_COUNT"],
 				"USER_TYPE_SETTINGS" => $this->_property["USER_TYPE_SETTINGS"],
 			);
 		}

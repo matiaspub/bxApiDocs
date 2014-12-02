@@ -162,16 +162,18 @@ class CReport
 
 	public static function setViewParams($id, $templateName, $strParams)
 	{
+		global $USER;
+
 		$result = false;
 		if (empty($templateName)) $templateName = '.default';
 		if (
-			get_class($GLOBALS['USER']) === 'CUser'
+			get_class($USER) === 'CUser'
 			&& $id !== null && intval($id) >= 0
 			&& !empty($templateName)
 			&& !empty($strParams)
 		)
 		{
-			$user_id = $GLOBALS['USER']->GetId();
+			$user_id = $USER->GetId();
 			if ($user_id != null)
 			{
 				$result = CUserOptions::SetOption(
@@ -185,11 +187,13 @@ class CReport
 
 	public static function getViewParams($id, $templateName)
 	{
+		global $USER;
+
 		$result = '';
 		if (empty($templateName)) $templateName = '.default';
-		if (get_class($GLOBALS['USER']) === 'CUser' && $id !== null && intval($id) >= 0 && !empty($templateName))
+		if (get_class($USER) === 'CUser' && $id !== null && intval($id) >= 0 && !empty($templateName))
 		{
-			$user_id = $GLOBALS['USER']->GetId();
+			$user_id = $USER->GetId();
 			if ($user_id != null)
 			{
 				$result = CUserOptions::GetOption(
@@ -204,25 +208,23 @@ class CReport
 
 	public static function clearViewParams($id)
 	{
-		if (get_class($GLOBALS['USER']) === 'CUser' && $id !== null && intval($id) >= 0)
+		global $USER;
+
+		if (get_class($USER) === 'CUser' && $id !== null && intval($id) >= 0)
 		{
-			$user_id = $GLOBALS['USER']->GetId();
+			$user_id = $USER->GetId();
 			if ($user_id != null)
 			{
-				while (
-					$row = CUserOptions::GetList(
-						array("ID" => "ASC"),
-						array(
-							'USER_ID' => $user_id,
-							'CATEGORY' => 'report',
-							'NAME_MASK' => 'view_params_'.$id.'_'
-						)
-					)->fetch()
-				)
+				$dbRes = CUserOptions::GetList(
+					array("ID" => "ASC"),
+					array('USER_ID' => $user_id, 'CATEGORY' => 'report', 'NAME_MASK' => 'view_params_'.$id.'_')
+				);
+				if (is_object($dbRes))
 				{
-					if (strpos($row['NAME'], 'view_params_'.$id.'_') === 0)
+					while ($row = $dbRes->fetch())
 					{
-						CUserOptions::DeleteOption('report', $row['NAME'], false, $user_id);
+						if (strpos($row['NAME'], 'view_params_'.$id.'_') === 0)
+							CUserOptions::DeleteOption('report', $row['NAME'], false, $user_id);
 					}
 				}
 			}
@@ -266,7 +268,7 @@ class CReport
 					}
 					else
 					{
-						throw new Exception('', 100);
+						throw new \Bitrix\Main\SystemException('', 100);
 					}
 				}
 				catch (Exception $e)
@@ -355,7 +357,6 @@ class CReport
 
 		if ($level == 0)
 		{
-			self::IncludeEntityLangFileByChainTree($chains);
 			self::attachLangToColumnTree($tree, $initEntity, $helper_class);
 		}
 
@@ -364,19 +365,35 @@ class CReport
 
 	protected static function attachLangToColumnTree(&$tree, $initEntity, $helper_class, $preTitle = array())
 	{
+		$arUFInfo = call_user_func(array($helper_class, 'getUFInfo'));
+
 		foreach($tree as &$treeElem)
 		{
 			$ownerId = call_user_func(array($helper_class, 'getOwnerId'));
 
+			$humanTitle = '';
+
 			if (!empty($treeElem['field']))
 			{
+				// detect UF
+				$arUF = call_user_func(array($helper_class, 'detectUserField'), $treeElem['field']);
+				if ($arUF['isUF'])
+				{
+					$treeElem['isUF'] = true;
+					$treeElem['ufInfo'] = $arUF['ufInfo'];
+					$humanTitle = $arUF['ufInfo']['LIST_COLUMN_LABEL'];
+				}
+				unset($arUF);
+
 				// first: report-defined lang
 				$rElementTitle = 'REPORT_'.$ownerId.'_'.$treeElem['fieldName'];
 
 				// second: entity-defined lang
 				$eElementTitle = $treeElem['field']->getLangCode();
 
-				$elementTitle = HasMessage($rElementTitle) ? $rElementTitle : $eElementTitle;
+				//$elementTitle = HasMessage($rElementTitle) ? $rElementTitle : $eElementTitle;
+				$elementMessage = GetMessage($rElementTitle);
+				$elementTitle = (!empty($elementMessage)) ? $rElementTitle : $eElementTitle;
 			}
 			else
 			{
@@ -385,15 +402,17 @@ class CReport
 				$elementTitle = 'REPORT_'.$ownerId.'_COLUMN_TREE_'.$elementName;
 			}
 
-			// PRCNT hack should not be here
-
-			if (substr($elementTitle, -12) == '_PRCNT_FIELD')
+			if (!isset($treeElem['isUF']) || !$treeElem['isUF'])
 			{
-				$humanTitle = GetMessage(substr($elementTitle, 0, -12).'_FIELD');
-			}
-			else
-			{
-				$humanTitle = GetMessage($elementTitle);
+				// PRCNT hack should not be here
+				if (substr($elementTitle, -12) == '_PRCNT_FIELD')
+				{
+					$humanTitle = GetMessage(substr($elementTitle, 0, -12).'_FIELD');
+				}
+				else
+				{
+					$humanTitle = GetMessage($elementTitle);
+				}
 			}
 
 			if (empty($humanTitle))
@@ -430,57 +449,6 @@ class CReport
 		}
 	}
 
-
-	public static function IncludeEntityLangFileByChainTree($chainTree, $level = 0)
-	{
-		$fileList = array();
-
-		foreach ($chainTree as $key => $chain)
-		{
-			if($chain instanceof Entity\QueryChain)
-			{
-				// normal field
-				foreach ($chain->getAllElements() as $chainElem)
-				{
-
-					if ($chainElem->getValue() instanceof Entity\Base)
-					{
-						$path = $chainElem->getValue()->GetFilePath();
-					}
-					elseif ($chainElem->getValue() instanceof Entity\ReferenceField)
-					{
-						$path = $chainElem->getValue()->GetRefEntity()->getFilePath();
-					}
-					elseif (is_array($chainElem->getValue()))
-					{
-						list($ref_entity, ) = $chainElem->getValue();
-						$path = $ref_entity->GetFilePath();
-					}
-					elseif ($chainElem->getValue() instanceof Entity\Field)
-					{
-						$path = $chainElem->getValue()->GetEntity()->getFilePath();
-					}
-
-					$fileList[$path] = true;
-				}
-			}
-			else
-			{
-				$fileList = array_merge($fileList, self::IncludeEntityLangFileByChainTree($chain, $level + 1));
-			}
-		}
-
-		if ($level == 0)
-		{
-			foreach (array_keys($fileList) as $path)
-			{
-				IncludeModuleLangFile($path);
-			}
-		}
-
-		return $fileList;
-	}
-
 	public static function fillFilterReferenceColumns(&$filters, &$fieldList, $helperClass)
 	{
 		foreach ($filters as &$filter)
@@ -503,12 +471,21 @@ class CReport
 		}
 	}
 
-	public static function prepareSelectViewElement($elem, $select, $is_init_entity_aggregated, $fList, $fChainList, $helper_class)
+	/**
+	 * @param                     $elem
+	 * @param                     $select
+	 * @param                     $is_init_entity_aggregated
+	 * @param                     $fList
+	 * @param Entity\QueryChain[] $fChainList
+	 * @param                     $helper_class
+	 * @param Entity\Base         $entity
+	 *
+	 * @return array
+	 */
+	public static function prepareSelectViewElement($elem, $select, $is_init_entity_aggregated, $fList, $fChainList, $helper_class, Entity\Base $entity)
 	{
 		$result = null;
 		$alias = null;
-
-		$entity = Entity\Base::getInstance(call_user_func(array($helper_class, 'getEntityName')));
 
 		if (empty($elem['aggr']) && !strlen($elem['prcnt']))
 		{
@@ -516,21 +493,25 @@ class CReport
 		}
 		else
 		{
-			$dataType = '';
 			$expression = '';
 
-			$alias = Entity\QueryChain::getAliasByDefinition($entity, $elem['name']);
+			/** @var Entity\Field $field */
 			$field = $fList[$elem['name']];
 			$chain = $fChainList[$elem['name']];
+			$alias = $chain->getAlias();
+
+			$dataType = call_user_func(array($helper_class, 'getFieldDataType'), $field);
 
 			if (!empty($elem['aggr']))
 			{
 				$alias = $elem['aggr'] . '_' . $alias;
 
-				if ($field->getDataType() == 'boolean')
+				if ($dataType == 'boolean')
 				{
 					// sum int for boolean
 					global $DB;
+
+					/** @var Entity\BooleanField $field */
 					$trueValue = $field->normalizeValue(true);
 					$localDef = 'CASE WHEN %s = \''.$DB->ForSql($trueValue).'\' THEN 1 ELSE 0 END';
 				}
@@ -548,13 +529,9 @@ class CReport
 				}
 				else
 				{
-					if ($field->getDataType() == 'boolean')
+					if ($dataType == 'boolean')
 					{
 						$dataType = 'integer';
-					}
-					else
-					{
-						$dataType = $field->getDataType();
 					}
 
 					if ($elem['aggr'] == 'GROUP_CONCAT')
@@ -588,10 +565,7 @@ class CReport
 						}
 
 						$query = new Entity\Query($entity);
-						$query->addSelect(array(
-							'data_type' => $dataType,
-							'expression' => $expression
-						), 'X');
+						$query->addSelect(new Entity\ExpressionField('X', $expression[0], $elem['name']));
 						$query->setFilter($filter);
 						$query->setTableAliasPostfix('_sub');
 
@@ -638,7 +612,7 @@ class CReport
 						$localMembers = array_slice($expression, 1);
 					}
 
-					list($remoteAlias, $remoteSelect) = self::prepareSelectViewElement($select[$elem['prcnt']], $select, $is_init_entity_aggregated, $fList, $fChainList, $helper_class);
+					list($remoteAlias, $remoteSelect) = self::prepareSelectViewElement($select[$elem['prcnt']], $select, $is_init_entity_aggregated, $fList, $fChainList, $helper_class, $entity);
 
 					if (is_array($remoteSelect) && !empty($remoteSelect['expression']))
 					{
@@ -654,7 +628,8 @@ class CReport
 						$remoteDef = '%s';
 						$remoteMembers = array($remoteSelect);
 
-						$alias = $alias . '_FROM_' . $remoteSelect;
+						$remoteAlias = Entity\QueryChain::getAliasByDefinition($entity, $remoteSelect);
+						$alias = $alias . '_FROM_' . $remoteAlias;
 					}
 
 					$exprDef = '('.$localDef.') / ('.$remoteDef.') * 100';
@@ -701,7 +676,7 @@ class CReport
 		return $title;
 	}
 
-	public static function isColumnPercentable($view)
+	public static function isColumnPercentable($view, $helperClassName)
 	{
 		/*
 		1. any integer
@@ -710,15 +685,18 @@ class CReport
 		4. any with COUNT_DISTINCT aggr
 		*/
 
-		if ($view['field']->getDataType() == 'integer' || $view['field']->getDataType() == 'float')
+		$dataType = call_user_func(array($helperClassName, 'getFieldDataType'), $view['field']);
+
+		/** @var Entity\Field[] $view */
+		if ($dataType === 'integer' || $dataType === 'float')
 		{
 			return true;
 		}
-		elseif ($view['field']->getDataType() == 'boolean' && $view['aggr'] == 'SUM')
+		elseif ($dataType === 'boolean' && $view['aggr'] === 'SUM')
 		{
 			return true;
 		}
-		elseif ($view['aggr'] == 'COUNT_DISTINCT')
+		elseif ($view['aggr'] === 'COUNT_DISTINCT')
 		{
 			return true;
 		}
@@ -726,9 +704,12 @@ class CReport
 		return false;
 	}
 
-	public static function isColumnTotalCountable($view)
+	public static function isColumnTotalCountable($view, $helperClassName)
 	{
-		if (($view['field']->getDataType() == 'integer' || $view['field']->getDataType() == 'float')
+		/** @var Entity\Field[] $view */
+		$dataType = call_user_func(array($helperClassName, 'getFieldDataType'), $view['field']);
+
+		if (($dataType === 'integer' || $dataType === 'float')
 			&& empty($view['aggr'])
 		)
 		{
@@ -742,7 +723,7 @@ class CReport
 		return false;
 	}
 
-	public static function appendHrefSelectElements(&$elem, $fList, $entity, $helper_class, &$select)
+	public static function appendHrefSelectElements(&$elem, $fList, $entity, $helper_class, &$select, &$runtime)
 	{
 		// default href assign
 		if (empty($elem['href']))
@@ -758,6 +739,7 @@ class CReport
 		// user defined or default href
 		if (!empty($elem['href']))
 		{
+			$matches = array();
 			preg_match_all('/#([a-zA-Z0-9_\.:\\\\]+)#/', $elem['href']['pattern'], $matches);
 
 			if (!empty($matches[1]))
@@ -813,7 +795,7 @@ class CReport
 							// add to select
 							if ($fieldAggr == 'COUNT_DISTINCT')
 							{
-								$select[$fieldAlias] = array(
+								$runtime[$fieldAlias] = array(
 									'data_type' => 'integer',  // until we don't have group_concat
 									'expression' => array(
 										'COUNT(DISTINCT %s)', $fieldDefinition
@@ -822,13 +804,15 @@ class CReport
 							}
 							else
 							{
-								$select[$fieldAlias] = array(
-									'data_type' => $field->GetDataType(),
+								$runtime[$fieldAlias] = array(
+									'data_type' => call_user_func(array($helper_class, 'getFieldDataType') ,$field),
 									'expression' => array(
 										$fieldAggr.'(%s)', $fieldDefinition
 									)
 								);
 							}
+
+							$select[] = $fieldAlias;
 						}
 					}
 				} // href pattern and elements saved
@@ -858,13 +842,13 @@ class CReport
 	}
 
 
-	public static function rewriteUserShortName(&$select, $format, $entity, $grc =false)
+	public static function rewriteUserShortName(&$select, &$runtime, $format, $entity, $grc =false)
 	{
 		foreach ($select as $k => $def)
 		{
 			if (
 				(is_string($def) && (substr($def, -11) == '.SHORT_NAME' || $def === 'SHORT_NAME'))
-				|| (is_array($def) && substr($def['expression'][1], -11) == '.SHORT_NAME')
+				|| (is_array($def) && count($def['expression']) === 2 && substr($def['expression'][1], -11) == '.SHORT_NAME')
 			)
 			{
 				$definition = is_string($def) ? $def : $def['expression'][1];
@@ -906,7 +890,7 @@ class CReport
 
 				if (is_string($def))
 				{
-					$select[$_alias] = array(
+					$runtime[$_alias] = array(
 						'data_type' => 'string',
 						'expression' => $expression
 					);
@@ -925,11 +909,13 @@ class CReport
 
 					$expression[0] = str_replace('%s', $expression[0], $def['expression'][0]);
 
-					$select[$_alias] = array(
+					$runtime[$_alias] = array(
 						'data_type' => 'integer',
 						'expression' => $expression
 					);
 				}
+
+				$select[] = $_alias;
 			}
 		}
 	}
@@ -1135,5 +1121,7 @@ class CReport
 
 }
 
-class BXUserException extends Exception {}
-class BXFormException extends Exception {}
+class BXUserException extends \Bitrix\Main\SystemException
+{}
+class BXFormException extends \Bitrix\Main\SystemException
+{}

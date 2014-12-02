@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.
+ * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</body> </html>
  *
  *
  *
@@ -294,7 +294,7 @@ class CHit
 	*
 	*
 	*
-	* @param int $hit_id  ID хита.</b
+	* @param int $hit_id  ID хита.
 	*
 	*
 	*

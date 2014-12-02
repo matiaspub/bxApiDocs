@@ -197,42 +197,57 @@ class CUrlRewriter
 		$bFilterCondition = array_key_exists("CONDITION", $arFilter);
 		$bFilterID = array_key_exists("ID", $arFilter);
 		$bFilterPath = array_key_exists("PATH", $arFilter);
+		$bFound = false;
 
 		foreach(self::$arRules[$docRoot] as $key => $arRule)
 		{
-			$bMatch = true;
 			if ($bFilterQuery && !preg_match($arRule["CONDITION"], $arFilter["QUERY"]))
-				$bMatch = false;
-			if ($bMatch && $bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
-				$bMatch = false;
-			if ($bMatch && $bFilterID && $arRule["ID"] != $arFilter["ID"])
-				$bMatch = false;
-			if ($bMatch && $bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
-				$bMatch = false;
-
-			if ($bMatch)
 			{
-				if (array_key_exists("CONDITION", $arFields))
-					self::$arRules[$docRoot][$key]["CONDITION"] = $arFields["CONDITION"];
-				if (array_key_exists("RULE", $arFields))
-					self::$arRules[$docRoot][$key]["RULE"] = $arFields["RULE"];
-				if (array_key_exists("ID", $arFields))
-					self::$arRules[$docRoot][$key]["ID"] = $arFields["ID"];
-				if (array_key_exists("PATH", $arFields))
-					self::$arRules[$docRoot][$key]["PATH"] = $arFields["PATH"];
+				continue;
+			}
+			if ($bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
+			{
+				continue;
+			}
+			if ($bFilterID && $arRule["ID"] != $arFilter["ID"])
+			{
+				continue;
+			}
+			if ($bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
+			{
+				continue;
+			}
+
+			$bFound = true;
+			if (array_key_exists("CONDITION", $arFields))
+				self::$arRules[$docRoot][$key]["CONDITION"] = $arFields["CONDITION"];
+			if (array_key_exists("RULE", $arFields))
+				self::$arRules[$docRoot][$key]["RULE"] = $arFields["RULE"];
+			if (array_key_exists("ID", $arFields))
+				self::$arRules[$docRoot][$key]["ID"] = $arFields["ID"];
+			if (array_key_exists("PATH", $arFields))
+				self::$arRules[$docRoot][$key]["PATH"] = $arFields["PATH"];
+		}
+
+		if ($bFound)
+		{
+			uasort(self::$arRules[$docRoot], array("CUrlRewriter", "__RecordsCompare"));
+			if ($f = fopen($docRoot."/urlrewrite.php", "w"))
+			{
+				fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
+				fclose($f);
+				bx_accelerator_reset();
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
-
-		uasort(self::$arRules[$docRoot], array("CUrlRewriter", "__RecordsCompare"));
-		if ($f = fopen($docRoot."/urlrewrite.php", "w"))
+		else
 		{
-			fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
-			fclose($f);
-			bx_accelerator_reset();
 			return true;
 		}
-
-		return false;
 	}
 
 	public static function Delete($arFilter)
@@ -263,38 +278,56 @@ class CUrlRewriter
 		$bFilterCondition = array_key_exists("CONDITION", $arFilter);
 		$bFilterID = array_key_exists("ID", $arFilter);
 		$bFilterPath = array_key_exists("PATH", $arFilter);
+		$bFound = false;
 
 		foreach (self::$arRules[$docRoot] as $key => $arRule)
 		{
-			$bMatch = true;
 			if ($bFilterQuery && !preg_match($arRule["CONDITION"], $arFilter["QUERY"]))
-				$bMatch = false;
-			if ($bMatch && $bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
-				$bMatch = false;
-			if ($bMatch && $bFilterID
-				&& (($arFilter["ID"] != "NULL" && $arRule["ID"] != $arFilter["ID"]) || ($arFilter["ID"] == "NULL" && strlen($arRule["ID"]) <= 0))
+			{
+				continue;
+			}
+			if ($bFilterCondition && $arRule["CONDITION"] != $arFilter["CONDITION"])
+			{
+				continue;
+			}
+			if (
+				$bFilterID
+				&& (
+					($arFilter["ID"] != "NULL" && $arRule["ID"] != $arFilter["ID"])
+					|| ($arFilter["ID"] == "NULL" && strlen($arRule["ID"]) <= 0)
 				)
-				$bMatch = false;
-			if ($bMatch && $bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
-				$bMatch = false;
+			)
+			{
+				continue;
+			}
+			if ($bFilterPath && $arRule["PATH"] != $arFilter["PATH"])
+			{
+				continue;
+			}
 
-			if ($bMatch)
-				unset(self::$arRules[$docRoot][$key]);
+			unset(self::$arRules[$docRoot][$key]);
+			$bFound = true;
 		}
 
-		uasort(self::$arRules[$docRoot], array("CUrlRewriter", "__RecordsCompare"));
-
-		if ($f = fopen($docRoot."/urlrewrite.php", "w"))
+		if ($bFound)
 		{
-			fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
-			fclose($f);
-
-			bx_accelerator_reset();
-
+			uasort(self::$arRules[$docRoot], array("CUrlRewriter", "__RecordsCompare"));
+			if ($f = fopen($docRoot."/urlrewrite.php", "w"))
+			{
+				fwrite($f, "<"."?\n".CUrlRewriter::printArray(self::$arRules[$docRoot])."\n?".">");
+				fclose($f);
+				bx_accelerator_reset();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
 			return true;
 		}
-
-		return false;
 	}
 
 	public static function ReIndexAll($max_execution_time = 0, $NS = array())

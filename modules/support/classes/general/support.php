@@ -6,7 +6,7 @@ $SUPPORT_CACHE_USER_ROLES  = Array();
 
 
 /**
- * <b>CTicket</b> - класс для работы с обращениями.
+ * <b>CTicket</b> - класс для работы с обращениями.</body> </html>
  *
  *
  *
@@ -160,7 +160,7 @@ public static 	function IsSupportClient($userID=false)
 	}
 
 	// возвращает роли заданного пользователя
-	funpublic static ction GetRoles(&$isDemo, &$isSupportClient, &$isSupportTeam, &$isAdmin, &$isAccess, &$userID, $checkRights=true)
+	public static function GetRoles(&$isDemo, &$isSupportClient, &$isSupportTeam, &$isAdmin, &$isAccess, &$userID, $checkRights=true)
 	{
 		global $DB, $USER, $APPLICATION;
 		static $arTicketUserRoles;
@@ -199,7 +199,7 @@ public static 	function IsSupportClient($userID=false)
 
 	// возвращает массив ID групп для которых задана роль
 	// $role - идентификатор роли
-	fpublic static unction GetGroupsByRole($role)
+	public static function GetGroupsByRole($role)
 	{
 		//Todo: определиться с доступом по умолчанию
 
@@ -1381,7 +1381,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array())
 	*
 	*
 	*
-	* @param int $ID  ID сообщения.
+	* @param int $ID  ID сообщения.</bod
 	*
 	*
 	*
@@ -1699,13 +1699,13 @@ public static 	function SetTicket($arFields, $ticketID="", $checkRights="Y", $se
 									SET
 	*****************************************************************/
 	
-public static 	static function addSupportText($cn)
+public static function addSupportText($cn)
 	{
 		if($cn > 0 && (CTicket::IsSupportTeam($cn) || CTicket::IsAdmin($cn))) return " " . GetMessage("SUP_TECHSUPPORT_HINT");
 		return "";
 	}
 	
-public static 	static function EmailsFromStringToArray($emails, $res = null)
+public static function EmailsFromStringToArray($emails, $res = null)
 	{
 		if(!is_array($res)) $res = array();
 		$arEmails = explode(",", $emails);
@@ -1739,7 +1739,7 @@ public static 	static function EmailsFromStringToArray($emails, $res = null)
 		return $res;
 	}
 	
-public static 	static function GetCSupportTableFields($name, $arrOrTable = CSupportTableFields::C_Array)
+public static function GetCSupportTableFields($name, $arrOrTable = CSupportTableFields::C_Array)
 	{
 		$n = CSupportTableFields::VT_NUMBER;
 		$s = CSupportTableFields::VT_STRING;
@@ -2042,12 +2042,37 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 		$arUserIDs = array($mf->OWNER_USER_ID, $mf->CREATED_USER_ID, $mf->MODIFIED_USER_ID, $mf->RESPONSIBLE_USER_ID);
 		$arGuestIDs = array($mf->OWNER_GUEST_ID, $mf->CREATED_GUEST_ID, $mf->MODIFIED_GUEST_ID);
 		$arStrUsers =CTicket::GetUsersPropertiesArray($arUserIDs, $arGuestIDs);
-		
+
+		// set name, login, email
+		$userCategories = array('OWNER', 'RESPONSIBLE', 'CREATED');
+
+		if (!$v->isNew)
+		{
+			$userCategories[] = 'MODIFIED';
+		}
+
+		foreach ($userCategories as $userCategory)
+		{
+			$propertyId = $userCategory.'_USER_ID';
+
+			if ($mf->$propertyId > 0 && isset($arStrUsers['arUsers'][$mf->$propertyId]))
+			{
+				$name = CUser::FormatName(CSite::GetNameFormat(), $arStrUsers['arUsers'][$mf->$propertyId], true, true);
+				$propertyName = $userCategory.'_USER_NAME';
+				$mf->$propertyName = $name;
+
+				$propertyLogin = $userCategory.'_USER_LOGIN';
+				$mf->$propertyLogin = $arStrUsers['arUsers'][$mf->$propertyId]['LOGIN'];
+
+				$propertyEmail = $userCategory.'_USER_EMAIL';
+				$mf->$propertyEmail = $arStrUsers['arUsers'][$mf->$propertyId]['EMAIL'];
+			}
+		}
+
 		$mf->FILES_LINKS = self::Set_getFilesLinks($v->arrFILES, $v->arrSite["LANGUAGE_ID"]);
 		$mf->IMAGE_LINK = $mf->FILES_LINKS;
 		
 		$mf->MESSAGE_BODY = PrepareTxtForEmail($arFields["MESSAGE"], $v->arrSite["LANGUAGE_ID"], false, false);
-		if(strlen($mf->MESSAGE_BODY) > 0) $mf->MESSAGE_BODY = (strlen($mf->FILES_LINKS) > 0 ? "\n" : "\n\n") . $mf->MESSAGE_BODY . "\n";
 
 		// сформируем email автора
 		// Событие: "TICKET_CHANGE_BY_AUTHOR_FOR_AUTHOR"	- #DEFAULT_EMAIL_FROM# -> #OWNER_EMAIL# (Обращение изменено автором (для автора))
@@ -2312,7 +2337,7 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 		
 		$arEventFields_author = $mf->ToArray(CSupportTableFields::ALL); //, array(CSupportTableFields::NOT_NULL)
 		$arEventFields_support = $arEventFields_author;
-		
+
 		// отсылаем письмо автору
 		if($v->SEND_EMAIL_TO_AUTHOR == "Y" && ($v->isNew || strlen($v->change) > 0))
 		{
@@ -2329,10 +2354,10 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 				if(CTicket::IsSupportTeam($mf->MESSAGE_AUTHOR_USER_ID) || CTicket::IsAdmin($mf->MESSAGE_AUTHOR_USER_ID)) 
 					$EventType = "TICKET_CHANGE_BY_SUPPORT_FOR_AUTHOR";
 			}
-			$arEventFields_author = CTicket::ExecuteEvents('OnBeforeSendMailToAuthor' , $arEventFields_author, $v->isNew);
+			$arEventFields_author = CTicket::ExecuteEvents('OnBeforeSendMailToAuthor' , $arEventFields_author, $v->isNew, $EventType);
 			if ($arEventFields_author) CEvent::Send($EventType, $v->arrSite["ID"], $arEventFields_author);
 		}
-				
+
 		// отсылаем письмо техподдержке
 		if($v->SEND_EMAIL_TO_TECHSUPPORT == "Y" && ($v->isNew || strlen($v->change) > 0 || strlen($v->change_hidden) > 0))
 		{
@@ -3094,7 +3119,7 @@ public static 	function GetFUA($site_id)
 		return $rs;
 	}
 
-public static 	function GetRefBookValues($type, $site_id=false)
+	public static function GetRefBookValues($type, $site_id=false)
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: GetRefBookValues<br>Line: ";
 		global $DB;
@@ -3123,12 +3148,11 @@ public static 	function IsResponsible($userID=false)
 		return CTicket::IsSupportTeam($userID);
 	}
 
-	public static function ExecuteEvents($message, $arFields, $isNew)
+public static 	function ExecuteEvents($message, $arFields, $isNew, &$eventType = false)
 	{
-		$rs = GetModuleEvents('support', $message);
-		while ($arr = $rs->Fetch())
+		foreach(GetModuleEvents('support', $message, true) as $arr)
 		{
-			$arFields = ExecuteModuleEventEx($arr, array($arFields, $isNew));
+			$arFields = ExecuteModuleEventEx($arr, array($arFields, $isNew, &$eventType));
 		}
 
 		return $arFields;
@@ -3180,7 +3204,7 @@ public static 	function GetResponsibleList($userID, $CMGM = null, $CMUGM = null,
 		return $res;
 	}
 
-public static 	static function GetUsersPropertiesArray($arUserIDs = array(), $arGuestIDs = array())
+public static function GetUsersPropertiesArray($arUserIDs = array(), $arGuestIDs = array())
 	{
 		$arGuestUserIDs = array();
 		$arResUsers = array();
@@ -3237,7 +3261,7 @@ public static 	static function GetUsersPropertiesArray($arUserIDs = array(), $ar
 				$arResUsers[$v] = array("NAME" => GetMessage("SUP_UNKNOWN_USER"), "SECOND_NAME" => "","LAST_NAME" => "","LOGIN" => GetMessage("SUP_UNKNOWN_USER"),"ID" => $v, "EMAIL" => "");
 			}
 			$name = CUser::FormatName($siteNameFormat, $arResUsers[$v], true, true);
-			$arResUsers[$v]["HTML_NAME"] = "[<a title=\"" . GetMessage("SUP_USER_PROFILE") . "\" href=\"/bitrix/admin/user_edit.php?lang=" . LANGUAGE_ID . "&ID=" . $v . "\">" . $v."</a>] " . $name;
+			$arResUsers[$v]["HTML_NAME"] = "[<a title=\"" . GetMessage("SUP_USER_PROFILE") . "\" href=\"/bitrix/admin/user_edit.php?lang=" . LANGUAGE_ID . "&ID=" . $v . "\">" . $v."</a>] (" . htmlspecialcharsbx($arResUsers[$v]['LOGIN'])  . ") " . $name;
 				//" (".$str_OWNER_LOGIN.") ".$str_OWNER_NAME;
 			$arResUsers[$v]["HTML_NAME_S"] = "[" . $v . "] " . $name;
 		}

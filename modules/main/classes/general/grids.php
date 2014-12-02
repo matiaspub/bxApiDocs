@@ -19,15 +19,32 @@ class CGridOptions
 		$aOptions = CUserOptions::GetOption("main.interface.grid", $this->grid_id, array());
 
 		if(!is_array($aOptions))
+		{
 			$aOptions = array();
+		}
 		if(!is_array($aOptions["views"]))
+		{
 			$aOptions["views"] = array();
+		}
 		if(!is_array($aOptions["filters"]))
+		{
 			$aOptions["filters"] = array();
-		if(!isset($aOptions["views"]["default"]))
-			$aOptions["views"]["default"] = array("columns"=>"");
+		}
 		if($aOptions["current_view"] == '' || !isset($aOptions["views"][$aOptions["current_view"]]))
+		{
 			$aOptions["current_view"] = "default";
+		}
+
+		$defaultOptions = CUserOptions::GetOption("main.interface.grid.common", $this->grid_id, array());
+
+		if(is_array($defaultOptions["view"]) && !isset($aOptions["views"]["default"]))
+		{
+			$aOptions["views"]["default"] = $defaultOptions["view"];
+		}
+		if(!isset($aOptions["views"]["default"]))
+		{
+			$aOptions["views"]["default"] = array("columns"=>"");
+		}
 
 		$this->all_options = $aOptions;
 
@@ -50,6 +67,11 @@ class CGridOptions
 				$this->filter = $this->filterPresets[$this->options["saved_filter"]]["fields"];
 			}
 		}
+	}
+
+	public function GetOptions()
+	{
+		return $this->all_options;
 	}
 
 	public function GetSorting($arParams=array())
@@ -265,6 +287,44 @@ class CGridOptions
 			"page_size"=>$settings["page_size"],
 			"saved_filter"=>$settings["saved_filter"],
 		);
+	}
+
+	public function SetDefaultView($settings, $apply = false)
+	{
+		$options = array(
+			"view" => array(
+				"name"=>$settings["name"],
+				"columns"=>$settings["columns"],
+				"sort_by"=>$settings["sort_by"],
+				"sort_order"=>$settings["sort_order"],
+				"page_size"=>$settings["page_size"],
+				"saved_filter"=>$settings["saved_filter"],
+			)
+		);
+
+		CUserOptions::SetOption("main.interface.grid.common", $this->grid_id, $options, true);
+	}
+
+	public function ResetDefaultView()
+	{
+		$res = CUserOptions::GetList(
+			null,
+			array(
+				"CATEGORY" => "main.interface.grid",
+				"NAME" => $this->grid_id,
+			)
+		);
+		while($row = $res->Fetch())
+		{
+			$options = unserialize($row["VALUE"]);
+			if(!is_array($options))
+			{
+				$options = array();
+			}
+			unset($options["views"]["default"]);
+			$options["current_view"] = "default";
+			CUserOptions::SetOption("main.interface.grid", $this->grid_id, $options, false, $row["USER_ID"]);
+		}
 	}
 
 	public function DeleteView($view_id)

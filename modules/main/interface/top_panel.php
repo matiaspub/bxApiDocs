@@ -267,19 +267,10 @@ endif;
 ?><div class="adm-header-right-block"><?
 
 if ($USER->IsAuthorized()):
+
 	if ($USER->CanDoOperation('view_own_profile') || $USER->CanDoOperation('edit_own_profile')):
 
-		$userName = CUser::FormatName(
-			CSite::GetNameFormat(false),
-			array(
-				"NAME" => $USER->GetFirstName(),
-				"LAST_NAME" => $USER->GetLastName(),
-				"SECOND_NAME" => $USER->GetSecondName(),
-				"LOGIN" => $USER->GetLogin()
-			),
-			true, false
-		);
-?><a hidefocus="true" href="/bitrix/admin/user_edit.php?lang=<?=LANGUAGE_ID?>&amp;ID=<?=$USER->GetID()?>" class="adm-header-user-block" id="bx-panel-user"><?=htmlspecialcharsbx($userName);?></a><?
+?><a hidefocus="true" href="/bitrix/admin/user_edit.php?lang=<?=LANGUAGE_ID?>&amp;ID=<?=$USER->GetID()?>" class="adm-header-user-block" id="bx-panel-user"><?=$USER->GetFormattedName();?></a><?
 
 	else:
 

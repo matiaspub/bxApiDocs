@@ -15,8 +15,7 @@ use Bitrix\Main\Type;
  *
  * @package Bitrix\Main
  */
-class HttpRequest
-	extends Request
+class HttpRequest extends Request
 {
 	/**
 	 * @var Type\ParameterDictionary
@@ -95,7 +94,7 @@ class HttpRequest
 	}
 
 	/**
-	 * Returns _GET parameter of the current request.
+	 * Returns the GET parameter of the current request.
 	 *
 	 * @param string $name Parameter name
 	 * @return null|string
@@ -106,7 +105,7 @@ class HttpRequest
 	}
 
 	/**
-	 * Return list of _GET parameters of current request.
+	 * Returns the list of GET parameters of the current request.
 	 *
 	 * @return Type\ParameterDictionary
 	 */
@@ -116,7 +115,7 @@ class HttpRequest
 	}
 
 	/**
-	 * 
+	 * Returns the POST parameter of the current request.
 	 *
 	 * @param $name
 	 * @return null|string
@@ -126,26 +125,53 @@ class HttpRequest
 		return $this->postData->get($name);
 	}
 
+	/**
+	 * Returns the list of POST parameters of the current request.
+	 *
+	 * @return Type\ParameterDictionary
+	 */
 	public function getPostList()
 	{
 		return $this->postData;
 	}
 
+	/**
+	 * Returns the FILES parameter of the current request.
+	 *
+	 * @param $name
+	 * @return null|string
+	 */
 	public function getFile($name)
 	{
 		return $this->files->get($name);
 	}
 
+	/**
+	 * Returns the list of FILES parameters of the current request.
+	 *
+	 * @return Type\ParameterDictionary
+	 */
 	public function getFileList()
 	{
 		return $this->files;
 	}
 
+	/**
+	 * Returns the COOKIES parameter of the current request.
+	 *
+	 * @param $name
+	 * @return null|string
+	 */
 	public function getCookie($name)
 	{
 		return $this->cookies->get($name);
 	}
 
+	/**
+	 * Returns the list of COOKIES parameters of the current request.
+	 *
+	 * @return Type\ParameterDictionary
+	 */
 	public function getCookieList()
 	{
 		return $this->cookies;
@@ -181,6 +207,10 @@ class HttpRequest
 		return ($this->getRequestMethod() == "POST");
 	}
 
+	/**
+	 * Returns the User-Agent HTTP request header.
+	 * @return null|string
+	 */
 	public function getUserAgent()
 	{
 		return $this->server->get("HTTP_USER_AGENT");
@@ -204,26 +234,40 @@ class HttpRequest
 		return $acceptedLanguages;
 	}
 
+	/**
+	 * Returns the current page calculated from the request URI.
+	 *
+	 * @return string
+	 */
 	public function getRequestedPage()
 	{
-		if ($this->requestedFile != null)
+		if ($this->requestedPage === null)
 		{
-			return $this->requestedFile;
+			if($this->getRequestUri() == '')
+			{
+				$this->requestedPage = parent::getRequestedPage();
+			}
+			else
+			{
+				$this->requestedPage = $this->convertToPath($this->getDecodedUri());
+			}
 		}
+		return $this->requestedPage;
+	}
 
+	/**
+	 * Returns url-decoded and converted to the current encoding URI of the request.
+	 *
+	 * @return string
+	 */
+	public function getDecodedUri()
+	{
 		$page = $this->getRequestUri();
-		if (empty($page))
-		{
-			$this->requestedFile = parent::getRequestedPage();
-			return $this->requestedFile;
-		}
 
 		$page = urldecode($page);
 		$page = Text\Encoding::convertEncodingToCurrent($page);
 
-		$this->requestedFile = $this->convertToPath($page);
-
-		return $this->requestedFile;
+		return $page;
 	}
 
 	public function getHttpHost($raw = true)
@@ -307,5 +351,23 @@ class HttpRequest
 		$path = IO\Path::normalize($path);
 
 		return $path;
+	}
+
+	/**
+	 * Returns script file possibly corrected by urlrewrite.php or virtual_file_system.php.
+	 *
+	 * @return string
+	 */
+	public function getScriptFile()
+	{
+		$scriptName = $this->getScriptName();
+		if($scriptName == "/bitrix/urlrewrite.php" || $scriptName == "/404.php" || $scriptName == "/bitrix/virtual_file_system.php")
+		{
+			if(($v = $this->server->get("REAL_FILE_PATH")) != null)
+			{
+				$scriptName = $v;
+			}
+		}
+		return $scriptName;
 	}
 }

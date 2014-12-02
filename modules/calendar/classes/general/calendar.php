@@ -1,7 +1,6 @@
 <?
 /** var CMain $APPLICATION */
 IncludeModuleLangFile(__FILE__);
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/calendar/admin/task_description.php");
 
 class CCalendar
 {
@@ -62,9 +61,10 @@ class CCalendar
 		$silentErrorMode = false,
 		$weekStart,
 		$bCurUserSocNetAdmin,
+		$serverPath,
 		$pathesList = array('path_to_user','path_to_user_calendar','path_to_group','path_to_group_calendar','path_to_vr','path_to_rm');
 
-	public function Init($Params)
+	public static function Init($Params)
 	{
 		global $USER;
 		$access = new CAccess();
@@ -132,11 +132,9 @@ class CCalendar
 		if (self::$bOwner && !empty(self::$ownerId))
 			self::$path = self::GetPath(self::$type, self::$ownerId, true);
 		else
-			self::$path = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER['HTTP_HOST'].$page;
+			self::$path = CCalendar::GetServerPath().$page;
 
 		self::$outerUrl = $GLOBALS['APPLICATION']->GetCurPageParam('', array("action", "bx_event_calendar_request", "clear_cache", "bitrix_include_areas", "bitrix_show_mode", "back_url_admin", "SEF_APPLICATION_CUR_PAGE_URL", "EVENT_ID", "CHOOSE_MR"), false);
-
-		//$this->fullUrl = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER['HTTP_HOST'].$page;
 
 		// Superposing
 		self::$bCanAddToSuperpose = false;
@@ -273,6 +271,12 @@ class CCalendar
 
 		if (!self::$bIntranet && !$bExchange && !$bCalDAV)
 			$bShowBanner = false;
+		$dd = self::GetMeetingRoomList(array(
+			'RMiblockId' => self::$settings['rm_iblock_id'],
+			'pathToMR' => self::$pathesForSite['path_to_rm'],
+			'VMiblockId' => self::$settings['vr_iblock_id'],
+			'pathToVR' => self::$pathesForSite['path_to_vr']
+		));
 
 		$JSConfig = Array(
 			'id' => $id,
@@ -410,6 +414,11 @@ class CCalendar
 			$JSConfig['bChooseMR'] = isset($_GET['CHOOSE_MR']) && $_GET['CHOOSE_MR'] == "Y";
 		}
 
+		if (!in_array($JSConfig['lastSection'], $arSectionIds))
+		{
+			$JSConfig['lastSection'] = $arSectionIds[0];
+		}
+
 		//  **** GET EVENTS ****
 		// NOTICE: Attendees for meetings selected inside this method and returns as array by link '$arAttendees'
 		$arAttendees = array(); // List of attendees for each event Array([ID] => Array(), ..,);
@@ -503,12 +512,8 @@ class CCalendar
 		global $USER;
 
 		$JSConfig['bCalDAV'] = true;
-		if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
-			$serverName = SITE_SERVER_NAME;
-		else
-			$serverName = COption::GetOptionString("main", "server_name", $_SERVER["SERVER_NAME"]);
+		$JSConfig['caldav_link_all'] = CCalendar::GetServerPath();
 
-		$JSConfig['caldav_link_all'] = (CMain::IsHTTPS() ? "https://" : "http://").$serverName;
 		$login = '';
 		if (self::$type == 'user')
 		{
@@ -524,17 +529,17 @@ class CCalendar
 			}
 
 			if (CCalendar::IsBitrix24())
-				$JSConfig['caldav_link_one'] = "https://".$_SERVER["SERVER_NAME"].":1443/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
+				$JSConfig['caldav_link_one'] = "https://".CCalendar::GetServerName().":1443/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
 			else
-				$JSConfig['caldav_link_one'] = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER["SERVER_NAME"]."/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
+				$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
 
 		}
 		else if (self::$type == 'group')
 		{
 			if (CCalendar::IsBitrix24())
-				$JSConfig['caldav_link_one'] = "https://".$_SERVER["SERVER_NAME"].":1443/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
+				$JSConfig['caldav_link_one'] = "https://".CCalendar::GetServerName().":1443/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
 			else
-				$JSConfig['caldav_link_one'] = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER["SERVER_NAME"]."/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
+				$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
 		}
 
 		if (self::$type == 'user')
@@ -760,10 +765,20 @@ class CCalendar
 					if (isset($_POST['remind']['checked']) && $_POST['remind']['checked'] == 'Y')
 						$remind[] = array('type' => $_POST['remind']['type'], 'count' => intval($_POST['remind']['count']));
 
+					$rrule = isset($_POST['rrule_enabled']) ? $_POST['rrule'] : false;
+					$from_ts = $_POST['from_ts'];
+					$to_ts = $_POST['to_ts'];
+
+					if ((isset($_POST['skip_time']) && $_POST['skip_time'] == 'Y') || $rrule)
+					{
+						$from_ts = self::_fixTimestamp($from_ts);
+						$to_ts = self::_fixTimestamp($to_ts);
+					}
+
 					$arFields = array(
 						"ID" => $id,
-						"DT_FROM_TS" => $_POST['from_ts'],
-						"DT_TO_TS" => $_POST['to_ts'],
+						"DT_FROM_TS" => $from_ts,
+						"DT_TO_TS" => $to_ts,
 						'NAME' => $_POST['name'],
 						'DESCRIPTION' => trim($_POST['desc']),
 						'SECTIONS' => $_POST['sections'],
@@ -771,8 +786,8 @@ class CCalendar
 						'TEXT_COLOR' => $_POST['text_color'],
 						'ACCESSIBILITY' => $_POST['accessibility'],
 						'IMPORTANCE' => $_POST['importance'],
-						'PRIVATE_EVENT' => $_POST['private_event'],
-						'RRULE' => isset($_POST['rrule_enabled']) ? $_POST['rrule'] : false,
+						'PRIVATE_EVENT' => $_POST['private_event'] == 'Y',
+						'RRULE' => $rrule,
 						'LOCATION' => is_array($_POST['location']) ? $_POST['location'] : array(),
 						"REMIND" => $remind,
 						"IS_MEETING" => !!$_POST['is_meeting'],
@@ -815,31 +830,19 @@ class CCalendar
 						);
 					}
 
-					$newId = self::SaveEvent(array('arFields' => $arFields));
+					// Userfields for event
+					$arUFFields = array();
+					foreach ($_POST as $field => $value)
+					{
+						if (substr($field, 0, 3) == "UF_")
+						{
+							$arUFFields[$field] = $value;
+						}
+					}
+
+					$newId = self::SaveEvent(array('arFields' => $arFields, 'UF' => $arUFFields));
 					if ($newId)
 					{
-						// Userfields for event
-						$arUFFields = array();
-						foreach ($_POST as $field => $value)
-						{
-							if (substr($field, 0, 3) == "UF_")
-							{
-								$arUFFields[$field] = $value;
-							}
-						}
-
-						if (count($arUFFields) > 0)
-							CCalendarEvent::UpdateUserFields($newId, $arUFFields);
-
-						if ($arFields['IS_MEETING'])
-						{
-							if (!empty($arUFFields['UF_WEBDAV_CAL_EVENT']))
-							{
-								$UF = $GLOBALS['USER_FIELD_MANAGER']->GetUserFields("CALENDAR_EVENT", $newId, LANGUAGE_ID);
-								CCalendar::UpdateUFRights($arUFFields['UF_WEBDAV_CAL_EVENT'], $arAccessCodes, $UF['UF_WEBDAV_CAL_EVENT']);
-							}
-						}
-
 						$arFilter = array("ID" => $newId);
 						$month = intVal($_REQUEST['month']);
 						$year = intVal($_REQUEST['year']);
@@ -885,9 +888,14 @@ class CCalendar
 							return CCalendar::ThrowError(GetMessage('EC_ACCESS_DENIED'));
 					}
 
+					$from_ts = intVal($_POST['from_ts']);
+					if (isset($_POST['skip_time']) && $_POST['skip_time'] == 'Y')
+					{
+						$from_ts = self::_fixTimestamp($from_ts);
+					}
 					$arFields = array(
 						"ID" => $id,
-						"DT_FROM_TS" => intVal($_POST['from_ts']),
+						"DT_FROM_TS" => $from_ts,
 						"SKIP_TIME" => isset($_POST['skip_time']) && $_POST['skip_time'] == 'Y'
 					);
 
@@ -966,6 +974,7 @@ class CCalendar
 					}
 
 					//  **** GET TASKS ****
+					$arTaskIds = array();
 					if (self::$bTasks && $bGetTask)
 					{
 						$arTasks = self::GetTaskList(array(
@@ -1268,30 +1277,29 @@ class CCalendar
 							CCalendar::ThrowError($error);
 					}
 					break;
-				case 'userfield_view':
-					CCalendarSceleton::GetUserfieldsViewHtml(intVal($_REQUEST['event_id']));
-					CCalendar::OutputJSRes($reqId, array('result' => true));
-					break;
-				case 'userfield_edit':
-					CCalendarSceleton::GetUserfieldsEditHtml(intVal($_REQUEST['event_id']), self::$actionUrl);
-					CCalendar::OutputJSRes($reqId, array('result' => true));
-					break;
-				case 'userfield_save':
-					$arFields = array();
-					$bRefresh = false;
-					foreach ($_POST as $field => $value)
-						if (substr($field, 0, 3) == "UF_")
-						{
-							$arFields[$field] = $value;
-							if ($field == 'UF_CRM_CAL_EVENT')
-								$bRefresh = true;
-						}
-
-					if (count($arFields) > 0)
-						CCalendarEvent::UpdateUserFields($_REQUEST['event_id'], $arFields);
-
-					CCalendar::OutputJSRes($reqId, array('result' => true, 'refresh' => $bRefresh));
-					break;
+//				case 'userfield_view':
+//					CCalendarSceleton::GetUserfieldsViewHtml(intVal($_REQUEST['event_id']));
+//					CCalendar::OutputJSRes($reqId, array('result' => true));
+//					break;
+//				case 'userfield_edit':
+//					CCalendarSceleton::GetUserfieldsEditHtml(intVal($_REQUEST['event_id']), self::$actionUrl);
+//					CCalendar::OutputJSRes($reqId, array('result' => true));
+//					break;
+//				case 'userfield_save':
+//					$arFields = array();
+//					$bRefresh = false;
+//					foreach ($_POST as $field => $value)
+//						if (substr($field, 0, 3) == "UF_")
+//						{
+//							$arFields[$field] = $value;
+//							if ($field == 'UF_CRM_CAL_EVENT')
+//								$bRefresh = true;
+//						}
+//					if (count($arFields) > 0)
+//						CCalendarEvent::UpdateUserFields($_REQUEST['event_id'], $arFields);
+//
+//					CCalendar::OutputJSRes($reqId, array('result' => true, 'refresh' => $bRefresh));
+//					break;
 
 				case 'get_view_event_dialog':
 					$APPLICATION->ShowAjaxHead();
@@ -1317,7 +1325,7 @@ class CCalendar
 							'id' => $jsId,
 							'event' => $Event[0],
 							'sectionName' => $_REQUEST['section_name'],
-							'fromTs' => $_REQUEST['from_ts'],
+							'fromTs' => self::_fixTimestamp($_REQUEST['from_ts']),
 							'bIntranet' => self::IsIntranetEnabled(),
 							'bSocNet' => self::IsSocNet(),
 							'AVATAR_SIZE' => 21
@@ -1389,8 +1397,8 @@ class CCalendar
 					{
 						$acc = CCalendar::CheckUsersAccessibility(array(
 							'users' => $userIds,
-							'from' => self::Date($_REQUEST['event_from_ts']),
-							'to' => self::Date($_REQUEST['event_to_ts']),
+							'from' => self::Date(self::_fixTimestamp($_REQUEST['event_from_ts'])),
+							'to' => self::Date(self::_fixTimestamp($_REQUEST['event_to_ts'])),
 							'eventId' => intVal($_REQUEST['cur_event_id'])
 						));
 						foreach($result as $i => $user)
@@ -1593,7 +1601,8 @@ class CCalendar
 		$res = array();
 		while($task = $rsTasks->Fetch())
 		{
-			unset($dtFrom, $dtTo);
+			$dtFrom = NULL;
+			$dtTo = NULL;
 			$arTaskIds[] = $task['ID'];
 
 			$skipFromOffset = false;
@@ -1942,7 +1951,8 @@ class CCalendar
 			// For exchange we change only calendar name
 			if ($oSect && $oSect['IS_EXCHANGE'] && $oSect['DAV_EXCH_CAL'])
 			{
-				if (CDavExchangeCalendar::DoDeleteCalendar($oSect['OWNER_ID'], $oSect['DAV_EXCH_CAL']) !== true)
+				$exchRes = CDavExchangeCalendar::DoDeleteCalendar($oSect['OWNER_ID'], $oSect['DAV_EXCH_CAL']);
+				if ($exchRes !== true)
 					return CCalendar::CollectExchangeErrors($exchRes);
 			}
 		}
@@ -1968,7 +1978,8 @@ class CCalendar
 
 		// Fetch current event
 		$oCurEvent = false;
-		if ($arFields['ID'] > 0)
+		$bNew = !isset($arFields['ID']) || !$arFields['ID'];
+		if (!$bNew)
 		{
 			$oCurEvent = CCalendarEvent::GetList(
 				array(
@@ -1993,7 +2004,6 @@ class CCalendar
 			$arFields['ACTIVE'] = $oCurEvent['ACTIVE'];
 
 			$bChangeMeeting = $arFields['CAL_TYPE'] != 'user' && CCalendarSect::CanDo('calendar_edit', $oCurEvent['SECT_ID'], self::$userId);
-
 
 			if (!isset($arFields['DT_FROM_TS']) && !isset($arFields['DT_FROM']))
 				$arFields['DT_FROM_TS'] = $oCurEvent['DT_FROM_TS'];
@@ -2187,6 +2197,26 @@ class CCalendar
 			$Params['path'] = self::$path;
 
 		$id = CCalendarEvent::Edit($Params);
+
+		$UFs = $Params['UF'];
+		if (isset($UFs) && count($UFs) > 0)
+		{
+			CCalendarEvent::UpdateUserFields($id, $UFs);
+
+			if ($arFields['IS_MEETING'])
+			{
+				if (!empty($UFs['UF_WEBDAV_CAL_EVENT']))
+				{
+					$UF = $GLOBALS['USER_FIELD_MANAGER']->GetUserFields("CALENDAR_EVENT", $id, LANGUAGE_ID);
+					CCalendar::UpdateUFRights($UFs['UF_WEBDAV_CAL_EVENT'], $arFields['ATTENDEES_CODES'], $UF['UF_WEBDAV_CAL_EVENT']);
+				}
+			}
+		}
+
+		$arFields['ID'] = $id;
+		foreach(GetModuleEvents("calendar", "OnAfterCalendarEventEdit", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array('arFields' => $arFields,'bNew' => $bNew,'userId' => $userId));
+
 		return $id;
 	}
 
@@ -2269,6 +2299,9 @@ class CCalendar
 
 		$fromTs = CCalendar::Timestamp($Params["from"]);
 		$toTs = CCalendar::Timestamp($Params["to"]);
+
+		$fromTs = CCalendar::_fixTimestamp($fromTs);
+		$toTs = CCalendar::_fixTimestamp($toTs);
 
 		$arNotifyFields = array(
 			'EMAIL_TEMPLATE' => "CALENDAR_INVITATION",
@@ -2995,11 +3028,12 @@ class CCalendar
 
 	public static function AddAgent($remindTime, $arParams)
 	{
+		global $DB;
 		CCalendar::RemoveAgent($arParams);
-		if (CCalendar::Timestamp($remindTime) > 0)
+		if (strlen($remindTime) > 0 && $DB->IsDate($remindTime, false, LANG, "FULL"))
 		{
 			CAgent::AddAgent(
-				"CCalendar::ReminderAgent(".$arParams['eventId'].", ".$arParams['userId'].", '".$arParams['viewPath']."', '".$arParams['calendarType']."', ".$arParams['ownerId'].");",
+				"CCalendar::ReminderAgent(".intVal($arParams['eventId']).", ".intVal($arParams['userId']).", '".addslashes($arParams['viewPath'])."', '".addslashes($arParams['calendarType'])."', ".intVal($arParams['ownerId']).");",
 				"calendar",
 				"N",
 				86400,
@@ -3135,7 +3169,7 @@ class CCalendar
 							elseif ($reminder['type'] == 'day')
 								$delta =  $delta * 60 * 24; //Day
 
-							if (($startTs - $delta) >= (time() - 60 * 5)) // Inaccuracy - 5 min
+							if (($startTs - $delta) >= (time() - 60 * 10)) // Inaccuracy - 10 min
 								CCalendar::AddAgent(CCalendar::Date($startTs - $delta), $remAgentParams);
 						}
 					}
@@ -3375,8 +3409,8 @@ class CCalendar
 			{
 				$MRList[] = array(
 					'ID' => $arMeeting['ID'],
-					'NAME' => $arMeeting['NAME'],
-					'DESCRIPTION' => $arMeeting['DESCRIPTION'],
+					'NAME' => $arMeeting['~NAME'],
+					'DESCRIPTION' => $arMeeting['~DESCRIPTION'],
 					'UF_PLACE' => $arMeeting['UF_PLACE'],
 					'UF_PHONE' => $arMeeting['UF_PHONE'],
 					'URL' => str_replace(array("#id#", "#ID#"), $arMeeting['ID'], $pathToMR)
@@ -3393,8 +3427,8 @@ class CCalendar
 			{
 				$MRList[] = array(
 					'ID' => $VMiblockId,
-					'NAME' => $arMeeting["NAME"],
-					'DESCRIPTION' => $arMeeting['DESCRIPTION'],
+					'NAME' => $arMeeting["~NAME"],
+					'DESCRIPTION' => $arMeeting['~DESCRIPTION'],
 					'URL' => str_replace(array("#id#", "#ID#"), $arMeeting['ID'], $pathToVR),
 				);
 			}
@@ -3549,7 +3583,6 @@ class CCalendar
 
 		$bs = new CIBlockElement;
 		$id = $bs->Add($arFields);
-
 
 		// Hack: reserve meeting calendar based on old calendar's cache
 		$cache = new CPHPCache;
@@ -4001,7 +4034,8 @@ class CCalendar
 			'IMPORTANCE' => isset($arFields['IMPORTANCE']) ? $arFields['IMPORTANCE'] : 'normal',
 			"REMIND" => is_array($arFields['REMIND']) ? $arFields['REMIND'] : array(),
 			"RRULE" => is_array($arFields['RRULE']) ? is_array($arFields['RRULE']) : array(),
-			"VERSION" => isset($arFields['VERSION']) ? intVal($arFields['VERSION']) : 1
+			"VERSION" => isset($arFields['VERSION']) ? intVal($arFields['VERSION']) : 1,
+			"PRIVATE_EVENT" => !!$arFields['PRIVATE_EVENT']
 		);
 
 		$bServerTime = false;
@@ -4560,6 +4594,15 @@ class CCalendar
 		return $timestamp;
 	}
 
+	public static function _fixTimestamp($timestamp)
+	{
+		if (date("Z") !== date("Z", $timestamp))
+		{
+			$timestamp += (date("Z") - date("Z", $timestamp));
+		}
+		return $timestamp;
+	}
+
 	public static function RoundTimestamp($ts)
 	{
 		return round($ts / 60) * 60; // We don't need for seconds here
@@ -4736,6 +4779,8 @@ class CCalendar
 
 	public static function GetAccessTasks($binging = 'calendar_section')
 	{
+		\Bitrix\Main\Localization\Loc::loadLanguageFile($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/calendar/admin/task_description.php");
+
 		if (is_array(self::$arAccessTask[$binging]))
 			return self::$arAccessTask[$binging];
 
@@ -4834,7 +4879,7 @@ class CCalendar
 						$path = str_replace(array('#group_id#', '#GROUP_ID#'), $ownerId, $path);
 				}
 
-				$path = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER['HTTP_HOST'].$path;
+				$path = CCalendar::GetServerPath().$path;
 			}
 		}
 		else
@@ -4920,19 +4965,9 @@ class CCalendar
 
 
 			if ($mrevid && $mrevid != 'reserved' && $mrevid != 'expire' && $mrevid > 0)
-			{
 				$locNew = 'ECMR_'.$locNew['mrid'].'_'.$mrevid;
-			}
 			else
-			{
 				$locNew = '';
-				// if($mrevid == 'reserved')
-				// $locNew = 'bxec_error_reserved';
-				// elseif($mrevid == 'expire')
-				// $locNew = 'bxec_error_expire';
-				// else
-				// $locNew = 'bxec_error';
-			}
 		}
 		else
 		{
@@ -5314,7 +5349,7 @@ class CCalendar
 
 		$calendarUrl = self::$pathes[$siteId]['path_to_user_calendar'];
 		$calendarUrl = str_replace(array('#user_id#', '#USER_ID#'), $userId, $calendarUrl);
-		$calendarUrl = (CMain::IsHTTPS() ? "https://" : "http://").$_SERVER['HTTP_HOST'].$calendarUrl;
+		$calendarUrl = CCalendar::GetServerPath().$calendarUrl;
 
 		return $calendarUrl;
 	}
@@ -5512,6 +5547,12 @@ class CCalendar
 
 	public static function GetFromToHtml($fromTs = false, $toTs = false, $skipTime = false, $dtLength = 0)
 	{
+		$deltaTimezone = date("Z", $fromTs) - date("Z", $toTs);
+		if ($deltaTimezone !== 0)
+		{
+			$toTs += $deltaTimezone;
+		}
+
 		// Formats
 		$formatShort = CCalendar::DFormat(false);
 		$formatFull = CCalendar::DFormat(true);
@@ -5527,9 +5568,9 @@ class CCalendar
 			{
 				$html = FormatDate(array(
 					"tommorow" => "tommorow",
-					"-" => $formatShort,
 					"today" => "today",
 					"yesterday" => "yesterday",
+					"-" => $formatShort,
 					"" => $formatShort,
 				), $fromTs);
 				$html .= ', '.GetMessage('EC_VIEW_FULL_DAY');
@@ -5538,17 +5579,17 @@ class CCalendar
 			{
 				$from = FormatDate(array(
 					"tommorow" => "tommorow",
-					"-" => $formatShort,
 					"today" => "today",
 					"yesterday" => "yesterday",
+					"-" => $formatShort,
 					"" => $formatShort,
 				), $fromTs);
 
 				$to = FormatDate(array(
 					"tommorow" => "tommorow",
-					"-" => $formatShort,
 					"today" => "today",
 					"yesterday" => "yesterday",
+					"-" => $formatShort,
 					"" => $formatShort,
 				), $toTs - self::DAY_LENGTH);
 
@@ -5562,9 +5603,9 @@ class CCalendar
 			{
 				$html = FormatDate(array(
 					"tommorow" => "tommorow",
-					"-" => $formatShort,
 					"today" => "today",
 					"yesterday" => "yesterday",
+					"-" => $formatShort,
 					"" => $formatShort,
 				), $fromTs);
 
@@ -5757,6 +5798,37 @@ class CCalendar
 
 			unset($iblockId);
 		}
+	}
+
+	public static function GetServerName()
+	{
+		if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
+			$server_name = SITE_SERVER_NAME;
+		if (!$server_name)
+			$server_name = COption::GetOptionString("main", "server_name", "");
+		if (!$server_name)
+			$server_name = $_SERVER['HTTP_HOST'];
+		$server_name = rtrim($server_name, '/');
+		if (!preg_match('/^[a-z0-9\.\-]+$/i', $server_name)) // cyrillic domain hack
+		{
+			$converter = new CBXPunycode(defined('BX_UTF') && BX_UTF === true ? 'UTF-8' : 'windows-1251');
+			$host = $converter->Encode($server_name);
+			if (!preg_match('#--p1ai$#', $host)) // trying to guess
+				$host = $converter->Encode(CharsetConverter::ConvertCharset($server_name, 'utf-8', 'windows-1251'));
+			$server_name = $host;
+		}
+
+		return $server_name;
+	}
+
+	public static function GetServerPath()
+	{
+		if (!isset(self::$serverPath))
+		{
+			self::$serverPath = (CMain::IsHTTPS() ? "https://" : "http://").self::GetServerName();
+		}
+
+		return self::$serverPath;
 	}
 }
 ?>

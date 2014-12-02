@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.
+ * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.</body> </html>
  *
  *
  *

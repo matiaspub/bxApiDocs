@@ -144,10 +144,12 @@ class CSaleBasket extends CAllSaleBasket
 	* корзин, уже привязанных к заказу.)</td> </tr> <tr> <td>ORDER_PAYED</td> <td>Заказ
 	* корзины оплачен. (Для корзин, уже привязанных к заказу.)</td> </tr> <tr>
 	* <td>ORDER_PRICE</td> <td>Стоимость заказа корзины. (Для корзин, уже
-	* привязанных к заказу.)</td> </tr> <tr> <td>DETAIL_PAGE_URL</td> <td>Ссылка на страницу
-	* детального просмотра товара.</td> </tr> <tr> <td>FUSER_ID</td> <td>Внутренний код
-	* владельца корзины (не совпадает с кодом пользователя) </td> </tr> <tr>
-	* <td>ORDER_ID</td> <td>Код заказа, в который вошла эта запись (товар). Для
+	* привязанных к заказу.)</td> </tr> <tr> <td>ORDER_CANCELED</td> <td>Флаг отмены
+	* заказа.</td> </tr> <tr> <td>DETAIL_PAGE_URL</td> <td>Ссылка на страницу детального
+	* просмотра товара.</td> </tr> <tr> <td>FUSER_ID</td> <td>Внутренний код владельца
+	* корзины (не совпадает с кодом пользователя) </td> </tr> <tr> <td>USER_ID</td>
+	* <td>Реальный идентификатор пользователя. (не путать с FUSER_ID)</td> </tr>
+	* <tr> <td>ORDER_ID</td> <td>Код заказа, в который вошла эта запись (товар). Для
 	* товаров, которые помещены в корзину, но ещё не заказаны, это поле
 	* равно NULL. </td> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления товара в
 	* корзину.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
@@ -216,54 +218,53 @@ class CSaleBasket extends CAllSaleBasket
 	* 
 	* &lt;?
 	* $arID = array();
+	* 
 	* $arBasketItems = array();
 	* 
 	* $dbBasketItems = CSaleBasket::GetList(
 	*      array(
-	* "NAME" =&gt; "ASC",
-	* "ID" =&gt; "ASC"
-	* ),
-	* array(
-	* "FUSER_ID" =&gt; CSaleBasket::GetBasketUserID(),
-	* "LID" =&gt; SITE_ID,
-	* "ORDER_ID" =&gt; "NULL"
-	* ),
-	* false,
-	* false,
-	* array("ID", "CALLBACK_FUNC", "MODULE", "PRODUCT_ID", "QUANTITY", "PRODUCT_PROVIDER_CLASS")
-	* );
+	*                 "NAME" =&gt; "ASC",
+	*                 "ID" =&gt; "ASC"
+	*              ),
+	*      array(
+	*                 "FUSER_ID" =&gt; CSaleBasket::GetBasketUserID(),
+	*                 "LID" =&gt; SITE_ID,
+	*                 "ORDER_ID" =&gt; "NULL"
+	*              ),
+	*      false,
+	*      false,
+	*      array("ID", "CALLBACK_FUNC", "MODULE", "PRODUCT_ID", "QUANTITY", "PRODUCT_PROVIDER_CLASS")
+	*              );
 	* while ($arItems = $dbBasketItems-&gt;Fetch())
 	* {
-	* if ('' != $arItems['PRODUCT_PROVIDER_CLASS'] || '' != $arItems["CALLBACK_FUNC"])
-	* {
-	* CSaleBasket::UpdatePrice($arItems["ID"],
-	* $arItems["CALLBACK_FUNC"],
-	* $arItems["MODULE"],
-	* $arItems["PRODUCT_ID"],
-	* $arItems["QUANTITY"],
-	* "N",
-	* $arItems["PRODUCT_PROVIDER_CLASS"]
-	* );
-	* $arID[] = $arItems["ID"];
-	* }
+	*      if ('' != $arItems['PRODUCT_PROVIDER_CLASS'] || '' != $arItems["CALLBACK_FUNC"])
+	*      {
+	*           CSaleBasket::UpdatePrice($arItems["ID"],
+	*                                  $arItems["CALLBACK_FUNC"],
+	*                                  $arItems["MODULE"],
+	*                                  $arItems["PRODUCT_ID"],
+	*                                  $arItems["QUANTITY"],
+	*                                  "N",
+	*                                  $arItems["PRODUCT_PROVIDER_CLASS"]
+	*                                  );
+	*           $arID[] = $arItems["ID"];
+	*      }
 	* }
 	* if (!empty($arID))
-	* {
-	* $dbBasketItems = CSaleBasket::GetList(
-	* array(
-	* "NAME" =&gt; "ASC",
-	* "ID" =&gt; "ASC"
-	* ),
-	* array(
-	* "ID" =&gt; $arID,
+	*      {
+	*      $dbBasketItems = CSaleBasket::GetList(
+	*      array(
+	*           "NAME" =&gt; "ASC",
+	*           "ID" =&gt; "ASC"
+	*           ),
+	*      array(
+	*           "ID" =&gt; $arID,
 	*         "ORDER_ID" =&gt; "NULL"
-	* ),
+	*           ),
 	*         false,
 	*         false,
-	*         array("ID", "CALLBACK_FUNC", "MODULE",
-	* "PRODUCT_ID", "QUANTITY", "DELAY",
-	* "CAN_BUY", "PRICE", "WEIGHT", "PRODUCT_PROVIDER_CLASS", "NAME")
-	* );
+	*         array("ID", "CALLBACK_FUNC", "MODULE", "PRODUCT_ID", "QUANTITY", "DELAY", "CAN_BUY", "PRICE", "WEIGHT", "PRODUCT_PROVIDER_CLASS", "NAME")
+	*                 );
 	* while ($arItems = $dbBasketItems-&gt;Fetch())
 	* {
 	*     $arBasketItems[] = $arItems;
@@ -646,11 +647,10 @@ class CSaleBasket extends CAllSaleBasket
 	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код записи. </td> </tr> <tr>
 	* <td>BASKET_ID</td> <td>Код элемента корзины, к которому привязано данное
 	* свойство.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
-	* <td>Значение свойства. </td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
-	* свойства. </td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки свойства. </td> </tr>
-	* </table> <p>Если в качестве параметра arGroupBy передается пустой массив,
-	* то функция вернет число записей, удовлетворяющих фильтру.</p> <a
-	* name="examples"></a>
+	* <td>Значение свойства. </td> </tr> <tr> <td>CODE</td> <td>Символьный код свойства.
+	* </td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки свойства. </td> </tr> </table> <p>Если
+	* в качестве параметра arGroupBy передается пустой массив, то функция
+	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 
@@ -898,6 +898,49 @@ class CSaleBasket extends CAllSaleBasket
 		if (!CSaleBasket::CheckFields("ADD", $arFields))
 			return false;
 
+
+		if (!array_key_exists('IGNORE_CALLBACK_FUNC', $arFields) || 'Y' != $arFields['IGNORE_CALLBACK_FUNC'])
+		{
+			if ((array_key_exists("CALLBACK_FUNC", $arFields) && !empty($arFields["CALLBACK_FUNC"]))
+				|| (array_key_exists("PRODUCT_PROVIDER_CLASS", $arFields) && !empty($arFields["PRODUCT_PROVIDER_CLASS"]))
+			)
+			{
+				/** @var $productProvider IBXSaleProductProvider */
+				if ($productProvider = CSaleBasket::GetProductProvider(array("MODULE" => $arFields["MODULE"], "PRODUCT_PROVIDER_CLASS" => $arFields["PRODUCT_PROVIDER_CLASS"])))
+				{
+					$providerParams = array(
+						"PRODUCT_ID" => $arFields["PRODUCT_ID"],
+						"QUANTITY" => $arFields["QUANTITY"],
+						"RENEWAL" => $arFields["RENEWAL"],
+						"USER_ID" => (isset($arFields["USER_ID"]) ? $arFields["USER_ID"] : 0),
+						"SITE_ID" => (isset($arFields["LID"]) ? $arFields["LID"] : false),
+					);
+					if (isset($arFields['NOTES']))
+						$providerParams['NOTES'] = $arFields['NOTES'];
+
+					if (!($productProvider::GetProductData($providerParams)))
+					{
+						return false;
+					}
+				}
+				else
+				{
+					if (!(CSaleBasket::ExecuteCallbackFunction(
+						$arFields["CALLBACK_FUNC"],
+						$arFields["MODULE"],
+						$arFields["PRODUCT_ID"],
+						$arFields["QUANTITY"],
+						$arFields["RENEWAL"],
+						$arFields["USER_ID"],
+						$arFields["LID"]
+					)))
+					{
+						return false;
+					}
+				}
+			}
+		}
+
 		foreach(GetModuleEvents("sale", "OnBeforeBasketAdd", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
 				return false;
@@ -1122,8 +1165,7 @@ class CSaleBasket extends CAllSaleBasket
 	* if (CSaleBasket::Delete(22))
 	*     echo "Запись успешно удалена";
 	* ?&gt;
-	* 
-	* Метод может использоваться и для удаления записей корзин, которые уже превращены в заказы. То есть, мы можем удалить запись из состава заказа. Но следует помнить, что после использования функции необходимо обновлять итоговую сумму заказа, например, так: 
+	* </htmМетод может использоваться и для удаления записей корзин, которые уже превращены в заказы. То есть, мы можем удалить запись из состава заказа. Но следует помнить, что после использования функции необходимо обновлять итоговую сумму заказа, например, так: 
 	* 
 	* 
 	*  $contents = array();
@@ -1321,6 +1363,7 @@ class CSaleBasket extends CAllSaleBasket
 			$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$arBasket["ID"], true);
 			$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$arBasket["ID"], true);
 		}
+
 
 		$_SESSION["SALE_BASKET_NUM_PRODUCTS"][SITE_ID] = 0;
 

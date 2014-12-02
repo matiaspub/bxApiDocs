@@ -35,7 +35,7 @@ interface IBPRootActivity
 
 
 /**
- * Класс документа должен реализовывать методы интерфейса <b>IBPWorkflowDocument</b>. Этот интерфейс содержит методы, которые необходимы бизнес-процессу для работы с документом.
+ * Класс документа должен реализовывать методы интерфейса <b>IBPWorkflowDocument</b>. Этот интерфейс содержит методы, которые необходимы бизнес-процессу для работы с документом.</body> </html>
  *
  *
  *
@@ -78,7 +78,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetDocument($documentId);
+	public static function GetDocument($documentId);
 
 	/**
 	* Метод возвращает массив свойств (полей), которые имеет документ данного типа. Метод GetDocument возвращает значения свойств для заданного документа.
@@ -110,7 +110,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentFields.php
 	* @author Bitrix
 	*/
-	public static static public function GetDocumentFields($documentType);
+	public static function GetDocumentFields($documentType);
 
 	/**
 	* Метод создает новый документ с указанными свойствами (полями).
@@ -149,7 +149,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/CreateDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function CreateDocument($parentDocumentId, $arFields);
+	public static function CreateDocument($parentDocumentId, $arFields);
 
 	/**
 	* Метод изменяет свойства (поля) указанного документа на указанные значения.
@@ -218,7 +218,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/DeleteDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function DeleteDocument($documentId);
+	public static function DeleteDocument($documentId);
 
 	/**
 	* Метод публикует документ. То есть делает его доступным в публичной части сайта.
@@ -242,14 +242,14 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/PublishDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function PublishDocument($documentId);
+	public static function PublishDocument($documentId);
 
 	/**
 	* Метод снимает документ с публикации. То есть делает его недоступным в публичной части сайта.
 	*
 	* @param string $documentId - код документа.
 	*/
-
+	
 	/**
 	* <p>Метод снимает документ с публикации, то есть делает его недоступным в публичной части сайта.</p>
 	*
@@ -266,7 +266,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/UnpublishDocument.php
 	* @author Bitrix
 	*/
-		static public function UnpublishDocument($documentId);
+	static public function UnpublishDocument($documentId);
 
 	/**
 	* Метод блокирует указанный документ для указанного рабочего потока. Заблокированый документ может изменяться только указанным рабочим потоком.
@@ -286,7 +286,7 @@ interface IBPWorkflowDocument
 	*
 	*
 	*
-	* @param string $workflowId  Код бизнес-процесса
+	* @param string $workflowId  Код бизнес-процесса </htm
 	*
 	*
 	*
@@ -296,7 +296,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/LockDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function LockDocument($documentId, $workflowId);
+	public static function LockDocument($documentId, $workflowId);
 
 	/**
 	* Метод разблокирует указанный документ. При разблокировке вызываются обработчики события вида "Сущность_OnUnlockDocument", которым входящим параметром передается код документа.
@@ -316,7 +316,7 @@ interface IBPWorkflowDocument
 	*
 	*
 	*
-	* @param string $workflowId  Код бизнес-процесса
+	* @param string $workflowId  Код бизнес-процесса </htm
 	*
 	*
 	*
@@ -326,7 +326,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/UnlockDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function UnlockDocument($documentId, $workflowId);
+	public static function UnlockDocument($documentId, $workflowId);
 
 	/**
 	* Метод проверяет, заблокирован ли указанный документ для указанного рабочего потока. Т.е. если для данного рабочего потока документ не доступен для записи из-за того, что он заблокирован другим рабочим потоком, то метод должен вернуть true, иначе - false.
@@ -346,7 +346,7 @@ interface IBPWorkflowDocument
 	*
 	*
 	*
-	* @param string $workflowId  Код бизнес-процесса
+	* @param string $workflowId  Код бизнес-процесса </htm
 	*
 	*
 	*
@@ -356,7 +356,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/IsDocumentLocked.php
 	* @author Bitrix
 	*/
-	public static 	static public function IsDocumentLocked($documentId, $workflowId);
+	public static function IsDocumentLocked($documentId, $workflowId);
 
 	/**
 	* Метод проверяет права на выполнение операций над заданным документом. Проверяются операции 0 - просмотр данных рабочего потока, 1 - запуск рабочего потока, 2 - право изменять документ, 3 - право смотреть документ.
@@ -374,7 +374,7 @@ interface IBPWorkflowDocument
 	*
 	*
 	*
-	* @param int $operation  Операция
+	* @param int $operation  Операция</bod
 	*
 	*
 	*
@@ -404,7 +404,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/CanUserOperateDocument.php
 	* @author Bitrix
 	*/
-	public static 	static public function CanUserOperateDocument($operation, $userId, $documentId, $arParameters = array());
+	public static function CanUserOperateDocument($operation, $userId, $documentId, $arParameters = array());
 
 	/**
 	* Метод проверяет права на выполнение операций над документами заданного типа. Проверяются операции 4 - право изменять шаблоны рабочий потоков для данного типа документа.
@@ -422,7 +422,7 @@ interface IBPWorkflowDocument
 	*
 	*
 	*
-	* @param int $operation  Операция
+	* @param int $operation  Операция</bod
 	*
 	*
 	*
@@ -477,7 +477,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentAdminPage.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetDocumentAdminPage($documentId);
+	public static function GetDocumentAdminPage($documentId);
 
 	/**
 	* Метод возвращает массив произвольной структуры, содержащий всю информацию о документе. По этому массиву документ восстановливается методом RecoverDocumentFromHistory.
@@ -502,7 +502,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetDocumentForHistory.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetDocumentForHistory($documentId, $historyIndex);
+	public static function GetDocumentForHistory($documentId, $historyIndex);
 
 	/**
 	* Метод восстанавливает указанный документ из массива. Массив создается методом RecoverDocumentFromHistory.
@@ -531,7 +531,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/RecoverDocumentFromHistory.php
 	* @author Bitrix
 	*/
-	public static 	static public function RecoverDocumentFromHistory($documentId, $arDocument);
+	public static function RecoverDocumentFromHistory($documentId, $arDocument);
 
 	// array("read" => "Ета чтение", "write" => "Ета запысь")
 
@@ -551,7 +551,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetAllowableOperations.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetAllowableOperations($documentType);
+	public static function GetAllowableOperations($documentType);
 	// array("1" => "Админы", 2 => "Гости", 3 => ..., "Author" => "Афтар")
 
 	/**
@@ -570,7 +570,7 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetAllowableUserGroups.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetAllowableUserGroups($documentType);
+	public static function GetAllowableUserGroups($documentType);
 
 	/**
 	* <p>Метод возвращает пользователей указанной группы для указанного документа в виде массива кодов пользователей.</p>
@@ -592,6 +592,6 @@ interface IBPWorkflowDocument
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/interface/IBPWorkflowDocument/GetUsersFromUserGroup.php
 	* @author Bitrix
 	*/
-	public static 	static public function GetUsersFromUserGroup($group, $documentId);
+	public static function GetUsersFromUserGroup($group, $documentId);
 }
 ?>

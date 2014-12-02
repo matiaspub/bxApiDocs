@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
+ * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. </body> </html>
  *
  *
  *
@@ -87,7 +87,7 @@ class _CIBElement
 	* свойства, если необходимо вывести все значения, то установите
 	* <i>ACTIVE</i> в пустое значение; <br>     <i>SEARCHABLE</i> - участвует в поиске
 	* или нет (Y|N); <br>     <i>PROPERTY_TYPE</i> - тип свойства; <br>     <i>CODE</i> -
-	* мнемонический код свойства; <br>     <i>EMPTY</i> - пустота значения
+	* символьный код свойства; <br>     <i>EMPTY</i> - пустота значения
 	* свойства (Y|N). По умолчанию выводятся все свойства и имеющие
 	* непустые значения и без значений. <br> Не обязательный параметр, по
 	* умолчанию равен array().
@@ -390,7 +390,7 @@ class _CIBElement
 	*
 	*
 	*
-	* @param mixed $ID  Числовой или мнемонический код свойства.
+	* @param mixed $ID  Числовой или символьный код свойства.
 	*
 	*
 	*

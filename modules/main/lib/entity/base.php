@@ -32,19 +32,19 @@ class Base
 	/** @var Field[] */
 	protected $fields;
 
-	protected
-		$fieldsMap,
-		$u_fields;
+	protected $fieldsMap;
+
+	/** @var UField[] */
+	protected $u_fields;
 
 	protected
 		$references;
 
-	protected
-		$filePath;
-
 	protected static
 		$instances;
 
+	/** @var bool */
+	protected $isClone = false;
 
 	/**
 	 * @static
@@ -55,15 +55,7 @@ class Base
 	 */
 	public static function getInstance($entityName)
 	{
-		if (strtolower(substr($entityName, -5)) !== 'table')
-		{
-			$entityName .= 'Table';
-		}
-
-		if (substr($entityName, 0, 1) !== '\\')
-		{
-			$entityName = '\\'.$entityName;
-		}
+		$entityName = static::normalizeEntityClass($entityName);
 
 		return self::getInstanceDirect($entityName);
 	}
@@ -89,12 +81,16 @@ class Base
 	 * @param string $fieldName
 	 * @param array  $fieldInfo
 	 *
-	 * @return BooleanField|ScalarField|ExpressionField|ReferenceField|UField
+	 * @return Field
 	 * @throws Main\ArgumentException
 	 */
 	public function initializeField($fieldName, $fieldInfo)
 	{
-		if (!empty($fieldInfo['reference']))
+		if ($fieldInfo instanceof Field)
+		{
+			$field = $fieldInfo;
+		}
+		elseif (!empty($fieldInfo['reference']))
 		{
 			if (strpos($fieldInfo['data_type'], '\\') === false)
 			{
@@ -103,15 +99,18 @@ class Base
 			}
 
 			//$refEntity = Base::getInstance($fieldInfo['data_type']."Table");
-			$field = new ReferenceField($fieldName, $this, $fieldInfo['data_type'], $fieldInfo['reference'], $fieldInfo);
+			$field = new ReferenceField($fieldName, $fieldInfo['data_type'], $fieldInfo['reference'], $fieldInfo);
 		}
 		elseif (!empty($fieldInfo['expression']))
 		{
-			$field = new ExpressionField($fieldName, $fieldInfo['data_type'], $this, $fieldInfo['expression'], $fieldInfo);
+			$expression = array_shift($fieldInfo['expression']);
+			$buildFrom =  $fieldInfo['expression'];
+
+			$field = new ExpressionField($fieldName, $expression, $buildFrom, $fieldInfo);
 		}
 		elseif (!empty($fieldInfo['USER_TYPE_ID']))
 		{
-			$field = new UField($fieldInfo, $this);
+			$field = new UField($fieldInfo);
 		}
 		else
 		{
@@ -120,7 +119,12 @@ class Base
 
 			if (strlen($fieldInfo['data_type']) && class_exists($fieldClass))
 			{
-				$field = new $fieldClass($fieldName, $fieldInfo['data_type'], $this, $fieldInfo);
+				$field = new $fieldClass($fieldName, $fieldInfo);
+			}
+			elseif (strlen($fieldInfo['data_type']) && class_exists($fieldInfo['data_type']))
+			{
+				$fieldClass = $fieldInfo['data_type'];
+				$field = new $fieldClass($fieldName, $fieldInfo);
 			}
 			else
 			{
@@ -131,16 +135,17 @@ class Base
 			}
 		}
 
+		$field->setEntity($this);
+
 		return $field;
 	}
 
 	public function initialize($className)
 	{
+		/** @var $className \Bitrix\Main\Entity\DataManager */
 		$this->className = $className;
 
 		/** @var DataManager $className */
-		//TODO: don't use $this->filePath
-		$this->filePath = $className::getFilePath();
 		$this->connectionName = $className::getConnectionName();
 		$this->dbTableName = $className::getTableName();
 		$this->fieldsMap = $className::getMap();
@@ -196,54 +201,94 @@ class Base
 		// attributes
 		foreach ($this->fieldsMap as $fieldName => &$fieldInfo)
 		{
-			$field = $this->initializeField($fieldName, $fieldInfo);
-
-			if ($field instanceof ReferenceField)
-			{
-				// references cache
-				$this->references[strtolower($fieldInfo['data_type'])][] = $field;
-			}
-
-			$this->fields[$fieldName] = $field;
-
-			if ($field instanceof ScalarField && $field->isPrimary())
-			{
-				$this->primary[] = $fieldName;
-
-				if($field->isAutocomplete())
-					$this->autoIncrement = $fieldName;
-			}
-
-			// add reference field for UField iblock_section
-			if ($field instanceof UField && $field->getTypeId() == 'iblock_section')
-			{
-				$refFieldName = $field->getName().'_BY';
-
-				if ($field->isMultiple())
-				{
-					$localFieldName = $field->getValueFieldName();
-				}
-				else
-				{
-					$localFieldName = $field->getName();
-				}
-
-				$newFieldInfo = array(
-					'data_type' => 'Bitrix\Iblock\Section',
-					'reference' => array($localFieldName, 'ID')
-				);
-
-				//$refEntity = Base::getInstance($newFieldInfo['data_type']."Table");
-				$newRefField = new ReferenceField($refFieldName, $this, $newFieldInfo['data_type'], $newFieldInfo['reference'][0], $newFieldInfo['reference'][1]);
-
-				$this->fields[$refFieldName] = $newRefField;
-			}
+			$this->addField($fieldInfo, $fieldName);
 		}
 
-		if (empty($this->primary))
+		if (!empty($this->fieldsMap) && empty($this->primary))
 		{
 			throw new Main\SystemException(sprintf('Primary not found for %s Entity', $this->name));
 		}
+
+		// attach userfields
+		if (!empty($this->uf_id))
+		{
+			Main\UserFieldTable::attachFields($this, $this->uf_id);
+		}
+	}
+
+	/**
+	 * @param Field $field
+	 *
+	 * @return bool
+	 */
+	protected function appendField(Field $field)
+	{
+		if (isset($this->fields[$field->getName()]) && !$this->isClone)
+		{
+			trigger_error(sprintf(
+				'Entity `%s` already has Field with name `%s`.', $this->getFullName(), $field->getName()
+			), E_USER_WARNING);
+
+			return false;
+		}
+
+		if ($field instanceof ReferenceField)
+		{
+			// references cache
+			$this->references[$field->getRefEntityName()][] = $field;
+		}
+
+		$this->fields[$field->getName()] = $field;
+
+		if ($field instanceof ScalarField && $field->isPrimary())
+		{
+			$this->primary[] = $field->getName();
+
+			if($field->isAutocomplete())
+			{
+				$this->autoIncrement = $field->getName();
+			}
+		}
+
+		// add reference field for UField iblock_section
+		if ($field instanceof UField && $field->getTypeId() == 'iblock_section')
+		{
+			$refFieldName = $field->getName().'_BY';
+
+			if ($field->isMultiple())
+			{
+				$localFieldName = $field->getValueFieldName();
+			}
+			else
+			{
+				$localFieldName = $field->getName();
+			}
+
+			$newFieldInfo = array(
+				'data_type' => 'Bitrix\Iblock\Section',
+				'reference' => array($localFieldName, 'ID')
+			);
+
+			$newRefField = new ReferenceField($refFieldName, $newFieldInfo['data_type'], $newFieldInfo['reference'][0], $newFieldInfo['reference'][1]);
+			$newRefField->setEntity($this);
+
+			$this->fields[$refFieldName] = $newRefField;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param array|Field $fieldInfo
+	 * @param null|string $fieldName
+	 *
+	 * @return Field|false
+	 */
+	public function addField($fieldInfo, $fieldName = null)
+	{
+		$field = $this->initializeField($fieldName, $fieldInfo);
+
+		return $this->appendField($field) ? $field : false;
 	}
 
 	public function getReferencesCountTo($refEntityName)
@@ -296,6 +341,31 @@ class Base
 		return isset($this->fields[$name]);
 	}
 
+	/**
+	 * @return ScalarField[]
+	 */
+	public function getScalarFields()
+	{
+		$scalarFields = array();
+
+		foreach ($this->getFields() as $field)
+		{
+			if ($field instanceof ScalarField)
+			{
+				$scalarFields[$field->getName()] = $field;
+			}
+		}
+
+		return $scalarFields;
+	}
+
+	/**
+	 * @deprecated
+	 * @param $name
+	 *
+	 * @return UField
+	 * @throws \Exception
+	 */
 	public function getUField($name)
 	{
 		if ($this->hasUField($name))
@@ -308,6 +378,12 @@ class Base
 		));
 	}
 
+	/**
+	 * @deprecated
+	 * @param $name
+	 *
+	 * @return bool
+	 */
 	public function hasUField($name)
 	{
 		if (is_null($this->u_fields))
@@ -321,13 +397,15 @@ class Base
 
 				foreach ($USER_FIELD_MANAGER->getUserFields($this->uf_id) as $info)
 				{
-					$this->u_fields[$info['FIELD_NAME']] = new UField($info, $this);
+					$this->u_fields[$info['FIELD_NAME']] = new UField($info);
+					$this->u_fields[$info['FIELD_NAME']]->setEntity($this);
 
 					// add references for ufield (UF_DEPARTMENT_BY)
 					if ($info['USER_TYPE_ID'] == 'iblock_section')
 					{
 						$info['FIELD_NAME'] .= '_BY';
 						$this->u_fields[$info['FIELD_NAME']] = new UField($info, $this);
+						$this->u_fields[$info['FIELD_NAME']]->setEntity($this);
 					}
 				}
 			}
@@ -355,20 +433,23 @@ class Base
 	{
 		if($this->module === null)
 		{
-			// Bitrix\Main\Site -> "main"
-			// Partner\Module\Thing -> "partner.module"
-			// Thing -> ""
+			// \Bitrix\Main\Site -> "main"
+			// \Partner\Module\Thing -> "partner.module"
+			// \Thing -> ""
 			$parts = explode("\\", $this->className);
-			if($parts[0] == "Bitrix")
-				$this->module = strtolower($parts[1]);
-			elseif(!empty($parts[0]) && isset($parts[1]))
-				$this->module = strtolower($parts[0].".".$parts[1]);
+			if($parts[1] == "Bitrix")
+				$this->module = strtolower($parts[2]);
+			elseif(!empty($parts[1]) && isset($parts[2]))
+				$this->module = strtolower($parts[1].".".$parts[2]);
 			else
 				$this->module = "";
 		}
 		return $this->module;
 	}
 
+	/**
+	 * @return DataManager
+	 */
 	public function getDataClass()
 	{
 		return $this->className;
@@ -377,11 +458,6 @@ class Base
 	public function getConnection()
 	{
 		return \Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection($this->connectionName);
-	}
-
-	public function getFilePath()
-	{
-		return $this->filePath;
 	}
 
 	public function getDBTableName()
@@ -421,7 +497,22 @@ class Base
 
 	public static function isExists($name)
 	{
-		return class_exists($name . 'Table');
+		return class_exists(static::normalizeEntityClass($name));
+	}
+
+	public static function normalizeEntityClass($entityName)
+	{
+		if (strtolower(substr($entityName, -5)) !== 'table')
+		{
+			$entityName .= 'Table';
+		}
+
+		if (substr($entityName, 0, 1) !== '\\')
+		{
+			$entityName = '\\'.$entityName;
+		}
+
+		return $entityName;
 	}
 
 	public function getCode()
@@ -468,6 +559,26 @@ class Base
 		return str_replace(' ', '', ucwords($str));
 	}
 
+	public static function normalizeName($entityName)
+	{
+		if (substr($entityName, 0, 1) !== '\\')
+		{
+			$entityName = '\\'.$entityName;
+		}
+
+		if (strtolower(substr($entityName, -5)) === 'table')
+		{
+			$entityName = substr($entityName, 0, -5);
+		}
+
+		return $entityName;
+	}
+
+	public function __clone()
+	{
+		$this->isClone = true;
+	}
+
 	public static function getInstanceByQuery(Query $query, &$entity_name = null)
 	{
 		if ($entity_name === null)
@@ -498,8 +609,19 @@ class Base
 			}
 			else
 			{
-				$fieldDefinition = is_numeric($k) ? $v : $k;
-				$fieldsMap[$fieldDefinition] = array('data_type' => $query_chains[$fieldDefinition]->getLastElement()->getValue()->getDataType());
+				if ($v instanceof ExpressionField)
+				{
+					$fieldDefinition = $v->getName();
+				}
+				else
+				{
+					$fieldDefinition = is_numeric($k) ? $v : $k;
+				}
+
+				// better to initialize fields as objects after entity is created
+				$dataType = Field::getOldDataTypeByField($query_chains[$fieldDefinition]->getLastElement()->getValue());
+
+				$fieldsMap[$fieldDefinition] = array('data_type' => $dataType);
 			}
 
 			if (isset($replaced_aliases[$k]))
@@ -524,5 +646,153 @@ class Base
 		eval($eval);
 
 		return self::getInstance($entity_name);
+	}
+
+	/**
+	 * @param string               $entityName
+	 * @param null|array[]|Field[] $fields
+	 * @param array                $parameters [namespace, table_name, uf_id]
+	 *
+	 * @return Base
+	 *
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function compileEntity($entityName, $fields = null, $parameters = array())
+	{
+		$classCode = '';
+		$classCodeEnd = '';
+
+		if (strtolower(substr($entityName, -5)) !== 'table')
+		{
+			$entityName .= 'Table';
+		}
+
+		// validation
+		if (!preg_match('/^[a-z0-9_]+$/i', $entityName))
+		{
+			throw new Main\ArgumentException(sprintf(
+				'Invalid entity classname `%s`.', $entityName
+			));
+		}
+
+		$fullEntityName = $entityName;
+
+		// namespace configuration
+		if (!empty($parameters['namespace']) && $parameters['namespace'] !== '\\')
+		{
+			$namespace = $parameters['namespace'];
+
+			if (!preg_match('/^[a-z0-9\\\\]+$/i', $namespace))
+			{
+				throw new Main\ArgumentException(sprintf(
+					'Invalid namespace name `%s`', $namespace
+				));
+			}
+
+			$classCode = $classCode."namespace {$namespace} {";
+			$classCodeEnd = '}'.$classCodeEnd;
+
+			$fullEntityName = '\\'.$namespace.'\\'.$fullEntityName;
+		}
+
+		// build entity code
+		$classCode = $classCode."class {$entityName} extends \\Bitrix\\Main\\Entity\\DataManager {";
+		$classCodeEnd = '}'.$classCodeEnd;
+
+		if (!empty($parameters['table_name']))
+		{
+			$classCode .= 'public static function getTableName(){return '.var_export($parameters['table_name'], true).';}';
+		}
+
+		if (!empty($parameters['uf_id']))
+		{
+			$classCode .= 'public static function getUfId(){return '.var_export($parameters['uf_id'], true).';}';
+		}
+
+		$classCode .= 'public static function getFilePath(){return __FILE__;}';
+
+		// create entity
+		eval($classCode.$classCodeEnd);
+
+		$entity = self::getInstance($fullEntityName);
+
+		// add fields
+		if (!empty($fields))
+		{
+			foreach ($fields as $fieldName => $field)
+			{
+				$entity->addField($field, $fieldName);
+			}
+		}
+
+		return $entity;
+	}
+
+	/**
+	 * @return string[] Array of SQL queries
+	 */
+	public function compileDbTableStructureDump()
+	{
+		$fields = $this->getScalarFields();
+		$connection = Main\Application::getConnection();
+
+		$autocomplete = array();
+
+		foreach ($fields as $field)
+		{
+			if ($field->isAutocomplete())
+			{
+				$autocomplete[] = $field->getColumnName();
+			}
+		}
+
+		// start collecting queries
+		$connection->disableQueryExecuting();
+
+		// create table
+		$connection->createTable($this->getDBTableName(), $fields, $this->getPrimaryArray(), $autocomplete);
+
+		// stop collecting queries
+		$connection->enableQueryExecuting();
+
+		return $connection->getDisabledQueryExecutingDump();
+	}
+
+	/**
+	 * Creates table according to Fields collection
+	 *
+	 * @return void
+	 */
+	public function createDbTable()
+	{
+		foreach ($this->compileDbTableStructureDump() as $sqlQuery)
+		{
+			Main\Application::getConnection()->query($sqlQuery);
+		}
+	}
+
+	/**
+	 * @param Base|string $entity
+	 *
+	 * @return bool
+	 */
+	public static function destroy($entity)
+	{
+		if ($entity instanceof Base)
+		{
+			$entityName = $entity->getDataClass();
+		}
+		else
+		{
+			$entityName = static::normalizeEntityClass($entity);
+		}
+
+		if (isset(self::$instances[$entityName]))
+		{
+			unset(self::$instances[$entityName]);
+			return true;
+		}
+
+		return false;
 	}
 }

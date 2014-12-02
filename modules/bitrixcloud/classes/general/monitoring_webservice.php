@@ -17,6 +17,8 @@ class CBitrixCloudMonitoringWebService extends CBitrixCloudWebService
 	{
 		$arParams["license"] = md5(LICENSE_KEY);
 		$arParams["spd"] = CUpdateClient::getSpd();
+		$arParams["CHHB"] = $_SERVER["HTTP_HOST"];
+		$arParams["CSAB"] = $_SERVER["SERVER_ADDR"];
 		foreach($this->addParams as $key => $value)
 			$arParams[$key] = $value;
 

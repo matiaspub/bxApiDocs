@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.
+ * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.</body> </html>
  *
  *
  *

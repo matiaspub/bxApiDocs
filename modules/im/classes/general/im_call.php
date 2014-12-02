@@ -47,16 +47,21 @@ class CIMCall
 					$arUserToConnect[$userId] = $callStatus;
 			}
 			$arConfig['USERS_CONNECT'] = $arUserToConnect;
-			
+
 			$arSend['users'] = $arUserData['users'];
 			$arSend['hrphoto'] = $arUserData['hrphoto'];
 			$arSend['video'] = $arConfig['VIDEO'] == 'Y'? true: false;
 			$arSend['callToGroup'] = $arConfig['CALL_TO_GROUP'];
 			$arSend['chat'] = $arChat['chat'];
+			$arSend['userChatBlockStatus'] = $arChat['userChatBlockStatus'];
 			$arSend['userInChat'] = $arChat['userInChat'];
 			foreach ($arChat['userCallStatus'][$arConfig['CHAT_ID']] as $userId => $callStatus)
+			{
 				if ($userId != $arConfig['USER_ID'] && !in_array($callStatus, Array(IM_CALL_STATUS_DECLINE)))
+				{
 					self::Command($arConfig['CHAT_ID'], $userId, 'invite_join', $arSend);
+				}
+			}
 		}
 		else
 		{
@@ -82,12 +87,42 @@ class CIMCall
 			$arSend['video'] = $arConfig['VIDEO'] == 'Y'? true: false;
 			$arSend['callToGroup'] = $arConfig['CALL_TO_GROUP'];
 			$arSend['chat'] = $arChat['chat'];
+			$arSend['userChatBlockStatus'] = $arChat['userChatBlockStatus'];
 			$arSend['userInChat'] = $arChat['userInChat'];
 			foreach ($arUserToConnect as $userId => $callStatus)
 				self::Command($arConfig['CHAT_ID'], $userId, 'invite', $arSend);
 
 			$arConfig['USER_DATA']['USERS'] = $arUserData['users'];
 			$arConfig['USER_DATA']['HR_PHOTO'] = $arUserData['hrphoto'];
+
+			if (!$arConfig['CALL_TO_GROUP'] && CModule::IncludeModule('pull') && CPullOptions::GetPushStatus())
+			{
+				$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME");
+				$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $USER->GetID()), array('FIELDS' => $arSelect));
+				if ($arUser = $dbUsers->GetNext(true, false))
+				{
+					$sName = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
+					$pushText = GetMessage('IM_CALL_INVITE', Array('#USER_NAME#' => $sName));
+				}
+				else
+				{
+					$pushText = GetMessage('IM_CALL_INVITE', Array('#USER_NAME#' => GetMessage('IM_CALL_INVITE_NA')));
+				}
+
+				$CPushManager = new CPushManager();
+				foreach ($arUserToConnect as $sendTouserId => $callStatus)
+				{
+					$CPushManager->AddQueue(Array(
+						'USER_ID' => $sendTouserId,
+						'MESSAGE' => $pushText,
+						'EXPIRY' => 0,
+						'PARAMS' => 'IMINV_'. $USER->GetID()."_".time(),
+						'APP_ID' => 'Bitrix24',
+						'SOUND'=>'call.aif',
+						'SEND_IMMEDIATELY' => 'Y'
+					));
+				}
+			}
 		}
 		foreach(GetModuleEvents("im", "OnCallStart", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($arConfig));
@@ -361,7 +396,7 @@ class CIMCall
 			}
 			else
 			{
-				self::MessageToPrivate($arConfig['RECIPIENT_ID'], $arConfig['USER_ID'], "IM_CALL_CHAT_WAIT", true, false);
+				self::MessageToPrivate($arConfig['USER_ID'], $arConfig['RECIPIENT_ID'], "IM_CALL_CHAT_WAIT", $arConfig['RECIPIENT_ID'], false);
 			}
 		}
 		else if ($arParams['REASON'] == 'errorOffline')
@@ -395,10 +430,15 @@ class CIMCall
 			$arSend['video'] = $arParams['VIDEO'] == 'Y'? true: false;
 
 		foreach ($arUserToConnect as $userId)
+		{
 			self::Command($arConfig['CHAT_ID'], $userId, $arParams['REASON'], $arSend);
+		}
 
 		if ($arParams['REASON'] == 'decline')
+		{
 			self::Command($arConfig['CHAT_ID'], $arConfig['USER_ID'], 'decline_self', $arSend);
+			self::Command($arConfig['CHAT_ID'], $arConfig['RECIPIENT_ID'], 'end_call', $arSend);
+		}
 
 		return true;
 	}
@@ -493,8 +533,12 @@ class CIMCall
 		$message = '';
 		if ($fromUserId > 0 && $getUserData)
 		{
+			$userSelectId = $fromUserId;
+			if ($getUserData !== true)
+				$userSelectId = intval($getUserData);
+
 			$arSelect = Array("ID", "LAST_NAME", "NAME", "LOGIN", "SECOND_NAME", "PERSONAL_GENDER");
-			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $fromUserId), array('FIELDS' => $arSelect));
+			$dbUsers = CUser::GetList(($sort_by = false), ($dummy=''), array('ID' => $userSelectId), array('FIELDS' => $arSelect));
 			if ($arUser = $dbUsers->Fetch())
 				$message = GetMessage($messageId.($addGenderToMessageId? ($arUser["PERSONAL_GENDER"] == 'F'? 'F': 'M'): ''), Array('#USER_NAME#' => CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false)));
 		}

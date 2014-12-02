@@ -58,13 +58,14 @@ class CCalendarEvent
 		$checkPermissions = $Params['checkPermissions'] !== false;
 		$bCache = CCalendar::CacheTime() > 0;
 		$Params['setDefaultLimit'] = $Params['setDefaultLimit'] === true;
+		$userId = isset($Params['userId']) ? intVal($Params['userId']) : CCalendar::GetCurUserId();
 
 		CTimeZone::Disable();
 		if($bCache)
 		{
 			$cache = new CPHPCache;
 			if ($checkPermissions)
-				$cacheId = 'event_list_'.md5(serialize(array($Params, CCalendar::GetCurUserId())));
+				$cacheId = 'event_list_'.md5(serialize(array($Params, $userId)));
 			else
 				$cacheId = 'event_list_'.md5(serialize(array($Params)));
 
@@ -105,7 +106,6 @@ class CCalendarEvent
 
 			$arOrder = isset($Params['arOrder']) ? $Params['arOrder'] : Array('SORT' => 'asc');
 			$arFields = self::GetFields();
-			$userId = isset($Params['userId']) ? intVal($Params['userId']) : CCalendar::GetCurUserId();
 
 			if (!isset($arFilter["DELETED"]))
 				$arFilter["DELETED"] = "N";
@@ -316,8 +316,8 @@ class CCalendarEvent
 				{
 					$event['~ATTENDEES'] = $arAttendees[$event['ID']];
 				}
-
 				$checkPermissionsForEvent = $userId != $event['CREATED_BY']; // It's creator
+
 				// It's event in user's calendar
 				if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && $userId == $event['OWNER_ID'])
 					$checkPermissionsForEvent = false;
@@ -448,7 +448,7 @@ class CCalendarEvent
 						"DELETED" => "N"
 					),
 					'parseRecursion' => false,
-					'fetchAttendees' => false,
+					'fetchAttendees' => $checkPermissions,
 					'checkPermissions' => $checkPermissions,
 					'setDefaultLimit' => false
 				)
@@ -616,7 +616,6 @@ class CCalendarEvent
 		}
 		else // Events with time
 		{
-
 			$event['~DT_TO_TS'] = mktime(date("H", $evFromTS), date("i", $evFromTS), date("s", $evFromTS) + $event['DT_LENGTH'], date("m", $evFromTS), date("d", $evFromTS), date("Y", $evFromTS));
 
 			$event['~DT_TO'] = CCalendar::Date($event['~DT_TO_TS']);
@@ -644,7 +643,7 @@ class CCalendarEvent
 			if (($rrule['COUNT'] > 0 && $count >= $rrule['COUNT']) || (!$rrule['COUNT'] && $fromTS >= $limitToTS))
 				break;
 
-			if($instanceCount && $realCount >= $instanceCount)
+			if($instanceCount && $dispCount >= $instanceCount)
 				break;
 
 			if ($rrule['FREQ'] == 'WEEKLY')
@@ -712,13 +711,25 @@ class CCalendarEvent
 
 						$day = $orig_d;
 						$month = $orig_m + $durOffset;
+						$year = $orig_y;
+
+						if ($month > 12)
+						{
+							$delta_y = floor($month / 12);
+							$delta_m = $month - $delta_y * 12;
+
+							$month = $delta_m;
+							$year = $orig_y + $delta_y;
+						}
+
 						// 1. Check only for 29-31 dates. 2.We are out of range in this month
-						if ($orig_d > 28 && $orig_d > date("t", mktime($hour, $min, $sec, $month, 1, $y)))
+						if ($orig_d > 28 && $orig_d > date("t", mktime($hour, $min, $sec, $month, 1, $year)))
 						{
 							$month++;
 							$day = 1;
 						}
-						$fromTS = mktime($hour, $min, $sec, $month, $day, $y);
+
+						$fromTS = mktime($hour, $min, $sec, $month, $day, $year);
 						break;
 					case 'YEARLY':
 						$fromTS = mktime($hour, $min, $sec, $orig_m, $orig_d, $y + $rrule['INTERVAL']);
@@ -774,18 +785,21 @@ class CCalendarEvent
 	{
 		// *** $item['~DT_FROM_TS'] & $item['~DT_TO_TS'] - are real FROM AND TO timestamps of the first original event
 		$item['RRULE'] = $Params['RRULE'];
+		$item['DT_FROM_TS'] = $Params['DT_FROM_TS'];
+		$item['DT_TO_TS'] = $Params['DT_TO_TS'];
+
+		$item['~DT_FROM_TS'] += date("Z", $item['~DT_FROM_TS']) - date("Z");
+		$item['~DT_TO_TS'] += date("Z", $item['~DT_TO_TS']) - date("Z");
 
 		$offset = CCalendar::GetOffset();
 		if ($item['DT_SKIP_TIME'] == 'N' && $offset != 0)
 		{
 			$item['~DT_FROM_TS'] += $offset;
 			$item['~DT_TO_TS'] += $offset;
+
 			$item['~DT_FROM'] = CCalendar::Date($item['~DT_FROM_TS']);
 			$item['~DT_TO'] = CCalendar::Date($item['~DT_TO_TS']);
 		}
-
-		$item['DT_FROM_TS'] = $Params['DT_FROM_TS'];
-		$item['DT_TO_TS'] = $Params['DT_TO_TS'];
 
 		if ($item['DT_SKIP_TIME'] == 'Y')
 			$item['DT_TO_TS'] -= CCalendar::GetDayLen();
@@ -987,8 +1001,11 @@ class CCalendarEvent
 		// Event length in seconds
 		if (!isset($arFields['DT_LENGTH']))
 		{
-			if($fromTs == $toTs && date('H:i', $fromTs) == '00:00') // One day
+			//if($fromTs == $toTs && date('H:i', $fromTs) == '00:00') // One day
+			if($fromTs == $toTs && date('H:i', $fromTs) == '00:00' && $arFields['DT_SKIP_TIME'] == 'Y') // One day
+			{
 				$arFields['DT_LENGTH'] = $h24;
+			}
 			else
 			{
 				$arFields['DT_LENGTH'] = intVal($toTs - $fromTs);
@@ -1126,12 +1143,13 @@ class CCalendarEvent
 				$arFields['LOCATION']['OLD'] = $oldEvent['LOCATION'];
 		}
 
+		$offset = CCalendar::GetOffset();
 		$arFields['LOCATION'] = CCalendar::SetLocation(
 			$arFields['LOCATION']['OLD'],
 			$arFields['LOCATION']['NEW'],
 			array(
-				'dateFrom' => $arFields['DT_FROM'],
-				'dateTo' => $arFields['DT_TO'],
+				'dateFrom' => CCalendar::Date($arFields['DT_FROM_TS'] + $offset),
+				'dateTo' => CCalendar::Date($arFields['DT_TO_TS'] + $offset),
 				'name' => $arFields['NAME'],
 				'persons' => count($attendees),
 				'attendees' => $attendees,
@@ -1314,10 +1332,6 @@ class CCalendarEvent
 
 		if ($arFields['CAL_TYPE'] == 'user' && $arFields['IS_MEETING'] && !empty($attendeesCodes))
 			CCalendarLiveFeed::OnEditCalendarEventEntry($ID, $arFields, $attendeesCodes);
-
-		$arFields['ID'] = $ID;
-		foreach(GetModuleEvents("calendar", "OnAfterCalendarEventEdit", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array('arFields' => $arFields,'bNew' => $bNew,'userId' => $userId));
 
 		CCalendar::ClearCache('event_list');
 		return $ID;
@@ -1668,7 +1682,7 @@ class CCalendarEvent
 							"TO_LIMIT" => CCalendar::Date(2145938400, false)
 						),
 						'parseRecursion' => true,
-						'maxInstanceCount' => 1,
+						'maxInstanceCount' => 2,
 						'preciseLimits' => true,
 						'fetchAttendees' => true,
 						'checkPermissions' => false,
@@ -1703,6 +1717,8 @@ class CCalendarEvent
 			{
 				if ($attendeeId == $userId)
 					continue;
+
+				$viewPath = CCalendar::GetPath('user', $attendeeId, true);
 
 				$remAgentParams = array(
 					'eventId' => $eventId,
@@ -2236,22 +2252,22 @@ class CCalendarEvent
 		if (CModule::IncludeModule('intranet') && $event['CAL_TYPE'] == 'user' && $settings['dep_manager_sub'])
 			$bManager = in_array($userId, CCalendar::GetUserManagers($event['OWNER_ID'], true));
 
-		if ($event['CAL_TYPE'] == 'user' && $event['IS_MEETING'] && $event['OWNER_ID'] != $userId)
+		if ($event['CAL_TYPE'] == 'user' && $event['IS_MEETING'] && $event['OWNER_ID'] != $userId && $bAttendee)
 			$sectId = CCalendar::GetMeetingSection($userId);
 
-		if ($private || (!CCalendarSect::CanDo('calendar_view_full', $sectId) && !$bManager && !$bAttendee))
+		if ($private || (!CCalendarSect::CanDo('calendar_view_full', $sectId, $userId) && !$bManager && !$bAttendee))
 		{
 			if ($private)
 			{
 				$event['NAME'] = '['.GetMessage('EC_ACCESSIBILITY_'.strtoupper($event['ACCESSIBILITY'])).']';
-				if (!$bManager && !CCalendarSect::CanDo('calendar_view_time', $sectId))
+				if (!$bManager && !CCalendarSect::CanDo('calendar_view_time', $sectId, $userId))
 					return false;
 			}
 			else
 			{
-				if (!CCalendarSect::CanDo('calendar_view_title', $sectId))
+				if (!CCalendarSect::CanDo('calendar_view_title', $sectId, $userId))
 				{
-					if (CCalendarSect::CanDo('calendar_view_time', $sectId))
+					if (CCalendarSect::CanDo('calendar_view_time', $sectId, $userId))
 						$event['NAME'] = '['.GetMessage('EC_ACCESSIBILITY_'.strtoupper($event['ACCESSIBILITY'])).']';
 					else
 						return false;
@@ -2314,6 +2330,7 @@ class CCalendarEvent
 		);
 
 		// Part 2: select attendees
+		CTimeZone::Disable();
 		if (count($arUsers) > 0)
 			$userQ = ' AND CA.USER_ID in ('.implode(',',$arUsers).')';
 		else
@@ -2331,6 +2348,8 @@ class CCalendarEvent
 				b_calendar_event_sect CES ON (CA.EVENT_ID=CES.EVENT_ID)
 			WHERE
 					CE.ID IS NOT NULL
+				AND
+					CE.DELETED='N'
 				AND
 					STATUS='Y'
 				AND
@@ -2377,6 +2396,7 @@ class CCalendarEvent
 			else
 				self::HandleEvent($arEvents2, $event);
 		}
+		CTimeZone::Enable();
 
 		$arEvents = array_merge($arEvents, $arEvents2);
 		$bSocNet = CModule::IncludeModule("socialnetwork");
@@ -2490,6 +2510,31 @@ class CCalendarEvent
 			CCalendar::ClearCache(array('event_list'));
 		}
 		return $event['ATTENDEES_CODES'];
+	}
+
+	public static function CanView($eventId, $userId)
+	{
+		CModule::IncludeModule("calendar");
+		$Event = CCalendarEvent::GetList(
+			array(
+				'arFilter' => array(
+					"ID" => $eventId,
+				),
+				'parseRecursion' => false,
+				'fetchAttendees' => false,
+				'checkPermissions' => true,
+				'userId' => $userId,
+			)
+		);
+		if ($Event && is_array($Event[0]))
+		{
+			// Event partly accessible
+			if (!isset($Event[0]['DESCRIPTION'], $Event[0]['IS_MEETING'], $Event[0]['LOCATION']))
+				return false;
+			return true;
+		}
+
+		return false;
 	}
 }
 ?>

@@ -125,18 +125,18 @@ $arParams = array(
 );
 
 $arExpertBackupDefaultParams = array(
-	'dump_base' => 1,
-	'dump_base_skip_stat' => 0,
-	'dump_base_skip_search' => 0,
-	'dump_base_skip_log' => 0,
+	'dump_base' => IntOption('dump_base', 1),
+	'dump_base_skip_stat' => IntOption('dump_base_skip_stat', 0),
+	'dump_base_skip_search' => IntOption('dump_base_skip_search', 0),
+	'dump_base_skip_log' => IntOption('dump_base_skip_log', 0),
 
-	'dump_file_public' => 1,
-	'dump_file_kernel' => 1,
-	'dump_do_clouds' => 1,
-	'skip_mask' => 0,
-	'skip_mask_array' => array(),
-	'dump_max_file_size' => 0,
-	'skip_symlinks' => 0,
+	'dump_file_public' => IntOption('dump_file_public', 1),
+	'dump_file_kernel' => IntOption('dump_file_kernel', 1),
+	'dump_do_clouds' => IntOption('dump_do_clouds', 1),
+	'skip_mask' => IntOption('skip_mask', 0),
+	'skip_mask_array' => is_array($ar = unserialize(COption::GetOptionString("main","skip_mask_array_auto"))) ? $ar : array(),
+	'dump_max_file_size' => IntOption('dump_max_file_size', 0),
+	'skip_symlinks' => IntOption('skip_symlinks', 0),
 );
 
 if (!is_array($arExpertBackupParams))
@@ -168,7 +168,10 @@ if (!$NS['step'])
 	elseif(($arc_name = $argv[1]) && !is_dir($arc_name))
 		$arc_name =  str_replace(array('.tar','.gz','.enc'),'',$arc_name);
 	else
-		$arc_name = CBackup::GetArcName();
+	{
+		$prefix = str_replace('/', '', COption::GetOptionString("main", "server_name", ""));
+		$arc_name = CBackup::GetArcName(preg_match('#^[a-z0-9\.\-]+$#i', $prefix) ? substr($prefix, 0, 20).'_' : '');
+	}
 
 	$NS['arc_name'] = $arc_name.($NS['dump_encrypt_key'] ? ".enc" : ".tar").($arParams['dump_use_compression'] ? ".gz" : '');
 	$NS['dump_name'] = $arc_name.'.sql';
@@ -187,7 +190,7 @@ if ($NS['step'] <= 2)
 		{
 			ShowBackupStatus('Dumping database');
 			if (!CBackup::MakeDump($NS['dump_name'], $NS['dump_state']))
-				RaiseErrorAndDie(GetMessage('DUMP_NO_PERMS', 100, $NS['dump_name']));
+				RaiseErrorAndDie(GetMessage('DUMP_NO_PERMS'), 100, $NS['dump_name']);
 
 			if (!$NS['dump_state']['end'])
 				CheckPoint();
@@ -395,7 +398,7 @@ if ($NS['step'] == 6)
 						$backup = CBitrixCloudBackup::getInstance();
 						$q = $backup->getQuota();
 						if ($NS['arc_size'] > $q)
-							RaiseErrorAndDie(GetMessage('DUMP_ERR_BIG_BACKUP', 620, array('#ARC_SIZE#' => $NS['arc_size'], '#QUOTA#' => $q)));
+							RaiseErrorAndDie(GetMessage('DUMP_ERR_BIG_BACKUP', array('#ARC_SIZE#' => $NS['arc_size'], '#QUOTA#' => $q)), 620);
 
 						$obBucket = $backup->getBucketToWriteFile(CTar::getCheckword($NS['dump_encrypt_key']), basename($NS['arc_name']));
 						$NS['obBucket'] = serialize($obBucket);

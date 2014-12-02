@@ -13,12 +13,7 @@ class Path
 	const DIRECTORY_SEPARATOR_ALT = '\\';
 	const PATH_SEPARATOR = PATH_SEPARATOR;
 
-	const INVALID_FILENAME_CHARS = "\\/:*?\"'<>|~#";
-
-	protected static $physicalEncoding = "";
-	protected static $logicalEncoding = "";
-
-	protected static $directoryIndex = null;
+	const INVALID_FILENAME_CHARS = "\\/:*?\"'<>|~#&;";
 
 	protected static $physicalEncoding = "";
 	protected static $logicalEncoding = "";
@@ -31,7 +26,9 @@ class Path
 			return null;
 
 		//slashes doesn't matter for Windows
-		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0 ? "'[\\\\/]+'" : "'[/]+'");
+		static $pattern = null;
+		if (!$pattern)
+			$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0 ? "'[\\\\/]+'" : "'[/]+'");
 		$pathTmp = preg_replace($pattern, "/", $path);
 
 		if (($p = strpos($pathTmp, "\0")) !== false)
@@ -39,28 +36,27 @@ class Path
 		if (($p = strpos($pathTmp, self::PATH_SEPARATOR)) !== false)
 			$pathTmp = substr($pathTmp, 0, $p);
 
-		$arPathTmp = explode('/', $pathTmp);
-		$arPathStack = array();
-
-		for ($i = 0, $cnt = count($arPathTmp); $i < $cnt; $i++)
+		if (preg_match("#(^|/)(\\.|\\.\\.)(/|\$)#", $pathTmp))
 		{
-			if ($arPathTmp[$i] === '.')
-				continue;
-			if (($arPathTmp[$i] === '') && ($i !== 0) && ($i !== ($cnt - 1)))
-				continue;
+			$arPathTmp = explode('/', $pathTmp);
+			$arPathStack = array();
+			foreach ($arPathTmp as $i => $pathPart)
+			{
+				if ($pathPart === '.')
+					continue;
 
-			if ($arPathTmp[$i] === "..")
-			{
-				if (array_pop($arPathStack) === null)
-					throw new InvalidPathException($path);
+				if ($pathPart === "..")
+				{
+					if (array_pop($arPathStack) === null)
+						throw new InvalidPathException($path);
+				}
+				else
+				{
+					array_push($arPathStack, $pathPart);
+				}
 			}
-			else
-			{
-				array_push($arPathStack, $arPathTmp[$i]);
-			}
+			$pathTmp = implode("/", $arPathStack);
 		}
-
-		$pathTmp = implode("/", $arPathStack);
 
 		$pathTmp = rtrim($pathTmp, "\0.\\/+ ");
 
@@ -288,23 +284,12 @@ class Path
 
 	public static function randomizeInvalidFilename($filename)
 	{
-		return preg_replace("#([\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."])#e", "chr(rand(97, 122))", $filename);
+		return preg_replace_callback("#([\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."])#", '\Bitrix\Main\IO\Path::getRandomChar', $filename);
 	}
 
-	public static function isAbsolute($path)
+	public static function getRandomChar()
 	{
-		return (substr($path, 0, 1) === "/") || preg_match("#^[a-z]:/#i", $path);
-	}
-
-	protected static function getDirectoryIndexArray()
-	{
-		static $directoryIndexDefault = array("index.php" => 1, "index.html" => 1, "index.htm" => 1, "index.phtml" => 1, "default.html" => 1, "index.php3" => 1);
-
-		$directoryIndex = Main\Config\Configuration::getValue("directory_index");
-		if ($directoryIndex !== null)
-			return $directoryIndex;
-
-		return $directoryIndexDefault;
+		return chr(rand(97, 122));
 	}
 
 	public static function isAbsolute($path)

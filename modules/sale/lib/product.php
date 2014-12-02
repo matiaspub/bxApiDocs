@@ -8,14 +8,12 @@
 namespace Bitrix\Sale;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class ProductTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_catalog_product';
@@ -278,70 +276,6 @@ class ProductTable extends Entity\DataManager
 				'expression' => array(
 					'%s * (%s * %s / %s / %s)',
 					'SUMMARY_PRICE', 'CURRENT_CURRENCY_RATE', 'CURRENT_SITE_CURRENCY_RATE_CNT', 'CURRENT_SITE_CURRENCY_RATE', 'CURRENT_CURRENCY_RATE_CNT'
-				)
-			),
-
-			'VIEWS_IN_PERIOD_BY_SHOP' => array(
-				'data_type' => 'integer',
-				'expression' => array(
-					'(SELECT  SUM(1) FROM b_catalog_product, b_sale_viewed_product WHERE %s = b_sale_viewed_product.PRODUCT_ID
-					AND b_catalog_product.ID = b_sale_viewed_product.PRODUCT_ID
-					AND b_sale_viewed_product.DATE_VISIT %%RT_TIME_INTERVAL%% AND b_sale_viewed_product.LID %%RT_SITE_FILTER%%)', 'ID'
-				)
-			),
-
-			'ORDERS_IN_PERIOD_BY_SHOP' => array(
-				'data_type' => 'integer',
-				'expression' => array(
-					'(SELECT  COUNT(DISTINCT b_sale_order.ID)
-					FROM b_catalog_product
-						INNER JOIN b_sale_basket ON b_catalog_product.ID = b_sale_basket.PRODUCT_ID
-						INNER JOIN b_sale_order ON b_sale_basket.ORDER_ID = b_sale_order.ID
-					WHERE
-							b_catalog_product.ID = %s
-						AND b_sale_order.PAYED = \'Y\'
-						AND b_sale_order.DATE_INSERT %%RT_TIME_INTERVAL%%
-						AND b_sale_basket.LID %%RT_SITE_FILTER%%)', 'ID'
-				)
-			),
-			'SALED_PRODUCTS_IN_PERIOD_BY_SHOP' => array(
-				'data_type' => 'integer',
-				'expression' => array(
-					$DB->isNull('(SELECT  SUM(b_sale_basket.QUANTITY)
-						FROM b_sale_basket
-							INNER JOIN b_sale_order ON b_sale_basket.ORDER_ID = b_sale_order.ID
-						WHERE b_sale_basket.PRODUCT_ID = %s
-							AND b_sale_order.PAYED = \'Y\'
-							AND b_sale_order.DEDUCTED = \'Y\'
-							AND b_sale_order.DATE_INSERT %%RT_TIME_INTERVAL%%
-							AND b_sale_basket.LID %%RT_SITE_FILTER%%)', 0).'+'.
-					$DB->isNull('(SELECT  SUM(b_catalog_docs_element.AMOUNT)
-						FROM b_catalog_store_docs
-							INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
-						WHERE b_catalog_store_docs.DOC_TYPE = \'D\'
-							AND b_catalog_store_docs.STATUS = \'Y\'
-							AND b_catalog_store_docs.DATE_DOCUMENT %%RT_TIME_INTERVAL%%
-							AND b_catalog_docs_element.ELEMENT_ID = %s)', 0),
-					'ID', 'ID'
-				)
-			),
-			'ARRIVED_PRODUCTS_IN_PERIOD_BY_SHOP' => array(
-				'data_type' => 'float',
-				'expression' => array(
-					'(SELECT  SUM(b_catalog_docs_element.AMOUNT)
-						FROM b_catalog_store_docs
-						INNER JOIN b_catalog_docs_element on b_catalog_store_docs.ID = b_catalog_docs_element.DOC_ID
-						WHERE b_catalog_store_docs.DOC_TYPE in (\'A\', \'R\')
-							AND b_catalog_store_docs.STATUS = \'Y\'
-							AND b_catalog_store_docs.DATE_DOCUMENT %%RT_TIME_INTERVAL%%
-							AND b_catalog_docs_element.ELEMENT_ID = %s)', 'ID'
-				)
-			),
-			'CONVERSION' => array(
-				'data_type' => 'float',
-				'expression' => array(
-					'100 * CASE WHEN %s IS NULL OR %s = 0 THEN NULL ELSE %s / %s END',
-					'VIEWS_IN_PERIOD_BY_SHOP', 'VIEWS_IN_PERIOD_BY_SHOP', 'ORDERS_IN_PERIOD_BY_SHOP', 'VIEWS_IN_PERIOD_BY_SHOP'
 				)
 			)
 		);

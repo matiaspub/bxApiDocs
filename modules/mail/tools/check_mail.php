@@ -20,24 +20,86 @@ CModule::IncludeModule('mail');
 $siteId = isset($_REQUEST['SITE_ID']) ? $_REQUEST['SITE_ID'] : SITE_ID;
 
 $error = false;
-$acc = CMailbox::GetList(
+
+$dbAcc = CMailbox::GetList(
 	array(
 		'TIMESTAMP_X' => 'DESC'
 	),
 	array(
-		'LID'         => $siteId,
+		'LID'         => SITE_ID,
 		'ACTIVE'      => 'Y',
-		'SERVER_TYPE' => 'imap',
-		'USER_ID'     => $userId
+		'USER_ID'     => $USER->GetID()
 	)
-)->Fetch();
+);
+while (($acc = $dbAcc->fetch()) !== false && !in_array($acc['SERVER_TYPE'], array('imap', 'controller', 'domain', 'crdomain')));
+
 if (!empty($acc))
 {
-	$unseen = CMailUtil::CheckImapMailbox(
-		$acc['SERVER'], $acc['PORT'], $acc['USE_TLS'] == 'Y',
-		$acc['LOGIN'], $acc['PASSWORD'],
-		$error, 30
-	);
+	switch ($acc['SERVER_TYPE'])
+	{
+		case 'imap':
+			$unseen = CMailUtil::CheckImapMailbox(
+				$acc['SERVER'], $acc['PORT'], $acc['USE_TLS'] == 'Y',
+				$acc['LOGIN'], $acc['PASSWORD'],
+				$error, 30
+			);
+			break;
+		case 'controller':
+			list($acc['login'], $acc['domain']) = explode('@', $acc['LOGIN'], 2);
+			$crCheckMailbox = CControllerClient::ExecuteEvent('OnMailControllerCheckMailbox', array(
+				'DOMAIN' => $acc['domain'],
+				'NAME'   => $acc['login']
+			));
+			if (isset($crCheckMailbox['result']))
+			{
+				$unseen = intval($crCheckMailbox['result']);
+			}
+			else
+			{
+				$unseen = -1;
+				$error  = empty($crCheckMailbox['error'])
+					? GetMessage('INTR_MAIL_CONTROLLER_INVALID')
+					: CMail::getErrorMessage($crCheckMailbox['error']);
+			}
+			break;
+		case 'crdomain':
+			list($acc['login'], $acc['domain']) = explode('@', $acc['LOGIN'], 2);
+			$crCheckMailbox = CControllerClient::ExecuteEvent('OnMailControllerCheckMemberMailbox', array(
+				'DOMAIN' => $acc['domain'],
+				'NAME'   => $acc['login']
+			));
+			if (isset($crCheckMailbox['result']))
+			{
+				$unseen = intval($crCheckMailbox['result']);
+			}
+			else
+			{
+				$unseen = -1;
+				$error  = empty($crCheckMailbox['error'])
+					? GetMessage('INTR_MAIL_CONTROLLER_INVALID')
+					: CMail::getErrorMessage($crCheckMailbox['error']);
+			}
+			break;
+		case 'domain':
+			$service = \Bitrix\Mail\MailServicesTable::getRowById($acc['SERVICE_ID']);
+			list($acc['login'], $acc['domain']) = explode('@', $acc['LOGIN'], 2);
+			$result = CMailDomain2::getUnreadMessagesCount(
+				$service['TOKEN'],
+				$acc['domain'], $acc['login'],
+				$error
+			);
+
+			if (is_null($result))
+			{
+				$unseen = -1;
+				$error = CMail::getErrorMessage($error);
+			}
+			else
+			{
+				$unseen = intval($result);
+			}
+			break;
+	}
 
 	CUserCounter::Set($userId, 'mail_unseen', $unseen, $siteId);
 

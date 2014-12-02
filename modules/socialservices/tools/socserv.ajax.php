@@ -109,6 +109,22 @@ BX.loadScript('/bitrix/js/socialservices/ss_timeman.js?<?=$t?>', function(){
 			CUserOptions::SetOption("socialservices","user_socserv_end_text",$userSocServEndText, false, $userId);
 		}
 	}
+	elseif($_REQUEST['action'] == "registernetwork")
+	{
+		$domain = ToLower(rtrim(trim($_REQUEST['url']), '/'));
+
+		if(preg_match("/^http[s]{0,1}:\/\/[^\/]+/", $domain))
+		{
+			$res = CSocServBitrix24Net::registerSite($domain);
+		}
+		else
+		{
+			$res = array("error" => GetMessage("B24NET_REG_WRONG_URL"));
+		}
+
+		Header('Content-Type: application/json');
+		echo \Bitrix\Main\Web\Json::encode($res);
+	}
 }
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_after.php");
 ?>

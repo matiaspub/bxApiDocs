@@ -8,7 +8,7 @@ class CSqlFormatFormatter
 	{
 		$result = "";
 		$skipWS = false;
-		foreach($tokens as $i => $token)
+		foreach ($tokens as $i => $token)
 		{
 			if ($token[1] === ",")
 			{
@@ -48,7 +48,7 @@ class CSqlFormatFormatter
 					if ($token[0] === T_WHITESPACE)
 						continue;
 				}
-				elseif ($tokens[$i-1][2] <> $token[2])
+				elseif ($tokens[$i - 1][2] <> $token[2])
 				{
 					$result .= "\x3".str_repeat("\x2", $token[2]);
 					if ($token[0] === T_WHITESPACE)
@@ -98,10 +98,12 @@ class CSqlFormatFormatter
 	{
 		return " ";
 	}
+
 	static public function getSpace()
 	{
 		return " ";
 	}
+
 	static public function getTab()
 	{
 		return " ";
@@ -114,10 +116,12 @@ class CSqlFormatText extends CSqlFormatFormatter
 	{
 		return "\n";
 	}
+
 	static public function getSpace()
 	{
 		return " ";
 	}
+
 	static public function getTab()
 	{
 		return "\t";
@@ -135,20 +139,20 @@ class CSqlTokenizer
 		array_shift($this->tokens);
 		$this->current = 0;
 
-		while(isset($this->tokens[$this->current]))
+		while (isset($this->tokens[$this->current]))
 		{
-			//Remove excessive brakets
+			//Remove excessive brackets
 			if (
 				$this->tokens[$this->current] === "("
 				&& $this->lookForwardFor("(")
 			)
 			{
-				if ($this->removeBalancedBrakets())
+				if ($this->removeBalancedBrackets())
 					continue;
 			}
 
 			//Remove following spaces
-			if ($this->tokens[$this->current][0] === T_WHITESPACE && $this->tokens[$this->current-1][0] === T_WHITESPACE)
+			if ($this->tokens[$this->current][0] === T_WHITESPACE && $this->tokens[$this->current - 1][0] === T_WHITESPACE)
 			{
 				array_splice($this->tokens, $this->current, 1);
 				continue;
@@ -213,12 +217,12 @@ class CSqlTokenizer
 		return $token;
 	}
 
-	protected function removeBalancedBrakets()
+	protected function removeBalancedBrackets()
 	{
 		$pos = $this->current;
 		$balance = 0;
 		$hasOp = array(false);
-		while(isset($this->tokens[$pos]))
+		while (isset($this->tokens[$pos]))
 		{
 			if ($this->tokens[$pos][0] === "(")
 			{
@@ -232,6 +236,7 @@ class CSqlTokenizer
 			elseif (
 				$this->tokens[$pos][0] === T_LOGICAL_AND
 				|| $this->tokens[$pos][0] === T_LOGICAL_OR
+				|| $this->tokens[$pos][0] === ","
 			)
 			{
 				$hasOp[$balance] = true;
@@ -239,7 +244,7 @@ class CSqlTokenizer
 
 			if ($balance === 0)
 			{
-				if (!$hasOp[$balance+1])
+				if (!$hasOp[$balance + 1])
 				{
 					array_splice($this->tokens, $pos, 1);
 					array_splice($this->tokens, $this->current, 1);
@@ -257,8 +262,8 @@ class CSqlTokenizer
 
 	protected function lookForwardFor($token)
 	{
-		$pos = $this->current+1;
-		while(isset($this->tokens[$pos]))
+		$pos = $this->current + 1;
+		while (isset($this->tokens[$pos]))
 		{
 			if ($this->tokens[$pos] == $token)
 				return true;
@@ -275,7 +280,7 @@ class CSqlLevel
 	private $tokens = array();
 	private $balance = 0;
 	private $level = 0;
-	private $add = array();
+	private $current = 0;
 
 	public function addLevel(array $tokens)
 	{
@@ -283,7 +288,7 @@ class CSqlLevel
 		$this->balance = 0;
 		$this->tokens = $tokens;
 		$this->current = 0;
-		while(isset($this->tokens[$this->current]))
+		while (isset($this->tokens[$this->current]))
 		{
 			if ($this->tokens[$this->current][1] === "(")
 				$this->balance++;
@@ -309,8 +314,8 @@ class CSqlLevel
 		if ($this->tokens[$this->current][1] === ")")
 		{
 			$this->level["("]--;
-			$this->level["SELECT_".($this->balance+1)] = 0;
-			$this->level["JOIN_".($this->balance+1)] = 0;
+			$this->level["SELECT_".($this->balance + 1)] = 0;
+			$this->level["JOIN_".($this->balance + 1)] = 0;
 		}
 		elseif (
 			$this->tokens[$this->current][1] === "FROM"
@@ -375,8 +380,8 @@ class CSqlLevel
 
 	protected function lookForwardFor($token)
 	{
-		$pos = $this->current+1;
-		while(isset($this->tokens[$pos]))
+		$pos = $this->current + 1;
+		while (isset($this->tokens[$pos]))
 		{
 			if ($this->tokens[$pos][1] == $token)
 				return true;
@@ -389,8 +394,8 @@ class CSqlLevel
 
 	protected function lookBackwardFor($token)
 	{
-		$pos = $this->current-1;
-		while(isset($this->tokens[$pos]))
+		$pos = $this->current - 1;
+		while (isset($this->tokens[$pos]))
 		{
 			if ($this->tokens[$pos][1] == $token)
 				return true;
@@ -404,13 +409,16 @@ class CSqlLevel
 
 class CSqlFormat
 {
+	/** @var CSqlTokenizer */
 	private $tokenizer = null;
+	/** @var CSqlLevel */
 	private $levelizer = null;
 
 	private $current = null;
 	private $level = 0;
 	private $add = 0;
 	private $result = "";
+	/** @var CSqlFormatFormatter */
 	private $formatter = null;
 
 	public function __construct()
@@ -449,6 +457,4 @@ class CSqlFormat
 		$tokens = $this->levelizer->addLevel($tokens);
 		return $this->formatter->format($tokens);
 	}
-
-
 }

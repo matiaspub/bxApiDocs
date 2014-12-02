@@ -85,7 +85,7 @@ class Context
 	/**
 	 * Returns request object of the context.
 	 *
-	 * @return Request
+	 * @return HttpRequest
 	 */
 	public function getRequest()
 	{

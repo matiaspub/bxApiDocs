@@ -99,12 +99,12 @@ class CAccess
 		{
 			foreach(self::$arAuthProviders as $provider_id=>$provider)
 			{
-				$pr = new $provider["CLASS"];
-				if(is_callable(array($pr, "UpdateCodes")))
+				if(is_callable(array($provider["CLASS"], "UpdateCodes")))
 				{
 					//are there access codes for the user already?
 					if(!self::CheckUserCodes($provider_id, $USER_ID))
 					{
+						$pr = new $provider["CLASS"];
 						//call provider to insert access codes
 						$pr->UpdateCodes($USER_ID);
 

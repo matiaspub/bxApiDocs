@@ -22,7 +22,6 @@ class CSaleYMLocation
 	private function getData()
 	{
 		$ttl = 2592000;
-		$cityNames = array();
 
 		$cacheManager = \Bitrix\Main\Application::getInstance()->getManagedCache();
 
@@ -60,7 +59,7 @@ class CSaleYMLocation
 		{
 			if(isset($arLocation["CITY_NAME_LANG"]) && strlen($arLocation["CITY_NAME_LANG"]) > 0 )
 			{
-				$cityNames[$arLocation["ID"]] = $this->strToLower($arLocation["CITY_NAME_LANG"]);
+				$cityNames[$arLocation["ID"]] = ToLower($arLocation["CITY_NAME_LANG"]);
 			}
 		}
 
@@ -73,26 +72,7 @@ class CSaleYMLocation
 	 */
 	public function getLocationByCityName($cityName)
 	{
-		$result =  array_search($this->strToLower($cityName), $this->cityNames);
-		return $result;
-	}
-
-	/**
-	 * @param $string
-	 * @return string
-	 */
-	private function strToLower($string)
-	{
-		static $bigLetters = "";
-		static $smallLetters = "";
-
-		if($bigLetters == "" || $smallLetters == "")
-		{
-			$bigLetters = GetMessage("SALE_YML_BIG_LETTERS")."ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-			$smallLetters = GetMessage("SALE_YML_SMALL_LETTERS")."abcdefghijklmnopqrstuvwxyz";
-		}
-
-		$result = strtr($string, $bigLetters, $smallLetters);
+		$result =  array_search(ToLower($cityName), $this->cityNames);
 		return $result;
 	}
 }

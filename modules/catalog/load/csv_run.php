@@ -55,6 +55,30 @@ global
 	$defCatalogAvailGroupFields,
 	$defCatalogAvailCurrencies;
 
+if (!isset($arCatalogAvailProdFields))
+	$arCatalogAvailProdFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($arCatalogAvailPriceFields))
+	$arCatalogAvailPriceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($arCatalogAvailValueFields))
+	$arCatalogAvailValueFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($arCatalogAvailQuantityFields))
+	$arCatalogAvailQuantityFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($arCatalogAvailGroupFields))
+	$arCatalogAvailGroupFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+
+if (!isset($defCatalogAvailProdFields))
+	$defCatalogAvailProdFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($defCatalogAvailPriceFields))
+	$defCatalogAvailPriceFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($defCatalogAvailValueFields))
+	$defCatalogAvailValueFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($defCatalogAvailQuantityFields))
+	$defCatalogAvailQuantityFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($defCatalogAvailGroupFields))
+	$defCatalogAvailGroupFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_SECTION);
+if (!isset($defCatalogAvailCurrencies))
+	$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
+
 $IBLOCK_ID = intval($IBLOCK_ID);
 if ($IBLOCK_ID<=0)
 {
@@ -377,7 +401,9 @@ if (empty($arRunErrors))
 
 			$strVal = COption::GetOptionString("catalog", "allowed_currencies", $defCatalogAvailCurrencies);
 			$arVal = explode(",", $strVal);
-			$lcur = CCurrency::GetList(($by1="sort"), ($order1="asc"));
+			$by1="sort";
+			$order1="asc";
+			$lcur = CCurrency::GetList($by1, $order1);
 			$arCurList = array();
 			while ($lcur_res = $lcur->Fetch())
 			{

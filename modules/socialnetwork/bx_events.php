@@ -205,20 +205,22 @@ class _CEventsSocialnetwork {
 	public static function OnBeforeSocNetFeaturesPermsUpdate(&$arParams){}
 
 	/**
-	 * после изменения права на дополнительный функционал.
-	 * 
-	 * 
-	 * <i>Вызывается в методе:</i><br>
-	 * CSocNetFeaturesPerms::Update<br><br>
-	 * 
-	 * 
-	 * @param array $arFields Массив полей измененной записи.
-	 * 
-	 * 
-	 * 
+	 * Событие вызывается после изменения права на дополнительный функционал.
+	 *
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Массив полей измененной записи.
+	 *
+	 *
+	 *
+	 * @return mixed 
+	 *
+	 * @static
 	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetFeaturesPermsUpdate.php
+	 * @author Bitrix
 	 */
-	public static function OnSocNetFeaturesPermsUpdate(){}
+	public static function OnSocNetFeaturesPermsUpdate(&$arFields){}
 
 	/**
 	 * <p>Вызывается перед удалением сообщения.</p>
@@ -226,7 +228,7 @@ class _CEventsSocialnetwork {
 	 *
 	 *
 	 *
-	 * @param int $ID  ID сообщения.
+	 * @param int $ID  ID сообщения.</bod
 	 *
 	 *
 	 *
@@ -245,7 +247,7 @@ class _CEventsSocialnetwork {
 	 *
 	 *
 	 *
-	 * @param int $ID  ID сообщения.
+	 * @param int $ID  ID сообщения.</bod
 	 *
 	 *
 	 *
@@ -357,8 +359,11 @@ class _CEventsSocialnetwork {
 	 *
 	 *
 	 *
-	 * @param array &$arFields  Массив из двух параметров - <i>$ID</i> и <i>$arFields</i>, причем второй - по
-	 * ссылке.
+	 * @param int $ID  ID добавленной группы. </ht
+	 *
+	 *
+	 *
+	 * @param array &$arFields  Поля группы, по ссылке.
 	 *
 	 *
 	 *
@@ -368,7 +373,7 @@ class _CEventsSocialnetwork {
 	 * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php
 	 * @author Bitrix
 	 */
-	public static function OnSocNetGroupAdd(&$arFields){}
+	public static function OnSocNetGroupAdd($ID, &$arFields){}
 
 	/**
 	 * Событие вызывается в методе изменения параметров рабочей группы до изменения, и может быть использовано для отмены изменения или переопределения некоторых полей.

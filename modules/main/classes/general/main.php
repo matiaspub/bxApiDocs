@@ -7,6 +7,10 @@
  */
 
 use Bitrix\Main\Localization\CultureTable;
+use Bitrix\Main\Page\Asset;
+use Bitrix\Main\Page\AssetLocation;
+use Bitrix\Main\Page\AssetMode;
+use Bitrix\Main\Page\Frame;
 
 // define('BX_SPREAD_SITES', 2);
 // define('BX_SPREAD_DOMAIN', 4);
@@ -31,29 +35,23 @@ abstract class CAllMain
 	var $arDirProperties = array();
 	var $sLastError;
 
+	/** @var Asset */
+	public $oAsset;
+
+	/**
+	 * Array of css, js, and inline strings
+	 */
 	var $sPath2css = array();
-	var $sKernelCSS = array();
-	var $sKernelJS = array();
-	private $arJSModuleInfo = array();
-	private $arCSSModuleInfo = array();
-	private $cssPackInfo = array();
-	private $jsPackInfo = array();
-	private $sCssJsFList = array('JS' => array(), 'CSS' => array());
-	var $iHeaderLastCSS = 0;
-	var $iWorkAreaLastCSS = 0;
-	var $iHeaderLastJS = 0;
-	var $iWorkAreaLastJS = 0;
 	var $arHeadStrings = array();
 	var $arHeadScripts = array();
+
+	/**
+	 * Additional css, js and inline strings. Need to include in specifik place.
+	 */
 	var $arHeadAdditionalCSS = array();
 	var $arHeadAdditionalScripts = array();
 	var $arHeadAdditionalStrings = array();
 	var $arHeadBeforeCSSStrings = array();
-	var $arLangJS = array();
-	var $arAdditionalJS = array();
-	private $bShowHeadString = false;
-	private $bShowHeadScript = false;
-	private $bShowBodyScript = false;
 	var $bInAjax = false;
 
 	var $version;
@@ -62,7 +60,11 @@ abstract class CAllMain
 	var $arPanelButtons = array();
 	var $arPanelFutureButtons = array();
 	var $ShowLogout = false;
-	var $ShowPanel = NULL, $PanelShowed = false;
+
+	var $ShowPanel = NULL;
+	var $PanelShowed = false;
+	var $showPanelWasInvoked = false;
+
 	var $arrSPREAD_COOKIE = array();
 	var $buffer_content = array();
 	var $buffer_content_type = array();
@@ -84,6 +86,7 @@ abstract class CAllMain
 	/** @var array */
 	var $arComponentMatch = false;
 	var $arAuthResult;
+	private $__componentStack = array();
 
 	public function __construct()
 	{
@@ -96,6 +99,8 @@ abstract class CAllMain
 		$this->sDocPath2 = GetPagePath(false, true);
 		$this->sDirPath = GetDirPath($this->sDocPath2);
 		$this->sUriParam = (strlen($_SERVER["QUERY_STRING"])>0) ? $_SERVER["QUERY_STRING"] : $QUERY_STRING;
+
+		$this->oAsset = \Bitrix\Main\Page\Asset::getInstance();
 	}
 
 	public function reinitPath()
@@ -179,7 +184,7 @@ abstract class CAllMain
 	*
 	*
 	*
-	* @param string $page  Адрес страницы. Например, "/ru/index.php".
+	* @param string $page  Адрес страницы. Например, "/ru/index.php". </htm
 	*
 	*
 	*
@@ -625,15 +630,12 @@ abstract class CAllMain
 			$arAuthResult = $mess;
 
 		/** @global CMain $APPLICATION */
-		global $APPLICATION, $forgot_password, $change_password, $register, $confirm_registration, $authorize_registration;
+		global $APPLICATION, $forgot_password, $change_password, $register, $confirm_registration;
 
 		//page title
 		$APPLICATION->SetTitle(GetMessage("AUTH_TITLE"));
 
-		//last login from cookie
-		$last_login = ${COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_LOGIN"};
-
-		$comp_name = "";
+		$inc_file = "";
 		if($forgot_password=="yes")
 		{
 			//pass request form
@@ -653,23 +655,23 @@ abstract class CAllMain
 			//registration form
 			$APPLICATION->SetTitle(GetMessage("AUTH_TITLE_REGISTER"));
 			$comp_name = "system.auth.registration";
-			$inc_file = "registration";
 		}
 		elseif(($confirm_registration === "yes") && ($isAdmin === "") && (COption::GetOptionString("main", "new_user_registration_email_confirmation", "N") === "Y"))
 		{
 			//confirm registartion
 			$APPLICATION->SetTitle(GetMessage("AUTH_TITLE_CONFIRM"));
 			$comp_name = "system.auth.confirmation";
-			$inc_file = "confirmation";
 		}
-		elseif($authorize_registration=="yes" && $isAdmin=="")
+		elseif(CModule::IncludeModule("security") && \Bitrix\Security\Mfa\Otp::isOtpRequired() && $_REQUEST["login_form"] <> "yes")
 		{
-			//combined auth and reg form
-			$inc_file = "authorize_registration";
+			//otp form
+			$APPLICATION->SetTitle(GetMessage("AUTH_TITLE_OTP"));
+			$comp_name = "system.auth.otp";
+			$inc_file = "otp";
 		}
 		else
 		{
-			Header('X-Bitrix-Ajax-Status: Authorize');
+			header('X-Bitrix-Ajax-Status: Authorize');
 
 			//auth form
 			$comp_name = "system.auth.authorize";
@@ -687,17 +689,10 @@ abstract class CAllMain
 		if($isAdmin == "")
 		{
 			// form by Components 2.0
-			if(COption::GetOptionString("main", "auth_comp2", "N") == "Y" && $comp_name <> "")
-			{
-				$this->IncludeComponent("bitrix:".$comp_name, "", array(
-					"AUTH_RESULT" => $arAuthResult,
-					"NOT_SHOW_LINKS" => $not_show_links,
-				));
-			}
-			else
-			{
-				$this->IncludeFile("main/auth/".$inc_file.".php", array("last_login"=>$last_login, "arAuthResult"=>$arAuthResult, "not_show_links" => $not_show_links));
-			}
+			$this->IncludeComponent("bitrix:".$comp_name, "", array(
+				"AUTH_RESULT" => $arAuthResult,
+				"NOT_SHOW_LINKS" => $not_show_links,
+			));
 		}
 		else
 		{
@@ -887,21 +882,21 @@ abstract class CAllMain
 	* if ($ITEM_TYPE=="D")
 	* {
 	*     if ($SELECTED)
-	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_folder_open.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_folder_open.gif' width='17' border='0'&gt;&lt;/td&gt;";
 	*     else
-	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_folder.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_folder.gif' width='17' border='0'&gt;&lt;/td&gt;";
 	* }
 	* else
 	* {
 	*     if ($SELECTED)
 	*     {
-	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
-	*         $strDir_d = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir_d = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
 	*     }
 	*     else
 	*     {
-	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
-	*         $strDir_d = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir_d = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
 	*     }
 	* }
 	* 
@@ -916,7 +911,7 @@ abstract class CAllMain
 	* if ($PARAMS["SEPARATOR"]=="Y")
 	* {
 	*     $strstyle = " style='background-color: #D5ECE6; border-top: 1px solid #A6D0D7; border-bottom: 1px solid #A6D0D7; padding:8;'";
-	*     $strDir = "&lt;img height='13' src='//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif' width='17' border='0'&gt;";
+	*     $strDir = "&lt;img height='13' src='/bitrix/templates/demo/images/1.gif' width='17' border='0'&gt;";
 	*     $strtext = "leftmenu";
 	* }
 	* else
@@ -926,16 +921,16 @@ abstract class CAllMain
 	* // Content of variable $sMenuProlog is typed just before all menu items iterations
 	* // Content of variable $sMenuEpilog is typed just after all menu items iterations
 	* $sMenuProlog = "&lt;table border='0' cellpadding='0' cellspacing='0' width='100%'&gt;";
-	* $sMenuEpilog = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
+	* $sMenuEpilog = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
 	* 
 	* // if $PERMISSION &gt; "D" then current user can access this page
 	* if ($PERMISSION &gt; "D")
 	* {
-	*     $sMenuBody = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir.'&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class="'.$strtext.'"&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
+	*     $sMenuBody = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir.'&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class="'.$strtext.'"&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
 	* }
 	* else
 	* {
-	*     $sMenuBody = '&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir_d.'&lt;/td&gt;&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class='.$strtext.'&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
+	*     $sMenuBody = '&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir_d.'&lt;/td&gt;&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class='.$strtext.'&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
 	* 
 	* }
 	* ?&gt;
@@ -1001,7 +996,7 @@ abstract class CAllMain
 	* <pre>
 	* Вывод меню в файле /bitrix/templates/demo/header.php:
 	* </h
-	* &lt;script language="JavaScript1.2" src="//www.1c-bitrix.ru.js.1c-bitrix-cdn.ru/bitrix/templates/demo/js/ddnmenu.js"&gt;&lt;/script&gt;
+	* &lt;script language="JavaScript1.2" src="/bitrix/templates/demo/js/ddnmenu.js"&gt;&lt;/script&gt;
 	* &lt;?echo <b>$APPLICATION-&gt;GetMenuHtmlEx</b>("top");?&gt;Файл /.top.menu.php:</b
 	* &lt;?
 	* // основной файл меню
@@ -1048,7 +1043,7 @@ abstract class CAllMain
 	* Файл /bitrix/templates/demo/top.menu_template.php:</b
 	* &lt;?
 	* // шаблон меню
-	* $sMenu = '&lt;table width="100%" border="0" cellspacing="0" cellpadding="0"&gt;&lt;tr&gt;&lt;td width="0%"&gt;&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/top_menu_corner.gif" alt="" width="15" height="19"&gt;&lt;/td&gt;';
+	* $sMenu = '&lt;table width="100%" border="0" cellspacing="0" cellpadding="0"&gt;&lt;tr&gt;&lt;td width="0%"&gt;&lt;img src="/bitrix/templates/demo/images/top_menu_corner.gif" alt="" width="15" height="19"&gt;&lt;/td&gt;';
 	* 
 	* for($i=0; $i&lt;count($arMENU); $i++)
 	* {
@@ -1066,9 +1061,9 @@ abstract class CAllMain
 	*     $sMenu .= '&lt;td width="0%" bgcolor="#7B9DBB"&gt;';
 	* 
 	*     if($i&lt;count($arMENU)-1) //add vertical divider after all items but not after the last one
-	*         $sMenu .= '&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/top_menu_divider.gif" width="15" height="19" alt=""&gt;';
+	*         $sMenu .= '&lt;img src="/bitrix/templates/demo/images/top_menu_divider.gif" width="15" height="19" alt=""&gt;';
 	*     else
-	*         $sMenu .= '&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="19" alt=""&gt;';
+	*         $sMenu .= '&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="19" alt=""&gt;';
 	* 
 	*     $sMenu .= '&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
 	* 
@@ -1086,8 +1081,8 @@ abstract class CAllMain
 	*     }
 	*     $sMenu .= '&lt;/td&gt;';
 	* }
-	* $sMenu .= '&lt;td width="100%" bgcolor="#7B9DBB"&gt;&lt;img src="//www.1c-bitrix.ru.images.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="50" height="1" alt=""&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
-	* ?&gt;Файл /bitrix/templates/demo/popup.menu_template.php:</b
+	* $sMenu .= '&lt;td width="100%" bgcolor="#7B9DBB"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="50" height="1" alt=""&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
+	* ?&gt;</boФайл /bitrix/templates/demo/popup.menu_template.php:</b
 	* &lt;?
 	* $sMenu =
 	*     '&lt;table border="0" cellspacing="0" cellpadding="0" width="110"&gt;'.
@@ -1483,7 +1478,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	* >Отложенные функции</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul> </htm<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul> </ht<a
 	* name="examples"></a>
 	*
 	*
@@ -1641,7 +1636,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
-	* </li> </ul> </htm<a name="examples"></a>
+	* </li> </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -2072,7 +2067,7 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <p><a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/index.php">Классы модуля
-	* Реклама</a></p> <a name="examples"></a>
+	* Реклама</a></p> </htm<a name="examples"></a>
 	*
 	*
 	* @static
@@ -2142,7 +2137,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php">CMain::GetMeta</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li> </ul>
-	* </htm<a name="examples"></a>
+	* </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -2194,82 +2189,32 @@ abstract class CAllMain
 	*/
 	public function SetAdditionalCSS($Path2css, $additional=false)
 	{
+		$this->oAsset->addCss($Path2css, $additional);
+
 		if($additional)
-			$this->arHeadAdditionalCSS[] = self::__GetCssJsPath($Path2css);
+			$this->arHeadAdditionalCSS[] = $this->oAsset->getAssetPath($Path2css);
 		else
-			$this->sPath2css[] = self::__GetCssJsPath($Path2css);
+			$this->sPath2css[] = $this->oAsset->getAssetPath($Path2css);
 	}
 
-	public function SetHeaderLastCSS($lastKey = 0)
-	{
-		$this->iHeaderLastCSS = intval($lastKey);
-	}
-
-	public function SetWorkAreaLastCSS($lastKey = 0)
-	{
-		$this->iWorkAreaLastCSS = intval($lastKey);
-	}
-
-	public function SetHeaderLastJS($lastKey = 0)
-	{
-		$this->iHeaderLastJS = intval($lastKey);
-	}
-
-	public function SetWorkAreaLastJS($lastKey = 0)
-	{
-		$this->iWorkAreaLastJS = intval($lastKey);
-	}
-
-	static function FixCssIncludes($contents, $css_path)
-	{
-		$css_path = dirname($css_path);
-
-		$contents = preg_replace_callback(
-			'#([;\s:]*(?:url|@import)\s*\(\s*)(\'|"|)(.+?)(\2)\s*\)#si',
-			create_function('$matches', 'return $matches[1].CMain::__ReplaceUrlCSS($matches[2].$matches[3].$matches[4], "'.addslashes($css_path).'").")";'),
-			$contents
-		);
-
-		$contents = preg_replace_callback(
-			'#(\s*@import\s*)([\'"][^\'"]+[\'"])\s*\;#si',
-			create_function('$matches', 'return $matches[1].CMain::__ReplaceUrlCSS($matches[2], "'.addslashes($css_path).'").";";'),
-			$contents
-		);
-
-		return $contents;
-	}
-
-	private function InsertCss($css, $bXhtmlStyle=true, $setLabel=false,  $bInline=false)
-	{
-		$label = $setLabel ? ' data-template-style="true" ' : '';
-		if($bInline)
-		{
-			return '<style type="text/css"'.$label.'>'."\n".$css."\n</style>\n";
-		}
-		else
-		{
-			return '<link href="'.$css.'" type="text/css" '.$label.' rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
-		}
-	}
-
+	/** @deprecated */
 	public function GetAdditionalCSS()
 	{
 		$n = count($this->sPath2css);
 		if($n > 0)
+		{
 			return $this->sPath2css[$n-1];
+		}
 		return false;
 	}
 
+	/** @deprecated */
 	public function GetCSSArray()
 	{
 		return array_unique($this->sPath2css);
 	}
 
-	public function GetAdditionalCSSArray()
-	{
-		return array_unique($this->arHeadAdditionalCSS);
-	}
-
+	/** @deprecated use Asset::getInstance()->getCss() */
 	
 	/**
 	* <p>Возвращает CSS страницы. CSS страницы может быть задан с помощью функций <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>. Помимо заданных CSS стилей, всегда возвращается CSS текущего шаблона сайта, задаваемого в файле <b>/bitrix/templates/</b><i>ID шаблона</i><b>/styles.css</b>.</p>
@@ -2309,698 +2254,16 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php
 	* @author Bitrix
 	*/
-	public function GetCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
+	public function GetCSS($cMaxStylesCnt = true, $bXhtmlStyle = true)
 	{
-		$res = '';
-		$site_template = '';
-		$templateCSSIndex = 0;
-		$arTmpCss = array();
-		$arTemplateCss = array();
-		$arCSS = $this->GetCSSArray();
-		$arAdditionalCSS = $this->GetAdditionalCSSArray();
-		$optimizeCSS = self::IsCSSOptimized();
-
 		if($cMaxStylesCnt === true)
 		{
-			$cMaxStylesCnt = COption::GetOptionInt('main', 'max_css_files', 20);
+			$cMaxStylesCnt = \Bitrix\Main\Config\Option::get('main', 'max_css_files', 20);
 		}
-
-		global $USER;
-		if(!$this->bInAjax && (!defined("ADMIN_SECTION") || ADMIN_SECTION !== true))
-		{
-			if(isset($_GET['bx_template_preview_mode']) && $_GET['bx_template_preview_mode'] == 'Y' && $USER->CanDoOperation('edit_other_settings'))
-			{
-				$path = BX_PERSONAL_ROOT."/tmp/templates/__bx_preview/";
-				$arTemplateCss[] = $path."styles.css";
-				$arTemplateCss[] = $path."template_styles.css";
-			}
-			elseif(defined("SITE_TEMPLATE_ID"))
-			{
-				$site_template = SITE_TEMPLATE_ID;
-				$path = SITE_TEMPLATE_PATH;
-				$arTemplateCss[] = $path."/styles.css";
-				$arTemplateCss[] = $path."/template_styles.css";
-			}
-			else
-			{
-				$site_template = '.default';
-				$path = BX_PERSONAL_ROOT."/templates/.default";
-				$arTemplateCss[] = $path."/styles.css";
-				$arTemplateCss[] = $path."/template_styles.css";
-			}
-		}
-
-		$cssFile = array();
-		$cssSrcFile = array();
-		$cssBxFile = array('main' => array());
-		$cssSrcBxFile = array('main' => array());
-		$cssTemplateFile = array();
-		$cssSrcTemplateFile = array();
-
-		if($optimizeCSS)
-		{
-			$cMaxStylesCnt -= 3;
-
-			foreach ($arTemplateCss as $key => $css)
-			{
-				if(!file_exists($_SERVER['DOCUMENT_ROOT'].$css))
-					unset($arTemplateCss[$key]);
-			}
-		}
-		else
-		{
-			if(!empty($arTemplateCss))
-			{
-				$templateCSSIndex = count($arCSS)+1;
-			}
-			$arCSS = array_merge($arCSS, $arTemplateCss, $arAdditionalCSS);
-		}
-
-		$cnt = 0;
-		$cntFull = 0;
-		$ruleCount = 0;
-		$res_content = '';
-		$isIE = IsIE();
-		$optimizeCnt = count($arTemplateCss) + count($arAdditionalCSS);
-		$setLabel = false;
-
-		foreach($arCSS as $cssKey => $css_path)
-		{
-			$bExternalLink = self::IsExternalLink($css_path);
-
-			$css_file = $filename = "";
-			if(!$bExternalLink)
-			{
-				$css_file = $css_path;
-				$filename = $_SERVER["DOCUMENT_ROOT"].$css_file;
-			}
-
-			$optimize = (
-				$optimizeCSS &&
-				(
-					strncmp($css_path, '/bitrix/panel/', 14) != 0
-					&& strncmp($css_path, '/bitrix/themes/', 15) != 0
-					&& strncmp($css_path, '/bitrix/modules/', 16) != 0
-				)
-			);
-
-			if($bExternalLink)
-			{
-				if($this->bInAjax)
-				{
-					$arTmpCss[] = $css_path;
-				}
-				else
-				{
-					$res .= self::InsertCss($css_path, $bXhtmlStyle);
-					$cnt++;
-				}
-			}
-			elseif(file_exists($filename) && filesize($filename) > 0)
-			{
-				$css_path = CUtil::GetAdditionalFileURL($css_path, true);
-				if(!$optimizeCSS)
-				{
-					$setLabel = ($cntFull > 0 && $cntFull == $templateCSSIndex);
-				}
-
-				if($this->bInAjax)
-				{
-					$arTmpCss[] = $css_path;
-				}
-				elseif($optimize)
-				{
-					if(strncmp($css_path, '/bitrix/js/', 11) != 0)
-					{
-						if($cssKey > $this->iHeaderLastCSS && ($cssKey <= $this->iWorkAreaLastCSS || $this->iWorkAreaLastCSS == 0))
-						{
-							// Page css
-							$cssSrcFile[] = $css_path;
-							$cssFile[] = $css_file;
-						}
-						else
-						{
-							// Template css
-							$cssSrcTemplateFile[] = $css_path;
-							$cssTemplateFile[] = $css_file;
-						}
-						$optimizeCnt++;
-					}
-					else
-					{
-						// Kernell css
-						if($moduleInfo = $this->IsKernelCSS($css_file))
-						{
-							$cssSrcBxFile[$moduleInfo['MODULE_ID']][] = $css_path;
-							$cssBxFile[$moduleInfo['MODULE_ID']][] = $css_file;
-							$optimizeCnt++;
-						}
-						else
-						{
-							$res .= self::InsertCss($css_path, $bXhtmlStyle);
-							$cnt++;
-						}
-					}
-				}
-				elseif($isIE)
-				{
-					if($cnt < $cMaxStylesCnt)
-					{
-						$res .= self::InsertCss($css_path, $bXhtmlStyle, $setLabel);
-						$cnt++;
-					}
-					else
-					{
-						$arTmp = $this->__ShowInlineCssIE($filename, $css_path, $ruleCount, $setLabel, true);
-						$ruleCount = $arTmp['CNT'];
-						$res_content .= $arTmp['CONTENT'];
-					}
-				}
-				else
-				{
-
-						$res .= self::InsertCss($css_path, $bXhtmlStyle, $setLabel);
-						$cnt++;
-				}
-			}
-			else
-			{
-				$cntFull++;
-				continue;
-			}
-			$cntFull++;
-		}
-
-		if($res_content != '')
-		{
-			$res .= self::InsertCss($res_content, $bXhtmlStyle, $setLabel, true);
-		}
-
-		if($optimizeCSS && $optimizeCnt > 0)
-		{
-			if(array_key_exists('page', $this->cssPackInfo) && !empty($this->cssPackInfo['page']))
-			{
-				$pageUnique = true;
-				$pageSuffix = 'page_'.$this->cssPackInfo['page'];
-			}
-			else
-			{
-				$pageUnique = false;
-				$pageSuffix = 'page';
-			}
-
-			$res .= $this->__OptimizeCssJs($cssFile, $cssSrcFile, $site_template, $pageUnique, $pageSuffix, 'css', $bXhtmlStyle);
-
-			foreach($cssBxFile as  $moduleID => $cssList)
-			{
-				$res .= $this->__OptimizeCssJs($cssList, $cssSrcBxFile[$moduleID], $site_template, true, 'kernel_'.$moduleID, 'css', $bXhtmlStyle);
-			}
-
-			$arTemplateCss = array_merge($arTemplateCss, $arAdditionalCSS);
-			foreach ($arTemplateCss as $css)
-			{
-				$cssTemplateFile[] = $css;
-				$cssSrcTemplateFile[] = CUtil::GetAdditionalFileURL($css);
-			}
-
-			if(array_key_exists('template', $this->cssPackInfo) && !empty($this->cssPackInfo['template']))
-			{
-				$templateUnique = true;
-				$templateSuffix = 'template_'.$this->cssPackInfo['template'];
-			}
-			else
-			{
-				$templateUnique = false;
-				$templateSuffix = 'template';
-			}
-
-			$res .= $this->__OptimizeCssJs($cssTemplateFile, $cssSrcTemplateFile, $site_template, $templateUnique, $templateSuffix, 'css', $bXhtmlStyle);
-			unset($cssFile, $cssSrcFile, $arTemplateCss, $cssTemplateFile, $cssSrcTemplateFile);
-		}
-
-		if($this->bInAjax && !empty($arTmpCss))
-		{
-			$res .= '<script type="text/javascript">'."BX.loadCSS(['".implode("','", $arTmpCss)."']);".'</script>';
-		}
-
+		$this->oAsset->setMaxCss($cMaxStylesCnt);
+		$this->oAsset->setXhtml($bXhtmlStyle);
+		$res = $this->oAsset->getCss();
 		return $res;
-	}
-
-	/**
-	 * Optimize css and js files
-	 *
-	 * @param array $arFile - Full path for a source css or js file
-	 * @param array $arSrcFile - Full path for a source css or js file with timestamp
-	 * @param string $site_template - Site template name
-	 * @param bool $unique - Create unique file for all site in a current template
-	 * @param string $sufix - Some sufix for css or js files
-	 * @param string $type - file type, css or js
-	 * @param bool $bXhtmlStyle - Xhtml or not
-	 * @return string - String for including css or js in html page
-	 */
-	private function __OptimizeCssJs($arFile = array(), $arSrcFile = array(), $site_template, $unique = false, $sufix = 'default', $type = 'css', $bXhtmlStyle=true)
-	{
-		if((!is_array($arFile) || empty($arFile)) || (!is_array($arSrcFile) || empty($arSrcFile)))
-		{
-			return '';
-		}
-
-		$res = '';
-		$strFiles = '';
-		$fileMTime = '';
-		$upOptim = 'NO';
-		$isIE = IsIE();
-		$writeResult = true;
-		$unsetKey = array();
-		$arFilesInfo = array();
-		$arFilesInfo['CUR_SEL_CNT'] = 0;
-		$arFilesInfo['CUR_IE_CNT'] = 0;
-		$arFilesInfo['FILES'] = array();
-		$noCheckOnly = !defined('BX_HEADFILES_CACHE_CHECK_ONLY');
-		$add2End = (strncmp($sufix, 'kernel', 6) == 0);
-
-		$sufix = trim($sufix);
-		$sufix = strlen($sufix) < 1 ? 'default' : $sufix;
-		$type = ($type == 'js' ? 'js' : 'css');
-
-		if(empty($arFile) || empty($arSrcFile))
-		{
-			return $res;
-		}
-
-		if(!$unique)
-		{
-			$fileMTime = '_'.md5(implode('_', $arSrcFile));
-			$sufix .= '_'.md5(implode('_', $arFile));
-		}
-
-		$optimPath = BX_PERSONAL_ROOT.'/cache/'.$type.'/'.SITE_ID.'/'.$site_template.'/'.$sufix.'/';
-		$infoFile = BX_PERSONAL_ROOT.'/managed_cache/'.$GLOBALS['DB']->type.'/'.$type.'/'.SITE_ID.'/'.$site_template.'/'.$sufix.'/info'.$fileMTime.'.php';
-
-		$maxAddCssSelect = 3950;
-		$maxCssSelect = 4000;
-		$cssFNameIE = $optimPath.$sufix.$fileMTime.'#CNT#.css';
-		if($type == 'css')
-		{
-			$optimFName = $optimPath.$sufix.$fileMTime.'.css';
-		}
-		else
-		{
-			$optimFName = $optimPath.$sufix.$fileMTime.'.js';
-		}
-
-		$optimFileExist = (file_exists($_SERVER["DOCUMENT_ROOT"].$optimFName) && file_exists($_SERVER['DOCUMENT_ROOT'].$infoFile));
-
-		if($optimFileExist)
-		{
-			if($unique)
-			{
-				include($_SERVER['DOCUMENT_ROOT'].$infoFile);
-				if(is_array($arFilesInfo['FILES']))
-				{
-					foreach($arFile as $key => $fp)
-					{
-						if(isset($arFilesInfo['FILES'][$fp]))
-						{
-							if($arSrcFile[$key] != $fp.'?'.$arFilesInfo['FILES'][$fp])
-							{
-								$upOptim = 'NEW';
-								break;
-							}
-							else
-							{
-								$unsetKey[] = $key;
-							}
-						}
-						else
-						{
-							$upOptim = 'UP';
-						}
-					}
-				}
-				else
-				{
-					$upOptim = 'NEW';
-				}
-			}
-		}
-		else
-		{
-			$upOptim = 'NEW';
-		}
-
-		if(!$optimFileExist || $upOptim == 'NEW')
-		{
-			$upOptim = 'NEW';
-			$arFilesInfo = array();
-			$arFilesInfo['CUR_SEL_CNT'] = 0;
-			$arFilesInfo['CUR_IE_CNT'] = 0;
-			$arFilesInfo['FILES'] = array();
-			$writeResult = false;
-		}
-
-		$contents = '';
-		$arIEContent = array();
-
-		if($upOptim != 'NO')
-		{
-			if($upOptim == 'UP' && $optimFileExist)
-			{
-				foreach($unsetKey as $key)
-					unset($arFile[$key]);
-
-				if($noCheckOnly)
-				{
-					$contents .= file_get_contents($_SERVER["DOCUMENT_ROOT"].$optimFName);
-
-					if($type == 'css')
-					{
-						if($arFilesInfo['CUR_SEL_CNT'] < $maxAddCssSelect)
-						{
-							$css = str_replace('#CNT#', $arFilesInfo['CUR_IE_CNT'], $cssFNameIE);
-							if(file_exists($_SERVER["DOCUMENT_ROOT"].$css))
-							{
-								$arIEContent[$arFilesInfo['CUR_IE_CNT']] .= file_get_contents($_SERVER["DOCUMENT_ROOT"].$css);
-								$arFilesInfo['CUR_SEL_CNT'] = self::__GetCssSelectCnt($arIEContent[$arFilesInfo['CUR_IE_CNT']]);
-							}
-						}
-						elseif($arFilesInfo['CUR_SEL_CNT'] >= $maxAddCssSelect)
-						{
-							$arFilesInfo['CUR_IE_CNT']++;
-							$arFilesInfo['CUR_SEL_CNT'] = 0;
-						}
-					}
-				}
-				else
-				{
-					$writeResult = false;
-				}
-			}
-
-			$needWrite = false;
-			if($noCheckOnly)
-			{
-				$tmp_str = '';
-				foreach($arFile as $key => $filename)
-				{
-					$tmp_content = file_get_contents($_SERVER['DOCUMENT_ROOT'].$filename);
-					if(empty($tmp_content))
-					{
-						unset($arFile[$key], $arSrcFile[$key]);
-					}
-					else
-					{
-						if($type == 'css')
-						{
-							$f_cnt = self::__GetCssSelectCnt($tmp_content);
-							$new_cnt = $f_cnt + $arFilesInfo['CUR_SEL_CNT'];
-
-							$strFiles .= "/* ".$arFile[$key]." */\n";
-							$tmp_content = self::FixCssIncludes($tmp_content, $arSrcFile[$key]);
-							$tmp_content = "\n/* Start:".$arFile[$key]."*/\n".$tmp_content."\n/* End */\n";
-
-							if($new_cnt < $maxCssSelect)
-							{
-								$arFilesInfo['CUR_SEL_CNT'] = $new_cnt;
-								$arIEContent[$arFilesInfo['CUR_IE_CNT']] .= $tmp_content;
-							}
-							else
-							{
-								$arFilesInfo['CUR_SEL_CNT'] = $f_cnt;
-								$arFilesInfo['CUR_IE_CNT']++;
-								$arIEContent[$arFilesInfo['CUR_IE_CNT']] .= $tmp_content;
-							}
-							$tmp_str .= "\n\n".$tmp_content;
-						}
-						else
-						{
-							$strFiles .= "; /* ".$arFile[$key]."*/\n";
-							$tmp_str .= "\n; /* Start:".$arFile[$key]."*/\n".$tmp_content."\n/* End */\n;";
-						}
-
-						$arFilesInfo['FILES'][$filename] = self::__GetCssJsTime($arSrcFile[$key]);
-						$needWrite = true;
-					}
-				}
-
-				if($needWrite)
-				{
-					if($add2End)
-					{
-						$contents = $strFiles.$contents.$tmp_str;
-					}
-					else
-					{
-						$contents = $tmp_str.$contents.$strFiles;
-					}
-
-					if($writeResult = self::__WriteCssJsCache($optimFName, $contents))
-					{
-
-						$cacheInfo = '<? $arFilesInfo = array( \'FILES\' => array(';
-
-						foreach($arFilesInfo['FILES'] as $key => $time)
-							$cacheInfo .= '"'.EscapePHPString($key).'" => "'.$time.'",';
-
-						$cacheInfo .= "), 'CUR_SEL_CNT' => '".$arFilesInfo['CUR_SEL_CNT']."', 'CUR_IE_CNT' => '".$arFilesInfo['CUR_IE_CNT']."'); ?>";
-						self::__WriteCssJsCache($infoFile, $cacheInfo, false);
-
-						if($type == 'css')
-						{
-							foreach($arIEContent as $key => $ieContent)
-							{
-								$css = str_replace('#CNT#', $key, $cssFNameIE);
-								self::__WriteCssJsCache($css, $ieContent);
-							}
-						}
-					}
-				}
-				elseif($optimFileExist)
-				{
-					$writeResult = true;
-				}
-
-				unset($contents, $arIEContent);
-			}
-		}
-
-		$label = (($sufix == 'template' || substr($sufix, 0, 9)  == 'template_') ? ' data-template-style="true" ' : '');
-		if($type == 'css' && $isIE && $writeResult)
-		{
-			for($i = 0; $i <= $arFilesInfo['CUR_IE_CNT']; $i++)
-			{
-				$css = str_replace('#CNT#', $i, $cssFNameIE);
-				$res .= '<link href="'.CUtil::GetAdditionalFileURL($css).'" type="text/css" '.($i == 0 ? $label : '').' rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
-			}
-		}
-		else
-		{
-			if($type == 'css')
-			{
-				if($writeResult || !$writeResult && $unique && $upOptim == 'UP')
-				{
-					$res .= '<link href="'.CUtil::GetAdditionalFileURL($optimFName).'" type="text/css" '.$label.' rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
-				}
-
-				if(!$writeResult)
-				{
-					if($isIE)
-					{
-						$cnt = 0;
-						$res_content = '';
-						$ruleCount = 0;
-						$cMaxStylesCnt = COption::GetOptionInt('main', 'max_css_files', 15);
-
-						foreach($arFile as $key => $src)
-						{
-							if($cnt < $cMaxStylesCnt)
-							{
-								$res .= '<link href="'.$arSrcFile[$key].'" '.($cnt == 0 ? $label : '').' type="text/css" rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
-							}
-							elseif(file_exists($_SERVER['DOCUMENT_ROOT'].$arFile[$key]) && filesize($_SERVER['DOCUMENT_ROOT'].$arFile[$key]) > 0)
-							{
-								$arTmp = $this->__ShowInlineCssIE($_SERVER['DOCUMENT_ROOT'].$arFile[$key], $arFile[$key], $ruleCount, true);
-								$ruleCount = $arTmp['CNT'];
-								$res_content .= $arTmp['CONTENT'];
-							}
-							$cnt++;
-						}
-
-						if($res_content != '')
-						{
-							$res .= '<style type="text/css">'."\n".$res_content."\n</style>\n";
-						}
-					}
-					else
-					{
-						foreach($arFile as $key => $src)
-						{
-							$res .= '<link href="'.$arSrcFile[$key].'" type="text/css" '.$label.' rel="stylesheet"'.($bXhtmlStyle? ' /':'').'>'."\n";
-						}
-					}
-				}
-			}
-			else
-			{
-				if($writeResult || (!$writeResult && $unique && $upOptim == 'UP'))
-				{
-					$res .= '<script type="text/javascript" src="'.CUtil::GetAdditionalFileURL($optimFName).'"></script>'."\n";
-				}
-
-				if(!$writeResult)
-				{
-					foreach ($arFile as $key => $src)
-					{
-						$res .= '<script type="text/javascript" src="'.$arSrcFile[$key].'"></script>'."\n";
-					}
-				}
-			}
-		}
-
-		$tmpType = ($type == 'js' ? 'JS' : 'CSS');
-		$arF = array_keys($arFilesInfo['FILES']);
-		foreach ($arF as $item)
-		{
-			$this->sCssJsFList[$tmpType][] = str_replace($_SERVER['DOCUMENT_ROOT'], '', $item);
-		}
-
-		unset($arFile, $arSrcFile, $arFilesInfo);
-		return $res;
-	}
-
-	/**
-	 * Write optimized css, js files or info file
-	 *
-	 * @param string $file_path - Path for optimized css, js or info file
-	 * @param string $contents - File contents
-	 * @param bool $gzip_content - For disabled gzip
-	 * @return bool - TRUE or FALSE result
-	 */
-	public static function __WriteCssJsCache($file_path, $contents, $gzip_content = true)
-	{
-		$result = false;
-
-		CheckDirPath($_SERVER["DOCUMENT_ROOT"].$file_path);
-
-		if(!$handle = @fopen($_SERVER["DOCUMENT_ROOT"].$file_path.'.tmp', "wb"))
-			return false;
-
-		if(($written = @fwrite($handle, $contents)) === false)
-			return false;
-
-		$len = function_exists('mb_strlen') ? mb_strlen($contents, 'latin1'): strlen($contents);
-		fclose($handle);
-
-		if($written === $len)
-		{
-			//This checks for Zend Server CE in order to supress warnings
-			if(function_exists('accelerator_reset'))
-				@unlink($_SERVER["DOCUMENT_ROOT"].$file_path);
-			elseif(file_exists($_SERVER["DOCUMENT_ROOT"].$file_path))
-				@unlink($_SERVER["DOCUMENT_ROOT"].$file_path);
-
-			if(@rename($_SERVER["DOCUMENT_ROOT"].$file_path.'.tmp', $_SERVER["DOCUMENT_ROOT"].$file_path) === false)
-				return false;
-
-			$result = true;
-
-			if(
-				$gzip_content && COption::GetOptionString('main', 'compres_css_js_files', 'N') == 'Y' &&
-				extension_loaded('zlib') && function_exists('gzcompress')
-			)
-			{
-				$tmpGz = $_SERVER["DOCUMENT_ROOT"].$file_path.'.tmp.gz';
-				if($gz = gzopen($tmpGz, 'wb9f'))
-				{
-					$written = @gzwrite ($gz, $contents);
-					gzclose ($gz);
-					$len = function_exists('mb_strlen') ? mb_strlen($contents, 'latin1'): strlen($contents);
-					if($written === $len)
-						@rename($tmpGz, $_SERVER["DOCUMENT_ROOT"].$file_path.'.gz');
-				}
-			}
-		}
-		return $result;
-	}
-
-	/**
-	 * Show css inline for IE
-	 *
-	 * @param string $filename - Full path for a source css file
-	 * @param string $css_path - Path to css without document root, Include timestamp
-	 * @param int $ruleCount - Current css selector count
-	 * @param bool $skipCheck - Skip file check
-	 * @return array - Return array(cnt - current css selector count, content - css content)
-	 */
-	public static function __ShowInlineCssIE($filename, $css_path, $ruleCount, $skipCheck=false)
-	{
-		$res_content = '';
-		if($skipCheck || (file_exists($filename) && filesize($filename) > 0))
-		{
-			$contents = file_get_contents($filename);
-			if($contents != '')
-			{
-				$contents = self::FixCssIncludes($contents, $css_path);
-
-				$ruleCountOld = $ruleCount;
-				$c = self::__GetCssSelectCnt($contents);
-				$ruleCount += $c;
-				if($ruleCount > 4000)
-				{
-					$ruleCount = $c;
-					if($ruleCountOld > 0)
-					{
-						$res_content .= '</style>'."\n".'<style type="text/css">';
-					}
-				}
-				$res_content .= "\n".$contents."\n";
-			}
-		}
-
-		return array('CNT' => $ruleCount, 'CONTENT' => $res_content);
-	}
-
-	static function __GetCssJsTime($css_file)
-	{
-		$qpos = strpos($css_file, '?');
-		if($qpos === false)
-			return false;
-		$qpos++;
-		return substr($css_file, $qpos);
-	}
-
-	static function __GetCssJsPath($src)
-	{
-		if(($p = strpos($src, "?")) > 0 && !self::IsExternalLink($src))
-		{
-			$src = substr($src, 0, $p);
-		}
-		return $src;
-	}
-
-	/**
-	 * Return count of css selectors
-	 *
-	 * @param str $css - Css text
-	 * @return int - Selectors count
-	 */
-	static function __GetCssSelectCnt($css)
-	{
-		$matches = array();
-		$cnt = preg_match_all("#[^,{]+\\s*(?:\\{[^}]*\\}\\s*;?|,)#is", $css, $matches);
-		unset($matches);
-
-		return intval($cnt);
-	}
-
-	static function __ReplaceUrlCSS($url, $cssPath)
-	{
-		if(strpos($url, "://") !== false || strpos($url, "data:") !== false)
-			return $url;
-		$url = trim(stripslashes($url), "'\" \r\n\t");
-		if(substr($url, 0, 1) == "/")
-			return $url;
-		return "'".$cssPath.'/'.$url."'";
 	}
 
 	
@@ -3056,7 +2319,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
-	* </ul> </htm<a name="examples"></a>
+	* </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -3069,6 +2332,7 @@ abstract class CAllMain
 		$this->AddBufferContent(array(&$this, "GetCSS"), $cMaxStylesCnt, $bXhtmlStyle);
 	}
 
+	/** @deprecated $Asset::getInstance->addString($str, $bUnique, $location); */
 	
 	/**
 	* <p>Функция добавляет строку в секцию &lt;head&gt;…&lt;/head&gt; сайта.</p>
@@ -3100,7 +2364,7 @@ abstract class CAllMain
 	* <pre>
 	* Добавим файл стилей <b>style.css</b> из текущего каталога.
 	* 
-	* &lt;?$APPLICATION-&gt;AddHeadString('&lt;link href=".$APPLICATION-&gt;GetCurDir()."style.css";  type="text/css" rel="stylesheet" /&gt;',true)?&gt;
+	* &lt;?$APPLICATION-&gt;AddHeadString('&lt;link href="'.$APPLICATION-&gt;GetCurDir().'"style.css";  type="text/css" rel="stylesheet" /&gt;',true)?&gt;
 	* </pre>
 	*
 	*
@@ -3108,93 +2372,25 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadstring.php
 	* @author Bitrix
 	*/
-	public function AddHeadString($str, $bUnique = false, $location = 'DEFAULT')
+	public function AddHeadString($str, $bUnique = false, $location = AssetLocation::AFTER_JS)
 	{
-		if($location === false)
-		{
-			$location = 'DEFAULT';
-		}
-		elseif($location === true)
-		{
-			$location = 'AFTER_CSS';
-		}
-
-		if($str <> '')
-		{
-			if($bUnique)
-			{
-				$check_sum = md5($str);
-				if($location == 'BEFORE_CSS')
-				{
-					if(!array_key_exists($check_sum, $this->arHeadBeforeCSSStrings))
-					{
-						$this->arHeadBeforeCSSStrings[$check_sum] = $str;
-					}
-				}
-				elseif($location == 'AFTER_CSS')
-				{
-					if(!array_key_exists($check_sum, $this->arHeadAdditionalStrings))
-					{
-						$this->arHeadAdditionalStrings[$check_sum] = $str;
-					}
-				}
-				else
-				{
-					if(!array_key_exists($check_sum, $this->arHeadStrings))
-					{
-						$this->arHeadStrings[$check_sum] = $str;
-					}
-				}
-			}
-			else
-			{
-				if($location == 'BEFORE_CSS')
-				{
-					$this->arHeadBeforeCSSStrings[] = $str;
-				}
-				elseif($location == 'AFTER_CSS')
-				{
-					$this->arHeadAdditionalStrings[] = $str;
-				}
-				else
-				{
-					$this->arHeadStrings[] = $str;
-				}
-			}
-		}
+		$location = Asset::getLocationByName($location);
+		$this->oAsset->addString($str, $bUnique, $location);
 	}
 
-	public function GetHeadStrings($location = 'DEFAULT')
+	public function GetHeadStrings($location = AssetLocation::AFTER_JS_KERNEL)
 	{
-		if($location === false)
+		$location = Asset::getLocationByName($location);
+		if($location === AssetLocation::AFTER_JS_KERNEL)
 		{
-			$location = 'DEFAULT';
-		}
-		elseif($location === true)
-		{
-			$location = 'AFTER_CSS';
-		}
-
-		if($location == 'BEFORE_CSS')
-		{
-			$res = implode("\n", $this->arHeadBeforeCSSStrings);
-		}
-		elseif($location == 'AFTER_CSS')
-		{
-			$res = implode("\n", $this->arHeadAdditionalStrings);
+			$res = $this->oAsset->getJs(1);
 		}
 		else
 		{
-			$res = $this->GetHeadScripts(1);
-			$res .= implode("\n", $this->arHeadStrings);
+			$res = $this->oAsset->getStrings($location);
 		}
 
-		if($res <> '')
-		{
-			$res .= "\n";
-		}
-
-		return $res;
+		return ($res == '' ? '' : $res."\n");
 	}
 
 	
@@ -3246,7 +2442,7 @@ abstract class CAllMain
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	* >Отложенные функции</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php">CMain::AddHeadScript</a></li> </ul>
-	* </htm<a name="examples"></a>
+	* </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -3255,14 +2451,14 @@ abstract class CAllMain
 	*/
 	public function ShowHeadStrings()
 	{
-		if(!$this->bShowHeadString)
+		if(!$this->oAsset->getShowHeadString())
 		{
-			$this->bShowHeadString = true;
-			$this->AddBufferContent(array(&$this, "GetHeadStrings"), 'AFTER_CSS');
+			$this->oAsset->setShowHeadString();
 			$this->AddBufferContent(array(&$this, "GetHeadStrings"), 'DEFAULT');
 		}
 	}
 
+	/** @deprecated use Asset::getInstance()->addJs($src, $additional) */
 	
 	/**
 	* <p>Подключает java скрипты в шаблоне сайта и в шаблоне компонентов. Порядок их включения в страницу и порядок при объединении - соответствует порядку вызовов API. Исключение: в случае объединения вначале сгруппируются скрипты от ядра, а потом выведутся скрипты шаблона и страницы.</p>
@@ -3303,45 +2499,31 @@ abstract class CAllMain
 	*/
 	public function AddHeadScript($src, $additional=false)
 	{
+		$this->oAsset->addJs($src, $additional);
+
 		if($src <> '')
 		{
 			if($additional)
-				$this->arHeadAdditionalScripts[] = self::__GetCssJsPath($src);
+			{
+				$this->arHeadAdditionalScripts[] = Asset::getAssetPath($src);
+			}
 			else
-				$this->arHeadScripts[] = self::__GetCssJsPath($src);
+			{
+				$this->arHeadScripts[] = Asset::getAssetPath($src);
+			}
 		}
 	}
 
+	/** @deprecated use Asset::getInstance()->addBeforeJs($content) */
 	public function AddLangJS($content)
 	{
-		if($content <> '')
-			$this->arLangJS[] = $content;
+		$this->oAsset->addString($content, true, 'AFTER_CSS');
 	}
 
-	public function GetLangJS()
-	{
-		return implode("\n", $this->arLangJS)."\n";
-	}
-
+	/** @deprecated use Asset::getInstance()->addString($content, false, \Bitrix\Main\Page\AssetLocation::AFTER_JS, $mode) */
 	public function AddAdditionalJS($content)
 	{
-		if($content <> '')
-			$this->arAdditionalJS[] = $content;
-	}
-
-	public function GetAdditionalJS()
-	{
-		return implode("\n", $this->arAdditionalJS)."\n";
-	}
-
-	public function IsCSSOptimized()
-	{
-		return (!defined("ADMIN_SECTION") || ADMIN_SECTION !== true) && COption::GetOptionString('main', 'optimize_css_files', 'N') == 'Y' && !$this->bInAjax;
-	}
-
-	public function IsJSOptimized()
-	{
-		return (!defined("ADMIN_SECTION") || ADMIN_SECTION !== true) && COption::GetOptionString('main', 'optimize_js_files', 'N') == 'Y' && !$this->bInAjax;
+		$this->oAsset->addString($content, false, AssetLocation::AFTER_JS);
 	}
 
 	static function IsExternalLink($src)
@@ -3349,424 +2531,54 @@ abstract class CAllMain
 		return (strncmp($src, 'http://', 7) == 0 || strncmp($src, 'https://', 8) == 0 || strncmp($src, '//', 2) == 0);
 	}
 
+	/** @deprecated deprecated use Asset::addCssKernelInfo() */
 	public function AddCSSKernelInfo($module = '', $arCSS = array())
 	{
-		if(empty($module) || empty($arCSS))
-			return;
-
-		if(!array_key_exists($module, $this->arCSSModuleInfo))
-		{
-			$this->arCSSModuleInfo[$module] = array('MODULE_ID' => $module, 'FILES_INFO' => true);
-		}
-
-		foreach($arCSS as $css)
-		{
-			$this->sKernelCSS[$css] = $module;
-		}
+		$this->oAsset->addCssKernelInfo($module, $arCSS);
 	}
 
+	/** @deprecated deprecated use Asset::addJsKernelInfo() */
 	public function AddJSKernelInfo($module = '', $arJS = array())
 	{
-		if(empty($module) || empty($arJS))
-			return;
-
-		if(!array_key_exists($module, $this->arJSModuleInfo))
-		{
-			$this->arJSModuleInfo[$module] = array('MODULE_ID' => $module, 'FILES_INFO' => true, 'BODY' => false);
-		}
-
-		foreach($arJS as $js)
-		{
-			$this->sKernelJS[$js] = $module;
-		}
+		$this->oAsset->addJsKernelInfo($module, $arJS);
 	}
 
+	/** @deprecated use Asset::getInstance()->groupJs($from, $to) */
 	public function GroupModuleJS($from = '', $to = '')
 	{
-		if(empty($from) || empty($to))
-			return;
-
-		if(array_key_exists($from, $this->arJSModuleInfo))
-		{
-			$this->arJSModuleInfo[$from]['MODULE_ID'] = $to;
-		}
-		else
-		{
-			$this->arJSModuleInfo[$from] = array('MODULE_ID' => $to, 'FILES_INFO' => false, 'BODY' => false);
-		}
+		$this->oAsset->groupJs($from, $to);
 	}
 
+	/** @deprecated use Asset::getInstance()->moveJs($module) */
 	public function MoveJSToBody($module = '')
 	{
-		if(empty($module))
-			return;
-
-		if(array_key_exists($module, $this->arJSModuleInfo))
-		{
-			$this->arJSModuleInfo[$module]['BODY'] = true;
-		}
-		else
-		{
-			$this->arJSModuleInfo[$module] = array('MODULE_ID' => $module, 'FILES_INFO' => false, 'BODY' => true);
-		}
+		$this->oAsset->moveJs($module);
 	}
 
+	/** @deprecated use Asset::getInstance()->groupCss($from, $to) */
 	public function GroupModuleCSS($from = '', $to = '')
 	{
-		if(empty($from) || empty($to))
-			return;
-
-		if(array_key_exists($from, $this->arCSSModuleInfo))
-		{
-			$this->arCSSModuleInfo[$from]['MODULE_ID'] = $to;
-		}
-		else
-		{
-			$this->arCSSModuleInfo[$from] = array('MODULE_ID' => $to, 'FILES_INFO' => false);
-		}
+		$this->oAsset->groupCss($from, $to);
 	}
 
+	/** @deprecated use Asset::getInstance()->setUnique($type, $id) */
 	public function SetUniqueCSS($id = '', $cssType = 'page')
 	{
-		$id = preg_replace('#[^a-z0-9_]#i', '', $id);
-		if(empty($id))
-		{
-			return false;
-		}
-
-		$cssType = ($cssType == 'page') ? 'page' : 'template';
-		$this->cssPackInfo[$cssType] = $id;
+		$cssType = (($cssType == 'page') ? 'PAGE' : 'TEMPLATE');
+		$this->oAsset->setUnique($cssType, $id);
 		return true;
 	}
 
-	public function SetUniqueJS($id = '', $jsType = 'page')
+	/** @deprecated */
+	public static function SetUniqueJS($id = '', $jsType = 'page')
 	{
-		$id = preg_replace('#[^a-z0-9_]#i', '', $id);
-		if(empty($id))
-		{
-			return false;
-		}
-
-		$jsType = ($jsType == 'page') ? 'page' : 'template';
-		$this->jsPackInfo[$jsType] = $id;
 		return true;
 	}
 
-	public function IsKernelJS($src)
-	{
-		if(array_key_exists($src, $this->sKernelJS))
-		{
-			return array(
-				'MODULE_ID' => $this->arJSModuleInfo[$this->sKernelJS[$src]]['MODULE_ID'],
-				'BODY' => $this->arJSModuleInfo[$this->arJSModuleInfo[$this->sKernelJS[$src]]['MODULE_ID']]['BODY'],
-				'FILES_INFO' => $this->arJSModuleInfo[$this->sKernelJS[$src]]['FILES_INFO'],
-				'IS_KERNEL' => true
-			);
-		}
-		else
-		{
-			$arTmp = explode('/', $src);
-			$moduleID = $arTmp['3'];
-			unset($arTmp);
-
-			if(empty($moduleID))
-			{
-				return array('MODULE_ID' => false, 'BODY' => false, 'FILES_INFO' => false, 'IS_KERNEL' => false);
-			}
-			elseif(array_key_exists($moduleID, $this->arJSModuleInfo))
-			{
-				if($this->arJSModuleInfo[$moduleID]['FILES_INFO'])
-				{
-					return array('MODULE_ID' => $this->arJSModuleInfo[$moduleID]['MODULE_ID'], 'BODY' => false, 'FILES_INFO' => false, 'IS_KERNEL' => false);
-				}
-				else
-				{
-					return array(
-						'MODULE_ID' => $this->arJSModuleInfo[$moduleID]['MODULE_ID'],
-						'BODY' => $this->arJSModuleInfo[$this->arJSModuleInfo[$moduleID]['MODULE_ID']]['BODY'],
-						'FILES_INFO' => $this->arJSModuleInfo[$moduleID]['FILES_INFO'],
-						'IS_KERNEL' => true
-					);
-				}
-			}
-
-			return array('MODULE_ID' => $moduleID, 'BODY' => false, 'FILES_INFO' => false, 'IS_KERNEL' => true);
-		}
-	}
-
-	public function IsKernelCSS($src)
-	{
-		if(array_key_exists($src, $this->sKernelCSS))
-		{
-			return $this->arCSSModuleInfo[$this->sKernelCSS[$src]];
-		}
-		else
-		{
-			$arTmp = explode('/', $src);
-			$moduleID = $arTmp['3'];
-			unset($arTmp);
-
-			if(empty($moduleID))
-			{
-				return false;
-			}
-			elseif(array_key_exists($moduleID, $this->arCSSModuleInfo))
-			{
-				if($this->arCSSModuleInfo[$moduleID]['FILES_INFO'])
-				{
-					return false;
-				}
-				else
-				{
-					return $this->arCSSModuleInfo[$moduleID];
-				}
-			}
-
-			return array('MODULE_ID' => $moduleID, 'BODY' => false, 'FILES_INFO' => false);
-		}
-	}
-
+	/** @deprecated use Asset::getInstance()->getJs($type) */
 	public function GetHeadScripts($type = 0)
 	{
-		$type = intval($type);
-		$optimJS = $this->IsJSOptimized();
-
-		static $firstExec = true;
-		static $arJS = array('LANG' => '', 'KERNEL' => '', 'TEMPLATE' => '', 'PAGE' => '', 'BODY' => '');
-
-		if($type == 1 && $this->bShowHeadString && !$this->bShowHeadScript)
-		{
-			$type = 0;
-		}
-
-		if($firstExec)
-		{
-			$additionalJS = array_unique($this->arHeadAdditionalScripts);
-
-			$arBxFile = array('main' => array());
-			$arSrcBxFile = array('main' => array());
-			$arSrcBxNoKernel = array();
-
-			$arTemplateFile = array();
-			$arSrcTemplateFile = array();
-
-			$arPageFile = array();
-			$arSrcPageFile = array();
-
-			$arPageFile = array();
-			$arSrcPageFile = array();
-
-			if($optimJS)
-			{
-				foreach($additionalJS as $jsKey => $jsSrc)
-				{
-					if(!self::IsExternalLink($jsSrc) && !file_exists($_SERVER['DOCUMENT_ROOT'].$jsSrc))
-					{
-						unset($additionalJS[$jsKey]);
-					}
-				}
-
-				$arScripts = $this->arHeadScripts;
-				if(!empty($arScripts) || !empty($additionalJS) || !empty($this->sCssJsFList['CSS']))
-				{
-					CJSCore::Init();
-					//must reinit for CJSCore::Init() can add the script
-					$arScripts = array_unique($this->arHeadScripts);
-				}
-			}
-			else
-			{
-				$arScripts = array_unique(array_merge($this->arHeadScripts, $additionalJS));
-			}
-
-			foreach($arScripts as $jsKey => $src)
-			{
-				$bExternalLink = self::IsExternalLink($src);
-				if($bExternalLink)
-				{
-					$arJS['KERNEL'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
-					continue;
-				}
-				else
-				{
-					if(file_exists($_SERVER['DOCUMENT_ROOT'].$src))
-					{
-						$src = CUtil::GetAdditionalFileURL($src, true);
-					}
-					else
-					{
-						continue;
-					}
-				}
-
-				if($optimJS)
-				{
-					if(strncmp($src, '/bitrix/js/', 11) != 0)
-					{
-						if($jsKey > $this->iHeaderLastJS && ($jsKey <= $this->iWorkAreaLastJS || $this->iWorkAreaLastJS == 0))
-						{
-							$arPageFile[] = $arScripts[$jsKey];
-							$arSrcPageFile[] = $src;
-						}
-						else
-						{
-							$arTemplateFile[] = $arScripts[$jsKey];
-							$arSrcTemplateFile[] = $src;
-						}
-					}
-					else
-					{
-						$moduleInfo = $this->IsKernelJS($arScripts[$jsKey]);
-						if($moduleInfo['IS_KERNEL'])
-						{
-							if($moduleInfo['BODY'] && $this->bShowBodyScript)
-							{
-								$arBxBodyFile[$moduleInfo['MODULE_ID']][] = $arScripts[$jsKey];
-								$arSrcBxBodyFile[$moduleInfo['MODULE_ID']][] = $src;
-							}
-							else
-							{
-								$arBxFile[$moduleInfo['MODULE_ID']][] = $arScripts[$jsKey];
-								$arSrcBxFile[$moduleInfo['MODULE_ID']][] = $src;
-							}
-						}
-						else
-						{
-							if($moduleInfo['MODULE_ID'] != '')
-							{
-								if(!array_key_exists($moduleInfo['MODULE_ID'], $arBxFile))
-								{
-									$arBxFile[$moduleInfo['MODULE_ID']] = array();
-									$arSrcBxFile[$moduleInfo['MODULE_ID']] = array();
-								}
-
-								$arSrcBxNoKernel[$moduleInfo['MODULE_ID']] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
-							}
-							else
-							{
-								$this->AddAdditionalJS('<script type="text/javascript" src="'.$src.'"></script>');
-							}
-						}
-					}
-				}
-				else
-				{
-					if(strncmp($src, '/bitrix/js/', 11) != 0)
-					{
-						$arJS['PAGE'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
-					}
-					else
-					{
-						if(
-							$this->bShowBodyScript
-							&& ($moduleInfo = $this->IsKernelJS($src))
-							&& $moduleInfo['BODY'])
-						{
-							$arJS['BODY'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
-						}
-						else
-						{
-								$arJS['KERNEL'] .= '<script type="text/javascript" src="'.$src.'"></script>'."\n";
-						}
-					}
-				}
-			}
-
-			if(!empty($this->arLangJS))
-			{
-				$arJS['LANG'] .= "<script type=\"text/javascript\">if(!window.BX)window.BX={message:function(mess){if(typeof mess=='object') for(var i in mess) BX.message[i]=mess[i]; return true;}};</script>\n";
-				$arJS['LANG'] .= $this->GetLangJS();
-			}
-
-			if($optimJS)
-			{
-				$site_template = defined("SITE_TEMPLATE_ID") ? SITE_TEMPLATE_ID : '.default';
-				foreach($arBxFile as $moduleID => $arJsFiles)
-				{
-					if(!empty($arJsFiles))
-					{
-						$arJS['KERNEL'] .= $this->__OptimizeCssJs($arJsFiles, $arSrcBxFile[$moduleID], $site_template, true, 'kernel_'.$moduleID, 'js');
-					}
-
-					if(array_key_exists($moduleID, $arSrcBxNoKernel))
-					{
-						$arJS['KERNEL'] .= $arSrcBxNoKernel[$moduleID];
-					}
-				}
-
-				if(!empty($this->sCssJsFList['CSS']))
-				{
-					$arJS['KERNEL'] .= '<script type="text/javascript">'."BX.setCSSList(['".implode("','", $this->sCssJsFList['CSS'])."']); </script>\n";
-				}
-				if(!empty($this->sCssJsFList['JS']))
-				{
-					$arJS['KERNEL'] .= '<script type="text/javascript">'."BX.setJSList(['".implode("','", $this->sCssJsFList['JS'])."']); </script>\n";
-				}
-
-				foreach($arBxBodyFile as $moduleID => $arJsFiles)
-				{
-					$arJS['BODY'] .= $this->__OptimizeCssJs($arJsFiles, $arSrcBxBodyFile[$moduleID], $site_template, true, 'kernel_'.$moduleID, 'js');
-				}
-
-				$arTemplateFile = array_merge($arTemplateFile, $additionalJS);
-				foreach($additionalJS as $key => $js)
-				{
-					$additionalJS[$key] = CUtil::GetAdditionalFileURL($js);
-				}
-				$arSrcTemplateFile  = array_merge($arSrcTemplateFile, $additionalJS);
-
-				if(array_key_exists('template', $this->jsPackInfo) && !empty($this->jsPackInfo['template']))
-				{
-					$templateUnique = true;
-					$templateSuffix = 'template_'.$this->jsPackInfo['template'];
-				}
-				else
-				{
-					$templateUnique = false;
-					$templateSuffix = 'template';
-				}
-
-				$arJS['TEMPLATE'] .= $this->__OptimizeCssJs($arTemplateFile, $arSrcTemplateFile, $site_template, $templateUnique, $templateSuffix, 'js');
-
-				if(array_key_exists('page', $this->jsPackInfo) && !empty($this->jsPackInfo['page']))
-				{
-					$pageUnique = true;
-					$pageSuffix = 'page_'.$this->jsPackInfo['page'];
-				}
-				else
-				{
-					$pageUnique = false;
-					$pageSuffix = 'page';
-				}
-
-				$arJS['PAGE'] .= $this->__OptimizeCssJs($arPageFile, $arSrcPageFile, $site_template, $pageUnique, $pageSuffix, 'js');
-			}
-
-			$arJS['KERNEL'] .= "\n".$this->GetAdditionalJS();
-			$firstExec = false;
-		}
-
-		switch ($type)
-		{
-			case 1:
-				$res = $arJS['LANG']."\n".$arJS['KERNEL'];
-				break;
-			case 2:
-				$res = $arJS['TEMPLATE']."\n".$arJS['PAGE'];
-				break;
-			case 3:
-				$res = $arJS['BODY'];
-				break;
-			default:
-				$res = $arJS['LANG']."\n".$arJS['KERNEL']."\n".$arJS['TEMPLATE']."\n".$arJS['PAGE'];
-				break;
-		}
-		$res = trim($res);
-		if($res <> '')
-		{
-			$res .= "\n";
-		}
-		return $res;
+		return $this->oAsset->getJs($type);
 	}
 
 	
@@ -3791,13 +2603,13 @@ abstract class CAllMain
 	*/
 	public function ShowHeadScripts()
 	{
-		$this->bShowHeadScript = true;
+		$this->oAsset->setShowHeadScript();
 		$this->AddBufferContent(array(&$this, "GetHeadScripts"), 2);
 	}
 
 	public function ShowBodyScripts()
 	{
-		$this->bShowBodyScript = true;
+		$this->oAsset->setShowBodyScript();
 		$this->AddBufferContent(array(&$this, "GetHeadScripts"), 3);
 	}
 
@@ -3845,21 +2657,15 @@ abstract class CAllMain
 	public function ShowAjaxHead($bXhtmlStyle = true, $showCSS = true, $showStrings = true, $showScripts = true)
 	{
 		$this->RestartBuffer();
-
 		$this->sPath2css = array();
-		$this->arAdditionalJS = array();
 		$this->arHeadAdditionalCSS = array();
 		$this->arHeadAdditionalStrings = array();
 		$this->arHeadAdditionalScripts = array();
 		$this->arHeadScripts = array();
 		$this->arHeadStrings = array();
-		$this->arLangJS = array();
-		$this->iHeaderLastCSS = 0;
-		$this->iHeaderLastJS = 0;
-		$this->iWorkAreaLastCSS = 0;
-		$this->iWorkAreaLastJS = 0;
-
 		$this->bInAjax = true;
+
+		$this->oAsset = $this->oAsset->setAjax();
 
 		if($showCSS === true)
 		{
@@ -4408,7 +3214,9 @@ abstract class CAllMain
 				if($arParams['AJAX_MODE'] == 'Y')
 					$obAjax = new CComponentAjax($componentName, $componentTemplate, $arParams, $parentComponent);
 
+				$this->__componentStack[] = $component;
 				$result = $component->IncludeComponent($componentTemplate, $arParams, $parentComponent);
+				array_pop($this->__componentStack);
 			}
 
 			if($bDrawIcons)
@@ -4432,6 +3240,17 @@ abstract class CAllMain
 
 
 		return $result;
+	}
+
+	/**
+	 * Returns false or instance of current component being executed.
+	 *
+	 * @return boolean|CBitrixComponent
+	 *
+	 */
+	public function getCurrentIncludedComponent()
+	{
+		return end($this->__componentStack);
 	}
 
 	
@@ -4488,7 +3307,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку в одну строку и передать в <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов.</p>
+	* <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку и передать в <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов.</p>
 	*
 	*
 	*
@@ -4755,12 +3574,12 @@ abstract class CAllMain
 		if(substr($rel_path, 0, 1)!="/")
 		{
 			$bComponent = true;
-			$path = BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/".$rel_path;
-			if(!file_exists($_SERVER["DOCUMENT_ROOT"].$path))
+			$path = getLocalPath("templates/".SITE_TEMPLATE_ID."/".$rel_path, BX_PERSONAL_ROOT);
+			if($path === false)
 			{
 				$sType = "DEFAULT";
-				$path = BX_PERSONAL_ROOT."/templates/.default/".$rel_path;
-				if(!file_exists($_SERVER["DOCUMENT_ROOT"].$path))
+				$path = getLocalPath("templates/.default/".$rel_path, BX_PERSONAL_ROOT);
+				if($path === false)
 				{
 					$path = BX_PERSONAL_ROOT."/templates/".SITE_TEMPLATE_ID."/".$rel_path;
 					$module_id = substr($rel_path, 0, strpos($rel_path, "/"));
@@ -4778,7 +3597,9 @@ abstract class CAllMain
 			}
 		}
 		else
+		{
 			$path = $rel_path;
+		}
 
 		if($arFunctionParams["WORKFLOW"] && !IsModuleInstalled("workflow"))
 			$arFunctionParams["WORKFLOW"] = false;
@@ -5015,7 +3836,6 @@ abstract class CAllMain
 	* &lt;?
 	* <b>$APPLICATION-&gt;AddChainItem</b>("Форум &amp;quot;Отзывы&amp;quot;", "/ru/forum/list.php?FID=3");
 	* ?&gt;
-	* </h
 	* </pre>
 	*
 	*
@@ -5024,7 +3844,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927"
 	* >Навигационная цепочка</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul> </htm<a
 	* name="examples"></a>
 	*
 	*
@@ -5085,7 +3905,7 @@ abstract class CAllMain
 	* >Навигационная цепочка</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> </ul>
-	* <br><br>
+	* </htm<br><br>
 	*
 	*
 	* @static
@@ -6140,7 +4960,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfilecontent.php">CMain::GetFileContent</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforechangefile.php">Событие
 	* "OnChangeFile"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul></bod<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -6872,6 +5692,59 @@ abstract class CAllMain
 		return $right;
 	}
 
+	public static function GetUserRightArray($module_id, $arGroups = false)
+	{
+		global $DB, $USER;
+		$err_mess = (CAllMain::err_mess())."<br>Function: GetUserRightArray<br>Line: ";
+		$arRes = array();
+
+		if (is_array($arGroups))
+		{
+			foreach($arGroups as $key => $groupIdTmp)
+			{
+				if (intval($groupIdTmp) <= 0)
+				{
+					unset($arGroups[$key]);
+				}
+			}
+
+			if (!empty($arGroups))
+			{
+				$groups = '';
+				foreach($arGroups as $grp)
+				{
+					$groups .= ($groups <> '' ? ',' : '').intval($grp);
+				}
+
+				$strSql = "
+					SELECT
+						MG.G_ACCESS G_ACCESS,
+						MG.GROUP_ID,
+						MG.SITE_ID
+					FROM
+						b_module_group MG
+					INNER JOIN b_group G ON (MG.GROUP_ID = G.ID)
+					WHERE
+						MG.MODULE_ID = '".$DB->ForSql($module_id, 50)."'
+					and MG.GROUP_ID in (".$groups.")
+					and G.ACTIVE = 'Y'";
+
+				$t = $DB->Query($strSql, false, $err_mess.__LINE__);
+				while ($tr = $t->Fetch())
+				{
+					if (!isset($arRes[$tr["SITE_ID"]]))
+					{
+						$arRes[$tr["SITE_ID"]] = array();
+					}
+
+					$arRes[(strlen($tr["SITE_ID"]) > 0 ? $tr["SITE_ID"] : "common")][$tr["GROUP_ID"]] = $tr["G_ACCESS"];
+				}
+			}
+		}
+
+		return $arRes;
+	}
+
 	public static function GetGroupRightList($arFilter, $site_id=false)
 	{
 		global $DB;
@@ -7253,20 +6126,41 @@ abstract class CAllMain
 
 	public function StoreCookies()
 	{
+		if(
+			isset($_SESSION['SPREAD_COOKIE'])
+			&& is_array($_SESSION['SPREAD_COOKIE'])
+			&& !empty($_SESSION['SPREAD_COOKIE'])
+		)
+		{
+			$this->arrSPREAD_COOKIE += $_SESSION['SPREAD_COOKIE'];
+		}
 		$_SESSION['SPREAD_COOKIE'] = $this->arrSPREAD_COOKIE;
 	}
 
-	// Returns string with images to spread cookies
-	function GetSpreadCookieHTML()
+	public static function HoldSpreadCookieHTML($bSet = false)
 	{
-		static $showed_already;
+		static $showed_already = false;
+		$result = $showed_already;
+		if ($bSet)
+		{
+			$showed_already = true;
+		}
+		return $result;
+	}
+
+	// Returns string with images to spread cookies
+	public function GetSpreadCookieHTML()
+	{
 		$res = "";
-		if($showed_already!="Y" && COption::GetOptionString("main", "ALLOW_SPREAD_COOKIE", "Y")=="Y")
+		if(
+			!$this->HoldSpreadCookieHTML()
+			&& COption::GetOptionString("main", "ALLOW_SPREAD_COOKIE", "Y") == "Y"
+		)
 		{
 			foreach($this->GetSpreadCookieUrls() as $url)
 			{
 				$res .= "new Image().src='".CUtil::JSEscape($url)."';\n";
-				$showed_already = "Y";
+				$this->HoldSpreadCookieHTML(true);
 			}
 		}
 
@@ -7553,8 +6447,11 @@ abstract class CAllMain
 	{
 		global $USER;
 
-		if(isset($GLOBALS["USER"]) && is_object($USER) && $USER->IsAuthorized() && !isset($_REQUEST["bx_hit_hash"]))
+		$isFrameAjax = Bitrix\Main\Page\Frame::getUseHTMLCache() && Bitrix\Main\Page\Frame::isAjaxRequest();
+		if (isset($GLOBALS["USER"]) && is_object($USER) && $USER->IsAuthorized() && !isset($_REQUEST["bx_hit_hash"]) && !$isFrameAjax)
+		{
 			echo CTopPanel::GetPanelHtml();
+		}
 	}
 
 	
@@ -7603,8 +6500,11 @@ abstract class CAllMain
 	{
 		global $USER;
 
-		if(isset($GLOBALS["USER"]) && is_object($USER) && $USER->IsAuthorized() && !isset($_REQUEST["bx_hit_hash"]))
+		$isFrameAjax = Bitrix\Main\Page\Frame::getUseHTMLCache() && Bitrix\Main\Page\Frame::isAjaxRequest();
+		if (isset($GLOBALS["USER"]) && is_object($USER) && $USER->IsAuthorized() && !isset($_REQUEST["bx_hit_hash"]) && !$isFrameAjax)
 		{
+			$this->showPanelWasInvoked = true;
+
 			class_exists('CTopPanel'); //http://bugs.php.net/bug.php?id=47948
 			AddEventHandler('main', 'OnBeforeEndBufferContent', array('CTopPanel', 'InitPanel'));
 			$this->AddBufferContent(array('CTopPanel', 'GetPanelHtml'));
@@ -7746,7 +6646,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> </ul> </htm<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> </ul> </ht<a
 	* name="examples"></a>
 	*
 	*
@@ -7783,8 +6683,8 @@ abstract class CAllMain
 
 	public function RestartBuffer()
 	{
-		$this->bShowHeadString = false;
-		$this->bShowHeadScript = false;
+		$this->oAsset->setShowHeadString(false);
+		$this->oAsset->setShowHeadScript(false);
 		$this->buffer_man = true;
 		ob_end_clean();
 		$this->buffer_man = false;
@@ -7827,14 +6727,25 @@ abstract class CAllMain
 			return '';
 		}
 
+		Frame::checkAdminPanel();
+
 		if(function_exists("getmoduleevents"))
 		{
 			foreach(GetModuleEvents("main", "OnBeforeEndBufferContent", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array());
 		}
 
-		$this->AddLangJS(CJSCore::GetCoreMessagesScript());
-		$this->AddAdditionalJS($this->GetSpreadCookieHTML());
+		if (Frame::getUseAppCache())
+		{
+			Asset::getInstance()->addString(CJSCore::GetCoreMessagesScript(), false, AssetLocation::AFTER_CSS, AssetMode::ALL);
+		}
+		else
+		{
+			Asset::getInstance()->addString(CJSCore::GetCoreMessagesScript(), false, AssetLocation::AFTER_CSS, AssetMode::STANDARD);
+			Asset::getInstance()->addString(CJSCore::GetCoreMessagesScript(true), false, AssetLocation::AFTER_CSS, AssetMode::COMPOSITE);
+		}
+
+		Asset::getInstance()->addString($this->GetSpreadCookieHTML(), false, AssetLocation::AFTER_JS, AssetMode::STANDARD);
 
 		if(is_object($GLOBALS["APPLICATION"])) //php 5.1.6 fix: http://bugs.php.net/bug.php?id=40104
 		{
@@ -7843,6 +6754,9 @@ abstract class CAllMain
 				$this->buffer_content[$i*2+1] = call_user_func_array($this->buffer_content_type[$i]["F"], $this->buffer_content_type[$i]["P"]);
 		}
 
+		$composite = Frame::getInstance();
+		$compositeContent = $composite->startBuffering($content);
+
 		$content = implode('', $this->buffer_content).$content;
 
 		if(function_exists("getmoduleevents"))
@@ -7850,6 +6764,8 @@ abstract class CAllMain
 			foreach(GetModuleEvents("main", "OnEndBufferContent", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array(&$content));
 		}
+
+		$composite->endBuffering($content, $compositeContent);
 
 		return $content;
 	}
@@ -7989,7 +6905,7 @@ abstract class CAllMain
 	*
 	*
 	*
-	* @param string $charset_in  Исходная кодировка </ht
+	* @param string $charset_in  Исходная кодировка </h
 	*
 	*
 	*
@@ -8035,7 +6951,7 @@ abstract class CAllMain
 	*
 	*
 	*
-	* @param string $charset_from  Исходная кодировка </ht
+	* @param string $charset_from  Исходная кодировка </h
 	*
 	*
 	*
@@ -8295,14 +7211,24 @@ abstract class CAllMain
 
 		if (defined("BX_CHECK_SHORT_URI") && BX_CHECK_SHORT_URI)
 		{
-			if ($arUri = CBXShortUri::GetUri($_SERVER["REQUEST_URI"]))
+			if ($arUri = CBXShortUri::GetUri(Bitrix\Main\Context::getCurrent()->getRequest()->getDecodedUri()))
 			{
 				CBXShortUri::SetLastUsed($arUri["ID"]);
 				if (CModule::IncludeModule("statistic"))
+				{
 					CStatEvent::AddCurrent("short_uri_redirect", "", "", "", "", $arUri["URI"], "N", SITE_ID);
+				}
 				LocalRedirect($arUri["URI"], true, CBXShortUri::GetHttpStatusCodeText($arUri["STATUS"]));
 				die();
 			}
+		}
+
+		if(COption::GetOptionString("main", "buffer_content", "Y")=="Y" && (!defined("BX_BUFFER_USED") || BX_BUFFER_USED!==true))
+		{
+			ob_start(array(&$APPLICATION, "EndBufferContent"));
+			$APPLICATION->buffered = true;
+			// define("BX_BUFFER_USED", true);
+			register_shutdown_function(create_function('', '// define("BX_BUFFER_SHUTDOWN", true); while(@ob_end_flush());'));
 		}
 
 		//session expander
@@ -8312,9 +7238,13 @@ abstract class CAllMain
 
 			$phpSessTimeout = ini_get("session.gc_maxlifetime");
 			if($arPolicy["SESSION_TIMEOUT"] > 0)
+			{
 				$sessTimeout = min($arPolicy["SESSION_TIMEOUT"]*60, $phpSessTimeout);
+			}
 			else
+			{
 				$sessTimeout = $phpSessTimeout;
+			}
 
 			$cookie_prefix = COption::GetOptionString('main', 'cookie_name', 'BITRIX_SM');
 			$salt = $_COOKIE[$cookie_prefix.'_UIDH']."|".$_SERVER["REMOTE_ADDR"]."|".@filemtime($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/version.php")."|".LICENSE_KEY."|".CMain::GetServerUniqID();
@@ -8322,7 +7252,7 @@ abstract class CAllMain
 
 			$bShowMess = ($USER->IsAuthorized() && COption::GetOptionString("main", "session_show_message", "Y") <> "N");
 
-			CUtil::InitJSCore(array('ajax'));
+			CUtil::InitJSCore(array('ajax', 'ls'));
 
 			$jsMsg = '<script type="text/javascript">'."\n".
 				($bShowMess? 'bxSession.mess.messSessExpired = \''.CUtil::JSEscape(GetMessage("MAIN_SESS_MESS", array("#TIMEOUT#"=>round($sessTimeout/60)))).'\';'."\n" : '').
@@ -8334,12 +7264,16 @@ abstract class CAllMain
 
 			$_SESSION["BX_SESSION_COUNTER"] = intval($_SESSION["BX_SESSION_COUNTER"]) + 1;
 			if(!defined("BX_SKIP_SESSION_TERMINATE_TIME"))
+			{
 				$_SESSION["BX_SESSION_TERMINATE_TIME"] = time()+$sessTimeout;
+			}
 		}
 
 		//user auto time zone via js cookies
 		if(CTimeZone::Enabled() && (!defined("BX_SKIP_TIMEZONE_COOKIE") || BX_SKIP_TIMEZONE_COOKIE === false))
+		{
 			CTimeZone::SetAutoCookie();
+		}
 
 		// check user options set via cookie
 		if ($USER->IsAuthorized())
@@ -8351,16 +7285,10 @@ abstract class CAllMain
 			}
 		}
 
-		if(COption::GetOptionString("main", "buffer_content", "Y")=="Y" && (!defined("BX_BUFFER_USED") || BX_BUFFER_USED!==true))
-		{
-			ob_start(array(&$APPLICATION, "EndBufferContent"));
-			$APPLICATION->buffered = true;
-			// define("BX_BUFFER_USED", true);
-			register_shutdown_function(create_function('', 'while(@ob_end_flush());'));
-		}
-
 		foreach(GetModuleEvents("main", "OnProlog", true) as $arEvent)
+		{
 			ExecuteModuleEventEx($arEvent);
+		}
 	}
 
 	public static function EpilogActions()
@@ -8429,6 +7357,15 @@ abstract class CAllMain
 		$DBPassword = $DB->DBPassword;
 		$DB = new CDatabase;
 		$DB->Connect($DBHost, $DBName, $DBLogin, $DBPassword);
+
+		$app = \Bitrix\Main\Application::getInstance();
+		if ($app != null)
+		{
+			$con = $app->getConnection();
+			if ($con != null)
+				$con->connect();
+		}
+
 		$DB->DoConnect();
 		$DB->StartUsingMasterOnly();
 		foreach($arFunctions as $action)
@@ -8522,7 +7459,7 @@ class CAllSite
 	* $arIBlockElement = false;
 	* $arIBlockElement = GetIBlockElement($ID);
 	* echo $arIBlockElement['NAME'].'<br>';
-	* if ( !CSite::InGroup( (array(3) ):
+	* if ( !CSite::InGroup (array(3) ) ):
 	* echo $arIBlockElement['DETAIL_TEXT'].'<br>';
 	* echo ShowImage($arIBlockElement['DETAIL_PICTURE'], 150, 150, 'border="0"', '', true);
 	* endif;
@@ -8776,6 +7713,11 @@ class CAllSite
 			$this->LAST_ERROR .= GetMessage("BAD_SITE_LID")." ";
 			$arMsg[] = array("id"=>"LID", "text"=> GetMessage("BAD_SITE_LID"));
 		}
+		if(isset($arFields["LID"]) && preg_match("/[^a-z0-9_]/i", $arFields["LID"]))
+		{
+			$this->LAST_ERROR .= GetMessage("MAIN_SITE_LATIN")." ";
+			$arMsg[] = array("id"=>"LID", "text"=> GetMessage("MAIN_SITE_LATIN"));
+		}
 		if(isset($arFields["DIR"]) && $arFields["DIR"] == '')
 		{
 			$this->LAST_ERROR .= GetMessage("BAD_LANG_DIR")." ";
@@ -8893,7 +7835,7 @@ class CAllSite
 		$domains = str_replace("\r", "\n", $domains);
 		$arDomains = explode("\n", $domains);
 		for($i=0, $n=count($arDomains); $i<$n; $i++)
-			$arDomains[$i] = preg_replace("#^(http://|https://)#", "", trim(strtolower($arDomains[$i])));
+			$arDomains[$i] = preg_replace("#^(http://|https://)#", "", rtrim(trim(strtolower($arDomains[$i])), "/"));
 		$arDomains = array_unique($arDomains);
 
 		$bIsDomain = false;
@@ -9676,6 +8618,7 @@ class CAllSite
 		return array(
 			'#NAME# #LAST_NAME#' => GetMessage('MAIN_NAME_JOHN_SMITH'),
 			'#LAST_NAME# #NAME#' => GetMessage('MAIN_NAME_SMITH_JOHN'),
+			'#TITLE# #LAST_NAME#' => GetMessage("MAIN_NAME_MR_SMITH"),
 			'#NAME# #SECOND_NAME_SHORT# #LAST_NAME#' => GetMessage('MAIN_NAME_JOHN_L_SMITH'),
 			'#LAST_NAME# #NAME# #SECOND_NAME#' => GetMessage('MAIN_NAME_SMITH_JOHN_LLOYD'),
 			'#LAST_NAME#, #NAME# #SECOND_NAME#' => GetMessage('MAIN_NAME_SMITH_COMMA_JOHN_LLOYD'),
@@ -9687,22 +8630,6 @@ class CAllSite
 			'#LAST_NAME#, #NAME_SHORT#' => GetMessage('MAIN_NAME_SMITH_COMMA_J'),
 			'#LAST_NAME#, #NAME_SHORT# #SECOND_NAME_SHORT#' => GetMessage('MAIN_NAME_SMITH_COMMA_J_L')
 		);
-	}
-
-	public static function GetNameFormatByValue($sValue)
-	{
-		$arNameTemplates = self::GetNameTemplates();
-
-		foreach ($arNameTemplates as $sFormat => $sName)
-		{
-			if ($sValue == $sName)
-				return $sFormat;
-		}
-
-		if ($sValue == GetMessage("MAIN_FORMAT_NAME_NOT_SET"))
-			return "";
-		else
-			return self::GetDefaultNameFormat();
 	}
 
 	/**
@@ -9783,47 +8710,11 @@ class CAllSite
 	* Returns default name template
 	* By default: Russian #LAST_NAME# #NAME#, English #NAME# #LAST_NAME#
 	*
-	* @param string $sLangId - language id, if we need to get value for specific language
 	* @return string - one of two possible default values
 	*/
-	public static function GetDefaultNameFormat($sLangId = "")
+	public static function GetDefaultNameFormat()
 	{
 		return '#NAME# #LAST_NAME#';
-	}
-
-	public static function SelectBoxName($sFieldName, $sValue, $sDefaultValue="", $sFuncName="", $field="class=\"typeselect\"")
-	{
-		$arNameTemplates = self::GetNameTemplates();
-
-		if (empty($sValue))
-			$arNameTemplates["0"] = GetMessage("MAIN_FORMAT_NAME_NOT_SET");
-
-		$s = '<select name="'.$sFieldName.'" '.$field;
-		$s1 = '';
-		if(strlen($sFuncName)>0) $s .= ' OnChange="'.$sFuncName.'"';
-		$s .= '>'."\n";
-		$found = false;
-
-		if (defined('FORMAT_NAME'))
-		{
-			$s1 .= '<option value="constant" selected>'.CUser::FormatName(FORMAT_NAME,
-				array("NAME"		=>	GetMessage("MAIN_NAME_JOHN"),
-					"LAST_NAME"		=>	GetMessage("MAIN_NAME_SMITH"),
-					"SECOND_NAME"	=>	GetMessage("MAIN_NAME_LLOYD")), false).' '.GetMessage("MAIN_NAME_DEFINED_IN_DBCONN").'</option>';
-		}
-		else
-		{
-			foreach ($arNameTemplates as $template => $value)
-			{
-				$found = ($template == $sValue);
-				$s1 .= '<option value="'.$value.'"'.($found ? ' selected':'').'>'.htmlspecialcharsex($value).'</option>'."\n";
-			}
-
-			if(strlen($sDefaultValue)>0)
-				$s .= "<option value='NOT_REF' ".($found ? "" : "selected").">".htmlspecialcharsex($sDefaultValue)."</option>";
-		}
-
-		return $s.$s1.'</select>';
 	}
 }
 
@@ -10304,6 +9195,7 @@ class CAllLanguage
 	* if (<b>CLanguage::Delete</b>("en")) 
 	*   echo "Язык успешно удален.";
 	* ?&gt;
+	* </htm
 	* </pre>
 	*
 	*
@@ -10357,7 +9249,7 @@ class CAllLanguage
 	*
 	*
 	*
-	* @param string $name  Имя выпадающего списка:<br> &lt;select name="<i>name</i>" ...&gt;
+	* @param string $name  Имя выпадающего списка:<br> &lt;select name="<i>name</i>" ...&gt; </ht
 	*
 	*
 	*
@@ -10393,7 +9285,7 @@ class CAllLanguage
 	*     &lt;td&gt;Язык:&lt;/td&gt;
 	*     &lt;td&gt;&lt;?=<b>CLanguage::SelectBox</b>("LANGUAGE", LANGUAGE_ID)?&gt;&lt;/td&gt;
 	*   &lt;/tr&gt;
-	* &lt;/table&gt;</bod
+	* &lt;/table&gt;</b
 	* </pre>
 	*
 	*
@@ -10822,9 +9714,10 @@ class CCaptchaAgent
 
 class CDebugInfo
 {
-	var $start_time, $cnt_query, $query_time;
+	var $start_time;
+	/** @var \Bitrix\Main\Diag\SqlTracker */
+	var $savedTracker = null;
 	var $cache_size = 0;
-	var $arQueryDebugSave;
 	var $arCacheDebugSave;
 	var $arResult;
 	static $level = 0;
@@ -10851,13 +9744,14 @@ class CDebugInfo
 		$this->start_time = getmicrotime();
 		if($DB->ShowSqlStat)
 		{
-			$this->cnt_query = $DB->cntQuery;
-			$DB->cntQuery = 0;
-			$this->query_time = $DB->timeQuery;
-			$DB->timeQuery = 0;
-			$this->arQueryDebugSave = $DB->arQueryDebug;
-			$DB->arQueryDebug = array();
+			$application = \Bitrix\Main\Application::getInstance();
+			$connection  = $application->getConnection();
+			$this->savedTracker = $application->getConnection()->getTracker();
+			$connection->setTracker(null);
+			$connection->startTracker();
+			$DB->sqlTracker = $connection->getTracker();
 		}
+
 		if(\Bitrix\Main\Data\Cache::getShowCacheStat())
 		{
 			$this->arCacheDebugSave = \Bitrix\Main\Diag\CacheTracker::getCacheTracking();
@@ -10895,18 +9789,24 @@ class CDebugInfo
 			"LEVEL" => self::$level,
 		);
 
-		if($DB->ShowSqlStat)
+		if($this->savedTracker)
 		{
-			if($DB->cntQuery)
+			$application = \Bitrix\Main\Application::getInstance();
+			$connection  = $application->getConnection();
+			$sqlTracker  = $connection->getTracker();
+
+			if($sqlTracker->getCounter() > 0)
 			{
-				$this->arResult["QUERY_COUNT"] = $DB->cntQuery;
-				$this->arResult["QUERY_TIME"] = $DB->timeQuery;
-				$this->arResult["QUERIES"] = $DB->arQueryDebug;
+				$this->arResult["QUERY_COUNT"] = $sqlTracker->getCounter();
+				$this->arResult["QUERY_TIME"] = $sqlTracker->getTime();
+				$this->arResult["QUERIES"] = $sqlTracker->getQueries();
 			}
-			$DB->arQueryDebug = $this->arQueryDebugSave;
-			$DB->cntQuery = $this->cnt_query;
-			$DB->timeQuery = $this->query_time;
+
+			$connection->setTracker($this->savedTracker);
+			$DB->sqlTracker = $connection->getTracker();
+			$this->savedTracker = null;
 		}
+
 		if(\Bitrix\Main\Data\Cache::getShowCacheStat())
 		{
 			$this->arResult["CACHE"] = \Bitrix\Main\Diag\CacheTracker::getCacheTracking();

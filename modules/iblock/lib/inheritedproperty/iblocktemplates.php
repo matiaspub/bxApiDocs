@@ -9,11 +9,11 @@ namespace Bitrix\Iblock\InheritedProperty;
 class IblockTemplates extends BaseTemplate
 {
 	/**
-	 * @param integer $iblock_id Identifier of the iblock.
+	 * @param integer $iblockId Identifier of the iblock.
 	 */
-	public static function __construct($iblock_id)
+	public static function __construct($iblockId)
 	{
-		$entity = new IblockValues($iblock_id);
+		$entity = new IblockValues($iblockId);
 		parent::__construct($entity);
 	}
 }

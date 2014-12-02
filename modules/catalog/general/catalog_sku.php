@@ -1,9 +1,10 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
 
 
 /**
- * Это вспомогательный класс для получения информации об инфоблоках, свойствах и элементах инфоблоков, относящихся к SKU.
+ * Это вспомогательный класс для получения информации об инфоблоках, свойствах и элементах инфоблоков, относящихся к SKU.</body> </html>
  *
  *
  *
@@ -28,14 +29,14 @@ class CAllCatalogSKU
 
 	static public function GetCatalogTypes($boolFull = false)
 	{
-		$boolFull = (true == $boolFull);
+		$boolFull = ($boolFull === true);
 		if ($boolFull)
 		{
 			return array(
-				self::TYPE_CATALOG => GetMessage('BT_CAT_SKU_TYPE_CATALOG'),
-				self::TYPE_PRODUCT => GetMessage('BT_CAT_SKU_TYPE_PRODUCT'),
-				self::TYPE_OFFERS => GetMessage('BT_CAT_SKU_TYPE_OFFERS'),
-				self::TYPE_FULL => GetMessage('BT_CAT_SKU_TYPE_FULL')
+				self::TYPE_CATALOG => Loc::getMessage('BT_CAT_SKU_TYPE_CATALOG'),
+				self::TYPE_PRODUCT => Loc::getMessage('BT_CAT_SKU_TYPE_PRODUCT'),
+				self::TYPE_OFFERS => Loc::getMessage('BT_CAT_SKU_TYPE_OFFERS'),
+				self::TYPE_FULL => Loc::getMessage('BT_CAT_SKU_TYPE_FULL')
 			);
 		}
 		return array(
@@ -89,16 +90,16 @@ class CAllCatalogSKU
 	*/
 	static public function GetProductInfo($intOfferID, $intIBlockID = 0)
 	{
-		$intOfferID = intval($intOfferID);
-		if (0 >= $intOfferID)
+		$intOfferID = (int)$intOfferID;
+		if ($intOfferID <= 0)
 			return false;
 
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0)
 		{
-			$intIBlockID = intval(CIBlockElement::GetIBlockByID($intOfferID));
+			$intIBlockID = (int)CIBlockElement::GetIBlockByID($intOfferID);
 		}
-		if (0 >= $intIBlockID)
+		if ($intIBlockID <= 0)
 			return false;
 
 		if (!isset(self::$arOfferCache[$intIBlockID]))
@@ -120,8 +121,8 @@ class CAllCatalogSKU
 		);
 		if ($arItem = $rsItems->Fetch())
 		{
-			$arItem['VALUE'] = intval($arItem['VALUE']);
-			if (0 < $arItem['VALUE'])
+			$arItem['VALUE'] = (int)$arItem['VALUE'];
+			if ($arItem['VALUE'] > 0)
 			{
 				return array(
 					'ID' => $arItem['VALUE'],
@@ -195,12 +196,13 @@ class CAllCatalogSKU
 	*/
 	static public function GetInfoByOfferIBlock($intIBlockID)
 	{
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0)
 			return false;
 
 		if (!isset(self::$arOfferCache[$intIBlockID]))
 		{
+			self::$arOfferCache[$intIBlockID] = false;
 			$rsOffers = CCatalog::GetList(
 				array(),
 				array('IBLOCK_ID' => $intIBlockID, '!PRODUCT_IBLOCK_ID' => 0),
@@ -211,11 +213,11 @@ class CAllCatalogSKU
 			$arResult = $rsOffers->Fetch();
 			if (!empty($arResult))
 			{
-				$arResult['IBLOCK_ID'] = intval($arResult['IBLOCK_ID']);
-				$arResult['PRODUCT_IBLOCK_ID'] = intval($arResult['PRODUCT_IBLOCK_ID']);
-				$arResult['SKU_PROPERTY_ID'] = intval($arResult['SKU_PROPERTY_ID']);
+				$arResult['IBLOCK_ID'] = (int)$arResult['IBLOCK_ID'];
+				$arResult['PRODUCT_IBLOCK_ID'] = (int)$arResult['PRODUCT_IBLOCK_ID'];
+				$arResult['SKU_PROPERTY_ID'] = (int)$arResult['SKU_PROPERTY_ID'];
+				self::$arOfferCache[$intIBlockID] = $arResult;
 			}
-			self::$arOfferCache[$intIBlockID] = $arResult;
 		}
 		else
 		{
@@ -267,11 +269,12 @@ class CAllCatalogSKU
 	*/
 	static public function GetInfoByProductIBlock($intIBlockID)
 	{
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0)
 			return false;
 		if (!isset(self::$arProductCache[$intIBlockID]))
 		{
+			self::$arProductCache[$intIBlockID] = false;
 			$rsProducts = CCatalog::GetList(
 				array(),
 				array('PRODUCT_IBLOCK_ID' => $intIBlockID),
@@ -282,11 +285,11 @@ class CAllCatalogSKU
 			$arResult = $rsProducts->Fetch();
 			if (!empty($arResult))
 			{
-				$arResult['IBLOCK_ID'] = intval($arResult['IBLOCK_ID']);
-				$arResult['PRODUCT_IBLOCK_ID'] = intval($arResult['PRODUCT_IBLOCK_ID']);
-				$arResult['SKU_PROPERTY_ID'] = intval($arResult['SKU_PROPERTY_ID']);
+				$arResult['IBLOCK_ID'] = (int)$arResult['IBLOCK_ID'];
+				$arResult['PRODUCT_IBLOCK_ID'] = (int)$arResult['PRODUCT_IBLOCK_ID'];
+				$arResult['SKU_PROPERTY_ID'] = (int)$arResult['SKU_PROPERTY_ID'];
+				self::$arProductCache[$intIBlockID] = $arResult;
 			}
-			self::$arProductCache[$intIBlockID] = $arResult;
 		}
 		else
 		{
@@ -321,11 +324,12 @@ class CAllCatalogSKU
 	*/
 	static public function GetInfoByLinkProperty($intPropertyID)
 	{
-		$intPropertyID = intval($intPropertyID);
-		if (0 >= $intPropertyID)
+		$intPropertyID = (int)$intPropertyID;
+		if ($intPropertyID <= 0)
 			return false;
 		if (!isset(self::$arPropertyCache[$intPropertyID]))
 		{
+			self::$arPropertyCache[$intPropertyID] = false;
 			$rsProducts = CCatalog::GetList(
 				array(),
 				array('SKU_PROPERTY_ID' => $intPropertyID),
@@ -336,11 +340,11 @@ class CAllCatalogSKU
 			$arResult = $rsProducts->Fetch();
 			if (!empty($arResult))
 			{
-				$arResult['IBLOCK_ID'] = intval($arResult['IBLOCK_ID']);
-				$arResult['PRODUCT_IBLOCK_ID'] = intval($arResult['PRODUCT_IBLOCK_ID']);
-				$arResult['SKU_PROPERTY_ID'] = intval($arResult['SKU_PROPERTY_ID']);
+				$arResult['IBLOCK_ID'] = (int)$arResult['IBLOCK_ID'];
+				$arResult['PRODUCT_IBLOCK_ID'] = (int)$arResult['PRODUCT_IBLOCK_ID'];
+				$arResult['SKU_PROPERTY_ID'] = (int)$arResult['SKU_PROPERTY_ID'];
+				self::$arPropertyCache[$intPropertyID] = $arResult;
 			}
-			self::$arPropertyCache[$intPropertyID] = $arResult;
 		}
 		else
 		{
@@ -379,16 +383,16 @@ class CAllCatalogSKU
 	*/
 	static public function IsExistOffers($intProductID, $intIBlockID = 0)
 	{
-		$intProductID = intval($intProductID);
-		if (0 == $intProductID)
+		$intProductID = (int)$intProductID;
+		if ($intProductID == 0)
 			return false;
 
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0 && $intProductID > 0)
 		{
-			$intIBlockID = intval(CIBlockElement::GetIBlockByID($intProductID));
+			$intIBlockID = (int)CIBlockElement::GetIBlockByID($intProductID);
 		}
-		if (0 >= $intIBlockID)
+		if ($intIBlockID <= 0)
 			return false;
 
 		if (!isset(self::$arProductCache[$intIBlockID]))
@@ -407,7 +411,7 @@ class CAllCatalogSKU
 			array('IBLOCK_ID' => $arSkuInfo['IBLOCK_ID'], '=PROPERTY_'.$arSkuInfo['SKU_PROPERTY_ID'] => $intProductID),
 			array()
 		);
-		return (0 < $intCount);
+		return ($intCount > 0);
 	}
 
 	

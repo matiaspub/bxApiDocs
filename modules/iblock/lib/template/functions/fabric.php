@@ -231,8 +231,8 @@ class FunctionTranslit extends FunctionBase
 	 */
 	public function calculate(array $parameters)
 	{
-		$change_case = false;
-		$replace_char = "";
+		$changeCase = false;
+		$replaceChar = "";
 
 		if (
 			isset($this->data)
@@ -240,8 +240,8 @@ class FunctionTranslit extends FunctionBase
 			&& $this->data["replace_space"] != ""
 		)
 		{
-			$change_case = isset($this->data[""])? $this->data["change_case"]: false;
-			$replace_char = $this->data["replace_space"];
+			$changeCase = isset($this->data[""])? $this->data["change_case"]: false;
+			$replaceChar = $this->data["replace_space"];
 		}
 
 		if (
@@ -250,15 +250,15 @@ class FunctionTranslit extends FunctionBase
 			&& $this->data["change_case"] != ""
 		)
 		{
-			$change_case = $this->data["change_case"];
+			$changeCase = $this->data["change_case"];
 		}
 
 
 		return \CUtil::translit($this->parametersToString($parameters), LANGUAGE_ID, array(
 			//"max_len" => 50,
-			"change_case" => $change_case, // 'L' - toLower, 'U' - toUpper, false - do not change
-			"replace_space" => $replace_char,
-			"replace_other" => $replace_char,
+			"change_case" => $changeCase, // 'L' - toLower, 'U' - toUpper, false - do not change
+			"replace_space" => $replaceChar,
+			"replace_other" => $replaceChar,
 			"delete_repeat_replace" => true,
 		));
 	}
@@ -375,15 +375,28 @@ class FunctionMin extends FunctionBase
 	public function calculate(array $parameters)
 	{
 		$result = $this->parametersToArray($parameters);
-		$min = null;
+		$asFloat = array();
 		foreach ($result as $value)
 		{
-			if ($min === null)
-				$min = $value;
-			elseif (doubleval($min) > doubleval($value))
-				$min = $value;
+			if (!isset($asFloat[$value]))
+			{
+				$floatFalue = doubleval(preg_replace("/[^0-9.]+/", "", $value));
+				$asFloat[$value] = $floatFalue;
+			}
 		}
-		return $min;
+		if (empty($asFloat))
+		{
+			return '';
+		}
+		elseif (count($asFloat) == 1)
+		{
+			return end($result);
+		}
+		else
+		{
+			$min = min($asFloat);
+			return array_search($min, $asFloat);
+		}
 	}
 }
 
@@ -405,15 +418,28 @@ class FunctionMax extends FunctionBase
 	public function calculate(array $parameters)
 	{
 		$result = $this->parametersToArray($parameters);
-		$max = null;
+		$asFloat = array();
 		foreach ($result as $value)
 		{
-			if ($max === null)
-				$max = $value;
-			elseif (doubleval($max) < doubleval($value))
-				$max = $value;
+			if (!isset($asFloat[$value]))
+			{
+				$floatFalue = doubleval(preg_replace("/[^0-9.]+/", "", $value));
+				$asFloat[$value] = $floatFalue;
+			}
 		}
-		return $max;
+		if (empty($asFloat))
+		{
+			return '';
+		}
+		elseif (count($asFloat) == 1)
+		{
+			return end($result);
+		}
+		else
+		{
+			$max = max($asFloat);
+			return array_search($max, $asFloat);
+		}
 	}
 }
 

@@ -3,35 +3,42 @@ IncludeModuleLangFile(__DIR__.'\\store_docs.php');
 
 class CCatalogStoreControlUtil
 {
+	protected static $storeNames = array();
+
 	/** By store ID, returns its title and\or address.
 	 * @param $storeId
 	 * @return string
 	 */
 	public static function getStoreName($storeId)
 	{
-		static $dbStore = '';
-		static $arStores = array();
-		if($storeId <= 0)
+		$storeId = (int)$storeId;
+		if ($storeId <= 0)
 			return '';
 
-		$storeName = '';
-
-		if($dbStore == '')
+		if (!isset(self::$storeNames[$storeId]))
 		{
-			$dbStore = CCatalogStore::GetList(array(), array("ACTIVE" => "Y"));
+			$storeIterator = CCatalogStore::GetList(
+				array(),
+				array('ID' => $storeId),
+				false,
+				false,
+				array('ID', 'ADDRESS', 'TITLE')
+			);
+			$storeName = '';
+			if ($store = $storeIterator->Fetch())
+			{
+				$store['ID'] = (int)$store['ID'];
+				$store['ADDRESS'] = (string)$store['ADDRESS'];
+				$store['TITLE'] = (string)$store['TITLE'];
+				$storeName = ($store['TITLE'] !== '' ? $store['TITLE'].' ('.$store['ADDRESS'].')' : $store['ADDRESS']);
+			}
+			unset($store, $storeIterator);
+			self::$storeNames[$storeId] = $storeName;
 		}
-		if(empty($arStores))
-			while($arStore = $dbStore->Fetch())
-			{
-				$arStores[] = $arStore;
-			}
-
-		foreach($arStores as $arStore)
-			if($arStore["ID"] == $storeId)
-			{
-				$storeName = $arStore["ADDRESS"];
-				$storeName = ($arStore["TITLE"] !== '') ? $arStore["TITLE"]." (".$storeName.") " : $storeName;
-			}
+		else
+		{
+			$storeName = self::$storeNames[$storeId];
+		}
 
 		return $storeName;
 	}
@@ -127,4 +134,40 @@ class CCatalogStoreControlUtil
 		return $DB->Query("SELECT SUM(SP.AMOUNT) as SUM, CP.QUANTITY_RESERVED as RESERVED FROM b_catalog_store_product SP INNER JOIN b_catalog_product CP ON SP.PRODUCT_ID = CP.ID INNER JOIN b_catalog_store CS ON SP.STORE_ID = CS.ID WHERE SP.PRODUCT_ID = ".$productId."  AND CS.ACTIVE = 'Y' GROUP BY QUANTITY_RESERVED ", true);
 	}
 
+	public static function clearStoreName($storeId)
+	{
+		$storeId = (int)$storeId;
+		if ($storeId > 0)
+		{
+			if (isset(self::$storeNames[$storeId]))
+				unset(self::$storeNames[$storeId]);
+		}
+	}
+
+	public static function clearAllStoreNames()
+	{
+		self::$storeNames = array();
+	}
+
+	public static function loadAllStoreNames($active = true)
+	{
+		$active = ($active === true);
+		self::$storeNames = array();
+		$filter = ($active ? array('ACTIVE' => 'Y') : array());
+		$storeIterator = CCatalogStore::GetList(
+			array(),
+			$filter,
+			false,
+			false,
+			array('ID', 'ADDRESS', 'TITLE')
+		);
+		while ($store = $storeIterator->Fetch())
+		{
+			$store['ID'] = (int)$store['ID'];
+			$store['ADDRESS'] = (string)$store['ADDRESS'];
+			$store['TITLE'] = (string)$store['TITLE'];
+			self::$storeNames[$store['ID']] = ($store['TITLE'] !== '' ? $store['TITLE'].' ('.$store['ADDRESS'].')' : $store['ADDRESS']);
+		}
+		unset($store, $storeIterator, $filter);
+	}
 }

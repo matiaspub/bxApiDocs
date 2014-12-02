@@ -6,7 +6,6 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 	static public function Add($arFields, $boolCalc = false)
 	{
 		global $DB;
-		global $stackCacheManager;
 
 		if (!CCatalogDiscountSave::CheckFields("ADD", $arFields))
 			return false;
@@ -83,7 +82,7 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 
 		if (!is_array($arFilter))
 			$arFilter = array();
-		$arFilter['TYPE'] = DISCOUNT_TYPE_SAVE;
+		$arFilter['TYPE'] = self::ENTITY_ID;
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 

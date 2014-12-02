@@ -60,4 +60,3 @@ if(!IsModuleInstalled("compression") && !defined('PUBLIC_AJAX_MODE') && ($_REQUE
 $DB->Disconnect();
 
 CMain::ForkActions();
-?>

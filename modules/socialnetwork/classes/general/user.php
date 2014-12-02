@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.
+ * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.</body> </html>
  *
  *
  *
@@ -127,6 +127,7 @@ class CAllSocNetUser
 			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arRelation["GROUP_ID"]);
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$user_id);
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 				if ($bIM)
 				{
 					CIMNotify::DeleteByTag("SOCNET|INVITE_GROUP|".$user_id."|".intval($arRelation["ID"]));
@@ -328,11 +329,11 @@ class CAllSocNetUser
 	*
 	*
 	*
-	* @param string $lastName  Фамилия пользователя.
+	* @param string $lastName  Фамилия пользователя. </htm
 	*
 	*
 	*
-	* @param string $login  Логин пользователя. </ht
+	* @param string $login  Логин пользователя. </h
 	*
 	*
 	*
@@ -370,15 +371,15 @@ class CAllSocNetUser
 	*
 	*
 	*
-	* @param string $secondName  Отчество пользователя.
+	* @param string $secondName  Отчество пользователя. </htm
 	*
 	*
 	*
-	* @param string $lastName  Фамилия пользователя.
+	* @param string $lastName  Фамилия пользователя. </htm
 	*
 	*
 	*
-	* @param string $login  Логин пользователя </ht
+	* @param string $login  Логин пользователя </h
 	*
 	*
 	*

@@ -9,11 +9,11 @@ namespace Bitrix\Iblock\InheritedProperty;
 class IblockValues extends BaseValues
 {
 	/**
-	 * @param integer $iblock_id Iblock identifier.
+	 * @param integer $iblockId Iblock identifier.
 	 */
-	static public function __construct($iblock_id)
+	static public function __construct($iblockId)
 	{
-		parent::__construct($iblock_id);
+		parent::__construct($iblockId);
 	}
 
 	/**
@@ -43,7 +43,7 @@ class IblockValues extends BaseValues
 	 */
 	public function getId()
 	{
-		return $this->iblock_id;
+		return $this->iblockId;
 	}
 
 	/**
@@ -53,7 +53,7 @@ class IblockValues extends BaseValues
 	 */
 	public function  createTemplateEntity()
 	{
-		return new \Bitrix\Iblock\Template\Entity\Iblock($this->iblock_id);
+		return new \Bitrix\Iblock\Template\Entity\Iblock($this->iblockId);
 	}
 
 	/**
@@ -90,7 +90,7 @@ class IblockValues extends BaseValues
 					b_iblock_iblock_iprop IP
 					INNER JOIN b_iblock_iproperty P ON P.ID = IP.IPROP_ID
 				WHERE
-					IP.IBLOCK_ID = ".$this->iblock_id."
+					IP.IBLOCK_ID = ".$this->iblockId."
 			");
 
 			while ($row = $query->fetch())
@@ -104,7 +104,7 @@ class IblockValues extends BaseValues
 				foreach ($result as $row)
 				{
 					$connection->add("b_iblock_iblock_iprop", array(
-						"IBLOCK_ID" => $this->iblock_id,
+						"IBLOCK_ID" => $this->iblockId,
 						"IPROP_ID" => $row["ID"],
 						"VALUE" => $row["VALUE"],
 					));
@@ -124,15 +124,15 @@ class IblockValues extends BaseValues
 		$connection = \Bitrix\Main\Application::getConnection();
 		$connection->query("
 			DELETE FROM b_iblock_element_iprop
-			WHERE IBLOCK_ID = ".$this->iblock_id."
+			WHERE IBLOCK_ID = ".$this->iblockId."
 		");
 		$connection->query("
 			DELETE FROM b_iblock_section_iprop
-			WHERE IBLOCK_ID = ".$this->iblock_id."
+			WHERE IBLOCK_ID = ".$this->iblockId."
 		");
 		$connection->query("
 			DELETE FROM b_iblock_iblock_iprop
-			WHERE IBLOCK_ID = ".$this->iblock_id."
+			WHERE IBLOCK_ID = ".$this->iblockId."
 		");
 	}
 }

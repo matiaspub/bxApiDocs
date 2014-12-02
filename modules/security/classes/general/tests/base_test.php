@@ -12,6 +12,9 @@
  */
 abstract class CSecurityBaseTest
 {
+	const STATUS_FAILED = "failed";
+	const STATUS_PASSED = "passed";
+
 	protected $internalName = "BaseTest";
 	protected $isDebug = false;
 	protected $params = array();
@@ -46,16 +49,15 @@ abstract class CSecurityBaseTest
 	public function check(array $params = array())
 	{
 		$this->initializeParams($params);
-		$isSomethingFound = false;
-		$neededTests = self::getParam("folder", array());
-		if(is_string($neededTests) && $neededTests != "")
+		$neededTests = self::getParam("needed_tests", null);
+		if(is_string($neededTests) && $neededTests)
 		{
 			$neededTests = array($neededTests);
 		}
 
 		foreach($this->tests as $name => $test)
 		{
-			if(!empty($pNeededTests) && !in_array($name, $neededTests, true))
+			if($neededTests && !empty($neededTests) && !in_array($name, $neededTests, true))
 				continue;
 
 			if(isset($test["params"]) && is_array($test["params"]))
@@ -67,11 +69,12 @@ abstract class CSecurityBaseTest
 				$testParams = array();
 			}
 
-			if(!call_user_func_array(array($this, $test["method"]), $testParams))
+			$result = call_user_func_array(array($this, $test["method"]), $testParams);
+			if($result === self::STATUS_FAILED || $result === false)
 			{
-				if(isset($test["base_message_key"]) && $test["base_message_key"] != "")
+				if(isset($test["base_message_key"]) && $test["base_message_key"])
 				{
-					if(isset($test["critical"]) && $test["critical"] != "")
+					if(isset($test["critical"]) && $test["critical"])
 					{
 						$critical = $test["critical"];
 					}
@@ -82,7 +85,6 @@ abstract class CSecurityBaseTest
 
 					$this->addUnformattedDetailError($test["base_message_key"], $critical);
 				}
-				$isSomethingFound = true;
 			}
 		}
 
@@ -91,7 +93,7 @@ abstract class CSecurityBaseTest
 			'name' => $this->getName(),
 			'problem_count' => count($this->getDetailErrors()),
 			'errors' => $this->getDetailErrors(),
-			'status' => !$isSomethingFound
+			'status' => !count($this->getDetailErrors())
 		);
 
 		return $result;
@@ -213,15 +215,7 @@ abstract class CSecurityBaseTest
 	 */
 	protected static function getDetailText($baseMessageKey, array $placeholders = array())
 	{
-		if(HasMessage($baseMessageKey."_DETAIL"))
-		{
-			$result = GetMessage($baseMessageKey."_DETAIL", $placeholders);
-		}
-		else
-		{
-			$result = "";
-		}
-		return $result;
+		return GetMessage($baseMessageKey."_DETAIL", $placeholders);
 	}
 
 	/**
@@ -231,15 +225,7 @@ abstract class CSecurityBaseTest
 	 */
 	protected static function getRecommendationText($baseMessageKey, array $placeholders = array())
 	{
-		if(HasMessage($baseMessageKey."_RECOMMENDATION"))
-		{
-			$result = GetMessage($baseMessageKey."_RECOMMENDATION", $placeholders);
-		}
-		else
-		{
-			$result = "";
-		}
-		return $result;
+		return GetMessage($baseMessageKey."_RECOMMENDATION", $placeholders);
 	}
 
 	/**
@@ -249,31 +235,26 @@ abstract class CSecurityBaseTest
 	 */
 	protected static function getTitleText($baseMessageKey, array $placeholders = array())
 	{
-		if(HasMessage($baseMessageKey))
-		{
-			$result = GetMessage($baseMessageKey, $placeholders);
-		}
-		else
-		{
-			$result = "";
-		}
-		return $result;
+		return GetMessage($baseMessageKey, $placeholders);
 	}
 
 	/**
 	 * Add new error
+	 *
 	 * @param string $title
 	 * @param string $critical
 	 * @param string $detail
 	 * @param string $recommendation
+	 * @param string $additionalInfo
 	 */
-	protected function addDetailError($title, $critical, $detail, $recommendation = "")
+	protected function addDetailError($title, $critical, $detail, $recommendation = "", $additionalInfo = "")
 	{
 		$detailError = array(
 			"title" => $title,
 			"critical" => $critical,
 			"detail" => $detail,
-			"recommendation" => $recommendation
+			"recommendation" => $recommendation,
+			"additional_info" => $additionalInfo
 		);
 		$this->pushDetailError($detailError);
 	}
@@ -296,11 +277,12 @@ abstract class CSecurityBaseTest
 	 *
 	 * @param string $baseMessageKey
 	 * @param string $critical
+	 * @param string $additionalInfo
 	 * @return $this
 	 */
-	protected function addUnformattedDetailError($baseMessageKey, $critical)
+	protected function addUnformattedDetailError($baseMessageKey, $critical, $additionalInfo = "")
 	{
-		$detailError = self::formatDetailError($baseMessageKey, $critical);
+		$detailError = self::formatDetailError($baseMessageKey, $critical, $additionalInfo);
 		$this->pushDetailError($detailError);
 		return $this;
 	}
@@ -309,15 +291,17 @@ abstract class CSecurityBaseTest
 	 * Return formatted detail error from messages
 	 * @param string $baseMessageKey
 	 * @param string $critical
+	 * @param string $additionalInfo
 	 * @return array
 	 */
-	protected static function formatDetailError($baseMessageKey, $critical)
+	protected static function formatDetailError($baseMessageKey, $critical, $additionalInfo = "")
 	{
 		return array(
 				"title" => self::getTitleText($baseMessageKey),
 				"critical" => $critical,
 				"detail" => self::getDetailText($baseMessageKey),
-				"recommendation" => self::getRecommendationText($baseMessageKey)
+				"recommendation" => self::getRecommendationText($baseMessageKey),
+				"additional_info" => $additionalInfo
 			);
 	}
 

@@ -1404,6 +1404,15 @@ class CAllRatings
 			if (!$rsRB->SelectedRowsCount())
 				$DB->Insert("b_rating_user", $arFields, $err_mess.__LINE__);
 		}
+		if (CACHED_b_rating_vote!==false)
+		{
+			global $CACHE_MANAGER;
+			$bucket_size = intval(CACHED_b_rating_bucket_size);
+			if($bucket_size <= 0)
+				$bucket_size = 100;
+
+			$CACHE_MANAGER->Clean("b_rvu_".$arParam['RATING_ID'].intval($arParam['ENTITY_ID']/$bucket_size), "b_rating_user");
+		}
 		return true;
 	}
 
@@ -1492,11 +1501,12 @@ class CAllRatings
 			$bucket_size = 100;
 
 		$bucket = intval($entityId/$bucket_size);
-		if($CACHE_MANAGER->Read(CACHED_b_rating, $cache_id="b_rvu_".$ratingId.$bucket, "b_rating_user"))
+		$arResult = $CACHE_MANAGER->Read(CACHED_b_rating, $cache_id="b_rvu_".$ratingId.$bucket, "b_rating_user");
+		if($arResult)
 		{
 			$arResult = $CACHE_MANAGER->Get($cache_id);
 		}
-		else
+		if (!$arResult)
 		{
 			$sql_str = "
 				SELECT RATING_ID, ENTITY_ID, BONUS, VOTE_WEIGHT, VOTE_COUNT

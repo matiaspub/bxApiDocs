@@ -1545,7 +1545,7 @@ class CAllFormOutput extends CFormOutput_old
 	*
 	* @return string <p>Возвращается HTML-код кнопки отправки формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
-	* &lt;?=$FORM-&gt;ShowSubmitButton("Отправить заявку", "form-button-submit")?&gt; </pre> </ht
+	* &lt;?=$FORM-&gt;ShowSubmitButton("Отправить заявку", "form-button-submit")?&gt; </pre>
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1597,7 +1597,7 @@ class CAllFormOutput extends CFormOutput_old
 	*
 	* @return string <p>Возвращается HTML-код кнопки "Применить"</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
-	* &lt;?=$FORM-&gt;ShowApplyButton("Применить", "form-button-apply")?&gt; </pre>
+	* &lt;?=$FORM-&gt;ShowApplyButton("Применить", "form-button-apply")?&gt; </pre></bod
 	*
 	*
 	* <h4>See Also</h4> 

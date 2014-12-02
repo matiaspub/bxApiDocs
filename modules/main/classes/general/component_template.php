@@ -223,6 +223,12 @@ class CBitrixComponentTemplate
 			}
 		}
 
+		$arReturn["frameMode"] = $this->frameMode;
+		if (!$this->frameMode)
+		{
+			$arReturn["frameModeCtx"] = $this->__file;
+		}
+
 		return $arReturn;
 	}
 
@@ -258,6 +264,12 @@ class CBitrixComponentTemplate
 				{
 					\Bitrix\Main\Page\FrameHelper::applyCachedData($frameState);
 				}
+			}
+
+			if (array_key_exists("frameMode", $arData) && $arData["frameMode"] === false)
+			{
+				$context = isset($arData["frameModeCtx"]) ? "(from component cache) ".$arData["frameModeCtx"] : "";
+				\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($context);
 			}
 		}
 	}
@@ -387,7 +399,7 @@ class CBitrixComponentTemplate
 		$parentTemplateName = "";
 		$parentComponent = & $this->__component->GetParent();
 		$defSiteTemplate = ($this->__siteTemplate == ".default");
-		if ($parentComponent)
+		if ($parentComponent && $parentComponent->GetTemplate())
 		{
 			$parentRelativePath = $parentComponent->GetRelativePath();
 			$parentTemplateName = $parentComponent->GetTemplate()->GetName();
@@ -595,21 +607,7 @@ class CBitrixComponentTemplate
 
 		if (!$this->frameMode)
 		{
-			$staticHtmlCache = \Bitrix\Main\Data\StaticHtmlCache::getInstance();
-			$staticHtmlCache->markNonCacheable();
-			if (
-				defined("BX_COMPOSITE_DEBUG")
-				&& defined("USE_HTML_STATIC_CACHE")
-				&& USE_HTML_STATIC_CACHE == true
-			)
-			{
-				AddMessage2Log(
-					"Template: ".$this->__file."\n".
-					"Request URI: ".$_SERVER["REQUEST_URI"]."\n".
-					"Script: ".(isset($_SERVER["REAL_FILE_PATH"]) ? $_SERVER["REAL_FILE_PATH"] : $_SERVER["SCRIPT_NAME"]),
-					"composite"
-				);
-			}
+			\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($this->__file);
 		}
 
 		$component_epilog = $this->__folder."/component_epilog.php";
@@ -635,20 +633,26 @@ class CBitrixComponentTemplate
 		if (!$this->__bInited)
 			return false;
 
+		$arLangMessages = null;
+		$externalEngine = ($arBXAvailableTemplateEngines[$this->__engineID]["function"] <> '' && function_exists($arBXAvailableTemplateEngines[$this->__engineID]["function"]));
+
 		$arParams = $this->__component->arParams;
 
 		if($this->__folder <> '')
 		{
-			$arLangMessages = $this->IncludeLangFile();
+			if ($externalEngine)
+			{
+				$arLangMessages = $this->IncludeLangFile("", false, true);
+			}
+			else
+			{
+				$this->IncludeLangFile();
+			}
 			$this->__IncludeMutatorFile($arResult, $arParams);
 			if (!isset($this->__hasCSS) || $this->__hasCSS)
 				$this->__IncludeCSSFile();
 			if (!isset($this->__hasJS) || $this->__hasJS)
 				$this->__IncludeJSFile();
-		}
-		else
-		{
-			$arLangMessages = array();
 		}
 
 		$parentTemplateFolder = "";
@@ -656,11 +660,11 @@ class CBitrixComponentTemplate
 		if ($parentComponent)
 		{
 			$parentTemplate = $parentComponent->GetTemplate();
-			$parentTemplateFolder = $parentTemplate->GetFolder();
+			if ($parentTemplate)
+				$parentTemplateFolder = $parentTemplate->GetFolder();
 		}
 
-		if (strlen($arBXAvailableTemplateEngines[$this->__engineID]["function"]) > 0
-			&& function_exists($arBXAvailableTemplateEngines[$this->__engineID]["function"]))
+		if ($externalEngine)
 		{
 			$result = call_user_func(
 				$arBXAvailableTemplateEngines[$this->__engineID]["function"],
@@ -681,39 +685,31 @@ class CBitrixComponentTemplate
 		return $result;
 	}
 
-	public static function __IncludeLangFile($path)
-	{
-		global $MESS;
-		static $messCache = array();
-
-		if (!isset($messCache[$path]))
-			$messCache[$path] = __IncludeLang($path, true);
-
-		foreach($messCache[$path] as $key => $value)
-			$MESS[$key] = $value;
-
-		return $messCache[$path];
-	}
-
-	public function IncludeLangFile($relativePath = "", $lang = false)
+	public function IncludeLangFile($relativePath = "", $lang = false, $return = false)
 	{
 		$arLangMessages = array();
 
 		if($this->__folder <> '')
 		{
-			$absPath = $_SERVER["DOCUMENT_ROOT"].$this->__folder."/lang/";
-
-			if ($lang === false)
-				$lang = LANGUAGE_ID;
-
 			if ($relativePath == "")
+			{
 				$relativePath = bx_basename($this->__file);
+			}
 
-			$langSubst = LangSubst($lang);
-			if ($lang <> $langSubst)
-				$arLangMessages = $this->__IncludeLangFile($absPath.$langSubst."/".$relativePath);
+			$absPath = $_SERVER["DOCUMENT_ROOT"].$this->__folder."/".$relativePath;
 
-			$arLangMessages = $this->__IncludeLangFile($absPath.$lang."/".$relativePath) + $arLangMessages;
+			if ($lang === false && $return === false)
+			{
+				\Bitrix\Main\Localization\Loc::loadMessages($absPath);
+			}
+			else
+			{
+				if ($lang === false)
+				{
+					$lang = LANGUAGE_ID;
+				}
+				$arLangMessages = \Bitrix\Main\Localization\Loc::loadLanguageFile($absPath, $lang);
+			}
 		}
 
 		return $arLangMessages;
@@ -728,7 +724,9 @@ class CBitrixComponentTemplate
 		if($this->__folder <> '')
 		{
 			if (file_exists($_SERVER["DOCUMENT_ROOT"].$this->__folder."/result_modifier.php"))
+			{
 				include($_SERVER["DOCUMENT_ROOT"].$this->__folder."/result_modifier.php");
+			}
 		}
 	}
 

@@ -93,6 +93,8 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 		$this->addParams = array(
 			"file_name" => $file_name,
 			"spd" => CUpdateClient::getSpd(),
+			"CHHB" => $_SERVER["HTTP_HOST"],
+			"CSAB" => $_SERVER["SERVER_ADDR"],
 		);
 		return $this->backup_action("write_file");
 	}
@@ -143,7 +145,7 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 					$weekdaysIsOk = false;
 			}
 		}
-		if (!$weekdays)
+		if (!$weekdaysIsOk)
 		{
 			throw new CBitrixCloudException(GetMessage("BCL_BACKUP_WRONG_WEEKDAYS"), "");
 		}
@@ -156,6 +158,8 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 			"time" => $h.":".$m,
 			"domain" => $parsedUrl["host"],
 			"spd" => CUpdateClient::getSpd(),
+			"CHHB" => $_SERVER["HTTP_HOST"],
+			"CSAB" => $_SERVER["SERVER_ADDR"],
 		);
 
 		if ($parsedUrl["scheme"] === "https")
@@ -181,6 +185,8 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 		$this->addStr = "";
 		$this->addParams = array(
 			"spd" => CUpdateClient::getSpd(),
+			"CHHB" => $_SERVER["HTTP_HOST"],
+			"CSAB" => $_SERVER["SERVER_ADDR"],
 		);
 
 		return $this->backup_action("delete_backup_job");
@@ -195,6 +201,8 @@ class CBitrixCloudBackupWebService extends CBitrixCloudWebService
 		$this->addStr = "";
 		$this->addParams = array(
 			"spd" => CUpdateClient::getSpd(),
+			"CHHB" => $_SERVER["HTTP_HOST"],
+			"CSAB" => $_SERVER["SERVER_ADDR"],
 		);
 
 		return $this->backup_action("get_backup_job");

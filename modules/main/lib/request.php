@@ -17,8 +17,8 @@ abstract class Request
 	 */
 	protected $server;
 
-	protected $requestedFile = null;
-	protected $requestedFileDirectory = null;
+	protected $requestedPage = null;
+	protected $requestedPageDirectory = null;
 
 	public function __construct(Server $server, array $request)
 	{
@@ -47,31 +47,32 @@ abstract class Request
 
 	public function getRequestedPage()
 	{
-		if ($this->requestedFile !== null)
-			return $this->requestedFile;
-
-		$page = $this->getScriptName();
-		if (empty($page))
+		if ($this->requestedPage === null)
 		{
-			return $this->requestedFile = $page;
+			$page = $this->getScriptName();
+			if (!empty($page))
+			{
+				$page = IO\Path::normalize($page);
+
+				if (substr($page, 0, 1) !== "/" && !preg_match("#^[a-z]:[/\\\\]#i", $page))
+				{
+					$page = "/".$page;
+				}
+			}
+			$this->requestedPage = $page;
 		}
 
-		$page = IO\Path::normalize($page);
-
-		if (substr($page, 0, 1) !== "/" && !preg_match("#^[a-z]:[/\\\\]#i", $page))
-			$page = "/".$page;
-
-		return $this->requestedFile = $page;
+		return $this->requestedPage;
 	}
 
 	public function getRequestedPageDirectory()
 	{
-		if ($this->requestedFileDirectory != null)
-			return $this->requestedFileDirectory;
-
-		$requestedFile = $this->getRequestedPage();
-
-		return $this->requestedFileDirectory = IO\Path::getDirectory($requestedFile);
+		if ($this->requestedPageDirectory === null)
+		{
+			$requestedPage = $this->getRequestedPage();
+			$this->requestedPageDirectory = IO\Path::getDirectory($requestedPage);
+		}
+		return $this->requestedPageDirectory;
 	}
 
 	public function isAdminSection()

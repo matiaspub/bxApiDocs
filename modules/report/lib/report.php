@@ -8,14 +8,12 @@
 namespace Bitrix\Report;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class ReportTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getMap()
 	{
 		$fieldsMap = array(
@@ -44,6 +42,9 @@ class ReportTable extends Entity\DataManager
 			),
 			'SETTINGS' => array(
 				'data_type' => 'string'
+			),
+			'MARK_DEFAULT' => array(
+				'data_type' => 'integer'
 			)
 		);
 

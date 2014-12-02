@@ -75,7 +75,7 @@ class SitemapFile
 
 		parent::__construct($this->siteRoot.'/'.$fileName, $this->settings['SITE_ID']);
 
-		$this->partChanged = $this->isExists();
+		$this->partChanged = $this->isExists() && !$this->isSplitNeeded();
 	}
 
 	protected function reInit($fileName)
@@ -168,7 +168,13 @@ class SitemapFile
 		}
 		else
 		{
+			if(!$this->partChanged)
+			{
+				$this->addHeader();
+			}
+
 			$fd = $this->open('r+');
+
 			fseek($fd, $this->getFileSize()-strlen(self::FILE_FOOTER));
 			fwrite($fd, sprintf(
 				self::ENTRY_TPL,
@@ -188,9 +194,11 @@ class SitemapFile
 		{
 			$c = $this->getContents();
 			$p = strpos($c, $pattern);
+
 			if($p !== false)
 			{
 				$fd = $this->open('r+');
+
 				fseek($fd, intval($p));
 				fwrite($fd, str_repeat(" ", strlen(sprintf(
 					self::ENTRY_TPL,

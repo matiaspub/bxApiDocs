@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiUtils</b> - Класс дополнительных функций.
+ * <b>CWikiUtils</b> - Класс дополнительных функций.</body> </html>
  *
  *
  *

@@ -1,5 +1,0 @@
-<?
-class CPerfomanceHit extends CAllPerfomanceHit
-{
-}
-?>

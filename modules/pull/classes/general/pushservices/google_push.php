@@ -18,12 +18,12 @@ class CGoogleMessage extends CPushMessage
 
 		$data = array(
 			"data" => array(
-					'contentTitle' => $this->_sTitle,
-					"contentText" => $this->_sText,
-					"messageParams"=>$this->_aCustomProperties
+					'contentTitle' => $this->title,
+					"contentText" => $this->text,
+					"messageParams"=>$this->customProperties
 				),
-			"time_to_live" => $this->_nExpiryValue,
-			"registration_ids" => $this->_aDeviceTokens
+			"time_to_live" => $this->expiryValue,
+			"registration_ids" => $this->deviceTokens
 		);
 
 		$data = CPushManager::_MakeJson($data,"",true);

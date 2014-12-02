@@ -83,7 +83,7 @@ class CAllSaleOrderPropsValue
 	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код значения свойства заказа.</td> </tr>
 	* <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код
 	* свойства.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
-	* <td>Значение свойства.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код
+	* <td>Значение свойства.</td> </tr> <tr> <td>CODE</td> <td>Символьный код
 	* свойства.</td> </tr> </table> <br><br>
 	*
 	* @static
@@ -124,7 +124,7 @@ class CAllSaleOrderPropsValue
 	* значениями - соответствующие новые значения. <br><br> Допустимые
 	* ключи: <ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li> <b>ORDER_PROPS_ID</b> - код
 	* свойства;</li> <li> <b>NAME</b> - название свойства;</li> <li> <b>VALUE</b> - значение
-	* свойства;</li> <li> <b>CODE</b> - мнемонический код свойства.</li> </ul>
+	* свойства;</li> <li> <b>CODE</b> - символьный код свойства.</li> </ul>
 	*
 	*
 	*

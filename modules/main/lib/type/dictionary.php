@@ -117,7 +117,14 @@ class Dictionary
 	 */
 	public function offsetSet($offset, $value)
 	{
-		$this->values[$offset] = $value;
+		if($offset === null)
+		{
+			$this->values[] = $value;
+		}
+		else
+		{
+			$this->values[$offset] = $value;
+		}
 	}
 
 	/**

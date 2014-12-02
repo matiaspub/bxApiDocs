@@ -22,6 +22,8 @@ class CCalendarLiveFeed
 					"OPERATION" => "view",
 					"OPERATION_ADD" => "log_rights",
 					"ADD_CALLBACK" => array("CCalendarLiveFeed", "AddComment_Calendar"),
+					"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
+					"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
 					"CLASS_FORMAT" => "CSocNetLogTools",
 					"METHOD_FORMAT" => "FormatComment_Forum"
 				)
@@ -371,44 +373,72 @@ class CCalendarLiveFeed
 	public static function NotifyComment($eventID, $arComment)
 	{
 		if (!CModule::IncludeModule("im"))
-			return;
-/*
-		$arComment = array(
-			"USER_ID" => ...,
-			"MESSAGE" => ...,
-			"URL" => ...
-		);
-
-
-		// get recipients
-
-
-		$arMessageFields = array(
-			"FROM_USER_ID" => $arComment["USER_ID"],
-			"NOTIFY_TYPE" => IM_NOTIFY_FROM,
-			"NOTIFY_MODULE" => "calendar",
-			"NOTIFY_EVENT" => "event_comment",
-			"NOTIFY_MESSAGE" => str_replace(
-				array("#TASK_TITLE#", "#TASK_COMMENT_TEXT#"),
-				array('[URL=' . tasksServerName(). $messageUrl . "#message" . $messageID.']' . htmlspecialcharsbx($arTask["TITLE"]) . '[/URL]', '[COLOR=#000000]' . $MESSAGE_SITE . '[/COLOR]'),
-				($MESSAGE_TYPE != "EDIT" ? GetMessage("SONET_GL_EVENT_TITLE_TASK_COMMENT_MESSAGE_ADD") : GetMessage("SONET_GL_EVENT_TITLE_TASK_COMMENT_MESSAGE_EDIT"))
-			),
-			"NOTIFY_MESSAGE_OUT" => str_replace(
-				array("#TASK_TITLE#", "#TASK_COMMENT_TEXT#"),
-				array(htmlspecialcharsbx($arTask["TITLE"]), $MESSAGE_SITE . ' #BR# ' . tasksServerName() . $messageUrl . "#message" . $messageID . ' '),
-				($MESSAGE_TYPE != "EDIT" ? GetMessage("SONET_GL_EVENT_TITLE_TASK_COMMENT_MESSAGE_ADD") : GetMessage("SONET_GL_EVENT_TITLE_TASK_COMMENT_MESSAGE_EDIT"))
-			),
-		);
-
-		foreach ($arRecipientsIDs as $recipientUserID)
 		{
-			$arMessageFields1 = array_merge($arMessageFields, array(
-				"TO_USER_ID" => $recipientUserID
-			));
-			CIMNotify::Add($arMessageFields1);
+			return;
 		}
-*/
 
+		if (intval($eventID) <= 0)
+		{
+			return;
+		}
+
+		if ($arCalendarEvent = CCalendarEvent::GetById($eventID))
+		{
+			$rsUser = CUser::GetList(
+				$by = 'id',
+				$order = 'asc',
+				array('ID_EQUAL_EXACT' => intval($arComment["USER_ID"])),
+				array('FIELDS' => array('PERSONAL_GENDER'))
+			);
+
+			$strMsgAddComment  = GetMessage("EC_LF_COMMENT_MESSAGE_ADD");
+			$strMsgEditComment = GetMessage("EC_LF_COMMENT_MESSAGE_ADD");
+
+			if ($arUser = $rsUser->fetch())
+			{
+				switch ($arUser['PERSONAL_GENDER'])
+				{
+					case "F":
+					case "M":
+						$strMsgAddComment = GetMessage("EC_LF_COMMENT_MESSAGE_ADD" . '_' . $arUser['PERSONAL_GENDER']);
+						break;
+					default:
+						break;
+				}
+			}
+
+			$arMessageFields = array(
+				"FROM_USER_ID" => $arComment["USER_ID"],
+				"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+				"NOTIFY_MODULE" => "calendar",
+				"NOTIFY_EVENT" => "event_comment",
+				"NOTIFY_MESSAGE" => str_replace(
+					array("#EVENT_TITLE#"),
+					array(strlen($arComment["URL"]) > 0 ? "<a href=\"".$arComment["URL"]."\" class=\"bx-notifier-item-action\">".$arCalendarEvent["NAME"]."</a>" : $arCalendarEvent["NAME"]),
+					$strMsgAddComment
+				),
+				"NOTIFY_MESSAGE_OUT" => str_replace(
+					array("#EVENT_TITLE#"),
+					array($arCalendarEvent["NAME"]),
+					$strMsgAddComment
+				).(strlen($arComment["URL"]) > 0 ? " (".$arComment["URL"].")" : "")."#BR##BR#".$arComment["MESSAGE"]
+			);
+
+			if (is_array($arCalendarEvent["~ATTENDEES"]))
+			{
+				foreach($arCalendarEvent["~ATTENDEES"] as $arAttendee)
+				{
+					if ($arAttendee["USER_ID"] == $arComment["USER_ID"])
+					{
+						continue;
+					}
+					$arMessageFields1 = array_merge($arMessageFields, array(
+						"TO_USER_ID" => $arAttendee["USER_ID"]
+					));
+					CIMNotify::Add($arMessageFields1);
+				}
+			}
+		}
 	}
 
 	public static function EditCalendarEventEntry($arFields = array(), $arUFFields = array(), $arAccessCodes = array(), $params = array())

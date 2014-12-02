@@ -23,7 +23,7 @@ class CSaleUserTransact extends CAllSaleUserTransact
 	*
 	*
 	*
-	* @param int $ID  Номер транзакции. </h
+	* @param int $ID  Номер транзакции.
 	*
 	*
 	*

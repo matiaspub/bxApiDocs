@@ -21,13 +21,20 @@ class StringField extends ScalarField
 	 */
 	protected $format = null;
 
-	public function __construct($name, $dataType, Base $entity, $parameters = array())
+	/** @var int|null  */
+	protected $size = null;
+
+	public function __construct($name, $parameters = array())
 	{
-		parent::__construct($name, $dataType, $entity, $parameters);
+		parent::__construct($name, $parameters);
 
 		if (!empty($parameters['format']))
 		{
 			$this->format = $parameters['format'];
+		}
+		if(isset($parameters['size']) && intval($parameters['size']) > 0)
+		{
+			$this->size = intval($parameters['size']);
 		}
 	}
 
@@ -50,5 +57,14 @@ class StringField extends ScalarField
 		}
 
 		return $validators;
+	}
+
+	/**
+	 * Returns the size of the field in a database (in characters).
+	 * @return int|null
+	 */
+	public function getSize()
+	{
+		return $this->size;
 	}
 }

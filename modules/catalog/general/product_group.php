@@ -83,13 +83,12 @@ class CAllCatalogProductGroups
 				$arFields["ACCESS_LENGTH"] = 0;
 		}
 
-		if ((is_set($arFields, "ACCESS_LENGTH_TYPE") || $ACTION=="ADD") && !array_key_exists($arFields["ACCESS_LENGTH_TYPE"], $GLOBALS["CATALOG_TIME_PERIOD_TYPES"]))
+		if ((is_set($arFields, "ACCESS_LENGTH_TYPE") || $ACTION=="ADD") && !array_key_exists($arFields["ACCESS_LENGTH_TYPE"], CCatalogProduct::GetTimePeriodTypes(true)))
 		{
-			$arTypeKeys = array_keys($GLOBALS["CATALOG_TIME_PERIOD_TYPES"]);
-			$arFields["ACCESS_LENGTH_TYPE"] = $arRecurSchemeKeys[1];
+			$arFields["ACCESS_LENGTH_TYPE"] = CCatalogProduct::TIME_PERIOD_DAY;
 		}
 
-		return True;
+		return true;
 	}
 
 	

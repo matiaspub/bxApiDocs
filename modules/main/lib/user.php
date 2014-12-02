@@ -8,14 +8,12 @@
 namespace Bitrix\Main;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class UserTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_user';
@@ -80,6 +78,39 @@ class UserTable extends Entity\DataManager
 			'PERSONAL_MOBILE' => array(
 				'data_type' => 'string'
 			),
+			'PERSONAL_WWW' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_ICQ' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_FAX' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_PAGER' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_STREET' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_CITY' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_STATE' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_ZIP' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_COUNTRY' => array(
+				'data_type' => 'string'
+			),
+			'WORK_COMPANY' => array(
+				'data_type' => 'string'
+			),
+			'PERSONAL_PROFESSION' => array(
+				'data_type' => 'string'
+			),
 			'SECOND_NAME' => array(
 				'data_type' => 'string'
 			),
@@ -115,20 +146,19 @@ class UserTable extends Entity\DataManager
 				'data_type' => 'boolean',
 				'values' => array('N', 'Y'),
 				'expression' => array(
-					'CASE WHEN %s > '.$helper->addSecondsToDateTime('(-%%USER_IS_ONLINE_INTERVAL%%)').' THEN \'Y\' ELSE \'N\' END',
+					'CASE WHEN %s > '.$helper->addSecondsToDateTime('(-120)').' THEN \'Y\' ELSE \'N\' END',
 					'LAST_ACTIVITY_DATE',
-				),
-				'options' => array(
-					'USER_IS_ONLINE_INTERVAL' => 120 // sec
 				)
 			),
 			'EXTERNAL_AUTH_ID' => array(
 				'data_type' => 'string'
 			),
-			'UTS_OBJECT' => array(
-				'data_type' => 'UtsUser',
-				'reference' => array('=this.ID' => 'ref.VALUE_ID')
-			)
+			'XML_ID' => array(
+				'data_type' => 'string'
+			),
+			'TITLE' => array(
+				'data_type' => 'string'
+			),
 		);
 	}
 

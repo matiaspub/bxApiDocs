@@ -1,114 +1,8 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/message.php");
 
-
-/**
- * <b>CForumMessage</b> - класс для работы с сообщениями форумов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/index.php
- * @author Bitrix
- */
 class CForumMessage extends CAllForumMessage
 {
-	
-	/**
-	* <p>Создает новое сообщение с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного сообщения.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields = Array() Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где <ul> <li>
-	* <b>field</b> - название поля;</li> <li> <b>value</b> - значение поля.</li> </ul> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
-	* полей сообщения</a>. Обязательные поля должны быть заполнены. <br><br>
-	* Для первого сообщения в теме форума - обязательно передать
-	* параметр "NEW_TOPIC" =&gt; "Y".
-	*
-	*
-	*
-	* @param string $strUploadDir = false Каталог для загрузки файлов. Должен быть задан относительно
-	* главного каталога для загрузки. Необязательный. По умолчанию
-	* равен "forum".
-	*
-	*
-	*
-	* @param array $arParams = Array() Массив параметров. Необязательный.
-	*
-	*
-	*
-	* @return int <b>False</b><h4>Примечания</h4><p>Перед добавлением сообщения следует
-	* проверить возможность добавления методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>.</p>
-	* <p>Для добавления и изменения сообщения и темы рекомендуется
-	* пользоваться высокоуровневой функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = Array(
-	*   "POST_MESSAGE" =&gt; $POST_MESSAGE,
-	*   "USE_SMILES" =&gt; ($USE_SMILES=="Y") ? "Y" : "N",
-	*   "APPROVED" =&gt; $APPROVED,
-	*   "AUTHOR_NAME" =&gt; $AUTHOR_NAME,
-	*   "AUTHOR_ID" =&gt; $AUTHOR_ID,
-	*   "FORUM_ID" =&gt; $FID,
-	*   "TOPIC_ID" =&gt; $TID,
-	*   "AUTHOR_IP" =&gt; ($AUTHOR_IP!==False) ? $AUTHOR_IP : "<no address>",
-	*   "NEW_TOPIC" =&gt; "N"
-	* );
-	* $ID = CForumMessage::Add($arFields);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </no>
-	* Если необходимо узнать ошибку:
-	* 
-	* &lt;?
-	* $arFields = Array(
-	*   "POST_MESSAGE" =&gt; $POST_MESSAGE,
-	*   "USE_SMILES" =&gt; ($USE_SMILES=="Y") ? "Y" : "N",
-	*   "APPROVED" =&gt; $APPROVED,
-	*   "AUTHOR_NAME" =&gt; $AUTHOR_NAME,
-	*   "AUTHOR_ID" =&gt; $AUTHOR_ID,
-	*   "FORUM_ID" =&gt; $FID,
-	*   "TOPIC_ID" =&gt; $TID,
-	*   "AUTHOR_IP" =&gt; ($AUTHOR_IP!==False) ? $AUTHOR_IP : "<no address>",
-	*   "NEW_TOPIC" =&gt; "N"
-	* );
-	* $ID = CForumMessage::Add($arFields);
-	* if ($IDGetException())
-	*    echo $ex-&gt;GetString();
-	* ?&gt;
-	* </no>
-	* IP адрес проходит дополнительную проверку и, если он отличается от реального IP адреса пользователя, то на форуме вместо: 
-	* 
-	* IP: ###.###.###.###выводится: IP / реальный: ###.###.###.### / 
-	* Для того, чтобы этого избежать, используем дополнительное поле: 
-	* 
-	* 
-	* "AUTHOR_IP" =&gt; $AUTHOR_IP,
-	* "AUTHOR_REAL_IP"=&gt; $AUTHOR_IP,
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	* </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields, $strUploadDir = false, $arParams = array())
 	{
 		global $DB;
@@ -199,7 +93,7 @@ class CForumMessage extends CAllForumMessage
 		}
 /***************** Events onAfterMessageAdd ************************/
 		foreach(GetModuleEvents("forum", "onAfterMessageAdd", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array(&$ID, $arMessage, $arMessage["TOPIC_INFO"], $arMessage["FORUM_INFO"]));
+			ExecuteModuleEventEx($arEvent, array(&$ID, $arMessage, $arMessage["TOPIC_INFO"], $arMessage["FORUM_INFO"], $arFields));
 /***************** /Events *****************************************/
 		if ($arMessage["APPROVED"] == "Y")
 		{
@@ -240,6 +134,15 @@ class CForumMessage extends CAllForumMessage
 					"INDEX_TITLE" => $arMessage["NEW_TOPIC"] == "Y",
 				);
 
+				// get mentions
+				$arMentionedUserID = CForumMessage::GetMentionedUserID($arMessage["POST_MESSAGE"]);
+				if (!empty($arMentionedUserID))
+				{
+					$arSearchInd["PARAMS"] = array(
+						"mentioned_user_id" => $arMentionedUserID
+					);
+				}
+
 				$urlPatterns = array(
 					"FORUM_ID" => $arMessage["FORUM_ID"],
 					"TOPIC_ID" => $arMessage["TOPIC_ID"],
@@ -276,101 +179,6 @@ class CForumMessage extends CAllForumMessage
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Возвращает список сообщений по фильтру <b>arFilter</b>, отсортированый в соответствии с <b>arOrder</b>.</p>
-	*
-	*
-	*
-	*
-	* @param array $arOrder = Array("ID"=>"ASC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	* сортировки может принимать значения: <ul> <li> <b>AUTHOR_NAME</b> - имя автора
-	* сообщения;</li> <li> <b>POST_DATE</b> - дата создания сообщения;</li> <li> <b>FORUM_ID</b>
-	* - ID форума;</li> <li> <b>TOPIC_ID</b> - ID темы;</li> <li> <b>APPROVED</b> - опубликовано;</li>
-	* <li> <b>ID</b> - ID сообщения;</li> </ul> Направление сортировки может
-	* принимать значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
-	* убыванию;</li> </ul> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
-	*
-	*
-	*
-	* @param array $arFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> - ID
-	* сообщения;</li> <li> <b>AUTHOR_NAME</b> - имя автора сообщения;</li> <li> <b>AUTHOR_ID</b> -
-	* ID автора сообщения;</li> <li> <b>FORUM_ID</b> - ID форума;</li> <li> <b>TOPIC_ID</b> - ID
-	* темы;</li> <li> <b>APPROVED</b> - опубликовано;</li> <li> <b>PARAM1</b> - первый параметр
-	* элемента;</li> <li> <b>PARAM2</b> - второй параметр элемента;</li> <li> <b>AUTHOR_NAME</b>
-	* - имя автора сообщения;</li> <li> <b>POST_MESSAGE</b> - проверка текста
-	* сообщения;</li> <li> <b>APPROVED</b> - опубликовано;</li> <li> <b>NEW_TOPIC</b> - новая
-	* тема;</li> <li> <b>ATTACH_IMG</b> - присоединенная картинка;</li> <li> <b>EDIT_DATE</b> -
-	* дата редактирования сообщения;</li> <li> <b>POST_DATE</b> - дата создания
-	* сообщения;</li> </ul> Перед названием фильтруемого поля может быть
-	* указан тип фильтрации: <ul> <li>"!" - не равно</li> <li>"&lt;" - меньше</li> <li>"&lt;="
-	* - меньше либо равно</li> <li>"&gt;" - больше</li> <li>"&gt;=" - больше либо
-	* равно</li> </ul> Необязательное. По умолчанию записи не фильтруются.
-	*
-	*
-	*
-	* @param bool $bCount = false Если параметр равен True, то возвращается только количество
-	* сообщений, которое соответствует установленному фильтру.
-	* Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @param int $iNum = 0 Ограничение числа возвращаемых записей. Если параметр iNum отличен
-	* от нуля, то возвращается не более iNum записей. Поддерживается не
-	* для всех баз данных. Если параметр не поддерживается, то его
-	* установки игнорируются. Необязательный. По умолчанию равен 0.
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив добавления параметров.
-	*
-	*
-	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // выберем все опубликованные сообщения темы с кодом $TID в порядке поступления
-	* $db_res = CForumMessage::GetList(array("ID"=&gt;"ASC"), array("TOPIC_ID"=&gt;$TID));
-	* while ($ar_res = $db_res-&gt;Fetch())
-	* {
-	*   echo $ar_res["POST_MESSAGE"]."&lt;br&gt;";
-	* }
-	* ?&gt;
-	* 
-	* 
-	* 
-	* &lt;?
-	* //вывести сообщения, не из форумов с ID 12 и 45.
-	* 
-	* '!@FORUM_ID' =&gt; array(12, 45),
-	* ?&gt;
-	* 
-	* 
-	* 
-	* &lt;?
-	* // Фильтрация по дате сообщения:
-	* 
-	* $db_res = CForumMessage::GetList(array("ID"=&gt;"ASC"), array("&gt;=POST_DATE" =&gt; "23.12.2010", "&lt;=POST_DATE" =&gt; "24.12.2010"));
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul> <a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = Array("ID"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
 	{
 		global $DB;
@@ -650,7 +458,6 @@ class CForumMessage extends CAllForumMessage
 			$iNum = ($iNum > 0) ? $iNum : intVal($arAddParams["nTopCount"]);
 			$strSql .= " LIMIT 0,".$iNum;
 		}
-
 		if (!$iNum && is_array($arAddParams) && is_set($arAddParams, "bDescPageNumbering") && (intVal($arAddParams["nTopCount"])<=0))
 		{
 			$db_res =  new CDBResult();
@@ -665,122 +472,6 @@ class CForumMessage extends CAllForumMessage
 		return new _CMessageDBResult($db_res, $arAddParams);
 	}
 
-	
-	/**
-	* <p>Возвращает список сообщений (включая связанные данные) по фильтру <b>arFilter</b>, отсортированный в соответствии с <b>arOrder</b>.</p>
-	*
-	*
-	*
-	*
-	* @param array $arOrder = Array("ID"=>"ASC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	* сортировки может принимать значения: <ul> <li> <b>AUTHOR_NAME</b> - имя автора
-	* сообщения;</li> <li> <b>POST_DATE</b> - дата создания сообщения;</li> <li> <b>FORUM_ID</b>
-	* - ID форума;</li> <li> <b>TOPIC_ID</b> - ID темы;</li> <li> <b>APPROVED</b> - опубликовано;</li>
-	* <li> <b>ID</b> - ID сообщения;</li> <li> <b>USE_SMILES</b> - разрешено заменять
-	* смайлики на их графические изображения;</li> <li> <b>NEW_TOPIC</b> - новая
-	* тема;</li> <li> <b>APPROVED</b> - опубликовано;</li> <li> <b>POST_DATE</b> - дата создания
-	* сообщения;</li> <li> <b>POST_MESSAGE</b> - сообщение;</li> <li> <b>ATTACH_IMG</b> -
-	* присоединенная картинка;</li> <li> <b>PARAM1</b> - первый параметр
-	* элемента;</li> <li> <b>PARAM2</b> - второй параметр элемента;</li> <li> <b>AUTHOR_ID</b> -
-	* ID автора сообщения;</li> <li> <b>AUTHOR_EMAIL</b> - e-mail автора сообщения;</li> <li>
-	* <b>AUTHOR_IP</b> - IP-адрес автора сообщения;</li> <li> <b>AUTHOR_REAL_IP</b> - реальный
-	* IP-адрес автора сообщения;</li> <li> <b>GUEST_ID</b> - ID посетителя;</li> <li>
-	* <b>EDITOR_ID</b> - ID того, кто отредактировал сообщение;</li> <li> <b>EDITOR_NAME</b> -
-	* имя того, кто отредактировал сообщение;</li> <li> <b>EDITOR_EMAIL</b> - e-mail
-	* того, кто отредактировал сообщение;</li> <li> <b>EDIT_REASON</b> - причина
-	* редактирования сообщения;</li> <li> <b>EDIT_DATE</b> - дата редактирования
-	* сообщения;</li> </ul> Направление сортировки может принимать
-	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
-	* убыванию;</li> </ul> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
-	*
-	*
-	*
-	* @param array $arFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> - ID
-	* сообщения;</li> <li> <b>AUTHOR_NAME</b> - имя автора сообщения;</li> <li> <b>AUTHOR_ID</b> -
-	* ID автора сообщения;</li> <li> <b>FORUM_ID</b> - ID форума;</li> <li> <b>TOPIC_ID</b> - ID
-	* темы;</li> <li> <b>APPROVED</b> - опубликовано;</li> <li> <b>PARAM1</b> - первый параметр
-	* элемента;</li> <li> <b>PARAM2</b> - второй параметр элемента;</li> <li> <b>APPROVED</b> -
-	* опубликовано;</li> <li> <b>NEW_TOPIC</b> - новая тема;</li> <li> <b>POST_MESSAGE</b> -
-	* сообщение;</li> <li> <b>ATTACH_IMG</b> - присоединенная картинка;</li> <li>
-	* <b>POST_DATE</b> - дата создания сообщения;</li> <li> <b>USER_ID</b> - ID
-	* пользователя;</li> <li> <b>NEW_MESSAGE</b> - новое сообщение;</li> <li> <b>USER_GROUP</b> -
-	* группа пользователя;</li> <li> <b>TOPIC_SOCNET_GROUP_ID</b> - ID группы соцсети;</li>
-	* <li> <b>TOPIC_OWNER_ID</b> - ID владельца темы;</li> <li> <b>TOPIC</b> - тема;</li> <li>
-	* <b>TOPIC_TITLE</b> - название темы;</li> <li> <b>TITLE</b> - название сообщения;</li> </ul>
-	* Перед названием фильтруемого поля может быть указан тип
-	* фильтрации: <ul> <li>"!" - не равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше
-	* либо равно</li> <li>"&gt;" - больше</li> <li>"&gt;=" - больше либо равно</li> </ul>
-	* Необязательное. По умолчанию записи не фильтруются.
-	*
-	*
-	*
-	* @param bool $bCount = false Если параметр равен True, то возвращается только количество
-	* сообщений, которое соответствует установленному фильтру.
-	* Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @param int $iNum = 0 Ограничение числа возвращаемых записей. Если параметр iNum отличен
-	* от нуля, то возвращается не более iNum записей. Поддерживается не
-	* для всех баз данных. Если параметр не поддерживается, то его
-	* установки игнорируются. Необязательный. По умолчанию равен 0.
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив параметров. </h
-	*
-	*
-	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // выберем все опубликованные сообщения темы с кодом $TID в порядке, обратном поступлению
-	* 
-	* $db_res = CForumMessage::GetListEx(array("ID"=&gt;"DESC"), array("TOPIC_ID"=&gt;$TID));
-	* while ($ar_res = $db_res-&gt;Fetch())
-	* {
-	*   echo "&lt;pre&gt;";
-	*   print_r($ar_res);
-	*   echo "&lt;/pre&gt;&lt;br&gt;";
-	* }
-	* ?&gt;
-	* 
-	* 
-	* 
-	* &lt;?
-	* // Для выборки сообщений из нескольких топиков можно использовать код:
-	* 
-	* cmodule::includemodule('forum');
-	* 
-	* $res = CForumMessage::GetListEx(array("POST_DATE"=&gt;"DESC"), array('@TOPIC_ID'=&gt;array(6,7)), false, 2);
-	* while($arMessages = $res-&gt;Fetch())
-	* {
-	*   echo "&lt;pre&gt;";
-	* print_r($arMessages["POST_MESSAGE"]);
-	*   echo "&lt;/pre&gt;";
-	* }
-	* 
-	* 
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a> </li> </ul> <a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getlistex.php
-	* @author Bitrix
-	*/
 	public static function GetListEx($arOrder = Array("ID"=>"ASC"), $arFilter = Array(), $bCount = false, $iNum = 0, $arAddParams = array())
 	{
 		global $DB;
@@ -914,14 +605,36 @@ class CForumMessage extends CAllForumMessage
 						$arSqlSelect[] = "FT.OWNER_ID as TOPIC_OWNER_ID";
 					break;
 				case "TOPIC":
+					$arSqlFrom["FT"] = "
+						LEFT JOIN b_forum_topic FT ON (FT.ID = FM.TOPIC_ID)";
+					$arSqlSelect[] = "FT.TITLE";
+					$arSqlSelect[] = CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO";
+					$arSqlSelect[] = "FT.DESCRIPTION AS TOPIC_DESCRIPTION";
+					$arSqlSelect[] = $DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE";
+					$arSqlSelect[] = "FT.USER_START_NAME";
+					$arSqlSelect[] = "FT.USER_START_ID";
+					$arSqlSelect[] = "FT.XML_ID AS TOPIC_XML_ID";
+					$arSqlSelect[] = "FT.SOCNET_GROUP_ID AS TOPIC_SOCNET_GROUP_ID";
+					$arSqlSelect[] = "FT.OWNER_ID AS TOPIC_OWNER_ID";
+				break;
+				case "TOPIC_MESSAGE_ID":
+					if (is_array($val))
+					{
+						$val_int = array();
+						foreach ($val as $v)
+							$val_int[] = intval($v);
+						$val = implode(", ", $val_int);
+					}
+					else
+					{
+						$val = intval($val);
+					}
+					if (!empty($val))
+					{
 						$arSqlFrom["FT"] = "
 							LEFT JOIN b_forum_topic FT ON (FT.ID = FM.TOPIC_ID)";
-						$arSqlSelect[] = "FT.TITLE";
-						$arSqlSelect[] = CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO";
-						$arSqlSelect[] = "FT.DESCRIPTION AS TOPIC_DESCRIPTION";
-						$arSqlSelect[] = $DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE";
-						$arSqlSelect[] = "FT.USER_START_NAME";
-						$arSqlSelect[] = "FT.USER_START_ID";
+						$arSqlSearch[] = "FT.ID IN (SELECT DISTINCT TOPIC_ID FROM b_forum_message WHERE ID IN (".$val."))";
+					}
 				break;
 				case "TOPIC_TITLE":
 				case "TITLE":

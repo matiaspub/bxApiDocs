@@ -168,6 +168,7 @@ class COpenIDClient
 				'LID' => SITE_ID,
 				"PERSONAL_WWW" => $arOpenID['identity'],
 			);
+
 			if (array_key_exists('openid_sreg_email', $_GET))
 				$arFields['EMAIL'] = $_GET['openid_sreg_email'];
 
@@ -212,8 +213,16 @@ class COpenIDClient
 
 			if($GLOBALS["USER"]->IsAuthorized() && $GLOBALS["USER"]->GetID())
 			{
-				CSocServAuthDB::Add($arFields);
-				self::CleanParam();
+				if(!CSocServAuth::isSplitDenied())
+				{
+					$arFields['USER_ID'] = $GLOBALS["USER"]->GetID();
+					CSocServAuthDB::Add($arFields);
+					self::CleanParam();
+				}
+				else
+				{
+					$errorCode = SOCSERV_REGISTRATION_DENY;
+				}
 			}
 			else
 			{
@@ -239,38 +248,53 @@ class COpenIDClient
 					if($def_group != '')
 						$arFields['GROUP_ID'] = explode(',', $def_group);
 
-					foreach(GetModuleEvents("main", "OnBeforeOpenIDUserAdd", true) as $arEvent)
-						ExecuteModuleEventEx($arEvent, array($arFields));
+					if(!empty($arFields['GROUP_ID']) && CSocServAuth::isAuthDenied($arFields['GROUP_ID']))
+					{
+						$errorCode = SOCSERV_REGISTRATION_DENY;
+					}
+					else
+					{
+						foreach(GetModuleEvents("main", "OnBeforeOpenIDUserAdd", true) as $arEvent)
+							ExecuteModuleEventEx($arEvent, array($arFields));
 
-					$arFieldsUser = $arFields;
-					$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
-					if(!($USER_ID = $GLOBALS["USER"]->Add($arFieldsUser)))
-						return false;
-					$arFields['CAN_DELETE'] = 'N';
-					$arFields['USER_ID'] = $USER_ID;
-					CSocServAuthDB::Add($arFields);
-					unset($arFields['CAN_DELETE']);
+						$arFieldsUser = $arFields;
+						$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
+						if(!($USER_ID = $GLOBALS["USER"]->Add($arFieldsUser)))
+							return false;
+						$arFields['CAN_DELETE'] = 'N';
+						$arFields['USER_ID'] = $USER_ID;
+						CSocServAuthDB::Add($arFields);
+						unset($arFields['CAN_DELETE']);
+					}
 				}
 				elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
 					$errorCode = 2;
 				if (intval($USER_ID) > 0)
 				{
-					$USER->Authorize($USER_ID);
+					$arGroups = $USER->GetUserGroup($USER_ID);
+					if(CSocServAuth::isAuthDenied($arGroups))
+					{
+						$errorCode = SOCSERV_AUTHORISATION_ERROR;
+					}
+					else
+					{
+						$USER->AuthorizeWithOtp($USER_ID);
 
-					$arKillParams = array("auth_service_id", "check_key");
-					foreach (array_keys($_GET) as $k)
-						if (strpos($k, 'openid_') === 0)
-							$arKillParams[] = $k;
+						$arKillParams = array("auth_service_id", "check_key");
+						foreach (array_keys($_GET) as $k)
+							if (strpos($k, 'openid_') === 0)
+								$arKillParams[] = $k;
 
-					$redirect_url = $APPLICATION->GetCurPageParam('', $arKillParams, false);
+						$redirect_url = $APPLICATION->GetCurPageParam('', $arKillParams, false);
 
-					foreach(GetModuleEvents("main", "OnBeforeOpenIDAuthFinalRedirect", true) as $arEvent)
-						ExecuteModuleEventEx($arEvent, array($redirect_url, $USER_ID, $arFields));
+						foreach(GetModuleEvents("main", "OnBeforeOpenIDAuthFinalRedirect", true) as $arEvent)
+							ExecuteModuleEventEx($arEvent, array($redirect_url, $USER_ID, $arFields));
 
-					if ($redirect_url)
-						LocalRedirect($redirect_url, true);
+						if ($redirect_url)
+							LocalRedirect($redirect_url, true);
 
-					return $USER_ID;
+						return $USER_ID;
+					}
 				}
 			}
 		}

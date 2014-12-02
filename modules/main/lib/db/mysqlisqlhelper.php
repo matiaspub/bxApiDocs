@@ -1,264 +1,78 @@
 <?php
 namespace Bitrix\Main\DB;
 
-use Bitrix\Main;
-use Bitrix\Main\Type;
+use Bitrix\Main\Entity;
 
-class MysqliSqlHelper extends SqlHelper
+class MysqliSqlHelper extends MysqlCommonSqlHelper
 {
-
 	/**
-	 * Identificator escaping - left char
+	 * Escapes special characters in a string for use in an SQL statement.
+	 *
+	 * @param string $value Value to be escaped.
+	 * @param integer $maxLength Limits string length if set.
+	 *
 	 * @return string
 	 */
-	static public function getLeftQuote()
-	{
-		return '`';
-	}
-
-	/**
-	 * Identificator escaping - left char
-	 * @return string
-	 */
-	static public function getRightQuote()
-	{
-		return '`';
-	}
-
-	static public function getQueryDelimiter()
-	{
-		return ';';
-	}
-
-	static public function getAliasLength()
-	{
-		return 256;
-	}
-
 	public function forSql($value, $maxLength = 0)
 	{
 		if ($maxLength > 0)
 			$value = substr($value, 0, $maxLength);
 
-		$con = $this->dbConnection->getResource();
+		$con = $this->connection->getResource();
 		/** @var $con \mysqli */
 
 		return $con->real_escape_string($value);
 	}
 
-	static public function getCurrentDateTimeFunction()
+	/**
+	 * Returns instance of a descendant from Entity\ScalarField
+	 * that matches database type.
+	 *
+	 * @param string $name Database column name.
+	 * @param mixed $type Database specific type.
+	 * @param array $parameters Additional information.
+	 *
+	 * @return Entity\ScalarField
+	 */
+	static public function getFieldByColumnType($name, $type, array $parameters = null)
 	{
-		return "NOW()";
-	}
-
-	static public function getCurrentDateFunction()
-	{
-		return "CURDATE()";
-	}
-
-	static public function addSecondsToDateTime($seconds, $from = null)
-	{
-		if ($from === null)
+		switch($type)
 		{
-			$from = static::getCurrentDateTimeFunction();
+			case MYSQLI_TYPE_TINY:
+			case MYSQLI_TYPE_SHORT:
+			case MYSQLI_TYPE_LONG:
+			case MYSQLI_TYPE_INT24:
+			case MYSQLI_TYPE_CHAR:
+				return new Entity\IntegerField($name);
+
+			case MYSQLI_TYPE_DECIMAL:
+			case MYSQLI_TYPE_NEWDECIMAL:
+			case MYSQLI_TYPE_FLOAT:
+			case MYSQLI_TYPE_DOUBLE:
+				return new Entity\FloatField($name);
+
+			case MYSQLI_TYPE_DATETIME:
+			case MYSQLI_TYPE_TIMESTAMP:
+				return new Entity\DatetimeField($name);
+
+			case MYSQLI_TYPE_DATE:
+			case MYSQLI_TYPE_NEWDATE:
+				return new Entity\DateField($name);
 		}
-
-		return 'DATE_ADD('.$from.', INTERVAL '.$seconds.' SECOND)';
-	}
-
-	static public function getConcatFunction()
-	{
-		$str = "";
-		$ar = func_get_args();
-		if (is_array($ar))
-			$str .= implode(", ", $ar);
-		if (strlen($str) > 0)
-			$str = "CONCAT(".$str.")";
-		return $str;
-	}
-
-	static public function getIsNullFunction($expression, $result)
-	{
-		return "IFNULL(".$expression.", ".$result.")";
-	}
-
-	static public function getLengthFunction($field)
-	{
-		return "LENGTH(".$field.")";
-	}
-
-	static public function getCharToDateFunction($value)
-	{
-		return "'".$value."'";
-	}
-
-	static public function getDateToCharFunction($fieldName)
-	{
-		return $fieldName;
-	}
-
-	static public function getDatetimeToDateFunction($value)
-	{
-		return 'DATE('.$value.')';
-	}
-
-	static public function formatDate($format, $field = null)
-	{
-		static $search  = array(
-			"YYYY",
-			"MMMM",
-			"MM",
-			"MI",
-			"DD",
-			"HH",
-			"GG",
-			"G",
-			"SS",
-			"TT",
-			"T"
-		);
-		static $replace = array(
-			"%Y",
-			"%M",
-			"%m",
-			"%i",
-			"%d",
-			"%H",
-			"%h",
-			"%l",
-			"%s",
-			"%p",
-			"%p"
-		);
-
-		foreach ($search as $k=>$v)
-		{
-			$format = str_replace($v, $replace[$k], $format);
-		}
-
-		if (strpos($format, '%H') === false)
-		{
-			$format = str_replace("H", "%h", $format);
-		}
-
-		if (strpos($format, '%M') === false)
-		{
-			$format = str_replace("M", "%b", $format);
-		}
-
-		if($field === null)
-		{
-			return $format;
-		}
-		else
-		{
-			return "DATE_FORMAT(".$field.", '".$format."')";
-		}
-	}
-
-	public function prepareInsert($tableName, $arFields)
-	{
-		$strInsert1 = "";
-		$strInsert2 = "";
-
-		$arColumns = $this->dbConnection->getTableFields($tableName);
-		foreach ($arColumns as $columnName => $columnInfo)
-		{
-			if (array_key_exists($columnName, $arFields))
-			{
-				$strInsert1 .= ", `".$columnName."`";
-				$strInsert2 .= ", ".$this->convertValueToDb($arFields[$columnName], $columnInfo);
-			}
-			elseif (array_key_exists("~".$columnName, $arFields))
-			{
-				$strInsert1 .= ", `".$columnName."`";
-				$strInsert2 .= ", ".$arFields["~".$columnName];
-			}
-		}
-
-		if ($strInsert1 != "")
-		{
-			$strInsert1 = " ".substr($strInsert1, 2)." ";
-			$strInsert2 = " ".substr($strInsert2, 2)." ";
-		}
-
-		return array($strInsert1, $strInsert2, array());
-	}
-
-	protected function convertValueToDb($value, array $columnInfo)
-	{
-		if ($value === null)
-		{
-			return "NULL";
-		}
-
-		if ($value instanceof SqlExpression)
-		{
-			return $value->compile();
-		}
-
-		switch ($columnInfo["TYPE"])
-		{
-			case "datetime":
-				if (empty($value))
-				{
-					$result = "NULL";
-				}
-				elseif($value instanceof Type\Date)
-				{
-					if($value instanceof Type\DateTime)
-					{
-						$value = clone($value);
-						$value->setDefaultTimeZone();
-					}
-					$result = $this->getCharToDateFunction($value->format("Y-m-d H:i:s"));
-				}
-				else
-				{
-					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
-				}
-				break;
-			case "date":
-				if (empty($value))
-				{
-					$result = "NULL";
-				}
-				elseif($value instanceof Type\Date)
-				{
-					$result = $this->getCharToDateFunction($value->format("Y-m-d"));
-				}
-				else
-				{
-					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
-				}
-				break;
-			case "int":
-				$result = "'".intval($value)."'";
-				break;
-			case "real":
-				$result = "'".doubleval($value)."'";
-				break;
-			default:
-				$result = "'".$this->forSql($value)."'";
-				break;
-		}
-
-		return $result;
-	}
-
-	static public function getTopSql($sql, $limit, $offset = 0)
-	{
-		$offset = intval($offset);
-		$limit = intval($limit);
-
-		if ($offset > 0 && $limit <= 0)
-			throw new \Bitrix\Main\ArgumentException("Limit must be set if offset is set");
-
-		if ($limit > 0)
-		{
-			$sql .= "\nLIMIT ".$offset.", ".$limit."\n";
-		}
-
-		return $sql;
+		//MYSQLI_TYPE_BIT
+		//MYSQLI_TYPE_LONGLONG
+		//MYSQLI_TYPE_TIME
+		//MYSQLI_TYPE_YEAR
+		//MYSQLI_TYPE_INTERVAL
+		//MYSQLI_TYPE_ENUM
+		//MYSQLI_TYPE_SET
+		//MYSQLI_TYPE_TINY_BLOB
+		//MYSQLI_TYPE_MEDIUM_BLOB
+		//MYSQLI_TYPE_LONG_BLOB
+		//MYSQLI_TYPE_BLOB
+		//MYSQLI_TYPE_VAR_STRING
+		//MYSQLI_TYPE_STRING
+		//MYSQLI_TYPE_GEOMETRY
+		return new Entity\StringField($name);
 	}
 }

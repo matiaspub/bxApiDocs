@@ -705,7 +705,7 @@ class _CEventsCatalog {
 	 *
 	 *
 	 *
-	 * @param int $ID  Идентификатор цены. </ht
+	 * @param int $ID  Идентификатор цены. </h
 	 *
 	 *
 	 *
@@ -858,7 +858,7 @@ class _CEventsCatalog {
 	 * <p><b>Методы</b></p></bo<ul> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
 	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
-	 * </li> </ul><p><b>События</b></p></bod<ul> <li> <a
+	 * </li> </ul><p><b>События</b></p><ul> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a> </li> </ul><a
 	 * name="examples"></a>
 	 *
@@ -890,7 +890,7 @@ class _CEventsCatalog {
 	 * <p><b>Методы</b></p></bo<ul> <li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
 	 * <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
-	 * </li> </ul><p><b>События</b></p></bod<ul><li> <a
+	 * </li> </ul><p><b>События</b></p><ul><li> <a
 	 * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
 	 * </li></ul><br><br>
 	 *
@@ -1050,10 +1050,43 @@ class _CEventsCatalog {
 	 * В противном случае нужно вернуть значение <i>true</i>.</p>
 	 *
 	 *
+	 * <h4>Example</h4> 
+	 * <pre>
+	 * AddEventHandler("catalog", "OnBeforeGroupUpdate", Array("My_Class", "OnBeforeGroupUpdate"));
+	 * 
+	 * class My_Class
+	 * {
+	 * //запрещает редактировать базовый тип цен
+	 *     function OnBeforeGroupUpdate($ID, &amp;$arFields)
+	 *     {
+	 *         $base = (string)(isset($arFields['BASE']) ? $arFields['BASE'] : '');
+	 *         if ($base == '')
+	 *         {
+	 *             $groupIterator = CCatalogGroup::GetListEx(
+	 *                 array(),
+	 *                 array('ID' =&gt; $ID),
+	 *                 false,
+	 *                 false,
+	 *                 array('ID', 'BASE')
+	 *             );
+	 *             if ($group = $groupIterator-&gt;Fetch())
+	 *             {
+	 *                 $base = $group['BASE'];
+	 *                 unset($group);
+	 *             }
+	 *             unset($groupIterator);
+	 *         }
+	 *         return ($base != 'Y');
+	 *     }
+	 * }
+	 * </pre>
+	 *
+	 *
+	 *
 	 * <h4>See Also</h4> 
 	 * <ul> <li><a
 	 * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a></li>
-	 * </ul><br><br>
+	 * </ul>
 	 *
 	 *
 	 * @static

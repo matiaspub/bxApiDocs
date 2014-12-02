@@ -8,7 +8,10 @@ class CAllSocNetLogEvents
 	/***************************************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB, $arSocNetAllowedEntityTypes, $arSocNetAllowedSubscribeEntityTypes, $arSocNetLogEvents, $arSocNetFeaturesSettings;
+		global $DB, $arSocNetAllowedEntityTypes;
+
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
+		$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
 		{
@@ -23,7 +26,7 @@ class CAllSocNetLogEvents
 		}
 		elseif (is_set($arFields, "ENTITY_TYPE"))
 		{
-			if (!in_array($arFields["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypes))
+			if (!in_array($arFields["ENTITY_TYPE"], CSocNetAllowed::GetAllowedEntityTypes()))
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_LE_ERROR_NO_ENTITY_TYPE"), "ERROR_NO_ENTITY_TYPE");
 				return false;
@@ -164,16 +167,18 @@ class CAllSocNetLogEvents
 
 	public static function DeleteByUserAndEntity($userID, $entityType, $entityID)
 	{
-		global $DB, $arSocNetAllowedSubscribeEntityTypes;
+		global $DB;
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 			return false;
 
 		$entityType = Trim($entityType);
-		
-		if (!in_array($entityType, $arSocNetAllowedSubscribeEntityTypes))
+
+		if (!in_array($entityType, CSocNetAllowed::GetAllowedEntityTypes()))
+		{
 			return false;
+		}
 
 		$entityID = IntVal($entityID);
 		if ($entityID <= 0)
@@ -218,8 +223,6 @@ class CAllSocNetLogEvents
 	/***************************************/
 	public static function AutoSubscribe($userID, $entityType, $entityID)
 	{
-		global $arSocNetFeaturesSettings;
-
 		$dbRes = CSocNetLogEvents::GetList(
 			array(),
 			array("USER_ID" => $userID, "ENTITY_TYPE" => $entityType, "ENTITY_ID" => $entityID)
@@ -254,6 +257,7 @@ class CAllSocNetLogEvents
 			CSocNetLogEvents::Add($arLogEvent);
 		}
 
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 		foreach ($arSocNetFeaturesSettings as $key => $value)
 		{
 			$arLogEvent = array(
@@ -310,15 +314,19 @@ class CAllSocNetLogEvents
 				$strNotMyEntities[$entity_type_tmp] = "(".$table_alias.".ENTITY_ID NOT IN (".implode(",", $arMyEntity).") AND ".$table_alias.".ENTITY_TYPE = '".$entity_type_tmp."')";
 			}
 		}
-		
+
 		$arCBFilterEntityType = array();
-		foreach($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"] as $entity_type_tmp => $arEntityTypeTmp)
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
+		foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
 		{
 			if (
 				array_key_exists("USE_CB_FILTER", $arEntityTypeTmp)
 				&& $arEntityTypeTmp["USE_CB_FILTER"] == "Y"
 			)
+			{
 				$arCBFilterEntityType[] = "'".$entity_type_tmp."'";
+			}
 		}
 
 		if (is_array($arCBFilterEntityType) && count($arCBFilterEntityType) > 0)
@@ -659,8 +667,10 @@ class CAllSocNetLogEvents
 
 	public static function GetSQLForEvent($entity_type, $entity_id, $event_id, $user_id, $transport = false, $visible = true, $arOfEntities = array())
 	{
-		if (!in_array($entity_type, $GLOBALS["arSocNetAllowedSubscribeEntityTypes"]))
+		if (!in_array($entity_type, CSocNetAllowed::GetAllowedEntityTypes()))
+		{
 			return false;
+		}
 
 		if (intval($entity_id) <= 0)
 			return false;
@@ -691,11 +701,14 @@ class CAllSocNetLogEvents
 				".$strTransport."
 			)";
 
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
 		if (
-			array_key_exists("USE_CB_FILTER", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type])
-			&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entity_type]["USE_CB_FILTER"] == "Y"
+			array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+			&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 			&& intval($user_id) > 0
 		)
+		{
 			$strSQL .= "
 				OR 
 				(
@@ -709,6 +722,7 @@ class CAllSocNetLogEvents
 					)
 					".$strTransport."
 				)";
+		}
 
 		$strSQL .= "
 			OR

@@ -193,12 +193,7 @@ class CCourse
 
 		if ( ! isset($arMap['C' . $courseId]) )
 		{
-			// Logic error
-			throw new LearnException (
-				'EA_LOGIC: is DB corrupted?', 
-				LearnException::EXC_ERR_ALL_GIVEUP
-				| LearnException::EXC_ERR_ALL_LOGIC
-				);
+			return false;
 		}
 
 		// return id of corresponded lesson
@@ -227,8 +222,7 @@ class CCourse
 			$arMsg[] = array("id"=>"ACTIVE_TO", "text"=> GetMessage("LEARNING_BAD_ACTIVE_TO"));
 		}
 
-
-		if (is_set($arFields, "PREVIEW_PICTURE"))
+		if (is_set($arFields, "PREVIEW_PICTURE") && is_array($arFields["PREVIEW_PICTURE"]))
 		{
 			$error = CFile::CheckImageFile($arFields["PREVIEW_PICTURE"]);
 			if (strlen($error)>0)
@@ -558,7 +552,8 @@ class CCourse
 		if (is_set($arFields, "RATING_TYPE") && !in_array($arFields["RATING_TYPE"], Array("like", "standart_text", "like_graphic", "standart")))
 			$arFields["RATING_TYPE"] = NULL;
 
-		if ($this->CheckFields($arFields, $ID))
+		$lessonId = self::CourseGetLinkedLesson ($ID);
+		if ($this->CheckFields($arFields, $ID) && $lessonId !== false)
 		{
 			if (array_key_exists('ID', $arFields))
 				unset($arFields["ID"]);
@@ -590,7 +585,6 @@ class CCourse
 
 			}
 
-			$lessonId = self::CourseGetLinkedLesson ($ID);
 			CLearnLesson::Update($lessonId, $arFieldsLesson);
 
 			if ($ID && (is_set($arFields, "NAME") || is_set($arFields, "DESCRIPTION") || is_set($arFields, 'DETAIL_TEXT')))
@@ -714,6 +708,11 @@ class CCourse
 			return false;
 
 		$lessonId = CCourse::CourseGetLinkedLesson($ID);
+		if ($lessonId === false)
+		{
+			return false;
+		}
+
 		CLearnLesson::Delete($lessonId);
 
 		return true;
@@ -1166,6 +1165,7 @@ class CCourse
 	* }
 	* 
 	* ?&gt;
+	* </bod
 	* </pre>
 	*
 	*
@@ -1212,15 +1212,13 @@ class CCourse
 	public static function OnSearchReindex($NS = array(), $oCallback = null, $callback_method = '')
 	{
 		global $DB;
+		static $arCourseToSiteCache = array();
 
 		$arResult         = array();
 		$arAllSitesPathes = array();
-		$oPath            = new CLearnPath();
 		$elementStartId   = 0;
 		$indexElementType = 'C';	// start reindex from courses
 		$by = $order = '';
-
-		$lastProcessedCourseId = false;
 
 		$sites = CLang::GetList($by, $order, Array('TYPE' => 'C'));
 		while($site = $sites->Fetch())
@@ -1229,7 +1227,7 @@ class CCourse
 				'C' => CCourse::GetSitePathes($site['LID'], 'C'),
 				'H' => CCourse::GetSitePathes($site['LID'], 'H'),
 				'L' => CCourse::GetSitePathes($site['LID'], 'L')
-				);			
+			);
 		}
 
 		$arCoursesFilter = array();
@@ -1250,7 +1248,7 @@ class CCourse
 			$rsCourse = CCourse::GetList(
 				array('ID' => 'ASC'), 
 				$arCoursesFilter
-				);
+			);
 
 			while ($arCourse = $rsCourse->Fetch())
 			{
@@ -1259,6 +1257,10 @@ class CCourse
 					$arCourse["SITE_ID"] = CCourse::GetSiteId($arCourse['ID']);
 					$arPathes            = $arAllSitesPathes[$arCourse['SITE_ID']]['C'];
 					$linkedLessonId      = CCourse::CourseGetLinkedLesson($arCourse['ID']);
+					if ($linkedLessonId === false)
+					{
+						continue;
+					}
 					$arGroupPermissions  = CLearnAccess::GetSymbolsAccessibleToLesson ($linkedLessonId, CLearnAccess::OP_LESSON_READ);
 				}
 				catch (LearnException $e)
@@ -1274,15 +1276,11 @@ class CCourse
 					$arSiteIds[$arCourse['SITE_ID']] = $Url;
 				}
 
-				$lastProcessedCourseId = $arCourse['ID'];
-
-				$detailText = '';
 				if ($arCourse["DETAIL_TEXT_TYPE"] !== 'text')
 					$detailText = CSearch::KillTags($arCourse['DETAIL_TEXT']);
 				else
 					$detailText = strip_tags($arCourse['DETAIL_TEXT']);
 
-				$dataBody = '';
 				if (strlen($detailText) > 0)
 					$dataBody = $detailText;
 				else
@@ -1319,91 +1317,115 @@ class CCourse
 			$rsLessons = CLearnLesson::GetList(
 				array('LESSON_ID' => 'ASC'),
 				$arLessonsFilter
-				);
+			);
 
-			$arLessonsWithCourse = array();	// list of lessons in context of some course
-
-			while ($arLesson = $rsLessons->Fetch())
+			while ($arLessonFromDb = $rsLessons->Fetch())
 			{
-				$arOParentPathes = CLearnLesson::GetListOfParentPathes($arLesson['LESSON_ID']);
+				$arLessonsWithCourse = array();	// list of lessons in context of some course
+
+				$arOParentPathes = CLearnLesson::GetListOfParentPathes($arLessonFromDb['LESSON_ID']);
 
 				foreach ($arOParentPathes as $oParentPath)
 				{
-					$mostParentLesson = $oParentPath->GetTop();
-					$linkedCourseId = CLearnLesson::GetLinkedCourse($mostParentLesson);
-					if ($linkedCourseId !== false)
-						$arLessonsWithCourse[] = array_merge($arLesson, array('PARENT_COURSE_ID' => $linkedCourseId));
-				}
-			}
+					$arParentLessons = $oParentPath->GetPathAsArray();
 
-			foreach ($arLessonsWithCourse as $arLesson)
-			{
-				try
-				{
-					$arGroupPermissions  = CLearnAccess::GetSymbolsAccessibleToLesson ($arLesson['LESSON_ID'], CLearnAccess::OP_LESSON_READ);
-		
-					$arSiteIds = array();
-					$lessonType = 'L';
-					if ($arLesson['IS_CHILDS'])
-						$lessonType = 'H';
-
-					foreach ($arAllSitesPathes as $siteId => $arSitePathesByLessonType)
+					foreach ($arParentLessons as $lessonId)
 					{
-						foreach ($arSitePathesByLessonType as $someLessonType => $arPathes)
+						$linkedCourseId = CLearnLesson::GetLinkedCourse($lessonId);
+						if (($linkedCourseId !== false) && ($linkedCourseId > 0))
+							$arLessonsWithCourse[] = array_merge($arLessonFromDb, array('PARENT_COURSE_ID' => $linkedCourseId));
+					}
+
+				}
+
+				foreach ($arLessonsWithCourse as $arLesson)
+				{
+					try
+					{
+						$arGroupPermissions = CLearnAccess::GetSymbolsAccessibleToLesson ($arLesson['LESSON_ID'], CLearnAccess::OP_LESSON_READ);
+
+						$courseId = $arLesson['PARENT_COURSE_ID'];
+
+						if ( ! isset($arCourseToSiteCache[$courseId]) )
 						{
-							// skip wrong types of lessons
-							if ($lessonType !== $someLessonType)
+							$strSql = "SELECT SITE_ID FROM b_learn_course_site WHERE COURSE_ID=" . (int) $courseId;
+							$rc = $DB->Query($strSql, true);
+
+							if ($rc === false)
 								continue;
 
-							foreach ($arPathes as $k => $path)
+							$arCourseToSiteCache[$courseId] = array();
+							while ($arCourseSite = $rc->fetch())
+								$arCourseToSiteCache[$courseId][] = $arCourseSite['SITE_ID'];
+						}
+
+						$arAllowedSites = $arCourseToSiteCache[$courseId];
+
+						if (empty($arAllowedSites))
+							continue;
+
+						$arSiteIds = array();
+						$lessonType = 'L';
+						if ($arLesson['IS_CHILDS'])
+							$lessonType = 'H';
+
+						foreach ($arAllSitesPathes as $siteId => $arSitePathesByLessonType)
+						{
+							if ( ! in_array($siteId, $arAllowedSites, true) )
+								continue;
+
+							foreach ($arSitePathesByLessonType as $someLessonType => $arPathes)
 							{
-								$oPath->SetPath($arLesson['LESSON_ID']);
+								// skip wrong types of lessons
+								if ($lessonType !== $someLessonType)
+									continue;
 
-								if ($lessonType == 'H')
-									$Url = str_replace("#CHAPTER_ID#", '0' . $arLesson['LESSON_ID'], $path);
-								else
-									$Url = str_replace("#LESSON_ID#", $arLesson['LESSON_ID'], $path);
+								foreach ($arPathes as $k => $path)
+								{
+									if ($lessonType == 'H')
+										$Url = str_replace("#CHAPTER_ID#", '0' . $arLesson['LESSON_ID'], $path);
+									else
+										$Url = str_replace("#LESSON_ID#", $arLesson['LESSON_ID'], $path);
 
-								$Url = str_replace("#COURSE_ID#", $arLesson['PARENT_COURSE_ID'], $Url);
-								$arSiteIds[$siteId] = $Url;
+									$Url = str_replace("#COURSE_ID#", $arLesson['PARENT_COURSE_ID'], $Url);
+									$arSiteIds[$siteId] = $Url;
+								}
 							}
 						}
 					}
+					catch (LearnException $e)
+					{
+						continue;	// skip indexation of this item
+					}
+
+					if ($arLesson["DETAIL_TEXT_TYPE"] !== 'text')
+						$detailText = CSearch::KillTags($arLesson['DETAIL_TEXT']);
+					else
+						$detailText = strip_tags($arLesson['DETAIL_TEXT']);
+
+					if (strlen($detailText) > 0)
+						$dataBody = $detailText;
+					else
+						$dataBody = $arLesson['NAME'];
+
+					$Result = array(
+						"ID"            => 'U' . $arLesson['LESSON_ID'],
+						"LAST_MODIFIED"	=> $arLesson['TIMESTAMP_X'],
+						"TITLE"         => $arLesson['NAME'],
+						"BODY"          => $dataBody,
+						"SITE_ID"       => $arSiteIds,
+						"PERMISSIONS"   => $arGroupPermissions
+					);
+
+					if ($oCallback)
+					{
+						$res = call_user_func(array($oCallback, $callback_method), $Result);
+						if ( ! $res )
+							return ('U' . $arLesson['LESSON_ID']);
+					}
+					else
+						$arResult[] = $Result;
 				}
-				catch (LearnException $e)
-				{
-					continue;	// skip indexation of this item
-				}
-
-				$detailText = '';
-				if ($arLesson["DETAIL_TEXT_TYPE"] !== 'text')
-					$detailText = CSearch::KillTags($arLesson['DETAIL_TEXT']);
-				else
-					$detailText = strip_tags($arLesson['DETAIL_TEXT']);
-
-				$dataBody = '';
-				if (strlen($detailText) > 0)
-					$dataBody = $detailText;
-				else
-					$dataBody = $arLesson['NAME'];
-
-				$Result = array(
-					"ID"            => 'U' . $arLesson['LESSON_ID'],
-					"LAST_MODIFIED"	=> $arLesson['TIMESTAMP_X'],
-					"TITLE"         => $arLesson['NAME'],
-					"BODY"          => $dataBody,
-					"SITE_ID"       => $arSiteIds,
-					"PERMISSIONS"   => $arGroupPermissions
-				);
-
-				if ($oCallback)
-				{
-					$res = call_user_func(array($oCallback, $callback_method), $Result);
-					if ( ! $res )
-						return ('U' . $arLesson['LESSON_ID']);
-				}
-				else
-					$arResult[] = $Result;
 			}
 		}
 
@@ -1501,7 +1523,7 @@ class CCourse
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
-	* $permission = CIBlock::GetPermission($id);
+	* $permission = CCourse::GetPermission($id);
 	* if ($permission&lt;"X")
 	*     return false;
 	* ?&gt;

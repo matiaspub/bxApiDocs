@@ -4,71 +4,8 @@ IncludeModuleLangFile(__FILE__);
 //*****************************************************************************************************************
 //	PM
 //************************************!****************************************************************************
-
-/**
- * <b>CForumPrivateMessage</b> - класс для работы с приватными сообщениями.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/index.php
- * @author Bitrix
- */
 class CAllForumPrivateMessage
 {
-	
-	/**
-	* <p>Создает новое сообщение с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного сообщения.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a>. Обязательные поля должны быть заполнены.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = Array(
-	* 	"AUTHOR_ID"    =&gt; $AUTHOR_ID,
-	* 	"POST_DATE"    =&gt; $POST_DATE,   
-	* 	"POST_SUBJ"    =&gt; $POST_SUBJ,   
-	* 	"POST_MESSAGE" =&gt; $POST_MESSAGE,
-	* 	"USER_ID"      =&gt; $USER_ID,     
-	* 	"FOLDER_ID"    =&gt; 1,   
-	* 	"IS_READ"      =&gt; "N",     
-	* 	"USE_SMILES"   =&gt; ($USE_SMILES=="Y") ? "Y" : "N",
-	* 	"AUTHOR_NAME"  =&gt; $AUTHOR_NAME 
-	* );
-	* $ID = CForumPrivateMessage::Send($arFields);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a> </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/send.php
-	* @author Bitrix
-	*/
 	public static function Send($arFields = array())
 	{
 		global $DB;
@@ -154,38 +91,6 @@ class CAllForumPrivateMessage
 		return false;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующего сообщения с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого сообщения.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения, параметры которого необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a>.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB, $USER;
@@ -220,23 +125,6 @@ class CAllForumPrivateMessage
 		return false;
 	}
 
-	
-	/**
-	* <p>Удаляет сообщение с кодом <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения, которое необходимо удалить.
-	*
-	*
-	*
-	* @return bool <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER;
@@ -355,44 +243,6 @@ class CAllForumPrivateMessage
 		return true;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров сообщения по его коду <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения.
-	*
-	*
-	*
-	* @return array 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arMessage = CForumPrivateMessage::GetByID($MID);
-	* if ($arMessage)
-	* {
-	*   $AUTHOR_ID = IntVal($arMessage["AUTHOR_ID"]);
-	*   $USER_ID = IntVal($arMessage["USER_ID"]);
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a> </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/getbyid.php
-	* @author Bitrix
-	*/
 	function GetByID($ID)
 	{
 		global $DB;
@@ -419,59 +269,6 @@ class CAllForumPrivateMessage
 		return $result;
 	}
 
-	
-	/**
-	* <p>Возвращает список сообщений по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	*
-	*
-	*
-	*
-	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	* <br><br><i>by</i> - поле для сортировки, может принимать значения <br>
-	*     <b>ID </b>- ID сообщения; <br>     <b>AUTHOR_ID </b>- ID автора сообщения; <br>
-	*     <b>POST_DATE </b>- дата создания сообщения; <br>     <b>POST_SUBJ </b>- тема
-	* сообщения; <br>     <b>POST_MESSAGE </b>- текст сообщения; <br>     <b>USER_ID </b>- ID
-	* получателя сообщения (владельца); <br>     <b>FOLDER_ID </b>- ID папки; <br>
-	*     <b>IS_READ </b>- метка о прочтении сообщения; <br>     <b>USE_SMILES </b>-
-	* метка о разрешении использования смайликов как рисунков; <br>
-	*     <b>AUTHOR_NAME </b>- имя автора сообщения; <br><br><i>order</i> - порядок
-	* сортировки, может принимать значения <br>     <b>ASC</b> - по
-	* возрастанию; <br>     <b>DESC</b> - по убыванию; <br><br> Необязательный. По
-	* умолчанию равен Array("ID"=&gt;"ASC")
-	*
-	*
-	*
-	* @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
-	* "фильтруемое поле" может принимать значения <br>     <b>ID </b>- ID
-	* сообщения; <br>     <b>AUTHOR_ID </b>- ID автора сообщения; <br>     <b>POST_SUBJ </b>-
-	* тема сообщения; <br>     <b>POST_MESSAGE </b>- текст сообщения; <br>     <b>USER_ID
-	* </b>- ID получателя сообщения (владельца); <br>     <b>FOLDER_ID </b>- ID папки;
-	* <br>     <b>IS_READ </b>- метка о прочтении сообщения; <br><br> фильтруемое
-	* поле может содержать перед названием тип проверки фильтра <br> "!" -
-	* не равно <br> "&lt;" - меньше <br> "&lt;=" - меньше либо равно <br> "&gt;" - больше
-	* <br> "&gt;=" - больше либо равно <br><br> Обязательное.
-	*
-	*
-	*
-	* @param bool $bCount  Если параметр равен True, то возвращается только количество
-	* сообщений, которое соответствует установленному фильтру.
-	* Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	* <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter, $bCnt=false)
 	{
 		global $DB;
@@ -605,23 +402,6 @@ class CAllForumPrivateMessage
 		return $count["CNT"];
 	}
 
-	
-	/**
-	* <p>Позволяет получить количество непрочитанных персональных сообщений.</p>
-	*
-	*
-	*
-	*
-	* @param bool $FOLDER_ID = false Идентификатор папки. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return array <p>Возвращается массив с единственным ключом UNREAD_PM</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/getnewpm.php
-	* @author Bitrix
-	*/
 	public static function GetNewPM($FOLDER_ID = false)
 	{
 		global $DB, $USER;
@@ -649,55 +429,8 @@ class CAllForumPrivateMessage
 //*****************************************************************************************************************
 //	PM. Folders.
 //************************************!****************************************************************************
-
-/**
- * <b>CForumPMFolder</b> - класс для работы папками пользователя.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/index.php
- * @author Bitrix
- */
 class CALLForumPMFolder
 {
-	
-	/**
-	* <p>Создает новую папку с названием, указанным в <i>Title</i>. Возвращает код созданной папки.</p>
-	*
-	*
-	*
-	*
-	* @param string $Title  Название папки. Обязательный параметр. <br>
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $ID = CForumPMFolder::Add($TITLE);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
-	* пользователя"</a> </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/add.php
-	* @author Bitrix
-	*/
 	public static function Add($title)
 	{
 		global $DB, $USER, $APPLICATION;
@@ -710,36 +443,6 @@ class CALLForumPMFolder
 		return $DB->Add("b_forum_pm_folder", array("TITLE"=>$title, "USER_ID"=>$USER->GetId(), "SORT"=>"0"));
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующей папки пользователя с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код папки пользователя, параметры которой необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка пользователя"</a>.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
-	* пользователя"</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields = array())
 	{
 		global $DB, $USER, $APPLICATION;
@@ -770,51 +473,6 @@ class CALLForumPMFolder
 		return $dbRes;
 	}
 
-	
-	/**
-	* <p>Возвращает список сообщений по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	*
-	*
-	*
-	*
-	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <br><i>by</i> -
-	* поле для сортировки, может принимать значения <br>    <b>ID</b> - ID
-	* сообщения; <br>    <b>USER_ID</b> - ID владельца папки; <br>    <b>TITLE</b> - имя
-	* папки пользователя; <br><br><i>order</i> - порядок сортировки, может
-	* принимать значения <br>     <b>ASC</b> - по возрастанию; <br>     <b>DESC</b> -
-	* по убыванию; <br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
-	*
-	*
-	*
-	* @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
-	* "фильтруемое поле" может принимать значения <br><br>    <b>ID</b> - ID
-	* сообщения;<br>    <b>USER_ID</b> - ID владельца папки; <br>    <b>TITLE</b> - имя
-	* папки пользователя; <br><br> фильтруемое поле может содержать перед
-	* названием тип проверки фильтра <br> "!" - не равно <br> "&lt;" - меньше <br>
-	* "&lt;=" - меньше либо равно <br> "&gt;" - больше <br> "&gt;=" - больше либо равно
-	* <br><br> Обязательное.
-	*
-	*
-	*
-	* @param bool $bCount  Если параметр равен True, то возвращается только количество
-	* сообщений, которое соответствует установленному фильтру.
-	* Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
-	* <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumpmfolder">"Папка
-	* пользователя"</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = array("SORT" => "DESC", "TITLE"=>"DESC"), $arFilter, $bCnt=false)
 	{
 		global $DB;
@@ -896,23 +554,6 @@ class CALLForumPMFolder
 		return false;
 	}
 
-	
-	/**
-	* <p>Удаляет папку пользователя с кодом <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код папки пользователя, которую необходимо удалить.
-	*
-	*
-	*
-	* @return bool <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpmfolder/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB;

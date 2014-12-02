@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/traffic.php");
 
 /**
- * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта.
+ * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта.</body> </html>
  *
  *
  *
@@ -71,7 +71,7 @@ class CTraffic extends CAllTraffic
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/traffic.php">Отчет
-	* "Посещаемость"</a> </li> </ul> </htm<a name="examples"></a>
+	* "Посещаемость"</a> </li> </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static

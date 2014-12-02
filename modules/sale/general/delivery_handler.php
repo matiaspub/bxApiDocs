@@ -1372,7 +1372,7 @@ WHERE
 	*
 	*
 	*
-	* @param int $STEP  Текущий шаг расчёта. </htm
+	* @param int $STEP  Текущий шаг расчёта. </ht
 	*
 	*
 	*

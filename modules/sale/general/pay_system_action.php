@@ -189,6 +189,15 @@ class CAllSalePaySystemAction
 			return False;
 		}
 
+		if($key === "BASKET_ITEMS" && isset($GLOBALS["SALE_INPUT_PARAMS"]["BASKET_ITEMS"]))
+		{
+			return $GLOBALS["SALE_INPUT_PARAMS"]["BASKET_ITEMS"];
+		}
+		elseif($key === "TAX_LIST" && isset($GLOBALS["SALE_INPUT_PARAMS"]["TAX_LIST"]))
+		{
+			return $GLOBALS["SALE_INPUT_PARAMS"]["TAX_LIST"];
+		}
+
 		if (!isset($GLOBALS["SALE_CORRESPONDENCE"]) || !is_array($GLOBALS["SALE_CORRESPONDENCE"]))
 			return False;
 
@@ -227,8 +236,13 @@ class CAllSalePaySystemAction
 		return $res;
 	}
 
-	public static function InitParamArrays($arOrder, $orderID = 0, $psParams = "")
+	public static function InitParamArrays($arOrder, $orderID = 0, $psParams = "", $relatedData = array())
 	{
+		if(!is_array($relatedData))
+		{
+			$relatedData = array();
+		}
+
 		$GLOBALS["SALE_INPUT_PARAMS"] = array();
 		$GLOBALS["SALE_CORRESPONDENCE"] = array();
 
@@ -274,26 +288,39 @@ class CAllSalePaySystemAction
 		}
 
 		$arCurOrderProps = array();
-		$dbOrderPropVals = CSaleOrderPropsValue::GetList(
-				array(),
-				array("ORDER_ID" => $GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["ID"]),
-				false,
-				false,
-				array("ID", "CODE", "VALUE", "ORDER_PROPS_ID", "PROP_TYPE")
-			);
-		while ($arOrderPropVals = $dbOrderPropVals->Fetch())
+		if(isset($relatedData["PROPERTIES"]) && is_array($relatedData["PROPERTIES"]))
 		{
-			$arCurOrderPropsTmp = CSaleOrderProps::GetRealValue(
-					$arOrderPropVals["ORDER_PROPS_ID"],
-					$arOrderPropVals["CODE"],
-					$arOrderPropVals["PROP_TYPE"],
-					$arOrderPropVals["VALUE"],
-					LANGUAGE_ID
-				);
-			foreach ($arCurOrderPropsTmp as $key => $value)
+			$properties = $relatedData["PROPERTIES"];
+			foreach ($properties as $key => $value)
 			{
 				$arCurOrderProps["~".$key] = $value;
 				$arCurOrderProps[$key] = htmlspecialcharsEx($value);
+			}
+		}
+		else
+		{
+			$dbOrderPropVals = CSaleOrderPropsValue::GetList(
+					array(),
+					array("ORDER_ID" => $GLOBALS["SALE_INPUT_PARAMS"]["ORDER"]["ID"]),
+					false,
+					false,
+					array("ID", "CODE", "VALUE", "ORDER_PROPS_ID", "PROP_TYPE")
+				);
+			while ($arOrderPropVals = $dbOrderPropVals->Fetch())
+			{
+				$arCurOrderPropsTmp = CSaleOrderProps::GetRealValue(
+						$arOrderPropVals["ORDER_PROPS_ID"],
+						$arOrderPropVals["CODE"],
+						$arOrderPropVals["PROP_TYPE"],
+						$arOrderPropVals["VALUE"],
+						LANGUAGE_ID
+					);
+
+				foreach ($arCurOrderPropsTmp as $key => $value)
+				{
+					$arCurOrderProps["~".$key] = $value;
+					$arCurOrderProps[$key] = htmlspecialcharsEx($value);
+				}
 			}
 		}
 
@@ -323,6 +350,16 @@ class CAllSalePaySystemAction
 		{
 			$GLOBALS["SALE_CORRESPONDENCE"][$key]["~VALUE"] = $val["VALUE"];
 			$GLOBALS["SALE_CORRESPONDENCE"][$key]["VALUE"] = htmlspecialcharsEx($val["VALUE"]);
+		}
+
+		if(isset($relatedData["BASKET_ITEMS"]) && is_array($relatedData["BASKET_ITEMS"]))
+		{
+			$GLOBALS["SALE_INPUT_PARAMS"]["BASKET_ITEMS"] = $relatedData["BASKET_ITEMS"];
+		}
+
+		if(isset($relatedData["TAX_LIST"]) && is_array($relatedData["TAX_LIST"]))
+		{
+			$GLOBALS["SALE_INPUT_PARAMS"]["TAX_LIST"] = $relatedData["TAX_LIST"];
 		}
 	}
 

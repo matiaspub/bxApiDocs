@@ -10,62 +10,8 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/fo
 /**********************************************************************/
 /************** FORUM *************************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumUserPoints</b> - класс для работы с голосованиями пользователей форума за других пользователей форума.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuserpoints/index.php
- * @author Bitrix
- */
 class CForumNew extends CAllForumNew
 {
-	
-	/**
-	* <p>Создает новый форум с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного форума.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
-	* форума</a>. Обязательные поля должны быть заполнены.
-	*
-	*
-	*
-	* @return int <br><br><br><br><br><br><br><br><br><br>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?<br>CModule::IncludeModule("forum");
-	* $arFields = Array(
-	*    "NAME" =&gt; "Название форума", <br>   "DESCRIPTION" =&gt; "Описание форума (м.б. пустым, м.б. html-код)",<br>   "FORUM_GROUP_ID" =&gt; 0,<br>   "GROUP_ID" =&gt; array(1 =&gt; "Y", 2 =&gt; "I"), <br>   "SITES" =&gt; array(), // заполняется ниже<br>   "ACTIVE" =&gt; "Y", <br>   "MODERATION" =&gt; "N",<br>   "INDEXATION" =&gt; "Y",<br>   "SORT" =&gt; 150,<br>   "ASK_GUEST_EMAIL" =&gt; "N",<br>   "USE_CAPTCHA" =&gt; "N",<br>   "ALLOW_HTML" =&gt; "N",<br>   "ALLOW_ANCHOR" =&gt; "Y",<br>   "ALLOW_BIU" =&gt; "Y",<br>   "ALLOW_IMG" =&gt; "Y",<br>   "ALLOW_VIDEO" =&gt; "Y",<br>   "ALLOW_LIST" =&gt; "Y",<br>   "ALLOW_QUOTE" =&gt; "Y",<br>   "ALLOW_CODE" =&gt; "Y",<br>   "ALLOW_FONT" =&gt; "Y",<br>   "ALLOW_SMILES" =&gt; "Y",<br>   "ALLOW_UPLOAD" =&gt; "Y", <br>   "ALLOW_UPLOAD_EXT" =&gt; "",<br>   "ALLOW_TOPIC_TITLED" =&gt; "N", <br>   "EVENT1" =&gt; "forum");<br><br>$db_res = CSite::GetList($lby="sort", $lorder="asc");<br>while ($res = $db_res-&gt;Fetch()):<br>   $arFields["SITES"][$res["LID"]] = "/".$res["LID"]."/forum/#FORUM_ID#/#TOPIC_ID#/";<br>endwhile;<br><br>$res = CForumNew::Add($arFields);<br>if (intVal($res) &gt; 0):<br>   echo "New Forum ID: ".$res;<br>else:<br>   $e = $GLOBALS['APPLICATION']-&gt;GetException();<br>   if ($e &amp;&amp; $str = $e-&gt;GetString()):<br>       echo "Error: ".$str;<br>   else:<br>       echo "Unknown Error";<br>   endif;<br>endif;<br>?&gt;<br><br>Короткий пример добавления форума c обязательными полями:<br> 
-	* &lt;?<br>CModule::IncludeModule("forum");
-	* $arFields = Array(
-	*    "NAME" =&gt; "Имя форума",<br>   "GROUP_ID" =&gt; array(1 =&gt; "Y", 2 =&gt; "I"), <br>   "SITES" =&gt; array(<br>       "ru" =&gt; "/url/"));<br>$res = CForumNew::Add($arFields);<br>?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
-	* <li>Перед добавлением форума следует проверить возможность
-	* добавления методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php">CForumNew::CanUserAddForum</a>
-	* </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -264,70 +210,8 @@ class CForumNew extends CAllForumNew
 /**********************************************************************/
 /************** FORUM GROUP *******************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumGroup</b> - класс для работы с группами форумов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/index.php
- * @author Bitrix
- */
 class CForumGroup extends CAllForumGroup
 {
-	
-	/**
-	* <p>Создает новую группу с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной группы. На добавление нового звания параметры посетителей форума не пересчитываются. Пересчет будт происходить постепенно по мере общения посетителей на форуме.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
-	* полей групп</a>. В специальное поле "LANG" заносится массив массивов
-	* полей языковых параметров групп, которые имеют аналогичную
-	* структуру.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = array("SORT" =&gt; $SORT);
-	* $arSysLangs = array("ru", "en");
-	* for ($i = 0; $i&lt;count($arSysLangs); $i++)
-	* {
-	*   $arFields["LANG"][] = array(
-	*     "LID" =&gt; $arSysLangs[$i],
-	*     "NAME" =&gt; ${"NAME_".$arSysLangs[$i]},
-	*     "DESCRIPTION" =&gt; ${"DESCRIPTION_".$arSysLangs[$i]}
-	*     );
-	* }
-	* $ID = CForumGroup::Add($arFields);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -365,59 +249,6 @@ class CForumGroup extends CAllForumGroup
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующей группы с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой группы.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код группы, параметры которой необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
-	* полей групп</a>. В специальное поле "LANG" заносится массив массивов
-	* полей языковых параметров групп, которые имеют аналогичную
-	* структуру.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = array("SORT" =&gt; $SORT);
-	* $arSysLangs = array("ru", "en");
-	* for ($i = 0; $i&lt;count($arSysLangs); $i++)
-	* {
-	*   $arFields["LANG"][] = array(
-	*     "LID" =&gt; $arSysLangs[$i],
-	*     "NAME" =&gt; ${"NAME_".$arSysLangs[$i]},
-	*     "DESCRIPTION" =&gt; ${"DESCRIPTION_".$arSysLangs[$i]}
-	*     );
-	* }
-	* $ID1 = CForumGroup::Update($ID, $arFields);
-	* if (IntVal($ID1)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -468,49 +299,8 @@ class CForumGroup extends CAllForumGroup
 /**********************************************************************/
 /************** FORUM SMILE *******************************************/
 /**********************************************************************/
-
-/**
- * <b>CForumSmile</b> - класс для работы со смайлами.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/index.php
- * @author Bitrix
- */
 class CForumSmile extends CAllForumSmile
 {
-	
-	/**
-	* <p>Создает новый смайл с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного смайла.</p>
-	*
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">списке
-	* полей смайла</a>. В специальное поле "LANG" заносится массив массивов
-	* полей языковых параметров смайла, которые имеют аналогичную
-	* структуру. Обязательные поля должны быть заполнены.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumsmile">Поля смайла</a> </li></ul>
-	* <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;

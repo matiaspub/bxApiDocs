@@ -13,10 +13,14 @@ class CWorkflow extends CAllWorkflow
 	public static function Insert($arFields)
 	{
 		$err_mess = (CWorkflow::err_mess())."<br>Function: Insert<br>Line: ";
-		global $DB, $USER;
+		global $DB;
 		$arInsert = $DB->PrepareInsert("b_workflow_document", $arFields, "workflow");
-		$strSql = "INSERT INTO b_workflow_document(DATE_MODIFY, DATE_ENTER,  ".$arInsert[0].") VALUES(now(), now(), ".$arInsert[1].")";
-		$DB->Query($strSql, false, $err_mess.__LINE__);
+		$DB->Query("
+			INSERT INTO b_workflow_document
+			(DATE_MODIFY, DATE_ENTER,  ".$arInsert[0].")
+			VALUES
+			(now(), now(), ".$arInsert[1].")",
+		false, $err_mess.__LINE__);
 		$ID = $DB->LastID();
 		$LOG_ID = CWorkflow::SetHistory($ID);
 		CWorkflow::SetMove($ID, $arFields["STATUS_ID"], 0, $LOG_ID);
@@ -29,20 +33,32 @@ class CWorkflow extends CAllWorkflow
 		global $DB;
 		$z = CWorkflow::GetByID($DOCUMENT_ID);
 		$change = false;
-		if ($zr=$z->Fetch())
+		if ($zr = $z->Fetch())
 		{
-			if ($zr["STATUS_ID"]	!=	$DB->ForSql($arFields["STATUS_ID"]) or
-				$zr["BODY"]			!=	$DB->ForSql($arFields["BODY"])		or
-				$zr["BODY_TYPE"]	!=	$DB->ForSql($arFields["BODY_TYPE"])	or
-				$zr["COMMENTS"]		!=	$DB->ForSql($arFields["COMMENTS"])	or
-				$zr["FILENAME"]		!=	$DB->ForSql($arFields["FILENAME"])	or
-				$zr["SITE_ID"]		!=	$DB->ForSql($arFields["SITE_ID"])	or
-				$zr["TITLE"]		!=	$DB->ForSql($arFields["TITLE"]))
+			if (
+				$zr["STATUS_ID"] != $arFields["STATUS_ID"]
+				|| $zr["BODY"] != $arFields["BODY"]
+				|| $zr["BODY_TYPE"] != $arFields["BODY_TYPE"]
+				|| $zr["COMMENTS"] != $arFields["COMMENTS"]
+				|| $zr["FILENAME"] != $arFields["FILENAME"]
+				|| $zr["SITE_ID"] != $arFields["SITE_ID"]
+				|| $zr["TITLE"] != $arFields["TITLE"]
+			)
+			{
 				$change = true;
+			}
 		}
+
 		$strUpdate = $DB->PrepareUpdate("b_workflow_document", $arFields, "workflow");
-		$strSql = "UPDATE b_workflow_document SET ".$strUpdate.", DATE_MODIFY=now(), DATE_ENTER=now() WHERE ID=".$DOCUMENT_ID;
-		$DB->Query($strSql, false, $err_mess.__LINE__);
+		if ($strUpdate)
+		{
+			$DB->Query("
+				UPDATE b_workflow_document
+				SET ".$strUpdate.", DATE_MODIFY=now(), DATE_ENTER=now()
+				WHERE ID = ".$DOCUMENT_ID
+			, false, $err_mess.__LINE__);
+		}
+
 		if ($change)
 		{
 			$LOG_ID = CWorkflow::SetHistory($DOCUMENT_ID);
@@ -60,10 +76,10 @@ class CWorkflow extends CAllWorkflow
 		$strSql = "
 			SELECT
 				LOCKED_BY,
-				".$DB->DateToCharFunction("DATE_LOCK")."		DATE_LOCK,
+				".$DB->DateToCharFunction("DATE_LOCK")." DATE_LOCK,
 				if (DATE_LOCK is null, 'green',
 					if(DATE_ADD(DATE_LOCK,interval $MAX_LOCK MINUTE)<now(), 'green',
-						if(LOCKED_BY=$uid, 'yellow', 'red')))						LOCK_STATUS
+						if(LOCKED_BY=$uid, 'yellow', 'red'))) LOCK_STATUS
 			FROM
 				b_workflow_document
 			WHERE
@@ -89,19 +105,18 @@ class CWorkflow extends CAllWorkflow
 		$uid = intval($USER->GetID());
 		if (is_array($arFilter))
 		{
-			$filter_keys = array_keys($arFilter);
-			for ($i=0; $i<count($filter_keys); $i++)
+			foreach ($arFilter as $key => $val)
 			{
-				$key = $filter_keys[$i];
-				$val = $arFilter[$filter_keys[$i]];
-				if (strlen($val)<=0 || "$val"=="NOT_REF") continue;
-				if (is_array($val) && count($val)<=0) continue;
-				$match_value_set = (in_array($key."_EXACT_MATCH", $filter_keys)) ? true : false;
+				if (strlen($val)<=0 || "$val"=="NOT_REF")
+					continue;
+				if (is_array($val) && count($val)<=0)
+					continue;
+				$match_value_set = (array_key_exists($key."_EXACT_MATCH", $arFilter) ? true : false);
 				$key = strtoupper($key);
 				switch($key)
 				{
 					case "ID":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $match_value_set) ? "Y" : "N";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="N") ? "Y" : "N";
 						$arSqlSearch[] = GetFilterQuery("D.ID",$val,$match);
 						break;
 					case "DATE_MODIFY_1":
@@ -113,11 +128,11 @@ class CWorkflow extends CAllWorkflow
 							$arSqlSearch[] = "D.DATE_MODIFY < ".$DB->CharToDateFunction($val, "SHORT")." + INTERVAL 1 DAY";
 						break;
 					case "MODIFIED_BY":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $match_value_set) ? "N" : "Y";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="Y") ? "N" : "Y";
 						$arSqlSearch[] = GetFilterQuery("D.MODIFIED_BY, UM.LOGIN, UM.NAME, UM.LAST_NAME", $val, $match);
 						break;
 					case "MODIFIED_USER_ID":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $match_value_set) ? "Y" : "N";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="N") ? "Y" : "N";
 						$arSqlSearch[] = GetFilterQuery("D.MODIFIED_BY",$val,$match);
 						break;
 					case "LOCK_STATUS":
@@ -127,35 +142,35 @@ class CWorkflow extends CAllWorkflow
 								if(D.LOCKED_BY=$uid, 'yellow', 'red'))) = '".$DB->ForSql($val)."'";
 						break;
 					case "STATUS":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $match_value_set) ? "N" : "Y";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="Y") ? "N" : "Y";
 						$arSqlSearch[] = GetFilterQuery("D.STATUS_ID, S.TITLE",$val,$match);
 						break;
 					case "STATUS_ID":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $match_value_set) ? "Y" : "N";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="N") ? "Y" : "N";
 						$arSqlSearch[] = GetFilterQuery("D.STATUS_ID",$val,$match);
 						break;
 					case "SITE_ID":
 					case "TITLE":
 					case "BODY":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $match_value_set) ? "N" : "Y";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="Y") ? "N" : "Y";
 						$arSqlSearch[] = GetFilterQuery("D.".$key,$val,$match);
 						break;
 					case "FILENAME":
-						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $match_value_set) ? "N" : "Y";
+						$match = ($match_value_set && $arFilter[$key."_EXACT_MATCH"]=="Y") ? "N" : "Y";
 						$arSqlSearch[] = GetFilterQuery("D.FILENAME",$val,$match, array("/", "\\", ".", "_"));
 						break;
 				}
 			}
 		}
 
-		if ($by == "s_id")					$strSqlOrder = "ORDER BY D.ID";
-		elseif ($by == "s_lock_status")		$strSqlOrder = "ORDER BY LOCK_STATUS";
-		elseif ($by == "s_date_modify")		$strSqlOrder = "ORDER BY D.DATE_MODIFY";
-		elseif ($by == "s_modified_by")		$strSqlOrder = "ORDER BY D.MODIFIED_BY";
-		elseif ($by == "s_filename")		$strSqlOrder = "ORDER BY D.FILENAME";
-		elseif ($by == "s_title")			$strSqlOrder = "ORDER BY D.TITLE";
-		elseif ($by == "s_site_id")			$strSqlOrder = "ORDER BY D.SITE_ID";
-		elseif ($by == "s_status")			$strSqlOrder = "ORDER BY D.STATUS_ID";
+		if ($by == "s_id") $strSqlOrder = "ORDER BY D.ID";
+		elseif ($by == "s_lock_status") $strSqlOrder = "ORDER BY LOCK_STATUS";
+		elseif ($by == "s_date_modify") $strSqlOrder = "ORDER BY D.DATE_MODIFY";
+		elseif ($by == "s_modified_by") $strSqlOrder = "ORDER BY D.MODIFIED_BY";
+		elseif ($by == "s_filename") $strSqlOrder = "ORDER BY D.FILENAME";
+		elseif ($by == "s_title") $strSqlOrder = "ORDER BY D.TITLE";
+		elseif ($by == "s_site_id") $strSqlOrder = "ORDER BY D.SITE_ID";
+		elseif ($by == "s_status") $strSqlOrder = "ORDER BY D.STATUS_ID";
 		else
 		{
 			$by = "s_date_modify";
@@ -173,15 +188,15 @@ class CWorkflow extends CAllWorkflow
 			$strSql = "
 				SELECT DISTINCT
 					D.*,
-					".$DB->DateToCharFunction("D.DATE_ENTER")."				DATE_ENTER,
-					".$DB->DateToCharFunction("D.DATE_MODIFY")."			DATE_MODIFY,
-					".$DB->DateToCharFunction("D.DATE_LOCK")."				DATE_LOCK,
-					concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,''))	MUSER_NAME,
-					concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,''))	EUSER_NAME,
-					S.TITLE													STATUS_TITLE,
+					".$DB->DateToCharFunction("D.DATE_ENTER")." DATE_ENTER,
+					".$DB->DateToCharFunction("D.DATE_MODIFY")." DATE_MODIFY,
+					".$DB->DateToCharFunction("D.DATE_LOCK")." DATE_LOCK,
+					concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,'')) MUSER_NAME,
+					concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,'')) EUSER_NAME,
+					S.TITLE STATUS_TITLE,
 					if (D.DATE_LOCK is null, 'green',
 						if(DATE_ADD(D.DATE_LOCK, interval $MAX_LOCK MINUTE)<now(), 'green',
-							if(D.LOCKED_BY=$uid, 'yellow', 'red')))						LOCK_STATUS
+							if(D.LOCKED_BY=$uid, 'yellow', 'red'))) LOCK_STATUS
 				FROM
 					b_workflow_document D
 					LEFT JOIN b_workflow_status S ON (S.ID = D.STATUS_ID)
@@ -197,15 +212,15 @@ class CWorkflow extends CAllWorkflow
 			$strSql = "
 				SELECT DISTINCT
 					D.*,
-					".$DB->DateToCharFunction("D.DATE_ENTER")."				DATE_ENTER,
-					".$DB->DateToCharFunction("D.DATE_MODIFY")."			DATE_MODIFY,
-					".$DB->DateToCharFunction("D.DATE_LOCK")."				DATE_LOCK,
-					concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,''))	MUSER_NAME,
-					concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,''))	EUSER_NAME,
-					S.TITLE													STATUS_TITLE,
+					".$DB->DateToCharFunction("D.DATE_ENTER")." DATE_ENTER,
+					".$DB->DateToCharFunction("D.DATE_MODIFY")." DATE_MODIFY,
+					".$DB->DateToCharFunction("D.DATE_LOCK")." DATE_LOCK,
+					concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,'')) MUSER_NAME,
+					concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,'')) EUSER_NAME,
+					S.TITLE STATUS_TITLE,
 					if (D.DATE_LOCK is null, 'green',
 						if(DATE_ADD(D.DATE_LOCK, interval $MAX_LOCK MINUTE)<now(), 'green',
-							if(D.LOCKED_BY=$uid, 'yellow', 'red')))						LOCK_STATUS
+							if(D.LOCKED_BY=$uid, 'yellow', 'red'))) LOCK_STATUS
 				FROM
 					b_workflow_document D
 					INNER JOIN b_workflow_status2group G ON (G.STATUS_ID = D.STATUS_ID)
@@ -219,7 +234,7 @@ class CWorkflow extends CAllWorkflow
 				$strSqlOrder
 				";
 		}
-		//echo "<pre>".$strSql."</pre>";
+
 		$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
 		$is_filtered = (IsFiltered($strSqlSearch));
 		$arr = array();
@@ -243,17 +258,17 @@ class CWorkflow extends CAllWorkflow
 		$strSql = "
 			SELECT
 				D.*,
-				".$DB->DateToCharFunction("D.DATE_ENTER")."				DATE_ENTER,
-				".$DB->DateToCharFunction("D.DATE_MODIFY")."			DATE_MODIFY,
-				".$DB->DateToCharFunction("D.DATE_LOCK")."				DATE_LOCK,
-				concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,''))	MUSER_NAME,
-				concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,''))	EUSER_NAME,
-				concat('(',UL.LOGIN,') ',ifnull(UL.NAME,''),' ',ifnull(UL.LAST_NAME,''))	LUSER_NAME,
-				UE.EMAIL												EUSER_EMAIL,
-				S.TITLE													STATUS_TITLE,
+				".$DB->DateToCharFunction("D.DATE_ENTER")." DATE_ENTER,
+				".$DB->DateToCharFunction("D.DATE_MODIFY")." DATE_MODIFY,
+				".$DB->DateToCharFunction("D.DATE_LOCK")." DATE_LOCK,
+				concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,'')) MUSER_NAME,
+				concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,'')) EUSER_NAME,
+				concat('(',UL.LOGIN,') ',ifnull(UL.NAME,''),' ',ifnull(UL.LAST_NAME,'')) LUSER_NAME,
+				UE.EMAIL EUSER_EMAIL,
+				S.TITLE STATUS_TITLE,
 				if (D.DATE_LOCK is null, 'green',
 					if(DATE_ADD(D.DATE_LOCK, interval $MAX_LOCK MINUTE)<now(), 'green',
-						if(D.LOCKED_BY=$uid, 'yellow', 'red')))						LOCK_STATUS
+						if(D.LOCKED_BY=$uid, 'yellow', 'red'))) LOCK_STATUS
 			FROM
 				b_workflow_document D
 				LEFT JOIN b_user UM ON (UM.ID = D.MODIFIED_BY)
@@ -294,16 +309,16 @@ class CWorkflow extends CAllWorkflow
 		$strSql = "
 			SELECT
 				D.*,
-				".$DB->DateToCharFunction("D.DATE_ENTER")."				DATE_ENTER,
-				".$DB->DateToCharFunction("D.DATE_MODIFY")."			DATE_MODIFY,
-				".$DB->DateToCharFunction("D.DATE_LOCK")."				DATE_LOCK,
-				concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,''))	MUSER_NAME,
-				concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,''))	EUSER_NAME,
-				concat('(',UL.LOGIN,') ',ifnull(UL.NAME,''),' ',ifnull(UL.LAST_NAME,''))	LUSER_NAME,
-				S.TITLE													STATUS_TITLE,
+				".$DB->DateToCharFunction("D.DATE_ENTER")." DATE_ENTER,
+				".$DB->DateToCharFunction("D.DATE_MODIFY")." DATE_MODIFY,
+				".$DB->DateToCharFunction("D.DATE_LOCK")." DATE_LOCK,
+				concat('(',UM.LOGIN,') ',ifnull(UM.NAME,''),' ',ifnull(UM.LAST_NAME,'')) MUSER_NAME,
+				concat('(',UE.LOGIN,') ',ifnull(UE.NAME,''),' ',ifnull(UE.LAST_NAME,'')) EUSER_NAME,
+				concat('(',UL.LOGIN,') ',ifnull(UL.NAME,''),' ',ifnull(UL.LAST_NAME,'')) LUSER_NAME,
+				S.TITLE STATUS_TITLE,
 				if (D.DATE_LOCK is null, 'green',
 					if(DATE_ADD(D.DATE_LOCK, interval $MAX_LOCK MINUTE)<now(), 'green',
-						if(D.LOCKED_BY=$uid, 'yellow', 'red')))						LOCK_STATUS
+						if(D.LOCKED_BY=$uid, 'yellow', 'red'))) LOCK_STATUS
 			FROM
 				b_workflow_document D
 				LEFT JOIN b_user UM ON (UM.ID = D.MODIFIED_BY)
@@ -327,14 +342,13 @@ class CWorkflow extends CAllWorkflow
 		$strSqlSearch = "";
 		if (is_array($arFilter))
 		{
-			$filter_keys = array_keys($arFilter);
-			for ($i=0; $i<count($filter_keys); $i++)
+			foreach ($arFilter as $key => $val)
 			{
-				$key = $filter_keys[$i];
-				$val = $arFilter[$filter_keys[$i]];
-				if (strlen($val)<=0 || "$val"=="NOT_REF") continue;
-				if (is_array($val) && count($val)<=0) continue;
-				$match_value_set = (in_array($key."_EXACT_MATCH", $filter_keys)) ? true : false;
+				if (strlen($val)<=0 || "$val"=="NOT_REF")
+					continue;
+				if (is_array($val) && count($val)<=0)
+					continue;
+				$match_value_set = (array_key_exists($key."_EXACT_MATCH", $arFilter)) ? true : false;
 				$key = strtoupper($key);
 				switch($key)
 				{
@@ -387,14 +401,14 @@ class CWorkflow extends CAllWorkflow
 			}
 		}
 
-		if ($by == "s_id")					$strSqlOrder = "ORDER BY L.ID";
-		elseif ($by == "s_document_id")		$strSqlOrder = "ORDER BY L.DOCUMENT_ID";
-		elseif ($by == "s_date_modify")		$strSqlOrder = "ORDER BY L.TIMESTAMP_X";
-		elseif ($by == "s_modified_by")		$strSqlOrder = "ORDER BY L.MODIFIED_BY";
-		elseif ($by == "s_filename")		$strSqlOrder = "ORDER BY L.FILENAME";
-		elseif ($by == "s_site_id")			$strSqlOrder = "ORDER BY L.SITE_ID";
-		elseif ($by == "s_title")			$strSqlOrder = "ORDER BY L.TITLE";
-		elseif ($by == "s_status")			$strSqlOrder = "ORDER BY L.STATUS_ID";
+		if ($by == "s_id") $strSqlOrder = "ORDER BY L.ID";
+		elseif ($by == "s_document_id") $strSqlOrder = "ORDER BY L.DOCUMENT_ID";
+		elseif ($by == "s_date_modify") $strSqlOrder = "ORDER BY L.TIMESTAMP_X";
+		elseif ($by == "s_modified_by") $strSqlOrder = "ORDER BY L.MODIFIED_BY";
+		elseif ($by == "s_filename") $strSqlOrder = "ORDER BY L.FILENAME";
+		elseif ($by == "s_site_id") $strSqlOrder = "ORDER BY L.SITE_ID";
+		elseif ($by == "s_title") $strSqlOrder = "ORDER BY L.TITLE";
+		elseif ($by == "s_status") $strSqlOrder = "ORDER BY L.STATUS_ID";
 		else
 		{
 			$by = "s_id";
@@ -421,7 +435,7 @@ class CWorkflow extends CAllWorkflow
 			$strSqlSearch
 			$strSqlOrder
 			";
-		//echo "<pre>".$strSql."</pre>";
+
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 		$is_filtered = (IsFiltered($strSqlSearch));
 		return $res;
@@ -498,8 +512,8 @@ class CWorkflow extends CAllWorkflow
 		$strSql = "
 			SELECT
 				F.*, D.SITE_ID,
-				".$DB->DateToCharFunction("F.TIMESTAMP_X")."		TIMESTAMP_X,
-				concat('(',U.LOGIN,') ',ifnull(U.NAME,''),' ',ifnull(U.LAST_NAME,''))	USER_NAME
+				".$DB->DateToCharFunction("F.TIMESTAMP_X")." TIMESTAMP_X,
+				concat('(',U.LOGIN,') ',ifnull(U.NAME,''),' ',ifnull(U.LAST_NAME,'')) USER_NAME
 			FROM
 				b_workflow_document D
 				INNER JOIN b_workflow_file F ON (F.DOCUMENT_ID = D.ID)

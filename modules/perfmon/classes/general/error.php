@@ -1,5 +1,6 @@
-<?
-class CAllPerfomanceError
+<?php
+
+class CPerfomanceError
 {
 	public static function Delete($arFilter)
 	{
@@ -12,7 +13,6 @@ class CAllPerfomanceError
 				"FIELD_NAME" => "HIT_ID",
 				"FIELD_TYPE" => "int",
 				"JOIN" => false,
-				//"LEFT_JOIN" => "lt",
 			),
 			"ERRNO" => array(
 				"TABLE_ALIAS" => "e",
@@ -43,16 +43,16 @@ class CAllPerfomanceError
 		$strSql = "
 			DELETE FROM b_perf_error
 		";
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
-		if($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
+		if ($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
 		{
 			$strSql .= "
 				WHERE
 				".$strQueryWhere."
 			";
 		}
-		//echo "<pre>",htmlspecialcharsbx($strSql),"</pre><hr>";
+
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
@@ -60,9 +60,9 @@ class CAllPerfomanceError
 	{
 		global $DB;
 
-		if(!is_array($arSelect))
+		if (!is_array($arSelect))
 			$arSelect = array();
-		if(count($arSelect) < 1)
+		if (count($arSelect) < 1)
 			$arSelect = array(
 				"ID",
 				"HIT_ID",
@@ -72,66 +72,66 @@ class CAllPerfomanceError
 				"ERRSTR",
 			);
 
-		if(!is_array($arOrder))
+		if (!is_array($arOrder))
 			$arOrder = array();
-		if(count($arOrder) < 1)
+		if (count($arOrder) < 1)
 			$arOrder = array(
 				"HIT_ID" => "DESC",
 				"ID" => "DESC",
 			);
 
 		$arQueryOrder = array();
-		foreach($arOrder as $strColumn => $strDirection)
+		foreach ($arOrder as $strColumn => $strDirection)
 		{
 			$strColumn = strtoupper($strColumn);
-			$strDirection = strtoupper($strDirection)=="ASC"? "ASC": "DESC";
-			switch($strColumn)
+			$strDirection = strtoupper($strDirection) == "ASC"? "ASC": "DESC";
+			switch ($strColumn)
 			{
-				case "ID":
-				case "HIT_ID":
-				case "ERRNO":
-				case "ERRFILE":
-				case "ERRLINE":
-				case "ERRSTR":
+			case "ID":
+			case "HIT_ID":
+			case "ERRNO":
+			case "ERRFILE":
+			case "ERRLINE":
+			case "ERRSTR":
+				$arSelect[] = $strColumn;
+				$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				break;
+			case "COUNT":
+				if ($bGroup)
+				{
 					$arSelect[] = $strColumn;
 					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					break;
-				case "COUNT":
-					if($bGroup)
-					{
-						$arSelect[] = $strColumn;
-						$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					}
-					break;
+				}
+				break;
 			}
 		}
 
 		$arQueryGroup = array();
 		$arQuerySelect = array();
-		foreach($arSelect as $strColumn)
+		foreach ($arSelect as $strColumn)
 		{
 			$strColumn = strtoupper($strColumn);
-			switch($strColumn)
+			switch ($strColumn)
 			{
-				case "ID":
-				case "HIT_ID":
-					if(!$bGroup)
-						$arQuerySelect[$strColumn] = "e.".$strColumn;
-					break;
-				case "ERRNO":
-				case "ERRFILE":
-				case "ERRLINE":
-				case "ERRSTR":
-					if($bGroup)
-						$arQueryGroup[$strColumn] = "e.".$strColumn;
+			case "ID":
+			case "HIT_ID":
+				if (!$bGroup)
 					$arQuerySelect[$strColumn] = "e.".$strColumn;
-					break;
-				case "COUNT":
-					if($bGroup)
-					{
-						$arQuerySelect[$strColumn] = "COUNT(e.ID) ".$strColumn;
-					}
-					break;
+				break;
+			case "ERRNO":
+			case "ERRFILE":
+			case "ERRLINE":
+			case "ERRSTR":
+				if ($bGroup)
+					$arQueryGroup[$strColumn] = "e.".$strColumn;
+				$arQuerySelect[$strColumn] = "e.".$strColumn;
+				break;
+			case "COUNT":
+				if ($bGroup)
+				{
+					$arQuerySelect[$strColumn] = "COUNT(e.ID) ".$strColumn;
+				}
+				break;
 			}
 		}
 
@@ -142,7 +142,6 @@ class CAllPerfomanceError
 				"FIELD_NAME" => "HIT_ID",
 				"FIELD_TYPE" => "int",
 				"JOIN" => false,
-				//"LEFT_JOIN" => "lt",
 			),
 			"ERRNO" => array(
 				"TABLE_ALIAS" => "e",
@@ -170,8 +169,8 @@ class CAllPerfomanceError
 			),
 		));
 
-		if(count($arQuerySelect) < 1)
-			$arQuerySelect = array("ID"=>"e.ID");
+		if (count($arQuerySelect) < 1)
+			$arQuerySelect = array("ID" => "e.ID");
 
 		$strSql = "
 			SELECT
@@ -179,30 +178,30 @@ class CAllPerfomanceError
 			FROM
 				b_perf_error e
 		";
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
-		if($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
+		if ($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
 		{
 			$strSql .= "
 				WHERE
 				".$strQueryWhere."
 			";
 		}
-		if($bGroup && count($arQueryGroup) > 0)
+		if ($bGroup && count($arQueryGroup) > 0)
 		{
 			$strSql .= "
 				GROUP BY
 				".implode(", ", $arQueryGroup)."
 			";
 		}
-		if(count($arQueryOrder) > 0)
+		if (count($arQueryOrder) > 0)
 		{
 			$strSql .= "
 				ORDER BY
 				".implode(", ", $arQueryOrder)."
 			";
 		}
-		//echo "<pre>",htmlspecialcharsbx($strSql),"</pre><hr>";
+
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
@@ -212,4 +211,3 @@ class CAllPerfomanceError
 		return $DB->Query("TRUNCATE TABLE b_perf_error");
 	}
 }
-?>

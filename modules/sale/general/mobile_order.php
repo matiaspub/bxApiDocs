@@ -994,11 +994,8 @@ class CSaleMobileOrderPush
 
 	private static function checkRights($userId, $eventId, $arParams)
 	{
-		global $USER;
-
 		$orderId = $arParams["ORDER_ID"];
-		$arUserGroups = $USER->GetUserGroupArray();
-
+		$arUserGroups = CUser::GetUserGroup($userId);
 		return CSaleOrder::CanUserViewOrder($orderId, $arUserGroups, $userId);
 	}
 
@@ -1020,15 +1017,14 @@ class CSaleMobileOrderPush
 	private static function makeMessage($eventId, $arParams)
 	{
 		global $DB;
-		$strResult = "";
 
-		if(HasMessage('SMOB_PUSH_MES_'.$eventId))
-			$strResult = GetMessage('SMOB_PUSH_MES_'.$eventId, array(
-				"#ACCOUNT_NUMBER#" => $arParams["ORDER"]["ACCOUNT_NUMBER"],
-				"#DATE_INSERT#" => FormatDate($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")), strtotime($arParams["ORDER"]["DATE_INSERT"])),
-				"#PRICE#" => $arParams["ORDER"]["PRICE"],
-				"#CURRENCY#" => $arParams["ORDER"]["CURRENCY"]
-			));
+		$strResult = GetMessage('SMOB_PUSH_MES_'.$eventId, array(
+			"#ACCOUNT_NUMBER#" => $arParams["ORDER"]["ACCOUNT_NUMBER"],
+			"#DATE_INSERT#" => FormatDate($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")), strtotime($arParams["ORDER"]["DATE_INSERT"])),
+			"#PRICE#" => $arParams["ORDER"]["PRICE"],
+			"#CURRENCY#" => $arParams["ORDER"]["CURRENCY"]
+		));
+
 		if($eventId == "ORDER_STATUS_CHANGED")
 		{
 			$arFilter = array(

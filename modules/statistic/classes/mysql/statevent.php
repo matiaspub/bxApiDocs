@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/statevent.php");
 
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.</body> </html>
  *
  *
  *
@@ -732,7 +732,7 @@ class CStatEvent extends CAllStatEvent
 				SELECT
 					COUNT(1)							COUNTER,
 					round(sum(if(E.CHARGEBACK='Y',-E.MONEY,E.MONEY)*$rate),2)	MONEY,
-					'$view_currency'						CURRENCY
+					'".$DB->ForSql($view_currency)."'						CURRENCY
 				FROM
 					b_stat_event_list E
 				INNER JOIN b_stat_event V ON (V.ID=E.EVENT_ID)
@@ -750,7 +750,7 @@ class CStatEvent extends CAllStatEvent
 				SELECT
 					E.ID, E.EVENT3, E.EVENT_ID, E.ADV_ID, E.ADV_BACK, E.COUNTRY_ID, E.SESSION_ID, E.GUEST_ID, E.HIT_ID, E.REFERER_URL, E.URL, E.REDIRECT_URL, E.CHARGEBACK, E.SITE_ID, E.REFERER_SITE_ID,
 					round((E.MONEY*$rate),2)										MONEY,
-					'$view_currency'												CURRENCY,
+					'".$DB->ForSql($view_currency)."'												CURRENCY,
 					".$DB->DateToCharFunction("E.DATE_ENTER")."						DATE_ENTER,
 					V.ID															TYPE_ID,
 					V.DESCRIPTION, V.NAME, V.EVENT1, V.EVENT2,

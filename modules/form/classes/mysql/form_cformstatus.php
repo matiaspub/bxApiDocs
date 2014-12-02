@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>.
+ * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. </body> </html>
  *
  *
  *
@@ -18,7 +18,7 @@
  */
 class CFormStatus extends CAllFormStatus
 {
-	fpublic static unction err_mess()
+	public static function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -33,7 +33,7 @@ class CFormStatus extends CAllFormStatus
 	*
 	*
 	*
-	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
+	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
 	*
 	*
 	*

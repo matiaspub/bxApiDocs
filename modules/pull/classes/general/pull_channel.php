@@ -3,18 +3,26 @@ IncludeModuleLangFile(__FILE__);
 
 class CPullChannel
 {
-	public static function GetShared($cache = true, $reOpen = false)
-	{
-		return self::Get(0, $cache, $reOpen);
-	}
-
 	public static function GetNewChannelId()
 	{
 		global $APPLICATION;
 		return md5(uniqid().$_SERVER["REMOTE_ADDR"].$_SERVER["SERVER_NAME"].(is_object($APPLICATION)? $APPLICATION->GetServerUniqID(): ''));
 	}
 
-	public static function Get($userId, $cache = true, $reOpen = false)
+	public static function GetChannelShared($channelType = 'shared', $cache = true, $reOpen = false)
+	{
+		return self::GetShared($cache, $reOpen, $channelType);
+	}
+	public static function GetShared($cache = true, $reOpen = false, $channelType = 'shared')
+	{
+		return self::Get(0, $cache, $reOpen, $channelType);
+	}
+
+	public static function GetChannel($userId, $channelType = 'private', $cache = true, $reOpen = false)
+	{
+		return self::Get($userId, $cache, $reOpen, $channelType);
+	}
+	public static function Get($userId, $cache = true, $reOpen = false, $channelType = 'private')
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -22,7 +30,7 @@ class CPullChannel
 
 		$arResult = false;
 		$userId = intval($userId);
-		$cache_id="b_pchc_".$userId;
+		$cache_id="b_pchc_".$userId.'_'.$channelType;
 
 		if ($nginxStatus && $cache)
 		{
@@ -35,9 +43,9 @@ class CPullChannel
 			$arResult = Array();
 			CTimeZone::Disable();
 			$strSql = "
-					SELECT CHANNEL_ID, ".$DB->DatetimeToTimestampFunction('DATE_CREATE')." DATE_CREATE, LAST_ID
+					SELECT CHANNEL_ID, CHANNEL_TYPE, ".$DB->DatetimeToTimestampFunction('DATE_CREATE')." DATE_CREATE, LAST_ID
 					FROM b_pull_channel
-					WHERE USER_ID = ".$userId."
+					WHERE USER_ID = ".$userId." AND CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'
 			";
 			CTimeZone::Enable();
 			$res = $DB->Query($strSql);
@@ -51,6 +59,7 @@ class CPullChannel
 		{
 			$arChannel = Array(
 				'CHANNEL_ID' => self::GetNewChannelId(),
+				'CHANNEL_TYPE' => $channelType,
 				'DATE_CREATE' => time(),
 				'LAST_ID' => 0,
 			);
@@ -58,11 +67,11 @@ class CPullChannel
 
 			if (isset($arResult['CHANNEL_ID']))
 			{
-				$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$arResult['CHANNEL_ID']."'";
+				$strSql = "DELETE FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSQL($arResult['CHANNEL_ID'])."'";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 
-			$channelId = self::Add($userId, $arChannel['CHANNEL_ID']);
+			$channelId = self::Add($userId, $arChannel['CHANNEL_ID'], $arChannel['CHANNEL_TYPE']);
 
 			if (isset($arResult['CHANNEL_ID']) && $channelId != $arResult['CHANNEL_ID'])
 			{
@@ -76,6 +85,7 @@ class CPullChannel
 
 			return $channelId? Array(
 				'CHANNEL_ID' => $channelId,
+				'CHANNEL_TYPE' => $channelType,
 				'CHANNEL_DT' => time(),
 				'LAST_ID' => 0,
 			): false;
@@ -93,6 +103,7 @@ class CPullChannel
 			}
 			return Array(
 				'CHANNEL_ID' => $arResult['CHANNEL_ID'],
+				'CHANNEL_TYPE' => $arResult['CHANNEL_TYPE'],
 				'CHANNEL_DT' => $arResult['DATE_CREATE'],
 				'LAST_ID' => $arResult['LAST_ID'],
 			);
@@ -100,17 +111,18 @@ class CPullChannel
 	}
 
 	// create a channel for the user
-	public static function Add($userId, $channelId = null)
+	public static function Add($userId, $channelId = null, $channelType = 'private')
 	{
 		global $DB;
 
 		$userId = intval($userId);
-		$cache_id="b_pchc_".$userId;
+		$cache_id="b_pchc_".$userId."_".$channelType;
 
 		$channelId = is_null($channelId)? self::GetNewChannelId(): $channelId;
 		$arParams = Array(
 			'USER_ID' => intval($userId),
 			'CHANNEL_ID' => $channelId,
+			'CHANNEL_TYPE' => $channelType,
 			'LAST_ID' => 0,
 			'~DATE_CREATE' => $DB->CurrentTimeFunction(),
 		);
@@ -119,6 +131,7 @@ class CPullChannel
 		{
 			$arChannel = Array(
 				'CHANNEL_ID' => $channelId,
+				'CHANNEL_TYPE' => $channelType,
 				'DATE_CREATE' => time(),
 				'LAST_ID' => 0,
 			);
@@ -140,7 +153,7 @@ class CPullChannel
 			$strSql = "
 					SELECT CHANNEL_ID, ".$DB->DatetimeToTimestampFunction('DATE_CREATE')." DATE_CREATE, LAST_ID
 					FROM b_pull_channel
-					WHERE USER_ID = ".$userId."
+					WHERE USER_ID = ".$userId." AND CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'
 			";
 			CTimeZone::Enable();
 			$res = $DB->Query($strSql);
@@ -168,14 +181,14 @@ class CPullChannel
 	{
 		global $DB, $CACHE_MANAGER;
 
-		$strSql = "SELECT USER_ID FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSQL($channelId)."'";
+		$strSql = "SELECT ID, USER_ID, CHANNEL_TYPE FROM b_pull_channel WHERE CHANNEL_ID = '".$DB->ForSQL($channelId)."'";
 		$res = $DB->Query($strSql);
 		if ($arRes = $res->Fetch())
 		{
-			$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$arRes['USER_ID'];
+			$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$arRes['USER_ID']." AND CHANNEL_TYPE = '".$DB->ForSql($arRes['CHANNEL_TYPE'])."'";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			$CACHE_MANAGER->Clean("b_pchc_".intval($arRes['USER_ID']), "b_pull_channel");
+			$CACHE_MANAGER->Clean("b_pchc_".$arRes['USER_ID']."_".$arRes['CHANNEL_TYPE'], "b_pull_channel");
 
 			$arMessage = Array(
 				'module_id' => 'pull',
@@ -188,24 +201,36 @@ class CPullChannel
 		return true;
 	}
 
-	public static function DeleteByUser($userId, $channelId = null)
+	public static function DeleteByUser($userId, $channelId = null, $channelType = '')
 	{
 		global $DB, $CACHE_MANAGER;
 
 		$userId = intval($userId);
+		if ($userId == 0 && $channelType == 'private')
+		{
+			$channelType = 'shared';
+		}
 
 		if (is_null($channelId))
 		{
-			$strSql = "SELECT CHANNEL_ID FROM b_pull_channel WHERE USER_ID = ".$userId;
+			$strSql = "SELECT CHANNEL_ID, CHANNEL_TYPE FROM b_pull_channel WHERE USER_ID = ".$userId." AND CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'";
 			$res = $DB->Query($strSql);
 			if ($arRes = $res->Fetch())
+			{
 				$channelId = $arRes['CHANNEL_ID'];
+				$channelType = $arRes['CHANNEL_TYPE'];
+			}
 		}
 
-		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId;
+		if (strlen($channelType) <= 0)
+			$channelType = "(CHANNEL_TYPE = '' OR CHANNEL_TYPE IS NULL)";
+		else
+			$channelType = "CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'";
+
+		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId." AND ".$channelType;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$CACHE_MANAGER->Clean("b_pchc_".$userId, "b_pull_channel");
+		$CACHE_MANAGER->Clean("b_pchc_".$userId."_".$channelType, "b_pull_channel");
 
 		$arMessage = Array(
 			'module_id' => 'pull',
@@ -369,12 +394,12 @@ class CPullChannel
 		if (!is_null($sqlDateFunction))
 		{
 			$strSql = "
-					SELECT USER_ID, CHANNEL_ID
+					SELECT USER_ID, CHANNEL_ID, CHANNEL_TYPE
 					FROM b_pull_channel
 					WHERE DATE_CREATE < ".$sqlDateFunction;
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arRes = $dbRes->Fetch())
-				self::DeleteByUser($arRes['USER_ID'], $arRes['CHANNEL_ID']);
+				self::DeleteByUser($arRes['USER_ID'], $arRes['CHANNEL_ID'], $arRes['CHANNEL_TYPE']);
 		}
 
 		return "CPullChannel::CheckExpireAgent();";
@@ -400,12 +425,14 @@ class CPullChannel
 		if (!is_null($sqlDateFunction))
 		{
 			$strSql = "
-					SELECT USER_ID, CHANNEL_ID
+					SELECT USER_ID, CHANNEL_ID, CHANNEL_TYPE
 					FROM b_pull_channel
 					WHERE DATE_CREATE >= ".$sqlDateFunction;
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arRes = $dbRes->Fetch())
+			{
 				$arUser[$arRes['CHANNEL_ID']] = $arRes['USER_ID'];
+			}
 		}
 		if (count($arUser) > 0)
 		{
@@ -444,17 +471,26 @@ class CPullChannel
 		}
 
 		$arSend = Array();
-		$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
-		while ($arUser = $dbUsers->Fetch())
+		if (CModule::IncludeModule('im'))
 		{
-			$arSend[$arUser["ID"]] = Array(
-				'id' => $arUser["ID"],
-				'status' => 'online',
-			);
+			$ar = CIMStatus::GetList();
+			$arSend = $ar['users'];
+		}
+		else
+		{
+			$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
+			while ($arUser = $dbUsers->Fetch())
+			{
+				$arSend[$arUser["ID"]] = Array(
+					'id' => $arUser["ID"],
+					'status' => 'online',
+					'idle' => 0,
+				);
+			}
 		}
 
 		CPullStack::AddShared(Array(
-			'module_id' => 'main',
+			'module_id' => 'online',
 			'command' => 'online_list',
 			'params' => Array(
 				'USERS' => $arSend
@@ -462,6 +498,68 @@ class CPullChannel
 		));
 
 		return "CPullChannel::CheckOnlineChannel();";
+	}
+
+	public static function GetUserConfig($userId)
+	{
+		$pullConfig = Array();
+
+		if (defined('BX_PULL_SKIP_LS'))
+			$pullConfig['LOCAL_STORAGE'] = 'N';
+
+		if (IsModuleInstalled('bitrix24'))
+			$pullConfig['BITRIX24'] = 'Y';
+
+		$pullChannel = CPullChannel::Get($userId);
+		if (is_array($pullChannel))
+		{
+			$pullWebSocketStatus = false;
+			$pullNginxStatus = CPullOptions::GetQueueServerStatus();
+
+			$pullChannels = Array($pullChannel['CHANNEL_ID']);
+			if ($pullNginxStatus)
+			{
+				if (defined('BX_PULL_SKIP_WEBSOCKET'))
+				{
+					$pullWebSocketStatus = false;
+					$pullConfig['WEBSOCKET'] = 'N';
+				}
+				else
+				{
+					$pullWebSocketStatus = CPullOptions::GetWebSocketStatus();
+				}
+
+				$pullChannelShared = CPullChannel::GetShared();
+				if (is_array($pullChannelShared))
+				{
+					$pullChannels[] = $pullChannelShared['CHANNEL_ID'];
+					if ($pullChannel['CHANNEL_DT'] > $pullChannelShared['CHANNEL_DT'])
+						$pullChannel['CHANNEL_DT'] = $pullChannelShared['CHANNEL_DT'];
+				}
+			}
+
+			if (defined('BX_MOBILE') || defined('BX_PULL_MOBILE')) // TODO delete BX_PULL_MOBILE in 15.5
+			{
+				$pullConfig['MOBILE'] = 'Y';
+				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels, true): CPullOptions::GetListenUrl($pullChannels, true)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
+			}
+			else
+			{
+				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
+			}
+
+			$pullConfig = $pullConfig+Array(
+				'CHANNEL_ID' => implode('/', $pullChannels),
+				'LAST_ID' => $pullChannel['LAST_ID'],
+				'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
+				'PATH' => $pullPath,
+				'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
+				'PATH_COMMAND' => defined('BX_PULL_COMMAND_PATH')? BX_PULL_COMMAND_PATH: '',
+				'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
+			);
+		}
+
+		return $pullConfig;
 	}
 
 	public static function OnAfterUserAuthorize($arParams)
@@ -488,13 +586,26 @@ class CPullChannel
 		$_SESSION['USER_LAST_AUTH_'.$arParams['user_fields']['ID']] = time();
 		unset($_SESSION['USER_LAST_LOGOUT_'.$arParams['user_fields']['ID']]);
 
+		$userStatus = 'online';
+		if (CModule::IncludeModule('im'))
+		{
+			$res = Bitrix\Im\StatusTable::getById($arParams['user_fields']['ID']);
+			if ($status = $res->fetch())
+			{
+				$userStatus = $status['STATUS'];
+			}
+		}
+
 		CPullStack::AddShared(Array(
-			'module_id' => 'main',
+			'module_id' => 'online',
 			'command' => 'user_authorize',
 			'params' => Array(
-				'USER_ID' => $arParams['user_fields']['ID']
+				'USER_ID' => $arParams['user_fields']['ID'],
+				'STATUS' => $userStatus
 			),
 		));
+
+		return true;
 	}
 
 	public static function OnAfterUserLogout($arParams)
@@ -512,7 +623,7 @@ class CPullChannel
 		unset($_SESSION['USER_LAST_AUTH_'.$arParams['USER_ID']]);
 
 		CPullStack::AddShared(Array(
-			'module_id' => 'main',
+			'module_id' => 'online',
 			'command' => 'user_logout',
 			'params' => Array(
 				'USER_ID' => $arParams['USER_ID']

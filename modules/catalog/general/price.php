@@ -100,13 +100,13 @@ class CAllPrice
 	* @return bool <p>Возвращает ID обновляемой цены в случае успешного сохранения
 	* цены и <i>false</i> - в противном случае. Для получения детальной
 	* информации об ошибке следует вызвать <b>$APPLICATION-&gt;GetException()</b>.</p>
-	* <h4>События</h4></bod<p>Метод работает с событиями <a
+	* <h4>События</h4><p>Метод работает с событиями <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">OnBeforePriceUpdate</a> и <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php">OnPriceUpdate</a>.</p>
-	* <h4>Примечания</h4><p>Если параметр $boolRecalc = true, все равно необходимо
-	* указывать цену и валюту (в том случае, когда тип цены - не базовый).
-	* Если существует базовая цена, значения цены и валюты будут
-	* изменены, если нет - код наценки будет изменен на ноль.</p> <p>В
+	* <h4>Примечания</h4><p>Если параметр $boolRecalc = true, все равно
+	* необходимо указывать цену и валюту (в том случае, когда тип цены -
+	* не базовый). Если существует базовая цена, значения цены и валюты
+	* будут изменены, если нет - код наценки будет изменен на ноль.</p> <p>В
 	* обработчиках события OnBeforePriceUpdate можно запретить или, наоборот,
 	* включить пересчет цены. За это отвечает ключ RECALC массива данных,
 	* передаваемых в обработчик.</p>
@@ -238,7 +238,7 @@ class CAllPrice
 	* <h4>See Also</h4> 
 	* <p><b>Методы</b></p></bo<ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
-	* </ul><p><b>События</b></p></bod<ul> <li> <a
+	* </ul><p><b>События</b></p><ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepricedelete.php">OnProductPriceDelete</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpricedelete.php">OnPriceDelete</a> </li> </ul><a
 	* name="examples"></a>
@@ -426,15 +426,15 @@ class CAllPrice
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__setbaseprice.a8de1fcf.php
 	* @author Bitrix
 	*/
-	public static function SetBasePrice($ProductID, $Price, $Currency, $quantityFrom = 0, $quantityTo = 0, $bGetID = false)
+	public static function SetBasePrice($ProductID, $Price, $Currency, $quantityFrom = false, $quantityTo = false, $bGetID = false)
 	{
-		$bGetID = ($bGetID == true ? true : false);
+		$bGetID = ($bGetID == true);
 
 		$arFields = array();
-		$arFields["PRICE"] = DoubleVal($Price);
+		$arFields["PRICE"] = doubleval($Price);
 		$arFields["CURRENCY"] = $Currency;
-		$arFields["QUANTITY_FROM"] = intval($quantityFrom);
-		$arFields["QUANTITY_TO"] = intval($quantityTo);
+		$arFields["QUANTITY_FROM"] = ($quantityFrom == false ? false : (int)$quantityFrom);
+		$arFields["QUANTITY_TO"] = ($quantityTo == false ? false : (int)$quantityTo);
 		$arFields["EXTRA_ID"] = false;
 
 		$ID = false;
@@ -513,7 +513,7 @@ class CAllPrice
 	public static function OnCurrencyDelete($Currency)
 	{
 		global $DB;
-		if ('' == $Currency)
+		if ($Currency == '')
 			return false;
 
 		$strSql = "DELETE FROM b_catalog_price WHERE CURRENCY = '".$DB->ForSql($Currency)."'";
@@ -554,7 +554,6 @@ class CAllPrice
 	* <h4>Example</h4> 
 	* <pre>
 	* <b>Удаление всех цен товара</b>
-	* 
 	* $boolResult = CPrice::DeleteByProduct(241);<br>
 	* <b>Удаление всех цен товара, кроме двух</b>
 	* 
@@ -566,7 +565,7 @@ class CAllPrice
 	* <h4>See Also</h4> 
 	* <p><b>Методы</b></p></bo<ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
-	* </ul><p><b>События</b></p></bod<ul> <li> <a
+	* </ul><p><b>События</b></p><ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>
 	* </li> </ul><a name="examples"></a>

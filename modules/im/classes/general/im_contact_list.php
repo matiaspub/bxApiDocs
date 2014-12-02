@@ -281,7 +281,7 @@ class CAllIMContactList
 
 			$nameTemplate = COption::GetOptionString("im", "user_name_template", "#LAST_NAME# #NAME#", SITE_ID);
 			$nameTemplateSite = CSite::GetNameFormat(false);
-			$cache_id = 'im_contact_list_'.$nameTemplate.'_'.$nameTemplateSite.(!empty($arExtranetUsers)? '_'.$USER->GetID(): '');
+			$cache_id = 'im_contact_list_'.$nameTemplate.'_'.$nameTemplateSite.(!empty($arExtranetUsers)? '_'.$USER->GetID(): '').'_v3';
 			$obCLCache = new CPHPCache;
 			$cache_dir = '/bx/imc/contact';
 
@@ -296,16 +296,10 @@ class CAllIMContactList
 				$arUsersToGroup = $tmpVal['USER_TO_GROUP'];
 				$arUserInGroupStructure = $tmpVal['USER_IN_GROUP'];
 				unset($tmpVal);
-				$arOnline = self::GetStatus();
-				foreach ($arUsers as $userId => $value)
-				{
-					$arUsers[$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arUsers[$userId]['birthday']): false;
-					$arUsers[$userId]['status'] = isset($arOnline['users'][$userId])? 'online': 'offline';
-				}
 			}
 			else
 			{
-				$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "IS_ONLINE"), 'ONLINE_INTERVAL' => 180);
+				$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "PERSONAL_GENDER", "WORK_POSITION"));
 				if ($bIntranetEnable)
 					$arExtParams['SELECT'] = array('UF_DEPARTMENT');
 
@@ -352,9 +346,12 @@ class CAllIMContactList
 							'id' => $arUser["ID"],
 							'name' => CUser::FormatName($nameTemplateSite, $arUser, true, false),
 							'nameList' => CUser::FormatName($nameTemplate, $arUser, true, false),
+							'workPosition' => $arUser['WORK_POSITION'],
 							'avatar' => empty($arFileTmp['src'])? '/bitrix/js/im/images/blank.gif': $arFileTmp['src'],
-							'status' => $arUser['IS_ONLINE'] == 'Y'? 'online': 'offline',
+							'status' => 'offline',
 							'birthday' => $arUser['PERSONAL_BIRTHDAY'],
+							'gender' => $arUser['PERSONAL_GENDER'] == 'F'? 'F': 'M',
+							'extranet' => self::IsExtranet($arUser),
 							'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false), array("user_id" => $arUser["ID"]))
 						);
 					}
@@ -381,12 +378,18 @@ class CAllIMContactList
 						);
 					}
 				}
-				foreach ($arUsers as $userId => $value)
-					$arUsers[$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arUsers[$userId]['birthday']): false;
+			}
+
+			$arOnline = CIMStatus::GetList();
+			foreach ($arUsers as $userId => $value)
+			{
+				$arUsers[$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arUsers[$userId]['birthday']): false;
+				$arUsers[$userId]['status'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['status']: 'offline';
+				$arUsers[$userId]['idle'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['idle']: 0;
 			}
 
 			//uasort($ar, create_function('$a, $b', 'if($a["stamp"] < $b["stamp"]) return 1; elseif($a["stamp"] > $b["stamp"]) return -1; else return 0;'));
-			if (isset($arUsersToGroup[$USER->GetID()]))
+			if (is_array($arUsersToGroup[$USER->GetID()]))
 			{
 				foreach($arUsersToGroup[$USER->GetID()] as $dep_id)
 				{
@@ -431,7 +434,13 @@ class CAllIMContactList
 		else
 			$arFilter['UF_IM_SEARCH'] = CIMSettings::PRIVACY_RESULT_ALL;
 
-		$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "IS_ONLINE"), 'SELECT' => Array('UF_IM_SEARCH'));
+		$bIntranetEnable = IsModuleInstalled('intranet');
+
+		$arExtParams = Array('FIELDS' => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_BIRTHDAY", "WORK_POSITION", "PERSONAL_GENDER"), 'SELECT' => Array('UF_IM_SEARCH'));
+		if($bIntranetEnable)
+			$arExtParams['SELECT'] = array('UF_DEPARTMENT');
+
+		$arUsers = Array();
 		$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc')), ($dummy=''), $arFilter, $arExtParams);
 		while ($arUser = $dbUsers->GetNext(true, false))
 		{
@@ -444,16 +453,35 @@ class CAllIMContactList
 
 			$arUsers[$arUser["ID"]] = Array(
 				'id' => $arUser["ID"],
-				'select' => $arUser['UF_IM_SEARCH'],
 				'name' => CUser::FormatName($nameTemplateSite, $arUser, true, false),
 				'nameList' => CUser::FormatName($nameTemplate, $arUser, true, false),
+				'workPosition' => $arUser['WORK_POSITION'],
 				'avatar' => empty($arFileTmp['src'])? '/bitrix/js/im/images/blank.gif': $arFileTmp['src'],
-				'status' => $arUser['IS_ONLINE'] == 'Y'? 'online': 'offline',
-				'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false), array("user_id" => $arUser["ID"]))
+				'status' => 'offline',
+				'birthday' => $bIntranetEnable? CIntranetUtils::IsToday($arUser['PERSONAL_BIRTHDAY']): false,
+				'gender' => $arUser['PERSONAL_GENDER'] == 'F'? 'F': 'M',
+				'extranet' => self::IsExtranet($arUser),
+				'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false), array("user_id" => $arUser["ID"])),
+				'select' => $arUser['UF_IM_SEARCH'],
 			);
-
 		}
+
+		if (!empty($arUsers))
+		{
+			$arOnline = CIMStatus::GetList(Array('ID' => array_keys($arUsers)));
+			foreach ($arUsers as $userId => $value)
+			{
+				$arUsers[$userId]['status'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['status']: 'offline';
+				$arUsers[$userId]['idle'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['idle']: 0;
+			}
+		}
+
 		return Array('users' => $arUsers);
+	}
+
+	public static function GetStatus($params)
+	{
+		return CIMStatus::GetList($params);
 	}
 
 	public static function AllowToSend($arParams)
@@ -461,6 +489,7 @@ class CAllIMContactList
 		$bResult = false;
 		if (isset($arParams['TO_USER_ID']))
 		{
+			global $USER;
 			$toUserId = intval($arParams['TO_USER_ID']);
 
 			$bResult = true;
@@ -575,6 +604,17 @@ class CAllIMContactList
 					unset($obSGCache);
 				}
 			}
+			else if (!IsModuleInstalled('intranet'))
+			{
+				if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($USER->GetID(), $arParams['TO_USER_ID']))
+				{
+					$bResult = false;
+				}
+				else if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE, $arParams['TO_USER_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($USER->GetID(), $arParams['TO_USER_ID']))
+				{
+					$bResult = false;
+				}
+			}
 		}
 		else if (isset($arParams['TO_CHAT_ID']))
 		{
@@ -643,14 +683,17 @@ class CAllIMContactList
 			{
 				$arCacheResult = $obCache->GetVars();
 				if ($showOnline)
-					$arOnline = self::GetStatus(Array('ID' => array_keys($arCacheResult['users'])));
+					$arOnline = CIMStatus::GetList(Array('ID' => array_keys($arCacheResult['users'])));
 
 				foreach ($arCacheResult['users'] as $userId => $value)
 				{
 					$arCacheResult['users'][$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arCacheResult['users'][$userId]['birthday']): false;
 
 					if ($showOnline)
-						$arCacheResult['users'][$userId]['status'] = isset($arOnline['users'][$userId])? 'online': 'offline';
+					{
+						$arCacheResult['users'][$userId]['status'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['status']: 'offline';
+						$arCacheResult['users'][$userId]['idle'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['idle']: 0;
+					}
 
 					if ($getHrPhoto && !isset($arCacheResult['hrphoto']))
 					{
@@ -669,7 +712,7 @@ class CAllIMContactList
 			}
 		}
 
-		$arSelect = array('FIELDS' => array("ID", "LAST_NAME", "NAME", "LOGIN", "PERSONAL_PHOTO", "SECOND_NAME", "IS_ONLINE", "PERSONAL_BIRTHDAY", "PERSONAL_GENDER"), 'ONLINE_INTERVAL' => 180);
+		$arSelect = array('FIELDS' => array("ID", "LAST_NAME", "NAME", "LOGIN", "PERSONAL_PHOTO", "SECOND_NAME", "PERSONAL_BIRTHDAY", "WORK_POSITION", "PERSONAL_GENDER", "IS_ONLINE"), 'ONLINE_INTERVAL' => 180);
 		if ($getPhones)
 		{
 			$arSelect['FIELDS'][] = 'WORK_PHONE';
@@ -704,10 +747,12 @@ class CAllIMContactList
 				'id' => $arUser["ID"],
 				'name' => CUser::FormatName($nameTemplateSite, $arUser, true, false),
 				'nameList' => CUser::FormatName($nameTemplate, $arUser, true, false),
+				'workPosition' => $arUser['WORK_POSITION'],
 				'avatar' => empty($arPhotoTmp['src'])? '/bitrix/js/im/images/blank.gif': $arPhotoTmp['src'],
-				'status' => ($arUser['IS_ONLINE'] == 'Y'? 'online': 'offline'),
+				'status' => 'offline',
 				'birthday' => $arUser['PERSONAL_BIRTHDAY'],
 				'gender' => $arUser['PERSONAL_GENDER'] == 'F'? 'F': 'M',
+				'extranet' => self::IsExtranet($arUser),
 				'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", CModule::IncludeModule('extranet') && !CExtranet::IsIntranetUser()? "ex": false), array("user_id" => $arUser["ID"]))
 			);
 
@@ -767,8 +812,16 @@ class CAllIMContactList
 				}
 			}
 		}
+		$arOnline = Array();
+		if ($showOnline)
+			$arOnline = CIMStatus::GetList(Array('ID' => array_keys($arUsers)));
+
 		foreach ($arUsers as $userId => $arUser)
+		{
 			$arUsers[$userId]['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($arUsers[$userId]['birthday']): false;
+			$arUsers[$userId]['status'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['status']: 'offline';
+			$arUsers[$userId]['idle'] = isset($arOnline['users'][$userId])? $arOnline['users'][$userId]['idle']: 0;
+		}
 
 		$result = array('users' => $arUsers, 'hrphoto' => $arHrPhoto, 'userInGroup' => $arUserInGroup, 'woUserInGroup' => $arWoUserInGroup, 'phones' => $arPhones, 'source' => $arSource);
 
@@ -809,56 +862,6 @@ class CAllIMContactList
 		return $result;
 	}
 
-	public static function GetStatus($arParams = Array())
-	{
-		if (!is_array($arParams))
-			$arParams = Array();
-
-		$arID = Array();
-		if (isset($arParams['ID']) && is_array($arParams['ID']) && !empty($arParams['ID']))
-		{
-			foreach ($arParams['ID'] as $key => $value)
-				$arID[] = intval($value);
-		}
-		else if (isset($arParams['ID']) && intval($arParams['ID']) > 0)
-		{
-			$arID[] = intval($arParams['ID']);
-		}
-
-		global $USER;
-		if(!isset($arParams['ID']) && !IsModuleInstalled('intranet') && is_object($USER))
-		{
-			$arID[] = $USER->GetID();
-			if (CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
-			{
-				$dbFriends = CSocNetUserRelations::GetList(array(),array("USER_ID" => $USER->GetID(), "RELATION" => SONET_RELATIONS_FRIEND), false, false, array("ID", "FIRST_USER_ID", "SECOND_USER_ID"));
-				if ($dbFriends)
-				{
-					while ($arFriends = $dbFriends->GetNext(true, false))
-					{
-						$friendId = $pref = (IntVal($USER->GetID()) == $arFriends["FIRST_USER_ID"]) ? $arFriends["SECOND_USER_ID"] : $arFriends["FIRST_USER_ID"];
-						$arID[] = $friendId;
-					}
-				}
-			}
-		}
-
-		$arUsers = Array();
-		$dbUsers = CUser::GetList(($sort_by = 'ID'), ($sort_dir = 'asc'), array('LAST_ACTIVITY' => '180'), array('FIELDS' => array("ID")));
-		while ($arUser = $dbUsers->GetNext(false, false))
-		{
-			if (!empty($arID) && !in_array($arUser["ID"], $arID))
-				continue;
-
-			$arUsers[$arUser["ID"]] = Array(
-				'id' => $arUser["ID"],
-				'status' => 'online',
-			);
-		}
-
-		return Array('users' => $arUsers);
-	}
-
 	public static function SetOnline($userId = null, $cache = false)
 	{
 		global $USER;
@@ -897,11 +900,11 @@ class CAllIMContactList
 		$sqlDateFunction = 'NULL';
 		$dbType = strtolower($DB->type);
 		if ($dbType== "mysql")
-			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 180 SECOND)";
+			$sqlDateFunction = "DATE_SUB(NOW(), INTERVAL 120 SECOND)";
 		else if ($dbType == "mssql")
-			$sqlDateFunction = "dateadd(SECOND, -180, getdate())";
+			$sqlDateFunction = "dateadd(SECOND, -120, getdate())";
 		else if ($dbType == "oracle")
-			$sqlDateFunction = "SYSDATE-(1/24/60/60*180)";
+			$sqlDateFunction = "SYSDATE-(1/24/60/60*120)";
 
 		$DB->Query("UPDATE b_user SET LAST_ACTIVITY_DATE = ".$sqlDateFunction." WHERE ID = ".$userId);
 
@@ -1029,9 +1032,9 @@ class CAllIMContactList
 			$strSql = "
 				SELECT
 					R.ITEM_TYPE, R.ITEM_ID,
-					R.ITEM_MID M_ID, M.AUTHOR_ID M_AUTHOR_ID, M.MESSAGE M_MESSAGE, ".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." M_DATE_CREATE,
+					R.ITEM_MID M_ID, M.AUTHOR_ID M_AUTHOR_ID, M.ID M_ID, M.CHAT_ID M_CHAT_ID, M.MESSAGE M_MESSAGE, ".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." M_DATE_CREATE,
 					C.TITLE C_TITLE, C.AUTHOR_ID C_OWNER_ID, C.ENTITY_TYPE C_ENTITY_TYPE, C.AVATAR C_AVATAR,
-					U.LOGIN, U.NAME, U.LAST_NAME, U.PERSONAL_PHOTO, U.SECOND_NAME, U.PERSONAL_BIRTHDAY, U.PERSONAL_GENDER
+					U.LOGIN, U.NAME, U.LAST_NAME, U.PERSONAL_PHOTO, U.SECOND_NAME, U.PERSONAL_BIRTHDAY, U.PERSONAL_GENDER, U.WORK_POSITION
 				FROM
 				b_im_recent R
 				LEFT JOIN b_user U ON R.ITEM_TYPE = '".IM_MESSAGE_PRIVATE."' AND R.ITEM_ID = U.ID
@@ -1042,12 +1045,14 @@ class CAllIMContactList
 				CTimeZone::Enable();
 
 			$toDelete = Array();
+			$arMessageId = Array();
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 255;
 			$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => ($bSmiles? "Y": "N"), "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arRes = $dbRes->GetNext(true, false))
 			{
+				$arMessageId[] = $arRes['M_ID'];
 				$arRes['ITEM_TYPE'] = trim($arRes['ITEM_TYPE']);
 				if ($arRes['M_DATE_CREATE']+2592000 < time())
 				{
@@ -1060,6 +1065,7 @@ class CAllIMContactList
 					'TYPE' => $arRes['ITEM_TYPE'],
 					'MESSAGE' => Array(
 						'id' => $arRes['M_ID'],
+						'chatId' => $arRes['M_CHAT_ID'],
 						'senderId' => $arRes['M_AUTHOR_ID'],
 						'date' => $arRes['M_DATE_CREATE'],
 						'text' => $CCTP->convertText(preg_replace("/\[s\].*?\[\/s\]/i", "", $arRes['M_MESSAGE']))
@@ -1069,6 +1075,7 @@ class CAllIMContactList
 				if ($arRes['ITEM_TYPE'] == IM_MESSAGE_PRIVATE)
 				{
 					$arUsers[] = $arRes['ITEM_ID'];
+
 					$arFileTmp = CFile::ResizeImageGet(
 						$arRes["PERSONAL_PHOTO"],
 						array('width' => 58, 'height' => 58),
@@ -1080,38 +1087,41 @@ class CAllIMContactList
 						'id' => $arRes['ITEM_ID'],
 						'name' => CUser::FormatName($nameTemplateSite, $arRes, true, false),
 						'nameList' => CUser::FormatName($nameTemplate, $arRes, true, false),
+						'workPosition' => $arRes['WORK_POSITION'],
 						'avatar' => empty($arFileTmp['src'])? '/bitrix/js/im/images/blank.gif': $arFileTmp['src'],
-						'gender' => $arRes['PERSONAL_GENDER'] == 'F'? 'F': 'M',
 						'status' => 'offline',
 						'birthday' => $arRes['PERSONAL_BIRTHDAY'],
+						'gender' => $arRes['PERSONAL_GENDER'] == 'F'? 'F': 'M',
+						'extranet' => false,
 						'profile' => CComponentEngine::MakePathFromTemplate(COption::GetOptionString('im', 'path_to_user_profile', "", $nameOfSite), array("user_id" => $arRes["ITEM_ID"]))
 					);
 				}
 				else
 				{
-					$avatar = '/bitrix/js/im/images/blank.gif';
-					if (intval($arRes["C_AVATAR"]) > 0)
-					{
-						$arFileTmp = CFile::ResizeImageGet(
-							$arRes["C_AVATAR"],
-							array('width' => 58, 'height' => 58),
-							BX_RESIZE_IMAGE_EXACT,
-							false
-						);
-						$avatar = empty($arFileTmp['src'])? $avatar: $arFileTmp['src'];
-					}
 					$itemId = 'chat'.$itemId;
 					$item['CHAT'] = Array(
 						'id' => $arRes['ITEM_ID'],
 						'name' => $arRes["C_TITLE"],
-						'avatar' => $avatar,
+						'avatar' => CIMChat::GetAvatarImage($arRes["C_AVATAR"]),
 						'owner' => $arRes["C_OWNER_ID"],
 						'style' => strlen($arRes["C_ENTITY_TYPE"])>0? 'call': 'group',
 					);
 				}
 				$arRecent[$itemId] = $item;
 			}
-			// remove old entity
+			$params = CIMMessageParam::Get($arMessageId);
+			foreach ($arRecent as $key => $value)
+			{
+				if (isset($params[$value['MESSAGE']['id']]))
+				{
+					if (count($params[$value['MESSAGE']['id']]['FILE_ID']) > 0 && strlen(trim($arRecent[$key]['MESSAGE']['text'])) <= 0)
+					{
+						$arRecent[$key]['MESSAGE']['text'] = "[".GetMessage('IM_FILE')."]";
+					}
+					$arRecent[$key]['MESSAGE']['params'] = $params[$value['MESSAGE']['id']];
+				}
+			}
+
 			if (!empty($toDelete))
 			{
 				if (isset($toDelete[IM_MESSAGE_PRIVATE]))
@@ -1119,18 +1129,41 @@ class CAllIMContactList
 				if (isset($toDelete[IM_MESSAGE_GROUP]))
 					self::DeleteRecent($toDelete[IM_MESSAGE_GROUP], true);
 			}
+
+			if (IsModuleInstalled('extranet') && $bIntranetEnable)
+			{
+				$arUserDepartment = Array();
+				$arFilter['ID'] = $USER->GetID()."|".implode('|', $arUsers);
+				$arExtParams = Array('FIELDS' => Array("ID"), 'SELECT' => Array('UF_DEPARTMENT'));
+
+				$dbUsers = CUser::GetList(($sort_by = Array('last_name'=>'asc')), ($dummy=''), $arFilter, $arExtParams);
+				while ($arUser = $dbUsers->GetNext(true, false))
+				{
+					$arUserDepartment[$arUser['ID']] = self::IsExtranet($arUser);
+				}
+
+				foreach ($arRecent as $key => $value)
+				{
+					if (isset($value['USER']))
+					{
+						$arRecent[$key]['USER']['extranet'] = $arUserDepartment[$value['USER']['id']];
+					}
+				}
+			}
+
 			if($obCache->StartDataCache())
 				$obCache->EndDataCache(Array('recent' => $arRecent, 'users' => $arUsers));
 		}
 
-		$arOnline = self::GetStatus(Array('ID' => array_values($arUsers)));
+		$arOnline = CIMStatus::GetList(Array('ID' => array_values($arUsers)));
 		foreach ($arRecent as $key => $value)
 		{
 			if ($value['TYPE'] != IM_MESSAGE_PRIVATE)
 				continue;
 
 			$arRecent[$key]['USER']['birthday'] = $bIntranetEnable? CIntranetUtils::IsToday($value['USER']['birthday']): false;
-			$arRecent[$key]['USER']['status'] = isset($arOnline['users'][$value['USER']['id']])? 'online': 'offline';
+			$arRecent[$key]['USER']['status'] = isset($arOnline['users'][$value['USER']['id']])? $arOnline['users'][$value['USER']['id']]['status']: 'offline';
+			$arRecent[$key]['USER']['idle'] = isset($arOnline['users'][$value['USER']['id']])? $arOnline['users'][$value['USER']['id']]['idle']: 0;
 		}
 
 		if ($bLoadUnreadMessage)
@@ -1173,6 +1206,7 @@ class CAllIMContactList
 				'ORDER' => 'ASC',
 				'GROUP_BY_CHAT' => 'Y',
 				'USER_LOAD' => 'N',
+				'FILE_LOAD' => 'N',
 				'USE_SMILES' => $bSmiles? 'Y': 'N',
 				'USE_TIME_ZONE' => $bTimeZone? 'Y': 'N'
 			));
@@ -1197,6 +1231,7 @@ class CAllIMContactList
 
 		if (!empty($arRecent))
 		{
+
 			sortByColumn(
 				$arRecent,
 				array(
@@ -1204,20 +1239,45 @@ class CAllIMContactList
 					'MESSAGE' => array(SORT_NUMERIC, SORT_DESC)
 				),
 				array(
-					'COUNTER' => function($counter)
-					{
-						return !is_null($counter);
-					},
-					'MESSAGE' => function($recent)
-					{
-						return $recent['date'];
-					}
+					'COUNTER' => array(__CLASS__, 'GetRecentListSortCounter'),
+					'MESSAGE' => array(__CLASS__, 'GetRecentListSortMessage'),
 				),
 				null, true
 			);
 		}
 
 		return $arRecent;
+	}
+
+	public static function GetRecentListSortCounter($counter)
+	{
+		return !is_null($counter);
+	}
+
+	public static function GetRecentListSortMessage($recent)
+	{
+		return $recent['date'];
+	}
+
+	public static function IsExtranet($arUser)
+	{
+		$result = false;
+		if (IsModuleInstalled('extranet'))
+		{
+			if (array_key_exists('UF_DEPARTMENT', $arUser))
+			{
+				if ($arUser['UF_DEPARTMENT'] == "")
+				{
+					$result = true;
+				}
+				else if (is_array($arUser['UF_DEPARTMENT']) && empty($arUser['UF_DEPARTMENT']))
+				{
+					$result = true;
+				}
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

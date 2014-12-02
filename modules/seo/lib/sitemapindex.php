@@ -45,7 +45,7 @@ class SitemapIndex
 
 	public function appendIndexEntry($file)
 	{
-		if($this->isExists())
+		if($this->isExists() && $file->isExists())
 		{
 			$fileUrlEnc = Converter::getXmlConverter()->encode($this->settings['PROTOCOL'].'://'.\CBXPunycode::toASCII($this->settings['DOMAIN'], $e = null).$this->getFileUrl($file));
 

@@ -38,6 +38,9 @@ class Query
 		$where_chains = array(),
 		$having_chains = array();
 
+	/**
+	 * @var QueryChain[]
+	 */
 	protected
 		$select_expr_chains = array(), // from select expr "build_from"
 		$having_expr_chains = array(), // from having expr "build_from"
@@ -45,9 +48,6 @@ class Query
 
 	protected
 		$runtime_chains;
-
-	protected
-		$options;
 
 	/**
 	 * @var QueryChain[]
@@ -61,20 +61,26 @@ class Query
 	 * If disabled, 1:N entity fields in filter will be trasnformed to exists() subquery
 	 * @var bool
 	 */
-	protected $data_doubling = true;
+	protected $data_doubling_off = false;
 
 	protected $table_alias_postfix = '';
 
 	protected
 		$join_map = array();
 
+	/** @var array list of used joins */
+	protected $join_registry;
+
 	protected
 		$is_executing = false;
 
-	protected
-		$last_query;
+	/** @var string Last executed SQL query */
+	protected static $last_query;
 
 	protected $replaced_aliases;
+
+	/** @var callable[] */
+	protected $selectFetchModifiers = array();
 
 	/**
 	 * @param Base|Query|string $source
@@ -88,11 +94,11 @@ class Query
 		}
 		elseif ($source instanceof Base)
 		{
-			$this->init_entity = $source;
+			$this->init_entity = clone $source;
 		}
 		elseif (is_string($source))
 		{
-			$this->init_entity = Base::getInstance($source);
+			$this->init_entity = clone Base::getInstance($source);
 		}
 		else
 		{
@@ -275,7 +281,6 @@ class Query
 	public function addOrder($definition, $order = 'ASC')
 	{
 		$order = strtoupper($order);
-		$definition = strtoupper($definition);
 
 		if (!in_array($order, array('ASC', 'DESC'), true))
 		{
@@ -357,64 +362,66 @@ class Query
 	}
 
 	/**
-	 * @deprecated
+	 * @see disableDataDoubling
+	 *
+	 * @return void
 	 */
 	public function enableDataDoubling()
 	{
-		$this->data_doubling = true;
+		$this->data_doubling_off = false;
 	}
 
 	/**
-	 * @deprecated
+	 * Replaces all 1:N relations in filter to ID IN (subquery SELECT ID FROM <1:N relation>)
+	 * Available for Entities with 1 primary field only
+	 *
+	 * @return bool
 	 */
 	public function disableDataDoubling()
 	{
-		$this->data_doubling = false;
+		if (count($this->init_entity->getPrimaryArray()) !== 1)
+		{
+			// mssql doesn't support constructions WHERE (col1, col2) IN (SELECT col1, col2 FROM SomeOtherTable)
+			/* @see http://connect.microsoft.com/SQLServer/feedback/details/299231/add-support-for-ansi-standard-row-value-constructors */
+			trigger_error(sprintf(
+				'Disabling data doubling available for Entities with 1 primary field only. Number of primaries of your entity `%s` is %d.',
+				$this->init_entity->getFullName(), count($this->init_entity->getPrimaryArray())
+			), E_USER_WARNING);
+
+			return false;
+		}
+
+		$this->data_doubling_off = true;
+
+		return true;
 	}
 
 	/**
-	 * @deprecated
-	 */
-	public function getOptions()
-	{
-		return $this->options;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function setOptions($options)
-	{
-		$this->options = $options;
-		return $this;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	public function addOption($option_name, $option_value)
-	{
-		$this->options[$option_name] = $option_value;
-		return $this;
-	}
-
-	/**
-	 * Adds a runtime field (created dinamycally, opposite to described statically in the entity map) for SELECT clause
+	 * Adds a runtime field (being created dinamycally, opposite to being described statically in the entity map)
 	 *
-	 * @param string $name
-	 * @param array $fieldInfo
+	 * @param string|null $name
+	 * @param array|Field $fieldInfo
+	 *
 	 * @return Query
 	 */
 	public function registerRuntimeField($name, $fieldInfo)
 	{
-		$field = $this->init_entity->initializeField($name, $fieldInfo);
+		if ((empty($name) || is_numeric($name)) && $fieldInfo instanceof Field)
+		{
+			$name = $fieldInfo->getName();
+		}
 
-		$chain = new QueryChain;
-		$chain->addElement(new QueryChainElement($this->init_entity));
-		$chain->addElement(new QueryChainElement($field));
+		$this->init_entity->addField($fieldInfo, $name);
 
-		// add
+		// force chain creation for further needs
+		$chain = $this->getRegisteredChain($name, true);
 		$this->registerChain('runtime', $chain);
+
+		if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+		{
+			$this->collectExprChains($chain, array('hidden'));
+		}
+
 		return $this;
 	}
 
@@ -447,11 +454,15 @@ class Query
 		return $result;
 	}
 
-	protected function addToSelectChain($definition, $alias = '')
+	protected function addToSelectChain($definition, $alias = null)
 	{
-		if (is_array($definition))
+		if ($definition instanceof ExpressionField)
 		{
-			// it is runtime field
+			if (empty($alias))
+			{
+				$alias = $definition->getName();
+			}
+
 			$this->registerRuntimeField($alias, $definition);
 			$chain = $this->getRegisteredChain($alias);
 
@@ -464,12 +475,21 @@ class Query
 				$this->collectExprChains($chain, array('hidden', 'select_expr'));
 			}
 		}
+		elseif (is_array($definition))
+		{
+			// it is runtime field
+			// now they are @deprecated in here
+			throw new Main\ArgumentException(
+				'Expression as an array in `select` section is no more supported due to security reason.'
+				.' Please use `runtime` parameter, or Query->registerRuntimeField method, or pass ExpressionField object instead of array.'
+			);
+		}
 		else
 		{
 			// there is normal scalar field, or Reference, or Entity (all fields of)
 			$chain = $this->getRegisteredChain($definition, true);
 
-			if (!empty($alias))
+			if ($alias !== null)
 			{
 				// custom alias
 				$chain = clone $chain;
@@ -479,6 +499,7 @@ class Query
 			$last_elem = $chain->getLastElement();
 
 			// fill if element is not scalar
+			/** @var null|Base $expand_entity */
 			$expand_entity = null;
 
 			if ($last_elem->getValue() instanceof ReferenceField)
@@ -494,40 +515,61 @@ class Query
 				$expand_entity = $last_elem->getValue();
 			}
 
+			if (!$expand_entity && $alias !== null)
+			{
+				// we have a single field, lets cheks its custom alias
+				if (
+					$this->init_entity->hasField($alias)
+					&& (
+						// if it's not the same field
+						$this->init_entity->getFullName() !== $last_elem->getValue()->getEntity()->getFullName()
+						||
+						$last_elem->getValue()->getName() !== $alias
+					)
+				)
+				{
+					// deny aliases eq. existing fields
+					throw new Main\ArgumentException(sprintf(
+						'Alias "%s" matches already existing field "%s" of initial entity "%s". '.
+						'Please choose another name for alias.',
+						$alias, $alias, $this->init_entity->getFullName()
+					));
+				}
+			}
+
 			if ($expand_entity)
 			{
 				// add all fields of entity
 				foreach ($expand_entity->getFields() as $exp_field)
 				{
-					if (!($exp_field instanceof ReferenceField))
+					// except for references and expressions
+					if ($exp_field instanceof ScalarField)
 					{
-						if ($exp_field instanceof ExpressionField)
-						{
-							// we should have own copy of build_from_chains to set join aliases there
-							// actually is copy&paste from getChainByDefinition
-							// it would be correct to form DEFINITIONs here and call getChainByDefinition for each
-							// better to skip expressions
-							continue;
-						}
-
 						$exp_chain = clone $chain;
 						$exp_chain->addElement(new QueryChainElement(
 							$exp_field
 						));
 
 						// custom alias
-						if (!empty($alias))
+						if ($alias !== null)
 						{
-							$exp_chain->setCustomAlias($alias.$exp_field->getName());
+							$fieldAlias = $alias . $exp_field->getName();
+
+							// deny aliases eq. existing fields
+							if ($this->init_entity->hasField($fieldAlias))
+							{
+								throw new Main\ArgumentException(sprintf(
+									'Alias "%s" + field "%s" match already existing field "%s" of initial entity "%s". '.
+									'Please choose another name for alias.',
+									$alias, $exp_field->getName(), $fieldAlias, $this->init_entity->getFullName()
+								));
+							}
+
+							$exp_chain->setCustomAlias($fieldAlias);
 						}
 
 						// add
 						$this->registerChain('select', $exp_chain);
-
-						if ($exp_field instanceof ExpressionField)
-						{
-							$this->collectExprChains($exp_chain, array('hidden', 'select_expr'));
-						}
 					}
 				}
 			}
@@ -547,9 +589,9 @@ class Query
 		return $this;
 	}
 
-	public function setFilterChains(array $filter, $section = 'filter')
+	public function setFilterChains(&$filter, $section = 'filter')
 	{
-		foreach ($filter as $filter_def => $filter_match)
+		foreach ($filter as $filter_def => &$filter_match)
 		{
 			if ($filter_def === 'LOGIC')
 			{
@@ -561,14 +603,99 @@ class Query
 				$csw_result = \CSQLWhere::makeOperation($filter_def);
 				list($definition, ) = array_values($csw_result);
 
-				$chain = $this->getRegisteredChain($definition, true);
+				// do not register it in global chain registry - get it in a smuggled way
+				// - we will do the registration later after UF rewriting and data doubling checking
+				$chain = $this->getRegisteredChain($definition);
 
-				$this->registerChain($section, $chain, $definition);
-
-				// fill hidden select
-				if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+				if (!$chain)
 				{
-					$this->collectExprChains($chain);
+					// try to find it in filter chains if it is 2nd call of method (when dividing filter for where/having)
+					// and chain is still not registered in global (e.g. when forcesDataDoublingOff)
+					if (isset($this->filter_chains[$definition]))
+					{
+						$chain = $this->filter_chains[$definition];
+					}
+					else
+					{
+						$chain = QueryChain::getChainByDefinition($this->init_entity, $definition);
+					}
+				}
+
+				// dirty hack for UF multiple fields: replace text UF_SMTH by UF_SMTH_SINGLE
+				$dstField = $chain->getLastElement()->getValue();
+				$dstEntity = $dstField->getEntity();
+
+				if ($dstField instanceof ExpressionField && count($dstField->getBuildFromChains()) == 1)
+				{
+					// hold entity, but get real closing field
+					$dstBuildFromChains = $dstField->getBuildFromChains();
+
+					/** @var QueryChain $firstChain */
+					$firstChain = $dstBuildFromChains[0];
+					$dstField = $firstChain->getLastElement()->getValue();
+				}
+
+				// check for base linking
+				if ($dstField instanceof TextField && $dstEntity->hasField($dstField->getName().'_SINGLE'))
+				{
+					$utmLinkField = $dstEntity->getField($dstField->getName().'_SINGLE');
+
+					if ($utmLinkField instanceof ExpressionField)
+					{
+						$buildFromChains = $utmLinkField->getBuildFromChains();
+
+						// check for back-reference
+						if (count($buildFromChains) == 1 && $buildFromChains[0]->hasBackReference())
+						{
+							$endField = $buildFromChains[0]->getLastElement()->getValue();
+
+							// and final check for entity name
+							if (strpos($endField->getEntity()->getName(), 'Utm'))
+							{
+								$expressionChain = clone $chain;
+								$expressionChain->removeLastElement();
+								$expressionChain->addElement(new QueryChainElement(clone $utmLinkField));
+								$expressionChain->forceDataDoublingOff();
+
+								$chain = $expressionChain;
+
+								// rewrite filter definition
+								unset($filter[$filter_def]);
+								$filter[$filter_def.'_SINGLE'] = $filter_match;
+								$definition .= '_SINGLE';
+							}
+						}
+					}
+				}
+
+				// continue
+				$registerChain = true;
+
+				// if data doubling disabled and it is back-reference - do not register, it will be overwritten
+				if ($chain->forcesDataDoublingOff() || ($this->data_doubling_off && $chain->hasBackReference()))
+				{
+					$registerChain = false;
+				}
+
+				if ($registerChain)
+				{
+					$this->registerChain($section, $chain, $definition);
+
+					// fill hidden select
+					if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+					{
+						$this->collectExprChains($chain);
+					}
+				}
+				else
+				{
+					// hide from global registry to avoid "join table"
+					// but we still need it in filter chains
+					$this->filter_chains[$chain->getAlias()] = $chain;
+					$this->filter_chains[$definition] = $chain;
+
+					// and we will need primary chain in filter later when overwriting data-doubling
+					$this->getRegisteredChain($this->init_entity->getPrimary(), true);
 				}
 			}
 
@@ -699,19 +826,21 @@ class Query
 		}
 	}
 
-	protected function buildJoinMap()
+	protected function buildJoinMap($chains = null)
 	{
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$aliasLength = $helper->getAliasLength();
 
-		// list of used joins
-		$done = array();
-
 		$talias_count = 0;
 
-		foreach ($this->global_chains as $chain)
+		if (empty($chains))
+		{
+			$chains = $this->global_chains;
+		}
+
+		foreach ($chains as $chain)
 		{
 			if ($chain->getLastElement()->getParameter('talias'))
 			{
@@ -720,7 +849,7 @@ class Query
 			}
 
 			// in NO_DOUBLING mode skip 1:N relations that presented in filter only
-			if (!$this->data_doubling && $chain->hasBackReference())
+			if ($chain->forcesDataDoublingOff() || ($this->data_doubling_off && $chain->hasBackReference()))
 			{
 				$alias = $chain->getAlias();
 
@@ -733,7 +862,6 @@ class Query
 				}
 			}
 
-			$prev_entity = $this->init_entity;
 			$prev_alias = $this->getInitAlias(false);
 
 			$map_key = '';
@@ -744,20 +872,20 @@ class Query
 			 * */
 			$elements = array_slice($chain->getAllElements(), 1);
 
+			$currentDedinition = array();
+
 			foreach ($elements as $element)
 			{
 				$table_alias = null;
 
 				/**
 				 * define main objects
-				 * @var $src_entity Base
 				 * @var $ref_field ReferenceField
 				 * @var $dst_entity Base
 				 */
 				if ($element->getValue() instanceof ReferenceField)
 				{
 					// ref to another entity
-					$src_entity = $prev_entity;
 					$ref_field = $element->getValue();
 					$dst_entity = $ref_field->getRefEntity();
 				}
@@ -765,7 +893,6 @@ class Query
 				)
 				{
 					// link from another entity to this
-					$src_entity = $prev_entity;
 					list($dst_entity, $ref_field) = $element->getValue();
 				}
 				else
@@ -778,15 +905,17 @@ class Query
 				// mapping
 				if (empty($map_key))
 				{
-					$map_key = $src_entity->getName();
+					$map_key = join('.', $currentDedinition);
 				}
 
 				$map_key .= '/' . $ref_field->getName() . '/' . $dst_entity->getName();
 
-				if (isset($done[$map_key]))
+				$currentDedinition[] = $element->getDefinitionFragment();
+
+				if (isset($this->join_registry[$map_key]))
 				{
 					// already connected
-					$table_alias = $done[$map_key];
+					$table_alias = $this->join_registry[$map_key];
 				}
 				else
 				{
@@ -802,12 +931,17 @@ class Query
 
 							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
-								$table_alias = 'TALIAS'.$this->table_alias_postfix.'_' . (++$talias_count);
+								$table_alias = 'TALIAS_' . (++$talias_count);
 							}
 						}
 
 						$alias_this = $prev_alias;
 						$alias_ref = $table_alias;
+
+						$isBackReference = false;
+
+						$definition_this = join('.', array_slice($currentDedinition, 0, -1));
+						$definition_ref = join('.', $currentDedinition);
 					}
 					elseif (is_array($element->getValue()))
 					{
@@ -818,46 +952,52 @@ class Query
 
 							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
-								$table_alias = 'TALIAS'.$this->table_alias_postfix.'_' . (++$talias_count);
+								$table_alias = 'TALIAS_' . (++$talias_count);
 							}
 						}
 
 						$alias_this = $table_alias;
 						$alias_ref = $prev_alias;
 
-						if ($dst_entity->isUtm())
-						{
-							// add to $reference
-							$reference = array(
-								$reference,
-								'=this.FIELD_ID' => array('?i', $element->getParameter('ufield')->getFieldId())
-							);
-						}
+						$isBackReference = true;
+
+						$definition_this = join('.', $currentDedinition);
+						$definition_ref = join('.', array_slice($currentDedinition, 0, -1));
+					}
+					else
+					{
+						throw new Main\SystemException(sprintf('Unknown reference element `%s`', $element->getValue()));
 					}
 
-					// replace this. and ref. to real definition -- not supported yet
-					// instead it we set $alias_this and $alias_ref
-
+					// replace this. and ref. to real definition
 					$csw_reference = $this->prepareJoinReference(
-						$reference, $alias_this.$this->table_alias_postfix, $alias_ref.$this->table_alias_postfix
+						$reference,
+						$alias_this.$this->table_alias_postfix,
+						$alias_ref.$this->table_alias_postfix,
+						$definition_this,
+						$definition_ref,
+						$isBackReference
 					);
 
-					$join = array(
-						'type' => $ref_field->getJoinType(),
-						'table' => $dst_entity->getDBTableName(),
-						'alias' => $table_alias.$this->table_alias_postfix,
-						'reference' => $csw_reference
-					);
+					// double check after recursive call in prepareJoinReference
+					if (!isset($this->join_registry[$map_key]))
+					{
+						$join = array(
+							'type' => $ref_field->getJoinType(),
+							'table' => $dst_entity->getDBTableName(),
+							'alias' => $table_alias.$this->table_alias_postfix,
+							'reference' => $csw_reference,
+							'map_key' => $map_key
+						);
 
-					$this->join_map[] = $join;
-
-					$done[$map_key] = $table_alias;
+						$this->join_map[] = $join;
+						$this->join_registry[$map_key] = $table_alias;
+					}
 				}
 
 				// set alias for each element
 				$element->setParameter('talias', $table_alias.$this->table_alias_postfix);
 
-				$prev_entity = $dst_entity;
 				$prev_alias = $table_alias;
 			}
 		}
@@ -877,7 +1017,7 @@ class Query
 			$sql[] = 1;
 		}
 
-		return "\t".join(",\n\t", $sql);
+		return "\n\t".join(",\n\t", $sql);
 	}
 
 	protected function buildJoin()
@@ -885,7 +1025,7 @@ class Query
 		$sql = array();
 		$csw = new \CSQLWhere;
 
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		foreach ($this->join_map as $join)
@@ -897,13 +1037,13 @@ class Query
 			// sql
 			$sql[] = sprintf('%s JOIN %s %s ON %s',
 				$join['type'],
-				$helper->quote($join['table']),
+				$this->quoteTableSource($join['table']),
 				$helper->quote($join['alias']),
 				trim($csw->getQuery($join['reference']))
 			);
 		}
 
-		return join("\n", $sql);
+		return "\n".join("\n", $sql);
 	}
 
 	protected function buildWhere()
@@ -938,19 +1078,21 @@ class Query
 					continue;
 				}
 
-//				if (isset($this->select_chains[$alias]) || isset($this->select_expr_chains[$alias]) || isset($this->order_chains[$alias])
-//					|| isset($this->having_chains[$alias]) || isset($this->having_expr_chains[$alias]))
 				if (isset($this->select_chains[$alias]) || isset($this->order_chains[$alias]) || isset($this->having_chains[$alias]))
 				{
-					//if (!($chain->getLastElement()->getValue() instanceof ExpressionField) && !$chain->hasAggregation())
-					// skip subqueries
-					if (!$chain->hasAggregation() && !$chain->hasSubquery())
+					if (isset($this->group_chains[$alias]))
 					{
+						// skip already groupped
+						continue;
+					}
+					elseif (!$chain->hasAggregation() && !$chain->hasSubquery())
+					{
+						// skip subqueries and already aggregated
 						$this->registerChain('group', $chain);
 					}
-					// but include build_from of subqueries
 					elseif (!$chain->hasAggregation() && $chain->hasSubquery() && $chain->getLastElement()->getValue() instanceof ExpressionField)
 					{
+						// but include build_from of subqueries
 						$sub_chains = $chain->getLastElement()->getValue()->getBuildFromChains();
 
 						foreach ($sub_chains as $sub_chain)
@@ -1016,7 +1158,7 @@ class Query
 
 	protected function buildQuery()
 	{
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		if ($this->query_build_parts === null)
@@ -1024,7 +1166,7 @@ class Query
 
 			foreach ($this->select as $key => $value)
 			{
-				$this->addToSelectChain($value, is_numeric($key) ? '' : $key);
+				$this->addToSelectChain($value, is_numeric($key) ? null : $key);
 			}
 
 			$this->setFilterChains($this->filter);
@@ -1049,13 +1191,7 @@ class Query
 			$sqlHaving = $this->buildHaving();
 			$sqlOrder = $this->buildOrder();
 
-			$sqlFrom = $this->init_entity->getDBTableName();
-
-			if (strpos($sqlFrom, '(') === false)
-			{
-				// is not subquery
-				$sqlFrom = $helper->quote($sqlFrom);
-			}
+			$sqlFrom = $this->quoteTableSource($this->init_entity->getDBTableName());
 
 			$sqlFrom .= ' '.$helper->quote($this->getInitAlias());
 			$sqlFrom .= ' '.$sqlJoin;
@@ -1081,14 +1217,6 @@ class Query
 
 		list($query, $replaced) = $this->replaceSelectAliases($query);
 		$this->replaced_aliases = $replaced;
-
-		if (!empty($this->options))
-		{
-			foreach ($this->options as $opt => $value)
-			{
-				$query = str_replace('%'.$opt.'%', $value, $query);
-			}
-		}
 
 		if ($this->limit > 0)
 		{
@@ -1117,6 +1245,7 @@ class Query
 				$chain = $this->filter_chains[$definition];
 				$last = $chain->getLastElement();
 
+				// need to create an alternative of CSQLWhere in D7.Entity
 				$field_type = $last->getValue()->getDataType();
 
 				// rewrite type & value for CSQLWhere
@@ -1151,13 +1280,40 @@ class Query
 					$field_type = 'string';
 				}
 
+				$sqlDefinition = $chain->getSqlDefinition();
+
+				$callback = null;
+
+				// data-doubling-off mode
+				/** @see disableDataDoubling */
+				if ($chain->forcesDataDoublingOff() || ($this->data_doubling_off && $chain->hasBackReference()))
+				{
+					$primaryName = $this->init_entity->getPrimary();
+					$uniquePostfix = '_TMP'.rand();
+
+					// build subquery
+					$subQuery = new Query($this->init_entity);
+					$subQuery->addSelect($primaryName);
+					$subQuery->addFilter($filter_def, $filter_match);
+					$subQuery->setTableAliasPostfix(strtolower($uniquePostfix));
+					$subQuerySql = $subQuery->getQuery();
+
+					// proxying subquery as value to callback
+					$filter_match = $subQuerySql;
+					$callback = array($this, 'dataDoublingCallback');
+
+					$field_type = 'callback';
+
+					// change sql definition
+					$idChain = $this->getRegisteredChain($primaryName);
+					$sqlDefinition = $idChain->getSqlDefinition();
+				}
+
 				//$is_having = $last->getValue() instanceof ExpressionField && $last->getValue()->isAggregated();
 
 				// if back-reference found (Entity:REF)
 				// if NO_DOUBLING mode enabled, then change getSQLDefinition to subquery exists(...)
 				// and those chains should not be in joins if it is possible
-
-				$callback = null;
 
 				/*if (!$this->data_doubling && $chain->hasBackReference())
 				{
@@ -1192,7 +1348,7 @@ class Query
 
 				$fields[$definition] = array(
 					'TABLE_ALIAS' => 'table',
-					'FIELD_NAME' => $chain->getSqlDefinition(),
+					'FIELD_NAME' => $sqlDefinition,
 					'FIELD_TYPE' => $field_type,
 					'MULTIPLE' => '',
 					'JOIN' => '',
@@ -1209,13 +1365,8 @@ class Query
 		return $fields;
 	}
 
-	protected function prepareJoinReference($reference, $alias_this, $alias_ref)
+	protected function prepareJoinReference($reference, $alias_this, $alias_ref, $baseDefinition, $refDefenition, $isBackReference)
 	{
-		$connection = \Bitrix\Main\Application::getConnection();
-		$helper = $connection->getSqlHelper();
-		$leftQuote = $helper->getLeftQuote();
-		$rightQuote = $helper->getRightQuote();
-
 		$new = array();
 
 		foreach ($reference as $k => $v)
@@ -1229,27 +1380,70 @@ class Query
 			if (is_numeric($k))
 			{
 				// subfilter, recursive call
-				$new[$k] = $this->prepareJoinReference($v, $alias_this, $alias_ref);
+				$new[$k] = $this->prepareJoinReference($v, $alias_this, $alias_ref, $baseDefinition, $refDefenition, $isBackReference);
 			}
 			else
 			{
 				// key
 				$csw_result = \CSQLWhere::makeOperation($k);
-				list($field, ) = array_values($csw_result);
+				list($field, $operation) = array_values($csw_result);
 
 				if (strpos($field, 'this.') === 0)
 				{
-					$k = str_replace('this.', $helper->quote($alias_this).'.'.$leftQuote, $k);
-					$k .= $rightQuote;
+					// parse the chain
+					$definition = str_replace(\CSQLWhere::getOperationByCode($operation).'this.', '', $k);
+					$absDefinition = strlen($baseDefinition) ? $baseDefinition . '.' . $definition : $definition;
+
+					$chain = $this->getRegisteredChain($absDefinition, true);
+
+					if (!$isBackReference)
+					{
+						// make sure these fields will be joined bebore the main join
+						$this->buildJoinMap(array($chain));
+					}
+					else
+					{
+						$chain->getLastElement()->setParameter('talias', $alias_this);
+					}
+
+					// recursively collect all "build_from" fields
+					if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+					{
+						$this->collectExprChains($chain);
+						$this->buildJoinMap($chain->getLastElement()->getValue()->getBuildFromChains());
+					}
+
+					$k = \CSQLWhere::getOperationByCode($operation).$chain->getSqlDefinition();
 				}
 				elseif (strpos($field, 'ref.') === 0)
 				{
-					$k = str_replace('ref.', $helper->quote($alias_ref).'.'.$leftQuote, $k);
-					$k .= $rightQuote;
+					$definition = str_replace(\CSQLWhere::getOperationByCode($operation).'ref.', '', $k);
+					$absDefinition = strlen($refDefenition) ? $refDefenition . '.' . $definition : $definition;
+
+					$chain = $this->getRegisteredChain($absDefinition, true);
+
+					if ($isBackReference)
+					{
+						// make sure these fields will be joined bebore the main join
+						$this->buildJoinMap(array($chain));
+					}
+					else
+					{
+						$chain->getLastElement()->setParameter('talias', $alias_ref);
+					}
+
+					// recursively collect all "build_from" fields
+					if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+					{
+						$this->collectExprChains($chain);
+						$this->buildJoinMap($chain->getLastElement()->getValue()->getBuildFromChains());
+					}
+
+					$k = \CSQLWhere::getOperationByCode($operation).$chain->getSqlDefinition();
 				}
 				else
 				{
-					throw new Main\SystemException();
+					throw new Main\SystemException(sprintf('Unknown reference key `%s`', $k));
 				}
 
 				// value
@@ -1258,19 +1452,76 @@ class Query
 					// field = expression
 					$v = new \CSQLWhereExpression($v[0], array_slice($v, 1));
 				}
-				else
+				elseif ($v instanceof Main\DB\SqlExpression)
 				{
-					// field = field
+					// it's ok, nothing to do
+				}
+				elseif (!is_object($v))
+				{
 					if (strpos($v, 'this.') === 0)
 					{
-						$field_def = str_replace('this.', $alias_this.'.', $v);
+						$definition = str_replace('this.', '', $v);
+						$absDefinition = strlen($baseDefinition) ? $baseDefinition . '.' . $definition : $definition;
+
+						$chain = $this->getRegisteredChain($absDefinition, true);
+
+						if (!$isBackReference)
+						{
+							// make sure these fields will be joined bebore the main join
+							$this->buildJoinMap(array($chain));
+						}
+						else
+						{
+							$chain->getLastElement()->setParameter('talias', $alias_this);
+						}
+
+						// recursively collect all "build_from" fields
+						if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+						{
+							$this->collectExprChains($chain);
+							$this->buildJoinMap($chain->getLastElement()->getValue()->getBuildFromChains());
+						}
+
+						$field_def = $chain->getSqlDefinition();
 					}
 					elseif (strpos($v, 'ref.') === 0)
 					{
-						$field_def = str_replace('ref.', $alias_ref.'.', $v);
+						$definition = str_replace('ref.', '', $v);
+						$absDefinition = strlen($refDefenition) ? $refDefenition . '.' . $definition : $definition;
+
+						$chain = $this->getRegisteredChain($absDefinition, true);
+
+						if ($isBackReference)
+						{
+							// make sure these fields will be joined bebore the main join
+							$this->buildJoinMap(array($chain));
+						}
+						else
+						{
+							$chain->getLastElement()->setParameter('talias', $alias_ref);
+						}
+
+						$this->buildJoinMap(array($chain));
+
+						// recursively collect all "build_from" fields
+						if ($chain->getLastElement()->getValue() instanceof ExpressionField)
+						{
+							$this->collectExprChains($chain);
+							$this->buildJoinMap($chain->getLastElement()->getValue()->getBuildFromChains());
+						}
+
+						$field_def = $chain->getSqlDefinition();
+					}
+					else
+					{
+						throw new Main\SystemException(sprintf('Unknown reference value `%s`', $v));
 					}
 
 					$v = new \CSQLWhereExpression('?#', $field_def);
+				}
+				else
+				{
+					throw new Main\SystemException(sprintf('Unknown reference value `%s`', $v));
 				}
 
 				$new[$k] = $v;
@@ -1355,6 +1606,7 @@ class Query
 			$tmp_chain = clone $pre_chain;
 
 			// exclude init entity
+			/** @var QueryChainElement[] $bf_elements */
 			$bf_elements = array_slice($bf_chain->getAllElements(), 1);
 
 			// add elements
@@ -1373,6 +1625,7 @@ class Query
 				// replace "build_from" chain end by registered chain end
 				// actually it's better and more correctly to replace the whole chain
 				$bf_chain->removeLastElement();
+				/** @var QueryChain $reg_chain */
 				$bf_chain->addElement($reg_chain->getLastElement());
 			}
 
@@ -1412,23 +1665,6 @@ class Query
 			$this->{$storage_name}[$opt_key] = $reg_chain;
 		}
 
-		// get default options from expressions
-		if ($chain->getLastElement()->getValue() instanceof ExpressionField)
-		{
-			$options = $chain->getLastElement()->getValue()->getOptions();
-
-			if (!empty($options))
-			{
-				foreach ($options as $option => $value)
-				{
-					if (!isset($this->options[$option]))
-					{
-						$this->options[$option] = $value;
-					}
-				}
-			}
-		}
-
 		return $reg_chain;
 	}
 
@@ -1450,6 +1686,11 @@ class Query
 		return false;
 	}
 
+	static public function dataDoublingCallback($field, $operation, $value)
+	{
+		return $field.' IN ('.$value.')';
+	}
+
 	protected function query($query)
 	{
 		// check nosql configuration
@@ -1459,14 +1700,14 @@ class Query
 		{
 			$nosqlConnectionName = $configuration['handlersocket']['read'];
 
-			$nosqlConnection = \Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection($nosqlConnectionName);
+			$nosqlConnection = Main\Application::getInstance()->getConnectionPool()->getConnection($nosqlConnectionName);
 			$isNosqlCapable = NosqlPrimarySelector::checkQuery($nosqlConnection, $this);
 
 			if ($isNosqlCapable)
 			{
 				$nosqlResult = NosqlPrimarySelector::relayQuery($nosqlConnection, $this);
 
-				return new \Bitrix\Main\DB\ArrayResult($nosqlResult);
+				return new Main\DB\ArrayResult($nosqlResult);
 			}
 		}
 
@@ -1489,19 +1730,60 @@ Vadim: this is for paging but currently is not used
 			$cnt = $connection->queryScalar($cnt_query);
 		}
 */
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 
 		$result = $connection->query($query);
 		$result->setReplacedAliases($this->replaced_aliases);
 
-		$this->last_query = $query;
+		if ($this->isFetchModificationRequired())
+		{
+			$result->addFetchDataModifier(array($this, 'fetchDataModificationCallback'));
+		}
+
+		static::$last_query = $query;
 
 		return $result;
 	}
 
+	/**
+	 * Being called in Db\Result as a data fetch modifier
+	 * @param $data
+	 */
+	public function fetchDataModificationCallback(&$data)
+	{
+		// entity-defined callbacks
+		foreach ($this->selectFetchModifiers as $alias => $modifiers)
+		{
+			foreach ($modifiers as $modifier)
+			{
+				$data[$alias] = call_user_func_array($modifier, array($data[$alias], $this, $data, $alias));
+			}
+		}
+	}
+
+	/**
+	 * Check if fetch data modification reqired, also caches modifier-callbacks
+	 * @return bool
+	 */
+	public function isFetchModificationRequired()
+	{
+		$this->selectFetchModifiers = array();
+
+		foreach ($this->select_chains as $chain)
+		{
+			if ($chain->getLastElement()->getValue()->getFetchDataModifiers())
+			{
+				$this->selectFetchModifiers[$chain->getAlias()] = $chain->getLastElement()->getValue()->getFetchDataModifiers();
+			}
+		}
+
+		return !empty($this->selectFetchModifiers) || !empty($this->files);
+	}
+
+
 	protected function replaceSelectAliases($query)
 	{
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$length = (int) $helper->getAliasLength();
@@ -1531,6 +1813,30 @@ Vadim: this is for paging but currently is not used
 		}
 
 		return array($query, $replaced);
+	}
+
+	static public function quoteTableSource($source)
+	{
+		// don't quote subqueries
+		if (!preg_match('/\s*\(\s*SELECT.*\)\s*/is', $source))
+		{
+			$source =  Main\Application::getConnection()->getSqlHelper()->quote($source);
+		}
+
+		return $source;
+	}
+
+	public function __clone()
+	{
+		$this->init_entity = clone $this->init_entity;
+
+		foreach ($this->select as $k => $v)
+		{
+			if ($v instanceof ExpressionField)
+			{
+				$this->select[$k] = clone $v;
+			}
+		}
 	}
 
 	/**
@@ -1617,9 +1923,9 @@ Vadim: this is for paging but currently is not used
 	 *
 	 * @return string
 	 */
-	public function getLastQuery()
+	public static function getLastQuery()
 	{
-		return $this->last_query;
+		return static::$last_query;
 	}
 
 	public function getEntity()
@@ -1640,7 +1946,7 @@ Vadim: this is for paging but currently is not used
 			$init_alias .= $this->table_alias_postfix;
 		}
 
-		$connection = \Bitrix\Main\Application::getConnection();
+		$connection = Main\Application::getConnection();
 		$aliasLength = $connection->getSqlHelper()->getAliasLength();
 
 		if (strlen($init_alias) > $aliasLength)
@@ -1661,7 +1967,7 @@ Vadim: this is for paging but currently is not used
 		echo '<pre>';
 
 		echo 'last query: ';
-		var_dump($this->last_query);
+		var_dump(static::$last_query);
 		echo PHP_EOL;
 
 		echo 'size of select_chains: '.count($this->select_chains);

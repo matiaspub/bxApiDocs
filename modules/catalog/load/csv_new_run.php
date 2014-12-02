@@ -123,6 +123,30 @@ global
 	$defCatalogAvailGroupFields,
 	$defCatalogAvailCurrencies;
 
+if (!isset($arCatalogAvailProdFields))
+	$arCatalogAvailProdFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($arCatalogAvailPriceFields))
+	$arCatalogAvailPriceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($arCatalogAvailValueFields))
+	$arCatalogAvailValueFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($arCatalogAvailQuantityFields))
+	$arCatalogAvailQuantityFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($arCatalogAvailGroupFields))
+	$arCatalogAvailGroupFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+
+if (!isset($defCatalogAvailProdFields))
+	$defCatalogAvailProdFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($defCatalogAvailPriceFields))
+	$defCatalogAvailPriceFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($defCatalogAvailValueFields))
+	$defCatalogAvailValueFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($defCatalogAvailQuantityFields))
+	$defCatalogAvailQuantityFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($defCatalogAvailGroupFields))
+	$defCatalogAvailGroupFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_SECTION);
+if (!isset($defCatalogAvailCurrencies))
+	$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
+
 $IBLOCK_ID = intval($IBLOCK_ID);
 if ($IBLOCK_ID<=0)
 {
@@ -260,7 +284,6 @@ if (empty($arRunErrors))
 		$arGroupProps = array(); // section fields array (no user props)
 		$arElementProps = array(); // element props
 		$arCatalogGroups = array(); // prices
-		$arProductFields = array(); // product properties
 		$bNeedCounts = false; // price ranges
 		$arCountFields = array(); // price ranges fields
 		$arValueCodes = array();
@@ -367,8 +390,13 @@ if (empty($arRunErrors))
 			{
 				if (in_array($arOneCatalogAvailPriceFields['value'],$arAvailPriceFields))
 				{
+					$iblockField = (isset($arOneCatalogAvailPriceFields["field_orig"])
+						? $arOneCatalogAvailPriceFields["field_orig"]
+						: $arOneCatalogAvailPriceFields["field"]
+					);
 					$arAvailPriceFields_names[$arOneCatalogAvailPriceFields['value']] = array(
 						"field" => $arOneCatalogAvailPriceFields["field"],
+						'iblock_field' => 'CATALOG_'.$iblockField,
 						"important" => $arOneCatalogAvailPriceFields["important"]
 					);
 
@@ -381,15 +409,13 @@ if (empty($arRunErrors))
 							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
 						);
 						$bNeedProducts = true;
-						$arProductFields[] = $arOneCatalogAvailPriceFields['value'];
+						$selectArray[] = 'CATALOG_'.$iblockField;
 					}
 					$intCount++;
 				}
 			}
 			if (isset($arOneCatalogAvailPriceFields))
 				unset($arOneCatalogAvailPriceFields);
-			if ($bNeedProducts)
-				$arProductFields = array_values(array_unique($arProductFields));
 
 			// Prepare arrays for price loading
 			$strAvailCountFields = $defCatalogAvailQuantityFields;
@@ -497,7 +523,7 @@ if (empty($arRunErrors))
 		while ($obIBlockElement = $dbIBlockElement->GetNextElement())
 		{
 			$arIBlockElement = $obIBlockElement->GetFields();
-			if (array_key_exists("PREVIEW_PICTURE", $arIBlockElement))
+			if (isset($arIBlockElement["PREVIEW_PICTURE"]))
 			{
 				if ('Y' == $export_files)
 				{
@@ -510,7 +536,7 @@ if (empty($arRunErrors))
 						$arIBlockElement["~PREVIEW_PICTURE"] = $arIBlockElement["PREVIEW_PICTURE"]["SRC"];
 				}
 			}
-			if (array_key_exists("DETAIL_PICTURE", $arIBlockElement))
+			if (isset($arIBlockElement["DETAIL_PICTURE"]))
 			{
 				if ('Y' == $export_files)
 				{
@@ -539,7 +565,7 @@ if (empty($arRunErrors))
 						if(strlen($arProperty["USER_TYPE"]))
 						{
 							$arUserType = CIBlockProperty::GetUserType($arProperty["USER_TYPE"]);
-							if(array_key_exists("GetPublicViewHTML", $arUserType))
+							if (isset($arUserType["GetPublicViewHTML"]))
 								$arUserTypeFormat[$arProperty["ID"]] = $arUserType["GetPublicViewHTML"];
 						}
 					}
@@ -553,10 +579,10 @@ if (empty($arRunErrors))
 				{
 					if($arUserTypeFormat[$arProperty["ID"]])
 					{
-						if(is_array($arProperty["VALUE"]))
+						if ($arProperty['MULTIPLE'] == 'Y' && is_array($arProperty["~VALUE"]))
 						{
 							$arValues = array();
-							foreach($arProperty["VALUE"] as $value)
+							foreach($arProperty["~VALUE"] as $value)
 								$arValues[] = call_user_func_array($arUserTypeFormat[$arProperty["ID"]],
 									array(
 										$arProperty,
@@ -569,7 +595,7 @@ if (empty($arRunErrors))
 							$arValues = call_user_func_array($arUserTypeFormat[$arProperty["ID"]],
 								array(
 									$arProperty,
-									array("VALUE" => $arProperty["VALUE"]),
+									array("VALUE" => $arProperty["~VALUE"]),
 									array("MODE" => "CSV_EXPORT"),
 								));
 						}
@@ -630,7 +656,7 @@ if (empty($arRunErrors))
 				{
 					if (0 < intval($arSection['ADDITIONAL_PROPERTY_ID']))
 						continue;
-					if (!array_key_exists($arSection['ID'],$arCacheChains))
+					if (!isset($arCacheChains[$arSection['ID']]))
 					{
 						$arPath = array();
 						$j = 0;
@@ -674,10 +700,10 @@ if (empty($arRunErrors))
 					}
 
 					$arPath = array();
-					if (!array_key_exists($arSection['ID'],$arCacheResultSections))
+					if (!isset($arCacheResultSections[$arSection['ID']]))
 					{
 						$intCurSect = $arSection['ID'];
-						while (array_key_exists($intCurSect,$arCacheChains))
+						while (isset($arCacheChains[$intCurSect]))
 						{
 							$arPath = array_merge($arPath,$arCacheSections[$intCurSect]);
 							$intCurSect = $arCacheChains[$intCurSect];
@@ -714,7 +740,7 @@ if (empty($arRunErrors))
 					);
 				while ($arProductPrice = $dbProductPrice->Fetch())
 				{
-					if (!array_key_exists($arProductPrice["QUANTITY_FROM"]."-".$arProductPrice["QUANTITY_TO"], $arResPricesMap))
+					if (!isset($arResPricesMap[$arProductPrice["QUANTITY_FROM"]."-".$arProductPrice["QUANTITY_TO"]]))
 					{
 						$mapIndex++;
 						$arResPricesMap[$arProductPrice["QUANTITY_FROM"]."-".$arProductPrice["QUANTITY_TO"]] = $mapIndex;
@@ -726,7 +752,6 @@ if (empty($arRunErrors))
 					}
 					$arResPrices[$intDiap]['QUANTITY_FROM'] = $arProductPrice["QUANTITY_FROM"];
 					$arResPrices[$intDiap]['QUANTITY_TO'] = $arProductPrice["QUANTITY_TO"];
-					//$arResPrices[$arResPricesMap[$arProductPrice["QUANTITY_FROM"]."-".$arProductPrice["QUANTITY_TO"]]][IntVal($arProductPrice["CATALOG_GROUP_ID"])] = $arProductPrice;
 				}
 				if (empty($arResPrices))
 					$arResPrices[] = array();
@@ -739,13 +764,9 @@ if (empty($arRunErrors))
 			$arResProducts = array();
 			if ($boolCatalog && $bNeedProducts)
 			{
-				$arProduct = CCatalogProduct::GetByID($arIBlockElement["ID"]);
-				if (!empty($arProduct))
+				foreach ($arAvailPriceFields_names as $key => $value)
 				{
-					foreach ($arAvailPriceFields_names as $key => $value)
-					{
-						$arResProducts[$value['field']] = $arProduct[$value['field']];
-					}
+					$arResProducts[$value['field']] = $arIBlockElement[$value['iblock_field']];
 				}
 			}
 
@@ -764,12 +785,12 @@ if (empty($arRunErrors))
 						elseif (strncmp($field_name, "IC_", 3) == 0)
 						{
 							$strKey = $field_name;
-							$arTuple[] = (array_key_exists('~'.$strKey,$arPath) ? $arPath['~'.$strKey] : '');
+							$arTuple[] = (isset($arPath['~'.$strKey]) ? $arPath['~'.$strKey] : '');
 						}
 						elseif (strncmp($field_name, 'CV_', 3) == 0)
 						{
 							$strKey = substr($field_name,3);
-							$arTuple[] = (array_key_exists($strKey,$arPrice) ? $arPrice[$strKey] : '');
+							$arTuple[] = (isset($arPrice[$strKey]) ? $arPrice[$strKey] : '');
 						}
 						elseif (strncmp($field_name, 'CP_', 3) == 0)
 						{

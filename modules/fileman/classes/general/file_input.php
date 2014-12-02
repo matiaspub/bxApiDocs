@@ -267,8 +267,7 @@ class CFileInput
 			self::$curFiles[] = $arFile;
 		}
 
-		if (!self::$bViewMode)
-			self::DisplayControl($inputs);
+		self::DisplayControl($inputs);
 
 		$result = ob_get_contents();
 		ob_end_clean();

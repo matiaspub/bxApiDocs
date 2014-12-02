@@ -93,9 +93,9 @@ class CAllSaleOrderTax
 	* значения.<br> Допустимые ключи:<ul> <li> <b>ORDER_ID</b> - код заказа;</li> <li>
 	* <b>TAX_NAME</b> - название налога;</li> <li> <b>VALUE</b> - величина налога;</li> <li>
 	* <b>VALUE_MONEY</b> - общая сумма этого налога;</li> <li> <b>APPLY_ORDER</b> - порядок
-	* применения;</li> <li> <b>CODE</b> - мнемонический код налога;</li> <li>
-	* <b>IS_PERCENT</b> - должно быть значение "Y";</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N)
-	* входит ли налог уже в цену товара.</li> </ul>
+	* применения;</li> <li> <b>CODE</b> - символьный код налога;</li> <li> <b>IS_PERCENT</b> -
+	* должно быть значение "Y";</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли налог
+	* уже в цену товара.</li> </ul>
 	*
 	*
 	*
@@ -188,7 +188,7 @@ class CAllSaleOrderTax
 	* налогов.</td> </tr> <tr> <td>ORDER_ID</td> <td>Код заказа.</td> </tr> <tr> <td>TAX_NAME</td>
 	* <td>Название налога.</td> </tr> <tr> <td>VALUE</td> <td>Ставка налога.</td> </tr> <tr>
 	* <td>VALUE_MONEY</td> <td>Сумма налога.</td> </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок
-	* применения.</td> </tr> <tr> <td>CODE</td> <td>Мнемонический код налога.</td> </tr> <tr>
+	* применения.</td> </tr> <tr> <td>CODE</td> <td>Символьный код налога.</td> </tr> <tr>
 	* <td>IS_IN_PRICE</td> <td>Флаг (Y/N) включен ли налог в цену товара.</td> </tr> <tr>
 	* <td>IS_PERCENT</td> <td>Y</td> </tr> </table> <p>  </p
 	*
@@ -224,7 +224,7 @@ class CAllSaleOrderTax
 	*
 	*
 	*
-	* @param float $Price  Стоимость товара. </htm
+	* @param float $Price  Стоимость товара. </h
 	*
 	*
 	*

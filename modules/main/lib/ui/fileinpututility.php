@@ -21,9 +21,14 @@ class FileInputUtility
 	{
 	}
 
-	public function registerControl($controlId)
+	public function registerControl($CID, $controlId = "")
 	{
-		$CID = md5(randString(15));
+		if (func_num_args() == 1)
+		{
+			$controlId = $CID;
+			$CID = "";
+		}
+		$CID = (!empty($CID) ? $CID : md5(randString(15)));
 		$this->initSession($CID, $controlId);
 		return $CID;
 	}
@@ -88,19 +93,19 @@ class FileInputUtility
 				if($arSession["SESSID"] != bitrix_sessid()
 					|| $ts-$arSession["TS"] > self::SESSION_TTL)
 				{
-					$c = $_SESSION[self::SESSION_LIST][$controlId][$key]["CID"];
 					unset($_SESSION[self::SESSION_LIST][$controlId][$key]);
-					unset($_SESSION[self::SESSION_VAR_PREFIX.$c]);
+					unset($_SESSION[self::SESSION_VAR_PREFIX.$key]);
 				}
 			}
 		}
-
-		$_SESSION[self::SESSION_LIST][$controlId][] = array(
-			"CID" => $CID,
-			"TS" => $ts,
-			"SESSID" => bitrix_sessid()
-		);
-		$_SESSION[self::SESSION_VAR_PREFIX.$CID] = array();
+		if (!array_key_exists($CID, $_SESSION[self::SESSION_LIST][$controlId]))
+		{
+			$_SESSION[self::SESSION_LIST][$controlId][$CID] = array(
+				"TS" => $ts,
+				"SESSID" => bitrix_sessid()
+			);
+			$_SESSION[self::SESSION_VAR_PREFIX.$CID] = array();
+		}
 	}
 
 	protected function getSessionControlFiles($controlId)
@@ -109,13 +114,12 @@ class FileInputUtility
 
 		if(isset($_SESSION[self::SESSION_LIST][$controlId]))
 		{
-			foreach($_SESSION[self::SESSION_LIST][$controlId] as $arSession)
+			foreach($_SESSION[self::SESSION_LIST][$controlId] as $CID => $arSession)
 			{
-				if(isset($_SESSION[self::SESSION_VAR_PREFIX.$arSession['CID']]))
+				if(isset($_SESSION[self::SESSION_VAR_PREFIX.$CID]))
 				{
-					$res = array_merge($_SESSION[self::SESSION_VAR_PREFIX.$arSession['CID']]);
+					$res = array_merge($_SESSION[self::SESSION_VAR_PREFIX.$CID]);
 				}
-
 			}
 		}
 

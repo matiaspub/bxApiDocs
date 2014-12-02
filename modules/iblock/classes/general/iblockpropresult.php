@@ -1,4 +1,7 @@
 <?
+use Bitrix\Iblock\PropertyTable;
+use Bitrix\Main\Type\Collection;
+
 class CIBlockPropertyResult extends CDBResult
 {
 	protected $IBLOCK_ID = 0;
@@ -24,7 +27,7 @@ class CIBlockPropertyResult extends CDBResult
 			$res = parent::Fetch();
 		}
 
-		if($res && $res["USER_TYPE"]!="")
+		if ($res && $res["USER_TYPE"]!="")
 		{
 			$arUserType = CIBlockProperty::GetUserType($res["USER_TYPE"]);
 			if (isset($arUserType["ConvertFromDB"]))
@@ -81,8 +84,8 @@ class CIBlockPropertyResult extends CDBResult
 								SELECT ID, VALUE, DESCRIPTION
 								FROM b_iblock_element_prop_m".$arProp["IBLOCK_ID"]."
 								WHERE
-									IBLOCK_ELEMENT_ID = ".intval($res["IBLOCK_ELEMENT_ID"])."
-									AND IBLOCK_PROPERTY_ID = ".intval($arProp["ID"])."
+									IBLOCK_ELEMENT_ID = ".(int)$res["IBLOCK_ELEMENT_ID"]."
+									AND IBLOCK_PROPERTY_ID = ".(int)$arProp["ID"]."
 								ORDER BY ID
 							";
 							$rs = $DB->Query($strSql);
@@ -122,7 +125,7 @@ class CIBlockPropertyResult extends CDBResult
 					{
 						if ($res[$field_name] != "")
 						{
-							if ($this->extMode)
+							if ($this->extMode && $arProp["PROPERTY_TYPE"] == PropertyTable::TYPE_NUMBER)
 							{
 								$res[$field_name] = CIBlock::NumberFormat($res[$field_name]);
 							}
@@ -153,13 +156,16 @@ class CIBlockPropertyResult extends CDBResult
 			else
 			{
 				do {
-					if ($this->arProperties[$res["IBLOCK_PROPERTY_ID"]]["PROPERTY_TYPE"] == "N" && !$this->extMode)
-						$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE_NUM"]);
-					else
-						$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE"]);
-					if ($this->extMode)
+					if (isset($this->arProperties[$res["IBLOCK_PROPERTY_ID"]]))
 					{
-						$this->addPropertyData($res["IBLOCK_PROPERTY_ID"], $res['PROPERTY_VALUE_ID'], $res['DESCRIPTION']);
+						if ($this->arProperties[$res["IBLOCK_PROPERTY_ID"]]["PROPERTY_TYPE"] == "N" && !$this->extMode)
+							$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE_NUM"]);
+						else
+							$this->addPropertyValue($res["IBLOCK_PROPERTY_ID"], $res["VALUE"]);
+						if ($this->extMode)
+						{
+							$this->addPropertyData($res["IBLOCK_PROPERTY_ID"], $res['PROPERTY_VALUE_ID'], $res['DESCRIPTION']);
+						}
 					}
 					$res = parent::Fetch();
 				} while ($res && ($res["IBLOCK_ELEMENT_ID"] == $this->arPropertiesValues["IBLOCK_ELEMENT_ID"]));
@@ -233,14 +239,43 @@ class CIBlockPropertyResult extends CDBResult
 		}
 	}
 
-	public function setIBlock($IBLOCK_ID)
+	public function setIBlock($IBLOCK_ID, $propertyID = array())
 	{
 		$this->VERSION = CIBlockElement::GetIBVersion($IBLOCK_ID);
 
+		if (!empty($propertyID))
+		{
+			Collection::normalizeArrayValuesByInt($propertyID);
+		}
 		$this->arProperties = array();
-		$rsProperty = CIBlockProperty::GetList(array("ID" => "ASC"), array("IBLOCK_ID" => $IBLOCK_ID));
-		while($arProp = $rsProperty->Fetch())
-			$this->arProperties[$arProp["ID"]] = $arProp;
+		$propertyIterator = PropertyTable::getList(array(
+			'select' => array(
+				'ID', 'IBLOCK_ID', 'NAME', 'ACTIVE', 'SORT', 'CODE', 'DEFAULT_VALUE', 'PROPERTY_TYPE',
+				'MULTIPLE', 'LINK_IBLOCK_ID', 'VERSION', 'USER_TYPE', 'USER_TYPE_SETTINGS'
+			),
+			'filter' => (empty($propertyID) ? array('IBLOCK_ID' => $IBLOCK_ID) : array('ID' => $propertyID, 'IBLOCK_ID' => $IBLOCK_ID)),
+			'order' => array('ID' => 'ASC')
+		));
+		while ($property = $propertyIterator->fetch())
+		{
+			if ($property['USER_TYPE'])
+			{
+				$userType = CIBlockProperty::GetUserType($property['USER_TYPE']);
+				if (isset($userType["ConvertFromDB"]))
+				{
+					if(array_key_exists("DEFAULT_VALUE", $property))
+					{
+						$value = array("VALUE" => $property["DEFAULT_VALUE"], "DESCRIPTION" => "");
+						$value = call_user_func_array($userType["ConvertFromDB"], array($property, $value));
+						$property["DEFAULT_VALUE"] = $value["VALUE"];
+					}
+				}
+			}
+			if ($property['USER_TYPE_SETTINGS'] !== '' || $property['USER_TYPE_SETTINGS'] !== null)
+				$property['USER_TYPE_SETTINGS'] = unserialize($property['USER_TYPE_SETTINGS']);
+			$this->arProperties[$property['ID']] = $property;
+		}
+		unset($property, $propertyIterator);
 	}
 
 	public function setMode($extMode)

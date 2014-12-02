@@ -489,7 +489,7 @@ public 	function Out()
 		echo $strReturn;
 	}
 
-	fpublic unction getData(&$arResult)
+	public function getData(&$arResult)
 	{
 		global $APPLICATION, $USER;
 
@@ -638,7 +638,7 @@ public 	function __prepareDataForTpl()
 	 * Initialize Captcha
 	 *
 	 */
-	fpublic unction CaptchaInitialize()
+	public function CaptchaInitialize()
 	{
 		$this->CAPTCHACode = $GLOBALS["APPLICATION"]->CaptchaGetCode();
 		//echo $this->CAPTCHACode;

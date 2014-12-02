@@ -362,8 +362,11 @@ class CPushManager
 		$arFields['PARAMS'] = '';
 		if (isset($arParams['PARAMS']) && strlen(trim($arParams['PARAMS'])) > 0)
 			$arFields['PARAMS'] = $arParams['PARAMS'];
+		if (strlen($arParams['SOUND']) > 0)
+			$arFields['SOUND'] = $arParams['SOUND'];
 
-		if (isset($arParams['SEND_IMMEDIATELY']) && $arParams['SEND_IMMEDIATELY'] == 'Y' || !CUser::IsOnLine($arFields['USER_ID'], 180))
+
+		if (isset($arParams['SEND_IMMEDIATELY']) && $arParams['SEND_IMMEDIATELY'] == 'Y' || !CUser::IsOnLine($arFields['USER_ID'], 120))
 		{
 			$arAdd = Array(
 				'USER_ID' => $arFields['USER_ID'],
@@ -378,6 +381,11 @@ class CPushManager
 				$arAdd['APP_ID'] = $arFields['APP_ID'];
 			else
 				$arAdd['APP_ID'] = "Bitrix24";
+
+			if (strlen($arFields['SOUND']) > 0)
+				$arAdd['SOUND'] = $arFields['SOUND'];
+			if(strlen($arParams['EXPIRY']) > 0)
+				$arAdd['EXPIRY'] = $arParams['EXPIRY'];
 
 			$CPushManager = new CPushManager();
 			$CPushManager->SendMessage(Array($arAdd));
@@ -554,12 +562,16 @@ class CPushManager
 			if($arPushMessages[$serviceID])
 			{
 				if (class_exists(self::$pushServices[$serviceID]["CLASS"]))
-					$obPush = new self::$pushServices[$serviceID]["CLASS"];
-
-				if(method_exists($obPush, "getBatch"))
 				{
-					$batch.= $obPush->getBatch($arPushMessages[$serviceID]);
+					$obPush = new self::$pushServices[$serviceID]["CLASS"];
+					if (method_exists($obPush, "getBatch"))
+					{
+						$batch .= $obPush->getBatch($arPushMessages[$serviceID]);
+					}
 				}
+
+
+
 			}
 		}
 		$this->sendBatch($batch);

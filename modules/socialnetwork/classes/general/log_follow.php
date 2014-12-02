@@ -345,7 +345,7 @@ class CSocNetLogFollow
 					LC.RATING_TYPE_ID = '".$rating_type_id."' 
 					AND LC.RATING_ENTITY_ID = ".intval($rating_entity_id)." 
 					AND LFW.REF_ID = LC.LOG_ID 
-					AND LFW.CODE = ".$DB->Concat("'L'", "LC.LOG_ID")." 
+					AND LFW.CODE = ".$DB->Concat("'L'", ($DB->type == "MSSQL" ? "CAST(LC.LOG_ID as varchar(17))" : "LC.LOG_ID"))." 
 				WHERE  
 					LFW.USER_ID = ".intval($user_id);
 
@@ -369,7 +369,7 @@ class CSocNetLogFollow
 					L.RATING_TYPE_ID = '".$rating_type_id."' 
 					AND L.RATING_ENTITY_ID = ".intval($rating_entity_id)." 
 					AND LFW.REF_ID = L.ID 
-					AND LFW.CODE = ".$DB->Concat("'L'", "L.ID")." 
+					AND LFW.CODE = ".$DB->Concat("'L'", ($DB->type == "MSSQL" ? "CAST(L.ID as varchar(17))" : "L.ID"))." 
 				WHERE  
 					LFW.USER_ID = ".intval($user_id);
 
@@ -489,7 +489,7 @@ class CSocNetLogFollow
 				intval($arMessageFields["TO_USER_ID"]), 
 				"L".intval($arMessageFields["LOG_ID"]), 
 				"Y", 
-				ConvertTimeStamp(time() + (CTimeZone::GetOffset()*2), "FULL", SITE_ID)
+				ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID)
 			);
 		}
 

@@ -10,6 +10,7 @@ namespace Bitrix\Main\Entity;
 
 /**
  * Entity field class for user field
+ * @deprecated
  * @package bitrix
  * @subpackage main
  */
@@ -21,7 +22,7 @@ class UField extends Field
 		$base_type,
 		$field_id;
 
-	public function __construct(array $info, Base $entity)
+	public function __construct(array $info)
 	{
 		global $USER_FIELD_MANAGER;
 
@@ -50,7 +51,9 @@ class UField extends Field
 			$data_type = 'string';
 		}
 
-		parent::__construct($info['FIELD_NAME'], $data_type, $entity, $info);
+		parent::__construct($info['FIELD_NAME'], $info);
+
+		$this->dataType = $data_type;
 
 		$this->is_multiple = $info['MULTIPLE'] === 'Y';
 		$this->type_id = $info['USER_TYPE_ID'];
@@ -134,6 +137,11 @@ class UField extends Field
 		}
 
 		return $data_type;
+	}
+
+	public function getColumnName()
+	{
+		return $this->name;
 	}
 }
 

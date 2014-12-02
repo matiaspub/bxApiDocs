@@ -84,11 +84,9 @@ class CSecurityFilePermissionsTest
 		else
 			$recommendationFilesCount = self::MAX_OUTPUT_FILES;
 
-		$recommendation = GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_RECOMMENDATION");
-		$recommendation .= "<br>";
-		$recommendation .= GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_ADDITIONAL",array("#COUNT#" => $recommendationFilesCount));
-		$recommendation .= "<br>";
-		$recommendation .= $this->getFilesPathInString();
+		$additionalInfo = GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_ADDITIONAL",array("#COUNT#" => $recommendationFilesCount));
+		$additionalInfo .= "<br>";
+		$additionalInfo .= $this->getFilesPathInString();
 
 		$result = array(
 			"name" => $this->getName(),
@@ -98,7 +96,8 @@ class CSecurityFilePermissionsTest
 					"title" => GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_TITLE", array("#COUNT#" => $this->filesCount)),
 					"critical" => CSecurityCriticalLevel::HIGHT,
 					"detail" => GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_DETAIL"),
-					"recommendation" => $recommendation
+					"recommendation" => GetMessage("SECURITY_SITE_CHECKER_FILE_PERM_RECOMMENDATION"),
+					"additional_info" => $additionalInfo
 				)
 			),
 			"status" => ($this->filesCount <= 0)

@@ -331,9 +331,9 @@ class CSMTPServerHost
 
 	public function RemoveConnection($id)
 	{
+		$this->WriteToLog("Connection removed (".$id.", ".$this->arClients[$id]->ip.", ".$this->arClients[$id]->sock.")", 3);
 		unset($this->arClients[$id]);
 		unset($this->arSockets[$id]);
-		$this->WriteToLog("Connection removed (".$id.", ".$this->arClients[$id]->ip.", ".$this->arClients[$id]->sock.")", 3);
 		if($this->_stopAfterDisconnect && count($this->arClients)<=0)
 			$this->_Stop();
 	}

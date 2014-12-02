@@ -5,7 +5,7 @@ It uses fixed delivery price for any location groups. Needs at least one group o
 ********************************************************************************/
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_simple.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_simple.php');
 
 class CDeliverySimple
 {

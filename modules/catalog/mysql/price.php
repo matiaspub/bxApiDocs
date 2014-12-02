@@ -53,7 +53,7 @@ class CPrice extends CAllPrice
 	* @return mixed <p>Возвращает идентификатор добавленной цены в случае успешного
 	* сохранения и <i>false</i> - в противном случае. Для получения детальной
 	* информации об ошибке следует вызвать <b>$APPLICATION-&gt;GetException()</b>.</p>
-	* <h4>События</h4></bod<p>Метод работает с событиями <a
+	* <h4>События</h4><p>Метод работает с событиями <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceadd.php">OnBeforePriceAdd</a> и <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceadd.php">OnPriceAdd</a>.</p>
 	* <h4>Примечания</h4><p>Если параметр <b>$boolRecalc = true</b>, все равно

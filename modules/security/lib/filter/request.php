@@ -182,7 +182,7 @@ class Request
 	 */
 	protected function filterVar($context, $value, $name)
 	{
-		if (preg_match('#^[A-Za-z0-9_.,-]*$#', $value))
+		if (preg_match('#^[A-Za-z0-9_.,-]*$#D', $value))
 			return $value;
 
 		self::adjustPcreBacktrackLimit($value);

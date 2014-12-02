@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.
+ * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.</body> </html>
  *
  *
  *

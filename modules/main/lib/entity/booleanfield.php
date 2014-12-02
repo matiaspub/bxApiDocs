@@ -21,9 +21,9 @@ class BooleanField extends ScalarField
 	 */
 	protected $values;
 
-	public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $parameters = array())
 	{
-		parent::__construct($name, $dataType, $entity, $parameters);
+		parent::__construct($name, $parameters);
 
 		if (empty($parameters['values']))
 		{

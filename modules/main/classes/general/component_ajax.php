@@ -541,7 +541,7 @@ top.bxcompajaxframeonload = function() {
 			for ($i = $cnt_old; $i<$cnt_new; $i++)
 				$arHeadScriptsNew[] = $arHeadScripts[$i];
 
-		if(!$APPLICATION->IsJSOptimized())
+		if(!$APPLICATION->oAsset->optimizeJs())
 		{
 			$arHeadScriptsNew = array_merge(CJSCore::GetScriptsList(), $arHeadScriptsNew);
 		}
@@ -549,6 +549,7 @@ top.bxcompajaxframeonload = function() {
 		// prepare additional data
 		$arAdditionalData = array();
 		$arAdditionalData['TITLE'] = htmlspecialcharsback($APPLICATION->GetTitle());
+		$arAdditionalData['WINDOW_TITLE'] = htmlspecialcharsback($APPLICATION->GetTitle('title'));
 
 		$arAdditionalData['SCRIPTS'] = array();
 		$arHeadScriptsNew = array_unique($arHeadScriptsNew);
@@ -607,7 +608,9 @@ top.bxcompajaxframeonload = function() {
 
 		$arBuffer = array_slice($APPLICATION->buffer_content, $this->buffer_start_counter, $this->buffer_finish_counter - $this->buffer_start_counter);
 
-		$data = implode('###AJAX_DELIMITER###', $arBuffer);
+		$delimiter = '###AJAX_'.$APPLICATION->GetServerUniqID().'###';
+
+		$data = implode($delimiter, $arBuffer);
 
 		$this->__PrepareLinks($data);
 		$this->__PrepareForms($data);
@@ -622,7 +625,7 @@ top.bxcompajaxframeonload = function() {
 					'<script type="text/javascript">if (window.location.hash != \'\' && window.location.hash != \'#\') top.BX.ajax.history.checkRedirectStart(\''.CUtil::JSEscape(BX_AJAX_PARAM_ID).'\', \''.CUtil::JSEscape($this->componentID).'\')</script>'
 					.$data
 					.'<script type="text/javascript">if (top.BX.ajax.history.bHashCollision) top.BX.ajax.history.checkRedirectFinish(\''.CUtil::JSEscape(BX_AJAX_PARAM_ID).'\', \''.CUtil::JSEscape($this->componentID).'\');</script>'
-					.'<script type="text/javascript">top.BX.bind(window, \'load\', function() {window.AJAX_PAGE_STATE = new top.BX.ajax.component(\'comp_'.$this->componentID.'\'); top.BX.ajax.history.init(window.AJAX_PAGE_STATE);})</script>';
+					.'<script type="text/javascript">top.BX.ready(BX.defer(function() {window.AJAX_PAGE_STATE = new top.BX.ajax.component(\'comp_'.$this->componentID.'\'); top.BX.ajax.history.init(window.AJAX_PAGE_STATE);}))</script>';
 			}
 		}
 		else
@@ -636,7 +639,7 @@ top.bxcompajaxframeonload = function() {
 			}
 		}
 
-		$arBuffer = explode('###AJAX_DELIMITER###', $data);
+		$arBuffer = explode($delimiter, $data);
 		for ($i = 0, $cnt = count($arBuffer); $i < $cnt; $i++)
 		{
 			$APPLICATION->buffer_content[$this->buffer_start_counter + $i] = $arBuffer[$i];

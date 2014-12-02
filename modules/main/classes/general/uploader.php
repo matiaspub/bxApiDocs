@@ -955,6 +955,7 @@ class CFileUploader
 	public $files = array();
 	public $error = "";
 	public $status = "ready";
+	public $controlId = "fileUploader";
 	public $params = array(
 		"allowUpload" => "A",
 /*		"allowUploadExt" => "",
@@ -986,6 +987,7 @@ class CFileUploader
 	 */
 	public function __construct($params = array(), $doCheckPost = true)
 	{
+		global $APPLICATION;
 		$this->errorCode = array(
 			"BXU344" => GetMessage("UP_CID_IS_REQUIRED"),
 			"BXU344.1" => GetMessage("UP_PACKAGE_INDEX_IS_REQUIRED"),
@@ -994,7 +996,7 @@ class CFileUploader
 			"BXU347" => GetMessage("UP_FILE_IS_LOST"),
 			"BXU348" => GetMessage("UP_FILE_IS_NOT_UPLOADED"));
 		$params = (is_array($params) ? $params : array());
-		$this->script = (array_key_exists("urlToUpload", $params) ? $params["urlToUpload"] : $GLOBALS["APPLICATION"]->GetCurPageParam());
+		$this->script = (array_key_exists("urlToUpload", $params) ? $params["urlToUpload"] : $APPLICATION->GetCurPageParam());
 		if (array_key_exists("copies", $params) && is_array($params["copies"]))
 		{
 			$copies = array();
@@ -1029,7 +1031,21 @@ class CFileUploader
 				$this->params["allowUpload"] = "A";
 			$this->params["allowUploadExt"] = $params["allowUploadExt"];
 		}
-
+		if (array_key_exists("controlId", $params))
+			$this->controlId = $params["controlId"];
+		$this->params["controlId"] = $this->controlId;
+		$this->path = CTempFile::GetDirectoryName(
+			12,
+			array(
+				"bxu",
+				md5(serialize(array(
+					$this->controlId,
+					bitrix_sessid(),
+					CMain::GetServerUniqID()
+					))
+				)
+			)
+		);
 		if ($doCheckPost !== false && !$this->checkPost(($doCheckPost === true || $doCheckPost == "post")))
 		{
 			$this->showError();
@@ -1089,12 +1105,13 @@ class CFileUploader
 		{
 			if ($res["packages"] <= count($res["chunks"])) // TODO glue pieces
 			{
+				ksort($res["chunks"]);
 				$buff = 4096;
 				$fdst = fopen($path, 'a');
-				foreach($res["chunks"] as $key => $chunk)
+				foreach($res["chunks"] as $chunk)
 				{
 					$fsrc = fopen($chunk['tmp_name'], 'r');
-					while(($data = fread($fsrc, $buff)) !== '')
+					while(!feof($fsrc) && ($data = fread($fsrc, $buff)) !== '')
 					{
 						fwrite($fdst, $data);
 					}
@@ -1152,9 +1169,9 @@ class CFileUploader
 	 * @param array $file
 	 * @return string
 	 */
-	public static function getHash($file = array())
+	public function getHash($file = array())
 	{
-		return md5($file["id"]);
+		return $this->controlId.md5($file["id"]);
 	}
 
 	/**
@@ -1185,19 +1202,20 @@ class CFileUploader
 	 */
 	private static function __UnEscape($data)
 	{
-		$res = $data;
+		global $APPLICATION;
+
 		if(is_array($data))
 		{
 			$res = array();
 			foreach($data as $k => $v)
 			{
-				$k = $GLOBALS["APPLICATION"]->ConvertCharset(CHTTP::urnDecode($k), "UTF-8", LANG_CHARSET);
+				$k = $APPLICATION->ConvertCharset(CHTTP::urnDecode($k), "UTF-8", LANG_CHARSET);
 				$res[$k] = self::__UnEscape($v);
 			}
 		}
 		else
 		{
-			$res = $GLOBALS["APPLICATION"]->ConvertCharset(CHTTP::urnDecode($data), "UTF-8", LANG_CHARSET);
+			$res = $APPLICATION->ConvertCharset(CHTTP::urnDecode($data), "UTF-8", LANG_CHARSET);
 		}
 
 		return $res;
@@ -1256,12 +1274,21 @@ class CFileUploader
 			if (!empty($default))
 				$copies["default"] = $default;
 		}
-		$file = $this->getFromCache($hash);
-		if (!!$file && (!empty($copies) || !empty($watermark)))
+		$files = array();
+		$hashes = FileInputUtility::instance()->checkFiles($this->controlId, (is_array($hash) ? $hash : array($hash)));
+		if (!empty($hashes))
 		{
-			$this->checkCanvases($hash, $file, $copies, $watermark);
+			foreach ($hashes as $h)
+			{
+				$file = $this->getFromCache($h);
+				if (!!$file && (!empty($copies) || !empty($watermark)))
+				{
+					$this->checkCanvases($hash, $file, $copies, $watermark);
+				}
+				$files[$h] = $file;
+			}
 		}
-		return $file;
+		return (is_array($hash) ? $files : $files[$hash]);
 	}
 
 	private function getFromCache($hash, $data = array())
@@ -1289,15 +1316,14 @@ class CFileUploader
 	 */
 	public function getUrl($hash, $act = "view")
 	{
-		return  CHTTP::URN2URI($this->script.(strpos($this->script, "?") === false ? "?" : "&").
+		return CHTTP::URN2URI($this->script.(strpos($this->script, "?") === false ? "?" : "&").
 			CHTTP::PrepareData(
 				array(
 					self::INFO_NAME => array(
 						"CID" => $this->CID,
 						"mode" => $act,
 						"hash" => $hash
-					),
-					"sessid" => bitrix_sessid()
+					)
 				)
 			)
 		);
@@ -1350,7 +1376,7 @@ class CFileUploader
 				{
 					foreach(GetModuleEvents(self::EVENT_NAME, "onFileIsUploaded", true) as $arEvent)
 					{
-						if (!ExecuteModuleEventEx($arEvent, array($hash, $file, &$this->package["data"], &$this->uploading["data"], &$error)))
+						if (!ExecuteModuleEventEx($arEvent, array($hash, &$file, &$this->package["data"], &$this->uploading["data"], &$error)))
 							$status = "error";
 					}
 				}
@@ -1360,6 +1386,11 @@ class CFileUploader
 				$this->setIntoCache($hash, $file);
 				FileInputUtility::instance()->registerFile($this->CID, $hash);
 			}
+		}
+		else
+		{
+			$error = "Empty data.";
+			$status = "error";
 		}
 		return array("error" => $error, "hash" => $hash, "file" => $file, "status" => $status);
 	}
@@ -1390,8 +1421,7 @@ class CFileUploader
 		{
 			$key = (preg_match("/\\\\(.+?)\\\\/", $file["~name"], $matches) ? $matches[1] : "default");
 			$res = (array_key_exists($key, $arFile["files"]) ? $arFile["files"][$key] : array("copy" => $key));
-
-			if (preg_match("/\/(\d+)\/(\d+)\//", $file["~name"], $matches))
+			if (preg_match("/\/(\d+)\/(\d+)\/$/", $file["~name"], $matches))
 			{
 				$file["package"] = $matches[2];
 				$file["packages"] = $matches[1];
@@ -1470,9 +1500,10 @@ class CFileUploader
 		{
 			foreach($files[self::FILE_NAME]["name"] as $fileID => $fileNames)
 			{
-				$arFile = (array_key_exists($fileID, $data) ? $data[$fileID] : $this->getFromCache(
-						$this->getHash(array("id" => $fileID, "name" => $fileNames))
-					)
+				$arFile = $this->getFromCache($this->getHash(array("id" => $fileID, "name" => $fileNames)));
+				$arFile = self::merge(
+					(array_key_exists($fileID, $data) ? $data[$fileID] : array( "id" => $fileID, "files" => array())),
+					(is_array($arFile) ? $arFile : array())
 				);
 				if (is_array($fileNames))
 				{
@@ -1600,22 +1631,11 @@ class CFileUploader
 	private function fillRequireData($requestType)
 	{
 		$this->mode = $this->getPost("mode", $requestType);
-		$this->CID = $this->getPost("CID", $requestType);
-		$this->path = CTempFile::GetDirectoryName(
-			12,
-			array(
-				"bxu",
-				md5(serialize(array(
-					"CID" => $this->CID,
-					"sessid" => bitrix_sessid()))
-				)
-			)
-		);
+		$this->CID = FileInputUtility::instance()->registerControl($this->getPost("CID", $requestType), $this->controlId);
+
 		if (in_array($this->mode, array("upload", "delete", "view")))
 		{
-			if (empty($this->CID))
-				$this->error = "BXU344";
-			else if (!check_bitrix_sessid())
+			if ($this->mode != "view" && !check_bitrix_sessid())
 				$this->error = "BXU345";
 			else if (!CheckDirPath($this->path))
 				$this->error .= "BXU346";
@@ -1633,7 +1653,7 @@ class CFileUploader
 				$this->error = "BXU344.1";
 
 			$this->uploading = array(
-				"handler" => CBXVirtualIo::GetInstance()->GetFile($this->path.".log"),
+				"handler" => CBXVirtualIo::GetInstance()->GetFile($this->path.$this->CID.".log"),
 				"data" => array());
 			if ($this->uploading["handler"]->IsExists())
 				$this->uploading["data"] = unserialize($this->uploading["handler"]->GetContents());

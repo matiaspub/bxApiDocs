@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.
+ * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.</body> </html>
  *
  *
  *
@@ -1827,23 +1827,28 @@ class CAllIBlockSection
 				{
 					if(strncmp("b_iblock_element_prop_s", $strTable, 23)==0)
 					{
+						$tableFields = $DB->GetTableFields($strTable);
 						foreach($arProps as $prop_id)
 						{
-							$strSql = "UPDATE ".$strTable." SET PROPERTY_".$prop_id."=null,DESCRIPTION_".$prop_id."=null WHERE PROPERTY_".$prop_id."=".$s["ID"];
+							$strSql = "UPDATE ".$strTable." SET PROPERTY_".$prop_id."=null";
+							if (isset($tableFields["DESCRIPTION_".$prop_id]))
+								$strSql .= ",DESCRIPTION_".$prop_id."=null";
+							$strSql .= " WHERE PROPERTY_".$prop_id."=".$s["ID"];
 							if(!$DB->Query($strSql, false, $err_mess.__LINE__))
 								return false;
 						}
 					}
 					elseif(strncmp("b_iblock_element_prop_m", $strTable, 23)==0)
 					{
+						$tableFields = $DB->GetTableFields(str_replace("prop_m", "prop_s", $strTable));
 						$strSql = "SELECT IBLOCK_PROPERTY_ID, IBLOCK_ELEMENT_ID FROM ".$strTable." WHERE IBLOCK_PROPERTY_ID IN (".implode(", ", $arProps).") AND VALUE_NUM=".$s["ID"];
 						$rs = $DB->Query($strSql, false, $err_mess.__LINE__);
 						while($ar = $rs->Fetch())
 						{
 							$strSql = "
 								UPDATE ".str_replace("prop_m", "prop_s", $strTable)."
-								SET	PROPERTY_".$ar["IBLOCK_PROPERTY_ID"]."=null,
-									DESCRIPTION_".$ar["IBLOCK_PROPERTY_ID"]."=null
+								SET	PROPERTY_".$ar["IBLOCK_PROPERTY_ID"]."=null
+									".(isset($tableFields["DESCRIPTION_".$ar["IBLOCK_PROPERTY_ID"]])? ",DESCRIPTION_".$ar["IBLOCK_PROPERTY_ID"]."=null": "")."
 								WHERE IBLOCK_ELEMENT_ID = ".$ar["IBLOCK_ELEMENT_ID"]."
 							";
 							if(!$DB->Query($strSql, false, $err_mess.__LINE__))
@@ -2387,9 +2392,9 @@ class CAllIBlockSection
 	* bold;">date_active_from</span> - начало периода действия элемента; </li> <li>
 	* <b>active_to</b> или <span style="font-weight: bold;">date_active_to</span> - окончание периода
 	* действия элемента; </li> <li> <b>status</b> - код статуса элемента в
-	* документообороте; </li> <li> <b>code</b> - мнемонический код элемента; </li>
-	* <li> <b>iblock_id</b> - числовой код информационного блока; </li> <li> <b>modified_by</b>
-	* - код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
+	* документообороте; </li> <li> <b>code</b> - символьный код элемента; </li> <li>
+	* <b>iblock_id</b> - числовой код информационного блока; </li> <li> <b>modified_by</b> -
+	* код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
 	* активности элемента; </li> <li> <i>show_counter </i>- количество показов
 	* элемента (учитывается функцией <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
@@ -2406,45 +2411,43 @@ class CAllIBlockSection
 	* bold;">created_date</span> - дата создания без учета времени;</li> <li> <span
 	* style="font-weight: bold;">cnt</span> - количество элементов (только при заданной
 	* группировке); <br> </li> <li> <b>property_&lt;PROPERTY_CODE&gt;</b> - по значению свойства
-	* с числовым или мнемоническим кодом <i>PROPERTY_CODE</i> (например, PROPERTY_123
-	* или PROPERTY_NEWS_SOURCE); </li> <li> <b>propertysort_&lt;PROPERTY_CODE&gt;</b> - по индексу
-	* сортировки варианта значения свойства. Только для свойств типа
-	* "Список" ; </li> <li> <b>catalog_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю CATALOG_FIELD
-	* (может быть PRICE - цена или CURRENCY - валюта) из цены с типом <i>PRICE_TYPE</i>
-	* (например, catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <b>CATALOG_QUANTITY</b> - общее
-	* количество товара;</li> <li> <b>CATALOG_WEIGHT</b> - вес товара;</li> <li>
-	* <b>CATALOG_AVAILABLE</b> - признак доступности к покупке (Y|N). Товар считается
-	* недоступным, если его количество меньше либо равно нулю, включен
-	* количественный учет и запрещена покупка при нулевом
-	* количестве;</li> <li> <span style="font-weight: bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> -
-	* по значению поля элемента указанного в качестве привязки. PROPERTY_CODE
-	* - мнемонический или символьный код свойства типа привязка к
-	* элементам. FIELD может принимать значения:</li> <ul> <li>ID <br> </li> <li>TIMESTAMP_X
-	* <br> </li> <li>MODIFIED_BY <br> </li> <li>CREATED <br> </li> <li>CREATED_DATE <br> </li> <li>CREATED_BY <br> </li>
-	* <li>IBLOCK_ID <br> </li> <li>ACTIVE <br> </li> <li>ACTIVE_FROM <br> </li> <li>ACTIVE_TO <br> </li> <li>SORT <br> </li>
-	* <li>NAME <br> </li> <li>SHOW_COUNTER <br> </li> <li>SHOW_COUNTER_START <br> </li> <li>CODE <br> </li> <li>TAGS <br>
-	* </li> <li>XML_ID <br> </li> <li>STATUS </li> </ul> <li> <span style="font-weight:
+	* с числовым или символьным кодом <i>PROPERTY_CODE</i> (например, PROPERTY_123 или
+	* PROPERTY_NEWS_SOURCE); </li> <li> <b>propertysort_&lt;PROPERTY_CODE&gt;</b> - по индексу сортировки
+	* варианта значения свойства. Только для свойств типа "Список" ; </li>
+	* <li> <b>catalog_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю CATALOG_FIELD (может быть PRICE -
+	* цена или CURRENCY - валюта) из цены с типом <i>PRICE_TYPE</i> (например,
+	* catalog_PRICE_1 или CATALOG_CURRENCY_3);</li> <li> <b>CATALOG_QUANTITY</b> - общее количество
+	* товара;</li> <li> <b>CATALOG_WEIGHT</b> - вес товара;</li> <li> <b>CATALOG_AVAILABLE</b> - признак
+	* доступности к покупке (Y|N). Товар считается недоступным, если его
+	* количество меньше либо равно нулю, включен количественный учет и
+	* запрещена покупка при нулевом количестве;</li> <li> <span style="font-weight:
+	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - по значению поля элемента
+	* указанного в качестве привязки. PROPERTY_CODE - символьный код свойства
+	* типа привязка к элементам. FIELD может принимать значения:</li> <ul> <li>ID
+	* <br> </li> <li>TIMESTAMP_X <br> </li> <li>MODIFIED_BY <br> </li> <li>CREATED <br> </li> <li>CREATED_DATE <br> </li>
+	* <li>CREATED_BY <br> </li> <li>IBLOCK_ID <br> </li> <li>ACTIVE <br> </li> <li>ACTIVE_FROM <br> </li> <li>ACTIVE_TO <br>
+	* </li> <li>SORT <br> </li> <li>NAME <br> </li> <li>SHOW_COUNTER <br> </li> <li>SHOW_COUNTER_START <br> </li> <li>CODE
+	* <br> </li> <li>TAGS <br> </li> <li>XML_ID <br> </li> <li>STATUS </li> </ul> <li> <span style="font-weight:
 	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.PROPERTY_&lt;</span><span style="font-weight: bold;">PROPERTY_CODE2</span><span
 	* style="font-weight: bold;">&gt;</span> - по значению свойства элемента указанного в
-	* качестве привязки. PROPERTY_CODE - мнемонический или символьный код
-	* свойства типа привязки к элементам. PROPERTY_CODE2- код свойства
-	* связанных элементов. </li> <li> <b>HAS_PREVIEW_PICTURE</b> и <b>HAS_DETAIL_PICTURE</b> -
-	* сортировка по наличию и отсутствию картинок.</li> </ul> <br><br> для
-	* разделов: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код родительской
-	* группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> - мнемонический
-	* код группы;</li> <li> <b>active</b> - активности группы;</li> <li> <b>left_margin</b> -
-	* левая граница;</li> <li> <b>depth_level</b> - глубина вложенности (начинается с
-	* 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по времени
-	* создания группы;</li> <li> <b>created_by</b> - по идентификатору создателя
-	* группы;</li> <li> <b>modified_by</b> - по идентификатору пользователя
-	* изменившего группу;</li> <li> <b>element_cnt</b> - количество элементов в
-	* группе, работает только если <b>bIncCnt</b> = true;</li> <li> <b>timestamp_x</b> - по
-	* времени последнего изменения.</li> </ul> <i>order1, ... </i> - порядок
-	* сортировки, может принимать значения: <ul> <li> <b>asc</b> - по
-	* возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> <br> Значение по
-	* умолчанию Array("SORT"=&gt;"ASC") означает, что результат выборки будет
-	* отсортирован по возрастанию. Если задать пустой массив Array(), то
-	* результат отсортирован не будет.
+	* качестве привязки. PROPERTY_CODE - символьный код свойства типа
+	* привязки к элементам. PROPERTY_CODE2- код свойства связанных элементов.
+	* </li> <li> <b>HAS_PREVIEW_PICTURE</b> и <b>HAS_DETAIL_PICTURE</b> - сортировка по наличию и
+	* отсутствию картинок.</li> </ul> <br><br> для разделов: <ul> <li> <b>id</b> - код
+	* группы;</li> <li> <b>section</b> - код родительской группы;</li> <li> <b>name</b> -
+	* название группы;</li> <li> <b>code</b> - символьный код группы;</li> <li> <b>active</b>
+	* - активности группы;</li> <li> <b>left_margin</b> - левая граница;</li> <li>
+	* <b>depth_level</b> - глубина вложенности (начинается с 1);</li> <li> <b>sort</b> -
+	* индекс сортировки;</li> <li> <b>created</b> - по времени создания группы;</li>
+	* <li> <b>created_by</b> - по идентификатору создателя группы;</li> <li> <b>modified_by</b>
+	* - по идентификатору пользователя изменившего группу;</li> <li>
+	* <b>element_cnt</b> - количество элементов в группе, работает только если
+	* <b>bIncCnt</b> = true;</li> <li> <b>timestamp_x</b> - по времени последнего изменения.</li>
+	* </ul> <i>order1, ... </i> - порядок сортировки, может принимать значения: <ul>
+	* <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> <br>
+	* Значение по умолчанию Array("SORT"=&gt;"ASC") означает, что результат
+	* выборки будет отсортирован по возрастанию. Если задать пустой
+	* массив Array(), то результат отсортирован не будет.
 	*
 	*
 	*
@@ -2456,7 +2459,7 @@ class CAllIBlockSection
 	* (<i>"ACTIVE"=&gt;""</i>) выводит все элементы без учета их состояния (<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string_equal.php">Строка</a>); </li> <li> <b>NAME</b> - по
 	* названию (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li>
-	* <b>CODE</b> - по мнемоническому идентификатору (<a
+	* <b>CODE</b> - по символьному идентификатору (<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>TAGS</b> - по
 	* тегам (<a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>); </li> <li> <b>
 	* EXTERNAL_ID</b> - по внешнему коду (<a
@@ -2497,8 +2500,8 @@ class CAllIBlockSection
 	* <b>SHOW_HISTORY</b> не установлен или не равен Y и <b>SHOW_NEW</b>=Y, то будут
 	* показываться ещё неопубликованные элементы вместе с
 	* опубликованными; </li> <li> <b>PROPERTY_&lt;PROPERTY_CODE</b><b>&gt;</b> - фильтр по
-	* значениям свойств, где PROPERTY_CODE - код свойства или мнемонический
-	* код. Для свойств типа "Список", "Число", "Привязка к элементам" и
+	* значениям свойств, где PROPERTY_CODE - код свойства или символьный код.
+	* Для свойств типа "Список", "Число", "Привязка к элементам" и
 	* "Привязка к разделам" - <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>. Для прочих - <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/string.php">Маска</a>; </li> <li> <b style="font-weight:
@@ -2510,19 +2513,19 @@ class CAllIBlockSection
 	* <i>CATALOG_FIELD</i> из цены типа <i>PRICE_TYPE</i> (ID типа цены), где <i>CATALOG_FIELD</i>
 	* может быть: PRICE - цена, CURRENCY - валюта.</li> <li> <span style="font-weight:
 	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - фильтр по значениям полей
-	* связанных элементов. , где PROPERTY_CODE - ID или мнемонический код
-	* свойства привязки, а FIELD - поле указанного в привязке элемента.</li>
-	* </ul> для разделов: <ul> <li> <b>IBLOCK_ID</b> - по коду родительского
-	* информационного блока;</li> <li> <b>NAME</b> - по названию (можно искать по
-	* шаблону [%_]);</li> <li> <b>CODE</b> - по мнемоническому коду (по шаблону
-	* [%_]);</li> <li> <b>EXTERNAL_ID</b> - по внешнему коду (по шаблону [%_]);</li> <li>
-	* <b>SECTION_ID</b> - по коду раздела-родителя;</li> <li> <b>ID_1</b>, <b>ID_2</b> - по кодам
-	* разделов от ID_1 до ID_2;</li> <li> <b>TIMESTAMP_X_1</b>, <b>TIMESTAMP_X_2</b> - по времени
-	* последнего изменения от TIMESTAMP_X_1 до TIMESTAMP_X_2;</li> <li> <b>DATE_CREATE_1</b>,
-	* <b>DATE_CREATE_2</b> - по времени создания от DATE_CREATE_1 до DATE_CREATE_2;</li> <li>
-	* <b>MODIFIED_BY </b>- по коду пользователя изменившему раздел; <br> </li> <li>
-	* <b>CREATED_BY</b> - по создателю; <br> </li> <li> <b>PROPERTY </b><i> - </i>по значениям
-	* свойств внутрилежащих элементов, PROPERTY - массив вида Array("код
+	* связанных элементов. , где PROPERTY_CODE - ID или символьный код свойства
+	* привязки, а FIELD - поле указанного в привязке элемента.</li> </ul> для
+	* разделов: <ul> <li> <b>IBLOCK_ID</b> - по коду родительского информационного
+	* блока;</li> <li> <b>NAME</b> - по названию (можно искать по шаблону [%_]);</li> <li>
+	* <b>CODE</b> - по символьному коду (по шаблону [%_]);</li> <li> <b>EXTERNAL_ID</b> - по
+	* внешнему коду (по шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду
+	* раздела-родителя;</li> <li> <b>ID_1</b>, <b>ID_2</b> - по кодам разделов от ID_1 до
+	* ID_2;</li> <li> <b>TIMESTAMP_X_1</b>, <b>TIMESTAMP_X_2</b> - по времени последнего изменения
+	* от TIMESTAMP_X_1 до TIMESTAMP_X_2;</li> <li> <b>DATE_CREATE_1</b>, <b>DATE_CREATE_2</b> - по времени
+	* создания от DATE_CREATE_1 до DATE_CREATE_2;</li> <li> <b>MODIFIED_BY </b>- по коду
+	* пользователя изменившему раздел; <br> </li> <li> <b>CREATED_BY</b> - по
+	* создателю; <br> </li> <li> <b>PROPERTY </b><i> - </i>по значениям свойств
+	* внутрилежащих элементов, PROPERTY - массив вида Array("код
 	* свойства"=&gt;"значение", ...).</li> </ul> <br> Необязательное. По умолчанию
 	* записи не фильтруются.
 	*
@@ -2931,18 +2934,18 @@ class CAllIBlockSection
 	* @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...])<br>
 	* "фильтруемое поле" может принимать значения:<br>     <i>ACTIVE</i> -
 	* фильтр по активности (Y|N);<br>     <i>GLOBAL_ACTIVE</i> - фильтр по активности,
-	* учитывая активность вышележащих разделов (Y|N);<br>     <i>NAME</i> -
-	* по названию (можно искать по шаблону [%_]);<br>     <i>CODE</i> -
-	* по мнемоническому коду (по шаблону [%_]);<br>     <i>EXTERNAL_ID</i> -
-	* по внешнему коду (по шаблону [%_]);<br>     <i>SECTION_ID</i> - по коду
-	* раздела-родителя;<br>     <i>DEPTH_LEVEL</i> - по уровню вложенности;<br>
-	*     <i>LEFT_BORDER, RIGHT_BORDER</i> - по левой и правой границе (поля <i>LEFT_MARGIN</i>
-	* и <i>RIGHT_MARGIN</i>, см. примечание);<br>     <i>ID</i> - по коду раздела;<br>
-	*     <i>IBLOCK_ID</i> - по коду родительского информационного блока;<br>
-	*     <i>IBLOCK_ACTIVE</i> - по активности родительского информационного
-	* блока;<br>     <i>IBLOCK_NAME</i> - по названию информационного блока (по
-	* шаблону [%_]);<br>     <i>IBLOCK_TYPE</i> - по типу информационного блока; <br>
-	*     <i>IBLOCK_CODE - </i>по мнемоническому коду информационного блока (по
+	* учитывая активность вышележащих разделов (Y|N);<br>     <i>NAME</i> - по
+	* названию (можно искать по шаблону [%_]);<br>     <i>CODE</i> - по
+	* символьному коду (по шаблону [%_]);<br>     <i>EXTERNAL_ID</i> - по внешнему
+	* коду (по шаблону [%_]);<br>     <i>SECTION_ID</i> - по коду раздела-родителя;<br>
+	*     <i>DEPTH_LEVEL</i> - по уровню вложенности;<br>     <i>LEFT_BORDER, RIGHT_BORDER</i> -
+	* по левой и правой границе (поля <i>LEFT_MARGIN</i> и <i>RIGHT_MARGIN</i>, см.
+	* примечание);<br>     <i>ID</i> - по коду раздела;<br>     <i>IBLOCK_ID</i> - по
+	* коду родительского информационного блока;<br>     <i>IBLOCK_ACTIVE</i> - по
+	* активности родительского информационного блока;<br>
+	*     <i>IBLOCK_NAME</i> - по названию информационного блока (по шаблону
+	* [%_]);<br>     <i>IBLOCK_TYPE</i> - по типу информационного блока; <br>
+	*     <i>IBLOCK_CODE - </i>по символьному коду информационного блока (по
 	* шаблону [%_]);<br>     <i>IBLOCK_EXTERNAL_ID</i> - по внешнему коду
 	* информационного блока (по шаблону [%_]);<br><br> Перед названием
 	* фильтруемого поля можно указать тип фильтрации:<br> "!" - не равно<br>

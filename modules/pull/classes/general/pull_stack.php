@@ -31,7 +31,6 @@ class CAllPullStack
 		return $arMessage;
 	}
 
-
 	// add a message to stack
 	public static function AddByChannel($channelId, $arParams = Array())
 	{
@@ -94,22 +93,22 @@ class CAllPullStack
 		return false;
 	}
 
-	public static function AddByUser($userId, $arMessage)
+	public static function AddByUser($userId, $arMessage, $channelType = 'private')
 	{
 		if (intval($userId) <= 0)
 			return false;
 
-		$arChannel = CPullChannel::Get($userId);
+		$arChannel = CPullChannel::GetChannel($userId, $channelType);
 		$arMessage['push_user'] = $userId;
 		return self::AddByChannel($arChannel['CHANNEL_ID'], $arMessage);
 	}
 
-	public static function AddShared($arMessage)
+	public static function AddShared($arMessage, $channelType = 'shared')
 	{
 		if (!CPullOptions::GetQueueServerStatus())
 			return false;
 
-		$arChannel = CPullChannel::GetShared();
+		$arChannel = CPullChannel::GetChannelShared($channelType);
 		return self::AddByChannel($arChannel['CHANNEL_ID'], $arMessage);
 	}
 

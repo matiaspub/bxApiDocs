@@ -48,7 +48,7 @@ $nRandom5 = 4689*mt_rand(999, 31999);
 
 
 /**
- * Класс для работы с рекламными контрактами.
+ * Класс для работы с рекламными контрактами.</body> </html>
  *
  *
  *
@@ -246,7 +246,7 @@ public static 	function GetManagerEmails()
 	}
 
 	// возвращает массивы EMail'ов всех пользователей имеющих доступ к заданному контракту (владельцы контракта)
-public static 	function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL, &$VIEW_EMAIL, &$EDIT_EMAIL)
+	public static function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL, &$VIEW_EMAIL, &$EDIT_EMAIL)
 	{
 		$OWNER_EMAIL = array();
 		$VIEW_EMAIL = array();
@@ -1319,7 +1319,7 @@ public static 	function DeleteSiteLink($CONTRACT_ID)
 	}
 
 	// удаление связи контракта с типами баннеров
-	funcpublic static tion DeleteTypeLink($CONTRACT_ID)
+	public static function DeleteTypeLink($CONTRACT_ID)
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: DeleteTypeLink<br>Line: ";
 		global $DB;
@@ -1493,7 +1493,7 @@ public static 	function GetStatList($by, $order, $arFilter)
 
 
 /**
- * Класс для работы с рекламными баннерами.
+ * Класс для работы с рекламными баннерами.</body> </html>
  *
  *
  *
@@ -1506,7 +1506,7 @@ public static 	function GetStatList($by, $order, $arFilter)
  */
 class CAdvBanner_all
 {
-	public static function err_mess()
+public static 	function err_mess()
 	{
 		$module_id = "advertising";
 		return "<br>Module: ".$module_id."<br>Class: CAdvBanner_all<br>File: ".__FILE__;
@@ -1724,7 +1724,6 @@ public static 	function Copy($BANNER_ID, $CHECK_RIGHTS="Y")
 	}
 
 	// удаление баннера
-
 	/**
 	* <p>Функция удаляет баннер.</p>
 	*
@@ -3422,7 +3421,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* баннера и массива ключевых фраз заданного в настройках контракта к которому 
 	* принадлежит баннер.
 	* 
-	* ПримечанияКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
+	* Примечания</bodКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
 	* </pre>
 	*
 	*
@@ -3495,7 +3494,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* &lt;/head&gt;
 	* &lt;body&gt;
 	* ...
-	* ПримечанияКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
+	* Примечания</bodКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
 	* </pre>
 	*
 	*
@@ -3708,7 +3707,7 @@ public static 	function GetDesiredKeywords($TYPE_SID="", $EXACT_MATCH="")
 						TrimArr($arrBannerKeywords);
 					}
 
-					if ($DONT_USE_CONTRACT == "Y" || !array_key_exists("CONTRACT_KEYWORDS", $ar))
+					if ($DONT_USE_CONTRACT <> "Y" && $ar["CONTRACT_KEYWORDS"] <> '')
 					{
 						$arrContractKeywords = preg_split('/[\n\r]+/', $ar["CONTRACT_KEYWORDS"]);
 						if (is_array($arrContractKeywords))
@@ -4531,7 +4530,6 @@ public static 	function ReplaceURL($text, $arBanner)
 	}
 
 	// фиксируем показ баннера
-	
 	/**
 	* <p>Функция фиксирует показ баннера в базе данных. Помимо этого, функция устанавливает cookie в котором фиксирует факт того что посетителю был показан баннер.</p>
 	*
@@ -4617,7 +4615,7 @@ public static 	function BeforeRestartBuffer()
 	}
 	
 	// устанавливаем cookie посетителю о просмотре баннера
-public static 	function SetCookie($arBanner, &$inc_banner_counter, &$inc_contract_counter)
+	public static function SetCookie($arBanner, &$inc_banner_counter, &$inc_contract_counter)
 	{
 		global $arrADV_VIEWED_BANNERS, $APPLICATION;
 		if (intval($arBanner["ID"])>0)
@@ -4655,6 +4653,8 @@ public static 	function SetCookie($arBanner, &$inc_banner_counter, &$inc_contrac
 				$arr = explode(",", $APPLICATION->get_cookie($cookie_name));
 				if (is_array($arr) && count($arr)>0)
 				{
+					$now = time();
+
 					foreach($arr as $str)
 					{
 						$ar = explode("_",$str);
@@ -4674,18 +4674,26 @@ public static 	function SetCookie($arBanner, &$inc_banner_counter, &$inc_contrac
 						else
 						{
 							$strDate = trim($ar[3]);
-							$month = substr($strDate,2,2);
-							$day = substr($strDate,0,2);
-							$year = substr($strDate,4,4);
-							$stmp = mktime(0,0,0,$month,$day,$year);
-							$now = time();
-							if ($stmp>$now)
+							$month = intval(substr($strDate,2,2));
+							$day = intval(substr($strDate,0,2));
+							$year = intval(substr($strDate,4,4));
+							$stmp = false;
+
+							if ($month && $day && $year)
+							{
+								$stmp = mktime(0, 0, 0, $month, $day, $year);
+							}
+
+							if (
+								$stmp
+								&& $stmp > $now
+							)
 							{
 								$arrCookie[$banner_id] = array(
-									"CONTRACT_ID"		=> $contract_id,
-									"COUNTER"			=> $counter,
-									"EXPIRATION_DATE"	=> date("dmY",$stmp)
-									);
+									"CONTRACT_ID" => $contract_id,
+									"COUNTER" => $counter,
+									"EXPIRATION_DATE" => ($stmp ? date("dmY", $stmp) : $strDate)
+								);
 							}
 						}
 					}
@@ -5236,7 +5244,7 @@ public static 	function GetDynamicList($arFilter, &$arrLegend, &$is_filtered)
 
 
 /**
- * Класс для работы с типами баннеров.
+ * Класс для работы с типами баннеров.</body> </html>
  *
  *
  *
@@ -5497,7 +5505,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	*
 	*
 	*
-	* @param varchar(255) $TYPE_SID  Символьный ID типа. </ht
+	* @param varchar(255) $TYPE_SID  Символьный ID типа.
 	*
 	*
 	*
@@ -5550,7 +5558,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	}
 
 	// удаляем тип баннера
-
+	
 	/**
 	* <p>Функция удаляет тип баннеров и все баннеры к нему привязанные.</p>
 	*
@@ -5573,7 +5581,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvtype/delete.php
 	* @author Bitrix
 	*/
-	public static 	function Delete($TYPE_SID, $CHECK_RIGHTS="Y")
+	public static function Delete($TYPE_SID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAdvType_all::err_mess())."<br>Function: Delete<br>Line: ";
 		global $DB, $strError;
@@ -5605,7 +5613,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	}
 
 	// удаляем связь типа с контрактом
-	function DeleteContractLink($TYPE_SID)
+public static 	function DeleteContractLink($TYPE_SID)
 	{
 		$err_mess = (CAdvType_all::err_mess())."<br>Function: DeleteContractLink<br>Line: ";
 		global $DB;

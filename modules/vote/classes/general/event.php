@@ -16,8 +16,6 @@ class CAllVoteEvent
 
 	public static function GetByID($ID)
 	{
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: GetByID<br>Line: ";
-		global $DB;
 		$ID = intval($ID);
 		if ($ID<=0) return;
 		$res = CVoteEvent::GetList($by, $order, array("ID" => $ID), $is_filtered, "Y");
@@ -26,7 +24,7 @@ class CAllVoteEvent
 
 	public static function GetAnswer($EVENT_ID, $ANSWER_ID)
 	{
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: GetAnswer<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: GetAnswer<br>Line: ";
 		global $DB;
 		$EVENT_ID = intval($EVENT_ID);
 		$ANSWER_ID = intval($ANSWER_ID);
@@ -54,7 +52,7 @@ class CAllVoteEvent
 
 	public static function Delete($EVENT_ID)
 	{
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: Delete<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: Delete<br>Line: ";
 		global $DB;
 		$EVENT_ID = intval($EVENT_ID);
 		if ($EVENT_ID <= 0):
@@ -77,7 +75,7 @@ class CAllVoteEvent
 
 	public static function SetValid($EVENT_ID, $valid)
 	{
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: SetValid<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: SetValid<br>Line: ";
 		global $DB;
 		$valid = ($valid == "Y" ? "Y" : "N");
 		$arrQuestion = array();
@@ -117,7 +115,7 @@ class CAllVoteEvent
 	public static function CheckStat($arParams, $bForseCheckStat = false)
 	{
 		global $DB;
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: CheckStat<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: CheckStat<br>Line: ";
 		$VOTE_ID = intval($arParams["VOTE_ID"]);
 		$arAnswers = array(); $arQuestions = array();
 
@@ -194,7 +192,7 @@ class CAllVoteEvent
 
 	public static function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered, $get_user="N")
 	{
-		$err_mess = (CAllVoteEvent::err_mess())."<br>Function: GetList<br>Line: ";
+		$err_mess = (self::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB;
 		$arSqlSearch = Array();
 		$strSqlSearch = "";
@@ -238,7 +236,8 @@ class CAllVoteEvent
 						$arSqlSearch[] = GetFilterQuery("E.VOTE_USER_ID",$val,$match);
 						break;
 					case "USER_ID":
-						if ($get_user=="Y") {
+						if ($get_user=="Y")
+						{
 							$match = ($arFilter[$key."_EXACT_MATCH"]=="N" && $match_value_set) ? "Y" : "N";
 							$arSqlSearch[] = GetFilterQuery("U.AUTH_USER_ID",$val,$match);
 						}

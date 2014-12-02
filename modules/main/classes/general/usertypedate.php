@@ -8,6 +8,9 @@
 
 IncludeModuleLangFile(__FILE__);
 
+use Bitrix\Main;
+use Bitrix\Main\Type;
+
 class CUserTypeDate
 {
 	public static function GetUserTypeDescription()
@@ -132,5 +135,63 @@ class CUserTypeDate
 			);
 		}
 		return $aMsg;
+	}
+
+	/**
+	 * @param array $userfield
+	 * @param array $fetched
+	 *
+	 * @return string
+	 */
+	static public function onAfterFetch($userfield, $fetched)
+	{
+		$value = $fetched['VALUE'];
+
+		if ($userfield['MULTIPLE'] == 'Y' && !($value instanceof Type\Date))
+		{
+			try
+			{
+				//try new independent date format
+				$value = new Type\Date($value, \Bitrix\Main\UserFieldTable::MULTIPLE_DATE_FORMAT);
+			}
+			catch (Main\ObjectException $e)
+			{
+				// try site format (sometimes it can be full site format)
+				try
+				{
+					$value = new Type\Date($value);
+				}
+				catch (Main\ObjectException $e)
+				{
+					$value = new Type\Date($value, Type\DateTime::getFormat());
+				}
+			}
+		}
+
+		return (string) $value;
+	}
+
+	/**
+	 * @param array            $userfield
+	 * @param Type\Date|string $value
+	 *
+	 * @return Type\Date
+	 */
+	static public function onBeforeSave($userfield, $value)
+	{
+		if (strlen($value) && !($value instanceof Type\Date))
+		{
+			// try both site's format - short and full
+			try
+			{
+				$value = new Type\Date($value);
+			}
+			catch (Main\ObjectException $e)
+			{
+				$value = new Type\Date($value, Type\DateTime::getFormat());
+			}
+		}
+
+		return $value;
 	}
 }

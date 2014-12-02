@@ -1,11 +1,14 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Loader;
+use Bitrix\Main\Localization\Loc;
+Loc::loadMessages(__FILE__);
+
 class CCatalogAdmin
 {
 	public static function get_other_elements_menu($IBLOCK_TYPE_ID, $IBLOCK_ID, $arSection, &$more_url)
 	{
 		$urlSectionAdminPage = CIBlock::GetAdminSectionListLink($IBLOCK_ID, array('catalog' => null));
-		$more_url[] = $urlSectionAdminPage."&find_section_section=".intval($arSection["ID"]);
+		$more_url[] = $urlSectionAdminPage."&find_section_section=".(int)$arSection["ID"];
 		$more_url[] = CIBlock::GetAdminSectionEditLink($IBLOCK_ID, $arSection["ID"], array('catalog' => null));
 
 		if (($arSection["RIGHT_MARGIN"] - $arSection["LEFT_MARGIN"]) > 1)
@@ -35,19 +38,19 @@ class CCatalogAdmin
 				$menu_id = "menu_catalog_category_".$IBLOCK_ID."/";
 				if (0 == strncmp($_REQUEST['admin_mnu_menu_id'], $menu_id, strlen($menu_id)))
 				{
-					$rsSections = CIBlockSection::GetNavChain($IBLOCK_ID, substr($_REQUEST['admin_mnu_menu_id'], strlen($menu_id)));
+					$rsSections = CIBlockSection::GetNavChain($IBLOCK_ID, substr($_REQUEST['admin_mnu_menu_id'], strlen($menu_id)), array('ID', 'IBLOCK_ID'));
 					while ($arSection = $rsSections->Fetch())
 						$arSectionsChain[$arSection["ID"]] = $arSection["ID"];
 				}
 			}
 			if(
 				isset($_REQUEST["find_section_section"])
-				&& intval($_REQUEST["find_section_section"]) > 0
+				&& (int)$_REQUEST["find_section_section"] > 0
 				&& isset($_REQUEST["IBLOCK_ID"])
 				&& $_REQUEST["IBLOCK_ID"] == $IBLOCK_ID
 			)
 			{
-				$rsSections = CIBlockSection::GetNavChain($IBLOCK_ID, $_REQUEST["find_section_section"]);
+				$rsSections = CIBlockSection::GetNavChain($IBLOCK_ID, $_REQUEST["find_section_section"], array('ID', 'IBLOCK_ID'));
 				while ($arSection = $rsSections->Fetch())
 					$arSectionsChain[$arSection["ID"]] = $arSection["ID"];
 			}
@@ -70,20 +73,20 @@ class CCatalogAdmin
 		));
 		$intCount = 0;
 		$arOtherSectionTmp = array();
-		$limit = COption::GetOptionInt("iblock", "iblock_menu_max_sections");
+		$limit = (int)COption::GetOptionInt("iblock", "iblock_menu_max_sections");
 		while ($arSection = $rsSections->Fetch())
 		{
-			if (($limit > 0) && ($intCount >= $limit))
+			if ($limit > 0 && $intCount >= $limit)
 			{
 				if (empty($arOtherSectionTmp))
 				{
 					$arOtherSectionTmp = array(
-						"text" => GetMessage("CAT_MENU_ALL_OTH"),
-						"url" => $urlSectionAdminPage."&find_section_section=".intval($arSection["IBLOCK_SECTION_ID"]),
+						"text" => Loc::getMessage("CAT_MENU_ALL_OTH"),
+						"url" => $urlSectionAdminPage."&find_section_section=".(int)$arSection["IBLOCK_SECTION_ID"],
 						"more_url" => array(
 							CIBlock::GetAdminSectionEditLink($IBLOCK_ID, $arSection["ID"], array('catalog' => null)),
 						),
-						"title" => GetMessage("CAT_MENU_ALL_OTH_TITLE"),
+						"title" => Loc::getMessage("CAT_MENU_ALL_OTH_TITLE"),
 						"icon" => "iblock_menu_icon_sections",
 						"page_icon" => "iblock_page_icon_sections",
 						"skip_chain" => true,
@@ -91,8 +94,13 @@ class CCatalogAdmin
 						"module_id" => "catalog",
 						"items" => array()
 					);
+					CCatalogAdmin::get_other_elements_menu($IBLOCK_TYPE_ID, $IBLOCK_ID, $arSection, $arOtherSectionTmp["more_url"]);
 				}
-				CCatalogAdmin::get_other_elements_menu($IBLOCK_TYPE_ID, $IBLOCK_ID, $arSection, $arOtherSectionTmp["more_url"]);
+				else
+				{
+					$arOtherSectionTmp['more_url'][] = $urlSectionAdminPage."&find_section_section=".(int)$arSection["ID"];
+					$arOtherSectionTmp['more_url'][] = CIBlock::GetAdminSectionEditLink($IBLOCK_ID, $arSection["ID"], array('catalog' => null));
+				}
 			}
 			else
 			{
@@ -134,15 +142,14 @@ class CCatalogAdmin
 
 	public static function OnBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
 	{
-		if (!CModule::IncludeModule("iblock"))
-			return;
-		//When UnRegisterModuleDependences is called from module uninstall
-		//cached EventHandlers may be called
 		if (defined("BX_CATALOG_UNINSTALLED"))
 			return;
 
+		if (!Loader::includeModule("iblock"))
+			return;
+
 		$aMenu = array(
-			"text" => GetMessage("CAT_MENU_ROOT"),
+			"text" => Loc::getMessage("CAT_MENU_ROOT"),
 			"title" => "",
 			"items_id" => "menu_catalog_list",
 			"items" => array(),
@@ -158,8 +165,8 @@ class CCatalogAdmin
 		);
 		while ($ar = $rsCatalog->Fetch())
 		{
-			$ar["PRODUCT_IBLOCK_ID"] = intval($ar["PRODUCT_IBLOCK_ID"]);
-			$ar["IBLOCK_ID"] = intval($ar["IBLOCK_ID"]);
+			$ar["PRODUCT_IBLOCK_ID"] = (int)$ar["PRODUCT_IBLOCK_ID"];
+			$ar["IBLOCK_ID"] = (int)$ar["IBLOCK_ID"];
 			if (0 < $ar["PRODUCT_IBLOCK_ID"])
 			{
 				$arCatalogs[$ar["PRODUCT_IBLOCK_ID"]] = 1;
@@ -170,13 +177,14 @@ class CCatalogAdmin
 				$arCatalogs[$ar["IBLOCK_ID"]] = 1;
 			}
 		}
-		$rsIBlocks = CIBlock::GetList(array(
-			"SORT" => "asc",
-			"NAME" => "ASC",
-		), array(
-			'ID' => array_keys($arCatalogs),
-			"MIN_PERMISSION" => "S"
-		));
+		if (empty($arCatalogs))
+		{
+			return;
+		}
+		$rsIBlocks = CIBlock::GetList(
+			array("SORT" => "ASC", "NAME" => "ASC"),
+			array('ID' => array_keys($arCatalogs), "MIN_PERMISSION" => "S")
+		);
 		while ($arIBlock = $rsIBlocks->Fetch())
 		{
 			if (CIBlock::GetAdminListMode($arIBlock["ID"]) == 'C')
@@ -186,7 +194,7 @@ class CCatalogAdmin
 
 			$arItems = array(
 				array(
-					"text" => GetMessage("CAT_MENU_PRODUCT_LIST"),
+					"text" => Loc::getMessage("CAT_MENU_PRODUCT_LIST"),
 					"url" => $url."?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&type=".urlencode($arIBlock["IBLOCK_TYPE_ID"]).'&find_section_section=-1',
 					"more_url" => array(
 						"cat_product_admin.php?IBLOCK_ID=".$arIBlock["ID"],
@@ -215,7 +223,7 @@ class CCatalogAdmin
 			if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
 			{
 				$arItems[] = array(
-					"text" => GetMessage("CAT_MENU_PRODUCT_PROPERTIES"),
+					"text" => Loc::getMessage("CAT_MENU_PRODUCT_PROPERTIES"),
 					"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
 					"more_url" => array(
 						"iblock_property_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&admin=N",
@@ -234,7 +242,7 @@ class CCatalogAdmin
 				if (CIBlockRights::UserHasRightTo($intOffersIBlockID, $intOffersIBlockID, "iblock_edit"))
 				{
 					$arItems[] = array(
-						"text" => GetMessage("CAT_MENU_SKU_PROPERTIES"),
+						"text" => Loc::getMessage("CAT_MENU_SKU_PROPERTIES"),
 						"url" => "iblock_property_admin.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$intOffersIBlockID."&admin=N",
 						"more_url" => array(
 							"iblock_property_admin.php?IBLOCK_ID=".$intOffersIBlockID."&admin=N",
@@ -251,7 +259,7 @@ class CCatalogAdmin
 			if(CIBlockRights::UserHasRightTo($arIBlock["ID"], $arIBlock["ID"], "iblock_edit"))
 			{
 				$arItems[] = array(
-					"text" => GetMessage("CAT_MENU_CATALOG_SETTINGS"),
+					"text" => Loc::getMessage("CAT_MENU_CATALOG_SETTINGS"),
 					"url" => "cat_catalog_edit.php?lang=".LANGUAGE_ID."&IBLOCK_ID=".$arIBlock["ID"],
 					"more_url" => array(
 						"cat_catalog_edit.php?IBLOCK_ID=".$arIBlock["ID"],
@@ -272,6 +280,7 @@ class CCatalogAdmin
 				"items" => $arItems,
 			);
 		}
+
 		if (!empty($aMenu["items"]))
 		{
 			if (count($aMenu["items"]) == 1)
@@ -302,7 +311,7 @@ class CCatalogAdmin
 			$tmpVar = CIBlock::ReplaceDetailUrl($obRow->arRes["SECTION_PAGE_URL"], $obRow->arRes, true, "S");
 			$obRow->aActions[] = array(
 				"ICON" => "view",
-				"TEXT" => GetMessage("CAT_ACT_MENU_VIEW_SECTION"),
+				"TEXT" => Loc::getMessage("CAT_ACT_MENU_VIEW_SECTION"),
 				"ACTION" => $obList->ActionRedirect(htmlspecialcharsbx($tmpVar)),
 			);
 			$tmpVar = CIBlock::GetAdminElementListLink($obRow->arRes["IBLOCK_ID"], array(
@@ -319,9 +328,10 @@ class CCatalogAdmin
 
 	public static function OnBuildSaleMenu(&$arGlobalMenu, &$arModuleMenu)
 	{
-		if (!CModule::IncludeModule("sale"))
-			return;
 		if (defined("BX_CATALOG_UNINSTALLED"))
+			return;
+
+		if (!Loader::includeModule("sale"))
 			return;
 
 		if (!defined("BX_SALE_MENU_CATALOG_CLEAR") || 'Y' != BX_SALE_MENU_CATALOG_CLEAR)
@@ -385,10 +395,10 @@ class CCatalogAdmin
 		{
 			$arResult = array();
 			$arResult[] = array(
-				"text" => GetMessage("CM_DISCOUNTS3"),
+				"text" => Loc::getMessage("CM_DISCOUNTS3"),
 				"url" => "cat_discount_admin.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_discount_edit.php"),
-				"title" => GetMessage("CM_DISCOUNTS_ALT2"),
+				"title" => Loc::getMessage("CM_DISCOUNTS_ALT2"),
 				"readonly" => !$boolDiscount,
 			);
 			if (!empty($arItems))
@@ -396,19 +406,19 @@ class CCatalogAdmin
 			if (CBXFeatures::IsFeatureEnabled('CatDiscountSave'))
 			{
 				$arResult[] = array(
-					"text" => GetMessage("CAT_DISCOUNT_SAVE"),
+					"text" => Loc::getMessage("CAT_DISCOUNT_SAVE"),
 					"url" => "cat_discsave_admin.php?lang=".LANGUAGE_ID,
 					"more_url" => array("cat_discsave_edit.php"),
-					"title" => GetMessage("CAT_DISCOUNT_SAVE_DESCR"),
+					"title" => Loc::getMessage("CAT_DISCOUNT_SAVE_DESCR"),
 					"readonly" => !$boolDiscount,
 				);
 			}
 
 			$arResult[] = array(
-				"text" => GetMessage("CM_COUPONS"),
+				"text" => Loc::getMessage("CM_COUPONS"),
 				"url" => "cat_discount_coupon.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_discount_coupon_edit.php"),
-				"title" => GetMessage("CM_COUPONS_ALT"),
+				"title" => Loc::getMessage("CM_COUPONS_ALT"),
 				"readonly" => !$boolDiscount,
 			);
 
@@ -431,10 +441,10 @@ class CCatalogAdmin
 		if ($boolRead || $boolVat)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("VAT"),
+				"text" => Loc::getMessage("VAT"),
 				"url" => "cat_vat_admin.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_vat_edit.php"),
-				"title" => GetMessage("VAT_ALT"),
+				"title" => Loc::getMessage("VAT_ALT"),
 				"readonly" => !$boolVat,
 			);
 		}
@@ -460,10 +470,10 @@ class CCatalogAdmin
 		if ($boolRead || $boolGroup)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("GROUP"),
+				"text" => Loc::getMessage("GROUP"),
 				"url" => "cat_group_admin.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_group_edit.php"),
-				"title" => GetMessage("GROUP_ALT"),
+				"title" => Loc::getMessage("GROUP_ALT"),
 				"readonly" => !$boolGroup,
 			);
 		}
@@ -473,10 +483,10 @@ class CCatalogAdmin
 			if ($boolRead || $boolPrice)
 			{
 				$arItems[] = array(
-					"text" => GetMessage("EXTRA"),
+					"text" => Loc::getMessage("EXTRA"),
 					"url" => "cat_extra.php?lang=".LANGUAGE_ID,
 					"more_url" => array("cat_extra_edit.php"),
-					"title" => GetMessage("EXTRA_ALT"),
+					"title" => Loc::getMessage("EXTRA_ALT"),
 					"readonly" => !$boolPrice,
 				);
 			}
@@ -485,10 +495,10 @@ class CCatalogAdmin
 		if ($boolRead || $boolMeasure)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("MEASURE"),
+				"text" => Loc::getMessage("MEASURE"),
 				"url" => "cat_measure_list.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_measure_edit.php"),
-				"title" => GetMessage("MEASURE_ALT"),
+				"title" => Loc::getMessage("MEASURE_ALT"),
 				"readonly" => !$boolMeasure,
 			);
 		}
@@ -496,10 +506,10 @@ class CCatalogAdmin
 		if ($boolRead || $boolExportEdit || $boolExportExec)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("SETUP_UNLOAD_DATA"),
+				"text" => Loc::getMessage("SETUP_UNLOAD_DATA"),
 				"url" => "cat_export_setup.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_exec_exp.php"),
-				"title" => GetMessage("SETUP_UNLOAD_DATA_ALT"),
+				"title" => Loc::getMessage("SETUP_UNLOAD_DATA_ALT"),
 				"dynamic" => true,
 				"module_id" => "sale",
 				"items_id" => "mnu_catalog_exp",
@@ -511,10 +521,10 @@ class CCatalogAdmin
 		if ($boolRead || $boolImportEdit || $boolImportExec)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("SETUP_LOAD_DATA"),
+				"text" => Loc::getMessage("SETUP_LOAD_DATA"),
 				"url" => "cat_import_setup.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_exec_imp.php"),
-				"title" => GetMessage("SETUP_LOAD_DATA_ALT"),
+				"title" => Loc::getMessage("SETUP_LOAD_DATA_ALT"),
 				"dynamic" => true,
 				"module_id" => "sale",
 				"items_id" => "mnu_catalog_imp",
@@ -537,29 +547,30 @@ class CCatalogAdmin
 
 		if ($boolRead || $boolStore)
 		{
+			$arResult = array();
 			if(COption::GetOptionString('catalog','default_use_store_control','N') == 'Y')
 			{
 				$arResult[] = array(
-					"text" => GetMessage("CM_STORE_DOCS"),
+					"text" => Loc::getMessage("CM_STORE_DOCS"),
 					"url" => "cat_store_document_list.php?lang=".LANGUAGE_ID,
 					"more_url" => array("cat_store_document_edit.php"),
-					"title" => GetMessage("CM_STORE_DOCS"),
+					"title" => Loc::getMessage("CM_STORE_DOCS"),
 					"readonly" => !$boolStore,
 				);
 
 				$arResult[] = array(
-					"text" => GetMessage("CM_CONTRACTORS"),
+					"text" => Loc::getMessage("CM_CONTRACTORS"),
 					"url" => "cat_contractor_list.php?lang=".LANGUAGE_ID,
 					"more_url" => array("cat_contractor_edit.php"),
-					"title" => GetMessage("CM_CONTRACTORS"),
+					"title" => Loc::getMessage("CM_CONTRACTORS"),
 					"readonly" => !$boolStore,
 				);
 			}
 			$arResult[] = array(
-				"text" => GetMessage("CM_STORE"),
+				"text" => Loc::getMessage("CM_STORE"),
 				"url" => "cat_store_list.php?lang=".LANGUAGE_ID,
 				"more_url" => array("cat_store_edit.php"),
-				"title" => GetMessage("CM_STORE"),
+				"title" => Loc::getMessage("CM_STORE"),
 				"readonly" => !$boolStore,
 			);
 			$arItems = $arResult;
@@ -598,7 +609,7 @@ class CCatalogAdmin
 						$arProfileList[] = array(
 							"text" => htmlspecialcharsbx($strName),
 							"url" => "cat_exec_exp.php?lang=".LANGUAGE_ID."&ACT_FILE=".$arProfile["FILE_NAME"]."&ACTION=EXPORT&PROFILE_ID=".$arProfile["ID"]."&".bitrix_sessid_get(),
-							"title" => GetMessage("CAM_EXPORT_DESCR_EXPORT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
+							"title" => Loc::getMessage("CAM_EXPORT_DESCR_EXPORT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
 							"readonly" => !$boolExportExec,
 						);
 					}
@@ -607,7 +618,7 @@ class CCatalogAdmin
 						$arProfileList[] = array(
 							"text" => htmlspecialcharsbx($strName),
 							"url" => "cat_export_setup.php?lang=".LANGUAGE_ID."&ACT_FILE=".$arProfile["FILE_NAME"]."&ACTION=EXPORT_EDIT&PROFILE_ID=".$arProfile["ID"]."&".bitrix_sessid_get(),
-							"title"=>GetMessage("CAM_EXPORT_DESCR_EDIT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
+							"title"=>Loc::getMessage("CAM_EXPORT_DESCR_EDIT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
 							"readonly" => !$boolExportEdit,
 						);
 					}
@@ -647,7 +658,7 @@ class CCatalogAdmin
 						$arProfileList[] = array(
 							"text" => htmlspecialcharsbx($strName),
 							"url" => "cat_exec_imp.php?lang=".LANGUAGE_ID."&ACT_FILE=".$arProfile["FILE_NAME"]."&ACTION=IMPORT&PROFILE_ID=".$arProfile["ID"]."&".bitrix_sessid_get(),
-							"title" => GetMessage("CAM_IMPORT_DESCR_IMPORT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
+							"title" => Loc::getMessage("CAM_IMPORT_DESCR_IMPORT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
 							"readonly" => !$boolImportExec,
 						);
 					}
@@ -656,7 +667,7 @@ class CCatalogAdmin
 						$arProfileList[] = array(
 							"text" => htmlspecialcharsbx($strName),
 							"url" => "cat_import_setup.php?lang=".LANGUAGE_ID."&ACT_FILE=".$arProfile["FILE_NAME"]."&ACTION=IMPORT_EDIT&PROFILE_ID=".$arProfile["ID"]."&".bitrix_sessid_get(),
-							"title" => GetMessage("CAM_IMPORT_DESCR_EDIT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
+							"title" => Loc::getMessage("CAM_IMPORT_DESCR_EDIT")." &quot;".htmlspecialcharsbx($strName)."&quot;",
 							"readonly" => !$boolImportEdit,
 						);
 					}

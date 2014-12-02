@@ -10,7 +10,7 @@ Loc::loadMessages(__FILE__);
 */
 class Helper
 {
-	const BX_ENV_MIN_VERSION = "5.0-0";
+	const BX_ENV_MIN_VERSION = "5.0-44";
 
 	public static function checkBxEnvVersion($version = false)
 	{
@@ -174,6 +174,30 @@ class Helper
 		else
 		{
 			$result = false;
+		}
+
+		return $result;
+	}
+
+	public static function getNetworkInterfaces()
+	{
+		$result = array();
+		$shellAdapter = new ShellAdapter();
+		$execRes = $shellAdapter->syncExec("sudo -u root /opt/webdir/bin/bx-node -o json");
+		$jsonData = $shellAdapter->getLastOutput();
+
+		if($execRes)
+		{
+			$arData = json_decode($jsonData, true);
+
+			if(isset($arData["params"]["pool_interfaces"]))
+				$result = $arData["params"]["pool_interfaces"];
+
+			if(is_array($result))
+			{
+				foreach($result as $iface => $ip)
+					$result[$iface] = $iface." (".$ip.")";
+			}
 		}
 
 		return $result;

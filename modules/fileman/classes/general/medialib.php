@@ -244,7 +244,7 @@ class CMedialib
 				window.oBXMedialib = new BXMediaLib(oConfig);
 				oBXMedialib.Open();
 				<?endif;?>
-			}
+			};
 			</script>
 			<?
 		}
@@ -268,52 +268,54 @@ BX.loadScript("/bitrix/js/main/file_dialog.js?v=<?=@filemtime($_SERVER['DOCUMENT
 	public static function AppendLangMessages()
 	{
 ?>
-var ML_MESS =
+if (typeof ML_MESS === "undefined")
 {
-	AccessDenied : '<?= GetMessageJS('ML_ACCESS_DENIED')?>',
-	SessExpired : '<?= GetMessageJS('ML_SESS_EXPIRED')?>',
-	DelCollection : '<?= GetMessageJS('ML_DEL_COLLECTION')?>',
-	DelItem : '<?= GetMessageJS('ML_DEL_ITEM')?>',
-	DelCollectionConf : '<?= GetMessageJS('ML_DEL_COLLECTION_CONFIRM')?>',
-	DelItemConf : '<?= GetMessageJS('ML_DEL_ITEM_CONFIRM')?>',
-	EditCollection : '<?= GetMessageJS('ML_EDIT_COLLECTION')?>',
-	EditItem : '<?= GetMessageJS('ML_EDIT_ITEM')?>',
-	NewCollection : '<?= GetMessageJS('ML_NEW_COLLECTION')?>',
-	Collection : '<?= GetMessageJS('ML_COLLECTION')?>',
-	ColLocEr : '<?= GetMessageJS('ML_COL_LOC_ER')?>',
-	ColLocEr2 : '<?= GetMessageJS('ML_COL_LOC_ER2')?>',
-	Item : '<?= GetMessageJS('ML_ITEM')?>',
-	NewItem : '<?= GetMessageJS('ML_NEW_ITEM')?>',
-	DelColFromItem : '<?= GetMessageJS('ML_DEL_COL2ITEM')?>',
-	ItemNoColWarn : '<?= GetMessageJS('ML_COL2ITEM_WARN')?>',
-	DateModified : '<?= GetMessageJS('ML_DATE_MODIFIED')?>',
-	FileSize : '<?= GetMessageJS('ML_FILE_SIZE')?>',
-	ImageSize : '<?= GetMessageJS('ML_IMAGE_SIZE')?>',
-	CheckedColTitle : '<?= GetMessageJS('ML_CHECKED_COL_TITLE')?>',
-	ItSourceError : '<?= GetMessageJS('ML_SOURCE_ERROR')?>',
-	ItNameError : '<?= GetMessageJS('ML_NAME_ERROR')?>',
-	ItCollsError : '<?= GetMessageJS('ML_COLLS_ERROR')?>',
-	ColNameError : '<?= GetMessageJS('ML_COL_NAME_ERROR')?>',
-	DelItConfTxt : '<?= GetMessageJS('ML_DEL_CONF_TEXT')?>',
-	DelItB1 : '<?= GetMessageJS('ML_DEL_IT_B1')?>',
-	DelItB2 : '<?= GetMessageJS('ML_DEL_IT_B2')?>',
-	CollAccessDenied : '<?= GetMessageJS('ML_COLL_ACCESS_DENIED')?>',
-	CollAccessDenied2 : '<?= GetMessageJS('ML_COLL_ACCESS_DENIED2')?>',
-	CollAccessDenied3: '<?= GetMessageJS('ML_COLL_ACCESS_DENIED3')?>',
-	CollAccessDenied4: '<?= GetMessageJS('ML_COLL_ACCESS_DENIED4')?>',
-	BadSubmit: '<?= GetMessageJS('ML_BAD_SUBMIT')?>',
-	ColNameError: '<?= GetMessageJS('ML_COL_NAME_ERROR')?>',
-	ItemExtError: '<?= GetMessageJS('ML_ITEM_EXT_ERROR')?>',
-	EditItemError: '<?= GetMessageJS('ML_EDIT_ITEM_ERROR')?>',
-	SearchResultEx: '<?= GetMessageJS('ML_SEARCH_RESULT_EX')?>',
-	DelElConfirm: '<?= GetMessageJS('ML_DEL_EL_CONFIRM')?>',
-	DelElConfirmYes: '<?= GetMessageJS('ML_DEL_EL_CONFIRM_YES')?>',
-	SearchDef: '<?= GetMessageJS('ML_SEARCH_DEF')?>',
-	NoResult: '<?= GetMessageJS('ML_SEARCH_NO_RESULT')?>',
-	ViewItem : '<?= GetMessageJS('ML_VIEW_ITEM')?>',
-	FileExt : '<?= GetMessageJS('ML_FILE_EXT')?>',
-	CheckExtTypeConf : '<?= GetMessageJS('ML_CHECK_TYPE_EXT_CONF')?>'
-};
+	var ML_MESS =
+	{
+		AccessDenied : '<?= GetMessageJS('ML_ACCESS_DENIED')?>',
+		SessExpired : '<?= GetMessageJS('ML_SESS_EXPIRED')?>',
+		DelCollection : '<?= GetMessageJS('ML_DEL_COLLECTION')?>',
+		DelItem : '<?= GetMessageJS('ML_DEL_ITEM')?>',
+		DelCollectionConf : '<?= GetMessageJS('ML_DEL_COLLECTION_CONFIRM')?>',
+		DelItemConf : '<?= GetMessageJS('ML_DEL_ITEM_CONFIRM')?>',
+		EditCollection : '<?= GetMessageJS('ML_EDIT_COLLECTION')?>',
+		EditItem : '<?= GetMessageJS('ML_EDIT_ITEM')?>',
+		NewCollection : '<?= GetMessageJS('ML_NEW_COLLECTION')?>',
+		Collection : '<?= GetMessageJS('ML_COLLECTION')?>',
+		ColLocEr : '<?= GetMessageJS('ML_COL_LOC_ER')?>',
+		ColLocEr2 : '<?= GetMessageJS('ML_COL_LOC_ER2')?>',
+		Item : '<?= GetMessageJS('ML_ITEM')?>',
+		NewItem : '<?= GetMessageJS('ML_NEW_ITEM')?>',
+		DelColFromItem : '<?= GetMessageJS('ML_DEL_COL2ITEM')?>',
+		ItemNoColWarn : '<?= GetMessageJS('ML_COL2ITEM_WARN')?>',
+		DateModified : '<?= GetMessageJS('ML_DATE_MODIFIED')?>',
+		FileSize : '<?= GetMessageJS('ML_FILE_SIZE')?>',
+		ImageSize : '<?= GetMessageJS('ML_IMAGE_SIZE')?>',
+		CheckedColTitle : '<?= GetMessageJS('ML_CHECKED_COL_TITLE')?>',
+		ItSourceError : '<?= GetMessageJS('ML_SOURCE_ERROR')?>',
+		ItNameError : '<?= GetMessageJS('ML_NAME_ERROR')?>',
+		ItCollsError : '<?= GetMessageJS('ML_COLLS_ERROR')?>',
+		ColNameError : '<?= GetMessageJS('ML_COL_NAME_ERROR')?>',
+		DelItConfTxt : '<?= GetMessageJS('ML_DEL_CONF_TEXT')?>',
+		DelItB1 : '<?= GetMessageJS('ML_DEL_IT_B1')?>',
+		DelItB2 : '<?= GetMessageJS('ML_DEL_IT_B2')?>',
+		CollAccessDenied : '<?= GetMessageJS('ML_COLL_ACCESS_DENIED')?>',
+		CollAccessDenied2 : '<?= GetMessageJS('ML_COLL_ACCESS_DENIED2')?>',
+		CollAccessDenied3: '<?= GetMessageJS('ML_COLL_ACCESS_DENIED3')?>',
+		CollAccessDenied4: '<?= GetMessageJS('ML_COLL_ACCESS_DENIED4')?>',
+		BadSubmit: '<?= GetMessageJS('ML_BAD_SUBMIT')?>',
+		ItemExtError: '<?= GetMessageJS('ML_ITEM_EXT_ERROR')?>',
+		EditItemError: '<?= GetMessageJS('ML_EDIT_ITEM_ERROR')?>',
+		SearchResultEx: '<?= GetMessageJS('ML_SEARCH_RESULT_EX')?>',
+		DelElConfirm: '<?= GetMessageJS('ML_DEL_EL_CONFIRM')?>',
+		DelElConfirmYes: '<?= GetMessageJS('ML_DEL_EL_CONFIRM_YES')?>',
+		SearchDef: '<?= GetMessageJS('ML_SEARCH_DEF')?>',
+		NoResult: '<?= GetMessageJS('ML_SEARCH_NO_RESULT')?>',
+		ViewItem : '<?= GetMessageJS('ML_VIEW_ITEM')?>',
+		FileExt : '<?= GetMessageJS('ML_FILE_EXT')?>',
+		CheckExtTypeConf : '<?= GetMessageJS('ML_CHECK_TYPE_EXT_CONF')?>'
+	};
+}
 <?
 	}
 
@@ -1183,8 +1185,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 		{
 			$title = isset($Params['title']) ? $Params['title'] : GetMessage('ML_BR_BUT_ML_TITLE');
 			?>
-			<input id="<?= $inputId?>" style="display: none;"/>
-			<input type="button" value="<?= $value?>" title="<?= $title?>" onclick="<?= $arMLConfig['event']?>();"/>
+			<input id="<?= 'bx_ml_'.$inputId?>" type="button" value="<?= $value?>" title="<?= $title?>" onclick="<?= $arMLConfig['event']?>();"/>
 			<?
 		}
 		elseif ($mode == 'file_dialog')

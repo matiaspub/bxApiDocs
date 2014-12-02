@@ -64,10 +64,15 @@ class CAdminFileDialog
 	*/
 	public static function ShowScript($arConfig)
 	{
-		global $USER;
+		global $USER, $APPLICATION;
 		$bCloudsBrowse = is_object($USER) && $USER->CanDoOperation("clouds_browse") && $arConfig["operation"] === "O";
 
 		CUtil::InitJSCore(array('ajax', 'window'));
+		$APPLICATION->AddHeadScript("/bitrix/js/main/file_dialog.js");
+
+		$io = CBXVirtualIo::GetInstance();
+		$rootPath = "";
+		$resultDest = "";
 
 		if(CModule::IncludeModule("fileman"))
 		{
@@ -75,8 +80,6 @@ class CAdminFileDialog
 			$arConfig['site'] = (isset($arConfig['arPath']['SITE']) ? $arConfig['arPath']['SITE'] : '');
 			$arConfig['lang'] = (isset($arConfig['lang']) ? $arConfig['lang'] : LANGUAGE_ID);
 			$arConfig['zIndex'] = isset($arConfig['zIndex']) ? $arConfig['zIndex'] : 2500;
-
-			$io = CBXVirtualIo::GetInstance();
 
 			$path = $io->CombinePath("/", $arConfig['path']);
 			$path = CFileMan::SecurePathVar($path);
@@ -108,7 +111,6 @@ class CAdminFileDialog
 					$functionError .= GetMessage("BX_FD_NO_EVENT").". ";
 			}
 
-			$resultDest = "";
 			if (!isset($arConfig['arResultDest']) || !is_array($arConfig['arResultDest']))
 			{
 				$functionError .= GetMessage("BX_FD_NO_RETURN_PRM").". ";
@@ -163,15 +165,19 @@ class CAdminFileDialog
 				if (!Params)
 					Params = {};
 
-				<?if(!$GLOBALS['USER']->CanDoOperation('fileman_view_file_structure')):?>
-					return alert(mess_ACCESS_DENIED);
+				<?if(!$USER->CanDoOperation('fileman_view_file_structure')):?>
+					<?echo '
+					alert(mess_ACCESS_DENIED);
+					return;
+					'?>
 				<?else:?>
+					var UserConfig;
 				<?
 				$fd_config = stripslashes(CUserOptions::GetOption("fileman", "file_dialog_config", "N"));
 				if ($fd_config == "N" || $arConfig['saveConfig'] === false)
 				{
 				?>
-					var UserConfig =
+					UserConfig =
 					{
 						site : '<?= CUtil::JSEscape($arConfig['site'])?>',
 						path : '<?= CUtil::JSEscape($arConfig['path'])?>',
@@ -192,7 +198,7 @@ class CAdminFileDialog
 					if (!$io->DirectoryExists($rootPath.$arConfig['path']))
 						$arConfig['path'] = '/';
 					?>
-					var UserConfig =
+					UserConfig =
 					{
 						site : '<?= CUtil::JSEscape($arConfig['site'])?>',
 						path : '<?= CUtil::JSEscape($arConfig['path'])?>',
@@ -203,13 +209,6 @@ class CAdminFileDialog
 					<?
 				}
 				?>
-
-				if (!window.BXFileDialog)
-				{
-					if (bLoadJS !== false)
-						BX.loadScript("/bitrix/js/main/file_dialog.js?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/js/main/file_dialog.js')?>");
-					return setTimeout(function(){window['<?= CUtil::JSEscape($arConfig['event'])?>'](false, Params)}, 50);
-				}
 
 				var oConfig =
 				{
@@ -283,7 +282,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 					name = full;
 
 				<?if ($resultDest == "FUNCTION"): ?>
-					<?= CUtil::JSEscape($arConfig['arResultDest']["FUNCTION_NAME"])?>(filename, path, site, title || '', menu || '');
+					<?= CUtil::JSEscape($arConfig['arResultDest']["FUNCTION_NAME"])."(filename, path, site, title || '', menu || '');"?>
 				<?elseif($resultDest == "FORM"): ?>
 					document.<?= CUtil::JSEscape($arConfig['arResultDest']["FORM_NAME"])?>.<?= CUtil::JSEscape($arConfig['arResultDest']["FORM_ELEMENT_NAME"])?>.value = full;
 					BX.fireEvent(document.<?= CUtil::JSEscape($arConfig['arResultDest']["FORM_NAME"])?>.<?= CUtil::JSEscape($arConfig['arResultDest']["FORM_ELEMENT_NAME"])?>, 'change');
@@ -292,27 +291,12 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 					BX.fireEvent(BX('<?= CUtil::JSEscape($arConfig['arResultDest']["ELEMENT_ID"])?>'), 'change');
 				<?endif;?>
 			};
-			<?self::AttachJSScripts();?>
 			</script>
 			<?
 		}
 		else
 		{
 			echo "<font color=\"#FF0000\">".htmlspecialcharsbx($functionError)."</font>";
-		}
-	}
-
-	public static function AttachJSScripts()
-	{
-		if(!defined("BX_B_FILE_DIALOG_SCRIPT_LOADED"))
-		{
-			// define("BX_B_FILE_DIALOG_SCRIPT_LOADED", true);
-?>
-if (window.jsUtils)
-{
-	jsUtils.addEvent(window, 'load', function(){jsUtils.loadJSFile("/bitrix/js/main/file_dialog.js?v=<?=@filemtime($_SERVER['DOCUMENT_ROOT'].'/bitrix/js/main/file_dialog.js')?>");}, false);
-}
-<?
 		}
 	}
 
@@ -430,23 +414,22 @@ if (window.jsUtils)
 			<table class="bx-fd-top-contr-tbl">
 				<tr>
 					<?if (count($arSites) > 1):?>
-						<td style="width:22px!important; padding: 0px 4px 0px 5px !important;">
+						<td style="width:22px!important; padding: 0 4px 0 5px !important;">
 						<div id="__bx_site_selector" bxvalue='<?= CUtil::JSEscape($Params['site'])?>' onclick="oBXDialogControls.SiteSelectorOnClick(this);" class="site_selector_div"><span><?= CUtil::JSEscape($Params['site'])?></span><span class="fd_iconkit site_selector_div_arrow">&nbsp;&nbsp;</span></div>
 						</td>
 					<?endif;?>
-					<td style="padding: 0px 2px 0px 2px !important;">
-						<input class="fd_input" type="text" id="__bx_dir_path_bar"></input>
+					<td style="padding: 0 2px 0 2px !important;">
+						<input class="fd_input" type="text" id="__bx_dir_path_bar">
 					</td>
-					<td nowrap style="width:170px !important; padding: 0px 2px 0px 2px !important;">
+					<td nowrap style="width:170px !important; padding: 0 2px 0 2px !important;">
 						<img src="/bitrix/images/1.gif" class="fd_iconkit go_button" id="__bx_dir_path_go" title="<?=GetMessage("FD_GO_TO")?>"/>
 						<img src="/bitrix/images/1.gif" __bx_disable="Y" class="fd_iconkit path_back_dis" title="<?=GetMessage("FD_GO_BACK")?>" id="__bx_dir_path_back"/>
 						<img src="/bitrix/images/1.gif" __bx_disable="Y" class="fd_iconkit path_forward_dis" title="<?=GetMessage("FD_GO_FORWARD")?>" id="__bx_dir_path_forward"/>
 						<img src="/bitrix/images/1.gif" class="fd_iconkit dir_path_up" title="<?=GetMessage("FD_GO_UP")?>" id="__bx_dir_path_up" />
 						<img src="/bitrix/images/1.gif" class="fd_iconkit dir_path_root" title="<?=GetMessage("FD_GO_TO_ROOT")?>" id="__bx_dir_path_root" />
 						<img src="/bitrix/images/1.gif" class="fd_iconkit new_dir" title="<?=GetMessage("FD_NEW_FOLDER")?>" id="__bx_new_dir" />
-						<img src="/bitrix/images/1.gif" class="fd_iconkit refresh" title="<?=GetMessage("FD_REFRESH")?>" onclick="oBXDialogControls.RefreshOnclick(this);"/>
+						<img src="/bitrix/images/1.gif" class="fd_iconkit refresh" title="<?=GetMessage("FD_REFRESH")?>" onclick="oBXDialogControls.RefreshOnclick();"/>
 						<?
-						$arSitesPP = Array();
 						$arViews = Array(
 							Array("ID" => 'list', "TEXT" => GetMessage("FD_VIEW_LIST"), "ONCLICK" => "oBXDialogControls.ViewSelector.OnChange('list')"),
 							Array("ID" => 'detail', "TEXT" => GetMessage("FD_VIEW_DETAIL"), "ONCLICK" => "oBXDialogControls.ViewSelector.OnChange('detail')"),
@@ -457,7 +440,7 @@ if (window.jsUtils)
 						?>
 						<img onclick="oBXDialogControls.ViewSelector.OnClick();" src="/bitrix/images/1.gif" id="__bx_view_selector" class="fd_iconkit view_selector"  title="<?=GetMessage("FD_SELECT_VIEW")?>"/>
 					</td>
-					<td nowrap style="width:180px !important; padding: 0px 6px 0px 3px !important; text-align:right !important;" align="right">
+					<td nowrap style="width:180px !important; padding: 0 6px 0 3px !important; text-align:right !important;" align="right">
 						<?=GetMessage("FD_SORT_BY")?>:
 						<select class="fd_select" id="__bx_sort_selector" title="<?=GetMessage("FD_SORT_BY")?>" style="font-size:11px !important;">
 							<option value="name"><?=GetMessage("FD_SORT_BY_NAME")?></option>
@@ -466,7 +449,7 @@ if (window.jsUtils)
 							<option value="date"><?=GetMessage("FD_SORT_BY_DATE")?></option>
 						</select>
 					</td>
-					<td style="width:20px !important; padding: 0px 6px 0px 3px !important;">
+					<td style="width:20px !important; padding: 0 6px 0 3px !important;">
 						<img src="/bitrix/images/1.gif" class="fd_iconkit sort_up" title="<?=GetMessage("FD_CHANGE_SORT_ORDER")?>" __bx_value="asc" id="__bx_sort_order" />
 					</td>
 				</tr>
@@ -489,7 +472,7 @@ if (window.jsUtils)
 			</table>
 		</div>
 		<div id="__bx_fd_preview_and_panel" style="display:block;">
-			<table style="width:100% !important;height:132px !important; padding:0px !important;" border="0">
+			<table style="width:100% !important;height:132px !important; padding:0 !important;" border="0">
 				<tr>
 					<td style="width:25% !important; height: 100% !important;">
 							<div style="margin: 3px 8px 3px 5px;border:1px solid #C6C6C6"><div style="height:127px;">
@@ -554,7 +537,7 @@ if (window.jsUtils)
 						</tr>
 						<tr>
 							<td align="right"><?=GetMessage("FD_PAGE_TITLE")?>:</td>
-							<td><input type="text" id="__bx_page_title2" value=""></input></td>
+							<td><input type="text" id="__bx_page_title2" value=""></td>
 						</tr>
 						<tr>
 							<td align="right"><?=GetMessage("FD_MENU_TYPE")?></td>
@@ -610,8 +593,8 @@ if (window.jsUtils)
 			</tr>
 			<tr>
 				<td class="bx-fd-buttons-cont">
-					<input type="button" id="__bx_fd_submit_but2" value=""></input>
-					<input type="button" onclick="oBXFileDialog.Close()" value="<?=GetMessage("FD_BUT_CANCEL");?>"></input>
+					<input type="button" id="__bx_fd_submit_but2" value="">
+					<input type="button" onclick="oBXFileDialog.Close()" value="<?=GetMessage("FD_BUT_CANCEL");?>">
 				</td>
 			</tr>
 		</table><?endif;?></div>
@@ -673,7 +656,10 @@ arSites['<?= CUtil::JSEscape($key)?>'] = '<?= CUtil::JSEscape($val)?>';
 function OnLoad()
 {
 	if (!window.BXWaitWindow || !window.BXDialogTree || !window.BXDialogWindow)
-		return setTimeout(function(){OnLoad();}, 20);
+	{
+		setTimeout(function(){OnLoad();}, 20);
+		return;
+	}
 
 	window.oWaitWindow = new BXWaitWindow();
 	window.oBXDialogTree = new BXDialogTree();
@@ -769,7 +755,10 @@ var FD_MESS =
 		global $USER, $APPLICATION;
 
 		if(!CModule::IncludeModule("fileman"))
-			return $APPLICATION->ThrowException(GetMessage("BX_FD_NO_FILEMAN"));
+		{
+			$APPLICATION->ThrowException(GetMessage("BX_FD_NO_FILEMAN"));
+			return false;
+		}
 
 		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($path));
 		$path = CFileMan::SecurePathVar($path);
@@ -792,8 +781,7 @@ var FD_MESS =
 			$res = CFileMan::GetMenuArray($DOC_ROOT.$menuname);
 			$aMenuLinksTmp = $res["aMenuLinks"];
 
-			$itemcnt = 0;
-			for($j=0; $j<count($aMenuLinksTmp); $j++)
+			for($j = 0, $n = count($aMenuLinksTmp); $j < $n; $j++)
 			{
 				$aMenuLinksItem = $aMenuLinksTmp[$j];
 				$arItems[] = htmlspecialcharsbx($aMenuLinksItem[0]);
@@ -828,9 +816,11 @@ var FD_MESS =
 		$scriptRes = "\n".'arFDMenuTypes["'.CUtil::JSEscape($path).'"] = {types: ['.$strTypes.'], items: ['.$strItems.']};'."\n";
 
 		if ($bEchoResult)
+		{
 			echo $scriptRes;
-		else
-			return array($arMenuTypes, $scriptRes, $arAllItems[$strSelected]);
+			return null;
+		}
+		return array($arMenuTypes, $scriptRes, $arAllItems[$strSelected]);
 	}
 
 	public static function GetItems($Params)
@@ -847,13 +837,22 @@ var FD_MESS =
 		if(strlen($Params["site"]) > 2)
 		{
 			if (!$USER->CanDoOperation('clouds_browse'))
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_ACCESS_DENIED'), 'access_denied');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_ACCESS_DENIED'), 'access_denied');
+				return;
+			}
 
 			if($Params['operation'] !== 'O')
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 04]', 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 04]', 'path_corrupt');
+				return;
+			}
 
 			if(!CModule::IncludeModule('clouds'))
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 01]', 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 01]', 'path_corrupt');
+				return;
+			}
 
 			$obBucket = null;
 			foreach(CCloudStorageBucket::GetAllBuckets() as $arBucket)
@@ -863,10 +862,16 @@ var FD_MESS =
 			}
 
 			if(!$obBucket)
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 02]', 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 02]', 'path_corrupt');
+				return;
+			}
 
 			if(!$obBucket->Init())
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 03]', 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 03]', 'path_corrupt');
+				return;
+			}
 
 			$path = preg_replace("#[\\\\\\/]+#", "/", "/".$APPLICATION->UnJSEscape($Params['path']));
 			$path_js = $path == "" ? "/" : addslashes(htmlspecialcharsex($path));
@@ -874,7 +879,10 @@ var FD_MESS =
 
 			$arFiles = $obBucket->ListFiles($path);
 			if(!is_array($arFiles))
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 05]', 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT').' [clouds 05]', 'path_corrupt');
+				return;
+			}
 ?>
 arFDDirs['<?=$path_js?>'] = [];
 arFDFiles['<?=$path_js?>'] = [];
@@ -935,10 +943,14 @@ arFDPermission['<?=$path_js?>'] = {
 		$rootPath = CSite::GetSiteDocRoot($site);
 		if (!$io->FileExists($rootPath.$path) && !$io->DirectoryExists($rootPath.$path) && $Params['bThrowException'] === true)
 		{
-			return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT'), 'path_corrupt');
+			$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT'), 'path_corrupt');
+			return;
 		}
 		elseif (!$USER->CanDoFileOperation('fm_view_listing', array($site, $path)))
-			return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_ACCESS_DENIED'), 'access_denied');
+		{
+			$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_ACCESS_DENIED'), 'access_denied');
+			return;
+		}
 
 		$arDirs = array(); $arFiles = array();
 		GetDirList(array($site, $path), $arDirs, $arFiles, array(), array("name" => "asc"), "DF", false, true);
@@ -1048,7 +1060,7 @@ arFDPermission['<?=$path_js?>'] = {
 
 	public static function GetItemsRecursively($Params)
 	{
-		global $APPLICATION, $USER;
+		global $APPLICATION;
 
 		$io = CBXVirtualIo::GetInstance();
 
@@ -1058,7 +1070,10 @@ arFDPermission['<?=$path_js?>'] = {
 		if (!$io->FileExists($rootPath.$path) && !$io->DirectoryExists($rootPath.$path))
 		{
 			if ($Params['bThrowException'] === true)
-				return $APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT'), 'path_corrupt');
+			{
+				$APPLICATION->ThrowException(GetMessage('BX_FD_ERROR').': '.GetMessage('BX_FD_PATH_CORRUPT'), 'path_corrupt');
+				return;
+			}
 			$path = '/';
 		}
 
@@ -1086,14 +1101,14 @@ arFDPermission['<?=$path_js?>'] = {
 
 	public static function MakeNewDir($Params)
 	{
+		global $USER, $APPLICATION;
+
+		$io = CBXVirtualIo::GetInstance();
+		$path = $io->CombinePath("/", $APPLICATION->UnJSEscape($Params['path']));
+		$site = $Params['site'];
+
 		if(CModule::IncludeModule("fileman"))
 		{
-			global $USER, $APPLICATION;
-
-			$io = CBXVirtualIo::GetInstance();
-			$path = $io->CombinePath("/", $APPLICATION->UnJSEscape($Params['path']));
-
-			$site = $Params['site'];
 			$arPath = Array($site, $path);
 			$DOC_ROOT = CSite::GetSiteDocRoot($site);
 			$abs_path = $DOC_ROOT.$path;
@@ -1102,15 +1117,23 @@ arFDPermission['<?=$path_js?>'] = {
 
 			//Check access to folder
 			if (!$USER->CanDoFileOperation('fm_create_new_folder', $arPath))
+			{
 				$strWarning = GetMessage("ACCESS_DENIED");
-			else if(!$io->DirectoryExists($abs_path))
+			}
+			elseif(!$io->DirectoryExists($abs_path))
+			{
 				$strWarning = GetMessage("FD_FOLDER_NOT_FOUND", array('#PATH#' => addslashes(htmlspecialcharsbx($path))));
+			}
 			else
 			{
 				if (strlen($dirname) > 0 && ($mess = self::CheckFileName($dirname)) !== true)
+				{
 					$strWarning = $mess;
-				else if(strlen($dirname) <= 0)
+				}
+				elseif(strlen($dirname) <= 0)
+				{
 					$strWarning = GetMessage("FD_NEWFOLDER_ENTER_NAME");
+				}
 				else
 				{
 					$pathto = Rel2Abs($path, $dirname);
@@ -1134,15 +1157,15 @@ arFDPermission['<?=$path_js?>'] = {
 
 	public static function Remove($Params)
 	{
+		global $USER, $APPLICATION;
+
+		$io = CBXVirtualIo::GetInstance();
+		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
+		$path = CFileMan::SecurePathVar($path);
+		$site = $Params['site'];
+
 		if(CModule::IncludeModule("fileman"))
 		{
-			global $USER, $APPLICATION;
-
-			$io = CBXVirtualIo::GetInstance();
-			$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
-			$path = CFileMan::SecurePathVar($path);
-
-			$site = $Params['site'];
 			$arPath = Array($site, $path);
 			$DOC_ROOT = CSite::GetSiteDocRoot($site);
 			$abs_path = $DOC_ROOT.$path;
@@ -1179,19 +1202,19 @@ arFDPermission['<?=$path_js?>'] = {
 
 	public static function Rename($Params)
 	{
+		global $USER, $APPLICATION;
+
+		$io = CBXVirtualIo::GetInstance();
+		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
+		$path = CFileMan::SecurePathVar($path);
+		$site = $Params['site'];
+
 		if(CModule::IncludeModule("fileman"))
 		{
-			global $USER, $APPLICATION;
 
 			$name = str_replace("/", "_", $APPLICATION->UnJSEscape($Params['name']));
 			$oldName = str_replace("/", "_", $APPLICATION->UnJSEscape($Params['old_name']));
 
-			$io = CBXVirtualIo::GetInstance();
-
-			$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
-			$path = CFileMan::SecurePathVar($path);
-			$site = $Params['site'];
-			$arPath = Array($site, $path);
 			$DOC_ROOT = CSite::GetSiteDocRoot($site);
 
 			$oldPath = Rel2Abs($path, $oldName);
@@ -1318,8 +1341,8 @@ arFDPermission['<?=$path_js?>'] = {
 ?>
 <HTML>
 <HEAD></HEAD>
-<BODY id="__flash" style="margin:0px; border-width: 0px;">
-<embed id="__flash_preview" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" name="__flash_preview" quality="high" width="<?=$Params['width']?>" height="<?=$Params['height']?>" src="<?=htmlspecialcharsex($path)?>" />
+<BODY id="__flash" style="margin:0; border-width: 0;">
+<embed id="__flash_preview" pluginspage="http://www.macromedia.com/go/getflashplayer" type="application/x-shockwave-flash" name="__flash_preview" quality="high" width="<?=$Params['width']?>" height="<?=$Params['height']?>" src="<?=htmlspecialcharsex($path)?>"></embed>
 </BODY>
 </HTML>
 <?
@@ -1335,7 +1358,7 @@ arFDPermission['<?=$path_js?>'] = {
 		?>
 <HTML>
 <HEAD><?=$res?></HEAD>
-<BODY style="margin:0px !important; background-color:#F4F4F4; font-family:Verdana;">
+<BODY style="margin:0 !important; background-color:#F4F4F4; font-family:Verdana,serif;">
 <form name="frmLoad" action="file_dialog.php?action=uploader&lang=<?=$lang?>&site=<?=$site?>&<?=bitrix_sessid_get()?>" onsubmit="return parent.oBXDialogControls.Uploader.OnSubmit();" method="post" enctype="multipart/form-data">
 	<input id="__bx_fd_server_site" type="hidden" name="cur_site" value="<?=$site?>" />
 	<table style="width: 540px; height: 123px; font-size:70%">
@@ -1343,7 +1366,7 @@ arFDPermission['<?=$path_js?>'] = {
 			<td style="width:40%;" align="left">
 				<?=GetMessage('FD_LOAD_FILE')?>:
 			</td>
-			<td style="width:60%; padding-top: 0px;" valign="top" align="left">
+			<td style="width:60%; padding-top: 0;" valign="top" align="left">
 				<input id="__bx_fd_load_file" size="45" type="file" name="load_file">
 			</td>
 		</tr>
@@ -1364,9 +1387,9 @@ arFDPermission['<?=$path_js?>'] = {
 			</td>
 		</tr>
 		<tr height="0%">
-			<td style="width:100%; padding:0px 8px 5px 0px" valign="bottom" align="right" colSpan="2">
-				<input  type="submit" value="<?=GetMessage("FD_BUT_LOAD");?>"></input>
-				<input style="width:100px;" type="button" onclick="parent.oBXFileDialog.Close()" value="<?=GetMessage("FD_BUT_CANCEL");?>"></input>
+			<td style="width:100%; padding:0 8px 5px 0" valign="bottom" align="right" colSpan="2">
+				<input  type="submit" value="<?=GetMessage("FD_BUT_LOAD");?>">
+				<input style="width:100px;" type="button" onclick="parent.oBXFileDialog.Close()" value="<?=GetMessage("FD_BUT_CANCEL");?>">
 			</td>
 		</tr>
 	</table>
@@ -1418,6 +1441,7 @@ arFDPermission['<?=$path_js?>'] = {
 					{
 						//************************** Quota **************************//
 						$bQuota = true;
+						$quota = null;
 						if(COption::GetOptionInt("main", "disk_space") > 0)
 						{
 							$bQuota = false;
@@ -1465,4 +1489,3 @@ arFDPermission['<?=$path_js?>'] = {
 	}
 
 }
-?>

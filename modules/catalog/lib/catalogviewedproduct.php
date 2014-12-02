@@ -5,18 +5,12 @@ use Bitrix\Main\Entity\DataManager as DataManager;
 use Bitrix\Main\Application as Application;
 use Bitrix\Main\Entity\Query as Query;
 use Bitrix\Main\Config\Option as Option;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class CatalogViewedProductTable extends DataManager
 {
-	/**
-	 * @override
-	 * @return string
-	 */
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	/**
 	 * @override
 	 * @return string
@@ -57,7 +51,8 @@ class CatalogViewedProductTable extends DataManager
 			),
 			'ELEMENT' => array(
 				'data_type' => '\Bitrix\Iblock\ElementTable',
-				'reference' => array('=this.PRODUCT_ID' => 'ref.ID')
+				'reference' => array('=this.PRODUCT_ID' => 'ref.ID'),
+				'join_type' => 'INNER'
 			),
 			'PRODUCT' => array(
 				'data_type' => '\Bitrix\Sale\ProductTable',
@@ -73,11 +68,11 @@ class CatalogViewedProductTable extends DataManager
 	/**
 	 * Common function, used to update/insert any product.
 	 *
-	 * @param $productId - id of product
-	 * @param $fulserId  - user basket id
-	 * @param $siteId    - site id
+	 * @param int $productId   Id of product.
+	 * @param int $fuserId   User basket id.
+	 * @param string $siteId      Site id.
 	 *
-	 * @return id of row
+	 * @return int Id of row.
 	 */
 	public static function refresh($productId, $fuserId, $siteId = SITE_ID)
 	{
@@ -163,10 +158,10 @@ class CatalogViewedProductTable extends DataManager
 	/**
 	 * Returns ids map: SKU_PRODUCT_ID => PRODUCT_ID
 	 *
-	 * @param array $originalIds
+	 * @param array $originalIds Input products ids.
 	 * @return integer[]
 	 */
-	public static function getProductsMap($originalIds = array())
+	public static function getProductsMap(array $originalIds = array())
 	{
 		if(!is_array($originalIds) || !count($originalIds))
 			return array();
@@ -220,7 +215,8 @@ class CatalogViewedProductTable extends DataManager
 	/**
 	 * Clear table b_catalog_viewed_product
 	 *
-	 * @param int $liveTime
+	 * @param int $liveTime Live time.
+	 * @return void
 	 */
 	public static function clear($liveTime = 10)
 	{

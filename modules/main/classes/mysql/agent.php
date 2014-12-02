@@ -76,12 +76,7 @@ class CAgent extends CAllAgent
 				return "";
 		}
 
-		$uniq = COption::GetOptionString("main", "server_uniq_id", "");
-		if(strlen($uniq)<=0)
-		{
-			$uniq = md5(uniqid(rand(), true));
-			COption::SetOptionString("main", "server_uniq_id", $uniq);
-		}
+		$uniq = CMain::GetServerUniqID();
 
 		$strSql = "
 			SELECT 'x'
@@ -133,20 +128,13 @@ class CAgent extends CAllAgent
 			"	AND NEXT_EXEC<=now() ".
 			"	AND (DATE_CHECK IS NULL OR DATE_CHECK<=now()) ".
 			$str_crontab.
-			" ORDER BY SORT desc";
+			" ORDER BY RUNNING ASC, SORT desc";
 
 		$db_result_agents = $DB->Query($strSql);
-		$i = 0;
 		$ids = '';
 		$agents_array = array();
 		while($db_result_agents_array = $db_result_agents->Fetch())
 		{
-			if($i==0)
-			{
-				@set_time_limit(0);
-				ignore_user_abort(true);
-				$i=1;
-			}
 			$agents_array[] = $db_result_agents_array;
 			$ids .= ($ids <> ''? ', ':'').$db_result_agents_array["ID"];
 		}
@@ -157,21 +145,27 @@ class CAgent extends CAllAgent
 		}
 
 		$DB->Query("SELECT RELEASE_LOCK('".$uniq."_agent')");
-		$logFunction = defined("BX_AGENTS_LOG_FUNCTION") && function_exists(BX_AGENTS_LOG_FUNCTION)? BX_AGENTS_LOG_FUNCTION: false;
+
+		$logFunction = (defined("BX_AGENTS_LOG_FUNCTION") && function_exists(BX_AGENTS_LOG_FUNCTION)? BX_AGENTS_LOG_FUNCTION : false);
 
 		for($i = 0, $n = count($agents_array); $i < $n; $i++)
 		{
 			$arAgent = $agents_array[$i];
+
 			if ($logFunction)
 				$logFunction($arAgent, "start");
 
 			@set_time_limit(0);
+			ignore_user_abort(true);
 
 			if(strlen($arAgent["MODULE_ID"])>0 && $arAgent["MODULE_ID"]!="main")
 			{
 				if(!CModule::IncludeModule($arAgent["MODULE_ID"]))
 					continue;
 			}
+
+			//update the agent to the running state - if it fails it'll go to the end of the list on the next try
+			$DB->Query("UPDATE b_agent SET RUNNING='Y' WHERE ID=".$arAgent["ID"]);
 
 			//these vars can be assigned within agent code
 			$pPERIOD = $arAgent["AGENT_INTERVAL"];
@@ -181,24 +175,32 @@ class CAgent extends CAllAgent
 			global $USER;
 			unset($USER);
 			$eval_result = "";
-			eval("\$eval_result=".$arAgent["NAME"]);
+			$e = eval("\$eval_result=".$arAgent["NAME"]);
 			unset($USER);
 
 			CTimeZone::Enable();
 
 			if ($logFunction)
-				$logFunction($arAgent, "finish", $eval_result);
+				$logFunction($arAgent, "finish", $eval_result, $e);
 
-			if(strlen($eval_result)<=0)
+			if($e === false)
 			{
-				$strSql="DELETE FROM b_agent WHERE ID=".$arAgent["ID"];
+				continue;
+			}
+			elseif(strlen($eval_result)<=0)
+			{
+				$strSql = "DELETE FROM b_agent WHERE ID=".$arAgent["ID"];
 			}
 			else
 			{
-				if($arAgent["IS_PERIOD"]=="Y")
-					$strSql="UPDATE b_agent SET NAME='".$DB->ForSQL($eval_result, 2000)."', LAST_EXEC=now(), NEXT_EXEC=DATE_ADD(NEXT_EXEC, INTERVAL ".$pPERIOD." SECOND), DATE_CHECK=NULL WHERE ID=".$arAgent["ID"];
-				else
-					$strSql="UPDATE b_agent SET NAME='".$DB->ForSQL($eval_result, 2000)."', LAST_EXEC=now(), NEXT_EXEC=DATE_ADD(now(), INTERVAL ".$pPERIOD." SECOND), DATE_CHECK=NULL WHERE ID=".$arAgent["ID"];
+				$strSql = "
+					UPDATE b_agent SET
+						NAME='".$DB->ForSQL($eval_result, 2000)."',
+						LAST_EXEC=now(),
+						NEXT_EXEC=DATE_ADD(".($arAgent["IS_PERIOD"]=="Y"? "NEXT_EXEC" : "now()").", INTERVAL ".$pPERIOD." SECOND),
+						DATE_CHECK=NULL,
+						RUNNING='N'
+					WHERE ID=".$arAgent["ID"];
 			}
 			$DB->Query($strSql);
 		}

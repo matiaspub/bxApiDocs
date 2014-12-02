@@ -24,7 +24,7 @@ class CIBlockFormatProperties
 	*
 	*
 	*
-	* @return array <p>Массив полей элемента.</p> <h4>Примечание</h4> <p>Метод в поле DISPLAY_VALUE
+	* @return array <p>Массив полей элемента.</p> <h4>Примечание</h4><p>Метод в поле DISPLAY_VALUE
 	* выводит только активные по дате элементы (используется фильтр на
 	* уровне ядра, поэтому вывести ссылки на неактивные элементы не
 	* получится стандартными средствами). </p> <br><br>
@@ -96,7 +96,7 @@ class CIBlockFormatProperties
 							$arLinkFilter,
 							false,
 							false,
-							array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL", "PREVIEW_PICTURE", "DETAIL_PUCTURE")
+							array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL", "PREVIEW_PICTURE", "DETAIL_PICTURE")
 						);
 						$CACHE["E"][$val] = $rsLink->GetNext();
 					}
@@ -150,37 +150,39 @@ class CIBlockFormatProperties
 			else
 			{
 				$trimmed = trim($val);
-				if(strpos($trimmed, "http")===0)
+				if (strpos($trimmed, "http") === 0)
 				{
 					if($installedStatictic)
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("/bitrix/redirect.php?event1=".urlencode($event1)."&event2=".urlencode($trimmed)."&event3=".urlencode($arItem["NAME"])."&goto=".urlencode($trimmed)).'">'.$trimmed.'</a>';
 					else
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx($trimmed).'">'.$trimmed.'</a>';
 				}
-				elseif(strpos($trimmed, "www")===0)
+				elseif (strpos($trimmed, "www") === 0)
 				{
 					if($installedStatictic)
 						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("/bitrix/redirect.php?event1=".urlencode($event1)."&event2=".urlencode("http://".$trimmed)."&event3=".urlencode($arItem["NAME"])."&goto=".urlencode("http://".$trimmed)).'">'.$trimmed.'</a>';
 					else
-						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("http://".$val).'">'.$val.'</a>';
+						$arDisplayValue[] =  '<a href="'.htmlspecialcharsbx("http://".$trimmed).'">'.$trimmed.'</a>';
 				}
 				else
 					$arDisplayValue[] = $val;
 			}
 		}
 
-		if(count($arDisplayValue)==1)
+		$displayCount = count($arDisplayValue);
+		if ($displayCount == 1)
 			$arProperty["DISPLAY_VALUE"] = $arDisplayValue[0];
-		elseif(count($arDisplayValue)>1)
+		elseif ($displayCount > 1)
 			$arProperty["DISPLAY_VALUE"] = $arDisplayValue;
 		else
 			$arProperty["DISPLAY_VALUE"] = false;
 
 		if ($arProperty["PROPERTY_TYPE"]=="F")
 		{
-			if(count($arFiles)==1)
+			$fileCount = count($arFiles);
+			if ($fileCount == 1)
 				$arProperty["FILE_VALUE"] = $arFiles[0];
-			elseif(count($arFiles)>1)
+			elseif ($fileCount > 1)
 				$arProperty["FILE_VALUE"] = $arFiles;
 			else
 				$arProperty["FILE_VALUE"] = false;

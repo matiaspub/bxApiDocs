@@ -99,7 +99,10 @@ class blogTextParser extends CTextParser
 			"SHORT_ANCHOR" => ($allow["SHORT_ANCHOR"] == "Y" ? "Y" : "N"),
 			"USER" => ($allow["USER"] == "N" ? "N" : "Y"),
 			"TAG" => ($allow["TAG"] == "N" ? "N" : "Y"),
+			"USERFIELDS" => (is_array($allow["USERFIELDS"]) ? $allow["USERFIELDS"] : array())
 		);
+		if (!empty($this->arUserfields))
+			$this->allow["USERFIELDS"] = array_merge($this->allow["USERFIELDS"], $this->arUserfields);
 
 		$this->arImages = $arImages;
 		$this->bPreview = $bPreview;
@@ -115,7 +118,6 @@ class blogTextParser extends CTextParser
 			AddEventHandler("main", "TextParserAfterTags", Array("blogTextParser", "ParserTag"));
 			AddEventHandler("main", "TextParserAfter", Array("blogTextParser", "ParserCutAfter"));
 			AddEventHandler("main", "TextParserVideoConvert", Array("blogTextParser", "blogConvertVideo"));
-			AddEventHandler("main", "TextParserAfterTags", Array(&$this, "ParserUserfields"));
 		}
 
 		$text = $this->convertText($text);
@@ -163,48 +165,15 @@ class blogTextParser extends CTextParser
 			$text = preg_replace("/\[tag(?:[^\]])*\](.+?)\[\/tag\]/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_blog_tag('\\1')", $text);
 	}
 
-	public static function ParserUserfields(&$text, &$obj, $type="html")
-	{
-		if (is_object($obj) && get_class($obj) == "blogTextParser" && !empty($obj->arUserfields))
-		{
-			foreach($obj->arUserfields as $key => $userField)
-			{
-				if (!empty($userField["TAG"]) && method_exists($userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"))
-				{
-//					$userField["TAG"] = (!empty($userField["TAG"]) ? $userField["TAG"] : $userField["FIELD_NAME"]);
-					$obj->userField = array_merge($userField, array("PARSED" => array()));
-					$obj->type = $type;
-					$text = preg_replace_callback(
-						"/\[".$userField["TAG"]."\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
-						array( &$obj, 'convert_userfields'),
-						$text
-					);
-					$obj->arUserfields[$key]["PARSED"] = $obj->userField["PARSED"];
-				}
-			}
-		}
-		return $text;
-	}
-
-	public function convert_userfields($matches)
-	{
-		$id = intval($matches[1]);
-		if (is_array($this->userField["VALUE"]) && $id > 0 && in_array($id, $this->userField["VALUE"]))
-		{
-			$this->userField["PARSED"][] = $id;
-			return call_user_func_array(array($this->userField["USER_TYPE"]["CLASS_NAME"], "GetPublicViewHTML"), array($this->userField, $id, $matches[2]));
-		}
-		return $matches[0];
-	}
-
-
 	public function convert_blog_user($userId = 0, $name = "")
 	{
 		$userId = IntVal($userId);
 		if($userId <= 0)
+		{
 			return;
+		}
 		$anchor_id = RandString(8);
-		return '<a class="blog-p-user-name" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
+		return '<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
 	}
 	public static function convert_blog_tag($name = "")
 	{
@@ -450,7 +419,7 @@ class blogTextParser extends CTextParser
 		$this->{$marker."_open"}++;
 		if ($this->type == "rss")
 			return "\n====".$marker."====\n";
-		return "<div class='blog-post-".$marker."'><span>".GetMessage("BLOG_".ToUpper($marker))."</span><table class='blog".$marker."'><tr><td>";
+		return "<div class='blog-post-".$marker."' title=\"".GetMessage("BLOG_".ToUpper($marker))."\"><table class='blog".$marker."'><tr><td>";
 	}
 
 	public static function blogConvertVideo(&$arParams)

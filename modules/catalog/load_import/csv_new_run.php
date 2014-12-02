@@ -34,6 +34,30 @@ global
 	$defCatalogAvailGroupFields,
 	$defCatalogAvailCurrencies;
 
+if (!isset($arCatalogAvailProdFields))
+	$arCatalogAvailProdFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($arCatalogAvailPriceFields))
+	$arCatalogAvailPriceFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($arCatalogAvailValueFields))
+	$arCatalogAvailValueFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($arCatalogAvailQuantityFields))
+	$arCatalogAvailQuantityFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($arCatalogAvailGroupFields))
+	$arCatalogAvailGroupFields = CCatalogCSVSettings::getSettingsFields(CCatalogCSVSettings::FIELDS_SECTION);
+
+if (!isset($defCatalogAvailProdFields))
+	$defCatalogAvailProdFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_ELEMENT);
+if (!isset($defCatalogAvailPriceFields))
+	$defCatalogAvailPriceFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CATALOG);
+if (!isset($defCatalogAvailValueFields))
+	$defCatalogAvailValueFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE);
+if (!isset($defCatalogAvailQuantityFields))
+	$defCatalogAvailQuantityFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_PRICE_EXT);
+if (!isset($defCatalogAvailGroupFields))
+	$defCatalogAvailGroupFields = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_SECTION);
+if (!isset($defCatalogAvailCurrencies))
+	$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
+
 $NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels"));
 
 $max_execution_time = intval($max_execution_time);
@@ -1164,7 +1188,7 @@ if ('' == $strImportErrorMessage)
 		$bAllDataLoaded = false;
 
 		$INTERNAL_VARS_LIST = "tmpid,line_num,correct_lines,error_lines,killed_lines,arIBlockProperty,bThereIsGroups,arProductGroups,arIBlockPropertyValue,bDeactivationStarted,bUpdatePrice";
-		$SETUP_VARS_LIST = "IBLOCK_ID,URL_DATA_FILE,fields_type,first_names_r,delimiter_r,delimiter_other_r,first_names_f,metki_f,PATH2IMAGE_FILES,outFileAction,inFileAction,max_execution_time,IMAGE_RESIZE,USE_TRANSLIT,TRANSLIT_LANG,CLEAR_EMPTY_PRICE";
+		$SETUP_VARS_LIST = "IBLOCK_ID,URL_DATA_FILE,fields_type,first_names_r,delimiter_r,delimiter_other_r,first_names_f,metki_f,PATH2IMAGE_FILES,outFileAction,inFileAction,max_execution_time,IMAGE_RESIZE,USE_TRANSLIT,TRANSLIT_LANG,CLEAR_EMPTY_PRICE,CML2_LINK_IS_XML";
 		for ($i = 0; $i < $NUM_FIELDS; $i++)
 			$SETUP_VARS_LIST .= ",field_".$i;
 		$CUR_FILE_POS = $csvFile->GetPos();

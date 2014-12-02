@@ -64,9 +64,9 @@ class CSocServMyMailRu extends CSocServAuth
 					}
 					if(isset($arMRUser['0']['sex']) && $arMRUser['0']['sex'] != '')
 					{
-						if ($arMRUser['0']['sex'] == '1')
+						if ($arMRUser['0']['sex'] == '0')
 							$gender = 'M';
-						elseif ($arMRUser['0']['sex'] == '2')
+						elseif ($arMRUser['0']['sex'] == '1')
 							$gender = 'F';
 					}
 

@@ -121,7 +121,7 @@ class CSecuritySessionDB
 	 */
 	protected static function isValidId($pId)
 	{
-		return (bool) preg_match("/^[\da-z]{1,32}$/i", $pId);
+		return (bool) preg_match("/^[\\da-z]{6,32}$/iD", $pId);
 	}
 
 }

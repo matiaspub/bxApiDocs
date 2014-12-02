@@ -9,17 +9,17 @@ namespace Bitrix\Iblock\InheritedProperty;
 abstract class BaseValues
 {
 	/** @var integer */
-	protected $iblock_id = null;
+	protected $iblockId = null;
 
 	/** @var array[string][string]string */
 	protected $values = false;
 
 	/**
-	 * @param integer $iblock_id Iblock identifier.
+	 * @param integer $iblockId Iblock identifier.
 	 */
-	public function __construct($iblock_id)
+	public function __construct($iblockId)
 	{
-		$this->iblock_id = intval($iblock_id);
+		$this->iblockId = intval($iblockId);
 	}
 
 	/**
@@ -29,7 +29,7 @@ abstract class BaseValues
 	 */
 	public function getIblockId()
 	{
-		return $this->iblock_id;
+		return $this->iblockId;
 	}
 
 	/**
@@ -39,7 +39,7 @@ abstract class BaseValues
 	 */
 	static public function getValueTableName()
 	{
-		return"";
+		return "";
 	}
 
 	/**
@@ -102,7 +102,7 @@ abstract class BaseValues
 		$result = array();
 		foreach ($this->values as $CODE => $row)
 		{
-			$result[$CODE] = \Bitrix\Main\Text\String::htmlEncode($row["VALUE"]);
+			$result[$CODE] = htmlspecialcharsEx($row["VALUE"]);
 		}
 		return $result;
 	}
@@ -120,7 +120,7 @@ abstract class BaseValues
 			$this->values = $this->queryValues();
 
 		if (isset($this->values[$propertyCode]))
-			return \Bitrix\Main\Text\String::htmlEncode($this->values[$propertyCode]["VALUE"]);
+			return htmlspecialcharsEx($this->values[$propertyCode]["VALUE"]);
 		else
 			return "";
 	}

@@ -3,7 +3,7 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage main
- * @copyright 2001-2012 Bitrix
+ * @copyright 2001-2014 Bitrix
  */
 namespace Bitrix\Main;
 
@@ -11,11 +11,6 @@ use Bitrix\Main\Entity;
 
 class GroupTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
 	public static function getTableName()
 	{
 		return 'b_group';
@@ -46,7 +41,10 @@ class GroupTable extends Entity\DataManager
 			),
 			'DESCRIPTION' => array(
 				'data_type' => 'string'
-			)
+			),
+			'STRING_ID' => array(
+				'data_type' => 'string'
+			),
 		);
 	}
 }

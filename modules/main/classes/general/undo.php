@@ -98,8 +98,8 @@ class CUndo
 			{
 				$n = strtoupper($filter_keys[$i]);
 				$val = $arFilter[$filter_keys[$i]];
-				if ($n == 'ID')
-					$arSqlSearch[] = GetFilterQuery("U.ID", $val, 'N');
+				if ($n == 'ID' || $n == 'USER_ID')
+					$arSqlSearch[] = GetFilterQuery("U.".$n, $val, 'N');
 				elseif(isset($arFields[$n]))
 					$arSqlSearch[] = GetFilterQuery($arFields[$n]["FIELD_NAME"], $val);
 			}
@@ -225,16 +225,15 @@ class CAutoSave
 				$this->autosaveId = preg_replace("/[^a-z0-9_]/i", "", $_REQUEST['autosave_id']);
 			}
 			else
+			{
 				$this->formId = self::_GetFormID();
+			}
 
 			addEventHandler('main', 'OnBeforeLocalRedirect', array($this, 'Reset'));
 
 			if (!defined('BX_PUBLIC_MODE'))
-				CJSCore::Init(array('autosave'));
-
-			if (!$this->bSkipRestore)
 			{
-				addEventHandler('main', 'onEpilog', array($this, 'checkRestore'));
+				CJSCore::Init(array('autosave'));
 			}
 		}
 	}
@@ -261,6 +260,8 @@ class CAutoSave
 });
 </script>
 <?
+			$this->checkRestore();
+
 			$this->bInited = true;
 		}
 		return true;
@@ -315,7 +316,12 @@ class CAutoSave
 		if (is_array($arFields))
 		{
 ?>
-<script type="text/javascript">if (window.autosave_<?=$this->GetID();?>) window.autosave_<?=$this->GetID();?>.Restore(<?=CUtil::PhpToJSObject($arFields);?>);</script>
+<script type="text/javascript">BX.ready(function(){
+	if (window.autosave_<?=$this->GetID();?>)
+	{
+		window.autosave_<?=$this->GetID();?>.Restore(<?=CUtil::PhpToJSObject($arFields);?>);
+	}
+});</script>
 <?
 		}
 	}

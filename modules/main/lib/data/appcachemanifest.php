@@ -9,9 +9,11 @@ class AppCacheManifest
 	const MANIFEST_CHECK_FILE = "/bitrix/tools/check_appcache.php";
 
 	private static $instance;
+
 	private static $isEnabled = false;
-	private $pageURI = "";
+	private static $customCheckFile = null;
 	private $files = Array();
+	private $pageURI = "";
 	private $network = Array();
 	private $fallbackPages = Array();
 	private $params = Array();
@@ -137,7 +139,7 @@ class AppCacheManifest
 		else
 		{
 			$selfObject->setPageURI($server->get("REQUEST_URI"));
-			$APPLICATION->SetPageProperty("manifest", " manifest=\"" . self::MANIFEST_CHECK_FILE . "?manifest_id=" . $selfObject->getCurrentManifestID() . "\"");
+			$APPLICATION->SetPageProperty("manifest", " manifest=\"" . self::getManifestCheckFile() . "?manifest_id=" . $selfObject->getCurrentManifestID() . "\"");
 			$params = Array(
 				"PAGE_URL" => $selfObject->getPageURI(),
 				"PARAMS" => $selfObject->getAdditionalParams(),
@@ -146,6 +148,27 @@ class AppCacheManifest
 		}
 
 		return (is_array($params) ? $params : array());
+	}
+
+	/**Gets file for getting of manifest content
+	 * @return string
+	 */
+	static public function getManifestCheckFile()
+	{
+		$checkFile = self::MANIFEST_CHECK_FILE;
+		if(self::$customCheckFile != null && strlen(self::$customCheckFile)>0)
+			$checkFile = self::$customCheckFile;
+		return $checkFile;
+	}
+
+	/**
+	 * Sets custom file for getting of manifest content
+	 * self::MANIFEST_CHECK_FILE uses by default
+	 *@param string $customManifestCheckFile
+	 */
+	static public function setManifestCheckFile($customManifestCheckFile)
+	{
+		self::$customCheckFile = $customManifestCheckFile;
 	}
 
 	/*

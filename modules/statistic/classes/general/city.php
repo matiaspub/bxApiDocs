@@ -422,8 +422,7 @@ class CCity
 		if(!$selected)
 		{
 			$arResolvers = array();
-			$rsEvents = GetModuleEvents("statistic", "OnCityLookup");
-			while($arEvent = $rsEvents->Fetch())
+			foreach(GetModuleEvents("statistic", "OnCityLookup", true) as $arEvent)
 			{
 				$ob = ExecuteModuleEventEx($arEvent);
 				$ar = $ob->GetDescription();
@@ -512,8 +511,8 @@ class CCity
 				}
 				$this->city_id = $DB->Add("b_stat_city", array(
 					"COUNTRY_ID" => $country_code,
-					"REGION" => $region_name,
-					"NAME" => $city_name,
+					"REGION" => $region_name ? $region_name: false,
+					"NAME" => $city_name ? $city_name: false,
 				));
 			}
 		}

@@ -47,7 +47,7 @@ class CAllSalePersonType
 	*
 	*
 	*
-	* @param int $ID  Код типа плательщика.
+	* @param int $ID  Код типа плательщика. </ht
 	*
 	*
 	*
@@ -147,7 +147,7 @@ class CAllSalePersonType
 	*
 	*
 	*
-	* @param int $ID  Код типа плательщика.
+	* @param int $ID  Код типа плательщика. </ht
 	*
 	*
 	*
@@ -239,7 +239,7 @@ class CAllSalePersonType
 	*
 	*
 	*
-	* @param int $ID  Код типа плательщика.
+	* @param int $ID  Код типа плательщика. </ht
 	*
 	*
 	*

@@ -14,7 +14,7 @@ class TaggedCache
 {
 	protected $compCacheStack = array();
 	protected $salt = false;
-	protected $dbCacheTags = false;
+	protected $dbCacheTags = array();
 	protected $wasTagged = false;
 	protected $isMySql = false;
 
@@ -43,13 +43,13 @@ class TaggedCache
 			$con = Main\Application::getConnection();
 			$sqlHelper = $con->getSqlHelper();
 
-			$rs = $con->query($sqlHelper->getTopSql("
+			$rs = $con->query("
 				SELECT TAG
 				FROM b_cache_tag
 				WHERE SITE_ID = '".$sqlHelper->forSql(SITE_ID, 2)."'
 				AND CACHE_SALT = '".$sqlHelper->forSql($this->salt, 4)."'
 				AND RELATIVE_PATH = '".$sqlHelper->forSql($path)."'
-			", 1));
+			");
 			while ($ar = $rs->fetch())
 			{
 				$this->dbCacheTags[$path][$ar["TAG"]] = true;

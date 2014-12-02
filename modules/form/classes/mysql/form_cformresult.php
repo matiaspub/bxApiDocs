@@ -6,7 +6,7 @@
 
 
 /**
- * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.
+ * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.</body> </html>
  *
  *
  *
@@ -34,7 +34,7 @@ public static 	function err_mess()
 	*
 	*
 	*
-	* @param int $form_id  ID веб-формы.
+	* @param int $form_id  ID веб-формы.</bod
 	*
 	*
 	*

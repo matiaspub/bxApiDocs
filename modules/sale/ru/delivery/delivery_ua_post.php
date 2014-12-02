@@ -7,7 +7,7 @@ Order's weight must be less or equal 100 Kg.
 ********************************************************************************/
 CModule::IncludeModule('sale');
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_ua_post.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_ua_post.php');
 
 class CDeliveryUaPost
 {

@@ -1,6 +1,8 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+use Bitrix\Im as IM;
+
 class CIMMessenger
 {
 	private $user_id = 0;
@@ -63,6 +65,9 @@ class CIMMessenger
 		if (!isset($arFields['NOTIFY_EVENT']))
 			$arFields['NOTIFY_EVENT'] = 'default';
 
+		if (!isset($arFields['PARAMS']))
+			$arFields['PARAMS'] = Array();
+
 		if ($arFields['MESSAGE_TYPE'] == IM_MESSAGE_SYSTEM)
 		{
 			if (!isset($arFields['NOTIFY_TYPE']) && intval($arFields['FROM_USER_ID']) > 0)
@@ -112,24 +117,53 @@ class CIMMessenger
 
 		if ($arFields['MESSAGE_TYPE'] == IM_MESSAGE_PRIVATE)
 		{
-			$arFields['FROM_USER_ID'] = intval($arFields['FROM_USER_ID']);
-			$arFields['TO_USER_ID'] = intval($arFields['TO_USER_ID']);
-
-			if (!IsModuleInstalled('intranet'))
+			if (isset($arFields['TO_CHAT_ID']))
 			{
-				if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE) == CIMSettings::PRIVACY_RESULT_CONTACT)
+				$chatId = $arFields['TO_CHAT_ID'];
+				$arRel = CIMChat::GetRelationById($chatId);
+				foreach ($arRel as $rel)
 				{
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY_SELF'), "ERROR_FROM_PRIVACY_SELF");
-					return false;
+					if ($rel['USER_ID'] == $arFields['FROM_USER_ID'])
+						continue;
+
+					$arFields['TO_USER_ID'] = $rel['USER_ID'];
 				}
-				else if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE, $arFields['TO_USER_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+
+				if (!IsModuleInstalled('intranet'))
 				{
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY'), "ERROR_FROM_PRIVACY");
-					return false;
+					if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+					{
+						$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY_SELF'), "ERROR_FROM_PRIVACY_SELF");
+						return false;
+					}
+					else if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE, $arFields['TO_USER_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+					{
+						$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY'), "ERROR_FROM_PRIVACY");
+						return false;
+					}
 				}
 			}
+			else
+			{
+				$arFields['FROM_USER_ID'] = intval($arFields['FROM_USER_ID']);
+				$arFields['TO_USER_ID'] = intval($arFields['TO_USER_ID']);
 
-			$chatId = CIMMessage::GetChatId($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']);
+				if (!IsModuleInstalled('intranet'))
+				{
+					if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+					{
+						$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY_SELF'), "ERROR_FROM_PRIVACY_SELF");
+						return false;
+					}
+					else if (CIMSettings::GetPrivacy(CIMSettings::PRIVACY_MESSAGE, $arFields['TO_USER_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT && CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed() && !CSocNetUserRelations::IsFriends($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']))
+					{
+						$GLOBALS["APPLICATION"]->ThrowException(GetMessage('IM_ERROR_MESSAGE_PRIVACY'), "ERROR_FROM_PRIVACY");
+						return false;
+					}
+				}
+				$chatId = CIMMessage::GetChatId($arFields['FROM_USER_ID'], $arFields['TO_USER_ID']);
+			}
+
 			if ($chatId > 0)
 			{
 				$arParams = Array();
@@ -148,17 +182,40 @@ class CIMMessenger
 				else
 					$arParams['~DATE_CREATE'] = $DB->CurrentTimeFunction();
 
+
+				$arFiles = Array();
+				$arFields['FILES'] = Array();
+				if (isset($arFields['PARAMS']['FILE_ID']))
+				{
+					foreach ($arFields['PARAMS']['FILE_ID'] as $fileId)
+					{
+						$arFiles[$fileId] = $fileId;
+					}
+				}
+				$arFields['FILES'] = CIMDisk::GetFiles($chatId, $arFiles);
+
+				$messageFiles = self::GetFormatFilesMessageOut($arFields['FILES']);
+				if (strlen($messageFiles) > 0)
+				{
+					$arParams['MESSAGE_OUT'] = strlen($arParams['MESSAGE_OUT'])>0? $arParams['MESSAGE_OUT']."\n".$messageFiles: $messageFiles;
+					$arFields['MESSAGE_OUT'] = $arParams['MESSAGE_OUT'];
+				}
+
 				$messageID = IntVal($DB->Add("b_im_message", $arParams, Array('MESSAGE','MESSAGE_OUT')));
 				if ($messageID <= 0)
 					return false;
+
+				if (!empty($arFields['PARAMS']))
+					CIMMessageParam::Set($messageID, $arFields['PARAMS']);
 
 				//CUserCounter::Increment($arFields['TO_USER_ID'], 'im_message', '**', false);
 				CIMContactList::SetRecent($arFields['TO_USER_ID'], $messageID, false, $arFields['FROM_USER_ID']);
 				CIMContactList::SetRecent($arFields['FROM_USER_ID'], $messageID, false, $arFields['TO_USER_ID']);
 
+				CIMStatus::SetIdle($arFields['FROM_USER_ID'], false);
+
 				if (!$bConvert)
 				{
-
 					$strSql = "
 						UPDATE b_im_relation
 						SET STATUS = (case when USER_ID = ".$arFields['TO_USER_ID']." then '".IM_STATUS_UNREAD."' else '".IM_STATUS_READ."' end),
@@ -182,6 +239,18 @@ class CIMMessenger
 							{
 								$sName = CUser::FormatName(CSite::GetNameFormat(false), $arUser, true, false);
 								$pushText = $sName.': '.$arParams['MESSAGE'];
+
+								if (count($arFields['FILES']) > 0 && strlen($pushText) < 200)
+								{
+									foreach ($arFields['FILES'] as $file)
+									{
+										$file = " [".GetMessage('IM_MESSAGE_FILE').": ".$file['name']."]";
+										if (strlen($pushText.$file) > 200)
+											break;
+
+										$pushText = trim($pushText).$file;
+									}
+								}
 							}
 						}
 
@@ -190,11 +259,14 @@ class CIMMessenger
 							'command' => 'message',
 							'params' => CIMMessage::GetFormatMessage(Array(
 								'ID' => $messageID,
+								'CHAT_ID' => $chatId,
 								'TO_USER_ID' => $arParams['TO_USER_ID'],
 								'FROM_USER_ID' => $arParams['FROM_USER_ID'],
 								'SYSTEM' => $arFields['SYSTEM'] == 'Y'? 'Y': 'N',
 								'MESSAGE' => $arParams['MESSAGE'],
 								'DATE_CREATE' => time(),
+								'PARAMS' => $arFields['PARAMS'],
+								'FILES' => $arFields['FILES'],
 							)),
 						);
 						$arPullFrom = $arPullTo;
@@ -206,7 +278,6 @@ class CIMMessenger
 						$arPullTo['push_text'] = preg_replace("/\[s\].*?\[\/s\]/i", "", $pushText);
 						$arPullTo['push_text'] = preg_replace("/\[[bui]\](.*?)\[\/[bui]\]/i", "$1", $arPullTo['push_text']);
 						$arPullTo['push_text'] = preg_replace("/------------------------------------------------------(.*)------------------------------------------------------/mi", " [".GetMessage('IM_QUOTE')."] ", str_replace(array("#BR#"), Array(" "), $arPullTo['push_text']));
-
 
 						CPullStack::AddByUser($arParams['TO_USER_ID'], $arPullTo);
 						CPullStack::AddByUser($arParams['FROM_USER_ID'], $arPullFrom);
@@ -277,9 +348,30 @@ class CIMMessenger
 				else
 					$arParams['~DATE_CREATE'] = $DB->CurrentTimeFunction();
 
+				$arFiles = Array();
+				$arFields['FILES'] = Array();
+				if (isset($arFields['PARAMS']['FILE_ID']))
+				{
+					foreach ($arFields['PARAMS']['FILE_ID'] as $fileId)
+					{
+						$arFiles[$fileId] = $fileId;
+					}
+				}
+				$arFields['FILES'] = CIMDisk::GetFiles($chatId, $arFiles);
+
+				$messageFiles = self::GetFormatFilesMessageOut($arFields['FILES']);
+				if (strlen($messageFiles) > 0)
+				{
+					$arParams['MESSAGE_OUT'] = strlen($arParams['MESSAGE_OUT'])>0? $arParams['MESSAGE_OUT']."\n".$messageFiles: $messageFiles;
+					$arFields['MESSAGE_OUT'] = $arParams['MESSAGE_OUT'];
+				}
+
 				$messageID = IntVal($DB->Add("b_im_message", $arParams, Array('MESSAGE','MESSAGE_OUT')));
 				if ($messageID <= 0)
 					return false;
+
+				if (!empty($arFields['PARAMS']))
+					CIMMessageParam::Set($messageID, $arFields['PARAMS']);
 				/*
 				$sqlCounter = "SELECT USER_ID as ID, 1 as CNT, '**' as SITE_ID, 'im_chat' as CODE, 1 as SENT
 								FROM b_im_relation R1
@@ -299,6 +391,8 @@ class CIMMessenger
 					WHERE CHAT_ID = ".$chatId;
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+				CIMStatus::SetIdle($arFields['FROM_USER_ID'], false);
+
 				if (CModule::IncludeModule("pull"))
 				{
 					$arParams['FROM_USER_ID'] = $arFields['FROM_USER_ID'];
@@ -309,11 +403,14 @@ class CIMMessenger
 						'command' => 'messageChat',
 						'params' => CIMMessage::GetFormatMessage(Array(
 							'ID' => $messageID,
+							'CHAT_ID' => $chatId,
 							'TO_CHAT_ID' => $arParams['TO_CHAT_ID'],
 							'FROM_USER_ID' => $arParams['FROM_USER_ID'],
 							'MESSAGE' => $arParams['MESSAGE'],
 							'SYSTEM' => $arFields['SYSTEM'] == 'Y'? 'Y': 'N',
 							'DATE_CREATE' => time(),
+							'PARAMS' => $arFields['PARAMS'],
+							'FILES' => $arFields['FILES'],
 						)),
 					);
 					$arPullFrom = $arPullTo;
@@ -505,6 +602,263 @@ class CIMMessenger
 		return false;
 	}
 
+	public static function CheckPossibilityUpdateMessage($id)
+	{
+		global $USER;
+
+		$result = false;
+		if (
+			CModule::IncludeModule('pull') && CPullOptions::GetNginxStatus() &&
+			intval($id) > 0 && $USER->GetID() > 0
+		)
+		{
+			$message = self::GetById($id);
+			if (
+				$message !== false &&
+				$message['AUTHOR_ID'] == $USER->GetID() &&
+				$message['DATE_CREATE']+259200 > time() &&
+				in_array($message['MESSAGE_TYPE'], Array(IM_MESSAGE_PRIVATE, IM_MESSAGE_GROUP)) &&
+				$message['PARAMS']['IS_DELETED'] == 'N'
+			)
+			{
+				$result = $message;
+			}
+		}
+
+		return $result;
+	}
+
+	public static function Update($id, $text)
+	{
+		$text = trim($text);
+		if (strlen($text) <= 0)
+		{
+			return self::Delete($id);
+		}
+
+		$message = self::CheckPossibilityUpdateMessage($id);
+		if (!$message)
+			return false;
+
+		global $DB;
+
+		$DB->Update("b_im_message", array('MESSAGE' => "'".$DB->ForSQL($text)."'"), "WHERE ID = ".$message['ID'], "File: ".__FILE__."<br>Line: ".__LINE__);
+		CIMMessageParam::Set($message['ID'], Array('IS_EDITED' => 'Y'));
+
+		$arFields = $message;
+		$arFields['MESSAGE'] = $text;
+		$arFields['DATE_MODIFY'] = time()+CTimeZone::GetOffset();
+
+		$CCTP = new CTextParser();
+		$CCTP->MaxStringLen = 200;
+		$CCTP->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$pullMessage = $CCTP->convertText(htmlspecialcharsbx($arFields['MESSAGE']));
+
+		$relations = CIMMessenger::GetRelationById($message['ID']);
+
+		$arPullMessage = Array(
+			'id' => $arFields['ID'],
+			'type' => $arFields['MESSAGE_TYPE'] == IM_MESSAGE_PRIVATE? 'private': 'group',
+			'text' => $pullMessage,
+			'date' => $arFields['DATE_MODIFY'],
+		);
+		if ($message['MESSAGE_TYPE'] == IM_MESSAGE_PRIVATE)
+		{
+			$arFields['FROM_USER_ID'] = $arFields['AUTHOR_ID'];
+			foreach ($relations as $rel)
+			{
+				if ($rel['USER_ID'] != $arFields['AUTHOR_ID'])
+					$arFields['TO_USER_ID'] = $rel['USER_ID'];
+			}
+
+			$arPullMessage['fromUserId'] = $arFields['FROM_USER_ID'];
+			$arPullMessage['toUserId'] = $arFields['TO_USER_ID'];
+		}
+		else
+		{
+			$arPullMessage['chatId'] = $arFields['CHAT_ID'];
+			$arPullMessage['senderId'] = $arFields['AUTHOR_ID'];
+		}
+
+		foreach ($relations as $rel)
+		{
+			CPullStack::AddByUser($rel['USER_ID'], Array(
+				'module_id' => 'im',
+				'command' => 'messageUpdate',
+				'params' => $arPullMessage,
+			));
+			$obCache = new CPHPCache();
+			$obCache->CleanDir('/bx/imc/recent'.self::GetCachePath($rel['USER_ID']));
+		}
+
+		foreach(GetModuleEvents("im", "OnAfterMessagesUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(intval($id), $arFields));
+
+		return true;
+	}
+
+	public static function Delete($id)
+	{
+		$message = self::CheckPossibilityUpdateMessage($id);
+		if (!$message)
+			return false;
+
+		global $DB;
+
+		$date = FormatDate("FULL", $message['DATE_CREATE']+CTimeZone::GetOffset());
+
+		$strSql = "
+			UPDATE b_im_message
+			SET MESSAGE = '".GetMessage('IM_MESSAGE_DELETED')."', MESSAGE_OUT = '".GetMessage('IM_MESSAGE_DELETED_OUT', Array('#DATE#' => $date))."'
+			WHERE ID = ".$message['ID'];
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		CIMMessageParam::Set($message['ID'], Array('IS_DELETED' => 'Y'));
+
+		$arFields = $message;
+		$arFields['MESSAGE'] = GetMessage('IM_MESSAGE_DELETED_OUT', Array('#DATE#' => $date));
+		$arFields['DATE_MODIFY'] = time()+CTimeZone::GetOffset();
+
+		$relations = CIMMessenger::GetRelationById($message['ID']);
+		$arPullMessage = Array(
+			'id' => $arFields['ID'],
+			'type' => $arFields['MESSAGE_TYPE'] == IM_MESSAGE_PRIVATE? 'private': 'group',
+			'date' => $arFields['DATE_MODIFY'],
+			'text' => GetMessage('IM_MESSAGE_DELETED'),
+		);
+		if ($message['MESSAGE_TYPE'] == IM_MESSAGE_PRIVATE)
+		{
+			$arFields['FROM_USER_ID'] = $arFields['AUTHOR_ID'];
+			foreach ($relations as $rel)
+			{
+				if ($rel['USER_ID'] != $arFields['AUTHOR_ID'])
+					$arFields['TO_USER_ID'] = $rel['USER_ID'];
+			}
+
+			$arPullMessage['fromUserId'] = $arFields['FROM_USER_ID'];
+			$arPullMessage['toUserId'] = $arFields['TO_USER_ID'];
+		}
+		else
+		{
+			$arPullMessage['chatId'] = $arFields['CHAT_ID'];
+			$arPullMessage['senderId'] = $arFields['AUTHOR_ID'];
+		}
+
+		foreach ($relations as $rel)
+		{
+			CPullStack::AddByUser($rel['USER_ID'], Array(
+				'module_id' => 'im',
+				'command' => 'messageDelete',
+				'params' => $arPullMessage
+			));
+			$obCache = new CPHPCache();
+			$obCache->CleanDir('/bx/imc/recent'.self::GetCachePath($rel['USER_ID']));
+		}
+
+		foreach(GetModuleEvents("im", "OnAfterMessagesDelete", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array(intval($id), $arFields));
+
+		return true;
+	}
+
+	public static function Like($id)
+	{
+		global $USER;
+		if (!CModule::IncludeModule('pull'))
+			return false;
+
+		$message = self::GetById($id, Array('WITH_FILES' => 'Y'));
+		if (!$message)
+			return false;
+
+		$relations = CIMMessenger::GetRelationById($id);
+		if (!isset($relations[$USER->GetId()]))
+			return false;
+
+		$isLike = true;
+		if (isset($message['PARAMS']['LIKE']))
+		{
+			$like = $message['PARAMS']['LIKE'];
+			$selfLike = array_search($USER->GetId(), $like);
+			if ($selfLike !== false)
+			{
+				$isLike = false;
+				unset($like[$selfLike]);
+			}
+			else
+			{
+				$like[] = $USER->GetId();
+			}
+		}
+		else
+		{
+			$like = Array($USER->GetId());
+		}
+		sort($like);
+		CIMMessageParam::Set($id, Array('LIKE' => $like));
+
+		$result = IM\ChatTable::getList(Array(
+			'filter'=>Array(
+				'=ID' => $message['CHAT_ID']
+			)
+		));
+		$chat = $result->fetch();
+
+		if ($message['AUTHOR_ID'] > 0 && $message['AUTHOR_ID'] != $USER->GetId() && $isLike)
+		{
+			$CCTP = new CTextParser();
+			$CCTP->MaxStringLen = 200;
+			$CCTP->allow = array("HTML" => "N", "ANCHOR" => "N", "BIU" => "N", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => "N", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+
+			$message['MESSAGE'] = str_replace('<br />', ' ', $CCTP->convertText($message['MESSAGE']));
+
+			if (count($message['FILES']) > 0 && strlen($message['MESSAGE']) < 200)
+			{
+				foreach ($message['FILES'] as $file)
+				{
+					$file = " [".GetMessage('IM_MESSAGE_FILE').": ".$file['name']."]";
+					if (strlen($message['MESSAGE'].$file) > 200)
+						break;
+
+					$message['MESSAGE'] .= $file;
+				}
+				$message['MESSAGE'] = trim($message['MESSAGE']);
+			}
+
+			$arMessageFields = array(
+				"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+				"TO_USER_ID" => $message['AUTHOR_ID'],
+				"FROM_USER_ID" => $USER->GetId(),
+				"NOTIFY_TYPE" => IM_NOTIFY_FROM,
+				"NOTIFY_MODULE" => "main",
+				"NOTIFY_EVENT" => "rating_vote",
+				"NOTIFY_TAG" => "RATING|IMMESSAGE|".$id,
+				"NOTIFY_MESSAGE" => GetMessage($chat && strlen($chat['TITLE']) > 0? 'IM_MESSAGE_LIKE': 'IM_MESSAGE_LIKE_PRIVATE', Array(
+					'#MESSAGE#' => $message['MESSAGE'],
+					'#TITLE#' => $chat['TITLE']
+				))
+			);
+			CIMNotify::Add($arMessageFields);
+		}
+
+		$arPullMessage = Array(
+			'id' => $id,
+			'chatId' => $relations[$USER->GetId()]['CHAT_ID'],
+			'senderId' => $USER->GetId(),
+			'users' => $like
+		);
+
+		foreach ($relations as $rel)
+		{
+			CPullStack::AddByUser($rel['USER_ID'], Array(
+				'module_id' => 'im',
+				'command' => 'messageLike',
+				'params' => $arPullMessage
+			));
+		}
+
+		return $like;
+	}
+
 	private static function CheckFields($arFields)
 	{
 		$aMsg = array();
@@ -517,16 +871,16 @@ class CIMMessenger
 			if($arFields["MESSAGE_TYPE"] == IM_MESSAGE_GROUP && !isset($arFields['SYSTEM']) && (intval($arFields["TO_CHAT_ID"]) <= 0 && intval($arFields["FROM_USER_ID"]) <= 0))
 				$aMsg[] = array("id"=>"TO_CHAT_ID", "text"=> GetMessage("IM_ERROR_MESSAGE_TO_FROM"));
 
-			if($arFields["MESSAGE_TYPE"] == IM_MESSAGE_PRIVATE && !(intval($arFields["TO_USER_ID"]) > 0 && intval($arFields["FROM_USER_ID"]) > 0))
+			if($arFields["MESSAGE_TYPE"] == IM_MESSAGE_PRIVATE && !((intval($arFields["TO_USER_ID"]) > 0 || intval($arFields["TO_CHAT_ID"]) > 0) && intval($arFields["FROM_USER_ID"]) > 0))
 				$aMsg[] = array("id"=>"FROM_USER_ID", "text"=> GetMessage("IM_ERROR_MESSAGE_TO_FROM"));
 
 			if (is_set($arFields, "MESSAGE_DATE") && (!$GLOBALS['DB']->IsDate($arFields["MESSAGE_DATE"], false, LANG, "FULL")))
 				$aMsg[] = array("id"=>"MESSAGE_DATE", "text"=> GetMessage("IM_ERROR_MESSAGE_DATE"));
 
-			if(in_array($arFields["MESSAGE_TYPE"], Array(IM_MESSAGE_PRIVATE, IM_MESSAGE_SYSTEM)) && intval($arFields["TO_USER_ID"]) <= 0)
+			if(in_array($arFields["MESSAGE_TYPE"], Array(IM_MESSAGE_PRIVATE, IM_MESSAGE_SYSTEM)) && !(intval($arFields["TO_USER_ID"]) > 0 || intval($arFields["TO_CHAT_ID"]) > 0))
 				$aMsg[] = array("id"=>"TO_USER_ID", "text"=> GetMessage("IM_ERROR_MESSAGE_TO"));
 
-			if(!is_set($arFields, "MESSAGE") || strlen(trim($arFields["MESSAGE"])) <= 0)
+			if(is_set($arFields, "MESSAGE") && strlen(trim($arFields["MESSAGE"])) <= 0)
 				$aMsg[] = array("id"=>"MESSAGE", "text"=> GetMessage("IM_ERROR_MESSAGE_TEXT"));
 
 			if($arFields["MESSAGE_TYPE"] == IM_MESSAGE_PRIVATE && is_set($arFields, "AUTHOR_ID") && intval($arFields["AUTHOR_ID"]) <= 0)
@@ -569,18 +923,37 @@ class CIMMessenger
 		return true;
 	}
 
-	public static function GetById($ID)
+	public static function GetById($ID, $params = Array())
 	{
 		global $DB;
 
 		$ID = intval($ID);
 
-		$strSql = "SELECT DISTINCT M.*, R.MESSAGE_TYPE FROM b_im_message M LEFT JOIN b_im_relation R ON M.CHAT_ID = R.CHAT_ID WHERE M.ID = ".$ID;
+		$strSql = "
+			SELECT
+				DISTINCT M.*,
+				".$DB->DatetimeToTimestampFunction('M.DATE_CREATE')." DATE_CREATE,
+				R.MESSAGE_TYPE
+			FROM b_im_message M
+			LEFT JOIN b_im_relation R ON M.CHAT_ID = R.CHAT_ID
+			WHERE M.ID = ".$ID;
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
-			return $arRes;
+		{
+			$param = CIMMessageParam::Get($arRes['ID']);
+			$arRes['PARAMS'] = $param? $param: Array();
+		}
+		if ($arRes && $params['WITH_FILES'] == 'Y')
+		{
+			$arFiles = Array();
+			foreach ($arRes['PARAMS']['FILE_ID'] as $fileId)
+			{
+				$arFiles[$fileId] = $fileId;
+			}
+			$arRes['FILES'] = CIMDisk::GetFiles($arRes['CHAT_ID'], $arFiles);
+		}
 
-		return false;
+		return $arRes;
 	}
 
 	public static function GetRelationById($ID)
@@ -590,11 +963,10 @@ class CIMMessenger
 		$ID = intval($ID);
 		$arResult = Array();
 
-		$strSql = "SELECT R.*, (case when M.AUTHOR_ID = R.USER_ID then 'Y' else 'N' end) as IS_AUTHOR
-			FROM b_im_message M LEFT JOIN b_im_relation R ON M.CHAT_ID = R.CHAT_ID WHERE M.ID = ".$ID;
+		$strSql = "SELECT R.USER_ID FROM b_im_message M LEFT JOIN b_im_relation R ON M.CHAT_ID = R.CHAT_ID WHERE M.ID = ".$ID;
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
-			$arResult[] = $arRes;
+			$arResult[$arRes['USER_ID']] = $arRes;
 
 		return $arResult;
 	}
@@ -608,6 +980,11 @@ class CIMMessenger
 				return true;
 		}
 		return false;
+	}
+
+	public static function CheckNetworkStatus()
+	{
+		return COption::GetOptionString('bitrix24', 'network', 'N') == 'Y';
 	}
 
 	public static function CheckInstallDesktop()
@@ -650,7 +1027,7 @@ class CIMMessenger
 
 	public static function CheckPhoneStatus()
 	{
-		return IsModuleInstalled('voximplant') && (!IsModuleInstalled('extranet') || CModule::IncludeModule('extranet') && CExtranet::IsIntranetUser());
+		return IsModuleInstalled('voximplant') && IsModuleInstalled('pull') && CPullOptions::GetNginxStatus() && (!IsModuleInstalled('extranet') || CModule::IncludeModule('extranet') && CExtranet::IsIntranetUser());
 	}
 
 	public static function CheckDesktopStatusOnline()
@@ -738,6 +1115,26 @@ class CIMMessenger
 		return true;
 	}
 
+	public static function GetFormatFilesMessageOut($files)
+	{
+		if (!is_array($files) || count($files) <= 0)
+			return false;
+
+		$messageFiles = '';
+		$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".((defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0) ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", ""));
+		foreach ($files as $fileId => $fileData)
+		{
+			if ($fileData['status'] == 'done')
+			{
+				$fileElement = $fileData['name'].' ('.CFile::FormatSize($fileData['size']).")\n".
+								GetMessage('IM_MESSAGE_FILE_DOWN').' '.$serverName.$fileData['urlDownload']['default']."\n";
+				$messageFiles = strlen($messageFiles)>0? $messageFiles."\n".$fileElement: $fileElement;
+			}
+		}
+
+		return $messageFiles;
+	}
+
 	public static function GetSessionLifeTime()
 	{
 		global $USER;
@@ -765,7 +1162,8 @@ class CIMMessenger
 			SELECT M.ID, M.NOTIFY_TYPE, M.NOTIFY_TAG
 			FROM b_im_message M
 			INNER JOIN b_im_relation R1 ON M.ID > R1.LAST_ID AND M.CHAT_ID = R1.CHAT_ID AND R1.USER_ID != M.AUTHOR_ID
-			WHERE R1.USER_ID = ".$userId."  AND R1.STATUS < ".IM_STATUS_READ;
+			WHERE R1.USER_ID = ".$userId."  AND R1.STATUS < ".IM_STATUS_READ."
+		";
 
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -868,6 +1266,9 @@ class CIMMessenger
 			$updateStateInterval = CPullOptions::GetNginxStatus()? self::GetSessionLifeTime(): 80;
 			if ($updateStateInterval > 100)
 			{
+				if ($updateStateInterval > 3600)
+					$updateStateInterval = 3600;
+				
 				if ($arTemplate['DESKTOP'] == 'true')
 					$updateStateInterval = intval($updateStateInterval/2);
 				else
@@ -875,19 +1276,26 @@ class CIMMessenger
 			}
 		}
 
+		$diskStatus = CIMDisk::Enabled();
+
 		if ($arTemplate['INIT'] == 'Y')
 		{
-			$phoneAvailable = false;
+			$phoneAvailable = 0;
+			$phoneSipAvailable = 0;
 			$phoneEnabled = self::CheckPhoneStatus();
 			if ($phoneEnabled && CModule::IncludeModule('voximplant'))
 			{
 				$phoneBalance = COption::GetOptionString("voximplant", "account_balance", 0);
-				if (floatval($phoneBalance) > 0)
+				if (floatval($phoneBalance) >= 0)
 				{
-					$phoneAvailable = true;
+					$phoneAvailable = floatval($phoneBalance) > 0? 2: 1;
 				}
-				$phoneAvailable = false;
+				$phoneSipAvailable = CVoxImplantConfig::GetModeStatus(CVoxImplantConfig::MODE_SIP);
 			}
+
+			$pathToIm = isset($arTemplate['PATH_TO_IM'])? $arTemplate['PATH_TO_IM']: '';
+			$pathToCall = isset($arTemplate['PATH_TO_CALL'])? $arTemplate['PATH_TO_CALL']: '';
+			$pathToFile = isset($arTemplate['PATH_TO_FILE'])? $arTemplate['PATH_TO_FILE']: '';
 
 			$sJS = "
 				BX.ready(function() {
@@ -900,8 +1308,10 @@ class CIMMessenger
 						'ppServerStatus': ".$ppServerStatus.",
 						'updateStateInterval': '".$updateStateInterval."',
 						'xmppStatus': ".(CIMMessenger::CheckXmppStatusOnline()? 'true': 'false').",
+						'bitrixNetworkStatus': ".(CIMMessenger::CheckNetworkStatus()? 'true': 'false').",
 						'bitrix24Status': ".(IsModuleInstalled('bitrix24')? 'true': 'false').",
 						'bitrix24Admin': ".(CModule::IncludeModule('bitrix24') && CBitrix24::IsPortalAdmin($USER->GetId())? 'true': 'false').",
+						'bitrix24net': ".(IsModuleInstalled('b24network')? 'true': 'false').",
 						'bitrixIntranet': ".(IsModuleInstalled('intranet')? 'true': 'false').",
 						'bitrixXmpp': ".(IsModuleInstalled('xmpp')? 'true': 'false').",
 						'desktop': ".$arTemplate["DESKTOP"].",
@@ -929,7 +1339,9 @@ class CIMMessenger
 						'woUserInGroup': ".(empty($arTemplate['CONTACT_LIST']['woUserInGroup'])? '{}': CUtil::PhpToJSObject($arTemplate['CONTACT_LIST']['woUserInGroup'])).",
 						'chat': ".(empty($arTemplate['CHAT']['chat'])? '{}': CUtil::PhpToJSObject($arTemplate['CHAT']['chat'])).",
 						'userInChat': ".(empty($arTemplate['CHAT']['userInChat'])? '{}': CUtil::PhpToJSObject($arTemplate['CHAT']['userInChat'])).",
+						'userChatBlockStatus': ".(empty($arTemplate['CHAT']['userChatBlockStatus'])? '{}': CUtil::PhpToJSObject($arTemplate['CHAT']['userChatBlockStatus'])).",
 						'message' : ".(empty($arTemplate['MESSAGE']['message'])? '{}': CUtil::PhpToJSObject($arTemplate['MESSAGE']['message'])).",
+						'files' : ".(empty($arTemplate['MESSAGE']['files'])? '{}': CUtil::PhpToJSObject($arTemplate['MESSAGE']['files'])).",
 						'showMessage' : ".(empty($arTemplate['MESSAGE']['usersMessage'])? '{}': CUtil::PhpToJSObject($arTemplate['MESSAGE']['usersMessage'])).",
 						'unreadMessage' : ".(empty($arTemplate['MESSAGE']['unreadMessage'])? '{}': CUtil::PhpToJSObject($arTemplate['MESSAGE']['unreadMessage'])).",
 						'flashMessage' : ".(empty($arTemplate['MESSAGE']['flashMessage'])? '{}': CUtil::PhpToJSObject($arTemplate['MESSAGE']['flashMessage'])).",
@@ -941,8 +1353,9 @@ class CIMMessenger
 						'currentTab' : '".CUtil::JSEscape($arTemplate['CURRENT_TAB'])."',
 						'userId': ".$USER->GetID().",
 						'userEmail': '".CUtil::JSEscape($USER->GetEmail())."',
-						'webrtc': {'turnServer' : '".CUtil::JSEscape($arTemplate['TURN_SERVER'])."', 'turnServerFirefox' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_FIREFOX'])."', 'turnServerLogin' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_LOGIN'])."', 'turnServerPassword' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_PASSWORD'])."', 'phoneEnabled': ".($phoneEnabled? 'true': 'false').", 'phoneAvailable': ".($phoneAvailable? 'true': 'false')."},
-						'path' : {'profile' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE'])."', 'profileTemplate' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE_TEMPLATE'])."', 'mail' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_MAIL'])."'}
+						'webrtc': {'turnServer' : '".CUtil::JSEscape($arTemplate['TURN_SERVER'])."', 'turnServerFirefox' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_FIREFOX'])."', 'turnServerLogin' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_LOGIN'])."', 'turnServerPassword' : '".CUtil::JSEscape($arTemplate['TURN_SERVER_PASSWORD'])."', 'phoneEnabled': ".($phoneEnabled? 'true': 'false').", 'phoneAvailable': ".$phoneAvailable.", 'phoneSipAvailable': ".($phoneSipAvailable? 'true': 'false')."},
+						'disk': {'enable' : ".($diskStatus? 'true': 'false')."},
+						'path' : {'profile' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE'])."', 'profileTemplate' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_PROFILE_TEMPLATE'])."', 'mail' : '".CUtil::JSEscape($arTemplate['PATH_TO_USER_MAIL'])."', 'im': '".CUtil::JSEscape($pathToIm)."', 'call': '".CUtil::JSEscape($pathToCall)."', 'file': '".CUtil::JSEscape($pathToFile)."'}
 					});
 				});
 			";
@@ -971,6 +1384,7 @@ class CIMMessenger
 						'openHistory' : ".(isset($_GET['IM_HISTORY'])? "'".CUtil::JSEscape(htmlspecialcharsbx($_GET['IM_HISTORY']))."'": 'false').",
 						'openSettings' : ".(isset($_GET['IM_SETTINGS']) && $_GET['IM_SETTINGS'] == 'Y'? "'true'": 'false').",
 
+						'disk': {'enable' : '".($diskStatus? 'true': 'false')."'},
 						'path' : {'profile' : '".$arTemplate['PATH_TO_USER_PROFILE']."', 'profileTemplate' : '".$arTemplate['PATH_TO_USER_PROFILE_TEMPLATE']."', 'mail' : '".$arTemplate['PATH_TO_USER_MAIL']."'}
 					});
 				});
@@ -1094,6 +1508,32 @@ class CIMMessenger
 
 		$CPushManager = new CPushManager();
 		$CPushManager->SendMessage($arPush, defined('PULL_PUSH_SANDBOX')? true: false);
+	}
+
+	public static function GetSpeedCounters()
+	{
+		$CIMNotify = new CIMNotify();
+		$arNotify = $CIMNotify->GetUnreadNotify(Array('USE_TIME_ZONE' => 'N'));
+		$arResult['NOTIFY']  = count($arNotify['notify']);
+
+		$CIMMessage = new CIMMessage();
+		$arMessage = $CIMMessage->GetUnreadMessage(Array(
+			'LOAD_DEPARTMENT' => 'N',
+			'FILE_LOAD' => 'N',
+			'ORDER' => 'ASC',
+		));
+		$arResult['MESSAGE'] = count($arMessage['message']);
+
+		$CIMChat = new CIMChat();
+		$arMessage = $CIMChat->GetUnreadMessage(Array(
+			'LOAD_DEPARTMENT' => 'N',
+			'ORDER' => 'ASC',
+			'FILE_LOAD' => 'N',
+			'USER_LOAD' => 'N',
+		));
+		$arResult['MESSAGE'] += count($arMessage['message']);
+
+		return $arResult;
 	}
 
 	public static function InitCounters($userId, $check = true)

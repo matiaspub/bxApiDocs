@@ -296,21 +296,11 @@ class CAllSaleRecurring
 				);
 		}
 
-		if (!$arProduct || !is_array($arProduct) || count($arProduct) <= 0)
+		if (!$arProduct || !is_array($arProduct) || empty($arProduct))
 		{
 			CSaleRecurring::CancelRecurring($arRecur["ID"], "Y", "Product is not found");
 
-			/*
-			$arFields = array(
-					"CANCELED" => "Y",
-					"DATE_CANCELED" => Date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL", LANG))),
-					"CANCELED_REASON" => "Product is not found"
-				);
-			CSaleRecurring::Update($arRecur["ID"], $arFields);
-			*/
-			//CSaleRecurring::Delete($arRecur["ID"]);
-
-			return True;
+			return true;
 		}
 
 		if ($arProduct["WITHOUT_ORDER"] == "Y" || $arRecur["SUCCESS_PAYMENT"] == "Y")

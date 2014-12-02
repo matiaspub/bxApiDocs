@@ -29,11 +29,7 @@ class CAllSaleStatus
 		}
 		else
 		{
-			$strSql =
-				"SELECT * ".
-				"FROM b_sale_status_lang ".
-				"WHERE STATUS_ID = '".$ID."' ".
-				"	AND LID = '".$strLang."' ";
+			$strSql = "SELECT * FROM b_sale_status_lang WHERE STATUS_ID = '".$ID."' AND LID = '".$strLang."'";
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			if ($res = $db_res->Fetch())
@@ -47,7 +43,7 @@ class CAllSaleStatus
 
 	public static function CheckFields($ACTION, &$arFields, $ID = "")
 	{
-		global $DB;
+		global $DB, $APPLICATION;
 
 		if ((is_set($arFields, "SORT") || $ACTION=="ADD") && IntVal($arFields["SORT"])<= 0) $arFields["SORT"] = 100;
 		if ((is_set($arFields, "ID") || $ACTION=="ADD") && strlen($arFields["ID"])<=0) return false;
@@ -56,20 +52,26 @@ class CAllSaleStatus
 
 		if((is_set($arFields, "ID") && !preg_match("#[A-Za-z]#i", $arFields["ID"])) || (strlen($ID)>0 && !preg_match("#[A-Za-z]#i", $ID)))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SKGS_ID_NOT_SYMBOL"), "ERROR_ID_NOT_SYMBOL");
+			$APPLICATION->ThrowException(GetMessage("SKGS_ID_NOT_SYMBOL"), "ID");
 			return false;
 		}
 
 		if ($ACTION=="ADD")
 		{
 			$arFields["ID"] = $DB->ForSql($arFields["ID"], 1);
-			$db_res = $DB->Query("SELECT ID FROM b_sale_status WHERE ID = '".$arFields["ID"]."' ");
-			if ($db_res->Fetch()) return false;
+			$db_res = $DB->Query("SELECT ID FROM b_sale_status WHERE ID = '".$arFields["ID"]."'");
+			if ($db_res->Fetch())
+			{
+				$APPLICATION->ThrowException(GetMessage("SKGS_SALE_STATUS_ALREADY_EXISTS"), "ID");
+				return false;
+			}
 		}
 
 		if (is_set($arFields, "LANG"))
 		{
-			$db_lang = CLangAdmin::GetList(($b="sort"), ($o="asc"), array("ACTIVE" => "Y"));
+			$b = 'sort';
+			$o = 'asc';
+			$db_lang = CLangAdmin::GetList($b, $o, array("ACTIVE" => "Y"));
 			while ($arLang = $db_lang->Fetch())
 			{
 				$bFound = false;
@@ -231,7 +233,9 @@ class CAllSaleStatus
 
 		$eventType->Delete("SALE_STATUS_CHANGED_".$ID);
 
-		$dbSiteList = CSite::GetList(($b = ""), ($o = ""));
+		$b = 'sort';
+		$o = 'asc';
+		$dbSiteList = CSite::GetList($b, $o);
 		while ($arSiteList = $dbSiteList->Fetch())
 		{
 			IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/status.php", $arSiteList["LANGUAGE_ID"]);

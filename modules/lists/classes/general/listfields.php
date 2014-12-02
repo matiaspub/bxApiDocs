@@ -5,6 +5,7 @@ class CListFieldList
 {
 	protected $iblock_id = 0;
 	protected $form_id = "";
+	/** @var array[string]CListField  */
 	protected $fields = array();
 
 	public function __construct($iblock_id)
@@ -28,6 +29,10 @@ class CListFieldList
 		}
 	}
 
+	/**
+	 * @param $field_id string
+	 * @return CListField|null
+	 */
 	public function GetByID($field_id)
 	{
 		if(isset($this->fields[$field_id]))
@@ -44,9 +49,15 @@ class CListFieldList
 	public function GetArrayByID($field_id)
 	{
 		if(isset($this->fields[$field_id]))
-			$result = $this->fields[$field_id]->GetArray();
+		{
+			/** @var CListField $obField */
+			$obField = $this->fields[$field_id];
+			$result = $obField->GetArray();
+		}
 		else
+		{
 			$result = array();
+		}
 
 		$result["IBLOCK_ID"] = $this->iblock_id;
 
@@ -57,11 +68,14 @@ class CListFieldList
 	{
 		if($field_id != "NAME" && isset($this->fields[$field_id]))
 		{
-			$this->fields[$field_id]->Delete();
+			/** @var CListField $obField */
+			$obField = $this->fields[$field_id];
+			$obField->Delete();
 			unset($this->fields[$field_id]);
 
 			$this->_save_form_settings($this->form_id);
 		}
+		return true;
 	}
 
 	public function AddField($arFields)
@@ -103,6 +117,7 @@ class CListFieldList
 
 		if(isset($this->fields[$field_id]))
 		{
+			/** @var CListField $obField */
 			$obField = $this->fields[$field_id];
 
 			if(isset($arFields["TYPE"]) && ($arFields["TYPE"] != $obField->GetTypeID()))
@@ -162,6 +177,7 @@ class CListFieldList
 			$arFormLayout[] = "edit1--#--".CIBlock::GetArrayByID($this->iblock_id, "ELEMENT_NAME");
 			foreach($this->fields as $field_id => $sort)
 			{
+				/** @var CListField $obField */
 				$obField = $this->fields[$field_id];
 				$arFormLayout[] =
 						$obField->GetID()
@@ -185,7 +201,7 @@ class CListFieldList
 	protected function _read_form_settings($form_id)
 	{
 		if(!$form_id)
-			return;
+			return null;
 
 		global $DB;
 
@@ -221,12 +237,12 @@ class CListFieldList
 							$customName = ltrim($customName, "* -\xa0");
 
 							if(CListFieldTypeList::IsField($FIELD_ID))
-								$fields[$FIELD_ID] = new CListElementField($this->iblock_id, $FIELD_ID, $customName, $sort);
+								$obField = $fields[$FIELD_ID] = new CListElementField($this->iblock_id, $FIELD_ID, $customName, $sort);
 							else
-								$fields[$FIELD_ID] = new CListPropertyField($this->iblock_id, $FIELD_ID, $customName, $sort);
+								$obField = $fields[$FIELD_ID] = new CListPropertyField($this->iblock_id, $FIELD_ID, $customName, $sort);
 
 							//check if property was deleted from admin interface
-							if(!is_array($fields[$FIELD_ID]->GetArray()))
+							if(!is_array($obField->GetArray()))
 							{
 								unset($fields[$FIELD_ID]);
 							}
@@ -254,11 +270,11 @@ class CListFieldList
 			foreach($dbFields as $FIELD_ID => $arField)
 			{
 				if(CListFieldTypeList::IsField($FIELD_ID))
-					$fields[$FIELD_ID] = new CListElementField($this->iblock_id, $FIELD_ID, $arField["NAME"], $arField["SORT"]);
+					$obField = $fields[$FIELD_ID] = new CListElementField($this->iblock_id, $FIELD_ID, $arField["NAME"], $arField["SORT"]);
 				else
-					$fields[$FIELD_ID] = new CListPropertyField($this->iblock_id, $FIELD_ID, $arField["NAME"], $arField["SORT"]);
+					$obField = $fields[$FIELD_ID] = new CListPropertyField($this->iblock_id, $FIELD_ID, $arField["NAME"], $arField["SORT"]);
 				//check if property was deleted from admin interface
-				if(!is_array($fields[$FIELD_ID]->GetArray()))
+				if(!is_array($obField->GetArray()))
 				{
 					unset($fields[$FIELD_ID]);
 					$DB->Query("
@@ -273,6 +289,11 @@ class CListFieldList
 		return $fields;
 	}
 
+	/**
+	 * @param $a CListField
+	 * @param $b CListField
+	 * @return int
+	 */
 	public static function Order($a, $b)
 	{
 		$a_sort = $a->GetSort();
@@ -302,6 +323,7 @@ class CListFieldList
 		$sort = 10;
 		foreach($this->fields as $field_id => $obField)
 		{
+			/** @var CListField $obField */
 			$obField->SetSort($sort);
 			$sort += 10;
 		}

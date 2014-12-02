@@ -108,11 +108,10 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* <td>Код заказа.</td> </tr> <tr> <td>TAX_NAME</td> <td>Название налога.</td> </tr> <tr>
 	* <td>VALUE</td> <td>Ставка налога.</td> </tr> <tr> <td>VALUE_MONEY</td> <td>Сумма налога.</td>
 	* </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr> <td>CODE</td>
-	* <td>Мнемонический код налога.</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N)
-	* включен ли налог в цену товара.</td> </tr> <tr> <td>IS_PERCENT</td> <td>Y</td> </tr> </table>
-	* <p>Если в качестве параметра arGroupBy передается пустой массив, то
-	* функция вернет число записей, удовлетворяющих фильтру.</p> <a
-	* name="examples"></a>
+	* <td>Символьный код налога.</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) включен
+	* ли налог в цену товара.</td> </tr> <tr> <td>IS_PERCENT</td> <td>Y</td> </tr> </table> <p>Если в
+	* качестве параметра arGroupBy передается пустой массив, то функция
+	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
 	*
 	*
 	* <h4>Example</h4> 
@@ -127,7 +126,7 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* while ($ar_tax_list = $db_tax_list-&gt;Fetch())
 	* {
 	*    $arTaxList[$i] = $ar_tax_list;
-	*    // определяем, какой из налогов - НДС, предполагая, что его мнемонический код - NDS
+	*    // определяем, какой из налогов - НДС, предполагая, что его символьный код - NDS
 	*    if ($arTaxList[$i]["CODE"] == "NDS")
 	*       $iNds = $i;
 	* 
@@ -252,9 +251,8 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* (обязательный);</li> <li> <b>TAX_NAME</b> - название налога;</li> <li> <b>VALUE</b> -
 	* величина налога (в процентах);</li> <li> <b>VALUE_MONEY</b> - общая сумма этого
 	* налога;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>CODE</b> -
-	* мнемонический код налога;</li> <li> <b>IS_PERCENT</b> - должно быть значение
-	* "Y";</li> <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли налог уже в цену товара.</li>
-	* </ul>
+	* символьный код налога;</li> <li> <b>IS_PERCENT</b> - должно быть значение "Y";</li>
+	* <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли налог уже в цену товара.</li> </ul>
 	*
 	*
 	*

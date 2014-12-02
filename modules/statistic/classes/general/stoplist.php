@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStopList</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листом</a>.
+ * <b>CStopList</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листом</a>.</body> </html>
  *
  *
  *

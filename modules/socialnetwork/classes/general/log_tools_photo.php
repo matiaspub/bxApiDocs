@@ -8,24 +8,56 @@ class CSocNetLogToolsPhoto
 		static $arSiteWorkgroupsPage;
 
 		if (!CModule::IncludeModule("iblock"))
+		{
 			return;
+		}
 
 		if (
 			!array_key_exists("IS_SOCNET", $arComponentParams)
 			|| $arComponentParams["IS_SOCNET"] != "Y"
 		)
+		{
 			return;
+		}
 
+		$bPassword = false;
 		$arComponentResult["SECTION"]["PATH"] = array();
-		$rsPath = CIBlockSection::GetNavChain(intval($arComponentParams["IBLOCK_ID"]), intval($arFields["IBLOCK_SECTION"]));
-		while($arPath = $rsPath->Fetch())
-			$arComponentResult["SECTION"]["PATH"][] = $arPath;
+		
+		$rsSectionAlbum = CIBlockSection::GetList(
+			array(), 
+			array(
+				"ID" => intval($arFields["IBLOCK_SECTION"])
+			),
+			false, 
+			array("ID", "LEFT_MARGIN", "RIGHT_MARGIN", "DEPTH_LEVEL")
+		);
+
+		if ($arSectionAlbum = $rsSectionAlbum->Fetch())
+		{
+			$dbSection = CIBlockSection::GetList(
+				array("LEFT_MARGIN" => "ASC"),
+				array(
+					"IBLOCK_ID" => intval($arComponentParams["IBLOCK_ID"]),
+					"<=LEFT_BORDER" => intval($arSectionAlbum["LEFT_MARGIN"]),
+					">=RIGHT_BORDER" => intval($arSectionAlbum["RIGHT_MARGIN"]),
+					"<=DEPTH_LEVEL" => intval($arSectionAlbum["DEPTH_LEVEL"]),
+				),
+				false, 
+				array("ID", "IBLOCK_ID", "NAME", "CREATED_BY", "DEPTH_LEVEL", "LEFT_MARGIN", "RIGHT_MARGIN", "UF_PASSWORD")
+			);
+
+			while ($arPath = $dbSection->Fetch())
+			{
+				$arComponentResult["SECTION"]["PATH"][] = $arPath;
+			}
+		}
 
 		foreach($arComponentResult["SECTION"]["PATH"] as $arPathSection)
 		{
-			if (strlen(trim($arPathSection["PASSWORD"])) > 0)
+			if (strlen(trim($arPathSection["UF_PASSWORD"])) > 0)
 			{
-				return;
+				$bPassword = true;
+				break;
 			}
 		}
 
@@ -134,7 +166,11 @@ class CSocNetLogToolsPhoto
 			);
 
 			CSocNetLog::Update($res["ID"], $arSonetFields);
-			CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
+			if (!$bPassword)
+			{
+				CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
+			}			
+
 			$logID = $res["ID"];
 		}
 		else
@@ -189,7 +225,17 @@ class CSocNetLogToolsPhoto
 					"RATING_TYPE_ID" => "IBLOCK_SECTION",
 					"RATING_ENTITY_ID" => $arFields["IBLOCK_SECTION"]
 				));
-				CSocNetLogRights::SetForSonet($logID, $entity_type, $entity_id, "photo", "view", true);
+
+				if ($bPassword)
+				{
+					CSocNetLogRights::DeleteByLogID($logID);
+					CSocNetLogRights::Add($logID, array("U".$GLOBALS["USER"]->GetID(), "SA"));
+				}
+				else
+				{
+					CSocNetLogRights::SetForSonet($logID, $entity_type, $entity_id, "photo", "view", true);
+				}			
+
 				CSocNetLog::CounterIncrement($logID);
 			}
 		}
@@ -288,17 +334,27 @@ class CSocNetLogToolsPhoto
 		while ($db_res && $res = $db_res->Fetch())
 		{
 			if (strlen($res["PARAMS"]) > 0)
+			{
 				$arResParams = unserialize($res["PARAMS"]);
+			}
 			else
+			{
 				continue;
+			}
 
 			if (is_array($arResParams) && in_array($arFields["ID"], $arResParams["arItems"]))
+			{
 				$arResParams["arItems"] = array_diff($arResParams["arItems"], array($arFields["ID"]));
+			}
 			else
+			{
 				continue;
+			}
 
 			if (count($arResParams["arItems"]) <= 0)
+			{
 				CSocNetLog::Delete($res["ID"]);
+			}
 			else
 			{
 				$arResParams["COUNT"]--;
@@ -308,7 +364,7 @@ class CSocNetLogToolsPhoto
 				);
 
 				CSocNetLog::Update($res["ID"], $arSonetFields);
-				CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
+//				CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
 			}
 		}
 
@@ -369,7 +425,9 @@ class CSocNetLogToolsPhoto
 				$arSectionID[] = $arSection["ID"];
 		}
 		else
+		{
 			return;
+		}
 	}
 
 	public static function OnAfterSectionDrop($ID, $arFields, $arComponentParams, $arComponentResult)
@@ -516,7 +574,7 @@ class CSocNetLogToolsPhoto
 					"<=RIGHT_MARGIN" => $arComponentResult["SECTION"]["RIGHT_MARGIN"],
 				),
 				false,
-				array("ID")
+				array("ID", "CREATED_BY")
 			);
 
 			while ($arSection = $dbSection->Fetch())
@@ -531,7 +589,38 @@ class CSocNetLogToolsPhoto
 					)
 				);
 				while ($db_res && $res = $db_res->Fetch())
-					CSocNetLog::Delete($res["ID"]);
+				{
+					CSocNetLogRights::DeleteByLogID($res["ID"]);
+					CSocNetLogRights::Add($res["ID"], array("U".$arSection["CREATED_BY"], "SA"));
+				}
+			}
+			
+			$dbElement = CIBlockElement::GetList(
+				array(),
+				array(
+					"IBLOCK_ID" => $arFields["IBLOCK_ID"],
+					"SECTION_ID" => $arComponentResult["SECTION"]["ID"],
+					"INCLUDE_SUBSECTIONS" => "Y"
+				),
+				false,
+				false,
+				array("ID", "CREATED_BY")
+			);
+
+			while ($arElement = $dbElement->Fetch())
+			{
+				$db_res = CSocNetLog::GetList(
+					array(),
+					array(
+						"EVENT_ID"	=> "photo_photo",
+						"SOURCE_ID" => $arElement["ID"]
+					)
+				);
+				while ($db_res && $res = $db_res->Fetch())
+				{
+					CSocNetLogRights::DeleteByLogID($res["ID"]);
+					CSocNetLogRights::Add($res["ID"], array("U".$arElement["CREATED_BY"], "SA"));
+				}
 			}
 		}
 		elseif (
@@ -540,9 +629,68 @@ class CSocNetLogToolsPhoto
 		)
 		{
 			// show photos
+
+			$dbSection = CIBlockSection::GetList(
+				array("BS.LEFT_MARGIN"=>"ASC"),
+				array(
+					"IBLOCK_ID" => $arFields["IBLOCK_ID"],
+					">=LEFT_MARGIN" => $arComponentResult["SECTION"]["LEFT_MARGIN"],
+					"<=RIGHT_MARGIN" => $arComponentResult["SECTION"]["RIGHT_MARGIN"],
+				),
+				false,
+				array("ID", "CREATED_BY")
+			);
+
+			while ($arSection = $dbSection->Fetch())
+			{
+				$db_res = CSocNetLog::GetList(
+					array(),
+					array(
+						"ENTITY_TYPE" => $entity_type,
+						"ENTITY_ID" => $entity_id,
+						"EVENT_ID"	=> "photo",
+						"SOURCE_ID" => $arSection["ID"]
+					)
+				);
+				while ($db_res && $res = $db_res->Fetch())
+				{
+					CSocNetLogRights::DeleteByLogID($res["ID"]);
+					CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
+				}
+			}
+			
+			$dbElement = CIBlockElement::GetList(
+				array(),
+				array(
+					"IBLOCK_ID" => $arFields["IBLOCK_ID"],
+					"SECTION_ID" => $arComponentResult["SECTION"]["ID"],
+					"INCLUDE_SUBSECTIONS" => "Y"
+				),
+				false,
+				false,
+				array("ID", "CREATED_BY")
+			);
+
+			while ($arElement = $dbElement->Fetch())
+			{
+				$db_res = CSocNetLog::GetList(
+					array(),
+					array(
+						"EVENT_ID"	=> "photo_photo",
+						"SOURCE_ID" => $arElement["ID"]
+					)
+				);
+				while ($db_res && $res = $db_res->Fetch())
+				{
+					CSocNetLogRights::DeleteByLogID($res["ID"]);
+					CSocNetLogRights::SetForSonet($res["ID"], $entity_type, $entity_id, "photo", "view");
+				}
+			}
 		}
 		else
+		{
 			return;
+		}
 	}
 }
 
@@ -627,19 +775,17 @@ class CSocNetPhotoCommentEvent
 			"NOTES" => ""
 		);
 	}
-
-	public static function AddComment_Photo($arFields)
+	
+	public static function FindLogType($logID)
 	{
 		$dbResult = CSocNetLog::GetList(
 			array(),
-			array("ID" => $arFields["LOG_ID"]),
+			array("ID" => $logID),
 			false,
 			false,
 			array("ID", "SOURCE_ID", "USER_ID", "TITLE", "URL", "PARAMS")
 		);
 
-		$bFoundForum = false;
-		$bFoundBlog = false;
 		if ($arLog = $dbResult->Fetch())
 		{
 			if (strlen($arLog["PARAMS"]) > 0)
@@ -654,46 +800,80 @@ class CSocNetPhotoCommentEvent
 						array_key_exists("SECTION_NAME", $arTmp)
 						&& strlen($arTmp["SECTION_NAME"]) > 0
 					)
+					{
 						$log_section_name = $arTmp["SECTION_NAME"];
+					}
 
 					if (
 						array_key_exists("SECTION_URL", $arTmp)
 						&& strlen($arTmp["SECTION_URL"]) > 0
 					)
+					{
 						$log_section_url = $arTmp["SECTION_URL"];
+					}
 				}
 			}
-			if ($FORUM_ID > 0 && intval($arLog["SOURCE_ID"]) > 0)
+
+			if (
+				$FORUM_ID > 0 
+				&& intval($arLog["SOURCE_ID"]) > 0
+			)
+			{
 				$bFoundForum = true;
-			elseif ($BLOG_ID > 0 && intval($arLog["SOURCE_ID"]) > 0)
+			}
+			elseif (
+				$BLOG_ID > 0 
+				&& intval($arLog["SOURCE_ID"]) > 0
+			)
+			{
 				$bFoundBlog = true;
+			}
 		}
 
-		if ($bFoundForum)
-			$arReturn = CSocNetPhotoCommentEvent::AddComment_Photo_Forum($arFields, $FORUM_ID, $arLog);
-		elseif ($bFoundBlog)
-			$arReturn = CSocNetPhotoCommentEvent::AddComment_Photo_Blog($arFields, $BLOG_ID, $arLog);
+		return array(
+			"TYPE" => ($bFoundForum ? "FORUM" : ($bFoundBlog ? "BLOG" : false)),
+			"ENTITY_ID" => ($bFoundForum ? $FORUM_ID : ($bFoundBlog ? $BLOG_ID : false)),
+			"SECTION_NAME" => $log_section_name,
+			"SECTION_URL" => $log_section_url,
+			"LOG" => $arLog
+		);
+	}
+
+	public static function AddComment_Photo($arFields)
+	{
+		$arLogType = self::FindLogType($arFields["LOG_ID"]);
+
+		if ($arLogType["TYPE"] == "FORUM")
+		{
+			$arReturn = CSocNetPhotoCommentEvent::AddComment_Photo_Forum($arFields, $arLogType["ENTITY_ID"], $arLogType["LOG"]);
+		}
+		elseif ($arLogType["TYPE"] == "BLOG")
+		{
+			$arReturn = CSocNetPhotoCommentEvent::AddComment_Photo_Blog($arFields, $arLogType["ENTITY_ID"], $arLogType["LOG"]);
+		}
 		else
+		{
 			$arReturn =  array(
 				"SOURCE_ID" => false,
-				"ERROR" => GetMessage("SONET_ADD_COMMENT_SOURCE_ERROR"),
+				"ERROR" => GetMessage("SONET_PHOTO_ADD_COMMENT_SOURCE_ERROR"),
 				"NOTES" => ""
 			);
-			
+		}
+
 		if (
-			($bFoundForum || $bFoundBlog)
+			$arLogType["TYPE"]
 			&& !empty($arReturn["IM_MESSAGE"])
 		)
 		{
 			$arFieldsIM = Array(
 				"TYPE" => "COMMENT",
-				"TITLE" => $arLog["TITLE"],
+				"TITLE" => $arLogType["LOG"]["TITLE"],
 				"MESSAGE" => $arReturn["IM_MESSAGE"],
-				"URL" => $arLog["URL"],
+				"URL" => $arLogType["LOG"]["URL"],
 				"SECTION_NAME" => $log_section_name,
 				"SECTION_URL" => $log_section_url,
-				"ID" => $arLog["SOURCE_ID"],
-				"PHOTO_AUTHOR_ID" => $arLog["USER_ID"],
+				"ID" => $arLogType["LOG"]["SOURCE_ID"],
+				"PHOTO_AUTHOR_ID" => $arLogType["LOG"]["USER_ID"],
 				"COMMENT_AUTHOR_ID" => $GLOBALS["USER"]->GetID(),
 			);
 			CSocNetPhotoCommentEvent::NotifyIm($arFieldsIM);
@@ -884,6 +1064,53 @@ class CSocNetPhotoCommentEvent
 			"IM_MESSAGE" => ($arFieldsComment ? $arFieldsComment["POST_TEXT"] : false)
 		);
 	}
+	
+	public static function UpdateComment_Photo($arFields)
+	{
+		$arLogType = self::FindLogType($arFields["LOG_ID"]);
+
+		if ($arLogType["TYPE"] == "FORUM")
+		{
+			$arReturn = CSocNetLogTools::UpdateComment_Forum($arFields);
+		}
+		elseif ($arLogType["TYPE"] == "BLOG")
+		{
+//			$arReturn = CSocNetPhotoCommentEvent::UpdateComment_Photo_Blog($arFields, $arLogType["ENTITY_ID"], $arLogType["LOG"]);
+		}
+		else
+		{
+			$arReturn =  array(
+				"SOURCE_ID" => false,
+				"ERROR" => GetMessage("SONET_PHOTO_UPDATE_COMMENT_SOURCE_ERROR"),
+				"NOTES" => ""
+			);
+		}
+
+		return $arReturn;
+	}
+
+	public static function DeleteComment_Photo($arFields)
+	{
+		$arLogType = self::FindLogType($arFields["LOG_ID"]);
+
+		if ($arLogType["TYPE"] == "FORUM")
+		{
+			$arReturn = CSocNetLogTools::DeleteComment_Forum($arFields);
+		}
+		elseif ($arLogType["TYPE"] == "BLOG")
+		{
+//			$arReturn = CSocNetPhotoCommentEvent::DeleteComment_Photo_Blog($arFields, $arLogType["ENTITY_ID"], $arLogType["LOG"]);
+		}
+		else
+		{
+			$arReturn =  array(
+				"ERROR" => GetMessage("SONET_PHOTO_DELETE_COMMENT_SOURCE_ERROR"),
+				"NOTES" => ""
+			);
+		}
+
+		return $arReturn;
+	}
 
 	public function SetVars($arParams, $arResult)
 	{
@@ -1041,16 +1268,36 @@ class CSocNetPhotoCommentEvent
 						$arLogParams["SECTION_NAME"] = $arSection["NAME"];
 						$arLogParams["SECTION_URL"] = str_replace("#SECTION_ID#", $arSection["ID"], $this->arPath["SECTION_URL"]);
 
+						$arSectionPath = array();
+						$bPassword = false;
+
+						$dbSection = CIBlockSection::GetList(
+							array("LEFT_MARGIN" => "ASC"),
+							array(
+								"IBLOCK_ID" => intval($arLogParams["IBLOCK_ID"]),
+								"<=LEFT_BORDER" => intval($arSection["LEFT_MARGIN"]),
+								">=RIGHT_BORDER" => intval($arSection["RIGHT_MARGIN"]),
+								"<=DEPTH_LEVEL" => intval($arSection["DEPTH_LEVEL"]),
+							),
+							false, 
+							array("ID", "IBLOCK_ID", "NAME", "CODE", "CREATED_BY", "DEPTH_LEVEL", "LEFT_MARGIN", "RIGHT_MARGIN", "UF_PASSWORD")
+						);
+
+						while ($arPath = $dbSection->Fetch())
+						{
+							$arSectionPath[] = $arPath;
+							if (strlen(trim($arPath["UF_PASSWORD"])) > 0)
+							{
+								$bPassword = true;
+								break;
+							}
+						}
+
 						if (!$alias)
 						{
-							$arSectionPath = array();
-							$rsPath = CIBlockSection::GetNavChain($arLogParams["IBLOCK_ID"], intval($arLogParams["SECTION_ID"]));
-							if($arPath = $rsPath->Fetch())
-							{
-								$entity_type = SONET_ENTITY_USER;
-								$entity_id = $arPath["CREATED_BY"];
-								$alias = $arPath["CODE"];
-							}
+							$entity_type = SONET_ENTITY_USER;
+							$entity_id = $arSectionPath[0]["CREATED_BY"];
+							$alias = $arSectionPath[0]["CODE"];
 						}
 
 						if (!$arSiteWorkgroupsPage && IsModuleInstalled("extranet") && $entity_type == SONET_ENTITY_GROUP)
@@ -1104,7 +1351,15 @@ class CSocNetPhotoCommentEvent
 						$log_user_id = $arSonetFields["USER_ID"];
 
 						CSocNetLog::Update($log_id, array("TMP_ID" => $log_id));
-						CSocNetLogRights::SetForSonet($log_id, $entity_type, $entity_id, "photo", "view");
+						if ($bPassword)
+						{
+							CSocNetLogRights::DeleteByLogID($log_id);
+							CSocNetLogRights::Add($log_id, array("U".$GLOBALS["USER"]->GetID(), "SA"));
+						}
+						else
+						{
+							CSocNetLogRights::SetForSonet($log_id, $entity_type, $entity_id, "photo", "view");
+						}
 					}
 				}
 			}
@@ -1204,7 +1459,9 @@ class CSocNetPhotoCommentEvent
 						);
 
 						if (intVal($arComment["AUTHOR_ID"]) > 0)
+						{
 							$arFieldsForSocnet["USER_ID"] = $arComment["AUTHOR_ID"];
+						}
 
 						$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
 						if ($comment_id)
@@ -1224,6 +1481,11 @@ class CSocNetPhotoCommentEvent
 							);
 							CSocNetPhotoCommentEvent::NotifyIm($arFieldsIM);
 						}
+					}
+
+					if ($arElement)
+					{
+						self::InheriteAlbumFollow($arElement["IBLOCK_SECTION_ID"], $log_id, (intVal($arElement["CREATED_BY"]) > 0 ? $arElement["CREATED_BY"] : false));
 					}
 				}
 			}
@@ -1324,16 +1586,36 @@ class CSocNetPhotoCommentEvent
 						$arLogParams["SECTION_NAME"] = $arSection["NAME"];
 						$arLogParams["SECTION_URL"] = str_replace("#SECTION_ID#", $arSection["ID"], $this->arPath["SECTION_URL"]);
 
+						$arSectionPath = array();
+						$bPassword = false;
+
+						$dbSectionPath = CIBlockSection::GetList(
+							array("LEFT_MARGIN" => "ASC"),
+							array(
+								"IBLOCK_ID" => intval($arLogParams["IBLOCK_ID"]),
+								"<=LEFT_BORDER" => intval($arSection["LEFT_MARGIN"]),
+								">=RIGHT_BORDER" => intval($arSection["RIGHT_MARGIN"]),
+								"<=DEPTH_LEVEL" => intval($arSection["DEPTH_LEVEL"]),
+							),
+							false, 
+							array("ID", "IBLOCK_ID", "NAME", "CREATED_BY", "DEPTH_LEVEL", "LEFT_MARGIN", "RIGHT_MARGIN", "UF_PASSWORD")
+						);
+
+						while ($arPath = $dbSectionPath->Fetch())
+						{
+							$arSectionPath[] = $arPath;
+							if (strlen(trim($arPath["UF_PASSWORD"])) > 0)
+							{
+								$bPassword = true;
+								break;
+							}
+						}
+
 						if (!$alias)
 						{
-							$arSectionPath = array();
-							$rsPath = CIBlockSection::GetNavChain($arLogParams["IBLOCK_ID"], intval($arLogParams["SECTION_ID"]));
-							if($arPath = $rsPath->Fetch())
-							{
-								$entity_type = SONET_ENTITY_USER;
-								$entity_id = $arPath["CREATED_BY"];
-								$alias = $arPath["CODE"];
-							}
+							$entity_type = SONET_ENTITY_USER;
+							$entity_id = $arSectionPath[0]["CREATED_BY"];
+							$alias = $arSectionPath[0]["CODE"];
 						}
 					}
 
@@ -1375,7 +1657,15 @@ class CSocNetPhotoCommentEvent
 						$log_user_id = $arSonetFields["USER_ID"];
 
 						CSocNetLog::Update($log_id, array("TMP_ID" => $log_id));
-						CSocNetLogRights::SetForSonet($log_id, $entity_type, $entity_id, "photo", "view", true);
+						if ($bPassword)
+						{
+							CSocNetLogRights::DeleteByLogID($log_id);
+							CSocNetLogRights::Add($log_id, array("U".$GLOBALS["USER"]->GetID(), "SA"));
+						}
+						else
+						{
+							CSocNetLogRights::SetForSonet($log_id, $entity_type, $entity_id, "photo", "view", true);
+						}
 					}
 				}
 			}
@@ -1479,7 +1769,60 @@ class CSocNetPhotoCommentEvent
 							CSocNetPhotoCommentEvent::NotifyIm($arFieldsIM);
 						}
 					}
+
+					if ($arElement)
+					{
+						self::InheriteAlbumFollow($arElement["IBLOCK_SECTION_ID"], $log_id, (intVal($arElement["CREATED_BY"]) > 0 ? $arElement["CREATED_BY"] : false));
+					}
 				}
+			}
+		}
+	}
+	
+	public static function InheriteAlbumFollow($albumId, $logId, $authorId = false)
+	{
+		$albumId = intval($albumId);
+		$logId = intval($logId);
+
+		if (
+			!$albumId
+			|| !$logId
+		)
+		{
+			return false;
+		}
+
+		$dbAlbumLogEntry = CSocNetLog::GetList(
+			array("ID" => "DESC"),
+			array(
+				"EVENT_ID"	=> "photo",
+				"SOURCE_ID"	=> $albumId
+			),
+			false,
+			false,
+			array("ID")
+		);
+
+		if ($arAlbumLogEntry = $dbAlbumLogEntry->Fetch())
+		{
+			$rsFollower = CSocNetLogFollow::GetList(
+				array(
+					"CODE" => "L".$arAlbumLogEntry["ID"],
+				),
+				array("USER_ID", "TYPE")
+			);
+
+			while ($arFollower = $rsFollower->Fetch())
+			{
+				if (
+					$authorId
+					&& intval($authorId) == $arFollower["USER_ID"]
+				)
+				{
+					continue;
+				}
+
+				CSocNetLogFollow::Set($arFollower["USER_ID"], "L".$logId, $arFollower["TYPE"], ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));							
 			}
 		}
 	}

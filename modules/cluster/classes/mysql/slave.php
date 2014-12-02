@@ -414,6 +414,10 @@ class CClusterSlave
 		return $arSlaves;
 	}
 
+	/**
+	 * @param array $arNode
+	 * @param CDatabase $nodeDB
+	 */
 	public static function AdjustServerID($arNode, $nodeDB)
 	{
 		$rs = $nodeDB->Query("show variables like 'server_id'", false, '', array("fixed_connection"=>true));
@@ -426,5 +430,72 @@ class CClusterSlave
 			}
 		}
 	}
+
+	public static function GetRandomNode()
+	{
+		$arSlaves = static::GetList();
+		if(empty($arSlaves))
+			return false;
+
+		$max_slave_delay = COption::GetOptionInt("cluster", "max_slave_delay", 10);
+		if(isset($_SESSION["BX_REDIRECT_TIME"]))
+		{
+			$redirect_delay = time() - $_SESSION["BX_REDIRECT_TIME"] + 1;
+			if(
+				$redirect_delay > 0
+				&& $redirect_delay < $max_slave_delay
+			)
+				$max_slave_delay = $redirect_delay;
+		}
+
+		$total_weight = 0;
+		foreach($arSlaves as $i=>$slave)
+		{
+			if(defined("BX_CLUSTER_GROUP") && BX_CLUSTER_GROUP != $slave["GROUP_ID"])
+			{
+				unset($arSlaves[$i]);
+			}
+			elseif($slave["ROLE_ID"] == "SLAVE")
+			{
+				$arSlaveStatus = static::GetStatus($slave["ID"], true, false, false);
+				if(
+					$arSlaveStatus['Seconds_Behind_Master'] > $max_slave_delay
+					|| $arSlaveStatus['Last_SQL_Error'] != ''
+					|| $arSlaveStatus['Last_IO_Error'] != ''
+					|| $arSlaveStatus['Slave_SQL_Running'] === 'No'
+				)
+				{
+					unset($arSlaves[$i]);
+				}
+				else
+				{
+					$total_weight += $slave["WEIGHT"];
+					$arSlaves[$i]["PIE_WEIGHT"] = $total_weight;
+				}
+			}
+			else
+			{
+				$total_weight += $slave["WEIGHT"];
+				$arSlaves[$i]["PIE_WEIGHT"] = $total_weight;
+			}
+		}
+
+		$found = false;
+		$rand = mt_rand(0, $total_weight);
+		foreach($arSlaves as $slave)
+		{
+			if($rand < $slave["PIE_WEIGHT"])
+			{
+				$found = $slave;
+				break;
+			}
+		}
+
+		if(!$found || $found["ROLE_ID"] != "SLAVE")
+		{
+			return false; //use main connection
+		}
+
+		return $found;
+	}
 }
-?>

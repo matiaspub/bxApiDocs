@@ -15,6 +15,9 @@ class UpdateResult extends Result
 	/** @var int */
 	protected $affectedRowsCount;
 
+	/** @var array */
+	protected $primary;
+
 	static public function __construct()
 	{
 		parent::__construct();
@@ -31,5 +34,32 @@ class UpdateResult extends Result
 	public function getAffectedRowsCount()
 	{
 		return $this->affectedRowsCount;
+	}
+
+	public function setPrimary($primary)
+	{
+		$this->primary = $primary;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPrimary()
+	{
+		return $this->primary;
+	}
+
+	/**
+	 * Returns id of updated record
+	 * @return int
+	 */
+	public function getId()
+	{
+		if (count($this->primary) == 1)
+		{
+			return end($this->primary);
+		}
+
+		return $this->primary;
 	}
 }

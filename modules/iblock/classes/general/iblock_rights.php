@@ -1,6 +1,4 @@
 <?
-IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/iblock/admin/task_description.php");
-
 class CIBlockRights
 {
 	const GROUP_CODE = 1;
@@ -1238,25 +1236,40 @@ class CIBlockElementRights extends CIBlockRights
 		else
 			$sqlID = array_map('intval', $arID);
 
-		$rs = $DB->Query("
-			SELECT ER.ELEMENT_ID ID, O.NAME
-			FROM b_iblock_element E
-			INNER JOIN b_iblock_element_right ER ON ER.ELEMENT_ID = E.ID
-			INNER JOIN b_iblock_right IBR ON IBR.ID = ER.RIGHT_ID
-			INNER JOIN b_task_operation T ON T.TASK_ID = IBR.TASK_ID
-			INNER JOIN b_operation O ON O.ID = T.OPERATION_ID
-			".($USER_ID > 0? "LEFT": "INNER")." JOIN b_user_access UA ON UA.ACCESS_CODE = IBR.GROUP_CODE AND UA.USER_ID = ".$USER_ID."
-			WHERE E.ID in (".implode(", ", $sqlID).")
-			".($bAuthorized || $USER_ID > 0? "
-				AND (UA.USER_ID IS NOT NULL
-				".($bAuthorized? "OR IBR.GROUP_CODE = 'AU'": "")."
-				".($USER_ID > 0? "OR (IBR.GROUP_CODE = 'CR' AND E.CREATED_BY = ".$USER_ID.")": "")."
-			)": "")."
-		");
-
 		$arResult = array();
-		while($ar = $rs->Fetch())
-			$arResult[$ar["ID"]][$ar["NAME"]] = $ar["NAME"];
+
+		while (!empty($sqlID))
+		{
+			if (count($sqlID) > 1000)
+			{
+				$head = array_slice($sqlID, 0, 1000);
+				array_splice($sqlID, 0, 1000);
+			}
+			else
+			{
+				$head = $sqlID;
+				$sqlID = array();
+			}
+
+			$rs = $DB->Query($s="
+				SELECT ER.ELEMENT_ID ID, O.NAME
+				FROM b_iblock_element E
+				INNER JOIN b_iblock_element_right ER ON ER.ELEMENT_ID = E.ID
+				INNER JOIN b_iblock_right IBR ON IBR.ID = ER.RIGHT_ID
+				INNER JOIN b_task_operation T ON T.TASK_ID = IBR.TASK_ID
+				INNER JOIN b_operation O ON O.ID = T.OPERATION_ID
+				".($USER_ID > 0? "LEFT": "INNER")." JOIN b_user_access UA ON UA.ACCESS_CODE = IBR.GROUP_CODE AND UA.USER_ID = ".$USER_ID."
+				WHERE E.ID in (".implode(", ", $head).")
+				".($bAuthorized || $USER_ID > 0? "
+					AND (UA.USER_ID IS NOT NULL
+					".($bAuthorized? "OR IBR.GROUP_CODE = 'AU'": "")."
+					".($USER_ID > 0? "OR (IBR.GROUP_CODE = 'CR' AND E.CREATED_BY = ".$USER_ID.")": "")."
+				)": "")."
+			");
+
+			while($ar = $rs->Fetch())
+				$arResult[$ar["ID"]][$ar["NAME"]] = $ar["NAME"];
+		}
 
 		if(is_array($arID))
 			return $arResult;

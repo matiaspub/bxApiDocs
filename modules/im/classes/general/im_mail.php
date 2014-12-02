@@ -32,6 +32,12 @@ class CIMMail
 				continue;
 			}
 
+			if ($arNotify["MESSAGE_OUT"] == IM_MAIL_SKIP)
+			{
+				unset($arUnsendNotify[$id]);
+				continue;
+			}
+
 			if (!$arNotify["TO_USER_LID"] || StrLen($arNotify["TO_USER_LID"]) <= 0)
 			{
 				$arNotify["TO_USER_LID"] = $defSiteID;
@@ -147,6 +153,12 @@ class CIMMail
 			}
 
 			if (!CIMSettings::GetNotifyAccess($arMessage["TO_USER_ID"], 'im', 'message', CIMSettings::CLIENT_MAIL))
+			{
+				unset($arUnsendMessage[$id]);
+				continue;
+			}
+
+			if ($arMessage["MESSAGE_OUT"] == IM_MAIL_SKIP)
 			{
 				unset($arUnsendMessage[$id]);
 				continue;
@@ -277,6 +289,9 @@ class CIMMail
 			return false;
 
 		if (COption::GetOptionString('intranet', 'allow_external_mail', 'Y') != 'Y')
+			return false;
+
+		if (COption::GetOptionString('extranet', 'extranet_site', '') == SITE_ID)
 			return false;
 
 		if (isset($_SESSION['aExtranetUser_'.$USER->GetID()][SITE_ID]))

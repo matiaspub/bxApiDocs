@@ -1,9 +1,9 @@
 <?php
 /**
  * Bitrix Framework
- * @package    bitrix
- * @subpackage MODULE_NAME
- * @copyright  2001-2012 Bitrix
+ * @package bitrix
+ * @subpackage main
+ * @copyright 2001-2012 Bitrix
  */
 
 namespace Bitrix\Main\Data;

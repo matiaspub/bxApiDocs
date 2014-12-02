@@ -1,12 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Алексей
- * Date: 09.10.13
- * Time: 9:47
- * To change this template use File | Settings | File Templates.
- */
-
 namespace Bitrix\Main\Diag;
 
 

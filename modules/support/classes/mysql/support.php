@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/
 
 
 /**
- * <b>CTicket</b> - класс для работы с обращениями.
+ * <b>CTicket</b> - класс для работы с обращениями.</body> </html>
  *
  *
  *
@@ -125,7 +125,7 @@ class CTicket extends CAllTicket
 	*
 	*
 	*
-	* @param int $MESSAGE_ID  ID сообщения.
+	* @param int $MESSAGE_ID  ID сообщения.</bod
 	*
 	*
 	*
@@ -1035,7 +1035,7 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 					case "OWNER":
 						$getUserName = "Y";
 						$match = ($arFilter[$key."_EXACT_MATCH"]=="Y" && $matchValueSet) ? "N" : "Y";
-						$arSqlSearch[] = GetFilterQuery("UO.ID, UO.LOGIN, UO.LAST_NAME, UO.NAME, T.OWNER_SID", $val, $match, array("@", ".")); //T.OWNER_USER_ID,
+						$arSqlSearch[] = GetFilterQuery("UO.ID, UO.LOGIN, UO.LAST_NAME, UO.NAME", $val, $match, array("@", ".")); //T.OWNER_USER_ID,
 						break;
 					case "OWNER_USER_ID":
 					case "OWNER_SID":
@@ -1578,6 +1578,12 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 			else
 			{
 				$cntSql = "SELECT COUNT(T.ID) as C " . $strSqlFrom . $strSqlWhere . $strSqlGroup . $strSqlHaving;
+
+				if (!empty($strSqlGroup))
+				{
+					$cntSql = 'SELECT COUNT(1) AS C FROM ('.$cntSql.') tt';
+				}
+
 				$res_cnt = $DB->Query($cntSql);
 				$res_cnt = $res_cnt->Fetch();
 				$res = new CDBResult();

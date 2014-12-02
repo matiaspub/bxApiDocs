@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.
+ * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.</body> </html>
  *
  *
  *
@@ -396,7 +396,7 @@ class CAllSocNetUserRelations
 	*
 	*
 	*
-	* @param int $firstUserID  Первый пользователь. </htm
+	* @param int $firstUserID  Первый пользователь. </ht
 	*
 	*
 	*
@@ -418,30 +418,42 @@ class CAllSocNetUserRelations
 	{
 		global $DB;
 
+		static $arSocNetURNCache = array();
+		static $arSocNetUserRelationsCache1 = array();
+
 		$firstUserID = IntVal($firstUserID);
 		if ($firstUserID <= 0)
+		{
 			return false;
+		}
+
 		$secondUserID = IntVal($secondUserID);
 		if ($secondUserID <= 0)
+		{
 			return false;
-			
-		global $arSocNetURNCache;
-		if (!isset($arSocNetURNCache) || !is_array($arSocNetURNCache) || array_key_exists("arSocNetURNCache", $_REQUEST))
-			$arSocNetURNCache = array();
+		}
 
 		if (array_key_exists($firstUserID, $arSocNetURNCache))
 		{
 			if (array_key_exists($secondUserID, $arSocNetURNCache[$firstUserID]))
+			{
 				return $arSocNetURNCache[$firstUserID][$secondUserID];
+			}
 			elseif(count($arSocNetURNCache[$firstUserID]) != 100)
+			{
 				return false;
+			}
 		}
 		elseif (array_key_exists($secondUserID, $arSocNetURNCache))
 		{
 			if (array_key_exists($firstUserID, $arSocNetURNCache[$secondUserID]))
+			{
 				return $arSocNetURNCache[$secondUserID][$firstUserID];
+			}
 			elseif(count($arSocNetURNCache[$secondUserID]) != 100)
+			{
 				return false;
+			}
 		}
 
 		// get top N relations of user1		
@@ -450,9 +462,13 @@ class CAllSocNetUserRelations
 		while ($arResult = $dbResult->Fetch())
 		{
 			if ($arResult["FIRST_USER_ID"] == $firstUserID)
+			{
 				$arSocNetURNCache[$firstUserID][$arResult["SECOND_USER_ID"]] = $arResult["RELATION"];
+			}
 			else
+			{
 				$arSocNetURNCache[$firstUserID][$arResult["FIRST_USER_ID"]] = $arResult["RELATION"];
+			}
 		}
 
 		// get top N relations of user2
@@ -461,14 +477,14 @@ class CAllSocNetUserRelations
 		while ($arResult = $dbResult->Fetch())
 		{
 			if ($arResult["FIRST_USER_ID"] == $secondUserID)
+			{
 				$arSocNetURNCache[$secondUserID][$arResult["SECOND_USER_ID"]] = $arResult["RELATION"];
+			}
 			else
+			{
 				$arSocNetURNCache[$secondUserID][$arResult["FIRST_USER_ID"]] = $arResult["RELATION"];
+			}
 		}
-
-		global $arSocNetUserRelationsCache1;
-		if (!isset($arSocNetUserRelationsCache1) || !is_array($arSocNetUserRelationsCache1) || array_key_exists("arSocNetUserRelationsCache1", $_REQUEST))
-			$arSocNetUserRelationsCache1 = array();
 
 		if (!array_key_exists($firstUserID."_".$secondUserID, $arSocNetUserRelationsCache1))
 		{
@@ -485,9 +501,13 @@ class CAllSocNetUserRelations
 
 			$dbResult = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arResult = $dbResult->Fetch())
+			{
 				$arSocNetUserRelationsCache1[$firstUserID."_".$secondUserID] = $arResult["RELATION"];
+			}
 			else
+			{
 				$arSocNetUserRelationsCache1[$firstUserID."_".$secondUserID] = false;
+			}
 		}
 
 		return $arSocNetUserRelationsCache1[$firstUserID."_".$secondUserID];
@@ -500,7 +520,7 @@ class CAllSocNetUserRelations
 	*
 	*
 	*
-	* @param int $firstUserID  Первый пользователь. </htm
+	* @param int $firstUserID  Первый пользователь. </ht
 	*
 	*
 	*
@@ -517,17 +537,19 @@ class CAllSocNetUserRelations
 	public static function IsFriends($firstUserID, $secondUserID)
 	{
 		global $DB;
+		static $arSocNetUserRelationsCache = array();
 
 		$firstUserID = IntVal($firstUserID);
 		if ($firstUserID <= 0)
+		{
 			return false;
+		}
+
 		$secondUserID = IntVal($secondUserID);
 		if ($secondUserID <= 0)
+		{
 			return false;
-
-		global $arSocNetUserRelationsCache;
-		if (!isset($arSocNetUserRelationsCache) || !is_array($arSocNetUserRelationsCache) || array_key_exists("arSocNetUserRelationsCache", $_REQUEST))
-			$arSocNetUserRelationsCache = array();
+		}
 
 		if (!array_key_exists($firstUserID."_".$secondUserID, $arSocNetUserRelationsCache))
 		{
@@ -546,9 +568,13 @@ class CAllSocNetUserRelations
 
 			$dbResult = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($dbResult->Fetch())
+			{
 				$arSocNetUserRelationsCache[$firstUserID."_".$secondUserID] = true;
+			}
 			else
+			{
 				$arSocNetUserRelationsCache[$firstUserID."_".$secondUserID] = false;
+			}
 		}
 
 		return $arSocNetUserRelationsCache[$firstUserID."_".$secondUserID];
@@ -578,17 +604,19 @@ class CAllSocNetUserRelations
 	public static function IsFriends2($firstUserID, $secondUserID)
 	{
 		global $DB;
+		static $arSocNetUser2RelationsCache = array();
 
 		$firstUserID = IntVal($firstUserID);
 		if ($firstUserID <= 0)
+		{
 			return false;
+		}
+
 		$secondUserID = IntVal($secondUserID);
 		if ($secondUserID <= 0)
+		{
 			return false;
-
-		global $arSocNetUser2RelationsCache;
-		if (!isset($arSocNetUser2RelationsCache) || !is_array($arSocNetUser2RelationsCache) || array_key_exists("arSocNetUser2RelationsCache", $_REQUEST))
-			$arSocNetUser2RelationsCache = array();
+		}
 
 		if (!array_key_exists($firstUserID."_".$secondUserID, $arSocNetUser2RelationsCache))
 		{
@@ -627,9 +655,13 @@ class CAllSocNetUserRelations
 
 			$dbResult = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($dbResult->Fetch())
+			{
 				$arSocNetUser2RelationsCache[$firstUserID."_".$secondUserID] = true;
+			}
 			else
+			{
 				$arSocNetUser2RelationsCache[$firstUserID."_".$secondUserID] = false;
+			}
 		}
 
 		return $arSocNetUser2RelationsCache[$firstUserID."_".$secondUserID];
@@ -829,7 +861,7 @@ class CAllSocNetUserRelations
 			$requestUrl = COption::GetOptionString("socialnetwork", "user_request_page", 
 				(IsModuleInstalled("intranet")) ? "/company/personal/user/#USER_ID#/requests/" : "/club/user/#USER_ID#/requests/", SITE_ID);
 
-			$requestUrl = $serverName.str_replace("#user_id#", $targetUserID, strtolower($requestUrl));
+			$requestUrl = $serverName.str_replace(array("#USER_ID#", "#user_id#"), $targetUserID, $requestUrl);
 
 			$arMessageFields['NOTIFY_MESSAGE_OUT'] = $arMessageFields['NOTIFY_MESSAGE'];
 			$arMessageFields['NOTIFY_MESSAGE_OUT'] .= "\n\n".GetMessage('SONET_U_INVITE_CONFIRM').": ".$requestUrl.'?INVITE_USER='.$ID.'&CONFIRM=Y';

@@ -18,6 +18,7 @@ Loc::loadMessages(__FILE__);
  * <li> CALL_NUMBER string(20) optional
  * <li> ENTITY_TYPE string(50) optional
  * <li> ENTITY_ID string(50) optional
+ * <li> DISK_FOLDER_ID int optional
  * <li> AUTHOR reference to {@link \Bitrix\User\UserTable}
  * </ul>
  *
@@ -80,6 +81,9 @@ class ChatTable extends Entity\DataManager
 			'AUTHOR' => array(
 				'data_type' => 'Bitrix\Main\User',
 				'reference' => array('=this.AUTHOR_ID' => 'ref.ID'),
+			),
+			'DISK_FOLDER_ID' => array(
+				'data_type' => 'integer'
 			),
 		);
 	}

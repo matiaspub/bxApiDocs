@@ -3,12 +3,13 @@ namespace Bitrix\Main\DB;
 
 use Bitrix\Main;
 use Bitrix\Main\Type;
+use Bitrix\Main\Entity;
 
 class MssqlSqlHelper extends SqlHelper
 {
-
 	/**
 	 * Identificator escaping - left char
+	 *
 	 * @return string
 	 */
 	static public function getLeftQuote()
@@ -18,6 +19,7 @@ class MssqlSqlHelper extends SqlHelper
 
 	/**
 	 * Identificator escaping - left char
+	 *
 	 * @return string
 	 */
 	static public function getRightQuote()
@@ -25,38 +27,77 @@ class MssqlSqlHelper extends SqlHelper
 		return ']';
 	}
 
+	/**
+	 * Returns maximum length of an alias in a select statement
+	 *
+	 * @return integer
+	 */
+	static public function getAliasLength()
+	{
+		return 28;
+	}
+
+	/**
+	 * Returns database specific query delimiter for batch processing.
+	 *
+	 * @return string
+	 */
 	static public function getQueryDelimiter()
 	{
 		return "\nGO";
 	}
 
+	/**
+	 * Escapes special characters in a string for use in an SQL statement.
+	 *
+	 * @param string $value Value to be escaped.
+	 * @param integer $maxLength Limits string length if set.
+	 *
+	 * @return string
+	 */
 	public static function forSql($value, $maxLength = 0)
 	{
-		return str_replace("\x00", "", ($maxLength > 0) ? str_replace("'", "''", substr($value, 0, $maxLength)) : str_replace("'", "''", $value));
+		if ($maxLength > 0)
+		{
+			$value = substr($value, 0, $maxLength);
+		}
+		$value = str_replace("'", "''", $value);
+		$value = str_replace("\x00", "", $value);
+		return $value;
 	}
 
+	/**
+	 * Returns function for getting current time.
+	 *
+	 * @return string
+	 */
 	static public function getCurrentDateTimeFunction()
 	{
 		return "GETDATE()";
 	}
 
-	static public function getSubstrFunction($str, $from, $length = null)
-	{
-		$sql = 'SUBSTRING('.$str.', '.$from;
-
-		if (!is_null($length))
-			$sql .= ', '.$length;
-		else
-			$sql .= ', LEN('.$str.') + 1 - '.$from;
-
-		return $sql.')';
-	}
-
+	/**
+	 * Returns function for getting current date without time part.
+	 *
+	 * @return string
+	 */
 	static public function getCurrentDateFunction()
 	{
 		return "convert(datetime, cast(year(getdate()) as varchar(4)) + '-' + cast(month(getdate()) as varchar(2)) + '-' + cast(day(getdate()) as varchar(2)), 120)";
 	}
 
+	/**
+	 * Returns function for adding seconds time interval to $from.
+	 * <p>
+	 * If $from is null or omitted, then current time is used.
+	 * <p>
+	 * $seconds and $from parameters are SQL unsafe.
+	 *
+	 * @param integer $seconds How many seconds to add.
+	 * @param integer $from Datetime database field of expression.
+	 *
+	 * @return string
+	 */
 	static public function addSecondsToDateTime($seconds, $from = null)
 	{
 		if ($from === null)
@@ -67,12 +108,46 @@ class MssqlSqlHelper extends SqlHelper
 		return 'DATEADD(second, '.$seconds.', '.$from.')';
 	}
 
+	/**
+	 * Returns function cast $value to datetime database type.
+	 * <p>
+	 * $value parameter is SQL unsafe.
+	 *
+	 * @param string $value Database field or expression to cast.
+	 *
+	 * @return string
+	 */
 	static public function getDatetimeToDateFunction($value)
 	{
 		return 'DATEADD(dd, DATEDIFF(dd, 0, '.$value.'), 0)';
 	}
 
-	public function formatDate($format, $field = null)
+	/**
+	 * Returns database expression for converting $field value according the $format.
+	 * <p>
+	 * Following format parts converted:
+	 * - YYYY   A full numeric representation of a year, 4 digits
+	 * - MMMM   A full textual representation of a month, such as January or March
+	 * - MM     Numeric representation of a month, with leading zeros
+	 * - MI     Minutes with leading zeros
+	 * - M      A short textual representation of a month, three letters
+	 * - DD     Day of the month, 2 digits with leading zeros
+	 * - HH     24-hour format of an hour with leading zeros
+	 * - H      12-hour format of an hour with leading zeros
+	 * - GG     24-hour format of an hour with leading zeros
+	 * - G      12-hour format of an hour with leading zeros
+	 * - SS     Minutes with leading zeros
+	 * - TT     AM or PM
+	 * - T      AM or PM
+	 * <p>
+	 * $field parameter is SQL unsafe.
+	 *
+	 * @param string $format Format string.
+	 * @param string $field Database field or expression.
+	 *
+	 * @return string
+	 */
+	static public function formatDate($format, $field = null)
 	{
 		if ($field === null)
 		{
@@ -125,151 +200,381 @@ class MssqlSqlHelper extends SqlHelper
 					$result[] = "\n\tCASE WHEN DATEPART(HH, $field) < 12 THEN 'AM' ELSE 'PM' END";
 					break;
 				default:
-					$result[] = "'".$this->forSql($part)."'";
+					$result[] = "'".$part."'";
 					break;
 			}
 		}
 
-		return join("+", $result);
+		return implode("+", $result);
 	}
 
+	/**
+	 * Returns function for getting part of string.
+	 * <p>
+	 * If length is null or omitted, the substring starting
+	 * from start until the end of the string will be returned.
+	 * <p>
+	 * $str and $from parameters are SQL unsafe.
+	 *
+	 * @param string $str Database field or expression.
+	 * @param integer $from Start position.
+	 * @param integer $length Maximum length.
+	 *
+	 * @return string
+	 */
+	static public function getSubstrFunction($str, $from, $length = null)
+	{
+		$sql = 'SUBSTRING('.$str.', '.$from;
+
+		if (!is_null($length))
+			$sql .= ', '.$length;
+		else
+			$sql .= ', LEN('.$str.') + 1 - '.$from;
+
+		return $sql.')';
+	}
+
+	/**
+	 * Returns function for concatenating database fields or expressions.
+	 * <p>
+	 * All parameters are SQL unsafe.
+	 *
+	 * @param string $field,... Database fields or expressions.
+	 *
+	 * @return string
+	 */
 	static public function getConcatFunction()
 	{
-		$str = "";
-		$ar = func_get_args();
-		if (is_array($ar))
-			$str .= implode(" + ", $ar);
-		return $str;
+		return implode(" + ", func_get_args());
 	}
 
+	/**
+	 * Returns function for testing database field or expressions
+	 * against NULL value. When it is NULL then $result will be returned.
+	 * <p>
+	 * All parameters are SQL unsafe.
+	 *
+	 * @param string $expression Database field or expression for NULL test.
+	 * @param string $result Database field or expression to return when $expression is NULL.
+	 *
+	 * @return string
+	 */
 	static public function getIsNullFunction($expression, $result)
 	{
 		return "ISNULL(".$expression.", ".$result.")";
 	}
 
+	/**
+	 * Returns function for getting length of database field or expression.
+	 * <p>
+	 * $field parameter is SQL unsafe.
+	 *
+	 * @param string $field Database field or expression.
+	 *
+	 * @return string
+	 */
 	static public function getLengthFunction($field)
 	{
 		return "LEN(".$field.")";
 	}
 
+	/**
+	 * Returns function for converting string value into datetime.
+	 * $value must be in YYYY-MM-DD HH:MI:SS format.
+	 * <p>
+	 * $value parameter is SQL unsafe.
+	 *
+	 * @param string $value String in YYYY-MM-DD HH:MI:SS format.
+	 *
+	 * @return string
+	 * @see \Bitrix\Main\DB\MssqlSqlHelper::formatDate
+	 */
 	static public function getCharToDateFunction($value)
 	{
 		return "CONVERT(datetime, '".$value."', 120)";
 	}
 
+	/**
+	 * Returns function for converting database field or expression into string.
+	 * <p>
+	 * Result string will be in YYYY-MM-DD HH:MI:SS format.
+	 * <p>
+	 * $fieldName parameter is SQL unsafe.
+	 *
+	 * @param string $fieldName Database field or expression.
+	 *
+	 * @return string
+	 * @see \Bitrix\Main\DB\MssqlSqlHelper::formatDate
+	 */
 	static public function getDateToCharFunction($fieldName)
 	{
 		return "CONVERT(varchar(19), ".$fieldName.", 120)";
 	}
 
-	public function prepareInsert($tableName, $arFields)
+	/**
+	 * Returns $value converted to an type according to $field type.
+	 * <p>
+	 * For example if $field is Entity\DatetimeField then returned value will be instance of Type\DateTime.
+	 *
+	 * @param mixed $value Value to be converted.
+	 * @param Entity\ScalarField $field Type "source".
+	 *
+	 * @return mixed
+	 */
+	static public function convertFromDb($value, Entity\ScalarField $field)
 	{
-		$strInsert1 = "";
-		$strInsert2 = "";
-
-		$arColumns = $this->dbConnection->getTableFields($tableName);
-		foreach ($arColumns as $columnName => $columnInfo)
+		if($value !== null)
 		{
-			if (array_key_exists($columnName, $arFields))
+			if($field instanceof Entity\DatetimeField)
 			{
-				$strInsert1 .= ", ".$columnName."";
-				$strInsert2 .= ", ".$this->convertValueToDb($arFields[$columnName], $columnInfo);
+				$value = new Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
 			}
-			elseif (array_key_exists("~".$columnName, $arFields))
+			elseif($field instanceof Entity\DateField)
 			{
-				$strInsert1 .= ", ".$columnName."";
-				$strInsert2 .= ", ".$arFields["~".$columnName];
+				$value = new Type\Date($value, "Y-m-d");
+			}
+			elseif($field instanceof Entity\StringField)
+			{
+				if(preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
+				{
+					$value = new Type\DateTime($value, "Y-m-d H:i:s");
+				}
 			}
 		}
 
-		if ($strInsert1 != "")
-		{
-			$strInsert1 = " ".substr($strInsert1, 2)." ";
-			$strInsert2 = " ".substr($strInsert2, 2)." ";
-		}
-
-		return array($strInsert1, $strInsert2, array());
+		return $value;
 	}
 
-	protected function convertValueToDb($value, array $columnInfo)
+	/**
+	 * Returns callback to be called for a field value on fetch.
+	 *
+	 * @param Entity\ScalarField $field Type "source".
+	 *
+	 * @return false|callback
+	 */
+	static public function getConverter(Entity\ScalarField $field)
 	{
-		if ($value === null)
+		if ($field instanceof Entity\DatetimeField)
 		{
-			return "NULL";
+			return array($this, "convertDatetimeField");
+		}
+		elseif ($field instanceof Entity\DateField)
+		{
+			return array($this, "convertDateField");
+		}
+		elseif ($field instanceof Entity\StringField)
+		{
+			return array($this, "convertStringField");
+		}
+		else
+		{
+			return parent::getConverter($field);
+		}
+	}
+
+	/**
+	 * Converts string into \Bitrix\Main\Type\DateTime object.
+	 * <p>
+	 * Helper function.
+	 *
+	 * @param string $value Value fetched.
+	 *
+	 * @return null|\Bitrix\Main\Type\DateTime
+	 * @see \Bitrix\Main\Db\MssqlSqlHelper::getConverter
+	 */
+	static public function convertDatetimeField($value)
+	{
+		if ($value !== null)
+		{
+			$value = new Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
 		}
 
-		if ($value instanceof SqlExpression)
+		return $value;
+	}
+
+	/**
+	 * Converts string into \Bitrix\Main\Type\Date object.
+	 * <p>
+	 * Helper function.
+	 *
+	 * @param string $value Value fetched.
+	 *
+	 * @return null|\Bitrix\Main\Type\DateTime
+	 * @see \Bitrix\Main\Db\MssqlSqlHelper::getConverter
+	 */
+	static public function convertDateField($value)
+	{
+		if($value !== null)
 		{
-			return $value->compile();
+			$value = new Type\Date($value, "Y-m-d");
 		}
 
-		switch ($columnInfo["TYPE"])
+		return $value;
+	}
+
+	/**
+	 * Converts string into \Bitrix\Main\Type\Date object if string has datetime specific format..
+	 * <p>
+	 * Helper function.
+	 *
+	 * @param string $value Value fetched.
+	 *
+	 * @return null|\Bitrix\Main\Type\DateTime
+	 * @see \Bitrix\Main\Db\MssqlSqlHelper::getConverter
+	 */
+	static public function convertStringField($value)
+	{
+		if ($value !== null)
 		{
-			case "datetime":
-			case "timestamp":
-				if (empty($value))
+			if(preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\$#", $value))
+			{
+				$value = new Type\DateTime($value, "Y-m-d H:i:s");
+			}
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Returns a column type according to ScalarField object.
+	 *
+	 * @param Entity\ScalarField $field Type "source".
+	 *
+	 * @return string
+	 */
+	static public function getColumnTypeByField(Entity\ScalarField $field)
+	{
+		if ($field instanceof Entity\IntegerField)
+		{
+			return 'int';
+		}
+		elseif ($field instanceof Entity\FloatField)
+		{
+			return 'float';
+		}
+		elseif ($field instanceof Entity\DatetimeField)
+		{
+			return 'datetime';
+		}
+		elseif ($field instanceof Entity\DateField)
+		{
+			return 'date';
+		}
+		elseif ($field instanceof Entity\TextField)
+		{
+			return 'text';
+		}
+		elseif ($field instanceof Entity\BooleanField)
+		{
+			$values = $field->getValues();
+
+			if (ctype_digit($values[0]) && ctype_digit($values[1]))
+			{
+				return 'int';
+			}
+			else
+			{
+				return 'varchar('.max(strlen($values[0]), strlen($values[1])).')';
+			}
+		}
+		elseif ($field instanceof Entity\EnumField)
+		{
+			return 'varchar('.max(array_map('strlen', $field->getValues())).')';
+		}
+		else
+		{
+			// string by default
+			$defaultLength = false;
+			foreach ($field->getValidators() as $validator)
+			{
+				if ($validator instanceof Entity\Validator\Length)
 				{
-					$result = "NULL";
-				}
-				elseif($value instanceof Type\Date)
-				{
-					if($value instanceof Type\DateTime)
+					if ($defaultLength === false || $defaultLength > $validator->getMax())
 					{
-						$value = clone($value);
-						$value->setDefaultTimeZone();
+						$defaultLength = $validator->getMax();
 					}
-					$result = $this->getCharToDateFunction($value->format("Y-m-d H:i:s"));
 				}
-				else
-				{
-					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
-				}
-				break;
-			case "date":
-				if (empty($value))
-				{
-					$result = "NULL";
-				}
-				elseif($value instanceof Type\Date)
-				{
-					$result = $this->getCharToDateFunction($value->format("Y-m-d"));
-				}
-				else
-				{
-					throw new Main\ArgumentTypeException('value', '\Bitrix\Main\Type\Date');
-				}
-				break;
-			case "date":
-				if (empty($value))
-					$result = "NULL";
-				else
-					$result = $this->getDatetimeToDbFunction($value, \Bitrix\Main\Type\DateTime::DATE_WITHOUT_TIME);
-				break;
-			case "int":
-			case "tinyint":
-			case "smallint":
-			case "bigint":
-				$result = "'".intval($value)."'";
-				break;
-			case "decimal":
-			case "numeric":
-				$result = "'".round(doubleval($value), intval($columnInfo["NUMERIC_SCALE"]))."'";
-				break;
-			case "real":
-			case "float":
-				$result = "'".doubleval($value)."'";
-				break;
-			case "image":
-				$result = $value;
-				break;
-			default:
-				$result = "'".$this->forSql($value, $columnInfo['CHARACTER_MAXIMUM_LENGTH'])."'";
-				break;
+			}
+			return 'varchar('.($defaultLength > 0? $defaultLength: 255).')';
 		}
-
-		return $result;
 	}
 
+	/**
+	 * Returns instance of a descendant from Entity\ScalarField
+	 * that matches database type.
+	 *
+	 * @param string $name Database column name.
+	 * @param mixed $type Database specific type.
+	 * @param array $parameters Additional information.
+	 *
+	 * @return Entity\ScalarField
+	 */
+	static public function getFieldByColumnType($name, $type, array $parameters = null)
+	{
+		switch($type)
+		{
+			case 4:
+			case 5:
+			case -6:
+				//int SQL_INTEGER (4)
+				//smallint SQL_SMALLINT (5)
+				//tinyint SQL_TINYINT (-6)
+				return new Entity\IntegerField($name);
+
+			case 2:
+			case 3:
+			case 6:
+			case 7:
+				//numeric SQL_NUMERIC (2)
+				//decimal SQL_DECIMAL (3)
+				//smallmoney SQL_DECIMAL (3)
+				//money SQL_DECIMAL (3)
+				//float SQL_FLOAT (6)
+				//real SQL_REAL (7)
+				return new Entity\FloatField($name, array("scale" => $parameters["scale"]));
+
+			case 93:
+				//datetime - SQL_TYPE_TIMESTAMP (93)
+				//datetime2 - SQL_TYPE_TIMESTAMP (93)
+				//smalldatetime - SQL_TYPE_TIMESTAMP (93)
+				return new Entity\DatetimeField($name);
+
+			case 91:
+				//date - SQL_TYPE_DATE (91)
+				return new Entity\DateField($name);
+		}
+		//bigint SQL_BIGINT (-5)
+		//binary SQL_BINARY (-2)
+		//bit SQL_BIT (-7)
+		//char SQL_CHAR (1)
+		//datetimeoffset SQL_SS_TIMESTAMPOFFSET (-155)
+		//image SQL_LONGVARBINARY (-4)
+		//nchar SQL_WCHAR (-8)
+		//ntext SQL_WLONGVARCHAR (-10)
+		//nvarchar SQL_WVARCHAR (-9)
+		//text SQL_LONGVARCHAR (-1)
+		//time SQL_SS_TIME2 (-154)
+		//timestamp SQL_BINARY (-2)
+		//udt SQL_SS_UDT (-151)
+		//uniqueidentifier SQL_GUID (-11)
+		//varbinary SQL_VARBINARY (-3)
+		//varchar SQL_VARCHAR (12)
+		//xml SQL_SS_XML (-152)
+		return new Entity\StringField($name, array("size" => $parameters["size"]));
+	}
+
+	/**
+	 * Transforms Sql according to $limit and $offset limitations.
+	 * <p>
+	 * You must specify $limit when $offset is set.
+	 *
+	 * @param string $sql Sql text.
+	 * @param integer $limit Maximum number of rows to return.
+	 * @param integer $offset Offset of the first row to return.
+	 *
+	 * @return string
+	 * @throws Main\ArgumentException
+	 */
 	static public function getTopSql($sql, $limit, $offset = 0)
 	{
 		$offset = intval($offset);
@@ -322,5 +627,4 @@ class MssqlSqlHelper extends SqlHelper
 		}
 		return $sql;
 	}
-
 }

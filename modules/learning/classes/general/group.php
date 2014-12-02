@@ -189,6 +189,10 @@ class CLearningGroup
 			'MEMBER_ID'        => 'LGM.USER_ID'
 		);
 
+		$arFieldsSort = $arFields;
+		$arFieldsSort["ACTIVE_FROM"] = "LG.ACTIVE_FROM";
+		$arFieldsSort["ACTIVE_TO"] = "LG.ACTIVE_TO";
+
 		if (count($arSelect) <= 0 || in_array("*", $arSelect))
 			$arSelect = array_diff(array_keys($arFields), array('MEMBER_ID'));
 		elseif (!in_array("ID", $arSelect))
@@ -207,9 +211,9 @@ class CLearningGroup
 			if ($order != "asc")
 				$order = "desc";
 
-			if (array_key_exists($byUppercase, $arFields))
+			if (array_key_exists($byUppercase, $arFieldsSort))
 			{
-				$arSqlOrder[] = ' ' . $byUppercase . ' ' . $order . ' ';
+				$arSqlOrder[] = ' ' . $arFieldsSort[$byUppercase] . ' ' . $order . ' ';
 				$needle = $byUppercase;
 			}
 			elseif ($s = $obUserFieldsSql->getOrder(strtolower($by)))

@@ -75,7 +75,7 @@ class CListFieldTypeList
 			{
 				foreach($type as  $ar)
 				{
-					if(array_key_exists("GetPublicEditHTML", $ar))
+					if($ar && array_key_exists("GetPublicEditHTML", $ar))
 					{
 						$typeId = $ar["PROPERTY_TYPE"].":".$ar["USER_TYPE"];
 						self::$types[$typeId] = new CListFieldType($typeId, $ar["DESCRIPTION"], CListFieldType::NOT_FIELD, CListFieldType::NOT_READONLY);

@@ -6,7 +6,7 @@
 
 
 /**
- * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>.
+ * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. </body> </html>
  *
  *
  *
@@ -19,7 +19,7 @@
  */
 class CAllFormStatus
 {
-	fpublic static unction err_mess()
+	public static function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -646,7 +646,6 @@ public static 	function CheckFields($arFields, $STATUS_ID, $CHECK_RIGHTS="Y")
 	}
 
 	// копирует статус
-	f
 	/**
 	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статус</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в случае положительного результата, в противном случае - "false".</p>
 	*
@@ -714,7 +713,7 @@ public static 	function CheckFields($arFields, $STATUS_ID, $CHECK_RIGHTS="Y")
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/copy.php
 	* @author Bitrix
 	*/
-	public static unction Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
+	public static function Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
 	{
 		global $DB, $APPLICATION, $strError;
 		$err_mess = (CAllFormStatus::err_mess())."<br>Function: Copy<br>Line: ";

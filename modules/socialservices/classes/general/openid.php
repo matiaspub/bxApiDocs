@@ -19,8 +19,11 @@ class CSocServOpenID
 			}
 			elseif($step == 1)
 			{
-				if($identity === false)
-					$identity = $_REQUEST['OPENID_IDENTITY_OPENID'];
+				if($identity === false || is_array($identity))
+				{
+					$identity = $_REQUEST[$var];
+				}
+
 				CSocServAuthManager::SetUniqueKey();
 				$return_to = CSocServUtil::GetCurUrl("auth_service_id=".urlencode($_REQUEST["auth_service_id"])."&check_key=".$_SESSION["UNIQUE_KEY"], array("SEF_APPLICATION_CUR_PAGE_URL", "auth_service_error", "auth_service_id", "login"));
 
@@ -51,7 +54,7 @@ class CSocServYandex extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = "http://openid.yandex.ru/".$_REQUEST['OPENID_IDENTITY_YANDEX'];
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_YANDEX');
@@ -64,7 +67,7 @@ class CSocServYandex extends CSocServOpenID
 		if(preg_match('#openid.yandex.ru/([^/$]+)#i', $arParams["~LAST_LOGIN"], $matches))
 			$login = $matches[1];
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon yandex"></span>
 <input type="text" name="OPENID_IDENTITY_YANDEX" value="'.htmlspecialcharsbx($login).'" size="20" />
 <span>@yandex.ru</span>
 '.bitrix_sessid_post().'
@@ -78,7 +81,7 @@ class CSocServMailRu extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = "http://openid.mail.ru/mail/".$_REQUEST['OPENID_IDENTITY_MAILRU'];
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_MAILRU');
@@ -92,7 +95,7 @@ class CSocServMailRu extends CSocServOpenID
 			$login = $matches[1];
 
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon openid-mail-ru"></span>
 <input type="text" name="OPENID_IDENTITY_MAILRU" value="'.htmlspecialcharsbx($login).'" size="20" />
 <span>@mail.ru</span>
 '.bitrix_sessid_post().'
@@ -106,7 +109,7 @@ class CSocServLivejournal extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = $_REQUEST['OPENID_IDENTITY_LIVEJOURNAL'].".livejournal.com";
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_LIVEJOURNAL');
@@ -119,7 +122,7 @@ class CSocServLivejournal extends CSocServOpenID
 		if(preg_match('#([^\.]+).livejournal.com#i', $arParams["~LAST_LOGIN"], $matches))
 			$login = $matches[1];
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon livejournal"></span>
 <input type="text" name="OPENID_IDENTITY_LIVEJOURNAL" value="'.htmlspecialcharsbx($login).'" size="20" />
 <span>.livejournal.com</span>
 '.bitrix_sessid_post().'
@@ -133,7 +136,7 @@ class CSocServLiveinternet extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = "http://www.liveinternet.ru/users/".$_REQUEST['OPENID_IDENTITY_LIVEINTERNET']."/";
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_LIVEINTERNET');
@@ -146,7 +149,7 @@ class CSocServLiveinternet extends CSocServOpenID
 		if(preg_match('#www.liveinternet.ru/users/([^/$]+)#i', $arParams["~LAST_LOGIN"], $matches))
 			$login = $matches[1];
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon liveinternet"></span>
 <span>liveinternet.ru/users/</span>
 <input type="text" name="OPENID_IDENTITY_LIVEINTERNET" value="'.htmlspecialcharsbx($login).'" size="15" />
 '.bitrix_sessid_post().'
@@ -160,7 +163,7 @@ class CSocServBlogger extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = "http://".$_REQUEST['OPENID_IDENTITY_BLOGGER'].".blogspot.com/";
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_BLOGGER');
@@ -173,7 +176,7 @@ class CSocServBlogger extends CSocServOpenID
 		if(preg_match('#([^\.]+).blogspot.com#i', $arParams["~LAST_LOGIN"], $matches))
 			$login = $matches[1];
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon blogger"></span>
 <input type="text" name="OPENID_IDENTITY_BLOGGER" value="'.htmlspecialcharsbx($login).'" size="20" />
 <span>.blogspot.com</span>
 '.bitrix_sessid_post().'
@@ -187,7 +190,7 @@ class CSocServRambler extends CSocServOpenID
 {
 	static public function Authorize($identity=false, $var=false)
 	{
-		if($identity === false)
+		if($identity === false || is_array($identity))
 			$identity = "http://id.rambler.ru/users/".$_REQUEST['OPENID_IDENTITY_RAMBLER'];
 
 		return parent::Authorize($identity, 'OPENID_IDENTITY_RAMBLER');
@@ -200,7 +203,7 @@ class CSocServRambler extends CSocServOpenID
 		if(preg_match('#id.rambler.ru/users/([^/$]+)#i', $arParams["~LAST_LOGIN"], $matches))
 			$login = $matches[1];
 		return '
-<span class="bx-ss-icon openid"></span>
+<span class="bx-ss-icon rambler"></span>
 <input type="text" name="OPENID_IDENTITY_RAMBLER" value="'.htmlspecialcharsbx($login).'" size="20" />
 <span>@rambler.ru</span>
 '.bitrix_sessid_post().'

@@ -6,7 +6,7 @@ $arSocNetUserInRoleCache = array();
 
 
 /**
- * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.
+ * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.</body> </html>
  *
  *
  *
@@ -179,6 +179,7 @@ class CAllSocNetUserToGroup
 		{
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arUser2Group["GROUP_ID"]);
 			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$arUser2Group["USER_ID"]);
+			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
 		}
 
 		if (
@@ -528,7 +529,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -734,7 +735,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -872,7 +873,7 @@ class CAllSocNetUserToGroup
 			$requestUrl = COption::GetOptionString("socialnetwork", "user_request_page", 
 				(IsModuleInstalled("intranet")) ? "/company/personal/user/#USER_ID#/requests/" : "/club/user/#USER_ID#/requests/", SITE_ID);
 
-			$requestUrl = $serverName.str_replace("#user_id#", $userID, strtolower($requestUrl));
+			$requestUrl = $serverName.str_replace(array("#USER_ID#", "#user_id#"), $userID, $requestUrl);
 	
 			$groupUrl = $serverName.str_replace("#group_id#", $groupID, COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", SITE_ID));
 
@@ -904,7 +905,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -943,7 +944,9 @@ class CAllSocNetUserToGroup
 		}
 
 		if (!is_array($arRelationID))
+		{
 			return true;
+		}
 
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
@@ -955,7 +958,9 @@ class CAllSocNetUserToGroup
 		$arGroupSites = array();
 		$rsGroupSite = CSocNetGroup::GetSite($groupID);
 		while ($arGroupSite = $rsGroupSite->Fetch())
+		{
 			$arGroupSites[] = $arGroupSite["LID"];
+		}
 
 		$userRole = CSocNetUserToGroup::GetUserRole($userID, $groupID);
 		$bUserIsMember = ($userRole && in_array($userRole, array(SONET_ROLES_OWNER, SONET_ROLES_MODERATOR, SONET_ROLES_USER)));
@@ -985,14 +990,20 @@ class CAllSocNetUserToGroup
 		{
 			$arRelationID[$i] = IntVal($arRelationID[$i]);
 			if ($arRelationID[$i] <= 0)
+			{
 				continue;
+			}
 
 			$arRelation = CSocNetUserToGroup::GetByID($arRelationID[$i]);
 			if (!$arRelation)
+			{
 				continue;
+			}
 
 			if ($arRelation["GROUP_ID"] != $groupID || $arRelation["INITIATED_BY_TYPE"] != SONET_INITIATED_BY_USER || $arRelation["ROLE"] != SONET_ROLES_REQUEST)
+			{
 				continue;
+			}
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_USER,
@@ -1003,7 +1014,9 @@ class CAllSocNetUserToGroup
 				$arSuccessRelations[] = $arRelation;
 
 				if ($bAutoSubscribe)
+				{
 					CSocNetLogEvents::AutoSubscribe($arRelation["USER_ID"], SONET_ENTITY_GROUP, $groupID);
+				}
 					
 				if (CModule::IncludeModule("im"))
 				{
@@ -1022,9 +1035,13 @@ class CAllSocNetUserToGroup
 						strpos($groupUrl, "http://") === 0
 						|| strpos($groupUrl, "https://") === 0
 					)
+					{
 						$serverName = "";
+					}
 					else
+					{
 						$serverName = $arTmp["SERVER_NAME"];
+					}
 
 					$arMessageFields = array(
 						"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
@@ -1054,9 +1071,14 @@ class CAllSocNetUserToGroup
 			{
 				$errorMessage = "";
 				if ($e = $APPLICATION->GetException())
+				{
 					$errorMessage = $e->GetString();
+				}
+
 				if (StrLen($errorMessage) <= 0)
+				{
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
+				}
 
 				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CONFIRM_MEMBER");
 				$bSuccess = false;
@@ -1090,7 +1112,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -1284,9 +1306,13 @@ class CAllSocNetUserToGroup
 						strpos($url, "http://") === 0
 						|| strpos($url, "https://") === 0
 					)
+					{
 						$serverName = "";
+					}
 					else
+					{
 						$serverName = $arTmp["SERVER_NAME"];
+					}
 
 					$arMessageFields = array(
 						"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
@@ -1304,6 +1330,27 @@ class CAllSocNetUserToGroup
 						"NOTIFY_MESSAGE_OUT" => str_replace("#NAME#", $arResult["GROUP_NAME"], GetMessage("SONET_UG_CONFIRM_MEMBER_MESSAGE")." (".$serverName.$url.")"),
 					);
 					CIMNotify::Add($arMessageFields);
+
+					$arMessageFields = array(
+						"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
+						"TO_USER_ID" => $arResult['USER_ID'],
+						"NOTIFY_TYPE" => IM_NOTIFY_SYSTEM,
+						"NOTIFY_MODULE" => "socialnetwork",
+						"NOTIFY_EVENT" => "invite_group",
+						"NOTIFY_TAG" => "SOCNET|INVITE_GROUP|".intval($arResult['USER_ID'])."|".$relationID,
+						"NOTIFY_MESSAGE" => str_replace(
+							"#NAME#", 
+							"<a href=\"".$url."\" class=\"bx-notifier-item-action\">".$arResult["GROUP_NAME"]."</a>", 
+							GetMessage("SONET_UG_CONFIRM_MEMBER_MESSAGE_G")
+						),
+						"NOTIFY_MESSAGE_OUT" => str_replace(
+							"#NAME#", 
+							$arResult["GROUP_NAME"], 
+							GetMessage("SONET_UG_CONFIRM_MEMBER_MESSAGE_G")." (".$serverName.$url.")"
+						)						
+					);
+
+					CIMNotify::Add($arMessageFields);					
 
 					$arNotifyParams = array(
 						"TYPE" => "join",
@@ -1473,7 +1520,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -1635,7 +1682,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -1796,7 +1843,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -1911,7 +1958,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -2260,7 +2307,7 @@ class CAllSocNetUserToGroup
 	*
 	*
 	*
-	* @param int $groupID  Код рабочей группы. </ht
+	* @param int $groupID  Код рабочей группы. </h
 	*
 	*
 	*
@@ -2620,12 +2667,18 @@ class CAllSocNetUserToGroup
 			elseif (count($arTag) == 6 && $arTag[1] == "REQUEST_GROUP")
 			{
 				if ($value == "Y")
+				{
 					self::ConfirmRequestToBeMember($GLOBALS["USER"]->GetID(), $arTag[3], array($arTag[4]));
+				}
 				else
+				{
 					self::RejectRequestToBeMember($GLOBALS["USER"]->GetID(), $arTag[3], array($arTag[4]));
+				}
 
 				if (CModule::IncludeModule('im'))
+				{
 					CIMNotify::DeleteBySubTag("SOCNET|REQUEST_GROUP|".$arTag[2]."|".$arTag[3]."|".$arTag[4]);
+				}
 
 				return true;
 			}			

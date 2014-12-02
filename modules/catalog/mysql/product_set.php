@@ -20,8 +20,8 @@ class CCatalogProductSet extends CCatalogProductSetAll
 		unset($arSet['ITEMS']);
 		$arInsert = $DB->PrepareInsert("b_catalog_product_sets", $arFields);
 		$strSql = "insert into b_catalog_product_sets(".$arInsert[0].") values(".$arInsert[1].")";
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$intID = intval($DB->LastID());
+		$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+		$intID = (int)$DB->LastID();
 		if (0 < $intID)
 		{
 			foreach ($arFields['ITEMS'] as &$arOneItem)
@@ -29,11 +29,15 @@ class CCatalogProductSet extends CCatalogProductSetAll
 				$arOneItem['SET_ID'] = $intID;
 				$arInsert = $DB->PrepareInsert("b_catalog_product_sets", $arOneItem);
 				$strSql = "insert into b_catalog_product_sets(".$arInsert[0].") values(".$arInsert[1].")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			}
 			unset($arOneItem);
 			if (self::TYPE_SET == $arSet['TYPE'])
-				CCatalogProduct::SetProductType($arSet['ITEM_ID'], CCatalogProduct::TYPE_SET);
+			{
+				$setParams = self::createSetItemsParamsFromAdd($arFields['ITEMS']);
+				self::fillSetItemsParams($setParams);
+				self::calculateSetParams($arSet['ITEM_ID'], $setParams);
+			}
 
 			foreach (GetModuleEvents("catalog", "OnProductSetAdd", true) as $arEvent)
 			{
@@ -67,14 +71,14 @@ class CCatalogProductSet extends CCatalogProductSetAll
 			if (!empty($strUpdate))
 			{
 				$strSql = "update b_catalog_product_sets set ".$strUpdate." where ID = ".$intID;
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			}
 			if ($boolItems)
 			{
 				$arIDs = array();
 				foreach ($arFields['ITEMS'] as &$arOneItem)
 				{
-					if (array_key_exists('ID', $arOneItem))
+					if (isset($arOneItem['ID']))
 					{
 						$intSubID = $arOneItem['ID'];
 						unset($arOneItem['ID']);
@@ -82,15 +86,15 @@ class CCatalogProductSet extends CCatalogProductSetAll
 						if (!empty($strUpdate))
 						{
 							$strSql = "update b_catalog_product_sets set ".$strUpdate." where ID = ".$intSubID;
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+							$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 						}
 					}
 					else
 					{
 						$arInsert = $DB->PrepareInsert("b_catalog_product_sets", $arOneItem);
 						$strSql = "insert into b_catalog_product_sets(".$arInsert[0].") values(".$arInsert[1].")";
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-						$intSubID = intval($DB->LastID());
+						$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+						$intSubID = (int)$DB->LastID();
 					}
 					$arOneItem['ID'] = $intSubID;
 					$arIDs[] = $intSubID;
@@ -100,11 +104,15 @@ class CCatalogProductSet extends CCatalogProductSetAll
 					self::deleteFromSet($intID, $arIDs);
 			}
 			$strSql = "select ID, ITEM_ID, TYPE from b_catalog_product_sets where ID = ".$intID;
-			$rsSets = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$rsSets = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			if ($arSet = $rsSets->Fetch())
 			{
 				if (self::TYPE_SET == $arSet['TYPE'])
-					CCatalogProduct::SetProductType($arSet['ITEM_ID'], CCatalogProduct::TYPE_SET);
+				{
+					$setParams = self::createSetItemsParamsFromUpdate($intID);
+					self::fillSetItemsParams($setParams);
+					self::calculateSetParams($arSet['ITEM_ID'], $setParams);
+				}
 			}
 
 			foreach (GetModuleEvents("catalog", "OnProductSetUpdate", true) as $arEvent)
@@ -120,7 +128,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intID = intval($intID);
+		$intID = (int)$intID;
 		if (0 >= $intID)
 			return false;
 
@@ -134,9 +142,9 @@ class CCatalogProductSet extends CCatalogProductSetAll
 		if (!empty($arItem) && is_array($arItem))
 		{
 			$strSql = "delete from b_catalog_product_sets where SET_ID=".$arItem['ID'];
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			$strSql = "delete from b_catalog_product_sets where ID=".$arItem['ID'];
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			if (self::TYPE_SET == $arItem['TYPE'])
 				CCatalogProduct::SetProductType($arItem['ITEM_ID'], CCatalogProduct::TYPE_PRODUCT);
 
@@ -184,7 +192,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 			if (!empty($arSqls["GROUPBY"]))
 				$strSql .= " group by ".$arSqls["GROUPBY"];
 
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
@@ -201,9 +209,9 @@ class CCatalogProductSet extends CCatalogProductSetAll
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
+		if ($boolNavStartParams && isset($arNavStartParams['nTopCount']))
 		{
-			$intTopCount = intval($arNavStartParams["nTopCount"]);
+			$intTopCount = (int)$arNavStartParams["nTopCount"];
 		}
 		if ($boolNavStartParams && 0 >= $intTopCount)
 		{
@@ -213,7 +221,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 			if (!empty($arSqls["GROUPBY"]))
 				$strSql_tmp .= " group by ".$arSqls["GROUPBY"];
 
-			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes = $DB->Query($strSql_tmp, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			$cnt = 0;
 			if (empty($arSqls["GROUPBY"]))
 			{
@@ -235,7 +243,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 			{
 				$strSql .= " limit ".$intTopCount;
 			}
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$dbRes = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		}
 
 		return $dbRes;
@@ -245,15 +253,15 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intProductID = intval($intProductID);
+		$intProductID = (int)$intProductID;
 		if (0 >= $intProductID)
 			return false;
-		$intSetType = intval($intSetType);
+		$intSetType = (int)$intSetType;
 		$strSql = 'select ID from b_catalog_product_sets where ITEM_ID='.$intProductID;
 		if (self::TYPE_SET == $intSetType || self::TYPE_GROUP == $intSetType)
 			$strSql .= ' and TYPE='.$intSetType;
 		$strSql .= ' limit 1';
-		$rsRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$rsRes = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if ($arRes = $rsRes->Fetch())
 		{
 			return true;
@@ -271,13 +279,13 @@ class CCatalogProductSet extends CCatalogProductSetAll
 		CatalogClearArray($arProductID, false);
 		if (empty($arProductID))
 			return false;
-		$intSetType = intval($intSetType);
+		$intSetType = (int)$intSetType;
 
 		$strSql = 'select ID from b_catalog_product_sets where OWNER_ID in('.implode(', ', $arProductID).')';
 		if (self::TYPE_SET == $intSetType || self::TYPE_GROUP == $intSetType)
 			$strSql .= ' and TYPE='.$intSetType;
 		$strSql .= ' limit 1';
-		$rsRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$rsRes = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if ($arRes = $rsRes->Fetch())
 		{
 			return true;
@@ -289,10 +297,10 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intProductID = intval($intProductID);
+		$intProductID = (int)$intProductID;
 		if (0 >= $intProductID)
 			return false;
-		$intSetType = intval($intSetType);
+		$intSetType = (int)$intSetType;
 		if (self::TYPE_SET != $intSetType && self::TYPE_GROUP != $intSetType)
 			return false;
 
@@ -301,25 +309,25 @@ class CCatalogProductSet extends CCatalogProductSetAll
 		$boolSet = self::TYPE_SET == $intSetType;
 
 		$arResult = array();
-		$strSql = "select ID, SET_ID, ACTIVE, OWNER_ID, ITEM_ID, SORT";
+		$strSql = "select ID, SET_ID, ACTIVE, OWNER_ID, ITEM_ID, SORT, QUANTITY, MEASURE";
 		if ($boolSet)
-			$strSql .= ", QUANTITY, MEASURE, DISCOUNT_PERCENT";
+			$strSql .= ", DISCOUNT_PERCENT";
 		$strSql .= " from b_catalog_product_sets where OWNER_ID=".$intProductID." AND TYPE=".$intSetType;
-		$rsItems = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$rsItems = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		while ($arItem = $rsItems->Fetch())
 		{
-			$arItem['ID'] = intval($arItem['ID']);
-			$arItem['SET_ID'] = intval($arItem['SET_ID']);
-			$arItem['OWNER_ID'] = intval($arItem['OWNER_ID']);
-			$arItem['ITEM_ID'] = intval($arItem['ITEM_ID']);
-			$arItem['SORT'] = intval($arItem['SORT']);
+			$arItem['ID'] = (int)$arItem['ID'];
+			$arItem['SET_ID'] = (int)$arItem['SET_ID'];
+			$arItem['OWNER_ID'] = (int)$arItem['OWNER_ID'];
+			$arItem['ITEM_ID'] = (int)$arItem['ITEM_ID'];
+			$arItem['SORT'] = (int)$arItem['SORT'];
 
 			$boolProduct = $arItem['ITEM_ID'] == $arItem['OWNER_ID'];
 			$intSetID = ($boolProduct ? $arItem['ID'] : $arItem['SET_ID']);
 			if ($boolSet)
 			{
 				$arItem['QUANTITY'] = (is_null($arItem['QUANTITY']) ? false : doubleval($arItem['QUANTITY']));
-				$arItem['MEASURE'] = (is_null($arItem['MEASURE']) ? false : intval($arItem['MEASURE']));
+				$arItem['MEASURE'] = (is_null($arItem['MEASURE']) ? false : (int)$arItem['MEASURE']);
 				$arItem['DISCOUNT_PERCENT'] = (is_null($arItem['DISCOUNT_PERCENT']) ? false : $arItem['DISCOUNT_PERCENT']);
 			}
 			if ($boolProduct)
@@ -335,7 +343,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 				unset($arItem['OWNER_ID']);
 				unset($arItem['ACTIVE']);
 			}
-			if (!array_key_exists($intSetID, $arResult))
+			if (!isset($arResult[$intSetID]))
 			{
 				$arResult[$intSetID] = $arEmptySet;
 				$arResult[$intSetID]['SET_ID'] = $intSetID;
@@ -357,39 +365,39 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intID = intval($intID);
-		if (0 >= $intID)
+		$intID = (int)$intID;
+		if ($intID <= 0)
 			return false;
 
 		$arResult = array();
 		$arItemList = array();
 		$arOwner = array();
 		$strSql = "select * from b_catalog_product_sets where ID=".$intID;
-		$rsItems = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$rsItems = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if ($arItem = $rsItems->Fetch())
 		{
-			$arItem['ID'] = intval($arItem['ID']);
-			$arItem['SET_ID'] = intval($arItem['SET_ID']);
-			$arItem['OWNER_ID'] = intval($arItem['OWNER_ID']);
-			$arItem['ITEM_ID'] = intval($arItem['ITEM_ID']);
-			$arItem['SORT'] = intval($arItem['SORT']);
+			$arItem['ID'] = (int)$arItem['ID'];
+			$arItem['SET_ID'] = (int)$arItem['SET_ID'];
+			$arItem['OWNER_ID'] = (int)$arItem['OWNER_ID'];
+			$arItem['ITEM_ID'] = (int)$arItem['ITEM_ID'];
+			$arItem['SORT'] = (int)$arItem['SORT'];
 			$arItem['QUANTITY'] = (is_null($arItem['QUANTITY']) ? false : doubleval($arItem['QUANTITY']));
-			$arItem['MEASURE'] =  (is_null($arItem['MEASURE']) ? false : intval($arItem['MEASURE']));
+			$arItem['MEASURE'] =  (is_null($arItem['MEASURE']) ? false : (int)$arItem['MEASURE']);
 			$arItem['DISCOUNT_PERCENT'] =  (is_null($arItem['DISCOUNT_PERCENT']) ? false : doubleval($arItem['DISCOUNT_PERCENT']));
 
 			$arResult = $arItem;
 			$arResult['ITEMS'] = array();
 			$strSql = "select * from b_catalog_product_sets where SET_ID=".$intID;
-			$rsSubs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$rsSubs = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			while ($arSub = $rsSubs->Fetch())
 			{
-				$arSub['ID'] = intval($arSub['ID']);
-				$arSub['SET_ID'] = intval($arSub['SET_ID']);
-				$arSub['OWNER_ID'] = intval($arSub['OWNER_ID']);
-				$arSub['ITEM_ID'] = intval($arSub['ITEM_ID']);
-				$arSub['SORT'] = intval($arSub['SORT']);
+				$arSub['ID'] = (int)$arSub['ID'];
+				$arSub['SET_ID'] = (int)$arSub['SET_ID'];
+				$arSub['OWNER_ID'] = (int)$arSub['OWNER_ID'];
+				$arSub['ITEM_ID'] = (int)$arSub['ITEM_ID'];
+				$arSub['SORT'] = (int)$arSub['SORT'];
 				$arSub['QUANTITY'] = (is_null($arSub['QUANTITY']) ? false: doubleval($arSub['QUANTITY']));
-				$arSub['MEASURE'] = (is_null($arSub['MEASURE']) ? false: intval($arSub['MEASURE']));
+				$arSub['MEASURE'] = (is_null($arSub['MEASURE']) ? false: (int)$arSub['MEASURE']);
 				$arSub['DISCOUNT_PERCENT'] = (is_null($arSub['DISCOUNT_PERCENT']) ? false : doubleval($arSub['DISCOUNT_PERCENT']));
 
 				$arResult['ITEMS'][$arSub['ID']] = $arSub;
@@ -402,36 +410,112 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intProductID = intval($intProductID);
+		$intProductID = (int)$intProductID;
 		if (0 >= $intProductID)
 			return false;
-		$intSetType = intval($intSetType);
+		$intSetType = (int)$intSetType;
 		if (self::TYPE_SET != $intSetType && self::TYPE_GROUP != $intSetType)
 			return false;
 		$strSql = 'delete from b_catalog_product_sets where OWNER_ID='.$intProductID.' and TYPE='.$intSetType;
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if (self::TYPE_SET == $intSetType)
 			CCatalogProduct::SetProductType($intProductID, CCatalogProduct::TYPE_PRODUCT);
 		return true;
+	}
+
+	static public function recalculateSetsByProduct($product)
+	{
+		global $DB;
+
+		if (self::$recalculateSet < 0)
+			return;
+
+		$setsList = array();
+		$setsID = array();
+		$product = (int)$product;
+		$query = 'select SET_ID, OWNER_ID, ITEM_ID from b_catalog_product_sets where ITEM_ID='.$product.' and TYPE='.self::TYPE_SET;
+		$setIterator = $DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+		while ($setItem = $setIterator->Fetch())
+		{
+			$setItem['SET_ID'] = (int)$setItem['SET_ID'];
+			$setItem['OWNER_ID'] = (int)$setItem['OWNER_ID'];
+			$setItem['ITEM_ID'] = (int)$setItem['ITEM_ID'];
+			if ($setItem['ITEM_ID'] === $setItem['OWNER_ID'])
+				continue;
+			$setsList[$setItem['SET_ID']] = array();
+			$setsID[] = $setItem['SET_ID'];
+		}
+		if (isset($setItem))
+			unset($setItem);
+		unset($setIterator, $query);
+
+		if (!empty($setsID))
+		{
+			$productMap = array();
+			$query = 'select SET_ID, OWNER_ID, ITEM_ID, QUANTITY as QUANTITY_IN_SET from b_catalog_product_sets where SET_ID IN('.implode(',', $setsID).')';
+			$setIterator = $DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			while ($setItem = $setIterator->Fetch())
+			{
+				$setItem['SET_ID'] = (int)$setItem['SET_ID'];
+				$setItem['OWNER_ID'] = (int)$setItem['OWNER_ID'];
+				$setItem['ITEM_ID'] = (int)$setItem['ITEM_ID'];
+				if ($setItem['ITEM_ID'] === $setItem['OWNER_ID'])
+					continue;
+				if (!isset($setsList[$setItem['OWNER_ID']]))
+					$setsList[$setItem['OWNER_ID']] = array();
+				$setsList[$setItem['OWNER_ID']][$setItem['ITEM_ID']] = $setItem;
+				if (!isset($productMap[$setItem['ITEM_ID']]))
+					$productMap[$setItem['ITEM_ID']] = array();
+				$productMap[$setItem['ITEM_ID']][] = $setItem['OWNER_ID'];
+			}
+			unset($setItem, $setIterator, $query);
+
+			$productIterator = CCatalogProduct::GetList(
+				array(),
+				array('=ID' => array_keys($productMap)),
+				false,
+				false,
+				array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'WEIGHT')
+			);
+			while ($item = $productIterator->Fetch())
+			{
+				$item['ID'] = (int)$item['ID'];
+				if (!isset($productMap[$item['ID']]))
+					continue;
+				foreach ($productMap[$item['ID']] as &$setKey)
+				{
+					$setsList[$setKey][$item['ID']] = array_merge($setsList[$setKey][$item['ID']], $item);
+				}
+				unset($setKey);
+			}
+			if (isset($item))
+				unset($item);
+			unset($productIterator);
+
+			foreach ($setsList as $setKey => $oneSet)
+			{
+				self::calculateSetParams($setKey, $oneSet);
+			}
+		}
 	}
 
 	protected function getSetID($intID)
 	{
 		global $DB;
 
-		$intID = intval($intID);
+		$intID = (int)$intID;
 		if (0 >= $intID)
 			return false;
 
 		$strSql = "select ID, TYPE, SET_ID, OWNER_ID, ITEM_ID from b_catalog_product_sets where ID=".$intID;
-		$rsItems = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$rsItems = $DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if ($arItem = $rsItems->Fetch())
 		{
-			$arItem['ID'] = intval($arItem['ID']);
-			$arItem['SET_ID'] = intval($arItem['SET_ID']);
-			$arItem['OWNER_ID'] = intval($arItem['OWNER_ID']);
-			$arItem['ITEM_ID'] = intval($arItem['ITEM_ID']);
-			$arItem['TYPE'] = intval($arItem['TYPE']);
+			$arItem['ID'] = (int)$arItem['ID'];
+			$arItem['SET_ID'] = (int)$arItem['SET_ID'];
+			$arItem['OWNER_ID'] = (int)$arItem['OWNER_ID'];
+			$arItem['ITEM_ID'] = (int)$arItem['ITEM_ID'];
+			$arItem['TYPE'] = (int)$arItem['TYPE'];
 			if ($arItem['OWNER_ID'] == $arItem['ITEM_ID'] && 0 == $arItem['SET_ID'])
 			{
 				return $arItem;
@@ -444,7 +528,7 @@ class CCatalogProductSet extends CCatalogProductSetAll
 	{
 		global $DB;
 
-		$intID = intval($intID);
+		$intID = (int)$intID;
 		if (0 >= $intID)
 			return false;
 		CatalogClearArray($arEx, false);
@@ -452,8 +536,129 @@ class CCatalogProductSet extends CCatalogProductSetAll
 			return false;
 
 		$strSql = "delete from b_catalog_product_sets where SET_ID=".$intID." and ID NOT IN(".implode(', ', $arEx).")";
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		return true;
+	}
+
+	protected function calculateSetParams($productID, $items)
+	{
+		global $DB;
+
+		$quantityTrace = 'N';
+		$canBuyZero = 'Y';
+		$quantity = null;
+		$weight = 0;
+
+		$allItems = true;
+		$tracedItems = array_filter($items, 'CCatalogProductSet::isTracedItem');
+		if (empty($tracedItems))
+		{
+			$tracedItems = $items;
+		}
+		else
+		{
+			$allItems = false;
+			$quantityTrace = 'Y';
+			$canBuyZero = 'N';
+			foreach ($items as &$oneItem)
+			{
+				$weight += $oneItem['WEIGHT']*$oneItem['QUANTITY_IN_SET'];
+			}
+			unset($oneItem);
+		}
+		foreach ($tracedItems as &$oneItem)
+		{
+			if ($oneItem['QUANTITY'] <= 0)
+			{
+				$itemQuantity = 0;
+			}
+			else
+			{
+				$itemQuantity = (int)floor($oneItem['QUANTITY']/$oneItem['QUANTITY_IN_SET']);
+			}
+			if ($quantity === null || $quantity > $itemQuantity)
+				$quantity = $itemQuantity;
+			if ($allItems)
+				$weight += $oneItem['WEIGHT']*$oneItem['QUANTITY_IN_SET'];
+		}
+		unset($oneItem);
+
+		$measure = CCatalogMeasure::getDefaultMeasure(true, false);
+
+		$fields = array(
+			'WEIGHT' => $weight,
+			'QUANTITY' => $quantity,
+			'QUANTITY_TRACE' => $quantityTrace,
+			'CAN_BUY_ZERO' => $canBuyZero,
+			'NEGATIVE_AMOUNT_TRACE' => $canBuyZero,
+			'MEASURE' => $measure['ID'],
+			'TYPE' => CCatalogProduct::TYPE_SET
+		);
+
+		$update = $DB->PrepareUpdate('b_catalog_product', $fields);
+
+		if (!empty($update))
+		{
+			$query = "update b_catalog_product set ".$update." where ID = ".$productID;
+			$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+		}
+
+		$query = "delete from b_catalog_measure_ratio where PRODUCT_ID = ".$productID;
+		$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+		$fields = array(
+			'PRODUCT_ID' => $productID,
+			'RATIO' => 1
+		);
+		$insert = $DB->PrepareInsert('b_catalog_measure_ratio', $fields);
+		$query = "insert into b_catalog_measure_ratio (".$insert[0].") values(".$insert[1].")";
+		$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+
+		return true;
+	}
+
+	protected function createSetItemsParamsFromUpdate($setID, $getProductID = false)
+	{
+		global $DB;
+		$result = array();
+
+		$getProductID = ($getProductID === true);
+		if ($getProductID)
+		{
+			$result = array(
+				'ITEM_ID' => 0,
+				'ITEMS' => array()
+			);
+			$query = 'select ID, ITEM_ID, QUANTITY from b_catalog_product_sets where SET_ID = '.$setID.' or ID = '.$setID;
+			$setIterator = $DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			while ($item = $setIterator->Fetch())
+			{
+				$item['ID'] = (int)$item['ID'];
+				if ($item['ID'] == $setID)
+				{
+					$result['ITEM_ID'] = $item['ID'];
+				}
+				else
+				{
+					$item['ITEM_ID'] = (int)$item['ITEM_ID'];
+					$result['ITEMS'][$item['ITEM_ID']] = array(
+						'QUANTITY_IN_SET' => $item['QUANTITY']
+					);
+				}
+			}
+		}
+		else
+		{
+			$query = 'select ITEM_ID, QUANTITY from b_catalog_product_sets where SET_ID = '.$setID;
+			$setIterator = $DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			while ($item = $setIterator->Fetch())
+			{
+				$item['ITEM_ID'] = (int)$item['ITEM_ID'];
+				$result[$item['ITEM_ID']] = array(
+					'QUANTITY_IN_SET' => $item['QUANTITY']
+				);
+			}
+		}
+		return $result;
 	}
 }
 ?>

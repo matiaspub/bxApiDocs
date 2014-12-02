@@ -1,7 +1,5 @@
 <?
 // define("PATH2CONVERT_TABLES", $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/cvtables/");
-global $BX_CHARSET_TABLE_CACHE;
-$BX_CHARSET_TABLE_CACHE = Array();
 
 class CharsetConverter
 {
@@ -36,7 +34,7 @@ class CharsetConverter
 		if ($string == '')
 			return '';
 
-		if (extension_loaded("mbstring"))
+		if (extension_loaded("mbstring") && mb_encoding_aliases($charset_in) && mb_encoding_aliases($charset_out))
 		{
 			//For UTF-16 we have to detect the order of bytes
 			//Default for mbstring extension is Big endian
@@ -128,9 +126,9 @@ class CharsetConverter
 
 	protected function BuildConvertTable()
 	{
-		global $BX_CHARSET_TABLE_CACHE;
+		static $BX_CHARSET_TABLE_CACHE = array();
 
-		for ($i = 0; $i < func_num_args(); $i++)
+		for ($i = 0, $n = func_num_args(); $i < $n; $i++)
 		{
 			$fileName = func_get_arg($i);
 
@@ -163,12 +161,12 @@ class CharsetConverter
 				{
 					if (substr($line, 0, 1) != "#")
 					{
-						$hexValue = preg_split("/[\s,]+/", $line, 3);
+						$hexValue = preg_split("/[\\s,]+/", $line, 3);
 						if (substr($hexValue[1], 0, 1) != "#")
 						{
 							$key = strtoupper(str_replace("0x", "", $hexValue[1]));
 							$value = strtoupper(str_replace("0x", "", $hexValue[0]));
-							$BX_CHARSET_TABLE_CACHE[func_get_arg($i)][$key] = $value;
+							$BX_CHARSET_TABLE_CACHE[$fileName][$key] = $value;
 						}
 					}
 				}
@@ -250,7 +248,8 @@ class CharsetConverter
 			if(!$arConvertTable)
 				return false;
 
-			$stringLength = (extension_loaded("mbstring") ? mb_strlen($sourceString, $charsetFrom) : strlen($sourceString));
+			$stringLength = function_exists('mb_strlen') ? mb_strlen($sourceString, '8bit') : strlen($sourceString);
+
 			for ($i = 0; $i < $stringLength; $i++)
 			{
 				$hexChar = strtoupper(dechex(ord($sourceString[$i])));
@@ -329,4 +328,3 @@ class CharsetConverter
 		$this->arErrors = array();
 	}
 }
-?>

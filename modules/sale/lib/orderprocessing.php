@@ -3,17 +3,14 @@ namespace Bitrix\Sale;
 use \Bitrix\Main\Entity\DataManager as DataManager;
 use \Bitrix\Main\Type\DateTime as DateTime;
 use \Bitrix\Main\Application as Application;
+use Bitrix\Main\Localization\Loc;
 
+Loc::loadMessages(__FILE__);
 
 
 class OrderProcessingTable extends DataManager
 {
 	protected $orderProcessedCache = array();
-
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
 
 	public static function getTableName()
 	{

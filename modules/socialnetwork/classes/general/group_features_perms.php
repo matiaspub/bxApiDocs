@@ -5,7 +5,7 @@ $GLOBALS["arSonetFeaturesPermsCache"] = array();
 
 
 /**
- * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей.
+ * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей.</body> </html>
  *
  *
  *
@@ -23,7 +23,9 @@ class CAllSocNetFeaturesPerms
 	/***************************************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB, $arSocNetFeaturesSettings, $arSocNetAllowedRolesForFeaturesPerms, $arSocNetAllowedEntityTypes, $arSocNetAllowedRelationsType;
+		global $DB, $arSocNetAllowedRolesForFeaturesPerms, $arSocNetAllowedEntityTypes, $arSocNetAllowedRelationsType;
+
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
 		{
@@ -82,7 +84,10 @@ class CAllSocNetFeaturesPerms
 					$groupFeatureType = $arGroupFeature["FEATURE_ENTITY_TYPE"];
 				}
 			}
-			if (StrLen($groupFeature) <= 0 || !array_key_exists($groupFeature, $arSocNetFeaturesSettings))
+			if (
+				StrLen($groupFeature) <= 0 
+				|| !array_key_exists($groupFeature, $arSocNetFeaturesSettings)
+			)
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GFP_BAD_OPERATION_ID"), "BAD_OPERATION_ID");
 				return false;
@@ -396,6 +401,8 @@ class CAllSocNetFeaturesPerms
 	*/
 	public static function SetPerm($featureID, $operation, $perm)
 	{
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
+
 		$featureID = IntVal($featureID);
 		$operation = Trim($operation);
 		$perm = Trim($perm);
@@ -454,9 +461,9 @@ class CAllSocNetFeaturesPerms
 
 			if (
 				!in_array($feature, array("tasks", "files", "blog"))
-				&& is_array($GLOBALS["arSocNetFeaturesSettings"][$feature]["subscribe_events"]))
+				&& is_array($arSocNetFeaturesSettings[$feature]["subscribe_events"]))
 			{
-				$arEventsTmp = array_keys($GLOBALS["arSocNetFeaturesSettings"][$feature]["subscribe_events"]);
+				$arEventsTmp = array_keys($arSocNetFeaturesSettings[$feature]["subscribe_events"]);
 				$rsLog = CSocNetLog::GetList(
 					array(), 
 					array(
@@ -476,7 +483,7 @@ class CAllSocNetFeaturesPerms
 						$entity_type, 
 						$entity_id, 
 						$feature, 
-						$GLOBALS["arSocNetFeaturesSettings"][$feature]["subscribe_events"][$arLog["EVENT_ID"]]["OPERATION"]
+						$arSocNetFeaturesSettings[$feature]["subscribe_events"][$arLog["EVENT_ID"]]["OPERATION"]
 					);
 				}
 			}
@@ -654,7 +661,9 @@ class CAllSocNetFeaturesPerms
 	*/
 	public static function CanPerformOperation($userID, $type, $id, $feature, $operation, $bCurrentUserIsAdmin = false)
 	{
-		global $arSocNetFeaturesSettings, $arSocNetAllowedEntityTypes;
+		global $arSocNetAllowedEntityTypes;
+
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 
 		$userID = IntVal($userID);
 
@@ -714,15 +723,21 @@ class CAllSocNetFeaturesPerms
 				$resGroupTmp = CSocNetGroup::GetList(array("ID"=>"ASC"), array("ID"=>$arGroupToGet));
 				while ($arGroupTmp = $resGroupTmp->Fetch())
 				{
-					if ($arGroupTmp["CLOSED"] == "Y" && !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])):
+					if (
+						$arGroupTmp["CLOSED"] == "Y" 
+						&& !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])
+					)
+					{
 						if (COption::GetOptionString("socialnetwork", "work_with_closed_groups", "N") != "Y")
 						{
 							$arReturn[$arGroupTmp["ID"]] = false;
 							continue;
 						}
 						else
+						{
 							$featureOperationPerms[$arGroupTmp["ID"]] = SONET_ROLES_OWNER;
-					endif;
+						}
+					}
 
 					if ($bCurrentUserIsAdmin)
 					{
@@ -814,20 +829,31 @@ class CAllSocNetFeaturesPerms
 
 				$userRoleInGroup = CSocNetUserToGroup::GetUserRole($userID, $id);
 				if ($userRoleInGroup == SONET_ROLES_BAN)
+				{
 					return false;
+				}
 
 				$arGroupTmp = CSocNetGroup::GetByID($id);
 
-				if ($arGroupTmp["CLOSED"] == "Y" && !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])):
+				if (
+					$arGroupTmp["CLOSED"] == "Y" 
+					&& !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])
+				)
+				{
 					if (COption::GetOptionString("socialnetwork", "work_with_closed_groups", "N") != "Y")
+					{
 						return false;
+					}
 					else
+					{
 						$featureOperationPerms = SONET_ROLES_OWNER;
-				endif;
-
+					}
+				}
 
 				if ($bCurrentUserIsAdmin)
+				{
 					return true;
+				}
 
 				if ($featureOperationPerms == SONET_ROLES_ALL)
 				{
@@ -1065,7 +1091,9 @@ class CAllSocNetFeaturesPerms
 	*/
 	public static function GetOperationPerm($type, $id, $feature, $operation)
 	{
-		global $arSocNetFeaturesSettings, $arSocNetAllowedEntityTypes;
+		global $arSocNetAllowedEntityTypes;
+
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 
 		$type = Trim($type);
 		if ((StrLen($type) <= 0) || !in_array($type, $arSocNetAllowedEntityTypes))
@@ -1100,7 +1128,8 @@ class CAllSocNetFeaturesPerms
 		if (
 			!array_key_exists($feature, $arSocNetFeaturesSettings) 
 			|| !array_key_exists("allowed", $arSocNetFeaturesSettings[$feature])
-			|| !in_array($type, $arSocNetFeaturesSettings[$feature]["allowed"]))
+			|| !in_array($type, $arSocNetFeaturesSettings[$feature]["allowed"])
+		)
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GF_ERROR_NO_FEATURE_ID"), "ERROR_NO_FEATURE_ID");
 			if (is_array($id))
@@ -1111,7 +1140,9 @@ class CAllSocNetFeaturesPerms
 				return $arReturn;
 			}
 			else
+			{
 				return false;
+			}
 		}
 
 		$operation = StrToLower(Trim($operation));
@@ -1177,22 +1208,34 @@ class CAllSocNetFeaturesPerms
 					$featureOperationPerms = SONET_ROLES_OWNER;
 
 					if (!array_key_exists($feature, $arFeaturesPerms[$TmpEntityID]))
+					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
+					}
 					elseif (!array_key_exists($operation, $arFeaturesPerms[$TmpEntityID][$feature]))
+					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
+					}
 					else
+					{
 						$featureOperationPerms = $arFeaturesPerms[$TmpEntityID][$feature][$operation];
+					}
 				}
 				else
 				{
 					$featureOperationPerms = SONET_RELATIONS_TYPE_NONE;
 
 					if (!array_key_exists($feature, $arFeaturesPerms[$TmpEntityID]))
+					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
+					}
 					elseif (!array_key_exists($operation, $arFeaturesPerms[$TmpEntityID][$feature]))
+					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
+					}
 					else
+					{
 						$featureOperationPerms = $arFeaturesPerms[$TmpEntityID][$feature][$operation];
+					}
 				}
 
 				$arReturn[$TmpEntityID] = $featureOperationPerms;
@@ -1297,22 +1340,34 @@ class CAllSocNetFeaturesPerms
 				$featureOperationPerms = SONET_ROLES_OWNER;
 
 				if (!array_key_exists($feature, $arFeaturesPerms))
+				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
+				}
 				elseif (!array_key_exists($operation, $arFeaturesPerms[$feature]))
+				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
+				}
 				else
+				{
 					$featureOperationPerms = $arFeaturesPerms[$feature][$operation];
+				}
 			}
 			else
 			{
 				$featureOperationPerms = SONET_RELATIONS_TYPE_NONE;
 
 				if (!array_key_exists($feature, $arFeaturesPerms))
+				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
+				}
 				elseif (!array_key_exists($operation, $arFeaturesPerms[$feature]))
+				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
+				}
 				else
+				{
 					$featureOperationPerms = $arFeaturesPerms[$feature][$operation];
+				}
 			}
 
 			return $featureOperationPerms;

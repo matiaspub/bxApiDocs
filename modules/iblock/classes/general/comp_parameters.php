@@ -1,8 +1,75 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Loader;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class CIBlockParameters
 {
+	protected static $catalogIncluded = null;
+
+	static $elementPropertyCache = array();
+	private static function getIblockElementProperties($iblock_id)
+	{
+		if (!isset(self::$elementPropertyCache[$iblock_id]))
+		{
+			self::$elementPropertyCache[$iblock_id] = array();
+			$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $iblock_id));
+			while($property = $rsProperty->fetch())
+			{
+				self::$elementPropertyCache[$iblock_id][] = $property;
+			}
+		}
+		return self::$elementPropertyCache[$iblock_id];
+	}
+
+	static $catalogStoreCache = null;
+	private static function getCatalogStores()
+	{
+		if (!isset(self::$catalogStoreCache))
+		{
+			self::$catalogStoreCache = array();
+			if (self::$catalogIncluded === null)
+				self::$catalogIncluded = Loader::includeModule('catalog');
+			if (self::$catalogIncluded)
+			{
+				$storeCount = 0;
+				$maxStores = (int)COption::GetOptionString("iblock", "seo_max_stores");
+				$rsStore = CCatalogStore::GetList(array('SORT' => 'ASC'), array(), false, false, array('ID', 'TITLE', 'ADDRESS'));
+				while ($store = $rsStore->Fetch())
+				{
+					self::$catalogStoreCache[$storeCount] = $store;
+					$storeCount++;
+					if ($maxStores > 0 && $storeCount >= $maxStores)
+					{
+						break;
+					}
+				}
+			}
+		}
+		return self::$catalogStoreCache;
+	}
+
+	static $catalogPriceCache = null;
+	private static function getCatalogPrices()
+	{
+		if (!isset(self::$catalogPriceCache))
+		{
+			self::$catalogPriceCache = array();
+			if (self::$catalogIncluded === null)
+				self::$catalogIncluded = Loader::includeModule('catalog');
+			if (self::$catalogIncluded)
+			{
+				$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
+				while ($price = $rsPrice->Fetch())
+				{
+					self::$catalogPriceCache[] = $price;
+				}
+			}
+		}
+		return self::$catalogPriceCache;
+	}
+
 	public static function GetFieldCode($name, $parent, $options = array())
 	{
 		//Common use in components
@@ -14,39 +81,39 @@ class CIBlockParameters
 			"ADDITIONAL_VALUES" => "Y",
 			"SIZE" => 8,
 			"VALUES" => array(
-				"ID" => GetMessage("IBLOCK_FIELD_ID"),
-				"CODE" => GetMessage("IBLOCK_FIELD_CODE"),
-				"XML_ID" => GetMessage("IBLOCK_FIELD_XML_ID"),
-				"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
-				"TAGS" => GetMessage("IBLOCK_FIELD_TAGS"),
-				"SORT"=> GetMessage("IBLOCK_FIELD_SORT"),
-				"PREVIEW_TEXT" => GetMessage("IBLOCK_FIELD_PREVIEW_TEXT"),
-				"PREVIEW_PICTURE" => GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
-				"DETAIL_TEXT" => GetMessage("IBLOCK_FIELD_DETAIL_TEXT"),
-				"DETAIL_PICTURE" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
-				"DATE_ACTIVE_FROM" => GetMessage("IBLOCK_FIELD_DATE_ACTIVE_FROM"),
-				"ACTIVE_FROM" => GetMessage("IBLOCK_FIELD_ACTIVE_FROM"),
-				"DATE_ACTIVE_TO" => GetMessage("IBLOCK_FIELD_DATE_ACTIVE_TO"),
-				"ACTIVE_TO" => GetMessage("IBLOCK_FIELD_ACTIVE_TO"),
-				"SHOW_COUNTER" => GetMessage("IBLOCK_FIELD_SHOW_COUNTER"),
-				"SHOW_COUNTER_START" => GetMessage("IBLOCK_FIELD_SHOW_COUNTER_START"),
-				"IBLOCK_TYPE_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_TYPE_ID"),
-				"IBLOCK_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_ID"),
-				"IBLOCK_CODE" => GetMessage("IBLOCK_FIELD_IBLOCK_CODE"),
-				"IBLOCK_NAME" => GetMessage("IBLOCK_FIELD_IBLOCK_NAME"),
-				"IBLOCK_EXTERNAL_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_EXTERNAL_ID"),
-				"DATE_CREATE" => GetMessage("IBLOCK_FIELD_DATE_CREATE"),
-				"CREATED_BY" => GetMessage("IBLOCK_FIELD_CREATED_BY"),
-				"CREATED_USER_NAME" => GetMessage("IBLOCK_FIELD_CREATED_USER_NAME"),
-				"TIMESTAMP_X" => GetMessage("IBLOCK_FIELD_TIMESTAMP_X"),
-				"MODIFIED_BY" => GetMessage("IBLOCK_FIELD_MODIFIED_BY"),
-				"USER_NAME" => GetMessage("IBLOCK_FIELD_USER_NAME"),
+				"ID" => Loc::getMessage("IBLOCK_FIELD_ID"),
+				"CODE" => Loc::getMessage("IBLOCK_FIELD_CODE"),
+				"XML_ID" => Loc::getMessage("IBLOCK_FIELD_XML_ID"),
+				"NAME" => Loc::getMessage("IBLOCK_FIELD_NAME"),
+				"TAGS" => Loc::getMessage("IBLOCK_FIELD_TAGS"),
+				"SORT"=> Loc::getMessage("IBLOCK_FIELD_SORT"),
+				"PREVIEW_TEXT" => Loc::getMessage("IBLOCK_FIELD_PREVIEW_TEXT"),
+				"PREVIEW_PICTURE" => Loc::getMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
+				"DETAIL_TEXT" => Loc::getMessage("IBLOCK_FIELD_DETAIL_TEXT"),
+				"DETAIL_PICTURE" => Loc::getMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
+				"DATE_ACTIVE_FROM" => Loc::getMessage("IBLOCK_FIELD_DATE_ACTIVE_FROM"),
+				"ACTIVE_FROM" => Loc::getMessage("IBLOCK_FIELD_ACTIVE_FROM"),
+				"DATE_ACTIVE_TO" => Loc::getMessage("IBLOCK_FIELD_DATE_ACTIVE_TO"),
+				"ACTIVE_TO" => Loc::getMessage("IBLOCK_FIELD_ACTIVE_TO"),
+				"SHOW_COUNTER" => Loc::getMessage("IBLOCK_FIELD_SHOW_COUNTER"),
+				"SHOW_COUNTER_START" => Loc::getMessage("IBLOCK_FIELD_SHOW_COUNTER_START"),
+				"IBLOCK_TYPE_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_TYPE_ID"),
+				"IBLOCK_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_ID"),
+				"IBLOCK_CODE" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_CODE"),
+				"IBLOCK_NAME" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_NAME"),
+				"IBLOCK_EXTERNAL_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_EXTERNAL_ID"),
+				"DATE_CREATE" => Loc::getMessage("IBLOCK_FIELD_DATE_CREATE"),
+				"CREATED_BY" => Loc::getMessage("IBLOCK_FIELD_CREATED_BY"),
+				"CREATED_USER_NAME" => Loc::getMessage("IBLOCK_FIELD_CREATED_USER_NAME"),
+				"TIMESTAMP_X" => Loc::getMessage("IBLOCK_FIELD_TIMESTAMP_X"),
+				"MODIFIED_BY" => Loc::getMessage("IBLOCK_FIELD_MODIFIED_BY"),
+				"USER_NAME" => Loc::getMessage("IBLOCK_FIELD_USER_NAME"),
 			),
 		);
 
 		//Check for any additional fields
 		if(isset($options["SECTION_ID"]) && $options["SECTION_ID"])
-			$result["VALUES"]["SECTION_ID"] = GetMessage("IBLOCK_FIELD_SECTION_ID");
+			$result["VALUES"]["SECTION_ID"] = Loc::getMessage("IBLOCK_FIELD_SECTION_ID");
 
 		return $result;
 	}
@@ -62,22 +129,22 @@ class CIBlockParameters
 			"ADDITIONAL_VALUES" => "Y",
 			"SIZE" => 8,
 			"VALUES" => array(
-				"ID" => GetMessage("IBLOCK_FIELD_ID"),
-				"CODE" => GetMessage("IBLOCK_FIELD_CODE"),
-				"XML_ID" => GetMessage("IBLOCK_FIELD_XML_ID"),
-				"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
-				"SORT"=> GetMessage("IBLOCK_FIELD_SORT"),
-				"DESCRIPTION" => GetMessage("IBLOCK_FIELD_DESCRIPTION"),
-				"PICTURE" => GetMessage("IBLOCK_FIELD_PICTURE"),
-				"DETAIL_PICTURE" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
-				"IBLOCK_TYPE_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_TYPE_ID"),
-				"IBLOCK_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_ID"),
-				"IBLOCK_CODE" => GetMessage("IBLOCK_FIELD_IBLOCK_CODE"),
-				"IBLOCK_EXTERNAL_ID" => GetMessage("IBLOCK_FIELD_IBLOCK_EXTERNAL_ID"),
-				"DATE_CREATE" => GetMessage("IBLOCK_FIELD_DATE_CREATE"),
-				"CREATED_BY" => GetMessage("IBLOCK_FIELD_CREATED_BY"),
-				"TIMESTAMP_X" => GetMessage("IBLOCK_FIELD_TIMESTAMP_X"),
-				"MODIFIED_BY" => GetMessage("IBLOCK_FIELD_MODIFIED_BY"),
+				"ID" => Loc::getMessage("IBLOCK_FIELD_ID"),
+				"CODE" => Loc::getMessage("IBLOCK_FIELD_CODE"),
+				"XML_ID" => Loc::getMessage("IBLOCK_FIELD_XML_ID"),
+				"NAME" => Loc::getMessage("IBLOCK_FIELD_NAME"),
+				"SORT"=> Loc::getMessage("IBLOCK_FIELD_SORT"),
+				"DESCRIPTION" => Loc::getMessage("IBLOCK_FIELD_DESCRIPTION"),
+				"PICTURE" => Loc::getMessage("IBLOCK_FIELD_PICTURE"),
+				"DETAIL_PICTURE" => Loc::getMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
+				"IBLOCK_TYPE_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_TYPE_ID"),
+				"IBLOCK_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_ID"),
+				"IBLOCK_CODE" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_CODE"),
+				"IBLOCK_EXTERNAL_ID" => Loc::getMessage("IBLOCK_FIELD_IBLOCK_EXTERNAL_ID"),
+				"DATE_CREATE" => Loc::getMessage("IBLOCK_FIELD_DATE_CREATE"),
+				"CREATED_BY" => Loc::getMessage("IBLOCK_FIELD_CREATED_BY"),
+				"TIMESTAMP_X" => Loc::getMessage("IBLOCK_FIELD_TIMESTAMP_X"),
+				"MODIFIED_BY" => Loc::getMessage("IBLOCK_FIELD_MODIFIED_BY"),
 			),
 		);
 		return $result;
@@ -109,8 +176,8 @@ class CIBlockParameters
 				"d.M.Y g:i A" => CIBlockFormatProperties::DateFormat("d.M.Y g:i A", $timestamp),//"22.Febkate.2007 1:30 PM",
 				"d.m.y G:i" => CIBlockFormatProperties::DateFormat("d.m.y G:i", $timestamp),//"22.02.07 7:30",
 				"d.m.Y H:i" => CIBlockFormatProperties::DateFormat("d.m.Y H:i", $timestamp),//"22.02.2007 07:30",
-				"SHORT" => GetMessage('COMP_PARAM_DATE_FORMAT_SITE'),
-				"FULL" => GetMessage('COMP_PARAM_DATETIME_FORMAT_SITE')
+				"SHORT" => Loc::getMessage('COMP_PARAM_DATE_FORMAT_SITE'),
+				"FULL" => Loc::getMessage('COMP_PARAM_DATETIME_FORMAT_SITE')
 			),
 			"DEFAULT" => $DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")),
 			"ADDITIONAL_VALUES" => "Y",
@@ -124,175 +191,175 @@ class CIBlockParameters
 		case "DETAIL":
 			return array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
-					"TITLE" => "#SITE_DIR# - ".GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TITLE" => "#SITE_DIR# - ".Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
 					"ONCLICK" => "$action_function('#SITE_DIR#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
-					"TITLE" => "#SERVER_NAME# - ".GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TITLE" => "#SERVER_NAME# - ".Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
 					"ONCLICK" => "$action_function('#SERVER_NAME#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
-					"TITLE" => "#IBLOCK_TYPE_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TITLE" => "#IBLOCK_TYPE_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_TYPE_ID#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
-					"TITLE" => "#IBLOCK_ID#".GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TITLE" => "#IBLOCK_ID#".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
-					"TITLE" => "#IBLOCK_CODE# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TITLE" => "#IBLOCK_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
 					"ONCLICK" => "$action_function('#IBLOCK_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
-					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_EXTERNAL_ID#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_ID"),
-					"TITLE" => "#SECTION_ID# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID"),
+					"TITLE" => "#SECTION_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID"),
 					"ONCLICK" => "$action_function('#SECTION_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
-					"TITLE" => "#SECTION_CODE# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TITLE" => "#SECTION_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
 					"ONCLICK" => "$action_function('#SECTION_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
-					"TITLE" => "#SECTION_CODE_PATH# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
+					"TITLE" => "#SECTION_CODE_PATH# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
 					"ONCLICK" => "$action_function('#SECTION_CODE_PATH#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
-					"TITLE" => "#ID# - ".GetMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
+					"TITLE" => "#ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
 					"ONCLICK" => "$action_function('#ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_ID")."(2)",
-					"TITLE" => "#ELEMENT_ID# - ".GetMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_ID")."(2)",
+					"TITLE" => "#ELEMENT_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_ID"),
 					"ONCLICK" => "$action_function('#ELEMENT_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
-					"TITLE" => "#CODE# - ".GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
+					"TITLE" => "#CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
 					"ONCLICK" => "$action_function('#CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE")."(2)",
-					"TITLE" => "#ELEMENT_CODE# - ".GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_CODE")."(2)",
+					"TITLE" => "#ELEMENT_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
 					"ONCLICK" => "$action_function('#ELEMENT_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_EXTERNAL_ID"),
-					"TITLE" => "#EXTERNAL_ID# - ".GetMessage("IB_COMPLIB_POPUP_ELEMENT_EXTERNAL_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_EXTERNAL_ID"),
+					"TITLE" => "#EXTERNAL_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_EXTERNAL_ID"),
 					"ONCLICK" => "$action_function('#EXTERNAL_ID#', '$menuID', '$inputID')",
 				),
 			);
 		case "SECTION":
 			return array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
-					"TITLE" => "#SITE_DIR# - ".GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TITLE" => "#SITE_DIR# - ".Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
 					"ONCLICK" => "$action_function('#SITE_DIR#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
-					"TITLE" => "#SERVER_NAME# - ".GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TITLE" => "#SERVER_NAME# - ".Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
 					"ONCLICK" => "$action_function('#SERVER_NAME#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
-					"TITLE" => "#IBLOCK_TYPE_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TITLE" => "#IBLOCK_TYPE_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_TYPE_ID#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
-					"TITLE"=>"#IBLOCK_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TITLE"=>"#IBLOCK_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
-					"TITLE" => "#IBLOCK_CODE# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TITLE" => "#IBLOCK_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
 					"ONCLICK" => "$action_function('#IBLOCK_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
-					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_EXTERNAL_ID#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_ID"),
-					"TITLE" => "#ID# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID"),
+					"TITLE" => "#ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID"),
 					"ONCLICK" => "$action_function('#ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_ID")."(2)",
-					"TITLE" => "#SECTION_ID# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID")."(2)",
+					"TITLE" => "#SECTION_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_ID"),
 					"ONCLICK" => "$action_function('#SECTION_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
-					"TITLE" => "#CODE# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TITLE" => "#CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
 					"ONCLICK" => "$action_function('#CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE")."(2)",
-					"TITLE" => "#SECTION_CODE# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE")."(2)",
+					"TITLE" => "#SECTION_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
 					"ONCLICK" => "$action_function('#SECTION_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
-					"TITLE" => "#SECTION_CODE_PATH# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
+					"TITLE" => "#SECTION_CODE_PATH# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE_PATH"),
 					"ONCLICK" => "$action_function('#SECTION_CODE_PATH#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_EXTERNAL_ID"),
-					"TITLE"=>"#EXTERNAL_ID# - ".GetMessage("IB_COMPLIB_POPUP_SECTION_EXTERNAL_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_EXTERNAL_ID"),
+					"TITLE"=>"#EXTERNAL_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_SECTION_EXTERNAL_ID"),
 					"ONCLICK" => "$action_function('#EXTERNAL_ID#', '$menuID', '$inputID')",
 				),
 			);
 		default:
 			return array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
 					"ONCLICK" => "$action_function('#SITE_DIR#', '$menuID', '$inputID')",
-					"TITLE"=> "#SITE_DIR# - ".GetMessage("IB_COMPLIB_POPUP_SITE_DIR"),
+					"TITLE"=> "#SITE_DIR# - ".Loc::getMessage("IB_COMPLIB_POPUP_SITE_DIR"),
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
-					"TITLE" => "#SERVER_NAME# - ".GetMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
+					"TITLE" => "#SERVER_NAME# - ".Loc::getMessage("IB_COMPLIB_POPUP_SERVER_NAME"),
 					"ONCLICK" => "$action_function('#SERVER_NAME#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
-					"TITLE" => "#IBLOCK_TYPE_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
+					"TITLE" => "#IBLOCK_TYPE_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TYPE_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_TYPE_ID#', '$menuID', '$inputID')",
 				),
 				array("SEPARATOR" => true),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
-					"TITLE"=>"#IBLOCK_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
+					"TITLE"=>"#IBLOCK_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_ID#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
-					"TITLE" => "#IBLOCK_CODE# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TITLE" => "#IBLOCK_CODE# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
 					"ONCLICK" => "$action_function('#IBLOCK_CODE#', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
-					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".GetMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
+					"TITLE" => "#IBLOCK_EXTERNAL_ID# - ".Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_EXTERNAL_ID"),
 					"ONCLICK" => "$action_function('#IBLOCK_EXTERNAL_ID#', '$menuID', '$inputID')",
 				),
 			);
@@ -304,22 +371,22 @@ class CIBlockParameters
 		global $USER_FIELD_MANAGER;
 		$result = array();
 		$result["this"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_NAME"),
 					"ONCLICK" => "$action_function('{=this.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_LOWER_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_LOWER_NAME"),
 					"ONCLICK" => "$action_function('{=lower this.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_CODE"),
 					"ONCLICK" => "$action_function('{=this.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTION_PREVIEW_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTION_PREVIEW_TEXT"),
 					"ONCLICK" => "$action_function('{=this.PreviewText}', '$menuID', '$inputID')",
 				),
 			),
@@ -327,7 +394,7 @@ class CIBlockParameters
 		if ($iblock_id > 0)
 		{
 			$result["properties"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PROPERTIES"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PROPERTIES"),
 				"MENU" => array(
 				),
 			);
@@ -344,66 +411,69 @@ class CIBlockParameters
 			}
 		}
 		$result["parent"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
 					"ONCLICK" => "$action_function('{=parent.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
 					"ONCLICK" => "$action_function('{=parent.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
 					"ONCLICK" => "$action_function('{=parent.PreviewText}', '$menuID', '$inputID')",
 				),
 			),
 		);
 		$result["iblock"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
 					"ONCLICK" => "$action_function('{=iblock.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
 					"ONCLICK" => "$action_function('{=iblock.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
 					"ONCLICK" => "$action_function('{=iblock.PreviewText}', '$menuID', '$inputID')",
 				),
 			),
 		);
-		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		if (self::$catalogIncluded === null)
+			self::$catalogIncluded = Loader::includeModule('catalog');
+		if (self::$catalogIncluded)
 		{
 			$result["store"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
 				"MENU" => array(),
 			);
-			$rsStore = CCatalogStore::GetList();
-			while ($store = $rsStore->Fetch())
+			foreach (self::getCatalogStores() as $store)
 			{
 				$result["store"]["MENU"][] = array(
-					"TEXT" => $store["TITLE"],
+					"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
 					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
 				);
 			}
 		}
 		$result["misc"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_MISC"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MISC"),
 			"MENU" => array(),
 		);
 		$result["misc"]["MENU"][] =  array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
 			"ONCLICK" => "$action_function('{=concat this.sections.name this.name \" / \"}', '$menuID', '$inputID')",
 		);
-		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		if (self::$catalogIncluded === null)
+			self::$catalogIncluded = Loader::includeModule('catalog');
+		if (self::$catalogIncluded)
 		{
 			$result["misc"]["MENU"][] =  array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
 				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
 			);
 		}
@@ -422,26 +492,26 @@ class CIBlockParameters
 	{
 		$result = array();
 		$result["this"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_NAME"),
 					"ONCLICK" => "$action_function('{=this.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_LOWER_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_LOWER_NAME"),
 					"ONCLICK" => "$action_function('{=lower this.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_CODE"),
 					"ONCLICK" => "$action_function('{=this.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_PREVIEW_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_PREVIEW_TEXT"),
 					"ONCLICK" => "$action_function('{=this.PreviewText}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_ELEMENT_DETAIL_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_ELEMENT_DETAIL_TEXT"),
 					"ONCLICK" => "$action_function('{=this.DetailText}', '$menuID', '$inputID')",
 				),
 			),
@@ -449,12 +519,11 @@ class CIBlockParameters
 		if ($iblock_id > 0)
 		{
 			$result["properties"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PROPERTIES"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PROPERTIES"),
 				"MENU" => array(
 				),
 			);
-			$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $iblock_id));
-			while($property = $rsProperty->fetch())
+			foreach (self::getIblockElementProperties($iblock_id) as $property)
 			{
 				if ($property["PROPERTY_TYPE"] != "F")
 				{
@@ -466,46 +535,48 @@ class CIBlockParameters
 			}
 		}
 		$result["parent"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_NAME"),
 					"ONCLICK" => "$action_function('{=parent.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_CODE"),
 					"ONCLICK" => "$action_function('{=parent.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PARENT_TEXT"),
 					"ONCLICK" => "$action_function('{=parent.PreviewText}', '$menuID', '$inputID')",
 				),
 			),
 		);
 		$result["iblock"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK"),
 			"MENU" => array(
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_NAME"),
 					"ONCLICK" => "$action_function('{=iblock.Name}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_CODE"),
 					"ONCLICK" => "$action_function('{=iblock.Code}', '$menuID', '$inputID')",
 				),
 				array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_IBLOCK_TEXT"),
 					"ONCLICK" => "$action_function('{=iblock.PreviewText}', '$menuID', '$inputID')",
 				),
 			),
 		);
-		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		if (self::$catalogIncluded === null)
+			self::$catalogIncluded = Loader::includeModule('catalog');
+		if (self::$catalogIncluded)
 		{
 			$arCatalog = \CCatalogSKU::GetInfoByProductIBlock($iblock_id);
 			if (is_array($arCatalog))
 			{
 				$result["sku_properties"] = array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
 					"MENU" => array(
 					),
 				);
@@ -521,31 +592,30 @@ class CIBlockParameters
 					}
 				}
 				$result["sku_price"] = array(
-					"TEXT" => GetMessage("IB_COMPLIB_POPUP_SKU_PRICE"),
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PRICE"),
 					"MENU" => array(),
 				);
-				$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
-				while ($price = $rsPrice->Fetch())
+				foreach (self::getCatalogPrices() as $price)
 				{
 					if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
 					{
 						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
 							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
 						);
 						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
 							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
 						);
 					}
 					else
 					{
 						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
 							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
 						);
 						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => GetMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
 							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
 						);
 					}
@@ -553,24 +623,23 @@ class CIBlockParameters
 			}
 
 			$result["catalog"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG"),
 				"MENU" => array(
 					array(
-						"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG_WEIGHT"),
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_WEIGHT"),
 						"ONCLICK" => "$action_function('{=this.catalog.weight}', '$menuID', '$inputID')",
 					),
 					array(
-						"TEXT" => GetMessage("IB_COMPLIB_POPUP_CATALOG_MEASURE"),
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_MEASURE"),
 						"ONCLICK" => "$action_function('{=this.catalog.measure}', '$menuID', '$inputID')",
 					),
 				),
 			);
 			$result["price"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_PRICE"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PRICE"),
 				"MENU" => array(),
 			);
-			$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
-			while ($price = $rsPrice->Fetch())
+			foreach (self::getCatalogPrices() as $price)
 			{
 				if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
 					$result["price"]["MENU"][] = array(
@@ -584,30 +653,31 @@ class CIBlockParameters
 					);
 			}
 			$result["store"] = array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
 				"MENU" => array(),
 			);
-			$rsStore = CCatalogStore::GetList();
-			while ($store = $rsStore->Fetch())
+			foreach (self::getCatalogStores() as $store)
 			{
 				$result["store"]["MENU"][] = array(
-					"TEXT" => $store["TITLE"],
+					"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
 					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
 				);
 			}
 		}
 		$result["misc"] = array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_MISC"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MISC"),
 			"MENU" => array(),
 		);
 		$result["misc"]["MENU"][] =  array(
-			"TEXT" => GetMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
+			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
 			"ONCLICK" => "$action_function('{=concat this.sections.name \" / \"}', '$menuID', '$inputID')",
 		);
-		if (\Bitrix\Main\Loader::includeModule('catalog'))
+		if (self::$catalogIncluded === null)
+			self::$catalogIncluded = Loader::includeModule('catalog');
+		if (self::$catalogIncluded)
 		{
 			$result["misc"]["MENU"][] =  array(
-				"TEXT" => GetMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
 				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
 			);
 		}
@@ -647,7 +717,7 @@ class CIBlockParameters
 		if (!isset($arComponentParameters['GROUPS']))
 			$arComponentParameters['GROUPS'] = array();
 		$arComponentParameters["GROUPS"]["PAGER_SETTINGS"] = array(
-			"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_SETTINGS"),
+			"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_SETTINGS"),
 		);
 
 		$arTemplateInfo = CComponentUtil::GetTemplatesList('bitrix:system.pagenavigation');
@@ -655,7 +725,7 @@ class CIBlockParameters
 		{
 			$arComponentParameters["PARAMETERS"]["PAGER_TEMPLATE"] = Array(
 				"PARENT" => "PAGER_SETTINGS",
-				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE"),
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_TEMPLATE"),
 				"TYPE" => "STRING",
 				"DEFAULT" => "",
 			);
@@ -665,7 +735,7 @@ class CIBlockParameters
 			sortByColumn($arTemplateInfo, array('TEMPLATE' => SORT_ASC, 'NAME' => SORT_ASC));
 			$arTemplateList = array();
 			$arSiteTemplateList = array(
-				'.default' => GetMessage('T_IBLOCK_DESC_PAGER_TEMPLATE_SITE_DEFAULT')
+				'.default' => Loc::getMessage('T_IBLOCK_DESC_PAGER_TEMPLATE_SITE_DEFAULT')
 			);
 			$arTemplateID = array();
 			foreach ($arTemplateInfo as &$template)
@@ -694,13 +764,13 @@ class CIBlockParameters
 			{
 				if (isset($arHiddenTemplates[$template['NAME']]))
 					continue;
-				$strDescr = $template["TITLE"].' ('.('' != $template["TEMPLATE"] && '' != $arSiteTemplateList[$template["TEMPLATE"]] ? $arSiteTemplateList[$template["TEMPLATE"]] : GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_SYSTEM")).')';
+				$strDescr = $template["TITLE"].' ('.('' != $template["TEMPLATE"] && '' != $arSiteTemplateList[$template["TEMPLATE"]] ? $arSiteTemplateList[$template["TEMPLATE"]] : Loc::getMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_SYSTEM")).')';
 				$arTemplateList[$template['NAME']] = $strDescr;
 			}
 			unset($template);
 			$arComponentParameters["PARAMETERS"]["PAGER_TEMPLATE"] = array(
 				"PARENT" => "PAGER_SETTINGS",
-				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_EXT"),
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_TEMPLATE_EXT"),
 				"TYPE" => "LIST",
 				"VALUES" => $arTemplateList,
 				"DEFAULT" => ".default",
@@ -710,40 +780,40 @@ class CIBlockParameters
 
 		$arComponentParameters["PARAMETERS"]["DISPLAY_TOP_PAGER"] = Array(
 			"PARENT" => "PAGER_SETTINGS",
-			"NAME" => GetMessage("T_IBLOCK_DESC_TOP_PAGER"),
+			"NAME" => Loc::getMessage("T_IBLOCK_DESC_TOP_PAGER"),
 			"TYPE" => "CHECKBOX",
 			"DEFAULT" => "N",
 		);
 		$arComponentParameters["PARAMETERS"]["DISPLAY_BOTTOM_PAGER"] = Array(
 			"PARENT" => "PAGER_SETTINGS",
-			"NAME" => GetMessage("T_IBLOCK_DESC_BOTTOM_PAGER"),
+			"NAME" => Loc::getMessage("T_IBLOCK_DESC_BOTTOM_PAGER"),
 			"TYPE" => "CHECKBOX",
 			"DEFAULT" => "Y",
 		);
 		$arComponentParameters["PARAMETERS"]["PAGER_TITLE"] = Array(
 			"PARENT" => "PAGER_SETTINGS",
-			"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_TITLE"),
+			"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_TITLE"),
 			"TYPE" => "STRING",
 			"DEFAULT" => $pager_title,
 		);
 		$arComponentParameters["PARAMETERS"]["PAGER_SHOW_ALWAYS"] = Array(
 			"PARENT" => "PAGER_SETTINGS",
-			"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_SHOW_ALWAYS"),
+			"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_SHOW_ALWAYS"),
 			"TYPE" => "CHECKBOX",
-			"DEFAULT" => "Y",
+			"DEFAULT" => "N",
 		);
 
 		if($bDescNumbering)
 		{
 			$arComponentParameters["PARAMETERS"]["PAGER_DESC_NUMBERING"] = Array(
 				"PARENT" => "PAGER_SETTINGS",
-				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_DESC_NUMBERING"),
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_DESC_NUMBERING"),
 				"TYPE" => "CHECKBOX",
 				"DEFAULT" => "N",
 			);
 			$arComponentParameters["PARAMETERS"]["PAGER_DESC_NUMBERING_CACHE_TIME"] = Array(
 				"PARENT" => "PAGER_SETTINGS",
-				"NAME" => GetMessage("T_IBLOCK_DESC_PAGER_DESC_NUMBERING_CACHE_TIME"),
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_PAGER_DESC_NUMBERING_CACHE_TIME"),
 				"TYPE" => "STRING",
 				"DEFAULT" => "36000",
 			);
@@ -753,9 +823,9 @@ class CIBlockParameters
 		{
 			$arComponentParameters["PARAMETERS"]["PAGER_SHOW_ALL"] = Array(
 				"PARENT" => "PAGER_SETTINGS",
-				"NAME" => GetMessage("T_IBLOCK_DESC_SHOW_ALL"),
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_SHOW_ALL"),
 				"TYPE" => "CHECKBOX",
-				"DEFAULT" => "Y"
+				"DEFAULT" => "N"
 			);
 		}
 	}
@@ -784,21 +854,21 @@ class CIBlockParameters
 			$arFields = array($arFields);
 		if (!is_array($arOptions))
 			$arOptions = array();
-		$boolLowerCase = (array_key_exists('KEY_LOWERCASE', $arOptions) && 'Y' == $arOptions['KEY_LOWERCASE'] ? true: false);
+		$boolLowerCase = (isset($arOptions['KEY_LOWERCASE']) && $arOptions['KEY_LOWERCASE'] == 'Y');
 		$arSortFields = array(
-			"SHOWS" => GetMessage("IBLOCK_SORT_FIELD_SHOWS"),
-			"SORT" => GetMessage("IBLOCK_SORT_FIELD_SORT"),
-			"TIMESTAMP_X" => GetMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
-			"NAME" => GetMessage("IBLOCK_SORT_FIELD_NAME"),
-			"ID" => GetMessage("IBLOCK_SORT_FIELD_ID"),
-			"ACTIVE_FROM" => GetMessage("IBLOCK_SORT_FIELD_ACTIVE_FROM"),
-			"ACTIVE_TO" => GetMessage("IBLOCK_SORT_FIELD_ACTIVE_TO"),
+			"SHOWS" => Loc::getMessage("IBLOCK_SORT_FIELD_SHOWS"),
+			"SORT" => Loc::getMessage("IBLOCK_SORT_FIELD_SORT"),
+			"TIMESTAMP_X" => Loc::getMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
+			"NAME" => Loc::getMessage("IBLOCK_SORT_FIELD_NAME"),
+			"ID" => Loc::getMessage("IBLOCK_SORT_FIELD_ID"),
+			"ACTIVE_FROM" => Loc::getMessage("IBLOCK_SORT_FIELD_ACTIVE_FROM"),
+			"ACTIVE_TO" => Loc::getMessage("IBLOCK_SORT_FIELD_ACTIVE_TO"),
 		);
 		if (!empty($arFields))
 		{
 			foreach ($arFields as &$strFieldName)
 			{
-				if (array_key_exists($strFieldName, $arSortFields))
+				if (isset($arSortFields[$strFieldName]))
 					$arResult[$strFieldName] = $arSortFields[$strFieldName];
 			}
 			if (isset($strFieldName))
@@ -822,19 +892,19 @@ class CIBlockParameters
 			$arFields = array($arFields);
 		if (!is_array($arOptions))
 			$arOptions = array();
-		$boolLowerCase = (array_key_exists('KEY_LOWERCASE', $arOptions) && 'Y' == $arOptions['KEY_LOWERCASE'] ? true: false);
+		$boolLowerCase = (isset($arOptions['KEY_LOWERCASE']) && $arOptions['KEY_LOWERCASE'] == 'Y');
 		$arSortFields = array(
-			"SORT" => GetMessage("IBLOCK_SORT_FIELD_SORT"),
-			"TIMESTAMP_X" => GetMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
-			"NAME" => GetMessage("IBLOCK_SORT_FIELD_NAME"),
-			"ID" => GetMessage("IBLOCK_SORT_FIELD_ID"),
-			"DEPTH_LEVEL" => GetMessage("IBLOCK_SORT_FIELD_DEPTH_LEVEL"),
+			"SORT" => Loc::getMessage("IBLOCK_SORT_FIELD_SORT"),
+			"TIMESTAMP_X" => Loc::getMessage("IBLOCK_SORT_FIELD_TIMESTAMP"),
+			"NAME" => Loc::getMessage("IBLOCK_SORT_FIELD_NAME"),
+			"ID" => Loc::getMessage("IBLOCK_SORT_FIELD_ID"),
+			"DEPTH_LEVEL" => Loc::getMessage("IBLOCK_SORT_FIELD_DEPTH_LEVEL"),
 		);
 		if (!empty($arFields))
 		{
 			foreach ($arFields as &$strFieldName)
 			{
-				if (array_key_exists($strFieldName, $arSortFields))
+				if (isset($arSortFields[$strFieldName]))
 					$arResult[$strFieldName] = $arSortFields[$strFieldName];
 			}
 			if (isset($strFieldName))
@@ -849,6 +919,11 @@ class CIBlockParameters
 			$arResult = array_change_key_case($arResult, CASE_LOWER);
 		}
 		return $arResult;
+	}
+
+	public static function checkParamValues($value)
+	{
+		return ($value !== null && $value !== '' && $value !== false);
 	}
 }
 

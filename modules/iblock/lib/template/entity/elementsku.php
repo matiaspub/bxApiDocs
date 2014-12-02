@@ -90,13 +90,13 @@ class ElementSku extends Base
 			$this->elementFields = $elementList->fetch();
 			if ($this->elementFields)
 			{
-				$arCatalog = \CCatalogSKU::getInfoByProductIBlock($this->elementFields["IBLOCK_ID"]);
-				if (is_array($arCatalog))
+				$catalog = \CCatalogSKU::getInfoByProductIBlock($this->elementFields["IBLOCK_ID"]);
+				if (is_array($catalog))
 				{
-					$this->skuIblockId = $arCatalog["IBLOCK_ID"];
+					$this->skuIblockId = $catalog["IBLOCK_ID"];
 					$skuList = \CIBlockElement::getList(array(), array(
-						"IBLOCK_ID" => $arCatalog["IBLOCK_ID"],
-						"=PROPERTY_".$arCatalog["SKU_PROPERTY_ID"] => $this->id,
+						"IBLOCK_ID" => $catalog["IBLOCK_ID"],
+						"=PROPERTY_".$catalog["SKU_PROPERTY_ID"] => $this->id,
 					), false, false, $select);
 					while ($sku = $skuList->fetch())
 					{

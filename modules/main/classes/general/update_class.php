@@ -2856,7 +2856,7 @@ public static 	function UpdateHelp($updates_dir, $arHelp, &$strError, &$arErrorH
 
 
 
-	funpublic static ction Report2Server($arServerReport)
+	public static function Report2Server($arServerReport)
 	{
 		$strError_tmp = "";
 
@@ -3053,7 +3053,7 @@ public static 	function AddMessage2Log($sText, $sErrorCode = "")
 
 
 	/** Собирает из массива модулей строку запроса **/
-	fpublic static unction ModulesArray2Query($arClientModules, $pref = "bitm_")
+	public static function ModulesArray2Query($arClientModules, $pref = "bitm_")
 	{
 		$strRes = "";
 		if (is_array($arClientModules))
@@ -3747,7 +3747,7 @@ public static 	function EraseOldFolders($iCnt = 1)
 	}
 
 	/** Запускает updater модуля **/
-    public static 	function RunUpdaterScript($path, &$strError, $from_dir, $moduleID)
+public static 	function RunUpdaterScript($path, &$strError, $from_dir, $moduleID)
 	{
 		global $DBType, $DB, $APPLICATION, $USER;
 
@@ -3789,7 +3789,7 @@ public static 	function EraseOldFolders($iCnt = 1)
 
 
 	/** Получение лицензионного ключа текущего клиента **/
-    public static 	function GetLicenseKey()
+public static 	function GetLicenseKey()
 	{
 		if(defined("LICENSE_KEY"))
 			return LICENSE_KEY;
@@ -3817,7 +3817,7 @@ public static 	function EraseOldFolders($iCnt = 1)
 		return $sText;
 	}
 
-    public static 	function CheckEMail($email)
+public static 	function CheckEMail($email)
 	{
 		$email = trim($email);
 		if (strlen($email)<=0)
@@ -3829,7 +3829,7 @@ public static 	function EraseOldFolders($iCnt = 1)
 		return false;
 	}
 
-    public static	function GetDateFormat($strDBFormat = false)
+public static 	function GetDateFormat($strDBFormat = false)
 	{
 		if ($strDBFormat===false)
 			$strDBFormat = FORMAT_DATE;

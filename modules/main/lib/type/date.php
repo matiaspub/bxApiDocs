@@ -3,6 +3,7 @@ namespace Bitrix\Main\Type;
 
 use Bitrix\Main;
 use Bitrix\Main\Context;
+use Bitrix\Main\DB;
 
 class Date
 {
@@ -138,7 +139,7 @@ class Date
 		return $this->toString();
 	}
 
-	protected static function getFormat(Context\Culture $culture = null)
+	public static function getFormat(Context\Culture $culture = null)
 	{
 		static $defaultCulture = null;
 
@@ -245,7 +246,7 @@ class Date
 	 * @return static
 	 */
 	public static function createFromPhp(\DateTime $datetime)
- 	{
+	{
 		/** @var Date $d */
 		$d = new static();
 		$d->value = $datetime;
@@ -259,7 +260,7 @@ class Date
 	 * @return static
 	 */
 	public static function createFromTimestamp($timestamp)
- 	{
+	{
 		/** @var Date $d */
 		$d = new static();
 		$d->value->setTimestamp($timestamp);

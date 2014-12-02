@@ -99,6 +99,7 @@ class Collection
 	 * @param array $a array to analyze
 	 * @param string|int $k key to lookup
 	 * @param mixed $a,... unlimited array/key pairs to go through
+	 * @return mixed|string
 	 */
 	public static function firstNotEmpty()
 	{
@@ -133,5 +134,33 @@ class Collection
 			}
 		}
 		return "";
+	}
+
+	/**
+	 * convert array values to int, return unique values > 0. optionally sorted array
+	 *
+	 * @param array $map - array for normalize
+	 * @param bool $sorted - if sorted true, result array will be sorted
+	 * @return null
+	 */
+	public static function normalizeArrayValuesByInt(&$map, $sorted = true)
+	{
+		if (empty($map) || !is_array($map))
+			return;
+
+		$result = array();
+		foreach ($map as $value)
+		{
+			$value = (int)$value;
+			if (0 < $value)
+				$result[$value] = true;
+		}
+		$map = array();
+		if (!empty($result))
+		{
+			$map = array_keys($result);
+			if ($sorted)
+				sort($map);
+		}
 	}
 }

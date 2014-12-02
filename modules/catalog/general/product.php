@@ -1,5 +1,7 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 
 /**
@@ -21,6 +23,15 @@ class CAllCatalogProduct
 	const TYPE_SKU = 3;
 	const TYPE_OFFER = 4;
 
+	const TIME_PERIOD_HOUR = 'H';
+	const TIME_PERIOD_DAY = 'D';
+	const TIME_PERIOD_WEEK = 'W';
+	const TIME_PERIOD_MONTH = 'M';
+	const TIME_PERIOD_QUART = 'Q';
+	const TIME_PERIOD_SEMIYEAR = 'S';
+	const TIME_PERIOD_YEAR = 'Y';
+	const TIME_PERIOD_DOUBLE_YEAR = 'T';
+
 	protected static $arProductCache = array();
 
 	public static function ClearCache()
@@ -31,7 +42,6 @@ class CAllCatalogProduct
 	static public function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
-		global $CATALOG_TIME_PERIOD_TYPES;
 
 		$arMsg = array();
 		$boolResult = true;
@@ -40,12 +50,12 @@ class CAllCatalogProduct
 
 		if ($ACTION == "ADD" && (!is_set($arFields, "ID") || intval($arFields["ID"])<=0))
 		{
-			$arMsg[] = array('id' => 'ID','text' => GetMessage('KGP_EMPTY_ID'));
+			$arMsg[] = array('id' => 'ID','text' => Loc::getMessage('KGP_EMPTY_ID'));
 			$boolResult = false;
 		}
 		if ($ACTION != "ADD" && intval($ID) <= 0)
 		{
-			$arMsg[] = array('id' => 'ID','text' => GetMessage('KGP_EMPTY_ID'));
+			$arMsg[] = array('id' => 'ID','text' => Loc::getMessage('KGP_EMPTY_ID'));
 			$boolResult = false;
 		}
 
@@ -92,12 +102,9 @@ class CAllCatalogProduct
 		if ((is_set($arFields, "PRICE_TYPE") || $ACTION=="ADD") && ($arFields["PRICE_TYPE"] != "R") && ($arFields["PRICE_TYPE"] != "T"))
 			$arFields["PRICE_TYPE"] = "S";
 
-		if (isset($CATALOG_TIME_PERIOD_TYPES) && is_array($CATALOG_TIME_PERIOD_TYPES))
+		if ((is_set($arFields, "RECUR_SCHEME_TYPE") || $ACTION=="ADD") && (StrLen($arFields["RECUR_SCHEME_TYPE"]) <= 0 || !in_array($arFields["RECUR_SCHEME_TYPE"], CCatalogProduct::GetTimePeriodTypes(false))))
 		{
-			if ((is_set($arFields, "RECUR_SCHEME_TYPE") || $ACTION=="ADD") && (StrLen($arFields["RECUR_SCHEME_TYPE"]) <= 0 || !array_key_exists($arFields["RECUR_SCHEME_TYPE"], $CATALOG_TIME_PERIOD_TYPES)))
-			{
-				$arFields["RECUR_SCHEME_TYPE"] = 'D';
-			}
+			$arFields["RECUR_SCHEME_TYPE"] = self::TIME_PERIOD_DAY;
 		}
 
 		if ((is_set($arFields, "RECUR_SCHEME_LENGTH") || $ACTION=="ADD") && (intval($arFields["RECUR_SCHEME_LENGTH"])<=0))
@@ -121,7 +128,7 @@ class CAllCatalogProduct
 		{
 			if (empty($arFields['PURCHASING_CURRENCY']))
 			{
-				$arMsg[] = array('id' => 'PURCHASING_CURRENCY','text' => GetMessage('BT_MOD_CATALOG_PROD_ERR_COST_CURRENCY'));
+				$arMsg[] = array('id' => 'PURCHASING_CURRENCY','text' => Loc::getMessage('BT_MOD_CATALOG_PROD_ERR_COST_CURRENCY'));
 				$boolResult = false;
 			}
 			else
@@ -322,9 +329,7 @@ class CAllCatalogProduct
 	*/
 	static public function GetByIDEx($ID, $boolAllValues = false)
 	{
-		global $DB, $USER;
-
-		$boolAllValues = (true == $boolAllValues ? true : false);
+		$boolAllValues = ($boolAllValues === true);
 		$ID = intval($ID);
 		if (0 >= $ID)
 			return false;
@@ -460,7 +465,6 @@ class CAllCatalogProduct
 	*/
 	static public function QuantityTracer($ProductID, $DeltaQuantity)
 	{
-		global $DB;
 		global $CACHE_MANAGER;
 
 		$boolClearCache = false;
@@ -576,7 +580,6 @@ class CAllCatalogProduct
 	{
 		global $APPLICATION;
 
-		$mxResult = true;
 		foreach (GetModuleEvents("catalog", "OnGetNearestQuantityPrice", true) as $arEvent)
 		{
 			$mxResult = ExecuteModuleEventEx($arEvent, array($productID, $quantity, $arUserGroups));
@@ -588,14 +591,14 @@ class CAllCatalogProduct
 		$productID = intval($productID);
 		if ($productID <= 0)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_PROD_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_PROD_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
 			return false;
 		}
 
 		$quantity = doubleval($quantity);
 		if ($quantity <= 0)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_PROD_ERR_QUANTITY_ABSENT"), "NO_QUANTITY");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_PROD_ERR_QUANTITY_ABSENT"), "NO_QUANTITY");
 			return false;
 		}
 
@@ -745,7 +748,6 @@ class CAllCatalogProduct
 	{
 		global $APPLICATION;
 
-		$mxResult = true;
 		foreach (GetModuleEvents("catalog", "OnGetOptimalPrice", true) as $arEvent)
 		{
 			$mxResult = ExecuteModuleEventEx($arEvent, array($intProductID, $quantity, $arUserGroups, $renewal, $arPrices, $siteID, $arDiscountCoupons));
@@ -756,14 +758,14 @@ class CAllCatalogProduct
 		$intProductID = intval($intProductID);
 		if (0 >= $intProductID)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_PROD_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_PROD_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
 			return false;
 		}
 
 		$quantity = doubleval($quantity);
 		if (0 >= $quantity)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_PROD_ERR_QUANTITY_ABSENT"), "NO_QUANTITY");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_PROD_ERR_QUANTITY_ABSENT"), "NO_QUANTITY");
 			return false;
 		}
 
@@ -797,14 +799,14 @@ class CAllCatalogProduct
 		$strBaseCurrency = CCurrency::GetBaseCurrency();
 		if (empty($strBaseCurrency))
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_PROD_ERR_NO_BASE_CURRENCY"), "NO_BASE_CURRENCY");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_PROD_ERR_NO_BASE_CURRENCY"), "NO_BASE_CURRENCY");
 			return false;
 		}
 
 		$intIBlockID = intval(CIBlockElement::GetIBlockByID($intProductID));
 		if (0 >= $intIBlockID)
 		{
-			$APPLICATION->ThrowException(str_replace("#ID#", $intProductID, GetMessage('BT_MOD_CATALOG_PROD_ERR_ELEMENT_ID_NOT_FOUND')), "NO_ELEMENT");
+			$APPLICATION->ThrowException(str_replace("#ID#", $intProductID, Loc::getMessage('BT_MOD_CATALOG_PROD_ERR_ELEMENT_ID_NOT_FOUND')), "NO_ELEMENT");
 			return false;
 		}
 
@@ -1314,6 +1316,32 @@ class CAllCatalogProduct
 		return $boolFlag;
 	}
 
+	public static function GetTimePeriodTypes($boolFull = false)
+	{
+		$boolFull = ($boolFull === true);
+		if ($boolFull)
+		{
+			return array(
+				self::TIME_PERIOD_HOUR => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_HOUR'),
+				self::TIME_PERIOD_DAY => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_DAY'),
+				self::TIME_PERIOD_WEEK => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_WEEK'),
+				self::TIME_PERIOD_MONTH => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_MONTH'),
+				self::TIME_PERIOD_QUART => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_QUART'),
+				self::TIME_PERIOD_SEMIYEAR => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_SEMIYEAR'),
+				self::TIME_PERIOD_YEAR => Loc::getMessage('BT_MOD_CATALOG_PROD_PERIOD_YEAR')
+			);
+		}
+		return array(
+			self::TIME_PERIOD_HOUR,
+			self::TIME_PERIOD_DAY,
+			self::TIME_PERIOD_WEEK,
+			self::TIME_PERIOD_MONTH,
+			self::TIME_PERIOD_QUART,
+			self::TIME_PERIOD_SEMIYEAR,
+			self::TIME_PERIOD_YEAR
+		);
+	}
+
 	protected function __PrimaryDiscountFilter(&$arDiscount, &$arPriceDiscount, &$arDiscSave, &$arParams)
 	{
 		if (isset($arParams['PRICE']) && isset($arParams['CURRENCY']))
@@ -1327,7 +1355,8 @@ class CAllCatalogProduct
 				foreach ($arDiscount as $arOneDiscount)
 				{
 					$dblDiscountValue = 0.0;
-					if ('F' == $arOneDiscount['VALUE_TYPE'])
+					$arOneDiscount['PRIORITY'] = intval($arOneDiscount['PRIORITY']);
+					if (CCatalogDiscount::TYPE_FIX == $arOneDiscount['VALUE_TYPE'])
 					{
 						if ($arParams['CURRENCY'] == $arOneDiscount["CURRENCY"])
 							$dblDiscountValue = $arOneDiscount["VALUE"];
@@ -1337,7 +1366,7 @@ class CAllCatalogProduct
 							continue;
 						$arOneDiscount['DISCOUNT_CONVERT'] = $dblDiscountValue;
 					}
-					elseif ('S' == $arOneDiscount['VALUE_TYPE'])
+					elseif (CCatalogDiscount::TYPE_SALE == $arOneDiscount['VALUE_TYPE'])
 					{
 						if ($arParams['CURRENCY'] == $arOneDiscount["CURRENCY"])
 							$dblDiscountValue = $arOneDiscount["VALUE"];
@@ -1347,11 +1376,11 @@ class CAllCatalogProduct
 							continue;
 						$arOneDiscount['DISCOUNT_CONVERT'] = $dblDiscountValue;
 					}
-					elseif ('P' == $arOneDiscount['VALUE_TYPE'])
+					elseif (CCatalogDiscount::TYPE_PERCENT == $arOneDiscount['VALUE_TYPE'])
 					{
 						if (100 < $arOneDiscount["VALUE"])
 							continue;
-						if (DISCOUNT_TYPE_STANDART == $arOneDiscount['TYPE'] && 0 < $arOneDiscount["MAX_DISCOUNT"])
+						if ($arOneDiscount['TYPE'] == CCatalogDiscount::ENTITY_ID && $arOneDiscount["MAX_DISCOUNT"] > 0)
 						{
 							if ($arParams['CURRENCY'] == $arOneDiscount["CURRENCY"])
 								$dblDiscountValue = $arOneDiscount["MAX_DISCOUNT"];
@@ -1360,13 +1389,13 @@ class CAllCatalogProduct
 							$arOneDiscount['DISCOUNT_CONVERT'] = $dblDiscountValue;
 						}
 					}
-					if (DISCOUNT_TYPE_SAVE == $arOneDiscount['TYPE'])
+					if ($arOneDiscount['TYPE'] == CCatalogDiscountSave::ENTITY_ID)
 					{
 						$arDiscSave[] = $arOneDiscount;
 					}
 					else
 					{
-						$arPriceDiscount[intval($arOneDiscount['PRIORITY'])][] = $arOneDiscount;
+						$arPriceDiscount[$arOneDiscount['PRIORITY']][] = $arOneDiscount;
 					}
 				}
 
@@ -1397,7 +1426,7 @@ class CAllCatalogProduct
 						$dblPriceTmp = -1;
 						switch($arOneDiscount['VALUE_TYPE'])
 						{
-						case 'P':
+						case CCatalogDiscount::TYPE_PERCENT:
 							$dblTempo = $dblCurrentPrice*$arOneDiscount['VALUE']/100.0;
 							if (isset($arOneDiscount['DISCOUNT_CONVERT']))
 							{
@@ -1406,7 +1435,7 @@ class CAllCatalogProduct
 							}
 							$dblPriceTmp = $dblCurrentPrice - $dblTempo;
 							break;
-						case 'F':
+						case CCatalogDiscount::TYPE_FIX:
 							if ($arOneDiscount['DISCOUNT_CONVERT'] > $dblCurrentPrice)
 							{
 								$boolDelete = true;
@@ -1416,7 +1445,7 @@ class CAllCatalogProduct
 								$dblPriceTmp = $dblCurrentPrice - $arOneDiscount['DISCOUNT_CONVERT'];
 							}
 							break;
-						case 'S':
+						case CCatalogDiscount::TYPE_SALE:
 							if (!($arOneDiscount['DISCOUNT_CONVERT'] < $dblCurrentPrice))
 							{
 								$boolDelete = true;
@@ -1481,10 +1510,10 @@ class CAllCatalogProduct
 					$boolDelete = false;
 					switch($arOneDiscount['VALUE_TYPE'])
 					{
-					case 'P':
+					case CCatalogDiscountSave::TYPE_PERCENT:
 						$dblPriceTmp = $dblCurrentPrice*(1 - $arOneDiscount['VALUE']/100.0);
 						break;
-					case 'F':
+					case CCatalogDiscountSave::TYPE_FIX:
 						if ($arOneDiscount['DISCOUNT_CONVERT'] > $dblCurrentPrice)
 						{
 							$boolDelete = true;

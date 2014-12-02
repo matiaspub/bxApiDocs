@@ -230,8 +230,8 @@ class CCatalogProduct extends CAllCatalogProduct
 	{
 		global $DB;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		if (array_key_exists('ID', $arFields))
@@ -248,7 +248,6 @@ class CCatalogProduct extends CAllCatalogProduct
 
 		$strUpdate = $DB->PrepareUpdate("b_catalog_product", $arFields);
 
-		$strUpdate = trim($strUpdate);
 		$boolSubscribe = false;
 		if (!empty($strUpdate))
 		{
@@ -265,14 +264,24 @@ class CCatalogProduct extends CAllCatalogProduct
 				}
 				if (isset($arFields["OLD_QUANTITY"]))
 				{
-					$boolSubscribe = !(0 < $arFields["OLD_QUANTITY"]);
+					$boolSubscribe = $arFields["OLD_QUANTITY"] <= 0;
 				}
 			}
 
 			$strSql = "UPDATE b_catalog_product SET ".$strUpdate." WHERE ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			if (array_key_exists($ID, self::$arProductCache))
+			if (
+				CBXFeatures::IsFeatureEnabled('CatCompleteSet')
+				&& (
+					isset($arFields['QUANTITY']) || isset($arFields['QUANTITY_TRACE']) || isset($arFields['CAN_BUY_ZERO']) || isset($arFields['WEIGHT'])
+				)
+			)
+			{
+				CCatalogProductSet::recalculateSetsByProduct($ID);
+			}
+
+			if (isset(self::$arProductCache[$ID]))
 			{
 				unset(self::$arProductCache[$ID]);
 				if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
@@ -319,18 +328,18 @@ class CCatalogProduct extends CAllCatalogProduct
 	{
 		global $DB;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		$DB->Query('delete from b_catalog_price where PRODUCT_ID = '.$ID, true);
 		$DB->Query('delete from b_catalog_product2group where PRODUCT_ID = '.$ID, true);
 		$DB->Query('delete from b_catalog_product_sets where ITEM_ID = '.$ID.' or OWNER_ID = '.$ID, true);
 
-		if (array_key_exists($ID, self::$arProductCache))
+		if (isset(self::$arProductCache[$ID]))
 		{
 			unset(self::$arProductCache[$ID]);
-			if (defined('CATALOG_GLOBAL_VARS') && 'Y' == CATALOG_GLOBAL_VARS)
+			if (defined('CATALOG_GLOBAL_VARS') && CATALOG_GLOBAL_VARS == 'Y')
 			{
 				global $CATALOG_PRODUCT_CACHE;
 				$CATALOG_PRODUCT_CACHE = self::$arProductCache;
@@ -344,21 +353,13 @@ class CCatalogProduct extends CAllCatalogProduct
 		global $DB, $USER;
 		global $stackCacheManager;
 
-		$strDefQuantityTrace = COption::GetOptionString('catalog', 'default_quantity_trace');
-		if ('Y' != $strDefQuantityTrace)
-			$strDefQuantityTrace = 'N';
-		$strDefCanBuyZero = COption::GetOptionString('catalog', 'default_can_buy_zero');
-		if ('Y' != $strDefCanBuyZero)
-			$strDefCanBuyZero = 'N';
-		$strDefNegAmount = COption::GetOptionString('catalog', 'allow_negative_amount');
-		if ('Y' != $strDefNegAmount)
-			$strDefNegAmount = 'N';
-		$strSubscribe = COption::GetOptionString('catalog', 'default_subscribe');
-		if ('N' != $strSubscribe)
-			$strSubscribe = 'Y';
+		$strDefQuantityTrace = (COption::GetOptionString('catalog', 'default_quantity_trace') == 'Y' ? 'Y' : 'N');
+		$strDefCanBuyZero = (COption::GetOptionString('catalog', 'default_can_buy_zero') == 'Y' ? 'Y' : 'N');
+		$strDefNegAmount = (COption::GetOptionString('catalog', 'allow_negative_amount') == 'Y' ? 'Y' : 'N');
+		$strSubscribe = (COption::GetOptionString('catalog', 'default_subscribe') == 'N' ? 'N' : 'Y');
 
-		$sResSelect = "";
-		$sResFrom = "";
+		$sResSelect = '';
+		$sResFrom = '';
 		$sResWhere = "";
 		$arResOrder = array();
 		$arJoinGroup = array();
@@ -378,50 +379,57 @@ class CCatalogProduct extends CAllCatalogProduct
 			{
 				if ($arField = CCatalogProduct::ParseQueryBuildField($by))
 				{
-					$inum = $arField["NUM"];
-					$by = $arField["FIELD"];
 					$res = '';
+					$join = true;
 
-					if (0 >= $inum && array_key_exists($by, $arSensID))
+					$inum = (int)$arField["NUM"];
+					$by = (string)$arField["FIELD"];
+					if ($by == '' || ($inum <= 0 && isset($arSensID[$by])))
 						continue;
 
-					if ($by == "PRICE")
+					switch ($by)
 					{
-						$res = " ".CIBlock::_Order("CAT_P".$inum.".PRICE", $order, "asc")." ";
+						case 'PRICE':
+							$res = " ".CIBlock::_Order("CAT_P".$inum.".PRICE", $order, "asc")." ";
+							break;
+						case 'CURRENCY':
+							$res = " ".CIBlock::_Order("CAT_P".$inum.".CURRENCY", $order, "asc")." ";
+							break;
+						case 'QUANTITY':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.QUANTITY", $order, "asc", false)." ";
+							$join = false;
+							break;
+						case 'WEIGHT':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.WEIGHT", $order, "asc", false)." ";
+							$join = false;
+							break;
+						case 'AVAILABLE':
+							$arResOrder[$key] = " ".CIBlock::_Order("CATALOG_AVAILABLE", $order, "desc", false)." ";
+							$join = false;
+							break;
+						case 'TYPE':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.TYPE", $order, "asc", false)." ";
+							$join = false;
+							break;
+						case 'PURCHASING_PRICE':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.PURCHASING_PRICE", $order, "asc")." ";
+							$join = false;
+							break;
+						case 'PURCHASING_CURRENCY':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.PURCHASING_CURRENCY", $order, "asc")." ";
+							$join = false;
+							break;
+						default:
+							$res = " ".CIBlock::_Order("CAT_P".$inum.".ID", $order, "asc", false)." ";
+							break;
 					}
-					elseif ($by == "CURRENCY")
+					if ($join)
 					{
-						$res = " ".CIBlock::_Order("CAT_P".$inum.".CURRENCY", $order, "asc")." ";
+						if (!isset($arOrderTmp[$inum]))
+							$arOrderTmp[$inum] = array();
+						$arOrderTmp[$inum][$key] = $res;
+						$arJoinGroup[$inum] = true;
 					}
-					elseif ($by == "QUANTITY")
-					{
-						$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.QUANTITY", $order, "asc", false)." ";
-						continue;
-					}
-					elseif ($by == 'WEIGHT')
-					{
-						$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.WEIGHT", $order, "asc", false)." ";
-						continue;
-					}
-					elseif ($by == 'AVAILABLE')
-					{
-						$arResOrder[$key] = " ".CIBlock::_Order("CATALOG_AVAILABLE", $order, "desc", false)." ";
-						continue;
-					}
-					elseif ($by == "TYPE")
-					{
-						$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.TYPE", $order, "asc", false)." ";
-						continue;
-					}
-					else
-					{
-						$res = " ".CIBlock::_Order("CAT_P".$inum.".ID", $order, "asc", false)." ";
-					}
-
-					if (!array_key_exists($inum, $arOrderTmp))
-						$arOrderTmp[$inum] = array();
-					$arOrderTmp[$inum][$key] = $res;
-					$arJoinGroup[$inum] = true;
 				}
 			}
 		}
@@ -431,7 +439,7 @@ class CCatalogProduct extends CAllCatalogProduct
 
 		$filter_keys = (!is_array($arFilter) ? array() : array_keys($arFilter));
 
-		for ($i=0, $cnt = count($filter_keys); $i < $cnt; $i++)
+		for ($i = 0, $cnt = count($filter_keys); $i < $cnt; $i++)
 		{
 			$key = strtoupper($filter_keys[$i]);
 			$val = $arFilter[$filter_keys[$i]];
@@ -442,53 +450,60 @@ class CCatalogProduct extends CAllCatalogProduct
 
 			if ($arField = CCatalogProduct::ParseQueryBuildField($key))
 			{
-				$key = $arField["FIELD"];
-				$inum = $arField["NUM"];
+				$res = '';
 
-				if (0 >= $inum && array_key_exists($key, $arSensID))
+				$key = (string)$arField["FIELD"];
+				$inum = (int)$arField["NUM"];
+
+				if ($key == '' || ($inum <= 0 && isset($arSensID[$key])))
 					continue;
 
-				$res = "";
 				switch($key)
 				{
-				case "PRODUCT_ID":
-					$res = CIBlock::FilterCreate("CAT_P".$inum.".PRODUCT_ID", $val, "number", $cOperationType);
-					break;
-				case "CATALOG_GROUP_ID":
-					$res = CIBlock::FilterCreate("CAT_P".$inum.".CATALOG_GROUP_ID", $val, "number", $cOperationType);
-					break;
-				case "CURRENCY":
-					$res = CIBlock::FilterCreate("CAT_P".$inum.".CURRENCY", $val, "string", $cOperationType);
-					break;
-				case "SHOP_QUANTITY":
-					$res = ' 1=1 ';
-					$arAddJoinOn[$inum] =
-						(($cOperationType=="N") ? " NOT " : " ").
-						" ((CAT_P".$inum.".QUANTITY_FROM <= ".intval($val)." OR CAT_P".$inum.".QUANTITY_FROM IS NULL) AND (CAT_P".$inum.".QUANTITY_TO >= ".intval($val)." OR CAT_P".$inum.".QUANTITY_TO IS NULL)) ";
-					break;
-				case "PRICE":
-					$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE", $val, "number", $cOperationType);
-					break;
-				case "QUANTITY":
-					$res = CIBlock::FilterCreate("CAT_PR.QUANTITY", $val, "number", $cOperationType);
-					break;
-				case "AVAILABLE":
-					if ('N' !== $val)
-						$val = 'Y';
-					$res =
-						" (IF (
-				CAT_PR.QUANTITY > 0 OR
-				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
-				IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
-				'Y', 'N'
-				) ".(($cOperationType=="N") ? "<>" : "=")." '".$val."') ";
-					break;
-				case "WEIGHT":
-					$res = CIBlock::FilterCreate("CAT_PR.WEIGHT", $val, "number", $cOperationType);
-					break;
-				case 'TYPE':
-					$res = CIBlock::FilterCreate("CAT_PR.TYPE", $val, "number", $cOperationType);
-					break;
+					case "PRODUCT_ID":
+						$res = CIBlock::FilterCreate("CAT_P".$inum.".PRODUCT_ID", $val, "number", $cOperationType);
+						break;
+					case "CATALOG_GROUP_ID":
+						$res = CIBlock::FilterCreate("CAT_P".$inum.".CATALOG_GROUP_ID", $val, "number", $cOperationType);
+						break;
+					case "CURRENCY":
+						$res = CIBlock::FilterCreate("CAT_P".$inum.".CURRENCY", $val, "string", $cOperationType);
+						break;
+					case "SHOP_QUANTITY":
+						$res = ' 1=1 ';
+						$arAddJoinOn[$inum] =
+							(($cOperationType=="N") ? " NOT " : " ").
+							" ((CAT_P".$inum.".QUANTITY_FROM <= ".intval($val)." OR CAT_P".$inum.".QUANTITY_FROM IS NULL) AND (CAT_P".$inum.".QUANTITY_TO >= ".intval($val)." OR CAT_P".$inum.".QUANTITY_TO IS NULL)) ";
+						break;
+					case "PRICE":
+						$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE", $val, "number", $cOperationType);
+						break;
+					case "QUANTITY":
+						$res = CIBlock::FilterCreate("CAT_PR.QUANTITY", $val, "number", $cOperationType);
+						break;
+					case "AVAILABLE":
+						if ('N' !== $val)
+							$val = 'Y';
+						$res =
+							" (IF (
+					CAT_PR.QUANTITY > 0 OR
+					IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
+					IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
+					'Y', 'N'
+					) ".(($cOperationType=="N") ? "<>" : "=")." '".$val."') ";
+						break;
+					case "WEIGHT":
+						$res = CIBlock::FilterCreate("CAT_PR.WEIGHT", $val, "number", $cOperationType);
+						break;
+					case 'TYPE':
+						$res = CIBlock::FilterCreate("CAT_PR.TYPE", $val, "number", $cOperationType);
+						break;
+					case 'PURCHASING_PRICE':
+						$res = CIBlock::FilterCreate("CAT_PR.PURCHASING_PRICE", $val, "number", $cOperationType);
+						break;
+					case 'PURCHASING_CURRENCY':
+						$res = CIBlock::FilterCreate("CAT_PR.PURCHASING_PRICE", $val, "string", $cOperationType);
+						break;
 				}
 
 				if ('' == $res)
@@ -501,7 +516,6 @@ class CCatalogProduct extends CAllCatalogProduct
 			}
 		}
 
-		$strSubWhere = "";
 		if (!empty($arSelect))
 		{
 			foreach ($arSelect as &$strOneSelect)
@@ -509,8 +523,8 @@ class CCatalogProduct extends CAllCatalogProduct
 				$val = strtoupper($strOneSelect);
 				if (0 != strncmp($val, 'CATALOG_GROUP_', 14))
 					continue;
-				$num = intval(substr($val, 14));
-				if (0 < $num)
+				$num = (int)substr($val, 14);
+				if ($num > 0)
 					$arJoinGroup[$num] = true;
 			}
 			if (isset($strOneSelect))
@@ -521,7 +535,7 @@ class CCatalogProduct extends CAllCatalogProduct
 		{
 			$strSubWhere = implode(',', array_keys($arJoinGroup));
 
-			$strUserGroups = $USER->GetGroups();
+			$strUserGroups = (CCatalog::IsUserExists() ? $USER->GetGroups() : '2');
 			$strCacheKey = "P_".$strUserGroups;
 			$strCacheKey .= "_".$strSubWhere;
 			$strCacheKey .= "_".LANGUAGE_ID;
@@ -555,18 +569,16 @@ class CCatalogProduct extends CAllCatalogProduct
 				$stackCacheManager->Set("catalog_GetQueryBuildArrays", $strCacheKey, $arResult);
 			}
 
-			$arCatGroups = array();
-
 			foreach ($arResult as &$row)
 			{
-				$i = intval($row["ID"]);
+				$i = (int)$row["ID"];
 
-				if (!empty($arWhereTmp[$i]) && is_array($arWhereTmp[$i]))
+				if (isset($arWhereTmp[$i]) && !empty($arWhereTmp[$i]) && is_array($arWhereTmp[$i]))
 				{
-					$sResWhere .= ' AND '.implode(' AND ',$arWhereTmp[$i]);
+					$sResWhere .= ' AND '.implode(' AND ', $arWhereTmp[$i]);
 				}
 
-				if (!empty($arOrderTmp[$i]) && is_array($arOrderTmp[$i]))
+				if (isset($arOrderTmp[$i]) && !empty($arOrderTmp[$i]) && is_array($arOrderTmp[$i]))
 				{
 					foreach($arOrderTmp[$i] as $k=>$v)
 						$arResOrder[$k] = $v;
@@ -592,12 +604,15 @@ class CCatalogProduct extends CAllCatalogProduct
 				unset($row);
 		}
 
-		$sResSelect .= ", CAT_PR.QUANTITY as CATALOG_QUANTITY, ".
+		$sResSelect .= ", CAT_PR.QUANTITY as CATALOG_QUANTITY, CAT_PR.QUANTITY_RESERVED as CATALOG_QUANTITY_RESERVED, ".
 			" IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) as CATALOG_QUANTITY_TRACE, ".
 			" CAT_PR.QUANTITY_TRACE as CATALOG_QUANTITY_TRACE_ORIG, ".
 			" IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) as CATALOG_CAN_BUY_ZERO, ".
+			" CAT_PR.CAN_BUY_ZERO as CATALOG_CAN_BUY_ZERO_ORIG, ".
 			" IF (CAT_PR.NEGATIVE_AMOUNT_TRACE = 'D', '".$strDefNegAmount."', CAT_PR.NEGATIVE_AMOUNT_TRACE) as CATALOG_NEGATIVE_AMOUNT_TRACE, ".
+			" CAT_PR.NEGATIVE_AMOUNT_TRACE as CATALOG_NEGATIVE_AMOUNT_ORIG, ".
 			" IF (CAT_PR.SUBSCRIBE = 'D', '".$strSubscribe."', CAT_PR.SUBSCRIBE) as CATALOG_SUBSCRIBE, ".
+			" CAT_PR.SUBSCRIBE as CATALOG_SUBSCRIBE_ORIG, ".
 			" IF (
 				CAT_PR.QUANTITY > 0 OR
 				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
@@ -616,7 +631,7 @@ class CCatalogProduct extends CAllCatalogProduct
 		$sResFrom .= " LEFT JOIN b_catalog_iblock CAT_IB ON ((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0) AND CAT_IB.IBLOCK_ID = BE.IBLOCK_ID) ";
 		$sResFrom .= " LEFT JOIN b_catalog_vat CAT_VAT ON (CAT_VAT.ID = IF((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0), CAT_IB.VAT_ID, CAT_PR.VAT_ID)) ";
 
-		if (!empty($arWhereTmp[0]) && is_array($arWhereTmp[0]))
+		if (isset($arWhereTmp[0]) && !empty($arWhereTmp[0]) && is_array($arWhereTmp[0]))
 		{
 			$sResWhere .= ' AND '.implode(' AND ', $arWhereTmp[0]);
 		}
@@ -909,143 +924,6 @@ class CCatalogProduct extends CAllCatalogProduct
 	public static function GetListEx($arOrder=array("SORT"=>"ASC"), $arFilter=array())
 	{
 		return false;
-		global $DB, $USER;
-
-		$arSqlSearch = CIBlockElement::MkFilter($arFilter);
-		$bSections = false;
-		if($arSqlSearch["SECTION"]=="Y")
-		{
-			$bSections = true;
-			unset($arSqlSearch["SECTION"]);
-		}
-		$strSqlSearch = "";
-		for ($i = 0, $intCount = count($arSqlSearch); $i < $intCount; $i++)
-			$strSqlSearch .= " AND (".$arSqlSearch[$i].") ";
-
-		$MAX_LOCK = intval(COption::GetOptionString("workflow", "MAX_LOCK_TIME", "60"));
-		$uid = intval($USER->GetID());
-
-		$db_groups = CCatalogGroup::GetList(array("SORT" => "ASC"));
-		$strSelectPart = "";
-		$strFromPart = "";
-		$i = -1;
-		while ($groups = $db_groups->Fetch())
-		{
-			$i++;
-			$strSelectPart .= ", P".$i.".PRICE as PRICE".$i.", P".$i.".CURRENCY as CURRENCY".$i.", P".$i.".CATALOG_GROUP_ID as CATALOG_GROUP_ID".$i.", P".$i.".ID as PRICE_ID".$i." ";
-			$strFromPart .= " LEFT JOIN b_catalog_price P".$i." ON (P".$i.".PRODUCT_ID = BE.ID AND P".$i.".CATALOG_GROUP_ID = ".$groups["ID"].") ";
-		}
-		$maxInd = $i;
-
-		if (!$USER->IsAdmin())
-		{
-			$strSql =
-				"SELECT DISTINCT BE.*, ".
-				"	".$DB->DateToCharFunction("BE.TIMESTAMP_X")." as TIMESTAMP_X, ".
-				"	".$DB->DateToCharFunction("BE.ACTIVE_FROM", "SHORT")." as ACTIVE_FROM, ".
-				"	".$DB->DateToCharFunction("BE.ACTIVE_TO", "SHORT")." as ACTIVE_TO, ".
-				"	".$DB->DateToCharFunction("BE.WF_DATE_LOCK")." as WF_DATE_LOCK, ".
-				"	L.DIR as LANG_DIR, B.DETAIL_PAGE_URL, B.LIST_PAGE_URL, ".
-				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE) as QUANTITY_TRACE, CAP.WEIGHT, CAP.WIDTH, CAP.LENGTH, CAP.HEIGHT, CAP.MEASURE, ".
-				"   IF (CAP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAP.CAN_BUY_ZERO) as CAN_BUY_ZERO, ".
-				"   IF (CAP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CAP.NEGATIVE_AMOUNT_TRACE) as NEGATIVE_AMOUNT_TRACE, ".
-				"	CAP.VAT_ID, CAP.VAT_INCLUDED, ".
-				"	CAP.PRICE_TYPE, CAP.RECUR_SCHEME_TYPE, CAP.RECUR_SCHEME_LENGTH, CAP.TRIAL_PRICE_ID, ".
-				"	CAP.WITHOUT_ORDER, CAP.SELECT_BEST_PRICE, CAP.PURCHASING_PRICE, CAP.PURCHASING_CURRENCY, CAP.BARCODE_MULTI, ".
-				"	CAP.TMP_ID ".
-				"	".$strSelectPart." ".
-				"FROM b_iblock_element BE, b_lang L, ".
-				($bSections?"b_iblock_section_element BSE,":"").
-				"	b_iblock B ".
-				"	LEFT JOIN b_iblock_group IBG ON IBG.IBLOCK_ID = B.ID ".
-				"	LEFT JOIN b_catalog_product CAP ON BE.ID = CAP.ID ".
-				"	".$strFromPart." ".
-				"WHERE BE.IBLOCK_ID = B.ID ".
-				"	AND B.LID = L.LID ".
-				($bSections?"	AND BSE.IBLOCK_ELEMENT_ID = BE.ID ":"").
-				"	AND IBG.GROUP_ID IN (".$USER->GetGroups().") ".
-				"	".CIBlockElement::WF_GetSqlLimit("BE.", $SHOW_NEW)." ".
-				"	AND IBG.PERMISSION>='".(strlen($arFilter["MIN_PERMISSION"])==1 ? $arFilter["MIN_PERMISSION"] : "R")."' ".
-				"	AND (IBG.PERMISSION='X' OR B.ACTIVE='Y') ".
-				"	".$strSqlSearch." ";
-		}
-		else
-		{
-			$strSql =
-				"SELECT BE.*, ".
-				"	".$DB->DateToCharFunction("BE.TIMESTAMP_X")." as TIMESTAMP_X, ".
-				"	".$DB->DateToCharFunction("BE.ACTIVE_FROM", "SHORT")." as ACTIVE_FROM, ".
-				"	".$DB->DateToCharFunction("BE.ACTIVE_TO", "SHORT")." as ACTIVE_TO, ".
-				"	".$DB->DateToCharFunction("BE.WF_DATE_LOCK")." as WF_DATE_LOCK, ".
-				"	L.DIR as LANG_DIR, B.DETAIL_PAGE_URL, B.LIST_PAGE_URL, ".
-				"	CAP.QUANTITY, CAP.QUANTITY_RESERVED, IF (CAP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CAP.QUANTITY_TRACE)  as QUANTITY_TRACE, CAP.WEIGHT, CAP.WIDTH, CAP.LENGTH, CAP.HEIGHT, CAP.MEASURE, ".
-				"   IF (CAP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CAP.CAN_BUY_ZERO) as CAN_BUY_ZERO, ".
-				"   IF (CAP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CAP.NEGATIVE_AMOUNT_TRACE) as NEGATIVE_AMOUNT_TRACE, ".
-				"	CAP.VAT_ID, CAP.VAT_INCLUDED, ".
-				"	CAP.PRICE_TYPE, CAP.RECUR_SCHEME_TYPE, CAP.RECUR_SCHEME_LENGTH, CAP.TRIAL_PRICE_ID, ".
-				"	CAP.WITHOUT_ORDER, CAP.SELECT_BEST_PRICE, CAP.PURCHASING_PRICE, CAP.PURCHASING_CURRENCY, CAP.BARCODE_MULTI, ".
-				"	CAP.TMP_ID ".
-				"	".$strSelectPart." ".
-				"FROM  b_iblock B, b_lang L, ".
-				($bSections?"b_iblock_section_element BSE,":"").
-				"	b_iblock_element BE ".
-				"	LEFT JOIN b_catalog_product CAP ON BE.ID = CAP.ID ".
-				"	".$strFromPart." ".
-				"WHERE BE.IBLOCK_ID = B.ID ".
-				($bSections?"	AND BSE.IBLOCK_ELEMENT_ID = BE.ID ":"").
-				"	".CIBlockElement::WF_GetSqlLimit("BE.",$SHOW_NEW)." ".
-				"	AND B.LID = L.LID ".
-				"	".$strSqlSearch." ";
-		}
-
-		$arSqlOrder = array();
-		foreach($arOrder as $by=>$order)
-		{
-			$by = strtoupper($by);
-			$order = strtoupper($order);
-			if ($order!="ASC") $order = "DESC";
-
-			if ($by == "ID")				$arSqlOrder[] = " BE.ID ".$order." ";
-			elseif ($by == "SECTION")		$arSqlOrder[] = " BE.IBLOCK_SECTION_ID ".$order." ";
-			elseif ($by == "NAME")			$arSqlOrder[] = " BE.NAME ".$order." ";
-			elseif ($by == "STATUS")		$arSqlOrder[] = " BE.WF_STATUS_ID ".$order." ";
-			elseif ($by == "MODIFIED_BY")	$arSqlOrder[] = " BE.MODIFIED_BY ".$order." ";
-			elseif ($by == "ACTIVE")		$arSqlOrder[] = " BE.ACTIVE ".$order." ";
-			elseif ($by == "ACTIVE_FROM")	$arSqlOrder[] = " BE.ACTIVE_FROM ".$order." ";
-			elseif ($by == "ACTIVE_TO")	$arSqlOrder[] = " BE.ACTIVE_TO ".$order." ";
-			elseif ($by == "SORT")			$arSqlOrder[] = " BE.SORT ".$order." ";
-			elseif (substr($by, 0, 5) == "PRICE" && intval(substr($by, 5))<=$maxInd)
-			{
-				$indx = intval(substr($by, 5));
-				$arSqlOrder[] = " P".$indx.".PRICE ".$order." ";
-			}
-			elseif (substr($by, 0, 8) == "CURRENCY" && intval(substr($by, 8))<=$maxInd)
-			{
-				$indx = intval(substr($by, 8));
-				$arSqlOrder[] = " P".$indx.".CURRENCY ".$order." ";
-			}
-			else
-			{
-				$arSqlOrder[] = " BE.ID ".$order." ";
-				$by = "ID";
-			}
-		}
-
-		$strSqlOrder = "";
-		DelDuplicateSort($arSqlOrder);
-		for ($i = 0, $intCount = count($arSqlOrder); $i < $intCount; $i++)
-		{
-			if($i==0)
-				$strSqlOrder = " ORDER BY ";
-			else
-				$strSqlOrder .= ",";
-
-			$strSqlOrder .= $arSqlOrder[$i];
-		}
-		$strSql .= $strSqlOrder;
-		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		return $res;
 	}
 
 	public static function GetVATInfo($PRODUCT_ID)

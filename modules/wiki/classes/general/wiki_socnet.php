@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть».
+ * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть».</body> </html>
  *
  *
  *
@@ -369,8 +369,9 @@ class CWikiSocnet
 			}
 			else
 			{
+				$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
 				$url = CComponentEngine::MakePathFromTemplate($arParams['PATH_TO_GROUP'], array('group_id' => $arFields['ENTITY_ID']));
-				$arResult['ENTITY']['FORMATTED']['TYPE_NAME'] = $GLOBALS['arSocNetAllowedSubscribeEntityTypesDesc'][SONET_SUBSCRIBE_ENTITY_GROUP]['TITLE_ENTITY'];
+				$arResult['ENTITY']['FORMATTED']['TYPE_NAME'] = $arSocNetAllowedSubscribeEntityTypesDesc[SONET_SUBSCRIBE_ENTITY_GROUP]['TITLE_ENTITY'];
 				$arResult['ENTITY']['FORMATTED']['URL'] = $url;
 				$arResult['ENTITY']['FORMATTED']['NAME'] = $arFields['GROUP_NAME'];
 			}
@@ -462,13 +463,16 @@ class CWikiSocnet
 			}
 
 			if ($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP)
+			{
 				$arResult["EVENT_FORMATTED"]["DESTINATION"] = array(
 					array(
-						"STYLE" => "sonetgroup",
+						"STYLE" => "sonetgroups",
 						"TITLE" => $arResult["ENTITY"]["FORMATTED"]["NAME"],
 						"URL" => $arResult["ENTITY"]["FORMATTED"]["URL"],
+						"IS_EXTRANET" => (is_array($GLOBALS["arExtranetGroupID"]) && in_array($arFields["ENTITY_ID"], $GLOBALS["arExtranetGroupID"]))
 					)
 				);
+			}
 		}
 
 		return $arResult;

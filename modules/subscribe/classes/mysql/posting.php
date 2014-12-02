@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CPosting</b> - класс для работы с выпусками новостей подписки.
+ * <b>CPosting</b> - класс для работы с выпусками новостей подписки.</body> </html>
  *
  *
  *

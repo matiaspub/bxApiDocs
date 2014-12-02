@@ -3,6 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CList
 {
+	/** @var CListFieldList */
 	var $fields = null;
 	var $new_ids = array();
 	protected $iblock_id = 0;

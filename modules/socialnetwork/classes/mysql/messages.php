@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.
+ * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.</body> </html>
  *
  *
  *
@@ -430,7 +430,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	*
 	*
 	*
-	* @param int $userID1  Первый пользователь. </htm
+	* @param int $userID1  Первый пользователь. </ht
 	*
 	*
 	*

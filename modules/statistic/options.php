@@ -794,4 +794,3 @@ if ($STAT_RIGHT>="R"):
 	<?endif;?>
 	<?$tabControl2->End();?>
 <?endif;?>
-

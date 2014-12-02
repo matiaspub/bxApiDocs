@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице.
+ * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице.</body> </html>
  *
  *
  *
@@ -39,7 +39,7 @@ class CWikiParser
 	*
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы
+	* @param string $text  Содержимое Wiki-страницы </ht
 	*
 	*
 	*
@@ -601,7 +601,7 @@ class CWikiParser
 	*
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы
+	* @param string $text  Содержимое Wiki-страницы </ht
 	*
 	*
 	*
@@ -649,7 +649,7 @@ class CWikiParser
 	*
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы
+	* @param string $text  Содержимое Wiki-страницы </ht
 	*
 	*
 	*

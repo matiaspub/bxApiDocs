@@ -1,70 +1,8 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/user.php");
 
-
-/**
- * <b>CForumUser</b> - класс для работы с профайлами посетителей форума
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/index.php
- * @author Bitrix
- */
 class CForumUser extends CAllForumUser
 {
-	
-	/**
-	* <p>Возвращает список профайлов по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	*
-	*
-	*
-	*
-	* @param array $arrayarOrder = array("ID"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
-	* <br><br><i>by</i> - поле для сортировки, может принимать значения<br>
-	*     <b>ID</b> - ID профайла;<br>     <b>USER_ID</b> - ID пользователя;<br>
-	*     <b>SHOW_NAME</b> - показывать имя вместо логина;<br>     <b>NUM_POSTS</b> -
-	* количество сообщений;<br>     <b>LAST_POST</b> - ID последнего сообщения;<br>
-	*     <b>NAME</b> - имя пользователя;<br>     <b>LAST_NAME</b> - фамилия
-	* пользователя;<br>     <b>LOGIN</b> - логин;<br>     <b>LAST_VISIT</b> - дата
-	* последнего посещения;<br><br><i>order</i> - порядок сортировки, может
-	* принимать значения<br>     <b>ASC</b> - по возрастанию;<br>     <b>DESC</b> - по
-	* убыванию;<br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
-	*
-	*
-	*
-	* @param array $arrayarFilter = array() массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])<br>
-	* "фильтруемое поле" может принимать значения<br>     <b>ID</b> - ID
-	* профайла;<br>     <b>USER_ID</b> - ID пользователя;<br>     <b>RANK_ID</b> - ID звания
-	* пользователя;<br>     <b>SHOW_NAME</b> - показывать имя вместо логина;<br>
-	*     <b>NUM_POSTS</b> - количество сообщений;<br>     <b>ALLOW_POST</b> - разрешено
-	* писать сообщения (т.е. не забанен);<br><br> фильтруемое поле может
-	* иметь содержать перед названием тип проверки фильтра<br> "!" - не
-	* равно<br> "&lt;" - меньше<br> "&lt;=" - меньше либо равно<br> "&gt;" - больше<br>
-	* "&gt;=" - больше либо равно<br><br> Необязательное. По умолчанию записи
-	* не фильтруются.
-	*
-	*
-	*
-	* @param array $arAddParams = array() Массив параметров. </h
-	*
-	*
-	*
-	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/getlist.php
-	* @author Bitrix
-	*/
 	public static function GetList($arOrder = Array("ID"=>"ASC"), $arFilter = Array(), $arAddParams = array())
 	{
 		global $DB;
@@ -740,19 +678,6 @@ class CForumUser extends CAllForumUser
 	}
 }
 
-
-/**
- * <b>CForumSubscribe</b> - класс для работы с подпиской на новые сообщения форума и темы.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsubscribe/index.php
- * @author Bitrix
- */
 class CForumSubscribe extends CAllForumSubscribe
 {
 }

@@ -68,7 +68,7 @@ class _CEventsFileman {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/fileman/events/onincludehtmleditorscript.php">Событие
-	 * "OnIncludeHTMLEditorScript"</a> </li></ul></bod<a name="examples"></a>
+	 * "OnIncludeHTMLEditorScript"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static
@@ -122,7 +122,7 @@ class _CEventsFileman {
 	 *
 	 * <h4>See Also</h4> 
 	 * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/fileman/events/onbeforehtmleditorscriptsget.php">Событие
-	 * "OnBeforeHTMLEditorScriptsGet"</a> </li></ul></bod<a name="examples"></a>
+	 * "OnBeforeHTMLEditorScriptsGet"</a> </li></ul><a name="examples"></a>
 	 *
 	 *
 	 * @static

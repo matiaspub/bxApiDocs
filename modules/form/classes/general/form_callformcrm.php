@@ -215,32 +215,35 @@ WHERE fcl.FORM_ID='".intval($FORM_ID)."' AND fc.ACTIVE='Y'";
 							$bFound = true;
 							if ($arCrmFields[$arRes['CRM_FIELD']])
 							{
+								$value = '';
 								switch ($arCrmFields[$arRes['CRM_FIELD']]['TYPE'])
 								{
 									case 'enum':
-									{
-										if ($arAns['FIELD_TYPE'] == 'dropdown' || $arAns['FIELD_TYPE'] == 'checkbox' || $arAns['FIELD_TYPE'] == 'radio' || $arAns['FIELD_TYPE'] == 'multiselect')
-										{
-											$arLeadFields[$arRes['CRM_FIELD']] = $arAns['VALUE'];
-										}
-										else
-										{
-											$arLeadFields[$arRes['CRM_FIELD']] = $arAns['ANSWER_TEXT'];
-										}
-									}
-									break;
+										$value = $arAns['ANSWER_TEXT'];
+										break;
 									case 'boolean':
-										$arLeadFields[$arRes['CRM_FIELD']] = 'Y';
-									break;
+										$value = 'Y';
+										break;
 									default:
-										$arLeadFields[$arRes['CRM_FIELD']] = (strlen($arAns['USER_TEXT']) > 0
+										$value = (strlen($arAns['USER_TEXT']) > 0
 											? $arAns['USER_TEXT']
 											: (
-												strlen($arAns['ANSWER_TEXT']) > 0
+											strlen($arAns['ANSWER_TEXT']) > 0
 												? $arAns['ANSWER_TEXT']
 												: $arAns['VALUE']
 											)
 										);
+										break;
+								}
+
+								if($arCrmFields[$arRes['CRM_FIELD']]['MULTIPLE'] === "true")
+								{
+									$arLeadFields[$arRes['CRM_FIELD']] .=
+										(empty($arLeadFields[$arRes['CRM_FIELD']]) ? '' : ',').$value;
+								}
+								else
+								{
+									$arLeadFields[$arRes['CRM_FIELD']] = $value;
 								}
 							}
 						}

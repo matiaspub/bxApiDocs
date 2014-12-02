@@ -777,7 +777,7 @@ class CIBlockDocument
 	* @param string $documentId - код документа.
 	* @return string - ссылка на страницу документа в административной части.
 	*/
-public static 	public function GetDocumentAdminPage($documentId)
+	public static function GetDocumentAdminPage($documentId)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -810,7 +810,7 @@ public static 	public function GetDocumentAdminPage($documentId)
 	* @param string $documentId - код документа.
 	* @return array - массив свойств документа.
 	*/
-public static 	public function GetDocument($documentId)
+	public static function GetDocument($documentId)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -853,7 +853,7 @@ public static 	public function GetDocument($documentId)
 						|| $propertyValue["USER_TYPE"] == "employee" && (COption::GetOptionString("bizproc", "employee_compatible_mode", "N") != "Y"))
 					{
 						$arPropertyValue = $propertyValue["VALUE"];
-						$arPropertyKey = $propertyValue["VALUE_ENUM_ID"];
+						$arPropertyKey = isset($propertyValue["VALUE_ENUM_ID"]) ? $propertyValue["VALUE_ENUM_ID"] : $propertyValue["PROPERTY_VALUE_ID"];
 						if (!is_array($arPropertyValue))
 						{
 							$db = CUser::GetByID($arPropertyValue);
@@ -927,7 +927,7 @@ public static 	public function GetDocument($documentId)
 		return $arResult;
 	}
 
-public static 	public function GetDocumentType($documentId)
+	public static function GetDocumentType($documentId)
 	{
 		if (substr($documentId, 0, strlen("iblock_")) == "iblock_")
 			return $documentId;
@@ -944,7 +944,7 @@ public static 	public function GetDocumentType($documentId)
 		return "iblock_".$arResult["IBLOCK_ID"];
 	}
 
-	public static public function GetDocumentFields($documentType)
+	public static function GetDocumentFields($documentType)
 	{
 		$iblockId = intval(substr($documentType, strlen("iblock_")));
 		if ($iblockId <= 0)
@@ -1218,7 +1218,7 @@ public static 	public function GetDocumentType($documentId)
 		return $arResult;
 	}
 
-public static 	public function GetDocumentFieldTypes($documentType)
+	public static function GetDocumentFieldTypes($documentType)
 	{
 		$iblockId = intval(substr($documentType, strlen("iblock_")));
 		if ($iblockId <= 0)
@@ -1264,7 +1264,7 @@ public static 	public function GetDocumentFieldTypes($documentType)
 		return $arResult;
 	}
 
-	pupublic static blic function AddDocumentField($documentType, $arFields)
+	public static function AddDocumentField($documentType, $arFields)
 	{
 		$iblockId = intval(substr($documentType, strlen("iblock_")));
 		if ($iblockId <= 0)
@@ -1347,7 +1347,7 @@ public static 	public function GetDocumentFieldTypes($documentType)
 		return "PROPERTY_".$arFields["code"];
 	}
 
-public static 	public function UpdateDocument($documentId, $arFields)
+	public static function UpdateDocument($documentId, $arFields)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -1451,7 +1451,7 @@ public static 	public function UpdateDocument($documentId, $arFields)
 			throw new Exception($iblockElement->LAST_ERROR);
 	}
 
-public static 	public function LockDocument($documentId, $workflowId)
+	public static function LockDocument($documentId, $workflowId)
 	{
 		global $DB;
 		$strSql = "
@@ -1480,7 +1480,7 @@ public static 	public function LockDocument($documentId, $workflowId)
 		}
 	}
 
-public static 	public function UnlockDocument($documentId, $workflowId)
+	public static function UnlockDocument($documentId, $workflowId)
 	{
 		global $DB;
 
@@ -1515,7 +1515,7 @@ public static 	public function UnlockDocument($documentId, $workflowId)
 		return $result > 0;
 	}
 
-public static 	public function IsDocumentLocked($documentId, $workflowId)
+	public static function IsDocumentLocked($documentId, $workflowId)
 	{
 		global $DB;
 		$strSql = "
@@ -1530,7 +1530,7 @@ public static 	public function IsDocumentLocked($documentId, $workflowId)
 			return false;
 	}
 
-	fpublic static unction CanUserOperateDocument($operation, $userId, $documentId, $arParameters = array())
+	public static function CanUserOperateDocument($operation, $userId, $documentId, $arParameters = array())
 	{
 		$documentId = trim($documentId);
 		if (strlen($documentId) <= 0)
@@ -1570,8 +1570,10 @@ public static 	public function IsDocumentLocked($documentId, $workflowId)
 				return CIBlockElementRights::UserHasRightTo($arParameters["IBlockId"], $documentId, "element_read");
 			elseif ($operation === CBPCanUserOperateOperation::WriteDocument)
 				return CIBlockElementRights::UserHasRightTo($arParameters["IBlockId"], $documentId, "element_edit");
-			elseif ($operation === CBPCanUserOperateOperation::StartWorkflow
-				|| $operation === CBPCanUserOperateOperation::ViewWorkflow)
+			elseif (
+				$operation === CBPCanUserOperateOperation::StartWorkflow
+				|| $operation === CBPCanUserOperateOperation::ViewWorkflow
+			)
 			{
 				if (CIBlockElementRights::UserHasRightTo($arParameters["IBlockId"], $documentId, "element_edit"))
 					return true;
@@ -1630,6 +1632,17 @@ public static 	public function IsDocumentLocked($documentId, $workflowId)
 					if (in_array($chop, $ar))
 						return true;
 				}
+			}
+			elseif (
+				$operation === CBPCanUserOperateOperation::CreateWorkflow
+			)
+			{
+				return CBPDocument::CanUserOperateDocumentType(
+					CBPCanUserOperateOperation::CreateWorkflow,
+					$userId,
+					array("iblock", "CIBlockDocument", $documentId),
+					$arParameters
+				);
 			}
 
 			return false;
@@ -1871,7 +1884,7 @@ public static 	function CanUserOperateDocumentType($operation, $userId, $documen
 	* @param array $arFields - массив значений свойств документа в виде array(код_свойства => значение, ...). Коды свойств соответствуют кодам свойств, возвращаемым методом GetDocumentFields.
 	* @return int - код созданного документа.
 	*/
-public static 	public function CreateDocument($parentDocumentId, $arFields)
+	public static function CreateDocument($parentDocumentId, $arFields)
 	{
 		if (!array_key_exists("IBLOCK_ID", $arFields) || intval($arFields["IBLOCK_ID"]) <= 0)
 			throw new Exception("IBlock ID is not found");
@@ -1969,7 +1982,7 @@ public static 	public function CreateDocument($parentDocumentId, $arFields)
 	*
 	* @param string $documentId - код документа.
 	*/
-public static 	public function DeleteDocument($documentId)
+	public static function DeleteDocument($documentId)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -1983,7 +1996,7 @@ public static 	public function DeleteDocument($documentId)
 	*
 	* @param string $documentId - код документа.
 	*/
-public static 	public function PublishDocument($documentId)
+	public static function PublishDocument($documentId)
 	{
 		global $DB;
 		$ID = intval($documentId);
@@ -2113,7 +2126,7 @@ public static 	public function PublishDocument($documentId)
 		return false;
 	}
 
-public static 	public function CloneElement($ID, $arFields = array())
+	public static function CloneElement($ID, $arFields = array())
 	{
 		global $DB;
 		$ID = intval($ID);
@@ -2240,7 +2253,7 @@ public static 	public function CloneElement($ID, $arFields = array())
 	*
 	* @param string $documentId - код документа.
 	*/
-public static 	public function UnpublishDocument($documentId)
+	public static function UnpublishDocument($documentId)
 	{
 		global $DB;
 		CIBlockElement::WF_CleanUpHistoryCopies($documentId, 0);
@@ -2250,7 +2263,7 @@ public static 	public function UnpublishDocument($documentId)
 	}
 
 	// array("read" => "Ета чтение", "write" => "Ета запысь")
-public static 	public function GetAllowableOperations($documentType)
+	public static function GetAllowableOperations($documentType)
 	{
 		$iblockId = intval(substr($documentType, strlen("iblock_")));
 		if ($iblockId <= 0)
@@ -2265,7 +2278,7 @@ public static 	public function GetAllowableOperations($documentType)
 		return array("read" => GetMessage("IBD_OPERATION_READ"), "write" => GetMessage("IBD_OPERATION_WRITE"));
 	}
 
-public static 	public function GetJSFunctionsForFields($documentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
+public static function GetJSFunctionsForFields($documentType, $objectName, $arDocumentFields = array(), $arDocumentFieldTypes = array())
 	{
 		return "";
 	}
@@ -2428,7 +2441,7 @@ public static 	public function GetJSFunctionsForFields($documentType, $objectNam
 		return $arResult;
 	}
 
-public static 	public function GetUsersFromUserGroup($group, $documentId)
+	public static function GetUsersFromUserGroup($group, $documentId)
 	{
 		if (strtolower($group) == "author")
 		{
@@ -2460,7 +2473,7 @@ public static 	public function GetUsersFromUserGroup($group, $documentId)
 		return $arResult;
 	}
 
-public static 	public function SetPermissions($documentId, $workflowId, $arPermissions, $bRewrite = true)
+public static function SetPermissions($documentId, $workflowId, $arPermissions, $bRewrite = true)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -2520,7 +2533,7 @@ public static 	public function SetPermissions($documentId, $workflowId, $arPermi
 	* @param string $documentId - код документа.
 	* @return array - массив документа.
 	*/
-public static 	public function GetDocumentForHistory($documentId, $historyIndex)
+	public static function GetDocumentForHistory($documentId, $historyIndex)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)
@@ -2603,7 +2616,7 @@ public static 	public function GetDocumentForHistory($documentId, $historyIndex)
 	* @param string $documentId - код документа.
 	* @param array $arDocument - массив.
 	*/
-public static 	public function RecoverDocumentFromHistory($documentId, $arDocument)
+	public static function RecoverDocumentFromHistory($documentId, $arDocument)
 	{
 		$documentId = intval($documentId);
 		if ($documentId <= 0)

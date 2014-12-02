@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/catalog_
 
 
 /**
- * Это вспомогательный класс для получения информации об инфоблоках, свойствах и элементах инфоблоков, относящихся к SKU.
+ * Это вспомогательный класс для получения информации об инфоблоках, свойствах и элементах инфоблоков, относящихся к SKU.</body> </html>
  *
  *
  *
@@ -20,8 +20,8 @@ class CCatalogSKU extends CAllCatalogSKU
 	{
 		global $DB;
 
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0)
 			return false;
 
 		if (!isset(self::$arIBlockCache[$intIBlockID]))
@@ -38,10 +38,10 @@ class CCatalogSKU extends CAllCatalogSKU
 			$rsCatalogs = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while ($arCatalog = $rsCatalogs->Fetch())
 			{
-				$arCatalog['IBLOCK_ID'] = intval($arCatalog['IBLOCK_ID']);
-				$arCatalog['PRODUCT_IBLOCK_ID'] = intval($arCatalog['PRODUCT_IBLOCK_ID']);
-				$arCatalog['SKU_PROPERTY_ID'] = intval($arCatalog['SKU_PROPERTY_ID']);
-				$arCatalog['VAT_ID'] = intval($arCatalog['VAT_ID']);
+				$arCatalog['IBLOCK_ID'] = (int)$arCatalog['IBLOCK_ID'];
+				$arCatalog['PRODUCT_IBLOCK_ID'] = (int)$arCatalog['PRODUCT_IBLOCK_ID'];
+				$arCatalog['SKU_PROPERTY_ID'] = (int)$arCatalog['SKU_PROPERTY_ID'];
+				$arCatalog['VAT_ID'] = (int)$arCatalog['VAT_ID'];
 				$boolExists = true;
 				if ($arCatalog['IBLOCK_ID'] == $intIBlockID)
 				{

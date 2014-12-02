@@ -276,6 +276,7 @@ function fGetFormatedProductData($USER_ID, $LID, $arData, $CNT, $currency, $type
 function fChangeOrderStatus($ID, $STATUS_ID)
 {
 	global $APPLICATION;
+	global $crmMode;
 
 	$errorMessageTmp = "";
 
@@ -337,6 +338,8 @@ function fChangeOrderStatus($ID, $STATUS_ID)
  */
 function fShowFilePropertyField($name, $property_fields, $values, $max_file_size_show=50000)
 {
+	global $crmMode;
+	$disableFiles = (isset($crmMode) && $crmMode);
 	$res = "";
 	if (CModule::IncludeModule('fileman'))
 	{
@@ -364,8 +367,11 @@ function fShowFilePropertyField($name, $property_fields, $values, $max_file_size
 						"MAX_SIZE" => array("W" => 200, "H" => 170),
 					),
 					array(
-						'upload' => true,
-						'del' => true,
+						'upload' => !$disableFiles,
+						'del' => !$disableFiles,
+						'medialib' => false,
+						'file_dialog' => false,
+						'cloud' => false,
 						'description' => false
 					)
 				);
@@ -390,8 +396,11 @@ function fShowFilePropertyField($name, $property_fields, $values, $max_file_size
 				"IMAGE_POPUP" => "Y",
 				"MAX_SIZE" => array("W" => 200, "H" => 170),
 			), false, array(
-					'upload' => true,
-					'del' => true,
+					'upload' => !$disableFiles,
+					'del' => !$disableFiles,
+					'medialib' => false,
+					'file_dialog' => false,
+					'cloud' => false,
 					'description' => false
 			));
 		}
@@ -650,7 +659,7 @@ function fGetBuyerType($PERSON_TYPE_ID, $LID, $USER_ID = '', $ORDER_ID = 0, $for
 		else
 			$resultHtml .= "<tr id=\"town_location_".$arProperties["ID"]."\"".$adit.">\n";
 
-		if(($arProperties["TYPE"] == "MULTISELECT" || $arProperties["TYPE"] == "TEXTAREA") || ($ORDER_ID <= 0 && $arProperties["IS_PROFILE_NAME"] == "Y") )
+		if(($arProperties["TYPE"] == "MULTISELECT" || $arProperties["TYPE"] == "TEXTAREA" || $arProperties["TYPE"] == "FILE") || ($ORDER_ID <= 0 && $arProperties["IS_PROFILE_NAME"] == "Y") )
 			$resultHtml .= "<td valign=\"top\" class=\"adm-detail-content-cell-l\" width=\"40%\">\n";
 		else
 			$resultHtml .= "<td align=\"right\" width=\"40%\" ".$requiredField.">\n";
@@ -1261,17 +1270,20 @@ function fUserProfile($USER_ID, $BUYER_TYPE = '', $default = '')
 	$userProfileSelect .= "<option value=\"0\">".GetMessage("NEWO_BUYER_PROFILE_NEW")."</option>";
 	$userProfile = CSaleOrderUserProps::DoLoadProfiles($USER_ID, $BUYER_TYPE);
 	$i = "";
-	foreach($userProfile as $key => $val)
+	if (!empty($userProfile) && is_array($userProfile))
 	{
-		if ($default == "" AND $i == "")
+		foreach($userProfile as $key => $val)
 		{
-			$userProfileSelect .= "<option selected value=\"".$key."\">".$val["NAME"]."</option>";
-			$i = $key;
+			if ($default == "" AND $i == "")
+			{
+				$userProfileSelect .= "<option selected value=\"".$key."\">".$val["NAME"]."</option>";
+				$i = $key;
+			}
+			elseif ($default == $key)
+				$userProfileSelect .= "<option selected value=\"".$key."\">".$val["NAME"]."</option>";
+			else
+				$userProfileSelect .= "<option value=\"".$key."\">".$val["NAME"]."</option>";
 		}
-		elseif ($default == $key)
-			$userProfileSelect .= "<option selected value=\"".$key."\">".$val["NAME"]."</option>";
-		else
-			$userProfileSelect .= "<option value=\"".$key."\">".$val["NAME"]."</option>";
 	}
 	$userProfileSelect .= "</select>";
 
@@ -1313,6 +1325,7 @@ function fGetDeliverySystemsHTML($location, $locationZip, $weight, $price, $curr
 	$arResult = array();
 	$description = "";
 	$error = "";
+	$setDeliveryPrice = false;
 
 	$arDelivery = CSaleDelivery::DoLoadDelivery($location, $locationZip, $weight, $price, $currency, $siteId, $arShoppingCart);
 
@@ -1341,6 +1354,7 @@ function fGetDeliverySystemsHTML($location, $locationZip, $weight, $price, $curr
 						}
 						$price = $v["DELIVERY_PRICE"];
 						$description = $val["DESCRIPTION"];
+						$setDeliveryPrice = true;
 					}
 
 					$deliveryHTML .= "<option".$selected." value=\"".$v["ID"]."\">".$val["TITLE"]." (".$v["TITLE"].") [".$v["ID"]."]</option>";
@@ -1354,6 +1368,7 @@ function fGetDeliverySystemsHTML($location, $locationZip, $weight, $price, $curr
 				{
 					$selected = " selected=\"selected\"";
 					$price = $val["PRICE"];
+					$setDeliveryPrice = true;
 					$description = $val["DESCRIPTION"];
 				}
 
@@ -1366,7 +1381,7 @@ function fGetDeliverySystemsHTML($location, $locationZip, $weight, $price, $curr
 
 	$arResult["DELIVERY"] = $deliveryHTML;
 	$arResult["DELIVERY_DEFAULT"] = $defaultDelivery;
-	$arResult["DELIVERY_DEFAULT_PRICE"] = (count($arDelivery) > 0) ? $price : 0;
+	$arResult["DELIVERY_DEFAULT_PRICE"] = (count($arDelivery) > 0 && $setDeliveryPrice === true) ? $price : 0;
 	$arResult["DELIVERY_DEFAULT_DESCRIPTION"] = $description;
 	$arResult["DELIVERY_DEFAULT_ERR"] = $error;
 	$arResult["CURRENCY"] = $currency;
@@ -1521,9 +1536,14 @@ function fGetUserShoppingCart($arProduct, $LID, $recalcOrder)
 			foreach ($arOrderProductPrice as &$arOrderProductPriceDat)
 			{
 				if (isset($arOrderProductPriceDat['ID']) && $arOrderProductPriceDat['ID'] == $arBasketItems['ID'] && $arBasketItems['RESERVED'] == "Y")
+				{
 					$arOrderProductPriceDat['RESERVED'] = "Y";
+					break;
+				}
 				else
+				{
 					$arOrderProductPriceDat['RESERVED'] = "N";
+				}
 			}
 			unset($arOrderProductPriceDat);
 		}
@@ -2170,16 +2190,16 @@ function setBarcodeClass($barcodeValue)
 function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userColumns, $tmpId = "")
 {
 	if (!\Bitrix\Main\Loader::includeModule("catalog"))
-		return;
+		return array();
 
 	$arParams = array();
 
-	$productId = intval($productId);
+	$productId = (int)$productId;
 	if ($productId <= 0)
 	{
 		return $arParams;
 	}
-	$iblockId = intval(CIBlockElement::GetIBlockByID($productId));
+	$iblockId = (int)CIBlockElement::GetIBlockByID($productId);
 	if ($iblockId <= 0)
 	{
 		return $arParams;
@@ -2187,8 +2207,6 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 
 	$arSku2Parent = array();
 	$arElementId = array();
-	$arParent = array();
-	$arProductData = array();
 
 	$arElementId[] = $productId;
 	$arParent = CCatalogSku::GetProductInfo($productId, $iblockId);
@@ -2209,7 +2227,13 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 		}
 		else
 		{
-			$dbres = CIBlockProperty::GetList(array(), array("CODE" => substr($column, 9)));
+			$propertyCode = substr($column, 9);
+			if ($propertyCode == '')
+			{
+				unset($arUserColumns[$key]);
+				continue;
+			}
+			$dbres = CIBlockProperty::GetList(array(), array("CODE" => $propertyCode));
 			if ($arPropData = $dbres->GetNext())
 				$arPropertyInfo[$column] = $arPropData;
 		}
@@ -2231,19 +2255,19 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 		{
 			foreach ($arElement as $key => $value)
 			{
-				if ((substr($key, 0, 9) == "PROPERTY_") && (substr($key, -6) == "_VALUE"))
+				if (strncmp($key, 'PROPERTY_', 9) == 0 && substr($key, -6) == "_VALUE")
 				{
 					$columnCode = str_replace("_VALUE", "", $key);
-					$arElement[$key] = getIblockPropInfo($value, $arPropertyInfo[$columnCode], array("WIDTH" => 90, "HEIGHT" => 90), intval($ID));
+					$arElement[$key] = getIblockPropInfo($value, $arPropertyInfo[$columnCode], array("WIDTH" => 90, "HEIGHT" => 90));
 				}
 			}
 		}
 		unset($arElement);
 
-		if (array_key_exists($productId, $arProductData))
+		if (isset($arProductData[$productId]))
 			$arElementInfo = $arProductData[$productId];
 
-		if (array_key_exists($productId, $arSku2Parent))
+		if (isset( $arSku2Parent[$productId]))
 			$arParent = $arProductData[$arSku2Parent[$productId]];
 
 		if (!empty($arSku2Parent)) // if sku element doesn't have value of some property - we'll show parent element value instead
@@ -2259,14 +2283,16 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 					$arElementInfo[$fieldVal] = $arProductData[$parentId][$fieldVal];
 				}
 			}
+			if (strpos($arElementInfo["~XML_ID"], '#') === false)
+			{
+				$arElementInfo["~XML_ID"] = $arParent['~XML_ID'].'#'.$arElementInfo["~XML_ID"];
+			}
 		}
 
 		$arElementInfo["MODULE"] = "catalog";
 		$arElementInfo["PRODUCT_PROVIDER_CLASS"] = "CCatalogProductProvider";
 
 		$arElementInfo["PRODUCT_ID"] = $arElementInfo["ID"];
-		$arElementInfo["NAME"] = $arElementInfo["NAME"];
-		$arElementInfo["DETAIL_PAGE_URL"] = htmlspecialcharsex($arElementInfo["DETAIL_PAGE_URL"]);
 
 		if ($arElementInfo["IBLOCK_ID"] > 0)
 		{
@@ -2304,9 +2330,29 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 
 		// sku props
 		$arSkuData = array();
-		$arSkuProperty = CSaleProduct::GetProductSkuProps($productId);
-		foreach ($arSkuProperty as $name => $val)
-			$arSkuData[] = array("NAME" => $name, "VALUE" => $val, "CODE" => "");
+		$arProps[] = array(
+			"NAME" => "Catalog XML_ID",
+			"CODE" => "CATALOG.XML_ID",
+			"VALUE" => $arElementInfo['~IBLOCK_XML_ID']
+		);
+		$arSkuProperty = CSaleProduct::GetProductSkuProps($productId, '', true);
+		if (!empty($arSkuProperty))
+		{
+			foreach ($arSkuProperty as &$val)
+			{
+				$arSkuData[] = array(
+					'NAME' => $val['NAME'],
+					'VALUE' => $val['VALUE'],
+					'CODE' => $val['CODE']
+				);
+			}
+			unset($val);
+		}
+		$arSkuData[] = array(
+			"NAME" => "Product XML_ID",
+			"CODE" => "PRODUCT.XML_ID",
+			"VALUE" => $arElementInfo["~XML_ID"]
+		);
 
 		// currency
 		$arCurFormat = CCurrencyLang::GetCurrencyFormat($arElementInfo["CURRENCY"]);
@@ -2316,7 +2362,7 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 
 		// measure
 		$arElementInfo["MEASURE_TEXT"] = "";
-		if (intval($arProduct["MEASURE"]) > 0)
+		if ((int)$arProduct["MEASURE"] > 0)
 		{
 			$dbMeasure = CCatalogMeasure::GetList(array(), array("ID" => intval($arProduct["MEASURE"])), false, false, array("ID", "SYMBOL_RUS", "SYMBOL_INTL"));
 			if ($arMeasure = $dbMeasure->Fetch())
@@ -2416,8 +2462,8 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 
 		// params array
 		$arParams["id"] = $productId;
-		$arParams["name"] = $arElementInfo["NAME"];
-		$arParams["url"] = $arElementInfo["DETAIL_PAGE_URL"];
+		$arParams["name"] = $arElementInfo["~NAME"];
+		$arParams["url"] = htmlspecialcharsex($arElementInfo["~DETAIL_PAGE_URL"]);
 		$arParams["urlEdit"] = $arElementInfo["EDIT_PAGE_URL"];
 		$arParams["urlImg"] = $imgUrl;
 		$arParams["price"] = floatval($arElementInfo["PRICE"]);
@@ -2438,8 +2484,8 @@ function getProductDataToFillBasket($productId, $quantity, $userId, $LID, $userC
 		$arParams["priceType"] = $arPrice["PRICE"]["CATALOG_GROUP_NAME"];
 		$arParams["balance"] = $balance;
 		$arParams["notes"] = (is_array($arPrice["PRICE"]) && array_key_exists("CATALOG_GROUP_NAME", $arPrice["PRICE"])) ? $arPrice["PRICE"]["CATALOG_GROUP_NAME"] : "";
-		$arParams["catalogXmlID"] = $arElementInfo["IBLOCK_EXTERNAL_ID"];
-		$arParams["productXmlID"] = $arElementInfo["XML_ID"];
+		$arParams["catalogXmlID"] = $arElementInfo["~IBLOCK_XML_ID"];
+		$arParams["productXmlID"] = $arElementInfo["~XML_ID"];
 		$arParams["callback"] = "";
 		$arParams["orderCallback"] = "";
 		$arParams["cancelCallback"] = "";

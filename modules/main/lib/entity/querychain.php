@@ -2,6 +2,9 @@
 
 namespace Bitrix\Main\Entity;
 
+use Bitrix\Main;
+use Bitrix\Main\SystemException;
+
 class QueryChain
 {
 	/**
@@ -17,6 +20,9 @@ class QueryChain
 
 	protected $custom_alias;
 
+	/** @var boolean */
+	protected $forcesDataDoulingOff = false;
+
 	/**
 	 * @var QueryChainElement
 	 */
@@ -31,7 +37,7 @@ class QueryChain
 	{
 		if (empty($this->chain) && !($element->getValue() instanceof Base))
 		{
-			throw new \Exception('The first element of chain should be Entity only.');
+			throw new SystemException('The first element of chain should be Entity only.');
 		}
 
 		$this->chain[] = $element;
@@ -47,11 +53,17 @@ class QueryChain
 		return $this->chain[0];
 	}
 
+	/**
+	 * @return QueryChainElement
+	 */
 	public function getLastElement()
 	{
 		return $this->last_element;
 	}
 
+	/**
+	 * @return array|QueryChainElement[]
+	 */
 	public function getAllElements()
 	{
 		return $this->chain;
@@ -129,7 +141,6 @@ class QueryChain
 
 		foreach ($def_elements as &$def_element)
 		{
-			$is_first_elem = ($i == 0);
 			$is_last_elem  = (++$i == $def_elements_size);
 
 			$not_found = false;
@@ -152,7 +163,7 @@ class QueryChain
 				}
 				elseif (!$is_last_elem)
 				{
-					throw new \Exception(sprintf(
+					throw new SystemException(sprintf(
 						'Normal fields can be only the last in chain, `%s` %s is not the last.',
 						$field->getName(), get_class($field)
 					));
@@ -166,18 +177,16 @@ class QueryChain
 
 				$chain->addElement(new QueryChainElement($field));
 			}
-			elseif ($prev_entity->hasUField($def_element))
+			elseif ($prev_entity->hasUField($def_element) && false)
 			{
+				/** @deprecated */
 				// extend chain with utm/uts entity
 				$ufield = $prev_entity->getUField($def_element);
-
-				$u_entity = null;
 
 				if ($ufield->isMultiple())
 				{
 					// add utm entity  user.utm:source_object (1:N)
 					$utm_entity = Base::getInstance($prev_entity->getNamespace().'Utm'.$prev_entity->getName());
-					$u_entity = $utm_entity;
 
 					$chain->addElement(new QueryChainElement(
 						array($utm_entity, $utm_entity->getField('SOURCE_OBJECT')),
@@ -208,7 +217,6 @@ class QueryChain
 					// uts table - single value
 					// add uts entity user.uts (1:1)
 					$uts_entity = Base::getInstance($prev_entity->getNamespace().'Uts'.$prev_entity->getName());
-					$u_entity = $uts_entity;
 
 					$chain->addElement(new QueryChainElement(
 						$prev_entity->getField('UTS_OBJECT')
@@ -248,18 +256,28 @@ class QueryChain
 				if (
 					Base::isExists($ref_entity_name)
 					&& Base::getInstance($ref_entity_name)->hasField($ref_field_name = substr($def_element, $pos_wh+1))
-					&& Base::getInstance($ref_entity_name)->getField($ref_field_name)->getRefEntity()->getName() == $prev_entity->getName()
+					&& Base::getInstance($ref_entity_name)->getField($ref_field_name) instanceof ReferenceField
 				)
 				{
-					// chain element is another entity with >1 references to current entity
-					// def like NewsArticle:AUTHOR, NewsArticle:LAST_COMMENTER
-					// NewsArticle - entity, AUTHOR and LAST_COMMENTER - Reference fields
-					$chain->addElement(new QueryChainElement(array(
-						Base::getInstance($ref_entity_name),
-						Base::getInstance($ref_entity_name)->getField($ref_field_name)
-					)));
+					/** @var ReferenceField $reference */
+					$reference = Base::getInstance($ref_entity_name)->getField($ref_field_name);
 
-					$prev_entity = Base::getInstance($ref_entity_name);
+					if ($reference->getRefEntity()->getFullName() == $prev_entity->getFullName())
+					{
+						// chain element is another entity with >1 references to current entity
+						// def like NewsArticle:AUTHOR, NewsArticle:LAST_COMMENTER
+						// NewsArticle - entity, AUTHOR and LAST_COMMENTER - Reference fields
+						$chain->addElement(new QueryChainElement(array(
+							Base::getInstance($ref_entity_name),
+							Base::getInstance($ref_entity_name)->getField($ref_field_name)
+						)));
+
+						$prev_entity = Base::getInstance($ref_entity_name);
+					}
+					else
+					{
+						$not_found = true;
+					}
 				}
 				else
 				{
@@ -279,7 +297,7 @@ class QueryChain
 
 			if ($not_found)
 			{
-				throw new \Exception(sprintf(
+				throw new SystemException(sprintf(
 					'Unknown field definition `%s` (%s) for %s Entity.',
 					$def_element, $definition, $prev_entity->getName()
 				), 100);
@@ -317,15 +335,6 @@ class QueryChain
 
 		$elements = $chain->getAllElements();
 
-		// cut non-last expressions
-		foreach ($elements as $k => $element)
-		{
-			if ($element->getValue() instanceof ExpressionField && $element !== end($elements))
-			{
-				//unset($elements[$k]);
-			}
-		}
-
 		// add prefix of init entity
 		if (count($elements) > 2)
 		{
@@ -333,6 +342,7 @@ class QueryChain
 		}
 
 		// add other members of chain
+		/** @var QueryChainElement[] $elements */
 		$elements = array_slice($elements, 1);
 
 		foreach ($elements  as $element)
@@ -395,13 +405,23 @@ class QueryChain
 			&& $this->getLastElement()->getValue()->isConstant());
 	}
 
+	public function forceDataDoublingOff()
+	{
+		$this->forcesDataDoulingOff = true;
+	}
+
+	public function forcesDataDoublingOff()
+	{
+		return $this->forcesDataDoulingOff;
+	}
+
 	public function getSqlDefinition($with_alias = false)
 	{
 		$sql_def = $this->getLastElement()->getSqlDefinition();
 
 		if ($with_alias)
 		{
-			$connection = \Bitrix\Main\Application::getConnection();
+			$connection = Main\Application::getConnection();
 			$helper = $connection->getSqlHelper();
 
 			$sql_def .= ' AS ' . $helper->quote($this->getAlias());
@@ -417,6 +437,9 @@ class QueryChain
 
 	public function dump()
 	{
+		echo '  '.'   forcesDataDoublingOff: '.($this->forcesDataDoublingOff()?'true':'false');
+		echo PHP_EOL;
+
 		$i = 0;
 		foreach ($this->chain as $elem)
 		{

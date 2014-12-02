@@ -19,8 +19,11 @@ class SystemException extends \Exception
 	{
 		parent::__construct($message, $code, $previous);
 
-		$this->file = $file;
-		$this->line = $line;
+		if (!empty($file) && !empty($line))
+		{
+			$this->file = $file;
+			$this->line = $line;
+		}
 	}
 }
 
@@ -160,6 +163,16 @@ class NotSupportedException extends SystemException
 	}
 }
 
+/**
+ * Exception is thrown when a method call is invalid for current state of object.
+ */
+class InvalidOperationException extends SystemException
+{
+	static public function __construct($message = "", \Exception $previous = null)
+	{
+		parent::__construct($message, 160, '', 0, $previous);
+	}
+}
 
 /**
  * Exception is thrown when object property is not valid.
@@ -180,5 +193,16 @@ class ObjectException extends SystemException
 	static public function __construct($message = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 500, '', 0, $previous);
+	}
+}
+
+/**
+ * Exception is thrown when an object is not present.
+ */
+class ObjectNotFoundException extends SystemException
+{
+	static public function __construct($message = "", \Exception $previous = null)
+	{
+		parent::__construct($message, 510, '', 0, $previous);
 	}
 }

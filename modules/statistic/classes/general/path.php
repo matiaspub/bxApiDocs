@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту.
+ * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту.</body> </html>
  *
  *
  *

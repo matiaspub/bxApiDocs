@@ -108,6 +108,7 @@ class CAllOption
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	* Длина не более 50 символов.
 	*
 	*
 	*
@@ -229,10 +230,11 @@ class CAllOption
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
+	* Длина не более 50 символов.
 	*
 	*
 	*
-	* @param string $name  Идентификатор параметра.
+	* @param string $name  Идентификатор параметра. Длина не более 50 символов.
 	*
 	*
 	*
@@ -362,7 +364,7 @@ class CAllPageOption
 	*
 	*
 	*
-	* @param mixed $def = false Значение по умолчанию. </htm
+	* @param mixed $def = false Значение по умолчанию. </ht
 	*
 	*
 	*
@@ -386,7 +388,7 @@ class CAllPageOption
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
 	* >Параметры страницы</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/getoptionint.php">CPageOption::GetOptionInt</a> </li>
-	* </ul> <a name="examples"></a>
+	* </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -437,7 +439,7 @@ class CAllPageOption
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
 	* >Параметры страницы</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/setoptionint.php">CPageOption::SetOptionInt</a> </li>
-	* </ul> <a name="examples"></a>
+	* </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -493,7 +495,7 @@ class CAllPageOption
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
-	* >Параметры страницы</a> </li></ul> <a name="examples"></a>
+	* >Параметры страницы</a> </li></ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -538,7 +540,7 @@ class CAllPageOption
 	*
 	*
 	*
-	* @param mixed $def = false Значение по умолчанию. </htm
+	* @param mixed $def = false Значение по умолчанию. </ht
 	*
 	*
 	*
@@ -562,7 +564,7 @@ class CAllPageOption
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
 	* >Параметры страницы</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/getoptionstring.php">CPageOption::GetOptionString</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static
@@ -617,7 +619,7 @@ class CAllPageOption
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
 	* >Параметры страницы</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/setoptionstring.php">CPageOption::SetOptionString</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul> </ht<a name="examples"></a>
 	*
 	*
 	* @static

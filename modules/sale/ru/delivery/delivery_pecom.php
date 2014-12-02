@@ -21,7 +21,7 @@ use Bitrix\Sale\Delivery\Pecom\Adapter;
 use Bitrix\Sale\Delivery\Pecom\Request;
 use Bitrix\Sale\Delivery\Pecom\Calculator;
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_pecom.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_pecom.php');
 
 class CDeliveryPecom
 {

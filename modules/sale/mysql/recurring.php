@@ -59,7 +59,7 @@ class CSaleRecurring extends CAllSaleRecurring
 	{
 		global $DB;
 
-		$ID = IntVal($ID);
+		$ID = (int)$ID;
 		if ($ID <= 0)
 			return false;
 
@@ -69,18 +69,17 @@ class CSaleRecurring extends CAllSaleRecurring
 		}
 		else
 		{
-			$strSql = 
+			$strSql =
 				"SELECT SR.ID, SR.USER_ID, SR.MODULE, SR.PRODUCT_ID, SR.PRODUCT_NAME, ".
 				"	SR.PRODUCT_URL, SR.PRODUCT_PRICE_ID, SR.RECUR_SCHEME_TYPE, ".
 				"	SR.RECUR_SCHEME_LENGTH, SR.WITHOUT_ORDER, SR.PRICE, SR.CURRENCY, SR.ORDER_ID, ".
-				"	SR.CANCELED, SR.DESCRIPTION, SR.CALLBACK_FUNC, ".
+				"	SR.CANCELED, SR.DESCRIPTION, SR.CALLBACK_FUNC, SR.PRODUCT_PROVIDER_CLASS, ".
 				"	SR.REMAINING_ATTEMPTS, SR.SUCCESS_PAYMENT, SR.CANCELED_REASON, ".
 				"	".$DB->DateToCharFunction("SR.TIMESTAMP_X", "FULL")." as TIMESTAMP_X, ".
 				"	".$DB->DateToCharFunction("SR.DATE_CANCELED", "FULL")." as DATE_CANCELED, ".
 				"	".$DB->DateToCharFunction("SR.PRIOR_DATE", "FULL")." as PRIOR_DATE, ".
 				"	".$DB->DateToCharFunction("SR.NEXT_DATE", "FULL")." as NEXT_DATE ".
-				"FROM b_sale_recurring SR ".
-				"WHERE SR.ID = ".$ID." ";
+				"FROM b_sale_recurring SR WHERE SR.ID = ".$ID;
 
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($res = $db_res->Fetch())
@@ -208,8 +207,8 @@ class CSaleRecurring extends CAllSaleRecurring
 	{
 		global $DB;
 
-		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("ID", "USER_ID", "MODULE", "PRODUCT_ID", "PRODUCT_NAME", "PRODUCT_URL", "PRODUCT_PRICE_ID", "RECUR_SCHEME_TYPE", "RECUR_SCHEME_LENGTH", "WITHOUT_ORDER", "PRICE", "CURRENCY", "ORDER_ID", "CANCELED", "DATE_CANCELED", "CANCELED_REASON", "CALLBACK_FUNC", "DESCRIPTION", "TIMESTAMP_X", "PRIOR_DATE", "NEXT_DATE", "REMAINING_ATTEMPTS", "SUCCESS_PAYMENT");
+		if (empty($arSelectFields))
+			$arSelectFields = array("ID", "USER_ID", "MODULE", "PRODUCT_ID", "PRODUCT_NAME", "PRODUCT_URL", "PRODUCT_PRICE_ID", "RECUR_SCHEME_TYPE", "RECUR_SCHEME_LENGTH", "WITHOUT_ORDER", "PRICE", "CURRENCY", "ORDER_ID", "CANCELED", "DATE_CANCELED", "CANCELED_REASON", "CALLBACK_FUNC", "PRODUCT_PROVIDER_CLASS", "DESCRIPTION", "TIMESTAMP_X", "PRIOR_DATE", "NEXT_DATE", "REMAINING_ATTEMPTS", "SUCCESS_PAYMENT");
 
 		// FIELDS -->
 		$arFields = array(
@@ -230,6 +229,7 @@ class CSaleRecurring extends CAllSaleRecurring
 				"DATE_CANCELED" => array("FIELD" => "SR.DATE_CANCELED", "TYPE" => "datetime"),
 				"CANCELED_REASON" => array("FIELD" => "SR.CANCELED_REASON", "TYPE" => "string"),
 				"CALLBACK_FUNC" => array("FIELD" => "SR.CALLBACK_FUNC", "TYPE" => "string"),
+				"PRODUCT_PROVIDER_CLASS" => array("FIELD" => "SR.PRODUCT_PROVIDER_CLASS", "TYPE" => "string"),
 				"DESCRIPTION" => array("FIELD" => "SR.DESCRIPTION", "TYPE" => "string"),
 				"TIMESTAMP_X" => array("FIELD" => "SR.TIMESTAMP_X", "TYPE" => "datetime"),
 				"PRIOR_DATE" => array("FIELD" => "SR.PRIOR_DATE", "TYPE" => "datetime"),
@@ -269,7 +269,7 @@ class CSaleRecurring extends CAllSaleRecurring
 				return False;
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
 			"FROM b_sale_recurring SR ".
 			"	".$arSqls["FROM"]." ";

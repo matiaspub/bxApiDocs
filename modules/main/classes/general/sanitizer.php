@@ -363,15 +363,15 @@
 		* <li>CBXSanitizer::SECURE_LEVEL_MIDDLE</li> <li>CBXSanitizer::SECURE_LEVEL_LOW</li> </ul> <p>При этом в
 		* список разрешенных будут добавлены следующие тэги и атрибуты:</p>
 		* <pre> CBXSanitizer::SECURE_LEVEL_HIGH $arTags = array( 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(),
-		* 'code' =&gt; array(), 'del' =&gt; array(), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt; array(), 'h1' =&gt;
-		* array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt;
-		* array(), 'i' =&gt; array(), 'ins' =&gt; array(), 'li' =&gt; array(), 'ol' =&gt; array(), 'p' =&gt; array(), 'small'
-		* =&gt; array(), 's' =&gt; array(), 'sub' =&gt; array(), 'sup' =&gt; array(), 'strong' =&gt; array(), 'pre' =&gt; array(),
-		* 'u' =&gt; array(), 'ul' =&gt; array() ); </pre> <pre> CBXSanitizer::SECURE_LEVEL_MIDDLE $arTags = array( 'a' =&gt;
-		* array('href', 'title','name','alt'), 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(), 'code' =&gt; array(),
-		* 'caption' =&gt; array(), 'del' =&gt; array('title'), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font' =&gt;
-		* array('color','size'), 'color' =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt;
-		* array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'img' =&gt;
+		* 'blockquote' =&gt; array(), 'code' =&gt; array(), 'del' =&gt; array(), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font'
+		* =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6'
+		* =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'ins' =&gt; array(), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
+		* =&gt; array(), 'small' =&gt; array(), 's' =&gt; array(), 'sub' =&gt; array(), 'sup' =&gt; array(), 'strong' =&gt;
+		* array(), 'pre' =&gt; array(), 'u' =&gt; array(), 'ul' =&gt; array() ); </pre> <pre> CBXSanitizer::SECURE_LEVEL_MIDDLE
+		* $arTags = array( 'a' =&gt; array('href', 'title','name','alt'), 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt;
+		* array(), 'code' =&gt; array(), 'caption' =&gt; array(), 'del' =&gt; array('title'), 'dt' =&gt; array(), 'dd' =&gt;
+		* array(), 'font' =&gt; array('color','size'), 'color' =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt;
+		* array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'img' =&gt;
 		* array('src','alt','height','width','title'), 'ins' =&gt; array('title'), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
 		* =&gt; array(), 'pre' =&gt; array(), 's' =&gt; array(), 'small' =&gt; array(), 'strong' =&gt; array(), 'sub' =&gt;
 		* array(), 'sup' =&gt; array(), 'table' =&gt; array('border','width'), 'tbody' =&gt; array('align','valign'), 'td' =&gt;

@@ -2,6 +2,8 @@
 
 namespace Bitrix\Main\Entity;
 
+use Bitrix\Main\SystemException;
+
 class QueryChainElement
 {
 	protected $value;
@@ -20,7 +22,7 @@ class QueryChainElement
 	 * 2. ReferenceField - pointer to another entity
 	 * 3. array(Base, ReferenceField) - pointer from another entity to this
 	 * 4. Base - all fields of entity
-	 * @param ScalarField|ExpressionField|ReferenceField|array|Base $element
+	 * @param Field|array|Base $element
 	 * @param array $parameters
 	 * @throws \Exception
 	 */
@@ -47,7 +49,7 @@ class QueryChainElement
 		}
 		else
 		{
-			throw new \Exception(sprintf('Invalid value for QueryChainElement: %s.', $element));
+			throw new SystemException(sprintf('Invalid value for QueryChainElement: %s.', $element));
 		}
 
 		$this->value = $element;
@@ -55,7 +57,7 @@ class QueryChainElement
 	}
 
 	/**
-	 * @return array|Base|ExpressionField|ReferenceField|ScalarField
+	 * @return array|Base|ExpressionField|ReferenceField|FileField|ScalarField
 	 */
 	public function getValue()
 	{
@@ -97,9 +99,7 @@ class QueryChainElement
 				}
 				else
 				{
-					$this->definition_fragment =
-						$this->value[0]->getNamespace().'\\'.$this->value[0]->getName()
-						. ':' . $this->value[1]->getName();
+					$this->definition_fragment = $this->value[0]->getFullName()	. ':' . $this->value[1]->getName();
 				}
 			}
 			elseif ($this->type == 4)
@@ -174,7 +174,7 @@ class QueryChainElement
 	{
 		if (is_array($this->value) || $this->value instanceof ReferenceField || $this->value instanceof Base)
 		{
-			throw new \Exception('');
+			throw new SystemException('Unknown value');
 		}
 
 		if ($this->value instanceof ExpressionField)
@@ -203,7 +203,23 @@ class QueryChainElement
 
 	public function isBackReference()
 	{
-		return $this->type === 3;
+		if ($this->type === 3)
+		{
+			return true;
+		}
+
+		if ($this->value instanceof ExpressionField)
+		{
+			foreach ($this->value->getBuildFromChains() as $bfChain)
+			{
+				if ($bfChain->hasBackReference())
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	public function dump()

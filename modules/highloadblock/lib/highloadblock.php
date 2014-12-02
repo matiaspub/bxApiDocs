@@ -3,7 +3,7 @@
  * Bitrix Framework
  * @package    bitrix
  * @subpackage highloadblock
- * @copyright  2001-2012 1C-Bitrix
+ * @copyright  2001-2014 1C-Bitrix
  */
 
 namespace Bitrix\Highloadblock;
@@ -11,7 +11,6 @@ namespace Bitrix\Highloadblock;
 use Bitrix\Main;
 use Bitrix\Main\Application;
 use Bitrix\Main\DB\MssqlConnection;
-use Bitrix\Main\DB\OracleConnection;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Type;
 
@@ -22,11 +21,9 @@ use Bitrix\Main\Type;
  */
 class HighloadBlockTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
+	/**
+	 * @return string
+	 */
 	public static function getTableName()
 	{
 		return 'b_hlblock_entity';
@@ -35,6 +32,8 @@ class HighloadBlockTable extends Entity\DataManager
 	public static function getMap()
 	{
 		IncludeModuleLangFile(__FILE__);
+
+		$sqlHelper = Application::getConnection()->getSqlHelper();
 
 		$fieldsMap = array(
 			'ID' => array(
@@ -55,7 +54,7 @@ class HighloadBlockTable extends Entity\DataManager
 			'FIELDS_COUNT' => array(
 				'data_type' => 'integer',
 				'expression' => array(
-					'(SELECT COUNT(ID) FROM b_user_field WHERE b_user_field.ENTITY_ID = '.$GLOBALS['DB']->concat("'HLBLOCK_'", 'CAST(%s as char)').')', 'ID'
+					'(SELECT COUNT(ID) FROM b_user_field WHERE b_user_field.ENTITY_ID = '.$sqlHelper->getConcatFunction("'HLBLOCK_'", 'CAST(%s as char)').')', 'ID'
 				)
 			)
 		);
@@ -63,6 +62,12 @@ class HighloadBlockTable extends Entity\DataManager
 		return $fieldsMap;
 	}
 
+	/**
+	 * @param array $data
+	 *
+	 * @return Entity\AddResult
+	 * @throws \Bitrix\Main\SystemException
+	 */
 	public static function add($data)
 	{
 		$result = parent::add($data);
@@ -80,28 +85,28 @@ class HighloadBlockTable extends Entity\DataManager
 
 		if ($dbtype == 'mysql')
 		{
-			$GLOBALS['DB']->query('
+			$connection->query('
 				CREATE TABLE '.$sqlHelper->quote($data['TABLE_NAME']).' (ID int(11) unsigned NOT NULL AUTO_INCREMENT, PRIMARY KEY (ID))
 			');
 		}
 		elseif ($dbtype == 'mssql')
 		{
-			$GLOBALS['DB']->query('
+			$connection->query('
 				CREATE TABLE '.$sqlHelper->quote($data['TABLE_NAME']).' (ID int NOT NULL IDENTITY (1, 1),
 				CONSTRAINT '.$data['TABLE_NAME'].'_ibpk_1 PRIMARY KEY (ID))
 			');
 		}
 		elseif ($dbtype == 'oracle')
 		{
-			$GLOBALS['DB']->query('
+			$connection->query('
 				CREATE TABLE '.$sqlHelper->quote($data['TABLE_NAME']).' (ID number(11) NOT NULL, PRIMARY KEY (ID))
 			');
 
-			$GLOBALS['DB']->query('
+			$connection->query('
 				CREATE SEQUENCE sq_'.$data['TABLE_NAME'].'
 			');
 
-			$GLOBALS['DB']->query('
+			$connection->query('
 				CREATE OR REPLACE TRIGGER '.$data['TABLE_NAME'].'_insert
 					BEFORE INSERT
 					ON '.$sqlHelper->quote($data['TABLE_NAME']).'
@@ -115,14 +120,22 @@ class HighloadBlockTable extends Entity\DataManager
 		}
 		else
 		{
-			throw new \Exception('Unknown DB type');
+			throw new Main\SystemException('Unknown DB type');
 		}
 
 		return $result;
 	}
 
+	/**
+	 * @param mixed $primary
+	 * @param array $data
+	 *
+	 * @return Entity\UpdateResult
+	 */
 	public static function update($primary, $data)
 	{
+		global $USER_FIELD_MANAGER;
+
 		// get old data
 		$oldData = static::getByPrimary($primary)->fetch();
 
@@ -144,38 +157,44 @@ class HighloadBlockTable extends Entity\DataManager
 			if ($connection instanceof MssqlConnection)
 			{
 				// rename constraint
-				$connection->query("EXEC sp_rename ".$oldData['TABLE_NAME']."_ibpk_1, ".$data['TABLE_NAME']."_ibpk_1, 'OBJECT'");
+				$connection->query(sprintf(
+					"EXEC sp_rename %s, %s, 'OBJECT'",
+					$sqlHelper->quote($oldData['TABLE_NAME'].'_ibpk_1'),
+					$sqlHelper->quote($data['TABLE_NAME'].'_ibpk_1')
+				));
 			}
-			elseif ($connection instanceof OracleConnection)
+
+			// rename also uf multiple tables and its constraints, sequences, and triggers
+			foreach ($USER_FIELD_MANAGER->getUserFields('HLBLOCK_'.$oldData['ID']) as $field)
 			{
-				// rename sequence, rename trigger
-				$connection->query('DROP TRIGGER '.$oldData['TABLE_NAME'].'_insert');
-				$connection->query('RENAME sq_'.$oldData['TABLE_NAME'].' TO sq_'.$data['TABLE_NAME']);
-				$connection->query('
-					CREATE OR REPLACE TRIGGER '.$data['TABLE_NAME'].'_insert
-						BEFORE INSERT
-						ON '.$sqlHelper->quote($data['TABLE_NAME']).'
-						FOR EACH ROW
-							BEGIN
-							IF :NEW.ID IS NULL THEN
-								SELECT sq_'.$data['TABLE_NAME'].'.NEXTVAL INTO :NEW.ID FROM dual;
-							END IF;
-						END;
-				');
+				if ($field['MULTIPLE'] == 'Y')
+				{
+					$oldUtmTableName = static::getMultipleValueTableName($oldData, $field);
+					$newUtmTableName = static::getMultipleValueTableName($data, $field);
+
+					$connection->renameTable($oldUtmTableName, $newUtmTableName);
+				}
 			}
 		}
 
 		return $result;
 	}
 
+	/**
+	 * @param mixed $primary
+	 *
+	 * @return Main\DB\Result|Entity\DeleteResult
+	 */
 	public static function delete($primary)
 	{
+		global $USER_FIELD_MANAGER;
+
 		// get old data
-		$oldData = static::getByPrimary($primary)->fetch();
+		$hlblock = static::getByPrimary($primary)->fetch();
 
 		// get file fields
 		$file_fields = array();
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$oldData['ID']);
+		$fields = $USER_FIELD_MANAGER->getUserFields('HLBLOCK_'.$hlblock['ID']);
 
 		foreach ($fields as $name => $field)
 		{
@@ -188,7 +207,7 @@ class HighloadBlockTable extends Entity\DataManager
 		// delete files
 		if (!empty($file_fields))
 		{
-			$oldEntity = static::compileEntity($oldData);
+			$oldEntity = static::compileEntity($hlblock);
 
 			$query = new Entity\Query($oldEntity);
 
@@ -214,16 +233,42 @@ class HighloadBlockTable extends Entity\DataManager
 				{
 					if (!empty($row[$file_field]))
 					{
-						\CFile::delete($row[$file_field]);
+						if (is_array($row[$file_field]))
+						{
+							foreach ($row[$file_field] as $value)
+							{
+								\CFile::delete($value);
+							}
+						}
+						else
+						{
+							\CFile::delete($row[$file_field]);
+						}
 					}
 				}
 			}
 		}
 
-		foreach ($fields as $name => $field)
+		$connection = Application::getConnection();
+
+		foreach ($fields as $field)
 		{
-			$GLOBALS['DB']->query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$field['ID'], false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-			$GLOBALS['DB']->query("DELETE FROM b_user_field WHERE ID = ".$field['ID'], false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
+			// delete from uf registry
+			if ($field['USER_TYPE']['BASE_TYPE'] === 'enum')
+			{
+				$enumField = new \CUserFieldEnum;
+				$enumField->DeleteFieldEnum($field['ID']);
+			}
+
+			$connection->query("DELETE FROM b_user_field_lang WHERE USER_FIELD_ID = ".$field['ID']);
+			$connection->query("DELETE FROM b_user_field WHERE ID = ".$field['ID']);
+
+			// if multiple - drop utm table
+			if ($field['MULTIPLE'] == 'Y')
+			{
+				$utmTableName = static::getMultipleValueTableName($hlblock, $field);
+				$connection->dropTable($utmTableName);
+			}
 		}
 
 		// clear uf cache
@@ -231,40 +276,28 @@ class HighloadBlockTable extends Entity\DataManager
 
 		if(CACHED_b_user_field !== false)
 		{
-			$CACHE_MANAGER->CleanDir("b_user_field");
+			$CACHE_MANAGER->cleanDir("b_user_field");
 		}
 
 		// remove row
 		$result = parent::delete($primary);
 
-		// remove table in db
-		$dbtype = strtolower($GLOBALS['DB']->type);
-
-		$connection = Application::getConnection();
-		$sqlHelper = $connection->getSqlHelper();
-
-		if ($dbtype == 'oracle')
-		{
-			$GLOBALS['DB']->query('DROP TABLE '.$sqlHelper->quote($oldData['TABLE_NAME']).' CASCADE CONSTRAINTS');
-			$GLOBALS['DB']->query('DROP SEQUENCE sq_'.$oldData['TABLE_NAME']);
-		}
-		else
-		{
-			$GLOBALS['DB']->query('DROP TABLE '.$sqlHelper->quote($oldData['TABLE_NAME']));
-		}
-
-		if (!empty($fields))
-		{
-			$GLOBALS['DB']->query("DROP SEQUENCE SQ_B_UTM_".'HLBLOCK_'.$oldData['ID'], true);
-			$GLOBALS['DB']->query("DROP TABLE b_uts_".strtolower('HLBLOCK_'.$oldData['ID']), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-			$GLOBALS['DB']->query("DROP TABLE b_utm_".strtolower('HLBLOCK_'.$oldData['ID']), false, "FILE: ".__FILE__."<br>LINE: ".__LINE__);
-		}
+		// drop hl table
+		$connection->dropTable($hlblock['TABLE_NAME']);
 
 		return $result;
 	}
 
+	/**
+	 * @param array $hlblock
+	 *
+	 * @return Entity\Base
+	 * @throws \Bitrix\Main\SystemException
+	 */
 	public static function compileEntity($hlblock)
 	{
+		global $USER_FIELD_MANAGER;
+
 		// generate entity & data manager
 		$fieldsMap = array();
 
@@ -275,17 +308,7 @@ class HighloadBlockTable extends Entity\DataManager
 			'autocomplete' => true
 		);
 
-		// add other fields
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$hlblock['ID']);
-
-		foreach ($fields as $field)
-		{
-			$fieldsMap[$field['FIELD_NAME']] = array(
-				'data_type' => \Bitrix\Main\Entity\UField::convertBaseTypeToDataType($field['USER_TYPE']['BASE_TYPE'])
-			);
-		}
-
-		// build classes
+		// build datamanager class
 		$entity_name = $hlblock['NAME'];
 		$entity_data_class = $hlblock['NAME'];
 
@@ -293,21 +316,18 @@ class HighloadBlockTable extends Entity\DataManager
 		{
 			if (!preg_match('/^[a-z0-9_]+$/i', $entity_data_class))
 			{
-				throw new \Exception(sprintf(
+				throw new Main\SystemException(sprintf(
 					'Invalid entity name `%s`.', $entity_data_class
 				));
 			}
 
+			$entity_data_class .= 'Table';
 			$entity_table_name = $hlblock['TABLE_NAME'];
 
+			// make with an empty map
 			$eval = '
-				class '.$entity_data_class.'Table extends '.__NAMESPACE__.'\DataManager
+				class '.$entity_data_class.' extends '.__NAMESPACE__.'\DataManager
 				{
-					public static function getFilePath()
-					{
-						return __FILE__;
-					}
-
 					public static function getTableName()
 					{
 						return '.var_export($entity_table_name, true).';
@@ -317,48 +337,71 @@ class HighloadBlockTable extends Entity\DataManager
 					{
 						return '.var_export($fieldsMap, true).';
 					}
+
+					public static function getHighloadBlock()
+					{
+						return '.var_export($hlblock, true).';
+					}
 				}
 			';
+
 			eval($eval);
+
+			// then configure and attach fields
+			/** @var \Bitrix\Main\Entity\DataManager $entity_data_class */
+			$entity = $entity_data_class::getEntity();
+
+			$uFields = $USER_FIELD_MANAGER->getUserFields('HLBLOCK_'.$hlblock['ID']);
+
+			foreach ($uFields as $uField)
+			{
+				if ($uField['MULTIPLE'] == 'N')
+				{
+					// just add single field
+					$field = $USER_FIELD_MANAGER->getEntityField($uField, $uField['FIELD_NAME']);
+					$entity->addField($field);
+
+					foreach ($USER_FIELD_MANAGER->getEntityReferences($uField, $field) as $reference)
+					{
+						$entity->addField($reference);
+					}
+				}
+				else
+				{
+					// build utm entity
+					static::compileUtmEntity($entity, $uField);
+				}
+			}
 		}
 
-		return \Bitrix\Main\Entity\Base::getInstance($entity_name);
+		return Entity\Base::getInstance($entity_name);
 	}
 
 	public static function OnBeforeUserTypeAdd($field)
 	{
 		if (preg_match('/^HLBLOCK_(\d+)$/', $field['ENTITY_ID'], $matches))
 		{
-			// validate usertype, it should be only from bx pack for now
-			$utnames = array(
-				'employee', 'crm_status', 'crm', 'video', 'string', 'integer', 'double', 'datetime', 'webdav_element',
-				'boolean', 'file', 'enumeration', 'iblock_section', 'iblock_element', 'string_formatted', 'vote',
-				'webdav_element_history'
-			);
+			return array('PROVIDE_STORAGE' => false);
+		}
 
-			if (!in_array($field['USER_TYPE_ID'], $utnames, true))
-			{
-				$GLOBALS['APPLICATION']->throwException(sprintf(
-					'Selected type "%s" hasn\'t been supported yet.', $field['USER_TYPE_ID']
-				));
+		return true;
+	}
 
-				return false;
-			}
+	public static function onAfterUserTypeAdd($field)
+	{
+		global $APPLICATION, $USER_FIELD_MANAGER;
 
-			if ($field['MULTIPLE'] == 'Y')
-			{
-				$GLOBALS['APPLICATION']->throwException('Multiple fields for highloadblock hasn\'t been supported yet.');
-
-				return false;
-			}
+		if (preg_match('/^HLBLOCK_(\d+)$/', $field['ENTITY_ID'], $matches))
+		{
+			$field['USER_TYPE'] = $USER_FIELD_MANAGER->getUserType($field['USER_TYPE_ID']);
 
 			// get entity info
 			$hlblock_id = $matches[1];
-			$hlentity = HighloadBlockTable::getById($hlblock_id)->fetch();
+			$hlblock = HighloadBlockTable::getById($hlblock_id)->fetch();
 
-			if (empty($hlentity))
+			if (empty($hlblock))
 			{
-				$GLOBALS['APPLICATION']->throwException(sprintf(
+				$APPLICATION->throwException(sprintf(
 					'Entity "HLBLOCK_%s" wasn\'t found.', $hlblock_id
 				));
 
@@ -366,15 +409,42 @@ class HighloadBlockTable extends Entity\DataManager
 			}
 
 			// get usertype info
-			$uf_type_info = $GLOBALS['USER_FIELD_MANAGER']->getUserType($field['USER_TYPE_ID']);
-			$uf_type_object = new $uf_type_info['CLASS_NAME'];
-			$sql_column = $uf_type_object->getDBColumnType(null);
+			$sql_column_type = $USER_FIELD_MANAGER->getUtsDBColumnType($field);
 
 			// create field in db
 			$connection = Application::getConnection();
 			$sqlHelper = $connection->getSqlHelper();
 
-			$connection->query('ALTER TABLE '.$sqlHelper->quote($hlentity['TABLE_NAME']).' ADD '.$sqlHelper->quote($field['FIELD_NAME']).' '.$sql_column);
+			$connection->query(sprintf(
+				'ALTER TABLE %s ADD %s %s',
+				$sqlHelper->quote($hlblock['TABLE_NAME']), $sqlHelper->quote($field['FIELD_NAME']), $sql_column_type
+			));
+
+			if ($field['MULTIPLE'] == 'Y')
+			{
+				// create table for this relation
+				$hlentity = static::compileEntity($hlblock);
+				$utmEntity = Entity\Base::getInstance(HighloadBlockTable::getUtmEntityClassName($hlentity, $field));
+
+				$utmEntity->createDbTable();
+
+				// add indexes
+				$connection->query(sprintf(
+					'CREATE INDEX %s ON %s (%s)',
+					$sqlHelper->quote('IX_UTM_HL'.$hlblock['ID'].'_'.$field['ID'].'_ID'),
+					$sqlHelper->quote($utmEntity->getDBTableName()),
+					$sqlHelper->quote('ID')
+				));
+
+				$connection->query(sprintf(
+					'CREATE INDEX %s ON %s (%s)',
+					$sqlHelper->quote('IX_UTM_HL'.$hlblock['ID'].'_'.$field['ID'].'_VALUE'),
+					$sqlHelper->quote($utmEntity->getDBTableName()),
+					$sqlHelper->quote('VALUE')
+				));
+			}
+
+			return array('PROVIDE_STORAGE' => false);
 		}
 
 		return true;
@@ -382,27 +452,151 @@ class HighloadBlockTable extends Entity\DataManager
 
 	public static function OnBeforeUserTypeDelete($field)
 	{
+		global $APPLICATION, $USER_FIELD_MANAGER;
+
 		if (preg_match('/^HLBLOCK_(\d+)$/', $field['ENTITY_ID'], $matches))
 		{
 			// get entity info
 			$hlblock_id = $matches[1];
-			$hlentity = HighloadBlockTable::getById($hlblock_id)->fetch();
+			$hlblock = HighloadBlockTable::getById($hlblock_id)->fetch();
 
-			if (empty($hlentity))
+			if (empty($hlblock))
 			{
-				$GLOBALS['APPLICATION']->throwException(sprintf(
+				$APPLICATION->throwException(sprintf(
 					'Entity "HLBLOCK_%s" wasn\'t found.', $hlblock_id
 				));
 
 				return false;
 			}
 
+			$fieldType = $USER_FIELD_MANAGER->getUserType($field["USER_TYPE_ID"]);
+
+			if ($fieldType['BASE_TYPE'] == 'file')
+			{
+				// if it was file field, then delete all files
+				$entity = static::compileEntity($hlblock);
+
+				/** @var DataManager $dataClass */
+				$dataClass = $entity->getDataClass();
+
+				$rows = $dataClass::getList(array('select' => array($field['FIELD_NAME'])));
+
+				while ($oldData = $rows->fetch())
+				{
+					if (empty($oldData[$field['FIELD_NAME']]))
+					{
+						continue;
+					}
+
+					if(is_array($oldData[$field['FIELD_NAME']]))
+					{
+						foreach($oldData[$field['FIELD_NAME']] as $value)
+						{
+							\CFile::delete($value);
+						}
+					}
+					else
+					{
+						\CFile::delete($oldData[$field['FIELD_NAME']]);
+					}
+				}
+			}
+
 			// drop db column
 			$connection = Application::getConnection();
-			$connection->dropColumn($hlentity['TABLE_NAME'], $field['FIELD_NAME']);
+			$connection->dropColumn($hlblock['TABLE_NAME'], $field['FIELD_NAME']);
+
+			// if multiple - drop utm table
+			if ($field['MULTIPLE'] == 'Y')
+			{
+				$utmTableName = static::getMultipleValueTableName($hlblock, $field);
+				$connection->dropTable($utmTableName);
+			}
+
+			return array('PROVIDE_STORAGE' => false);
 		}
 
 		return true;
+	}
+
+	protected static function compileUtmEntity(Entity\Base $hlentity, $userfield)
+	{
+		global $USER_FIELD_MANAGER;
+
+		// build utm entity
+		/** @var DataManager $hlDataClass */
+		$hlDataClass = $hlentity->getDataClass();
+		$hlblock = $hlDataClass::getHighloadBlock();
+
+		$utmClassName = static::getUtmEntityClassName($hlentity, $userfield);
+		$utmTableName = static::getMultipleValueTableName($hlblock, $userfield);
+
+		// main fields
+		$utmValueField = $USER_FIELD_MANAGER->getEntityField($userfield, 'VALUE');
+
+		$utmEntityFields = array(
+			new Entity\IntegerField('ID'),
+			$utmValueField
+		);
+
+		// references
+		$references = $USER_FIELD_MANAGER->getEntityReferences($userfield, $utmValueField);
+
+		foreach ($references as $reference)
+		{
+			$utmEntityFields[] = $reference;
+		}
+
+		// create entity
+		$utmEntity = Entity\Base::compileEntity($utmClassName, $utmEntityFields, array(
+			'table_name' => $utmTableName,
+			'namespace' => $hlentity->getNamespace()
+		));
+
+		// add original entity reference
+		$referenceField = new Entity\ReferenceField(
+			'OBJECT',
+			$hlentity,
+			array('=this.ID' => 'ref.ID')
+		);
+
+		$utmEntity->addField($referenceField);
+
+		// add short alias for back-reference
+		$aliasField = new Entity\ExpressionField(
+			$userfield['FIELD_NAME'].'_SINGLE',
+			'%s',
+			$utmEntity->getFullName().':'.'OBJECT.VALUE',
+			array('data_type' => get_class($utmEntity->getField('VALUE')))
+		);
+
+		$hlentity->addField($aliasField);
+
+		// add aliases to references
+		/*foreach ($references as $reference)
+		{
+			// todo after #44924 is resolved
+			// actually no. to make it work expression should support linking to references
+		}*/
+
+		// add seriazed cache-field
+		$cacheField = new Entity\TextField($userfield['FIELD_NAME']);
+
+		Main\UserFieldTable::setMultipleFieldSerialization($cacheField, $userfield);
+
+		$hlentity->addField($cacheField);
+
+		return $utmEntity;
+	}
+
+	public static function getUtmEntityClassName(Entity\Base $hlentity, $userfield)
+	{
+		return $hlentity->getName().'Utm'.Entity\Base::snake2camel($userfield['FIELD_NAME']);
+	}
+
+	public static function getMultipleValueTableName($hlblock, $userfield)
+	{
+		return $hlblock['TABLE_NAME'].'_'.strtolower($userfield['FIELD_NAME']);
 	}
 
 	public static function validateName()
@@ -438,176 +632,3 @@ class HighloadBlockTable extends Entity\DataManager
 	}
 }
 
-
-abstract class DataManager extends Entity\DataManager
-{
-	public static function checkFields(Entity\Result $result, $primary, array $data)
-	{
-		// check data - fieldname & type & strlen etc.
-		foreach ($data as $k => $v)
-		{
-			if (!(static::getEntity()->hasField($k) && static::getEntity()->getField($k) instanceof \Bitrix\Main\Entity\ScalarField))
-			{
-				throw new \Exception(sprintf(
-					'Field `%s` not found in entity when trying to query %s row.',
-					$k, static::getEntity()->getName()
-				));
-			}
-		}
-
-		// check by uf manager
-		$entityName = static::getEntity()->getName();
-		$hlblock = HighloadBlockTable::getList(array('select'=>array('ID'), 'filter'=>array('=NAME' => $entityName)))->fetch();
-
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$hlblock['ID']);
-
-		// dear uf manager, please go fuck yourself and don't touch unchanged files
-		foreach ($data as $k => $v)
-		{
-			// hide them from him
-			$arUserField = $fields[$k];
-
-			if ($arUserField["USER_TYPE"]["BASE_TYPE"] == 'file' && !is_array($v))
-			{
-				//unset($data[$k]);
-			}
-		}
-
-		if (!$GLOBALS["USER_FIELD_MANAGER"]->checkFields('HLBLOCK_'.$hlblock['ID'], null, $data))
-		{
-			if(is_object($GLOBALS['APPLICATION']) && $GLOBALS['APPLICATION']->getException())
-			{
-				$e = $GLOBALS['APPLICATION']->getException();
-				$result->addError(new Entity\EntityError($e->getString()));
-				$GLOBALS['APPLICATION']->resetException();
-			}
-			else
-			{
-				$result->addError(new Entity\EntityError("Unknown error."));
-			}
-		}
-	}
-
-	public static function add(array $data)
-	{
-		$entityName = static::getEntity()->getName();
-		$hlblock = HighloadBlockTable::getList(array('select'=>array('ID'), 'filter'=>array('=NAME' => $entityName)))->fetch();
-
-		// add other fields
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$hlblock['ID']);
-
-		foreach ($data as $k => $v)
-		{
-			$arUserField = $fields[$k];
-
-			if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave")))
-			{
-				$data[$k] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $data[$k]));
-			}
-
-			if(strlen($data[$k])<=0)
-			{
-				$data[$k] = false;
-			}
-			else
-			{
-				// convert string datetime to DateTime object
-				if ($arUserField['USER_TYPE_ID'] == 'datetime')
-				{
-					try
-					{
-						$data[$k] = Type\DateTime::createFromUserTime($v);
-					}
-					catch(Main\ObjectException $e)
-					{
-						$data[$k] = '';
-					}
-				}
-			}
-		}
-
-		return parent::add($data);
-	}
-
-	public static function update($primary, array $data)
-	{
-		$entityName = static::getEntity()->getName();
-		$hlblock = HighloadBlockTable::getList(array('select'=>array('ID'), 'filter'=>array('=NAME' => $entityName)))->fetch();
-
-		// add other fields
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$hlblock['ID']);
-
-		foreach ($data as $k => $v)
-		{
-			$arUserField = $fields[$k];
-
-			if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave")))
-			{
-				if ($arUserField["USER_TYPE"]['BASE_TYPE'] == 'file' && !empty($v['old_id']) && $v['error'] === 4)
-				{
-					// no files changed. dear uf manager, please keep current file
-					$arUserField['VALUE'] = $v;
-				}
-
-				$data[$k] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $data[$k]));
-			}
-
-			if(strlen($data[$k])<=0)
-			{
-				$data[$k] = false;
-			}
-			else
-			{
-				// convert string datetime to DateTime object
-				if ($arUserField['USER_TYPE_ID'] == 'datetime')
-				{
-					try
-					{
-						$data[$k] = Type\DateTime::createFromUserTime($v);
-					}
-					catch(Main\ObjectException $e)
-					{
-						$data[$k] = '';
-					}
-				}
-			}
-		}
-
-		return parent::update($primary, $data);
-	}
-
-	public static function delete($primary)
-	{
-		// get old data
-		$oldData = static::getByPrimary($primary)->fetch();
-
-		// remove row
-		$result = parent::delete($primary);
-
-		// remove files
-
-		$entityName = static::getEntity()->getName();
-		$hlblock = HighloadBlockTable::getList(array('select'=>array('ID'), 'filter'=>array('=NAME' => $entityName)))->fetch();
-
-		// add other fields
-		$fields = $GLOBALS['USER_FIELD_MANAGER']->getUserFields('HLBLOCK_'.$hlblock['ID']);
-
-		foreach ($oldData as $k => $v)
-		{
-			$arUserField = $fields[$k];
-
-			if($arUserField["USER_TYPE"]["BASE_TYPE"]=="file")
-			{
-				if(is_array($oldData[$k]))
-				{
-					foreach($oldData[$k] as $value)
-						\CFile::delete($value);
-				}
-				else
-					\CFile::delete($oldData[$k]);
-			}
-		}
-
-		return $result;
-	}
-}

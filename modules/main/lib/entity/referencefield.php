@@ -7,6 +7,8 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\ArgumentException;
+use Bitrix\Main\SystemException;
 
 /**
  * Reference field describes relation 1-to-1 or 1-to-many between two entities
@@ -24,11 +26,33 @@ class ReferenceField extends Field
 	protected $join_type = 'LEFT';
 
 
-	public function __construct($name, Base $entity, $refEntityName, $reference, $parameters = array())
+	/**
+	 * @param string       $name
+	 * @param string|Base  $refEntity
+	 * @param array        $reference
+	 * @param array        $parameters
+	 *
+	 * @throws ArgumentException
+	 */
+	public function __construct($name, $refEntity, $reference, $parameters = array())
 	{
-		parent::__construct($name, $parameters['data_type'], $entity);
+		parent::__construct($name);
 
-		$this->refEntityName = $refEntityName;
+		if ($refEntity instanceof Base)
+		{
+			$this->refEntity = $refEntity;
+			$this->refEntityName = $refEntity->getFullName();
+		}
+		else
+		{
+			// this one could be without leading backslash and/or with Table-postfix
+			$this->refEntityName = Base::normalizeName($refEntity);
+		}
+
+		if (empty($reference))
+		{
+			throw new ArgumentException('Reference for `'.$name.'` shouldn\'t be empty');
+		}
 
 		$this->reference = $reference;
 
@@ -45,9 +69,25 @@ class ReferenceField extends Field
 
 	static public function validateValue($value, $row, Result $result)
 	{
-		throw new Exception('Reference field doesn\'t support value set up and validation.');
+		throw new SystemException('Reference field doesn\'t support value set up and validation.');
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getRefEntityName()
+	{
+		return $this->refEntityName;
+	}
+
+	public function getDataType()
+	{
+		return $this->refEntityName;
+	}
+
+	/**
+	 * @return \Bitrix\Main\Entity\Base
+	 */
 	public function getRefEntity()
 	{
 		if ($this->refEntity === null)

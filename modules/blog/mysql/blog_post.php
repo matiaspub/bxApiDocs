@@ -103,11 +103,15 @@ class CBlogPost extends CAllBlogPost
 
 						if(strlen($arFields["PATH"]) > 0)
 						{
-							if(strlen($arFields["CODE"]) > 0)
-								$arFields["PATH"] = str_replace("#post_id#", $arFields["CODE"], $arFields["PATH"]);
-							else
-								$arFields["PATH"] = str_replace("#post_id#", $ID, $arFields["PATH"]);
-							$arPostSite = array($arGroup["SITE_ID"] => $arFields["PATH"]);
+							$arFields["PATH"] = (
+								strlen($arFields["CODE"]) > 0 
+									? str_replace("#post_id#", $arFields["CODE"], $arFields["PATH"]) 
+									: str_replace("#post_id#", $ID, $arFields["PATH"])
+							);
+
+							$arPostSite = array(
+								$arGroup["SITE_ID"] => $arFields["PATH"]
+							);
 						}
 						else
 						{
@@ -121,6 +125,25 @@ class CBlogPost extends CAllBlogPost
 										$arBlog["SOCNET_GROUP_ID"]
 									)
 							);
+						}
+
+						if (
+							$arBlog["USE_SOCNET"] == "Y" 
+							&& CModule::IncludeModule("extranet")
+						)
+						{
+							$arPostSiteExt = CExtranet::GetSitesByLogDestinations($arFields["SC_PERM"]);
+							foreach($arPostSiteExt as $lid)
+							{
+								if (!array_key_exists($lid, $arPostSite))
+								{
+									$arPostSite[$lid] = str_replace(
+										array("#user_id#", "#post_id#"), 
+										array($arBlog["OWNER_ID"], $arPost["ID"]), 
+										COption::GetOptionString("socialnetwork", "userblogpost_page", false, $lid)
+									);
+								}
+							}
 						}
 
 						if(strlen($arPost["CATEGORY_ID"])>0)
@@ -197,6 +220,17 @@ class CBlogPost extends CAllBlogPost
 										"entity" => "socnet_group",
 									);
 								}
+							}
+
+							// get mentions and grats
+							$arMentionedUserID = CBlogPost::GetMentionedUserID($arPost);
+							if (!empty($arMentionedUserID))
+							{
+								if (!isset($arSearchIndex["PARAMS"]))
+								{
+									$arSearchIndex["PARAMS"] = array();
+								}
+								$arSearchIndex["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
 							}
 						}
 
@@ -346,10 +380,11 @@ class CBlogPost extends CAllBlogPost
 					}
 					elseif(strlen($arNewPost["PATH"]) > 0)
 					{
-						if(strlen($arNewPost["CODE"]) > 0)
-							$arNewPost["PATH"] = str_replace("#post_id#", $arNewPost["CODE"], $arNewPost["PATH"]);
-						else
-							$arNewPost["PATH"] = str_replace("#post_id#", $ID, $arNewPost["PATH"]);
+						$arNewPost["PATH"] = (
+							strlen($arNewPost["CODE"]) > 0 
+								? str_replace("#post_id#", $arNewPost["CODE"], $arNewPost["PATH"]) 
+								: str_replace("#post_id#", $ID, $arNewPost["PATH"])
+						);
 						$arPostSite = array($arGroup["SITE_ID"] => $arNewPost["PATH"]);
 					}
 					else
@@ -364,6 +399,25 @@ class CBlogPost extends CAllBlogPost
 									$arBlog["SOCNET_GROUP_ID"]
 								)
 						);
+					}
+
+					if (
+						$arBlog["USE_SOCNET"] == "Y" 
+						&& CModule::IncludeModule("extranet")
+					)
+					{
+						$arPostSiteExt = CExtranet::GetSitesByLogDestinations($arFields["SC_PERM"]);
+						foreach($arPostSiteExt as $lid)
+						{
+							if (!array_key_exists($lid, $arPostSite))
+							{
+								$arPostSite[$lid] = str_replace(
+									array("#user_id#", "#post_id#"), 
+									array($arBlog["OWNER_ID"], $arNewPost["ID"]), 
+									COption::GetOptionString("socialnetwork", "userblogpost_page", false, $lid)
+								);
+							}
+						}
 					}
 
 					if(strlen($arNewPost["CATEGORY_ID"])>0)
@@ -449,6 +503,17 @@ class CBlogPost extends CAllBlogPost
 									"entity" => "socnet_group",
 								);
 							}
+						}
+
+						// get mentions and grats
+						$arMentionedUserID = CBlogPost::GetMentionedUserID($arNewPost);
+						if (!empty($arMentionedUserID))
+						{
+							if (!isset($arSearchIndex["PARAMS"]))
+							{
+								$arSearchIndex["PARAMS"] = array();
+							}
+							$arSearchIndex["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
 						}
 					}
 
@@ -638,7 +703,8 @@ class CBlogPost extends CAllBlogPost
 			if (strpos($k, "POST_PARAM_") === 0)
 			{
 				$user_id = 0; $ii++; $pref = "BPP".$ii;
-				if (is_array($val)) {
+				if (is_array($val))
+				{
 					$user_id = (isset($val["USER_ID"]) ? intval($val["USER_ID"]) : 0);
 					$arFilter[$key] = $val["VALUE"];
 				}

@@ -707,6 +707,8 @@ class CAutoCheck
 			"install/components/bitrix/" => "/bitrix/components/bitrix/",
 			"install/js/" => "/bitrix/js/",
 			"install/activities/" => "/bitrix/activities/",
+			"install/admin/" => "/bitrix/admin/",
+			"install/wizards/" => "/bitrix/wizards/",
 		);
 
 		if(!$_SESSION["BX_CHECKLIST"][$arParams["TEST_ID"]])
@@ -797,7 +799,7 @@ class CAutoCheck
 					if (strpos($file, $key) === 0)
 					{
 						$arFile = str_replace($key, $_SERVER["DOCUMENT_ROOT"].$value, $file);
-						if (file_exists($arFile) && md5_file($arFile)!=$checksum)
+						if (!file_exists($arFile) || md5_file($arFile)!=$checksum)
 						{
 							$arModifiedFilesCount++;
 							$arMessage.= str_replace(array("//", "\\\\"), array("/", "\\"), $arFile)."\n";

@@ -109,6 +109,7 @@ class CBlogComment extends CAllBlogComment
 						"ENTITY_TYPE_ID" => "BLOG_COMMENT",
 						"ENTITY_ID" => $arComment["ID"],
 					);
+
 					if($arBlog["USE_SOCNET"] == "Y")
 					{
 						if(is_array($arFields["SC_PERM"]))
@@ -134,12 +135,33 @@ class CBlogComment extends CAllBlogComment
 							}
 
 							if(!in_array("U".$arComment["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
+							{
 								$arSearchIndex["PERMISSIONS"][] = "U".$arComment["AUTHOR_ID"];
+							}
+						}
+					}
+					
+					if (
+						$arBlog["USE_SOCNET"] == "Y"
+						|| strpos($arBlog["URL"], "idea_") === 0
+					)
+					{
+						// get mentions
+						$arMentionedUserID = CBlogComment::GetMentionedUserID($arComment);
+						if (!empty($arMentionedUserID))
+						{
+							if (!isset($arSearchIndex["PARAMS"]))
+							{
+								$arSearchIndex["PARAMS"] = array();
+							}
+							$arSearchIndex["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
 						}
 					}
 
 					if(strlen($arComment["TITLE"]) <= 0)
+					{
 						$arSearchIndex["TITLE"] = substr($arSearchIndex["BODY"], 0, 100);
+					}
 
 					CSearch::Index("blog", "C".$ID, $arSearchIndex);
 				}
@@ -196,7 +218,7 @@ class CBlogComment extends CAllBlogComment
 				if($arComment["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH && $arFields["PUBLISH_STATUS"] != BLOG_PUBLISH_STATUS_PUBLISH)
 					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS - 1"), false);
 				elseif($arComment["PUBLISH_STATUS"] != BLOG_PUBLISH_STATUS_PUBLISH && $arFields["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH)
-					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1", false));
+					CBlogPost::Update($arComment["POST_ID"], array("=NUM_COMMENTS" => "NUM_COMMENTS + 1"), false);
 			}
 			
 			$strSql =
@@ -298,6 +320,23 @@ class CBlogComment extends CAllBlogComment
 							}
 							if(!in_array("U".$arComment["AUTHOR_ID"], $arSearchIndex["PERMISSIONS"]))
 								$arSearchIndex["PERMISSIONS"][] = "U".$arComment["AUTHOR_ID"];
+						}
+					}
+
+					if (
+						$arBlog["USE_SOCNET"] == "Y"
+						|| strpos($arBlog["URL"], "idea_") === 0
+					)
+					{
+						// get mentions
+						$arMentionedUserID = CBlogComment::GetMentionedUserID($arComment);
+						if (!empty($arMentionedUserID))
+						{
+							if (!isset($arSearchIndex["PARAMS"]))
+							{
+								$arSearchIndex["PARAMS"] = array();
+							}
+							$arSearchIndex["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
 						}
 					}
 
@@ -484,7 +523,7 @@ class CBlogComment extends CAllBlogComment
 			$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "DISTINCT", $arSqls["SELECT"]);
 		else
 			$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
-		
+
 		$r = $obUserFieldsSql->GetFilter();
 		if(strlen($r)>0)
 			$strSqlUFFilter = " (".$r.") ";

@@ -100,7 +100,8 @@ class CSecurityUserTest
 						'title' => GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD'),
 						'critical' => CSecurityCriticalLevel::HIGHT,
 						'detail' => GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_DETAIL'),
-						'recommendation' => static::formatRecommendation($weakUsers)
+						'recommendation' => $result = GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_RECOMMENDATIONS'),
+						'additional_info' => static::formatRecommendation($weakUsers)
 					)
 				),
 				'status' => empty($weakUsers)
@@ -139,7 +140,7 @@ class CSecurityUserTest
 	 */
 	protected static function formatRecommendation(array $weakUsers)
 	{
-		$result = GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_RECOMMENDATION');
+		$result = getMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_USER_LIST');
 		foreach (static::getUsersLogins($weakUsers) as $id => $login)
 		{
 			$result .= sprintf(

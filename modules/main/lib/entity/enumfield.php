@@ -7,6 +7,7 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\SystemException;
 
 /**
  * Entity field class for enum data type
@@ -17,13 +18,13 @@ class EnumField extends ScalarField
 {
 	protected $values;
 
-	public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $parameters = array())
 	{
-		parent::__construct($name, $dataType, $entity, $parameters);
+		parent::__construct($name, $parameters);
 
 		if (empty($parameters['values']))
 		{
-			throw new \Exception(sprintf(
+			throw new SystemException(sprintf(
 				'Required parameter "values" for %s field in %s entity not found',
 				$this->name, $this->entity->getNamespace().$this->entity->getName()
 			));
@@ -31,11 +32,12 @@ class EnumField extends ScalarField
 
 		if (!is_array($parameters['values']))
 		{
-			throw new \Exception(sprintf(
+			throw new SystemException(sprintf(
 				'Parameter "values" for %s field in %s entity should be an array',
 				$this->name, $this->entity->getNamespace().$this->entity->getName()
 			));
 		}
+
 
 		$this->values = $parameters['values'];
 	}

@@ -5,7 +5,7 @@
 /******************************************************************************/
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_ups.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_ups.php');
 
 // define('DELIVERY_UPS_ZONES_PHP_FILE', 'ups/zones.php');
 // define('DELIVERY_UPS_EXPORT_PHP_FILE', 'ups/export.php');

@@ -19,13 +19,13 @@ class CSalePaySystemTarifPFC extends CSalePaySystemTarif
 		$fullPrice = $orderPrice + $deliveryPrice;
 
 		if($fullPrice <= 1000)
-			$tarifNum = "1";
+			$tarifNum = "0";
 		elseif($fullPrice <= 5000)
-			$tarifNum = "2";
+			$tarifNum = "1";
 		elseif($fullPrice <= 20000)
-			$tarifNum = "3";
+			$tarifNum = "2";
 		elseif($fullPrice <= 500000)
-			$tarifNum = "4";
+			$tarifNum = "3";
 
 		if(floatval($arTarif["TARIFS"][$tarifNum]["UPPER_SUMM"]) > 0)
 			$percent = floatval($arTarif["TARIFS"][$tarifNum]["UPPER_SUMM"])*floatval($arTarif["TARIFS"][$tarifNum]["PERCENT"]);

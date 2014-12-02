@@ -8,17 +8,17 @@ namespace Bitrix\Iblock\InheritedProperty;
 
 class ElementValues extends BaseValues
 {
-	protected $section_id = 0;
-	protected $element_id = 0;
+	protected $sectionId = 0;
+	protected $elementId = 0;
 
 	/**
-	 * @param integer $iblock_id Iblock identifier.
-	 * @param integer $element_id Element identifier.
+	 * @param integer $iblockId Iblock identifier.
+	 * @param integer $elementId Element identifier.
 	 */
-	public function __construct($iblock_id, $element_id)
+	public function __construct($iblockId, $elementId)
 	{
-		parent::__construct($iblock_id);
-		$this->element_id = intval($element_id);
+		parent::__construct($iblockId);
+		$this->elementId = intval($elementId);
 	}
 
 	/**
@@ -48,7 +48,7 @@ class ElementValues extends BaseValues
 	 */
 	public function getId()
 	{
-		return $this->element_id;
+		return $this->elementId;
 	}
 
 	/**
@@ -58,7 +58,7 @@ class ElementValues extends BaseValues
 	 */
 	public function  createTemplateEntity()
 	{
-		return new \Bitrix\Iblock\Template\Entity\Element($this->element_id);
+		return new \Bitrix\Iblock\Template\Entity\Element($this->elementId);
 	}
 
 	/**
@@ -75,12 +75,12 @@ class ElementValues extends BaseValues
 			if (!empty($sectionId))
 			{
 				$sectionId = array_map("intval", $sectionId);
-				$this->section_id = min($sectionId);
+				$this->sectionId = min($sectionId);
 			}
 		}
 		else
 		{
-			$this->section_id = intval($sectionId);
+			$this->sectionId = intval($sectionId);
 		}
 	}
 
@@ -93,25 +93,25 @@ class ElementValues extends BaseValues
 	public function getParents()
 	{
 		$parents = array();
-		if ($this->element_id > 0)
+		if ($this->elementId > 0)
 		{
 			$elementList = \Bitrix\Iblock\ElementTable::getList(array(
 				"select" => array("IBLOCK_SECTION_ID"),
-				"filter" => array("=ID" => $this->element_id),
+				"filter" => array("=ID" => $this->elementId),
 			));
 			$element = $elementList->fetch();
 			if ($element && $element["IBLOCK_SECTION_ID"] > 0)
-				$parents[] = new SectionValues($this->iblock_id, $element["IBLOCK_SECTION_ID"]);
+				$parents[] = new SectionValues($this->iblockId, $element["IBLOCK_SECTION_ID"]);
 			else
-				$parents[] = new IblockValues($this->iblock_id);
+				$parents[] = new IblockValues($this->iblockId);
 		}
-		elseif ($this->section_id > 0)
+		elseif ($this->sectionId > 0)
 		{
-			$parents[] = new SectionValues($this->iblock_id, $this->section_id);
+			$parents[] = new SectionValues($this->iblockId, $this->sectionId);
 		}
 		else
 		{
-			$parents[] = new IblockValues($this->iblock_id);
+			$parents[] = new IblockValues($this->iblockId);
 		}
 		return $parents;
 	}
@@ -140,8 +140,8 @@ class ElementValues extends BaseValues
 					b_iblock_element_iprop IP
 					INNER JOIN b_iblock_iproperty P ON P.ID = IP.IPROP_ID
 				WHERE
-					IP.IBLOCK_ID = ".$this->iblock_id."
-					AND IP.ELEMENT_ID = ".$this->element_id."
+					IP.IBLOCK_ID = ".$this->iblockId."
+					AND IP.ELEMENT_ID = ".$this->elementId."
 			");
 
 			while ($row = $query->fetch())
@@ -156,16 +156,16 @@ class ElementValues extends BaseValues
 				{
 					$elementList = \Bitrix\Iblock\ElementTable::getList(array(
 						"select" => array("IBLOCK_SECTION_ID"),
-						"filter" => array("=ID" => $this->element_id),
+						"filter" => array("=ID" => $this->elementId),
 					));
 					$element = $elementList->fetch();
 
 					foreach ($result as $CODE => $row)
 					{
 						$connection->add("b_iblock_element_iprop", array(
-							"IBLOCK_ID" => $this->iblock_id,
+							"IBLOCK_ID" => $this->iblockId,
 							"SECTION_ID" => intval($element["IBLOCK_SECTION_ID"]),
-							"ELEMENT_ID" => $this->element_id,
+							"ELEMENT_ID" => $this->elementId,
 							"IPROP_ID" => $row["ID"],
 							"VALUE" => $row["VALUE"],
 						));
@@ -186,8 +186,8 @@ class ElementValues extends BaseValues
 		$connection = \Bitrix\Main\Application::getConnection();
 		$connection->query("
 			DELETE FROM b_iblock_element_iprop
-			WHERE IBLOCK_ID = ".$this->iblock_id."
-			AND ELEMENT_ID = ".$this->element_id."
+			WHERE IBLOCK_ID = ".$this->iblockId."
+			AND ELEMENT_ID = ".$this->elementId."
 		");
 	}
 }

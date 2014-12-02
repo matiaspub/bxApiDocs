@@ -19,7 +19,7 @@ class MemcacheConnection extends NosqlConnection
 
 	protected $port = '11211';
 
-	public function __construct($configuration)
+	public function __construct(array $configuration)
 	{
 		parent::__construct($configuration);
 

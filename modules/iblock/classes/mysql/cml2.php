@@ -150,7 +150,7 @@ class CIBlockXMLFile
 		{
 			global $DB;
 			if($DB->TableExists($this->_table_name))
-				return $DB->Query("drop table ".$this->_table_name);
+				return $DB->DDL("drop table ".$this->_table_name);
 			else
 				return true;
 		}
@@ -196,7 +196,7 @@ class CIBlockXMLFile
 			if(defined("MYSQL_TABLE_TYPE") && strlen(MYSQL_TABLE_TYPE) > 0)
 				$DB->Query("SET storage_engine = '".MYSQL_TABLE_TYPE."'", true);
 
-			$res = $DB->Query("create table ".$this->_table_name."
+			$res = $DB->DDL("create table ".$this->_table_name."
 				(
 					ID int(11) not null auto_increment,
 					".($with_sess_id? "SESS_ID varchar(32),": "")."
@@ -215,6 +215,39 @@ class CIBlockXMLFile
 				$res = $this->IndexTemporaryTables($with_sess_id);
 
 			return $res;
+		}
+	}
+
+	public static function IsExistTemporaryTable()
+	{
+		global $DB;
+
+		if (!isset($this) || !is_object($this) || strlen($this->_table_name) <= 0)
+		{
+			$ob = new CIBlockXMLFile;
+			return $ob->IsExistTemporaryTable();
+		}
+		else
+		{
+			return $DB->TableExists($this->_table_name);
+		}
+	}
+
+	public static function GetCountItemsWithParent($parentID)
+	{
+		global $DB;
+
+		if (!isset($this) || !is_object($this) || strlen($this->_table_name) <= 0)
+		{
+			$ob = new CIBlockXMLFile;
+			return $ob->GetCountItemsWithParent($parentID);
+		}
+		else
+		{
+			$parentID = (int)$parentID;
+			$rs = $DB->Query("select count(*) C from ".$this->_table_name." where PARENT_ID = ".$parentID);
+			$ar = $rs->Fetch();
+			return $ar['C'];
 		}
 	}
 
@@ -267,16 +300,16 @@ class CIBlockXMLFile
 			if($with_sess_id)
 			{
 				if(!$DB->IndexExists($this->_table_name, array("SESS_ID", "PARENT_ID")))
-					$res = $DB->Query("CREATE INDEX ix_".$this->_table_name."_parent on ".$this->_table_name."(SESS_ID, PARENT_ID)");
+					$res = $DB->DDL("CREATE INDEX ix_".$this->_table_name."_parent on ".$this->_table_name."(SESS_ID, PARENT_ID)");
 				if($res && !$DB->IndexExists($this->_table_name, array("SESS_ID", "LEFT_MARGIN")))
-					$res = $DB->Query("CREATE INDEX ix_".$this->_table_name."_left on ".$this->_table_name."(SESS_ID, LEFT_MARGIN)");
+					$res = $DB->DDL("CREATE INDEX ix_".$this->_table_name."_left on ".$this->_table_name."(SESS_ID, LEFT_MARGIN)");
 			}
 			else
 			{
 				if(!$DB->IndexExists($this->_table_name, array("PARENT_ID")))
-					$res = $DB->Query("CREATE INDEX ix_".$this->_table_name."_parent on ".$this->_table_name."(PARENT_ID)");
+					$res = $DB->DDL("CREATE INDEX ix_".$this->_table_name."_parent on ".$this->_table_name."(PARENT_ID)");
 				if($res && !$DB->IndexExists($this->_table_name, array("LEFT_MARGIN")))
-					$res = $DB->Query("CREATE INDEX ix_".$this->_table_name."_left on ".$this->_table_name."(LEFT_MARGIN)");
+					$res = $DB->DDL("CREATE INDEX ix_".$this->_table_name."_left on ".$this->_table_name."(LEFT_MARGIN)");
 			}
 
 			return $res;
@@ -973,6 +1006,7 @@ class CIBlockXMLFile
 
 				$file_name = trim(str_replace("\\", "/", trim($entry_name)), "/");
 				$file_name = $APPLICATION->ConvertCharset($file_name, "cp866", LANG_CHARSET);
+				$file_name = preg_replace("#^import_files/tmp/webdata/\\d+/\\d+/import_files/#", "import_files/", $file_name);
 
 				$bBadFile = HasScriptExtension($file_name)
 					|| IsFileUnsafe($file_name)

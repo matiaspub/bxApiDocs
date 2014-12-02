@@ -1,4 +1,5 @@
 <?
+use Bitrix\Main\Type\Collection;
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/discount.php");
 
 
@@ -45,26 +46,9 @@ class CSaleDiscount extends CAllSaleDiscount
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__add.php
 	* @author Bitrix
 	*/
-	public static function Add($arFields)
+	static public function Add($arFields)
 	{
 		global $DB;
-		global $USER;
-
-		$arFields1 = array();
-		if (isset($USER) && $USER instanceof CUser && 'CUser' == get_class($USER))
-		{
-			if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
-				$arFields["CREATED_BY"] = intval($USER->GetID());
-			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
-				$arFields["MODIFIED_BY"] = intval($USER->GetID());
-		}
-		if (array_key_exists('TIMESTAMP_X', $arFields))
-			unset($arFields['TIMESTAMP_X']);
-		if (array_key_exists('DATE_CREATE', $arFields))
-			unset($arFields['DATE_CREATE']);
-
-		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
-		$arFields1['DATE_CREATE'] = $DB->GetNowFunction();
 
 		$boolNewVersion = true;
 		if (!array_key_exists('CONDITIONS', $arFields) && !array_key_exists('ACTIONS', $arFields))
@@ -87,42 +71,16 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		$arInsert = $DB->PrepareInsert("b_sale_discount", $arFields);
 
-		if (!empty($arFields1))
-		{
-			$arInsert[0] .= ', '.implode(', ',array_keys($arFields1));
-			$arInsert[1] .= ', '.implode(', ',array_values($arFields1));
-		}
-
-		$strSql = "INSERT INTO b_sale_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
+		$strSql = "insert into b_sale_discount(".$arInsert[0].") values(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$ID = intval($DB->LastID());
+		$ID = (int)$DB->LastID();
 
-		if (0 < $ID)
+		if ($ID > 0)
 		{
-			if (!empty($arFields['USER_GROUPS']))
-			{
-				$arValid = array();
-				foreach ($arFields['USER_GROUPS'] as &$value)
-				{
-					$value = intval($value);
-					if (0 < $value)
-						$arValid[] = $value;
-				}
-				if (isset($value))
-					unset($value);
-				$arFields['USER_GROUPS'] = array_unique($arValid);
-				if (!empty($arFields['USER_GROUPS']))
-				{
-					foreach ($arFields['USER_GROUPS'] as &$value)
-					{
-						$strSql = "INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) VALUES(".$ID.", ".$value.")";
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					}
-					if (isset($value))
-						unset($value);
-				}
-			}
+			self::updateUserGroups($ID, $arFields['USER_GROUPS'], $arFields['ACTIVE'], false);
+			if (isset($arFields['HANDLERS']))
+				self::updateDiscountHandlers($ID, $arFields['HANDLERS'], false);
 		}
 
 		return $ID;
@@ -162,40 +120,23 @@ class CSaleDiscount extends CAllSaleDiscount
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__update.700e1b34.php
 	* @author Bitrix
 	*/
-	public static function Update($ID, $arFields)
+	static public function Update($ID, $arFields)
 	{
 		global $DB;
-		global $USER;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
-		$arFields1 = array();
-		if (array_key_exists('CREATED_BY',$arFields))
-			unset($arFields['CREATED_BY']);
-		if (array_key_exists('DATE_CREATE',$arFields))
-			unset($arFields['DATE_CREATE']);
-		if (array_key_exists('TIMESTAMP_X', $arFields))
-			unset($arFields['TIMESTAMP_X']);
-		if (isset($USER) && $USER instanceof CUser && 'CUser' == get_class($USER))
-		{
-			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
-				$arFields["MODIFIED_BY"] = intval($USER->GetID());
-		}
-		$arFields1['TIMESTAMP_X'] = $DB->GetNowFunction();
-
 		$boolNewVersion = true;
+		$arFields['ID'] = $ID;
 		if (!array_key_exists('CONDITIONS', $arFields) && !array_key_exists('ACTIONS', $arFields))
 		{
-			$arFields['ID'] = $ID;
 			$boolConvert = CSaleDiscount::__ConvertOldFormat('UPDATE', $arFields);
 			if (!$boolConvert)
 				return false;
 			$boolNewVersion = false;
 		}
-		if (array_key_exists('ID', $arFields))
-			unset($arFields['ID']);
 
 		if (!CSaleDiscount::CheckFields("UPDATE", $arFields))
 			return false;
@@ -210,44 +151,15 @@ class CSaleDiscount extends CAllSaleDiscount
 		$strUpdate = $DB->PrepareUpdate("b_sale_discount", $arFields);
 		if (!empty($strUpdate))
 		{
-			$arAdd = array();
-			if (!empty($arFields1))
-			{
-				foreach ($arFields1 as $key => $value)
-				{
-					$arAdd[] = $key."=".$value;
-				}
-				$strUpdate .= ', '.implode(', ', $arAdd);
-			}
-
-			$strSql = "UPDATE b_sale_discount SET ".$strUpdate." WHERE ID = ".$ID;
+			$strSql = "update b_sale_discount set ".$strUpdate." where ID = ".$ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		if (array_key_exists('USER_GROUPS',$arFields) && is_array($arFields['USER_GROUPS']) && !empty($arFields['USER_GROUPS']))
-		{
-			$DB->Query("DELETE FROM b_sale_discount_group WHERE DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$arValid = array();
-			foreach ($arFields['USER_GROUPS'] as &$value)
-			{
-				$value = intval($value);
-				if (0 < $value)
-					$arValid[] = $value;
-			}
-			if (isset($value))
-				unset($value);
-			$arFields['USER_GROUPS'] = array_unique($arValid);
-			if (!empty($arFields['USER_GROUPS']))
-			{
-				foreach ($arFields['USER_GROUPS'] as &$value)
-				{
-					$strSql = "INSERT INTO b_sale_discount_group(DISCOUNT_ID, GROUP_ID) VALUES(".$ID.", ".$value.")";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				}
-				if (isset($value))
-					unset($value);
-			}
-		}
+		if (isset($arFields['USER_GROUPS']))
+			self::updateUserGroups($ID, $arFields['USER_GROUPS'], (isset($arFields['ACTIVE']) ? $arFields['ACTIVE'] : ''), true);
+
+		if (isset($arFields['HANDLERS']))
+			self::updateDiscountHandlers($ID, $arFields['HANDLERS'], true);
 
 		return $ID;
 	}
@@ -270,15 +182,16 @@ class CSaleDiscount extends CAllSaleDiscount
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__delete.7216613a.php
 	* @author Bitrix
 	*/
-	public static function Delete($ID)
+	static public function Delete($ID)
 	{
 		global $DB;
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
-		$DB->Query("DELETE FROM b_sale_discount_group WHERE DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $DB->Query("DELETE FROM b_sale_discount WHERE ID = ".$ID, true);
+		$DB->Query("delete from b_sale_discount_group where DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		$DB->Query("delete from b_sale_discount_module where DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		return $DB->Query("delete from b_sale_discount where ID = ".$ID, true);
 	}
 
 	
@@ -418,15 +331,15 @@ class CSaleDiscount extends CAllSaleDiscount
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__getlist.7e987f7e.php
 	* @author Bitrix
 	*/
-	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
+	static public function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
 
 		if (!is_array($arOrder) && !is_array($arFilter))
 		{
-			$arOrder = strval($arOrder);
-			$arFilter = strval($arFilter);
-			if ('' != $arOrder && '' != $arFilter)
+			$arOrder = (string)($arOrder);
+			$arFilter = (string)($arFilter);
+			if ($arOrder !== '' && $arFilter !== '')
 				$arOrder = array($arOrder => $arFilter);
 			else
 				$arOrder = array();
@@ -434,7 +347,7 @@ class CSaleDiscount extends CAllSaleDiscount
 				$arFilter = $arGroupBy;
 			else
 				$arFilter = array();
-			if (array_key_exists("PRICE", $arFilter))
+			if (isset($arFilter["PRICE"]))
 			{
 				$valTmp = $arFilter["PRICE"];
 				unset($arFilter["PRICE"]);
@@ -470,6 +383,7 @@ class CSaleDiscount extends CAllSaleDiscount
 			"UNPACK" => array("FIELD" => "D.UNPACK", "TYPE" => "string"),
 			"APPLICATION" => array("FIELD" => "D.APPLICATION", "TYPE" => "string"),
 			"ACTIONS" => array("FIELD" => "D.ACTIONS", "TYPE" => "string"),
+			"USE_COUPONS" => array("FIELD" => "D.USE_COUPONS", "TYPE" => "char"),
 			"USER_GROUPS" => array("FIELD" => "DG.GROUP_ID", "TYPE" => "int","FROM" => "LEFT JOIN b_sale_discount_group DG ON (D.ID = DG.DISCOUNT_ID)")
 		);
 
@@ -484,11 +398,11 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"];
+			$strSql = "select ".$arSqls["SELECT"]." from b_sale_discount D ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= " WHERE ".$arSqls["WHERE"];
+				$strSql .= " where ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+				$strSql .= " group by ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -497,27 +411,27 @@ class CSaleDiscount extends CAllSaleDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount D ".$arSqls["FROM"];
+		$strSql = "select ".$arSqls["SELECT"]." from b_sale_discount D ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= " WHERE ".$arSqls["WHERE"];
+			$strSql .= " where ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+			$strSql .= " group by ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
+			$strSql .= " order by ".$arSqls["ORDERBY"];
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
+		if ($boolNavStartParams && isset($arNavStartParams['nTopCount']))
 		{
-			$intTopCount = intval($arNavStartParams["nTopCount"]);
+			$intTopCount = (int)$arNavStartParams["nTopCount"];
 		}
-		if ($boolNavStartParams && 0 >= $intTopCount)
+		if ($boolNavStartParams && $intTopCount <= 0)
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_discount D ".$arSqls["FROM"];
+			$strSql_tmp = "select COUNT('x') as CNT from b_sale_discount D ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
+				$strSql_tmp .= " where ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
+				$strSql_tmp .= " group by ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -537,9 +451,9 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 		else
 		{
-			if ($boolNavStartParams && 0 < $intTopCount)
+			if ($boolNavStartParams && $intTopCount > 0)
 			{
-				$strSql .= " LIMIT ".$intTopCount;
+				$strSql .= " limit ".$intTopCount;
 			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
@@ -547,7 +461,7 @@ class CSaleDiscount extends CAllSaleDiscount
 		return $dbRes;
 	}
 
-	public static function GetDiscountGroupList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
+	static public function GetDiscountGroupList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
 
@@ -563,11 +477,11 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount_group DG ".$arSqls["FROM"];
+			$strSql = "select ".$arSqls["SELECT"]." from b_sale_discount_group DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql .= " WHERE ".$arSqls["WHERE"];
+				$strSql .= " where ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+				$strSql .= " group by ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -576,13 +490,13 @@ class CSaleDiscount extends CAllSaleDiscount
 				return false;
 		}
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_discount_group DG ".$arSqls["FROM"];
+		$strSql = "select ".$arSqls["SELECT"]." from b_sale_discount_group DG ".$arSqls["FROM"];
 		if (!empty($arSqls["WHERE"]))
-			$strSql .= " WHERE ".$arSqls["WHERE"];
+			$strSql .= " where ".$arSqls["WHERE"];
 		if (!empty($arSqls["GROUPBY"]))
-			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
+			$strSql .= " group by ".$arSqls["GROUPBY"];
 		if (!empty($arSqls["ORDERBY"]))
-			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
+			$strSql .= " order by ".$arSqls["ORDERBY"];
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
@@ -592,11 +506,11 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 		if ($boolNavStartParams && 0 >= $intTopCount)
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_discount_group DG ".$arSqls["FROM"];
+			$strSql_tmp = "select COUNT('x') as CNT from b_sale_discount_group DG ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
-				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
+				$strSql_tmp .= " where ".$arSqls["WHERE"];
 			if (!empty($arSqls["GROUPBY"]))
-				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
+				$strSql_tmp .= " group by ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
@@ -618,12 +532,117 @@ class CSaleDiscount extends CAllSaleDiscount
 		{
 			if ($boolNavStartParams && 0 < $intTopCount)
 			{
-				$strSql .= " LIMIT ".$intTopCount;
+				$strSql .= " limit ".$intTopCount;
 			}
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
 		return $dbRes;
+	}
+
+	protected function updateUserGroups($discountID, $userGroups, $active = '', $updateData)
+	{
+		global $DB;
+
+		$discountID = (int)$discountID;
+		if ($discountID <= 0 || empty($userGroups) || !is_array($userGroups))
+			return;
+
+		$active = (string)$active;
+		if ($active !== 'Y' && $active !== 'N')
+		{
+			$strQuery = 'select ID, ACTIVE from b_sale_discount where DISCOUNT_ID = '.$discountID;
+			$rsActive = $DB->Query($strQuery,  false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($activeFromDatabase = $rsActive->Fetch())
+			{
+				$active = $activeFromDatabase['ACTIVE'];
+			}
+		}
+		if ($updateData)
+		{
+			$strQuery = 'delete from b_sale_discount_group where DISCOUNT_ID = '.$discountID;
+			$DB->Query($strQuery,  false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		foreach ($userGroups as &$value)
+		{
+			$strQuery = "insert into b_sale_discount_group(DISCOUNT_ID, GROUP_ID) values(".$discountID.", ".$value.")";
+			$DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+		unset($value);
+	}
+
+	protected function updateDiscountHandlers($discountID, $handlers, $update)
+	{
+		global $DB;
+
+		$discountID = (int)$discountID;
+		if ($discountID <= 0 || empty($handlers) || !is_array($handlers))
+		{
+			return;
+		}
+		if (isset($handlers['MODULES']))
+		{
+			if ($update)
+			{
+				$sqlQuery = 'delete from b_sale_discount_module where DISCOUNT_ID = '.$discountID;
+				$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			}
+			if (!empty($handlers['MODULES']))
+			{
+				foreach ($handlers['MODULES'] as &$oneModuleID)
+				{
+					$fields = array(
+						'DISCOUNT_ID' => $discountID,
+						'MODULE_ID' => $oneModuleID
+					);
+					$insert = $DB->PrepareInsert('b_sale_discount_module', $fields);
+					$sqlQuery = "insert into b_sale_discount_module(".$insert[0].") values(".$insert[1].")";
+					$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+				}
+				unset($oneModuleID);
+			}
+		}
+	}
+
+	protected function getDiscountHandlers($discountList)
+	{
+		global $DB;
+
+		$defaultRes = array(
+			'MODULES' => array(),
+			'EXT_FILES' => array()
+		);
+		$result = array();
+		if (!empty($discountList) && is_array($discountList))
+		{
+			$map = array();
+			foreach ($discountList as $value)
+			{
+				$value = (int)$value;
+				if (0 < $value)
+					$map[$value] = true;
+			}
+			if (!empty($map))
+			{
+				$map = array_keys($map);
+				sort($map);
+			}
+			$discountList = $map;
+			if (!empty($discountList))
+			{
+				$result = array_fill_keys($discountList, $defaultRes);
+				$discountIn = implode(', ', $discountList);
+				$sqlQuery = 'select * from b_sale_discount_module where DISCOUNT_ID IN ('.$discountIn.')';
+				$resQuery = $DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+				while ($row = $resQuery->Fetch())
+				{
+					$row['DISCOUNT_ID'] = (int)$row['DISCOUNT_ID'];
+					$result[$row['DISCOUNT_ID']]['MODULES'][] = $row['MODULE_ID'];
+				}
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

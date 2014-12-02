@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/stateventtype.php");
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.</body> </html>
  *
  *
  *
@@ -401,7 +401,7 @@ class CStatEventType extends CAllStatEventType
 				E.EVENT2,
 				E.COUNTER,
 				E.DIAGRAM_DEFAULT,
-				'$view_currency'									CURRENCY,
+				'".$DB->ForSql($view_currency)."'									CURRENCY,
 				".$DB->DateToCharFunction("E.DATE_ENTER")."						DATE_ENTER,
 				".$DB->DateToCharFunction("max(D.DATE_LAST)")."						DATE_LAST,
 				max(ifnull(D.DATE_LAST,'1980-01-01'))							E_DATE_LAST,
@@ -496,7 +496,7 @@ class CStatEventType extends CAllStatEventType
 			SELECT
 				$group											GROUPING_KEY,
 				$group,
-				'$view_currency'									CURRENCY,
+				'".$DB->ForSql($view_currency)."'									CURRENCY,
 				".$DB->DateToCharFunction("min(E.DATE_ENTER)")."					DATE_ENTER,
 				".$DB->DateToCharFunction("max(D.DATE_LAST)")."						DATE_LAST,
 				max(ifnull(D.DATE_LAST,'1980-01-01'))							E_DATE_LAST,
@@ -527,7 +527,7 @@ class CStatEventType extends CAllStatEventType
 			$strSql = "
 			SELECT
 				$group							GROUPING_KEY,
-				'$view_currency'					CURRENCY,
+				'".$DB->ForSql($view_currency)."'					CURRENCY,
 				sum(ifnull(E.COUNTER,0))				COUNTER,
 				sum(round(ifnull(E.MONEY,0)*$rate,2))			TOTAL_MONEY,
 				".$DB->DateToCharFunction("min(E.DATE_ENTER)")."	DATE_ENTER

@@ -234,7 +234,7 @@ class ActionsData
 			{
 				foreach($arData["params"] as $bid => $actionParams)
 				{
-					if(strpos($bid, 'common_') === 0 || strpos($bid, 'monitor_') === 0)
+					if(strpos($bid, 'common_') === 0) // || strpos($bid, 'monitor_') === 0)
 						continue;
 
 					if($actionParams["status"] == "running")

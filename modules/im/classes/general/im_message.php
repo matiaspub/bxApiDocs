@@ -37,12 +37,29 @@ class CIMMessage
 
 		$ID = intval($ID);
 
-		$strSql = "SELECT M.* FROM b_im_relation R, b_im_message M WHERE M.ID = ".$ID." AND R.USER_ID = ".$this->user_id." AND R.MESSAGE_TYPE = '".IM_MESSAGE_PRIVATE."' AND R.CHAT_ID = M.CHAT_ID";
+		$strSql = "SELECT M.* FROM b_im_relation R, b_im_message M WHERE M.ID = ".$ID." AND R.USER_ID = ".$this->user_id." AND R.CHAT_ID = M.CHAT_ID";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
 			return $arRes;
 
 		return false;
+	}
+
+	public static function UpdateMessageOut($id, $messageOut)
+	{
+		$id = intval($id);
+		if ($id <= 0)
+			return false;
+
+		global $DB;
+
+		$strSql = "
+			UPDATE b_im_message
+			SET MESSAGE_OUT = '".$DB->ForSQL($messageOut)."'
+			WHERE ID = ".$id;
+		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+		return true;
 	}
 
 	public function GetUnreadMessage($arParams = Array())
@@ -56,6 +73,7 @@ class CIMMessage
 		$bTimeZone = isset($arParams['USE_TIME_ZONE']) && $arParams['USE_TIME_ZONE'] == 'N'? false: true;
 		$bGroupByChat = isset($arParams['GROUP_BY_CHAT']) && $arParams['GROUP_BY_CHAT'] == 'Y'? true: false;
 		$bUserLoad = isset($arParams['USER_LOAD']) && $arParams['USER_LOAD'] == 'N'? false: true;
+		$bFileLoad = isset($arParams['FILE_LOAD']) && $arParams['FILE_LOAD'] == 'N'? false: true;
 		$arExistUserData = isset($arParams['EXIST_USER_DATA']) && is_array($arParams['EXIST_USER_DATA'])? $arParams['EXIST_USER_DATA']: Array();
 		$bSmiles = isset($arParams['USE_SMILES']) && $arParams['USE_SMILES'] == 'N'? false: true;
 
@@ -68,6 +86,7 @@ class CIMMessage
 			'unreadMessage' => Array(),
 			'usersMessage' => Array(),
 			'users' => Array(),
+			'files' => Array(),
 			'userInGroup' => Array(),
 			'woUserInGroup' => Array(),
 			'countMessage' => 0,
@@ -108,6 +127,8 @@ class CIMMessage
 
 			$arLastMessage = Array();
 			$arMark = Array();
+			$arMessageId = Array();
+			$arMessageChatId = Array();
 
 			while ($arRes = $dbRes->Fetch())
 			{
@@ -128,6 +149,7 @@ class CIMMessage
 
 				$arMessages[$arRes['ID']] = Array(
 					'id' => $arRes['ID'],
+					'chatId' => $arRes['CHAT_ID'],
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
 					'date' => $arRes['DATE_CREATE'],
@@ -151,6 +173,42 @@ class CIMMessage
 
 				if (!isset($arLastMessage[$convId]) || $arLastMessage[$convId] < $arRes["ID"])
 					$arLastMessage[$convId] = $arRes["ID"];
+
+				$arMessageId[] = $arRes['ID'];
+				$arMessageChatId[$arRes['CHAT_ID']][$arRes["ID"]] = $arRes["ID"];
+			}
+			$params = CIMMessageParam::Get($arMessageId);
+			if ($bFileLoad)
+			{
+				foreach ($arMessageChatId as $chatId => $messages)
+				{
+					$files = Array();
+					foreach ($messages as $messageId)
+					{
+						$arMessages[$messageId]['params'] = $params[$messageId];
+
+						if (isset($params[$messageId]['FILE_ID']))
+						{
+							foreach ($params[$messageId]['FILE_ID'] as $fileId)
+							{
+								$files[$fileId] = $fileId;
+							}
+						}
+					}
+
+					$arMessageFiles = CIMDisk::GetFiles($chatId, $files);
+					foreach ($arMessageFiles as $key => $value)
+					{
+						$arResult['files'][$chatId][$key] = $value;
+					}
+				}
+			}
+			else
+			{
+				foreach ($params as $messageId => $param)
+				{
+					$arMessages[$messageId]['params'] = $param;
+				}
 			}
 
 			if (!empty($arMessages))
@@ -159,6 +217,9 @@ class CIMMessage
 				$CCTP->MaxStringLen = 200;
 				$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => ($bSmiles? "Y": "N"), "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			}
+
+			foreach ($arMark as $chatId => $lastSendId)
+				self::SetLastSendId($chatId, $this->user_id, $lastSendId);
 
 			if ($bGroupByChat)
 			{
@@ -192,8 +253,6 @@ class CIMMessage
 					$arMessages[$key]['text_mobile'] = strip_tags(preg_replace("/<img.*?data-code=\"([^\"]*)\".*?>/i", "$1", $CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $value['text'])))) , '<br>');
 				}
 			}
-			foreach ($arMark as $chatId => $lastSendId)
-				self::SetLastSendId($chatId, $this->user_id, $lastSendId);
 
 			$arResult['message'] = $arMessages;
 			$arResult['unreadMessage'] = $arUnreadMessage;
@@ -245,6 +304,7 @@ class CIMMessage
 		$startId = 0;
 		$arMessages = Array();
 		$arUsersMessage = Array();
+		$arMessageId = Array();
 
 		if (!$bTimeZone)
 			CTimeZone::Disable();
@@ -308,6 +368,8 @@ class CIMMessage
 				$dbRes = $DB->Query(str_replace("#LIMIT#", "", $strSql), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 
+			CIMStatus::Set($fromUserId, Array('IDLE' => null));
+
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
 			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
@@ -331,6 +393,7 @@ class CIMMessage
 
 				$arMessages[$arRes['ID']] = Array(
 					'id' => $arRes['ID'],
+					'chatId' => $arRes['CHAT_ID'],
 					'senderId' => $arRes['FROM_USER_ID'],
 					'recipientId' => $arRes['TO_USER_ID'],
 					'system' => $arRes['NOTIFY_EVENT'] == 'private'? 'N': 'Y',
@@ -338,15 +401,34 @@ class CIMMessage
 					'text' => $CCTP->convertText(htmlspecialcharsbx($arRes['MESSAGE']))
 				);
 
+				$arMessageId[] = $arRes['ID'];
 				$arUsersMessage[$convId][] = $arRes['ID'];
 			}
 		}
+		$params = CIMMessageParam::Get($arMessageId);
+
+		$arFiles = Array();
+		foreach ($params as $messageId => $param)
+		{
+			$arMessages[$messageId]['params'] = $param;
+			if (isset($param['FILE_ID']))
+			{
+				foreach ($param['FILE_ID'] as $fileId)
+				{
+					$arFiles[$fileId] = $fileId;
+				}
+			}
+		}
+		$arChatFiles = CIMDisk::GetFiles($chatId, $arFiles);
+
 		$arResult = Array(
+			'chatId' => $chatId,
 			'message' => $arMessages,
 			'usersMessage' => $arUsersMessage,
 			'users' => Array(),
 			'userInGroup' => Array(),
 			'woUserInGroup' => Array(),
+			'files' => $arChatFiles
 		);
 
 		if ($lastRead > 0)
@@ -718,6 +800,7 @@ class CIMMessage
 		$arParams['FROM_USER_ID'] = intval($arParams['FROM_USER_ID']);
 		$arParams['MESSAGE'] = trim($arParams['MESSAGE']);
 		$arParams['DATE_CREATE'] = intval($arParams['DATE_CREATE']);
+		$arParams['PARAMS'] = empty($arParams['PARAMS'])? Array(): $arParams['PARAMS'];
 
 		$arUsers = CIMContactList::GetUserData(Array('ID' => isset($arParams['TO_CHAT_ID'])? $arParams['FROM_USER_ID']: Array($arParams['TO_USER_ID'], $arParams['FROM_USER_ID'])));
 		$arChat = Array();
@@ -737,18 +820,23 @@ class CIMMessage
 		$text_mobile = strip_tags(preg_replace("/<img.*?data-code=\"([^\"]*)\".*?>/i", "$1", $CCTP->convertText(htmlspecialcharsbx(preg_replace("/\[s\].*?\[\/s\]/i", "", $arParams['MESSAGE'])))) , '<br>');
 
 		return Array(
+			'CHAT_ID' => $arParams['CHAT_ID'],
 			'CHAT' => isset($arChat['chat'])? $arChat['chat']: Array(),
 			'USER_IN_CHAT' => isset($arChat['userInChat'])? $arChat['userInChat']: Array(),
+			'USER_BLOCK_CHAT' => $arChat['userChatBlockStatus'],
 			'USERS' => $arUsers['users'],
 			'MESSAGE' => Array(
 				'id' => $arParams['ID'],
+				'chatId' => $arParams['CHAT_ID'],
 				'senderId' => $arParams['FROM_USER_ID'],
 				'recipientId' => isset($arParams['TO_CHAT_ID'])? 'chat'.$arParams['TO_USER_ID']: $arParams['TO_USER_ID'],
 				'system' => $arParams['SYSTEM'] == 'Y'? 'Y': 'N',
 				'date' => $arParams['DATE_CREATE'],
 				'text' => $text,
-				'text_mobile' => $text_mobile
+				'text_mobile' => $text_mobile,
+				'params' => $arParams['PARAMS']
 			),
+			'FILES' => isset($arParams['FILES'])? $arParams['FILES']: Array(),
 		);
 	}
 

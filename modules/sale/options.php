@@ -1,16 +1,21 @@
 <?
 $module_id = "sale";
+
+use Bitrix\Main\Loader;
+use Bitrix\Main\SiteTable;
+use Bitrix\Main\Config\Option;
+use Bitrix\Sale\SalesZone;
+
 $SALE_RIGHT = $APPLICATION->GetGroupRight($module_id);
 if ($SALE_RIGHT>="R") :
 
-global $MESS;
-include(GetLangFileName($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/main/lang/", "/options.php"));
-include(GetLangFileName($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/sale/lang/", "/options.php"));
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/options.php');
+IncludeModuleLangFile(__FILE__);
 
 $APPLICATION->AddHeadScript("/bitrix/js/sale/options.js");
 $APPLICATION->SetAdditionalCSS("/bitrix/themes/.default/sale.css");
 
-\Bitrix\Main\Loader::includeModule('sale');
+Loader::includeModule('sale');
 
 function checkAccountNumberValue($templateType, $number_data, $number_prefix)
 {
@@ -43,19 +48,21 @@ function checkAccountNumberValue($templateType, $number_data, $number_prefix)
 	return $res;
 }
 
-include_once($GLOBALS["DOCUMENT_ROOT"]."/bitrix/modules/sale/include.php");
-
 $siteList = array();
-$rsSites = CSite::GetList($by="sort", $order="asc", Array());
-while($arRes = $rsSites->GetNext())
+$siteIterator = SiteTable::getList(array(
+	'select' => array('LID', 'NAME'),
+	'order' => array('SORT' => 'ASC')
+));
+while ($oneSite = $siteIterator->fetch())
 {
-	$siteList[] = Array("ID" => $arRes["ID"], "NAME" => $arRes["NAME"]);
+	$siteList[] = array('ID' => $oneSite['LID'], 'NAME' => $oneSite['NAME']);
 }
+unset($oneSite, $siteIterator);
 $siteCount = count($siteList);
 
 $bWasUpdated = false;
 
-if ($REQUEST_METHOD=="GET" && strlen($RestoreDefaults)>0 && $SALE_RIGHT=="W" && check_bitrix_sessid())
+if ($_SERVER['REQUEST_METHOD'] == "GET" && strlen($RestoreDefaults)>0 && $SALE_RIGHT=="W" && check_bitrix_sessid())
 {
 	$bWasUpdated = true;
 
@@ -66,7 +73,7 @@ if ($REQUEST_METHOD=="GET" && strlen($RestoreDefaults)>0 && $SALE_RIGHT=="W" && 
 }
 
 $arAllOptions =
-	Array(
+	array(
 		Array("order_email", GetMessage("SALE_EMAIL_ORDER"), "order@".$SERVER_NAME, Array("text", 30)),
 		//Array("default_email", GetMessage("SALE_EMAIL_REGISTER"), "admin@".$SERVER_NAME, Array("text", 30)),
 		Array("delete_after", GetMessage("SALE_DELETE_AFTER"), "", Array("text", 10)),
@@ -87,8 +94,8 @@ $arAllOptions =
 		Array("delivery_handles_custom_path", GetMessage("SMO_DELIVERY_HANDLERS_CUSTOM_PATH"), BX_PERSONAL_ROOT."/php_interface/include/sale_delivery/", Array("text", 40)),
 		Array("use_secure_cookies", GetMessage("SMO_USE_SECURE_COOKIES"), "N", Array("checkbox", 40)),
 		Array("encode_fuser_id", GetMessage("SMO_ENCODE_FUSER_ID"), "N", Array("checkbox", 40)),
-		Array("recalc_product_list", GetMessage("SALE_RECALC_PRODUCT_LIST"), "N", Array("checkbox", 40)),
-		Array("recalc_product_list_period", GetMessage("SALE_RECALC_PRODUCT_LIST_PERIOD"), 7, Array("text", 10)),
+		//Array("recalc_product_list", GetMessage("SALE_RECALC_PRODUCT_LIST"), "N", Array("checkbox", 40)),
+		//Array("recalc_product_list_period", GetMessage("SALE_RECALC_PRODUCT_LIST_PERIOD"), 7, Array("text", 10)),
 		Array("COUNT_DISCOUNT_4_ALL_QUANTITY", GetMessage("SALE_OPT_COUNT_DISCOUNT_4_ALL_QUANTITY"), "N", Array("checkbox", 40)),
 		Array("COUNT_DELIVERY_TAX", GetMessage("SALE_OPT_COUNT_DELIVERY_TAX"), "N", Array("checkbox", 40)),
 		Array("QUANTITY_FACTORIAL", GetMessage("SALE_OPT_QUANTITY_FACTORIAL"), "N", Array("checkbox", 40)),
@@ -125,7 +132,7 @@ $aTabs = array(
 	array("DIV" => "edit1", "TAB" => GetMessage("MAIN_TAB_SET"), "ICON" => "sale_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_SET")),
 	array("DIV" => "edit7", "TAB" => GetMessage("SALE_TAB_WEIGHT"), "ICON" => "sale_settings", "TITLE" => GetMessage("SALE_TAB_WEIGHT_TITLE")),
 	array("DIV" => "edit5", "TAB" => GetMessage("SALE_TAB_ADDRESS"), "ICON" => "sale_settings", "TITLE" => GetMessage("SALE_TAB_ADDRESS_TITLE"))
-	);
+);
 
 if (CBXFeatures::IsFeatureEnabled('SaleCCards') && COption::GetOptionString($module_id, "use_ccards", "N") == "Y")
 	$aTabs[] = array("DIV" => "edit2", "TAB" => GetMessage("SALE_TAB_2"), "ICON" => "sale_settings", "TITLE" => GetMessage("SMO_CRYPT_TITLE"));
@@ -135,7 +142,7 @@ $aTabs[] = array("DIV" => "edit4", "TAB" => GetMessage("MAIN_TAB_RIGHTS"), "ICON
 $tabControl = new CAdminTabControl("tabControl", $aTabs);
 
 $strWarning = "";
-if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && check_bitrix_sessid())
+if ($_SERVER['REQUEST_METHOD'] == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && check_bitrix_sessid())
 {
 	if (!checkAccountNumberValue($_POST["account_number_template"], $_POST["account_number_number"], $_POST["account_number_prefix"]))
 	{
@@ -220,13 +227,12 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 			"NAME" => "CSaleUser::DeleteOldAgent(%",
 		));
 
-
 		while($arAgent = $rsAgents->Fetch())
 		{
 			CAgent::Delete($arAgent["ID"]);
 		}
 
-		$delete_after = intval(COption::GetOptionString("sale", "delete_after"));
+		$delete_after = (int)COption::GetOptionInt("sale", "delete_after");
 		if ($delete_after > 0)
 			CAgent::AddAgent("CSaleUser::DeleteOldAgent(".$delete_after.");", "sale", "N", 8*60*60, "", "Y");
 
@@ -255,17 +261,20 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 
 		CAgent::RemoveAgent("CSaleOrder::RemindPayment();", "sale");
 		COption::RemoveOption("sale", "pay_reminder");
-		if(isset($_POST["reminder"]) && is_array($_POST["reminder"]) && !empty($_POST["reminder"]))
- 		{
+		if (isset($_POST["reminder"]) && is_array($_POST["reminder"]) && !empty($_POST["reminder"]))
+		{
 			COption::SetOptionString("sale", "pay_reminder", serialize($_POST["reminder"]));
 			CAgent::AddAgent("CSaleOrder::RemindPayment();", "sale", "N", 86400, "", "Y");
 		}
 
 		//subscribe product
-		$rsAgents = CAgent::GetList(array("ID"=>"DESC"), array(
-			"MODULE_ID" => "sale",
-			"NAME" => "CSaleBasket::ClearProductSubscribe(%",
-		));
+		$rsAgents = CAgent::GetList(
+			array("ID"=>"DESC"),
+			array(
+				"MODULE_ID" => "sale",
+				"NAME" => "CSaleBasket::ClearProductSubscribe(%",
+			)
+		);
 		while($arAgent = $rsAgents->Fetch())
 			CAgent::Delete($arAgent["ID"]);
 		if(!empty($subscribProd))
@@ -285,7 +294,6 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 			}
 			COption::SetOptionString("sale", "subscribe_prod", serialize($subscribProd));
 		}
-
 
 		//viewed product
 		if(!empty($viewed))
@@ -426,24 +434,24 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 
 		CAgent::AddAgent("Bitrix\\Sale\\Product2ProductTable::deleteOldProducts({$p2p_del_exp});", "sale", "N", 24 * 3600 * $p2p_del_period, "", "Y");
 
-
-		$db_result_lang = CLang::GetList(($by1="sort"), ($order1="asc"));
-		while ($db_result_lang_array = $db_result_lang->Fetch())
+		foreach ($siteList as &$oneSite)
 		{
-			$valCurrency = Trim(${"CURRENCY_".$db_result_lang_array["LID"]});
-			UnSet($arFields);
-			$arFields["LID"] = $db_result_lang_array["LID"];
-			if (strlen($valCurrency)<=0) $valCurrency = false;
-			$arFields["CURRENCY"] = $valCurrency;
-			if ($arRes = CSaleLang::GetByID($db_result_lang_array["LID"]))
+			$valCurrency = trim(${"CURRENCY_".$oneSite['ID']});
+			if ($valCurrency == '') $valCurrency = false;
+			$arFields = array(
+				'LID' => $oneSite['ID'],
+				'CURRENCY' => $valCurrency
+			);
+
+			if ($arRes = CSaleLang::GetByID($oneSite['ID']))
 			{
 				if ($valCurrency!==false)
 				{
-					CSaleLang::Update($db_result_lang_array["LID"], $arFields);
+					CSaleLang::Update($oneSite['ID'], $arFields);
 				}
 				else
 				{
-					CSaleLang::Delete($db_result_lang_array["LID"]);
+					CSaleLang::Delete($oneSite['ID']);
 				}
 			}
 			else
@@ -454,20 +462,21 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 				}
 			}
 
-			CSaleGroupAccessToSite::DeleteBySite($db_result_lang_array["LID"]);
-			if (isset(${"SITE_USER_GROUPS_".$db_result_lang_array["LID"]})
-				&& is_array(${"SITE_USER_GROUPS_".$db_result_lang_array["LID"]}))
+			CSaleGroupAccessToSite::DeleteBySite($oneSite['ID']);
+			if (isset(${"SITE_USER_GROUPS_".$oneSite['ID']})
+				&& is_array(${"SITE_USER_GROUPS_".$oneSite['ID']}))
 			{
-				for ($i = 0, $intCount = count(${"SITE_USER_GROUPS_".$db_result_lang_array["LID"]}); $i < $intCount; $i++)
+				for ($i = 0, $intCount = count(${"SITE_USER_GROUPS_".$oneSite['ID']}); $i < $intCount; $i++)
 				{
-					if (IntVal(${"SITE_USER_GROUPS_".$db_result_lang_array["LID"]}[$i]) > 0)
+					$groupID = intval(${"SITE_USER_GROUPS_".$oneSite['ID']}[$i]);
+					if ($groupID > 0)
 					{
 						CSaleGroupAccessToSite::Add(
-								array(
-										"SITE_ID" => $db_result_lang_array["LID"],
-										"GROUP_ID" => IntVal(${"SITE_USER_GROUPS_".$db_result_lang_array["LID"]}[$i])
-									)
-							);
+							array(
+								"SITE_ID" => $oneSite['ID'],
+								"GROUP_ID" => $groupID
+							)
+						);
 					}
 				}
 			}
@@ -479,7 +488,7 @@ if ($REQUEST_METHOD == "POST" && strlen($Update) > 0 && $SALE_RIGHT == "W" && ch
 	}
 }
 
-$arStatuses = Array("" => GetMessage("SMO_STATUS"));
+$arStatuses = array("" => GetMessage("SMO_STATUS"));
 $dbStatus = CSaleStatus::GetList(Array("SORT" => "ASC"), Array("LID" => LANGUAGE_ID), false, false, Array("ID", "NAME", "SORT"));
 while ($arStatus = $dbStatus->GetNext())
 {
@@ -487,20 +496,19 @@ while ($arStatus = $dbStatus->GetNext())
 }
 
 
-if(strlen($strWarning)>0)
+if($strWarning != '')
 	CAdminMessage::ShowMessage($strWarning);
 elseif ($bWasUpdated)
 {
 	if(strlen($Update)>0 && strlen($_REQUEST["back_url_settings"])>0)
 		LocalRedirect($_REQUEST["back_url_settings"]);
 	else
-		LocalRedirect($APPLICATION->GetCurPage()."?mid=".urlencode($mid)."&lang=".urlencode(LANGUAGE_ID)."&back_url_settings=".urlencode($_REQUEST["back_url_settings"])."&".$tabControl->ActiveTabParam());
+		LocalRedirect($APPLICATION->GetCurPage()."?mid=".urlencode($mid)."&lang=".LANGUAGE_ID."&back_url_settings=".urlencode($_REQUEST["back_url_settings"])."&".$tabControl->ActiveTabParam());
 }
 
 $tabControl->Begin();
 ?><form method="POST" action="<?echo $APPLICATION->GetCurPage()?>?mid=<?=htmlspecialcharsbx($mid)?>&lang=<?=LANGUAGE_ID?>" name="opt_form">
-<?=bitrix_sessid_post()?>
-<?
+<?=bitrix_sessid_post();
 $tabControl->BeginNextTab();
 ?>
 <tr class="heading">
@@ -677,7 +685,10 @@ $tabControl->BeginNextTab();
 				foreach($arAccountNumberTemplates as $template => $templateName)
 				{
 					?>
-					<option value="<?=$template?>"<?if ($val == $template) { echo " selected"; $templateNumber = $ind; } ?>><?=$templateName?></option>
+					<option value="<?=$template?>"<?
+						if ($val == $template)
+						{ echo " selected"; $templateNumber = $ind; }
+					?>><?=$templateName?></option>
 					<?
 					$ind++;
 				}
@@ -685,7 +696,7 @@ $tabControl->BeginNextTab();
 			</select>
 		</td>
 	</tr>
-	<tr id="account_template_1" <?=($templateNumber == "1") ? "" : "style=\"display:none\""?>>
+	<tr id="account_template_1" <?=($templateNumber == '1' ? '' : 'style="display:none"'); ?>>
 		<td>&nbsp;</td>
 		<td>
 			<?
@@ -845,11 +856,7 @@ $tabControl->BeginNextTab();
 			<input type="text" size="5" value="<?=htmlspecialcharsbx(COption::GetOptionString("sale", "p2p_del_exp", "10"))?>" name="p2p_del_exp">
 		</td>
 	</tr>
-
 	<!-- /Recommended products -->
-
-
-
 	<?
 	if (CBXFeatures::IsFeatureEnabled('SaleAccounts'))
 	{
@@ -1002,7 +1009,7 @@ $tabControl->BeginNextTab();
 	</tr>
 
 	<?$tabControl->BeginNextTab();?>
-<script language="javascript">
+<script type="text/javascript">
 var cur_site = {WEIGHT:'<?=CUtil::JSEscape($siteList[0]["ID"])?>',ADDRESS:'<?=CUtil::JSEscape($siteList[0]["ID"])?>'};
 function changeSiteList(value, add_id)
 {
@@ -1149,9 +1156,9 @@ function allowAutoDelivery(value)
 for ($i = 0; $i < $siteCount; $i++):
 	$location_zip = COption::GetOptionString('sale', 'location_zip', '', $siteList[$i]["ID"]);
 	$location = intval(COption::GetOptionString('sale', 'location', '', $siteList[$i]["ID"]));
-	$sales_zone_countries = \Bitrix\Sale\SalesZone::getCountriesIds($siteList[$i]["ID"]);
-	$sales_zone_regions = \Bitrix\Sale\SalesZone::getRegionsIds($siteList[$i]["ID"]);
-	$sales_zone_cities = \Bitrix\Sale\SalesZone::getCitiesIds($siteList[$i]["ID"]);
+	$sales_zone_countries = SalesZone::getCountriesIds($siteList[$i]["ID"]);
+	$sales_zone_regions = SalesZone::getRegionsIds($siteList[$i]["ID"]);
+	$sales_zone_cities = SalesZone::getCitiesIds($siteList[$i]["ID"]);
 
 
 	if ($location_zip == 0) $location_zip = '';
@@ -1177,7 +1184,7 @@ for ($i = 0; $i < $siteCount; $i++):
 								"CITY_NAME_LANG"=>"ASC"
 							),
 							array(),
-							LANG);
+							LANGUAGE_ID);
 						?>
 						<?while ($arLocation = $dbLocationList->GetNext()):
 							$locationName = $arLocation["COUNTRY_NAME"];
@@ -1203,7 +1210,7 @@ for ($i = 0; $i < $siteCount; $i++):
 			<tr>
 				<td class="adm-detail-content-cell-l" valign="top">
 					<?=GetMessage("SMO_LOCATION_SALES_ZONE").":";?>
-					<script language="JavaScript">
+					<script type="text/javascript">
 						BX.ready( function(){
 							BX.bind(BX("sales_zone_countries_<?=$siteList[$i]["ID"]?>"), 'change', BX.Sale.Options.onCountrySelect);
 							BX.bind(BX("sales_zone_regions_<?=$siteList[$i]["ID"]?>"), 'change', BX.Sale.Options.onRegionSelect);
@@ -1230,7 +1237,7 @@ for ($i = 0; $i < $siteCount; $i++):
 								<option value=''<?=in_array("", $sales_zone_regions) ? " selected" : ""?>><?=GetMessage("SMO_LOCATION_ALL")?></option>
 								<option value='NULL'<?=in_array("NULL", $sales_zone_regions) ? " selected" : ""?>><?=GetMessage("SMO_LOCATION_NO_REGION")?></option>
 								<?if(!in_array("", $sales_zone_countries)):?>
-									<?$arRegions = \Bitrix\Sale\SalesZone::getRegions($sales_zone_countries, $lang);?>
+									<?$arRegions = SalesZone::getRegions($sales_zone_countries, LANGUAGE_ID);?>
 									<?foreach($arRegions as $regionId => $arRegionName):?>
 										<option value="<?=$regionId?>"<?=in_array($regionId, $sales_zone_regions) ? " selected" : ""?>><?= htmlspecialcharsbx($arRegionName)?></option>
 									<?endforeach;?>
@@ -1240,7 +1247,7 @@ for ($i = 0; $i < $siteCount; $i++):
 							<select id="sales_zone_cities_<?=$siteList[$i]["ID"]?>" name="sales_zone_cities[<?=$siteList[$i]["ID"]?>][]" multiple size="10" class="sale-options-location-mselect">
 								<option value=''<?=in_array("", $sales_zone_cities) ? " selected" : ""?>><?=GetMessage("SMO_LOCATION_ALL")?></option>
 								<?if(!in_array("", $sales_zone_regions)):?>
-									<?$arCities = \Bitrix\Sale\SalesZone::getCities($sales_zone_countries, $sales_zone_regions, $lang);?>
+									<?$arCities = SalesZone::getCities($sales_zone_countries, $sales_zone_regions, LANGUAGE_ID);?>
 									<?foreach($arCities as $cityId => $cityName):?>
 										<option value="<?=$cityId?>"<?=in_array($cityId, $sales_zone_cities) ? " selected" : ""?>><?= htmlspecialcharsbx($cityName)?></option>
 									<?endforeach;?>
@@ -1393,11 +1400,11 @@ endfor;
 <?$tabControl->BeginNextTab();?>
 <?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/admin/group_rights.php");?>
 <?$tabControl->Buttons();?>
-<script language="JavaScript">
+<script type="text/javascript">
 function RestoreDefaults()
 {
 	if (confirm('<?echo AddSlashes(GetMessage("MAIN_HINT_RESTORE_DEFAULTS_WARNING"))?>'))
-		window.location = "<?echo $APPLICATION->GetCurPage()?>?RestoreDefaults=Y&lang=<?echo LANG?>&mid=<?echo urlencode($mid)?>";
+		window.location = "<?echo $APPLICATION->GetCurPage()?>?RestoreDefaults=Y&lang=<?echo LANGUAGE_ID?>&mid=<?echo urlencode($mid)?>";
 }
 </script>
 
@@ -1411,7 +1418,7 @@ function RestoreDefaults()
 <?$tabControl->End();?>
 </form>
 <?endif;?>
-<script language="JavaScript">
+<script type="text/javascript">
 	BX.ready( function(){
 		BX.message["SMO_LOCATION_JS_GET_DATA_ERROR"] = "<?=GetMessage("SMO_LOCATION_JS_GET_DATA_ERROR")?>";
 		BX.message["SMO_LOCATION_ALL"] = "<?=GetMessage("SMO_LOCATION_ALL")?>";

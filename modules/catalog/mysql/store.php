@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/store.ph
 
 
 /**
- * <b>CCatalogStore</b> - класс для работы со складами.
+ * <b>CCatalogStore</b> - класс для работы со складами.</body> </html>
  *
  *
  *

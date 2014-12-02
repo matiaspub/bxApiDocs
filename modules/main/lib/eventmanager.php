@@ -63,7 +63,7 @@ class EventManager
 
 		$arEvents = &$this->handlers[$fromModuleId];
 
-		if (!isset($arEvents[$eventType]) || !is_array($arEvents[$eventType]))
+		if (!isset($arEvents[$eventType]) || !is_array($arEvents[$eventType]) || empty($arEvents[$eventType]))
 		{
 			$arEvents[$eventType] = array($arEvent);
 			$iEventHandlerKey = 0;
@@ -71,7 +71,8 @@ class EventManager
 		else
 		{
 			$newEvents = array();
-			$iEventHandlerKey = count($arEvents[$eventType]);
+			$iEventHandlerKey = max(array_keys($arEvents[$eventType])) + 1;
+			//$iEventHandlerKey = count($arEvents[$eventType]);
 			foreach ($arEvents[$eventType] as $key => $value)
 			{
 				if ($value["SORT"] > $arEvent["SORT"])

@@ -145,56 +145,6 @@ define('GF_TWOBYTWO', (1 << 7));
 define('SALE_TIME_LOCK_USER', 600);
 
 /**
- * SALE_DEBUG
- */
-define('SALE_DEBUG', false);
-
-/**
- * SALE_PROC_REC_NUM
- */
-define('SALE_PROC_REC_NUM', 3);
-
-/**
- * SALE_PROC_REC_ATTEMPTS
- */
-define('SALE_PROC_REC_ATTEMPTS', 3);
-
-/**
- * SALE_PROC_REC_TIME
- */
-define('SALE_PROC_REC_TIME', 43200);
-
-/**
- * SALE_PROC_REC_FREQUENCY
- */
-define('SALE_PROC_REC_FREQUENCY', 7200);
-
-/**
- * SALE_REPORT_OWNER_ID
- */
-define('SALE_REPORT_OWNER_ID', 'sale');
-
-/**
- * CACHED_b_sale_order
- */
-define('CACHED_b_sale_order', 3600*24);
-
-/**
- * SALE_VALUE_PRECISION
- */
-define('SALE_VALUE_PRECISION', 2);
-
-/**
- * SALE_WEIGHT_PRECISION
- */
-define('SALE_WEIGHT_PRECISION', 3);
-
-/**
- * BX_SALE_MENU_CATALOG_CLEAR
- */
-define('BX_SALE_MENU_CATALOG_CLEAR', 'Y');
-
-/**
  * NO_KEEP_STATISTIC
  */
 define('NO_KEEP_STATISTIC', true);

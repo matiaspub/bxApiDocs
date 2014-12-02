@@ -136,6 +136,27 @@ class Element extends Base
 				$this->parent = new Section($fields["IBLOCK_SECTION_ID"]);
 				$this->sections = new SectionPath($fields["IBLOCK_SECTION_ID"]);
 			}
+			elseif (
+				isset($fields["IBLOCK_SECTION"])
+				&& is_array($fields["IBLOCK_SECTION"])
+			)
+			{
+				$section = -1;
+				foreach ($fields["IBLOCK_SECTION"] as $sectionId)
+				{
+					if ($sectionId > 0)
+					{
+						if ($section < 0 || $section > $sectionId)
+							$section = $sectionId;
+					}
+				}
+
+				if ($section > 0)
+				{
+					$this->parent = new Section($section);
+					$this->sections = new SectionPath($section);
+				}
+			}
 
 			if (\Bitrix\Main\Loader::includeModule('catalog'))
 				$this->catalog = new ElementCatalog($this->id);

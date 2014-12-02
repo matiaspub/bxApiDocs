@@ -5,13 +5,24 @@ class CIBlockPropertyHTML
 {
 	public static function GetPublicViewHTML($arProperty, $value, $strHTMLControlName)
 	{
-		if(!is_array($value["VALUE"]))
+		if (!is_array($value["VALUE"]))
 			$value = CIBlockPropertyHTML::ConvertFromDB($arProperty, $value);
 		$ar = $value["VALUE"];
-		if($ar)
-			return FormatText($ar["TEXT"], $ar["TYPE"]);
+		if (!empty($ar) && is_array($ar))
+		{
+			if (isset($strHTMLControlName['MODE']) && $strHTMLControlName['MODE'] == 'CSV_EXPORT')
+			{
+				return '['.$ar["TYPE"].']'.$ar["TEXT"];
+			}
+			else
+			{
+				return FormatText($ar["TEXT"], $ar["TYPE"]);
+			}
+		}
 		else
-			return "";
+		{
+			return '';
+		}
 	}
 
 	public static function GetAdminListViewHTML($arProperty, $value, $strHTMLControlName)
@@ -21,13 +32,12 @@ class CIBlockPropertyHTML
 		$ar = $value["VALUE"];
 		if($ar)
 		{
-			//if (strToLower($ar["TYPE"]) != "text")
-			//	return $ar["TEXT"];
-			//else
 				return htmlspecialcharsex($ar["TYPE"].":".$ar["TEXT"]);
 		}
 		else
+		{
 			return "&nbsp;";
+		}
 	}
 
 	public static function GetPublicEditHTML($arProperty, $value, $strHTMLControlName)
@@ -54,6 +64,7 @@ class CIBlockPropertyHTML
 			'bUseFileDialogs' => false,
 			'bFloatingToolbar' => false,
 			'bArisingToolbar' => false,
+			'bRecreate' => true,
 			'toolbarConfig' => array(
 				'Bold', 'Italic', 'Underline', 'RemoveFormat',
 				'CreateLink', 'DeleteLink', 'Image', 'Video',
@@ -85,7 +96,7 @@ class CIBlockPropertyHTML
 		$settings = CIBlockPropertyHTML::PrepareSettings($arProperty);
 
 		ob_start();
-		?><table><?
+		?><table width="100%"><?
 		if($strHTMLControlName["MODE"]=="FORM_FILL" && COption::GetOptionString("iblock", "use_htmledit", "Y")=="Y" && CModule::IncludeModule("fileman")):
 		?><tr>
 			<td colspan="2" align="center">
@@ -93,14 +104,14 @@ class CIBlockPropertyHTML
 				<?
 				$text_name = preg_replace("/([^a-z0-9])/is", "_", $strHTMLControlName["VALUE"]."[TEXT]");
 				$text_type = preg_replace("/([^a-z0-9])/is", "_", $strHTMLControlName["VALUE"]."[TYPE]");
-				CFileMan::AddHTMLEditorFrame($text_name, $ar["TEXT"], $text_type, strToLower($ar["TYPE"]), $settings['height'], "N", 0, "", "");
+				CFileMan::AddHTMLEditorFrame($text_name, htmlspecialcharsBx($ar["TEXT"]), $text_type, strToLower($ar["TYPE"]), $settings['height'], "N", 0, "", "");
 				?>
 			</td>
 		</tr>
 		<?else:?>
 		<tr>
-			<td><?echo GetMessage("IBLOCK_DESC_TYPE")?></td>
-			<td>
+			<td align="right"><?echo GetMessage("IBLOCK_DESC_TYPE")?></td>
+			<td align="left">
 				<input type="radio" name="<?=$strHTMLControlName["VALUE"]?>[TYPE]" id="<?=$strHTMLControlName["VALUE"]?>[TYPE][TEXT]" value="text" <?if($ar["TYPE"]!="html")echo " checked"?>>
 				<label for="<?=$strHTMLControlName["VALUE"]?>[TYPE][TEXT]"><?echo GetMessage("IBLOCK_DESC_TYPE_TEXT")?></label> /
 				<input type="radio" name="<?=$strHTMLControlName["VALUE"]?>[TYPE]" id="<?=$strHTMLControlName["VALUE"]?>[TYPE][HTML]" value="html"<?if($ar["TYPE"]=="html")echo " checked"?>>
@@ -108,7 +119,7 @@ class CIBlockPropertyHTML
 			</td>
 		</tr>
 		<tr>
-			<td colspan="2" align="center"><textarea cols="60" rows="10" name="<?=$strHTMLControlName["VALUE"]?>[TEXT]" style="width:100%"><?=$ar["TEXT"]?></textarea></td>
+			<td colspan="2" align="center"><textarea cols="60" rows="10" name="<?=$strHTMLControlName["VALUE"]?>[TEXT]" style="width:100%"><?=htmlspecialcharsEx($ar["TEXT"])?></textarea></td>
 		</tr>
 		<?endif;
 		if (($arProperty["WITH_DESCRIPTION"]=="Y") && ('' != trim($strHTMLControlName["DESCRIPTION"]))):?>
@@ -129,6 +140,15 @@ class CIBlockPropertyHTML
 	{
 		global $DB;
 		$return = false;
+
+		if (!is_array($value))
+		{
+			$value = self::getValueFromString($value, true);
+		}
+		elseif (isset($value['VALUE']) && !is_array($value['VALUE']))
+		{
+			$value['VALUE'] = self::getValueFromString($value['VALUE'], false);
+		}
 
 		if(
 			is_array($value)
@@ -151,17 +171,18 @@ class CIBlockPropertyHTML
 				$return = array(
 					"VALUE" => serialize($value["VALUE"]),
 				);
-				if(strlen(trim($value["DESCRIPTION"])) > 0)
+				if(trim($value["DESCRIPTION"]) != '')
 					$return["DESCRIPTION"] = trim($value["DESCRIPTION"]);
 			}
 		}
+
 		return $return;
 	}
 
 	public static function ConvertFromDB($arProperty, $value)
 	{
 		$return = false;
-		if(!is_array($value["VALUE"]))
+		if (!is_array($value["VALUE"]))
 		{
 			$return = array(
 				"VALUE" => unserialize($value["VALUE"]),
@@ -174,7 +195,6 @@ class CIBlockPropertyHTML
 
 	public static function CheckArray($arFields = false)
 	{
-		$return = false;
 		if (!is_array($arFields))
 		{
 			$return = unserialize($arFields);
@@ -203,7 +223,7 @@ class CIBlockPropertyHTML
 	public static function GetLength($arProperty, $value)
 	{
 		if(is_array($value) && array_key_exists("VALUE", $value))
-			return strLen(trim($value["VALUE"]["TEXT"]));
+			return strlen(trim($value["VALUE"]["TEXT"]));
 		else
 			return 0;
 	}
@@ -211,9 +231,9 @@ class CIBlockPropertyHTML
 	public static function PrepareSettings($arProperty)
 	{
 		$height = 0;
-		if(is_array($arProperty["USER_TYPE_SETTINGS"]))
-			$height = intval($arProperty["USER_TYPE_SETTINGS"]["height"]);
-		if($height <= 0)
+		if (isset($arProperty["USER_TYPE_SETTINGS"]["height"]))
+			$height = (int)$arProperty["USER_TYPE_SETTINGS"]["height"];
+		if ($height <= 0)
 			$height = 200;
 
 		return array(
@@ -228,8 +248,8 @@ class CIBlockPropertyHTML
 		);
 
 		$height = 0;
-		if(is_array($arProperty["USER_TYPE_SETTINGS"]))
-			$height = intval($arProperty["USER_TYPE_SETTINGS"]["height"]);
+		if (isset($arProperty["USER_TYPE_SETTINGS"]["height"]))
+			$height = (int)$arProperty["USER_TYPE_SETTINGS"]["height"];
 		if($height <= 0)
 			$height = 200;
 
@@ -239,6 +259,40 @@ class CIBlockPropertyHTML
 			<td><input type="text" size="5" name="'.$strHTMLControlName["NAME"].'[height]" value="'.$height.'">px</td>
 		</tr>
 		';
+	}
+
+	protected function getValueFromString($value, $getFull = false)
+	{
+		$getFull = ($getFull === true);
+		$valueType = 'HTML';
+		$value = (string)$value;
+		if ($value !== '')
+		{
+			$prefix = strtoupper(substr($value, 0, 6));
+			$isText = $prefix == '[TEXT]';
+			if ($prefix == '[HTML]' || $isText)
+			{
+				if ($isText)
+					$valueType = 'TEXT';
+				$value = substr($value, 6);
+			}
+		}
+		if ($getFull)
+		{
+			return array(
+				'VALUE' => array(
+					'TEXT' => $value,
+					'TYPE' => $valueType
+				)
+			);
+		}
+		else
+		{
+			return array(
+				'TEXT' => $value,
+				'TYPE' => $valueType
+			);
+		}
 	}
 
 }

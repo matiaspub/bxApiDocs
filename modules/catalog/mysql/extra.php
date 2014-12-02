@@ -127,10 +127,10 @@ class CExtra extends CAllExtra
 	* CDBResult</a>, содержащий ассоциативные массивы с ключами:</p> <table
 	* class="tnormal" width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
 	* <td>Код наценки.</td> </tr> <tr> <td>NAME</td> <td>Название наценки.</td> </tr> <tr>
-	* <td>PERCENTAGE</td> <td>Величина наценки.</td> </tr> </tbody></table> <h4>Примечания</h4><a
-	* name="old"></a><p>Сохранен старый способ вызова:</p> <pre class="syntax"><b>CDBResult
-	* CExtra::GetList(</b> string by, string order <b>);</b></pre><p>где by - поле сортировки, а order -
-	* направление.</p> <br><br>
+	* <td>PERCENTAGE</td> <td>Величина наценки.</td> </tr> </tbody></table>
+	* <h4>Примечания</h4><a name="old"></a><p>Сохранен старый способ вызова:</p> <pre
+	* class="syntax"><b>CDBResult CExtra::GetList(</b> string by, string order <b>);</b></pre><p>где by - поле
+	* сортировки, а order - направление.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cextra/getlist.php

@@ -238,6 +238,177 @@ class CAllSaleLocation
 		return False;
 	}
 
+	public static function GetLocationString($locationId, $siteId = SITE_ID, $langId = LANGUAGE_ID)
+	{
+		$locationString = '';
+
+		if(!\Bitrix\Sale\SalesZone::checkLocationId($locationId, $siteId))
+			$locationId = 0;
+
+		$countryId = $regionId = $cityId = 0;
+		if ($locationId > 0)
+		{
+			if ($arLocation = CSaleLocation::GetByID($locationId))
+			{
+				$countryId = $arLocation["COUNTRY_ID"];
+				$regionId = $arLocation["REGION_ID"];
+				$cityId = $arLocation["CITY_ID"];
+			}
+		}
+
+		//check in location city
+		$bEmptyCity = "N";
+		$arCityFilter = array("!CITY_ID" => "NULL", ">CITY_ID" => "0");
+		if ($countryId > 0)
+			$arCityFilter["COUNTRY_ID"] = $countryId;
+		$rsLocCount = CSaleLocation::GetList(array(), $arCityFilter, false, false, array("ID"));
+		if (!$rsLocCount->Fetch())
+			$bEmptyCity = "Y";
+
+		//check in location region
+		$bEmptyRegion = "N";
+		$arRegionFilter = array("!REGION_ID" => "NULL", ">REGION_ID" => "0");
+		if ($countryId > 0 && $regionId > 0)
+			$arRegionFilter["COUNTRY_ID"] = $countryId;
+		if ($regionId > 0)
+			$arRegionFilter["REGION_ID"] = $regionId;
+		$rsLocCount = CSaleLocation::GetList(array(), $arRegionFilter, false, false, array("ID"));
+		if (!$rsLocCount->Fetch())
+			$bEmptyRegion = "Y";
+
+		//check if exist another city
+		if ($bEmptyCity == "Y" && $bEmptyRegion == "Y")
+		{
+			$arCityFilter = array("!CITY_ID" => "NULL", ">CITY_ID" => "0");
+			$rsLocCount = CSaleLocation::GetList(array(), $arCityFilter, false, false, array("ID"));
+			if ($rsLocCount->Fetch())
+				$bEmptyCity = "N";
+		}
+
+		//location value
+		if ($locationId > 0 )
+		{
+			if ($arLocation = CSaleLocation::GetByID($locationId))
+			{
+				if ($bEmptyRegion == "Y" && $bEmptyCity == "Y")
+					$countryId = $locationId;
+				else
+					$countryId = $arLocation["COUNTRY_ID"];
+
+				if ($bEmptyCity == "Y")
+					$regionId = $arLocation["ID"];
+				else
+					$regionId = $arLocation["REGION_ID"];
+
+				$cityId = $locationId;
+			}
+		}
+
+		//select country
+		$arCountryList = array();
+
+		if ($bEmptyRegion == "Y" && $bEmptyCity == "Y")
+			$rsCountryList = CSaleLocation::GetList(array("SORT" => "ASC", "NAME_LANG" => "ASC"), array("LID" => $langId), false, false, array("ID", "COUNTRY_ID", "COUNTRY_NAME_LANG"));
+		else
+			$rsCountryList = CSaleLocation::GetCountryList(array("SORT" => "ASC", "NAME_LANG" => "ASC"));
+
+		while ($arCountry = $rsCountryList->GetNext())
+		{
+			if(!\Bitrix\Sale\SalesZone::checkCountryId($arCountry["ID"], $siteId))
+				continue;
+
+			if ($bEmptyRegion == "Y" && $bEmptyCity == "Y")
+				$arCountry["NAME_LANG"] = $arCountry["COUNTRY_NAME_LANG"];
+
+			$arCountryList[] = $arCountry;
+			if ($arCountry["ID"] == $countryId && strlen($arCountry["NAME_LANG"]) > 0)
+				$locationString .= $arCountry["NAME_LANG"];
+		}
+
+		if (count($arCountryList) <= 0)
+			$arCountryList = array();
+		elseif (count($arCountryList) == 1)
+			$countryId = $arCountryList[0]["ID"];
+
+		//select region
+		$arRegionList = array();
+		if ($countryId > 0 || count($arCountryList) <= 0)
+		{
+			$arRegionFilter = array("LID" => $langId, "!REGION_ID" => "NULL", "!REGION_ID" => "0");
+			if ($countryId > 0)
+				$arRegionFilter["COUNTRY_ID"] = IntVal($countryId);
+
+			if ($bEmptyCity == "Y")
+				$rsRegionList = CSaleLocation::GetList(array("SORT" => "ASC", "NAME_LANG" => "ASC"), $arRegionFilter, false, false, array("ID", "REGION_ID", "REGION_NAME_LANG"));
+			else
+				$rsRegionList = CSaleLocation::GetRegionList(array("SORT" => "ASC", "NAME_LANG" => "ASC"), $arRegionFilter);
+
+			while ($arRegion = $rsRegionList->GetNext())
+			{
+				if(!\Bitrix\Sale\SalesZone::checkRegionId($arRegion["ID"], $siteId))
+					continue;
+
+				if ($bEmptyCity == "Y")
+					$arRegion["NAME_LANG"] = $arRegion["REGION_NAME_LANG"];
+
+				$arRegionList[] = $arRegion;
+				if ($arRegion["ID"] == $regionId && strlen($arRegion["NAME_LANG"]) > 0)
+					$locationString = $arRegion["NAME_LANG"].", ".$locationString;
+			}
+		}
+		if (count($arRegionList) <= 0)
+			$arRegionList = array();
+		elseif (count($arRegionList) == 1)
+			$regionId = $arRegionList[0]["ID"];
+
+		//select city
+		$arCityList = array();
+		if (
+			$bEmptyCity == "N"
+			&& ((count($arCountryList) > 0 && count($arRegionList) > 0 && $countryId > 0 && $regionId > 0)
+				|| (count($arCountryList) <= 0 && count($arRegionList) > 0 && $regionId > 0)
+				|| (count($arCountryList) > 0 && count($arRegionList) <= 0 && $countryId > 0)
+				|| (count($arCountryList) <= 0 && count($arRegionList) <= 0))
+		)
+		{
+			$arCityFilter = array("LID" => $langId);
+			if ($countryId > 0)
+				$arCityFilter["COUNTRY_ID"] = $countryId;
+			if ($regionId > 0)
+				$arCityFilter["REGION_ID"] = $regionId;
+
+			$rsLocationsList = CSaleLocation::GetList(
+				array(
+					"SORT" => "ASC",
+					"COUNTRY_NAME_LANG" => "ASC",
+					"CITY_NAME_LANG" => "ASC"
+				),
+				$arCityFilter,
+				false,
+				false,
+				array(
+					"ID", "CITY_ID", "CITY_NAME"
+				)
+			);
+
+			while ($arCity = $rsLocationsList->GetNext())
+			{
+				if(!\Bitrix\Sale\SalesZone::checkCityId($arCity["CITY_ID"], $siteId))
+					continue;
+
+				$arCityList[] = array(
+					"ID" => $arCity["ID"],
+					"CITY_ID" => $arCity['CITY_ID'],
+					"CITY_NAME" => $arCity["CITY_NAME"],
+				);
+				if ($arCity["ID"] == $cityId)
+					$locationString = (strlen($arCity["CITY_NAME"]) > 0 ? $arCity["CITY_NAME"].", " : "").$locationString;
+			}//end while
+		}
+
+		return $locationString;
+	}
+
 
 	// COUNTRY
 	public static function CountryCheckFields($ACTION, &$arFields)

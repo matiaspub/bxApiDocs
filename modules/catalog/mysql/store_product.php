@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/store_pr
 
 
 /**
- * <b>CCatalogStoreProduct</b> - класс для работы со остатками товара на складах.
+ * <b>CCatalogStoreProduct</b> - класс для работы со остатками товара на складах.</body> </html>
  *
  *
  *
@@ -162,7 +162,7 @@ class CCatalogStoreProduct
 	* <h4>Example</h4> 
 	* <pre>
 	* Список возможных полей
-	* <tbody>
+	* </htm<tbody>
 	* <tr>
 	* <th width="15%">Поля</th>
 	* <th width="404">Описание</th> </tr>

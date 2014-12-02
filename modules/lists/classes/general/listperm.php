@@ -13,6 +13,13 @@ class CListPermissions
 	const CAN_WRITE = 'W';
 	const IS_ADMIN = 'X';
 
+	/**
+	 * @param $USER CUser
+	 * @param $iblock_type_id string
+	 * @param bool $iblock_id int
+	 * @param int $socnet_group_id int
+	 * @return int|string
+	 */
 	static public function CheckAccess($USER, $iblock_type_id, $iblock_id = false, $socnet_group_id = 0)
 	{
 		if($socnet_group_id > 0 && CModule::IncludeModule('socialnetwork'))
@@ -38,6 +45,13 @@ class CListPermissions
 		}
 	}
 
+	/**
+	 * @param $USER CUser
+	 * @param $iblock_type_id string
+	 * @param $iblock_id int
+	 * @param $socnet_group_id int
+	 * @return string
+	 */
 	static protected function _socnet_check($USER, $iblock_type_id, $iblock_id, $socnet_group_id)
 	{
 		$type_check = CListPermissions::_socnet_type_check($USER, $iblock_type_id, $socnet_group_id);
@@ -66,20 +80,40 @@ class CListPermissions
 				$socnet_role = "N";
 		}
 
-		$arSocnetPerm = CLists::GetSocnetPermission($iblock_id);
-
-		return $arSocnetPerm[$socnet_role];
+		if (!CSocNetFeaturesPerms::CanPerformOperation($USER->GetID(), SONET_ENTITY_GROUP, $socnet_group_id, "group_lists", "write", CSocNetUser::IsCurrentUserModuleAdmin()))
+		{
+			return "D";
+		}
+		else
+		{
+			$arSocnetPerm = CLists::GetSocnetPermission($iblock_id);
+			return $arSocnetPerm[$socnet_role];
+		}
 	}
 
+	/**
+	 * @param $USER CUser
+	 * @param $iblock_type_id string
+	 * @param $socnet_group_id int
+	 * @return int|string
+	 */
 	static protected function _socnet_type_check($USER, $iblock_type_id, $socnet_group_id)
 	{
 		if($iblock_type_id === COption::GetOptionString("lists", "socnet_iblock_type_id"))
 		{
 			$socnet_role = CSocNetUserToGroup::GetUserRole($USER->GetID(), $socnet_group_id);
-			if($socnet_role == "A")
+
+			if (
+				$socnet_role == "A"
+				&& CSocNetFeaturesPerms::CanPerformOperation($USER->GetID(), SONET_ENTITY_GROUP, $socnet_group_id, "group_lists", "write", CSocNetUser::IsCurrentUserModuleAdmin())
+			)
+			{
 				return CListPermissions::IS_ADMIN;
+			}
 			else
+			{
 				return CListPermissions::CAN_READ;
+			}
 		}
 		else
 		{
@@ -87,6 +121,11 @@ class CListPermissions
 		}
 	}
 
+	/**
+	 * @param $USER CUser
+	 * @param $iblock_type_id string
+	 * @return string
+	 */
 	static protected function _lists_type_check($USER, $iblock_type_id)
 	{
 		$arListsPerm = CLists::GetPermission($iblock_type_id);
@@ -100,6 +139,12 @@ class CListPermissions
 		return CListPermissions::CAN_READ;
 	}
 
+	/**
+	 * @param $USER CUser
+	 * @param $iblock_type_id string
+	 * @param $iblock_id int
+	 * @return int|string
+	 */
 	static protected function _lists_check($USER, $iblock_type_id, $iblock_id)
 	{
 		$iblock_check = CListPermissions::_iblock_check($iblock_type_id, $iblock_id);
@@ -117,6 +162,11 @@ class CListPermissions
 		return CIBlock::GetPermission($iblock_id);
 	}
 
+	/**
+	 * @param $iblock_type_id string
+	 * @param $iblock_id int
+	 * @return int
+	 */
 	static protected function _iblock_check($iblock_type_id, $iblock_id)
 	{
 		$iblock_id = intval($iblock_id);
@@ -201,6 +251,31 @@ class CListPermissions
 		}
 
 		return $arResult;
+	}
+
+	/**
+	 * @param $iblockId int
+	 * @param $fieldId int
+	 */
+	public static function CheckFieldId($iblock_id, $field_id)
+	{
+		if ($field_id === "DETAIL_PICTURE")
+			return true;
+		elseif ($field_id === "PREVIEW_PICTURE")
+			return true;
+		elseif ($field_id === "PICTURE")
+			return true;
+		elseif ($iblock_id <= 0)
+			return false;
+		elseif (!preg_match("/^PROPERTY_(.+)\$/", $field_id, $match))
+			return false;
+		else
+		{
+			$db_prop = CIBlockProperty::GetPropertyArray($match[1], $iblock_id);
+			if(is_array($db_prop) && $db_prop["PROPERTY_TYPE"] === "F")
+				return true;
+		}
+		return false;
 	}
 }
 ?>

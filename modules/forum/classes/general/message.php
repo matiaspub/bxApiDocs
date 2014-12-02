@@ -7,76 +7,9 @@
 ##############################################
 IncludeModuleLangFile(__FILE__);
 
-
-/**
- * <b>CForumMessage</b> - класс для работы с сообщениями форумов.
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/index.php
- * @author Bitrix
- */
 class CAllForumMessage
 {
 	//---------------> Message add, update, delete
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новое сообщение в тему <i>TID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $TID  Код темы, в которую пользователь хочет добавить сообщение.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	*
-	*
-	*
-	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	* методом $USER-&gt;GetID()
-	*
-	*
-	*
-	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
-	* проверяются права самого форума, а идет доверие только этому
-	* параметру. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return bool 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if (CForumMessage::CanUserAddMessage($TID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	* {
-	* 	echo "You can add message!";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php
-	* @author Bitrix
-	*/
 	public static function CanUserAddMessage($TID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$TID = intVal($TID);
@@ -100,60 +33,6 @@ class CAllForumMessage
 		return False;
 	}
 
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, изменить сообщение с кодом <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $MID  Код сообщения, которое пользователь хочет изменить.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	*
-	*
-	*
-	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	* методом $USER-&gt;GetID()
-	*
-	*
-	*
-	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
-	* проверяются права самого форума, а идет доверие только этому
-	* параметру. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return bool 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if (CForumMessage::CanUserUpdateMessage($MID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	* {
-	* 	echo "You can modify this message!";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php
-	* @author Bitrix
-	*/
 	public static function CanUserUpdateMessage($MID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$MID = intVal($MID);
@@ -187,60 +66,6 @@ class CAllForumMessage
 		return false;
 	}
 
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, удалить сообщение с кодом <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $MID  Код сообщения, которое пользователь хочет удалить.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	*
-	*
-	*
-	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	* методом $USER-&gt;GetID()
-	*
-	*
-	*
-	* @param bool $ExternalPermission = false "Приоритетное право доступа", если этот параметр передается, то не
-	* проверяются права самого форума, а идет доверие только этому
-	* параметру. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @return bool 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if (CForumMessage::CanUserDeleteMessage($MID, $USER-&gt;GetUserGroupArray(), $USER-&gt;GetID()))
-	* {
-	* 	CForumMessage::Delete($MID);
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuseraddmessage.php">CForumMessage::CanUserAddMessage</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php
-	* @author Bitrix
-	*/
 	public static function CanUserDeleteMessage($MID, $arUserGroups, $iUserID = 0, $ExternalPermission = false)
 	{
 		$MID = intVal($MID);
@@ -411,75 +236,6 @@ class CAllForumMessage
 		return True;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующего сообщения с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого сообщения.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения, параметры которого необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
-	* полей сообщения</a>.
-	*
-	*
-	*
-	* @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
-	* сообщения не будут автоматически обсчитаны статистические
-	* данные. Это ускоряет работу функции, но создает логические ошибки
-	* в данных. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
-	* главного каталога для загрузки. Необязательный. По умолчанию
-	* равен "forum".
-	*
-	*
-	*
-	* @return int <p>Возвращает код измененного сообщения. В случае ошибки
-	* изменения возвращает False.</p> <h4>Примечания</h4><p>Перед изменением
-	* сообщения следует проверить возможность изменения методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p>
-	* <p>Для добавления и изменения сообщения и темы рекомендуется
-	* пользоваться высокоуровневой функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* // Добавление информации о редактировании на форумах, где есть только логины: 
-	* // 1. Не стоит использовать время PHP (время PHP и БД довольно часто различается, а сейчас в форуме, практически, везде используется время БД);
-	* // 2. Нельзя показывать логин пользователя без его разрешения.
-	* 
-	* &lt;?
-	* $arUser = CForumUser::GetByUSER_ID($USER-&gt;GetID());
-	* $arFields = array( 
-	*    "POST_MESSAGE" =&gt; $_POST["POST_MESSAGE"], 
-	*    "EDIT_DATE" =&gt; "", 
-	*    "EDITOR_ID" =&gt; $USER-&gt;GetID(), 
-	*    "EDITOR_NAME" =&gt; trim($arUser["SHOW_NAME"] == "Y" ? $USER-&gt;GetFullName() : $USER-&gt;GetLogin()));
-	* $arFields["EDITOR_NAME"] = (empty($arFields["EDITOR_NAME"]) ? $USER-&gt;GetLogin() : $arFields["EDITOR_NAME"]);
-	* CForumMessage::Update($MID, $arFields);
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	* </li></ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields, $skip_counts = false, $strUploadDir = false)
 	{
 		global $DB;
@@ -709,6 +465,15 @@ class CAllForumMessage
 			"INDEX_TITLE" => $arMessage["NEW_TOPIC"] == "Y",
 		);
 
+		// get mentions
+		$arMentionedUserID = CForumMessage::GetMentionedUserID($arMessage["POST_MESSAGE"]);
+		if (!empty($arMentionedUserID))
+		{
+			$arSearchInd["PARAMS"] = array(
+				"mentioned_user_id" => $arMentionedUserID
+			);
+		}
+
 		$urlPatterns = array(
 			"FORUM_ID" => $arMessage["FORUM_ID"],
 			"TOPIC_ID" => $arMessage["TOPIC_ID"],
@@ -744,35 +509,6 @@ class CAllForumMessage
 		CSearch::Index("forum", $ID, $arSearchInd, true);
 	}
 
-	
-	/**
-	* <p>Удаляет сообщение с кодом <i>ID</i>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения, которое необходимо удалить.
-	*
-	*
-	*
-	* @return bool <p>Перед удалением вызывает событие onBeforeMessageDelete с параметрами $ID и
-	* $arMessage, возвращение false из обработчика отменяет удаление
-	* сообщения.</p> <p>После удаления вызывает событие onAfterMessageDelete с теми
-	* же параметрами структура массива $arMessage соответствует результату
-	* работы функции CForumMessage::GetByID($ID). </p>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li>Перед удалением сообщения следует проверить возможность
-	* удаления методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserdeletemessage.php">CForumMessage::CanUserDeleteMessage</a>
-	* </li></ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -836,47 +572,6 @@ class CAllForumMessage
 	}
 
 	//---------------> Message list
-	
-	/**
-	* <p>Возвращает массив параметров сообщения по его коду <b>ID</b>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения.
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив добавления параметров.
-	*
-	*
-	*
-	* @return mixed 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arMessage = CForumMessage::GetByID($MID);
-	* if ($arMessage)
-	* {
-	*   $TID = IntVal($arMessage["TOPIC_ID"]);
-	*   $FID = IntVal($arMessage["FORUM_ID"]);
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	* </li></ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -917,49 +612,6 @@ class CAllForumMessage
 		return $res;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров сообщения, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения.
-	*
-	*
-	*
-	* @param array $arAddParams = Array() Массив добавления параметров.
-	*
-	*
-	*
-	* @return mixed 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Распечатаем на экран все возвращаемые параметры сообщения
-	* $arMessage = CForumMessage::GetByIDEx($MID);
-	* if ($arMessage)
-	* {
-	*   echo "&lt;pre&gt;";
-	*   print_r($arMessage);
-	*   echo "&lt;/pre&gt;";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	* </li></ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyidex.php
-	* @author Bitrix
-	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -1071,60 +723,6 @@ class CAllForumMessage
 	}
 
 	//---------------> Message utils
-	
-	/**
-	* <p>Возвращает страницу, на которой будет находиться сообщение с кодом <i>ID</i> для пользователя, входящего в группы <i>arUserGroups</i>, при постраничном показе с <i>mess_per_page</i> сообщениями на странице.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код сообщения.
-	*
-	*
-	*
-	* @param int $mess_per_page  Количество сообщений на страницу. Обычно равно переменной
-	* $FORUM_MESSAGES_PER_PAGE, которая определяется модулем форума. Эта
-	* переменная инициализируется из настроек модуля форума.
-	*
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray().
-	*
-	*
-	*
-	* @param bool $TID = false Код темы форума. Необязательный. По умолчанию равен False.
-	*
-	*
-	*
-	* @param array $arAddParams  Массив параметров. </h
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* if ($MID&gt;0)
-	*   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE, true, CForumMessage::GetMessagePage($MID, $FORUM_MESSAGES_PER_PAGE, $USER-&gt;GetUserGroupArray()));
-	* else
-	*   $db_Message-&gt;NavStart($FORUM_MESSAGES_PER_PAGE);
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>
-	* </li></ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getmessagepage.php
-	* @author Bitrix
-	*/
 	public static function GetMessagePage($ID, $mess_per_page, $arUserGroups, $TID = false, $arAddParams = array())
 	{
 		$ID = intVal($ID);
@@ -1533,6 +1131,22 @@ class CAllForumMessage
 				CWebDavIblock::appendRightsOnElements($arDocs, $rights);
 			}
 		}
+	}
+
+	public static function GetMentionedUserID($strMessage)
+	{
+		$arMentionedUserID = array();
+								
+		if (strlen($strMessage) > 0)
+		{
+			preg_match_all("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER, $strMessage, $arMention);
+			if (!empty($arMention))
+			{
+				$arMentionedUserID = array_merge($arMentionedUserID, $arMention[1]);
+			}
+		}
+
+		return $arMentionedUserID;
 	}
 }
 

@@ -4,7 +4,7 @@
  */
 global $USER_FIELD_MANAGER;
 
-// 2012-04-14 Checked/modified for compatibility with new data model
+
 
 /**
  * 
@@ -20,7 +20,6 @@ global $USER_FIELD_MANAGER;
  */
 abstract class CAllTestAttempt
 {
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function CheckFields(&$arFields, $ID = false, $bCheckRights = true)
 	{
 		global $DB, $APPLICATION;
@@ -90,7 +89,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Метод добавляет новую попытку.</p>
@@ -182,7 +180,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Метод изменяет параметры попытки с идентификатором ID.</p>
@@ -281,7 +278,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Метод удаляет попытку с идентификатором ID.</p>
@@ -349,7 +345,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function GetFilter($arFilter)
 	{
 
@@ -397,7 +392,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
@@ -431,7 +425,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Возвращает количество попыток студента для указанного теста.</p>
@@ -469,7 +462,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Проверяет, пройден ли тест.</p>
@@ -563,7 +555,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function OnAttemptChange($ATTEMPT_ID, $bCOMPLETED = false)
 	{
 		global $DB;
@@ -646,7 +637,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы.</p>
@@ -726,7 +716,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function RecountQuestions($ATTEMPT_ID)
 	{
 		global $DB;
@@ -752,7 +741,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	public static function IsTestFailed($ATTEMPT_ID, $PERCENT)
 	{
 		global $DB;
@@ -811,7 +799,6 @@ abstract class CAllTestAttempt
 	}
 
 
-	// 2012-04-13 Checked/modified for compatibility with new data model
 	
 	/**
 	* <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
@@ -985,7 +972,8 @@ abstract class CAllTestAttempt
 
 		$bCheckPerm = 'ORPHANED VAR';
 
-		$strSql = static::_GetListSQLFormer($sSelect, $obUserFieldsSql, $bCheckPerm, $USER, $arFilter, $strSqlSearch);
+		$strSqlFrom = '';
+		$strSql = static::_GetListSQLFormer($sSelect, $obUserFieldsSql, $bCheckPerm, $USER, $arFilter, $strSqlSearch, $strSqlFrom);
 
 		if (!is_array($arOrder))
 			$arOrder = Array();
@@ -1042,20 +1030,95 @@ abstract class CAllTestAttempt
 
 		$strSql .= $strSqlOrder;
 
-		if (isset($arNavParams['NAV_PARAMS']['nPageTop']) && ($arNavParams['NAV_PARAMS']['nPageTop'] > 0))
-			$strSql = $DB->TopSql($strSql, $arNavParams['NAV_PARAMS']['nPageTop']);
+		if ( ! empty($arNavParams) )
+		{
+			$nTopCount = null;
+			if (isset($arNavParams['NAV_PARAMS']['nPageTop']) && ($arNavParams['NAV_PARAMS']['nPageTop'] > 0))
+				$nTopCount = (int) $arNavParams['NAV_PARAMS']['nPageTop'];
+			else if (isset($arNavParams['nPageTop']))
+				$nTopCount = (int) $arNavParams['nPageTop'];
+			else if (isset($arNavParams['nTopCount']))
+				$nTopCount = (int) $arNavParams['nTopCount'];
+			else
+			{
+				$res_cnt = $DB->Query("SELECT COUNT(A.ID) as C " . $strSqlFrom);
+				$res_cnt = $res_cnt->fetch();
+				$res = new CDBResult();
+				$res->NavQuery($strSql, $res_cnt['C'], $arNavParams);
+				$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields("LEARN_ATTEMPT"));
+			}
 
-		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields("LEARN_ATTEMPT"));
+			if ($nTopCount !== null)
+			{
+				$strSql = $DB->TopSql($strSql, $nTopCount);
+				$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields("LEARN_ATTEMPT"));
+			}
+		}
+		else
+		{
+			$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$res->SetUserFields($USER_FIELD_MANAGER->GetUserFields("LEARN_ATTEMPT"));
+		}
+
 
 		return $res;
 	}
 
 
-	// 2012-04-14 Checked/modified for compatibility with new data model
-	protected static function _CreateAttemptQuestions($arCallbackSqlFormer, $ATTEMPT_ID)
+	
+	/**
+	* <p>Создаёт план вопросов для указанной попытки.</p>
+	*
+	*
+	*
+	*
+	* @param int $ATTEMPT_ID  Идентификатор попытки.
+	*
+	*
+	*
+	* @return bool <p>Метод возвращает <i>true</i>, если создание плана вопросов прошло
+	* успешно. При возникновении ошибки метод вернёт <i>false</i>, а в
+	* исключениях будут содержаться ошибки.</p>
+	*
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if (CModule::IncludeModule("learning"))
+	* {
+	*     $ATTEMPT_ID = 563;
+	* 
+	*     $success = CTestAttempt::CreateAttemptQuestions($ATTEMPT_ID);
+	* 
+	*     if($success)
+	*     {
+	*         echo "Questions have been created.";
+	*     }
+	*     else
+	*     {
+	*         if($ex = $APPLICATION-&gt;GetException())
+	*             echo "Error: ".$ex-&gt;GetString();
+	*     }
+	* 
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/index.php">CTestResult</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestresult/add.php">Add</a> </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/createattemptquestions.php
+	* @author Bitrix
+	*/
+	public static function CreateAttemptQuestions($ATTEMPT_ID)
 	{
-		global $APPLICATION, $DB;
+		global $APPLICATION, $DB, $DBType;
 
 		$ATTEMPT_ID = intval($ATTEMPT_ID);
 
@@ -1127,7 +1190,7 @@ abstract class CAllTestAttempt
 
 				. " AND Q.ACTIVE = 'Y' "		// active questions only
 				. ($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "")
-				. "ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT");
+				. "ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID");
 			}
 			else	// 'L' X questions from every lesson in course
 			{
@@ -1137,7 +1200,7 @@ abstract class CAllTestAttempt
 				"INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID ".
 				"WHERE L.ID IN (" . $clauseAllChildsLessons . ") AND Q.ACTIVE = 'Y' ".
 				($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
-				"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT");
+				"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID");
 			}
 
 			if (!$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__))
@@ -1210,19 +1273,50 @@ abstract class CAllTestAttempt
 			}
 
 			$strSql =
-			"INSERT INTO b_learn_test_result (ATTEMPT_ID, QUESTION_ID) ".
-			"SELECT ".$ATTEMPT_ID." ,Q.ID ".
+			"SELECT Q.ID AS QUESTION_ID ".
 			"FROM b_learn_lesson L ".
 			"INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID ".
 			"WHERE " . $WHERE . " AND Q.ACTIVE = 'Y' ".
 			($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
-			"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "Q.SORT ").
+			"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID ").
 			($arTest["QUESTIONS_AMOUNT"] > 0 ? "LIMIT ".$arTest["QUESTIONS_AMOUNT"] :"");
 
-			//echo $strSql;exit;
+			$success = false;
+			$rsQuestions = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			$q = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if (!$q || intval($q->AffectedRowsCount())<=0)
+			$strSql = '';
+			if ($rsQuestions)
+			{
+				if ($DBType === 'oracle')
+				{
+					while ($arQuestion = $rsQuestions->fetch())
+					{
+						$strSql .= " \nINTO b_learn_test_result (ATTEMPT_ID, QUESTION_ID) "
+							. "VALUES (" . $ATTEMPT_ID . ", " . (int) $arQuestion['QUESTION_ID'] . ")";
+					}
+
+					if ($strSql !== '')
+						$strSql = "INSERT ALL " . $strSql . " \nSELECT 1 FROM DUAL";
+				}
+				else
+				{
+					$arSqlSubstrings = array();
+					while ($arQuestion = $rsQuestions->fetch())
+						$arSqlSubstrings[] = "(" . $ATTEMPT_ID . ", " . $arQuestion['QUESTION_ID'] . ")";
+
+					if ( ! empty($arSqlSubstrings) )
+						$strSql = "INSERT INTO b_learn_test_result (ATTEMPT_ID, QUESTION_ID) VALUES " . implode(",\n", $arSqlSubstrings);
+				}
+
+				if ($strSql !== '')
+				{
+					$rc = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($rc && intval($rc->AffectedRowsCount()) > 0)
+						$success = true;
+				}
+			}
+
+			if ( ! $success )
 			{
 				$APPLICATION->ThrowException(GetMessage("LEARNING_BAD_TEST_IS_EMPTY"), "ERROR_TEST_IS_EMPTY");
 				return false;
@@ -1240,17 +1334,83 @@ abstract class CAllTestAttempt
 
 			$clauseAllChildsLessons = CLearnHelper::SQLClauseForAllSubLessons ($courseLessonId);
 
-			$strSql = call_user_func($arCallbackSqlFormer, $ATTEMPT_ID, $arTest, $clauseAllChildsLessons, $courseLessonId);
+			if ($DBType === 'mysql')
+			{
+				$strSql =
+				"SELECT Q.ID AS QUESTION_ID
+				FROM b_learn_lesson L
+				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				AND Q.ACTIVE = 'Y' "
+				. ($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
+				"ORDER BY " . ($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID ").
+				($arTest["QUESTIONS_AMOUNT"] > 0 ? "LIMIT " . ($arTest["QUESTIONS_AMOUNT"] + 0) : "");
 
-			//echo $strSql; exit;
+			}
+			elseif ($DBType === 'mssql')
+			{
+				$strSql =
+				"SELECT " . ($arTest["QUESTIONS_AMOUNT"] > 0 ? "TOP " . ($arTest["QUESTIONS_AMOUNT"] + 0) . " " :"") . " Q.ID AS QUESTION_ID 
+				FROM b_learn_lesson L
+				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				AND Q.ACTIVE = 'Y' "
+				. ($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
+				"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID");
+			}
+			else	// oracle
+			{
+				$strSql =
+				"SELECT Q.ID AS QUESTION_ID 
+				FROM b_learn_lesson L 
+				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID 
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				AND Q.ACTIVE = 'Y' "
+				. ($arTest["QUESTIONS_AMOUNT"] > 0 ? "AND ROWNUM <= ".$arTest["QUESTIONS_AMOUNT"]." " :"").
+				($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
+				"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID");
+			}
 
-			$q = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if (!$q || intval($q->AffectedRowsCount())<=0)
+			$success = false;
+			$rsQuestions = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			$strSql = '';
+			if ($rsQuestions)
+			{
+				if ($DBType === 'oracle')
+				{
+					while ($arQuestion = $rsQuestions->fetch())
+					{
+						$strSql .= " \nINTO b_learn_test_result (ATTEMPT_ID, QUESTION_ID) "
+							. "VALUES (" . $ATTEMPT_ID . ", " . (int) $arQuestion['QUESTION_ID'] . ")";
+					}
+
+					if ($strSql !== '')
+						$strSql = "INSERT ALL " . $strSql . " \nSELECT 1 FROM DUAL";
+				}
+				else
+				{
+					$arSqlSubstrings = array();
+					while ($arQuestion = $rsQuestions->fetch())
+						$arSqlSubstrings[] = "(" . $ATTEMPT_ID . ", " . $arQuestion['QUESTION_ID'] . ")";
+
+					if ( ! empty($arSqlSubstrings) )
+						$strSql = "INSERT INTO b_learn_test_result (ATTEMPT_ID, QUESTION_ID) VALUES " . implode(",\n", $arSqlSubstrings);
+				}
+
+				if ($strSql !== '')
+				{
+					$rc = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					if ($rc && intval($rc->AffectedRowsCount()) > 0)
+						$success = true;
+				}
+			}
+
+			if ( ! $success )
 			{
 				$APPLICATION->ThrowException(GetMessage("LEARNING_BAD_TEST_IS_EMPTY"), "ERROR_TEST_IS_EMPTY");
 				return false;
 			}
-
 		}
 		else
 			return (false);

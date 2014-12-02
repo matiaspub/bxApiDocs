@@ -10,25 +10,36 @@ namespace Bitrix\Main\Entity;
 
 class EventResult extends \Bitrix\Main\EventResult
 {
-	protected $modified;
-	protected $unset;
-	protected $errors;
+	/** @var array */
+	protected $modified = array();
 
-	public function __construct()
+	/** @var string[] */
+	protected $unset = array();
+
+	/** @var FieldError[] */
+	protected $errors = array();
+
+	static public function __construct()
 	{
 		parent::__construct(parent::SUCCESS, $parameters = null, $moduleId = null, $handler = null);
-		$this->modified = array();
-		$this->unset = array();
-		$this->errors = array();
 	}
 
 	/**
 	 * Sets the errors array and changes the event type to ERROR
-	 * @param array $errors
+	 * @param FieldError[] $errors
 	 */
 	public function setErrors(array $errors)
 	{
 		$this->errors = $errors;
+		$this->type = parent::ERROR;
+	}
+
+	/**
+	 * @param FieldError $error
+	 */
+	public function addError(FieldError $error)
+	{
+		$this->errors[] = $error;
 		$this->type = parent::ERROR;
 	}
 
@@ -58,6 +69,14 @@ class EventResult extends \Bitrix\Main\EventResult
 	public function unsetFields(array $fields)
 	{
 		$this->unset = $fields;
+	}
+
+	/**
+	 * @param string $fieldName
+	 */
+	public function unsetField($fieldName)
+	{
+		$this->unset[] = $fieldName;
 	}
 
 	public function getUnset()

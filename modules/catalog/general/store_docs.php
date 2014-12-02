@@ -21,7 +21,7 @@ class CAllCatalogDocs
 	{
 		/** @global CDataBase $DB */
 		global $DB;
-		$id = intval($id);
+		$id = (int)$id;
 
 		if(array_key_exists('DATE_CREATE',$arFields))
 			unset($arFields['DATE_CREATE']);
@@ -34,13 +34,13 @@ class CAllCatalogDocs
 
 		$arFields['~DATE_MODIFY'] = $DB->GetNowFunction();
 
-		if($id <= 0 || !self::CheckFields('UPDATE', $arFields))
+		if ($id <= 0 || !self::CheckFields('UPDATE', $arFields))
 			return false;
 		$strUpdate = $DB->PrepareUpdate("b_catalog_store_docs", $arFields);
 
 		if(!empty($strUpdate))
 		{
-			$strSql = "UPDATE b_catalog_store_docs SET ".$strUpdate." WHERE ID = ".$id." ";
+			$strSql = "update b_catalog_store_docs set ".$strUpdate." where ID = ".$id;
 			if(!$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__))
 				return false;
 
@@ -63,7 +63,7 @@ class CAllCatalogDocs
 	public static function delete($id)
 	{
 		global $DB;
-		$id = intval($id);
+		$id = (int)$id;
 		if($id > 0)
 		{
 			$dbDocument = CCatalogDocs::getList(array(), array("ID" => $id), false, false, array('ID', 'STATUS'));
@@ -131,8 +131,8 @@ class CAllCatalogDocs
 	{
 		global $APPLICATION;
 
-		$documentId = intval($documentId);
-		$userId = intval($userId);
+		$documentId = (int)$documentId;
+		$userId = (int)$userId;
 		$currency = null;
 		$contractorId = 0;
 		$result = false;
@@ -181,7 +181,8 @@ class CAllCatalogDocs
 	public static function cancellationDocument($documentId, $userId = 0)
 	{
 		$result = '';
-		$documentId = intval($documentId);
+		$documentId = (int)$documentId;
+		$userId = (int)$userId;
 		$dbDocType = CCatalogDocs::getList(
 			array(),
 			array("ID" => $documentId),
@@ -203,8 +204,8 @@ class CAllCatalogDocs
 			{
 				$arDocFields = array("STATUS" => "N");
 
-				if(intval($userId) > 0)
-					$arDocFields["STATUS_BY"] = intval($userId);
+				if($userId > 0)
+					$arDocFields["STATUS_BY"] = $userId;
 				if(!self::Update($documentId, $arDocFields))
 					return false;
 			}
@@ -215,7 +216,7 @@ class CAllCatalogDocs
 	public static function OnIBlockElementDelete($productID)
 	{
 		global $DB;
-		$productID = IntVal($productID);
+		$productID = (int)$productID;
 		if($productID > 0)
 		{
 			$dbDeleteElements = CCatalogStoreDocsElement::getList(array(), array("ELEMENT_ID" => $productID), false, false, array('ID'));
@@ -223,29 +224,31 @@ class CAllCatalogDocs
 			{
 				CCatalogStoreDocsElement::delete($arDeleteElements["ID"]);
 			}
-			return $DB->Query("DELETE FROM b_catalog_store_barcode WHERE PRODUCT_ID = ".$productID." ", true);
+			return $DB->Query("delete from b_catalog_store_barcode where PRODUCT_ID = ".$productID, true);
 		}
 	}
 
 	public static function OnCatalogStoreDelete($storeID)
 	{
 		global $DB;
-		$storeID = IntVal($storeID);
+		$storeID = (int)$storeID;
 		if ($storeID > 0)
 		{
-			return $DB->Query("DELETE FROM b_catalog_store_barcode WHERE STORE_ID = ".$storeID." ", true);
+			return $DB->Query("delete from b_catalog_store_barcode where STORE_ID = ".$storeID, true);
 		}
 	}
 
 	public static function OnBeforeIBlockElementDelete($productID)
 	{
-		$productID = IntVal($productID);
-		if($productID > 0)
+		global $APPLICATION;
+
+		$productID = (int)$productID;
+		if ($productID > 0)
 		{
 			$dbStoreDocs = CCatalogDocs::getList(array(), array("PRODUCTS_ELEMENT_ID" => $productID, "STATUS" => "Y"), false, false, array('ID'));
-			if($arStoreDocs = $dbStoreDocs->fetch())
+			if ($arStoreDocs = $dbStoreDocs->fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("CAT_DOC_ERROR_ELEMENT_IN_DOCUMENT"));
+				$APPLICATION->ThrowException(GetMessage("CAT_DOC_ERROR_ELEMENT_IN_DOCUMENT"));
 				return false;
 			}
 		}

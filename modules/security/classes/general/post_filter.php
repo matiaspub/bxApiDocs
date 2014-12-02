@@ -53,8 +53,11 @@ class CSecurityXSSDetect
 	 */
 	public function process($content)
 	{
-		if(!preg_match('/<script/i' ,$content))
+		if(!preg_match('#</script#' ,$content))
+		{
+			// Probably does not include the scripts
 			return $content;
+		}
 
 		$this->variables = new CSecurityXSSDetectVariables();
 		$this->extractVariablesFromArray("\$_GET", $_GET);
@@ -281,11 +284,11 @@ class CSecurityXSSDetect
 			return;
 		if(strlen($value) <= 2)
 			return; //too short
-		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/", $value))
+		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/D", $value))
 			return; //there is no potantially dangerous code
-		if(preg_match("/^[,0-9_-]*\$/", $value))
+		if(preg_match("/^[,0-9_-]*\$/D", $value))
 			return; //there is no potantially dangerous code
-		if($name === '$_COOKIE[__utmz]' && preg_match("/^[0-9.]++(utm[a-z]{3}=\(?([a-z\/0-1.]++|\(not provided\))\)?\|?)++\$/i", $value))
+		if($name === '$_COOKIE[__utmz]' && preg_match("/^[0-9.]++(utm[a-z]{3}=\(?([a-z\/0-1.]++|\(not provided\))\)?\|?)++\$/iD", $value))
 			return; //there is no potantially dangerous code, google analytics
 
 		$this->variables->addVariable($name, str_replace(chr(0), "", $value));

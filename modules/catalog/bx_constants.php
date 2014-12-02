@@ -245,6 +245,11 @@ define('BX_CAT_CRON', true);
 define('NO_AGENT_CHECK', true);
 
 /**
+ * SITE_ID
+ */
+define('SITE_ID', 's1');
+
+/**
  * STOP_STATISTICS
  */
 define('STOP_STATISTICS', true);

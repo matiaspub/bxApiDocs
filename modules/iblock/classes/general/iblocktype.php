@@ -15,7 +15,7 @@ IncludeModuleLangFile(__FILE__);
  */
 
 /**
- * CIBlockType - класс для работы с типами информационных блоков.
+ * CIBlockType - класс для работы с типами информационных блоков.</body> </html>
  *
  *
  *
@@ -118,7 +118,7 @@ class CIBlockType
 			if (!is_array($val) && strlen($val) <= 0)
 				continue;
 
-			switch (strtoupper($key)) 
+			switch (strtoupper($key))
 			{
 			case "ID":
 				$strSqlSearch .= "AND UPPER(T.ID) LIKE UPPER('".$DB->ForSql($val)."')\n";
@@ -238,7 +238,10 @@ class CIBlockType
 			$rs = $DB->Query("SELECT * FROM b_iblock_type_lang");
 			while ($ar = $rs->GetNext())
 			{
-				$arIBlocks[$ar['IBLOCK_TYPE_ID']]["_lang"][$ar["LID"]] = $ar;
+				if (array_key_exists($ar['IBLOCK_TYPE_ID'], $arIBlocks))
+				{
+					$arIBlocks[$ar['IBLOCK_TYPE_ID']]["_lang"][$ar["LID"]] = $ar;
+				}
 			}
 			$CACHE_MANAGER->Set("b_iblock_type", $arIBlocks);
 		}
@@ -299,7 +302,7 @@ class CIBlockType
 		{
 			$arResult = CIBlockType::_GetCache($ID);
 			$res = new CDBResult;
-			if ($arResult !== false)
+			if ($arResult !== false && isset($arResult["ID"]))
 			{
 				unset($arResult["_lang"]);
 				$res->InitFromArray(array($arResult));

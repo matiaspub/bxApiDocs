@@ -16,10 +16,9 @@ namespace Bitrix\Main\Data;
 class HsphpReadConnection extends NosqlConnection implements \Bitrix\Main\Entity\INosqlPrimarySelector
 {
 	protected $host = 'localhost';
-
 	protected $port = '9998';
 
-	public function __construct($configuration)
+	public function __construct(array $configuration)
 	{
 		parent::__construct($configuration);
 

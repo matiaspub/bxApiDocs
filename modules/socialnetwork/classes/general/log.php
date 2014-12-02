@@ -10,7 +10,7 @@ class CAllSocNetLog
 	{
 		static $arSiteWorkgroupsPage;
 
-		global $DB, $arSocNetAllowedEntityTypes, $arSocNetAllowedSubscribeEntityTypes, $arSocNetFeaturesSettings, $arSocNetLogEvents;
+		global $DB, $arSocNetAllowedEntityTypes;
 
 		if (!$arSiteWorkgroupsPage && IsModuleInstalled("extranet") && $arFields["ENTITY_TYPE"] == SONET_ENTITY_GROUP)
 		{
@@ -34,7 +34,7 @@ class CAllSocNetLog
 		}
 		elseif (is_set($arFields, "ENTITY_TYPE"))
 		{
-			if (!in_array($arFields["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypes))
+			if (!in_array($arFields["ENTITY_TYPE"], CSocNetAllowed::GetAllowedEntityTypes()))
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GL_ERROR_NO_ENTITY_TYPE"), "ERROR_NO_ENTITY_TYPE");
 				return false;
@@ -280,6 +280,8 @@ class CAllSocNetLog
 
 	public static function SendEvent($ID, $mailTemplate = "SONET_NEW_EVENT", $tmp_id = false, $bAgent = false, $bTransport = false)
 	{
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
 		$ID = IntVal($ID);
 		$tmp_id = IntVal($tmp_id);
 
@@ -344,16 +346,18 @@ class CAllSocNetLog
 		}
 
 		if (
-			array_key_exists($arLog["ENTITY_TYPE"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"])
-			&& array_key_exists("HAS_MY", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]])
-			&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["HAS_MY"] == "Y"
-			&& array_key_exists("CLASS_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]])
-			&& array_key_exists("METHOD_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]])
-			&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["CLASS_OF"]) > 0
-			&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["METHOD_OF"]) > 0
-			&& method_exists($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["METHOD_OF"])
+			array_key_exists($arLog["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypesDesc)
+			&& array_key_exists("HAS_MY", $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]])
+			&& $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["HAS_MY"] == "Y"
+			&& array_key_exists("CLASS_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]])
+			&& array_key_exists("METHOD_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]])
+			&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["CLASS_OF"]) > 0
+			&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["METHOD_OF"]) > 0
+			&& method_exists($arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["METHOD_OF"])
 		)
-			$arOfEntities = call_user_func(array($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLog["ENTITY_TYPE"]]["METHOD_OF"]), $arLog["ENTITY_ID"]);
+		{
+			$arOfEntities = call_user_func(array($arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$arLog["ENTITY_TYPE"]]["METHOD_OF"]), $arLog["ENTITY_ID"]);
+		}
 
 		if ($bTransport)
 		{

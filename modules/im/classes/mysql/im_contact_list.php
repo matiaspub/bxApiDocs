@@ -47,7 +47,7 @@ class CIMContactList extends CAllIMContactList
 		$strSQL = "
 			SELECT U.ID, S.STATUS
 			FROM b_user U LEFT JOIN b_im_status S ON U.ID = S.USER_ID
-			WHERE U.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL 180 SECOND)
+			WHERE U.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL 120 SECOND)
 		";
 		$dbUsers = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		while ($arUser = $dbUsers->Fetch())

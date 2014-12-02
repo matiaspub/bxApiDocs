@@ -695,7 +695,7 @@ class CCalendarSect
 		if (!isset($USER) || !is_object($USER) || !$sectId)
 			return false;
 
-		if ($USER->CanDoOperation('edit_php'))
+		if ($userId == CCalendar::GetCurUserId() && $USER->CanDoOperation('edit_php'))
 			return true;
 
 		if ((CCalendar::GetType() == 'group' || CCalendar::GetType() == 'user') && CCalendar::IsSocNet() && CCalendar::IsSocnetAdmin())
@@ -786,7 +786,8 @@ class CCalendarSect
 
 	public static function GetOutlookLink($Params)
 	{
-		return CIntranetUtils::GetStsSyncURL($Params);
+		if (CModule::IncludeModule('intranet'))
+			return CIntranetUtils::GetStsSyncURL($Params);
 	}
 
 	private static function GetUniqCalendarId()

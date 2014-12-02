@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.
+ * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.</body> </html>
  *
  *
  *
@@ -42,6 +42,13 @@ class CSocNetTextParser
 		7 => 160); //"xx-large"
 	var $word_separator = "\s.,;:!?\#\-\*\|\[\]\(\)\{\}";
 
+	var $matchNum = 0;
+	var $matchNum2 = 0;
+	var $matchType = "html";
+	var $matchType2 = "";
+	var $matchType3 = "";
+	var $matchType4 = "";
+
 	public function CSocNetTextParser($strLang = False, $pathToSmile = false)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -73,8 +80,10 @@ class CSocNetTextParser
 				}
 			}
 
-			public function sonet_sortlen($a, $b) {
-				if (strlen($a["TYPING"]) == strlen($b["TYPING"])) {
+			public function sonet_sortlen($a, $b) 
+			{
+				if (strlen($a["TYPING"]) == strlen($b["TYPING"])) 
+				{
 					return 0;
 				}
 				return (strlen($a["TYPING"]) > strlen($b["TYPING"])) ? -1 : 1;
@@ -98,7 +107,7 @@ class CSocNetTextParser
 	*
 	*
 	*
-	* @param string $text  Исходное сообщение. </htm
+	* @param string $text  Исходное сообщение. </ht
 	*
 	*
 	*
@@ -166,19 +175,31 @@ class CSocNetTextParser
 				$text = str_replace(array("\001", "\002", chr(5), chr(6), "'", "\""), array("", "", "", "", chr(5), chr(6)), $text);
 				$text = preg_replace(
 					array(
-					"#<code(\s+[^>]*>|>)(.+?)</code(\s+[^>]*>|>)#is".BX_UTF_PCRE_MODIFIER,
-					"/\[code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
-					"/\[\/code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
-					"/(?<=[\001])(([^\002]+))(?=([\002]))/ise".BX_UTF_PCRE_MODIFIER,
-					"/\001/",
-					"/\002/"),
+						"#<code(\s+[^>]*>|>)(.+?)</code(\s+[^>]*>|>)#is".BX_UTF_PCRE_MODIFIER,
+						"/\[code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
+						"/\[\/code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER),
 					array(
-					"[code]\\2[/code]",
-					"\001",
-					"\002",
-					"\$this->pre_convert_code_tag('\\2')",
-					"[code]",
-					"[/code]"), $text);
+						"[code]\\2[/code]",
+						"\001",
+						"\002",
+					),
+					$text
+				);
+				$this->matchNum = 2;
+				$text = preg_replace_callback(
+					"/(?<=[\001])(([^\002]+))(?=([\002]))/is".BX_UTF_PCRE_MODIFIER, 
+					array($this, "pre_convert_code_tag_callback"), 
+					$text
+				);
+				$text = preg_replace(
+					array(
+						"/\001/",
+						"/\002/"),
+					array(
+						"[code]",
+						"[/code]"
+					), $text
+				);
 				$text = str_replace(array(chr(5), chr(6)), array("'", "\""), $text);
 			}
 			if ($allow["ANCHOR"]=="Y")
@@ -260,41 +281,74 @@ class CSocNetTextParser
 			$text = preg_replace("'(?<=^|[".$word_separator."]|\s)((http|https|news|ftp|aim|mailto)://[\.\-\_\:a-z0-9\@]([^\"\s\'\[\]\{\}\(\)])*)'is",
 				"[url]\\1[/url]", $text);
 		}
-		if ($allow["CODE"]=="Y")
+		if ($allow["CODE"] == "Y")
 		{
 			$text = preg_replace(
 				array(
-				"/\[code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
-				"/\[\/code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
-				"/(\001)([^\002]+)(\002)/ies".BX_UTF_PCRE_MODIFIER,
-				"/\001/",
-				"/\002/"),
+					"/\[code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER,
+					"/\[\/code([^\]])*\]/is".BX_UTF_PCRE_MODIFIER
+				),
 				array(
-				"\001",
-				"\002",
-				"\$this->convert_code_tag('[code]\\2[/code]', \$type)",
-				"[code]",
-				"[/code]"), $text);
+					"\001",
+					"\002"
+				), 
+				$text
+			);
+			$this->matchNum = 2;
+			$this->matchType = $type;
+			$text = preg_replace_callback(
+				"/(\001)([^\002]+)(\002)/is".BX_UTF_PCRE_MODIFIER, 
+				array($this, "convert_code_tag_callback"), 
+				$text
+			);
+			$text = preg_replace(
+				array(
+					"/\001/",
+					"/\002/"
+				),
+				array(
+					"[code]",
+					"[/code]"
+				), 
+				$text
+			);			
 		}
-		if ($allow["QUOTE"]=="Y")
+		if ($allow["QUOTE"] == "Y")
 		{
-			$text = preg_replace("#(\[quote([^\]])*\](.*)\[/quote([^\]])*\])#ies", "\$this->convert_quote_tag('\\1', \$type)", $text);
+			$this->matchNum = 1;
+			$this->matchType = $type;
+			$text = preg_replace_callback(
+				"#(\[quote([^\]])*\](.*)\[/quote([^\]])*\])#is", 
+				array($this, "convert_quote_tag_callback"),
+				$text
+			);			
 		}
 		if ($allow["IMG"]=="Y")
 		{
-			$text = preg_replace("#\[img\](.+?)\[/img\]#ie", "\$this->convert_image_tag('\\1', \$type)", $text);
+			$this->matchNum = 1;
+			$this->matchType = $type;
+			$text = preg_replace_callback(
+				"#\[img\](.+?)\[/img\]#i",
+				array($this, "convert_image_tag_callback"),
+				$text
+			);
 		}
-		if ($allow["ANCHOR"]=="Y")
+		if ($allow["ANCHOR"] == "Y")
 		{
-			$text = preg_replace(
-				array(
-					"/\[url\]([^\]]+?)\[\/url\]/ie".BX_UTF_PCRE_MODIFIER,
-					"/\[url\s*=\s*([^\]]+?)\s*\](.*?)\[\/url\]/ie".BX_UTF_PCRE_MODIFIER
-					),
-				array(
-					"\$this->convert_anchor_tag('\\1', '\\1', '' , \$type)",
-					"\$this->convert_anchor_tag('\\1', '\\2', '', \$type)"),
-				$text);
+			$this->matchNum = 1;
+			$this->matchNum2 = 1;
+			$text = preg_replace_callback(
+				"/\[url\]([^\]]+?)\[\/url\]/i".BX_UTF_PCRE_MODIFIER,
+				array($this, "convert_anchor_tag_callback"),
+				$text
+			);
+			$this->matchNum = 1;
+			$this->matchNum2 = 2;
+			$text = preg_replace_callback(
+				"/\[url\s*=\s*([^\]]+?)\s*\](.*?)\[\/url\]/i".BX_UTF_PCRE_MODIFIER,
+				array($this, "convert_anchor_tag_callback"),
+				$text
+			);
 		}
 		if ($allow["BIU"]=="Y")
 		{
@@ -325,44 +379,75 @@ class CSocNetTextParser
 		{
 			while (preg_match("/\[size\s*=\s*([^\]]+)\](.+?)\[\/size\]/is".BX_UTF_PCRE_MODIFIER, $text))
 			{
-				$text = preg_replace("/\[size\s*=\s*([^\]]+)\](.+?)\[\/size\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('size', '\\1', '\\2')", $text);
+				$this->matchNum = 1;
+				$this->matchNum2 = 2;
+				$this->matchType = 'size';
+				$text = preg_replace_callback(
+					"/\[size\s*=\s*([^\]]+)\](.+?)\[\/size\]/is".BX_UTF_PCRE_MODIFIER, 
+					array($this, "convert_font_attr_callback"),
+					$text
+				);				
 			}
 			while (preg_match("/\[font\s*=\s*([^\]]+)\](.*?)\[\/font\]/is".BX_UTF_PCRE_MODIFIER, $text))
 			{
-				$text = preg_replace("/\[font\s*=\s*([^\]]+)\](.*?)\[\/font\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('font', '\\1', '\\2')", $text);
+				$this->matchNum = 1;
+				$this->matchNum2 = 2;
+				$this->matchType = 'font';
+				$text = preg_replace_callback(
+					"/\[font\s*=\s*([^\]]+)\](.*?)\[\/font\]/is".BX_UTF_PCRE_MODIFIER,
+					array($this, "convert_font_attr_callback"),
+					$text
+				);
 			}
 			while (preg_match("/\[color\s*=\s*([^\]]+)\](.+?)\[\/color\]/is".BX_UTF_PCRE_MODIFIER, $text))
 			{
-				$text = preg_replace("/\[color\s*=\s*([^\]]+)\](.+?)\[\/color\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_font_attr('color', '\\1', '\\2')", $text);
+				$this->matchNum = 1;
+				$this->matchNum2 = 2;
+				$this->matchType = 'color';
+				$text = preg_replace_callback(
+					"/\[color\s*=\s*([^\]]+)\](.+?)\[\/color\]/is".BX_UTF_PCRE_MODIFIER, 
+					array($this, "convert_font_attr_callback"),
+					$text
+				);
 			}
 		}
-
-
-//			$text = preg_replace("#(^|\s)((http|https|news|ftp)://[-_:A-Za-z0-9@]+(\.[-_/=:A-Za-z0-9@&?=%]+)+)#ie", "\$this->convert_anchor_tag('\\2', '\\2', '\\1')", $text);
 
 		$text = str_replace(
 			array(
 				"(c)", "(C)",
 				"(tm)", "(TM)", "(Tm)", "(tM)",
 				"(r)", "(R)",
-				"\n"),
+				"\n"
+			),
 			array(
 				"&copy;", "&copy;",
 				"&#153;", "&#153;", "&#153;", "&#153;",
 				"&reg;", "&reg;",
-				"<br />"), $text);
-		if ($this->MaxStringLen>0)
+				"<br />"
+			), 
+			$text
+		);
+		if ($this->MaxStringLen > 0)
 		{
-			$text = preg_replace("/(?<=^|\>)([^\<]+)(?=\<|$)/ies".BX_UTF_PCRE_MODIFIER, "\$this->part_long_words('\\1')", $text);
+			$this->matchNum = 1;
+			$text = preg_replace_callback(
+				"/(?<=^|\>)([^\<]+)(?=\<|$)/is".BX_UTF_PCRE_MODIFIER, 
+				array($this, "part_long_words_callback"),
+				$text
+			);
 		}
 		if ($allow["SMILES"]=="Y")
 		{
 			if (count($this->smiles) > 0)
 			{
 				if ($this->path_to_smile !== false)
+				{
 					$path_to_smile = $this->path_to_smile;
+				}
 				else
+				{
 					$path_to_smile = "/bitrix/images/socialnetwork/smile/";
+				}
 
 				$arSmiles = array();
 				$arQuoted = array();
@@ -389,7 +474,13 @@ class CSocNetTextParser
 		{
 			while (preg_match("/\[video(.+?)\](.+?)\[\/video[\s]*\]/is".BX_UTF_PCRE_MODIFIER, $text))
 			{
-				$text = preg_replace("/\[video([^\]]*)\](.+?)\[\/video[\s]*\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_video('\\1', '\\2')", $text);
+				$this->matchNum = 1;
+				$this->matchNum2 = 2;
+				$text = preg_replace_callback(
+					"/\[video([^\]]*)\](.+?)\[\/video[\s]*\]/is".BX_UTF_PCRE_MODIFIER,
+					array($this, "convert_video_callback"),
+					$text
+				);
 			}
 		}
 		return trim($text);
@@ -397,6 +488,8 @@ class CSocNetTextParser
 
 	public static function killAllTags($text)
 	{
+		if (method_exists("CTextParser", "clearAllTags"))
+			return CTextParser::clearAllTags($text);
 		$text = strip_tags($text);
 		$text = preg_replace(
 			array(
@@ -472,17 +565,6 @@ class CSocNetTextParser
 		$text = preg_replace($arPattern, $arReplace, $text);
 		$text = str_replace("&shy;", "", $text);
 
-/*		$text = str_replace("&quot;", "\"", $text);
-		$text = str_replace("&#092;", "\\", $text);
-		$text = str_replace("&#036;", "\$", $text);
-		$text = str_replace("&#33;", "!", $text);
-		$text = str_replace("&#39;", "'", $text);
-		$text = str_replace("&lt;", "<", $text);
-		$text = str_replace("&gt;", ">", $text);
-		$text = str_replace("&nbsp;", " ", $text);
-		$text = str_replace("&#124;", '|', $text);
-		$text = str_replace("&amp;", "&", $text);*/
-
 		return $text;
 	}
 
@@ -537,6 +619,11 @@ class CSocNetTextParser
 		return $video;
 	}
 
+	private function convert_video_callback($m)
+	{
+		return $this->convert_video($m[$this->matchNum], $m[$this->matchNum2]);	
+	}
+
 	public function convert_emoticon($code = "", $image = "", $description = "", $servername = "")
 	{
 		if (strlen($code)<=0 || strlen($image)<=0) return;
@@ -548,13 +635,29 @@ class CSocNetTextParser
 		return '<img src="'.$servername.'/bitrix/images/socialnetwork/smile/'.$image.'" border="0" alt="smile'.$code.'" title="'.$description.'" />';
 	}
 
+	private function convert_emoticon_callback($m)
+	{
+		return $this->convert_emoticon($this->matchType, $this->matchType2, $this->matchType3, $this->matchType4);	
+	}
+
 	public static function pre_convert_code_tag ($text = "")
 	{
-		if (strLen($text)<=0) return;
+		if (strLen($text) <= 0)
+		{
+			return;
+		}
 		$text = str_replace(
-			array("&", "<", ">", "[", "]"), array("&amp;", "&lt;", "&gt;", "&#91;", "&#93;"), $text);
+			array("&", "<", ">", "[", "]"), 
+			array("&amp;", "&lt;", "&gt;", "&#91;", "&#93;"), 
+			$text
+		);
 		return $text;
 	}
+
+	private function pre_convert_code_tag_callback($m)
+	{
+		return $this->pre_convert_code_tag($m[$this->matchNum]);
+	}	
 
 	public function convert_code_tag($text = "", $type = "html")
 	{
@@ -564,16 +667,34 @@ class CSocNetTextParser
 		$text = stripslashes($text);
 		$text = str_replace(array("  ", "\t", ), array("&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;"), $text);
 		$txt = $text;
-		$txt = preg_replace(
-			array(
-				"/\[code\]/ie".BX_UTF_PCRE_MODIFIER,
-				"/\[\/code\]/ie".BX_UTF_PCRE_MODIFIER),
-			array(
-				"\$this->convert_open_tag('code', \$type)",
-				"\$this->convert_close_tag('code', \$type)"), $txt);
-		if (($this->code_open==$this->code_closed) && ($this->code_error==0))
+
+		$this->matchType = 'code';
+		$this->matchType2 = $type;
+		$txt = preg_replace_callback(
+			"/\[code\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "convert_open_tag_callback"),
+			$txt
+		);
+		$this->matchType = 'code';
+		$txt = preg_replace_callback(
+			"/\[\/code\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "convert_close_tag_callback"),
+			$txt
+		);			
+
+		if (
+			($this->code_open == $this->code_closed) 
+			&& ($this->code_error == 0)
+		)
+		{
 			return $txt;
+		}
 		return $text;
+	}
+	
+	private function convert_code_tag_callback($m)
+	{
+		return $this->convert_code_tag('[code]'.$m[$this->matchNum].'[/code]', $this->matchType);
 	}
 
 	public function convert_quote_tag($text = "", $type = "html")
@@ -582,17 +703,33 @@ class CSocNetTextParser
 		$txt = $text;
 		$type = ($type == "rss" ? "rss" : "html");
 
-		$txt = preg_replace(
-			array(
-				"/\[quote([^\]])*\]/ie".BX_UTF_PCRE_MODIFIER,
-				"/\[\/quote([^\]])*\]/ie".BX_UTF_PCRE_MODIFIER),
-			array(
-				"\$this->convert_open_tag('quote', \$type)",
-				"\$this->convert_close_tag('quote', \$type)"), $txt);
+		$this->matchType = 'quote';
+		$this->matchType2 = $type;
+		$txt = preg_replace_callback(
+			"/\[quote([^\]])*\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "convert_open_tag_callback"),
+			$txt
+		);
+		$this->matchType = 'quote';
+		$txt = preg_replace_callback(
+			"/\[\/quote([^\]])*\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "convert_close_tag_callback"),
+			$txt
+		);			
 
-		if (($this->quote_open==$this->quote_closed) && ($this->quote_error==0))
+		if (
+			($this->quote_open == $this->quote_closed) 
+			&& ($this->quote_error == 0)
+		)
+		{
 			return $txt;
+		}
 		return $text;
+	}
+	
+	private function convert_quote_tag_callback($m)
+	{
+		return $this->convert_quote_tag($m[$this->matchNum], $this->matchType);
 	}
 
 	public function convert_open_tag($marker = "quote", $type = "html")
@@ -604,6 +741,11 @@ class CSocNetTextParser
 		if ($type == "rss")
 			return "\n====".$marker."====\n";
 		return "<table class='sonet-".$marker."'><thead><tr><th>".($marker == "quote" ? GetMessage("SONET_QUOTE") : GetMessage("SONET_CODE"))."</th></tr></thead><tbody><tr><td>";
+	}
+
+	private function convert_open_tag_callback($m)
+	{
+		return $this->convert_open_tag($this->matchType, $this->matchType2);
 	}
 
 	public function convert_close_tag($marker = "quote")
@@ -622,6 +764,11 @@ class CSocNetTextParser
 		return "</td></tr></tbody></table>";
 	}
 
+	private function convert_close_tag_callback($m)
+	{
+		return $this->convert_close_tag($this->matchType);
+	}
+
 	public function convert_image_tag($url = "", $type = "html")
 	{
 		static $bShowedScript = false;
@@ -633,34 +780,21 @@ class CSocNetTextParser
 		$extension = preg_quote($extension, "/");
 
 		$bErrorIMG = False;
-		//if (strpos($url, "/bitrix/components/bitrix/socialnetwork.interface/show_file.php?fid=") === false)
-		//{
-			if (preg_match("/[?&;]/".BX_UTF_PCRE_MODIFIER, $url)) $bErrorIMG = True;
-			if (!$bErrorIMG && !preg_match("/$extension(\||\$)/".BX_UTF_PCRE_MODIFIER, $this->allow_img_ext)) $bErrorIMG = True;
-			if (!$bErrorIMG && !preg_match("/^(http|https|ftp|\/)/i".BX_UTF_PCRE_MODIFIER, $url)) $bErrorIMG = True;
-		//}
+		if (preg_match("/[?&;]/".BX_UTF_PCRE_MODIFIER, $url)) $bErrorIMG = True;
+		if (!$bErrorIMG && !preg_match("/$extension(\||\$)/".BX_UTF_PCRE_MODIFIER, $this->allow_img_ext)) $bErrorIMG = True;
+		if (!$bErrorIMG && !preg_match("/^(http|https|ftp|\/)/i".BX_UTF_PCRE_MODIFIER, $url)) $bErrorIMG = True;
+
 		if ($bErrorIMG)
+		{
 			return "[img]".$url."[/img]";
-		//if ($type != "html")
-			return '<img src="'.$url.'" alt="'.GetMessage("FRM_IMAGE_ALT").'" border="0" />';
-/*
-		$result = $GLOBALS["APPLICATION"]->IncludeComponent(
-			"bitrix:socialnetwork.interface",
-			$this->image_params["template"],
-			Array(
-				"URL" => $url,
+		}
 
-				"WIDTH"=> $this->image_params["width"],
-				"HEIGHT"=> $this->image_params["height"],
-				"CONVERT" => "N",
-				"FAMILY" => "SOCIALNETWORK",
-				"SINGLE" => "Y",
-				"RETURN" => "Y"
-			),
-			null,
-			array("HIDE_ICONS" => "Y"));
+		return '<img src="'.$url.'" alt="'.GetMessage("FRM_IMAGE_ALT").'" border="0" />';
+	}
 
-		return $result;*/
+	private function convert_image_tag_callback($m)
+	{
+		return $this->convert_image_tag($m[$this->matchNum], $this->matchType);
 	}
 
 	public function convert_font_attr($attr, $value = "", $text = "")
@@ -687,13 +821,27 @@ class CSocNetTextParser
 			return "<font face='".$value."'>".$text."</font>";
 		}
 	}
+	
+	private function convert_font_attr_callback($m)
+	{
+		return $this->convert_font_attr($this->matchType, $m[$this->matchNum], $m[$this->matchNum2]);
+	}
+
 	// Only for public using
 	public function wrap_long_words($text="")
 	{
-		if ($this->MaxStringLen > 0 && !empty($text))
+		if (
+			$this->MaxStringLen > 0 
+			&& !empty($text)
+		)
 		{
 			$text = str_replace(array(chr(7), chr(8), chr(34), chr(39)), array("", "", chr(7), chr(8)), $text);
-			$text = preg_replace("/(?<=^|\>)([^\<]+)(?=\<|$)/ies".BX_UTF_PCRE_MODIFIER, "\$this->part_long_words('\\1')", $text);
+			$this->matchNum = 1;
+			$text = preg_replace_callback(
+				"/(?<=^|\>)([^\<]+)(?=\<|$)/is".BX_UTF_PCRE_MODIFIER, 
+				array($this, "part_long_words_callback"),
+				$text
+			);
 			$text = str_replace(array(chr(7), chr(8)), array(chr(34), chr(39)), $text);
 		}
 		return $text;
@@ -707,23 +855,48 @@ class CSocNetTextParser
 			$str = str_replace(
 				array(chr(1), chr(2), chr(3), chr(4), chr(5), chr(6), "&amp;", "&lt;", "&gt;", "&quot;", "&nbsp;", "&copy;", "&reg;", "&trade;"),
 				array("", "", "", "", "", "", chr(5), "<", ">", chr(6), chr(1), chr(2), chr(3), chr(4)),
-				$str);
-			$str = preg_replace("/(?<=[".$word_separator."]|^)(([^".$word_separator."]+))(?=[".$word_separator."]|$)/ise".BX_UTF_PCRE_MODIFIER, "\$this->cut_long_words('\\2')", $str);
-
+				$str
+			);
+			$this->matchNum = 2;
+			$str = preg_replace_callback(
+				"/(?<=[".$word_separator."]|^)(([^".$word_separator."]+))(?=[".$word_separator."]|$)/is".BX_UTF_PCRE_MODIFIER, 
+				array($this, "cut_long_words_callback"),
+				$str
+			);
 			$str = str_replace(
 				array(chr(5), "<", ">", chr(6), chr(1), chr(2), chr(3), chr(4), "&lt;WBR/&gt;", "&lt;WBR&gt;", "&amp;shy;"),
 				array("&amp;", "&lt;", "&gt;", "&quot;", "&nbsp;", "&copy;", "&reg;", "&trade;", "<WBR/>", "<WBR/>", "&shy;"),
-				$str);
+				$str
+			);
 		}
 		return $str;
+	}
+	
+	private function part_long_words_callback($m)
+	{
+		return $this->cut_long_words($m[$this->matchNum]);
 	}
 
 	public function cut_long_words($str)
 	{
-		if (($this->MaxStringLen > 0) && (strLen($str) > 0))
-			$str = preg_replace("/([^ \n\r\t\x01]{".$this->MaxStringLen."})/is".BX_UTF_PCRE_MODIFIER, "\\1<WBR/>&shy;", $str);
+		if (
+			($this->MaxStringLen > 0) 
+			&& (strLen($str) > 0)
+		)
+		{
+			$str = preg_replace(
+				"/([^ \n\r\t\x01]{".$this->MaxStringLen."})/is".BX_UTF_PCRE_MODIFIER, 
+				"\\1<WBR/>&shy;", 
+				$str
+			);
+		}
 		return $str;
 	}
+	
+	public function cut_long_words_callback($m)
+	{
+		return $this->cut_long_words($m[$this->matchNum]);
+	}	
 
 	public static function convert_anchor_tag($url, $text, $pref="")
 	{
@@ -766,6 +939,10 @@ class CSocNetTextParser
 		return $pref."<a href='".$url."' target='_blank'>".$text."</a>".$end;
 	}
 
+	public function convert_anchor_tag_callback($m)
+	{
+		return $this->convert_anchor_tag($m[$this->matchNum], $m[$this->matchNum2], '');
+	}
 
 	public function convert_to_rss($text, $arImages = Array(), $arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N"), $arParams = array())
 	{
@@ -820,7 +997,7 @@ class CSocNetTextParser
 			}
 		}
 
-		if ($bAllowSmiles=="Y")
+		if ($bAllowSmiles == "Y")
 		{
 			if (count($this->smiles) > 0)
 			{
@@ -830,7 +1007,17 @@ class CSocNetTextParser
 					$image = preg_quote(str_replace("'", "\\'", $row["IMAGE"]));
 					$description = preg_quote(htmlspecialcharsbx($row["DESCRIPTION"], ENT_QUOTES), "/");
 
-					$text = preg_replace("/(?<=[^\w&])$code(?=.\W|\W.|\W$)/ei", "\$this->convert_emoticon('$code', '$image', '$description', 'http://".$arParams["SERVER_NAME"]."')", ' '.$text.' ');
+					$this->matchType = $code;
+					$this->matchType2 = $image;
+					$this->matchType3 = $description;
+					$this->matchType4 = "http://".$arParams["SERVER_NAME"];
+
+					$text = preg_replace_callback(
+						"/(?<=[^\w&])$code(?=.\W|\W.|\W$)/i", 
+						array($this, "convert_emoticon_callback"), 
+						$text
+					);
+
 				}
 			}
 		}
@@ -1327,5 +1514,474 @@ class CSocNetTools
 		return CSocNetLogTools:: HasLogEventCreatedBy($event_id);
 	}
 
+	public static function InitGlobalExtranetArrays($SITE_ID = SITE_ID)
+	{
+		if (
+			!isset($GLOBALS["arExtranetGroupID"])
+			|| !isset($GLOBALS["arExtranetUserID"])
+		)
+		{
+			$GLOBALS["arExtranetGroupID"] = array();
+			$GLOBALS["arExtranetUserID"] = array();
+
+			if($GLOBALS["USER"]->IsAuthorized())
+			{
+				$ttl = (defined("BX_COMP_MANAGED_CACHE") ? 2592000 : 600);
+				$cache_id = 'sonet_ex_gr_'.$SITE_ID;
+				$obCache = new CPHPCache;
+				$cache_dir = '/bitrix/sonet_log_sg';
+
+				if($obCache->InitCache($ttl, $cache_id, $cache_dir))
+				{
+					$tmpVal = $obCache->GetVars();
+					$GLOBALS["arExtranetGroupID"] = $tmpVal['EX_GROUP_ID'];
+					$GLOBALS["arExtranetUserID"] = $tmpVal['EX_USER_ID'];
+					unset($tmpVal);
+				}
+				elseif (CModule::IncludeModule("extranet"))
+				{
+					global $CACHE_MANAGER;
+					if (defined("BX_COMP_MANAGED_CACHE"))
+					{
+						$CACHE_MANAGER->StartTagCache($cache_dir);
+					}
+
+					if (!CExtranet::IsExtranetSite())
+					{
+						$dbGroupTmp = CSocNetGroup::GetList(
+							array(),
+							array(
+								"SITE_ID" => CExtranet::GetExtranetSiteID()
+							),
+							false,
+							false,
+							array("ID")
+						);
+						while($arGroupTmp = $dbGroupTmp->Fetch())
+						{
+							$GLOBALS["arExtranetGroupID"][] = $arGroupTmp["ID"];
+							if (defined("BX_COMP_MANAGED_CACHE"))
+							{
+								$CACHE_MANAGER->RegisterTag('sonet_group_'.$arGroupTmp["ID"]);
+							}
+						}
+					}
+
+					$rsUsers = CUser::GetList(
+						($by="ID"),
+						($order="asc"),
+						array(
+							"GROUPS_ID" => array(CExtranet::GetExtranetUserGroupID()),
+							"UF_DEPARTMENT" => false
+						),
+						array("FIELDS" => array("ID"))
+					);
+					while($arUser = $rsUsers->Fetch())
+					{
+						$GLOBALS["arExtranetUserID"][] = $arUser["ID"];
+						if (defined("BX_COMP_MANAGED_CACHE"))
+						{
+							$CACHE_MANAGER->RegisterTag('sonet_user2group');
+						}
+					}
+
+					if (defined("BX_COMP_MANAGED_CACHE"))
+					{
+						$CACHE_MANAGER->EndTagCache();
+					}
+
+					if($obCache->StartDataCache())
+					{
+						$obCache->EndDataCache(array(
+							'EX_GROUP_ID' => $GLOBALS["arExtranetGroupID"],
+							'EX_USER_ID' => $GLOBALS["arExtranetUserID"]
+						));
+					}
+				}
+			}
+		}
+	}
+
+	public static function GetSubordinateGroups($userID = false)
+	{
+		static $arSubordinateGroupsByUser = array();
+
+		$userID = intval($userID);
+		if ($userID <= 0)
+		{
+			$userID = $GLOBALS["USER"]->GetID();
+		}
+
+		if ($userID <= 0)
+		{
+			return array();
+		}
+
+		if (isset($arSubordinateGroupsByUser[$userID]))
+		{
+			$arUserSubordinateGroups = $arSubordinateGroupsByUser[$userID];
+		}
+		else
+		{
+			$arUserSubordinateGroups = Array(2);
+			$arUserGroups_u = CUser::GetUserGroup($userID);
+			for ($j = 0,$len = count($arUserGroups_u); $j < $len; $j++)
+			{
+				$arSubordinateGroups = CGroup::GetSubordinateGroups($arUserGroups_u[$j]);
+				$arUserSubordinateGroups = array_merge ($arUserSubordinateGroups, $arSubordinateGroups);
+			}
+			$arUserSubordinateGroups = array_unique($arUserSubordinateGroups);
+
+			$arSubordinateGroupsByUser[$userID] = $arUserSubordinateGroups;
+		}
+
+		return $arUserSubordinateGroups;
+	}
 }
+
+class CSocNetAllowed
+{
+	private static $arAllowedEntityTypes = array();
+	private static $arAllowedEntityTypesDesc = array();
+	private static $arAllowedFeatures = array();
+	private static $arAllowedLogEvents = array();
+
+	/* --- entity types --- */
+
+	public static function RunEventForAllowedEntityType()
+	{
+		global $arSocNetAllowedSubscribeEntityTypesDesc;
+		$arSocNetAllowedSubscribeEntityTypesDesc = array();
+
+		$newAllowedEntityTypes = array();
+
+		$events = GetModuleEvents("socialnetwork", "OnFillSocNetAllowedSubscribeEntityTypes");
+		while ($arEvent = $events->Fetch())
+		{
+			ExecuteModuleEventEx($arEvent, array(&$newAllowedEntityTypes));
+		}
+
+		foreach($newAllowedEntityTypes as $entityType)
+		{
+			self::AddAllowedEntityType($entityType);
+		}
+
+		foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entityTypeDescCode => $arEntityTypeDesc)
+		{
+			self::AddAllowedEntityTypeDesc($entityTypeDescCode, $arEntityTypeDesc);
+		}
+
+		unset($arSocNetAllowedSubscribeEntityTypesDesc);
+	}
+
+	public static function AddAllowedEntityType($entityType)
+	{
+		if (is_array($entityType))
+		{
+			foreach ($entityType as $tmp)
+			{
+				self::AddAllowedEntityType($tmp);
+			}
+			return true;
+		}
+
+		$entityType = trim($entityType);
+		if (
+			strlen($entityType) <= 0
+			|| in_array($entityType, self::$arAllowedEntityTypes)
+			|| !preg_match('/^[a-zA-Z0-9]+$/', $entityType)
+		)
+		{
+			return false;
+		}
+
+		if (
+			$entityType == SONET_SUBSCRIBE_ENTITY_GROUP
+			&& !CBXFeatures::IsFeatureEnabled("Workgroups")
+		)
+		{
+			return false;
+		}
+
+		self::$arAllowedEntityTypes[] = $entityType;
+	}
+
+	public static function GetAllowedEntityTypes()
+	{
+		self::RunEvents();
+		return self::$arAllowedEntityTypes;
+	}
+
+	/* --- entity types desc --- */
+
+	public static function AddAllowedEntityTypeDesc($entityTypeDescCode, $arEntityTypeDesc)
+	{
+		$entityTypeDescCode = trim($entityTypeDescCode);
+
+		if (
+			strlen($entityTypeDescCode) <= 0
+			|| array_key_exists($entityTypeDescCode, self::$arAllowedEntityTypesDesc)
+			|| !is_array($arEntityTypeDesc)
+		)
+		{
+			return false;
+		}
+
+		if (
+			$entityTypeDescCode == SONET_SUBSCRIBE_ENTITY_GROUP
+			&& !CBXFeatures::IsFeatureEnabled("Workgroups")
+		)
+		{
+			return false;
+		}
+
+		self::$arAllowedEntityTypesDesc[$entityTypeDescCode] = $arEntityTypeDesc;
+	}
+
+	public static function GetAllowedEntityTypesDesc()
+	{
+		self::RunEvents();
+		return self::$arAllowedEntityTypesDesc;
+	}
+
+	/* --- features --- */
+
+	public static function RunEventForAllowedFeature()
+	{
+		$newAllowedFeatures = array();
+
+		$events = GetModuleEvents("socialnetwork", "OnFillSocNetFeaturesList");
+		while ($arEvent = $events->Fetch())
+		{
+			ExecuteModuleEventEx($arEvent, array(&$newAllowedFeatures, SITE_ID));
+		}	
+
+		foreach($newAllowedFeatures as $strFeatureCode => $arFeature)
+		{
+			self::AddAllowedFeature($strFeatureCode, $arFeature);
+		}
+	}
+
+	public static function AddAllowedFeature($strFeatureCode, $arFeature)
+	{
+		$strFeatureCode = trim($strFeatureCode);
+
+		if (
+			strlen($strFeatureCode) <= 0
+			|| !is_array($arFeature)
+		)
+		{
+			return false;
+		}
+
+		if (
+			!CBXFeatures::IsFeatureEnabled("Workgroups")
+			&& array_key_exists("subscribe_events", $arFeature)
+		)
+		{
+			foreach ($arFeature["subscribe_events"] as $event_id_tmp => $arEventTmp)
+			{
+				if (
+					array_key_exists("ENTITIES", $arEventTmp)
+					&& array_key_exists(SONET_SUBSCRIBE_ENTITY_GROUP, $arEventTmp["ENTITIES"])
+				)
+				{
+					unset($arFeature["subscribe_events"][$event_id_tmp]["ENTITIES"][SONET_SUBSCRIBE_ENTITY_GROUP]);
+				}
+			}
+		}
+
+		if (!array_key_exists($strFeatureCode, self::$arAllowedFeatures))
+		{
+			self::$arAllowedFeatures[$strFeatureCode] = $arFeature;
+		}
+		else
+		{
+			if (
+				array_key_exists("operations", $arFeature)
+				&& is_array($arFeature["operations"])
+			)
+			{
+				if (!array_key_exists("operations", self::$arAllowedFeatures[$strFeatureCode]))
+				{
+					self::$arAllowedFeatures[$strFeatureCode]["operations"] = array();
+				}
+
+				foreach ($arFeature["operations"] as $strOpCode => $arOperation)
+				{
+					if (is_array($arOperation))
+					{
+						if (!array_key_exists($strOpCode, self::$arAllowedFeatures[$strFeatureCode]["operations"]))
+						{
+							self::$arAllowedFeatures[$strFeatureCode]["operations"][$strOpCode] = array();
+						}
+
+						foreach ($arOperation as $key => $value)
+						{
+							self::$arAllowedFeatures[$strFeatureCode]["operations"][$strOpCode][$key] = $value;
+						}
+					}
+				}
+			}
+
+			if (
+				array_key_exists("subscribe_events", $arFeature)
+				&& is_array($arFeature["subscribe_events"])
+			)
+			{
+				if (!array_key_exists("subscribe_events", self::$arAllowedFeatures[$strFeatureCode]))
+				{
+					self::$arAllowedFeatures[$strFeatureCode]["subscribe_events"] = array();
+				}
+
+				foreach ($arFeature["subscribe_events"] as $strEventCode => $arEvent)
+				{
+					if (is_array($arEvent))
+					{
+						self::$arAllowedFeatures[$strFeatureCode]["subscribe_events"][$strEventCode] = $arEvent;
+					}
+				}
+			}
+		}
+	}
+
+	public static function UpdateAllowedFeature($strFeatureCode, $arFeature)
+	{
+		$strFeatureCode = trim($strFeatureCode);
+
+		if (
+			strlen($strFeatureCode) <= 0
+			|| !array_key_exists($strFeatureCode, self::$arAllowedFeatures)
+			|| !is_array($arFeature)
+		)
+		{
+			return false;
+		}
+
+		if (
+			!CBXFeatures::IsFeatureEnabled("Workgroups")
+			&& array_key_exists("subscribe_events", $arFeature)
+		)
+		{
+			foreach ($arFeature["subscribe_events"] as $event_id_tmp => $arEventTmp)
+			{
+				if (
+					array_key_exists("ENTITIES", $arEventTmp)
+					&& array_key_exists(SONET_SUBSCRIBE_ENTITY_GROUP, $arEventTmp["ENTITIES"])
+				)
+				{
+					unset($arFeature["subscribe_events"][$event_id_tmp]["ENTITIES"][SONET_SUBSCRIBE_ENTITY_GROUP]);
+				}
+			}
+		}
+
+		self::$arAllowedFeatures[$strFeatureCode] = $arFeature;
+	}
+
+	public static function GetAllowedFeatures()
+	{
+		self::RunEvents();
+		return self::$arAllowedFeatures;
+	}
+
+	/* --- log events --- */
+
+	public static function RunEventForAllowedLogEvent()
+	{
+		$newAllowedLogEvent = array();
+
+		$events = GetModuleEvents("socialnetwork", "OnFillSocNetLogEvents");
+		while ($arEvent = $events->Fetch())
+		{
+			ExecuteModuleEventEx($arEvent, array(&$newAllowedLogEvent));
+		}
+
+		foreach($newAllowedLogEvent as $strEventCode => $arLogEvent)
+		{
+			self::AddAllowedLogEvent($strEventCode, $arLogEvent);
+		}
+	}
+
+	public static function AddAllowedLogEvent($strEventCode, $arLogEvent)
+	{
+		$strEventCode = trim($strEventCode);
+
+		if (
+			strlen($strEventCode) <= 0
+			|| array_key_exists($strEventCode, self::$arAllowedLogEvents)
+			|| !is_array($arLogEvent)
+		)
+		{
+			return false;
+		}
+		
+		if (!CBXFeatures::IsFeatureEnabled("Workgroups"))
+		{
+			if ($strEventCode == "system_groups")
+			{
+				return false;
+			}
+
+			if (
+				array_key_exists("ENTITIES", $arLogEvent)
+				&& array_key_exists(SONET_SUBSCRIBE_ENTITY_GROUP, $arLogEvent["ENTITIES"])
+			)
+			{
+				unset($arLogEvent["ENTITIES"][SONET_SUBSCRIBE_ENTITY_GROUP]);
+			}
+
+			if ($strEventCode == "system")
+			{
+				foreach($arLogEvent["FULL_SET"] as $i => $event_id_tmp)
+				{
+					if ($event_id_tmp == "system_groups")
+					{
+						unset($arLogEvent["FULL_SET"][$i]);
+					}
+				}
+			}
+		}
+
+		if (!CBXFeatures::IsFeatureEnabled("Friends"))
+		{
+			if ($strEventCode == "system_friends")
+			{
+				return false;
+			}
+
+			if ($strEventCode == "system")
+			{
+				foreach($arLogEvent["FULL_SET"] as $i => $event_id_tmp)
+				{
+					if ($event_id_tmp == "system_friends")
+					{
+						unset($arLogEvent["FULL_SET"][$i]);
+					}
+				}
+			}
+		}
+
+		self::$arAllowedLogEvents[$strEventCode] = $arLogEvent;
+	}
+	
+	public static function GetAllowedLogEvents()
+	{
+		self::RunEvents();
+		return self::$arAllowedLogEvents;
+	}
+
+	function RunEvents()
+	{
+		static $bAlreadyRun;
+
+		if (!$bAlreadyRun)
+		{
+			self::RunEventForAllowedEntityType();
+			self::RunEventForAllowedFeature();
+			self::RunEventForAllowedLogEvent();
+			$bAlreadyRun = true;
+		}
+	}
+}
+
 ?>

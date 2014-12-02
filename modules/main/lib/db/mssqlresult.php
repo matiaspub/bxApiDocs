@@ -1,31 +1,46 @@
 <?php
 namespace Bitrix\Main\DB;
 
-use Bitrix\Main\Diag;
-use Bitrix\Main\Type;
-
 class MssqlResult extends Result
 {
-	private $resultFields = array();
+	/** @var \Bitrix\Main\Entity\ScalarField[]  */
+	private $resultFields = null;
 
-	static public function __construct($result, Connection $dbConnection = null, Diag\SqlTrackerQuery $trackerQuery = null)
+	/**
+	 * @param resource $result Database-specific query result.
+	 * @param Connection $dbConnection Connection object.
+	 * @param \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery Helps to collect debug information.
+	 */
+	static public function __construct($result, Connection $dbConnection = null, \Bitrix\Main\Diag\SqlTrackerQuery $trackerQuery = null)
 	{
 		parent::__construct($result, $dbConnection, $trackerQuery);
 	}
 
-	public function getResultFields()
+	/**
+	 * Returns an array of fields according to columns in the result.
+	 *
+	 * @return \Bitrix\Main\Entity\ScalarField[]
+	 */
+	public function getFields()
 	{
-		if (empty($this->resultFields))
+		if ($this->resultFields == null)
 		{
-			$fields = sqlsrv_field_metadata($this->resource);
-			if ($fields)
+			$this->resultFields = array();
+			if (is_resource($this->resource))
 			{
-				foreach ($fields as $key => $value)
+				$fields = sqlsrv_field_metadata($this->resource);
+				if ($fields && $this->connection)
 				{
-					$this->resultFields[$key] = array(
-						"name" => $value["Name"],
-						"type" => $value["Type"],
-					);
+					$helper = $this->connection->getSqlHelper();
+					foreach ($fields as $value)
+					{
+						$name = ($value["Name"] <> ''? $value["Name"]: uniqid());
+						$parameters = array(
+							"size" => $value["Size"],
+							"scale" => $value["Scale"],
+						);
+						$this->resultFields[$name] = $helper->getFieldByColumnType($name, $value["Type"], $parameters);
+					}
 				}
 			}
 		}
@@ -33,53 +48,23 @@ class MssqlResult extends Result
 		return $this->resultFields;
 	}
 
+	/**
+	 * Returns the number of rows in the result.
+	 *
+	 * @return integer
+	 */
 	public function getSelectedRowsCount()
 	{
 		return sqlsrv_num_rows($this->resource);
 	}
 
-	public function getFieldsCount()
-	{
-		return count($this->getResultFields());
-	}
-
-	public function getFieldName($column)
-	{
-		$fields = $this->getResultFields();
-		return $fields[$column]["name"];
-	}
-
+	/**
+	 * Returns next result row or false.
+	 *
+	 * @return array|false
+	 */
 	protected function fetchRowInternal()
 	{
-		return sqlsrv_fetch_array($this->resource, SQLSRV_FETCH_NUMERIC);
-	}
-
-	protected function convertDataFromDb($value, $type)
-	{
-		switch ($type)
-		{
-			case 93:
-				if($value !== null)
-				{
-					$value = new Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
-				}
-				break;
-			case 12:
-				if((strlen($value) == 19) && preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
-				{
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-				break;
-			case 91:
-				if($value !== null)
-				{
-					$value = new Type\Date($value, "Y-m-d");
-				}
-				break;
-			default:
-				break;
-		}
-
-		return $value;
+		return sqlsrv_fetch_array($this->resource, SQLSRV_FETCH_ASSOC);
 	}
 }

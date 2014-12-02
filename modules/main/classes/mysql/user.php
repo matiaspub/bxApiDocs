@@ -383,6 +383,10 @@ class CUser extends CAllUser
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$filter = Array<br>(<br>    "ID"                  =&gt; "1 | 2",<br>    "TIMESTAMP_1"         =&gt; "04.02.2004", // в формате текущего сайта<br>    "TIMESTAMP_2"         =&gt; "04.02.2005",<br>    "LAST_LOGIN_1"        =&gt; "01.02.2004",<br>    "ACTIVE"              =&gt; "Y",<br>    "LOGIN"               =&gt; "nessy | admin",<br>    "NAME"                 =&gt; "Виталий &amp; Соколов",<br>    "EMAIL"               =&gt; "mail@server.com | mail@server.com",<br>    "KEYWORDS"            =&gt; "www.bitrix.ru",<br>    "PERSONAL_PROFESSION" =&gt; "системотехник",<br>    "PERSONAL_GENDER"     =&gt; "M",<br>    "PERSONAL_COUNTRY"    =&gt; "4 | 1", // Беларусь или Россия<br>    "ADMIN_NOTES"         =&gt; "\"UID = 145\"",<br>    "GROUPS_ID"           =&gt; Array(1,4,10)<br>);<br>$rsUsers = <b>CUser::GetList</b>(($by="personal_country"), ($order="desc"), $filter); // выбираем пользователей<br>$is_filtered = $rsUsers-&gt;is_filtered; // отфильтрована ли выборка ?<br>$rsUsers-&gt;NavStart(50); // разбиваем постранично по 50 записей<br>echo $rsUsers-&gt;NavPrint(GetMessage("PAGES")); // печатаем постраничную навигацию<br>while($rsUsers-&gt;NavNext(true, "f_")) :<br>	echo "[".$f_ID."] (".$f_LOGIN.") ".$f_NAME." ".$f_LAST_NAME."&lt;br&gt;";	<br>endwhile;<br>?&gt;
+	* 
+	* $rsUsers = CUser::GetList(array('sort' =&gt; 'asc'), 'sort');$order = array('sort' =&gt; 'asc');
+	* $tmp = 'sort'; // параметр проигнорируется методом, но обязан быть
+	* $rsUsers = CUser::GetList($order, $tmp);
 	* </pre>
 	*
 	*
@@ -436,7 +440,13 @@ class CUser extends CAllUser
 		$obUserFieldsSql->SetOrder($arOrder);
 
 		$arFields_m = array("ID", "ACTIVE", "LAST_LOGIN", "LOGIN", "EMAIL", "NAME", "LAST_NAME", "SECOND_NAME", "TIMESTAMP_X", "PERSONAL_BIRTHDAY", "IS_ONLINE");
-		$arFields = array("DATE_REGISTER", "PERSONAL_PROFESSION", "PERSONAL_WWW", "PERSONAL_ICQ", "PERSONAL_GENDER", "PERSONAL_PHOTO", "PERSONAL_PHONE", "PERSONAL_FAX", "PERSONAL_MOBILE", "PERSONAL_PAGER", "PERSONAL_STREET", "PERSONAL_MAILBOX", "PERSONAL_CITY", "PERSONAL_STATE", "PERSONAL_ZIP", "PERSONAL_COUNTRY", "PERSONAL_NOTES", "WORK_COMPANY", "WORK_DEPARTMENT", "WORK_POSITION", "WORK_WWW", "WORK_PHONE", "WORK_FAX", "WORK_PAGER", "WORK_STREET", "WORK_MAILBOX", "WORK_CITY", "WORK_STATE", "WORK_ZIP", "WORK_COUNTRY", "WORK_PROFILE", "WORK_NOTES", "ADMIN_NOTES", "XML_ID", "LAST_NAME", "SECOND_NAME", "STORED_HASH", "CHECKWORD_TIME", "EXTERNAL_AUTH_ID", "CONFIRM_CODE", "LOGIN_ATTEMPTS", "LAST_ACTIVITY_DATE", "AUTO_TIME_ZONE", "TIME_ZONE", "TIME_ZONE_OFFSET", "PASSWORD", "CHECKWORD", "LID");
+		$arFields = array(
+			"DATE_REGISTER", "PERSONAL_PROFESSION", "PERSONAL_WWW", "PERSONAL_ICQ", "PERSONAL_GENDER", "PERSONAL_PHOTO", "PERSONAL_PHONE", "PERSONAL_FAX",
+			"PERSONAL_MOBILE", "PERSONAL_PAGER", "PERSONAL_STREET", "PERSONAL_MAILBOX", "PERSONAL_CITY", "PERSONAL_STATE", "PERSONAL_ZIP", "PERSONAL_COUNTRY", "PERSONAL_NOTES",
+			"WORK_COMPANY", "WORK_DEPARTMENT", "WORK_POSITION", "WORK_WWW", "WORK_PHONE", "WORK_FAX", "WORK_PAGER", "WORK_STREET", "WORK_MAILBOX", "WORK_CITY", "WORK_STATE",
+			"WORK_ZIP", "WORK_COUNTRY", "WORK_PROFILE", "WORK_NOTES", "ADMIN_NOTES", "XML_ID", "LAST_NAME", "SECOND_NAME", "STORED_HASH", "CHECKWORD_TIME", "EXTERNAL_AUTH_ID",
+			"CONFIRM_CODE", "LOGIN_ATTEMPTS", "LAST_ACTIVITY_DATE", "AUTO_TIME_ZONE", "TIME_ZONE", "TIME_ZONE_OFFSET", "PASSWORD", "CHECKWORD", "LID", "TITLE",
+		);
 		$arFields_all = array_merge($arFields_m, $arFields);
 
 		$arSelectFields = array();
@@ -684,7 +694,7 @@ class CUser extends CAllUser
 			{
 				$cur_year = intval(date('Y'));
 				$arSqlOrder[$field] = "IF(ISNULL(PERSONAL_BIRTHDAY), '9999-99-99', IF (
-					DATE_FORMAT(U.PERSONAL_BIRTHDAY, '".$cur_year."-%m-%d') < DATE_FORMAT(CURDATE(), '%Y-%m-%d'),
+					DATE_FORMAT(U.PERSONAL_BIRTHDAY, '".$cur_year."-%m-%d') < DATE_FORMAT(DATE_ADD(".$DB->CurrentTimeFunction().", INTERVAL ".CTimeZone::GetOffset()." SECOND), '%Y-%m-%d'),
 					DATE_FORMAT(U.PERSONAL_BIRTHDAY, '".($cur_year + 1)."-%m-%d'),
 					DATE_FORMAT(U.PERSONAL_BIRTHDAY, '".$cur_year."-%m-%d')
 				)) ".$dir;
@@ -818,7 +828,7 @@ class CUser extends CAllUser
 	*
 	*
 	*
-	* @param $interva $l = 120 Время в секундах </ht
+	* @param $interva $l = 120 Время в секундах
 	*
 	*
 	*

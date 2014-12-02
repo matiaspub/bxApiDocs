@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/adv.php");
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.</body> </html>
  *
  *
  *
@@ -750,7 +750,7 @@ class CAdv extends CAllAdv
 					A.ID, A.REFERER1, A.REFERER2, A.PRIORITY, A.EVENTS_VIEW, A.DESCRIPTION,
 					A.DATE_FIRST C_TIME_FIRST,
 					A.DATE_LAST C_TIME_LAST,
-					'$view_currency' CURRENCY,
+					'".$DB->ForSql($view_currency)."' CURRENCY,
 					".$DB->DateToCharFunction("A.DATE_FIRST","SHORT")." DATE_FIRST,
 					".$DB->DateToCharFunction("A.DATE_LAST","SHORT")." DATE_LAST,
 					UNIX_TIMESTAMP(ifnull(A.DATE_LAST,0))-UNIX_TIMESTAMP(ifnull(A.DATE_FIRST,0)) ADV_TIME,
@@ -810,7 +810,7 @@ class CAdv extends CAllAdv
 					A.$group,
 					min(A.DATE_LAST)											C_TIME_FIRST,
 					max(A.DATE_LAST)											C_TIME_LAST,
-					'$view_currency'											CURRENCY,
+					'".$DB->ForSql($view_currency)."'											CURRENCY,
 					".$DB->DateToCharFunction("min(A.DATE_FIRST)","SHORT")."	DATE_FIRST,
 					".$DB->DateToCharFunction("max(A.DATE_LAST)","SHORT")."		DATE_LAST,
 					UNIX_TIMESTAMP(max(ifnull(A.DATE_LAST,0)))-UNIX_TIMESTAMP(min(ifnull(A.DATE_FIRST,0)))	ADV_TIME,

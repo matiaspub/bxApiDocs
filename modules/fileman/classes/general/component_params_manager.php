@@ -165,7 +165,8 @@ class CComponentParamsManager
 			'CompParManNoValue' => GetMessage('PAR_MAN_SELECT_NO_VALUE'),
 			'CompParManSearch' => GetMessage('PAR_MAN_SEARCH'),
 			'NoSearchResults' => GetMessage('PAR_MAN_NO_SEARCH_RESULTS'),
-			'TemplateGroup' => GetMessage('PAR_MAN_TEMPLATE_GROUP')
+			'TemplateGroup' => GetMessage('PAR_MAN_TEMPLATE_GROUP'),
+			'DefTemplate' => GetMessage('PAR_MAN_DEF_TEMPLATE')
 		);
 		return $messages;
 	}

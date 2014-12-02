@@ -9,7 +9,7 @@ Files:
 
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_ems.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_ems.php');
 
 // define('DELIVERY_EMS_CACHE_LIFETIME', 2592000); // cache lifetime - 30 days (60*60*24*30)
 // define('DELIVERY_EMS_PRICE_TARIFF', 0.01); // price koefficient - 1%

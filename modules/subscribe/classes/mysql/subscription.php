@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CSubscription</b> - класс для работы с подписками на рассылки.
+ * <b>CSubscription</b> - класс для работы с подписками на рассылки.</body> </html>
  *
  *
  *
@@ -24,7 +24,7 @@ class CSubscription extends CSubscriptionGeneral
 	*
 	*
 	*
-	* @param string $email  Уникальный Email подписчика.
+	* @param string $email  Уникальный Email подписчика. </htm
 	*
 	*
 	*

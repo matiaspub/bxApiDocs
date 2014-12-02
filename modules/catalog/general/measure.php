@@ -33,7 +33,7 @@ class CCatalogMeasureAll
 	 */
 	public static function update($id, $arFields)
 	{
-		$id = intval($id);
+		$id = (int)$id;
 		if($id < 0 || !self::checkFields('UPDATE', $arFields))
 			return false;
 		global $DB;
@@ -51,8 +51,8 @@ class CCatalogMeasureAll
 	public static function delete($id)
 	{
 		global $DB;
-		$id = intval($id);
-		if($id > 0)
+		$id = (int)$id;
+		if ($id > 0)
 		{
 			if($DB->Query("DELETE FROM b_catalog_measure WHERE ID = ".$id, true))
 				return true;
@@ -62,7 +62,7 @@ class CCatalogMeasureAll
 
 	public static function getDefaultMeasure($getStub = false, $getExt = false)
 	{
-		if (null === self::$defaultMeasure)
+		if (self::$defaultMeasure === null)
 		{
 			$measureRes = CCatalogMeasure::getList(
 				array(),
@@ -73,12 +73,12 @@ class CCatalogMeasureAll
 			);
 			if ($measure = $measureRes->GetNext())
 			{
-				$measure['ID'] = intval($measure['ID']);
-				$measure['CODE'] = intval($measure['CODE']);
+				$measure['ID'] = (int)$measure['ID'];
+				$measure['CODE'] = (int)$measure['CODE'];
 				self::$defaultMeasure = $measure;
 			}
 		}
-		if (null === self::$defaultMeasure)
+		if (self::$defaultMeasure === null)
 		{
 			$measureRes = CCatalogMeasure::getList(
 				array(),
@@ -89,31 +89,33 @@ class CCatalogMeasureAll
 			);
 			if ($measure = $measureRes->GetNext())
 			{
-				$measure['ID'] = intval($measure['ID']);
-				$measure['CODE'] = intval($measure['CODE']);
+				$measure['ID'] = (int)$measure['ID'];
+				$measure['CODE'] = (int)$measure['CODE'];
 				self::$defaultMeasure = $measure;
 			}
 		}
-		if (null === self::$defaultMeasure)
+		if (self::$defaultMeasure === null)
 		{
 			if ($getStub)
 			{
 				$defaultMeasureDescription = CCatalogMeasureClassifier::getMeasureInfoByCode(self::DEFAULT_MEASURE_CODE);
-				if (null !== $defaultMeasureDescription)
-				self::$defaultMeasure = array(
-					'ID' => 0,
-					'CODE' => self::DEFAULT_MEASURE_CODE,
-					'MEASURE_TITLE' => $defaultMeasureDescription['MEASURE_TITLE'],
-					'SYMBOL_RUS' => $defaultMeasureDescription['SYMBOL_RUS'],
-					'SYMBOL_INTL' => $defaultMeasureDescription['SYMBOL_INTL'],
-					'SYMBOL_LETTER_INTL' => $defaultMeasureDescription['SYMBOL_LETTER_INTL']
-				);
-				if ($getExt)
+				if ($defaultMeasureDescription !== null)
 				{
-					self::$defaultMeasure['~MEASURE_TITLE'] = self::$defaultMeasure['MEASURE_TITLE'];
-					self::$defaultMeasure['~SYMBOL_RUS'] = self::$defaultMeasure['SYMBOL_RUS'];
-					self::$defaultMeasure['~SYMBOL_INTL'] = self::$defaultMeasure['SYMBOL_INTL'];
-					self::$defaultMeasure['~SYMBOL_LETTER_INTL'] = self::$defaultMeasure['SYMBOL_LETTER_INTL'];
+					self::$defaultMeasure = array(
+						'ID' => 0,
+						'CODE' => self::DEFAULT_MEASURE_CODE,
+						'MEASURE_TITLE' => $defaultMeasureDescription['MEASURE_TITLE'],
+						'SYMBOL_RUS' => $defaultMeasureDescription['SYMBOL_RUS'],
+						'SYMBOL_INTL' => $defaultMeasureDescription['SYMBOL_INTL'],
+						'SYMBOL_LETTER_INTL' => $defaultMeasureDescription['SYMBOL_LETTER_INTL']
+					);
+					if ($getExt)
+					{
+						self::$defaultMeasure['~MEASURE_TITLE'] = self::$defaultMeasure['MEASURE_TITLE'];
+						self::$defaultMeasure['~SYMBOL_RUS'] = self::$defaultMeasure['SYMBOL_RUS'];
+						self::$defaultMeasure['~SYMBOL_INTL'] = self::$defaultMeasure['SYMBOL_INTL'];
+						self::$defaultMeasure['~SYMBOL_LETTER_INTL'] = self::$defaultMeasure['SYMBOL_LETTER_INTL'];
+					}
 				}
 			}
 		}

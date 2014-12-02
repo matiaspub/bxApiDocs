@@ -16,7 +16,7 @@ interface IValidator
 	 * @param array $row
 	 * @param Field $field
 	 *
-	 * @return string|boolean
+	 * @return string|boolean|EntityError
 	 */
 	static public function validate($value, $primary, array $row, Field $field);
 }

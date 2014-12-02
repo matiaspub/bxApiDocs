@@ -115,9 +115,10 @@ final class Loc
 			while(($slashPos = strrpos($filePath, "/")) !== false)
 			{
 				$filePath = substr($filePath, 0, $slashPos);
-				if(is_dir($filePath."/lang"))
+				$langPath = $filePath."/lang";
+				if(is_dir($langPath))
 				{
-					$langDir = $filePath."/lang";
+					$langDir = $langPath;
 					$fileName = substr($file, $slashPos);
 					$langDirCache[$path] = $langDir;
 					break;
@@ -206,6 +207,11 @@ final class Loc
 			{
 				unset(self::$lazyLoadFiles[$file]);
 			}
+		}
+
+		if(!isset(self::$messages[$language][$code]) && defined("BX_MESS_LOG"))
+		{
+			file_put_contents(BX_MESS_LOG, $code.": not found for ".$currentFile."\n", FILE_APPEND);
 		}
 	}
 

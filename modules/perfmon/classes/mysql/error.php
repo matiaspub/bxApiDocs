@@ -1,5 +1,0 @@
-<?
-class CPerfomanceError extends CAllPerfomanceError
-{
-}
-?>

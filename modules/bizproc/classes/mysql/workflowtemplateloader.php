@@ -171,7 +171,7 @@ class CBPWorkflowTemplateLoader
 		return $dbRes;
 	}
 
-public static 	public function AddTemplate($arFields)
+public static function AddTemplate($arFields)
 	{
 		global $DB;
 
@@ -187,7 +187,7 @@ public static 	public function AddTemplate($arFields)
 		return intval($DB->LastID());
 	}
 
-public static 	public function UpdateTemplate($id, $arFields)
+public static function UpdateTemplate($id, $arFields)
 	{
 		global $DB;
 

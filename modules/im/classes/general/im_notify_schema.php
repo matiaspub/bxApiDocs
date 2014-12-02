@@ -49,7 +49,7 @@ class CIMNotifySchema
 
 	public static function OnGetNotifySchema()
 	{
-		return array(
+		$config = array(
 			"im" => array(
 				"NOTIFY" => Array(
 					"message" => Array(
@@ -59,23 +59,29 @@ class CIMNotifySchema
 						"NAME" => GetMessage('IM_NS_DEFAULT'),
 					),
 				),
-			),
-			"main" => array(
+			)
+		);
+
+		if (!IsModuleInstalled("b24network"))
+		{
+			$config["main"] = array(
 				"NAME" => GetMessage('IM_NS_MAIN'),
 				"NOTIFY" => Array(
 					"rating_vote" => Array(
 						"NAME" => GetMessage('IM_NS_MAIN_RATING_VOTE'),
 					),
 				),
-			),
-			"bizproc" => array(
+			);
+			$config["bizproc"] = array(
 				"NOTIFY" => Array(
 					"activity" => Array(
 						"NAME" => GetMessage('IM_NS_BIZPROC_ACTIVITY'),
 					),
 				),
-			),
-		);
+			);
+		}
+
+		return $config;
 	}
 }
 

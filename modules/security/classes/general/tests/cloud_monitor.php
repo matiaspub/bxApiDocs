@@ -21,6 +21,7 @@ class CSecurityCloudMonitorTest
 	/** @var CSecurityTemporaryStorage */
 	protected $sessionData = null;
 	protected $checkingResults = array();
+	protected $protocolVersion = 2;
 
 	static public function __construct()
 	{
@@ -82,7 +83,7 @@ class CSecurityCloudMonitorTest
 		if($this->sessionData->getInt('results_repeat_count') > self::MAX_RESULTS_REQUEST_REPEATE_COUNT)
 			$this->stopChecking(GetMessage('SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE'));
 
-		$response = new CSecurityCloudMonitorRequest('get_results', $this->getCheckingToken());
+		$response = new CSecurityCloudMonitorRequest('get_results', $this->protocolVersion, $this->getCheckingToken());
 		if($response->isOk())
 		{
 			$this->sessionData->flushData();
@@ -129,7 +130,7 @@ class CSecurityCloudMonitorTest
 	 */
 	protected function doCheckRequest()
 	{
-		$response = new CSecurityCloudMonitorRequest('check');
+		$response = new CSecurityCloudMonitorRequest('check', $this->protocolVersion);
 		if($response->isOk())
 		{
 			$this->sessionData->flushData();
@@ -231,11 +232,10 @@ class CSecurityCloudMonitorTest
 			if(isset($result['recommendation']))
 			{
 				$formattedResult[$count]['recommendation'] = $result['recommendation'];
-				$formattedResult[$count]['recommendation'] .= isset($result['additional_info'])? '<br>'.$result['additional_info']: '';
 			}
-			if ($result['requests_errors'])
+			if(isset($result['additional_info']))
 			{
-				$formattedResult[$count]['requests_errors'] = $result['requests_errors'];
+				$formattedResult[$count]['additional_info'] = $result['additional_info'];
 			}
 			$count++;
 		}

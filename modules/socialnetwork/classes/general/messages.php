@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.
+ * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.</body> </html>
  *
  *
  *

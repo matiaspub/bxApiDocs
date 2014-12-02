@@ -217,7 +217,8 @@ final class Loader
 		{
 			foreach ($arClasses as $key => $value)
 			{
-				self::$arAutoLoadClasses[strtr($key, static::ALPHA_UPPER, static::ALPHA_LOWER)] = array(
+				$class = ltrim($key, "\\");
+				self::$arAutoLoadClasses[strtr($class, static::ALPHA_UPPER, static::ALPHA_LOWER)] = array(
 					"module" => $moduleName,
 					"file" => $value
 				);
@@ -227,7 +228,7 @@ final class Loader
 
 	public static function isAutoLoadClassRegistered($className)
 	{
-		$className = trim($className);
+		$className = trim(ltrim($className, "\\"));
 		if ($className == '')
 			return false;
 

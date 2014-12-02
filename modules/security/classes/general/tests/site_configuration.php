@@ -40,18 +40,14 @@ class CSecuritySiteConfigurationTest
 			"method" => "checkDbPassword"
 		),
 		"scriptExtension" => array(
-			"method" => "checkScriptExtension",
-			"base_message_key" => "SECURITY_SITE_CHECKER_SCRIPT_EXTENSIONS",
-			"critical" => CSecurityCriticalLevel::HIGHT
+			"method" => "checkScriptExtension"
 		),
 		"modulesVersion" => array(
-			"method" => "checkModulesVersion",
-			"base_message_key" => "SECURITY_SITE_CHECKER_MODULES_VERSION",
-			"critical" => CSecurityCriticalLevel::HIGHT
+			"method" => "checkModulesVersion"
 		)
 	);
 
-	protected static $actualScriptExtensions = "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp";
+	protected static $expectedScriptExtensions = "php,php3,php4,php5,php6,phtml,pl,asp,aspx,cgi,dll,exe,ico,shtm,shtml,fcg,fcgi,fpl,asmx,pht,py,psp";
 
 	static public function __construct()
 	{
@@ -63,24 +59,52 @@ class CSecuritySiteConfigurationTest
 	 */
 	protected function checkScriptExtension()
 	{
+		$actualExtensions = getScriptFileExt();
 		$missingExtensions = array_diff(
-			explode(",", self::$actualScriptExtensions),
-			getScriptFileExt()
+			explode(",", self::$expectedScriptExtensions),
+			$actualExtensions
 		);
 
-		return empty($missingExtensions);
+		if(!empty($missingExtensions))
+		{
+			$this->addUnformattedDetailError(
+				"SECURITY_SITE_CHECKER_DANGER_EXTENSIONS",
+				CSecurityCriticalLevel::HIGHT,
+				getMessage("SECURITY_SITE_CHECKER_DANGER_EXTENSIONS_ADDITIONAL", array(
+					"#EXPECTED#" => self::$expectedScriptExtensions,
+					"#ACTUAL#" => join(",", $actualExtensions),
+					"#MISSING#" => join(",", $missingExtensions)
+				))
+			);
+			return self::STATUS_FAILED;
+		}
+
+		return self::STATUS_PASSED;
 	}
 
 	protected function checkSecurityLevel()
 	{
+		$isFailed = false;
 		if(!CSecurityFilter::IsActive())
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_WAF_OFF", CSecurityCriticalLevel::HIGHT);
+			$isFailed = true;
+		}
+		if(!CSecurityRedirect::IsActive())
+		{
+			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_REDIRECT_OFF", CSecurityCriticalLevel::MIDDLE);
+			$isFailed = true;
 		}
 		if(self::AdminPolicyLevel() != "high")
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL", CSecurityCriticalLevel::HIGHT);
+			$isFailed = true;
 		}
+
+		if($isFailed)
+			return self::STATUS_FAILED;
+		else
+			return self::STATUS_PASSED;
 	}
 
 	/**
@@ -94,7 +118,10 @@ class CSecuritySiteConfigurationTest
 		/** @global CDataBase $DB */
 		global $DB;
 
-		return !$DB->debug;
+		if($DB->debug)
+			return self::STATUS_FAILED;
+		else
+			return self::STATUS_PASSED;
 	}
 
 	/**
@@ -106,9 +133,13 @@ class CSecuritySiteConfigurationTest
 	protected function checkErrorReporting()
 	{
 		$validErrorReporting = E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE;
-		return !(
+		if (
 			COption::GetOptionInt("main", "error_reporting", $validErrorReporting) != $validErrorReporting
-			&& COption::GetOptionInt("main","error_reporting","") != 0);
+			&& COption::GetOptionInt("main","error_reporting","") != 0
+		)
+			return self::STATUS_FAILED;
+		else
+			return self::STATUS_PASSED;
 	}
 
 	/**
@@ -120,11 +151,14 @@ class CSecuritySiteConfigurationTest
 	protected function checkExceptionDebug()
 	{
 		$exceptionConfig = \Bitrix\Main\Config\Configuration::getValue('exception_handling');
-		return !(
+		if(
 			is_array($exceptionConfig)
 			&& isset($exceptionConfig['debug'])
 			&& $exceptionConfig['debug']
-		);
+		)
+			return self::STATUS_FAILED;
+		else
+			return self::STATUS_PASSED;
 	}
 
 	/**
@@ -137,14 +171,26 @@ class CSecuritySiteConfigurationTest
 	{
 		try
 		{
-			return !$this->isModuleUpdateAvailable();
+			$updates = $this->getAvailableUpdates();
+			if(!empty($updates))
+			{
+				$this->addUnformattedDetailError(
+					"SECURITY_SITE_CHECKER_MODULES_VERSION",
+					CSecurityCriticalLevel::HIGHT,
+					getMessage("SECURITY_SITE_CHECKER_MODULES_VERSION_ARRITIONAL", array(
+						"#MODULES#" => nl2br(htmlspecialcharsbx(join("\n", $updates)))
+					))
+				);
+				return self::STATUS_FAILED;
+			}
 		}
 		catch (SystemException $e)
 		{
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_MODULES_VERSION_ERROR", CSecurityCriticalLevel::HIGHT);
+			return self::STATUS_FAILED;
 		}
 
-		return true;
+		return self::STATUS_PASSED;
 	}
 
 	protected function checkDbPassword()
@@ -181,10 +227,10 @@ class CSecuritySiteConfigurationTest
 
 	/**
 	 * @since 14.0.7
-	 * @return bool
+	 * @return array
 	 * @throws Bitrix\Main\SystemException
 	 */
-	protected function isModuleUpdateAvailable()
+	protected function getAvailableUpdates()
 	{
 		require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/classes/general/update_client.php');
 
@@ -208,9 +254,10 @@ class CSecuritySiteConfigurationTest
 			throw new SystemException('Empty update modules list');
 		}
 
+		$result = array();
 		if (!$updateList['MODULES'][0]['#'])
 		{
-			return false;
+			return $result;
 		}
 
 		if (
@@ -224,10 +271,10 @@ class CSecuritySiteConfigurationTest
 		foreach ($updateList['MODULES'][0]['#']['MODULE'] as $module)
 		{
 			if (array_key_exists($module['@']['ID'], $installedModules))
-				return true;
+				$result[] = $module['@']['ID'];
 		}
 
-		return false;
+		return $result;
 	}
 
 	/**

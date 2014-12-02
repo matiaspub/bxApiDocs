@@ -7,13 +7,14 @@
  */
 
 namespace Bitrix\Main\Entity;
+use Bitrix\Main\DB\SqlExpression;
 
 /**
  * Scalar entity field class for non-array and non-object data types
  * @package bitrix
  * @subpackage main
  */
-class ScalarField extends Field
+abstract class ScalarField extends Field
 {
 	protected $is_primary;
 
@@ -28,9 +29,9 @@ class ScalarField extends Field
 	/** @var null|callable|mixed  */
 	protected $default_value;
 
-	public function __construct($name, $dataType, Base $entity, $parameters = array())
+	public function __construct($name, $parameters = array())
 	{
-		parent::__construct($name, $dataType, $entity, $parameters);
+		parent::__construct($name, $parameters);
 
 		$this->is_primary = (isset($parameters['primary']) && $parameters['primary']);
 		$this->is_unique = (isset($parameters['unique']) && $parameters['unique']);
@@ -66,8 +67,21 @@ class ScalarField extends Field
 		return $this->column_name;
 	}
 
+	/**
+	 * @param string $column_name
+	 */
+	public function setColumnName($column_name)
+	{
+		$this->column_name = $column_name;
+	}
+
 	static public function isValueEmpty($value)
 	{
+		if ($value instanceof SqlExpression)
+		{
+			$value = $value->compile();
+		}
+
 		return (strval($value) === '');
 	}
 

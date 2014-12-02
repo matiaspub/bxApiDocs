@@ -10,7 +10,7 @@ class CAllSocNetLogComments
 	{
 		static $arSiteWorkgroupsPage;
 
-		global $DB, $arSocNetAllowedEntityTypes, $arSocNetAllowedSubscribeEntityTypes, $arSocNetFeaturesSettings, $arSocNetLogEvents;
+		global $DB, $arSocNetAllowedEntityTypes;
 
 		if (
 			!$arSiteWorkgroupsPage 
@@ -20,7 +20,9 @@ class CAllSocNetLogComments
 		{
 			$rsSite = CSite::GetList($by="sort", $order="desc", Array("ACTIVE" => "Y"));
 			while($arSite = $rsSite->Fetch())
+			{
 				$arSiteWorkgroupsPage[$arSite["ID"]] = COption::GetOptionString("socialnetwork", "workgroups_page", $arSite["DIR"]."workgroups/", $arSite["ID"]);
+			}
 		}
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
@@ -38,7 +40,7 @@ class CAllSocNetLogComments
 		}
 		elseif (is_set($arFields, "ENTITY_TYPE"))
 		{
-			if (!in_array($arFields["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypes))
+			if (!in_array($arFields["ENTITY_TYPE"], CSocNetAllowed::GetAllowedEntityTypes()))
 			{
 				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GLC_ERROR_NO_ENTITY_TYPE"), "ERROR_NO_ENTITY_TYPE");
 				return false;
@@ -58,7 +60,9 @@ class CAllSocNetLogComments
 			{
 				$arRe = CAllSocNetLog::GetByID($ID);
 				if ($arRe)
+				{
 					$newEntityType = $arRe["ENTITY_TYPE"];
+				}
 			}
 			if (StrLen($newEntityType) <= 0)
 			{
@@ -135,7 +139,7 @@ class CAllSocNetLogComments
 		return True;
 	}
 
-	public static function Delete($ID)
+	public static function Delete($ID, $bSetSource = false)
 	{
 		global $DB;
 
@@ -146,21 +150,75 @@ class CAllSocNetLogComments
 			return false;
 		}
 
-		$arComment = CSocNetLogComments::GetByID($ID);
+		$bSuccess = false;
 
-		$bSuccess = True;
+		if ($arComment = CSocNetLogComments::GetByID($ID))
+		{
+			if ($bSetSource)
+			{
+				if (strlen($arComment["EVENT_ID"]) > 0)
+				{
+					$arCommentEvent = CSocNetLogTools::FindLogCommentEventByID($arComment["EVENT_ID"]);
+					if (
+						!$arCommentEvent
+						|| !array_key_exists("DELETE_CALLBACK", $arCommentEvent)
+						|| !is_callable($arCommentEvent["DELETE_CALLBACK"])
+					)
+					{
+						$bSetSource = false;
+					}
+				}
+			}
 
-		if ($bSuccess)
-			$bSuccess = $DB->Query("DELETE FROM b_sonet_log_comment WHERE ID = ".$ID."", true);
+			$bSuccess = true;
 
-		if ($bSuccess)
-			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_COMMENT", $ID);
+			if ($bSetSource)
+			{
+				$arSource = CSocNetLogComments::SetSource($arComment, "DELETE");
+			}
 
-		if ($bSuccess && intval($arComment["LOG_ID"]) > 0)
-			CSocNetLogComments::UpdateLogData($arComment["LOG_ID"], false, true);
+			if (
+				!$bSetSource
+				|| (
+					is_array($arSource)
+					&& (
+						!isset($arSource["ERROR"])
+						|| empty($arSource["ERROR"])
+					)
+				)
+			)
+			{
+				if ($bSuccess)
+				{
+					$bSuccess = $DB->Query("DELETE FROM b_sonet_log_comment WHERE ID = ".$ID."", true);
+				}
 
-		if($bSuccess && defined("BX_COMP_MANAGED_CACHE"))
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);
+				if ($bSuccess)
+				{
+					$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_COMMENT", $ID);
+				}
+
+				if ($bSuccess && intval($arComment["LOG_ID"]) > 0)
+				{
+					CSocNetLogComments::UpdateLogData($arComment["LOG_ID"], false, true);
+				}
+
+				if($bSuccess && defined("BX_COMP_MANAGED_CACHE"))
+				{
+					$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_COMMENT_".$ID);
+				}
+			}
+			elseif (
+				is_array($arSource)
+				&& isset($arSource["ERROR"])
+				&& is_string($arSource["ERROR"])
+				&& !empty($arSource["ERROR"])
+			)
+			{
+				$GLOBALS["APPLICATION"]->ThrowException($arSource["ERROR"], "ERROR_DELETE_SOURCE");
+				$bSuccess = false;
+			}
+		}
 
 		return $bSuccess;
 	}
@@ -205,6 +263,8 @@ class CAllSocNetLogComments
 
 	public static function SendEvent($ID, $mailTemplate = "SONET_NEW_EVENT", $bTransport = false)
 	{
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
+
 		$ID = IntVal($ID);
 		if ($ID <= 0)
 			return false;
@@ -253,16 +313,18 @@ class CAllSocNetLogComments
 		}
 
 		if (
-			array_key_exists($arLogComment["ENTITY_TYPE"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"])
-			&& array_key_exists("HAS_MY", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]])
-			&& $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["HAS_MY"] == "Y"
-			&& array_key_exists("CLASS_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]])
-			&& array_key_exists("METHOD_OF", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]])
-			&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["CLASS_OF"]) > 0
-			&& strlen($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["METHOD_OF"]) > 0
-			&& method_exists($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["METHOD_OF"])
+			array_key_exists($arLogComment["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypesDesc)
+			&& array_key_exists("HAS_MY", $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]])
+			&& $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["HAS_MY"] == "Y"
+			&& array_key_exists("CLASS_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]])
+			&& array_key_exists("METHOD_OF", $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]])
+			&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["CLASS_OF"]) > 0
+			&& strlen($arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["METHOD_OF"]) > 0
+			&& method_exists($arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["METHOD_OF"])
 		)
-			$arOfEntities = call_user_func(array($GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["CLASS_OF"], $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$arLogComment["ENTITY_TYPE"]]["METHOD_OF"]), $arLogComment["ENTITY_ID"]);
+		{
+			$arOfEntities = call_user_func(array($arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["CLASS_OF"], $arSocNetAllowedSubscribeEntityTypesDesc[$arLogComment["ENTITY_TYPE"]]["METHOD_OF"]), $arLogComment["ENTITY_ID"]);
+		}
 
 		if ($bTransport)
 		{
@@ -538,16 +600,33 @@ class CAllSocNetLogComments
 		}	
 	}
 
-	public static function SetSource($arFields)
+	public static function SetSource($arFields, $action = false)
 	{
 		$arCallback = false;
-		
+
+		if (!$action)
+		{
+			$action = "ADD";
+		}
+
+		if (!in_array($action, array("ADD", "UPDATE", "DELETE")))
+		{
+			return false;
+		}
+
 		$arEvent = CSocNetLogTools::FindLogCommentEventByID($arFields["EVENT_ID"]);
 		if ($arEvent)
-			$arCallback = $arEvent["ADD_CALLBACK"];
+		{
+			$arCallback = $arEvent[$action."_CALLBACK"];
+		}
 
-		if ($arCallback && is_callable($arCallback))
+		if (
+			$arCallback 
+			&& is_callable($arCallback)
+		)
+		{
 			$arSource = call_user_func_array($arCallback, array($arFields));
+		}
 
 		return $arSource;
 	}

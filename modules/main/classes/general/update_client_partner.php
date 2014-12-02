@@ -298,8 +298,6 @@ public static 	function SearchModulesEx($arOrder, $arFilter, $searchPage, $lang,
 		if (strlen($strError_tmp) <= 0)
 			CUpdateClientPartner::__ParseServerData($content, $arResult, $strError_tmp);
 
-		//echo "<pre>";print_r($arResult);echo "</pre>";
-
 		if (strlen($strError_tmp) <= 0)
 		{
 			if (!isset($arResult["DATA"]) || !is_array($arResult["DATA"]))
@@ -360,8 +358,6 @@ public static 	function SearchModules($searchModule, $lang)
 		$arResult = Array();
 		if (strlen($strError_tmp) <= 0)
 			CUpdateClientPartner::__ParseServerData($content, $arResult, $strError_tmp);
-
-		//echo "<pre>";print_r($arResult);echo "</pre>";
 
 		if (strlen($strError_tmp) <= 0)
 		{
@@ -830,16 +826,11 @@ public static 	function GetStepUpdateInfo($updatesDir, &$strError)
 		if (strlen($strError_tmp) <= 0)
 			$content = file_get_contents($updatesDirFull."/update_info.xml");
 
-		//echo "!1!".htmlspecialcharsbx($content)."!2!";
-
 		if (strlen($strError_tmp) <= 0)
 		{
 			$arResult = Array();
 			CUpdateClientPartner::__ParseServerData($content, $arResult, $strError_tmp);
 		}
-
-		//echo "!3!".htmlspecialcharsbx($content)."!4!";
-		//echo "<pre>";print_r($arRes);echo "</pre>";
 
 		if (strlen($strError_tmp) <= 0)
 		{
@@ -936,6 +927,16 @@ public static 	function GetStepUpdateInfo($updatesDir, &$strError)
 			}
 			if (StrLen($strResultTmp) > 0)
 				$strResult .= "&".$strResultTmp;
+
+			if (CModule::IncludeModule("cluster") && class_exists("CCluster"))
+				$strResult .= "&SUPD_SRS=".urlencode(CCluster::getServersCount());
+			else
+				$strResult .= "&SUPD_SRS=".urlencode("RU");
+
+			if (method_exists("CHTMLPagesCache", "IsOn") && method_exists("CHTMLPagesCache", "IsCompositeEnabled") && CHTMLPagesCache::IsOn() && CHTMLPagesCache::IsCompositeEnabled())
+				$strResult .= "&SUPD_CMP=".urlencode("Y");
+			else
+				$strResult .= "&SUPD_CMP=".urlencode("N");
 
 			return $strResult;
 		}
@@ -1035,8 +1036,6 @@ public static 	function GetUpdatesList(&$strError, $lang = false, $stableVersion
 		$arResult = Array();
 		if (strlen($strError_tmp) <= 0)
 			CUpdateClientPartner::__ParseServerData($content, $arResult, $strError_tmp);
-
-		//echo "<pre>";print_r($arResult);echo "</pre>";
 
 		if (strlen($strError_tmp) <= 0)
 		{

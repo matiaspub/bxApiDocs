@@ -131,7 +131,7 @@ public static 	function SocnetPrepareVars()
 		return '';
 	}
 
-public static 	public static function SocnetLogMessageAdd($arParams, $arMessageFields, $action = "")
+public static function SocnetLogMessageAdd($arParams, $arMessageFields, $action = "")
 	{
 		static $parser = null;
 		if ($parser == null)

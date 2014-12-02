@@ -262,7 +262,10 @@ class CLearningGroupLesson
 
 		$rs = self::getList(
 			array(),
-			array('LESSON_ID' => $arLessonsIds),
+			array(
+				'LEARNING_GROUP_ID' => $learningGroupId,
+				'LESSON_ID'         => $arLessonsIds
+			),
 			array('LESSON_ID', 'DELAY')
 		);
 
@@ -299,7 +302,10 @@ class CLearningGroupLesson
 		{
 			$rs = self::getList(
 				array(),
-				array('LESSON_ID' => $arLessonsIds),
+				array(
+					'LEARNING_GROUP_ID' => $learningGroupId,
+					'LESSON_ID'         => $arLessonsIds
+				),
 				array('LESSON_ID')
 			);
 

@@ -14,15 +14,26 @@ class Event extends \Bitrix\Main\Event
 	protected $entityEventType;
 
 	/**
-	 * @param Base $entity
+	 * @param Base   $entity
 	 * @param string $type
-	 * @param array $parameters
+	 * @param array  $parameters
+	 * @param bool   $withNamespace
 	 */
-	public function __construct(Base $entity, $type, array $parameters = array())
+	public function __construct(Base $entity, $type, array $parameters = array(), $withNamespace = false)
 	{
-		parent::__construct($entity->getModule(), $entity->getName().$type, $parameters);
+		if ($withNamespace)
+		{
+			$eventName = $entity->getNamespace() . $entity->getName() . '::' . $type;
+			$this->entityEventType = $type;
+		}
+		else
+		{
+			$eventName = $entity->getName().$type;
+		}
+
+		parent::__construct($entity->getModule(), $eventName, $parameters);
+
 		$this->entity = $entity;
-		$this->entityEventType = $type;
 	}
 
 	/**
@@ -48,7 +59,7 @@ class Event extends \Bitrix\Main\Event
 			/** @var $evenResult EventResult */
 			foreach($this->getResults() as $evenResult)
 			{
-				if($evenResult->getResultType() === EventResult::ERROR)
+				if($evenResult->getType() === EventResult::ERROR)
 				{
 					$hasErrors = true;
 					$result->addErrors($evenResult->getErrors());
@@ -72,7 +83,7 @@ class Event extends \Bitrix\Main\Event
 			/** @var $evenResult EventResult */
 			foreach($this->getResults() as $evenResult)
 			{
-				if($evenResult->getResultType() !== EventResult::ERROR)
+				if($evenResult->getType() !== EventResult::ERROR)
 				{
 					$removed = $evenResult->getUnset();
 					foreach($removed as $val)

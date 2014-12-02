@@ -6,7 +6,7 @@ class CAllSocNetEventUserView
 
 	public static function SetUser($entityID, $feature = false, $permX = false, $bSetFeatures = false)
 	{
-		global $arSocNetLogEvents, $APPLICATION, $DB;
+		global $APPLICATION, $DB;
 
 		$CacheRelatedUsers = array();
 
@@ -18,6 +18,8 @@ class CAllSocNetEventUserView
 		}
 
 		$event_id = array();
+		$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
+
 		foreach ($arSocNetLogEvents as $event_tmp_id => $arLogEventTmp)
 		{
 			if (
@@ -193,7 +195,9 @@ class CAllSocNetEventUserView
 		{
 			$arActiveFeatures = array_keys(CSocNetFeatures::GetActiveFeaturesNames(SONET_ENTITY_USER, $entityID));
 			foreach ($arActiveFeatures as $feature)
+			{
 				CSocNetEventUserView::SetFeature(SONET_ENTITY_USER, $entityID, $feature);
+			}
 		}
 
 		return true;
@@ -201,7 +205,7 @@ class CAllSocNetEventUserView
 	
 	public static function SetGroup($entityID, $bSetFeatures = false)
 	{
-		global $arSocNetLogEvents, $APPLICATION, $DB;
+		global $APPLICATION, $DB;
 
 		$entityID = IntVal($entityID);
 		if ($entityID <= 0)
@@ -218,6 +222,7 @@ class CAllSocNetEventUserView
 		}
 
 		$arLogEvent = array();
+		$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
 
 		foreach ($arSocNetLogEvents as $event_tmp_id => $arLogEventTmp)
 		{
@@ -294,7 +299,9 @@ class CAllSocNetEventUserView
 		{
 			$arActiveFeatures = array_keys(CSocNetFeatures::GetActiveFeaturesNames(SONET_ENTITY_GROUP, $entityID));
 			foreach ($arActiveFeatures as $feature)
+			{
 				CSocNetEventUserView::SetFeature(SONET_ENTITY_GROUP, $entityID, $feature);
+			}
 		}
 		
 		return true;
@@ -302,7 +309,10 @@ class CAllSocNetEventUserView
 
 	public static function SetFeature($entityType, $entityID, $feature, $op = false, $permX = false, $bCheckEmpty = false)
 	{
-		global $arSocNetFeaturesSettings, $arSocNetAllowedEntityTypes, $APPLICATION, $DB;
+		global $APPLICATION, $DB, $arSocNetAllowedEntityTypes;
+
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
+		$arSocNetAllowedSubscribeEntityTypesDesc = CSocNetAllowed::GetAllowedEntityTypesDesc();
 
 		$CacheRelatedUsers = array();
 		
@@ -425,14 +435,14 @@ class CAllSocNetEventUserView
 			if
 			(
 				intval($entityID) > 0
-				&& array_key_exists($entityType, $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"])
-				&& array_key_exists("CLASS_DESC_GET", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entityType])
-				&& array_key_exists("METHOD_DESC_GET", $GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entityType])
+				&& array_key_exists($entityType, $arSocNetAllowedSubscribeEntityTypesDesc)
+				&& array_key_exists("CLASS_DESC_GET", $arSocNetAllowedSubscribeEntityTypesDesc[$entityType])
+				&& array_key_exists("METHOD_DESC_GET", $arSocNetAllowedSubscribeEntityTypesDesc[$entityType])
 			)
 				$arEntityTmp = call_user_func(
 					array(
-						$GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entityType]["CLASS_DESC_GET"],
-						$GLOBALS["arSocNetAllowedSubscribeEntityTypesDesc"][$entityType]["METHOD_DESC_GET"]
+						$arSocNetAllowedSubscribeEntityTypesDesc[$entityType]["CLASS_DESC_GET"],
+						$arSocNetAllowedSubscribeEntityTypesDesc[$entityType]["METHOD_DESC_GET"]
 					),
 					$entityID
 				);
@@ -676,10 +686,10 @@ class CAllSocNetEventUserView
 
 	public static function Entity2UserAdd($entityType, $entityID, $userID, $role)
 	{
-		global $arSocNetFeaturesSettings, $arSocNetAllowedEntityTypes, $arSocNetLogEvents, $APPLICATION, $DB;
+		global $APPLICATION, $DB, $arSocNetAllowedEntityTypes;
 
 		$CacheRelatedUsers = array();
-		
+
 		$entityType = trim($entityType);
 		if (!in_array($entityType, $arSocNetAllowedEntityTypes))
 		{
@@ -723,6 +733,8 @@ class CAllSocNetEventUserView
 		if (!CSocNetEventUserView::IsEntityEmpty($entityType, $entityID))
 		{
 			$arEvents = array();
+			$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
+
 			foreach ($arSocNetLogEvents as $event_tmp_id => $arLogEventTmp)
 			{
 				if (
@@ -748,10 +760,13 @@ class CAllSocNetEventUserView
 					$arEvents[] = $arLogEventTmp["COMMENT_EVENT"]["EVENT_ID"];
 			}
 
+			$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedEntityTypes();
 			foreach ($arSocNetFeaturesSettings as $feature => $arFeature)
 			{
 				if (!array_key_exists("subscribe_events", $arFeature))
+				{
 					continue;
+				}
 
 				foreach ($arFeature["subscribe_events"] as $event_id_tmp => $arEventIDTmp)
 				{
@@ -809,7 +824,9 @@ class CAllSocNetEventUserView
 
 	public static function CheckFields($ACTION, &$arFields)
 	{
-		global $DB, $arSocNetAllowedEntityTypes, $arSocNetAllowedSubscribeEntityTypes;
+		global $DB;
+
+		$arSocNetAllowedSubscribeEntityTypes = CSocNetAllowed::GetAllowedEntityTypes();
 
 		if (!array_key_exists("ENTITY_TYPE", $arFields))
 		{
@@ -817,7 +834,7 @@ class CAllSocNetEventUserView
 			return false;
 		}
 
-		if (!in_array($arFields["ENTITY_TYPE"], $arSocNetAllowedSubscribeEntityTypes))
+		if (!in_array($arFields["ENTITY_TYPE"], CSocNetAllowed::GetAllowedEntityTypes()))
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_EUV_INCORRECT_ENTITY_TYPE"), "ERROR_INCORRECT_ENTITY_TYPE");
 			return false;
@@ -855,10 +872,15 @@ class CAllSocNetEventUserView
 
 	public static function Delete($entityType, $entityID, $feature = false, $event = false)	
 	{
-		global $arSocNetLogEvents, $arSocNetAllowedEntityTypes, $arSocNetAllowedSubscribeEntityTypes, $arSocNetFeaturesSettings, $DB;
+		global $DB;
+
+		$arSocNetAllowedSubscribeEntityTypes = CSocNetAllowed::GetAllowedEntityTypes();
+		$arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
+		$arSocNetLogEvents = CSocNetAllowed::GetAllowedLogEvents();
 
 		$entityType = trim($entityType);
-		if (!in_array($entityType, $arSocNetAllowedSubscribeEntityTypes))
+
+		if (!in_array($entityType, CSocNetAllowed::GetAllowedEntityTypes()))
 		{
 			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_EUV_INCORRECT_ENTITY_TYPE"), "ERROR_INCORRECT_ENTITY_TYPE");
 			return false;
@@ -919,7 +941,9 @@ class CAllSocNetEventUserView
 								array_key_exists("NO_SET", $arEventIDTmp)
 								&& $arEventIDTmp["NO_SET"]
 							)
+							{
 								continue;
+							}
 
 							$event_id[] = $event_id_tmp;
 
@@ -979,8 +1003,6 @@ class CAllSocNetEventUserView
 	
 	public static function CheckPermissions($table, $user_id)
 	{
-		global $arSocNetAllowedEntityTypes;
-	
 		if ($user_id === false)
 			$strUser = " AND EUV.USER_ANONYMOUS = 'Y' AND EUV.USER_ID = 0";
 		else

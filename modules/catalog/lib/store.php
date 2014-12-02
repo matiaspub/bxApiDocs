@@ -3,19 +3,27 @@
 namespace Bitrix\Catalog;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class StoreTable extends Entity\DataManager
 {
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
+	/**
+	 * Returns DB table name for entity.
+	 *
+	 * @return string
+	 */
 	public static function getTableName()
 	{
 		return 'b_catalog_store';
 	}
 
+	/**
+	 * Returns entity map definition.
+	 *
+	 * @return array
+	 */
 	public static function getMap()
 	{
 		$fieldsMap = array(

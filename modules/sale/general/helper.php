@@ -274,45 +274,39 @@ class CSaleHelper
 
 	private static function getShopLocationParams($siteId = false)
 	{
-		static $arResult = array();
+		$loc_diff = COption::GetOptionString('sale', 'ADDRESS_different_set', 'N');
 
-		if(!isset($arResult[$siteId]))
+		if ($loc_diff == "Y" && ($siteId !== false || defined(SITE_ID)))
 		{
-			$loc_diff = COption::GetOptionString('sale', 'ADDRESS_different_set', 'N');
+			if($siteId === false)
+				$siteId = SITE_ID;
 
-			if ($loc_diff == "Y" && ($siteId !== false || defined(SITE_ID)))
+			$locId = COption::GetOptionInt('sale', 'location', '', $siteId);
+			$locZip = COption::GetOptionString('sale', 'location_zip', '', $siteId);
+		}
+		else
+		{
+			$locId = COption::GetOptionInt('sale', 'location', '');
+			$locZip = COption::GetOptionString('sale', 'location_zip', '');
+
+			if(strlen($locId) <= 0)
 			{
-				if($siteId === false)
-					$siteId = SITE_ID;
-
-				$locId = COption::GetOptionInt('sale', 'location', '', $siteId);
-				$locZip = COption::GetOptionString('sale', 'location_zip', '', $siteId);
-			}
-			else
-			{
-				$locId = COption::GetOptionInt('sale', 'location', '');
-				$locZip = COption::GetOptionString('sale', 'location_zip', '');
-
-				if(strlen($locId) <= 0)
-				{
+				static $defSite = null;
+				if (!isset($defSite))
 					$defSite =  CSite::GetDefSite();
 
-					if($defSite)
-					{
-						$arLoc = static::getShopLocationParams($defSite);
-						$locId = $arLoc['ID'];
-						$locZip = $arLoc['ZIP'];
-					}
+				if($defSite)
+				{
+					$locId = COption::GetOptionInt('sale', 'location', '', $defSite);
+					$locZip = COption::GetOptionString('sale', 'location_zip', '', $defSite);
 				}
 			}
-
-			$arResult[$siteId] = array(
-				'ID' => $locId,
-				'ZIP' => $locZip
-			);
 		}
 
-		return $arResult[$siteId];
+		return array(
+			'ID' => $locId,
+			'ZIP' => $locZip
+		);
 	}
 
 	public static function getShopLocationId($siteId)

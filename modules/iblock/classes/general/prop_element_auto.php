@@ -1,5 +1,5 @@
 <?
-use Bitrix\Main\Localization\Loc as Loc;
+use Bitrix\Main\Localization\Loc;
 Loc::loadMessages(__FILE__);
 
 define ('BT_UT_AUTOCOMPLETE_CODE','EAutocomplete');
@@ -28,16 +28,16 @@ class CIBlockPropertyElementAutoComplete
 	{
 		static $cache = array();
 
-		$intIBlockID = intval($intIBlockID);
-		if (0 >= $intIBlockID)
+		$intIBlockID = (int)$intIBlockID;
+		if ($intIBlockID <= 0)
 			$intIBlockID = 0;
-		$intElementID = intval($intElementID);
-		if (0 >= $intElementID)
+		$intElementID = (int)$intElementID;
+		if ($intElementID <= 0)
 			return false;
 		if (!isset($cache[$intElementID]))
 		{
 			$arFilter = array();
-			if (0 < $intIBlockID)
+			if ($intIBlockID > 0)
 				$arFilter['IBLOCK_ID'] = $intIBlockID;
 			$arFilter['ID'] = $intElementID;
 			$arFilter['SHOW_HISTORY'] = 'Y';
@@ -64,7 +64,7 @@ class CIBlockPropertyElementAutoComplete
 	{
 		$mxResult = false;
 
-		if (0 < intval($arValue['VALUE']))
+		if ((int)$arValue['VALUE'] > 0)
 		{
 			$mxResult = self::GetLinkElement($arValue['VALUE'],$arProperty['LINK_IBLOCK_ID']);
 			if (is_array($mxResult))
@@ -85,7 +85,7 @@ class CIBlockPropertyElementAutoComplete
 
 	protected function GetPropertyViewsList($boolFull)
 	{
-		$boolFull = (true === $boolFull);
+		$boolFull = ($boolFull === true);
 		if ($boolFull)
 		{
 			return array(
@@ -104,7 +104,7 @@ class CIBlockPropertyElementAutoComplete
 
 	protected function GetReplaceSymList($boolFull = false)
 	{
-		$boolFull = (true === $boolFull);
+		$boolFull = ($boolFull === true);
 		if ($boolFull)
 		{
 			return array(
@@ -172,7 +172,7 @@ class CIBlockPropertyElementAutoComplete
 		$arRepSym = array_fill(0,sizeof($arBanSym),$strRepSym);
 		$arResult = array(
 			'BAN_SYM' => $arBanSym,
-			'REP_SYM' => array_fill(0,sizeof($arBanSym),$strRepSym),
+			'REP_SYM' => $arRepSym,
 			'BAN_SYM_STRING' => $strBanSym,
 			'REP_SYM_STRING' => $strRepSym,
 		);
@@ -194,7 +194,7 @@ class CIBlockPropertyElementAutoComplete
 			if (!is_array($mxElement))
 			{
 				$strResult = '<input type="text" name="'.htmlspecialcharsbx($strHTMLControlName["VALUE"]).'" id="'.$strHTMLControlName["VALUE"].'" value="" size="5">'.
-					'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'iblock_element_search.php?lang='.LANGUAGE_ID.'&amp;IBLOCK_ID='.intval($arProperty["LINK_IBLOCK_ID"]).'&amp;n='.urlencode($strHTMLControlName["VALUE"]).'\', 800, 600);">'.
+					'<input type="button" value="..." onClick="jsUtils.OpenWindow(\'iblock_element_search.php?lang='.LANGUAGE_ID.'&amp;IBLOCK_ID='.(int)$arProperty["LINK_IBLOCK_ID"].'&amp;n='.urlencode($strHTMLControlName["VALUE"]).'\', 800, 600);">'.
 					'&nbsp;<span id="sp_'.$strHTMLControlName["VALUE"].'" ></span>';
 			}
 			else
@@ -227,7 +227,7 @@ class CIBlockPropertyElementAutoComplete
 				), null, array("HIDE_ICONS" => "Y")
 			);
 			?><?
-			if ('T' == $arSettings['VIEW'])
+			if ($arSettings['VIEW'] == 'T')
 			{
 				$name = $APPLICATION->IncludeComponent(
 					'bitrix:main.tree.selector',
@@ -250,21 +250,20 @@ class CIBlockPropertyElementAutoComplete
 				);
 				?><?
 			}
-			elseif ('E' == $arSettings['VIEW'])
+			elseif ($arSettings['VIEW'] == 'E')
 			{
-				?><input
-				style="float: left; margin-right: 10px; margin-top: 5px;"
+				?><input style="float: left; margin-right: 10px; margin-top: 5px;"
 				type="button" value="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
 				title="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT_DESCR'); ?>"
 				onclick="jsUtils.OpenWindow('/bitrix/admin/iblock_element_search.php?lang=<? echo LANGUAGE_ID; ?>&IBLOCK_ID=<? echo $arProperty["LINK_IBLOCK_ID"]; ?>&n=&k=&lookup=<? echo 'jsMLI_'.$control_id; ?>', 900, 600);"><?
 			}
-			if ('Y' == $arProperty['USER_TYPE_SETTINGS']['SHOW_ADD'])
+			if ($arProperty['USER_TYPE_SETTINGS']['SHOW_ADD'] == 'Y')
 			{
-				if ('Y' == $arSettings['IBLOCK_MESS'])
+				if ($arSettings['IBLOCK_MESS'] == 'Y')
 				{
 					$arLangMess = CIBlock::GetMessages($arProperty["LINK_IBLOCK_ID"]);
 					$strButtonCaption = $arLangMess['ELEMENT_ADD'];
-					if ('' == $strButtonCaption)
+					if ($strButtonCaption == '')
 					{
 						$strButtonCaption = Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_NEW_ELEMENT');
 					}
@@ -273,12 +272,9 @@ class CIBlockPropertyElementAutoComplete
 				{
 					$strButtonCaption = Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_NEW_ELEMENT');
 				}
-				?><input
-					type="button"
-					style="margin-top: 5px;"
-					value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
+				?><input type="button" style="margin-top: 5px;" value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
 					title="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_NEW_ELEMENT_DESCR'); ?>"
-					onclick="jsUtils.OpenWindow('<? echo CIBlock::GetAdminElementEditLink(
+					onclick="jsUtils.OpenWindow('<? echo '/bitrix/admin/'.CIBlock::GetAdminElementEditLink(
 						$arProperty["LINK_IBLOCK_ID"],
 						null,
 						array(
@@ -317,7 +313,7 @@ class CIBlockPropertyElementAutoComplete
 				}
 			}
 
-			if (0 < intval($arProperty['MULTIPLE_CNT']))
+			if ((int)$arProperty['MULTIPLE_CNT'] > 0)
 			{
 				for ($i = 0; $i < $arProperty['MULTIPLE_CNT']; $i++)
 				{
@@ -357,7 +353,7 @@ class CIBlockPropertyElementAutoComplete
 				), null, array("HIDE_ICONS" => "Y")
 			);
 			?><?
-			if ('T' == $arSettings['VIEW'])
+			if ($arSettings['VIEW'] == 'T')
 			{
 				$name = $APPLICATION->IncludeComponent(
 					'bitrix:main.tree.selector',
@@ -380,17 +376,15 @@ class CIBlockPropertyElementAutoComplete
 				);
 				?><?
 			}
-			elseif ('E' == $arSettings['VIEW'])
+			elseif ($arSettings['VIEW'] == 'E')
 			{
-				?><input
-					style="float: left; margin-right: 10px; margin-top: 5px;"
-					type="button" value="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
+				?><input style="float: left; margin-right: 10px; margin-top: 5px;" type="button" value="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
 					title="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT_MULTI_DESCR'); ?>"
 					onclick="jsUtils.OpenWindow('/bitrix/admin/iblock_element_search.php?lang=<? echo LANGUAGE_ID; ?>&IBLOCK_ID=<? echo $arProperty["LINK_IBLOCK_ID"]; ?>&n=&k=&m=y&lookup=<? echo 'jsMLI_'.$control_id; ?>', 900, 600);"><?
 			}
-			if ('Y' == $arProperty['USER_TYPE_SETTINGS']['SHOW_ADD'])
+			if ($arProperty['USER_TYPE_SETTINGS']['SHOW_ADD'] == 'Y')
 			{
-				if ('Y' == $arSettings['IBLOCK_MESS'])
+				if ($arSettings['IBLOCK_MESS'] == 'Y')
 				{
 					$arLangMess = CIBlock::GetMessages($arProperty["LINK_IBLOCK_ID"]);
 					$strButtonCaption = $arLangMess['ELEMENT_ADD'];
@@ -403,12 +397,9 @@ class CIBlockPropertyElementAutoComplete
 				{
 					$strButtonCaption = Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_NEW_ELEMENT');
 				}
-				?><input
-				type="button"
-				style="margin-top: 5px;"
-				value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
+				?><input type="button" style="margin-top: 5px;" value="<? echo htmlspecialcharsbx($strButtonCaption); ?>"
 				title="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_NEW_ELEMENT_DESCR'); ?>"
-				onclick="jsUtils.OpenWindow('<? echo CIBlock::GetAdminElementEditLink(
+				onclick="jsUtils.OpenWindow('<? echo '/bitrix/admin/'.CIBlock::GetAdminElementEditLink(
 					$arProperty["LINK_IBLOCK_ID"],
 					null,
 					array(
@@ -431,7 +422,7 @@ class CIBlockPropertyElementAutoComplete
 		$mxResult = self::GetPropertyValue($arProperty,$arValue);
 		if (is_array($mxResult))
 		{
-			$strResult = $mxResult['NAME'].' [<a href="'.
+			$strResult = $mxResult['NAME'].' [<a href="/bitrix/admin/'.
 				CIBlock::GetAdminElementEditLink(
 					$mxResult['IBLOCK_ID'],
 					$mxResult['ID'],
@@ -448,29 +439,36 @@ class CIBlockPropertyElementAutoComplete
 		static $cache = array();
 
 		$strResult = '';
-		$arValue['VALUE'] = intval($arValue['VALUE']);
-		if (0 < $arValue['VALUE'])
+		$arValue['VALUE'] = (int)$arValue['VALUE'];
+		if ($arValue['VALUE'] > 0)
 		{
 			if (!isset($cache[$arValue['VALUE']]))
 			{
 				$arFilter = array();
-				$intIBlockID = intval($arProperty['LINK_IBLOCK_ID']);
-				if (0 < $intIBlockID) $arFilter['IBLOCK_ID'] = $intIBlockID;
+				$intIBlockID = (int)$arProperty['LINK_IBLOCK_ID'];
+				if ($intIBlockID > 0)
+				{
+					$arFilter['IBLOCK_ID'] = $intIBlockID;
+				}
 				$arFilter['ID'] = $arValue['VALUE'];
-				$arFilter["ACTIVE"] = "Y";
-				$arFilter["ACTIVE_DATE"] = "Y";
-				$arFilter["CHECK_PERMISSIONS"] = "Y";
-				$arFilter["MIN_PERMISSION"] = "R";
-				$rsElements = CIBlockElement::GetList(array(), $arFilter, false, false, array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL"));
+				$arFilter['ACTIVE'] = 'Y';
+				$arFilter['ACTIVE_DATE'] = 'Y';
+				$arFilter['CHECK_PERMISSIONS'] = 'Y';
+				$arFilter['MIN_PERMISSION'] = 'R';
+				$rsElements = CIBlockElement::GetList(array(), $arFilter, false, false, array('ID', 'XML_ID', 'IBLOCK_ID', 'NAME', 'DETAIL_PAGE_URL'));
 				$cache[$arValue['VALUE']] = $rsElements->GetNext(true,true);
 			}
 			if (is_array($cache[$arValue['VALUE']]))
 			{
-				if (isset($strHTMLControlName['MODE']) && 'CSV_EXPORT' == $strHTMLControlName['MODE'])
+				if (isset($strHTMLControlName['MODE']) && $strHTMLControlName['MODE'] == 'CSV_EXPORT')
 				{
 					$strResult = $cache[$arValue['VALUE']]['ID'];
 				}
-				elseif (isset($strHTMLControlName['MODE']) && ('SIMPLE_TEXT' == $strHTMLControlName['MODE'] || 'ELEMENT_TEMPLATE' == $strHTMLControlName['MODE']))
+				elseif (isset($strHTMLControlName['MODE']) && $strHTMLControlName['MODE'] == 'EXTERNAL_ID')
+				{
+					$strResult = $cache[$arValue['VALUE']]['~XML_ID'];
+				}
+				elseif (isset($strHTMLControlName['MODE']) && ($strHTMLControlName['MODE'] == 'SIMPLE_TEXT' || $strHTMLControlName['MODE'] == 'ELEMENT_TEMPLATE'))
 				{
 					$strResult = $cache[$arValue['VALUE']]["~NAME"];
 				}
@@ -501,27 +499,27 @@ class CIBlockPropertyElementAutoComplete
 		$strView = (isset($arFields['USER_TYPE_SETTINGS']['VIEW']) && in_array($arFields['USER_TYPE_SETTINGS']['VIEW'],$arViewsList) ? $arFields['USER_TYPE_SETTINGS']['VIEW'] : current($arViewsList));
 
 		$strShowAdd = (isset($arFields['USER_TYPE_SETTINGS']['SHOW_ADD']) ? $arFields['USER_TYPE_SETTINGS']['SHOW_ADD'] : '');
-		$strShowAdd = ('Y' == $strShowAdd ? 'Y' : 'N');
+		$strShowAdd = ($strShowAdd == 'Y' ? 'Y' : 'N');
 
-		$intMaxWidth = intval(isset($arFields['USER_TYPE_SETTINGS']['MAX_WIDTH']) ? $arFields['USER_TYPE_SETTINGS']['MAX_WIDTH'] : 0);
-		if (0 >= $intMaxWidth) $intMaxWidth = 0;
+		$intMaxWidth = (int)(isset($arFields['USER_TYPE_SETTINGS']['MAX_WIDTH']) ? $arFields['USER_TYPE_SETTINGS']['MAX_WIDTH'] : 0);
+		if ($intMaxWidth <= 0) $intMaxWidth = 0;
 
-		$intMinHeight = intval(isset($arFields['USER_TYPE_SETTINGS']['MIN_HEIGHT']) ? $arFields['USER_TYPE_SETTINGS']['MIN_HEIGHT'] : 0);
-		if (0 >= $intMinHeight) $intMinHeight = 24;
+		$intMinHeight = (int)(isset($arFields['USER_TYPE_SETTINGS']['MIN_HEIGHT']) ? $arFields['USER_TYPE_SETTINGS']['MIN_HEIGHT'] : 0);
+		if ($intMinHeight <= 0) $intMinHeight = 24;
 
-		$intMaxHeight = intval(isset($arFields['USER_TYPE_SETTINGS']['MAX_HEIGHT']) ? $arFields['USER_TYPE_SETTINGS']['MAX_HEIGHT'] : 0);
-		if (0 >= $intMaxHeight) $intMaxHeight = 1000;
+		$intMaxHeight = (int)(isset($arFields['USER_TYPE_SETTINGS']['MAX_HEIGHT']) ? $arFields['USER_TYPE_SETTINGS']['MAX_HEIGHT'] : 0);
+		if ($intMaxHeight <= 0) $intMaxHeight = 1000;
 
 		$strBannedSymbols = trim(isset($arFields['USER_TYPE_SETTINGS']['BAN_SYM']) ? $arFields['USER_TYPE_SETTINGS']['BAN_SYM'] : ',;');
 		$strBannedSymbols = str_replace(' ','',$strBannedSymbols);
-		if (false === strpos($strBannedSymbols,','))
+		if (strpos($strBannedSymbols,',') === false)
 			$strBannedSymbols .= ',';
-		if (false === strpos($strBannedSymbols,';'))
+		if (strpos($strBannedSymbols,';') === false)
 			$strBannedSymbols .= ';';
 
 		$strOtherReplaceSymbol = '';
 		$strReplaceSymbol = (isset($arFields['USER_TYPE_SETTINGS']['REP_SYM']) ? $arFields['USER_TYPE_SETTINGS']['REP_SYM'] : ' ');
-		if (BT_UT_AUTOCOMPLETE_REP_SYM_OTHER == $strReplaceSymbol)
+		if ($strReplaceSymbol == BT_UT_AUTOCOMPLETE_REP_SYM_OTHER)
 		{
 			$strOtherReplaceSymbol = (isset($arFields['USER_TYPE_SETTINGS']['OTHER_REP_SYM']) ? substr($arFields['USER_TYPE_SETTINGS']['OTHER_REP_SYM'],0,1) : '');
 			if ((',' == $strOtherReplaceSymbol) || (';' == $strOtherReplaceSymbol))
@@ -577,15 +575,15 @@ class CIBlockPropertyElementAutoComplete
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_MAX_WIDTH').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_WIDTH]" value="'.intval($arSettings['MAX_WIDTH']).'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MAX_WIDTH').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_WIDTH]" value="'.(int)$arSettings['MAX_WIDTH'].'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MAX_WIDTH').'</td>
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_MIN_HEIGHT').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MIN_HEIGHT]" value="'.intval($arSettings['MIN_HEIGHT']).'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MIN_HEIGHT').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MIN_HEIGHT]" value="'.(int)$arSettings['MIN_HEIGHT'].'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MIN_HEIGHT').'</td>
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_MAX_HEIGHT').'</td>
-		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_HEIGHT]" value="'.intval($arSettings['MAX_HEIGHT']).'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MAX_HEIGHT').'</td>
+		<td><input type="text" name="'.$strHTMLControlName["NAME"].'[MAX_HEIGHT]" value="'.(int)$arSettings['MAX_HEIGHT'].'">&nbsp;'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_COMMENT_MAX_HEIGHT').'</td>
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_EAUTOCOMPLETE_SETTING_BAN_SYMBOLS').'</td>
@@ -608,13 +606,13 @@ class CIBlockPropertyElementAutoComplete
 
 		$strValue = '';
 
-		if (isset($_REQUEST[$strHTMLControlName["VALUE"]]) && (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) || (0 < intval($_REQUEST[$strHTMLControlName["VALUE"]]))))
+		if (isset($_REQUEST[$strHTMLControlName["VALUE"]]) && (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) || (0 < (int)$_REQUEST[$strHTMLControlName["VALUE"]])))
 		{
 			$arFilterValues = (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) ? $_REQUEST[$strHTMLControlName["VALUE"]] : array($_REQUEST[$strHTMLControlName["VALUE"]]));
 			$mxResultValue = self::GetValueForAutoCompleteMulti($arProperty,$arFilterValues,$arSymbols['BAN_SYM'],$arSymbols['REP_SYM']);
 			$strValue = (is_array($mxResultValue) ? htmlspecialcharsback(implode("\n",$mxResultValue)) : '');
 		}
-		elseif (isset($GLOBALS[$strHTMLControlName["VALUE"]]) && (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) || (0 < intval($GLOBALS[$strHTMLControlName["VALUE"]]))))
+		elseif (isset($GLOBALS[$strHTMLControlName["VALUE"]]) && (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) || (0 < (int)$GLOBALS[$strHTMLControlName["VALUE"]])))
 		{
 			$arFilterValues = (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) ? $GLOBALS[$strHTMLControlName["VALUE"]] : array($GLOBALS[$strHTMLControlName["VALUE"]]));
 			$mxResultValue = self::GetValueForAutoCompleteMulti($arProperty,$arFilterValues,$arSymbols['BAN_SYM'],$arSymbols['REP_SYM']);
@@ -639,9 +637,8 @@ class CIBlockPropertyElementAutoComplete
 				'FILTER' => 'Y',
 			), null, array("HIDE_ICONS" => "Y")
 		);
-		?><input
-			style="float: left; margin-right: 10px;"
-			type="button" value="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
+		?><input style="float: left; margin-right: 10px;" type="button"
+			value="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT'); ?>"
 			title="<? echo Loc::getMessage('BT_UT_EAUTOCOMPLETE_MESS_SEARCH_ELEMENT_MULTI_DESCR'); ?>"
 			onclick="jsUtils.OpenWindow('/bitrix/admin/iblock_element_search.php?lang=<? echo LANGUAGE_ID; ?>&IBLOCK_ID=<? echo $arProperty["LINK_IBLOCK_ID"]; ?>&n=&k=&m=y&lookup=<? echo 'jsMLI_'.$control_id; ?>', 900, 600);">
 		<script type="text/javascript">
@@ -660,21 +657,20 @@ class CIBlockPropertyElementAutoComplete
 	static public function AddFilterFields($arProperty, $strHTMLControlName, &$arFilter, &$filtered)
 	{
 		$filtered = false;
-
 		$arFilterValues = array();
 
-		if (isset($_REQUEST[$strHTMLControlName["VALUE"]]) && (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) || (0 < intval($_REQUEST[$strHTMLControlName["VALUE"]]))))
+		if (isset($_REQUEST[$strHTMLControlName["VALUE"]]) && (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) || (0 < (int)$_REQUEST[$strHTMLControlName["VALUE"]])))
 		{
 			$arFilterValues = (is_array($_REQUEST[$strHTMLControlName["VALUE"]]) ? $_REQUEST[$strHTMLControlName["VALUE"]] : array($_REQUEST[$strHTMLControlName["VALUE"]]));
 		}
-		elseif (isset($GLOBALS[$strHTMLControlName["VALUE"]]) && (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) || (0 < intval($GLOBALS[$strHTMLControlName["VALUE"]]))))
+		elseif (isset($GLOBALS[$strHTMLControlName["VALUE"]]) && (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) || (0 < (int)$GLOBALS[$strHTMLControlName["VALUE"]])))
 		{
 			$arFilterValues = (is_array($GLOBALS[$strHTMLControlName["VALUE"]]) ? $GLOBALS[$strHTMLControlName["VALUE"]] : array($GLOBALS[$strHTMLControlName["VALUE"]]));
 		}
 
 		foreach ($arFilterValues as $key => $value)
 		{
-			if (0 >= intval($value))
+			if ((int)($value) <= 0)
 				unset($arFilterValues[$key]);
 		}
 

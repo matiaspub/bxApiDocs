@@ -126,7 +126,7 @@ class CCatalogDiscountConvertTmp
 			$intMinProduct = 0;
 
 		$strSql = "SELECT COUNT(CD.ID) as CNT FROM ".self::$strMainTableName." CD WHERE
-			CD.TYPE = ".DISCOUNT_TYPE_STANDART." AND CD.VERSION = ".CATALOG_DISCOUNT_NEW_VERSION."
+			CD.TYPE = ".CCatalogDiscount::ENTITY_ID." AND CD.VERSION = ".CCatalogDiscount::CURRENT_FORMAT."
 			AND CD.ID NOT IN (SELECT CDT.ID FROM ".self::$strTableName." CDT WHERE 1=1)";
 		if (0 < $intMinProduct)
 		{

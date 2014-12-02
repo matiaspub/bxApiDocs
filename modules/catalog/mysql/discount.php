@@ -31,7 +31,10 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		$strSql = "INSERT INTO b_catalog_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$ID = intval($DB->LastID());
+		$ID = (int)$DB->LastID();
+
+		if (isset($arFields['HANDLERS']))
+			self::updateDiscountHandlers($ID, $arFields['HANDLERS'], false);
 
 		return $ID;
 	}
@@ -58,7 +61,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 					$arFields['VALUE'] = doubleval($arDiscount['VALUE']);
 				if (!isset($arFields['VALUE_TYPE']))
 					$arFields['VALUE_TYPE'] = $arDiscount['VALUE_TYPE'];
-				if ('P' == $arFields['VALUE_TYPE'] && 100 < $arFields['VALUE'])
+				if (self::TYPE_PERCENT == $arFields['VALUE_TYPE'] && 100 < $arFields['VALUE'])
 				{
 					$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_DISC_ERR_BAD_VALUE"), "VALUE");
 					return false;
@@ -76,8 +79,11 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		$strUpdate = $DB->PrepareUpdate("b_catalog_discount", $arFields);
 		if (!empty($strUpdate))
 		{
-			$strSql = "UPDATE b_catalog_discount SET ".$strUpdate." WHERE ID = ".$ID." AND TYPE = ".DISCOUNT_TYPE_STANDART;
+			$strSql = "UPDATE b_catalog_discount SET ".$strUpdate." WHERE ID = ".$ID." AND TYPE = ".self::ENTITY_ID;
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			if (isset($arFields['HANDLERS']))
+				self::updateDiscountHandlers($ID, $arFields['HANDLERS'], true);
 		}
 
 		return $ID;
@@ -118,16 +124,14 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$stackCacheManager->Clear("catalog_discount");
 
-		$DB->Query("DELETE FROM b_catalog_discount_cond WHERE DISCOUNT_ID = ".$ID);
-		$DB->Query("DELETE FROM b_catalog_discount_coupon WHERE DISCOUNT_ID = ".$ID);
-		$DB->Query("DELETE FROM b_catalog_discount2iblock WHERE DISCOUNT_ID = ".$ID);
-		$DB->Query("DELETE FROM b_catalog_discount2section WHERE DISCOUNT_ID = ".$ID);
-		$DB->Query("DELETE FROM b_catalog_discount2product WHERE DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount_module where DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount_cond where DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount_coupon where DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount2iblock where DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount2section where DISCOUNT_ID = ".$ID);
+		$DB->Query("delete from b_catalog_discount2product where DISCOUNT_ID = ".$ID);
 
-
-		$DB->Query("DELETE FROM b_catalog_discount WHERE ID = ".$ID." AND TYPE = ".DISCOUNT_TYPE_STANDART);
-
-		CCatalogDiscount::SaveFilterOptions();
+		$DB->Query("delete from b_catalog_discount where ID = ".$ID." and TYPE = ".self::ENTITY_ID);
 
 		foreach (GetModuleEvents("catalog", "OnDiscountDelete", true) as $arEvent)
 		{
@@ -180,7 +184,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			$DB->DateToCharFunction("CD.ACTIVE_TO", "FULL")." as ACTIVE_TO, ".
 			"CD.CREATED_BY, CD.MODIFIED_BY, ".$DB->DateToCharFunction('CD.DATE_CREATE', 'FULL').' as DATE_CREATE, '.
 			"CD.PRIORITY, CD.LAST_DISCOUNT, CD.VERSION, CD.CONDITIONS, CD.UNPACK ".
-			"FROM b_catalog_discount CD WHERE CD.ID = ".$ID." AND CD.TYPE = ".DISCOUNT_TYPE_STANDART;
+			"FROM b_catalog_discount CD WHERE CD.ID = ".$ID." AND CD.TYPE = ".self::ENTITY_ID;
 
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($res = $db_res->Fetch())
@@ -403,7 +407,28 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		if (!is_array($arFilter))
 			$arFilter = array();
-		$arFilter['TYPE'] = DISCOUNT_TYPE_STANDART;
+		if (!empty($arFilter))
+		{
+			$filterKeys = array_keys($arFilter);
+			foreach ($filterKeys as &$oneKey)
+			{
+				if (
+					preg_match('/^\!?\+.{0,2}(GROUP_ID|USER_GROUP_ID|CATALOG_GROUP_ID|PRICE_TYPE_ID)$/', $oneKey) == 1
+				)
+				{
+					if (is_array($arFilter[$oneKey]))
+					{
+						$arFilter[$oneKey][] = -1;
+					}
+					else
+					{
+						$arFilter[$oneKey] = array($arFilter[$oneKey], -1);
+					}
+				}
+			}
+			unset($oneKey, $filterKeys);
+		}
+		$arFilter['TYPE'] = self::ENTITY_ID;
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
@@ -1176,6 +1201,9 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		self::__SaveFilterForEntity(array('ENTITY_ID' => 'USER_GROUP_ID', 'OPTION_ID' => 'do_use_discount_group'));
 	}
 
+/*
+* @deprecated deprecated since catalog 14.5.6
+*/
 	protected function __SaveFilterForEntity($arParams)
 	{
 		global $DB;
@@ -1201,28 +1229,44 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		COption::SetOptionString("catalog", $arParams['OPTION_ID'], $strFilter);
 	}
 
-	protected function __UpdateSubdiscount($intDiscountID, &$arConditions)
+	protected function __UpdateSubdiscount($intDiscountID, &$arConditions, $active = '')
 	{
-		global $APPLICATION;
 		global $DB;
 
 		$arMsg = array();
 		$boolResult = true;
 
-		$intDiscountID = intval($intDiscountID);
-		if (0 >= $intDiscountID)
+		$intDiscountID = (int)$intDiscountID;
+		if ($intDiscountID <= 0)
 		{
 			$arMsg[] = array('id' => 'ID', "text" => GetMessage('BT_MOD_CATALOG_DISC_ERR_DISCOUNT_ID_ABSENT'));
 			$boolResult = false;
 		}
-		if (!is_array($arConditions) || empty($arConditions))
+		if (empty($arConditions) || !is_array($arConditions))
 		{
 			$arMsg[] = array('id' => 'SUBDISCOUNT', "text" => GetMessage('BT_MOD_CATALOG_DISC_ERR_SUBDISCOUNT_ROWS_ABSENT'));
 			$boolResult = false;
 		}
 
+		$active = (string)$active;
+		if ($active !== 'Y' && $active !== 'N')
+		{
+			$strQuery = 'select ID, ACTIVE from b_catalog_discount where ID = '.$intDiscountID;
+			$rsActive = $DB->Query($strQuery,  false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($activeFromDatabase = $rsActive->Fetch())
+			{
+				$active = $activeFromDatabase['ACTIVE'];
+			}
+			else
+			{
+				$arMsg[] = array('id' => 'ID', "text" => GetMessage('BT_MOD_CATALOG_DISC_ERR_DISCOUNT_ID_ABSENT'));
+				$boolResult = false;
+			}
+		}
+
 		$arEmptyRow = array(
 			'DISCOUNT_ID' => $intDiscountID,
+			'ACTIVE' => $active,
 			'USER_GROUP_ID' => -1,
 			'PRICE_TYPE_ID' => -1,
 		);
@@ -1262,6 +1306,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 		$arFields = array(
 			"DISCOUNT_ID" => array("FIELD" => "DC.DISCOUNT_ID", "TYPE" => "int"),
+			"ACTIVE" => array("FIELD" => "DC.ACTIVE", "TYPE" => "char"),
 			"USER_GROUP_ID" => array("FIELD" => "DC.USER_GROUP_ID", "TYPE" => "int"),
 			"PRICE_TYPE_ID" => array("FIELD" => "DC.PRICE_TYPE_ID", "TYPE" => "int"),
 		);
@@ -1283,6 +1328,24 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			$arFilter['PRICE_TYPE_ID'][] = -1;
 		else
 			unset($arFilter['PRICE_TYPE_ID']);
+
+		$active = 'Y';
+		if (array_key_exists('ACTIVE', $arFilter))
+		{
+			if ($arFilter['ACTIVE'] === null)
+			{
+				$active = '';
+			}
+			elseif ($arFilter['ACTIVE'] == 'Y' || $arFilter['ACTIVE'] == 'N')
+			{
+				$active = $arFilter['ACTIVE'];
+			}
+			unset($arFilter['ACTIVE']);
+		}
+		if ($active != '')
+		{
+			$arFilter['ACTIVE'] = $active;
+		}
 
 		if (array_key_exists('DISCOUNT_ID', $arFilter))
 			unset($arFilter['DISCOUNT_ID']);
@@ -1418,6 +1481,65 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			}
 		}
 		return $boolResult;
+	}
+
+	protected function updateDiscountHandlers($discountID, $handlers, $update)
+	{
+		global $DB;
+
+		$discountID = (int)$discountID;
+		if ($discountID <= 0 || empty($handlers) || !is_array($handlers))
+		{
+			return;
+		}
+		if (isset($handlers['MODULES']))
+		{
+			if ($update)
+			{
+				$sqlQuery = 'delete from b_catalog_discount_module where DISCOUNT_ID = '.$discountID;
+				$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			}
+			if (!empty($handlers['MODULES']))
+			{
+				foreach ($handlers['MODULES'] as &$oneModuleID)
+				{
+					$fields = array(
+						'DISCOUNT_ID' => $discountID,
+						'MODULE_ID' => $oneModuleID
+					);
+					$insert = $DB->PrepareInsert('b_catalog_discount_module', $fields);
+					$sqlQuery = "insert into b_catalog_discount_module(".$insert[0].") values(".$insert[1].")";
+					$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+				}
+				unset($oneModuleID);
+			}
+		}
+	}
+
+	protected function getDiscountHandlers($discountList)
+	{
+		global $DB;
+
+		$defaultRes = array(
+			'MODULES' => array(),
+			'EXT_FILES' => array()
+		);
+		$result = array();
+		CatalogClearArray($discountList, true);
+		if (!empty($discountList))
+		{
+			$result = array_fill_keys($discountList, $defaultRes);
+			$discountIn = implode(', ', $discountList);
+			$sqlQuery = 'select * from b_catalog_discount_module where DISCOUNT_ID IN ('.$discountIn.')';
+			$resQuery = $DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+			while ($row = $resQuery->Fetch())
+			{
+				$row['DISCOUNT_ID'] = (int)$row['DISCOUNT_ID'];
+				$result[$row['DISCOUNT_ID']]['MODULES'][] = $row['MODULE_ID'];
+			}
+		}
+
+		return $result;
 	}
 }
 ?>

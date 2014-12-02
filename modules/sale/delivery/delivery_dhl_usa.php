@@ -6,7 +6,7 @@ It uses on-line calculator. Calculation only from USA.
 
 CModule::IncludeModule("sale");
 
-IncludeModuleLangFile('/bitrix/modules/sale/delivery/delivery_dhl_usa.php');
+IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/delivery/delivery_dhl_usa.php');
 
 // define('DELIVERY_DHL_USA_WRITE_LOG', 0); // flag 'write to log'. use CDeliveryDHLUSA::__WriteToLog() for logging.
 // define('DELIVERY_DHL_USA_CACHE_LIFETIME', 2592000); // cache lifetime - 30 days (60*60*24*30)

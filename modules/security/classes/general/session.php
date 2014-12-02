@@ -128,7 +128,7 @@ class CSecuritySession
 	 */
 	public static function checkSessionId($id)
 	{
-		return (bool) preg_match("/^[\da-z]{10,32}$/i", $id);
+		return (bool) preg_match("/^[\da-z]{10,32}$/iD", $id);
 	}
 
 	public static function activate()

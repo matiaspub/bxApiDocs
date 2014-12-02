@@ -316,7 +316,7 @@ class CAllUserCounter
 	*
 	*
 	*
-	* @param cod $e  Код удаляемого счётчика.
+	* @param cod $e  Код удаляемого счётчика. </htm
 	*
 	*
 	*

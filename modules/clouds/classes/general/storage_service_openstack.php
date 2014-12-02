@@ -307,9 +307,12 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 
 	public function GetFileSRC($arBucket, $arFile)
 	{
+		global $APPLICATION;
+		$proto = $APPLICATION->IsHTTPS()? "https": "http";
+
 		if($arBucket["CNAME"])
 		{
-			$host = "http://".$arBucket["CNAME"];
+			$host = $proto."://".$arBucket["CNAME"];
 		}
 		else
 		{

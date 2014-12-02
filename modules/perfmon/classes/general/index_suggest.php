@@ -1,63 +1,64 @@
-<?
+<?php
+
 class CPerfomanceIndexSuggest
 {
 	public static function GetList($arSelect, $arFilter, $arOrder)
 	{
 		global $DB;
 
-		if(!is_array($arSelect))
+		if (!is_array($arSelect))
 			$arSelect = array();
-		if(count($arSelect) < 1)
+		if (count($arSelect) < 1)
 			$arSelect = array(
 				"ID",
 			);
 
-		if(!is_array($arOrder))
+		if (!is_array($arOrder))
 			$arOrder = array();
-		if(count($arOrder) < 1)
+		if (count($arOrder) < 1)
 			$arOrder = array(
 				"TABLE_NAME" => "ASC",
 			);
 
 		$arQueryOrder = array();
-		foreach($arOrder as $strColumn => $strDirection)
+		foreach ($arOrder as $strColumn => $strDirection)
 		{
 			$strColumn = strtoupper($strColumn);
-			$strDirection = strtoupper($strDirection)=="ASC"? "ASC": "DESC";
-			switch($strColumn)
+			$strDirection = strtoupper($strDirection) == "ASC"? "ASC": "DESC";
+			switch ($strColumn)
 			{
-				case "ID":
-				case "TABLE_NAME":
-				case "SQL_COUNT":
-				case "SQL_TIME":
-					$arSelect[] = $strColumn;
-					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					break;
+			case "ID":
+			case "TABLE_NAME":
+			case "SQL_COUNT":
+			case "SQL_TIME":
+				$arSelect[] = $strColumn;
+				$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				break;
 			}
 		}
 
 		$bJoin = false;
 		$arQuerySelect = array();
-		foreach($arSelect as $strColumn)
+		foreach ($arSelect as $strColumn)
 		{
 			$strColumn = strtoupper($strColumn);
-			switch($strColumn)
+			switch ($strColumn)
 			{
-				case "ID":
-				case "TABLE_NAME":
-				case "TABLE_ALIAS":
-				case "COLUMN_NAMES":
-				case "SQL_MD5":
-				case "SQL_TEXT":
-				case "SQL_COUNT":
-				case "SQL_TIME":
-				case "SQL_EXPLAIN":
-					$arQuerySelect[$strColumn] = "s.".$strColumn;
-					break;
-				case "BANNED":
-					$arQuerySelect[$strColumn] = "c.".$strColumn;
-					$bJoin = true;
-					break;
+			case "ID":
+			case "TABLE_NAME":
+			case "TABLE_ALIAS":
+			case "COLUMN_NAMES":
+			case "SQL_MD5":
+			case "SQL_TEXT":
+			case "SQL_COUNT":
+			case "SQL_TIME":
+			case "SQL_EXPLAIN":
+				$arQuerySelect[$strColumn] = "s.".$strColumn;
+				break;
+			case "BANNED":
+				$arQuerySelect[$strColumn] = "c.".$strColumn;
+				$bJoin = true;
+				break;
 			}
 		}
 
@@ -96,10 +97,10 @@ class CPerfomanceIndexSuggest
 			),
 		));
 
-		if(count($arQuerySelect) < 1)
-			$arQuerySelect = array("ID"=>"s.ID");
+		if (count($arQuerySelect) < 1)
+			$arQuerySelect = array("ID" => "s.ID");
 
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
 		$strQueryWhere = $obQueryWhere->GetQuery($arFilter);
 
@@ -127,8 +128,8 @@ class CPerfomanceIndexSuggest
 	{
 		global $DB;
 		$ID = intval($ID);
-		$res = $DB->Query("DELETE FROM b_perf_index_suggest_sql WHERE SUGGEST_ID = ".$ID);
-		$res = $DB->Query("DELETE FROM b_perf_index_suggest WHERE ID = ".$ID);
+		$DB->Query("DELETE FROM b_perf_index_suggest_sql WHERE SUGGEST_ID = ".$ID);
+		$DB->Query("DELETE FROM b_perf_index_suggest WHERE ID = ".$ID);
 	}
 
 	public static function UpdateStat($sql_md5, $count, $query_time, $sql_id)
@@ -143,7 +144,7 @@ class CPerfomanceIndexSuggest
 			WHERE iss.SQL_MD5 = '".$DB->ForSQL($sql_md5)."'
 			AND s.ID = ".intval($sql_id)."
 		");
-		if(is_object($res))
+		if (is_object($res))
 		{
 			$DB->Query("
 				UPDATE b_perf_index_suggest
@@ -163,4 +164,3 @@ class CPerfomanceIndexSuggest
 		$DB->Query("TRUNCATE TABLE b_perf_index_suggest_sql");
 	}
 }
-?>

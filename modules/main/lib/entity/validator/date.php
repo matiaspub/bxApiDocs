@@ -15,6 +15,11 @@ class Date extends Base
 {
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
+		if (empty($value))
+		{
+			return true;
+		}
+
 		if ($value instanceof Type\DateTime)
 		{
 			// self-validating object

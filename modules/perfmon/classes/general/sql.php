@@ -1,106 +1,116 @@
-<?
+<?php
+
 class CAllPerfomanceSQL
 {
+	/**
+	 * @param array $arSelect
+	 * @param array $arFilter
+	 * @param array $arOrder
+	 * @param boolean $bGroup
+	 * @param boolean|array $arNavStartParams
+	 *
+	 * @return boolean|CDBResult
+	 */
 	public static function GetList($arSelect, $arFilter, $arOrder, $bGroup, $arNavStartParams = false)
 	{
 		global $DB;
 
-		if(!is_array($arSelect))
+		if (!is_array($arSelect))
 			$arSelect = array();
-		if(count($arSelect) < 1)
+		if (count($arSelect) < 1)
 			$arSelect = array(
 				"ID",
 			);
 
-		if(!is_array($arOrder))
+		if (!is_array($arOrder))
 			$arOrder = array();
-		if(count($arOrder) < 1)
+		if (count($arOrder) < 1)
 			$arOrder = array(
 				"HIT_ID" => "DESC",
 				"NN" => "ASC",
 			);
 
 		$arQueryOrder = array();
-		foreach($arOrder as $strColumn => $strDirection)
+		foreach ($arOrder as $strColumn => $strDirection)
 		{
 			$strColumn = strtoupper($strColumn);
-			$strDirection = strtoupper($strDirection)=="ASC"? "ASC": "DESC";
-			switch($strColumn)
+			$strDirection = strtoupper($strDirection) == "ASC"? "ASC": "DESC";
+			switch ($strColumn)
 			{
-				case "ID":
-				case "HIT_ID":
-				case "NN":
-				case "MODULE_NAME":
-				case "COMPONENT_NAME":
-				case "NODE_ID":
+			case "ID":
+			case "HIT_ID":
+			case "NN":
+			case "MODULE_NAME":
+			case "COMPONENT_NAME":
+			case "NODE_ID":
+				$arSelect[] = $strColumn;
+				$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				break;
+			case "SQL_TEXT":
+			case "QUERY_TIME":
+				if (!$bGroup)
+				{
 					$arSelect[] = $strColumn;
 					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					break;
-				case "SQL_TEXT":
-				case "QUERY_TIME":
-					if(!$bGroup)
-					{
-						$arSelect[] = $strColumn;
-						$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					}
-					break;
-				case "MAX_QUERY_TIME":
-				case "MIN_QUERY_TIME":
-				case "AVG_QUERY_TIME":
-				case "SUM_QUERY_TIME":
-					if($bGroup)
-					{
-						$arSelect[] = $strColumn;
-						$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					}
-					break;
-				case "COUNT":
-					if($bGroup)
-					{
-						$arSelect[] = $strColumn;
-						$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
-					}
-					break;
+				}
+				break;
+			case "MAX_QUERY_TIME":
+			case "MIN_QUERY_TIME":
+			case "AVG_QUERY_TIME":
+			case "SUM_QUERY_TIME":
+				if ($bGroup)
+				{
+					$arSelect[] = $strColumn;
+					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				}
+				break;
+			case "COUNT":
+				if ($bGroup)
+				{
+					$arSelect[] = $strColumn;
+					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
+				}
+				break;
 			}
 		}
 
 		$arQueryGroup = array();
 		$arQuerySelect = array();
-		foreach($arSelect as $strColumn)
+		foreach ($arSelect as $strColumn)
 		{
 			$strColumn = strtoupper($strColumn);
-			switch($strColumn)
+			switch ($strColumn)
 			{
-				case "ID":
-				case "HIT_ID":
-				case "NN":
-				case "MODULE_NAME":
-				case "COMPONENT_NAME":
-				case "NODE_ID":
-					if($bGroup)
-						$arQueryGroup[$strColumn] = "s.".$strColumn;
+			case "ID":
+			case "HIT_ID":
+			case "NN":
+			case "MODULE_NAME":
+			case "COMPONENT_NAME":
+			case "NODE_ID":
+				if ($bGroup)
+					$arQueryGroup[$strColumn] = "s.".$strColumn;
+				$arQuerySelect[$strColumn] = "s.".$strColumn;
+				break;
+			case "SQL_TEXT":
+			case "QUERY_TIME":
+				if (!$bGroup)
 					$arQuerySelect[$strColumn] = "s.".$strColumn;
-					break;
-				case "SQL_TEXT":
-				case "QUERY_TIME":
-					if(!$bGroup)
-						$arQuerySelect[$strColumn] = "s.".$strColumn;
-					break;
-				case "MAX_QUERY_TIME":
-				case "MIN_QUERY_TIME":
-				case "AVG_QUERY_TIME":
-				case "SUM_QUERY_TIME":
-					if($bGroup)
-					{
-						$arQuerySelect[$strColumn] = substr($strColumn, 0, 3)."(s.".substr($strColumn, 4).") ".$strColumn;
-					}
-					break;
-				case "COUNT":
-					if($bGroup)
-					{
-						$arQuerySelect[$strColumn] = "COUNT(s.ID) ".$strColumn;
-					}
-					break;
+				break;
+			case "MAX_QUERY_TIME":
+			case "MIN_QUERY_TIME":
+			case "AVG_QUERY_TIME":
+			case "SUM_QUERY_TIME":
+				if ($bGroup)
+				{
+					$arQuerySelect[$strColumn] = substr($strColumn, 0, 3)."(s.".substr($strColumn, 4).") ".$strColumn;
+				}
+				break;
+			case "COUNT":
+				if ($bGroup)
+				{
+					$arQuerySelect[$strColumn] = "COUNT(s.ID) ".$strColumn;
+				}
+				break;
 			}
 		}
 
@@ -109,9 +119,8 @@ class CAllPerfomanceSQL
 			"HIT_ID" => array(
 				"TABLE_ALIAS" => "s",
 				"FIELD_NAME" => "s.HIT_ID",
-				"FIELD_TYPE" => "int", //int, double, file, enum, int, string, date, datetime
+				"FIELD_TYPE" => "int",
 				"JOIN" => false,
-				//"LEFT_JOIN" => "lt",
 			),
 			"COMPONENT_ID" => array(
 				"TABLE_ALIAS" => "s",
@@ -146,14 +155,14 @@ class CAllPerfomanceSQL
 			),
 		));
 
-		if(count($arQuerySelect) < 1)
-			$arQuerySelect = array("ID"=>"s.ID");
+		if (count($arQuerySelect) < 1)
+			$arQuerySelect = array("ID" => "s.ID");
 
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
 		$strQueryWhere = $obQueryWhere->GetQuery($arFilter);
 
-		if(is_array($arNavStartParams) && $arNavStartParams["nTopCount"] > 0)
+		if (is_array($arNavStartParams) && $arNavStartParams["nTopCount"] > 0)
 		{
 			$strSql = $DB->TopSQL("
 				SELECT ".implode(", ", $arQuerySelect)."
@@ -162,10 +171,10 @@ class CAllPerfomanceSQL
 				".($strQueryWhere? "WHERE ".$strQueryWhere: "")."
 				".($bGroup? "GROUP BY ".implode(", ", $arQueryGroup): "")."
 				".(count($arQueryOrder)? "ORDER BY ".implode(", ", $arQueryOrder): "")."
-			", $arNavStartParams["nTopCount"] );
+			", $arNavStartParams["nTopCount"]);
 			$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		elseif(is_array($arNavStartParams))
+		elseif (is_array($arNavStartParams))
 		{
 			$strSql = "
 				SELECT count('x') CNT
@@ -226,23 +235,24 @@ class CAllPerfomanceSQL
 		$strSql = preg_replace("/([\\s)])(VALUES)([\\s(])/i", "\\1\n\\2\n\\3", $strSql);
 		$strSql = preg_replace("/ (FROM|WHERE|ORDER BY|GROUP BY|HAVING) /i", "\n\\1\n", $strSql);
 		$arMatch = array();
-		if(preg_match("/.*WHERE(.+)\s(ORDER BY|GROUP BY|HAVING|$)/is", $strSql." ", $arMatch))
+
+		if (preg_match("/.*WHERE(.+)\\s(ORDER BY|GROUP BY|HAVING|$)/is", $strSql." ", $arMatch))
 		{
 			$strWhere = $arMatch[1];
 			$len = strlen($strWhere);
 			$res = "";
 			$group = 0;
-			for($i = 0; $i < $len; $i++)
+			for ($i = 0; $i < $len; $i++)
 			{
 				$char = substr($strWhere, $i, 1);
-				if($char == "(")
+				if ($char == "(")
 					$group++;
-				elseif($char == ")")
+				elseif ($char == ")")
 					$group--;
-				elseif($group == 0)
+				elseif ($group == 0)
 				{
 					$match = array();
-					if(preg_match("/^(\s)(AND|OR|NOT)([\s(])/is", substr($strWhere, $i), $match))
+					if (preg_match("/^(\\s)(AND|OR|NOT)([\\s(])/is", substr($strWhere, $i), $match))
 					{
 						$char = "\n    ".$match[2];
 						$i += strlen($match[1].$match[2]) - 1;
@@ -252,20 +262,21 @@ class CAllPerfomanceSQL
 			}
 			$strSql = str_replace($arMatch[1], $res, $strSql);
 		}
-		if(preg_match("/.*?SELECT(.+)\s(FROM)/is", $strSql." ", $arMatch))
+
+		if (preg_match("/.*?SELECT(.+)\\s(FROM)/is", $strSql." ", $arMatch))
 		{
 			$strWhere = $arMatch[1];
 			$len = strlen($strWhere);
 			$res = "";
 			$group = 0;
-			for($i = 0; $i < $len; $i++)
+			for ($i = 0; $i < $len; $i++)
 			{
 				$char = substr($strWhere, $i, 1);
-				if($char == "(")
+				if ($char == "(")
 					$group++;
-				elseif($char == ")")
+				elseif ($char == ")")
 					$group--;
-				elseif($group == 0 && $char == ",")
+				elseif ($group == 0 && $char == ",")
 				{
 					$char = "\n    ".$char;
 				}
@@ -273,20 +284,21 @@ class CAllPerfomanceSQL
 			}
 			$strSql = str_replace($arMatch[1], $res, $strSql);
 		}
-		if(preg_match("/.*?UPDATE\s.+?\sSET\s(.+?)WHERE/is", $strSql." ", $arMatch))
+
+		if (preg_match("/.*?UPDATE\\s.+?\\sSET\\s(.+?)WHERE/is", $strSql." ", $arMatch))
 		{
 			$strWhere = $arMatch[1];
 			$len = strlen($strWhere);
 			$res = "";
 			$group = 0;
-			for($i = 0; $i < $len; $i++)
+			for ($i = 0; $i < $len; $i++)
 			{
 				$char = substr($strWhere, $i, 1);
-				if($char == "(")
+				if ($char == "(")
 					$group++;
-				elseif($char == ")")
+				elseif ($char == ")")
 					$group--;
-				elseif($group == 0 && $char == ",")
+				elseif ($group == 0 && $char == ",")
 				{
 					$char = "\n    ".$char;
 				}
@@ -297,4 +309,3 @@ class CAllPerfomanceSQL
 		return $strSql;
 	}
 }
-?>

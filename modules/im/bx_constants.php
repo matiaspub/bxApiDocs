@@ -2,7 +2,7 @@
 /**
  * IM_REVISION
  */
-define('IM_REVISION', 30);
+define('IM_REVISION', 42);
 
 /**
  * IM_MESSAGE_SYSTEM
@@ -63,6 +63,11 @@ define('IM_CALL_VIDEO', 1);
  * IM_CALL_AUDIO
  */
 define('IM_CALL_AUDIO', 2);
+
+/**
+ * IM_MAIL_SKIP
+ */
+define('IM_MAIL_SKIP', '#SKIP#');
 
 /**
  * IM_CALL_STATUS_NONE
