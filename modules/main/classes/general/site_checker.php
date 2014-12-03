@@ -2682,7 +2682,7 @@ function InitPureDB()
 	if(defined('BX_UTF'))
 		define('BX_UTF_PCRE_MODIFIER', 'u');
 	else
-		// define('BX_UTF_PCRE_MODIFIER', '');
+		;// define('BX_UTF_PCRE_MODIFIER', '');
 
 	include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/lib/loader.php");
 	$application = \Bitrix\Main\HttpApplication::getInstance();

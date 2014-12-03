@@ -16,7 +16,7 @@ require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.ph
 set_time_limit(0);
 
 if (!defined("CATALOG_LOAD_NO_STEP"))
-	// define("CATALOG_LOAD_NO_STEP", true);
+;// define("CATALOG_LOAD_NO_STEP", true);
 
 if (CModule::IncludeModule("catalog"))
 {

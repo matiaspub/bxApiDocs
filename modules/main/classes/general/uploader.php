@@ -1700,15 +1700,15 @@ class CFileUploader
 		}
 
 		if (!defined("PUBLIC_AJAX_MODE"))
-			// define("PUBLIC_AJAX_MODE", true);
+			;// define("PUBLIC_AJAX_MODE", true);
 		if (!defined("NO_KEEP_STATISTIC"))
-			// define("NO_KEEP_STATISTIC", "Y");
+			;// define("NO_KEEP_STATISTIC", "Y");
 		if (!defined("NO_AGENT_STATISTIC"))
-			// define("NO_AGENT_STATISTIC", "Y");
+			;// define("NO_AGENT_STATISTIC", "Y");
 		if (!defined("NO_AGENT_CHECK"))
-			// define("NO_AGENT_CHECK", true);
+			;// define("NO_AGENT_CHECK", true);
 		if (!defined("DisableEventsCheck"))
-			// define("DisableEventsCheck", true);
+			;// define("DisableEventsCheck", true);
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
 		$GLOBALS["APPLICATION"]->RestartBuffer();
 		if (strlen($this->error) > 0)

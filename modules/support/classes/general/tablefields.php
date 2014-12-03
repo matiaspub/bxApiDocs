@@ -323,7 +323,7 @@ public function FromTable($table, $fields = self::ALL, $notNull = array(), $remo
 		}
 	}
 	
-public static function __get($name)
+public function __get($name)
 	{
 		return $this->Get($name);
 	}
@@ -374,7 +374,7 @@ public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false
 		return $res;
 	}
 		
-	pubpublic lic function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
+	public function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
 	{
 		$row = $this->checkRow($row);
 		if(!array_key_exists($name, $this->_arFieldsTypes))
@@ -390,7 +390,7 @@ public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false
 		return self::ConvertForHTML($ft["TYPE"], $place, $value, $op);
 	}
 	
-public static function GetColumn($name)
+	public function GetColumn($name)
 	{
 		$res = array();
 		if(!array_key_exists($name, $this->_arFieldsTypes))

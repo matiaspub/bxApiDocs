@@ -1,8 +1,8 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-//if(!defined("START_EXEC_TIME"))
-	// define("START_EXEC_TIME", getmicrotime());
+if(!defined("START_EXEC_TIME"))
+	;// define("START_EXEC_TIME", getmicrotime());
 
 
 /**

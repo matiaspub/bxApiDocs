@@ -28,7 +28,7 @@ foreach($aProtocols as $prot)
 }
 
 if (!defined("AUTH_404"))
-	// define("AUTH_404", "Y");
+	;// define("AUTH_404", "Y");
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/bx_root.php");
 require_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/dbconn.php");

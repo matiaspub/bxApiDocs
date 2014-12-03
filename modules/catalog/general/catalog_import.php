@@ -484,7 +484,7 @@ class CAllCatalogImport
 		$bFirstLoadStep = true;
 
 		if (!defined("CATALOG_LOAD_NO_STEP"))
-			// define("CATALOG_LOAD_NO_STEP", true);
+			;// define("CATALOG_LOAD_NO_STEP", true);
 
 		$strImportErrorMessage = "";
 		$strImportOKMessage = "";

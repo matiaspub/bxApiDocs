@@ -40,7 +40,7 @@ class OldPage extends \Bitrix\Main\Page
 			// define("NEED_AUTH", true);
 
 			if (isset($_REQUEST['bxpublic']) && $_REQUEST['bxpublic'] == 'Y' && !defined('BX_PUBLIC_MODE'))
-				// define('BX_PUBLIC_MODE', 1);
+				;// define('BX_PUBLIC_MODE', 1);
 		}
 		//
 

@@ -24,13 +24,13 @@ if (!function_exists("file_get_contents"))
 }
 
 if (!defined("US_SHARED_KERNEL_PATH"))
-	// define("US_SHARED_KERNEL_PATH", "/bitrix");
+	;// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 if (!defined("US_CALL_TYPE"))
-	// define("US_CALL_TYPE", "ALL");
+	;// define("US_CALL_TYPE", "ALL");
 
 if (!defined("US_BASE_MODULE"))
-	// define("US_BASE_MODULE", "main");
+	;// define("US_BASE_MODULE", "main");
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_class.php");
 

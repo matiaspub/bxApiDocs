@@ -66,7 +66,7 @@ else
 	IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/admin/dump.php');
 }
 if (!defined('DOCUMENT_ROOT'))
-	// define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
+	;// define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/backup.php");
 
 if (!CLI) // hit from bitrixcloud service
@@ -295,7 +295,7 @@ if ($NS['step'] == 4)
 		ShowBackupStatus('Archiving files');
 		$DOCUMENT_ROOT_SITE = DOCUMENT_ROOT;
 		if (!defined('DOCUMENT_ROOT_SITE'))
-			// define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
+			;// define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
 
 		$tar = new CTar;
 		$tar->EncryptKey = $NS['dump_encrypt_key'];

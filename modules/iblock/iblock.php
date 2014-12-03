@@ -1,11 +1,11 @@
 <?php
 IncludeModuleLangFile(__FILE__);
 
-if(!defined("CACHED_b_iblock_type")) // define("CACHED_b_iblock_type", 36000);
-if(!defined("CACHED_b_iblock")) // define("CACHED_b_iblock", 36000);
-if(!defined("CACHED_b_iblock_bucket_size")) // define("CACHED_b_iblock_bucket_size", 20);
-if(!defined("CACHED_b_iblock_property_enum")) // define("CACHED_b_iblock_property_enum", 36000);
-if(!defined("CACHED_b_iblock_property_enum_bucket_size")) // define("CACHED_b_iblock_property_enum_bucket_size", 100);
+if(!defined("CACHED_b_iblock_type"));// define("CACHED_b_iblock_type", 36000);
+if(!defined("CACHED_b_iblock"));// define("CACHED_b_iblock", 36000);
+if(!defined("CACHED_b_iblock_bucket_size"));// define("CACHED_b_iblock_bucket_size", 20);
+if(!defined("CACHED_b_iblock_property_enum"));// define("CACHED_b_iblock_property_enum", 36000);
+if(!defined("CACHED_b_iblock_property_enum_bucket_size"));// define("CACHED_b_iblock_property_enum_bucket_size", 100);
 
 /** @global string $DBType */
 global $DBType;

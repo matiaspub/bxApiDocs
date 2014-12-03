@@ -945,7 +945,7 @@ public 	function DropEntity($entity_id)
 	 * <p>Десериализует поле SETTINGS.</p>
 	 * @return array возвращает false в случае последней записи выборки.
 	 */
-public static 	function Fetch()
+	public function Fetch()
 	{
 		$res = parent::Fetch();
 		if($res && strlen($res["SETTINGS"])>0)
@@ -1017,7 +1017,7 @@ public 	function GetUserType($user_type_id = false)
 			return $this->arUserTypes;
 	}
 
-	functpublic ion GetDBColumnType($arUserField)
+	public function GetDBColumnType($arUserField)
 	{
 		if($arType = $this->GetUserType($arUserField["USER_TYPE_ID"]))
 		{
@@ -1027,7 +1027,7 @@ public 	function GetUserType($user_type_id = false)
 		return "";
 	}
 
-public static 	function getUtsDBColumnType($arUserField)
+public 	function getUtsDBColumnType($arUserField)
 	{
 		if ($arUserField['MULTIPLE'] == 'Y')
 		{
@@ -1040,7 +1040,7 @@ public static 	function getUtsDBColumnType($arUserField)
 		}
 	}
 
-public static 	function getUtmDBColumnType($arUserField)
+public 	function getUtmDBColumnType($arUserField)
 	{
 		return $this->GetDBColumnType($arUserField);
 	}
@@ -1507,7 +1507,7 @@ public static 	function EditFormTab($entity_id)
 		}
 	}
 
-	public static function AdminListAddFilterFields($entity_id, &$arFilterFields)
+	public function AdminListAddFilterFields($entity_id, &$arFilterFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1536,7 +1536,7 @@ public 	function IsNotEmpty($value)
 		}
 	}
 
-public static 	function AdminListAddFilter($entity_id, &$arFilter)
+public 	function AdminListAddFilter($entity_id, &$arFilter)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1558,7 +1558,7 @@ public static 	function AdminListAddFilter($entity_id, &$arFilter)
 		}
 	}
 
-public static 	function AdminListPrepareFields($entity_id, &$arFields)
+public function AdminListPrepareFields($entity_id, &$arFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1566,7 +1566,7 @@ public static 	function AdminListPrepareFields($entity_id, &$arFields)
 				unset($arFields[$FIELD_NAME]);
 	}
 
-public 	function AdminListAddHeaders($entity_id, &$arHeaders)
+public function AdminListAddHeaders($entity_id, &$arHeaders)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1582,7 +1582,7 @@ public 	function AdminListAddHeaders($entity_id, &$arHeaders)
 		}
 	}
 
-	public static function AddUserFields($entity_id, $arRes, &$row)
+	public function AddUserFields($entity_id, $arRes, &$row)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1590,7 +1590,7 @@ public 	function AdminListAddHeaders($entity_id, &$arHeaders)
 				$this->AddUserField($arUserField, $arRes[$FIELD_NAME], $row);
 	}
 
-public static 	function AddFindFields($entity_id, &$arFindFields)
+public function AddFindFields($entity_id, &$arFindFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1612,7 +1612,7 @@ public static 	function AddFindFields($entity_id, &$arFindFields)
 		}
 	}
 
-public static 	function AdminListShowFilter($entity_id)
+public function AdminListShowFilter($entity_id)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -2734,7 +2734,7 @@ class CUserTypeSQL
 		}
 	}
 
-public static 	function GetDistinct()
+public function GetDistinct()
 	{
 		return $this->obWhere->bDistinctReqired;
 	}
@@ -2753,7 +2753,7 @@ public 	function GetSelect()
 		return $result;
 	}
 
-public static 	function GetJoin($ID)
+public function GetJoin($ID)
 	{
 		$result = $this->obWhere->GetJoins();
 		$table = " b_uts_".$this->entity_id." ".$this->table_alias." ";
@@ -2762,7 +2762,7 @@ public static 	function GetJoin($ID)
 		return $result;
 	}
 
-public static 	function SetOrder($arOrder)
+public function SetOrder($arOrder)
 	{
 		if(is_array($arOrder))
 		{
@@ -2791,7 +2791,7 @@ public 	function SetFilter($arFilter)
 			$this->filter = $arFilter;
 	}
 
-public static 	function GetFilter()
+public function GetFilter()
 	{
 		return $this->obWhere->GetQuery($this->filter);
 	}
@@ -2938,7 +2938,7 @@ public 	function getOperationByCode($code)
 		return $all_operations[$code];
 	}
 
-public static 	function GetQuery($arFilter)
+public function GetQuery($arFilter)
 	{
 		$this->l_joins = array();
 		$this->c_joins = array();
@@ -3575,7 +3575,7 @@ public 	function addStringFilter(&$result, $isMultiple, $FIELD_NAME, $operation,
 		}
 	}
 
-	public static function addDateFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value, $format)
+	public function addDateFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value, $format)
 	{
 		global $DB;
 
@@ -3715,7 +3715,7 @@ class CSQLWhereExpression
 		$this->DB = $DB;
 	}
 
-public static function compile()
+public function compile()
 	{
 		$this->i = -1;
 
@@ -3726,7 +3726,7 @@ public static function compile()
 		return $value;
 	}
 
-	public protected function execPlaceholders($matches)
+	public function execPlaceholders($matches)
 	{
 		$this->i++;
 
@@ -3823,7 +3823,7 @@ class CUserFieldEnum
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/setenumvalues.php
 	* @author Bitrix
 	*/
-	public static 	function SetEnumValues($FIELD_ID, $values)
+	public function SetEnumValues($FIELD_ID, $values)
 	{
 		global $DB, $CACHE_MANAGER, $APPLICATION;
 		$aMsg = array();

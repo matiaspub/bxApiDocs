@@ -9,7 +9,7 @@ class CSecurityRedirect
 
 		//This define will be used on buffer end handler
 		if(!defined("BX_SECURITY_LOCAL_REDIRECT"))
-			// define("BX_SECURITY_LOCAL_REDIRECT", true);
+			;// define("BX_SECURITY_LOCAL_REDIRECT", true);
 
 		if(array_key_exists("LOCAL_REDIRECTS", $_SESSION))
 		{

@@ -57,7 +57,7 @@ class CAllSocNetUser
 	{
 		$rsUser = CUser::GetByID($arFields["ID"]);
 		if ($arUser = $rsUser->Fetch())
-			// define("GLOBAL_ACTIVE_VALUE", $arUser["ACTIVE"]);
+			;// define("GLOBAL_ACTIVE_VALUE", $arUser["ACTIVE"]);
 	}
 
 	public static function OnAfterUserAdd(&$arFields)

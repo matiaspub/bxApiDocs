@@ -5,7 +5,7 @@
 /**********************************************************************/
 
 if (!defined("BX_DIR_PERMISSIONS"))
-	// define("BX_DIR_PERMISSIONS", 0755);
+	;// define("BX_DIR_PERMISSIONS", 0755);
 
 if (!function_exists("file_get_contents"))
 {
@@ -19,7 +19,7 @@ if (!function_exists("file_get_contents"))
 }
 
 if (!defined("US_SHARED_KERNEL_PATH"))
-	// define("US_SHARED_KERNEL_PATH", "/bitrix");
+	;// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 class CUpdateSystem
 {

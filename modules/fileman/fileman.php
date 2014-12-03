@@ -10,7 +10,7 @@
 global $DOCUMENT_ROOT, $MESS;
 IncludeModuleLangFile(__FILE__);
 // define("DEBUG_FILE_MAN", false);
-if(!defined("CACHED_stickers_count")) // define("CACHED_stickers_count", 36000000);
+if(!defined("CACHED_stickers_count"));// define("CACHED_stickers_count", 36000000);
 
 $GLOBALS['arFilemanPredifinedFileTypesR'] = array();
 $GLOBALS['arFilemanPredifinedFileTypes'] = array(

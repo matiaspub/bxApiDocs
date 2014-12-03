@@ -1623,13 +1623,13 @@ class CQAACheckListTests
 	static private function defineScanParams()
 	{
 		if(!defined('T_INCLUDE_RESULT_MODIFIER'))
-			// define('T_INCLUDE_RESULT_MODIFIER', 10001);
+			;// define('T_INCLUDE_RESULT_MODIFIER', 10001);
 		if(!defined('T_INCLUDE_COMPONENTTEMPLATE'))
-			// define('T_INCLUDE_COMPONENTTEMPLATE', 10002);
+			;// define('T_INCLUDE_COMPONENTTEMPLATE', 10002);
 		if(!defined('T_INCLUDE_COMPONENT'))
-			// define('T_INCLUDE_COMPONENT', 10003);
+			;// define('T_INCLUDE_COMPONENT', 10003);
 		if(!defined('T_INCLUDE_END'))
-			// define('T_INCLUDE_END', 10004);
+			;// define('T_INCLUDE_END', 10004);
 		$SKIPDIR = array(// skipping directories
 			'lang',
 			'help',

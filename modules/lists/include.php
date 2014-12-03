@@ -2,7 +2,7 @@
 if(!CModule::IncludeModule('iblock'))
 	return false;
 
-if(!defined("CACHED_b_lists_permission")) // define("CACHED_b_lists_permission", 36000);
+if(!defined("CACHED_b_lists_permission"));// define("CACHED_b_lists_permission", 36000);
 
 CModule::AddAutoloadClasses(
 	"lists",

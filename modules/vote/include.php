@@ -8,7 +8,7 @@ require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/vote/classes/".strtolow
 IncludeModuleLangFile(__FILE__);
 
 if (!defined("VOTE_CACHE_TIME"))
-	// define("VOTE_CACHE_TIME", 3600);
+	;// define("VOTE_CACHE_TIME", 3600);
 
 // define("VOTE_DEFAULT_DIAGRAM_TYPE", "histogram");
 

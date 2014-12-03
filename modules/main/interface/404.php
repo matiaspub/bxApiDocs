@@ -1,6 +1,6 @@
 <?
 if($_SERVER["REDIRECT_STATUS"]=="404")
-	// define("ERROR_404","Y");
+	;// define("ERROR_404","Y");
 
 // define('BX_ADMIN_SECTION_404', 'Y');
 

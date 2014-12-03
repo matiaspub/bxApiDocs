@@ -62,19 +62,19 @@ $GLOBALS["FORUM_CACHE"] = array(
 	path to clear cache
 */
 if(!defined("CACHED_b_forum_group"))
-	// define("CACHED_b_forum_group", 3600);
+;// define("CACHED_b_forum_group", 3600);
 if(!defined("CACHED_b_forum"))
-	// define("CACHED_b_forum", 3600);
+;// define("CACHED_b_forum", 3600);
 if(!defined("CACHED_b_forum_perms"))
-	// define("CACHED_b_forum_perms", 3600);
+;// define("CACHED_b_forum_perms", 3600);
 if(!defined("CACHED_b_forum2site"))
-	// define("CACHED_b_forum2site", 3600);
+;// define("CACHED_b_forum2site", 3600);
 if(!defined("CACHED_b_forum_smile"))
-	// define("CACHED_b_forum_smile", 3600);
+;// define("CACHED_b_forum_smile", 3600);
 if(!defined("CACHED_b_forum_filter"))
-	// define("CACHED_b_forum_filter", 3600);
+;// define("CACHED_b_forum_filter", 3600);
 if(!defined("CACHED_b_forum_user"))
-	// define("CACHED_b_forum_user", 3600);
+;// define("CACHED_b_forum_user", 3600);
 
 CModule::AddAutoloadClasses(
 	"forum",
