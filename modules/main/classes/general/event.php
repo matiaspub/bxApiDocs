@@ -351,7 +351,7 @@ class CAllEvent
 			return "=?".$charset."?B?".base64_encode(substr($text, 0, $i))."?=".substr($text, $i);
 	}
 
-	function GetMailEOL()
+	public static function GetMailEOL()
 	{
 		static $eol = false;
 		if($eol!==false)
