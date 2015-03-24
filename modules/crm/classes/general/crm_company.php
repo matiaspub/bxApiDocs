@@ -1354,7 +1354,15 @@ class CAllCrmCompany
 			CCrmPerms::UpdateEntityAttr('COMPANY', $ID, $entityAttrs);
 		}
 	}
-
+    /**
+     * Удаляет выранную компанию из CRM
+     *
+     * @param $ID - id компании
+     * @param array $arOptions - массив опций, необязательный параметр.
+     * @return bool - возвращает true, если компания удаленаб иначе false
+     * @throws \Bitrix\Main\ArgumentException
+     * @throws \Bitrix\Main\ArgumentTypeException
+     */
 	public function Delete($ID, $arOptions = array())
 	{
 		global $DB, $APPLICATION;
