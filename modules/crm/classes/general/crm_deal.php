@@ -339,9 +339,55 @@ class CAllCrmDeal
 	}
 
 	/**
-	 * @param array $arOrder
-	 * @param array $arFilter
-	 * @param array $arSelect
+     *
+     *
+	 * @param array $arOrder - Массив вида array(by1=>order1[, by2=>order2 [, ..]]), где by - поле для сортировки, order - значение сортировки - ASC - по возрастанию, DESC - по убыванию.
+	 * @param array $arFilter - Массив вида array("фильтруемое поле"=>"значения фильтра" [, ...]). "фильтруемое поле" может принимать значения:
+     *
+     *<ul>
+     *<li><b>ID</b> - ид</li>
+     *<li><b>TITLE</b> - наименование сделки</li>
+     *<li><b>COMMENTS</b> - комментарии</li>
+     *<li><b>LEAD_ID</b> - лид</li>
+     *<li><b>COMPANY_ID</b> - компания(ID)</li>
+     *<li><b>COMPANY_TITLE</b> - компания(название)</li>
+     *<li><b>CONTACT_ID</b> - контакт(ID)</li>
+     *<li><b>CONTACT_FULL_NAME</b> - компания(по ФИО или его части)</li>
+     *<li><b>STAGE_ID</b> - стадия сделки</li>
+     *<li><b>CLOSED</b></li>
+     *<li><b>TYPE_ID</b> - тип</li>
+     *<li><b>PRODUCT_ID</b> - товар сделки</li>
+     *<li><b>PROBABILITY</b> - вероятность</li>
+     *<li><b>OPPORTUNITY</b> - план продаж</li>
+     *<li><b>TAX_VALUE</b> - сумма налога</li>
+     *<li><b>CURRENCY_ID</b> - валюта</li>
+     *<li><b>CURRENCY_ID</b> - валюта</li>
+     *<li><b>OPPORTUNITY_ACCOUNT</b>/li>
+     *<li><b>TAX_VALUE_ACCOUNT</b></li>
+     *<li><b>ACCOUNT_CURRENCY_ID</b></li>
+     *<li><b>ACCOUNT_CURRENCY_ID</b></li>
+     *<li><b>BEGINDATE</b> - дата начала</li>
+     *<li><b>CLOSEDATE</b> - дата завершения</li>
+     *<li><b>ASSIGNED_BY</b> - ответственный</li>
+     *<li><b>ASSIGNED_BY_ID</b> - ответственный(ID)</li>
+     *<li><b>CREATED_BY</b> - кем создана</li>
+     *<li><b>CREATED_BY_ID</b> - кем создана(ID)</li>
+     *<li><b>MODIFY_BY</b> - кем изменена</li>
+     *<li><b>MODIFY_BY_ID</b> - кем изменена(ID)</li>
+     *<li><b>DATE_CREATE</b> - дата создания</li>
+     *<li><b>DATE_MODIFY</b> - дата изменения</li>
+     *<li><b>OPENED</b></li>
+     *<li><b>ASSIGNED_BY_LOGIN</b> - ответственный(логин)</li>
+     *<li><b>CREATED_BY_NAME</b> - ответственный(имя)</li>
+     *<li><b>CREATED_BY_LAST_NAME</b> - ответственный(фамилия)</li>
+     *<li><b>CREATED_BY_SECOND_NAME</b> - ответственный(отчество)</li>
+     *<li><b>MODIFY_BY_LOGIN</b> - кем изменена(логин)</li>
+     *<li><b>MODIFY_BY_NAME</b> - кем изменена(имя)</li>
+     *<li><b>MODIFY_BY_LAST_NAME</b> - кем изменена(фамилия)</li>
+     *<li><b>MODIFY_BY_SECOND_NAME</b> - кем изменена(отчество)</li>
+     * </ul>
+	 * @param array $arSelect - Массив возвращаемых полей элемента. Содержит поля элемента, а также пользовательские поля. Для выбора всех пользовательских полей необходимо указать UF_*.
+	 * @param $nPageTop - Необязательный параметр, поумолчанию равен <b>false</b>. Количество возвращаемых записей "сверху" выборки.
 	 * @return CDBResult
 	 * Obsolete. Always select all record from database. Please use GetListEx instead.
 	 */
