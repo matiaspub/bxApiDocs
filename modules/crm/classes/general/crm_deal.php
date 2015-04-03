@@ -338,11 +338,11 @@ class CAllCrmDeal
 		);
 	}
 
-	/**
+    /**
+     * Возвращает список сделок по фильтру arFilter.
      *
-     *
-	 * @param array $arOrder - Массив вида array(by1=>order1[, by2=>order2 [, ..]]), где by - поле для сортировки, order - значение сортировки - ASC - по возрастанию, DESC - по убыванию.
-	 * @param array $arFilter - Массив вида array("фильтруемое поле"=>"значения фильтра" [, ...]). "фильтруемое поле" может принимать значения:
+     * @param array $arOrder - Массив вида array(by1=>order1[, by2=>order2 [, ..]]), где by - поле для сортировки, order - значение сортировки - ASC - по возрастанию, DESC - по убыванию.
+     * @param array $arFilter - Массив вида array("фильтруемое поле"=>"значения фильтра" [, ...]). "фильтруемое поле" может принимать значения:
      *
      *<ul>
      *<li><b>ID</b> - ид</li>
@@ -386,11 +386,11 @@ class CAllCrmDeal
      *<li><b>MODIFY_BY_LAST_NAME</b> - кем изменена(фамилия)</li>
      *<li><b>MODIFY_BY_SECOND_NAME</b> - кем изменена(отчество)</li>
      * </ul>
-	 * @param array $arSelect - Массив возвращаемых полей элемента. Содержит поля элемента, а также пользовательские поля. Для выбора всех пользовательских полей необходимо указать UF_*.
-	 * @param $nPageTop - Необязательный параметр, поумолчанию равен <b>false</b>. Количество возвращаемых записей "сверху" выборки.
-	 * @return CDBResult
-	 * Obsolete. Always select all record from database. Please use GetListEx instead.
-	 */
+     * @param array $arSelect - Массив возвращаемых полей элемента. Содержит поля элемента, а также пользовательские поля. Для выбора всех пользовательских полей необходимо указать UF_*.
+     * @param $nPageTop - Необязательный параметр, поумолчанию равен <b>false</b>. Количество возвращаемых записей "сверху" выборки.
+     *
+     * @return CDBResult
+     */
 	public static function GetList($arOrder = Array('DATE_CREATE' => 'DESC'), $arFilter = Array(), $arSelect = Array(), $nPageTop = false)
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -1341,7 +1341,25 @@ class CAllCrmDeal
 		}
 	}
 
-	public function Update($ID, array &$arFields, $bCompare = true, $bUpdateSearch = true, $options = array())
+    /**
+     * Метод изменяет параметры сделки с кодом ID.<br/>
+     * Перед изменением сделки вызываются обработчики события <b>OnBeforeCrmDealUpdate</b> из которых можно изменить значения полей или отменить изменение сделки вернув сообщение об ошибке.<br/>
+     * После изменения элемента вызывается само событие <b>OnAfterCrmDealUpdate</b>.<br/>
+     *
+     * @param $ID - id изменяемой сделки.
+     * @param array $arFields - обновляемые поля сделки.
+     * @param bool $bCompare - отображать изменения сделки в живой ленте CRM. Необязательный параметр, по умолчанию <b>true</b>.
+     * @param bool $bUpdateSearch - Индексировать сделку для поиска. Для повышения производительности можно отключать этот параметр во время серии изменений сделок, а после их окончания переиндексировать поиск. Не обязательный параметр, по умолчанию сделка после изменения будет автоматически проиндексирована в поиске.
+     * @param array $options - массив опций. Имеет следующие ключи
+     *
+     * <ul>
+     * <li><b>REGISTER_SONET_EVENT</b> - </li>
+     * <li><b>DISABLE_USER_FIELD_CHECK</b> - отмена проверки поля</li>
+     * </ul>
+     *
+     * @return bool - возвращает true, если сделка обновлена, иначе false. При неудачной поптыке обновить сделку в $arFields['LAST_ERROR'] будет содержаться сообщение об ошибке.
+     */
+    public function Update($ID, array &$arFields, $bCompare = true, $bUpdateSearch = true, $options = array())
 	{
 		global $DB;
 
