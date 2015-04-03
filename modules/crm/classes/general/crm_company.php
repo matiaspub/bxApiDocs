@@ -316,11 +316,11 @@ class CAllCrmCompany
 		return intval($arRes['ID']);
 	}
 
-	/**
-	 *Функция получает список компаний CRM
+    /**
+     *Функция получает список компаний CRM
      *
-	 * @param array $arOrder - Порядок сортировки. массив вида
-	 * @param array $arFilter - Массив вида array("фильтруемое поле"=>"значения фильтра" [, ...]). "фильтруемое поле" может принимать значения:
+     * @param array $arOrder - Порядок сортировки. массив вида
+     * @param array $arFilter - Массив вида array("фильтруемое поле"=>"значения фильтра" [, ...]). "фильтруемое поле" может принимать значения:
      *
      * <ul>
      *<li><b>ID</b> - ид</li>
@@ -352,11 +352,11 @@ class CAllCrmCompany
      * Также в фильтре присутствуют пользовательские поля типа <b>UF_*</b>
      *
      *
-	 * @param array $arSelect - Массив возвращаемых полей элемента. Содержит поля элемента, а также пользовательские поля. Для выбора всех пользовательских полей необходимо указать UF_*.
+     * @param array $arSelect - Массив возвращаемых полей элемента. Содержит поля элемента, а также пользовательские поля. Для выбора всех пользовательских полей необходимо указать UF_*.
      * @param array $nPageTop - Необязательный параметр, поумолчанию равен <b>false</b>. Количество возвращаемых записей "сверху" выборки.
      *
-	 * @return CDBResult - Возвращает объект класса CDBResult.
-	 */
+     * @return CDBResult - Возвращает объект класса CDBResult.
+     */
 	public static function GetList($arOrder = Array('DATE_CREATE' => 'DESC'), $arFilter = Array(), $arSelect = Array(), $nPageTop = false)
 	{
 		global $DB, $USER_FIELD_MANAGER;
@@ -1353,16 +1353,21 @@ class CAllCrmCompany
 			CCrmPerms::UpdateEntityAttr('COMPANY', $ID, $entityAttrs);
 		}
 	}
+
     /**
-     * Удаляет выранную компанию из CRM
+     * Удаляет выранную компанию из CRM.<br/>
+     * Перед изменением компании вызываются обработчики события <b>OnBeforeCrmDealDelete</b> из которых можно изменить значения полей или отменить изменение компании вернув сообщение об ошибке.<br/>
+     * После изменения элемента вызывается само событие <b>OnAfterCrmDealDelete</b>.<br/>
      *
-     * @param $ID - id компании
+     * @param $ID - id компании.
      * @param array $arOptions - массив опций, необязательный параметр.
+     *
      * @return bool - возвращает true, если компания удаленаб иначе false
      * @throws \Bitrix\Main\ArgumentException
      * @throws \Bitrix\Main\ArgumentTypeException
      */
-	public function Delete($ID, $arOptions = array())
+
+    public function Delete($ID, $arOptions = array())
 	{
 		global $DB, $APPLICATION;
 
