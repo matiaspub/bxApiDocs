@@ -8324,7 +8324,7 @@ public static function GetPopupOptions($wnd_id)
 	*
 	*
 	*
-	* @return result_type 
+	* @return string
 	*
 	*
 	* <h4>Example</h4> 
