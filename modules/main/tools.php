@@ -2574,7 +2574,7 @@ function is_set(&$a, $k=false)
  *
  *
  *
- * @param pass_char $s = false набор символов. Необязательный. По умолчанию:
+ * @param array|string|false $pass_chars = false набор символов. Необязательный. По умолчанию:
  * abcdefghijklnmopqrstuvwxyzABCDEFGHIJKLNMOPQRSTUVWXYZ01234567­89. <p>может быть массивом классов
  * символов и тогда в результирующую строчку войдет как минимум
  * один символ из каждого класса.</p> Пример: <pre class="syntax">echo randString(7, array(
@@ -8324,7 +8324,7 @@ public static function GetPopupOptions($wnd_id)
 	*
 	*
 	*
-	* @return result_type 
+	* @return string
 	*
 	*
 	* <h4>Example</h4> 
