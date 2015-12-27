@@ -8,7 +8,7 @@ require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/vote/classes/".strtolow
 IncludeModuleLangFile(__FILE__);
 
 if (!defined("VOTE_CACHE_TIME"))
-	;// define("VOTE_CACHE_TIME", 3600);
+	// define("VOTE_CACHE_TIME", 3600);
 
 // define("VOTE_DEFAULT_DIAGRAM_TYPE", "histogram");
 
@@ -240,7 +240,7 @@ function VoteVoteEditFromArray($CHANNEL_ID, $VOTE_ID = false, $arFields = array(
 				endif;
 
 				if ($arAnswer["ID"] > 0):
-					$arAnswer["C_SORT"] = $iAnswers * 10;
+					$arAnswer["C_SORT"] = ($iAnswers + 1)* 10;
 					CVoteAnswer::Update($arAnswer["ID"], $arAnswer);
 				else:
 					$arAnswer["QUESTION_ID"] = $arQuestion["ID"];

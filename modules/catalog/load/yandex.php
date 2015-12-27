@@ -1,4 +1,6 @@
 <?
+use Bitrix\Currency;
+
 global $APPLICATION;
 set_time_limit(0);
 
@@ -72,19 +74,29 @@ $strAll.= "<platform>1C-Bitrix</platform>\n";
 
 //*****************************************//
 
-$arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH');
-$by="sort";
-$order="asc";
-$db_acc = CCurrency::GetList($by, $order);
+$BASE_CURRENCY = Currency\CurrencyManager::getBaseCurrency();
+$RUR = 'RUB';
+$currencyIterator = Currency\CurrencyTable::getList(array(
+	'select' => array('CURRENCY'),
+	'filter' => array('=CURRENCY' => 'RUR')
+));
+if ($currency = $currencyIterator->fetch())
+	$RUR = 'RUR';
+unset($currency, $currencyIterator);
+$arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'KZT');
 $strTmp = "<currencies>\n";
-while ($arAcc = $db_acc->Fetch())
-{
-	if (in_array($arAcc['CURRENCY'], $arCurrencyAllowed))
-		$strTmp .= "<currency id=\"".$arAcc["CURRENCY"]."\" rate=\"".(CCurrencyRates::ConvertCurrency(1, $arAcc["CURRENCY"], "RUR"))."\"/>\n";
-}
+$currencyIterator = Currency\CurrencyTable::getList(array(
+	'select' => array('CURRENCY'),
+	'filter' => array('@CURRENCY' => $arCurrencyAllowed),
+	'order' => array('SORT' => 'ASC')
+));
+while ($currency = $currencyIterator->fetch())
+	$strTmp.= '<currency id="'.$currency['CURRENCY'].'" rate="'.(CCurrencyRates::ConvertCurrency(1, $currency['CURRENCY'], $RUR)).'" />'."\n";
+unset($currency, $currencyIterator);
 $strTmp.= "</currencies>\n";
 
 $strAll.= $strTmp;
+unset($strTmp);
 
 //*****************************************//
 
@@ -94,12 +106,6 @@ $strTmpCat = "";
 $strTmpOff = "";
 
 $arSiteServers = array();
-
-$BASE_CURRENCY = CCurrency::GetBaseCurrency();
-if ($arCurrency = CCurrency::GetByID('RUR'))
-	$RUR = 'RUR';
-else
-	$RUR = 'RUB';
 
 $db_catalog_list = CCatalog::GetList(array(), array("YANDEX_EXPORT" => "Y", "PRODUCT_IBLOCK_ID" => 0), false, false, array('IBLOCK_ID'));
 while ($arCatalog_list = $db_catalog_list->Fetch())
@@ -269,9 +275,7 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 			if (is_array($arPictInfo))
 			{
 				if(substr($arPictInfo["SRC"], 0, 1) == "/")
-					$strFile = "http://".$arAcc['SERVER_NAME'].implode("/", array_map("rawurlencode", explode("/", $arPictInfo["SRC"])));
-				elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $arPictInfo["SRC"], $match))
-					$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+					$strFile = "http://".$arAcc['SERVER_NAME'].CHTTP::urnEncode($arPictInfo["SRC"], 'utf-8');
 				else
 					$strFile = $arPictInfo["SRC"];
 				$strTmpOff.="<picture>".$strFile."</picture>\n";
@@ -319,8 +323,8 @@ if (!empty($strYandexPath))
 
 	if ($fp = @fopen($_SERVER["DOCUMENT_ROOT"].$strYandexPath, 'wb'))
 	{
-		@fwrite($fp, $strAll);
-		@fclose($fp);
+		fwrite($fp, $strAll);
+		fclose($fp);
 		$boolError = false;
 	}
 }
@@ -341,4 +345,3 @@ if ($bTmpUserCreated)
 		unset($USER_TMP);
 	}
 }
-?>

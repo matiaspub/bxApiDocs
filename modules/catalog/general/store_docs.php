@@ -23,6 +23,10 @@ class CAllCatalogDocs
 		global $DB;
 		$id = (int)$id;
 
+		foreach(GetModuleEvents("catalog", "OnBeforeDocumentUpdate", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+				return false;
+
 		if(array_key_exists('DATE_CREATE',$arFields))
 			unset($arFields['DATE_CREATE']);
 		if(array_key_exists('DATE_MODIFY', $arFields))
@@ -52,6 +56,9 @@ class CAllCatalogDocs
 						CCatalogStoreDocsElement::update($arElement["ID"], $arElement);
 				}
 			}
+
+			foreach(GetModuleEvents("catalog", "OnDocumentUpdate", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id, $arFields));
 		}
 		return true;
 	}
@@ -80,6 +87,10 @@ class CAllCatalogDocs
 				ExecuteModuleEventEx($event, array($id));
 
 			$DB->Query("DELETE FROM b_catalog_store_docs WHERE ID = ".$id, true);
+
+			foreach(GetModuleEvents("catalog", "OnDocumentDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id));
+
 			return true;
 		}
 		return false;

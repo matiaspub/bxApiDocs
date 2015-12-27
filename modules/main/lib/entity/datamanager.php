@@ -231,13 +231,19 @@ abstract class DataManager
 	}
 
 	/**
-	 * Performs COUNT query on entity and returns the result
+	 * Performs COUNT query on entity and returns the result.
 	 *
+	 * @param array $filter
 	 * @return int
 	 */
-	public static function getCount()
+	public static function getCount(array $filter = array())
 	{
-		$result = static::query()->addSelect(new ExpressionField('CNT', 'COUNT(1)'))->exec()->fetch();
+		$query = static::query();
+
+		$query->addSelect(new ExpressionField('CNT', 'COUNT(1)'));
+		$query->setFilter($filter);
+
+		$result = $query->exec()->fetch();
 
 		return $result['CNT'];
 	}
@@ -250,6 +256,23 @@ abstract class DataManager
 	public static function query()
 	{
 		return new Query(static::getEntity());
+	}
+
+	protected static function replaceFieldName($data = array())
+	{
+		foreach ($data as $fieldName => $value)
+		{
+			/** @var ScalarField $field */
+			$field = static::getEntity()->getField($fieldName);
+			$columnName = $field->getColumnName();
+			if($columnName != $fieldName)
+			{
+				$data[$columnName] = $data[$fieldName];
+				unset($data[$fieldName]);
+			}
+		}
+
+		return $data;
 	}
 
 	protected static function normalizePrimary(&$primary, $data = array())
@@ -403,7 +426,10 @@ abstract class DataManager
 	 * Adds row to entity table
 	 *
 	 * @param array $data
+	 *
 	 * @return AddResult Contains ID of inserted row
+	 *
+	 * @throws \Exception
 	 */
 	public static function add(array $data)
 	{
@@ -412,139 +438,150 @@ abstract class DataManager
 		$entity = static::getEntity();
 		$result = new AddResult();
 
-		//event before adding
-		$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields"=>$data));
-		$event->send();
-		$event->getErrors($result);
-		$data = $event->mergeFields($data);
-
-		//event before adding (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields"=>$data), true);
-		$event->send();
-		$event->getErrors($result);
-		$data = $event->mergeFields($data);
-
-		// set fields with default values
-		foreach (static::getEntity()->getFields() as $field)
+		try
 		{
-			if ($field instanceof ScalarField &&  !array_key_exists($field->getName(), $data))
-			{
-				$defaultValue =  $field->getDefaultValue();
+			//event before adding
+			$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields" => $data));
+			$event->send();
+			$event->getErrors($result);
+			$data = $event->mergeFields($data);
 
-				if ($defaultValue !== null)
+			//event before adding (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_BEFORE_ADD, array("fields" => $data), true);
+			$event->send();
+			$event->getErrors($result);
+			$data = $event->mergeFields($data);
+
+			// set fields with default values
+			foreach (static::getEntity()->getFields() as $field)
+			{
+				if ($field instanceof ScalarField && !array_key_exists($field->getName(), $data))
 				{
-					$data[$field->getName()] = $field->getDefaultValue();
+					$defaultValue = $field->getDefaultValue();
+
+					if ($defaultValue !== null)
+					{
+						$data[$field->getName()] = $field->getDefaultValue();
+					}
 				}
 			}
-		}
 
-		// uf values
-		$ufdata = array();
+			// uf values
+			$ufdata = array();
 
-		// separate userfields
-		if (static::getEntity()->getUfId())
-		{
-			// collect uf data
-			$userfields = $USER_FIELD_MANAGER->GetUserFields(static::getEntity()->getUfId());
-
-			foreach ($userfields as $userfield)
+			// separate userfields
+			if (static::getEntity()->getUfId())
 			{
-				if (array_key_exists($userfield['FIELD_NAME'], $data))
-				{
-					// copy value
-					$ufdata[$userfield['FIELD_NAME']] = $data[$userfield['FIELD_NAME']];
+				// collect uf data
+				$userfields = $USER_FIELD_MANAGER->GetUserFields(static::getEntity()->getUfId());
 
-					// remove original
-					unset($data[$userfield['FIELD_NAME']]);
+				foreach ($userfields as $userfield)
+				{
+					if (array_key_exists($userfield['FIELD_NAME'], $data))
+					{
+						// copy value
+						$ufdata[$userfield['FIELD_NAME']] = $data[$userfield['FIELD_NAME']];
+
+						// remove original
+						unset($data[$userfield['FIELD_NAME']]);
+					}
 				}
 			}
-		}
 
-		// check data
-		static::checkFields($result, null, $data);
+			// check data
+			static::checkFields($result, null, $data);
 
-		// check uf data
-		if (!empty($ufdata))
-		{
-			if (!$USER_FIELD_MANAGER->CheckFields(static::getEntity()->getUfId(), false, $ufdata))
+			// check uf data
+			if (!empty($ufdata))
 			{
-				if(is_object($APPLICATION) && $APPLICATION->getException())
+				if (!$USER_FIELD_MANAGER->CheckFields(static::getEntity()->getUfId(), false, $ufdata))
 				{
-					$e = $APPLICATION->getException();
-					$result->addError(new EntityError($e->getString()));
-					$APPLICATION->resetException();
-				}
-				else
-				{
-					$result->addError(new EntityError("Unknown error while checking userfields"));
+					if (is_object($APPLICATION) && $APPLICATION->getException())
+					{
+						$e = $APPLICATION->getException();
+						$result->addError(new EntityError($e->getString()));
+						$APPLICATION->resetException();
+					}
+					else
+					{
+						$result->addError(new EntityError("Unknown error while checking userfields"));
+					}
 				}
 			}
-		}
 
-		// check if there is still some data
-		if (!count($data + $ufdata))
+			// check if there is still some data
+			if (!count($data + $ufdata))
+			{
+				$result->addError(new EntityError("There is no data to add."));
+			}
+
+			// return if any error
+			if (!$result->isSuccess(true))
+			{
+				return $result;
+			}
+
+			//event on adding
+			$event = new Event($entity, self::EVENT_ON_ADD, array("fields" => $data + $ufdata));
+			$event->send();
+
+			//event on adding (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_ADD, array("fields" => $data + $ufdata), true);
+			$event->send();
+
+			// use save modifiers
+			foreach ($data as $fieldName => $value)
+			{
+				$field = static::getEntity()->getField($fieldName);
+				$data[$fieldName] = $field->modifyValueBeforeSave($value, $data);
+			}
+
+			// save data
+			$connection = $entity->getConnection();
+
+			$tableName = $entity->getDBTableName();
+			$identity = $entity->getAutoIncrement();
+
+			$dataReplacedColumn = static::replaceFieldName($data);
+			$id = $connection->add($tableName, $dataReplacedColumn, $identity);
+
+			$result->setId($id);
+			$result->setData($data);
+
+			// build stamdard primary
+			$primary = null;
+
+			if (!empty($id))
+			{
+				$primary = array($entity->getAutoIncrement() => $id);
+				static::normalizePrimary($primary);
+			}
+			else
+			{
+				static::normalizePrimary($primary, $data);
+			}
+
+			// save uf data
+			if (!empty($ufdata))
+			{
+				$USER_FIELD_MANAGER->update(static::getEntity()->getUfId(), end($primary), $ufdata);
+			}
+
+			//event after adding
+			$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id" => $id, "fields" => $data));
+			$event->send();
+
+			//event after adding (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id" => $id, "primary" => $primary, "fields" => $data), true);
+			$event->send();
+		}
+		catch (\Exception $e)
 		{
-			$result->addError(new EntityError("There is no data to add."));
+			// check result to avoid warning
+			$result->isSuccess();
+
+			throw $e;
 		}
-
-		// return if any error
-		if(!$result->isSuccess(true))
-		{
-			return $result;
-		}
-
-		//event on adding
-		$event = new Event($entity, self::EVENT_ON_ADD, array("fields"=>$data + $ufdata));
-		$event->send();
-
-		//event on adding (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_ADD, array("fields"=>$data + $ufdata), true);
-		$event->send();
-
-		// use save modifiers
-		foreach ($data as $fieldName => $value)
-		{
-			$field = static::getEntity()->getField($fieldName);
-			$data[$fieldName] = $field->modifyValueBeforeSave($value, $data);
-		}
-
-		// save data
-		$connection = Main\Application::getConnection();
-
-		$tableName = $entity->getDBTableName();
-		$identity = $entity->getAutoIncrement();
-
-		$id = $connection->add($tableName, $data, $identity);
-
-		$result->setId($id);
-		$result->setData($data);
-
-		// build stamdard primary
-		$primary = null;
-
-		if (!empty($id))
-		{
-			$primary = $id;
-			static::normalizePrimary($primary);
-		}
-		else
-		{
-			static::normalizePrimary($primary, $data);
-		}
-
-		// save uf data
-		if (!empty($ufdata))
-		{
-			$USER_FIELD_MANAGER->update(static::getEntity()->getUfId(), end($primary), $ufdata);
-		}
-
-		//event after adding
-		$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id"=>$id, "fields"=>$data));
-		$event->send();
-
-		//event after adding (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_AFTER_ADD, array("id"=>$id, "primary"=>$primary, "fields"=>$data), true);
-		$event->send();
 
 		return $result;
 	}
@@ -554,7 +591,10 @@ abstract class DataManager
 	 *
 	 * @param mixed $primary
 	 * @param array $data
+	 *
 	 * @return UpdateResult
+	 *
+	 * @throws \Exception
 	 */
 	public static function update($primary, array $data)
 	{
@@ -567,123 +607,135 @@ abstract class DataManager
 		$entity = static::getEntity();
 		$result = new UpdateResult();
 
-		//event before update
-		$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id"=>$primary, "fields"=>$data));
-		$event->send();
-		$event->getErrors($result);
-		$data = $event->mergeFields($data);
-
-		//event before update (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id"=>$primary, "primary"=>$primary, "fields"=>$data), true);
-		$event->send();
-		$event->getErrors($result);
-		$data = $event->mergeFields($data);
-
-		// uf values
-		$ufdata = array();
-
-		// separate userfields
-		if (static::getEntity()->getUfId())
+		try
 		{
-			// collect uf data
-			$userfields = $USER_FIELD_MANAGER->GetUserFields(static::getEntity()->getUfId());
+			//event before update
+			$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id" => $primary, "fields" => $data));
+			$event->send();
+			$event->getErrors($result);
+			$data = $event->mergeFields($data);
 
-			foreach ($userfields as $userfield)
+			//event before update (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_BEFORE_UPDATE, array("id" => $primary, "primary" => $primary, "fields" => $data), true);
+			$event->send();
+			$event->getErrors($result);
+			$data = $event->mergeFields($data);
+
+			// uf values
+			$ufdata = array();
+
+			// separate userfields
+			if (static::getEntity()->getUfId())
 			{
-				if (array_key_exists($userfield['FIELD_NAME'], $data))
-				{
-					// copy value
-					$ufdata[$userfield['FIELD_NAME']] = $data[$userfield['FIELD_NAME']];
+				// collect uf data
+				$userfields = $USER_FIELD_MANAGER->GetUserFields(static::getEntity()->getUfId());
 
-					// remove original
-					unset($data[$userfield['FIELD_NAME']]);
+				foreach ($userfields as $userfield)
+				{
+					if (array_key_exists($userfield['FIELD_NAME'], $data))
+					{
+						// copy value
+						$ufdata[$userfield['FIELD_NAME']] = $data[$userfield['FIELD_NAME']];
+
+						// remove original
+						unset($data[$userfield['FIELD_NAME']]);
+					}
 				}
 			}
-		}
 
-		// check data
-		static::checkFields($result, $primary, $data);
+			// check data
+			static::checkFields($result, $primary, $data);
 
-		// check uf data
-		if (!empty($ufdata))
-		{
-			if (!$USER_FIELD_MANAGER->CheckFields(static::getEntity()->getUfId(), end($primary), $ufdata))
+			// check uf data
+			if (!empty($ufdata))
 			{
-				if(is_object($APPLICATION) && $APPLICATION->getException())
+				if (!$USER_FIELD_MANAGER->CheckFields(static::getEntity()->getUfId(), end($primary), $ufdata))
 				{
-					$e = $APPLICATION->getException();
-					$result->addError(new EntityError($e->getString()));
-					$APPLICATION->resetException();
-				}
-				else
-				{
-					$result->addError(new EntityError("Unknown error while checking userfields"));
+					if (is_object($APPLICATION) && $APPLICATION->getException())
+					{
+						$e = $APPLICATION->getException();
+						$result->addError(new EntityError($e->getString()));
+						$APPLICATION->resetException();
+					}
+					else
+					{
+						$result->addError(new EntityError("Unknown error while checking userfields"));
+					}
 				}
 			}
-		}
 
-		// check if there is still some data
-		if (!count($data + $ufdata))
+			// check if there is still some data
+			if (!count($data + $ufdata))
+			{
+				$result->addError(new EntityError("There is no data to update."));
+			}
+
+			// return if any error
+			if (!$result->isSuccess(true))
+			{
+				return $result;
+			}
+
+			//event on update
+			$event = new Event($entity, self::EVENT_ON_UPDATE, array("id" => $primary, "fields" => $data + $ufdata));
+			$event->send();
+
+			//event on update (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_UPDATE, array("id" => $primary, "primary" => $primary, "fields" => $data + $ufdata), true);
+			$event->send();
+
+			// use save modifiers
+			foreach ($data as $fieldName => $value)
+			{
+				$field = static::getEntity()->getField($fieldName);
+				$data[$fieldName] = $field->modifyValueBeforeSave($value, $data);
+			}
+
+			// save data
+			$connection = $entity->getConnection();
+			$helper = $connection->getSqlHelper();
+
+			$tableName = $entity->getDBTableName();
+
+			$dataReplacedColumn = static::replaceFieldName($data);
+			$update = $helper->prepareUpdate($tableName, $dataReplacedColumn);
+
+			$replacedPrimary = static::replaceFieldName($primary);
+			$id = array();
+			foreach ($replacedPrimary as $k => $v)
+			{
+				$id[] = $helper->prepareAssignment($tableName, $k, $v);
+			}
+			$where = implode(' AND ', $id);
+
+			$sql = "UPDATE ".$tableName." SET ".$update[0]." WHERE ".$where;
+			$connection->queryExecute($sql, $update[1]);
+
+			$result->setAffectedRowsCount($connection);
+			$result->setData($data);
+			$result->setPrimary($primary);
+
+			// save uf data
+			if (!empty($ufdata))
+			{
+				$USER_FIELD_MANAGER->update(static::getEntity()->getUfId(), end($primary), $ufdata);
+			}
+
+			//event after update
+			$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id" => $primary, "fields" => $data));
+			$event->send();
+
+			//event after update (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id" => $primary, "primary" => $primary, "fields" => $data), true);
+			$event->send();
+		}
+		catch (\Exception $e)
 		{
-			$result->addError(new EntityError("There is no data to update."));
+			// check result to avoid warning
+			$result->isSuccess();
+
+			throw $e;
 		}
-
-		// return if any error
-		if(!$result->isSuccess(true))
-		{
-			return $result;
-		}
-
-		//event on update
-		$event = new Event($entity, self::EVENT_ON_UPDATE, array("id"=>$primary, "fields"=>$data+$ufdata));
-		$event->send();
-
-		//event on update (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_UPDATE, array("id"=>$primary, "primary"=>$primary, "fields"=>$data+$ufdata), true);
-		$event->send();
-
-		// use save modifiers
-		foreach ($data as $fieldName => $value)
-		{
-			$field = static::getEntity()->getField($fieldName);
-			$data[$fieldName] = $field->modifyValueBeforeSave($value, $data);
-		}
-
-		// save data
-		$connection = Main\Application::getConnection();
-		$helper = $connection->getSqlHelper();
-
-		$tableName = $entity->getDBTableName();
-
-		$update = $helper->prepareUpdate($tableName, $data);
-
-		$id = array();
-		foreach ($primary as $k => $v)
-		{
-			$id[] = $helper->prepareAssignment($tableName, $k, $v);
-		}
-		$where = implode(' AND ', $id);
-
-		$sql = "UPDATE ".$tableName." SET ".$update[0]." WHERE ".$where;
-		$connection->queryExecute($sql, $update[1]);
-
-		$result->setAffectedRowsCount($connection);
-		$result->setData($data);
-		$result->setPrimary($primary);
-
-		// save uf data
-		if (!empty($ufdata))
-		{
-			$USER_FIELD_MANAGER->update(static::getEntity()->getUfId(), end($primary), $ufdata);
-		}
-
-		//event after update
-		$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id"=>$primary, "fields"=>$data));
-		$event->send();
-
-		//event after update (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_AFTER_UPDATE, array("id"=>$primary, "primary"=>$primary, "fields"=>$data), true);
-		$event->send();
 
 		return $result;
 	}
@@ -692,7 +744,10 @@ abstract class DataManager
 	 * Deletes row in entity table by primary key
 	 *
 	 * @param mixed $primary
+	 *
 	 * @return DeleteResult
+	 *
+	 * @throws \Exception
 	 */
 	public static function delete($primary)
 	{
@@ -705,59 +760,70 @@ abstract class DataManager
 		$entity = static::getEntity();
 		$result = new DeleteResult();
 
-		//event before delete
-		$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id"=>$primary));
-		$event->send();
-		$event->getErrors($result);
-
-		//event before delete (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id"=>$primary, "primary"=>$primary), true);
-		$event->send();
-		$event->getErrors($result);
-
-		// return if any error
-		if (!$result->isSuccess(true))
+		try
 		{
-			return $result;
+			//event before delete
+			$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id" => $primary));
+			$event->send();
+			$event->getErrors($result);
+
+			//event before delete (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_BEFORE_DELETE, array("id" => $primary, "primary" => $primary), true);
+			$event->send();
+			$event->getErrors($result);
+
+			// return if any error
+			if (!$result->isSuccess(true))
+			{
+				return $result;
+			}
+
+			//event on delete
+			$event = new Event($entity, self::EVENT_ON_DELETE, array("id" => $primary));
+			$event->send();
+
+			//event on delete (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_DELETE, array("id" => $primary, "primary" => $primary), true);
+			$event->send();
+
+			// delete
+			$connection = $entity->getConnection();
+			$helper = $connection->getSqlHelper();
+
+			$tableName = $entity->getDBTableName();
+
+			$replacedPrimary = static::replaceFieldName($primary);
+			$id = array();
+			foreach ($replacedPrimary as $k => $v)
+			{
+				$id[] = $helper->prepareAssignment($tableName, $k, $v);
+			}
+			$where = implode(' AND ', $id);
+
+			$sql = "DELETE FROM ".$tableName." WHERE ".$where;
+			$connection->queryExecute($sql);
+
+			// delete uf data
+			if (static::getEntity()->getUfId())
+			{
+				$USER_FIELD_MANAGER->delete(static::getEntity()->getUfId(), end($primary));
+			}
+
+			//event after delete
+			$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id" => $primary));
+			$event->send();
+
+			//event after delete (modern with namespace)
+			$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id" => $primary, "primary" => $primary), true);
+			$event->send();
 		}
-
-		//event on delete
-		$event = new Event($entity, self::EVENT_ON_DELETE, array("id"=>$primary));
-		$event->send();
-
-		//event on delete (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_DELETE, array("id"=>$primary, "primary"=>$primary), true);
-		$event->send();
-
-		// delete
-		$connection = Main\Application::getConnection();
-		$helper = $connection->getSqlHelper();
-
-		$tableName = $entity->getDBTableName();
-
-		$id = array();
-		foreach ($primary as $k => $v)
+		catch (\Exception $e)
 		{
-			$id[] = $k." = '".$helper->forSql($v)."'";
+			// check result to avoid warning
+			$result->isSuccess();
+
+			throw $e;
 		}
-		$where = implode(' AND ', $id);
-
-		$sql = "DELETE FROM ".$tableName." WHERE ".$where;
-		$connection->queryExecute($sql);
-
-		// delete uf data
-		if (static::getEntity()->getUfId())
-		{
-			$USER_FIELD_MANAGER->delete(static::getEntity()->getUfId(), end($primary));
-		}
-
-		//event after delete
-		$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id"=>$primary));
-		$event->send();
-
-		//event after delete (modern with namespace)
-		$event = new Event($entity, self::EVENT_ON_AFTER_DELETE, array("id"=>$primary, "primary" => $primary), true);
-		$event->send();
 
 		return $result;
 	}

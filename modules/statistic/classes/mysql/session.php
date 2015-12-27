@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CSession</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</body> </html>
- *
- *
+ * <b>CSession</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>. 
  *
  *
  * @return mixed 
@@ -86,8 +84,6 @@ class CSession
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID сессии;
 	* </li> <li> <b>s_last_site_id</b> - ID сайта последнего <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хита</a> сессии; </li> <li>
@@ -106,12 +102,8 @@ class CSession
 	* первого хита сессии; </li> <li> <b>s_url_to</b> - страница последнего хита
 	* сессии. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID сессии; </li> <li>
@@ -200,15 +192,10 @@ class CSession
 	* допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	* логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -233,7 +220,6 @@ class CSession
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -471,14 +457,9 @@ class CSession
 	* <p>Возвращает данные по указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $session_id  ID сессии.</bod
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -492,7 +473,6 @@ class CSession
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

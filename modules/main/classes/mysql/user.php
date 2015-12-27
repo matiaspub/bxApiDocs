@@ -17,9 +17,7 @@ class CUser extends CAllUser
 
 	
 	/**
-	* <p>Функция добавляет нового пользователя. При успешном выполнении возвращает ID нового пользователя, в противном случае - вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. <br><br><b>CUser::Add()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса CUser. </p>
-	*
-	*
+	* <p>Метод добавляет нового пользователя. При успешном выполнении возвращает ID нового пользователя, в противном случае - вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод.</p> <p></p> <div class="note"> <b>Примечание</b>: CUser::Add можно вызывать только как метод инициализированного объекта, а не как статический метод класса CUser.</div>
 	*
 	*
 	* @param array $fields  Массив значений полей, в качестве ключей данного массива
@@ -67,10 +65,7 @@ class CUser extends CAllUser
 	* заметки касаемо работы пользователя </li> </ul> <font color="red">*</font> -
 	* обязательные поля.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -101,7 +96,6 @@ class CUser extends CAllUser
 	*     echo $user-&gt;LAST_ERROR;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -221,7 +215,7 @@ class CUser extends CAllUser
 			$CACHE_MANAGER->ClearByTag("USER_CARD_".intval($ID / TAGGED_user_card_size));
 			$CACHE_MANAGER->ClearByTag("USER_CARD");
 			$CACHE_MANAGER->ClearByTag("USER_NAME_".$ID);
-			$CACHE_MANAGER->ClearByTag("USER_NAME");			
+			$CACHE_MANAGER->ClearByTag("USER_NAME");
 		}
 
 		return $Result;
@@ -248,9 +242,7 @@ class CUser extends CAllUser
 
 	
 	/**
-	* <p>Возвращает список пользователей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Возвращает список пользователей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Статичный метод.</p>
 	*
 	*
 	* @param mixed &$by = "timestamp_x" ссылка на переменную с полем для сортировки, может принимать
@@ -284,15 +276,11 @@ class CUser extends CAllUser
 	* множественной сортировки. Значения ключей массива совпадают с
 	* перечисленными выше.</p>
 	*
-	*
-	*
 	* @param string &$order = "desc" Ссылка на переменную с порядком сортировки, может принимать
 	* значения: <br><ul> <li> <b>asc</b> - по возрастанию </li> <li> <b>desc</b> - по убыванию
 	* </li> </ul> <p>При использовании массива в параметре <em>by</em> данный
 	* параметр игнорируется. Значения c <i>nulls</i> не работают, например:
 	* <i>desc,nulls</i>.</p>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации пользователей. (<a
 	* href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683#types" >Типы
@@ -307,46 +295,46 @@ class CUser extends CAllUser
 	* совпадение с логином) </li> <li> <sup>1</sup><b>LOGIN</b> - по имени входа (ищет
 	* подстроку в логине) </li> <li> <sup>1</sup><b>NAME</b> - по имени и фамилии </li> <li>
 	* <sup>1</sup><b>EMAIL</b> - по E-Mail адресу </li> <li> <sup>1</sup><b>COUNTRY_ID</b> - по коду
-	* страны </li> <li> <b>GROUPS_ID</b> - по группам (массив с кодами групп
-	* пользователей) </li> <li> <b>PERSONAL_BIRTHDAY_1</b> - день рождения "с" </li> <li>
-	* <b>PERSONAL_BIRTHDAY_2</b> - день рождения "по" </li> <li> <sup>1</sup><b>KEYWORDS</b> - по
-	* нижеследующим полям профайла помеченных символом - * </li> <li>
-	* <sup>1</sup>* <b>PERSONAL_PROFESSION</b> - профессия </li> <li> <sup>1</sup>* <b>PERSONAL_WWW</b> -
-	* WWW-страница </li> <li> <sup>1</sup>* <b>PERSONAL_ICQ</b> - номер ICQ </li> <li> <sup>1</sup>*
-	* <b>PERSONAL_GENDER</b> - пол ("M" - мужской; "F" - женский) </li> <li> <sup>1</sup>*
-	* <b>PERSONAL_PHOTO</b> - ID файла - фотографии (таблица b_file) </li> <li> <sup>1</sup>*
-	* <b>PERSONAL_PHONE</b> - номер телефона </li> <li> <sup>1</sup>* <b>PERSONAL_FAX</b> - номер факса
-	* </li> <li> <sup>1</sup>* <b>PERSONAL_MOBILE</b> - номер мобильного </li> <li> <sup>1</sup>*
-	* <b>PERSONAL_PAGER</b> - номер пейджера </li> <li> <sup>1</sup>* <b>PERSONAL_STREET</b> - улица </li>
-	* <li> <sup>1</sup>* <b>PERSONAL_MAILBOX</b> - почтовый ящик </li> <li> <sup>1</sup>* <b>PERSONAL_CITY</b> -
-	* город </li> <li> <sup>1</sup>* <b>PERSONAL_STATE</b> - область / край </li> <li> <sup>1</sup>*
-	* <b>PERSONAL_ZIP</b> - почтовый индекс </li> <li> <sup>1</sup>* <b>PERSONAL_COUNTRY</b> - код
-	* страны (хранится в файлах \bitrix\modules\main\lang\ru\tools.php,
-	* \bitrix\modules\main\lang\en\tools.php) </li> <li> <sup>1</sup>* <b>PERSONAL_NOTES</b> - дополнительные
-	* заметки </li> <li> <sup>1</sup>* <b>WORK_COMPANY</b> - наименования компании </li> <li>
-	* <sup>1</sup>* <b>WORK_DEPARTMENT</b> - отдел </li> <li> <sup>1</sup>* <b>WORK_POSITION</b> - должность
-	* </li> <li> <sup>1</sup>* <b>WORK_WWW</b> - WWW-страница компании </li> <li> <sup>1</sup>*
-	* <b>WORK_PHONE</b> - рабочий телефон </li> <li> <sup>1</sup>* <b>WORK_FAX</b> - рабочий факс
-	* </li> <li> <sup>1</sup>* <b>WORK_PAGER</b> - рабочий пейджер </li> <li> <sup>1</sup>* <b>WORK_STREET</b> -
-	* улица компании </li> <li> <sup>1</sup>* <b>WORK_MAILBOX</b> - почтовый ящик компании
-	* </li> <li> <sup>1</sup>* <b>WORK_CITY</b> - город компании </li> <li> <sup>1</sup>* <b>WORK_STATE</b> -
-	* область / край компании </li> <li> <sup>1</sup>* <b>WORK_ZIP</b> - почтовый индекс
-	* компании </li> <li> <sup>1</sup>* <b>WORK_COUNTRY</b> - код страны компании (хранится
-	* в файлах \bitrix\modules\main\lang\ru\tools.php, \bitrix\modules\main\lang\en\tools.php) </li> <li> <sup>1</sup>*
-	* <b>WORK_PROFILE</b> - направление деятельности компании </li> <li> <sup>1</sup>*
-	* <b>WORK_NOTES</b> - дополнительные заметки касаемо места работы </li> <li>
-	* <sup>1</sup>* <b>ADMIN_NOTES</b> - комментарий администратора (доступен для
-	* просмотра и редактирования только администратору сайта) </li> </ul>
-	* <sup>1</sup> - в данных полях допускается <a
+	* страны, оставлен для обратной совместимости. Сейчас при его
+	* использовании производится фильтрация по WORK_COUNTRY.</li> <li> <b>GROUPS_ID</b> -
+	* по группам (массив с кодами групп пользователей) </li> <li>
+	* <b>PERSONAL_BIRTHDAY_1</b> - день рождения "с" </li> <li> <b>PERSONAL_BIRTHDAY_2</b> - день
+	* рождения "по" </li> <li> <sup>1</sup><b>KEYWORDS</b> - по нижеследующим полям
+	* профайла помеченных символом - * </li> <li> <sup>1</sup>* <b>PERSONAL_PROFESSION</b> -
+	* профессия </li> <li> <sup>1</sup>* <b>PERSONAL_WWW</b> - WWW-страница </li> <li> <sup>1</sup>*
+	* <b>PERSONAL_ICQ</b> - номер ICQ </li> <li> <sup>1</sup>* <b>PERSONAL_GENDER</b> - пол ("M" - мужской; "F"
+	* - женский) </li> <li> <sup>1</sup>* <b>PERSONAL_PHOTO</b> - ID файла - фотографии (таблица
+	* b_file) </li> <li> <sup>1</sup>* <b>PERSONAL_PHONE</b> - номер телефона </li> <li> <sup>1</sup>*
+	* <b>PERSONAL_FAX</b> - номер факса </li> <li> <sup>1</sup>* <b>PERSONAL_MOBILE</b> - номер
+	* мобильного </li> <li> <sup>1</sup>* <b>PERSONAL_PAGER</b> - номер пейджера </li> <li>
+	* <sup>1</sup>* <b>PERSONAL_STREET</b> - улица </li> <li> <sup>1</sup>* <b>PERSONAL_MAILBOX</b> - почтовый
+	* ящик </li> <li> <sup>1</sup>* <b>PERSONAL_CITY</b> - город </li> <li> <sup>1</sup>* <b>PERSONAL_STATE</b> -
+	* область / край </li> <li> <sup>1</sup>* <b>PERSONAL_ZIP</b> - почтовый индекс </li> <li>
+	* <sup>1</sup>* <b>PERSONAL_COUNTRY</b> - код страны (хранится в файлах
+	* \bitrix\modules\main\lang\ru\tools.php, \bitrix\modules\main\lang\en\tools.php) </li> <li> <sup>1</sup>*
+	* <b>PERSONAL_NOTES</b> - дополнительные заметки </li> <li> <sup>1</sup>* <b>WORK_COMPANY</b> -
+	* наименования компании </li> <li> <sup>1</sup>* <b>WORK_DEPARTMENT</b> - отдел </li> <li>
+	* <sup>1</sup>* <b>WORK_POSITION</b> - должность </li> <li> <sup>1</sup>* <b>WORK_WWW</b> - WWW-страница
+	* компании </li> <li> <sup>1</sup>* <b>WORK_PHONE</b> - рабочий телефон </li> <li> <sup>1</sup>*
+	* <b>WORK_FAX</b> - рабочий факс </li> <li> <sup>1</sup>* <b>WORK_PAGER</b> - рабочий пейджер
+	* </li> <li> <sup>1</sup>* <b>WORK_STREET</b> - улица компании </li> <li> <sup>1</sup>* <b>WORK_MAILBOX</b> -
+	* почтовый ящик компании </li> <li> <sup>1</sup>* <b>WORK_CITY</b> - город компании </li>
+	* <li> <sup>1</sup>* <b>WORK_STATE</b> - область / край компании </li> <li> <sup>1</sup>*
+	* <b>WORK_ZIP</b> - почтовый индекс компании </li> <li> <sup>1</sup>* <b>WORK_COUNTRY</b> - код
+	* страны компании (хранится в файлах \bitrix\modules\main\lang\ru\tools.php,
+	* \bitrix\modules\main\lang\en\tools.php) </li> <li> <sup>1</sup>* <b>WORK_PROFILE</b> - направление
+	* деятельности компании </li> <li> <sup>1</sup>* <b>WORK_NOTES</b> - дополнительные
+	* заметки касаемо места работы </li> <li> <sup>1</sup>* <b>ADMIN_NOTES</b> -
+	* комментарий администратора (доступен для просмотра и
+	* редактирования только администратору сайта) </li> </ul> <sup>1</sup> - в
+	* данных полях допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложные условия</a>. Сложные
 	* условия для данного поля работают только при указании: <b>ID</b>. При
 	* указании <b>!ID</b> и <b>&gt;ID</b>, сложные условия работать не будут. <br> * -
 	* поиск по "KEYWORDS" по сути является поиском по полям отмеченных
 	* символом "*"
 	*
-	*
-	*
-	* @param array $arParams = array() Массив с дополнительными параметрами функции. Может содержать
+	* @param array $arParams = array() Массив с дополнительными параметрами метода. Может содержать
 	* ключи: <br><p><strong>SELECT</strong> - массив с идентификаторами
 	* пользовательских полей для их выборки в результат, например
 	* array("UF_TEXT_1", "UF_STRUCTURE"). Для указания выборки всех полей используйте
@@ -375,10 +363,7 @@ class CUser extends CAllUser
 	* <td>AUTO_TIME_ZONE</td> <td>TIME_ZONE</td> <td>PASSWORD</td> </tr> <tr> <td>CHECKWORD</td> <td>LID</td> <td></td>
 	* <td></td> </tr> </tbody></table>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -388,7 +373,6 @@ class CUser extends CAllUser
 	* $tmp = 'sort'; // параметр проигнорируется методом, но обязан быть
 	* $rsUsers = CUser::GetList($order, $tmp);
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -503,6 +487,7 @@ class CUser extends CAllUser
 					&& $key != "LAST_LOGIN"
 					&& $key != "!LAST_LOGIN"
 					&& $key != "EXTERNAL_AUTH_ID"
+					&& $key != "!EXTERNAL_AUTH_ID"
 				)
 				{
 					if(strlen($val) <= 0 || $val === "NOT_REF")
@@ -569,6 +554,33 @@ class CUser extends CAllUser
 						$arSqlSearch[] = "U.EXTERNAL_AUTH_ID='".$DB->ForSQL($val, 255)."'";
 					else
 						$arSqlSearch[] = "(U.EXTERNAL_AUTH_ID IS NULL OR U.EXTERNAL_AUTH_ID='')";
+					break;
+				case "!EXTERNAL_AUTH_ID":
+  					if (
+						is_array($val)
+						&& count($val) > 0
+					)
+					{
+						$strTmp = "";
+						foreach($val as $authId)
+						{
+							if (strlen($authId) > 0)
+							{
+								$strTmp .= (strlen($strTmp) > 0 ? "," : "")."'".$DB->ForSQL($authId, 255)."'";
+							}
+						}
+						if (strlen($strTmp) > 0)
+						{
+							$arSqlSearch[] = "U.EXTERNAL_AUTH_ID NOT IN (".$strTmp.") OR U.EXTERNAL_AUTH_ID IS NULL";
+						}
+					}
+					elseif (!is_array($val))
+					{
+						if($val <> '')
+							$arSqlSearch[] = "U.EXTERNAL_AUTH_ID <> '".$DB->ForSql($val, 255)."' OR U.EXTERNAL_AUTH_ID IS NULL";
+						else
+							$arSqlSearch[] = "(U.EXTERNAL_AUTH_ID IS NOT NULL AND LENGTH(U.EXTERNAL_AUTH_ID) > 0)";
+					}
 					break;
 				case "LOGIN_EQUAL_EXACT":
 					$arSqlSearch[] = "U.LOGIN='".$DB->ForSql($val)."'";
@@ -819,21 +831,14 @@ class CUser extends CAllUser
 
 	
 	/**
-	* <p>Метод предназначен для определения статуса "Сейчас на сайте" по ID пользователя.</p>
+	* <p>Метод предназначен для определения статуса "Сейчас на сайте" по ID пользователя. Динамичный метод.</p>
 	*
 	*
+	* @param mixed $id  ID пользователя
 	*
-	*
-	* @param $i $d  ID пользователя
-	*
-	*
-	*
-	* @param $interva $l = 120 Время в секундах
-	*
-	*
+	* @param mixed $interval = 120 Время в секундах
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -877,19 +882,14 @@ class CGroup extends CAllGroup
 
 	
 	/**
-	* <p>Функция добавляет новую группу пользователей. Возвращает ID вставленной группы. При возникновении ошибки функция вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки.</p>
-	*
-	*
+	* <p>Метод добавляет новую группу пользователей. Возвращает ID вставленной группы. При возникновении ошибки метод вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php#flds">полей</a> вида
 	* array("поле"=&gt;"значение" [, ...]).
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -907,7 +907,6 @@ class CGroup extends CAllGroup
 	* if (strlen($group-&gt;LAST_ERROR)&gt;0) ShowError($group-&gt;LAST_ERROR);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -993,6 +992,7 @@ class CGroup extends CAllGroup
 
 				$DB->Query($strSql);
 			}
+			CUser::clearUserGroupCache();
 		}
 
 		$arFields["ID"] = $ID;
@@ -1024,9 +1024,7 @@ class CGroup extends CAllGroup
 
 	
 	/**
-	* <p>Возвращает список групп в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Возвращает список групп в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Статичный метод.</p>
 	*
 	*
 	* @param string &$by = "c_sort" Ссылка на переменную с полем для сортировки, может принимать
@@ -1035,13 +1033,9 @@ class CGroup extends CAllGroup
 	* <b>c_sort</b> - порядок сортировки </li> <li> <b>description</b> - описание </li> <li>
 	* <b>users</b> - кол-во пользователей входящих в группу </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки, может принимать
 	* следующие значения: <ul> <li> <b>asc</b> - по возрастанию </li> <li> <b>desc</b> - по
 	* убыванию </li> </ul>
-	*
-	*
 	*
 	* @param array $filter  Массив для фильтрации пользователей. В массиве допустимы
 	* следующие индексы: <ul> <li> <b>ID</b> - ID группы (допускается <a
@@ -1056,16 +1050,11 @@ class CGroup extends CAllGroup
 	* кол-во пользователей "с" </li> <li> <b>USERS_2</b> - кол-во пользователей "по"
 	* </li> </ul>
 	*
-	*
-	*
 	* @param string $SHOW_USERS_AMOUNT = "N" "Y" - в выборке будет присутствовать поле ("USERS") с количеством
 	* пользователей в каждой группе; "N" - в выборке не будет поля с
 	* количеством пользователей в каждой группе (по умолчанию);
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1108,7 +1097,6 @@ class CGroup extends CAllGroup
 	*    }
 	* }
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1708,23 +1696,16 @@ class CGroup extends CAllGroup
 
 
 	/**
-	* <p>Возвращает группу пользователей по ее коду <i>ID</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Возвращает группу пользователей по ее коду <i>ID</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Статичный метод.</p>
 	*
 	*
 	* @param int $id  ID группы.</bo
-	*
-	*
 	*
 	* @param string $SHOW_USERS_AMOUNT = "N" "Y" - в выборке будет присутствовать поле ("USERS") с количеством
 	* пользователей в группе; "N" - в выборке не будет поля с количеством
 	* пользователей в группе (по умолчанию);
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1734,7 +1715,6 @@ class CGroup extends CAllGroup
 	* echo "&lt;pre&gt;"; print_r($arGroup); echo "&lt;/pre&gt;";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

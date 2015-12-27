@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CSubscription</b> - класс для работы с подписками на рассылки.</body> </html>
- *
- *
+ * <b>CSubscription</b> - класс для работы с подписками на рассылки. 
  *
  *
  * @return mixed 
@@ -19,21 +17,16 @@ class CSubscription extends CSubscriptionGeneral
 	//get by e-mail
 	
 	/**
-	* <p>Функция выбирает подписку по уникальному Email.</p>
-	*
-	*
+	* <p>Метод выбирает подписку по уникальному Email.</p>
 	*
 	*
 	* @param string $email  Уникальный Email подписчика. </htm
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны <a
 	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscription/csubscriptionfields.php">поля объекта
 	* "Подписка"</a>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

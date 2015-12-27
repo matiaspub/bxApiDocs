@@ -221,7 +221,13 @@ class CCatalogCSVSettings
 						'field' => 'VAT_INCLUDED',
 						'important' => 'N',
 						'name' => Loc::getMessage('I_VAT_INCLUDED').' (B_CATALOG_PRODUCT.VAT_INCLUDED)'
-					)
+					),
+					'CP_MEASURE' => array(
+						'value' => 'CP_MEASURE',
+						'field' => 'MEASURE',
+						'important' => 'N',
+						'name' => Loc::getMessage('BX_CAT_CSV_SETTINGS_PRODUCT_FIELD_NAME_MEASURE_ID').' (B_CATALOG_PRODUCT.MEASURE)'
+					),
 				);
 				break;
 			case self::FIELDS_PRICE:
@@ -267,6 +273,12 @@ class CCatalogCSVSettings
 				break;
 			case self::FIELDS_SECTION:
 				$result = array(
+					'IC_ID' => array(
+						'value' => 'IC_ID',
+						'field' => 'ID',
+						'important' => 'N',
+						'name' => Loc::getMessage('CATI_FI_ID').' (B_IBLOCK_SECTION.ID)'
+					),
 					'IC_XML_ID' => array(
 						'value' => 'IC_XML_ID',
 						'field' => 'XML_ID',
@@ -384,4 +396,3 @@ class CCatalogCSVSettings
 		return $result;
 	}
 }
-?>

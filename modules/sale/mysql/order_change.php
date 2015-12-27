@@ -129,9 +129,9 @@ class CSaleOrderChange extends CAllSaleOrderChange
 		}
 
 		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("ID", "ORDER_ID", "TYPE", "DATA", "DATE_CREATE", "DATE_MODIFY", "USER_ID");
+			$arSelectFields = array("ID", "ORDER_ID", "TYPE", "DATA", "DATE_CREATE", "DATE_MODIFY", "USER_ID", "ENTITY", "ENTITY_ID");
 		elseif (in_array("*", $arSelectFields))
-			$arSelectFields = array("ID", "ORDER_ID", "TYPE", "DATA", "DATE_CREATE", "DATE_MODIFY", "USER_ID");
+			$arSelectFields = array("ID", "ORDER_ID", "TYPE", "DATA", "DATE_CREATE", "DATE_MODIFY", "USER_ID", "ENTITY", "ENTITY_ID");
 
 		$arFields = array(
 			"ID" => array("FIELD" => "SOC.ID", "TYPE" => "int"),
@@ -141,6 +141,8 @@ class CSaleOrderChange extends CAllSaleOrderChange
 			"DATE_CREATE" => array("FIELD" => "SOC.DATE_CREATE", "TYPE" => "datetime"),
 			"DATE_MODIFY" => array("FIELD" => "SOC.DATE_MODIFY", "TYPE" => "datetime"),
 			"USER_ID" => array("FIELD" => "SOC.USER_ID", "TYPE" => "int"),
+			"ENTITY" => array("FIELD" => "SOC.ENTITY", "TYPE" => "string"),
+			"ENTITY_ID" => array("FIELD" => "SOC.ENTITY_ID", "TYPE" => "int"),
 		);
 
 		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);

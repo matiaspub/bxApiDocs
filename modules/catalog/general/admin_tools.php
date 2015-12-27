@@ -1,5 +1,9 @@
 <?
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Localization\Loc,
+	Bitrix\Main,
+	Bitrix\Iblock,
+	Bitrix\Catalog;
+
 Loc::loadMessages(__FILE__);
 
 class CCatalogAdminToolsAll
@@ -8,6 +12,8 @@ class CCatalogAdminToolsAll
 	const TAB_SKU = 'O';
 	const TAB_SET = 'S';
 	const TAB_GROUP = 'G';
+
+	const TAB_KEY = 'PRODUCT_TYPE';
 
 	protected static $strMainPrefix = '';
 	protected static $arErrors = array();
@@ -53,7 +59,7 @@ class CCatalogAdminToolsAll
 
 		if ($arCatalog['CATALOG'] == 'Y')
 		{
-			$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_CATALOG;
+			$arParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_CATALOG;
 			$arItems[] = array(
 				'ICON' => 'btn_new',
 				'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_PROD'),
@@ -63,7 +69,7 @@ class CCatalogAdminToolsAll
 			);
 			if (CCatalogSKU::TYPE_FULL == $arCatalog['CATALOG_TYPE'])
 			{
-				$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SKU;
+				$arParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SKU;
 				$arSubItems[] = array(
 					'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SKU'),
 					'TITLE' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SKU_TITLE'),
@@ -75,7 +81,7 @@ class CCatalogAdminToolsAll
 			{
 				if (CCatalogSKU::TYPE_OFFERS != $arCatalog['CATALOG_TYPE'])
 				{
-					$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SET;
+					$arParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SET;
 					$arSubItems[] = array(
 						'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SET'),
 						'TITLE' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SET_TITLE'),
@@ -83,7 +89,7 @@ class CCatalogAdminToolsAll
 						'SHOW_TITLE' => true
 					);
 				}
-				$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_GROUP;
+				$arParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_GROUP;
 				$arSubItems[] = array(
 					'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_GROUP'),
 					'TITLE' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_GROUP_TITLE'),
@@ -94,7 +100,7 @@ class CCatalogAdminToolsAll
 		}
 		else
 		{
-			$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SKU;
+			$arParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SKU;
 			$arItems[] = array(
 				'ICON' => 'btn_new',
 				'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SKU'),
@@ -112,9 +118,7 @@ class CCatalogAdminToolsAll
 			);
 		}
 		if (!empty($arItems))
-		{
 			$arResult = $arItems;
-		}
 
 		return $arResult;
 	}
@@ -142,9 +146,9 @@ class CCatalogAdminToolsAll
 		$intProductID = CIBlockElement::GetRealElement($intID);
 
 		$strProductType = '';
-		if (isset($_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE']))
+		if (isset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]))
 		{
-			$strProductType = (string)$_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE'];
+			$strProductType = (string)$_REQUEST[self::$strMainPrefix.self::TAB_KEY];
 			if ('' != $strProductType && !in_array($strProductType, self::getTabList()))
 				$strProductType = '';
 		}
@@ -174,7 +178,7 @@ class CCatalogAdminToolsAll
 				if (CCatalogSKU::TYPE_FULL == $arCatalog['CATALOG_TYPE'])
 				{
 					$arNewParams = $arParams;
-					$arNewParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SKU;
+					$arNewParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SKU;
 					$arItems[] = array(
 						'ICON' => '',
 						'TEXT' => Loc::getMessage('BT_CAT_SET_PRODUCT_TYPE_SKU'),
@@ -184,7 +188,7 @@ class CCatalogAdminToolsAll
 				if ($boolFeatureSet)
 				{
 					$arNewParams = $arParams;
-					$arNewParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SET;
+					$arNewParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SET;
 					$arItems[] = array(
 						'ICON' => '',
 						'TEXT' => Loc::getMessage('BT_CAT_SET_PRODUCT_TYPE_SET'),
@@ -234,7 +238,7 @@ class CCatalogAdminToolsAll
 					);
 					if (CCatalogSKU::TYPE_FULL == $arCatalog['CATALOG_TYPE'])
 					{
-						$arNewParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_SKU;
+						$arNewParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SKU;
 						$arItems[] = array(
 							'ICON' => '',
 							'TEXT' => Loc::getMessage('BT_CAT_SET_PRODUCT_TYPE_SKU'),
@@ -251,9 +255,7 @@ class CCatalogAdminToolsAll
 			}
 		}
 		if (!$boolFeatureSet && CCatalogSKU::TYPE_FULL != $arCatalog['CATALOG_TYPE'])
-		{
 			$arItems = array();
-		}
 		//group
 		if ($boolFeatureSet && self::TAB_GROUP != $strProductType)
 		{
@@ -261,7 +263,7 @@ class CCatalogAdminToolsAll
 			if (!$boolExistGroup)
 			{
 				$arNewParams = $arParams;
-				$arNewParams[self::$strMainPrefix.'PRODUCT_TYPE'] = self::TAB_GROUP;
+				$arNewParams[self::$strMainPrefix.self::TAB_KEY] = self::TAB_GROUP;
 				$arItems[] = array(
 					'ICON' => '',
 					'TEXT' => Loc::getMessage('BT_CAT_SET_PRODUCT_TYPE_GROUP_ADD'),
@@ -307,9 +309,9 @@ class CCatalogAdminToolsAll
 
 		$arResult = array_fill_keys(self::getTabList(false), false);
 		$strProductType = '';
-		if (isset($_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE']))
+		if (isset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]))
 		{
-			$strProductType = (string)$_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE'];
+			$strProductType = (string)$_REQUEST[self::$strMainPrefix.self::TAB_KEY];
 			if ('' != $strProductType && !isset($arResult[$strProductType]))
 				$strProductType = '';
 		}
@@ -406,23 +408,126 @@ class CCatalogAdminToolsAll
 		return $arResult;
 	}
 
+	public static function getFormParams($params = array())
+	{
+		$featureSet = CBXFeatures::IsFeatureEnabled('CatCompleteSet');
+		$productType = '';
+		if (isset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]))
+		{
+			$productType = (string)$_REQUEST[self::$strMainPrefix.self::TAB_KEY];
+			if ($productType != '' && !in_array($productType, self::getTabList(false)))
+				$productType = '';
+		}
+		if ($productType != '' && !$featureSet)
+		{
+			if ($productType == self::TAB_SET || $productType == self::TAB_GROUP)
+				$productType = '';
+		}
+		if (!is_array($params))
+			$params = array();
+		if ($productType != '')
+			$params[self::$strMainPrefix.self::TAB_KEY] = $productType;
+		return $params;
+	}
+
 	public static function showFormParams()
 	{
-		$boolFeatureSet = CBXFeatures::IsFeatureEnabled('CatCompleteSet');
-		if (isset($_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE']))
+		$params = self::getFormParams();
+		if (!empty($params))
 		{
-			$strProductType = (string)$_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE'];
-			if ('' != $strProductType && !in_array($strProductType, self::getTabList(false)))
-				$strProductType = '';
+			foreach ($params as $key => $value)
+			{
+				?><input type="hidden" name="<? echo htmlspecialcharsbx($key); ?>" value="<? echo htmlspecialcharsbx($value); ?>"><?
+			}
+			unset($key, $value);
 		}
-		if ('' != $strProductType && !$boolFeatureSet)
+		unset($params);
+	}
+
+	public static function setCatalogPanelButtons(&$buttons, $iblock, $catalogButtons, $params, $windowParams)
+	{
+		global $APPLICATION;
+
+		$iblock = (int)$iblock;
+		if ($iblock <= 0)
+			return;
+		if (empty($params) || !is_array($params))
+			return;
+		if (empty($windowParams) || !is_array($windowParams))
+			$windowParams = array('width' => 700, 'height' => 400, 'resize' => false);
+
+		if (isset($catalogButtons['add_product']))
 		{
-			if (self::TAB_SET == $strProductType || self::TAB_GROUP == $strProductType)
-				$strProductType = '';
+			$params[self::$strMainPrefix.self::TAB_KEY] = self::TAB_CATALOG;
+			$url = '/bitrix/admin/'.CIBlock::GetAdminElementEditLink($iblock, null, $params);
+			$action = $APPLICATION->GetPopupLink(
+				array(
+					"URL" => $url,
+					"PARAMS" => $windowParams,
+				)
+			);
+			$productButton = array(
+				'TITLE' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_PROD'),
+				'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_PROD_TITLE'),
+				'ACTION' => 'javascript:'.$action,
+				'ACTION_URL' => $url,
+				'ONCLICK' => $action,
+				'ICON' => 'bx-context-toolbar-create-icon',
+				'ID' => 'bx-context-toolbar-add-element',
+			);
+
+			$buttons['edit']['add_element'] = $productButton;
+			$buttons['configure']['add_element'] = $productButton;
+			$buttons['intranet'][] = array(
+				'TEXT' => $productButton['TEXT'],
+				'TITLE' => $productButton['TITLE'],
+				'ICON'	=> 'add',
+				'ONCLICK' => $productButton['ACTION'],
+				'SORT' => 1000,
+			);
+
+			$url = str_replace('&bxpublic=Y&from_module=iblock', '', $url);
+			$productButton['ACTION'] = "javascript:jsUtils.Redirect([], '".CUtil::JSEscape($url)."')";
+			unset($productButton['ONCLICK']);
+			$buttons['submenu']['add_element'] = $productButton;
+			unset($productButton);
 		}
-		if ('' != $strProductType)
+
+		if (isset($catalogButtons['add_sku']))
 		{
-			?><input type="hidden" name="<? echo self::$strMainPrefix; ?>PRODUCT_TYPE" value="<? echo $strProductType; ?>"><?
+			$params[self::$strMainPrefix.self::TAB_KEY] = self::TAB_SKU;
+			$url = '/bitrix/admin/'.CIBlock::GetAdminElementEditLink($iblock, null, $params);
+			$action = $APPLICATION->GetPopupLink(
+				array(
+					"URL" => $url,
+					"PARAMS" => $windowParams,
+				)
+			);
+			$skuButton = array(
+				'TITLE' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SKU'),
+				'TEXT' => Loc::getMessage('BT_CAT_ADM_TOOLS_ADD_SKU_TITLE'),
+				'ACTION' => 'javascript:'.$action,
+				'ACTION_URL' => $url,
+				'ONCLICK' => $action,
+				'ICON' => 'bx-context-toolbar-create-icon',
+				'ID' => 'bx-context-toolbar-add-sku',
+			);
+
+			$buttons['edit']['add_sku'] = $skuButton;
+			$buttons['configure']['add_sku'] = $skuButton;
+			$buttons['intranet'][] = array(
+				'TEXT' => $skuButton['TEXT'],
+				'TITLE' => $skuButton['TITLE'],
+				'ICON'	=> 'add',
+				'ONCLICK' => $skuButton['ACTION'],
+				'SORT' => 1010,
+			);
+
+			$url = str_replace('&bxpublic=Y&from_module=iblock', '', $url);
+			$skuButton['ACTION'] = "javascript:jsUtils.Redirect([], '".CUtil::JSEscape($url)."')";
+			unset($skuButton['ONCLICK']);
+			$buttons['submenu']['add_sku'] = $skuButton;
+			unset($skuButton);
 		}
 	}
 
@@ -473,13 +578,9 @@ class CCatalogAdminToolsAll
 		if ($boolFeatureSet)
 		{
 			if (isset($_REQUEST['groupdel']) && 'Y' == $_REQUEST['groupdel'])
-			{
 				$result = CCatalogProductSet::deleteAllSetsByProduct($intProductID, CCatalogProductSet::TYPE_GROUP);
-			}
 			elseif (isset($_REQUEST['setdel']) && 'Y' == $_REQUEST['setdel'])
-			{
 				$result = CCatalogProductSet::deleteAllSetsByProduct($intProductID, CCatalogProductSet::TYPE_SET);
-			}
 		}
 		return $result;
 	}
@@ -489,9 +590,10 @@ class CCatalogAdminToolsAll
 		if (!is_array($arParams))
 			return;
 		$boolFeatureSet = CBXFeatures::IsFeatureEnabled('CatCompleteSet');
-		if (isset($_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE']))
+		$strProductType = '';
+		if (isset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]))
 		{
-			$strProductType = (string)$_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE'];
+			$strProductType = (string)$_REQUEST[self::$strMainPrefix.self::TAB_KEY];
 			if ('' != $strProductType && !in_array($strProductType, self::getTabList(false)))
 				$strProductType = '';
 		}
@@ -502,14 +604,14 @@ class CCatalogAdminToolsAll
 		}
 		if ('' != $strProductType)
 		{
-			$arParams[self::$strMainPrefix.'PRODUCT_TYPE'] = $strProductType;
+			$arParams[self::$strMainPrefix.self::TAB_KEY] = $strProductType;
 		}
 	}
 
 	public static function clearTabParams()
 	{
-		if (array_key_exists(self::$strMainPrefix.'PRODUCT_TYPE', $_REQUEST))
-			unset($_REQUEST[self::$strMainPrefix.'PRODUCT_TYPE']);
+		if (array_key_exists(self::$strMainPrefix.self::TAB_KEY, $_REQUEST))
+			unset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]);
 	}
 }
 
@@ -649,17 +751,74 @@ class CCatalogAdminProductSetEdit
 		if (!isset(self::$arSrcValues[self::$strMainPrefix]) || empty(self::$arSrcValues[self::$strMainPrefix]))
 			return;
 
-		$arSets = self::$arSrcValues[self::$strMainPrefix];
+		foreach (self::$arSrcValues[self::$strMainPrefix] as $setKey => $setData)
+		{
+			if (empty($setData['ITEMS']))
+			{
+				if (array_key_exists($setKey, $arSets))
+					unset($arSets[$setKey]);
+				continue;
+			}
+			$newSetData = $setData;
+			unset($newSetData['ITEMS']);
+			$newItemCount = 0;
+			$setItems = array();
+
+			foreach ($setData['ITEMS'] as $itemKey => $item)
+			{
+				if (empty($item['ITEM_ID']) || trim($item['ITEM_ID'] == ''))
+					continue;
+				$itemKey = (int)$itemKey;
+				if ($itemKey > 0)
+				{
+					$setItems[$itemKey] = $item;
+				}
+				else
+				{
+					$setItems['n'.$newItemCount] = $item;
+					$newItemCount++;
+				}
+			}
+			unset($itemKey, $item);
+
+			$newSetData['ITEMS'] = $setItems;
+			$newSetData['NEW_ITEM_COUNT'] = $newItemCount;
+
+			if (isset($arSets[$setKey]))
+			{
+				$arSets[$setKey] = array_merge($newSetData, $arSets[$setKey]);
+				$arSets[$setKey]['ITEMS'] = $newSetData['ITEMS'];
+				$arSets[$setKey]['NEW_ITEM_COUNT'] = $newSetData['NEW_ITEM_COUNT'];
+			}
+			else
+			{
+				$arSets[$setKey] = $newSetData;
+			}
+			unset($newSetData, $newItemCount, $setItems);
+		}
+		unset($setKey, $setData);
 	}
 
 	public static function addEmptyValues(&$arSets)
 	{
+		if (empty($arSets) || !is_array($arSets))
+			return;
 
+		foreach ($arSets as $setKey => $setData)
+		{
+			$start = isset($setData['NEW_ITEM_COUNT']) ? $setData['NEW_ITEM_COUNT'] : 0;
+			foreach (self::getEmptyItem($start) as $rowKey => $row)
+				$arSets[$setKey]['ITEMS'][$rowKey] = $row;
+			$arSets[$setKey]['NEW_ITEM_COUNT'] = $start + self::NEW_ITEM_COUNT;
+			unset($rowKey, $row, $start);
+		}
+		unset($setKey, $setData);
 	}
 
 	public static function getItemsInfo(&$arSets)
 	{
-		$arItemList = array();
+		$itemList = array();
+		$itemIds = array();
 		if (empty($arSets) || !is_array($arSets))
 			return;
 		foreach ($arSets as $key => $arOneSet)
@@ -671,38 +830,49 @@ class CCatalogAdminProductSetEdit
 				$intItemID = (int)$arItem['ITEM_ID'];
 				if (0 >= $intItemID)
 					continue;
-				if (!isset($arItemList[$intItemID]))
-					$arItemList[$intItemID] = array();
-				$arItemList[$intItemID][] = array(
-					'SET' => $key,
-					'ITEM' => $keyItem
-				);
-			}
-		}
-		if (!empty($arItemList))
-		{
-			$arFilter = array(
-				'ID' => array_keys($arItemList)
-			);
-			$rsProducts = CIBlockElement::GetList(
-				array(),
-				$arFilter,
-				false,
-				false,
-				array('ID', 'NAME')
-			);
-			while ($arProduct = $rsProducts->Fetch())
-			{
-				$arProduct['ID'] = (int)$arProduct['ID'];
-				if (isset($arItemList[$arProduct['ID']]))
+				if (!isset($itemList[$intItemID]))
 				{
-					foreach ($arItemList[$arProduct['ID']] as $arOneKey)
-					{
-						$arSets[$arOneKey['SET']]['ITEMS'][$arOneKey['ITEM']]['ITEM_NAME'] = $arProduct['NAME'];
-					}
+					$itemList[$intItemID] = array();
+					$itemIds[] = $intItemID;
 				}
+				$itemList[$intItemID][] = &$arSets[$key]['ITEMS'][$keyItem];
 			}
 		}
+		if (!empty($itemList))
+		{
+			$productIterator = Iblock\ElementTable::getList(array(
+				'select' => array('ID', 'NAME'),
+				'filter' => array('@ID' => $itemIds)
+			));
+			while ($product = $productIterator->fetch())
+			{
+				$product['ID'] = (int)$product['ID'];
+				if (!isset($itemList[$product['ID']]))
+					continue;
+				foreach ($itemList[$product['ID']] as &$setItem)
+					$setItem['ITEM_NAME'] = $product['NAME'];
+				unset($setItem);
+			}
+			unset($product, $productIterator);
+			$productRatio = Catalog\ProductTable::getCurrentRatioWithMeasure($itemIds);
+			if (!empty($productRatio))
+			{
+				foreach ($productRatio as $productId => $productData)
+				{
+					if (!isset($itemList[$productId]))
+						continue;
+					foreach ($itemList[$productId] as &$setItem)
+					{
+						$setItem['RATIO'] = $productData['RATIO'];
+						$setItem['MEASURE'] = $productData['MEASURE'];
+					}
+					unset($setItem);
+				}
+				unset($productId, $productData);
+			}
+			unset($productRatio);
+		}
+		unset($itemIds, $itemList);
 	}
 
 	public static function clearOwnerSet(&$arSets)
@@ -735,8 +905,6 @@ class CCatalogAdminProductSetEdit
 
 	public static function showEditForm($arSets)
 	{
-		global $APPLICATION;
-
 		if (CCatalogProductSet::TYPE_SET != self::$intTypeID && CCatalogProductSet::TYPE_GROUP != self::$intTypeID)
 			return;
 		if (empty($arSets) || !is_array($arSets))
@@ -746,7 +914,7 @@ class CCatalogAdminProductSetEdit
 		if (!$boolFeatureSet)
 			return;
 
-		$APPLICATION->AddHeadScript('/bitrix/js/catalog/tbl_edit.js');
+		Main\Page\Asset::getInstance()->addJs('/bitrix/js/catalog/tbl_edit.js');
 
 		self::getItemsInfo($arSets);
 
@@ -757,7 +925,8 @@ class CCatalogAdminProductSetEdit
 			?><table id="<? echo $strIDPrefix; ?>_TBL" class="internal" style="margin: 0 auto;">
 			<tr class="heading">
 			<td class="align-left"><? echo Loc::getMessage('BT_CAT_SET_ITEM_NAME'); ?></td>
-			<td class="align-right"><? echo Loc::getMessage('BT_CAT_SET_ITEM_QUANTITY'); ?></td><?
+			<td class="align-right"><? echo Loc::getMessage('BT_CAT_SET_ITEM_QUANTITY'); ?></td>
+			<td class="align-left">&nbsp;</td><?
 			if (CCatalogProductSet::TYPE_SET == self::$intTypeID)
 			{
 				?><td class="align-right"><? echo Loc::getMessage('BT_CAT_SET_ITEM_DISCOUNT_PERCENT_EXT'); ?></td><?
@@ -825,12 +994,19 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 		?><tr>
 		<td class="align-left">
 			<input name="<? echo $strNamePrefix; ?>[ITEM_ID]" id="<? echo $strIDPrefix; ?>_ITEM_ID" value="<? echo htmlspecialcharsbx($arRow['ITEM_ID']); ?>" size="5" type="text">
-			<input type="button" value="..." onclick="jsUtils.OpenWindow('/bitrix/admin/iblock_element_search.php?lang=<? echo LANGUAGE_ID; ?>&n=<? echo $strIDPrefix; ?>_ITEM_ID&discount=Y', 900, 600);">
+			<input type="button" value="..." id="<? echo $strIDPrefix; ?>_BTN" data-row-id="<? echo $strIDPrefix; ?>">
 			&nbsp;<span id="<? echo $strIDPrefix; ?>_ITEM_ID_link"><? echo htmlspecialcharsex($arRow['ITEM_NAME']); ?></span>
 		</td>
 		<td class="align-right">
 			<input type="text" size="5" name="<? echo $strNamePrefix; ?>[QUANTITY]" id="<? echo $strIDPrefix; ?>_QUANTITY" value="<? echo htmlspecialcharsbx($arRow['QUANTITY']) ?>">
-		</td><?
+		</td>
+		<td class="align-left"><?
+		$measure = '';
+		if (isset($arRow['RATIO']) && isset($arRow['MEASURE']))
+		{
+			$measure = ' * '.$arRow['RATIO'].' '.$arRow['MEASURE']['SYMBOL_RUS'];
+		}
+		?><span id="<? echo $strIDPrefix; ?>_MEASURE"><? echo $measure; ?></span></td><?
 		if (CCatalogProductSet::TYPE_SET == self::$intTypeID)
 		{
 		?><td class="align-right">
@@ -872,7 +1048,7 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 		$arCells = array();
 		$arCellParams = array();
 		$arCells[] = '<input name="'.$strNamePrefix.'[ITEM_ID]" id="'.$strIDPrefix.'_ITEM_ID" value="" size="5" type="text">'.
-			' <input type="button" value="..." onclick="jsUtils.OpenWindow(\'/bitrix/admin/iblock_element_search.php?lang='.LANGUAGE_ID.'&n='.$strIDPrefix.'_ITEM_ID&discount=Y\', 900, 600);">'.
+			' <input type="button" value="..." id="'.$strIDPrefix.'_BTN" data-row-id="'.$strIDPrefix.'">'.
 			'&nbsp;<span id="'.$strIDPrefix.'_ITEM_ID_link"></span>';
 		$arCellParams[] = array(
 			'attrs' => array(
@@ -883,6 +1059,12 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 		$arCellParams[] = array(
 			'attrs' => array(
 				'className' => 'align-right'
+			)
+		);
+		$arCells[] = '<span id="'.$strIDPrefix.'_MEASURE"></span>';
+		$arCellParams[] = array(
+			'attrs' => array(
+				'className' => 'align-left'
 			)
 		);
 		if (CCatalogProductSet::TYPE_SET == self::$intTypeID)
@@ -1031,4 +1213,3 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 		return self::$arErrors;
 	}
 }
-?>

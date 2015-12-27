@@ -50,8 +50,7 @@ class CPerfomanceKeeper
 			{
 				CPerfomanceKeeper::SetActive(false);
 				if (COption::GetOptionString("perfmon", "total_mark_value", "") == "measure")
-					;
-				COption::SetOptionString("perfmon", "total_mark_value", "calc");
+					COption::SetOptionString("perfmon", "total_mark_value", "calc");
 			}
 			else
 			{
@@ -74,6 +73,9 @@ class CPerfomanceKeeper
 		// define("PERFMON_STARTED", $DB->ShowSqlStat."|".\Bitrix\Main\Data\Cache::getShowCacheStat()."|".$APPLICATION->ShowIncludeStat);
 
 		$DB->ShowSqlStat = true;
+		$application = \Bitrix\Main\HttpApplication::getInstance();
+		$application->getConnection()->startTracker();
+
 		\Bitrix\Main\Data\Cache::setShowCacheStat(COption::GetOptionString("perfmon", "cache_log") === "Y");
 		$APPLICATION->ShowIncludeStat = true;
 	}
@@ -85,6 +87,7 @@ class CPerfomanceKeeper
 		$toRestore = explode("|", constant("PERFMON_STARTED"));
 
 		$DB->ShowSqlStat = $toRestore[0];
+
 		\Bitrix\Main\Data\Cache::setShowCacheStat($toRestore[1]);
 		$APPLICATION->ShowIncludeStat = $toRestore[2];
 	}
@@ -122,7 +125,10 @@ class CPerfomanceKeeper
 
 		$connection->stopTracker();
 		$DB->ShowSqlStat = false;
-		$arQueryDebug = $connection->getTracker()->getQueries();
+		if ($connection->getTracker())
+			$arQueryDebug = $connection->getTracker()->getQueries();
+		else
+			$arQueryDebug = array();
 		$arIncludeDebug = $APPLICATION->arIncludeDebug;
 
 		$cache_log = COption::GetOptionString("perfmon", "cache_log") === "Y";
@@ -576,7 +582,7 @@ class CPerfomanceKeeper
 				"FILE_NAME" => $arCacheInfo["filename"],
 				"FILE_PATH" => $arCacheInfo["path"],
 			);
-			$DB->Add("b_perf_cache", $arFields, array("SQL_TEXT"));
+			$DB->Add("b_perf_cache", $arFields);
 		}
 	}
 

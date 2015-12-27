@@ -64,7 +64,7 @@ class CWizardBase
 
 		$this->variablePrefix = "__wiz_";
 		$this->formName = "__wizard_form";
-		$this->formActionScript = $_SERVER["REQUEST_URI"];
+		$this->formActionScript = "/".ltrim($_SERVER["REQUEST_URI"], "/");
 
 		$this->returnOutput = false;
 		$this->defaultVars = Array();
@@ -892,7 +892,7 @@ class CWizardStep
 		$strReturn = "";
 		$wizard = $this->GetWizard();
 		$prefixName = $wizard->GetRealName($name);
-		$value = ($wizard->GetVar($name) ? $wizard->GetVar($name) : $wizard->GetDefaultVar($name));
+		$value = (($v = $wizard->GetVar($name)) <> '' ? $v : $wizard->GetDefaultVar($name));
 
 		$this->SetDisplayVars(Array($name));
 

@@ -397,7 +397,7 @@ class CSupportTimetableCache
 		return $res;
 	}
 
-public static function InsertDefaultValues()
+public static 	static function InsertDefaultValues()
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: InsertDefaultValues<br>Line: ";
@@ -445,7 +445,7 @@ public static function InsertDefaultValues()
 
 	}
 
-public static function GetShedule($arFilter)
+public static 	static function GetShedule($arFilter)
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: getShedule<br>Line: ";
@@ -544,7 +544,7 @@ public static function GetShedule($arFilter)
 		return $res;
 	}
 			
-public static function MergeIntervals($arr)
+public static 	static function MergeIntervals($arr)
 	{
 		if(count($arr) <= 0)
 		{
@@ -566,7 +566,7 @@ public static function MergeIntervals($arr)
 		return  $r;
 	}
 	
-public static function TimeToStr($t)
+public static 	static function TimeToStr($t)
 	{
 		$s = intval(fmod($t, 60));
 		$m = ($t - $s) / 60;
@@ -574,7 +574,7 @@ public static function TimeToStr($t)
 		return date("H:i", mktime($h, $m, 0, 1, 1, 2000));
 	}
 	
-public static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDate = null)
+public static 	static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDate = null)
 	{
 		/*
 		$arFilter(
@@ -741,7 +741,7 @@ public static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDa
 	}
 	
 	//$dateFrom - время сервера с часовым поясом из настроек текущего пользователя
-public static function getEndDate($sla, $periodMin0, $dateFrom, $secondTry = false)
+public static 	static function getEndDate($sla, $periodMin0, $dateFrom, $secondTry = false)
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: getEndDate<br>Line: ";

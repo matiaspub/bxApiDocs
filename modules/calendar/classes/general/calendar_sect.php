@@ -82,6 +82,7 @@ class CCalendarSect
 					}
 					elseif ($n == 'CAL_TYPE' && is_array($val))
 					{
+						$Params['joinTypeInfo'] = true;
 						$strType = "";
 						foreach($val as $type)
 							$strType .= ",'".CDatabase::ForSql($type)."'";
@@ -147,14 +148,16 @@ class CCalendarSect
 			{
 				$arRes['COLOR'] = CCalendar::Color($arRes['COLOR'], true);
 				$arSectionIds[] = $arRes['ID'];
-				if (isset($arRes['EXPORT']) && $arRes['EXPORT'] != "")
+				if (isset($arRes['EXPORT']) && $arRes['EXPORT'] != "" && CheckSerializedData($arRes['EXPORT']))
 				{
 					$arRes['EXPORT'] = unserialize($arRes['EXPORT']);
 					if (is_array($arRes['EXPORT']) && $arRes['EXPORT']['ALLOW'])
 						$arRes['EXPORT']['LINK'] = self::GetExportLink($arRes['ID'], $arRes['CAL_TYPE'], $arRes['OWNER_ID']);
 				}
 				if (!is_array($arRes['EXPORT']))
+				{
 					$arRes['EXPORT'] = array('ALLOW' => false, 'SET' => false, 'LINK' => false);
+				}
 
 				// Outlook js
 				if (CCalendar::IsIntranetEnabled())
@@ -692,6 +695,9 @@ class CCalendarSect
 	{
 		global $USER;
 
+		if (!$userId)
+			$userId = CCalendar::GetCurUserId();
+
 		if (!isset($USER) || !is_object($USER) || !$sectId)
 			return false;
 
@@ -819,7 +825,7 @@ class CCalendarSect
 			if ($ar === false) // Get
 			{
 				$str = CUserOptions::GetOption("calendar", "hidden_sections", false, $userId);
-				if ($str !== false)
+				if ($str !== false && CheckSerializedData($str))
 					$res = unserialize($str);
 			}
 			elseif(is_array($ar)) // Set

@@ -9,8 +9,9 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Type;
 use Bitrix\Main\Security\Sign\BadSignatureException;
 use Bitrix\Main\Security\Sign\TimeSigner;
+use Bitrix\Main\Security\Random;
 use Bitrix\Security\Codec\Base32;
-use Bitrix\Security\Random;
+
 
 Loc::loadMessages(__FILE__);
 
@@ -36,6 +37,8 @@ class Otp
 	);
 	protected $algorithmClass = null;
 	protected $regenerated = false;
+	/* @var \Bitrix\Main\Context $context */
+	protected $context = null;
 
 	protected $userId = null;
 	protected $userLogin = null;
@@ -199,8 +202,7 @@ class Otp
 	{
 		if (!$newSecret)
 		{
-			$random = new Random;
-			$newSecret = $random->getBytes(static::SECRET_LENGTH);
+			$newSecret = Random::getBytes(static::SECRET_LENGTH);
 		}
 
 		$this->regenerated = true;
@@ -794,6 +796,31 @@ class Otp
 	}
 
 	/**
+	 * Returns context of the current request.
+	 *
+	 * @return \Bitrix\Main\Context
+	 */
+	public function getContext()
+	{
+		if ($this->context === null)
+			$this->context = Application::getInstance()->getContext();
+
+		return $this->context;
+	}
+
+	/**
+	 * Set context of the current request.
+	 *
+	 * @param \Bitrix\Main\Context $context Application context.
+	 * @return \Bitrix\Main\Context
+	 */
+	public function setContext(\Bitrix\Main\Context $context)
+	{
+		$this->context = $context;
+		return $this;
+	}
+
+	/**
 	 * Set custom user login
 	 *
 	 * @param string $login Login.
@@ -929,11 +956,8 @@ class Otp
 	 */
 	public function canSkipMandatoryByRights()
 	{
-
 		$targetRights = static::getMandatoryRights();
-		$access = new \CAccess();
-		$access->updateCodes(array('USER_ID' => $this->getUserId()));
-		$userRights = $access->getUserCodesArray($this->getUserId());
+		$userRights = \CAccess::getUserCodesArray($this->getUserId());
 		$existedRights = array_intersect($targetRights, $userRights);
 		$result = empty($existedRights);
 
@@ -947,14 +971,12 @@ class Otp
 	 */
 	protected function canSkipByCookie()
 	{
-		/** @global \CMain $APPLICATION */
-		global $APPLICATION;
-		$signedValue = $APPLICATION->get_cookie(static::SKIP_COOKIE);
-
-		if (!$signedValue || !is_string($signedValue))
+		if (Option::get('security', 'otp_allow_remember') !== 'Y')
 			return false;
 
-		if (Option::get('security', 'otp_allow_remember') !== 'Y')
+		$signedValue = $this->getContext()->getRequest()->getCookie(static::SKIP_COOKIE);
+
+		if (!$signedValue || !is_string($signedValue))
 			return false;
 
 		try
@@ -982,7 +1004,8 @@ class Otp
 	{
 		// ToDo: must be tied to the ID of "computer" when it will appear in the main module
 		$rememberMask = $this->getRememberIpMask();
-		return md5(ip2long($rememberMask) & ip2long($_SERVER['REMOTE_ADDR']));
+		$userIp = $this->getContext()->getRequest()->getRemoteAddress();
+		return md5(ip2long($rememberMask) & ip2long($userIp));
 	}
 
 	/**
@@ -1004,7 +1027,22 @@ class Otp
 			->setKey($this->getSecret())
 			->sign($rememberValue, $rememberLifetime, 'MFA_SAVE');
 
-		$APPLICATION->set_cookie(static::SKIP_COOKIE, $signedValue, $rememberLifetime, '/', false, false, true, false, true);
+		$isSecure = (
+			Option::get('main', 'use_secure_password_cookies', 'N') === 'Y'
+			&& $this->getContext()->getRequest()->isHttps()
+		);
+
+		$APPLICATION->set_cookie(
+			static::SKIP_COOKIE, // $name
+			$signedValue,        // $value
+			$rememberLifetime,   // $time = false
+			'/',                 // $folder = "/"
+			false,               // $domain = false
+			$isSecure,           // $secure = false
+			true,                // $spread = true
+			false,               // $name_prefix = false
+			true                 // $httpOnly = false
+		);
 
 		return $this;
 	}

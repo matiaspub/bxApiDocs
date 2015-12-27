@@ -1,24 +1,36 @@
 #!#PHP_PATH# -q
 <?php
 $_SERVER["DOCUMENT_ROOT"] = "#DOCUMENT_ROOT#";
+$DOCUMENT_ROOT = $_SERVER["DOCUMENT_ROOT"];
+
+$siteID = '#SITE_ID#';  // your site ID - need for language ID
 
 // define("NO_KEEP_STATISTIC", true);
 // define("NOT_CHECK_PERMISSIONS",true);
 // define("BX_CAT_CRON", true);
 // define('NO_AGENT_CHECK', true);
-// define('SITE_ID', 's1'); // your site ID - need for language ID
-$DOCUMENT_ROOT = $_SERVER["DOCUMENT_ROOT"];
-
-$profile_id = $argv[1];
+if (preg_match('/^[a-z0-9_]{2}$/i', $siteID) === 1)
+{
+	// define('SITE_ID', $siteID);
+}
+else
+{
+	die('No defined site - $siteID');
+}
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+
+if (!defined('LANGUAGE_ID') || preg_match('/^[a-z]{2}$/i', LANGUAGE_ID) !== 1)
+	die('Language id is absent - defined site is bad');
 
 set_time_limit (0);
 
 if (CModule::IncludeModule("catalog"))
 {
-	$profile_id = intval($profile_id);
-	if ($profile_id<=0) die();
+	$profile_id = 0;
+	if (isset($argv[1]))
+		$profile_id = (int)$argv[1];
+	if ($profile_id<=0) die('No profile id');
 
 	$ar_profile = CCatalogExport::GetByID($profile_id);
 	if (!$ar_profile) die();
@@ -35,7 +47,7 @@ if (CModule::IncludeModule("catalog"))
 
 	$arSetupVars = array();
 	$intSetupVarsCount = 0;
-	if ('Y' != $ar_profile["DEFAULT_PROFILE"])
+	if ($ar_profile["DEFAULT_PROFILE"] != 'Y')
 	{
 		parse_str($ar_profile["SETUP_VARS"], $arSetupVars);
 		if (!empty($arSetupVars) && is_array($arSetupVars))
@@ -77,4 +89,3 @@ if (CModule::IncludeModule("catalog"))
 		)
 	);
 }
-?>

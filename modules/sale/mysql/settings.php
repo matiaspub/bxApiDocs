@@ -1,10 +1,6 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/settings.php");
 
-class CSaleLang extends CAllSaleLang
-{
-}
-
 class CSaleGroupAccessToSite extends CAllSaleGroupAccessToSite
 {
 	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())

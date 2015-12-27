@@ -325,53 +325,6 @@ class OracleSqlHelper extends SqlHelper
 	}
 
 	/**
-	 * Returns $value converted to an type according to $field type.
-	 * <p>
-	 * For example if $field is Entity\DatetimeField then returned value will be instance of Type\DateTime.
-	 *
-	 * @param mixed $value Value to be converted.
-	 * @param Entity\ScalarField $field Type "source".
-	 *
-	 * @return mixed
-	 */
-	static public function convertFromDb($value, Entity\ScalarField $field)
-	{
-		if ($value !== null)
-		{
-			if ($field instanceof Entity\DatetimeField)
-			{
-				if (strlen($value) == 19)
-				{
-					//preferable format: NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-				else
-				{
-					//default Oracle date format: 03-MAR-14
-					$value = new Type\DateTime($value." 00:00:00", "d-M-y H:i:s");
-				}
-			}
-			elseif ($field instanceof Entity\TextField)
-			{
-				if (is_object($value))
-				{
-					/** @var \OCI_Lob $value */
-					$value = $value->load();
-				}
-			}
-			elseif ($field instanceof Entity\StringField)
-			{
-				if ((strlen($value) == 19) && preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
-				{
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-			}
-		}
-
-		return $value;
-	}
-
-	/**
 	 * Returns callback to be called for a field value on fetch.
 	 *
 	 * @param Entity\ScalarField $field Type "source".
@@ -587,7 +540,7 @@ class OracleSqlHelper extends SqlHelper
 		{
 			$values = $field->getValues();
 
-			if (ctype_digit($values[0]) && ctype_digit($values[1]))
+			if (preg_match('/^[0-9]+$/', $values[0]) && preg_match('/^[0-9]+$/', $values[1]))
 			{
 				return 'number(1)';
 			}
@@ -740,5 +693,69 @@ class OracleSqlHelper extends SqlHelper
 	static public function getDescendingOrder()
 	{
 		return 'DESC NULLS LAST';
+	}
+
+	/**
+	 * Builds the strings for the SQL MERGE command for the given table.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array $primaryFields Array("column")[] Primary key columns list.
+	 * @param array $insertFields Array("column" => $value)[] What to insert.
+	 * @param array $updateFields Array("column" => $value)[] How to update.
+	 *
+	 * @return array (merge)
+	 */
+	public function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
+	{
+		$insert = $this->prepareInsert($tableName, $insertFields);
+
+		$updateColumns = array();
+		$sourceSelectColumns = array();
+		$targetConnectColumns = array();
+		$tableFields = $this->connection->getTableFields($tableName);
+		foreach($tableFields as $columnName => $tableField)
+		{
+			$quotedName = $this->quote($columnName);
+			if (in_array($columnName, $primaryFields))
+			{
+				$sourceSelectColumns[] = $this->convertToDb($insertFields[$columnName], $tableField)." AS ".$quotedName;
+				$targetConnectColumns[] = "source.".$quotedName." = target.".$quotedName;
+			}
+
+			if (isset($updateFields[$columnName]) || array_key_exists($columnName, $updateFields))
+			{
+				$updateColumns[] = "target.".$quotedName.' = '.$this->convertToDb($updateFields[$columnName], $tableField);
+			}
+		}
+
+		if (
+			$insert && $insert[0] != "" && $insert[1] != ""
+			&& $updateColumns
+			&& $sourceSelectColumns && $targetConnectColumns
+		)
+		{
+			$sql = "
+				MERGE INTO ".$this->quote($tableName)." target USING (
+					SELECT ".implode(", ", $sourceSelectColumns)." FROM dual
+				)
+				source ON
+				(
+					".implode(" AND ", $targetConnectColumns)."
+				)
+				WHEN MATCHED THEN
+					UPDATE SET ".implode(", ", $updateColumns)."
+				WHEN NOT MATCHED THEN
+					INSERT (".$insert[0].")
+					VALUES (".$insert[1].")
+			";
+		}
+		else
+		{
+			$sql = "";
+		}
+
+		return array(
+			$sql
+		);
 	}
 }

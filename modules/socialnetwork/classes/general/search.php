@@ -85,10 +85,16 @@ class CSocNetSearch
 				CSearch::ChangePermission(false, $arGroups, false, false, false, false, $arParams);
 			}
 		}
-		if($feature == "blog" && in_array($operation, Array("view_post", "view_comment")) && CModule::IncludeModule('blog'))
+		if (
+			$feature == "blog"
+			&& in_array($operation, Array("view_post", "view_comment"))
+			&& CModule::IncludeModule('blog')
+		)
 		{
 			if($operation == "view_post")
+			{
 				CBlogPost::ChangeSocNetPermission($entity_type, $entity_id, $operation);
+			}
 
 			if($operation == "view_post")
 			{
@@ -139,6 +145,7 @@ class CSocNetSearch
 								}
 							}
 						}
+
 						CSearch::ChangePermission("blog", $arPost[$arComment["POST_ID"]]["PERMS_CALC"], "C".$arComment["ID"]);
 					}
 				}
@@ -353,7 +360,7 @@ class CSocNetSearch
 		}
 
 		if(
-			$ELEMENT_ID > 0 
+			$ELEMENT_ID > 0
 			&& CModule::IncludeModule('iblock')
 		)
 		{
@@ -366,9 +373,14 @@ class CSocNetSearch
 		}
 
 		if (
-			$entity_type == SONET_ENTITY_GROUP
-			&& count($arFields["LID"]) > 1
-			&& CModule::IncludeModule("extranet")
+			count($arFields["LID"]) > 1
+			&& (
+				(
+					$entity_type == SONET_ENTITY_GROUP
+					&& CModule::IncludeModule("extranet")
+				)
+				|| $entity_type == SONET_ENTITY_USER
+			)
 		)
 		{
 			if (!$arSiteData)
@@ -378,9 +390,20 @@ class CSocNetSearch
 
 			foreach($arSiteData as $siteId => $arUrl)
 			{
-				if (strpos($path_template, $arUrl["GROUPS_PATH"]) === 0)
+				if (
+					$entity_type == SONET_ENTITY_GROUP
+					&& strpos($path_template, $arUrl["GROUPS_PATH"]) === 0
+				)
 				{
 					$path_template = str_replace($arUrl["GROUPS_PATH"], "#GROUP_PATH#", $path_template);
+					break;
+				}
+				elseif (
+					$entity_type == SONET_ENTITY_USER
+					&& strpos($path_template, $arUrl["USER_PATH"]) === 0
+				)
+				{
+					$path_template = str_replace($arUrl["USER_PATH"], "#USER_PATH#", $path_template);
 					break;
 				}
 			}
@@ -399,7 +422,8 @@ class CSocNetSearch
 					"#section_id#",
 					"#element_id#",
 					"#task_id#",
-					"#GROUP_PATH#"
+					"#GROUP_PATH#",
+					"#USER_PATH#"
 				),
 				array(
 					($this->_user_id > 0 ? $this->_user_id : $USER->GetID()),
@@ -411,7 +435,8 @@ class CSocNetSearch
 					$SECTION_ID,
 					$ELEMENT_ID,
 					$ELEMENT_ID,
-					($arSiteData ? $arSiteData[$site_id]["GROUPS_PATH"] : "")
+					($arSiteData ? $arSiteData[$site_id]["GROUPS_PATH"] : ""),
+					($arSiteData ? $arSiteData[$site_id]["USER_PATH"] : "")
 				),
 				$path_template
 			);
@@ -532,17 +557,33 @@ class CSocNetSearch
 			elseif(
 				$arFields["MODULE_ID"] == "forum" 
 				&& intval($arFields["PARAM1"]) == intval($this->_params["TASK_FORUM_ID"])
+				&& !preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match) // calendar comments live in the same TASK_FORUM_ID :(
 			)
 			{
-				// tasks
-				if (!preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)) // calendar comments live in the same TASK_FORUM_ID :(
-				{
-					$arFields = $this->BeforeIndexForum($arFields,
-						SONET_ENTITY_GROUP, $this->_group_id,
-						"tasks", "view",
-						$this->Url($this->_params["PATH_TO_GROUP_TASK_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
-					);
-				}
+				$arFields = $this->BeforeIndexForum(
+					$arFields,
+					SONET_ENTITY_GROUP,
+					$this->_group_id,
+					"tasks",
+					"view",
+					$this->Url(
+						$this->_params["PATH_TO_GROUP_TASK_ELEMENT"], 
+						array(
+							"MID"=>"#message_id#"
+						),
+						"message#message_id#"
+					)
+				);
+			}
+			elseif(
+				$arFields["MODULE_ID"] == "forum" 
+				&& preg_match('/^EVENT_[0-9]+/', $arFields["TITLE"], $match)
+			)
+			{
+				$arFields = array(
+					"TITLE" => "",
+					"BODY" => ""
+				);
 			}
 			elseif(
 				$arFields["MODULE_ID"] == "forum" 
@@ -560,22 +601,27 @@ class CSocNetSearch
 				&& ($arFields["PARAM1"] == "POST" || $arFields["PARAM1"] == "MICROBLOG")
 			)
 			{
+/*
 				$paramsTmp = $this->GetSearchParams(
 					SONET_ENTITY_GROUP, $this->_group_id,
 					'blog', 'view_post'
 				);
+
 				$arFields["PARAMS"] = (!empty($arFields["PARAMS"]) ? array_merge($paramsTmp, $arFields["PARAMS"]) : $paramsTmp);
+*/
 			}
 			elseif(
 				$arFields["MODULE_ID"] == "blog"
 				&& $arFields["PARAM1"] == "COMMENT"
 			)
 			{
+/*
 				$paramsTmp = $this->GetSearchParams(
 					SONET_ENTITY_GROUP, $this->_group_id,
 					'blog', 'view_comment'
 				);
 				$arFields["PARAMS"] = (!empty($arFields["PARAMS"]) ? array_merge($paramsTmp, $arFields["PARAMS"]) : $paramsTmp);
+*/
 			}
 		}
 		elseif($this->_user_id)
@@ -634,10 +680,17 @@ class CSocNetSearch
 				&& intval($arFields["PARAM1"]) == intval($this->_params["PHOTO_FORUM_ID"])
 			)
 			{
-				$arFields = $this->BeforeIndexForum($arFields,
-					SONET_ENTITY_USER, $this->_user_id,
-					"photo", "view",
-					$this->Url($this->_params["PATH_TO_USER_PHOTO_ELEMENT"], array("MID"=>"#message_id#"), "message#message_id#")
+				$arFields = $this->BeforeIndexForum(
+					$arFields,
+					SONET_ENTITY_USER,
+					$this->_user_id,
+					"photo",
+					"view",
+					$this->Url(
+						$this->_params["PATH_TO_USER_PHOTO_ELEMENT"],
+						array("MID"=>"#message_id#"),
+						"message#message_id#"
+					)
 				);
 			}
 			elseif(
@@ -664,6 +717,15 @@ class CSocNetSearch
 					'blog', 'view_comment'
 				);
 				$arFields["PARAMS"] = (!empty($arFields["PARAMS"]) ? array_merge($paramsTmp, $arFields["PARAMS"]) : $paramsTmp);
+			}
+		}
+
+		foreach(GetModuleEvents("socialnetwork", "BeforeIndexSocNet", true) as $arEvent)
+		{
+			$arEventResult = ExecuteModuleEventEx($arEvent, array($this, $arFields));
+			if(is_array($arEventResult))
+			{
+				$arFields = $arEventResult;
 			}
 		}
 
@@ -1014,7 +1076,10 @@ class CSocNetSearch
 
 	public static function OnBeforeIndexUpdate($ID, $arFields)
 	{
-		if (isset($arFields["PARAMS"]) && is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
+		if (
+			isset($arFields["PARAMS"])
+			&& isset($arFields["PARAMS"]["socnet_group"])
+		)
 		{
 			CBitrixComponent::clearComponentCache("bitrix:search.tags.cloud");
 		}
@@ -1022,7 +1087,10 @@ class CSocNetSearch
 
 	public static function OnAfterIndexAdd($ID, $arFields)
 	{
-		if (isset($arFields["PARAMS"]) && is_array($arFields["PARAMS"]) && array_key_exists("socnet_group", $arFields["PARAMS"]))
+		if (
+			isset($arFields["PARAMS"])
+			&& isset($arFields["PARAMS"]["socnet_group"])
+		)
 		{
 			CBitrixComponent::clearComponentCache("bitrix:search.tags.cloud");
 		}

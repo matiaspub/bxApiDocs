@@ -6,8 +6,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -110,18 +108,13 @@ class CAllCertification
 	* <p>Метод добавляет новый сертификат.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
 	* сертификата. Обязательные поля должны быть заполнены.
 	*
-	*
-	*
 	* @return int <p>Метод возвращает идентификатор добавленного сертификата, если
 	* добавление прошло успешно. При возникновении ошибки метод вернет
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -155,7 +148,6 @@ class CAllCertification
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -201,22 +193,15 @@ class CAllCertification
 	* <p>Метод изменяет параметры сертификата с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор сертификата.
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
 	* сертификата. Обязательные поля должны быть заполнены.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
 	* возникновении ошибки функция вернет <i>false</i>. При возникновении
 	* ошибки в исключениях будет содержаться текст ошибки</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -246,7 +231,6 @@ class CAllCertification
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -302,15 +286,10 @@ class CAllCertification
 	* <p>Метод удаляет сертификат с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор сертификата.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления
 	* сертификата, в противном случае возвращает <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -335,7 +314,6 @@ class CAllCertification
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -438,21 +416,15 @@ class CAllCertification
 	* <p>Возвращает сертификат по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор сертификата.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $CERTIFICATE_ID = 13;<br><br>    $res = CCertification::GetByID($CERTIFICATE_ID);<br><br>    if ($arCertificate = $res-&gt;GetNext())<br>    {<br>        echo "Course: ".$arCertificate["COURSE_NAME"].<br>             " User: ".$arCertificate["USER_NAME"].<br>             " Score: ".$arCertificate["SUMMARY"];<br>    }<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -479,18 +451,11 @@ class CAllCertification
 	* <p>Проверяет, пройден ли курс. Курс считается пройденным, если пройдены все его тесты.</p>
 	*
 	*
-	*
-	*
 	* @param int $STUDENT_ID  Идентификатор студента.
-	*
-	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если курс пройден, иначе - <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -510,7 +475,6 @@ class CAllCertification
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -591,25 +555,17 @@ class CAllCertification
 	* <p>Добавляет или изменяет сертификат, если курс был пройден.</p>
 	*
 	*
-	*
-	*
 	* @param int $STUDENT_ID  Идентификатор студента.
-	*
-	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если сертификация прошла успешно,
 	* иначе - <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $STUDENT_ID = 1;<br>    $COURSE_ID = 92;<br><br>    $done = CCertification::Certificate($STUDENT_ID, $COURSE_ID);<br><br>    if ($done)<br>        echo "Success!";<br>    else<br>        echo "Course is not completed";<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

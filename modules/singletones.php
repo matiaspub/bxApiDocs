@@ -2,30 +2,25 @@
 /* @var $APPLICATION CMain */
 /* @var $GLOBALS['APPLICATION'] CMain */
 /* @var $GLOBALS["APPLICATION"] CMain */
-if (! isset($APPLICATION)) {
-	$APPLICATION = $GLOBALS['APPLICATION'] = $GLOBALS["APPLICATION"] = new CMain();
-}
+$APPLICATION = $GLOBALS['APPLICATION'] = $GLOBALS["APPLICATION"] = new CMain();
 
 /* @var $USER CUser */
 /* @var $GLOBALS['USER'] CUser */
 /* @var $GLOBALS["USER"] CUser */
-if (! isset($USER)) {
-	$USER = $GLOBALS['USER'] = $GLOBALS["USER"] = new CUser();
-}
+$USER = $GLOBALS['USER'] = $GLOBALS["USER"] = new CUser();
 
 /* @var $USER_FIELD_MANAGER CUserTypeManager */
 /* @var $GLOBALS['USER_FIELD_MANAGER'] CUserTypeManager */
 /* @var $GLOBALS["USER_FIELD_MANAGER"] CUserTypeManager */
-if (! isset($USER_FIELD_MANAGER)) {
-	/**
-	 * Эта переменная содержит экземпляр класса через API которого
-	 * и происходит работа с пользовательскими свойствами.
-	 * @global CUserTypeManager $GLOBALS['USER_FIELD_MANAGER']
-	 * @name $USER_FIELD_MANAGER
-	 */
-	$USER_FIELD_MANAGER = $GLOBALS['USER_FIELD_MANAGER'] = $GLOBALS["USER_FIELD_MANAGER"] = new CUserTypeManager;
-}
+$USER_FIELD_MANAGER = $GLOBALS['USER_FIELD_MANAGER'] = $GLOBALS["USER_FIELD_MANAGER"] = new CUserTypeManager;
+
+/* @var $CACHE_MANAGER CCacheManager */
+/* @var $GLOBALS['CACHE_MANAGER'] CCacheManager */
+/* @var $GLOBALS["CACHE_MANAGER"] CCacheManager */
+$CACHE_MANAGER = $GLOBALS['CACHE_MANAGER'] = $GLOBALS["CACHE_MANAGER"] = new CCacheManager;
 
 /* @var $DB CDatabase */
-$DB = new CDatabase();
+/* @var $GLOBALS['DB'] CDatabase */
+/* @var $GLOBALS["DB"] CDatabase */
+$DB = $GLOBALS['DB'] = $GLOBALS["DB"] = new CDatabase();
 ?>

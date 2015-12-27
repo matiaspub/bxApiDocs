@@ -4,15 +4,21 @@ IncludeModuleLangFile(__FILE__);
 class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 {
 	private $domain = "";
+	private $https = null;
+	private $optimize = null;
 	/**
 	 *
 	 * @param string $domain
 	 * @return void
 	 *
 	 */
-	public function __construct($domain)
+	public function __construct($domain, $optimize = null, $https = null)
 	{
 		$this->domain = $domain;
+		if (isset($optimize))
+			$this->optimize = ($optimize == true);
+		if (isset($https))
+			$this->https = ($https == true);
 	}
 	/**
 	 * Returns URL to update policy
@@ -32,6 +38,10 @@ class CBitrixCloudCDNWebService extends CBitrixCloudWebService
 
 		$arParams["license"] = md5(LICENSE_KEY);
 		$arParams["domain"] = $domain;
+		if (isset($this->https))
+			$arParams["https"] = ($this->https? "Y": "N");
+		if (isset($this->optimize))
+			$arParams["optimize"] = ($this->optimize? "Y": "N");
 		$url = COption::GetOptionString("bitrixcloud", "cdn_policy_url");
 		$url = CHTTP::urlAddParams($url, $arParams, array(
 			"encode" => true,

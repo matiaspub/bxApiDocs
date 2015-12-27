@@ -21,9 +21,7 @@ class CHTMLPagesCache
 	 */
 	public static function startCaching()
 	{
-		self::getAjaxRandom();
-
-		$HTML_PAGES_ROOT = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
+		self::$ajaxRandom = self::removeRandParam();
 
 		if (
 			isset($_SERVER["HTTP_BX_AJAX"])
@@ -48,6 +46,11 @@ class CHTMLPagesCache
 		{
 			//to warm up localStorage
 			// define("ENABLE_HTML_STATIC_CACHE_JS", true);
+		}
+		else
+		{
+			//uses in check_bitrix_sessid()
+			// define("BITRIX_STATIC_PAGES", true);
 		}
 
 		if ($_SERVER["REQUEST_METHOD"] !== "GET" || isset($_GET["sessid"]))
@@ -169,18 +172,8 @@ class CHTMLPagesCache
 			}
 		}
 
-		$PAGES_FILE = $HTML_PAGES_ROOT.self::convertUriToPath($_SERVER["REQUEST_URI"], $host);
-
-		//This checks for invalid symbols
-		//TODO: make it Windows compatible
-		if (preg_match("/(\\?|\\*)/", $PAGES_FILE) > 0)
-		{
-			return;
-		}
-
 		if (self::isAjaxRequest())
 		{
-			//Ajax request
 			define("USE_HTML_STATIC_CACHE", true);
 			return;
 		}
@@ -208,8 +201,8 @@ class CHTMLPagesCache
 
 			if ($lastModified !== false)
 			{
-				$utc = gmdate("D, d M Y H:i:s", $lastModified)." GMT";
-				if (array_key_exists("HTTP_IF_MODIFIED_SINCE", $_SERVER) && $_SERVER["HTTP_IF_MODIFIED_SINCE"] === $utc)
+				$sinceModified = isset($_SERVER["HTTP_IF_MODIFIED_SINCE"]) ? strtotime($_SERVER["HTTP_IF_MODIFIED_SINCE"]) : false;
+				if ($sinceModified && $sinceModified >= $lastModified)
 				{
 					self::setStatus("304 Not Modified");
 					self::setHeaders($etag, false, "304");
@@ -218,28 +211,9 @@ class CHTMLPagesCache
 			}
 
 			$contents = $cache->getContents();
-			if (self::isCacheConsistent($contents))
+			if ($contents !== false)
 			{
-				self::setHeaders($etag, $lastModified, "200");
-
-				$contentType = $cache->getContentType();
-				if ($contentType === false)
-				{
-					//Try to parse charset encoding
-					$head_end = strpos($contents, "</head>");
-					if ($head_end !== false)
-					{
-						if (preg_match("#<meta\\s+http-equiv\\s*=\\s*(['\"])Content-Type(\\1)\\s+content\\s*=\\s*(['\"])(.*?)(\\3)#im", substr($contents, 0, $head_end), $arMatch))
-						{
-							header("Content-type: ".$arMatch[4]);
-						}
-					}
-				}
-				else
-				{
-					header("Content-type: ".$contentType);
-				}
-
+				self::setHeaders($etag, $lastModified, "200", $cache->getContentType());
 
 				//compression support
 				$compress = "";
@@ -257,26 +231,17 @@ class CHTMLPagesCache
 
 				if ($compress)
 				{
-					if (isset($_SERVER["HTTP_USER_AGENT"]))
-					{
-						$userAgent = $_SERVER["HTTP_USER_AGENT"];
-						if ( (strpos($userAgent, "MSIE 5")>0 || strpos($userAgent, "MSIE 6.0") > 0) && strpos($userAgent, "Opera") === false)
-						{
-							$contents = str_repeat(" ", 2048)."\r\n".$contents;
-						}
-					}
-					$size = function_exists("mb_strlen")? mb_strlen($contents, "latin1"): strlen($contents);
-					$crc = crc32($contents);
-					$contents = gzcompress($contents, 4);
-					$contents = function_exists("mb_substr")? mb_substr($contents, 0, -4, "latin1"): substr($contents, 0, -4);
-
-					header("Content-Encoding: $compress");
-					echo "\x1f\x8b\x08\x00\x00\x00\x00\x00", $contents, pack("V", $crc), pack("V", $size);
+					header("Content-Encoding: ".$compress);
+					echo $cache->isGzipped() ? $contents : gzencode($contents, 4);
 				}
 				else
 				{
-					$length = function_exists("mb_strlen")? mb_strlen($contents, "latin1"): strlen($contents);
-					header("Content-Length: ".$length);
+					if ($cache->isGzipped())
+					{
+						$contents = self::gzdecode($contents);
+					}
+
+					header("Content-Length: ".self::getBinaryLength($contents));
 					echo $contents;
 				}
 
@@ -297,7 +262,9 @@ class CHTMLPagesCache
 		}
 		else
 		{
-			// define("HTML_PAGES_FILE", $PAGES_FILE);
+			$cacheFile = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages"
+						.self::convertUriToPath($_SERVER["REQUEST_URI"], "");
+			// define("HTML_PAGES_FILE", $cacheFile);
 		}
 
 		self::restoreErrorHandler();
@@ -558,6 +525,62 @@ class CHTMLPagesCache
 		return $randValue;
 	}
 
+	/**
+	 *
+	 * Decodes a gzip compressed string
+	 *
+	 * @param $data
+	 * @return string
+	 */
+	public static function gzdecode($data)
+	{
+		if (function_exists("gzdecode"))
+		{
+			return gzdecode($data);
+		}
+
+		$data = self::getBinarySubstring($data, 10, -8);
+		if ($data !== "")
+		{
+			$data = gzinflate($data);
+		}
+
+		return $data;
+	}
+
+	/**
+	 *
+	 * Binary version of substr
+	 * @param $str
+	 * @param $start
+	 * @return string
+	 */
+	private static function getBinarySubstring($str, $start)
+	{
+		if (function_exists("mb_substr"))
+		{
+			$length = (func_num_args() > 2 ? func_get_arg(2) : self::getBinaryLength($str));
+			return mb_substr($str, $start, $length, "latin1");
+		}
+
+		if (func_num_args() > 2)
+		{
+			return substr($str, $start, func_get_arg(2));
+		}
+
+		return substr($str, $start);
+	}
+
+	/**
+	 * Binary version of strlen
+	 * @param $str
+	 * @return int
+	 */
+	public static function getBinaryLength($str)
+	{
+		return function_exists("mb_strlen") ? mb_strlen($str, "latin1") : strlen($str);
+	}
+
 	private static function isIndexOnlyMode($arHTMLPagesOptions)
 	{
 		if (!isset($arHTMLPagesOptions["INDEX_ONLY"]) || !$arHTMLPagesOptions["INDEX_ONLY"])
@@ -635,7 +658,7 @@ class CHTMLPagesCache
 		}
 	}
 
-	private static function setHeaders($etag, $lastModified, $compositeHeader = false)
+	private static function setHeaders($etag, $lastModified, $compositeHeader = false, $contentType = false)
 	{
 		if ($etag !== false)
 		{
@@ -648,6 +671,11 @@ class CHTMLPagesCache
 		{
 			$utc = gmdate("D, d M Y H:i:s", $lastModified)." GMT";
 			header("Last-Modified: ".$utc);
+		}
+
+		if ($contentType !== false)
+		{
+			header("Content-type: ".$contentType);
 		}
 
 		if ($compositeHeader !== false)
@@ -704,7 +732,8 @@ class CHTMLPagesCache
 			$privateKey = "/".trim($privateKey, "/");
 		}
 
-		return $host.$uriPath."@".$queryString.$privateKey.".html";
+		$cacheKey = $host.$uriPath."@".$queryString.$privateKey.".html";
+		return str_replace(array("?", "*"), "_", $cacheKey);
 	}
 
 	/**
@@ -1477,6 +1506,12 @@ abstract class StaticHtmlCacheResponse
 	abstract public function getContents();
 
 	/**
+	 * Returns true if content is gzipped
+	 * @return bool
+	 */
+	abstract public function isGzipped();
+
+	/**
 	 * Returns the time the cache was last modified
 	 * @return int|false
 	 */
@@ -1508,82 +1543,6 @@ abstract class StaticHtmlCacheResponse
 	abstract public function shouldCountQuota();
 }
 
-final class StaticHtmlFileResponse extends StaticHtmlCacheResponse
-{
-	private $cacheFile = null;
-	private $lastModified = null;
-
-	public function __construct($cacheKey, array $configuration, array $htmlCacheOptions)
-	{
-		parent::__construct($cacheKey, $configuration, $htmlCacheOptions);
-		$pagesPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
-
-		if (file_exists($pagesPath.$this->cacheKey))
-		{
-			$this->cacheFile = $pagesPath.$this->cacheKey;
-		}
-	}
-
-	public function getContents()
-	{
-		if ($this->cacheFile === null)
-		{
-			return false;
-		}
-
-		return file_get_contents($this->cacheFile);
-	}
-
-	public function getLastModified()
-	{
-		if ($this->cacheFile === null)
-		{
-			return false;
-		}
-
-		if ($this->lastModified === null)
-		{
-			$this->lastModified = filemtime($this->cacheFile);
-		}
-
-		return $this->lastModified;
-
-	}
-
-	public function getEtag()
-	{
-		if ($this->cacheFile === null)
-		{
-			return false;
-		}
-
-		return md5(
-			$this->cacheFile.
-			filesize($this->cacheFile).
-			$this->getLastModified()
-		);
-	}
-
-	static public function getContentType()
-	{
-		return false;
-	}
-
-	public function exists()
-	{
-		return $this->cacheFile !== null;
-	}
-
-	/**
-	 * Should we count a quota limit
-	 * @return bool
-	 */
-	static public function shouldCountQuota()
-	{
-		return true;
-	}
-}
-
 final class StaticHtmlMemcachedResponse extends StaticHtmlCacheResponse
 {
 	/**
@@ -1596,6 +1555,10 @@ final class StaticHtmlMemcachedResponse extends StaticHtmlCacheResponse
 	 */
 	private static $memcached = null;
 	private static $connected = null;
+	private $contents = null;
+	private $flags = 0;
+
+	const MEMCACHED_GZIP_FLAG = 65536;
 
 	static public function __construct($cacheKey, array $configuration, array $htmlCacheOptions)
 	{
@@ -1605,12 +1568,17 @@ final class StaticHtmlMemcachedResponse extends StaticHtmlCacheResponse
 
 	public function getContents()
 	{
-		if (self::$memcached !== null)
+		if (self::$memcached === null)
 		{
-			return self::$memcached->get($this->cacheKey);
+			return false;
 		}
 
-		return false;
+		if ($this->contents === null)
+		{
+			$this->contents = self::$memcached->get($this->cacheKey, $this->flags);
+		}
+
+		return $this->contents;
 	}
 
 	public function getLastModified()
@@ -1631,6 +1599,16 @@ final class StaticHtmlMemcachedResponse extends StaticHtmlCacheResponse
 	public function exists()
 	{
 		return $this->getProps() !== false;
+	}
+
+	/**
+	 * Returns true if content is gzipped
+	 * @return bool
+	 */
+	public function isGzipped()
+	{
+		$this->getContents();
+		return ($this->flags & self::MEMCACHED_GZIP_FLAG) === self::MEMCACHED_GZIP_FLAG;
 	}
 
 	/**
@@ -1790,6 +1768,109 @@ final class StaticHtmlMemcachedResponse extends StaticHtmlCacheResponse
 		{
 			return $props->{$property};
 		}
+		return false;
+	}
+}
+
+final class StaticHtmlFileResponse extends StaticHtmlCacheResponse
+{
+	private $cacheFile = null;
+	private $lastModified = null;
+	private $contents = null;
+
+	public function __construct($cacheKey, array $configuration, array $htmlCacheOptions)
+	{
+		parent::__construct($cacheKey, $configuration, $htmlCacheOptions);
+		$pagesPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/html_pages";
+
+		if (file_exists($pagesPath.$this->cacheKey))
+		{
+			$this->cacheFile = $pagesPath.$this->cacheKey;
+		}
+	}
+
+	public function getContents()
+	{
+		if ($this->cacheFile === null)
+		{
+			return false;
+		}
+
+		if ($this->contents === null)
+		{
+			$this->contents = file_get_contents($this->cacheFile);
+			if ($this->contents === false || strlen($this->contents) < 2500 || !preg_match("/^[a-f0-9]{32}$/", substr($this->contents, -35, 32)))
+			{
+				$this->contents = false;
+			}
+		}
+
+		return $this->contents;
+	}
+
+	public function getLastModified()
+	{
+		if ($this->cacheFile === null)
+		{
+			return false;
+		}
+
+		if ($this->lastModified === null)
+		{
+			$this->lastModified = filemtime($this->cacheFile);
+		}
+
+		return $this->lastModified;
+
+	}
+
+	public function getEtag()
+	{
+		if ($this->cacheFile === null)
+		{
+			return false;
+		}
+
+		return md5(
+			$this->cacheFile.
+			filesize($this->cacheFile).
+			$this->getLastModified()
+		);
+	}
+
+	public function getContentType()
+	{
+		$contents = $this->getContents();
+		$head = strpos($contents, "</head>");
+		$meta = "#<meta\\s+http-equiv\\s*=\\s*(['\"])Content-Type(\\1)\\s+content\\s*=\\s*(['\"])(.*?)(\\3)#im";
+		if ($head !== false && preg_match($meta, substr($contents, 0, $head), $match))
+		{
+			return $match[4];
+		}
+
+		return false;
+	}
+
+	public function exists()
+	{
+		return $this->cacheFile !== null;
+	}
+
+	/**
+	 * Should we count a quota limit
+	 * @return bool
+	 */
+	static public function shouldCountQuota()
+	{
+		return true;
+	}
+
+	/**
+	 * Returns true if content is gzipped
+	 * @return bool
+	 */
+	static public function isGzipped()
+	{
 		return false;
 	}
 }

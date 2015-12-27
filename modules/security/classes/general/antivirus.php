@@ -47,7 +47,7 @@ class CSecurityAntiVirus
 
 	private $quotes = array();
 
-public 	function __construct($place = "body")
+public static 	function __construct($place = "body")
 	{
 		$this->place = $place;
 		global $BX_SECURITY_AV_ACTION;
@@ -55,7 +55,7 @@ public 	function __construct($place = "body")
 			$this->replace = false;
 	}
 
-public static function IsActive()
+public static 	public static function IsActive()
 	{
 		$bActive = false;
 		foreach(GetModuleEvents("main", "OnPageStart", true) as $event)
@@ -72,7 +72,7 @@ public static function IsActive()
 		return $bActive;
 	}
 
-	public static function SetActive($bActive = false)
+	public static public static function SetActive($bActive = false)
 	{
 		if($bActive)
 		{
@@ -227,14 +227,14 @@ public static 	function PHPShutdown()
 		}
 	}
 
-public static function GetWhiteList()
+public static 	public static function GetWhiteList()
 	{
 		global $DB;
 		$res = $DB->Query("SELECT * FROM b_sec_white_list ORDER BY ID", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		return $res;
 	}
 
-public static function UpdateWhiteList($arWhiteList)
+public 	public static function UpdateWhiteList($arWhiteList)
 	{
 		global $DB, $CACHE_MANAGER;
 		$res = $DB->Query("DELETE FROM b_sec_white_list", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
@@ -278,7 +278,7 @@ public 	function isInWhiteList()
 		if(preg_match('/(jsAjaxUtil|jsUtils|jsPopup|elOnline|jsAdminChain|jsEvent|jsAjaxHistory|bxSession|BXHotKeys|oSearchDialog)\./', $this->body))
 			return 9;
 
-		if(preg_match('/new\s+(PopupMenu|JCAdminFilter|JCSmartFilter|JCAdminMenu|BXHint|ViewTabControl|BXHTMLEditor|JCTitleSearch|JCWDTitleSearch|BxInterfaceForm|Date|JCEmployeeSelectControl|JCCatalogSection|JCCatalogElement|JCCatalogTopSlider|JCCatalogTopSection|JCCatalogSectionRec|JCCatalogSectionViewed|B24\.SearchTitle)/', $this->body))
+		if(preg_match('/new\s+(PopupMenu|JCAdminFilter|JCSmartFilter|JCAdminMenu|BXHint|ViewTabControl|BXHTMLEditor|JCTitleSearch|JCWDTitleSearch|BxInterfaceForm|Date|JCEmployeeSelectControl|JCCatalogBigdataProducts|JCCatalogSection|JCCatalogElement|JCCatalogTopSlider|JCCatalogTopSection|JCCatalogSectionRec|JCCatalogSectionViewed|JCCatalogCompareList|B24\.SearchTitle)/', $this->body))
 			return 10;
 
 		if(strpos($this->body, 'document\.write(\'<link href="/bitrix/templates/') !== false)
@@ -377,6 +377,10 @@ public 	function isInWhiteList()
 		//site checker
 		if(preg_match('/var\s*fix_mode\s*=/i', $this->body))
 			return 43;
+
+		//Voximplant document uploader
+		if($this->type == 'iframe' && preg_match('#\s*src=[\'"]https://verify.voximplant.com/#i', $this->atributes))
+			return 45;
 
 		if($this->type === "script")
 		{
@@ -1034,7 +1038,7 @@ public 	function ruleallsources()
 	}
 
 	// Анализ частотных вхождений символов...
-	public function rulescriptfrequensy()
+	funpublic ction rulescriptfrequensy()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1521,7 +1525,7 @@ public 	function rulescriptwhiterules()
 	}
 
 	//анализ признаков в именах функций и переменных
-	public function rulescriptnamerules()
+	fupublic nction rulescriptnamerules()
 	{
 
 		$rr = $this->getnames($this->body);
@@ -1685,13 +1689,13 @@ public static 	function getstatchars(&$str)
 		return $out;
 	}
 
-public 	function getnames_cb($m)
+public static 	function getnames_cb($m)
 	{
 		$this->quotes[] = ($m[2]);
 		return $m[1].$m[3];
 	}
 
-public 	function getnames($str)
+public static 	function getnames($str)
 	{
 		$flt = new CSecurityXSSDetect(array("action" => "none", "log" => "N"));
 		$flt->removeQuotedStrings($str);

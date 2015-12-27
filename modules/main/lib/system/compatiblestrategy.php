@@ -51,7 +51,7 @@ class CompatibleStrategy
 			// define("NEED_AUTH", true);
 
 			if (isset($_REQUEST['bxpublic']) && $_REQUEST['bxpublic'] == 'Y' && !defined('BX_PUBLIC_MODE'))
-				;// define('BX_PUBLIC_MODE', 1);
+				// define('BX_PUBLIC_MODE', 1);
 		}
 		//
 
@@ -83,7 +83,7 @@ class CompatibleStrategy
 		FormDecode();
 	}
 
-public static function initializeBasicKernel()
+public static 	public function initializeBasicKernel()
 	{
 		//language independed classes
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/punycode.php");
@@ -149,7 +149,7 @@ public static function initializeBasicKernel()
 		error_reporting(\COption::getOptionInt("main", "error_reporting", E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE) & ~E_STRICT);
 
 		if(!defined("BX_COMP_MANAGED_CACHE") && \COption::getOptionString("main", "component_managed_cache_on", "Y") <> "N")
-			;// define("BX_COMP_MANAGED_CACHE", true);
+			// define("BX_COMP_MANAGED_CACHE", true);
 
 		require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/filter_tools.php");
 		require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/ajax_tools.php");
@@ -253,7 +253,7 @@ public static function initializeBasicKernel()
 		$GLOBALS["arCustomTemplateEngines"] = array();
 	}
 
-public static function authenticateUser()
+public static 	public function authenticateUser()
 	{
 		/** @var $context \Bitrix\Main\HttpContext */
 		//$context = \Bitrix\Main\Application::getInstance()->getContext();
@@ -364,17 +364,17 @@ public static function authenticateUser()
 		}
 	}
 
-public static function initializeContext()
+public static 	public function initializeContext()
 	{
 		$GLOBALS["MESS"] = array();
 		$GLOBALS["ALL_LANG_FILES"] = array();
 	}
 
-public static function initializeExtendedKernel()
+public static 	public function initializeExtendedKernel()
 	{
 	}
 
-public static function createDatabaseConnection()
+public static 	public function createDatabaseConnection()
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		//read database connection parameters require_once
@@ -394,25 +394,25 @@ public static function createDatabaseConnection()
 		if(defined('BX_UTF'))
 			define('BX_UTF_PCRE_MODIFIER', 'u');
 		else
-			;// define('BX_UTF_PCRE_MODIFIER', '');
+			// define('BX_UTF_PCRE_MODIFIER', '');
 
-		if(!defined("CACHED_b_lang")) ;// define("CACHED_b_lang", 3600);
-		if(!defined("CACHED_b_option")) ;// define("CACHED_b_option", 3600);
-		if(!defined("CACHED_b_lang_domain")) ;// define("CACHED_b_lang_domain", 3600);
-		if(!defined("CACHED_b_site_template")) ;// define("CACHED_b_site_template", 3600);
-		if(!defined("CACHED_b_event")) ;// define("CACHED_b_event", 3600);
-		if(!defined("CACHED_b_agent")) ;// define("CACHED_b_agent", 3660);
-		if(!defined("CACHED_menu")) ;// define("CACHED_menu", 3600);
-		if(!defined("CACHED_b_file")) ;// define("CACHED_b_file", false);
-		if(!defined("CACHED_b_file_bucket_size")) ;// define("CACHED_b_file_bucket_size", 100);
-		if(!defined("CACHED_b_user_field")) ;// define("CACHED_b_user_field", 3600);
-		if(!defined("CACHED_b_user_field_enum")) ;// define("CACHED_b_user_field_enum", 3600);
-		if(!defined("CACHED_b_task")) ;// define("CACHED_b_task", 3600);
-		if(!defined("CACHED_b_task_operation")) ;// define("CACHED_b_task_operation", 3600);
-		if(!defined("CACHED_b_rating")) ;// define("CACHED_b_rating", 3600);
+		if(!defined("CACHED_b_lang")) // define("CACHED_b_lang", 3600);
+		if(!defined("CACHED_b_option")) // define("CACHED_b_option", 3600);
+		if(!defined("CACHED_b_lang_domain")) // define("CACHED_b_lang_domain", 3600);
+		if(!defined("CACHED_b_site_template")) // define("CACHED_b_site_template", 3600);
+		if(!defined("CACHED_b_event")) // define("CACHED_b_event", 3600);
+		if(!defined("CACHED_b_agent")) // define("CACHED_b_agent", 3660);
+		if(!defined("CACHED_menu")) // define("CACHED_menu", 3600);
+		if(!defined("CACHED_b_file")) // define("CACHED_b_file", false);
+		if(!defined("CACHED_b_file_bucket_size")) // define("CACHED_b_file_bucket_size", 100);
+		if(!defined("CACHED_b_user_field")) // define("CACHED_b_user_field", 3600);
+		if(!defined("CACHED_b_user_field_enum")) // define("CACHED_b_user_field_enum", 3600);
+		if(!defined("CACHED_b_task")) // define("CACHED_b_task", 3600);
+		if(!defined("CACHED_b_task_operation")) // define("CACHED_b_task_operation", 3600);
+		if(!defined("CACHED_b_rating")) // define("CACHED_b_rating", 3600);
 
 		if(!defined("POST_FORM_ACTION_URI"))
-			;// define("POST_FORM_ACTION_URI", htmlspecialcharsbx($_SERVER["REQUEST_URI"]));
+			// define("POST_FORM_ACTION_URI", htmlspecialcharsbx($_SERVER["REQUEST_URI"]));
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//connect to database, from here global variable $DB is available (CDatabase class)
@@ -449,11 +449,11 @@ public static function createDatabaseConnection()
 		}
 	}
 
-public static function authorizeUser()
+public static 	public function authorizeUser()
 	{
 	}
 
-public static function postInitialize()
+public static 	public function postInitialize()
 	{
 	}
 }

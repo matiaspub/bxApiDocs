@@ -15,9 +15,7 @@ IncludeModuleLangFile(__FILE__);
  */
 
 /**
- * CIBlockType - класс для работы с типами информационных блоков.</body> </html>
- *
- *
+ * CIBlockType - класс для работы с типами информационных блоков. 
  *
  *
  * @return mixed 
@@ -62,17 +60,13 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p>Возвращает список типов информационных блоков по фильтру <i>arFilter</i> с сортировкой <i>arOrder</i>.</p>
-	*
-	*
+	* <p>Возвращает список типов информационных блоков по фильтру <i>arFilter</i> с сортировкой <i>arOrder</i>. Метод статический.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("SORT"=>"ASC") Массив полей для сортировки, содержащий пары "поле
 	* сортировки"=&gt;"направление сортировки". <br> Поля сортировки могут
 	* принимать значения: <br>    <i>id</i> - код типа; <br>    <i>sort</i> - индекс
 	* сортировки; <br>    <i>NAME</i> - название типа. <br>
-	*
-	*
 	*
 	* @param array $arrayarFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]) <br> может
 	* принимать значения: <br>    <i>ID</i> - регистронезависимый по
@@ -81,16 +75,12 @@ class CIBlockType
 	* типа (для всех языков); <br> Необязательное. По умолчанию записи не
 	* фильтруются. <br>    <i>LANGUAGE_ID</i> - код языка. <br>
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$db_iblock_type = CIBlockType::GetList();<br>while($ar_iblock_type = $db_iblock_type-&gt;Fetch())<br>{<br>   if($arIBType = CIBlockType::GetByIDLang($ar_iblock_type["ID"], LANG))<br>   {<br>      echo htmlspecialcharsEx($arIBType["NAME"])."&lt;br&gt;";<br>   }   <br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -269,17 +259,12 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p>Возвращает тип информационных блоков по его коду <i>ID</i>.</p>
-	*
-	*
+	* <p>Возвращает тип информационных блоков по его коду <i>ID</i>. Метод статический.</p>
 	*
 	*
 	* @param string $ID  Код типа.</bod
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
@@ -342,33 +327,23 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p>Метод возвращает языковые настройки типа информационных блоков по его коду <i>ID</i>, для языка <i>LANGUAGE_ID</i>. Если <span class="syntax">для языка <i>LANGUAGE_ID</i> нет настроек и параметр <i>bFindAny</i> установлен в true, функция вернет настройки типа для языка по умолчанию. </span></p>
-	*
-	*
+	* <p>Метод возвращает языковые настройки типа информационных блоков по его коду <i>ID</i>, для языка <i>LANGUAGE_ID</i>. Если <span class="syntax">для языка <i>LANGUAGE_ID</i> нет настроек и параметр <i>bFindAny</i> установлен в true, метод вернет настройки типа для языка по умолчанию.</span> Метод статический.</p>
 	*
 	*
 	* @param string $ID  Код типа.</bod
 	*
-	*
-	*
 	* @param string $LANGUAGE_ID  Код языка.
-	*
-	*
 	*
 	* @param bool $bFindAny = true Возвращать настройки для языка по умолчинию или нет.
 	* Необязательный. По умолчанию - возвращать.
 	*
-	*
-	*
 	* @return mixed <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">полей</a></bo<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">параметров</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$db_iblock_type = CIBlockType::GetList();<br>while($ar_iblock_type = $db_iblock_type-&gt;Fetch())<br>{<br>   if($arIBType = CIBlockType::GetByIDLang($ar_iblock_type["ID"], LANG))<br>   {<br>      echo htmlspecialcharsex($arIBType["NAME"])."&lt;br&gt;";<br>   }   <br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -438,23 +413,17 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p>Функция удаляет тип информационных блоков по его коду <i>ID</i>. Также удаляются все информационные блоки указанного типа. <br></p>
-	*
-	*
+	* <p>Метод удаляет тип информационных блоков по его коду <i>ID</i>. Также удаляются все информационные блоки указанного типа. Метод статический. <br></p>
 	*
 	*
 	* @param string $ID  Код типа.</bod
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$DB-&gt;StartTransaction();<br>if(!CIBlockType::Delete('catalog'))<br>{<br>    $DB-&gt;Rollback();<br>    echo 'Delete error!';<br>}<br>$DB-&gt;Commit();<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -570,9 +539,7 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p> Метод добавляет новый тип информационных блоков. Этот метод не может быть использован как статическая функция. В случае ошибки в свойстве объекта LAST_ERROR будет содержаться текст ошибки. </p>
-	*
-	*
+	* <p> Метод добавляет новый тип информационных блоков. В случае ошибки в свойстве объекта LAST_ERROR будет содержаться текст ошибки. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Массив поле=&gt;значение... Содержит значения <a
@@ -582,16 +549,12 @@ class CIBlockType
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">языковых свойств</a>
 	* типа.Ключами этого массива служат идентификаторы языков. <br>
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arFields = Array(<br>	'ID'=&gt;'catalog',<br>	'SECTIONS'=&gt;'Y',<br>	'IN_RSS'=&gt;'N',<br>	'SORT'=&gt;100,<br>	'LANG'=&gt;Array(<br>		'en'=&gt;Array(<br>			'NAME'=&gt;'Catalog',<br>			'SECTION_NAME'=&gt;'Sections',<br>			'ELEMENT_NAME'=&gt;'Products'<br>			)<br>		)<br>	);<br><br>$obBlocktype = new CIBlockType;<br>$DB-&gt;StartTransaction();<br>$res = $obBlocktype-&gt;Add($arFields);<br>if(!$res)<br>{<br>   $DB-&gt;Rollback();<br>   echo 'Error: '.$obBlocktype-&gt;LAST_ERROR.'&lt;br&gt;';<br>}<br>else<br>   $DB-&gt;Commit();<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -645,14 +608,10 @@ class CIBlockType
 	 */
 	
 	/**
-	* <p>Функция изменяет параметры типа информационных блоков с кодом <i>ID</i>.</p>
-	*
-	*
+	* <p>Метод изменяет параметры типа информационных блоков с кодом <i>ID</i>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ID  Код изменяемой записи. </htm
-	*
-	*
 	*
 	* @param array $arFields  Массив поле=&gt;значение... Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktype">полей типа информационных
@@ -661,17 +620,13 @@ class CIBlockType
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocktypelang">языковых свойств</a> типа.
 	* Ключами этого массива служат идентификаторы языков.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arFields = Array(<br>	'SECTIONS'=&gt;'Y',<br>	'IN_RSS'=&gt;'N',<br>	'SORT'=&gt;100,<br>	'LANG'=&gt;Array(<br>		'en'=&gt;Array(<br>			'NAME'=&gt;'Catalog',<br>			'SECTION_NAME'=&gt;'Sections',<br>			'ELEMENT_NAME'=&gt;'Products'<br>			)<br>		)<br>	);<br>
 	* $obBlocktype = new CIBlockType;<br>$DB-&gt;StartTransaction();<br>$res = $obBlocktype-&gt;Update('catalog', $arFields);<br>if(!$res)<br>{<br>   $DB-&gt;Rollback();<br>   echo 'Error: '.$obBlocktype-&gt;LAST_ERROR.'&lt;br&gt;';<br>}<br>else<br>   $DB-&gt;Commit();<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

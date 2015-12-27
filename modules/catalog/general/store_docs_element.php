@@ -24,6 +24,11 @@ class CCatalogStoreDocsElementAll
 	public static function update($id, $arFields)
 	{
 		$id = intval($id);
+
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsElementUpdate", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+				return false;
+
 		if($id < 0 || !self::CheckFields('UPDATE',$arFields))
 			return false;
 		global $DB;
@@ -31,6 +36,9 @@ class CCatalogStoreDocsElementAll
 		$strSql = "UPDATE b_catalog_docs_element SET ".$strUpdate." WHERE ID = ".$id;
 		if(!$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__))
 			return false;
+
+		foreach(GetModuleEvents("catalog", "OnCatalogStoreDocsElementUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 		return true;
 	}
 
@@ -40,8 +48,16 @@ class CCatalogStoreDocsElementAll
 		$id = intval($id);
 		if($id > 0)
 		{
+			foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsElementDelete", true) as $arEvent)
+				if(ExecuteModuleEventEx($arEvent, array($id)) === false)
+					return false;
+
 			$DB->Query("DELETE FROM b_catalog_docs_barcode WHERE DOC_ELEMENT_ID = ".$id." ", true);
 			$DB->Query("DELETE FROM b_catalog_docs_element WHERE ID = ".$id." ", true);
+
+			foreach(GetModuleEvents("catalog", "OnCatalogStoreDocsElementDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id));
+
 			return true;
 		}
 		return false;

@@ -7,7 +7,7 @@ define('B_PROLOG_INCLUDED', null);
 /**
  * 9.0.0
  */
-define('BX_MAIL_DEFAULT_CHARSET', "windows-1251");
+define('BX_MAIL_DEFAULT_CHARSET', null);
 
 /**
  * 7.0.1
@@ -73,26 +73,6 @@ define('BX_BUFFER_USED', false);
  * BX_NO_ACCELERATOR_RESET
  */
 define('BX_NO_ACCELERATOR_RESET', true);
-
-/**
- * NO_KEEP_STATISTIC
- */
-define('NO_KEEP_STATISTIC', 'Y');
-
-/**
- * NO_AGENT_STATISTIC
- */
-define('NO_AGENT_STATISTIC', 'Y');
-
-/**
- * NO_AGENT_CHECK
- */
-define('NO_AGENT_CHECK', true);
-
-/**
- * DisableEventsCheck
- */
-define('DisableEventsCheck', true);
 
 
 ?>

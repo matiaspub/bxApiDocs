@@ -28,6 +28,8 @@ class CPerfQueryStat
 	{
 		global $DB;
 		static $cache = array();
+		$table = trim($table, "`");
+
 		if (!array_key_exists($table, $cache))
 		{
 			$strSql = "SHOW COLUMNS FROM `".$DB->ForSQL($table)."`";
@@ -53,8 +55,10 @@ class CPerfQueryStat
 		$arColumns = explode(",", $columns);
 		if (count($arColumns) != 1)
 			return false;
-
+		
+		$column = trim($arColumns[0], "`");
 		$value = trim($q->find_value($table, $arColumns[0]), "'");
+
 		if ($value == "")
 			return false;
 
@@ -63,10 +67,10 @@ class CPerfQueryStat
 		if ($tab->IsExists())
 		{
 			$arTableColumns = CPerfQueryStat::GetTableColumns($table);
-			if (!array_key_exists($arColumns[0], $arTableColumns))
+			if (!array_key_exists($column, $arTableColumns))
 				return false; //May be it is worth to ban
 
-			if ($arTableColumns[$arColumns[0]]["Type"] === "char(1)")
+			if ($arTableColumns[$column]["Type"] === "char(1)")
 			{
 				if (is_array(CPerfQueryStat::_get_stat($table, $arColumns[0])))
 					return true;
@@ -128,6 +132,7 @@ class CPerfQueryStat
 	public static function GatherTableStat($table)
 	{
 		global $DB;
+		$table = trim($table, "`");
 
 		$arStat = CPerfQueryStat::_get_stat($table);
 		if (!$arStat)
@@ -146,6 +151,8 @@ class CPerfQueryStat
 	protected static function _gather_stat($table, $column, $value, $max_size = -1)
 	{
 		global $DB;
+		$table = trim($table, "`");
+		$column = trim($column, "`");
 
 		$arStat = CPerfQueryStat::GatherTableStat($table);
 		if ($max_size < 0 || $arStat["TABLE_SIZE"] < $max_size)
@@ -154,13 +161,13 @@ class CPerfQueryStat
 			$column = preg_replace("/[^A-Za-z0-9%_]+/i", "", $column);
 
 			if (isset($value))
-				$rs = $DB->Query("
+				$rs = $DB->Query($d="
 					select count(1) CNT
 					from ".$DB->ForSQL($table)."
 					where ".$DB->ForSQL($column)." = '".$DB->ForSQL($value)."'
 				");
 			else
-				$rs = $DB->Query("
+				$rs = $DB->Query($d="
 					select count(distinct ".$DB->ForSQL($column).") CNT
 					from ".$DB->ForSQL($table)."
 				");
@@ -184,6 +191,9 @@ class CPerfQueryStat
 	protected static function _get_stat($table, $column = "", $value = "")
 	{
 		global $DB;
+		$table = trim($table, "`");
+		$column = trim($column, "`");
+
 		if ($column == "")
 		{
 			$rs = $DB->Query("

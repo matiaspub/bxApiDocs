@@ -5,10 +5,7 @@
  * <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -96,18 +93,13 @@ class CAllGradeBook
 	* <p>Метод добавляет новую запись в журнал.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return int <p>Метод возвращает идентификатор добавленной записи в журнал,
 	* если добавление прошло успешно. При возникновении ошибки метод
 	* вернёт <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -143,7 +135,6 @@ class CAllGradeBook
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/update.php">Update</a> </li> <li> <a
@@ -177,22 +168,15 @@ class CAllGradeBook
 	* <p>Метод изменяет параметры записи в журнале с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор записи в журнале.
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	* возникновении ошибки функция вернет <i>false</i>. При возникновении
+	* возникновении ошибки метод вернет <i>false</i>. При возникновении
 	* ошибки в исключениях будет содержаться текст ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -221,7 +205,6 @@ class CAllGradeBook
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -265,15 +248,10 @@ class CAllGradeBook
 	* <p>Метод удаляет запись в журнале с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор записи. </htm
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления записи, в
 	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -372,15 +350,10 @@ class CAllGradeBook
 	* <p>Возвращает запись журнала по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор записи в журнале.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -399,7 +372,6 @@ class CAllGradeBook
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -532,8 +504,6 @@ class CAllGradeBook
 	* <p>Возвращает список записей журнала по фильтру arFilter, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
 	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
 	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
@@ -545,8 +515,6 @@ class CAllGradeBook
 	* <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по убыванию;</li> </ul>
 	* Необязательный. По умолчанию фильтруется по убыванию
 	* идентификатора записи журнала.
-	*
-	*
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
@@ -560,17 +528,14 @@ class CAllGradeBook
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
 	* <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
 	* значение "N" - права доступа не проверяются.</li> </ul> Перед названием
-	* фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не
+	* фильтруемого поля можно указать тип фильтрации: <ul> <li>"!" - не
 	* равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше либо равно</li> <li>"&gt;" -
 	* больше</li> <li>"&gt;=" - больше либо равно</li> </ul> <br> "<i>значения
 	* фильтра</i>" - одиночное значение или массив.<br><br> Необязательный.
 	* По умолчанию записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -612,7 +577,6 @@ class CAllGradeBook
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -665,9 +629,9 @@ class CAllGradeBook
 			$strSqlFrom .= ' AND ' . $strSqlSearch;
 
 		$strSql =
-		"SELECT G.*, T.NAME as TEST_NAME, T.COURSE_ID as COURSE_ID, 
+		"SELECT G.*, T.NAME as TEST_NAME, T.COURSE_ID as COURSE_ID,
 		T.APPROVED as TEST_APPROVED,
-		(T.ATTEMPT_LIMIT + G.EXTRA_ATTEMPTS) AS ATTEMPT_LIMIT, TUL.NAME as COURSE_NAME, 
+		(T.ATTEMPT_LIMIT + G.EXTRA_ATTEMPTS) AS ATTEMPT_LIMIT, TUL.NAME as COURSE_NAME,
 		C.LINKED_LESSON_ID AS LINKED_LESSON_ID, ".
 		$DB->Concat("'('",'U.LOGIN',"') '","CASE WHEN U.NAME IS NULL THEN '' ELSE U.NAME END","' '", "CASE WHEN U.LAST_NAME IS NULL THEN '' ELSE U.LAST_NAME END")." as USER_NAME, U.ID as USER_ID ".
 		$strSqlFrom;
@@ -704,7 +668,7 @@ class CAllGradeBook
 
 		$strSqlOrder = "";
 		DelDuplicateSort($arSqlOrder);
-		for ($i=0; $i<count($arSqlOrder); $i++)
+		for ($i=0, $len = count($arSqlOrder); $i < $len; $i++)
 		{
 			if($i==0)
 				$strSqlOrder = " ORDER BY ";
@@ -747,25 +711,28 @@ class CAllGradeBook
 	 */
 	protected static function __getSqlFromClause($SqlSearchLang)
 	{
-		$strSqlFrom = 
+		$strSqlFrom =
 			"FROM b_learn_gradebook G ".
 			"INNER JOIN b_learn_test T ON G.TEST_ID = T.ID ".
 			"INNER JOIN b_user U ON U.ID = G.STUDENT_ID ".
 			"LEFT JOIN b_learn_course C ON C.ID = T.COURSE_ID ".
 			"LEFT JOIN b_learn_lesson TUL ON TUL.ID = C.LINKED_LESSON_ID ".
 			"LEFT JOIN b_learn_test_mark TM ON G.TEST_ID = TM.TEST_ID ".
-			"WHERE (TM.SCORE IS NULL 
-				OR TM.SCORE = 
+			"WHERE (TM.SCORE IS NULL
+				OR TM.SCORE =
 					(
-					SELECT MIN(SCORE) AS SCORE 
-					FROM b_learn_test_mark 
-					WHERE SCORE >= 
-						CASE WHEN G.MAX_RESULT > 0
-						THEN
-							(G.RESULT/G.MAX_RESULT*100) 
-						ELSE
-							0
-						END
+					SELECT MIN(SCORE) AS SCORE
+					FROM b_learn_test_mark
+					WHERE
+						TEST_ID = G.TEST_ID
+							AND
+						SCORE >=
+							CASE WHEN G.MAX_RESULT > 0
+							THEN
+								(G.RESULT/G.MAX_RESULT*100)
+							ELSE
+								0
+							END
 					)
 				) ".
 			(strlen($SqlSearchLang)<=2?"":

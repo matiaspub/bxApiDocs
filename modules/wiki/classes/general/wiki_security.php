@@ -4,9 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов.</body> </html>
- *
- *
+ * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов. Динамичный метод. 
  *
  *
  * @return mixed 
@@ -276,14 +274,9 @@ class CWikiSecurity
 	* <p>Метод обрабатывает содержимое Wiki-страницы.</p>
 	*
 	*
-	*
-	*
 	* @param string &$str  Содержимое Wiki-страницы </ht
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -302,7 +295,6 @@ class CWikiSecurity
 	* echo $arElement['~DETAIL_TEXT'];<br>?&gt;
 	* </htm
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

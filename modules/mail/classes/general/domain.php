@@ -14,11 +14,11 @@
 class CMailDomain
 {
 
-public static function __construct()
+public static 	public function __construct()
 	{
 	}
 
-public static function isUserExists($token, $domain, $login, &$error)
+public static 	public static function isUserExists($token, $domain, $login, &$error)
 	{
 		$result = CMailYandex::checkUser($token, $login, $error);
 
@@ -35,7 +35,7 @@ public static function isUserExists($token, $domain, $login, &$error)
 		}
 	}
 
-public static function addUser($token, $domain, $login, $password, &$error)
+public static 	public static function addUser($token, $domain, $login, $password, &$error)
 	{
 		$result = CMailYandex::registerUserToken($token, $login, $password, $error);
 
@@ -50,7 +50,7 @@ public static function addUser($token, $domain, $login, $password, &$error)
 		}
 	}
 
-public static function getRedirectUrl($locale, $token, $domain, $login, $errorUrl, &$error)
+public static 	public static function getRedirectUrl($locale, $token, $domain, $login, $errorUrl, &$error)
 	{
 		$result = CMailYandex::userOAuthToken($token, $domain, $login, $error);
 
@@ -65,7 +65,7 @@ public static function getRedirectUrl($locale, $token, $domain, $login, $errorUr
 		}
 	}
 
-public static function getUnreadMessagesCount($token, $domain, $login, &$error)
+public static 	public static function getUnreadMessagesCount($token, $domain, $login, &$error)
 	{
 		$result = CMailYandex::getMailInfo($token, $login, $error);
 
@@ -80,7 +80,7 @@ public static function getUnreadMessagesCount($token, $domain, $login, &$error)
 		}
 	}
 
-public static function changePassword($token, $domain, $login, $password, &$error)
+public static 	public static function changePassword($token, $domain, $login, $password, &$error)
 	{
 		$result = CMailYandex::editUser($token, $login, array('domain' => $domain, 'password' => $password), $error);
 
@@ -95,7 +95,7 @@ public static function changePassword($token, $domain, $login, $password, &$erro
 		}
 	}
 
-public static function getDomainStatus($token, $domain, &$error)
+public static 	public static function getDomainStatus($token, $domain, &$error)
 	{
 		$result = CMailYandex::getDomainUsers($token, 1, 1, $error);
 
@@ -121,7 +121,7 @@ public static function getDomainStatus($token, $domain, &$error)
 		}
 	}
 
-public static function getDomainUsers($token, $domain, &$error)
+public static 	public static function getDomainUsers($token, $domain, &$error)
 	{
 		$users = array();
 
@@ -154,7 +154,7 @@ public static function getDomainUsers($token, $domain, &$error)
 		}
 	}
 
-public static function setDomainLogo($token, $domain, $logo, &$error)
+public static 	public static function setDomainLogo($token, $domain, $logo, &$error)
 	{
 		$result = CMailYandex::addLogo($token, $domain, $logo, $error);
 
@@ -169,7 +169,7 @@ public static function setDomainLogo($token, $domain, $logo, &$error)
 		}
 	}
 
-public static function deleteUser($token, $domain, $login, &$error)
+public static 	public static function deleteUser($token, $domain, $login, &$error)
 	{
 		$result = CMailYandex::deleteUser($token, $login, $error);
 
@@ -184,7 +184,7 @@ public static function deleteUser($token, $domain, $login, &$error)
 		}
 	}
 
-private static function getErrorCode($error)
+public static 	private static function getErrorCode($error)
 	{
 		$errorsList = array(
 			'no_auth'          => CMail::ERR_API_DENIED,

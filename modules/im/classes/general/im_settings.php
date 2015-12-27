@@ -7,6 +7,10 @@ class CIMSettings
 	const CLIENT_SITE = 'site';
 	const CLIENT_XMPP = 'xmpp';
 	const CLIENT_MAIL = 'email';
+	const CLIENT_PUSH = 'push';
+
+	const START_MESSAGE_FIRST = 'first';
+	const START_MESSAGE_LAST = 'last';
 
 	const PRIVACY_MESSAGE = 'privacyMessage';
 	const PRIVACY_CHAT = 'privacyChat';
@@ -34,8 +38,8 @@ class CIMSettings
 
 		if(!is_array($arSettings) || !isset($arSettings['settings']) || !isset($arSettings['notify']))
 		{
-			$arSettings[self::SETTINGS] = CUserOptions::GetOption('IM', self::SETTINGS, Array(), $userId);
-			$arSettings[self::NOTIFY] = CUserOptions::GetOption('IM', self::NOTIFY, Array(), $userId);
+			$arSettings[self::SETTINGS] = CUserOptions::GetOption('im', self::SETTINGS, Array(), $userId);
+			$arSettings[self::NOTIFY] = CUserOptions::GetOption('im', self::NOTIFY, Array(), $userId);
 			$CACHE_MANAGER->Set($cache_id, $arSettings);
 		}
 		// Check fields and add default values
@@ -69,7 +73,7 @@ class CIMSettings
 				unset($value[$key]);
 			}
 		}
-		CUserOptions::SetOption('IM', $type, $value, false, $userId);
+		CUserOptions::SetOption('im', $type, $value, false, $userId);
 
 		if (isset($value[self::PRIVACY_SEARCH]))
 		{
@@ -91,7 +95,7 @@ class CIMSettings
 		if ($userId == 0)
 			$userId = $USER->GetId();
 
-		$arSettings = CUserOptions::GetOption('IM', $type, Array(), $userId);
+		$arSettings = CUserOptions::GetOption('im', $type, Array(), $userId);
 		foreach ($value as $key => $val)
 			$arSettings[$key] = $val;
 
@@ -110,7 +114,7 @@ class CIMSettings
 				unset($value[$key]);
 			}
 		}
-		CUserOptions::SetOption('IM', $type, $arSettings, false, $userId);
+		CUserOptions::SetOption('im', $type, $arSettings, false, $userId);
 		if (isset($value[self::PRIVACY_SEARCH]))
 		{
 			$USER_FIELD_MANAGER->Update("USER", $userId, Array('UF_IM_SEARCH' => $value[self::PRIVACY_SEARCH]));
@@ -149,6 +153,8 @@ class CIMSettings
 				return false;
 			elseif ($clientId == self::CLIENT_MAIL && !$arSettings['settings']['notifySchemeSendEmail'])
 				return false;
+			elseif ($clientId == self::CLIENT_PUSH && !$arSettings['settings']['notifySchemeSendPush'])
+				return false;
 
 			return isset($arSettings['notify']) && array_key_exists($notifyId, $arSettings['notify']) && $arSettings['notify'][$notifyId] === false? false: true;
 		}
@@ -175,21 +181,26 @@ class CIMSettings
 				'status' => 'online',
 				'bxdNotify' => true,
 				'sshNotify' => true,
+				'trackStatus' => '',
 				'nativeNotify' => true,
 				'viewOffline' => COption::GetOptionString("im", "view_offline"),
 				'viewGroup' => COption::GetOptionString("im", "view_group"),
+				'viewLastMessage' => true,
 				'enableSound' => true,
+				'enableBigSmile' => true,
 				'sendByEnter' => COption::GetOptionString("im", "send_by_enter"),
 				'correctText' => COption::GetOptionString("im", "correct_text"),
 				'panelPositionHorizontal' => COption::GetOptionString("im", "panel_position_horizontal"),
 				'panelPositionVertical' => COption::GetOptionString("im", "panel_position_vertical"),
 				'loadLastMessage' => COption::GetOptionString("im", "load_last_message"),
 				'loadLastNotify' => COption::GetOptionString("im", "load_last_notify"),
+				'notifyAutoRead' => true,
 				'notifyScheme' => 'simple',
 				'notifySchemeLevel' => 'important',
 				'notifySchemeSendSite' => true,
 				'notifySchemeSendEmail' => true,
 				'notifySchemeSendXmpp' => true,
+				'notifySchemeSendPush' => true,
 				'privacyMessage' => COption::GetOptionString("im", "privacy_message"),
 				'privacyChat' => COption::GetOptionString("im", "privacy_chat"),
 				'privacyCall' => COption::GetOptionString("im", "privacy_call"),
@@ -204,9 +215,14 @@ class CIMSettings
 			{
 				foreach ($notifyTypes['NOTIFY'] as $notifyId => $notify)
 				{
-					$arDefault[self::CLIENT_SITE.'|'.$moduleId.'|'.$notifyId] = is_bool($notify['SITE'])? $notify['SITE']: true;
-					$arDefault[self::CLIENT_MAIL.'|'.$moduleId.'|'.$notifyId] = is_bool($notify['MAIL'])? $notify['MAIL']: true;
-					$arDefault[self::CLIENT_XMPP.'|'.$moduleId.'|'.$notifyId] = is_bool($notify['XMPP'])? $notify['XMPP']: true;
+					$arDefault[self::CLIENT_SITE.'|'.$moduleId.'|'.$notifyId] = $notify['SITE'];
+					$arDefault[self::CLIENT_MAIL.'|'.$moduleId.'|'.$notifyId] = $notify['MAIL'];
+					$arDefault[self::CLIENT_XMPP.'|'.$moduleId.'|'.$notifyId] = $notify['XMPP'];
+					$arDefault[self::CLIENT_PUSH.'|'.$moduleId.'|'.$notifyId] = $notify['PUSH'];
+					$arDefault['disabled|'.self::CLIENT_SITE.'|'.$moduleId.'|'.$notifyId] = $notify['DISABLED']['SITE'];
+					$arDefault['disabled|'.self::CLIENT_MAIL.'|'.$moduleId.'|'.$notifyId] = $notify['DISABLED']['MAIL'];
+					$arDefault['disabled|'.self::CLIENT_XMPP.'|'.$moduleId.'|'.$notifyId] = $notify['DISABLED']['XMPP'];
+					$arDefault['disabled|'.self::CLIENT_PUSH.'|'.$moduleId.'|'.$notifyId] = $notify['DISABLED']['PUSH'];
 					$arDefault['important|'.$moduleId.'|'.$notifyId] = is_bool($notify['IMPORTANT'])? $notify['IMPORTANT']: true;
 				}
 			}
@@ -243,7 +259,7 @@ class CIMSettings
 				{
 					$arValues[$key] = in_array($value[$key], Array(self::PRIVACY_RESULT_ALL, self::PRIVACY_RESULT_CONTACT))? $value[$key]: $default;
 				}
-				else if (in_array($key, Array('privacyProfile')))
+				else if ($key == 'privacyProfile')
 				{
 					$arValues[$key] = in_array($value[$key], Array(self::PRIVACY_RESULT_ALL, self::PRIVACY_RESULT_CONTACT, self::PRIVACY_RESULT_NOBODY))? $value[$key]: $default;
 				}
@@ -258,6 +274,23 @@ class CIMSettings
 				else if ($key == 'notifySchemeLevel')
 				{
 					$arValues[$key] = in_array($value[$key], Array('normal', 'important'))? $value[$key]: $default;
+				}
+				else if ($key == 'trackStatus')
+				{
+					$value[$key] = explode(',', $value[$key]);
+					foreach ($value[$key] as $k => $v)
+					{
+						if ($v != 'all')
+						{
+							$value[$key][$k] = intval($v);
+							if ($value[$key][$k] == 0)
+							{
+								unset($value[$key][$k]);
+							}
+						}
+					}
+					$arValues[$key] = implode(',', $value[$key]);
+
 				}
 				else if (array_key_exists($key, $value))
 				{
@@ -317,6 +350,8 @@ class CIMSettings
 					list($clientId, $moduleId, $notifyId) = explode('|', $key, 3);
 					if ($clientId == self::CLIENT_SITE)
 					{
+						if (CIMNotifySchema::CheckDisableFeature($moduleId, $notifyId, $clientId))
+							continue;
 						if ($byModule)
 							$arNotifyBlocked[$moduleId][$notifyId] = false;
 						else
@@ -332,10 +367,18 @@ class CIMSettings
 				if ($value === false)
 				{
 					list($clientId, $moduleId, $notifyId) = explode('|', $key, 3);
-					if ($byModule)
-						$arNotifyBlocked[$moduleId][$notifyId] = false;
-					else
-						$arNotifyBlocked[$moduleId.'|'.$notifyId] = false;
+					if (in_array($clientId, Array('push', 'important', 'disabled')))
+						continue;
+					
+					if ($clientId == self::CLIENT_SITE)
+					{
+						if (CIMNotifySchema::CheckDisableFeature($moduleId, $notifyId, $clientId))
+							continue;
+						if ($byModule)
+							$arNotifyBlocked[$moduleId][$notifyId] = false;
+						else
+							$arNotifyBlocked[$moduleId.'|'.$notifyId] = false;
+					}
 				}
 			}
 		}
@@ -347,6 +390,11 @@ class CIMSettings
 	{
 		$ar = CIMSettings::Get($userId);
 		return array_key_exists($type, $ar[CIMSettings::SETTINGS])? $ar[CIMSettings::SETTINGS][$type]: false;
+	}
+
+	public static function GetStartChatMessage()
+	{
+		return COption::GetOptionString("im", 'start_chat_message');
 	}
 
 	public static function ClearCache($userId = false)

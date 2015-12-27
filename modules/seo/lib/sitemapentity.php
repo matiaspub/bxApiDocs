@@ -30,7 +30,7 @@ class SitemapEntityTable extends Entity\DataManager
 
 	public static function add($sitemapId, $entityId )
 	{
-		parent::add(array(
+		return parent::add(array(
 			'ENTITY_TYPE' => static::ENTITY_TYPE,
 			'ENTITY_ID' => $entityId,
 			'SITEMAP_ID' => $sitemapId,

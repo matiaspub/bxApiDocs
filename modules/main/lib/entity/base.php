@@ -92,7 +92,7 @@ class Base
 		}
 		elseif (!empty($fieldInfo['reference']))
 		{
-			if (strpos($fieldInfo['data_type'], '\\') === false)
+			if (is_string($fieldInfo['data_type']) && strpos($fieldInfo['data_type'], '\\') === false)
 			{
 				// if reference has no namespace, then it'is in the same namespace
 				$fieldInfo['data_type'] = $this->getNamespace().$fieldInfo['data_type'];
@@ -455,6 +455,9 @@ class Base
 		return $this->className;
 	}
 
+	/**
+	 * @return Main\DB\Connection
+	 */
 	public function getConnection()
 	{
 		return \Bitrix\Main\Application::getInstance()->getConnectionPool()->getConnection($this->connectionName);
@@ -550,7 +553,7 @@ class Base
 
 	public static function camel2snake($str)
 	{
-		return strtolower(preg_replace('/(.)([A-Z])(.*?)/', '$1_$2$3', $str));
+		return strtolower(preg_replace('/(.)([A-Z])/', '$1_$2', $str));
 	}
 
 	public static function snake2camel($str)
@@ -638,9 +641,6 @@ class Base
 		$eval .= 'public static function getTableName() {'.PHP_EOL;
 		$eval .= 'return '.var_export($query_string, true).';'.PHP_EOL;
 		$eval .= '}';
-		$eval .= 'public static function getFilePath() {'.PHP_EOL;
-		$eval .= 'return null;'.PHP_EOL;
-		$eval .= '}';
 		$eval .= '}';
 
 		eval($eval);
@@ -689,14 +689,14 @@ class Base
 				));
 			}
 
-			$classCode = $classCode."namespace {$namespace} {";
+			$classCode = $classCode."namespace {$namespace} "."{";
 			$classCodeEnd = '}'.$classCodeEnd;
 
 			$fullEntityName = '\\'.$namespace.'\\'.$fullEntityName;
 		}
 
 		// build entity code
-		$classCode = $classCode."class {$entityName} extends \\Bitrix\\Main\\Entity\\DataManager {";
+		$classCode = $classCode."class {$entityName} extends \\Bitrix\\Main\\Entity\\DataManager "."{";
 		$classCodeEnd = '}'.$classCodeEnd;
 
 		if (!empty($parameters['table_name']))
@@ -708,8 +708,6 @@ class Base
 		{
 			$classCode .= 'public static function getUfId(){return '.var_export($parameters['uf_id'], true).';}';
 		}
-
-		$classCode .= 'public static function getFilePath(){return __FILE__;}';
 
 		// create entity
 		eval($classCode.$classCodeEnd);
@@ -734,7 +732,7 @@ class Base
 	public function compileDbTableStructureDump()
 	{
 		$fields = $this->getScalarFields();
-		$connection = Main\Application::getConnection();
+		$connection = $this->getConnection();
 
 		$autocomplete = array();
 
@@ -767,7 +765,7 @@ class Base
 	{
 		foreach ($this->compileDbTableStructureDump() as $sqlQuery)
 		{
-			Main\Application::getConnection()->query($sqlQuery);
+			$this->getConnection()->query($sqlQuery);
 		}
 	}
 

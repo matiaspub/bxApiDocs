@@ -1,11 +1,10 @@
 <?
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/discount.php");
+use Bitrix\Main;
+require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/general/discount.php');
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -91,14 +90,10 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 	
 	/**
-	* <p>Метод удаляет скидку с кодом ID.</p>
-	*
-	*
+	* <p>Метод удаляет скидку с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код удаляемой записи.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
 	* случае ошибки.</p> <br><br>
@@ -143,14 +138,10 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 	
 	/**
-	* <p>Метод выбирает параметры скидки по ее коду ID.</p>
-	*
-	*
+	* <p>Метод выбирает параметры скидки по ее коду ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код записи.
-	*
-	*
 	*
 	* @return array <p>Метод возвращает ассоциативный массив параметров скидки с
 	* ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li> <b>SITE_ID</b> - сайт;</li> <li>
@@ -225,11 +216,17 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		return false;
 	}
 
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array $arGroupBy
+	 * @param bool|array $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|CDBResult
+	 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей скидок в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей скидок в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -244,8 +241,6 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -269,38 +264,30 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* проверяется на соответствие передаваемой в фильтр строке в
 	* соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
 	* может стоять любое поле скидки.<br><br> Пример фильтра: <pre
-	* class="syntax">array("!DISCOUNT_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
-	* записи, в которых значение в поле DISCOUNT_ID (код скидки) не равно
-	* 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
+	* class="syntax">array("ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все записи, в
+	* которых значение в поле DISCOUNT_ID (код скидки) не равно 15".<br><br>
+	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
-	*
-	*
 	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются скидки. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле скидки.<br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
@@ -316,9 +303,8 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* код группы товаров, на которую дается скидка;</li> <li> <b>GROUP_ID</b> - код
 	* группы пользователей, на которую дается скидка;</li> <li>
 	* <b>CATALOG_GROUP_ID</b> - код типа цен, на который дается скидка.</li> </ul> <p>Если
-	* в качестве параметра arGroupBy передается пустой массив, то функция
+	* в качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -501,9 +487,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей с информацией о привязке скидок к группам пользователей в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей с информацией о привязке скидок к группам пользователей в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -518,8 +502,6 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -548,39 +530,31 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* не равно 5".<br><br> Значение по умолчанию - пустой массив array() -
 	* означает, что результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
 	* <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>GROUP_ID</b> - код группы
 	* пользователей.</li> </ul> <p>Если в качестве параметра arGroupBy передается
-	* пустой массив, то функция вернет число записей, удовлетворяющих
+	* пустой массив, то метод вернет число записей, удовлетворяющих
 	* фильтру.</p> <br><br>
 	*
 	* @static
@@ -594,9 +568,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей с информацией о привязке скидок к типам цен в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей с информацией о привязке скидок к типам цен в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -611,8 +583,6 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -641,38 +611,30 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <ul> <li>ID - код записи;</li>
 	* <li>DISCOUNT_ID - код скидки;</li> <li>CATALOG_GROUP_ID - код типа цены.</li> </ul> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <br><br>
 	*
 	* @static
@@ -689,9 +651,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей с информацией о привязке скидок к товарам в соответствии со своими параметрами.</p> <p><b><font color="#FF0000">Важно! Метод не может быть использован для выборки товаров, на которые действуют скидки.</font></b></p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей с информацией о привязке скидок к товарам в соответствии со своими параметрами. Метод динамичный.</p> <p></p> <div class="note"><font color="#FF0000"><b>Важно!</b> Метод не может быть использован для выборки товаров, на которые действуют скидки.</font></div>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -706,8 +666,6 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -736,43 +694,36 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
 	* <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>PRODUCT_ID</b> - код товара.</li> </ul> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountproductslist.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.0.0
 	*/
 	static public function GetDiscountProductsList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
@@ -858,9 +809,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей с информацией о привязке скидок к группам товаров в соответствии со своими параметрами.</p> <p><b><font color="#FF0000">Важно! Метод не может быть использован для выборки товаров, на которые действуют скидки.</font></b></p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей с информацией о привязке скидок к группам товаров в соответствии со своими параметрами. Метод динамичный.</p> <p></p> <div class="note"><font color="#FF0000"><b>Важно!</b> Метод не может быть использован для выборки товаров, на которые действуют скидки.</font></div>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -875,8 +824,6 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -905,43 +852,36 @@ class CCatalogDiscount extends CAllCatalogDiscount
 	* 15".<br><br> Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле записи. <br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
 	* <b>DISCOUNT_ID</b> - код скидки;</li> <li> <b>PRODUCT_ID</b> - код товара.</li> </ul> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountsectionslist.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.0.0
 	*/
 	static public function GetDiscountSectionsList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
@@ -1333,19 +1273,13 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		if (array_key_exists('ACTIVE', $arFilter))
 		{
 			if ($arFilter['ACTIVE'] === null)
-			{
 				$active = '';
-			}
 			elseif ($arFilter['ACTIVE'] == 'Y' || $arFilter['ACTIVE'] == 'N')
-			{
 				$active = $arFilter['ACTIVE'];
-			}
 			unset($arFilter['ACTIVE']);
 		}
 		if ($active != '')
-		{
 			$arFilter['ACTIVE'] = $active;
-		}
 
 		if (array_key_exists('DISCOUNT_ID', $arFilter))
 			unset($arFilter['DISCOUNT_ID']);
@@ -1358,7 +1292,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			unset($arFilter['RESTRICTIONS']);
 		}
 
-		$arSqls = CCatalog::PrepareSql($arFields, array(), $arFilter, false, $arSelectFields);
+		$arSqls = CCatalog::PrepareSql($arFields, array('DISCOUNT_ID' => 'ASC'), $arFilter, false, $arSelectFields);
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 		if (empty($arSqls["WHERE"]))
@@ -1373,17 +1307,17 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			$arRestrictions = array();
 			while ($arDiscount = $rsDiscounts->Fetch())
 			{
-				$arDiscount['DISCOUNT_ID'] = intval($arDiscount['DISCOUNT_ID']);
+				$arDiscount['DISCOUNT_ID'] = (int)$arDiscount['DISCOUNT_ID'];
 				$arDiscountID[$arDiscount['DISCOUNT_ID']] = true;
-				if (!array_key_exists($arDiscount['DISCOUNT_ID'], $arRestrictions))
+				if (!isset($arRestrictions[$arDiscount['DISCOUNT_ID']]))
 				{
 					$arRestrictions[$arDiscount['DISCOUNT_ID']] = array(
 						'USER_GROUP' => array(),
 						'PRICE_TYPE' => array(),
 					);
 				}
-				$arDiscount['USER_GROUP_ID'] = intval($arDiscount['USER_GROUP_ID']);
-				$arDiscount['PRICE_TYPE_ID'] = intval($arDiscount['PRICE_TYPE_ID']);
+				$arDiscount['USER_GROUP_ID'] = (int)$arDiscount['USER_GROUP_ID'];
+				$arDiscount['PRICE_TYPE_ID'] = (int)$arDiscount['PRICE_TYPE_ID'];
 				$arRestrictions[$arDiscount['DISCOUNT_ID']]['USER_GROUP'][$arDiscount['USER_GROUP_ID']] = true;
 				$arRestrictions[$arDiscount['DISCOUNT_ID']]['PRICE_TYPE'][$arDiscount['PRICE_TYPE_ID']] = true;
 			}
@@ -1408,7 +1342,7 @@ class CCatalogDiscount extends CAllCatalogDiscount
 		{
 			while ($arDiscount = $rsDiscounts->Fetch())
 			{
-				$arDiscount['DISCOUNT_ID'] = intval($arDiscount['DISCOUNT_ID']);
+				$arDiscount['DISCOUNT_ID'] = (int)$arDiscount['DISCOUNT_ID'];
 				$arDiscountID[$arDiscount['DISCOUNT_ID']] = true;
 			}
 			if (!empty($arDiscountID))
@@ -1525,21 +1459,27 @@ class CCatalogDiscount extends CAllCatalogDiscount
 			'EXT_FILES' => array()
 		);
 		$result = array();
-		CatalogClearArray($discountList, true);
+		Main\Type\Collection::normalizeArrayValuesByInt($discountList, true);
 		if (!empty($discountList))
 		{
 			$result = array_fill_keys($discountList, $defaultRes);
-			$discountIn = implode(', ', $discountList);
-			$sqlQuery = 'select * from b_catalog_discount_module where DISCOUNT_ID IN ('.$discountIn.')';
-			$resQuery = $DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-			while ($row = $resQuery->Fetch())
+			$discountRows = array_chunk($discountList, 500);
+			foreach ($discountRows as &$oneRow)
 			{
-				$row['DISCOUNT_ID'] = (int)$row['DISCOUNT_ID'];
-				$result[$row['DISCOUNT_ID']]['MODULES'][] = $row['MODULE_ID'];
+				$sqlQuery = 'select * from b_catalog_discount_module where DISCOUNT_ID IN ('.implode(', ', $oneRow).')';
+				$resQuery = $DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+				while ($row = $resQuery->Fetch())
+				{
+					$row['DISCOUNT_ID'] = (int)$row['DISCOUNT_ID'];
+					$result[$row['DISCOUNT_ID']]['MODULES'][] = $row['MODULE_ID'];
+				}
+				if (isset($row))
+					unset($row);
+				unset($resQuery, $sqlQuery);
 			}
+			unset($oneRow, $discountRows);
 		}
 
 		return $result;
 	}
 }
-?>

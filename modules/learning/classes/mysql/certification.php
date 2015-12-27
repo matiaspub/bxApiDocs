@@ -13,8 +13,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/learning/classes/general
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -26,8 +24,6 @@ class CCertification extends CAllCertification
 	
 	/**
 	* <p>Возвращает список сертификатов по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
-	*
-	*
 	*
 	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
@@ -46,8 +42,6 @@ class CCertification extends CAllCertification
 	* </li> <li> <b>desc</b> - по убыванию; </li> </ul> Необязательный. По умолчанию
 	* фильтруется по убыванию идентификатора сертификата.
 	*
-	*
-	*
 	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
 	* идентификатор сертификата; </li> <li> <b>STUDENT_ID</b> - идентификатор
@@ -65,23 +59,19 @@ class CCertification extends CAllCertification
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li>
 	* <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
 	* значение "N" - права доступа не проверяются. </li> </ul> Перед названием
-	* фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
+	* фильтруемого поля можно указать тип фильтрации: <ul> <li>"!" - не равно
 	* </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
 	* </li> <li>"&gt;=" - больше либо равно </li> </ul> <br> "<i>значения фильтра</i>" -
 	* одиночное значение или массив. <br><br> Необязательный. По умолчанию
 	* записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $COURSE_ID = 100;<br>    $res = CCertification::GetList(<br>        Array("SUMMARY" =&gt; "DESC", "SORT"=&gt;"ASC"), <br>        Array("ACTIVE" =&gt; "Y", "COURSE_ID" =&gt; $COURSE_ID)<br>    );<br><br>    while ($arCertification = $res-&gt;GetNext())<br>    {<br>        echo "User:".$arCertification["USER_NAME"].<br>             "; Course name: ".$arCertification["COURSE_NAME"]."&lt;br&gt;";<br>    }<br>}<br>?&gt;&lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $COURSE_ID = 100;<br>    $res = CCertification::GetList(<br>        Array("SUMMARY" =&gt; "DESC", "SORT"=&gt;"ASC"), <br>        Array("ACTIVE" =&gt; "Y", "CHECK_PERMISSIONS" =&gt; "N")<br>    );<br><br>    while ($arCertification = $res-&gt;GetNext())<br>    {<br>        echo "User:".$arCertification["USER_NAME"].<br>             "; Course name: ".$arCertification["COURSE_NAME"]."&lt;br&gt;";<br>    }<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -113,7 +103,7 @@ class CCertification extends CAllCertification
 		}
 
 		$strSql =
-		"SELECT C.*, CER.*, C.NAME as COURSE_NAME, COURSEOLD.ID as COURSE_ID, "
+		"SELECT CER.*, C.NAME as COURSE_NAME, COURSEOLD.ID as COURSE_ID, "
 		. "COURSEOLD.ACTIVE_FROM as ACTIVE_FROM, COURSEOLD.ACTIVE_TO as ACTIVE_TO, COURSEOLD.RATING as RATING, "
 		. "COURSEOLD.RATING_TYPE as RATING_TYPE, COURSEOLD.SCORM as SCORM, "
 		. $DB->Concat("'('",'U.LOGIN',"') '","CASE WHEN U.NAME IS NULL THEN '' ELSE U.NAME END","' '", "CASE WHEN U.LAST_NAME IS NULL THEN '' ELSE U.LAST_NAME END")." as USER_NAME, U.ID as USER_ID, ".

@@ -2,9 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/searcher.php");
 
 /**
- * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>.</body> </html>
- *
- *
+ * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>. 
  *
  *
  * @return mixed 
@@ -43,8 +41,6 @@ class CSearcher extends CAllSearcher
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковых систем</a> и количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц) каждой из них за все время ведения статистики, за последние 3 дня, либо за указанный интервал времени.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_today_hits" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID поисковой
 	* системы; </li> <li> <b>s_date_last</b> - дата последнего хита; </li> <li> <b>s_today_hits</b> -
 	* количество хитов за сегодня; </li> <li> <b>s_yesterday_hits</b> - количество
@@ -56,12 +52,8 @@ class CSearcher extends CAllSearcher
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_useragent">UserAgent поисковой
 	* системы</a>. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID поисковой системы; </li>
@@ -87,22 +79,15 @@ class CSearcher extends CAllSearcher
 	* <b>USER_AGENT</b> будет искаться точное совпадение. </li> </ul> * - допускается
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка поисковых систем. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param mixed $limit = false Максимальное количество поисковых систем которые будут выбраны
 	* в списке. Если значение равно false, то кол-во РК будет ограничено в
 	* соответствии со значением параметра "Максимальное кол-во
 	* показываемых записей в таблицах" из настроек модуля "Статистика".
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -130,7 +115,6 @@ class CSearcher extends CAllSearcher
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -328,20 +312,12 @@ class CSearcher extends CAllSearcher
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_hit">хитов</a> (проиндексированных страниц), для указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системы</a> в разрезе по дням.</p>
 	*
 	*
-	*
-	*
 	* @param int $searcher_id  ID поисковой системы. </ht
-	*
-	*
 	*
 	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul><li> <b>s_date</b> - дата. </li></ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array &$max_min  Ссылка на массив содержащий максимальную и минимальную даты
 	* результирующего списка. Структура данного массива: <pre> Array (
@@ -352,17 +328,12 @@ class CSearcher extends CAllSearcher
 	* максимальной даты (1-12) [MAX_YEAR] =&gt; номер года для максимальной даты
 	* )</pre>
 	*
-	*
-	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>DATE1</b> - начальное значение
 	* интервала для поля "дата"; </li> <li> <b>DATE2</b> - конечное значение
 	* интервала для поля "дата". </li> </ul>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -394,7 +365,6 @@ class CSearcher extends CAllSearcher
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

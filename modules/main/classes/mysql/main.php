@@ -12,6 +12,7 @@ require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/main.ph
 
 class CMain extends CAllMain
 {
+	/** @deprecated */
 	public static function __GetConditionFName()
 	{
 		return "`CONDITION`";
@@ -247,72 +248,6 @@ class CMain extends CAllMain
 
 class CSite extends CAllSite
 {
-	public static function GetCurTemplate()
-	{
-		/** @noinspection PhpUnusedLocalVariableInspection */
-		global $DB, $APPLICATION, $USER, $CACHE_MANAGER;
-
-		if(CACHED_b_site_template===false)
-		{
-			$strSql = "
-				SELECT
-					".CMain::__GetConditionFName().",
-					TEMPLATE
-				FROM
-					b_site_template
-				WHERE
-					SITE_ID = '".SITE_ID."'
-				ORDER BY
-					if(length(".CMain::__GetConditionFName().")>0, 1, 2), SORT
-				";
-			$dbr = $DB->Query($strSql);
-			while($ar = $dbr->Fetch())
-			{
-				$strCondition = trim($ar["CONDITION"]);
-				if(strlen($strCondition)>0 && (!@eval("return ".$strCondition.";")))
-					continue;
-				if(($path = getLocalPath("templates/".$ar["TEMPLATE"], BX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
-					return $ar["TEMPLATE"];
-			}
-		}
-		else
-		{
-			if($CACHE_MANAGER->Read(CACHED_b_site_template, "b_site_template"))
-			{
-				$arSiteTemplateBySite = $CACHE_MANAGER->Get("b_site_template");
-			}
-			else
-			{
-				$dbr = $DB->Query("
-					SELECT
-						".CMain::__GetConditionFName().",
-						TEMPLATE,
-						SITE_ID
-					FROM
-						b_site_template
-					ORDER BY
-						SITE_ID, if(length(".CMain::__GetConditionFName().")>0, 1, 2), SORT
-				");
-				$arSiteTemplateBySite = array();
-				while($ar = $dbr->Fetch())
-					$arSiteTemplateBySite[$ar['SITE_ID']][]=$ar;
-				$CACHE_MANAGER->Set("b_site_template", $arSiteTemplateBySite);
-			}
-			if(is_array($arSiteTemplateBySite[SITE_ID]))
-			{
-				foreach($arSiteTemplateBySite[SITE_ID] as $ar)
-				{
-					$strCondition = trim($ar["CONDITION"]);
-					if(strlen($strCondition)>0 && (!@eval("return ".$strCondition.";")))
-						continue;
-					if(($path = getLocalPath("templates/".$ar["TEMPLATE"], BX_PERSONAL_ROOT)) !== false && is_dir($_SERVER["DOCUMENT_ROOT"].$path))
-						return $ar["TEMPLATE"];
-				}
-			}
-		}
-
-		return ".default";
-	}
 }
 
 class CFilterQuery extends CAllFilterQuery

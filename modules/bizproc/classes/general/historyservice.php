@@ -10,7 +10,13 @@ class CBPAllHistoryService
 
 	public function __construct()
 	{
-		$this->useGZipCompression = (function_exists("gzcompress") && ($GLOBALS["DB"]->type != "ORACLE" || !defined('BX_UTF')));
+		$useGZipCompressionOption = \Bitrix\Main\Config\Option::get("bizproc", "use_gzip_compression", "");
+		if ($useGZipCompressionOption === "Y")
+			$this->useGZipCompression = true;
+		elseif ($useGZipCompressionOption === "N")
+			$this->useGZipCompression = false;
+		else
+			$this->useGZipCompression = (function_exists("gzcompress") && ($GLOBALS["DB"]->type != "ORACLE" || !defined('BX_UTF')));
 	}
 
 	protected function ParseFields(&$arFields, $id = 0)
@@ -120,10 +126,9 @@ class CBPAllHistoryService
 		if ($ar = $db->Fetch())
 		{
 			$deleteFile = true;
-			$rsHandlers = GetModuleEvents("bizproc", "OnBeforeDeleteFileFromHistory");
-			while($arHandler = $rsHandlers->Fetch())
+			foreach(GetModuleEvents("bizproc", "OnBeforeDeleteFileFromHistory", true) as $event)
 			{
-				if(ExecuteModuleEventEx($arHandler, array($id, $documentId)) !== true)
+				if(ExecuteModuleEventEx($event, array($id, $documentId)) !== true)
 				{
 					$deleteFile = false;
 					break;
@@ -257,6 +262,23 @@ class CBPAllHistoryService
 			"WHERE DOCUMENT_ID = '".$DB->ForSql($arSecondDocumentId[2])."' ".
 			"	AND ENTITY = '".$DB->ForSql($arSecondDocumentId[1])."' ".
 			"	AND MODULE_ID = '".$DB->ForSql($arSecondDocumentId[0])."' "
+		);
+	}
+
+	public static function MigrateDocumentType($oldType, $newType, $workflowTemplateIds)
+	{
+		global $DB;
+
+		$arOldType = CBPHelper::ParseDocumentId($oldType);
+		$arNewType = CBPHelper::ParseDocumentId($newType);
+
+		$DB->Query(
+			"UPDATE b_bp_history SET ".
+			"	ENTITY = '".$DB->ForSql($arNewType[1])."', ".
+			"	MODULE_ID = '".$DB->ForSql($arNewType[0])."' ".
+			"WHERE ENTITY = '".$DB->ForSql($arOldType[1])."' ".
+			"	AND MODULE_ID = '".$DB->ForSql($arOldType[0])."' ".
+			"	AND DOCUMENT_ID IN (SELECT t.DOCUMENT_ID FROM b_bp_workflow_state t WHERE t.WORKFLOW_TEMPLATE_ID in (".implode(",", $workflowTemplateIds).") and t.MODULE_ID='".$DB->ForSql($arOldType[0])."' and t.ENTITY='".$DB->ForSql($arOldType[1])."') "
 		);
 	}
 }

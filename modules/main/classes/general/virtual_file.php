@@ -73,6 +73,35 @@ abstract class CBXVirtualDirectory
 	/**
 	 * @return CBXVirtualDirectoryFileSystem[] | CBXVirtualFileFileSystem[]
 	 */
+	
+	/**
+	* <p>Метод возвращает содержимое папки в виде массива. Элементами массива являются экземпляры классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualdirectory/index.php">CBXVirtualDirectory</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualfile/index.php">CBXVirtualFile</a>. Динамичный метод.</p> <a name="examples"></a>
+	*
+	*
+	* @return array 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $dir = $io-&gt;GetDirectory($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
+	* $arChildren = $dir-&gt;GetChildren();
+	* foreach ($arChildren as $child)
+	* {
+	*  if (!$child-&gt;IsDirectory())
+	*  {
+	*   echo "В папке есть файл ".$child-&gt;GetName()." размером ".$child-&gt;GetFileSize()."<br>";
+	*  }
+	*  if ($child-&gt;IsDirectory())
+	*  {
+	*   echo "В папке есть подпапка ".$child-&gt;GetName()."<br>";
+	*  }
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualdirectory/getchildren.php
+	* @author Bitrix
+	*/
 	public abstract function GetChildren();
 	public abstract function Create();
 }

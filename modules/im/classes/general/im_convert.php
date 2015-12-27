@@ -35,7 +35,7 @@ class CIMConvert
 				$arUsers = Array();
 				$arInsert = Array();
 				$CIMMessage = new CIMMessage(false, array(
-					'hide_link' => true
+					'HIDE_LINK' => 'Y'
 				));
 				$arMessages = $CIMMessage->GetLastSendMessage(Array(
 					'TO_USER_ID' => array_keys($arRecent[IM_MESSAGE_PRIVATE]),
@@ -64,16 +64,16 @@ class CIMConvert
 				foreach ($arInsert as $arAdd)
 					$DB->Add('b_im_recent', $arAdd);
 			}
-			if (isset($arRecent[IM_MESSAGE_GROUP]) && !empty($arRecent[IM_MESSAGE_GROUP]))
+			if (isset($arRecent[IM_MESSAGE_CHAT]) && !empty($arRecent[IM_MESSAGE_CHAT]))
 			{
 				$arChats = Array();
 				$arInsert = Array();
 
 				$CIMChat = new CIMChat(false, array(
-						'hide_link' => true
+					'HIDE_LINK' => 'Y'
 				));
 				$arMessagesGroup = $CIMChat->GetLastSendMessage(Array(
-					'CHAT_ID' => array_keys($arRecent[IM_MESSAGE_GROUP]),
+					'ID' => array_keys($arRecent[IM_MESSAGE_CHAT]),
 					'ORDER' => 'ASC',
 					'LIMIT' => 30,
 					'USE_TIME_ZONE' => 'N'
@@ -83,7 +83,7 @@ class CIMConvert
 					$arChats[] = $chatId;
 					$arInsert[$chatId] = Array(
 						'USER_ID' => $USER->GetId(),
-						'ITEM_TYPE' => IM_MESSAGE_GROUP,
+						'ITEM_TYPE' => IM_MESSAGE_CHAT,
 						'ITEM_ID' => $chatId,
 						'ITEM_MID' => $arMessage['id'],
 					);
@@ -91,7 +91,16 @@ class CIMConvert
 
 				if (!empty($arChats))
 				{
-					$strSql = "SELECT ITEM_ID FROM b_im_recent WHERE USER_ID = ".$USER->GetId()." AND ITEM_TYPE = '".IM_MESSAGE_GROUP."' AND ITEM_ID IN (".implode(',', $arChats).")";
+					$strSql = "
+						SELECT
+							ITEM_ID
+						FROM
+							b_im_recent
+						WHERE
+							USER_ID = ".$USER->GetId()."
+							AND ITEM_TYPE = '".IM_MESSAGE_CHAT."'
+							AND ITEM_ID IN (".implode(',', $arChats).")
+					";
 					$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 					while ($arRes = $dbRes->Fetch())
 						unset($arInsert[$arRes['ITEM_ID']]);

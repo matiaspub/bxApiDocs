@@ -308,7 +308,7 @@ class CSVUserImport
 			return true;
 		}
 
-		if (!array_key_exists("PASSWORD", $arFields) || strlen($arFields["PASSWORD"]) < 6)
+		if (!array_key_exists("PASSWORD", $arFields) || strlen($arFields["PASSWORD"]) < 1)
 			$arFields["PASSWORD"] = $this->GenerateUserPassword(6);
 		$arFields["CONFIRM_PASSWORD"] = $arFields["PASSWORD"];
 

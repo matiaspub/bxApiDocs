@@ -8,11 +8,11 @@
 namespace Bitrix\Seo\Engine;
 
 use Bitrix\Seo\Engine;
-use Bitrix\Seo\SearchEngineTable;
+use Bitrix\Seo\IEngine;
 use Bitrix\Main\Text\Converter;
 use Bitrix\Main\Web\Json;
 
-class Google extends Engine
+class Google extends Engine implements IEngine
 {
 	const ENGINE_ID = 'google';
 	const SCOPE_BASE = 'https://www.google.com/webmasters/tools/feeds/';
@@ -51,11 +51,6 @@ class Google extends Engine
 		return $this->scope;
 	}
 
-	public function getSettings()
-	{
-		return $this->engineSettings;
-	}
-
 	public function getAuthUrl()
 	{
 		return $this->getInterface()->getAuthUrl($this->engine['REDIRECT_URI']);
@@ -77,17 +72,6 @@ class Google extends Engine
 		}
 
 		return $this->authInterface;
-	}
-
-	public function getAuthSettings()
-	{
-		return $this->engineSettings['AUTH'];
-	}
-
-	public function clearAuthSettings()
-	{
-		unset($this->engineSettings['AUTH']);
-		$this->saveSettings();
 	}
 
 	public function setAuthSettings($settings = null)
@@ -433,7 +417,6 @@ EOT;
 	protected function processResult($res)
 	{
 		$obXml = new \CDataXML();
-
 		if($obXml->loadString($res))
 		{
 			$arEntries = $obXml->getTree()->elementsByName('entry');
@@ -449,7 +432,6 @@ EOT;
 				foreach ($entryChildren as $child)
 				{
 					$tag = $child->name();
-
 					switch($tag)
 					{
 						case 'category': break;
@@ -567,13 +549,6 @@ EOT;
 
 			return $http;
 		}
-	}
-
-	protected function saveSettings()
-	{
-		SearchEngineTable::update($this->engine['ID'], array(
-			'SETTINGS' => serialize($this->engineSettings)
-		));
 	}
 
 	protected function getSiteId($domain, $dir = '/')

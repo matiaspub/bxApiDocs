@@ -4,8 +4,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -16,9 +14,7 @@ class CAllCatalogImport
 {
 	
 	/**
-	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a>.</p>
-	*
-	*
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
@@ -26,8 +22,6 @@ class CAllCatalogImport
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a>;</li> <li>
 	* <b>UPDATE</b> - для метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/update.php">CCatalogImport::Update</a>.</li> </ul>
-	*
-	*
 	*
 	* @param array &$arFields  Ассоциативный массив параметров профиля импорта. Допустимые
 	* ключи: <ul> <li> <b>CREATED_BY</b> - ID пользователя, создавшего профиль;</li> <li>
@@ -47,11 +41,8 @@ class CAllCatalogImport
 	* пор, пока профиль не будет отредактирован, он выполняться не
 	* будет). </li> </ul>
 	*
-	*
-	*
 	* @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
 	* иначе - <i>false</i>.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogimport/add.php">CCatalogImport::Add</a></li>
@@ -149,14 +140,10 @@ class CAllCatalogImport
 
 	
 	/**
-	* <p>Функция удаляет профиль импорта с кодом ID. </p>
-	*
-	*
+	* <p>Метод удаляет профиль импорта с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код удаляемого профиля импорта.
-	*
-	*
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
 	* противном случае.</p> <br><br>
@@ -175,9 +162,7 @@ class CAllCatalogImport
 
 	
 	/**
-	* <p>Возвращает список профилей импорта по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
-	*
-	*
+	* <p>Возвращает список профилей импорта по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array("ID"=>"ASC") Массив, в соответствии с которым сортируются результирующие
@@ -203,8 +188,6 @@ class CAllCatalogImport
 	* элементу (т.е. сначала сортируется по первому элементу, потом
 	* результат сортируется по второму и т.д.).
 	*
-	*
-	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи профилей
 	* импорта. Массив имеет вид: <pre class="syntax">array(
 	* "[модификатор]название_поля1" =&gt; "значение1",
@@ -216,13 +199,9 @@ class CAllCatalogImport
 	* стоять любое поле профиля импорта, кроме <i>SETUP_VARS</i>, <i>TIMESTAMP_X</i> и
 	* <i>DATE_CREATE</i>.
 	*
-	*
-	*
 	* @param bool $bCount = false Если параметр равен <i>true</i>, то возвращается только количество
 	* профилей, которое соответствует установленному фильтру.
 	* Необязательный. По умолчанию равен <i>false</i>.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий коллекцию
 	* ассоциативных массивов с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
@@ -385,14 +364,10 @@ class CAllCatalogImport
 
 	
 	/**
-	* <p>Метод возвращает информацию о профиле импорта с заданным ID.</p>
-	*
-	*
+	* <p>Метод возвращает информацию о профиле импорта с заданным ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код записи.
-	*
-	*
 	*
 	* @return array <p>Метод возвращает ассоциативный массив параметров профиля с
 	* ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li> <b>FILE_NAME</b> - имя файла
@@ -441,14 +416,10 @@ class CAllCatalogImport
 
 	
 	/**
-	* <p>Метод выполняет профиль <i>profile_id</i> на агенте.</p>
-	*
-	*
+	* <p>Метод выполняет профиль <i>profile_id</i> на агенте. Метод динамичный.</p>
 	*
 	*
 	* @param int $profile_id  Код выполняемого профиля.
-	*
-	*
 	*
 	* @return mixed <p>В случае успешного выполнения профиля импорта метод возвращает
 	* строку для следующего вызова агента. В противном случае метод
@@ -484,7 +455,7 @@ class CAllCatalogImport
 		$bFirstLoadStep = true;
 
 		if (!defined("CATALOG_LOAD_NO_STEP"))
-			;// define("CATALOG_LOAD_NO_STEP", true);
+			// define("CATALOG_LOAD_NO_STEP", true);
 
 		$strImportErrorMessage = "";
 		$strImportOKMessage = "";

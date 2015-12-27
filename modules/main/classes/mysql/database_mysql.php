@@ -21,7 +21,7 @@ class CDatabase extends CDatabaseMysql
 		if(!$this->db_Conn)
 		{
 			$s = (DBPersistent && !$this->bNodeConnection? "mysql_pconnect" : "mysql_connect");
-			if($this->debug || (@session_start() && $_SESSION["SESS_AUTH"]["ADMIN"]))
+			if($this->debug || (isset($_SESSION["SESS_AUTH"]["ADMIN"]) && $_SESSION["SESS_AUTH"]["ADMIN"]))
 				echo "<br><font color=#ff0000>Error! ".$s."()</font><br>".mysql_error()."<br>";
 
 			SendError("Error! ".$s."()\n".mysql_error()."\n");
@@ -31,7 +31,7 @@ class CDatabase extends CDatabaseMysql
 
 		if(!mysql_select_db($this->DBName, $this->db_Conn))
 		{
-			if($this->debug || (@session_start() && $_SESSION["SESS_AUTH"]["ADMIN"]))
+			if($this->debug || (isset($_SESSION["SESS_AUTH"]["ADMIN"]) && $_SESSION["SESS_AUTH"]["ADMIN"]))
 				echo "<br><font color=#ff0000>Error! mysql_select_db(".$this->DBName.")</font><br>".mysql_error($this->db_Conn)."<br>";
 
 			SendError("Error! mysql_select_db(".$this->DBName.")\n".mysql_error($this->db_Conn)."\n");
@@ -59,13 +59,10 @@ class CDatabase extends CDatabaseMysql
 
 	
 	/**
-	* <p>Функция возвращает ID последней вставленной записи.</p> <p> </p>
-	*
-	*
+	* <p>Метод возвращает ID последней вставленной записи. Динамичный метод.</p> <p> </p>
 	*
 	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -81,7 +78,6 @@ class CDatabase extends CDatabaseMysql
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -101,22 +97,15 @@ class CDatabase extends CDatabaseMysql
 
 	
 	/**
-	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>.</p> <p> </p>
-	*
-	*
+	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>. Динамичный метод.</p> <p> </p>
 	*
 	*
 	* @param string $value  Исходная строка.
 	*
-	*
-	*
 	* @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
 	* обрезается).
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -133,7 +122,6 @@ class CDatabase extends CDatabaseMysql
 	* $w = $DB-&gt;Query($strSql, false, $err_mess.__LINE__);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -226,13 +214,10 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Функция возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ...").</p> <p class="note">Для Oracle версии данная функция будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
-	*
-	*
+	* <p>Метод возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ..."). Динамичный метод.</p> <p class="note"><b>Примечание</b>. Для Oracle версии данный метод будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
 	*
 	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -248,7 +233,6 @@ class CDBResult extends CDBResultMysql
 	* endif;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -274,13 +258,10 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Функция возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>.</p> <br>
-	*
-	*
+	* <p>Метод возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>. Динамичный метод.</p> <br>
 	*
 	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -315,7 +296,6 @@ class CDBResult extends CDBResultMysql
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php">CDBResult::SelectedRowsCount</a>
@@ -344,13 +324,10 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Функция возвращает количество полей результата выборки.</p>
-	*
-	*
+	* <p>Метод возвращает количество полей результата выборки. Динамичный метод.</p>
 	*
 	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -365,7 +342,6 @@ class CDBResult extends CDBResultMysql
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -387,17 +363,12 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Функция возвращает название поля по его номеру.</p>
-	*
-	*
+	* <p>Метод возвращает название поля по его номеру. Динамичный метод.</p>
 	*
 	*
 	* @param int $column  
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -412,7 +383,6 @@ class CDBResult extends CDBResultMysql
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

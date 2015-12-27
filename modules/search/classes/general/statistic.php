@@ -1,4 +1,15 @@
 <?
+
+/**
+ * Класс для работы со статистикой поиска. 
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/index.php
+ * @author Bitrix
+ */
 class CSearchStatistic
 {
 	var $phrase_id = 0;
@@ -91,6 +102,51 @@ class CSearchStatistic
 		}
 	}
 
+	
+	/**
+	* <p>Метод возвращает список поисковых фраз. Метод динамичный.</p>
+	*
+	*
+	* @param array $arOrder = false Массив, содержащий признак сортировки в виде наборов "название
+	* поля"=&gt;"направление". Название поля может принимать значение
+	* названия любого из полей <a
+	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
+	* статистики</a>. Необязательный параметр. <br><br> Значение по
+	* умолчанию - <i>false</i> - означает, что результат отсортирован не
+	* будет.
+	*
+	* @param array $arFilter = false Массив, содержащий поля для выборки. Можно указать только те поля,
+	* которые необходимы. Необязательный параметр. <br><br> Значение по
+	* умолчанию - <i>false</i> - означает, что будут возвращены все поля
+	* основной таблицы запроса.
+	*
+	* @param array $arSelect = false Массив, содержащий фильтр в виде наборов "название
+	* поля"=&gt;"значение фильтра". Название поля может принимать
+	* значение названия любого из полей <a
+	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
+	* статистики</a>. Необязательный параметр. <br><br> Значение по
+	* умолчанию - <i>false</i> - означает, что результат отфильтрован не
+	* будет.
+	*
+	* @param array $bGroup = false Массив полей, по которым группируются поисковые фразы. Массив
+	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
+	* качестве "название_поля<i>N</i>" может стоять любое поле <a
+	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
+	* статистики</a>. Необязательный параметр. <br> Если массив пустой, то
+	* метод вернет число записей, удовлетворяющих фильтру. При <i>bGroup =
+	* true</i> в <i>arOrder</i> можно передать <i>COUNT</i> для сортировки по
+	* количеству.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	* результат группироваться не будет.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступными поля,
+	* перечисленные в параметре arSelect.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = false, $arFilter = false, $arSelect = false, $bGroup = false)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
@@ -217,6 +273,12 @@ class CSearchStatistic
 				"FIELD_TYPE" => "int",
 				"JOIN" => false,
 			),
+			"RESULT_COUNT" => array(
+				"TABLE_ALIAS" => "sph",
+				"FIELD_NAME" => "sph.RESULT_COUNT",
+				"FIELD_TYPE" => "int",
+				"JOIN" => false,
+			),
 		));
 
 		if(count($arQuerySelect) < 1)
@@ -274,8 +336,7 @@ class CSearchStatistic
 	public static function IsActive()
 	{
 		$bActive = false;
-		$rsEvents = GetModuleEvents("main", "OnEpilog");
-		while($arEvent = $rsEvents->Fetch())
+		foreach (GetModuleEvents("main", "OnEpilog", true) as $arEvent)
 		{
 			if(
 				$arEvent["TO_MODULE_ID"] == "search"

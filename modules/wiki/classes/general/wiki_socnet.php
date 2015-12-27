@@ -3,9 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть».</body> </html>
- *
- *
+ * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть». 
  *
  *
  * @return mixed 
@@ -28,21 +26,14 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод инициализирует интеграцию.</p>
-	*
-	*
+	* <p>Метод инициализирует интеграцию. Статичный метод.</p>
 	*
 	*
 	* @param int $SOCNET_GROUP_ID  Идентификатор рабочей группы соц. сети
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Идентификатор инфо.блока
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -62,7 +53,7 @@ class CWikiSocnet
 		if (!self::IsEnabledSocnet())
 			return false;
 
-		self::$iSocNetId = $SOCNET_GROUP_ID;
+		self::$iSocNetId = intVal($SOCNET_GROUP_ID);
 
 		// detect work group
 		$arFilter = Array();
@@ -115,9 +106,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод проверяет включена ли интеграция.</p> <br><br>
-	*
-	*
+	* <p>Метод проверяет включена ли интеграция. Статичный метод.</p> <br><br>
 	*
 	*
 	* @return bool 
@@ -147,9 +136,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод проверяет находится ли модуль в режиме интеграции.</p> <br><br><br>
-	*
-	*
+	* <p>Метод проверяет находится ли модуль в режиме интеграции. Статичный метод.</p> <br><br>
 	*
 	*
 	* @return bool 
@@ -165,14 +152,10 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод инициализирует интеграцию.</p>
-	*
-	*
+	* <p>Метод инициализирует интеграцию. Статичный метод.</p>
 	*
 	*
 	* @param bool $bActive  true – включает интеграцию, false – отключает интеграцию
-	*
-	*
 	*
 	* @return void 
 	*
@@ -240,6 +223,8 @@ class CWikiSocnet
 						"OPERATION" => "view",
 						"OPERATION_ADD" => "view",
 						"ADD_CALLBACK" => array("CWikiSocnet", "AddComment_Wiki"),
+						"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
+						"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
 						"CLASS_FORMAT" => "CWikiSocnet",
 						"METHOD_FORMAT" => "FormatComment_Wiki"
 					)
@@ -310,7 +295,7 @@ class CWikiSocnet
 				'group_wiki_post_history_diff' => 'group/#group_id#/wiki/#wiki_name#/history/diff/',
 				'group_wiki_post_discussion' => 'group/#group_id#/wiki/#wiki_name#/discussion/',
 				'group_wiki_post_category' => 'group/#group_id#/wiki/#wiki_name#/',
-				'group_wiki_post_comment' => 'wiki/comment/#message_id#/'
+				'group_wiki_post_comment' => 'group/#group_id#/wiki/#wiki_name#/?MID=#message_id##message#message_id#'
 			);
 		}
 
@@ -537,9 +522,9 @@ class CWikiSocnet
 					"USER" => "Y"
 				);
 
-				$parserLog->pathToUser = $arParams["PATH_TO_USER"];
+				$parserLog->pathToUser = $parserLog->userPath = $arParams["PATH_TO_USER"];
 				$parserLog->arUserfields = $arFields["UF"];
-
+				$parserLog->bMobile = ($arParams["MOBILE"] == "Y");
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
 			}
 			else
@@ -637,10 +622,21 @@ class CWikiSocnet
 			);
 			$db_res = CIBlockElement::GetList(array(), $arFilter, false, false, $arSelectedFields);
 			if ($db_res && $res = $db_res->GetNext())
+			{
 				$arElement = $res;
+			}
 
 			if ($arElement)
 			{
+				if (
+					isset($arFields["ENTITY_TYPE"])
+					&& isset($arFields["ENTITY_ID"])
+				)
+				{
+					$arElement["ENTITY_TYPE"] = $arFields["ENTITY_TYPE"];
+					$arElement["ENTITY_ID"] = $arFields["ENTITY_ID"];
+				}
+
 				// check iblock properties
 				CSocNetLogTools::AddComment_Review_CheckIBlock($arElement);
 
@@ -830,6 +826,54 @@ class CWikiSocnet
 	public static function __ProcessPath($arUrl, $user_id)
 	{
 		return CSocNetLogTools::ProcessPath($arUrl, $user_id);
+	}
+	
+	public static function BeforeIndexSocNet($bxSocNetSearch, $arFields)
+	{
+		static $isSonetEnable = false;
+		static $sonetForumId = false;
+		
+		if (!$isSonetEnable)
+		{
+			$isSonetEnable = COption::GetOptionString('wiki', 'socnet_enable');	
+		}
+
+		if (!$sonetForumId)
+		{
+			$sonetForumId = intval(COption::GetOptionString('wiki', 'socnet_forum_id'));
+		}
+
+		if(
+			$arFields['ENTITY_TYPE_ID'] == 'FORUM_POST' 
+			&& $isSonetEnable == 'Y'
+			&& intval($arFields['PARAM1']) == $sonetForumId
+			&& CModule::IncludeModule("socialnetwork")
+		)
+		{
+			if($bxSocNetSearch->_group_id)
+			{
+				$arFields = $bxSocNetSearch->BeforeIndexForum(
+					$arFields,
+					SONET_ENTITY_GROUP, 
+					$bxSocNetSearch->_group_id,
+					"wiki", 
+					"view",
+					$bxSocNetSearch->Url(
+						str_replace(
+							"#wiki_name#",
+							urlencode($arFields["TITLE"]),
+							$bxSocNetSearch->_params["PATH_TO_GROUP_WIKI_POST_COMMENT"]
+						),
+						array(
+							"MID" => "#message_id#"
+						), 
+						"message#message_id#"
+					)
+				);
+			}
+		}
+
+		return $arFields;
 	}
 }
 ?>

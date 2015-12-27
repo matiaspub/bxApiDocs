@@ -26,7 +26,7 @@ abstract class Response
 
 	}
 
-	public function flush($text)
+	public function flush($text = '')
 	{
 		$this->writeHeaders();
 		$this->writeBody($text);
@@ -34,7 +34,7 @@ abstract class Response
 
 	protected abstract function writeHeaders();
 
-	private function writeBody($text)
+	protected function writeBody($text)
 	{
 		echo $text;
 	}

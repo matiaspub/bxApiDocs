@@ -1,19 +1,9 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Currency;
 
+Loc::loadMessages(__FILE__);
 
-/**
- * <b>CCurrencyLang</b> - класс для работы с языкозависимыми параметрами валют (название, формат и пр.)</body> </html>
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/index.php
- * @author Bitrix
- */
 class CAllCurrencyLang
 {
 	const SEP_EMPTY = 'N';
@@ -45,9 +35,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция служит для возвращения после вызова метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/disableusehidezero.php">CurrencyLang::disableUseHideZero</a> в исходное состояние использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>.</p>
-	*
-	*
+	* <p>Метод служит для возвращения после вызова метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/disableusehidezero.php">CurrencyLang::disableUseHideZero</a> в исходное состояние использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Метод статический.</p>
 	*
 	*
 	* @return mixed <p>Нет.</p></bo<br><br>
@@ -65,9 +53,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция служит для временного отключения использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Для возвращения в исходное состояние необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/enableusehidezero.php">CCurrencyLang::enableUseHideZero</a>.</p>
-	*
-	*
+	* <p>Метод служит для временного отключения использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Для возвращения в исходное состояние необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/enableusehidezero.php">CCurrencyLang::enableUseHideZero</a>. Метод статический.</p>
 	*
 	*
 	* @return mixed <p>Нет.</p></bo<br><br>
@@ -85,9 +71,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Метод проверяет снят ли флаг, запрещающий использование настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>.</p>
-	*
-	*
+	* <p>Метод проверяет снят ли флаг, запрещающий использование настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Метод статический.</p>
 	*
 	*
 	* @return bool <p>Если флаг снят, то метод возвращает <i>true</i>, в противном случае -
@@ -119,8 +103,8 @@ class CAllCurrencyLang
 			if (isset($fields['LID']))
 				$language = $fields['LID'];
 		}
-		$currency = CCurrency::checkCurrencyID($currency);
-		$language = self::checkLanguage($language);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
+		$language = Currency\CurrencyManager::checkLanguage($language);
 		if ($currency === false || $language === false)
 			return false;
 
@@ -133,7 +117,14 @@ class CAllCurrencyLang
 			'DATE_CREATE',
 			'~DATE_CREATE',
 			'~MODIFIED_BY',
-			'~CREATED_BY'
+			'~CREATED_BY',
+			'~FORMAT_STRING',
+			'~FULL_NAME',
+			'~DEC_POINT',
+			'~THOUSANDS_SEP',
+			'~DECIMALS',
+			'~THOUSANDS_VARIANT',
+			'~HIDE_ZERO'
 		);
 		if ($action == 'UPDATE')
 		{
@@ -160,7 +151,7 @@ class CAllCurrencyLang
 			if (!isset($fields['FORMAT_STRING']) || empty($fields['FORMAT_STRING']))
 			{
 				$errorMessages[] = array(
-					'id' => 'FORMAT_STRING', 'text' => GetMessage('BT_CUR_LANG_ERR_FORMAT_STRING_IS_EMPTY', array('#LANG#' => $language))
+					'id' => 'FORMAT_STRING', 'text' => Loc::getMessage('BT_CUR_LANG_ERR_FORMAT_STRING_IS_EMPTY', array('#LANG#' => $language))
 				);
 			}
 
@@ -175,7 +166,7 @@ class CAllCurrencyLang
 			if (isset($fields['FORMAT_STRING']) && empty($fields['FORMAT_STRING']))
 			{
 				$errorMessages[] = array(
-					'id' => 'FORMAT_STRING', 'text' => GetMessage('BT_CUR_LANG_ERR_FORMAT_STRING_IS_EMPTY', array('#LANG#' => $language))
+					'id' => 'FORMAT_STRING', 'text' => Loc::getMessage('BT_CUR_LANG_ERR_FORMAT_STRING_IS_EMPTY', array('#LANG#' => $language))
 				);
 			}
 			if (isset($fields['DECIMALS']))
@@ -187,25 +178,19 @@ class CAllCurrencyLang
 			if (isset($fields['THOUSANDS_VARIANT']))
 			{
 				if (empty($fields['THOUSANDS_VARIANT']) || !isset(self::$arSeparators[$fields['THOUSANDS_VARIANT']]))
-				{
 					$fields['THOUSANDS_VARIANT'] = false;
-				}
 				else
-				{
 					$fields['THOUSANDS_SEP'] = false;
-				}
 			}
 			if (isset($fields['HIDE_ZERO']))
-			{
 				$fields['HIDE_ZERO'] = ($fields['HIDE_ZERO'] == 'Y' ? 'Y' : 'N');
-			}
 		}
 		$intUserID = 0;
 		$boolUserExist = CCurrency::isUserExists();
 		if ($boolUserExist)
 			$intUserID = (int)$USER->GetID();
 		$strDateFunction = $DB->GetNowFunction();
-		$fields['~DATE_UPDATE'] = $strDateFunction;
+		$fields['~TIMESTAMP_X'] = $strDateFunction;
 		if ($boolUserExist)
 		{
 			if (!isset($fields['MODIFIED_BY']))
@@ -230,9 +215,7 @@ class CAllCurrencyLang
 		if (!empty($errorMessages))
 		{
 			if ($getErrors)
-			{
 				return $errorMessages;
-			}
 
 			$obError = new CAdminException($errorMessages);
 			$APPLICATION->ResetException();
@@ -244,9 +227,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция добавляет новые языкозависимые параметры валюты.</p>
-	*
-	*
+	* <p>Метод добавляет новые языкозависимые параметры валюты. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив параметров валюты, ключами которого
@@ -263,11 +244,8 @@ class CAllCurrencyLang
 	* в дробной части (результат будет виден только в публичной
 	* части).</p>
 	*
-	*
-	*
 	* @return bool <p>Возвращает значение True в случае успешного добавления и False - в
 	* противном случае </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -281,7 +259,7 @@ class CAllCurrencyLang
 	*/
 	static public function Add($arFields)
 	{
-		global $DB, $stackCacheManager, $CACHE_MANAGER;
+		global $DB;
 
 		if (!self::checkFields('ADD', $arFields))
 			return false;
@@ -291,28 +269,20 @@ class CAllCurrencyLang
 		$strSql = "insert into b_catalog_currency_lang(".$arInsert[0].") values(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$stackCacheManager->Clear("currency_currency_lang");
-		$CACHE_MANAGER->Clean("currency_currency_list");
-		$CACHE_MANAGER->Clean("currency_currency_list_".$arFields['LID']);
+		Currency\CurrencyManager::clearCurrencyCache($arFields['LID']);
 
 		return true;
 	}
 
 	
 	/**
-	* <p>Функция обновляет языкозависимые параметры валюты currency для языка lang.</p>
-	*
-	*
+	* <p>Метод обновляет языкозависимые параметры валюты currency для языка lang. Метод динамичный.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужно обновить.
 	*
-	*
-	*
 	* @param string $lang  Код языка, для которого языкозависимые параметры валюты нужно
 	* обновить.
-	*
-	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив новых параметров валюты, ключами которого
 	* являются названия параметров, а значениями - значения
@@ -325,11 +295,8 @@ class CAllCurrencyLang
 	* определяет скрывать или показывать незначащие нули в дробной
 	* части (результат будет виден только в публичной части). </p>
 	*
-	*
-	*
 	* @return bool <p>Возвращает значение True в случае успешного добавления и False - в
 	* противном случае</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -343,10 +310,10 @@ class CAllCurrencyLang
 	*/
 	static public function Update($currency, $lang, $arFields)
 	{
-		global $DB, $stackCacheManager, $CACHE_MANAGER;
+		global $DB;
 
-		$currency = CCurrency::checkCurrencyID($currency);
-		$lang = self::checkLanguage($lang);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
+		$lang = Currency\CurrencyManager::checkLanguage($lang);
 		if ($currency === false || $lang === false)
 			return false;
 
@@ -359,9 +326,7 @@ class CAllCurrencyLang
 			$strSql = "update b_catalog_currency_lang set ".$strUpdate." where CURRENCY = '".$DB->ForSql($currency)."' and LID='".$DB->ForSql($lang)."'";
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			$stackCacheManager->Clear("currency_currency_lang");
-			$CACHE_MANAGER->Clean("currency_currency_list");
-			$CACHE_MANAGER->Clean("currency_currency_list_".$lang);
+			Currency\CurrencyManager::clearCurrencyCache($lang);
 		}
 
 		return true;
@@ -369,20 +334,14 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция удаляет языкозависимые свойства валюты currency для языка lang</p>
-	*
-	*
+	* <p>Метод удаляет языкозависимые свойства валюты currency для языка lang. Метод динамичный.</p>
 	*
 	*
 	* @param string $currency  Код валюты для удаления.
 	*
-	*
-	*
 	* @param string $lang  Код языка.
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает True в случае успешного удаления и False - в
+	* @return bool <p>Метод возвращает True в случае успешного удаления и False - в
 	* противном случае.</p> <br><br>
 	*
 	* @static
@@ -391,16 +350,14 @@ class CAllCurrencyLang
 	*/
 	static public function Delete($currency, $lang)
 	{
-		global $DB, $stackCacheManager, $CACHE_MANAGER;
+		global $DB;
 
-		$currency = CCurrency::checkCurrencyID($currency);
-		$lang = self::checkLanguage($lang);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
+		$lang = Currency\CurrencyManager::checkLanguage($lang);
 		if ($currency === false || $lang === false)
 			return false;
 
-		$stackCacheManager->Clear("currency_currency_lang");
-		$CACHE_MANAGER->Clean("currency_currency_list");
-		$CACHE_MANAGER->Clean("currency_currency_list_".$lang);
+		Currency\CurrencyManager::clearCurrencyCache($lang);
 
 		$strSql = "delete from b_catalog_currency_lang where CURRENCY = '".$DB->ForSql($currency)."' and LID = '".$DB->ForSql($lang)."'";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -410,21 +367,26 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция возвращает массив языкозависимых параметров валюты currency для языка lang.</p>
-	*
-	*
+	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang. Метод динамичный.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужны.
 	*
-	*
-	*
 	* @param string $lang  Код языка.
 	*
-	*
-	*
 	* @return array <p>Ассоциативный массив с ключами</p> <table width="100%" class="tnormal"><tbody> <tr> <th
-	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENCY</td> <td>Код валюты
+	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENC
+/**
+ * <b>CCurrencyLang</b> - класс для работы с языкозависимыми параметрами валют (название, формат и пр.) 
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/index.php
+ * @author Bitrix
+ */
+Y</td> <td>Код валюты
 	* (трехсимвольный).</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr>
 	* <td>FORMAT_STRING</td> <td>Строка формата, в соответствии с которой выводится
 	* суммы в этой валюте на этом языке.</td> </tr> <tr> <td>FULL_NAME</td> <td>Полное
@@ -435,7 +397,6 @@ class CAllCurrencyLang
 	* Определяет скрывать или показывать незначащие нули в дробной
 	* части (результат будет виден только в публичной части).</td> </tr>
 	* </tbody></table> <p></p><a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -451,8 +412,8 @@ class CAllCurrencyLang
 	{
 		global $DB;
 
-		$currency = CCurrency::checkCurrencyID($currency);
-		$lang = self::checkLanguage($lang);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
+		$lang = Currency\CurrencyManager::checkLanguage($lang);
 		if ($currency === false || $lang === false)
 			return false;
 
@@ -467,18 +428,12 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Функция возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Функция аналогична функции <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в функции CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов функции с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. </p>
-	*
-	*
+	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Метод аналогичен методу <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в методе CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов метода с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. Метод динамичный.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужны.
 	*
-	*
-	*
 	* @param string $lang = LANGUAGE_ID Код языка. Необязательный параметр.
-	*
-	*
 	*
 	* @return array <p>Ассоциативный массив с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
 	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENCY</td> <td>Код валюты
@@ -492,7 +447,6 @@ class CAllCurrencyLang
 	* Определяет скрывать или показывать незначащие нули в дробной
 	* части (результат будет виден только в публичной части).</td> </tr> </table>
 	* <p></p><a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -620,11 +574,11 @@ class CAllCurrencyLang
 		if ($boolFull)
 		{
 			return array(
-				self::SEP_EMPTY => GetMessage('BT_CUR_LANG_SEP_VARIANT_EMPTY'),
-				self::SEP_DOT => GetMessage('BT_CUR_LANG_SEP_VARIANT_DOT'),
-				self::SEP_COMMA => GetMessage('BT_CUR_LANG_SEP_VARIANT_COMMA'),
-				self::SEP_SPACE => GetMessage('BT_CUR_LANG_SEP_VARIANT_SPACE'),
-				self::SEP_NBSPACE => GetMessage('BT_CUR_LANG_SEP_VARIANT_NBSPACE')
+				self::SEP_EMPTY => Loc::getMessage('BT_CUR_LANG_SEP_VARIANT_EMPTY'),
+				self::SEP_DOT => Loc::getMessage('BT_CUR_LANG_SEP_VARIANT_DOT'),
+				self::SEP_COMMA => Loc::getMessage('BT_CUR_LANG_SEP_VARIANT_COMMA'),
+				self::SEP_SPACE => Loc::getMessage('BT_CUR_LANG_SEP_VARIANT_SPACE'),
+				self::SEP_NBSPACE => Loc::getMessage('BT_CUR_LANG_SEP_VARIANT_NBSPACE')
 			);
 		}
 		return array(
@@ -699,7 +653,7 @@ class CAllCurrencyLang
 
 		if (in_array('RUB', $installCurrencies))
 		{
-			$rubTitle = GetMessage('BT_CUR_LANG_CURRENCY_RUBLE');
+			$rubTitle = Loc::getMessage('BT_CUR_LANG_CURRENCY_RUBLE');
 			$templates[] = array(
 				'TEXT' => '3.456,70 '.$rubTitle,
 				'FORMAT' => '# '.$rubTitle,
@@ -771,18 +725,12 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Форматирует цену в соответствии с настройками валюты. В случае вызова в административной части дополнительно выполняет очистку формата от тегов и скриптов. Если метод вызывается в публичной части, то будет задействован параметр HIDE_ZERO, который отвечает за скрытие незначащих нулей в дробной части.</p> <p><b>Примечание:</b> используется взамен функций <a href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformat.php">CurrencyFormat</a> и <a href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformatnumber.php">CurrencyFormatNumber</a>, которые считаются устаревшими с версии модуля <b>14.0.0</b>. </p>
-	*
-	*
+	* <p>Форматирует цену в соответствии с настройками валюты. В случае вызова в административной части дополнительно выполняет очистку формата от тегов и скриптов. Если метод вызывается в публичной части, то будет задействован параметр HIDE_ZERO, который отвечает за скрытие незначащих нулей в дробной части. Метод статический.</p> <p></p> <div class="note"> <b>Примечание:</b> используется взамен функций <a href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformat.php">CurrencyFormat</a> и <a href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformatnumber.php">CurrencyFormatNumber</a>, которые считаются устаревшими с версии модуля <b>14.0.0</b>. </div>
 	*
 	*
 	* @param float $price  Цена (денежная сумма), которую нужно сконвертировать.
 	*
-	*
-	*
 	* @param string $currency  Код валюты.
-	*
-	*
 	*
 	* @param bool $useTemplate  Если указано <i>true</i>, то работает как <a
 	* href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformat.php">CurrencyFormat</a> и вызывается
@@ -790,32 +738,38 @@ class CAllCurrencyLang
 	* Если задано <i>false</i>, то работает как <a
 	* href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformatnumber.php">CurrencyFormatNumber</a>.
 	*
-	*
-	*
 	* @return string <p>Возвращает отформатированную строку.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/currencyformat.php
 	* @author Bitrix
 	*/
-	public static function CurrencyFormat($price, $currency, $useTemplate)
+	public static function CurrencyFormat($price, $currency, $useTemplate = true)
 	{
+		static $eventExists = null;
+
 		$result = '';
 		$useTemplate = !!$useTemplate;
 		if ($useTemplate)
 		{
-			foreach(GetModuleEvents('currency', 'CurrencyFormat', true) as $arEvent)
+			if ($eventExists === true || $eventExists === null)
 			{
-				$result = ExecuteModuleEventEx($arEvent, array($price, $currency));
+				foreach (GetModuleEvents('currency', 'CurrencyFormat', true) as $arEvent)
+				{
+					$eventExists = true;
+					$result = ExecuteModuleEventEx($arEvent, array($price, $currency));
+					if ($result != '')
+						return $result;
+				}
+				if ($eventExists === null)
+					$eventExists = false;
 			}
 		}
-		if ($result != '')
-			return $result;
 
 		if (!isset($price) || $price === '')
 			return '';
 
-		$currency = CCurrency::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return '';
 
@@ -839,15 +793,14 @@ class CAllCurrencyLang
 
 	public static function checkLanguage($language)
 	{
-		$language = (string)$language;
-		return ($language === '' || strlen($language) > 2 ? false : $language);
+		return Currency\CurrencyManager::checkLanguage($language);
 	}
 
 	public static function isExistCurrencyLanguage($currency, $language)
 	{
 		global $DB;
-		$currency = CCurrency::checkCurrencyID($currency);
-		$language = self::checkLanguage($language);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
+		$language = Currency\CurrencyManager::checkLanguage($language);
 		if ($currency === false || $language === false)
 			return false;
 		$query = "select LID from b_catalog_currency_lang where CURRENCY = '".$DB->ForSql($currency)."' and LID = '".$DB->ForSql($language)."'";
@@ -863,5 +816,9 @@ class CAllCurrencyLang
 	{
 		return ($value !== null);
 	}
+}
+
+class CCurrencyLang extends CAllCurrencyLang
+{
 }
 ?>

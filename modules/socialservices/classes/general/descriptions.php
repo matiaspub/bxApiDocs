@@ -21,6 +21,12 @@ class CSocServDescription
 				"ICON" => "facebook",
 			),
 			array(
+				"ID" => "YandexOAuth",
+				"CLASS" => "CSocServYandexAuth",
+				"NAME" => GetMessage("socserv_openid_yandex"),
+				"ICON" => "yandex",
+			),
+			array(
 				"ID" => "MyMailRu",
 				"CLASS" => "CSocServMyMailRu",
 				"NAME" => GetMessage("socserv_mailru_name"),
@@ -35,7 +41,7 @@ class CSocServDescription
 			array(
 				"ID" => "YandexOpenID",
 				"CLASS" => "CSocServYandex",
-				"NAME" => GetMessage("socserv_openid_yandex"),
+				"NAME" => GetMessage("socserv_openid_yandex_openid"),
 				"ICON" => "yandex",
 			),
 			array(
@@ -85,7 +91,7 @@ class CSocServDescription
 				"ID" => "GooglePlusOAuth",
 				"CLASS" => "CSocServGooglePlusOAuth",
 				"NAME" => "Google+",
-				"ICON" => "google",
+				"ICON" => "google-plus",
 			),
 			array(
 				"ID" => "LiveIDOAuth",
@@ -98,6 +104,18 @@ class CSocServDescription
 				"CLASS" => "CSocServOdnoklassniki",
 				"NAME" => GetMessage("socserv_odnoklassniki_name"),
 				"ICON" => "odnoklassniki",
+			),
+			array(
+				"ID" => "Dropbox",
+				"CLASS" => "CSocServDropboxAuth",
+				"NAME" => "Dropbox",
+				"ICON" => "dropbox",
+			),
+			array(
+				"ID" => "Box",
+				"CLASS" => "CSocServBoxAuth",
+				"NAME" => "Box.com",
+				"ICON" => "box",
 			),
 		);
 	}

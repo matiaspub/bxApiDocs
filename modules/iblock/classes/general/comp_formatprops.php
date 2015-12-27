@@ -5,29 +5,22 @@ class CIBlockFormatProperties
 {
 	
 	/**
-	* <p>Метод помогает компонентам показать значения свойства элемента. Вынесен в модуль для унификации отображения.</p>
-	*
-	*
+	* <p>Метод помогает компонентам показать значения свойства элемента. Вынесен в модуль для унификации отображения. Метод статический.</p>
 	*
 	*
 	* @param array $arItem  Массив полей элемента.
 	*
-	*
-	*
 	* @param array $arProperty  Массив полей свойства (как его возвращает метод <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getproperty.php">CIBlockElement::GetProperty</a>).
-	*
-	*
 	*
 	* @param string $event1  Метка для создания события перехода по ссылке в случае, когда
 	* установлен модуль <b>Веб-аналитика</b>.
 	*
-	*
-	*
-	* @return array <p>Массив полей элемента.</p> <h4>Примечание</h4><p>Метод в поле DISPLAY_VALUE
-	* выводит только активные по дате элементы (используется фильтр на
-	* уровне ядра, поэтому вывести ссылки на неактивные элементы не
-	* получится стандартными средствами). </p> <br><br>
+	* @return array <p>Массив полей элемента.</p> <p></p><div class="note"> <b>Примечание:</b> метод в
+	* поле DISPLAY_VALUE выводит только активные по дате элементы
+	* (используется фильтр на уровне ядра, поэтому вывести ссылки на
+	* неактивные элементы не получится стандартными средствами). </div>
+	* <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockformatproperties/getdisplayvalue.php
@@ -206,20 +199,14 @@ class CIBlockFormatProperties
 	 */
 	
 	/**
-	* <p>Конвертирует дату в нужный формат. Доступные форматы можно посмотреть, вызвав <b>CIBlockParameters::GetDateFormat</b>.</p> <p><b>Примечание:</b> является функцией-оберткой для <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/formatdate.php">FormatDate</a>.</p>
-	*
-	*
+	* <p>Конвертирует дату в нужный формат. Доступные форматы можно посмотреть, вызвав <b>CIBlockParameters::GetDateFormat</b>. Метод статический.</p> <p></p> <div class="note"> <b>Примечание:</b> является функцией-оберткой для <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/formatdate.php">FormatDate</a>.</div>
 	*
 	*
 	* @param string $format  Формат даты/времени. Может дополнительно принимать 2 значения:
 	* <i>SHORT</i> и <i>FULL</i> (для них берется формат даты или времени для
 	* сайта).
 	*
-	*
-	*
 	* @param string $timestamp  Метка времени в Unix формате.
-	*
-	*
 	*
 	* @return string <p>Отформатированная строка.</p> <br><br>
 	*

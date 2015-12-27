@@ -2,7 +2,12 @@
 /**
  * IM_REVISION
  */
-define('IM_REVISION', 42);
+define('IM_REVISION', 61);
+
+/**
+ * IM_MOBILE_REVISION
+ */
+define('IM_MOBILE_REVISION', 3);
 
 /**
  * IM_MESSAGE_SYSTEM
@@ -15,9 +20,14 @@ define('IM_MESSAGE_SYSTEM', "S");
 define('IM_MESSAGE_PRIVATE', "P");
 
 /**
- * IM_MESSAGE_GROUP
+ * IM_MESSAGE_CHAT
  */
-define('IM_MESSAGE_GROUP', "G");
+define('IM_MESSAGE_CHAT', "C");
+
+/**
+ * IM_MESSAGE_OPEN
+ */
+define('IM_MESSAGE_OPEN', "O");
 
 /**
  * IM_NOTIFY_CONFIRM
@@ -130,19 +140,29 @@ define('IM_SPEED_MESSAGE', 2);
 define('IM_SPEED_GROUP', 3);
 
 /**
- * IM_FEATURE_DESKTOP
+ * IM_NOTIFY_FEATURE_SITE
  */
-define('IM_FEATURE_DESKTOP', "DESKTOP");
+define('IM_NOTIFY_FEATURE_SITE', "site");
 
 /**
- * IM_FEATURE_XMPP
+ * IM_NOTIFY_FEATURE_XMPP
  */
-define('IM_FEATURE_XMPP', "XMPP");
+define('IM_NOTIFY_FEATURE_XMPP', "xmpp");
 
 /**
- * IM_FEATURE_MAIL
+ * IM_NOTIFY_FEATURE_MAIL
  */
-define('IM_FEATURE_MAIL', "MAIL");
+define('IM_NOTIFY_FEATURE_MAIL', "mail");
+
+/**
+ * IM_NOTIFY_FEATURE_PUSH
+ */
+define('IM_NOTIFY_FEATURE_PUSH', "push");
+
+/**
+ * IM_MESSAGE_GROUP
+ */
+define('IM_MESSAGE_GROUP', "C");
 
 
 ?>

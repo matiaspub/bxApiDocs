@@ -54,7 +54,13 @@ class CCatalogStoreControlUtil
 		if($elementId <= 0)
 			return $result;
 
-		$dbProduct = CIBlockElement::GetList(array(), array("ID" => $elementId), false, false, array('ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'DETAIL_PICTURE', 'PREVIEW_PICTURE', 'IBLOCK_TYPE_ID', 'NAME'));
+		$dbProduct = CIBlockElement::GetList(
+			array(),
+			array("ID" => $elementId),
+			false,
+			false,
+			array('ID', 'IBLOCK_ID', 'IBLOCK_SECTION_ID', 'DETAIL_PICTURE', 'PREVIEW_PICTURE', 'NAME', 'XML_ID')
+		);
 		while($arProduct = $dbProduct->GetNext())
 		{
 			$imgCode = "";
@@ -69,7 +75,6 @@ class CCatalogStoreControlUtil
 
 			$arProduct["NAME"] = ($arProduct["NAME"]);
 			$arProduct["DETAIL_PAGE_URL"] = htmlspecialcharsex($arProduct["DETAIL_PAGE_URL"]);
-			$arProduct["CURRENCY"] = htmlspecialcharsex($arProduct["CURRENCY"]);
 
 			if($imgCode > 0)
 			{

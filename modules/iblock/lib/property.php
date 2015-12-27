@@ -1,8 +1,9 @@
 <?php
 namespace Bitrix\Iblock;
 
-use Bitrix\Main\Entity;
+use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
+
 Loc::loadMessages(__FILE__);
 
 /**
@@ -43,7 +44,7 @@ Loc::loadMessages(__FILE__);
  * @package Bitrix\Iblock
  **/
 
-class PropertyTable extends Entity\DataManager
+class PropertyTable extends Main\Entity\DataManager
 {
 	const CHECKBOX = 'C';
 	const LISTBOX = 'L';
@@ -224,7 +225,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateName()
 	{
 		return array(
-			new Entity\Validator\Length(null, 255),
+			new Main\Entity\Validator\Length(null, 255),
 		);
 	}
 
@@ -236,7 +237,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateCode()
 	{
 		return array(
-			new Entity\Validator\Length(null, 50),
+			new Main\Entity\Validator\Length(null, 50),
 		);
 	}
 
@@ -248,7 +249,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateXmlId()
 	{
 		return array(
-			new Entity\Validator\Length(null, 100),
+			new Main\Entity\Validator\Length(null, 100),
 		);
 	}
 
@@ -260,7 +261,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateFileType()
 	{
 		return array(
-			new Entity\Validator\Length(null, 200),
+			new Main\Entity\Validator\Length(null, 200),
 		);
 	}
 
@@ -272,7 +273,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateTmpId()
 	{
 		return array(
-			new Entity\Validator\Length(null, 40),
+			new Main\Entity\Validator\Length(null, 40),
 		);
 	}
 
@@ -284,7 +285,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateUserType()
 	{
 		return array(
-			new Entity\Validator\Length(null, 255),
+			new Main\Entity\Validator\Length(null, 255),
 		);
 	}
 
@@ -296,7 +297,7 @@ class PropertyTable extends Entity\DataManager
 	public static function validateHint()
 	{
 		return array(
-			new Entity\Validator\Length(null, 255),
+			new Main\Entity\Validator\Length(null, 255),
 		);
 	}
 }

@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>.</body> </html>
- *
- *
+ * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>. 
  *
  *
  * @return mixed 
@@ -107,19 +105,13 @@ class CAllSearcher
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">доменов поисковых систем</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID домена;
 	* </li> <li> <b>s_domain</b> - домен; </li> <li> <b>s_variable</b> - имя переменной (или группа
 	* имен переменных разделенных запятой) в которых хранится
 	* поисковая фраза. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID домена; </li> <li>
@@ -135,15 +127,10 @@ class CAllSearcher
 	* точное совпадение. </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -168,7 +155,6 @@ class CAllSearcher
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -256,14 +242,9 @@ class CAllSearcher
 	* <p>Возвращает данные по указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $searcher_id  ID поисковой системы. </ht
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -277,7 +258,6 @@ class CAllSearcher
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

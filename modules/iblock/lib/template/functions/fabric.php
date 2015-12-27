@@ -57,7 +57,7 @@ class Fabric
 			{
 				foreach($event->getResults() as $evenResult)
 				{
-					if($evenResult->getResultType() == \Bitrix\Main\EventResult::SUCCESS)
+					if($evenResult->getType() == \Bitrix\Main\EventResult::SUCCESS)
 					{
 						$functionClass = $evenResult->getParameters();
 						if (is_string($functionClass) && class_exists($functionClass))

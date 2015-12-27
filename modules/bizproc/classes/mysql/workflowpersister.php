@@ -9,8 +9,13 @@ class CBPWorkflowPersister
 	private function __construct()
 	{
 		$this->serviceInstanceId = uniqid("", true);
-		$this->ownershipDelta = 300;
-		$this->useGZipCompression = function_exists("gzcompress");
+		$useGZipCompressionOption = \Bitrix\Main\Config\Option::get("bizproc", "use_gzip_compression", "");
+		if ($useGZipCompressionOption === "Y")
+			$this->useGZipCompression = true;
+		elseif ($useGZipCompressionOption === "N")
+			$this->useGZipCompression = false;
+		else
+			$this->useGZipCompression = function_exists("gzcompress");
 	}
 
 	public static function GetPersister() 
@@ -28,16 +33,7 @@ class CBPWorkflowPersister
 	{
 		global $DB;
 
-		$queryCondition = 
-			"( ".
-			"	(OWNER_ID = '".$DB->ForSql($this->serviceInstanceId)."' ".
-			"		AND OWNED_UNTIL >= ".$DB->CurrentTimeFunction().") ".
-			"	OR ".
-			"	(OWNER_ID IS NULL) ".
-			"	OR ".
-			"	(OWNER_ID IS NOT NULL ".
-			"		AND OWNED_UNTIL < ".$DB->CurrentTimeFunction().") ".
-			") ";
+		$queryCondition = $this->getLockerQueryCondition();
 
 		$buffer = "";
 		$dbResult = $DB->Query(
@@ -75,16 +71,7 @@ class CBPWorkflowPersister
 	{
 		global $DB;
 
-		$queryCondition = 
-			"( ".
-			"	(OWNER_ID = '".$DB->ForSql($this->serviceInstanceId)."' ".
-			"		AND OWNED_UNTIL >= ".$DB->CurrentTimeFunction().") ".
-			"	OR ".
-			"	(OWNER_ID IS NULL) ".
-			"	OR ".
-			"	(OWNER_ID IS NOT NULL ".
-			"		AND OWNED_UNTIL < ".$DB->CurrentTimeFunction().") ".
-			") ";
+		$queryCondition = $this->getLockerQueryCondition();
 
 		if ($status == CBPWorkflowStatus::Completed || $status == CBPWorkflowStatus::Terminated)
 		{

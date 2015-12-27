@@ -575,7 +575,7 @@ class CBlogComment extends CAllBlogComment
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"])<=0)
 		{
 			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
+				"SELECT COUNT(".($bNeedDistinct? "DISTINCT ": "")."C.ID) as CNT ".
 					$obUserFieldsSql->GetSelect()." ".
 				"FROM b_blog_comment C ".
 				"	".$arSqls["FROM"]." ".

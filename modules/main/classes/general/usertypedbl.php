@@ -25,6 +25,7 @@ class CUserTypeDouble
 			case "mssql":
 				return "float";
 		}
+		return null;
 	}
 
 	public static function PrepareSettings($arUserField)
@@ -168,6 +169,9 @@ class CUserTypeDouble
 	public static function CheckFields($arUserField, $value)
 	{
 		$aMsg = array();
+
+		$value = str_replace(array(',', ' '), array('.', ''), $value);
+
 		if(strlen($value)>0 && $arUserField["SETTINGS"]["MIN_VALUE"]!=0 && doubleval($value)<$arUserField["SETTINGS"]["MIN_VALUE"])
 		{
 			$aMsg[] = array(
@@ -205,9 +209,11 @@ class CUserTypeDouble
 
 	public static function OnBeforeSave($arUserField, $value)
 	{
+		$value = str_replace(array(',', ' '), array('.', ''), $value);
 		if(strlen($value)>0)
+		{
 			return "".round(doubleval($value), $arUserField["SETTINGS"]["PRECISION"]);
+		}
+		return null;
 	}
 }
-
-?>

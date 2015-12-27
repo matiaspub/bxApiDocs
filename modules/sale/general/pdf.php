@@ -25,6 +25,17 @@ class CSaleTfpdf extends tFPDF
 		}
 	}
 
+	static public function Image($file, $x = null, $y = null, $w = 0, $h = 0, $type = '', $link = '')
+	{
+		try
+		{
+			return parent::Image($file, $x, $y, $w, $h, $type, $link);
+		}
+		catch (Exception $e)
+		{
+		}
+	}
+
 	public function Header()
 	{
 		if (!empty($this->background))
@@ -186,7 +197,7 @@ class CSalePdf
 		$this->generator->SetBackground($this->GetImagePath($image), $bgHeight, $bgWidth, $style);
 	}
 
-	static public function GetImageSize($file)
+	public function GetImageSize($file)
 	{
 		$height = 0;
 		$width  = 0;
@@ -203,7 +214,7 @@ class CSalePdf
 		}
 		else
 		{
-			$arFile = CFile::GetImageSize($file, true);
+			$arFile = CFile::GetImageSize($this->GetImagePath($file), true);
 
 			if ($arFile)
 			{
@@ -228,7 +239,9 @@ class CSalePdf
 		}
 		elseif ($file)
 		{
-			$path = $_SERVER['DOCUMENT_ROOT'] . $file;
+			$path = strpos($file, $_SERVER['DOCUMENT_ROOT']) === 0
+				? $file
+				: $_SERVER['DOCUMENT_ROOT'] . $file;
 		}
 
 		return $path;
@@ -236,15 +249,7 @@ class CSalePdf
 
 	public function Image($file, $x = null, $y = null, $w = 0, $h = 0, $type = '', $link = '')
 	{
-		try
-		{
-			$path = $this->GetImagePath($file);
-
-			return $this->generator->Image($path, $x, $y, $w, $h, $type, $link);
-		}
-		catch (Exception $e)
-		{
-		}
+		return $this->generator->Image($this->GetImagePath($file), $x, $y, $w, $h, $type, $link);
 	}
 
 }

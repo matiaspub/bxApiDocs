@@ -1,6 +1,6 @@
 <?php
 if (!defined("T_KEYWORD"))
-	;// define("T_KEYWORD", 400);
+	// define("T_KEYWORD", 400);
 
 class CSqlFormatFormatter
 {

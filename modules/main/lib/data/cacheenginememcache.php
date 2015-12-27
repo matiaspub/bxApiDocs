@@ -32,10 +32,9 @@ class CacheEngineMemcache
 				else
 					$port = 11211;
 
-				if (self::$obMemcache->connect($v["host"], $port))
+				if (self::$obMemcache->pconnect($v["host"], $port))
 				{
 					self::$isConnected = true;
-					register_shutdown_function(array("\\Bitrix\\Main\\Data\\CacheEngineMemcache", "close"));
 				}
 			}
 		}

@@ -21,9 +21,12 @@ class CRatingsComponentsWiki
 	}
 	
 	public static function BeforeIndex($arParams)
-	{ 
-		if ($arParams['PARAM1'] == 'wiki' && intval($arParams['PARAM2']) > 0 
-			&& intval($arParams['ITEM_ID']) > 0)
+	{
+		if (
+			$arParams['PARAM1'] == 'wiki' 
+			&& intval($arParams['PARAM2']) > 0 
+			&& intval($arParams['ITEM_ID']) > 0
+		)
 		{
 			$arParams['ENTITY_TYPE_ID'] = 'IBLOCK_ELEMENT';
 			$arParams['ENTITY_ID'] = intval($arParams['ITEM_ID']);

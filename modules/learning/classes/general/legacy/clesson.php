@@ -8,13 +8,12 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/learning/classes/clesson/index.php
  * @author Bitrix
+ * @deprecated
  */
 class CLesson
 {
@@ -24,9 +23,7 @@ class CLesson
 	 */
 	
 	/**
-	* <p>Возвращает список уроков по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
-	*
-	*
+	* <p>Возвращает список уроков по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя. Метод устарел, рекомендуется использовать CLearnLesson::GetList.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("TIMESTAMP_X"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
@@ -38,10 +35,8 @@ class CLesson
 	* урок. </li> <li> <b>CHAPTER_NAME</b> - название главы, в . </li> <li> <b>DATE_CREATE</b> - дата
 	* создания урока. </li> </ul>Направление сортировки может принимать
 	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию;
-	* </li> </ul>Необязательный. По умолчанию фильтруется по убыванию даты
+	* </li> </ul>Необязательный. По умолчанию сортируется по убыванию даты
 	* изменения урока.
-	*
-	*
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
@@ -65,11 +60,8 @@ class CLesson
 	* одиночное значение или массив.<br><br>Необязательный. По умолчанию
 	* записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -146,7 +138,6 @@ class CLesson
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clesson/index.php">CLesson</a>::<a
@@ -158,6 +149,7 @@ class CLesson
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/clesson/getlist.php
 	* @author Bitrix
+	* @deprecated
 	*/
 	public static function GetList($arOrder = 'will be ignored', $arFilter = array())
 	{

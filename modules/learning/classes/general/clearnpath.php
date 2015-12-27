@@ -122,7 +122,7 @@ class CLearnPath implements ILearnPath
 	}
 
 	// returns true if $str is path with two or more elements
-	static public function IsUrlencodedPath ($str)
+	public static function IsUrlencodedPath ($str)
 	{
 		$tmp = urldecode($str);
 

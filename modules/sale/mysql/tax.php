@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/tax.php");
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CSaleTax extends CAllSaleTax
 {
 	
 	/**
-	* <p>Функция добавляет новый налог с параметрами из массива arFields </p>
-	*
-	*
+	* <p>Метод добавляет новый налог с параметрами из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров нового налога, ключами в котором
@@ -28,8 +24,6 @@ class CSaleTax extends CAllSaleTax
 	* значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> <li> <b>NAME</b>
 	* - название налога;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li> <b>CODE</b> -
 	* символьный код.</li> </ul>
-	*
-	*
 	*
 	* @return int <p>Возвращается код добавленного налога или <i>false</i> в случае
 	* ошибки.</p> <br><br>

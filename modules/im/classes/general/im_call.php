@@ -14,12 +14,13 @@ class CIMCall
 		$arConfig['RECIPIENT_ID'] = intval($arParams['RECIPIENT_ID']);
 		$arConfig['USER_ID'] = intval($arParams['USER_ID']) > 0? intval($arParams['USER_ID']): IntVal($USER->GetID());
 		$arConfig['VIDEO'] = isset($arParams['VIDEO']) && $arParams['VIDEO'] == 'N'? 'N': 'Y';
+		$arConfig['MOBILE'] = isset($arParams['MOBILE']) && $arParams['MOBILE'] == 'Y'? 'Y': 'N';
 
-		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID']));
+		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID'], 'USER_ID' => $USER->GetId()));
 		if (empty($arChat['chat']))
 			return false;
 
-		$arConfig['CALL_TO_GROUP'] = $arChat['chat'][$arConfig['CHAT_ID']]['type'] == IM_MESSAGE_GROUP;
+		$arConfig['CALL_TO_GROUP'] = $arChat['chat'][$arConfig['CHAT_ID']]['messageType'] == IM_MESSAGE_CHAT;
 		$arConfig['STATUS_TYPE'] = intval($arChat['chat'][$arConfig['CHAT_ID']]['call']);
 
 		if (!$arConfig['CALL_TO_GROUP'] && !IsModuleInstalled('intranet') && CIMSettings::GetPrivacy(CIMSettings::PRIVACY_CALL, $arConfig['RECIPIENT_ID']) == CIMSettings::PRIVACY_RESULT_CONTACT
@@ -84,11 +85,12 @@ class CIMCall
 			$arUserData = CIMContactList::GetUserData(Array('ID' => $arChat['userInChat'][$arConfig['CHAT_ID']], 'DEPARTMENT' => 'N', 'HR_PHOTO' => 'Y'));
 			$arSend['users'] = $arUserData['users'];
 			$arSend['hrphoto'] = $arUserData['hrphoto'];
-			$arSend['video'] = $arConfig['VIDEO'] == 'Y'? true: false;
+			$arSend['video'] = $arConfig['VIDEO'] == 'Y';
 			$arSend['callToGroup'] = $arConfig['CALL_TO_GROUP'];
 			$arSend['chat'] = $arChat['chat'];
 			$arSend['userChatBlockStatus'] = $arChat['userChatBlockStatus'];
 			$arSend['userInChat'] = $arChat['userInChat'];
+			$arSend['isMobile'] = $arConfig['MOBILE'] == 'Y';
 			foreach ($arUserToConnect as $userId => $callStatus)
 				self::Command($arConfig['CHAT_ID'], $userId, 'invite', $arSend);
 
@@ -149,15 +151,15 @@ class CIMCall
 		if (empty($arConfig['USERS']))
 			return false;
 
-		global $DB;
+		global $DB, $USER;
 
-		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID']));
+		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID'], 'USER_ID' => $USER->GetId()));
 		if (empty($arChat['chat']))
 			return false;
 
 		$arConfig['CALL_TYPE'] = intval($arChat['chat'][$arConfig['CHAT_ID']]['call']);
 		$arConfig['LAST_CHAT_ID'] = $arConfig['CHAT_ID'];
-		if ($arChat['chat'][$arConfig['CHAT_ID']]['type'] == IM_MESSAGE_PRIVATE)
+		if ($arChat['chat'][$arConfig['CHAT_ID']]['messageType'] == IM_MESSAGE_PRIVATE)
 		{
 			$strSql = "UPDATE b_im_chat SET CALL_TYPE = ".IM_CALL_NONE." WHERE ID = ".$arConfig['CHAT_ID'];
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -197,7 +199,7 @@ class CIMCall
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
-		else if ($arChat['chat'][$arConfig['CHAT_ID']]['type'] == IM_MESSAGE_GROUP)
+		else if ($arChat['chat'][$arConfig['CHAT_ID']]['messageType'] == IM_MESSAGE_CHAT)
 		{
 			$CIMChat = new CIMChat();
 			$result = $CIMChat->AddUser($arConfig['CHAT_ID'], $arConfig['USERS']);
@@ -254,12 +256,26 @@ class CIMCall
 		if ($arParams['CALL_TO_GROUP'])
 			self::MessageToChat($arConfig['CHAT_ID'], "IM_CALL_CHAT_START_", $arConfig['USER_ID'], true);
 
+		$arConfig['MOBILE'] = isset($arParams['MOBILE']) && $arParams['MOBILE'] == 'Y'? 'Y': 'N';
+
 		CIMCall::Signaling(Array(
 			'CHAT_ID' => $arConfig['CHAT_ID'],
 			'USER_ID' => $arConfig['USER_ID'],
+			'PARAMS' => Array('isMobile' => $arConfig['MOBILE'] == 'Y'),
 			'COMMAND' => 'answer',
 		));
 		self::Command($arConfig['CHAT_ID'], $arConfig['USER_ID'], 'answer_self', Array());
+
+		if (false && !$arParams['CALL_TO_GROUP'] && CModule::IncludeModule('pull') && CPullOptions::GetPushStatus())
+		{
+			$CPushManager = new CPushManager();
+			$CPushManager->AddQueue(Array(
+				'USER_ID' => $arConfig['USER_ID'],
+				'EXPIRY' => 0,
+				'APP_ID' => 'Bitrix24',
+				'SEND_IMMEDIATELY' => 'Y'
+			));
+		}
 
 		return true;
 	}
@@ -316,7 +332,7 @@ class CIMCall
 		$arConfig['USER_ID'] = intval($arParams['USER_ID']) > 0? intval($arParams['USER_ID']): IntVal($USER->GetID());
 		$arConfig['RECIPIENT_ID'] = intval($arParams['RECIPIENT_ID']);
 
-		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID']));
+		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID'], 'USER_ID' => $USER->GetId()));
 		if (empty($arChat['chat']))
 			return false;
 
@@ -351,7 +367,7 @@ class CIMCall
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		$arConfig['CALL_TO_GROUP'] = $arChat['chat'][$arConfig['CHAT_ID']]['type'] == IM_MESSAGE_GROUP;
+		$arConfig['CALL_TO_GROUP'] = $arChat['chat'][$arConfig['CHAT_ID']]['messageType'] == IM_MESSAGE_CHAT;
 		if ($arParams['REASON'] == 'decline')
 		{
 			if ($arConfig['CALL_TO_GROUP'])
@@ -438,6 +454,17 @@ class CIMCall
 		{
 			self::Command($arConfig['CHAT_ID'], $arConfig['USER_ID'], 'decline_self', $arSend);
 			self::Command($arConfig['CHAT_ID'], $arConfig['RECIPIENT_ID'], 'end_call', $arSend);
+
+			if (false && !$arConfig['CALL_TO_GROUP'] && CModule::IncludeModule('pull') && CPullOptions::GetPushStatus())
+			{
+				$CPushManager = new CPushManager();
+				$CPushManager->AddQueue(Array(
+					'USER_ID' => $arConfig['USER_ID'],
+					'EXPIRY' => 0,
+					'APP_ID' => 'Bitrix24',
+					'SEND_IMMEDIATELY' => 'Y'
+				));
+			}
 		}
 
 		return true;
@@ -455,7 +482,7 @@ class CIMCall
 		$arConfig['COMMAND'] = isset($arParams['COMMAND'])? $arParams['COMMAND']: 'signaling';
 		$arConfig['PARAMS'] = isset($arParams['PARAMS'])? $arParams['PARAMS']: Array();
 
-		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID']));
+		$arChat = CIMChat::GetChatData(Array('ID' => $arConfig['CHAT_ID'], 'USER_ID' => $USER->GetId()));
 		if (empty($arChat['chat']))
 			return false;
 

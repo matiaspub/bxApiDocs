@@ -55,7 +55,7 @@ class CBitrixCloudCDN
 			{
 				try
 				{
-					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
+					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML(true);
 					$o->saveToOptions();
 					if (!$o->isActive())
 					{
@@ -90,7 +90,7 @@ class CBitrixCloudCDN
 			{
 				try
 				{
-					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML();
+					$o = CBitrixCloudCDNConfig::getInstance()->loadRemoteXML(true);
 					$o->saveToOptions();
 					self::$domain_changed = false;
 				}
@@ -254,7 +254,7 @@ class CBitrixCloudCDN
 		if (!empty($arPrefixes) && !empty($arExtensions))
 		{
 			$prefix_regex = "(?:".implode("|", $arPrefixes).")";
-			$extension_regex = "(?:".implode("|", $arExtensions).")";
+			$extension_regex = "(?i:".implode("|", $arExtensions).")";
 			$regex = "/
 				((?i:
 					href=

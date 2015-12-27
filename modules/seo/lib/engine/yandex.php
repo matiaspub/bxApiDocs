@@ -8,11 +8,11 @@
 namespace Bitrix\Seo\Engine;
 
 use Bitrix\Seo\Engine;
-use Bitrix\Seo\SearchEngineTable;
+use Bitrix\Seo\IEngine;
 use Bitrix\Main\Text;
 use Bitrix\Main\Text\Converter;
 
-class Yandex extends Engine
+class Yandex extends Engine\YandexBase implements IEngine
 {
 	const ENGINE_ID = 'yandex';
 
@@ -40,137 +40,10 @@ class Yandex extends Engine
 	protected $engineId = 'yandex';
 	protected $arServiceList = array();
 
-	public function getSettings()
-	{
-		return $this->engineSettings;
-	}
-
-	public function getAuthUrl()
-	{
-		return $this->getInterface()->getAuthUrl();
-	}
-
-	public function getInterface()
-	{
-		if($this->authInterface === null)
-		{
-			$this->authInterface = new \CYandexOAuthInterface($this->engine['CLIENT_ID'], $this->engine['CLIENT_SECRET']);
-
-			if($this->engineSettings['AUTH'])
-			{
-				$this->authInterface->setToken($this->engineSettings['AUTH']['access_token']);
-				$this->authInterface->setRefreshToken($this->engineSettings['AUTH']['refresh_token']);
-				$this->authInterface->setAccessTokenExpires($this->engineSettings['AUTH']['expires_in']);
-			}
-		}
-
-		return $this->authInterface;
-	}
-
+	// temporary hack
 	public function getAuthSettings()
 	{
 		return $this->engineSettings['AUTH'];
-	}
-
-	public function clearAuthSettings()
-	{
-		unset($this->engineSettings['AUTH']);
-		$this->saveSettings();
-	}
-
-	public function clearSitesSettings()
-	{
-		unset($this->engineSettings['SITES']);
-		$this->saveSettings();
-	}
-
-	public function setAuthSettings($settings = null)
-	{
-		if($settings === null)
-		{
-			$settings = $this->getInterface();
-		}
-
-		if($settings instanceof \CYandexOAuthInterface)
-		{
-			$settings = array(
-				'access_token' => $settings->getToken(),
-				'refresh_token' => $settings->getRefreshToken(),
-				'expires_in' => $settings->getAccessTokenExpires()
-			);
-		}
-
-		$this->engineSettings['AUTH'] = $settings;
-		$this->saveSettings();
-	}
-
-	public function checkAuthExpired($bGetNew)
-	{
-		$ob = $this->getInterface();
-		if(!$ob->checkAccessToken())
-		{
-			return $bGetNew ? $this->refreshAuth() : false;
-		}
-		return true;
-	}
-
-	public function refreshAuth()
-	{
-		$ob = $this->getInterface();
-		if($ob->getNewAccessToken())
-		{
-			$this->setAuthSettings();
-			return true;
-		}
-
-		throw new \Exception($ob->getError());
-
-		return false;
-	}
-
-	public function getAuth($code)
-	{
-		$ob = $this->getInterface();
-		$ob->setCode($code);
-
-		if($ob->getAccessToken())
-		{
-			unset($this->engineSettings['AUTH_USER']);
-
-			$this->setAuthSettings();
-			return true;
-		}
-
-		throw new \Exception($ob->getError());
-
-		return false;
-	}
-
-	public function getCurrentUser()
-	{
-		global $APPLICATION;
-
-		if(!isset($this->engineSettings['AUTH_USER']) || !is_array($this->engineSettings['AUTH_USER']))
-		{
-			$queryResult = $this->query(self::QUERY_USER);
-			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
-			{
-				$res = json_decode($queryResult->result, true);
-				if(is_array($res))
-				{
-					$this->engineSettings['AUTH_USER'] = $APPLICATION->convertCharsetArray($res, 'utf-8', LANG_CHARSET);
-					$this->saveSettings();
-
-					return $this->engineSettings['AUTH_USER'];
-				}
-			}
-
-			throw new Engine\YandexException($queryResult);
-		}
-		else
-		{
-			return $this->engineSettings['AUTH_USER'];
-		}
 	}
 
 	public function getFeeds()
@@ -182,7 +55,7 @@ class Yandex extends Engine
 
 		if(isset($this->arServiceList[self::HOSTS_SERVICE]))
 		{
-			$queryResult = $this->query($this->arServiceList[self::HOSTS_SERVICE]);
+			$queryResult = $this->queryOld($this->arServiceList[self::HOSTS_SERVICE]);
 
 			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 			{
@@ -206,7 +79,7 @@ class Yandex extends Engine
 
 		if(isset($this->engineSettings['SITES'][$domain]))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['href']);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['href']);
 
 			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 			{
@@ -234,7 +107,7 @@ class Yandex extends Engine
 
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_INFO]);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_INFO]);
 			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 			{
 				return $this->processResult($queryResult->result);
@@ -261,7 +134,7 @@ class Yandex extends Engine
 
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_TOP_QUERIES]);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_TOP_QUERIES]);
 			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 			{
 				$obXml = new \CDataXML();
@@ -329,7 +202,7 @@ class Yandex extends Engine
 
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_ORIGINAL_TEXTS]);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_ORIGINAL_TEXTS]);
 			if($queryResult->status == self::HTTP_STATUS_OK)
 			{
 				$obXml = new \CDataXML();
@@ -379,7 +252,7 @@ $str = <<<EOT
 <original-text><content>%s</content></original-text>
 EOT;
 
-			$queryResult = $this->query(
+			$queryResult = $this->queryOld(
 				$this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_ORIGINAL_TEXTS],
 				'POST',
 				urlencode(sprintf(
@@ -417,7 +290,7 @@ EOT;
 
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_INDEXED]);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_INDEXED]);
 			if($queryResult->status == self::HTTP_STATUS_OK)
 			{
 				$obXml = new \CDataXML();
@@ -469,7 +342,7 @@ EOT;
 
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
-			$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_EXCLUDED]);
+			$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_EXCLUDED]);
 			if($queryResult->status == self::HTTP_STATUS_OK)
 			{
 				$obXml = new \CDataXML();
@@ -508,7 +381,6 @@ EOT;
 	public function addSite($domain, $dir = '/')
 	{
 		$domain = ToLower($domain);
-
 		if(!isset($this->arServiceList[self::HOSTS_SERVICE]))
 		{
 			$this->getServiceDocument();
@@ -519,7 +391,7 @@ EOT;
 			$str = <<<EOT
 <host><name>%s</name></host>
 EOT;
-			$queryResult = $this->query(
+			$queryResult = $this->queryOld(
 				$this->arServiceList[self::HOSTS_SERVICE],
 				"POST",
 				sprintf($str, Converter::getXmlConverter()->encode($domain))
@@ -549,7 +421,7 @@ EOT;
 		{
 			if(!$bCheck)
 			{
-				$queryResult = $this->query($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_VERIFY]);
+				$queryResult = $this->queryOld($this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_VERIFY]);
 				if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 				{
 					$obXml = new \CDataXML();
@@ -576,10 +448,10 @@ EOT;
 			}
 			else
 			{
-				$queryResult = $this->query(
+				$queryResult = $this->queryOld(
 					$this->engineSettings['SITES'][$domain]['SERVICES'][self::HOST_VERIFY],
 					"PUT",
-					"<host><type>TXT_FILE</type></host>"
+					"<host><type>HTML_FILE</type></host>"
 				);
 
 				if($queryResult->status == self::HTTP_STATUS_OK || $queryResult->status == self::HTTP_STATUS_NO_CONTENT)
@@ -598,7 +470,7 @@ EOT;
 
 	protected function getServiceDocument()
 	{
-		$queryResult = $this->query(self::SERVICE_URL);
+		$queryResult = $this->queryOld(self::SERVICE_URL);
 		if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
 		{
 			return $this->processServiceDocument($queryResult->result);
@@ -724,7 +596,8 @@ EOT;
 		return false;
 	}
 
-	protected function query($scope, $method = "GET", $data = null, $bSkipRefreshAuth = false)
+	// TODO: rewrite the whole upper code to use \Bitrix\Main\Web\HttpClient and than kill that implementation
+	protected function queryOld($scope, $method = "GET", $data = null, $skipRefreshAuth = false)
 	{
 		if($this->engineSettings['AUTH'])
 		{
@@ -752,11 +625,11 @@ EOT;
 				break;
 			}
 
-			if($http->status == 401 && !$bSkipRefreshAuth)
+			if($http->status == 401 && !$skipRefreshAuth)
 			{
 				if($this->checkAuthExpired(false))
 				{
-					$this->query($scope, $method, $data, true);
+					$this->queryOld($scope, $method, $data, true);
 				}
 			}
 
@@ -764,13 +637,6 @@ EOT;
 
 			return $http;
 		}
-	}
-
-	protected function saveSettings()
-	{
-		SearchEngineTable::update($this->engine['ID'], array(
-			'SETTINGS' => serialize($this->engineSettings)
-		));
 	}
 }
 ?>

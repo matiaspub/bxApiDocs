@@ -263,33 +263,6 @@ abstract class MysqlCommonSqlHelper extends SqlHelper
 	}
 
 	/**
-	 * Returns $value converted to an type according to $field type.
-	 * <p>
-	 * For example if $field is Entity\DatetimeField then returned value will be instance of Type\DateTime.
-	 *
-	 * @param mixed $value Value to be converted.
-	 * @param Entity\ScalarField $field Type "source".
-	 *
-	 * @return mixed
-	 */
-	static public function convertFromDb($value, Entity\ScalarField $field)
-	{
-		if($value !== null)
-		{
-			if($field instanceof Entity\DatetimeField)
-			{
-				$value = new Type\DateTime($value, "Y-m-d H:i:s");
-			}
-			elseif($field instanceof Entity\DateField)
-			{
-				$value = new Type\Date($value, "Y-m-d");
-			}
-		}
-
-		return $value;
-	}
-
-	/**
 	 * Returns callback to be called for a field value on fetch.
 	 *
 	 * @param Entity\ScalarField $field Type "source".
@@ -324,12 +297,12 @@ abstract class MysqlCommonSqlHelper extends SqlHelper
 	 */
 	static public function convertDatetimeField($value)
 	{
-		if($value !== null)
+		if($value !== null && $value != '0000-00-00 00:00:00')
 		{
-			$value = new Type\DateTime($value, "Y-m-d H:i:s");
+			return new Type\DateTime($value, "Y-m-d H:i:s");
 		}
 
-		return $value;
+		return null;
 	}
 
 	/**
@@ -344,12 +317,12 @@ abstract class MysqlCommonSqlHelper extends SqlHelper
 	 */
 	static public function convertDateField($value)
 	{
-		if($value !== null)
+		if($value !== null && $value != '0000-00-00')
 		{
-			$value = new Type\Date($value, "Y-m-d");
+			return new Type\Date($value, "Y-m-d");
 		}
 
-		return $value;
+		return null;
 	}
 
 	/**
@@ -385,7 +358,7 @@ abstract class MysqlCommonSqlHelper extends SqlHelper
 		{
 			$values = $field->getValues();
 
-			if (ctype_digit($values[0]) && ctype_digit($values[1]))
+			if (preg_match('/^[0-9]+$/', $values[0]) && preg_match('/^[0-9]+$/', $values[1]))
 			{
 				return 'int';
 			}
@@ -442,5 +415,41 @@ abstract class MysqlCommonSqlHelper extends SqlHelper
 		}
 
 		return $sql;
+	}
+
+	/**
+	 * Builds the strings for the SQL MERGE command for the given table.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array $primaryFields Array("column")[] Primary key columns list.
+	 * @param array $insertFields Array("column" => $value)[] What to insert.
+	 * @param array $updateFields Array("column" => $value)[] How to update.
+	 *
+	 * @return array (merge)
+	 */
+	public function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
+	{
+		$insert = $this->prepareInsert($tableName, $insertFields);
+		$update = $this->prepareUpdate($tableName, $updateFields);
+
+		if (
+			$insert && $insert[0] != "" && $insert[1] != ""
+			&& $update && $update[1] != ""
+		)
+		{
+			$sql = "
+				INSERT INTO ".$this->quote($tableName)." (".$insert[0].")
+				VALUES (".$insert[1].")
+				ON DUPLICATE KEY UPDATE ".$update[0]."
+			";
+		}
+		else
+		{
+			$sql = "";
+		}
+
+		return array(
+			$sql
+		);
 	}
 }

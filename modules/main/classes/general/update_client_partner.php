@@ -24,13 +24,13 @@ if (!function_exists("file_get_contents"))
 }
 
 if (!defined("US_SHARED_KERNEL_PATH"))
-	;// define("US_SHARED_KERNEL_PATH", "/bitrix");
+	// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 if (!defined("US_CALL_TYPE"))
-	;// define("US_CALL_TYPE", "ALL");
+	// define("US_CALL_TYPE", "ALL");
 
 if (!defined("US_BASE_MODULE"))
-	;// define("US_BASE_MODULE", "main");
+	// define("US_BASE_MODULE", "main");
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_class.php");
 
@@ -1891,10 +1891,6 @@ public static 	function __ParseServerData(&$strServerOutput, &$arRes, &$strError
 			}
 			if (isset($arRes["DATA"]["#"]["CLIENT"]) && isset($arRes["DATA"]["#"]["CLIENT"][0]["@"]["DATE_TO_SOURCE"]))
 				COption::SetOptionString(US_BASE_MODULE, "~support_finish_date", $arRes["DATA"]["#"]["CLIENT"][0]["@"]["DATE_TO_SOURCE"]);
-			if (isset($arRes["DATA"]["#"]["CLIENT"]) && isset($arRes["DATA"]["#"]["CLIENT"][0]["@"]["MAX_SITES"]))
-				COption::SetOptionString("main", "PARAM_MAX_SITES", IntVal($arRes["DATA"]["#"]["CLIENT"][0]["@"]["MAX_SITES"]));
-			if (isset($arRes["DATA"]["#"]["CLIENT"]) && isset($arRes["DATA"]["#"]["CLIENT"][0]["@"]["MAX_USERS"]))
-				COption::SetOptionString("main", "PARAM_MAX_USERS", IntVal($arRes["DATA"]["#"]["CLIENT"][0]["@"]["MAX_USERS"]));
 		}
 
 		if (strlen($strError_tmp) > 0)

@@ -7,6 +7,11 @@ class CCatalogStoreDocsElement
 	public static function add($arFields)
 	{
 		global $DB;
+
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsElementAdd", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+				return false;
+
 		if (!self::CheckFields('ADD',$arFields))
 			return false;
 
@@ -17,6 +22,10 @@ class CCatalogStoreDocsElement
 		if(!$res)
 			return false;
 		$lastId = intval($DB->LastID());
+
+		foreach(GetModuleEvents("catalog", "OnCatalogStoreDocsElementAdd", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($lastId, $arFields));
+
 		return $lastId;
 	}
 

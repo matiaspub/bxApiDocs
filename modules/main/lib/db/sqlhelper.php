@@ -321,6 +321,21 @@ abstract class SqlHelper
 	}
 
 	/**
+	 * Builds the strings for the SQL MERGE command for the given table.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array $primaryFields Array("column")[] Primary key columns list.
+	 * @param array $insertFields Array("column" => $value)[] What to insert.
+	 * @param array $updateFields Array("column" => $value)[] How to update.
+	 *
+	 * @return array (merge)
+	 */
+	protected function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
+	{
+		return array();
+	}
+
+	/**
 	 * Performs additional processing of CLOB fields.
 	 *
 	 * @param Entity\ScalarField[] $tableFields Table fields.
@@ -442,7 +457,19 @@ abstract class SqlHelper
 	 *
 	 * @return mixed
 	 */
-	abstract public function convertFromDb($value, Entity\ScalarField $field);
+	public function convertFromDb($value, Entity\ScalarField $field)
+	{
+		if($value !== null)
+		{
+			$converter = $this->getConverter($field);
+			if (is_callable($converter))
+			{
+				return call_user_func_array($converter, array($value));
+			}
+		}
+
+		return $value;
+	}
 
 	/**
 	 * Returns callback to be called for a field value on fetch.

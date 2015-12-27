@@ -73,7 +73,7 @@ class Signer
 	}
 
 	/**
-	 * Return message signature provided by hashing algorithm
+	 * Return message signature
 	 *
 	 * @param string $value Message.
 	 * @param string|null $salt Salt.
@@ -148,9 +148,13 @@ class Signer
 	 * @param string|null $salt Salt, if used while signing.
 	 * @return string
 	 * @throws BadSignatureException
+	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
 	public function unsign($signedValue, $salt = null)
 	{
+		if (!is_string($signedValue))
+			throw new ArgumentTypeException('signedValue', 'string');
+
 		list($value, $signature) = $this->unpack($signedValue);
 		if (!$this->verifySignature($value, $signature, $salt))
 			throw new BadSignatureException('Signature does not match');
@@ -161,21 +165,14 @@ class Signer
 	/**
 	 * Simply validation of message signature
 	 *
-	 * @param string $signedValue Signed value, must be in format "{message}{separator}{signature}".
+	 * @param string $value Message.
+	 * @param string $signature Signature.
 	 * @param string|null $salt Salt, if used while signing.
 	 * @return bool True if OK, otherwise - false.
 	 */
-	public function validate($signedValue, $salt = null)
+	public function validate($value, $signature, $salt = null)
 	{
-		try
-		{
-			$this->unsign($signedValue, $salt);
-			return true;
-		}
-		catch(BadSignatureException $e)
-		{
-			return false;
-		}
+		return $this->verifySignature($value, $signature, $salt);
 	}
 
 	/**
@@ -286,8 +283,8 @@ class Signer
 			if ($pos === false)
 				throw new BadSignatureException('Separator not found in value');
 
-			$result[] = \CUtil::BinSubstr($value, $pos + 1);
-			$value = \CUtil::BinSubstr($value, 0, $pos);
+			$result[] = \CUtil::binSubstr($value, $pos + 1);
+			$value = \CUtil::binSubstr($value, 0, $pos);
 		}
 		$result[] = $value;
 
@@ -297,7 +294,7 @@ class Signer
 	/**
 	 * Return encoded signature
 	 *
-	 * @param string $value Signature in binary representation
+	 * @param string $value Signature in binary representation.
 	 * @return string Encoded signature
 	 */
 	protected function encodeSignature($value)
@@ -308,11 +305,15 @@ class Signer
 	/**
 	 * Return decoded signature
 	 *
-	 * @param string $value Encoded signature
+	 * @param string $value Encoded signature.
 	 * @return string Signature in binary representation
+	 * @throws BadSignatureException
 	 */
 	protected function decodeSignature($value)
 	{
+		if (preg_match('#[^[:xdigit:]]#', $value))
+			throw new BadSignatureException('Signature must be hexadecimal string');
+
 		// ToDo: use hex2bin instead pack for PHP > 5.4.0
 		return pack('H*', $value);
 	}

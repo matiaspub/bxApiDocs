@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителям</a> сайта.</body> </html>
- *
- *
+ * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителям</a> сайта. 
  *
  *
  * @return mixed 
@@ -17,8 +15,6 @@ class CAllGuest
 	
 	/**
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</p>
-	*
-	*
 	*
 	*
 	* @param string &$by = "s_last_date" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID
@@ -44,12 +40,8 @@ class CAllGuest
 	* последнем заходе; </li> <li> <b>s_last_country_id</b> - ID страны посетителя на
 	* последнем заходе. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID посетителя; </li> <li>
@@ -135,15 +127,10 @@ class CAllGuest
 	* допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	* логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка посетителей. Если значение равно
 	* "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -168,7 +155,6 @@ class CAllGuest
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -517,14 +503,9 @@ class CAllGuest
 	* <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителю</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $guest_id  ID посетителя.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -538,7 +519,6 @@ class CAllGuest
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

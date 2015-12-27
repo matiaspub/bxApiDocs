@@ -15,8 +15,7 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 		$strSql = "INSERT INTO b_catalog_discount(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$ID = intval($DB->LastID());
-
+		$ID = (int)$DB->LastID();
 		if ($ID > 0)
 		{
 			foreach ($arFields['RANGES'] as &$arRange)
@@ -33,7 +32,7 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 
-			$boolCalc = ($boolCalc === true ? true : false);
+			$boolCalc = ($boolCalc === true);
 			if ($boolCalc)
 				CCatalogDiscountSave::UserDiscountCalc($ID,$arFields,false);
 
@@ -41,6 +40,63 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 		return $ID;
 	}
 
+	static public function Update($intID, $arFields, $boolCalc = false)
+	{
+		global $DB;
+
+		$intID = (int)$intID;
+		if ($intID <= 0)
+			return false;
+
+		if (!CCatalogDiscountSave::CheckFields('UPDATE',$arFields,$intID))
+			return false;
+
+		$strUpdate = $DB->PrepareUpdate("b_catalog_discount", $arFields);
+		if (!empty($strUpdate))
+		{
+			$strSql = "update b_catalog_discount SET ".$strUpdate." where ID = ".$intID." and TYPE = ".self::ENTITY_ID;
+			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
+
+		if (!empty($arFields['RANGES']))
+		{
+			$DB->Query("delete from b_catalog_disc_save_range where DISCOUNT_ID = ".$intID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			foreach ($arFields['RANGES'] as &$arRange)
+			{
+				$arRange['DISCOUNT_ID'] = $intID;
+				$arInsert = $DB->PrepareInsert("b_catalog_disc_save_range", $arRange);
+				$strSql = "insert into b_catalog_disc_save_range(".$arInsert[0].") values(".$arInsert[1].")";
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+			unset($arRange);
+		}
+
+		if (!empty($arFields['GROUP_IDS']))
+		{
+			$DB->Query("delete from b_catalog_disc_save_group where DISCOUNT_ID = ".$intID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			foreach ($arFields['GROUP_IDS'] as &$intGroupID)
+			{
+				$strSql = "insert into b_catalog_disc_save_group(DISCOUNT_ID,GROUP_ID) values(".$intID.",".$intGroupID.")";
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
+			unset($intGroupID);
+		}
+
+		$boolCalc = ($boolCalc === true);
+		if ($boolCalc)
+			CCatalogDiscountSave::UserDiscountCalc($intID, $arFields, false);
+
+		return $intID;
+	}
+
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array $arGroupBy
+	 * @param bool|array $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|CDBResult
+	 */
 	static public function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -521,4 +577,3 @@ class CCatalogDiscountSave extends CAllCatalogDiscountSave
 		}
 	}
 }
-?>

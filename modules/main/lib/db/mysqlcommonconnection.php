@@ -162,7 +162,9 @@ abstract class MysqlCommonConnection extends Connection
 				));
 			}
 
-			$sqlFields[] = $this->getSqlHelper()->quote($columnName)
+			$realColumnName = $field->getColumnName();
+
+			$sqlFields[] = $this->getSqlHelper()->quote($realColumnName)
 				. ' ' . $this->getSqlHelper()->getColumnTypeByField($field)
 				. ' NOT NULL' // null for oracle if is not primary
 				. (in_array($columnName, $autoincrement, true) ? ' AUTO_INCREMENT' : '')
@@ -175,7 +177,8 @@ abstract class MysqlCommonConnection extends Connection
 		{
 			foreach ($primary as &$primaryColumn)
 			{
-				$primaryColumn = $this->getSqlHelper()->quote($primaryColumn);
+				$realColumnName = $fields[$primaryColumn]->getColumnName();
+				$primaryColumn = $this->getSqlHelper()->quote($realColumnName);
 			}
 
 			$sql .= ', PRIMARY KEY('.join(', ', $primary).')';

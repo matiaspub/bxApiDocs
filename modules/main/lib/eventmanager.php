@@ -384,6 +384,8 @@ class EventManager
 		try
 		{
 			$result = true;
+			$includeResult = true;
+
 			$event->addDebugInfo($handler);
 
 			if (isset($handler["TO_MODULE_ID"]) && !empty($handler["TO_MODULE_ID"]) && ($handler["TO_MODULE_ID"] != 'main'))
@@ -395,59 +397,66 @@ class EventManager
 				$path = ltrim($handler["TO_PATH"], "/");
 				if (($path = Loader::getLocal($path)) !== false)
 				{
-					$result = include_once($path);
+					$includeResult = include_once($path);
 				}
 			}
 			elseif (isset($handler["FULL_PATH"]) && !empty($handler["FULL_PATH"]) && IO\File::isFileExists($handler["FULL_PATH"]))
 			{
-				$result = include_once($handler["FULL_PATH"]);
+				$includeResult = include_once($handler["FULL_PATH"]);
 			}
 
 			$event->addDebugInfo($result);
 
-			if (isset($handler["TO_METHOD_ARG"]) && is_array($handler["TO_METHOD_ARG"]) && !empty($handler["TO_METHOD_ARG"]))
+			if ($result)
 			{
-				$args = $handler["TO_METHOD_ARG"];
-			}
-			else
-			{
-				$args = array();
-			}
+				if (isset($handler["TO_METHOD_ARG"]) && is_array($handler["TO_METHOD_ARG"]) && !empty($handler["TO_METHOD_ARG"]))
+				{
+					$args = $handler["TO_METHOD_ARG"];
+				}
+				else
+				{
+					$args = array();
+				}
 
-			if ($handler["VERSION"] > 1)
-			{
-				$args[] = $event;
-			}
-			else
-			{
-				$args = array_merge($args, array_values($event->getParameters()));
-			}
+				if ($handler["VERSION"] > 1)
+				{
+					$args[] = $event;
+				}
+				else
+				{
+					$args = array_merge($args, array_values($event->getParameters()));
+				}
 
-			$callback = null;
-			if (isset($handler["CALLBACK"]))
-			{
-				$callback = $handler["CALLBACK"];
-			}
-			elseif (!empty($handler["TO_CLASS"]) && !empty($handler["TO_METHOD"]) && class_exists($handler["TO_CLASS"]))
-			{
-				$callback = array($handler["TO_CLASS"], $handler["TO_METHOD"]);
-			}
+				$callback = null;
+				if (isset($handler["CALLBACK"]))
+				{
+					$callback = $handler["CALLBACK"];
+				}
+				elseif (!empty($handler["TO_CLASS"]) && !empty($handler["TO_METHOD"]) && class_exists($handler["TO_CLASS"]))
+				{
+					$callback = array($handler["TO_CLASS"], $handler["TO_METHOD"]);
+				}
 
-			if ($callback != null)
-			{
-				$result = call_user_func_array($callback, $args);
-			}
+				if ($callback != null)
+				{
+					$result = call_user_func_array($callback, $args);
+				}
+				else
+				{
+					$result = $includeResult;
+				}
 
-			if (($result != null) && !($result instanceof EventResult))
-			{
-				$result = new EventResult(EventResult::UNDEFINED, $result, $handler["TO_MODULE_ID"]);
-			}
+				if (($result != null) && !($result instanceof EventResult))
+				{
+					$result = new EventResult(EventResult::UNDEFINED, $result, $handler["TO_MODULE_ID"]);
+				}
 
-			$event->addDebugInfo($result);
+				$event->addDebugInfo($result);
 
-			if ($result != null)
-			{
-				$event->addResult($result);
+				if ($result != null)
+				{
+					$event->addResult($result);
+				}
 			}
 		}
 		catch (\Exception $ex)

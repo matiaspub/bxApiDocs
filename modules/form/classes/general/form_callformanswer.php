@@ -6,9 +6,7 @@
 
 
 /**
- * <b>CFormAnswer</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответами</a>.</body> </html>
- *
- *
+ * <b>CFormAnswer</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответами</a>. 
  *
  *
  * @return mixed 
@@ -32,12 +30,8 @@ public static 	function err_mess()
 	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a>. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> в случае положительного результата, в противном случае - "false".</p>
 	*
 	*
-	*
-	*
 	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> который необходимо
 	* скопировать.
-	*
-	*
 	*
 	* @param mixed $question_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>, в который
 	* необходимо скопировать <a
@@ -45,16 +39,13 @@ public static 	function err_mess()
 	* параметр. По умолчанию - "false" (текущий <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>).
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
 	* $answer_id = 589; // ID ответа "да" на вопрос "Вы женаты/замужем?"
-	* // скопируем ответа
+	* // скопируем ответ
 	* if ($NEW_ANSWER_ID = <b>CFormAnswer::Copy</b>($answer_id))
 	* {
 	*     echo "Ответ #589 успешно скопирован в новый ответ #".$NEW_ANSWER_ID;
@@ -67,7 +58,6 @@ public static 	function err_mess()
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -114,21 +104,14 @@ public static 	function err_mess()
 	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> и все значения в результатах, связанные с ним. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
 	*
 	*
-	*
-	*
 	* @param int $answer_id  ID удаляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. </h
-	*
-	*
 	*
 	* @param int $question_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>, к которому
 	* приписан удаляемый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a>.
 	* Указание данного параметра позволяет ускорить выполнение
 	* функции.<br> Параметр необязательный. По умолчанию - "false".
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -147,7 +130,6 @@ public static 	function err_mess()
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -202,24 +184,16 @@ public static 	function GetTypeList()
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответов</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $question_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.</bod
-	*
-	*
 	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
 	* списка. Может принимать значения: <ul> <li> <b>s_id</b> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>; </li> <li> <b>s_sort</b> - индекс
 	* сортировки. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки. Может принимать
 	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
 	* </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации. Необязательный параметр. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID <a
@@ -245,16 +219,11 @@ public static 	function GetTypeList()
 	* точное совпадение. </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>
 	*
-	*
-	*
-	* @param bool &$is_filtered  Ссылка на переменную хранящую флаг отфильтрованности
+	* @param bool &$is_filtered  Ссылка на переменную, хранящую флаг отфильтрованности
 	* результирующего списка. Если значение равно "true", то список был
 	* отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -288,7 +257,6 @@ public static 	function GetTypeList()
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -390,14 +358,9 @@ public static 	function GetTypeList()
 	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformanswer/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $answer_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.</bo
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -408,7 +371,6 @@ public static 	function GetTypeList()
 	* echo "&lt;pre&gt;"; print_r($arAnswer); echo "&lt;/pre";
 	* ?&gt;</bo
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -481,8 +443,6 @@ public static 	function CheckFields($arFields, $ANSWER_ID=false)
 	* <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> в случае положительного результата, в противном случае - "false".</p>
 	*
 	*
-	*
-	*
 	* @param array $fields  Массив значений, в качестве ключей массива допустимы: <ul> <li>
 	* <b>QUESTION_ID</b><font color="red">*</font> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> </li> <li> <b>MESSAGE</b><font
@@ -509,23 +469,16 @@ public static 	function CheckFields($arFields, $ANSWER_ID=false)
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>. </li> </ul> <font color="red">*</font> -
 	* обязательные поля.
 	*
-	*
-	*
 	* @param mixed $answer_id = false ID обновляемого <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>.<br>
 	* Параметр необязательный. По умолчанию - "false" (добавление нового <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>).
 	*
-	*
-	*
 	* @param mixed $current_question_id = false ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>, к которому
 	* приписан обновляемый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a>.
 	* Указание данного параметра позволяет ускорить выполнение
-	* функции. <br>Параметр необязательный. По умолчанию - "false".
-	*
-	*
+	* метода. <br>Параметр необязательный. По умолчанию - "false".
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -576,7 +529,6 @@ public static 	function CheckFields($arFields, $ANSWER_ID=false)
 	* <b>CFormAnswer::Set</b>($arFields);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

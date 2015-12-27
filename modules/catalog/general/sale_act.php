@@ -1,15 +1,11 @@
 <?
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Catalog;
 
 Loc::loadMessages(__FILE__);
 
 class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
 	public static function GetControlShow($arParams)
 	{
 		$arControls = static::GetControls();
@@ -22,8 +18,6 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 		);
 		foreach ($arControls as &$arOneControl)
 		{
-			$arLogic = static::GetLogicAtom($arOneControl['LOGIC']);
-			$arValue = static::GetValueAtom($arOneControl['JS_VALUE']);
 			$arResult['children'][] = array(
 				'controlId' => $arOneControl['ID'],
 				'group' => false,
@@ -35,8 +29,8 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 						'type' => 'prefix',
 						'text' => $arOneControl['PREFIX'],
 					),
-					$arLogic,
-					$arValue,
+					static::GetLogicAtom($arOneControl['LOGIC']),
+					static::GetValueAtom($arOneControl['JS_VALUE'])
 				),
 			);
 		}
@@ -48,7 +42,10 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
+		$strParentResult = '';
 		$strResult = '';
+		$parentResultValues = array();
+		$resultValues = array();
 
 		if (is_string($arControl))
 		{
@@ -71,36 +68,108 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			}
 			else
 			{
-				if ($arControl['PARENT'] && !isset($arLogic['PARENT']))
-					$arControl['PARENT'] = false;
+				$useParent = ($arControl['PARENT'] && isset($arLogic['PARENT']));
 				$strParent = $arParams['BASKET_ROW'].'[\'CATALOG\'][\'PARENT_'.$arControl['FIELD'].'\']';
 				$strField = $arParams['BASKET_ROW'].'[\'CATALOG\'][\''.$arControl['FIELD'].'\']';
 				switch ($arControl['FIELD_TYPE'])
 				{
 					case 'int':
 					case 'double':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							if (!isset($arLogic['MULTI_SEP']))
+							{
+								$boolError = true;
+							}
+							else
+							{
+								foreach ($arValues['value'] as &$value)
+								{
+									if ($useParent)
+										$parentResultValues[] = str_replace(
+											array('#FIELD#', '#VALUE#'),
+											array($strParent, $value),
+											$arLogic['OP'][$arControl['MULTIPLE']]
+										);
+									$resultValues[] = str_replace(
+										array('#FIELD#', '#VALUE#'),
+										array($strField, $value),
+										$arLogic['OP'][$arControl['MULTIPLE']]
+									);
+								}
+								unset($value);
+								if ($useParent)
+									$strParentResult = '('.implode($arLogic['MULTI_SEP'], $parentResultValues).')';
+								$strResult = '('.implode($arLogic['MULTI_SEP'], $resultValues).')';
+								unset($resultValues, $parentResultValues);
+							}
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(
+									array('#FIELD#', '#VALUE#'),
+									array($strParent, $arValues['value']),
+									$arLogic['OP'][$arControl['MULTIPLE']]
+								);
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'char':
 					case 'string':
 					case 'text':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(
+									array('#FIELD#', '#VALUE#'),
+									array($strParent, '"'.EscapePHPString($arValues['value']).'"'),
+									$arLogic['OP'][$arControl['MULTIPLE']]
+								);
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, '"'.EscapePHPString($arValues['value']).'"'),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'date':
 					case 'datetime':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(
+									array('#FIELD#', '#VALUE#'),
+									array($strParent, $arValues['value']),
+									$arLogic['OP'][$arControl['MULTIPLE']]
+								);
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 				}
 				$existBasket = 'isset('.$arParams['BASKET_ROW'].'[\'CATALOG\'])';
 				$strResult = 'isset('.$strField.') && '.$strResult;
-				if ($arControl['PARENT'])
+				if ($useParent)
 				{
 					$strResult = '(isset('.$strParent.') ? (('.$strResult.')'.$arLogic['PARENT'].$strParentResult.') : ('.$strResult.'))';
 				}
-				$strResult = $existBasket.' && '.$strResult;
+				$strResult = '('.$existBasket.' && '.$strResult.')';
 			}
 		}
 
@@ -118,25 +187,36 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 		return $arControls;
 	}
 
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
+		$vatList = array();
+		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME'), 'order' => array('SORT' => 'ASC')));
+		while ($vat = $vatIterator->fetch())
+		{
+			$vat['ID'] = (int)$vat['ID'];
+			$vatList[$vat['ID']] = $vat['NAME'];
+		}
+		unset($vat, $vatIterator);
+
 		$arControlList = array(
 			'CondIBElement' => array(
 				'ID' => 'CondIBElement',
-				'PARENT' => true,
 				'FIELD' => 'ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
-					'type' => 'popup',
-					'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
+					'type' => 'dialog',
+					'popup_url' =>  '/bitrix/admin/cat_product_search_dialog.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
-						'discount' => 'Y'
+						'caller' => 'discount_rules',
+						'allow_select_parent' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y'
@@ -147,11 +227,8 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			),
 			'CondIBIBlock' => array(
 				'ID' => 'CondIBIBlock',
-				'PARENT' => true,
 				'FIELD' => 'IBLOCK_ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_IBLOCK_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_IBLOCK_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -174,8 +251,6 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 				'PARENT' => false,
 				'FIELD' => 'SECTION_ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'Y',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SECTION_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SECTION_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -195,12 +270,9 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			),
 			'CondIBCode' => array(
 				'ID' => 'CondIBCode',
-				'PARENT' => true,
 				'FIELD' => 'CODE',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CODE_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CODE_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -211,12 +283,9 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			),
 			'CondIBXmlID' => array(
 				'ID' => 'CondIBXmlID',
-				'PARENT' => true,
 				'FIELD' => 'XML_ID',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_XML_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_XML_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -227,12 +296,9 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			),
 			'CondIBName' => array(
 				'ID' => 'CondIBName',
-				'PARENT' => true,
 				'FIELD' => 'NAME',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -241,14 +307,127 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 				),
 				'PHP_VALUE' => ''
 			),
+			'CondIBDateActiveFrom' => array(
+				'ID' => 'CondIBDateActiveFrom',
+				'FIELD' => 'DATE_ACTIVE_FROM',
+				'FIELD_TYPE' => 'datetime',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_FROM_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_FROM_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'datetime',
+					'format' => 'datetime'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBDateActiveTo' => array(
+				'ID' => 'CondIBDateActiveTo',
+				'FIELD' => 'DATE_ACTIVE_TO',
+				'FIELD_TYPE' => 'datetime',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_TO_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_TO_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'datetime',
+					'format' => 'datetime'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBSort' => array(
+				'ID' => 'CondIBSort',
+				'FIELD' => 'SORT',
+				'FIELD_TYPE' => 'int',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SORT_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SORT_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBPreviewText' => array(
+				'ID' => 'CondIBPreviewText',
+				'FIELD' => 'PREVIEW_TEXT',
+				'FIELD_TYPE' => 'text',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBDetailText' => array(
+				'ID' => 'CondIBDetailText',
+				'FIELD' => 'DETAIL_TEXT',
+				'FIELD_TYPE' => 'text',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBDateCreate' => array(
+				'ID' => 'CondIBDateCreate',
+				'FIELD' => 'DATE_CREATE',
+				'FIELD_TYPE' => 'datetime',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_CREATE_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_CREATE_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'datetime',
+					'format' => 'datetime'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBCreatedBy' => array(
+				'ID' => 'CondIBCreatedBy',
+				'FIELD' => 'CREATED_BY',
+				'FIELD_TYPE' => 'int',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CREATED_BY_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CREATED_BY_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => array(
+					'VALIDATE' => 'user'
+				)
+			),
+			'CondIBTimestampX' => array(
+				'ID' => 'CondIBTimestampX',
+				'FIELD' => 'TIMESTAMP_X',
+				'FIELD_TYPE' => 'datetime',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TIMESTAMP_X_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TIMESTAMP_X_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'datetime',
+					'format' => 'datetime'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondIBModifiedBy' => array(
+				'ID' => 'CondIBModifiedBy',
+				'FIELD' => 'MODIFIED_BY',
+				'FIELD_TYPE' => 'int',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_MODIFIED_BY_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_MODIFIED_BY_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => array(
+					'VALIDATE' => 'user'
+				)
+			),
 			'CondIBTags' => array(
 				'ID' => 'CondIBTags',
-				'PARENT' => true,
 				'FIELD' => 'TAGS',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TAGS_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TAGS_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -260,10 +439,11 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 			'CondCatQuantity' => array(
 				'ID' => 'CondCatQuantity',
 				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
 				'FIELD' => 'CATALOG_QUANTITY',
+				'FIELD_TABLE' => 'QUANTITY',
 				'FIELD_TYPE' => 'double',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_QUANTITY_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_QUANTITY_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -271,7 +451,86 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 					'type' => 'input',
 				),
 			),
+			'CondCatWeight' => array(
+				'ID' => 'CondCatWeight',
+				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
+				'FIELD' => 'CATALOG_WEIGHT',
+				'FIELD_TABLE' => 'WEIGHT',
+				'FIELD_TYPE' => 'double',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_WEIGHT_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_WEIGHT_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
+				'JS_VALUE' => array(
+					'type' => 'input'
+				),
+				'PHP_VALUE' => ''
+			),
+			'CondCatVatID' => array(
+				'ID' => 'CondCatVatID',
+				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
+				'FIELD' => 'CATALOG_VAT_ID',
+				'FIELD_TABLE' => 'VAT_ID',
+				'FIELD_TYPE' => 'int',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_ID_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_ID_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
+				'JS_VALUE' => array(
+					'type' => 'select',
+					'values' => $vatList
+				),
+				'PHP_VALUE' => array(
+					'VALIDATE' => 'list'
+				)
+			),
+			'CondCatVatIncluded' => array(
+				'ID' => 'CondCatVatIncluded',
+				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
+				'FIELD' => 'CATALOG_VAT_INCLUDED',
+				'FIELD_TABLE' => 'VAT_INCLUDED',
+				'FIELD_TYPE' => 'char',
+				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_LABEL'),
+				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_PREFIX'),
+				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
+				'JS_VALUE' => array(
+					'type' => 'select',
+					'values' => array(
+						'Y' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_VALUE_YES'),
+						'N' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_VALUE_NO')
+					)
+				),
+				'PHP_VALUE' => array(
+					'VALIDATE' => 'list'
+				)
+			)
 		);
+		if (empty($vatList))
+		{
+			unset($arControlList['CondCatVatID']);
+			unset($arControlList['CondCatVatIncluded']);
+		}
+		foreach ($arControlList as &$control)
+		{
+			if (!isset($control['PARENT']))
+				$control['PARENT'] = true;
+			$control['EXIST_HANDLER'] = 'Y';
+			$control['MODULE_ID'] = 'catalog';
+			if (!isset($control['MODULE_ENTITY']))
+				$control['MODULE_ENTITY'] = 'iblock';
+			if (!isset($control['ENTITY']))
+				$control['ENTITY'] = 'ELEMENT';
+			if (!isset($control['FIELD_TABLE']))
+				$control['FIELD_TABLE'] = false;
+			$control['MULTIPLE'] = 'N';
+			$control['GROUP'] = 'N';
+		}
+		unset($control);
+		$arControlList['CondIBSection']['MULTIPLE'] = 'Y';
 
 		if ($strControlID === false)
 		{
@@ -290,11 +549,6 @@ class CCatalogActionCtrlBasketProductFields extends CGlobalCondCtrlComplex
 
 class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
 	public static function GetControlShow($arParams)
 	{
 		$arControls = static::GetControls();
@@ -341,6 +595,8 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
 		$strResult = '';
+		$resultValues = array();
+		$arValues = false;
 
 		if (is_string($arControl))
 		{
@@ -368,19 +624,69 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 				{
 					case 'int':
 					case 'double':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							if (!isset($arLogic['MULTI_SEP']))
+							{
+								$boolError = true;
+							}
+							else
+							{
+								foreach ($arValues['value'] as &$value)
+								{
+									$resultValues[] = str_replace(
+										array('#FIELD#', '#VALUE#'),
+										array($strField, $value),
+										$arLogic['OP'][$arControl['MULTIPLE']]
+									);
+								}
+								unset($value);
+								$strResult = '('.implode($arLogic['MULTI_SEP'], $resultValues).')';
+								unset($resultValues);
+							}
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'char':
 					case 'string':
 					case 'text':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, '"'.EscapePHPString($arValues['value']).'"'),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'date':
 					case 'datetime':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 				}
-				$strResult = 'isset('.$arParams['BASKET_ROW'].'[\'CATALOG\']) && isset('.$strField.') && '.$strResult;
+				$strResult = '(isset('.$arParams['BASKET_ROW'].'[\'CATALOG\']) && isset('.$strField.') && '.$strResult.')';
 			}
 		}
 
@@ -398,6 +704,10 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 		return $arControls;
 	}
 
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
 		$arControlList = array();
@@ -426,9 +736,7 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 					$rsProps = CIBlockProperty::GetList(array('SORT' => 'ASC', 'NAME' => 'ASC'), array('IBLOCK_ID' => $intIBlockID));
 					while ($arProp = $rsProps->Fetch())
 					{
-						if ('CML2_LINK' == $arProp['XML_ID'])
-							continue;
-						if ('F' == $arProp['PROPERTY_TYPE'])
+						if ('CML2_LINK' == $arProp['XML_ID'] || 'F' == $arProp['PROPERTY_TYPE'])
 							continue;
 						if ('L' == $arProp['PROPERTY_TYPE'])
 						{
@@ -494,8 +802,8 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 									}
 									if (isset($arOnePropValue))
 										unset($arOnePropValue);
-									break;
 									$arPhpValue = array('VALIDATE' => 'list');
+									break;
 								case 'E':
 									$strFieldType = 'int';
 									$arLogic = static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ));
@@ -528,11 +836,17 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 									break;
 							}
 						}
-						$arControlList["CondIBProp:".$intIBlockID.':'.$arProp['ID']] = array(
-							"ID" => "CondIBProp:".$intIBlockID.':'.$arProp['ID'],
-							"IBLOCK_ID" => $intIBlockID,
-							"FIELD" => "PROPERTY_".$arProp['ID']."_VALUE",
-							"FIELD_TYPE" => $strFieldType,
+						$arControlList['CondIBProp:'.$intIBlockID.':'.$arProp['ID']] = array(
+							'ID' => 'CondIBProp:'.$intIBlockID.':'.$arProp['ID'],
+							'PARENT' => false,
+							'EXIST_HANDLER' => 'Y',
+							'MODULE_ID' => 'catalog',
+							'MODULE_ENTITY' => 'iblock',
+							'ENTITY' => 'ELEMENT_PROPERTY',
+							'IBLOCK_ID' => $intIBlockID,
+							'FIELD' => 'PROPERTY_'.$arProp['ID'].'_VALUE',
+							'FIELD_TABLE' => $intIBlockID.':'.$arProp['ID'],
+							'FIELD_TYPE' => $strFieldType,
 							'MULTIPLE' => 'Y',
 							'GROUP' => 'N',
 							'SEP' => ($boolSep ? 'Y' : 'N'),
@@ -565,4 +879,3 @@ class CCatalogActionCtrlBasketProductProps extends CGlobalCondCtrlComplex
 		}
 	}
 }
-?>

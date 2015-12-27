@@ -28,11 +28,13 @@ foreach($aProtocols as $prot)
 }
 
 if (!defined("AUTH_404"))
-	;// define("AUTH_404", "Y");
+	// define("AUTH_404", "Y");
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/bx_root.php");
 require_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/dbconn.php");
 
+if (defined("BX_URLREWRITE"))
+	return;
 // define("BX_URLREWRITE", true);
 
 $foundQMark = strpos($_SERVER["REQUEST_URI"], "?");
@@ -64,7 +66,12 @@ if((isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404') 
 	}
 	else
 	{
-		$url = $requestUri = $_SERVER["REQUEST_URI"] = $REQUEST_URI = ((is_array($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))? '' : $_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
+		if(!is_string($_GET["SEF_APPLICATION_CUR_PAGE_URL"]))
+		{
+			$_GET["SEF_APPLICATION_CUR_PAGE_URL"] = '';
+		}
+		$url = $requestUri = $_GET["SEF_APPLICATION_CUR_PAGE_URL"];
+		$_SERVER["REQUEST_URI"] = $REQUEST_URI = CHTTP::urnEncode($_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
 		unset($_GET["SEF_APPLICATION_CUR_PAGE_URL"]);
 	}
 
@@ -81,7 +88,7 @@ if((isset($_SERVER['REDIRECT_STATUS']) && $_SERVER['REDIRECT_STATUS'] == '404') 
 			if (ini_get_bool("register_globals"))
 				$GLOBALS += $vars;
 
-			$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
+			$_SERVER["QUERY_STRING"] = $QUERY_STRING = CHTTP::urnEncode($params);
 		}
 	}
 
@@ -123,8 +130,7 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 
 				$_GET += $vars;
 				$_REQUEST += $vars;
-				//$GLOBALS += $vars;
-				$_SERVER["QUERY_STRING"] = $QUERY_STRING = $params;
+				$_SERVER["QUERY_STRING"] = $QUERY_STRING = CHTTP::urnEncode($params);
 				$url = substr($url, 0, $pos);
 			}
 
@@ -140,8 +146,7 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 			$urlTmp = str_replace(".", "", $urlTmp);
 			$urlTmp7 = substr($urlTmp, 0, 7);
 
-			if (($urlTmp7 == "upload/"
-				|| ($urlTmp7 == "bitrix/" && substr($urlTmp, 0, 16) != "bitrix/services/" && substr($urlTmp, 0, 18) != "bitrix/groupdavphp")))
+			if (($urlTmp7 == "upload/" || ($urlTmp7 == "bitrix/" && substr($urlTmp, 0, 16) != "bitrix/services/" && substr($urlTmp, 0, 18) != "bitrix/groupdavphp")))
 				continue;
 
 			$ext = strtolower(GetFileExtension($url));
@@ -151,9 +156,7 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 			CHTTP::SetStatus("200 OK");
 
 			$_SERVER["REAL_FILE_PATH"] = $url;
-
 			include_once($io->GetPhysicalName($_SERVER['DOCUMENT_ROOT'].$url));
-
 			die();
 		}
 	}
@@ -162,6 +165,7 @@ if (!CHTTP::isPathTraversalUri($_SERVER["REQUEST_URI"]))
 //admin section 404
 if(strpos($requestUri, "/bitrix/admin/") === 0)
 {
+	$_SERVER["REAL_FILE_PATH"] = "/bitrix/admin/404.php";
 	include($_SERVER["DOCUMENT_ROOT"]."/bitrix/admin/404.php");
 	die();
 }

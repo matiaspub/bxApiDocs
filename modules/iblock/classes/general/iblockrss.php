@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br> </body> </html>
- *
- *
+ * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br> 
  *
  *
  * @return mixed 
@@ -44,40 +42,26 @@ class CAllIBlockRSS
 
 	
 	/**
-	* <p>Загружает xml c указанного адреса и разбирает его в массив. В качестве значения user-agent'а используется "BitrixSMRSS". После загрузки xml будет конвертирован в кодировку текущего сайта. Если во время работы функции возникли ошибки, то массив результата будет пустым. <br></p> <p><b>Примечание</b>: xml кешируется на время указанное в элементе ttl или если время не указано, то на один час.</p>
-	*
-	*
+	* <p>Загружает xml c указанного адреса и разбирает его в массив. В качестве значения user-agent'а используется "BitrixSMRSS". После загрузки xml будет конвертирован в кодировку текущего сайта. Если во время работы метода возникли ошибки, то массив результата будет пустым. Метод динамичный. <br></p> <p></p> <div class="note"> <b>Примечание</b>: xml кешируется на время указанное в элементе ttl или если время не указано, то на один час.</div>
 	*
 	*
 	* @param string $SITE  IP-адрес или доменное имя сайта.
 	*
-	*
-	*
-	* @param string $PORT  Номер порта к которовму будет выполнено подключение. HTTP порт по
+	* @param string $PORT  Номер порта, к которому будет выполнено подключение. HTTP порт по
 	* умолчанию -  80.
-	*
-	*
 	*
 	* @param string $PATH  Объединяются через знак вопроса ("?") и передаются HTTP команде GET.
 	*
-	*
-	*
 	* @param string $QUERY_STR  Требуется указать true, если новости находятся вне элемента channel.
-	*
-	*
 	*
 	* @param bool $bOutChannel = false 
 	*
-	*
-	*
 	* @return array <p>Массив представления xml.</p> </ht
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arRSS = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>print_r($arRSS);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -229,22 +213,16 @@ class CAllIBlockRSS
 
 	
 	/**
-	* <p>Функция преобразует результат функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление.</p>
+	* <p>Метод преобразует результат метода <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> в более приемлемое представление. Метод динамичный.</p>
 	*
 	*
-	*
-	*
-	* @param array $arRes  Массив описания xml. Результат работы функции <a
+	* @param array $arRes  Массив описания xml. Результат работы метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx.</a>
 	*
-	*
-	*
-	* @param array $bOutChannel = false Параметр должен быть синхронизирован с одноименным функции <a
+	* @param array $bOutChannel = false Параметр должен быть синхронизирован с одноименным метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a>.
-	*
-	*
 	*
 	* @return array <p>Массив следующего вида:</p> <ul> <li>title - заголовок rss ленты;</li> <li>link -
 	* ссылка;</li> <li>description - описание;</li> <li>lastBuildDate - время в rss формате (см.
@@ -261,12 +239,10 @@ class CAllIBlockRSS
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/xmldate2dec.php">XMLDate2Dec</a>);</li> </ul> </ul>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arXML = CIBlockRSS::GetNewsEx('www.1c-bitrix.ru', '80', '/bitrix/rss.php', 'ID=news_sm&amp;LANG=ru&amp;TYPE=news&amp;LIMIT=5');<br>if(count($arXML) &gt; 0)<br>{<br>    $arRSS = CIBlockRSS::FormatArray($arXML);<br>    print_r($arRSS);<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -422,22 +398,15 @@ class CAllIBlockRSS
 
 	
 	/**
-	* <p>Преобразует дату из rss формата в формат "DD.MM.YYYY".</p> <p><b>Примечание</b>: под rss форматом даты понимается формат, описанный в rfc 822.</p>
-	*
-	*
+	* <p>Преобразует дату из rss формата в формат "DD.MM.YYYY". Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: под rss форматом даты понимается формат, описанный в rfc 822.</div>
 	*
 	*
 	* @param string $dateXML  rss дата/время.
 	*
-	*
-	*
 	* @param string $dateFormat = "DD.MM.YYYY" Формат даты. Необязательный параметр. По умолчанию используется
 	* формат "DD.MM.YYYY".
 	*
-	*
-	*
 	* @return string <p>строка.</p></bod
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -445,13 +414,12 @@ class CAllIBlockRSS
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
-	* <ul> <li> http://www.w3.org/Protocols/rfc822/ </li> <li> <a
+	* <ul> <li><a href="http://www.w3.org/Protocols/rfc822/" >http://www.w3.org/Protocols/rfc822/</a></li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/getnewsex.php">GetNewsEx</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/index.php">CIBlockRSS</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockrss/formatarray.php">FormatArray</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -488,16 +456,23 @@ class CAllIBlockRSS
 		echo "<rss version=\"2.0\"";
 		echo ">\n";
 
-		$dbr = CIBlock::GetList(array(), array(
-			"type" => $TYPE,
-			"LID" => $LANG,
-			"ACTIVE" => "Y",
-			"ID" => $ID,
+		$dbr = CIBlockType::GetList(array(), array(
+			"=ID" => $TYPE,
 		));
-		$arIBlock = $dbr->Fetch();
-		if ($arIBlock && ($arIBlock["RSS_ACTIVE"] == "Y"))
+		$arType = $dbr->Fetch();
+		if ($arType && ($arType["IN_RSS"] == "Y"))
 		{
-			echo CIBlockRSS::GetRSSText($arIBlock, $LIMIT_NUM, $LIMIT_DAY, $yandex);
+			$dbr = CIBlock::GetList(array(), array(
+				"type" => $TYPE,
+				"LID" => $LANG,
+				"ACTIVE" => "Y",
+				"ID" => $ID,
+			));
+			$arIBlock = $dbr->Fetch();
+			if ($arIBlock && ($arIBlock["RSS_ACTIVE"] == "Y"))
+			{
+				echo CIBlockRSS::GetRSSText($arIBlock, $LIMIT_NUM, $LIMIT_DAY, $yandex);
+			}
 		}
 
 		echo "</rss>\n";

@@ -150,9 +150,9 @@ class CAllBlogTrackback
 
 			$url = urlencode("http://".$serverName.CBlogPost::PreparePath($arBlog["URL"], $postID, $arGroup["SITE_ID"]));
 
-			for ($i = 0; $i < count($arPingUrls); $i++)
+
+			foreach($arPingUrls as $pingUrl)
 			{
-				$pingUrl = $arPingUrls[$i];
 				$pingUrl = str_replace("http://", "", $pingUrl);
 				$pingUrl = str_replace("https://", "", $pingUrl);
 				$arPingUrl = explode("/", $pingUrl);
@@ -167,8 +167,8 @@ class CAllBlogTrackback
 
 				if (!empty($path) && !empty($host))
 				{
-					$query = "title=$title&url=$url&excerpt=$excerpt&blog_name=$blogName";
-					$fp = @fsockopen("$host", "$port", $errnum, $errstr, 30);
+					$query = "title=".$title."&url=".$url."&excerpt=".$excerpt."&blog_name=".$blogName;
+					$fp = @fsockopen($host, $port, $errnum, $errstr, 30);
 					if ($fp)
 					{ 
 						fputs($fp, "POST {$path} HTTP/1.1\r\n");
@@ -257,7 +257,7 @@ class CAllBlogTrackback
 			}
 
 			preg_match("/charset=(\")*(.*?)(\")*(;|$)/", $_SERVER["CONTENT_TYPE"], $charset);
-			$charset = preg_replace("#[^[:space:]a-zA-Z0-9\-]#ies", "", $charset[2]);
+			$charset = preg_replace("#[^[:space:]a-zA-Z0-9\-]#is", "", $charset[2]);
 			if(strlen($charset)<=0) $charset = "utf-8";
 			
 			if ($charset != $serverCharset)
@@ -283,9 +283,9 @@ class CAllBlogTrackback
 				if (!CBlogTrackback::Update($arTrackback["ID"], $arFields))
 				{
 					if ($ex = $GLOBALS["APPLICATION"]->GetException())
-						$errorMessage .= $ex->GetString().".<br>";
+						$errorMessage = $ex->GetString().".<br>";
 					else
-						$errorMessage .= "Unknown error".".<br>";
+						$errorMessage = "Unknown error".".<br>";
 					CBlogTrackback::SendPingResponce(1, $errorMessage);
 				}
 			}
@@ -294,9 +294,9 @@ class CAllBlogTrackback
 				if (!CBlogTrackback::Add($arFields))
 				{
 					if ($ex = $GLOBALS["APPLICATION"]->GetException())
-						$errorMessage .= $ex->GetString().".<br>";
+						$errorMessage = $ex->GetString().".<br>";
 					else
-						$errorMessage .= "Unknown error".".<br>";
+						$errorMessage = "Unknown error".".<br>";
 					CBlogTrackback::SendPingResponce(1, $errorMessage);
 				}
 			}

@@ -88,7 +88,6 @@ abstract class CBXAllShortUri
 		if (isset($ar["path"]))
 			$shortUri = $ar["path"];
 
-		//$shortUri = @parse_url($shortUri, PHP_URL_PATH);
 		$shortUri = trim($shortUri, "/");
 
 		$uriCrc32 = self::Crc32($shortUri);
@@ -274,6 +273,21 @@ abstract class CBXAllShortUri
 		while (!$bNew);
 
 		return $uri;
+	}
+
+	public static function CheckUri()
+	{
+		if ($arUri = static::GetUri(Bitrix\Main\Context::getCurrent()->getRequest()->getDecodedUri()))
+		{
+			static::SetLastUsed($arUri["ID"]);
+			if (CModule::IncludeModule("statistic"))
+			{
+				CStatEvent::AddCurrent("short_uri_redirect", "", "", "", "", $arUri["URI"], "N", SITE_ID);
+			}
+			LocalRedirect($arUri["URI"], true, static::GetHttpStatusCodeText($arUri["STATUS"]));
+			return true;
+		}
+		return false;
 	}
 }
 

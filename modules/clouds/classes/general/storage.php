@@ -163,7 +163,11 @@ class CCloudStorage
 			}
 		}
 
-		$bImmediate = $arResizeParams[5];
+		if (defined("BX_MOBILE") && constant("BX_MOBILE") === true)
+			$bImmediate = true;
+		else
+			$bImmediate = $arResizeParams[5];
+
 		$callbackData["cacheID"] = $arFile["ID"]."/".md5(serialize($arResizeParams));
 		$callbackData["cacheOBJ"] = new CPHPCache;
 		$callbackData["fileDIR"] = "/"."resize_cache/".$callbackData["cacheID"]."/".$arFile["SUBDIR"];
@@ -181,7 +185,7 @@ class CCloudStorage
 				!$bImmediate
 				&& COption::GetOptionString("clouds", "delayed_resize") === "Y"
 				&& is_array($delayInfo = CCloudStorage::ResizeImageFileGet($cacheImageFile))
-				&& $delayInfo["ERROR_CODE"] == 0
+				&& $delayInfo["ERROR_CODE"] < 10
 			)
 			{
 				$callbackData["cacheSTARTED"] = true;
@@ -285,6 +289,9 @@ class CCloudStorage
 			if(isset($callbackData["tmpFile"])) //have to upload to the cloud
 			{
 				$arFileToStore = CFile::MakeFileArray($io->GetPhysicalName($cacheImageFileTmp));
+				if (!preg_match("/^image\\//", $arFileToStore["type"]))
+					$arFileToStore["type"] = $arFile["CONTENT_TYPE"];
+
 				if($obTargetBucket->SaveFile($callbackData["fileURL"], $arFileToStore))
 				{
 					$cacheImageFile = $obTargetBucket->GetFileSRC($callbackData["fileURL"]);
@@ -399,7 +406,7 @@ class CCloudStorage
 		");
 
 		$a = $q->Fetch();
-		if ($a && $a["ERROR_CODE"] == 1)
+		if ($a && $a["ERROR_CODE"] >= 10 && $a["ERROR_CODE"] < 20)
 		{
 			$DB->Query("DELETE from b_clouds_file_resize WHERE ID = ".$a["ID"]);
 			$a = false;
@@ -407,6 +414,7 @@ class CCloudStorage
 
 		if (!$a)
 		{
+			$arResizeParams["type"] = $sourceFile["CONTENT_TYPE"];
 			$DB->Add("b_clouds_file_resize", array(
 				"~TIMESTAMP_X" => $DB->CurrentTimeFunction(),
 				"ERROR_CODE" => "0",
@@ -433,16 +441,20 @@ class CCloudStorage
 		");
 		if ($resize = $q->Fetch())
 		{
-			if ($resize["ERROR_CODE"] === "0")
+			if ($resize["ERROR_CODE"] < 10)
 			{
 				$arResizeParams = unserialize($resize["PARAMS"]);
 				$id = $resize["ID"];
 			} //Give it a try
-			elseif ((MakeTimeStamp($resize["TIMESTAMP_X"]) + 300/*5min*/) < (time() + CTimeZone::GetOffset()))
+			elseif (
+				$resize["ERROR_CODE"] >= 10
+				&& $resize["ERROR_CODE"] < 20
+				&& (MakeTimeStamp($resize["TIMESTAMP_X"]) + 300/*5min*/) < (time() + CTimeZone::GetOffset())
+			)
 			{
 				$DB->Query("
 					UPDATE b_clouds_file_resize
-					SET ERROR_CODE='0'
+					SET ERROR_CODE='1'
 					WHERE ID=".$resize["ID"]."
 				");
 				$arResizeParams = unserialize($resize["PARAMS"]);
@@ -485,9 +497,10 @@ class CCloudStorage
 		{
 			if ($id <= 0)
 			{
+				$arResizeParams["type"] = $sourceFile["CONTENT_TYPE"];
 				$id = $DB->Add("b_clouds_file_resize", array(
 					"~TIMESTAMP_X" => $DB->CurrentTimeFunction(),
-					"ERROR_CODE" => "0",
+					"ERROR_CODE" => "2",
 					"PARAMS" => serialize($arResizeParams),
 					"FROM_PATH" => $sourceFile["SRC"],
 					"TO_PATH" => $destinationFile,
@@ -527,18 +540,37 @@ class CCloudStorage
 		if (!$task)
 			return false;
 
-		if ($task["ERROR_CODE"] !== "0")
+		//File in the Sky with Diamonds
+		if ($task["ERROR_CODE"] == 9)
+		{
+			return true;
+		}
+
+		//Fatal error
+		if ($task["ERROR_CODE"] >= 20)
+		{
+			return false;
+		}
+
+		//Recoverable error
+		if ($task["ERROR_CODE"] >= 10 && $task["ERROR_CODE"] < 20)
 		{
 			if ((MakeTimeStamp($task["TIMESTAMP_X"]) + 300/*5min*/) > (time() + CTimeZone::GetOffset()))
 				return false;
 		}
+
+		$DB->Query("
+			UPDATE b_clouds_file_resize
+			SET ERROR_CODE = '11'
+			WHERE ID = ".$task["ID"]."
+		");
 
 		$tmpFile = CFile::MakeFileArray($task["FROM_PATH"]);
 		if (!is_array($tmpFile) || !file_exists($tmpFile["tmp_name"]))
 		{
 			$DB->Query("
 				UPDATE b_clouds_file_resize
-				SET ERROR_CODE = '1'
+				SET ERROR_CODE = '22'
 				WHERE ID = ".$task["ID"]."
 			");
 			return false;
@@ -549,11 +581,17 @@ class CCloudStorage
 		{
 			$DB->Query("
 				UPDATE b_clouds_file_resize
-				SET ERROR_CODE = '2'
+				SET ERROR_CODE = '23'
 				WHERE ID = ".$task["ID"]."
 			");
 			return false;
 		}
+
+		$DB->Query("
+			UPDATE b_clouds_file_resize
+			SET ERROR_CODE = '14'
+			WHERE ID = ".$task["ID"]."
+		");
 
 		$arSize = $arResizeParams[0];
 		$resizeType = $arResizeParams[1];
@@ -567,20 +605,7 @@ class CCloudStorage
 		{
 			$DB->Query("
 				UPDATE b_clouds_file_resize
-				SET ERROR_CODE = '3'
-				WHERE ID = ".$task["ID"]."
-			");
-			return false;
-		}
-
-		$fileToStore = CFile::MakeFileArray($to_path);
-		$baseURL = preg_replace("/^https?:/i", "", $obBucket->GetFileSRC("/"));
-		$pathToStore = substr($task["TO_PATH"], strlen($baseURL)-1);
-		if (!$obBucket->SaveFile(urldecode($pathToStore), $fileToStore))
-		{
-			$DB->Query("
-				UPDATE b_clouds_file_resize
-				SET ERROR_CODE = '4'
+				SET ERROR_CODE = '25'
 				WHERE ID = ".$task["ID"]."
 			");
 			return false;
@@ -588,7 +613,29 @@ class CCloudStorage
 
 		$DB->Query("
 			UPDATE b_clouds_file_resize
-			SET ERROR_CODE = '0'
+			SET ERROR_CODE = '16'
+			WHERE ID = ".$task["ID"]."
+		");
+
+		$fileToStore = CFile::MakeFileArray($to_path);
+		if ($arResizeParams["type"] && !preg_match("/^image\\//", $fileToStore["type"]))
+			$fileToStore["type"] = $arResizeParams["type"];
+
+		$baseURL = preg_replace("/^https?:/i", "", $obBucket->GetFileSRC("/"));
+		$pathToStore = substr($task["TO_PATH"], strlen($baseURL)-1);
+		if (!$obBucket->SaveFile(urldecode($pathToStore), $fileToStore))
+		{
+			$DB->Query("
+				UPDATE b_clouds_file_resize
+				SET ERROR_CODE = '27'
+				WHERE ID = ".$task["ID"]."
+			");
+			return false;
+		}
+
+		$DB->Query("
+			UPDATE b_clouds_file_resize
+			SET ERROR_CODE = '9'
 			WHERE ID = ".$task["ID"]."
 		");
 		return true;
@@ -814,7 +861,20 @@ class CCloudStorage
 				$temp_fileX =  $io->GetPhysicalName($temp_file);
 				CheckDirPath($temp_fileX);
 
-				if(!copy($io->GetPhysicalName($ar["tmp_name"]), $temp_fileX))
+				if (file_exists($ar["tmp_name"]))
+				{
+					$sourceFile = $ar["tmp_name"];
+				}
+				elseif (file_exists($io->GetPhysicalName($ar["tmp_name"])))
+				{
+					$sourceFile = $io->GetPhysicalName($ar["tmp_name"]);
+				}
+				else
+				{
+					return CCloudStorage::FILE_SKIPPED;
+				}
+				
+				if(!copy($sourceFile, $temp_fileX))
 					return CCloudStorage::FILE_SKIPPED;
 
 				if($obUpload->Start($bucket->ID, $arFile["FILE_SIZE"], $arFile["CONTENT_TYPE"], $temp_file))
@@ -1213,7 +1273,23 @@ class CCloudStorage
 					if($obBucket->Init())
 					{
 						$match = array();
-						if($obBucket->FileExists($request_uri))
+						if(
+							COption::GetOptionString("clouds", "delayed_resize") === "Y"
+							&& preg_match("#^(/".$obBucket->PREFIX."|)(/resize_cache/.*\$)#", $request_uri, $match)
+						)
+						{
+							session_write_close();
+							$to_file = $obBucket->GetFileSRC(urldecode($match[2]));
+							if (CCloudStorage::ResizeImageFileCheck($obBucket, $to_file))
+							{
+								$cache_time = 3600*24*30; // 30 days
+								header("Cache-Control: max-age=".$cache_time);
+								header("Expires: ".gmdate("D, d M Y H:i:s", time()+$cache_time)." GMT");
+								header_remove("Pragma");
+								LocalRedirect($to_file, true, "301 Moved Permanently");
+							}
+						}
+						elseif($obBucket->FileExists($request_uri))
 						{
 							if(COption::GetOptionString("clouds", "log_404_errors") === "Y")
 								CEventLog::Log("WARNING", "CLOUDS_404", "clouds", $_SERVER["REQUEST_URI"], $_SERVER["HTTP_REFERER"]);
@@ -1227,18 +1303,6 @@ class CCloudStorage
 								if(COption::GetOptionString("clouds", "log_404_errors") === "Y")
 									CEventLog::Log("WARNING", "CLOUDS_404", "clouds", $_SERVER["REQUEST_URI"], $_SERVER["HTTP_REFERER"]);
 								LocalRedirect($obBucket->GetFileSRC($check_url), true);
-							}
-						}
-						elseif(
-							COption::GetOptionString("clouds", "delayed_resize") === "Y"
-							&& preg_match("#^(/".$obBucket->PREFIX."|)(/resize_cache/.*\$)#", $request_uri, $match)
-						)
-						{
-							session_write_close();
-							$to_file = $obBucket->GetFileSRC(urldecode($match[2]));
-							if (CCloudStorage::ResizeImageFileCheck($obBucket, $to_file))
-							{
-								LocalRedirect($to_file, true);
 							}
 						}
 					}

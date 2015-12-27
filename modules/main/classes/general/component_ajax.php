@@ -318,7 +318,7 @@ class CComponentAjax
 		$add_param = CAjax::GetSessionParam($this->componentID);
 
 		$regexp_links = '/(<a[^>]*?>.*?<\/a>)/is'.BX_UTF_PCRE_MODIFIER;
-		$regexp_params = '/([\w]+)\s*=\s*([\"\'])(.*?)\2/is'.BX_UTF_PCRE_MODIFIER;
+		$regexp_params = '/([\w\-]+)\s*=\s*([\"\'])(.*?)\2/is'.BX_UTF_PCRE_MODIFIER;
 
 		$this->_checkPcreLimit($data);
 		$arData = preg_split($regexp_links, $data, -1, PREG_SPLIT_DELIM_CAPTURE);

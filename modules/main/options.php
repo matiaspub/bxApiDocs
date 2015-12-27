@@ -71,9 +71,10 @@ if($_SERVER["REQUEST_METHOD"] == "GET" && $USER->CanDoOperation('edit_other_sett
 }
 
 $bEmailIndex = (COption::GetOptionString("main", "new_user_email_uniq_check", "N") !== "Y") && !$DB->IndexExists("b_user", array("EMAIL"));
-$arSmileSet = CSmileSet::getFormList(true);
-foreach ($arSmileSet as $key => $value)
-	$arSmileSet[$key] = htmlspecialcharsback($value);
+
+$arSmileGallery = CSmileGallery::getListForForm();
+foreach ($arSmileGallery as $key => $value)
+	$arSmileGallery[$key] = htmlspecialcharsback($value);
 
 $arAllOptions = array(
 	"main" => Array(
@@ -84,7 +85,7 @@ $arAllOptions = array(
 		Array("header_200", GetMessage("HEADER_200"), "N", Array("checkbox", "Y")),
 		Array("error_reporting", GetMessage("MAIN_ERROR_REPORTING"), E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE, Array("selectbox", Array(E_COMPILE_ERROR|E_ERROR|E_CORE_ERROR|E_PARSE=>GetMessage("MAIN_OPTION_ERROR1"), E_ALL^E_NOTICE=>GetMessage("MAIN_OPTION_ERROR2"), 0=>GetMessage("MAIN_OPTION_ERROR3")))),
 		Array("use_hot_keys", GetMessage("main_options_use_hot_keys"), "Y", Array("checkbox", "Y")),
-		Array("smile_set_id", GetMessage("main_options_smile_set_id"), 0, Array("selectbox", $arSmileSet)),
+		Array("smile_gallery_id", GetMessage("MAIN_OPTIONS_SMILE_GALLERY_ID"), 0, Array("selectbox", $arSmileGallery)),
 
 		GetMessage("main_options_mail"),
 		Array("all_bcc", GetMessage("MAIN_EMAIL"), "", Array("text", 30)),
@@ -93,6 +94,8 @@ $arAllOptions = array(
 		Array("email_from", GetMessage("MAIN_EMAIL_FROM"), "admin@".$SERVER_NAME, Array("text", 30)),
 		Array("CONVERT_UNIX_NEWLINE_2_WINDOWS", GetMessage("MAIN_CONVERT_UNIX_NEWLINE_2_WINDOWS"), "N", Array("checkbox", "Y")),
 		Array("convert_mail_header", GetMessage("MAIN_OPTION_CONVERT_8BIT"), "Y", Array("checkbox", "Y")),
+		Array("attach_images", GetMessage("MAIN_OPTION_ATTACH_IMAGES"), "N", array("checkbox", "Y")),
+		Array("max_file_size", GetMessage("MAIN_OPTION_MAX_FILE_SIZE"), "0", Array("text", 10)),
 		Array("mail_event_period", GetMessage("main_option_mail_period"), "14", Array("text", 10)),
 		Array("mail_event_bulk", GetMessage("main_option_mail_bulk"), "5", Array("text", 10)),
 		Array("mail_additional_parameters", GetMessage("MAIN_OPTION_MAIL_ADDITIONAL_PARAMETERS"), "", Array("text", 30)),
@@ -110,6 +113,8 @@ $arAllOptions = array(
 		GetMessage("MAIN_OPTIMIZE_CSS_SETTINGS"),
 		Array("optimize_css_files", GetMessage("MAIN_OPTIMIZE_CSS"), "N", Array("checkbox", "Y")),
 		Array("optimize_js_files", GetMessage("MAIN_OPTIMIZE_JS"), "N", Array("checkbox", "Y")),
+		Array("use_minified_assets", GetMessage("MAIN_USE_MINIFIED_ASSETS"), "Y", Array("checkbox", "Y")),
+		Array("move_js_to_body", GetMessage("MAIN_MOVE_JS_TO_BODY"), "N", Array("checkbox", "Y")),
 		Array("compres_css_js_files", GetMessage("MAIN_COMPRES_CSS_JS"), "N", Array("checkbox", "Y")),
 
 		GetMessage("MAIN_OPTIMIZE_TRANSLATE_SETTINGS"),
@@ -140,6 +145,7 @@ $arAllOptions = array(
 		Array("use_digest_auth", GetMessage("MAIN_OPT_HTTP_DIGEST"), "N", Array("checkbox", "Y")),
 		Array("note"=>GetMessage("MAIN_OPT_DIGEST_NOTE")),
 		Array("custom_register_page", GetMessage("MAIN_OPT_REGISTER_PAGE"), "", Array("text", 40)),
+		Array("auth_components_template", GetMessage("MAIN_OPTIONS_AUTH_TEMPLATE") , "", Array("text", 40)),
 
 		GetMessage("MAIN_OPT_SECURE_AUTH"),
 		Array("use_encrypted_auth", GetMessage("MAIN_OPT_SECURE_PASS"), "N", Array("checkbox", "Y"), (CRsaSecurity::Possible()? "N":"Y")),
@@ -162,6 +168,7 @@ $arAllOptions = array(
 		Array("event_log_module_access", GetMessage("MAIN_EVENT_LOG_MODULE_ACCESS"), "N", Array("checkbox", "Y")),
 		Array("event_log_file_access", GetMessage("MAIN_EVENT_LOG_FILE_ACCESS"), "N", Array("checkbox", "Y")),
 		Array("event_log_task", GetMessage("MAIN_EVENT_LOG_TASK"), "N", Array("checkbox", "Y")),
+		Array("event_log_marketplace", GetMessage("MAIN_EVENT_LOG_MARKETPLACE"), "Y", Array("checkbox", "Y")),
 	),
 	"controller_auth" => Array(
 		Array("auth_controller_prefix", GetMessage("MAIN_OPTION_CTRL_PREF"), "controller", Array("text", "30")),
@@ -281,6 +288,7 @@ $arAllOptions["auth"][] = Array("new_user_email_uniq_check", GetMessage("MAIN_RE
 
 $arAllOptions["auth"][] = GetMessage("MAIN_OPTION_SESS");
 $arAllOptions["auth"][] = Array("session_expand", GetMessage("MAIN_OPTION_SESS_EXPAND"), "Y", Array("checkbox", "Y"));
+$arAllOptions["auth"][] = Array("session_auth_only", GetMessage("MAIN_OPTION_SESS_AUTH"), "Y", Array("checkbox", "Y"));
 $arAllOptions["auth"][] = Array("session_show_message", GetMessage("MAIN_OPTION_SESS_MESS"), "Y", Array("checkbox", "Y"));
 
 $aTabs = array(
@@ -545,7 +553,7 @@ foreach($arGROUPS as $value):
 			{
 				if ($v_gr['ID'] == $value["ID"])
 					continue;
-				?><option value="<?=$v_gr['ID']?>" <?echo (in_array($v_gr['ID'],$arSubordinateGroups) || $v_gr['ID'] == 2) ? 'selected' : ''?>><? echo $v_gr['NAME'].' ['.$v_gr['ID'].']'?></option><?
+				?><option value="<?=$v_gr['ID']?>" <?echo (in_array($v_gr['ID'],$arSubordinateGroups)) ? 'selected' : ''?>><? echo $v_gr['NAME'].' ['.$v_gr['ID'].']'?></option><?
 			}
 			?>
 			</select>

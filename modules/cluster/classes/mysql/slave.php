@@ -349,31 +349,31 @@ class CClusterSlave
 					}
 				}
 			}
+		}
 
-			if($bGlobalStatus)
+		if($bGlobalStatus)
+		{
+			$rs = $nodeDB->Query("show global status where Variable_name in ('Com_select', 'Com_do')", true, "", array("fixed_connection" => true));
+			if(is_object($rs))
 			{
-				$rs = $nodeDB->Query("show global status where Variable_name in ('Com_select', 'Com_do')", true, "", array("fixed_connection" => true));
-				if(is_object($rs))
+				while($ar = $rs->Fetch())
 				{
-					while($ar = $rs->Fetch())
-					{
-						if($ar['Variable_name'] == 'Com_do')
-							$arStatus['Com_select'] -= $ar['Value']*2;
-						else
-							$arStatus['Com_select'] += $ar['Value'];
-					}
-				}
-				else
-				{
-					$rs = $nodeDB->Query("show status like 'Com_select'", false, "", array("fixed_connection" => true));
-					$ar = $rs->Fetch();
-					if($ar)
-						$arStatus['Com_select'] += $ar['Value'];
-					$rs = $nodeDB->Query("show status like 'Com_do'", false, "", array("fixed_connection" => true));
-					$ar = $rs->Fetch();
-					if($ar)
+					if($ar['Variable_name'] == 'Com_do')
 						$arStatus['Com_select'] -= $ar['Value']*2;
+					else
+						$arStatus['Com_select'] += $ar['Value'];
 				}
+			}
+			else
+			{
+				$rs = $nodeDB->Query("show status like 'Com_select'", false, "", array("fixed_connection" => true));
+				$ar = $rs->Fetch();
+				if($ar)
+					$arStatus['Com_select'] += $ar['Value'];
+				$rs = $nodeDB->Query("show status like 'Com_do'", false, "", array("fixed_connection" => true));
+				$ar = $rs->Fetch();
+				if($ar)
+					$arStatus['Com_select'] -= $ar['Value']*2;
 			}
 		}
 

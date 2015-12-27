@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.</body> </html>
- *
- *
+ * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков. 
  *
  *
  * @return mixed 
@@ -19,9 +17,7 @@ class CIBlockSection extends CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>.</p>
-	*
-	*
+	* <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
@@ -42,8 +38,6 @@ class CIBlockSection extends CAllIBlockSection
 	* Значение по умолчанию Array("SORT"=&gt;"ASC") означает, что результат
 	* выборки будет отсортирован по возрастанию. Если задать пустой
 	* массив Array(), то результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). <i>Фильтруемое
 	* поле</i> может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по
@@ -79,12 +73,10 @@ class CIBlockSection extends CAllIBlockSection
 	* фильтруемые поля могут содержать перед названием <a
 	* href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
 	* фильтра</a>. <br><br><b><i>Значения фильтра</i></b> одиночное значение или
-	* массив. <br><br><b>Важно!</b> Чтобы фильтрация выполнялась по
+	* массив. <br><br><div class="note"> <b>Важно!</b> Чтобы фильтрация выполнялась по
 	* пользовательским свойствам, необходимо обязательно передавать в
-	* фильтр <i>IBLOCK_ID</i>. <br><br> Необязательное. По умолчанию записи не
-	* фильтруются.
-	*
-	*
+	* фильтр <i>IBLOCK_ID</i>. Само свойство надо указывать в виде UF_... </div> <br>
+	* Необязательное. По умолчанию записи не фильтруются.
 	*
 	* @param bool $bIncCnt = false Возвращать ли поле <i>ELEMENT_CNT</i> - количество элементов в разделе.
 	* При этом arFilter дополнительно обрабатывает следующие фильтруемые
@@ -96,8 +88,6 @@ class CIBlockSection extends CAllIBlockSection
 	* умолчанию N. Учитывается флаг активности элемента ACTIVE и даты
 	* начала и окончания активности. <br> </li> </ul> Необязательный параметр,
 	* по умолчанию равен false.
-	*
-	*
 	*
 	* @param array $Select = Array() Массив для выборки. <ul> <li> <b>ID</b> - ID группы информационного
 	* блока.</li> <li> <b>CODE</b> - Символьный идентификатор.</li> <li> <b>EXTERNAL_ID или
@@ -129,38 +119,36 @@ class CIBlockSection extends CAllIBlockSection
 	* пользовательские свойства, если задать их код (см. примечание
 	* ниже).
 	*
+	* @param array $NavStartParams = false Массив для постраничной навигации. Может содержать следующие
+	* ключи: <ul> <li> <b>bShowAll</b> - разрешить вывести все элементы при
+	* постраничной навигации;</li> <li> <b>iNumPage</b> - номер страницы при
+	* постраничной навигации;</li> <li> <b>nPageSize</b> - количество элементов на
+	* странице при постраничной навигации;</li> <li> <b>nTopCount</b> - ограничить
+	* количество возвращаемых методом записей сверху значением этого
+	* ключа (ключ доступен с версии <b>15.5.5 </b>).</li> </ul>
 	*
+	* @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><p></p><div
+	* class="note"> <b>Примечание №1:</b> для вывода пользовательских свойств
+	* обязательно должен быть передан <i>IBLOCK_ID</i> и в arSelect код
+	* необходимых свойств <i>UF_XXX</i>. Если необходимо вывести все
+	* пользовательские свойства, то в arSelect необходимо передать
+	* <i>UF_*</i>.</div> <p></p><div class="note"> <b>Примечание №2:</b> поле для сортировки
+	* <i>left_margin</i>, так называемая "сквозная" сортировка, высчитывается на
+	* основании поля <i>sort</i>, уровня вложенности и сортировкой верхнего
+	* уровня. Отличие полей <i>sort</i> и <i>left_margin</i> в том, что <i>sort</i>
+	* указывается пользователем, для сортировки разделов между собой в
+	* пределах одного раздела-родителя, а вычисляемое <i>left_margin</i>
+	* предназначено для сортировки во всем информационном блоке. </div>
+	* <p></p><div class="note"> <b>Примечание №3:</b> нет возможности фильтровать
+	* разделы в выборке по количеству элементов.</div>
 	*
-	* @param array $NavStartParams = false Массив для постраничной навигации. <ul> <li> <b>bShowAll</b> - разрешить
-	* вывести все элементы при постраничной навигации</li> <li> <b>iNumPage</b> -
-	* номер страницы при постраничной навигации</li> <li> <b>nPageSize</b> -
-	* количество элементов на странице при постраничной навигации</li>
-	* </ul>
-	*
-	*
-	*
-	* @return CIBlockResult <a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><h4>Примечание
-	* №1</h4><p>Для вывода пользовательских свойств обязательно должен
-	* быть передан <i>IBLOCK_ID</i> и в arSelect код необходимых свойств <i>UF_XXX</i>.
-	* Если необходимо вывести все пользовательские свойства, то в arSelect
-	* необходимо передать <i>UF_*</i>.</p> <h4>Примечание №2</h4><p> Поле для
-	* сортировки <i>left_margin</i>, так называемая "сквозная" сортировка,
-	* высчитывается на основании поля <i>sort</i>, уровня вложенности и
-	* сортировкой верхнего уровня. Отличие полей <i>sort</i> и <i>left_margin</i> в
-	* том, что <i>sort</i> указывается пользователем, для сортировки
-	* разделов между собой в пределах одного раздела-родителя, а
-	* вычисляемое <i>left_margin</i> предназначено для сортировки во всем
-	* информационном блоке. </p>
-	*
-	*
-	* <h4>Example</h4>
+	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arIBTYPE = CIBlockType::GetByIDLang($type, LANGUAGE_ID);<br>if($arIBTYPE!==false)<br>{<br>  // выборка только активных разделов из инфоблока $IBLOCK_ID, в которых есть элементы <br>  // со значением свойства SRC, начинающееся с https://<br>  $arFilter = Array('IBLOCK_ID'=&gt;$IBLOCK_ID, 'GLOBAL_ACTIVE'=&gt;'Y', 'PROPERTY'=&gt;Array('SRC'=&gt;'https://%'));<br>  $db_list = CIBlockSection::GetList(Array($by=&gt;$order), $arFilter, true);<br>  $db_list-&gt;NavStart(20);<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>  while($ar_result = $db_list-&gt;GetNext())<br>  {<br>    echo $ar_result['ID'].' '.$ar_result['NAME'].': '.$ar_result['ELEMENT_CNT'].'&lt;br&gt;';<br>  }<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>}<br>?&gt;<br>
-	*
-	*
-	*
-	* //пример выборки дерева подразделов для раздела
+	* 
+	* 
+	* 
+	* //пример выборки дерева подразделов для раздела 
 	* $rsParentSection = CIBlockSection::GetByID(ID_необходимой_секции);
 	* if ($arParentSection = $rsParentSection-&gt;GetNext())
 	* {
@@ -171,16 +159,16 @@ class CIBlockSection extends CAllIBlockSection
 	*        // получаем подразделы
 	*    }
 	* }
-	*
-	*
-	*
-	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле
-	*
-	* &lt;?
+	* 
+	* 
+	* 
+	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле 
+	* 
+	* &lt;? 
 	* //внутри цикла построения меню
 	* $uf_iblock_id = 1; //ID инфоблока
 	* $uf_name = Array("UF_PAGE_LINK"); //пользовательское поле UF_PAGE_LINK
-	*
+	* 
 	* preg_match('/\?ID=([0-9]+)\&amp;?/i', $arItem["LINK"], $matches); //SEF отключен, поэтому спокойно берем SECTION_ID из ссылки по шаблону ID=#SECTION_ID#
 	* $uf_section_id = $matches[1];
 	* if(CModule::IncludeModule("iblock")): //подключаем модуль инфоблок для работы с классом CIBlockSection
@@ -191,37 +179,388 @@ class CIBlockSection extends CAllIBlockSection
 	*       endif;
 	*    endif;
 	* endif;
-	* ?&gt;
-	*
-	*
-	*
+	* ?&gt; 
+	* 
+	* 
+	* 
 	* //рассмотрим разницу использования фильтра по LEFT_MARGIN, RIGHT_MARGIN и LEFT_BORDER, RIGHT_BORDER
 	* //допустим, что у некоторого раздела LEFT_MARGIN (значение в базе) = 10, RIGHT_MARGIN (значение в базе) = 40
-	*
+	* 
 	* //в первом примере кода будет выбран как сам раздел, так и все его подразделы,
 	* //поскольку всегда LEFT_MARGIN раздела-потомка &gt; LEFT_MARGIN раздела-родителя
 	* //и RIGHT_MARGIN раздела-потомка &lt; RIGHT_MARGIN раздела-родителя
-	*
+	* 
 	* $arFilter = array('IBLOCK_ID' =&gt; 10, 'LEFT_MARGIN' =&gt; 10, 'RIGHT_MARGIN' =&gt; 40);
 	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
-	* while ($arSction = $rsSections-&gt;Fetch())
+	* while ($arSection = $rsSections-&gt;Fetch())
 	* {
 	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&amp;ltbr&gt;';
 	* }
-	*
+	* 
 	* //во втором примере кода будет возвращена только одна запись - сам раздел
-	*
+	* 
 	* $arFilter = array('IBLOCK_ID' =&gt; 10, 'LEFT_BORDER' =&gt; 10, 'RIGHT_BORDER' =&gt; 40);
 	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
 	* while ($arSction = $rsSections-&gt;Fetch())
 	* {
 	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&lt;br&gt;';
 	* }
+	* 
+	* 
+	* 
+	* 		<!--
+	* 		imgID = 'img-7308';
+	* 		imgIDsection = 'img-7308-section';
+	* 		document.getElementById(imgID).src = "/api_help/minus.gif";
+	* 		document.getElementById(imgIDsection).src = "/api_help/section_open.gif";
+	* 		//-->
+	* 		
+	* 		<!--
+	* 		imgID = 'img-7310';
+	* 		imgIDsection = 'img-7310-section';
+	* 		document.getElementById(imgID).src = "/api_help/minus.gif";
+	* 		document.getElementById(imgIDsection).src = "/api_help/section_open.gif";
+	* 		//-->
+	* 		
+	* 		<!--
+	* 		imgID = 'img-7316';
+	* 		imgIDsection = 'img-7316-section';
+	* 		document.getElementById(imgID).src = "/api_help/minus.gif";
+	* 		document.getElementById(imgIDsection).src = "/api_help/section_open.gif";
+	* 		//-->
+	* 		
+	* 		function MoveToPage(move_to)
+	* 		{
+	* 			if('next'==move_to)
+	* 				window.location = '/api_help/iblock/classes/ciblocksection/getmixedlist.php';
+	* 			else if('prev'==move_to)
+	* 				window.location = '/api_help/iblock/classes/ciblocksection/getcount.php';
+	* 		}
+	* 		
+	* 							<!--
+	* 							document.getElementById('90688').style.fontWeight = 'bold';
+	* 							//-->
+	* 							
+	* var smallEngLettersReg = new Array(/e'/g, /ch/g, /sh/g, /yo/g, /jo/g, /zh/g, /yu/g, /ju/g, /ya/g, /ja/g, /a/g, /b/g, /v/g, /g/g, /d/g, /e/g, /z/g, /i/g, /j/g, /k/g, /l/g, /m/g, /n/g, /o/g, /p/g, /r/g, /s/g, /t/g, /u/g, /f/g, /h/g, /c/g, /w/g, /~/g, /y/g, /'/g);
+	* var smallRusLetters = new Array("э", "ч", "ш", "ё", "ё", "ж", "ю", "ю", "я", "я", "а", "б", "в", "г", "д", "е", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "щ", "ъ", "ы", "ь");
+	* 
+	* var capitEngLettersReg = new Array(
+	* 	/Ch/g, /Sh/g, 
+	* 	/Yo/g, /Zh/g, 
+	* 	/Yu/g, /Ya/g, 
+	* 	/E'/g, /CH/g, /SH/g, /YO/g, /JO/g, /ZH/g, /YU/g, /JU/g, /YA/g, /JA/g, /A/g, /B/g, /V/g, /G/g, /D/g, /E/g, /Z/g, /I/g, /J/g, /K/g, /L/g, /M/g, /N/g, /O/g, /P/g, /R/g, /S/g, /T/g, /U/g, /F/g, /H/g, /C/g, /W/g, /Y/g);
+	* var capitRusLetters = new Array(
+	* 	"Ч", "Ш",
+	* 	"Ё", "Ж",
+	* 	"Ю", "Я",
+	* 	"Э", "Ч", "Ш", "Ё", "Ё", "Ж", "Ю", "Ю", "\Я", "\Я", "А", "Б", "В", "Г", "Д", "Е", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П", "Р", "С", "Т", "У", "Ф", "Х", "Ц", "Щ", "Ы");
+	* 
+	* var smallRusLettersReg = new Array(/э/g, /ч/g, /ш/g, /ё/g, /ё/g,/ж/g, /ю/g, /ю/g, /я/g, /я/g, /а/g, /б/g, /в/g, /г/g, /д/g, /е/g, /з/g, /и/g, /й/g, /к/g, /л/g, /м/g, /н/g, /о/g, /п/g, /р/g, /с/g, /т/g, /у/g, /ф/g, /х/g, /ц/g, /щ/g, /ъ/g, /ы/g, /ь/g );
+	* var smallEngLetters = new Array("e", "ch", "sh", "yo", "jo", "zh", "yu", "ju", "ya", "ja", "a", "b", "v", "g", "d", "e", "z", "i", "j", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "h", "c", "w", "~", "y", "'");
+	* 
+	* var capitRusLettersReg = new Array(
+	* 	/Ч(?=[^А-Я])/g, /Ш(?=[^А-Я])/g, 
+	* 	/Ё(?=[^А-Я])/g, /Ж(?=[^А-Я])/g, 
+	* 	/Ю(?=[^А-Я])/g, /Я(?=[^А-Я])/g, 
+	* 	/Э/g, /Ч/g, /Ш/g, /Ё/g, /Ё/g, /Ж/g, /Ю/g, /Ю/g, /Я/g, /Я/g, /А/g, /Б/g, /В/g, /Г/g, /Д/g, /Е/g, /З/g, /И/g, /Й/g, /К/g, /Л/g, /М/g, /Н/g, /О/g, /П/g, /Р/g, /С/g, /Т/g, /У/g, /Ф/g, /Х/g, /Ц/g, /Щ/g, /Ъ/g, /Ы/g, /Ь/g);
+	* var capitEngLetters = new Array(
+	* 	"Ch", "Sh",
+	* 	"Yo", "Zh",
+	* 	"Yu", "Ya",
+	* 	"E", "CH", "SH", "YO", "JO", "ZH", "YU", "JU", "YA", "JA", "A", "B", "V", "G", "D", "E", "Z", "I", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "C", "W", "~", "Y", "'");
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-315789-1451244916',
+	* 			'FORUM_POST',
+	* 			'315789',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-319631-1451244366',
+	* 			'FORUM_POST',
+	* 			'319631',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-320394-1451244539',
+	* 			'FORUM_POST',
+	* 			'320394',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-320627-1451244986',
+	* 			'FORUM_POST',
+	* 			'320627',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-331219-1451244897',
+	* 			'FORUM_POST',
+	* 			'331219',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-342695-1451244893',
+	* 			'FORUM_POST',
+	* 			'342695',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-351621-1451244718',
+	* 			'FORUM_POST',
+	* 			'351621',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-355817-1451244607',
+	* 			'FORUM_POST',
+	* 			'355817',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* 
+	* 
+	* 			DocSwitchTab('DocGeneral')
+	* 		
+	* 		BX.ready(function(){
+	* 			hljs.configure({tabReplace: '    '});
+	* 			hljs.initHighlightingOnLoad();
+	* 			var elements = BX.findChildren(document, {tag: 'pre'}, true);
+	* 			if (elements != null)
+	* 			{
+	* 				for (var j = 0; j < elements.length; j++)
+	* 				{
+	* 					hljs.highlightBlock(elements[j]);
+	* 				}
+	* 			}		
+	* 		});
 	* </pre>
 	*
 	*
-	*
-	* <h4>See Also</h4>
+	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
 	* информационного блока </a> </li> </ul> <a name="examples"></a>
@@ -234,6 +573,9 @@ class CIBlockSection extends CAllIBlockSection
 	public static function GetList($arOrder=Array("SORT"=>"ASC"), $arFilter=Array(), $bIncCnt = false, $arSelect = array(), $arNavStartParams=false)
 	{
 		global $DB, $USER, $USER_FIELD_MANAGER;
+
+		if (!is_array($arOrder))
+			$arOrder = array();
 
 		if(isset($arFilter["IBLOCK_ID"]) && $arFilter["IBLOCK_ID"] > 0)
 		{
@@ -495,11 +837,11 @@ class CIBlockSection extends CAllIBlockSection
 			$strGroupBy = "GROUP BY BS.ID, B.ID";
 		}
 
-		$arSqlOrder = Array();
+		$arSqlOrder = array();
 		foreach($arOrder as $by=>$order)
 		{
 			$by = strtolower($by);
-			if(array_key_exists($by, $arSqlOrder))
+			if(isset($arSqlOrder[$by]))
 				continue;
 			$order = strtolower($order);
 			if($order!="asc")
@@ -532,10 +874,21 @@ class CIBlockSection extends CAllIBlockSection
 
 		if(is_array($arNavStartParams))
 		{
-			$res_cnt = $DB->Query("SELECT COUNT(DISTINCT BS.ID) as C ".$strSql);
-			$res_cnt = $res_cnt->Fetch();
-			$res = new CDBResult();
-			$res->NavQuery("SELECT DISTINCT ".$strSelect.$strSql.$strGroupBy.$strSqlOrder, $res_cnt["C"], $arNavStartParams);
+			$nTopCount = intval($arNavStartParams["nTopCount"]);
+			if($nTopCount > 0)
+			{
+				$res = $DB->Query($DB->TopSql(
+					"SELECT DISTINCT ".$strSelect.$strSql.$strGroupBy.$strSqlOrder,
+					$nTopCount
+				));
+			}
+			else
+			{
+				$res_cnt = $DB->Query("SELECT COUNT(DISTINCT BS.ID) as C ".$strSql);
+				$res_cnt = $res_cnt->Fetch();
+				$res = new CDBResult();
+				$res->NavQuery("SELECT DISTINCT ".$strSelect.$strSql.$strGroupBy.$strSqlOrder, $res_cnt["C"], $arNavStartParams);
+			}
 		}
 		else
 		{

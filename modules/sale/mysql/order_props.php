@@ -6,21 +6,18 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order_props
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderprops/index.php
  * @author Bitrix
+ * @deprecated
  */
 class CSaleOrderProps extends CAllSaleOrderProps
 {
 	
 	/**
-	* <p>Функция возвращает результат выборки из свойств заказов в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки из свойств заказов в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -35,8 +32,6 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи свойств
 	* заказа. Массив имеет вид: <pre class="syntax">array(
@@ -66,38 +61,31 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи свойств заказа.
 	* Массив имеет вид: <pre class="syntax"> array("название_поля1",
 	* "группирующая_функция2" =&gt; "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле свойств заказа. В
-	* качестве группирующей функции могут стоять: <ul> <li> <b> COUNT</b> -
+	* качестве группирующей функции могут стоять: <ul> <li> <b>COUNT</b> -
 	* подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
-	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
-	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
-	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
-	* означает, что результат группироваться не будет.
-	*
-	*
+	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b>MAX</b> -
+	* вычисление максимального значения;</li> <li> <b>UTIL</b> - флаг Y/N,
+	* служебное;</li> <li> <b>SUM</b> - вычисление суммы.</li> </ul> Если массив
+	* пустой, то метод вернет число записей, удовлетворяющих
+	* фильтру.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	* результат группироваться не будет.
 	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов параметров свойств с ключами:</p> <table
@@ -125,9 +113,8 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	* <td>Флаг (Y/N) использовать ли значение свойства как местоположение
 	* покупателя для расчёта налогов (только для свойств типа LOCATION)</td>
 	* </tr> <tr> <td>CODE</td> <td>Символьный код свойства.</td> </tr> </table> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -168,7 +155,7 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	*       }
 	*       elseif ($props["TYPE"]=="TEXT")
 	*       {
-	*          echo '&lt;input type="text" class="inputtext" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:30).'" maxlength="250" value="'.htmlspecialchars($props["DEFAULT_VALUE"]).'" name="ORDER_PROP_'.$props["ID"].'"&gt;";
+	*          echo '&lt;input type="text" class="inputtext" size="'.((IntVal($props["SIZE1"])&gt;0)?$props["SIZE1"]:30).'" maxlength="250" value="'.htmlspecialchars($props["DEFAULT_VALUE"]).'" name="ORDER_PROP_'.$props["ID"].'"&gt;';
 	*       }
 	*       elseif ($props["TYPE"]=="SELECT")
 	*       {
@@ -204,7 +191,7 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	*          $db_vars = CSaleLocation::GetList(Array("SORT"=&gt;"ASC", "COUNTRY_NAME_LANG"=&gt;"ASC", "CITY_NAME_LANG"=&gt;"ASC"), array(), LANGUAGE_ID);
 	*          while ($vars = $db_vars-&gt;Fetch())
 	*          {
-	*             echo '&lt;option value="'.$vars["ID"].'"".((IntVal($vars["ID"])==IntVal($props["DEFAULT_VALUE"]))?" selected":"").'&gt;'.htmlspecialchars($vars["COUNTRY_NAME"]." - ".$vars["CITY_NAME"]).'&lt;/option&gt;';
+	*             echo '&lt;option value="'.$vars["ID"].'"'.((IntVal($vars["ID"])==IntVal($props["DEFAULT_VALUE"]))?" selected":"").'&gt;'.htmlspecialchars($vars["COUNTRY_NAME"]." - ".$vars["CITY_NAME"]).'&lt;/option&gt;';
 	*          }
 	*          echo '&lt;/select&gt;';
 	*       }
@@ -290,7 +277,7 @@ class CSaleOrderProps extends CAllSaleOrderProps
 			"TYPE" => array("FIELD" => "P.TYPE", "TYPE" => "string"),
 			"REQUIED" => array("FIELD" => "P.REQUIED", "TYPE" => "char"),
 			"REQUIRED" => array("FIELD" => "P.REQUIED", "TYPE" => "char"),
-			"DEFAULT_VALUE" => array("FIELD" => "P.DEFAULT_VALUE", "TYPE" => "string"),
+			//"DEFAULT_VALUE" => array("FIELD" => "P.DEFAULT_VALUE", "TYPE" => "string"),
 			"SORT" => array("FIELD" => "P.SORT", "TYPE" => "int"),
 			"USER_PROPS" => array("FIELD" => "P.USER_PROPS", "TYPE" => "char"),
 			"IS_LOCATION" => array("FIELD" => "P.IS_LOCATION", "TYPE" => "char"),
@@ -324,6 +311,8 @@ class CSaleOrderProps extends CAllSaleOrderProps
 			"DELIVERY_ID" => array("FIELD" => "SOD.PROPERTY_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order_props_relation SOD ON P.ID = SOD.PROPERTY_ID", "WHERE" => array("CSaleOrderProps", "PrepareRelation4Where"))
 		);
 		// <-- FIELDS
+
+		self::addPropertyDefaultValueField('P', $arFields);
 
 		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
@@ -459,9 +448,7 @@ class CSaleOrderProps extends CAllSaleOrderProps
 
 	
 	/**
-	* <p>Функция добавляет новое свойство заказа с параметрами из массива arFields </p>
-	*
-	*
+	* <p>Метод добавляет новое свойство заказа с параметрами из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив, в котором ключами являются названия
@@ -494,10 +481,7 @@ class CSaleOrderProps extends CAllSaleOrderProps
 	* 10.0.</li> <li> <b>UTIL</b> - позволяет использовать свойство только в
 	* административной части. С версии 11.0.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного свойства заказа.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -571,6 +555,9 @@ class CSaleOrderProps extends CAllSaleOrderProps
 
 		if (!CSaleOrderProps::CheckFields("ADD", $arFields))
 			return false;
+
+		// translate here
+		$arFields['DEFAULT_VALUE'] = self::translateLocationIDToCode($arFields);
 
 		$arInsert = $DB->PrepareInsert("b_sale_order_props", $arFields);
 

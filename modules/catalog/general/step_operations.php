@@ -32,15 +32,11 @@ class CCatalogStepOperations
 		$this->stepErrors = array();
 		$maxExecutionTime = (int)$maxExecutionTime;
 		if ($maxExecutionTime < 0)
-		{
 			$maxExecutionTime = $this->getDefaultExecutionTime();
-		}
 		$this->maxExecutionTime = $maxExecutionTime;
 		$maxOperationCounter = (int)$maxOperationCounter;
 		if ($maxOperationCounter < 0)
-		{
 			$maxOperationCounter = 10;
-		}
 		$this->maxOperationCounter = $maxOperationCounter;
 		$this->startOperationTime = time();
 		$this->finishOperation = false;
@@ -59,11 +55,6 @@ class CCatalogStepOperations
 		{
 			if (isset($_SESSION[$this->sessID]['ERRORS_COUNTER']) && (int)$_SESSION[$this->sessID]['ERRORS_COUNTER'] > 0)
 				$this->errorCounter = (int)$_SESSION[$this->sessID]['ERRORS_COUNT'];
-			if ($this->errorCounter > 0)
-			{
-				if (isset($_SESSION[$this->sessID]['ERRORS']) && is_array($_SESSION[$this->sessID]['ERRORS']))
-				$this->errors = $_SESSION[$this->sessID]['ERRORS'];
-			}
 		}
 		$this->stepErrors = array();
 		$lastID = (int)$lastID;
@@ -87,14 +78,8 @@ class CCatalogStepOperations
 		if ($this->errorCounter > 0)
 		{
 			if (!empty($this->stepErrors))
-			{
-				$this->errors = (!empty($this->errors) ? array_merge($this->errors, $this->stepErrors) : $this->stepErrors);
-			}
+				$this->errors = $this->stepErrors;
 			$_SESSION[$this->sessID]['ERRORS_COUNTER'] = $this->errorCounter;
-			if (!empty($this->errors))
-			{
-				$_SESSION[$this->sessID]['ERRORS'] = $this->errors;
-			}
 		}
 		$messageParams = array(
 			'MESSAGE' => '',
@@ -107,9 +92,7 @@ class CCatalogStepOperations
 		if (!$this->finishOperation)
 		{
 			if ($this->maxExecutionTime > (2*(time() - $this->startOperationTime)))
-			{
 				$this->maxOperationCounter = $this->maxOperationCounter*2;
-			}
 		}
 
 		$message = new CAdminMessage($messageParams);
@@ -236,9 +219,7 @@ class CCatalogProductSetAvailable extends CCatalogStepOperations
 		}
 		CTimeZone::Enable();
 		if ($emptyList)
-		{
 			$this->finishOperation = true;
-		}
 	}
 
 	public static function getAllCounter()
@@ -250,4 +231,3 @@ class CCatalogProductSetAvailable extends CCatalogStepOperations
 		);
 	}
 }
-?>

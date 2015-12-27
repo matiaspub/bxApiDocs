@@ -10,8 +10,6 @@ global $USER_FIELD_MANAGER;
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -94,18 +92,13 @@ abstract class CAllTestAttempt
 	* <p>Метод добавляет новую попытку.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return int <p>Метод возвращает идентификатор добавленной попытки, если
 	* добавление прошло успешно. При возникновении ошибки метод вернёт
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -138,7 +131,6 @@ abstract class CAllTestAttempt
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -185,22 +177,15 @@ abstract class CAllTestAttempt
 	* <p>Метод изменяет параметры попытки с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор попытки
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	* возникновении ошибки функция вернёт <i>false</i>. При возникновении
+	* возникновении ошибки метод вернёт <i>false</i>. При возникновении
 	* ошибки в исключениях будет содержаться текст ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -231,7 +216,6 @@ abstract class CAllTestAttempt
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -283,15 +267,10 @@ abstract class CAllTestAttempt
 	* <p>Метод удаляет попытку с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор попытки.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления попытки, в
 	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -372,6 +351,10 @@ abstract class CAllTestAttempt
 					$arSqlSearch[] = CLearnHelper::FilterCreate("A.".$key, $val, "number", $bFullJoin, $cOperationType);
 					break;
 
+				case "SPEED":
+					$arSqlSearch[] = CLearnHelper::FilterCreate(self::getSpeedFieldSql(), $val, "number", $bFullJoin, $cOperationType);
+					break;
+
 				case "STATUS":
 				case "COMPLETED":
 					$arSqlSearch[] = CLearnHelper::FilterCreate("A.".$key, $val, "string_equal", $bFullJoin, $cOperationType);
@@ -397,15 +380,10 @@ abstract class CAllTestAttempt
 	* <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор попытки.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>See Also</h4> 
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
@@ -430,15 +408,9 @@ abstract class CAllTestAttempt
 	* <p>Возвращает количество попыток студента для указанного теста.</p>
 	*
 	*
-	*
-	*
 	* @param int $TEST_ID  Идентификатор теста.
 	*
-	*
-	*
 	* @param int $STUDENT_ID  Идентификатор студента.
-	*
-	*
 	*
 	* @return int <p>Число - количество попыток.</p>
 	*
@@ -467,18 +439,11 @@ abstract class CAllTestAttempt
 	* <p>Проверяет, пройден ли тест.</p>
 	*
 	*
-	*
-	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
-	*
-	*
 	*
 	* @param int $PERCENT  Количество процентов, необходимых для прохождения теста.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если тест пройден, иначе - <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -497,7 +462,6 @@ abstract class CAllTestAttempt
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -642,15 +606,10 @@ abstract class CAllTestAttempt
 	* <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы.</p>
 	*
 	*
-	*
-	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если операция выполнилась успешно,
 	* иначе <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -665,7 +624,6 @@ abstract class CAllTestAttempt
 	*         echo "Error!";
 	* }
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -804,8 +762,6 @@ abstract class CAllTestAttempt
 	* <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
 	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
 	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
@@ -818,9 +774,7 @@ abstract class CAllTestAttempt
 	* </li> <li> <b>TEST_NAME</b> - название теста. </li> </ul>Направление сортировки
 	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
 	* <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
-	* фильтруется по убыванию идентификатора попытки.
-	*
-	*
+	* сортируется по убыванию идентификатора попытки.
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
@@ -843,21 +797,14 @@ abstract class CAllTestAttempt
 	* одиночное значение или массив.<br><br>Необязательный. По умолчанию
 	* записи не фильтруются.
 	*
-	*
-	*
-	* @param array $arrayarSelect = Array() Массив полей записей, которые будут возвращены функцией.<br><br>
+	* @param array $arrayarSelect = Array() Массив полей записей, которые будут возвращены методом.<br><br>
 	* Значение по умолчанию - пустой массив array() - означает, что будут
 	* возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @param array $arrayarNavParams = Array() Массив настроек постраничной навигации.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -900,7 +847,6 @@ abstract class CAllTestAttempt
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
@@ -940,6 +886,9 @@ abstract class CAllTestAttempt
 			"USER_ID" => "U.ID",
 			"MARK" => "TM.MARK",
 			"MESSAGE" => "TM.DESCRIPTION",
+			"LINKED_LESSON_ID" => "C.LINKED_LESSON_ID",
+			"COURSE_ID" => "C.ID",
+			"SPEED" => self::getSpeedFieldSql()
 		);
 
 		if (count($arSelect) <= 0 || in_array("*", $arSelect))
@@ -1009,6 +958,8 @@ abstract class CAllTestAttempt
 				$arSqlOrder[] = " USER_NAME ".$order." ";
 			elseif ($by == "test_name")
 				$arSqlOrder[] = " TEST_NAME ".$order." ";
+			elseif ($by == "speed")
+				$arSqlOrder[] = " SPEED ".$order." ";
 			elseif ($s = $obUserFieldsSql->GetOrder($by))
 				$arSqlOrder[$by] = " ".$s." ".$order." ";
 			else
@@ -1065,22 +1016,33 @@ abstract class CAllTestAttempt
 		return $res;
 	}
 
+	private static function getSpeedFieldSql()
+	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		if ($connection instanceof \Bitrix\Main\DB\MssqlConnection)
+		{
+			return "DATEDIFF(s, A.DATE_START, A.DATE_END) / A.QUESTIONS";
+		}
+		elseif ($connection instanceof \Bitrix\Main\DB\OracleConnection)
+		{
+			return "round((A.DATE_END-A.DATE_START)*86400) / A.QUESTIONS";
+		}
+		else
+		{
+			return "(unix_timestamp(A.DATE_END)-unix_timestamp(A.DATE_START)) / A.QUESTIONS";
+		}
+	}
 
 	
 	/**
 	* <p>Создаёт план вопросов для указанной попытки.</p>
 	*
 	*
-	*
-	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если создание плана вопросов прошло
 	* успешно. При возникновении ошибки метод вернёт <i>false</i>, а в
 	* исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1104,7 +1066,6 @@ abstract class CAllTestAttempt
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1148,17 +1109,17 @@ abstract class CAllTestAttempt
 		 *       In new data model it means, get X questions from every lesson in the course, except
 		 *       1) immediate lessons-childs of the course and
 		 *       2) lessons, contains other lessons (because, in old data model chapters doesn't contains questions)
-		 * 
-		 * 'H' - all questions from the selected chapter (recursive) in the course 
+		 *
+		 * 'H' - all questions from the selected chapter (recursive) in the course
 		 *       This case must be ignored, because converter to new data model updates 'H' to 'R', but in case
 		 *       when chapter is not exists updates didn't become. So QUESTIONS_FROM stayed in 'H' value. And it means,
 		 *       that there is no chapter exists with QUESTIONS_FROM_ID, so we can't do work. And we should just
 		 *       ignore, for backward compatibility (so, don't throw an error).
 		 * 'S' - all questions from the selected lesson (unilesson_id in QUESTIONS_FROM_ID)
 		 * 'A' - all questions of the course (nothing interesting in QUESTIONS_FROM_ID)
-		 * 
+		 *
 		 * new values:
-		 * 'R' - all questions from the tree with root at selected lesson (include questions of selected lesson) 
+		 * 'R' - all questions from the tree with root at selected lesson (include questions of selected lesson)
 		 *       in the course (unilesson_id in QUESTIONS_FROM_ID)
 		 */
 
@@ -1181,10 +1142,10 @@ abstract class CAllTestAttempt
 				FROM b_learn_lesson L
 				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
 				INNER JOIN b_learn_lesson_edges TLEUP ON L.ID = TLEUP.TARGET_NODE
-				LEFT OUTER JOIN b_learn_lesson_edges TLEDOWN ON L.ID = TLEDOWN.SOURCE_NODE "	
+				LEFT OUTER JOIN b_learn_lesson_edges TLEDOWN ON L.ID = TLEDOWN.SOURCE_NODE "
 				. "WHERE L.ID IN (" . $clauseAllChildsLessons . ") \n"		// only lessons from COURSE_ID = $arTest['COURSE_ID']
 				. " AND TLEDOWN.SOURCE_NODE IS NULL \n"						// exclude lessons, contains other lessons ("chapters")
-					
+
 					// include lessons in current course tree context only (and exclude immediate childs of course)
 				. " AND TLEUP.SOURCE_NODE IN (" . $clauseAllChildsLessons . ") \n"
 
@@ -1248,7 +1209,7 @@ abstract class CAllTestAttempt
 			if ($arTest["QUESTIONS_FROM"] == "H")
 			{
 				/**
-				 * 'H' - all questions from the selected chapter (recursive) in the course 
+				 * 'H' - all questions from the selected chapter (recursive) in the course
 				 *       This case must be ignored, because converter to new data model updates 'H' to 'R', but in case
 				 *       when chapter is not exists updates didn't become. So QUESTIONS_FROM stayed in 'H' value. And it means,
 				 *       that there is no chapter exists with QUESTIONS_FROM_ID, so we can't do work. And we should just
@@ -1340,7 +1301,7 @@ abstract class CAllTestAttempt
 				"SELECT Q.ID AS QUESTION_ID
 				FROM b_learn_lesson L
 				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
-				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") )
 				AND Q.ACTIVE = 'Y' "
 				. ($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
 				"ORDER BY " . ($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID ").
@@ -1350,10 +1311,10 @@ abstract class CAllTestAttempt
 			elseif ($DBType === 'mssql')
 			{
 				$strSql =
-				"SELECT " . ($arTest["QUESTIONS_AMOUNT"] > 0 ? "TOP " . ($arTest["QUESTIONS_AMOUNT"] + 0) . " " :"") . " Q.ID AS QUESTION_ID 
+				"SELECT " . ($arTest["QUESTIONS_AMOUNT"] > 0 ? "TOP " . ($arTest["QUESTIONS_AMOUNT"] + 0) . " " :"") . " Q.ID AS QUESTION_ID
 				FROM b_learn_lesson L
 				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
-				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") )
 				AND Q.ACTIVE = 'Y' "
 				. ($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").
 				"ORDER BY ".($arTest["RANDOM_QUESTIONS"] == "Y" ? CTest::GetRandFunction() : "L.SORT, Q.SORT, L.ID");
@@ -1361,10 +1322,10 @@ abstract class CAllTestAttempt
 			else	// oracle
 			{
 				$strSql =
-				"SELECT Q.ID AS QUESTION_ID 
-				FROM b_learn_lesson L 
-				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID 
-				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") ) 
+				"SELECT Q.ID AS QUESTION_ID
+				FROM b_learn_lesson L
+				INNER JOIN b_learn_question Q ON L.ID = Q.LESSON_ID
+				WHERE (L.ID IN (" . $clauseAllChildsLessons . ") OR (L.ID = " . ($courseLessonId + 0) . ") )
 				AND Q.ACTIVE = 'Y' "
 				. ($arTest["QUESTIONS_AMOUNT"] > 0 ? "AND ROWNUM <= ".$arTest["QUESTIONS_AMOUNT"]." " :"").
 				($arTest["INCLUDE_SELF_TEST"] != "Y" ? "AND Q.SELF = 'N' " : "").

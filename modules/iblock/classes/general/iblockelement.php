@@ -14,9 +14,7 @@ $ar_IBLOCK_SITE_FILTER_CACHE = Array();
 
 
 /**
- * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков. </body> </html>
- *
- *
+ * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков. 
  *
  *
  * @return mixed 
@@ -30,17 +28,17 @@ class CAllIBlockElement
 	public $LAST_ERROR = "";
 	protected $bWF_SetMove = true;
 
-	protected $strField;
+	public $strField;
 	protected $subQueryProp;
-	protected $arFilter;
-	protected $sFrom;
-	protected $sWhere;
+	public $arFilter;
+	public $sFrom;
+	public $sWhere;
+
+	protected static $elementIblock = array();
 
 	
 	/**
-	* <p>Позволяет использовать подзапросы.</p> <p><b>Примечание</b>: применимо только к полю <b>ID</b> элемента основного запроса.</p>
-	*
-	*
+	* <p>Позволяет использовать подзапросы. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: применимо только к полю <b>ID</b> элемента основного запроса.</div>
 	*
 	*
 	* @param string $strField  Название поля, по которому будет осуществляться фильтрация. <br>
@@ -49,21 +47,15 @@ class CAllIBlockElement
 	* <b>PROPERTY_CODE</b> - это ID или символьный код свойства привязки. Свойство
 	* должно быть типа "привязка к элементам". </li> </ul>
 	*
-	*
-	*
-	* @param array $arFilter  Фильтр элементов тот же, что и в функции <a
+	* @param array $arFilter  Фильтр элементов тот же, что и в методе <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>.
 	*
-	*
-	*
 	* @return object <p>Объект подзапроса.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>//Выбрать авторов написавших книги в 21-ом веке.<br>if(CModule::IncludeModule('iblock'))<br>{<br>  $rsBooks = CIBlockElement::GetList(<br>    array("NAME" =&gt; "ASC"), //Сортируем по имени<br>    array(<br>      "IBLOCK_ID" =&gt; $AUTHOR_IBLOCK,<br>      "ACTIVE" =&gt; "Y",<br>      "ID" =&gt; CIBlockElement::SubQuery("PROPERTY_AUTHOR", array(<br>        "IBLOCK_ID" =&gt; $BOOK_IBLOCK,<br>        "&gt;=PROPERTY_PRINT_DATE" =&gt; "2000-01-01 00:00:00",<br>      )),<br>   ),<br>   false, // Без группировки<br>   false,  //Без постранички<br>   array("ID", "IBLOCK_ID", "NAME") // Выбираем только поля необходимые для показа<br>  );<br>  while($arBook = $rsBooks-&gt;GetNext())<br>    echo "&lt;li&gt;", $arBook["NAME"],"\n";<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -445,7 +437,8 @@ class CAllIBlockElement
 			if($HISTORY_COPIES===false)
 				$HISTORY_COPIES = intval(COption::GetOptionString("workflow","HISTORY_COPIES","10"));
 
-			$ELEMENT_ID = intval($ELEMENT_ID);
+			$strSqlSearch = '';
+			$ELEMENT_ID = (int)$ELEMENT_ID;
 			if($ELEMENT_ID>0)
 				$strSqlSearch = " AND ID = $ELEMENT_ID ";
 			$strSql = "SELECT ID FROM b_iblock_element ".
@@ -544,6 +537,10 @@ class CAllIBlockElement
 	public static function WF_GetStatusTitle($STATUS_ID)
 	{
 		global $DB;
+
+		$zr = array(
+			'TITLE' => null
+		);
 		if(CModule::IncludeModule("workflow"))
 		{
 			$STATUS_ID = intval($STATUS_ID);
@@ -680,6 +677,15 @@ class CAllIBlockElement
 			$Logic = "AND";
 		}
 
+		if ($Logic === "AND" && $level === 0)
+		{
+			$f = new \Bitrix\Iblock\PropertyIndex\QueryBuilder($arFilter["IBLOCK_ID"]);
+			if ($f->isValid())
+			{
+				$arJoinProps["FC"] = $f->getFilterSql($arFilter, $arSqlSearch);
+				$arJoinProps["FC_DISTINCT"] = $f->getDistinct();
+			}
+		}
 		foreach($arFilter as $orig_key => $val)
 		{
 			$res = CIBlock::MkOperationFilter($orig_key);
@@ -2561,8 +2567,14 @@ class CAllIBlockElement
 		&$arIBlockLongProps
 		)
 	{
-		if(is_array($arSelectFields) && in_array("DETAIL_PAGE_URL", $arSelectFields) && !in_array("LANG_DIR", $arSelectFields))
+		if(
+			is_array($arSelectFields)
+			&& (in_array("DETAIL_PAGE_URL", $arSelectFields) || in_array("CANONICAL_PAGE_URL", $arSelectFields))
+			&& !in_array("LANG_DIR", $arSelectFields)
+		)
+		{
 			$arSelectFields[] = "LANG_DIR";
+		}
 
 		global $DB, $USER;
 
@@ -2639,7 +2651,9 @@ class CAllIBlockElement
 			"RV" => false,
 			"RVU" => false,
 			"RVV" => false,
+			"FC" => "",
 		);
+
 		$arIBlockMultProps = Array();
 		$arIBlockAllProps = Array();
 		$arIBlockNumProps = Array();
@@ -2817,9 +2831,11 @@ class CAllIBlockElement
 				"CATALOG_PURCHASING_CURRENCY" => true,
 				"CATALOG_WEIGHT" => true,
 				"CATALOG_QUANTITY" => true,
+				"CATALOG_QUANTITY_RESERVED" => true,
 				"CATALOG_VAT_INCLUDED" => true,
 				"CATALOG_TYPE" => true,
-				"CATALOG_MEASURE" => true
+				"CATALOG_MEASURE" => true,
+				"CATALOG_AVAILABLE" => true
 			);
 			$bStar = false;
 			foreach($arSelectFields as $key=>$val)
@@ -2940,11 +2956,11 @@ class CAllIBlockElement
 				{
 					$arAddSelectFields[] = $val;
 				}
-				elseif(isset($arProductFields[$val]))
+				elseif(substr($val, 0, 21) == "CATALOG_STORE_AMOUNT_")
 				{
 					$arAddSelectFields[] = $val;
 				}
-				elseif(substr($val, 0, 18) == "CATALOG_USE_STORE_")
+				elseif(isset($arProductFields[$val]))
 				{
 					$arAddSelectFields[] = $val;
 				}
@@ -2995,6 +3011,8 @@ class CAllIBlockElement
 			{
 				//Try to add missing fields for correct URL translation (only then no grouping)
 				if(array_key_exists("DETAIL_PAGE_URL", $arDisplayedColumns))
+					$arAddFields = array("LANG_DIR", "ID", "CODE", "EXTERNAL_ID", "IBLOCK_SECTION_ID", "IBLOCK_TYPE_ID", "IBLOCK_ID", "IBLOCK_CODE", "IBLOCK_EXTERNAL_ID", "LID");
+				elseif(array_key_exists("CANONICAL_PAGE_URL", $arDisplayedColumns))
 					$arAddFields = array("LANG_DIR", "ID", "CODE", "EXTERNAL_ID", "IBLOCK_SECTION_ID", "IBLOCK_TYPE_ID", "IBLOCK_ID", "IBLOCK_CODE", "IBLOCK_EXTERNAL_ID", "LID");
 				elseif(array_key_exists("SECTION_PAGE_URL", $arDisplayedColumns))
 					$arAddFields = array("LANG_DIR", "ID", "CODE", "EXTERNAL_ID", "IBLOCK_SECTION_ID", "IBLOCK_TYPE_ID", "IBLOCK_ID", "IBLOCK_CODE", "IBLOCK_EXTERNAL_ID", "LID");
@@ -3048,9 +3066,7 @@ class CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* Метод добавляет новый элемент информационного блока. Перед добавлением элемента вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a>, из которых можно изменить значения полей или отменить добавление элемента вернув сообщение об ошибке. После добавления элемента вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a>.
-	*
-	*
+	* Метод добавляет новый элемент информационного блока. Перед добавлением элемента вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a>, из которых можно изменить значения полей или отменить добавление элемента вернув сообщение об ошибке. После добавления элемента вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a>. Метод динамичный.
 	*
 	*
 	* @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
@@ -3065,16 +3081,13 @@ class CAllIBlockElement
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode()</a>.
-	* <br><br><b>Примечание:</b> поля с датами задаются в формате сайта.
-	*
-	*
+	* <br><br><div class="note"> <b>Примечание:</b> поля с датами задаются в формате
+	* сайта.</div>
 	*
 	* @param bool $bWorkFlow = false Вставка в режиме документооборота. Если true и модуль
 	* документооборота установлен, то данное добавление будет учтено в
 	* журнале изменения элемента. Не обязательный параметр, по
 	* умолчанию вставка в режиме документооборота отключена.
-	*
-	*
 	*
 	* @param bool $bUpdateSearch = true Индексировать элемент для поиска. Для повышения
 	* производительности можно отключать этот параметр во время серии
@@ -3082,18 +3095,13 @@ class CAllIBlockElement
 	* Не обязательный параметр, по умолчанию элемент после добавления
 	* будет проиндексирован в поиске.
 	*
-	*
-	*
 	* @param bool $bResizePictures = false Использовать настройки инфоблока для обработки изображений. По
 	* умоляанию настройки не применяются. Если этот параметр имеет
 	* значение true, то к полям PREVIEW_PICTURE и DETAIL_PICTURE будут применены правила
 	* генерации и масштабирования в соответствии с настройками
 	* информационного блока.
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3229,7 +3237,6 @@ class CAllIBlockElement
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
@@ -3240,11 +3247,13 @@ class CAllIBlockElement
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">OnBeforeIBlockElementAdd</a></li>
 	* <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">OnAfterIBlockElementAdd</a></li>
-	* </ul><br><p><b>Примечание:</b> если при добавлении свойств в PROPERTY_VALUES при
-	* сохранении элемента инфоблока функцией CIBlockElement::Add, происходит
-	* подобная ошибка: </p> <pre class="syntax"> MySQL Query Error: INS ERT INTO b_iblock_element_property
-	* (IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM) SEL ECT 323 ,P.ID ,'28' ,28,0000 FR OM b_iblock_property P
-	* WHERE ID=42[Column count doesn't match val ue count at row 1]</pre><i>setlocale( LC_NUMERIC, '' );</i><br><a
+	* </ul><br><p></p><div class="note"> <b>Примечание:</b> если при добавлении свойств в
+	* PROPERTY_VALUES при сохранении элемента инфоблока методом CIBlockElement::Add,
+	* происходит подобная ошибка: <pre class="syntax"> MySQL Query Error: INS ERT INTO
+	* b_iblock_element_property (IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM) SEL ECT 323 ,P.ID ,'28' ,28,0000 FR
+	* OM b_iblock_property P WHERE ID=42[Column count doesn't match val ue count at row 1]</pre> попробуйте
+	* выставить пустое значение в <i>setlocale( LC_NUMERIC, '' );</i>, чтобы PHP
+	* использовал точку при форматировании числа, а не запятую.</div> <br><a
 	* name="examples"></a>
 	*
 	*
@@ -3282,11 +3291,17 @@ class CAllIBlockElement
 			}
 		}
 
-		if(is_set($arFields, "IBLOCK_SECTION_ID") && intval($arFields["IBLOCK_SECTION_ID"])<=0)
-			unset($arFields["IBLOCK_SECTION_ID"]);
-
-		if(is_set($arFields, "IBLOCK_SECTION_ID") && !is_set($arFields, "IBLOCK_SECTION"))
-			$arFields["IBLOCK_SECTION"] = Array($arFields["IBLOCK_SECTION_ID"]);
+		if(array_key_exists("IBLOCK_SECTION_ID", $arFields))
+		{
+			if (!array_key_exists("IBLOCK_SECTION", $arFields))
+			{
+				$arFields["IBLOCK_SECTION"] = array($arFields["IBLOCK_SECTION_ID"]);
+			}
+			elseif (is_array($arFields["IBLOCK_SECTION"]) && !in_array($arFields["IBLOCK_SECTION_ID"], $arFields["IBLOCK_SECTION"]))
+			{
+				unset($arFields["IBLOCK_SECTION_ID"]);
+			}
+		}
 
 		$strWarning = "";
 		if($bResizePictures)
@@ -3305,7 +3320,15 @@ class CAllIBlockElement
 			{
 				$arNewPreview = $arFields["DETAIL_PICTURE"];
 				$arNewPreview["COPY_FILE"] = "Y";
-				$arNewPreview["description"] = $arFields["PREVIEW_PICTURE"]["description"];
+				if (
+					isset($arFields["PREVIEW_PICTURE"])
+					&& is_array($arFields["PREVIEW_PICTURE"])
+					&& isset($arFields["PREVIEW_PICTURE"]["description"])
+				)
+				{
+					$arNewPreview["description"] = $arFields["PREVIEW_PICTURE"]["description"];
+				}
+
 				$arFields["PREVIEW_PICTURE"] = $arNewPreview;
 			}
 
@@ -3607,6 +3630,9 @@ class CAllIBlockElement
 			}
 			$arFields["~TIMESTAMP_X"] = $arFields["~DATE_CREATE"] = $DB->CurrentTimeFunction();
 
+			$IBLOCK_SECTION_ID = $arFields["IBLOCK_SECTION_ID"];
+			unset($arFields["IBLOCK_SECTION_ID"]);
+
 			$ID = $DB->Add("b_iblock_element", $arFields, array("DETAIL_TEXT", "SEARCHABLE_CONTENT"), "iblock");
 
 			if(array_key_exists("PREVIEW_PICTURE", $arFields))
@@ -3634,7 +3660,7 @@ class CAllIBlockElement
 				CIBlockElement::SetPropertyValues($ID, $arFields["IBLOCK_ID"], $arFields["PROPERTY_VALUES"]);
 
 			if(is_set($arFields, "IBLOCK_SECTION"))
-				CIBlockElement::SetElementSection($ID, $arFields["IBLOCK_SECTION"], true, $arIBlock["RIGHTS_MODE"] === "E"? $arIBlock["ID"]: 0);
+				CIBlockElement::SetElementSection($ID, $arFields["IBLOCK_SECTION"], true, $arIBlock["RIGHTS_MODE"] === "E"? $arIBlock["ID"]: 0, $IBLOCK_SECTION_ID);
 
 			if($arIBlock["RIGHTS_MODE"] === "E")
 			{
@@ -3653,6 +3679,8 @@ class CAllIBlockElement
 
 			if($bUpdateSearch)
 				CIBlockElement::UpdateSearch($ID);
+
+			\Bitrix\Iblock\PropertyIndex\Manager::updateElementIndex($arIBlock["ID"], $ID);
 
 			if(
 				!isset($arFields["WF_PARENT_ELEMENT_ID"])
@@ -3762,8 +3790,7 @@ class CAllIBlockElement
 		foreach (GetModuleEvents("iblock", "OnAfterIBlockElementAdd", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("iblock_id_".$arIBlock["ID"]);
+		CIBlock::clearIblockTagCache($arIBlock['ID']);
 
 		return $Result;
 	}
@@ -3954,17 +3981,12 @@ class CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция удаляет элемент информационного блока. Также удаляются значения свойств типа "Привязка к элементу" указывающие на удаляемый. При установленном модуле поиска элемент удаляется из поискового индекса. Перед удалением вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementdelete.php">OnBeforeIBlockElementDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockElementDelete. </p>
-	*
-	*
+	* <p>Метод удаляет элемент информационного блока. Также удаляются значения свойств типа "Привязка к элементу" указывающие на удаляемый. При установленном модуле поиска элемент удаляется из поискового индекса. Перед удалением вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementdelete.php">OnBeforeIBlockElementDelete</a> из которых можно отменить это действие. После удаления вызывается обработчик события OnAfterIBlockElementDelete. Метод статический.</p>
 	*
 	*
 	* @param int $ID  Код элемента.
 	*
-	*
-	*
 	* @return bool <br><br><a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -4056,6 +4078,8 @@ class CAllIBlockElement
 						);
 					}
 				}
+
+				$piId = \Bitrix\Iblock\PropertyIndex\Manager::resolveElement($zr["IBLOCK_ID"], $zr["ID"]);
 
 				while($res = $db_res->Fetch())
 					CIBlockElement::DeleteFile($res["VALUE"], $zr["ID"], "PROPERTY", $zr["WF_PARENT_ELEMENT_ID"], $zr["IBLOCK_ID"]);
@@ -4154,7 +4178,9 @@ class CAllIBlockElement
 					ExecuteModuleEventEx($arEvent, array(IntVal($zr["ID"])));
 
 				if(IntVal($zr["WF_PARENT_ELEMENT_ID"])<=0 && $zr["WF_STATUS_ID"]==1 && CModule::IncludeModule("search"))
+				{
 					CSearch::DeleteIndex("iblock", IntVal($zr["ID"]));
+				}
 
 				CIBlockElement::DeleteFile($zr["PREVIEW_PICTURE"], $zr["ID"], "PREVIEW", $zr["WF_PARENT_ELEMENT_ID"], $zr["IBLOCK_ID"]);
 				CIBlockElement::DeleteFile($zr["DETAIL_PICTURE"], $zr["ID"], "DETAIL", $zr["WF_PARENT_ELEMENT_ID"], $zr["IBLOCK_ID"]);
@@ -4169,14 +4195,15 @@ class CAllIBlockElement
 				if(!$DB->Query("DELETE FROM b_iblock_element WHERE ID=".IntVal($zr["ID"])))
 					return false;
 
+				\Bitrix\Iblock\PropertyIndex\Manager::deleteElementIndex($zr["IBLOCK_ID"], $piId);
+
 				if(CModule::IncludeModule("bizproc"))
 					CBPDocument::OnDocumentDelete(array("iblock", "CIBlockDocument", $zr["ID"]), $arErrorsTmp);
 
 				foreach (GetModuleEvents("iblock", "OnAfterIBlockElementDelete", true) as $arEvent)
 					ExecuteModuleEventEx($arEvent, array($zr));
 
-				if(defined("BX_COMP_MANAGED_CACHE"))
-					$GLOBALS["CACHE_MANAGER"]->ClearByTag("iblock_id_".$zr["IBLOCK_ID"]);
+				CIBlock::clearIblockTagCache($zr['IBLOCK_ID']);
 			}
 		}
 		/************* QUOTA *************/
@@ -4187,21 +4214,19 @@ class CAllIBlockElement
 
 	
 	/**
-	* <p>Возвращает параметры элемента с кодом <i>ID</i> или <i>false</i>, если элемент не найден. <br></p>
-	*
-	*
+	* <p>Возвращает параметры элемента с кодом <i>ID</i> или <i>false</i>, если элемент не найден. Метод статический. <br></p>
 	*
 	*
 	* @param int $ID  ID элемента.
 	*
-	*
-	*
 	* @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
-	* информационного блока</a> <i>false</i><h4>Примечание</h4><i>ID</i><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockElement</a><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>
-	*
+	* информационного блока</a> <i>false</i><p></p><div class="note"> <b>Примечание:</b>
+	* метод не проверяет, чтобы элемент с кодом <i>ID</i> был опубликован и
+	* не являлся записью из истории. Для выборки только опубликованных
+	* элементов воспользуйтесь методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockElement</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>.</div>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -4211,7 +4236,6 @@ class CAllIBlockElement
 	* 
 	* &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($ar_res = $res-&gt;GetNext())<br>  echo $ar_res['NAME'];<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -4233,16 +4257,18 @@ class CAllIBlockElement
 		return CIBlockElement::GetList(Array(), $arFilter=Array("ID"=>IntVal($ID), "SHOW_HISTORY"=>"Y"));
 	}
 
+	/**
+	 * Return IBLOCK_ID for element.
+	 *
+	 * @param int $ID				Element id.
+	 * @return bool|int
+	 */
 	
 	/**
-	* <p>Метод возвращает инфоблок по <i>ID</i> его элемента.</p>
-	*
-	*
+	* <p>Метод возвращает инфоблок по <i>ID</i> его элемента. Метод статический.</p>
 	*
 	*
 	* @param int $ID  ID элемента.
-	*
-	*
 	*
 	* @return mixed <p>Метод возвращает идентификатор инфоблока по <i>ID</i> его элемента
 	* или <i>false</i>, если элемент не найден.</p> <br><br>
@@ -4254,16 +4280,19 @@ class CAllIBlockElement
 	public static function GetIBlockByID($ID)
 	{
 		global $DB;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if ($ID <= 0)
 			return false;
-		$strSql = "SELECT IBLOCK_ID FROM b_iblock_element WHERE ID=".$ID;
-		$rsItems = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-		if ($arItem = $rsItems->Fetch())
+		if (!isset(self::$elementIblock[$ID]))
 		{
-			return $arItem['IBLOCK_ID'];
+			self::$elementIblock[$ID] = false;
+			$strSql = "select IBLOCK_ID from b_iblock_element where ID=".$ID;
+			$rsItems = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			if ($arItem = $rsItems->Fetch())
+				self::$elementIblock[$ID] = (int)$arItem['IBLOCK_ID'];
+			unset($arItem, $rsItems);
 		}
-		return false;
+		return self::$elementIblock[$ID];
 	}
 	///////////////////////////////////////////////////////////////////
 	// Checks fields before update or insert
@@ -4795,26 +4824,17 @@ class CAllIBlockElement
 	//////////////////////////////////////////////////////////////////////////
 	
 	/**
-	* Функция изменяет значение свойства элемента информационного блока. Выполняет один дополнительный запрос к БД для определения кода информационного блока элемента. Если код инфоблока известен, то лучше воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a>, задав ей 4-й параметр.
-	*
-	*
+	* Метод изменяет значение свойства элемента информационного блока. Выполняет один дополнительный запрос к БД для определения кода информационного блока элемента. Если код инфоблока известен, то лучше воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a>, задав ей 4-й параметр. Метод динамичный.
 	*
 	*
 	* @param int $ELEMENT_ID  Код элемента, значение свойства которого изменяется.
 	*
-	*
-	*
 	* @param string $PROPERTY_CODE  Символьный или числовой код свойства, которое изменяется.
-	*
-	*
 	*
 	* @param string $PROPERTY_VALUE  Значение свойства (одиночное или множественное в виде массива
 	* значений).
 	*
-	*
-	*
 	* @return bool <p>При успешном изменении вернет <i>true</i>, иначе - <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -4832,7 +4852,6 @@ class CAllIBlockElement
 	* <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=5534#value_file_upd">Как обновить значение множественного свойства типа "Файл"?</a></li>
 	* <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=5534#string_add">Вставка множественного свойства типа "Строка" с полем для описания значения</a></li>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -4868,22 +4887,16 @@ class CAllIBlockElement
 
 	
 	/**
-	* <p>Принимает массив идентификаторов элементов. Возвращает группы, которым принадлежит элемент, по его коду <i>ID</i>.</p>
-	*
-	*
+	* <p>Принимает массив идентификаторов элементов. Возвращает группы, которым принадлежит элемент, по его коду <i>ID</i>. Метод статический.</p>
 	*
 	*
 	* @param int $ID  ID элемента, либо массив ID элементов, для которых надо вернуть
 	* привязки к разделам.
 	*
-	*
-	*
 	* @param bool $bElementOnly = false Не обязательный параметр. Указывает на необходимость выборки
 	* привязок и из свойств типа "Привязка к разделу". По умолчанию
 	* равен false и значения свойств будут выбраны. Если значения свойств
 	* не нужны, то значением параметра надо задать true. <br>
-	*
-	*
 	*
 	* @param array $arSelect = array() Перечень возвращаемых полей. Допустимые поля: <p>Поля, относящиеся
 	* к разделу:</p> <ul> <li>ID - ID раздела инфоблока;</li> <li>TIMESTAMP_X - дата
@@ -4915,16 +4928,12 @@ class CAllIBlockElement
 	* разделу через свойство).</li> </ul> По умолчанию возвращаются все
 	* поля.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$db_old_groups = CIBlockElement::GetElementGroups($ELEMENT_ID, true);<br>$ar_new_groups = Array($NEW_GROUP_ID);<br>while($ar_group = $db_old_groups-&gt;Fetch())<br>	$ar_new_groups[] = $ar_group["ID"];<br>CIBlockElement::SetElementSection($ELEMENT_ID, $ar_new_groups);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -5052,28 +5061,102 @@ class CAllIBlockElement
 	//////////////////////////////////////////////////////////////////////////
 	//
 	//////////////////////////////////////////////////////////////////////////
-	public static function RecalcSections($ID)
+	public static function RecalcSections($ID, $sectionId = null)
 	{
 		global $DB;
-		$ID = IntVal($ID);
-		$res = $DB->Query(
-			"SELECT COUNT('x') as C, MIN(SE.IBLOCK_SECTION_ID) as IBLOCK_SECTION_ID_NEW, E.IBLOCK_SECTION_ID, E.IN_SECTIONS ".
-			"FROM b_iblock_section_element SE, b_iblock_element E ".
-			"WHERE SE.IBLOCK_ELEMENT_ID = ".$ID." ".
-			"	AND E.ID=".$ID." ".
-			"	AND ADDITIONAL_PROPERTY_ID IS NULL ".
-			"GROUP BY E.IN_SECTIONS, E.IBLOCK_SECTION_ID"
-			);
-		$res = $res->Fetch();
-		$cnt = (IntVal($res["C"])>0?"Y":"N");
-		if($cnt!=$res["IN_SECTIONS"] || $res["IBLOCK_SECTION_ID_NEW"]!=$res["IBLOCK_SECTION_ID"])
+		$ID = intval($ID);
+		$res = false;
+		if ($sectionId !== null)
 		{
-			$DB->Query(
-				"UPDATE b_iblock_element SET ".
-				"	IN_SECTIONS='".$cnt."', ".
-				"	IBLOCK_SECTION_ID=".(IntVal($res["IBLOCK_SECTION_ID_NEW"])>0?IntVal($res["IBLOCK_SECTION_ID_NEW"]):"NULL")." ".
-				"WHERE ID=".$ID
-				);
+			$res = $DB->Query("
+				SELECT
+					SE.IBLOCK_SECTION_ID as IBLOCK_SECTION_ID_NEW
+					,E.IBLOCK_SECTION_ID
+					,E.IN_SECTIONS
+					,E.IBLOCK_ID
+				FROM
+					b_iblock_section_element SE
+					INNER JOIN b_iblock_element E ON E.ID = SE.IBLOCK_ELEMENT_ID
+				WHERE
+					SE.IBLOCK_ELEMENT_ID = ".$ID."
+					AND SE.IBLOCK_SECTION_ID = ".intval($sectionId)."
+					AND SE.ADDITIONAL_PROPERTY_ID IS NULL
+			");
+			$res = $res->Fetch();
+			if ($res)
+			{
+				$oldInSections = $res["IN_SECTIONS"];
+				$newInSections = "Y";
+				$oldSectionId = intval($res["IBLOCK_SECTION_ID"]);
+				$newSectionId = intval($res["IBLOCK_SECTION_ID_NEW"]);
+			}
+			else
+			{
+				//No such section linked to the element
+				return;
+			}
+		}
+		else
+		{
+			$res = $DB->Query("
+				SELECT
+					COUNT('x') as C
+					,MIN(SE.IBLOCK_SECTION_ID) as MIN_IBLOCK_SECTION_ID
+					,E.IBLOCK_SECTION_ID
+					,E.IN_SECTIONS
+					,E.IBLOCK_ID
+				FROM
+					b_iblock_section_element SE
+					INNER JOIN b_iblock_element E ON E.ID = SE.IBLOCK_ELEMENT_ID
+				WHERE
+					SE.IBLOCK_ELEMENT_ID = ".$ID."
+					AND SE.ADDITIONAL_PROPERTY_ID IS NULL
+				GROUP BY
+					E.IBLOCK_SECTION_ID
+					,E.IN_SECTIONS
+					,E.IBLOCK_ID
+			");
+			$res = $res->Fetch();
+			if ($res)
+			{
+				$oldInSections = $res["IN_SECTIONS"];
+				$newInSections = ($res["C"] > 0? "Y": "N");
+
+				$arIBlock = CIBlock::GetArrayByID($res["IBLOCK_ID"]);
+				if (
+					$arIBlock["FIELDS"]["IBLOCK_SECTION"]["DEFAULT_VALUE"]["KEEP_IBLOCK_SECTION_ID"] === "Y"
+					&& $oldInSections === $newInSections
+				)
+				{
+					//We'll keep IBLOCK_SECTION_ID
+					return;
+				}
+
+				$oldSectionId = intval($res["IBLOCK_SECTION_ID"]);
+				$newSectionId = intval($res["MIN_IBLOCK_SECTION_ID"]);
+			}
+			else
+			{
+				//No such element
+				$oldInSections = "";
+				$newInSections = ($res["C"] > 0? "Y": "N");
+				$oldSectionId = 0;
+				$newSectionId = 0;
+			}
+		}
+
+		if (
+			$oldInSections != $newInSections
+			|| ($oldSectionId != $newSectionId)
+		)
+		{
+			$DB->Query("
+				UPDATE b_iblock_element SET
+					IN_SECTIONS = '".$newInSections."',
+					IBLOCK_SECTION_ID= ".($newSectionId > 0? $newSectionId: "NULL")."
+				WHERE
+					ID = ".$ID."
+			");
 		}
 	}
 
@@ -5082,19 +5165,13 @@ class CAllIBlockElement
 	//////////////////////////////////////////////////////////////////////////
 	
 	/**
-	* Функция привязывает элемент информационного блока к группам.
-	*
-	*
+	* Метод привязывает элемент информационного блока к группам. Метод динамичный.
 	*
 	*
 	* @param int $ID  Код (ID) элемента.
 	*
-	*
-	*
 	* @param array $arSections  Массив кодов групп, к которым принадлежит указанный элемент. Если
 	* передать пустой, то элемент будет "отвязан" от всех групп. <br>
-	*
-	*
 	*
 	* @param bool $bNew = false Необязательный. Если это новый элемент или элемент не имеющий
 	* привязок, то можно указать значением этого параметра true. Это
@@ -5102,22 +5179,16 @@ class CAllIBlockElement
 	* для оптимизации, когда известно, что элемент ни к чему не
 	* привязан.
 	*
-	*
-	*
 	* @param int $bRightsIBlock = 0 Код (ID) инфоблока, к которому принадлежит элемент. Параметр
 	* обязателен в случае включенных расширенных прав, иначе -
 	* необязателен.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$ID = 18;  // код элемента<br>$arSects = array(1, 5, 7); // массив кодов групп<br>CIBlockElement::SetElementSection($ID, $arSects);<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -5131,10 +5202,10 @@ class CAllIBlockElement
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setelementsection.php
 	* @author Bitrix
 	*/
-	public static function SetElementSection($ID, $arSections, $bNew = false, $bRightsIBlock = 0)
+	public static function SetElementSection($ID, $arSections, $bNew = false, $bRightsIBlock = 0, $sectionId = null)
 	{
 		global $DB;
-		$ID = IntVal($ID);
+		$ID = intval($ID);
 
 		$min_old_id = null;
 		$min_new_id = null;
@@ -5232,8 +5303,10 @@ class CAllIBlockElement
 			$obElementRights->ChangeParents($arOldParents, $arNewParents);
 		}
 
-		if($min_old_id !== $min_new_id)
-			CIBlockElement::RecalcSections($ID);
+		if($sectionId !== null || ($min_old_id !== $min_new_id))
+		{
+			CIBlockElement::RecalcSections($ID, $sectionId);
+		}
 
 		return !empty($arToDelete) || !empty($arToInsert);
 	}
@@ -5293,19 +5366,13 @@ class CAllIBlockElement
 
 	
 	/**
-	* Индексирует элемент с кодом <i>ID</i> в модуле поиска.
-	*
-	*
+	* Индексирует элемент с кодом <i>ID</i> в модуле поиска. Метод динамичный.
 	*
 	*
 	* @param int $ID  Код элемента.
 	*
-	*
-	*
 	* @param bool $bOverWrite = false Переиндексировать ли элемент, если дата его изменения не
 	* изменилась.
-	*
-	*
 	*
 	* @return mixed 
 	*
@@ -5323,6 +5390,7 @@ class CAllIBlockElement
 
 		static $strElementSql = false;
 		if(!$strElementSql)
+		{
 			$strElementSql = "
 				SELECT BE.ID, BE.NAME, BE.XML_ID as EXTERNAL_ID,
 					BE.PREVIEW_TEXT_TYPE, BE.PREVIEW_TEXT, BE.CODE,
@@ -5341,6 +5409,7 @@ class CAllIBlockElement
 					AND B.INDEX_ELEMENT='Y'
 					".CIBlockElement::WF_GetSqlLimit("BE.", "N")."
 					AND BE.ID=";
+		}
 
 		$dbrIBlockElement = $DB->Query($strElementSql.$ID);
 
@@ -5348,14 +5417,14 @@ class CAllIBlockElement
 		{
 			$IBLOCK_ID = $arIBlockElement["IBLOCK_ID"];
 			$DETAIL_URL =
-					"=ID=".$arIBlockElement["ID"].
-					"&EXTERNAL_ID=".$arIBlockElement["EXTERNAL_ID"].
-					"&IBLOCK_SECTION_ID=".$arIBlockElement["IBLOCK_SECTION_ID"].
-					"&IBLOCK_TYPE_ID=".$arIBlockElement["IBLOCK_TYPE_ID"].
-					"&IBLOCK_ID=".$arIBlockElement["IBLOCK_ID"].
-					"&IBLOCK_CODE=".$arIBlockElement["IBLOCK_CODE"].
-					"&IBLOCK_EXTERNAL_ID=".$arIBlockElement["IBLOCK_EXTERNAL_ID"].
-					"&CODE=".$arIBlockElement["CODE"];
+					"=ID=".urlencode($arIBlockElement["ID"]).
+					"&EXTERNAL_ID=".urlencode($arIBlockElement["EXTERNAL_ID"]).
+					"&IBLOCK_SECTION_ID=".urlencode($arIBlockElement["IBLOCK_SECTION_ID"]).
+					"&IBLOCK_TYPE_ID=".urlencode($arIBlockElement["IBLOCK_TYPE_ID"]).
+					"&IBLOCK_ID=".urlencode($arIBlockElement["IBLOCK_ID"]).
+					"&IBLOCK_CODE=".urlencode($arIBlockElement["IBLOCK_CODE"]).
+					"&IBLOCK_EXTERNAL_ID=".urlencode($arIBlockElement["IBLOCK_EXTERNAL_ID"]).
+					"&CODE=".urlencode($arIBlockElement["CODE"]);
 
 			static $arGroups = array();
 			if(!array_key_exists($IBLOCK_ID, $arGroups))
@@ -5677,23 +5746,45 @@ class CAllIBlockElement
 		$selectListMultiply = array('SORT' => SORT_ASC, 'VALUE' => SORT_STRING);
 		$selectAllMultiply = array('PROPERTY_VALUE_ID' => SORT_ASC);
 
+		$propertyListFilter = array(
+			'IBLOCK_ID' => $iblockID
+		);
 		$propertyID = array();
 		if (isset($propertyFilter['ID']))
 		{
 			$propertyID = (is_array($propertyFilter['ID']) ? $propertyFilter['ID'] : array($propertyFilter['ID']));
 			Collection::normalizeArrayValuesByInt($propertyID);
 		}
-		$propertyListFilter = array(
-			'IBLOCK_ID' => $iblockID
-		);
 		if (!empty($propertyID))
-			$propertyListFilter['ID'] = $propertyID;
-		$propertyListFilter['ACTIVE'] = (
+		{
+			$propertyListFilter['@ID'] = $propertyID;
+		}
+		elseif (isset($propertyFilter['CODE']))
+		{
+			if (!is_array($propertyFilter['CODE']))
+				$propertyFilter['CODE'] = array($propertyFilter['CODE']);
+			$propertyCodes = array();
+			if (!empty($propertyFilter['CODE']))
+			{
+				foreach ($propertyFilter['CODE'] as &$code)
+				{
+					$code = (string)$code;
+					if ($code !== '')
+						$propertyCodes[] = $code;
+				}
+				unset($code);
+			}
+			if (!empty($propertyCodes))
+				$propertyListFilter['@CODE'] = $propertyCodes;
+			unset($propertyCodes);
+		}
+		$propertyListFilter['=ACTIVE'] = (
 			isset($propertyFilter['ACTIVE']) && ($propertyFilter['ACTIVE'] == 'Y' || $propertyFilter['ACTIVE'] == 'N')
 			? $propertyFilter['ACTIVE']
 			: 'Y'
 		);
 
+		$propertyID = array();
 		$propertyIterator = PropertyTable::getList(array(
 			'select' => array(
 				'ID', 'IBLOCK_ID', 'NAME', 'ACTIVE', 'SORT', 'CODE', 'DEFAULT_VALUE', 'PROPERTY_TYPE', 'ROW_COUNT', 'COL_COUNT', 'LIST_TYPE',
@@ -5701,15 +5792,14 @@ class CAllIBlockElement
 				'IS_REQUIRED', 'VERSION', 'USER_TYPE', 'USER_TYPE_SETTINGS', 'HINT'
 			),
 			'filter' => $propertyListFilter,
-			'order' => array('SORT'=>'ASC','ID'=>'ASC')
+			'order' => array('SORT'=>'ASC', 'ID'=>'ASC')
 		));
 		while ($property = $propertyIterator->fetch())
 		{
+			$propertyID[] = (int)$property['ID'];
 			$property['CODE'] = trim((string)$property['CODE']);
 			if ($property['CODE'] === '')
-			{
 				$property['CODE'] = $property['ID'];
-			}
 			$code = $property['CODE'];
 			$property['~NAME'] = $property['NAME'];
 			if (preg_match("/[;&<>\"]/", $property['NAME']))
@@ -5718,7 +5808,7 @@ class CAllIBlockElement
 			if ($property['USER_TYPE'])
 			{
 				$userType = CIBlockProperty::GetUserType($property['USER_TYPE']);
-				if (isset($userType["ConvertFromDB"]))
+				if (isset($userType['ConvertFromDB']))
 				{
 					$userTypesList[$property['ID']] = $userType;
 					if(array_key_exists("DEFAULT_VALUE", $property))
@@ -5746,9 +5836,7 @@ class CAllIBlockElement
 		unset($property, $propertyIterator);
 
 		if (empty($propertiesList))
-		{
 			return;
-		}
 
 		if (!empty($existList))
 		{
@@ -5774,10 +5862,11 @@ class CAllIBlockElement
 			unset($enum, $enumIterator);
 		}
 
-		if (!empty($propertyID))
-			$valuesRes = CIBlockElement::GetPropertyValues($iblockID, $filter, true, array('ID' => $propertyID));
-		else
-			$valuesRes = CIBlockElement::GetPropertyValues($iblockID, $filter, true);
+		$valuesRes = (
+			!empty($propertyID)
+			? CIBlockElement::GetPropertyValues($iblockID, $filter, true, array('ID' => $propertyID))
+			: CIBlockElement::GetPropertyValues($iblockID, $filter, true)
+		);
 		while ($value = $valuesRes->Fetch())
 		{
 			$elementID = $value['IBLOCK_ELEMENT_ID'];
@@ -6099,18 +6188,12 @@ class CAllIBlockElement
 
 	
 	/**
-	* <p>Функция возвращает значения свойства для элемента <i>element_id.</i></p>
-	*
-	*
+	* <p>Метод возвращает значения свойства для элемента <i>element_id</i>. Метод статический.</p>
 	*
 	*
 	* @param  $int  Код инфоблока.
 	*
-	*
-	*
 	* @param iblock_i $d  Код элемента.
-	*
-	*
 	*
 	* @param int $element_id  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> -
 	* поле для сортировки, может принимать значения: <ul> <li> <b>id</b> - код
@@ -6121,11 +6204,9 @@ class CAllIBlockElement
 	* варианта списочного свойства; </li> </ul> <i>order</i> - порядок сортировки,
 	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
 	* <b>desc</b> - по убыванию; </li> </ul> Необязательный. По умолчанию равен
-	* <i>Array("sort"=&gt;"asc")</i><br><br><b>Примечание:</b> параметр не должен быть
-	* <i>false</i>, иначе метод отработает неправильно и результат не будет
-	* отобран по заданным критериям.
-	*
-	*
+	* <i>Array("sort"=&gt;"asc")</i><br><div class="note"> <b>Примечание:</b> параметр не должен
+	* быть <i>false</i>, иначе метод отработает неправильно и результат не
+	* будет отобран по заданным критериям.</div>
 	*
 	* @param array $arOrder = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])
 	* "фильтруемое поле" может принимать значения: ACTIVE - активность (Y/N),
@@ -6138,15 +6219,10 @@ class CAllIBlockElement
 	* bold;">EMPTY</span> - пустота свойства (Y|N).</li> </ul> Не обязательный параметр,
 	* по умолчанию равен array().
 	*
-	*
-	*
 	* @param array $arFilter = Array() 
-	*
-	*
 	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">поля свойств</a> <br><br><br><br><br>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -6163,7 +6239,7 @@ class CAllIBlockElement
 	*     {
 	*         $VALUE = $ob['VALUE'];
 	*     }
-	* Если значений у свойства нет и в фильтр не передается "EMPTY"=&gt;"N", то функция вернет массив с с пустым ключом VALUE:
+	* Если значений у свойства нет и в фильтр не передается "EMPTY"=&gt;"N", то метод вернет массив с с пустым ключом VALUE:
 	* 
 	* 
 	* //используются Инфоблоки 2.0
@@ -6172,7 +6248,6 @@ class CAllIBlockElement
 	* echo "&lt;pre&gt;".print_r($ar_props, true)."&lt;pre&gt;";
 	* endif;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -6388,17 +6463,12 @@ class CAllIBlockElement
 
 	
 	/**
-	* Увеличивает счетчик просмотров элемента с кодом <i>ID</i>. При увеличении учитывается уникальность просмотров данного элемента в одной сессии.
-	*
-	*
+	* Увеличивает счетчик просмотров элемента с кодом <i>ID</i>. При увеличении учитывается уникальность просмотров данного элемента в одной сессии. Метод статический.
 	*
 	*
 	* @param int $ID  Код элемента.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -6480,28 +6550,21 @@ class CAllIBlockElement
 
 	
 	/**
-	* Функция сохраняет значения всех свойств элемента информационного блока. В отличие от <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a> может не содержать полный набор значений. Значения свойств, неуказанных в массиве PROPERTY_VALUES, будут сохранены. Эта функция более экономна в количестве запросов к БД. <br> Функция возвращает <b>Null</b>.
-	*
-	*
+	* Метод сохраняет значения всех свойств элемента информационного блока. В отличие от <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues</a> может не содержать полный набор значений. Значения свойств, неуказанных в массиве PROPERTY_VALUES, будут сохранены. Этот метод более экономен в количестве запросов к БД. Метод статический. <br> Метод возвращает <b>Null</b>. <p>Если необходимо сохранить пустое значение для множественного свойства, то используйте значение <i>false</i>, так как просто пустой массив не сохранится.</p>
 	*
 	*
 	* @param int $ELEMENT_ID  Код элемента, значения свойств которого необходимо установить.
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Код информационного блока. Может быть не указан. В этом случае
 	* будет прочитан из базы данных по коду элемента. <br>
-	*
-	*
 	*
 	* @param array $PROPERTY_VALUES  Массив значений свойств, в котором коду свойства ставится в
 	* соответствие значение свойства. <br> Должен быть вида Array("код
 	* свойства1"=&gt;"значения свойства1", ....), где "код свойства" - числовой
 	* или символьный код свойства, "значения свойства" - одно или массив
-	* всех значений свойства (множественное).<br><br><b>Примечание:</b> при
-	* добавлении значений свойств типа "Файл" поле DESCRIPTION обязательно.
-	*
-	*
+	* всех значений свойства (множественное).<br><br><div class="note">
+	* <b>Примечание:</b> при добавлении значений свойств типа "Файл" поле
+	* DESCRIPTION обязательно.</div>
 	*
 	* @param array $FLAGS = array() Необязательный параметр предоставляет информацию для
 	* оптимизации выполнения. Может содержать следующие ключи: <br><ul>
@@ -6510,10 +6573,7 @@ class CAllIBlockElement
 	* <li>DoNotValidateLists - для свойств типа "список" отключает проверку
 	* наличия значений в метаданных свойства. <br> </li> </ul>
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -6556,7 +6616,6 @@ class CAllIBlockElement
 	* <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=5534#string_add">Вставка множественного свойства типа "Строка" с полем для описания значения</a></li>
 	* <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=5534#value_files_add">Как добавить несколько значений множественного свойства типа "Файл"?</a></li>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -6733,7 +6792,9 @@ class CAllIBlockElement
 
 				if($PROPS_CACHE[$IBLOCK_ID][$key]["ConvertToDB"]!==false)
 				{
-					$val = call_user_func_array($PROPS_CACHE[$IBLOCK_ID][$key]["ConvertToDB"], array($PROPS_CACHE[$IBLOCK_ID][$key], $val));
+					$arProperty = $PROPS_CACHE[$IBLOCK_ID][$key];
+					$arProperty["ELEMENT_ID"] = $ELEMENT_ID;
+					$val = call_user_func_array($PROPS_CACHE[$IBLOCK_ID][$key]["ConvertToDB"], array($arProperty, $val));
 				}
 
 				if(
@@ -6945,7 +7006,7 @@ class CAllIBlockElement
 		$ar2Update = array(
 			//"b_iblock_element_property" => array(/*property_id=>value, property_id=>value, ...*/),
 			//"b_iblock_element_prop_m".$IBLOCK_ID => array(/*property_id=>value, property_id=>value, ...*/),
-			"b_iblock_element_prop_s".$IBLOCK_ID => array(/*property_id=>value, property_id=>value, ...*/),
+			//"b_iblock_element_prop_s".$IBLOCK_ID => array(/*property_id=>value, property_id=>value, ...*/),
 		);
 
 		foreach($arDBProps as $property_id=>$values)

@@ -10,6 +10,46 @@ IncludeModuleLangFile(__FILE__);
 
 class CEventLog
 {
+	const SEVERITY_SECURITY = 1;
+	const SEVERITY_ERROR = 2;
+	const SEVERITY_WARNING = 3;
+	const SEVERITY_INFO = 4;
+	const SEVERITY_DEBUG = 5;
+
+	
+	/**
+	* <p>Метод добавляет запись в лог. Динамичный метод.</p>
+	*
+	*
+	* @param SEVERIT $Y  Степень важности записи. Доступны значения: SECURITY или WARNING, для
+	* иного система установит UNKNOWN.
+	*
+	* @param AUDIT_TYPE_I $D  Идентификатор события, к которому относится запись.
+	*
+	* @param MODULE_I $D  Модуль, к которому относится запись
+	*
+	* @param ITEM_I $D  ID объекта, в связи с которым происходит добавление (пользователь,
+	* элемент ИБ, ID сообщения).
+	*
+	* @param DESCRIPTIO $N = false Описание записи лога, или техническая информация.
+	* Необязательный. По умолчанию - <i>false</i>.
+	*
+	* @param SITE_I $D = false Идентификатор сайта, к которому относится запись в логе.
+	* Необязательный. По умолчанию - <i>false</i>.
+	*
+	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventlog/log.php
+	* @author Bitrix
+	*/
 	public static function Log($SEVERITY, $AUDIT_TYPE_ID, $MODULE_ID, $ITEM_ID, $DESCRIPTION = false, $SITE_ID = false)
 	{
 		return CEventLog::Add(array(
@@ -22,15 +62,54 @@ class CEventLog
 		));
 	}
 
+	
+	/**
+	* <p>Метод добавляет событие для записи в логе событий. Динамичный метод.</p>
+	*
+	*
+	* @param array $fields  Поля добавляемого события. Значения: <ul> <li> <b>SEVERITY</b> - степень
+	* важности записи. Доступны значения: SECURITY или WARNING, для иного
+	* система установит UNKNOWN.</li> <li> <b>AUDIT_TYPE_ID</b> - собственный ID типа
+	* события.</li> <li> <b>MODULE_ID</b> - модуль, с которого происходит запись в
+	* лог.</li> <li> <b>ITEM_ID</b> - ID объекта, в связи с которым происходит
+	* добавление (пользователь, элемент ИБ, ID сообщения, ...)</li> <li>
+	* <b>REMOTE_ADDR</b> - IP, с которого обратились.</li> <li> <b>USER_AGENT</b> - браузер.</li>
+	* <li> <b>REQUEST_URI</b> - URL страницы.</li> <li> <b>SITE_ID</b> - ID сайта, к которому
+	* относится добавляемое событие.</li> <li> <b>USER_ID</b> - ID пользователя.</li>
+	* <li> <b>GUEST_ID</b> - ID пользователя из модуля статистики</li> <li> <b>DESCRIPTION</b> -
+	* собственно описание записи лога, или техническая информация.</li>
+	* </ul>
+	*
+	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* CEventLog::Add(array(
+	*          "SEVERITY" =&gt; "SECURITY",
+	*          "AUDIT_TYPE_ID" =&gt; "MY_OWN_TYPE",
+	*          "MODULE_ID" =&gt; "main",
+	*          "ITEM_ID" =&gt; 123,
+	*          "DESCRIPTION" =&gt; "Какое-то описание",
+	*       ));
+	* ?&gt;
+	* </ht
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventlog/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $USER, $DB;
 		static $arSeverity = array(
-			"SECURITY" => 1,
-			"ERROR" => 2,
-			"WARNING" => 3,
-			"INFO" => 4,
-			"DEBUG" => 5
+			"SECURITY" => self::SEVERITY_SECURITY,
+			"ERROR" => self::SEVERITY_ERROR,
+			"WARNING" => self::SEVERITY_WARNING,
+			"INFO" => self::SEVERITY_INFO,
+			"DEBUG" => self::SEVERITY_DEBUG,
 		);
 
 		$url = preg_replace("/(&?sessid=[0-9a-z]+)/", "", $_SERVER["REQUEST_URI"]);
@@ -67,6 +146,52 @@ class CEventLog
 		return "CEventLog::CleanUpAgent();";
 	}
 
+	
+	/**
+	* <p>Метод возвращает отфильтрованный и отсортированный список записей в логе. Динамичный метод.</p>
+	*
+	*
+	* @param arOrde $r = Array Массив для сортировки результата. Массив вида array("поле
+	* сортировки"=&gt;"направление сортировки" [, ...]). Поле для сортировки
+	* может принимать значения: <ul> <li> <b>ID</b> - идентификатор записи;</li> <li>
+	* <b>TIMESTAMP_X</b> - Время в Unix-формате.</li> </ul> Направление сортировки
+	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li>
+	* <b>desc</b> - по убыванию.</li> </ul>
+	*
+	* @param I $D  Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]), может
+	* принимать значения: <ul> <li> <b>SEVERITY</b> - степень важности записи.
+	* Доступны значения: SECURITY или WARNING, для иного система установит
+	* UNKNOWN.</li> <li> <b>AUDIT_TYPE_ID</b> - собственный ID типа события.</li> <li> <b>MODULE_ID</b>
+	* - модуль, с которого происходит запись в лог.</li> <li> <b>ITEM_ID</b> - ID
+	* объекта, в связи с которым происходит добавление (пользователь,
+	* элемент ИБ, ID сообщения)</li> <li> <b>REMOTE_ADDR</b> - IP, с которого
+	* обратились.</li> <li> <b>USER_AGENT</b> - браузер.</li> <li> <b>REQUEST_URI</b> - URL
+	* страницы.</li> <li> <b>SITE_ID</b> - ID сайта, к которому относится
+	* добавляемое событие.</li> <li> <b>USER_ID</b> - ID пользователя.</li> <li> <b>GUEST_ID</b>
+	* - ID пользователя из модуля статистики.</li> <li> <b>DESCRIPTION</b> -
+	* собственно описание записи лога, или техническая информация.</li>
+	* </ul>
+	*
+	* @param DES $C  Массив настроек постраничной навигации.
+	*
+	* @param  $arFilter = array() 
+	*
+	* @param mixed $arNavParams = false 
+	*
+	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/ceventlog/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = array(), $arNavParams = false)
 	{
 		global $DB;

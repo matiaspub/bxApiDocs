@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/store.ph
 
 
 /**
- * <b>CCatalogStore</b> - класс для работы со складами.</body> </html>
- *
- *
+ * <b>CCatalogStore</b> - класс для работы со складами. 
  *
  *
  * @return mixed 
@@ -24,9 +22,7 @@ class CCatalogStore
 	 */
 	
 	/**
-	* <p>Метод добавляет новый склад, в соответствии с данными из массива arFields.</p>
-	*
-	*
+	* <p>Метод добавляет новый склад, в соответствии с данными из массива arFields. Метод статический.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров нового склада, ключами в котором
@@ -39,11 +35,8 @@ class CCatalogStore
 	* склада (максимальный размер поля 255 символов);</li> <li>XML_ID - XML_ID
 	* склада для экспорта\импорта из 1С;</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращает <i>ID</i> вновь созданного склада, если добавление
 	* совершено, в противном случае - <i>false</i>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -118,9 +111,7 @@ class CCatalogStore
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из таблицы складов в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из таблицы складов в соответствии со своими параметрами. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -135,8 +126,6 @@ class CCatalogStore
 	* первому элементу, потом результат сортируется по второму и т.д.). 
 	* <br><br> Значение по умолчанию - пустой массив array() - означает, что
 	* результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -165,33 +154,25 @@ class CCatalogStore
 	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи. Массив имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле. <br><br> Если массив
-	* пустой, то функция вернет число записей, удовлетворяющих фильтру.
+	* пустой, то метод вернет число записей, удовлетворяющих фильтру.
 	* <br><br> Значение по умолчанию - <i>false</i> - означает, что результат
 	* группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li>любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные поля.
 	* <br><br> Значение по умолчанию - пустой массив array() - означает, что
 	* будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return mixed <p>Возвращает объект класса <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
@@ -204,32 +185,54 @@ class CCatalogStore
 	static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
-
-		if(empty($arSelectFields))
-			$arSelectFields = array("ID", "ACTIVE", "TITLE", "PHONE", "SCHEDULE", "ADDRESS", "DESCRIPTION", "GPS_N", "GPS_S", "IMAGE_ID", "DATE_CREATE", "DATE_MODIFY", "USER_ID", "XML_ID", "SORT", "EMAIL", "ISSUING_CENTER", "SHIPPING_CENTER", "SITE_ID"/*, "BASE"*/);
+		
+		if (empty($arSelectFields))
+			$arSelectFields = array(
+				"ID",
+				"ACTIVE",
+				"TITLE",
+				"PHONE",
+				"SCHEDULE",
+				"ADDRESS",
+				"DESCRIPTION",
+				"GPS_N",
+				"GPS_S",
+				"IMAGE_ID",
+				"DATE_CREATE",
+				"DATE_MODIFY",
+				"USER_ID",
+				"XML_ID",
+				"SORT",
+				"EMAIL",
+				"ISSUING_CENTER",
+				"SHIPPING_CENTER",
+				"SITE_ID"
+				/*, "BASE"*/
+			);
 
 		$keyForDelete = array_search("PRODUCT_AMOUNT", $arSelectFields);
-		if(!isset($arFilter["PRODUCT_ID"]) && $keyForDelete !== false)
-		{
+
+		if (!isset($arFilter["PRODUCT_ID"]) && $keyForDelete !== false)
 			unset($arSelectFields[$keyForDelete]);
-		}
-		if($keyForDelete == false)
+
+		if ($keyForDelete == false)
 		{
 			$keyForDelete = array_search("ELEMENT_ID", $arSelectFields);
 			if($keyForDelete !== false)
 				unset($arSelectFields[$keyForDelete]);
 		}
 		$productID = '(';
-		if(is_array($arFilter["PRODUCT_ID"]))
+
+		if (is_array($arFilter["PRODUCT_ID"]))
 		{
 			foreach($arFilter["PRODUCT_ID"] as $id)
-			{
 				$productID .= intval($id).',';
-			}
 			$productID = rtrim($productID, ',').')';
 		}
 		else
-			$productID .= intval($arFilter["PRODUCT_ID"]).')';
+		{
+			$productID .= intval($arFilter["PRODUCT_ID"]) . ')';
+		}
 
 		$arFields = array(
 			"ID" => array("FIELD" => "CS.ID", "TYPE" => "int"),
@@ -253,60 +256,102 @@ class CCatalogStore
 			"ISSUING_CENTER" => array("FIELD" => "CS.ISSUING_CENTER", "TYPE" => "char"),
 			"SHIPPING_CENTER" => array("FIELD" => "CS.SHIPPING_CENTER", "TYPE" => "char"),
 			"SITE_ID" => array("FIELD" => "CS.SITE_ID", "TYPE" => "string"),
-			"PRODUCT_AMOUNT" => array("FIELD" => "CP.AMOUNT", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_store_product CP ON (CS.ID = CP.STORE_ID AND CP.PRODUCT_ID IN $productID)"),
-			"ELEMENT_ID" => array("FIELD" => "CP.PRODUCT_ID", "TYPE" => "int"),
+			"PRODUCT_AMOUNT" => array("FIELD" => "CP.AMOUNT", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_store_product CP ON (CS.ID = CP.STORE_ID AND CP.PRODUCT_ID IN ".$productID.")"),
+			"ELEMENT_ID" => array("FIELD" => "CP.PRODUCT_ID", "TYPE" => "int")
 		);
+
+		$userField = new CUserTypeSQL();
+		$userField->SetEntity("CAT_STORE", "CS.ID");
+		$userField->SetSelect($arSelectFields);
+		$userField->SetFilter($arFilter);
+		$userField->SetOrder($arOrder);
+
+		$strUfFilter = $userField->GetFilter();
+		$strSqlUfFilter = (strlen($strUfFilter) > 0) ? " (".$strUfFilter.") " : "";
+
+
+		$strSqlUfOrder = "";
+		foreach ($arOrder as $field => $by)
+		{
+			$field = $userField->GetOrder($field);
+			if (empty($field))
+				continue;
+
+			if (strlen($strSqlUfOrder) > 0)
+				$strSqlUfOrder .= ', ';
+			$strSqlUfOrder .= $field." ".$by;
+		}
+
+
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		if(empty($arGroupBy) && is_array($arGroupBy))
+		if (empty($arGroupBy) && is_array($arGroupBy))
 		{
-			$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store CS ".$arSqls["FROM"];
-			if(!empty($arSqls["WHERE"]))
-				$strSql .= " WHERE ".$arSqls["WHERE"];
-			if(!empty($arSqls["GROUPBY"]))
+			$strSql = "SELECT ".$arSqls["SELECT"]." ".$userField->GetSelect()." FROM b_catalog_store CS ".$arSqls["FROM"]. " ".$userField->GetJoin("CS.ID");
+			if (!empty($arSqls["WHERE"]))
+				$strSql .= " WHERE ".$arSqls["WHERE"]." ";
+
+			if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUfFilter) > 0)
+				$strSql .= " AND ".$strSqlUfFilter." ";
+			elseif (strlen($arSqls["WHERE"]) == 0 && strlen($strSqlUfFilter) > 0)
+				$strSql .= " WHERE ".$strSqlUfFilter." ";
+
+
+			if (!empty($arSqls["GROUPBY"]))
 				$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if($arRes = $dbRes->Fetch())
+			if ($arRes = $dbRes->Fetch())
 				return $arRes["CNT"];
 			else
 				return false;
 		}
+		$strSql = "SELECT ".$arSqls["SELECT"]." ".$userField->GetSelect()." FROM b_catalog_store CS ".$arSqls["FROM"]." ".$userField->GetJoin("CS.ID");
+		if (!empty($arSqls["WHERE"]))
+			$strSql .= " WHERE ".$arSqls["WHERE"]." ";
 
-		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_catalog_store CS ".$arSqls["FROM"];
-		if(!empty($arSqls["WHERE"]))
-			$strSql .= " WHERE ".$arSqls["WHERE"];
-		if(!empty($arSqls["GROUPBY"]))
+		if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUfFilter) > 0)
+			$strSql .= " AND ".$strSqlUfFilter." ";
+		elseif (strlen($arSqls["WHERE"]) <= 0 && strlen($strSqlUfFilter) > 0)
+			$strSql .= " WHERE ".$strSqlUfFilter." ";
+
+		if (!empty($arSqls["GROUPBY"]))
 			$strSql .= " GROUP BY ".$arSqls["GROUPBY"];
-		if(!empty($arSqls["ORDERBY"]))
+
+		if (!empty($arSqls["ORDERBY"]))
 			$strSql .= " ORDER BY ".$arSqls["ORDERBY"];
+		elseif (strlen($arSqls["ORDERBY"]) <= 0 && strlen($strSqlUfOrder) > 0)
+			$strSql .= " ORDER BY ".$strSqlUfOrder;
+
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
-		{
+		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
 			$intTopCount = intval($arNavStartParams["nTopCount"]);
-		}
-		if($boolNavStartParams && 0 >= $intTopCount)
+
+		if ($boolNavStartParams && 0 >= $intTopCount)
 		{
-			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_store CS ".$arSqls["FROM"];
-			if(!empty($arSqls["WHERE"]))
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_store CS ".$arSqls["FROM"]. " ".$userField->GetJoin("CS.ID");
+			if (!empty($arSqls["WHERE"]))
 				$strSql_tmp .= " WHERE ".$arSqls["WHERE"];
-			if(!empty($arSqls["GROUPBY"]))
+
+			if (strlen($arSqls["WHERE"]) > 0 && strlen($strSqlUfFilter) > 0)
+				$strSql_tmp .= " AND ".$strSqlUfFilter." ";
+			elseif (strlen($arSqls["WHERE"]) <= 0 && strlen($strSqlUfFilter) > 0)
+				$strSql_tmp .= " WHERE ".$strSqlUfFilter." ";
+
+			if (!empty($arSqls["GROUPBY"]))
 				$strSql_tmp .= " GROUP BY ".$arSqls["GROUPBY"];
 
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
 			$cnt = 0;
-			if(empty($arSqls["GROUPBY"]))
-			{
-				if($arRes = $dbRes->Fetch())
+			if (empty($arSqls["GROUPBY"]))
+				if ($arRes = $dbRes->Fetch())
 					$cnt = $arRes["CNT"];
-			}
 			else
-			{
 				$cnt = $dbRes->SelectedRowsCount();
-			}
 
 			$dbRes = new CDBResult();
 
@@ -315,9 +360,8 @@ class CCatalogStore
 		else
 		{
 			if($boolNavStartParams && 0 < $intTopCount)
-			{
 				$strSql .= " LIMIT ".$intTopCount;
-			}
+
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 

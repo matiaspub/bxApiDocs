@@ -4,9 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWiki</b> - Класс для работы c Wiki.</body> </h
- *
- *
+ * <b>CWiki</b> - Класс для работы c Wiki. </h
  *
  *
  * @return mixed 
@@ -34,17 +32,12 @@ class CWiki
 
 	
 	/**
-	* <p>Метод добавляет новую Wiki-страницу.</p>
-	*
-	*
+	* <p>Метод добавляет новую Wiki-страницу. Динамичный метод.</p>
 	*
 	*
 	* @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -63,7 +56,6 @@ class CWiki
 	* 	echo 'Ошибка. Страница не создана.';
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -100,21 +92,14 @@ class CWiki
 
 	
 	/**
-	* <p>Метод изменяет Wiki-страницу, добавляет запись в историю и обслуживает привязки к категориям</p>
-	*
-	*
+	* <p>Метод изменяет Wiki-страницу, добавляет запись в историю и обслуживает привязки к категориям. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор Wiki-страницы
 	*
-	*
-	*
 	* @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -130,7 +115,6 @@ class CWiki
 	* if (!$CWiki-&gt;Update($ID, $arFields))
 	* 	echo 'Ошибка. Страница не изменена.';<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -167,25 +151,16 @@ class CWiki
 
 	
 	/**
-	* <p>Метод восстанавливает Wiki-страницу из истории.</p>
-	*
-	*
+	* <p>Метод восстанавливает Wiki-страницу из истории. Динамичный метод.</p>
 	*
 	*
 	* @param int $HISTORY_ID  Идентификатор записи истории
 	*
-	*
-	*
 	* @param int $ID  Идентификатор Wiki-страницы
-	*
-	*
 	*
 	* @param int $IBLOCK_ID  Идентификатор Инфо.блока
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -199,7 +174,6 @@ class CWiki
 	* if (!$CWiki-&gt;Recover($HISTORY_ID, $ID, $IBLOCK_ID))
 	* 	echo 'Ошибка. Страница не восстановлена.';<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -238,25 +212,16 @@ class CWiki
 
 	
 	/**
-	* <p>Метод создает запись в истории на основе Wiki-страницы.</p>
+	* <p>Метод создает запись в истории на основе Wiki-страницы. Динамичный метод.</p>
 	*
 	*
+	* @param mixed $ID  Идентификатор Wiki-страницы
 	*
+	* @param mixed $IBLOCK_ID  Идентификатор Инфоблока
 	*
-	* @param $I $D  Идентификатор Wiki-страницы
-	*
-	*
-	*
-	* @param $IBLOCK_I $D  Идентификатор Инфоблока
-	*
-	*
-	*
-	* @param $modifyCommen $t = false Необязательный.
-	*
-	*
+	* @param mixed $modifyComment = false Необязательный.
 	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -269,7 +234,6 @@ class CWiki
 	* if (!$CWiki-&gt;UpdateHistory($ID, $IBLOCK_ID))
 	* 	echo 'Ошибка. Запись истории не создана.';<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -324,25 +288,16 @@ class CWiki
 
 	
 	/**
-	* <p>Метод обновляет привязки Wiki-страницы к категориям.</p>
-	*
-	*
+	* <p>Метод обновляет привязки Wiki-страницы к категориям. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор Wiki-страницы
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Идентификатор Инфо.блока
-	*
-	*
 	*
 	* @param array $arCats  Массив наименований категорий страницы
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -355,7 +310,6 @@ class CWiki
 	* $CWiki = new CWiki();
 	* $CWiki-&gt;UpdateCategory($ID, $IBLOCK_ID, $arCats);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -543,21 +497,14 @@ class CWiki
 	//TODO: Delete (check) all comments
 	
 	/**
-	* <p>Метод удаляет Wiki-страницу.</p>
-	*
-	*
+	* <p>Метод удаляет Wiki-страницу. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор Wiki-страницы
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Идентификатор Инфо.блока. <br> До версии 10.0.0 назывался <b>BLOCK_ID</b>.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -591,25 +538,16 @@ class CWiki
 
 	
 	/**
-	* <p>Метод привязывает изображение к Wiki-странице.</p>
-	*
-	*
+	* <p>Метод привязывает изображение к Wiki-странице. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор Wiki-страницы. До версии 10.0.0 назывался <b>ELEMENT_ID</b>.
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Идентификатор Инфо.блока
-	*
-	*
 	*
 	* @param array $arImage  Массив свойств изображения
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -624,7 +562,6 @@ class CWiki
 	*     $CWiki-&gt;AddImage($ID, $IBLOCK_ID, $_FILES['FILE_ID']);
 	* }<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -694,25 +631,16 @@ class CWiki
 
 	
 	/**
-	* <p>Удаляет изображение из Wiki-страницы.</p>
-	*
-	*
+	* <p>Удаляет изображение из Wiki-страницы. Динамичный метод.</p>
 	*
 	*
 	* @param int $IMAGE_ID  Идентификатор изображения.
 	*
-	*
-	*
 	* @param int $ID  Идентификатор Wiki-страницы. До версии 10.0.0 назывался <b>ELEMENT_ID</b>
-	*
-	*
 	*
 	* @param int $IBLOCK_ID  Идентификатор Инфоблока.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -725,7 +653,6 @@ class CWiki
 	* $CWiki = new CWiki();
 	* $CWiki-&gt;DeleteImage($IMAGE_ID, $ID, $IBLOCK_ID);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -760,31 +687,21 @@ class CWiki
 
 	
 	/**
-	* <p>Метод изменяет Wiki-страницу, добавляет запись в историю и обслуживает привязки к категориям</p>
-	*
-	*
+	* <p>Метод изменяет Wiki-страницу, добавляет запись в историю и обслуживает привязки к категориям. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор Wiki-страницы
 	*
-	*
-	*
 	* @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>
-	*
-	*
 	*
 	* @param bUpdateSearc $h = true Необязательный.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br><br>// <span style='font-size: 10pt; line-height: 115%; font-family: "Courier New";'>Переименуем </span>Wiki-страницу с идентификатором 13 в инфо.блоке с идентификатором 2<br>$ID = 13;<br>$arFields = array(<br>	'IBLOCK_ID' =&gt; 2,<br>	'NAME' =&gt; 'Измененная тестовая страница'	<br>);<br>$CWiki = new CWiki();<br>if (!$CWiki-&gt;Rename($ID, $arFields))<br>	echo 'Ошибка. Страница не переименована.';<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -966,21 +883,14 @@ class CWiki
 
 	
 	/**
-	* <p>Метод устанавливает Wiki-страницу по-умолчанию</p>
-	*
-	*
+	* <p>Метод устанавливает Wiki-страницу по-умолчанию. Динамичный метод.</p>
 	*
 	*
 	* @param int $IBLOCK_ID  Идентификатор Инфоблока. <br>До версии 10.0.0 назывался <b>BLOCK_ID</b>.
 	*
-	*
-	*
 	* @param string $NAME  Наименование страницы
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -992,7 +902,6 @@ class CWiki
 	* if (!CWiki::SetDefaultPage($IBLOCK_ID, $NAME))
 	* 	echo 'Ошибка. Страница по-умолчанию не установлена.';<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1054,17 +963,12 @@ class CWiki
 
 	
 	/**
-	* <p>Метод возвращает Wiki-страницу по-умолчанию.</p>
-	*
-	*
+	* <p>Метод возвращает Wiki-страницу по-умолчанию. Динамичный метод.</p>
 	*
 	*
 	* @param int $IBLOCK_ID  Идентификатор Инфоблока. <br> До версии 10.0.0 назвался <b>BLOCK_ID</b>.
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1077,7 +981,6 @@ class CWiki
 	* 	echo 'Ошибка. Страница по-умолчанию не установлена.';
 	* <br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1116,18 +1019,12 @@ class CWiki
 
 	
 	/**
-	* <p>Метод возвращает массив категорий Wiki-страницы.</p>
-	*
-	*
+	* <p>Метод возвращает массив категорий Wiki-страницы. Динамичный метод.</p>
 	*
 	*
 	* @param string $NAME  Наименование Wiki-страницы. До версии 9.5.3 назывался <b>ID</b>.
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Идентификатор Инфоблока. До версии 10.0.0 назывался <b>BLOCK_ID</b>.
-	*
-	*
 	*
 	* @return array <p> Возвращается массив категорий, содержащих поля со значениями:
 	* </p> <table width="100%" class="tnormal"><tbody> <tr> <th width="15%">Параметр</th> <th>Описание</th>
@@ -1135,7 +1032,6 @@ class CWiki
 	* <td>наименование категории для подсказки</td> </tr> <tr> <td>LINK</td> <td>ссылка
 	* на категорию</td> </tr> <tr> <td>IS_RED</td> <td>является ли ссылка красной (т.е.
 	* страница категории не создана)</td> </tr> </tbody></table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1255,6 +1151,52 @@ class CWiki
 	 * @param int $ID
 	 * @return array
 	 */
+	
+	/**
+	* <p>Возвращает Wiki-страницу по фильтру arFilter. Статичный метод.</p>
+	*
+	*
+	* @param int $ID  Идентификатор Wiki-страницы
+	*
+	* @param array $arFilter  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php">GetList</a>
+	*
+	* @return array <p>Возвращается массив, содержащий поля со значениями: </p> <table
+	* width="100%" class="tnormal"><tbody> <tr> <th width="15%">Параметр</th> <th>Описание</th> </tr> <tr>
+	* <td>NAME</td> <td>наименование страницы</td> </tr> <tr> <td>DETAIL_TEXT_TYPE</td> <td>тип
+	* содержимого страницы</td> </tr> <tr> <td>DETAIL_TEXT</td> <td>текст содержимого
+	* страницы</td> </tr> <tr> <td>IMAGES</td> <td>массив изображений страницы</td> </tr>
+	* <tr> <td>SECTIONS</td> <td>массив категорий страницы</td> </tr> <tr> <td>TAGS</td>
+	* <td>массив тэгов страницы</td> </tr> </tbody></table>
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?<br>
+	* // Получим Wiki-страницу с идентификатором 13 инфо.блока с идентификатором 2
+	* $ID = 13;
+	* $arFilter = array(
+	* 	'ACTIVE' =&gt; 'Y',
+	* 	'CHECK_PERMISSIONS' =&gt; 'N',
+	* 	'IBLOCK_ID' =&gt; 2
+	* );
+	* $arElement = CWiki::GetElementById($ID, $arFilter);
+	* if ($arElement == false)
+	* 	echo 'Страница не найдена.';
+	* <br>?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementByName.php">CWiki::GetElementByName</a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetCategory.php">CWiki::GetCategory</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php">CWikiParser::Parse</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li> </ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/wiki/classes/cwiki/GetElementById.php
+	* @author Bitrix
+	*/
 	public static function GetElementById($ID, $arFilter)
 	{
 		global $arParams;
@@ -1313,22 +1255,14 @@ class CWiki
 	 */
 	
 	/**
-	* <p>Возвращает Wiki-страницу по фильтру arFilter.</p>
-	*
-	*
+	* <p>Возвращает Wiki-страницу по фильтру arFilter. Статичный метод.</p>
 	*
 	*
 	* @param string $NAME  Название Wiki-страницы
 	*
-	*
-	*
 	* @param array $arFilter  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getlist.php">GetList</a>
 	*
-	*
-	*
 	* @param arComponentParam $s = array() Необязательный.
-	*
-	*
 	*
 	* @return result_type <p>Возвращается массив, содержащий поля со значениями: </p> <table
 	* width="100%" class="tnormal"><tbody> <tr> <th width="15%">Параметр</th> <th>Описание</th> </tr> <tr>
@@ -1337,7 +1271,6 @@ class CWiki
 	* страницыы</td> </tr> <tr> <td>IMAGES</td> <td>массив изображений страницы</td> </tr>
 	* <tr> <td>SECTIONS</td> <td>массив категорий страницы</td> </tr> <tr> <td>TAGS</td>
 	* <td>массив тэгов страницы</td> </tr> </tbody></table>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1355,7 +1288,6 @@ class CWiki
 	* 	echo 'Страница не найдена.';
 	* <br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

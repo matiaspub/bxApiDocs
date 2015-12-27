@@ -6,8 +6,6 @@ IncludeModuleLangFile(__FILE__);
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -20,9 +18,7 @@ class CAllCatalogGroup
 
 	
 	/**
-	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</p>
-	*
-	*
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
@@ -31,8 +27,6 @@ class CAllCatalogGroup
 	* <li> <b>UPDATE</b> - для метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.</li>
 	* </ul>
-	*
-	*
 	*
 	* @param array &$arFields  Ассоциативный массив параметров типа цены. Допустимые ключи: <ul>
 	* <li>BASE - Флаг (Y/N) является ли тип базовым.</li> <li>NAME - Внутреннее
@@ -48,17 +42,12 @@ class CAllCatalogGroup
 	* коды языков, а значениями - названия этого типа цены на
 	* соответствующем языке.</li> </ul>
 	*
-	*
-	*
 	* @param int $ID = 0 Код типа цен. Параметр является необязательным и имеет смысл
 	* только для $ACTION = 'UPDATE'.
 	*
-	*
-	*
 	* @return bool <p> В случае корректности переданных параметров возвращает true,
-	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	* можно получить текст ошибок.</p>
-	*
+	* иначе - false. Если метод вернул false, с помощью $APPLICATION-&gt;GetException() можно
+	* получить текст ошибок.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
@@ -361,14 +350,12 @@ class CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция возвращает код и внутреннее название базового типа цен. Результат работы функции кэшируется, поэтому повторные вызовы этой функции в рамках одной страницы не приводят к дополнительным запросам базы данных.</p> <p>От цены базового типа расчитываются цены других типов, если они указаны с использованием системы наценок. Понятие базового типа цены используется только в административной части и не оказывает влияния на публичную часть. </p>
+	* <p>Метод возвращает код и внутреннее название базового типа цен. Результат работы метода кешируется, поэтому повторные вызовы этого метода в рамках одной страницы не приводят к дополнительным запросам базы данных. Метод динамичный.</p> <p>От цены базового типа расчитываются цены других типов, если они указаны с использованием системы наценок. Понятие базового типа цены используется только в административной части и не оказывает влияния на публичную часть. </p>
 	*
 	*
-	*
-	*
-	* @return array <p>Функция возвращает ассоциативный массив с ключами:</p> <table
-	* class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td>
-	* <td>Код базового типа цен.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название
+	* @return array <p>Метод возвращает ассоциативный массив с ключами:</p> <table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
+	* базового типа цен.</td> </tr> <tr> <td>NAME</td> <td>Внутреннее название
 	* базового типа цен.</td> </tr> <tr> <td>NAME_LANG</td> <td>Базовая цена.</td> </tr> <tr>
 	* <td>XML_ID</td> <td>XML ID базовой цены.</td> </tr> </table> <br><br>
 	*

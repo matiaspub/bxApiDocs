@@ -129,7 +129,7 @@ class CForumMessage extends CAllForumMessage
 					"TITLE" => $arMessage["TOPIC_INFO"]["TITLE"].($arMessage["NEW_TOPIC"] == "Y" && !empty($arMessage["TOPIC_INFO"]["DESCRIPTION"]) ?
 						", ".$arMessage["TOPIC_INFO"]["DESCRIPTION"] : ""),
 					"TAGS" => ($arMessage["NEW_TOPIC"] == "Y" ? $arMessage["TOPIC_INFO"]["TAGS"] : ""),
-					"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(textParser::killAllTags($arMessage["POST_MESSAGE"])),
+					"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(forumTextParser::clearAllTags($arMessage["POST_MESSAGE"])),
 					"URL" => "",
 					"INDEX_TITLE" => $arMessage["NEW_TOPIC"] == "Y",
 				);
@@ -513,7 +513,7 @@ class CForumMessage extends CAllForumMessage
 					break;
 				case "APPROVED_AND_MINE":
 					if ($val >= 0)
-						$arSqlSearch[] = "(FM.APPROVED='Y' OR (FM.APPROVED != 'Y' AND FM.AUTHOR_ID=".intval($val)."))";
+						$arSqlSearch[] = "(FM.APPROVED='Y' OR FM.AUTHOR_ID=".intval($val).")";
 					else
 						$arSqlSearch[] = "(FM.APPROVED='Y')";
 					break;
@@ -876,7 +876,7 @@ class CForumFiles extends CAllForumFiles
 				// to table b_forum_message
 				case "APPROVED_AND_MINE":
 					if ($val >= 0)
-						$arSqlSearch[] = "(FM.APPROVED='Y' OR (FM.APPROVED != 'Y' AND FM.AUTHOR_ID=".intval($val)."))";
+						$arSqlSearch[] = "(FM.APPROVED='Y' OR FM.AUTHOR_ID=".intval($val).")";
 					else
 						$arSqlSearch[] = "(FM.APPROVED='Y')";
 					break;

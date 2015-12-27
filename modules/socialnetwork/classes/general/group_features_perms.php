@@ -5,15 +5,13 @@ $GLOBALS["arSonetFeaturesPermsCache"] = array();
 
 
 /**
- * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей.</body> </html>
- *
- *
+ * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/index.php
  * @author Bitrix
  */
 class CAllSocNetFeaturesPerms
@@ -154,6 +152,10 @@ class CAllSocNetFeaturesPerms
 					$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["ROLE"], GetMessage("SONET_GFP_ERROR_NO_ROLE")), "ERROR_NO_SITE");
 					return false;
 				}
+				elseif($arFields["ROLE"] == SONET_RELATIONS_TYPE_FRIENDS2)
+				{
+					$arFields["ROLE"] = SONET_RELATIONS_TYPE_FRIENDS;
+				}
 			}
 		}
 
@@ -165,16 +167,12 @@ class CAllSocNetFeaturesPerms
 	* <p>Удаляет право.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Идентификатор записи. </htm
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -228,34 +226,27 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Изменяет параметры права.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
-	*
-	*
+	* <p>Изменяет параметры права.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
 	*
 	*
 	* @param int $id  Идентификатор записи </htm
-	*
-	*
 	*
 	* @param array $arFields  Массив новых значений параметров. Допустимые ключи:<br><b>FEATURE_ID</b> -
 	* код дополнительного функционала,<br><b>OPERATION_ID</b> - код
 	* операции,<br><b>ROLE</b> - роль.
 	*
-	*
-	*
 	* @return int <p>Код измененной записи.</p> </htm
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
 	* <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a></li>
 	* </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -334,25 +325,16 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется.</p> <p><b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a>.</p>
-	*
-	*
+	* <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется.</p> <p><b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a>.</p>
 	*
 	*
 	* @param int $featureID  Идентификатор дополнительного функционала.
 	*
-	*
-	*
 	* @param string $operation  Название операции. </ht
-	*
-	*
 	*
 	* @param string $perm  Право на операцию.
 	*
-	*
-	*
 	* @return int <p>Возвращается идентификатор записи.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -386,17 +368,16 @@ class CAllSocNetFeaturesPerms
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Add.php">CSocNetFeaturesPerms::Add</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a></li>
 	* <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/Update.php">CSocNetFeaturesPerms::Update</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a></li>
 	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/SetPerm.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php
 	* @author Bitrix
 	*/
 	public static function SetPerm($featureID, $operation, $perm)
@@ -500,25 +481,20 @@ class CAllSocNetFeaturesPerms
 	* <p>Возвращает параметры права.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Идентификатор записи </htm
-	*
-	*
 	*
 	* @return array <p>Возвращается массив с ключами:<br><b>ID</b> - код записи,<br><b>FEATURE_ID</b> -
 	* код дополнительного функционала,<br><b>OPERATION_ID</b> - код
 	* операции,<br><b>ROLE</b> - роль.</p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetList.php">CSocNetFeaturesPerms::GetList</a>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/GetList.php">CSocNetFeaturesPerms::GetList</a>
 	* </li> </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetByID.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/GetByID.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)
@@ -547,34 +523,22 @@ class CAllSocNetFeaturesPerms
 	* <p>Проверяет, имеет ли текущий пользователь право на совершение операции.</p>
 	*
 	*
-	*
-	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	*
-	*
 	* @param int $id  Код объекта (пользователя или группы).
-	*
-	*
 	*
 	* @param string $feature  Название дополнительного функционала.
 	*
-	*
-	*
 	* @param string $operation  Название операции. </ht
 	*
-	*
-	*
 	* @param bool $site_id = SITE_ID Код сайта. Необязательный.
-	*
-	*
 	*
 	* @return bool <p>True, если текущий пользователь имеет право на совершение
 	* операции. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/currentusercanperformperation.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/currentusercanperformperation.php
 	* @author Bitrix
 	*/
 	public static function CurrentUserCanPerformOperation($type, $id, $feature, $operation, $site_id = SITE_ID)
@@ -593,34 +557,20 @@ class CAllSocNetFeaturesPerms
 	* <p>Метод проверяет, может ли указанный пользователь совершать указанное действие над указанным дополнительным функционалом. Например, метод может проверить, может ли указанный пользователь добавлять записи в отчеты указанной рабочей группы.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя, права которого проверяются.
-	*
-	*
 	*
 	* @param char $type  Тип объекта:<br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	*
-	*
 	* @param mixed $id  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
 	* кодов объектов.
 	*
-	*
-	*
 	* @param string $feature  Название дополнительного функционала.
-	*
-	*
 	*
 	* @param string $operation  Название операции. </ht
 	*
-	*
-	*
 	* @param bool $bUserIsAdmin = false Является ли пользователь администратором сайта или модуля
 	* социальной сети.
-	*
-	*
 	*
 	* @return mixed <p>Если в параметре id передано скалярное значение, то метод
 	* возвращает true если пользователь имеет права на указанную
@@ -643,7 +593,6 @@ class CAllSocNetFeaturesPerms
 	* комментариев</li> <li>full_comment - полный доступ к комментариям</li> </ul> </li>
 	* </ul> <a name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
@@ -656,7 +605,7 @@ class CAllSocNetFeaturesPerms
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/CanPerformOperation.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/CanPerformOperation.php
 	* @author Bitrix
 	*/
 	public static function CanPerformOperation($userID, $type, $id, $feature, $operation, $bCurrentUserIsAdmin = false)
@@ -684,28 +633,36 @@ class CAllSocNetFeaturesPerms
 
 		if ($type == SONET_ENTITY_GROUP)
 		{
+			$bWorkWithClosedGroups = (COption::GetOptionString("socialnetwork", "work_with_closed_groups", "N") == "Y");
 			if (is_array($id))
 			{
 				$arGroupToGet = array();
 				foreach($id as $group_id)
 				{
 					if ($featureOperationPerms[$group_id] == false)
+					{
 						$arReturn[$group_id] = false;
+					}
 					else
+					{
 						$arGroupToGet[] = $group_id;
+					}
 				}
 
 				$userRoleInGroup = CSocNetUserToGroup::GetUserRole($userID, $arGroupToGet);
-
 				$arGroupToGet = array();
 				if (is_array($userRoleInGroup))
 				{
 					foreach($userRoleInGroup as $group_id => $role)
 					{
 						if ($userRoleInGroup[$group_id] == SONET_ROLES_BAN)
+						{
 							$arReturn[$group_id] = false;
+						}
 						else
+						{
 							$arGroupToGet[] = $group_id;
+						}
 					}
 				}
 
@@ -716,7 +673,9 @@ class CAllSocNetFeaturesPerms
 				{
 					$arReturn = array();
 					foreach($id as $group_id)
+					{
 						$arReturn[$group_id] = false;
+					}
 					return $arReturn;
 				}
 
@@ -728,7 +687,7 @@ class CAllSocNetFeaturesPerms
 						&& !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])
 					)
 					{
-						if (COption::GetOptionString("socialnetwork", "work_with_closed_groups", "N") != "Y")
+						if (!$bWorkWithClosedGroups)
 						{
 							$arReturn[$arGroupTmp["ID"]] = false;
 							continue;
@@ -748,7 +707,9 @@ class CAllSocNetFeaturesPerms
 					if ($featureOperationPerms[$arGroupTmp["ID"]] == SONET_ROLES_ALL)
 					{
 						if ($arGroupTmp["VISIBLE"] == "N")
+						{
 							$featureOperationPerms[$arGroupTmp["ID"]] = SONET_ROLES_USER;
+						}
 						else
 						{
 							$arReturn[$arGroupTmp["ID"]] = true;
@@ -822,10 +783,12 @@ class CAllSocNetFeaturesPerms
 			}
 			else // not array of groups
 			{
-				$group_id = IntVal($id);
+				$id = IntVal($id);
 
 				if ($featureOperationPerms == false)
+				{
 					return false;
+				}
 
 				$userRoleInGroup = CSocNetUserToGroup::GetUserRole($userID, $id);
 				if ($userRoleInGroup == SONET_ROLES_BAN)
@@ -840,7 +803,7 @@ class CAllSocNetFeaturesPerms
 					&& !in_array($operation, $arSocNetFeaturesSettings[$feature]["minoperation"])
 				)
 				{
-					if (COption::GetOptionString("socialnetwork", "work_with_closed_groups", "N") != "Y")
+					if (!$bWorkWithClosedGroups)
 					{
 						return false;
 					}
@@ -858,42 +821,36 @@ class CAllSocNetFeaturesPerms
 				if ($featureOperationPerms == SONET_ROLES_ALL)
 				{
 					if ($arGroupTmp["VISIBLE"] == "N")
+					{
 						$featureOperationPerms = SONET_ROLES_USER;
+					}
 					else
+					{
 						return true;
+					}
 				}
 
 				if ($featureOperationPerms == SONET_ROLES_AUTHORIZED)
 				{
-					if ($userID > 0)
-						return true;
-					else
-						return false;
+					return ($userID > 0);
 				}
 
 				if ($userRoleInGroup == false)
+				{
 					return false;
+				}
 
 				if ($featureOperationPerms == SONET_ROLES_MODERATOR)
 				{
-					if ($userRoleInGroup == SONET_ROLES_MODERATOR || $userRoleInGroup == SONET_ROLES_OWNER)
-						return true;
-					else
-						return false;
+					return (in_array($userRoleInGroup, array(SONET_ROLES_MODERATOR, SONET_ROLES_OWNER)));
 				}
 				elseif ($featureOperationPerms == SONET_ROLES_USER)
 				{
-					if ($userRoleInGroup == SONET_ROLES_MODERATOR || $userRoleInGroup == SONET_ROLES_OWNER || $userRoleInGroup == SONET_ROLES_USER)
-						return true;
-					else
-						return false;
+					return (in_array($userRoleInGroup, array(SONET_ROLES_MODERATOR, SONET_ROLES_OWNER, SONET_ROLES_USER)));
 				}
 				elseif ($featureOperationPerms == SONET_ROLES_OWNER)
 				{
-					if ($userRoleInGroup == SONET_ROLES_OWNER)
-						return true;
-					else
-						return false;
+					return ($userRoleInGroup == SONET_ROLES_OWNER);
 				}
 			}
 		}
@@ -954,44 +911,17 @@ class CAllSocNetFeaturesPerms
 
 					if ($featureOperationPerms[$entity_id] == SONET_RELATIONS_TYPE_AUTHORIZED)
 					{
-						if ($userID > 0)
-							$arReturn[$entity_id] = true;
-						else
-							$arReturn[$entity_id] = false;
+						$arReturn[$entity_id] = ($userID > 0);
 						continue;
 					}
 
-					if ($featureOperationPerms[$entity_id] == SONET_RELATIONS_TYPE_FRIENDS)
+					if (
+						$featureOperationPerms[$entity_id] == SONET_RELATIONS_TYPE_FRIENDS
+						|| $featureOperationPerms[$entity_id] == SONET_RELATIONS_TYPE_FRIENDS2
+					)
 					{
-						if (CSocNetUserRelations::IsFriends($userID, $entity_id))
-						{
-							$arReturn[$entity_id] = true;
-							continue;
-						}
-						else
-						{
-							$arReturn[$entity_id] = false;
-							continue;
-						}
-					}
-
-					if ($featureOperationPerms[$entity_id] == SONET_RELATIONS_TYPE_FRIENDS2)
-					{
-						if (CSocNetUserRelations::IsFriends($userID, $entity_id))
-						{
-							$arReturn[$entity_id] = true;
-							continue;
-						}
-						elseif (CSocNetUserRelations::IsFriends2($userID, $entity_id))
-						{
-							$arReturn[$entity_id] = true;
-							continue;
-						}
-						else
-						{
-							$arReturn[$entity_id] = false;
-							continue;
-						}
+						$arReturn[$entity_id] = CSocNetUserRelations::IsFriends($userID, $entity_id);
+						continue;
 					}
 				}
 
@@ -1024,28 +954,15 @@ class CAllSocNetFeaturesPerms
 
 				if ($featureOperationPerms == SONET_RELATIONS_TYPE_AUTHORIZED)
 				{
-					if ($userID > 0)
-						return true;
-					else
-						return false;
+					return ($userID > 0);
 				}
 
-				if ($featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS)
+				if (
+					$featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS
+					|| $featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS2
+				)
 				{
-					if (CSocNetUserRelations::IsFriends($userID, $id))
-						return true;
-					else
-						return false;
-				}
-
-				if ($featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS2)
-				{
-					if (CSocNetUserRelations::IsFriends($userID, $id))
-						return true;
-					elseif (CSocNetUserRelations::IsFriends2($userID, $id))
-						return true;
-					else
-						return false;
+					return CSocNetUserRelations::IsFriends($userID, $id);
 				}
 			}
 
@@ -1059,25 +976,15 @@ class CAllSocNetFeaturesPerms
 	* <p>Возвращает права на операцию.</p>
 	*
 	*
-	*
-	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа, <br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
-	*
-	*
 	*
 	* @param mixed $id  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
 	* кодов объектов.
 	*
-	*
-	*
 	* @param string $feature  Название дополнительного функционала.
 	*
-	*
-	*
 	* @param string $operation  Название операции. </ht
-	*
-	*
 	*
 	* @return mixed <p>Строка, содержащая право на операцию. Если (с версии 8.6.4) в
 	* параметре id передан массив кодов объектов, то возвращается
@@ -1086,7 +993,7 @@ class CAllSocNetFeaturesPerms
 	* логике.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeaturesPerms/GetOperationPerm.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/GetOperationPerm.php
 	* @author Bitrix
 	*/
 	public static function GetOperationPerm($type, $id, $feature, $operation)
@@ -1184,7 +1091,11 @@ class CAllSocNetFeaturesPerms
 			{
 				$dbResult = CSocNetFeaturesPerms::GetList(
 					Array(),
-					Array("FEATURE_ENTITY_ID" => $arGroupToGet, "FEATURE_ENTITY_TYPE" => $type, "GROUP_FEATURE_ACTIVE" => "Y"),
+					Array(
+						"FEATURE_ENTITY_ID" => $arGroupToGet,
+						"FEATURE_ENTITY_TYPE" => $type,
+						"GROUP_FEATURE_ACTIVE" => "Y"
+					),
 					false,
 					false,
 					array("OPERATION_ID", "FEATURE_ENTITY_ID", "FEATURE_FEATURE", "ROLE")
@@ -1205,8 +1116,6 @@ class CAllSocNetFeaturesPerms
 
 				if ($type == SONET_ENTITY_GROUP)
 				{
-					$featureOperationPerms = SONET_ROLES_OWNER;
-
 					if (!array_key_exists($feature, $arFeaturesPerms[$TmpEntityID]))
 					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
@@ -1222,8 +1131,6 @@ class CAllSocNetFeaturesPerms
 				}
 				else
 				{
-					$featureOperationPerms = SONET_RELATIONS_TYPE_NONE;
-
 					if (!array_key_exists($feature, $arFeaturesPerms[$TmpEntityID]))
 					{
 						$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
@@ -1236,10 +1143,14 @@ class CAllSocNetFeaturesPerms
 					{
 						$featureOperationPerms = $arFeaturesPerms[$TmpEntityID][$feature][$operation];
 					}
+
+					if ($featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS2)
+					{
+						$featureOperationPerms = SONET_RELATIONS_TYPE_FRIENDS;
+					}
 				}
 
 				$arReturn[$TmpEntityID] = $featureOperationPerms;
-
 			}
 
 			return $arReturn;
@@ -1337,8 +1248,6 @@ class CAllSocNetFeaturesPerms
 
 			if ($type == SONET_ENTITY_GROUP)
 			{
-				$featureOperationPerms = SONET_ROLES_OWNER;
-
 				if (!array_key_exists($feature, $arFeaturesPerms))
 				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_GROUP];
@@ -1354,8 +1263,6 @@ class CAllSocNetFeaturesPerms
 			}
 			else
 			{
-				$featureOperationPerms = SONET_RELATIONS_TYPE_NONE;
-
 				if (!array_key_exists($feature, $arFeaturesPerms))
 				{
 					$featureOperationPerms = $arSocNetFeaturesSettings[$feature]["operations"][$operation][SONET_ENTITY_USER];
@@ -1368,11 +1275,15 @@ class CAllSocNetFeaturesPerms
 				{
 					$featureOperationPerms = $arFeaturesPerms[$feature][$operation];
 				}
+
+				if ($featureOperationPerms == SONET_RELATIONS_TYPE_FRIENDS2)
+				{
+					$featureOperationPerms = SONET_RELATIONS_TYPE_FRIENDS;
+				}
 			}
 
 			return $featureOperationPerms;
 		}
-
 	}
 }
 ?>

@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/index.php
  * @author Bitrix
  */
 class CSocNetGroupSubject extends CAllSocNetGroupSubject
@@ -24,18 +22,14 @@ class CSocNetGroupSubject extends CAllSocNetGroupSubject
 	* <p>Метод добавляет новую тему.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив параметров новой темы. Ключами массива являются названия
 	* полей темы, а значениями - их значения. Допустимые ключи:<br><b>SITE_ID</b>
 	* - код сайта,<br><b>NAME</b> - название.
 	*
-	*
-	*
 	* @return int <p>Возвращается код созданной темы или false в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -124,20 +118,14 @@ class CSocNetGroupSubject extends CAllSocNetGroupSubject
 	* <p>Возвращает список тем в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("SORT" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID<b>,
 	* <b>SITE_ID</b>, <b>NAME</b>. </b></b>
 	*
-	*
-	*
 	* @param AS $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: <b>ID<b>, <b>SITE_ID</b>, <b>NAME</b>. </b></b>
-	*
-	*
 	*
 	* @param I $D  Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
@@ -145,36 +133,23 @@ class CSocNetGroupSubject extends CAllSocNetGroupSubject
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
 	* поля <b>ID<b>, <b>SITE_ID</b>, <b>NAME</b>. </b></b>
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
 	* поля <b>ID<b>, <b>SITE_ID</b>, <b>NAME</b>. </b></b>
 	*
-	*
-	*
 	* @param array $arNavStartParams = false 
-	*
-	*
 	*
 	* @param array $arSelectFields = array() 
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект типа CDBResult, содержащий список записей,
 	* удовлетворяющих фильтру.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
@@ -182,7 +157,7 @@ class CSocNetGroupSubject extends CAllSocNetGroupSubject
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/getlist.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/getlist.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("SORT" => "ASC", "ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())

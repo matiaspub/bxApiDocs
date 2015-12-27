@@ -2,13 +2,36 @@
 if (file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/geshi/geshi.php"))
 	require_once($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/geshi/geshi.php");
 
-function perfmon_NumberFormat($num, $dec = 2, $html = true)
+IncludeModuleLangFile(__FILE__);
+/**
+ * Formats float number according to flags.
+ *
+ * @param float $num Number value to be formatted.
+ * @param integer $dec How many digits after decimal point.
+ * @param integer $mode Output mode.
+ *
+ * @return string
+**/
+function perfmon_NumberFormat($num, $dec = 2, $mode = 0)
 {
-	$str = number_format($num, $dec, ".", " ");
-	if ($html)
-		return str_replace(" ", "&nbsp;", $str);
-	else
-		return $str;
+	switch ($mode)
+	{
+	case 1:
+		$str = number_format($num, $dec, '.', '');
+		break;
+	case 2:
+		$str = number_format($num, $dec, '.', ' ');
+		$str = str_replace(' ', '<span></span>', $str);
+		$str = '<span class="perfmon_number">'.$str.'</span>';
+		break;
+	default:
+		if ($_REQUEST["mode"] == "excel")
+			$str = perfmon_NumberFormat($num, $dec, 1);
+		else
+			$str = perfmon_NumberFormat($num, $dec, 2);
+		break;
+	}
+	return $str;
 }
 
 class CAdminListColumn

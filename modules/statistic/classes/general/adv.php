@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.</body> </html>
- *
- *
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>. 
  *
  *
  * @return mixed 
@@ -271,14 +269,9 @@ class CAllAdv
 	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламную кампанию</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $adv_id  ID рекламной кампании. </htm
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -288,7 +281,6 @@ class CAllAdv
 	*     echo "Рекламная кампания #".$adv_id." успешно удалена.";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -324,14 +316,9 @@ class CAllAdv
 	* <p>Обнуляет статистические данные <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	*
 	*
-	*
-	*
 	* @param int $adv_id  ID рекламной кампании. </htm
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -341,7 +328,6 @@ class CAllAdv
 	*     echo "Данные по рекламной кампании #".$adv_id." успешно удалены.";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

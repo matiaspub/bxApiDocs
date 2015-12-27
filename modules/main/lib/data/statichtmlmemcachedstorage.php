@@ -18,12 +18,24 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 	{
 		parent::__construct($cacheKey, $configuration, $htmlCacheOptions);
 		$this->memcached = \StaticHtmlMemcachedResponse::getConnection($configuration, $htmlCacheOptions);
+		if ($this->memcached !== null)
+		{
+			$this->memcached->setCompressThreshold(0);
+		}
+		
 		$this->compression = !isset($htmlCacheOptions["MEMCACHE_COMPRESSION"]) || $htmlCacheOptions["MEMCACHE_COMPRESSION"] !== "N";
 	}
 
 	public function write($content, $md5)
 	{
-		if (!$this->memcached || !$this->memcached->set($this->cacheKey, $content, $this->compression ? MEMCACHE_COMPRESSED : 0, 0))
+		$flags = 0;
+		if ($this->compression)
+		{
+			$flags = \StaticHtmlMemcachedResponse::MEMCACHED_GZIP_FLAG;
+			$content = gzencode($content, 4);
+		}
+
+		if (!$this->memcached || !$this->memcached->set($this->cacheKey, $content, $flags))
 		{
 			return false;
 		}
@@ -33,18 +45,20 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 		$this->props->etag = md5($this->cacheKey.$this->props->size.$this->props->mtime);
 		$this->props->type = "text/html; charset=".LANG_CHARSET;
 		$this->props->md5 = $md5;
+		$this->props->gzip = $this->compression;
+
 		if (function_exists("mb_strlen"))
 		{
-			$this->props->size = mb_strlen(gzcompress($content), "latin1");
+			$this->props->size = mb_strlen($content, "latin1");
 			$this->props->size += mb_strlen(serialize($this->props), "latin1");
 		}
 		else
 		{
-			$this->props->size = strlen(gzcompress($content));
+			$this->props->size = strlen($content);
 			$this->props->size += strlen(serialize($this->props));
 		}
 
-		$this->memcached->set("~".$this->cacheKey, $this->props, 0, 0);
+		$this->memcached->set("~".$this->cacheKey, $this->props);
 
 		return $this->props->size;
 	}
@@ -53,7 +67,9 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 	{
 		if ($this->memcached !== null)
 		{
-			return $this->memcached->get($this->cacheKey);
+			$flags = 0;
+			$content = $this->memcached->get($this->cacheKey, $flags);
+			return $flags & \StaticHtmlMemcachedResponse::MEMCACHED_GZIP_FLAG ? \CHTMLPagesCache::gzdecode($content) : $content;
 		}
 
 		return false;
@@ -70,7 +86,7 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 		{
 			$size = $this->getProp("size");
 			$this->deleteProps();
-    		return $size;
+			return $size;
 		}
 
 		return false;

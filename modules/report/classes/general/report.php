@@ -449,6 +449,7 @@ class CReport
 		}
 	}
 
+	/** @deprecated 14.5.5 Method moved into a helper class */
 	public static function fillFilterReferenceColumns(&$filters, &$fieldList, $helperClass)
 	{
 		foreach ($filters as &$filter)
@@ -688,11 +689,13 @@ class CReport
 		$dataType = call_user_func(array($helperClassName, 'getFieldDataType'), $view['field']);
 
 		/** @var Entity\Field[] $view */
-		if ($dataType === 'integer' || $dataType === 'float')
+		if (($dataType === 'integer' || $dataType === 'float')
+			&& (!$view['isUF'] || $view['ufInfo']['MULTIPLE'] !== 'Y'))
 		{
 			return true;
 		}
-		elseif ($dataType === 'boolean' && $view['aggr'] === 'SUM')
+		elseif ($dataType === 'boolean' && $view['aggr'] === 'SUM'
+			&& (!$view['isUF'] || $view['ufInfo']['MULTIPLE'] !== 'Y'))
 		{
 			return true;
 		}
@@ -711,7 +714,7 @@ class CReport
 
 		if (($dataType === 'integer' || $dataType === 'float')
 			&& empty($view['aggr'])
-		)
+			&& (!$view['isUF'] || $view['ufInfo']['MULTIPLE'] !== 'Y'))
 		{
 			return true;
 		}
@@ -870,18 +873,13 @@ class CReport
 				else
 				{
 					$arConcatNameElements = array($DB->IsNull('%s', '\' \''));
-					if (($n = $nNameElements) > 1)
-					{
-						while (--$n > 0)
-							$arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
-					}
+					$n = $nNameElements;
+					while (--$n > 0)
+						$arConcatNameElements[] = $DB->IsNull('%s', '\' \'');
 					$strConcatNameElements = call_user_func_array(array($DB, 'concat'), $arConcatNameElements);
 					$expression[0] = 'CASE WHEN '.$DB->Length('LTRIM(RTRIM('.$strConcatNameElements.'))').'>0 THEN '.$expression[0].' ELSE %s END';
-					if ($nNameElements > 1)
-					{
-						for ($i = 1; $i <= $nNameElements; $i++)
-							$expression[] = $expression[$i];
-					}
+					for ($i = 1; $i <= $nNameElements; $i++)
+						$expression[] = $expression[$i];
 					$expression[] = (empty($pre) ? '' : $pre.'.').'LOGIN';
 				}
 

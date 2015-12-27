@@ -85,11 +85,9 @@ class ConfigTable extends Entity\DataManager
 
 	public static function getSupportedPlatforms()
 	{
-		return array(
-			"android",
-			"ios",
-			"global",
-		);
+		$platforms = AppTable::getSupportedPlatforms();
+		$platforms[] = "global";
+		return $platforms;
 	}
 
 	public static function checkFields(Result $result, $primary, array $data)

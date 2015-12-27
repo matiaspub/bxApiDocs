@@ -49,7 +49,7 @@ $arClasses = array(
 	"CSocNetLogToolsPhoto" => "classes/general/log_tools_photo.php",
 	"CSocNetForumComments" => "classes/general/log_forum_comments.php",
 	"CSocNetLogRights" => "classes/general/log_rights.php",
-	"CSocNetLogPages" => "classes/".$DBType."/log_pages.php",
+	"CSocNetLogPages" => "classes/general/log_pages.php",
 	"CSocNetLogFollow" => "classes/general/log_follow.php",
 	"CSocNetLogSmartFilter" => "classes/".$DBType."/log_smartfilter.php",
 	"CSocNetLogRestService" => "classes/general/rest.php",
@@ -73,6 +73,8 @@ $arClasses = array(
 	"CSocNetPullSchema" => "classes/general/notify_schema.php",
 	"Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
 	"\\Bitrix\\Socialnetwork\\WorkgroupTable" => "lib/workgroup.php",
+	"Bitrix\\Socialnetwork\\LogPageTable" => "lib/logpags.php",
+	"\\Bitrix\\Socialnetwork\\LogPageTable" => "lib/logpage.php",
 	"socialnetwork" => "install/index.php",
 );
 CModule::AddAutoloadClasses("socialnetwork", $arClasses);
@@ -185,11 +187,34 @@ if (
 	|| BX_MOBILE_LOG != true
 )
 {
+	CModule::IncludeModule('intranet');
+	IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/socialnetwork/install/js/log_destination.php');
 	CJSCore::RegisterExt('socnetlogdest', array(
 		'js' => '/bitrix/js/socialnetwork/log-destination.js',
 		'css' => '/bitrix/js/main/core/css/core_finder.css',
-		'lang' => '/bitrix/modules/socialnetwork/lang/'.LANGUAGE_ID.'/install/js/log_destination.php',
-		'rel' => array('core', 'popup', 'json')
+		'lang_additional' => array(
+			'LM_POPUP_TITLE' => GetMessage("LM_POPUP_TITLE"),
+			'LM_POPUP_TAB_LAST' => GetMessage("LM_POPUP_TAB_LAST"),
+			'LM_POPUP_TAB_SG' => GetMessage("LM_POPUP_TAB_SG"),
+			'LM_POPUP_TAB_STRUCTURE' => GetMessage("LM_POPUP_TAB_STRUCTURE"),
+			'LM_POPUP_CHECK_STRUCTURE' => GetMessage("LM_POPUP_CHECK_STRUCTURE"),
+			'LM_POPUP_TAB_LAST_USERS' => GetMessage("LM_POPUP_TAB_LAST_USERS"),
+			'LM_POPUP_TAB_LAST_CONTACTS' => GetMessage("LM_POPUP_TAB_LAST_CONTACTS"),
+			'LM_POPUP_TAB_LAST_COMPANIES' => GetMessage("LM_POPUP_TAB_LAST_COMPANIES"),
+			'LM_POPUP_TAB_LAST_LEADS' => GetMessage("LM_POPUP_TAB_LAST_LEADS"),
+			'LM_POPUP_TAB_LAST_DEALS' => GetMessage("LM_POPUP_TAB_LAST_DEALS"),
+			'LM_POPUP_TAB_LAST_SG' => GetMessage("LM_POPUP_TAB_LAST_SG"),
+			'LM_POPUP_TAB_LAST_STRUCTURE' => GetMessage("LM_POPUP_TAB_LAST_STRUCTURE"),
+			'LM_POPUP_CHECK_STRUCTURE' => GetMessage("LM_POPUP_CHECK_STRUCTURE"),
+			'LM_SEARCH_PLEASE_WAIT' => GetMessage("LM_SEARCH_PLEASE_WAIT"),
+			'LM_EMPTY_LIST' => GetMessage("LM_EMPTY_LIST"),
+			'LM_PLEASE_WAIT' => GetMessage("LM_PLEASE_WAIT"),
+			'LM_CREATE_SONETGROUP_TITLE' => GetMessage("LM_CREATE_SONETGROUP_TITLE"),
+			'LM_CREATE_SONETGROUP_BUTTON_CREATE' => GetMessage("LM_CREATE_SONETGROUP_BUTTON_CREATE"),
+			'LM_CREATE_SONETGROUP_BUTTON_CANCEL' => GetMessage("LM_CREATE_SONETGROUP_BUTTON_CANCEL"),
+			'LM_POPUP_WAITER_TEXT' => GetMessage("LM_POPUP_WAITER_TEXT")
+		),
+		'rel' => array('core', 'popup', 'json', 'finder')
 	));
 }
 
@@ -218,7 +243,8 @@ $arFeatureTmp = array(
 				"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
 				"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
 				"CLASS_FORMAT" => "CSocNetLogTools",
-				"METHOD_FORMAT" => "FormatComment_Forum"
+				"METHOD_FORMAT" => "FormatComment_Forum",
+				"RATING_TYPE_ID" => "FORUM_POST"
 			)
 		)
 	)
@@ -282,7 +308,8 @@ $arFeatureTmp = array(
 				"UPDATE_CALLBACK" => "NO_SOURCE",
 				"DELETE_CALLBACK" => "NO_SOURCE",
 				"CLASS_FORMAT" => "CSocNetLogTools",
-				"METHOD_FORMAT"	=> "FormatComment_PhotoAlbum"
+				"METHOD_FORMAT"	=> "FormatComment_PhotoAlbum",
+				"RATING_TYPE_ID" => "LOG_COMMENT"
 			)
 		),
 		"photo_photo" =>  array(
@@ -417,9 +444,12 @@ if ($bIntranet)
 					"OPERATION_ADD"	=> "log_rights",
 					"ADD_CALLBACK" => array("CSocNetLogTools", "AddComment_Tasks"),
 					"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
-					"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
+					"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Task"),
 					"CLASS_FORMAT" => "CSocNetLogTools",
-					"METHOD_FORMAT"	=> "FormatComment_Forum"
+					"METHOD_FORMAT"	=> "FormatComment_Forum",
+					"METHOD_CANEDIT" => array("CSocNetLogTools", "CanEditComment_Task"),
+					"METHOD_CANEDITOWN" => array("CSocNetLogTools", "CanEditOwnComment_Task"),
+					"RATING_TYPE_ID" => "FORUM_POST"
 				)
 			)
 		);

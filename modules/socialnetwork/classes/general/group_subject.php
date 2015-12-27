@@ -3,15 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/index.php
  * @author Bitrix
  */
 class CAllSocNetGroupSubject
@@ -73,16 +71,12 @@ class CAllSocNetGroupSubject
 	* <p>Метод удаляет тему рабочих групп. Если есть группы с этой темой, то тема удалена не будет.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код темы.</bod
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -125,22 +119,16 @@ class CAllSocNetGroupSubject
 	* <p>Изменяет параметры темы.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код темы.</bod
-	*
-	*
 	*
 	* @param array $arFields  Массив новых параметров темы. Ключами массива являются названия
 	* полей темы, а значениями - их значения. Допустимые ключи: <b>SITE_ID</b> -
 	* код сайта, <b>NAME</b> - название.
 	*
-	*
-	*
 	* @return int <p>Возвращается код измененной темы или false в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -231,17 +219,13 @@ class CAllSocNetGroupSubject
 	* <p>Возвращает параметры темы. Не порождает запросов к базе данных.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код темы.</bod
-	*
-	*
 	*
 	* @return array <p>Массив параметров темы. Массив имеет ключи:<br><b>ID</b> - код
 	* темы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название. </p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroupSubject/GetByID.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/GetByID.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)

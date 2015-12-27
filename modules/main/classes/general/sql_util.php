@@ -87,6 +87,16 @@ class CSqlUtil
 			$key = substr($key, 1);
 			$strOperation = "IN";
 		}
+		elseif (substr($key, 0, 2)=="=%")
+		{
+			$key = substr($key, 2);
+			$strOperation = "RLIKE";
+		}
+		elseif (substr($key, 0, 2)=="%=")
+		{
+			$key = substr($key, 2);
+			$strOperation = "LLIKE";
+		}
 		elseif (substr($key, 0, 1)=="%")
 		{
 			$key = substr($key, 1);
@@ -324,8 +334,9 @@ class CSqlUtil
 				{
 					if($dbType === "MYSQL")
 					{
+						//Use MySql feature for sort in 'NULLS_LAST' mode
 						if($order === 'ASC')
-							$arSqlOrder[] = '(CASE WHEN ISNULL('.$arFields[$by]["FIELD"].') THEN 1 ELSE 0 END) '.$order.', '.$arFields[$by]["FIELD"]." ".$order;
+							$arSqlOrder[] = "-".$arFields[$by]["FIELD"]." DESC";
 						else
 							$arSqlOrder[] = $arFields[$by]["FIELD"]." ".$order;
 					}
@@ -513,7 +524,8 @@ class CSqlUtil
 									$strOperation = '=';
 								}
 
-								if ($strOperation === "LIKE" && ($fieldType === "int" || $fieldType === "double"))
+								if (($strOperation === "LIKE" || $strOperation === "RLIKE" || $strOperation === "LLIKE")
+									&& ($fieldType === "int" || $fieldType === "double"))
 								{
 									// Ignore LIKE operation for numeric types.
 									$strOperation = '=';
@@ -558,6 +570,15 @@ class CSqlUtil
 												else
 													$arSqlSearch_tmp[] = $fieldName." LIKE '%".self::ForLike($val)."%' ESCAPE '!'";
 
+											}
+											elseif($strOperation === "RLIKE" || $strOperation === "LLIKE")
+											{
+												if(is_array($val))
+													$arSqlSearch_tmp[] = "(".$fieldName." LIKE '".implode("' OR ". $fieldName." LIKE '", $DB->ForSql($val))."')";
+												elseif(strlen($val)<=0)
+													$arSqlSearch_tmp[] = $fieldName;
+												else
+													$arSqlSearch_tmp[] = $fieldName." LIKE '".$DB->ForSql($val)."'";
 											}
 											else
 												$arSqlSearch_tmp[] = (($strNegative == "Y") ? " ".$fieldName." IS NULL OR NOT " : "")."(".$fieldName." ".$strOperation." '".$DB->ForSql($val)."' )";

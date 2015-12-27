@@ -145,7 +145,7 @@ class CCalendarWebService extends IWebService
 
 		$data->addChild($obNode = new CXMLCreator('RegionalSettings'));
 
-		//$obNode->addChild(CXMLCreator::createTagAttributed('Language', '1033'));
+		$obNode->addChild(CXMLCreator::createTagAttributed('Language', '1049'));
 		//$obNode->addChild(CXMLCreator::createTagAttributed('Locale', '1033'));
 		$obNode->addChild(CXMLCreator::createTagAttributed('AdvanceHijri', '0'));
 		$obNode->addChild(CXMLCreator::createTagAttributed('CalendarType', '0'));
@@ -164,8 +164,6 @@ class CCalendarWebService extends IWebService
 
 	public function __getRow($event, $listName, &$last_change)
 	{
-		global $APPLICATION, $USER;
-
 		$arStatusValues = $this->arStatusValues;
 		$arPriorityValues = $this->arPriorityValues;
 
@@ -184,25 +182,21 @@ class CCalendarWebService extends IWebService
 		$bAllDay = $event['DT_SKIP_TIME'] == 'Y' ? 1 : 0;
 
 		$TZBias = intval(date('Z'));
-		$localTime = new DateTime();
-		$TZBiasStart = $localTime->getOffset();
-
+		$offset = CCalendar::GetOffset();
 		$duration = $event['DT_LENGTH'];
 		if ($bAllDay)
 			$duration -= 20;
 
 		if (!$bAllDay || defined('OLD_OUTLOOK_VERSION'))
 		{
-			$ts_start -= $TZBiasStart;
-			$ts_finish -= $TZBiasStart;
+			$ts_start = $ts_start - $TZBias - $offset; // We need time in UTC
+			$ts_finish = $ts_finish - $TZBias - $offset;
 		}
 
 		$obRow = new CXMLCreator('z:row');
 		$obRow->setAttribute('ows_ID', $event['ID']);
 		$obRow->setAttribute('ows_Title', htmlspecialcharsback($event['NAME'])); // we have data htmlspecialchared yet
-
 		$version = $event['VERSION'] ? $event['VERSION'] : 1;
-
 		$obRow->setAttribute('ows_Attachments', 0);
 		$obRow->setAttribute('ows_owshiddenversion', $version);
 		$obRow->setAttribute('ows_MetaInfo_vti_versionhistory', md5($event['ID']).':'.$version);
@@ -222,19 +216,13 @@ class CCalendarWebService extends IWebService
 		$status = $arStatusValues[$event['ACCESSIBILITY']];
 		$obRow->setAttribute('ows_MetaInfo_BusyStatus', $status === null ? -1 : $status);
 		$obRow->setAttribute('ows_MetaInfo_Priority', intval($arPriorityValues[$event['IMPORTANCE']]));
-
 		$obRow->setAttribute('ows_Created', $this->__makeDateTime(MakeTimeStamp($event['DATE_CREATE'])-$TZBias));
 		$obRow->setAttribute('ows_Modified', $this->__makeDateTime($change-$TZBias));
 		$obRow->setAttribute('ows_EventType', $bRecurrent ? 1 : 0);
-
 		$obRow->setAttribute('ows_Location', CCalendar::GetTextLocation($event['LOCATION']));
 		$obRow->setAttribute('ows_Description', $event['~DESCRIPTION']); // Description parsed from BB-codes to HTML
-
 		$obRow->setAttribute('ows_EventDate', $this->__makeDateTime($ts_start));
 		$obRow->setAttribute('ows_EndDate', $this->__makeDateTime($ts_start + $event['DT_LENGTH']));
-
-		//$obRow->setAttribute('ows_EndDate', $this->__makeDateTime(((false && $bRecurrent) ? $ts_start + $event['DT_LENGTH'] : $ts_finish) + ($bAllDay ? 86340 : 0)));
-		//$obRow->setAttribute('ows_EndDate', $this->__makeDateTime(($bRecurrent ? $ts_start + $event['DT_LENGTH'] : $ts_finish) - ($bAllDay ? 20 : 0)));
 
 		$obRow->setAttribute('ows_fAllDayEvent', $bAllDay);
 
@@ -308,7 +296,6 @@ class CCalendarWebService extends IWebService
 		}
 		else
 		{
-			//$obRow->setAttribute('ows_Duration', ($duration ? $duration : 86400) - 60);
 			$obRow->setAttribute('ows_Duration', $duration);
 		}
 
@@ -667,9 +654,6 @@ class CCalendarWebService extends IWebService
 					$TZBias = $arData['fAllDayEvent'] ? 0 : $TZBias;
 					$arData['EventDate'] += $TZBias;
 					$arData['EndDate'] += $TZBias;
-
-//					$arData["DT_FROM"] = ConvertTimeStamp($arData['EventDate'], 'FULL');
-//					$arData["DT_TO"] = ConvertTimeStamp($arData['EndDate'], 'FULL');
 				}
 				else
 				{
@@ -686,8 +670,6 @@ class CCalendarWebService extends IWebService
 					'DT_FROM_TS' => $arData['EventDate'],
 					'DT_TO_TS' => $arData['EndDate'],
 					'DT_SKIP_TIME' => $skipTime,
-//					"DT_FROM" => $arData["DT_FROM"],
-//					"DT_TO" => $arData["DT_TO"],
 					'NAME' => $arData['Title'],
 					'DESCRIPTION' => CCalendar::ParseHTMLToBB($arData['Description']),
 					'SECTIONS' => array($arSection['ID']),

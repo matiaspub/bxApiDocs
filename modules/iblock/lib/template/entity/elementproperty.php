@@ -142,6 +142,15 @@ class ElementProperty extends Base
 							$this->elementLinkProperties[$fieldCode] = $propertyValues;
 							$value = new ElementPropertyElement($propertyValues);
 						}
+						elseif (is_array($propertyValues))
+						{
+							$value = array();
+							foreach ($propertyValues as $propertyValue)
+							{
+								if (is_numeric($propertyValue))
+									$value[] = new ElementPropertyElement($propertyValue);
+							}
+						}
 						else
 						{
 							$value = $propertyValues;
@@ -158,6 +167,15 @@ class ElementProperty extends Base
 						{
 							$this->sectionLinkProperties[$fieldCode] = $propertyValues;
 							$value = new ElementPropertySection($propertyValues);
+						}
+						elseif (is_array($propertyValues))
+						{
+							$value = array();
+							foreach ($propertyValues as $propertyValue)
+							{
+								if (is_numeric($propertyValue))
+									$value[] = new ElementPropertySection($propertyValue);
+							}
 						}
 						else
 						{
@@ -256,7 +274,6 @@ class ElementPropertyUserField extends LazyValueLoader
 {
 	/** @var array  */
 	private $property = null;
-	private $propertyFormatFunction = null;
 
 	/**
 	 * @param integer $key  Iblock element identifier.
@@ -268,17 +285,6 @@ class ElementPropertyUserField extends LazyValueLoader
 		if (is_array(($property)))
 		{
 			$this->property = $property;
-			if(strlen($property["USER_TYPE"]))
-			{
-				$propertyUserType = \CIBlockProperty::GetUserType($property["USER_TYPE"]);
-				if(
-					array_key_exists("GetPublicViewHTML", $propertyUserType)
-					&& is_callable($propertyUserType["GetPublicViewHTML"])
-				)
-				{
-					$this->propertyFormatFunction = $propertyUserType["GetPublicViewHTML"];
-				}
-			}
 		}
 	}
 	/**
@@ -288,9 +294,10 @@ class ElementPropertyUserField extends LazyValueLoader
 	 */
 	protected function load()
 	{
-		if ($this->propertyFormatFunction)
+		$propertyFormatFunction = $this->getFormatFunction();
+		if ($propertyFormatFunction)
 		{
-			return call_user_func_array($this->propertyFormatFunction,
+			return call_user_func_array($propertyFormatFunction,
 				array(
 					$this->property,
 					array("VALUE" => $this->key),
@@ -302,6 +309,32 @@ class ElementPropertyUserField extends LazyValueLoader
 		{
 			return $this->key;
 		}
+	}
+	/**
+	 * Retruns GetPublicViewHTML handler function for $this->property.
+	 * Returns false if no handler defined.
+	 *
+	 * @return callable|false
+	 */
+	protected function getFormatFunction()
+	{
+		static $propertyFormatFunction = null;
+		if (!isset($propertyFormatFunction))
+		{
+			$propertyFormatFunction = false;
+			if ($this->property && strlen($this->property["USER_TYPE"]))
+			{
+				$propertyUserType = \CIBlockProperty::getUserType($this->property["USER_TYPE"]);
+				if(
+					array_key_exists("GetPublicViewHTML", $propertyUserType)
+					&& is_callable($propertyUserType["GetPublicViewHTML"])
+				)
+				{
+					$propertyFormatFunction = $propertyUserType["GetPublicViewHTML"];
+				}
+			}
+		}
+		return $propertyFormatFunction;
 	}
 }
 

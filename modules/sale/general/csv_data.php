@@ -25,7 +25,7 @@ public 	function LoadFile($filename)
 		fclose($file_id); 
 	}
 
-public 	function SetFieldsType($fields_type = "R")
+public static 	function SetFieldsType($fields_type = "R")
 	{
 		$this->cFieldsType = ($fields_type=="F") ? "F" : "R";
 	}
@@ -54,7 +54,7 @@ public 	function SetWidthMap($arMap)
 		}
 	}
 
-	public function FetchDelimiter()
+	fpublic unction FetchDelimiter()
 	{
 		$bInString = false;
 		$str = "";
@@ -131,7 +131,7 @@ public 	function SetWidthMap($arMap)
 		return false;
 	}
 
-	public function FetchWidth()
+	fupublic nction FetchWidth()
 	{
 		$str = "";
 		$ind = 1;

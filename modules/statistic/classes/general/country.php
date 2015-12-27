@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CCountry</b> - класс для получения данных по трафику в разрезе по странами.</body> </html>
- *
- *
+ * <b>CCountry</b> - класс для получения данных по трафику в разрезе по странами. 
  *
  *
  * @return mixed 
@@ -19,8 +17,6 @@ class CCountry
 	* <p>Возвращает список стран, определённых в модуле "Статистика". Загрузка списка стран осуществляется при переиндексации базы IP адресов в настройках модуля "Статистика".</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_name" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> -
 	* двухсимвольный идентификатор страны; </li> <li> <b>s_short_name</b> -
 	* трехсимвольный идентификатор страны; </li> <li> <b>s_name</b> -
@@ -34,12 +30,8 @@ class CCountry
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> по данной стране.
 	* </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - двухсимвольный
@@ -62,15 +54,10 @@ class CCountry
 	* поля "кол-во событий". <br><br> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a> </li> </ul>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка UserAgent'ов. Если значение равно "true",
 	* то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -104,7 +91,6 @@ class CCountry
 	* echo SelectBoxM("arCOUNTRY_ID[]", <b>CCountry::GetList</b>(), $arCOUNTRY_ID, "", false, 20);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -232,14 +218,10 @@ class CCountry
 	* <p>Возвращает данные необходимые для построения графика и круговой диаграммы посещаемости в разрезе по странам.</p>
 	*
 	*
-	*
-	*
 	* @param array $filter  Массив для фильтрации стран. В массиве допустимы следующие ключи:
 	* <ul> <li> <b>COUNTRY_ID</b> - двухсимвольный идентификатор страны; </li> <li>
 	* <b>DATE1</b> - начальное значение <i>интервала времени</i>; </li> <li> <b>DATE2</b> -
 	* конечное значение <i>интервала времени</i>. </li> </ul>
-	*
-	*
 	*
 	* @param array &$legend  Массив содержащий суммарные показатели по каждой стране, а также
 	* цвет линии графика и сектора круговой диаграммы для каждой
@@ -257,16 +239,12 @@ class CCountry
 	* хитов<br> [TOTAL_C_EVENTS] =&gt; суммарное кол-во событий<br> [COLOR] =&gt; цвет
 	* линии графика и сектора круговой диаграммы<br> )<br> ...<br>)<br></pre>
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/colors.php");<br>// отфильтруем данные только по России на декабрь 2007 года<br>$arFilter = Array(<br>    "COUNTRY_ID" =&gt; "ru",<br>    "DATE1"      =&gt; "01.12.2007",<br>    "DATE2"      =&gt; "31.12.2007"<br>    );<br><br>// получим массив данных в разрезе по дням<br>$arDays = <b>CCountry::GetGraphArray</b>($arFilter, $arLegend);<br><br>// выведем полученные данные по России за декабрь 2007 года<br>while (list($date, $arr) = each($arDays))<br>{<br>    echo "Дата: ".$date."&lt;br&gt;";<br>    echo "Данные на эту дату: &lt;pre&gt;"; print_r($arr); echo "&lt;/pre&gt;";    <br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

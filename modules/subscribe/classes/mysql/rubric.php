@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CRubric</b> - класс для работы с рубриками подписки.</body> </html>
- *
- *
+ * <b>CRubric</b> - класс для работы с рубриками подписки. 
  *
  *
  * @return mixed 

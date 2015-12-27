@@ -29,6 +29,31 @@ class CAllForumNew
 		return ($strPerms < "E" ? false : true);
 	}
 
+	
+	/**
+	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новый форум.</p>
+	*
+	*
+	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
+	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
+	*
+	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
+	* методом $USER-&gt;GetID()
+	*
+	* @return bool 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
+	* </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
+	* </li> </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php
+	* @author Bitrix
+	*/
 	public static function CanUserAddForum($arUserGroups, $iUserID = 0)
 	{
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
@@ -208,57 +233,6 @@ class CAllForumNew
 		return true;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующего форума с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого форума.</p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код форума, параметры которого необходимо изменить.
-	*
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
-	* форума</a>.
-	*
-	*
-	*
-	* @param bool $bReindex = true Необязательный. По умолчанию равен True.
-	*
-	*
-	*
-	* @return int 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Этот код привязывает сайт с кодом $site_code к форуму $FORUM_ID и прописывает "Шаблон пути к сообщению на сайте" в виде $FORUM_PATH
-	* 
-	* $arFields = array("ACTIVE" =&gt; "Y", "SITES" =&gt; CForumNew::GetSites($FORUM_ID));
-	* $arFields["SITES"][$site_code] = str_replace("#SITE_PATH#", $site_path, $FORUM_PATH);
-	* CForumNew::Update($FORUM_ID, $arFields);
-	* 
-	* ?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
-	* <li>Перед изменением форума следует проверить возможность
-	* изменения методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
-	* </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields, $bReindex = true)
 	{
 		global $DB;
@@ -460,6 +434,38 @@ class CAllForumNew
 	}
 
 	//---------------> Array of sites (langs) where forum is available
+	
+	/**
+	* <p>Функция возвращает ассоциативный массив, в котором ключами являются сайты, к которым привязан форум с кодом ID, а значениями - шаблоны пути к сообщению форума в соответствующем сайте. </p>
+	*
+	*
+	* @param int $ID  Код форума.
+	*
+	* @return array 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* // Для форума с кодом $FID получим массив реальных путей к сообщению
+	* // с кодом $MID из темы с кодом $TID
+	* 
+	* $arForumPaths = CForumNew::GetSites($FID);
+	* $arForumPathsCodes = array_keys($arForumPaths);
+	* for ($i = 0; $i &lt; count($arForumPathsCodes); $i++)
+	* {
+	*     $arForumPaths[$arForumPathsCodes[$i]] = 
+	*         CForumNew::PreparePath2Message($arForumPaths[$arForumPathsCodes[$i]],
+	*                                        array("FORUM_ID"=&gt;$FID,
+	*                                              "TOPIC_ID"=&gt;$TID,
+	*                                              "MESSAGE_ID"=&gt;$MID)
+	*                                        );
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getsites.php
+	* @author Bitrix
+	*/
 	public static function GetSites($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -747,6 +753,72 @@ class CAllForumNew
 		}
 
 		return array("FIELD"=>$key, "NEGATIVE"=>$strNegative, "OPERATION"=>$strOperation);
+	}
+
+	public static function prepareField($operation, $type, $vals)
+	{
+		$val = '';
+		if ($operation == "IN")
+		{
+			if (is_string($vals))
+				$vals = explode(",", $vals);
+			else if (!is_array($vals))
+				$vals = array($vals);
+			if ($type == "int")
+			{
+				array_walk($vals, create_function("&\$item", "\$item=intval(\$item);"));
+				$vals = array_unique($vals);
+				$val = implode(",", $vals);
+			}
+			elseif ($type == "double")
+			{
+				array_walk($vals, create_function("&\$item", "\$item=doubleval(\$item);"));
+				$vals = array_unique($vals);
+				$val = implode(",", $vals);
+			}
+			elseif ($type == "datetime")
+			{
+				array_walk($vals, create_function("&\$item", "\$item=\"'\".\$GLOBALS[\"DB\"]->CharToDateFunction(\$GLOBALS[\"DB\"]->ForSql(\$item), \"FULL\").\"'\";"));
+				$vals = array_unique($vals);
+				$val = implode(",", $vals);
+			}
+			elseif ($type == "date")
+			{
+				array_walk($vals, create_function("&\$item", "\$item=\"'\".\$GLOBALS[\"DB\"]->CharToDateFunction(\$GLOBALS[\"DB\"]->ForSql(\$item), \"SHORT\").\"'\";"));
+				$vals = array_unique($vals);
+				$val = implode(",", $vals);
+			}
+			else
+			{
+				array_walk($vals, create_function("&\$item", "\$item=\"'\".\$GLOBALS[\"DB\"]->ForSql(\$item).\"'\";"));
+				$vals = array_unique($vals);
+				$val = implode(",", $vals);
+			}
+		}
+		else if ($type === "int")
+		{
+			$val = intval($vals);
+			$val = ($val > 0 ? $val : '');
+		}
+		elseif ($type === "double")
+		{
+			$val = doubleval(str_replace(",", ".", $vals));
+			$val = ($val > 0 ? $val : '');
+		}
+		elseif ($type === "datetime")
+		{
+			$val = $GLOBALS["DB"]->CharToDateFunction($GLOBALS["DB"]->ForSql($vals), "FULL");
+		}
+		elseif ($type === "date")
+		{
+			$val = $GLOBALS["DB"]->CharToDateFunction($GLOBALS["DB"]->ForSql($vals), "SHORT");
+		}
+		else if ($type == "string" || $type == "char")
+		{
+			$val = $GLOBALS["DB"]->ForSql($vals);
+		}
+
+		return $val;
 	}
 
 	public static function GetSelectFields($arAddParams = array())
@@ -1192,6 +1264,7 @@ class CAllForumNew
 			elseif ($by == "MODERATION") $arSqlOrder["F.MODERATION"] = " F.MODERATION ".$order." ";
 			elseif ($by == "FORUM_GROUP_ID") $arSqlOrder["F.FORUM_GROUP_ID"] = " F.FORUM_GROUP_ID ".$order." ";
 			elseif ($by == "FORUM_GROUP_SORT") $arSqlOrder["FG.SORT"] = " FG.SORT ".$order." ";
+			elseif ($by == "FORUM_GROUP_LEFT_MARGIN") $arSqlOrder["FG.LEFT_MARGIN"] = " FG.LEFT_MARGIN ".$order." ";
 			elseif ($by == "TOPICS") $arSqlOrder["F.TOPICS"] = " F.TOPICS ".$order." ";
 			elseif ($by == "POSTS") $arSqlOrder["F.POSTS"] = " F.POSTS ".$order." ";
 			elseif ($by == "POSTS_UNAPPROVED") $arSqlOrder["F.POSTS_UNAPPROVED"] = " F.POSTS_UNAPPROVED ".$order." ";
@@ -2304,376 +2377,159 @@ class CAllForumGroup
 /**********************************************************************/
 /************** FORUM SMILE *******************************************/
 /**********************************************************************/
-class CAllForumSmile
+class CForumSmile
 {
-	//---------------> User insert, update, delete
-	public static function CheckFields($ACTION, &$arFields)
+	static $smiles = array();
+	static $sets = array();
+
+	static function Add()
 	{
-		$aMsg = array();
-
-		if ((is_set($arFields, "TYPE") || $ACTION=="ADD") && $arFields["TYPE"]!="I" && $arFields["TYPE"]!="S")
-		{
-			if (empty($arFields["TYPE"]))
-			{
-				$aMsg[] = array(
-					"id" => "TYPE",
-					"text" => GetMessage("FS_ERROR_EMPTY_TYPE"));
-			}
-			else
-			{
-				$aMsg[] = array(
-					"id" => "TYPE",
-					"text" => GetMessage("FS_ERROR_UNKNOWN_TYPE", array("#TYPE#" => $arFields["TYPE"])));
-			}
-		}
-		if (is_set($arFields, "TYPING") && !empty($arFields["TYPING"]))
-		{
-			if (preg_match("/[\<\>\"\']/is", $arFields["TYPING"]) != false)
-			{
-				$aMsg[] = array(
-					"id" => "TYPING",
-					"text" => GetMessage("FS_ERROR_TYPING"));
-			}
-		}
-
-		if ((is_set($arFields, "IMAGE") || $ACTION=="ADD") && empty($arFields["IMAGE"]))
-		{
-			$aMsg[] = array(
-				"id" => "IMAGE",
-				"text" => GetMessage("FS_ERROR_EMPTY_IMAGE"));
-		}
-		elseif (is_set($arFields, "IMAGE"))
-		{
-			$arFile = CFile::GetImageSize($_SERVER['DOCUMENT_ROOT'].BX_ROOT."/images/forum/".($arFields["TYPE"] == "I" ? "icon" : "smile")."/".$arFields["IMAGE"]);
-			$arFile = (is_array($arFile) ? $arFile : array());
-			$arFile = array(
-				"name" => $arFields["IMAGE"],
-				"tmp_name" => $_SERVER['DOCUMENT_ROOT'].BX_ROOT."/images/forum/".($arFields["TYPE"] == "I" ? "icon" : "smile")."/".$arFields["IMAGE"],
-				"type" => $arFile["mime"],
-				"size" => @filesize($_SERVER['DOCUMENT_ROOT'].BX_ROOT."/images/forum/".($arFields["TYPE"] == "I" ? "icon" : "smile")."/".$arFields["IMAGE"]),
-				"error" => 0,
-				"width" => $arFile[0],
-				"height" => $arFile[1]);
-
-			$res = CFile::CheckImageFile($arFile, COption::GetOptionString("forum", "file_max_size", 5242880));
-			if (strLen($res) > 0)
-			{
-				$aMsg[] = array(
-					"id" => "IMAGE",
-					"text" => $res);
-			}
-			else
-			{
-				$arFields["IMAGE_WIDTH"] = $arFile["width"];
-				$arFields["IMAGE_HEIGHT"] = $arFile["height"];
-			}
-		}
-
-		if (is_set($arFields, "LANG") || $ACTION == "ADD")
-		{
-			$res = (is_array($arFields["LANG"]) ? $arFields["LANG"] : array());
-			foreach ($res as $i => $val)
-			{
-				if (empty($res[$i]["LID"]) || empty($res[$i]["NAME"]))
-				{
-					unset($res[$i]);
-				}
-			}
-
-			$db_lang = CLanguage::GetList(($b="sort"), ($o="asc"));
-			while ($arLang = $db_lang->Fetch())
-			{
-				$bFound = false;
-				foreach ($res as $i => $val)
-				{
-					if ($res[$i]["LID"] == $arLang["LID"])
-						$bFound = true;
-				}
-				if (!$bFound)
-				{
-					$aMsg[] = array("id" => 'NAME_'.$arLang["LID"],
-						"text" => GetMessage("FS_ERROR_EMPTY_NAME",
-							array("#LID#" => $arLang["LID"], "#LID_NAME#" => $arLang["NAME"])));
-				}
-			}
-		}
-
-		if ((is_set($arFields, "SORT") || $ACTION=="ADD") && intVal($arFields["SORT"]) <= 0)
-		{
-			$arFields["SORT"] = 150;
-		}
-
-		if(!empty($aMsg))
-		{
-			$e = new CAdminException(array_reverse($aMsg));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
-			return false;
-		}
-		return true;
+		return false;
 	}
 
-	public static function Update($ID, $arFields)
+	public static function CheckFields()
 	{
-		global $DB;
-		$ID = intVal($ID);
-		if ($ID <= 0):
-			return false;
-		endif;
-
-		if (!CForumSmile::CheckFields("UPDATE", $arFields))
-			return false;
-		if(CACHED_b_forum_smile !== false)
-			$GLOBALS["CACHE_MANAGER"]->CleanDir("b_forum_smile");
-
-		$strUpdate = $DB->PrepareUpdate("b_forum_smile", $arFields);
-		if (!empty($strUpdate))
-		{
-			$strSql = "UPDATE b_forum_smile SET ".$strUpdate." WHERE ID = ".$ID;
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		if (!empty($arFields["LANG"]))
-		{
-			$DB->Query("DELETE FROM b_forum_smile_lang WHERE SMILE_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-			foreach ($arFields["LANG"] as $i => $val)
-			{
-				$arInsert = $DB->PrepareInsert("b_forum_smile_lang", $arFields["LANG"][$i]);
-				$strSql = "INSERT INTO b_forum_smile_lang(SMILE_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-		}
-		return $ID;
+		return false;
 	}
 
-	public static function Delete($ID)
+	public static function Update()
 	{
-		global $DB;
-		$ID = intVal($ID);
-		if ($ID <= 0):
-			return false;
-		endif;
-		if(CACHED_b_forum_smile !== false)
-			$GLOBALS["CACHE_MANAGER"]->CleanDir("b_forum_smile");
-		$DB->Query("UPDATE b_forum_topic SET ICON_ID = NULL WHERE ICON_ID = ".$ID, true);
-		$DB->Query("DELETE FROM b_forum_smile_lang WHERE SMILE_ID = ".$ID, true);
-		$DB->Query("DELETE FROM b_forum_smile WHERE ID = ".$ID, true);
-
-		return true;
+		return false;
 	}
 
-	public static function GetList($arOrder = array("SORT"=>"ASC"), $arFilter = array())
+	
+	/**
+	* <p>Удаляет смайл с кодом <i>ID</i>.</p>
+	*
+	*
+	* @param int $ID  Код смайла, который необходимо удалить.
+	*
+	* @return bool <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/delete.php
+	* @author Bitrix
+	*/
+	static function Delete()
 	{
-		global $DB;
-		$arSqlSearch = Array();
-		$strSqlSearch = "";
-		$arSqlOrder = Array();
-		$strSqlOrder = "";
-		$arFilter = (is_array($arFilter) ? $arFilter : array());
-
-		foreach ($arFilter as $key => $val)
-		{
-			$key_res = CForumNew::GetFilterOperation($key);
-			$key = strtoupper($key_res["FIELD"]);
-			$strNegative = $key_res["NEGATIVE"];
-			$strOperation = $key_res["OPERATION"];
-
-			switch ($key)
-			{
-				case "ID":
-				case "SORT":
-					if (intVal($val)<=0)
-						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FR.".$key." IS NULL OR FR.".$key."<=0)";
-					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FR.".$key." IS NULL OR NOT ":"")."(FR.".$key." ".$strOperation." ".intVal($val)." )";
-					break;
-				case "TYPE":
-					if (strlen($val)<=0)
-						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FR.TYPE IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(FR.TYPE)<=0)";
-					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FR.TYPE IS NULL OR NOT ":"")."(FR.TYPE ".$strOperation." '".$DB->ForSql($val)."' )";
-					break;
-			}
-		}
-		if (!empty($arSqlSearch))
-			$strSqlSearch = "WHERE (".implode(") AND (", $arSqlSearch).") ";
-
-		foreach ($arOrder as $by => $order)
-		{
-			$by = strtoupper($by); $order = strtoupper($order);
-			$order = ($order == "ASC" ? "ASC" : "DESC");
-			if ($by == "ID") $arSqlOrder[] = " FR.ID ".$order." ";
-			elseif ($by == "TYPE") $arSqlOrder[] = " FR.TYPE ".$order." ";
-			else
-			{
-				$arSqlOrder[] = " FR.SORT ".$order." ";
-				$by = "SORT";
-			}
-		}
-		DelDuplicateSort($arSqlOrder);
-		if (!empty($arSqlOrder))
-			$strSqlOrder = " ORDER BY ".implode(", ", $arSqlOrder);
-
-		$strSql = "SELECT FR.ID, FR.SORT, FR.TYPE, FR.TYPING, FR.IMAGE, FR.CLICKABLE, FR.DESCRIPTION, FR.IMAGE_WIDTH, FR.IMAGE_HEIGHT ".
-			"FROM b_forum_smile FR ".
-			$strSqlSearch." ".
-			$strSqlOrder;
-
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $db_res;
+		return false;
 	}
 
-	public static function GetListEx($arOrder = array("SORT"=>"ASC"), $arFilter = array())
+	public static function GetList()
 	{
 		global $DB;
-		$arSqlSearch = Array();
-		$strSqlSearch = "";
-		$arSqlOrder = Array();
-		$strSqlOrder = "";
-		$arFilter = (is_array($arFilter) ? $arFilter : array());
-
-		foreach ($arFilter as $key => $val)
-		{
-			$key_res = CForumNew::GetFilterOperation($key);
-			$key = strtoupper($key_res["FIELD"]);
-			$strNegative = $key_res["NEGATIVE"];
-			$strOperation = $key_res["OPERATION"];
-
-			switch ($key)
-			{
-				case "ID":
-				case "SORT":
-					if (intVal($val)<=0)
-						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FR.".$key." IS NULL OR FR.".$key."<=0)";
-					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FR.".$key." IS NULL OR NOT ":"")."(FR.".$key." ".$strOperation." ".intVal($val)." )";
-					break;
-				case "TYPE":
-					if (strlen($val)<=0)
-						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FR.TYPE IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(FR.TYPE)<=0)";
-					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FR.TYPE IS NULL OR NOT ":"")."(FR.TYPE ".$strOperation." '".$DB->ForSql($val)."' )";
-					break;
-				case "LID":
-					if (strlen($val)<=0)
-						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FRL.LID IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(FRL.LID)<=0)";
-					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FRL.LID IS NULL OR NOT ":"")."(FRL.LID ".$strOperation." '".$DB->ForSql($val)."' )";
-					break;
-			}
-		}
-		if (!empty($arSqlSearch))
-			$strSqlSearch = " WHERE (".implode(") AND (", $arSqlSearch).") ";
-
-		foreach ($arOrder as $by=>$order)
-		{
-			$by = strtoupper($by); $order = strtoupper($order);
-			$order = ($order == "ASC" ? "ASC" : "DESC");
-
-			if ($by == "ID") $arSqlOrder[] = " FR.ID ".$order." ";
-			elseif ($by == "LID") $arSqlOrder[] = " FRL.LID ".$order." ";
-			elseif ($by == "NAME") $arSqlOrder[] = " FRL.NAME ".$order." ";
-			elseif ($by == "TYPE") $arSqlOrder[] = " FR.TYPE ".$order." ";
-			else
-			{
-				$arSqlOrder[] = " FR.SORT ".$order." ";
-				$by = "SORT";
-			}
-		}
-		DelDuplicateSort($arSqlOrder);
-		if (!empty($arSqlOrder))
-			$strSqlOrder = " ORDER BY ".implode(", ", $arSqlOrder);
-
-		$strSql =
-			"SELECT FR.ID, FR.SORT, FR.TYPE, FR.TYPING, FR.IMAGE, FR.CLICKABLE, ".
-			"	FRL.LID, FRL.NAME, FR.DESCRIPTION, FR.IMAGE_WIDTH, FR.IMAGE_HEIGHT ".
-			"FROM b_forum_smile FR ".
-			"	LEFT JOIN b_forum_smile_lang FRL ON FR.ID = FRL.SMILE_ID ".
-			$strSqlSearch." ".
-			$strSqlOrder;
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $db_res;
+		return $DB->Query("", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	public static function GetByID($ID)
+	public static function GetListEx()
 	{
 		global $DB;
-		$ID = intVal($ID);
-		$strSql =
-			"SELECT FR.ID, FR.SORT, FR.TYPE, FR.TYPING, FR.IMAGE, FR.CLICKABLE, ".
-			"	FR.DESCRIPTION, FR.IMAGE_WIDTH, FR.IMAGE_HEIGHT ".
-			"FROM b_forum_smile FR ".
-			"WHERE FR.ID = ".$ID."";
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		return $DB->Query("", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+	}
 
-		if ($res = $db_res->Fetch())
-		{
-			return $res;
-		}
+	static function GetByID()
+	{
 		return false;
 	}
 
 	public static function GetByIDEx($ID, $strLang)
 	{
-		global $DB;
-		$ID = intVal($ID);
-
-		$strSql = "SELECT FR.ID, FR.SORT, FR.TYPE, FR.TYPING, FR.IMAGE, FR.CLICKABLE, ".
-			"	FRL.LID, FRL.NAME, FR.DESCRIPTION, FR.IMAGE_WIDTH, FR.IMAGE_HEIGHT ".
-			"FROM b_forum_smile FR ".
-			"	LEFT JOIN b_forum_smile_lang FRL ON (FR.ID = FRL.SMILE_ID AND FRL.LID = '".$DB->ForSql($strLang)."') ".
-			"WHERE FR.ID = ".$ID."";
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		if ($res = $db_res->Fetch())
-		{
-			return $res;
-		}
 		return false;
 	}
 
 	public static function GetLangByID($SMILE_ID, $strLang)
 	{
-		global $DB;
-		$SMILE_ID = intVal($SMILE_ID);
-
-		$strSql = "SELECT FRL.ID, FRL.SMILE_ID, FRL.LID, FRL.NAME ".
-			"FROM b_forum_smile_lang FRL ".
-			"WHERE FRL.SMILE_ID = ".$SMILE_ID." ".
-			"	AND FRL.LID = '".$DB->ForSql($strLang)."' ";
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		if ($res = $db_res->Fetch())
-		{
-			return $res;
-		}
 		return false;
 	}
 
-	public static function GetByType($TYPE, $LANGUAGE_ID)
+	/**
+	 * @deprecated
+	 * @param $type
+	 * @param $lang
+	 * @return mixed
+	 */
+	static function GetByType($type, $lang)
 	{
-		global $CACHE_MANAGER;
-		$arFields = array();
-		if (in_array($TYPE, array("S", "I")))
-			$arFields["TYPE"] = $TYPE;
-		if (!empty($LANGUAGE_ID))
-			$arFields["LID"] = $LANGUAGE_ID;
-		$cache_id = "b_forum_smile_".implode("_", array_keys($arFields))."_".implode("_", $arFields);
-		$result = array();
-		if (CACHED_b_forum_smile !== false && $CACHE_MANAGER->Read(CACHED_b_forum_smile, $cache_id, "b_forum_smile"))
+		if (COption::GetOptionInt("forum", "smile_native_gallery_id", 0) <= 0)
+			return self::getSmiles($type, $lang);
+		$type = ($type == "I" ? CSmile::TYPE_ICON : CSmile::TYPE_SMILE);
+		$key = "old_".$type."_".$lang;
+		if (!array_key_exists($key, self::$smiles))
 		{
-			$result = $CACHE_MANAGER->Get($cache_id);
+			$smiles = CSmile::getByGalleryId($type, COption::GetOptionInt("forum", "smile_native_gallery_id", 0), $lang);
+			$result = array();
+			foreach ($smiles as $smile)
+			{
+				if ($smile['HIDDEN'] == 'Y')
+					continue;
+
+				$result[] = array(
+					'ID' => $smile['ID'],
+					'TYPE' => $type,
+					'TYPING' => $smile['TYPING'],
+					'IMAGE' => $smile["IMAGE"],
+					'DESCRIPTION' => '',
+					'CLICKABLE' => 'Y',
+					'SORT' => $smile['SORT'],
+					'IMAGE_WIDTH' => $smile['IMAGE_WIDTH'],
+					'IMAGE_HEIGHT' => $smile['IMAGE_HEIGHT'],
+					'SET_ID' => $smile['SET_ID'],
+					'NAME' => $smile['NAME'],
+					'WIDTH' => $smile['IMAGE_WIDTH'],
+					'HEIGHT' => $smile['IMAGE_HEIGHT'],
+				);
+			}
+			self::$smiles[$key] = $result;
 		}
-		else
+		return self::$smiles[$key];
+	}
+
+	static function getSmiles($type, $lang)
+	{
+		$type = ($type == "I" ? CSmile::TYPE_ICON : CSmile::TYPE_SMILE);
+		$key = "new_".$type."_".$lang;
+		if (!array_key_exists($key, self::$smiles))
 		{
-			$db_res = CForumSmile::GetListEx(array("SORT"=>"ASC"), $arFields);
-			while ($res = $db_res->Fetch()):
-				$result[] = $res;
-			endwhile;
-			if (CACHED_b_forum_smile !== false)
-				$CACHE_MANAGER->Set($cache_id, $result);
+			$smiles = CSmile::getByGalleryId($type, COption::GetOptionInt("forum", "smile_gallery_id", 0), $lang);
+			$result = array();
+			foreach ($smiles as $smile)
+			{
+				if ($smile['HIDDEN'] == 'Y')
+					continue;
+
+				$result[] = array(
+					'SET_ID' => $smile['SET_ID'],
+					'NAME' => $smile['NAME'],
+					'IMAGE' => ($smile['TYPE'] == CSmile::TYPE_SMILE ? CSmile::PATH_TO_SMILE : CSmile::PATH_TO_ICON).$smile["SET_ID"]."/".$smile["IMAGE"],
+					'TYPING' => $smile['TYPING'],
+					'WIDTH' => $smile['IMAGE_WIDTH'],
+					'HEIGHT' => $smile['IMAGE_HEIGHT'],
+				);
+			}
+			self::$smiles[$key] = $result;
 		}
-		return $result;
+		return self::$smiles[$key];
+	}
+
+	static function getSetsByType($type, $lang)
+	{
+		$type = ($type == CSmile::TYPE_ICON ? CSmile::TYPE_ICON : CSmile::TYPE_SMILE);
+		$key = $type."_".$lang;
+		if (!array_key_exists($key, self::$sets))
+		{
+			$smiles = self::GetByType($type, $lang);
+			$smilesSet = CSmileSet::getListCache();
+			$result = array();
+			foreach ($smiles as $smile)
+			{
+				if (!array_key_exists($smile["SET_ID"], $result))
+				{
+					$result[$smile["SET_ID"]] = $smilesSet[$smile["SET_ID"]];
+				}
+			}
+			self::$sets[$key] = $result;
+		}
+		return self::$sets[$key];
 	}
 }
 

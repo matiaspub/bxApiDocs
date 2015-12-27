@@ -5,10 +5,7 @@
  * <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -72,22 +69,15 @@ class CSOAPRequest extends CSOAPEnvelope
     
     
     /**
-    * <p>Метод добавляет в SOAP запрос часть заголовка. </p>
-    *
-    *
+    * <p>Метод добавляет в SOAP запрос часть заголовка. Метод динамичный.</p>
     *
     *
     * @param string $name  Название сообщения в заголовке soap запроса.
     *
-    *
-    *
     * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
     * заголовке запроса. См. CXMLCreator::encodeValueLight.
     *
-    *
-    *
     * @return void 
-    *
     *
     * <h4>Example</h4> 
     * <pre>
@@ -110,18 +100,12 @@ class CSOAPRequest extends CSOAPEnvelope
 	//     Adds a new attribute to the body element.
     
     /**
-    * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. </p>
-    *
-    *
+    * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. Метод динамичный.</p>
     *
     *
     * @param string $name  Название атрибута. </ht
     *
-    *
-    *
     * @param string $value  Значение атрибута. </ht
-    *
-    *
     *
     * @return void 
     *
@@ -137,20 +121,14 @@ class CSOAPRequest extends CSOAPEnvelope
 	//      and value.
     
     /**
-    * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса - параметры вызываемого метода.</p>
-    *
-    *
+    * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса - параметры вызываемого метода. Метод динамичный.</p>
     *
     *
     * @param string $name  Название параметра. </ht
     *
-    *
-    *
     * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
     * заголовке запроса. См. <a
     * href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
-    *
-    *
     *
     * @return void 
     *

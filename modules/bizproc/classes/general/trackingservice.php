@@ -5,6 +5,7 @@ class CBPAllTrackingService
 	extends CBPRuntimeService
 {
 	protected $skipTypes = array();
+	protected static $userGroupsCache = array();
 
 	public function Start(CBPRuntime $runtime = null)
 	{
@@ -99,6 +100,73 @@ class CBPAllTrackingService
 	{
 		CBPTrackingService::ClearOld(COption::GetOptionString("bizproc", "log_cleanup_days", "90"));
 		return "CBPTrackingService::ClearOldAgent();";
+	}
+
+	public static function parseStringParameter($string, $documentType = null)
+	{
+		if (!$documentType)
+			$documentType = array('','','');
+		return preg_replace_callback(
+			CBPActivity::ValueInlinePattern,
+			create_function(
+				'$matches',
+				'return CBPAllTrackingService::parseStringParameterMatches($matches, array("'.$documentType[0].'", "'.$documentType[1].'", "'.$documentType[2].'"));'
+			),
+			$string
+		);
+	}
+
+	public static function parseStringParameterMatches($matches, $documentType = null)
+	{
+		$result = "";
+		$documentType = is_array($documentType) ? array_filter($documentType) : null;
+
+		if ($matches[1] == "user")
+		{
+			$user = $matches[2];
+
+			$l = strlen("user_");
+			if (substr($user, 0, $l) == "user_")
+			{
+				$result = CBPHelper::ConvertUserToPrintableForm(intval(substr($user, $l)));
+			}
+			elseif (strpos($user, 'group_') === 0)
+			{
+				$result = htmlspecialcharsbx(CBPHelper::getExtendedGroupName($user));
+			}
+			elseif ($documentType)
+			{
+				$v = implode(",", $documentType);
+				if (!array_key_exists($v,self::$userGroupsCache ))
+					self::$userGroupsCache[$v] = CBPDocument::GetAllowableUserGroups($documentType);
+
+				$result = self::$userGroupsCache[$v][$user];
+			}
+			else
+				$result = $user;
+		}
+		elseif ($matches[1] == "group")
+		{
+			if (strpos($matches[2], 'group_') === 0)
+			{
+				$result = htmlspecialcharsbx(CBPHelper::getExtendedGroupName($matches[2]));
+			}
+			elseif ($documentType)
+			{
+				$v = implode(",", $documentType);
+				if (!array_key_exists($v, self::$userGroupsCache))
+					self::$userGroupsCache[$v] = CBPDocument::GetAllowableUserGroups($documentType);
+
+				$result = self::$userGroupsCache[$v][$matches[2]];
+			}
+			else
+				$result = $matches[2];
+		}
+		else
+		{
+			$result = $matches[0];
+		}
+		return $result;
 	}
 }
 

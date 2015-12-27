@@ -62,6 +62,9 @@ class CCatalogMeasureAll
 
 	public static function getDefaultMeasure($getStub = false, $getExt = false)
 	{
+		$getStub = ($getStub === true);
+		$getExt = ($getExt === true);
+
 		if (self::$defaultMeasure === null)
 		{
 			$measureRes = CCatalogMeasure::getList(
@@ -71,7 +74,7 @@ class CCatalogMeasureAll
 				false,
 				array()
 			);
-			if ($measure = $measureRes->GetNext())
+			if ($measure = $measureRes->GetNext(true, $getExt))
 			{
 				$measure['ID'] = (int)$measure['ID'];
 				$measure['CODE'] = (int)$measure['CODE'];
@@ -87,7 +90,7 @@ class CCatalogMeasureAll
 				false,
 				array()
 			);
-			if ($measure = $measureRes->GetNext())
+			if ($measure = $measureRes->GetNext(true, $getExt))
 			{
 				$measure['ID'] = (int)$measure['ID'];
 				$measure['CODE'] = (int)$measure['CODE'];
@@ -104,17 +107,21 @@ class CCatalogMeasureAll
 					self::$defaultMeasure = array(
 						'ID' => 0,
 						'CODE' => self::DEFAULT_MEASURE_CODE,
-						'MEASURE_TITLE' => $defaultMeasureDescription['MEASURE_TITLE'],
-						'SYMBOL_RUS' => $defaultMeasureDescription['SYMBOL_RUS'],
-						'SYMBOL_INTL' => $defaultMeasureDescription['SYMBOL_INTL'],
-						'SYMBOL_LETTER_INTL' => $defaultMeasureDescription['SYMBOL_LETTER_INTL']
+						'MEASURE_TITLE' => htmlspecialcharsEx($defaultMeasureDescription['MEASURE_TITLE']),
+						'SYMBOL_RUS' => htmlspecialcharsEx($defaultMeasureDescription['SYMBOL_RUS']),
+						'SYMBOL_INTL' => htmlspecialcharsEx($defaultMeasureDescription['SYMBOL_INTL']),
+						'SYMBOL_LETTER_INTL' => htmlspecialcharsEx($defaultMeasureDescription['SYMBOL_LETTER_INTL']),
+						'IS_DEFAULT' => 'Y'
 					);
 					if ($getExt)
 					{
+						self::$defaultMeasure['~ID'] = '0';
+						self::$defaultMeasure['~CODE'] = (string)self::DEFAULT_MEASURE_CODE;
 						self::$defaultMeasure['~MEASURE_TITLE'] = self::$defaultMeasure['MEASURE_TITLE'];
 						self::$defaultMeasure['~SYMBOL_RUS'] = self::$defaultMeasure['SYMBOL_RUS'];
 						self::$defaultMeasure['~SYMBOL_INTL'] = self::$defaultMeasure['SYMBOL_INTL'];
 						self::$defaultMeasure['~SYMBOL_LETTER_INTL'] = self::$defaultMeasure['SYMBOL_LETTER_INTL'];
+						self::$defaultMeasure['~IS_DEFAULT'] = 'Y';
 					}
 				}
 			}

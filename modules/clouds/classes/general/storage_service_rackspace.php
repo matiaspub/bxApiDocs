@@ -146,7 +146,11 @@ class CCloudStorageService_RackSpaceCloudFiles extends CCloudStorageService_Open
 	public function GetFileSRC($arBucket, $arFile)
 	{
 		global $APPLICATION;
-		$proto = $APPLICATION->IsHTTPS()? "https": "http";
+
+		if ($arBucket["SETTINGS"]["FORCE_HTTP"] === "Y")
+			$proto = "http";
+		else
+			$proto = ($APPLICATION->IsHTTPS()? "https": "http");
 
 		if($arBucket["CNAME"])
 		{

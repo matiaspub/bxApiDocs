@@ -93,6 +93,11 @@ class CPullOptions
 		$result = COption::GetOptionString("pull", "nginx");
 		return $result == 'N'? false: true;
 	}
+	public static function GetQueueServerHeaders()
+	{
+		$result = COption::GetOptionString("pull", "nginx_headers");
+		return $result == 'Y'? true: false;
+	}
 
 	/*
 	 * @deprecated No longer used by internal code and not recommended. Use CPullOptions::SetQueueServerStatus()
@@ -119,6 +124,11 @@ class CPullOptions
 		return true;
 	}
 
+	public static function SetQueueServerHeaders($flag = "Y")
+	{
+		COption::SetOptionString("pull", "nginx_headers", $flag=='Y'?'Y':'N');
+		return true;
+	}
 	public static function GetPushStatus()
 	{
 		$result = COption::GetOptionString("pull", "push");
@@ -154,53 +164,83 @@ class CPullOptions
 		return true;
 	}
 
-	public static function GetListenUrl($channelId = "", $mobile = false)
+	public static function GetListenUrl($channelId = "", $mobile = false, $modern = false)
 	{
 		if (!is_array($channelId) && strlen($channelId) > 0)
 			$channelId = Array($channelId);
 		else if (!is_array($channelId))
 			$channelId = Array();
 
-		$url = COption::GetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		$url = COption::GetOptionString("pull", "path_to_".($modern? 'modern_': ($mobile? 'mobile_':''))."listener").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
 		$url = str_replace('#PORT#', self::GetQueueServerVersion()>1? '': ':8893', $url);
 
 		return $url;
 	}
 
-	public static function SetListenUrl($path = "", $mobile = false)
+	public static function SetListenUrl($path = "", $mobile = false, $modern = false)
 	{
+		$pathValue = $path;
+
+		if ($modern)
+		{
+			$pathName = "path_to_modern_listener";
+		}
+		else if ($mobile)
+		{
+			$pathName = "path_to_mobile_listener";
+		}
+		else
+		{
+			$pathName = "path_to_listener";
+		}
+
 		if (strlen($path)<=0)
 		{
 			include($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
-			$path = $mobile? $pull_default_option["path_to_mobile_listener"]: $pull_default_option["path_to_listener"];
+			$pathValue = $pull_default_option[$pathName];
 		}
 
-		COption::SetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener", $path);
+		COption::SetOptionString("pull", $pathName, $pathValue);
 		return true;
 	}
 
-	public static function GetListenSecureUrl($channelId = "", $mobile = false)
+	public static function GetListenSecureUrl($channelId = "", $mobile = false, $modern = false)
 	{
 		if (!is_array($channelId) && strlen($channelId) > 0)
 			$channelId = Array($channelId);
 		else if (!is_array($channelId))
 			$channelId = Array();
 
-		$url = COption::GetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener_secure").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
+		$url = COption::GetOptionString("pull", "path_to_".($modern? 'modern_': ($mobile? 'mobile_':''))."listener_secure").(count($channelId)>0?'?CHANNEL_ID='.implode('/', $channelId):'');
 		$url = str_replace('#PORT#', self::GetQueueServerVersion()>1? '': ':8894', $url);
 
 		return $url;
 	}
 
-	public static function SetListenSecureUrl($path = "", $mobile = false)
+	public static function SetListenSecureUrl($path = "", $mobile = false, $modern = false)
 	{
+		$pathValue = $path;
+
+		if ($modern)
+		{
+			$pathName = "path_to_modern_listener_secure";
+		}
+		else if ($mobile)
+		{
+			$pathName = "path_to_mobile_listener_secure";
+		}
+		else
+		{
+			$pathName = "path_to_listener_secure";
+		}
+
 		if (strlen($path)<=0)
 		{
 			include($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/pull/default_option.php');
-			$path = $mobile? $pull_default_option["path_to_mobile_listener_secure"]: $pull_default_option["path_to_listener_secure"];
+			$pathValue = $pull_default_option[$pathName];
 		}
 
-		COption::SetOptionString("pull", "path_to_".($mobile? 'mobile_':'')."listener_secure", $path);
+		COption::SetOptionString("pull", $pathName, $pathValue);
 		return true;
 	}
 
@@ -341,8 +381,17 @@ class CPullOptions
 
 	public static function OnEpilog()
 	{
-		if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_REQUEST['AJAX_CALL'] == 'Y')
-			&& $GLOBALS['USER'] && intval($GLOBALS['USER']->GetID()) > 0 && CModule::IncludeModule('pull'))
+		$userId = 0;
+		if (defined('PULL_USER_ID'))
+		{
+			$userId = PULL_USER_ID;
+		}
+		else if ($GLOBALS['USER'] && intval($GLOBALS['USER']->GetID()) > 0)
+		{
+			$userId = intval($GLOBALS['USER']->GetID());
+		}
+
+		if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_REQUEST['AJAX_CALL'] == 'Y') && $userId != 0 && CModule::IncludeModule('pull'))
 		{
 			// define("BX_PULL_SKIP_INIT", true);
 
@@ -350,17 +399,10 @@ class CPullOptions
 			{
 				CJSCore::Init(array('pull'));
 
-				$pullConfig = CPullChannel::GetUserConfig($GLOBALS['USER']->GetID());
+				$pullConfig = CPullChannel::GetConfig($userId);
 
 				global $APPLICATION;
 				$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
-				/*
-				if(!defined("BX_DESKTOP") && !defined("BX_MOBILE") && !defined("ADMIN_SECTION") && !IsModuleInstalled('b24network') && IsModuleInstalled('bitrix24') && (COption::GetOptionString('bitrix24', 'network', 'N') == 'Y'))
-				{
-					CJSCore::Init(array('npull'));
-					$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.NPULL.start(); });</script>');
-				}
-				*/
 			}
 		}
 	}

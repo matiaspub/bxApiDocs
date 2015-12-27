@@ -12,10 +12,13 @@ Loc::loadMessages(__FILE__);
  * <ul>
  * <li> ID int mandatory
  * <li> TITLE string(255) optional
+ * <li> TYPE string(2) optional
  * <li> AUTHOR_ID int mandatory
  * <li> AVATAR int optional
+ * <li> COLOR string optional
  * <li> CALL_TYPE int optional
  * <li> CALL_NUMBER string(20) optional
+ * <li> EXTRANET bool optional default 'N'
  * <li> ENTITY_TYPE string(50) optional
  * <li> ENTITY_ID string(50) optional
  * <li> DISK_FOLDER_ID int optional
@@ -51,6 +54,23 @@ class ChatTable extends Entity\DataManager
 				'validation' => array(__CLASS__, 'validateTitle'),
 				'title' => Loc::getMessage('CHAT_ENTITY_TITLE_FIELD'),
 			),
+			'COLOR' => array(
+				'data_type' => 'string',
+				'validation' => array(__CLASS__, 'validateColor'),
+				'title' => Loc::getMessage('CHAT_ENTITY_COLOR_FIELD'),
+			),
+			'TYPE' => array(
+				'data_type' => 'string',
+				'validation' => array(__CLASS__, 'validateType'),
+				'title' => Loc::getMessage('CHAT_ENTITY_TYPE_FIELD'),
+				'default_value' => 'P',
+			),
+			'EXTRANET' => array(
+				'data_type' => 'boolean',
+				'values' => array('N', 'Y'),
+				'title' => Loc::getMessage('CHAT_ENTITY_EXTRANET_FIELD'),
+				'default_value' => 'N',
+			),
 			'AUTHOR_ID' => array(
 				'data_type' => 'integer',
 				'required' => true,
@@ -85,9 +105,24 @@ class ChatTable extends Entity\DataManager
 			'DISK_FOLDER_ID' => array(
 				'data_type' => 'integer'
 			),
+			'LAST_MESSAGE_ID' => array(
+				'data_type' => 'integer'
+			),
 		);
 	}
 	public static function validateTitle()
+	{
+		return array(
+			new Entity\Validator\Length(null, 255),
+		);
+	}
+	public static function validateType()
+	{
+		return array(
+			new Entity\Validator\Length(null, 2),
+		);
+	}
+	public static function validateColor()
 	{
 		return array(
 			new Entity\Validator\Length(null, 255),

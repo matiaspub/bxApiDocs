@@ -9,8 +9,6 @@ IncludeModuleLangFile(__FILE__);
  * <p>В коде действия объект-оболочка для бизнес-процесса, в который входит это действие, доступна через переменную-член workflow:</p> <pre class="syntax">$this-&gt;workflow-&gt;ExecuteActivity($activity);</pre>
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -42,11 +40,8 @@ class CBPWorkflow
 	* <p>Метод возвращает экземпляр исполняющей среды, в которой запущен бизнес-процесс.</p>
 	*
 	*
-	*
-	*
 	* @return CBPRuntime <p>Возвращается объект типа CBPRuntime, представляющий собой экземпляр
 	* исполняющей среды, в которой запущен бизнес-процесс.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
@@ -65,8 +60,6 @@ class CBPWorkflow
 	
 	/**
 	* <p>Метод возвращает текущий статус выполнения бизнес-процесса.</p>
-	*
-	*
 	*
 	*
 	* @return int <ul> <li> <b>CBPActivityExecutionStatus::Initialized</b> - бизнес-процесс создан, </li> <li>
@@ -90,8 +83,6 @@ class CBPWorkflow
 	* <p>Метод возвращает результат выполнения бизнес-процесса.</p>
 	*
 	*
-	*
-	*
 	* @return int <ul> <li> <b>CBPActivityExecutionResult::None</b> - результат выполнения
 	* бизнес-процесса не установлен, </li> <li> <b>CBPActivityExecutionResult::Succeeded</b> -
 	* бизнес-процесс завершен успешно, </li> <li> <b>CBPActivityExecutionResult::Canceled</b> -
@@ -99,7 +90,6 @@ class CBPWorkflow
 	* бизнес-процесс остановлен по ошибке, </li> <li>
 	* <b>CBPActivityExecutionResult::Uninitialized</b> - бизнес-процесс не инициализирован.
 	* </li> </ul> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -150,18 +140,11 @@ class CBPWorkflow
 	* <p>Конструктор создает новый экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string $instanceId  Идентификатор бизнес-процесса
-	*
-	*
 	*
 	* @param CBPRuntime $runtime  Исполняющая среда </ht
 	*
-	*
-	*
 	* @return public 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
@@ -183,12 +166,23 @@ class CBPWorkflow
 		$this->runtime = $runtime;
 	}
 
+	/**
+	 * Remove workflow object from serialized data
+	 * @return array
+	 */
+	static public function __sleep()
+	{
+		return array();
+	}
+
 	/************************  CREATE / LOAD WORKFLOW  ****************************************/
 
-	public function Initialize(CBPActivity $rootActivity, $documentId, $workflowParameters = array(), $workflowVariablesTypes = array(), $workflowParametersTypes = array())
+	public function Initialize(CBPActivity $rootActivity, $documentId, $workflowParameters = array(), $workflowVariablesTypes = array(), $workflowParametersTypes = array(), $workflowTemplateId = 0)
 	{
 		$this->rootActivity = $rootActivity;
 		$rootActivity->SetWorkflow($this);
+		if (method_exists($rootActivity, 'SetWorkflowTemplateId'))
+			$rootActivity->SetWorkflowTemplateId($workflowTemplateId);
 
 		$arDocumentId = CBPHelper::ParseDocumentId($documentId);
 
@@ -204,6 +198,7 @@ class CBPWorkflow
 		}
 
 		$rootActivity->SetProperties($workflowParameters);
+
 
 		$rootActivity->SetVariablesTypes($workflowVariablesTypes);
 		if (is_array($workflowVariablesTypes))
@@ -271,8 +266,8 @@ class CBPWorkflow
 		}
 		catch (Exception $e)
 		{
-		    $this->Terminate($e);
-		    throw $e;
+			$this->Terminate($e);
+			throw $e;
 		}
 
 		if ($this->rootActivity->executionStatus == CBPActivityExecutionStatus::Closed)
@@ -307,8 +302,8 @@ class CBPWorkflow
 		}
 		catch (Exception $e)
 		{
-		    $this->Terminate($e);
-		    throw $e;
+			$this->Terminate($e);
+			throw $e;
 		}
 
 		if ($this->rootActivity->executionStatus == CBPActivityExecutionStatus::Closed)

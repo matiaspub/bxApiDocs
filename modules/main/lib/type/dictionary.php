@@ -79,8 +79,7 @@ class Dictionary
 	 */
 	public function valid()
 	{
-		$key = $this->key();
-		return ($key != null);
+		return ($this->key() !== null);
 	}
 
 	/**
@@ -144,12 +143,21 @@ class Dictionary
 	}
 
 	/**
-	 * Returns values as an array
+	 * Returns the values as an array.
 	 *
 	 * @return array
 	 */
 	public function toArray()
 	{
 		return $this->values;
+	}
+
+	/**
+	 * Returns true if the dictionary is empty.
+	 * @return bool
+	 */
+	public function isEmpty()
+	{
+		return empty($this->values);
 	}
 }

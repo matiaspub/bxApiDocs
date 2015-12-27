@@ -27,7 +27,6 @@ $arSocNetFeaturesSettings = CSocNetAllowed::GetAllowedFeatures();
 $arUserPermsVar = array(
 	SONET_RELATIONS_TYPE_NONE => GetMessage("SONET_PVU_NONE"),
 	SONET_RELATIONS_TYPE_FRIENDS => GetMessage("SONET_PVU_FR"),
-	SONET_RELATIONS_TYPE_FRIENDS2 => GetMessage("SONET_PVU_FR2"),
 	SONET_RELATIONS_TYPE_AUTHORIZED => GetMessage("SONET_PVU_AUTHORIZED"),
 	SONET_RELATIONS_TYPE_ALL => GetMessage("SONET_PVU_ALL"),
 );
@@ -97,13 +96,17 @@ $arTooltipProperties = array();
 if (!empty($arRes))
 {
 	foreach ($arRes as $key => $val)
+	{
 		$arTooltipProperties[$val["FIELD_NAME"]] = (strLen($val["EDIT_FORM_LABEL"]) > 0 ? $val["EDIT_FORM_LABEL"] : $val["FIELD_NAME"]);
+	}
 }
 
 $arRatings = array();
 $db_res = CRatings::GetList($aSort = array("ID" => "ASC"), array("ACTIVE" => "Y", "ENTITY_ID" => "USER"));
 while ($res = $db_res->GetNext())
+{
 	$arRatings[$res["ID"]] = "[ ".$res["ID"]." ] ".$res["NAME"];
+}
 
 if ($bIntranet)
 {
@@ -167,11 +170,20 @@ if (!function_exists('set_valign'))
 {
 	function set_valign($ctrlType, $bIsMultiple = false)
 	{
-		if ((in_array($ctrlType, array("select_fields", "select_properties", "select_rating", "select_user_perm", "select_user", "select_group")) && $bIsMultiple == false)
-			|| in_array($ctrlType, array("checkbox", "text")))
+		if (
+			(
+				in_array($ctrlType, array("select_fields", "select_properties", "select_rating", "select_user_perm", "select_user", "select_group"))
+				&& $bIsMultiple == false
+			)
+			|| in_array($ctrlType, array("checkbox", "text"))
+		)
+		{
 			return;
+		}
 		else
+		{
 			return "class=\"adm-detail-valign-top\"";
+		}
 	}
 }
 
@@ -183,12 +195,13 @@ $arAllOptionsCommon = array(
 );
 
 if (!IsModuleInstalled("intranet"))
+{
 	$arAllOptionsCommon[] = array("sonet_log_smart_filter", GetMessage("SONET_LOG_SMART_FILTER"), "N", Array("checkbox"));
+}
 
 $arAllOptions = array(
 	array("allow_frields", GetMessage("SONET_ALLOW_FRIELDS"), "Y", Array("checkbox")),
 	array("allow_tooltip", GetMessage("SONET_ALLOW_TOOLTIP"), "Y", Array("checkbox")),
-	array("subject_path_template", GetMessage("SONET_SUBJECT_PATH_TEMPLATE"), "", Array("text", 40)),
 	array("group_path_template", GetMessage("SONET_GROUP_PATH_TEMPLATE"), "", Array("text", 40)),
 	array("messages_path", GetMessage("SONET_MESSAGES_PATH"), "/company/personal/messages/", Array("text", 40)),
 	array("tooltip_fields", GetMessage("SONET_TOOLTIP_FIELDS"), $arTooltipFieldsDefault, Array("select_fields", true, 7)),
@@ -602,85 +615,123 @@ if (
 	if ($bFriendsDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("Friends"))
+		{
 			CBXFeatures::SetFeatureEnabled("Friends", false, false);
+		}
 	}
-	elseif($bFriendsEnabledForAnySite && CBXFeatures::IsFeatureEditable("Friends"))
+	elseif(
+		$bFriendsEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("Friends")
+		&& !CBXFeatures::IsFeatureEnabled("Friends")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("Friends"))
-			CBXFeatures::SetFeatureEnabled("Friends", true, false);
+		CBXFeatures::SetFeatureEnabled("Friends", true, false);
 	}
 
 	if ($bFilesDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("PersonalFiles"))
+		{
 			CBXFeatures::SetFeatureEnabled("PersonalFiles", false, false);
+		}
 	}
-	elseif($bFilesEnabledForAnySite && CBXFeatures::IsFeatureEditable("PersonalFiles"))
+	elseif(
+		$bFilesEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("PersonalFiles")
+		&& !CBXFeatures::IsFeatureEnabled("PersonalFiles")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("PersonalFiles"))
-			CBXFeatures::SetFeatureEnabled("PersonalFiles", true, false);
+		CBXFeatures::SetFeatureEnabled("PersonalFiles", true, false);
 	}
 
 	if ($bBlogDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("PersonalBlog"))
+		{
 			CBXFeatures::SetFeatureEnabled("PersonalBlog", false, false);
+		}
 	}
-	elseif($bBlogEnabledForAnySite && CBXFeatures::IsFeatureEditable("PersonalBlog"))
+	elseif(
+		$bBlogEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("PersonalBlog")
+		&& !CBXFeatures::IsFeatureEnabled("PersonalBlog")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("PersonalBlog"))
-			CBXFeatures::SetFeatureEnabled("PersonalBlog", true, false);
+		CBXFeatures::SetFeatureEnabled("PersonalBlog", true, false);
 	}
 
 	if ($bPhotoDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("PersonalPhoto"))
+		{
 			CBXFeatures::SetFeatureEnabled("PersonalPhoto", false, false);
+		}
 	}
-	elseif($bPhotoEnabledForAnySite && CBXFeatures::IsFeatureEditable("PersonalPhoto"))
+	elseif(
+		$bPhotoEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("PersonalPhoto")
+		&& !CBXFeatures::IsFeatureEnabled("PersonalPhoto")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("PersonalPhoto"))
-			CBXFeatures::SetFeatureEnabled("PersonalPhoto", true, false);
+		CBXFeatures::SetFeatureEnabled("PersonalPhoto", true, false);
 	}
 
 	if ($bForumDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("PersonalForum"))
+		{
 			CBXFeatures::SetFeatureEnabled("PersonalForum", false, false);
+		}
 	}
-	elseif($bForumEnabledForAnySite && CBXFeatures::IsFeatureEditable("PersonalForum"))
+	elseif(
+		$bForumEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("PersonalForum")
+		&& !CBXFeatures::IsFeatureEnabled("PersonalForum")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("PersonalForum"))
-			CBXFeatures::SetFeatureEnabled("PersonalForum", true, false);
+		CBXFeatures::SetFeatureEnabled("PersonalForum", true, false);
 	}
 
 	if ($bTasksDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("Tasks"))
+		{
 			CBXFeatures::SetFeatureEnabled("Tasks", false, false);
+		}
+
 	}
-	elseif($bTasksEnabledForAnySite && CBXFeatures::IsFeatureEditable("Tasks"))
+	elseif(
+		$bTasksEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("Tasks")
+		&& !CBXFeatures::IsFeatureEnabled("Tasks")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("Tasks"))
-			CBXFeatures::SetFeatureEnabled("Tasks", true, false);
+		CBXFeatures::SetFeatureEnabled("Tasks", true, false);
 	}
 
 	if ($bCalendarDisabledForAllSites)
 	{
 		if (CBXFeatures::IsFeatureEnabled("Calendar"))
+		{
 			CBXFeatures::SetFeatureEnabled("Calendar", false, false);
+		}
 	}
-	elseif($bCalendarEnabledForAnySite && CBXFeatures::IsFeatureEditable("Calendar"))
+	elseif(
+		$bCalendarEnabledForAnySite
+		&& CBXFeatures::IsFeatureEditable("Calendar")
+		&& !CBXFeatures::IsFeatureEnabled("Calendar")
+	)
 	{
-		if (!CBXFeatures::IsFeatureEnabled("Calendar"))
-			CBXFeatures::SetFeatureEnabled("Calendar", true, false);
+		CBXFeatures::SetFeatureEnabled("Calendar", true, false);
 	}
 
 	CBitrixComponent::clearComponentCache("bitrix:menu");
 }
 
 if (strlen($strWarning) > 0)
+{
 	CAdminMessage::ShowMessage($strWarning);
+}
 
 $aTabs = array(
 	array("DIV" => "edit1", "TAB" => GetMessage("SONET_TAB_SET"), "ICON" => "socialnetwork_settings", "TITLE" => GetMessage("SONET_TAB_SET_ALT")),
@@ -701,7 +752,6 @@ foreach ($arFeatures as $key => $value)
 	$aSubTabs[] = array("DIV" => "opt_group_feature_".$key."_common", "TAB" => $value, 'TITLE' => GetMessage('SONET_SUBTAB_GROUP_TITLE_FEATURE').' "'.$value.'"');
 }
 $arChildTabControlGroupCommon = new CAdminViewTabControl("childTabControlGroupCommon", $aSubTabs);
-
 
 $aSiteTabs = array();
 
@@ -907,7 +957,8 @@ $tabControl->BeginNextTab();
 								disabled_cr: true
 							},
 							groups: { disabled: true },
-							socnetgroups: { disabled: true }
+							socnetgroups: { disabled: true },
+							extranet: { disabled: true }
 						});
 
 						var startValue = {};
@@ -1002,23 +1053,32 @@ $tabControl->BeginNextTab();
 			$arChildTabControlSite->BeginNextTab();
 			?><table cellspacing="7" cellpadding="0" border="0" width="100%"><?
 			$tmp_count = count($arAllOptions);
-			for ($i = 0; $i < $tmp_count; $i++):
+			for ($i = 0; $i < $tmp_count; $i++)
+			{
 				$Option = $arAllOptions[$i];
 				$val = COption::GetOptionString("socialnetwork", $Option[0], $Option[2], $siteList[$j]["ID"]);
+
+				if ($Option[0] == "allow_frields")
+				{
+					$bAllowFriends = ($val == "Y");
+				}
+
 				$type = $Option[3];
 
-				if ($type[0] == "select_fields" || $type[0] == "select_properties" || $type[0] == "select_rating"):
-					if($type[1] == true) // multiple select
-						$val = unserialize($val);
-					else
-						$val = array($val);
-				endif;
+				if (in_array($type[0], array("select_fields", "select_properties", "select_rating")))
+				{
+					$val = ($type[1] == true ? unserialize($val) : array($val)); // multiple select
+				}
 				?><tr>
 					<td <?=set_valign($type[0], $type[1])?> width="40%" align="right"><?
 						if ($type[0]=="checkbox")
+						{
 							echo "<label for=\"".htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])."\">".$Option[1]."</label>";
+						}
 						else
+						{
 							echo $Option[1];
+						}
 					?>:</td>
 					<td width="60%" align="left">
 						<?if($type[0]=="checkbox"):?>
@@ -1048,7 +1108,7 @@ $tabControl->BeginNextTab();
 						<?endif?>
 					</td>
 				</tr><?
-			endfor;
+			}
 			?><tr class="heading">
 				<td colspan="2"><?=GetMessage("SONET_4_USERS")?></td>
 			</tr><?
@@ -1086,10 +1146,29 @@ $tabControl->BeginNextTab();
 						elseif($type[0]=="select_user_perm")
 						{
 							?><select name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?
-							foreach ($arUserPermsVar as $key => $value)
-							{
-								?><option value="<?=$key?>" <?=($key == $val ? "selected" : "")?>><?=$value?></option><?
-							}
+								if (!$bAllowFriends)
+								{
+									if (in_array($val, array(SONET_RELATIONS_TYPE_FRIENDS, SONET_RELATIONS_TYPE_FRIENDS2)))
+									{
+										$val = SONET_RELATIONS_TYPE_NONE;
+									}
+								}
+								elseif ($val == SONET_RELATIONS_TYPE_FRIENDS2)
+								{
+									$val = SONET_RELATIONS_TYPE_FRIENDS;
+								}
+
+								foreach ($arUserPermsVar as $key => $value)
+								{
+									if (
+										!$bAllowFriends
+										&& $key == SONET_RELATIONS_TYPE_FRIENDS
+									)
+									{
+										continue;
+									}
+									?><option value="<?=$key?>" <?=($key == $val ? "selected" : "")?>><?=$value?></option><?
+								}
 							?></select><?
 						}
 					?></td>
@@ -1127,19 +1206,40 @@ $tabControl->BeginNextTab();
 										<textarea rows="<?echo $type[1]?>" cols="<?echo $type[2]?>" name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>"><?echo htmlspecialcharsbx($val)?></textarea>
 									<?elseif($type[0]=="select_user"):?>
 										<select name="<?echo htmlspecialcharsbx($Option[0]."_".$siteList[$j]["ID"])?>">
-										<?foreach ($arUserPermsVar as $permvar_key => $permvar_value):
+										<?foreach ($arUserPermsVar as $permvar_key => $permvar_value)
+										{
 											preg_match('/^default_'.$feature.'_operation_([A-Za-z_]+)_user$/i', $Option[0], $matches);
 											$operation = $matches[1];
+
+											if (!$bAllowFriends)
+											{
+												if (in_array($val, array(SONET_RELATIONS_TYPE_FRIENDS, SONET_RELATIONS_TYPE_FRIENDS2)))
+												{
+													$val = SONET_RELATIONS_TYPE_NONE;
+												}
+											}
+											elseif ($val == SONET_RELATIONS_TYPE_FRIENDS2)
+											{
+												$val = SONET_RELATIONS_TYPE_FRIENDS;
+											}
 
 											if (
 												is_array($arSocNetFeaturesSettings[$feature]["operations"][$operation])
 												&& (!array_key_exists("restricted", $arSocNetFeaturesSettings[$feature]["operations"][$operation])
 												|| !in_array($permvar_key, $arSocNetFeaturesSettings[$feature]["operations"][$operation]["restricted"][SONET_ENTITY_USER]))
-											):
+											)
+											{
+												if (
+													!$bAllowFriends
+													&& $permvar_key == SONET_RELATIONS_TYPE_FRIENDS
+												)
+												{
+													continue;
+												}
 												?><option value="<?= $permvar_key ?>"<?= ($permvar_key == $val) ? " selected" : "" ?>><?= $permvar_value ?></option><?
-											endif;
-										endforeach;?>
-										</select>
+											}
+										}
+										?></select>
 									<?endif?>
 								</td>
 							</tr>

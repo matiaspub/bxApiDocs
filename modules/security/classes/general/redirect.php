@@ -9,7 +9,7 @@ class CSecurityRedirect
 
 		//This define will be used on buffer end handler
 		if(!defined("BX_SECURITY_LOCAL_REDIRECT"))
-			;// define("BX_SECURITY_LOCAL_REDIRECT", true);
+			// define("BX_SECURITY_LOCAL_REDIRECT", true);
 
 		if(array_key_exists("LOCAL_REDIRECTS", $_SESSION))
 		{
@@ -33,7 +33,7 @@ class CSecurityRedirect
 
 		//In case of absolute url will check if server to be redirected is our
 		$bSkipCheck = false;
-		if(preg_match("/^(http|https):\\/\\/(.*?)\\//i", $url_l, $arMatch))
+		if(preg_match('~^(?:http|https)://(.*?)(?:/|\?|#|$)~iD', $url_l, $arMatch))
 		{
 			if(defined("BX24_HOST_NAME"))
 			{
@@ -52,11 +52,12 @@ class CSecurityRedirect
 				$arSite = false;
 			}
 
-			if($arSite && $arSite["SERVER_NAME"])
+			if(!$bSkipCheck && $arSite && $arSite["SERVER_NAME"])
 			{
-				$bSkipCheck = $arMatch[2] === $arSite["SERVER_NAME"];
+				$bSkipCheck = $arMatch[1] === $arSite["SERVER_NAME"];
 			}
-			elseif($arSite && $arSite["DOMAINS"])
+
+			if(!$bSkipCheck && $arSite && $arSite["DOMAINS"])
 			{
 				$arDomains = explode("\n", str_replace("\r", "\n", $arSite["DOMAINS"]));
 				foreach($arDomains as $domain)
@@ -64,7 +65,7 @@ class CSecurityRedirect
 					$domain = trim($domain, " \t\n\r");
 					if(strlen($domain) > 0)
 					{
-						if($domain === substr($arMatch[2], -strlen($domain)))
+						if($domain === substr($arMatch[1], -strlen($domain)))
 						{
 							$bSkipCheck = true;
 							break;
@@ -72,12 +73,11 @@ class CSecurityRedirect
 					}
 				}
 			}
-			elseif($host = COption::GetOptionString("main", "server_name", ""))
+
+			if(!$bSkipCheck)
 			{
-				if($arMatch[2] === $host)
-				{
-					$bSkipCheck = true;
-				}
+				$host = COption::GetOptionString("main", "server_name", "");
+				$bSkipCheck = $host && $arMatch[1] === $host;
 			}
 		}
 
@@ -140,12 +140,13 @@ class CSecurityRedirect
 					$html_url = '<nobr><a href="'.$url.'">'.$url.'</a></nobr>';
 					$html_mess = str_replace("#URL#", $html_url, $html_mess);
 					header('X-Frame-Options: DENY');
+					header('X-Robots-Tag: noindex, nofollow');
 		?>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?echo $charset?>" />
 <meta http-equiv="Refresh" content="<?=$timeout?>; URL=<?=$url?>">
-<meta name="robots" content="none" />
+<meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />
 </head>
@@ -344,7 +345,7 @@ class CSecurityRedirect
 		{
 			if(!CSecurityRedirect::IsActive())
 			{
-				COption::SetOptionString("security", "redirect_sid", md5(mt_rand()));
+				COption::SetOptionString("security", "redirect_sid", Bitrix\Main\Security\Random::getString(32));
 				RegisterModuleDependences("main", "OnBeforeLocalRedirect", "security", "CSecurityRedirect", "BeforeLocalRedirect", "1");
 				RegisterModuleDependences("main", "OnEndBufferContent", "security", "CSecurityRedirect", "EndBufferContent", "1");
 			}

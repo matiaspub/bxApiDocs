@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.</body> </html>
- *
- *
+ * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserperms/index.php
  * @author Bitrix
  */
 class CSocNetUserPerms extends CAllSocNetUserPerms
@@ -24,18 +22,14 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	* <p>Метод добавляет новую запись в таблицу прав на доступ к профайлу пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив параметров записи с ключами<br><b>USER_ID</b> - код
 	* пользователя,<br><b>OPERATION_ID</b> - операция,<br><b>RELATION_TYPE</b> - тип отношений
 	* между пользователями.
 	*
-	*
-	*
 	* @return int <p>Код добавленной записи или false в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/Add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserperms/Add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -90,18 +84,12 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	* <p>Метод возвращает список прав в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
@@ -109,25 +97,16 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() 
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
 	* удовлетворяющие условию выборки.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
@@ -135,7 +114,7 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserPerms/GetList.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserperms/GetList.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())

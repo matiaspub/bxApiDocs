@@ -163,6 +163,8 @@ class CSupportEMail
 		$rsAttach = CMailAttachment::GetList(Array(), Array("MESSAGE_ID"=>$ID));
 		while ($arAttach = $rsAttach->Fetch())
 		{
+			if ($arAttach['FILE_ID'])
+				$arAttach['FILE_DATA'] = CMailAttachment::getContents($arAttach);
 			// save from db to hdd
 			$filename = CTempFile::GetFileName(md5(uniqid("")).".tmp");
 			CheckDirPath($filename);

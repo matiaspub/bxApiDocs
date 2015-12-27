@@ -48,7 +48,7 @@ class CAllPullStack
 			);
 			if (CPullOptions::GetQueueServerStatus())
 			{
-				$command = Array('MESSAGE' => Array($arData), 'ERROR' => '');
+				$command = Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '');
 				if (!is_array($channelId) && CPullOptions::GetQueueServerVersion() == 1)
 					$command['CHANNEL_ID'] = $channelId;
 
@@ -56,7 +56,8 @@ class CAllPullStack
 				if (!defined('BX_UTF') || !BX_UTF)
 					$message = $GLOBALS['APPLICATION']->ConvertCharset($message, SITE_CHARSET,'utf-8');
 
-				$res = CPullChannel::Send($channelId, str_replace("\n", " ", $message));
+				$options = isset($arParams['expiry']) ? array('expiry' => intval($arParams['expiry'])) : array();
+				$res = CPullChannel::Send($channelId, str_replace("\n", " ", $message), $options);
 				$result = $res? true: false;
 			}
 			else
@@ -95,7 +96,7 @@ class CAllPullStack
 
 	public static function AddByUser($userId, $arMessage, $channelType = 'private')
 	{
-		if (intval($userId) <= 0)
+		if (intval($userId) == 0)
 			return false;
 
 		$arChannel = CPullChannel::GetChannel($userId, $channelType);

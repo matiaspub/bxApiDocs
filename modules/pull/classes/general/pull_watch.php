@@ -6,11 +6,12 @@ class CAllPullWatch
 	private static $arUpdate = Array();
 	private static $arInsert = Array();
 
-	public static function Add($userId, $tag)
+	public static function Add($userId, $tag, $immediate = false)
 	{
 		global $DB, $CACHE_MANAGER;
 
-		if (intval($userId) <= 0 && strlen($tag) <= 0)
+		$userId = intval($userId);
+		if ($userId == 0 || strlen($tag) <= 0)
 			return false;
 
 		$arResult = $CACHE_MANAGER->Read(3600, $cache_id="b_pw_".$userId, "b_pull_watch");
@@ -32,7 +33,6 @@ class CAllPullWatch
 
 			$CACHE_MANAGER->Set($cache_id, $arResult);
 		}
-
 		if ($arResult && $arResult[$tag])
 		{
 			if ($arResult[$tag]['DATE_CREATE']+1800 > time())
@@ -50,6 +50,11 @@ class CAllPullWatch
 
 		self::$arInsert[trim($tag)] = trim($tag);
 
+		if ($immediate)
+		{
+			self::DeferredSql($userId);
+		}
+
 		return true;
 	}
 
@@ -59,10 +64,15 @@ class CAllPullWatch
 		if (empty(self::$arUpdate) && empty(self::$arInsert))
 			return false;
 
-		if ($userId <= 0)
+		if (defined('PULL_USER_ID'))
+			$userId = PULL_USER_ID;
+
+		$userId = intval($userId);
+
+		if ($userId === 0)
 			$userId = $USER->GetId();
 
-		if ($userId <= 0)
+		if ($userId === 0)
 			return false;
 		
 		$arChannel = CPullChannel::Get($userId);
@@ -107,6 +117,9 @@ class CAllPullWatch
 			}
 		}
 
+		self::$arInsert = Array();
+		self::$arUpdate = Array();
+
 		return true;
 	}
 
@@ -126,7 +139,7 @@ class CAllPullWatch
 	{
 		global $DB, $CACHE_MANAGER;
 
-		if (intval($userId) <= 0 && strlen($tag) <= 0)
+		if (intval($userId) == 0 || strlen($tag) <= 0)
 			return false;
 
 		$strSql = "SELECT ID FROM b_pull_watch WHERE USER_ID = ".intval($userId)." AND TAG = '".$DB->ForSQL($tag)."'";
@@ -157,6 +170,7 @@ class CAllPullWatch
 		{
 			$arChannels[] = $arRes['CHANNEL_ID'];
 		}
+
 		$result = CPullStack::AddByChannel($arChannels, $arMessage);
 		if (!$result)
 			return false;

@@ -42,7 +42,7 @@ class HttpApplication extends Application
 			$params["cookie"]
 		);
 
-		$response = null; //new HttpResponse($context);
+		$response = new HttpResponse($context);
 
 		$context->initialize($request, $response, $server, array('env' => $params["env"]));
 

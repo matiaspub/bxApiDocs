@@ -54,16 +54,14 @@ class Event extends \Bitrix\Main\Event
 	public function getErrors(Result $result)
 	{
 		$hasErrors = false;
-		if ($this->getResults() != null)
+
+		/** @var $evenResult EventResult */
+		foreach($this->getResults() as $evenResult)
 		{
-			/** @var $evenResult EventResult */
-			foreach($this->getResults() as $evenResult)
+			if($evenResult->getType() === EventResult::ERROR)
 			{
-				if($evenResult->getType() === EventResult::ERROR)
-				{
-					$hasErrors = true;
-					$result->addErrors($evenResult->getErrors());
-				}
+				$hasErrors = true;
+				$result->addErrors($evenResult->getErrors());
 			}
 		}
 		return $hasErrors;
@@ -83,19 +81,16 @@ class Event extends \Bitrix\Main\Event
 			/** @var $evenResult EventResult */
 			foreach($this->getResults() as $evenResult)
 			{
-				if($evenResult->getType() !== EventResult::ERROR)
+				$removed = $evenResult->getUnset();
+				foreach($removed as $val)
 				{
-					$removed = $evenResult->getUnset();
-					foreach($removed as $val)
-					{
-						unset($data[$val]);
-					}
+					unset($data[$val]);
+				}
 
-					$modified = $evenResult->getModified();
-					if(!empty($modified))
-					{
-						$data = array_merge($data, $modified);
-					}
+				$modified = $evenResult->getModified();
+				if(!empty($modified))
+				{
+					$data = array_merge($data, $modified);
 				}
 			}
 		}

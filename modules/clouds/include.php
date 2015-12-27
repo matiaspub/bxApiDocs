@@ -4,8 +4,8 @@
 /**
  * @global CDatabase $DB
  */
-if(!defined("CACHED_b_clouds_file_bucket"));// define("CACHED_b_clouds_file_bucket", 360000);
-if(!defined("CACHED_clouds_file_resize"));// define("CACHED_clouds_file_resize", 360000);
+if(!defined("CACHED_b_clouds_file_bucket")) // define("CACHED_b_clouds_file_bucket", 360000);
+if(!defined("CACHED_clouds_file_resize")) // define("CACHED_clouds_file_resize", 360000);
 
 $db_type = strtolower($DB->type);
 CModule::AddAutoloadClasses(

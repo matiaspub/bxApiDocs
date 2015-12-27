@@ -41,6 +41,8 @@ CModule::AddAutoloadClasses(
 
 		// event handlers
 		"CFormEventHandlers" => "events.php",
+		"Bitrix\\Form\\SenderEventHandler" => "lib/senderconnector.php",
+		"Bitrix\\Form\\SenderConnectorForm" => "lib/senderconnector.php",
 	)
 );
 

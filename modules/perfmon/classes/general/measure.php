@@ -150,8 +150,6 @@ class CPerfomanceMeasure
 			return new CPerfAccelZend;
 		elseif (extension_loaded('apc') && !extension_loaded('apcu'))
 			return new CPerfAccelAPC;
-		elseif (extension_loaded('eAccelerator'))
-			return new CPerfAccelEAccel;
 		elseif (extension_loaded('xcache'))
 			return new CPerfAccelXCache;
 		elseif (extension_loaded('wincache'))
@@ -491,80 +489,6 @@ class CPerfAccelAPC extends CPerfAccel
 				),
 			),
 		);
-	}
-}
-
-class CPerfAccelEAccel extends CPerfAccel
-{
-	public static function __construct()
-	{
-		if (function_exists("eaccelerator_info"))
-			$memory = eaccelerator_info();
-		else
-			$memory = array(
-				"memorySize" => intval(ini_get('eaccelerator.shm_size')) * 1024 * 1024,
-				"memoryAllocated" => -1,
-			);
-
-		if (\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
-			$cache_limit = intval(ini_get('eaccelerator.shm_max'));
-		else
-			$cache_limit = -1;
-
-		parent::__construct(
-			ini_get('eaccelerator.enable') != "0",
-			intval(ini_get('eaccelerator.shm_ttl')),
-			-1,
-			ini_get('eaccelerator.check_mtime') != "0",
-			$memory["memorySize"],
-			$memory["memoryAllocated"],
-			$cache_limit
-		);
-	}
-
-	public static function GetParams()
-	{
-		$res = array(
-			"enabled" => array(
-				array(
-					"PARAMETER" => 'eaccelerator.enable',
-					"VALUE" => ini_get('eaccelerator.enable'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_SET_REC", array("#value#" => "1")),
-				),
-			),
-			"cache_ttl" => array(
-				array(
-					"PARAMETER" => 'eaccelerator.shm_ttl',
-					"VALUE" => ini_get('eaccelerator.shm_ttl'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_GREATER_THAN_ZERO_REC"),
-				),
-			),
-			"check_mtime" => array(
-				array(
-					"PARAMETER" => 'eaccelerator.check_mtime',
-					"VALUE" => ini_get('eaccelerator.check_mtime'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_SET_REC", array("#value#" => "1")),
-				),
-			),
-			"memory_pct" => array(
-				array(
-					"PARAMETER" => 'eaccelerator.shm_size ('.GetMessage("PERFMON_MEASURE_CURRENT_VALUE", array("#value#" => ini_get('eaccelerator.shm_size'))).')',
-					"VALUE" => ini_get('eaccelerator.shm_size'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_EQUAL_OR_GREATER_THAN_REC", array("#value#" => "40")),
-				),
-			),
-		);
-		if (\Bitrix\Main\Data\Cache::getCacheEngineType() == "cacheengineeaccelerator")
-		{
-			$res["cache_limit"] = array(
-				array(
-					"PARAMETER" => 'eaccelerator.shm_max',
-					"VALUE" => ini_get('eaccelerator.shm_max'),
-					"RECOMMENDATION" => GetMessage("PERFMON_MEASURE_GREATER_THAN_ZERO_REC"),
-				),
-			);
-		}
-		return $res;
 	}
 }
 

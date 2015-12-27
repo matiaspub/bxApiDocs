@@ -4,9 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiUtils</b> - Класс дополнительных функций.</body> </html>
- *
- *
+ * <b>CWikiUtils</b> - Класс дополнительных функций. 
  *
  *
  * @return mixed 
@@ -221,13 +219,10 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на чтение.</p>
-	*
-	*
+	* <p>Метод проверяет доступ пользователя на чтение. Статичный метод.</p>
 	*
 	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
@@ -249,13 +244,10 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на запись.</p>
-	*
-	*
+	* <p>Метод проверяет доступ пользователя на запись. Статичный метод.</p>
 	*
 	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
@@ -288,13 +280,10 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на удаление.</p>
-	*
-	*
+	* <p>Метод проверяет доступ пользователя на удаление. Статичный метод.</p>
 	*
 	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
@@ -316,17 +305,12 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя.</p>
-	*
-	*
+	* <p>Метод проверяет доступ пользователя. Статичный метод.</p>
 	*
 	*
 	* @param string $access  Тип проверяемого доступа (view, write, delete)
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
@@ -350,7 +334,7 @@ class CWikiUtils
 
 		if (CWikiSocnet::IsSocNet())
 		{
-			$arSonetGroup = CSocNetGroup::GetByID($iSocNetId);
+			$arSonetGroup = CSocNetGroup::GetByID(CWikiSocnet::$iSocNetId);
 			if ($arSonetGroup && CSocNetUser::IsCurrentUserModuleAdmin($arSonetGroup['SITE_ID']))
 				return true;
 
@@ -378,21 +362,14 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет, является ли запрашиваемая страница сервисной.</p>
-	*
-	*
+	* <p>Метод проверяет, является ли запрашиваемая страница сервисной. Статичный метод.</p>
 	*
 	*
 	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>
 	*
-	*
-	*
 	* @param string &$SERVICE_NAME  Наименование сервисной страницы
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
@@ -427,21 +404,14 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет, является ли запрашиваемая страница страницей категории.</p>
-	*
-	*
+	* <p>Метод проверяет, является ли запрашиваемая страница страницей категории. Статичный метод.</p>
 	*
 	*
 	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>.
 	*
-	*
-	*
 	* @param string &$CATEGORY_NAME  Наименование категории
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a

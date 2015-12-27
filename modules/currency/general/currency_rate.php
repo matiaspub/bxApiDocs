@@ -1,11 +1,11 @@
 <?
+use Bitrix\Currency;
+
 IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.</body> </html>
- *
- *
+ * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр. 
  *
  *
  * @return mixed 
@@ -18,9 +18,7 @@ class CAllCurrencyRates
 {
 	
 	/**
-	* <p>Выполняет проверку полей курса при добавлении или изменении.</p>
-	*
-	*
+	* <p>Выполняет проверку полей курса при добавлении или изменении. Метод динамичный.</p>
 	*
 	*
 	* @param ACTIO $N  Равно <b>ADD</b> или <b>UPDATE</b> с учетом регистра. Если значение в другом
@@ -28,8 +26,6 @@ class CAllCurrencyRates
 	* ошибки (exception). Если значение равно <b>UPDATE</b>, то проверяется ID. Если
 	* ID &lt;= 0, то возвращается ошибка. В случае наличия в <i>arFields</i> ключа ID
 	* удалит его.
-	*
-	*
 	*
 	* @param arField $s  Значения ключей: <ul> <li>CURRENCY - не пустой код валюты, обрезается до 3
 	* символов. Обязательно будет проверен, если присутствует в
@@ -41,16 +37,11 @@ class CAllCurrencyRates
 	* вещественным числом &gt; 0.</li> </ul> <p>При добавлении обязательны все.
 	* При обновлении - RATE_CNT и RATE могут отсутсвовать.</p>
 	*
-	*
-	*
 	* @param I $D = 0 Код обновляемого курса. Необязательный параметр.
-	*
-	*
 	*
 	* @return boolean <p>В случае успеха возвращает <i>true</i>. В случае ошибки - <i>false</i>.
 	* Текст ошибки можно получить через <code>$APPLICATION-&gt;GetException()</code>.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -148,9 +139,7 @@ class CAllCurrencyRates
 
 	
 	/**
-	* <p>Функция создает новый курс на заданную дату. Перед добавлением проверяет, нет ли курса этой валюты на этот день.</p> <p>Сбрасывает кеш <b>currency_rate</b> в случае успешного добавления, сбрасывает тэгированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
-	*
-	*
+	* <p>Метод создает новый курс на заданную дату. Перед добавлением проверяет, нет ли курса этой валюты на этот день. Метод динамичный.</p> <p>Сбрасывает кеш <b>currency_rate</b> в случае успешного добавления, сбрасывает тэгированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив параметров курса валюты, ключами которого
@@ -162,12 +151,9 @@ class CAllCurrencyRates
 	* валюты (например, если 10 Датских крон стоят 48.7 рублей, то 10 - это
 	* количество единиц);</li> <li>RATE - курс валюты.</li> </ul>
 	*
-	*
-	*
 	* @return bool <p>Возвращает значение ID курса валют в случае успешного
 	* добавления и <i>False</i> - в противном случае. Текст ошибки выводится с
 	* помощью <code>$APPLICATION-&gt;GetException()</code>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -224,7 +210,7 @@ class CAllCurrencyRates
 			$ID = $DB->Add("b_catalog_currency_rate", $arFields);
 
 			CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
-			CCurrency::clearTagCache($arFields['CURRENCY']);
+			Currency\CurrencyManager::clearTagCache($arFields['CURRENCY']);
 
 			foreach (GetModuleEvents("currency", "OnCurrencyRateAdd", true) as $arEvent)
 			{
@@ -237,14 +223,10 @@ class CAllCurrencyRates
 
 	
 	/**
-	* <p>Функция обновляет параметры записи в таблице курсов валют на значения из массива <i>arFields</i>. Перед обновлением выполняется проверка, нет ли курса этой валюты на эту дату с другим ID. Если есть - то произойдет ошибка.</p> <p>В случае успешного обновления сбрасываются кеш <b>currency_rate</b> и тэгированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
-	*
-	*
+	* <p>Метод обновляет параметры записи в таблице курсов валют на значения из массива <i>arFields</i>. Перед обновлением выполняется проверка, нет ли курса этой валюты на эту дату с другим ID. Если есть - то произойдет ошибка. Метод динамичный.</p> <p>В случае успешного обновления сбрасываются кеш <b>currency_rate</b> и тэгированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	*
 	*
 	* @param int $ID  Код записи.
-	*
-	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив новых параметров курса валюты, ключами
 	* которого являются названия параметров, а значениями - значения
@@ -254,8 +236,6 @@ class CAllCurrencyRates
 	* единиц валюты, которое участвует в задании курса валюты
 	* (например, если 10 Датских крон стоят 48.7 рублей, то 10 - это
 	* количество единиц);</li> <li>RATE - курс валюты.</li> </ul>
-	*
-	*
 	*
 	* @return bool <p>В случае успеха возвращает ID изменённого курса, иначе <i>false</i>.
 	* Текст ошибки выводится через <code>$APPLICATION-&gt;GetException()</code>.</p> <br><br>
@@ -303,7 +283,7 @@ class CAllCurrencyRates
 
 				$stackCacheManager->Clear("currency_rate");
 				CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
-				CCurrency::clearTagCache($arFields['CURRENCY']);
+				Currency\CurrencyManager::clearTagCache($arFields['CURRENCY']);
 			}
 			foreach (GetModuleEvents("currency", "OnCurrencyRateUpdate", true) as $arEvent)
 			{
@@ -315,14 +295,10 @@ class CAllCurrencyRates
 
 	
 	/**
-	* <p>Удаляет запись с кодом ID из таблицы курсов валют. Если удаляется несуществующий курс (нет курса с таким ID) - будет ошибка. </p> <p>В случае успеха сбросится кеш <b>currency_rate</b> и тэгированный <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
-	*
-	*
+	* <p>Удаляет запись с кодом ID из таблицы курсов валют. Если удаляется несуществующий курс (нет курса с таким ID) - будет ошибка. Метод динамичный.</p> <p>В случае успеха сбросится кеш <b>currency_rate</b> и тэгированный <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	*
 	*
 	* @param int $ID  Код записи для удаления.
-	*
-	*
 	*
 	* @return bool <p>Возвращает значение <i>True</i> в случае успешного добавления и
 	* <i>False</i> - в противном случае. Текст ошибки выводится с помощью
@@ -363,7 +339,7 @@ class CAllCurrencyRates
 		$strSql = "DELETE FROM b_catalog_currency_rate WHERE ID = ".$ID;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		CCurrency::updateCurrencyBaseRate($arFields['CURRENCY']);
-		CCurrency::clearTagCache($arFields['CURRENCY']);
+		Currency\CurrencyManager::clearTagCache($arFields['CURRENCY']);
 
 		foreach(GetModuleEvents("currency", "OnCurrencyRateDelete", true) as $arEvent)
 		{
@@ -374,14 +350,10 @@ class CAllCurrencyRates
 
 	
 	/**
-	* <p>Возвращает параметры курса валют с кодом ID </p>
-	*
-	*
+	* <p>Возвращает параметры курса валют с кодом ID. Метод динамичный. </p>
 	*
 	*
 	* @param int $ID  Код курса.
-	*
-	*
 	*
 	* @return array <p>Ассоциативный массив с ключами</p> <table class="tnormal" width="100%"> <tr> <th
 	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код курса.</td> </tr> <tr>
@@ -416,20 +388,14 @@ class CAllCurrencyRates
 
 	
 	/**
-	* <p>Функция возвращает список курсов валют, удовлетворяющих фильтру arFilter, отсортированный по полю by в направлении order </p>
-	*
-	*
+	* <p>Метод возвращает список курсов валют, удовлетворяющих фильтру arFilter, отсортированный по полю by в направлении order. Метод динамичный. </p>
 	*
 	*
 	* @param string &$by  Переменная , содержащая название поля для сортировки. Доступные
 	* названия:<br> date - дата курса (по умолчанию) <br> curr - валюта<br> rate - курс.
 	*
-	*
-	*
 	* @param string &$order  Переменная, содержащая направление сортировки. Допустимы
 	* значения:<br> asc - по возрастанию (по умолчанию)<br> desc - по убыванию.
-	*
-	*
 	*
 	* @param array $arFilter = Array() <p>Фильтр на записи представляет собой ассоциативный массив, в
 	* котором ключами являются названия фильтруемых полей, а
@@ -438,8 +404,6 @@ class CAllCurrencyRates
 	* курса (выбираются записи с датами больше или равными указанной)
 	* <br> !DATE_RATE - дата курса (выбираются записи с датами меньше
 	* указанной) </p>
-	*
-	*
 	*
 	* @return CDBResult <p>Объект класса CDBResult, содержащий записи с ключами </p> <table class="tnormal"
 	* width="100%"> <tr> <th width="30%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
@@ -451,7 +415,6 @@ class CAllCurrencyRates
 	* сайта должна иметь курс "по-умолчанию" 1, она называется базовой,
 	* остальные валюты имеют курс относительно базовой валюты)</td> </tr>
 	* </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

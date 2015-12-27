@@ -3,9 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.</body> </html>
- *
- *
+ * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов. 
  *
  *
  * @return mixed 
@@ -102,22 +100,14 @@ class CSocNetTextParser
 
 	
 	/**
-	* <p>Функция форматирования сообщения.</p>
-	*
-	*
+	* <p>Метод форматирования сообщения.</p>
 	*
 	*
 	* @param string $text  Исходное сообщение. </ht
 	*
-	*
-	*
 	* @param bool $bPreview = true Необязательный параметр. По умолчанию равен true.
 	*
-	*
-	*
 	* @param array $arImages = array() Массив картинок сообщения.
-	*
-	*
 	*
 	* @param array $allow = array() Массив параметров для форматирования сообщения, со значениями
 	* <i>Y</i> или <i>N</i>: <ul> <li> <b>HTML</b> - в тексте могут содержаться любые HTML
@@ -130,16 +120,11 @@ class CSocNetTextParser
 	* каретки на тег &lt;br&gt; при разрешении принимать любые HTML теги, </li>
 	* <li> <b>VIDEO</b> - разрешена вставка видео, </li> </ul>
 	*
-	*
-	*
 	* @param string $type = html Тип сообщения. Необязательный параметр. По умолчанию принимает
 	* значение html.
 	*
-	*
-	*
 	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -502,14 +487,10 @@ class CSocNetTextParser
 
 	
 	/**
-	* <p>Функция форматирования сообщения для отправки по электронной почте.</p>
-	*
-	*
+	* <p>Метод форматирования сообщения для отправки по электронной почте.</p>
 	*
 	*
 	* @param string $text  Текст сообщения.
-	*
-	*
 	*
 	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <br><br>
 	*
@@ -1123,15 +1104,13 @@ class CSocNetTextParser
 
 
 /**
- * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/index.php
  * @author Bitrix
  */
 class CSocNetTools
@@ -1141,46 +1120,29 @@ class CSocNetTools
 	* <p>Метод возвращает параметры изображения, заданного его идентификатором. При необходимости осуществляется масштабирование изображения. В случае отсутствия изображения возвращается изображение заданное как изображение по-умолчанию.</p>
 	*
 	*
-	*
-	*
 	* @param int $imageID  Идентификатор изображения.
-	*
-	*
 	*
 	* @param int $imageSize  Размер изображения. В случае, если оригинальное изображение хотя
 	* бы по одному измерению больше указанного размера, осуществляется
 	* автоматическое масштабирование.
 	*
-	*
-	*
 	* @param string $defaultImage  Ссылка на изображение "по-умолчанию". Используется, если
 	* изображение не найдено.
 	*
-	*
-	*
 	* @param int $defaultImageSize  Размер изображения "по-умолчанию".
-	*
-	*
 	*
 	* @param string $imageUrl  Ссылка, на которую браузер переходит при клике на изображении.
 	* Может быть не задана.
 	*
-	*
-	*
 	* @param string $showImageUrl  Флаг, имеющий значение true, если необходимо показывать ссылку.
 	* Иначе - false.
 	*
-	*
-	*
 	* @param string $urlParams = false Дополнительные параметры ссылки (тега <i>a</i>).
-	*
-	*
 	*
 	* @return array <p>Метод возвращает массив с ключами FILE и IMG. В ключе FILE содержится
 	* массив, описывающий изображение (аналогичен массиву,
 	* возвращаемому метолом CFile::GetFileArray). В ключе IMG содержится готовая
 	* для вывода строка HTML, показывающая изображение.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1189,7 +1151,7 @@ class CSocNetTools
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/initimage.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/csocnettools_initimage.php
 	* @author Bitrix
 	*/
 	public static function InitImage($imageID, $imageSize, $defaultImage, $defaultImageSize, $imageUrl, $showImageUrl, $urlParams=false)
@@ -1261,27 +1223,19 @@ class CSocNetTools
 	* <p>Метод осуществляет масштабирование изображения, заданного в виде идентификатора или в виде массива, совпадающего по структуре с массивом, возвращаемым методом CFile::GetByID. Если размеры изображения превышают заданные, то осуществляется масштабирование.</p> <p><b>Примечание</b>: возможное примечание.</p>
 	*
 	*
-	*
-	*
 	* @param mixed $aFile  Идентификатор изображения или в массив, совпадающий по структуре
 	* с массивом, возвращаемым методом CFile::GetByID.
 	*
-	*
-	*
 	* @param int $sizeX  Масштабируемый размер по горизонтали.
 	*
-	*
-	*
 	* @param int $sizeY  Масштабируемый размер по вертикали.
-	*
-	*
 	*
 	* @return string <p>Метод возвращает путь к масштабируемому изображению
 	* относительно корня сайта. В случае ошибки возвращается false.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/ResizeImage.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/csocnettools_resizeimage.php
 	* @author Bitrix
 	*/
 	public static function ResizeImage($aFile, $sizeX, $sizeY)
@@ -1317,26 +1271,18 @@ class CSocNetTools
 	* <p>Подготавливает день рождения для вывода.</p>
 	*
 	*
-	*
-	*
 	* @param date $datetime  Дата рождения
-	*
-	*
 	*
 	* @param char $gender  Пол. Допустимые значения: M - мужской, F - женский, X - средний.
 	*
-	*
-	*
 	* @param char $showYear = "N" Показывать ли год рождения. Допустимые значения: Y - показывать, M -
 	* показывать только для мужского пола, N - не показывать.
-	*
-	*
 	*
 	* @return array <p>Метод возвращает массив с ключами: DATE - отформатированный день
 	* рождения, MONTH - месяц рождения, DAY - день в месяце.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetTools/Birthday.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/csocnettools_birthday.php
 	* @author Bitrix
 	*/
 	public static function Birthday($datetime, $gender, $showYear = "N")
@@ -1564,6 +1510,11 @@ class CSocNetTools
 							{
 								$CACHE_MANAGER->RegisterTag('sonet_group_'.$arGroupTmp["ID"]);
 							}
+						}
+
+						if (defined("BX_COMP_MANAGED_CACHE"))
+						{
+							$CACHE_MANAGER->RegisterTag('sonet_group');
 						}
 					}
 

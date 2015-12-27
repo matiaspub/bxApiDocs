@@ -2,9 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/adv.php");
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.</body> </html>
- *
- *
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>. 
  *
  *
  * @return mixed 
@@ -90,8 +88,6 @@ class CAdv extends CAllAdv
 	
 	/**
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК) с рассчитанными статистическими показателями и со всеми данными по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a>.</p>
-	*
-	*
 	*
 	*
 	* @param string &$by = "SESSIONS" Поле для сортировки. Возможные значения: <ul> <li> <b>ID</b> - ID РК; </li> <li>
@@ -194,12 +190,8 @@ class CAdv extends CAllAdv
 	* фильтре интервал времени; </li> <li> <b>HITS_BACK_PERIOD</b> - кол-во хитов на
 	* возврате за установленный в фильтре интервал времени. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>GROUP</b> - список возможных
@@ -284,19 +276,13 @@ class CAdv extends CAllAdv
 	* <b>DESCRIPTION</b> будет искаться точное совпадение. </li> </ul> * - допускается
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка рекламных кампаний. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param mixed $limit = "" Максимальное число РК которые будут выбраны в списке. Если
 	* значение равно "", то кол-во РК будет ограничено в соответствии со
 	* значением параметра "Максимальное кол-во показываемых записей в
 	* таблицах" из настроек модуля "Статистика".
-	*
-	*
 	*
 	* @param array &$referer_group  Ссылка на массив инициализируемый только при установленной
 	* группировке по referer1 или referer2 (если <i>filter</i>["GROUP"]="referer1" или
@@ -346,15 +332,10 @@ class CAdv extends CAllAdv
 	* за период времени [HITS_BACK_PERIOD] =&gt; хитов на возврате за период
 	* времени ) </pre>
 	*
-	*
-	*
 	* @param string &$sql  Ссылка на результирующий SQL запрос по которому будет выбран
 	* список РК.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -385,7 +366,6 @@ class CAdv extends CAllAdv
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -900,14 +880,9 @@ class CAdv extends CAllAdv
 	* <p>Возвращает настройки <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $adv_id  ID рекламной кампании. </htm
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -921,7 +896,6 @@ class CAdv extends CAllAdv
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -959,11 +933,7 @@ class CAdv extends CAllAdv
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a>, инициализированных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителями</a>, зашедшими по определённой <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> (РК).</p>
 	*
 	*
-	*
-	*
 	* @param int $adv_id  ID рекламной кампании. </htm
-	*
-	*
 	*
 	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a> </li> <li>
@@ -981,12 +951,8 @@ class CAdv extends CAllAdv
 	* кампании <i>adv_id</i> </li> <li> <b>s_def</b> - сортировка по умолчанию (для
 	* вывода в соответствующей таблице) </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID типа события </li> <li>
@@ -1025,15 +991,10 @@ class CAdv extends CAllAdv
 	* кампании <i>adv_id</i> </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка типов событий. Если значение равно
 	* "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1065,7 +1026,6 @@ class CAdv extends CAllAdv
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1418,20 +1378,12 @@ class CAdv extends CAllAdv
 	* <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> в разрезе по датам.</p>
 	*
 	*
-	*
-	*
 	* @param int $adv_id  ID рекламной кампании. </htm
-	*
-	*
 	*
 	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul><li> <b>s_date</b> - дата </li></ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul>
-	*
-	*
 	*
 	* @param array &$max_min  Ссылка на массив содержащий максимальную и минимальную даты
 	* результирующего списка. Структура данного массива: <pre> Array (
@@ -1441,16 +1393,11 @@ class CAdv extends CAllAdv
 	* (1-31) [MAX_MONTH] =&gt; месяц максимальной даты (1-12) [MAX_YEAR] =&gt; год
 	* максимальной даты ) </pre>
 	*
-	*
-	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>DATE_1</b> - дата "с" </li> <li> <b>DATE_2</b> -
 	* дата "по" </li> </ul>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1483,7 +1430,6 @@ class CAdv extends CAllAdv
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1627,19 +1573,13 @@ class CAdv extends CAllAdv
 	* <p>Возвращает упрощённый список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК).</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_referer1" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID РК; </li> <li>
 	* <b>s_referer1</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a>
 	* referer1 РК; </li> <li> <b>s_referer2</b> - идентификатор referer2 РК; </li> <li> <b>s_description</b>
 	* - описание РК. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID РК; </li> <li> <b>ID_EXACT_MATCH</b> -
@@ -1654,15 +1594,10 @@ class CAdv extends CAllAdv
 	* искаться точное совпадение. </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка рекламных кампаний. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1687,7 +1622,6 @@ class CAdv extends CAllAdv
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

@@ -5,9 +5,7 @@
 
 
 /**
- * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>.</body> </html>
- *
- *
+ * <b>CForm</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формами</a>. 
  *
  *
  * @return mixed 
@@ -31,20 +29,14 @@ class CForm extends CAllForm
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-форм</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки, может принимать
 	* значения: <ul> <li> <b>s_id</b> - ID веб-формы; </li> <li> <b>s_sort</b> - индекс
 	* сортировки; </li> <li> <b>s_name</b> - заголовок веб-формы; </li> <li> <b>s_sid</b> -
 	* символьный идентификатор веб-формы. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки, может принимать
 	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
 	* </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации. В массиве допустимы следующие ключи: <ul> <li>
 	* <b>ID</b>* - ID веб-формы (по умолчанию будет искаться точное
@@ -65,22 +57,15 @@ class CForm extends CAllForm
 	* фильтрации по <b>SITE</b> будет искаться вхождение. </li> </ul> * -
 	* допускается сложная логика
 	*
-	*
-	*
 	* @param bool &$is_filtered  Ссылка на переменную, хранящую флаг отфильтрованности списка
 	* веб-форм. Если значение равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param int $min_permission = 10 Минимальный уровень <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">прав на
 	* веб-форму</a>.<br><br>Параметр необязательный. По умолчанию - 2. С
 	* версии 4.0.4 - 10 (право на заполнение веб-формы и создание нового
 	* результата).
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -98,7 +83,7 @@ class CForm extends CAllForm
 	*  "SITE"                    =&gt; array("r1", "e2") // веб-форма приписана и к сайтам r1, e2
 	* );
 	* 
-	* // получим список всех форм у которых у текущего пользователя есть право на заполнение
+	* // получим список всех форм, для которых у текущего пользователя есть право на заполнение
 	* $rsForms = <b>CForm::GetList</b>($by="s_id", $order="desc", $arFilter, $is_filtered);
 	* while ($arForm = $rsForms-&gt;Fetch())
 	* {
@@ -106,7 +91,6 @@ class CForm extends CAllForm
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -270,18 +254,11 @@ class CForm extends CAllForm
 	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $form_id  Необязательный параметр.
 	*
-	*
-	*
-	* @param $GET_BY_SI $D = "N" 
-	*
-	*
+	* @param mixed $GET_BY_SID = "N" 
 	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -292,7 +269,6 @@ class CForm extends CAllForm
 	* echo "&lt;pre&gt;"; print_r($arForm); echo "&lt;/pre&gt;";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

@@ -208,7 +208,7 @@ class CBitrixCloudCDNLocation
 					/* @var CBitrixCloudCDNClass $file_class */
 					foreach ($file_class->getExtensions() as $extension)
 					{
-						if ($p_extension === $extension)
+						if (strtolower($p_extension) === $extension)
 						{
 							/* @var CBitrixCloudCDNServerGroup $server_group */
 							$server_group = $this->server_groups[$i];

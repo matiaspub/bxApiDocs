@@ -1,5 +1,10 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Main;
+use Bitrix\Currency;
+use Bitrix\Catalog;
+
+Loc::loadMessages(__FILE__);
 
 class CAllCatalogDiscountSave
 {
@@ -16,8 +21,14 @@ class CAllCatalogDiscountSave
 	const ACTION_TIME_INTERVAL = 'D';
 	const ACTION_TIME_PERIOD = 'P';
 
+	const APPLY_MODE_REPLACE = 'R';
+	const APPLY_MODE_ADD = 'A';
+	const APPLY_MODE_DISABLE = 'D';
+
 	static protected $intDisable = 0;
 	static protected $intDiscountUserID = 0;
+	static protected $userGroups = array();
+	static protected $discountFilterCache = array();
 
 	public static function Enable()
 	{
@@ -57,13 +68,31 @@ class CAllCatalogDiscountSave
 		if ($boolFull)
 		{
 			return array(
-				self::TYPE_PERCENT => GetMessage('BT_CAT_CAT_DSC_SV_TYPE_PERCENT'),
-				self::TYPE_FIX => GetMessage('BT_CAT_CAT_DSC_SV_TYPE_FIX')
+				self::TYPE_PERCENT => Loc::getMessage('BT_CAT_CAT_DSC_SV_TYPE_PERCENT'),
+				self::TYPE_FIX => Loc::getMessage('BT_CAT_CAT_DSC_SV_TYPE_FIX')
 			);
 		}
 		return array(
 			self::TYPE_PERCENT,
 			self::TYPE_FIX
+		);
+	}
+
+	public static function GetApplyModeList($extendedMode = false)
+	{
+		$extendedMode = ($extendedMode === true);
+		if ($extendedMode)
+		{
+			return array(
+				self::APPLY_MODE_REPLACE => Loc::getMessage('BX_CAT_DISCSAVE_APPLY_MODE_R'),
+				self::APPLY_MODE_ADD => Loc::getMessage('BX_CAT_DISCSAVE_APPLY_MODE_A'),
+				self::APPLY_MODE_DISABLE => Loc::getMessage('BX_CAT_DISCSAVE_APPLY_MODE_D')
+			);
+		}
+		return array(
+			self::APPLY_MODE_REPLACE,
+			self::APPLY_MODE_ADD,
+			self::APPLY_MODE_DISABLE
 		);
 	}
 
@@ -78,23 +107,52 @@ class CAllCatalogDiscountSave
 			return false;
 		$intID = (int)$intID;
 
-		$arCurrencyList = array();
-		$by = 'sort';
-		$order = 'asc';
-		$rsCurrencies = CCurrency::GetList($by, $order);
-		while ($arCurrency = $rsCurrencies->Fetch())
-		{
-			$arCurrencyList[] = $arCurrency['CURRENCY'];
-		}
+		$arCurrencyList = Currency\CurrencyManager::getCurrencyList();
 
 		$boolResult = true;
 		$arMsg = array();
 
-		if (array_key_exists('ID',$arFields))
-			unset($arFields['ID']);
+		$clearFields = array(
+			'ID',
+			'~ID',
+			'UNPACK',
+			'~UNPACK',
+			'~CONDITIONS',
+			'CONDITIONS',
+			'USE_COUPONS',
+			'~USE_COUPONS',
+			'HANDLERS',
+			'~HANDLERS',
+			'~TYPE',
+			'~RENEWAL',
+			'~PRIORITY',
+			'~LAST_DISCOUNT',
+			'~VERSION',
+			'TIMESTAMP_X',
+			'DATE_CREATE',
+			'~DATE_CREATE',
+			'~MODIFIED_BY',
+			'~CREATED_BY'
+		);
+		if ($strAction == 'UPDATE')
+			$clearFields[] = 'CREATED_BY';
+		$arFields = array_filter($arFields, 'CCatalogDiscountSave::clearFields');
+		foreach ($clearFields as &$fieldName)
+		{
+			if (isset($arFields[$fieldName]))
+				unset($arFields[$fieldName]);
+		}
+		unset($fieldName, $clearFields);
+
+		$arFields['TYPE'] = self::ENTITY_ID;
+		$arFields["RENEWAL"] = 'N';
+		$arFields['PRIORITY'] = 1;
+		$arFields['LAST_DISCOUNT'] = 'Y';
+		$arFields['VERSION'] = Catalog\DiscountTable::ACTUAL_VERSION;
+
 		if ((is_set($arFields, "SITE_ID") || $strAction=="ADD") && empty($arFields["SITE_ID"]))
 		{
-			$arMsg[] = array('id' => 'SITE_ID', 'text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_SITE'));
+			$arMsg[] = array('id' => 'SITE_ID', 'text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_SITE'));
 			$boolResult = false;
 		}
 		else
@@ -102,14 +160,14 @@ class CAllCatalogDiscountSave
 			$rsSites = CSite::GetByID($arFields['SITE_ID']);
 			if (!$arSite = $rsSites->Fetch())
 			{
-				$arMsg[] = array('id' => 'SITE_ID','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_SITE'));
+				$arMsg[] = array('id' => 'SITE_ID','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_SITE'));
 				$boolResult = false;
 			}
 		}
 
 		if ((is_set($arFields, "NAME") || $strAction=="ADD") && (strlen(trim($arFields["NAME"])) <= 0))
 		{
-			$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_NAME'));
+			$arMsg[] = array('id' => 'NAME', 'text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_NAME'));
 			$boolResult = false;
 		}
 		if ((is_set($arFields, "ACTIVE") || $strAction=="ADD") && $arFields["ACTIVE"] != "N")
@@ -118,12 +176,7 @@ class CAllCatalogDiscountSave
 			$arFields['SORT'] = 500;
 		if ((is_set($arFields, "CURRENCY") || $strAction=="ADD") && empty($arFields["CURRENCY"]))
 		{
-			$arMsg[] = array('id' => 'CURRENCY', 'text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_CURRENCY'));
-			$boolResult = false;
-		}
-		elseif (!in_array($arFields['CURRENCY'],$arCurrencyList))
-		{
-			$arMsg[] = array('id' => 'CURRENCY', 'text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_CURRENCY'));
+			$arMsg[] = array('id' => 'CURRENCY', 'text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_CURRENCY'));
 			$boolResult = false;
 		}
 		if ((is_set($arFields, "ACTIVE_FROM") || $strAction=="ADD") && (!$DB->IsDate($arFields["ACTIVE_FROM"], false, LANGUAGE_ID, "FULL")))
@@ -154,24 +207,15 @@ class CAllCatalogDiscountSave
 		if ((is_set($arFields,'ACTION_TYPE') || $strAction == 'ADD') && !in_array($arFields['ACTION_TYPE'],array('D','M','Y')))
 			$arFields['ACTION_TYPE'] = 'Y';
 
-		$arFields['TYPE'] = self::ENTITY_ID;
-		$arFields["RENEWAL"] = 'N';
-		$arFields['PRIORITY'] = 1;
-		$arFields['LAST_DISCOUNT'] = 'Y';
-
 		$intUserID = 0;
 		$boolUserExist = CCatalog::IsUserExists();
 		if ($boolUserExist)
 			$intUserID = (int)$USER->GetID();
 		$strDateFunction = $DB->GetNowFunction();
-		if (array_key_exists('TIMESTAMP_X', $arFields))
-			unset($arFields['TIMESTAMP_X']);
-		if (array_key_exists('DATE_CREATE', $arFields))
-			unset($arFields['DATE_CREATE']);
 		$arFields['~TIMESTAMP_X'] = $strDateFunction;
 		if ($boolUserExist)
 		{
-			if (!array_key_exists('MODIFIED_BY', $arFields) || intval($arFields["MODIFIED_BY"]) <= 0)
+			if (!array_key_exists('MODIFIED_BY', $arFields) || (int)$arFields["MODIFIED_BY"] <= 0)
 				$arFields["MODIFIED_BY"] = $intUserID;
 		}
 		if ('ADD' == $strAction)
@@ -179,21 +223,16 @@ class CAllCatalogDiscountSave
 			$arFields['~DATE_CREATE'] = $strDateFunction;
 			if ($boolUserExist)
 			{
-				if (!array_key_exists('CREATED_BY', $arFields) || intval($arFields["CREATED_BY"]) <= 0)
+				if (!array_key_exists('CREATED_BY', $arFields) || (int)$arFields["CREATED_BY"] <= 0)
 					$arFields["CREATED_BY"] = $intUserID;
 			}
-		}
-		if ('UPDATE' == $strAction)
-		{
-			if (array_key_exists('CREATED_BY', $arFields))
-				unset($arFields['CREATED_BY']);
 		}
 
 		if (is_set($arFields,'RANGES') || $strAction == 'ADD')
 		{
 			if (!is_array($arFields['RANGES']) || empty($arFields['RANGES']))
 			{
-				$arMsg[] = array('id' => 'RANGES', 'text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_RANGES'));
+				$arMsg[] = array('id' => 'RANGES', 'text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_RANGES'));
 				$boolResult = false;
 			}
 			else
@@ -204,7 +243,7 @@ class CAllCatalogDiscountSave
 				{
 					if (!is_array($arRange) || empty($arRange))
 					{
-						$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE'));
+						$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE'));
 						$boolResult = false;
 					}
 					else
@@ -217,18 +256,18 @@ class CAllCatalogDiscountSave
 							$arRange["VALUE"] = doubleval($arRange["VALUE"]);
 							if (!(0 < $arRange["VALUE"]))
 							{
-								$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
+								$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
 								$boolResult = false;
 							}
 							elseif (self::TYPE_PERCENT == $arRange['TYPE'] && 100 < $arRange["VALUE"])
 							{
-								$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
+								$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
 								$boolResult = false;
 							}
 						}
 						else
 						{
-							$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
+							$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_VALUE'));
 							$boolResult = false;
 						}
 
@@ -238,7 +277,7 @@ class CAllCatalogDiscountSave
 							$arRange["RANGE_FROM"] = doubleval($arRange["RANGE_FROM"]);
 							if (0 > $arRange["RANGE_FROM"])
 							{
-								$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_FROM'));
+								$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_FROM'));
 								$boolResult = false;
 							}
 							else
@@ -255,7 +294,7 @@ class CAllCatalogDiscountSave
 						}
 						else
 						{
-							$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_FROM'));
+							$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_BAD_RANGE_FROM'));
 							$boolResult = false;
 						}
 					}
@@ -264,7 +303,7 @@ class CAllCatalogDiscountSave
 					unset($arRange);
 				if ($boolRepeat)
 				{
-					$arMsg[] = array('id' => 'RANGES','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_DUP_RANGE_FROM'));
+					$arMsg[] = array('id' => 'RANGES','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_DUP_RANGE_FROM'));
 					$boolResult = false;
 				}
 			}
@@ -288,10 +327,26 @@ class CAllCatalogDiscountSave
 			}
 			if (empty($arFields['GROUP_IDS']))
 			{
-				$arMsg[] = array('id' => 'GROUP_IDS','text' => GetMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_GROUP_IDS'));
+				$arMsg[] = array('id' => 'GROUP_IDS','text' => Loc::getMessage('BT_MOD_CAT_DSC_SV_ERR_EMPTY_GROUP_IDS'));
 				$boolResult = false;
 			}
 		}
+		if ($boolResult)
+		{
+			$cond = new CCatalogCondTree();
+			$boolCond = $cond->Init(BT_COND_MODE_GENERATE, BT_COND_BUILD_CATALOG, array());
+			if (!$boolCond)
+			{
+				$boolResult = false;
+			}
+			else
+			{
+				$arFields['CONDITIONS'] = $cond->GetDefaultConditions();
+				$arFields['UNPACK'] = $cond->Generate($arFields['CONDITIONS'], array());
+				$arFields['CONDITIONS'] = serialize($arFields['CONDITIONS']);
+			}
+		}
+
 		if (!$boolResult)
 		{
 			$obError = new CAdminException($arMsg);
@@ -322,60 +377,6 @@ class CAllCatalogDiscountSave
 			return $arDiscount;
 		}
 		return false;
-	}
-
-	static public function Update($intID, $arFields, $boolCalc = false)
-	{
-		global $DB;
-
-		$intID = (int)$intID;
-		if ($intID <= 0)
-			return false;
-
-		if (!CCatalogDiscountSave::CheckFields('UPDATE',$arFields,$intID))
-			return false;
-
-		$strUpdate = $DB->PrepareUpdate("b_catalog_discount", $arFields);
-		if (!empty($strUpdate))
-		{
-			$strSql = "UPDATE b_catalog_discount SET ".$strUpdate." WHERE ID = ".$intID." AND TYPE = ".self::ENTITY_ID;
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-
-		if (!empty($arFields['RANGES']))
-		{
-			$DB->Query("delete from b_catalog_disc_save_range where DISCOUNT_ID = ".$intID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			foreach ($arFields['RANGES'] as &$arRange)
-			{
-				$arRange['DISCOUNT_ID'] = $intID;
-				$arInsert = $DB->PrepareInsert("b_catalog_disc_save_range", $arRange);
-				$strSql =
-					"INSERT INTO b_catalog_disc_save_range(".$arInsert[0].") ".
-					"VALUES(".$arInsert[1].")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-			if (isset($arRange))
-				unset($arRange);
-		}
-
-		if (!empty($arFields['GROUP_IDS']))
-		{
-			$DB->Query("delete from b_catalog_disc_save_group where DISCOUNT_ID = ".$intID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			foreach ($arFields['GROUP_IDS'] as &$intGroupID)
-			{
-				$strSql =
-					"INSERT INTO b_catalog_disc_save_group(DISCOUNT_ID,GROUP_ID) VALUES(".$intID.",".$intGroupID.")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			}
-			if (isset($intGroupID))
-				unset($intGroupID);
-		}
-
-		$boolCalc = ($boolCalc === true ? true : false);
-		if ($boolCalc)
-			CCatalogDiscountSave::UserDiscountCalc($intID, $arFields, false);
-
-		return $intID;
 	}
 
 	static public function Delete($intID)
@@ -443,6 +444,8 @@ class CAllCatalogDiscountSave
 	{
 		global $DB, $USER;
 
+		$adminSection = (defined('ADMIN_SECTION') && ADMIN_SECTION === true);
+
 		$arResult = array();
 
 		if (!CCatalog::IsUserExists() || !$USER->IsAuthorized() || !self::IsEnabled())
@@ -462,7 +465,7 @@ class CAllCatalogDiscountSave
 		$arUserGroups = array();
 		$strSiteID = false;
 		if (isset($arParams['USER_ID']))
-			$intUserID = $arParams['USER_ID'];
+			$intUserID = (int)$arParams['USER_ID'];
 		if (isset($arParams['USER_GROUPS']))
 			$arUserGroups = $arParams['USER_GROUPS'];
 		if (isset($arParams['SITE_ID']))
@@ -470,41 +473,44 @@ class CAllCatalogDiscountSave
 
 		if (self::GetDiscountUserID() > 0)
 		{
-			$intUserID = self::GetDiscountUserID();
-			$arUserGroups = $USER->GetUserGroup($intUserID);
+			$intUserID = (int)self::GetDiscountUserID();
+			$arUserGroups = array();
 		}
-		else
+		if ($intUserID <= 0 && !$adminSection)
 		{
-			$intUserID = (int)$intUserID;
-			if ($intUserID <= 0)
-			{
-				$intUserID = $USER->GetID();
-				$arUserGroups = $USER->GetUserGroupArray();
-			}
-			else
-			{
-				if (empty($arUserGroups))
-					$arUserGroups = $USER->GetUserGroup($intUserID);
-			}
+			$intUserID = (int)$USER->GetID();
+			$arUserGroups = array();
+		}
+		if (empty($arUserGroups))
+		{
+			if (!isset(self::$userGroups[$intUserID]))
+				self::$userGroups[$intUserID] = $USER->GetUserGroup($intUserID);
+			$arUserGroups = self::$userGroups[$intUserID];
 		}
 		if (empty($arUserGroups) || !is_array($arUserGroups) || $intUserID <= 0)
 			return $arResult;
-		$key = array_search(2,$arUserGroups);
+		$key = array_search(2, $arUserGroups);
 		if ($key !== false)
 			unset($arUserGroups[$key]);
 		if (empty($arUserGroups))
 			return $arResult;
+		Main\Type\Collection::normalizeArrayValuesByInt($arUserGroups, true);
+		if (empty($arUserGroups))
+			return $arResult;
 		if ($strSiteID === false)
 			$strSiteID = SITE_ID;
+		$cacheKey = md5('U'.implode('_', $arUserGroups));
+		if (!isset(self::$discountFilterCache[$cacheKey]))
+			self::$discountFilterCache[$cacheKey] = CCatalogDiscountSave::__GetDiscountIDByGroup($arUserGroups);
+		if (empty(self::$discountFilterCache[$cacheKey]))
+			return $arResult;
 
-		$arCurrentDiscountID = CCatalogDiscountSave::__GetDiscountIDByGroup($arUserGroups);
+		$arCurrentDiscountID = self::$discountFilterCache[$cacheKey];
 		if (isset($arParams['ID']))
 		{
-			CatalogClearArray($arParams['ID'], false);
+			Main\Type\Collection::normalizeArrayValuesByInt($arUserGroups, true);
 			if (!empty($arParams['ID']))
-			{
 				$arCurrentDiscountID = array_intersect($arCurrentDiscountID, $arParams['ID']);
-			}
 		}
 
 		if (!empty($arCurrentDiscountID))
@@ -531,6 +537,8 @@ class CAllCatalogDiscountSave
 				$arDiscSave['ACTIVE_TO_UT'] = false;
 				$arDiscSave['COUNT_FROM_UT'] = false;
 				$arDiscSave['COUNT_TO_UT'] = false;
+				$arDiscSave['TYPE'] = (int)$arDiscSave['TYPE'];
+				$arDiscSave['MODULE_ID'] = 'catalog';
 
 				$strCountPeriod = self::COUNT_TIME_ALL;
 				$strActionPeriod = self::ACTION_TIME_ALL;
@@ -682,7 +690,7 @@ class CAllCatalogDiscountSave
 				}
 
 				$rsRanges = CCatalogDiscountSave::GetRangeByDiscount(
-					array('RANGE_FROM' => 'desc'),
+					array('RANGE_FROM' => 'DESC'),
 					array('DISCOUNT_ID' => $arDiscSave['ID'], '<=RANGE_FROM' => $arOrderSumm['RANGE_SUMM']),
 					false,
 					array('nTopCount' => 1)
@@ -737,13 +745,15 @@ class CAllCatalogDiscountSave
 						$arOneResult['VALUE'] = $arRange['VALUE'];
 						$arOneResult['VALUE_TYPE'] = $arRange['TYPE'];
 						$arOneResult['RANGE_FROM'] = $arRange['RANGE_FROM'];
+						$arOneResult['MAX_DISCOUNT'] = 0;
 					}
 					else
 					{
 						$arOneResult['VALUE'] = 0;
 						$arOneResult['VALUE_TYPE'] = self::TYPE_PERCENT;
+						$arOneResult['MAX_DISCOUNT'] = 0;
 						$rsRanges = CCatalogDiscountSave::GetRangeByDiscount(
-							array('RANGE_FROM' => 'asc'),
+							array('RANGE_FROM' => 'ASC'),
 							array('DISCOUNT_ID' => $arDiscSave['ID']),
 							false,
 							array('nTopCount' => 1)
@@ -770,9 +780,9 @@ class CAllCatalogDiscountSave
 		if ($boolFull)
 		{
 			$arResult = array(
-				'D' => GetMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_DAY'),
-				'M' => GetMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_MONTH'),
-				'Y' => GetMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_YEAR'),
+				'D' => Loc::getMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_DAY'),
+				'M' => Loc::getMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_MONTH'),
+				'Y' => Loc::getMessage('BT_MOD_CAT_DSC_SV_MESS_PERIOD_YEAR'),
 			);
 		}
 		else
@@ -785,32 +795,36 @@ class CAllCatalogDiscountSave
 	protected function __SaleOrderSumm($arOrderFilter, $strCurrency)
 	{
 		$arOrderSumm = array(
+			'ORDER_FILTER' => $arOrderFilter,
 			'SUMM' => 0,
 			'CURRENCY' => '',
 			'LAST_ORDER_DATE' => '',
 			'TIMESTAMP' => 0,
 			'RANGE_SUMM' => 0,
+			'RANGE_SUMM_CURRENCY' => $strCurrency
 		);
-		foreach (GetModuleEvents("catalog", "OnSaleOrderSumm", true) as $arEvent)
+		foreach (GetModuleEvents('catalog', 'OnSaleOrderSumm', true) as $arEvent)
 		{
 			$mxOrderCount = ExecuteModuleEventEx($arEvent, array($arOrderFilter));
 			if (!empty($mxOrderCount) && is_array($mxOrderCount))
 			{
-				if ($mxOrderCount['CURRENCY'] != $strCurrency)
-				{
-					$dblSumm = doubleval(CCurrencyRates::ConvertCurrency($mxOrderCount['PRICE'], $mxOrderCount['CURRENCY'], $strCurrency));
-				}
-				else
-				{
-					$dblSumm = doubleval($mxOrderCount['PRICE']);
-				}
+				$mxOrderCount['PRICE'] = (float)$mxOrderCount['PRICE'];
+
 				$arOrderSumm['LAST_ORDER_DATE'] = $mxOrderCount['LAST_ORDER_DATE'];
 				$arOrderSumm['SUMM'] = $mxOrderCount['PRICE'];
 				$arOrderSumm['CURRENCY'] = $mxOrderCount['CURRENCY'];
 				$arOrderSumm['TIMESTAMP'] = $mxOrderCount['TIMESTAMP'];
-				$arOrderSumm['RANGE_SUMM'] = $dblSumm;
+				$arOrderSumm['RANGE_SUMM'] = (
+					$mxOrderCount['CURRENCY'] != $strCurrency
+					? CCurrencyRates::ConvertCurrency($mxOrderCount['PRICE'], $mxOrderCount['CURRENCY'], $strCurrency)
+					: $mxOrderCount['PRICE']
+				);
+				break;
 			}
-			break;
+		}
+		foreach (GetModuleEvents('catalog', 'OnSaleOrderSummResult', true) as $arEvent)
+		{
+			ExecuteModuleEventEx($arEvent, array(&$arOrderSumm));
 		}
 		return $arOrderSumm;
 	}
@@ -827,5 +841,9 @@ class CAllCatalogDiscountSave
 			$arTimeStamp = array();
 		return $arTimeStamp;
 	}
+
+	protected static function clearFields($value)
+	{
+		return ($value !== null);
+	}
 }
-?>

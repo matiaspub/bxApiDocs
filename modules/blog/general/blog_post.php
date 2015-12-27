@@ -1,9 +1,15 @@
 <?
 IncludeModuleLangFile(__FILE__);
-$GLOBALS["BLOG_POST"] = Array();
 
 class CAllBlogPost
 {
+	public static $arSocNetPostPermsCache = array();
+	public static $arUACCache = array();
+	public static $arBlogPostCache = array();
+	public static $arBlogPostIdCache = array();
+	public static $arBlogPCCache = array();
+	public static $arBlogUCache = array();
+
 	public static function CanUserEditPost($ID, $userID)
 	{
 		$ID = IntVal($ID);
@@ -225,7 +231,7 @@ class CAllBlogPost
 		if ((is_set($arFields, "ENABLE_COMMENTS") || $ACTION=="ADD") && $arFields["ENABLE_COMMENTS"] != "Y" && $arFields["ENABLE_COMMENTS"] != "N")
 			$arFields["ENABLE_COMMENTS"] = "Y";
 
-		if (is_set($arFields, "ATTACH_IMG"))
+		if (!empty($arFields["ATTACH_IMG"]))
 		{
 			$res = CFile::CheckImageFile($arFields["ATTACH_IMG"], 0, 0, 0);
 			if (strlen($res) > 0)
@@ -289,6 +295,8 @@ class CAllBlogPost
 
 		$ID = IntVal($ID);
 		$permsType = (($permsType == BLOG_PERMS_COMMENT) ? BLOG_PERMS_COMMENT : BLOG_PERMS_POST);
+		if(!is_array($arPerms))
+			$arPerms = array();
 
 		$arPost = CBlogPost::GetByID($ID);
 		if ($arPost)
@@ -466,7 +474,7 @@ class CAllBlogPost
 
 			CBlogPost::DeleteSocNetPostPerms($ID);
 
-			unset($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID]);
+			unset(static::$arBlogPostCache[$ID]);
 
 			$arBlog = CBlog::GetByID($arPost["BLOG_ID"]);
 
@@ -733,23 +741,31 @@ class CAllBlogPost
 								&& !in_array("SG".$matches[1]."_".SONET_ROLES_MODERATOR, $socnetPerms)
 								&& !in_array("SG".$matches[1]."_".SONET_ROLES_OWNER, $socnetPerms)
 							)
+							{
 								$socnetPermsAdd[] = "SG".$matches[1]."_".SONET_ROLES_USER;
-							
+							}
 						}
 					}
 					if (count($socnetPermsAdd) > 0)
+					{
 						$socnetPerms = array_merge($socnetPerms, $socnetPermsAdd);
+					}
 				}
 
 				CSocNetLog::Update($logID, array("TMP_ID" => $logID));
 				if (CModule::IncludeModule("extranet"))
 				{
-					$arSiteID = CExtranet::GetSitesByLogDestinations($socnetPerms, $arPost["AUTHOR_ID"]);
+					$arSiteID = CExtranet::GetSitesByLogDestinations($socnetPerms, $arPost["AUTHOR_ID"], SITE_ID);
 					CSocNetLog::Update($logID, array("SITE_ID" => $arSiteID));
 				}
 
 				CSocNetLogRights::DeleteByLogID($logID);
 				CSocNetLogRights::Add($logID, $socnetPerms);
+
+				\Bitrix\Main\FinderDestTable::merge(array(
+					"CONTEXT" => "blog_post",
+					"CODE" => \Bitrix\Main\FinderDestTable::convertRights($socnetPerms, array("U".$arPost["AUTHOR_ID"]))
+				));
 
 				CSocNetLog::CounterIncrement(
 					$logID, 
@@ -904,9 +920,11 @@ class CAllBlogPost
 		if(strlen($code) <= 0 || IntVal($blogID) <= 0)
 			return false;
 
-		if (isset($GLOBALS["BLOG_POST"]["BLOG_POST_ID_CACHE_".$blogID."_".$code]) && IntVal($GLOBALS["BLOG_POST"]["BLOG_POST_ID_CACHE_".$blogID."_".$code]) > 0)
+		if (
+			!empty(static::$arBlogPostIdCache[$blogID."_".$code])
+			&& IntVal(static::$arBlogPostIdCache[$blogID."_".$code]) > 0)
 		{
-			return $GLOBALS["BLOG_POST"]["BLOG_POST_ID_CACHE_".$blogID."_".$code];
+			return static::$arBlogPostIdCache[$blogID."_".$code];
 		}
 		else
 		{
@@ -916,7 +934,7 @@ class CAllBlogPost
 			$dbPost = CBlogPost::GetList(Array(), $arFilter, false, Array("nTopCount" => 1), Array("ID"));
 			if($arPost = $dbPost->Fetch())
 			{
-				$GLOBALS["BLOG_POST"]["BLOG_POST_ID_CACHE_".$blogID."_".$code] = $arPost["ID"];
+				static::$arBlogPostIdCache[$blogID."_".$code] = $arPost["ID"];
 				$postID = $arPost["ID"];
 			}
 		}
@@ -1003,6 +1021,12 @@ class CAllBlogPost
 						$arResult[] = $val;
 				}
 			}
+		}
+
+		BXClearCache(true, "/blog/getsocnetperms/".$ID."/");
+		if(defined("BX_COMP_MANAGED_CACHE"))
+		{
+			$GLOBALS["CACHE_MANAGER"]->ClearByTag("blog_post_getsocnetperms_".$ID);
 		}
 
 		return $arResult;
@@ -1105,25 +1129,39 @@ class CAllBlogPost
 		if($ID <= 0)
 			return false;
 
-		$arResult = Array();
-		if (isset($GLOBALS["BLOG_POST"]["GetSocNetPerms_".$ID]) && !empty($GLOBALS["BLOG_POST"]["GetSocNetPerms_".$ID]))
+		$arResult = array();
+
+		$cacheTtl = defined("BX_COMP_MANAGED_CACHE") ? 3153600 : 3600*4;
+		$cacheId = 'blog_post_getsocnetperms_'.$ID;
+		$cacheDir = '/blog/getsocnetperms/'.$ID;
+
+		$obCache = new CPHPCache;
+		if($obCache->InitCache($cacheTtl, $cacheId, $cacheDir))
 		{
-			$arResult = $GLOBALS["BLOG_POST"]["GetSocNetPerms_".$ID];
+			$arResult = $obCache->GetVars();
 		}
 		else
 		{
+			$obCache->StartDataCache();
+
 			$strSql = "SELECT SR.ENTITY_ID, SR.ENTITY_TYPE, SR.ENTITY FROM b_blog_socnet_rights SR
 				INNER JOIN b_blog_post P ON (P.ID = SR.POST_ID)
 				WHERE SR.POST_ID=".$ID." ORDER BY SR.ENTITY ASC";
-				/*."
-				AND SR.ENTITY <> CONCAT('US', P.AUTHOR_ID)";*/
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			while($arRes = $dbRes->Fetch())
 			{
 				$arResult[$arRes["ENTITY_TYPE"]][$arRes["ENTITY_ID"]][] = $arRes["ENTITY"];
 			}
-			$GLOBALS["BLOG_POST"]["GetSocNetPerms_".$ID] = $arResult;
+
+			if(defined("BX_COMP_MANAGED_CACHE"))
+			{
+				$GLOBALS["CACHE_MANAGER"]->StartTagCache($cacheDir);
+				$GLOBALS["CACHE_MANAGER"]->RegisterTag("blog_post_getsocnetperms_".$ID);
+				$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+			}
+			$obCache->EndDataCache($arResult);
 		}
+
 		return $arResult;
 	}
 
@@ -1241,9 +1279,9 @@ class CAllBlogPost
 			return false;
 
 		$cId = md5(serialize(func_get_args()));
-		if(isset($GLOBALS["BLOG_BP_SOCNETPOSTPERMS"]) && !empty($GLOBALS["BLOG_BP_SOCNETPOSTPERMS"][$cId]))
+		if (!empty(static::$arSocNetPostPermsCache[$cId]))
 		{
-			return $GLOBALS["BLOG_BP_SOCNETPOSTPERMS"][$cId];
+			return static::$arSocNetPostPermsCache[$cId];
 		}
 
 		if (!CModule::IncludeModule("socialnetwork"))
@@ -1256,14 +1294,17 @@ class CAllBlogPost
 
 		if(!$bByUserId)
 		{
-			$blogModulePermissions = $GLOBALS["APPLICATION"]->GetGroupRight("blog");
-			if ($blogModulePermissions >= "W" || CSocNetUser::IsCurrentUserModuleAdmin())
+			if (CSocNetUser::IsCurrentUserModuleAdmin())
+			{
 				$perms = $arAvailPerms[count($arAvailPerms) - 1];
+			}
 		}
 		else
 		{
 			if(CSocNetUser::IsUserModuleAdmin($userId))
+			{
 				$perms = $arAvailPerms[count($arAvailPerms) - 1];
+			}
 		}
 
 		if(IntVal($postAuthor) <= 0)
@@ -1283,29 +1324,29 @@ class CAllBlogPost
 		{
 			$arPerms = CBlogPost::GetSocNetPerms($postId);
 			$arEntities = Array();
-			if (isset($GLOBALS["BLOG_POST"]["UAC_CACHE_".$userId]) && !empty($GLOBALS["BLOG_POST"]["UAC_CACHE_".$userId]))
+			if (!empty(static::$arUACCache[$userId]))
 			{
-				$arEntities = $GLOBALS["BLOG_POST"]["UAC_CACHE_".$userId];
+				$arEntities = static::$arUACCache[$userId];
 			}
 			else
 			{
-				$dbA = CAccess::GetUserCodes($userId);
-				while($arA = $dbA->Fetch())
+				$arCodes = CAccess::GetUserCodesArray($userId);
+				foreach($arCodes as $code)
 				{
-					if($arA["PROVIDER_ID"] == "intranet")
+					if (
+						preg_match('/^DR([0-9]+)/', $code, $match)
+						|| preg_match('/^D([0-9]+)/', $code, $match)
+						|| preg_match('/^IU([0-9]+)/', $code, $match)
+					)
 					{
-						$arEntities["DR"][$arA["ACCESS_CODE"]] = $arA["ACCESS_CODE"];
+						$arEntities["DR"][$code] = $code;
 					}
-					elseif($arA["PROVIDER_ID"] == "socnetgroup")
+					elseif (preg_match('/^SG([0-9]+)_([A-Z])/', $code, $match))
 					{
-						$g = substr($arA["ACCESS_CODE"], 2);
-						$gId = IntVal($g);
-						$gR = substr($g, strpos($g, "_")+1);
-
-						$arEntities["SG"][$gId][$gR] = $gR;
+						$arEntities["SG"][$match[1]][$match[2]] = $match[2];
 					}
 				}
-				$GLOBALS["BLOG_POST"]["UAC_CACHE_".$userId] = $arEntities;
+				static::$arUACCache[$userId] = $arEntities;
 			}
 
 			foreach($arPerms as $t => $val)
@@ -1409,15 +1450,18 @@ class CAllBlogPost
 				}
 			}
 		}
-		$GLOBALS["BLOG_BP_SOCNETPOSTPERMS"][$cId] = $perms;
+
+		static::$arSocNetPostPermsCache[$cId] = $perms;
 
 		return $perms;
 	}
 
 	public static function NotifyIm($arParams)
 	{
-		if(!CModule::IncludeModule("im"))
+		if (!CModule::IncludeModule("im"))
+		{
 			return;
+		}
 
 		$arUsers = array();
 		$arUserIDSent = array();
@@ -1427,8 +1471,13 @@ class CAllBlogPost
 			foreach($arParams["TO_USER_ID"] as $val)
 			{
 				$val = IntVal($val);
-				if($val > 0 && $val != $arParams["FROM_USER_ID"])
+				if (
+					$val > 0
+					&& $val != $arParams["FROM_USER_ID"]
+				)
+				{
 					$arUsers[] = $val;
+				}
 			}
 		}
 		if(!empty($arParams["TO_SOCNET_RIGHTS"]))
@@ -1447,7 +1496,9 @@ class CAllBlogPost
 						)
 						&& $u != $arParams["FROM_USER_ID"]
 					)
+					{
 						$arUsers[] = $u;
+					}
 				}
 			}
 		}
@@ -1472,6 +1523,12 @@ class CAllBlogPost
 				}
 			}
 		}
+
+		$authorName = (
+			$arUser
+				? CUser::FormatName(CSite::GetNameFormat(), $arUser, true)
+				: GetMessage("BLG_GP_PUSH_USER")
+		);
 		
 		if (CModule::IncludeModule("socialnetwork"))
 		{
@@ -1486,98 +1543,369 @@ class CAllBlogPost
 				array("ID")
 			);
 			if ($arLog = $rsLog->Fetch())
+			{
 				$arMessageFields["LOG_ID"] = $arLog["ID"];
+			}
 		}
 
 		$arParams["TITLE"] = str_replace(Array("\r\n", "\n"), " ", $arParams["TITLE"]);
 		$arParams["TITLE"] = TruncateText($arParams["TITLE"], 100);
 		$arParams["TITLE_OUT"] = TruncateText($arParams["TITLE"], 255);
+		$bTitleEmpty = (strlen(trim($arParams["TITLE"], " \t\n\r\0\x0B\xA0" )) <= 0);
 
 		$serverName = (CMain::IsHTTPS() ? "https" : "http")."://".((defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0) ? SITE_SERVER_NAME : COption::GetOptionString("main", "server_name", ""));
 
 		if (IsModuleInstalled("extranet"))
 		{
 			$user_path = COption::GetOptionString("socialnetwork", "user_page", false, SITE_ID);
-			if (strpos($arParams["URL"], $user_path) === 0)
+			if (
+				strlen($user_path) > 0
+				&& strpos($arParams["URL"], $user_path) === 0
+			)
+			{
 				$arParams["URL"] = str_replace($user_path, "#USER_PATH#", $arParams["URL"]);
+			}
 		}
 
 		if($arParams["TYPE"] == "POST")
 		{
+			$arMessageFields["PUSH_PARAMS"] = array(
+				"ACTION" => "post"
+			);
+
 			$arMessageFields["NOTIFY_EVENT"] = "post";
 			$arMessageFields["NOTIFY_TAG"] = "BLOG|POST|".$arParams["ID"];
-			$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-			$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."";
+
+			if (!$bTitleEmpty)
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_1".$aditGM,
+					array(
+						"#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_1".$aditGM,
+					array(
+						"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_1".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+					)
+				);
+			}
+			else
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_1A".$aditGM,
+					array(
+						"#post#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_1B")."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_1A".$aditGM,
+					array(
+						"#post#" => GetMessage("BLG_GP_IM_1B")
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_1A".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#post#" => GetMessage("BLG_GP_IM_1B")
+					)
+				);
+			}
 		}
 		elseif($arParams["TYPE"] == "COMMENT")
 		{
+			$arMessageFields["PUSH_PARAMS"] = array(
+				"ACTION" => "comment"
+			);
+
 			$arMessageFields["NOTIFY_EVENT"] = "comment";
 			$arMessageFields["NOTIFY_TAG"] = "BLOG|COMMENT|".$arParams["ID"];
-			$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-			$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
-			$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-			$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
+			if (!$bTitleEmpty)
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_4".$aditGM,
+					array(
+						"#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_4".$aditGM,
+					array(
+						"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+					)
+				)." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_4".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+					)
+				);
+
+				$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage(
+					"BLG_GP_IM_5".$aditGM,
+					array(
+						"#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage(
+					"BLG_GP_IM_5".$aditGM,
+					array(
+						"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+					)
+				)." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
+				$arMessageFields["PUSH_MESSAGE_AUTHOR"] = GetMessage(
+					"BLG_GP_PUSH_5".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+					)
+				);
+			}
+			else
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_4A".$aditGM,
+					array(
+						"#post#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_4B")."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_4A".$aditGM,
+					array(
+						"#post#" => GetMessage("BLG_GP_IM_4B")
+					)
+				)." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_4A".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#post#" => GetMessage("BLG_GP_IM_4B")
+					)
+				);
+
+				$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage(
+					"BLG_GP_IM_5A".$aditGM,
+					array(
+						"#post#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_5B")."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage(
+					"BLG_GP_IM_5A".$aditGM,
+					Array(
+						"#post#" => GetMessage("BLG_GP_IM_5B")
+					)
+				)." ".$serverName.$arParams["URL"]."\n\n".$arParams["BODY"];
+				$arMessageFields["PUSH_MESSAGE_AUTHOR"] = GetMessage(
+					"BLG_GP_PUSH_5A".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#post#" => GetMessage("BLG_GP_IM_5B")
+					)
+				);
+			}
 		}
 		elseif($arParams["TYPE"] == "SHARE")
 		{
+			$arMessageFields["PUSH_PARAMS"] = array(
+				"ACTION" => "share"
+			);
+
 			$arMessageFields["NOTIFY_EVENT"] = "share";
 			$arMessageFields["NOTIFY_TAG"] = "BLOG|SHARE|".$arParams["ID"];
-			$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-			$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."";
+			if (!$bTitleEmpty)
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_8".$aditGM,
+					array(
+						"#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_8".$aditGM,
+					Array(
+						"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSHMESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_8".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+					)
+				);
+			}
+			else
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_8A".$aditGM,
+					array(
+						"#post#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_8B")."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_8A".$aditGM,
+					array(
+						"#post#" => GetMessage("BLG_GP_IM_8B")
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_8A".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#post#" => GetMessage("BLG_GP_IM_8B")
+					)
+				);
+			}
 		}
 		elseif($arParams["TYPE"] == "SHARE2USERS")
 		{
+			$arMessageFields["PUSH_PARAMS"] = array(
+				"ACTION" => "share2users"
+			);
+
 			$arMessageFields["NOTIFY_EVENT"] = "share2users";
 			$arMessageFields["NOTIFY_TAG"] = "BLOG|SHARE2USERS|".$arParams["ID"];
-			$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-			$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."";
+			if (!$bTitleEmpty)
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_9".$aditGM,
+					array(
+						"#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_9".$aditGM,
+					array(
+						"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_9".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+					)
+				);
+			}
+			else
+			{
+				$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+					"BLG_GP_IM_9A".$aditGM,
+					array(
+						"#post#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_9B")."</a>"
+					)
+				);
+				$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+					"BLG_GP_IM_9A".$aditGM,
+					array(
+						"#post#" => GetMessage("BLG_GP_IM_9B")
+					)
+				)." ".$serverName.$arParams["URL"]."";
+				$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+					"BLG_GP_PUSH_9A".$aditGM,
+					array(
+						"#name#" => htmlspecialcharsbx($authorName),
+						"#post#" => GetMessage("BLG_GP_IM_9B")
+					)
+				);
+			}
 		}
+
+		$arMessageFields["PUSH_PARAMS"]["TAG"] = $arMessageFields["NOTIFY_TAG"];
 
 		foreach($arUsers as $v)
 		{
-			if(!empty($arParams["EXCLUDE_USERS"]) && IntVal($arParams["EXCLUDE_USERS"][$v]) > 0)
+			if(
+				!empty($arParams["EXCLUDE_USERS"])
+				&& IntVal($arParams["EXCLUDE_USERS"][$v]) > 0
+			)
+			{
 				continue;
+			}
 
 			if (IsModuleInstalled("extranet"))
 			{
-
 				$arTmp = CSocNetLogTools::ProcessPath(
 					array(
 						"URL" => $arParams["URL"],
 					),
-					$v
+					$v,
+					SITE_ID
 				);
 				$url = $arTmp["URLS"]["URL"];
 
-				if (
+				$serverName = (
 					strpos($url, "http://") === 0
 					|| strpos($url, "https://") === 0
-				)
-					$serverName = "";
-				else
-					$serverName = $arTmp["SERVER_NAME"];
+						? ""
+						: $arTmp["SERVER_NAME"]
+				);
 
 				if($arParams["TYPE"] == "POST")
 				{
-					$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-					$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." (".$serverName.$url.")";
+					if (!$bTitleEmpty)
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_1".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." (".$serverName.$url.")";
+					}
+					else
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_1A".$aditGM, Array("#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_1B")."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_1A".$aditGM, Array("#post#" => GetMessage("BLG_GP_IM_1B")))." (".$serverName.$url.")";
+					}
 				}
 				elseif($arParams["TYPE"] == "COMMENT")
 				{
-					$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-					$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."\n\n".$arParams["BODY"];
-					$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-					$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."\n\n".$arParams["BODY"];
+					if (!$bTitleEmpty)
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_4".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."\n\n".$arParams["BODY"];
+						$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage("BLG_GP_IM_5".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."\n\n".$arParams["BODY"];
+					}
+					else
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_4A".$aditGM, Array("#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_4B")."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_4A".$aditGM, Array("#post#" => GetMessage("BLG_GP_IM_4B")))." ".$serverName.$url."\n\n".$arParams["BODY"];
+						$arMessageFields["NOTIFY_MESSAGE_AUTHOR"] = GetMessage("BLG_GP_IM_5A".$aditGM, Array("#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_5B")."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"] = GetMessage("BLG_GP_IM_5A".$aditGM, Array("#post#" => GetMessage("BLG_GP_IM_5B")))." ".$serverName.$url."\n\n".$arParams["BODY"];
+					}
 				}
 				elseif($arParams["TYPE"] == "SHARE")
 				{
-					$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-					$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
+					if (!$bTitleEmpty)
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_8".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
+					}
+					else
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_8A".$aditGM, Array("#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_8B")."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_8A".$aditGM, Array("#post#" => GetMessage("BLG_GP_IM_8B")))." ".$serverName.$url."";
+					}
 				}
 				elseif($arParams["TYPE"] == "SHARE2USERS")
 				{
-					$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-					$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
+					if (!$bTitleEmpty)
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_9".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
+					}
+					else
+					{
+						$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_9A".$aditGM, Array("#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_9B")."</a>"));
+						$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_9A".$aditGM, Array("#post#" => GetMessage("BLG_GP_IM_9B")))." ".$serverName.$url."";
+					}
 				}
 			}
 
@@ -1588,11 +1916,12 @@ class CAllBlogPost
 				{
 					$arMessageFieldsTmp["NOTIFY_MESSAGE"] = $arMessageFields["NOTIFY_MESSAGE_AUTHOR"];
 					$arMessageFieldsTmp["NOTIFY_MESSAGE_OUT"] = $arMessageFields["NOTIFY_MESSAGE_AUTHOR_OUT"];
+					$arMessageFieldsTmp["PUSH_MESSAGE"] = $arMessageFields["PUSH_MESSAGE_AUTHOR"];
 				}
 			}
 
 			$arMessageFieldsTmp["TO_USER_ID"] = $v;
-			$ID = CIMNotify::Add($arMessageFieldsTmp);
+			CIMNotify::Add($arMessageFieldsTmp);
 
 			$arUserIDSent[] = $v;
 		}
@@ -1600,75 +1929,163 @@ class CAllBlogPost
 		if(!empty($arParams["MENTION_ID"]))
 		{
 			if(!is_array($arParams["MENTION_ID_OLD"]))
+			{
 				$arParams["MENTION_ID_OLD"] = Array();
+			}
+
 			foreach($arParams["MENTION_ID"] as $val)
 			{
 				$val = IntVal($val);
-				if(IntVal($val) > 0 && !in_array($val, $arUsers) && !in_array($val, $arParams["MENTION_ID_OLD"]) && $val != $arParams["FROM_USER_ID"])
+				if (
+					IntVal($val) > 0
+					&& !in_array($val, $arUsers)
+					&& !in_array($val, $arParams["MENTION_ID_OLD"])
+					&& $val != $arParams["FROM_USER_ID"]
+					&& CBlogPost::GetSocNetPostPerms($arParams["ID"], false, $val) >= BLOG_PERMS_READ
+				)
 				{
-					if(CBlogPost::GetSocNetPostPerms($arParams["ID"], false, $val) >= BLOG_PERMS_READ)
+					$arMessageFields["TO_USER_ID"] = $val;
+
+					if (IsModuleInstalled("extranet"))
 					{
-						$arMessageFields["TO_USER_ID"] = $val;
+						$arTmp = CSocNetLogTools::ProcessPath(
+							array(
+								"URL" => $arParams["URL"],
+							),
+							$val,
+							SITE_ID
+						);
+						$url = $arTmp["URLS"]["URL"];
+
+						$serverName = (
+							strpos($url, "http://") === 0
+							|| strpos($url, "https://") === 0
+								? ""
+								: $arTmp["SERVER_NAME"]
+						);
+					}
+					else
+					{
+						$url = $arParams["URL"];
+					}
+
+					$arMessageFields["PUSH_PARAMS"] = array(
+						"ACTION" => "mention"
+					);
+
+					if ($arParams["TYPE"] == "POST")
+					{
 						$arMessageFields["NOTIFY_EVENT"] = "mention";
+						$arMessageFields["NOTIFY_TAG"] = "BLOG|POST_MENTION|".$arParams["ID"];
 
-						if (IsModuleInstalled("extranet"))
+						if (!$bTitleEmpty)
 						{
-
-							$arTmp = CSocNetLogTools::ProcessPath(
+							$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+								"BLG_GP_IM_6".$aditGM,
 								array(
-									"URL" => $arParams["URL"],
-								),
-								$val
+									"#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+								)
 							);
-							$url = $arTmp["URLS"]["URL"];
-
-							if (
-								strpos($url, "http://") === 0
-								|| strpos($url, "https://") === 0
-							)
-								$serverName = "";
-							else
-								$serverName = $arTmp["SERVER_NAME"];
-
-							if($arParams["TYPE"] == "POST")
-							{
-								$arMessageFields["NOTIFY_TAG"] = "BLOG|POST_MENTION|".$arParams["ID"];
-								$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_6".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-								$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_6".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
-							}
-							elseif($arParams["TYPE"] == "COMMENT")
-							{
-								$arMessageFields["NOTIFY_TAG"] = "BLOG|COMMENT_MENTION|".$arParams["ID"];
-								$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_7".$aditGM, Array("#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-								$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_7".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$url."";
-							}
+							$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+									"BLG_GP_IM_6".$aditGM,
+									array(
+										"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+									)
+							)." ".$serverName.$url."";
+							$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+								"BLG_GP_PUSH_6".$aditGM,
+								array(
+									"#name#" => htmlspecialcharsbx($authorName),
+									"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+								)
+							);
 						}
 						else
 						{
-							if($arParams["TYPE"] == "POST")
-							{
-								$arMessageFields["NOTIFY_TAG"] = "BLOG|POST_MENTION|".$arParams["ID"];
-								$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_6".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-								$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_6".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."";
-							}
-							elseif($arParams["TYPE"] == "COMMENT")
-							{
-								$arMessageFields["NOTIFY_TAG"] = "BLOG|COMMENT_MENTION|".$arParams["ID"];
-								$arMessageFields["NOTIFY_MESSAGE"] = GetMessage("BLG_GP_IM_7".$aditGM, Array("#title#" => "<a href=\"".$arParams["URL"]."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"));
-								$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage("BLG_GP_IM_7".$aditGM, Array("#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])))." ".$serverName.$arParams["URL"]."";
-							}
+							$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+								"BLG_GP_IM_6A".$aditGM,
+								array(
+									"#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_6B")."</a>"
+								)
+							);
+							$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+								"BLG_GP_IM_6A".$aditGM,
+								array(
+									"#post#" => GetMessage("BLG_GP_IM_6B")
+								)
+							)." ".$serverName.$url."";
+							$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+								"BLG_GP_PUSH_6A".$aditGM,
+								array(
+									"#name#" => htmlspecialcharsbx($authorName),
+									"#post#" => GetMessage("BLG_GP_IM_6B")
+								)
+							);
 						}
-
-						$ID = CIMNotify::Add($arMessageFields);
-						$arUserIDSent[] = $val;
-
-						if (
-							intval($ID) > 0
-							&& intval($arMessageFields["LOG_ID"]) > 0
-						)
+					}
+					elseif ($arParams["TYPE"] == "COMMENT")
+					{
+						$arMessageFields["NOTIFY_EVENT"] = "mention_comment";
+						$arMessageFields["NOTIFY_TAG"] = "BLOG|COMMENT_MENTION|".$arParams["ID"];
+						if (!$bTitleEmpty)
 						{
-							foreach(GetModuleEvents("blog", "OnBlogPostMentionNotifyIm", true) as $arEvent)
-								ExecuteModuleEventEx($arEvent, Array($ID, $arMessageFields));
+							$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+								"BLG_GP_IM_7".$aditGM,
+								array(
+									"#title#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".htmlspecialcharsbx($arParams["TITLE"])."</a>"
+								)
+							);
+							$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+								"BLG_GP_IM_7".$aditGM,
+								array(
+									"#title#" => htmlspecialcharsbx($arParams["TITLE_OUT"])
+								)
+							)." ".$serverName.$url."";
+							$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+								"BLG_GP_PUSH_7".$aditGM,
+								array(
+									"#name#" => htmlspecialcharsbx($authorName),
+									"#title#" => htmlspecialcharsbx($arParams["TITLE"])
+								)
+							);
+						}
+						else
+						{
+							$arMessageFields["NOTIFY_MESSAGE"] = GetMessage(
+								"BLG_GP_IM_7A".$aditGM,
+								array(
+									"#post#" => "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".GetMessage("BLG_GP_IM_7B")."</a>"
+								)
+							);
+							$arMessageFields["NOTIFY_MESSAGE_OUT"] = GetMessage(
+								"BLG_GP_IM_7A".$aditGM,
+								array(
+									"#post#" => GetMessage("BLG_GP_IM_7B")
+								)
+							)." ".$serverName.$url."";
+							$arMessageFields["PUSH_MESSAGE"] = GetMessage(
+								"BLG_GP_PUSH_7A".$aditGM,
+								array(
+									"#name#" => htmlspecialcharsbx($authorName),
+									"#post#" => GetMessage("BLG_GP_IM_7B")
+								)
+							);
+						}
+					}
+
+					$arMessageFields["PUSH_PARAMS"]["TAG"] = $arMessageFields["NOTIFY_TAG"];
+
+					$ID = CIMNotify::Add($arMessageFields);
+					$arUserIDSent[] = $val;
+
+					if (
+						intval($ID) > 0
+						&& intval($arMessageFields["LOG_ID"]) > 0
+					)
+					{
+						foreach(GetModuleEvents("blog", "OnBlogPostMentionNotifyIm", true) as $arEvent)
+						{
+							ExecuteModuleEventEx($arEvent, Array($ID, $arMessageFields));
 						}
 					}
 				}
@@ -1696,7 +2113,9 @@ class CAllBlogPost
 							|| empty($arParams["TO_SOCNET_RIGHTS_OLD"]["SG"][$group_id_tmp])
 						)
 					)
+					{
 						$arGroupsId[] = $group_id_tmp;
+					}
 				}
 			}
 
@@ -1794,5 +2213,6 @@ class CAllBlogPost
 
 		return $arMentionedUserID;
 	}
+
 }
 ?>

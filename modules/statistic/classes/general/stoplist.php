@@ -3,9 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStopList</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листом</a>.</body> </html>
- *
- *
+ * <b>CStopList</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листом</a>. 
  *
  *
  * @return mixed 
@@ -21,14 +19,9 @@ class CAllStopList
 	* <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list_record">записи</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листа</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $record_id  ID записи сто-листа. </ht
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -42,7 +35,6 @@ class CAllStopList
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

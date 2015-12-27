@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order.php")
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CSaleOrder extends CAllSaleOrder
 {
 	
 	/**
-	* <p>Функция добавляет новый заказ с параметрами из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderAdd модуля магазина, а после добавления - обработчики события OnOrderAdd модуля магазина.</p>
-	*
-	*
+	* <p>Метод добавляет новый заказ с параметрами из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderAdd модуля магазина, а после добавления - обработчики события OnOrderAdd модуля магазина. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
@@ -44,7 +40,7 @@ class CSaleOrder extends CAllSaleOrder
 	* заказа;</li> <li> <b>CURRENCY</b> - валюта стоимости заказа;</li> <li> <b>DISCOUNT_VALUE</b>
 	* - общая величина скидки;</li> <li> <b>USER_ID</b> - код пользователя
 	* заказчика;</li> <li> <b>PAY_SYSTEM_ID</b> - платежная система, которой (будет)
-	* оплачен заказа;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
+	* оплачен заказ;</li> <li> <b>DELIVERY_ID</b> - способ (служба) доставки
 	* заказа;</li> <li> <b>USER_DESCRIPTION</b> - описание заказа заказчиком;</li> <li>
 	* <b>ADDITIONAL_INFO</b> - дополнительная информация по заказу;</li> <li> <b>COMMENTS</b>
 	* - произвольные комментарии;</li> <li> <b>TAX_VALUE</b> - общая сумма
@@ -64,11 +60,8 @@ class CSaleOrder extends CAllSaleOrder
 	* номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
 	* поручения.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -110,7 +103,10 @@ class CSaleOrder extends CAllSaleOrder
 	*/
 	public static function Add($arFields)
 	{
-		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER, $APPLICATION;
+
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
+
 
 		$arFields1 = array();
 		foreach ($arFields as $key => $value)
@@ -122,6 +118,29 @@ class CSaleOrder extends CAllSaleOrder
 			}
 		}
 
+		if (!empty($arFields['TAX_LIST']) && is_array($arFields['TAX_LIST']))
+		{
+			$arFields1['TAX_LIST'] = $arFields['TAX_LIST'];
+		}
+
+		if (!empty($arFields['ORDER_PROP']) && is_array($arFields['TAX_LIST']))
+		{
+			$arFields1['ORDER_PROP'] = $arFields['ORDER_PROP'];
+		}
+
+		if (!empty($arFields['DELIVERY_PRICE']) && floatval($arFields['DELIVERY_PRICE']) > 0)
+		{
+			$arFields1['DELIVERY_PRICE'] = $arFields['DELIVERY_PRICE'];
+		}
+
+		if (array_key_exists('ONLY_FULL_PAY_FROM_ACCOUNT', $arFields))
+		{
+			$arFields1['ONLY_FULL_PAY_FROM_ACCOUNT'] = $arFields['ONLY_FULL_PAY_FROM_ACCOUNT'];
+		}
+
+		unset($arFields['DELIVERY_PRICE']);
+		unset($arFields['TAX_LIST']);
+
 		if (!CSaleOrder::CheckFields("ADD", $arFields))
 			return false;
 
@@ -129,50 +148,79 @@ class CSaleOrder extends CAllSaleOrder
 			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
 				return false;
 
-		$arInsert = $DB->PrepareInsert("b_sale_order", $arFields);
-
-		if (!array_key_exists("DATE_STATUS", $arFields))
+		if ($isOrderConverted == 'Y')
 		{
-			$arInsert[0] .= ", DATE_STATUS";
-			$arInsert[1] .= ", ".$DB->GetNowFunction();
-		}
-		if (!array_key_exists("DATE_INSERT", $arFields))
-		{
-			$arInsert[0] .= ", DATE_INSERT";
-			$arInsert[1] .= ", ".$DB->GetNowFunction();
-		}
-		if (!array_key_exists("DATE_UPDATE", $arFields))
-		{
-			$arInsert[0] .= ", DATE_UPDATE";
-			$arInsert[1] .= ", ".$DB->GetNowFunction();
-		}
-
-		foreach ($arFields1 as $key => $value)
-		{
-			if (strlen($arInsert[0])>0)
+			if (!empty($arFields1))
 			{
-				$arInsert[0] .= ", ";
-				$arInsert[1] .= ", ";
+				$arFields1 = \Bitrix\Sale\Compatible\OrderCompatibility::backRawField(\Bitrix\Sale\Compatible\OrderCompatibility::ENTITY_ORDER, $arFields1);
 			}
-			$arInsert[0] .= $key;
-			$arInsert[1] .= $value;
+
+			$result = \Bitrix\Sale\Compatible\OrderCompatibility::add(array_merge($arFields, $arFields1));
+			if ($result->isSuccess(true))
+			{
+				$ID = $result->getId();
+			}
+			else
+			{
+				foreach($result->getErrorMessages() as $error)
+				{
+					$APPLICATION->ThrowException($error);
+				}
+
+				return false;
+			}
+		}
+		else
+		{
+			$arInsert = $DB->PrepareInsert("b_sale_order", $arFields);
+
+			if (!array_key_exists("DATE_STATUS", $arFields))
+			{
+				$arInsert[0] .= ", DATE_STATUS";
+				$arInsert[1] .= ", ".$DB->GetNowFunction();
+			}
+			if (!array_key_exists("DATE_INSERT", $arFields))
+			{
+				$arInsert[0] .= ", DATE_INSERT";
+				$arInsert[1] .= ", ".$DB->GetNowFunction();
+			}
+			if (!array_key_exists("DATE_UPDATE", $arFields))
+			{
+				$arInsert[0] .= ", DATE_UPDATE";
+				$arInsert[1] .= ", ".$DB->GetNowFunction();
+			}
+
+			foreach ($arFields1 as $key => $value)
+			{
+				if (strlen($arInsert[0])>0)
+				{
+					$arInsert[0] .= ", ";
+					$arInsert[1] .= ", ";
+				}
+				$arInsert[0] .= $key;
+				$arInsert[1] .= $value;
+			}
+
+			$strSql =
+				"INSERT INTO b_sale_order(".$arInsert[0].") ".
+				"VALUES(".$arInsert[1].")";
+
+			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			$ID = IntVal($DB->LastID());
+			CSaleOrder::SetAccountNumber($ID);
 		}
 
-		$strSql =
-			"INSERT INTO b_sale_order(".$arInsert[0].") ".
-			"VALUES(".$arInsert[1].")";
 
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		$ID = IntVal($DB->LastID());
-
-		CSaleOrder::SetAccountNumber($ID);
 		CSaleOrderChange::AddRecord($ID, "ORDER_ADDED");
 
 		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
-		foreach(GetModuleEvents("sale", "OnOrderAdd", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
+		if ($isOrderConverted != 'Y')
+		{
+			foreach (GetModuleEvents("sale", "OnOrderAdd", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
+		}
 
 		if(defined("CACHED_b_sale_order"))
 		{
@@ -185,14 +233,10 @@ class CSaleOrder extends CAllSaleOrder
 
 	
 	/**
-	* <p>Функция изменяет параметры заказа с кодом ID на новые параметры из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderUpdate модуля магазина, а после добавления - обработчики события OnOrderUpdate модуля магазина. </p>
-	*
-	*
+	* <p>Метод изменяет параметры заказа с кодом ID на новые параметры из массива <i> arFields</i>. Перед добавлением заказа вызываются обработчики события OnBeforeOrderUpdate модуля магазина, а после добавления - обработчики события OnOrderUpdate модуля магазина. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код заказа.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров заказа, ключами в котором
 	* являются названия параметров заказа, а значениями - новые
@@ -234,16 +278,11 @@ class CSaleOrder extends CAllSaleOrder
 	* номер платежного поручения;</li> <li> <b>PAY_VOUCHER_DATE</b> - дата платежного
 	* поручения.</li> <li> <b>DATE_INSERT</b> - дата создания заказа.</li> </ul>
 	*
-	*
-	*
 	* @param bDateUpdat $e  Обновление даты изменения заказа. Значения <i>true/false</i>
 	* (по-умолчанию <i>true</i>).
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного заказа или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -269,7 +308,9 @@ class CSaleOrder extends CAllSaleOrder
 	*/
 	public static function Update($ID, $arFields, $bDateUpdate = true)
 	{
-		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
+		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER, $APPLICATION;
+
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
 
 		$ID = IntVal($ID);
 
@@ -290,32 +331,68 @@ class CSaleOrder extends CAllSaleOrder
 			if (ExecuteModuleEventEx($arEvent, Array($ID, &$arFields))===false)
 				return false;
 
-		$strUpdate = $DB->PrepareUpdate("b_sale_order", $arFields);
 
-		foreach ($arFields1 as $key => $value)
+		if ($isOrderConverted == "Y")
 		{
-			if (strlen($strUpdate)>0) $strUpdate .= ", ";
-			$strUpdate .= $key."=".$value." ";
+			if (!empty($arFields1))
+			{
+				$arFields1 = \Bitrix\Sale\Compatible\OrderCompatibility::backRawField(\Bitrix\Sale\Compatible\OrderCompatibility::ENTITY_ORDER, $arFields1);
+			}
+
+			$result = \Bitrix\Sale\Compatible\OrderCompatibility::update($ID, array_merge($arFields, $arFields1), $bDateUpdate);
+			if (!$result->isSuccess())
+			{
+				foreach($result->getErrorMessages() as $error)
+				{
+					$APPLICATION->ThrowException($error);
+				}
+
+				return false;
+			}
+			else
+			{
+				$arOrderOldFields = array();
+
+				$resultFields = $result->getData();
+				if (!empty($resultFields['OLD_FIELDS']) && is_array($resultFields['OLD_FIELDS']))
+				{
+					$arOrderOldFields = $resultFields['OLD_FIELDS'];
+				}
+
+				$updated = true;
+			}
 		}
+		else
+		{
 
-		//get old fields
-		$arOrderOldFields = CSaleOrder::GetByID($ID);
+			$strUpdate = $DB->PrepareUpdate("b_sale_order", $arFields);
 
-		$strSql =
-			"UPDATE b_sale_order SET ".
-			"	".$strUpdate." ";
-		if($bDateUpdate)
-			$strSql .=	",	DATE_UPDATE = ".$DB->GetNowFunction()." ";
-		$strSql .=	"WHERE ID = ".$ID." ";
+			foreach ($arFields1 as $key => $value)
+			{
+				if (strlen($strUpdate)>0) $strUpdate .= ", ";
+				$strUpdate .= $key."=".$value." ";
+			}
 
-		$res = $DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+			//get old fields
+			$arOrderOldFields = CSaleOrder::GetByID($ID);
 
-		if (!$res)
-			return false;
+			$strSql =
+				"UPDATE b_sale_order SET ".
+				"	".$strUpdate." ";
+			if($bDateUpdate)
+				$strSql .=	",	DATE_UPDATE = ".$DB->GetNowFunction()." ";
+			$strSql .=	"WHERE ID = ".$ID." ";
+
+			$updated = $DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__);
+
+			if (!$updated)
+				return false;
+
+		}
 
 		$USER_FIELD_MANAGER->Update("ORDER", $ID, $arFields);
 
-		if ($res)
+		if ($updated)
 			CSaleOrderChange::AddRecordsByFields($ID, $arOrderOldFields, $arFields);
 
 		unset($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID]);
@@ -334,6 +411,7 @@ class CSaleOrder extends CAllSaleOrder
 				$userId =  (isset($arFields["USER_ID"])) ? $arFields["USER_ID"] : $arOrderOldFields["USER_ID"];
 
 				$payerName = "";
+				$payerEMail = '';
 				$dbUser = CUser::GetByID($userId);
 				if ($arUser = $dbUser->Fetch())
 				{
@@ -345,12 +423,12 @@ class CSaleOrder extends CAllSaleOrder
 
 				$arEmailFields = Array(
 					"ORDER_ID" => $accountNumber,
-					"ORDER_DATE" => Date($DB->DateFormatToPHP(CLang::GetDateFormat("SHORT", $arOrder["LID"]))),
+					"ORDER_DATE" => Date($DB->DateFormatToPHP(CLang::GetDateFormat("SHORT", $arOrderOldFields["LID"]))),
 					"ORDER_USER" => $payerName,
 					"ORDER_TRACKING_NUMBER" => $arFields["TRACKING_NUMBER"],
-					"BCC" => COption::GetOptionString("sale", "order_email", "order@".$SERVER_NAME),
+					"BCC" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER['SERVER_NAME']),
 					"EMAIL" => $payerEMail,
-					"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$SERVER_NAME)
+					"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER['SERVER_NAME'])
 				);
 
 				$event = new CEvent;
@@ -369,7 +447,6 @@ class CSaleOrder extends CAllSaleOrder
 
 	public static function PrepareGetListArray($key, &$arFields, &$arPropIDsTmp)
 	{
-		global $DB;
 		$propIDTmp = false;
 		if (StrPos($key, "PROPERTY_ID_") === 0)
 			$propIDTmp = IntVal(substr($key, StrLen("PROPERTY_ID_")));
@@ -382,6 +459,8 @@ class CSaleOrder extends CAllSaleOrder
 		elseif (StrPos($key, "PROPERTY_VAL_BY_CODE_") === 0)
 			$propIDTmp = preg_replace("/[^a-zA-Z0-9_-]/is", "", trim(substr($key, StrLen("PROPERTY_VAL_BY_CODE_"))));
 
+		$locationPropInfo = self::getLocationPropertyInfo();
+
 		if (strlen($propIDTmp) > 0 || $propIDTmp > 0)
 		{
 			if (!in_array($propIDTmp, $arPropIDsTmp))
@@ -391,18 +470,33 @@ class CSaleOrder extends CAllSaleOrder
 				$arFields["PROPERTY_ID_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
 				$arFields["PROPERTY_ORDER_PROPS_ID_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".ORDER_PROPS_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
 				$arFields["PROPERTY_NAME_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
-				$arFields["PROPERTY_VALUE_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
+				
+				if(CSaleLocation::isLocationProMigrated() && isset($locationPropInfo['ID'][$propIDTmp]))
+				{
+					$arFields["PROPERTY_VALUE_".$propIDTmp] = array("FIELD" => "L_".$propIDTmp.".ID", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID) INNER JOIN b_sale_location L_".$propIDTmp." ON (SP_".$propIDTmp.".VALUE = L_".$propIDTmp.".CODE)");
+				}
+				else
+				{
+					$arFields["PROPERTY_VALUE_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
+				}
+
 				$arFields["PROPERTY_CODE_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".ORDER_PROPS_ID = ".$propIDTmp." AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
-				$arFields["PROPERTY_VAL_BY_CODE_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".CODE = '".$propIDTmp."' AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
+
+				if(CSaleLocation::isLocationProMigrated() && isset($locationPropInfo['CODE'][$propIDTmp]))
+				{
+					$arFields["PROPERTY_VAL_BY_CODE_".$propIDTmp] = array("FIELD" => "L_".$propIDTmp.".ID", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".CODE = '".$propIDTmp."' AND O.ID = SP_".$propIDTmp.".ORDER_ID) INNER JOIN b_sale_location L_".$propIDTmp." ON (SP_".$propIDTmp.".VALUE = L_".$propIDTmp.".CODE)");
+				}
+				else
+				{
+					$arFields["PROPERTY_VAL_BY_CODE_".$propIDTmp] = array("FIELD" => "SP_".$propIDTmp.".VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP_".$propIDTmp." ON (SP_".$propIDTmp.".CODE = '".$propIDTmp."' AND O.ID = SP_".$propIDTmp.".ORDER_ID)");
+				}
 			}
 		}
 	}
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из заказов в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из заказов в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = Array("ID"=>"DESC") Массив, в соответствии с которым сортируются результирующие
@@ -415,8 +509,6 @@ class CSaleOrder extends CAllSaleOrder
 	* имеет несколько элементов, то результирующий набор сортируется
 	* последовательно по каждому элементу (т.е. сначала сортируется по
 	* первому элементу, потом результат сортируется по второму и т.д.).
-	*
-	*
 	*
 	* @param array $arFilter = Array() Массив, в соответствии с которым фильтруются записи заказов.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -457,8 +549,6 @@ class CSaleOrder extends CAllSaleOrder
 	* ключи DATE_UPDATE_FROM, DATE_UPDATE_TO для фильтрации по дате изменения и DATE_FROM,
 	* DATE_TO для фильтрации по дате добавления заказа.</p>
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи заказов. Массив
 	* имеет вид: <pre class="syntax"> array("название_поля1", "группирующая_функция2"
 	* =&gt; "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
@@ -466,29 +556,23 @@ class CSaleOrder extends CAllSaleOrder
 	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
 	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
 	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то метод
 	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
 	* умолчанию - <i>false</i> - означает, что результат группироваться не
 	* будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
@@ -506,9 +590,8 @@ class CSaleOrder extends CAllSaleOrder
 	* с внутреннего счета).</td> </tr> <tr> <td>PAY_VOUCHER_NUM</td> <td>Номер платежного
 	* поручения.</td> </tr> <tr> <td>PAY_VOUCHER_DATE</td> <td>Дата платежного поручения.</td>
 	* </tr> </table> <p>Если в качестве параметра arGroupBy передается пустой
-	* массив, то функция вернет число записей, удовлетворяющих
-	* фильтру.</p> <a name="examples"></a>
-	*
+	* массив, то метод вернет число записей, удовлетворяющих фильтру.</p>
+	* <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -571,9 +654,18 @@ class CSaleOrder extends CAllSaleOrder
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/csaleorder__getlist.41061294.php
 	* @author Bitrix
 	*/
-	public static function GetList($arOrder = Array("ID"=>"DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arOptions = array())
+	public static function GetList($arOrder = array("ID"=>"DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array(), $arOptions = array())
 	{
 		global $DB, $USER_FIELD_MANAGER;
+
+		if (!is_array($arOrder))
+			$arOrder = array('ID' => 'DESC');
+		if (!is_array($arFilter))
+			$arFilter = array();
+		if (!is_array($arSelectFields))
+			$arSelectFields = array();
+
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("ORDER", "O.ID");
@@ -719,7 +811,15 @@ class CSaleOrder extends CAllSaleOrder
 			unset($arFilter["CUSTOM_SUBQUERY"]);
 		}
 
-		if (count($arSelectFields) <= 0)
+		if ($isOrderConverted == "Y")
+		{
+			$result = \Bitrix\Sale\Compatible\OrderCompatibility::getList($arOrder, $arFilter, $arGroupBy, $arNavStartParams, $arSelectFields, $callback);
+			$result->addFetchAdapter(new \Bitrix\Sale\Compatible\OrderFetchAdapter());
+			return $result;
+		}
+
+
+		if (empty($arSelectFields))
 		{
 			$arSelectFields = array(
 				"ID",
@@ -898,7 +998,7 @@ class CSaleOrder extends CAllSaleOrder
 			"DATE_CANCELED" => array("FIELD" => "O.DATE_CANCELED", "TYPE" => "datetime"),
 			"EMP_CANCELED_ID" => array("FIELD" => "O.EMP_CANCELED_ID", "TYPE" => "int"),
 			"REASON_CANCELED" => array("FIELD" => "O.REASON_CANCELED", "TYPE" => "string"),
-			"STATUS_ID" => array("FIELD" => "O.STATUS_ID", "TYPE" => "char"),
+			"STATUS_ID" => array("FIELD" => "O.STATUS_ID", "TYPE" => "string"),
 			"DATE_STATUS" => array("FIELD" => "O.DATE_STATUS", "TYPE" => "datetime"),
 			"PAY_VOUCHER_NUM" => array("FIELD" => "O.PAY_VOUCHER_NUM", "TYPE" => "string"),
 			"PAY_VOUCHER_DATE" => array("FIELD" => "O.PAY_VOUCHER_DATE", "TYPE" => "date"),
@@ -942,17 +1042,21 @@ class CSaleOrder extends CAllSaleOrder
 			"RECOUNT_FLAG" => array("FIELD" => "O.RECOUNT_FLAG", "TYPE" => "char"),
 			"AFFILIATE_ID" => array("FIELD" => "O.AFFILIATE_ID", "TYPE" => "int"),
 			"LOCKED_BY" => array("FIELD" => "O.LOCKED_BY", "TYPE" => "int"),
+
 			"LOCK_STATUS" => array("FIELD" => "if(DATE_LOCK is null, 'green', if(DATE_ADD(DATE_LOCK, interval ".$maxLock." MINUTE)<now(), 'green', if(LOCKED_BY=".$userID.", 'yellow', 'red')))", "TYPE" => "string"),
-			"LOCK_USER_NAME" => array("FIELD" => "concat('(',UL.LOGIN,') ',UL.NAME,' ',UL.LAST_NAME)", "FROM" => "LEFT JOIN b_user UL ON (O.LOCKED_BY = UL.ID)", "TYPE" => "string"),
+
+			"LOCK_USER_NAME" => array("FIELD" => "concat('(', UL.LOGIN ,') ',UL.NAME,' ',UL.LAST_NAME)", "FROM" => "LEFT JOIN b_user UL ON (O.LOCKED_BY = UL.ID)", "TYPE" => "string"),
+
 			"DELIVERY_DOC_NUM" => array("FIELD" => "O.DELIVERY_DOC_NUM", "TYPE" => "string"),
 			"DELIVERY_DOC_DATE" => array("FIELD" => "O.DELIVERY_DOC_DATE", "TYPE" => "date"),
 			"UPDATED_1C" => array("FIELD" => "O.UPDATED_1C", "TYPE" => "string"),
 			"STORE_ID" => array("FIELD" => "O.STORE_ID", "TYPE" => "int"),
+			"BY_RECOMMENDATION" => array("FIELD" => "(SELECT (CASE WHEN MAX(BR.RECOMMENDATION) IS NULL OR MAX(BR.RECOMMENDATION) = '' THEN 'N' ELSE 'Y' END) FROM b_sale_basket BR WHERE BR.ORDER_ID=O.ID GROUP BY BR.ORDER_ID)", "TYPE" => "char"),
 
 			"ORDER_TOPIC" => array("FIELD" => "O.ORDER_TOPIC", "TYPE" => "string"),
 			"RESPONSIBLE_ID" => array("FIELD" => "O.RESPONSIBLE_ID", "TYPE" => "int"),
-			"DATE_PAY_BEFORE" => array("FIELD" => "O.DATE_PAY_BEFORE", "TYPE" => "datetime"),
-			"DATE_BILL" => array("FIELD" => "O.DATE_BILL", "TYPE" => "datetime"),
+			"DATE_PAY_BEFORE" => array("FIELD" => "O.DATE_PAY_BEFORE", "TYPE" => "date"),
+			"DATE_BILL" => array("FIELD" => "O.DATE_BILL", "TYPE" => "date"),
 			"ACCOUNT_NUMBER" => array("FIELD" => "O.ACCOUNT_NUMBER", "TYPE" => "string"),
 			"TRACKING_NUMBER" => array("FIELD" => "O.TRACKING_NUMBER", "TYPE" => "string"),
 			"XML_ID" => array("FIELD" => "O.XML_ID", "TYPE" => "string"),
@@ -990,18 +1094,8 @@ class CSaleOrder extends CAllSaleOrder
 			"BASKET_DISCOUNT_VALUE" => array("FIELD" => "B.DISCOUNT_VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 			"BASKET_DISCOUNT_COUPON" => array("FIELD" => "B.DISCOUNT_COUPON", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 			"BASKET_VAT_RATE" => array("FIELD" => "B.VAT_RATE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
-
-			"STATUS_PERMS_GROUP_ID" => array("FIELD" => "SS2G.GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_VIEW" => array("FIELD" => "SS2G.PERM_VIEW", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_CANCEL" => array("FIELD" => "SS2G.PERM_CANCEL", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_MARK" => array("FIELD" => "SS2G.PERM_MARK", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_DELIVERY" => array("FIELD" => "SS2G.PERM_DELIVERY", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_DEDUCTION" => array("FIELD" => "SS2G.PERM_DEDUCTION", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_PAYMENT" => array("FIELD" => "SS2G.PERM_PAYMENT", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_STATUS" => array("FIELD" => "SS2G.PERM_STATUS", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_STATUS_FROM" => array("FIELD" => "SS2G.PERM_STATUS_FROM", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_UPDATE" => array("FIELD" => "SS2G.PERM_UPDATE", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
-			"STATUS_PERMS_PERM_DELETE" => array("FIELD" => "SS2G.PERM_DELETE", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_status2group SS2G ON (O.STATUS_ID = SS2G.STATUS_ID)"),
+			"BASKET_RECOMMENDATION" => array("FIELD" => "B.RECOMMENDATION", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
+			"BASKET_PRICE_TOTAL" => array("FIELD" => "(B.PRICE * B.QUANTITY)", "TYPE" => "double", "FROM" => "INNER JOIN b_sale_basket B ON (O.ID = B.ORDER_ID)"),
 
 			"PROPERTY_ID" => array("FIELD" => "SP.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
 			"PROPERTY_ORDER_PROPS_ID" => array("FIELD" => "SP.ORDER_PROPS_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
@@ -1010,9 +1104,10 @@ class CSaleOrder extends CAllSaleOrder
 			"PROPERTY_CODE" => array("FIELD" => "SP.CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
 			"PROPERTY_VAL_BY_CODE" => array("FIELD" => "SP.VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props_value SP ON (O.ID = SP.ORDER_ID)"),
 
-			"COMPLETE_ORDERS" => array("WHERE" => array(self, "ProcessCompleteOrdersParam")),
 			"DELIVERY_DATE_REQUEST" => array("FIELD" => "OD.DATE_REQUEST", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order_delivery OD ON (O.ID = OD.ORDER_ID)")
 		);
+		require_once $_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/sale/general/status.php';
+		CSaleStatusAdapter::addFieldsTo($arFields, 'O.STATUS_ID', 'STATUS_PERMS_');
 		// <-- FIELDS
 
 		$arPropIDsTmp = array();
@@ -1027,7 +1122,7 @@ class CSaleOrder extends CAllSaleOrder
 			CSaleOrder::PrepareGetListArray($key, $arFields, $arPropIDsTmp);
 		}
 
-		if ($arGroupBy)
+		if (is_array($arGroupBy))
 			foreach ($arGroupBy as $key => $value)
 				CSaleOrder::PrepareGetListArray($key, $arFields, $arPropIDsTmp);
 
@@ -1039,6 +1134,7 @@ class CSaleOrder extends CAllSaleOrder
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
 		$r = $obUserFieldsSql->GetFilter();
+		$strSqlUFFilter = '';
 		if(strlen($r)>0)
 			$strSqlUFFilter = " (".$r.") ";
 

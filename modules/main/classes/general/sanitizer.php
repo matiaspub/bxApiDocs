@@ -79,6 +79,8 @@
 			{
 				$this->localAlph="";
 			}
+
+			$this->localAlph .= '\\x80-\\xFF';
 		}
 
 		/**
@@ -91,18 +93,13 @@
 		* <p>Добавляет тэги и их атрибуты в список разрешенных к использованию.</p> <p>Возвращает количество добавленных в список тэгов.</p> <p><b>CBXSanitizer::AddTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		*
-		*
 		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
 		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
 		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
 		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
 		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
 		*
-		*
-		*
 		* @return int 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -144,18 +141,13 @@
 		* <p>Обновляет тэги и их атрибуты в списоке разрешенных к использованию.</p> <p>Возвращает количество обновленных в списке тэгов.</p> <p><b>CBXSanitizer::UpdateTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		*
-		*
 		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
 		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
 		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
 		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
 		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
 		*
-		*
-		*
 		* @return int 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -185,16 +177,11 @@
 		* <p>Удаляет тэги из списка разрешенных к использованию.</p> <p>Возвращает количество удаленных из списка тэгов.</p> <p><b>CBXSanitizer::DelTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		*
-		*
 		* @param array $arTagsNames  Массив содержащий имена тэгов, которые необходимо удалить из
 		* списка разрешенных тэгов. <ul> <li>Имя тэга 1</li> <li>Имя тэга 2</li> <li>...</li>
 		* </ul>
 		*
-		*
-		*
 		* @return int 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -231,13 +218,10 @@
 		 */
 		
 		/**
-		* <p>Удаляет все тэги из списка разрешенных к использованию.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DelAllTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>.</p>
-		*
-		*
+		* <p>Удаляет все тэги из списка разрешенных к использованию.</p> <p>Метод ничего не возвращает.</p> <p><b>CBXSanitizer::DelAllTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>.</p>
 		*
 		*
 		* @return void 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -278,17 +262,12 @@
 		 */
 		
 		/**
-		* <p>Применяет, либо удаляет настройку класса - применять функцию htmlspecialchars к простому тексту и тэгам не входящим в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::ApplyHtmlSpecChars()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		*
-		*
+		* <p>Применяет, либо удаляет настройку класса - применять функцию htmlspecialchars к простому тексту и тэгам не входящим в список разрешенных.</p> <p>Метод ничего не возвращает.</p> <p><b>CBXSanitizer::ApplyHtmlSpecChars()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
 		* @param bool $bApply = true Логический параметр, принимающий значения true, либо false.
 		*
-		*
-		*
 		* @return void 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -316,17 +295,12 @@
 		 */
 		
 		/**
-		* <p>Применяет, либо удаляет настройку класса - удалять тэги не входящие в список разрешенных.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::DeleteSanitizedTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		*
-		*
+		* <p>Применяет, либо удаляет настройку класса - удалять тэги не входящие в список разрешенных.</p> <p>Метод ничего не возвращает.</p> <p><b>CBXSanitizer::DeleteSanitizedTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
 		* @param bool $bApply = true Логический параметр, принимающий значения <i>true</i>, либо <i>false</i>.
 		*
-		*
-		*
 		* @return void 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -354,9 +328,7 @@
 		 */
 		
 		/**
-		* <p>Заполняет массив тэгов, разрешенных к использованию в соответствии с выбранным уровнем.</p> <p>Функция ничего не возвращает.</p> <p><b>CBXSanitizer::SetLevel()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
-		*
-		*
+		* <p>Заполняет массив тэгов, разрешенных к использованию в соответствии с выбранным уровнем.</p> <p>Метод ничего не возвращает.</p> <p><b>CBXSanitizer::SetLevel()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
 		* @param bool $secLevel  <p>Может принимать следующие значения: </p> <ul> <li>CBXSanitizer::SECURE_LEVEL_HIGH</li>
@@ -401,10 +373,7 @@
 		* array('align','valign','style','id','class'), 'tr' =&gt; array('align','valign','style','id','class'), 'u' =&gt;
 		* array('style','id','class'), 'ul' =&gt; array('style','id','class') ); </pre>
 		*
-		*
-		*
 		* @return void 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -574,7 +543,7 @@
 					if(!preg_match("#^(http://|https://|ftp://|file://|mailto:|callto:|skype:|\\#|/)#i".BX_UTF_PCRE_MODIFIER, $attrValue))
 						$arAttr[3] = "http://".$arAttr[3];
 
-					$valid = (!preg_match("#javascript:|data:|[^\\w".$this->localAlph.":/\\.=@;,!~\\*\\&\\#\\)(%\\s\\+\$\\?\\-]#i".BX_UTF_PCRE_MODIFIER, $attrValue)) ? true : false;
+					$valid = (!preg_match("#javascript:|data:|[^\\w".$this->localAlph."a-zA-Z:/\\.=@;,!~\\*\\&\\#\\)(%\\s\\+\$\\?\\-]#i".BX_UTF_PCRE_MODIFIER, $attrValue)) ? true : false;
 					break;
 
 				case 'height':
@@ -590,7 +559,7 @@
 					break;
 
 				case 'style':
-					$valid = !preg_match("#(behavior|expression|position|javascript)#i".BX_UTF_PCRE_MODIFIER, $attrValue) && !preg_match("#[^\\w\\s)(,:\\.;\\-]#i".BX_UTF_PCRE_MODIFIER, $attrValue) ? true : false;
+					$valid = !preg_match("#(behavior|expression|position|javascript)#i".BX_UTF_PCRE_MODIFIER, $attrValue) && !preg_match("#[^\\w\\s)(,:\\.;\\-\\#]#i".BX_UTF_PCRE_MODIFIER, $attrValue) ? true : false;
 					break;
 
 				case 'coords':
@@ -598,7 +567,7 @@
 					break;
 
 				default:
-					$valid = !preg_match("#[^\\#\\w".$this->localAlph."\\-\\#\\.]#i".BX_UTF_PCRE_MODIFIER, $attrValue) ? true : false;
+					$valid = !preg_match("#[^\\s\\w".$this->localAlph."\\-\\#\\.]#i".BX_UTF_PCRE_MODIFIER, $attrValue) ? true : false;
 					break;
 			}
 
@@ -614,10 +583,7 @@
 		* <p>Возвращает список разрешенных к использованию тэгов в виде отформатированного текста.</p> <p><b>CBXSanitizer::GetTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		*
-		*
 		* @return void 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -695,14 +661,9 @@
 		* <p>Очищает HTML переданный в качестве параметра от тэгов и атрибутов не содержащихся в списке разрешенных.</p> <p>Возвращает очищенный html.</p> <p><b>CBXSanitizer::SanitizeHtml()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		*
-		*
 		* @param string $html  текст в формате html. </h
 		*
-		*
-		*
 		* @return string 
-		*
 		*
 		* <h4>Example</h4> 
 		* <pre>
@@ -787,12 +748,22 @@
 							preg_match_all('#([a-z_]+)\s*=\s*([\'\"])\s*(.*?)\s*\2#i'.BX_UTF_PCRE_MODIFIER, $matches[3], $arTagAttrs, PREG_SET_ORDER);
 							$attr = array();
 							foreach($arTagAttrs as $arTagAttr)
+							{
 								if(in_array(strtolower($arTagAttr[1]), $this->arHtmlTags[$seg[$i]['tagName']]))
+								{
 									if($this->IsValidAttr($arTagAttr))
+									{
 										if($this->bHtmlSpecChars)
+										{
 											$attr[strtolower($arTagAttr[1])] = htmlspecialchars($arTagAttr[3], ENT_QUOTES, LANG_CHARSET, $this->bDoubleEncode);
+										}
 										else
+										{
 											$attr[strtolower($arTagAttr[1])] = $arTagAttr[3];
+										}
+									}
+								}
+							}
 
 							$seg[$i]['attr'] = $attr;
 							if($seg[$i]['tagName'] == 'code')

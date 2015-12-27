@@ -1,7 +1,7 @@
 <?
 use \Bitrix\Main\Localization\Loc;
 
-Loc::loadLanguageFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
 if(!defined('B24NETWORK_URL'))
 {
@@ -24,15 +24,21 @@ class CSocServBitrix24Net extends CSocServAuth
 		);
 	}
 
-	public function getFormHtml()
+	public function getFormHtml($arParams)
 	{
 		$url = $this->getUrl("popup");
 
 		$phrase = ($arParams["FOR_INTRANET"]) ? Loc::getMessage("socserv_b24net_note_intranet") : Loc::getMessage("socserv_b24net_note");
 
 		return $arParams["FOR_INTRANET"]
-			? array("ON_CLICK" => 'onclick="window.location.href = \''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\'"')
-			: '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 800, 600)" class="bx-ss-button bitrix24net-button"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
+			? array("ON_CLICK" => 'onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 800, 600)"')
+			: '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 800, 600)" class="bx-ss-button bitrix24net-button bitrix24net-button-'.LANGUAGE_ID.'"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
+	}
+
+	public function GetOnClickJs()
+	{
+		$url = $this->getUrl("popup");
+		return "BX.util.popup('".CUtil::JSEscape($url)."', 800, 600)";
 	}
 
 	public function getEntityOAuth($code = false)
@@ -82,6 +88,7 @@ class CSocServBitrix24Net extends CSocServAuth
 		global $APPLICATION;
 		$APPLICATION->RestartBuffer();
 
+		$bProcessState = false;
 		$authError = SOCSERV_AUTHORISATION_ERROR;
 
 		if(
@@ -90,9 +97,11 @@ class CSocServBitrix24Net extends CSocServAuth
 		)
 		{
 			$redirect_uri = CSocServUtil::ServerName().'/bitrix/tools/oauth/bitrix24net.php';
+			$bProcessState = true;
 
 			if($this->getEntityOAuth($_REQUEST["code"])->GetAccessToken($redirect_uri) !== false)
 			{
+
 				$arB24NetUser = $this->entityOAuth->GetCurrentUser();
 				if($arB24NetUser)
 				{
@@ -109,6 +118,7 @@ class CSocServBitrix24Net extends CSocServAuth
 							if($arUser['CONFIRM_CODE'] == $checkword)
 							{
 								$arUserFields = array(
+									'CONFIRM_CODE' => '',
 									'XML_ID' => $arB24NetUser['ID'],
 									'EXTERNAL_AUTH_ID' => 'socservices',
 								);
@@ -172,6 +182,11 @@ class CSocServBitrix24Net extends CSocServAuth
 		$url = ($APPLICATION->GetCurDir() == "/login/") ? "" : $APPLICATION->GetCurDir();
 
 		$mode = 'page';
+
+		if(!$bProcessState)
+		{
+			unset($_REQUEST["state"]);
+		}
 
 		if(isset($_REQUEST["state"]))
 		{
@@ -462,6 +477,7 @@ class CBitrix24NetOAuthInterface
 		}
 
 		$http = new \Bitrix\Main\Web\HttpClient(array('socketTimeout' => $this->httpTimeout));
+
 		$result = $http->get(self::NET_URL.self::TOKEN_URL.'?'.http_build_query(array(
 			'code' => $this->code,
 			'client_id' => $this->appID,
@@ -500,13 +516,14 @@ class CBitrix24NetOAuthInterface
 			$this->addScope($scope);
 
 		$http = new \Bitrix\Main\Web\HttpClient(array('socketTimeout' => $this->httpTimeout));
+
 		$result = $http->get(self::NET_URL.self::TOKEN_URL.'?'.http_build_query(array(
-				'client_id' => $this->appID,
-				'client_secret' => $this->appSecret,
-				'refresh_token' => $refreshToken,
-				'scope' => implode(',',$this->getScope()),
-				'grant_type' => 'refresh_token',
-			)));
+			'client_id' => $this->appID,
+			'client_secret' => $this->appSecret,
+			'refresh_token' => $refreshToken,
+			'scope' => implode(',',$this->getScope()),
+			'grant_type' => 'refresh_token',
+		)));
 
 		$arResult = CUtil::JsObjectToPhp($result);
 
@@ -635,18 +652,23 @@ class CBitrix24NetTransport
 		$this->access_token = $access_token;
 	}
 
-	protected function prepareAnswer($result)
+	protected function prepareResponse($result)
 	{
-		if(!defined("BX_UTF"))
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
-		$res = CUtil::JsObjectToPhp($result);
+		return \Bitrix\Main\Web\Json::decode($result);
+	}
 
-		if(!$res)
-		{
-			AddMessage2Log('Strange answer from Network! '.$result.print_r($res,1));
-		}
+	protected function prepareRequest(array $request)
+	{
+		$request["auth"] = $this->access_token;
 
-		return $res;
+		return $this->convertRequest($request);
+	}
+
+	protected function convertRequest(array $request)
+	{
+		global $APPLICATION;
+
+		return $APPLICATION->ConvertCharsetArray($request, LANG_CHARSET, 'utf-8');
 	}
 
 	public function call($methodName, $additionalParams = null)
@@ -656,15 +678,29 @@ class CBitrix24NetTransport
 			$additionalParams = array();
 		}
 
-		$additionalParams['auth'] = $this->access_token;
+		$request = $this->prepareRequest($additionalParams);
 
 		$http = new \Bitrix\Main\Web\HttpClient(array('socketTimeout' => $this->httpTimeout));
 		$result = $http->post(
 			CBitrix24NetOAuthInterface::NET_URL.self::SERVICE_URL.$methodName,
-			$additionalParams
+			$request
 		);
 
-		return $this->prepareAnswer($result);
+		try
+		{
+			$res = $this->prepareResponse($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$res = false;
+		}
+
+		if(!$res)
+		{
+			AddMessage2Log('Strange answer from Network! '.$http->getStatus().' '.$result);
+		}
+
+		return $res;
 	}
 
 	public function batch($actions)
@@ -718,4 +754,40 @@ class CBitrix24NetTransport
 		$this->httpTimeout = 2;
 		return $this->call(self::METHOD_PROFILE_CHANNEL);
 	}
+}
+
+class CBitrix24NetPortalTransport extends CBitrix24NetTransport
+{
+	protected $clientId = null;
+	protected $clientSecret = null;
+
+	public static function init()
+	{
+		$result = parent::init();
+
+		if(!$result)
+		{
+			$interface = new CBitrix24NetOAuthInterface();
+			$result = new self($interface->getAppID(), $interface->getAppSecret());
+		}
+
+		return $result;
+	}
+
+	public function __construct($clientId, $clientSecret)
+	{
+		$this->clientId = $clientId;
+		$this->clientSecret = $clientSecret;
+
+		return parent::__construct('');
+	}
+
+	protected function prepareRequest(array $request)
+	{
+		$request["client_id"] = $this->clientId;
+		$request["client_secret"] = $this->clientSecret;
+
+		return $this->convertRequest($request);
+	}
+
 }

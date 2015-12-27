@@ -14,7 +14,7 @@ class CTextParser
 
 	public $imageWidth = 800;
 	public $imageHeight = 800;
-	public $maxStringLen = 60;
+	public $maxStringLen = 0;
 	public $maxAnchorLength = 40;
 	public $arFontSize = array(
 		1 => 40, //"xx-small"
@@ -47,11 +47,13 @@ class CTextParser
 	protected $wordSeparator = "\\s.,;:!?\\#\\-\\*\\|\\[\\]\\(\\)\\{\\}";
 	protected $smilePatterns = null;
 	protected $smileReplaces = null;
-	protected static $defSmiles = null;
+	protected static $repoSmiles = array();
+	public $smilesGallery = CSmileGallery::GALLERY_DEFAULT;
 	protected $defended_urls = array();
 	protected $anchorSchemes = null;
 	protected $userField;
 	public $bMobile = false;
+	public $LAZYLOAD = "N";
 
 	/* @deprecated */ public $allowImgExt = "gif|jpg|jpeg|png";
 
@@ -84,10 +86,9 @@ class CTextParser
 
 	protected function initSmiles()
 	{
-		if(static::$defSmiles === null)
+		if (!array_key_exists($this->smilesGallery, self::$repoSmiles))
 		{
-			$smiles = CSmile::getByType();
-
+			$smiles = CSmile::getByGalleryId(CSmile::TYPE_SMILE, $this->smilesGallery);
 			$arSmiles = array();
 			foreach($smiles as $smile)
 			{
@@ -102,9 +103,9 @@ class CTextParser
 					));
 				}
 			}
-			static::$defSmiles = $arSmiles;
+			self::$repoSmiles[$this->smilesGallery] = $arSmiles;
 		}
-		$this->smiles = static::$defSmiles;
+		$this->smiles = self::$repoSmiles[$this->smilesGallery];
 	}
 
 	protected function initSmilePatterns()
@@ -112,7 +113,7 @@ class CTextParser
 		$this->smilePatterns = array();
 		$this->smileReplaces = array();
 
-		$pre = "[^\\w&]";
+		$pre = "";
 		foreach ($this->smiles as $row)
 		{
 			if(preg_match("/\\w\$/", $row["TYPING"]))
@@ -128,20 +129,35 @@ class CTextParser
 				$code = preg_quote(str_replace(array("\x5C"), array("&#092;"), $code));
 				$image = preg_quote(str_replace("'", "\\'", $row["IMAGE"]));
 				$description = preg_quote(htmlspecialcharsbx(str_replace(array("\x5C"), array("&#092;"), $row["DESCRIPTION"]), ENT_QUOTES), "/");
-				$width = intval($row["IMAGE_WIDTH"]);
-				$height = intval($row["IMAGE_HEIGHT"]);
-				$descriptionDecode = $row["DESCRIPTION_DECODE"] == 'Y'? true: false;
 
-				if(in_array($row["TYPING"], array(":/", "8)")))
-					$this->smilePatterns[] = "/(?<=".$pre.")$patt(?=.\\W|\\W.|\\W$)/ei".BX_UTF_PCRE_MODIFIER;
-				else
-					$this->smilePatterns[] = "/".$patt."/ei".BX_UTF_PCRE_MODIFIER;
+				$patternName = "pattern".count($this->smilePatterns);
 
-				$this->smileReplaces[] = "\$this->convert_emoticon('".$code."', '".$image."', '".$description."', '".$width."', '".$height."', '".$descriptionDecode."')";
+				$this->smilePatterns[] = "/(?<=^|\\>|[".$this->wordSeparator."\\&]".$pre.")(?P<".$patternName.">$patt)(?=$|\\<|[".$this->wordSeparator."\\&])/s".BX_UTF_PCRE_MODIFIER;
+
+				$this->smileReplaces[$patternName] = array(
+					"code" => $code,
+					"image" => $image,
+					"description" => $description,
+					"width" => intval($row["IMAGE_WIDTH"]),
+					"height" => intval($row["IMAGE_HEIGHT"]),
+					"descriptionDecode" => $row["DESCRIPTION_DECODE"] == 'Y'? true: false,
+					"imageDefinition" => $row["IMAGE_DEFINITION"]? $row["IMAGE_DEFINITION"]: CSmile::IMAGE_SD
+				);
 			}
 		}
+		usort($this->smilePatterns, function($a, $b) { return (strlen($a) > strlen($b) ? -1 : 1); });
 	}
-
+	protected static function chr($a)
+	{
+		return \CharsetConverter::ConvertCharset($a, 'cp1251', SITE_CHARSET);
+	}
+	protected static function strpos($s, $a)
+	{
+		$a = self::chr($a);
+		if (function_exists('mb_orig_strpos'))
+			return mb_orig_strpos($s, $a);
+		return strpos($s, $a);
+	}
 	public function convertText($text)
 	{
 		$text = preg_replace(array("#([?&;])PHPSESSID=([0-9a-zA-Z]{32})#is", "/\\x{00A0}/".BX_UTF_PCRE_MODIFIER), array("\\1PHPSESSID1=", " "), $text);
@@ -168,11 +184,6 @@ class CTextParser
 		foreach(GetModuleEvents("main", "TextParserBefore", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$text, &$this));
 
-		if ($this->allow["HTML"] != "Y" && $this->allow['NL2BR'] == 'Y')
-		{
-			$text = preg_replace("#<br(.*?)>#is", "\n", $text);
-		}
-
 		if ($this->allow["CODE"]=="Y")
 		{
 			$text = preg_replace_callback(
@@ -183,7 +194,10 @@ class CTextParser
 				$text
 			);
 		}
-
+		if ($this->allow["HTML"] != "Y" && $this->allow['NL2BR'] == 'Y')
+		{
+			$text = preg_replace("#<br(.*?)>#is", "\n", $text);
+		}
 		if ($this->allow["HTML"] != "Y")
 		{
 			if ($this->allow["ANCHOR"]=="Y")
@@ -318,11 +332,15 @@ class CTextParser
 			$text = preg_replace_callback($patt, array($this, "preconvertAnchor"), $text);
 
 			$word_separator = str_replace("?", "", $this->wordSeparator);
+			$patt = array("/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER);
+			if (self::strpos($text, "“") !== false)
+				$patt[] = "/(?<=[".self::chr("“")."])(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[".self::chr("”")."])/is".BX_UTF_PCRE_MODIFIER;
+			if (self::strpos($text, "‘") !== false)
+				$patt[] = "/(?<=[".self::chr("‘")."])(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[".self::chr("’")."])/is".BX_UTF_PCRE_MODIFIER;
+			if (self::strpos($text, "«") !== false)
+				$patt[] = "/(?<=[".self::chr("«")."])(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[".self::chr("»")."])/is".BX_UTF_PCRE_MODIFIER;
 
-			$text = preg_replace_callback(
-				"/(?<=^|[".$word_separator."]|\\s)(?<!\\[nomodify\\]|<nomodify>)((".$this->getAnchorSchemes()."):\\/\\/[._:a-z0-9@-].*?)(?=[\\s'\"{}\\[\\]]|&quot;|\$)/is".BX_UTF_PCRE_MODIFIER,
-				array($this, "preconvertUrl"), $text
-			);
+			$text = preg_replace_callback($patt, array($this, "preconvertUrl"), $text);
 		}
 		else if (!empty($patt))
 		{
@@ -357,14 +375,27 @@ class CTextParser
 
 				if (!empty($this->smilePatterns))
 				{
-					$text = preg_replace($this->smilePatterns, $this->smileReplaces, ' '.$text.' ');
+					$text = preg_replace_callback($this->smilePatterns, array($this, "convertEmoticon"), ' '.$text.' ');
 				}
 			}
 		}
 
 		$text = $this->post_convert_anchor_tag($text);
 
-		foreach ($this->allow as $tag => $val)
+		$res = array_merge(
+			array(
+				"VIDEO" => "N",
+				"IMG" => "N",
+				"ANCHOR" => "N",
+				"BIU" => "N",
+				"LIST" => "N",
+				"FONT" => "N",
+				"TABLE" => "N",
+				"ALIGN" => "N",
+				"QUOTE" => "N"
+			), $this->allow
+		);
+		foreach ($res as $tag => $val)
 		{
 			if ($val != "Y")
 				continue;
@@ -435,8 +466,8 @@ class CTextParser
 					{
 						$text = preg_replace(
 							array(
-								"/\\[list\\s*=\\s*1\\s*\\](\\s*)(.+?)\\[\\/list\\](([\\040\\r\\t]*)\\n?)/is".BX_UTF_PCRE_MODIFIER,
-								"/\\[list\\s*=\\s*a\\s*\\](\\s*)(.+?)\\[\\/list\\](([\\040\\r\\t]*)\\n?)/is".BX_UTF_PCRE_MODIFIER,
+								"/\\[list\\s*=\\s*1\\s*\\](\\s*)(.+?)\\[\\/list\\](([\040\\r\\t]*)\\n?)/is".BX_UTF_PCRE_MODIFIER,
+								"/\\[list\\s*=\\s*a\\s*\\](\\s*)(.+?)\\[\\/list\\](([\040\\r\\t]*)\\n?)/is".BX_UTF_PCRE_MODIFIER,
 								"/\\[\\*\\]/".BX_UTF_PCRE_MODIFIER,
 							),
 							array(
@@ -612,7 +643,7 @@ class CTextParser
 		if ($this->allow["HTML"] != "Y" && $this->maxStringLen > 0)
 		{
 			$text = preg_replace("/(\\&\\#\\d{1,3}\\;)/is".BX_UTF_PCRE_MODIFIER, "<\019\\1>", $text);
-			$text = preg_replace_callback("/(?<=^|\\>)([^\\<\\[]+)(?=\\<\\[|$)/is".BX_UTF_PCRE_MODIFIER, array($this, "partWords"), $text);
+			$text = preg_replace_callback("/(?<=^|\\>)([^\\<\\>\\[]+?)(?=\\<|\\[|$)/is".BX_UTF_PCRE_MODIFIER, array($this, "partWords"), $text);
 			$text = preg_replace("/(\\<\019((\\&\\#\\d{1,3}\\;))\\>)/is".BX_UTF_PCRE_MODIFIER, "\\2", $text);
 		}
 
@@ -628,12 +659,12 @@ class CTextParser
 		return trim($text);
 	}
 
-	public function defendTags($matches)
+public 	public function defendTags($matches)
 	{
 		return $this->defended_tags($matches[1], 'replace');
 	}
 
-	public function defended_tags($text, $tag = 'replace')
+public 	function defended_tags($text, $tag = 'replace')
 	{
 		$text = str_replace("\\\"", "\"", $text);
 		switch ($tag)
@@ -648,7 +679,7 @@ class CTextParser
 		return $text;
 	}
 
-	public static function convert4mail($text)
+public static 	function convert4mail($text)
 	{
 		$text = Trim($text);
 		if (strlen($text)<=0) return "";
@@ -707,6 +738,18 @@ class CTextParser
 		$arPattern[] = "/\\[DISK(.+?)\\]/is".BX_UTF_PCRE_MODIFIER;
 		$arReplace[] = "";
 
+		$arPattern[] = "/\\[(table)(.*?)\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "\n>================== \\1 ===================\n";
+
+		$arPattern[] = "/\\[\\/table(.*?)\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "\n>===========================================\n";
+
+		$arPattern[] = "/\\[tr\\]\\s+/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "";
+
+		$arPattern[] = "/\\[(\\/?)(tr|td)\\]/is".BX_UTF_PCRE_MODIFIER;
+		$arReplace[] = "";
+
 		$text = preg_replace($arPattern, $arReplace, $text);
 
 		$text = str_replace("&shy;", "", $text);
@@ -727,12 +770,12 @@ class CTextParser
 		return $text;
 	}
 
-	public function convertVideo($matches)
+public 	public function convertVideo($matches)
 	{
 		return $this->convert_video($matches[1], $matches[2]);
 	}
 
-	private function convert_video($params, $path)
+public 	private function convert_video($params, $path)
 	{
 		if (strlen($path) <= 0)
 			return "";
@@ -778,7 +821,25 @@ class CTextParser
 		return $this->defended_tags($video, 'replace');
 	}
 
-	public function convert_emoticon($code = "", $image = "", $description = "", $width = "", $height = "", $descriptionDecode = false)
+public 	function convertEmoticon($matches)
+	{
+		$replacement = reset(array_intersect_key($this->smileReplaces, $matches));
+		if (!empty($replacement))
+		{
+			return $this->convert_emoticon(
+				$replacement["code"],
+				$replacement["image"],
+				$replacement["description"],
+				$replacement["width"],
+				$replacement["height"],
+				$replacement["descriptionDecode"],
+				$replacement["imageDefinition"]
+			);
+		}
+		return $matches[0];
+	}
+
+public 	function convert_emoticon($code = "", $image = "", $description = "", $width = "", $height = "", $descriptionDecode = false, $imageDefinition = CSmile::IMAGE_SD)
 	{
 		if ($code == '' || $image == '')
 			return '';
@@ -790,7 +851,7 @@ class CTextParser
 		if ($descriptionDecode)
 			$description = htmlspecialcharsback($description);
 
-		$html = '<img src="'.$this->serverName.$this->pathToSmile.$image.'" border="0" data-code="'.$code.'" alt="'.$code.'" '.($width > 0? 'width="'.$width.'"':'').' '.($height > 0? 'height="'.$height.'"':'').' title="'.$description.'" class="bx-smile" />';
+		$html = '<img src="'.$this->serverName.$this->pathToSmile.$image.'" border="0" data-code="'.$code.'" data-definition="'.$imageDefinition.'" alt="'.$code.'" '.($width > 0? 'width="'.$width.'"':'').' '.($height > 0? 'height="'.$height.'"':'').' title="'.$description.'" class="bx-smile" />';
 		$cacheKey = md5($html);
 		if (!isset($this->preg["cache"][$cacheKey]))
 			$this->preg["cache"][$cacheKey] = $this->defended_tags($html, 'replace');
@@ -798,7 +859,7 @@ class CTextParser
 		return $this->preg["cache"][$cacheKey];
 	}
 
-	public function convertCode($matches)
+public 	public function convertCode($matches)
 	{
 		$text = $matches[2];
 
@@ -807,7 +868,7 @@ class CTextParser
 
 		$text = str_replace(
 			array("[nomodify]", "[/nomodify]", "&#91;", "&#93;", "&", "<", ">", "\\r", "\\n", "\\\"", "\\", "[", "]", "  ", "\t"),
-			array("", "", "[", "]", "&#38;", "&#60;", "&#62;", "&#92;r", "&#92;n", "\"", "&#92;", "&#91;", "&#93;", "&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;"),
+			array("", "", "[", "]", "&#38;", "&#60;", "&#62;", "&#92;r", "&#92;n", '&#92;"', "&#92;", "&#91;", "&#93;", "&nbsp;&nbsp;", "&nbsp;&nbsp;&nbsp;"),
 			$text
 		);
 
@@ -816,12 +877,12 @@ class CTextParser
 		return $this->defended_tags($this->convert_open_tag('code')."<pre>".$text."</pre>".$this->convert_close_tag('code'), 'replace');
 	}
 
-	public function convertQuote($matches)
+public 	public function convertQuote($matches)
 	{
 		return $this->convert_quote_tag($matches[1]);
 	}
 
-	static public function convertTable($matches)
+public 	public function convertTable($matches)
 	{
 		$text = preg_replace(
 			array(
@@ -836,10 +897,18 @@ class CTextParser
 				),
 			$matches[1]
 		);
-		return "<table class=\"data-table\">".$text."</table>";
+
+		if ($this->bMobile)
+		{
+			return "<div style=\"overflow-x: auto;\"><table class=\"data-table\">".$text."</table></div>";
+		}
+		else
+		{
+			return "<table class=\"data-table\">".$text."</table>";
+		}
 	}
 
-	public function convert_quote_tag($text = "")
+public 	function convert_quote_tag($text = "")
 	{
 		if (strlen($text)<=0)
 			return '';
@@ -849,7 +918,7 @@ class CTextParser
 		return $this->convert_open_tag('quote').$text.$this->convert_close_tag('quote');
 	}
 
-	public function convert_open_tag($marker = "quote")
+public 	function convert_open_tag($marker = "quote")
 	{
 		$marker = (strtolower($marker) == "code" ? "code" : "quote");
 
@@ -859,7 +928,7 @@ class CTextParser
 		return "<div class='".$marker."'><table class='".$marker."'><tr><td>";
 	}
 
-	public function convert_close_tag($marker = "quote")
+public 	function convert_close_tag($marker = "quote")
 	{
 		$marker = (strtolower($marker) == "code" ? "code" : "quote");
 
@@ -875,12 +944,12 @@ class CTextParser
 		return "</td></tr></table></div>";
 	}
 
-	public function convertImage($matches)
+public 	public function convertImage($matches)
 	{
 		return $this->convert_image_tag($matches[2], $matches[1]);
 	}
 
-	public function convert_image_tag($url = "", $params = "")
+public 	function convert_image_tag($url = "", $params = "")
 	{
 		$url = trim($url);
 		if (strlen($url)<=0)
@@ -921,28 +990,28 @@ class CTextParser
 		if($height > 0)
 			$strPar .= " height=\"".$height."\"";
 
+		$image = '<img src="'.$this->serverName.$url.'" border="0"'.$strPar.' data-bx-image="'.$this->serverName.$url.'" />';
 		if(strlen($this->serverName) <= 0 || preg_match("/^(http|https|ftp)\\:\\/\\//i".BX_UTF_PCRE_MODIFIER, $url))
-			return '<img src="'.$url.'" border="0"'.$strPar.' data-bx-image="'.$url.'" />';
-		else
-			return '<img src="'.$this->serverName.$url.'" border="0"'.$strPar.' data-bx-image="'.$this->serverName.$url.'" />';
+			$image = '<img src="'.$url.'" border="0"'.$strPar.' data-bx-image="'.$url.'" />';
+		return $this->defended_tags($image, 'replace');
 	}
 
-	public function convertFont($matches)
+public 	public function convertFont($matches)
 	{
 		return $this->convert_font_attr('font', $matches[1], $matches[2]);
 	}
 
-	public function convertFontSize($matches)
+public 	public function convertFontSize($matches)
 	{
 		return $this->convert_font_attr('size', $matches[1], $matches[2]);
 	}
 
-	public function convertFontColor($matches)
+public 	public function convertFontColor($matches)
 	{
 		return $this->convert_font_attr('color', $matches[1], $matches[2]);
 	}
 
-	public function convert_font_attr($attr, $value = "", $text = "")
+public 	function convert_font_attr($attr, $value = "", $text = "")
 	{
 		if (strlen($text)<=0)
 			return "";
@@ -990,6 +1059,7 @@ class CTextParser
 		}
 
 		$vars["bMobile"] = $this->bMobile;
+		$vars["LAZYLOAD"] = $this->LAZYLOAD;
 
 		$userField = $this->userField;
 		$id = $matches[2];
@@ -1010,7 +1080,7 @@ class CTextParser
 	}
 
 	// Only for public using
-	public function wrap_long_words($text="")
+public 	function wrap_long_words($text="")
 	{
 		if ($this->maxStringLen > 0 && !empty($text))
 		{
@@ -1021,12 +1091,12 @@ class CTextParser
 		return $text;
 	}
 
-	public function partWords($matches)
+public 	public function partWords($matches)
 	{
 		return $this->part_long_words($matches[1]);
 	}
 
-	public function part_long_words($str)
+public 	function part_long_words($str)
 	{
 		$word_separator = $this->wordSeparator;
 		if (($this->maxStringLen > 0) && (strlen(trim($str)) > 0))
@@ -1054,48 +1124,41 @@ class CTextParser
 		return $str;
 	}
 
-	public function cutWords($matches)
+public 	public function cutWords($matches)
 	{
 		return $this->cut_long_words($matches[2]);
 	}
 
-	public function cut_long_words($str)
+public 	function cut_long_words($str)
 	{
 		if (($this->maxStringLen > 0) && (strlen($str) > 0))
 			$str = preg_replace("/([^ \n\r\t\x01]{".$this->maxStringLen."})/is".BX_UTF_PCRE_MODIFIER, "\\1<WBR/>&shy;", $str);
 		return $str;
 	}
 
-	public function convertAnchor($matches)
+public 	public function convertAnchor($matches)
 	{
 		return $this->convert_anchor_tag($matches[1], ($matches[2] <> ''? $matches[2] : $matches[1]), '');
 	}
 
-	public function convert_anchor_tag($url, $text, $pref="")
+public 	function convert_anchor_tag($url, $text, $pref="")
 	{
-		$url = str_replace(array("[nomodify]", "[/nomodify]"), "", $url);
-		$bTextUrl = false;
-		if(strlen(trim($text)) <= 0)
-			$text = $url;
-		else
-			$text = str_replace(array("[nomodify]", "[/nomodify]"), "", $text);
+		$url = trim(str_replace(array("[nomodify]", "[/nomodify]"), "", $url));
+		$text = trim(str_replace(array("[nomodify]", "[/nomodify]"), "", $text));
+		$text = (strlen($text) <= 0 ? $url : $text);
 
-		if($text == $url)
-			$bTextUrl = true;
-
-		$bShortUrl = ($this->allow["SHORT_ANCHOR"] == "Y") ? true : false;
+		$bTextUrl = ($text == $url);
+		$bShortUrl = ($this->allow["SHORT_ANCHOR"] == "Y");
 
 		$text = str_replace("\\\"", "\"", $text);
 		$end = "";
-		if (preg_match("/([\\.,\\?]|&#33;)$/".BX_UTF_PCRE_MODIFIER, $url, $match))
+		$pattern = "/([\\.,\\?\\!\\;]|&#33;)$/".BX_UTF_PCRE_MODIFIER;
+		if ($bTextUrl && preg_match($pattern, $url, $match))
 		{
 			$end = $match[1];
-			$url = preg_replace("/([\\.,\\?]|&#33;)$/".BX_UTF_PCRE_MODIFIER, "", $url);
-			$text = preg_replace("/([\\.,\\?]|&#33;)$/".BX_UTF_PCRE_MODIFIER, "", $text);
+			$url = preg_replace($pattern, "", $url);
+			$text = preg_replace($pattern, "", $text);
 		}
-
-		if (preg_match("/\\[\\/(quote|code|img|imag|video)/i", $url))
-			return $url;
 
 		$url = preg_replace(
 			array(
@@ -1117,55 +1180,34 @@ class CTextParser
 
 		if (substr($url, 0, 1) != "/" && !preg_match("/^(".$this->getAnchorSchemes().")\\:/i".BX_UTF_PCRE_MODIFIER, $url))
 			$url = "http://".$url;
-
-		if (preg_match("/^<img\\s+src/i".BX_UTF_PCRE_MODIFIER, $text))
-			$bShortUrl = false;
-
 		$text = preg_replace(
 			array("/&amp;/i".BX_UTF_PCRE_MODIFIER, "/javascript:/i".BX_UTF_PCRE_MODIFIER),
 			array("&", "javascript&#58; "),
 			$text
 		);
 
-		if ($bShortUrl && strlen($text) < $this->maxAnchorLength)
-			$bShortUrl = false;
-		if ($bShortUrl && !preg_match("/^(".$this->getAnchorSchemes()."):\\/\\//i".BX_UTF_PCRE_MODIFIER, $text))
-			$bShortUrl = false;
-
-		if($bTextUrl)
+		if ($bShortUrl &&
+			strlen($text) > $this->maxAnchorLength &&
+			preg_match("/^(".$this->getAnchorSchemes()."):\\/\\/(\\S+)$/i".BX_UTF_PCRE_MODIFIER, $text, $matches))
 		{
-			$lastInd = substr($url, -1);
-			if(in_array($lastInd, array(")", "”", "\"", "'")))
-			{
-				$url = substr($url, 0, -1);
-				$text = substr($text, 0, -1);
-				$end = $lastInd;
-			}
-		}
-
-		if ($bShortUrl)
-		{
-			preg_match("/^(".$this->getAnchorSchemes()."):\\/\\/(\\S+)$/i".BX_UTF_PCRE_MODIFIER, $text, $matches);
 			$uri_type = $matches[1];
 			$stripped = $matches[2];
-
-			if(strlen($stripped) > $this->maxAnchorLength)
-				$text = $uri_type.'://'.substr($stripped, 0, $this->maxAnchorLength-10).'...'.substr($stripped, -10);
-			else
-				$text = $uri_type.'://'.$stripped;
+			$text = $uri_type.'://'.(strlen($stripped) > $this->maxAnchorLength ?
+					substr($stripped, 0, $this->maxAnchorLength-10).'...'.substr($stripped, -10) :
+					$stripped
+				);
 		}
 
-		$url = htmlspecialcharsbx(htmlspecialcharsback($url));
-
+		$url = $this->defended_tags(htmlspecialcharsbx(htmlspecialcharsback($url)), 'replace');
 		return $pref.($this->parser_nofollow == "Y" ? '<noindex>' : '').'<a href="'.$url.'" target="'.$this->link_target.'"'.($this->parser_nofollow == "Y" ? ' rel="nofollow"' : '').'>'.$text.'</a>'.($this->parser_nofollow == "Y" ? '</noindex>' : '').$end;
 	}
 
-private function preconvertUrl($matches)
+public 	private function preconvertUrl($matches)
 	{
 		return $this->pre_convert_anchor_tag($matches[0], $matches[0], "[url]".$matches[0]."[/url]");
 	}
 
-public function preconvertAnchor($matches)
+public 	public function preconvertAnchor($matches)
 	{
 		return $this->pre_convert_anchor_tag($matches[1], $matches[2], $matches[0]);
 	}
@@ -1208,13 +1250,13 @@ public static 	function TextParserConvertVideo($arParams)
 		global $APPLICATION;
 
 		if(
-			empty($arParams) 
+			empty($arParams)
 			|| strlen($arParams["PATH"]) <= 0
 		)
 		{
 			return false;
 		}
-		
+
 		if (
 			isset($arParams["PARSER_OBJECT"])
 			&& is_object($arParams["PARSER_OBJECT"])
@@ -1227,25 +1269,29 @@ public static 	function TextParserConvertVideo($arParams)
 
 		if ($arParams["TYPE"] == 'YOUTUBE' || $arParams["TYPE"] == 'RUTUBE' || $arParams["TYPE"] == 'VIMEO')
 		{
-			if (
-				(!defined("BX_MOBILE_LOG") || BX_MOBILE_LOG !== true)
-				&& (!$ob || !$ob->bMobile)
-			)
+			// Replace http://someurl, https://someurl by //someurl
+			$arParams["PATH"] = preg_replace("/https?:\/\//is", '//', $arParams["PATH"]);
+
+			if(preg_match("/^(https?:)?\/\/(www\.)?(youtube\.com|youtu\.be|rutube\.ru|vimeo\.com|player\.vimeo\.com)\//i", $arParams["PATH"]))
 			{
-				// Replace http://someurl, https://someurl by //someurl
-				$arParams["PATH"] = preg_replace("/https?:\/\//is", '//', $arParams["PATH"]);
-				echo '<iframe src="'.$arParams["PATH"].'" allowfullscreen="" frameborder="0" height="'.$arParams["HEIGHT"].'" width="'.$arParams["WIDTH"].'"></iframe>';
-			}
-			else
-			{
-				?><a href="<?=$arParams["PATH"]?>"><?=$arParams["PATH"]?></a><?
+				if (
+					$ob
+					&& $ob->bMobile
+				)
+				{
+					?><a href="<?=$arParams["PATH"]?>"><?=$arParams["PATH"]?></a><?
+				}
+				else
+				{
+					?><iframe src="<?=$arParams["PATH"]?>" allowfullscreen="" frameborder="0" height="<?=$arParams["HEIGHT"]?>" width="<?=$arParams["WIDTH"]?>"></iframe><?
+				}
 			}
 		}
 		else
 		{
 			if (
-				(defined("BX_MOBILE_LOG") && BX_MOBILE_LOG === true)
-				|| ($ob && $ob->bMobile)
+				$ob
+				&& $ob->bMobile
 			)
 			{
 				?><div onclick="return BX.eventCancelBubble(event);"><?
@@ -1292,13 +1338,85 @@ public static 	function TextParserConvertVideo($arParams)
 			);
 
 			if (
-				(defined("BX_MOBILE_LOG") && BX_MOBILE_LOG === true)
-				|| ($ob && $ob->bMobile)
+				$ob
+				&& $ob->bMobile
 			)
 			{
 				?></div><?
 			}
 		}
+		
+/*
+		if (
+			defined("BX_MOBILE_LOG")
+			&& BX_MOBILE_LOG === true
+		)
+		{
+			?><div onclick="return BX.eventCancelBubble(event);"><?
+		}
+
+		if ($arParams["TYPE"] == 'YOUTUBE' || $arParams["TYPE"] == 'RUTUBE' || $arParams["TYPE"] == 'VIMEO')
+		{
+			// Replace http://someurl, https://someurl by //someurl
+			$arParams["PATH"] = preg_replace("/https?:\/\//is", '//', $arParams["PATH"]);
+
+			if(preg_match("/^(https?:)?\/\/(www\.)?(youtube\.com|youtu\.be|rutube\.ru|vimeo\.com|player\.vimeo\.com)\//i", $arParams["PATH"]))
+			{
+				?><iframe src="<?=$arParams["PATH"]?>" allowfullscreen="" frameborder="0" height="<?=$arParams["HEIGHT"]?>" width="<?=$arParams["WIDTH"]?>"></iframe><?
+			}
+		}
+		else
+		{
+			$APPLICATION->IncludeComponent(
+				"bitrix:player", "",
+				array(
+					"PLAYER_TYPE" => "auto",
+					"USE_PLAYLIST" => "N",
+					"PATH" => $arParams["PATH"],
+					"WIDTH" => $arParams["WIDTH"],
+					"HEIGHT" => $arParams["HEIGHT"],
+					"PREVIEW" => $arParams["PREVIEW"],
+					"LOGO" => "",
+					"FULLSCREEN" => "Y",
+					"SKIN_PATH" => "/bitrix/components/bitrix/player/mediaplayer/skins",
+					"SKIN" => "bitrix.swf",
+					"CONTROLBAR" => "bottom",
+					"WMODE" => "transparent",
+					"HIDE_MENU" => "N",
+					"SHOW_CONTROLS" => "Y",
+					"SHOW_STOP" => "N",
+					"SHOW_DIGITS" => "Y",
+					"CONTROLS_BGCOLOR" => "FFFFFF",
+					"CONTROLS_COLOR" => "000000",
+					"CONTROLS_OVER_COLOR" => "000000",
+					"SCREEN_COLOR" => "000000",
+					"AUTOSTART" => "N",
+					"REPEAT" => "N",
+					"VOLUME" => "90",
+					"DISPLAY_CLICK" => "play",
+					"MUTE" => "N",
+					"HIGH_QUALITY" => "Y",
+					"ADVANCED_MODE_SETTINGS" => "N",
+					"BUFFER_LENGTH" => "10",
+					"DOWNLOAD_LINK" => "",
+					"DOWNLOAD_LINK_TARGET" => "_self"
+				),
+				null,
+				array(
+					"HIDE_ICONS" => "Y"
+				)
+			);
+		}
+
+		if (
+			defined("BX_MOBILE_LOG")
+			&& BX_MOBILE_LOG === true
+		)
+		{
+			?></div><?
+		}
+*/
+		
 
 		$video = ob_get_contents();
 		ob_end_clean();
@@ -1350,6 +1468,8 @@ public static 	function closeTags($html)
 
 		for($i = 0; $i < $len_opened; $i++)
 		{
+			if ($openedtags[$i] === 'br')
+				continue;
 			if (!in_array($openedtags[$i], $closedtags))
 				$html .= '</'.$openedtags[$i].'>';
 			else
@@ -1359,7 +1479,7 @@ public static 	function closeTags($html)
 		return $html;
 	}
 
-	public static function clearAllTags($text)
+public static 	public static function clearAllTags($text)
 	{
 		$text = strip_tags(Trim($text));
 		if (strlen($text)<=0) return "";

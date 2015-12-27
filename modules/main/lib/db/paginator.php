@@ -3,6 +3,7 @@ namespace Bitrix\Main\DB;
 /**
  * Class Paginator
  *
+ * @deprecated To be removed soon. Don't use it.
  * @package Bitrix\Main\DB
  */
 class Paginator

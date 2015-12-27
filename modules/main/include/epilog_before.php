@@ -82,32 +82,9 @@ if($BX_GLOBAL_AREA_EDIT_ICON == true)
 	echo $APPLICATION->IncludeStringAfter($arIcons, array('TOOLTIP'=>GetMessage("main_epilog_before_menu_title"), 'ICON'=>'edit-icon', "COMPONENT_ID" => "page_edit_control"));
 }
 
-/*
-//Prints global url classes and  variables for HotKeys
-if($USER->IsAuthorized())
-{
-	AddEventHandler("main", "OnBeforeEndBufferContent", 'PrintHKGlobalUrlVar');
-
-	function PrintHKGlobalUrlVar()
-	{
-		$GLOBALS["APPLICATION"]->AddBufferContent("PrintHKGlobalUrlVar2");
-	}
-
-	function PrintHKGlobalUrlVar2()
-	{
-		return CHotKeys::GetInstance()->PrintGlobalUrlVar();
-	}
-}
-*/
-
 \Bitrix\Main\Page\Asset::getInstance()->startTarget('TEMPLATE');
 $sPreviewFile = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/tmp/templates/__bx_preview/footer.php";
-if(
-	isset($_GET['bx_template_preview_mode'])
-	&& $_GET['bx_template_preview_mode'] == 'Y'
-	&& $USER->CanDoOperation('edit_other_settings')
-	&& file_exists($sPreviewFile)
-)
+if(defined("SITE_TEMPLATE_PREVIEW_MODE") && file_exists($sPreviewFile))
 {
 	include_once($sPreviewFile);
 }

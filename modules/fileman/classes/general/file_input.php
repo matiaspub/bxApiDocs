@@ -52,6 +52,13 @@ class CFileInput
 		self::$jsId = 'bx_file_'.strtolower(preg_replace("/[^a-z0-9]/i", "_", $inputName));
 	}
 
+/**
+ * @param $strInputName
+ * @param string $strFileId
+ * @param bool|array $showInfo
+ * @param array $inputs
+ * @return string
+ */
 	public static function Show(
 		$strInputName,
 		$strFileId = "",
@@ -179,6 +186,14 @@ class CFileInput
 		return $result;
 	}
 
+/**
+ * @param array $values
+ * @param string $inputNameTemplate
+ * @param bool|array $showInfo
+ * @param bool $maxCount
+ * @param array $inputs
+ * @return string
+ */
 	public static function ShowMultiple(
 		$values = array(),
 		$inputNameTemplate = "", // #IND# will be replaced by autoincrement int (0, 1, 2,..)
@@ -452,7 +467,7 @@ class CFileInput
 			if ($arFile['IS_IMAGE'])
 				$hint .= '<span class="adm-input-file-hint-row">'.GetMessage('ADM_FILE_INFO_DIM').':&nbsp;&nbsp;'.$arFile['WIDTH'].'x'.$arFile['HEIGHT'].'</span>';
 			if ($sImagePath != '')
-				$hint .= '<span class="adm-input-file-hint-row">'.GetMessage('ADM_FILE_INFO_LINK').':&nbsp;&nbsp;<a href="'.$sImagePath.'">'.$sImagePath.'</a></span>';
+				$hint .= '<span class="adm-input-file-hint-row">'.GetMessage('ADM_FILE_INFO_LINK').':&nbsp;&nbsp;<a href="'.CHTTP::urnEncode($sImagePath, "UTF-8").'">'.$sImagePath.'</a></span>';
 
 			if (!self::$bShowDescInput && $arFile['DESCRIPTION'] != "")
 				$hint .= '<span class="adm-input-file-hint-row">'.GetMessage('ADM_FILE_DESCRIPTION').':&nbsp;&nbsp;'.htmlspecialcharsbx($arFile['DESCRIPTION']).'</span>';

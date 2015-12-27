@@ -27,6 +27,38 @@ final class ModuleManager
 		return self::$installedModules;
 	}
 
+	public static function getVersion($moduleName)
+	{
+		$moduleName = preg_replace("/[^a-zA-Z0-9_.]+/i", "", trim($moduleName));
+		if ($moduleName == '')
+			return false;
+
+		if (!self::isModuleInstalled($moduleName))
+			return false;
+
+		$version = false;
+
+		if ($moduleName == 'main')
+		{
+			if (!defined("SM_VERSION"))
+			{
+				include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/version.php");
+			}
+			$version = SM_VERSION;
+		}
+		else
+		{
+			$modulePath = getLocalPath("modules/".$moduleName."/install/version.php");
+			if ($modulePath === false)
+				return false;
+
+			include($_SERVER["DOCUMENT_ROOT"].$modulePath);
+			$version = array_key_exists("VERSION", $arModuleVersion)? $arModuleVersion["VERSION"]: false;
+		}
+
+		return $version;
+	}
+
 	public static function isModuleInstalled($moduleName)
 	{
 		$arInstalledModules = self::getInstalledModules();

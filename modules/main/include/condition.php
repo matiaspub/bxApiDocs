@@ -125,7 +125,7 @@ function ConditionShow($arArgs=array())
 	?><input title="<?=GetMessage("MAIN_PATH")?>" type="text" size="25" id="fname<?=$i?>" name="<?=$field_name?>[CONDITION_folder]" value="<?=htmlspecialcharsbx($strFolder)?>">&nbsp;<input type="button" name="browse" value="..." onClick="BtnClick<?=$i?>()">
 	</div>
 	<div style="display:<?=$arDisplay['ugroups']?>" id="type_ugroups<?=$i?>">
-		<select title="<?=GetMessage("MAIN_USERGROUPS");?>" multiple size=5 style="width:100%" name="<?=$field_name?>[CONDITION_ugroups][]"><?
+		<select title="<?=GetMessage("MAIN_USERGROUPS");?>" multiple size=5 name="<?=$field_name?>[CONDITION_ugroups][]"><?
 		reset($arGroupsNames);
 		while ($e=each($arGroupsNames))
 			echo '<option value="'.$e[0].'"'.(in_array($e[0], $arSelGroups)?" selected":"").'>'.htmlspecialcharsbx($e[1]).'</option>';
@@ -144,7 +144,7 @@ function ConditionShow($arArgs=array())
 		=
 		<input title="<?=GetMessage("MAIN_URL_VALUE")?>" type="text" size="10" name="<?=$field_name?>[CONDITION_url_value]" value="<?=htmlspecialcharsbx($strUrl_value)?>">
 	</div>
-	<div style="display:<?=$arDisplay['php']?>" id="type_php<?=$i?>"><input type="text" style="width:100%" size="25" name="<?=$field_name?>[CONDITION_php]" value="<?=htmlspecialcharsex($strCondition)?>" <?echo ((!$USER->CanDoOperation('edit_php')) ? 'disabled' : '');?>></div>
+	<div style="display:<?=$arDisplay['php']?>" id="type_php<?=$i?>"><input type="text" size="30" name="<?=$field_name?>[CONDITION_php]" value="<?=htmlspecialcharsex($strCondition)?>" <?echo ((!$USER->CanDoOperation('edit_php')) ? 'disabled' : '');?>></div>
 <?
 }
 

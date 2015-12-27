@@ -1,76 +1,100 @@
 <?
 /**
- * Идентификатор текущего сайта.
+ * Идентификатор текущего сайта.</body>
+ * </html>
  */
-define('SITE_ID', $site_id);
+define('SITE_ID', $arLang["LID"]);
 
 /**
- * Поле "Папка сайта" в настройках сайта. Как правило используется в случае организации многосайтовости <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">на одном домене</a>.
+ * Поле "Папка сайта" в настройках сайта. Как правило используется в случае организации многосайтовости <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=286" target="_blank">на одном домене</a>.</body>
+ * </html>
  */
 define('SITE_DIR', $arLang["DIR"]);
 
 /**
- * Поле "URL сервера" в настройках текущего сайта.
+ * Поле "URL сервера" в настройках текущего сайта.</body>
+ * </html>
  */
 define('SITE_SERVER_NAME', $arLang["SERVER_NAME"]);
 
 /**
- * URL от корня сайта до папки текущего шаблона.
+ * URL от корня сайта до папки текущего шаблона.</body>
+ * </html>
  */
 define('SITE_TEMPLATE_PATH', BX_PERSONAL_ROOT.'/templates/'.SITE_TEMPLATE_ID);
 
 /**
- * Поле "Кодировка" в настройках текущего сайта. <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.
+ * Поле "Кодировка" в настройках текущего сайта.
+ * <p></p>
+ * <div class="note">
+ * <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.</div>
+ * 
+ * </body>
+ * </html>
  */
 define('SITE_CHARSET', $arLang["CHARSET"]);
 
 /**
- * Для публичной части, 		в данной константе 		хранится формат даты из настроек текущего сайта. 		Для административной 		части - формат даты текущего языка.
+ * Для публичной части, 		в данной константе 		хранится формат даты из настроек текущего сайта. 		Для административной 		части - формат даты текущего языка.</body>
+ * </html>
  */
 define('FORMAT_DATE', $arLang["FORMAT_DATE"]);
 
 /**
- * Для публичной части, в данной константе хранится формат времени из настроек текущего сайта.	Для административной части - формат времени текущего языка.
+ * Для публичной части, в данной константе хранится формат времени из настроек текущего сайта.	Для административной части - формат времени текущего языка.</body>
+ * </html>
  */
 define('FORMAT_DATETIME', $arLang["FORMAT_DATETIME"]);
 
 /**
- * Если это публичная часть, то в данной константе храниться поле "Язык" из настроек текущего сайта, если административная часть, то в данной константе храниться идентификатор текущего языка.
+ * Если это публичная часть, то в данной константе храниться поле "Язык" из настроек текущего сайта, если административная часть, то в данной константе храниться идентификатор текущего языка.</body>
+ * </html>
  */
-define('LANGUAGE_ID', 'en');
+define('LANGUAGE_ID', $arLang["LANGUAGE_ID"]);
 
 /**
- * В данной константе содержится значение кодировки, указанной в секции 	<i>Параметры</i> формы настроек текущего сайта. <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.
+ * В данной константе содержится значение кодировки, указанной в секции 	<i>Параметры</i> формы настроек текущего сайта. 
+ * <p></p>
+ * <div class="note">
+ * <b>Примечание</b>: в публичной части понятие языка и сайта отличаются. Поэтому LANG_CHARSET и  SITE_CHARSET могут принимать разные значения.</div>
+ * </body>
+ * </html>
  */
 define('LANG_CHARSET', $arLang["CHARSET"]);
 
 /**
- * Идентификатор текущего шаблона сайта.
+ * Идентификатор текущего шаблона сайта.</body>
+ * </html>
  */
 define('SITE_TEMPLATE_ID', $siteTemplateId);
 
 /**
- * Содержит время начала работы страницы в формате возвращаемом функцией <a href="/api_help/main/functions/date/getmicrotime.php">getmicrotime</a>.
+ * Содержит время начала работы страницы в формате возвращаемом функцией <a href="/api_help/main/functions/date/getmicrotime.php">getmicrotime</a>.</body>
+ * </html>
  */
 define('START_EXEC_TIME', microtime(true));
 
 /**
- * Если подключена служебная часть пролога, то данная константа будет инициализирована значением "true". Как правило эту константу используют во включаемых файлах в целях безопасности, когда необходимо убедиться, что пролог подключен и все необходимые права проверены.
+ * Если подключена служебная часть пролога, то данная константа будет инициализирована значением "true". Как правило эту константу используют во включаемых файлах в целях безопасности, когда необходимо убедиться, что пролог подключен и все необходимые права проверены.</body>
+ * </html>
  */
 define('B_PROLOG_INCLUDED', true);
 
 /**
- * Текущая версия главного модуля.
+ * Текущая версия главного модуля.</body>
+ * </html>
  */
-define('SM_VERSION', "15.0.2");
+define('SM_VERSION', "15.5.10");
 
 /**
- * Дата выпуска текущей версии главного модуля.
+ * Дата выпуска текущей версии главного модуля.</body>
+ * </html>
  */
-define('SM_VERSION_DATE', "2014-11-13 14:40:00");
+define('SM_VERSION_DATE', "2015-10-19 13:46:00");
 
 /**
- * Если необходимо подключать пролог административной части, то значение данной константы - "true".
+ * Если необходимо подключать пролог административной части, то значение данной константы - "true".</body>
+ * </html>
  */
 define('ADMIN_SECTION', true);
 
@@ -82,7 +106,8 @@ define('ADMIN_SECTION', true);
  *         <p>Необходимость инициализации этой константы связана с тем, что на несуществующие страницы отослать данные методом POST нельзя, а именно с этим методом и работают вышеперечисленные компоненты. Поэтому если файл текущей страницы физически не существует на сервере, то без этой константы компоненты работать не будут.</p>
  *        	Пример: 
  *         <pre>define("AUTH_404", "Y");</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('AUTH_404', "Y");
 
@@ -92,7 +117,8 @@ define('AUTH_404', "Y");
  *        Пример: 
  *         <pre>define("HELP_FILE",
  *        "my_admin_script.php");</pre>
- *
+ *        </body>
+ * </html>
  */
 define('HELP_FILE', "updates/index.php");
 
@@ -101,7 +127,8 @@ define('HELP_FILE', "updates/index.php");
  *         <br><br>
  *        Пример: 
  *         <pre>define("NEED_AUTH", true);</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('NEED_AUTH', true);
 
@@ -111,7 +138,8 @@ define('NEED_AUTH', true);
  *        Пример: 
  *         <pre>define("ERROR_EMAIL", 
  *        "admin@site.ru, support@site.ru");</pre>
- *
+ *        	 	</body>
+ * </html>
  */
 define('ERROR_EMAIL', null);
 
@@ -122,7 +150,8 @@ define('ERROR_EMAIL', null);
  *         <pre>define("LOG_FILENAME", 
  *        $_SERVER["DOCUMENT_ROOT"].
  *            "/log.txt");</pre>
- *
+ *        	 	</body>
+ * </html>
  */
 define('LOG_FILENAME', null);
 
@@ -133,7 +162,8 @@ define('LOG_FILENAME', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("STATISTIC_ONLY", true);</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('STATISTIC_ONLY', true);
 
@@ -142,9 +172,10 @@ define('STATISTIC_ONLY', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("NO_KEEP_STATISTIC", true);</pre>
- *
+ *        	</body>
+ * </html>
  */
-define('NO_KEEP_STATISTIC', true);
+define('NO_KEEP_STATISTIC', "Y");
 
 /**
  * Константа предназначена для отключения автоматического сбора статистики, 	реализованного как вызов функции <code><a href="/api_help/statistic/classes/cstatistics/keep.php">CStatistics::Keep</a></code> в качестве обработчика события <a href="/api_help/main/events/onbeforeprolog.php">OnBeforeProlog</a>. Константу необходимо инициализировать до подключения пролога. Затем, при необходимости, можно использовать "ручной" сбор статистики, вызвав функцию 	<code>CStatistics::Keep</code> (с первым параметром, равным true). 
@@ -161,9 +192,10 @@ define('NO_KEEP_STATISTIC', true);
  * CStatistics::Keep(true);
  * 
  * ...</pre>
- *
+ *        </body>
+ * </html>
  */
-define('STOP_STATISTICS', true);
+define('STOP_STATISTICS', null);
 
 /**
  * Инициализация этой константы каким-либо значением 	приведет к запрету следующих действий модуля "Статистика", 	выполняемых ежедневно при помощи технологии <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" target="_blank">агентов</a>: 
@@ -176,16 +208,18 @@ define('STOP_STATISTICS', true);
  *          </ul>
  *        Пример: 
  *         <pre>define("NO_AGENT_STATISTIC", true);</pre>
- *
+ *        </body>
+ * </html>
  */
-define('NO_AGENT_STATISTIC', true);
+define('NO_AGENT_STATISTIC', "Y");
 
 /**
  * При установке в <b>true</b> отключает выполнение всех агентов 
  *         <p>Пример: </p>
  *        
  *         <pre>define("NO_AGENT_CHECK", true);</pre>
- *
+ *        </body>
+ * </html>
  */
 define('NO_AGENT_CHECK', true);
 
@@ -194,7 +228,8 @@ define('NO_AGENT_CHECK', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("NOT_CHECK_PERMISSIONS", true);</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('NOT_CHECK_PERMISSIONS', true);
 
@@ -203,7 +238,8 @@ define('NOT_CHECK_PERMISSIONS', true);
  *         <br><br>
  *        Пример: 
  *         <pre>define("ONLY_EMAIL", "admin@site.ru");</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('ONLY_EMAIL', null);
 
@@ -212,16 +248,18 @@ define('ONLY_EMAIL', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_CRONTAB", true);</pre>
- *
+ *        	</body>
+ * </html>
  */
-define('BX_CRONTAB', true);
+define('BX_CRONTAB', null);
 
 /**
  * Unix-права для вновь создаваемых файлов. 	 
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_FILE_PERMISSIONS", 0755);</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('BX_FILE_PERMISSIONS', null);
 
@@ -230,7 +268,8 @@ define('BX_FILE_PERMISSIONS', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("BX_DIR_PERMISSIONS", 0755);</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('BX_DIR_PERMISSIONS', 0755);
 
@@ -239,7 +278,8 @@ define('BX_DIR_PERMISSIONS', 0755);
  *         <br><br>
  *        Пример: 
  *         <pre>define("SM_SAFE_MODE", true);</pre>
- *
+ *        	 	</body>
+ * </html>
  */
 define('SM_SAFE_MODE', null);
 
@@ -255,7 +295,8 @@ define('SM_SAFE_MODE', null);
  *     default.html 
  *     index.php3
  * ");</pre>
- *
+ *        	</body>
+ * </html>
  */
 define('DIRECTORY_INDEX', null);
 
@@ -264,7 +305,8 @@ define('DIRECTORY_INDEX', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("MYSQL_TABLE_TYPE", "InnoDB");</pre>
- *
+ *        	 	</body>
+ * </html>
  */
 define('MYSQL_TABLE_TYPE', null);
 
@@ -273,29 +315,40 @@ define('MYSQL_TABLE_TYPE', null);
  *         <br><br>
  *        Пример: 
  *         <pre>define("DBPersistent", true);</pre>
- *
+ *        	 	</body>
+ * </html>
  */
 define('DBPersistent', true);
 
 /**
- * Может принимать значение true/false. Константа регулирует значение по умолчанию для параметра get_index_page функций GetPagePath(), CMain::GetCurPage(), CMain::GetCurPageParam(). Параметр get_index_page указывает, нужно ли для индексной страницы раздела возвращать путь, заканчивающийся на "index.php". Если значение параметра равно true, то возвращается путь с "index.php", иначе - путь, заканчивающийся на "/". Параметр имеет значение, <i>обратное</i> значению константы.
+ * Может принимать значение true/false. Константа регулирует значение по умолчанию для параметра get_index_page функций GetPagePath(), CMain::GetCurPage(), CMain::GetCurPageParam(). Параметр get_index_page указывает, нужно ли для индексной страницы раздела возвращать путь, заканчивающийся на "index.php". Если значение параметра равно true, то возвращается путь с "index.php", иначе - путь, заканчивающийся на "/". Параметр имеет значение, <i>обратное</i> значению константы. </body>
+ * </html>
  */
 define('BX_DISABLE_INDEX_PAGE', null);
 
 /**
- * Может принимать значение true/false. Если инициализировать данную константу каким либо значением,то она отключает/включает сбор бектрейсов при включенной отладке.
+ * Может принимать значение true/false. Если инициализировать данную константу каким либо значением,то она отключает/включает сбор бектрейсов при включенной отладке.</body>
+ * </html>
  */
 define('BX_NO_SQL_BACKTRACE', null);
 
 /**
- * Константа для регулирования тегированного кеша пользователей.
+ * Константа для регулирования тегированного кеша пользователей.</body>
+ * </html>
  */
 define('TAGGED_user_card_size', null);
 
 /**
- * Константа запрещающая сброс кеша акселератора.
+ * Константа запрещающая сброс кеша акселератора.</body>
+ * </html>
  */
-define('BX_NO_ACCELERATOR_RESET', true);
+define('BX_NO_ACCELERATOR_RESET', null);
+
+/**
+ * При установке константы в true не используется монитор производительности.</body>
+ * </html>
+ */
+define('PERFMON_STOP', null);
 
 /**
  * BX_ROOT
@@ -313,6 +366,11 @@ define('BX_PERSONAL_ROOT', BX_ROOT);
 define('ENABLE_HTML_STATIC_CACHE_JS', true);
 
 /**
+ * BITRIX_STATIC_PAGES
+ */
+define('BITRIX_STATIC_PAGES', true);
+
+/**
  * USE_HTML_STATIC_CACHE
  */
 define('USE_HTML_STATIC_CACHE', true);
@@ -320,7 +378,7 @@ define('USE_HTML_STATIC_CACHE', true);
 /**
  * HTML_PAGES_FILE
  */
-define('HTML_PAGES_FILE', $PAGES_FILE);
+define('HTML_PAGES_FILE', $cacheFile);
 
 /**
  * BX_MEMCACHE_CONNECTED
@@ -346,6 +404,11 @@ define('CRYPT_MODE_ECB', 0);
  * CRYPT_MODE_CBC
  */
 define('CRYPT_MODE_CBC', 1);
+
+/**
+ * BX_B_FILE_DIALOG_SCRIPT_LOADED
+ */
+define('BX_B_FILE_DIALOG_SCRIPT_LOADED', true);
 
 /**
  * BX_SPREAD_SITES
@@ -451,11 +514,6 @@ define('UPDATE_SYSTEM_VERSION', "11.0.12");
  * __CUpdateOutputScript
  */
 define('__CUpdateOutputScript', true);
-
-/**
- * DisableEventsCheck
- */
-define('DisableEventsCheck', true);
 
 /**
  * T_INCLUDE_RESULT_MODIFIER
@@ -578,11 +636,6 @@ define('START_EXEC_EPILOG_BEFORE_1', microtime());
 define('ADMIN_AJAX_MODE', true);
 
 /**
- * BITRIX_STATIC_PAGES
- */
-define('BITRIX_STATIC_PAGES', true);
-
-/**
  * START_EXEC_PROLOG_AFTER_1
  */
 define('START_EXEC_PROLOG_AFTER_1', microtime());
@@ -618,34 +671,9 @@ define('POST_FORM_ACTION_URI', htmlspecialcharsbx($_SERVER["REQUEST_URI"]));
 define('BX_CHECK_SHORT_URI', true);
 
 /**
- * ERROR_404
- */
-define('ERROR_404', "Y");
-
-/**
- * BX_ADMIN_SECTION_404
- */
-define('BX_ADMIN_SECTION_404', 'Y');
-
-/**
- * ADMIN_THEMES_PATH
- */
-define('ADMIN_THEMES_PATH', "/bitrix/themes");
-
-/**
- * BX_SEARCH_ADMIN
- */
-define('BX_SEARCH_ADMIN', true);
-
-/**
- * ADMIN_THEME_ID
- */
-define('ADMIN_THEME_ID', CAdminTheme::GetCurrentTheme());
-
-/**
  * LANG
  */
-define('LANG', "ru");
+define('LANG', $arLang["LID"]);
 
 /**
  * LANG_DIR
@@ -748,54 +776,14 @@ define('CACHED_b_task_operation', 3600);
 define('CACHED_b_rating', 3600);
 
 /**
+ * DisableEventsCheck
+ */
+define('DisableEventsCheck', true);
+
+/**
  * ADMIN_MODULE_NAME
  */
 define('ADMIN_MODULE_NAME', 'main');
-
-/**
- * START_TIME
- */
-define('START_TIME', time());
-
-/**
- * CLI
- */
-define('CLI', php_sapi_name() == 'cli');
-
-/**
- * LOCK_FILE
- */
-define('LOCK_FILE', $_SERVER['DOCUMENT_ROOT'].'/bitrix/backup/auto_lock');
-
-/**
- * STATISTIC_SKIP_ACTIVITY_CHECK
- */
-define('STATISTIC_SKIP_ACTIVITY_CHECK', true);
-
-/**
- * DOCUMENT_ROOT
- */
-define('DOCUMENT_ROOT', rtrim(str_replace('\\','/',$_SERVER['DOCUMENT_ROOT']),'/'));
-
-/**
- * DOCUMENT_ROOT_SITE
- */
-define('DOCUMENT_ROOT_SITE', $DOCUMENT_ROOT_SITE);
-
-/**
- * BX_PUBLIC_TOOLS
- */
-define('BX_PUBLIC_TOOLS', true);
-
-/**
- * BX_SECURITY_SHOW_MESSAGE
- */
-define('BX_SECURITY_SHOW_MESSAGE', 1);
-
-/**
- * NOT_CHECK_FILE_PERMISSIONS
- */
-define('NOT_CHECK_FILE_PERMISSIONS', true);
 
 /**
  * AM_PM_NONE

@@ -78,7 +78,7 @@ class CFormValidatorNumberEx
 				return false;
 			}
 
-			if ($arParams["NUMBER_FLOAT"] != "Y" && strval(intval($value)) !== strval($value))
+			if ($arParams["NUMBER_FLOAT"] != "Y" && strval($value + 0) !== strval($value))
 			{
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_EX_ERROR_NOTINT"));
 				return false;

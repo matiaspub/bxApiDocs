@@ -6,8 +6,6 @@ IncludeModuleLangFile(__FILE__);
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CAllCatalogProductGroups
 {
 	
 	/**
-	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.add.php">CCatalogProductGroups::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.update.php">CCatalogProductGroups::Update</a>.</p>
-	*
-	*
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.add.php">CCatalogProductGroups::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.update.php">CCatalogProductGroups::Update</a>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
@@ -29,8 +25,6 @@ class CAllCatalogProductGroups
 	* <li> <b>UPDATE</b> - для метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproductgroups/ccatalogproductgroups.update.php">CCatalogProductGroups::Update</a>.</li>
 	* </ul>
-	*
-	*
 	*
 	* @param array &$arFields  Ассоциативный массив параметров информации о связи товаров и
 	* групп пользователей. Допустимые ключи: <ul> <li> <b>PRODUCT_ID</b> - код
@@ -42,19 +36,14 @@ class CAllCatalogProductGroups
 	* "D" - сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" -
 	* год).</li> </ul>
 	*
-	*
-	*
 	* @param int $ID = 0 Код записи с информацией о связи товаров и групп пользователей, к
 	* которым пользователь привязывается при покупке товаров.
 	* Параметр является необязательным и имеет смысл только для $ACTION =
 	* 'UPDATE'.
 	*
-	*
-	*
 	* @return bool <p> В случае корректности переданных параметров возвращает true,
-	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	* можно получить текст ошибок.</p>
-	*
+	* иначе - false. Если метод вернул false, с помощью $APPLICATION-&gt;GetException() можно
+	* получить текст ошибок.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
@@ -93,14 +82,10 @@ class CAllCatalogProductGroups
 
 	
 	/**
-	* <p>Метод выбирает параметры информации о связи между товаром и группами пользователей по коду информации ID.</p>
-	*
-	*
+	* <p>Метод выбирает параметры информации о связи между товаром и группами пользователей по коду информации ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код записи.
-	*
-	*
 	*
 	* @return array <p>Метод возвращает ассоциативный массив параметров информации о
 	* временном доступе с ключами:</p> <ul> <li> <b>ID</b> - код записи;</li> <li>
@@ -133,14 +118,10 @@ class CAllCatalogProductGroups
 
 	
 	/**
-	* <p>Метод изменяет параметры записи с кодом ID информации о связи товаров и групп пользователей, к которым пользователь привязывается при покупке товара, в соответствии с данными из массива arFields.</p>
-	*
-	*
+	* <p>Метод изменяет параметры записи с кодом ID информации о связи товаров и групп пользователей, к которым пользователь привязывается при покупке товара, в соответствии с данными из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  код записи </bod
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой информации о связи
 	* товаров и групп пользователей, ключами в котором являются
@@ -152,8 +133,6 @@ class CAllCatalogProductGroups
 	* который пользователь привязывается к группе пользователей при
 	* покупке товара ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" - квартал,
 	* "S" - полугодие, "Y" - год).</li> </ul>
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает код измененной записи или <i>false</i> в случае
 	* ошибки.</p> <br><br>
@@ -185,14 +164,10 @@ class CAllCatalogProductGroups
 
 	
 	/**
-	* <p>Метод удаляет информацию о связи товаров и группы пользователей, к которой пользователь привязывается при покупке товара.</p>
-	*
-	*
+	* <p>Метод удаляет информацию о связи товаров и группы пользователей, к которой пользователь привязывается при покупке товара. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код удаляемой записи.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
 	* случае ошибки.</p> <br><br>
@@ -214,14 +189,10 @@ class CAllCatalogProductGroups
 
 	
 	/**
-	* <p>Метод удаляет привязку к группе пользователей с кодом <i>ID</i> из всех карточек товаров-подписок (продажа прав).</p>
-	*
-	*
+	* <p>Метод удаляет привязку к группе пользователей с кодом <i>ID</i> из всех карточек товаров-подписок (продажа прав). Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код группы.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
 	* случае ошибки.</p> <br><br>

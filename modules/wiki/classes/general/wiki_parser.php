@@ -4,9 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице.</body> </html>
- *
- *
+ * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице. 
  *
  *
  * @return mixed 
@@ -34,29 +32,18 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы.</p>
-	*
-	*
+	* <p>Метод обрабатывает содержимое Wiki-страницы. Динамичный метод.</p>
 	*
 	*
 	* @param string $text  Содержимое Wiki-страницы </ht
 	*
-	*
-	*
 	* @param typ $e = 'text' Тип содержимого Wiki-страницы (html|text). Необязательный.
-	*
-	*
 	*
 	* @param arFil $e = array() Массив изображений. Необязательный.
 	*
-	*
-	*
 	* @param arParam $s = array() Путь до папки. Необязательный.
 	*
-	*
-	*
 	* @return string <p>Возвращает обработанную Wiki-страницу, без Wiki-разметки. <br></p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -74,7 +61,6 @@ class CWikiParser
 	* $CWikiParser = new CWikiParser();
 	* echo $CWikiParser-&gt;Parse($arElement['~DETAIL_TEXT'], $arElement['DETAIL_TEXT_TYPE'], $arElement['IMAGES']);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -596,21 +582,14 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением.</p>
-	*
-	*
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением. Динамичный метод.</p>
 	*
 	*
 	* @param string $text  Содержимое Wiki-страницы </ht
 	*
-	*
-	*
 	* @param array &$arCat  Массив будет заполнен категориями, указанными в тексте страницы
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -644,14 +623,10 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением</p>
-	*
-	*
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением. Динамичный метод.</p>
 	*
 	*
 	* @param string $text  Содержимое Wiki-страницы </ht
-	*
-	*
 	*
 	* @return string 
 	*

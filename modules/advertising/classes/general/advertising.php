@@ -48,9 +48,7 @@ $nRandom5 = 4689*mt_rand(999, 31999);
 
 
 /**
- * Класс для работы с рекламными контрактами.</body> </html>
- *
- *
+ * Класс для работы с рекламными контрактами. 
  *
  *
  * @return mixed 
@@ -246,7 +244,7 @@ public static 	function GetManagerEmails()
 	}
 
 	// возвращает массивы EMail'ов всех пользователей имеющих доступ к заданному контракту (владельцы контракта)
-	public static function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL, &$VIEW_EMAIL, &$EDIT_EMAIL)
+public static 	function GetOwnerEmails($CONTRACT_ID, &$OWNER_EMAIL, &$ADD_EMAIL, &$VIEW_EMAIL, &$EDIT_EMAIL)
 	{
 		$OWNER_EMAIL = array();
 		$VIEW_EMAIL = array();
@@ -275,22 +273,15 @@ public static 	function GetManagerEmails()
 	// получение массива прав текущего пользователя по всем контрактам
 
 	/**
-	* <p>Функция возвращает массив прав заданного пользователя по всем контрактам.</p>
-	*
-	*
+	* <p>Метод возвращает массив прав заданного пользователя по всем контрактам.</p>
 	*
 	*
 	* @param int $USER_ID = false ID пользователя; если не определён - используется ID текущего
 	* пользователя. Необязательный параметр.
 	*
-	*
-	*
 	* @param CONTRACT_I $D = 0 Необязательный параметр.
 	*
-	*
-	*
 	* @return text 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -309,9 +300,14 @@ public static 	function GetManagerEmails()
 	* 			[1] =&gt; VIEW
 	* 		)
 	* )
+	* 
+	* </pre>
+	* <p>
 	* Индексом массива является ID контракта. 
 	* Значением - массив прав на данный контракт.
-	* </pre>
+	* 
+	* 
+	* </p>
 	* </pre>
 	*
 	*
@@ -387,7 +383,7 @@ public static 	function GetManagerEmails()
 
 	// true - если пользователь имеет доступ к контракту
 	// false - в противном случае
-	public static function IsOwner($CONTRACT_ID, $USER_ID=false)
+	fupublic static nction IsOwner($CONTRACT_ID, $USER_ID=false)
 	{
 		$CONTRACT_ID = intval($CONTRACT_ID);
 		if ($CONTRACT_ID<=0) return false;
@@ -400,14 +396,10 @@ public static 	function GetManagerEmails()
 	// получение массива всех прав доступа по заданному контракту
 
 	/**
-	* <p>Функция возвращает права всех пользователей по заданному контракту.</p>
-	*
-	*
+	* <p>Метод возвращает права всех пользователей по заданному контракту.</p>
 	*
 	*
 	* @param int $CONTRACT_ID  ID контракта.
-	*
-	*
 	*
 	* @return text 
 	*
@@ -639,7 +631,7 @@ public static 	function GetTypeArray($CONTRACT_ID)
 	}
 
 	// получаем массив языков связанных с контрактом
-public static 	function GetSiteArray($CONTRACT_ID)
+	public static function GetSiteArray($CONTRACT_ID)
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: GetSiteArray<br>Line: ";
 		global $DB;
@@ -686,27 +678,20 @@ public static 	function GetPageArray($CONTRACT_ID, $SHOW="SHOW")
 	// получаем контракт по ID
 
 	/**
-	* <p>Функция возвращает контракт по его ID.</p>
-	*
-	*
+	* <p>Метод возвращает контракт по его ID.</p>
 	*
 	*
 	* @param int $CONTRACT_ID  ID контракта.
-	*
-	*
 	*
 	* @param char(1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
 	* (администратор рекламы, рекламодатель и т.д.). Если параметр
 	* определён как "N", то считается, что текущий пользователь обладает
 	* административными правами доступа к модулю Реклама. Если
-	* параметр пропущен либо равен "Y", то функция проверяет уровень
+	* параметр пропущен либо равен "Y", то метод проверяет уровень
 	* доступа к контракту, которому принадлежит баннер. Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @return record 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -757,7 +742,7 @@ public static 	function GetPageArray($CONTRACT_ID, $SHOW="SHOW")
 	}
 
 	// проверка полей при модификации контракта
-public static 	function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
+	public static function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
 	{
 		global $strError;
 		$str = "";
@@ -798,9 +783,7 @@ public static 	function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
 	// добавляем новый контракт или модифицируем существующий
 
 	/**
-	* <p>Функция создает новый контракт, либо модифицирует существующий в случае указания во втором параметре ID контракта. Возвращает ID созданного контракта, либо ID модифицированного контракта.</p>
-	*
-	*
+	* <p>Метод создает новый контракт, либо модифицирует существующий в случае указания во втором параметре ID контракта. Возвращает ID созданного контракта, либо ID модифицированного контракта.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров контракта. В массиве допустимы следующие
@@ -816,38 +799,82 @@ public static 	function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
 	* модификации отображаемой части существующих, допустимы
 	* следующие значения: <ul> <li>PUBLISHED - баннер подтвержден и
 	* опубликован</li> <li>READY - баннер на рассмотрении</li> <li>REJECTED - баннер
-	* отклонен</li> </ul> </li> <li>arrSHOW_PAGE - массив страниц и разделов сайта на
+	* отклонен</li> </ul> </li> <li>arrSHOW_PAGE - массив страниц и разделов сайта, на
 	* которых должны показываться баннеры контракта </li> <li>arrNOT_SHOW_PAGE -
-	* массив страниц и разделов сайта на которых не могут показываться
+	* массив страниц и разделов сайта, на которых не могут показываться
 	* баннеры контракта </li> <li>arrTYPE - массив доступных типов баннеров </li>
-	* <li>arrWEEKDAY - массив описывающий время и дни недели для показа
+	* <li>arrWEEKDAY - массив, описывающий время и дни недели для показа
 	* баннера; в массиве допустимы следующие индексы: <ul> <li>SUNDAY - массив
-	* часов в которые надо показывать баннер в воскресенье (0-23) </li>
+	* часов, в которые надо показывать баннер в воскресенье (0-23) </li>
 	* <li>MONDAY - -||- в понедельник </li> <li>TUESDAY - -||- во вторник </li> <li>WEDNESDAY - -||- в
 	* среду </li> <li>THURSDAY - -||- в четверг </li> <li>FRIDAY - -||- в пятницу </li> <li>SATURDAY -
-	* -||- в субботу</li> </ul> </li> <li>arrUSER_VIEW - массив ID пользователей для
+	* -||- в субботу</li> </ul> </li> <li>arrUSER_VIEW - массив ID пользователей, для
 	* которых доступен просмотр параметров контракта и баннеров и их
-	* графики </li> <li>arrUSER_ADD - массив ID пользователей для которых доступен
-	* просмотр параметров контракта и управление баннерами </li>
-	* <li>arrUSER_EDIT - массив ID пользователей для которых доступно
+	* графики </li> <li>arrUSER_ADD - массив ID пользователей, для которых
+	* доступен просмотр параметров контракта и управление баннерами
+	* </li> <li>arrUSER_EDIT - массив ID пользователей, для которых доступно
 	* редактирование заголовка и описания контракта, а также
 	* возможность назначения прав для просмотра и управления
 	* баннерами</li> </ul>
 	*
-	*
-	*
 	* @param int $CONTRACT_ID = "" ID контракта, если не указывать - создаётся новый контракт.
-	*
-	*
 	*
 	* @param char(1) $CHECK_RIGHTS = "Y" Флаг необходимости проверки прав текущего пользователя: "Y" -
 	* необходимо проверить права текущего пользователя; "N" - контракт
 	* создавать и модифицировать независимо от прав текущего
 	* пользователя. Необязательный параметр.
 	*
-	*
-	*
 	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ((strlen($save)&gt;0 || strlen($apply)&gt;0) &amp;&amp; $REQUEST_METHOD=="POST")
+	* {
+	* 	$arrWEEKDAY = array(
+	* 		"SUNDAY"	=&gt; $arrSUNDAY,
+	* 		"MONDAY"	=&gt; $arrMONDAY,
+	* 		"TUESDAY"	=&gt; $arrTUESDAY,
+	* 		"WEDNESDAY"	=&gt; $arrWEDNESDAY,
+	* 		"THURSDAY"	=&gt; $arrTHURSDAY,
+	* 		"FRIDAY"	=&gt; $arrFRIDAY,
+	* 		"SATURDAY"	=&gt; $arrSATURDAY
+	* 		);
+	* 	$arFields = array(
+	* 		"ACTIVE"				=&gt; $ACTIVE,
+	* 		"NAME"				  =&gt; $NAME,
+	* 		"DESCRIPTION"		   =&gt; $DESCRIPTION,
+	* 		"ADMIN_COMMENTS"		=&gt; $ADMIN_COMMENTS,
+	* 		"WEIGHT"				=&gt; $WEIGHT,
+	* 		"SORT"				  =&gt; $SORT,
+	* 		"MAX_SHOW_COUNT"		=&gt; $MAX_SHOW_COUNT,
+	* 		"MAX_CLICK_COUNT"	   =&gt; $MAX_CLICK_COUNT,
+	* 		"DATE_SHOW_FROM"		=&gt; $DATE_SHOW_FROM,
+	* 		"DATE_SHOW_TO"		  =&gt; $DATE_SHOW_TO,
+	* 		"DEFAULT_STATUS_SID"	=&gt; $DEFAULT_STATUS_SID,
+	* 		"arrSHOW_PAGE"		  =&gt; split("[\n\r]",$SHOW_PAGE),
+	* 		"arrNOT_SHOW_PAGE"	  =&gt; split("[\n\r]",$NOT_SHOW_PAGE),
+	* 		"arrTYPE"			   =&gt; $arrTYPE,
+	* 		"arrWEEKDAY"			=&gt; $arrWEEKDAY,
+	* 		"arrUSER_VIEW"		  =&gt; $arrUSER_VIEW,
+	* 		"arrUSER_ADD"		   =&gt; $arrUSER_ADD,
+	* 		"arrUSER_EDIT"		  =&gt; $arrUSER_EDIT
+	* 		);
+	* 	if ($ID = <b>CAdvContract::Set</b>($arFields, $ID))
+	* 	{
+	* 		if (strlen($strError)&lt;=0)
+	* 		{
+	* 			if (strlen($save) &gt; 0)
+	* 				LocalRedirect("adv_contract_list.php?lang=".LANG);
+	* 			else
+	* 				LocalRedirect("adv_contract_edit.php?ID=".$ID."&amp;lang=".LANG);
+	* 		}
+	* 	}
+	* 	$DB-&gt;PrepareFields("b_adv_contract");
+	* }
+	* ?&gt;
+	* </pre>
+	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvcontract/set.php
@@ -1240,20 +1267,14 @@ public static 	function CheckFields($arFields, $CONTRACT_ID, $CHECK_RIGHTS="Y")
 	// удаление контракта
 
 	/**
-	* <p>Функция удаляет контракт и все баннеры к нему привязанные.</p>
-	*
-	*
+	* <p>Метод удаляет контракт и все баннеры, к нему привязанные.</p>
 	*
 	*
 	* @param int $CONTRACT_ID  ID контракта.
 	*
-	*
-	*
 	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
 	* пользователя; "N" - прав проверять не надо. Необязательный
 	* параметр.
-	*
-	*
 	*
 	* @return boolean 
 	*
@@ -1319,7 +1340,7 @@ public static 	function DeleteSiteLink($CONTRACT_ID)
 	}
 
 	// удаление связи контракта с типами баннеров
-	public static function DeleteTypeLink($CONTRACT_ID)
+	funcpublic static tion DeleteTypeLink($CONTRACT_ID)
 	{
 		$err_mess = (CAdvContract_all::err_mess())."<br>Function: DeleteTypeLink<br>Line: ";
 		global $DB;
@@ -1493,9 +1514,7 @@ public static 	function GetStatList($by, $order, $arFilter)
 
 
 /**
- * Класс для работы с рекламными баннерами.</body> </html>
- *
- *
+ * Класс для работы с рекламными баннерами. 
  *
  *
  * @return mixed 
@@ -1531,27 +1550,20 @@ public static 	function SetCurUri($uri=false)
 	// получим баннер по ID
 
 	/**
-	* <p>Функция возвращает баннер по его ID.</p>
-	*
-	*
+	* <p>Метод возвращает баннер по его ID.</p>
 	*
 	*
 	* @param int $BANNER_ID  ID баннера.
-	*
-	*
 	*
 	* @param char(1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
 	* (администратор рекламы, рекламодатель и т.д.). Если параметр
 	* определён как "N", то считается, что текущий пользователь обладает
 	* административными правами доступа к модулю Реклама. Если
-	* параметр пропущен либо равен "Y", то функция проверяет уровень
+	* параметр пропущен либо равен "Y", то метод проверяет уровень
 	* доступа к контракту, которому принадлежит баннер. Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @return record 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1711,6 +1723,7 @@ public static 	function Copy($BANNER_ID, $CHECK_RIGHTS="Y")
 				"arrFlashIMAGE_ID" => $arBanner["arrFlashIMAGE_ID"],
 				"FLASH_JS" => $arBanner["FLASH_JS"],
 				"FLASH_VER" => $arBanner["FLASH_VER"],
+				"TEMPLATE" => $arBanner["TEMPLATE"]
 				);
 			if (intval($arBanner["IMAGE_ID"])>0)
 			{
@@ -1718,27 +1731,37 @@ public static 	function Copy($BANNER_ID, $CHECK_RIGHTS="Y")
 				$arrIMAGE["MODULE_ID"] = "advertising";
 				$arFields["arrIMAGE_ID"] = $arrIMAGE;
 			}
+			if ($arBanner["TEMPLATE_FILES"] && CheckSerializedData($arBanner["TEMPLATE_FILES"]))
+				$arBanner["TEMPLATE_FILES"] = unserialize(htmlspecialchars_decode($arBanner["TEMPLATE_FILES"]));
+			else
+				$arBanner["TEMPLATE_FILES"] = array();
+			$arrTEMPLATE_FILES = array();
+			foreach ($arBanner["TEMPLATE_FILES"] as $k1 => $v1)
+			{
+				foreach ($v1 as $k2 => $v2)
+				{
+					$arrTEMPLATE_FILES[$k1][$k2] = CFile::MakeFileArray($v2);
+				}
+			}
+
+			$arFields["TEMPLATE_FILES"] = $arrTEMPLATE_FILES;
+
 			$ID = CAdvBanner::Set($arFields, 0);
 		}
 		return $ID;
 	}
 
 	// удаление баннера
+	f
 	/**
-	* <p>Функция удаляет баннер.</p>
-	*
-	*
+	* <p>Метод удаляет баннер.</p>
 	*
 	*
 	* @param int $BANNER_ID  ID баннера.
 	*
-	*
-	*
 	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
 	* пользователя; "N" - прав проверять не надо. Необязательный
 	* параметр.
-	*
-	*
 	*
 	* @return boolean 
 	*
@@ -1746,7 +1769,7 @@ public static 	function Copy($BANNER_ID, $CHECK_RIGHTS="Y")
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/delete.php
 	* @author Bitrix
 	*/
-	public static function Delete($BANNER_ID, $CHECK_RIGHTS="Y")
+	public static unction Delete($BANNER_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAdvBanner_all::err_mess())."<br>Function: Delete<br>Line: ";
 		global $DB, $strError;
@@ -2137,6 +2160,22 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 						$str .= $strRes."<br>";
 				}
 
+				if (in_array("TEMPLATE_FILES", $arrKeys) && is_array($arFields["TEMPLATE_FILES"]))
+				{
+					foreach ($arFields["TEMPLATE_FILES"] as $unit)
+					{
+						if (is_array($unit))
+						{
+							foreach ($unit as $file)
+							{
+								$file["MODULE_ID"] = "advertising";
+								$strRes = CAdvBanner_all::CheckFile($file, 0, 0, 0, array("IMAGE", "VIDEO"));
+								if (strlen($strRes) > 0)
+									$str .= $strRes."<br>";
+							}
+						}
+					}
+				}
 
 				if ($arFields["FLYUNIFORM"] == "Y")
 				{
@@ -2171,12 +2210,201 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 			return true;
 	}
 
+public static 	public static function CheckFile($arFile, $iMaxSize=0, $iMaxWidth=0, $iMaxHeight=0, $access_typies=array(), $bForceMD5=false, $bSkipExt=false)
+	{
+		if ($arFile["name"] == "")
+		{
+			return "";
+		}
+
+		if (preg_match("#^php://filter#i", $arFile["tmp_name"]))
+		{
+			return GetMessage("FILE_BAD_FILE_TYPE").".<br>";
+		}
+
+		$extension = GetFileExtension(strtolower($arFile["name"]));
+		switch ($extension)
+		{
+			case "jpg": case "jpeg": case "gif": case "bmp": case "png":	$file_type = "IMAGE"; break;
+			case "swf":	$file_type = "FLASH"; break;
+			case "mp4": case "webm": case "ogg": $file_type = "VIDEO"; break;
+			default: $file_type = "UNKNOWN";
+		}
+
+		// IMAGE by default
+		$flashEnabled = false;
+		if(!in_array($file_type, $access_typies))
+		{
+			$file_type = "IMAGE";
+		}
+
+		if ($file_type == "FLASH")
+		{
+			$flashEnabled = true;
+			static $flashMime = array("application/x-shockwave-flash", "application/vnd.adobe.flash.movie");
+			$res = CFile::CheckFile($arFile, $iMaxSize, $flashMime, CFile::GetFlashExtensions(), $bForceMD5, $bSkipExt);
+		}
+		else if ($file_type == "VIDEO")
+		{
+			$res = CFile::CheckFile($arFile, $iMaxSize, "video/", "mp4,webm,ogg", $bForceMD5, $bSkipExt);
+		}
+		else
+		{
+			$res = CFile::CheckFile($arFile, $iMaxSize, "image/", CFile::GetImageExtensions(), $bForceMD5, $bSkipExt);
+		}
+
+		if($res <> '')
+		{
+			return $res;
+		}
+
+		if ($file_type == 'IMAGE' || $file_type == "FLASH")
+		{
+			$imgArray = CFile::GetImageSize($arFile["tmp_name"], true, $flashEnabled);
+			if(is_array($imgArray))
+			{
+				$intWIDTH = $imgArray[0];
+				$intHEIGHT = $imgArray[1];
+			}
+			else
+			{
+				return GetMessage("FILE_BAD_FILE_TYPE").".<br>";
+			}
+			//check for dimensions
+			if($iMaxWidth > 0 && ($intWIDTH > $iMaxWidth || $intWIDTH == 0) || $iMaxHeight > 0 && ($intHEIGHT > $iMaxHeight || $intHEIGHT == 0))
+			{
+				return GetMessage("FILE_BAD_MAX_RESOLUTION")." (".$iMaxWidth." * ".$iMaxHeight." ".GetMessage("main_include_dots").").<br>";
+			}
+		}
+
+		return null;
+	}
+
+public static 	public static function makeFileArray($data, $del = false, $description = null, $options = array())
+	{
+		$emptyFile = array(
+			"name" => null,
+			"type" => null,
+			"tmp_name" => null,
+			"error" => 4,
+			"size" => 0,
+		);
+
+		if ($del)
+		{
+			$result = $emptyFile;
+			$result["del"] = "Y";
+		}
+		elseif (is_null($data))
+		{
+			$result = $emptyFile;
+		}
+		elseif (is_numeric($data))
+		{
+			$result = self::makeFileArrayFromId($data, $description, $options);
+			if ($result === false)
+				$result = $emptyFile;
+		}
+		elseif (is_string($data))
+		{
+			$result = self::makeFileArrayFromPath($data, $description, $options);
+			if ($result === false)
+				$result = $emptyFile;
+		}
+		elseif (is_array($data))
+		{
+			$result = self::makeFileArrayFromArray($data, $description, $options);
+			if ($result === false)
+				$result = $emptyFile;
+		}
+		else
+		{
+			$result = $emptyFile;
+		}
+
+		return $result;
+	}
+
+public static 	private static function makeFileArrayFromId($file_id, $description = null, $options = array())
+	{
+		$result = false;
+
+		$result = CFile::MakeFileArray($file_id);
+		if (is_array($result))
+		{
+			if (!is_null($description))
+				$result["description"] = $description;
+		}
+
+		return $result;
+	}
+
+public static 	private static function makeFileArrayFromPath($file_path, $description = null, $options = array())
+	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		$result = false;
+
+		if (preg_match("/^https?:\\/\\//", $file_path))
+		{
+			$result = CFile::MakeFileArray($file_path);
+		}
+		else
+		{
+			$io = CBXVirtualIo::GetInstance();
+			$normPath = $io->CombinePath("/", $file_path);
+			$absPath = $io->CombinePath($_SERVER["DOCUMENT_ROOT"], $normPath);
+			if ($io->ValidatePathString($absPath) && $io->FileExists($absPath))
+			{
+				$perm = $APPLICATION->GetFileAccessPermission($normPath);
+				if ($perm >= "W")
+					$result = CFile::MakeFileArray($io->GetPhysicalName($absPath));
+			}
+		}
+
+		if (is_array($result))
+		{
+			if (!is_null($description))
+				$result["description"] = $description;
+		}
+
+		return $result;
+	}
+
+public static 	private static function makeFileArrayFromArray($file_array, $description = null, $options = array())
+	{
+		$result = false;
+		if (file_exists($_SERVER["DOCUMENT_ROOT"].$file_array["tmp_name"]))
+		{
+			$result = $file_array;
+			$result["tmp_name"] = $_SERVER["DOCUMENT_ROOT"].$file_array["tmp_name"];
+			if (!is_null($description))
+				$result["description"] = $description;
+		}
+		else
+		{
+			$emptyFile = array(
+				"name" => null,
+				"type" => null,
+				"tmp_name" => null,
+				"error" => 4,
+				"size" => 0,
+			);
+			if ($file_array == $emptyFile)
+			{
+				$result = $emptyFile;
+				if (!is_null($description))
+					$result["description"] = $description;
+			}
+		}
+
+		return $result;
+	}
+
 	// добавляем новый баннер или модифицируем существующий
-	
+
 	/**
-	* <p>Функция создает новый баннер, либо модифицирует существующий в случае указания во втором параметре ID баннера. Возвращает ID созданного баннера, либо ID модифицированного баннера.</p>
-	*
-	*
+	* <p>Метод создает новый баннер, либо модифицирует существующий в случае указания во втором параметре ID баннера. Возвращает ID созданного баннера, либо ID модифицированного баннера.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров баннера. В массиве допустимы следующие
@@ -2189,7 +2417,7 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 	* <li>STATUS_COMMENTS - комментарий к статусу </li> <li>NAME - имя баннера </li>
 	* <li>GROUP_SID - имя группы баннера </li> <li>ACTIVE - флаг активности: "Y" - баннер
 	* активен; "N" - баннер не активен; </li> <li> <span lang="en-us">arrSITE</span> - код
-	* языковой части сайта в которой будет показываться баннер </li>
+	* языковой части сайта, в которой будет показываться баннер </li>
 	* <li>WEIGHT - вес (приоритет) баннера </li> <li>MAX_SHOW_COUNT - максимальное
 	* количество показов баннера </li> <li>RESET_SHOW_COUNT - флаг необходимости
 	* сбросить счетчик показов у баннера (автоматически будет уменьшен
@@ -2198,18 +2426,18 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 	* сбросить счетчик кликов на баннер (автоматически будет уменьшен
 	* счетчик кликов у всего контракта) </li> <li>DATE_SHOW_FROM - дата начала
 	* показов баннера </li> <li>DATE_SHOW_TO - дата окончания показов баннера </li>
-	* <li>arrIMAGE<span lang="en-us">_ID</span> - массив описывающий загружаемое
+	* <li>arrIMAGE<span lang="en-us">_ID</span> - массив, описывающий загружаемое
 	* изображение; в массиве допустимые следующие индексы: <ul> <li>name -
 	* исходное имя загружаемого файла</li> <li>type - тип загружаемого файла
 	* (например: "image/gif")</li> <li>tmp_name - имя временного файла на сервере</li>
 	* <li>error - код ошибки ("0" - нет ошибок)</li> <li>size - размер загружаемого
 	* файла</li> <li>MODULE_ID - идентификатор модуля ("advertising")</li> </ul> </li> <li>IMAGE_ALT -
 	* текст всплывающей подсказки к изображению </li> <li>URL - ссылка на
-	* изображении. В данном поле можно использовать шаблон
+	* изображение. В данном поле можно использовать шаблон
 	* <code>#EVENT_GID#</code>, который при клике на баннер будет заменен на
-	* идентификатор посетителя который используется в модуле
+	* идентификатор посетителя, который используется в модуле
 	* статистики при загрузке событий. </li> <li>URL_TARGET - в данном поле вы
-	* можете задать строку влияющее на поведение браузера при нажатии
+	* можете задать строку, влияющую на поведение браузера при нажатии
 	* на ссылку-изображение: <ul> <li>_self - открыть в текущем окне</li> <li>_blank -
 	* открыть в новом окне</li> <li>_parent - открыть в своем фреймсете</li> <li>_top -
 	* во всем текущем окне браузера</li> </ul> </li> <li>CODE - код баннера </li>
@@ -2225,45 +2453,117 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 	* показывать баннер только для новых посетителей; "N" - показывать
 	* баннер только для посетителей уже посещавших сайт </li> <li>COMMENTS -
 	* комментарий к баннеру </li> <li>arrSHOW_PAGE - массив страниц и разделов
-	* сайта на которых должен показываться баннер </li> <li>arrNOT_SHOW_PAGE -
-	* массив страниц и разделов сайта на которых не должен
+	* сайта, на которых должен показываться баннер </li> <li>arrNOT_SHOW_PAGE -
+	* массив страниц и разделов сайта, на которых не должен
 	* показываться баннер </li> <li>arrCOUNTRY - массив двухсимвольных кодов
-	* стран посетителям которых необходимо показывать баннер </li>
-	* <li>arrSTAT_ADV - массив идентификаторов рекламных кампаний посетителям
-	* которых необходимо показывать баннер (как на прямых заходах, так
-	* и на возвратах) </li> <li>arrWEEKDAY - массив описывающий время и дни недели
-	* для показа баннера; в массиве допустимы следующие индексы: <ul>
-	* <li>SUNDAY - массив часов в которые надо показывать баннер в
-	* воскресенье (0-23) </li> <li>MONDAY - -||- в понедельник </li> <li>TUESDAY - -||- во
-	* вторник </li> <li>WEDNESDAY - -||- в среду </li> <li>THURSDAY - -||- в четверг </li> <li>FRIDAY -
-	* -||- в пятницу </li> <li>SATURDAY - -||- в субботу</li> </ul> </li> <li>SEND_EMAIL - флаг
-	* необходимости отослать EMail владельцам контракта при смене
-	* статуса баннера; письмо отсылается по шаблону "Изменился статус
-	* баннера"</li> </ul>
-	*
-	*
+	* стран, посетителям которых необходимо показывать баннер </li>
+	* <li>arrSTAT_ADV - массив идентификаторов рекламных кампаний,
+	* посетителям которых необходимо показывать баннер (как на прямых
+	* заходах, так и на возвратах) </li> <li>arrWEEKDAY - массив, описывающий
+	* время и дни недели для показа баннера; в массиве допустимы
+	* следующие индексы: <ul> <li>SUNDAY - массив часов в которые надо
+	* показывать баннер в воскресенье (0-23) </li> <li>MONDAY - -||- в понедельник
+	* </li> <li>TUESDAY - -||- во вторник </li> <li>WEDNESDAY - -||- в среду </li> <li>THURSDAY - -||- в
+	* четверг </li> <li>FRIDAY - -||- в пятницу </li> <li>SATURDAY - -||- в субботу</li> </ul> </li>
+	* <li>SEND_EMAIL - флаг необходимости отослать EMail владельцам контракта
+	* при смене статуса баннера; письмо отсылается по шаблону
+	* "Изменился статус баннера"</li> </ul>
 	*
 	* @param int $BANNER_ID = "" ID баннера, если не указывать - создаётся новый баннер.
-	*
-	*
 	*
 	* @param char(1) $CHECK_RIGHTS = "Y" Флаг необходимости проверки прав текущего пользователя: "Y" -
 	* необходимо проверить права текущего пользователя; "N" - баннер
 	* создавать и модифицировать независимо от прав текущего
 	* пользователя. Необязательный параметр.
 	*
-	*
-	*
 	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* if ((strlen($save)&gt;0 || strlen($apply)&gt;0) &amp;&amp; $REQUEST_METHOD=="POST")
+	* {
+	* 	InitBVar($SEND_EMAIL);
+	* 	$arrIMAGE_ID = $HTTP_POST_FILES["IMAGE_ID"];
+	* 	$arrIMAGE_ID["MODULE_ID"] = "advertising";
+	* 	$arrIMAGE_ID["del"] = ${"IMAGE_ID_del"};
+	* 	$arrWEEKDAY = array(
+	* 		"SUNDAY"	=&gt; $arrSUNDAY,
+	* 		"MONDAY"	=&gt; $arrMONDAY,
+	* 		"TUESDAY"   =&gt; $arrTUESDAY,
+	* 		"WEDNESDAY" =&gt; $arrWEDNESDAY,
+	* 		"THURSDAY"  =&gt; $arrTHURSDAY,
+	* 		"FRIDAY"	=&gt; $arrFRIDAY,
+	* 		"SATURDAY"  =&gt; $arrSATURDAY
+	* 		);
+	* 	if ($action=="view" &amp;&amp; $isAbsAdmin)
+	* 	{
+	* 		 $arFields = array(
+	* 			"STATUS_SID"		=&gt; $STATUS_SID,
+	* 			"STATUS_COMMENTS"   =&gt; $STATUS_COMMENTS
+	* 			);
+	* 	}
+	* 	else
+	* 	{
+	* 		 $arFields = array(
+	* 			"CONTRACT_ID"	   =&gt; $CONTRACT_ID,
+	* 			"TYPE_SID"		  =&gt; $TYPE_SID,
+	* 			"STATUS_SID"		=&gt; $STATUS_SID,
+	* 			"STATUS_COMMENTS"   =&gt; $STATUS_COMMENTS,
+	* 			"NAME"			  =&gt; $NAME,
+	* 			"GROUP_SID"		 =&gt; $GROUP_SID,
+	* 			"ACTIVE"		=&gt; $ACTIVE,
+	* 			"arrSITE"		=&gt; $arrSITE,
+	* 			"WEIGHT"		=&gt; $WEIGHT,
+	* 			"MAX_SHOW_COUNT"	=&gt; $MAX_SHOW_COUNT,
+	* 			"RESET_SHOW_COUNT"  =&gt; $RESET_SHOW_COUNT,
+	* 			"MAX_CLICK_COUNT"   =&gt; $MAX_CLICK_COUNT,
+	* 			"RESET_CLICK_COUNT" =&gt; $RESET_CLICK_COUNT,
+	* 			"DATE_SHOW_FROM"	=&gt; $DATE_SHOW_FROM,
+	* 			"DATE_SHOW_TO"	  =&gt; $DATE_SHOW_TO,
+	* 			"arrIMAGE_ID"	   =&gt; $arrIMAGE_ID,
+	* 			"IMAGE_ALT"		 =&gt; $IMAGE_ALT,
+	* 			"URL"			   =&gt; $URL,
+	* 			"URL_TARGET"		=&gt; $URL_TARGET,
+	* 			"CODE"			  =&gt; $CODE,
+	* 			"CODE_TYPE"		 =&gt; $CODE_TYPE,
+	* 			"STAT_EVENT_1"	  =&gt; $STAT_EVENT_1,
+	* 			"STAT_EVENT_2"	  =&gt; $STAT_EVENT_2,
+	* 			"STAT_EVENT_3"	  =&gt; $STAT_EVENT_3,
+	* 			"FOR_NEW_GUEST"	 =&gt; $FOR_NEW_GUEST,
+	* 			"COMMENTS"		  =&gt; $COMMENTS,
+	* 			"arrSHOW_PAGE"	  =&gt; split("[\n\r]",$SHOW_PAGE),
+	* 			"arrNOT_SHOW_PAGE"  =&gt; split("[\n\r]",$NOT_SHOW_PAGE),
+	* 			"arrCOUNTRY"		=&gt; $arrCOUNTRY,
+	* 			"arrSTAT_ADV"	   =&gt; $arrSTAT_ADV,
+	* 			"arrWEEKDAY"		=&gt; $arrWEEKDAY,
+	* 			"SEND_EMAIL"		=&gt; $SEND_EMAIL
+	* 			);
+	* 	}
+	* 	if ($ID = <b>CAdvBanner::Set</b>($arFields, $ID))
+	* 	{
+	* 		if (strlen($strError) &lt;= 0)
+	* 		{
+	* 			 if (strlen($save) &gt; 0)
+	* 				 LocalRedirect("adv_banner_list.php?lang=".LANG);
+	* 			 else
+	* 				 LocalRedirect("adv_banner_edit.php?ID=".$ID."&amp;CONTRACT_ID=".$CONTRACT_ID."&amp;lang=".LANG."&amp;action=".$action);
+	* 		}
+	* 	}
+	* 	$DB-&gt;PrepareFields("b_adv_banner");
+	* }
+	* ?&gt;
+	* </pre>
+	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/set.php
 	* @author Bitrix
 	*/
-	public static function Set($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
+	public static 	function Set($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAdvBanner_all::err_mess())."<br>Function: Set<br>Line: ";
-		global $DB, $USER;
+		global $DB, $USER, $APPLICATION, $strError;
 		$BANNER_ID = intval($BANNER_ID);
 		if (CAdvBanner::CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS))
 		{
@@ -2282,6 +2582,25 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 				$isAdmin = $isManager = true;
 				$CHECK_CONTRACT_RIGHTS = "N";
 			}
+
+			if ($BANNER_ID <= 0)
+				$events = GetModuleEvents("advertising", "OnBeforeBannerAdd", true);
+			else
+				$events = GetModuleEvents("advertising", "OnBeforeBannerUpdate", true);
+
+			foreach ($events as $arEvent)
+			{
+				if (ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+				{
+					if ($err = $APPLICATION->GetException())
+						$strError .= $err->GetString()."<br />";
+					else
+						$strError .= GetMessage("AD_ERROR_ON_HANDLER", array ("#HANDLER#" => $arEvent['MESSAGE_ID']))."<br />";
+
+					return false;
+				}
+			}
+
 			$arFields_i = array();
 			$arrKeys = array_keys($arFields);
 
@@ -2472,6 +2791,64 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 					}
 				}
 
+				if (in_array("TEMPLATE_FILES", $arrKeys) && is_array($arFields["TEMPLATE_FILES"]))
+				{
+					if ($BANNER_ID>0)
+					{
+						$z = $DB->Query("SELECT TEMPLATE_FILES FROM b_adv_banner WHERE ID='$BANNER_ID'", false, $err_mess.__LINE__);
+						$zr = $z->Fetch();
+						if (CheckSerializedData($zr['TEMPLATE_FILES']))
+							$zr = unserialize($zr['TEMPLATE_FILES']);
+						else
+							$zr = array();
+					}
+					$subdir = COption::GetOptionString("advertising", "UPLOAD_SUBDIR");
+					$arTemplateFiles = array();
+					$cnt = 0;
+					foreach ($arFields["TEMPLATE_FILES"] as $tfk => $tfv)
+					{
+						if (is_array($tfv))
+						{
+							foreach($tfv as $k => $arFile)
+							{
+								$arFile["MODULE_ID"] = "advertising";
+								if(isset($zr[$arFile['lastKey']][$k]))
+									$arFile["old_file"] = $zr[$arFile['lastKey']][$k];
+
+								if (strlen($arFile["name"])>0 || strlen($arFile["description"])>0 || isset($arFile["del"]) && strlen($arFile["del"])>0)
+								{
+									$fid = CFile::SaveFile($arFile, $subdir);
+
+									if ($fid === false && strlen($arFile["description"]) > 0 && strlen($arFile["old_file"]) > 0)
+									{
+										$arTemplateFiles[$cnt][$k] = intval($arFile["old_file"]);
+										continue;
+									}
+
+									if (intval($fid)>0)
+									{
+										$arTemplateFiles[$cnt][$k] = intval($fid);
+									}
+									else
+									{
+										$arTemplateFiles[$cnt][$k] = "null";
+									}
+									if (intval($zr[$arFile['lastKey']][$k]) != intval($arTemplateFiles[$cnt][$k]))
+									{
+										$modify_status = "Y";
+									}
+								}
+								else
+								{
+									$arTemplateFiles[$cnt][$k] = $zr[$arFile['lastKey']][$k];
+								}
+							}
+						}
+						$cnt++;
+					}
+					$arFields_i["TEMPLATE_FILES"] = "'".$DB->ForSql(serialize($arTemplateFiles),2000)."'";
+				}
+
 				if (in_array("IMAGE_ALT", $arrKeys))
 				{
 					$arFields_i["IMAGE_ALT"] = "'".$DB->ForSql($arFields["IMAGE_ALT"],255)."'";
@@ -2483,7 +2860,7 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 
 				if (in_array("URL", $arrKeys))
 				{
-					$arFields_i["URL"] = "'".$DB->ForSql($arFields["URL"],2000)."'";
+					$arFields_i["URL"] = "'".$DB->ForSql($arFields["URL"])."'";
 					if ("'".$DB->ForSql($arBanner["URL"],2000)."'" != $arFields_i["URL"])
 					{
 						$modify_status = "Y";
@@ -2564,6 +2941,15 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 				{
 					$arFields_i["AD_TYPE"] = "'".$DB->ForSql($arFields["AD_TYPE"],20)."'";
 					if ("'".$DB->ForSql($arBanner["AD_TYPE"], 20)."'"!=$arFields_i["AD_TYPE"])
+					{
+						$modify_status = "Y";
+					}
+				}
+
+				if (in_array("TEMPLATE", $arrKeys))
+				{
+					$arFields_i["TEMPLATE"] = "'".$DB->ForSql($arFields["TEMPLATE"])."'";
+					if ("'".$DB->ForSql($arBanner["TEMPLATE"])."'"!=$arFields_i["TEMPLATE"])
 					{
 						$modify_status = "Y";
 					}
@@ -2868,7 +3254,7 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 
 					// если необходимо оповестить
 					$SEND_EMAIL = $arFields["SEND_EMAIL"]=="N" ? "N" : "Y";
-					if ($email_notify=="Y" && (!$isAdmin || !$isManager || $SEND_EMAIL=="Y"))
+					if (true)
 					{
 						// получаем данные по баннеру
 						CTimeZone::Disable();
@@ -2970,6 +3356,7 @@ public static 	function CheckFields($arFields, $BANNER_ID, $CHECK_RIGHTS="Y")
 								"DATE_MODIFY"			=> $arBanner["DATE_MODIFY"],
 								"MODIFIED_BY"			=> $MODIFIED_BY,
 								"AD_TYPE"				=> $arBanner["AD_TYPE"],
+								"TEMPLATE"				=> unserialize($arBanner["TEMPLATE"]),
 								"FLASH_TRANSPARENT" => $arBanner["FLASH_TRANSPARENT"],
 								"FLASH_IMAGE_LINK" => $FLASHIMAGE_LINK,
 								"FLASH_JS" => $arBanner["FLASH_JS"],
@@ -3039,40 +3426,31 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 		}
 	}
 
-
+	
 	/**
-	* <p>Функция возвращает весь или часть массива, хранящего ключевые слова, заданные для данной страницы с помощью функций <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setdesiredkeywords.php">CAdvBanner::SetDesiredKeywords</a> и <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setrequiredkeywords.php">CAdvBanner::SetRequiredKeywords</a>.</p>
-	*
-	*
+	* <p>Метод возвращает весь или часть массива, хранящего ключевые слова, заданные для данной страницы с помощью методов <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setdesiredkeywords.php">CAdvBanner::SetDesiredKeywords</a> и <a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setrequiredkeywords.php">CAdvBanner::SetRequiredKeywords</a>.</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID = "" Символьный идентификатор типа рекламы. Если задан, то
-	* возвращаются все ключевые слова по заданные для данного типа.
+	* возвращаются все ключевые слова, заданные для данного типа.
 	* Необязательный параметр.
-	*
-	*
 	*
 	* @param varchar(255) $LOGIC = "" Идентификатор обязательности наличия ключевых слов в баннере.
 	* Возможные значения: "DESIRED" либо "REQUIRED". Если задан тип рекламы и
-	* данный параметр, то функция возвратит массив ключевых слов
+	* данный параметр, то метод возвратит массив ключевых слов,
 	* заданных для соответствующего типа и работающих по логике
 	* "ПРИСУТСТВИЕ ЖЕЛАТЕЛЬНО" либо "ПРИСУТСТВИЕ ОБЯЗАТЕЛЬНО".
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @param char(1) $EXACT_MATCH = "" Идентификатор типа поиска (прямое совпадение либо вхождение
 	* части слова). Возможные значения: "Y" либо "N". Если задан тип
-	* рекламы, идентификатор логики и данный параметр, то функция
-	* возвратит массив ключевых слов заданных для соответствующего
+	* рекламы, идентификатор логики и данный параметр, то метод
+	* возвратит массив ключевых слов, заданных для соответствующего
 	* типа, работающих по соответствующей логике, при этом слова в
 	* массиве будут заданы для поиска вхождения (EXACT_MATCH=N), либо для
 	* поиска прямого совпадения (EXACT_MATCH=Y). Необязательный параметр.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3113,10 +3491,10 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* </li>
 	* 
 	* 
-	* Если на странице заданы ключевые слова, то возможны две ситуация когда:
+	* Если на странице заданы ключевые слова, то возможны две ситуации, когда:
 	* 
 	* 
-	* <li>Не будет найден ни один баннер, подходящий под условия ключевых фраз. В этом случае будут показываться все баннеры, у которых список ключевых фраз пуст, в соответствии с приоритетом указанным в их настройках.</li>
+	* <li>Не будет найден ни один баннер, подходящий под условия ключевых фраз. В этом случае будут показываться все баннеры, у которых список ключевых фраз пуст, в соответствии с приоритетом, указанным в их настройках.</li>
 	* 	<li>Будет найдено несколько баннеров, удовлетворяющих условию ключевых фраз. В этом случае, среди этих баннеров будет выбран один в соответствии с приоритетом, указанным в его настройках, а также в соответствии с приоритетом, указанным в настройках контракта, к которому принадлежит этот баннер.</li>
 	* 
 	* 
@@ -3128,7 +3506,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/getkeywords.php
 	* @author Bitrix
 	*/
-	public static 	function GetKeywords($TYPE_SID="", $LOGIC="", $EXACT_MATCH="")
+	public static function GetKeywords($TYPE_SID="", $LOGIC="", $EXACT_MATCH="")
 	{
 		global $arrADV_KEYWORDS, $APPLICATION;
 		$arrReturn = $arrADV_KEYWORDS;
@@ -3180,25 +3558,19 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 
 
 	/**
-	* <p>Функция обнуляет массив (либо его части) ключевых слов баннеров заданных для страницы.</p>
-	*
-	*
+	* <p>Метод обнуляет массив (либо его части) ключевых слов баннеров, заданных для страницы.</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID = "" Символьный идентификатор типа рекламы. Если задан, то обнуляется
-	* массив ключевых слов заданных для данного типа. Необязательный
+	* массив ключевых слов, заданных для данного типа. Необязательный
 	* параметр.
-	*
-	*
 	*
 	* @param varchar(255) $LOGIC = "" Идентификатор обязательности наличия ключевых слов в баннере.
 	* Возможные значения: "DESIRED" либо "REQUIRED". Если задан тип рекламы и
-	* данный параметр, то функция обнулит массив ключевых слов
-	* заданных для соответствующего типа и работающих по логике
-	* "ПРИСУТСТВИЕ ЖЕЛАТЕЛЬНО" либо "ПРИСУТСТВИЕ ОБЯЗАТЕЛЬНО".
-	* Необязательный параметр.
-	*
-	*
+	* данный параметр, то метод обнулит массив ключевых слов, заданных
+	* для соответствующего типа и работающих по логике "ПРИСУТСТВИЕ
+	* ЖЕЛАТЕЛЬНО" либо "ПРИСУТСТВИЕ ОБЯЗАТЕЛЬНО". Необязательный
+	* параметр.
 	*
 	* @param char(1) $EXACT_MATCH = "" Идентификатор типа поиска (прямое совпадение либо вхождение
 	* части слова). Возможные значения: "Y" либо "N". Если задан тип
@@ -3206,10 +3578,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* то обнуляется массив данного параметра, данной логики поиска и
 	* данного типа рекламы. Необязательный параметр.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3267,7 +3636,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* 		)
 	* 	)
 	* )
-	* </boЕсли для вышеописанного массива вызвать функцию <code>CAdvBanner::ResetKeywords("LEFT","REQUIRED","N")</code>, то массив ключевых слов будет выглядеть следующим образом:
+	* </boЕсли для вышеописанного массива вызвать метод <code>CAdvBanner::ResetKeywords("LEFT","REQUIRED","N")</code>, то массив ключевых слов будет выглядеть следующим образом:
 	* 
 	* 
 	* Array
@@ -3344,25 +3713,18 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 
 
 	/**
-	* <p>Функция задает массив обязательных ключевых слов для данной страницы. Баннер будет показан на данной странице с наивысшим приоритетом только в том случае, если все слова из заданного с помощью данной функции массива, будут найдены в ключевых словах баннера (либо контракта к которому принадлежит баннер). В случае, если не будет найден ни один баннер отвечающий установленным ключевым словам, то баннер для показа будет выбран из тех, для которых вообще не установлено ни одно ключевое слово.</p>
-	*
-	*
+	* <p>Метод задает массив обязательных ключевых слов для данной страницы. Баннер будет показан на данной странице с наивысшим приоритетом только в том случае, если все слова из заданного с помощью данного метода массива, будут найдены в ключевых словах баннера (либо контракта к которому принадлежит баннер). В случае, если не будет найден ни один баннер, отвечающий установленным ключевым словам, то баннер для показа будет выбран из тех, для которых вообще не установлено ни одно ключевое слово.</p>
 	*
 	*
 	* @param mixed $keywords  Ключевые слова. Конструкции, которые можно передавать в этом
 	* параметре, описаны в примечаниях ниже.
-	*
-	*
 	*
 	* @param varchar(255) $TYPE_SID = "" Идентификатор типа. В данном параметре можно указать тип рекламы,
 	* для которой будут заданы ключевые слова. Если данный параметр
 	* оставить пустым, то ключевые слова будут заданы для всех типов.
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3405,23 +3767,21 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* Если на странице заданы ключевые слова, то возможны две ситуация:
 	* 
 	* 
-	* <li>Не будет найден ни один баннер подходящий под условия ключевых фраз. В этом 
+	* <li>Не будет найден ни один баннер, подходящий под условия ключевых фраз. В этом 
 	* случае будут показываться все баннеры, у которых список ключевых фраз пуст, в 
-	* соответствии с приоритетом указанным в их настройках. 
+	* соответствии с приоритетом, указанным в их настройках. 
 	* </li>
-	* <li>Будет найдено несколько баннеров удовлетворяющих условию ключевых фраз. В 
+	* <li>Будет найдено несколько баннеров, удовлетворяющих условию ключевых фраз. В 
 	* этом случае среди этих баннеров будет выбран один в соответствии с приоритетом, 
-	* указанным в его настройках, а также в соответствии с приоритетом указанным в 
-	* настройках контракта к которому принадлежит этот баннер.
+	* указанным в его настройках, а также в соответствии с приоритетом, указанным в 
+	* настройках контракта, к которому принадлежит этот баннер.
 	* </li>
 	* 
 	* 
-	* Помимо этого необходимо иметь в виду что под <b>массивом ключевых фраз 
-	* баннера</b> понимается сумма массива ключевых фраз заданного в настройках 
-	* баннера и массива ключевых фраз заданного в настройках контракта к которому 
+	* Помимо этого, необходимо иметь в виду что под <b>массивом ключевых фраз 
+	* баннера</b> понимается сумма массива ключевых фраз, заданного в настройках 
+	* баннера, и массива ключевых фраз, заданного в настройках контракта, к которому 
 	* принадлежит баннер.
-	* 
-	* Примечания</bodКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
 	* </pre>
 	*
 	*
@@ -3429,32 +3789,25 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setrequiredkeywords.php
 	* @author Bitrix
 	*/
-	public static 	function SetRequiredKeywords($keywords, $TYPE_SID="")
+		function SetRequiredKeywords($keywords, $TYPE_SID="")
 	{
 		CAdvBanner::SetKeywords($keywords, $TYPE_SID, "REQUIRED");
 	}
 
-
+	
 	/**
-	* <p>Функция задает массив желательных ключевых слов для данной страницы. Если одно из ключевых слов баннера (либо контракта, к которому принадлежит баннер) будет найдено в данном массиве, то этот баннер будет показываться на данной странице с более высоким приоритетом. В случае, если не будет найден ни один баннер, отвечающий установленным ключевым словам, то баннер для показа будет выбран из тех, для которых вообще не установлено ни одно ключевое слово.</p>
-	*
-	*
+	* <p>Метод задает массив желательных ключевых слов для данной страницы. Если одно из ключевых слов баннера (либо контракта, к которому принадлежит баннер) будет найдено в данном массиве, то этот баннер будет показываться на данной странице с более высоким приоритетом. В случае, если не будет найден ни один баннер, отвечающий установленным ключевым словам, то баннер для показа будет выбран из тех, для которых вообще не установлено ни одно ключевое слово.</p>
 	*
 	*
 	* @param mixed $keywords  Ключевые слова. Конструкции, которые можно передавать в этом
 	* параметре, описаны в примечаниях ниже.
-	*
-	*
 	*
 	* @param varchar(255) $TYPE_SID = "" Идентификатор типа. В данном параметре вы можете указать тип
 	* рекламы для которой будут заданы ключевые слова. Если данный
 	* параметр оставить пустым, то ключевые слова будут заданы для всех
 	* типов. Необязательный параметр.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3494,7 +3847,6 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* &lt;/head&gt;
 	* &lt;body&gt;
 	* ...
-	* Примечания</bodКонструкции, которые можно передавать в параметре <code>keywords</code>, включают.
 	* </pre>
 	*
 	*
@@ -3502,7 +3854,7 @@ public static 	function SetKeywords($keywords, $TYPE_SID="", $LOGIC="DESIRED")
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/setdesiredkeywords.php
 	* @author Bitrix
 	*/
-	public static 	function SetDesiredKeywords($keywords, $TYPE_SID="")
+	public static function SetDesiredKeywords($keywords, $TYPE_SID="")
 	{
 		CAdvBanner::SetKeywords($keywords, $TYPE_SID, "DESIRED");
 	}
@@ -3517,20 +3869,25 @@ public static 	function GetDesiredKeywords($TYPE_SID="", $EXACT_MATCH="")
 		return CAdvBanner::GetKeywords($TYPE_SID, "DESIRED", $EXACT_MATCH);
 	}
 
+public static 	function arr_comp_uniform($a, $b)
+	{
+		if ($a["val"] < $b["val"])
+			return -1;
+		elseif ($a["val"] > $b["val"])
+			return 1;
+		else
+			return 0;
+	}
+
 	// возвращает массив описывающий произвольный баннер
 
 	/**
-	* <p>Функция выбирает в соответствии с весами (приоритетами) произвольный баннер по указанному типу и возвращает массив частично его описывающий.</p>
-	*
-	*
+	* <p>Метод выбирает в соответствии с весами (приоритетами) произвольный баннер по указанному типу и возвращает массив, частично его описывающий.</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID  Символьный идентификатор типа.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -4044,6 +4401,438 @@ public static 	function GetDesiredKeywords($TYPE_SID="", $EXACT_MATCH="")
 		return null;
 	}
 
+	// возвращает массив, описывающий $quantity произвольных баннеров
+public static 	function GetRandomArray($TYPE_SID, $quantity = 1)
+	{
+		$err_mess = (CAdvBanner_all::err_mess())."<br>Function: GetRandom<br>Line: ";
+		global $APPLICATION, $DB, $arrViewedBanners, $arrADV_VIEWED_BANNERS;
+
+		static $arrWeightSum = false;
+
+		$TYPE_SID = trim($TYPE_SID);
+		if (strlen($TYPE_SID)<=0)
+		{
+			return false;
+		}
+
+		$DONT_USE_CONTRACT = COption::GetOptionString("advertising", "DONT_USE_CONTRACT", "N");
+
+		if ($arrWeightSum === false)
+		{
+			// получим массив весов для текущей страницы
+			$arrWeightSum = array();
+
+			$arrCookie_counter = array();
+			// если мы уже получили на странице значение cookie то
+			if (is_array($arrADV_VIEWED_BANNERS))
+			{
+				while (list($banner_id, $arr)=each($arrADV_VIEWED_BANNERS))
+				{
+					$arrCookie_counter[$banner_id] = $arr["COUNTER"];
+				}
+			}
+			else // если мы первый раз обращаемся к значению хранимому в cookie
+			{
+				$cookie_name = "BANNERS";
+				$arr = explode(",", $APPLICATION->get_cookie($cookie_name));
+				if (is_array($arr) && count($arr)>0)
+				{
+					foreach($arr as $str)
+					{
+						$ar = explode("_",$str);
+						$banner_id = intval($ar[1]);
+						$counter = intval($ar[2]);
+						$arrCookie_counter[$banner_id] = $counter;
+					}
+				}
+			}
+
+			$arrWeightSum_RequiredKeywords = array();
+			$arrWeightSum_DesiredKeywords = array();
+			$arrWeightSum_EmptyKeywords = array();
+			$arrWeightSum_all = array();
+			$arKeywordsSet = array(); // заданы ли ключевые слова для того или иного типа
+
+			$arrRequiredKeywordsBanners = array(); // массив баннеров для которых были найдены все ключевые слова
+			$arrDesiredKeywordsBanners = array(); // массив баннеров для которых было найдено хотя бы одно желательное слово
+			$arrEmptyKeywordsBanners = array(); // массив баннеров у которых поле "ключевые слова" не заполнено
+			$arrPAGE_KEYWORDS = CAdvBanner::GetKeywords(); // массив ключевых слов заданных для данной страницы
+
+			$arrDesiredPageKeywords_all = is_array($arrPAGE_KEYWORDS[""]["DESIRED"]) ? $arrPAGE_KEYWORDS[""]["DESIRED"] : array();
+			$arrRequiredPageKeywords_all = is_array($arrPAGE_KEYWORDS[""]["REQUIRED"]) ? $arrPAGE_KEYWORDS[""]["REQUIRED"] : array();
+
+			$rs = CAdvBanner::GetPageWeights_RS();
+			while($ar=$rs->Fetch())
+			{
+				// Check for blocked uniformed banners
+				if (isset($ar["FLYUNIFORM"]) and $ar["FLYUNIFORM"] == "Y")
+				{
+						$unitest = CAdvBanner_all::GetUniformityCoef($ar);
+						if ($unitest >= 1.0 + BANNER_UNIFORMITY_DIVERGENCE_COEF)
+							continue;
+				}
+
+				$arKeywordsSet[$ar["TYPE_SID"]] = "N";
+
+				if ((intval($ar["SHOWS_FOR_VISITOR"])>0 && intval($arrCookie_counter[$ar["BANNER_ID"]])<intval($ar["SHOWS_FOR_VISITOR"])) || intval($ar["SHOWS_FOR_VISITOR"])<=0)
+				{
+					$arr = $arrPAGE_KEYWORDS[$ar["TYPE_SID"]]["DESIRED"];
+					$arrDesiredPageKeywords = is_array($arr) ? $arr : array();
+
+					$arr = $arrPAGE_KEYWORDS[$ar["TYPE_SID"]]["REQUIRED"];
+					$arrRequiredPageKeywords = is_array($arr) ? $arr : array();
+
+					if (count($arrRequiredPageKeywords)>0 ||
+						count($arrRequiredPageKeywords_all)>0 ||
+						count($arrDesiredPageKeywords)>0 ||
+						count($arrDesiredPageKeywords_all)>0
+					)
+					{
+						$arKeywordsSet[$ar["TYPE_SID"]] = "Y";
+					}
+
+					$arrBannerKeywords = preg_split('/[\n\r]+/', $ar["BANNER_KEYWORDS"]);
+					if (is_array($arrBannerKeywords))
+					{
+						TrimArr($arrBannerKeywords);
+					}
+
+					if ($DONT_USE_CONTRACT <> "Y" && $ar["CONTRACT_KEYWORDS"] <> '')
+					{
+						$arrContractKeywords = preg_split('/[\n\r]+/', $ar["CONTRACT_KEYWORDS"]);
+						if (is_array($arrContractKeywords))
+						{
+							TrimArr($arrContractKeywords);
+						}
+						$arrBannerKeywords = array_unique(array_merge($arrBannerKeywords, $arrContractKeywords));
+					}
+
+					if ($DONT_USE_CONTRACT == "Y" || !array_key_exists("CONTRACT_ID", $ar))
+						$ar["CONTRACT_ID"] = 0;
+
+					if (count($arrBannerKeywords)>0)
+					{
+						$found_required = true;
+						if (count($arrRequiredPageKeywords)>0 || count($arrRequiredPageKeywords_all)>0)
+						{
+							$arr = array("Y","N"); // совпадение | вхождение
+							foreach($arr as $exact_match)
+							{
+								$arr1 = is_array($arrRequiredPageKeywords[$exact_match]) ? $arrRequiredPageKeywords[$exact_match] : array();
+								$arr2 = is_array($arrRequiredPageKeywords_all[$exact_match]) ? $arrRequiredPageKeywords_all[$exact_match] : array();
+								$arrRequiredKeywords = array_unique(array_merge($arr1, $arr2));
+								if (count($arrRequiredKeywords)>0)
+								{
+									reset($arrRequiredKeywords);
+									foreach($arrRequiredKeywords as $page_word)
+									{
+										$page_word = strtoupper($page_word);
+										reset($arrBannerKeywords);
+										$found = false;
+										foreach($arrBannerKeywords as $banner_word)
+										{
+											$banner_word = strtoupper($banner_word);
+											// совпадение
+											if ($exact_match=="Y")
+											{
+												if ($banner_word==$page_word)
+												{
+													$found = true;
+													break;
+												}
+											}
+											elseif ($exact_match=="N")
+											{
+												if (strpos($page_word, $banner_word)!==false || strpos($banner_word, $page_word)!==false)
+												{
+													$found = true;
+													break;
+												}
+											}
+										}
+										if (!$found)
+										{
+											$found_required = false;
+											break 2;
+										}
+									}
+								}
+							}
+							// если все ключевые слова были найдены то
+							if ($found_required)
+							{
+								// запоминаем баннер в массиве баннеров для которых были найдены все ключевые слова
+								$arrRequiredKeywordsBanners[] = $ar["BANNER_ID"];
+							}
+						}
+
+						// если по обязательным словам баннер подходит то проверим по желательным словам
+						if ($found_required && (count($arrDesiredPageKeywords)>0 || count($arrDesiredPageKeywords_all)>0))
+						{
+							$found_desired = false;
+							$arr = array("Y","N"); // совпадение | вхождение
+							foreach($arr as $exact_match)
+							{
+								$arr1 = is_array($arrDesiredPageKeywords) ? $arrDesiredPageKeywords[$exact_match] : array();
+								$arr2 = is_array($arrDesiredPageKeywords_all) ? $arrDesiredPageKeywords_all[$exact_match] : array();
+								if (!is_array($arr1)) $arr1 = array();
+								if (!is_array($arr2)) $arr2 = array();
+								$arrDesiredKeywords = array_unique(array_merge($arr1, $arr2));
+								if (is_array($arrDesiredKeywords) && count($arrDesiredKeywords)>0)
+								{
+									reset($arrDesiredKeywords);
+									foreach($arrDesiredKeywords as $page_word)
+									{
+										$page_word = strtoupper($page_word);
+										reset($arrBannerKeywords);
+										foreach($arrBannerKeywords as $banner_word)
+										{
+											$banner_word = strtoupper($banner_word);
+											// совпадение
+											if ($exact_match=="Y")
+											{
+												if ($banner_word==$page_word)
+												{
+													$found_desired = true;
+													break 3;
+												}
+											}
+											elseif ($exact_match=="N")
+											{
+												if (strpos($page_word, $banner_word)!==false || strpos($banner_word, $page_word)!==false)
+												{
+													$found_desired = true;
+													break 3;
+												}
+											}
+										}
+									}
+								}
+							}
+							// если все ключевые слова были найдены то
+							if ($found_desired)
+							{
+								// запоминаем баннер в массиве баннеров для которых были найдены все ключевые слова
+								$arrDesiredKeywordsBanners[] = $ar["BANNER_ID"];
+							}
+						}
+					}
+					else
+					{
+						// запомнить баннеры у которых вообще не задано ключевых слов
+						$arrEmptyKeywordsBanners[] = $ar["BANNER_ID"];
+					}
+
+					if (in_array($ar["BANNER_ID"], $arrRequiredKeywordsBanners))
+					{
+						$arrWeightSum_RequiredKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["WEIGHT"] = intval($ar["CONTRACT_WEIGHT"]);
+						$arrWeightSum_RequiredKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["BANNERS"][$ar["BANNER_ID"]] = intval($ar["BANNER_WEIGHT"]);
+					}
+					if (in_array($ar["BANNER_ID"], $arrDesiredKeywordsBanners))
+					{
+						$arrWeightSum_DesiredKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["WEIGHT"] = intval($ar["CONTRACT_WEIGHT"]);
+						$arrWeightSum_DesiredKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["BANNERS"][$ar["BANNER_ID"]] = intval($ar["BANNER_WEIGHT"]);
+					}
+					if (in_array($ar["BANNER_ID"], $arrEmptyKeywordsBanners))
+					{
+						$arrWeightSum_EmptyKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["WEIGHT"] = intval($ar["CONTRACT_WEIGHT"]);
+						$arrWeightSum_EmptyKeywords[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["BANNERS"][$ar["BANNER_ID"]] = intval($ar["BANNER_WEIGHT"]);
+					}
+					$arrWeightSum_all[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["WEIGHT"] = intval($ar["CONTRACT_WEIGHT"]);
+					$arrWeightSum_all[$ar["TYPE_SID"]][$ar["CONTRACT_ID"]]["BANNERS"][$ar["BANNER_ID"]] = intval($ar["BANNER_WEIGHT"]);
+				}
+			}
+
+			$arrAllTypies = array_keys($arrWeightSum_all);
+			if (count($arrAllTypies)>0)
+			{
+				foreach($arrAllTypies as $tsid)
+				{
+					// если для данного типа ключевые слова заданы то
+					if ($arKeywordsSet[$tsid]=="Y")
+					{
+						// желательные слова
+						if (is_array($arrWeightSum_DesiredKeywords[$tsid]) && count($arrWeightSum_DesiredKeywords[$tsid])>0)
+						{
+							$arrWeightSum[$tsid] = $arrWeightSum_DesiredKeywords[$tsid];
+						}
+						// обязательные слова
+						elseif (is_array($arrWeightSum_RequiredKeywords[$tsid]) && count($arrWeightSum_RequiredKeywords[$tsid])>0)
+						{
+							$arrWeightSum[$tsid] = $arrWeightSum_RequiredKeywords[$tsid];
+						}
+						// с пустыми словами
+						elseif ($arKeywordsSet[$tsid]=="Y" && is_array($arrWeightSum_EmptyKeywords[$tsid]))
+						{
+							$arrWeightSum[$tsid] = $arrWeightSum_EmptyKeywords[$tsid];
+						}
+					}
+					else
+					{
+						$arrWeightSum[$tsid] = $arrWeightSum_all[$tsid];
+					}
+				}
+			}
+		}
+
+		$arrWSum = $arrWeightSum[$TYPE_SID];
+
+		// если массив весов подготовлен то
+		if (is_array($arrWSum) && count($arrWSum)>0)
+		{
+			$CONTRACT_ID = 0;
+
+			if ($DONT_USE_CONTRACT == "N" || !array_key_exists("0", $arrWSum))
+			{
+				// получим сумму весов контрактов
+				$intSum = 0;
+				reset($arrWSum);
+
+				while (list($cid, $arr) = each($arrWSum))
+				{
+					$CONTRACT_ID = $cid;
+					$intSum += intval($arr["WEIGHT"]);
+				}
+
+				// выберем контракт по весу
+				$intStep = 0;
+				$rndWeight = $intSum * (mt_rand()/mt_getrandmax());
+				reset($arrWSum);
+				while (list($cid, $arr) = each($arrWSum))
+				{
+					if($rndWeight>=$intStep && $rndWeight<=$intStep+$arr["WEIGHT"])
+					{
+						$CONTRACT_ID = $cid;
+						break;
+					}
+					$intStep += $arr["WEIGHT"];
+				}
+				$CONTRACT_ID = intval($CONTRACT_ID)<=0 ? 1 : intval($CONTRACT_ID);
+			}
+
+			$arrWeightBanners = $arrWSum[$CONTRACT_ID]["BANNERS"];
+
+			// если ID контракта определен то
+			if (is_array($arrWeightBanners) && count($arrWeightBanners)>0)
+			{
+				// получим сумму весов баннеров контракта
+				$intSum = 0;
+				$strBanners = "0";
+				reset($arrWeightBanners);
+				while (list($bid, $weight) = each($arrWeightBanners))
+				{
+					if(in_array($bid, $arrViewedBanners))
+						continue;
+					$intSum += intval($weight);
+					$strBanners .= ",".intval($bid);
+				}
+
+				if ($CONTRACT_ID>0)
+				{
+					$strSql = "
+						SELECT
+							B.*,
+							".$DB->DateToCharFunction("B.DATE_SHOW_FIRST", "FULL")." DATE_SHOW_FIRST,
+							".$DB->DateToCharFunction("B.DATE_SHOW_FROM", "FULL")." DATE_SHOW_FROM,
+							".$DB->DateToCharFunction("B.DATE_SHOW_TO", "FULL")." DATE_SHOW_TO,
+							C.MAX_VISITOR_COUNT		CONTRACT_MAX_VISITOR_COUNT
+						FROM
+							b_adv_banner B,
+							b_adv_contract C
+						WHERE
+							B.CONTRACT_ID = $CONTRACT_ID
+						and	B.TYPE_SID = '".$DB->ForSql($TYPE_SID,255)."'
+						and B.ID in (".$strBanners.")
+						and C.ID = B.CONTRACT_ID
+						ORDER BY
+							FLYUNIFORM DESC
+						";
+				}
+				else
+				{
+					$strSql = "
+						SELECT
+							B.*,
+							".$DB->DateToCharFunction("B.DATE_SHOW_FIRST", "FULL")." DATE_SHOW_FIRST,
+							".$DB->DateToCharFunction("B.DATE_SHOW_FROM", "FULL")." DATE_SHOW_FROM,
+							".$DB->DateToCharFunction("B.DATE_SHOW_TO", "FULL")." DATE_SHOW_TO
+						FROM
+							b_adv_banner B
+						WHERE
+						B.TYPE_SID = '".$DB->ForSql($TYPE_SID,255)."'
+						AND B.ID in (".$strBanners.")
+						ORDER BY
+							FLYUNIFORM DESC
+						";
+
+				}
+
+				$intSum = 0;
+				$inf = array();
+				$stubs = array();
+
+				$rsBanners = $DB->Query($strSql, false, $err_mess.__LINE__);
+				while($arBanner = $rsBanners->Fetch())
+				{
+					if (isset($arBanner["FLYUNIFORM"]) and $arBanner["FLYUNIFORM"] == "Y")
+					{
+						$unitest = CAdvBanner_all::GetUniformityCoef($arBanner);
+						if ($unitest < 1.0 + BANNER_UNIFORMITY_DIVERGENCE_COEF)
+							$inf[$arBanner['ID']] = $arBanner;
+					}
+					else
+					{
+						$intSum += intval($arBanner["WEIGHT"]);
+						$stubs[$arBanner['ID']] = $arBanner; // Save stubs
+					}
+				}
+
+				// Sort array from most last (weak) rotated banner (x<<1) to strongest
+				uasort($inf, array('CAdvBanner_all', 'arr_comp_uniform'));
+
+				// Sorting stubs array
+				$infStubs = array();
+				while (count($stubs))
+				{
+					$intStep = 0;
+					$rndWeight = $intSum * (mt_rand()/mt_getrandmax());
+
+					reset($stubs);
+					$infCurr = current($stubs);
+					if($rndWeight < $intStep or $rndWeight > $intStep + $infCurr["WEIGHT"])
+					{
+						$intStep += $infCurr["WEIGHT"];
+						while (next($stubs))
+						{
+							$infCurr = current($stubs);
+							if($rndWeight>=$intStep && $rndWeight<=$intStep+$infCurr["WEIGHT"])
+								break;
+							$intStep += $infCurr["WEIGHT"];
+						}
+					}
+					$infStubs[$infCurr['ID']] = $infCurr;
+					unset($stubs[$infCurr['ID']]);
+				}
+
+				$arBanners = array_slice(array_merge($inf, $infStubs), 0, intval($quantity));
+
+				foreach ($arBanners as $arB)
+				{
+					$BANNER_ID = intval($arB["ID"]);
+					if ($BANNER_ID > 0)
+					{
+						unset($arrWeightSum[$TYPE_SID][$CONTRACT_ID]["BANNERS"][$arB["ID"]]);
+						if(count($arrWeightSum[$TYPE_SID][$CONTRACT_ID]["BANNERS"]) <= 0)
+							unset($arrWeightSum[$TYPE_SID][$CONTRACT_ID]);
+						$arrViewedBanners[] = $arB["ID"];
+					}
+				}
+				return $arBanners;
+			}
+		}
+		return null;
+	}
+
 	// Uniformity coefficient
 public static 	function GetUniformityCoef($arBanner)
 	{
@@ -4116,7 +4905,7 @@ public static 	function CalculateTimeProgress($arBanner)
 		return $stmpnow/$diff;
 	}
 
-	public static function CalculateRotationProgress($arBanner)
+public static 	function CalculateRotationProgress($arBanner)
 	{
 		if (!isset($arBanner["MAX_SHOW_COUNT"]) or !isset($arBanner["SHOW_COUNT"]) or
 			intval($arBanner["MAX_SHOW_COUNT"])==0) return 0;
@@ -4155,6 +4944,9 @@ public static 	function GetRedirectURL($url, $arBanner)
 				"id=".$arBanner["ID"]
 			);
 
+			if (defined('SITE_ID'))
+				$arUrlParams[] = 'site_id=' . SITE_ID;
+
 			$event1 = CAdvBanner::PrepareHTML($arBanner["STAT_EVENT_1"], $arBanner);
 			$event2 = CAdvBanner::PrepareHTML($arBanner["STAT_EVENT_2"], $arBanner);
 			$event3 = CAdvBanner::PrepareHTML($arBanner["STAT_EVENT_3"], $arBanner);
@@ -4190,9 +4982,7 @@ public static 	function ReplaceURL($text, $arBanner)
 	// возвращает HTML баннера по массиву
 
 	/**
-	* <p>Функция возвращает готовый HTML баннера.</p>
-	*
-	*
+	* <p>Метод возвращает готовый HTML баннера.</p>
 	*
 	*
 	* @param array $arrBanner  Массив, описывающий параметры баннера; в массиве достаточно и
@@ -4204,11 +4994,7 @@ public static 	function ReplaceURL($text, $arBanner)
 	* браузера при клике на изображение баннера</li> <li>CODE - код баннера
 	* (если используется)</li> <li>CODE_TYPE - тип кода баннера [text | html]</li> </ul>
 	*
-	*
-	*
 	* @param bNoInde $x = false Необязательный параметр.
-	*
-	*
 	*
 	* @return text 
 	*
@@ -4221,7 +5007,7 @@ public static 	function ReplaceURL($text, $arBanner)
 		$strReturn = "";
 
 		// обрабатываем изображение
-		if(intval($arBanner["IMAGE_ID"]) > 0 && $arBanner["AD_TYPE"] <> "html")
+		if(intval($arBanner["IMAGE_ID"]) > 0 && $arBanner["AD_TYPE"] <> "html" && $arBanner["AD_TYPE"] <> "template")
 		{
 			$arImage = CFile::GetFileArray($arBanner["IMAGE_ID"]);
 			if ($arImage)
@@ -4264,7 +5050,7 @@ public static 	function ReplaceURL($text, $arBanner)
 							$strReturn = '<div style="width: '.$arImage["WIDTH"].'px; height: '.$arImage["HEIGHT"].'px; padding:0; margin:0">';
 							if(strlen(trim($arBanner["URL"]))>0 && $arBanner["NO_URL_IN_FLASH"] == "Y")
 							{
-								$strReturn .= ($bNoIndex? '<noindex>':'').'<div style="position:absolute; z-index:100;"><a href="'.$url.'"'.$a_target.$a_title.($bNoIndex? ' rel="nofollow"':'').'><img src="/bitrix/images/1.gif" width="'.$arImage["WIDTH"].'" height="'.$arImage["HEIGHT"].'" border="0" alt="'.htmlspecialcharsEx($alt).'" /></a></div>'.($bNoIndex? '</noindex>':'');
+								$strReturn .= ($bNoIndex? '<noindex>':'').'<div style="position:absolute; z-index:100;"><a href="'.$url.'"'.$a_target.$a_title.($bNoIndex? ' rel="nofollow"':'').'><img src="/bitrix/images/1.gif" width="'.$arImage["WIDTH"].'" height="'.$arImage["HEIGHT"].'" style="border:0;" alt="'.htmlspecialcharsEx($alt).'" /></a></div>'.($bNoIndex? '</noindex>':'');
 							}
 							$strReturn .=
 '<OBJECT
@@ -4314,7 +5100,7 @@ public static 	function ReplaceURL($text, $arBanner)
 							if(trim($arBanner["URL"]) <> '')
 							{
 								if($arBanner["NO_URL_IN_FLASH"] == "Y")
-									$strReturn .= ($bNoIndex? '<noindex>':'').'<div style="position:absolute; z-index:100;"><a href="'.$url.'"'.$a_target.$a_title.($bNoIndex? ' rel="nofollow"':'').'><img src="/bitrix/images/1.gif" width="'.$arImage["WIDTH"].'" height="'.$arImage["HEIGHT"].'" border="0" alt="'.htmlspecialcharsEx($alt).'" /></a></div>'.($bNoIndex? '</noindex>':'');
+									$strReturn .= ($bNoIndex? '<noindex>':'').'<div style="position:absolute; z-index:100;"><a href="'.$url.'"'.$a_target.$a_title.($bNoIndex? ' rel="nofollow"':'').'><img src="/bitrix/images/1.gif" width="'.$arImage["WIDTH"].'" height="'.$arImage["HEIGHT"].'" style="border:0;" alt="'.htmlspecialcharsEx($alt).'" /></a></div>'.($bNoIndex? '</noindex>':'');
 								else
 									$altHref = $url;
 							}
@@ -4333,7 +5119,7 @@ public static 	function ReplaceURL($text, $arBanner)
 
 					default:
 						$alt = CAdvBanner::PrepareHTML(trim($arBanner["IMAGE_ALT"]), $arBanner);
-						$strImage = "<img alt=\"".htmlspecialcharsEx($alt)."\"  title=\"".htmlspecialcharsEx($alt)."\" src=\"".$path."\" width=\"".$arImage["WIDTH"]."\" height=\"".$arImage["HEIGHT"]."\" border=\"0\" />";
+						$strImage = "<img alt=\"".htmlspecialcharsEx($alt)."\" title=\"".htmlspecialcharsEx($alt)."\" src=\"".$path."\" width=\"".$arImage["WIDTH"]."\" height=\"".$arImage["HEIGHT"]."\" style=\"border:0;\" />";
 						if (strlen(trim($arBanner["URL"]))>0)
 						{
 							$url = $arBanner["URL"];
@@ -4365,7 +5151,7 @@ public static 	function ReplaceURL($text, $arBanner)
 		return $strReturn;
 	}
 
-	public static function FixShowAll()
+public static 	function FixShowAll()
 	{
 		global $DB, $CACHE_ADVERTISING, $arrADV_VIEWED_BANNERS, $APPLICATION;
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: FixShowAll<br>Line: ";
@@ -4377,7 +5163,7 @@ public static 	function ReplaceURL($text, $arBanner)
 			array_key_exists("BANNERS_CNT", $CACHE_ADVERTISING) &&
 			is_array($CACHE_ADVERTISING["BANNERS_CNT"]))
 		{
-		
+
 			if( array_key_exists( "ALL_DATE_SHOW_FIRST", $CACHE_ADVERTISING ) && is_array( $CACHE_ADVERTISING["ALL_DATE_SHOW_FIRST"] ) )
 			{
 				foreach( $CACHE_ADVERTISING["ALL_DATE_SHOW_FIRST"] as $key => $value )
@@ -4385,7 +5171,7 @@ public static 	function ReplaceURL($text, $arBanner)
 					$DB->Update( "b_adv_banner", Array( "DATE_SHOW_FIRST" => $value ), "WHERE ID='" . $key . "'", $err_mess . __LINE__ );
 				}
 			}
-			
+
 			$bEqualBanID = ($CACHE_ADVERTISING["BANNERS_ALL"] == $CACHE_ADVERTISING["BANNERS_CNT"]);
 
 			//Update баннеров
@@ -4524,23 +5310,23 @@ public static 	function ReplaceURL($text, $arBanner)
 				}
 				$cookie_value = trim($cookie_value,",");
 				$cookie_name = "BANNERS";
-				$APPLICATION->set_cookie($cookie_name, $cookie_value);
+				$secure = (COption::GetOptionString("main", "use_secure_password_cookies", "N") == "Y" && CMain::IsHTTPS());
+				$APPLICATION->set_cookie($cookie_name, $cookie_value, false, "/", false, $secure);
 			}
+
+			CAdvBanner::BeforeRestartBuffer();
 		}
 	}
 
 	// фиксируем показ баннера
+
 	/**
-	* <p>Функция фиксирует показ баннера в базе данных. Помимо этого, функция устанавливает cookie в котором фиксирует факт того что посетителю был показан баннер.</p>
-	*
-	*
+	* <p>Метод фиксирует показ баннера в базе данных. Помимо этого, метод устанавливает cookie, в котором фиксирует факт того, что посетителю был показан баннер.</p>
 	*
 	*
 	* @param array $arrBanner  Массив, описывающий параметры баннера; в массиве достаточно и
 	* необходимо иметь наличие следующих индексов и соответствующих
 	* значений:<ul> <li>ID - ID баннера</li> <li>CONTRACT_ID - ID контракта баннера</li> </ul>
-	*
-	*
 	*
 	* @return mixed 
 	*
@@ -4548,7 +5334,7 @@ public static 	function ReplaceURL($text, $arBanner)
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/fixshow.php
 	* @author Bitrix
 	*/
-	public static function FixShow($arBanner)
+	public static 	function FixShow($arBanner)
 	{
 		global $DB, $CACHE_ADVERTISING;
 
@@ -4599,7 +5385,7 @@ public static 	function ReplaceURL($text, $arBanner)
 			}
 		}
 	}
-	
+
 public static 	function BeforeRestartBuffer()
 	{
 		global $CACHE_ADVERTISING, $arrADV_VIEWED_BANNERS;
@@ -4610,12 +5396,12 @@ public static 	function BeforeRestartBuffer()
 			"CONTRACTS_CNT" => array(),
 		);
 		$arrADV_VIEWED_BANNERS = false;
-		
+
 		//return true;
 	}
-	
+
 	// устанавливаем cookie посетителю о просмотре баннера
-	public static function SetCookie($arBanner, &$inc_banner_counter, &$inc_contract_counter)
+public static 	function SetCookie($arBanner, &$inc_banner_counter, &$inc_contract_counter)
 	{
 		global $arrADV_VIEWED_BANNERS, $APPLICATION;
 		if (intval($arBanner["ID"])>0)
@@ -4724,22 +5510,14 @@ public static 	function BeforeRestartBuffer()
 	// возвращает HTML произвольного баннера по типу
 
 	/**
-	* <p>Функция выбирает в соответствии с весами (приоритетами) произвольный баннер по указанному типу, фиксирует факт показа баннера в базе данных и возвращает готовый HTML баннера (используется в шаблоне сайта для вывода баннеров).</p>
-	*
-	*
+	* <p>Метод выбирает в соответствии с весами (приоритетами) произвольный баннер по указанному типу, фиксирует факт показа баннера в базе данных и возвращает готовый HTML баннера (используется в шаблоне сайта для вывода баннеров).</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID  Символьный идентификатор типа.
 	*
-	*
-	*
 	* @param text $HTML_BEFORE = false Необязательный параметр.
 	*
-	*
-	*
 	* @param text $HTML_AFTER = false Необязательный параметр.
-	*
-	*
 	*
 	* @return text 
 	*
@@ -4781,7 +5559,7 @@ public static 	function BeforeRestartBuffer()
 		return false;
 	}
 
-public static 	function GetEditIcons($arBanner, $TYPE_SID="")
+public static 	function GetEditIcons($arBanner, $TYPE_SID="", $arIcons = array())
 	{
 		global $USER, $APPLICATION;
 		static $arContractTypes = false;
@@ -4791,86 +5569,123 @@ public static 	function GetEditIcons($arBanner, $TYPE_SID="")
 		{
 			if(CAdvContract::IsManager() || CAdvContract::IsAdmin())
 			{
-				$arIcons = array();
-				if (!empty($arBanner) && isset($arBanner["ID"]))
+				if (is_array($arIcons) && count($arIcons) > 0)
 				{
-					$arIcons[] = array(
-						"URL" => 'javascript:'.$APPLICATION->GetPopupLink(
-							array(
-								'URL' => "/bitrix/admin/adv_banner_edit.php?bxpublic=Y&from_module=advertising&lang=".LANGUAGE_ID."&ID=".$arBanner["ID"]. "&CONTRACT_ID=".$arBanner["CONTRACT_ID"],
-								'PARAMS' => array(
-									'width' => 700,
-									'height' => 400,
-									'resize' => false,
-								)
-							)
-						),
-						"ICON" => "bx-context-toolbar-edit-icon",
-						"TITLE" => GetMessage("AD_PUBLIC_ICON_EDIT_BANNER")
-					);
-
-					$TYPE_SID = $arBanner["TYPE_SID"];
-				}
-				if (strlen($TYPE_SID) > 0)
-				{
-					$arSubMenu = array();
-
-					if($arContracts === false)
+					if (!empty($arBanner) && isset($arBanner["ID"]))
 					{
-						$arContracts = array();
-						$arContractTypes = array();
-						$contracts = CAdvContract::GetList($sort="s_sort", $order="desc", array(), $is_filtered=false);
-						while($arContract = $contracts->Fetch())
-						{
-							$arContracts[] = $arContract;
-							$arContractTypes[$arContract["ID"]] = CAdvContract::GetTypeArray($arContract["ID"]);
-						}
-					}
-
-					foreach($arContracts as $arContract)
-					{
-						if (array_key_exists("ALL", $arContractTypes[$arContract["ID"]]) || array_key_exists($TYPE_SID, $arContractTypes[$arContract["ID"]]))
-						{
-							$arSubMenu[] = array(
+						$curIcon = array(
 								"URL" => 'javascript:'.$APPLICATION->GetPopupLink(
-									array(
-										'URL' => "/bitrix/admin/adv_banner_edit.php?bxpublic=Y&from_module=advertising&lang=".LANGUAGE_ID."&TYPE_SID=".$TYPE_SID."&CONTRACT_ID=".$arContract["ID"],
-										'PARAMS' => array(
-											'width' => 700,
-											'height' => 400,
-											'resize' => false,
-											)
-										)
-									),
-								"TEXT" => $arContract["NAME"]
+												array(
+														'URL' => "/bitrix/admin/adv_banner_edit.php?bxpublic=Y&from_module=advertising&lang=".LANGUAGE_ID."&ID=".$arBanner["ID"]. "&CONTRACT_ID=".$arBanner["CONTRACT_ID"],
+														'PARAMS' => array(
+																'width' => 700,
+																'height' => 400,
+																'resize' => false,
+														)
+												)
+										),
+								"TEXT" => $arBanner["NAME"]
+						);
+
+						if (!is_array($arIcons[0]['MENU']))
+						{
+							$arIcons[0]['MENU'] = array(
+								array(
+									"URL" => $arIcons[0]['URL'],
+									"TEXT" => $arIcons[0]['MESS']
+								)
 							);
+							unset($arIcons[0]['URL']);
+							unset($arIcons[0]['MESS']);
+						}
+
+						array_push($arIcons[0]['MENU'], $curIcon);
+					}
+				}
+				else
+				{
+					$arIcons = array();
+					if (!empty($arBanner) && isset($arBanner["ID"]))
+					{
+						$arIcons[] = array(
+								"URL" => 'javascript:'.$APPLICATION->GetPopupLink(
+												array(
+														'URL' => "/bitrix/admin/adv_banner_edit.php?bxpublic=Y&from_module=advertising&lang=".LANGUAGE_ID."&ID=".$arBanner["ID"]. "&CONTRACT_ID=".$arBanner["CONTRACT_ID"],
+														'PARAMS' => array(
+																'width' => 700,
+																'height' => 400,
+																'resize' => false,
+														)
+												)
+										),
+								"ICON" => "bx-context-toolbar-edit-icon",
+								"TITLE" => GetMessage("AD_PUBLIC_ICON_EDIT_BANNER"),
+								"MESS" => $arBanner["NAME"]
+						);
+
+						$TYPE_SID = $arBanner["TYPE_SID"];
+					}
+					if (strlen($TYPE_SID) > 0)
+					{
+						$arSubMenu = array();
+
+						if($arContracts === false)
+						{
+							$arContracts = array();
+							$arContractTypes = array();
+							$contracts = CAdvContract::GetList($sort="s_sort", $order="desc", array("SITE" => SITE_ID), $is_filtered=false);
+							while($arContract = $contracts->Fetch())
+							{
+								$arContracts[] = $arContract;
+								$arContractTypes[$arContract["ID"]] = CAdvContract::GetTypeArray($arContract["ID"]);
+							}
+						}
+
+						foreach($arContracts as $arContract)
+						{
+							if (array_key_exists("ALL", $arContractTypes[$arContract["ID"]]) || array_key_exists($TYPE_SID, $arContractTypes[$arContract["ID"]]))
+							{
+								$arSubMenu[] = array(
+										"URL" => 'javascript:'.$APPLICATION->GetPopupLink(
+														array(
+																'URL' => "/bitrix/admin/adv_banner_edit.php?bxpublic=Y&from_module=advertising&lang=".LANGUAGE_ID."&TYPE_SID=".$TYPE_SID."&CONTRACT_ID=".$arContract["ID"],
+																'PARAMS' => array(
+																		'width' => 700,
+																		'height' => 400,
+																		'resize' => false,
+																)
+														)
+												),
+										"TEXT" => $arContract["NAME"]
+								);
+							}
+						}
+
+						$arIcon = array(
+								"ICON" => "bx-context-toolbar-create-icon",
+								"TITLE" => GetMessage("AD_PUBLIC_ICON_ADD_BANNER")
+						);
+
+						$nSubMenu = count($arSubMenu);
+						if($nSubMenu == 1)
+						{
+							$arIcon["URL"] = $arSubMenu[0]["URL"];
+							$arIcons[] = $arIcon;
+						}
+						elseif($nSubMenu > 1)
+						{
+							$arIcon["MENU"] = $arSubMenu;
+							$arIcons[] = $arIcon;
 						}
 					}
 
-					$arIcon = array(
-						"ICON" => "bx-context-toolbar-create-icon",
-						"TITLE" => GetMessage("AD_PUBLIC_ICON_ADD_BANNER")
+					$arIcons[] = array(
+							"URL" => "/bitrix/admin/adv_banner_list.php?lang=".LANGUAGE_ID."&find_contract_id[]=".$arBanner["CONTRACT_ID"]. "&find_type_sid[]=".$arBanner["TYPE_SID"]."&set_filter=Y",
+							"SRC" => "/bitrix/themes/.default/icons/advertising/comp_view.gif",
+							"TITLE" => GetMessage("AD_PUBLIC_ICON_BANNER_LIST"),
+							"IN_PARAMS_MENU" => true
 					);
-
-					$nSubMenu = count($arSubMenu);
-					if($nSubMenu == 1)
-					{
-						$arIcon["URL"] = $arSubMenu[0]["URL"];
-						$arIcons[] = $arIcon;
-					}
-					elseif($nSubMenu > 1)
-					{
-						$arIcon["MENU"] = $arSubMenu;
-						$arIcons[] = $arIcon;
-					}
 				}
-
-				$arIcons[] = array(
-					"URL" => "/bitrix/admin/adv_banner_list.php?lang=".LANGUAGE_ID."&find_contract_id[]=".$arBanner["CONTRACT_ID"]. "&find_type_sid[]=".$arBanner["TYPE_SID"]."&set_filter=Y",
-					"SRC" => "/bitrix/themes/.default/icons/advertising/comp_view.gif",
-					"TITLE" => GetMessage("AD_PUBLIC_ICON_BANNER_LIST"),
-					"IN_PARAMS_MENU" => true
-				);
 
 				return $arIcons;
 			}
@@ -5111,7 +5926,7 @@ public static 	function GetDynamicList($arFilter, &$arrLegend, &$is_filtered)
 		return $arrDays;
 	}
 
-	function GetStatList($by, $order, $arFilter)
+	functpublic static ion GetStatList($by, $order, $arFilter)
 	{
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: GetDynamicList<br>Line: ";
 		global $DB;
@@ -5244,9 +6059,7 @@ public static 	function GetDynamicList($arFilter, &$arrLegend, &$is_filtered)
 
 
 /**
- * Класс для работы с типами баннеров.</body> </html>
- *
- *
+ * Класс для работы с типами баннеров. 
  *
  *
  * @return mixed 
@@ -5257,7 +6070,7 @@ public static 	function GetDynamicList($arFilter, &$arrLegend, &$is_filtered)
  */
 class CAdvType_all
 {
-	public static function err_mess()
+public static 	function err_mess()
 	{
 		$module_id = "advertising";
 		return "<br>Module: ".$module_id."<br>Class: CAdvType_all<br>File: ".__FILE__;
@@ -5355,9 +6168,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	// добавляем новый тип или модифицируем существующий
 
 	/**
-	* <p>Функция создает новый тип баннеров, либо модифицирует существующий в случае указания во втором параметре символьного ID типа. Возвращает ID созданного типа, либо ID модифицированного типа.</p>
-	*
-	*
+	* <p>Метод создает новый тип баннеров, либо модифицирует существующий в случае указания во втором параметре символьного ID типа. Возвращает ID созданного типа, либо ID модифицированного типа.</p>
 	*
 	*
 	* @param 255) $CAdvType  Массив параметров контракта. В массиве допустимы следующие
@@ -5366,26 +6177,16 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	* тип активен; "N" - тип не активен; </li> <li>NAME - имя типа </li> <li>DESCRIPTION -
 	* описание типа </li> <li>SORT - порядок сортировки типа в списках</li> </ul>
 	*
-	*
-	*
 	* @param Se $t  ID типа, если не указывать - создаётся новый тип.
-	*
-	*
 	*
 	* @param array $arFields  Флаг необходимости проверки прав текущего пользователя: "Y" -
 	* необходимо проверить права текущего пользователя; "N" - тип
 	* создавать и модифицировать независимо от прав текущего
 	* пользователя. Необязательный параметр.
 	*
-	*
-	*
 	* @param varchar(255) $TYPE_SID = "" 
 	*
-	*
-	*
 	* @param char(1) $CHECK_RIGHTS = "Y" 
-	*
-	*
 	*
 	* @return mixed 
 	*
@@ -5500,27 +6301,12 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	// получаем тип баннера по ID
 
 	/**
-	* <p>Функция возвращает тип баннера по его символьному ID.</p>
-	*
-	*
+	* <p>Метод возвращает тип баннера по его символьному ID.</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID  Символьный ID типа.
 	*
-	*
-	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
-	* (администратор рекламы, рекламодатель и т.д.). Если параметр
-	* определён как "N", то считается, что текущий пользователь обладает
-	* административными правами доступа к модулю Реклама. Если
-	* параметр пропущен либо равен "Y", то функция проверяет уровень
-	* доступа к контракту, которому принадлежит баннер. Необязательный
-	* параметр.
-	*
-	*
-	*
 	* @return record 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -5558,22 +6344,16 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	}
 
 	// удаляем тип баннера
-	
+
 	/**
-	* <p>Функция удаляет тип баннеров и все баннеры к нему привязанные.</p>
-	*
-	*
+	* <p>Метод удаляет тип баннеров и все баннеры, к нему привязанные.</p>
 	*
 	*
 	* @param varchar(255) $TYPE_SID  Символьный идентификатор типа.
 	*
-	*
-	*
 	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
 	* пользователя; "N" - прав проверять не надо. Необязательный
 	* параметр.
-	*
-	*
 	*
 	* @return boolean 
 	*
@@ -5581,7 +6361,7 @@ public static 	function CheckFields($arFields, $OLD_SID, $CHECK_RIGHTS)
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvtype/delete.php
 	* @author Bitrix
 	*/
-	public static function Delete($TYPE_SID, $CHECK_RIGHTS="Y")
+	public static 	function Delete($TYPE_SID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAdvType_all::err_mess())."<br>Function: Delete<br>Line: ";
 		global $DB, $strError;
@@ -5630,25 +6410,19 @@ public static 	function DeleteContractLink($TYPE_SID)
 	// получаем список типов баннеров
 
 	/**
-	* <p>Функция предназначена для получения списка типов баннеров.</p>
+	* <p>Метод предназначен для получения списка типов баннеров.</p>
 	*
 	*
-	*
-	*
-	* @param varchar &$by  Идентификатор позволяющий задать имя поля для сортировки.
+	* @param varchar &$by  Идентификатор, позволяющий задать имя поля для сортировки.
 	* Допустимы следующие значения: <ul> <li>s_sid - по символьному ID типа </li>
-	* <li>s_date_modify - по дате модификации </li> <li>s_modified_by - по ID пользователя
+	* <li>s_date_modify - по дате модификации </li> <li>s_modified_by - по ID пользователя,
 	* изменившего тип </li> <li>s_date_create - по дате создания </li> <li>s_created_by - по ID
-	* пользователя создавшего тип </li> <li>s_active - по флагу активности </li>
+	* пользователя, создавшего тип </li> <li>s_active - по флагу активности </li>
 	* <li>s_name - по имени </li> <li>s_banners - по количеству баннеров данного типа
 	* </li> <li>s_description - по описанию</li> </ul>
 	*
-	*
-	*
 	* @param varchar &$order  Порядок сортировки. Допустимы следующие значения: <ul> <li>desc - по
 	* убыванию (значение по умолчанию) </li> <li>asc - по возрастанию</li> </ul>
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив для фильтрации значений. Необязательный параметр. В
 	* массиве допустимы следующие индексы: <ul> <li>SID - символьный ID типа
@@ -5666,25 +6440,18 @@ public static 	function DeleteContractLink($TYPE_SID)
 	* искаться точное совпадение; "N" - в противном случае будет искаться
 	* вхождение (по умолчанию)</li> </ul>
 	*
-	*
-	*
-	* @param boolean &$is_filtered  Переменная возвращающая true в том случае если список типов
+	* @param boolean &$is_filtered  Переменная, возвращающая true в том случае, если список типов
 	* отфильтрован по какому либо критерию; либо false в противном случае.
-	*
-	*
 	*
 	* @param char(1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
 	* (администратор рекламы, рекламодатель и т.д.) Если параметр
 	* определён как "N", то считается, что текущий пользователь обладает
 	* административными правами доступа к модулю Реклама. Если
-	* параметр пропущен либо равен "Y", то функция проверяет уровень
+	* параметр пропущен либо равен "Y", то метод проверяет уровень
 	* доступа к контракту, которому принадлежит баннер. Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @return record 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

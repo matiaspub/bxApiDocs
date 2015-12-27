@@ -3,55 +3,83 @@ class CIBlockFindTools
 {
 	public static function GetElementID($element_id, $element_code, $section_id, $section_code, $arFilter)
 	{
-		$element_id = intval($element_id);
-		if($element_id > 0)
+		$element_id = (int)$element_id;
+		$element_code = (string)$element_code;
+		if ($element_id > 0)
 		{
 			return $element_id;
 		}
-		elseif(strlen($element_code) > 0)
+		elseif ($element_code != '')
 		{
-			$arFilter["=CODE"] = $element_code;
+			if (!is_array($arFilter))
+				$arFilter = array();
+			$arFilter['=CODE'] = $element_code;
 
-			$section_id = intval($section_id);
-			if($section_id > 0)
-				$arFilter["SECTION_ID"] = $section_id;
-			elseif(strlen($section_code) > 0)
+			$section_id = (int)$section_id;
+			$section_code = (string)$section_code;
+			if ($section_id > 0)
+				$arFilter['SECTION_ID'] = $section_id;
+			elseif ($section_code != '')
 				$arFilter["SECTION_CODE"] = $section_code;
 
 			$rsElement = CIBlockElement::GetList(array(), $arFilter, false, false, array("ID"));
-			if($arElement = $rsElement->Fetch())
-				return intval($arElement["ID"]);
+			if ($arElement = $rsElement->Fetch())
+				return (int)$arElement["ID"];
 		}
 		return 0;
 	}
 
 	public static function GetSectionID($section_id, $section_code, $arFilter)
 	{
-		$section_id = intval($section_id);
-		if($section_id > 0)
+		$section_id = (int)$section_id;
+		$section_code = (string)$section_code;
+		if ($section_id > 0)
 		{
 			return $section_id;
 		}
-		elseif(strlen($section_code) > 0)
+		elseif ($section_code != '')
 		{
-			$arFilter["=CODE"] = $section_code;
+			if (!is_array($arFilter))
+				$arFilter = array();
+			$arFilter['=CODE'] = $section_code;
 
 			$rsSection = CIBlockSection::GetList(array(), $arFilter, false, array("ID"));
-			if($arSection = $rsSection->Fetch())
-				return intval($arSection["ID"]);
+			if ($arSection = $rsSection->Fetch())
+				return (int)$arSection["ID"];
 		}
 		return 0;
+	}
+
+	public static function GetSectionIDByCodePath($iblock_id, $section_code_path)
+	{
+		$arVariables = array(
+			"SECTION_CODE_PATH" => $section_code_path,
+		);
+		return (self::checkSection($iblock_id, $arVariables) ? $arVariables["SECTION_ID"] : 0);
 	}
 
 	public static function resolveComponentEngine(CComponentEngine $engine, $pageCandidates, &$arVariables)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $CACHE_MANAGER;
+		static $aSearch = array("&lt;", "&gt;", "&quot;", "&#039;");
+		static $aReplace = array("<", ">", "\"", "'");
+
 		$component = $engine->GetComponent();
 		if ($component)
 			$iblock_id = intval($component->arParams["IBLOCK_ID"]);
 		else
 			$iblock_id = 0;
+
+		//To fix GetPagePath security hack for SMART_FILTER_PATH
+		foreach ($pageCandidates as $pageID => $arVariablesTmp)
+		{
+			foreach ($arVariablesTmp as $variableName => $variableValue)
+			{
+				if ($variableName === "SMART_FILTER_PATH")
+					$pageCandidates[$pageID][$variableName] = str_replace($aSearch, $aReplace, $variableValue);
+			}
+		}
 
 		$requestURL = $APPLICATION->GetCurPage(true);
 
@@ -113,7 +141,9 @@ class CIBlockFindTools
 			return $pageID;
 		}
 
+		reset($pageCandidates);
 		list($pageID, $arVariables) = each($pageCandidates);
+
 		return $pageID;
 	}
 
@@ -228,4 +258,3 @@ class CIBlockFindTools
 		}
 	}
 }
-?>

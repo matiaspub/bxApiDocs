@@ -171,7 +171,7 @@ class CSecuritySiteConfigurationTest
 	{
 		try
 		{
-			$updates = $this->getAvailableUpdates();
+			$updates = static::getAvailableUpdates();
 			if(!empty($updates))
 			{
 				$this->addUnformattedDetailError(
@@ -230,7 +230,7 @@ class CSecuritySiteConfigurationTest
 	 * @return array
 	 * @throws Bitrix\Main\SystemException
 	 */
-	protected function getAvailableUpdates()
+	protected static function getAvailableUpdates()
 	{
 		require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/main/classes/general/update_client.php');
 

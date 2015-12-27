@@ -142,5 +142,70 @@ class CSalePaySystemsHelper
 		return $isAffordPdf;
 	}
 
+	/**
+	 * Adds params if they are missed
+	 * @return array Added params
+	 */
+	public static function addMissingKeysToParams()
+	{
+		$result = array();
+		$res = CSalePaySystemAction::GetList(
+			array(),
+			array("PS_ACTIVE" => "Y"),
+			false,
+			false,
+			array("ID", "ACTION_FILE", "PARAMS")
+		);
+
+		while($ps = $res->Fetch())
+		{
+			$descriptionFile = $_SERVER["DOCUMENT_ROOT"].$ps["ACTION_FILE"]."/.description.php";
+
+			if(!file_exists($descriptionFile) || !is_file($descriptionFile))
+				continue;
+
+			$arPSCorrespondence = array();
+			include($descriptionFile);
+
+			if(!is_array($arPSCorrespondence) || empty($arPSCorrespondence))
+				continue;
+
+			$arCorrespondence = CSalePaySystemAction::UnSerializeParams($ps["PARAMS"]);
+
+			if(!is_array($arCorrespondence))
+				continue;
+
+			$missingKeys = array_keys(array_diff_key($arPSCorrespondence, $arCorrespondence));
+
+			if(!empty($missingKeys))
+			{
+				$result[$ps["ID"]] = $missingKeys;
+
+				foreach($missingKeys as $key)
+					$arCorrespondence[$key] = array_intersect_key(
+						$arPSCorrespondence[$key],
+						array("TYPE" => true, "VALUE" => true)
+					);
+
+				$updRes = CSalePaySystemAction::update(
+					$ps["ID"],
+					array("PARAMS" => CSalePaySystemAction::SerializeParams($arCorrespondence)
+				));
+
+				if($updRes <= 0)
+					$result[$ps["ID"]]["UPDATE_ERROR"] = true;
+			}
+		}
+
+		\CEventLog::Add(array(
+			"SEVERITY" => "INFO",
+			"AUDIT_TYPE_ID" => "PS_PARAMS_CONVERT_RESULT",
+			"MODULE_ID" => "sale",
+			"ITEM_ID" => "PaySystems",
+			"DESCRIPTION" => serialize($result),
+		));
+
+		return "";
+	}
 }
 ?>

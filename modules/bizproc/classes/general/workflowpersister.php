@@ -6,6 +6,7 @@ IncludeModuleLangFile(__FILE__);
 */
 class CBPAllWorkflowPersister
 {
+	const LOCK_BY_TIME = false;
 	protected $serviceInstanceId = "";
 	protected $ownershipDelta = 300;
 	protected $useGZipCompression = false;
@@ -94,6 +95,27 @@ class CBPAllWorkflowPersister
 			"			AND OWNED_UNTIL < ".$DB->CurrentTimeFunction().") ".
 			"	)"
 		);
+	}
+
+	protected function getLockerQueryCondition()
+	{
+		global $DB;
+
+		if (!static::LOCK_BY_TIME)
+		{
+			return "(OWNER_ID IS NULL OR OWNER_ID = '".$DB->ForSql($this->serviceInstanceId)."')";
+		}
+
+		return
+			"( ".
+			"	(OWNER_ID = '".$DB->ForSql($this->serviceInstanceId)."' ".
+			"		AND OWNED_UNTIL >= ".$DB->CurrentTimeFunction().") ".
+			"	OR ".
+			"	(OWNER_ID IS NULL) ".
+			"	OR ".
+			"	(OWNER_ID IS NOT NULL ".
+			"		AND OWNED_UNTIL < ".$DB->CurrentTimeFunction().") ".
+			") ";
 	}
 }
 ?>

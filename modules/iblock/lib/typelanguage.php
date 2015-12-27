@@ -148,4 +148,25 @@ class TypeLanguageTable extends Entity\DataManager
 			new Entity\Validator\Length(null, 100),
 		);
 	}
+
+	/**
+	 * Deletes information blocks type messages.
+	 * and language messages from TypeLanguageTable
+	 *
+	 * @param string $iblockTypeId Iblock type identifier.
+	 *
+	 * @return \Bitrix\Main\Entity\EventResult
+	 */
+	public static function deleteByIblockTypeId($iblockTypeId)
+	{
+		$connection = \Bitrix\Main\Application::getConnection();
+		$helper = $connection->getSqlHelper();
+		$entity = self::getEntity();
+
+		$sql = "DELETE FROM ".$entity->getDBTableName()." WHERE IBLOCK_TYPE_ID = '".$helper->forSql($iblockTypeId)."'";
+		$connection->queryExecute($sql);
+
+		$result = new \Bitrix\Main\Entity\DeleteResult();
+		return $result;
+	}
 }

@@ -1,12 +1,11 @@
 <?
-use Bitrix\Main\Type\Collection;
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/discount.php");
+use Bitrix\Sale\Internals;
+
+require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/sale/general/discount.php');
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -19,9 +18,7 @@ class CSaleDiscount extends CAllSaleDiscount
 {
 	
 	/**
-	* <p>Функция добавляет новую скидку на сумму заказа с параметрами из массива <i> arFields</i>.</p>
-	*
-	*
+	* <p>Метод добавляет новую скидку на сумму заказа с параметрами из массива <i> arFields</i>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров скидки, ключами в котором
@@ -36,8 +33,6 @@ class CSaleDiscount extends CAllSaleDiscount
 	* задана в абсолютной сумме);</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
 	* скидки;</li> <li> <b>SORT</b> - индекс сортировки (если по сумме заказа
 	* доступно несколько скидок, то берется первая по сортировке)</li> </ul>
-	*
-	*
 	*
 	* @return int <p>Возвращается код добавленной скидки или <i>false</i> в случае ошибки.
 	* </p> <br><br>
@@ -78,9 +73,11 @@ class CSaleDiscount extends CAllSaleDiscount
 
 		if ($ID > 0)
 		{
-			self::updateUserGroups($ID, $arFields['USER_GROUPS'], $arFields['ACTIVE'], false);
+			Internals\DiscountGroupTable::updateByDiscount($ID, $arFields['USER_GROUPS'], $arFields['ACTIVE'], true);
 			if (isset($arFields['HANDLERS']))
 				self::updateDiscountHandlers($ID, $arFields['HANDLERS'], false);
+			if (isset($arFields['ENTITIES']))
+				Internals\DiscountEntitiesTable::updateByDiscount($ID, $arFields['ENTITIES'], false);
 		}
 
 		return $ID;
@@ -88,14 +85,10 @@ class CSaleDiscount extends CAllSaleDiscount
 
 	
 	/**
-	* <p>Функция обновляет параметры скидки с кодом ID на параметры из массива arFields </p>
-	*
-	*
+	* <p>Метод обновляет параметры скидки с кодом ID на параметры из массива arFields. Метод динамичный. </p>
 	*
 	*
 	* @param int $ID  Код скидки.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров скидки, ключами в котором
 	* являются названия параметров, а значениями - новые значения.
@@ -110,8 +103,6 @@ class CSaleDiscount extends CAllSaleDiscount
 	* задана в абсолютной сумме);</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
 	* скидки;</li> <li> <b>SORT</b> - индекс сортировки (если по сумме заказа
 	* доступно несколько скидок, то берется первая по сортировке)</li> </ul>
-	*
-	*
 	*
 	* @return int <p>Возвращается код измененной скидки или <i>false</i> в случае
 	* ошибки.</p> <br><br>
@@ -156,49 +147,24 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 
 		if (isset($arFields['USER_GROUPS']))
-			self::updateUserGroups($ID, $arFields['USER_GROUPS'], (isset($arFields['ACTIVE']) ? $arFields['ACTIVE'] : ''), true);
-
+		{
+			Internals\DiscountGroupTable::updateByDiscount($ID, $arFields['USER_GROUPS'], (isset($arFields['ACTIVE']) ? $arFields['ACTIVE'] : ''), true);
+		}
+		elseif (isset($arFields['ACTIVE']))
+		{
+			Internals\DiscountGroupTable::changeActiveByDiscount($ID, $arFields['ACTIVE']);
+		}
 		if (isset($arFields['HANDLERS']))
 			self::updateDiscountHandlers($ID, $arFields['HANDLERS'], true);
+		if (isset($arFields['ENTITIES']))
+			Internals\DiscountEntitiesTable::updateByDiscount($ID, $arFields['ENTITIES'], true);
 
 		return $ID;
 	}
 
 	
 	/**
-	* <p>Функция удаляет скидку с кодом ID </p>
-	*
-	*
-	*
-	*
-	* @param int $ID  Код скидки.
-	*
-	*
-	*
-	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalediscount/csalediscount__delete.7216613a.php
-	* @author Bitrix
-	*/
-	static public function Delete($ID)
-	{
-		global $DB;
-		$ID = (int)$ID;
-		if ($ID <= 0)
-			return false;
-
-		$DB->Query("delete from b_sale_discount_group where DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$DB->Query("delete from b_sale_discount_module where DISCOUNT_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $DB->Query("delete from b_sale_discount where ID = ".$ID, true);
-	}
-
-	
-	/**
-	* <p>Функция возвращает результат выборки записей из скидок на заказ в соответствии со своими параметрами. </p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из скидок на заказ в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -213,8 +179,6 @@ class CSaleDiscount extends CAllSaleDiscount
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи скидки.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -242,8 +206,6 @@ class CSaleDiscount extends CAllSaleDiscount
 	* умолчанию - пустой массив array() - означает, что результат
 	* отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи скидок. Массив имеет
 	* вид: <pre class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
 	* "название_поля2", ...)</pre> В качестве "название_поля<i>N</i>" может стоять
@@ -251,29 +213,23 @@ class CSaleDiscount extends CAllSaleDiscount
 	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
 	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
 	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то метод
 	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
 	* умолчанию - <i>false</i> - означает, что результат группироваться не
 	* будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -290,9 +246,8 @@ class CSaleDiscount extends CAllSaleDiscount
 	* сумме заказа доступно несколько скидок, то берется первая по
 	* сортировке).</td> </tr> <tr> <td>USER_GROUPS</td> <td>Перечень групп пользователей,
 	* на которые должна действовать скидка.</td> </tr> </table> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -538,111 +493,6 @@ class CSaleDiscount extends CAllSaleDiscount
 		}
 
 		return $dbRes;
-	}
-
-	protected function updateUserGroups($discountID, $userGroups, $active = '', $updateData)
-	{
-		global $DB;
-
-		$discountID = (int)$discountID;
-		if ($discountID <= 0 || empty($userGroups) || !is_array($userGroups))
-			return;
-
-		$active = (string)$active;
-		if ($active !== 'Y' && $active !== 'N')
-		{
-			$strQuery = 'select ID, ACTIVE from b_sale_discount where DISCOUNT_ID = '.$discountID;
-			$rsActive = $DB->Query($strQuery,  false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($activeFromDatabase = $rsActive->Fetch())
-			{
-				$active = $activeFromDatabase['ACTIVE'];
-			}
-		}
-		if ($updateData)
-		{
-			$strQuery = 'delete from b_sale_discount_group where DISCOUNT_ID = '.$discountID;
-			$DB->Query($strQuery,  false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-		foreach ($userGroups as &$value)
-		{
-			$strQuery = "insert into b_sale_discount_group(DISCOUNT_ID, GROUP_ID) values(".$discountID.", ".$value.")";
-			$DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-		unset($value);
-	}
-
-	protected function updateDiscountHandlers($discountID, $handlers, $update)
-	{
-		global $DB;
-
-		$discountID = (int)$discountID;
-		if ($discountID <= 0 || empty($handlers) || !is_array($handlers))
-		{
-			return;
-		}
-		if (isset($handlers['MODULES']))
-		{
-			if ($update)
-			{
-				$sqlQuery = 'delete from b_sale_discount_module where DISCOUNT_ID = '.$discountID;
-				$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-			}
-			if (!empty($handlers['MODULES']))
-			{
-				foreach ($handlers['MODULES'] as &$oneModuleID)
-				{
-					$fields = array(
-						'DISCOUNT_ID' => $discountID,
-						'MODULE_ID' => $oneModuleID
-					);
-					$insert = $DB->PrepareInsert('b_sale_discount_module', $fields);
-					$sqlQuery = "insert into b_sale_discount_module(".$insert[0].") values(".$insert[1].")";
-					$DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-				}
-				unset($oneModuleID);
-			}
-		}
-	}
-
-	protected function getDiscountHandlers($discountList)
-	{
-		global $DB;
-
-		$defaultRes = array(
-			'MODULES' => array(),
-			'EXT_FILES' => array()
-		);
-		$result = array();
-		if (!empty($discountList) && is_array($discountList))
-		{
-			$map = array();
-			foreach ($discountList as $value)
-			{
-				$value = (int)$value;
-				if (0 < $value)
-					$map[$value] = true;
-			}
-			if (!empty($map))
-			{
-				$map = array_keys($map);
-				sort($map);
-			}
-			$discountList = $map;
-			if (!empty($discountList))
-			{
-				$result = array_fill_keys($discountList, $defaultRes);
-				$discountIn = implode(', ', $discountList);
-				$sqlQuery = 'select * from b_sale_discount_module where DISCOUNT_ID IN ('.$discountIn.')';
-				$resQuery = $DB->Query($sqlQuery, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-				while ($row = $resQuery->Fetch())
-				{
-					$row['DISCOUNT_ID'] = (int)$row['DISCOUNT_ID'];
-					$result[$row['DISCOUNT_ID']]['MODULES'][] = $row['MODULE_ID'];
-				}
-			}
-		}
-
-		return $result;
 	}
 }
 ?>

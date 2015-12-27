@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/index.php
  * @author Bitrix
  */
 class CSocNetUserToGroup extends CAllSocNetUserToGroup
@@ -22,8 +20,6 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	
 	/**
 	* <p>Метод добавляет новую связь между пользователем и группой.</p>
-	*
-	*
 	*
 	*
 	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
@@ -38,11 +34,8 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* инициализировавшего связь,<br><b>MESSAGE</b> - сообщение при запросе на
 	* создание связи.
 	*
-	*
-	*
 	* @return int <p>Код связи в случае успешного выполнения и false - в противном
 	* случае.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -62,7 +55,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/Add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -157,11 +150,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* <p>Метод изменяет параметры связи между пользователем и группой.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код связи.
-	*
-	*
 	*
 	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
 	* параметров, а значениями - их значения. Может содержать следующие
@@ -175,13 +164,11 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* инициализировавшего связь,<br><b>MESSAGE</b> - сообщение при запросе на
 	* создание связи.
 	*
-	*
-	*
 	* @return int <p>Код связи в случае успешного выполнения и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/Update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/Update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -271,8 +258,6 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* <p>Метод выбирает список отношений между пользователями и группами в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
@@ -283,8 +268,6 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* <b>INITIATED_BY_USER_NAME</b>, <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>,
 	* <b>INITIATED_BY_USER_EMAIL</b>, <b>RAND</b>.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: <b>ID</b>, <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
@@ -294,20 +277,14 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* <b>USER_LOGIN</b>, <b>USER_EMAIL</b>, <b>USER_LID</b>, <b>INITIATED_BY_USER_NAME</b>,
 	* <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>, <b>INITIATED_BY_USER_EMAIL</b>.
 	*
-	*
-	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
 	* произведена группировка. Если параметр содержит пустой массив,
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
@@ -315,15 +292,10 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* <b>INITIATED_BY_TYPE</b>, <b>INITIATED_BY_USER_ID</b>, <b>MESSAGE</b>. В массиве допустимы любые
 	* поля из списка полей.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() 
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
 	* удовлетворяющие условию выборки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -347,14 +319,13 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserToGroup/GetList.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/GetList.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
@@ -362,9 +333,16 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 		global $DB;
 
 		if (count($arSelectFields) <= 0)
+		{
 			$arSelectFields = array("ID", "USER_ID", "GROUP_ID", "ROLE", "DATE_CREATE", "DATE_UPDATE", "INITIATED_BY_TYPE", "INITIATED_BY_USER_ID", "MESSAGE");
+		}
 
-		$online_interval = (array_key_exists("ONLINE_INTERVAL", $arFilter) && intval($arFilter["ONLINE_INTERVAL"]) > 0 ? $arFilter["ONLINE_INTERVAL"] : 120);
+		$online_interval = (
+			array_key_exists("ONLINE_INTERVAL", $arFilter)
+			&& intval($arFilter["ONLINE_INTERVAL"]) > 0
+				? $arFilter["ONLINE_INTERVAL"]
+				: 120
+		);
 
 		static $arFields1 = array(
 			"ID" => Array("FIELD" => "UG.ID", "TYPE" => "int"),
@@ -394,6 +372,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			"USER_WORK_POSITION" => Array("FIELD" => "U.WORK_POSITION", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
 			"USER_LOGIN" => Array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
 			"USER_EMAIL" => Array("FIELD" => "U.EMAIL", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
+			"USER_CONFIRM_CODE" => Array("FIELD" => "U.CONFIRM_CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
 			"USER_PERSONAL_PHOTO" => Array("FIELD" => "U.PERSONAL_PHOTO", "TYPE" => "int", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
 			"USER_PERSONAL_GENDER" => Array("FIELD" => "U.PERSONAL_GENDER", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
 			"USER_LID" => Array("FIELD" => "U.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (UG.USER_ID = U.ID)"),
@@ -413,12 +392,20 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			$arFields["GROUP_SITE_ID"] = Array("FIELD" => "SGS.SITE_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sonet_group_site SGS ON UG.GROUP_ID = SGS.GROUP_ID");
 			$strDistinct = " DISTINCT ";
 			foreach ($arSelectFields as $i => $strFieldTmp)
+			{
 				if ($strFieldTmp == "GROUP_SITE_ID")
+				{
 					unset($arSelectFields[$i]);
+				}
+			}
 
 			foreach ($arOrder as $by => $order)
+			{
 				if (!in_array($by, $arSelectFields))
+				{
 					$arSelectFields[] = $by;
+				}
+			}
 		}
 		else
 		{
@@ -427,9 +414,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 		}
 
 		$arFields = array_merge($arFields1, $arFields);
-
 		$arSqls = CSocNetGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
-
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", $strDistinct, $arSqls["SELECT"]);
 
 		if (is_array($arGroupBy) && count($arGroupBy)==0)
@@ -446,10 +431,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($arRes = $dbRes->Fetch())
-				return $arRes["CNT"];
-			else
-				return False;
+			return (($arRes = $dbRes->Fetch()) ? $arRes["CNT"] : false);
 		}
 
 		$strSql =
@@ -481,7 +463,9 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 			if (strlen($arSqls["GROUPBY"]) <= 0)
 			{
 				if ($arRes = $dbRes->Fetch())
+				{
 					$cnt = $arRes["CNT"];
+				}
 			}
 			else
 			{
@@ -497,8 +481,13 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 		}
 		else
 		{
-			if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) > 0)
+			if (
+				is_array($arNavStartParams)
+				&& IntVal($arNavStartParams["nTopCount"]) > 0
+			)
+			{
 				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
+			}
 
 			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 

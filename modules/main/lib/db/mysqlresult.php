@@ -44,7 +44,7 @@ class MysqlResult extends Result
 					$helper = $this->connection->getSqlHelper();
 					for ($i = 0; $i < $numFields; $i++)
 					{
-						$name = strtoupper(mysql_field_name($this->resource, $i));
+						$name = mysql_field_name($this->resource, $i);
 						$type = mysql_field_type($this->resource, $i);
 
 						$this->resultFields[$name] = $helper->getFieldByColumnType($name, $type);

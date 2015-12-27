@@ -45,22 +45,34 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			$arSettings = unserialize($arBucket["SETTINGS"]);
 
 		if(!is_array($arSettings))
-			$arSettings = array("HOST" => "", "USER" => "", "KEY" => "");
+		{
+			$arSettings = array(
+				"HOST" => "",
+				"USER" => "",
+				"KEY" => "",
+				"FORCE_HTTP" => "N",
+			);
+		}
 
 		$htmlID = htmlspecialcharsbx($this->GetID());
+		$show = (($cur_SERVICE_ID == $this->GetID()) || !$bServiceSet)? '': 'none';
 
 		$result = '
-		<tr id="SETTINGS_2_'.$htmlID.'" style="display:'.($cur_SERVICE_ID == $this->GetID() || !$bServiceSet? '': 'none').'" class="settings-tr adm-detail-required-field">
+		<tr id="SETTINGS_2_'.$htmlID.'" style="display:'.$show.'" class="settings-tr adm-detail-required-field">
 			<td>'.GetMessage("CLO_STORAGE_OPENSTACK_EDIT_HOST").':</td>
 			<td><input type="hidden" name="SETTINGS['.$htmlID.'][HOST]" id="'.$htmlID.'HOST" value="'.htmlspecialcharsbx($arSettings['HOST']).'"><input type="text" size="55" name="'.$htmlID.'INP_HOST" id="'.$htmlID.'INP_HOST" value="'.htmlspecialcharsbx($arSettings['HOST']).'" '.($arBucket['READ_ONLY'] == 'Y'? '"disabled"': '').' onchange="BX(\''.$htmlID.'HOST\').value = this.value"></td>
 		</tr>
-		<tr id="SETTINGS_0_'.$htmlID.'" style="display:'.($cur_SERVICE_ID == $this->GetID() || !$bServiceSet? '': 'none').'" class="settings-tr adm-detail-required-field">
+		<tr id="SETTINGS_0_'.$htmlID.'" style="display:'.$show.'" class="settings-tr adm-detail-required-field">
 			<td>'.GetMessage("CLO_STORAGE_OPENSTACK_EDIT_USER").':</td>
 			<td><input type="hidden" name="SETTINGS['.$htmlID.'][USER]" id="'.$htmlID.'USER" value="'.htmlspecialcharsbx($arSettings['USER']).'"><input type="text" size="55" name="'.$htmlID.'INP_" id="'.$htmlID.'INP_USER" value="'.htmlspecialcharsbx($arSettings['USER']).'" '.($arBucket['READ_ONLY'] == 'Y'? '"disabled"': '').' onchange="BX(\''.$htmlID.'USER\').value = this.value"></td>
 		</tr>
-		<tr id="SETTINGS_1_'.$htmlID.'" style="display:'.($cur_SERVICE_ID == $this->GetID() || !$bServiceSet? '': 'none').'" class="settings-tr adm-detail-required-field">
+		<tr id="SETTINGS_1_'.$htmlID.'" style="display:'.$show.'" class="settings-tr adm-detail-required-field">
 			<td>'.GetMessage("CLO_STORAGE_OPENSTACK_EDIT_KEY").':</td>
 			<td><input type="hidden" name="SETTINGS['.$htmlID.'][KEY]" id="'.$htmlID.'KEY" value="'.htmlspecialcharsbx($arSettings['KEY']).'"><input type="text" size="55" name="'.$htmlID.'INP_KEY" id="'.$htmlID.'INP_KEY" value="'.htmlspecialcharsbx($arSettings['KEY']).'" autocomplete="off" '.($arBucket['READ_ONLY'] == 'Y'? '"disabled"': '').' onchange="BX(\''.$htmlID.'KEY\').value = this.value"></td>
+		</tr>
+		<tr id="SETTINGS_3_'.$htmlID.'" style="display:'.$show.'" class="settings-tr">
+			<td>'.GetMessage("CLO_STORAGE_OPENSTACK_FORCE_HTTP").':</td>
+			<td><input type="hidden" name="SETTINGS['.$htmlID.'][FORCE_HTTP]" id="'.$htmlID.'KEY" value="N"><input type="checkbox" name="SETTINGS['.$htmlID.'][FORCE_HTTP]" id="'.$htmlID.'FORCE_HTTP" value="Y" '.($arSettings['FORCE_HTTP'] == 'Y'? 'checked="checked"': '').'></td>
 		</tr>
 		';
 		return $result;
@@ -75,6 +87,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			"HOST" => is_array($arSettings)? trim($arSettings["HOST"]): '',
 			"USER" => is_array($arSettings)? trim($arSettings["USER"]): '',
 			"KEY" => is_array($arSettings)? trim($arSettings["KEY"]): '',
+			"FORCE_HTTP" => is_array($arSettings) && $arSettings["FORCE_HTTP"] == "Y"? "Y": "N",
 		);
 
 		if($arBucket["READ_ONLY"] !== "Y" && !strlen($result["HOST"]))
@@ -308,7 +321,11 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 	public function GetFileSRC($arBucket, $arFile)
 	{
 		global $APPLICATION;
-		$proto = $APPLICATION->IsHTTPS()? "https": "http";
+		
+		if ($arBucket["SETTINGS"]["FORCE_HTTP"] === "Y")
+			$proto = "http";
+		else
+			$proto = ($APPLICATION->IsHTTPS()? "https": "http");
 
 		if($arBucket["CNAME"])
 		{

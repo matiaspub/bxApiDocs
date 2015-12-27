@@ -25,6 +25,7 @@ class CFilemanUtils
 		{
 			$arSites[] = array(
 				"id" => $arSite["ID"],
+				"dir" => $arSite["DIR"],
 				"text" => '['.$arSite["ID"].'] '.$arSite["~NAME"],
 				"current" => $arSite["ID"] == $Params['site']
 			);
@@ -90,8 +91,8 @@ class CFilemanUtils
 					lang: '<?= LANGUAGE_ID?>',
 					site: '<?= CUtil::JSEscape($Params['site'])?>',
 					sessid_get: '<?= bitrix_sessid_get()?>',
-					viewFilePath: '<?= CUtil::JSEscape($Params['viewFilePath'])?>',
-					viewFolderPath: '<?= CUtil::JSEscape($Params['viewFolderPath'])?>',
+					viewMsFilePath: '<?= CUtil::JSEscape($Params['viewMsFilePath'])?>',
+					viewMsFolderPath: '<?= CUtil::JSEscape($Params['viewMsFolderPath'])?>',
 					dateFormat: '<?= CLang::GetDateFormat("SHORT")?>',
 					oUserConfig: <?= CUtil::PhpToJSObject(CFilemanSearch::GetConfig())?>,
 					arLastPathes: <?= CUtil::PhpToJSObject(CFilemanUtils::GetLastPathes())?>,
@@ -140,8 +141,8 @@ class CFilemanUtils
 					lang: '<?= LANGUAGE_ID?>',
 					site: '<?= CUtil::JSEscape($Params['site'])?>',
 					sessid_get: '<?= bitrix_sessid_get()?>',
-					viewFilePath: '<?= CUtil::JSEscape($Params['viewFilePath'])?>',
-					viewFolderPath: '<?= CUtil::JSEscape($Params['viewFolderPath'])?>',
+					viewMsFilePath: '<?= CUtil::JSEscape($Params['viewMsFilePath'])?>',
+					viewMsFolderPath: '<?= CUtil::JSEscape($Params['viewMsFolderPath'])?>',
 					oUserConfig: <?= CUtil::PhpToJSObject(CFilemanCopy::GetConfig())?>,
 					arLastPathes: <?= CUtil::PhpToJSObject(CFilemanUtils::GetLastPathes())?>,
 					arSites: <?= CUtil::PhpToJSObject($arSites)?>
@@ -197,8 +198,8 @@ class CFilemanUtils
 					lang: '<?= LANGUAGE_ID?>',
 					site: '<?= CUtil::JSEscape($Params['site'])?>',
 					sessid_get: '<?= bitrix_sessid_get()?>',
-					viewFilePath: '<?= CUtil::JSEscape($Params['viewFilePath'])?>',
-					viewFolderPath: '<?= CUtil::JSEscape($Params['viewFolderPath'])?>',
+					viewMsFilePath: '<?= CUtil::JSEscape($Params['viewMsFilePath'])?>',
+					viewMsFolderPath: '<?= CUtil::JSEscape($Params['viewMsFolderPath'])?>',
 					arLastPathes: <?= CUtil::PhpToJSObject(CFilemanUtils::GetLastPathes())?>,
 					arSites: <?= CUtil::PhpToJSObject($arSites)?>,
 					//archive types
@@ -587,7 +588,10 @@ CAdminFileDialog::ShowScript(Array
 				<!-- if pack "to archive", if not - "to folder" -->
 				<td class="bxfm-d-label"><label for="bx_pack_to"><?= GetMessage("FM_PACK_TO")?>:</label></td>
 				<td class="bxfm-d-value">
-					<input id="bx_pack_to" style="width: 260px;" value="/" type="text"/>&nbsp;<input type="button" value="..." title="<?= GetMessage('FD_OPEN_DIR')?>" onclick="FMFD_PackUnpackOpen(true, {site: window.oBXFMPack.site, path: window.oBXFMPack.GetFolderPath(window.oBXFMPack.oPackTo.pInput.value)});"  />
+					<div style="width: 340px;">
+						<input id="bx_pack_to" style="width: 260px;" value="/" type="text"/>&nbsp;<input type="button" value="..." title="<?= GetMessage('FD_OPEN_DIR')?>" onclick="FMFD_PackUnpackOpen(true, {site: window.oBXFMPack.oSiteSel.value, path: window.oBXFMPack.GetFolderPath(window.oBXFMPack.oPackTo.pInput.value)});"  />
+						<span class="bxfm-site-sel" id="bx_pack_site_sel"></span>
+					</div>
 				</td>
 			</tr>
 			<tr class="bx-pack-d-title" id="bx-pack-d-title-label">
@@ -793,10 +797,16 @@ CAdminFileDialog::ShowScript(Array
 						$pack_to = "/".$_POST["packTo"];
 				}
 
-				$pack_to = RemoveScriptExtension($pack_to);
+				$siteTo = CFileMan::__CheckSite($_POST['siteTo']);
+				$docRootTo = CSite::GetSiteDocRoot($siteTo) ? CSite::GetSiteDocRoot($siteTo) : '';
+				$siteFrom = CFileMan::__CheckSite($site);
+				$docRootFrom = CSite::GetSiteDocRoot($siteFrom);
+
+				if (!$USER->IsAdmin())
+					$pack_to = RemoveScriptExtension($pack_to);
 
 				//check writing permissions
-				if (!$USER->CanDoFileOperation('fm_create_new_file', $pack_to))
+				if (!$USER->CanDoFileOperation('fm_create_new_file', array($siteTo, $pack_to)))
 				{
 					?>
 					<script>
@@ -806,7 +816,7 @@ CAdminFileDialog::ShowScript(Array
 					return;
 				}
 
-				if(IsFileUnsafe($pack_to) || CFileMan::CheckFileName(GetFileName($pack_to)) !== true)
+				if(IsFileUnsafe($docRootTo.$pack_to) || CFileMan::CheckFileName(GetFileName($pack_to)) !== true)
 				{
 					?>
 					<script>
@@ -817,7 +827,7 @@ CAdminFileDialog::ShowScript(Array
 				}
 
 				//ask if the file already exists
-				if (file_exists($io->GetPhysicalName($_SERVER["DOCUMENT_ROOT"].$pack_to)))
+				if (file_exists($io->GetPhysicalName($docRootTo.$pack_to)))
 				{
 					if  (empty($startFile))
 					{
@@ -830,8 +840,9 @@ CAdminFileDialog::ShowScript(Array
 									{
 										name: "<?= CUtil::JSEscape(basename($pack_to))?>",
 										path: "<?= CUtil::JSEscape($pack_to)?>",
-										size: "<?= CFile::FormatSize(filesize($io->GetPhysicalName($_SERVER['DOCUMENT_ROOT'].$pack_to)))?>",
-										date: "<?= date(CDatabase::DateFormatToPHP(CLang::GetDateFormat('FULL')), filemtime($io->GetPhysicalName($_SERVER['DOCUMENT_ROOT'].$pack_to))+CTimeZone::GetOffset())?>"
+										site: "<?= CUtil::JSEscape($siteTo)?>",
+										size: "<?= CFile::FormatSize(filesize($io->GetPhysicalName($docRootTo.$pack_to)))?>",
+										date: "<?= date(CDatabase::DateFormatToPHP(CLang::GetDateFormat('FULL')), filemtime($io->GetPhysicalName($docRootTo.$pack_to))+CTimeZone::GetOffset())?>"
 									}
 								};
 							</script>
@@ -841,7 +852,7 @@ CAdminFileDialog::ShowScript(Array
 					}
 				}
 
-				$packarc = CBXArchive::GetArchive($_SERVER["DOCUMENT_ROOT"].$pack_to, trim($_POST['arcType']));
+				$packarc = CBXArchive::GetArchive($docRootTo.$pack_to, trim($_POST['arcType']));
 
 				if ($packarc instanceof IBXArchive)
 				{
@@ -851,7 +862,7 @@ CAdminFileDialog::ShowScript(Array
 							"COMPRESS"			=> true,
 							"STEP_TIME"			=> COption::GetOptionString("fileman", "archive_step_time", 30),
 							"ADD_PATH"			=> false,
-							"REMOVE_PATH"		=> $_SERVER["DOCUMENT_ROOT"].$quickPath,
+							"REMOVE_PATH"		=> $docRootFrom.$quickPath,
 							"CHECK_PERMISSIONS" => $USER->IsAdmin() ? false : true
 							)
 						);
@@ -859,7 +870,7 @@ CAdminFileDialog::ShowScript(Array
 					$arPackFiles = array();
 					foreach ($_POST["files"] as $path2file)
 					{
-						$arPackFiles[] = $_SERVER["DOCUMENT_ROOT"].$path2file;
+						$arPackFiles[] = $docRootFrom.$path2file['path'];
 					}
 
 					@set_time_limit(0);
@@ -919,8 +930,13 @@ CAdminFileDialog::ShowScript(Array
 						$pack_to = "/".$_POST["packTo"];
 				}
 
-				if (!($USER->CanDoFileOperation('fm_create_new_file', $_POST["packTo"]) ||
-				$USER->CanDoFileOperation('fm_create_new_folder', $_POST["packTo"])))
+				$siteFrom = CFileMan::__CheckSite($_GET['site']);
+				$siteTo = CFileMan::__CheckSite($_POST['siteTo']);
+				$docRootFrom = CSite::GetSiteDocRoot($siteFrom);
+				$docRootTo = CSite::GetSiteDocRoot($siteTo);
+
+				if (!($USER->CanDoFileOperation('fm_create_new_file', array($siteTo, $_POST["packTo"])) ||
+				$USER->CanDoFileOperation('fm_create_new_folder', array($siteTo, $_POST["packTo"]))))
 				{
 					?>
 					<script>
@@ -932,7 +948,7 @@ CAdminFileDialog::ShowScript(Array
 
 				$bReplaceFiles = $_POST["case_option"] == "replace" ? true : false;
 
-				$arc = CBXArchive::GetArchive($_SERVER["DOCUMENT_ROOT"].$_POST["files"][0]);
+				$arc = CBXArchive::GetArchive($docRootFrom.$_POST["files"][0]);
 
 				if ($arc instanceof IBXArchive)
 				{
@@ -941,13 +957,13 @@ CAdminFileDialog::ShowScript(Array
 					$arc->SetOptions
 						(
 						array(
-							"REMOVE_PATH"		=> $_SERVER["DOCUMENT_ROOT"],
+							"REMOVE_PATH"		=> $docRootFrom,
 							"UNPACK_REPLACE"	=> $bReplaceFiles,
 							"CHECK_PERMISSIONS" => $USER->IsAdmin() ? false : true
 							)
 						);
 
-					$uRes = $arc->Unpack($_SERVER["DOCUMENT_ROOT"].$pack_to);
+					$uRes = $arc->Unpack($docRootTo.$pack_to);
 
 					if (!$uRes)
 					{
@@ -1445,9 +1461,8 @@ class CFilemanSearch
 	{
 		$arConfig = array();
 		$strAr = CUserOptions::GetOption("fileman", "file_search_config", false);
-		if ($strAr)
+		if ($strAr && CheckSerializedData($strAr))
 			$arConfig = unserialize($strAr);
-
 		return $arConfig;
 	}
 }
@@ -1693,8 +1708,9 @@ class CFilemanCopy
 				}
 			}
 
-			foreach ($Params['arFiles'] as $filePath)
+			foreach ($Params['arFiles'] as $file)
 			{
+				$filePath = $file['path'];
 				$caseOption = $Params['caseOption'];
 
 				if($Params["userCaseLastPath"])
@@ -1729,6 +1745,7 @@ class CFilemanCopy
 							fileOld: {
 								name: "<?= CUtil::JSEscape($name_i)?>",
 								path: "<?= CUtil::JSEscape($pathTo.$name_i)?>",
+								site: "<?= CUtil::JSEscape($siteTo)?>",
 								bDir: <?= $bDir_i ? "true" : "false"?>,
 								size: "<?= $bDir_i ? '-' : CFile::FormatSize($fTmp->GetFileSize())?>",
 								date: "<?= date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL")), CFilemanUtils::GetModifyTime($absPathTo.$name_i)+CTimeZone::GetOffset())?>"
@@ -1737,6 +1754,7 @@ class CFilemanCopy
 								alt_name: "<?= CUtil::JSEscape($altName)?>",
 								name: "<?= CUtil::JSEscape($name_i)?>",
 								path: "<?= CUtil::JSEscape($filePath)?>",
+								site: "<?= CUtil::JSEscape($site)?>",
 								bDir: <?= $bDir_i ? "true" : "false"?>,
 								size: "<?= $bDir_i ? '-' : CFile::FormatSize($fTmp1->GetFileSize())?>",
 								date: "<?= date(CDatabase::DateFormatToPHP(CLang::GetDateFormat("FULL")), CFilemanUtils::GetModifyTime($absPath_i)+CTimeZone::GetOffset())?>"
@@ -1856,7 +1874,7 @@ class CFilemanCopy
 	{
 		$arConfig = array();
 		$strAr = CUserOptions::GetOption("fileman", "file_copy_move_config", false);
-		if ($strAr)
+		if ($strAr && CheckSerializedData($strAr))
 			$arConfig = unserialize($strAr);
 
 		return $arConfig;

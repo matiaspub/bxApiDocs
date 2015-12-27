@@ -4,6 +4,8 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPAllStateService
 	extends CBPRuntimeService
 {
+	const COUNTERS_CACHE_TAG_PREFIX = 'b_bp_wfi_cnt_';
+
 	static public function SetStateTitle($workflowId, $stateTitle)
 	{
 		global $DB;
@@ -28,13 +30,21 @@ class CBPAllStateService
 		if (strlen($workflowId) <= 0)
 			throw new Exception("workflowId");
 
-		if ($bRewrite)
+		// @TODO: add new logic to CBPSetPermissionsMode::Rewrite
+		if (!is_array($bRewrite) && $bRewrite == true
+			|| is_array($bRewrite) && isset($bRewrite['setMode']) && $bRewrite['setMode'] == CBPSetPermissionsMode::Clear)
 		{
 			$DB->Query(
 				"DELETE FROM b_bp_workflow_permissions ".
 				"WHERE WORKFLOW_ID = '".$DB->ForSql($workflowId)."' "
 			);
 		}
+		$arState = self::GetWorkflowState($workflowId);
+		$documentService = $this->runtime->GetService("DocumentService");
+		$documentService->SetPermissions($arState["DOCUMENT_ID"], $workflowId, $arStatePermissions, $bRewrite);
+		$documentType = $documentService->GetDocumentType($arState["DOCUMENT_ID"]);
+		if ($documentType)
+			$arStatePermissions = $documentService->toInternalOperations($documentType, $arStatePermissions);
 
 		foreach ($arStatePermissions as $permission => $arObjects)
 		{
@@ -46,10 +56,6 @@ class CBPAllStateService
 				);
 			}
 		}
-
-		$arState = self::GetWorkflowState($workflowId);
-		$documentService = $this->runtime->GetService("DocumentService");
-		$documentService->SetPermissions($arState["DOCUMENT_ID"], $workflowId, $arStatePermissions, $bRewrite);
 	}
 
 	static public function GetStateTitle($workflowId)
@@ -65,6 +71,21 @@ class CBPAllStateService
 			return $ar["STATE_TITLE"];
 
 		return "";
+	}
+
+	public static function GetStateDocumentId($workflowId)
+	{
+		global $DB;
+
+		$workflowId = trim($workflowId);
+		if (strlen($workflowId) <= 0)
+			throw new Exception("workflowId");
+
+		$db = $DB->Query("SELECT MODULE_ID, ENTITY, DOCUMENT_ID FROM b_bp_workflow_state WHERE ID = '".$DB->ForSql($workflowId)."' ");
+		if ($ar = $db->Fetch())
+			return array($ar["MODULE_ID"], $ar["ENTITY"], $ar["DOCUMENT_ID"]);
+
+		return false;
 	}
 
 	public function	AddWorkflow($workflowId, $workflowTemplateId, $documentId, $starterUserId = 0)
@@ -98,6 +119,9 @@ class CBPAllStateService
 			"INSERT INTO b_bp_workflow_state (ID, MODULE_ID, ENTITY, DOCUMENT_ID, DOCUMENT_ID_INT, WORKFLOW_TEMPLATE_ID, MODIFIED, STARTED, STARTED_BY) ".
 			"VALUES ('".$DB->ForSql($workflowId)."', ".((strlen($arDocumentId[0]) > 0) ? "'".$DB->ForSql($arDocumentId[0])."'" : "NULL").", '".$DB->ForSql($arDocumentId[1])."', '".$DB->ForSql($arDocumentId[2])."', ".intval($arDocumentId[2]).", ".intval($workflowTemplateId).", ".$DB->CurrentTimeFunction().", ".$DB->CurrentTimeFunction().", ".$starterUserId.")"
 		);
+
+		if (is_int($starterUserId))
+			self::cleanRunningCountersCache($starterUserId);
 	}
 
 	static public function DeleteWorkflow($workflowId)
@@ -107,6 +131,10 @@ class CBPAllStateService
 		$workflowId = trim($workflowId);
 		if (strlen($workflowId) <= 0)
 			throw new Exception("workflowId");
+
+		$info = self::getWorkflowStateInfo($workflowId);
+		if (!empty($info['STARTED_BY']))
+			self::cleanRunningCountersCache($info['STARTED_BY']);
 
 		$DB->Query(
 			"DELETE FROM b_bp_workflow_permissions ".
@@ -124,6 +152,18 @@ class CBPAllStateService
 		self::DeleteByDocument($documentId);
 	}
 
+	public function onStatusChange($workflowId, $status)
+	{
+		if ($status == CBPWorkflowStatus::Completed || $status == CBPWorkflowStatus::Terminated)
+		{
+			$info = $this->getWorkflowStateInfo($workflowId);
+			$userId = isset($info['STARTED_BY']) ? (int)$info['STARTED_BY'] : 0;
+			if ($userId > 0)
+			{
+				self::cleanRunningCountersCache($userId);
+			}
+		}
+	}
 
 	private static function __ExtractState(&$arStates, $arResult)
 	{
@@ -245,14 +285,91 @@ class CBPAllStateService
 		return $arStates;
 	}
 
+	public static function getWorkflowStateInfo($workflowId)
+	{
+		global $DB;
+
+		$workflowId = trim($workflowId);
+		if (strlen($workflowId) <= 0)
+			throw new Exception("workflowId");
+
+		$dbResult = $DB->Query(
+			"SELECT WS.ID, WS.STATE_TITLE, WS.MODULE_ID, WS.ENTITY, WS.DOCUMENT_ID, WI.STATUS, WS.STARTED_BY ".
+			"FROM b_bp_workflow_state WS ".
+			"LEFT JOIN b_bp_workflow_instance WI ON (WS.ID = WI.ID) ".
+			"WHERE WS.ID = '".$DB->ForSql($workflowId)."' "
+		);
+
+		$state = false;
+		$result = $dbResult->Fetch();
+		if ($result)
+		{
+			$state = array(
+				'ID' => $result["ID"],
+				"STATE_TITLE" => $result["STATE_TITLE"],
+				"WORKFLOW_STATUS" => $result["STATUS"],
+				"DOCUMENT_ID" => array($result["MODULE_ID"], $result["ENTITY"], $result["DOCUMENT_ID"]),
+				"STARTED_BY" => $result["STARTED_BY"],
+			);
+		}
+
+		return $state;
+	}
+
+	public static function getWorkflowIntegerId($workflowId)
+	{
+		global $DB;
+
+		$workflowId = trim($workflowId);
+		if (strlen($workflowId) <= 0)
+			throw new Exception("workflowId");
+
+		$dbResult = $DB->Query(
+			"SELECT ID FROM b_bp_workflow_state_identify WHERE WORKFLOW_ID = '".$DB->ForSql($workflowId)."' "
+		);
+
+		$result = $dbResult->fetch();
+		if (!$result)
+		{
+			$strSql =
+				"INSERT INTO b_bp_workflow_state_identify (WORKFLOW_ID) ".
+				"VALUES ('".$DB->ForSql($workflowId)."')";
+			$DB->Query($strSql);
+
+			$result = array('ID' => $DB->LastID());
+		}
+		return (int)$result['ID'];
+	}
+
+	public static function getWorkflowByIntegerId($integerId)
+	{
+		global $DB;
+
+		$integerId = intval($integerId);
+		if ($integerId <= 0)
+			throw new Exception("integerId");
+
+		$dbResult = $DB->Query(
+			"SELECT WORKFLOW_ID FROM b_bp_workflow_state_identify WHERE ID = ".$integerId." "
+		);
+
+		$result = $dbResult->fetch();
+		if ($result)
+		{
+			return $result['WORKFLOW_ID'];
+		}
+		return false;
+	}
+
 	public static function DeleteByDocument($documentId)
 	{
 		global $DB;
 
 		$arDocumentId = CBPHelper::ParseDocumentId($documentId);
+		$users = array();
 
 		$dbRes = $DB->Query(
-			"SELECT ID ".
+			"SELECT ID, STARTED_BY ".
 			"FROM b_bp_workflow_state ".
 			"WHERE DOCUMENT_ID = '".$DB->ForSql($arDocumentId[2])."' ".
 			"	AND ENTITY = '".$DB->ForSql($arDocumentId[1])."' ".
@@ -264,6 +381,8 @@ class CBPAllStateService
 				"DELETE FROM b_bp_workflow_permissions ".
 				"WHERE WORKFLOW_ID = '".$DB->ForSql($arRes["ID"])."' "
 			);
+			if (!empty($arRes['STARTED_BY']))
+				$users[] = $arRes['STARTED_BY'];
 		}
 
 		$DB->Query(
@@ -272,6 +391,8 @@ class CBPAllStateService
 			"	AND ENTITY = '".$DB->ForSql($arDocumentId[1])."' ".
 			"	AND MODULE_ID ".((strlen($arDocumentId[0]) > 0) ? "= '".$DB->ForSql($arDocumentId[0])."'" : "IS NULL")." "
 		);
+
+		self::cleanRunningCountersCache($users);
 	}
 
 	public static function MergeStates($firstDocumentId, $secondDocumentId)
@@ -291,6 +412,72 @@ class CBPAllStateService
 			"	AND ENTITY = '".$DB->ForSql($arSecondDocumentId[1])."' ".
 			"	AND MODULE_ID = '".$DB->ForSql($arSecondDocumentId[0])."' "
 		);
+	}
+
+	public static function MigrateDocumentType($oldType, $newType, $workflowTemplateIds)
+	{
+		global $DB;
+
+		$arOldType = CBPHelper::ParseDocumentId($oldType);
+		$arNewType = CBPHelper::ParseDocumentId($newType);
+
+		$DB->Query(
+			"UPDATE b_bp_workflow_state SET ".
+			"	ENTITY = '".$DB->ForSql($arNewType[1])."', ".
+			"	MODULE_ID = '".$DB->ForSql($arNewType[0])."' ".
+			"WHERE ENTITY = '".$DB->ForSql($arOldType[1])."' ".
+			"	AND MODULE_ID = '".$DB->ForSql($arOldType[0])."' ".
+			"	AND WORKFLOW_TEMPLATE_ID IN (".implode(",", $workflowTemplateIds).") "
+		);
+	}
+
+	public static function getRunningCounters($userId)
+	{
+		global $DB;
+
+		$counters = array('*' => 0);
+		$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+		$cacheTag = self::COUNTERS_CACHE_TAG_PREFIX.$userId;
+		if ($cache->read(3600*24*7, $cacheTag))
+		{
+			$counters = (array) $cache->get($cacheTag);
+		}
+		else
+		{
+			$query =
+				"SELECT WS.MODULE_ID AS MODULE_ID, WS.ENTITY AS ENTITY, COUNT('x') AS CNT ".
+				'FROM b_bp_workflow_state WS '.
+				'	INNER JOIN b_bp_workflow_instance WI ON (WS.ID = WI.ID) '.
+				'WHERE WS.STARTED_BY = '.(int)$userId.' '.
+				'GROUP BY MODULE_ID, ENTITY';
+
+			$iterator = $DB->Query($query, true);
+			if ($iterator)
+			{
+				while ($row = $iterator->fetch())
+				{
+					$cnt = (int)$row['CNT'];
+					$counters[$row['MODULE_ID']][$row['ENTITY']] = $cnt;
+					if (!isset($counters[$row['MODULE_ID']]['*']))
+						$counters[$row['MODULE_ID']]['*'] = 0;
+					$counters[$row['MODULE_ID']]['*'] += $cnt;
+					$counters['*'] += $cnt;
+				}
+				$cache->set($cacheTag, $counters);
+			}
+		}
+		return $counters;
+	}
+
+	protected static function cleanRunningCountersCache($users)
+	{
+		$users = (array) $users;
+		$users = array_unique($users);
+		$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+		foreach ($users as $userId)
+		{
+			$cache->clean(self::COUNTERS_CACHE_TAG_PREFIX.$userId);
+		}
 	}
 }
 ?>

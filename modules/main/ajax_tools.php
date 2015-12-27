@@ -65,6 +65,20 @@ class CAjax
 						$sSrcFile = "/bitrix/modules".substr($sSrcFile, strlen($sRealBitrixModules));
 						$bSrcFound = true;
 					}
+					else
+					{
+						// next special hack
+						$matches = array();
+						if (preg_match("#(?<=/modules/)[^/]+(?=/install/components/bitrix/)#", $sSrcFile, $matches))
+						{
+							$sRealBitrixComponentsDir = strtolower(str_replace("\\", "/", realpath($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$matches[0]."/install/components/bitrix")));
+							if(strpos($sSrcFile, $sRealBitrixComponentsDir) === 0)
+							{
+								$sSrcFile = "/bitrix/components/bitrix".substr($sSrcFile, strlen($sRealBitrixComponentsDir));
+								$bSrcFound = true;
+							}
+						}
+					}
 				}
 			}
 		}

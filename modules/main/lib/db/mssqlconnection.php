@@ -298,7 +298,9 @@ class MssqlConnection extends Connection
 				));
 			}
 
-			$sqlFields[] = $this->getSqlHelper()->quote($columnName)
+			$realColumnName = $field->getColumnName();
+
+			$sqlFields[] = $this->getSqlHelper()->quote($realColumnName)
 				. ' ' . $this->getSqlHelper()->getColumnTypeByField($field)
 				. ' NOT NULL'
 				. (in_array($columnName, $autoincrement, true) ? ' IDENTITY (1, 1)' : '')
@@ -311,7 +313,8 @@ class MssqlConnection extends Connection
 		{
 			foreach ($primary as &$primaryColumn)
 			{
-				$primaryColumn = $this->getSqlHelper()->quote($primaryColumn);
+				$realColumnName = $fields[$primaryColumn]->getColumnName();
+				$primaryColumn = $this->getSqlHelper()->quote($realColumnName);
 			}
 
 			$sql .= ', PRIMARY KEY('.join(', ', $primary).')';

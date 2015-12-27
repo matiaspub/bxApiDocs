@@ -132,18 +132,13 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 	 */
 
 	/**
-	* <p>Возвращает массив параметров пользовательского поля с кодом ID.</p>
-	*
-	*
+	* <p>Возвращает массив параметров пользовательского поля с кодом ID. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  ID пользовательского поля
 	*
-	*
-	*
 	* @return mixed <p>Возвращает массив параметров пользовательского поля. Или false
 	* если поле не найдено.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -203,9 +198,7 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 	 */
 
 	/**
-	* <p>Функция возвращает список пользовательских полей по фильтру <b>$arFilter</b> с сортировкой <b>$arOrder</b>.</p>
-	*
-	*
+	* <p>Метод возвращает список пользовательских полей по фильтру <b>$arFilter</b> с сортировкой <b>$arOrder</b>. Статичный метод.</p>
 	*
 	*
 	* @param array $Sort = array() Массив полей для сортировки, содержащий пары <b>поле сортировки</b>
@@ -216,8 +209,6 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 	* сортировки;</li> </ul> Направление сортировки: <ul> <li> <b>ASC</b> - по
 	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul>
 	*
-	*
-	*
 	* @param array $Filter = array() Массив вида <i>array("фильтруемое поле" =&gt; "значение" [, ...])</i>. Может
 	* принимать значения: <ul> <li> <b>ID</b> - ID пользовательского поля;</li> <li>
 	* <b>ENTITY_ID</b> - название объекта, которому принадлежит
@@ -225,13 +216,14 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 	* </li> <li> <b>FIELD_NAME</b> - Название поля;</li> <li> <b>SORT</b> - Значение
 	* сортировки;</li> <li><b>USER_TYPE_ID</b></li> <li><b>XML_ID</b></li> <li> <b>MULTIPLE</b> -
 	* Множественность свойства;</li> <li><b>MANDATORY</b></li> <li><b>SHOW_FILTER</b></li>
-	* <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> <li> <b>LANG</b> - ID
-	* языка</li> </ul> Необязательное. По умолчанию записи не фильтруются.
+	* <li><b>SHOW_IN_LIST</b></li> <li><b>EDIT_IN_LIST</b></li> <li><b>IS_SEARCHABLE</b></li> <li> <b>LANG</b> - ID языка
+	* <p class="note"><b>Внимание!</b> При не указание в фильтре ключа LANG со
+	* значением необходимого языка ('LANG' =&gt; 'ru'), поля "Подпись в форме
+	* редактирования", "Заголовок в списке" и т.д. не будут участвовать в
+	* выборке. ([EDIT_FORM_LABEL], [LIST_COLUMN_LABEL], [LIST_FILTER_LABEL], [ERROR_MESSAGE], [HELP_MESSAGE])</p> </li>
+	* </ul> Необязательное. По умолчанию записи не фильтруются.
 	*
-	*
-	*
-	* @return mixed <p>Возвращается объект CDBResult.</p> </h
-	*
+	* @return mixed <p>Возвращается объект CDBResult.</p> </h<a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -244,11 +236,6 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 	* }
 	* ?&gt;
 	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <p></p><a name="examples"></a>
 	*
 	*
 	* @static
@@ -296,7 +283,7 @@ public static 	function DropColumnSQL($strTable, $arColumns)
 				case "SHOW_IN_LIST":
 				case "EDIT_IN_LIST":
 				case "IS_SEARCHABLE":
-					$arFilter[] = "UF.".$key." LIKE '".$val."'";
+					$arFilter[] = "UF.".$key." = '".$val."'";
 					break;
 				case "LANG":
 					$bLangJoin = $val;
@@ -945,7 +932,7 @@ public 	function DropEntity($entity_id)
 	 * <p>Десериализует поле SETTINGS.</p>
 	 * @return array возвращает false в случае последней записи выборки.
 	 */
-	public function Fetch()
+public static 	function Fetch()
 	{
 		$res = parent::Fetch();
 		if($res && strlen($res["SETTINGS"])>0)
@@ -1017,7 +1004,7 @@ public 	function GetUserType($user_type_id = false)
 			return $this->arUserTypes;
 	}
 
-	public function GetDBColumnType($arUserField)
+	functpublic ion GetDBColumnType($arUserField)
 	{
 		if($arType = $this->GetUserType($arUserField["USER_TYPE_ID"]))
 		{
@@ -1027,7 +1014,7 @@ public 	function GetUserType($user_type_id = false)
 		return "";
 	}
 
-public 	function getUtsDBColumnType($arUserField)
+public static 	function getUtsDBColumnType($arUserField)
 	{
 		if ($arUserField['MULTIPLE'] == 'Y')
 		{
@@ -1040,7 +1027,7 @@ public 	function getUtsDBColumnType($arUserField)
 		}
 	}
 
-public 	function getUtmDBColumnType($arUserField)
+static 	function getUtmDBColumnType($arUserField)
 	{
 		return $this->GetDBColumnType($arUserField);
 	}
@@ -1249,7 +1236,7 @@ public 	function getUserFieldsWithReadyData($entity_id, $readyData, $LANG = fals
 		return $result;
 	}
 
-public 	function GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
+	fpublic unction GetUserFieldValue($entity_id, $field_id, $value_id, $LANG=false)
 	{
 		global $DB;
 		$entity_id = preg_replace("/[^0-9A-Z_]+/", "", $entity_id);
@@ -1334,7 +1321,7 @@ public static 	function OnAfterFetch($arUserField, $result)
 		return $result;
 	}
 
-public static 	function LoadMultipleValues($arUserField, $valueId)
+	fpublic static unction LoadMultipleValues($arUserField, $valueId)
 	{
 		global $DB;
 		$result = array();
@@ -1384,7 +1371,7 @@ public static 	function EditFormTab($entity_id)
 		);
 	}
 
-	function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
+public 	function EditFormShowTab($entity_id, $bVarsFromForm, $ID)
 	{
 		global $APPLICATION;
 
@@ -1507,7 +1494,7 @@ public static 	function EditFormTab($entity_id)
 		}
 	}
 
-	public function AdminListAddFilterFields($entity_id, &$arFilterFields)
+public static 	function AdminListAddFilterFields($entity_id, &$arFilterFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1515,7 +1502,7 @@ public static 	function EditFormTab($entity_id)
 				$arFilterFields[]="find_".$FIELD_NAME;
 	}
 
-public 	function IsNotEmpty($value)
+public static 	function IsNotEmpty($value)
 	{
 		if(is_array($value))
 		{
@@ -1536,7 +1523,7 @@ public 	function IsNotEmpty($value)
 		}
 	}
 
-public 	function AdminListAddFilter($entity_id, &$arFilter)
+	fpublic unction AdminListAddFilter($entity_id, &$arFilter)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1558,7 +1545,7 @@ public 	function AdminListAddFilter($entity_id, &$arFilter)
 		}
 	}
 
-public function AdminListPrepareFields($entity_id, &$arFields)
+public static 	function AdminListPrepareFields($entity_id, &$arFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1566,7 +1553,7 @@ public function AdminListPrepareFields($entity_id, &$arFields)
 				unset($arFields[$FIELD_NAME]);
 	}
 
-public function AdminListAddHeaders($entity_id, &$arHeaders)
+public static 	function AdminListAddHeaders($entity_id, &$arHeaders)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1575,14 +1562,14 @@ public function AdminListAddHeaders($entity_id, &$arHeaders)
 			{
 				$arHeaders[] = array(
 					"id" => $FIELD_NAME,
-					"content" => $arUserField["LIST_COLUMN_LABEL"]? $arUserField["LIST_COLUMN_LABEL"]: $arUserField["FIELD_NAME"],
+					"content" => htmlspecialcharsbx($arUserField["LIST_COLUMN_LABEL"]? $arUserField["LIST_COLUMN_LABEL"]: $arUserField["FIELD_NAME"]),
 					"sort" => $arUserField["MULTIPLE"]=="N"? $FIELD_NAME: false,
 				);
 			}
 		}
 	}
 
-	public function AddUserFields($entity_id, $arRes, &$row)
+public static 	function AddUserFields($entity_id, $arRes, &$row)
 	{
 		$arUserFields = $this->GetUserFields($entity_id);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1590,7 +1577,7 @@ public function AdminListAddHeaders($entity_id, &$arHeaders)
 				$this->AddUserField($arUserField, $arRes[$FIELD_NAME], $row);
 	}
 
-public function AddFindFields($entity_id, &$arFindFields)
+public static 	function AddFindFields($entity_id, &$arFindFields)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1601,7 +1588,7 @@ public function AddFindFields($entity_id, &$arFindFields)
 				{
 					if($arUserField["LIST_FILTER_LABEL"])
 					{
-						$arFindFields[$FIELD_NAME] = $arUserField["LIST_FILTER_LABEL"];
+						$arFindFields[$FIELD_NAME] = htmlspecialcharsbx($arUserField["LIST_FILTER_LABEL"]);
 					}
 					else
 					{
@@ -1612,7 +1599,7 @@ public function AddFindFields($entity_id, &$arFindFields)
 		}
 	}
 
-public function AdminListShowFilter($entity_id)
+	functpublic static ion AdminListShowFilter($entity_id)
 	{
 		$arUserFields = $this->GetUserFields($entity_id, 0, $GLOBALS["lang"]);
 		foreach($arUserFields as $FIELD_NAME=>$arUserField)
@@ -1624,60 +1611,13 @@ public function AdminListShowFilter($entity_id)
 		}
 	}
 
-	public static function ShowScript()
+public static 	function ShowScript()
 	{
-		static $first=true;
-		if($first)
-		{
-			$first = false;
-			return "
-				<script type=\"text/javascript\">
-				function addNewRow(tableID, regexp, rindex)
-				{
-					var tbl = document.getElementById(tableID);
-					var cnt = tbl.rows.length;
-					var oRow = tbl.insertRow(cnt-1);
-					var oCell = oRow.insertCell(0);
-					var html = tbl.rows[cnt-2].cells[0].innerHTML;
+		global $APPLICATION;
 
-					oCell.innerHTML =  html.replace(regexp,
-						function(html)
-						{
-							return html.replace(new RegExp('([\\\\[x])'+arguments[rindex]+'([\\\\]x])', 'gi'), '$1'+(1+parseInt(arguments[rindex]))+'$2');
-						}
-					);
+		$APPLICATION->AddHeadScript("/bitrix/js/main/usertype.js");
 
-					setTimeout(function() {
-						var r = BX.findChildren(oCell, {tag: /^(input|select|textarea)$/i});
-						if (r && r.length > 0)
-						{
-							for (var i=0,l=r.length;i<l;i++)
-							{
-								if (r[i].form && r[i].form.BXAUTOSAVE)
-									r[i].form.BXAUTOSAVE.RegisterInput(r[i]);
-								else
-									break;
-							}
-						}
-					}, 10);
-
-					var re = /<script[^>]*?>([\\w\\s\\S]*?)<\\/script>/gmi;
-					var otv = '';
-					while (otv = re.exec(oCell.innerHTML))
-					{
-						if (otv[1])
-						{
-							BX.evalGlobal(otv[1]);
-						}
-					}
-				}
-				</script>
-			";
-		}
-		else
-		{
-			return "";
-		}
+		return "";
 	}
 
 	public function GetEditFormHTML($bVarsFromForm, $form_value, $arUserField)
@@ -1792,9 +1732,9 @@ public function AdminListShowFilter($entity_id)
 					);
 					return '<tr'.($rowClass != '' ? ' class="'.$rowClass.'"' : '').'><td class="adm-detail-valign-top">'.$strLabelHTML.'</td><td>'.
 						'<table id="table_'.$arUserField["FIELD_NAME"].'">'.$html.'<tr><td>'.$fieldHtml.'</td></tr>'.
-					'<tr><td style="padding-top: 6px;"><input type="button" value="'.GetMessage("USER_TYPE_PROP_ADD").'" onClick="addNewRow(\'table_'.$arUserField["FIELD_NAME"].'\', /('.$FIELD_NAME_X.'|'.$arUserField["FIELD_NAME"].'|'.$arUserField["FIELD_NAME"].'_old_id)[x\[]([0-9]*)[x\]]/gi, 2)"></td></tr>'.
+					'<tr><td style="padding-top: 6px;"><input type="button" value="'.GetMessage("USER_TYPE_PROP_ADD").'" onClick="addNewRow(\'table_'.$arUserField["FIELD_NAME"].'\', \''.$FIELD_NAME_X.'|'.$arUserField["FIELD_NAME"].'|'.$arUserField["FIELD_NAME"].'_old_id\')"></td></tr>'.
 					"<script type=\"text/javascript\">BX.addCustomEvent('onAutoSaveRestore', function(ob, data) {for (var i in data){if (i.substring(0,".(strlen($arUserField['FIELD_NAME'])+1).")=='".CUtil::JSEscape($arUserField['FIELD_NAME'])."['){".
-						'addNewRow(\'table_'.$arUserField["FIELD_NAME"].'\', /('.$FIELD_NAME_X.'|'.$arUserField["FIELD_NAME"].'|'.$arUserField["FIELD_NAME"].'_old_id)[x\[]([0-9]*)[x\[]/gi, 2)'.
+					'addNewRow(\'table_'.$arUserField["FIELD_NAME"].'\', \''.$FIELD_NAME_X.'|'.$arUserField["FIELD_NAME"].'|'.$arUserField["FIELD_NAME"].'_old_id\')'.
 					"}}})</script>".
 					'</table>'.
 					'</td></tr>'.$js;
@@ -1915,7 +1855,12 @@ public function AdminListShowFilter($entity_id)
 			}
 			if($arUserField["EDIT_IN_LIST"]=="Y" && is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "getadminlistedithtml")))
 			{
-				if($arUserField["MULTIPLE"] == "N")
+				if (!$row->bEditMode)
+				{
+					// put dummy
+					$row->AddEditField($arUserField["FIELD_NAME"], "&nbsp;");
+				}
+				elseif($arUserField["MULTIPLE"] == "N")
 				{
 					$html = call_user_func_array(
 						array($arUserField["USER_TYPE"]["CLASS_NAME"], "getadminlistedithtml"),
@@ -2090,7 +2035,14 @@ public function AdminListShowFilter($entity_id)
 		return null;
 	}
 
-	function CheckFields($entity_id, $ID, &$arFields)
+	/**
+	 * @param      $entity_id
+	 * @param      $ID
+	 * @param      $arFields
+	 * @param bool $user_id False means current user id.
+	 * @return bool
+	 */
+	function CheckFields($entity_id, $ID, &$arFields, $user_id = false)
 	{
 		global $APPLICATION;
 
@@ -2194,7 +2146,7 @@ public function AdminListShowFilter($entity_id)
 						//apply appropriate check function
 						$ar = call_user_func_array(
 							array($CLASS_NAME, "checkfields"),
-							array($arUserField, $arFields[$FIELD_NAME])
+							array($arUserField, $arFields[$FIELD_NAME], $user_id)
 						);
 						$aMsg = array_merge($aMsg, $ar);
 					}
@@ -2207,7 +2159,7 @@ public function AdminListShowFilter($entity_id)
 								//apply appropriate check function
 								$ar = call_user_func_array(
 									array($CLASS_NAME, "checkfields"),
-									array($arUserField, $value)
+									array($arUserField, $value, $user_id)
 								);
 								$aMsg = array_merge($aMsg, $ar);
 							}
@@ -2314,7 +2266,7 @@ public function AdminListShowFilter($entity_id)
 				if($arUserField["MULTIPLE"] == "N")
 				{
 					if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave")))
-						$arFields[$FIELD_NAME] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $arFields[$FIELD_NAME]));
+						$arFields[$FIELD_NAME] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $arFields[$FIELD_NAME], $user_id));
 
 					if(strlen($arFields[$FIELD_NAME])>0)
 						$arUpdate[$FIELD_NAME] = $arFields[$FIELD_NAME];
@@ -2327,13 +2279,13 @@ public function AdminListShowFilter($entity_id)
 					$arInsertType[$arUserField["ID"]] = $arUserField["USER_TYPE"];
 
 					if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesaveall")))
-						$arInsert[$arUserField["ID"]] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesaveall"), array($arUserField, $arFields[$FIELD_NAME]));
+						$arInsert[$arUserField["ID"]] = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesaveall"), array($arUserField, $arFields[$FIELD_NAME], $user_id));
 					else
 					{
 						foreach($arFields[$FIELD_NAME] as $value)
 						{
 							if(is_callable(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave")))
-								$value = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $value));
+								$value = call_user_func_array(array($arUserField["USER_TYPE"]["CLASS_NAME"], "onbeforesave"), array($arUserField, $value, $user_id));
 
 							if(strlen($value)>0)
 							{
@@ -2734,7 +2686,7 @@ class CUserTypeSQL
 		}
 	}
 
-public function GetDistinct()
+public static 	function GetDistinct()
 	{
 		return $this->obWhere->bDistinctReqired;
 	}
@@ -2753,7 +2705,7 @@ public 	function GetSelect()
 		return $result;
 	}
 
-public function GetJoin($ID)
+public static 	function GetJoin($ID)
 	{
 		$result = $this->obWhere->GetJoins();
 		$table = " b_uts_".$this->entity_id." ".$this->table_alias." ";
@@ -2762,7 +2714,7 @@ public function GetJoin($ID)
 		return $result;
 	}
 
-public function SetOrder($arOrder)
+public static 	function SetOrder($arOrder)
 	{
 		if(is_array($arOrder))
 		{
@@ -2785,13 +2737,13 @@ public 	function GetOrder($field)
 		return $result;
 	}
 
-public 	function SetFilter($arFilter)
+	fupublic nction SetFilter($arFilter)
 	{
 		if(is_array($arFilter))
 			$this->filter = $arFilter;
 	}
 
-public function GetFilter()
+	public static function GetFilter()
 	{
 		return $this->obWhere->GetQuery($this->filter);
 	}
@@ -2814,7 +2766,7 @@ public static 	function _Upper($field)
 	{
 		return "UPPER(".$field.")";
 	}
-	public function _Empty($field)
+public 	function _Empty($field)
 	{
 		return "(".$field." IS NULL)";
 	}
@@ -2830,7 +2782,7 @@ public static 	function _StringNotEQ($field, $sql_value)
 	{
 		return "(".$field." IS NULL OR ".$field." <> '".$sql_value."')";
 	}
-public static 	function _StringIN($field, $sql_values)
+	fpublic static unction _StringIN($field, $sql_values)
 	{
 		return $field." in ('".implode("', '", $sql_values)."')";
 	}
@@ -2913,13 +2865,13 @@ public 	function AddFields($arFields)
 		}
 	}
 
-	public function SetFields($arFields)
+public 	function SetFields($arFields)
 	{
 		$this->fields = array();
 		$this->AddFields($arFields);
 	}
 
-public 	function MakeOperation($key)
+	public function MakeOperation($key)
 	{
 		if(isset(self::$triple_char[$op = substr($key,0,3)]))
 			return Array("FIELD"=>substr($key,3), "OPERATION"=>self::$triple_char[$op]);
@@ -2938,7 +2890,7 @@ public 	function getOperationByCode($code)
 		return $all_operations[$code];
 	}
 
-public function GetQuery($arFilter)
+public 	function GetQuery($arFilter)
 	{
 		$this->l_joins = array();
 		$this->c_joins = array();
@@ -2950,7 +2902,7 @@ public function GetQuery($arFilter)
 		return $this->GetQueryEx($arFilter, $this->l_joins);
 	}
 
-	public function GetQueryEx($arFilter, &$arJoins, $level=0)
+public 	function GetQueryEx($arFilter, &$arJoins, $level=0)
 	{
 		if(!is_array($arFilter))
 			return "";
@@ -3024,7 +2976,7 @@ public function GetQuery($arFilter)
 								|| (
 									($FIELD_TYPE=="int" && intval($value)!=0)
 									|| ($FIELD_TYPE=="double" && doubleval($value)!=0)
-									|| ($FIELD_TYPE!="int" && $FIELD_TYPE!="double" && strlen($value)>0)
+									|| ($FIELD_TYPE!="int" && $FIELD_TYPE!="double" && is_scalar($value) && strlen($value)>0)
 								)
 							)
 						)
@@ -3228,7 +3180,7 @@ public 	function addIntFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $v
 		}
 	}
 
-	public function addFloatFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value)
+public 	function addFloatFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value)
 	{
 		if (is_array($value))
 			$FIELD_VALUE = array_map("doubleval", $value);
@@ -3388,7 +3340,7 @@ public 	function addStringFilter(&$result, $isMultiple, $FIELD_NAME, $operation,
 			break;
 		case "E":
 			if (is_array($FIELD_VALUE))
-				$result[] = "(".$this->_Upper($FIELD_NAME)." like '".implode("' OR ".$this->_Upper($FIELD_NAME)." like '", $FIELD_VALUE)."')";
+				$result[] = "(".$this->_Upper($FIELD_NAME)." like upper('".implode("') OR ".$this->_Upper($FIELD_NAME)." like upper('", $FIELD_VALUE)."'))";
 			elseif (is_object($FIELD_VALUE))
 				$result[] = $this->_ExprEQ($FIELD_NAME, $FIELD_VALUE);
 			elseif(strlen($FIELD_VALUE)<=0)
@@ -3575,7 +3527,7 @@ public 	function addStringFilter(&$result, $isMultiple, $FIELD_NAME, $operation,
 		}
 	}
 
-	public function addDateFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value, $format)
+public static 	function addDateFilter(&$result, $isMultiple, $FIELD_NAME, $operation, $value, $format)
 	{
 		global $DB;
 
@@ -3583,11 +3535,28 @@ public 	function addStringFilter(&$result, $isMultiple, $FIELD_NAME, $operation,
 		{
 			$FIELD_VALUE = array();
 			foreach ($value as $val)
-				$FIELD_VALUE[] = $DB->CharToDateFunction($val, $format);
+			{
+				if ($val instanceof \Bitrix\Main\Type\Date)
+				{
+					$FIELD_VALUE[] = $DB->CharToDateFunction((string)$val, $format);
+				}
+				elseif (is_object($val))
+				{
+					$FIELD_VALUE[] = $val->compile();
+				}
+				elseif (strlen($val))
+				{
+					$FIELD_VALUE[] = $DB->CharToDateFunction($val, $format);
+				}
+				else
+				{
+					$FIELD_VALUE[] = '';
+				}
+			}
 		}
 		elseif ($value instanceof \Bitrix\Main\Type\Date)
 		{
-			$FIELD_VALUE = $DB->CharToDateFunction($value, $format);
+			$FIELD_VALUE = $DB->CharToDateFunction((string)$value, $format);
 		}
 		elseif (is_object($value))
 		{
@@ -3702,7 +3671,7 @@ class CSQLWhereExpression
 	protected
 		$DB;
 
-	public function __construct($expression, $args = null)
+public static 	public function __construct($expression, $args = null)
 	{
 		$this->expression = $expression;
 
@@ -3715,7 +3684,7 @@ class CSQLWhereExpression
 		$this->DB = $DB;
 	}
 
-public function compile()
+public static 	public function compile()
 	{
 		$this->i = -1;
 
@@ -3726,7 +3695,7 @@ public function compile()
 		return $value;
 	}
 
-	public function execPlaceholders($matches)
+public 	protected function execPlaceholders($matches)
 	{
 		$this->i++;
 
@@ -3781,14 +3750,10 @@ class CUserFieldEnum
 {
 
 	/**
-	* <p>Изменение значений списка пользовательского поля. </p>
-	*
-	*
+	* <p>Изменение значений списка пользовательского поля. Динамичный метод.</p>
 	*
 	*
 	* @param int $FIELD_ID  Идентификатор пользовательского поля. <br>
-	*
-	*
 	*
 	* @param array $values  Массив устанавливаемых значений. Ключами массива служат
 	* идентификаторы значений списка, а значения ключей определяют
@@ -3802,16 +3767,12 @@ class CUserFieldEnum
 	* равен Y, то данное значение будет удалено из списка.</li> </ul>
 	* Значения ключей задают точное соответствие для фильтрации. <br>
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Добавим значение выпадающего списка: "не знаю"<br><br>	$obEnum = new CUserFieldEnum;<br>	$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>		"n0" =&gt; array(<br>			"VALUE" =&gt; "не знаю",<br>		),<br>	));<br><br>	//2. Изменим "не знаю" на "не помню"<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не знаю",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"VALUE" =&gt; "не помню",<br>			),<br>		));<br>	}<br><br>	//3. удалим значение "не помню" из списка<br>	$rsEnum = CUserFieldEnum::GetList(array(), array(<br>		"VALUE" =&gt; "не помню",<br>	));<br>	if($arEnum = $rsEnum-&gt;Fetch())<br>	{<br>		$obEnum = new CUserFieldEnum;<br>		$obEnum-&gt;<strong>SetEnumValues</strong>($FIELD_ID, array(<br>			$arEnum["ID"] =&gt; array(<br>				"DEL" =&gt; "Y",<br>			),<br>		));<br>	}<br><br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -3823,10 +3784,21 @@ class CUserFieldEnum
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuserfieldenum/setenumvalues.php
 	* @author Bitrix
 	*/
-	public function SetEnumValues($FIELD_ID, $values)
+	public static 	function SetEnumValues($FIELD_ID, $values)
 	{
 		global $DB, $CACHE_MANAGER, $APPLICATION;
 		$aMsg = array();
+
+		foreach($values as $i=>$row)
+		{
+			foreach($row as $key=>$val)
+			{
+				if(strncmp($key, "~", 1)===0)
+				{
+					unset($values[$i][$key]);
+				}
+			}
+		}
 
 		/*check unique XML_ID*/
 		$arAdded = array();
@@ -3958,9 +3930,7 @@ class CUserFieldEnum
 
 
 	/**
-	* <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. </p>
-	*
-	*
+	* <p>Возвращает значения списка пользовательского поля в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Для параметра aSort по умолчанию является сортировка по полю SORT, а затем по полю ID по возрастанию. Динамичный метод.</p>
 	*
 	*
 	* @param array $arrayaSort = array() Массив для сортировки значений. В массиве допустимы следующие
@@ -3971,8 +3941,6 @@ class CUserFieldEnum
 	* Значения ключей могут принимать значения: <br><ul> <li> <b>ASC</b> - по
 	* возрастанию </li> <li> <b>DESC</b> - по убыванию </li> </ul>
 	*
-	*
-	*
 	* @param array $arrayaFilter = array() Массив для фильтрации значений. В массиве допустимы следующие
 	* ключи: <br><ul> <li> <b>ID</b> - ID значения списка; </li> <li> <b>USER_FIELD_ID</b> -
 	* идентификатор пользовательского поля; </li> <li> <b>VALUE</b> - значение
@@ -3980,16 +3948,12 @@ class CUserFieldEnum
 	* сортировка; </li> <li> <b>XML_ID</b> - код внешнего источника.</li> </ul> Значения
 	* ключей задают точное соответствие для фильтрации. <br>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. Выведем отображаемое значение для<br>// текущего пользователя.<br><br>//Сначала получим значение пользовательского поля:<br>global $USER;<br>if(is_object($USER))<br>{<br>	$rsUser = CUser::GetList($by, $order,<br>		array(<br>			"ID" =&gt; $USER-&gt;GetID(),<br>		),<br>		array(<br>			"SELECT" =&gt; array(<br>				"UF_GENDER",<br>			),<br>		)<br>	);<br>	if($arUser = $rsUser-&gt;Fetch())<br>	{<br>		$rsGender = <strong>CUserFieldEnum::GetList</strong>(array(), array(<br>			"ID" =&gt; $arUser["UF_GENDER"],<br>		));<br>		if($arGender = $rsGender-&gt;GetNext())<br>			echo $arGender["VALUE"];<br>	}<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -4122,23 +4086,17 @@ class CUserFieldEnum
 
 
 	/**
-	* <p>Удаление ВСЕХ значений списка пользовательского поля. Фактически это удаление справочника.</p>
-	*
-	*
+	* <p>Удаление ВСЕХ значений списка пользовательского поля. Фактически это удаление справочника. Динамичный метод.</p>
 	*
 	*
 	* @param int $FIELD_ID  Идентификатор пользовательского поля.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>//Пусть для пользователей определено пользовательское свойство<br>// типа список с кодом UF_GENDER. <br><br>//0. определим идентификатор поля.<br>$arFields = $GLOBALS['USER_FIELD_MANAGER']-&gt;GetUserFields("USER");<br>if(array_key_exists("UF_GENDER", $arFields))<br>{<br>	$FIELD_ID = $arFields["UF_GENDER"]["ID"];<br><br>	//1. Очистим выпадающий список<br><strong>CUserFieldEnum::DeleteFieldEnum</strong>($FIELD_ID);<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

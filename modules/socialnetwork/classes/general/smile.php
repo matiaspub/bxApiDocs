@@ -1,15 +1,13 @@
 <?
 
 /**
- * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/index.php
  * @author Bitrix
  */
 class CAllSocNetSmile
@@ -121,17 +119,13 @@ class CAllSocNetSmile
 	* <p>Метод удаляет смайл.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код смайла
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/Delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/Delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -151,11 +145,7 @@ class CAllSocNetSmile
 	* <p>Возвращает массив языконезависимых параметров смайла.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код смайла.
-	*
-	*
 	*
 	* @return array <p>Массив с ключами:<br><b>ID</b> - код смайла,<br><b>SORT</b> - индекс
 	* сортировки,<br><b>SMILE_TYPE</b> - тип смайла,<br><b>TYPING</b> - написание
@@ -164,7 +154,7 @@ class CAllSocNetSmile
 	* описание.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/getbyid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/getbyid.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)
@@ -191,15 +181,9 @@ class CAllSocNetSmile
 	* <p>Возвращает параметры смайла.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код смайла.
 	*
-	*
-	*
 	* @param string $strLang  Код языка.
-	*
-	*
 	*
 	* @return array <p>Массив параметров смайла, содержащий ключи:<br><b>ID</b> - код
 	* смайла,<br><b>SORT</b> - индекс сортировки,<br><b>SMILE_TYPE</b> - тип
@@ -209,7 +193,7 @@ class CAllSocNetSmile
 	* смайла.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/GetByIDEx.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/GetByIDEx.php
 	* @author Bitrix
 	*/
 	public static function GetByIDEx($ID, $strLang)
@@ -237,21 +221,15 @@ class CAllSocNetSmile
 	* <p>Возвращает языкозависимые параметры смайла.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Идентификатор смайла.
 	*
-	*
-	*
 	* @param string $strLang  Код языка.
-	*
-	*
 	*
 	* @return array <p>Массив языкозависимых параметров смайлов с ключами:<br> ID - код,<br>
 	* NAME - название. </p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/getlangbyid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/getlangbyid.php
 	* @author Bitrix
 	*/
 	public static function GetLangByID($SMILE_ID, $strLang)

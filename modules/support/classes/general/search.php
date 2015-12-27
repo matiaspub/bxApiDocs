@@ -390,7 +390,7 @@ class CSupportSearch
 		}
 	}
 
-public static function reindexTicket($ticket, $messages = null)
+public static 	public static function reindexTicket($ticket, $messages = null)
 	{
 		if(!self::CheckModule())
 		{
@@ -414,12 +414,12 @@ public static function reindexTicket($ticket, $messages = null)
 		return static::indexTicket($ticket, $messages);
 	}
 
-public static function indexAllTickets($startFromId = 0, $timeLimit = 10)
+public static 	public static function indexAllTickets($startFromId = 0, $timeLimit = 10)
 	{
 		return static::performAllTicketsIndexing($startFromId, $timeLimit, false);
 	}
 
-public static function reindexAllTickets($startFromId = 0, $timeLimit = 10)
+public static 	public static function reindexAllTickets($startFromId = 0, $timeLimit = 10)
 	{
 		return static::performAllTicketsIndexing($startFromId, $timeLimit, true);
 	}
@@ -505,7 +505,7 @@ public static 	protected static function performAllTicketsIndexing($startFromId 
 	/**
 	 * @deprecated
 	 */
-public static function WriteWordsInTable($M_ID, $SITE_ID, $s)
+public static 	static function WriteWordsInTable($M_ID, $SITE_ID, $s)
 	{
 		global $DB;
 		if(!self::CheckModule()) return;
@@ -529,7 +529,7 @@ public static function WriteWordsInTable($M_ID, $SITE_ID, $s)
 	/**
 	 * @deprecated
 	 */
-public static function ReindexMessages($firstID, $periodS = 8)
+public static 	static function ReindexMessages($firstID, $periodS = 8)
 	{		
 		global $DB;
 		$firstID = intval( $firstID);

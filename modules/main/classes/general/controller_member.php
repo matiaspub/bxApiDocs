@@ -157,14 +157,14 @@ class CControllerClient
 		return false;
 	}
 
-	public static 	function OnAfterUserLogin(&$arParams)
+public static 	function OnAfterUserLogin(&$arParams)
 	{
 		global $USER;
 		if($arParams["CONTROLLER_ADMIN"] === "Y")
 			$USER->SetControllerAdmin();
 	}
 
-	public static 	function UpdateUser($arFields = Array(), $FORMAT_DATE = false, $FORMAT_DATETIME = false)
+public static 	function UpdateUser($arFields = Array(), $FORMAT_DATE = false, $FORMAT_DATETIME = false)
 	{
 		global $DB;
 
@@ -184,8 +184,11 @@ class CControllerClient
 			$arFields["PERSONAL_BIRTHDAY"] = $DB->FormatDate($arFields["PERSONAL_BIRTHDAY"], $FORMAT_DATE, FORMAT_DATE);
 		}
 
-		$dbr_user = CUser::GetList($O, $B, Array("LOGIN_EQUAL_EXACT"=>$arFields["LOGIN"], "EXTERNAL_AUTH_ID"=>"__controller"));
-		if($ar_user = $dbr_user->Fetch())
+		$dbr_user = CUser::GetList($O = '', $B = '', array(
+			"LOGIN_EQUAL_EXACT" => $arFields["LOGIN"],
+			"EXTERNAL_AUTH_ID" => "__controller",
+		));
+		if ($ar_user = $dbr_user->Fetch())
 		{
 			$arFields['EXTERNAL_AUTH_ID'] = "__controller";
 			$USER_ID = $ar_user["ID"];
@@ -247,7 +250,7 @@ class CControllerClient
 		return $USER_ID;
 	}
 
-	public static 	function AuthorizeAdmin($arParams = Array())
+public static 	function AuthorizeAdmin($arParams = Array())
 	{
 		global $USER;
 		$ADMIN_ID = 0;
@@ -272,7 +275,7 @@ class CControllerClient
 		return false;
 	}
 
-	public static 	function AuthorizeUser($arParams = Array())
+public static 	function AuthorizeUser($arParams = Array())
 	{
 		global $USER;
 
@@ -286,7 +289,7 @@ class CControllerClient
 		return false;
 	}
 
-	public static 	function OnExternalAuthList()
+public static 	function OnExternalAuthList()
 	{
 		$arResult = Array(
 				Array(
@@ -298,7 +301,7 @@ class CControllerClient
 		return $arResult;
 	}
 
-	public static function PrepareUserInfo($arUser)
+	fpublic static unction PrepareUserInfo($arUser)
 	{
 		$arFields = array(
 			"ID",
@@ -384,7 +387,7 @@ class CControllerClient
 		return array($member_id, $member_secret_id, $ticket_id);
 	}
 
-	public static 	function JoinToControllerEx($controller_url, $controller_login, $controller_password, $arMemberParams = Array())
+public static 	function JoinToControllerEx($controller_url, $controller_login, $controller_password, $arMemberParams = Array())
 	{
 		if(COption::GetOptionString("main", "controller_member", "N")=="Y")
 			return false;
@@ -430,7 +433,7 @@ class CControllerClient
 		return true;
 	}
 
-	public static 	function JoinToController($controller_url, $controller_login, $controller_password, $site_url = false, $controller_group = false, $site_name = false, $bSharedKernel = false)
+public static 	function JoinToController($controller_url, $controller_login, $controller_password, $site_url = false, $controller_group = false, $site_name = false, $bSharedKernel = false)
 	{
 		$arMemberParams = Array(
 				"URL" => $site_url,
@@ -443,7 +446,7 @@ class CControllerClient
 	}
 
 
-	public static 	function RemoveFromController($controller_login, $controller_password)
+public static 	function RemoveFromController($controller_login, $controller_password)
 	{
 		if(COption::GetOptionString("main", "controller_member", "N")!="Y")
 			return false;
@@ -470,7 +473,7 @@ class CControllerClient
 		return true;
 	}
 
-	public static 	function UpdateCounters()
+public static 	function UpdateCounters()
 	{
 		if(COption::GetOptionString("main", "controller_member", "N") != "Y")
 		{
@@ -491,7 +494,7 @@ class CControllerClient
 		}
 	}
 
-	public static 	function ExecuteEvent($eventName, $arParams = array())
+public static 	function ExecuteEvent($eventName, $arParams = array())
 	{
 		if(COption::GetOptionString("main", "controller_member", "N") != "Y")
 		{
@@ -514,7 +517,7 @@ class CControllerClient
 		}
 	}
 
-	public static 	function Unlink()
+public static 	function Unlink()
 	{
 		$disconnect_command = COption::GetOptionString("main", "~controller_disconnect_command", "");
 		if(strlen($disconnect_command)>0)
@@ -531,13 +534,13 @@ class CControllerClient
 		return $arCachedData;
 	}
 
-	public static 	function SetBackup($arBackup)
+public static 	function SetBackup($arBackup)
 	{
 		COption::SetOptionString("main", "~controller_backup", serialize($arBackup));
 		CControllerClient::GetBackup(true);
 	}
 
-	public static 	function SetOptionString($module_id, $option_id, $value)
+public static 	function SetOptionString($module_id, $option_id, $value)
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(!is_set($arBackup["options"][$module_id], $option_id))
@@ -548,7 +551,7 @@ class CControllerClient
 		COption::SetOptionString($module_id, $option_id, $value);
 	}
 
-	public static 	function RestoreOption($module_id, $option_id)
+public static 	function RestoreOption($module_id, $option_id)
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(is_set($arBackup["options"][$module_id], $option_id))
@@ -561,7 +564,7 @@ class CControllerClient
 		return false;
 	}
 
-	public static 	function SetModules($arModules)
+public static 	function SetModules($arModules)
 	{
 		$arInstalled = Array();
 		$arm = CModule::_GetCache();
@@ -593,7 +596,7 @@ class CControllerClient
 		return true;
 	}
 
-	public static 	function RestoreModules()
+public static 	function RestoreModules()
 	{
 		$arBackup = CControllerClient::GetBackup();
 		if(isset($arBackup["modules"]))
@@ -627,7 +630,7 @@ class CControllerClient
 			CControllerClient::SetBackup($arBackup);
 		}
 	}
-	public static 	function RestoreGroupSecurity($group_code, $arModules)
+public static 	function RestoreGroupSecurity($group_code, $arModules)
 	{
 		$arBackup = CControllerClient::GetBackup();
 
@@ -651,7 +654,7 @@ class CControllerClient
 		CControllerClient::SetBackup($arBackup);
 	}
 
-	public static 	function SetTaskSecurity($task_id, $module_id, $arOperations, $letter = '')
+public static 	function SetTaskSecurity($task_id, $module_id, $arOperations, $letter = '')
 	{
 		$ID = 0;
 		$dbr_task = CTask::GetList(Array(), Array('NAME'=>$task_id, 'MODULE_ID'=>$module_id, "BINDING" => 'module'));
@@ -802,75 +805,210 @@ public static 	function RunCommand($command, $oRequest, $oResponse)
 }
 
 
-/////////////////////////////////////////////////////////////////
-// Базовый класс для классов различных пакетов
+/**
+ * Class __CControllerPacket
+ *
+ * Base class for various types of packets.
+ */
 class __CControllerPacket
 {
+	public $debug_const = '';
+	public $debug_file_const = '';
+
 	var $member_id;
 	var $session_id;
 	var $version;
 	var $strParameters = "";
-	var $arParameters = Array();
+	var $arParameters = array();
 	var $hash;
 	var $secret_id;
 	var $encoding;
 
-	////////////////////////////////////////////////////
-	// General methods:
-public 	function Debug($sText)
+	/**
+	 * Returns true if debug is enabled.
+	 *
+	 * @return boolean
+	 */
+	public public function isDebugEnabled()
 	{
-		if(!defined($this->debug_const) || constant($this->debug_const)!==true)
+		if (
+			$this->debug_const
+			&& defined($this->debug_const)
+			&& constant($this->debug_const) === true
+		)
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Returns debug logs directory.
+	 * You may define constant CONTROLLER_CLIENT_LOG_DIR.
+	 * It's value must end with directory delimiter.
+	 * By default logging will be into /bitrix/controller_logs/ directory
+	 * under the DOCUMENT_ROOT.
+	 *
+	 * @return string
+	 */
+public 	public function getDebugLogDirectory()
+	{
+		if ($this->debug_file_const && defined($this->debug_file_const))
+			return (string)constant($this->debug_file_const);
+		else
+			return $_SERVER['DOCUMENT_ROOT'].'/bitrix/controller_logs/';
+	}
+
+	/**
+	 * Returns log file name.
+	 * It's equal to session identifier or if there is no session it's randomized.
+	 *
+	 * @return string
+	 */
+public 	public function getDebugLogFileName()
+	{
+		if ($this->session_id)
+			return $this->session_id.".log";
+		else
+			return "gen_".md5(uniqid(rand(), true)).".log";
+
+	}
+
+	/**
+	 * Writes given information into log file.
+	 *
+	 * @param string|array $sText Text to write to log.
+	 *
+	 * @return void
+	 * @see __CControllerPacket::isDebugEnabled
+	 * @see __CControllerPacket::getDebugLogDirectory
+	 * @see __CControllerPacket::getDebugLogFileName
+	 */
+	public public function Debug($sText)
+	{
+		if (!$this->isDebugEnabled())
 			return;
 
-		if(!defined($this->debug_file_const))
-			$dirname = $_SERVER['DOCUMENT_ROOT'].'/bitrix/controller_logs/';
-		else
-			$dirname = constant($this->debug_file_const);
+		$filename = $this->getDebugLogDirectory().$this->getDebugLogFileName();
 
-		CheckDirPath($dirname);
-		$session_id = $this->session_id;
-		if(strlen($session_id)<=0)
-			$session_id = "gen_".md5(uniqid(rand(), true));
-
-		$filename = $dirname.$session_id.".log";
 		ignore_user_abort(true);
-		if ($fp = @fopen($filename, "ab+"))
-		{
-			if (flock($fp, LOCK_EX))
-			{
-				@fwrite($fp, date("Y-m-d H:i:s")." - ".$sText."\n");
-				@fwrite($fp, "----------\n");
-				@fflush($fp);
-				@flock($fp, LOCK_UN);
-				@fclose($fp);
-			}
-		}
+
+		CheckDirPath($filename);
+		file_put_contents($filename, date("Y-m-d H:i:s")." - ".(is_array($sText)? print_r($sText, true): $sText)."\n----------\n", FILE_APPEND | LOCK_EX);
+
 		ignore_user_abort(false);
 	}
 
-public 	function _decode(&$arParameters, $from ,$to)
+	/**
+	 * Unpacks $parameters and converts it using given $encoding into site charset.
+	 * Preserves "file" member of the array.
+	 *
+	 * @param string $parameters Serialized data.
+	 * @param string $encoding Encoding character set identifier.
+	 *
+	 * @return mixed|null
+	 */
+public 	protected function unpackParameters($parameters, $encoding = '')
+	{
+		if (CheckSerializedData($parameters))
+		{
+			$arParameters = unserialize($parameters);
+			if ($encoding)
+			{
+				if (array_key_exists("file", $arParameters))
+				{
+					$file = $arParameters["file"];
+					unset($arParameters["file"]);
+					$this->_decode($arParameters, $encoding, SITE_CHARSET);
+					$arParameters["file"] = $file;
+				}
+				else
+				{
+					$this->_decode($arParameters, $encoding, SITE_CHARSET);
+				}
+			}
+			return $arParameters;
+		}
+		return null;
+	}
+
+	/**
+	 * Recursively converts arParameter character set.
+	 *
+	 * @param array &$arParameters Input/Output parameter.
+	 * @param string $encodingFrom Encoding character set identifier.
+	 * @param string $encodingTo Encoding character set identifier.
+	 *
+	 * @return void
+	 * @see CMain::ConvertCharset
+	 */
+public 	protected function _decode(&$arParameters, $encodingFrom ,$encodingTo)
 	{
 		global $APPLICATION;
 
-		if(is_array($arParameters))
+		if (is_array($arParameters))
 		{
 			$res = array();
-			foreach($arParameters as $key => $value)
+			foreach ($arParameters as $key => $value)
 			{
-				if(is_string($key))
-					$key = $APPLICATION->ConvertCharset($key, $from, $to);
-				$this->_decode($value, $from, $to);
+				if (is_string($key))
+				{
+					$key = $APPLICATION->ConvertCharset($key, $encodingFrom, $encodingTo);
+				}
+
+				$this->_decode($value, $encodingFrom, $encodingTo);
+
 				$res[$key] = $value;
 			}
 			$arParameters = $res;
 		}
-		elseif(is_string($arParameters))
+		elseif (is_string($arParameters))
 		{
-			$arParameters = $APPLICATION->ConvertCharset($arParameters, $from, $to);
+			$arParameters = $APPLICATION->ConvertCharset($arParameters, $encodingFrom, $encodingTo);
 		}
 	}
-}
 
+	/**
+	 * Checks given parameters signature against $hash member.
+	 *
+	 * @param string $parameter,... Parameter to be checked
+	 *
+	 * @return boolean
+	 */
+public 	public function Check()
+	{
+		global $APPLICATION;
+
+		$hash = implode("|", func_get_args());
+		$md5hash = md5($hash);
+
+		if ($md5hash != $this->hash)
+		{
+			if (is_object($APPLICATION))
+			{
+				$e = new CApplicationException("Hash check failed: hash(".$hash.")=".$md5hash." != ".$this->hash);
+				$APPLICATION->ThrowException($e);
+			}
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Returns signature for given parameters.
+	 * Sets $hash member with calculated value.
+	 *
+	 * @param string $parameter,... Parameter to be checked
+	 *
+	 * @return boolean
+	 */
+public 	function Sign()
+	{
+		$hash = implode("|", func_get_args());
+		$this->hash = md5($hash);
+		return $this->hash;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Базовый класс для классов типа Request:
@@ -885,70 +1023,65 @@ public 	function _decode(&$arParameters, $from ,$to)
 ///////////////////////////////////////////////////////////////////////////////////////////
 class __CControllerPacketRequest extends __CControllerPacket
 {
-	var $operation;
+	public $operation;
+	protected $hostname = '';
 
 	///////////////////////////////////
 	//Для работе в классах получающих результаты (CControllerClientRequestFrom, CControllerServerRequestFrom):
 	///////////////////////////////////
 
 	// заполняет объект переменными, пришедшими в $_REQUEST
-public 	function InitFromRequest()
+public 	public function InitFromRequest()
 	{
-		global $APPLICATION;
-		//AddMessage2Log('InitFromRequest: '.print_r($_REQUEST, true));
 		$this->member_id = $_REQUEST['member_id'];
 		$this->session_id = $_REQUEST['session_id'];
 		$this->operation = $_REQUEST['operation'];
+
 		if(isset($_REQUEST['version']))
 			$this->version = $_REQUEST['version'];
+
 		if(isset($_REQUEST['encoding']))
 			$this->encoding = $_REQUEST['encoding'];
+
 		if(isset($_REQUEST['parameters']))
 		{
 			$this->strParameters = base64_decode($_REQUEST['parameters']);
-			if(CheckSerializedData($this->strParameters))
+			$arParameters = $this->unpackParameters($this->strParameters, isset($_REQUEST['encoding'])? $_REQUEST['encoding']: '');
+			if ($arParameters)
 			{
-				$arParameters = unserialize($this->strParameters);
-				if(isset($_REQUEST['encoding']))
-				{
-					if(array_key_exists("file", $arParameters))
-					{
-						$file = $arParameters["file"];
-						unset($arParameters["file"]);
-						$this->_decode($arParameters, $_REQUEST['encoding'], SITE_CHARSET);
-						$arParameters["file"] = $file;
-					}
-					else
-					{
-						$this->_decode($arParameters, $_REQUEST['encoding'], SITE_CHARSET);
-					}
-				}
 				$this->arParameters = $arParameters;
 			}
 		}
 		$this->hash = $_REQUEST['hash'];
 	}
 
-	// проверяет целостность и безопасность пришедшего запроса
-	function Check()
+	/**
+	 * Checks packet consistency.
+	 *
+	 * @return boolean
+	 * @see __CControllerPacket::Check
+	 */
+	public static public function Check()
 	{
-		global $APPLICATION;
-
-		$hash = $this->operation."|".$this->strParameters."|".$this->secret_id;
-
-		$md5hash = md5($hash);
-		if($md5hash != $this->hash)
-		{
-			$e = new CApplicationException("Hash check failed: hash(".$hash.")=".$md5hash." != ".$this->hash);
-			$GLOBALS["APPLICATION"]->ThrowException($e);
-			return false;
-		}
-
-		return true;
+		return parent::Check($this->operation, $this->strParameters, $this->secret_id);
 	}
 
-	//определяет пришел ли запрос используя вызов на АПИ или через редирект
-public 	function Internal()
+	/**
+	 * Sets $hash member with calculated value.
+	 *
+	 * @return void
+	 */
+public static 	public function Sign()
+	{
+		parent::Sign($this->operation, serialize($this->arParameters), $this->secret_id);
+	}
+
+	/**
+	 * Check if it was internal call or browser redirect.
+	 *
+	 * @return boolean
+	 **/
+	public function Internal()
 	{
 		return (count($_POST)>0);
 	}
@@ -956,10 +1089,14 @@ public 	function Internal()
 	///////////////////////////////////////
 	// Для работы в классах отправляющих запросы (CControllerClientRequestTo, CControllerServerRequestTo):
 	///////////////////////////////////////
-	// создает строку для отправки на принимающую сторону, с подписью пакета
-public 	function MakeRequestString()
+
+	/**
+	 * Returns url encoded and signed string of parameters.
+	 *
+	 * @return string
+	 **/
+public 	public function MakeRequestString()
 	{
-		global $APPLICATION;
 		$result = "operation=".$this->operation.
 			"&version=".$this->version.
 			"&session_id=".$this->session_id.
@@ -977,15 +1114,13 @@ public 	function MakeRequestString()
 		return $result;
 	}
 
-	// подписывает пакет (напрямую не используется)
-	public static function Sign()
-	{
-		$hash = md5($this->operation."|".serialize($this->arParameters)."|".$this->secret_id);
-		$this->hash = $hash;
-	}
-
-	// отправляет запрос в браузере через редирект на заданный урл
-public static 	function RedirectRequest($url)
+	/**
+	 * Asks user browser to do redirect.
+	 * And thus make a hit with all needed payload.
+	 *
+	 * @return void
+	 **/
+public static 	public function RedirectRequest($url)
 	{
 		if(strpos($url, "?")>0)
 			$url .= '&';
@@ -994,27 +1129,41 @@ public static 	function RedirectRequest($url)
 
 		$url .= $this->MakeRequestString();
 
-		$this->Debug("Request by redirect:\r\nPacket:".print_r($this, true)."\r\n".$url."\r\n");
+		if ($this->isDebugEnabled())
+		{
+			$this->Debug(array(
+				__FILE__.":".__LINE__,
+				"Request by redirect",
+				"url" => $url,
+				"Packet" => $this,
+			));
+		}
 
 		LocalRedirect($url, true);
 	}
 
-	// отправляет запрос на принимающую сторону
-public 	function Send($url, $page)
+	/**
+	 * Sends packet.
+	 *
+	 * @return __CControllerPacketResponse
+	 **/
+public 	public function Send($url, $page)
 	{
+		global $APPLICATION;
+
 		$server_port = 80;
 		$server_name = strtolower(trim($url, "/ \r\n\t"));
-		if(substr($server_name, 0, 7)=='http://')
+		if (substr($server_name, 0, 7)=='http://')
 		{
 			$server_name = substr($server_name, 7);
 		}
-		elseif(substr($server_name, 0, 8)=='https://')
+		elseif (substr($server_name, 0, 8)=='https://')
 		{
 			$server_name = substr($server_name, 8);
 			$server_port = 443;
 		}
 
-		if(preg_match('/.+:([0-9]+)$/', $server_name, $matches))
+		if (preg_match('/.+:([0-9]+)$/', $server_name, $matches))
 		{
 			$server_port = $matches[1];
 			$server_name = substr($server_name, 0, 0 - strlen($server_port) - 1);
@@ -1022,13 +1171,11 @@ public 	function Send($url, $page)
 
 		$proxy_url = COption::GetOptionString("main", "controller_proxy_url", "");
 		$proxy_port = COption::GetOptionString("main", "controller_proxy_port", "");
-		$proxy_user = COption::GetOptionString("main", "controller_proxy_user", "");
-		$proxy_password = COption::GetOptionString("main", "controller_proxy_password", "");
 
 		// соединяемся с удаленным сервером
 		$bUseProxy = (strlen($proxy_url) > 0 && strlen($proxy_port) > 0);
 
-		if($bUseProxy)
+		if ($bUseProxy)
 		{
 			$proxy_port = intval($proxy_port);
 			if ($proxy_port <= 0)
@@ -1037,6 +1184,11 @@ public 	function Send($url, $page)
 			$requestIP = $proxy_url;
 			$requestPort = $proxy_port;
 		}
+		elseif ($this->hostname)
+		{
+			$requestIP = $this->hostname;
+			$requestPort = $server_port;
+		}
 		else
 		{
 			$requestIP = $server_name;
@@ -1044,26 +1196,41 @@ public 	function Send($url, $page)
 		}
 
 		$conn = @fsockopen(($requestPort==443? 'ssl://': '').$requestIP, $requestPort, $errno, $errstr, 30);
-		if(!$conn)
+		if (!$conn)
 		{
-			$this->Debug("We can't send request to the $server_name:$server_port from member#".$this->member_id."(".$this->secret_id."):\r\n".$strError);
-			$strError = GetMessage("MAIN_CMEMBER_ERR5").$server_name.":".$server_port." (".$errstr.")";
-			if(is_object($GLOBALS["APPLICATION"]))
+			if ($this->isDebugEnabled())
 			{
-				$e = new CApplicationException(htmlspecialcharsex($strError));
-				$GLOBALS["APPLICATION"]->ThrowException($e);
+				$this->Debug(array(
+					__FILE__.":".__LINE__,
+					"We can't send request to the $server_name:$server_port from member#".$this->member_id,
+					"errno" => $errno,
+					"errstr" => $errstr,
+					"Packet" => $this,
+				));
 			}
+
+			if (is_object($APPLICATION))
+			{
+				$strError = GetMessage("MAIN_CMEMBER_ERR5").$server_name.":".$server_port." (".$errstr.")";
+				$e = new CApplicationException(htmlspecialcharsex($strError));
+				$APPLICATION->ThrowException($e);
+			}
+
 			return false;
 		}
 
 		$strVars = $this->MakeRequestString();
 
-		// запускаем, получаем результат
 		if ($bUseProxy)
 		{
 			$strRequest = "POST http://".$server_name.":".$server_port.$page." HTTP/1.0\r\n";
+
+			$proxy_user = COption::GetOptionString("main", "controller_proxy_user", "");
+			$proxy_password = COption::GetOptionString("main", "controller_proxy_password", "");
 			if (strlen($proxy_user) > 0)
+			{
 				$strRequest .= "Proxy-Authorization: Basic ".base64_encode($proxy_user.":".$proxy_password)."\r\n";
+			}
 		}
 		else
 		{
@@ -1077,35 +1244,47 @@ public 	function Send($url, $page)
 		$strRequest .= "Content-length: ".strlen($strVars)."\r\n\r\n";
 		$strRequest .= $strVars."\r\n";
 
-		$this->Debug(
-				"We send request to the $server_name:$server_port from member#".$this->member_id."(".$this->secret_id."):\r\n".
-				"Packet:".print_r($this, true)."\r\n".
-				"$strVars\r\n"
-				);
+		if ($this->isDebugEnabled())
+		{
+			$this->Debug(array(
+				__FILE__.":".__LINE__,
+				"We send request to the $server_name:$server_port from member#".$this->member_id,
+				"strVars" => strVars,
+				"Packet" => $this,
+			));
+		}
 
 		fputs($conn, $strRequest);
 
 		$header = '';
 		while (($line = fgets($conn, 4096)) && $line!="\r\n")
-		$header.=$line;
+		{
+			$header.=$line;
+		}
 
 		$result = '';
 		while ($line = fread($conn, 4096))
-		$result .= $line;
+		{
+			$result .= $line;
+		}
 
 		fclose($conn);
 
-
-		$ar_result = array();
 		$packet_result = new __CControllerPacketResponse();
 		$packet_result->secret_id = $this->secret_id;
 		$packet_result->ParseResult($result);
 
-		$this->Debug(
-				"We get response from $server_name:$server_port to member#".$packet_result->member_id."(".$this->secret_id."):\r\n".
-				"Packet (security check ".($packet_result->Check()?"passed":"failed")."): ".print_r($packet_result, true)."\r\n".
-				$result."\r\n"
-				);
+		if ($this->isDebugEnabled())
+		{
+			$this->Debug(array(
+				__FILE__.":".__LINE__,
+				"We get response from $server_name:$server_port to member#".$packet_result->member_id,
+				"secret_id" => $this->secret_id,
+				"result" => $result,
+				"Packet security check" => ($packet_result->Check()? "passed": "failed"),
+				"Packet" => $packet_result,
+			));
+		}
 
 		return $packet_result;
 	}
@@ -1128,12 +1307,16 @@ class __CControllerPacketResponse extends __CControllerPacket
 
 public 	function _InitFromRequest($oPacket, $arExclude = array('operation', 'arParameters'))
 	{
-		if(is_object($oPacket))
+		if (is_object($oPacket))
 		{
 			$vars = get_object_vars($oPacket);
-			foreach($vars as $name=>$value)
-				if(!in_array($name, $arExclude))
+			foreach ($vars as $name=>$value)
+			{
+				if (!in_array($name, $arExclude))
+				{
 					$this->$name = $value;
+				}
+			}
 		}
 	}
 
@@ -1141,22 +1324,25 @@ public 	function _InitFromRequest($oPacket, $arExclude = array('operation', 'arP
 	// Методы для работы в классах принимающих результат (CControllerServerResponseFrom, CControllerClientResponseFrom):
 	//////////////////////////////////////////////
 
-	// Проверяет подлинность присланного результата
+	/**
+	 * Checks packet consistency.
+	 *
+	 * @return boolean
+	 * @see __CControllerPacket::Check
+	 */
 public 	function Check()
 	{
-		$hash = $this->status."|".$this->text."|".$this->strParameters."|".$this->secret_id;
-		$md5hash = md5($hash);
-		if($md5hash != $this->hash)
-		{
-			if(is_object($GLOBALS["APPLICATION"]))
-			{
-				$e = new CApplicationException("Hash check failed: hash(".$hash.")=".$md5hash." != ".$this->hash);
-				$GLOBALS["APPLICATION"]->ThrowException($e);
-			}
-			return false;
-		}
+		return parent::Check($this->status, $this->text, $this->strParameters, $this->secret_id);
+	}
 
-		return true;
+	/**
+	 * Sets $hash member with calculated value.
+	 *
+	 * @return void
+	 */
+public 	function Sign()
+	{
+		parent::Sign($this->status, $this->text, serialize($this->arParameters), $this->secret_id);
 	}
 
 	// Возвращает успешно ли выполнился запрос по статус его ответа
@@ -1172,7 +1358,7 @@ public 	function ParseResult($result)
 
 		$ar_result = array();
 		$pairs = explode('&', trim($result, " \n\r\t"));
-		foreach($pairs as $pair)
+		foreach ($pairs as $pair)
 		{
 			list($name, $value) = explode('=', $pair, 2);
 			$ar_result[$name] = $value;
@@ -1183,36 +1369,29 @@ public 	function ParseResult($result)
 		$this->hash = urldecode($ar_result['hash']);
 		$this->status = urldecode($ar_result['status']);
 		$this->text = urldecode($ar_result['text']);
-		if(isset($ar_result['encoding']))
+
+		if (isset($ar_result['encoding']))
 			$this->encoding = urldecode($ar_result['encoding']);
 
 		$this->strParameters = base64_decode(urldecode($ar_result['parameters']));
-		if(CheckSerializedData($this->strParameters))
+		$arParameters = $this->unpackParameters($this->strParameters, isset($_REQUEST['encoding'])? $_REQUEST['encoding']: '');
+		if ($arParameters)
 		{
-			$arParameters = unserialize($this->strParameters);
-			if(isset($ar_result['encoding']))
+			$this->arParameters = $arParameters;
+			if (isset($ar_result['encoding']))
 			{
-				if(array_key_exists("file", $arParameters))
-				{
-					$file = $arParameters["file"];
-					unset($arParameters["file"]);
-					$this->_decode($arParameters, $this->encoding, SITE_CHARSET);
-					$arParameters["file"] = $file;
-				}
-				else
-				{
-					$this->_decode($arParameters, $this->encoding, SITE_CHARSET);
-				}
-
 				if($this->text && is_object($APPLICATION))
 					$this->text = $APPLICATION->ConvertCharset($this->text, $this->encoding, SITE_CHARSET);
 			}
-
-			$this->arParameters = $arParameters;
 		}
+
 		$this->version = $ar_result['version'];
 
-		if(strlen($this->status)<=0 && strlen($this->text)<=0 && strlen($this->member_id)<=0)
+		if (
+			strlen($this->status) <= 0
+			&& strlen($this->text) <= 0
+			&& strlen($this->member_id) <= 0
+		)
 		{
 			$this->status = "479";
 			$this->text = GetMessage("MAIN_CMEMBER_ERR7")." ".substr($result, 0, 1000);
@@ -1225,7 +1404,7 @@ public 	function ParseResult($result)
 	///////////////////////////////////////
 
 	// возвращает отформатированную строку ответа в формате понятном для приема на сервере, с подписью
-	function GetResponseBody($log = false)
+public 	function GetResponseBody($log = false)
 	{
 		$result = "status=".urlencode($this->status).
 			"&text=".urlencode($this->text).
@@ -1239,25 +1418,34 @@ public 	function ParseResult($result)
 		$this->Sign();
 		$result .= "&hash=".urlencode($this->hash);
 
-		if($log)
-			$this->Debug("We send errored response back:\r\nPacket:\r\n".serialize($this)."\r\n".$result."\r\n");
+		if($log && $this->isDebugEnabled())
+		{
+			$this->Debug(array(
+				__FILE__.":".__LINE__,
+				"We send errored response back",
+				"result" => $result,
+				"Packet" => $this,
+			));
+		}
 
 		return $result;
 	}
 
-	// подписывает пакет перед отправкой (не используется напрямую)
-public 	function Sign()
-	{
-		$hash = $this->status."|".$this->text."|".serialize($this->arParameters)."|".$this->secret_id;
-		//AddMessage2Log("\r\n\r\n\r\n".md5($hash)."=\r\n".$hash."]");
-		$this->hash = md5($hash);
-	}
-
 	// отправляет ответ обратно
-	public static function Send()
+public 	function Send()
 	{
-		$this->Debug("We send response back:\r\nPacket:\r\n".print_r($this, true)."\r\n".$this->GetResponseBody()."\r\n");
+		if ($this->isDebugEnabled())
+		{
+			$this->Debug(array(
+				__FILE__.":".__LINE__,
+				"We send response back",
+				"response body" => $this->GetResponseBody(),
+				"Packet" => $this,
+			));
+		}
+
 		while (@ob_end_flush());
+
 		echo $this->GetResponseBody();
 	}
 }
@@ -1268,7 +1456,7 @@ class CControllerClientRequestTo extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-public 	function CControllerClientRequestTo($operation, $arParameters = Array())
+public static 	function CControllerClientRequestTo($operation, $arParameters = Array())
 	{
 		$this->member_id = COption::GetOptionString("main", "controller_member_id", "");
 		$this->secret_id = COption::GetOptionString("main", "controller_member_secret_id", "");
@@ -1277,7 +1465,7 @@ public 	function CControllerClientRequestTo($operation, $arParameters = Array())
 		$this->session_id = md5(uniqid(rand(), true));
 	}
 
-	function SendWithCheck($page="/bitrix/admin/controller_ws.php")
+public 	function SendWithCheck($page="/bitrix/admin/controller_ws.php")
 	{
 		$oResponse = $this->Send($page);
 		if($oResponse===false)
@@ -1326,10 +1514,14 @@ class CControllerClientRequestFrom extends __CControllerPacketRequest
 	var $debug_const = "CONTROLLER_CLIENT_DEBUG";
 	var $debug_file_const = "CONTROLLER_CLIENT_LOG_DIR";
 
-	function CControllerClientRequestFrom()
+public static 	function CControllerClientRequestFrom()
 	{
 		$this->InitFromRequest();
-		$this->Debug('Request received from controller ('.($this->Check()?'checked':'check failed')."):\r\nPacket:\r\n".print_r($this, true));
+		$this->Debug(array(
+			"Request received from controller",
+			"check" => ($this->Check()? 'checked': 'check failed'),
+			"Packet" => $this,
+		));
 	}
 
 public static 	function Check()
@@ -1345,6 +1537,7 @@ public static 	function Check()
 
 		$member_secret_id = COption::GetOptionString("main", "controller_member_secret_id", "");
 		$this->secret_id = $member_secret_id;
+
 		return parent::Check();
 	}
 }

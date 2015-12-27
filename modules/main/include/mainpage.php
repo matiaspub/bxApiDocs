@@ -6,13 +6,10 @@ class CMainPage
 	// определяет сайт по HTTP_HOST в таблице сайтов
 
 	/**
-	* <p>Возвращает идентификатор сайта, определяя его по текущему хосту. Если идентификатор сайта неверный, то вернет - "false".</p>
-	*
-	*
+	* <p>Возвращает идентификатор сайта, определяя его по текущему хосту. Если идентификатор сайта неверный, то вернет - "false". Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -25,7 +22,6 @@ class CMainPage
 	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
 	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -76,9 +72,7 @@ class CMainPage
 	// определяет сайт по HTTP_ACCEPT_LANGUAGE
 
 	/**
-	* <p>Возвращает идентификатор сайта, определяя его по переменной Accept-Language в настройках браузера посетителя. Приоритетным для данной функции является порядок языков установленный в настройках браузера посетителя. Если ни один из этих языков не подойдет, то будет выбран [link=89624]сайт[/link] с установленным флагом "Сайт по умолчанию".</p>
-	*
-	*
+	* <p>Возвращает идентификатор сайта, определяя его по переменной Accept-Language в настройках браузера посетителя. Приоритетным для данной функции является порядок языков установленный в настройках браузера посетителя. Если ни один из этих языков не подойдет, то будет выбран сайт с установленным флагом "Сайт по умолчанию". Динамичный метод.</p>
 	*
 	*
 	* @param bool $compare_site_id = false Если значение "true", то поиск сайта будет осуществляться через
@@ -88,10 +82,7 @@ class CMainPage
 	* выбранного в настройках сайта.<br>Необязательный. По умолчанию -
 	* "false".
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -110,7 +101,6 @@ class CMainPage
 	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
 	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -157,18 +147,13 @@ class CMainPage
 	// делает перенаправление на сайт
 
 	/**
-	* <p>Перенаправляет на индексную страницу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.</p>
-	*
-	*
+	* <p>Перенаправляет на индексную страницу <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>. Динамичный метод.</p>
 	*
 	*
 	* @param string $site  Идентификатор [<a
 	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -187,7 +172,6 @@ class CMainPage
 	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
 	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -216,18 +200,13 @@ class CMainPage
 	// подключает страницу с папки другого сайта
 
 	/**
-	* <p>Возвращает абсолютный путь на индексную страницу заданного сайта, для дальнейшего ее подключения при помощи require() или include(). Если ни один из сайтов не найден по хосту, то функция вернет - "false".</p>
-	*
-	*
+	* <p>Возвращает абсолютный путь на индексную страницу заданного сайта, для дальнейшего ее подключения при помощи require() или include(). Если ни один из сайтов не найден по хосту, то функция вернет - "false". Динамичный метод.</p>
 	*
 	*
 	* @param string $site  Идентификатор <a
 	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04773" >сайта</a>.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -240,7 +219,6 @@ class CMainPage
 	* require($_SERVER['DOCUMENT_ROOT']."/bitrix/header.php");?&gt;
 	* &lt;?require($_SERVER['DOCUMENT_ROOT']."/bitrix/footer.php");?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

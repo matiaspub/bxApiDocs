@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlock</b> - класс для работы с информационными блоками</body> </html>
- *
- *
+ * <b>CIBlock</b> - класс для работы с информационными блоками 
  *
  *
  * @return mixed 
@@ -19,9 +17,7 @@ class CIBlock extends CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает список информационных блоков по фильтру <i>arFilter</i> отсортированный в порядке <i>arOrder</i>.</p>
-	*
-	*
+	* <p>Возвращает список информационных блоков по фильтру <i>arFilter</i> отсортированный в порядке <i>arOrder</i>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки результата. Содержит пары "<i>поле
@@ -32,8 +28,6 @@ class CIBlock extends CAllIBlock
 	* - индекс сортировки;</li> <li> <b>element_cnt </b> - количество элементов
 	* (только если <i>bIncCnt</i> = true);</li> <li> <b>timestamp_x </b> - дата последнего
 	* изменения.</li> </ul>
-	*
-	*
 	*
 	* @param array $arFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <i>ACTIVE</i> - фильтр
@@ -66,15 +60,10 @@ class CIBlock extends CAllIBlock
 	* фильтра</a>. <br> "<i>значения фильтра</i>" - одиночное значение или
 	* массив. <br><br> Необязательное. По умолчанию записи не фильтруются.
 	*
-	*
-	*
 	* @param bool $bIncCnt = false Возвращать ли количество элементов в информационном блоке в поле
 	* <i>ELEMENT_CNT</i>. Необязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -82,7 +71,6 @@ class CIBlock extends CAllIBlock
 	* 
 	* &lt;?<br>// выберем все активные информационные блоки для текущего сайта типа catalog<br>// у которых символьный код не my_products, со счетчиком активных элементов.<br>$res = CIBlock::GetList(<br>	Array(), <br>	Array(<br>		'TYPE'=&gt;'catalog', <br>		'SITE_ID'=&gt;SITE_ID, <br>		'ACTIVE'=&gt;'Y', <br>		"CNT_ACTIVE"=&gt;"Y", <br>		"!CODE"=&gt;'my_products'<br>	), true<br>);<br>while($ar_res = $res-&gt;Fetch())<br>{<br>	echo $ar_res['NAME'].': '.$ar_res['ELEMENT_CNT'];<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -121,6 +109,7 @@ class CIBlock extends CAllIBlock
 			case "NAME":
 			case "CODE":
 			case "XML_ID":
+			case "PROPERTY_INDEX":
 				$sql = CIBlock::FilterCreate("B.".$key, $val, "string", $cOperationType);
 				break;
 			case "EXTERNAL_ID":
@@ -143,7 +132,11 @@ class CIBlock extends CAllIBlock
 				$strSqlSearch .= " AND  (".$sql.") ";
 		}
 
-		$bCheckPermissions = !array_key_exists("CHECK_PERMISSIONS", $arFilter) || $arFilter["CHECK_PERMISSIONS"]!=="N";
+		$bCheckPermissions =
+			!array_key_exists("CHECK_PERMISSIONS", $arFilter)
+			|| $arFilter["CHECK_PERMISSIONS"] !== "N"
+			|| array_key_exists("OPERATION", $arFilter)
+		;
 		$bIsAdmin = is_object($USER) && $USER->IsAdmin();
 		if($bCheckPermissions && !$bIsAdmin)
 		{
@@ -172,7 +165,9 @@ class CIBlock extends CAllIBlock
 					AND (IBG.PERMISSION='X' OR B.ACTIVE='Y')
 				";
 
-			if($min_permission >= "X")
+			if (strlen($arFilter["OPERATION"]) > 0)
+				$operation  = "'".$DB->ForSql($arFilter["OPERATION"])."'";
+			elseif($min_permission >= "X")
 				$operation = "'iblock_edit'";
 			elseif($min_permission >= "U")
 				$operation = "'element_edit'";

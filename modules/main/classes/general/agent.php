@@ -13,19 +13,13 @@ class CAllAgent
 {
 	
 	/**
-	* <p>Функция регистрирует новую функцию-агент.</p> <p> </p>
-	*
-	*
+	* <p>Метод регистрирует новую функцию-агента. Динамичный метод.</p> <p> </p>
 	*
 	*
 	* @param string $name  PHP строка для запуска функции-агента.
 	*
-	*
-	*
 	* @param string $module = "" Идентификатор модуля. Необходим для подключения файлов
 	* модуля.<br>Необязательный. По умолчанию пустой.
-	*
-	*
 	*
 	* @param string $period = "N" <p>Если значение - "Y", то очередная дата запуска агента (<i>next_exec</i>)
 	* будет рассчитываться как:</p> <pre><i>next_exec</i> = <i>next_exec</i> + <i>interval</i></pre>
@@ -43,38 +37,25 @@ class CAllAgent
 	* периодичностью указанной в параметре <i>interval</i>. Параметр
 	* необязательный, по умолчанию - "N".
 	*
-	*
-	*
 	* @param int $interval = 86400 Интервал (в секундах), с какой периодичностью запускать агента.<br>
 	* Необязательный. По умолчанию - 86400 (1 сутки).
-	*
-	*
 	*
 	* @param string $datecheck = "" Дата первой проверки "не пора ли запустить агент" в формате
 	* текущего языка.<br> Необязательный. По умолчанию - текущее время.
 	*
-	*
-	*
 	* @param string $active = "Y" Активность агента (Y|N).<br> Необязательный. По умолчанию - "Y"
 	* (активен).
 	*
-	*
-	*
 	* @param string $next_exec = "" Дата первого запуска агента в формате текущего
 	* языка.<br>Необязательный. По умолчанию - текущее время.
-	*
-	*
 	*
 	* @param int $sort = 100 Индекс сортировки позволяющий указать порядок запуска данного
 	* агента относительно других агентов для которых подошло время
 	* запуска.<br>Необязательный. По умолчанию - 100.
 	*
-	*
-	*
 	* @return mixed <p>При успешном выполнении, возвращает ID вновь добавленного
 	* агента, иначе - <i>false</i>. Если агент ничего не возвращает, он
 	* удаляется. Как правило он должен вернуть вызов самого себя.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -149,7 +130,6 @@ class CAllAgent
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -248,26 +228,17 @@ class CAllAgent
 
 	
 	/**
-	* <p>Удаляет функцию-агента из таблицы зарегистрированных агентов. </p>
-	*
-	*
+	* <p>Метод удаляет функцию-агента из таблицы зарегистрированных агентов. Динамичный метод.</p>
 	*
 	*
 	* @param string $name  Функция-агент.
 	*
-	*
-	*
 	* @param string $module = "" Идентификатор модуля. Необязательный. По умолчанию - главный
 	* модуль ("main").
 	*
-	*
-	*
 	* @param string $user_id = false Идентификатор пользователя. Необязательный.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -281,12 +252,11 @@ class CAllAgent
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul></bod<a
 	* name="examples"></a>
 	*
 	*
@@ -314,17 +284,12 @@ class CAllAgent
 
 	
 	/**
-	* <p>Удаляет функцию-агент из таблицы зарегистрированных агентов.</p> <p> </p>
-	*
-	*
+	* <p>Метод удаляет функцию-агент из таблицы зарегистрированных агентов. Динамичный метод.</p> <p> </p>
 	*
 	*
 	* @param int $id  ID функции-агента.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -334,13 +299,12 @@ class CAllAgent
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	* </ul><a name="examples"></a>
+	* </ul></bod<a name="examples"></a>
 	*
 	*
 	* @static
@@ -362,17 +326,12 @@ class CAllAgent
 
 	
 	/**
-	* <p>Удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. </p>
-	*
-	*
+	* <p>Метод удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. Динамичный метод.</p>
 	*
 	*
 	* @param string $module  Идентификатор модуля.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -382,12 +341,11 @@ class CAllAgent
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul></bod<a
 	* name="examples"></a>
 	*
 	*

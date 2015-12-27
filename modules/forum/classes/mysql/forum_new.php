@@ -77,7 +77,7 @@ class CForumNew extends CAllForumNew
 
 		$strSql =
 			"SELECT STRAIGHT_JOIN FT.ID as TID, FM.ID as MID, FM.ID as ID, FT.FORUM_ID, FT.TITLE, ".
-				CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO")).",
+				CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO,
 				FT.DESCRIPTION, FT.TAGS, FT.HTML as FT_HTML,
 				FM.PARAM1, FM.PARAM2, FM.POST_MESSAGE, FM.POST_MESSAGE_FILTER, FM.POST_MESSAGE_HTML, FM.AUTHOR_NAME, FM.AUTHOR_ID, FM.NEW_TOPIC,
 				".$DB->DateToCharFunction("FM.POST_DATE")." as POST_DATE, ".$DB->DateToCharFunction("FM.EDIT_DATE")." as EDIT_DATE, FT.SOCNET_GROUP_ID, FT.OWNER_ID
@@ -130,8 +130,8 @@ class CForumNew extends CAllForumNew
 						", ".$res["DESCRIPTION"] : ""),
 				"TAGS" => ($res["NEW_TOPIC"] == "Y" ? $res["TAGS"] : ""),
 				"BODY" => GetMessage("AVTOR_PREF")." ".$res["AUTHOR_NAME"].". ".
-					(textParser::killAllTags(
-						COption::GetOptionString("forum", "FILTER", "Y") != "Y" ? $res["POST_MESSAGE"] : $res["POST_MESSAGE_FILTER"])),
+					forumTextParser::clearAllTags(
+						COption::GetOptionString("forum", "FILTER", "Y") != "Y" ? $res["POST_MESSAGE"] : $res["POST_MESSAGE_FILTER"]),
 				"URL" => "",
 				"INDEX_TITLE" => $res["NEW_TOPIC"] == "Y",
 			);
@@ -139,7 +139,9 @@ class CForumNew extends CAllForumNew
 			foreach ($arParams["SITE"][$res["FORUM_ID"]] as $key => $val)
 			{
 				$arResult["LID"][$key] = CForumNew::PreparePath2Message($val,
-					array("FORUM_ID"=>$res["FORUM_ID"], "TOPIC_ID"=>$res["TID"], "MESSAGE_ID"=>$res["MID"],
+					array("FORUM_ID"=>$res["FORUM_ID"],
+						"TOPIC_ID"=>$res["TID"], "TITLE_SEO"=>$res["TITLE_SEO"],
+						"MESSAGE_ID"=>$res["MID"],
 						"SOCNET_GROUP_ID" => $res["SOCNET_GROUP_ID"], "OWNER_ID" => $res["OWNER_ID"],
 						"PARAM1" => $res["PARAM1"], "PARAM2" => $res["PARAM2"]));
 				if (empty($arResult["URL"]) && !empty($arResult["LID"][$key]))
@@ -212,6 +214,49 @@ class CForumNew extends CAllForumNew
 /**********************************************************************/
 class CForumGroup extends CAllForumGroup
 {
+	
+	/**
+	* <p>Создает новую группу с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной группы. На добавление нового звания параметры посетителей форума не пересчитываются. Пересчет будт происходить постепенно по мере общения посетителей на форуме.</p>
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
+	* полей групп</a>. В специальное поле "LANG" заносится массив массивов
+	* полей языковых параметров групп, которые имеют аналогичную
+	* структуру.
+	*
+	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* $arFields = array("SORT" =&gt; $SORT);
+	* $arSysLangs = array("ru", "en");
+	* for ($i = 0; $i&lt;count($arSysLangs); $i++)
+	* {
+	*   $arFields["LANG"][] = array(
+	*     "LID" =&gt; $arSysLangs[$i],
+	*     "NAME" =&gt; ${"NAME_".$arSysLangs[$i]},
+	*     "DESCRIPTION" =&gt; ${"DESCRIPTION_".$arSysLangs[$i]}
+	*     );
+	* }
+	* $ID = CForumGroup::Add($arFields);
+	* if (IntVal($ID)&lt;=0)
+	*   echo "Error!";
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields)
 	{
 		global $DB;
@@ -235,11 +280,14 @@ class CForumGroup extends CAllForumGroup
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		$ID = intVal($DB->LastID());
 
-		for ($i = 0; $i < count($arFields["LANG"]); $i++)
+		if (array_key_exists("LANG", $arFields))
 		{
-			$arInsert = $DB->PrepareInsert("b_forum_group_lang", $arFields["LANG"][$i]);
-			$strSql = "INSERT INTO b_forum_group_lang(FORUM_GROUP_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			foreach ($arFields["LANG"] as $l)
+			{
+				$arInsert = $DB->PrepareInsert("b_forum_group_lang", $l);
+				$strSql = "INSERT INTO b_forum_group_lang(FORUM_GROUP_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			}
 		}
 		CForumGroup::Resort();
 /***************** Event onAfterGroupForumsAdd *********************/
@@ -280,9 +328,9 @@ class CForumGroup extends CAllForumGroup
 		{
 			$DB->Query("DELETE FROM b_forum_group_lang WHERE FORUM_GROUP_ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			for ($i = 0; $i<count($arFields["LANG"]); $i++)
+			foreach ($arFields["LANG"] as $l)
 			{
-				$arInsert = $DB->PrepareInsert("b_forum_group_lang", $arFields["LANG"][$i]);
+				$arInsert = $DB->PrepareInsert("b_forum_group_lang", $l);
 				$strSql = "INSERT INTO b_forum_group_lang(FORUM_GROUP_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
@@ -295,34 +343,3 @@ class CForumGroup extends CAllForumGroup
 		return $ID;
 	}
 }
-
-/**********************************************************************/
-/************** FORUM SMILE *******************************************/
-/**********************************************************************/
-class CForumSmile extends CAllForumSmile
-{
-	public static function Add($arFields)
-	{
-		global $DB;
-
-		if (!CForumSmile::CheckFields("ADD", $arFields))
-			return false;
-
-		if(CACHED_b_forum_smile !== false)
-			$GLOBALS["CACHE_MANAGER"]->CleanDir("b_forum_smile");
-
-		$arInsert = $DB->PrepareInsert("b_forum_smile", $arFields);
-		$strSql = "INSERT INTO b_forum_smile(".$arInsert[0].") VALUES(".$arInsert[1].")";
-		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		$ID = intVal($DB->LastID());
-
-		foreach ($arFields["LANG"] as $i => $val)
-		{
-			$arInsert = $DB->PrepareInsert("b_forum_smile_lang", $arFields["LANG"][$i]);
-			$strSql = "INSERT INTO b_forum_smile_lang(SMILE_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		}
-		return $ID;
-	}
-}
-?>

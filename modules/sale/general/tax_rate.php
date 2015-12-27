@@ -1,11 +1,13 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+use Bitrix\Sale\Location;
+use Bitrix\Sale\Location\Admin\LocationHelper as Helper;
+use Bitrix\Main\DB;
+
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -16,6 +18,8 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllSaleTaxRate
 {
+	const CONN_ENTITY_NAME = 'Bitrix\Sale\Tax\RateLocation';
+
 	public static function CheckFields($ACTION, &$arFields)
 	{
 		global $DB;
@@ -79,27 +83,34 @@ class CAllSaleTaxRate
 		return true;
 	}
 
-	public static function SetTaxRateLocation($ID, $arFields)
+	public static function SetTaxRateLocation($ID, $arFields, $arOptions = array())
 	{
-		global $DB;
-		$ID = intval($ID);
-		if (0 >= $ID)
-			return;
-
-		$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID);
-		if (is_array($arFields))
+		if(CSaleLocation::isLocationProMigrated())
 		{
-			$countField = count($arFields);
-			for ($i = 0; $i < $countField; $i++)
+			Helper::resetLocationsForEntity($ID, $arFields, self::CONN_ENTITY_NAME, !!$arOptions['EXPECT_LOCATION_CODES']);
+		}
+		else
+		{
+			global $DB;
+			$ID = intval($ID);
+			if (0 >= $ID)
+				return;
+
+			$DB->Query("DELETE FROM b_sale_tax2location WHERE TAX_RATE_ID = ".$ID);
+			if (is_array($arFields))
 			{
-				$arFields[$i]["LOCATION_ID"] = intval($arFields[$i]["LOCATION_ID"]);
-				if ($arFields[$i]["LOCATION_TYPE"]!="G") $arFields[$i]["LOCATION_TYPE"] = "L";
-				if ($arFields[$i]["LOCATION_ID"]>0)
+				$countField = count($arFields);
+				for ($i = 0; $i < $countField; $i++)
 				{
-					$strSql =
-						"INSERT INTO b_sale_tax2location(TAX_RATE_ID, LOCATION_ID, LOCATION_TYPE) ".
-						"VALUES(".$ID.", ".$arFields[$i]["LOCATION_ID"].", '".$arFields[$i]["LOCATION_TYPE"]."')";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$arFields[$i]["LOCATION_ID"] = intval($arFields[$i]["LOCATION_ID"]);
+					if ($arFields[$i]["LOCATION_TYPE"]!="G") $arFields[$i]["LOCATION_TYPE"] = "L";
+					if ($arFields[$i]["LOCATION_ID"]>0)
+					{
+						$strSql =
+							"INSERT INTO b_sale_tax2location(TAX_RATE_ID, LOCATION_CODE, LOCATION_TYPE) ".
+							"VALUES(".$ID.", ".$arFields[$i]["LOCATION_ID"].", '".$arFields[$i]["LOCATION_TYPE"]."')";
+						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					}
 				}
 			}
 		}
@@ -107,14 +118,10 @@ class CAllSaleTaxRate
 
 	
 	/**
-	* <p>Функция изменяет параметры ставки налога с кодом ID</p>
-	*
-	*
+	* <p>Метод изменяет параметры ставки налога с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код ставки налога. </ht
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров ставки налога. Ключами
 	* являются названия параметров ставки, а значениями -
@@ -130,8 +137,6 @@ class CAllSaleTaxRate
 	* местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
 	* группы местоположений.</li> </ul> </li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код измененной ставки налога или <i>false</i> в случае
 	* ошибки.</p> <br><br>
 	*
@@ -139,7 +144,7 @@ class CAllSaleTaxRate
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__update.bd202837.php
 	* @author Bitrix
 	*/
-	public static function Update($ID, $arFields)
+	public static function Update($ID, $arFields, $arOptions = array())
 	{
 		global $DB;
 		$ID = intval($ID);
@@ -153,23 +158,17 @@ class CAllSaleTaxRate
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if (array_key_exists("TAX_LOCATION", $arFields))
-		{
-			CSaleTaxRate::SetTaxRateLocation($ID, $arFields["TAX_LOCATION"]);
-		}
+			CSaleTaxRate::SetTaxRateLocation($ID, $arFields["TAX_LOCATION"], $arOptions);
 
 		return $ID;
 	}
 
 	
 	/**
-	* <p>Функция удаляет ставку налога с кодом ID </p>
-	*
-	*
+	* <p>Метод удаляет ставку налога с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код ставки налога. </ht
-	*
-	*
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> в
 	* противном случае.</p> <br><br>
@@ -190,14 +189,10 @@ class CAllSaleTaxRate
 
 	
 	/**
-	* <p>Функция возвращает параметры ставки налога с кодом ID </p>
-	*
-	*
+	* <p>Метод возвращает параметры ставки налога с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код ставки налога. </ht
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров ставки налога с
 	* ключами</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
@@ -233,62 +228,83 @@ class CAllSaleTaxRate
 		return false;
 	}
 
+	/**
+	 * Get locations connected with tax rate.
+	 * This method is deprecated. It will be removed in future releases.
+	 * 
+	 * 
+	 */
 	public static function GetLocationList($arFilter=Array())
 	{
-		global $DB;
-		$arSqlSearch = Array();
-
-		if (!is_array($arFilter))
-			$filter_keys = Array();
+		if(CSaleLocation::isLocationProMigrated())
+		{
+			try
+			{
+				return CSaleLocation::getDenormalizedLocationList(self::CONN_ENTITY_NAME, $arFilter);
+			}
+			catch(Exception $e)
+			{
+				return new DB\ArrayResult(array());
+			}
+		}
 		else
-			$filter_keys = array_keys($arFilter);
-
-		$countFilterKey = count($filter_keys);
-		for ($i=0; $i < $countFilterKey; $i++)
 		{
-			$val = $DB->ForSql($arFilter[$filter_keys[$i]]);
-			if (strlen($val)<=0) continue;
+			global $DB;
+			$arSqlSearch = Array();
 
-			$key = $filter_keys[$i];
-			if ($key[0]=="!")
-			{
-				$key = substr($key, 1);
-				$bInvert = true;
-			}
+			if (!is_array($arFilter))
+				$filter_keys = Array();
 			else
-				$bInvert = false;
+				$filter_keys = array_keys($arFilter);
 
-			switch (ToUpper($key))
+			$countFilterKey = count($filter_keys);
+			for ($i=0; $i < $countFilterKey; $i++)
 			{
-				case "TAX_RATE_ID":
-					$arSqlSearch[] = "TR2L.TAX_RATE_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
-					break;
-				case "LOCATION_ID":
-					$arSqlSearch[] = "TR2L.LOCATION_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
-					break;
-				case "LOCATION_TYPE":
-					$arSqlSearch[] = "TR2L.LOCATION_TYPE ".($bInvert?"<>":"=")." '".$val."' ";
-					break;
+				$val = $DB->ForSql($arFilter[$filter_keys[$i]]);
+				if (strlen($val)<=0) continue;
+
+				$key = $filter_keys[$i];
+				if ($key[0]=="!")
+				{
+					$key = substr($key, 1);
+					$bInvert = true;
+				}
+				else
+					$bInvert = false;
+
+				switch (ToUpper($key))
+				{
+					case "TAX_RATE_ID":
+						$arSqlSearch[] = "TR2L.TAX_RATE_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
+						break;
+					case "LOCATION_ID":
+						$arSqlSearch[] = "TR2L.LOCATION_CODE ".($bInvert?"<>":"=")." ".IntVal($val)." ";
+						break;
+					case "LOCATION_TYPE":
+						$arSqlSearch[] = "TR2L.LOCATION_TYPE ".($bInvert?"<>":"=")." '".$val."' ";
+						break;
+				}
 			}
+
+			$strSqlSearch = "";
+			$countSqlSearch = count($arSqlSearch);
+			for($i=0; $i < $countSqlSearch; $i++)
+			{
+				$strSqlSearch .= " AND ";
+				$strSqlSearch .= " (".$arSqlSearch[$i].") ";
+			}
+
+			$strSql =
+				"SELECT TR2L.TAX_RATE_ID, TR2L.LOCATION_CODE as LOCATION_ID, TR2L.LOCATION_TYPE ".
+				"FROM b_sale_tax2location TR2L ".
+				"WHERE 1 = 1 ".
+				"	".$strSqlSearch." ";
+
+			$strSql .= $strSqlOrder;
+			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			return $db_res;
+
 		}
-
-		$strSqlSearch = "";
-		$countSqlSearch = count($arSqlSearch);
-		for($i=0; $i < $countSqlSearch; $i++)
-		{
-			$strSqlSearch .= " AND ";
-			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
-		}
-
-		$strSql =
-			"SELECT TR2L.TAX_RATE_ID, TR2L.LOCATION_ID, TR2L.LOCATION_TYPE ".
-			"FROM b_sale_tax2location TR2L ".
-			"WHERE 1 = 1 ".
-			"	".$strSqlSearch." ";
-
-		$strSql .= $strSqlOrder;
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $db_res;
 	}
 }
 ?>

@@ -1,11 +1,11 @@
 <?
+use Bitrix\Catalog;
+use Bitrix\Sale\DiscountCouponsManager;
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/discount_coupon.php");
 
 
 /**
- * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.</body> </html>
- *
- *
+ * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок. 
  *
  *
  * @return mixed 
@@ -18,9 +18,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 {
 	
 	/**
-	* <p>Метод добавляет купон для выбранной скидки.</p>
-	*
-	*
+	* <p>Метод добавляет купон для выбранной скидки. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров нового купона, ключами в котором
@@ -36,15 +34,11 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* комментарий (необязательный)</li> </ul> Необязательные ключи,
 	* отсутствующие в массиве, получат значения по умолчанию.
 	*
-	*
-	*
 	* @param boolean $bAffectDataFile = True Необязательный параметр, указывающий на необходимость
 	* перегенерировать файл скидок и купонов. Эти действия
-	* осуществляет метод CCatalogDiscount::GenerateDataFile(). <br><br> Начиная с версии 12.0
-	* параметр не требуется, т.к. с этой версии больше не используется
-	* файловый кеш скидок.
-	*
-	*
+	* осуществляет метод CCatalogDiscount::GenerateDataFile(). <br><br><div class="note">
+	* <b>Примечание:</b> начиная с версии 12.0 параметр не требуется, т.к. с
+	* этой версии больше не используется файловый кеш скидок.</div>
 	*
 	* @return mixed <p>Метод возвращает код (ID) купона в случае успешного создания и
 	* <i>false</i>, если произошла ошибка. Для получения детальной
@@ -52,7 +46,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* добавлением записи в таблицу осуществляется проверка параметров
 	* привязки методом CCatalogDiscountCoupon::CheckFields. Если проверка прошла
 	* успешно, производится запись в базу.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -80,7 +73,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a></li>
@@ -96,12 +88,20 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*/
 	static public function Add($arFields, $bAffectDataFile = true)
 	{
+		static $eventOnBeforeAddExists = null;
+		static $eventOnAddExists = null;
 		global $DB;
 
-		foreach (GetModuleEvents("catalog", "OnBeforeCouponAdd", true) as $arEvent)
+		if ($eventOnBeforeAddExists === true || $eventOnBeforeAddExists === null)
 		{
-			if (false === ExecuteModuleEventEx($arEvent, array(&$arFields, &$bAffectDataFile)))
-				return false;
+			foreach (GetModuleEvents('catalog', 'OnBeforeCouponAdd', true) as $arEvent)
+			{
+				$eventOnBeforeAddExists = true;
+				if (ExecuteModuleEventEx($arEvent, array(&$arFields, &$bAffectDataFile)) === false)
+					return false;
+			}
+			if ($eventOnBeforeAddExists === null)
+				$eventOnBeforeAddExists = false;
 		}
 
 		$bAffectDataFile = false;
@@ -114,11 +114,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 		$strSql = "INSERT INTO b_catalog_discount_coupon(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$ID = intval($DB->LastID());
+		$ID = (int)$DB->LastID();
 
-		foreach (GetModuleEvents("catalog", "OnCouponAdd", true) as $arEvent)
+		if ($eventOnAddExists === true || $eventOnAddExists === null)
 		{
-			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+			foreach (GetModuleEvents('catalog', 'OnCouponAdd', true) as $arEvent)
+			{
+				$eventOnAddExists = true;
+				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+			}
+			if ($eventOnAddExists === null)
+				$eventOnAddExists = false;
 		}
 
 		return $ID;
@@ -126,14 +132,10 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод обновляет информацию о купоне.</p>
-	*
-	*
+	* <p>Метод обновляет информацию о купоне. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров купона. Может содержать
 	* следующие ключи: <ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки;</li> <li> <b>ACTIVE</b> -
@@ -142,8 +144,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* купона;</li> <li> <b>DESCRIPTION</b> - комментарий.</li> </ul> Ключи, не указанные в
 	* массиве, изменяться не будут.<br> Если массив пустой, обращения к
 	* базе не будет.
-	*
-	*
 	*
 	* @return mixed <p>Метод возвращает код (ID) купона, если запись существует, была
 	* успешно изменена либо не изменялась (пустой массив) и <i>false</i> -
@@ -154,7 +154,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a>.
 	* Если проверка прошла успешно и массив не пуст, запись
 	* изменяется.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
@@ -170,16 +169,24 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*/
 	static public function Update($ID, $arFields)
 	{
+		static $eventOnBeforeUpdateExists = null;
+		static $eventOnUpdateExists = null;
 		global $DB;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if ($ID <= 0)
 			return false;
 
-		foreach (GetModuleEvents("catalog", "OnBeforeCouponUpdate", true) as $arEvent)
+		if ($eventOnBeforeUpdateExists === true || $eventOnBeforeUpdateExists === null)
 		{
-			if (false === ExecuteModuleEventEx($arEvent, array($ID, &$arFields)))
-				return false;
+			foreach (GetModuleEvents('catalog', 'OnBeforeCouponUpdate', true) as $arEvent)
+			{
+				$eventOnBeforeUpdateExists = true;
+				if (ExecuteModuleEventEx($arEvent, array($ID, &$arFields)) === false)
+					return false;
+			}
+			if ($eventOnBeforeUpdateExists === null)
+				$eventOnBeforeUpdateExists = false;
 		}
 
 		if (!CCatalogDiscountCoupon::CheckFields("UPDATE", $arFields, $ID))
@@ -192,9 +199,15 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		foreach (GetModuleEvents("catalog", "OnCouponUpdate", true) as $arEvent)
+		if ($eventOnUpdateExists === true || $eventOnUpdateExists === null)
 		{
-			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+			foreach (GetModuleEvents('catalog', 'OnCouponUpdate', true) as $arEvent)
+			{
+				$eventOnUpdateExists = true;
+				ExecuteModuleEventEx($arEvent, array($ID, $arFields));
+			}
+			if ($eventOnUpdateExists === null)
+				$eventOnUpdateExists = false;
 		}
 
 		return $ID;
@@ -202,22 +215,16 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод удаляет купон.</p>
-	*
-	*
+	* <p>Метод удаляет купон. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
-	*
-	*
 	*
 	* @param boolean $bAffectDataFile = True Необязательный параметр, указывающий на необходимость
 	* перегенерировать файл скидок и купонов. Эти действия
 	* осуществляет метод CCatalogDiscount::GenerateDataFile(). <br><br> Начиная с версии 12.0
 	* параметр не требуется, т.к. с этой версии больше не используется
 	* файловый кеш скидок.
-	*
-	*
 	*
 	* @return mixed <p>Метод возвращает true в случае успешного удаления и false, если
 	* произошла ошибка.</p> <br><br>
@@ -228,26 +235,39 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*/
 	static public function Delete($ID, $bAffectDataFile = true)
 	{
+		static $eventOnBeforeDeleteExists = null;
+		static $eventOnDeleteExists = null;
 		global $DB;
 
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if ($ID <= 0)
 			return false;
 
-		foreach (GetModuleEvents("catalog", "OnBeforeCouponDelete", true) as $arEvent)
+		if ($eventOnBeforeDeleteExists === true || $eventOnBeforeDeleteExists === null)
 		{
-			if (false === ExecuteModuleEventEx($arEvent, array($ID, &$bAffectDataFile)))
-				return false;
+			foreach (GetModuleEvents('catalog', 'OnBeforeCouponDelete', true) as $arEvent)
+			{
+				$eventOnBeforeDeleteExists = true;
+				if (ExecuteModuleEventEx($arEvent, array($ID, &$bAffectDataFile)) === false)
+					return false;
+			}
+			if ($eventOnBeforeDeleteExists === null)
+				$eventOnBeforeDeleteExists = false;
 		}
 
 		$bAffectDataFile = false;
 
 		$DB->Query("DELETE FROM b_catalog_discount_coupon WHERE ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		foreach (GetModuleEvents("catalog", "OnCouponDelete", true) as $arEvent)
+		if ($eventOnDeleteExists === true || $eventOnDeleteExists === null)
 		{
-			if (false === ExecuteModuleEventEx($arEvent, array($ID)))
-				return false;
+			foreach (GetModuleEvents('catalog', 'OnCouponDelete', true) as $arEvent)
+			{
+				$eventOnDeleteExists = true;
+				ExecuteModuleEventEx($arEvent, array($ID));
+			}
+			if ($eventOnDeleteExists === null)
+				$eventOnDeleteExists = false;
 		}
 
 		return true;
@@ -255,22 +275,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод удаляет все купоны для выбранной скидки и перегенерирует файл скидок и купонов.</p>
-	*
-	*
+	* <p>Метод удаляет все купоны для выбранной скидки и перегенерирует файл скидок и купонов. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код (ID) скидки.
 	*
-	*
-	*
 	* @param boolean $bAffectDataFile = true Необязательный параметр, указывающий на необходимость
 	* перегенерировать файл скидок и купонов. Эти действия
 	* осуществляются методами CCatalogDiscount::ClearFile() и CCatalogDiscount::GenerateDataFile().
-	* <br><br> Начиная с версии 12.0 параметр не требуется, т.к. с этой версии
-	* больше не используется файловый кеш скидок.
-	*
-	*
+	* <br><br><div class="note"> <b>Примечание:</b> начиная с версии 12.0 параметр не
+	* требуется, т.к. с этой версии больше не используется файловый кеш
+	* скидок.</div>
 	*
 	* @return boolean <p>Возвращает <i>true</i> в случае успеха и <i>false</i>, если произошла
 	* ошибка.</p> <br><br>
@@ -284,7 +299,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 		global $DB;
 
 		$bAffectDataFile = false;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		if ($ID <= 0)
 			return false;
 
@@ -295,18 +310,13 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод возвращает информацию о купоне с заданным ID.</p>
-	*
-	*
+	* <p>Метод возвращает информацию о купоне с заданным ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
 	*
-	*
-	*
 	* @return mixed <p>Метод возвращает массив параметров купона либо <i>false</i>, если
 	* купон с таким ID не найден.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -322,7 +332,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* 	echo 'Код купона: '.$arCoupon['COUPON'];
 	* }
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -357,11 +366,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 		return false;
 	}
 
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array $arGroupBy
+	 * @param bool|array $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|CDBResult
+	 */
 	
 	/**
-	* <p>Метод выбирает купоны, соответствующие условиям.</p>
-	*
-	*
+	* <p>Метод выбирает купоны, соответствующие условиям. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив вида array(by1=&gt;order1[, by2=&gt;order2 [, ..]]), где by - поле для сортировки,
@@ -372,8 +387,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* - направление сортировки, может принимать значения: <ul> <li> <b>asc</b> -
 	* по возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> Необязательный.
 	* По умолчанию купоны не сортируются.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив параметров, по которым строится фильтр выборки. Имеет вид:
 	* <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
@@ -407,25 +420,19 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* фильтра - одиночное значение или массив значений.<br>
 	* Необязательное. По умолчанию купоны не фильтруются.
 	*
-	*
-	*
 	* @param mixed $arGroupBy = false Массив полей для группировки купонов. имеет вид: <pre
 	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
 	* "название_поля<i>N</i>" может стоять любое поле каталога. <br><br> Если
-	* массив пустой, то функция вернет число записей, удовлетворяющих
+	* массив пустой, то метод вернет число записей, удовлетворяющих
 	* фильтру. <br> Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	*
-	*
 	* @param mixed $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li>любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Необязательный. По умолчанию false - купоны не
 	* ограничиваются.
-	*
-	*
 	*
 	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать следующие поля <i>ID</i>, <i>DISCOUNT_ID</i>, <i>ACTIVE</i>, <i>ONE_TIME</i>, <i>COUPON</i>,
@@ -433,10 +440,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* значение "*", то будут возвращены все доступные поля.<br>
 	* Необязательный. По умолчанию выводятся все поля.
 	*
-	*
-	*
 	* @return CDBResult <p>Метод возвращает объект класса CDBResult.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -456,7 +460,6 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*    } 
 	* }
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -480,7 +483,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 			"ONE_TIME" => array("FIELD" => "CD.ONE_TIME", "TYPE" => "char"),
 			"COUPON" => array("FIELD" => "CD.COUPON", "TYPE" => "string"),
 			"DATE_APPLY" => array("FIELD" => "CD.DATE_APPLY", "TYPE" => "datetime"),
-			"DISCOUNT_NAME" => array("FIELD" => "CDD.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_catalog_discount CDD ON (CD.DISCOUNT_ID = CDD.ID)"),
+			"DISCOUNT_NAME" => array("FIELD" => "CDD.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_discount CDD ON (CD.DISCOUNT_ID = CDD.ID)"),
 			"DESCRIPTION" => array("FIELD" => "CD.DESCRIPTION","TYPE" => "string"),
 			"TIMESTAMP_X" => array("FIELD" => "CD.TIMESTAMP_X", "TYPE" => "datetime"),
 			"MODIFIED_BY" => array("FIELD" => "CD.MODIFIED_BY", "TYPE" => "int"),
@@ -557,88 +560,100 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 		return $dbRes;
 	}
 
+	/**
+	* @deprecated deprecated since catalog 15.0.4
+	* @see \Bitrix\Sale\DiscountCouponsManager
+	*/
 	static public function CouponApply($intUserID, $strCoupon)
 	{
-		global $DB;
-
-		$mxResult = false;
-
-		$intUserID = intval($intUserID);
-		if (0 > $intUserID)
-			$intUserID = 0;
-
-		$arCouponList = array();
-		$arCheck = (is_array($strCoupon) ? $strCoupon : array($strCoupon));
-		foreach ($arCheck as &$strOneCheck)
+		if (self::$existCouponsManager === null)
+			self::initCouponManager();
+		if (self::$existCouponsManager)
 		{
-			$strOneCheck = strval($strOneCheck);
-			if ('' != $strOneCheck)
-				$arCouponList[] = $strOneCheck;
+			$couponList = (is_array($strCoupon) ? $strCoupon : array($strCoupon));
+			return DiscountCouponsManager::setApplyByProduct(array('MODULE' => 'catalog'), $couponList, true);
 		}
-		if (isset($strOneCheck))
-			unset($strOneCheck);
+		else
+		{
+			global $DB;
 
-		if (empty($arCouponList))
+			$mxResult = false;
+
+			$intUserID = (int)$intUserID;
+			if ($intUserID < 0)
+				$intUserID = 0;
+
+			$arCouponList = array();
+			$arCheck = (is_array($strCoupon) ? $strCoupon : array($strCoupon));
+			foreach ($arCheck as &$strOneCheck)
+			{
+				$strOneCheck = (string)$strOneCheck;
+				if ('' != $strOneCheck)
+					$arCouponList[] = $strOneCheck;
+			}
+			if (isset($strOneCheck))
+				unset($strOneCheck);
+
+			if (empty($arCouponList))
+				return $mxResult;
+
+			$strDateFunction = $DB->GetNowFunction();
+			$boolFlag = false;
+			$couponIterator = Catalog\DiscountCouponTable::getList(array(
+				'select' => array('ID', 'TYPE', 'COUPON'),
+				'filter' => array('=COUPON' => $arCouponList, '=ACTIVE' => 'Y')
+			));
+			while ($arCoupon = $couponIterator->fetch())
+			{
+				$arCoupon['ID'] = (int)$arCoupon['ID'];
+				$arFields = array(
+					"~DATE_APPLY" => $strDateFunction
+				);
+
+				if ($arCoupon['TYPE'] == Catalog\DiscountCouponTable::TYPE_ONE_ROW)
+				{
+					$arFields["ACTIVE"] = "N";
+					if (0 < $intUserID)
+					{
+						CCatalogDiscountCoupon::EraseCouponByManage($intUserID, $arCoupon['COUPON']);
+					}
+					else
+					{
+						CCatalogDiscountCoupon::EraseCoupon($arCoupon['COUPON']);
+					}
+				}
+				elseif ($arCoupon['TYPE'] == Catalog\DiscountCouponTable::TYPE_ONE_ORDER)
+				{
+					$boolFlag = true;
+					if (!isset(self::$arOneOrderCoupons[$arCoupon['ID']]))
+						self::$arOneOrderCoupons[$arCoupon['ID']] = array(
+							'COUPON' => $arCoupon['COUPON'],
+							'USER_ID' => $intUserID,
+						);
+				}
+
+				$strUpdate = $DB->PrepareUpdate("b_catalog_discount_coupon", $arFields);
+				if (!empty($strUpdate))
+				{
+					$strSql = "UPDATE b_catalog_discount_coupon SET ".$strUpdate." WHERE ID = ".$arCoupon['ID'];
+					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$mxResult = true;
+				}
+			}
+			unset($arCoupon, $couponIterator);
+			if ($boolFlag)
+			{
+				AddEventHandler('sale', 'OnBasketOrder', array('CCatalogDiscountCoupon', 'CouponOneOrderDisable'));
+				AddEventHandler('sale', 'OnDoBasketOrder', array('CCatalogDiscountCoupon', 'CouponOneOrderDisable'));
+			}
 			return $mxResult;
-
-		$boolFlag = false;
-		$rsCoupons = CCatalogDiscountCoupon::GetList(
-			array(),
-			array('COUPON' => $arCouponList, 'ACTIVE' => 'Y'),
-			false,
-			false,
-			array('ID', 'ONE_TIME', 'COUPON')
-		);
-		$strDateFunction = $DB->GetNowFunction();
-		while ($arCoupon = $rsCoupons->Fetch())
-		{
-			$arCoupon['ID'] = intval($arCoupon['ID']);
-			$arFields = array(
-				"~DATE_APPLY" => $strDateFunction
-			);
-
-			if (self::TYPE_ONE_TIME == $arCoupon["ONE_TIME"])
-			{
-				$arFields["ACTIVE"] = "N";
-				if (0 < $intUserID)
-				{
-					CCatalogDiscountCoupon::EraseCouponByManage($intUserID, $arCoupon['COUPON']);
-				}
-				else
-				{
-					CCatalogDiscountCoupon::EraseCoupon($arCoupon['COUPON']);
-				}
-			}
-			elseif (self::TYPE_ONE_ORDER == $arCoupon["ONE_TIME"])
-			{
-				$boolFlag = true;
-				if (!array_key_exists($arCoupon['ID'], self::$arOneOrderCoupons))
-					self::$arOneOrderCoupons[$arCoupon['ID']] = array(
-						'COUPON' => $arCoupon['COUPON'],
-						'USER_ID' => $intUserID,
-					);
-			}
-
-			$strUpdate = $DB->PrepareUpdate("b_catalog_discount_coupon", $arFields);
-			if (!empty($strUpdate))
-			{
-				$strSql = "UPDATE b_catalog_discount_coupon SET ".$strUpdate." WHERE ID = ".$arCoupon['ID'];
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$mxResult = true;
-			}
 		}
-		if ($boolFlag)
-		{
-			AddEventHandler('sale', 'OnBasketOrder', array('CCatalogDiscountCoupon', 'CouponOneOrderDisable'));
-			AddEventHandler('sale', 'OnDoBasketOrder', array('CCatalogDiscountCoupon', 'CouponOneOrderDisable'));
-		}
-		return $mxResult;
 	}
 
-/*
-* @deprecated deprecated since catalog 12.5.6
-* @see CCatalogDiscountCoupon::CouponOneOrderDisable()
-*/
+	/**
+	* @deprecated deprecated since catalog 12.5.6
+	* @see CCatalogDiscountCoupon::CouponOneOrderDisable()
+	*/
 	static public function __CouponOneOrderDisable($arCoupons)
 	{
 		global $DB;
@@ -651,8 +666,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
+	/**
+	* @deprecated deprecated since catalog 15.0.4
+	* @see \Bitrix\Sale\DiscountCouponsManager::saveApplied
+	*/
 	static public function CouponOneOrderDisable($intOrderID = 0)
 	{
+		if (self::$existCouponsManager === null)
+			self::initCouponManager();
+		if (self::$existCouponsManager)
+			return;
+
 		global $DB;
 		if (!empty(self::$arOneOrderCoupons))
 		{
@@ -674,42 +698,54 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 			CatalogClearArray($arCouponID, false);
 			if (!empty($arCouponID))
 			{
-				$strSql = "UPDATE b_catalog_discount_coupon SET ACTIVE='N' WHERE ID IN (".implode(', ', $arCouponID).") AND ONE_TIME='".self::TYPE_ONE_ORDER."'";
+				$strSql = "UPDATE b_catalog_discount_coupon SET ACTIVE='N' WHERE ID IN (".implode(', ', $arCouponID).") AND ONE_TIME='".self::TYPE_ONE_ORDER."' AND ACTIVE='Y'";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 			self::$arOneOrderCoupons = array();
 		}
 	}
 
+	/**
+	* @deprecated deprecated since catalog 15.0.4
+	* @see \Bitrix\Sale\DiscountCouponsManager::isExist
+	*/
 	
 	/**
-	* <p>Метод проверяет существование купона.</p>
-	*
-	*
+	* <p>Метод проверяет существование купона. Метод динамичный.</p>
 	*
 	*
 	* @param string $strCoupon  Код купона.
-	*
-	*
 	*
 	* @return bool <p> В случае наличия купона возвращает true, иначе - false.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/isexistcoupon.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 15.0.4  ->  \Bitrix\Sale\DiscountCouponsManager::isExist
 	*/
 	static public function IsExistCoupon($strCoupon)
 	{
-		global $DB;
-
-		if ('' == $strCoupon)
+		if (self::$existCouponsManager === null)
+			self::initCouponManager();
+		if (self::$existCouponsManager)
+		{
+			$result = DiscountCouponsManager::isExist($strCoupon);
+			if (!empty($result))
+				return true;
 			return false;
+		}
+		else
+		{
+			global $DB;
 
-		$strSql = "select ID, COUPON from b_catalog_discount_coupon where COUPON='".$DB->ForSql($strCoupon)."' limit 1";
-		$rsCoupons = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		if ($arCoupon = $rsCoupons->Fetch())
-			return true;
+			if ($strCoupon == '')
+				return false;
+
+			$strSql = "select ID, COUPON from b_catalog_discount_coupon where COUPON='".$DB->ForSql($strCoupon)."' limit 1";
+			$rsCoupons = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			if ($arCoupon = $rsCoupons->Fetch())
+				return true;
+		}
 		return false;
 	}
 }
-?>

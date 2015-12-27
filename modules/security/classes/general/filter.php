@@ -45,18 +45,16 @@ class CSecurityFilter
 		if(CSecurityFilterMask::Check(SITE_ID, $_SERVER["REQUEST_URI"]))
 			return;
 
-		if(self::currentUserHaveRightsForSkip())
-		{
-			if(
-				check_bitrix_sessid()
-				&& (
-					!isset($_POST['____SECFILTER_CONVERT_JS'])
-					|| !$_POST['____SECFILTER_CONVERT_JS']
-				)
+		if(
+			check_bitrix_sessid()
+			&& self::currentUserHaveRightsForSkip()
+			&& (
+				!isset($_POST['____SECFILTER_CONVERT_JS'])
+				|| !$_POST['____SECFILTER_CONVERT_JS']
 			)
-			{
-				return;
-			}
+		)
+		{
+			return;
 		}
 
 		$filter = new CSecurityFilter;

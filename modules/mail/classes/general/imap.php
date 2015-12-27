@@ -12,9 +12,14 @@ class CMailImap
 		$this->counter = 0;
 	}
 
-	public function connect($host, $port, $timeout = 1)
+	public function connect($host, $port, $timeout = 1, $skip_cert = false)
 	{
-		$imap_stream = @fsockopen($host, $port, $errno, $errstr, $timeout);
+		$skip_cert = PHP_VERSION_ID < 50600 ? true : $skip_cert;
+
+		$imap_stream = @stream_socket_client(
+			sprintf('%s:%s', $host, $port), $errno, $errstr, $timeout, STREAM_CLIENT_CONNECT,
+			stream_context_create(array('ssl' => array('verify_peer' => !$skip_cert, 'verify_peer_name' => !$skip_cert)))
+		);
 
 		if ($imap_stream === false)
 			throw new Exception(GetMessage('MAIL_IMAP_ERR_CONNECT'));

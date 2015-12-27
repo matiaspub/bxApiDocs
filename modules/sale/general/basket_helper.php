@@ -23,8 +23,17 @@ class CSaleBasketHelper
 	*/
 	public static function isSetItem($arItem)
 	{
-		if (isset($arItem["SET_PARENT_ID"]) && intval($arItem["SET_PARENT_ID"]) > 0 && empty($arItem["TYPE"]))
-			return true;
+		$adminSection = (defined('ADMIN_SECTION') && ADMIN_SECTION === true);
+
+		if (isset($arItem["SET_PARENT_ID"]) && empty($arItem["TYPE"]))
+		{
+			if (
+				($adminSection && $arItem["SET_PARENT_ID"] != '' && $arItem["SET_PARENT_ID"] != 0)
+				||
+				intval($arItem["SET_PARENT_ID"]) > 0
+			)
+				return true;
+		}
 
 		return false;
 	}
@@ -37,10 +46,7 @@ class CSaleBasketHelper
 	*/
 	public static function isSetParent($arItem)
 	{
-		if (isset($arItem["SET_PARENT_ID"]) && intval($arItem["SET_PARENT_ID"]) > 0 && isset($arItem["TYPE"]) && intval($arItem["TYPE"]) == CSaleBasket::TYPE_SET)
-			return true;
-
-		return false;
+		return (isset($arItem["TYPE"]) && (int)$arItem["TYPE"] == CSaleBasket::TYPE_SET);
 	}
 
 	/*
@@ -73,7 +79,7 @@ class CSaleBasketHelper
 		else
 			return false;
 	}
-	
+
 	/**
 	 * Helper method. Is used to re-sort basket items data so Set parents will be added before Set items
 	 * @param $arBasketItemA
@@ -180,6 +186,44 @@ class CSaleBasketHelper
 		}
 
 		return $basketItems;
+	}
+
+
+	/**
+	 * @param array $basketItemData
+	 *
+	 * @return float|int
+	 */
+	public static function getVat(array $basketItemData)
+	{
+		if (empty($basketItemData['VAT_RATE']) || $basketItemData['VAT_RATE'] == 0)
+			return 0;
+
+		if (isset($basketItemData['VAT_INCLUDED']) && $basketItemData['VAT_INCLUDED'] === 'N')
+		{
+			$vat = roundEx(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE']), SALE_VALUE_PRECISION);
+		}
+		else
+		{
+			$vat = roundEx(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE'] / ($basketItemData['VAT_RATE'] + 1)), SALE_VALUE_PRECISION);
+		}
+
+		return $vat;
+	}
+
+	/**
+	 * @param array $basketItemData
+	 *
+	 * @return float|int
+	 */
+	public static function getFinalPrice(array $basketItemData)
+	{
+		$price = roundEx($basketItemData['PRICE'] * $basketItemData['QUANTITY'], SALE_VALUE_PRECISION);
+		if (isset($basketItemData['VAT_INCLUDED']) && $basketItemData['VAT_INCLUDED'] === 'N')
+		{
+			$price += static::getVat($basketItemData);
+		}
+		return $price;
 	}
 
 }

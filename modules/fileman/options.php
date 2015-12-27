@@ -46,7 +46,8 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 	COption::SetOptionString($module_id, "default_edit", $default_edit);
 
 	COption::SetOptionString($module_id, "use_medialib", $use_medialib == 'Y' ? 'Y' : 'N');
-	COption::SetOptionString($module_id, "use_editor_3", $use_editor_3);
+
+	COption::SetOptionString($module_id, "use_editor_3", $use_editor_3 == 'Y' ? 'Y' : 'N');
 	$useEditor3 = $use_editor_3 == "Y";
 
 	if (!$useEditor3)
@@ -76,6 +77,7 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		// LCA - limit component access
 		COption::SetOptionString($module_id, "use_lca", ($use_lca == 'Y' ? 'Y' : 'N'));
 	}
+	COption::SetOptionString($module_id, "replace_new_lines", isset($_POST['replace_new_lines'])? "Y" : "N");
 
 	// ******** Spell ********
 	COption::SetOptionString($module_id, "use_pspell", isset($_POST['use_pspell'])? "Y" : "N");
@@ -297,6 +299,7 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		COption::SetOptionString($module_id, "~script_files", $script_files);
 		COption::SetOptionString($module_id, "~allowed_components", $allowed_components);
 	}
+	$addError = false;
 
 	$siteList_ID = unserialize($mSiteList);
 
@@ -320,7 +323,10 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 			if(strlen(${"menutypes_".$siteList_ID[$j]["ID"]."_new_type"})>0 && $USER->CanDoOperation('fileman_edit_menu_types'))
 				$armt[${"menutypes_".$siteList_ID[$j]["ID"]."_new_type"}] = ${"menutypes_".$siteList_ID[$j]["ID"]."_new_name"};
 
-			SetMenuTypes($armt, $siteList_ID[$j]["ID"]);
+			if (strlen(addslashes(serialize($armt))) <= 2000)
+				SetMenuTypes($armt, $siteList_ID[$j]["ID"]);
+			else
+				$addError = GetMessage("FILEMAN_OPTION_ADD_ERROR_MENU").'<br />';
 
 			$arPT = Array();
 			for($i=0; $i<${"propstypes_".$siteList_ID[$j]["ID"]."_count"}; $i++)
@@ -331,7 +337,8 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 			if(strlen(${"propstypes_".$siteList_ID[$j]["ID"]."_new_type"})>0)
 				$arPT[${"propstypes_".$siteList_ID[$j]["ID"]."_new_type"}] = ${"propstypes_".$siteList_ID[$j]["ID"]."_new_name"};
 
-			CFileMan::SetPropstypes($arPT, false, $siteList_ID[$j]["ID"]);
+			if(!CFileMan::SetPropstypes($arPT, false, $siteList_ID[$j]["ID"]))
+				$addError .= GetMessage("FILEMAN_OPTION_ADD_ERROR_PROPS");
 			$j++;
 		}
 	}
@@ -350,7 +357,10 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		if(strlen($menutypes_new_type)>0 && $USER->CanDoOperation('fileman_edit_menu_types'))
 			$armt[$menutypes_new_type] = $menutypes_new_name;
 
-		SetMenuTypes($armt, '');
+		if (strlen(addslashes(serialize($armt))) <= 2000)
+			SetMenuTypes($armt, $siteList_ID[$j]["ID"]);
+		else
+			$addError = GetMessage("FILEMAN_OPTION_ADD_ERROR_MENU").'<br />';
 
 		$propstypes = "";
 		$arPT = Array();
@@ -362,7 +372,8 @@ if($REQUEST_METHOD == "POST" && strlen($Update)>0 && $USER->CanDoOperation('file
 		if(strlen($propstypes_new_type)>0)
 			$arPT[$propstypes_new_type] = $propstypes_new_name;
 
-		CFileMan::SetPropstypes($arPT);
+		if(!CFileMan::SetPropstypes($arPT))
+			$addError .= GetMessage("FILEMAN_OPTION_ADD_ERROR_PROPS");
 
 		$j = 0;
 		while($j < count($siteList_ID))
@@ -442,9 +453,13 @@ $aTabs = array(
 	array("DIV" => "edit1", "TAB" => GetMessage("MAIN_TAB_SET"), "ICON" => "fileman_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_SET")),
 	array("DIV" => "edit2", "TAB" => GetMessage("MAIN_TAB_VISUAL_EDITOR"), "ICON" => "fileman_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_VIS_ED_SET")),
 	array("DIV" => "edit5", "TAB" => GetMessage("MAIN_TAB_MEDIALIB"), "ICON" => "fileman_settings", "TITLE" => GetMessage("FILEMAN_SEC_MEDIALIB")),
-	array("DIV" => "edit3", "TAB" => GetMessage("MAIN_TAB_RIGHTS"), "ICON" => "fileman_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_RIGHTS")),
 	);
 
+if($USER->isAdmin())
+{
+	$rightsTab = array("DIV" => "edit3", "TAB" => GetMessage("MAIN_TAB_RIGHTS"), "ICON" => "fileman_settings", "TITLE" => GetMessage("MAIN_TAB_TITLE_RIGHTS"));
+	$aTabs[] = $rightsTab;
+}
 	$siteList = array();
 	$rsSites = CSite::GetList($by="sort", $order="asc", Array());
 	$i = 0;
@@ -455,10 +470,17 @@ $aTabs = array(
 		$i++;
 	}
 	$siteCount = $i;
-	$useEditor3 = COption::GetOptionString($module_id, "use_editor_3", "N") == "Y";
-
+	$useEditor3 = COption::GetOptionString($module_id, "use_editor_3", "Y") == "Y";
 	unset($rsSites);
 	unset($arRes);
+
+	if ($addError)
+	{
+		CAdminMessage::ShowMessage(array(
+			"DETAILS" => $addError,
+			"TYPE" => "ERROR",
+		));
+	}
 
 	$tabControl = new CAdmintabControl("tabControl", $aTabs);
 	$tabControl->Begin();
@@ -604,7 +626,7 @@ $aTabs = array(
 		<td colspan="2">
 		<table cellspacing="4"  cellpadding="0" width="100%">
 		<tr>
-			<td valign="top" width="40%" class="adm-detail-content-cell-l" style="{padding: 4px;}"><?= GetMessage('FILEMAN_OPTION_MENU_TYPES')?></td>
+			<td valign="top" width="40%" class="adm-detail-content-cell-l" style="padding: 4px;"><?= GetMessage('FILEMAN_OPTION_MENU_TYPES')?></td>
 			<td valign="top" width="60%" class="adm-detail-content-cell-r">
 			<table cellPadding="2" cellSpacing="2" border="0" width="100%">
 			<tr class="heading">
@@ -814,7 +836,7 @@ $aTabs = array(
 <?$tabControl->BeginNextTab();?>
 <tr>
 	<td valign="top"><label for="use_editor_3"><?= GetMessage('FILEMAN_OPTION_USE_EDITOR_3')?></label></td>
-	<td><input type="checkbox" name="use_editor_3" id="use_editor_3" value="Y" <?if(COption::GetOptionString($module_id, "use_editor_3", "N") == "Y") echo " checked"?>></td>
+	<td><input type="checkbox" name="use_editor_3" id="use_editor_3" value="Y" <?if($useEditor3) echo " checked"?>></td>
 </tr>
 
 <? if (!$useEditor3):?>
@@ -1352,14 +1374,21 @@ new BXButtonConfig();
 	<tr class="heading">
 		<td colspan="2"><? echo GetMessage("FILEMAN_EDITOR_CONVERT_SETTINGS");?></td>
 	</tr>
-	<? if (!$useEditor3):?>
+
+	<? if ($useEditor3):?>
+	<tr>
+		<td width="50%" valign="top"><label for='replace_new_lines'><?echo GetMessage("FILEMAN_REPLACE_NEW_LINES_WITH_BR");?>:</td>
+		<td  valign="top">
+			<input type="checkbox" name="replace_new_lines" id='replace_new_lines' value="Y" <? if (COption::GetOptionString($module_id, "replace_new_lines", 'Y') == 'Y') echo 'checked';?>>
+		</td>
+	</tr>
+	<? else:?>
 	<tr>
 		<td width="50%" valign="top"><label for='use_lca'><?echo GetMessage("FILEMAN_USE_LCA");?>:</td>
 		<td  valign="top">
 			<input type="checkbox" name="use_lca" id='use_lca' value="Y" <? if (COption::GetOptionString($module_id, "use_lca", 'N') == 'Y') echo 'checked';?>>
 		</td>
 	</tr>
-	<? endif; //!$useEditor3 ?>
 	<tr>
 		<td width="50%" valign="top"><?echo GetMessage("FILEMAN_ENTITIES_GROUPS");?>:</td>
 		<td  valign="top">
@@ -1386,7 +1415,10 @@ new BXButtonConfig();
 			</table>
 		</td>
 	</tr>
+	<? endif; //$useEditor3 ?>
+
 <? if ($useEditor3):?>
+
 	<tr class="heading">
 		<td colspan="2"><? echo GetMessage("FILEMAN_OPTION_SPELL_SET");?></td>
 	</tr>
@@ -1684,6 +1716,7 @@ function InitEventForType(id)
 </script>
 	</td></tr>
 
+<?if ($USER->IsAdmin()):?>
 <?$tabControl->BeginNextTab();?>
 <?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/admin/group_rights2.php");?>
 
@@ -1714,6 +1747,7 @@ while($group = $gr->Fetch())
 			</select>
 		</td>
 	</tr>
+<?endif;?>
 
 <?$tabControl->Buttons();?>
 <script>

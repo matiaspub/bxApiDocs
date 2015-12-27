@@ -8,23 +8,14 @@
 
 namespace Bitrix\Main\Entity;
 
-class Result
+class Result extends \Bitrix\Main\Result
 {
-	/** @var bool */
-	protected $isSuccess;
-	/** @var  array */
-	protected $data;
-
 	/** @var bool  */
 	protected $wereErrorsChecked = false;
 
-	/** @var EntityError[] */
-	protected $errors;
-
-	public function __construct()
+	static public function __construct()
 	{
-		$this->isSuccess = true;
-		$this->errors = array();
+		parent::__construct();
 	}
 
 	/**
@@ -37,32 +28,24 @@ class Result
 	 */
 	public function isSuccess($internalCall = false)
 	{
-		$this->wereErrorsChecked = !$internalCall;
+		if (!$internalCall && !$this->wereErrorsChecked)
+		{
+			$this->wereErrorsChecked = true;
+		}
 
-		return $this->isSuccess;
+		return parent::isSuccess();
 	}
 
 	/**
-	 * Adds error message for specified field
+	 * Returns an array of Error objects
 	 *
-	 * @param EntityError $error
-	 */
-	public function addError(EntityError $error)
-	{
-		$this->isSuccess = false;
-		$this->errors[] = $error;
-	}
-
-	/**
-	 * Returns array of FieldError objects
-	 *
-	 * @return FieldError[]
+	 * @return EntityError[]|FieldError[]
 	 */
 	public function getErrors()
 	{
 		$this->wereErrorsChecked = true;
 
-		return $this->errors;
+		return parent::getErrors();
 	}
 
 	/**
@@ -74,26 +57,7 @@ class Result
 	{
 		$this->wereErrorsChecked = true;
 
-		$messages = array();
-
-		foreach($this->errors as $error)
-			$messages[] = $error->getMessage();
-
-		return $messages;
-	}
-
-	/**
-	 * Adds array of FieldError objects
-	 *
-	 * @param FieldError[] $errors
-	 */
-	public function addErrors(array $errors)
-	{
-		if(is_array($errors))
-		{
-			foreach($errors as $error)
-				$this->addError($error);
-		}
+		return parent::getErrorMessages();
 	}
 
 	public function __destruct()
@@ -104,19 +68,5 @@ class Result
 			// make a warning (usually it should be written in log)
 			trigger_error(join('; ', $this->getErrorMessages()), E_USER_WARNING);
 		}
-	}
-
-	public function setData(array $data)
-	{
-		$this->data = $data;
-	}
-
-	/**
-	 * Returns data array saved into the record
-	 * @return array
-	 */
-	public function getData()
-	{
-		return $this->data;
 	}
 }

@@ -72,7 +72,7 @@ class CCatalogProductSetAll
 		if (empty($arFields) || !is_array($arFields))
 			return false;
 		if (array_key_exists('ID', $arFields))
-			unset($arFields);
+			unset($arFields['ID']);
 
 		if (array_key_exists('DATE_CREATE', $arFields))
 			unset($arFields['DATE_CREATE']);
@@ -298,10 +298,22 @@ class CCatalogProductSetAll
 			$arProductList = array_keys($arProductInSet);
 			if (!self::$disableCheckProduct)
 			{
-				if (!CCatalogProduct::CheckProducts($arProductList))
+				if ($arFields['TYPE'] == self::TYPE_GROUP)
+				{
+					$checkProductList = $arProductInSet;
+					if ($arFields['ITEM_ID'] > 0)
+						unset($checkProductList[$arFields['ITEM_ID']]);
+					$checkProductList = array_keys($checkProductList);
+				}
+				else
+				{
+					$checkProductList = $arProductList;
+				}
+				if (!CCatalogProduct::CheckProducts($checkProductList))
 				{
 					self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_NOT_PRODUCT'));
 				}
+				unset($checkProductList);
 			}
 			if (empty(self::$arErrors) && self::TYPE_SET == $arFields['TYPE'])
 			{
@@ -309,15 +321,12 @@ class CCatalogProductSetAll
 				{
 					self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SET'));
 				}
-				foreach ($arProductList as &$intOneID)
+				$existSKU = array_filter(CCatalogSKU::getExistOffers($arProductList));
+				if (!empty($existSKU))
 				{
-					if (CCatalogSKU::IsExistOffers($intOneID))
-					{
-						self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SKU'));
-						break;
-					}
+					self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SKU'));
 				}
-				unset($intOneID);
+				unset($existSKU);
 			}
 		}
 
@@ -367,6 +376,7 @@ class CCatalogProductSetAll
 		if ($intID <= 0)
 			self::$arErrors[] = array('id' => 'ID', 'text' => GetMessage('BT_CAT_SET_ERR_ID_IS_BAD'));
 
+		$arCurrent = array();
 		if (empty(self::$arErrors))
 		{
 			$arCurrent = CCatalogProductSet::getSetByID($intID);
@@ -506,10 +516,22 @@ class CCatalogProductSetAll
 				$arProductList = array_keys($arProductInSet);
 				if (!self::$disableCheckProduct)
 				{
-					if (!CCatalogProduct::CheckProducts($arProductList))
+					if ($arFields['TYPE'] == self::TYPE_GROUP)
+					{
+						$checkProductList = $arProductInSet;
+						if ($arFields['ITEM_ID'] > 0)
+							unset($checkProductList[$arFields['ITEM_ID']]);
+						$checkProductList = array_keys($checkProductList);
+					}
+					else
+					{
+						$checkProductList = $arProductList;
+					}
+					if (!CCatalogProduct::CheckProducts($checkProductList))
 					{
 						self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_NOT_PRODUCT'));
 					}
+					unset($checkProductList);
 				}
 				if (empty(self::$arErrors) && self::TYPE_SET == $arFields['TYPE'])
 				{
@@ -517,15 +539,12 @@ class CCatalogProductSetAll
 					{
 						self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SET'));
 					}
-					foreach ($arProductList as &$intOneID)
+					$existSKU = array_filter(CCatalogSKU::getExistOffers($arProductList));
+					if (!empty($existSKU))
 					{
-						if (CCatalogSKU::IsExistOffers($intOneID))
-						{
-							self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SKU'));
-							break;
-						}
+						self::$arErrors[] = array('id' => 'ITEMS', 'text' => GetMessage('BT_CAT_PRODUCT_SET_ERR_ITEMS_IS_SKU'));
 					}
-					unset($intOneID);
+					unset($existSKU);
 				}
 			}
 		}

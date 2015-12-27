@@ -6,9 +6,7 @@
 
 
 /**
- * <b>CFormAnswer</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответами</a>.</body> </html>
- *
- *
+ * <b>CFormAnswer</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответами</a>. 
  *
  *
  * @return mixed 

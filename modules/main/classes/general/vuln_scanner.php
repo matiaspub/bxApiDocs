@@ -229,7 +229,9 @@ class CVulnScanner
 									$arResult[$token_value]['requestInitialization'] = $this->variables[$token_value]->requestInitialization;
 									//break;
 								}
-								/*} else{
+								/*}
+								else
+								{
 									if(!$secure && (in_array($token_value, $this->v_userinput) || (isset($this->variables[$token_value]) && $this->variables[$token_value]->have_user_input && (!$this->variables[$token_value]->secure || $unsecure))))
 									{
 										$arResult[$token_value]['have_user_input'] = true;
@@ -240,14 +242,16 @@ class CVulnScanner
 							}
 						}
 					}
-				} elseif($cur_brace === -1 && $token === T_STRING
+				}
+				elseif($cur_brace === -1 && $token === T_STRING
 					&& in_array($token_value, $this->sec_func['INSTRING'])
 				)
 				{
 					$unsecure = true;
 					$secure = false;
 					$cur_brace = $braces;
-				} elseif(!$unsecure && ($token === T_STRING
+				}
+				elseif(!$unsecure && ($token === T_STRING
 					&& (
 						in_array($token_value, $this->sec_func['SECURES_ALL'])
 							|| in_array($token_value, $this->sec_func['STRING'])
@@ -263,18 +267,22 @@ class CVulnScanner
 					$cur_brace = $braces;
 					$braces++;
 					$i++;
-				} elseif($token === T_ISSET || ($token === T_STRING && substr($token_value, 0, 3) === 'is_')) 
+				}
+				elseif($token === T_ISSET || ($token === T_STRING && substr($token_value, 0, 3) === 'is_'))
 				{
 					$skip = true;
 				}
-			} elseif($braces === 1 && $tokens[$i] === ', ')
+			}
+			elseif($braces === 1 && $tokens[$i] === ', ')
 			{
 				$c_params++;
 				$skip = false;
-			} elseif($tokens[$i] === '(')
+			}
+			elseif($tokens[$i] === '(')
 			{
 				$braces++;
-			} elseif($tokens[$i] === ')')
+			}
+			elseif($tokens[$i] === ')')
 			{
 				$braces--;
 				if($cur_brace === $braces)
@@ -296,6 +304,7 @@ class CVulnScanner
 				$skip = false;
 			}
 		}
+
 		if(!empty($arResult))
 		{
 			$secure = true;
@@ -320,7 +329,8 @@ class CVulnScanner
 
 			return array($secure, $arResult, $requestInitialization);
 		}
-		else return false;
+
+		return false;
 	}
 
 	private function dependencyHave($tokens, $type)
@@ -369,7 +379,8 @@ class CVulnScanner
 						else
 							$i += $this->getBraceEnd($this->tokens, $i);
 					}
-				} elseif($token === T_STRING && in_array($token_value, $this->init_functions)) 
+				}
+				elseif($token === T_STRING && in_array($token_value, $this->init_functions))
 				{
 					if($this->tokens[$i + 1] === '(' && is_array($this->tokens[$i + 2]) && $this->tokens[$i + 3] === ')')
 						if(isset($this->variables[$val = $this->getVarName($this->tokens[$i + 2])]))
@@ -390,7 +401,8 @@ class CVulnScanner
 							if(!$this->mp_mode) //not done yet
 							{
 								$component_name = '';
-								if($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2][0] === T_CONSTANT_ENCAPSED_STRING) {
+								if($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2][0] === T_CONSTANT_ENCAPSED_STRING)
+								{
 									//if(!empty(substr($this->tokens[$i+2][1], 1, -1)))
 									$component_name = substr($this->tokens[$i + 2][1], 1, -1);
 								}
@@ -404,7 +416,16 @@ class CVulnScanner
 									$inc_file = $this->arParams['doc_root_path'].'/bitrix/components'.$component_name.'/component.php';
 								else
 									continue;
-								//	unset($component_path);
+
+								if(
+									$this->current_file === $inc_file
+									|| in_array($inc_file, $this->file_history)
+								)
+								{
+									// Recursion detected
+									continue;
+								}
+
 								if($this->tokens[$i + 1] === '(' && $this->tokens[$i + 4][0] === T_CONSTANT_ENCAPSED_STRING)
 									$component_template = substr($this->tokens[$i + 4][1], 1, -1);
 								
@@ -416,12 +437,19 @@ class CVulnScanner
 									if(count($scanner->arResult) > 0)
 										$this->arResult = array_merge($this->arResult, $scanner->arResult);
 									$this->vuln_count += $scanner->vuln_count;
-								} else
+								}
+								else
+								{
 									return false;
+								}
+
 								unset($scanner);
 								continue;
-							} else
+							}
+							else
+							{
 								continue;
+							}
 						}
 						//including result_modifier.php
 						elseif($token == T_INCLUDE_RESULT_MODIFIER)
@@ -439,22 +467,29 @@ class CVulnScanner
 									$inc_file = dirname($this->current_file).'/templates/'.$component_template.'/result_modifier.php';
 
 								unset($component_path);
-							} else
+							}
+							else
+							{
 								continue;
+							}
 						}
 						//component template including
-						elseif($token == T_INCLUDE_COMPONENTTEMPLATE) {
-							if(!$this->mp_mode) {
+						elseif($token == T_INCLUDE_COMPONENTTEMPLATE)
+						{
+							if(!$this->mp_mode)
+							{
 								$template_name = 'template';
 								$component_template = (!empty($this->tokens[$i][3]) ? $this->tokens[$i][3] : '.default');
 								$skip = 3;
-								if($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2][0] === T_CONSTANT_ENCAPSED_STRING) {
+								if($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2][0] === T_CONSTANT_ENCAPSED_STRING)
+								{
 									$tmp = substr($this->tokens[$i + 2][1], 1, -1);
 									if(!empty($tmp))
 										$template_name = $tmp;
 									unset($tmp);
 								}
-								elseif($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2] === ')') {
+								elseif($this->tokens[$i + 1] === '(' && $this->tokens[$i + 2] === ')')
+								{
 									$skip = 2;
 								}
 								$component_path = array_pop(explode('bitrix/components', dirname($this->current_file)));
@@ -467,8 +502,11 @@ class CVulnScanner
 								
 
 								unset($component_path);
-							} else
+							}
+							else
+							{
 								continue;
+							}
 						}
 						// include('xxx')
 						elseif((($this->tokens[$i + 1] === '('
@@ -478,7 +516,8 @@ class CVulnScanner
 							|| (is_array($this->tokens[$i + 1])
 								&& $this->tokens[$i + 1][0] === T_CONSTANT_ENCAPSED_STRING
 								&& $this->tokens[$i + 2] === ';'))
-						) {
+						)
+						{
 							if($this->tokens[$i + 1] === '(')
 							{
 								$inc_file = substr($this->tokens[$i + 2][1], 1, -1);
@@ -504,10 +543,14 @@ class CVulnScanner
 							$try_file = dirname($this->current_file).'/'.$inc_file;
 
 						}
+
 						//not including bitrix core, too hard:(
 						if(is_file($try_file) && !preg_match($this->arParams['PREG_FOR_SKIP_INCLUDE'], $inc_file))
 						{
-							if(!in_array(realpath($try_file), $this->file_history))
+							if(
+								$this->current_file !== realpath($try_file) // Circle including
+								&& !in_array(realpath($try_file), $this->file_history)
+							)
 							{
 								if($file = file_get_contents($try_file))
 								{
@@ -521,6 +564,7 @@ class CVulnScanner
 								}
 							}
 						}
+						unset($try_file);
 					}
 					//////TAINT ANALYSIS//////////
 					if(isset($this->scan_functions[$token_value])
@@ -670,8 +714,11 @@ class CVulnScanner
 									if($res === false)
 										$var_name .='['.self::tokenToString($token[3][$i]).']';
 					*/
-				} else
+				}
+				else
+				{
 					$var_name .= '['.$token[3][$i].']';
+				}
 			}
 		}
 		return $var_name;
@@ -700,7 +747,8 @@ class CVulnScanner
 
 		$dependencies = array();
 		/*TODO: Use dependency to detect overwritten variable!
-		* foreach ($this->dependencies as $dep_line => $dependency) {
+		* foreach ($this->dependencies as $dep_line => $dependency)
+		{
 			if(!empty($dependency))
 				$dependencies[$dep_line] = $dependency;
 		}*/
@@ -725,8 +773,11 @@ class CVulnScanner
 				$var->requestInitialization = false;
 			$var->newDeclare($id, $line, $start, $end, $tokens, $this->comment.$comment, $dependencies, $taintedVars);
 			$this->variables[$varName] = $var;
-		} elseif(isset($this->variables[$varName]))
+		}
+		elseif(isset($this->variables[$varName]))
+		{
 			unset($this->variables[$varName]); //TODO: Fix this, with dependency overwritten!
+		}
 	}
 
 	public function tokenize($code, $component_template = '')
@@ -825,8 +876,11 @@ class CVulnScanner
 						unset($tokens[$j]);
 					$i += $f;
 				}
-			} elseif($tokens[$i] === '@')
+			}
+			elseif($tokens[$i] === '@')
+			{
 				unset($tokens[$i]);
+			}
 		}
 
 		return array_values($tokens);
@@ -873,7 +927,8 @@ class CVulnScanner
 						array_slice($tokens, 0, $i + 1), array('('), array_slice($tokens, $i + 1)
 					);
 				}
-			} elseif(is_array($tokens[$i]))
+			}
+			elseif(is_array($tokens[$i]))
 			{
 				if(is_array($tokens[$i]) && (self::strtolower($tokens[$i][1]) === 'includecomponenttemplate' || self::strtolower($tokens[$i][1]) === 'initcomponenttemplate'))
 				{
@@ -883,11 +938,13 @@ class CVulnScanner
 					$tmp = array(array(T_INCLUDE_RESULT_MODIFIER, 'include_result_modifier', $tokens[$i][2], $component_template));
 					array_splice($tokens, $i - 1, 0, $tmp);
 					$i++;
-				} elseif(is_array($tokens[$i]) && (self::strtolower($tokens[$i][1]) == 'includecomponent'))
+				}
+				elseif(is_array($tokens[$i]) && (self::strtolower($tokens[$i][1]) == 'includecomponent'))
 				{
 					$tokens[$i][1] = self::strtolower($tokens[$i][1]);
 					$tokens[$i][0] = T_INCLUDE_COMPONENT;
-				} elseif(($tokens[$i][0] === T_IF || $tokens[$i][0] === T_ELSEIF || $tokens[$i][0] === T_FOR
+				}
+				elseif(($tokens[$i][0] === T_IF || $tokens[$i][0] === T_ELSEIF || $tokens[$i][0] === T_FOR
 					|| $tokens[$i][0] === T_FOREACH || $tokens[$i][0] === T_WHILE) && $tokens[$i + 1] === '('
 				)
 				{
@@ -938,7 +995,8 @@ class CVulnScanner
 							}
 						}
 						$tokens = $this->wrapBraces($tokens, $i + $f + 1, $c + 1, $i + $f + $c + 2);
-					} elseif($tokens[$i + $f] !== '{' && $tokens[$i + $f] !== ';')
+					}
+					elseif($tokens[$i + $f] !== '{' && $tokens[$i + $f] !== ';')
 					{
 						$c = 1;
 						while ($tokens[$i + $f + $c] !== ';' && $c < $max)
@@ -947,29 +1005,37 @@ class CVulnScanner
 						}
 						$tokens = $this->wrapBraces($tokens, $i + $f, $c + 1, $i + $f + $c + 1);
 					}
-				} elseif($tokens[$i][0] === T_ELSE
+				}
+				elseif($tokens[$i][0] === T_ELSE
 					&& $tokens[$i + 1][0] !== T_IF
 					&& $tokens[$i + 1] !== '{'
-				) {
+				)
+				{
 					$f = 2;
 					while ($tokens[$i + $f] !== ';' && $f < $max)
 					{
 						$f++;
 					}
 					$tokens = $this->wrapBraces($tokens, $i + 1, $f, $i + $f + 1);
-				} elseif($tokens[$i][0] === T_SWITCH && $tokens[$i + 1] === '(')
+				}
+				elseif($tokens[$i][0] === T_SWITCH && $tokens[$i + 1] === '(')
 				{
 					$braces = 1;
 					$c = 2;
-					while ($braces !== 0) {
+					while ($braces !== 0)
+					{
 						if($tokens[$i + $c] === '(')
 						{
 							$braces++;
-						} elseif($tokens[$i + $c] === ')')
+						}
+						elseif($tokens[$i + $c] === ')')
 						{
 							$braces--;
-						} elseif(!isset($tokens[$i + $c]) || $tokens[$i + $c] === ';')
+						}
+						elseif(!isset($tokens[$i + $c]) || $tokens[$i + $c] === ';')
+						{
 							break;
+						}
 						$c++;
 					}
 					if($tokens[$i + $c] === ':')
@@ -1031,7 +1097,8 @@ class CVulnScanner
 						}
 						$i++;
 					}
-				} elseif($tokens[$i][0] === T_DEFAULT
+				}
+				elseif($tokens[$i][0] === T_DEFAULT
 					&& $tokens[$i + 2] !== '{'
 				)
 				{
@@ -1053,10 +1120,12 @@ class CVulnScanner
 				elseif($tokens[$i][0] === T_FUNCTION)
 				{
 					$tokens[$i + 1][1] = self::strtolower($tokens[$i + 1][1]);
-				} elseif($tokens[$i][0] === T_STRING && $tokens[$i + 1] === '(')
+				}
+				elseif($tokens[$i][0] === T_STRING && $tokens[$i + 1] === '(')
 				{
 					$tokens[$i][1] = self::strtolower($tokens[$i][1]);
-				} elseif($tokens[$i][0] === T_DO)
+				}
+				elseif($tokens[$i][0] === T_DO)
 				{
 					$f = 2;
 					$otherDOs = 0;
@@ -1110,22 +1179,31 @@ class CVulnScanner
 				while ($has_more_keys && $index < 20)
 				{
 					$index++;
-					if(($tokens[$i + $c][0] === T_CONSTANT_ENCAPSED_STRING || $tokens[$i + $c][0] === T_LNUMBER || $tokens[$i + $c][0] === T_NUM_STRING) && $tokens[$i + $c + 1] === ']') {
+					if(($tokens[$i + $c][0] === T_CONSTANT_ENCAPSED_STRING || $tokens[$i + $c][0] === T_LNUMBER || $tokens[$i + $c][0] === T_NUM_STRING) && $tokens[$i + $c + 1] === ']')
+					{
 						unset($tokens[$i + $c - 1]);
 						$tokens[$i][3][$index] = str_replace(array('"', "'"), '', $tokens[$i + $c][1]);
 						unset($tokens[$i + $c]);
 						unset($tokens[$i + $c + 1]);
 						$c += 2;
-					} else {
+					}
+					else
+					{
 						$tokens[$i][3][$index] = array();
 						$braces = 1;
 						unset($tokens[$i + $c - 1]);
-						while ($braces !== 0 && $c < 100) {
-							if($tokens[$i + $c] === '[') {
+						while ($braces !== 0 && $c < 100)
+						{
+							if($tokens[$i + $c] === '[')
+							{
 								$braces++;
-							} elseif($tokens[$i + $c] === ']') {
+							}
+							elseif($tokens[$i + $c] === ']')
+							{
 								$braces--;
-							} else {
+							}
+							else
+							{
 								$tokens[$i][3][$index][] = $tokens[$i + $c];
 							}
 							unset($tokens[$i + $c]);
@@ -1150,8 +1228,10 @@ class CVulnScanner
 		$max = count($tokens);
 		$i = 0;
 
-		while ($i < $max) {
-			if($tokens[$i] === '?') {
+		while ($i < $max)
+		{
+			if($tokens[$i] === '?')
+			{
 				unset($tokens[$i]);
 
 				$k = 1;
@@ -1214,7 +1294,8 @@ class CVulnScanner
 				{
 
 					$value .= substr($tokens[$i][1], 1, -1);
-				} elseif($tokens[$i][0] === T_ENCAPSED_AND_WHITESPACE)
+				}
+				elseif($tokens[$i][0] === T_ENCAPSED_AND_WHITESPACE)
 				{
 					$value .= $tokens[$i][1];
 				}
@@ -1223,10 +1304,12 @@ class CVulnScanner
 				)
 				{
 					$value = dirname($file_name).'/';
-				} elseif($tokens[$i][0] === T_LNUMBER || $tokens[$i][0] === T_DNUMBER || $tokens[$i][0] === T_NUM_STRING)
+				}
+				elseif($tokens[$i][0] === T_LNUMBER || $tokens[$i][0] === T_DNUMBER || $tokens[$i][0] === T_NUM_STRING)
 				{
 					$value .= round($tokens[$i][1]);
-				} elseif($tokens[$i][0] === T_AS)
+				}
+				elseif($tokens[$i][0] === T_AS)
 				{
 					break;
 				}
@@ -1246,7 +1329,8 @@ class CVulnScanner
 			if($tokens[$i + $c] === '(')
 			{
 				$braces++;
-			} elseif($tokens[$i + $c] === ')')
+			}
+			elseif($tokens[$i + $c] === ')')
 			{
 				$braces--;
 			}
@@ -1279,7 +1363,8 @@ class CVulnScanner
 						$result .= '<span style="color: #0000BB;">'.$key.'</span>';
 					else
 						$result .= '<span style="color: #DD0000;">\''.htmlentities($key, ENT_QUOTES, 'utf-8').'\'</span>';
-				} else
+				}
+				else
 				{
 					foreach ($key as $token)
 					{
@@ -1332,7 +1417,8 @@ class CVulnScanner
 				if(in_array($token[0], $this->tokens_type['SPACE_WRAP']) || in_array($token[0], $this->tokens_type['OPERATOR']) || in_array($token[0], $this->tokens_type['ASSIGNMENT']))
 				{
 					$output .= '&nbsp;<span style="color: '.$this->getColor($token[0]).";\">{$token[1]}</span>&nbsp;";
-				} else
+				}
+				else
 				{
 					$text = htmlentities($token[1], ENT_QUOTES, 'utf-8');
 					$text = str_replace(array(' ', "\n"), '&nbsp;', $text);
@@ -1483,7 +1569,8 @@ class CVulnScanner
 
 	private static function searchSimilarVuln($output, $max)
 	{
-		for ($i = 0; $i < $max; $i++) {
+		for ($i = 0; $i < $max; $i++)
+		{
 			if(($output[$i]->name === $output[$i]->name) && ($output[$i]->filename === $output[$i]->filename) && $output[$i]->tainted_vars === $output[$max]->tainted_vars)
 				return $i;
 		}
@@ -1609,7 +1696,8 @@ class CQAACheckListTests
 						if(is_dir($name))
 						{
 							$arResult = array_merge($arResult, self::getFiles($name, $skip_preg, $filetypes, $doc_root));
-						} elseif(in_array(substr($name, -4), $filetypes))
+						}
+						elseif(in_array(substr($name, -4), $filetypes))
 						{
 							$arResult[] = $name;
 						}
@@ -1623,13 +1711,13 @@ class CQAACheckListTests
 	static private function defineScanParams()
 	{
 		if(!defined('T_INCLUDE_RESULT_MODIFIER'))
-			;// define('T_INCLUDE_RESULT_MODIFIER', 10001);
+			// define('T_INCLUDE_RESULT_MODIFIER', 10001);
 		if(!defined('T_INCLUDE_COMPONENTTEMPLATE'))
-			;// define('T_INCLUDE_COMPONENTTEMPLATE', 10002);
+			// define('T_INCLUDE_COMPONENTTEMPLATE', 10002);
 		if(!defined('T_INCLUDE_COMPONENT'))
-			;// define('T_INCLUDE_COMPONENT', 10003);
+			// define('T_INCLUDE_COMPONENT', 10003);
 		if(!defined('T_INCLUDE_END'))
-			;// define('T_INCLUDE_END', 10004);
+			// define('T_INCLUDE_END', 10004);
 		$SKIPDIR = array(// skipping directories
 			'lang',
 			'help',
@@ -2145,7 +2233,8 @@ class CQAACheckListTests
 						$NS['MESSAGE'][$NS['CUR_FILE_ID']]['OUTPUT'] = $scan->getOutput();
 					}
 					$NS['CUR_FILE_ID']++;
-				} else
+				}
+				else
 				{
 					if($NS['STUCK_FILE'] === $NS['CUR_FILE_ID'])
 					{
@@ -2155,7 +2244,9 @@ class CQAACheckListTests
 					else
 						$NS['STUCK_FILE'] = $NS['CUR_FILE_ID'];
 				}
-			} else {
+			}
+			else
+			{
 				$NS['CUR_FILE_ID']++;
 			}
 
@@ -2193,7 +2284,8 @@ class CQAACheckListTests
 			);
 		}
 		}
-		else {
+		else
+		{
 			$arResult = Array(
 				'MESSAGE' => Array(
 					'PREVIEW' => GetMessage('VULNSCAN_TOKENIZER_NOT_INSTALLED'),

@@ -1,11 +1,10 @@
 <?
+/** global array $CATALOG_BASE_GROUP */
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/cataloggroup.php");
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -18,18 +17,12 @@ class CCatalogGroup extends CAllCatalogGroup
 {
 	
 	/**
-	* <p>Функция возвращает параметры типа цен с кодом ID, включая языкозависимые параметры для языка lang.</p>
-	*
-	*
+	* <p>Метод возвращает параметры типа цен с кодом ID, включая языкозависимые параметры для языка lang. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код типа цены.
 	*
-	*
-	*
 	* @param string $lang = LANGUAGE_ID Код языка, по умолчанию равен текущему языку.
-	*
-	*
 	*
 	* @return array <p>Возвращает ассоциативный массив со следующими ключами:</p> <table
 	* class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> <th width="15%">С
@@ -46,7 +39,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* изменившего тип цен.</td> <td>12.5.5</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
 	* последнего изменения типа цен.</td> <td>12.5.5</td> </tr> <tr> <td>DATE_CREATE</td>
 	* <td>Дата создания типа цен.</td> <td>12.5.5</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -66,8 +58,8 @@ class CCatalogGroup extends CAllCatalogGroup
 	*/
 	public static function GetByID($ID, $lang = LANGUAGE_ID)
 	{
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		global $DB, $USER;
@@ -80,7 +72,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			"FROM b_catalog_group CG ".
 			"	LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$strUserGroups.") AND CGG.BUY <> 'Y') ".
 			"	LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$strUserGroups.") AND CGG1.BUY = 'Y') ".
-			"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($lang)."') ".
+			"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".$DB->ForSql($lang)."') ".
 			"WHERE CG.ID = ".$ID." GROUP BY CG.ID, CG.NAME, CG.BASE, CG.XML_ID, CG.MODIFIED_BY, CG.CREATED_BY, CG.DATE_CREATE, CG.TIMESTAMP_X, CGL.NAME";
 
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -91,9 +83,7 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция добавляет новый тип цен. При этом сохраняются как языкозависимые параметры типа, так и параметры, которые не зависят от языка. Так же есть возможность указать группы пользователей, члены которых могут просматривать и покупать товары по ценам этого типа. </p>
-	*
-	*
+	* <p>Метод добавляет новый тип цен. При этом сохраняются как языкозависимые параметры типа, так и параметры, которые не зависят от языка. Так же есть возможность указать группы пользователей, члены которых могут просматривать и покупать товары по ценам этого типа. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров типа цены, ключами которого
@@ -111,11 +101,8 @@ class CCatalogGroup extends CAllCatalogGroup
 	* цены, ключами которого являются коды языков, а значениями -
 	* названия этого типа цены на соответствующем языке. </li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращает код добавленного типа цены или <i>false</i> в случае
 	* ошибки </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -145,11 +132,7 @@ class CCatalogGroup extends CAllCatalogGroup
 	*/
 	public static function Add($arFields)
 	{
-		global $DB;
-		global $CACHE_MANAGER;
-		global $stackCacheManager;
-
-		$groupID = 0;
+		global $DB, $CACHE_MANAGER, $stackCacheManager;
 
 		foreach(GetModuleEvents("catalog", "OnBeforeGroupAdd", true) as $arEvent)
 		{
@@ -182,7 +165,7 @@ class CCatalogGroup extends CAllCatalogGroup
 		$strSql = "INSERT INTO b_catalog_group(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$groupID = intval($DB->LastID());
+		$groupID = (int)$DB->LastID();
 
 		foreach ($arFields["USER_GROUP"] as &$intValue)
 		{
@@ -205,7 +188,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			foreach ($arFields["USER_LANG"] as $key => $value)
 			{
 				$strSql =
-					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) VALUES(".$groupID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
+					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LANG, NAME) VALUES(".$groupID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
@@ -234,14 +217,10 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция изменяет параметры типа цены с кодом ID на значения из массива arFields. При этом сохраняются как языкозависимые параметры типа, так и параметры, которые не зависят от языка. Так же есть возможность указать группы пользователей, члены которых могут просматривать и покупать товары по ценам этого типа. </p>
-	*
-	*
+	* <p>Метод изменяет параметры типа цены с кодом ID на значения из массива arFields. При этом сохраняются как языкозависимые параметры типа, так и параметры, которые не зависят от языка. Так же есть возможность указать группы пользователей, члены которых могут просматривать и покупать товары по ценам этого типа. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код изменяемого типа цены.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров типа цены, ключами которого
 	* являются названия параметров, а значениями - новые значения.
@@ -256,11 +235,8 @@ class CCatalogGroup extends CAllCatalogGroup
 	* являются коды языков, а значениями - названия этого типа цены на
 	* соответствующем языке.</li> </ul>
 	*
-	*
-	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного изменения параметров типа
 	* цени и <i>false</i> - в случае ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -289,12 +265,10 @@ class CCatalogGroup extends CAllCatalogGroup
 	*/
 	public static function Update($ID, $arFields)
 	{
-		global $DB;
-		global $CACHE_MANAGER;
-		global $stackCacheManager;
+		global $DB, $CACHE_MANAGER, $stackCacheManager;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		foreach(GetModuleEvents("catalog", "OnBeforeGroupUpdate", true) as $arEvent)
@@ -360,7 +334,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			foreach ($arFields["USER_LANG"] as $key => $value)
 			{
 				$strSql =
-					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LID, NAME) VALUES(".$ID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
+					"INSERT INTO b_catalog_group_lang(CATALOG_GROUP_ID, LANG, NAME) VALUES(".$ID.", '".$DB->ForSql($key)."', '".$DB->ForSql($value)."')";
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
 		}
@@ -384,14 +358,10 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция удаляет тип цены с кодом ID. При этом цены этого типа так же удаляются. Базовый тип цен удалить невозможно. </p>
-	*
-	*
+	* <p>Метод удаляет тип цены с кодом ID. При этом цены этого типа так же удаляются. Базовый тип цен удалить невозможно. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код удаляемого типа цены.
-	*
-	*
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
 	* противном случае </p> <br><br>
@@ -402,13 +372,10 @@ class CCatalogGroup extends CAllCatalogGroup
 	*/
 	public static function Delete($ID)
 	{
-		global $DB;
-		global $CACHE_MANAGER;
-		global $stackCacheManager;
-		global $APPLICATION;
+		global $DB, $CACHE_MANAGER, $stackCacheManager, $APPLICATION;
 
-		$ID = intval($ID);
-		if (0 >= $ID)
+		$ID = (int)$ID;
+		if ($ID <= 0)
 			return false;
 
 		if ($res = CCatalogGroup::GetByID($ID))
@@ -451,9 +418,7 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из типов цен каталога в соответствии со своими параметрами. </p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из типов цен каталога в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -468,8 +433,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи типов цен
 	* каталога. Массив имеет вид: <pre class="syntax">array(
@@ -499,34 +462,25 @@ class CCatalogGroup extends CAllCatalogGroup
 	* равно Y".<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи типов цен каталога.
 	* Массив имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", .
 	* . .)</pre> В качестве "название_поля<i>N</i>" может стоять любое поле
-	* типов цен каталога. <br><br> Если массив пустой, то функция вернет
-	* число записей, удовлетворяющих фильтру.<br><br> Значение по
-	* умолчанию - <i>false</i> - означает, что результат группироваться не
-	* будет.
-	*
-	*
+	* типов цен каталога. <br><br> Если массив пустой, то метод вернет число
+	* записей, удовлетворяющих фильтру.<br><br> Значение по умолчанию -
+	* <i>false</i> - означает, что результат группироваться не будет.
 	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Объект класса CDBResult, содержащий набор ассоциативных массивов с
 	* ключами: </p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
@@ -543,7 +497,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* изменившего тип цен.</td> <td>12.5.5</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
 	* последнего изменения типа цен.</td> <td>12.5.5</td> </tr> <tr> <td>DATE_CREATE</td>
 	* <td>Дата создания типа цен.</td> <td>12.5.5</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -588,7 +541,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			else
 				$arFilter["LID"] = LANGUAGE_ID;
 		}
-		if (!array_key_exists('LID', $arFilter))
+		if (!isset($arFilter['LID']))
 			$arFilter['LID'] = LANGUAGE_ID;
 
 		$strUserGroups = (CCatalog::IsUserExists() ? $USER->GetGroups() : '2');
@@ -608,7 +561,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			"MODIFIED_BY" => array("FIELD" => "CG.MODIFIED_BY", "TYPE" => "int"),
 			"DATE_CREATE" => array("FIELD" => "CG.DATE_CREATE", "TYPE" => "datetime"),
 			"CREATED_BY" => array("FIELD" => "CG.CREATED_BY", "TYPE" => "int"),
-			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".$DB->ForSql($arFilter["LID"], 2)."')"),
+			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".$DB->ForSql($arFilter["LID"], 2)."')"),
 		);
 
 		$arFields["CAN_ACCESS"] = array(
@@ -722,7 +675,7 @@ class CCatalogGroup extends CAllCatalogGroup
 			"GROUP_GROUP_ID" => array("FIELD" => "CG2G.GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 			"GROUP_BUY" => array("FIELD" => "CG2G.BUY", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_group2group CG2G ON (CG.ID = CG2G.CATALOG_GROUP_ID)"),
 
-			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".LANGUAGE_ID."')"),
+			"NAME_LANG" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".LANGUAGE_ID."')"),
 		);
 
 		$arSqls = CCatalog::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
@@ -802,9 +755,7 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция возвращает записи из таблицы связей между типами цен и группами пользователей сайта по фильтру arFilter</p>
-	*
-	*
+	* <p>Метод возвращает записи из таблицы связей между типами цен и группами пользователей сайта по фильтру arFilter. Метод динамичный.</p>
 	*
 	*
 	* @param array $arrayarFilter = Array() Фильтр задается в виде ассоциативного массива, ключами в котором
@@ -815,8 +766,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* данного типа, N - запись о разрешении пользователям данной группы
 	* видеть цены данного типа; </li> <li>ID - код записи</li> </ul>
 	*
-	*
-	*
 	* @return CDBResult <p>Объект класса CDBResult, содержащий набор ассоциативных массивов с
 	* ключами </p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
 	* </tr> <tr> <td>ID</td> <td>Код записи.</td> </tr> <tr> <td>CATALOG_GROUP_ID</td> <td>Код типа
@@ -825,7 +774,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* данной группы покупать товары по ценам данного типа, N - запись о
 	* разрешении пользователям данной группы видеть цены данного
 	* типа.</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -875,9 +823,7 @@ class CCatalogGroup extends CAllCatalogGroup
 
 	
 	/**
-	* <p>Функция возвращает языкозависимые названия типов цен.</p>
-	*
-	*
+	* <p>Метод возвращает языкозависимые названия типов цен. Метод динамичный.</p>
 	*
 	*
 	* @param array $arrayarFilter = Array() Фильтр задается в виде ассоциативного массива, ключами в котором
@@ -885,8 +831,6 @@ class CCatalogGroup extends CAllCatalogGroup
 	* Допустимые ключи:<br><ul> <li>ID - код записи;</li> <li>CATALOG_GROUP_ID - код типа
 	* цен;</li> <li>LID - код языка;</li> <li>NAME - название типа цен в зависимости
 	* от языка интерфейса. </li> </ul>
-	*
-	*
 	*
 	* @return CDBResult <p>Объект класса CDBResult, содержащий набор ассоциативных массивов с
 	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
@@ -905,7 +849,8 @@ class CCatalogGroup extends CAllCatalogGroup
 		$arFields = array(
 			"ID" => array("FIELD" => "CGL.ID", "TYPE" => "int"),
 			"CATALOG_GROUP_ID" => array("FIELD" => "CGL.CATALOG_GROUP_ID", "TYPE" => "int"),
-			"LID" => array("FIELD" => "CGL.LID", "TYPE" => "string"),
+			"LID" => array("FIELD" => "CGL.LANG", "TYPE" => "string"),
+			"LANG" => array("FIELD" => "CGL.LANG", "TYPE" => "string"),
 			"NAME" => array("FIELD" => "CGL.NAME", "TYPE" => "string")
 		);
 

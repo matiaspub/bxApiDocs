@@ -1,11 +1,11 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/location_group.php");
 
+use Bitrix\Sale\Location;
+
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -18,9 +18,7 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 {
 	
 	/**
-	* <p>Функция возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder.</p>
-	*
-	*
+	* <p>Метод возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = Array("NAME"=>"ASC") Ассоциативный массив для указания сортировки результирующего
@@ -32,26 +30,19 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
 	* убыванию.</li> </ul>
 	*
-	*
-	*
 	* @param array $arFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
 	* ключами являются названия параметров группы, а значениями -
 	* условия на значения<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код группы
 	* местоположения.</li> </ul>
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
 	* текущему языку.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
 	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код группы местоположений.</td> </tr> <tr>
 	* <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>NAME</td> <td>Название
 	* группы.</td> </tr> <tr> <td>LID</td> <td>Язык названия.</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -104,8 +95,24 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 				$arSqlSearch[] = "LG.ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
 				break;
 			case "LOCATION":
-				$arSqlSearch[] = "LG.ID = L2LG.LOCATION_GROUP_ID AND L2LG.LOCATION_GROUP_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
-				$arSqlSearchFrom[] = ", b_sale_location2location_group L2LG ";
+
+				if(CSaleLocation::isLocationProMigrated())
+				{
+					try
+					{
+						$class = self::CONN_ENTITY_NAME.'Table';
+						$arSqlSearch[] = "	LG.ID ".($bInvert ? 'not' : '')." in (".$class::getConnectedEntitiesQuery(IntVal($val), 'id', array('select' => array('ID'))).") ";
+					}
+					catch(Exception $e)
+					{
+					}
+				}
+				else
+				{
+					$arSqlSearch[] = "LG.ID = L2LG.LOCATION_GROUP_ID AND L2LG.LOCATION_GROUP_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
+					$arSqlSearchFrom[] = ", b_sale_location2location_group L2LG ";
+				}
+
 				break;
 			}
 		}
@@ -169,19 +176,13 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Функция возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang </p>
-	*
-	*
+	* <p>Метод возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang. Метод динамичный. </p>
 	*
 	*
 	* @param int $ID  Код группы местоположений.
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
 	* текущему языку.
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
 	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
@@ -214,9 +215,7 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Функция добавляет новую группу местоположений с параметрами из массива arFields. </p>
-	*
-	*
+	* <p>Метод добавляет новую группу местоположений с параметрами из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Массив значений параметров группы местоположений, ключами в
@@ -227,11 +226,8 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 	* вид <pre class="syntax"> array("LID"=&gt;"язык параметров", "NAME"=&gt;"Название
 	* группы")</pre> </li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -261,6 +257,9 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 		if (!CSaleLocationGroup::CheckFields("ADD", $arFields))
 			return false;
 
+		// make IX_B_SALE_LOC_GROUP_CODE feel happy
+		$arFields['CODE'] = 'randstr'.rand(999, 999999);
+
 		$db_events = GetModuleEvents("sale", "OnBeforeLocationGroupAdd");
 		while ($arEvent = $db_events->Fetch())
 			if (ExecuteModuleEventEx($arEvent, array($arFields))===false)
@@ -275,6 +274,9 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 		$ID = IntVal($DB->LastID());
 
+		// make IX_B_SALE_LOC_CODE feel happy
+		Location\GroupTable::update($ID, array('CODE' => $ID));
+
 		$countFieldLang = count($arFields["LANG"]);
 		for ($i = 0; $i < $countFieldLang; $i++)
 		{
@@ -286,41 +288,57 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		$strSqlHead ="INSERT INTO b_sale_location2location_group (LOCATION_ID, LOCATION_GROUP_ID) VALUES ";
-		$strSqlHeadLength = strlen($strSqlHead);
-
-		$res = $DB->Query('SHOW VARIABLES LIKE \'max_allowed_packet\'');
-		$maxPack = $res->Fetch();
-
-		if(isset($maxPack["Value"]))
-			$max_allowed_packet = $maxPack["Value"]-$strSqlHeadLength-100;
-		else
-			$max_allowed_packet = 0;
-
-		$tmpSql = '';
-		$strSql = '';
-		$countFieldLoc = count($arFields["LOCATION_ID"]);
-		for ($i = 0; $i < $countFieldLoc; $i++)
+		if(CSaleLocation::isLocationProMigrated())
 		{
-			$tmpSql ="(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
-			$strSqlLen = strlen($strSql);
-
-			if($strSqlHeadLength + $strSqlLen + strlen($tmpSql) < $max_allowed_packet || $max_allowed_packet <= 0)
+			try
 			{
-				if($strSqlLen > 0)
-					$strSql .=",";
-
-				$strSql .= $tmpSql;
+				$entityClass = self::CONN_ENTITY_NAME.'Table';
+				$entityClass::resetMultipleForOwner($ID, array(
+					Location\Connector::DB_LOCATION_FLAG => $entityClass::normalizeLocationList($arFields["LOCATION_ID"])
+				));
 			}
-			else
+			catch(Exception $e)
 			{
-				$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$strSql = $tmpSql;
 			}
 		}
+		else
+		{
+			$strSqlHead ="INSERT INTO b_sale_location2location_group (LOCATION_ID, LOCATION_GROUP_ID) VALUES ";
+			$strSqlHeadLength = strlen($strSqlHead);
 
-		if(strlen($strSql) > 0)
-			$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$res = $DB->Query('SHOW VARIABLES LIKE \'max_allowed_packet\'');
+			$maxPack = $res->Fetch();
+
+			if(isset($maxPack["Value"]))
+				$max_allowed_packet = $maxPack["Value"]-$strSqlHeadLength-100;
+			else
+				$max_allowed_packet = 0;
+
+			$tmpSql = '';
+			$strSql = '';
+			$countFieldLoc = count($arFields["LOCATION_ID"]);
+			for ($i = 0; $i < $countFieldLoc; $i++)
+			{
+				$tmpSql ="(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
+				$strSqlLen = strlen($strSql);
+
+				if($strSqlHeadLength + $strSqlLen + strlen($tmpSql) < $max_allowed_packet || $max_allowed_packet <= 0)
+				{
+					if($strSqlLen > 0)
+						$strSql .=",";
+
+					$strSql .= $tmpSql;
+				}
+				else
+				{
+					$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$strSql = $tmpSql;
+				}
+			}
+
+			if(strlen($strSql) > 0)
+				$DB->Query($strSqlHead.$strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		}
 
 		$events = GetModuleEvents("sale", "OnLocationGroupAdd");
 		while ($arEvent = $events->Fetch())

@@ -18,6 +18,7 @@ Loc::loadMessages(__FILE__);
 
 class ConfigMap
 {
+	const VERSION = 1.0;
 	private static $configMap;
 	private static $configDescription;
 

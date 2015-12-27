@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/index.php
  * @author Bitrix
  */
 class CSocNetMessages extends CAllSocNetMessages
@@ -21,9 +19,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	* <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
-	*
-	*
+	* <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров нового сообщения. Может содержать
@@ -32,11 +28,8 @@ class CSocNetMessages extends CAllSocNetMessages
 	* поле),<br><b>DATE_CREATE</b> - дата создания сообщения (обязательное
 	* поле),<br><b>MESSAGE_TYPE</b> - тип сообщения: P - персональное, S - системное.
 	*
-	*
-	*
 	* @return int <p>Метод возвращает ID созданного сообщения в случае успешного
 	* завершения или false в случае ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -54,7 +47,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/Add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -65,15 +58,13 @@ class CSocNetMessages extends CAllSocNetMessages
 		{
 			if ($arFields["MESSAGE_TYPE"] == SONET_MESSAGE_SYSTEM)
 			{
-				if (!(isset($arFields["EMAIL_TEMPLATE"]) && strlen($arFields["EMAIL_TEMPLATE"]) > 0))
-					$arFields["EMAIL_TEMPLATE"] = "SONET_NEW_MESSAGE";
-
 				$ID = CIMNotify::Add($arFields);
-				
 				return $ID;
 			}
 			else
+			{
 				CIMMessenger::SpeedFileDelete($arFields['TO_USER_ID'], IM_SPEED_MESSAGE);
+			}
 		}
 
 		if (defined("INTASK_SKIP_SOCNET_MESSAGES1") && INTASK_SKIP_SOCNET_MESSAGES1)
@@ -136,11 +127,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <p>Метод изменяет параметры сообщения.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Код сообщения.
-	*
-	*
 	*
 	* @param array $arFields  Массив измененных параметров сообщения. Может содержать
 	* ключи:<br><b>FROM_USER_ID</b> - от кого,<br><b>TO_USER_ID</b> - кому,<br><b>MESSAGE</b> -
@@ -149,13 +136,11 @@ class CSocNetMessages extends CAllSocNetMessages
 	* S - системное,<br><b>SEND_MAIL</b> - флаг (Y/N) - сообщение было отправлено по
 	* почте.
 	*
-	*
-	*
 	* @return int <p>Метод возвращает ID сообщения в случае успешного завершения или
 	* false в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/Update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -222,8 +207,6 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <p>Метод возвращает список сообщений в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
@@ -232,8 +215,6 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <b>FROM_USER_LOGIN</b>, <b>FROM_USER_LID</b>, <b>TO_USER_NAME</b>, <b>TO_USER_LAST_NAME</b>, <b>TO_USER_LOGIN</b>,
 	* <b>TO_USER_EMAIL</b>, <b>TO_USER_LID</b>.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: <b>ID</b>, <b>FROM_USER_ID</b>, <b>TO_USER_ID</b>, <b>DATE_CREATE</b>, <b>DATE_VIEW</b>, <b>MESSAGE_TYPE</b>,
@@ -241,20 +222,14 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <b>FROM_USER_LAST_NAME</b>, <b>FROM_USER_LOGIN</b>, <b>FROM_USER_LID</b>, <b>TO_USER_NAME</b>, <b>TO_USER_LAST_NAME</b>,
 	* <b>TO_USER_LOGIN</b>, <b>TO_USER_EMAIL</b>, <b>TO_USER_LID</b>.
 	*
-	*
-	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
 	* произведена группировка. Если параметр содержит пустой массив,
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
@@ -262,24 +237,19 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <b>MESSAGE_TYPE</b>, <b>FROM_DELETED</b>, <b>TO_DELETED</b>. В массиве допустимы любые поля
 	* из списка полей.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() 
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
 	* удовлетворяющие условию выборки.</p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getbyid.php">CSocNetMessages::GetById</a>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getbyid.php">CSocNetMessages::GetById</a>
 	* </li> </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetList.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/GetList.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
@@ -310,34 +280,34 @@ class CSocNetMessages extends CAllSocNetMessages
 		$online_interval = (array_key_exists("ONLINE_INTERVAL", $arFilter) && intval($arFilter["ONLINE_INTERVAL"]) > 0 ? $arFilter["ONLINE_INTERVAL"] : 120);
 
 		static $arFields = array(
-			"ID" 						=> Array("FIELD" => "M.ID", "TYPE" => "int"),
-			"FROM_USER_ID" 				=> Array("FIELD" => "M.FROM_USER_ID", "TYPE" => "int"),
-			"TO_USER_ID" 				=> Array("FIELD" => "M.TO_USER_ID", "TYPE" => "int"),
-			"TITLE" 					=> Array("FIELD" => "M.TITLE", "TYPE" => "string"),
-			"MESSAGE"					=> Array("FIELD" => "M.MESSAGE", "TYPE" => "string"),
-			"DATE_CREATE" 				=> Array("FIELD" => "M.DATE_CREATE", "TYPE" => "datetime"),
-			"DATE_VIEW" 				=> Array("FIELD" => "M.DATE_VIEW", "TYPE" => "datetime"),
-			"MESSAGE_TYPE" 				=> Array("FIELD" => "M.MESSAGE_TYPE", "TYPE" => "string"),
-			"FROM_DELETED" 				=> Array("FIELD" => "M.FROM_DELETED", "TYPE" => "string"),
-			"TO_DELETED" 				=> Array("FIELD" => "M.TO_DELETED", "TYPE" => "string"),
-			"SEND_MAIL" 				=> Array("FIELD" => "M.SEND_MAIL", "TYPE" => "string"),
-			"IS_LOG" 						=> Array("FIELD" => "M.IS_LOG", "TYPE" => "string"),
-			"EMAIL_TEMPLATE" 			=> Array("FIELD" => "M.EMAIL_TEMPLATE", "TYPE" => "string"),
-			"FROM_USER_NAME" 			=> Array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_LAST_NAME" 		=> Array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_SECOND_NAME" 	=> Array("FIELD" => "U.SECOND_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_LOGIN" 			=> Array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_PERSONAL_PHOTO" 	=> Array("FIELD" => "U.PERSONAL_PHOTO", "TYPE" => "int", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_PERSONAL_GENDER"	=> Array("FIELD" => "U.PERSONAL_GENDER", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"FROM_USER_LID" 			=> Array("FIELD" => "U.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
-			"TO_USER_NAME" 				=> Array("FIELD" => "U1.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_LAST_NAME" 		=> Array("FIELD" => "U1.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_SECOND_NAME" 		=> Array("FIELD" => "U1.SECOND_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_LOGIN" 			=> Array("FIELD" => "U1.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_EMAIL" 			=> Array("FIELD" => "U1.EMAIL", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_PERSONAL_PHOTO" 	=> Array("FIELD" => "U1.PERSONAL_PHOTO", "TYPE" => "int", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_PERSONAL_GENDER" 	=> Array("FIELD" => "U1.PERSONAL_GENDER", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
-			"TO_USER_LID" 				=> Array("FIELD" => "U1.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"ID" => Array("FIELD" => "M.ID", "TYPE" => "int"),
+			"FROM_USER_ID" => Array("FIELD" => "M.FROM_USER_ID", "TYPE" => "int"),
+			"TO_USER_ID" => Array("FIELD" => "M.TO_USER_ID", "TYPE" => "int"),
+			"TITLE" => Array("FIELD" => "M.TITLE", "TYPE" => "string"),
+			"MESSAGE" => Array("FIELD" => "M.MESSAGE", "TYPE" => "string"),
+			"DATE_CREATE" => Array("FIELD" => "M.DATE_CREATE", "TYPE" => "datetime"),
+			"DATE_VIEW" => Array("FIELD" => "M.DATE_VIEW", "TYPE" => "datetime"),
+			"MESSAGE_TYPE" => Array("FIELD" => "M.MESSAGE_TYPE", "TYPE" => "string"),
+			"FROM_DELETED" => Array("FIELD" => "M.FROM_DELETED", "TYPE" => "string"),
+			"TO_DELETED" => Array("FIELD" => "M.TO_DELETED", "TYPE" => "string"),
+			"SEND_MAIL" => Array("FIELD" => "M.SEND_MAIL", "TYPE" => "string"),
+			"IS_LOG" => Array("FIELD" => "M.IS_LOG", "TYPE" => "string"),
+			"EMAIL_TEMPLATE" => Array("FIELD" => "M.EMAIL_TEMPLATE", "TYPE" => "string"),
+			"FROM_USER_NAME" => Array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_LAST_NAME" => Array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_SECOND_NAME" => Array("FIELD" => "U.SECOND_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_LOGIN" => Array("FIELD" => "U.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_PERSONAL_PHOTO" => Array("FIELD" => "U.PERSONAL_PHOTO", "TYPE" => "int", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_PERSONAL_GENDER" => Array("FIELD" => "U.PERSONAL_GENDER", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"FROM_USER_LID" => Array("FIELD" => "U.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)"),
+			"TO_USER_NAME" => Array("FIELD" => "U1.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_LAST_NAME" => Array("FIELD" => "U1.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_SECOND_NAME" => Array("FIELD" => "U1.SECOND_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_LOGIN" => Array("FIELD" => "U1.LOGIN", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_EMAIL" => Array("FIELD" => "U1.EMAIL", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_PERSONAL_PHOTO" => Array("FIELD" => "U1.PERSONAL_PHOTO", "TYPE" => "int", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_PERSONAL_GENDER" => Array("FIELD" => "U1.PERSONAL_GENDER", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
+			"TO_USER_LID" => Array("FIELD" => "U1.LID", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)"),
 		);
 		$arFields["FROM_USER_IS_ONLINE"] = Array("FIELD" => "IF(U.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL ".$online_interval." SECOND), 'Y', 'N')", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (M.FROM_USER_ID = U.ID)");
 		$arFields["TO_USER_IS_ONLINE"] = Array("FIELD" => "IF(U1.LAST_ACTIVITY_DATE > DATE_SUB(NOW(), INTERVAL ".$online_interval." SECOND), 'Y', 'N')", "TYPE" => "string", "FROM" => "INNER JOIN b_user U1 ON (M.TO_USER_ID = U1.ID)");
@@ -428,15 +398,9 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <p>Возвращает дату последнего сообщения в переписке между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID1  Первый пользователь. </ht
 	*
-	*
-	*
 	* @param int $userID2  Второй пользователь. </htm
-	*
-	*
 	*
 	* @return string <p>Строка, содержащая дату последнего сообщения между
 	* пользователями в формате YYYY-MM-DD 00:00:00. Если сообщений между
@@ -444,7 +408,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* формате.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getchatlastdate.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getchatlastdate.php
 	* @author Bitrix
 	*/
 	public static 	function GetChatLastDate($currentUserID, $userID)
@@ -489,28 +453,16 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <p>Возвращает сообщения переписки между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $currentUserID  Код текущего пользователя.
 	*
-	*
-	*
 	* @param int $userID  Код второго пользователя.
-	*
-	*
 	*
 	* @param string $date = false Дата, начиная с которой выбираются сообщения. Должна иметь формат
 	* YYYY-MM-DD HH:II:SS. Если задан параметр replyMessId, то дата не учитывается.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Параметр для организации постраничной навигации.
 	*
-	*
-	*
 	* @param int $replyMessId = false Код сообщения, начиная с которого выбираются сообщения.
-	*
-	*
 	*
 	* @return CDBResult <p>Объект типа CDBResult, содержащий сообщения переписки. <br> Каждое
 	* сообщение имеет поля:<br><b>WHO</b> - входящее или исходящее сообщение
@@ -519,14 +471,13 @@ class CSocNetMessages extends CAllSocNetMessages
 	* прочтения,<br><b>DATE_CREATE</b> - дата создания,<br><b>DATE_CREATE_FMT</b> - дата
 	* создания в формате YYYY-MM-DD HH:II:SS. </p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
 	* </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetMessagesForChat.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/GetMessagesForChat.php
 	* @author Bitrix
 	*/
 	public static 	function GetMessagesForChat($currentUserID, $userID, $date = false, $arNavStartParams = false, $replyMessId=false)
@@ -625,20 +576,12 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <p>Возвращает список пользователей, имеющих переписку с данным пользователем.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя. </h
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Параметры постраничной навигации.
 	*
-	*
-	*
 	* @param int $online_interval = 120 Параметр времени опроса сервера в сек. Необязательный параметр.
 	* По умолчанию равен 120.
-	*
-	*
 	*
 	* @return CDBResult <p>Объект типа CDBResult, содержащий список пользователей. Каждое
 	* сообщение имеет поля:<br><b>ID</b> - код пользователя,<br><b>LOGIN</b> - логин
@@ -647,7 +590,6 @@ class CSocNetMessages extends CAllSocNetMessages
 	* пользователя,<br><b>TOTAL</b> - всего сообщений в переписке,<br><b>MAX_DATE</b> -
 	* дата последнего сообщения,<br><b>UNREAD</b> - количество непрочитанных
 	* сообщений. </p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -663,14 +605,13 @@ class CSocNetMessages extends CAllSocNetMessages
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getmessagesusers.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getmessagesusers.php
 	* @author Bitrix
 	*/
 	public static 	function GetMessagesUsers($userID, $arNavStartParams = false, $online_interval = 120)

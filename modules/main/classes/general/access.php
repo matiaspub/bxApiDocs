@@ -104,7 +104,9 @@ class CAccess
 					//are there access codes for the user already?
 					if(!self::CheckUserCodes($provider_id, $USER_ID))
 					{
+						/** @var CGroupAuthProvider $pr For example*/
 						$pr = new $provider["CLASS"];
+
 						//call provider to insert access codes
 						$pr->UpdateCodes($USER_ID);
 
@@ -128,6 +130,7 @@ class CAccess
 			WHERE ID=".$USER_ID
 		);
 		$CACHE_MANAGER->Clean("access_check".$USER_ID, "access_check");
+		$CACHE_MANAGER->Clean("access_codes".$USER_ID, "access_check");
 
 		self::$arChecked[$provider][$USER_ID] = ($res->AffectedRowsCount() > 0);
 	}
@@ -177,6 +180,9 @@ class CAccess
 	{
 		global $DB;
 
+		$access = new CAccess();
+		$access->UpdateCodes(array('USER_ID' => $USER_ID));
+
 		$arWhere = array();
 		foreach($arFilter as $key=>$val)
 		{
@@ -211,10 +217,9 @@ class CAccess
 		global $CACHE_MANAGER;
 		$USER_ID = intval($USER_ID);
 
-		if (
-			CACHED_b_user_access_check !== false
-			&& $CACHE_MANAGER->Read(CACHED_b_user_access_check, "access_codes".$USER_ID, "access_check")
-		)
+		$useCache = (empty($arFilter) && CACHED_b_user_access_check !== false);
+
+		if ($useCache && $CACHE_MANAGER->Read(CACHED_b_user_access_check, "access_codes".$USER_ID, "access_check"))
 		{
 			return $CACHE_MANAGER->Get("access_codes".$USER_ID);
 		}
@@ -225,7 +230,7 @@ class CAccess
 			while($arRes = $res->Fetch())
 				$arCodes[] = $arRes["ACCESS_CODE"];
 
-			if (CACHED_b_user_access_check !== false)
+			if ($useCache)
 				$CACHE_MANAGER->Set("access_codes".$USER_ID, $arCodes);
 
 			return $arCodes;

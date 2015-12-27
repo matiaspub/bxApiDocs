@@ -271,7 +271,7 @@ class CSubscriptionGeneral
 	}
 
 	//check fields before writing
-	public function CheckFields($arFields, $ID, $SITE_ID=SITE_ID)
+	public function CheckFields(&$arFields, $ID, $SITE_ID=SITE_ID)
 	{
 		global $DB, $APPLICATION;
 

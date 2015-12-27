@@ -29,15 +29,5 @@ define('CACHED_b_sec_frame_mask', 36000);
  */
 define('CACHED_b_sec_redirect_url', 36000);
 
-/**
- * ANTIVIRUS_CREATE_TRACE
- */
-define('ANTIVIRUS_CREATE_TRACE', true);
-
-/**
- * BX_SECURITY_AV_STARTED
- */
-define('BX_SECURITY_AV_STARTED', true);
-
 
 ?>

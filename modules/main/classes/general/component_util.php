@@ -137,7 +137,7 @@ class CComponentUtil
 		return false;
 	}
 
-	public static function __GetComponentsTree($filterNamespace = false, $arNameFilter = false)
+	public static function __GetComponentsTree($filterNamespace = false, $arNameFilter = false, $arFilter = false)
 	{
 		$arTree = array();
 		$io = CBXVirtualIo::GetInstance();
@@ -172,10 +172,14 @@ class CComponentUtil
 								$arComponentDescription = array();
 								include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php");
 
+								if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
+									continue;
+
 								if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 								{
 									$arComponent = array();
 									$arComponent["NAME"] = $file;
+									$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
 									$arComponent["NAMESPACE"] = "";
 									$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
 									$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
@@ -237,10 +241,14 @@ class CComponentUtil
 												$arComponentDescription = array();
 												include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php");
 
+												if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
+													continue;
+
 												if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 												{
 													$arComponent = array();
 													$arComponent["NAME"] = $file.":".$file1;
+													$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
 													$arComponent["NAMESPACE"] = $file;
 													$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
 													$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
@@ -331,9 +339,9 @@ class CComponentUtil
 		}
 	}
 
-	public static function GetComponentsTree($filterNamespace = false, $arNameFilter = false)
+	public static function GetComponentsTree($filterNamespace = false, $arNameFilter = false, $arFilter = false)
 	{
-		$arTree = CComponentUtil::__GetComponentsTree($filterNamespace, $arNameFilter);
+		$arTree = CComponentUtil::__GetComponentsTree($filterNamespace, $arNameFilter, $arFilter);
 
 		CComponentUtil::__SortComponentsTree($arTree["#"]);
 
@@ -479,6 +487,7 @@ class CComponentUtil
 				$arComponentParameters["GROUPS"][$arParamKeys[$i]]["SORT"] = 1000+$i;
 		}
 
+		$arVariableAliasesSettings = null;
 		$arParamKeys = array_keys($arComponentParameters["PARAMETERS"]);
 		for ($i = 0, $cnt = count($arParamKeys); $i < $cnt; $i++)
 		{
@@ -544,6 +553,42 @@ class CComponentUtil
 					}
 				}
 			}
+			elseif ($arParamKeys[$i] == "SEF_MODE" && isset($arComponentParameters["PARAMETERS"]["SEF_RULE"]))
+			{
+				$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
+					"NAME" => GetMessage("COMP_GROUP_SEF_MODE"),
+					"SORT" => 500
+				);
+				$arComponentParameters["PARAMETERS"]["SEF_MODE"] = array(
+					"PARENT" => "SEF_MODE",
+					"NAME" => GetMessage("COMP_PROP_SEF_MODE"),
+					"TYPE" => "CHECKBOX",
+					"DEFAULT" => "N",
+				);
+				$arComponentParameters["PARAMETERS"]["SEF_RULE"]["PARENT"] = "SEF_MODE";
+			}
+			elseif ($arParamKeys[$i] == "SEF_RULE")
+			{
+				$arComponentParameters["PARAMETERS"]["SEF_RULE"]["TYPE"] = "TEMPLATES";
+				$arComponentParameters["PARAMETERS"]["SEF_RULE"]["NAME"] = GetMessage("COMP_PARAM_SEF_RULE");
+				if ($arCurrentValues["SEF_MODE"] == "Y")
+				{
+					if (is_array($arComponentParameters["PARAMETERS"]["SEF_RULE"]["VALUES"]))
+					{
+						foreach ($arComponentParameters["PARAMETERS"]["SEF_RULE"]["VALUES"] as $sefRuleValue)
+						{
+							if (
+								is_array($sefRuleValue)
+								&& isset($sefRuleValue["PARAMETER_LINK"])
+								&& isset($arComponentParameters["PARAMETERS"][$sefRuleValue["PARAMETER_LINK"]])
+							)
+							{
+								$arComponentParameters["PARAMETERS"][$sefRuleValue["PARAMETER_LINK"]]["PARENT"] = "SEF_MODE";
+							}
+						}
+					}
+				}
+			}
 			elseif ($arParamKeys[$i] == "SEF_MODE")
 			{
 				$arComponentParameters["GROUPS"]["SEF_MODE"] = array(
@@ -557,9 +602,7 @@ class CComponentUtil
 					"PARENT" => "SEF_MODE",
 					"NAME" => GetMessage("COMP_PROP_SEF_MODE"),
 					"TYPE" => "CHECKBOX",
-					/*"VALUES" => array("N" => GetMessage("COMP_PROP_SEF_MODE_NO"), "Y" => GetMessage("COMP_PROP_SEF_MODE_YES")),*/
 					"DEFAULT" => "N",
-					"ADDITIONAL_VALUES" => "N"
 				);
 				$arComponentParameters["PARAMETERS"]["SEF_FOLDER"] = array(
 					"PARENT" => "SEF_MODE",
@@ -572,6 +615,9 @@ class CComponentUtil
 
 				if (is_array($arSEFModeSettings) && count($arSEFModeSettings) > 0)
 				{
+					if (!isset($arVariableAliasesSettings))
+						$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
+
 					foreach ($arSEFModeSettings as $templateKey => $arTemplateValue)
 					{
 						$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey] = array(
@@ -585,11 +631,20 @@ class CComponentUtil
 							"VARIABLES" => array(),
 						);
 
-						$arVariableAliasesSettings = $arComponentParameters["PARAMETERS"]["VARIABLE_ALIASES"];
 						if (is_array($arVariableAliasesSettings) && count($arVariableAliasesSettings) > 0)
 						{
 							foreach ($arTemplateValue["VARIABLES"] as $variable)
+							{
+								if ($arVariableAliasesSettings[$variable]["TEMPLATE"])
+								{
+									$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey]["TYPE"] = "TEMPLATES";
+									$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey]["VALUES"][$variable] = array(
+										"TEXT" => $arVariableAliasesSettings[$variable]["NAME"],
+										"TEMPLATE" => $arVariableAliasesSettings[$variable]["TEMPLATE"],
+									);
+								}
 								$arComponentParameters["PARAMETERS"]["SEF_URL_TEMPLATES_".$templateKey]["VARIABLES"]["#".$variable."#"] = $arVariableAliasesSettings[$variable]["NAME"];
+							}
 						}
 					}
 				}

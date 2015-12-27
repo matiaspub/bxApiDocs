@@ -716,7 +716,7 @@ class CAllVote
 								$aID = $arAnswer["ID"];
 								$fieldName = ($arAnswer["FIELD_TYPE"] == 4 ? "vote_field_" : "vote_memo_").$aID;
 								$MESSAGE = trim($GLOBALS[$fieldName]);
-								if (!empty($MESSAGE))
+								if ($MESSAGE != "")
 								{
 									$arSqlAnswers[$qID][$aID] = array(
 										"ANSWER_ID" => $aID,
@@ -767,7 +767,7 @@ class CAllVote
 							"	LEFT JOIN b_vote_event_question VEQ ON (VEQ.EVENT_ID=VE.ID)".
 							"	LEFT JOIN b_vote_event_answer VEA ON (VEA.EVENT_QUESTION_ID=VEQ.ID)".
 							"	LEFT JOIN b_vote_user VU ON (VE.VOTE_USER_ID = VU.ID)".
-							" WHERE VE.VOTE_ID=".$VOTE_ID." AND VU.AUTH_USER_ID=".$USER->GetID().
+							" WHERE VE.VOTE_ID=".$VOTE_ID." AND VU.AUTH_USER_ID=".intval($USER->GetID()).
 							" ORDER BY VE.ID ASC, VEQ.QUESTION_ID ASC";
 						$db_res = $DB->Query($strSql, false, $err_mess.__LINE__);
 						if ($db_res && $res = $db_res->Fetch())
@@ -848,7 +848,7 @@ class CAllVote
 								CStatEvent::AddCurrent($arVote["EVENT1"], $arVote["EVENT2"], $event3);
 							}
 							// notification
-							if (!!$arVote["AUTHOR_ID"])
+							if (!!$arVote["AUTHOR_ID"] && $arVote["AUTHOR_ID"] != $USER->GetID())
 							{
 								if (empty($arVote["TITLE"]))
 								{
@@ -867,7 +867,9 @@ class CAllVote
 											$arVote["TOTAL_URL"] = (CMain::IsHTTPS() ? "https" : "http")."://".$arVote["TOTAL_URL"].$arVote["URL"];
 									}
 
+
 									// send notification
+									$gender = ($USER->getParam("PERSONAL_GENDER") == "F" ? "_F" : "");
 									$arMessageFields = array(
 										"MESSAGE_TYPE" => IM_MESSAGE_SYSTEM,
 										"TO_USER_ID" => $arVote["AUTHOR_ID"],
@@ -877,16 +879,16 @@ class CAllVote
 										"NOTIFY_EVENT" => "voting",
 										"NOTIFY_TAG" => "VOTING|".$VOTE_ID,
 										"NOTIFY_MESSAGE" => (!empty($arVote["URL"]) ?
-											GetMessage("V_NOTIFY_MESSAGE_HREF", array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["URL"])) :
-											GetMessage("V_NOTIFY_MESSAGE", array("#VOTE_TITLE#" => $arVote["TITLE"]))),
+											GetMessage("V_NOTIFY_MESSAGE_HREF".$gender, array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["URL"])) :
+											GetMessage("V_NOTIFY_MESSAGE".$gender, array("#VOTE_TITLE#" => $arVote["TITLE"]))),
 										"NOTIFY_MESSAGE_OUT" => (!empty($arVote["TOTAL_URL"]) ?
-											GetMessage("V_NOTIFY_MESSAGE_OUT_HREF", array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["TOTAL_URL"])) :
-											GetMessage("V_NOTIFY_MESSAGE", array("#VOTE_TITLE#" => $arVote["TITLE"])))
+											GetMessage("V_NOTIFY_MESSAGE_OUT_HREF".$gender, array("#VOTE_TITLE#" => $arVote["TITLE"], "#VOTE_URL#" => $arVote["TOTAL_URL"])) :
+											GetMessage("V_NOTIFY_MESSAGE".$gender, array("#VOTE_TITLE#" => $arVote["TITLE"])))
 									);
 
 									CIMNotify::Add($arMessageFields);
 								}
-								else if ($arVote["NOTIFY"] == "Y" && $arVote["AUTHOR_ID"] != $USER->GetID())
+								else if ($arVote["NOTIFY"] == "Y")
 								{
 									// send e-mail
 									$db_user = CUser::GetById($arVote["AUTHOR_ID"]);

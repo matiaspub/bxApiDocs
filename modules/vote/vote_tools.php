@@ -33,19 +33,13 @@ function GetVoteDiagramList()
  * <p>Функция возвращает ID опроса в случае, если такой опрос был найден в базе, а также массивы описывающие опрос.</p>
  *
  *
- *
- *
  * @param int $VOTE_ID  ID опроса.</bo
- *
- *
  *
  * @param array &$arChannel  Массив описывающий группу заданного опроса. <br>Индексы массива:
  * <li> <b>ID</b> - ID группы </li> <li> <b>SYMBOLIC_NAME</b> - символическое имя </li> <li>
  * <b>ACTIVE</b> - флаг активности ["Y"|"N"] </li> <li> <b>TITLE</b> - заголовок группы </li>
  * <li> <b>LID</b> - ID сайта </li> <li> <b>C_SORT</b> - порядок сортировки </li> <li>
  * <b>TIMESTAMP_X</b> - время изменения записи в базе данных </li>
- *
- *
  *
  * @param array &$arVote  Массив описывающий заданный опрос. <br>Индексы массива: <li> <b>ID</b> - ID
  * опроса </li> <li> <b>CHANNEL_ID</b> - ID группы опроса </li> <li> <b>C_SORT</b> - порядок
@@ -71,8 +65,6 @@ function GetVoteDiagramList()
  * установлен и текущая дата попадает в интервал проведения опроса.
  * </li>
  *
- *
- *
  * @param array &$arQuestions  Массив состоящий из массивов каждый из которых описывает один
  * вопрос. <br>Индексы массива: <li> <b>ID</b> - ID вопроса </li> <li> <b>ACTIVE</b> - флаг
  * активности ["Y"|"N"] </li> <li> <b>C_SORT</b> - порядок сортировки </li> <li> <b>QUESTION</b>
@@ -81,8 +73,6 @@ function GetVoteDiagramList()
  * в результирующую диаграмму ["Y"|"N"] </li> <li> <b>TEMPLATE</b> - шаблон для
  * показа результатов вопроса </li> <li> <b>TIMESTAMP_X</b> - дата изменения
  * записи в базе данных </li>
- *
- *
  *
  * @param array &$arAnswers  Массив ответов, его индексами являются ID вопросов, а значениями -
  * список массивов, каждый из которых описывает один ответ.
@@ -98,36 +88,25 @@ function GetVoteDiagramList()
  * дополнительные параметры поля ввода: стиль, класс </li> <li> <b>COLOR</b> -
  * RGB цвета элемента диаграммы (например: #FFOOCC) </li>
  *
- *
- *
  * @param array &$arDropDown  Массив с всеми элементами типа "2" (dropdown list) одного вопроса.
  * Индексом массива является ID вопроса, а значением - массив со
  * следующими индексами: <li> <b>REFERENCE</b> - текст ответа </li> <li> <b>REFERENCE_ID</b>
  * - ID ответа </li>
- *
- *
  *
  * @param array &$arMultiSelect  Массив с всеми элементами типа "3" (multiselect list) одного вопроса.
  * Индексом массива является ID вопроса, а значением - массив со
  * следующими индексами: <li> <b>REFERENCE</b> - текст ответа </li> <li> <b>REFERENCE_ID</b>
  * - ID ответа </li>
  *
- *
- *
  * @param array &$arGroupAnswers  Массив описывающий варианты ответов для элементов ввода типа "4"
  * (text) и "5" (textarea). Индексом массива является ID вопроса, а значением -
  * список массивов со следующими индексами: <li> <b>MESSAGE</b> - текст
  * ответа </li> <li> <b>COUNTER</b> - количество таких ответов </li>
  *
- *
- *
  * @param string $getGroupAnswers  Флаг принимающий следующие значения: "Y" - собирать массив arGroupAnswers;
  * "N" - собирать массив arGroupAnswers не нужно.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -182,6 +161,7 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
 	$arAnswers = array();
 	$arDropDown = array();
 	$arMultiSelect = array();
+	$arAddParams = (is_array($arAddParams) ? $arAddParams : array("bGetMemoStat" => $arAddParams));
 
 	$GLOBALS["VOTE_CACHE_VOTING"][$VOTE_ID] = (is_array($GLOBALS["VOTE_CACHE_VOTING"][$VOTE_ID]) ? $GLOBALS["VOTE_CACHE_VOTING"][$VOTE_ID] : array());
 
@@ -325,16 +305,10 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
  * <p>Функция возвращает ID текущего опроса в группе.</p>
  *
  *
- *
- *
  * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- *
  *
  * @param  $lid  ID сайта. По умолчанию - текущий - константа "LANG". Необязательный
  * параметр.
- *
- *
  *
  * @param  $access  Минимальный уровень доступа к опросу для текущего
  * пользователя:<li>0 - доступ закрыт</li> <li>1 - право на просмотр
@@ -344,10 +318,7 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
  * быть, как минимум, право на просмотр результатов. Необязательный
  * параметр.</li>
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -387,24 +358,15 @@ function GetCurrentVote($GROUP_SID, $site_id=SITE_ID, $access=1)
  * <p>Функция возвращает ID предыдущего опроса в группе.</p>
  *
  *
- *
- *
  * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- *
  *
  * @param  $level  Уровень предыдущего опроса (1 - предыдущий, 2 - пред- предыдущий и
  * т.д.). По умолчанию - 1. Необязательный параметр.
  *
- *
- *
  * @param  $lid  ID сайта. По умолчанию - текущий (константа LANG). Необязательный
  * параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -454,20 +416,13 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  * <p>Функция возвращает выборку из базы по опросам.</p>
  *
  *
- *
- *
  * @param  $GROUP_SYMBOLIC_NAME  Символическое имя группы опросов (по умолчанию функция вернет
  * выборку опросов из всех групп). Необязательный параметр.
- *
- *
  *
  * @param  $strSqlOrder  SQL код, содержащий параметры сортировки для выборки.
  * Необязательный параметр. По умолчанию: "ORDER BY C.C_SORT, C.ID, V.DATE_START desc"
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -634,15 +589,10 @@ function IsUserVoted($PUBLIC_VOTE_ID)
  * <p>Функция возвращает ID первого попавшегося опроса по которому пользователь ещё не голосовал, с учётом прав пользователя, у которого должно быть право "на участие в опросе" (&gt;=2)</p>
  *
  *
- *
- *
  * @param li $d  Сайт группы опросов. По умолчанию - текущий (константа LANG).
  * Необязательный параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -785,19 +735,12 @@ function arrAnswersSort(&$arr, $order="desc")
  * <p>Функция выводит HTML-код текущего опроса группы.</p>
  *
  *
- *
- *
  * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- *
  *
  * @param  $lid  ID сайта. Необязательный параметр. По умолчанию - текущий
  * (константа LANG).
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -853,20 +796,13 @@ function ShowCurrentVoteResults($GROUP_SID, $site_id=SITE_ID)
  * <p>Функция выводит HTML-код формы опроса.</p>
  *
  *
- *
- *
  * @param VOTE_I $D  ID опроса.</bo
- *
- *
  *
  * @param  $template  Имя файла - шаблона для показа опроса. По умолчанию будет
  * использован шаблон, заданный в параметрах опроса. Необязательный
  * параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -961,20 +897,13 @@ function ShowVote($VOTE_ID, $template1="")
  * <p>Функция выводит HTML-код с диаграммой результатов опроса.</p>
  *
  *
- *
- *
  * @param VOTE_I $D  ID опроса.</bo
- *
- *
  *
  * @param  $template  Имя файла - шаблона для показа результатов опроса. По умолчанию
  * будет использован шаблон, заданный в параметрах опроса.
  * Необязательный параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>

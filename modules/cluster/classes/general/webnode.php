@@ -157,6 +157,24 @@ class CClusterWebnode
 				"FIELD_TYPE" => "int",
 				"JOIN" => false,
 			),
+			"NAME" => array(
+				"TABLE_ALIAS" => "w",
+				"FIELD_NAME" => "w.NAME",
+				"FIELD_TYPE" => "string",
+				"JOIN" => false,
+			),
+			"HOST" => array(
+				"TABLE_ALIAS" => "w",
+				"FIELD_NAME" => "w.HOST",
+				"FIELD_TYPE" => "string",
+				"JOIN" => false,
+			),
+			"PORT" => array(
+				"TABLE_ALIAS" => "w",
+				"FIELD_NAME" => "w.PORT",
+				"FIELD_TYPE" => "int",
+				"JOIN" => false,
+			),
 		);
 		$obQueryWhere->SetFields($arFields);
 

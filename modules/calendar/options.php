@@ -119,7 +119,6 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 			'path_to_rm' => $_REQUEST['path_to_rm'],
 			'rm_iblock_type' => $_REQUEST['rm_iblock_type'],
 			'rm_iblock_id' => $_REQUEST['rm_iblock_id'],
-			'vr_iblock_id' => $_REQUEST['vr_iblock_id'],
 			'denied_superpose_types' => array(),
 			'pathes_for_sites' => isset($_REQUEST['pathes_for_sites']),
 			'pathes' => $_REQUEST['pathes'],
@@ -130,6 +129,11 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 			//'comment_allow_remove' =>  isset($_REQUEST['calendar_comment_allow_remove']),
 			//'max_upload_files_in_comments' =>  isset($_REQUEST['calendar_max_upload_files_in_comments'])
 		);
+
+		if (CModule::IncludeModule("video"))
+		{
+			$SET['vr_iblock_id'] = $_REQUEST['vr_iblock_id'];
+		}
 
 		foreach($arTypes as $type)
 		{
@@ -359,7 +363,7 @@ BX.ready(function(){
 		<td><label for="cal_rm_iblock_id"><?= GetMessage("CAL_RM_IBLOCK_ID")?>:</label></td>
 		<td>
 			<select id="cal_rm_iblock_id" name="rm_iblock_id">
-<?if ($SET['rm_iblock_id']):?>
+<?if ($SET['rm_iblock_type']):?>
 	<option value=""><?= GetMessage('CAL_NOT_SET')?></option>
 	<?foreach ($arIB[$SET['rm_iblock_type']] as $iblock_id => $iblock):?>
 		<option value="<?= $iblock_id?>"<? if($iblock_id == $SET['rm_iblock_id']){echo ' selected="selected"';}?>><?= $iblock?></option>
@@ -371,11 +375,13 @@ BX.ready(function(){
 			</select>
 		</td>
 	</tr>
+
+	<?if (CModule::IncludeModule("video")):?>
 	<tr>
 		<td><label for="cal_vr_iblock_id"><?= GetMessage("CAL_VR_IBLOCK_ID")?>:</label></td>
 		<td>
 			<select id="cal_vr_iblock_id" name="vr_iblock_id"">
-<?if ($SET['vr_iblock_id']):?>
+<?if ($SET['rm_iblock_type']):?>
 	<option value=""><?= GetMessage('CAL_NOT_SET')?></option>
 	<?foreach ($arIB[$SET['rm_iblock_type']] as $iblock_id => $iblock):?>
 		<option value="<?= $iblock_id?>"<? if($iblock_id == $SET['vr_iblock_id']){echo ' selected="selected"';}?>><?= $iblock?></option>
@@ -386,6 +392,7 @@ BX.ready(function(){
 			</select>
 		</td>
 	</tr>
+	<?endif?>
 	<?endif?>
 
 
@@ -514,11 +521,7 @@ function changeIblockList(value, index)
 		if (arControls[i])
 			arControls[i].options.length = 0;
 
-		if (!value)
-		{
-			arControls[i].options[0] = new Option('<?= GetMessage('CAL_NOT_SET')?>', '');
-			continue;
-		}
+		arControls[i].options[0] = new Option('<?= GetMessage('CAL_NOT_SET')?>', '');
 
 		for (j in arIblocks[value])
 			arControls[i].options[arControls[i].options.length] = new Option(arIblocks[value][j], j);

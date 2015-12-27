@@ -5,8 +5,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,30 +16,24 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список курсов отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает список курсов, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
-	* @param array $arrayarOrder = Array("TIMESTAMP_X"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
+	* @param array $arrayarOrder = array() Массив для сортировки результата. Массив вида <i>array("поле
 	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
 	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
 	* курса;</li> <li> <b>NAME</b> - название курса;</li> <li> <b>ACTIVE</b> - активность
 	* курса;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>TIMESTAMP_X</b> - дата
 	* изменения курса.</li> </ul> Направление сортировки может принимать
 	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
-	* убыванию;</li> </ul> Необязательный. По умолчанию фильтруется по
-	* убыванию даты изменения курса.
+	* убыванию;</li> </ul>
 	*
+	* @param array $arrayarFields = array() Массив из полей курса для фильтрации результирующего списка.
 	*
-	*
-	* @param array $arrayarFields = Array() Массив полей записей, которые будут возвращены функцией.
-	*
-	*
+	* @param array $arrayarNavParams = array() Массив настроек постраничной навигации.
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -123,7 +115,6 @@ class CCourse
 	* &lt;?endif?&gt;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -273,8 +264,6 @@ class CCourse
 	* <p>Метод добавляет новый курс.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">всех полей</a> курса.
 	* Обязательные поля должны быть заполнены. <br> Дополнительно в поле
@@ -285,12 +274,9 @@ class CCourse
 	* к курсу (см. <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">SetPermission</a>).
 	*
-	*
-	*
 	* @return int <p>Метод возвращает идентификатор добавленного курса, если
 	* добавление прошло успешно. При возникновении ошибки метод вернет
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -326,7 +312,6 @@ class CCourse
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -461,11 +446,7 @@ class CCourse
 	* <p>Метод изменяет параметры курса с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор изменяемого курса.
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">всех полей</a> курса.
@@ -477,12 +458,9 @@ class CCourse
 	* к курсу (см. <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">SetPermission</a>).
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	* возникновении ошибки функция вернет <i>false</i>. При возникновении
+	* возникновении ошибки метод вернет <i>false</i>. При возникновении
 	* ошибки в исключениях будет содержаться текст ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -514,7 +492,6 @@ class CCourse
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -657,18 +634,13 @@ class CCourse
 	 */
 	
 	/**
-	* <p>Метод удаляет курс с идентификатором ID.</p>
-	*
-	*
+	* <p>Метод удаляет курс с идентификатором ID.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Если есть сертификаты, полученные за указанный курс, метод возвратит <i>false</i>.</p> </div>
 	*
 	*
 	* @param int $ID  Идентификатор курса.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления курса, в
 	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -736,15 +708,10 @@ class CCourse
 	* <p>Возвращает поля курса по его коду ID. Учитываются права доступа текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор курса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -759,7 +726,6 @@ class CCourse
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -786,17 +752,12 @@ class CCourse
 	* <p>Возвращает права доступа к учебному курсу с идентификатором COURSE_ID для всех групп пользователей.</p>
 	*
 	*
-	*
-	*
 	* @param int $COURSE_ID  Идентификатор курса.
-	*
-	*
 	*
 	* @return array <p> Массив прав вида Array("ID группы"=&gt;"Право доступа"[, ...]). Право
 	* доступа может принимать значение: "D" - запрещён, "R" - чтение, "W" -
 	* изменение, "X" - полный доступ (изменение + право изменять права
 	* доступа).</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -819,7 +780,6 @@ class CCourse
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -846,15 +806,10 @@ class CCourse
 	* <p>Возвращает список сайтов для учебного курса с идентификатором COURSE_ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $COURSE_ID  Идентификатор курса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -874,7 +829,6 @@ class CCourse
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -967,14 +921,10 @@ class CCourse
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список активных глав и уроков, отсортированный по возрастанию индекса сортировки.</p>
-	*
-	*
+	* <p>Возвращает список активных глав и уроков, отсортированный по возрастанию индекса сортировки.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Возвращаемый список содержит одноименные поля глав и уроков. Обязательные поля списка: ID - идентификатор урока или главы; NAME - название; CHAPTER_ID - идентификатор родительской главы; SORT - индекс сортировки; DEPTH_LEVEL - уровень вложенности; TYPE - тип ("LE" - урок, "CH" - глава). Для вывода остальных полей используйте массив <i>arAddSelectFileds</i>. Метод предназначен для вывода "дерева" курса. Если поля "DETAIL_TEXT", "DETAIL_TEXT_TYPE", "DETAIL_PICTURE" не используются - рекомендуется <i>arAddSelectFileds</i> оставлять пустым (arAddSelectFileds = Array()). </p> </div>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
-	*
-	*
 	*
 	* @param array $arAddSelectFileds = Array("DETAIL_TEXT" Массив дополнительных полей. Допустимые поля:<br><i>PREVIEW_TEXT</i> -
 	* Предварительное описание (анонс);<br><i>PREVIEW_TEXT_TYPE</i> - Тип
@@ -985,19 +935,12 @@ class CCourse
 	* детального просмотра;<br><i>DETAIL_TEXT</i> - Детальное описание;<br> По
 	* умолчанию массив arAddSelectFileds = Array("DETAIL_TEXT", "DETAIL_TEXT_TYPE", "DETAIL_PICTURE");
 	*
-	*
-	*
 	* @param DETAIL_TEXT_TYP $E  
-	*
-	*
 	*
 	* @param DETAIL_PICTUR $E  
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1033,7 +976,6 @@ class CCourse
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1143,15 +1085,10 @@ class CCourse
 	* <p>Возвращает количество дней, часов, минут и секунд в виде строки, содержащихся в <i>seconds</i>.</p>
 	*
 	*
-	*
-	*
 	* @param int $seconds  Количество секунд. </ht
-	*
-	*
 	*
 	* @return string <p>Метод возвращает строку вида "DDдн. HHч. MMмин. SSсек.".</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1453,24 +1390,17 @@ class CCourse
 	 */
 	
 	/**
-	* <p>Функция устанавливает права доступа <i>arPERMISSIONS</i> для учебного курса с идентификатором <i>COURSE_ID</i>.</p>
-	*
-	*
+	* <p>Метод устанавливает права доступа <i>arPERMISSIONS</i> для учебного курса с идентификатором <i>COURSE_ID</i>.</p>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
-	*
-	*
 	*
 	* @param array $arPERMISSIONS  массив вида Array("код группы"=&gt;"право доступа", ....),<br>где <i>право
 	* доступа</i>: <ul> <li>D - доступ запрещён;</li> <li>R - чтение;</li> <li>W -
 	* запись;</li> <li>X - полный доступ (запись + назначение прав доступа на
 	* данный курс).</li> </ul>
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1478,7 +1408,6 @@ class CCourse
 	* CCourse::SetPermission($COURSE_ID, Array("2"=&gt;"R", "3"=&gt;"W"));
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1492,6 +1421,7 @@ class CCourse
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php
 	* @author Bitrix
+	* @deprecated this code can be removed at any time without any notice
 	*/
 	public static function SetPermission ($param1, $param2)
 	{
@@ -1510,15 +1440,10 @@ class CCourse
 	* <p>Возвращает право доступа к учебному курсу с идентификатором <i>courseId</i> для текущего пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $courseId  Идентификатор курса. <br><br> До версии 12.0.0 параметр назывался COURSE_ID.
-	*
-	*
 	*
 	* @return string <p>Символ права доступа: "D" - запрещён, "R" - чтение, "W" - изменение, "X" -
 	* полный доступ (изменение + право изменять права доступа). </p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1528,7 +1453,6 @@ class CCourse
 	*     return false;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1542,6 +1466,7 @@ class CCourse
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/getpermission.php
 	* @author Bitrix
+	* @deprecated this code can be removed at any time without any notice
 	*/
 	public static function GetPermission ($courseId)
 	{

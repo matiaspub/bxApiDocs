@@ -5,10 +5,7 @@
  * <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -76,7 +73,7 @@
  *             
  *             );
  * 
- *             $providersEncoded = CSOAPRequest::encodeValueLight("Providers", $providers);
+ *             $providersEncoded = CXMLCreator::encodeValueLight("Providers", $providers);
  *             $prup-&gt;addChild($providersEncoded);        
  *             
  *             $cserver-&gt;ShowRawResponse($root, true);
@@ -285,10 +282,7 @@ class CWSSOAPResponser extends CSOAPServerResponser
  * <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>

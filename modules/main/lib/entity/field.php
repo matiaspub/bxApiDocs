@@ -136,11 +136,20 @@ abstract class Field
 		$this->entity = $entity;
 	}
 
+	/**
+	 * @param        $value
+	 * @param        $primary
+	 * @param        $row
+	 * @param Result $result
+	 *
+	 * @return Result
+	 * @throws SystemException
+	 */
 	public function validateValue($value, $primary, $row, Result $result)
 	{
 		if ($value instanceof SqlExpression)
 		{
-			return;
+			return $result;
 		}
 
 		$validators = $this->getValidators();
@@ -168,6 +177,8 @@ abstract class Field
 				}
 			}
 		}
+
+		return $result;
 	}
 
 	public function modifyValueBeforeSave($value, $data)
@@ -487,16 +498,11 @@ abstract class Field
 
 	static public function serialize($value)
 	{
-		if (!is_string($value))
-		{
-			$value = serialize($value);
-		}
-
-		return $value;
+		return serialize($value);
 	}
 
 	static public function unserialize($value)
 	{
-		return unserialize($value) ?: array();
+		return unserialize($value);
 	}
 }

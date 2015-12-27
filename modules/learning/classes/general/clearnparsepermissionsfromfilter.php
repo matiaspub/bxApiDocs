@@ -105,8 +105,6 @@ class CLearnParsePermissionsFromFilter
 
 	public function SQLForAccessibleLessons()
 	{
-		$rc = false;
-
 		// SQL exists only if check permissions must be done
 		if ($this->bCheckPerm === false)
 		{
@@ -120,13 +118,29 @@ class CLearnParsePermissionsFromFilter
 		{
 			$this->cachedSQL = $this->oAccess->SQLClauseForAccessibleLessons ($this->requestedOperations);
 
-			if ( ! empty(self::$availableLessons[$this->requestedUserId]) )
+			global $USER;
+			if (is_object($USER) && method_exists($USER, "GetID") && intval($USER->GetID()) > 0)
 			{
-				foreach (self::$availableLessons[$this->requestedUserId] as $lessonId)
+				$rs = CLearningGroup::getList(
+					array(),
+					array(
+						"MEMBER_ID" => intval($USER->GetID()),
+						"ACTIVE" => "Y",
+						"ACTIVE_DATE" => "Y"
+					)
+				);
+
+				$availableCourses = array();
+				while ($group = $rs->fetch())
 				{
-					$this->cachedSQL .= " UNION SELECT " . (int) $lessonId . " AS LESSON_ID 
-						FROM b_learn_lesson 
-						WHERE ID = " . (int) $lessonId;
+					$availableCourses[] = $group["COURSE_LESSON_ID"];
+				}
+
+				if (count($availableCourses) > 0)
+				{
+					$this->cachedSQL .= " UNION SELECT ID as LESSON_ID
+						FROM b_learn_lesson
+						WHERE ID IN (".join(",", $availableCourses).")";
 				}
 			}
 		}
@@ -134,45 +148,8 @@ class CLearnParsePermissionsFromFilter
 		return ($this->cachedSQL);
 	}
 
-
 	public function IsNeedCheckPerm()
 	{
 		return ($this->bCheckPerm);
-	}
-
-
-	public static function registerAvailableCourse($lessonId)
-	{
-		global $USER;
-
-		if (is_object($USER) && method_exists($USER, 'GetID'))
-		{
-			$loggedUserId = (int) $USER->GetID();
-
-			if ( ! isset(self::$availableLessons[$loggedUserId]) )
-				self::$availableLessons[$loggedUserId] = array();
-
-			self::$availableLessons[$loggedUserId][] = (int) $lessonId;
-		}
-	}
-
-
-	public static function isRegisteredAsAvailableCourse($lessonId)
-	{
-		global $USER;
-
-		$isRegistered = false;
-
-		if (is_object($USER) && method_exists($USER, 'GetID'))
-		{
-			$loggedUserId = (int) $USER->GetID();
-
-			if (isset(self::$availableLessons[$loggedUserId]) && is_array(self::$availableLessons[$loggedUserId]))
-			{
-				$isRegistered = in_array($lessonId, self::$availableLessons[$loggedUserId]);
-			}
-		}
-
-		return ($isRegistered);
 	}
 }

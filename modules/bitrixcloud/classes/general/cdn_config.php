@@ -6,6 +6,8 @@ class CBitrixCloudCDNConfig
 	private $active = 0;
 	private $expires = 0; //timestamp
 	private $domain = "";
+	private $https = /*.(bool).*/null;
+	private $optimize = /*.(bool).*/null;
 	private $kernel_rewrite = /*.(bool).*/null;
 	private $content_rewrite = /*.(bool).*/null;
 	private $sites = /*.(array[string]string).*/ array();
@@ -61,16 +63,23 @@ class CBitrixCloudCDNConfig
 	/**
 	 * Loads and parses xml
 	 *
+	 * @param boolean $sendAdditionalInfo Flag to send https and optimize parameters.
+	 *
 	 * @return CBitrixCloudCDNConfig
 	 * @throws CBitrixCloudException
 	 */
-	public function loadRemoteXML()
+	public function loadRemoteXML($sendAdditionalInfo = false)
 	{
 		//Get configuration from remote service
 		$this->sites = CBitrixCloudOption::getOption("cdn_config_site")->getArrayValue();
 		$this->domain = CBitrixCloudOption::getOption("cdn_config_domain")->getStringValue();
+		if ($sendAdditionalInfo)
+		{
+			$this->https = (CBitrixCloudOption::getOption("cdn_config_https")->getStringValue() === "true");
+			$this->optimize = (CBitrixCloudOption::getOption("cdn_config_optimize")->getStringValue() === "true");
+		}
 
-		$web_service = new CBitrixCloudCDNWebService($this->domain);
+		$web_service = new CBitrixCloudCDNWebService($this->domain, $this->optimize, $this->https);
 		$web_service->setDebug($this->debug);
 		$obXML = $web_service->actionGetConfig();
 		//
@@ -186,6 +195,56 @@ class CBitrixCloudCDNConfig
 	static public function isKernelPrefix($prefix)
 	{
 		return preg_match("#^/bitrix/#", $prefix) > 0;
+	}
+	/**
+	 * Returns true if site operates by https.
+	 *
+	 * @return bool
+	 *
+	 */
+	public function isHttpsEnabled()
+	{
+		//It is true by default
+		if(!isset($this->https))
+			$this->https = (CBitrixCloudOption::getOption("cdn_config_https")->getStringValue() === "true");
+		return $this->https;
+	}
+	/**
+	 * Sets flag of the https.
+	 *
+	 * @param bool $https
+	 * @return CBitrixCloudCDNConfig
+	 *
+	 */
+	public function setHttps($https = true)
+	{
+		$this->https = ($https != false);
+		return $this;
+	}
+	/**
+	 * Returns true if resources optimization is enabled.
+	 *
+	 * @return bool
+	 *
+	 */
+	public function isOptimizationEnabled()
+	{
+		//It is true by default
+		if(!isset($this->optimize))
+			$this->optimize = (CBitrixCloudOption::getOption("cdn_config_optimize")->getStringValue() === "true");
+		return $this->optimize;
+	}
+	/**
+	 * Sets flag of the optimization.
+	 *
+	 * @param bool $optimize
+	 * @return CBitrixCloudCDNConfig
+	 *
+	 */
+	public function setOptimization($optimize = true)
+	{
+		$this->optimize = ($optimize != false);
+		return $this;
 	}
 	/**
 	 * Returns flag of the kernel links (/bitrix/ or other) rewrite
@@ -374,6 +433,10 @@ class CBitrixCloudCDNConfig
 		CBitrixCloudOption::getOption("cdn_config_expire_time")->setStringValue((string)$this->expires);
 		CBitrixCloudOption::getOption("cdn_config_domain")->setStringValue($this->domain);
 		CBitrixCloudOption::getOption("cdn_config_site")->setArrayValue($this->sites);
+		if ($this->https !== null)
+			CBitrixCloudOption::getOption("cdn_config_https")->setStringValue($this->https? "true": "false");
+		if ($this->optimize !== null)
+			CBitrixCloudOption::getOption("cdn_config_optimize")->setStringValue($this->optimize? "true": "false");
 		if ($this->content_rewrite !== null)
 			CBitrixCloudOption::getOption("cdn_config_content_rewrite")->setStringValue($this->content_rewrite? "true": "false");
 		if ($this->kernel_rewrite !== null)
@@ -382,6 +445,7 @@ class CBitrixCloudCDNConfig
 		$this->classes->saveOption(CBitrixCloudOption::getOption("cdn_class"));
 		$this->server_groups->saveOption(CBitrixCloudOption::getOption("cdn_server_group"));
 		$this->locations->saveOption(CBitrixCloudOption::getOption("cdn_location"));
+
 		return $this;
 	}
 	/**

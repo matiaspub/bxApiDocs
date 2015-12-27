@@ -49,10 +49,5 @@ define('BX_PULL_SKIP_INIT', true);
  */
 define('NOT_CHECK_FILE_PERMISSIONS', true);
 
-/**
- * BX_MOBILE_LOG
- */
-define('BX_MOBILE_LOG', true);
-
 
 ?>

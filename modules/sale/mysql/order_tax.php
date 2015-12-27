@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order_tax.p
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CSaleOrderTax extends CAllSaleOrderTax
 {
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из налогов заказа в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из налогов заказа в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array("TAX_NAME" Массив, в соответствии с которым сортируются результирующие
@@ -33,8 +29,6 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* имеет несколько элементов, то результирующий набор сортируется
 	* последовательно по каждому элементу (т.е. сначала сортируется по
 	* первому элементу, потом результат сортируется по второму и т.д.).
-	*
-	*
 	*
 	* @param AS $C  Массив, в соответствии с которым фильтруются записи налогов
 	* заказа. Массив имеет вид: <pre class="syntax">array(
@@ -61,8 +55,6 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* ORDER_ID (код налога) равно 125".<br><br> Значение по умолчанию - пустой
 	* массив array() - означает, что результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param  $array  Массив полей, по которым группируются записи вариантов налогов
 	* заказа. Массив имеет вид: <pre class="syntax">array("название_поля1",
 	* "группирующая_функция2" =&gt; "название_поля2", ...)</pre> В качестве
@@ -71,36 +63,26 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
 	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
 	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
+	* суммы.</li> </ul> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param arFilte $r = array() Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arGroupBy = false Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arGroupBy = false Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false 
 	*
-	*
-	*
 	* @param array $arSelectFields = array() Код суммы налогов. </ht
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы с ключами</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
@@ -110,9 +92,8 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* </tr> <tr> <td>APPLY_ORDER</td> <td>Порядок применения.</td> </tr> <tr> <td>CODE</td>
 	* <td>Символьный код налога.</td> </tr> <tr> <td>IS_IN_PRICE</td> <td>Флаг (Y/N) включен
 	* ли налог в цену товара.</td> </tr> <tr> <td>IS_PERCENT</td> <td>Y</td> </tr> </table> <p>Если в
-	* качестве параметра arGroupBy передается пустой массив, то функция
+	* качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -240,9 +221,7 @@ class CSaleOrderTax extends CAllSaleOrderTax
 
 	
 	/**
-	* <p>Функция добавляет новую сумму налога к заказу.</p>
-	*
-	*
+	* <p>Метод добавляет новую сумму налога к заказу. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой записи, ключами в котором
@@ -254,11 +233,8 @@ class CSaleOrderTax extends CAllSaleOrderTax
 	* символьный код налога;</li> <li> <b>IS_PERCENT</b> - должно быть значение "Y";</li>
 	* <li> <b>IS_IN_PRICE</b> - флаг (Y/N) входит ли налог уже в цену товара.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленной суммы налога или <i>false</i> в случае
 	* ошибки. </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -289,6 +265,22 @@ class CSaleOrderTax extends CAllSaleOrderTax
 
 		if (!CSaleOrderTax::CheckFields("ADD", $arFields))
 			return false;
+
+		$dbResult = CSaleOrderTax::GetList(
+			array(),
+			array(
+				"ORDER_ID" => $arFields['ORDER_ID'],
+				"TAX_NAME" => $arFields['TAX_NAME'],
+				"CODE" => $arFields['CODE'],
+			),
+			false,
+			false,
+			array("ID")
+		);
+		if ($dbResult->Fetch())
+		{
+			return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_sale_order_tax", $arFields);
 		$strSql =

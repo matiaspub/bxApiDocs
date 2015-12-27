@@ -8,10 +8,7 @@
  * <p>Если не предполагается использование страниц редактирования результата формы или просмотра списка результатов, то имеет смысл вставить в шаблон ответ веб-формы в обход основного шаблона:</p> <pre class="syntax" id="xmp4A9A280C"><buttononclick> &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt; &lt;?if($FORM-&gt;isFormNote()):?&gt; &lt;?=$FORM-&gt;ShowFormNote()?&gt; &lt;?else:?&gt; &lt;!-- здесь остальной шаблон веб-формы --&gt; &lt;?endif?&gt; </buttononclick></pre> <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -307,13 +304,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "есть ли ошибки валидатора формы".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если в процессе обработки результата формы обнаружены
 	* ошибки. <i>false</i> в противном случае.</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?if($FORM-&gt;isFormErrors()):?&gt;Ошибки: &lt;?=$FORM-&gt;ShowFormErrors()?&gt;&lt;?endif?&gt; </pre></bod
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -347,13 +341,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод отформатированных ошибок валидатора формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает отфоматированный список ошибок валидатора формы.
 	* Если ошибок нет, возвращается пустая строка.</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowFormErrors()?&gt;
 	* </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -394,13 +385,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод неотформатированных ошибок валидатора формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает неотфоматированный список ошибок валидатора формы.
 	* Если ошибок нет, возвращается пустая строка.</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">&lt;font
 	* color="#FF0000"&gt;&lt;?=$FORM-&gt;ShowFormErrorsText()?&gt;&lt;/font&gt;</pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
@@ -433,13 +421,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод отформатированных информационных сообщений формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает отфоматированные информационные сообщения формы
 	* (напр. "Ваша заявка принята"). Если сообщений нет, возвращается
 	* пустая строка.</p> <a name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowFormNote()?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -472,13 +457,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод неотформатированных информационных сообщений формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает неотфоматированные информационные сообщения формы
 	* (напр. "Ваша заявка принята"). Если сообщений нет, возвращается
 	* пустая строка.</p> <a name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowFormNoteText()?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -507,11 +489,8 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "есть ли текстовые заметки".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если у есть текстовые заметки. <i>false</i> в противном
 	* случае.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -520,7 +499,7 @@ class CAllFormOutput extends CFormOutput_old
 	* \\ способ проверить, отправлена ли форма, а затем вывести сообщение об успешной отправке
 	* &lt;? if($FORM-&gt;isFormNote()) //т.е. если сообщение есть, значит нужно его показать, т.е. форма отправлена
 	* {
-	* $FORM-&gt;ShowFormNote();?&gt; //выводим сообщение "Ваша заявка успешно отправлена"
+	* echo $FORM-&gt;ShowFormNote();?&gt; //выводим сообщение "Ваша заявка успешно отправлена"
 	*  }
 	* else //в противном случает выводим саму форму для заполнения
 	* {
@@ -529,7 +508,6 @@ class CAllFormOutput extends CFormOutput_old
 	* ;}
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -557,16 +535,13 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает код ошибки инициализации формы</p>
 	*
 	*
-	*
-	*
-	* @return string <p>Функция возвращает одну из следующих строк, либо пустую строку,
+	* @return string <p>Метод возвращает одну из следующих строк, либо пустую строку,
 	* если ошибок нет</p> <table class="tnormal" width="100%"> <tr> <th width="18%">Строка</th> <th
 	* width="82%">Описание</th> </tr> <tr> <td>FORM_NOT_FOUND</td> <td>Формы с переданным WEB_FORM_ID
 	* не существует</td> </tr> <tr> <td>FORM_ACCESS_DENIED</td> <td>Не хватает прав доступа к
 	* форме</td> </tr> </table> <p>Проверка наличия ошибки и вывод
 	* соответствующего ей языкового сообщения производится
 	* автоматически при инициализации формы</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -597,13 +572,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод HTML-заголовка формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает HTML-код заголовка формы. В том числе, тэг &lt;form&gt;,
 	* скрытые поля.</p> <a name="examples"></a><h4>Использование</h4> <p>При создании
 	* шаблона формы редактором, добавляется в начало шаблона
 	* автоматически.</p> <pre class="syntax"> &lt;?=$FORM-&gt;ShowFormHeader()?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -656,13 +628,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Завершение вывода формы</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращает завершающий HTML-код формы. В том числе, тэг &lt;/form&gt;.</p>
 	* <a name="examples"></a><h4>Использование</h4> <p>При создании шаблона формы
 	* редактором, добавляется в конец шаблона автоматически.</p> <pre
 	* class="syntax">&lt;?=$FORM-&gt;ShowFormFooter()?&gt;</pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
@@ -762,26 +731,17 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вставка в шаблон подписи поля ответа на вопрос.</p>
 	*
 	*
-	*
-	*
 	* @param string $FIELD_SID  Строковой идентификатор поля вопроса. Обязательный параметр.
-	*
-	*
 	*
 	* @param  $string  CSS-класс подписи. Необязательный параметр. Если для выставлено
 	* значение "Текст вопроса - HTML", то параметр игнорируется. До версии
 	* 5.1.2 значение по умолчанию - "tablebodytext".
 	*
-	*
-	*
-	* @param $CSSClas $s = ""] 
-	*
-	*
+	* @param mixed $CSSClass = ""] 
 	*
 	* @return string <p>Возвращается обработанная подпись поля формы.</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowInputCaption('MYFIELD_5')?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -870,68 +830,45 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод изображения, прикрепленного к вопросу формы. Если изображение есть, возвращается HTML-код вставки. В противном случае - пустая строка.</p>
 	*
 	*
-	*
-	*
 	* @param string $FIELD_SID  Строковой идентификатор поля вопроса. Обязательный параметр.
-	*
-	*
 	*
 	* @param  $string  Расположение изображения относительно текста. Может принимать
 	* одно из четырех значений - <code>LEFT</code>, <code>CENTER</code>, <code>RIGHT</code>
 	* (регистр не имеет значения) или пустое. Необязательный параметр.
 	*
-	*
-	*
-	* @param $sAlig $n = "" Максимальная ширина изображения. Если ширина картинки больше iMaxW,
+	* @param mixed $sAlign = "" Максимальная ширина изображения. Если ширина картинки больше iMaxW,
 	* то она будет пропорционально смаштабирована.<br> Необязательный.
 	* До версии 5.1.2 значение по умолчанию - "0" - без ограничений.
-	*
-	*
 	*
 	* @param int $iMaxW = 0 Максимальная высота изображения. Если высота картинки больше iMaxH,
 	* то она будет пропорционально смаштабирована.<br> Необязательный.
 	* До версии 5.1.2 значение по умолчанию - "0" - без ограничений.
-	*
-	*
 	*
 	* @param int $iMaxH = 0 Открывать ли при клике на изображении дополнительное popup окно с
 	* увеличенным изображением.<br> Необязательный. Должен приниметь
 	* одно из двух значений - "Y" или "N" (с учётом регистра). По умолчанию -
 	* "N" (до версии 5.1.2 - "false").
 	*
-	*
-	*
 	* @param string $bPopup = "N" Текст всплывающей подсказки на изображении (только если <i>bPopup</i> =
 	* "Y")<br> Необязательный. По умолчанию выводится фраза "Нажмите чтобы
 	* увеличить" на языке страницы (до версии 5.1.2 - "false").
-	*
-	*
 	*
 	* @param string $strPopupTitle = "" Устанавливает вертикальный отступ картинки от окружающего
 	* текста в пикселях.<br> Необязательный. По умолчанию - "0" - без
 	* отступа.
 	*
-	*
-	*
 	* @param string $sHSpace = "" Устанавливает горизонтальный отступ картинки от окружающего
 	* текста в пикселях.<br> Необязательный. По умолчанию - "0" - без
 	* отступа.
 	*
-	*
-	*
 	* @param string $sVSpace = "" Устанавливает толщину рамки вокруг изображения. Необязательный.
 	* По умолчанию равен "0" - без рамки:
 	*
-	*
-	*
 	* @param string $sBorder = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращает HTML-код для вставки изображения в форму</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowInputCaptionImage('MYFIELD_5', 'LEFT', 50, 50, "N", "", 5, 5)?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -990,18 +927,13 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "прикреплена ли к вопросу с данным идентификатором картинка".</p>
 	*
 	*
-	*
-	*
 	* @param string $FIELD_SID  Строковой идентификатор поля вопроса. Обязательный параметр.
-	*
-	*
 	*
 	* @return bool <p><i>true</i>, если к вопросу прикреплена картинка. <i>false</i> в противном
 	* случае.</p> <a name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowInputCaption('MYFIELD_5')?&gt;: &lt;?=$FORM-&gt;ShowInput('MYFIELD_5')?&gt;&lt;br /&gt;
 	* &lt;?if($FORM-&gt;isInputCaptionImage('MYFIELD_5')):?&gt; &lt;?=$FORM-&gt;ShowInputCaptionImage('MYFIELD_5')?&gt;
 	* &lt;?else:?&gt; &lt;?=CFile::ShowImage("/myimages/form_field_default.jpg")?&gt; &lt;?endif?&gt;: </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1035,24 +967,15 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вставка полей ответа на вопрос в шаблон. Параметры поля ввода задаются в настройках вопроса.</p>
 	*
 	*
-	*
-	*
 	* @param string $FIELD_SID  Строковой идентификатор поля вопроса. Обязательный параметр.
-	*
-	*
 	*
 	* @param  $string  CSS-класс для подписи к полю ввода. Необязательный параметр.
 	*
-	*
-	*
-	* @param $CSSClas $s = ""] 
-	*
-	*
+	* @param mixed $CSSClass = ""] 
 	*
 	* @return string <p>Возвращается HTML-код для вставки полей формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowInput('MYFIELD_5')?&gt;
 	* </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1366,8 +1289,6 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "форма использует CAPTCHA".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если форма использует CAPTCHA. <i>false</i> в противном случае.</p>
 	* <a name="examples"></a><h4>Использование</h4> <pre class="syntax">&lt;?if($FORM-&gt;isUseCaptcha()):?&gt;
 	* &lt;tr&gt; &lt;td colspan="2" height="8"&gt;&lt;/td&gt; &lt;/tr&gt; &lt;tr&gt; &lt;td valign="top" align="right"
@@ -1377,7 +1298,6 @@ class CAllFormOutput extends CFormOutput_old
 	* картинки&lt;?=$FORM-&gt;ShowRequired()?&gt;:&lt;/td&gt; &lt;td
 	* valign="top"&gt;&lt;?=$FORM-&gt;ShowCaptchaField()?&gt;&lt;/td&gt; &lt;/tr&gt; &lt;?endif?&gt;</pre>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <menu> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a>
 	* </li> <li> <a
@@ -1386,7 +1306,9 @@ class CAllFormOutput extends CFormOutput_old
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a>
 	* </li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
-	* </menu></b<br><br>
+	* </menu></b<br><br><h4>Смотрите также</h4> <ul><li><a
+	* href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление
+	* капчи без перезагрузки страницы</a></li></ul> <br><br>
 	*
 	*
 	* @static
@@ -1409,12 +1331,9 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает HTML-код для вставки изображения CAPTCHA</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращается HTML-код для вставки изображения CAPTCHA</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowCaptchaImage()?&gt;
 	* </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1424,7 +1343,9 @@ class CAllFormOutput extends CFormOutput_old
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchafield.php">CFormOutput::ShowCaptchaField</a></li>
 	* <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	* </menu></b<br><br>
+	* </menu></b<br><br><h4>Смотрите также</h4> <ul><li><a
+	* href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление
+	* капчи без перезагрузки страницы</a></li></ul> <br><br>
 	*
 	*
 	* @static
@@ -1450,12 +1371,9 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает код поля для ввода CAPTCHA</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращается HTML-код поля для ввода CAPTCHA</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowCaptchaField()?&gt;
 	* </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1465,7 +1383,9 @@ class CAllFormOutput extends CFormOutput_old
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
 	* <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	* </menu></b<br><br>
+	* </menu></b<br><br><h4>Смотрите также</h4> <ul><li><a
+	* href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление
+	* капчи без перезагрузки страницы</a></li></ul> <br><br>
 	*
 	*
 	* @static
@@ -1489,11 +1409,8 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает комбинацию изображения CAPTCHA и поля для ввода</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращается HTML-код обоих элементов</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowCaptcha()?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1503,7 +1420,9 @@ class CAllFormOutput extends CFormOutput_old
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showcaptchaimage.php">CFormOutput::ShowCaptchaImage</a></li>
 	* <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/isusecaptcha.php">CFormOutput::isUseCaptcha</a></li>
-	* </menu></b<br><br>
+	* </menu></b<br><br><h4>Смотрите также</h4> <ul><li><a
+	* href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление
+	* капчи без перезагрузки страницы</a></li></ul> <br><br>
 	*
 	*
 	* @static
@@ -1526,27 +1445,18 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает HTML-код кнопки отправки формы создания/редактирования записи</p>
 	*
 	*
-	*
-	*
 	* @param  $string  Текст, расположенный на кнопке. Если параметр пуст или не указан,
 	* то будет использовано значение параметра "Подпись на кнопке"
 	* вкладки "Свойства" страницы редактирования параметров веб-формы,
 	* либо значение по умолчанию. Необязательный параметр.
 	*
-	*
-	*
 	* @param CAPTIO $N = "" CSS-класс кнопки. Необязательный параметр.
 	*
-	*
-	*
 	* @param string $CSSClass = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращается HTML-код кнопки отправки формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowSubmitButton("Отправить заявку", "form-button-submit")?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1579,26 +1489,17 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает HTML-код кнопки "Применить" формы создания/редактирования записи</p>
 	*
 	*
-	*
-	*
 	* @param  $string  Текст, расположенный на кнопке. Необязательный параметр.
 	* Параметр необязательный, и если он пуст или не указан, то будет
 	* использовано значение по умолчанию.
 	*
-	*
-	*
 	* @param CAPTIO $N = "" CSS-класс кнопки. Необязательный параметр.
 	*
-	*
-	*
 	* @param string $CSSClass = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращается HTML-код кнопки "Применить"</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowApplyButton("Применить", "form-button-apply")?&gt; </pre></bod
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1631,27 +1532,18 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Возвращает HTML-код кнопки "Сбросить" формы создания/редактирования записи.</p>
 	*
 	*
-	*
-	*
 	* @param  $string  Текст, расположенный на кнопке. Если параметр пуст или не указан,
 	* то будет использовано значение по умолчанию. Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @param CAPTIO $N = "" CSS-класс кнопки. Необязательный параметр.
 	*
-	*
-	*
 	* @param string $CSSClass = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращается HTML-код кнопки "сбросить".</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre
 	* class="syntax">&lt;?=$FORM-&gt;ShowResetButton("Отменить изменения", "form-button-reset")?&gt; </pre>
 	* </h
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1684,22 +1576,15 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод описательного текста формы</p>
 	*
 	*
-	*
-	*
 	* @param  $string  CSS-класс который нужно применить к выводимому тексту.
 	* Необязательный параметр. Если для описания формы выставлено
 	* значение "HTML", то параметр игнорируется.
 	*
-	*
-	*
 	* @param CSSClas $s = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращает описательный текст формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowFormDescription("form-description-text")?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1735,13 +1620,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "есть ли у формы текстовое описание".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если у формы есть текстовое описание. <i>false</i> в противном
 	* случае.</p> <a name="examples"></a><h4>Использование</h4> <pre
 	* class="syntax">&lt;?if($FORM-&gt;isFormDescription()):?&gt;Описание:
 	* &lt;?=$FORM-&gt;ShowFormDescription()?&gt;&lt;?endif?&gt;</pre></bod
-	*
 	*
 	* <h4>See Also</h4> 
 	* <p><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a><br><a
@@ -1776,64 +1658,43 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод изображения, прикрепленного к описанию формы</p>
 	*
 	*
-	*
-	*
 	* @param  $string  Необязательный параметр. Значение по умолчанию - "border=\"0\"".
 	*
-	*
-	*
-	* @param $sAlig $n = "" Необязательный параметр.
-	*
-	*
+	* @param mixed $sAlign = "" Необязательный параметр.
 	*
 	* @param int $iMaxW = 0 Расположение изображения относительно текста. Может принимать
 	* одно из четырех значений - <code>LEFT</code>, <code>CENTER</code>, <code>RIGHT</code>
 	* (регистр не имеет значения) или пустое. Необязательный параметр.
 	*
-	*
-	*
 	* @param int $iMaxH = 0 Максимальная ширина изображения. Если ширина картинки больше iMaxW,
 	* то она будет пропорционально смаштабирована.<br> Необязательный.
 	* По умолчанию - "0" - без ограничений.
 	*
-	*
-	*
 	* @param string $bPopup = "N" Максимальная высота изображения. Если высота картинки больше iMaxH,
 	* то она будет пропорционально смаштабирована.<br> Необязательный.
 	* По умолчанию - "0" - без ограничений.
-	*
-	*
 	*
 	* @param string $strPopupTitle = "" Открывать ли при клике на изображении дополнительное popup окно с
 	* увеличенным изображением.<br> Необязательный. Должен приниметь
 	* одно из двух значений - "Y" или "N" (с учётом регистра). По умолчанию -
 	* "N" (до версии 5.1.2 - "false").
 	*
-	*
-	*
 	* @param string $sHSpace = "" Текст всплывающей подсказки на изображении (только если <i>bPopup</i> =
 	* "Y")<br> Необязательный. По умолчанию выводится фраза "Нажмите чтобы
 	* увеличить" на языке страницы (до версии 5.1.2 значение по умолчанию -
 	* "false").
 	*
-	*
-	*
 	* @param string $sVSpace = "" Устанавливает вертикальный отступ картинки от окружающего
 	* текста в пикселях.<br> Необязательный. По умолчанию - "0" - без
 	* отступа.
-	*
-	*
 	*
 	* @param string $sBorder = "" Устанавливает горизонтальный отступ картинки от окружающего
 	* текста в пикселях.<br> Необязательный. По умолчанию - "0" - без
 	* отступа.
 	*
-	*
-	*
 	* @return string <p>Возвращает HTML-код для вставки изображения в формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax"> &lt;?=$FORM-&gt;ShowFormImage("CENTER",
 	* 250, 250, "Y", GetMessage("FORM_ENLARGE"), 0, 0)?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1889,13 +1750,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "прикреплена ли к форме картинка".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если к форме прикреплена картинка. <i>false</i> в противном
 	* случае.</p> <a name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?if($FORM-&gt;isFormImage()):?&gt; &lt;?=$FORM-&gt;ShowFormImage()?&gt; &lt;?else:?&gt;
 	* &lt;?=CFile::ShowImage("/myimages/form_default.jpg")?&gt; &lt;?endif?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1923,21 +1781,14 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод текстового заголовка формы</p>
 	*
 	*
-	*
-	*
 	* @param  $string  CSS-класс который нужно применить к выводимому тексту.
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @param CSSClas $s = "" 
-	*
-	*
 	*
 	* @return string <p>Возвращает текстовый заголовок (название) формы</p> <a
 	* name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?=$FORM-&gt;ShowFormTitle("form-title")?&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -1973,12 +1824,9 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Проверка условия "есть ли у формы текстовый заголовок (название)".</p>
 	*
 	*
-	*
-	*
 	* @return bool <p><i>true</i>, если у формы есть текстовый заголово (название). <i>false</i> в
 	* противном случае.</p> <a name="examples"></a><h4>Использование</h4> <pre class="syntax">
 	* &lt;?if($FORM-&gt;isFormTitle()):?&gt;Описание: &lt;?=$FORM-&gt;ShowFormTitle()?&gt;&lt;?endif?&gt; </pre></bod
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>
@@ -2053,13 +1901,10 @@ class CAllFormOutput extends CFormOutput_old
 	* <p>Вывод пометки "обязательное поле" - <span style="font-family: Verdana, Arial, Helvetica, sans-serif; color:red; font-size:12px; ">*</span>. При выводе подписи к полю посредством <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/showinputcaption.php">CFormOutput::ShowInputCaption</a> пометка вставаляется автоматически.</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Возвращается HTML-код пометки</p> <a name="examples"></a><h4>Использование</h4>
 	* <pre class="syntax"> Первый обязательный вопрос
 	* &lt;?=$FORM-&gt;ShowRequired()?&gt;:&lt;?=$FORM-&gt;ShowInput('REQ_FIELD_1')?&gt;&lt;br /&gt;
 	* &lt;?=$FORM-&gt;ShowInputCaption('REQ_FIELD_2'):&lt;?=$FORM-&gt;ShowInput('REQ_FIELD_2')?&gt;&lt;br /&gt; </pre>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <menu> <li><a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformoutput/index.php">Класс CFormOutput</a></li>

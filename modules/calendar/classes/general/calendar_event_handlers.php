@@ -179,6 +179,7 @@ class CCalendarEventHandlers
 				'STATUS' => $arEvent['STATUS'],
 				'IS_MEETING' => $arEvent['IS_MEETING'] ? 'Y' : 'N',
 				'GUESTS' => $arEvent['GUESTS'],
+				'UF_WEBDAV_CAL_EVENT' => $arEvent['UF_WEBDAV_CAL_EVENT'],
 				'URL' => $url,
 			);
 		}
@@ -261,7 +262,7 @@ class CCalendarEventHandlers
 				$res = array(
 					'ID' => $event['ID'],
 					'NAME' => $event['NAME'],
-					'DESCRIPTION' => $event['DETAIL_TEXT'],
+					'DESCRIPTION' => CCalendarEvent::ParseText($event['DETAIL_TEXT'], $event['ID'], $event['UF_WEBDAV_CAL_EVENT']),
 					'URL' => '/company/personal/user/'.$USER->GetID().'/calendar/?EVENT_ID=' .$event['ID'],
 					'DATE_FROM' => MakeTimeStamp($event['DATE_FROM']),
 					'DATE_TO' => MakeTimeStamp($event['DATE_TO']),
@@ -332,7 +333,6 @@ class CCalendarEventHandlers
 					$res['GUESTS'] = array_merge($arGuests['Y'], $arGuests['N'], $arGuests['Q']);
 				}
 
-				$res['DESCRIPTION'] = HTMLToTxt($res['DESCRIPTION']);
 				if (strlen($res['DESCRIPTION']) > 150)
 				{
 					$res['DESCRIPTION'] = CUtil::closetags(substr($res['DESCRIPTION'], 0, 150)).'...';

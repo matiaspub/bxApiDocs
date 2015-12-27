@@ -217,7 +217,10 @@ class CUserTypeHlblock extends CUserTypeEnum
 		$hlblock_id = $userfield['SETTINGS']['HLBLOCK_ID'];
 		$hlfield_id = $userfield['SETTINGS']['HLFIELD_ID'];
 
-		$hlblock = \Bitrix\Highloadblock\HighloadBlockTable::getById($hlblock_id)->fetch();
+		if (!empty($hlblock_id))
+		{
+			$hlblock = \Bitrix\Highloadblock\HighloadBlockTable::getById($hlblock_id)->fetch();
+		}
 
 		if (!empty($hlblock))
 		{
@@ -266,6 +269,32 @@ class CUserTypeHlblock extends CUserTypeEnum
 		}
 
 		return $rows;
+	}
+
+	public static function GetAdminListViewHTML($arUserField, $arHtmlControl)
+	{
+		static $cache = array();
+		$empty_caption = '&nbsp;';
+
+		$cacheKey = $arUserField['SETTINGS']['HLBLOCK_ID'].'_v'.$arHtmlControl["VALUE"];
+
+		if(!array_key_exists($cacheKey, $cache) && !empty($arHtmlControl["VALUE"]))
+		{
+			$rsEnum = call_user_func_array(
+				array($arUserField["USER_TYPE"]["CLASS_NAME"], "getlist"),
+				array(
+					$arUserField,
+				)
+			);
+			if(!$rsEnum)
+				return $empty_caption;
+			while($arEnum = $rsEnum->GetNext())
+				$cache[$arUserField['SETTINGS']['HLBLOCK_ID'].'_v'.$arEnum["ID"]] = $arEnum["VALUE"];
+		}
+		if(!array_key_exists($cacheKey, $cache))
+			$cache[$cacheKey] = $empty_caption;
+
+		return $cache[$cacheKey];
 	}
 
 	public static function getDropDownData()

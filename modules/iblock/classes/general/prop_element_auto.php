@@ -41,7 +41,7 @@ class CIBlockPropertyElementAutoComplete
 				$arFilter['IBLOCK_ID'] = $intIBlockID;
 			$arFilter['ID'] = $intElementID;
 			$arFilter['SHOW_HISTORY'] = 'Y';
-			$rsElements = CIBlockElement::GetList(array(),$arFilter,false,false,array('IBLOCK_ID','ID','NAME'));
+			$rsElements = CIBlockElement::GetList(array(), $arFilter, false, false, array('IBLOCK_ID','ID','NAME'));
 			if ($arElement = $rsElements->GetNext())
 			{
 				$arResult = array(
@@ -63,7 +63,6 @@ class CIBlockPropertyElementAutoComplete
 	protected function GetPropertyValue($arProperty, $arValue)
 	{
 		$mxResult = false;
-
 		if ((int)$arValue['VALUE'] > 0)
 		{
 			$mxResult = self::GetLinkElement($arValue['VALUE'],$arProperty['LINK_IBLOCK_ID']);
@@ -442,6 +441,30 @@ class CIBlockPropertyElementAutoComplete
 		$arValue['VALUE'] = (int)$arValue['VALUE'];
 		if ($arValue['VALUE'] > 0)
 		{
+			$viewMode = '';
+			$resultKey = '';
+			if (!empty($strHTMLControlName['MODE']))
+			{
+				switch ($strHTMLControlName['MODE'])
+				{
+					case 'CSV_EXPORT':
+						$viewMode = 'CSV_EXPORT';
+						$resultKey = 'ID';
+						break;
+					case 'EXTERNAL_ID':
+						$viewMode = 'EXTERNAL_ID';
+						$resultKey = '~XML_ID';
+						break;
+					case 'SIMPLE_TEXT':
+						$viewMode = 'SIMPLE_TEXT';
+						$resultKey = '~NAME';
+						break;
+					case 'ELEMENT_TEMPLATE':
+						$viewMode = 'ELEMENT_TEMPLATE';
+						$resultKey = '~NAME';
+						break;
+				}
+			}
 			if (!isset($cache[$arValue['VALUE']]))
 			{
 				$arFilter = array();
@@ -451,30 +474,25 @@ class CIBlockPropertyElementAutoComplete
 					$arFilter['IBLOCK_ID'] = $intIBlockID;
 				}
 				$arFilter['ID'] = $arValue['VALUE'];
-				$arFilter['ACTIVE'] = 'Y';
-				$arFilter['ACTIVE_DATE'] = 'Y';
-				$arFilter['CHECK_PERMISSIONS'] = 'Y';
-				$arFilter['MIN_PERMISSION'] = 'R';
+				if ($viewMode === '')
+				{
+					$arFilter['ACTIVE'] = 'Y';
+					$arFilter['ACTIVE_DATE'] = 'Y';
+					$arFilter['CHECK_PERMISSIONS'] = 'Y';
+					$arFilter['MIN_PERMISSION'] = 'R';
+				}
 				$rsElements = CIBlockElement::GetList(array(), $arFilter, false, false, array('ID', 'XML_ID', 'IBLOCK_ID', 'NAME', 'DETAIL_PAGE_URL'));
-				$cache[$arValue['VALUE']] = $rsElements->GetNext(true,true);
+				$cache[$arValue['VALUE']] = $rsElements->GetNext(true, true);
 			}
-			if (is_array($cache[$arValue['VALUE']]))
+			if (!empty($cache[$arValue['VALUE']]) && is_array($cache[$arValue['VALUE']]))
 			{
-				if (isset($strHTMLControlName['MODE']) && $strHTMLControlName['MODE'] == 'CSV_EXPORT')
+				if ($viewMode !== '' && $resultKey !== '')
 				{
-					$strResult = $cache[$arValue['VALUE']]['ID'];
-				}
-				elseif (isset($strHTMLControlName['MODE']) && $strHTMLControlName['MODE'] == 'EXTERNAL_ID')
-				{
-					$strResult = $cache[$arValue['VALUE']]['~XML_ID'];
-				}
-				elseif (isset($strHTMLControlName['MODE']) && ($strHTMLControlName['MODE'] == 'SIMPLE_TEXT' || $strHTMLControlName['MODE'] == 'ELEMENT_TEMPLATE'))
-				{
-					$strResult = $cache[$arValue['VALUE']]["~NAME"];
+					$strResult = $cache[$arValue['VALUE']][$resultKey];
 				}
 				else
 				{
-					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.$cache[$arValue['VALUE']]["NAME"].'</a>';
+					$strResult = '<a href="'.$cache[$arValue['VALUE']]['DETAIL_PAGE_URL'].'">'.$cache[$arValue['VALUE']]['NAME'].'</a>';
 				}
 			}
 		}
@@ -495,7 +513,6 @@ class CIBlockPropertyElementAutoComplete
 		 * IBLOCK_MESS		- get lang mess from linked iblock
 		 */
 		$arViewsList = self::GetPropertyViewsList(false);
-		$strView = '';
 		$strView = (isset($arFields['USER_TYPE_SETTINGS']['VIEW']) && in_array($arFields['USER_TYPE_SETTINGS']['VIEW'],$arViewsList) ? $arFields['USER_TYPE_SETTINGS']['VIEW'] : current($arViewsList));
 
 		$strShowAdd = (isset($arFields['USER_TYPE_SETTINGS']['SHOW_ADD']) ? $arFields['USER_TYPE_SETTINGS']['SHOW_ADD'] : '');
@@ -681,4 +698,3 @@ class CIBlockPropertyElementAutoComplete
 		}
 	}
 }
-?>

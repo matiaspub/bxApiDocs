@@ -3,15 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/index.php
  * @author Bitrix
  */
 class CAllSocNetUser
@@ -57,7 +55,7 @@ class CAllSocNetUser
 	{
 		$rsUser = CUser::GetByID($arFields["ID"]);
 		if ($arUser = $rsUser->Fetch())
-			;// define("GLOBAL_ACTIVE_VALUE", $arUser["ACTIVE"]);
+			// define("GLOBAL_ACTIVE_VALUE", $arUser["ACTIVE"]);
 	}
 
 	public static function OnAfterUserAdd(&$arFields)
@@ -141,16 +139,12 @@ class CAllSocNetUser
 	* <p>Метод проверяет, находится ли сейчас пользователь на сайте. Пользователь находится на сайте, если он совершал на сайте какие-либо действия за последние 2 минуты.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя. </h
-	*
-	*
 	*
 	* @return bool <p>True, если пользователь сейчас на сайте. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/IsOnLine.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/IsOnLine.php
 	* @author Bitrix
 	*/
 	public static function IsOnLine($userID)
@@ -167,24 +161,20 @@ class CAllSocNetUser
 	* <p>Проверяет, разрешен ли функционал друзей.</p>
 	*
 	*
-	*
-	*
 	* @return bool <p>True, если функционал друзей включен на сайте. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/isfriendsallowed.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/isfriendsallowed.php
 	* @author Bitrix
 	*/
-	function IsFriendsAllowed()
+	public static function IsFriendsAllowed()
 	{
-		static $strOptionValue;
+		return (COption::GetOptionString("socialnetwork", "allow_frields", "Y") == "Y");
+	}
 
-		if (!$strOptionValue)
-		{
-			$strOptionValue = COption::GetOptionString("socialnetwork", "allow_frields", "Y");
-		}
-
-		return ($strOptionValue == "Y");
+	public static function IsFriendsFriendsAllowed()
+	{
+		return (COption::GetOptionString("socialnetwork", "allow_frields_friends", "Y") == "Y");
 	}
 
 	
@@ -192,26 +182,17 @@ class CAllSocNetUser
 	* <p>Метод проверяет, есть ли у текущего пользователя административные права на доступ к модулю социальной сети.</p>
 	*
 	*
-	*
-	*
 	* @param ) $;  Идентификатор сайта, необязательный параметр. По умолчанию
 	* подставляется текущий сайт.
-	*
-	*
 	*
 	* @param string $site_id = SITE_ID Параметр, указывающий использовать текущую сессию авторизации
 	* пользователя. Необязательный параметр. По умолчанию равен true.
 	*
-	*
-	*
 	* @param bool $bUseSession = true 
-	*
-	*
 	*
 	* @return bool <p>Если пользователь является администратором или имеет права
 	* записи на модуль социальной сети, то метод возвращает true, иначе -
 	* false.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -225,7 +206,7 @@ class CAllSocNetUser
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/iscurrentusermoduleadmin.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/iscurrentusermoduleadmin.php
 	* @author Bitrix
 	*/
 	public static function IsCurrentUserModuleAdmin($site_id = SITE_ID, $bUseSession = true)
@@ -256,92 +237,146 @@ class CAllSocNetUser
 		}
 	}
 
-	public static function IsUserModuleAdmin($userID, $site_id = SITE_ID)	
+	public static function IsUserModuleAdmin($userID, $site_id = SITE_ID)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 		static $arSocnetModuleAdminsCache = array();
 
 		if ($userID <= 0)
+		{
 			return false;
+		}
 
 		if ($site_id && !is_array($site_id))
+		{
 			$site_id = array($site_id, false);
+		}
 		elseif ($site_id && is_array($site_id))
+		{
 			$site_id = array_merge($site_id, array(false));
+		}
 
 		$cache_key = serialize($site_id);
 		if (!array_key_exists($cache_key, $arSocnetModuleAdminsCache))
 		{
-			if (!$site_id)
-				$strSqlSite = "and MG.SITE_ID IS NULL";
-			else
-			{
-				$strSqlSite = " and (";
-				foreach($site_id as $i => $site_id_tmp)
-				{
-					if ($i > 0)
-						$strSqlSite .= " OR ";
-
-					$strSqlSite .= "MG.SITE_ID ".($site_id_tmp ? "= '".$DB->ForSQL($site_id_tmp)."'" : "IS NULL");
-				}
-				$strSqlSite .= ")";
-			}
-
-			$strSql = "SELECT ".
-				"UG.USER_ID U_ID, ".
-				"G.ID G_ID, ".
-				"max(MG.G_ACCESS) G_ACCESS ".
-				"FROM b_user_group UG, b_module_group MG, b_group G  ".
-				"WHERE ".
-					"	(G.ID = MG.GROUP_ID or G.ID = 1) ".
-					"	AND MG.MODULE_ID = 'socialnetwork' ".
-					"	AND G.ID = UG.GROUP_ID ".
-					"	AND G.ACTIVE = 'Y' ".
-					"	AND G_ACCESS >= 'W'	".
-					"	AND UG.USER_ID = ".intval($userID)." ".
-					"	AND ((UG.DATE_ACTIVE_FROM IS NULL) OR (UG.DATE_ACTIVE_FROM <= ".$DB->CurrentTimeFunction().")) ".
-					"	AND ((UG.DATE_ACTIVE_TO IS NULL) OR (UG.DATE_ACTIVE_TO >= ".$DB->CurrentTimeFunction().")) ".
-					"	AND (G.ANONYMOUS<>'Y' OR G.ANONYMOUS IS NULL) ".
-					$strSqlSite." ".
-				"GROUP BY ".
-					"	UG.USER_ID, G.ID";
+			$cache = new CPHPCache;
+			$cache_time = 31536000;
+			$cache_id = 'site'.($site_id ? '_'.implode('|', $site_id) : '');
+			$cache_path = "/sonet/user_admin/";
 
 			$arModuleAdmins = array();
-			$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-			while($ar = $result->Fetch())
-				if (!in_array($ar["U_ID"], $arModuleAdmins))
-					$arModuleAdmins[] = $ar["U_ID"];
-					
+
+			if ($cache->InitCache($cache_time, $cache_id, $cache_path))
+			{
+				$arCacheVars = $cache->GetVars();
+				$arModuleAdmins = $arCacheVars["RESULT"];
+			}
+			else
+			{
+				$cache->StartDataCache($cache_time, $cache_id, $cache_path);
+
+				if(!$site_id)
+				{
+					$strSqlSite = "AND MG.SITE_ID IS NULL";
+				}
+				else
+				{
+					$strSqlSite = " AND (";
+					foreach($site_id as $i => $site_id_tmp)
+					{
+						if($i > 0)
+						{
+							$strSqlSite .= " OR ";
+						}
+
+						$strSqlSite .= "MG.SITE_ID " . ($site_id_tmp ? "= '" . $DB->ForSQL($site_id_tmp) . "'" : "IS NULL");
+					}
+					$strSqlSite .= ")";
+				}
+
+				$strSql = "SELECT " .
+					"UG.USER_ID U_ID, " .
+					"G.ID G_ID, " .
+					"MAX(".CDatabase::DatetimeToTimestampFunction("UG.DATE_ACTIVE_FROM").") UG_DATE_FROM_TS, " .
+					"MAX(".CDatabase::DatetimeToTimestampFunction("UG.DATE_ACTIVE_TO").") UG_DATE_TO_TS, " .
+					"MAX(MG.G_ACCESS) G_ACCESS " .
+					"FROM b_user_group UG, b_module_group MG, b_group G  " .
+					"WHERE " .
+					"	(G.ID = MG.GROUP_ID or G.ID = 1) " .
+					"	AND MG.MODULE_ID = 'socialnetwork' " .
+					"	AND G.ID = UG.GROUP_ID " .
+					"	AND G.ACTIVE = 'Y' " .
+					"	AND G_ACCESS >= 'W' " .
+					"	AND (G.ANONYMOUS<>'Y' OR G.ANONYMOUS IS NULL) " .
+						$strSqlSite .
+					" " .
+					"GROUP BY " .
+					"	UG.USER_ID, G.ID";
+
+				$result = $DB->Query($strSql, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
+				while($ar = $result->Fetch())
+				{
+					if(!array_key_exists($ar["U_ID"], $arModuleAdmins))
+					{
+						$arModuleAdmins[$ar["U_ID"]] = array(
+							"USER_ID" => $ar["U_ID"],
+							"DATE_FROM_TS" => $ar["UG_DATE_FROM_TS"],
+							"DATE_TO_TS" => $ar["UG_DATE_TO_TS"]
+						);
+					}
+				}
+			}
+
+			$arCacheData = Array(
+				"RESULT" => $arModuleAdmins
+			);
+
+			$cache->EndDataCache($arCacheData);
+
+			foreach ($arModuleAdmins as $key => $arUserData)
+			{
+				if (
+					(
+						!empty($arUserData["DATE_FROM_TS"])
+						&& $arUserData["DATE_FROM_TS"] > time()
+					)
+					|| (
+						!empty($arUserData["DATE_TO_TS"])
+						&& $arUserData["DATE_TO_TS"] < time()
+					)
+				)
+				{
+					unset($arModuleAdmins[$key]);
+				}
+			}
+
 			$arSocnetModuleAdminsCache[$cache_key] = $arModuleAdmins;
 		}
 
-		return (in_array($userID, $arSocnetModuleAdminsCache[$cache_key]));
+		return (array_key_exists($userID, $arSocnetModuleAdminsCache[$cache_key]));
 	}
-			
+
+	public static function DeleteUserAdminCache()
+	{
+		BXClearCache(true, "/sonet/user_admin/");
+	}
+
 	
 	/**
 	* <p>Метод подготавливает имя пользователя для вывода.</p>
 	*
 	*
-	*
-	*
 	* @param string $name  Имя пользователя.
-	*
-	*
 	*
 	* @param string $lastName  Фамилия пользователя. </htm
 	*
-	*
-	*
 	* @param string $login  Логин пользователя. </h
-	*
-	*
 	*
 	* @return string <p>Возвращается строка, содержащая отформатированное имя
 	* пользователя.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/formatname.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/formatname.php
 	* @author Bitrix
 	*/
 	public static function FormatName($name, $lastName, $login)
@@ -365,37 +400,23 @@ class CAllSocNetUser
 	* <p>Метод подготавливает имя пользователя для вывода в расширенном виде.</p>
 	*
 	*
-	*
-	*
 	* @param string $name  Имя пользователя.
-	*
-	*
 	*
 	* @param string $secondName  Отчество пользователя. </htm
 	*
-	*
-	*
 	* @param string $lastName  Фамилия пользователя. </htm
-	*
-	*
 	*
 	* @param string $login  Логин пользователя </h
 	*
-	*
-	*
 	* @param string $email  E-Mail пользователя.
 	*
-	*
-	*
 	* @param string $id  Код пользователя. </h
-	*
-	*
 	*
 	* @return string <p>Возвращается строка, содержащая отформатированное имя
 	* пользователя.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/formatnameex.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/formatnameex.php
 	* @author Bitrix
 	*/
 	public static function FormatNameEx($name, $secondName, $lastName, $login, $email, $id)
@@ -429,25 +450,19 @@ class CAllSocNetUser
 	* <p>Метод ищет пользователя по его имени или коду.</p>
 	*
 	*
-	*
-	*
 	* @param string $user  Имя или код пользователя. Если параметр является числом или
 	* строкой, в которой содержится число в квадратных скобках, то это
 	* число рассматривается как код пользователя. В противном случае
 	* параметр рассматривается как строка, содержащая ФИО
 	* пользователя.
 	*
-	*
-	*
 	* @param bool $bIntranet = false Флаг, определяющий, осуществляется ли работа в рамках решения
 	* интранет. Необязательный параметр. По умолчанию равен false.
-	*
-	*
 	*
 	* @return array <p>Массив пользователей, удовлетворяющих условию поиска.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/searchuser.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/searchuser.php
 	* @author Bitrix
 	*/
 	public static function SearchUser($user, $bIntranet = false)
@@ -505,17 +520,21 @@ class CAllSocNetUser
 					$arUser[] = $s;
 			}
 
-			if (count($arUser) <= 0 && strlen($email) > 0):
-				$arFilter = array
-					(
-						"ACTIVE" => "Y",
-						"EMAIL" => $email,
-					);
+			if (
+				count($arUser) <= 0
+				&& strlen($email) > 0
+			)
+			{
+				$arFilter = array(
+					"ACTIVE" => "Y",
+					"EMAIL" => $email,
+				);
 				$dbUsers = CUser::GetList(($by="id"), ($order="asc"), $arFilter);
-			else:
+			}
+			else
+			{
 				$dbUsers = CUser::SearchUserByName($arUser, $email);
-			endif;
-
+			}
 		}
 
 		if ($dbUsers)

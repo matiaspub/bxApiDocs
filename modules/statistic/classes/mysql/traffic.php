@@ -2,9 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/traffic.php");
 
 /**
- * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта.</body> </html>
- *
- *
+ * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта. 
  *
  *
  * @return mixed 
@@ -20,23 +18,16 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> в разрезе по часам, дням недели и месяцам.</p>
 	*
 	*
-	*
-	*
 	* @param string $data_type  Тип данных. Возможные значения: <ul> <li> <b>hour</b> - данные в разрезе по
 	* часам; </li> <li> <b>weekday</b> - данные в разрезе по дням недели; </li> <li>
 	* <b>month</b> - данные в разрезе по месяцам. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
 	* необходимо получить статистику по ссылающимся сайтам; </li> <li>
 	* <b>DATE1</b> - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -66,7 +57,6 @@ class CTraffic extends CAllTraffic
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -216,8 +206,6 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>, коэфициенты оценки внимательности посетителей в разрезе по дням.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID записи;
 	* </li> <li> <b>s_date</b> - дата; </li> <li> <b>s_hits</b> - количество хитов; </li> <li>
 	* <b>s_hosts</b> - количество хостов; </li> <li> <b>s_sessions</b> - количество сессий;
@@ -227,12 +215,8 @@ class CTraffic extends CAllTraffic
 	* <b>s_favorites</b> - количество посетителей, добавивших сайт в "<a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>". </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array &$max_min  Ссылка на массив содержащий максимальную и минимальную даты из
 	* выбранного результирующего списка. Структура данного массива: <pre
@@ -241,8 +225,6 @@ class CTraffic extends CAllTraffic
 	* =&gt; год минимальной даты [DATE_LAST] =&gt; максимальная дата [MAX_DAY] =&gt;
 	* день максимальной даты (1-31) [MAX_MONTH] =&gt; месяц максимальной даты (1-12)
 	* [MAX_YEAR] =&gt; год максимальной даты )</pre>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID записи; </li> <li>
@@ -272,21 +254,14 @@ class CTraffic extends CAllTraffic
 	* <b>SITE_ID</b> будет искаться вхождение. </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param string $get_maxmin = "Y" Если значение данной переменной равно "Y", то в параметр <i>max_min</i>
 	* будет возвращен соответствующий массив содержащий максимальную
 	* и минимальную даты из выбранного результирующего списка.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -317,7 +292,6 @@ class CTraffic extends CAllTraffic
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -517,17 +491,13 @@ class CTraffic extends CAllTraffic
 
 	
 	/**
-	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p> <p class="note">При фильтрации по сайту (<i>filter</i>[<b>SITE_ID</b>]), будут доступны только данные по хитам, хостам, сессиям, событиям. Данные по посетителям будут отсутствовать, т.к. текущая версия модуля предполагает, что посетитель один на весь портал.</p>
-	*
-	*
+	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p> <p class="note"><b>Примечание</b>: при фильтрации по сайту (<i>filter</i>[<b>SITE_ID</b>]), будут доступны только данные по хитам, хостам, сессиям, событиям. Данные по посетителям будут отсутствовать, т.к. текущая версия модуля предполагает, что посетитель один на весь портал.</p>
 	*
 	*
 	* @param array $arrayfilter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
 	* необходимо получить статистику; </li> <li> <b>DATE1</b> - начальная дата; </li>
 	* <li> <b>DATE2</b> - конечная дата. </li> </ul>
-	*
-	*
 	*
 	* @return array <p>В случае если не установлена фильтрация по сайту, то структура
 	* возвращаемого массива будет следующей:</p> <pre class="syntax">Array ( [TOTAL_HITS]
@@ -568,7 +538,6 @@ class CTraffic extends CAllTraffic
 	* количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в
 	* online</a> )</pre> <p></p>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
@@ -586,7 +555,6 @@ class CTraffic extends CAllTraffic
 	* echo "Посетителей в онлайн: ".$arr["ONLINE_GUESTS"];
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -721,8 +689,6 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "ref_today" Поле для сортировки. Возможные значения: <ul> <li> <b>ref_server</b> -
 	* ссылающийся сайт; </li> <li> <b>ref_today</b> - количество заходов с
 	* ссылающегося сайта за сегодня; </li> <li> <b>ref_yesterday</b> - количество
@@ -733,33 +699,22 @@ class CTraffic extends CAllTraffic
 	* установленный период времени <nobr>(<i>filter</i>[<b>DATE1</b>],
 	* <i>filter</i>[<b>DATE2</b>])</nobr>. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
 	* необходимо получить статистику по ссылающимся сайтам; </li> <li>
 	* <b>DATE1</b> - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка ссылающихся сайтов. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param mixed $limit = 10 Максимальное число записей результирующего списка. Если задано
 	* число &gt;0, то число записей будет ограничено, иначе ограничений не
 	* будет.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -792,7 +747,6 @@ class CTraffic extends CAllTraffic
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -899,8 +853,6 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковых фраз</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_today" Поле для сортировки. Возможные значения: <ul> <li> <b>s_phrase</b> -
 	* поисковая фраза; </li> <li> <b>s_today</b> - количество поисковых фраз за
 	* сегодня; </li> <li> <b>s_yesterday</b> - количество поисковых фраз за вчера; </li>
@@ -909,33 +861,22 @@ class CTraffic extends CAllTraffic
 	* количество поисковых фраз за установленный период времени
 	* <nobr>(<i>filter</i>[<b>DATE1</b>], <i>filter</i>[<b>DATE2</b>])</nobr>. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
 	* необходимо получить статистику по поисковым фразам; </li> <li> <b>DATE1</b>
 	* - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка поисковых фраз. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param mixed $limit = 10 Максимальное число записей результирующего списка. Если задано
 	* число &gt;0, то число записей будет ограничено, иначе ограничений не
 	* будет.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -966,7 +907,6 @@ class CTraffic extends CAllTraffic
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

@@ -1,77 +1,128 @@
 <?
+
+use \Bitrix\Sale\Internals\DeliveryPaySystemTable;
+use \Bitrix\Sale\Delivery;
+
 class CSaleDelivery2PaySystem
 {
 	public static $arFirstDS = array();
 	public static $arFirstPS = array();
 
-	private static function makeSqlSearch($arFilter)
+	protected static function convertDeliveryIds($oldDeliveryIds = array(), $oldProfiles = array())
 	{
-		$arSqlSearch = array();
+		if(!is_array($oldDeliveryIds))
+			$oldDeliveryIds = trim(strval($oldDeliveryIds)) != "" ? array($oldDeliveryIds) : array();
 
-		if (is_array($arFilter))
+		if(!is_array($oldProfiles))
+			$oldProfiles = trim(strval($oldProfiles)) != "" ? array($oldProfiles) : array();
+
+		if(empty($oldDeliveryIds) && empty($oldProfiles))
+			return array();
+
+		$qParams = array(
+			"LOGIC" => "AND",
+		);
+
+		if(!empty($oldDeliveryIds))
 		{
-			foreach ($arFilter as $key => $val)
+			$params = array (
+				"LOGIC" => "OR",
+				"%CODE" => array()
+			);
+
+			foreach($oldDeliveryIds as $id)
 			{
-				if (strlen($val) <= 0)
-					continue;
-
-				$key = strtoupper($key);
-
-				switch($key)
-				{
-					case "PAYSYSTEM_ID":
-						$arSqlSearch[] = $key."=".intval($val);
-						break;
-					case "DELIVERY_ID":
-					case "DELIVERY_PROFILE_ID":
-						$arSqlSearch[] = GetFilterQuery($key, $val, "N");
-						break;
-				}
+				$params["%CODE"][] = $id.":";
+				$params["%CODE"][] = $id;
 			}
+
+			$qParams[] = $params;
 		}
 
-		return GetFilterSqlSearch($arSqlSearch);
+		if(!empty($oldProfiles))
+		{
+			$params = array (
+				"LOGIC" => "OR",
+				"%CODE" => array()
+			);
+
+			foreach($oldProfiles as $id)
+				$params["%CODE"][] = ":".$id;
+
+			$qParams[] = $params;
+		}
+
+		$res = Delivery\Services\Table::getList(array(
+			'filter' => $qParams,
+			'select' => array("ID")
+		));
+
+		$result = array();
+
+		while($delivery = $res->fetch())
+			$result[] = $delivery["ID"];
+
+		return $result;
 	}
 
 	public static function GetList($arFilter = array(), $arGroupBy = false, $arSelectFields = array())
 	{
-		global $DB;
+		$params = array();
 
-		$strSqlSearch = self::makeSqlSearch($arFilter);
-
-		$arFieldsToSelect = array();
-
-		if (count($arSelectFields) > 0)
+		if(is_array($arFilter) && !empty($arFilter))
 		{
-			$arAllFields = array("DELIVERY_ID", "DELIVERY_PROFILE_ID", "PAYSYSTEM_ID");
+			if(isset($arFilter["DELIVERY_ID"]) || $arFilter["DELIVERY_PROFILE_ID"])
+			{
+				$ids = self::convertDeliveryIds(
+					isset($arFilter["DELIVERY_ID"]) ? $arFilter["DELIVERY_ID"] : array(),
+					isset($arFilter["DELIVERY_PROFILE_ID"]) ? $arFilter["DELIVERY_PROFILE_ID"] : array()
+				);
 
-			foreach ($arSelectFields as $value)
-				if(in_array($value, $arAllFields))
-					$arFieldsToSelect[] = $value;
+				if(!empty($ids))
+					$arFilter["=DELIVERY_ID"] = $ids;
+
+				unset($arFilter["DELIVERY_ID"]);
+				unset($arFilter["DELIVERY_PROFILE_ID"]);
+			}
+
+			if(isset($arFilter["PAYSYSTEM_ID"]))
+			{
+				$arFilter["=PAYSYSTEM_ID"] = $arFilter["PAYSYSTEM_ID"];
+				unset($arFilter["PAYSYSTEM_ID"]);
+			}
+
+			$params['filter'] = $arFilter;
 		}
 
-		if(!empty($arFieldsToSelect))
-			$strFieldsToSelect = implode(", ", $arFieldsToSelect);
-		else
-			$strFieldsToSelect = "*";
+		//todo:
+		if(is_array($arGroupBy) && !empty($arGroupBy))
+			$params['group'] = array_intersect($arGroupBy, array("DELIVERY_ID", "PAYSYSTEM_ID"));
 
-		$strSql = "
-			SELECT ".
-				$strFieldsToSelect.
-			" FROM
-				b_sale_delivery2paysystem
-			WHERE
-			".$strSqlSearch;
+		$params["select"] = array(
+			"DELIVERY_ID",
+			"PAYSYSTEM_ID",
+			"DELIVERY_SERVICE_CODE" => "DELIVERY_SERVICE.CODE"
+		);
 
-		if($arGroupBy !== false && is_array($arGroupBy) && !empty($arGroupBy))
+		$params["runtime"] = array( new \Bitrix\Main\Entity\ReferenceField('DELIVERY_SERVICE', 'Bitrix\Sale\Delivery\Services\Table',
+			array('=this.DELIVERY_ID' => 'ref.ID')
+		));
+
+		$records = array();
+		$res = DeliveryPaySystemTable::getList($params);
+
+		while($record = $res->fetch())
 		{
-			$strGroupBy = implode(", ", $arGroupBy);
-			$strSql .=" GROUP BY ".$strGroupBy;
+			$delivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($record["DELIVERY_SERVICE_CODE"]);
+			$record["DELIVERY_ID"] = $delivery["SID"];
+			$record["DELIVERY_PROFILE_ID"] = isset($delivery["PROFILE"]) ? $delivery["PROFILE"] : null;
+			unset($record["DELIVERY_SERVICE_CODE"]);
+			$records[] = $record;
 		}
 
-		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		return $res;
+		$result = new \CDBResult;
+		$result->InitFromArray($records);
+		return $result;
 	}
 
 	public static function isPaySystemApplicable($paySystemId, $deliveryId)
@@ -81,9 +132,7 @@ class CSaleDelivery2PaySystem
 
 		$result = false;
 		$arDelivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryId);
-
 		$psInList = $dInList = $together = false;
-
 		$dbPSRec = self::GetList();
 
 		while($arPSRec = $dbPSRec->Fetch())
@@ -126,8 +175,6 @@ class CSaleDelivery2PaySystem
 		if(!is_array($arFields) || strlen($ID) <= 0)
 			return false;
 
-		$arAddedRecords = array();
-
 		$arFilterFields["DELIVERY_ID"] = $ID;
 
 		if(isset($arFields["DELIVERY_PROFILE_ID"]))
@@ -142,8 +189,6 @@ class CSaleDelivery2PaySystem
 		{
 			$arFilterFields["PAYSYSTEM_ID"] = $psId;
 			self::Add($arFilterFields);
-
-			$arAddedRecords[] = $arFilterFields;
 		}
 
 		return true;
@@ -196,17 +241,40 @@ class CSaleDelivery2PaySystem
 
 	public static function Delete($arFilter)
 	{
-		global $DB;
+		$con = \Bitrix\Main\Application::getConnection();
+		$sqlHelper = $con->getSqlHelper();
 
-		$strSqlSearch = self::makeSqlSearch($arFilter);
+		$delParams = "";
 
-		return $DB->Query("DELETE FROM b_sale_delivery2paysystem WHERE ".$strSqlSearch);
+		if(isset($arFilter["PAYSYSTEM_ID"]) && strlen($arFilter["PAYSYSTEM_ID"]) > 0)
+				$delParams .= "PAYSYSTEM_ID=".$sqlHelper->forSql($arFilter["PAYSYSTEM_ID"]);
+
+		$code = "";
+
+		if(isset($arFilter["DELIVERY_ID"]) && strlen($arFilter["DELIVERY_ID"]) > 0)
+		{
+			$code .= $arFilter["DELIVERY_ID"];
+
+			if(isset($arFilter["DELIVERY_PROFILE_ID"]) && strlen($arFilter["DELIVERY_PROFILE_ID"]) > 0)
+				$code .= ":".$arFilter["DELIVERY_PROFILE_ID"];
+		}
+
+		$deliveryId = 0;
+
+		if(strlen($code) > 0)
+			$deliveryId = Delivery\Services\Table::getIdByCode($code);
+
+		if(intval($deliveryId) > 0)
+			$delParams .= "DELIVERY_ID=".$sqlHelper->forSql($deliveryId);
+
+		if(strlen($delParams) > 0)
+			$con->queryExecute("DELETE FROM ".DeliveryPaySystemTable::getTableName()." WHERE ".$delParams);
+
+		return new CDBResult();
 	}
 
 	public static function Add($arFields)
 	{
-		global $DB;
-
 		if(!isset($arFields["DELIVERY_ID"])
 			||
 			strlen(trim($arFields["DELIVERY_ID"])) <=0
@@ -219,151 +287,15 @@ class CSaleDelivery2PaySystem
 			return false;
 		}
 
-		$arFieldsFiltered = array();
-
-		$arFieldsFiltered["DELIVERY_ID"] = $DB->ForSql($arFields["DELIVERY_ID"]);
-		$arFieldsFiltered["PAYSYSTEM_ID"] = $DB->ForSql($arFields["PAYSYSTEM_ID"]);
-
-		if(isset($arFields["DELIVERY_PROFILE_ID"]))
-			$arFieldsFiltered["DELIVERY_PROFILE_ID"] = $DB->ForSql($arFields["DELIVERY_PROFILE_ID"]);
-
-		$arInsert = $DB->PrepareInsert("b_sale_delivery2paysystem", $arFieldsFiltered);
-
-		$strSql = "INSERT INTO b_sale_delivery2paysystem (".$arInsert[0].") VALUES(".$arInsert[1].")";
-
-		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-	}
-
-	public static function getSyncData()
-	{
-		$arD2PS = array();
-		$dbD2PS = self::GetList();
-		while($arTmpD2PS = $dbD2PS->Fetch())
-			$arD2PS[] = $arTmpD2PS;
-
-		static $arPS = null;
-		if(is_null($arPS))
+		if(isset($arFields["DELIVERY_PROFILE_ID"]) && strlen($arFields["DELIVERY_PROFILE_ID"]) > 0)
 		{
-			$arPS = array();
-			$dbPS = CSalePaySystem::GetList();
-			while($arTmpPS = $dbPS->Fetch())
-				$arPS[] = $arTmpPS;
+			$arFields["DELIVERY_ID"] .= ":".$arFields["DELIVERY_PROFILE_ID"];
+			unset($arFields["DELIVERY_PROFILE_ID"]);
 		}
 
-		static $arDS = null;
-		if(is_null($arDS))
-		{
-			$arDS = array();
-			$dbDS = CSaleDeliveryHandler::GetList();
-			while($arTmpDS = $dbDS->Fetch())
-				$arDS[] = $arTmpDS;
-
-			$dbDS = CSaleDelivery::GetList();
-			while($arTmpDS = $dbDS->Fetch())
-			{
-				if(!isset($arTmpDS["SID"]))
-					$arTmpDS["SID"] = $arTmpDS["ID"];
-
-				$arDS[] = $arTmpDS;
-			}
-		}
-
-		return array(
-			"D2PS" => $arD2PS,
-			"DS" => $arDS,
-			"PS" => $arPS
-			);
-	}
-
-	public static function convertEmptyAll()
-	{
-		$data = self::getSyncData();
-
-		$psList = array();
-		$dsList = array();
-		$d2ps = array(
-			"PS" => array(),
-			"DS" => array()
-		);
-
-		$psEmptyAll = array();
-		$dsEmptyAll = array();
-
-		foreach ($data["D2PS"] as $d2psRec)
-		{
-			if(!in_array($d2psRec["PAYSYSTEM_ID"], $d2ps["PS"]))
-				$d2ps["PS"][] = $d2psRec["PAYSYSTEM_ID"];
-
-			$dId = $d2psRec["DELIVERY_ID"].(!is_null($d2psRec["DELIVERY_PROFILE_ID"]) ? ":".$d2psRec["DELIVERY_PROFILE_ID"] : "");
-
-			if(!in_array($dId, $d2ps["DS"]))
-				$d2ps["DS"][] = $dId;
-		}
-
-		foreach ($data["PS"] as $ps)
-		{
-			$psList[] = $ps["ID"];
-
-			if(!in_array($ps["ID"], $d2ps["PS"]))
-				$psEmptyAll[] = $ps["ID"];
-		}
-
-		foreach ($data["DS"] as $ds)
-		{
-			if(!isset($ds["ID"]) && isset($ds["SID"]))
-			{
-				if(isset($ds["PROFILES"]) && is_array($ds["PROFILES"]))
-				{
-					foreach ($ds["PROFILES"] as $pId => $tmpProf)
-					{
-						$dsId = $ds["SID"].":".$pId;
-
-						if(!in_array($dsId, $d2ps["DS"]))
-							$dsEmptyAll[] = array(
-								"SID" => $ds["SID"],
-								"PROFILE_ID" => $pId
-								);
-					}
-				}
-				else
-				{
-					$dsId = $ds["SID"];
-
-					if(!in_array($dsId, $d2ps["DS"]))
-						$dsEmptyAll[] = array("SID" => $ds["SID"]);
-
-				}
-			}
-			else
-			{
-				$dsId = $ds["ID"];
-
-				if(!in_array($dsId, $d2ps["DS"]))
-					$dsEmptyAll[] = array("SID" => $ds["ID"]);
-			}
-
-			$dsList[] = $dsId;
-		}
-
-		foreach ($psEmptyAll as $psId)
-			self::UpdatePaySystem($psId, $dsList);
-
-		foreach ($dsEmptyAll as $ds)
-			self::UpdateDelivery(
-				$ds["SID"],
-				array(
-					"DELIVERY_PROFILE_ID" => $ds["PROFILE_ID"],
-					"PAYSYSTEM_ID" => $psList
-					)
-			);
-
-		return true;
-	}
-
-	public static function convertEmptyAllAgent()
-	{
-		self::convertEmptyAll();
-		return "";
+		$arFields["DELIVERY_ID"] = Delivery\Services\Table::getIdByCode($arFields["DELIVERY_ID"]);
+		$res = DeliveryPaySystemTable::add($arFields);
+		return new CDBResult($res);
 	}
 }
 ?>

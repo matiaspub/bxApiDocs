@@ -41,11 +41,16 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 		);
 
 		$arFilter = array("%NAME" => $search, "ACTIVE"=>"Y");
-		if($arParams["SITE_ID"] <> '')
+		if ($arParams["SITE_ID"] <> '')
+		{
 			$arFilter["SITE_ID"] = $arParams["SITE_ID"];
-		if(!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"], ($arParams["SITE_ID"] <> '' ? true : false)))
+		}
+
+		if (!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"], ($arParams["SITE_ID"] <> '' ? true : false)))
+		{
 			$arFilter["CHECK_PERMISSIONS"] = $USER->GetID();
-		
+		}
+
 		$rsGroups = CSocNetGroup::GetList(array("NAME" => "ASC"), $arFilter);
 		$rsGroups->NavStart(30);
 		while ($arGroup = $rsGroups->NavNext(false))
@@ -77,28 +82,41 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 			}
 			$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
 		}
-		
+
 		return $elements;
 	}
-	
+
 	public function GetFormHtml($arParams=false)
 	{
 		global $USER;
 
-		if(is_array($arParams["socnetgroups"]) && $arParams["socnetgroups"]["disabled"] == "true")
+		if (
+			is_array($arParams["socnetgroups"])
+			&& $arParams["socnetgroups"]["disabled"] == "true"
+		)
+		{
 			return false;
+		}
 
 		$currElements = '';
-		if(is_array($arParams[$this->id]) && ($group_id = intval($arParams[$this->id]["group_id"])) > 0)
+		if (
+			is_array($arParams[$this->id])
+			&& ($group_id = intval($arParams[$this->id]["group_id"])) > 0
+		)
 		{
 			$arFinderParams = Array(
 				"PROVIDER" => $this->id,
 				"TYPE" => 4,
 			);
 
-			$arFilter = array("ID"=>$group_id, "ACTIVE"=>"Y");
-			if(!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"]))
+			$arFilter = array(
+				"ID" => $group_id,
+				"ACTIVE" => "Y"
+			);
+			if (!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"]))
+			{
 				$arFilter["CHECK_PERMISSIONS"] = $USER->GetID();
+			}
 
 			$rsGroups = CSocNetGroup::GetList(array(), $arFilter);
 			if($arGroup = $rsGroups->Fetch())
@@ -132,19 +150,21 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 				$currElements .= CFinder::GetFinderItem($arFinderParams, $arItem);
 			}
 		}
-		
+
 		$elements = "";
 		$arFinderParams = Array(
 			"PROVIDER" => $this->id,
 			"TYPE" => 3,
 		);
-		
+
 		$arLRU = CAccess::GetLastRecentlyUsed($this->id);
-		if(!empty($arLRU))
+
+		if (!empty($arLRU))
 		{
 			$arLast = array();
 			$arLastID = array();
 			$arElements = array();
+
 			foreach($arLRU as $val) 
 			{
 				if (preg_match('/^SG([0-9]+)_([A-Z])/', $val, $match))
@@ -153,14 +173,22 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 					$arLastID[$match[1]] = $match[1];
 				}
 			}
+
 			if (!empty($arLastID))
 			{
-				$arFilter = array("ID"=>$arLastID, "ACTIVE"=>"Y");
+				$arFilter = array(
+					"ID" => $arLastID,
+					"ACTIVE" => "Y"
+				);
 				if($arParams["SITE_ID"] <> '')
+				{
 					$arFilter["SITE_ID"] = $arParams["SITE_ID"];
+				}
 				if(!CSocNetUser::IsCurrentUserModuleAdmin($arParams["SITE_ID"]))
+				{
 					$arFilter["CHECK_PERMISSIONS"] = $USER->GetID();
-				
+				}
+
 				$rsGroups = CSocNetGroup::GetList(array("NAME" => "ASC"), $arFilter);
 				while($arGroup = $rsGroups->Fetch())
 				{
@@ -186,53 +214,59 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 					}
 					$arElements[$arItem['ID']] = $arItem;
 				}
+
 				foreach($arLRU as $val) 
 				{
 					if (preg_match('/^SG([0-9]+)_([A-Z])/', $val, $match))
 					{
-						$arItem = $arElements[$match[1]];
-						if ($match[2] == 'K')
+						if (isset($arElements[$match[1]]))
 						{
-							$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_K';
-							$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_k");
+							$arItem = $arElements[$match[1]];
+							if ($match[2] == 'K')
+							{
+								$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_K';
+								$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_k");
+							}
+							else if ($match[2] == 'E')
+							{
+								$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_E';
+								$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_e");
+							}
+							else if ($match[2] == 'A')
+							{
+								$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_A';
+								$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_a");
+							}
+							$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
 						}
-						else if ($match[2] == 'E')
-						{
-							$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_E';
-							$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_e");
-						}
-						else if ($match[2] == 'A')
-						{
-							$arItem['ID'] = 'SG'.$arElements[$match[1]]['ID'].'_A';
-							$arItem['NAME'] = $arElements[$match[1]]['NAME'].': '.GetMessage("authprov_sg_a");
-						}
-						$elements .= CFinder::GetFinderItem($arFinderParams, $arItem);
 					}
 				}
 			}
 		}
-		
+
 		$arFinderParams = Array(
 			"PROVIDER" => $this->id,
 			"TYPE" => 4,
 		);
-		
+
 		$arFilter = array(
 			"USER_ID" => $USER->GetID(),
 			"<=ROLE" => SONET_ROLES_USER,
 			"GROUP_ACTIVE" => "Y"
 		);
 		if($arParams["SITE_ID"] <> '')
+		{
 			$arFilter["GROUP_SITE_ID"] = $arParams["SITE_ID"];
+		}
 
 		$rsGroups = CSocNetUserToGroup::GetList(
 			array("GROUP_NAME" => "ASC"),
 			$arFilter,
 			false,
-			array(),
+			false,
 			array("ID", "GROUP_ID", "GROUP_NAME", "GROUP_DESCRIPTION", "GROUP_IMAGE_ID")
 		);
-		
+
 		$myElements = '';
 		while($arGroup = $rsGroups->Fetch())
 		{
@@ -286,17 +320,21 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 			"SEARCH" => "Y",
 		);
 		$html = CFinder::GetFinderAppearance($arFinderParams, $arPanels);
-		
+
 		return array("HTML"=>$html, "SELECTED"=>($currElements <> ''));
 	}
-	
+
 	static public function GetNames($arCodes)
 	{
 		$arID = array();
-		foreach($arCodes as $code) 
-			if(preg_match('/^SG([0-9]+)_[A-Z]$/', $code, $match))
+		foreach ($arCodes as $code)
+		{
+			if (preg_match('/^SG([0-9]+)_[A-Z]$/', $code, $match))
+			{
 				$arID[] = $match[1];
-		
+			}
+		}
+
 		if(!empty($arID))
 		{
 			$arResult = array();
@@ -311,7 +349,7 @@ class CSocNetGroupAuthProvider extends CAuthProvider implements IProviderInterfa
 		}
 		return false;
 	}
-	
+
 	public static function GetProviders()
 	{
 		return array(
@@ -343,24 +381,13 @@ class CSocNetUserAuthProvider extends CAuthProvider
 		if(CSocNetUser::IsFriendsAllowed())
 		{
 			$USER_ID = intval($USER_ID);
-			
+
 			$dbFriends = CSocNetUserRelations::GetRelatedUsers($USER_ID, SONET_RELATIONS_FRIEND);
 			while ($arFriends = $dbFriends->Fetch())
 			{
 				$friendID = (($USER_ID == $arFriends["FIRST_USER_ID"]) ? $arFriends["SECOND_USER_ID"] : $arFriends["FIRST_USER_ID"]);
 				$DB->Query("INSERT INTO b_user_access (USER_ID, PROVIDER_ID, ACCESS_CODE) VALUES 
 					(".$friendID.", '".$DB->ForSQL($this->id)."', 'SU".$USER_ID."_".SONET_RELATIONS_TYPE_FRIENDS."')");
-
-				$dbFriends2 = CSocNetUserRelations::GetRelatedUsers($friendID, SONET_RELATIONS_FRIEND);
-				while ($arFriends2 = $dbFriends2->Fetch())
-				{
-					$friendID2 = (($friendID == $arFriends2["FIRST_USER_ID"]) ? $arFriends2["SECOND_USER_ID"] : $arFriends2["FIRST_USER_ID"]);
-					if ($friendID2 != $USER_ID)
-					{
-						$DB->Query("INSERT INTO b_user_access (USER_ID, PROVIDER_ID, ACCESS_CODE) VALUES 
-							(".$friendID2.", '".$DB->ForSQL($this->id)."', 'SU".$USER_ID."_".SONET_RELATIONS_TYPE_FRIENDS2."')");
-					}
-				}
 			}
 		}
 	}

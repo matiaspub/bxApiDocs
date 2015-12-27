@@ -189,10 +189,17 @@ class CSocNetLog extends CAllSocNetLog
 			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_LOG", $ID, $arFields);
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
+			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$ID);
+			}
+
+			$cache = new CPHPCache;
+			$cache->CleanDir("/sonet/log/".intval($ID / 1000)."/".$ID."/comments/");
 		}
 		elseif (!$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_LOG", $ID, $arFields))
+		{
 			$ID = False;
+		}
 
 		return $ID;
 	}
@@ -334,45 +341,77 @@ class CSocNetLog extends CAllSocNetLog
 			$default_follow = CSocNetLogFollow::GetDefaultValue($USER->GetID());
 			$default_field = ($default_follow == "Y" ? "LOG_UPDATE" : "LOG_DATE");
 
-			$arFields["DATE_FOLLOW"] = Array("FIELD" => "CASE 
-				WHEN LFW.USER_ID IS NULL 
-					THEN L.".$default_field." 
-				WHEN LFW.FOLLOW_DATE IS NOT NULL 
-					THEN LFW.FOLLOW_DATE 
-				WHEN LFW.TYPE = 'Y' 
-					THEN L.LOG_UPDATE 
-				ELSE L.LOG_DATE 
-				END", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
+			$arFields["DATE_FOLLOW"] = Array(
+				"FIELD" => "CASE
+					WHEN LFW.USER_ID IS NULL
+						THEN L.".$default_field."
+					WHEN LFW.FOLLOW_DATE IS NOT NULL
+						THEN LFW.FOLLOW_DATE
+					WHEN LFW.TYPE = 'Y'
+						THEN L.LOG_UPDATE
+					ELSE L.LOG_DATE
+				END",
+				"TYPE" => "datetime",
+				"FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID")
+			);
 
-			$arFields["FOLLOW"] = Array("FIELD" => "case when LFW.USER_ID IS NULL then '".$default_follow."' else LFW.TYPE end", "TYPE" => "string", "FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID"));
+			$arFields["FOLLOW"] = Array(
+				"FIELD" => "CASE
+					WHEN LFW.USER_ID IS NULL
+						THEN '".$default_follow."'
+					ELSE LFW.TYPE
+				END",
+				"TYPE" => "string",
+				"FROM" => "LEFT JOIN b_sonet_log_follow LFW ON LFW.USER_ID = ".$USER->GetID()." AND LFW.REF_ID = L.ID AND LFW.CODE = ".$DB->Concat("'L'", "L.ID")
+			);
 
 			if (!in_array("FOLLOW", $arSelectFields))
+			{
 				$arSelectFields[] = "FOLLOW";
+			}
 		}
 
 		if (array_key_exists("SITE_ID", $arFilter))
 		{
-			$arFields["SITE_ID"] = Array("FIELD" => "SLS.SITE_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sonet_log_site SLS ON L.ID = SLS.LOG_ID");
+			$arFields["SITE_ID"] = Array(
+				"FIELD" => "SLS.SITE_ID",
+				"TYPE" => "string",
+				"FROM" => "LEFT JOIN b_sonet_log_site SLS ON L.ID = SLS.LOG_ID"
+			);
 
 			if (is_array($arFilter["SITE_ID"]))
 			{
 				$site_cnt = 0;
 				foreach ($arFilter["SITE_ID"] as $site_id_tmp)
+				{
 					if ($site_id_tmp)
+					{
 						$site_cnt++;
+					}
+				}
 
 				$strDistinct = ($site_cnt > 1 ? " DISTINCT " : " ");
 			}
 			else
+			{
 				$strDistinct = " ";
+			}
 
 			foreach ($arSelectFields as $i => $strFieldTmp)
+			{
 				if ($strFieldTmp == "SITE_ID")
+				{
 					unset($arSelectFields[$i]);
+				}
+			}
 
 			foreach ($arOrder as $by => $order)
+			{
 				if (!in_array($by, $arSelectFields))
+				{
 					$arSelectFields[] = $by;
+				}
+			}
 		}
 		else
 		{
@@ -387,14 +426,23 @@ class CSocNetLog extends CAllSocNetLog
 		{
 			$arCBFilterEntityType = array();
 			foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
+			{
 				if (
 					array_key_exists("USE_CB_FILTER", $arEntityTypeTmp)
 					&& $arEntityTypeTmp["USE_CB_FILTER"] == "Y"
 				)
+				{
 					$arCBFilterEntityType[] = $entity_type_tmp;
+				}
+			}
 
-			if (is_array($arCBFilterEntityType) && count($arCBFilterEntityType) > 0)
+			if (
+				is_array($arCBFilterEntityType)
+				&& count($arCBFilterEntityType) > 0
+			)
+			{
 				$arFilter["ENTITY_TYPE"] = $arCBFilterEntityType;
+			}
 		}
 
 		if (array_key_exists("LOG_RIGHTS", $arFilter))
@@ -403,31 +451,56 @@ class CSocNetLog extends CAllSocNetLog
 			if(is_array($arFilter["LOG_RIGHTS"]))
 			{
 				foreach($arFilter["LOG_RIGHTS"] as $str)
+				{
 					if(trim($str))
+					{
 						$Rights[] = trim($str);
+					}
+				}
 			}
 			elseif(trim($arFilter["LOG_RIGHTS"]))
-				$Rights = trim($arFilter["LOG_RIGHTS"]);
-
-			unset($arFilter["LOG_RIGHTS"]);
-			if((is_array($Rights) && !empty($Rights)) || !is_array($Rights))
 			{
-				$arFilter["LOG_RIGHTS"] = $Rights;
-				$arFields["LOG_RIGHTS"] = Array("FIELD" => "SLR0.GROUP_CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log_right SLR0 ON L.ID = SLR0.LOG_ID");
+				$Rights = trim($arFilter["LOG_RIGHTS"]);
 			}
 
-			if(is_array($Rights) && count($Rights) > 1)
+			unset($arFilter["LOG_RIGHTS"]);
+			if (
+				(
+					is_array($Rights)
+					&& !empty($Rights)
+				)
+				|| !is_array($Rights)
+			)
+			{
+				$arFilter["LOG_RIGHTS"] = $Rights;
+				$arFields["LOG_RIGHTS"] = Array(
+					"FIELD" => "SLR0.GROUP_CODE",
+					"TYPE" => "string",
+					"FROM" => "INNER JOIN b_sonet_log_right SLR0 ON L.ID = SLR0.LOG_ID"
+				);
+			}
+
+			if(
+				is_array($Rights)
+				&& count($Rights) > 1
+			)
+			{
 				$strDistinct = " DISTINCT ";
+			}
 		}
 
 		if (array_key_exists("USER_ID|COMMENT_USER_ID", $arFilter))
+		{
 			$strDistinct = " DISTINCT ";
+		}
 
 		if($arParams["IS_CRM"] == "Y")
 		{
 			$events = GetModuleEvents("socialnetwork", "OnFillSocNetLogFields");
 			while ($arEvent = $events->Fetch())
+			{
 				ExecuteModuleEventEx($arEvent, array(&$arFields));
+			}
 		}
 
 		$arFields = array_merge($arFields1, $arFields);
@@ -440,8 +513,10 @@ class CSocNetLog extends CAllSocNetLog
 		}
 
 		$r = $obUserFieldsSql->GetFilter();
-		if(strlen($r)>0)
+		if (strlen($r) > 0)
+		{
 			$strSqlUFFilter = " (".$r.") ";
+		}
 
 		$arSqls["RIGHTS"] = "";
 		$arSqls["CRM_RIGHTS"] = "";
@@ -498,6 +573,7 @@ class CSocNetLog extends CAllSocNetLog
 			)
 			{
 				foreach($arSocNetAllowedSubscribeEntityTypesDesc as $entity_type_tmp => $arEntityTypeTmp)
+				{
 					if (
 						array_key_exists("HAS_MY", $arEntityTypeTmp)
 						&& $arEntityTypeTmp["HAS_MY"] == "Y"
@@ -507,7 +583,10 @@ class CSocNetLog extends CAllSocNetLog
 						&& strlen($arEntityTypeTmp["METHOD_MY"]) > 0
 						&& method_exists($arEntityTypeTmp["CLASS_MY"], $arEntityTypeTmp["METHOD_MY"])
 					)
+					{
 						$arMyEntities[$entity_type_tmp] = call_user_func(array($arEntityTypeTmp["CLASS_MY"], $arEntityTypeTmp["METHOD_MY"]));
+					}
+				}
 
 				$arParams["MY_ENTITIES"] = $arMyEntities;
 			}
@@ -705,68 +784,88 @@ class CSocNetLog extends CAllSocNetLog
 		if (strlen($arSqls["ORDERBY"]) > 0)
 			$strSql .= "ORDER BY ".$arSqls["ORDERBY"]." ";
 
-		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) <= 0)
+		if (
+			is_array($arNavStartParams)
+			&& IntVal($arNavStartParams["nTopCount"]) <= 0
+		)
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-				$obUserFieldsSql->GetSelect()." ".
-				"FROM b_sonet_log L ".
-				$strMinIDJoin.
-				"	".$arSqls["FROM"]." ".
-				$obUserFieldsSql->GetJoin("L.ID")." ";
-
-			$bWhereStarted = false;
-
-			if (strlen($arSqls["WHERE"]) > 0)
+			if (
+				isset($arNavStartParams["nRecordCount"])
+				&& intval($arNavStartParams["nRecordCount"]) > 0
+			)
 			{
-				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
-				$bWhereStarted = true;
-			}
-
-			if (strlen($strSqlUFFilter) > 0)
-			{
-				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$strSqlUFFilter." ";
-				$bWhereStarted = true;
-			}
-
-			if (strlen($arSqls["RIGHTS"]) > 0)
-			{
-				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["RIGHTS"]." ";
-				$bWhereStarted = true;
-			}
-
-			if (strlen($arSqls["CRM_RIGHTS"]) > 0)
-			{
-				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["CRM_RIGHTS"]." ";
-				$bWhereStarted = true;
-			}
-
-			if (strlen($arSqls["SUBSCRIBE"]) > 0)
-			{
-				$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ")."(".$arSqls["SUBSCRIBE"].") ";
-				$bWhereStarted = true;
-			}
-			if (strlen($arSqls["GROUPBY"]) > 0)
-				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-
-			//echo "!2.1!=".htmlspecialcharsbx($strSql_tmp)."<br>";
-
-			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			$cnt = 0;
-			if (strlen($arSqls["GROUPBY"]) <= 0)
-			{
-				if ($arRes = $dbRes->Fetch())
-					$cnt = $arRes["CNT"];
+				$cnt = intval($arNavStartParams["nRecordCount"]);
 			}
 			else
 			{
-				// ТОЛЬКО ДЛЯ MYSQL!!! ДЛЯ ORACLE ДРУГОЙ КОД
-				$cnt = $dbRes->SelectedRowsCount();
-			}
+				$strSql_tmp =
+					"SELECT COUNT('x') as CNT ".
+					$obUserFieldsSql->GetSelect()." ".
+					"FROM b_sonet_log L ".
+					$strMinIDJoin.
+					"	".$arSqls["FROM"]." ".
+					$obUserFieldsSql->GetJoin("L.ID")." ";
 
-			// for empty 2nd page show
-			if ($arNavStartParams["bSkipPageReset"] && $arNavStartParams["nPageSize"] >= $cnt)
-				$cnt = $arNavStartParams["nPageSize"] + $cnt;
+				$bWhereStarted = false;
+
+				if (strlen($arSqls["WHERE"]) > 0)
+				{
+					$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
+					$bWhereStarted = true;
+				}
+
+				if (strlen($strSqlUFFilter) > 0)
+				{
+					$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$strSqlUFFilter." ";
+					$bWhereStarted = true;
+				}
+
+				if (strlen($arSqls["RIGHTS"]) > 0)
+				{
+					$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["RIGHTS"]." ";
+					$bWhereStarted = true;
+				}
+
+				if (strlen($arSqls["CRM_RIGHTS"]) > 0)
+				{
+					$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ").$arSqls["CRM_RIGHTS"]." ";
+					$bWhereStarted = true;
+				}
+
+				if (strlen($arSqls["SUBSCRIBE"]) > 0)
+				{
+					$strSql_tmp .= ($bWhereStarted ? " AND " : " WHERE ")."(".$arSqls["SUBSCRIBE"].") ";
+					$bWhereStarted = true;
+				}
+				if (strlen($arSqls["GROUPBY"]) > 0)
+					$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+
+				//echo "!2.1!=".htmlspecialcharsbx($strSql_tmp)."<br>";
+
+				$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$cnt = 0;
+				if (strlen($arSqls["GROUPBY"]) <= 0)
+				{
+					if ($arRes = $dbRes->Fetch())
+					{
+						$cnt = $arRes["CNT"];
+					}
+				}
+				else
+				{
+					// ТОЛЬКО ДЛЯ MYSQL!!! ДЛЯ ORACLE ДРУГОЙ КОД
+					$cnt = $dbRes->SelectedRowsCount();
+				}
+
+				// for empty 2nd page show
+				if (
+					$arNavStartParams["bSkipPageReset"]
+					&& $arNavStartParams["nPageSize"] >= $cnt
+				)
+				{
+					$cnt = $arNavStartParams["nPageSize"] + $cnt;
+				}
+			}
 
 			$dbRes = new CDBResult();
 
@@ -777,7 +876,9 @@ class CSocNetLog extends CAllSocNetLog
 		else
 		{
 			if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) > 0)
+			{
 				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
+			}
 
 			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 
@@ -832,13 +933,23 @@ public static 	function Delete($ID)
 		$bSuccess = $DB->Query("DELETE FROM b_sonet_log WHERE ID = ".$ID, true);
 
 		if ($bSuccess)
+		{
 			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_LOG", $ID);
 
-		if(
-			$bSuccess 
-			&& defined("BX_COMP_MANAGED_CACHE")
-		)
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$ID);
+			$db_events = GetModuleEvents("socialnetwork", "OnSocNetLogDelete");
+			while ($arEvent = $db_events->Fetch())
+			{
+				ExecuteModuleEventEx($arEvent, array($ID));
+			}
+
+			if (defined("BX_COMP_MANAGED_CACHE"))
+			{
+				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".$ID);
+			}
+
+			$cache = new CPHPCache;
+			$cache->CleanDir("/sonet/log/".intval($ID / 1000)."/".$ID."/comments/");
+		}
 
 		return $bSuccess;
 	}

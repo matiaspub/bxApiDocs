@@ -2,7 +2,7 @@
 
 class CAppleMessage extends CPushMessage
 {
-	const PAYLOAD_MAXIMUM_SIZE = 256;
+	const PAYLOAD_MAXIMUM_SIZE = 2048;
 	const APPLE_RESERVED_NAMESPACE = 'aps';
 
 	protected $_bAutoAdjustLongPayload = true;
@@ -33,6 +33,12 @@ class CAppleMessage extends CPushMessage
 		{
 			$aPayload[self::APPLE_RESERVED_NAMESPACE]['alert'] = (string)$this->text;
 		}
+
+		if (isset($this->category))
+		{
+			$aPayload[self::APPLE_RESERVED_NAMESPACE]['category'] = (string)$this->category;
+		}
+
 		if (isset($this->badge) && $this->badge >= 0)
 		{
 			$aPayload[self::APPLE_RESERVED_NAMESPACE]['badge'] = (int)$this->badge;

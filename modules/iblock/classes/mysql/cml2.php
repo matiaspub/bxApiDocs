@@ -7,10 +7,7 @@ This class is used to parse and load an xml file into database table.
  * <br><br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -122,13 +119,10 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Удаляет таблицы содержащие ранее загруженный файл. Необходимо вызывать функцию перед началом загрузки XML. <br></p>
+	* <p>Удаляет таблицы, содержащие ранее загруженный файл. Необходимо вызывать метод перед началом загрузки XML. Метод динамичный. <br></p>
 	*
 	*
-	*
-	*
-	* @return bool <p>В случае возникновения ошибки функция возвращает false.</p>
-	*
+	* @return bool <p>В случае возникновения ошибки метожд возвращает false.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
@@ -158,20 +152,15 @@ class CIBlockXMLFile
 
 	
 	/**
-	* <p>Создает таблицы для загрузки XML.</p> <p><b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа. <br></p>
-	*
-	*
+	* <p>Создает таблицы для загрузки XML. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа.</div>
 	*
 	*
 	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
 	* поддержкой нескольких сессий "одновременного" импорта. Введён
 	* для совместимости. Необязательный параметр.
 	*
-	*
-	*
-	* @return bool <p>В случае если таблицы создать не удалось функция возвращает
+	* @return bool <p>В случае, если таблицы создать не удалось, метод возвращает
 	* false.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
@@ -261,20 +250,15 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. <br></p>
-	*
-	*
+	* <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. Метод динамичный. <br></p>
 	*
 	*
 	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
 	* поддержкой нескольких сессий "одновременного" импорта. Введён
 	* для совместимости. Необязательный параметр.
 	*
-	*
-	*
-	* @return bool <p>Если во время создания индексов произойдет ошибка БД, функция
+	* @return bool <p>Если во время создания индексов произойдет ошибка БД, метод
 	* вернет false.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
@@ -350,13 +334,10 @@ class CIBlockXMLFile
 
 	
 	/**
-	* <p>Метод возвращает объем прочитанных байт.</p>
-	*
-	*
+	* <p>Метод возвращает объем прочитанных байт. Метод динамичный.</p>
 	*
 	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -388,7 +369,6 @@ class CIBlockXMLFile
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
 	* </ul><br><br>
@@ -418,35 +398,24 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Функция загружает данные из файла в таблицы БД. Когда весь файл прочитан она возвращает true. Если функции не удалось уложиться в time_limit секунд она вернет false и в параметре NS данные необходимые для продолжения работы на следующем шаге. <br></p> <p><b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</p>
-	*
-	*
+	* <p>Метод загружает данные из файла в таблицы БД. Когда весь файл прочитан, он возвращает true. Если методу не удалось уложиться в time_limit секунд, он вернет false и в параметре NS данные, необходимые для продолжения работы на следующем шаге. Метод динамичный. <br></p> <p></p> <div class="note"> <b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</div>
 	*
 	*
 	* @param resource $fp  Дескриптор открытого файла. Файл рекомендуется открывать в
 	* режиме "rb". <br>
 	*
-	*
-	*
-	* @param array &$NS  Массив с данными для продолжения работы функции прерванной на
+	* @param array &$NS  Массив с данными для продолжения работы метода, прерванного на
 	* предыдущем шаге.
 	*
-	*
-	*
-	* @param int $time_limit = 0 Ограничение работы функции по времени. В секундах. Если не задан
-	* или равен нулю, то функция будет работать без ограничений. <br>
-	*
-	*
+	* @param int $time_limit = 0 Ограничение работы метода по времени. В секундах. Если не задан
+	* или равен нулю, то метод будет работать без ограничений. <br>
 	*
 	* @param int $read_size = 1024 Сколько байт считывать за одну операцию чтения файла. Большие
 	* значения увеличивают производительность при большем
 	* потреблении памяти.
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает true если файл был полностью загружен и false в
+	* @return bool <p>Метод возвращает true, если файл был полностью загружен, и false - в
 	* противном случае.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
@@ -770,7 +739,7 @@ class CIBlockXMLFile
 				//Let's handle attributes
 				$elementAttrs = substr($elementName, $ps+1);
 				$elementName = substr($elementName, 0, $ps);
-				preg_match_all("/(\\S+)\\s*=\\s*[\"](.*?)[\"]/s", $elementAttrs, $attrs_tmp);
+				preg_match_all("/(\\S+)\\s*=\\s*[\"](.*?)[\"]/s".BX_UTF_PCRE_MODIFIER, $elementAttrs, $attrs_tmp);
 				$attrs = array();
 				if(strpos($elementAttrs, "&")===false)
 				{
@@ -931,7 +900,9 @@ class CIBlockXMLFile
 		$arSQLWhere = array();
 		foreach($arFilter as $field => $value)
 		{
-			if($field == "ID" || $field == "LEFT_MARGIN")
+			if($field == "ID" && is_array($value) && !empty($value))
+				$arSQLWhere[$field] = $field." in (".implode(",", array_map("intval", $value)).")";
+			elseif($field == "ID" || $field == "LEFT_MARGIN")
 				$arSQLWhere[$field] = $field." = ".intval($value);
 			elseif($field == "PARENT_ID" || $field == "PARENT_ID+0")
 				$arSQLWhere[$field] = $field." = ".intval($value);

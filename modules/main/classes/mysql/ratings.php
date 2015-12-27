@@ -274,9 +274,7 @@ class CRatings extends CAllRatings
 	// insert result calculate rating-components
 	
 	/**
-	* <p>Обновляет дату следующего подсчета критерия рейтингования.</p>
-	*
-	*
+	* <p>Обновляет дату следующего подсчета критерия рейтингования. Динамичный метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
@@ -285,10 +283,7 @@ class CRatings extends CAllRatings
 	* <b>REFRESH_INTERVAL</b> – периодичность перерасчета критерия (в минутах)</li>
 	* </ul> Все поля являются обязательными.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

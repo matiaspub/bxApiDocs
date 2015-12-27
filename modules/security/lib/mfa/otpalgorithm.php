@@ -41,6 +41,7 @@ abstract class OtpAlgorithm
 	 * Each algorithm must provide:
 	 *  string type
 	 *  string title
+	 *  bool required_two_code
 	 *
 	 * @return array
 	 * @throws NotImplementedException

@@ -127,7 +127,7 @@ class Option
 				);
 				while ($ar = $res->fetch())
 				{
-					$s = ($ar["SITE_ID"] == "") ? "-" : $ar["SITE_ID"];
+					$s = ($ar["SITE_ID"] == ""? "-" : $ar["SITE_ID"]);
 					self::$options[$s][$moduleId][$ar["NAME"]] = $ar["VALUE"];
 				}
 			}
@@ -160,7 +160,7 @@ class Option
 		}
 	}
 
-	public static function set($moduleId, $name, $value = "", $siteId = false)
+	public static function set($moduleId, $name, $value = "", $siteId = "")
 	{
 		if (static::$cacheTtl === null)
 			static::$cacheTtl = self::getCacheTtl();
@@ -215,10 +215,8 @@ class Option
 			);
 		}
 
-		if ($siteId == "")
-			$siteId = '-';
-
-		self::$options[$siteId][$moduleId][$name] = $value;
+		$s = ($siteId == ""? '-' : $siteId);
+		self::$options[$s][$moduleId][$name] = $value;
 
 		self::loadTriggers($moduleId);
 
@@ -229,7 +227,17 @@ class Option
 		);
 		$event->send();
 
-		return;
+		$event = new Main\Event(
+			"main",
+			"OnAfterSetOption",
+			array(
+				"moduleId" => $moduleId,
+				"name" => $name,
+				"value" => $value,
+				"siteId" => $siteId,
+			)
+		);
+		$event->send();
 	}
 
 	private static function loadTriggers($moduleId)

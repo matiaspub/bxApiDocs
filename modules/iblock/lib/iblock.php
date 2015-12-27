@@ -20,6 +20,7 @@ Loc::loadMessages(__FILE__);
  * <li> LIST_PAGE_URL string(255) optional
  * <li> DETAIL_PAGE_URL string(255) optional
  * <li> SECTION_PAGE_URL string(255) optional
+ * <li> CANONICAL_PAGE_URL string(255) optional
  * <li> PICTURE int optional
  * <li> DESCRIPTION text optional
  * <li> DESCRIPTION_TYPE enum ('text', 'html') optional default 'text'
@@ -33,6 +34,7 @@ Loc::loadMessages(__FILE__);
  * <li> LIST_MODE enum ('S' or 'C') optional default ''
  * <li> RIGHTS_MODE enum ('S' or 'E') optional default 'S'
  * <li> SECTION_PROPERTY bool optional default 'N'
+ * <li> PROPERTY_INDEX enum ('N', 'Y', 'I') optional default 'N'
  * <li> VERSION enum (1 or 2) optional default 1
  * <li> LAST_CONV_ELEMENT int optional default 0 <b>internal use only</b>
  * <li> SOCNET_GROUP_ID int optional <b>internal use only</b>
@@ -52,6 +54,7 @@ class IblockTable extends Entity\DataManager
 	const COMBINED = 'C';
 	const SIMPLE = 'S';
 	const EXTENDED = 'E';
+	const INVALID = 'I';
 
 	/**
 	 * Returns path to the file which contains definition of the class.
@@ -132,6 +135,11 @@ class IblockTable extends Entity\DataManager
 				'title' => Loc::getMessage('IBLOCK_ENTITY_SECTION_PAGE_URL_FIELD'),
 				'validation' => array(__CLASS__, 'validateSectionPageUrl'),
 			),
+			'CANONICAL_PAGE_URL' => array(
+				'data_type' => 'string',
+				'title' => Loc::getMessage('IBLOCK_ENTITY_CANONICAL_PAGE_URL_FIELD'),
+				'validation' => array(__CLASS__, 'validateCanonicalPageUrl'),
+			),
 			'PICTURE' => array(
 				'data_type' => 'integer',
 				'title' => Loc::getMessage('IBLOCK_ENTITY_PICTURE_FIELD'),
@@ -193,6 +201,11 @@ class IblockTable extends Entity\DataManager
 			'SECTION_PROPERTY' => array(
 				'data_type' => 'boolean',
 				'values' => array('N','Y'),
+				'title' => Loc::getMessage('IBLOCK_ENTITY_SECTION_PROPERTY_FIELD'),
+			),
+			'PROPERTY_INDEX' => array(
+				'data_type' => 'enum',
+				'values' => array('N', 'Y', self::INVALID),
 				'title' => Loc::getMessage('IBLOCK_ENTITY_SECTION_PROPERTY_FIELD'),
 			),
 			'VERSION' => array(
@@ -291,6 +304,18 @@ class IblockTable extends Entity\DataManager
 	 * @return array
 	 */
 	public static function validateSectionPageUrl()
+	{
+		return array(
+			new Entity\Validator\Length(null, 255),
+		);
+	}
+
+	/**
+	 * Returns validators for CANONICAL_PAGE_URL field.
+	 *
+	 * @return array
+	 */
+	public static function validateCanonicalPageUrl()
 	{
 		return array(
 			new Entity\Validator\Length(null, 255),

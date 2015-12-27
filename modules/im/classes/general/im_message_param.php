@@ -1,4 +1,5 @@
 <?
+use Bitrix\Im as IM;
 
 class CIMMessageParam
 {
@@ -12,12 +13,16 @@ class CIMMessageParam
 
 		if (is_null($params) || count($params) <= 0)
 		{
-			$DB->Query("
-				DELETE FROM b_im_message_param
-				WHERE
-				MESSAGE_ID = ".$messageId."
-			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
+			$messageParameters = IM\MessageParamTable::getList(array(
+				'select' => array('ID'),
+				'filter' => array(
+					'=MESSAGE_ID' => $messageId,
+				),
+			));
+			while ($parameterInfo = $messageParameters->fetch())
+			{
+				IM\MessageParamTable::delete($parameterInfo['ID']);
+			}
 			return true;
 		}
 		$default = self::GetDefault();
@@ -27,52 +32,42 @@ class CIMMessageParam
 		{
 			if (isset($default[$key]) && $default[$key] == $val)
 			{
-				$sqlName = "'".$DB->ForSQL($key, 100)."'";
-				$arToDelete[$sqlName] = "
-					DELETE FROM b_im_message_param
-					WHERE
-					MESSAGE_ID = ".$messageId."
-					AND PARAM_NAME = ".$sqlName."
-				";
+				$arToDelete[$key] = array(
+					"=MESSAGE_ID" => $messageId,
+					"=PARAM_NAME" => $key,
+				);
 			}
 		}
 
 		$arToInsert = array();
 		foreach($params as $k1 => $v1)
 		{
-			$name = trim($k1);
+			$name = substr(trim($k1), 0, 100);
 			if(strlen($name))
 			{
-				$sqlName = "'".$DB->ForSQL($name, 100)."'";
-
 				if(!is_array($v1))
 					$v1 = array($v1);
 
 				if (empty($v1))
 				{
-					$arToDelete[$sqlName] = "
-						DELETE FROM b_im_message_param
-						WHERE
-						MESSAGE_ID = ".$messageId."
-						AND PARAM_NAME = ".$sqlName."
-					";
+					$arToDelete[$name] = array(
+						"=MESSAGE_ID" => $messageId,
+						"=PARAM_NAME" => $name,
+					);
 				}
 				else
 				{
 					foreach($v1 as $v2)
 					{
-						$value = trim($v2);
+						$value = substr(trim($v2), 0, 100);
 						if(strlen($value))
 						{
-							$sqlValue = "'".$DB->ForSQL($value, 100)."'";
-							$key = md5($sqlName).md5($sqlValue);
-
-							$arToInsert[$key] = "
-								INSERT INTO b_im_message_param
-								(MESSAGE_ID, PARAM_NAME, PARAM_VALUE)
-								VALUES
-								(".$messageId.", ".$sqlName.", ".$sqlValue.")
-							";
+							$key = md5($name).md5($value);
+							$arToInsert[$key] = array(
+								"MESSAGE_ID" => $messageId,
+								"PARAM_NAME" => $name,
+								"PARAM_VALUE" => $value,
+							);
 						}
 					}
 				}
@@ -81,38 +76,42 @@ class CIMMessageParam
 
 		if(!empty($arToInsert))
 		{
-			$rs = $DB->Query("
-				SELECT PARAM_NAME, PARAM_VALUE
-				FROM b_im_message_param
-				WHERE MESSAGE_ID = ".$messageId."
-			", false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			while($ar = $rs->Fetch())
+			$messageParameters = IM\MessageParamTable::getList(array(
+				'select' => array('ID', 'PARAM_NAME', 'PARAM_VALUE'),
+				'filter' => array(
+					'=MESSAGE_ID' => $messageId,
+				),
+			));
+			while($ar = $messageParameters->fetch())
 			{
-				$sqlName = "'".$DB->ForSQL($ar["PARAM_NAME"], 100)."'";
-				$sqlValue = "'".$DB->ForSQL($ar["PARAM_VALUE"], 100)."'";
-				$key = md5($sqlName).md5($sqlValue);
-
+				$key = md5($ar["PARAM_NAME"]).md5($ar["PARAM_VALUE"]);
 				if(array_key_exists($key, $arToInsert))
 				{
 					unset($arToInsert[$key]);
 				}
 				else if (isset($params[$ar["PARAM_NAME"]]))
 				{
-					$DB->Query($s = "
-						DELETE FROM b_im_message_param
-						WHERE
-						MESSAGE_ID = ".$messageId."
-						AND PARAM_NAME = ".$sqlName."
-						AND PARAM_VALUE = ".$sqlValue."
-					", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					IM\MessageParamTable::delete($ar['ID']);
 				}
 			}
 		}
-		foreach($arToInsert as $sql)
-			$DB->Query($sql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		foreach($arToDelete as $sql)
-			$DB->Query($sql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		foreach($arToInsert as $parameterInfo)
+		{
+			IM\MessageParamTable::add($parameterInfo);
+		}
+
+		foreach($arToDelete as $filter)
+		{
+			$messageParameters = IM\MessageParamTable::getList(array(
+				'select' => array('ID'),
+				'filter' => $filter,
+			));
+			while ($parameterInfo = $messageParameters->fetch())
+			{
+				IM\MessageParamTable::delete($parameterInfo['ID']);
+			}
+		}
 	}
 
 	public static function Get($messageId, $params = false)
@@ -178,6 +177,29 @@ class CIMMessageParam
 		}
 	}
 
+	public static function GetMessageIdByParam($paramName, $paramValue)
+	{
+		$arResult = Array();
+		if (strlen($paramName) <= 0 || strlen($paramValue) <= 0)
+		{
+			return $arResult;
+		}
+
+		global $DB;
+
+		$rs = $DB->Query("
+			SELECT MESSAGE_ID, PARAM_NAME, PARAM_VALUE
+			FROM b_im_message_param
+			WHERE PARAM_NAME = '".$DB->ForSQL($paramName)."' AND PARAM_VALUE = '".$DB->ForSQL($paramValue)."'
+		", false, "File: ".__FILE__."<br>Line: ".__LINE__);
+		while($ar = $rs->Fetch())
+		{
+			$arResult[] = $ar["MESSAGE_ID"];
+		}
+
+		return $arResult;
+	}
+
 	public static function PrepareValues($value)
 	{
 		$arValues = Array();
@@ -223,6 +245,7 @@ class CIMMessageParam
 			'FILE_ID' => Array(),
 			'IS_DELETED' => 'N',
 			'IS_EDITED' => 'N',
+			'ATTACHMENTS' => Array(),
 		);
 
 		return $arDefault;

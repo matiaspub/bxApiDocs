@@ -504,15 +504,29 @@ class CUrlRewriter
 		{
 			if ($arComponents[$i]["DATA"]["PARAMS"]["SEF_MODE"] == "Y")
 			{
-				$arFields = array(
-					"SITE_ID" => $site,
-					"CONDITION" => "#^".$arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"]."#",
-					"RULE" => "",
-					"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
-					"PATH" => $path
-				);
+				if (array_key_exists("SEF_RULE", $arComponents[$i]["DATA"]["PARAMS"]))
+				{
+					$ruleMaker = new \Bitrix\Main\UrlRewriterRuleMaker;
+					$ruleMaker->process($arComponents[$i]["DATA"]["PARAMS"]["SEF_RULE"]);
 
-				CUrlRewriter::Add($arFields);
+					CUrlRewriter::Add(array(
+						"SITE_ID" => $site,
+						"CONDITION" => $ruleMaker->getCondition(),
+						"RULE" => $ruleMaker->getRule(),
+						"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
+						"PATH" => $path
+					));
+				}
+				else
+				{
+					CUrlRewriter::Add(array(
+						"SITE_ID" => $site,
+						"CONDITION" => "#^".$arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"]."#",
+						"RULE" => "",
+						"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
+						"PATH" => $path
+					));
+				}
 			}
 		}
 

@@ -1,7 +1,7 @@
 <?
 IncludeModuleLangFile(__FILE__);
 //Never increase caching time here. There were cache clenup problems noticed.
-if(!defined("CACHED_b_cluster_dbnode"));// define("CACHED_b_cluster_dbnode", 3600);
+if(!defined("CACHED_b_cluster_dbnode")) // define("CACHED_b_cluster_dbnode", 3600);
 global $DB;
 $db_type = strtolower($DB->type);
 CModule::AddAutoloadClasses(

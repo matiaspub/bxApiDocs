@@ -3,15 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/index.php
  * @author Bitrix
  */
 class CAllSocNetMessages
@@ -91,19 +89,15 @@ class CAllSocNetMessages
 
 	
 	/**
-	* <p>Метод удаляет сообщение из базы данных. Используется для физического удаления записи. Для логического удаления согласно алгоритму работы модуля социальной сети следует использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/deleteMessage.php">CSocNetMessages::DeleteMessage</a>.</p> <p><b>Примечание</b>: при удалении записи вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesDelete.php">OnBeforeSocNetMessagesDelete</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesDelete.php">OnSocNetMessagesDelete</a>.</p>
-	*
-	*
+	* <p>Метод удаляет сообщение из базы данных. Используется для физического удаления записи. Для логического удаления согласно алгоритму работы модуля социальной сети следует использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/deleteMessage.php">CSocNetMessages::DeleteMessage</a>.</p> <p><b>Примечание</b>: при удалении записи вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesDelete.php">OnBeforeSocNetMessagesDelete</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesDelete.php">OnSocNetMessagesDelete</a>.</p>
 	*
 	*
 	* @param int $id  Код сообщения
 	*
-	*
-	*
 	* @return bool <p>True в случае успешного удаления и false - в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -133,28 +127,20 @@ class CAllSocNetMessages
 
 	
 	/**
-	* <p>Метод для логического удаления сообщения. Метод принимает на вход код пользователя - отправителя или получателя сообщения. Сообщение помечается как удаленное для этого пользователя. Для второго пользователя это сообщение не является удаленным и доступно как обычно. Физическое удаление сообщения происходит после логического удаления сообщения вторым пользователем.</p> <p><b>Примечание</b>: при физическом удалении используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/delete.php">CSocNetMessages::Delete</a>.</p>
-	*
-	*
+	* <p>Метод для логического удаления сообщения. Метод принимает на вход код пользователя - отправителя или получателя сообщения. Сообщение помечается как удаленное для этого пользователя. Для второго пользователя это сообщение не является удаленным и доступно как обычно. Физическое удаление сообщения происходит после логического удаления сообщения вторым пользователем.</p> <p><b>Примечание</b>: при физическом удалении используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/delete.php">CSocNetMessages::Delete</a>.</p>
 	*
 	*
 	* @param int $id  Код сообщения.
 	*
-	*
-	*
 	* @param int $userId  Код пользователя - отправителя или получателя сообщения, который
 	* удаляет сообщение.
 	*
-	*
-	*
 	* @param bool $bCheckMessages = true Необязательный параметр. По умолчанию равен true.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в случае ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/deleteMessage.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/deleteMessage.php
 	* @author Bitrix
 	*/
 	public static function DeleteMessage($ID, $userID, $bCheckMessages = true)
@@ -295,11 +281,7 @@ class CAllSocNetMessages
 	* <p>Метод возвращает массив с параметрами сообщения.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код сообщения.
-	*
-	*
 	*
 	* @return array <p>Возвращается массив с ключами:<br><b>ID</b> - идентификатор
 	* сообщения,<br><b>FROM_USER_ID</b> - код пользователя - отправителя
@@ -311,15 +293,14 @@ class CAllSocNetMessages
 	* отправителем,<br><b>TO_DELETED</b> - флаг (Y/N) удаления сообщения
 	* получателем.</p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/GetList.php">CSocNetMessages::GetList</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/GetList.php">CSocNetMessages::GetList</a></li>
 	* </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/getbyid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getbyid.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)
@@ -394,25 +375,19 @@ class CAllSocNetMessages
 	* <p>Метод отмечает сообщение как прочтенное.</p>
 	*
 	*
-	*
+	* @param targetUserI $D  Код пользователя-получателя сообщения.
 	*
 	* @param int $senderUserID  Код пользователя-отправителя сообщения.
 	*
-	*
-	*
 	* @param int $messageID  Код сообщения.
 	*
-	*
-	*
 	* @param bool $bRead = true Необязательный параметр. По умолчанию равен true
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/markmessageread.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/markmessageread.php
 	* @author Bitrix
 	*/
 	public static function MarkMessageRead($senderUserID, $messageID, $bRead = true)
@@ -483,26 +458,17 @@ class CAllSocNetMessages
 
 	
 	/**
-	* <p>Вспомогательный метод для отправки персонального сообщения от одного пользователя социальной сети другому.</p> <p><b>Примечание</b>: для отправки системного сообщения используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
-	*
-	*
+	* <p>Вспомогательный метод для отправки персонального сообщения от одного пользователя социальной сети другому.</p> <p><b>Примечание</b>: для отправки системного сообщения используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/Add.php">CSocNetMessages::Add</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
 	*
 	*
 	* @param int $senderUserId  Код пользователя-отправителя сообщения.
 	*
-	*
-	*
 	* @param int $targetUserID  Код пользователя-получателя сообщения.
-	*
-	*
 	*
 	* @param string $message  Текст сообщения.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает true в случае успешного сохранения сообщения и
 	* false в противном случае.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -516,15 +482,14 @@ class CAllSocNetMessages
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/Add.php">CSocNetMessages::Add</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/Add.php">CSocNetMessages::Add</a></li>
 	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/CreateMessage.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/CreateMessage.php
 	* @author Bitrix
 	*/
 	public static function CreateMessage($senderUserID, $targetUserID, $message, $title = false)
@@ -586,21 +551,15 @@ class CAllSocNetMessages
 	* <p>Отмечает набор сообщений как прочтенные.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя, являющегося получателем сообщений.
 	*
-	*
-	*
 	* @param array $arIDs  Массив идентификаторов сообщений.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/MarkMessageReadMultiple.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/MarkMessageReadMultiple.php
 	* @author Bitrix
 	*/
 	public static function MarkMessageReadMultiple($userID, $arIDs)
@@ -628,21 +587,15 @@ class CAllSocNetMessages
 	* <p>Удаляет набор сообщений.</p>
 	*
 	*
-	*
-	*
 	* @param int $userId  Пользователь, удаляющий сообщения. Пользователь должен быть
 	* автором или получателем сообщений.
 	*
-	*
-	*
 	* @param array $arIDs  Массив идентификаторов сообщений.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/DeleteMessageMultiple.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/DeleteMessageMultiple.php
 	* @author Bitrix
 	*/
 	public static function DeleteMessageMultiple($userID, $arIDs)
@@ -764,16 +717,12 @@ class CAllSocNetMessages
 	* <p>Проверяет, есть ли новые сообщения для пользователя. Проверка осуществляется эффективно, без обращения к базе данных.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя. </h
-	*
-	*
 	*
 	* @return bool <p>True, если есть новые сообщения. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetMessages/speedfileexists.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/speedfileexists.php
 	* @author Bitrix
 	*/
 	public static function SpeedFileExists($userID)

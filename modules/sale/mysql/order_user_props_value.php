@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order_user_
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 {
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из значений свойств профилей покупателя в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из значений свойств профилей покупателя в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -35,8 +31,6 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи значений
 	* свойств профилей покупателя. Массив имеет вид: <pre class="syntax">array(
@@ -63,11 +57,9 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* означает "выбрать все записи, в которых значение в поле USER_PROPS_ID
 	* (код профиля покупателя) равно 120".<br><br> Значение по умолчанию -
 	* пустой массив array() - означает, что результат отфильтрован не
-	* будет. <br><br><b>Важно!</b> Если результат фильтровать не нужно, то
-	* пустой массив фильтра надо передать обязательно. Это требуется
-	* из-за наследия старого API.
-	*
-	*
+	* будет. <br><br><div class="note"> <b>Важно!</b> Если результат фильтровать не
+	* нужно, то пустой массив фильтра надо передать обязательно. Это
+	* требуется из-за наследия старого API.</div>
 	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи значений свойств
 	* профилей покупателя. Массив имеет вид: <pre
@@ -78,28 +70,22 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li> <li>
 	* <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
 	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
+	* суммы.</li> </ul> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы параметров свойств с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -113,9 +99,8 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* <td>Название варианта значения свойства заказа со значением из
 	* профиля покупателя.</td> </tr> <tr> <td>CODE</td> <td>Символьный код свойства
 	* заказа.</td> </tr> </table> <p>Если в качестве параметра arGroupBy передается
-	* пустой массив, то функция вернет число записей, удовлетворяющих
+	* пустой массив, то метод вернет число записей, удовлетворяющих
 	* фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -157,19 +142,28 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "USER_PROPS_ID", "ORDER_PROPS_ID", "NAME", "VALUE", "PROP_ID", "PROP_PERSON_TYPE_ID", "PROP_NAME", "PROP_TYPE", "PROP_REQUIED", "PROP_DEFAULT_VALUE", "PROP_SORT", "PROP_USER_PROPS", "PROP_IS_LOCATION", "PROP_PROPS_GROUP_ID", "PROP_SIZE1", "PROP_SIZE2", "PROP_DESCRIPTION", "PROP_IS_EMAIL", "PROP_IS_PROFILE_NAME", "PROP_IS_PAYER", "PROP_IS_LOCATION4TAX", "PROP_IS_ZIP", "PROP_CODE", "VARIANT_ID", "VARIANT_ORDER_PROPS_ID", "VARIANT_NAME", "VARIANT_VALUE", "VARIANT_SORT", "VARIANT_DESCRIPTION");
 
+		// TODO proper compatibility CAllSaleOrderUserPropsValue::getList15
+		$sale15converted = \Bitrix\Main\Config\Option::get('main', '~sale_converted_15', 'N') == 'Y';
+		if ($sale15converted && is_array($arSelectFields) && $arSelectFields)
+		{
+			if (($i = array_search('PROP_SIZE1', $arSelectFields)) !== false)
+				unset($arSelectFields[$i]);
+			if (($i = array_search('PROP_SIZE2', $arSelectFields)) !== false)
+				unset($arSelectFields[$i]);
+		}
+
 		// FIELDS -->
 		$arFields = array(
 				"ID" => array("FIELD" => "UP.ID", "TYPE" => "int"),
 				"USER_PROPS_ID" => array("FIELD" => "UP.USER_PROPS_ID", "TYPE" => "int"),
 				"ORDER_PROPS_ID" => array("FIELD" => "UP.ORDER_PROPS_ID", "TYPE" => "int"),
 				"NAME" => array("FIELD" => "UP.NAME", "TYPE" => "string"),
-				"VALUE" => array("FIELD" => "UP.VALUE", "TYPE" => "string"),
 
 				"PROP_ID" => array("FIELD" => "P.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_PERSON_TYPE_ID" => array("FIELD" => "P.PERSON_TYPE_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_NAME" => array("FIELD" => "P.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_TYPE" => array("FIELD" => "P.TYPE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
-				"PROP_REQUIED" => array("FIELD" => "P.REQUIED", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
+				"PROP_REQUIED" => array("FIELD" => "P.REQUI".($sale15converted ? 'R' : '')."ED", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_DEFAULT_VALUE" => array("FIELD" => "P.DEFAULT_VALUE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_SORT" => array("FIELD" => "P.SORT", "TYPE" => "int", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
 				"PROP_USER_PROPS" => array("FIELD" => "P.USER_PROPS", "TYPE" => "char", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)"),
@@ -200,6 +194,8 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 				"CODE" => array("FIELD" => "P.CODE", "TYPE" => "string", "FROM" => "INNER JOIN b_sale_order_props P ON (UP.ORDER_PROPS_ID = P.ID)")
 			);
 		// <-- FIELDS
+
+		self::addPropertyValueField('UP', $arFields, $arSelectFields);
 
 		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
@@ -283,9 +279,7 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 
 
 	/**
-	* <p>Функция добавляет новое свойство профиля покупателя в соответствии с массивом параметров arFields</p>
-	*
-	*
+	* <p>Метод добавляет новое свойство профиля покупателя в соответствии с массивом параметров arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров нового свойства профиля
@@ -295,11 +289,8 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	* <b>ORDER_PROPS_ID</b> - код свойства заказа;</li> <li> <b>NAME</b> - название свойства
 	* заказа;</li> <li> <b>VALUE</b> - значение свойства заказа в профиле.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного свойства профиля покупателя или
 	* <i>false</i> в случае ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -322,6 +313,9 @@ class CSaleOrderUserPropsValue extends CAllSaleOrderUserPropsValue
 	public static 	function Add($arFields)
 	{
 		global $DB;
+
+		// translate here
+		$arFields['VALUE'] = self::translateLocationIDToCode($arFields['VALUE'], $arFields['ORDER_PROPS_ID']);
 
 		$arInsert = $DB->PrepareInsert("b_sale_user_props_value", $arFields);
 

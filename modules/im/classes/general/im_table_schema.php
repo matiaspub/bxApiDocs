@@ -17,13 +17,19 @@ class CIMTableSchema
 						"b_im_relation^^" => "START_ID",
 					),
 					"CHAT_ID" => array(
+						"b_im_chat" => "ID",
+					),
+				),
+				"b_im_chat" => array(
+					"ID" => array(
+						"b_im_message" => "CHAT_ID",
 						"b_im_relation" => "CHAT_ID",
 					),
 				),
-				"b_im_relation" => array(	
+				"b_im_relation" => array(
 					"CHAT_ID" => array(
-						"b_im_message" => "CHAT_ID",
-					),									
+						"b_im_chat" => "ID",
+					),
 				),
 			),
 			"main" => array(

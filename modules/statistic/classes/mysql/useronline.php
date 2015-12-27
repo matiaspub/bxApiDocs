@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>.</body> </html>
- *
- *
+ * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>. 
  *
  *
  * @return mixed 
@@ -19,10 +17,7 @@ class CUserOnline
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность на сайте (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) за определённый интервал времени. Данный интервал времени задается в настройках модуля "Статистика" в параметре "Интервал посетителей в online (сек.)".</p>
 	*
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -30,7 +25,6 @@ class CUserOnline
 	* echo "Сейчас на сайте посетителей: ".<b>CUserOnline::GetGuestCount</b>();
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -68,33 +62,20 @@ class CUserOnline
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, проявивших активность (совершивших <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хит</a>) на сайте за определённый интервал времени.</p>
 	*
 	*
-	*
-	*
-	* @param function $GetList  Ссылка на переменную, которая после выполнения функции будет
+	* @param function $GetList  Ссылка на переменную, которая после выполнения метода будет
 	* содержать количество <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a>.
 	*
-	*
-	*
-	* @param (&$guest_coun $t  Ссылка на переменную, которая после выполнения функции будет
+	* @param (&$guest_coun $t  Ссылка на переменную, которая после выполнения метода будет
 	* содержать количество сессий посетителей в online.
-	*
-	*
 	*
 	* @param &$session_coun $t  
 	*
+	* @param mixed $arOrder = Array() 
 	*
-	*
-	* @param $arOrde $r = Array() 
-	*
-	*
-	*
-	* @param $arFilte $r = Array()) 
-	*
-	*
+	* @param mixed $arFilter = Array()) 
 	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -112,7 +93,6 @@ class CUserOnline
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

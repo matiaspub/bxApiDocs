@@ -126,6 +126,22 @@ class CTimeZone
 		return null;
 	}
 
+	/**
+	 * Emulates timezone got from JS cookie setter like in SetAutoCookie.
+	 *
+	 * @param int $timezoneOffset Time zone offset
+	 */
+	public static function SetCookieValue($timezoneOffset)
+	{
+		static $cookie_prefix = null;
+		if($cookie_prefix === null)
+		{
+			$cookie_prefix = COption::GetOptionString('main', 'cookie_name', 'BITRIX_SM');
+		}
+
+		$_COOKIE[$cookie_prefix."_TIME_ZONE"] = $timezoneOffset;
+	}
+
 	public static function GetOffset($USER_ID = null)
 	{
 		global $USER;

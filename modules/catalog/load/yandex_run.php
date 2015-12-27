@@ -1,5 +1,9 @@
 <?
 //<title>Yandex</title>
+/** @global CUser $USER */
+/** @global CMain $APPLICATION */
+use Bitrix\Currency,
+	Bitrix\Iblock;
 
 IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/catalog/export_yandex.php');
 set_time_limit(0);
@@ -21,9 +25,7 @@ if (!CCatalog::IsUserExists())
 CCatalogDiscountSave::Disable();
 CCatalogDiscountCoupon::ClearCoupon();
 if ($USER->IsAuthorized())
-{
 	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
-}
 
 $arYandexFields = array('vendor', 'vendorCode', 'model', 'author', 'name', 'publisher', 'series', 'year', 'ISBN', 'volume', 'part', 'language', 'binding', 'page_extent', 'table_of_contents', 'performed_by', 'performance_type', 'storage', 'format', 'recording_length', 'artist', 'title', 'year', 'media', 'starring', 'director', 'originalName', 'country', 'aliases', 'description', 'sales_notes', 'promo', 'provider', 'tarifplan', 'xCategory', 'additional', 'worldRegion', 'region', 'days', 'dataTour', 'hotel_stars', 'room', 'meal', 'included', 'transport', 'price_min', 'price_max', 'options', 'manufacturer_warranty', 'country_of_origin', 'downloadable', 'param', 'place', 'hall', 'hall_part', 'is_premiere', 'is_kids', 'date',);
 
@@ -62,7 +64,7 @@ if (!function_exists("yandex_text2xml"))
 
 if (!function_exists('yandex_get_value'))
 {
-function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserTypeFormat)
+function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserTypeFormat, $usedProtocol)
 {
 	global $iblockServerName;
 
@@ -209,9 +211,7 @@ function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserT
 								if ($ar_file = CFile::GetFileArray($intValue))
 								{
 									if(substr($ar_file["SRC"], 0, 1) == "/")
-										$strFile = "http://".$iblockServerName.implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-									elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-										$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+										$strFile = $usedProtocol.$iblockServerName.CHTTP::urnEncode($ar_file['SRC'], 'utf-8');
 									else
 										$strFile = $ar_file["SRC"];
 									$value .= ($value ? ', ' : '').$strFile;
@@ -229,9 +229,7 @@ function yandex_get_value($arOffer, $param, $PROPERTY, &$arProperties, &$arUserT
 							if ($ar_file = CFile::GetFileArray($arProperty['VALUE']))
 							{
 								if(substr($ar_file["SRC"], 0, 1) == "/")
-									$strFile = "http://".$iblockServerName.implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-								elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-									$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+									$strFile = $usedProtocol.$iblockServerName.CHTTP::urnEncode($ar_file['SRC'], 'utf-8');
 								else
 									$strFile = $ar_file["SRC"];
 								$value = $strFile;
@@ -414,7 +412,7 @@ else
 			$arRunErrors[] = GetMessage('YANDEX_ERR_BAD_OFFERS_IBLOCK_ID');
 		}
 	}
-	if (true == $boolOffers)
+	if ($boolOffers)
 	{
 		if (empty($XML_DATA['SKU_EXPORT']))
 		{
@@ -518,6 +516,8 @@ if (!empty($XML_DATA['PRICE']))
 	}
 }
 
+$usedProtocol = (isset($USE_HTTPS) && $USE_HTTPS == 'Y' ? 'https://' : 'http://');
+
 if (strlen($SETUP_FILE_NAME) <= 0)
 {
 	$arRunErrors[] = GetMessage("CATI_NO_SAVE_FILE");
@@ -565,55 +565,60 @@ if (empty($arRunErrors))
 
 if (empty($arRunErrors))
 {
-	@fwrite($fp, '<? header("Content-Type: text/xml; charset=windows-1251");?>');
-	@fwrite($fp, '<? echo "<"."?xml version=\"1.0\" encoding=\"windows-1251\"?".">"?>');
-	@fwrite($fp, "\n<!DOCTYPE yml_catalog SYSTEM \"shops.dtd\">\n");
-	@fwrite($fp, "<yml_catalog date=\"".Date("Y-m-d H:i")."\">\n");
-	@fwrite($fp, "<shop>\n");
+	fwrite($fp, '<? header("Content-Type: text/xml; charset=windows-1251");?>');
+	fwrite($fp, '<? echo "<"."?xml version=\"1.0\" encoding=\"windows-1251\"?".">"?>');
+	fwrite($fp, "\n".'<!DOCTYPE yml_catalog SYSTEM "shops.dtd">'."\n");
+	fwrite($fp, '<yml_catalog date="'.date("Y-m-d H:i").'">'."\n");
+	fwrite($fp, '<shop>'."\n");
 
-	@fwrite($fp, "<name>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</name>\n");
+	fwrite($fp, '<name>'.$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString('main', 'site_name', '')), LANG_CHARSET, 'windows-1251')."</name>\n");
 
-	@fwrite($fp, "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n");
-	@fwrite($fp, "<url>http://".htmlspecialcharsbx($ar_iblock['SERVER_NAME'])."</url>\n");
-	@fwrite($fp, "<platform>1C-Bitrix</platform>\n");
+	fwrite($fp, '<company>'.$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString('main', 'site_name', '')), LANG_CHARSET, 'windows-1251')."</company>\n");
+	fwrite($fp, '<url>'.$usedProtocol.htmlspecialcharsbx($ar_iblock['SERVER_NAME'])."</url>\n");
+	fwrite($fp, '<platform>1C-Bitrix</platform>'."\n");
 
-	$strTmp = "<currencies>\n";
+	$strTmp = '<currencies>'."\n";
 
-	if ($arCurrency = CCurrency::GetByID('RUR'))
+	$RUR = 'RUB';
+	$currencyIterator = Currency\CurrencyTable::getList(array(
+		'select' => array('CURRENCY'),
+		'filter' => array('=CURRENCY' => 'RUR')
+	));
+	if ($currency = $currencyIterator->fetch())
 		$RUR = 'RUR';
-	else
-		$RUR = 'RUB';
+	unset($currency, $currencyIterator);
 
 	$arCurrencyAllowed = array($RUR, 'USD', 'EUR', 'UAH', 'BYR', 'KZT');
 
-	$BASE_CURRENCY = CCurrency::GetBaseCurrency();
+	$BASE_CURRENCY = Currency\CurrencyManager::getBaseCurrency();
 	if (is_array($XML_DATA['CURRENCY']))
 	{
 		foreach ($XML_DATA['CURRENCY'] as $CURRENCY => $arCurData)
 		{
 			if (in_array($CURRENCY, $arCurrencyAllowed))
 			{
-				$strTmp.= "<currency id=\"".$CURRENCY."\""
-				." rate=\"".($arCurData['rate'] == 'SITE' ? CCurrencyRates::ConvertCurrency(1, $CURRENCY, $RUR) : $arCurData['rate'])."\""
-				.($arCurData['plus'] > 0 ? ' plus="'.intval($arCurData['plus']).'"' : '')
+				$strTmp.= '<currency id="'.$CURRENCY.'"'
+				.' rate="'.($arCurData['rate'] == 'SITE' ? CCurrencyRates::ConvertCurrency(1, $CURRENCY, $RUR) : $arCurData['rate']).'"'
+				.($arCurData['plus'] > 0 ? ' plus="'.(int)$arCurData['plus'].'"' : '')
 				." />\n";
 			}
 		}
+		unset($CURRENCY, $arCurData);
 	}
 	else
 	{
-		$by="sort";
-		$order="asc";
-		$db_acc = CCurrency::GetList($by, $order);
-		while ($arAcc = $db_acc->Fetch())
-		{
-			if (in_array($arAcc['CURRENCY'], $arCurrencyAllowed))
-				$strTmp.= '<currency id="'.$arAcc["CURRENCY"].'" rate="'.(CCurrencyRates::ConvertCurrency(1, $arAcc["CURRENCY"], $RUR)).'" />'."\n";
-		}
+		$currencyIterator = Currency\CurrencyTable::getList(array(
+			'select' => array('CURRENCY'),
+			'filter' => array('@CURRENCY' => $arCurrencyAllowed),
+			'order' => array('SORT' => 'ASC', 'CURRENCY' => 'ASC')
+		));
+		while ($currency = $currencyIterator->fetch())
+			$strTmp .= '<currency id="'.$currency['CURRENCY'].'" rate="'.(CCurrencyRates::ConvertCurrency(1, $currency['CURRENCY'], $RUR)).'" />'."\n";
+		unset($currency, $currencyIterator);
 	}
-	$strTmp.= "</currencies>\n";
+	$strTmp .= "</currencies>\n";
 
-	@fwrite($fp, $strTmp);
+	fwrite($fp, $strTmp);
 	unset($strTmp);
 
 	//*****************************************//
@@ -668,6 +673,8 @@ if (empty($arRunErrors))
 			}
 			unset($section, $sectionIterator);
 		}
+		if (!empty($arSectionIDs))
+			$arSectionIDs = array_unique($arSectionIDs);
 	}
 	else
 	{
@@ -699,9 +706,17 @@ if (empty($arRunErrors))
 	//*****************************************//
 	$boolNeedRootSection = false;
 
-	if ('D' == $arCatalog['CATALOG_TYPE'] || 'O' == $arCatalog['CATALOG_TYPE'])
+	CCatalogProduct::setPriceVatIncludeMode(true);
+	CCatalogProduct::setUsedCurrency($BASE_CURRENCY);
+	CCatalogProduct::setUseDiscount(true);
+
+	if ($arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_CATALOG || $arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_OFFERS)
 	{
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+		$arSelect = array(
+			"ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME",
+			"PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL",
+			"CATALOG_AVAILABLE"
+		);
 
 		$filter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
@@ -711,7 +726,7 @@ if (empty($arRunErrors))
 		}
 		$filter["ACTIVE"] = "Y";
 		$filter["ACTIVE_DATE"] = "Y";
-		$res = CIBlockElement::GetList(array(), $filter, false, false, $arSelect);
+		$res = CIBlockElement::GetList(array('ID' => 'ASC'), $filter, false, false, $arSelect);
 
 		$total_sum = 0;
 		$is_exists = false;
@@ -724,22 +739,9 @@ if (empty($arRunErrors))
 			{
 				$arAcc["PROPERTIES"] = $obElement->GetProperties();
 			}
-			$arAcc['CATALOG_AVAILABLE'] = 'Y';
-			$rsProducts = CCatalogProduct::GetList(
-				array(),
-				array('ID' => $arAcc['ID']),
-				false,
-				false,
-				array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
-			);
-			if ($arProduct = $rsProducts->Fetch())
-			{
-				$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
-				if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
-					$arAcc['CATALOG_AVAILABLE'] = 'N';
-			}
-			$str_AVAILABLE = ' available="'.('Y' == $arAcc['CATALOG_AVAILABLE'] ? 'true' : 'false').'"';
+			$str_AVAILABLE = ' available="'.($arAcc['CATALOG_AVAILABLE'] == 'Y' ? 'true' : 'false').'"';
 
+			$fullPrice = 0;
 			$minPrice = 0;
 			$minPriceRUR = 0;
 			$minPriceGroup = 0;
@@ -758,37 +760,6 @@ if (empty($arRunErrors))
 				);
 				if ($arPrice = $rsPrices->Fetch())
 				{
-/*					$dbVAT = CCatalogProduct::GetVATInfo($arAcc['ID']);
-					if ($arVat = $dbVAT->Fetch())
-					{
-						$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-					}
-					else
-					{
-						$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-					}
-					$arPrice['VAT_RATE'] = $arVat['RATE'];
-					$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-					if ($arPrice['VAT_INCLUDED'] == 'N')
-					{
-						$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-						$arPrice['VAT_INCLUDED'] = 'Y';
-					}
-					$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-					$arDiscounts = CCatalogDiscount::GetDiscount(
-						$arAcc['ID'],
-						$IBLOCK_ID,
-						array($XML_DATA['PRICE']),
-						array(2),
-						'N',
-						$ar_iblock['LID'],
-						false
-					);
-					$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-					$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-					$minPriceCurrency = $arPrice["CURRENCY"];
-					$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR);
-					*/
 					if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 						$arAcc['ID'],
 						1,
@@ -799,9 +770,16 @@ if (empty($arRunErrors))
 						array()
 					))
 					{
-						$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
+/*						$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
 						$minPriceCurrency = $BASE_CURRENCY;
-						$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+						$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+						$minPrice = $arOptimalPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+						$fullPrice = $arOptimalPrice['RESULT_PRICE']['BASE_PRICE'];
+						$minPriceCurrency = $arOptimalPrice['RESULT_PRICE']['CURRENCY'];
+						if ($minPriceCurrency == $RUR)
+							$minPriceRUR = $minPrice;
+						else
+							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 						$minPriceGroup = $arOptimalPrice['PRICE']['CATALOG_GROUP_ID'];
 					}
 				}
@@ -818,14 +796,22 @@ if (empty($arRunErrors))
 					array()
 				))
 				{
-					$minPrice = $arPrice['DISCOUNT_PRICE'];
+/*					$minPrice = $arPrice['DISCOUNT_PRICE'];
 					$minPriceCurrency = $BASE_CURRENCY;
-					$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+					$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+					$minPrice = $arPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+					$fullPrice = $arPrice['RESULT_PRICE']['BASE_PRICE'];
+					$minPriceCurrency = $arPrice['RESULT_PRICE']['CURRENCY'];
+					if ($minPriceCurrency == $RUR)
+						$minPriceRUR = $minPrice;
+					else
+						$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 					$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 				}
 			}
 
-			if ($minPrice <= 0) continue;
+			if ($minPrice <= 0)
+				continue;
 
 			$boolCurrentSections = false;
 			$bNoActiveGroup = true;
@@ -864,10 +850,12 @@ if (empty($arRunErrors))
 			else
 				$str_TYPE = '';
 
-			$strTmpOff.= "<offer id=\"".$arAcc["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
-			$strTmpOff.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"]).(strstr($arAcc['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+			$strTmpOff.= '<offer id="'.$arAcc["ID"].'"'.$str_TYPE.$str_AVAILABLE.">\n";
+			$strTmpOff.= "<url>".$usedProtocol.$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arAcc["~DETAIL_PAGE_URL"]).(strstr($arAcc['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 			$strTmpOff.= "<price>".$minPrice."</price>\n";
+			if ($minPrice < $fullPrice)
+				$strTmpOff.= "<oldprice>".$fullPrice."</oldprice>\n";
 			$strTmpOff.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 			$strTmpOff.= $strTmpOff_tmp;
@@ -881,9 +869,7 @@ if (empty($arRunErrors))
 				if ($ar_file = CFile::GetFileArray($pictNo))
 				{
 					if(substr($ar_file["SRC"], 0, 1) == "/")
-						$strFile = "http://".$ar_iblock['SERVER_NAME'].implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-					elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-						$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+						$strFile = $usedProtocol.$ar_iblock['SERVER_NAME'].CHTTP::urnEncode($ar_file["SRC"], 'utf-8');
 					else
 						$strFile = $ar_file["SRC"];
 					$strTmpOff.="<picture>".$strFile."</picture>\n";
@@ -918,7 +904,7 @@ if (empty($arRunErrors))
 							$strParamValue = '';
 							if ($prop_id)
 							{
-								$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+								$strParamValue = yandex_get_value($arAcc, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat, $usedProtocol);
 							}
 							if ('' != $strParamValue)
 								$strTmpOff .= $strParamValue."\n";
@@ -940,7 +926,7 @@ if (empty($arRunErrors))
 					else
 					{
 						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 						if ('' != $strValue)
 							$strTmpOff .= $strValue."\n";
 					}
@@ -962,7 +948,7 @@ if (empty($arRunErrors))
 					if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 					{
 						$strValue = '';
-						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+						$strValue = yandex_get_value($arAcc, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 						if ('' != $strValue)
 							$strTmpOff .= $strValue."\n";
 					}
@@ -981,10 +967,14 @@ if (empty($arRunErrors))
 			}
 		}
 	}
-	elseif ('P' == $arCatalog['CATALOG_TYPE'] || 'X' == $arCatalog['CATALOG_TYPE'])
+	elseif ($arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_PRODUCT || $arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_FULL)
 	{
-		$arOfferSelect = array("ID", "LID", "IBLOCK_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
-		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, 'PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
+		$arOfferSelect = array(
+			"ID", "LID", "IBLOCK_ID", "NAME",
+			"PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL",
+			"CATALOG_AVAILABLE"
+		);
+		$arOfferFilter = array('IBLOCK_ID' => $intOfferIBlockID, '=PROPERTY_'.$arOffers['SKU_PROPERTY_ID'] => 0, "ACTIVE" => "Y", "ACTIVE_DATE" => "Y");
 		if (YANDEX_SKU_EXPORT_PROP == $arSKUExport['SKU_EXPORT_COND'])
 		{
 			$strExportKey = '';
@@ -997,7 +987,13 @@ if (empty($arRunErrors))
 			$arOfferFilter[$strExportKey] = $mxValues;
 		}
 
-		$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL");
+		$arSelect = array(
+			"ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME",
+			"PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL"
+		);
+		if ($arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_FULL)
+			$arSelect[] = "CATALOG_AVAILABLE";
+
 		$arFilter = array("IBLOCK_ID" => $IBLOCK_ID);
 		if (!$bAllSections && !empty($arSectionIDs))
 		{
@@ -1027,7 +1023,7 @@ if (empty($arRunErrors))
 		}
 
 		$cnt = 0;
-		$rsItems = CIBlockElement::GetList(array(), $arFilter, false, false, $arSelect);
+		$rsItems = CIBlockElement::GetList(array('ID' => 'ASC'), $arFilter, false, false, $arSelect);
 		while ($obItem = $rsItems->GetNextElement())
 		{
 			$cnt++;
@@ -1087,9 +1083,7 @@ if (empty($arRunErrors))
 				if ($ar_file = CFile::GetFileArray($pictNo))
 				{
 					if(substr($ar_file["SRC"], 0, 1) == "/")
-						$strFile = "http://".$ar_iblock['SERVER_NAME'].implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-					elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-						$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+						$strFile = $usedProtocol.$ar_iblock['SERVER_NAME'].CHTTP::urnEncode($ar_file['SRC'], 'utf-8');
 					else
 						$strFile = $ar_file["SRC"];
 				}
@@ -1101,8 +1095,8 @@ if (empty($arRunErrors))
 							strip_tags(preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arItem["~PREVIEW_TEXT"])) : preg_replace_callback("'&[^;]*;'", "yandex_replace_special", $arItem["~PREVIEW_TEXT"])),
 							255), true);
 
-			$arOfferFilter['PROPERTY_'.$arOffers['SKU_PROPERTY_ID']] = $arItem['ID'];
-			$rsOfferItems = CIBlockElement::GetList(array(),$arOfferFilter,false,false,$arOfferSelect);
+			$arOfferFilter['=PROPERTY_'.$arOffers['SKU_PROPERTY_ID']] = $arItem['ID'];
+			$rsOfferItems = CIBlockElement::GetList(array('ID' => 'ASC'), $arOfferFilter, false, false, $arOfferSelect);
 
 			if (!empty($strOfferTemplateURL))
 				$rsOfferItems->SetUrlTemplates($strOfferTemplateURL);
@@ -1116,7 +1110,8 @@ if (empty($arRunErrors))
 				while ($obOfferItem = $rsOfferItems->GetNextElement())
 				{
 					$arOfferItem = $obOfferItem->GetFields();
-					$minPrice = -1;
+					$fullPrice = 0;
+					$minPrice = 0;
 					if ($XML_DATA['PRICE'] > 0)
 					{
 						$rsPrices = CPrice::GetListEx(array(),array(
@@ -1130,36 +1125,6 @@ if (empty($arRunErrors))
 						);
 						if ($arPrice = $rsPrices->Fetch())
 						{
-/*							$dbVAT = CCatalogProduct::GetVATInfo($arOfferItem['ID']);
-							if ($arVat = $dbVAT->Fetch())
-							{
-								$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-							}
-							else
-							{
-								$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-							}
-							$arPrice['VAT_RATE'] = $arVat['RATE'];
-							$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-							if ($arPrice['VAT_INCLUDED'] == 'N')
-							{
-								$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-								$arPrice['VAT_INCLUDED'] = 'Y';
-							}
-							$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-							$arDiscounts = CCatalogDiscount::GetDiscount(
-								$arOfferItem['ID'],
-								$intOfferIBlockID,
-								array($XML_DATA['PRICE']),
-								array(2),
-								'N',
-								$arOfferIBlock['LID'],
-								false
-							);
-							$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-							$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-							$minPriceCurrency = $arPrice["CURRENCY"];
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 							if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 								$arOfferItem['ID'],
 								1,
@@ -1170,9 +1135,16 @@ if (empty($arRunErrors))
 								array()
 							))
 							{
-								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
+/*								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
 								$minPriceCurrency = $BASE_CURRENCY;
-								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+								$minPrice = $arOptimalPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+								$fullPrice = $arOptimalPrice['RESULT_PRICE']['BASE_PRICE'];
+								$minPriceCurrency = $arOptimalPrice['RESULT_PRICE']['CURRENCY'];
+								if ($minPriceCurrency == $RUR)
+									$minPriceRUR = $minPrice;
+								else
+									$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 								$minPriceGroup = $arOptimalPrice['PRICE']['CATALOG_GROUP_ID'];
 							}
 						}
@@ -1189,9 +1161,16 @@ if (empty($arRunErrors))
 							array()
 						))
 						{
-							$minPrice = $arPrice['DISCOUNT_PRICE'];
+/*							$minPrice = $arPrice['DISCOUNT_PRICE'];
 							$minPriceCurrency = $BASE_CURRENCY;
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+							$minPrice = $arPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+							$fullPrice = $arPrice['RESULT_PRICE']['BASE_PRICE'];
+							$minPriceCurrency = $arPrice['RESULT_PRICE']['CURRENCY'];
+							if ($minPriceCurrency == $RUR)
+								$minPriceRUR = $minPrice;
+							else
+								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 							$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 						}
 					}
@@ -1213,6 +1192,7 @@ if (empty($arRunErrors))
 
 						$arCurrentOffer = $arOfferItem;
 						$arCurrentPrice = array(
+							'FULL_PRICE' => $fullPrice,
 							'MIN_PRICE' => $minPrice,
 							'MIN_PRICE_CURRENCY' => $minPriceCurrency,
 							'MIN_PRICE_RUR' => $minPriceRUR,
@@ -1238,6 +1218,7 @@ if (empty($arRunErrors))
 
 							$arCurrentOffer = $arOfferItem;
 							$arCurrentPrice = array(
+								'FULL_PRICE' => $fullPrice,
 								'MIN_PRICE' => $minPrice,
 								'MIN_PRICE_CURRENCY' => $minPriceCurrency,
 								'MIN_PRICE_RUR' => $minPriceRUR,
@@ -1249,25 +1230,13 @@ if (empty($arRunErrors))
 				if (!empty($arCurrentOffer) && !empty($arCurrentPrice))
 				{
 					$arOfferItem = $arCurrentOffer;
+					$fullPrice = $arCurrentPrice['FULL_PRICE'];
 					$minPrice = $arCurrentPrice['MIN_PRICE'];
 					$minPriceCurrency = $arCurrentPrice['MIN_PRICE_CURRENCY'];
 					$minPriceRUR = $arCurrentPrice['MIN_PRICE_RUR'];
 					$minPriceGroup = $arCurrentPrice['MIN_PRICE_GROUP'];
 
-					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
-					$rsProducts = CCatalogProduct::GetList(
-						array(),
-						array('ID' => $arOfferItem['ID']),
-						false,
-						false,
-						array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
-					);
-					if ($arProduct = $rsProducts->Fetch())
-					{
-						$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
-						if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
-							$arOfferItem['YANDEX_AVAILABLE'] = 'false';
-					}
+					$arOfferItem['YANDEX_AVAILABLE'] = ($arOfferItem['CATALOG_AVAILABLE'] == 'Y' ? 'true' : 'false');
 
 					if (strlen($arOfferItem['DETAIL_PAGE_URL']) <= 0)
 						$arOfferItem['DETAIL_PAGE_URL'] = '/';
@@ -1282,10 +1251,12 @@ if (empty($arRunErrors))
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
-					$strOfferYandex .= "<offer id=\"".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+					$strOfferYandex .= '<offer id="'.$arOfferItem["ID"].'"'.$str_TYPE.' available="'.$arOfferItem['YANDEX_AVAILABLE'].'">'."\n";
+					$strOfferYandex .= "<url>".$usedProtocol.$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($minPrice < $fullPrice)
+						$strOfferYandex .= "<oldprice>".$fullPrice."</oldprice>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
@@ -1300,9 +1271,7 @@ if (empty($arRunErrors))
 						if ($ar_file = CFile::GetFileArray($pictNo))
 						{
 							if(substr($ar_file["SRC"], 0, 1) == "/")
-								$strFile = "http://".$ar_iblock['SERVER_NAME'].implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-							elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-								$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+								$strFile = $usedProtocol.$ar_iblock['SERVER_NAME'].CHTTP::urnEncode($ar_file['SRC'], 'utf-8');
 							else
 								$strFile = $ar_file["SRC"];
 						}
@@ -1347,7 +1316,7 @@ if (empty($arRunErrors))
 									$strParamValue = '';
 									if ($prop_id)
 									{
-										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat, $usedProtocol);
 									}
 									if ('' != $strParamValue)
 										$strOfferYandex .= $strParamValue."\n";
@@ -1368,7 +1337,7 @@ if (empty($arRunErrors))
 							else
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1388,7 +1357,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1417,22 +1386,10 @@ if (empty($arRunErrors))
 					}
 					$arOfferItem['PROPERTIES'] = $arCross;
 
-					$arOfferItem['YANDEX_AVAILABLE'] = 'true';
-					$rsProducts = CCatalogProduct::GetList(
-						array(),
-						array('ID' => $arOfferItem['ID']),
-						false,
-						false,
-						array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
-					);
-					if ($arProduct = $rsProducts->Fetch())
-					{
-						$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
-						if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
-							$arOfferItem['YANDEX_AVAILABLE'] = 'false';
-					}
+					$arOfferItem['YANDEX_AVAILABLE'] = ($arOfferItem['CATALOG_AVAILABLE'] == 'Y' ? 'true' : 'false');
 
-					$minPrice = -1;
+					$fullPrice = 0;
+					$minPrice = 0;
 					if ($XML_DATA['PRICE'] > 0)
 					{
 						$rsPrices = CPrice::GetListEx(array(),array(
@@ -1446,36 +1403,6 @@ if (empty($arRunErrors))
 						);
 						if ($arPrice = $rsPrices->Fetch())
 						{
-/*							$dbVAT = CCatalogProduct::GetVATInfo($arOfferItem['ID']);
-							if ($arVat = $dbVAT->Fetch())
-							{
-								$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-							}
-							else
-							{
-								$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-							}
-							$arPrice['VAT_RATE'] = $arVat['RATE'];
-							$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-							if ($arPrice['VAT_INCLUDED'] == 'N')
-							{
-								$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-								$arPrice['VAT_INCLUDED'] = 'Y';
-							}
-							$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-							$arDiscounts = CCatalogDiscount::GetDiscount(
-								$arOfferItem['ID'],
-								$intOfferIBlockID,
-								array($XML_DATA['PRICE']),
-								array(2),
-								'N',
-								$arOfferIBlock['LID'],
-								false
-							);
-							$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-							$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-							$minPriceCurrency = $arPrice["CURRENCY"];
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 							if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 								$arOfferItem['ID'],
 								1,
@@ -1486,9 +1413,16 @@ if (empty($arRunErrors))
 								array()
 							))
 							{
-								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
+/*								$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
 								$minPriceCurrency = $BASE_CURRENCY;
-								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+								$minPrice = $arOptimalPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+								$fullPrice = $arOptimalPrice['RESULT_PRICE']['BASE_PRICE'];
+								$minPriceCurrency = $arOptimalPrice['RESULT_PRICE']['CURRENCY'];
+								if ($minPriceCurrency == $RUR)
+									$minPriceRUR = $minPrice;
+								else
+									$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 								$minPriceGroup = $arOptimalPrice['PRICE']['CATALOG_GROUP_ID'];
 							}
 
@@ -1506,9 +1440,16 @@ if (empty($arRunErrors))
 							array()
 						))
 						{
-							$minPrice = $arPrice['DISCOUNT_PRICE'];
+/*							$minPrice = $arPrice['DISCOUNT_PRICE'];
 							$minPriceCurrency = $BASE_CURRENCY;
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+							$minPrice = $arPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+							$fullPrice = $arPrice['RESULT_PRICE']['BASE_PRICE'];
+							$minPriceCurrency = $arPrice['RESULT_PRICE']['CURRENCY'];
+							if ($minPriceCurrency == $RUR)
+								$minPriceRUR = $minPrice;
+							else
+								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 							$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 						}
 					}
@@ -1528,10 +1469,12 @@ if (empty($arRunErrors))
 					$arOfferItem['YANDEX_TYPE'] = $str_TYPE;
 
 					$strOfferYandex = '';
-					$strOfferYandex .= "<offer id=\"".$arOfferItem["ID"]."\"".$str_TYPE." available=\"".$arOfferItem['YANDEX_AVAILABLE']."\">\n";
-					$strOfferYandex .= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+					$strOfferYandex .= '<offer id="'.$arOfferItem["ID"].'"'.$str_TYPE.' available="'.$arOfferItem['YANDEX_AVAILABLE'].'">'."\n";
+					$strOfferYandex .= "<url>".$usedProtocol.$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arOfferItem["~DETAIL_PAGE_URL"]).(strstr($arOfferItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 					$strOfferYandex .= "<price>".$minPrice."</price>\n";
+					if ($minPrice < $fullPrice)
+						$strOfferYandex .= "<oldprice>".$fullPrice."</oldprice>\n";
 					$strOfferYandex .= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 					$strOfferYandex .= $arItem['YANDEX_CATEGORY'];
@@ -1546,9 +1489,7 @@ if (empty($arRunErrors))
 						if ($ar_file = CFile::GetFileArray($pictNo))
 						{
 							if(substr($ar_file["SRC"], 0, 1) == "/")
-								$strFile = "http://".$ar_iblock['SERVER_NAME'].implode("/", array_map("rawurlencode", explode("/", $ar_file["SRC"])));
-							elseif(preg_match("/^(http|https):\\/\\/(.*?)\\/(.*)\$/", $ar_file["SRC"], $match))
-								$strFile = "http://".$match[2].'/'.implode("/", array_map("rawurlencode", explode("/", $match[3])));
+								$strFile = $usedProtocol.$ar_iblock['SERVER_NAME'].CHTTP::urnEncode($ar_file['SRC'], 'utf-8');
 							else
 								$strFile = $ar_file["SRC"];
 						}
@@ -1593,7 +1534,7 @@ if (empty($arRunErrors))
 									$strParamValue = '';
 									if ($prop_id)
 									{
-										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+										$strParamValue = yandex_get_value($arOfferItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat, $usedProtocol);
 									}
 									if ('' != $strParamValue)
 										$strOfferYandex .= $strParamValue."\n";
@@ -1614,7 +1555,7 @@ if (empty($arRunErrors))
 							else
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1634,7 +1575,7 @@ if (empty($arRunErrors))
 							if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 							{
 								$strValue = '';
-								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+								$strValue = yandex_get_value($arOfferItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 								if ('' != $strValue)
 									$strOfferYandex .= $strValue."\n";
 							}
@@ -1647,24 +1588,11 @@ if (empty($arRunErrors))
 					$boolItemExport = true;
 				}
 			}
-			if ('X' == $arCatalog['CATALOG_TYPE'] && !$boolItemOffers)
+			if ($arCatalog['CATALOG_TYPE'] == CCatalogSKU::TYPE_FULL && !$boolItemOffers)
 			{
-				$arItem['CATALOG_AVAILABLE'] = 'Y';
-				$rsProducts = CCatalogProduct::GetList(
-					array(),
-					array('ID' => $arItem['ID']),
-					false,
-					false,
-					array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
-				);
-				if ($arProduct = $rsProducts->Fetch())
-				{
-					$arProduct['QUANTITY'] = doubleval($arProduct['QUANTITY']);
-					if (0 >= $arProduct['QUANTITY'] && 'Y' == $arProduct['QUANTITY_TRACE'] && 'N' == $arProduct['CAN_BUY_ZERO'])
-						$arItem['CATALOG_AVAILABLE'] = 'N';
-				}
-				$str_AVAILABLE = ' available="'.('Y' == $arItem['CATALOG_AVAILABLE'] ? 'true' : 'false').'"';
+				$str_AVAILABLE = ' available="'.($arItem['CATALOG_AVAILABLE'] == 'Y' ? 'true' : 'false').'"';
 
+				$fullPrice = 0;
 				$minPrice = 0;
 				$minPriceRUR = 0;
 				$minPriceGroup = 0;
@@ -1683,36 +1611,6 @@ if (empty($arRunErrors))
 					);
 					if ($arPrice = $rsPrices->Fetch())
 					{
-/*						$dbVAT = CCatalogProduct::GetVATInfo($arItem['ID']);
-						if ($arVat = $dbVAT->Fetch())
-						{
-							$arVat['RATE'] = floatval($arVat['RATE'] * 0.01);
-						}
-						else
-						{
-							$arVat = array('RATE' => 0, 'VAT_INCLUDED' => 'N');
-						}
-						$arPrice['VAT_RATE'] = $arVat['RATE'];
-						$arPrice['VAT_INCLUDED'] = $arVat['VAT_INCLUDED'];
-						if ($arPrice['VAT_INCLUDED'] == 'N')
-						{
-							$arPrice['PRICE'] *= (1 + $arPrice['VAT_RATE']);
-							$arPrice['VAT_INCLUDED'] = 'Y';
-						}
-						$arPrice['PRICE'] = roundEx($arPrice['PRICE'], CATALOG_VALUE_PRECISION);
-						$arDiscounts = CCatalogDiscount::GetDiscount(
-							$arItem['ID'],
-							$IBLOCK_ID,
-							array($XML_DATA['PRICE']),
-							array(2),
-							'N',
-							$ar_iblock['LID'],
-							false
-						);
-						$minPrice = CCatalogProduct::CountPriceWithDiscount($arPrice['PRICE'], $arPrice["CURRENCY"], $arDiscounts);
-						$minPriceGroup = $arPrice['CATALOG_GROUP_ID'];
-						$minPriceCurrency = $arPrice["CURRENCY"];
-						$minPriceRUR = CCurrencyRates::ConvertCurrency($arPrice['PRICE'], $arPrice["CURRENCY"], $RUR); */
 						if ($arOptimalPrice = CCatalogProduct::GetOptimalPrice(
 							$arItem['ID'],
 							1,
@@ -1723,9 +1621,16 @@ if (empty($arRunErrors))
 							array()
 						))
 						{
-							$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
+/*							$minPrice = $arOptimalPrice['DISCOUNT_PRICE'];
 							$minPriceCurrency = $BASE_CURRENCY;
-							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+							$minPrice = $arOptimalPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+							$fullPrice = $arOptimalPrice['RESULT_PRICE']['BASE_PRICE'];
+							$minPriceCurrency = $arOptimalPrice['RESULT_PRICE']['CURRENCY'];
+							if ($minPriceCurrency == $RUR)
+								$minPriceRUR = $minPrice;
+							else
+								$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 							$minPriceGroup = $arOptimalPrice['PRICE']['CATALOG_GROUP_ID'];
 						}
 					}
@@ -1742,9 +1647,16 @@ if (empty($arRunErrors))
 						array()
 					))
 					{
-						$minPrice = $arPrice['DISCOUNT_PRICE'];
+/*						$minPrice = $arPrice['DISCOUNT_PRICE'];
 						$minPriceCurrency = $BASE_CURRENCY;
-						$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+						$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR); */
+						$minPrice = $arPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+						$fullPrice = $arPrice['RESULT_PRICE']['BASE_PRICE'];
+						$minPriceCurrency = $arPrice['RESULT_PRICE']['CURRENCY'];
+						if ($minPriceCurrency == $RUR)
+							$minPriceRUR = $minPrice;
+						else
+							$minPriceRUR = CCurrencyRates::ConvertCurrency($minPrice, $minPriceCurrency, $RUR);
 						$minPriceGroup = $arPrice['PRICE']['CATALOG_GROUP_ID'];
 					}
 				}
@@ -1775,9 +1687,11 @@ if (empty($arRunErrors))
 
 				$strOfferYandex = '';
 				$strOfferYandex.= "<offer id=\"".$arItem["ID"]."\"".$str_TYPE.$str_AVAILABLE.">\n";
-				$strOfferYandex.= "<url>http://".$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
+				$strOfferYandex.= "<url>".$usedProtocol.$ar_iblock['SERVER_NAME'].htmlspecialcharsbx($arItem["~DETAIL_PAGE_URL"]).(strstr($arItem['DETAIL_PAGE_URL'], '?') === false ? '?' : '&amp;')."r1=<?echo \$strReferer1; ?>&amp;r2=<?echo \$strReferer2; ?></url>\n";
 
 				$strOfferYandex.= "<price>".$minPrice."</price>\n";
+				if ($minPrice < $fullPrice)
+					$strOfferYandex.= "<oldprice>".$fullPrice."</oldprice>\n";
 				$strOfferYandex.= "<currencyId>".$minPriceCurrency."</currencyId>\n";
 
 				$strOfferYandex.= $arItem['YANDEX_CATEGORY'];
@@ -1816,7 +1730,7 @@ if (empty($arRunErrors))
 								$strParamValue = '';
 								if ($prop_id)
 								{
-									$strParamValue = yandex_get_value($arItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat);
+									$strParamValue = yandex_get_value($arItem, 'PARAM_'.$key, $prop_id, $arProperties, $arUserTypeFormat, $usedProtocol);
 								}
 								if ('' != $strParamValue)
 									$strValue .= $strParamValue."\n";
@@ -1837,7 +1751,7 @@ if (empty($arRunErrors))
 						}
 						else
 						{
-							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 							if ('' != $strValue)
 								$strValue .= "\n";
 						}
@@ -1859,7 +1773,7 @@ if (empty($arRunErrors))
 						//if (is_array($XML_DATA) && is_array($XML_DATA['XML_DATA']) && $XML_DATA['XML_DATA'][$key])
 						if (isset($XML_DATA['XML_DATA'][$key]))
 						{
-							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat);
+							$strValue = yandex_get_value($arItem, $key, $XML_DATA['XML_DATA'][$key], $arProperties, $arUserTypeFormat, $usedProtocol);
 							if ('' != $strValue)
 								$strValue .= "\n";
 						}
@@ -1895,22 +1809,22 @@ if (empty($arRunErrors))
 		}
 	}
 
-	@fwrite($fp, "<categories>\n");
-	if (true == $boolNeedRootSection)
+	fwrite($fp, "<categories>\n");
+	if ($boolNeedRootSection)
 	{
 		$strTmpCat .= "<category id=\"".$intMaxSectionID."\">".yandex_text2xml(GetMessage('YANDEX_ROOT_DIRECTORY'), true)."</category>\n";
 	}
-	@fwrite($fp, $strTmpCat);
-	@fwrite($fp, "</categories>\n");
+	fwrite($fp, $strTmpCat);
+	fwrite($fp, "</categories>\n");
 
-	@fwrite($fp, "<offers>\n");
-	@fwrite($fp, $strTmpOff);
-	@fwrite($fp, "</offers>\n");
+	fwrite($fp, "<offers>\n");
+	fwrite($fp, $strTmpOff);
+	fwrite($fp, "</offers>\n");
 
-	@fwrite($fp, "</shop>\n");
-	@fwrite($fp, "</yml_catalog>\n");
+	fwrite($fp, "</shop>\n");
+	fwrite($fp, "</yml_catalog>\n");
 
-	@fclose($fp);
+	fclose($fp);
 }
 
 CCatalogDiscountSave::Enable();
@@ -1927,4 +1841,3 @@ if ($bTmpUserCreated)
 		unset($USER_TMP);
 	}
 }
-?>

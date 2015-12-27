@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CPosting</b> - класс для работы с выпусками новостей подписки.</body> </html>
- *
- *
+ * <b>CPosting</b> - класс для работы с выпусками новостей подписки. 
  *
  *
  * @return mixed 
@@ -18,9 +16,7 @@ class CPosting extends CPostingGeneral
 {
 	
 	/**
-	* <p>Функция возвращает список выпусков по фильтру.</p>
-	*
-	*
+	* <p>Метод возвращает список выпусков по фильтру.</p>
 	*
 	*
 	* @param array $arrayaSort = Array() Массив, содержащий признак сортировки в виде наборов "название
@@ -33,8 +29,6 @@ class CPosting extends CPostingGeneral
 	* значение: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
 	* убыванию.</li> </ul> Пример: <pre class="syntax"><code>array("STATUS"=&gt;"ASC", <br>
 	* "DATE_SENT"=&gt;"DESC")</code></pre>
-	*
-	*
 	*
 	* @param array $arrayaFilter = Array() Массив, содержащий фильтр в виде наборов "название
 	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
@@ -56,8 +50,6 @@ class CPosting extends CPostingGeneral
 	* был составлен выпуск (точное совпадение).</li> </ul> Пример: <pre
 	* class="syntax"><code>array("SUBJECT"=&gt;"test | тест", <br> "TO"=&gt;"@bitrixsoft.ru")</code></pre>
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны <a
@@ -65,7 +57,6 @@ class CPosting extends CPostingGeneral
 	* "Выпуск"</a>, за исключением полей типа text. <br><br> Если поля фильтра
 	* содержат ошибку, то переменная LAST_ERROR класса содержит сообщение
 	* об ошибке. </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -243,22 +234,17 @@ class CPosting extends CPostingGeneral
 
 	
 	/**
-	* <p>Функция возвращает true при успешной блокировке выпуска и false при не успешной. Используется при автоматической отправке выпусков.</p>
-	*
-	*
+	* <p>Метод возвращает true при успешной блокировке выпуска и false при не успешной. Используется при автоматической отправке выпусков.</p>
 	*
 	*
 	* @param int $ID  Идентификатор выпуска.
 	*
-	*
-	*
 	* @return bool <p>В случае успешной блокировки возвращается true. В противном
 	* случае возвращается false. Если блокировку не удалось получить
-	* из-за ошибки базы данных, то функция возвращает false и возбуждает
+	* из-за ошибки базы данных, то возвращается false и возбуждает
 	* исключение (<a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -284,18 +270,13 @@ class CPosting extends CPostingGeneral
 	}
 	
 	/**
-	* <p>Функция возвращает true при успешном снятии блокировки выпуска и false при неуспешном. Используется при отправке выпусков.</p>
-	*
-	*
+	* <p>Метод возвращает true при успешном снятии блокировки выпуска и false при неуспешном. Используется при отправке выпусков.</p>
 	*
 	*
 	* @param int $ID  Идентификатор выпуска.
 	*
-	*
-	*
 	* @return bool <p>В случае успешного снятия блокировки возвращается true. В
 	* противном случае возвращается false.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

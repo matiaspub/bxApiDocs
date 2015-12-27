@@ -12,15 +12,11 @@ class Event
 	protected $debugMode = false;
 	protected $debugInfo = array();
 
-	/**
-	 * @var EventResult[]
-	 */
-	protected $results = null;
+	/** @var EventResult[] */
+	protected $results = array();
 
-	/**
-	 * @var \Exception[]
-	 */
-	protected $exceptions;
+	/** @var \Exception[] */
+	protected $exceptions = array();
 
 	/**
 	 * @param $moduleId
@@ -36,7 +32,6 @@ class Event
 		$this->setFilter($filter);
 
 		$this->debugMode = false;
-		$this->results = null;
 	}
 
 	public function getModuleId()
@@ -64,9 +59,6 @@ class Event
 
 	public function setParameter($key, $value)
 	{
-		if (!is_array($this->parameters))
-			$this->parameters = array();
-
 		$this->parameters[$key] = $value;
 	}
 
@@ -96,6 +88,9 @@ class Event
 		return $this->filter;
 	}
 
+	/**
+	 * @return EventResult[]
+	 */
 	public function getResults()
 	{
 		return $this->results;
@@ -103,9 +98,6 @@ class Event
 
 	public function addResult(EventResult $result)
 	{
-		if (!is_array($this->results))
-			$this->results = array();
-
 		$this->results[] = $result;
 	}
 
@@ -122,9 +114,6 @@ class Event
 
 	public function addException(\Exception $exception)
 	{
-		if (!is_array($this->exceptions))
-			$this->exceptions = array();
-
 		$this->exceptions[] = $exception;
 	}
 

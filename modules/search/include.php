@@ -1,6 +1,6 @@
 <?
-if(!defined("CACHED_b_search_tags")) ;// define("CACHED_b_search_tags", 3600);
-if(!defined("CACHED_b_search_tags_len")) ;// define("CACHED_b_search_tags_len", 2);
+if(!defined("CACHED_b_search_tags")) // define("CACHED_b_search_tags", 3600);
+if(!defined("CACHED_b_search_tags_len")) // define("CACHED_b_search_tags_len", 2);
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/tools/stemming.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/tools/tags.php");
@@ -66,5 +66,5 @@ elseif($DB->TableExists("b_search_stem"))
 	COption::SetOptionString("search", "version", "v2.0");
 }
 else
-	;// define("BX_SEARCH_VERSION", 1);
+	// define("BX_SEARCH_VERSION", 1);
 ?>

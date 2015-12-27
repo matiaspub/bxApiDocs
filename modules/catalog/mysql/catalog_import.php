@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/catalog_
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CCatalogImport extends CAllCatalogImport
 {
 	
 	/**
-	* <p>Метод добавляет новый профиль импорта.</p> <p><b>Примечание</b>: в данном методе отключена возможность заносить значения в обход CheckFields, кроме одного исключения:</p> <pre class="syntax">"=LAST_USE" =&gt; $DB-&gt;GetNowFunction()</pre>
-	*
-	*
+	* <p>Метод добавляет новый профиль импорта. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: в данном методе отключена возможность заносить значения в обход CheckFields, кроме одного исключения: <pre class="syntax">"=LAST_USE" =&gt; $DB-&gt;GetNowFunction()</pre> </div>
 	*
 	*
 	* @param array $arFields  Доступные поля: <ul> <li> <b>CREATED_BY</b> - ID создавшего профиль. Если
@@ -46,11 +42,8 @@ class CCatalogImport extends CAllCatalogImport
 	* означает неполную настройку профиля (до тех пор, пока профиль не
 	* будет отредактирован, он выполняться не будет). </li> </ul>
 	*
-	*
-	*
 	* @return mixed <p>Метод возвращает код вставленной записи или <i>false</i> в случае
 	* ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -117,14 +110,10 @@ class CCatalogImport extends CAllCatalogImport
 
 	
 	/**
-	* <p>Функция изменяет параметры профиля импорта с кодом <i>ID</i> на значения из массива <i>arFields</i>. </p> <p><b>Примечание</b>: в данном методе отключена возможность заносить значения в обход CheckFields, кроме одного исключения:</p> <pre class="syntax">"=LAST_USE" =&gt; $DB-&gt;GetNowFunction()</pre>
-	*
-	*
+	* <p>Метод изменяет параметры профиля импорта с кодом <i>ID</i> на значения из массива <i>arFields</i>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: в данном методе отключена возможность заносить значения в обход CheckFields, кроме одного исключения: <pre class="syntax">"=LAST_USE" =&gt; $DB-&gt;GetNowFunction()</pre> </div>
 	*
 	*
 	* @param int $ID  Код изменяемого профиля импорта.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров профиля импорта, ключами
 	* которого являются названия параметров, а значениями - новые
@@ -141,8 +130,6 @@ class CCatalogImport extends CAllCatalogImport
 	* виде url-строки;</li> <li> <b>NEED_EDIT</b> - [Y|N] флаг означает неполную
 	* настройку профиля (до тех пор, пока профиль не будет
 	* отредактирован, он выполняться не будет). </li> </ul>
-	*
-	*
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного изменения параметров
 	* профиля импорта и <i>false</i> - в случае ошибки.</p> <br><br>

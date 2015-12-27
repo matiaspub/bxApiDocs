@@ -20,28 +20,35 @@ $arBXRuntimeTemplateEngines = false;
 
 class CBitrixComponentTemplate
 {
-	var $__name = "";
-	var $__page = "";
-	var $__engineID = "";
+	public $__name = "";
+	public $__page = "";
+	public $__engineID = "";
 
-	var $__file = "";
-	var $__fileAlt = "";
-	var $__folder = "";
-	var $__siteTemplate = "";
-	var $__templateInTheme = false;
-	var $__hasCSS = null;
-	var $__hasJS = null;
+	public $__file = "";
+	public $__fileAlt = "";
+	public $__folder = "";
+	public $__siteTemplate = "";
+	public $__templateInTheme = false;
+	public $__hasCSS = null;
+	public $__hasJS = null;
 
 	/** @var CBitrixComponent */
-	var $__component = null;
-	var $__component_epilog = false;
+	public $__component = null;
+	public $__component_epilog = false;
 
-	var $__bInited = false;
+	public $__bInited = false;
 	private $__view = array();
 	private $frames = array();
 	private $frameMode = false;
 
-	public function CBitrixComponentTemplate()
+	private $languageId = false;
+	private $externalCss = array();
+	private $externalJs = array();
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct()
 	{
 		$this->__bInited = false;
 
@@ -50,16 +57,21 @@ class CBitrixComponentTemplate
 		$this->__folder = "";
 	}
 
-	/***********  GET  ***************/
+	/**
+	 * Returns name of the template.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|string
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	
 	/**
-	* <p> Метод возвращает имя шаблона компонента. </p> <a name="examples"></a>
-	*
-	*
+	* <p>Метод возвращает имя шаблона компонента. Динамичный метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -82,6 +94,15 @@ class CBitrixComponentTemplate
 		return $this->__name;
 	}
 
+	/**
+	 * Returns template page.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|string
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	public function GetPageName()
 	{
 		if (!$this->__bInited)
@@ -90,15 +111,21 @@ class CBitrixComponentTemplate
 		return $this->__page;
 	}
 
+	/**
+	 * Returns path to the template file within DOCUMENT_ROOT.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|string
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	
 	/**
-	* <p> Метод возвращает путь к файлу шаблона относительно корня сайта. </p> <a name="examples"></a>
-	*
-	*
+	* <p>Метод возвращает путь к файлу шаблона относительно корня сайта. Динамичный метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -122,15 +149,21 @@ class CBitrixComponentTemplate
 		return $this->__file;
 	}
 
+	/**
+	 * Returns path to the template folder within DOCUMENT_ROOT.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|string
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	
 	/**
-	* <p> Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. </p> <a name="examples"></a>
-	*
-	*
+	* <p>Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. Динамичный метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -154,15 +187,21 @@ class CBitrixComponentTemplate
 		return $this->__folder;
 	}
 
+	/**
+	 * Returns site template name.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|string
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	
 	/**
-	* <p> Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. </p> <a name="examples"></a>
-	*
-	*
+	* <p>Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. Динамичный метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -185,6 +224,15 @@ class CBitrixComponentTemplate
 		return $this->__siteTemplate;
 	}
 
+	/**
+	 * Returns true if template belongs to another template of an complex component.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|boolean
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	public function IsInTheme()
 	{
 		if (!$this->__bInited)
@@ -193,12 +241,44 @@ class CBitrixComponentTemplate
 		return $this->__templateInTheme;
 	}
 
-	function &GetCachedData()
+	/**
+	 * Sets template language identifier.
+	 *
+	 * @param string $languageId
+	 *
+	 * @return void
+	 */
+	public function setLanguageId($languageId)
 	{
-		$arReturn = null;
+		$this->languageId = $languageId;
+	}
 
+	/**
+	 * Returns template language.
+	 *
+	 * @return string
+	 *
+	 * @see CBitrixcomponentTemplate::setLanguageId
+	 */
+	public function getLanguageId()
+	{
+		return $this->languageId;
+	}
+
+	/**
+	 * Returns data to be stored in the component cache.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @return null|array
+	 *
+	 * @see CBitrixComponentTemplate::Init
+	 * @see CBitrixComponentTemplate::ApplyCachedData
+	 */
+	public function GetCachedData()
+	{
 		if (!$this->__bInited)
-			return $arReturn;
+			return null;
 
 		$arReturn = array();
 
@@ -229,10 +309,27 @@ class CBitrixComponentTemplate
 			$arReturn["frameModeCtx"] = $this->__file;
 		}
 
+		if ($this->externalCss)
+		{
+			$arReturn["externalCss"] = $this->externalCss;
+		}
+
+		if ($this->externalJs)
+		{
+			$arReturn["externalJs"] = $this->externalJs;
+		}
+
 		return $arReturn;
 	}
 
-	/***********  INIT  ***************/
+	/**
+	 * Performs actions on cached hit.
+	 *
+	 * @param array $arData
+	 *
+	 * @return void
+	 * @see CBitrixComponentTemplate::GetCachedData
+	 */
 	public function ApplyCachedData($arData)
 	{
 		/** @global CMain $APPLICATION */
@@ -243,7 +340,6 @@ class CBitrixComponentTemplate
 			if (array_key_exists("additionalCSS", $arData) && strlen($arData["additionalCSS"]) > 0)
 			{
 				$APPLICATION->SetAdditionalCSS($arData["additionalCSS"]);
-
 				//Check if parent component exists and plug css it to it's "collection"
 				if($this->__component && $this->__component->__parent)
 					$this->__component->__parent->addChildCSS($this->__folder."/style.css");
@@ -252,7 +348,6 @@ class CBitrixComponentTemplate
 			if (array_key_exists("additionalJS", $arData) && strlen($arData["additionalJS"]) > 0)
 			{
 				$APPLICATION->AddHeadScript($arData["additionalJS"]);
-
 				//Check if parent component exists and plug js it to it's "collection"
 				if($this->__component && $this->__component->__parent)
 					$this->__component->__parent->addChildJS($this->__folder."/script.js");
@@ -271,40 +366,91 @@ class CBitrixComponentTemplate
 				$context = isset($arData["frameModeCtx"]) ? "(from component cache) ".$arData["frameModeCtx"] : "";
 				\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($context);
 			}
+
+			if (isset($arData["externalCss"]))
+			{
+				foreach ($arData["externalCss"] as $cssPath)
+				{
+					$APPLICATION->SetAdditionalCSS($cssPath);
+					//Check if parent component exists and plug css it to it's "collection"
+					if($this->__component && $this->__component->__parent)
+						$this->__component->__parent->addChildCSS($cssPath);
+				}
+			}
+
+			if (isset($arData["externalJs"]))
+			{
+				foreach ($arData["externalJs"] as $jsPath)
+				{
+					$APPLICATION->AddHeadScript($jsPath);
+					//Check if parent component exists and plug js it to it's "collection"
+					if($this->__component && $this->__component->__parent)
+						$this->__component->__parent->addChildJS($jsPath);
+				}
+			}
 		}
 	}
 
-	public static function InitTemplateEngines($arTemplateEngines = array())
+	/**
+	 * Called automatically on first usage of related functions.
+	 *
+	 * @param array $arTemplateEngines Array of engines to add.
+	 *
+	 * @return void
+	 */
+	static public function InitTemplateEngines($arTemplateEngines = array())
 	{
 		global $arBXAvailableTemplateEngines, $arBXRuntimeTemplateEngines;
 
-		if (array_key_exists("arCustomTemplateEngines", $GLOBALS)
+		if (
+			array_key_exists("arCustomTemplateEngines", $GLOBALS)
 			&& is_array($GLOBALS["arCustomTemplateEngines"])
-			&& count($GLOBALS["arCustomTemplateEngines"]) > 0)
+			&& count($GLOBALS["arCustomTemplateEngines"]) > 0
+		)
 		{
 			$arBXAvailableTemplateEngines = $arBXAvailableTemplateEngines + $GLOBALS["arCustomTemplateEngines"];
 		}
 
 		if (is_array($arTemplateEngines) && count($arTemplateEngines) > 0)
+		{
 			$arBXAvailableTemplateEngines = $arBXAvailableTemplateEngines + $arTemplateEngines;
+		}
 
 		$arBXRuntimeTemplateEngines = array();
 
 		foreach ($arBXAvailableTemplateEngines as $engineID => $engineValue)
+		{
 			foreach ($engineValue["templateExt"] as $ext)
+			{
 				$arBXRuntimeTemplateEngines[$ext] = $engineID;
+			}
+		}
 	}
 
+	/**
+	 * Have to be called before any template usage.
+	 * Returns true on success.
+	 *
+	 * @param CBitrixComponent $component Parent component.
+	 * @param boolean|string $siteTemplate Site template name.
+	 * @param string $customTemplatePath Additional path to look for template in.
+	 *
+	 * @return boolean
+	 */
 	public function Init(&$component, $siteTemplate = false, $customTemplatePath = "")
 	{
 		global $arBXRuntimeTemplateEngines;
 
 		$this->__bInited = false;
 
-		if ($siteTemplate === false && defined("SITE_TEMPLATE_ID"))
-			$this->__siteTemplate = SITE_TEMPLATE_ID;
+		if ($siteTemplate === false)
+		{
+			$this->__siteTemplate = $component->getSiteTemplateId();
+		}
 		else
+		{
 			$this->__siteTemplate = $siteTemplate;
+		}
 
 		if (strlen($this->__siteTemplate) <= 0)
 			$this->__siteTemplate = ".default";
@@ -345,13 +491,27 @@ class CBitrixComponentTemplate
 		return true;
 	}
 
-	public static function CheckName($name)
+	/**
+	 * Checks the template name for correctness.
+	 * Letters, digits, minus, underscore and dots are allowed.
+	 *
+	 * @param string $name Name of the template.
+	 *
+	 * @return boolean
+	 */
+	static public function CheckName($name)
 	{
-		return preg_match("#^([A-Za-z0-9_.-]+)(/[A-Za-z0-9_.-]+)?$#i", $name);
+		return preg_match("#^([A-Za-z0-9_.-]+)(/[A-Za-z0-9_.-]+)?$#i", $name) > 0;
 	}
 
-	/***********  SEARCH  ***************/
-	// Search file by its path and name without extention
+	/**
+	 * Search file by its path and name without extention.
+	 *
+	 * @param string $path Directory.
+	 * @param string $fileName File name (without extention).
+	 *
+	 * @return false|string
+	 */
 	public function __SearchTemplateFile($path, $fileName)
 	{
 		global $arBXRuntimeTemplateEngines;
@@ -359,22 +519,20 @@ class CBitrixComponentTemplate
 		if (!$arBXRuntimeTemplateEngines)
 			$this->InitTemplateEngines();
 
-		$fname = $_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".php";
-		if (file_exists($fname) && is_file($fname))
+		$filePath = $_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".php";
+		if (file_exists($filePath) && is_file($filePath))
 		{
 			return $fileName.".php";
 		}
 		else
 		{
-			// Look at glob() function for PHP >= 4.3.0 !!!
-
 			foreach ($arBXRuntimeTemplateEngines as $templateExt => $engineID)
 			{
 				if ($templateExt == "php")
 					continue;
 
-				if (file_exists($_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".".$templateExt)
-					&& is_file($_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".".$templateExt))
+				$filePath = $_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".".$templateExt;
+				if (file_exists($filePath) && is_file($filePath))
 				{
 					return $fileName.".".$templateExt;
 				}
@@ -384,6 +542,27 @@ class CBitrixComponentTemplate
 		return false;
 	}
 
+	/**
+	 * Search template by its name in various locations.
+	 * <ol>
+	 * <li>/local/templates/&lt;site template&gt;/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/local/templates/.default/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/local/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/local/templates/&lt;site template&gt;/components/&lt;component path&gt;/
+	 * <li>/local/templates/.default/components/&lt;component path&gt;/
+	 * <li>/local/components/&lt;component path&gt;/
+	 * <li>/&lt;BX_PERSONAL_ROOT&gt;/templates/&lt;site template&gt;/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/&lt;BX_PERSONAL_ROOT&gt;/templates/.default/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/bitrix/components/&lt;parent template&gt;/&lt;component path&gt;/
+	 * <li>/&lt;BX_PERSONAL_ROOT&gt;/templates/&lt;site template&gt;/components/&lt;component path&gt;/
+	 * <li>/&lt;BX_PERSONAL_ROOT&gt;/templates/.default/components/&lt;component path&gt;/
+	 * <li>/bitrix/components/&lt;component path&gt;/
+	 * </ol>
+	 *
+	 * @param string $customTemplatePath
+	 *
+	 * @return false|string
+	 */
 	public function __SearchTemplate($customTemplatePath = "")
 	{
 		$this->__file = "";
@@ -566,7 +745,19 @@ class CBitrixComponentTemplate
 		return ($this->__file != "");
 	}
 
-	/***********  INCLUDE  ***************/
+	/**
+	 * Executes template.php via include function.
+	 *
+	 * Requires Init call before usage.
+	 *
+	 * @param array &$arResult Result of the component calculations.
+	 * @param array &$arParams Parameters of the component call.
+	 * @param string $parentTemplateFolder Parent template.
+	 *
+	 * @return false|void
+	 * @throws \Bitrix\Main\NotSupportedException
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	public function __IncludePHPTemplate(/** @noinspection PhpUnusedParameterInspection */
 		&$arResult, &$arParams, $parentTemplateFolder = "")
 	{
@@ -626,6 +817,15 @@ class CBitrixComponentTemplate
 		return null;
 	}
 
+	/**
+	 * Executes template using appropriate template engine.
+	 *
+	 * Requires Init call before usage.
+	 * @param array &$arResult
+	 *
+	 * @return false|void
+	 * @see CBitrixComponentTemplate::Init
+	 */
 	public function IncludeTemplate(&$arResult)
 	{
 		global $arBXAvailableTemplateEngines;
@@ -685,6 +885,15 @@ class CBitrixComponentTemplate
 		return $result;
 	}
 
+	/**
+	 * Includes template language file.
+	 *
+	 * @param string $relativePath
+	 * @param false|string $lang
+	 * @param boolean $return
+	 *
+	 * @return array
+	 */
 	public function IncludeLangFile($relativePath = "", $lang = false, $return = false)
 	{
 		$arLangMessages = array();
@@ -706,7 +915,7 @@ class CBitrixComponentTemplate
 			{
 				if ($lang === false)
 				{
-					$lang = LANGUAGE_ID;
+					$lang = $this->getLanguageId();
 				}
 				$arLangMessages = \Bitrix\Main\Localization\Loc::loadLanguageFile($absPath, $lang);
 			}
@@ -715,6 +924,13 @@ class CBitrixComponentTemplate
 		return $arLangMessages;
 	}
 
+	/**
+	 * @param array &$arResult
+	 * @param array &$arParams
+	 *
+	 * @return void
+	 * @internal
+	 */
 	public function __IncludeMutatorFile(/** @noinspection PhpUnusedParameterInspection */
 		&$arResult, &$arParams)
 	{
@@ -730,33 +946,41 @@ class CBitrixComponentTemplate
 		}
 	}
 
+	/**
+	 * @return void
+	 * @internal
+	 */
 	public function __IncludeCSSFile()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
-		if(
-			$this->__folder <> ''
-			&& (
+		if ($this->__folder <> '')
+		{
+			if (
 				$this->__hasCSS
 				|| file_exists($_SERVER["DOCUMENT_ROOT"].$this->__folder."/style.css")
 			)
-		)
-		{
-			$APPLICATION->SetAdditionalCSS($this->__folder."/style.css");
+			{
+				$APPLICATION->SetAdditionalCSS($this->__folder."/style.css");
 
-			//Check if parent component exists and plug css it to it's "collection"
-			if($this->__component && $this->__component->__parent)
-				$this->__component->__parent->addChildCSS($this->__folder."/style.css");
+				//Check if parent component exists and plug css it to it's "collection"
+				if ($this->__component && $this->__component->__parent)
+					$this->__component->__parent->addChildCSS($this->__folder."/style.css");
+			}
 		}
 	}
 
+	/**
+	 * @return void
+	 * @internal
+	 */
 	public function __IncludeJSFile()
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
-		if($this->__folder <> '')
+		if ($this->__folder <> '')
 		{
 			if (
 				$this->__hasJS
@@ -771,14 +995,23 @@ class CBitrixComponentTemplate
 		}
 	}
 
-	/***********  UTIL  ***************/
-	public static function __GetTemplateExtension($templateName)
+	/**
+	 * @param string $templateName File name.
+	 *
+	 * @return string
+	 * @internal
+	 */
+	static public function __GetTemplateExtension($templateName)
 	{
 		$templateName = trim($templateName, ". \r\n\t");
 		$arTemplateName = explode(".", $templateName);
 		return strtolower($arTemplateName[count($arTemplateName) - 1]);
 	}
 
+	/**
+	 * @return void
+	 * @internal
+	 */
 	public function __GetTemplateEngine()
 	{
 		global $arBXRuntimeTemplateEngines;
@@ -794,6 +1027,16 @@ class CBitrixComponentTemplate
 			$this->__engineID = "php";
 	}
 
+	/**
+	 * Begins special output which will be showed by $APPLICATION->ShowViewContent.
+	 *
+	 * @param string $target Code name of the area.
+	 * @param integer $pos Sort index.
+	 *
+	 * @return void
+	 * @see CMain::ShowViewContent
+	 * @see CBitrixcomponentTemplate::EndViewTarget
+	 */
 	public function SetViewTarget($target, $pos = 500)
 	{
 		$this->EndViewTarget();
@@ -806,6 +1049,13 @@ class CBitrixComponentTemplate
 		ob_start();
 	}
 
+	/**
+	 * Ends special output which will be showed by $APPLICATION->ShowViewContent.
+	 *
+	 * @return void
+	 * @see CMain::ShowViewContent
+	 * @see CBitrixcomponentTemplate::SetViewTarget
+	 */
 	public function EndViewTarget()
 	{
 		/** @global CMain $APPLICATION */
@@ -834,55 +1084,78 @@ class CBitrixComponentTemplate
 		}
 	}
 
-	/**** EDIA AREA ICONS ************/
-	/*
-	inside template.php:
-
-	$this->AddEditAction(
-		'USER'.$arUser['ID'], // entry id. prefix like 'USER' needed only in case when template has two or more lists of differrent editable entities
-
-		$arUser['EDIT_LINK'], // edit link, should be set in a component. will be open in js popup.
-
-		GetMessage('INTR_ISP_EDIT_USER'), // button caption
-
-		array( // additional params
-			'WINDOW' => array("width"=>780, "height"=>500), // popup params
-			'ICON' => 'bx-context-toolbar-edit-icon' // icon css
-			'SRC' => '/bitrix/images/myicon.gif' // icon image
-		)
-	);
-
-	icon css is set to "edit" icon by default. button caption too.
-
-	$this->GetEditAreaId with the same id MUST be used for marking entry contaner or row, like this:
-	<tr id="<?=$this->GetEditAreaId('USER'.$arUser['ID']);?>">
-	*/
-	public function GetEditAreaId($entryId)
-	{
-		return $this->__component->GetEditAreaId($entryId);
-	}
-
+	/**
+	 * Shows menu with edit action in edit mode.
+	 * <code>
+	 * $this->AddEditAction(
+	 * 	'USER'.$arUser['ID'],
+	 * 	$arUser['EDIT_LINK'],
+	 * 	GetMessage('INTR_ISP_EDIT_USER'),
+	 * 	array(
+	 * 		'WINDOW' => array("width"=>780, "height"=>500), // popup params
+	 * 		'ICON' => 'bx-context-toolbar-edit-icon' // icon css
+	 * 		'SRC' => '/bitrix/images/myicon.gif' // icon image
+	 * 	)
+	 * );
+	 * </code>
+	 *
+	 * @param string $entryId Entry identifier. prefix like 'USER' needed only in case when template has two or more lists of different editable entities.
+	 * @param string $editLink Edit form link, Should be set in a component. Will be opened in js popup.
+	 * @param false|string $editTitle Button caption.
+	 * @param array $arParams Additional parameters.
+	 *
+	 * @return void
+	 * @see CBitrixcomponentTemplate::GetEditAreaId
+	 */
 	public function AddEditAction($entryId, $editLink, $editTitle = false, $arParams = array())
 	{
 		$this->__component->addEditButton(array('AddEditAction', $entryId, $editLink, $editTitle, $arParams));
 	}
 
-	/*
-	$arParams['CONFIRM'] = false - disable confirm;
-	$arParams['CONFIRM'] = 'Text' - confirm with custom text;
-	no $arParams['CONFIRM'] at all - confirm with default text
-	*/
+	/**
+	 * Shows menu with delete action in edit mode.
+	 * <ul>
+	 * $arParams['CONFIRM'] = false - disable confirm;
+	 * $arParams['CONFIRM'] = 'Text' - confirm with custom text;
+	 * no $arParams['CONFIRM'] at all - confirm with default text
+	 * </ul>
+	 *
+	 * @param string $entryId Entry identifier. prefix like 'USER' needed only in case when template has two or more lists of different editable entities.
+	 * @param string $deleteLink Delete action link, Should be set in a component.
+	 * @param false|string $deleteTitle Button caption.
+	 * @param array $arParams Additional parameters.
+	 *
+	 * @return void
+	 * @see CBitrixcomponentTemplate::GetEditAreaId
+	 */
 	public function AddDeleteAction($entryId, $deleteLink, $deleteTitle = false, $arParams = array())
 	{
 		$this->__component->addEditButton(array('AddDeleteAction', $entryId, $deleteLink, $deleteTitle, $arParams));
 	}
 
 	/**
+	 * Returns identifier to mark an html element as a container for highlight.
+	 *
+	 * <code>
+	 * &lt;tr id="&lt;?=$this-&gt;GetEditAreaId('USER'.$arUser['ID']);?&gt;"&gt;
+	 * </code>
+	 *
+	 * @param $entryId
+	 *
+	 * @return string
+	 * @see CBitrixcomponentTemplate::AddEditAction
+	 */
+	public function GetEditAreaId($entryId)
+	{
+		return $this->__component->GetEditAreaId($entryId);
+	}
+
+	/**
 	 * Function returns next pseudo random value.
 	 *
 	 * @param int $length
-	 * @return string
 	 *
+	 * @return string
 	 * @see \Bitrix\Main\Type\RandomSequence::randString
 	 */
 	public function randString($length = 6)
@@ -894,8 +1167,8 @@ class CBitrixComponentTemplate
 	 * Marks a template as capable of composite mode.
 	 *
 	 * @param bool $mode
-	 * @return void
 	 *
+	 * @return void
 	 */
 	public function setFrameMode($mode)
 	{
@@ -905,17 +1178,17 @@ class CBitrixComponentTemplate
 	/**
 	 * Returns new frame helper object to work with composite frame.
 	 *
-	 *
 	 * <code>
 	 * $frame = $this->createFrame()->begin("");
 	 * echo "10@".(time()+15);
 	 * $frame->end();
 	 * </code>
-	 * @see Bitrix\Main\Page\FrameHelper
 	 *
 	 * @param string $id
 	 * @param bool $autoContainer
+	 *
 	 * @return Bitrix\Main\Page\FrameHelper
+	 * @see Bitrix\Main\Page\FrameHelper
 	 */
 	public function createFrame($id = null, $autoContainer = true)
 	{
@@ -925,5 +1198,54 @@ class CBitrixComponentTemplate
 		$frame = new Bitrix\Main\Page\FrameHelper($id, $autoContainer);
 		array_unshift($this->frames, $frame);
 		return $frame;
+	}
+
+	/**
+	 * Shows css file in the head of html.
+	 * Supports caching.
+	 *
+	 * @param string $cssPath Path to css file.
+	 *
+	 * @return void
+	 * @see CMain::SetAdditionalCSS
+	 */
+	public function addExternalCss($cssPath)
+	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		$this->externalCss[] = $cssPath;
+		$APPLICATION->SetAdditionalCSS($cssPath);
+		//Check if parent component exists and plug css it to it's "collection"
+		if ($this->__component && $this->__component->__parent)
+			$this->__component->__parent->addChildCSS($cssPath);
+	}
+
+	/**
+	 * Shows js file in the head of html.
+	 * Supports caching.
+	 *
+	 * @param string $jsPath Path to js file.
+	 *
+	 * @return void
+	 * @see CMain::AddHeadScript
+	 */
+	public function addExternalJs($jsPath)
+	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+		$this->externalJs[] = $jsPath;
+		$APPLICATION->AddHeadScript($jsPath);
+		//Check if parent component exists and plug js it to it's "collection"
+		if($this->__component && $this->__component->__parent)
+			$this->__component->__parent->addChildJS($jsPath);
+	}
+
+	/**
+	 * A bit more civilised method of getting the parent component.
+	 * @return CBitrixComponent
+	 */
+	public function getComponent()
+	{
+		return $this->__component;
 	}
 }

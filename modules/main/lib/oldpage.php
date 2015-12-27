@@ -40,7 +40,7 @@ class OldPage extends \Bitrix\Main\Page
 			// define("NEED_AUTH", true);
 
 			if (isset($_REQUEST['bxpublic']) && $_REQUEST['bxpublic'] == 'Y' && !defined('BX_PUBLIC_MODE'))
-				;// define('BX_PUBLIC_MODE', 1);
+				// define('BX_PUBLIC_MODE', 1);
 		}
 		//
 
@@ -72,7 +72,7 @@ class OldPage extends \Bitrix\Main\Page
 	}
 
 
-public static function init()
+public static 	public function init()
 	{
 		//language independed classes
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/punycode.php");
@@ -231,7 +231,7 @@ public static function init()
 		$GLOBALS["arCustomTemplateEngines"] = array();
 	}
 
-public static function authorizeUser()
+public static 	public function authorizeUser()
 	{
 		// раскомментировать когда уберем из CurrentUser вызовы USER
 		//$GLOBALS["USER"] = new \CUser;

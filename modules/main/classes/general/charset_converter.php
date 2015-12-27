@@ -6,6 +6,7 @@ class CharsetConverter
 	private static $instance;
 
 	private $arErrors = array();
+	private $ignoreErrors = false;
 
 	/**
 	 * @static
@@ -22,19 +23,19 @@ class CharsetConverter
 		return self::$instance;
 	}
 
-	public static function ConvertCharset($string, $charset_in, $charset_out, &$errorMessage = "")
+	public static function ConvertCharset($string, $charset_in, $charset_out, &$errorMessage = "", $ignoreErrors = false)
 	{
 		$string = strval($string);
 
 		if(strcasecmp($charset_in, $charset_out) == 0)
 			return $string;
-		
+
 		$errorMessage = '';
 
 		if ($string == '')
 			return '';
 
-		if (extension_loaded("mbstring") && mb_encoding_aliases($charset_in) && mb_encoding_aliases($charset_out))
+		if (extension_loaded("mbstring") && @mb_encoding_aliases($charset_in) && @mb_encoding_aliases($charset_out))
 		{
 			//For UTF-16 we have to detect the order of bytes
 			//Default for mbstring extension is Big endian
@@ -76,7 +77,7 @@ class CharsetConverter
 				else
 					$res = iconv($charset_in, $charset_out."//IGNORE", $string);
 
-				if (!$res)
+				if (!$res && !$ignoreErrors)
 					$errorMessage .= "Iconv reported failure while converting string to requested character encoding. ";
 
 				return $res;
@@ -88,7 +89,7 @@ class CharsetConverter
 				else
 					$res = libiconv($charset_in, $charset_out, $string);
 
-				if (!$res)
+				if (!$res && !$ignoreErrors)
 					$errorMessage .= "Libiconv reported failure while converting string to requested character encoding. ";
 
 				return $res;
@@ -96,6 +97,7 @@ class CharsetConverter
 		}
 
 		$cvt = self::GetInstance();
+		$cvt->ignoreErrors = $ignoreErrors;
 		$res = $cvt->Convert($string, $charset_in, $charset_out);
 		if (!$res)
 		{
@@ -316,7 +318,7 @@ class CharsetConverter
 
 	protected function AddError($error, $errorCode = "")
 	{
-		if (empty($error))
+		if (empty($error) || $this->ignoreErrors)
 			return;
 
 		$fs = (empty($errorCode) ? "%s" : "[%s] %s");

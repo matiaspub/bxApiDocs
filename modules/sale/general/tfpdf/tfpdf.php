@@ -1074,12 +1074,32 @@ public function Write($h, $txt, $link='')
 
 public function Ln($h=null)
 {
+	if ($h === null)
+		$h = $this->lasth;
+
+	$k = $this->k;
+	if($this->y+$h>$this->PageBreakTrigger && !$this->InHeader && !$this->InFooter && $this->AcceptPageBreak())
+	{
+		// Automatic page break
+		$x = $this->x;
+		$ws = $this->ws;
+		if($ws>0)
+		{
+			$this->ws = 0;
+			$this->_out('0 Tw');
+		}
+		$this->AddPage($this->CurOrientation,$this->CurPageSize);
+		$this->x = $x;
+		if($ws>0)
+		{
+			$this->ws = $ws;
+			$this->_out(sprintf('%.3F Tw',$ws*$k));
+		}
+	}
+
 	// Line feed; default value is last cell height
 	$this->x = $this->lMargin;
-	if($h===null)
-		$this->y += $this->lasth;
-	else
-		$this->y += $h;
+	$this->y += $h;
 }
 
 public function Image($file, $x=null, $y=null, $w=0, $h=0, $type='', $link='')

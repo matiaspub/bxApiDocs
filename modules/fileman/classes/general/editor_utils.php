@@ -12,7 +12,7 @@ class CEditorUtils
 		$arParams['siteTemplateId'] = addslashes($arParams['siteTemplateId']);
 
 		if ($arParams['siteTemplateId'] && !defined("SITE_TEMPLATE_ID"))
-		;// define("SITE_TEMPLATE_ID", $arParams['siteTemplateId']);
+			// define("SITE_TEMPLATE_ID", $arParams['siteTemplateId']);
 
 		// Report only errors
 		error_reporting(E_ERROR);

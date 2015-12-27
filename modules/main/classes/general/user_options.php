@@ -102,6 +102,7 @@ class CUserOptions
 			$user_id = $USER->GetID();
 
 		$user_id = intval($user_id);
+		$category = strtolower($category);
 
 		if (!isset(self::$cache[$user_id][$category][$name]))
 		{
@@ -136,7 +137,9 @@ class CUserOptions
 				}
 
 				if (!isset(self::$cache[$user_id][$category][$name]))
-					return $default_value;
+				{
+					self::$cache[$user_id][$category][$name] = $default_value;
+				}
 			}
 			else
 			{
@@ -159,7 +162,9 @@ class CUserOptions
 				}
 
 				if (!isset(self::$cache[$user_id][$category][$name]))
-					return $default_value;
+				{
+					self::$cache[$user_id][$category][$name] = $default_value;
+				}
 			}
 		}
 

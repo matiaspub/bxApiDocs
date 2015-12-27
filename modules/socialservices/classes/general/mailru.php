@@ -15,7 +15,21 @@ class CSocServMyMailRu extends CSocServAuth
 		);
 	}
 
-	static public function GetFormHtml($arParams)
+	public function GetFormHtml($arParams)
+	{
+		$url = $this->getUrl();
+		if($arParams["FOR_INTRANET"])
+			return array("ON_CLICK" => 'onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)"');
+		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)" class="bx-ss-button mymailru-button"></a><span class="bx-spacer"></span><span>'.GetMessage("socserv_mailru_note").'</span>';
+	}
+
+	public function GetOnClickJs()
+	{
+		$url = $this->getUrl();
+		return "BX.util.popup('".CUtil::JSEscape($url)."', 580, 400)";
+	}
+
+	static public function getUrl()
 	{
 		$appID = trim(self::GetOption("mailru_id"));
 		$appSecret = trim(self::GetOption("mailru_secret_key"));
@@ -25,18 +39,20 @@ class CSocServMyMailRu extends CSocServAuth
 		$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
 		$state = 'site_id='.SITE_ID.'&backurl='.($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl")));
 
-		$url = $gAuth->GetAuthUrl($redirect_uri, $state);
-		if($arParams["FOR_INTRANET"])
-			return array("ON_CLICK" => 'onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)"');
-		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)" class="bx-ss-button mymailru-button"></a><span class="bx-spacer"></span><span>'.GetMessage("socserv_mailru_note").'</span>';
+		return $gAuth->GetAuthUrl($redirect_uri, $state);
 	}
 
 	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
+
 		$bSuccess = 1;
+		$bProcessState = false;
+
 		if((isset($_REQUEST["code"]) && $_REQUEST["code"] <> '') && CSocServAuthManager::CheckUniqueKey())
 		{
+			$bProcessState = true;
+
 			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code", "state", "check_key", "backurl"));
 			$appID = trim(self::GetOption("mailru_id"));
 			$appSecret = trim(self::GetOption("mailru_secret_key"));
@@ -93,6 +109,12 @@ class CSocServMyMailRu extends CSocServAuth
 				}
 			}
 		}
+
+		if(!$bProcessState)
+		{
+			unset($_REQUEST["state"]);
+		}
+
 		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "" : $GLOBALS["APPLICATION"]->GetCurDir();
 		if(isset($_REQUEST["state"]))
 		{

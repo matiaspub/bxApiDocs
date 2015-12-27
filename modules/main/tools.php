@@ -18,52 +18,33 @@
  * <p>Возвращает HTML код тегов &lt;input type="checkbox"&gt; (переключатель с множественным вариантом выбора ответа), либо &lt;input type="radio"&gt; (переключатель с единственным вариантом выбора ответа).</p>
  *
  *
- *
- *
  * @param string $type  Тип тэга:<br> &lt;input type="<i>type</i>" ... &gt; <br><br>Возможные значения: <ul> <li>
  * <b>checkbox</b> - переключатель с множественным вариантом выбора ответа
  * </li> <li> <b>radio</b> - переключатель с единственным вариантом выбора
  * ответа </li> </ul>
  *
- *
- *
  * @param string $name  Имя тэга:<br> &lt;input name="<i>name</i>" ... &gt;</bo
  *
- *
- *
  * @param string $value  Значение тэга:<br> &lt;input value="<i>value</i>" ... &gt;
- *
- *
  *
  * @param mixed $Cmp  Значение данного параметра будет сравниваться со значением
  * параметра <i>value</i>, в случае совпадения - переключатель будет
  * "отмечен" (checked):<br> &lt;input checked ... &gt;
  *
- *
- *
  * @param bool $print_value = false Если в данном параметре задано значение "true", то справа от тэга
  * будет выведено значение параметра <i>value</i>.<br>Необязательный
  * параметр. По умолчанию - "false".
- *
- *
  *
  * @param string $Print = "" Если параметр <i>print_value</i> не равен "true" и в параметре <i>title</i> задано
  * значение, то оно будет выведено справа от тэга.<br>Необязательный
  * параметр. По умолчанию - "".
  *
- *
- *
  * @param string $add_to_tag = "" Произвольный HTML который будет добавлен в тэг:<br> &lt;input <i>add_to_tag</i> ...
  * &gt; <br>Необязательный параметр. По умолчанию - "".
  *
- *
- *
  * @param string $Id = "" Необязательный параметр. По умолчанию - "".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -137,39 +118,26 @@ function InputType($strType, $strName, $strValue, $strCmp, $strPrintValue=false,
  * <p>Возвращает HTML код тега &lt;select&gt; (выпадающий список с единственным вариантом выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
  *
  *
- *
- *
  * @param string $name  Имя тэга:<br> &lt;select name="<i>name</i>" ... &gt;</bo
- *
- *
  *
  * @param CDBResult $values  Элементы списка. Объект типа <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
  * набор записей, каждая из которых должна иметь по два: "REFERENCE_ID"
  * (значение элемента списка) и "REFERENCE" (заголовок элемента списка).
  *
- *
- *
  * @param string $default = "" Заголовок элемента списка выбираемого по умолчанию. Значение
  * этого элемента - "NOT_REF". <br>Необязательный параметр. По умолчанию - ""
  * (не добавлять подобный элемент).
- *
- *
  *
  * @param string $selected = "" Выбранный элемент. Значение данного параметра будет
  * сравниваться с полями "REFERENCE_ID" набора записей передаваемого в
  * параметре <i>values</i>, в случае совпадения элемент будет "выбран"
  * (selected).<br>Необязательный параметр. По умолчанию - "".
  *
- *
- *
  * @param string $add_to_tag = "class=\"typeselect\"" Произвольный HTML который будет добавлен в тэг:<br> &lt;select <i>add_to_tag</i> ...
  * &gt; <br>Необязательный параметр. По умолчанию - "class=\"typeselect\"".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -188,7 +156,6 @@ function InputType($strType, $strName, $strValue, $strCmp, $strPrintValue=false,
  * echo <b>SelectBox</b>("GROUP", $rs, "&lt; выберите группу &gt;", $GROUP, "class =\"inputselect\"");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -239,24 +206,16 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  * <p>Возвращает HTML код тега &lt;select multiple&gt; (выпадающий список с множественными вариантами выбора ответа) на основании данных из объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
  *
  *
- *
- *
  * @param string $name  Имя тэга:<br> &lt;select name="<i>name</i>" ... &gt;</bo
- *
- *
  *
  * @param CDBResult $values  Элементы списка. Объект типа <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
  * набор записей, каждая из которых должна иметь по два: "REFERENCE_ID"
  * (значение элемента списка) и "REFERENCE" (заголовок элемента списка).
  *
- *
- *
  * @param array $selected  Выбранные элементы. Массив, элементы которого будут сравниваться
  * с полями "REFERENCE_ID" набора записей передаваемого в параметре
  * <i>values</i>, в случае совпадения элемент будет "выбран" (selected).
- *
- *
  *
  * @param string $top_element = "" Заголовок специального элемента который всегда помещается
  * первым в списке и он может быть всегда выбран (контролируется
@@ -264,27 +223,18 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  * "NOT_REF".<br>Необязательный параметр. По умолчанию - "" (не добавлять
  * подобный элемент).
  *
- *
- *
  * @param bool $select_top_element = false Если значение "true", то элемент <i>top_element</i> будет всегда выбран
  * (selected). <br>Необязательный параметр. По умолчанию - "false" (не
  * выбирать).
- *
- *
  *
  * @param int $size = 5 Поле size тэга select:<br> &lt;select size="<i>size</i>" ... &gt;<br> В данном параметре
  * передается количество видимых строк в списке множественного
  * выбора. Параметр необязательный. Значение по умолчанию - 5.
  *
- *
- *
  * @param string $add_to_tag = "class=\"typeselect\"" Произвольный HTML который будет добавлен в тэг:<br> &lt;select <i>add_to_tag</i> ...
  * &gt; <br>Необязательный параметр. По умолчанию - "class=\"typeselect\"".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -306,7 +256,6 @@ function SelectBox($strBoxName, $a,	$strDetText = "", $strSelectedVal = "", $fie
  * "class =\"inputselect\"");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -361,24 +310,16 @@ function SelectBoxM($strBoxName, $a, $arr, $strDetText = "", $strDetText_selecte
  * <p>Возвращает HTML код тега &lt;select multiple&gt; (выпадающий список с множественными вариантами выбора ответа) на основании данных из массива.</p>
  *
  *
- *
- *
  * @param string $name  Имя тэга:<br> &lt;select name="<i>name</i>" ... &gt;</bo
- *
- *
  *
  * @param array $values  Элементы списка. Массив имеющий следующую структуру:<br><pre> array(
  * "REFERENCE" =&gt; array( "Заголовок элемента 1", "Заголовок элемента 2", ... ),
  * "REFERENCE_ID" =&gt; array( "Значение элемента 1", "Значение элемента 2", ... ) )</pre>
  *
- *
- *
  * @param array $selected  Выбранные элементы. Массив, значения которого будут искаться в
  * массиве передаваемом в ключе "REFERENCE_ID" массива <i>values</i>, в случае
  * совпадения элемент будет "выбран" (selected).<br>Необязательный
  * параметр. По умолчанию - "".
- *
- *
  *
  * @param string $top_element = "" Заголовок специального элемента который всегда помещается
  * первым в списке и он может быть всегда выбран (контролируется
@@ -386,27 +327,18 @@ function SelectBoxM($strBoxName, $a, $arr, $strDetText = "", $strDetText_selecte
  * "NOT_REF".<br>Необязательный параметр. По умолчанию - "" (не добавлять
  * подобный элемент).
  *
- *
- *
  * @param bool $select_top_element = false Если значение "true", то элемент <i>top_element</i> будет всегда выбран
  * (selected). <br>Необязательный параметр. По умолчанию - "false" (не
  * выбирать).
- *
- *
  *
  * @param int $size = 5 Поле size тэга select:<br> &lt;select size="<i>size</i>" ... &gt;<br> В данном параметре
  * передается количество видимых строк в списке множественного
  * выбора. Параметр необязательный. Значение по умолчанию - 5.
  *
- *
- *
  * @param string $add_to_tag = "class=\"typeselect\"" Произвольный HTML который будет добавлен в тэг:<br> &lt;select <i>add_to_tag</i> ...
  * &gt; <br>Необязательный параметр. По умолчанию - "class=\"typeselect\"".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -421,7 +353,6 @@ function SelectBoxM($strBoxName, $a, $arr, $strDetText = "", $strDetText_selecte
  * "class =\"inputselect\"");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -477,51 +408,34 @@ function SelectBoxMFromArray($strBoxName, $a, $arr, $strDetText = "", $strDetTex
  * <p>Возвращает HTML код тега &lt;select&gt; (выпадающий список с единственным вариантом выбора ответа) на основании данных из массива.</p>
  *
  *
- *
- *
  * @param string $name  Имя тэга:<br> &lt;select name="<i>name</i>" ... &gt;</bo
- *
- *
  *
  * @param array $values  Элементы списка. Массив имеющий следующую структуру:<br><pre> array(
  * "REFERENCE" =&gt; array( "Заголовок элемента 1", "Заголовок элемента 2", ... ),
  * "REFERENCE_ID" =&gt; array( "Значение элемента 1", "Значение элемента 2", ... ) )</pre>
- *
- *
  *
  * @param string $selected = "" Выбранный элемент. Значение данного параметра будет искаться в
  * массиве передаваемом в ключе "REFERENCE_ID" массива <i>values</i>, в случае
  * совпадения элемент будет "выбран" (selected).<br>Необязательный
  * параметр. По умолчанию - "".
  *
- *
- *
  * @param string $default = "" Заголовок элемента списка выбираемого по умолчанию. Значение
  * этого элемента - "NOT_REF". <br>Необязательный параметр. По умолчанию - ""
  * (не добавлять подобный элемент).
  *
- *
- *
  * @param string $add_to_tag = "class=\"typeselect\"" Произвольный HTML который будет добавлен в тэг:<br> &lt;select <i>add_to_tag</i> ...
  * &gt; <br>Необязательный параметр. По умолчанию - "class=\"typeselect\"".
- *
- *
  *
  * @param bool $submit_form = false Если в данном параметре указать "true", то в момент выбора какого
  * либо значения из выпадающего списка, произойдет submit формы, имя
  * которой указано в параметре <i>form_name</i>. <br>Необязательный параметр.
  * По умолчанию - "false" (не submit'ить форму).
  *
- *
- *
  * @param string $form_name = "form1" Если параметр <i>submit_form</i> = true, то здесь вам необходимо указать имя
  * формы в которой будет расположен тэг &lt;select&gt;. <br>Необязательный
  * параметр. По умолчанию - "form1".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -537,7 +451,6 @@ function SelectBoxMFromArray($strBoxName, $a, $arr, $strDetText = "", $strDetTex
  * ?&gt;
  * &lt;/form&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -613,30 +526,19 @@ function SelectBoxFromArray(
  * <p>Возвращает иконку, при нажатии на которую появляется стандартное окно выбора даты. Выбранная в этом окне дата вставляется в указанное поле формы (либо, в случае выбора интервала - в два поля). Работает на JavaScript.</p>
  *
  *
- *
- *
  * @param string $FieldName  Имя поля, в которое будет вставлена выбранная дата.
- *
- *
  *
  * @param string $FormName = "skform" Имя формы, в которой находится поле для вставки
  * даты.<br>Необязательный параметр, по умолчанию принимает значение
  * "skform".
  *
- *
- *
  * @param string $FromName = "" Имя поля, в которое будет вставлена первая дата из выбранного
  * интервала (дата "с").<br>Необязательный параметр, по умолчанию - "".
- *
- *
  *
  * @param string $ToName = "" Имя поля, в которое будет вставлена вторая дата из выбранного
  * интервала (дата "по").<br>Необязательный параметр, по умолчанию - "".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -645,7 +547,6 @@ function SelectBoxFromArray(
  * &lt;?=<b>Calendar</b>("DATE", "curform")?&gt;
  * &lt;/form&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -698,36 +599,23 @@ function Calendar($sFieldName, $sFormName="skform", $sFromName="", $sToName="")
  * <p>Возвращает поле ввода и иконку, при нажатии на которую появляется стандартное окно выбора даты. Выбранная в этом окне дата вставляется в поле ввода. Работает на JavaScript.</p>
  *
  *
- *
- *
  * @param string $FromName  Имя поля ввода:<br> &lt;input type="text" name="<i>field_name</i>" ... &gt;
- *
- *
  *
  * @param string $FromVal  Начальное значение для поля ввода:<br> &lt;input type="text" value="<i>field_value</i>" ...
  * &gt;
- *
- *
  *
  * @param string $FormName = "skform" Имя формы, в которой находится поле ввода для вставки даты:<br> &lt;form
  * name="<i>form</i>"&gt; <br>Необязательный параметр, по умолчанию принимает
  * значение - "skform".
  *
- *
- *
  * @param string $size = "10" Ширина поля ввода:<br> &lt;input type="text" size="<i>field_size</i>" ... &gt;
  * <br>Необязательный параметр, по умолчанию принимает значение - "10".
- *
- *
  *
  * @param string $param = "class=\"typeinput\"" Строка дополнительных атрибутов поля ввода:<br> &lt;input type="text"
  * <i>field_param</i> ... &gt; <br>Необязательный параметр, по умолчанию
  * принимает значение - class="typeinput".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -735,7 +623,6 @@ function Calendar($sFieldName, $sFormName="skform", $sFromName="", $sToName="")
  * &lt;?echo <b>CalendarDate</b>("birthdate", "25.11.1975", "form1", "15", "class=\"my_input\"")?&gt;
  * &lt;/form&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -761,59 +648,40 @@ function CalendarDate($sFromName, $sFromVal, $sFormName="skform", $size="10", $p
  * <p>Отображает два поля ввода для дат "с" и "по" с иконками, при нажатии на которые появляется стандартное окно выбора даты, помимо этого рядом с первым полем выводится выпадающий список дней от 1 до 90, если выбрать какое-либо значение из этого списка, то в первое поле ввода будет установлена текущая дата минус то количество дней которое было выбрано. Работает на JavaScript.</p>
  *
  *
- *
- *
  * @param string $field_from_name  Имя поля ввода для первой даты ("с"):<br> &lt;input type="text" name="<i>field_from_name</i>"
  * ... &gt;
- *
- *
  *
  * @param string $field_from_value  Начальное значение для первой даты ("с"):<br> &lt;input type="text"
  * value="<i>field_from_value</i>" ... &gt;
  *
- *
- *
  * @param string $field_to_name  Имя поля ввода для второй даты ("по"):<br> &lt;input type="text" name="<i>field_to_name</i>"
  * ... &gt;
  *
- *
- *
  * @param string $field_to_value  Начальное значение для второй даты ("по"):<br> &lt;input type="text"
  * value="<i>field_to_value</i>" ... &gt;
- *
- *
  *
  * @param string $form = "skform" Имя формы, в которой находятся поля ввода для вставки дат:<br> &lt;form
  * name="<i>form</i>"&gt; <br>Необязательный параметр, по умолчанию принимает
  * значение - "skform".
  *
- *
- *
  * @param string $select_enabled = "N" Если значение "Y", то список дней, состоящий из цифр от 1 до 90, для
  * быстрого выбора даты, будет выведен.<br>Необязательный параметр,
  * по умолчанию принимает значение "N" - список не выводить.
- *
- *
  *
  * @param string $select_param = "class=\"typeselect\"" Строка дополнительных аттрибутов для списка дней:<br> &lt;select
  * name="<i>field_from_name</i>_DAYS_TO_BACK" <i>select_param</i> ... &gt; <br>Необязательный
  * параметр, по умолчанию принимает значение - class="typeselect".
  *
- *
- *
  * @param string $fields_param = "class=\"typeinput\"" Строка дополнительных аттрибутов для полей ввода дат:<br> &lt;input
  * type="text" <i>fields_param</i> ... &gt; <br>Необязательный параметр, по умолчанию
  * принимает значение - class="typeinput".
  *
- *
- *
  * @param string $fields_size = "10" Ширина полей ввода:<br> &lt;input type="text" size="<i>fields_size</i>" ... &gt;
  * <br>Необязательный параметр, по умолчанию принимает значение - "10".
- *
- *
+ * Если значение больше 10, то к дате периода добавляется выбор
+ * времени суток.
  *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -821,7 +689,6 @@ function CalendarDate($sFromName, $sFromVal, $sFormName="skform", $size="10", $p
  * &lt;?echo <b>CalendarPeriod</b>("date_from", "25.10.2003", "date_to", "29.10.2003", "form1", "Y")?&gt;
  * &lt;/form&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -971,7 +838,7 @@ function CheckDateTime($datetime, $format=false)
 	if ($hour>24 || $hour<0 || $min<0 || $min>59 || $sec<0 || $sec>59)
 		return false;
 
-	$s1 = preg_replace("~([^:\\\\/\\s.0-9-]+|[^:\\\\/\\s.a-z-]+)[\n\r\t ]*~i".BX_UTF_PCRE_MODIFIER, "P", $datetime);
+	$s1 = preg_replace("~([^:\\\\/\\s.,0-9-]+|[^:\\\\/\\s.,a-z-]+)[\n\r\t ]*~i".BX_UTF_PCRE_MODIFIER, "P", $datetime);
 	$s2 = preg_replace("/(DD|MMMM|MM|MI|M|YYYY|HH|H|GG|G|SS|TT|T)[\n\r\t ]*/i".BX_UTF_PCRE_MODIFIER, "P", $format);
 
 	if(strlen($s1) <= strlen($s2))
@@ -1005,11 +872,7 @@ function GetNumMonth ($month)
  * <p>Конвертирует время из строки в Unix-формат.</p>
  *
  *
- *
- *
  * @param string $datetime  Исходное время.
- *
- *
  *
  * @param string $format = FORMAT_DATETIME Формат времени заданном в параметре <i>datetime</i>. В формате допустимы
  * следующие обозначения: <ul> <li> <b>YYYY</b> - год </li> <li> <b>MM</b> - месяц </li> <li>
@@ -1019,10 +882,7 @@ function GetNumMonth ($month)
  * FORMAT_DATETIME</a>, хранящей текущий формат времени сайта или языка (для
  * административной части).
  *
- *
- *
  * @return int 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1078,7 +938,6 @@ function GetNumMonth ($month)
  * }
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1187,12 +1046,8 @@ function MakeTimeStamp($datetime, $format=false)
  * <p>Разбивает дату и время на части в соответствии с заданным форматом. Функция возвращает массив описывающий дату и время в соответствии с заданным форматом, если произошла ошибка - возвращает "false".</p>
  *
  *
- *
- *
  * @param string $datetime  Дата и время заданные в соответствии с форматом указанным в
  * параметре <i>format</i>.
- *
- *
  *
  * @param string $format = FORMAT_DATETIME Формат даты и времени. Вы можете использовать любые обозначения,
  * но желательно использовать символы формата даты и времени
@@ -1203,10 +1058,7 @@ function MakeTimeStamp($datetime, $format=false)
  * FORMAT_DATETIME</a>, хранящей текущий формат времени сайта или языка (для
  * административной части).
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1290,7 +1142,6 @@ function MakeTimeStamp($datetime, $format=false)
  * </pre>
  *
  *
- *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
  * </li> <li> <a
@@ -1312,7 +1163,7 @@ function ParseDateTime($datetime, $format=false)
 	if(preg_match_all("/(DD|MI|MMMM|MM|M|YYYY|HH|H|SS|TT|T|GG|G)/i", $format , $fm_args))
 	{
 		$dt_args = array();
-		if(preg_match_all("~([^:\\\\/\\s.0-9-]+|[^:\\\\/\\s.a-z-]+)~i".BX_UTF_PCRE_MODIFIER, $datetime, $dt_args))
+		if(preg_match_all("~([^:\\\\/\\s.,0-9-]+|[^:\\\\/\\s.,a-z-]+)~i".BX_UTF_PCRE_MODIFIER, $datetime, $dt_args))
 		{
 			$arrResult = array();
 			foreach($fm_args[0] as $i => $v)
@@ -1348,23 +1199,16 @@ function ParseDateTime($datetime, $format=false)
  * <p>Добавляет к дате в Unix-формате заданный интервал времени. Возвращает новую дату также в Unix-формате.</p>
  *
  *
- *
- *
  * @param array $add  Массив, описывающий добавляемый интервал времени. Допустимы
  * следующие ключи данного массива: <ul> <li> <b>DD</b> - дни </li> <li> <b>MM</b> -
  * месяцы </li> <li> <b>YYYY</b> - годы </li> <li> <b>HH</b> - часы </li> <li> <b>MI</b> - минуты </li>
  * <li> <b>SS</b> - секунды </li> </ul>
  *
- *
- *
  * @param int $tmp = false Время, к которому будет добавляться интервал в
  * Unix-формате.<br>Необязательный параметр, по умолчанию - текущее
  * время.
  *
- *
- *
  * @return int 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1374,8 +1218,8 @@ function ParseDateTime($datetime, $format=false)
  * // получим Unix timestamp из заданной даты
  * $stmp = MakeTimeStamp($date, "DD.MM.YYYY HH:MI:SS");
  * 
- * // добавим к полученному Unix timestamp
- * // 1 день, 1 месяц, 1 год, 1 час, 1 минуту, 1 секунду
+ * // добавим к полученному Unix timestamp 
+ * // 1 день, 1 год, 1 час, 1 минуту, 1 секунду и отнимем 1 месяц
  * $arrAdd = array(
  * 	"DD"	=&gt; 1,
  * 	"MM"	=&gt; -1,
@@ -1390,7 +1234,6 @@ function ParseDateTime($datetime, $format=false)
  * echo "Результат: ".date("d.m.Y H:i:s", $stmp); // 07.03.2006 12:33:01
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1446,11 +1289,7 @@ function AddToTimeStamp($arrAdd, $stmp=false)
  * <p>Конвертирует время из строки в формате сайта в строку произвольного формата.</p>
  *
  *
- *
- *
  * @param string $datetime  Время в формате сайта <i>site_id</i>.
- *
- *
  *
  * @param string $to_format = FORMAT_DATETIME Формат времени, в который необходимо сконвертировать. При
  * задании формата допустимо использовать следующие обозначения:
@@ -1461,19 +1300,12 @@ function AddToTimeStamp($arrAdd, $stmp=false)
  * хранящей текущий формат времени сайта или языка (для
  * административной части).
  *
- *
- *
  * @param mixed $from_site = false Идентификатор сайта, в формате которого было задано время
  * <i>time</i>.<br>Необязательный параметр. По умолчанию - текущий сайт.
  *
- *
- *
  * @param bool $SearchInSitesOnly = false Необязательный параметр. По умолчанию - "false", текущий сайт.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1481,7 +1313,6 @@ function AddToTimeStamp($arrAdd, $stmp=false)
  * echo <b>ConvertDateTime</b>("25.12.2003", "YYYY-MM-DD", "ru"); // 2003-12-25
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1505,30 +1336,19 @@ function ConvertDateTime($datetime, $to_format=false, $from_site=false, $bSearch
  * <p>Конвертирует время из Unix-формата в строку в формате сайта.</p>
  *
  *
- *
- *
  * @param int $timestamp = false Время в Unix-формате.<br>Необязательный параметр, по умолчанию -
  * текущее время.
- *
- *
  *
  * @param string $type = "SHORT" Тип формата. Допустимы следующие значения: <ul> <li> <b>FULL</b> - полный
  * (дата и время) </li> <li> <b>SHORT</b> - короткий (дата) </li> </ul> Необязательный
  * параметр, по умолчанию равен "SHORT".
  *
- *
- *
  * @param mixed $site = false Идентификатор сайта, в формате которого необходимо вернуть
  * дату.<br>Необязательный параметр. По умолчанию - текущий сайт.
  *
- *
- *
  * @param bool $SearchInSitesOnly = false 
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1542,7 +1362,6 @@ function ConvertDateTime($datetime, $to_format=false, $from_site=false, $bSearch
  * echo <b>ConvertTimeStamp</b>(mktime(0, 0, 0, 10, 25, 2003), "SHORT", "ru"); // 25.10.2003
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1658,9 +1477,7 @@ function convertTimeToMilitary ($strTime, $fromFormat = 'H:MI T', $toFormat = 'H
 
 
 /**
- * <p>Функция возвращает строку отформатированную в соответствии с заданным форматом основываясь на значении времени выраженного в timestamp.</p> <p><b>Примечание</b>: фактически эта функция является оберткой для php функции <noindex><a href="http://ru2.php.net/manual/en/function.date.php" title="date" rel="nofollow">date.</a></noindex></p>
- *
- *
+ * <p>Функция возвращает строку отформатированную в соответствии с заданным форматом основываясь на значении времени выраженного в timestamp.</p> <p class="note"><b>Примечание</b>: фактически эта функция является оберткой для php функции <noindex><a href="http://ru2.php.net/manual/en/function.date.php" title="date" rel="nofollow">date.</a></noindex></p>
  *
  *
  * @param string $format  Формат даты/времени. Кроме стандартных символов поддерживаются
@@ -1688,24 +1505,16 @@ function convertTimeToMilitary ($strTime, $fromFormat = 'H:MI T', $toFormat = 'H
  * зависимости от его величины.</td> <td>1 день <br> 22 дня <br> 3 месяца <br> 12
  * лет</td> </tr> </tbody></table>
  *
- *
- *
  * @param int $timestamp  
- *
- *
  *
  * @param int $now = time() N секунд назад
  *
- *
- *
  * @return string <p>Отформатированная строка.</p>
- *
  *
  * <h4>Example</h4> 
  * <pre>
  * Примечания</bodtimestampnow&lt;?<br>$rsUser = CUser::GetList($by, $order, array(<br>  "ID_EQUAL_EXACT" =&gt; $USER-&gt;GetID()<br>));<br>if($arUser = $rsUser-&gt;Fetch())<br>{<br>  echo "Зарегистрирован на сайте: ",FormatDate("Q", MakeTimeStamp($arUser["DATE_REGISTER"])),".";<br>}<br>?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -2492,20 +2301,13 @@ function InitBVarFromArr($arr)
  * <p>Функция удаляет из массива все элементы с пустыми значениями. Возвращает "true", если был удален хоть один пустой элемент, иначе - "false". Функция работает только с линейными массивами.</p>
  *
  *
- *
- *
  * @param array &$arr  Исходный массив. Данный параметр задается в виде ссылки на
  * исходную переменную.
- *
- *
  *
  * @param bool $trim_value = false Необязательный. По умолчанию стоит "false". Если передать true, к
  * каждому элементу массива будет применена функция trim().
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2568,22 +2370,15 @@ function is_set(&$a, $k=false)
  * <p>Возвращает строку указанной длины, состоящую из случайных символов. Символами могут быть буквы английского алфавита и цифры. Функция может использоваться например, для генерации пароля.</p>
  *
  *
- *
- *
  * @param int $pass_len = 10 Длина результирующей случайной строки.
  *
- *
- *
- * @param array|string|false $pass_chars = false набор символов. Необязательный. По умолчанию:
+ * @param pass_char $s = false набор символов. Необязательный. По умолчанию:
  * abcdefghijklnmopqrstuvwxyzABCDEFGHIJKLNMOPQRSTUVWXYZ01234567­89. <p>может быть массивом классов
  * символов и тогда в результирующую строчку войдет как минимум
  * один символ из каждого класса.</p> Пример: <pre class="syntax">echo randString(7, array(
  * "abcdefghijklnmopqrstuvwxyz", "ABCDEFGHIJKLNMOPQRSTUVWX­YZ", "0123456789", "!@#\$%^&amp;*()", ));</pre>
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2646,18 +2441,11 @@ function GetRandomCode($len=8)
  * <p>Отсекает от строки все символы свыше указанной длины. Если отсечение произошло, то к строке справа дописывается многоточие.</p>
  *
  *
- *
- *
  * @param string $text  Исходная строка.
- *
- *
  *
  * @param int $Len  Длина конечной строки.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2667,7 +2455,6 @@ function GetRandomCode($len=8)
  * // результатом будет строка "1234567..."
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -2692,32 +2479,19 @@ function TruncateText($strText, $intLen)
  * <p>Разбивает длинные слова тексте. Возвращает текст в котором максимальная длина каждого слова не превышает заданной длины.</p>
  *
  *
- *
- *
  * @param string $text  Исходный текст.
- *
- *
  *
  * @param int $MaxChar = 80 Максимальное количество символов в слове. Более длинные слова
  * разбиваются символом заданным в параметре <i>symbol</i>.
  *
- *
- *
  * @param string $symbol = " Символ которым будут разбиты слова длина которых превышает
  * <i>max_length</i>.
  *
- *
- *
  * @param  $bool  Необязательный. По умолчанию - "false".
- *
- *
  *
  * @param HTM $L = false 
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2727,7 +2501,6 @@ function TruncateText($strText, $intLen)
  * // результатом будет строчка "12345 67890 1234 12345 6"
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -2763,15 +2536,9 @@ function InsertSpaces($sText, $iMaxChar=80, $symbol=" ", $bHTML=false)
  * <p>Удаляет все крайние символы $symbol в строке $str.</p>
  *
  *
- *
- *
  * @param st $r  Строка, откуда производится удаление
  *
- *
- *
  * @param symbo $l  Символы, подлежащие удалению
- *
- *
  *
  * @return function 
  *
@@ -2792,24 +2559,14 @@ function TrimExAll($str,$symbol)
  * <p>Удаляет из строки $str символ $symbol со стороны $side. Функция удаляет не более одного символа с каждой стороны.</p>
  *
  *
- *
- *
  * @param st $r  Строка, откуда производится удаление
  *
- *
- *
  * @param symbo $l  Символы, подлежащие удалению
- *
- *
  *
  * @param sid $e = = С какой стороны удаление: <ul> <li> <b>both</b> - в начале и конце строки;</li>
  * <li> <b>left</b> - в начале строки;</li> <li> <b>right</b> - в конце строки.</li> </ul>
  *
- *
- *
  * @param bot $h  
- *
- *
  *
  * @return function 
  *
@@ -2841,14 +2598,9 @@ function TrimEx($str,$symbol,$side="both")
  * <p>Конвертирует строку из кодировки UTF-8 в кодировку Windows 1251.</p>
  *
  *
- *
- *
  * @param string $text  Исходная строка.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2873,21 +2625,14 @@ function utf8win1251($s)
 
 
 /**
- * <p>Преобразует символы исходной строки в верхний регистр. Данная функция, помимо символов других алфавитов, корректно конвертирует кириллические символы (русские символы) в верхний регистр.</p> <p class="note">Данную функцию можно использовать в случае если возникают проблемы с преобразованием кириллических символов стандартной PHP функцией strtoupper. Иногда это происходит на некоторых хостингах.</p>
- *
- *
+ * <p>Преобразует символы исходной строки в верхний регистр. Данная функция, помимо символов других алфавитов, корректно конвертирует кириллические символы (русские символы) в верхний регистр.</p> <p class="note"><b>Примечание</b>. Данную функцию можно использовать в случае если возникают проблемы с преобразованием кириллических символов стандартной PHP функцией strtoupper. Иногда это происходит на некоторых хостингах.</p>
  *
  *
  * @param string $text  Исходная строка.
  *
- *
- *
  * @param string $lang = false Идентификатор языка. </htm
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2897,7 +2642,6 @@ function utf8win1251($s)
  * // выводит строку "Верхний регистр: АБВГД ABCDEF"
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -2941,21 +2685,14 @@ function ToUpper($str, $lang = false)
 
 
 /**
- * <p>Преобразует символы исходной строки в нижний регистр. Данная функция, помимо символов других алфавитов, корректно конвертирует кириллические символы (русские символы) в нижний регистр.</p> <p class="note">Данную функцию можно использовать в случае если возникают проблемы с преобразованием кириллических символов стандартной PHP функцией strtolower. Иногда это происходит на некоторых хостингах.</p>
- *
- *
+ * <p>Преобразует символы исходной строки в нижний регистр. Данная функция, помимо символов других алфавитов, корректно конвертирует кириллические символы (русские символы) в нижний регистр.</p> <p class="note"><b>Примечание</b>. Данную функцию можно использовать в случае если возникают проблемы с преобразованием кириллических символов стандартной PHP функцией strtolower. Иногда это происходит на некоторых хостингах.</p>
  *
  *
  * @param string $text  Исходная строка.
  *
- *
- *
  * @param string $lang = false Идентификатор языка. </htm
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -2965,7 +2702,6 @@ function ToUpper($str, $lang = false)
  * // выводит строку "Нижний регистр: абвгд abcdef"
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -3013,12 +2749,12 @@ function ToLower($str, $lang = false)
 class CConvertorsPregReplaceHelper
 {
 	private $codeMessage = "";
-public 	function __construct($codeMessage = "")
+public static 	function __construct($codeMessage = "")
 	{
 		$this->codeMessage = $codeMessage;
 	}
 
-public function convertCodeTagForEmail($match)
+public 	public function convertCodeTagForEmail($match)
 	{
 		$text = is_array($match)? $match[2]: $match;
 		if ($text == '')
@@ -3052,13 +2788,13 @@ public function convertCodeTagForEmail($match)
 		$this->quoteBodyClass  = $bodyClass;
 	}
 
-public function convertOpenQuoteTag($match)
+public 	public function convertOpenQuoteTag($match)
 	{
 		$this->quoteOpened++;
 		return "<table class='".$this->quoteTableClass."' width='95%' border='0' cellpadding='3' cellspacing='1'><tr><td class='".$this->quoteHeadClass."'>".GetMessage("MAIN_QUOTE")."</td></tr><tr><td class='".$this->quoteBodyClass."'>";
 	}
 
-public function convertCloseQuoteTag()
+public 	public function convertCloseQuoteTag()
 	{
 		if ($this->quoteOpened == 0)
 		{
@@ -3069,7 +2805,7 @@ public function convertCloseQuoteTag()
 		return "</td></tr></table>";
 	}
 
-public function convertQuoteTag($match)
+public 	public function convertQuoteTag($match)
 	{
 		$this->quoteOpened = 0;
 		$this->quoteClosed = 0;
@@ -3097,7 +2833,7 @@ public function convertQuoteTag($match)
 	}
 
 	private $linkTarget  = "_self";
-public function setLinkTarget($linkTarget)
+public 	public function setLinkTarget($linkTarget)
 	{
 		$this->linkTarget = $linkTarget;
 	}
@@ -3113,7 +2849,7 @@ public function setLinkTarget($linkTarget)
 	}
 
 	private $script  = "/bitrix/redirect.php";
-public function setScript($script)
+public static 	public function setScript($script)
 	{
 		$this->script = $script;
 	}
@@ -3147,7 +2883,7 @@ public 	function convertToHref($match)
 	private $codeHeadClass  = "";
 	private $codeBodyClass  = "";
 	private $codeTextClass  = "";
-public function setCodeClasses($tableClass, $headClass, $bodyClass, $textAreaClass)
+public 	public function setCodeClasses($tableClass, $headClass, $bodyClass, $textAreaClass)
 	{
 		$this->codeTableClass = $tableClass;
 		$this->codeHeadClass  = $headClass;
@@ -3393,78 +3129,50 @@ function convert_to_mailto($s, $link_class="")
  * <p>Конвертирует обычный текст в HTML-код форматирующий исходный текст.</p>
  *
  *
- *
- *
  * @param string $text  Исходный текст.
- *
- *
  *
  * @param bool $make_url = true Если значение "true", то - преобразовывать подстроки, которые
  * представляют собой web-адреса (http://... или mailto:), в HTML
  * ссылки.<br>Необязательный параметр. По умолчанию - "true".
  *
- *
- *
  * @param int $max_string = 0 Максимальная длина слова. Все слова длиннее этого параметра
  * разбиваются пробелами. Значение "0" - означает "не разбивать
  * слова".<br>Необязательный параметр. По умолчанию - "0".
- *
- *
  *
  * @param string $quote_tag_enabled = "N" Если значение - "Y", то спец. тег &lt;QUOTE&gt;...&lt;/QUOTE&gt; (цитата) будет
  * преобразован в HTML таблицу (визуально цитата будет обрамлена
  * рамкой).<br>Необязательный параметр. По умолчанию - "N".
  *
- *
- *
  * @param string $not_convert_amp = "Y" Если значение - "Y", то "&amp;" не будет преобразован
  * "&amp;amp;".<br>Необязательный параметр. По умолчанию - "Y".
- *
- *
  *
  * @param string $code_tag_enabled = "N" Если значение - "Y", то спец. тег &lt;CODE&gt;...&lt;/CODE&gt; (код) будет
  * преобразован в HTML элемент textarea, в свою очередь обрамленный
  * таблицей (визуально код будет обрамлен рамкой и выведен в
  * textarea).<br>Необязательный параметр. По умолчанию - "N".
  *
- *
- *
  * @param string $biu_tags_enabled = "N" Если значение - "Y", то спец. теги &lt;b&gt;...&lt;/b&gt;, &lt;i&gt;...&lt;/i&gt;,
  * &lt;u&gt;...&lt;/u&gt; будут преобразованы в соответствующие им HTML теги.
- *
- *
  *
  * @param string $quote_table_class = "quotetable" CSS класс на таблицу цитаты (&lt;quote&gt;).<br>Необязательный параметр. По
  * умолчанию - "quotetable".
  *
- *
- *
  * @param string $quote_head_class = "tdquotehead" CSS класс на первую ячейку (TD) таблицы цитаты
  * (&lt;quote&gt;).<br>Необязательный параметр. По умолчанию - "tdquotehead".
- *
- *
  *
  * @param string $quote_body_class = "tdquote" CSS класс на вторую ячейку (TD) таблицы цитаты (&lt;quote&gt;): <pre> &lt;table
  * class="<i>quote_table_class</i>"&gt; &lt;tr&gt; &lt;td class="<i>quote_head_class</i>"&gt; ... &lt;/td&gt; &lt;/tr&gt;
  * &lt;tr&gt; &lt;td class="<i>quote_body_class</i>"&gt; ... &lt;/td&gt; &lt;/tr&gt;
  * &lt;/table&gt;</pre>Необязательный параметр. По умолчанию - "tdquote".
  *
- *
- *
  * @param string $code_table_class = "codetable" CSS класс на таблицу кода (&lt;code&gt;).<br>Необязательный параметр. По
  * умолчанию - "codetable".
- *
- *
  *
  * @param string $code_head_class = "tdcodehead" CSS класс на первую TD таблицы кода (&lt;code&gt;).<br>Необязательный
  * параметр. По умолчанию - "tdcodehead".
  *
- *
- *
  * @param string $code_body_class = "tdcodebody" CSS класс на вторую TD таблицы кода (&lt;code&gt;).<br>Необязательный
  * параметр. По умолчанию - "tdcodebody".
- *
- *
  *
  * @param string $code_textarea_class = "codetextarea" CSS класс на textarea в таблице кода (&lt;code&gt;): <pre> &lt;table
  * class="<i>code_table_class</i>"&gt; &lt;tr&gt; &lt;td class="<i>code_head_class</i>"&gt; ... &lt;/td&gt; &lt;/tr&gt;
@@ -3472,12 +3180,8 @@ function convert_to_mailto($s, $link_class="")
  * &lt;/textarea&gt; &lt;/td&gt; &lt;/tr&gt; &lt;/table&gt;</pre>Необязательный параметр. По
  * умолчанию - "codetextarea".
  *
- *
- *
  * @param string $link_class = "txttohtmllink" CSS класс на ссылках: <pre>&lt;a class="<i>link_class</i>"&gt; ...
  * &lt;/a&gt;</pre>Необязательный параметр. По умолчанию - "txttohtmllink".
- *
- *
  *
  * @param array $event = array() В данном массиве можно задать идентификаторы типа события,
  * которое будет фиксироваться при клике на HTML ссылке. Параметр
@@ -3488,10 +3192,7 @@ function convert_to_mailto($s, $link_class="")
  * корня к скрипту фиксирующему событие и осуществляющему
  * редирект.</li> </ul>
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -3612,7 +3313,6 @@ function convert_to_mailto($s, $link_class="")
  * </table>
  * <br><b>жирный текст</b><br><i>курсив</i><br><u>подчёркнутый</u><br>ссылка: <a class="txttohtmllink" href="http://www.1c-bitrix.ru">http://www.1c-bitrix.ru</a><br>email: <a class="txttohtmllink" href="mailto:support@1c-bitrix.ru">support@1c-bitrix.ru</a>
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -3772,33 +3472,22 @@ Convertation of HTML to text
  * <p>Преобразует исходный HTML-код в обычный текст путём удаления тегов или замены их на эквивалентное текстовое форматирование.</p>
  *
  *
- *
- *
  * @param string $text  Исходный текст в формате HTML.
- *
- *
  *
  * @param string $host = "" Web-адрес сайта. Если задан, то дописывается перед каждой ссылкой в
  * HTML для формирования абсолютной ссылки. <br> Необязательный
  * параметр. По умолчанию равен - "".
- *
- *
  *
  * @param array $delete = array() Массив шаблонов регулярных выражений, которые удаляются из
  * текста. <br> Необязательный параметр. По умолчанию - пустой массив.
  * <br> До версии главного модуля 9.0.7 шаблоны были для функции eregi_replace.
  * Начиная с указанной версии - preg_replace. <br>
  *
- *
- *
  * @param string $maxlen = 70 Вставляет тег <b>&lt;br/&gt;</b> через число символов, указанных в
  * значении. Что бы запретить подстановку этого тега достаточно
  * указать <b>false</b>.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -3806,7 +3495,6 @@ Convertation of HTML to text
  * 
  * Результат:Бизнес [ http://www.bitrix.ru/ru/products/sitemanager/editions/business.php ] <br>- полная версия продукта для управления интернет-магазином, интеграция с <br>"1С:Торговля и Склад", поддержка дилерских сетей.<br>$1699(MySQL-версия)<br>$24500 (Oracle-версия)     <br><br><br>- Пункт 1 <br>- Пункт 2 <br>- Пункт 3
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -3910,17 +3598,12 @@ function FormatText($strText, $strTextType="text")
 
 
 /**
- * <p>Переводит текст в HTML-безопасный вид, заменяя специальные символы их визуальным HTML представлением:<br></p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> <th>После замены</th> </tr> <tr> <td>&lt;</td> <td>&amp;lt;</td> </tr> <tr> <td>&gt;</td> <td>&amp;gt;</td> </tr> <tr> <td>"</td> <td>&amp;quot;</td> </tr> <tr> <td>&amp;quot;</td> <td>&amp;amp;quot;</td> </tr> <tr> <td>&amp;amp;</td> <td>&amp;amp;amp;</td> </tr> <tr> <td>&amp;lt;</td> <td>&amp;amp;lt;</td> </tr> <tr> <td>&amp;gt;</td> <td>&amp;amp;gt;</td> </tr> </table> <p class="note">в отличии от стандартной PHP функции <b>htmlspecialchars</b>, данная функция позволяет задавать в тексте символы в виде: <b>&amp;код_символа;</b></p>
- *
- *
+ * <p>Переводит текст в HTML-безопасный вид, заменяя специальные символы их визуальным HTML представлением:<br></p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> <th>После замены</th> </tr> <tr> <td>&lt;</td> <td>&amp;lt;</td> </tr> <tr> <td>&gt;</td> <td>&amp;gt;</td> </tr> <tr> <td>"</td> <td>&amp;quot;</td> </tr> <tr> <td>&amp;quot;</td> <td>&amp;amp;quot;</td> </tr> <tr> <td>&amp;amp;</td> <td>&amp;amp;amp;</td> </tr> <tr> <td>&amp;lt;</td> <td>&amp;amp;lt;</td> </tr> <tr> <td>&amp;gt;</td> <td>&amp;amp;gt;</td> </tr> </table> <p class="note"><b>Примечание</b>: в отличии от стандартной PHP функции <b>htmlspecialchars</b>, данная функция позволяет задавать в тексте символы в виде: <b>&amp;код_символа;</b></p>
  *
  *
  * @param string $text  &amp;lt;
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -3936,7 +3619,6 @@ function FormatText($strText, $strTextType="text")
  * // "если a&gt;b и b&gt;c, то a&gt;c"
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -3975,14 +3657,10 @@ function htmlspecialcharsbx($string, $flags=ENT_COMPAT)
 
 
 /**
- * <p>Проверяет физическое существование указанного пути. При необходимости - создает все каталоги входящие в данный путь.</p> <p class="note">Права на каталоги, которые будут устанавливаться этой функцией, должны быть предварительно определены в константе BX_DIR_PERMISSIONS (в файлах <b>/bitrix/php_interface/dbconn.php</b> или <nobr><b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b></nobr>). Если константа не определена, то она автоматически инициализируется значением 0777 и далее это значение используется везде когда дело касается установки Unix прав на файлы и каталоги.</p>
- *
- *
+ * <p>Проверяет физическое существование указанного пути. При необходимости - создает все каталоги входящие в данный путь.</p> <p>Права на каталоги, которые будут устанавливаться этой функцией, должны быть предварительно определены в константе BX_DIR_PERMISSIONS (в файлах <b>/bitrix/php_interface/dbconn.php</b> или <nobr><b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b></nobr>). Если константа не определена, то она автоматически инициализируется значением 0777 и далее это значение используется везде когда дело касается установки Unix прав на файлы и каталоги.</p>
  *
  *
  * @param string $path  Абсолютный путь к папке.
- *
- *
  *
  * @param bool $permissions = true Если значение данного параметра равно "true" и если последний
  * каталог пути указанного в параметре <i>abs_path</i> не доступен для
@@ -3993,10 +3671,7 @@ function htmlspecialcharsbx($string, $flags=ENT_COMPAT)
  * значение используется везде когда дело касается установки Unix
  * прав на файлы и каталоги.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4013,7 +3688,6 @@ function htmlspecialcharsbx($string, $flags=ENT_COMPAT)
  * <b>CheckDirPath</b>($_SERVER["DOCUMENT_ROOT"]."/temp/data/");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4049,45 +3723,30 @@ function CheckDirPath($path, $bPermission=true)
  * <p>Копирует файлы и каталоги. Возвращает "true" при успешном завершении копирования и "false" - в противном случае.</p>
  *
  *
- *
- *
  * @param string $path_from  Абсолютный путь к каталогу (файлу), содержимое которой нужно
  * скопировать.
- *
- *
  *
  * @param string $path_to  Абсолютный путь к каталогу, в который надо скопировать. Путь
  * указанный в данном параметре будет предварительно проверен
  * функцией <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/checkdirpath.php">CheckDirPath</a>.
  *
- *
- *
  * @param bool $rewrite = true Перезаписывать ли существующие файлы.<br> Необязательный
  * параметр, по умолчанию равен "true" (перезаписывать).
- *
- *
  *
  * @param bool $recursive = false Копировать ли рекурсивно все подкаталоги и файлы входящие в путь
  * указанный в параметре <i>from</i>.<br> Необязательный параметр, по
  * умолчанию равен "false" (копировать не рекурсивно).
- *
- *
  *
  * @param bool $DeleteAfterCopy = false Удалить ли путь указанный в параметре <i>from</i> после того как
  * копирование будет завершено (т.е. по сути - сделать перенос
  * каталогов и файлов).<br> Необязательный параметр, по умолчанию
  * равен "false" (не удалять).
  *
- *
- *
  * @param string $exclude = "" Если данный параметр задан, то из копирования будут исключены
  * файлы / папки, название которых начинается со значения данного
  * параметра.
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4100,7 +3759,6 @@ function CheckDirPath($path, $bPermission=true)
  * 
  * CopyDirFiles($_SERVER["DOCUMENT_ROOT"]."/temp1/file.ex", $_SERVER["DOCUMENT_ROOT"]."/temp2/file.ex");
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4188,14 +3846,9 @@ function CopyDirFiles($path_from, $path_to, $ReWrite = True, $Recursive = False,
  * <p>Удаляет рекурсивно указанный каталог (файл). Возвращает "true" в случае успешного выполнения.</p>
  *
  *
- *
- *
  * @param string $path  Путь относительно корня сайта к удаляемому каталогу (файлу).
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4204,7 +3857,6 @@ function CopyDirFiles($path_from, $path_to, $ReWrite = True, $Recursive = False,
  * <b>DeleteDirFilesEx</b>("/temp1");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4258,25 +3910,16 @@ function DeleteDirFilesEx($path)
  * <p>Удаляет из каталога все файлы, которые содержатся в другом каталоге. Функция не работает рекурсивно.</p>
  *
  *
- *
- *
  * @param string $frDir  Абсолютный путь к каталогу, файлы которого проверяются на
  * наличие в каталоге задаваемом в параметре <i>delete</i>.
- *
- *
  *
  * @param string $toDir  Абсолютный путь к каталогу, в котором будут удалены файлы с
  * именами найденными в каталоге задаваемом в параметре <i>check</i>.
  *
- *
- *
  * @param array $arExept = array() Массив исключений. Содержит краткие имена файлов, которые не
  * будут удалены.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4290,7 +3933,6 @@ function DeleteDirFilesEx($path)
  *     );
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4325,18 +3967,11 @@ function DeleteDirFiles($frDir, $toDir, $arExept = array())
  * <p>Записывает в файл новое содержимое. Возвращает "true" в случае удачной записи в файл, иначе - "false".</p>
  *
  *
- *
- *
  * @param string $abs_path  Абсолютный путь к файлу, который необходимо перезаписать.
- *
- *
  *
  * @param string $content  Новое содержимое файла.
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4354,7 +3989,6 @@ function DeleteDirFiles($frDir, $toDir, $arExept = array())
  * <b>RewriteFile</b>($_SERVER["DOCUMENT_ROOT"]."/ru/index.php", $content);
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4431,14 +4065,10 @@ function HasScriptExtension($check_name)
 
 
 /**
- * <p>По заданному пути к файлу <i>path</i> возвращает расширение файла.</p> <p><b>Примечание</b>: возможное примечание.</p>
- *
- *
+ * <p>По заданному пути к файлу <i>path</i> возвращает расширение файла.</p>
  *
  *
  * @param pat $h  Путь к файлу
- *
- *
  *
  * @return function <p>Фактически, функция возвращает символы после последней точки в
  * строке.</p> <br><br>
@@ -4502,11 +4132,7 @@ function IsFileUnsafe($name)
  * <p>По заданному пути к файлу возвращает его тип:</p> <ul> <li> <b>IMAGE</b> для jpg, jpeg, gif, bmp, png;</li> <li> <b>FLASH</b> для swf;</li> <li> <b>SOURCE</b> для html, htm, asp, aspx, phtml, php, php3, php4, php5, php6, shtml, sql, txt, inc, js, vbs, tpl, css, shtm;</li> <li> <b>UNKNOWN</b> для остальных.</li> </ul>
  *
  *
- *
- *
  * @param pat $h  Путь к файлу
- *
- *
  *
  * @return function 
  *
@@ -4547,12 +4173,8 @@ function GetDirectoryIndex($path, $strDirIndex=false)
  * <p>Возвращает имя индексного файла каталога.</p>
  *
  *
- *
- *
  * @param string $path  Путь к каталогу относительно корня для которого необходимо
  * определить индексный файл.
- *
- *
  *
  * @param string $DirIndex = false Разделенные пробелом возможные имена индексных файлов в порядке
  * убывания приоритета.<br>Для корректной работы функции в данный
@@ -4564,10 +4186,7 @@ function GetDirectoryIndex($path, $strDirIndex=false)
  * будет взято значение по умолчанию - "<b>index.php index.html index.htm index.phtml
  * default.html index.php3</b>").
  *
- *
- *
  * @return string 
- *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
@@ -4617,16 +4236,12 @@ function GetDirIndexArray($strDirIndex=false)
 
 
 /**
- * <p>Возвращает путь к странице относительно корня.</p> <p>В функцию может поступить URL относительно корня с параметрами, в этом случае функция вернет путь к странице без параметров. </p> <p>Если в функцию поступает путь без указания файла, например: <b>/ru/about/</b>, то функция попытается самостоятельно определить индексный файл каталога и если определит его например, как <b>index.php</b>, то в результате вернет значение <b>/ru/about/index.php</b>.</p> <p class="note">Алгоритм определения индексного файла представлен в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
- *
- *
+ * <p>Возвращает путь к странице относительно корня.</p> <p>В функцию может поступить URL относительно корня с параметрами, в этом случае функция вернет путь к странице без параметров. </p> <p>Если в функцию поступает путь без указания файла, например: <b>/ru/about/</b>, то функция попытается самостоятельно определить индексный файл каталога и если определит его например, как <b>index.php</b>, то в результате вернет значение <b>/ru/about/index.php</b>.</p> <p class="note"><b>Примечание</b>. Алгоритм определения индексного файла представлен в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
  *
  *
  * @param string $page = false Страница, путь к которой необходимо вернуть. Если параметр равен
  * "false", то возвращается путь к текущей странице.<br> Необязательный
  * параметр, по умолчанию равен "false".
- *
- *
  *
  * @param bool $get_index_page = null Параметр указывает, нужно ли для индексной страницы раздела
  * возвращать путь, заканчивающийся на "index.php". Если значение
@@ -4635,10 +4250,7 @@ function GetDirIndexArray($strDirIndex=false)
  * регулируется константой <b>BX_DISABLE_INDEX_PAGE</b>. Если значение константы
  * <i>true</i>, то значение параметра по умолчанию get_index_page=false.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li>
@@ -4751,14 +4363,9 @@ function GetFileFromURL($page, $get_index_page=null)
  * <p>Возвращает каталог файла по пути к этому файлу.</p>
  *
  *
- *
- *
  * @param string $path  Путь к файлу.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4767,7 +4374,6 @@ function GetFileFromURL($page, $get_index_page=null)
  * // выводит строку "/temp1/data/"
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -4834,18 +4440,11 @@ function bxstrrpos($haystack, $needle)
  * <p>Возвращает путь относительно заданного каталога <i>cur_dir</i>. Если <i>rel_path</i> пустой, то функция возвращает <b>false</b>. Если <i>rel_path</i> является абсолютным путем (т.е. начинается с "/" или имеет вид "C:\"), то параметр <i>cur_dir</i> игнорируется. Если в <i>rel_path</i> попытаться с помощью "../" подняться выше корня, то функция блокирует эту попытку удалив все промежуточные подъемы. Например: по запросу <code>/test/../../test.php</code> она вернет <code>/test/test.php</code>. <br></p>
  *
  *
- *
- *
  * @param string $cur_dir  Каталог, относительно которого задается путь <i>rel_path</i>.
- *
- *
  *
  * @param string $rel_path  Относительный путь. </ht
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4945,20 +4544,13 @@ function GetMessageJS($name, $aReplace=false)
  * <p>Возвращает по коду соответствующее сообщение на текущем языке. Массивы соответствий кодов и сообщений задаются в языковых файлах. Перед использованием этой функции необходимо подключить соответствующий языковой файл.</p>
  *
  *
- *
- *
  * @param string $name  Код сообщения. Код должен быть уникальным в рамках всего
  * продукта.
- *
- *
  *
  * @param array $Replace = false Массив пар "шаблон" =&gt; "замена". Позволяет организовать замену по
  * шаблону.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -4976,7 +4568,6 @@ function GetMessageJS($name, $aReplace=false)
  * {
  *    ShowError(GetMessage("ERROR_MODULE_NOT_FOUND", Array ("#MODULE#" =&gt; "blog")));
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -5091,23 +4682,16 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
  */
 
 /**
- * <p>Предназначена для подключения языковых файлов для скриптов лежащих в каталоге текущего шаблона сайта. Как правило используется в [link=89637]компонентах[/link], либо в прологе и/или эпилоге сайта.</p> <p>Алгоритм поиска языкового файла: </p> <ol> <li>Сначала языковой файл будет искаться в каталоге <br><br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Если файл не найден, он будет искаться в каталоге <br><br><b>/bitrix/templates/.default/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> <li>Затем если файл не найден, он будет искаться дистрибутиве модуля, т.е. в каталоге <br><br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/lang/</b><i>ID языка</i><b>/</b><i>относительный путь к скрипту</i> <br><br> </li> </ol> <p>В общем случае, под "<i>относительный путь к скрипту</i>", понимается путь к файлу относительно каталога <b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b>.</p> <p>В частном случае, при подключении компонент, под "<i>относительный путь к скрипту</i>", понимается путь для подключения компонента передаваемый в функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> в качестве первого параметра.</p>
- *
- *
+ * <p>Предназначена для подключения языковых файлов для скриптов лежащих в каталоге текущего шаблона сайта. Как правило используется в <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04565" >компонентах</a>, либо в прологе и/или эпилоге сайта.</p> <p>Алгоритм поиска языкового файла: </p> <ol> <li>Сначала языковой файл будет искаться в каталоге <br><br><code>/bitrix/templates/<i>ID текущего шаблона сайта</i>/lang/<i>ID языка</i>/<i>относительный путь к скрипту</i></code> <br><br> </li> <li>Если файл не найден, он будет искаться в каталоге <br><br><code>/bitrix/templates/.default/lang/<i>ID языка</i>/<i>относительный путь к скрипту</i></code> <br><br> </li> <li>Затем если файл не найден, он будет искаться дистрибутиве модуля, т.е. в каталоге <br><br><code>/bitrix/modules/<i>ID модуля</i>/install/templates/lang/<i>ID языка</i>/<i>относительный путь к скрипту</i></code> </li> </ol> <p>В общем случае, под "<i>относительный путь к скрипту</i>", понимается путь к файлу относительно каталога <code>/bitrix/templates/<i>ID текущего шаблона сайта</i>/</code>.</p> <p>В частном случае, при подключении компонент, под "<i>относительный путь к скрипту</i>", понимается путь для подключения компонента передаваемый в функцию <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> в качестве первого параметра.</p>
  *
  *
  * @param string $abs_path  Абсолютный путь к файлу, для которого необходимо подключить
  * языковые сообщения.
  *
- *
- *
  * @param string $lang = false Идентификатор языка. <br>Необязательный параметр, по умолчанию
  * равен "false" (текущий язык).
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -5117,7 +4701,6 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
  * <b>IncludeTemplateLangFile</b>(__FILE__);
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -5132,6 +4715,7 @@ function __IncludeLang($path, $bReturnArray=false, $bFileChecked=false)
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php
  * @author Bitrix
+ * @deprecated Use \Bitrix\Main\Localization\Loc
  */
 function IncludeTemplateLangFile($filepath, $lang=false)
 {
@@ -5241,28 +4825,19 @@ function IncludeTemplateLangFile($filepath, $lang=false)
 
 
 /**
- * <p>Подключает языковой файл для скрипта, полный путь к которому передается в параметре <i>path</i>. Как правило данная функция используется для подключения языковых файлов модулей.</p> <p>Подключаемый языковой файл должен иметь то же имя, что и подключающий файл, и быть расположен на диске в каталоге:<br><b>/bitrix/modules/</b><i>ID модуля</i><b>/lang/</b><i>ID языка</i><b>/</b><i>путь к файлу относительно корня модуля</i></p>
- *
- *
+ * <p>Подключает языковой файл для скрипта, полный путь к которому передается в параметре <i>path</i>. Как правило данная функция используется для подключения языковых файлов модулей.</p> <p>Подключаемый языковой файл должен иметь то же имя, что и подключающий файл, и быть расположен на диске в каталоге:<code>/bitrix/modules/<i>ID модуля</i>/lang/<i>ID языка</i>/<i>путь к файлу относительно корня модуля</i></code></p>
  *
  *
  * @param string $abs_path  Абсолютный путь к файлу, для которого необходимо подключить
  * языковые сообщения.
  *
- *
- *
  * @param string $lang = false Идентификатор языка. <br>Необязательный параметр, по умолчанию
  * равен "false" (текущий язык).
- *
- *
  *
  * @param bool $ReturnArray = false Массив возвращаемых значений. <br>Необязательный параметр, по
  * умолчанию равен "false".
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -5271,7 +4846,6 @@ function IncludeTemplateLangFile($filepath, $lang=false)
  * <b>IncludeModuleLangFile</b>(__FILE__);
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -5363,28 +4937,19 @@ Debugging
  * <p>Возвращает визуальное представление значения (дамп) переменной или объекта класса.</p>
  *
  *
- *
- *
  * @param mixed $var  Переменная для дампа. </ht
- *
- *
  *
  * @param int $max_depth = -1 Максимальное количество рекурсивных вызовов данной функции в
  * момент создания дампов сложных массивов или объектов класса с
  * большой вложенностью.<br>Необязательный параметр, по умолчанию - -1
  * (не ограничено).
  *
- *
- *
  * @param int $depth = 0 Счетчик рекурсивных вызовов данной функции в момент создания
  * дампов сложных массивов или объектов класса с большой
  * вложенностью. <br>Необязательный параметр, по умолчанию - 0
  * (начальное значение).
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -5601,20 +5166,13 @@ function mydump($thing, $maxdepth=-1, $depth=0)
  * <p>Отсылает по E-Mail сообщение об ошибке.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>ERROR_EMAIL</b>, содержащая E-Mail адрес на который будут отправляться сообщения об ошибках. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>ERROR_EMAIL</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Помимо текста ошибки, в письмо будут включены: </p> <ul> <li> <b>HTTP_GET_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа GET </li> <li> <b>HTTP_POST_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа POST </li> <li> <b>HTTP_COOKIE_VARS</b> - массив переменных хранящихся у посетителя на локальной машине (cookie) </li> <li> <b>HTTP_SERVER_VARS</b> - массив стандартных серверных переменных </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDataBase::Connect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> (только для Oracle версии) </li> </ul>
  *
  *
- *
- *
  * @param string $text  Текст сообщения.
- *
- *
  *
  * @param string $module_id = "" <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который сохраняет сообщение.<br>Необязательный параметр, по
  * умолчанию - "".
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -5657,31 +5215,20 @@ function SendError($error)
 
 
 /**
- * <p>Функция добавляет новую запись в log-файл. Путь до файла (или имя файла) рекомендуется делать уникальным в рамках каждого проекта.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>LOG_FILENAME</b>, содержащая абсолютный путь к log-файлу. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>LOG_FILENAME</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> </ul> <p class="note">Log-файл накапливает все добавленные в него сообщения. Для очистки log-файла его можно просто удалить с диска.</p> <p class="note">Существует возможность записывать в отдельный отладочный файл все запросы к базе данных и время их выполнения, для этого необходимо инициализировать <a href="http://dev.1c-bitrix.ru/api_help/main/general/magic_vars.php#dbdebugtofile">переменную $DBDebugToFile</a>, значением "true" в файле <b>/bitrix/php_interface/dbconn.php</b>.</p>
- *
- *
+ * <p>Функция добавляет новую запись в log-файл. Путь до файла (или имя файла) рекомендуется делать уникальным в рамках каждого проекта.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>LOG_FILENAME</b>, содержащая абсолютный путь к log-файлу. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>LOG_FILENAME</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> </ul> <p>Log-файл накапливает все добавленные в него сообщения. Для очистки log-файла его можно просто удалить с диска.</p> <p class="note"><b>Примечание</b>. Существует возможность записывать в отдельный отладочный файл все запросы к базе данных и время их выполнения, для этого необходимо инициализировать <a href="http://dev.1c-bitrix.ru/api_help/main/general/magic_vars.php#dbdebugtofile">переменную $DBDebugToFile</a>, значением "true" в файле <b>/bitrix/php_interface/dbconn.php</b>.</p>
  *
  *
  * @param string $text  Текст сообщения.
- *
- *
  *
  * @param string $module_id = "" <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который сохраняет сообщение.<br>Необязательный параметр, по
  * умолчанию - "".
  *
- *
- *
  * @param traceDept $h = 6 Необязательный параметр, по умолчанию - "6".
- *
- *
  *
  * @param bool $ShowArgs = false Необязательный параметр, по умолчанию - "false".
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -5705,7 +5252,6 @@ function SendError($error)
  * // работа скрипта будет прекращена и в лог-файл будет добавлено сообщение об ошибке
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -5736,8 +5282,9 @@ function AddMessage2Log($sText, $sModule = "", $traceDepth = 6, $bShowArgs = fal
 					$arBacktrace = Bitrix\Main\Diag\Helper::getBackTrace($traceDepth, ($bShowArgs? null : DEBUG_BACKTRACE_IGNORE_ARGS));
 					$strFunctionStack = "";
 					$strFilesStack = "";
+					$firstFrame = (count($arBacktrace) == 1? 0: 1);
 					$iterationsCount = min(count($arBacktrace), $traceDepth);
-					for ($i = 1; $i < $iterationsCount; $i++)
+					for ($i = $firstFrame; $i < $iterationsCount; $i++)
 					{
 						if (strlen($strFunctionStack)>0)
 							$strFunctionStack .= " < ";
@@ -5941,9 +5488,7 @@ Other functions
 *********************************************************************/
 
 /**
- * <p>Выполняет перенаправление браузера на указанную страницу.</p> <p class="note">Для административной части перенаправление браузера можно использовать только до вывода какого-либо контента (т.е. до подключения файла prolog_admin_after.php или prolog_admin.php). В публичной части - никаких ограничений не накладывается.</p>
- *
- *
+ * <p>Выполняет перенаправление браузера на указанную страницу.</p> <p class="note"><b>Примечание</b>. Для административной части перенаправление браузера можно использовать только до вывода какого-либо контента (т.е. до подключения файла <b>prolog_admin_after.php</b> или <b>prolog_admin.php</b>). В публичной части - никаких ограничений не накладывается.</p> <br>
  *
  *
  * @param string $url  URL на который будет перенаправлен браузер. Допустимо
@@ -5951,25 +5496,16 @@ Other functions
  * на другие сайты и начинающихся со следующих протоколов: "http://",
  * "https://", "ftp://".
  *
- *
- *
  * @param bool $skip_security_check = false Необязательный. Значение <i>true</i> позволяет пропустить проверку
  * модуля безопасности на фишинг.
- *
- *
  *
  * @param string $status = "302 Необязательный. Параметр устанавливает код (статус) в
  * HTTP-заголовке ответа. Например, "301 Moved permanently". Параметр добавлен в
  * версии 8.5.1.
  *
- *
- *
  * @param Foun $d  
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6021,13 +5557,12 @@ function LocalRedirect($url, $skip_security_check=false, $status="302 Found")
 	{
 		foreach(GetModuleEvents("main", "OnBeforeLocalRedirect", true) as $arEvent)
 		{
-			ExecuteModuleEventEx($arEvent, array(&$url, $skip_security_check));
+			ExecuteModuleEventEx($arEvent, array(&$url, $skip_security_check, $bExternal));
 		}
 	}
 
 	if(!$bExternal)
 	{
-		$APPLICATION->HoldSpreadCookieHTML(true);
 		//store cookies for next hit (see CMain::GetSpreadCookieHTML())
 		$APPLICATION->StoreCookies();
 
@@ -6044,8 +5579,6 @@ function LocalRedirect($url, $skip_security_check=false, $status="302 Found")
 
 	CHTTP::SetStatus($status);
 
-	header("Request-URI: ".$url);
-	header("Content-Location: ".$url);
 	header("Location: ".$url);
 
 	if(function_exists("getmoduleevents"))
@@ -6071,67 +5604,44 @@ function WriteFinalMessage($message = "")
  * <p>Выводит ряд HTML элементов, позволяющих задать ID пользователя и рядом с этим полем ввода получить данные пользователя. Также выводится кнопка, ведущая на страницу поиска пользователя.</p>
  *
  *
- *
- *
  * @param string $tag_name  Имя поля для ввода ID пользователя:<br><code> &lt;input type="text" name="<i>tag_name</i>"
  * ...&gt;</code>
  *
- *
- *
  * @param string $tag_value  Значение поля для ввода ID пользователя:<br><code> &lt;input type="text"
  * value="<i>tag_value</i>" ...&gt;</code>
- *
- *
  *
  * @param string $user_name = "" ID, логин, имя и фамилия пользователя, выводимые рядом с полем для
  * ввода ID пользователя, сразу же после загрузки страницы.<br><br>
  * Необязательный параметр. По умолчанию - "".
  *
- *
- *
  * @param string $form_name = "form1" Имя формы, в которой находится поле для ввода ID пользователя.<br><br>
  * Необязательный параметр. По умолчанию - "form1".
- *
- *
  *
  * @param string $tag_size = "3" Ширина поля для ввода ID пользователя.<br><code> &lt;input type="text"
  * size="<i>tag_size</i>" ...&gt;</code><br><br> Необязательный параметр. По умолчанию -
  * "3".
  *
- *
- *
  * @param string $tag_maxlength = "" Максимальное количество символов в поле для ввода ID
  * пользователя:<br><code> &lt;input type="text" maxlength="<i>tag_maxlength</i>" ...&gt;</code><br><br>
  * Необязательный параметр. По умолчанию - "" (не ограничено).
- *
- *
  *
  * @param string $button_title = "..." Подпись на кнопке ведущей на страницу поиска пользователя:<br><code>
  * &lt;input type="button" value="<i>button_title</i>" ...&gt;</code><br><br> Необязательный
  * параметр. По умолчанию - "...".
  *
- *
- *
  * @param string $tag_class = "typeinput" CSS класс для поля ввода ID пользователя:<br><code> &lt;input type="input"
  * class="<i>tag_class</i>" ...&gt;</code><br><br> Необязательный параметр. По умолчанию -
  * "typeinput".
- *
- *
  *
  * @param string $button_class = "tablebodybutton" CSS класс для кнопки ведущей на страницу поиска пользователя:<br><code>
  * &lt;input type="button" class="<i>button_class</i>" ...&gt;</code><br><br> Необязательный
  * параметр. По умолчанию - "tablebodybutton".
  *
- *
- *
  * @param string $search_page = "/bitrix/admin/user_search.php" Путь относительно корня на страницу поиска пользователя.<br>
  * Необязательный параметр. По умолчанию - "/bitrix/admin/user_search.php"
  * (административная страница).
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6222,22 +5732,15 @@ BX.ready(function(){
 
 
 /**
- * <p>Возвращает ссылку на один из сайтов службы Whois для получения данных по заданному IP адресу.</p> <p> Формат возвращаемой ссылки:<br><b>&lt;a href="http://www.whois.sc/</b><i>ip</i><b>" class="</b><i>link_class</i><b>"&gt;</b><i>ip</i><b>&lt;/a&gt;</b></p>
- *
- *
+ * <p>Возвращает ссылку на один из сайтов службы Whois для получения данных по заданному IP адресу.</p> <p> Формат возвращаемой ссылки:<br><code>&lt;a href="http://www.whois.sc/<i>ip</i>" class="<i>link_class</i><b>"&gt;<i>ip</i>&lt;/a&gt;</b></code></p>
  *
  *
  * @param string $ip  IP адрес в формате XXX.XXX.XXX.XXX для которого необходимо сформировать
  * ссылку.
  *
- *
- *
  * @param string $link_class  CSS класс ссылки.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6263,10 +5766,7 @@ function GetWhoisLink($ip, $class='')
  * <p>Возвращает "true", если текущий браузер посетителя является браузером "MS Internet Explorer", в противном случае - "false".</p>
  *
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6301,24 +5801,17 @@ function IsIE()
 
 
 /**
- * <p>Возвращает название страны на заданном языке по ее коду.</p> <p class="note">Цифровые коды стран вы можете посмотреть в файле <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
- *
- *
+ * <p>Возвращает название страны на заданном языке по ее коду.</p> <p class="note"><b>Примечание</b>. Цифровые коды стран вы можете посмотреть в файле <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
  *
  *
  * @param int $cid  Цифровой код страны. </htm
- *
- *
  *
  * @param string $lang = LANGUAGE_ID Идентификатор языка в котором необходимо вернуть название
  * страны.<br>Необязательный параметр. По умолчанию - <a
  * href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий
  * язык).
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6340,9 +5833,7 @@ function GetCountryByID($id, $lang=LANGUAGE_ID)
 
 
 /**
- * <p>Возвращает массив стран с названиями на заданном языке. Формат возвращаемого массива позволяет его использовать в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a> без предварительной подготовки.</p> <p class="note">Массив стран задается в файлах <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
- *
- *
+ * <p>Возвращает массив стран с названиями на заданном языке. Формат возвращаемого массива позволяет его использовать в функциях <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxfromarray.php">SelectBoxFromArray</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxmfromarray.php">SelectBoxMFromArray</a> без предварительной подготовки.</p> <p class="note"><b>Примечание</b>. Массив стран задается в файлах <b>/bitrix/modules/main/lang/</b><i>language_id</i><b>/tools.php</b>.</p>
  *
  *
  * @param string $language_id = LANGUAGE_ID Идентификатор языка в котором необходимо вернуть названия
@@ -6350,10 +5841,7 @@ function GetCountryByID($id, $lang=LANGUAGE_ID)
  * href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#language_id">LANGUAGE_ID</a> (текущий
  * язык).
  *
- *
- *
  * @return array 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6445,35 +5933,39 @@ function FormDecode()
 	$register_globals = ini_get_bool("register_globals");
 	if (!$register_globals)
 	{
+		$toGlobals = array();
+
 		$HTTP_ENV_VARS = $_ENV;
 		foreach($_ENV as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
 
 		$HTTP_GET_VARS = $_GET;
 		foreach($_GET as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
 
 		$HTTP_POST_VARS = $_POST;
 		foreach($_POST as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
 
 		$HTTP_POST_FILES = $_FILES;
 		foreach($_FILES as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
 
 		$HTTP_COOKIE_VARS = $_COOKIE;
 		foreach($_COOKIE as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
 
 		$HTTP_SERVER_VARS = $_SERVER;
 		foreach($_SERVER as $key => $val)
 			if(!isset($superglobals[$key]))
-				$GLOBALS[$key] = $val;
+				$toGlobals[$key] = $val;
+
+		$GLOBALS += $toGlobals;
 	}
 }
 
@@ -6485,39 +5977,23 @@ function FormDecode()
  * <p>Функция запрашивает указанный в параметрах web-адрес по протоколу HTTP. Возвращает тело (без заголовка) ответа, полученного от сервера. В случае ошибки возвращается пустая строка и устанавливаются параметры <i>error_number</i> и <i>error_text</i>.</p>
  *
  *
- *
- *
  * @param string $site  Адрес сайта, страница которого запрашивается.
- *
- *
  *
  * @param int $port  Номер порта. Как правило - 80.
  *
- *
- *
  * @param string $PATH  Путь к запрашиваемой странице.
  *
- *
- *
  * @param string $QUERY_STR  Строка параметров запроса в стандартном формате.
- *
- *
  *
  * @param int &$errno  Данный параметр является ссылкой на исходную переменную. В нее
  * будет возвращен номер ошибки в случае ее возникновения.
  *
- *
- *
  * @param string &$errstr  Данный параметр является ссылкой на исходную переменную. В нее
  * будет возвращен текст ошибки в случае ее возникновения.
- *
- *
  *
  * @param string $Method = "GET" Метод отправки запроса удаленному серверу. Допустимые
  * значения:<br><ul> <li>"<b>GET</b>" </li> <li>"<b>POST</b>" </li> </ul> Необязательный
  * параметр, по умолчанию равен GET.
- *
- *
  *
  * @param string $Proto = "" Префикс адреса сайта для работы с SSL и TLS. Допустимые значения:
  * <br><ul> <li>"" </li> <li>"<b>ssl://</b>" </li> <li>"<b>tls://</b>" </li> </ul> Необязательный
@@ -6525,14 +6001,9 @@ function FormDecode()
  * соединение. <p class="note">Ваш хостинг может не поддерживать
  * соединения, отличные от стандартного.</p>
  *
- *
- *
  * @param string $ContentType = 'N' Необязательный. По умолчанию "N".
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6564,6 +6035,7 @@ function FormDecode()
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/main/functions/other/querygetdata.php
  * @author Bitrix
+ * @deprecated Use Bitrix\Main\Web\HttpClient
  */
 function QueryGetData($SITE, $PORT, $PATH, $QUERY_STR, &$errno, &$errstr, $sMethod="GET", $sProto="", $sContentType = 'N')
 {
@@ -6728,19 +6200,14 @@ function init_get_params($url)
 
 
 /**
- * <p>Инициализирует переменные и массивы $_GET, $HTTP_GET_VARS, $_REQUEST, $GLOBALS параметрами переданными в <i>url</i>.</p> <p class="note">Как правило, данная функция используется с обработчике 404 ошибки, когда необходимо получить переменные переданные в URL'е. Подобные обработчики используются для организации сервисов на базе 404 ошибки. Подобные сервисы позволяют создавать более дружелюбные для поисковиков адреса.</p>
- *
- *
+ * <p>Инициализирует переменные и массивы $_GET, $HTTP_GET_VARS, $_REQUEST, $GLOBALS параметрами переданными в <i>url</i>.</p> <p class="note"><b>Примечание</b>. Как правило, данная функция используется с обработчике 404 ошибки, когда необходимо получить переменные переданные в URL'е. Подобные обработчики используются для организации сервисов на базе 404 ошибки. Подобные сервисы позволяют создавать более дружелюбные для поисковиков адреса.</p>
  *
  *
  * @param mixed $url = false URL, параметры которого необходимо
  * инициализировать.<br>Необязательный параметр. По умолчанию - "false"
  * (текущая страница).
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6788,20 +6255,13 @@ function _ShowHtmlspec($str)
  * <p>Выводит заданное сообщение.</p>
  *
  *
- *
- *
  * @param string $Note  Сообщение.
- *
- *
  *
  * @param string $cls = "notetext" Название CSS класса для оформления сообщения.<br>Необязательный
  * параметр, по умолчанию равен "notetext" (как правило <font
  * color="green">зеленого цвета</font>).
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6842,19 +6302,12 @@ function ShowNote($strNote, $cls="notetext")
  * <p>Выводит сообщение об ошибке.</p>
  *
  *
- *
- *
  * @param string $message  Строка сообщения.
- *
- *
  *
  * @param string $css_class  Название CSS класса для оформления сообщения.<br>Необязательный
  * параметр, как правило <font color="red">красного цвета</font>.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6895,8 +6348,6 @@ function ShowError($strError, $cls="errortext")
  * <p>Выводит ошибки и прочие сообщения. </p>
  *
  *
- *
- *
  * @param mixed $message  Текст сообщения об ошибке или массив со следующими ключами: <ul> <li>
  * <b>TYPE</b> - тип сообщения, допустимы следующие значения: <ul> <li> <b>OK</b> -
  * обычное сообщения, для вывода будет использоваться CSS класс "notetext"
@@ -6904,10 +6355,7 @@ function ShowError($strError, $cls="errortext")
  * использоваться CSS класс "errortext" </li> </ul> </li> <li> <b>MESSAGE</b> - текст
  * сообщения.</li> </ul>
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -6958,15 +6406,10 @@ function ShowMessage($arMess)
  * <p>На основе стандартного массива $HTTP_GET_VARS формирует строку параметров, удаляя из нее те параметры, имена которых указаны в <i>remove_params</i>.</p>
  *
  *
- *
- *
  * @param array $remove_params  Массив имен параметров, которые необходимо удалить из
  * результирующей строки.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -7027,7 +6470,7 @@ function check_email($email, $bStrict=false)
 
 	//"." can't be in the beginning or in the end of local-part
 	//dot-atom-text = 1*atext *("." 1*atext)
-	if(preg_match("#^[".$atom."]+(\\.[".$atom."]+)*@(([-0-9a-z_]+\\.)+)([a-z0-9-]{2,10})$#i", $email))
+	if(preg_match("#^[".$atom."]+(\\.[".$atom."]+)*@(([-0-9a-z_]+\\.)+)([a-z0-9-]{2,20})$#i", $email))
 	{
 		return true;
 	}
@@ -7042,15 +6485,9 @@ function check_email($email, $bStrict=false)
  * <p>Инициализирует переменную с именем в $varname значением $value. Если переменная уже определена, ее значение не меняется.</p>
  *
  *
- *
- *
  * @param varnam $e  Имя переменной
  *
- *
- *
  * @param valu $e = "" Значение переменной </htm
- *
- *
  *
  * @return function 
  *
@@ -7078,15 +6515,9 @@ function ClearVars($prefix="str_")
  * <p>Округляет сверху значение $value до $prec знаков после запятой.</p>
  *
  *
- *
- *
  * @param valu $e  Округляемое значение
  *
- *
- *
  * @param pre $c = 0 Число знаков запятой, до которых происходит округление.
- *
- *
  *
  * @return function 
  *
@@ -7202,11 +6633,7 @@ class CJSCore
 	* <p>Функция регистрирует собственные расширения.</p>
 	*
 	*
-	*
-	*
 	* @param my_extensio $n  имя расширения
-	*
-	*
 	*
 	* @param  $array  Массив параметров расширения: <ul> <li> <b>js</b> - Путь до файла
 	* расширения;</li> <li> <b>css</b> - Путь до файла css расширения;</li> <li> <b>lang</b> -
@@ -7215,118 +6642,61 @@ class CJSCore
 	* зависимости будут подключены автоматически.</li> <li> <b>skip_core</b> - При
 	* подключении расширения не требуется подключение <b>core.js</b>.</li> </ul>
 	*
-	*
-	*
 	* @param j $s  
-	*
-	*
 	*
 	* @param pat $h  
 	*
-	*
-	*
 	* @param t $o  
 	*
-	*
-	*
 	* @param j $s  
-	*
-	*
 	*
 	* @param my_ex $t  
 	*
-	*
-	*
 	* @param j $s  
 	*
-	*
-	*
 	* @param cs $s  
-	*
-	*
 	*
 	* @param pat $h  
 	*
-	*
-	*
 	* @param t $o  
 	*
-	*
-	*
 	* @param cs $s  
-	*
-	*
 	*
 	* @param my_ex $t  
 	*
-	*
-	*
 	* @param cs $s  
 	*
-	*
-	*
 	* @param lan $g  
-	*
-	*
 	*
 	* @param pat $h  
 	*
-	*
-	*
 	* @param t $o  
 	*
-	*
-	*
 	* @param lan $g  
-	*
-	*
 	*
 	* @param LANGUAGE_I $D  
 	*
-	*
-	*
 	* @param lan $g  
-	*
-	*
 	*
 	* @param ph $p  
 	*
-	*
-	*
 	* @param re $l  
-	*
-	*
 	*
 	* @param  $Array  
 	*
-	*
-	*
 	* @param aja $x  
-	*
-	*
 	*
 	* @param popu $p  
 	*
-	*
-	*
 	* @param l $s  
-	*
-	*
 	*
 	* @param skip_cor $e  
 	*
-	*
-	*
 	* @param  $false  
-	*
-	*
 	*
 	* @param  $true  
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -7361,7 +6731,7 @@ class CJSCore
 	* @link http://dev.1c-bitrix.ru/api_help/main/js_lib/my_extension/index.php
 	* @author Bitrix
 	*/
-	public static function RegisterExt($name, $arPaths)
+	public static 	public static function RegisterExt($name, $arPaths)
 	{
 		if(isset($arPaths['use']))
 		{
@@ -7388,18 +6758,11 @@ class CJSCore
 	* <table width="100%" class="tnormal"><tbody> <tr> <th width="30%">Метод</th> <th>Описание</th> <th width="7%">С версии</th> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/easing.php">BX.easing</a></td> <td>Конструктор.</td> <td>12.5</td> </tr> <tr> <td>BX.easing.prototype.animate</td> <td>Запускает анимацию.</td> <td>12.5</td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/easing_prototype_animateprogress.php">BX.easing.prototype.animateProgress</a></td> <td>Редко используемый метод. Запускает анимацию, но на каждой итерации вместо функции-обработчика <b>step</b>, вызывается функция-обработчик <b>progress</b>.</td> <td>12.5</td> </tr> <tr> <td>BX.easing.prototype.stop(completed)</td> <td>Останавливает анимацию на текущем шаге. Если completed=true, то дополнительно выполнится функция-обработчик окончания анимации.</td> <td>12.5</td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/animation.php">Анимационные функции</a></td> <td>Функции, которые позволяют делать различного вида плавные анимации.</td> <td>12.5</td> </tr> </tbody></table>
 	*
 	*
-	*
-	*
 	* @param arra $y  Конструктор.
-	*
-	*
 	*
 	* @param f $x  Запускает анимацию. </ht
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -7425,7 +6788,7 @@ class CJSCore
 	* @link http://dev.1c-bitrix.ru/api_help/main/js_lib/animation/index.php
 	* @author Bitrix
 	*/
-		public static function Init($arExt = array(), $bReturn = false)
+	public static 	public static function Init($arExt = array(), $bReturn = false)
 	{
 		global $USER;
 
@@ -7484,12 +6847,26 @@ class CJSCore
 		return $bReturn ? $ret : true;
 	}
 
-public static function GetCoreMessagesScript($compositeMode = false)
+	/**
+	 * Returns true if Core JS was inited
+	 * @return bool
+	 */
+public static 	public static function IsCoreLoaded()
 	{
+		return isset(self::$arCurrentlyLoadedExt["core"]);
+	}
+
+public static 	public static function GetCoreMessagesScript($compositeMode = false)
+	{
+		if (!self::IsCoreLoaded())
+		{
+			return "";
+		}
+
 		return self::_loadLang("", true, self::GetCoreMessages($compositeMode));
 	}
 
-public static function GetCoreMessages($compositeMode = false)
+public static 	public static function GetCoreMessages($compositeMode = false)
 	{
 		$arMessages = array(
 			"LANGUAGE_ID" => LANGUAGE_ID,
@@ -7528,7 +6905,7 @@ public static function GetCoreMessages($compositeMode = false)
 		return $arMessages;
 	}
 
-public static function GetHTML($arExt)
+public static 	public static function GetHTML($arExt)
 	{
 		$tmp = self::$arCurrentlyLoadedExt;
 		self::$arCurrentlyLoadedExt = array();
@@ -7537,18 +6914,155 @@ public static function GetHTML($arExt)
 		return $res;
 	}
 
-	public static function GetScriptsList()
+	/**
+	 *
+	 * When all of scripts are moved to the body, we need this code to add special classes (bx-chrome, bx-ie...) to <html> tag.
+	 * @return string
+	 */
+public static 	public static function GetInlineCoreJs()
+	{
+		$js = <<<JS
+		(function(w, d, n) {
+
+			var cl = "bx-core";
+			var ht = d.documentElement;
+			var htc = ht ? ht.className : undefined;
+			if (htc === undefined || htc.indexOf(cl) !== -1)
+			{
+				return;
+			}
+
+			var ua = n.userAgent;
+			if (/(iPad;)|(iPhone;)/i.test(ua))
+			{
+				cl += " bx-ios";
+			}
+			else if (/Android/i.test(ua))
+			{
+				cl += " bx-android";
+			}
+
+			cl += (/(ipad|iphone|android|mobile|touch)/i.test(ua) ? " bx-touch" : " bx-no-touch");
+
+			cl += w.devicePixelRatio && w.devicePixelRatio >= 2
+				? " bx-retina"
+				: " bx-no-retina";
+
+			var ieVersion = -1;
+			if (/AppleWebKit/.test(ua))
+			{
+				cl += " bx-chrome";
+			}
+			else if ((ieVersion = getIeVersion()) > 0)
+			{
+				cl += " bx-ie bx-ie" + ieVersion;
+				if (ieVersion > 7 && ieVersion < 10 && !isDoctype())
+				{
+					cl += " bx-quirks";
+				}
+			}
+			else if (/Opera/.test(ua))
+			{
+				cl += " bx-opera";
+			}
+			else if (/Gecko/.test(ua))
+			{
+				cl += " bx-firefox";
+			}
+
+			if (/Macintosh/i.test(ua))
+			{
+				cl += " bx-mac";
+			}
+
+			ht.className = htc ? htc + " " + cl : cl;
+
+public static 			function isDoctype()
+			{
+				if (d.compatMode)
+				{
+					return d.compatMode == "CSS1Compat";
+				}
+
+				return d.documentElement && d.documentElement.clientHeight;
+			}
+
+public static 			function getIeVersion()
+			{
+				if (/Opera/i.test(ua) || /Webkit/i.test(ua) || /Firefox/i.test(ua) || /Chrome/i.test(ua))
+				{
+					return -1;
+				}
+
+				var rv = -1;
+				if (!!(w.MSStream) && !(w.ActiveXObject) && ("ActiveXObject" in w))
+				{
+					rv = 11;
+				}
+				else if (!!d.documentMode && d.documentMode >= 10)
+				{
+					rv = 10;
+				}
+				else if (!!d.documentMode && d.documentMode >= 9)
+				{
+					rv = 9;
+				}
+				else if (d.attachEvent && !/Opera/.test(ua))
+				{
+					rv = 8;
+				}
+
+				if (rv == -1 || rv == 8)
+				{
+					var re;
+					if (n.appName == "Microsoft Internet Explorer")
+					{
+						re = new RegExp("MSIE ([0-9]+[\.0-9]*)");
+						if (re.exec(ua) != null)
+						{
+							rv = parseFloat(RegExp.$1);
+						}
+					}
+					else if (n.appName == "Netscape")
+					{
+						rv = 11;
+						re = new RegExp("Trident/.*rv:([0-9]+[\.0-9]*)");
+						if (re.exec(ua) != null)
+						{
+							rv = parseFloat(RegExp.$1);
+						}
+					}
+				}
+
+				return rv;
+			}
+
+		})(window, document, navigator);
+JS;
+		return '<script type="text/javascript" data-skip-moving="true">'.str_replace(array("\n", "\t"), "", $js)."</script>";
+	}
+
+public static 	public static function GetScriptsList()
 	{
 		$scriptsList = array();
 		foreach(self::$arCurrentlyLoadedExt as $ext=>$q)
 		{
 			if($ext!='core')
-				$scriptsList[] = self::$arRegisteredExt[$ext]['js'];
+			{
+				if(is_array(self::$arRegisteredExt[$ext]['js']))
+				{
+					$scriptsList = array_merge($scriptsList, self::$arRegisteredExt[$ext]['js']);
+				}
+				else
+				{
+					$scriptsList[] = self::$arRegisteredExt[$ext]['js'];
+				}
+			}
 		}
 		return $scriptsList;
 	}
 
-private function _loadExt($ext, $bReturn)
+public static 	private function _loadExt($ext, $bReturn)
 	{
 		$ret = '';
 
@@ -7589,7 +7103,7 @@ private function _loadExt($ext, $bReturn)
 		return $ret;
 	}
 
-public static function ShowTimer($params)
+public static 	public static function ShowTimer($params)
 	{
 		$id = $params['id'] ? $params['id'] : 'timer_'.RandString(7);
 
@@ -7610,23 +7124,23 @@ public static function ShowTimer($params)
 		return $res;
 	}
 
-public static function IsExtRegistered($ext)
+public static 	public static function IsExtRegistered($ext)
 	{
 		$ext = preg_replace('/[^a-z0-9_]/i', '', $ext);
 		return is_array(self::$arRegisteredExt[$ext]);
 	}
 
-	public static function getExtInfo($ext)
+	ppublic static ublic static function getExtInfo($ext)
 	{
 		return self::$arRegisteredExt[$ext];
 	}
 
-private static function _RegisterStandardExt()
+public static 	private function _RegisterStandardExt()
 	{
 		require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/main/jscore.php');
 	}
 
-public static function _loadJS($js, $bReturn)
+public static 	private static function _loadJS($js, $bReturn)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -7703,7 +7217,7 @@ public static function _loadJS($js, $bReturn)
 		return $jsMsg;
 	}
 
-private static function _loadCSS($css, $bReturn)
+public static 	private static function _loadCSS($css, $bReturn)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -7732,7 +7246,7 @@ private static function _loadCSS($css, $bReturn)
 
 class CUtil
 {
-public static function addslashes($s)
+public static 	public static function addslashes($s)
 	{
 		static $aSearch = array("\\", "\"", "'");
 		static $aReplace = array("\\\\", '\\"', "\\'");
@@ -7764,7 +7278,7 @@ public static function addslashes($s)
 		return $html;
 	}
 
-public static function JSEscape($s)
+public static 	public static function JSEscape($s)
 	{
 		static $aSearch = array("\xe2\x80\xa9", "\\", "'", "\"", "\r\n", "\r", "\n", "\xe2\x80\xa8", "*/", "</");
 		static $aReplace = array(" ", "\\\\", "\\'", '\\"', "\n", "\n", "\\n", "\\n", "*\\/", "<\\/");
@@ -7772,17 +7286,20 @@ public static function JSEscape($s)
 		return $val;
 	}
 
-public static function JSUrlEscape($s)
+public static 	public static function JSUrlEscape($s)
 	{
 		static $aSearch = array("%27", "%5C", "%0A", "%0D", "%", "&#039;", "&#39;", "&#x27;", "&apos;");
 		static $aReplace = array("\\'", "\\\\", "\\n", "\\r", "%25", "\\'", "\\'", "\\'", "\\'");
 		return str_replace($aSearch, $aReplace, $s);
 	}
 
-public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
+public static 	public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false, $bExtType = false)
 	{
-		static $aSearch = array("\r", "\n");
-		$bExtType = !!$bExtType;
+		static $use_bx_encode = null;
+		if (!isset($use_bx_encode))
+			$use_bx_encode = function_exists('bx_js_encode');
+		if ($use_bx_encode)
+			return bx_js_encode($arData, $bWS, $bSkipTilda, $bExtType);
 
 		switch(gettype($arData))
 		{
@@ -7803,41 +7320,49 @@ public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false,
 
 			if($j === $i)
 			{
+				$res = '[';
+				$first = true;
 				foreach($arData as $key => $value)
 				{
+					if($first)
+						$first = false;
+					else
+						$res .= ',';
+
 					switch(gettype($value))
 					{
 					case "string":
 						if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
-							$arData[$key] = "'".CUtil::JSEscape($value)."'";
+							$res .= "'".CUtil::JSEscape($value)."'";
 						else
-							$arData[$key] = "'".$value."'";
+							$res .= "'".$value."'";
 						break;
 					case "array":
-						$arData[$key] = CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
+						$res .= CUtil::PhpToJSObject($value, $bWS, $bSkipTilda, $bExtType);
 						break;
 					case "boolean":
 						if($value === true)
-							$arData[$key] = 'true';
+							$res .= 'true';
 						else
-							$arData[$key] = 'false';
+							$res .= 'false';
 						break;
 					case "integer":
 					case "double":
 						if ($bExtType)
-						{
-							$arData[$key] = $value;
-							break;
-						}
+							$res .= $value;
+						else
+							$res .= "'".$value."'";
+						break;
 					default:
 						if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
-							$arData[$key] = "'".CUtil::JSEscape($value)."'";
+							$res .= "'".CUtil::JSEscape($value)."'";
 						else
-							$arData[$key] = "'".$value."'";
+							$res .= "'".$value."'";
 						break;
 					}
 				}
-				return '['.implode(',', $arData).']';
+				$res .= ']';
+				return $res;
 			}
 
 			$sWS = ','.($bWS ? "\n" : '');
@@ -7854,7 +7379,7 @@ public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false,
 					$res .= $sWS;
 
 				if(preg_match("#['\"\\n\\r<\\\\\x80]#", $key))
-					$res .= "'".str_replace($aSearch, '', CUtil::JSEscape($key))."':";
+					$res .= "'".CUtil::JSEscape($key)."':";
 				else
 					$res .= "'".$key."':";
 
@@ -7878,10 +7403,10 @@ public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false,
 				case "integer":
 				case "double":
 					if ($bExtType)
-					{
 						$res .= $value;
-						break;
-					}
+					else
+						$res .= "'".$value."'";
+					break;
 				default:
 					if(preg_match("#['\"\\n\\r<\\\\\x80]#", $value))
 						$res .= "'".CUtil::JSEscape($value)."'";
@@ -7900,9 +7425,9 @@ public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false,
 		case "integer":
 		case "double":
 			if ($bExtType)
-			{
 				return $arData;
-			}
+			else
+				return "'".$arData."'";
 		default:
 			if(preg_match("#['\"\\n\\r<\\\\\x80]#", $arData))
 				return "'".CUtil::JSEscape($arData)."'";
@@ -7912,7 +7437,7 @@ public static function PhpToJSObject($arData, $bWS = false, $bSkipTilda = false,
 	}
 
 	//$data must be in LANG_CHARSET encoding
-public static function JsObjectToPhp($data, $bSkipNative=false)
+public static 	public static function JsObjectToPhp($data, $bSkipNative=false)
 	{
 		$arResult = array();
 
@@ -8124,7 +7649,7 @@ public static function JsObjectToPhp($data, $bSkipNative=false)
 		return $arResult;
 	}
 
-public static function DecodeUtf16($ch)
+public static 	public static function DecodeUtf16($ch)
 	{
 		$res = chr(hexdec($ch[2])).chr(hexdec($ch[1]));
 		return CharsetConverter::ConvertCharset($res, "UTF-16", LANG_CHARSET);
@@ -8136,7 +7661,7 @@ public static function DecodeUtf16($ch)
 		CUtil::decodeURIComponent($_REQUEST);
 	}
 
-	public static function decodeURIComponent(&$item)
+	public static public static function decodeURIComponent(&$item)
 	{
 		if(defined("BX_UTF"))
 		{
@@ -8155,7 +7680,7 @@ public static function DecodeUtf16($ch)
 		}
 	}
 
-public static function DetectUTF8($string)
+public static 	public static function DetectUTF8($string)
 	{
 		//http://mail.nl.linux.org/linux-utf8/1999-09/msg00110.html
 
@@ -8191,7 +7716,7 @@ public static function DetectUTF8($string)
 		return ($is_utf > 0);
 	}
 
-public static function ConvertToLangCharset($string)
+public static 	public static function ConvertToLangCharset($string)
 	{
 		$bUTF = CUtil::DetectUTF8($string);
 
@@ -8215,22 +7740,15 @@ public static function ConvertToLangCharset($string)
 
 
 	/**
-	* <p>Функция возвращает url к файлу с указанием метки версии файла, для его автоматического обновления на клиентской стороны. Метка формируется на основании даты изменения файла и его размера.</p>
-	*
-	*
+	* <p>Метод возвращает url к файлу с указанием метки версии файла, для его автоматического обновления на клиентской стороны. Метка формируется на основании даты изменения файла и его размера. Статичный метод.</p>
 	*
 	*
 	* @param fil $e  путь к файлу
 	*
-	*
-	*
 	* @param bSkipChec $k = false При установке в true не проверяет наличие файла и не формирует
 	* метку. Результат в этом случае равен $file. По умолчанию false.
 	*
-	*
-	*
 	* @return result_type 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -8242,7 +7760,7 @@ public static function ConvertToLangCharset($string)
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cutil/getadditionalfileurl.php
 	* @author Bitrix
 	*/
-	public static function GetAdditionalFileURL($file, $bSkipCheck=false)
+	public static 	public static function GetAdditionalFileURL($file, $bSkipCheck=false)
 	{
 		$filePath = $_SERVER['DOCUMENT_ROOT'].$file;
 		if($bSkipCheck || file_exists($filePath))
@@ -8251,12 +7769,12 @@ public static function ConvertToLangCharset($string)
 			return $file;
 	}
 
-public static function InitJSCore($arExt = array(), $bReturn = false)
+	public static public static function InitJSCore($arExt = array(), $bReturn = false)
 	{
 		return CJSCore::Init($arExt, $bReturn);
 	}
 
-public static function GetPopupSize($resize_id, $arDefaults = array())
+	public static public static function GetPopupSize($resize_id, $arDefaults = array())
 	{
 		if ($resize_id)
 		{
@@ -8273,7 +7791,7 @@ public static function GetPopupSize($resize_id, $arDefaults = array())
 			return false;
 	}
 
-public static function GetPopupOptions($wnd_id)
+	public static public static function GetPopupOptions($wnd_id)
 	{
 		if ($wnd_id)
 		{
@@ -8288,7 +7806,7 @@ public static function GetPopupOptions($wnd_id)
 		}
 	}
 
-	public static function SetPopupOptions($wnd_id, $arOptions)
+	public static public static function SetPopupOptions($wnd_id, $arOptions)
 	{
 		if ($wnd_id)
 		{
@@ -8300,19 +7818,14 @@ public static function GetPopupOptions($wnd_id)
 		}
 	}
 
+	pu
 	/**
-	* <p>Функция для транслитерации строки текста.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	* <p>Метод для транслитерации строки текста. Статичный метод.</p>
 	*
 	*
+	* @param string $str  Строка текста для транслитерации
 	*
-	*
-	* @param st $r  Строка текста для транслитерации
-	*
-	*
-	*
-	* @param array $lang  Язык с которого производится транслитерация
-	*
-	*
+	* @param string $lang  Язык с которого производится транслитерация
 	*
 	* @param array $params  Массив параметров: <ul> <li> <b>max_len</b> ограничение количества
 	* символов, по умолчанию - 100</li> <li> <b>change_case</b> к какому регистру
@@ -8320,12 +7833,10 @@ public static function GetPopupOptions($wnd_id)
 	* умолчанию - "L"</li> <li> <b>replace_space</b> чем заменять пробел, по умолчанию:
 	* "_"</li> <li> <b>replace_other</b> чем заменять прочие символы, по умолчанию:
 	* "_"</li> <li> <b>delete_repeat_replace</b> удалять повторяющиеся пробелы, по
-	* умолчанию - "true"</li> </ul>
+	* умолчанию - "true"</li> <li> <b>safe_chars</b> строка из символов, замена которых
+	* не производится</li> </ul>
 	*
-	*
-	*
-	* @return string
-	*
+	* @return result_type 
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -8344,7 +7855,7 @@ public static function GetPopupOptions($wnd_id)
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cutil/translit.php
 	* @author Bitrix
 	*/
-	public static function translit($str, $lang, $params = array())
+	public static blic static function translit($str, $lang, $params = array())
 	{
 		static $search = array();
 
@@ -8429,15 +7940,28 @@ public static function GetPopupOptions($wnd_id)
 		return $str_new;
 	}
 
-public static function BinStrlen($buf)
+	public static function BinStrlen($buf)
 	{
 		return (function_exists('mb_strlen')? mb_strlen($buf, 'latin1') : strlen($buf));
 	}
 
-public static function BinSubstr($buf, $start)
+public static 	public static function BinSubstr($buf, $start)
 	{
 		$length = (func_num_args() > 2? func_get_arg(2) : self::BinStrlen($buf));
 		return (function_exists('mb_substr')? mb_substr($buf, $start, $length, 'latin1') : substr($buf, $start, $length));
+	}
+
+public 	public static function BinStrpos($haystack, $needle, $offset = 0)
+	{
+		if (defined("BX_UTF"))
+		{
+			if (function_exists('mb_orig_strpos'))
+			{
+				return mb_orig_strpos($haystack, $needle, $offset);
+			}
+			return mb_strpos($haystack, $needle, $offset, 'latin1');
+		}
+		return strpos($haystack, $needle, $offset);
 	}
 
 	/**
@@ -8446,7 +7970,7 @@ public static function BinSubstr($buf, $start)
 	* @return int
 	*
 	*/
-public static function Unformat($str)
+public static 	public static function Unformat($str)
 	{
 		$str = strtolower($str);
 		$res = intval($str);
@@ -8468,7 +7992,7 @@ public static function Unformat($str)
 	 * @return void
 	 *
 	 */
-public static function AdjustPcreBacktrackLimit($val)
+public 	public static function AdjustPcreBacktrackLimit($val)
 	{
 		$val = intval($val);
 		if($val <=0 )
@@ -8584,7 +8108,7 @@ public 	function Post($url, $arPostData)
 		return false;
 	}
 
-	public function PrepareData($arPostData, $prefix = '')
+public 	function PrepareData($arPostData, $prefix = '')
 	{
 		$str = '';
 
@@ -8622,7 +8146,6 @@ public 	function Post($url, $arPostData)
 	 */
 public 	function HTTPQuery($method, $url, $postdata = '')
 	{
-		$arUrl = false;
 		if(is_resource($this->fp))
 			$file_pos = ftell($this->fp);
 
@@ -8631,7 +8154,7 @@ public 	function HTTPQuery($method, $url, $postdata = '')
 		while (true)
 		{
 			$this->url = $url;
-			$arUrl = $this->ParseURL($url, $arUrl);
+			$arUrl = $this->ParseURL($url);
 			if (!$this->Query($method, $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $postdata, $arUrl['proto']))
 			{
 				return false;
@@ -8717,7 +8240,6 @@ public 	function Query($method, $host, $port, $path, $postdata = false, $proto =
 				{
 					fwrite($fp, $postdata);
 				}
-				fwrite($fp, "\r\n");
 			}
 
 			if ($dont_wait_answer)
@@ -8790,27 +8312,9 @@ public static 	function SetAuthBasic($user, $pass)
 	/**
 	 * @deprecated Use Bitrix\Main\Web\Uri
 	 */
-	public function ParseURL($url, $arUrlOld = false)
+	ppublic ublic function ParseURL($url)
 	{
 		$arUrl = parse_url($url);
-
-		if (is_array($arUrlOld))
-		{
-			if (!array_key_exists('scheme', $arUrl))
-			{
-				$arUrl['scheme'] = $arUrlOld['scheme'];
-			}
-
-			if (!array_key_exists('host', $arUrl))
-			{
-				$arUrl['host'] = $arUrlOld['host'];
-			}
-
-			if (!array_key_exists('port', $arUrl))
-			{
-				$arUrl['port'] = $arUrlOld['port'];
-			}
-		}
 
 		$arUrl['proto'] = '';
 		if (array_key_exists('scheme', $arUrl))
@@ -8884,12 +8388,12 @@ public static 	function SetAuthBasic($user, $pass)
 		}
 	}
 
-public static function setFollowRedirect($follow)
+public static 	public function setFollowRedirect($follow)
 	{
 		$this->follow_redirect = $follow;
 	}
 
-public static function setRedirectMax($n)
+public static 	public function setRedirectMax($n)
 	{
 		$this->redirectMax = $n;
 	}
@@ -8897,7 +8401,7 @@ public static function setRedirectMax($n)
 	/**
 	 * @deprecated Use Bitrix\Main\Web\HttpClient
 	 */
-	public static function sGet($url, $follow_redirect = false) //static get
+	public static public static function sGet($url, $follow_redirect = false) //static get
 	{
 		$ob = new CHTTP();
 		$ob->setFollowRedirect($follow_redirect);
@@ -8932,7 +8436,7 @@ public static 	function SetAdditionalHeaders($arHeader=array())
 	 * @param int $httpTimeout
 	 * @return bool|string
 	 */
-public static function sGetHeader($url, $arHeader = array(), $httpTimeout = 0)
+public static 	public static function sGetHeader($url, $arHeader = array(), $httpTimeout = 0)
 	{
 		$httpTimeout = intval($httpTimeout);
 		$ob = new CHTTP();
@@ -8953,7 +8457,7 @@ public static function sGetHeader($url, $arHeader = array(), $httpTimeout = 0)
 	 * @param int $http_timeout
 	 * @return bool|string
 	 */
-public static function sPostHeader($url, $arPostData, $arHeader = array(), $http_timeout = 0)
+public static 	public static function sPostHeader($url, $arPostData, $arHeader = array(), $http_timeout = 0)
 	{
 		$http_timeout = intval($http_timeout);
 		$ob = new CHTTP();
@@ -8964,7 +8468,7 @@ public static function sPostHeader($url, $arPostData, $arHeader = array(), $http
 		return $ob->Post($url, $arPostData);
 	}
 
-public static function SetStatus($status)
+public static 	public static function SetStatus($status)
 	{
 		$bCgi = (stristr(php_sapi_name(), "cgi") !== false);
 		if($bCgi && (!defined("BX_HTTP_STATUS") || BX_HTTP_STATUS == false))
@@ -8974,12 +8478,12 @@ public static function SetStatus($status)
 		self::$lastSetStatus = $status;
 	}
 
-public static function GetLastStatus()
+public static 	public static function GetLastStatus()
 	{
 		return self::$lastSetStatus;
 	}
 
-public static function SetAuthHeader($bDigestEnabled=true)
+public static 	public static function SetAuthHeader($bDigestEnabled=true)
 	{
 		self::SetStatus('401 Unauthorized');
 
@@ -8998,7 +8502,7 @@ public static function SetAuthHeader($bDigestEnabled=true)
 		}
 	}
 
-public static function ParseAuthRequest()
+public static 	public static function ParseAuthRequest()
 	{
 		$sDigest = '';
 
@@ -9022,10 +8526,10 @@ public static function ParseAuthRequest()
 				$res = (isset($_SERVER['REDIRECT_REMOTE_USER'])? $_SERVER['REDIRECT_REMOTE_USER'] : $_SERVER['REMOTE_USER']);
 				if($res <> '')
 				{
-					if(preg_match('/(?<=(basic\s))(.*)$/is', $res, $matches))
+					if(preg_match('/^\x20*Basic\x20+([a-zA-Z0-9+\/=]+)\s*$/D', $res, $matches))
 					{
 						// Basic Authorization PHP FastCGI (CGI)
-						$res = trim($matches[0]);
+						$res = trim($matches[1]);
 						$res = base64_decode($res);
 						$res = CUtil::ConvertToLangCharset($res);
 						list($user, $pass) = explode(':', $res);
@@ -9039,10 +8543,10 @@ public static function ParseAuthRequest()
 							"password"=>$pass,
 						));
 					}
-					elseif(preg_match('/(?<=(digest\s))(.*)$/is', $res, $matches))
+					elseif(preg_match('/^\x20*Digest\x20+(.*)$/sD', $res, $matches))
 					{
 						// Digest Authorization PHP FastCGI (CGI)
-						$sDigest = trim($matches[0]);
+						$sDigest = trim($matches[1]);
 					}
 				}
 			}
@@ -9054,7 +8558,7 @@ public static function ParseAuthRequest()
 		return false;
 	}
 
-public static function ParseDigest($sDigest)
+public static 	public static function ParseDigest($sDigest)
 	{
 		$data = array();
 		$needed_parts = array('nonce'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
@@ -9072,7 +8576,7 @@ public static function ParseDigest($sDigest)
 		return ($needed_parts? false : $data);
 	}
 
-public static function urlAddParams($url, $add_params, $options = array())
+public static 	public static function urlAddParams($url, $add_params, $options = array())
 	{
 		if(count($add_params))
 		{
@@ -9109,29 +8613,13 @@ public static function urlAddParams($url, $add_params, $options = array())
 		return $url;
 	}
 
-public static function urlDeleteParams($url, $delete_params, $options = array())
+public static 	public static function urlDeleteParams($url, $delete_params, $options = array())
 	{
 		$url_parts = explode("?", $url, 2);
 		if(count($url_parts) == 2 && strlen($url_parts[1]) > 0)
 		{
 			if($options["delete_system_params"])
-				$delete_params = array_merge($delete_params, array(
-					"login",
-					"logout",
-					"register",
-					"forgot_password",
-					"change_password",
-					"confirm_registration",
-					"confirm_code",
-					"confirm_user_id",
-					"bitrix_include_areas",
-					"clear_cache",
-					"show_page_exec_time",
-					"show_include_exec_time",
-					"show_sql_stat",
-					"show_cache_stat",
-					"show_link_stat",
-				));
+				$delete_params = array_merge($delete_params, \Bitrix\Main\HttpRequest::getSystemParameters());
 
 			$params_pairs = explode("&", $url_parts[1]);
 			foreach($params_pairs as $i => $param_pair)
@@ -9150,7 +8638,7 @@ public static function urlDeleteParams($url, $delete_params, $options = array())
 		return $url;
 	}
 
-public static function urnEncode($str, $charset = false)
+public static 	public static function urnEncode($str, $charset = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -9177,7 +8665,7 @@ public static function urnEncode($str, $charset = false)
 		return $result;
 	}
 
-public static function urnDecode($str, $charset = false)
+public static 	public static function urnDecode($str, $charset = false)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
@@ -9205,7 +8693,7 @@ public static function urnDecode($str, $charset = false)
 	}
 
 	// search for /../ and ulrencoded /../
-public static function isPathTraversalUri($uri)
+public static 	public static function isPathTraversalUri($uri)
 	{
 		if (($pos = strpos($uri, "?")) !== false)
 			$uri = substr($uri, 0, $pos);
@@ -9254,7 +8742,7 @@ function GetMenuTypes($site=false, $default_value=false)
 
 function SetMenuTypes($armt, $site = '', $description = false)
 {
-	COption::SetOptionString('fileman', "menutypes", addslashes(serialize($armt)), $description, $site);
+	return COption::SetOptionString('fileman', "menutypes", addslashes(serialize($armt)), $description, $site);
 }
 
 function ParseFileContent($filesrc, $params = array())
@@ -9360,10 +8848,12 @@ function ParseFileContent($filesrc, $params = array())
 	$arPageProps = array();
 	if(strlen($prolog))
 	{
-		if (preg_match_all("'\\\$APPLICATION->SetPageProperty\\(\"(.*?)(?<!\\\\)\" *, *\"(.*?)(?<!\\\\)\"\\);'i", $prolog, $out))
+		if (preg_match_all("'\\\$APPLICATION->SetPageProperty\\(([\"\\'])(.*?)(?<!\\\\)[\"\\'] *, *([\"\\'])(.*?)(?<!\\\\)[\"\\']\\);'i", $prolog, $out))
 		{
-			foreach ($out[1] as $i => $m1)
-				$arPageProps[UnEscapePHPString($m1)] = UnEscapePHPString($out[2][$i]);
+			foreach ($out[2] as $i => $m1)
+			{
+				$arPageProps[UnEscapePHPString($m1, $out[1][$i])] = UnEscapePHPString($out[4][$i], $out[3][$i]);
+			}
 		}
 	}
 
@@ -9394,20 +8884,36 @@ function ParseFileContent($filesrc, $params = array())
 	);
 }
 
-function EscapePHPString($str)
+function EscapePHPString($str, $encloser = '"')
 {
-	$str = str_replace("\\", "\\\\", $str);
-	$str = str_replace("\$", "\\\$", $str);
-	$str = str_replace("\"", "\\"."\"", $str);
-	return $str;
+	if($encloser == "'")
+	{
+		$from = array("\\", "'");
+		$to = array("\\\\", "\\'");
+	}
+	else
+	{
+		$from = array("\\", "\$", "\"");
+		$to = array("\\\\", "\\\$", "\\\"");
+	}
+
+	return str_replace($from, $to, $str);
 }
 
-function UnEscapePHPString($str)
+function UnEscapePHPString($str, $encloser = '"')
 {
-	$str = str_replace("\\\\", "\\", $str);
-	$str = str_replace("\\\$", "\$", $str);
-	$str = str_replace("\\\"", "\"", $str);
-	return $str;
+	if($encloser == "'")
+	{
+		$from = array("\\\\", "\\'");
+		$to = array("\\", "'");
+	}
+	else
+	{
+		$from = array("\\\\", "\\\$", "\\\"");
+		$to = array("\\", "\$", "\"");
+	}
+
+	return str_replace($from, $to, $str);
 }
 
 function CheckSerializedData($str, $max_depth = 200)
@@ -9488,30 +8994,17 @@ function NormalizePhone($number, $minLength = 10)
  * <p>Проверяет существование функции custom_mail и если такая функция есть, то bxmail вызывает ее со всеми параметрами и возвращает ее результат.</p> <p>Иначе вызывается встроенная php функция mail. </p> <p>Данная функция вызывается из главного модуля при отправке почтовых событий, а так же из модуля подписки при отправке выпусков. Это позволяет переопределить обработчик всех писем отправляемых БУС. <br></p>
  *
  *
- *
- *
  * @param string $to  Получатель.
- *
- *
  *
  * @param string $subject  Заголовок письма. </h
  *
- *
- *
  * @param string $message  Тело письма.
- *
- *
  *
  * @param string $additional_haders = "" Дополнительные заголовки.
  *
- *
- *
  * @param string $additional_parameters = "" Дополнительные параметры.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>See Also</h4> 
  * <li> <a href="http://ru2.php.net/manual/en/function.mail.php">mail</a> <br><br> </li><br><br>

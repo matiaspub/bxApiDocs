@@ -40,23 +40,31 @@ class CFinder
 			if ($tabCount == 1)
 			{
 				$tabs .= '<a class="bx-finder-box-tab'.($bselect? ' bx-finder-box-tab-selected': '').($bsearch? ' bx-finder-box-tab-search': '').'" hidefocus="true">'.
-								'<span class="bx-finder-box-tab-left"></span><span class="bx-finder-box-tab-text">'.$panel['NAME'].'</span><span class="bx-finder-box-tab-right"></span>'.
-							'</a>';
+					$panel['NAME'].
+				'</a>';
 			}
 			else
 			{
 				$tabs .= '<a href="#switchTab" class="bx-finder-box-tab'.($bselect? ' bx-finder-box-tab-selected': '').($bsearch? ' bx-finder-box-tab-search': '').'" onclick="return BX.Finder.SwitchTab(this)" hidefocus="true">'.
-								'<span class="bx-finder-box-tab-left"></span><span class="bx-finder-box-tab-text">'.$panel['NAME'].'</span><span class="bx-finder-box-tab-right"></span>'.
-							'</a>';
+					$panel['NAME'].
+				'</a>';
 			}
 			$elements .= '<div class="bx-finder-box-tab-content'.($bselect? ' bx-finder-box-tab-content-selected': '').'">'.$panel['ELEMENTS'].'</div>';
 		}
 
 		$html = '<div class="bx-finder-box">'.
-						($bsearchable? '<div class="bx-finder-box-search"><input class="bx-finder-box-search-textbox" name="" onkeyup="BX.Finder.Search(this, \''.$arResult['PROVIDER'].'\')"></div>': '').
-						'<div class="bx-finder-box-tabs">'.$tabs.'</div><div class="popup-window-hr popup-window-buttons-hr"><i></i></div>'.
-						'<div class="bx-finder-box-tabs-content bx-finder-box-tabs-content-window">'.$elements.'</div>'.
-					'</div>';
+			($bsearchable? '<div class="bx-finder-box-search"><input class="bx-finder-box-search-textbox" name="" onkeyup="BX.Finder.Search(this, \''.$arResult['PROVIDER'].'\')"></div>': '').
+			'<div class="bx-finder-box-tabs">'.$tabs.'</div><div class="popup-window-hr popup-window-buttons-hr"><i></i></div>'.
+			'<div class="bx-finder-box-tabs-content bx-finder-box-tabs-content-window">'.
+				'<table class="bx-finder-box-tabs-content-table">'.
+					'<tr>'.
+						'<td class="bx-finder-box-tabs-content-cell">'.
+							$elements.
+						'</td>'.
+					'</tr>'.
+				'</table>'.
+			'</div>'.
+		'</div>';
 		
 		return $html;
 	}

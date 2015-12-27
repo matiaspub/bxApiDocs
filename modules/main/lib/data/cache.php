@@ -50,7 +50,11 @@ class Cache
 
 	public static function createCacheEngine()
 	{
-		$cacheEngine = null;
+		static $cacheEngine = null;
+		if ($cacheEngine)
+		{
+			return clone $cacheEngine;
+		}
 
 		// Events can't be used here because events use cache
 
@@ -119,7 +123,7 @@ class Cache
 			trigger_error("Cache engine is not available", E_USER_WARNING);
 		}
 
-		return $cacheEngine;
+		return clone $cacheEngine;
 	}
 
 	public static function getCacheEngineType()
@@ -157,7 +161,9 @@ class Cache
 
 	public static function setClearCache($clearCache)
 	{
+		$prevValue = static::$clearCache;
 		static::$clearCache = $clearCache;
+		return $prevValue;
 	}
 
 	public static function setClearCacheSession($clearCacheSession)

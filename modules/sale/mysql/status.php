@@ -6,21 +6,26 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/status.php"
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalestatus/index.php
  * @author Bitrix
+ * @deprecated
  */
 class CSaleStatus extends CAllSaleStatus
 {
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array  $arGroupBy
+	 * @param bool|array  $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|int|CDBResult
+	 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из статусов в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из статусов в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -35,8 +40,6 @@ class CSaleStatus extends CAllSaleStatus
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи статусов.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -63,8 +66,6 @@ class CSaleStatus extends CAllSaleStatus
 	* (код сайта) равно en".<br><br> Значение по умолчанию - пустой массив array()
 	* - означает, что результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи статусов. Массив
 	* имеет вид: <pre class="syntax">array("название_поля1", "группирующая_функция2"
 	* =&gt; "название_поля2", ...)</pre> В качестве "название_поля<i>N</i>" может
@@ -77,24 +78,18 @@ class CSaleStatus extends CAllSaleStatus
 	* системы) не равно en".<br><br> Значение по умолчанию - <i>false</i> - означает,
 	* что результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы параметров статусов с ключами:</p> <table class="tnormal" width="100%"> <tr>
@@ -102,7 +97,7 @@ class CSaleStatus extends CAllSaleStatus
 	* заказа.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>LID</td>
 	* <td>Язык.</td> </tr> <tr> <td>NAME</td> <td>Название статуса.</td> </tr> <tr> <td>DESCRIPTION</td>
 	* <td>Описание статуса.</td> </tr> </table> <p> Если в качестве параметра arGroupBy
-	* передается пустой массив, то функция вернет число записей,
+	* передается пустой массив, то метод вернет число записей,
 	* удовлетворяющих фильтру.</p> <br><br>
 	*
 	* @static
@@ -225,19 +220,13 @@ class CSaleStatus extends CAllSaleStatus
 
 	
 	/**
-	* <p>Функция возвращает параметры статуса с кодом ID, включая языкозависимые параметры для языка strLang </p>
-	*
-	*
+	* <p>Метод возвращает параметры статуса с кодом ID, включая языкозависимые параметры для языка strLang. Метод динамичный.</p>
 	*
 	*
 	* @param string $ID  Код статуса заказа. </htm
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Язык, для которого возвращаются языкозависимые параметры. По
 	* умолчанию используется текущий язык.
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров статуса с
 	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
@@ -245,7 +234,6 @@ class CSaleStatus extends CAllSaleStatus
 	* сортировки.</td> </tr> <tr> <td>LID</td> <td>Язык.</td> </tr> <tr> <td>NAME</td> <td>Название
 	* статуса.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание статуса.</td> </tr> </table> <p> 
 	* </p<a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -292,14 +280,10 @@ class CSaleStatus extends CAllSaleStatus
 
 	
 	/**
-	* <p>Функция изменяет параметры статуса заказа с кодом ID </p>
-	*
-	*
+	* <p>Метод изменяет параметры статуса заказа с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param string $ID  Код статуса.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров статуса. Ключами в массиве
 	* являются названия параметров статуса, а значениями -
@@ -313,8 +297,6 @@ class CSaleStatus extends CAllSaleStatus
 	* группа пользователей;</li> <li> <b>PERM_TYPE</b> - тип доступа (S - разрешен
 	* перевод заказа в данный статус, M - разрешено изменение заказа в
 	* данном статусе).</li> </ul> </li> </ul>
-	*
-	*
 	*
 	* @return string <p>Возвращается код добавленного статуса или <i>false</i> в случае
 	* ошибки.</p> <br><br>
@@ -344,13 +326,13 @@ class CSaleStatus extends CAllSaleStatus
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
-		if (array_key_exists('LANG', $arFields) && is_array($arFields['LANG']))
+		if (isset($arFields['LANG']) && is_array($arFields['LANG']))
 		{
 			$DB->Query("DELETE FROM b_sale_status_lang WHERE STATUS_ID = '".$ID."'");
 
-			for ($i = 0; $i<count($arFields["LANG"]); $i++)
+			foreach ($arFields['LANG'] as $statusLang)
 			{
-				$langUpdateFields = $langInsertFields = $arFields["LANG"][$i];
+				$langUpdateFields = $langInsertFields = $statusLang;
 				$langInsertFields['STATUS_ID'] = $ID;
 				$arInsert = $DB->PrepareInsert("b_sale_status_lang", $langInsertFields);
 				if (isset($langUpdateFields['STATUS_ID']))
@@ -361,15 +343,14 @@ class CSaleStatus extends CAllSaleStatus
 				if (count($langUpdateFields) > 0)
 					$langUpdate = " ON DUPLICATE KEY UPDATE ".$DB->PrepareUpdate("b_sale_status_lang", $langUpdateFields);
 				$strSql =
-					"INSERT INTO b_sale_status_lang(".$arInsert[0].") ".
-					"VALUES(".$arInsert[1].")".$langUpdate;
+					"INSERT INTO b_sale_status_lang(".$arInsert[0].") VALUES(".$arInsert[1].")".$langUpdate;
 				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
-			if (isset($arOneLang))
-				unset($arOneLang);
+			if (isset($statusLang))
+				unset($statusLang);
 		}
 
-		if (array_key_exists('PERMS', $arFields) && is_array($arFields["PERMS"]))
+		if (isset($arFields['PERMS']) && is_array($arFields["PERMS"]))
 		{
 			$DB->Query("DELETE FROM b_sale_status2group WHERE STATUS_ID = '".$ID."'");
 
@@ -480,4 +461,3 @@ class CSaleStatus extends CAllSaleStatus
 		return $dbRes;
 	}
 }
-?>

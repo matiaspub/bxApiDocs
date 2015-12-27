@@ -1,5 +1,7 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main\Localization\Loc;
+
+Loc::loadMessages(__FILE__);
 
 class CIBlockPropertyDateTime
 {
@@ -22,7 +24,7 @@ class CIBlockPropertyDateTime
 		{
 			if(CheckDateTime($from))
 			{
-				$from = CIBlockPropertyDateTime::ConvertToDB($arProperty, array("VALUE"=>$from));
+				$from = static::ConvertToDB($arProperty, array("VALUE"=>$from));
 				$arFilter[">=PROPERTY_".$arProperty["ID"]] = $from["VALUE"];
 				$filtered = true;
 			}
@@ -48,7 +50,7 @@ class CIBlockPropertyDateTime
 		{
 			if(CheckDateTime($to))
 			{
-				$to = CIBlockPropertyDateTime::ConvertToDB($arProperty, array("VALUE"=>$to));
+				$to = static::ConvertToDB($arProperty, array("VALUE"=>$to));
 				$arFilter["<=PROPERTY_".$arProperty["ID"]] = $to["VALUE"];
 				$filtered = true;
 			}
@@ -79,6 +81,9 @@ class CIBlockPropertyDateTime
 
 	public static function GetPublicFilterHTML($arProperty, $strHTMLControlName)
 	{
+		/** @var CMain */
+		global $APPLICATION;
+
 		$from_name = $strHTMLControlName["VALUE"].'_from';
 		$to_name = $strHTMLControlName["VALUE"].'_to';
 
@@ -104,7 +109,7 @@ class CIBlockPropertyDateTime
 
 		ob_start();
 
-		$GLOBALS["APPLICATION"]->IncludeComponent(
+		$APPLICATION->IncludeComponent(
 			'bitrix:main.calendar',
 			'',
 			array(
@@ -127,27 +132,34 @@ class CIBlockPropertyDateTime
 
 	public static function GetPublicViewHTML($arProperty, $value, $strHTMLControlName)
 	{
-		if(strlen($value["VALUE"])>0)
+		if (strlen($value["VALUE"]) > 0)
 		{
-			if(!CheckDateTime($value["VALUE"]))
-				$value = CIBlockPropertyDateTime::ConvertFromDB($arProperty, $value);
+			if (!CheckDateTime($value["VALUE"]))
+				$value = static::ConvertFromDB($arProperty, $value, $strHTMLControlName["DATETIME_FORMAT"]);
 
-			if(isset($strHTMLControlName["MODE"]) && $strHTMLControlName["MODE"] == "CSV_EXPORT")
-				return $value["VALUE"];
-			elseif(isset($strHTMLControlName["MODE"]) && ($strHTMLControlName["MODE"] == "SIMPLE_TEXT" || $strHTMLControlName["MODE"] == "ELEMENT_TEMPLATE"))
-				return $value["VALUE"];
-			else
-				return str_replace(" ", "&nbsp;", htmlspecialcharsex($value["VALUE"]));
+			if (isset($strHTMLControlName["MODE"]))
+			{
+				if ($strHTMLControlName["MODE"] == "CSV_EXPORT")
+					return $value["VALUE"];
+				elseif ($strHTMLControlName["MODE"] == "SIMPLE_TEXT")
+					return $value["VALUE"];
+				elseif ($strHTMLControlName["MODE"] == "ELEMENT_TEMPLATE")
+					return $value["VALUE"];
+			}
+			return str_replace(" ", "&nbsp;", htmlspecialcharsex($value["VALUE"]));
 		}
-		else
-			return '';
+
+		return '';
 	}
 
 	public static function GetPublicEditHTML($arProperty, $value, $strHTMLControlName)
 	{
+		/** @var CMain */
+		global $APPLICATION;
+
 		$s = '<input type="text" name="'.htmlspecialcharsbx($strHTMLControlName["VALUE"]).'" size="25" value="'.htmlspecialcharsbx($value["VALUE"]).'" />';
 		ob_start();
-		$GLOBALS["APPLICATION"]->IncludeComponent(
+		$APPLICATION->IncludeComponent(
 			'bitrix:main.calendar',
 			'',
 			array(
@@ -169,7 +181,7 @@ class CIBlockPropertyDateTime
 		if(strlen($value["VALUE"])>0)
 		{
 			if(!CheckDateTime($value["VALUE"]))
-				$value = CIBlockPropertyDateTime::ConvertFromDB($arProperty, $value);
+				$value = static::ConvertFromDB($arProperty, $value);
 			return str_replace(" ", "&nbsp;", htmlspecialcharsex($value["VALUE"]));
 		}
 		else
@@ -200,7 +212,7 @@ class CIBlockPropertyDateTime
 	{
 		$arResult = array();
 		if(strlen($value["VALUE"])>0 && !CheckDateTime($value["VALUE"]))
-			$arResult[] = GetMessage("IBLOCK_PROP_DATETIME_ERROR");
+			$arResult[] = Loc::getMessage("IBLOCK_PROP_DATETIME_ERROR_NEW", array("#FIELD_NAME#" => $arProperty["NAME"]));
 		return $arResult;
 	}
 
@@ -211,42 +223,48 @@ class CIBlockPropertyDateTime
 	//DB form of the value
 	public static function ConvertToDB($arProperty, $value)
 	{
-		static $intTimeOffset = false;
-		if (false === $intTimeOffset)
-			$intTimeOffset = CTimeZone::GetOffset();
-
-		if (strlen($value["VALUE"])>0)
+		if (strlen($value["VALUE"]) > 0)
 		{
-			if (0 != $intTimeOffset)
+			try
 			{
-				$value['VALUE'] = date("Y-m-d H:i:s", MakeTimeStamp($value['VALUE'], CLang::GetDateFormat("FULL")) - $intTimeOffset);
+				$time = Bitrix\Main\Type\DateTime::createFromUserTime($value['VALUE']);
+
+				$value['VALUE'] = $time->format("Y-m-d H:i:s");
 			}
-			else
+			catch(Bitrix\Main\ObjectException $e)
 			{
-				$value["VALUE"] = CDatabase::FormatDate($value["VALUE"], CLang::GetDateFormat("FULL"), "YYYY-MM-DD HH:MI:SS");
 			}
 		}
+
 		return $value;
 	}
 
-	public static function ConvertFromDB($arProperty, $value)
+	public static function ConvertFromDB($arProperty, $value, $format = '')
 	{
-		static $intTimeOffset = false;
-		if (false === $intTimeOffset)
-			$intTimeOffset = CTimeZone::GetOffset();
-
-		if(strlen($value["VALUE"])>0)
+		if (strlen($value["VALUE"]) > 0)
 		{
-			if (0 != $intTimeOffset)
+			try
 			{
-				$value["VALUE"] = ConvertTimeStamp(MakeTimeStamp($value["VALUE"], 'YYYY-MM-DD HH:MI:SS') + $intTimeOffset, 'FULL');
+				$time = new Bitrix\Main\Type\DateTime($value['VALUE'], "Y-m-d H:i:s");
+				$time->toUserTime();
+
+				if ($format === 'SHORT')
+					$phpFormat = $time->convertFormatToPhp(FORMAT_DATE);
+				elseif ($format === 'FULL')
+					$phpFormat = $time->convertFormatToPhp(FORMAT_DATETIME);
+				elseif ($format)
+					$phpFormat = $time->convertFormatToPhp($format);
+				else
+					$phpFormat = $time->getFormat();
+
+				$value["VALUE"] = $time->format($phpFormat);
+				$value["VALUE"] = str_replace(" 00:00:00", "", $value["VALUE"]);
 			}
-			else
+			catch(Bitrix\Main\ObjectException $e)
 			{
-				$value["VALUE"] = CDatabase::FormatDate($value["VALUE"], "YYYY-MM-DD HH:MI:SS", CLang::GetDateFormat("FULL"));
 			}
-			$value["VALUE"] = str_replace(" 00:00:00", "", $value["VALUE"]);
 		}
+
 		return $value;
 	}
 
@@ -258,6 +276,4 @@ class CIBlockPropertyDateTime
 
 		return '';
 	}
-
 }
-?>

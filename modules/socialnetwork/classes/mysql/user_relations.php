@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.</body> </html>
- *
- *
+ * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/index.php
  * @author Bitrix
  */
 class CSocNetUserRelations extends CAllSocNetUserRelations
@@ -24,8 +22,6 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* <p>Метод создает новую связь между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
 	* первого пользователя,<br><b>SECOND_USER_ID</b> - код второго
 	* пользователя,<br><b>RELATION</b> - тип связи: SONET_RELATIONS_FRIEND - пользователи
@@ -36,11 +32,8 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* сообщение от инициатора связи,<br><b>INITIATED_BY</b> - флаг, кем
 	* инициирована связь: F - первым пользователем, S - вторым.
 	*
-	*
-	*
 	* @return int <p>Код связи в случае успешного выполнения или false в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -67,7 +60,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -152,11 +145,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* <p>Метод изменяет связь между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код связи.
-	*
-	*
 	*
 	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
 	* первого пользователя,<br><b>SECOND_USER_ID</b> - код второго
@@ -168,13 +157,11 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* сообщение от инициатора связи,<br><b>INITIATED_BY</b> - флаг, кем
 	* инициирована связь: F - первым пользователем, S - вторым.
 	*
-	*
-	*
 	* @return int <p>Код связи в случае успешного выполнения или false в случае
 	* ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -261,18 +248,12 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* <p>Метод возвращает список связей между пользователями в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
@@ -280,12 +261,8 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
@@ -293,15 +270,10 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* <b>DATE_UPDATE</b>, <b>MESSAGE</b>, <b>INITIATED_BY</b>. В массиве допустимы любые поля из
 	* списка полей.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() 
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
 	* удовлетворяющие условию выборки.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
@@ -309,7 +281,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getlist.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getlist.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
@@ -407,31 +379,47 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 			&& count($arGroupBy) == 0
 		)
 		{
-			$strSql =
-				"SELECT ".$arSqls["SELECT"]." ".
-				"FROM b_sonet_user_relations UR ".
-				"	".$arSqls["FROM"]." ";
-			if (strlen($arSqls["WHERE"]) > 0)
-			{
-				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
-			}
-
 			if (
-				$arSqls2 
+				$arSqls2
 				&& strlen($arSqls2["WHERE"]) > 0
 			)
 			{
+				$strSql = "SELECT COUNT(*) AS CNT FROM  (";
+
 				$strSql .=
+					"SELECT UR.ID ".
+					"FROM b_sonet_user_relations UR ".
+					"	".$arSqls["FROM"]." ".
+					"WHERE ".$arSqls["WHERE"]." ".
 					"UNION ".
-					"SELECT ".$arSqls["SELECT"]." ".
+					"SELECT UR.ID ".
 					"FROM b_sonet_user_relations UR ".
 					"	".$arSqls["FROM"]." ".
 					"WHERE ".$arSqls2["WHERE"]." ";
-			}
 
-			if (strlen($arSqls["GROUPBY"]) > 0)
+				if (strlen($arSqls["GROUPBY"]) > 0)
+				{
+					$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				}
+
+				$strSql .= ") AS RELS";
+			}
+			else
 			{
-				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				$strSql =
+					"SELECT ".$arSqls["SELECT"]." ".
+					"FROM b_sonet_user_relations UR ".
+					"	".$arSqls["FROM"]." ";
+
+				if (strlen($arSqls["WHERE"]) > 0)
+				{
+					$strSql .= "WHERE ".$arSqls["WHERE"]." ";
+				}
+
+				if (strlen($arSqls["GROUPBY"]) > 0)
+				{
+					$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
+				}
 			}
 
 			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
@@ -473,7 +461,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 			{
 				$strSql .= "ORDER BY ".$arSqls2["ORDERBY"]." ";
 			}
-			$strSql .= ") ";			
+			$strSql .= ") ";
 		}
 
 		if (strlen($arSqls["GROUPBY"]) > 0)
@@ -531,20 +519,12 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* <p>Метод возвращает список друзей, упорядоченный по дню рождения.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя, друзья которого выбираются.
-	*
-	*
 	*
 	* @param int $number = 5 Количество возвращаемых записей.
 	*
-	*
-	*
 	* @param int $online_interval = 120 Параметр времени опроса сервера в сек. Необязательный параметр.
 	* По умолчанию равен 120.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект типа CDBResult, содержащий записи с
 	* полями:<br><b>ID</b> - код пользователя,<br><b>NAME</b> - имя
@@ -553,14 +533,13 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* E-Mail пользователя,<br><b>PERSONAL_PHOTO</b> - код фотографии
 	* пользователя,<br><b>PB</b> - день рождения.</p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
 	* </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getlistbirthday.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getlistbirthday.php
 	* @author Bitrix
 	*/
 	public static 	function GetListBirthday($userID, $number = 5, $online_interval = 120)

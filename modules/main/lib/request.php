@@ -84,4 +84,15 @@ abstract class Request
 			|| (defined("BX_PUBLIC_TOOLS") && BX_PUBLIC_TOOLS === true)
 		);
 	}
+
+	/**
+	 * Returns true if current request is AJAX
+	 * @return bool
+	 */
+	public function isAjaxRequest()
+	{
+		return
+			$this->server->get("HTTP_BX_AJAX") !== null ||
+			$this->server->get("HTTP_X_REQUESTED_WITH") === "XMLHttpRequest";
+	}
 }

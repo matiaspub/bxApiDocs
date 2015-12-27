@@ -34,9 +34,8 @@ class TimeSigner
 	public function sign($value, $time, $salt = null)
 	{
 		$timestamp = $this->getTimeStamp($time);
-
-		$value = $this->pack(array($value, $timestamp));
-		return parent::sign($value, $salt);
+		$signature = $this->getSignature($value, $timestamp, $salt);
+		return $this->pack(array($value, $timestamp, $signature));
 	}
 
 
@@ -99,6 +98,47 @@ class TimeSigner
 	}
 
 	/**
+	 * Return message signature
+	 *
+	 * @param string $value Message.
+	 * @param int $timestamp Expire timestamp.
+	 * @param null $salt Salt (if needed).
+	 * @return string
+	 * @throws ArgumentTypeException
+	 */
+	public function getSignature($value, $timestamp, $salt = null)
+	{
+		if (!is_string($value))
+			throw new ArgumentTypeException('value', 'string');
+
+		$timedValue = $this->pack(array($value, $timestamp));
+		return parent::getSignature($timedValue, $salt);
+	}
+
+	/**
+	 * Simply validation of message signature
+	 *
+	 * @param string $value Message.
+	 * @param int $timestamp Expire timestamp.
+	 * @param string $signature Signature.
+	 * @param string|null $salt Salt, if used while signing.
+	 * @return bool True if OK, otherwise - false.
+	 */
+	public function validate($value, $timestamp, $signature, $salt = null)
+	{
+		try
+		{
+			$signedValue = $this->pack(array($value, $timestamp, $signature));
+			$this->unsign($signedValue, $salt);
+			return true;
+		}
+		catch(BadSignatureException $e)
+		{
+			return false;
+		}
+	}
+
+	/**
 	 * Return timestamp parsed from English textual datetime description
 	 *
 	 * @param string|int $time Timestamp or datetime description (presented in format accepted by strtotime).
@@ -111,7 +151,7 @@ class TimeSigner
 		if (!is_string($time) && !is_int($time))
 			throw new ArgumentTypeException('time');
 
-		if (is_string($time))
+		if (is_string($time) && !is_numeric($time))
 		{
 			$timestamp = strtotime($time);
 			if (!$timestamp)

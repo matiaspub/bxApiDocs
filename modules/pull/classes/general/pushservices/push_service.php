@@ -59,6 +59,21 @@ abstract class CPushService
 						$message->setCustomProperty('params', $params);
 					}
 
+					if ($messages[$mess]["ACTION"])
+					{
+						$message->setCustomProperty('action', $messages[$mess]["ACTION"] );
+					}
+
+					if ($messages[$mess]["JSEVENT"])
+					{
+						$message->setCustomProperty('jsevent', $messages[$mess]["JSEVENT"] );
+					}
+
+					if ($messages[$mess]["CATEGORY"])
+					{
+						$message->setCategory($messages[$mess]["CATEGORY"]);
+					}
+
 					$message->setCustomProperty('target', md5($messages[$mess]["USER_ID"] . CMain::GetServerUniqID()));
 
 					if(array_key_exists("EXPIRY", $messages[$mess]))

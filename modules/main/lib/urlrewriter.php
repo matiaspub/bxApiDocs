@@ -104,7 +104,7 @@ class UrlRewriter
 					$isMatchedTmp = ($arRule["CONDITION"] == $arFilter["CONDITION"]);
 				elseif ($keyFilter == 'ID')
 					$isMatchedTmp = ($arRule["ID"] == $arFilter["ID"]);
-				elseif ($keyFilter == 'CONDITION')
+				elseif ($keyFilter == 'PATH')
 					$isMatchedTmp = ($arRule["PATH"] == $arFilter["PATH"]);
 				else
 					throw new ArgumentException("arFilter");
@@ -440,13 +440,29 @@ class UrlRewriter
 
 			if ($sef)
 			{
-				$arFields = array(
-					"CONDITION" => "#^".$arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"]."#",
-					"RULE" => "",
-					"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
-					"PATH" => $path,
-					"SORT" => self::DEFAULT_SORT,
-				);
+				if (array_key_exists("SEF_RULE", $arComponents[$i]["DATA"]["PARAMS"]))
+				{
+					$ruleMaker = new UrlRewriterRuleMaker;
+					$ruleMaker->process($arComponents[$i]["DATA"]["PARAMS"]["SEF_RULE"]);
+
+					$arFields = array(
+						"CONDITION" => $ruleMaker->getCondition(),
+						"RULE" => $ruleMaker->getRule(),
+						"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
+						"PATH" => $path,
+						"SORT" => self::DEFAULT_SORT,
+					);
+				}
+				else
+				{
+					$arFields = array(
+						"CONDITION" => "#^".$arComponents[$i]["DATA"]["PARAMS"]["SEF_FOLDER"]."#",
+						"RULE" => "",
+						"ID" => $arComponents[$i]["DATA"]["COMPONENT_NAME"],
+						"PATH" => $path,
+						"SORT" => self::DEFAULT_SORT,
+					);
+				}
 
 				UrlRewriter::add($siteId, $arFields);
 			}
@@ -498,5 +514,81 @@ class UrlRewriter
 				return true;
 
 		return false;
+	}
+}
+
+/**
+ * Class UrlRewriterRuleMaker
+ *
+ * Helper used for sef rules creation.
+ *
+ * @package Bitrix\Main
+ */
+class UrlRewriterRuleMaker
+{
+	protected $condition = "";
+	protected $variables = array();
+	protected $rule = "";
+
+	/**
+	 * @param string $sefRule SEF_RULE component parameter value.
+	 *
+	 * @return void
+	 */
+	public function process($sefRule)
+	{
+		$this->rule = "";
+		$this->variables = array();
+		$this->condition = "#^".preg_replace_callback("/(#[a-zA-Z0-9_]+#)/", array($this, "_callback"), $sefRule)."\\??(.*)#";
+		$i = 0;
+		foreach ($this->variables as $variableName)
+		{
+			$i++;
+			if ($this->rule)
+				$this->rule .= "&";
+			$this->rule .= $variableName."=\$".$i;
+		}
+		$i++;
+		$this->rule .= "&\$".$i;
+	}
+
+	/**
+	 * Returns CONDITION field of the sef rule based on what was processed.
+	 *
+	 * @return string
+	 */
+	public function getCondition()
+	{
+		return $this->condition;
+	}
+
+	/**
+	 * Returns RULE field of the sef rule based on what was processed.
+	 *
+	 * @return string
+	 */
+	public function getRule()
+	{
+		return $this->rule;
+	}
+
+	/**
+	 * Internal method used for preg_replace processing.
+	 *
+	 * @param array $match match array.
+	 *
+	 * @return string
+	 */
+	protected function _callback(array $match)
+	{
+		$this->variables[] = trim($match[0], "#");
+		if (substr($match[0], -6) == "_PATH#")
+		{
+			return "(.+?)";
+		}
+		else
+		{
+			return "([^/]+?)";
+		}
 	}
 }

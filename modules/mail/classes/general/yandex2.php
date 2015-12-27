@@ -22,7 +22,7 @@ class CMailYandex2
 	 * not_allowed - этому администратору запрещена такая операция с данным доменом, или этот администратор не является администратором данного домена
 	 * blocked - этот домен заблокирован
 	 */
-public static function addDomain($token, $domain, &$error)
+public static 	public static function addDomain($token, $domain, &$error)
 	{
 		$result = self::post('https://pddimp.yandex.ru/api2/admin/domain/register', array(
 			'token'  => $token,
@@ -49,7 +49,7 @@ public static function addDomain($token, $domain, &$error)
 	 * not_allowed - этому администратору запрещена такая операция с данным доменом, или этот администратор не является администратором данного домена
 	 * blocked - этот домен заблокирован
 	 */
-	public static function getDomainStatus($token, $domain, &$error)
+	ppublic static ublic static function getDomainStatus($token, $domain, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/domain/details', array(
 			'token'  => $token,
@@ -76,7 +76,7 @@ public static function addDomain($token, $domain, &$error)
 	 * not_allowed - этому администратору запрещена такая операция с данным доменом, или этот администратор не является администратором данного домена
 	 * blocked - этот домен заблокирован
 	 */
-public static function checkDomainStatus($token, $domain, &$error)
+public static 	public static function checkDomainStatus($token, $domain, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/domain/registration_status', array(
 			'token'  => $token,
@@ -104,7 +104,7 @@ public static function checkDomainStatus($token, $domain, &$error)
 	 * blocked - этот домен заблокирован
 	 * not_master_admin - эта операция разрешена только основному администратору домена
 	 */
-public static function deleteDomain($token, $domain, &$error)
+public static 	public static function deleteDomain($token, $domain, &$error)
 	{
 		$result = self::post('https://pddimp.yandex.ru/api2/domain/delete', array(
 			'token'  => $token,
@@ -133,8 +133,11 @@ public static function deleteDomain($token, $domain, &$error)
 	 * no_uid_or_login - не передан ни login, ни uid
 	 * account_not_found - аккаунт не найден
 	 */
-public static function checkUser($token, $domain, $login, &$error)
+public static 	public static function checkUser($token, $domain, $login, &$error)
 	{
+		if (in_array(strtolower($login), array('abuse', 'postmaster')))
+			return 'exists';
+
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/email/details', array(
 			'token'  => $token,
 			'domain' => $domain,
@@ -174,7 +177,7 @@ public static function checkUser($token, $domain, $login, &$error)
 	 * passwd-toolong - пароль длиннее 20 символов
 	 * badpasswd - пароль содержит запрещенные символы
 	 */
-public static function addUser($token, $domain, $login, $password, &$error)
+public static 	public static function addUser($token, $domain, $login, $password, &$error)
 	{
 		$result = self::post('https://pddimp.yandex.ru/api2/admin/email/add', array(
 			'token'    => $token,
@@ -206,7 +209,7 @@ public static function addUser($token, $domain, $login, $password, &$error)
 	 * user_blocked - аккаунт заблокирован, обратитесь в службу поддержки
 	 * account_not_found - аккаунт не найден
 	 */
-	public static function getOAuthToken($token, $domain, $login, &$error)
+	public static public static function getOAuthToken($token, $domain, $login, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/email/get_oauth_token', array(
 			'token'  => $token,
@@ -221,7 +224,7 @@ public static function addUser($token, $domain, $login, $password, &$error)
 		return false;
 	}
 
-	public static function passport($country, $oauthToken, $errorUrl)
+	public static public static function passport($country, $oauthToken, $errorUrl)
 	{
 		switch ($country)
 		{
@@ -246,7 +249,7 @@ public static function addUser($token, $domain, $login, $password, &$error)
 	 *
 	 *
 	 */
-public static function getMailInfo($token, $domain, $login, &$error)
+public static 	public static function getMailInfo($token, $domain, $login, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/email/counters', array(
 			'token'  => $token,
@@ -277,7 +280,7 @@ public static function getMailInfo($token, $domain, $login, &$error)
 	 * user_blocked - аккаунт заблокирован, обратитесь в службу поддержки
 	 * account_not_found - аккаунт не найден
 	 */
-public static function deleteUser($token, $domain, $login, &$error)
+public static 	public static function deleteUser($token, $domain, $login, &$error)
 	{
 		$result = self::post('https://pddimp.yandex.ru/api2/admin/email/del', array(
 			'token'    => $token,
@@ -311,7 +314,7 @@ public static function deleteUser($token, $domain, $login, &$error)
 	 * user_blocked - аккаунт заблокирован, обратитесь в службу поддержки
 	 * account_not_found - аккаунт не найден
 	 */
-public static function editUser($token, $domain, $login, $data, &$error)
+public static 	public static function editUser($token, $domain, $login, $data, &$error)
 	{
 		$postData = array(
 			'token'  => $token,
@@ -362,7 +365,7 @@ public static function editUser($token, $domain, $login, $data, &$error)
 	 * not_allowed - этому администратору запрещена такая операция с данным доменом, или этот администратор не является администратором данного домена
 	 * blocked - этот домен заблокирован
 	 */
-public static function getDomainUsers($token, $domain, $per_page = 30, $page = 0, &$error)
+public static 	public static function getDomainUsers($token, $domain, $per_page = 30, $page = 0, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/email/list', array(
 			'token'   => $token,
@@ -378,7 +381,7 @@ public static function getDomainUsers($token, $domain, $per_page = 30, $page = 0
 		return false;
 	}
 
-public static function checkLogo($token, $domain, &$error)
+public static 	public static function checkLogo($token, $domain, &$error)
 	{
 		$result = self::get('https://pddimp.yandex.ru/api2/admin/domain/logo/check', array(
 			'token'  => $token,
@@ -392,7 +395,7 @@ public static function checkLogo($token, $domain, &$error)
 		return false;
 	}
 
-public static function setLogo($token, $domain, $file, &$error)
+public static 	public static function setLogo($token, $domain, $file, &$error)
 	{
 		$http = new \Bitrix\Main\Web\HttpClient();
 
@@ -428,7 +431,7 @@ public static function setLogo($token, $domain, $file, &$error)
 		return false;
 	}
 
-public static function setCountry($token, $domain, $country, &$error)
+public static 	public static function setCountry($token, $domain, $country, &$error)
 	{
 		$result = self::post('https://pddimp.yandex.ru/api2/admin/domain/settings/set_country', array(
 			'token'   => $token,
@@ -443,7 +446,7 @@ public static function setCountry($token, $domain, $country, &$error)
 		return false;
 	}
 
-private static function post($url, $data)
+public static 	private static function post($url, $data)
 	{
 		$http = new \Bitrix\Main\Web\HttpClient();
 
@@ -453,7 +456,7 @@ private static function post($url, $data)
 		return $result;
 	}
 
-private static function get($url, $data)
+public static 	private static function get($url, $data)
 	{
 		$http = new \Bitrix\Main\Web\HttpClient();
 
@@ -463,7 +466,7 @@ private static function get($url, $data)
 		return $result;
 	}
 
-private static function setError($result, &$error)
+public static 	private static function setError($result, &$error)
 	{
 		$error = empty($result['error'])
 			? 'unknown'

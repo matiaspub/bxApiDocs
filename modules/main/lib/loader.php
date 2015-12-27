@@ -146,8 +146,12 @@ final class Loader
 		if (!is_string($moduleName) || $moduleName == "")
 			throw new LoaderException("Empty module name");
 
-		unset(static::$arLoadedModules[$moduleName]);
-		unset(static::$arLoadedModulesHolders[$moduleName]);
+		if($moduleName !== "main")
+		{
+			unset(static::$arLoadedModules[$moduleName]);
+			unset(static::$arLoadedModulesHolders[$moduleName]);
+		}
+
 		if (isset(static::$arSharewareModules[$moduleName]))
 			unset(static::$arSharewareModules[$moduleName]);
 	}

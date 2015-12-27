@@ -143,24 +143,27 @@ abstract class CListField
 		$arStore = false;
 		switch($this->_field_id)
 		{
-		case "DETAIL_TEXT":
-		case "PREVIEW_TEXT":
-			if(preg_match('/\s*(\d+)\s*(px|%|)/', $arSettings["WIDTH"], $match) && ($match[1] > 0))
-				$width = $match[1].$match[2];
-			else
-				$width = "40";
+			case "PREVIEW_TEXT":
+				if(preg_match('/\s*(\d+)\s*(px|%|)/', $arSettings["WIDTH"], $match) && ($match[1] > 0))
+					$width = $match[1].$match[2];
+				else
+					$width = "40";
 
-			if(preg_match('/\s*(\d+)\s*(px|%|)/', $arSettings["HEIGHT"], $match) && ($match[1] > 0))
-				$height = $match[1].$match[2];
-			else
-				$height = "3";
+				if(preg_match('/\s*(\d+)\s*(px|%|)/', $arSettings["HEIGHT"], $match) && ($match[1] > 0))
+					$height = $match[1].$match[2];
+				else
+					$height = "3";
 
-			$arStore = array(
-				"USE_EDITOR" => $arSettings["USE_EDITOR"]=="Y"? "Y": "N",
-				"WIDTH" => $width,
-				"HEIGHT" => $height,
-			);
-			break;
+				$arStore = array(
+					"USE_EDITOR" => $arSettings["USE_EDITOR"]=="Y"? "Y": "N",
+					"WIDTH" => $width,
+					"HEIGHT" => $height,
+					"SHOW_ADD_FORM" => $arSettings["SHOW_ADD_FORM"],
+					"SHOW_EDIT_FORM" => $arSettings["SHOW_EDIT_FORM"]
+				);
+				break;
+			default:
+				$arStore = $arSettings;
 		}
 
 		$arFields = array();
@@ -332,6 +335,25 @@ class CListPropertyField extends CListField
 	{
 		parent::__construct($iblock_id, $field_id, $label, $sort);
 
+		if(preg_match("/^PROPERTY_(\\d+)$/", $field_id, $match))
+		{
+			$this->_property = $this->getPropertyArrayFromCache($match[1]);
+		}
+
+		if ($this->_property)
+		{
+			if($this->_property["USER_TYPE"])
+				$this->_type = CListFieldTypeList::GetByID($this->_property["PROPERTY_TYPE"].":".$this->_property["USER_TYPE"]);
+			else
+				$this->_type = CListFieldTypeList::GetByID($this->_property["PROPERTY_TYPE"]);
+		}
+
+		if(!is_object($this->_type))
+			$this->_type = CListFieldTypeList::GetByID("S");
+	}
+
+	private function getPropertyArrayFromCache($id)
+	{
 		//Cache iblock metadata in order to reduce queries
 		if(!array_key_exists($this->_iblock_id, self::$prop_cache))
 		{
@@ -345,22 +367,12 @@ class CListPropertyField extends CListField
 			while($arProperty = $rsProperties->Fetch())
 				self::$prop_cache[$this->_iblock_id][$arProperty["ID"]] = $arProperty;
 		}
-		//init from cache
-		if(
-			preg_match("/^PROPERTY_(\\d+)$/", $field_id, $match)
-			&& array_key_exists($match[1], self::$prop_cache[$this->_iblock_id])
-		)
-		{
-			$this->_property = self::$prop_cache[$this->_iblock_id][$match[1]];
+		return self::$prop_cache[$this->_iblock_id][$id];
+	}
 
-			if($this->_property["USER_TYPE"])
-				$this->_type = CListFieldTypeList::GetByID($this->_property["PROPERTY_TYPE"].":".$this->_property["USER_TYPE"]);
-			else
-				$this->_type = CListFieldTypeList::GetByID($this->_property["PROPERTY_TYPE"]);
-		}
-
-		if(!is_object($this->_type))
-			$this->_type = CListFieldTypeList::GetByID("S");
+	private static function resetPropertyArrayCache()
+	{
+		self::$prop_cache = array();
 	}
 
 	public function IsRequired()
@@ -415,6 +427,7 @@ class CListPropertyField extends CListField
 				"ROW_COUNT" =>  $this->_property["ROW_COUNT"],
 				"COL_COUNT" =>  $this->_property["COL_COUNT"],
 				"USER_TYPE_SETTINGS" => $this->_property["USER_TYPE_SETTINGS"],
+				"SETTINGS" => $this->GetSettings(),
 			);
 		}
 		else
@@ -429,7 +442,10 @@ class CListPropertyField extends CListField
 		{
 			$obProperty = new CIBlockProperty;
 			if($obProperty->Delete($this->_property["ID"]))
+			{
+				$this->resetPropertyArrayCache();
 				$this->_property = false;
+			}
 		}
 
 		parent::Delete();
@@ -463,6 +479,8 @@ class CListPropertyField extends CListField
 			$obProperty = new CIBlockProperty;
 			if($obProperty->Update($this->_property["ID"], $this->_property))
 			{
+				self::resetPropertyArrayCache();
+
 				if($this->_property["PROPERTY_TYPE"] == "L" && is_array($arFields["LIST"]))
 					CList::UpdatePropertyList($this->_property["ID"], $arFields["LIST"]);
 
@@ -491,11 +509,14 @@ class CListPropertyField extends CListField
 					$arFields["PROPERTY_TYPE"] = $arFields["TYPE"];
 				$arFields["MULTIPLE_CNT"] = 1;
 				$arFields["CHECK_PERMISSIONS"] = "N";
+				$arFields["CODE"] = $arFields["CODE"] ? $arFields["CODE"] : CLists::generateMnemonicCode();
 
 				$obProperty = new CIBlockProperty;
 				$res = $obProperty->Add($arFields);
 				if($res)
 				{
+					self::resetPropertyArrayCache();
+
 					if($arFields["PROPERTY_TYPE"] == "L" && is_array($arFields["LIST"]))
 						CList::UpdatePropertyList($res, $arFields["LIST"]);
 

@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. </body> </html>
- *
- *
+ * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. 
  *
  *
  * @return mixed 
@@ -19,14 +17,11 @@ class _CIBElement
 
 	
 	/**
-	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. </p>
-	*
-	*
+	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. Метод динамичный.</p>
 	*
 	*
 	* @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
 	* информационного блока</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -39,7 +34,6 @@ class _CIBElement
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -61,11 +55,14 @@ class _CIBElement
 		return $this->fields;
 	}
 
+	/**
+	 * @param bool|array $arOrder
+	 * @param array $arFilter
+	 * @return array
+	 */
 	
 	/**
-	* <p>Метод возвращает значения свойств текущего элемента информационного блока.</p> <p><b>Примечание:</b> данный метод не работает, если в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a> в <b>arSelectFields</b> не указаны <i>ID</i> и <i>IBLOCK_ID</i>, а в <b>arFilter</b> не задан <i>IBLOCK_ID</i>. Должно быть, например, так:</p> <pre class="syntax"> $dbEl = CIBlockElement::GetList(Array(), Array("IBLOCK_TYPE"=&gt;"catalog", "IBLOCK_ID"=&gt;11), false, false, array("ID" , "IBLOCK_ID", ......)); </pre>
-	*
-	*
+	* <p>Метод возвращает значения свойств текущего элемента информационного блока. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> данный метод не работает, если в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a> в <b>arSelectFields</b> не указаны <i>ID</i> и <i>IBLOCK_ID</i>, а в <b>arFilter</b> не задан <i>IBLOCK_ID</i>. Должно быть, например, так: <pre class="syntax"> $dbEl = CIBlockElement::GetList( Array(), Array("IBLOCK_TYPE"=&gt;"catalog", "IBLOCK_ID"=&gt;11), false, false, array("ID" , "IBLOCK_ID", ......) ); </pre> </div>
 	*
 	*
 	* @param arOrde $r = false Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> -
@@ -77,8 +74,6 @@ class _CIBElement
 	* варианта списочного свойства; </li> </ul> <i>order</i> - порядок сортировки,
 	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
 	* <b>desc</b> - по убыванию; </li> </ul>
-	*
-	*
 	*
 	* @param arFilte $r = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
 	* "фильтруемое поле" может принимать значения: <br>     <i>NAME</i> -
@@ -92,12 +87,9 @@ class _CIBElement
 	* непустые значения и без значений. <br> Не обязательный параметр, по
 	* умолчанию равен array().
 	*
-	*
-	*
 	* @return array <li>в качестве индексов массива "Символьный код свойства" (задается
 	* в настройках информационного блока) или, если символьный код
 	* свойства не указан, то уникальный числовой ID свойства. </li>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <br><br>
@@ -107,13 +99,13 @@ class _CIBElement
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/getproperties.php
 	* @author Bitrix
 	*/
-	public function GetProperties($arOrder = false, $arFilter=Array())
+	public function GetProperties($arOrder = false, $arFilter = array())
 	{
-		if($arOrder===false)
-			$arOrder = Array("sort"=>"asc","id"=>"asc","enum_sort"=>"asc","value_id"=>"asc");
-		if(count($arFilter)==0 && is_array($this->props))
+		if($arOrder === false)
+			$arOrder = array("sort"=>"asc","id"=>"asc","enum_sort"=>"asc","value_id"=>"asc");
+		if (count($arFilter)==0 && is_array($this->props))
 		{
-			$arAllProps = Array();
+			$arAllProps = array();
 			foreach($this->props as $arProp)
 			{
 				if(strlen(trim($arProp["CODE"]))>0)
@@ -248,10 +240,13 @@ class _CIBElement
 			return $arAllProps;
 		}
 
-		if(array_key_exists("ID", $arFilter) && !is_numeric(substr($arFilter["ID"], 0, 1)))
+		if(array_key_exists("ID", $arFilter) && is_string($arFilter['ID']))
 		{
-			$arFilter["CODE"] = $arFilter["ID"];
-			unset($arFilter["ID"]);
+			if (!is_numeric(substr($arFilter["ID"], 0, 1)))
+			{
+				$arFilter["CODE"] = $arFilter["ID"];
+				unset($arFilter["ID"]);
+			}
 		}
 
 		if(!array_key_exists("ACTIVE", $arFilter))
@@ -385,22 +380,17 @@ class _CIBElement
 
 	
 	/**
-	* <p>Метод возвращает параметры свойства <i>ID</i> и его значения для текущего элемента информационного блока.</p>
-	*
-	*
+	* <p>Метод возвращает параметры свойства <i>ID</i> и его значения для текущего элемента информационного блока. Метод динамичный.</p>
 	*
 	*
 	* @param mixed $ID  Числовой или символьный код свойства.
 	*
-	*
-	*
 	* @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">полей свойства</a>
-	* <br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i><p><b>Примечание:</b>
-	* если <b>GetProperty</b> применяется к результату работы <a
+	* <br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i><br><p></p><div class="note">
+	* <b>Примечание:</b> если <b>GetProperty</b> применяется к результату работы <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>, то в
 	* <b>arSelectFields</b> необходимо <b>обязательно</b> указать <i>IBLOCK_ID</i>, иначе
-	* результат будет пустым.</p>
-	*
+	* результат будет пустым.</div>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -468,7 +458,6 @@ class _CIBElement
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getproperty.php">GetProperty()</a> </li> <li> <a
@@ -483,26 +472,22 @@ class _CIBElement
 	*/
 	public function GetProperty($ID)
 	{
-		$res = $this->GetProperties(Array(), Array("ID"=>$ID));
+		$res = $this->GetProperties(array(), array("ID"=>$ID));
 		list(, $res) = each($res);
 		return $res;
 	}
 
 	
 	/**
-	* <p>Возвращает группы, которым принадлежит текущий элемент и значения свойств типа "привязка к разделам" заданные для данного элемента. <br></p>
-	*
-	*
+	* <p>Возвращает группы, которым принадлежит текущий элемент и значения свойств типа "привязка к разделам" заданные для данного элемента. Метод динамичный. <br></p>
 	*
 	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($obRes = $res-&gt;GetNextElement())<br>{<br>  $ar_res = $obRes-&gt;GetGroups();<br>  print_r($ar_res);<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

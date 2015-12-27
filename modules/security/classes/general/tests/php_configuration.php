@@ -68,6 +68,15 @@ class CSecurityPhpConfigurationTest
 			"base_message_key" => "SECURITY_SITE_CHECKER_DISPLAY_ERRORS",
 			"critical" => CSecurityCriticalLevel::LOW
 		),
+		"requestOrder" => array(
+			"method" => "checkRequestOrder"
+		),
+		"mailAddHeader" => array(
+			"method" => "isPhpConfVarOff",
+			"params" => array("mail.add_x_header"),
+			"base_message_key" => "SECURITY_SITE_CHECKER_MAIL_ADD_HEADER",
+			"critical" => CSecurityCriticalLevel::LOW
+		),
 	);
 
 	static public function __construct()
@@ -113,6 +122,25 @@ class CSecurityPhpConfigurationTest
 		}
 		elseif ($entropyLength < 128)
 		{
+			return self::STATUS_FAILED;
+		}
+
+		return self::STATUS_PASSED;
+	}
+
+	protected function checkRequestOrder()
+	{
+		$order = ini_get('request_order');
+		if (!$order || !in_array($order, array('GP', 'PG'), true))
+		{
+			$this->addUnformattedDetailError(
+					'SECURITY_SITE_CHECKER_PHP_REQUEST_ORDER',
+					CSecurityCriticalLevel::MIDDLE,
+					getMessage('SECURITY_SITE_CHECKER_PHP_REQUEST_ORDER_ADDITIONAL', array(
+						'#CURRENT#' => $order,
+						'#RECOMMENDED#' => 'GP'
+					))
+			);
 			return self::STATUS_FAILED;
 		}
 

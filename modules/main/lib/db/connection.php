@@ -71,10 +71,7 @@ abstract class Connection extends Data\Connection
 		$this->login = $configuration['login'];
 		$this->password = $configuration['password'];
 		$this->initCommand = isset($configuration['initCommand']) ? $configuration['initCommand'] : "";
-
 		$this->options = intval($configuration['options']);
-		if ($this->options < 0)
-			$this->options = self::PERSISTENT | self::DEFERRED;
 	}
 
 	/**
@@ -718,6 +715,17 @@ abstract class Connection extends Data\Connection
 		$tableFields = $this->getTableFields($tableName);
 
 		return (isset($tableFields[$columnName])? $tableFields[$columnName] : null);
+	}
+
+	/**
+	 * Truncates all table data
+	 *
+	 * @param string $tableName Name of the table.
+	 * @return Result
+	 */
+	public function truncateTable($tableName)
+	{
+		return $this->query('TRUNCATE TABLE '.$this->getSqlHelper()->quote($tableName));
 	}
 
 	/**

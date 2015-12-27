@@ -107,6 +107,7 @@ class SectionTable extends Entity\DataManager
 			'ACTIVE' => array(
 				'data_type' => 'boolean',
 				'values' => array('N', 'Y'),
+				'default_value' => 'Y',
 				'title' => Loc::getMessage('IBLOCK_SECTION_ENTITY_ACTIVE_FIELD'),
 			),
 			'GLOBAL_ACTIVE' => array(
@@ -148,6 +149,7 @@ class SectionTable extends Entity\DataManager
 				'data_type' => 'enum',
 				'required' => true,
 				'values' => array('text', 'html'),
+				'default_value' => 'text',
 				'title' => Loc::getMessage('IBLOCK_SECTION_ENTITY_DESCRIPTION_TYPE_FIELD'),
 			),
 			'SEARCHABLE_CONTENT' => array(

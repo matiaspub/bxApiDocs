@@ -528,7 +528,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		$userId = CCalendar::GetCurUserId();
 
 		$arHost = CCalendar::GetUser($userId, true);
-		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost);
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatarSrc($arHost);
 		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
 		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
 		$Params['host'] = $arHost;
@@ -560,25 +560,28 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 			);
 
 			$userIds = array();
-			foreach ($event['~ATTENDEES'] as $i => $att)
+			if (is_array($event['~ATTENDEES']) && count($event['~ATTENDEES']) > 0)
 			{
-				$userIds[] = $att["USER_ID"];
-				if ($userId == $att["USER_ID"])
-					$curUserStatus = $att['STATUS'];
-				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att);
-				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
-				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
+				foreach ($event['~ATTENDEES'] as $i => $att)
+				{
+					$userIds[] = $att["USER_ID"];
+					if ($userId == $att["USER_ID"])
+						$curUserStatus = $att['STATUS'];
+					$att['AVATAR_SRC'] = CCalendar::GetUserAvatarSrc($att);
+					$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
+					$attendees[strtolower($att['STATUS'])]['users'][] = $att;
+				}
+
+				$acc = CCalendar::CheckUsersAccessibility(array(
+					'users' => $userIds,
+					'from' => $event['DT_FROM'],
+					'to' => $event['DT_TO'],
+					'eventId' => $event['ID']
+				));
+
+				foreach($event['~ATTENDEES'] as $i => $att)
+					$event['~ATTENDEES'][$i]['ACC'] = $acc[$att['USER_ID']];
 			}
-
-			$acc = CCalendar::CheckUsersAccessibility(array(
-				'users' => $userIds,
-				'from' => $event['DT_FROM'],
-				'to' => $event['DT_TO'],
-				'eventId' => $event['ID']
-			));
-
-			foreach($event['~ATTENDEES'] as $i => $att)
-				$event['~ATTENDEES'][$i]['ACC'] = $acc[$att['USER_ID']];
 		}
 
 		if ($event['IS_MEETING'] && empty($event['ATTENDEES_CODES']))
@@ -586,7 +589,6 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 
 		$Params['event'] = $event;
 		$Params['UF'] = $UF;
-		$fileRes = CCalendarSceleton::__GetFileUploadHtml($Params);
 
 		$arTabs = array(
 			array('name' => GetMessage('EC_EDEV_EVENT'), 'title' => GetMessage('EC_EDEV_EVENT_TITLE'), 'id' => $id."ed-tab-0", 'active' => true),
@@ -599,26 +601,12 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 ?>
 
 <script>
-	BX.message({
-		EC_MPF_IMAGE: '<?=GetMessageJS("EC_MPF_IMAGE_TITLE")?>',
-		EC_MPF_FILE: '<?=GetMessageJS("EC_MPF_INSERT_FILE")?>',
-		EC_MPF_FILE_INSERT_IN_TEXT: '<?=GetMessageJS("EC_MPF_FILE_INSERT_IN_TEXT")?>',
-		EC_MPF_FILE_IN_TEXT: '<?=GetMessageJS("EC_MPF_FILE_IN_TEXT")?>',
-
-		EC_MPF_IMAGE_LINK: '<?=GetMessageJS("EC_MPF_IMAGE_LINK")?>',
-		EC_FPF_VIDEO: '<?=GetMessageJS("EC_FPF_VIDEO")?>',
-		EC_BPC_VIDEO_P: '<?= GetMessageJS("EC_BPC_VIDEO_P")?>',
-		EC_BPC_VIDEO_PATH_EXAMPLE: '<?= GetMessageJS("EC_BPC_VIDEO_PATH_EXAMPLE")?>',
-		EC_MPF_VIDEO_SIZE: '<?=GetMessageJS("EC_MPF_VIDEO_SIZE")?>'
-	});
-
 	window.__ATTENDEES_ACC = null;
 		<?if($event['IS_MEETING'] && is_array($event['~ATTENDEES'])):?>
 	window.__ATTENDEES_ACC = <?= CUtil::PhpToJSObject($event['~ATTENDEES'])?>;
 	<?endif;?>
 </script>
-
-<form enctype="multipart/form-data" method="POST" name="event_edit_form">
+<form enctype="multipart/form-data" method="POST" name="event_edit_form" id="<?=$id?>_form">
 <input type="hidden" value="Y" name="skip_unescape"/>
 <input id="event-id<?=$id?>" type="hidden" value="0" name="id"/>
 <input id="event-month<?=$id?>" type="hidden" value="0" name="month"/>
@@ -718,9 +706,62 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 
 		<?/* ####### TAB 1 : DESCRIPTION - LHE ####### */?>
 		<div id="<?=$id?>ed-tab-1-cont" class="bxec-d-cont-div bxec-d-cont-div-lhe">
-			<div class="bxec-lhe">
-				<?CCalendarSceleton::__ShowEditorHtml($Params);?>
-			</div>
+			<!-- Description + files -->
+			<?
+			$APPLICATION->IncludeComponent(
+				"bitrix:main.post.form",
+				"",
+				array(
+					"FORM_ID" => "event_edit_form",
+					"SHOW_MORE" => "Y",
+					"PARSER" => Array(
+						"Bold", "Italic", "Underline", "Strike", "ForeColor",
+						"FontList", "FontSizeList", "RemoveFormat", "Quote",
+						"Code", "CreateLink",
+						"Image", "UploadFile",
+						"InputVideo",
+						"Table", "Justify", "InsertOrderedList",
+						"InsertUnorderedList",
+						"Source", "MentionUser", "Spoiler"
+					),
+					"BUTTONS" => Array(
+						"UploadFile",
+						"CreateLink",
+						"InputVideo",
+						"Quote",
+						//"MentionUser"
+					),
+					"TEXT" => Array(
+						"ID" => $id.'_edit_ed_desc',
+						"NAME" => "desc",
+						"VALUE" => $Params['event']['DESCRIPTION'],
+						"HEIGHT" => "280px"
+					),
+					"UPLOAD_WEBDAV_ELEMENT" => $Params['UF']['UF_WEBDAV_CAL_EVENT'],
+					"UPLOAD_FILE_PARAMS" => array("width" => 400, "height" => 400),
+					"FILES" => Array(
+						"VALUE" => array(),
+						"DEL_LINK" => '',
+						"SHOW" => "N"
+					),
+					"SMILES" => Array("VALUE" => array()),
+					"LHE" => array(
+
+						"id" => $Params['id'].'_event_editor',
+						"documentCSS" => "",
+						"jsObjName" => $Params['id'].'_event_editor',
+						"fontFamily" => "'Helvetica Neue', Helvetica, Arial, sans-serif",
+						"fontSize" => "12px",
+						"lazyLoad" => false,
+						"setFocusAfterShow" => false
+					)
+				),
+				false,
+				array(
+					"HIDE_ICONS" => "Y"
+				)
+			);
+			?>
 		</div>
 		<?/* ####### END TAB 1 ####### */?>
 
@@ -856,14 +897,6 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		<?/* ####### END TAB 3 ####### */?>
 	</div>
 </div>
-
-	<div class="bxec-d-files" id="bxed_file_cont_<?=$id?>" style="display: none;">
-		<?= $fileRes['UPLOAD_WEBDAV_ELEMENT_HTML'];?>
-		<script>
-			window.__UPLOAD_WEBDAV_ELEMENT_CID = '<?= CUtil::JSEscape($fileRes["UPLOAD_WEBDAV_ELEMENT_CID"]);?>';
-			window.__UPLOAD_WEBDAV_ELEMENT_VALUE = <?= CUtil::PhpToJSObject($fileRes['UPLOAD_WEBDAV_ELEMENT_VALUE'])?>;
-		</script>
-	</div>
 </form>
 <?
 	}
@@ -895,7 +928,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		$event['FROM_MONTH'] = FormatDate('n', $event['DT_FROM_TS']);
 
 		$arHost = CCalendar::GetUser($event['MEETING_HOST'], true);
-		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatar($arHost);
+		$arHost['AVATAR_SRC'] = CCalendar::GetUserAvatarSrc($arHost);
 		$arHost['URL'] = CCalendar::GetUserUrl($event['MEETING_HOST'], $Params["PATH_TO_USER"]);
 		$arHost['DISPLAY_NAME'] = CCalendar::GetUserName($arHost);
 		$curUserStatus = '';
@@ -932,16 +965,19 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 				)
 			);
 
-			foreach ($event['~ATTENDEES'] as $i => $att)
+			if (is_array($event['~ATTENDEES']))
 			{
-				if ($userId == $att["USER_ID"])
+				foreach ($event['~ATTENDEES'] as $att)
 				{
-					$curUserStatus = $att['STATUS'];
-					$viewComments = true;
+					if ($userId == $att["USER_ID"])
+					{
+						$curUserStatus = $att['STATUS'];
+						$viewComments = true;
+					}
+					$att['AVATAR_SRC'] = CCalendar::GetUserAvatarSrc($att);
+					$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
+					$attendees[strtolower($att['STATUS'])]['users'][] = $att;
 				}
-				$att['AVATAR_SRC'] = CCalendar::GetUserAvatar($att);
-				$att['URL'] = CCalendar::GetUserUrl($att["USER_ID"], $Params["PATH_TO_USER"]);
-				$attendees[strtolower($att['STATUS'])]['users'][] = $att;
 			}
 		}
 
@@ -1632,10 +1668,10 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 	<div class="bxec-mobile-cont">
 		<div class="bxec-mobile-header"><?= GetMessage('EC_MOBILE_HELP_HEADER');?></div>
 		<a id="bxec_mob_link_iphone_<?=$id?>" class="bxec-mobile-link bxec-link-hidden" href="javascript: void(0)"><div class="bxec-iconkit bxec-arrow"></div><?= GetMessage('EC_MOBILE_APPLE');?></a>
-		<div id="bxec_mobile_iphone_all<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ALL_HELP', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
-		<div id="bxec_mobile_iphone_one<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ONE_HELP', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
+		<div id="bxec_mobile_iphone_all<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ALL_HELP', array('#POINT_SET_PORT#' => GetMessage('EC_SET_PORT')))?></div>
+		<div id="bxec_mobile_iphone_one<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_IPHONE_ONE_HELP', array('#POINT_SET_PORT#' => GetMessage('EC_SET_PORT')))?></div>
 		<a id="bxec_mob_link_mac_<?=$id?>" class="bxec-mobile-link bxec-link-hidden" href="javascript: void(0)"><div class="bxec-iconkit bxec-arrow"></div><?= GetMessage('EC_MOBILE_MAC_OS');?></a>
-		<div id="bxec_mobile_mac_cont<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_MAC_1', array('#POINT_SET_PORT#' => GetMessage(CCalendar::IsBitrix24() ? 'EC_SET_PORT_BX24' : 'EC_SET_PORT')))?></div>
+		<div id="bxec_mobile_mac_cont<?=$id?>" style="display: none;"><?= GetMessage('EC_MOBILE_HELP_MAC_1', array('#POINT_SET_PORT#' => GetMessage('EC_SET_PORT')))?></div>
 		<a id="bxec_mob_link_bird_<?=$id?>" class="bxec-mobile-link bxec-link-hidden" href="javascript: void(0)"><div class="bxec-iconkit bxec-arrow"></div><?= GetMessage('EC_MOBILE_SUNBIRD');?></a>
 		<div id="bxec_mobile_sunbird_all<?=$id?>" style="display: none;"><?= GetMessage("EC_MOBILE_HELP_SUNBIRD_ALL_HELP")?></div>
 		<div id="bxec_mobile_sunbird_one<?=$id?>" style="display: none;"><?= GetMessage("EC_MOBILE_HELP_SUNBIRD_ONE_HELP")?></div>
@@ -1792,110 +1828,6 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 		<?
 	}
 
-
-
-	public static function __ShowEditorHtml($Params = array())
-	{
-		if (!CModule::IncludeModule("fileman"))
-			return;
-
-		$id = $Params['id'];
-		AddEventHandler("fileman", "OnIncludeLightEditorScript", array("CCalendarSceleton", "__CustomizeLightEditor"));
-		?>
-		<div id="bx_cal_editor_cont_<?= $id?>">
-			<?
-			$LHE = new CLightHTMLEditor;
-			$LHE->Show(array(
-				'id' => 'LHEEvDesc',
-				'width' => '603',
-				'height' => '280',
-				'inputId' => $id.'_edit_ed_desc',
-				'inputName' => 'desc',
-				'content' => $Params['event']['DESCRIPTION'],
-				'toolbarConfig' => array(
-					'Bold', 'Italic', 'Underline', 'RemoveFormat',
-					'Image',
-					'BackColor', 'ForeColor',
-					'InsertOrderedList', 'InsertUnorderedList',
-					'FontSizeList',
-					'Source',
-					'CreateLink',
-					'InputVideo'
-				),
-				'BBCode' => true,
-				'jsObjName' => 'pLHEEvDesc',
-				'bInitByJS' => false,
-				'bRecreate' => true,
-				'bSaveOnBlur' => false,
-				'bUseFileDialogs' => false,
-				'bUseMedialib' => true
-			));
-			?>
-			<!-- Buttons-->
-			<div class="cal-edittor-but-wrap">
-				<span class="cal-edittor-but feed-add-file" id="bx_cal_file_<?= $id?>" title="<?= GetMessage('ECLF_LHE_UPLOAD_FILE')?>"></span>
-				<span class="cal-edittor-but feed-add-link" id="bx_cal_link_<?= $id?>" title="<?= GetMessage('ECLF_LHE_CREATE_LINK')?>"></span>
-				<span class="cal-edittor-but feed-add-video" id="bx_cal_video_<?= $id?>" title="<?= GetMessage('ECLF_LHE_VIDEO')?>"></span>
-				<div class="cal-edittor-but-more-open"><span title="<?= GetMessage('ECLF_LHE_SHOW_PANEL')?>" class="cal-edittor-editor-btn" id="cal-editor-show-panel-btn"></span></div>
-			</div>
-		</div>
-		<?
-	}
-
-	public static function __CustomizeLightEditor($id = false, $templateFolder = "")
-	{
-		?>
-		<script>
-			(function(window){
-				function checkEditorCustomizedGrid()
-				{
-					if (!window.ModifyEditorForCalendarGrid)
-						return setTimeout(checkEditorCustomizedGrid, 20);
-					window.ModifyEditorForCalendarGrid();
-				}
-				checkEditorCustomizedGrid();
-			})(window);
-		</script>
-		<?
-	}
-
-	public static function __GetFileUploadHtml($Params = array())
-	{
-		global $APPLICATION;
-		$result = array();
-
-		if (!function_exists("__main_post_form_get_cid_webdav_cal"))
-		{
-			public static function __main_post_form_get_cid_webdav_cal($arResult = false, $arParams = false)
-			{
-				static $CID = false;
-
-				if ($arResult === false && $arParams === false)
-					return $CID;
-				if ($arParams['EDIT'] == 'Y')
-					$CID = $arResult['UID'];
-				return true;
-			}
-		}
-
-		ob_start();
-		$eventHandlerID = AddEventHandler("webdav", "webdav.user.field", "__main_post_form_get_cid_webdav_cal");
-		$APPLICATION->IncludeComponent(
-			"bitrix:system.field.edit",
-			"webdav_element",
-			array("arUserField" => $Params['UF']['UF_WEBDAV_CAL_EVENT']),
-			null,
-			array("HIDE_ICONS" => "Y")
-		);
-		RemoveEventHandler("webdav", "webdav.user.field", $eventHandlerID);
-		$result["UPLOAD_WEBDAV_ELEMENT_HTML"] = ob_get_clean();
-		$result["UPLOAD_WEBDAV_ELEMENT_CID"] = __main_post_form_get_cid_webdav_cal();
-
-		$result['UPLOAD_WEBDAV_ELEMENT_VALUE'] = $Params['UF']['UF_WEBDAV_CAL_EVENT']['VALUE'];
-
-		return $result;
-	}
-
 	public static function __ShowAttendeesDestinationHtml($Params = array())
 	{
 		CSocNetTools::InitGlobalExtranetArrays();
@@ -1934,6 +1866,7 @@ var EC_MESS = {0:0<?foreach($arLangMess as $m1 => $m2){echo ', '.$m1." : '".GetM
 							name : editEventDestinationFormName,
 							searchInput : BX('event-grid-dest-input'),
 							extranetUser :  false,
+							userSearchArea: 'I',
 							bindMainPopup : { 'node' : BX('event-grid-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
 							bindSearchPopup : { 'node' : BX('event-grid-dest-cont'), 'offsetTop' : '5px', 'offsetLeft': '15px'},
 							callback : {

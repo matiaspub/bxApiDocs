@@ -205,7 +205,7 @@ class CAllSaleExport
 		while($arOrder = $dbOrderList->Fetch())
 		{
 			if ($crmMode)
-			{			
+			{
 				if($bNewVersion && is_array($_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) && in_array($arOrder["ID"], $_SESSION["BX_CML2_EXPORT"][$lastOrderPrefix]) && empty($arFilter["ID"]))
 					continue;
 				ob_start();
@@ -299,6 +299,7 @@ class CAllSaleExport
 					false,
 					array("ID", "CODE", "VALUE", "ORDER_PROPS_ID", "PROP_TYPE")
 				);
+			$locationStreetPropertyValue = '';
 			while ($arOrderPropVals = $dbOrderPropVals->Fetch())
 			{
 				if ($arOrderPropVals["PROP_TYPE"] == "CHECKBOX")
@@ -330,7 +331,39 @@ class CAllSaleExport
 				elseif ($arOrderPropVals["PROP_TYPE"] == "LOCATION")
 				{
 					$arVal = CSaleLocation::GetByID($arOrderPropVals["VALUE"], LANGUAGE_ID);
-					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] =  ($arVal["COUNTRY_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["REGION_NAME"])<=0) ? "" : " - ").$arVal["REGION_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["CITY_NAME"])<=0) ? "" : " - ").$arVal["CITY_NAME"]);
+
+					if(CSaleLocation::isLocationProEnabled())
+					{
+						if(intval($arVal['ID']))
+						{
+							try
+							{
+								$res = \Bitrix\Sale\Location\LocationTable::getPathToNode($arVal['ID'], array('select' => array('LNAME' => 'NAME.NAME', 'TYPE_ID'), 'filter' => array('=NAME.LANGUAGE_ID' => LANGUAGE_ID)));
+								$types = \Bitrix\Sale\Location\Admin\TypeHelper::getTypeCodeIdMapCached();
+								$path = array();
+								while($item = $res->fetch())
+								{
+									// copy street to STREET property
+									if($types['ID2CODE'][$item['TYPE_ID']] == 'STREET')
+										$locationStreetPropertyValue = $item['LNAME'];
+									$path[] = $item['LNAME'];
+								}
+
+								$locationString = implode(' - ', $path);
+							}
+							catch(\Bitrix\Main\SystemException $e)
+							{
+								$locationString = '';
+							}
+						}
+						else
+							$locationString = '';
+					}
+					else
+						$locationString =  ($arVal["COUNTRY_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["REGION_NAME"])<=0) ? "" : " - ").$arVal["REGION_NAME"].((strlen($arVal["COUNTRY_NAME"])<=0 || strlen($arVal["CITY_NAME"])<=0) ? "" : " - ").$arVal["CITY_NAME"]);
+
+					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] = $locationString;
+
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_CITY"] = $arVal["CITY_NAME"];
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_COUNTRY"] = $arVal["COUNTRY_NAME"];
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]."_REGION"] = $arVal["REGION_NAME"];
@@ -340,6 +373,24 @@ class CAllSaleExport
 					$arProp["PROPERTY"][$arOrderPropVals["ORDER_PROPS_ID"]] = $arOrderPropVals["VALUE"];
 				}
 			}
+
+			$resShipment = \Bitrix\Sale\Internals\ShipmentTable::getList(
+				array(
+					'select' => array('DELIVERY_ID', 'ALLOW_DELIVERY', 'DEDUCTED', 'DATE_ALLOW_DELIVERY', 'DATE_DEDUCTED'),
+					'filter' => array('ORDER_ID' => $arOrder['ID'], '=SYSTEM' => 'N'),
+					'limit' => array(1)
+				)
+			);
+			$arShipment = $resShipment->fetch();
+
+			$resPayment = \Bitrix\Sale\Internals\PaymentTable::getList(
+				array(
+					'select' => array('PAY_VOUCHER_NUM', 'PAY_SYSTEM_ID', 'PAY_VOUCHER_DATE'),
+					'filter' => array('ORDER_ID' => $arOrder['ID'], '!PAY_SYSTEM_ID' => \Bitrix\Sale\Internals\PaySystemInner::getId()),
+					'limit' => array(1)
+				)
+			);
+			$arPayment = $resPayment->fetch();
 
 			foreach($agentParams as $k => $v)
 			{
@@ -369,6 +420,9 @@ class CAllSaleExport
 							$agent[$k] = $v["VALUE"];
 						else
 							$agent[$k] = $arProp[$v["TYPE"]][$v["VALUE"]];
+
+						if($k == 'STREET' && strlen($locationStreetPropertyValue))
+							$agent[$k] = $locationStreetPropertyValue.(strlen($agent[$k]) ? ', ' : '').$agent[$k];
 					}
 				}
 			}
@@ -484,19 +538,18 @@ class CAllSaleExport
 				?>
 				<<?=GetMessage("SALE_EXPORT_ITEMS")?>>
 				<?
-				$dbBasket = CSaleBasket::GetList(
-						array("NAME" => "ASC"),
-						array("ORDER_ID" => $arOrder["ID"]),
-						false,
-						false,
-						array("ID", "NOTES", "PRODUCT_XML_ID", "CATALOG_XML_ID", "NAME", "PRICE", "QUANTITY", "DISCOUNT_PRICE", "VAT_RATE", "MEASURE_CODE")
-					);
+				$dbBasket = \Bitrix\Sale\Internals\BasketTable::getList(array(
+					'select' => array("ID", "NOTES", "PRODUCT_XML_ID", "CATALOG_XML_ID", "NAME", "PRICE", "QUANTITY", "DISCOUNT_PRICE", "VAT_RATE", "MEASURE_CODE"),
+					'filter' => array("ORDER_ID" => $arOrder["ID"]),
+					'order' => array("NAME" => "ASC")
+				));
+
 				$basketSum = 0;
 				$priceType = "";
 				$bVat = false;
 				$vatRate = 0;
 				$vatSum = 0;
-				while ($arBasket = $dbBasket->Fetch())
+				while ($arBasket = $dbBasket->fetch())
 				{
 					if(strlen($priceType) <= 0)
 						$priceType = $arBasket["NOTES"];
@@ -666,43 +719,43 @@ class CAllSaleExport
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
-					if(strlen($arOrder["PAY_VOUCHER_NUM"])>0)
+					if(strlen($arPayment["PAY_VOUCHER_NUM"])>0)
 					{
 						?>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_NUMBER")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arOrder["PAY_VOUCHER_NUM"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arPayment["PAY_VOUCHER_NUM"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
-					if(IntVal($arOrder["PAY_SYSTEM_ID"])>0)
+					if(IntVal($arPayment["PAY_SYSTEM_ID"])>0)
 					{
 						?>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_SYSTEM")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($paySystems[$arOrder["PAY_SYSTEM_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($paySystems[$arPayment["PAY_SYSTEM_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_PAY_SYSTEM_ID")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arOrder["PAY_SYSTEM_ID"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($arPayment["PAY_SYSTEM_ID"])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
-					if(strlen($arOrder["DATE_ALLOW_DELIVERY"])>0)
+					if(strlen($arShipment["DATE_ALLOW_DELIVERY"])>0)
 					{
 						?>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_DATE_ALLOW_DELIVERY")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=$arOrder["DATE_ALLOW_DELIVERY"]?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=$arShipment["DATE_ALLOW_DELIVERY"]?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
-					if(strlen($arOrder["DELIVERY_ID"])>0)
+					if(strlen($arShipment["DELIVERY_ID"])>0)
 					{
 						?>
 						<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 							<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_DELIVERY_SERVICE")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($delivery[$arOrder["DELIVERY_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+							<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=htmlspecialcharsbx($delivery[$arShipment["DELIVERY_ID"]])?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 						</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<?
 					}
@@ -713,7 +766,7 @@ class CAllSaleExport
 					</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 					<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_ALLOW_DELIVERY")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
-						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=($arOrder["ALLOW_DELIVERY"]=="Y")?"true":"false";?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
+						<<?=GetMessage("SALE_EXPORT_VALUE")?>><?=($arShipment["ALLOW_DELIVERY"]=="Y")?"true":"false";?></<?=GetMessage("SALE_EXPORT_VALUE")?>>
 					</<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 					<<?=GetMessage("SALE_EXPORT_PROPERTY_VALUE")?>>
 						<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=GetMessage("SALE_EXPORT_CANCELED")?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
@@ -902,9 +955,9 @@ class CAllSaleExport
 		<<?=GetMessage("SALE_EXPORT_CONTRAGENTS")?>>
 			<<?=GetMessage("SALE_EXPORT_CONTRAGENT")?>><?
 		if ($bExportFromCrm): ?>
-				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arProp["CRM"]["CLIENT_ID"]."#".$arProp["CRM"]["CLIENT"]["LOGIN"]."#".$arProp["CRM"]["CLIENT"]["LAST_NAME"]." ".$arProp["CRM"]["CLIENT"]["NAME"]." ".$arProp["CRM"]["CLIENT"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>><?
+				<<?=GetMessage("SALE_EXPORT_ID")?>><?=htmlspecialcharsbx(substr($arProp["CRM"]["CLIENT_ID"]."#".$arProp["CRM"]["CLIENT"]["LOGIN"]."#".$arProp["CRM"]["CLIENT"]["LAST_NAME"]." ".$arProp["CRM"]["CLIENT"]["NAME"]." ".$arProp["CRM"]["CLIENT"]["SECOND_NAME"], 0, 80))?></<?=GetMessage("SALE_EXPORT_ID")?>><?
 		else: ?>
-				<<?=GetMessage("SALE_EXPORT_ID")?>><?=substr(htmlspecialcharsbx($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"]), 0, 80)?></<?=GetMessage("SALE_EXPORT_ID")?>><?
+				<<?=GetMessage("SALE_EXPORT_ID")?>><?=htmlspecialcharsbx(substr($arOrder["USER_ID"]."#".$arProp["USER"]["LOGIN"]."#".$arProp["USER"]["LAST_NAME"]." ".$arProp["USER"]["NAME"]." ".$arProp["USER"]["SECOND_NAME"], 0, 80))?></<?=GetMessage("SALE_EXPORT_ID")?>><?
 		endif; ?>
 				<<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>><?=htmlspecialcharsbx($agent["AGENT_NAME"])?></<?=GetMessage("SALE_EXPORT_ITEM_NAME")?>>
 				<?

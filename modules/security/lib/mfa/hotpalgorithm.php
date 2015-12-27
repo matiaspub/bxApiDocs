@@ -123,13 +123,19 @@ class HotpAlgorithm
 	}
 
 	/**
+	 * Returns algorithm description:
+	 *  string type
+	 *  string title
+	 *  bool required_two_code
+	 *
 	 * @return array
 	 */
 	public static function getDescription()
 	{
 		return array(
 			'type' => static::$type,
-			'title' => Loc::getMessage('SECURITY_HOTP_TITLE')
+			'title' => Loc::getMessage('SECURITY_HOTP_TITLE'),
+			'required_two_code' => true
 		);
 	}
 }

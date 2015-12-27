@@ -382,9 +382,6 @@ class CZip implements IBXArchive
 	*/
 	public function Unpack($strPath)
 	{
-		if (strpos($strPath, $_SERVER["DOCUMENT_ROOT"]) === false)
-			return false;
-
 		$this->SetOptions(array("ADD_PATH"=>$strPath));
 
 		$arParams = array(

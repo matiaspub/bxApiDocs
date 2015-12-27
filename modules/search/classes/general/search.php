@@ -2,13 +2,11 @@
 IncludeModuleLangFile(__FILE__);
 
 if(!defined("START_EXEC_TIME"))
-	;// define("START_EXEC_TIME", getmicrotime());
+	// define("START_EXEC_TIME", getmicrotime());
 
 
 /**
- * Класс для индексирования сайта и осуществления поиска по индексу</body> </html>
- *
- *
+ * Класс для индексирования сайта и осуществления поиска по индексу 
  *
  *
  * @return mixed 
@@ -58,9 +56,7 @@ class CAllSearch extends CDBResult
 	//returns recordset with search results
 	
 	/**
-	* <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа).</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearch.php">OnSearch</a>.</p>
-	*
-	*
+	* <p>Этот метод возвращает записи индекса, которые удовлетворяют заданной строке запроса и указанным параметрам, а так же доступны на просмотр для текущего посетителя (в соответствии с его уровнем доступа). Метод динамичный.</p> <p>Перед выполнением поисковых запросов вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearch.php">OnSearch</a>.</p>
 	*
 	*
 	* @param array $arParams  Массив, содержащий условия поиска в виде наборов "название
@@ -93,8 +89,6 @@ class CAllSearch extends CDBResult
 	* время);</li> <li> <b>CHECK_DATES</b> - если задан и равен Y, то найдены будут
 	* только активные элементы;</li> </ul>
 	*
-	*
-	*
 	* @param array $aSort = array() Массив, содержащий признак сортировки в виде наборов "название
 	* поля"=&gt;"направление". <br><br> Название поля может принимать
 	* значение: <ul> <li> <b>ID</b> - идентификатор в поисковом индексе;</li> <li>
@@ -124,8 +118,6 @@ class CAllSearch extends CDBResult
 	* элемента;</li> <li> <b>NAME</b> - значение тег;</li> <li> <b>CNT</b> - частота тега;</li>
 	* </ul>
 	*
-	*
-	*
 	* @param array $aParamsEx = array() Массив массивов, содержащий дополнительные условия поиска в виде
 	* наборов "название поля"=&gt;"значение". Эти условия будут объединены
 	* по условию ИЛИ. Смотри описание параметра arParams. <br><br> Так же может
@@ -137,12 +129,8 @@ class CAllSearch extends CDBResult
 	* данном случае поиск будет осуществляться в форумах с
 	* идентификаторами 1 и 2, а также в инфоблоке с идентификатором 3.
 	*
-	*
-	*
 	* @param bool $bTagsCloud = false Признак построения облака тегов. Если задан и равен true, то будет
 	* построено облако тегов.
-	*
-	*
 	*
 	* @return void <p>Набор записей, каждая из которых представляет собой массив
 	* следующей структуры:</p> <pre class="syntax">Array(<br> [ID] =&gt; Код индекса<br>
@@ -169,7 +157,6 @@ class CAllSearch extends CDBResult
 	* =&gt; тег<br> [CNT] =&gt; частота<br> [DATE_CHANGE] =&gt; Максимальная дата изменения
 	* элемента имеющего данный тег<br> [FULL_DATE_CHANGE] =&gt; Дата изменения
 	* элемента включая время.<br>)<br></pre> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -584,7 +571,7 @@ class CAllSearch extends CDBResult
 		if($this->Query->bStemming)
 		{
 			$arStemInfo = stemming_init($this->Query->m_lang);
-			$letters = $arStemInfo["letters"];
+			$pcreLettersClass = "[".$arStemInfo["pcre_letters"]."]";
 			$strWhUpp = stemming_upper($strWh, $this->Query->m_lang);
 		}
 		else
@@ -616,13 +603,13 @@ class CAllSearch extends CDBResult
 				$lw = strlen($strWhUpp);
 				for ($s = $pos; $s >= 0; $s--)
 				{
-					if (strpos($letters, substr($strWhUpp, $s, 1)) === false)
+					if (!preg_match("/$pcreLettersClass/".BX_UTF_PCRE_MODIFIER, substr($strWhUpp, $s, 1)))
 						break;
 				}
 				$s++;
 				for ($e = $pos; $e < $lw; $e++)
 				{
-					if (strpos($letters, substr($strWhUpp, $e, 1)) === false)
+					if (!preg_match("/$pcreLettersClass/".BX_UTF_PCRE_MODIFIER, substr($strWhUpp, $e, 1)))
 						break;
 				}
 				$e--;
@@ -839,9 +826,7 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Возвращает следующий найденный элемент.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
-	*
-	*
+	* <p>Возвращает следующий найденный элемент. Метод динамичный.</p> <p>Если поле результата URL начинается с символа "=", то вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onsearchgeturl.php">OnSearchGetURL</a>.</p>
 	*
 	*
 	* @return array <p>Смотри описание возвращаемого значения метода <a
@@ -1059,43 +1044,31 @@ class CAllSearch extends CDBResult
 	//       = false - add new ones. update changed and delete deleted.
 	
 	/**
-	* <p>Функция пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
+	* <p>Метод пошаговой переиндексации. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search". Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
 	*
 	*
 	* @param bool $bFull = false Если равен true, то на первом шаге поисковый индекс будет полностью
 	* очищен. По умолчанию равен false, что приводит к перестройке индекса
 	* только тех элементов, содержимое которых изменилось.
 	*
-	*
-	*
-	* @param int $max_execution_time = 0 Если задан и больше нуля, то как только время выполнения функции
-	* превысит значение этого параметра выполнение функции
-	* завершится. Данные для начала следующего шага будут возвращены
-	* как результат работы функции.
-	*
-	*
+	* @param int $max_execution_time = 0 Если задан и больше нуля, то как только время выполнения метода
+	* превысит значение этого параметра выполнение метода завершится.
+	* Данные для начала следующего шага будут возвращены как результат
+	* работы метода.
 	*
 	* @param array $NS = Array() Хранит состояние процесса индексации (прогресс) на начало шага.
-	*
-	*
 	*
 	* @param bool $clear_suggest = false Удаляет историю/статистику подсказок для строки поиска.
 	* Необязательный параметр, по умолчанию принимает значение false.
 	*
-	*
-	*
-	* @return mixed <p>Функция возвращает массив, если требуется вызвать функцию еще
-	* раз. Или число проиндексированных элементов, если переиндексация
+	* @return mixed <p>Метод возвращает массив, если требуется вызвать метод еще раз.
+	* Или число проиндексированных элементов, если переиндексация
 	* завершена.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
-	* &lt;?<br>//Этот пример не является примером пошаговой индексации.<br>//Для этого надо вызывать функцию ReIndexAll только один раз за запуск скрипта.<br>//А промежуточное состояние (NS) можно сохранять например в файле.<br><br>$NS = false;<br>$NS = CSearch::ReIndexAll(false, 60, $NS);<br>while(is_array($NS))<br>	$NS = CSearch::ReIndexAll(false, 60, $NS);<br>echo $NS;<br><br>?&gt;<br>
+	* &lt;?<br>//Этот пример не является примером пошаговой индексации.<br>//Для этого надо вызывать метод ReIndexAll только один раз за запуск скрипта.<br>//А промежуточное состояние (NS) можно сохранять например в файле.<br><br>$NS = false;<br>$NS = CSearch::ReIndexAll(false, 60, $NS);<br>while(is_array($NS))<br>	$NS = CSearch::ReIndexAll(false, 60, $NS);<br>echo $NS;<br><br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1280,29 +1253,21 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Функция инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search".</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться функцией <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
+	* <p>Метод инициирует переиндексацию указанного модуля. Для того, чтобы модуль был переиндексирован, он должен предоставить соответствующий метод, который должен быть зарегистрирован в системе событий как обработчик события <a href="http://dev.1c-bitrix.ru/api_help/search/events/onreindex.php">OnReIndex</a> модуля "search". Метод динамичный.</p> <p>С помощью этого метода невозможно переиндексировать данные модуля "main". Т.к. индексация файлов выполняется не через обработчики событий, а непосредственно модулем поиска. Но можно воспользоваться методом <a href="http://dev.1c-bitrix.ru/api_help/search/classes/csearch/reindexall.php">CSearch::ReIndexAll</a>, передав на первом шаге $NS = array("MODULE_ID"=&gt;"main").</p> <p></p> <div class="note"> <b>Примечание:</b> метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, переиндексация которого требуется.
-	*
-	*
 	*
 	* @param bool $bFull = false Производить ли полную переиндексацию с очисткой старых
 	* поисковых индексов. Не обязательный параметр, по умолчанию равен
 	* false.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
-	* OnReindex.<br><br>// регистрируем обработчик события "OnReindex" модуля "search"<br>RegisterModuleDependences("search", "OnReindex", "my_module", "CMyModule", "OnReindex");<br><br>// создаем в модуле my_module в классе CMyModule функцию-метод OnReindex<br>function OnReindex()<br>{<br>	global $DB;<br>	$arResult = array();<br><br>	$strSql =<br>		"SELECT FT.ID, FT.TITLE, FT.MESSAGE, ".<br>		"  DATE_FORMAT(FT.POST_DATE, '%d.%m.%Y %H:%i:%s') as POST_DATE, FT.LID ".<br>		"FROM b_my_table FT ";<br><br>	$db_res = $DB-&gt;Query($strSql);<br>	while ($res = $db_res-&gt;Fetch())<br>	{<br>		$arResult[] = array(<br>			"ID" =&gt; $res["ID"],<br>			"LID" =&gt; $res["LID"],<br>			"DATE_CHANGE" =&gt; $res["POST_DATE"],<br>			"URL" =&gt; "/my_module/index.php?ID=".$res["ID"],<br>			"PERMISSIONS" =&gt; array(2),<br>			"TITLE" =&gt; $res["TITLE"],<br>			"BODY" =&gt; $res["POST_MESSAGE"]<br>		);<br>	}<br>	return $arResult;<br>}<br><br>// вызываем переиндексацию модуля<br>CSearch::ReIndexModule("my_module");<br><br>?&gt;<br>
+	* OnReindex.<br><br>// регистрируем обработчик события "OnReindex" модуля "search"<br>RegisterModuleDependences("search", "OnReindex", "my_module", "CMyModule", "OnReindex");<br><br>// создаем в модуле my_module в классе CMyModule метод OnReindex<br>function OnReindex()<br>{<br>	global $DB;<br>	$arResult = array();<br><br>	$strSql =<br>		"SELECT FT.ID, FT.TITLE, FT.MESSAGE, ".<br>		"  DATE_FORMAT(FT.POST_DATE, '%d.%m.%Y %H:%i:%s') as POST_DATE, FT.LID ".<br>		"FROM b_my_table FT ";<br><br>	$db_res = $DB-&gt;Query($strSql);<br>	while ($res = $db_res-&gt;Fetch())<br>	{<br>		$arResult[] = array(<br>			"ID" =&gt; $res["ID"],<br>			"LID" =&gt; $res["LID"],<br>			"DATE_CHANGE" =&gt; $res["POST_DATE"],<br>			"URL" =&gt; "/my_module/index.php?ID=".$res["ID"],<br>			"PERMISSIONS" =&gt; array(2),<br>			"TITLE" =&gt; $res["TITLE"],<br>			"BODY" =&gt; $res["POST_MESSAGE"]<br>		);<br>	}<br>	return $arResult;<br>}<br><br>// вызываем переиндексацию модуля<br>CSearch::ReIndexModule("my_module");<br><br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1361,39 +1326,26 @@ class CAllSearch extends CDBResult
 	//combination of ($MODULE_ID, $ITEM_ID) is used to determine the documents
 	
 	/**
-	* <p>Функция переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
-	*
-	*
+	* <p>Метод переиндексирует какую-то одиночную позицию (сообщение на форуме, новость и т.п.), причем комбинация (MODULE_ID, ITEM_ID) используется для определения переиндексируемого документа. Метод динамичный.</p> <p>Вначале индексации вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/search/events/beforeindex.php">BeforeIndex</a>. Затем вычисляется пользовательский вес позиции. И производится собственно переиндексация.</p>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, которому принадлежит индексируемый элемент.
 	*
-	*
-	*
 	* @param string $ITEM_ID  Код индексируемого элемента.
 	*
-	*
-	*
 	* @param array $arFields  Массив свойств индексируемого элемента.
-	*
-	*
 	*
 	* @param bool $bOverWrite = false Перетирать индекс поиска элемента если элемент уже
 	* проиндексирован. Не обязательный параметр, по умолчанию равен
 	* false.
 	*
-	*
-	*
 	* @param string $SEARCH_SESS_ID = '' Служебный параметр, используется при пошаговой переиндексации.
-	*
-	*
 	*
 	* @return int 
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
-	* &lt;?<br>CSearch::Index(<br>	"iblock",<br>	$ID,<br>	Array(<br>		"DATE_CHANGE"=&gt;$arIBlockElement["DATE_CHANGE"],<br>		"TITLE"=&gt;$arIBlockElement["NAME"],<br>		"SITE_ID"=&gt;$arSites,<br>		"PARAM1"=&gt;$arIBlockElement["IBLOCK_TYPE_ID"],<br>		"PARAM2"=&gt;$IBLOCK_ID,<br>		"PERMISSIONS"=&gt;$arGroups,<br>		"URL"=&gt;str_replace("<code>#ID#</code>", $arIBlockElement["ID"], $DETAIL_PAGE_URL),<br>		"BODY"=&gt;$arIBlockElement["DETAIL_TEXT"],<br>		"TAGS"=&gt;$arIBlockElement["TAGS"]<br>	),<br>	$bOverWrite<br>);<br>?&gt;<br>
+	* &lt;?<br>CSearch::Index(<br>	"iblock",<br>	$ID,<br>	Array(<br>		"DATE_CHANGE"=&gt;$arIBlockElement["DATE_CHANGE"],<br>		"TITLE"=&gt;$arIBlockElement["NAME"],<br>		"SITE_ID"=&gt;$arSites,<br>		"PARAM1"=&gt;$arIBlockElement["IBLOCK_TYPE_ID"],<br>		"PARAM2"=&gt;$IBLOCK_ID,<br>		"PERMISSIONS"=&gt;$arGroups,<br>		"URL"=&gt;str_replace(&amp;quot#ID#", $arIBlockElement["ID"], $DETAIL_PAGE_URL),<br>		"BODY"=&gt;$arIBlockElement["DETAIL_TEXT"],<br>		"TAGS"=&gt;$arIBlockElement["TAGS"]<br>	),<br>	$bOverWrite<br>);<br>?&gt;<br>
 	* </pre>
 	*
 	*
@@ -1555,7 +1507,7 @@ class CAllSearch extends CDBResult
 			if(!$bOverWrite && $DATE_CHANGE == $arResult["DATE_CHANGE"])
 			{
 				if(strlen($SEARCH_SESS_ID)>0)
-					$DB->Query("UPDATE b_search_content SET UPD='".$SEARCH_SESS_ID."' WHERE ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$DB->Query("UPDATE b_search_content SET UPD='".$DB->ForSql($SEARCH_SESS_ID)."' WHERE ID = ".$ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				//$DB->Commit();
 				return $ID;
 			}
@@ -1787,6 +1739,10 @@ class CAllSearch extends CDBResult
 		if($file_site == "")
 			return 0;
 
+		$item_id = $file_site."|".$file_rel_path;
+		if (strlen($item_id) > 255)
+			return 0;
+
 		if(strlen($SEARCH_SESS_ID) > 0)
 		{
 			$DATE_CHANGE = $DB->CharToDateFunction(
@@ -1798,7 +1754,7 @@ class CAllSearch extends CDBResult
 				SELECT ID
 				FROM b_search_content
 				WHERE MODULE_ID = 'main'
-					AND ITEM_ID = '".$DB->ForSQL($file_site."|".$file_rel_path)."'
+					AND ITEM_ID = '".$DB->ForSQL($item_id)."'
 					AND DATE_CHANGE = ".$DATE_CHANGE."
 			";
 
@@ -1863,7 +1819,7 @@ class CAllSearch extends CDBResult
 		$tags = COption::GetOptionString("search", "page_tag_property");
 
 		//save to database
-		$ID = CSearch::Index("main", $file_site."|".$file_rel_path,
+		$ID = CSearch::Index("main", $item_id,
 			Array(
 				"SITE_ID" => $file_site,
 				"DATE_CHANGE" => date("d.m.Y H:i:s", $f->GetModificationTime()+1),
@@ -2018,7 +1974,7 @@ class CAllSearch extends CDBResult
 				//single line comment
 				while((++$i) < $c)
 				{
-					if($a[$i] === "\n")
+					if($a[$i] === "\n" || $a[$i] === '?>')
 						break;
 				}
 				continue;
@@ -2393,7 +2349,7 @@ class CAllSearch extends CDBResult
 		}
 		elseif(array_key_exists("DATE_CHANGE", $arFields))
 		{
-			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH.MI.SS", CLang::GetDateFormat());
+			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH:MI:SS", CLang::GetDateFormat());
 		}
 
 		if(BX_SEARCH_VERSION > 1)
@@ -2707,6 +2663,9 @@ class CAllSearch extends CDBResult
 		if(!is_array($SESS_ID))
 			$SESS_ID = array($SESS_ID);
 
+		foreach ($SESS_ID as $key => $value)
+			$SESS_ID[$key] = $DB->ForSql($value);
+
 		$strSql = "
 			SELECT ID
 			FROM b_search_content sc
@@ -2764,21 +2723,15 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Функция удаляет из индекса поиска указанную информацию.</p>
-	*
-	*
+	* <p>Метод удаляет из индекса поиска указанную информацию. Метод динамичный.</p>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, индексацию информации которого необходимо удалить .
-	*
-	*
 	*
 	* @param string $ITEM_ID = false Код элемента, индексацию информации которого необходимо удалить.
 	* Если этот параметр равен false, то ограничение по коду элемента не
 	* устанавливается (удаляется индексация информации с любыми
 	* кодами). Не обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
 	* проиндексированных элементов, индексацию информации которых
@@ -2786,15 +2739,11 @@ class CAllSearch extends CDBResult
 	* по первому параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
 	* проиндексированных элементов, индексацию информации которых
 	* необходимо удалить. Если этот параметр равен false, то ограничение
 	* по второму параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
 	* элементов, индексацию информации которых необходимо удалить.
@@ -2802,10 +2751,7 @@ class CAllSearch extends CDBResult
 	* устанавливается. Необязательный параметр, по умолчанию равен
 	* false.<br><br> До версии 4.0.6 параметр назывался LID.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -2897,7 +2843,7 @@ class CAllSearch extends CDBResult
 		}
 		elseif(array_key_exists("DATE_CHANGE", $arFields))
 		{
-			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH.MI.SS", CLang::GetDateFormat());
+			$arFields["DATE_CHANGE"] = $DB->FormatDate($arFields["DATE_CHANGE"], "DD.MM.YYYY HH:MI:SS", CLang::GetDateFormat());
 		}
 
 		if(BX_SEARCH_VERSION > 1)
@@ -3002,15 +2948,11 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Функция изменяет проиндексированную информацию данного модуля.</p>
-	*
-	*
+	* <p>Метод изменяет проиндексированную информацию данного модуля. Метод динамичный.</p>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, проиндексированную информацию которого необходимо
 	* поменять.
-	*
-	*
 	*
 	* @param array $arFields  Массив новых значений для поискового индекса. Массив должен
 	* иметь следующую структуру: <ul> <li> <b>"DATE_CHANGE"</b> =&gt; дата изменения
@@ -3024,14 +2966,10 @@ class CAllSearch extends CDBResult
 	* идентификаторы сайтов, а их значения пути к элементу. <br> </li> </ul>
 	* Атрибуты, значения которых не изменились, можно опустить.
 	*
-	*
-	*
 	* @param string $ITEM_ID = false Код элемента, индекс которого необходимо изменить. Если этот
 	* параметр равен false, то ограничение по коду элемента не
 	* устанавливается (изменяются индексы элементов с любыми кодами).
 	* Не обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
 	* проиндексированных элементов, индексы которых необходимо
@@ -3039,15 +2977,11 @@ class CAllSearch extends CDBResult
 	* параметру элемента не устанавливается. Не обязательный параметр,
 	* по умолчанию равен false.
 	*
-	*
-	*
 	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
 	* проиндексированных элементов, индексы которых необходимо
 	* поменять. Если этот параметр равен false, то ограничение по второму
 	* параметру элемента не устанавливается. Не обязательный параметр,
 	* по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $SITE_ID = false Сайт проиндексированого элемента, ограничивающий набор
 	* элементов, индекс которых необходимо поменять. Если этот
@@ -3055,10 +2989,7 @@ class CAllSearch extends CDBResult
 	* устанавливается. Необязательный параметр, по умолчанию равен false.
 	* <br><br> До версии 4.0.6 параметр назывался LID.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3097,27 +3028,19 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Функция изменяет привязку проиндексированной информации к сайтам.</p>
-	*
-	*
+	* <p>Метод изменяет привязку проиндексированной информации к сайтам. Метод динамичный.</p>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
 	* поменять.
 	*
-	*
-	*
 	* @param array $arSite  Ассоциативный массив привязки к сайтам.Ключи - идентификаторы
 	* сайтов, а их значения пути к проиндексированной информации. <br>
-	*
-	*
 	*
 	* @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
 	* Если этот параметр равен false, то ограничение по коду элемента не
 	* устанавливается (изменяются права на доступ к элементу с любыми
 	* кодами). Не обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
 	* проиндексированных элементов, права на доступ к которым
@@ -3125,25 +3048,18 @@ class CAllSearch extends CDBResult
 	* по первому параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
 	* проиндексированных элементов, права на доступ к которым
 	* необходимо поменять. Если этот параметр равен false, то ограничение
 	* по второму параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
 	* элементов, права на доступ к которым необходимо поменять. Если
 	* этот параметр равен false, то ограничение по сайту элемента не
 	* устанавливается. Необязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3185,27 +3101,19 @@ class CAllSearch extends CDBResult
 
 	
 	/**
-	* <p>Функция изменяет права на доступ к проиндексированной информации данного модуля.</p>
-	*
-	*
+	* <p>Метод изменяет права на доступ к проиндексированной информации данного модуля. Метод динамичный.</p>
 	*
 	*
 	* @param string $MODULE_ID  Код модуля, права на доступ к информации которого необходимо
 	* поменять.
 	*
-	*
-	*
 	* @param array $arGroups  Массив кодов групп, которые имеют право на чтение
 	* проиндексированной информации.
-	*
-	*
 	*
 	* @param string $ITEM_ID = false Код элемента, права на доступ к которому необходимо поменять.
 	* Если этот параметр равен false, то ограничение по коду элемента не
 	* устанавливается (изменяются права на доступ к элементу с любыми
 	* кодами). Не обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $PARAM1 = false Первый параметр элемента, ограничивающий набор
 	* проиндексированных элементов, права на доступ к которым
@@ -3213,15 +3121,11 @@ class CAllSearch extends CDBResult
 	* по первому параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @param string $PARAM2 = false Второй параметр элемента, ограничивающий набор
 	* проиндексированных элементов, права на доступ к которым
 	* необходимо поменять. Если этот параметр равен false, то ограничение
 	* по второму параметру элемента не устанавливается. Не
 	* обязательный параметр, по умолчанию равен false.
-	*
-	*
 	*
 	* @param string $SITE_ID = false Сайт проиндексированного элемента, ограничивающий набор
 	* элементов, права на доступ к которым необходимо поменять. Если
@@ -3229,14 +3133,9 @@ class CAllSearch extends CDBResult
 	* устанавливается. Необязательный параметр, по умолчанию равен
 	* false.<br><br> До версии 4.0.6 параметр назывался LID.
 	*
-	*
-	*
 	* @param string $PARAMS = false Необязательный параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @return void 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -3614,6 +3513,10 @@ class CAllSearchQuery
 		$qwe=preg_replace("/\|\&/s", "&", $qwe);
 		$qwe=preg_replace("/\&\|/s", "|", $qwe);
 
+		// remove unnesessary boolean operators one more time
+		$qwe=preg_replace("/\|+/", "|", $qwe);
+		$qwe=preg_replace("/&+/", "&", $qwe);
+
 		return $qwe;
 	}
 
@@ -3654,78 +3557,97 @@ class CAllSearchQuery
 	public static function StemQuery($q, $lang="en")
 	{
 		$arStemInfo = stemming_init($lang);
-		return preg_replace_callback("/([".$arStemInfo["pcre_letters"]."]+)/".BX_UTF_PCRE_MODIFIER, array("CAllSearchQuery", "StemWord"), $q);
+		return preg_replace_callback("/([".$arStemInfo["pcre_letters"]."]+)/".BX_UTF_PCRE_MODIFIER, array($this, "StemWord"), $q);
 	}
 
 	public function PrepareQuery($q)
 	{
 		$state = 0;
-		$qu = "";
+		$qu = array();
 		$n = 0;
 		$this->error = "";
 
-		$t=strtok($q," ");
-
+		$t = strtok($q," ");
 		while (($t!="") && ($this->error==""))
 		{
-			switch ($state)
+			if ($state == 0)
 			{
-			case 0:
 				if (($t=="||") || ($t=="&&") || ($t==")"))
 				{
-					$this->error=GetMessage("SEARCH_ERROR2")." ".$t;
-					$this->errorno=2;
+					$this->error = GetMessage("SEARCH_ERROR2")." ".$t;
+					$this->errorno = 2;
 				}
 				elseif ($t=="!")
 				{
-					$state=0;
-					$qu="$qu NOT ";
-					break;
+					$state = 0;
+					$qu[] = " NOT ";
 				}
 				elseif ($t=="(")
 				{
 					$n++;
-					$state=0;
-					$qu="$qu(";
+					$state = 0;
+					$qu[] = "(";
 				}
 				else
 				{
-					$state=1;
-					$qu="$qu ".$this->BuildWhereClause($t)." ";
+					$state = 1;
+					$where = $this->BuildWhereClause($t);
+					$c = count($qu);
+					if (
+						$where === "1=1"
+						&& (
+							($c > 0 && $qu[$c-1] === " OR ")
+							|| ($c > 1 && $qu[$c-1] === "(" && $qu[$c-2] === " OR ")
+						)
+					)
+					{
+						$where = "1<>1";
+					}
+					$qu[] = " ".$where." ";
 				}
-				break;
-
-			case 1:
+			}
+			elseif ($state == 1)
+			{
 				if (($t=="||") || ($t=="&&"))
 				{
-					$state=0;
-					if($t=='||') $qu="$qu OR ";
-					else $qu="$qu AND ";
+					$state = 0;
+					if ($t=='||')
+						$qu[] = " OR ";
+					else
+						$qu[] = " AND ";
 				}
 				elseif ($t==")")
 				{
 					$n--;
-					$state=1;
-					$qu="$qu)";
+					$state = 1;
+					$qu[] = ")";
 				}
 				else
 				{
-					$this->error=GetMessage("SEARCH_ERROR2")." ".$t;
-					$this->errorno=2;
+					$this->error = GetMessage("SEARCH_ERROR2")." ".$t;
+					$this->errorno = 2;
 				}
+			}
+			else
+			{
+
 				break;
 			}
-			$t=strtok(" ");
+			$t = strtok(" ");
 		}
 
 		if (($this->error=="") && ($n != 0))
 		{
-			$this->error=GetMessage("SEARCH_ERROR1");
-			$this->errorno=1;
+			$this->error = GetMessage("SEARCH_ERROR1");
+			$this->errorno = 1;
 		}
-		if ($this->error!="") return 0;
 
-		return $qu;
+		if ($this->error != "")
+		{
+			return 0;
+		}
+
+		return implode($qu);
 	}
 }
 

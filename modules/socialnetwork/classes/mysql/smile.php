@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/index.php
  * @author Bitrix
  */
 class CSocNetSmile extends CAllSocNetSmile
@@ -19,8 +17,6 @@ class CSocNetSmile extends CAllSocNetSmile
 	
 	/**
 	* <p>Метод добавляет новый смайл.</p>
-	*
-	*
 	*
 	*
 	* @param array $arFields  Массив значений параметров смайла. Может содержать
@@ -31,13 +27,11 @@ class CSocNetSmile extends CAllSocNetSmile
 	* языкозависимыми параметрами смайла. В этом ключе содержатся
 	* массивы с ключами LID - язык и NAME - название.
 	*
-	*
-	*
 	* @return int <p>Возвращается код измененной записи или false в случае ошибки.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/add.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/add.php
 	* @author Bitrix
 	*/
 	public static function Add($arFields)
@@ -73,11 +67,7 @@ class CSocNetSmile extends CAllSocNetSmile
 	* <p>Изменяет параметры смайла.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код смайла.
-	*
-	*
 	*
 	* @param array $arFields  Массив новых значений параметров смайла. Может содержать
 	* ключи:<br><b>SORT</b> - индекс сортировки,<br><b>SMILE_TYPE</b> - тип
@@ -88,13 +78,11 @@ class CSocNetSmile extends CAllSocNetSmile
 	* ключе содержатся массивы с ключами LID - язык и NAME - название. Если
 	* ключ LANG задан, то все старые языкозависимые параметры удаляются.
 	*
-	*
-	*
 	* @return int <p>Возвращается код измененной записи или false в случае ошибки.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/Update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/Update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -133,18 +121,12 @@ class CSocNetSmile extends CAllSocNetSmile
 	* <p>Возвращает список смайлов в соответствии с фильтром.</p>
 	*
 	*
-	*
-	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки.
 	*
-	*
-	*
 	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
@@ -152,25 +134,16 @@ class CSocNetSmile extends CAllSocNetSmile
 	* то метод вернет количество записей, удовлетворяющих фильтру. По
 	* умолчанию параметр равен false - не группировать.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив, задающий условия выбора для организации постраничной
 	* навигации.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() 
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа CDBResult, содержащий записи,
 	* удовлетворяющие условию выборки.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
@@ -178,7 +151,7 @@ class CSocNetSmile extends CAllSocNetSmile
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetSmile/getlist.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/getlist.php
 	* @author Bitrix
 	*/
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())

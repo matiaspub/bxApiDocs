@@ -16,7 +16,7 @@ class CSecurityCloudMonitorRequest
 	const REMOTE_STATUS_OK = "ok";
 	const REMOTE_STATUS_ERROR = "error";
 	const REMOTE_STATUS_FATAL_ERROR = "fatal_error";
-	const CONNECTION_TIMEOUT = 10;
+	const TIMEOUT = 10;
 
 	private static $validActions = array("check", "get_results");
 	protected $response = array();
@@ -186,7 +186,7 @@ class CSecurityCloudMonitorRequest
 	 */
 	protected static function getCheckerUrl()
 	{
-		$result = "http://";
+		$result = COption::GetOptionString('security', 'security_scanner_secure_connection') !== 'Y' ? 'http://' : 'https://';
 		$result .= COption::GetOptionString("main", "update_site", "www.bitrixsoft.com");
 		$result .= self::BITRIX_CHECKER_URL_PATH;
 		return $result;
@@ -194,23 +194,21 @@ class CSecurityCloudMonitorRequest
 
 	/**
 	 * Send request to Bitrix (check o receive)
-	 * @param array $pPayload
+	 * @param array $payload
 	 * @return array|bool
 	 */
-	protected static function sendRequest(array $pPayload)
+	protected static function sendRequest(array $payload)
 	{
-		$request = new CHTTP();
-		$request->http_timeout = self::CONNECTION_TIMEOUT;
-		$request->setFollowRedirect(true);
-		@$request->Post(self::getCheckerUrl(), $pPayload);
-		if($request->status === 200 && $request->result)
+		$httpClient = new \Bitrix\Main\Web\HttpClient;
+		$httpClient->setRedirect(true);
+		$httpClient->setStreamTimeout(static::TIMEOUT);
+		$response = $httpClient->post(self::getCheckerUrl(), $payload);
+		if($response && $httpClient->getStatus() == 200)
 		{
-			return self::decodeResponse($request->result);	
+			return self::decodeResponse($response);
 		}
-		else
-		{
-			return false;
-		}
+
+		return false;
 	}
 
 	/**

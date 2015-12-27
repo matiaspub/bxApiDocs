@@ -4,7 +4,8 @@ class CGoogleMessage extends CPushMessage
 {
 	public function __construct($sDeviceToken = null)
 	{
-		if (isset($sDeviceToken)) {
+		if (isset($sDeviceToken))
+		{
 			$this->addRecipient($sDeviceToken);
 		}
 	}
@@ -18,19 +19,20 @@ class CGoogleMessage extends CPushMessage
 
 		$data = array(
 			"data" => array(
-					'contentTitle' => $this->title,
-					"contentText" => $this->text,
-					"messageParams"=>$this->customProperties
-				),
+				'contentTitle' => $this->title,
+				"contentText" => $this->text,
+				"messageParams" => $this->customProperties,
+				"category" => $this->getCategory()
+			),
 			"time_to_live" => $this->expiryValue,
 			"registration_ids" => $this->deviceTokens
 		);
 
-		$data = CPushManager::_MakeJson($data,"",true);
+		$data = CPushManager::_MakeJson($data, "", true);
 		$batch = "Content-type: application/json\r\n";
-		$batch.= "Content-length: " . CUtil::BinStrlen($data) . "\r\n";
-		$batch.= "\r\n";
-		$batch.= $data;
+		$batch .= "Content-length: " . CUtil::BinStrlen($data) . "\r\n";
+		$batch .= "\r\n";
+		$batch .= $data;
 
 		return base64_encode($batch);
 	}
@@ -54,12 +56,16 @@ class CGooglePush extends CPushService
 	{
 		$arGroupedMessages = self::getGroupedByAppID($messageData);
 		if (is_array($arGroupedMessages) && count($arGroupedMessages) <= 0)
+		{
 			return false;
+		}
 
-		$batch = $this->getBatchWithModifier($arGroupedMessages,";3;");
+		$batch = $this->getBatchWithModifier($arGroupedMessages, ";3;");
 
 		if (strlen($batch) == 0)
+		{
 			return $batch;
+		}
 
 		return $batch;
 	}
@@ -75,4 +81,5 @@ class CGooglePush extends CPushService
 		return new CGoogleMessage($token);
 	}
 }
+
 ?>

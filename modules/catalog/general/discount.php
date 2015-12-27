@@ -1,12 +1,16 @@
 <?
-use Bitrix\Main\Loader;
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main,
+	Bitrix\Main\Loader,
+	Bitrix\Main\ModuleManager,
+	Bitrix\Main\Config\Option,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Sale\DiscountCouponsManager;
+
+Loc::loadMessages(__FILE__);
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -34,15 +38,20 @@ class CAllCatalogDiscount
 	static protected $cacheDiscountHandlers = array();
 	static protected $usedModules = array();
 
-	static public function GetDiscountTypes($boolFull = false)
+	static protected $existCouponsManager = null;
+	static protected $useSaleDiscount = null;
+	static protected $getPriceTypesOnly = false;
+	static protected $getPercentFromBasePrice = null;
+
+	public static function GetDiscountTypes($boolFull = false)
 	{
 		$boolFull = ($boolFull === true);
 		if ($boolFull)
 		{
 			return array(
-				self::TYPE_PERCENT => GetMessage('BT_CAT_DISCOUNT_TYPE_PERCENT'),
-				self::TYPE_FIX => GetMessage('BT_CAT_DISCOUNT_TYPE_FIX'),
-				self::TYPE_SALE => GetMessage('BT_CAT_DISCOUNT_TYPE_SALE_EXT'),
+				self::TYPE_PERCENT => Loc::getMessage('BT_CAT_DISCOUNT_TYPE_PERCENT'),
+				self::TYPE_FIX => Loc::getMessage('BT_CAT_DISCOUNT_TYPE_FIX'),
+				self::TYPE_SALE => Loc::getMessage('BT_CAT_DISCOUNT_TYPE_SALE_EXT'),
 			);
 		}
 		return array(
@@ -50,6 +59,27 @@ class CAllCatalogDiscount
 			self::TYPE_FIX,
 			self::TYPE_SALE,
 		);
+	}
+
+	public static function setSaleDiscountFilter($priceTypesOnly = false)
+	{
+		self::initDiscountSettings();
+		if (self::$useSaleDiscount)
+		{
+			self::$getPriceTypesOnly = ($priceTypesOnly === true);
+		}
+	}
+
+	/**
+	 * Return calculate discount percent mode. Compatibility with old api only.
+	 *
+	 * @return bool
+	 */
+	public static function getUseBasePrice()
+	{
+		if (self::$getPercentFromBasePrice === null)
+			self::initDiscountSettings();
+		return self::$getPercentFromBasePrice;
 	}
 
 	static public function CheckFields($ACTION, &$arFields, $ID = 0)
@@ -127,27 +157,27 @@ class CAllCatalogDiscount
 			if (!isset($arFields['SITE_ID']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'SITE_ID', 'text' => GetMessage("KGD_EMPTY_SITE"));
+				$arMsg[] = array('id' => 'SITE_ID', 'text' => Loc::getMessage("KGD_EMPTY_SITE"));
 			}
 			if (!isset($arFields['CURRENCY']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'CURRENCY', 'text' => GetMessage('KGD_EMPTY_CURRENCY'));
+				$arMsg[] = array('id' => 'CURRENCY', 'text' => Loc::getMessage('KGD_EMPTY_CURRENCY'));
 			}
 			if (!isset($arFields['NAME']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('KGD_EMPTY_NAME'));
+				$arMsg[] = array('id' => 'NAME', 'text' => Loc::getMessage('KGD_EMPTY_NAME'));
 			}
 			if (!isset($arFields['VALUE']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'VALUE', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_BAD_VALUE'));
+				$arMsg[] = array('id' => 'VALUE', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_BAD_VALUE'));
 			}
 			if (!isset($arFields['CONDITIONS']))
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_EMPTY_CONDITIONS'));
+				$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_EMPTY_CONDITIONS'));
 			}
 			$arFields['USE_COUPONS'] = 'N';
 		}
@@ -158,7 +188,7 @@ class CAllCatalogDiscount
 			if ($ID <= 0)
 			{
 				$boolResult = false;
-				$arMsg[] = array('id' => 'ID', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_BAD_ID', array('#ID#', $ID)));
+				$arMsg[] = array('id' => 'ID', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_BAD_ID', array('#ID#', $ID)));
 			}
 			else
 			{
@@ -180,7 +210,7 @@ class CAllCatalogDiscount
 					else
 					{
 						$boolResult = false;
-						$arMsg[] = array('id' => 'ID', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_BAD_ID', array('#ID#', $ID)));
+						$arMsg[] = array('id' => 'ID', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_BAD_ID', array('#ID#', $ID)));
 					}
 				}
 			}
@@ -193,7 +223,7 @@ class CAllCatalogDiscount
 				if (empty($arFields['SITE_ID']))
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'SITE_ID', 'text' => GetMessage('KGD_EMPTY_SITE'));
+					$arMsg[] = array('id' => 'SITE_ID', 'text' => Loc::getMessage('KGD_EMPTY_SITE'));
 				}
 			}
 			if (isset($arFields['CURRENCY']))
@@ -201,7 +231,7 @@ class CAllCatalogDiscount
 				if (empty($arFields['CURRENCY']))
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'CURRENCY', 'text' => GetMessage('KGD_EMPTY_CURRENCY'));
+					$arMsg[] = array('id' => 'CURRENCY', 'text' => Loc::getMessage('KGD_EMPTY_CURRENCY'));
 				}
 			}
 			if (isset($arFields['NAME']))
@@ -210,7 +240,7 @@ class CAllCatalogDiscount
 				if ($arFields['NAME'] === '')
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'NAME', 'text' => GetMessage('KGD_EMPTY_NAME'));
+					$arMsg[] = array('id' => 'NAME', 'text' => Loc::getMessage('KGD_EMPTY_NAME'));
 				}
 			}
 			if (isset($arFields['ACTIVE']))
@@ -278,7 +308,7 @@ class CAllCatalogDiscount
 				if ($arFields['VALUE'] <= 0)
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'VALUE', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_BAD_VALUE'));
+					$arMsg[] = array('id' => 'VALUE', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_BAD_VALUE'));
 				}
 			}
 			if ($ACTION == 'UPDATE')
@@ -302,7 +332,7 @@ class CAllCatalogDiscount
 				if ($arFields['VALUE_TYPE'] == self::TYPE_PERCENT && $arFields['VALUE'] > 100)
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'VALUE', 'text' => GetMessage("BT_MOD_CATALOG_DISC_ERR_BAD_VALUE"));
+					$arMsg[] = array('id' => 'VALUE', 'text' => Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_BAD_VALUE"));
 				}
 			}
 			if (isset($arFields['MIN_ORDER_SUM']))
@@ -328,7 +358,7 @@ class CAllCatalogDiscount
 				if (empty($arFields['CONDITIONS']))
 				{
 					$boolResult = false;
-					$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage("BT_MOD_CATALOG_DISC_ERR_EMPTY_CONDITIONS"));
+					$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_EMPTY_CONDITIONS"));
 				}
 				else
 				{
@@ -341,7 +371,7 @@ class CAllCatalogDiscount
 						{
 							$boolCond = false;
 							$boolResult = false;
-							$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
+							$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
 						}
 						else
 						{
@@ -350,7 +380,7 @@ class CAllCatalogDiscount
 							{
 								$boolCond = false;
 								$boolResult = false;
-								$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
+								$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
 							}
 						}
 					}
@@ -367,7 +397,7 @@ class CAllCatalogDiscount
 						{
 							$boolCond = false;
 							$boolResult = false;
-							$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
+							$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_BAD_CONDITIONS"));
 						}
 						else
 						{
@@ -381,12 +411,12 @@ class CAllCatalogDiscount
 						if (!empty($usedHandlers))
 							$arFields['HANDLERS'] = $usedHandlers;
 
-						if ('mysql' == strtolower($DB->type))
+						if (strtolower($DB->type) == 'mysql')
 						{
 							if (64000 < CUtil::BinStrlen($arFields['UNPACK']) || 64000 < CUtil::BinStrlen($arFields['CONDITIONS']))
 							{
 								$boolResult = false;
-								$arMsg[] = array('id' => 'CONDITIONS', 'text' => GetMessage('BT_MOD_CATALOG_DISC_ERR_CONDITIONS_TOO_LONG'));
+								$arMsg[] = array('id' => 'CONDITIONS', 'text' => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_CONDITIONS_TOO_LONG'));
 								unset($arFields['UNPACK']);
 								$arFields['CONDITIONS'] = unserialize($arFields['CONDITIONS']);
 							}
@@ -428,9 +458,7 @@ class CAllCatalogDiscount
 
 	
 	/**
-	* <p>Метод добавляет новую скидку в соответствии с данными из массива arFields.</p>
-	*
-	*
+	* <p>Метод добавляет новую скидку в соответствии с данными из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой скидки, ключами в котором
@@ -486,11 +514,8 @@ class CAllCatalogDiscount
 	* =&gt; 'CondGroup', 'DATA' =&gt; array('All' =&gt; 'AND', 'True' =&gt; 'True'), 'CHILDREN' =&gt; array() ); </pre> </li>
 	* </ul>
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает код вставленной записи или <i>false</i> в случае
 	* ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -589,14 +614,10 @@ class CAllCatalogDiscount
 
 	
 	/**
-	* <p>Метод изменяет параметры скидки с кодом ID в соответствии с данными из массива arFields.</p>
-	*
-	*
+	* <p>Метод изменяет параметры скидки с кодом ID в соответствии с данными из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код скидки.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой скидки, ключами в котором
 	* являются названия параметров, а значениями - соответствующие
@@ -652,11 +673,8 @@ class CAllCatalogDiscount
 	* =&gt; 'CondGroup', 'DATA' =&gt; array('All' =&gt; 'AND', 'True' =&gt; 'True'), 'CHILDREN' =&gt; array() ); </pre> </li>
 	* </ul>
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает код измененной записи или <i>false</i> в случае
 	* ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -817,25 +835,22 @@ class CAllCatalogDiscount
 */
 	
 	/**
-	* <p>Метод добавляет код купона <i> coupon</i> в массив доступных для получения скидки купонов текущего покупателя. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов.</p>
-	*
-	*
+	* <p>Метод добавляет код купона <i> coupon</i> в массив доступных для получения скидки купонов текущего покупателя. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов. Метод динамичный.</p>
 	*
 	*
 	* @param string $coupon  Код купона.
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного добавления кода
-	* купона и <i>false</i> в случае ошибки.</p> <h4>Примечание</h4><p>С версии 12.0
-	* считаются устаревшим. Оставлен для совместимости. Рекомендуется
-	* использовать <a
+	* купона и <i>false</i> в случае ошибки.</p> <p></p><div class="note"> <b>Примечание:</b> с
+	* версии 12.0 считаются устаревшим. Оставлен для совместимости.
+	* Рекомендуется использовать <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/setcoupon.php">аналогичный
-	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</p> <br>
+	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</div> <br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.setcoupon.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.0.0  ->  CCatalogDiscountCoupon::SetCoupon()
 	*/
 	static public function SetCoupon($coupon)
 	{
@@ -848,20 +863,20 @@ class CAllCatalogDiscount
 */
 	
 	/**
-	* <p>Метод возвращает массив доступных для получения скидки купонов текущего покупателя. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов.</p>
-	*
-	*
+	* <p>Метод возвращает массив доступных для получения скидки купонов текущего покупателя. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов. Метод динамичный.</p>
 	*
 	*
 	* @return array <p>Метод возвращает массив купонов текущего пользователя.</p>
-	* <h4>Примечание</h4><p>С версии 12.0 метод считается устаревшим.
-	* Оставлен для совместимости. Рекомендуется использовать <a
+	* <p></p><div class="note"> <b>Примечание:</b> с версии 12.0 метод считается
+	* устаревшим. Оставлен для совместимости. Рекомендуется
+	* использовать <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getcoupons.php">аналогичный
-	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</p> <br>
+	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</div> <br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getcoupons.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.0.0  ->  CCatalogDiscountCoupon::GetCoupons()
 	*/
 	static public function GetCoupons()
 	{
@@ -883,20 +898,19 @@ class CAllCatalogDiscount
 */
 	
 	/**
-	* <p>Метод очищает массив купонов, введенных текущим покупателем. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов.</p>
+	* <p>Метод очищает массив купонов, введенных текущим покупателем. Система вычисляет минимальную для данного покупателя цену товара с учётом всех его скидок и купонов. Метод динамичный.</p>
 	*
 	*
-	*
-	*
-	* @return void <p>Метод не возвращает значений.</p> <h4>Примечание</h4><p>С версии 12.0
-	* метод считается устаревшим. Оставлен для совместимости.
-	* Рекомендуется использовать <a
+	* @return void <p>Метод не возвращает значений.</p> <p></p><div class="note"> <b>Примечание:</b> с
+	* версии 12.0 метод считается устаревшим. Оставлен для
+	* совместимости. Рекомендуется использовать <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/clearcoupon.php">аналогичный
-	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</p> <br><br>
+	* метод</a> класса <b>CCatalogDiscountCoupon</b>.</div> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.clearcoupon.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.0.0  ->  CCatalogDiscountCoupon::ClearCoupon()
 	*/
 	static public function ClearCoupon()
 	{
@@ -956,6 +970,8 @@ class CAllCatalogDiscount
 	{
 		global $DB;
 		$GroupID = (int)$GroupID;
+		if ($GroupID <= 0)
+			return false;
 
 		return $DB->Query("DELETE FROM b_catalog_discount2group WHERE GROUP_ID = ".$GroupID, true);
 	}
@@ -976,44 +992,29 @@ class CAllCatalogDiscount
 
 	
 	/**
-	* <p>Метод вычисляет скидку на цену с кодом productPriceID товара для пользователя, принадлежащего группам пользователей arUserGroups.</p>
-	*
-	*
+	* <p>Метод вычисляет скидку на цену с кодом productPriceID товара для пользователя, принадлежащего группам пользователей arUserGroups. Метод динамичный.</p>
 	*
 	*
 	* @param int $productPriceID  Код цены.</bod
 	*
-	*
-	*
 	* @param  $array  Массив групп, которым принадлежит пользователь. Для текущего
 	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
 	*
-	*
-	*
 	* @param arUserGroup $s = array()[ Флаг "Продление подписки".
 	*
-	*
-	*
 	* @param string $renewal = "N"[ Сайт (по умолчанию текущий).
-	*
-	*
 	*
 	* @param string $siteID = false[ Массив купонов, которые влияют на выборку скидок. Если задано
 	* значение <i>false</i>, то массив купонов будет взят из <b>
 	* CCatalogDiscountCoupon::GetCoupons</b>
 	*
-	*
-	*
 	* @param array $arDiscountCoupons = false]]]] 
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает массив ассоциативных массивов скидок или
 	* <i>false</i> в случае ошибки. В массиве содержится ассоциативный
 	* массив параметров максимальной процентной скидки (если есть) и
 	* ассоциативный массив параметров максимальной фиксированной
 	* скидки (если есть). <a name="examples"></a> </p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1068,7 +1069,7 @@ class CAllCatalogDiscount
 		$productPriceID = (int)$productPriceID;
 		if ($productPriceID <= 0)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_DISC_ERR_PRICE_ID_ABSENT"), "NO_PRICE_ID");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_PRICE_ID_ABSENT"), "NO_PRICE_ID");
 			return false;
 		}
 
@@ -1085,51 +1086,44 @@ class CAllCatalogDiscount
 		}
 		else
 		{
-			$APPLICATION->ThrowException(str_replace("#ID#", $productPriceID, GetMessage("BT_MOD_CATALOG_DISC_ERR_PRICE_ID_NOT_FOUND")), "NO_PRICE");
+			$APPLICATION->ThrowException(
+				Loc::getMessage(
+					'BT_MOD_CATALOG_DISC_ERR_PRICE_ID_NOT_FOUND',
+					array(
+						'#ID#' => $productPriceID
+					)
+				),
+				'NO_PRICE'
+			);
 			return false;
 		}
 	}
 
 	
 	/**
-	* <p>Метод вычисляет скидку на товар с кодом productID для пользователя, принадлежащего группам пользователей arUserGroups.</p>
-	*
-	*
+	* <p>Метод вычисляет скидку на товар с кодом productID для пользователя, принадлежащего группам пользователей arUserGroups. Метод динамичный.</p>
 	*
 	*
 	* @param int $productID = 0[ Код товара.
 	*
-	*
-	*
 	* @param array $arUserGroups = array()[ Массив групп, которым принадлежит пользователь. Для текущего
 	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
 	*
-	*
-	*
 	* @param string $renewal = "N"[ Флаг "Продление подписки"
-	*
-	*
 	*
 	* @param array $arCatalogGroups = array()[ Массив типов цен, для которых искать скидку.
 	*
-	*
-	*
 	* @param string $siteID = false[ Сайт (по умолчанию текущий)
-	*
-	*
 	*
 	* @param array $arDiscountCoupons = false]]]] Массив купонов, которые влияют на выборку скидок. Если задано
 	* значение <i>false</i>, то массив купонов будет взят из <b>
 	* CCatalogDiscountCoupon::GetCoupons</b>
-	*
-	*
 	*
 	* @return mixed <p>Метод возвращает массив ассоциативных массивов скидок или
 	* <i>false</i> в случае ошибки. В массиве содержится ассоциативный
 	* массив параметров максимальной процентной скидки (если есть) и
 	* ассоциативный массив параметров максимальной фиксированной
 	* скидки (если есть).</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1163,30 +1157,67 @@ class CAllCatalogDiscount
 		$productID = (int)$productID;
 		if ($productID <= 0)
 		{
-			$APPLICATION->ThrowException(str_replace("#ID#", $productID, GetMessage("BT_MOD_CATALOG_DISC_ERR_ELEMENT_ID_NOT_FOUND")), "NO_ELEMENT");
+			$APPLICATION->ThrowException(
+				Loc::getMessage(
+					'BT_MOD_CATALOG_DISC_ERR_ELEMENT_ID_NOT_FOUND',
+					array(
+						'#ID' => $productID
+					)
+				),
+				'NO_ELEMENT');
 			return false;
 		}
 
 		$intIBlockID = CIBlockElement::GetIBlockByID($productID);
 		if ($intIBlockID === false)
 		{
-			$APPLICATION->ThrowException(str_replace("#ID#", $productID, GetMessage("BT_MOD_CATALOG_DISC_ERR_ELEMENT_ID_NOT_FOUND")), "NO_ELEMENT");
+			$APPLICATION->ThrowException(
+				Loc::getMessage(
+					'BT_MOD_CATALOG_DISC_ERR_ELEMENT_ID_NOT_FOUND',
+					array(
+						'#ID#' => $productID
+					)
+				),
+				'NO_ELEMENT'
+			);
 			return false;
 		}
 
 		return CCatalogDiscount::GetDiscount($productID, $intIBlockID, $arCatalogGroups, $arUserGroups, $renewal, $siteID, $arDiscountCoupons);
 	}
 
+	/**
+	 * @param int $intProductID
+	 * @param int $intIBlockID
+	 * @param array $arCatalogGroups
+	 * @param array $arUserGroups
+	 * @param string $strRenewal
+	 * @param bool|string $siteID
+	 * @param bool|array $arDiscountCoupons
+	 * @param bool $boolSKU
+	 * @param bool $boolGetIDS
+	 * @return array|false
+	 */
 	static public function GetDiscount($intProductID, $intIBlockID, $arCatalogGroups = array(), $arUserGroups = array(), $strRenewal = "N", $siteID = false, $arDiscountCoupons = false, $boolSKU = true, $boolGetIDS = false)
 	{
-		global $DB;
-		global $APPLICATION;
+		static $eventOnGetExists = null;
+		static $eventOnResultExists = null;
 
-		foreach (GetModuleEvents("catalog", "OnGetDiscount", true) as $arEvent)
+		global $DB, $APPLICATION;
+
+		self::initDiscountSettings();
+
+		if ($eventOnGetExists === true || $eventOnGetExists === null)
 		{
-			$mxResult = ExecuteModuleEventEx($arEvent, array($intProductID, $intIBlockID, $arCatalogGroups, $arUserGroups, $strRenewal, $siteID, $arDiscountCoupons, $boolSKU, $boolGetIDS));
-			if ($mxResult !== true)
-				return $mxResult;
+			foreach (GetModuleEvents("catalog", "OnGetDiscount", true) as $arEvent)
+			{
+				$eventOnGetExists = true;
+				$mxResult = ExecuteModuleEventEx($arEvent, array($intProductID, $intIBlockID, $arCatalogGroups, $arUserGroups, $strRenewal, $siteID, $arDiscountCoupons, $boolSKU, $boolGetIDS));
+				if ($mxResult !== true)
+					return $mxResult;
+			}
+			if ($eventOnGetExists === null)
+				$eventOnGetExists = false;
 		}
 
 		$boolSKU = ($boolSKU === true);
@@ -1195,45 +1226,45 @@ class CAllCatalogDiscount
 		$intProductID = (int)$intProductID;
 		if ($intProductID <= 0)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_DISC_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_PRODUCT_ID_ABSENT"), "NO_PRODUCT_ID");
 			return false;
 		}
 
 		$intIBlockID = (int)$intIBlockID;
 		if ($intIBlockID <= 0)
 		{
-			$APPLICATION->ThrowException(GetMessage("BT_MOD_CATALOG_DISC_ERR_IBLOCK_ID_ABSENT"), "NO_IBLOCK_ID");
+			$APPLICATION->ThrowException(Loc::getMessage("BT_MOD_CATALOG_DISC_ERR_IBLOCK_ID_ABSENT"), "NO_IBLOCK_ID");
 			return false;
 		}
 
-		if (!is_array($arCatalogGroups))
-		{
-			$arCatalogGroups = array($arCatalogGroups);
-		}
-		if (!empty($arCatalogGroups))
-		{
-			CatalogClearArray($arCatalogGroups);
-		}
-
 		if (!is_array($arUserGroups))
-		{
 			$arUserGroups = array($arUserGroups);
-		}
 		$arUserGroups[] = 2;
 		if (!empty($arUserGroups))
-		{
-			CatalogClearArray($arUserGroups);
-		}
+			Main\Type\Collection::normalizeArrayValuesByInt($arUserGroups, true);
 
-		$strRenewal = ($strRenewal == "Y" ? "Y" : "N");
+		if (!is_array($arCatalogGroups))
+			$arCatalogGroups = array($arCatalogGroups);
+		if (empty($arCatalogGroups))
+		{
+			$catalogGroupIterator = CCatalogGroup::GetGroupsList(array(
+				'GROUP_ID' => $arUserGroups,
+				'BUY' => array('Y', 'N')
+			));
+			while ($catalogGroup = $catalogGroupIterator->Fetch())
+				$arCatalogGroups[$catalogGroup['CATALOG_GROUP_ID']] = $catalogGroup['CATALOG_GROUP_ID'];
+			unset($catalogGroup, $catalogGroupIterator);
+		}
+		if (!empty($arCatalogGroups))
+			Main\Type\Collection::normalizeArrayValuesByInt($arCatalogGroups, true);
+		if (empty($arCatalogGroups))
+			return false;
+
+		$strRenewal = ((string)$strRenewal == 'Y' ? 'Y' : 'N');
 
 		if ($siteID === false)
 			$siteID = SITE_ID;
 
-		if ($arDiscountCoupons === false)
-			$arDiscountCoupons = CCatalogDiscountCoupon::GetCoupons();
-
-		$arSKU = false;
 		$arSKUExt = false;
 		if ($boolSKU)
 		{
@@ -1244,197 +1275,230 @@ class CAllCatalogDiscount
 		$arResult = array();
 		$arResultID = array();
 
-		$strCacheKey = md5('C'.implode('_', $arCatalogGroups).'-'.'U'.implode('_', $arUserGroups));
-		if (!isset(self::$arCacheDiscountFilter[$strCacheKey]))
+		if (self::$useSaleDiscount)
 		{
-			$arFilter = array(
-				'PRICE_TYPE_ID' => $arCatalogGroups,
-				'USER_GROUP_ID' => $arUserGroups,
-			);
-			$arDiscountIDs = CCatalogDiscount::__GetDiscountID($arFilter);
+
+		}
+		else
+		{
+			$strCacheKey = md5('C'.implode('_', $arCatalogGroups).'-'.'U'.implode('_', $arUserGroups));
+			if (!isset(self::$arCacheDiscountFilter[$strCacheKey]))
+			{
+				$arFilter = array(
+					'PRICE_TYPE_ID' => $arCatalogGroups,
+					'USER_GROUP_ID' => $arUserGroups,
+				);
+				$arDiscountIDs = CCatalogDiscount::__GetDiscountID($arFilter);
+				if (!empty($arDiscountIDs))
+					sort($arDiscountIDs);
+
+				self::$arCacheDiscountFilter[$strCacheKey] = $arDiscountIDs;
+			}
+			else
+			{
+				$arDiscountIDs = self::$arCacheDiscountFilter[$strCacheKey];
+			}
+
+			$arProduct = array();
+
 			if (!empty($arDiscountIDs))
 			{
-				sort($arDiscountIDs);
+				if ($arDiscountCoupons === false)
+				{
+					if (self::$existCouponsManager && Loader::includeModule('sale'))
+					{
+						$arDiscountCoupons = DiscountCouponsManager::getForApply(
+							array('MODULE' => 'catalog', 'DISCOUNT_ID' => $arDiscountIDs),
+							array('MODULE' => 'catalog', 'PRODUCT_ID' => $intProductID, 'BASKET_ID' => '0'),
+							true
+						);
+						if (!empty($arDiscountCoupons))
+							$arDiscountCoupons = array_keys($arDiscountCoupons);
+					}
+					else
+					{
+						if (!isset($_SESSION['CATALOG_USER_COUPONS']) || !is_array($_SESSION['CATALOG_USER_COUPONS']))
+							$_SESSION['CATALOG_USER_COUPONS'] = array();
+						$arDiscountCoupons = $_SESSION["CATALOG_USER_COUPONS"];
+					}
+				}
+				if ($arDiscountCoupons === false)
+					$arDiscountCoupons = array();
+				$boolGenerate = false;
+				if (empty(self::$cacheDiscountHandlers))
+				{
+					self::$cacheDiscountHandlers = CCatalogDiscount::getDiscountHandlers($arDiscountIDs);
+				}
+				else
+				{
+					$needDiscountHandlers = array();
+					foreach ($arDiscountIDs as &$discountID)
+					{
+						if (!isset(self::$cacheDiscountHandlers[$discountID]))
+							$needDiscountHandlers[] = $discountID;
+					}
+					unset($discountID);
+					if (!empty($needDiscountHandlers))
+					{
+						$discountHandlersList = CCatalogDiscount::getDiscountHandlers($needDiscountHandlers);
+						if (!empty($discountHandlersList))
+						{
+							foreach ($discountHandlersList as $discountID => $discountHandlers)
+								self::$cacheDiscountHandlers[$discountID] = $discountHandlers;
+
+							unset($discountHandlers, $discountID);
+						}
+						unset($discountHandlersList);
+					}
+					unset($needDiscountHandlers);
+				}
+
+				$strCacheKey = 'D'.implode('_', $arDiscountIDs).'-'.'S'.$siteID.'-R'.$strRenewal;
+				if (!empty($arDiscountCoupons))
+					$strCacheKey .= '-C'.implode('|', $arDiscountCoupons);
+
+				$strCacheKey = md5($strCacheKey);
+
+				if (!isset(self::$arCacheDiscountResult[$strCacheKey]))
+				{
+					$arDiscountList = array();
+
+					$arSelect = array(
+						'ID', 'TYPE', 'SITE_ID', 'ACTIVE', 'ACTIVE_FROM', 'ACTIVE_TO',
+						'RENEWAL', 'NAME', 'SORT', 'MAX_DISCOUNT', 'VALUE_TYPE', 'VALUE', 'CURRENCY',
+						'PRIORITY', 'LAST_DISCOUNT',
+						'COUPON', 'COUPON_ONE_TIME', 'COUPON_ACTIVE', 'UNPACK', 'CONDITIONS'
+					);
+					$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
+					$discountRows = array_chunk($arDiscountIDs, 500);
+					foreach ($discountRows as &$row)
+					{
+						$arFilter = array(
+							'@ID' => $row,
+							'SITE_ID' => $siteID,
+							'TYPE' => self::ENTITY_ID,
+							'RENEWAL' => $strRenewal,
+							'+<=ACTIVE_FROM' => $strDate,
+							'+>=ACTIVE_TO' => $strDate
+						);
+
+						if (is_array($arDiscountCoupons))
+							$arFilter['+COUPON'] = $arDiscountCoupons;
+
+						CTimeZone::Disable();
+						$rsPriceDiscounts = CCatalogDiscount::GetList(
+							array(),
+							$arFilter,
+							false,
+							false,
+							$arSelect
+						);
+						CTimeZone::Enable();
+						while ($arPriceDiscount = $rsPriceDiscounts->Fetch())
+						{
+							$arPriceDiscount['HANDLERS'] = array();
+							$arPriceDiscount['MODULE_ID'] = 'catalog';
+							$arPriceDiscount['TYPE'] = (int)$arPriceDiscount['TYPE'];
+							$arDiscountList[] = $arPriceDiscount;
+						}
+					}
+					unset($row, $discountRows);
+					self::$arCacheDiscountResult[$strCacheKey] = $arDiscountList;
+				}
+				else
+				{
+					$arDiscountList = self::$arCacheDiscountResult[$strCacheKey];
+				}
+
+				if (!empty($arDiscountList))
+				{
+					$discountApply = array();
+					foreach ($arDiscountList as &$arPriceDiscount)
+					{
+						if (!isset($discountApply[$arPriceDiscount['ID']]) && $arPriceDiscount['COUPON_ACTIVE'] != 'N')
+						{
+							if (!$boolGenerate)
+							{
+								if (!isset(self::$arCacheProduct[$intProductID]))
+								{
+									$arProduct = array('ID' => $intProductID, 'IBLOCK_ID' => $intIBlockID);
+									if (!self::__GenerateFields($arProduct))
+										return false;
+									if ($boolSKU)
+									{
+										if (!self::__GenerateParent($arProduct, $arSKUExt))
+											$boolSKU = false;
+									}
+									$boolGenerate = true;
+									self::$arCacheProduct[$intProductID] = $arProduct;
+								}
+								else
+								{
+									$boolGenerate = true;
+									$arProduct = self::$arCacheProduct[$intProductID];
+								}
+							}
+							$discountApply[$arPriceDiscount['ID']] = true;
+							$applyFlag = true;
+							if (isset(self::$cacheDiscountHandlers[$arPriceDiscount['ID']]))
+							{
+								$arPriceDiscount['HANDLERS'] = self::$cacheDiscountHandlers[$arPriceDiscount['ID']];
+								$moduleList = self::$cacheDiscountHandlers[$arPriceDiscount['ID']]['MODULES'];
+								if (!empty($moduleList))
+								{
+									foreach ($moduleList as &$moduleID)
+									{
+										if (!isset(self::$usedModules[$moduleID]))
+											self::$usedModules[$moduleID] = Loader::includeModule($moduleID);
+
+										if (!self::$usedModules[$moduleID])
+										{
+											$applyFlag = false;
+											break;
+										}
+									}
+									unset($moduleID);
+								}
+								unset($moduleList);
+							}
+							if ($applyFlag && CCatalogDiscount::__Unpack($arProduct, $arPriceDiscount['UNPACK']))
+							{
+								$arResult[] = $arPriceDiscount;
+								$arResultID[] = $arPriceDiscount['ID'];
+							}
+						}
+					}
+					if (isset($arPriceDiscount))
+						unset($arPriceDiscount);
+					unset($discountApply);
+				}
 			}
-			self::$arCacheDiscountFilter[$strCacheKey] = $arDiscountIDs;
-		}
-		else
-		{
-			$arDiscountIDs = self::$arCacheDiscountFilter[$strCacheKey];
-		}
 
-		$arProduct = array();
-
-		if (!empty($arDiscountIDs))
-		{
-			$boolGenerate = false;
-			if (empty(self::$cacheDiscountHandlers))
+			if (!$boolGetIDS)
 			{
-				self::$cacheDiscountHandlers = CCatalogDiscount::getDiscountHandlers($arDiscountIDs);
+				$arDiscSave = CCatalogDiscountSave::GetDiscount(array(
+					'USER_ID' => 0,
+					'USER_GROUPS' => $arUserGroups,
+					'SITE_ID' => $siteID
+				));
+				if (!empty($arDiscSave))
+					$arResult = (!empty($arResult) ? array_merge($arResult, $arDiscSave) : $arDiscSave);
 			}
 			else
 			{
-				$needDiscountHandlers = array();
-				foreach ($arDiscountIDs as &$discountID)
-				{
-					if (!isset(self::$cacheDiscountHandlers[$discountID]))
-						$needDiscountHandlers[] = $discountID;
-				}
-				unset($discountID);
-				if (!empty($needDiscountHandlers))
-				{
-					$discountHandlersList = CCatalogDiscount::getDiscountHandlers($needDiscountHandlers);
-					if (!empty($discountHandlersList))
-					{
-						foreach ($discountHandlersList as $discountID => $discountHandlers)
-						{
-							self::$cacheDiscountHandlers[$discountID] = $discountHandlers;
-						}
-						unset($discountHandlers, $discountID);
-					}
-					unset($discountHandlersList);
-				}
-				unset($needDiscountHandlers);
-			}
-
-			$strCacheKey = 'D'.implode('_', $arDiscountIDs).'-'.'S'.$siteID.'-R'.$strRenewal;
-			if (!empty($arDiscountCoupons))
-			{
-				$strCacheKey .= '-C'.implode('|', $arDiscountCoupons);
-			}
-			$strCacheKey = md5($strCacheKey);
-
-			if (!isset(self::$arCacheDiscountResult[$strCacheKey]))
-			{
-				$arSelect = array(
-					'ID', 'TYPE', 'SITE_ID', 'ACTIVE', 'ACTIVE_FROM', 'ACTIVE_TO',
-					'RENEWAL', 'NAME', 'SORT', 'MAX_DISCOUNT', 'VALUE_TYPE', 'VALUE', 'CURRENCY',
-					'PRIORITY', 'LAST_DISCOUNT',
-					'COUPON', 'COUPON_ONE_TIME', 'COUPON_ACTIVE', 'UNPACK'
-				);
-				$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
-				$arFilter = array(
-					'ID' => $arDiscountIDs,
-					'SITE_ID' => $siteID,
-					'TYPE' => self::ENTITY_ID,
-					'RENEWAL' => $strRenewal,
-					'+<=ACTIVE_FROM' => $strDate,
-					'+>=ACTIVE_TO' => $strDate
-				);
-
-				if (is_array($arDiscountCoupons))
-				{
-					$arFilter["+COUPON"] = $arDiscountCoupons;
-				}
-
-				$arDiscountList = array();
-				CTimeZone::Disable();
-				$rsPriceDiscounts = CCatalogDiscount::GetList(
-					array(),
-					$arFilter,
-					false,
-					false,
-					$arSelect
-				);
-				CTimeZone::Enable();
-				while ($arPriceDiscount = $rsPriceDiscounts->Fetch())
-				{
-					$arPriceDiscount['HANDLERS'] = array();
-					$arDiscountList[] = $arPriceDiscount;
-				}
-				self::$arCacheDiscountResult[$strCacheKey] = $arDiscountList;
-			}
-			else
-			{
-				$arDiscountList = self::$arCacheDiscountResult[$strCacheKey];
-			}
-
-			if (!empty($arDiscountList))
-			{
-				$discountApply = array();
-				foreach ($arDiscountList as &$arPriceDiscount)
-				{
-					if (!isset($discountApply[$arPriceDiscount['ID']]) && $arPriceDiscount['COUPON_ACTIVE'] != 'N')
-					{
-						if (!$boolGenerate)
-						{
-							if (!isset(self::$arCacheProduct[$intProductID]))
-							{
-								$arProduct = array('ID' => $intProductID, 'IBLOCK_ID' => $intIBlockID);
-								if (!self::__GenerateFields($arProduct))
-									return false;
-								if ($boolSKU)
-								{
-									if (!self::__GenerateParent($arProduct, $arSKUExt))
-										$boolSKU = false;
-								}
-								$boolGenerate = true;
-								self::$arCacheProduct[$intProductID] = $arProduct;
-							}
-							else
-							{
-								$boolGenerate = true;
-								$arProduct = self::$arCacheProduct[$intProductID];
-							}
-						}
-						$discountApply[$arPriceDiscount['ID']] = true;
-						$applyFlag = true;
-						if (isset(self::$cacheDiscountHandlers[$arPriceDiscount['ID']]))
-						{
-							$arPriceDiscount['HANDLERS'] = self::$cacheDiscountHandlers[$arPriceDiscount['ID']];
-							$moduleList = self::$cacheDiscountHandlers[$arPriceDiscount['ID']]['MODULES'];
-							if (!empty($moduleList))
-							{
-								foreach ($moduleList as &$moduleID)
-								{
-									if (!isset(self::$usedModules[$moduleID]))
-									{
-										self::$usedModules[$moduleID] = Loader::includeModule($moduleID);
-									}
-									if (!self::$usedModules[$moduleID])
-									{
-										$applyFlag = false;
-										break;
-									}
-								}
-								unset($moduleID);
-							}
-							unset($moduleList);
-						}
-						if ($applyFlag && CCatalogDiscount::__Unpack($arProduct, $arPriceDiscount['UNPACK']))
-						{
-							unset($arPriceDiscount['UNPACK']);
-							$arResult[] = $arPriceDiscount;
-							$arResultID[] = $arPriceDiscount['ID'];
-						}
-					}
-				}
-				if (isset($arPriceDiscount))
-					unset($arPriceDiscount);
-				unset($discountApply);
+				$arResult = $arResultID;
 			}
 		}
 
-		if (!$boolGetIDS)
+		if ($eventOnResultExists === true || $eventOnResultExists === null)
 		{
-			$arDiscSave = CCatalogDiscountSave::GetDiscount(array(
-				'USER_ID' => 0,
-				'USER_GROUPS' => $arUserGroups,
-				'SITE_ID' => $siteID
-			));
-			if (!empty($arDiscSave))
+			foreach (GetModuleEvents("catalog", "OnGetDiscountResult", true) as $arEvent)
 			{
-				$arResult = (!empty($arResult) ? array_merge($arResult, $arDiscSave) : $arDiscSave);
+				$eventOnResultExists = true;
+				ExecuteModuleEventEx($arEvent, array(&$arResult));
 			}
-		}
-		else
-		{
-			$arResult = $arResultID;
-		}
-
-		foreach (GetModuleEvents("catalog", "OnGetDiscountResult", true) as $arEvent)
-		{
-			ExecuteModuleEventEx($arEvent, array(&$arResult));
+			if ($eventOnResultExists === null)
+				$eventOnResultExists = false;
 		}
 
 		return $arResult;
@@ -1450,9 +1514,9 @@ class CAllCatalogDiscount
 
 		$excludeID = (int)$excludeID;
 		if ($excludeID > 0)
-			$arFilter["!ID"] = $excludeID;
+			$arFilter['!ID'] = $excludeID;
 
-		$dbRes = CCatalogDiscountCoupon::GetList(array(), $arFilter, false, array("nTopCount" => 1), array("ID"));
+		$dbRes = CCatalogDiscountCoupon::GetList(array(), $arFilter, false, array('nTopCount' => 1), array("ID"));
 		if ($dbRes->Fetch())
 			return true;
 		else
@@ -1486,9 +1550,16 @@ class CAllCatalogDiscount
 		return CCatalogDiscountCoupon::OnDeleteCouponList($intUserID, $arModules);
 	}
 
+	/**
+	 * @param array $arProduct
+	 * @param bool|array $arParams
+	 * @return array
+	 */
 	static public function GetDiscountForProduct($arProduct, $arParams = false)
 	{
 		global $DB;
+
+		self::initDiscountSettings();
 
 		$arResult = array();
 		$arResultID = array();
@@ -1506,6 +1577,12 @@ class CAllCatalogDiscount
 			if ($arProduct['IBLOCK_ID'] <= 0)
 				return $arResult;
 
+			$arSKUExt = false;
+			if (isset($arParams['SKU']) && $arParams['SKU'] == 'Y')
+			{
+				$arSKUExt = CCatalogSKU::GetInfoByOfferIBlock($arProduct['IBLOCK_ID']);
+			}
+
 			$arFieldsParams = array();
 			if (isset($arParams['TIME_ZONE']))
 				$arFieldsParams['TIME_ZONE'] = $arParams['TIME_ZONE'];
@@ -1513,7 +1590,7 @@ class CAllCatalogDiscount
 				$arFieldsParams['PRODUCT'] = $arParams['PRODUCT'];
 			$boolGenerate = false;
 
-			$arSelect = array("ID", "SITE_ID", "SORT", "NAME", "VALUE_TYPE", "VALUE", "CURRENCY", 'UNPACK');
+			$arSelect = array('ID', 'SITE_ID', 'SORT', 'NAME', 'VALUE_TYPE', 'VALUE', 'CURRENCY', 'UNPACK');
 			if (isset($arParams['DISCOUNT_FIELDS']) && !empty($arParams['DISCOUNT_FIELDS']) && is_array($arParams['DISCOUNT_FIELDS']))
 				$arSelect = $arParams['DISCOUNT_FIELDS'];
 			if (!in_array('UNPACK', $arSelect))
@@ -1528,8 +1605,7 @@ class CAllCatalogDiscount
 			{
 				$strRenewal = $arParams['RENEWAL'];
 			}
-			if ('Y' != $strRenewal)
-				$strRenewal = 'N';
+			$strRenewal = ($strRenewal == 'Y' ? 'Y' : 'N');
 
 			$arSiteList = array();
 			if (isset($arParams['SITE_ID']))
@@ -1549,12 +1625,12 @@ class CAllCatalogDiscount
 			}
 
 			$arFilter = array(
-				"SITE_ID" => $arSiteList,
-				"TYPE" => self::ENTITY_ID,
-				"ACTIVE" => "Y",
-				"RENEWAL" => $strRenewal,
-				"+<=ACTIVE_FROM" => $strDate,
-				"+>=ACTIVE_TO" => $strDate,
+				'SITE_ID' => $arSiteList,
+				'TYPE' => self::ENTITY_ID,
+				'ACTIVE' => "Y",
+				'RENEWAL' => $strRenewal,
+				'+<=ACTIVE_FROM' => $strDate,
+				'+>=ACTIVE_TO' => $strDate,
 				'COUPON' => ''
 			);
 			CTimeZone::Disable();
@@ -1576,6 +1652,10 @@ class CAllCatalogDiscount
 						{
 							if (!self::__GenerateFields($arProduct, $arFieldsParams))
 								return $arResult;
+							if (!empty($arSKUExt))
+							{
+								self::__GenerateParent($arProduct, $arSKUExt);
+							}
 							$boolGenerate = true;
 							self::$arCacheProduct[$arProduct['ID']] = $arProduct['ID'];
 						}
@@ -1589,60 +1669,6 @@ class CAllCatalogDiscount
 						unset($arPriceDiscount['UNPACK']);
 						$arResult[] = $arPriceDiscount;
 						$arResultID[] = $arPriceDiscount['ID'];
-					}
-				}
-			}
-
-			if (isset($arParams['SKU']) && 'Y' == $arParams['SKU'])
-			{
-				$arSKU = (
-					isset($arParams['SKU_PARAMS'])
-					? $arParams['SKU_PARAMS']
-					: CCatalogSKU::GetInfoByOfferIBlock($arProduct['IBLOCK_ID'])
-				);
-				if (!empty($arSKU) && is_array($arSKU))
-				{
-					$arParent = array();
-					$arParent['ID'] = 0;
-					$arParent['IBLOCK_ID'] = $arSKU['PRODUCT_IBLOCK_ID'];
-					if (
-						isset($arProduct['PROPERTY_'.$arSKU['SKU_PROPERTY_ID'].'_VALUE'])
-						&& is_array($arProduct['PROPERTY_'.$arSKU['SKU_PROPERTY_ID'].'_VALUE'])
-					)
-					{
-						$intParentID = (int)current($arProduct['PROPERTY_'.$arSKU['SKU_PROPERTY_ID'].'_VALUE']);
-						if ($intParentID > 0)
-						{
-							$arParent['ID'] = $intParentID;
-						}
-					}
-					$arParentParams = array();
-					if (isset($arParams['TIME_ZONE']))
-						$arParentParams['TIME_ZONE'] = $arParams['TIME_ZONE'];
-					if (isset($arParams['DISCOUNT_FIELDS']))
-						$arParentParams['DISCOUNT_FIELDS'] = $arParams['DISCOUNT_FIELDS'];
-					$arParentParams['RENEWAL'] = $strRenewal;
-					$arParentParams['SITE_ID'] = $arSiteList;
-					$arParentParams['CURRENT_DATE'] = $strDate;
-					$arDiscountParent = self::GetDiscountForProduct($arParent, $arParentParams);
-					if (!empty($arDiscountParent))
-					{
-						if (empty($arResult))
-						{
-							$arResult = $arDiscountParent;
-						}
-						else
-						{
-							foreach ($arDiscountParent as &$arOneParentDiscount)
-							{
-								if (in_array($arOneParentDiscount['ID'], $arResultID))
-									continue;
-								$arResult[] = $arOneParentDiscount;
-								$arResultID[] = $arOneParentDiscount['ID'];
-							}
-							if (isset($arOneParentDiscount))
-								unset($arOneParentDiscount);
-						}
 					}
 				}
 			}
@@ -1698,19 +1724,290 @@ class CAllCatalogDiscount
 		return CCatalogDiscount::__Unpack($arProduct, $arDiscount['UNPACK']);
 	}
 
+	public static function applyDiscountList($price, $currency, &$discountList)
+	{
+		$price = (float)$price;
+		$currency = CCurrency::checkCurrencyID($currency);
+		if ($currency === false || !is_array($discountList))
+			return false;
+
+		if (self::$useSaleDiscount === null)
+			self::initDiscountSettings();
+
+		$currentPrice = $price;
+		$applyDiscountList = array();
+
+		$result = array(
+			'PRICE' => $price,
+			'CURRENCY' => $currency,
+			'DISCOUNT_LIST' => array()
+		);
+		if ($price <= 0 || empty($discountList))
+			return $result;
+
+		if (self::$useSaleDiscount)
+		{
+
+		}
+		else
+		{
+			$accumulativeDiscountMode = (string)Option::get('catalog', 'discsave_apply');
+			$productDiscountList = array();
+			$accumulativeDiscountList = array();
+
+			self::primaryDiscountFilter(
+				$price,
+				$currency,
+				$discountList,
+				$productDiscountList,
+				$accumulativeDiscountList
+			);
+			if (!empty($productDiscountList))
+			{
+				foreach ($productDiscountList as &$priority)
+				{
+					$currentPrice = self::calculatePriorityLevel($price, $currentPrice, $currency, $priority, $applyDiscountList);
+					if ($currentPrice === false)
+						return false;
+					if (!empty($applyDiscountList))
+					{
+						$lastDiscount = end($applyDiscountList);
+						reset($applyDiscountList);
+						if (isset($lastDiscount['LAST_DISCOUNT']) && $lastDiscount['LAST_DISCOUNT'] == 'Y')
+							break;
+					}
+				}
+				unset($priority);
+			}
+
+			if (!empty($accumulativeDiscountList))
+			{
+				switch ($accumulativeDiscountMode)
+				{
+					case CCatalogDiscountSave::APPLY_MODE_REPLACE:
+						$applyAccumulativeList = array();
+						$accumulativePrice = self::calculateDiscSave(
+							$price,
+							$price,
+							$currency,
+							$accumulativeDiscountList,
+							$applyAccumulativeList
+						);
+						if ($accumulativePrice === false)
+							return false;
+						if (!empty($applyAccumulativeList) && $accumulativePrice < $currentPrice)
+						{
+							$currentPrice = $accumulativePrice;
+							$applyDiscountList = $applyAccumulativeList;
+						}
+						break;
+					case CCatalogDiscountSave::APPLY_MODE_ADD:
+						$currentPrice = self::calculateDiscSave(
+							$price,
+							$currentPrice,
+							$currency,
+							$accumulativeDiscountList,
+							$applyDiscountList
+						);
+						if ($currentPrice === false)
+							return false;
+						break;
+					case CCatalogDiscountSave::APPLY_MODE_DISABLE:
+						if (empty($applyDiscountList))
+						{
+							$currentPrice = self::calculateDiscSave(
+								$price,
+								$currentPrice,
+								$currency,
+								$accumulativeDiscountList,
+								$applyDiscountList
+							);
+							if ($currentPrice === false)
+								return false;
+						}
+						break;
+				}
+			}
+		}
+		$result = array(
+			'PRICE' => $currentPrice,
+			'CURRENCY' => $currency,
+			'DISCOUNT_LIST' => $applyDiscountList
+		);
+		return $result;
+	}
+
+	public static function calculateDiscountList($priceData, $currency, &$discountList, $getWithVat = true)
+	{
+		$getWithVat = ($getWithVat !== false);
+		$result = array();
+		if (empty($priceData) || !is_array($priceData))
+			return $result;
+		$priceData['PRICE'] = (float)$priceData['PRICE'];
+		$priceData['CURRENCY'] = CCurrency::checkCurrencyID($priceData['CURRENCY']);
+		$currency = CCurrency::checkCurrencyID($currency);
+		if ($priceData['CURRENCY'] === false || $currency === false || !is_array($discountList))
+			return $result;
+		if (empty($discountList))
+		{
+			if ($getWithVat && $priceData['VAT_INCLUDED'] == 'N')
+			{
+				$priceData['PRICE'] *= (1 + $priceData['VAT_RATE']);
+				$priceData['VAT_INCLUDED'] = 'Y';
+			}
+			elseif (!$getWithVat && $priceData['VAT_INCLUDED'] == 'Y')
+			{
+				$priceData['PRICE'] /= (1 + $priceData['VAT_RATE']);
+				$priceData['VAT_INCLUDED'] = 'N';
+			}
+			$convertPrice = (
+				$priceData['CURRENCY'] == $currency
+				? $priceData['PRICE']
+				: CCurrencyRates::ConvertCurrency($priceData['PRICE'], $priceData['CURRENCY'], $currency)
+			);
+			$convertPrice = roundEx($convertPrice, CATALOG_VALUE_PRECISION);
+			$result = array(
+				'BASE_PRICE' => $convertPrice,
+				'CURRENCY' => $currency,
+				'DISCOUNT_PRICE' => $convertPrice,
+				'DISCOUNT' => 0,
+				'PERCENT' => 0,
+				'VAT_RATE' => $priceData['VAT_RATE'],
+				'VAT_INCLUDED' => $priceData['VAT_INCLUDED']
+			);
+			return $result;
+		}
+
+		//$discountVat = ((string)Option::get('catalog', 'discount_vat') != 'N');
+		$discountVat = true;
+
+		$currentPrice = (
+			$priceData['CURRENCY'] == $currency
+			? $priceData['PRICE']
+			: CCurrencyRates::ConvertCurrency($priceData['PRICE'], $priceData['CURRENCY'], $currency)
+		);
+		$priceData['ORIG_VAT_INCLUDED'] = $priceData['VAT_INCLUDED'];
+		if ($discountVat)
+		{
+			if ($priceData['VAT_INCLUDED'] == 'N')
+			{
+				$currentPrice *= (1 + $priceData['VAT_RATE']);
+				$priceData['VAT_INCLUDED'] = 'Y';
+			}
+		}
+		else
+		{
+			if ($priceData['VAT_INCLUDED'] == 'Y')
+			{
+				$currentPrice /= (1 + $priceData['VAT_RATE']);
+				$priceData['VAT_INCLUDED'] = 'N';
+			}
+		}
+		$currentPrice = roundEx($currentPrice, CATALOG_VALUE_PRECISION);
+		$calculatePrice = $currentPrice;
+		foreach ($discountList as &$discount)
+		{
+			switch ($discount['VALUE_TYPE'])
+			{
+				case self::TYPE_FIX:
+					if ($discount['CURRENCY'] == $currency)
+						$currentDiscount = $discount['VALUE'];
+					else
+						$currentDiscount = CCurrencyRates::ConvertCurrency($discount['VALUE'], $discount['CURRENCY'], $currency);
+					$currentDiscount = roundEx($currentDiscount, CATALOG_VALUE_PRECISION);
+					$currentPrice = $currentPrice - $currentDiscount;
+					break;
+				case self::TYPE_PERCENT:
+					$currentDiscount = $currentPrice*$discount['VALUE']/100.0;
+					if ($discount['MAX_DISCOUNT'] > 0)
+					{
+						if ($discount['CURRENCY'] == $currency)
+							$maxDiscount = $discount['MAX_DISCOUNT'];
+						else
+							$maxDiscount = CCurrencyRates::ConvertCurrency($discount['MAX_DISCOUNT'], $discount['CURRENCY'], $currency);
+						if ($currentDiscount > $maxDiscount)
+							$currentDiscount = $maxDiscount;
+					}
+					$currentDiscount = roundEx($currentDiscount, CATALOG_VALUE_PRECISION);
+					$currentPrice = $currentPrice - $currentDiscount;
+					break;
+				case self::TYPE_SALE:
+					if ($discount['CURRENCY'] == $currency)
+						$currentPrice = $discount['VALUE'];
+					else
+						$currentPrice = CCurrencyRates::ConvertCurrency($discount['VALUE'], $discount['CURRENCY'], $currency);
+					$currentPrice = roundEx($currentPrice, CATALOG_VALUE_PRECISION);
+					break;
+			}
+		}
+		unset($discount);
+
+		$vatRate = (1 + $priceData['VAT_RATE']);
+		if ($discountVat)
+		{
+			if (!$getWithVat)
+			{
+				$calculatePrice /= $vatRate;
+				$currentPrice /= $vatRate;
+
+				$calculatePrice = roundEx($calculatePrice, CATALOG_VALUE_PRECISION);
+				$currentPrice = roundEx($currentPrice, CATALOG_VALUE_PRECISION);
+			}
+		}
+		else
+		{
+			if ($getWithVat)
+			{
+				$calculatePrice *= $vatRate;
+				$currentPrice *= $vatRate;
+
+				$calculatePrice = roundEx($calculatePrice, CATALOG_VALUE_PRECISION);
+				$currentPrice = roundEx($currentPrice, CATALOG_VALUE_PRECISION);
+			}
+		}
+		unset($vatRate);
+		unset($priceData['ORIG_VAT_INCLUDED']);
+		$currentDiscount = $calculatePrice - $currentPrice;
+
+		$result = array(
+			'BASE_PRICE' => $calculatePrice,
+			'CURRENCY' => $currency,
+			'DISCOUNT_PRICE' => $currentPrice,
+			'DISCOUNT' => $currentDiscount,
+			'PERCENT' => ($calculatePrice > 0 ? (100*$currentDiscount)/$calculatePrice : 0),
+			'VAT_RATE' => $priceData['VAT_RATE'],
+			'VAT_INCLUDED' => ($getWithVat ? 'Y' : 'N')
+		);
+		return $result;
+	}
+
 	static public function ExtendBasketItems(&$arBasket, $arExtend)
 	{
 		$arFields = array(
 			'ID',
 			'IBLOCK_ID',
-			'XML_ID',
 			'CODE',
+			'XML_ID',
+			'NAME',
+			'DATE_ACTIVE_FROM',
+			'DATE_ACTIVE_TO',
+			'SORT',
+			'PREVIEW_TEXT',
+			'DETAIL_TEXT',
+			'DATE_CREATE',
+			'CREATED_BY',
+			'TIMESTAMP_X',
+			'MODIFIED_BY',
 			'TAGS',
-			'NAME'
+			'TIMESTAMP_X_UNIX',
+			'DATE_CREATE_UNIX'
 		);
 		$arCatFields = array(
 			'ID',
-			'QUANTITY'
+			'QUANTITY',
+			'WEIGHT',
+			'VAT_ID',
+			'VAT_INCLUDED',
 		);
 
 		$boolFields = false;
@@ -1743,6 +2040,7 @@ class CAllCatalogDiscount
 				$iblockGroup = array();
 				$arIDS = array_keys($arIDS);
 				self::SetProductSectionsCache($arIDS);
+				CTimeZone::Disable();
 				$rsItems = CIBlockElement::GetList(array(), array('ID' => $arIDS), false, false, $arFields);
 				while ($arItem = $rsItems->Fetch())
 				{
@@ -1760,6 +2058,46 @@ class CAllCatalogDiscount
 						$arBasketData['XML_ID'] = (string)$arItem['XML_ID'];
 						$arBasketData['CODE'] = (string)$arItem['CODE'];
 						$arBasketData['TAGS'] = (string)$arItem['TAGS'];
+						$arBasketData['SORT'] = (int)$arBasketData['SORT'];
+						$arBasketData['PREVIEW_TEXT'] = (string)$arBasketData['PREVIEW_TEXT'];
+						$arBasketData['DETAIL_TEXT'] = (string)$arBasketData['DETAIL_TEXT'];
+						$arBasketData['CREATED_BY'] = (int)$arBasketData['CREATED_BY'];
+						$arBasketData['MODIFIED_BY'] = (int)$arBasketData['MODIFIED_BY'];
+
+						$arBasketData['DATE_ACTIVE_FROM'] = (string)$arItem['DATE_ACTIVE_FROM'];
+						if (!empty($arBasketData['DATE_ACTIVE_FROM']))
+							$arBasketData['DATE_ACTIVE_FROM'] = (int)MakeTimeStamp($arBasketData['DATE_ACTIVE_FROM']);
+
+						$arBasketData['DATE_ACTIVE_TO'] = (string)$arItem['DATE_ACTIVE_TO'];
+						if (!empty($arBasketData['DATE_ACTIVE_TO']))
+							$arBasketData['DATE_ACTIVE_TO'] = (int)MakeTimeStamp($arBasketData['DATE_ACTIVE_TO']);
+
+						if (isset($arItem['DATE_CREATE_UNIX']))
+						{
+							$arBasketData['DATE_CREATE'] = (string)$arItem['DATE_CREATE_UNIX'];
+							if ($arBasketData['DATE_CREATE'] != '')
+								$arBasketData['DATE_CREATE'] = (int)$arBasketData['DATE_CREATE'];
+						}
+						else
+						{
+							$arBasketData['DATE_CREATE'] = (string)$arItem['DATE_CREATE'];
+							if ($arBasketData['DATE_CREATE'] != '')
+								$arBasketData['DATE_CREATE'] = (int)MakeTimeStamp($arBasketData['DATE_CREATE']);
+						}
+
+						if (isset($arItem['TIMESTAMP_X_UNIX']))
+						{
+							$arBasketData['TIMESTAMP_X'] = (string)$arItem['TIMESTAMP_X_UNIX'];
+							if ($arBasketData['TIMESTAMP_X'] != '')
+								$arBasketData['TIMESTAMP_X'] = (int)$arBasketData['TIMESTAMP_X'];
+						}
+						else
+						{
+							$arBasketData['TIMESTAMP_X'] = (string)$arItem['TIMESTAMP_X'];
+							if ($arBasketData['TIMESTAMP_X'] != '')
+								$arBasketData['TIMESTAMP_X'] = (int)MakeTimeStamp($arBasketData['TIMESTAMP_X']);
+						}
+
 						$arProductSections = self::__GetSectionList($arItem['IBLOCK_ID'], $arItem['ID']);
 						if ($arProductSections !== false)
 							$arBasketData['SECTION_ID'] = $arProductSections;
@@ -1772,6 +2110,7 @@ class CAllCatalogDiscount
 					}
 					$arBasketResult[$arItem['ID']] = $arBasketData;
 				}
+				CTimeZone::Enable();
 				if ($boolProps && !empty($iblockGroup))
 				{
 					foreach ($iblockGroup as $iblockID => $iblockItems)
@@ -1789,13 +2128,19 @@ class CAllCatalogDiscount
 					}
 					unset($basketItem);
 				}
-				$rsProducts = CCatalogProduct::GetList(array(), array('ID' => $arIDS), false, false, $arCatFields);
+				$rsProducts = CCatalogProduct::GetList(array(), array('@ID' => $arIDS), false, false, $arCatFields);
 				while ($arProduct = $rsProducts->Fetch())
 				{
 					$arProduct['ID'] = (int)$arProduct['ID'];
 					if (!isset($arBasketResult[$arProduct['ID']]))
 						$arBasketResult[$arProduct['ID']] = array();
-					$arBasketResult[$arProduct['ID']]['CATALOG_QUANTITY'] = doubleval($arProduct['QUANTITY']);
+					foreach ($arProduct as $productKey => $productValue)
+					{
+						if ($productKey == 'ID')
+							continue;
+						$arBasketResult[$arProduct['ID']]['CATALOG_'.$productKey] = $productValue;
+					}
+					unset($productKey, $productValue);
 				}
 				if (!empty($iblockGroup))
 				{
@@ -1828,6 +2173,11 @@ class CAllCatalogDiscount
 		}
 	}
 
+	/**
+	 * @param array $arProduct
+	 * @param bool|array $arParams
+	 * @return bool
+	 */
 	protected function __GenerateFields(&$arProduct, $arParams = false)
 	{
 		$boolResult = false;
@@ -2171,6 +2521,11 @@ class CAllCatalogDiscount
 		return $mxResult;
 	}
 
+	/**
+	 * @param array $arProduct
+	 * @param array $arProps
+	 * @param bool|array $arParams
+	 */
 	protected function __ConvertProperties(&$arProduct, &$arProps, $arParams = false)
 	{
 		if (!empty($arProps) && is_array($arProps))
@@ -2195,12 +2550,24 @@ class CAllCatalogDiscount
 						switch($arOneProp['USER_TYPE'])
 						{
 							case 'DateTime':
+							case 'Date':
 								$arOneProp['VALUE'] = (string)$arOneProp['VALUE'];
 								if ('' != $arOneProp['VALUE'])
 								{
+									$propertyFormat = false;
+									if ($arOneProp['USER_TYPE'] == 'DateTime')
+									{
+										if (defined('FORMAT_DATETIME'))
+											$propertyFormat = FORMAT_DATETIME;
+									}
+									else
+									{
+										if (defined('FORMAT_DATE'))
+											$propertyFormat = FORMAT_DATE;
+									}
 									$intStackTimestamp = (int)$arOneProp['VALUE'];
 									if ($intStackTimestamp.'!' != $arOneProp['VALUE'].'!')
-										$arOneProp['VALUE'] = (int)MakeTimeStamp($arOneProp['VALUE']) - $intTimeOffset;
+										$arOneProp['VALUE'] = (int)MakeTimeStamp($arOneProp['VALUE'], $propertyFormat) - $intTimeOffset;
 									else
 										$arOneProp['VALUE'] = $intStackTimestamp;
 								}
@@ -2240,9 +2607,21 @@ class CAllCatalogDiscount
 						switch($arOneProp['USER_TYPE'])
 						{
 							case 'DateTime':
+							case 'Date':
 								$arValues = array();
 								if (is_array($arOneProp['VALUE']) && !empty($arOneProp['VALUE']))
 								{
+									$propertyFormat = false;
+									if ($arOneProp['USER_TYPE'] == 'DateTime')
+									{
+										if (defined('FORMAT_DATETIME'))
+											$propertyFormat = FORMAT_DATETIME;
+									}
+									else
+									{
+										if (defined('FORMAT_DATE'))
+											$propertyFormat = FORMAT_DATE;
+									}
 									foreach ($arOneProp['VALUE'] as &$strOneValue)
 									{
 										$strOneValue = (string)$strOneValue;
@@ -2250,7 +2629,7 @@ class CAllCatalogDiscount
 										{
 											$intStackTimestamp = (int)$strOneValue;
 											if ($intStackTimestamp.'!' != $strOneValue.'!')
-												$strOneValue = (int)MakeTimeStamp($strOneValue) - $intTimeOffset;
+												$strOneValue = (int)MakeTimeStamp($strOneValue, $propertyFormat) - $intTimeOffset;
 											else
 												$strOneValue = $intStackTimestamp;
 										}
@@ -2365,12 +2744,12 @@ class CAllCatalogDiscount
 
 		if (!self::__CheckOneEntity($arFields, 'GROUP_IDS'))
 		{
-			$arMsg[] = array('id' => 'GROUP_IDS', "text" => GetMessage('BT_MOD_CATALOG_DISC_ERR_PARSE_USER_GROUP'));
+			$arMsg[] = array('id' => 'GROUP_IDS', "text" => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_PARSE_USER_GROUP'));
 			$boolResult = false;
 		}
 		if (!self::__CheckOneEntity($arFields, 'CATALOG_GROUP_IDS'))
 		{
-			$arMsg[] = array('id' => 'CATALOG_GROUP_IDS', "text" => GetMessage('BT_MOD_CATALOG_DISC_ERR_PARSE_PRICE_TYPE'));
+			$arMsg[] = array('id' => 'CATALOG_GROUP_IDS', "text" => Loc::getMessage('BT_MOD_CATALOG_DISC_ERR_PARSE_PRICE_TYPE'));
 			$boolResult = false;
 		}
 
@@ -2887,16 +3266,14 @@ class CAllCatalogDiscount
 	public static function SetDiscountProductCache($arItem, $arParams = array())
 	{
 		if (empty($arItem) || !is_array($arItem))
-		{
 			return;
-		}
+
 		if (!empty($arParams) && isset($arParams['GET_BY_ID']) && $arParams['GET_BY_ID'] == 'Y')
 		{
 			$filter = array('ID' => $arItem);
 			if (isset($arParams['IBLOCK_ID']))
-			{
 				$filter['IBLOCK_ID'] = $arParams['IBLOCK_ID'];
-			}
+
 			$select = array('ID', 'IBLOCK_ID', 'CODE', 'XML_ID', 'NAME', 'ACTIVE', 'DATE_ACTIVE_FROM', 'DATE_ACTIVE_TO',
 				'SORT', 'PREVIEW_TEXT', 'DETAIL_TEXT', 'DATE_CREATE', 'DATE_CREATE_UNIX', 'CREATED_BY', 'TIMESTAMP_X', 'TIMESTAMP_X_UNIX',
 				'MODIFIED_BY', 'TAGS', 'CATALOG_QUANTITY'
@@ -3016,9 +3393,8 @@ class CAllCatalogDiscount
 					'PRODUCT' => 'Y'
 				);
 				if (!self::__GenerateFields($arItem, $arParams))
-				{
 					return;
-				}
+
 				$sku = CCatalogSKU::GetInfoByOfferIBlock($arItem['IBLOCK_ID']);
 				if (!empty($sku))
 				{
@@ -3037,6 +3413,7 @@ class CAllCatalogDiscount
 		CatalogClearArray($arItemIDs);
 		if (empty($arItemIDs))
 			return;
+
 		if (empty(self::$arCacheProductSections))
 		{
 			self::$arCacheProductSections = array_fill_keys($arItemIDs, array());
@@ -3044,11 +3421,10 @@ class CAllCatalogDiscount
 		else
 		{
 			foreach ($arItemIDs as &$intOneID)
-			{
 				self::$arCacheProductSections[$intOneID] = array();
-			}
 			unset($intOneID);
 		}
+
 		$rsSections = CIBlockElement::GetElementGroups($arItemIDs, true, array("ID", "IBLOCK_SECTION_ID", "IBLOCK_ELEMENT_ID"));
 		while ($arSection = $rsSections->Fetch())
 		{
@@ -3084,9 +3460,268 @@ class CAllCatalogDiscount
 			self::$arCacheProductProperties = array();
 	}
 
+	protected static function primaryDiscountFilter($price, $currency, &$discountList, &$priceDiscountList, &$accumulativeDiscountList)
+	{
+		$price = (float)$price;
+		$currency = CCurrency::checkCurrencyID($currency);
+		if ($price <= 0 || $currency === false)
+			return;
+
+		$priceDiscountList = array();
+		$accumulativeDiscountList = array();
+		foreach ($discountList as $oneDiscount)
+		{
+			$validDiscount = true;
+			$oneDiscount['PRIORITY'] = (int)$oneDiscount['PRIORITY'];
+			$oneDiscount['VALUE_TYPE'] = (string)$oneDiscount['VALUE_TYPE'];
+			$oneDiscount['VALUE'] = (float)$oneDiscount['VALUE'];
+			$oneDiscount['TYPE'] = (int)$oneDiscount['TYPE'];
+			$changeData = ($oneDiscount['CURRENCY'] != $currency);
+			switch ($oneDiscount['VALUE_TYPE'])
+			{
+				case self::TYPE_FIX:
+					$discountValue = (
+						!$changeData
+						? $oneDiscount['VALUE']
+						: roundEx(
+							CCurrencyRates::ConvertCurrency($oneDiscount['VALUE'], $oneDiscount['CURRENCY'], $currency),
+							CATALOG_VALUE_PRECISION
+						)
+					);
+					$validDiscount = ($price >= $discountValue);
+					if ($validDiscount)
+					{
+						$oneDiscount['DISCOUNT_CONVERT'] = $discountValue;
+						if ($changeData)
+							$oneDiscount['VALUE'] = $oneDiscount['DISCOUNT_CONVERT'];
+					}
+					break;
+				case self::TYPE_SALE:
+					$discountValue = (
+						!$changeData
+						? $oneDiscount['VALUE']
+						: roundEx(
+							CCurrencyRates::ConvertCurrency($oneDiscount['VALUE'], $oneDiscount['CURRENCY'], $currency),
+							CATALOG_VALUE_PRECISION
+						)
+					);
+					$validDiscount = ($price > $discountValue);
+					if ($validDiscount)
+					{
+						$oneDiscount['DISCOUNT_CONVERT'] = $discountValue;
+						if ($changeData)
+							$oneDiscount['VALUE'] = $oneDiscount['DISCOUNT_CONVERT'];
+					}
+					break;
+				case self::TYPE_PERCENT:
+					$validDiscount = ($oneDiscount['VALUE'] <= 100);
+					if ($validDiscount)
+					{
+						$oneDiscount['MAX_DISCOUNT'] = (float)$oneDiscount['MAX_DISCOUNT'];
+						if ($oneDiscount['TYPE'] == self::ENTITY_ID && $oneDiscount['MAX_DISCOUNT'] > 0)
+						{
+							$oneDiscount['DISCOUNT_CONVERT'] = (
+								!$changeData
+								? $oneDiscount['MAX_DISCOUNT']
+								: roundEx(
+									CCurrencyRates::ConvertCurrency($oneDiscount['MAX_DISCOUNT'], $oneDiscount['CURRENCY'], $currency),
+									CATALOG_VALUE_PRECISION
+								)
+							);
+							if ($changeData)
+								$oneDiscount['MAX_DISCOUNT'] = $oneDiscount['DISCOUNT_CONVERT'];
+						}
+					}
+					break;
+				default:
+					$validDiscount = false;
+			}
+			if (!$validDiscount)
+				continue;
+			if ($changeData)
+				$oneDiscount['CURRENCY'] = $currency;
+			if ($oneDiscount['TYPE'] == CCatalogDiscountSave::ENTITY_ID)
+			{
+				$accumulativeDiscountList[] = $oneDiscount;
+			}
+			elseif ($oneDiscount['TYPE'] == self::ENTITY_ID)
+			{
+				if (!isset($priceDiscountList[$oneDiscount['PRIORITY']]))
+					$priceDiscountList[$oneDiscount['PRIORITY']] = array();
+				$priceDiscountList[$oneDiscount['PRIORITY']][] = $oneDiscount;
+			}
+		}
+		unset($oneDiscount);
+
+		if (!empty($priceDiscountList))
+			krsort($priceDiscountList);
+	}
+
+	protected static function calculatePriorityLevel($basePrice, $price, $currency, &$discountList, &$resultDiscount)
+	{
+		$basePrice = (float)$basePrice;
+		$price = (float)$price;
+		$currency = CCurrency::checkCurrencyID($currency);
+		if ($basePrice <= 0 || $price <= 0 || $currency === false)
+			return false;
+
+		if (!is_array($resultDiscount))
+			$resultDiscount = array();
+
+		$currentPrice = $price;
+		do
+		{
+			$minPrice = false;
+			$minIndex = -1;
+			$apply = false;
+			foreach ($discountList as $discountIndex => $oneDiscount)
+			{
+				$calculatePrice = false;
+				switch($oneDiscount['VALUE_TYPE'])
+				{
+					case self::TYPE_PERCENT:
+						$discountValue = roundEx((
+							self::$getPercentFromBasePrice
+							? $basePrice
+							: $currentPrice
+							)*$oneDiscount['VALUE']/100,
+							CATALOG_VALUE_PRECISION
+						);
+						if (isset($oneDiscount['DISCOUNT_CONVERT']) && $oneDiscount['DISCOUNT_CONVERT'] > 0)
+						{
+							if ($discountValue > $oneDiscount['DISCOUNT_CONVERT'])
+								$discountValue = $oneDiscount['DISCOUNT_CONVERT'];
+						}
+						$needErase = ($currentPrice < $discountValue);
+						if (!$needErase)
+							$calculatePrice = $currentPrice - $discountValue;
+						unset($discountValue);
+						break;
+					case self::TYPE_FIX:
+						$needErase = ($oneDiscount['DISCOUNT_CONVERT'] > $currentPrice);
+						if (!$needErase)
+							$calculatePrice = $currentPrice - $oneDiscount['DISCOUNT_CONVERT'];
+						break;
+					case self::TYPE_SALE:
+						$needErase = ($oneDiscount['DISCOUNT_CONVERT'] >= $currentPrice);
+						if (!$needErase)
+							$calculatePrice = $oneDiscount['DISCOUNT_CONVERT'];
+						break;
+					default:
+						$needErase = true;
+						break;
+				}
+
+				if ($needErase)
+				{
+					unset($discountList[$discountIndex]);
+				}
+				else
+				{
+					$apply = ($minPrice === false || $minPrice > $calculatePrice);
+					if ($apply)
+					{
+						$minPrice = $calculatePrice;
+						$minIndex = $discountIndex;
+					}
+				}
+				unset($calculatePrice);
+			}
+			unset($oneDiscount, $discountIndex);
+
+			if ($minPrice !== false)
+			{
+				$currentPrice = $minPrice;
+				$resultDiscount[] = $discountList[$minIndex];
+				if ($discountList[$minIndex]['LAST_DISCOUNT'] == 'Y')
+				{
+					$discountList = array();
+				}
+				else
+				{
+					unset($discountList[$minIndex]);
+				}
+			}
+		}
+		while (!empty($discountList));
+
+		return $currentPrice;
+	}
+
+	protected static function calculateDiscSave($basePrice, $price, $currency, &$discsaveList, &$resultDiscount)
+	{
+		$basePrice = (float)$basePrice;
+		$price = (float)$price;
+		$currency = CCurrency::checkCurrencyID($currency);
+		if ($basePrice <= 0 || $price <= 0 || $currency === false)
+			return false;
+
+		$currentPrice = $price;
+		$minPrice = false;
+		$minIndex = -1;
+		$apply = false;
+		foreach ($discsaveList as $discountIndex => $oneDiscount)
+		{
+			$calculatePrice = false;
+			switch($oneDiscount['VALUE_TYPE'])
+			{
+				case CCatalogDiscountSave::TYPE_PERCENT:
+					$discountValue = roundEx((
+						self::$getPercentFromBasePrice
+							? $basePrice
+							: $currentPrice
+						)*$oneDiscount['VALUE']/100,
+						CATALOG_VALUE_PRECISION
+					);
+					$needErase = ($currentPrice < $discountValue);
+					if (!$needErase)
+						$calculatePrice = $currentPrice - $discountValue;
+					unset($discountValue);
+					break;
+				case CCatalogDiscountSave::TYPE_FIX:
+					$needErase = ($oneDiscount['DISCOUNT_CONVERT'] > $currentPrice);
+					if (!$needErase)
+						$calculatePrice = $currentPrice - $oneDiscount['DISCOUNT_CONVERT'];
+					break;
+				default:
+					$needErase = true;
+					break;
+			}
+			if (!$needErase)
+			{
+				$apply = ($minPrice === false || $minPrice > $calculatePrice);
+				if ($apply)
+				{
+					$minPrice = $calculatePrice;
+					$minIndex = $discountIndex;
+				}
+			}
+		}
+		if ($minPrice !== false && isset($discsaveList[$minIndex]))
+		{
+			$currentPrice = $minPrice;
+			$resultDiscount[] = $discsaveList[$minIndex];
+		}
+
+		return $currentPrice;
+	}
+
 	protected static function clearFields($value)
 	{
 		return ($value !== null);
 	}
+
+	protected static function initDiscountSettings()
+	{
+		$saleInstalled = ModuleManager::isModuleInstalled('sale');
+		if (self::$useSaleDiscount === null)
+			self::$useSaleDiscount = $saleInstalled && (string)Option::get('sale', 'use_sale_discount_only') == 'Y';
+		if (self::$getPercentFromBasePrice === null)
+		{
+			$moduleID = ($saleInstalled ? 'sale' : 'catalog');
+			self::$getPercentFromBasePrice = (string)Option::get($moduleID, 'get_discount_percent_from_base_price') == 'Y';
+		}
+		if (self::$existCouponsManager === null)
+			self::$existCouponsManager = $saleInstalled;
+	}
 }
-?>

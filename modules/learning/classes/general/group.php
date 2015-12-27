@@ -229,7 +229,7 @@ class CLearningGroup
 		}
 
 		if (
-			isset($arFilter['MEMBER_ID'])
+			array_key_exists('MEMBER_ID', $arFilter)
 			&& ( ! in_array('MEMBER_ID', $arSelect, true) )
 		)
 		{
@@ -393,8 +393,10 @@ class CLearningGroup
 
 		if ($id === false)
 		{
-			if ( ! array_key_exists('COURSE_LESSON_ID', $arFields) )
+			if (!array_key_exists('COURSE_LESSON_ID', $arFields) || intval($arFields["COURSE_LESSON_ID"]) < 1)
+			{
 				$arMsg[] = array("id"=>"COURSE_LESSON_ID", "text"=> GetMessage("LEARNING_BAD_COURSE_ID"));
+			}
 		}
 
 		if(!empty($arMsg))
@@ -442,7 +444,15 @@ class CLearningGroup
 					if ($val !== null)
 						$arSqlSearch[] = CLearnHelper::FilterCreate('LG.' . $key, $val, 'date', $bFullJoin, $cOperationType);
 					break;
-
+				case "ACTIVE_DATE":
+					if(strlen($val) > 0)
+					{
+						$arSqlSearch[] = ($cOperationType == "N" ? " NOT" : "")
+							. "((LG.ACTIVE_TO >= " . $DB->GetNowFunction()
+							." OR LG.ACTIVE_TO IS NULL) AND (LG.ACTIVE_FROM <= " . $DB->GetNowFunction()
+							. " OR LG.ACTIVE_FROM IS NULL))";
+					}
+					break;
 				case 'TITLE':
 				case 'CODE':
 					$arSqlSearch[] = CLearnHelper::FilterCreate("LG." . $key, $val, "string", $bFullJoin, $cOperationType);
@@ -453,7 +463,7 @@ class CLearningGroup
 					break;
 
 				case 'MEMBER_ID':
-					$arSqlSearch[] = CLearnHelper::FilterCreate('LGM.USER_ID', $val, 'number', $bFullJoin, $cOperationType);
+					$arSqlSearch[] = CLearnHelper::FilterCreate('LGM.USER_ID', intval($val), 'number', $bFullJoin, $cOperationType);
 					break;
 
 				default:

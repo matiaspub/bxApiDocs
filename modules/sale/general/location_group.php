@@ -1,9 +1,18 @@
 <?
+/**
+ * The content of this file was marked as deprecated.
+ * It will be removed from future releases. Do not rely on this code.
+ *
+ * @access private
+ */
+
+use Bitrix\Main\DB;
+use Bitrix\Main\Entity;
+use Bitrix\Sale\Location;
+
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -14,11 +23,14 @@
  */
 class CAllSaleLocationGroup
 {
+	const SELF_ENTITY_NAME = 		'Bitrix\Sale\Location\Group';
+	const CONN_ENTITY_NAME = 		'Bitrix\Sale\Location\GroupLocation';
+	const LOCATION_ENTITY_NAME = 	'Bitrix\Sale\Location\Location';
+	const NAME_ENTITY_NAME = 		'Bitrix\Sale\Location\Name\Group';
+
 	
 	/**
-	* <p>Функция возвращает набор местоположений, связанных с группами местоположений, удовлетворяющих фильтру arFilter.</p>
-	*
-	*
+	* <p>Метод возвращает набор местоположений, связанных с группами местоположений, удовлетворяющих фильтру arFilter. Метод динамичный.</p>
 	*
 	*
 	* @param array $arrayarFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
@@ -27,14 +39,11 @@ class CAllSaleLocationGroup
 	* местоположения;</li> <li> <b>LOCATION_GROUP_ID</b> - код группы
 	* местоположений.</li> </ul>
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
 	* <th>Описание</th> </tr> <tr> <td>LOCATION_ID</td> <td>Код местоположения.</td> </tr> <tr>
 	* <td>LOCATION_GROUP_ID</td> <td>Код группы местоположений.</td> </tr> </table> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -55,79 +64,153 @@ class CAllSaleLocationGroup
 	*/
 	public static function GetLocationList($arFilter=Array())
 	{
-		global $DB;
-		$arSqlSearch = Array();
+		if(CSaleLocation::isLocationProMigrated())
+		{
+			try
+			{
+				$query = new Entity\Query(self::CONN_ENTITY_NAME);
 
-		if(!is_array($arFilter))
-			$filter_keys = Array();
+				$fieldMap = array(
+					'D_SPIKE' => 'D_SPIKE',
+					'LLOCATION_ID' => 'C.ID',
+					'LOCATION_GROUP_ID' => 'LOCATION_GROUP_ID'
+				);
+				$fieldProxy = array(
+					'LLOCATION_ID' => 'LOCATION_ID'
+				);
+				
+				$query->registerRuntimeField(
+					'D_SPIKE',
+					array(
+						'data_type' => 'integer',
+						'expression' => array(
+							'distinct %s',
+							'LOCATION_GROUP_ID'
+						)
+					)
+				);
+
+				$query->registerRuntimeField(
+					'L',
+					array(
+						'data_type' => self::LOCATION_ENTITY_NAME,
+						'reference' => array(
+							'=this.LOCATION_ID' => 'ref.ID',
+						),
+						'join_type' => 'inner'
+					)
+				);
+
+				$query->registerRuntimeField(
+					'C',
+					array(
+						'data_type' => self::LOCATION_ENTITY_NAME,
+						'reference' => array(
+							'LOGIC' => 'OR',
+							array(
+								'>=ref.LEFT_MARGIN' => 'this.L.LEFT_MARGIN',
+								'<=ref.RIGHT_MARGIN' => 'this.L.RIGHT_MARGIN'
+							),
+							array(
+								'=ref.ID' => 'this.L.ID'
+							)
+						),
+						'join_type' => 'inner'
+					)
+				);
+
+				// select
+				$selectFields = CSaleLocation::processSelectForGetList(array('*'), $fieldMap);
+
+				// filter
+				list($filterFields, $filterClean) = CSaleLocation::processFilterForGetList($arFilter, $fieldMap, $fieldProxy);
+
+				$query->setSelect($selectFields);
+				$query->setFilter($filterFields);
+
+				$res = $query->exec();
+				$res->addReplacedAliases(array(
+					'LLOCATION_ID' => 'LOCATION_ID'
+				));
+
+				return $res;
+			}
+			catch(Exception $e)
+			{
+				return new DB\ArrayResult(array());
+			}
+		}
 		else
-			$filter_keys = array_keys($arFilter);
-
-		$countFieldKey = count($filter_keys);
-		for($i=0; $i < $countFieldKey; $i++)
 		{
-			$val = $DB->ForSql($arFilter[$filter_keys[$i]]);
-			if (strlen($val)<=0) continue;
 
-			$key = $filter_keys[$i];
-			if ($key[0]=="!")
-			{
-				$key = substr($key, 1);
-				$bInvert = true;
-			}
+			global $DB;
+			$arSqlSearch = Array();
+
+			if(!is_array($arFilter))
+				$filter_keys = Array();
 			else
-				$bInvert = false;
+				$filter_keys = array_keys($arFilter);
 
-			switch(ToUpper($key))
+			$countFieldKey = count($filter_keys);
+			for($i=0; $i < $countFieldKey; $i++)
 			{
-			case "LOCATION_ID":
-				$arSqlSearch[] = "LOCATION_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
-				break;
-			case "LOCATION_GROUP_ID":
-				$arSqlSearch[] = "LOCATION_GROUP_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
-				break;
+				$val = $DB->ForSql($arFilter[$filter_keys[$i]]);
+				if (strlen($val)<=0) continue;
+
+				$key = $filter_keys[$i];
+				if ($key[0]=="!")
+				{
+					$key = substr($key, 1);
+					$bInvert = true;
+				}
+				else
+					$bInvert = false;
+
+				switch(ToUpper($key))
+				{
+				case "LOCATION_ID":
+					$arSqlSearch[] = "LOCATION_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
+					break;
+				case "LOCATION_GROUP_ID":
+					$arSqlSearch[] = "LOCATION_GROUP_ID ".($bInvert?"<>":"=")." ".IntVal($val)." ";
+					break;
+				}
 			}
+
+			$strSqlSearch = "";
+			$countSqlSearch = count($arSqlSearch);
+			for($i=0; $i < $countSqlSearch; $i++)
+			{
+				$strSqlSearch .= " AND ";
+				$strSqlSearch .= " (".$arSqlSearch[$i].") ";
+			}
+
+			$strSql =
+				"SELECT LOCATION_ID, LOCATION_GROUP_ID ".
+				"FROM b_sale_location2location_group ".
+				"WHERE 1 = 1 ".
+				"	".$strSqlSearch." ";
+
+			$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			return $res;
+
 		}
-
-		$strSqlSearch = "";
-		$countSqlSearch = count($arSqlSearch);
-		for($i=0; $i < $countSqlSearch; $i++)
-		{
-			$strSqlSearch .= " AND ";
-			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
-		}
-
-		$strSql =
-			"SELECT LOCATION_ID, LOCATION_GROUP_ID ".
-			"FROM b_sale_location2location_group ".
-			"WHERE 1 = 1 ".
-			"	".$strSqlSearch." ";
-
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-		return $db_res;
 	}
 
 	
 	/**
-	* <p>Функция возвращает языкозависимые параметры группы местоположений с кодом ID для языка с кодом strLang</p>
-	*
-	*
+	* <p>Метод возвращает языкозависимые параметры группы местоположений с кодом ID для языка с кодом strLang. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код группы местоположений.
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Код языка.
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
 	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
 	* записи.</td> </tr> <tr> <td>LOCATION_GROUP_ID</td> <td>Код группы местоположений.</td>
 	* </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>LID</td> <td>Язык
 	* названия.</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -159,7 +242,6 @@ class CAllSaleLocationGroup
 		}
 		return False;
 	}
-
 
 	public static function CheckFields($ACTION, &$arFields)
 	{
@@ -195,14 +277,10 @@ class CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Функция обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields. Обновляются так же страна и город этого местоположения. </p>
-	*
-	*
+	* <p>Метод обновляет параметры местоположения с кодом ID в соответствии с параметрами из массива arFields. Обновляются также страна и город этого местоположения. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код местоположения. </h
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
 	* <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны (если такая
@@ -229,19 +307,16 @@ class CAllSaleLocationGroup
 	* языке")</pre> Эта пара ключ-значение должна присутствовать для
 	* каждого языка системы. </li> </ul> Массив с параметрами города должен
 	* содержать ключи: <ul> <li> <b>NAME</b> - название города (не зависящее от
-	* языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название города - абревиатура
-	* (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является
-	* код языка, а значением ассоциативный массив вида <pre class="syntax">
-	* array("LID" =&gt; "код языка", "NAME" =&gt; "название города на этом языке",
-	* "SHORT_NAME" =&gt; "сокращенное название города (аббревиатура) на этом
-	* языке")</pre> Эта пара ключ-значение должна присутствовать для
+	* языка);</li> <li> <b>SHORT_NAME</b> - сокращенное название города -
+	* аббревиатура (не зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> -
+	* ключем является код языка, а значением ассоциативный массив вида
+	* <pre class="syntax"> array("LID" =&gt; "код языка", "NAME" =&gt; "название города на этом
+	* языке", "SHORT_NAME" =&gt; "сокращенное название города (аббревиатура) на
+	* этом языке")</pre> Эта пара ключ-значение должна присутствовать для
 	* каждого языка системы.</li> </ul>
-	*
-	*
 	*
 	* @return int <p>Возвращается код измененного местоположения или <i>false</i> у
 	* случае ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -353,17 +428,33 @@ class CAllSaleLocationGroup
 			}
 		}
 
-		if (is_set($arFields, "LOCATION_ID"))
+		if(is_set($arFields, "LOCATION_ID"))
 		{
-			$DB->Query("DELETE FROM b_sale_location2location_group WHERE LOCATION_GROUP_ID = ".$ID."");
-
-			$countArFieldLoc = count($arFields["LOCATION_ID"]);
-			for ($i = 0; $i < $countArFieldLoc; $i++)
+			if(CSaleLocation::isLocationProMigrated())
 			{
-				$strSql =
-					"INSERT INTO b_sale_location2location_group(LOCATION_ID, LOCATION_GROUP_ID) ".
-					"VALUES(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				try
+				{
+					$entityClass = self::CONN_ENTITY_NAME.'Table';
+					$entityClass::resetMultipleForOwner($ID, array(
+						Location\Connector::DB_LOCATION_FLAG => $entityClass::normalizeLocationList($arFields["LOCATION_ID"])
+					));
+				}
+				catch(Exception $e)
+				{
+				}
+			}
+			else
+			{
+				$DB->Query("DELETE FROM b_sale_location2location_group WHERE LOCATION_GROUP_ID = ".$ID."");
+
+				$countArFieldLoc = count($arFields["LOCATION_ID"]);
+				for ($i = 0; $i < $countArFieldLoc; $i++)
+				{
+					$strSql =
+						"INSERT INTO b_sale_location2location_group(LOCATION_ID, LOCATION_GROUP_ID) ".
+						"VALUES(".$arFields["LOCATION_ID"][$i].", ".$ID.")";
+					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				}
 			}
 		}
 
@@ -372,18 +463,13 @@ class CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Функция удаляет группу местоположений с кодом ID. Местоположения, входящие в эту группу, не изменяются. </p>
-	*
-	*
+	* <p>Метод удаляет группу местоположений с кодом ID. Местоположения, входящие в эту группу, не изменяются. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код группы местоположений.
 	*
-	*
-	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
 	* противном случае.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -413,6 +499,7 @@ class CAllSaleLocationGroup
 			ExecuteModuleEventEx($arEvent, array($ID));
 
 		$DB->Query("DELETE FROM b_sale_delivery2location WHERE LOCATION_ID = ".$ID." AND LOCATION_TYPE = 'G'", true);
+		// tax rates drop ?
 		$DB->Query("DELETE FROM b_sale_location2location_group WHERE LOCATION_GROUP_ID = ".$ID."", true);
 		$DB->Query("DELETE FROM b_sale_location_group_lang WHERE LOCATION_GROUP_ID = ".$ID."", true);
 

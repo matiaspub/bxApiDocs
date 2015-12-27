@@ -3,15 +3,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUser/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/index.php
  * @author Bitrix
  */
 class CSocNetUser extends CAllSocNetUser

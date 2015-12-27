@@ -7,8 +7,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -20,22 +18,15 @@ class CChapter
 	// simple & stupid stub
 	
 	/**
-	* <p>Функция возвращает путь по дереву от корня до главы <i>chapterId</i>.</p>
-	*
-	*
+	* <p>Метод возвращает путь по дереву от корня до главы <i>chapterId</i>.</p>
 	*
 	*
 	* @param int $courseId  Идентификатор курса. <br><br> До версии 12.0.0 параметр назывался COURSE_ID.
 	*
-	*
-	*
 	* @param int $chapterId  Идентификатор главы.<br><br> До версии 12.0.0 параметр назывался CHAPTER_ID.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -64,7 +55,6 @@ class CChapter
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

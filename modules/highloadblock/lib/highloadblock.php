@@ -611,6 +611,10 @@ class HighloadBlockTable extends Entity\DataManager
 			new Entity\Validator\RegExp(
 				'/^[A-Z][A-Za-z0-9]*$/',
 				GetMessage('HIGHLOADBLOCK_HIGHLOAD_BLOCK_ENTITY_NAME_FIELD_REGEXP_INVALID')
+			),
+			new Entity\Validator\RegExp(
+				'/(?<!Table)$/i',
+				GetMessage('HIGHLOADBLOCK_HIGHLOAD_BLOCK_ENTITY_NAME_FIELD_TABLE_POSTFIX_INVALID')
 			)
 		);
 	}
@@ -627,8 +631,43 @@ class HighloadBlockTable extends Entity\DataManager
 			new Entity\Validator\RegExp(
 				'/^[a-z0-9_]+$/',
 				GetMessage('HIGHLOADBLOCK_HIGHLOAD_BLOCK_ENTITY_TABLE_NAME_FIELD_REGEXP_INVALID')
-			)
+			),
+			array(__CLASS__, 'validateTableExisting')
 		);
+	}
+
+	public static function validateTableExisting($value, $primary, array $row, Entity\Field $field)
+	{
+		$checkName = null;
+
+		if (empty($primary))
+		{
+			// new row
+			$checkName = $value;
+		}
+		else
+		{
+			// update row
+			$oldData = static::getByPrimary($primary)->fetch();
+
+			if ($value != $oldData['TABLE_NAME'])
+			{
+				// table name has been changed for existing row
+				$checkName = $value;
+			}
+		}
+
+		if (!empty($checkName))
+		{
+			if (Application::getConnection()->isTableExists($checkName))
+			{
+				return GetMessage('HIGHLOADBLOCK_HIGHLOAD_BLOCK_ENTITY_TABLE_NAME_ALREADY_EXISTS',
+					array('#TABLE_NAME#' => $value)
+				);
+			}
+		}
+
+		return true;
 	}
 }
 

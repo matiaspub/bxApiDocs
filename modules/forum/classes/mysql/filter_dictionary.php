@@ -1,9 +1,7 @@
 <?require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/forum/classes/general/filter_dictionary.php");
 
 /**
- * <b>CFilterDictionary</b> - класс для работы cо словарями нецензурных слов.</body> </html>
- *
- *
+ * <b>CFilterDictionary</b> - класс для работы cо словарями нецензурных слов. 
  *
  *
  * @return mixed 
@@ -14,6 +12,42 @@
  */
 class CFilterDictionary extends CAllFilterDictionary
 {
+	
+	/**
+	* <p>Возвращает список папок по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения <br>
+	*     <i>ID</i> - ID сообщения; <br>     <i>TITLE</i> - имя словаря; <br>     <i>TYPE</i> -
+	* тип словаря; <br><br><i>order</i> - порядок сортировки, может принимать
+	* значения <br>     <i>ASC</i> - по возрастанию; <br>     <i>DESC</i> - по
+	* убыванию; <br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
+	*
+	* @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
+	* "фильтруемое поле" может принимать значения <br>     <i>ID</i> - ID
+	* сообщения; <br>     <i>TITLE</i> - имя словаря; <br>     <i>TYPE</i> - тип словаря;
+	* <br><br> фильтруемое поле может содержать перед названием тип
+	* проверки фильтра <br> "!" - не равно <br> "&lt;" - меньше <br> "&lt;=" - меньше
+	* либо равно <br> "&gt;" - больше <br> "&gt;=" - больше либо равно <br><br>
+	* Обязательное.
+	*
+	* @param bool $bCount  Если параметр равен True, то возвращается только количество
+	* сообщений, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен False.
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li>поля
+	* таблицы <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li>
+	* </ul> </htm<br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array(), $bCount = false)
 	{
 		global $DB;
@@ -93,8 +127,60 @@ class CFilterDictionary extends CAllFilterDictionary
 		return $db_res;
 	}
 }
+
+/**
+ * <b>CFilterLetter</b> - класс для работы cо словарями букв. 
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/index.php
+ * @author Bitrix
+ */
 class CFilterLetter extends CAllFilterLetter
 {
+	
+	/**
+	* <p>Возвращает список записей по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения <br>
+	*     <i>ID</i> - ID сообщения; <br>     <i>LETTER</i> - имя буквы; <br>
+	*     <i>DICTIONARY_ID</i> - ID словаря; <br><br><i>order</i> - порядок сортировки, может
+	* принимать значения <br>     <i>ASC</i> - по возрастанию; <br>     <i>DESC</i> -
+	* по убыванию; <br><br> Необязательный. По умолчанию равен Array("ID"=&gt;"ASC")
+	*
+	* @param  $array  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
+	* "фильтруемое поле" может принимать значения <br>     <i>ID</i> - ID
+	* сообщения; <br>     <i>LETTER</i> - имя буквы; <br>     <i>DICTIONARY_ID</i> - ID
+	* словаря; <br><br> фильтруемое поле может содержать перед названием
+	* тип проверки фильтра <br> "!" - не равно <br> "&lt;" - меньше <br> "&lt;=" - меньше
+	* либо равно <br> "&gt;" - больше <br> "&gt;=" - больше либо равно <br><br>
+	* Обязательное.
+	*
+	* @param arFilte $r  Если параметр равен True, то возвращается только количество
+	* сообщений, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен False.
+	*
+	* @param  $bool  
+	*
+	* @param bCoun $t  
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
+	* </li> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
+	* транслита"</a> </li> </ul> <br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterletter/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array(), $bCount = false)
 	{
 		global $DB;
@@ -185,8 +271,62 @@ class CFilterLetter extends CAllFilterLetter
 		return $db_res;
 	}
 }
+
+/**
+ * <b>CFilterUnquotableWords</b> - класс для работы cо словарями слов. 
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/index.php
+ * @author Bitrix
+ */
 class CFilterUnquotableWords extends CAllFilterUnquotableWords
 {
+	
+	/**
+	* <p>Возвращает список записей по фильтру <i>arFilter</i>, отсортированый в соответствии с <i>arOrder</i>.</p>
+	*
+	*
+	* @param array $arOrder  Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где
+	* <br><br><i>by</i> - поле для сортировки, может принимать значения <br>
+	*     <i>ID</i> - ID сообщения; <br>     <i>WORDS</i> - слово; <br>     <i>PATTERN</i> -
+	* шаблон; <br>     <i>REPLACEMENT</i> - замена; <br>     <i>DESCRIPTION</i> - описание; <br>
+	*     <i>USE_IT</i> - использовать этот шаблон в фильтре; <br><br><i>order</i> -
+	* порядок сортировки, может принимать значения <br>     <i>ASC</i> - по
+	* возрастанию; <br>     <i>DESC</i> - по убыванию; <br><br> Необязательный. По
+	* умолчанию равен Array("ID"=&gt;"ASC")
+	*
+	* @param array $arFilter  массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
+	* "фильтруемое поле" может принимать значения <br>     <i>ID</i> - ID
+	* сообщения; <br>     <i>DICTIONARY_ID</i> - ID словаря; <br>     <i>WORDS</i> - слово; <br>
+	*     <i>PATTERN</i> - шаблон; <br>     <i>REPLACEMENT</i> - замена; <br>     <i>DESCRIPTION</i> -
+	* описание; <br>     <i>USE_IT</i> - использовать этот шаблон в фильтре;
+	* <br><br> фильтруемое поле может содержать перед названием тип
+	* проверки фильтра <br> "!" - не равно <br> "&lt;" - меньше <br> "&lt;=" - меньше
+	* либо равно <br> "&gt;" - больше <br> "&gt;=" - больше либо равно <br><br>
+	* Обязательное.
+	*
+	* @param bool $bCount  Если параметр равен True, то возвращается только количество
+	* сообщений, которое соответствует установленному фильтру.
+	* Необязательный. По умолчанию равен False.
+	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>
+	* <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>
+	* </li> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
+	* букв"</a> </li> <li>таблица <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
+	* </ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/getlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($arOrder = array("ID"=>"ASC"), $arFilter = array(), $bCount = false)
 	{
 		global $DB;

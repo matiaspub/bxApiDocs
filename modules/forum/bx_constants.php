@@ -25,11 +25,6 @@ define('CACHED_b_forum_perms', 3600);
 define('CACHED_b_forum2site', 3600);
 
 /**
- * CACHED_b_forum_smile
- */
-define('CACHED_b_forum_smile', 3600);
-
-/**
  * CACHED_b_forum_filter
  */
 define('CACHED_b_forum_filter', 3600);
@@ -48,16 +43,6 @@ define('ADMIN_MODULE_NAME', "forum");
  * ADMIN_MODULE_ICON
  */
 define('ADMIN_MODULE_ICON', "<img src=\"/bitrix/images/forum/forum.gif\" width=\"48\" height=\"48\" border=\"0\" alt=\"".GetMessage("FORUM_ICON_TITLE")."\" title=\"".GetMessage("FORUM_ICON_TITLE")."\">");
-
-/**
- * STOP_STATISTICS
- */
-define('STOP_STATISTICS', true);
-
-/**
- * ADMIN_SECTION
- */
-define('ADMIN_SECTION', true);
 
 
 ?>

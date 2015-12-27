@@ -10,7 +10,7 @@ IncludeModuleLangFile(__FILE__);
 
 class CHotKeysCode
 {
-	private $arList;
+	protected $arList;
 	protected $hkCacheTtl = 3600;
 
 	public function GetByID($ID)
@@ -20,18 +20,30 @@ class CHotKeysCode
 
 	public function GetCodeByClassName($className)
 	{
-		$this->LoadToCache();
+		static $codes = null;
+		if($codes === null)
+		{
+			$this->LoadToCache();
+			$codes = array();
+			if(is_array($this->arList))
+			{
+				foreach($this->arList as $arCode)
+				{
+					if(!isset($codes[$arCode["CLASS_NAME"]]))
+					{
+						$codes[$arCode["CLASS_NAME"]] = array();
+					}
+					$codes[$arCode["CLASS_NAME"]][] = $arCode;
+				}
+			}
+		}
 
-		$arRet = false;
+		if(isset($codes[$className]))
+		{
+			return $codes[$className];
+		}
 
-		if(!is_array($this->arList))
-			return false;
-
-		foreach ($this->arList as $arCode)
-			if($arCode["CLASS_NAME"] == $className)
-				$arRet[] = $arCode;
-
-		return $arRet;
+		return false;
 	}
 
 	protected function CleanUrl($url)
@@ -56,13 +68,14 @@ class CHotKeysCode
 		if(!is_array($this->arList))
 			return false;
 
-		$arRet = false;
+		$url = $this->CleanUrl($url);
 
+		$arRet = false;
 		foreach ($this->arList as $arCode)
 		{
 			$codeUrl = $this->CleanUrl($arCode["URL"]);
 
-			if(($codeUrl == substr($this->CleanUrl($url), 0, strlen($codeUrl)) && $codeUrl) || (!$arCode["CLASS_NAME"] && (!$arCode["URL"] || $arCode["URL"] == "*")))
+			if(($codeUrl == substr($url, 0, strlen($codeUrl)) && $codeUrl) || (!$arCode["CLASS_NAME"] && (!$arCode["URL"] || $arCode["URL"] == "*")))
 				$arRet[] = $arCode;
 		}
 
@@ -71,16 +84,26 @@ class CHotKeysCode
 
 	public function GetIDByTitleObj($strTitleObj)
 	{
+		static $codes = null;
 		if($strTitleObj)
 		{
-			$this->LoadToCache();
+			if($codes === null)
+			{
+				$this->LoadToCache();
+				$codes = array();
+				if(is_array($this->arList))
+				{
+					foreach($this->arList as $arCode)
+					{
+						$codes[$arCode["TITLE_OBJ"]] = $arCode["ID"];
+					}
+				}
+			}
 
-			if(!is_array($this->arList))
-				return false;
-
-			foreach ($this->arList as $arCode)
-				if($arCode["TITLE_OBJ"] == $strTitleObj)
-					return $arCode["ID"];
+			if(isset($codes[$strTitleObj]))
+			{
+				return $codes[$strTitleObj];
+			}
 		}
 
 		return false;
@@ -409,6 +432,10 @@ class CHotKeys
 			self::$optUse = COption::GetOptionString('main', "use_hot_keys", "Y") == "Y";
 			self::$ExpImpFileName = "hk_export_".$_SERVER['HTTP_HOST'].".srl";
 			self::$cacheId = "b_hot_keys".$USER->GetID().LANGUAGE_ID;
+			if(self::$optUse)
+			{
+				self::$instance->LoadToCache();
+			}
 		}
 
 		return self::$instance;
@@ -487,8 +514,6 @@ class CHotKeys
 		if(!$codeID)
 			return false;
 
-		$this->LoadToCache();
-
 		if(!is_array($this->arList))
 			return false;
 
@@ -550,8 +575,6 @@ class CHotKeys
 		if(!self::$optUse)
 			return false;
 
-		$this->LoadToCache();
-
 		$arCodes = self::$codes->GetCodeByClassName($className);
 
 		if(!is_array($arCodes))
@@ -576,7 +599,6 @@ class CHotKeys
 		if(!self::$optUse)
 			return false;
 
-		$this->LoadToCache();
 		$arCodes = self::$codes->GetByUrl($url);
 
 		if(!is_array($arCodes))
@@ -593,7 +615,6 @@ class CHotKeys
 		if(!self::$optUse)
 			return false;
 
-		$this->LoadToCache();
 		$codeID = self::$codes->GetIDByTitleObj($strTitleObj);
 		$arHK = $this->GetByCodeID($codeID);
 		$space = ($forHint ? "&nbsp;" : " ");
@@ -607,7 +628,9 @@ class CHotKeys
 	//if obj has unique id = b_hot-keys_code.TITLE_OBJ
 	public function SetTitle($className, $forHint = false)
 	{
-		$this->LoadToCache();
+		if(!self::$optUse)
+			return false;
+
 		$arCodes = self::$codes->GetCodeByClassName($className);
 
 		if(!is_array($arCodes))

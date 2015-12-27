@@ -8,51 +8,63 @@ use Bitrix\Main\DB;
 class DateTime extends Date
 {
 	/**
-	 * @param string $time String representation of datetime
+	 * @param string $time String representation of datetime.
 	 * @param string $format PHP datetime format. If not specified, the format is got from the current culture.
-	 * @param \DateTimeZone $timezone
+	 * @param \DateTimeZone $timezone Optional timezone object.
+	 *
 	 * @throws Main\ObjectException
 	 */
 	public function __construct($time = null, $format = null, \DateTimeZone $timezone = null)
 	{
-		if ($time === null || $time === "")
+		if ($timezone === null)
 		{
-			if ($timezone === null)
-			{
-				$this->value = new \DateTime();
-			}
-			else
-			{
-				$this->value = new \DateTime(null, $timezone);
-			}
+			$this->value = new \DateTime();
 		}
 		else
+		{
+			$this->value = new \DateTime(null, $timezone);
+		}
+
+		if ($time !== null && $time !== "")
 		{
 			if ($format === null)
 			{
 				$format = static::getFormat();
 			}
 
-			if ($timezone === null)
+			$parsedValue = date_parse_from_format($format, $time);
+			//Ignore errors when format is longer than date
+			//or date string is longer than format
+			if ($parsedValue['error_count'] > 1)
 			{
-				$this->value = \DateTime::createFromFormat($format, $time);
-			}
-			else
-			{
-				$this->value = \DateTime::createFromFormat($format, $time, $timezone);
+				if (
+					current($parsedValue['errors']) !== 'Trailing data'
+					&& current($parsedValue['errors']) !== 'Data missing'
+				)
+				{
+					throw new Main\ObjectException("Incorrect date/time: ".$time);
+				}
 			}
 
-			if (empty($this->value))
+			$this->value->setDate($parsedValue['year'], $parsedValue['month'], $parsedValue['day']);
+			$this->value->setTime($parsedValue['hour'], $parsedValue['minute'], $parsedValue['second']);
+
+			if (
+				isset($parsedValue["relative"])
+				&& isset($parsedValue["relative"]["second"])
+				&& $parsedValue["relative"]["second"] != 0
+			)
 			{
-				throw new Main\ObjectException("Incorrect date/time: ".$time);
+				$this->value->add(new \DateInterval("PT".$parsedValue["relative"]["second"]."S"));
 			}
 		}
 	}
 
 	/**
-	 * Converts date to string, using Culture and global timezone settings
+	 * Converts date to string, using Culture and global timezone settings.
 	 *
-	 * @param Context\Culture $culture Culture contains datetime format
+	 * @param Context\Culture $culture Culture contains datetime format.
+	 *
 	 * @return string
 	 */
 	static public function toString(Context\Culture $culture = null)
@@ -72,7 +84,7 @@ class DateTime extends Date
 	}
 
 	/**
-	 * Returns timezone object
+	 * Returns timezone object.
 	 *
 	 * @return \DateTimeZone
 	 */
@@ -82,9 +94,10 @@ class DateTime extends Date
 	}
 
 	/**
-	 * Sets timezone object
+	 * Sets timezone object.
 	 *
-	 * @param \DateTimeZone $timezone
+	 * @param \DateTimeZone $timezone Timezone object.
+	 *
 	 * @return DateTime
 	 */
 	public function setTimeZone(\DateTimeZone $timezone)
@@ -94,7 +107,7 @@ class DateTime extends Date
 	}
 
 	/**
-	 * Sets default timezone
+	 * Sets default timezone.
 	 *
 	 * @return DateTime
 	 */
@@ -106,9 +119,10 @@ class DateTime extends Date
 	}
 
 	/**
-	 * @param int $hour
-	 * @param int $minute
-	 * @param int $second
+	 * @param int $hour Hour value.
+	 * @param int $minute Minute value.
+	 * @param int $second Second value.
+	 *
 	 * @return DateTime
 	 */
 	public function setTime($hour, $minute, $second = 0)
@@ -118,7 +132,7 @@ class DateTime extends Date
 	}
 
 	/**
-	 * Changes time from server time to user time using global timezone settings
+	 * Changes time from server time to user time using global timezone settings.
 	 *
 	 * @return DateTime
 	 */
@@ -141,9 +155,10 @@ class DateTime extends Date
 	}
 
 	/**
-	 * Creates DateTime object from local user time using global timezone settings and default culture
+	 * Creates DateTime object from local user time using global timezone settings and default culture.
 	 *
-	 * @param string $timeString
+	 * @param string $timeString Full or short formatted time.
+	 *
 	 * @return DateTime
 	 */
 	public static function createFromUserTime($timeString)
@@ -176,8 +191,45 @@ class DateTime extends Date
 		return $time;
 	}
 
+	/**
+	 * Returns long (including time) date culture format.
+	 *
+	 * @param Context\Culture $culture Culture.
+	 *
+	 * @return string
+	 */
 	protected static function getCultureFormat(Context\Culture $culture)
 	{
 		return $culture->getDateTimeFormat();
+	}
+
+	/**
+	 * Creates DateTime object from PHP \DateTime object.
+	 *
+	 * @param \DateTime $datetime Source object.
+	 *
+	 * @return static
+	 */
+	public static function createFromPhp(\DateTime $datetime)
+	{
+		/** @var DateTime $d */
+		$d = new static();
+		$d->value = $datetime;
+		return $d;
+	}
+
+	/**
+	 * Creates DateTime object from Unix timestamp.
+	 *
+	 * @param int $timestamp Source timestamp.
+	 *
+	 * @return static
+	 */
+	public static function createFromTimestamp($timestamp)
+	{
+		/** @var DateTime $d */
+		$d = new static();
+		$d->value->setTimestamp($timestamp);
+		return $d;
 	}
 }

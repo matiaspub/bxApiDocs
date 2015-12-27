@@ -5,9 +5,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlockProperty</b> - класс для работы со свойствами информационных разделов.</body> </html>
- *
- *
+ * <b>CIBlockProperty</b> - класс для работы со свойствами информационных разделов. 
  *
  *
  * @return mixed 
@@ -22,9 +20,7 @@ class CAllIBlockProperty
 
 	
 	/**
-	* <p>Возвращает список свойств по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>. Функция учитывает права доступа. <br></p>
-	*
-	*
+	* <p>Возвращает список свойств по фильтру <i>arFilter</i> отсортированные в порядке <i>arOrder</i>. Метод статический.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array() Массив для сортировки, имеющий вид <i>by1=&gt;order1[,by2=&gt;order2 [, ..]]</i>,
@@ -37,8 +33,6 @@ class CAllIBlockProperty
 	* признаку участия свойства в фильре на странице списка элементов;
 	* </li> <li> <b>order</b> - порядок сортировки, может принимать значения: <ul> <li>
 	* <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по убыванию;</li> </ul> </li> </ul>
-	*
-	*
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение" [, ...])</i>. Ни один
 	* параметр фильтра не принимает массивы. <i>Фильтруемое поле</i>
@@ -75,16 +69,12 @@ class CAllIBlockProperty
 	* множественность. по умолчанию N.</li> </ul> Необязательное. По
 	* умолчанию записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$IBLOCK_ID = 11;<br>$properties = CIBlockProperty::GetList(Array("sort"=&gt;"asc", "name"=&gt;"asc"), Array("ACTIVE"=&gt;"Y", "IBLOCK_ID"=&gt;$IBLOCK_ID));<br>while ($prop_fields = $properties-&gt;GetNext())<br>{<br>  echo $prop_fields["ID"]." - ".$prop_fields["NAME"]."&lt;br&gt;";<br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -188,7 +178,7 @@ class CAllIBlockProperty
 
 			if(
 				$by === "ID"
-				|| $by === "BLOCK_ID"
+				|| $by === "IBLOCK_ID"
 				|| $by === "NAME"
 				|| $by === "ACTIVE"
 				|| $by === "SORT"
@@ -217,14 +207,10 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция удаляет свойство и все его значения.</p>
-	*
-	*
+	* <p>Метод удаляет свойство и все его значения. Метод статический.</p>
 	*
 	*
 	* @param int $ID  Код свойства.
-	*
-	*
 	*
 	* @return bool <p>В случае успешного удаления возвращается true, иначе - false. </p> <br><br>
 	*
@@ -322,9 +308,7 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция добавляет новое свойство. Отменить добавление или изменить поля свойства можно в обработчике события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a>. После добавления нового свойства вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a>.</p>
-	*
-	*
+	* <p>Метод добавляет новое свойство. Отменить добавление или изменить поля свойства можно в обработчике события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyadd.php">OnBeforeIBlockPropertyAdd</a>. После добавления нового свойства вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyadd.php">OnAfterIBlockPropertyAdd</a>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
@@ -336,10 +320,7 @@ class CAllIBlockProperty
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -382,7 +363,6 @@ class CAllIBlockProperty
 	*    $iblockproperty = new CIBlockProperty;
 	*    $PropertyID = $iblockproperty-&gt;Add($arFields);
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -494,7 +474,18 @@ class CAllIBlockProperty
 						!array_key_exists("SECTION_PROPERTY", $arFields)
 						|| $arFields["SECTION_PROPERTY"] !== "N"
 					)
-						CIBlockSectionPropertyLink::Add(0, $ID, array("SMART_FILTER" => $arFields["SMART_FILTER"]));
+					{
+						$arLink = array(
+							"SMART_FILTER" => $arFields["SMART_FILTER"],
+						);
+						if (array_key_exists("DISPLAY_TYPE", $arFields))
+							$arLink["DISPLAY_TYPE"] = $arFields["DISPLAY_TYPE"];
+						if (array_key_exists("DISPLAY_EXPANDED", $arFields))
+							$arLink["DISPLAY_EXPANDED"] = $arFields["DISPLAY_EXPANDED"];
+						if (array_key_exists("FILTER_HINT", $arFields))
+							$arLink["FILTER_HINT"] = $arFields["FILTER_HINT"];
+						CIBlockSectionPropertyLink::Add(0, $ID, $arLink);
+					}
 				}
 			}
 		}
@@ -545,7 +536,7 @@ class CAllIBlockProperty
 		if(isset($arFields["USER_TYPE"]))
 		{
 			$arUserType = CIBlockProperty::GetUserType($arFields["USER_TYPE"]);
-			if(array_key_exists("CheckFields", $arUserType))
+			if(isset($arUserType["CheckFields"]))
 			{
 				$value=array("VALUE"=>$arFields["DEFAULT_VALUE"]);
 				$arError = call_user_func_array($arUserType["CheckFields"],array($arFields,$value));
@@ -597,14 +588,10 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция изменяет параметры свойства с кодом <i>ID</i>. Перед изменением параметров вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a> из которых можно отменить изменения или переопределить поля. А после изменения параметром вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a>.</p>
-	*
-	*
+	* <p>Метод изменяет параметры свойства с кодом <i>ID</i>. Перед изменением параметров вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyupdate.php">OnBeforeIBlockPropertyUpdate</a> из которых можно отменить изменения или переопределить поля. А после изменения параметром вызывается событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyupdate.php">OnAfterIBlockPropertyUpdate</a>. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  ID изменяемой записи. </htm
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">всех полей</a> изменяемого
@@ -615,10 +602,7 @@ class CAllIBlockProperty
 	* метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/updateenum.php">UpdateEnum()</a>).
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -678,7 +662,6 @@ class CAllIBlockProperty
 	* //IBLOCK_ID в arFields указывать обязательно, иначе свойство не будет включено в умный фильтр, и при этом не выдаст ошибки.
 	* //Чтобы исключить свойство из умного фильтра в arFileds заменить:  'SMART_FILTER'=&gt;'N'
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -756,10 +739,6 @@ class CAllIBlockProperty
 					$arFields["USER_TYPE_SETTINGS"] = false;
 				}
 			}
-			else
-			{
-				$arFields["USER_TYPE_SETTINGS"] = false;
-			}
 
 			unset($arFields["ID"]);
 			unset($arFields["VERSION"]);
@@ -780,12 +759,26 @@ class CAllIBlockProperty
 				&& CIBlock::GetArrayByID($arFields["IBLOCK_ID"], "SECTION_PROPERTY") === "Y"
 			)
 			{
-				CIBlockSectionPropertyLink::Delete(0, $ID);
 				if(
 					!array_key_exists("SECTION_PROPERTY", $arFields)
 					|| $arFields["SECTION_PROPERTY"] !== "N"
 				)
-					CIBlockSectionPropertyLink::Add(0, $ID, array("SMART_FILTER" => $arFields["SMART_FILTER"]));
+				{
+					$arLink = array(
+						"SMART_FILTER" => $arFields["SMART_FILTER"],
+					);
+					if (array_key_exists("DISPLAY_TYPE", $arFields))
+						$arLink["DISPLAY_TYPE"] = $arFields["DISPLAY_TYPE"];
+					if (array_key_exists("DISPLAY_EXPANDED", $arFields))
+						$arLink["DISPLAY_EXPANDED"] = $arFields["DISPLAY_EXPANDED"];
+					if (array_key_exists("FILTER_HINT", $arFields))
+						$arLink["FILTER_HINT"] = $arFields["FILTER_HINT"];
+					CIBlockSectionPropertyLink::Set(0, $ID, $arLink);
+				}
+				else
+				{
+					CIBlockSectionPropertyLink::Delete(0, $ID);
+				}
 			}
 
 			global $BX_IBLOCK_PROP_CACHE;
@@ -812,33 +805,24 @@ class CAllIBlockProperty
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает свойство по его коду <i>ID</i>.</p>
-	*
-	*
+	* <p>Возвращает свойство по его коду <i>ID</i>. Метод статический.</p>
 	*
 	*
 	* @param mixed $ID  Числовой или символьный код свойства.
 	*
-	*
-	*
 	* @param int $IBLOCK_ID = false Код информационного блока. Используется для уточнения свойства,
 	* если его <i>ID</i> задано символьным кодом и с таким символьным кодом
 	* свойства присутствует в нескольких информационных блоках.
-	*
-	*
 	*
 	* @param string $IBLOCK_CODE = false Символьный код информационного блока. Используется для
 	* уточнения свойства, если его <i>ID</i> задано Символьным кодом и с
 	* таким символьным кодом свойства присутствует в нескольких
 	* информационных блоках.
 	*
-	*
-	*
-	* @return CDBResult <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><h4>Примечание</h4><p>Если
-	* заданы оба значения <i>IBLOCK_ID</i> и <i>IBLOCK_CODE</i>, то будет производиться
-	* попытка найти свойство в одном из них (логика "или").</p>
-	*
+	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><p></p><div class="note">
+	* <b>Примечание:</b> если заданы оба значения <i>IBLOCK_ID</i> и <i>IBLOCK_CODE</i>, то
+	* будет производиться попытка найти свойство в одном из них (логика
+	* "или").</div>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -847,7 +831,6 @@ class CAllIBlockProperty
 	*   echo $ar_res['NAME'];
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -989,14 +972,10 @@ class CAllIBlockProperty
 
 	
 	/**
-	* <p>Возвращает варианты для значения свойства <i>PROP_ID </i>типа "список" отсортированные в порядке <i>arOrder</i> и отфильтрованные по <i>arFilter</i>.</p>
-	*
-	*
+	* <p>Возвращает варианты для значения свойства <i>PROP_ID </i>типа "список" отсортированные в порядке <i>arOrder</i> и отфильтрованные по <i>arFilter</i>. Метод статический.</p>
 	*
 	*
 	* @param mixed $PROP_ID  Числовой или символьный код свойства.
-	*
-	*
 	*
 	* @param array $arOrder = Array("SORT"=>"asc") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
 	* <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> <br> by</i> - поле сортировки, может
@@ -1004,8 +983,6 @@ class CAllIBlockProperty
 	*     <i>sort</i> - поле сортировки<i>, <br></i>    <i>external_id</i> - внешний код,
 	* <br><i>order</i> - порядок сортировки, может принимать значения: <br>
 	*     <i>asc</i> - по возрастанию; <br>     <i>desc</i> - по убыванию;
-	*
-	*
 	*
 	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]) <br>
 	* "фильтруемое поле" может принимать значения: <br>     <i>VALUE</i> - по
@@ -1016,18 +993,14 @@ class CAllIBlockProperty
 	* значения варианта свойства; <br> Необязательное. По умолчанию
 	* записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockpropertyenum">полей вариантов
 	* свойства</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$db_enum_list = CIBlockProperty::GetPropertyEnum("IMPORTANT_NEWS", Array(), Array("IBLOCK_ID"=&gt;$BID, "VALUE"=&gt;"Yes"));<br>if($ar_enum_list = $db_enum_list-&gt;GetNext())<br>{<br>  $db_important_news = CIBlockElement::GetList(Array(), Array("IBLOCK_ID"=&gt;$BID, "PROPERTY"=&gt;array("IMPORTANT_NEWS"=&gt;$ar_enum_list["ID"])));<br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1119,14 +1092,10 @@ class CAllIBlockProperty
 
 	
 	/**
-	* <p>Функция устанавливает значения перечислений свойства типа "список".</p>
-	*
-	*
+	* <p>Метод устанавливает значения перечислений свойства типа "список". Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код свойства.
-	*
-	*
 	*
 	* @param array $arVALUES  Массив всех значений в формате Array("код существующего
 	* значения"=&gt;"массив полей значения", ..., "массив полей нового
@@ -1134,17 +1103,12 @@ class CAllIBlockProperty
 	* "SORT"=&gt;"порядок сортировки"][, "DEF"=&gt;"является значением по
 	* умолчанию (Y|N)"][, "XML_ID"=&gt;"внешний код"]).
 	*
-	*
-	*
 	* @param bool $bForceDelete = true Если принимает значение <i>true</i>, то удаляются варианты значений, у
 	* которых <i>VALUE</i> пустой. Значение <i>false</i> позволяет сохранить
 	* значения, использованные хотя бы у одного элемента.
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1152,7 +1116,6 @@ class CAllIBlockProperty
 	* $cnt = 0;<br>$ar_all_values = Array();<br>$db_enum_list = CIBlockProperty::GetPropertyEnum($PROP_ID, Array('SORT'=&gt;'ASC'));<br>while($ar_enum = $db_enum_list-&gt;Fetch())<br>{<br>	$cnt++;<br>	$ar_all_values[$ar_enum['ID']] = Array('SORT'=&gt;$cnt, 'VALUE'=&gt;$ar_enum['VALUE']);<br>}<br>$CIBlockProp = new CIBlockProperty;
 	* $CIBlockProp-&gt;UpdateEnum($PROP_ID, $ar_all_values); ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1347,17 +1310,12 @@ class CAllIBlockProperty
 
 	
 	/**
-	* <p>Функция возвращает описание пользовательского типа. <br></p> <p><b>Примечание</b>: если параметр USER_TYPE не задан, то функция вернет массив всех пользовательских типов свойств модуля инфоблоков.</p>
-	*
-	*
+	* <p>Метод возвращает описание пользовательского типа. Метод статический. <br></p> <p></p> <div class="note"> <b>Примечание</b>: если параметр USER_TYPE не задан, то метод вернет массив всех пользовательских типов свойств модуля инфоблоков.</div>
 	*
 	*
 	* @param string $USER_TYPE = false Идентификатор пользовательского типа <br>
 	*
-	*
-	*
 	* @return array <p>Массив описывающий пользовательский тип.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
@@ -1381,7 +1339,10 @@ class CAllIBlockProperty
 			foreach(GetModuleEvents("iblock", "OnIBlockPropertyBuildList", true) as $arEvent)
 			{
 				$res = ExecuteModuleEventEx($arEvent);
-				$CACHE[$res["USER_TYPE"]] = $res;
+				if (is_array($res) && array_key_exists("USER_TYPE", $res))
+				{
+					$CACHE[$res["USER_TYPE"]] = $res;
+				}
 			}
 		}
 
@@ -1426,6 +1387,27 @@ class CAllIBlockProperty
 			"GetAdminFilterHTML" => array("CIBlockPropertyDateTime","GetAdminFilterHTML"),
 			"GetPublicFilterHTML" => array("CIBlockPropertyDateTime","GetPublicFilterHTML"),
 			"AddFilterFields" => array("CIBlockPropertyDateTime","AddFilterFields"),
+		);
+	}
+
+	public static function _Date_GetUserTypeDescription()
+	{
+		return array(
+			"PROPERTY_TYPE" => "S",
+			"USER_TYPE" => "Date",
+			"DESCRIPTION" => GetMessage("IBLOCK_PROP_DATE_DESC"),
+			//optional handlers
+			"GetPublicViewHTML" => array("CIBlockPropertyDate","GetPublicViewHTML"),
+			"GetPublicEditHTML" => array("CIBlockPropertyDate","GetPublicEditHTML"),
+			"GetAdminListViewHTML" => array("CIBlockPropertyDate","GetAdminListViewHTML"),
+			"GetPropertyFieldHtml" => array("CIBlockPropertyDate","GetPropertyFieldHtml"),
+			"CheckFields" => array("CIBlockPropertyDate","CheckFields"),
+			"ConvertToDB" => array("CIBlockPropertyDate","ConvertToDB"),
+			"ConvertFromDB" => array("CIBlockPropertyDate","ConvertFromDB"),
+			"GetSettingsHTML" => array("CIBlockPropertyDate","GetSettingsHTML"),
+			"GetAdminFilterHTML" => array("CIBlockPropertyDate","GetAdminFilterHTML"),
+			"GetPublicFilterHTML" => array("CIBlockPropertyDate","GetPublicFilterHTML"),
+			"AddFilterFields" => array("CIBlockPropertyDate","AddFilterFields"),
 		);
 	}
 

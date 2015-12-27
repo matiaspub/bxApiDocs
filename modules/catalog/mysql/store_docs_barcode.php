@@ -7,6 +7,11 @@ class CCatalogStoreDocsBarcode
 	public static function add($arFields)
 	{
 		global $DB;
+
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsBarcodeAdd", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+				return false;
+
 		if (!self::CheckFields('ADD',$arFields))
 			return false;
 
@@ -17,6 +22,10 @@ class CCatalogStoreDocsBarcode
 		if(!$res)
 			return false;
 		$lastId = intval($DB->LastID());
+
+		foreach(GetModuleEvents("catalog", "OnCatalogStoreDocsBarcodeAdd", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($lastId, $arFields));
+
 		return $lastId;
 	}
 

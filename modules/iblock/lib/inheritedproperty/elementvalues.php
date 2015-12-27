@@ -159,16 +159,34 @@ class ElementValues extends BaseValues
 						"filter" => array("=ID" => $this->elementId),
 					));
 					$element = $elementList->fetch();
+					$element['IBLOCK_SECTION_ID'] = (int)$element['IBLOCK_SECTION_ID'];
 
+					$sqlHelper = $connection->getSqlHelper();
 					foreach ($result as $CODE => $row)
 					{
-						$connection->add("b_iblock_element_iprop", array(
-							"IBLOCK_ID" => $this->iblockId,
-							"SECTION_ID" => intval($element["IBLOCK_SECTION_ID"]),
-							"ELEMENT_ID" => $this->elementId,
-							"IPROP_ID" => $row["ID"],
-							"VALUE" => $row["VALUE"],
-						));
+						$mergeSql = $sqlHelper->prepareMerge(
+							"b_iblock_element_iprop",
+							array(
+								"ELEMENT_ID",
+								"IPROP_ID",
+							),
+							array(
+								"IBLOCK_ID" => $this->iblockId,
+								"SECTION_ID" => $element["IBLOCK_SECTION_ID"],
+								"ELEMENT_ID" => $this->elementId,
+								"IPROP_ID" => $row["ID"],
+								"VALUE" => $row["VALUE"],
+							),
+							array(
+								"IBLOCK_ID" => $this->iblockId,
+								"SECTION_ID" => $element["IBLOCK_SECTION_ID"],
+								"VALUE" => $row["VALUE"],
+							)
+						);
+						foreach ($mergeSql as $sql)
+						{
+							$connection->query($sql);
+						}
 					}
 				}
 			}

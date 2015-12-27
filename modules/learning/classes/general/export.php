@@ -5,8 +5,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -37,14 +35,9 @@ class CCoursePackage
 	* <p>Конструктор класса CCoursePackage инициализирует экспортируемый курс.</p>
 	*
 	*
-	*
-	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -77,7 +70,6 @@ class CCoursePackage
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -169,17 +161,12 @@ class CCoursePackage
 	* <p>Создает архив с учебным курсом.</p>
 	*
 	*
-	*
-	*
 	* @param int $PACKAGE_DIR  Путь (относительно корня сайта) к директории, куда будет
 	* скопирован архив курса.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если создание архива прошло успешно.
 	* При возникновении ошибки метод вернет false, а в свойстве объекта
 	* LAST_ERROR будет содержаться текст ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -212,7 +199,6 @@ class CCoursePackage
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -289,11 +275,8 @@ class CCoursePackage
 	* <p>Возвращает манифест (в xml-формате) архива учебного курса.</p>
 	*
 	*
-	*
-	*
 	* @return string <p>Метод возвращает строку - содержимое файла imsmanifest.xml архива
 	* учебного курса.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -321,7 +304,6 @@ class CCoursePackage
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

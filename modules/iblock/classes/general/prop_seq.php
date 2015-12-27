@@ -73,15 +73,16 @@ class CIBlockPropertySequence
 		else
 			$strWritable = "N";
 
-		return array(
+		$arProperty['USER_TYPE_SETTINGS'] = array(
 			"write" => $strWritable,
 		);
+		return $arProperty;
 	}
 
 	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
-			"HIDE" => array("SEARCHABLE", "WITH_DESCRIPTION", "ROW_COUNT", "COL_COUNT", "DEFAULT_VALUE"),
+			"HIDE" => array("SEARCHABLE", "WITH_DESCRIPTION", "ROW_COUNT", "COL_COUNT", "DEFAULT_VALUE")
 		);
 
 		if(is_array($arProperty["USER_TYPE_SETTINGS"]) && $arProperty["USER_TYPE_SETTINGS"]["write"]==="Y")

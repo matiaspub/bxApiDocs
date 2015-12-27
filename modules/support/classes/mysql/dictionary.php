@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/
 
 
 /**
- * <b>CTicketDictionary</b> - класс для работы со справочником обращений.</body> </html>
- *
- *
+ * <b>CTicketDictionary</b> - класс для работы со справочником обращений. 
  *
  *
  * @return mixed 
@@ -25,9 +23,7 @@ class CTicketDictionary extends CAllTicketDictionary
 
 	
 	/**
-	* <p>Функция предназначена для получения списка записей справочника.</p>
-	*
-	*
+	* <p>Метод предназначен для получения списка записей справочника.</p>
 	*
 	*
 	* @param varchar &$by  Идентификатор позволяющий задать имя поля для сортировки.
@@ -37,12 +33,8 @@ class CTicketDictionary extends CAllTicketDictionary
 	* ответственного </li> <li>s_dropdown - по указанному порядку сортировки и
 	* по имени </li> </ul>
 	*
-	*
-	*
 	* @param varchar &$order  Порядок сортировки. Допустимы следующие значения: <ul> <li>desc - по
 	* убыванию (значение по умолчанию) </li> <li>asc - по возрастанию </li> </ul>
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив для фильтрации значений. В массиве допустимы следующие
 	* индексы: <ul> <li>ID - ID записи (допускается сложная логика) </li> <li>SID -
@@ -55,16 +47,11 @@ class CTicketDictionary extends CAllTicketDictionary
 	* логика) </li> <li>DEFAULT - флаг "Выбирать по умолчанию"; "Y" - да, "N" - нет </li>
 	* </ul> Необязательный параметр.
 	*
-	*
-	*
 	* @param boolean &$is_filtered  Переменная возвращающая true в том случае если список результатов
 	* отфильтрован по какому либо критерию; либо false в противном случае.
 	* С версии 12.0.0 изменен на <b>isFiltered</b>.
 	*
-	*
-	*
 	* @return record <p>Возвращается объект CDBResult.</p> </h<a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

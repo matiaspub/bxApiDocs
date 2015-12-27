@@ -15,7 +15,7 @@ interface ILearnAccessInterface
 	 * // Selects only lessons, which are accessible by user with id = $someUserId
 	 * $rc = $DB->Query ("SELECT NAME FROM b_learn_lesson WHERE ACTIVE = 'Y' AND ID IN (" . $sql . ")");
 	 */
-	static public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $in_prfx = 'DEFPRFX');
+	static public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $lessonId = 0, $in_prfx = 'DEFPRFX');
 
 
 	public static function GetNameForTask ($taskId);
@@ -655,29 +655,24 @@ class CLearnAccess implements ILearnAccessInterface
 		static $cacheArIds = array();
 
 		$lessonId = intval($in_lessonId);
+		$cacheKey = $in_bitmaskOperations."_".$lessonId;
 
-		$cacheKey = 'k' . $in_bitmaskOperations;
-
-		if ( ! ($isUseCache && isset($cacheArIds[$cacheKey])) )
-			$cacheArIds[$cacheKey] = $this->GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache);
-
-		if (in_array($lessonId, $cacheArIds[$cacheKey]))
+		if ($isUseCache && array_key_exists($cacheKey, $cacheArIds))
 		{
-			return (true);
+			return true;
 		}
-		else
-		{
-			return (false);
-		}
+
+		$cacheArIds = array_merge($cacheArIds, $this->GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache, $lessonId));
+		return array_key_exists($cacheKey, $cacheArIds);
 	}
 
 
-	public function GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache = false)
+	public function GetAccessibleLessonsList($in_bitmaskOperations, $isUseCache = false, $lessonId = 0)
 	{
 		global $DB;
-		
-		$sql = $this->SQLClauseForAccessibleLessons($in_bitmaskOperations, $isUseCache);
-		
+
+		$sql = $this->SQLClauseForAccessibleLessons($in_bitmaskOperations, $isUseCache, $lessonId);
+
 		$rc = $DB->Query($sql, true);
 
 		if ($rc === false)
@@ -689,7 +684,7 @@ class CLearnAccess implements ILearnAccessInterface
 
 		$arIds = array();
 		while ($row = $rc->Fetch())
-			$arIds[] = (int) $row['LESSON_ID'];
+			$arIds[$in_bitmaskOperations."_".$row['LESSON_ID']] = (int) $row['LESSON_ID'];
 
 		return ($arIds);
 	}
@@ -708,7 +703,7 @@ class CLearnAccess implements ILearnAccessInterface
 	 * // Selects only lessons, which are accessible by user with id = $someUserId
 	 * $rc = $DB->Query ("SELECT NAME FROM b_learn_lesson WHERE ACTIVE = 'Y' AND ID IN (" . $sql . ")");
 	 */
-	public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $in_prfx = 'DEFPRFX')
+	public function SQLClauseForAccessibleLessons ($in_bitmaskOperations, $isUseCache = false, $lessonId = 0, $in_prfx = 'DEFPRFX')
 	{
 		if ( ! (is_int($in_bitmaskOperations) && ($in_bitmaskOperations > 0)) )
 		{
@@ -772,26 +767,22 @@ class CLearnAccess implements ILearnAccessInterface
 
 		$sqlWhere = implode("\n OR \n", $arSqlWhere);
 
-		// Yes, I know - we have not optimal sql string in general case, 
-		// but I must save time for more significant things.
-		// TODO: optimize it some time.
-
-		// optimize query for perfomance
-		if ($sqlWhere === '')
-			$sql = "SELECT ID AS LESSON_ID FROM b_learn_lesson WHERE 1=1";
-		else
+		$lessonId = intval($lessonId);
+		if ($lessonId > 0)
 		{
-			$sql = "SELECT ${prfx}TLL.ID AS LESSON_ID
-			FROM b_learn_lesson ${prfx}TLL
-			LEFT OUTER JOIN b_learn_rights ${prfx}TLR
-				ON ${prfx}TLL.ID = ${prfx}TLR.LESSON_ID
-			LEFT OUTER JOIN b_task_operation ${prfx}TTO
-				ON ${prfx}TLR.TASK_ID = ${prfx}TTO.TASK_ID
-			LEFT OUTER JOIN b_operation ${prfx}XTO
-				ON ${prfx}TTO.OPERATION_ID = ${prfx}XTO.ID
-			WHERE 
-				$sqlWhere";
+			$sqlWhere = "${prfx}TLL.ID={$lessonId} AND (".$sqlWhere.")";
 		}
+
+		$sql = "SELECT ${prfx}TLL.ID AS LESSON_ID
+		FROM b_learn_lesson ${prfx}TLL
+		LEFT OUTER JOIN b_learn_rights ${prfx}TLR
+			ON ${prfx}TLL.ID = ${prfx}TLR.LESSON_ID
+		LEFT OUTER JOIN b_task_operation ${prfx}TTO
+			ON ${prfx}TLR.TASK_ID = ${prfx}TTO.TASK_ID
+		LEFT OUTER JOIN b_operation ${prfx}XTO
+			ON ${prfx}TTO.OPERATION_ID = ${prfx}XTO.ID
+		WHERE
+			$sqlWhere";
 
 		return ($sql);
 		
@@ -828,11 +819,18 @@ class CLearnAccess implements ILearnAccessInterface
 	protected function GetBitmaskOperationsForAllLessons($arUserAccessSymbols)
 	{
 		global $DB;
+		static $cache = array();
 
-		$userAccessSymbols = 'NULL';
-		// convert array of access symbols to comma-separeted list for sql query (items will be escaped)
-		if (count($arUserAccessSymbols) > 0)
-			$userAccessSymbols = $this->Array2CommaSeparatedListForSQL ($arUserAccessSymbols);
+		if (!is_array($arUserAccessSymbols) || count($arUserAccessSymbols) < 1)
+		{
+			return 0;
+		}
+
+		$userAccessSymbols = $this->Array2CommaSeparatedListForSQL ($arUserAccessSymbols);
+		if (isset($cache[$userAccessSymbols]))
+		{
+			return $cache[$userAccessSymbols];
+		}
 
 		$rc = $DB->Query (
 			"SELECT XTO.NAME AS OPERATION_NAME
@@ -864,6 +862,7 @@ class CLearnAccess implements ILearnAccessInterface
 			$bitmaskOperations = $bitmaskOperations | self::$arOperations[$arData['OPERATION_NAME']];
 		}
 
+		$cache[$userAccessSymbols] = $bitmaskOperations;
 		return ($bitmaskOperations);
 	}
 

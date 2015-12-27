@@ -17,17 +17,26 @@ final class Frame
 	private static $onBeforeHandleKey = false;
 	private static $onRestartBufferHandleKey = false;
 	private static $onBeforeLocalRedirect = false;
+	private static $preventAutoUpdate = false;
 	private $injectedJS = false;
-	private $compositeWasInjected = null;
+	private $isCompositeInjected = false;
+	private $isRedirect = false;
+	private $isBufferRestarted = false;
 
+	/**
+	 * use self::getInstance()
+	 */
 	private function __construct()
 	{
-		//use self::getInstance()
+
 	}
 
+	/**
+	 * you can't clone it
+	 */
 	private function __clone()
 	{
-		//you can't clone it
+
 	}
 
 	/**
@@ -84,7 +93,7 @@ final class Frame
 
 				$realId = $dynamicArea->getContainerId() !== null ? $dynamicArea->getContainerId() : "bxdynamic_".$area->id;
 				$assets =  Asset::getInstance()->getAssetInfo($dynamicArea->getAssetId(), $dynamicArea->getAssetMode());
-				$areaContent = substr($content, $area->openTagEnd, $area->closingTagStart - $area->openTagEnd);
+				$areaContent = \CUtil::BinSubstr($content, $area->openTagEnd, $area->closingTagStart - $area->openTagEnd);
 
 				$data["dynamic"][] = array(
 					"ID"                      => $realId,
@@ -100,12 +109,12 @@ final class Frame
 					),
 				);
 
-				$data["static"] .= substr($content, $offset, $area->openTagStart - $offset);
+				$data["static"] .= \CUtil::BinSubstr($content, $offset, $area->openTagStart - $offset);
 				$data["static"] .= $dynamicArea->getContainerId() !== null ? $dynamicArea->getStub() : '<div id="bxdynamic_'.$area->id.'">'.$dynamicArea->getStub().'</div>';
 				$offset = $area->closingTagEnd;
 			}
 
-			$data["static"] .= substr($content, $offset);
+			$data["static"] .= \CUtil::BinSubstr($content, $offset);
 		}
 		else
 		{
@@ -113,11 +122,17 @@ final class Frame
 		}
 
 		self::replaceSessid($data["static"]);
+		Asset::getInstance()->moveJsToBody($data["static"]);
+
 		$data["md5"] = md5($data["static"]);
 
 		return $data;
 	}
 
+	/**
+	 * Replaces bitrix sessid in the $content
+	 * @param string $content
+	 */
 	private static function replaceSessid(&$content)
 	{
 		$methodInvocations = bitrix_sessid_post("sessid", true);
@@ -127,6 +142,10 @@ final class Frame
 		}
 	}
 
+	/**
+	 * @param string $content
+	 * @return array|bool
+	 */
 	private static function getFrameIndexes($content)
 	{
 		$openTag = "<!--'start_frame_cache_";
@@ -135,9 +154,9 @@ final class Frame
 
 		$areas = array();
 		$offset = 0;
-		while (($openTagStart = strpos($content, $openTag, $offset)) !== false)
+		while (($openTagStart = \CUtil::BinStrpos($content, $openTag, $offset)) !== false)
 		{
-			$endingPos = strpos($content, $ending, $openTagStart);
+			$endingPos = \CUtil::BinStrpos($content, $ending, $openTagStart);
 			if ($endingPos === false)
 			{
 				break;
@@ -145,11 +164,11 @@ final class Frame
 
 			$idStart = $openTagStart + strlen($openTag);
 			$idLength = $endingPos - $idStart;
-			$areaId = substr($content, $idStart, $idLength);
+			$areaId = \CUtil::BinSubstr($content, $idStart, $idLength);
 			$openTagEnd = $endingPos + strlen($ending);
 
 			$realClosingTag = $closingTag.$areaId.$ending;
-			$closingTagStart = strpos($content, $realClosingTag, $openTagEnd);
+			$closingTagStart = \CUtil::BinStrpos($content, $realClosingTag, $openTagEnd);
 			if ($closingTagStart === false)
 			{
 				$offset = $openTagEnd;
@@ -225,18 +244,32 @@ final class Frame
 			}
 		}
 
-		$this->injectedJS = $this->getInjectedJs($params);
+		$this->injectedJS = (
+			self::getPreventAutoUpdate()
+				? $this->getInjectedJsWORequest($params)
+				: $this->getInjectedJs($params)
+		);
+
 		Asset::getInstance()->addString(
 			$this->injectedJS["start"],
 			false,
 			AssetLocation::BEFORE_CSS,
-			self::getUseAppCache() ? AssetMode::ALL : AssetMode::COMPOSITE
+			self::getUseHTMLCache() ? AssetMode::COMPOSITE : AssetMode::ALL
 		);
+
+		$this->isCompositeInjected = true;
 	}
 
+	/**
+	 * @param $content
+	 * @return null|string
+	 */
 	public function startBuffering($content)
 	{
-		if (!$this->isEnabled() || !is_object($GLOBALS["APPLICATION"]) || defined("BX_BUFFER_SHUTDOWN"))
+		if (!$this->isEnabled() ||
+			!$this->isCompositeInjected ||
+			!is_object($GLOBALS["APPLICATION"]) ||
+			defined("BX_BUFFER_SHUTDOWN"))
 		{
 			return null;
 		}
@@ -246,7 +279,7 @@ final class Frame
 
 		Asset::getInstance()->setMode(AssetMode::COMPOSITE);
 
-		$this->compositeWasInjected = false;
+		$this->isCompositeInjected = false; //double-check
 		for ($i = 0; $i < $cnt; $i++)
 		{
 			$method = $GLOBALS["APPLICATION"]->buffer_content_type[$i]["F"];
@@ -258,28 +291,39 @@ final class Frame
 			if (in_array($method[1], array("GetCSS", "GetHeadScripts", "GetHeadStrings")))
 			{
 				$newBuffer[$i*2+1] = call_user_func_array($method, $GLOBALS["APPLICATION"]->buffer_content_type[$i]["P"]);
-				if ($this->compositeWasInjected !== true && $method[1] === "GetHeadStrings")
+				if ($this->isCompositeInjected !== true && $method[1] === "GetHeadStrings")
 				{
-					$this->compositeWasInjected = strpos($newBuffer[$i*2+1], "w.frameRequestStart") !== false;
+					$this->isCompositeInjected = \CUtil::BinStrpos($newBuffer[$i*2+1], "w.frameRequestStart") !== false;
 				}
 			}
 		}
 
 		Asset::getInstance()->setMode(AssetMode::STANDARD);
 
-		return $this->compositeWasInjected === true ? implode("", $newBuffer).$content : null;
+		return $this->isCompositeInjected === true ? implode("", $newBuffer).$content : null;
 	}
 
+	/**
+	 *
+	 * Returns true if $originalContent was modified
+	 * @param $originalContent
+	 * @param $compositeContent
+	 *
+	 * @return bool
+	 * @internal
+	 */
 	public function endBuffering(&$originalContent, $compositeContent)
 	{
 		if (!$this->isEnabled() || $compositeContent === null || defined("BX_BUFFER_SHUTDOWN"))
 		{
-			if ($this->compositeWasInjected === false && self::isAjaxRequest())
+			if (self::isAjaxRequest() && $this->isRedirect === false)
 			{
-				$originalContent = $this->getAjaxError("not_injected");
+				$originalContent = $this->getAjaxError();
+				StaticHtmlCache::getInstance()->delete();
+				return true;
 			}
 
-			return;
+			return false;
 		}
 
 		if (function_exists("getmoduleevents"))
@@ -294,15 +338,20 @@ final class Frame
 		if (self::isAjaxRequest())
 		{
 			$originalContent = $compositeContent;
+			return true;
 		}
 		elseif (self::getUseHTMLCache())
 		{
 			$originalContent = $this->replaceInjections($originalContent);
+			return false;
 		}
 		elseif (self::getUseAppCache())
 		{
 			$originalContent = $compositeContent;
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
@@ -333,10 +382,7 @@ final class Frame
 			if ($staticHTMLCache->isCacheable())
 			{
 				$cacheExists = $staticHTMLCache->exists();
-				if (
-					(!$cacheExists || $staticHTMLCache->getMd5() !== $dividedData["md5"])
-					&& (!\CHTMLPagesCache::isIE9()) //Temporary compatibility checking. If nginx doesn't skip IE9
-				)
+				if (!$cacheExists || $staticHTMLCache->getMd5() !== $dividedData["md5"])
 				{
 					if ($cacheExists)
 					{
@@ -357,13 +403,11 @@ final class Frame
 				{
 					$staticHTMLCache->delete();
 				}
-
-				$dividedData["static"] = $this->replaceInjections($content);
 			}
 			else
 			{
 				$staticHTMLCache->delete();
-				return $this->getAjaxError("not_cacheable");
+				return $this->getAjaxError();
 			}
 		}
 
@@ -404,8 +448,30 @@ final class Frame
 		return $content;
 	}
 
-	private function getAjaxError($error)
+	private function getAjaxError()
 	{
+		$error = "unknown";
+		if ($this->isBufferRestarted)
+		{
+			$error = "buffer_restarted";
+		}
+		elseif (!$this->isEnabled())
+		{
+			$error = "not_enabled";
+		}
+		elseif (defined("BX_BUFFER_SHUTDOWN"))
+		{
+			$error = "php_shutdown";
+		}
+		elseif (!StaticHtmlCache::getInstance()->isCacheable())
+		{
+			$error = "not_cacheable";
+		}
+		elseif (!$this->isCompositeInjected)
+		{
+			$error = "not_injected";
+		}
+
 		header("X-Bitrix-Composite: Ajax (error:".$error.")");
 		self::sendRandHeader();
 
@@ -444,11 +510,6 @@ final class Frame
 			);
 		}
 
-		if ($this->injectedJS && isset($this->injectedJS["start"]))
-		{
-			$content = str_replace($this->injectedJS["start"], "", $content);
-		}
-
 		return $content;
 	}
 
@@ -460,6 +521,7 @@ final class Frame
 	 */
 	public static function onBeforeRestartBuffer()
 	{
+		self::getInstance()->isBufferRestarted = true;
 		self::setEnable(false);
 
 		if (defined("BX_COMPOSITE_DEBUG"))
@@ -473,10 +535,10 @@ final class Frame
 		}
 	}
 
-	public static function onBeforeLocalRedirect(&$url, $skip_security_check)
+	public static function onBeforeLocalRedirect(&$url, $skip_security_check, $isExternal)
 	{
 		global $APPLICATION;
-		if (!self::isAjaxRequest() || ($skip_security_check !== true && !preg_match("~^/\\w~", $url)))
+		if (!self::isAjaxRequest() || ($isExternal && $skip_security_check !== true))
 		{
 			return;
 		}
@@ -492,6 +554,9 @@ final class Frame
 		{
 			$APPLICATION->RestartBuffer();
 		}
+
+		self::getInstance()->isRedirect = true;
+		StaticHtmlCache::getInstance()->delete();
 
 		header("X-Bitrix-Composite: Ajax (error:redirect)");
 		self::sendRandHeader();
@@ -568,7 +633,7 @@ final class Frame
 	 *
 	 * @return boolean
 	 */
-	static public function getUseAppCache()
+	public static function getUseAppCache()
 	{
 		$appCache = AppCacheManifest::getInstance();
 		return $appCache->isEnabled();
@@ -595,6 +660,28 @@ final class Frame
 	public static function getUseHTMLCache()
 	{
 		return self::$useHTMLCache;
+	}
+
+	/**
+	 * Sets useHTMLCache property.
+	 *
+	 * @param boolean preventAutoUpdate property.
+	 *
+	 * @return void
+	 */
+	public static function setPreventAutoUpdate($preventAutoUpdate = true)
+	{
+		self::$preventAutoUpdate = $preventAutoUpdate;
+	}
+
+	/**
+	 * Gets preventAutoUpdate property.
+	 *
+	 * @return boolean
+	 */
+	public static function getPreventAutoUpdate()
+	{
+		return self::$preventAutoUpdate;
 	}
 
 	/**
@@ -638,6 +725,7 @@ final class Frame
 	protected function getInjectedJs($params = array())
 	{
 		$vars = \CUtil::PhpToJSObject($params);
+
 		$inlineJS = <<<JS
 			(function(w) {
 
@@ -646,14 +734,15 @@ final class Frame
 			if (!r) { return; }
 
 			w.frameRequestStart = true;
+
 			var m = v.CACHE_MODE; var l = w.location; var x = new Date().getTime();
 			var q = "?bxrand=" + x + (l.search.length > 0 ? "&" + l.search.substring(1) : "");
 			var u = l.protocol + "//" + l.host + l.pathname + q;
 
 			r.open("GET", u, true);
 			r.setRequestHeader("BX-ACTION-TYPE", "get_dynamic");
-			r.setRequestHeader("BX-REF", document.referrer || "");
 			r.setRequestHeader("BX-CACHE-MODE", m);
+			try { r.setRequestHeader("BX-REF", document.referrer || "");} catch(e) {}
 
 			if (m === "APPCACHE")
 			{
@@ -670,7 +759,11 @@ final class Frame
 					var f = {error:true, reason:a!=x?"bad_rand":"bad_status", url:u, xhr:r, status:r.status};
 					if (w.BX && w.BX.ready)
 					{
-						BX.ready(function() { BX.onCustomEvent("onFrameDataRequestFail", [f]); });
+						BX.ready(function() {
+							setTimeout(function(){
+								BX.onCustomEvent("onFrameDataRequestFail", [f]);
+							}, 0);
+						});
 					}
 					else
 					{
@@ -693,14 +786,42 @@ final class Frame
 					w.frameDataString = r.responseText;
 				}
 			};
+
 			r.send();
 
 			})(window);
 JS;
 
 		return array(
-			"start" => "<style>".str_replace(array("\n", "\t"), "", self::getInjectedCSS())."</style>\n".
-						"<script>".str_replace(array("\n", "\t"), "", $inlineJS)."</script>"
+			"start" => '<style type="text/css">'.str_replace(array("\n", "\t"), "", self::getInjectedCSS())."</style>\n".
+						'<script type="text/javascript" data-skip-moving="true">'.str_replace(array("\n", "\t"), "", $inlineJS)."</script>"
+		);
+	}
+
+	/**
+	 * Returns JS minified code that will set global variables without doing a request
+	 * The code is returned in the 'start' key of the array.
+	 *
+	 * @param array $params
+	 * @return array[string]string
+	 */
+	protected function getInjectedJsWORequest($params = array())
+	{
+		$vars = \CUtil::PhpToJSObject($params);
+
+		$inlineJS = <<<JS
+			(function(w) {
+
+			w.frameCacheVars = $vars;
+			w.frameRequestStart = false;
+			w.preventAutoUpdate = true;
+
+			})(window);
+JS;
+
+		return array(
+			"start" => '<style type="text/css">'.str_replace(array("\n", "\t"), "", self::getInjectedCSS())."</style>\n".
+						'<script type="text/javascript" data-skip-moving="true">'.str_replace(array("\n", "\t"), "", $inlineJS)."</script>"
 		);
 	}
 

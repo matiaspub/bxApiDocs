@@ -6,6 +6,8 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPAllTaskService
 	extends CBPRuntimeService
 {
+	const COUNTERS_CACHE_TAG_PREFIX = 'b_bp_tasks_cnt_';
+
 	static public function DeleteTask($id)
 	{
 		self::Delete($id);
@@ -16,28 +18,146 @@ class CBPAllTaskService
 		self::DeleteByWorkflow($workflowId);
 	}
 
-	static public function MarkCompleted($id, $userId)
+	static public function MarkCompleted($taskId, $userId, $status = CBPTaskUserStatus::Ok)
 	{
 		global $DB;
 
-		$id = intval($id);
-		if ($id <= 0)
+		$taskId = (int)$taskId;
+		if ($taskId <= 0)
 			throw new Exception("id");
-		$userId = intval($userId);
+		$userId = (int)$userId;
 		if ($userId <= 0)
 			throw new Exception("userId");
+		$status = (int)$status;
 
-		$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." AND USER_ID = ".intval($userId)." ", true);
-
-		$dbRes = $DB->Query("SELECT COUNT(ID) as CNT FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
-		$arRes = $dbRes->Fetch();
-		if (intval($arRes["CNT"]) <= 0)
-			$DB->Query("DELETE FROM b_bp_task WHERE ID = ".intval($id)." ", true);
+		$DB->Query("UPDATE b_bp_task_user SET STATUS = ".$status.", DATE_UPDATE = ".$DB->CurrentTimeFunction()." WHERE TASK_ID = ".$taskId." AND USER_ID = ".$userId, true);
 
 		CUserCounter::Decrement($userId, 'bp_tasks', '**');
 
+		self::onTaskChange($taskId, array(
+			'USERS_STATUSES' => array($userId => $status)
+		), CBPTaskChangedStatus::Update);
 		foreach (GetModuleEvents("bizproc", "OnTaskMarkCompleted", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array($id, $userId));
+			ExecuteModuleEventEx($arEvent, array($taskId, $userId));
+	}
+
+	public static function getTaskUsers($taskId)
+	{
+		global $DB;
+
+		$taskId = (array)$taskId;
+		$taskId = array_map('intval', $taskId);
+		$taskId = array_filter($taskId);
+		if (sizeof($taskId) < 1)
+			throw new Exception("taskId");
+
+		$where = '';
+		foreach ($taskId as $id)
+		{
+			if ($where)
+				$where .= ' OR ';
+			$where .= ' TASK_ID = '.$id;
+		}
+
+		$users = array();
+		$iterator = $DB->Query('SELECT TU.*, U.PERSONAL_PHOTO, U.NAME, U.LAST_NAME, U.SECOND_NAME, U.LOGIN, U.TITLE'
+			.' FROM b_bp_task_user TU'
+			.' INNER JOIN b_user U ON (U.ID = TU.USER_ID)'
+			.' WHERE '.$where
+			.' ORDER BY TU.DATE_UPDATE DESC'
+		);
+		while ($user = $iterator->fetch())
+		{
+			$users[$user['TASK_ID']][] = $user;
+		}
+		return $users;
+	}
+
+	/**
+	 * @param string $workflowId - Internal workflow id.
+	 * @param null|int $userStatus - Filter participants by status.
+	 * @return array - User ids array (ex. array(1, 2, 3)).
+	 * @throws Exception
+	 */
+	public static function getWorkflowParticipants($workflowId, $userStatus = null)
+	{
+		global $DB;
+
+		if (strlen($workflowId) <= 0)
+			throw new Exception('workflowId');
+
+		$users = array();
+		$iterator = $DB->Query('SELECT DISTINCT TU.USER_ID'
+			.' FROM b_bp_task_user TU'
+			.' INNER JOIN b_bp_task T ON (T.ID = TU.TASK_ID)'
+			.' WHERE T.WORKFLOW_ID = \''.$DB->ForSql($workflowId).'\''
+			.($userStatus !== null ? ' AND TU.STATUS = '.(int)$userStatus : '')
+		);
+		while ($user = $iterator->fetch())
+		{
+			$users[] = (int)$user['USER_ID'];
+		}
+		return $users;
+	}
+
+	public static function delegateTask($taskId, $fromUserId, $toUserId)
+	{
+		global $DB;
+		$taskId = (int)$taskId;
+		$fromUserId = (int)$fromUserId;
+		$toUserId = (int)$toUserId;
+
+		if (!$taskId || !$fromUserId || !$toUserId)
+			return false;
+
+		$originalUserId = 0;
+
+		//check ORIGINAL_USER_ID
+		$iterator = $DB->Query('SELECT ORIGINAL_USER_ID'
+			.' FROM b_bp_task_user'
+			.' WHERE TASK_ID = '.$taskId.' AND USER_ID = '.$fromUserId
+		);
+		$row = $iterator->fetch();
+		if (!empty($row['ORIGINAL_USER_ID']))
+			$originalUserId = $row['ORIGINAL_USER_ID'];
+
+		// check USER_ID (USER_ID must be unique for task)
+		$iterator = $DB->Query('SELECT USER_ID'
+			.' FROM b_bp_task_user'
+			.' WHERE TASK_ID = '.$taskId.' AND USER_ID = '.$toUserId
+		);
+		$row = $iterator->fetch();
+		if (!empty($row['USER_ID']))
+			return false;
+
+		$DB->Query("UPDATE b_bp_task_user SET USER_ID = "
+			.$toUserId
+			.(!$originalUserId? ', ORIGINAL_USER_ID = '.$fromUserId : '')
+			." WHERE TASK_ID = ".$taskId." AND USER_ID = ".$fromUserId, true);
+		CUserCounter::Decrement($fromUserId, 'bp_tasks', '**');
+		CUserCounter::Increment($toUserId, 'bp_tasks', '**');
+		self::onTaskChange($taskId, array(
+			'USERS' => array($toUserId),
+			'USERS_REMOVED' => array($fromUserId)
+		), CBPTaskChangedStatus::Delegate);
+		return true;
+	}
+
+	public static function getOriginalTaskUserId($taskId, $realUserId)
+	{
+		global $DB;
+		$taskId = (int)$taskId;
+		$realUserId = (int)$realUserId;
+
+		$iterator = $DB->Query('SELECT ORIGINAL_USER_ID'
+			.' FROM b_bp_task_user'
+			.' WHERE TASK_ID = '.$taskId.' AND USER_ID = '.$realUserId
+		);
+		if ($row = $iterator->fetch())
+		{
+			return $row['ORIGINAL_USER_ID'] > 0 ? $row['ORIGINAL_USER_ID'] : $realUserId;
+		}
+		return false;
 	}
 
 	public static function Delete($id)
@@ -48,13 +168,18 @@ class CBPAllTaskService
 		if ($id <= 0)
 			throw new Exception("id");
 
-		$dbRes = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
+		$removedUsers = array();
+		$dbRes = $DB->Query("SELECT USER_ID, STATUS FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
 		while ($arRes = $dbRes->Fetch())
-			CUserCounter::Decrement($arRes["USER_ID"], 'bp_tasks', '**');
-
+		{
+			if ($arRes['STATUS'] == CBPTaskUserStatus::Waiting)
+				CUserCounter::Decrement($arRes["USER_ID"], 'bp_tasks', '**');
+			$removedUsers[] = $arRes["USER_ID"];
+		}
 		$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ", true);
 		$DB->Query("DELETE FROM b_bp_task WHERE ID = ".intval($id)." ", true);
 
+		self::onTaskChange($id, array('USERS_REMOVED' => $removedUsers), CBPTaskChangedStatus::Delete);
 		foreach (GetModuleEvents("bizproc", "OnTaskDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id));
 	}
@@ -75,12 +200,17 @@ class CBPAllTaskService
 		while ($arRes = $dbRes->Fetch())
 		{
 			$taskId = intval($arRes["ID"]);
-			$dbResUser = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".$taskId." ");
+			$removedUsers = array();
+			$dbResUser = $DB->Query("SELECT USER_ID, STATUS FROM b_bp_task_user WHERE TASK_ID = ".$taskId." ");
 			while ($arResUser = $dbResUser->Fetch())
-				CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
-
+			{
+				if ($arResUser['STATUS'] == CBPTaskUserStatus::Waiting)
+					CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
+				$removedUsers[] = $arResUser['USER_ID'];
+			}
 			$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".$taskId." ", true);
 
+			self::onTaskChange($taskId, array('USERS_REMOVED' => $removedUsers), CBPTaskChangedStatus::Delete);
 			foreach (GetModuleEvents("bizproc", "OnTaskDelete", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($taskId));
 		}
@@ -90,6 +220,99 @@ class CBPAllTaskService
 			"WHERE WORKFLOW_ID = '".$DB->ForSql($workflowId)."' ",
 			true
 		);
+	}
+
+	public static function getCounters($userId)
+	{
+		global $DB;
+
+		$counters = array('*' => 0);
+		$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+		$cacheTag = self::COUNTERS_CACHE_TAG_PREFIX.$userId;
+		if ($cache->read(3600*24*7, $cacheTag))
+		{
+			$counters = (array) $cache->get($cacheTag);
+		}
+		else
+		{
+			$query =
+				"SELECT WS.MODULE_ID AS MODULE_ID, WS.ENTITY AS ENTITY, COUNT('x') AS CNT ".
+				'FROM b_bp_task T '.
+				'	INNER JOIN b_bp_task_user TU ON (T.ID = TU.TASK_ID) '.
+				'	INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID) '.
+				'WHERE TU.STATUS = '.(int)CBPTaskUserStatus::Waiting.' '.
+				'	AND TU.USER_ID = '.(int)$userId.' '.
+				'GROUP BY MODULE_ID, ENTITY';
+
+			$iterator = $DB->Query($query, true);
+			if ($iterator)
+			{
+				while ($row = $iterator->fetch())
+				{
+					$cnt = (int)$row['CNT'];
+					$counters[$row['MODULE_ID']][$row['ENTITY']] = $cnt;
+					if (!isset($counters[$row['MODULE_ID']]['*']))
+						$counters[$row['MODULE_ID']]['*'] = 0;
+					$counters[$row['MODULE_ID']]['*'] += $cnt;
+					$counters['*'] += $cnt;
+				}
+				$cache->set($cacheTag, $counters);
+			}
+		}
+		return $counters;
+	}
+
+	protected static function onTaskChange($taskId, $taskData, $status)
+	{
+		$workflowId = isset($taskData['WORKFLOW_ID']) ? $taskData['WORKFLOW_ID'] : null;
+		if (!$workflowId)
+		{
+			$iterator = CBPTaskService::GetList(array('ID'=>'DESC'), array('ID' => $taskId), false, false, array('WORKFLOW_ID'));
+			$row = $iterator->fetch();
+			if (!$row)
+				return false;
+			$workflowId = $row['WORKFLOW_ID'];
+			$taskData['WORKFLOW_ID'] = $workflowId;
+		}
+
+		//clean counters cache
+		$users = array();
+		if (!empty($taskData['USERS']))
+			$users = $taskData['USERS'];
+		if (!empty($taskData['USERS_REMOVED']))
+			$users = array_merge($users, $taskData['USERS_REMOVED']);
+		if (!empty($taskData['USERS_STATUSES']))
+			$users = array_merge($users, array_keys($taskData['USERS_STATUSES']));
+		self::cleanCountersCache($users);
+
+		//ping document
+		$runtime = CBPRuntime::GetRuntime();
+		$runtime->StartRuntime();
+		$documentId = CBPStateService::GetStateDocumentId($workflowId);
+		if ($documentId)
+		{
+			$documentService = $runtime->GetService('DocumentService');
+			try
+			{
+				$documentService->onTaskChange($documentId, $taskId, $taskData, $status);
+			}
+			catch (Exception $e)
+			{
+
+			}
+		}
+		return true;
+	}
+
+	protected static function cleanCountersCache($users)
+	{
+		$users = (array) $users;
+		$users = array_unique($users);
+		$cache = \Bitrix\Main\Application::getInstance()->getManagedCache();
+		foreach ($users as $userId)
+		{
+			$cache->clean(self::COUNTERS_CACHE_TAG_PREFIX.$userId);
+		}
 	}
 
 	protected static function ParseFields(&$arFields, $id = 0)
@@ -236,7 +459,7 @@ class CBPTaskResult extends CDBResult
 		return $res;
 	}
 
-	public function ConvertBBCode($text)
+	public static function ConvertBBCode($text)
 	{
 		$text = preg_replace(
 			"'(?<=^|[\s.,;:!?\#\-\*\|\[\(\)\{\}]|\s)((http|https|news|ftp|aim|mailto)://[\.\-\_\:a-z0-9\@]([^\"\s\'\[\]\{\}])*)'is",
@@ -244,17 +467,16 @@ class CBPTaskResult extends CDBResult
 			$text
 		);
 
-		$text = preg_replace("#\[img\](.+?)\[/img\]#ie", "\$this->ConvertBCodeImageTag('\\1')", $text);
+		$text = preg_replace_callback("#\[img\](.+?)\[/img\]#i", array($this, "ConvertBCodeImageTag"), $text);
 
-		$text = preg_replace(
-			array(
-				"/\[url\]([^\]]+?)\[\/url\]/ie".BX_UTF_PCRE_MODIFIER,
-				"/\[url\s*=\s*([^\]]+?)\s*\](.*?)\[\/url\]/ie".BX_UTF_PCRE_MODIFIER
-			),
-			array(
-				"\$this->ConvertBCodeAnchorTag('\\1', '\\1')",
-				"\$this->ConvertBCodeAnchorTag('\\1', '\\2')"
-			),
+		$text = preg_replace_callback(
+			"/\[url\]([^\]]+?)\[\/url\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "ConvertBCodeAnchorTag"),
+			$text
+		);
+		$text = preg_replace_callback(
+			"/\[url\s*=\s*([^\]]+?)\s*\](.*?)\[\/url\]/i".BX_UTF_PCRE_MODIFIER,
+			array($this, "ConvertBCodeAnchorTag"),
 			$text
 		);
 
@@ -279,6 +501,8 @@ class CBPTaskResult extends CDBResult
 
 	public static function ConvertBCodeImageTag($url = "")
 	{
+		if (is_array($url))
+			$url = $url[1];
 		$url = trim($url);
 		if (strlen($url) <= 0)
 			return "";
@@ -302,8 +526,13 @@ class CBPTaskResult extends CDBResult
 		return '<img src="'.$url.'" border="0" />';
 	}
 
-	public static function ConvertBCodeAnchorTag($url, $text)
+	public static function ConvertBCodeAnchorTag($url, $text = '')
 	{
+		if (is_array($url))
+		{
+			$text = isset($url[2]) ? $url[2] : $url[1];
+			$url = $url[1];
+		}
 
 		$result = "";
 

@@ -41,7 +41,7 @@ class blogTextParser extends CTextParser
 				}
 			}
 
-			function sortlen($a, $b)
+			public function sortlen($a, $b) 
 			{
 				if (strlen($a["TYPING"]) == strlen($b["TYPING"]))
 					return 0;
@@ -148,21 +148,61 @@ class blogTextParser extends CTextParser
 	{
 		$text = preg_replace("/\[img([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER, "[imag id=\\1 \\2 \\3]", $text);
 	}
+
 	public static function ParserBlogImage(&$text, &$obj)
 	{
 		if(is_callable(array($obj, 'convert_blog_image')))
-			$text = preg_replace("/\[imag([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_blog_image('\\1', '\\2', '\\3', \$type, \$serverName)", $text);
+		{
+			$text = preg_replace_callback(
+				"/\[imag([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+				array($obj, "convertBlogImage"),
+				$text
+			);
+		}
+	}
+
+	public function convertBlogImage($matches)
+	{
+		return $this->convert_blog_image($matches[1], $matches[2], $matches[3]);
+	}
+
+	public function convertBlogImageMail($matches)
+	{
+		return $this->convert_blog_image('', $matches[2], '', 'mail');
 	}
 
 	public static function ParserUser(&$text, &$obj)
 	{
 		if($obj->allow["USER"] != "N" && is_callable(array($obj, 'convert_blog_user')))
-			$text = preg_replace("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_blog_user('\\1', '\\2')", $text);
+		{
+			$text = preg_replace_callback(
+				"/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER,
+				array($obj, "convertBlogUser"),
+				$text
+			);
+		}
 	}
+
+	public function convertBlogUser($matches)
+	{
+		return $this->convert_blog_user($matches[1], $matches[2]);
+	}
+
 	public static function ParserTag(&$text, &$obj)
 	{
 		if($obj->allow["TAG"] != "N" && is_callable(array($obj, 'convert_blog_tag')))
-			$text = preg_replace("/\[tag(?:[^\]])*\](.+?)\[\/tag\]/ies".BX_UTF_PCRE_MODIFIER, "\$obj->convert_blog_tag('\\1')", $text);
+		{
+			$text = preg_replace_callback(
+				"/\[tag(?:[^\]])*\](.+?)\[\/tag\]/is".BX_UTF_PCRE_MODIFIER,
+				array($obj, "convertBlogTag"),
+				$text
+			);
+		}
+	}
+
+	public function convertBlogTag($matches)
+	{
+		return $this->convert_blog_tag($matches[1]);
 	}
 
 	public function convert_blog_user($userId = 0, $name = "")
@@ -173,7 +213,12 @@ class blogTextParser extends CTextParser
 			return;
 		}
 		$anchor_id = RandString(8);
-		return '<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
+		return '<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.
+			(
+				!$this->bMobile
+					? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>'
+					: ''
+			);
 	}
 	public static function convert_blog_tag($name = "")
 	{
@@ -254,12 +299,17 @@ class blogTextParser extends CTextParser
 
 		$this->arImages = $arImages;
 		$this->serverName = $serverName;
-		$text = preg_replace("/\[img([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/ies".BX_UTF_PCRE_MODIFIER, "\$this->convert_blog_image('', '\\2', '', 'mail')", $text);
+
+		$text = preg_replace_callback(
+			"/\[img([^\]]*)id\s*=\s*([0-9]+)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+			array($this, "convertBlogImageMail"),
+			$text
+		);
 
 		return $text;
 	}
 
-	public function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html", $serverName="")
+	public function convert_blog_image($p1 = "", $imageId = "", $p2 = "", $type = "html")
 	{
 		$imageId = IntVal($imageId);
 		if($imageId <= 0)
@@ -482,11 +532,14 @@ class blogTextParser extends CTextParser
 
 	public static function killAllTags($text)
 	{
+		if (method_exists("CTextParser", "clearAllTags"))
+			return CTextParser::clearAllTags($text);
+
 		$text = strip_tags($text);
 		$text = preg_replace(
 			array(
 				"/\<(\/)(quote|code)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
-				"/\[(\/)(code|quote|video|td|tr|table|file|document)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
+				"/\[(\/)(code|quote|video|td|tr|th|table|tbody|thead|file|document|disk)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
 				"/\[(\/?)(\*)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER,
 				),
 			" ",
@@ -494,7 +547,7 @@ class blogTextParser extends CTextParser
 		$text = preg_replace(
 			array(
 				"/\<(\/?)(quote|code|font|color|video)([^\>]*)\>/is".BX_UTF_PCRE_MODIFIER,
-				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|td|tr|table|file|document|user|left|right|center|justify)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER
+				"/\[(\/?)(b|u|i|s|list|code|quote|font|color|url|img|video|td|tr|th|tbody|thead|table|file|document|disk|user|left|right|center|justify)([^\]]*)\]/is".BX_UTF_PCRE_MODIFIER
 				),
 			"",
 			$text);

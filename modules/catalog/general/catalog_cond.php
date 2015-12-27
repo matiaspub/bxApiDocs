@@ -1,6 +1,7 @@
 <?
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\UserTable;
+use Bitrix\Catalog;
 
 Loc::loadMessages(__FILE__);
 
@@ -30,12 +31,12 @@ class CGlobalCondCtrl
 
 	public static function GetClassName()
 	{
-		return __CLASS__;
+		return get_called_class();
 	}
 
 	public static function GetControlDescr()
 	{
-		$strClassName = static::GetClassName();
+		$strClassName = get_called_class();
 		return array(
 			'ID' => static::GetControlID(),
 			'GetControlShow' => array($strClassName, 'GetControlShow'),
@@ -87,6 +88,9 @@ class CGlobalCondCtrl
 		}
 	}
 
+	/**
+	 * @return string|array
+	 */
 	public static function GetControlID()
 	{
 		return '';
@@ -99,6 +103,10 @@ class CGlobalCondCtrl
 		return array_values(array_unique($arControls));
 	}
 
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
 		return false;
@@ -124,6 +132,10 @@ class CGlobalCondCtrl
 
 	}
 
+	/**
+	 * @param bool|array $arOperators
+	 * @return array
+	 */
 	public static function GetLogic($arOperators = false)
 	{
 		$arOperatorsList = array(
@@ -134,6 +146,7 @@ class CGlobalCondCtrl
 					'N' => '#FIELD# == #VALUE#'
 				),
 				'PARENT' => ' || ',
+				'MULTI_SEP' => ' || ',
 				'VALUE' => 'Equal',
 				'LABEL' => Loc::getMessage('BT_COND_LOGIC_EQ_LABEL')
 			),
@@ -144,6 +157,7 @@ class CGlobalCondCtrl
 					'N' => '#FIELD# != #VALUE#'
 				),
 				'PARENT' => ' && ',
+				'MULTI_SEP' => ' && ',
 				'VALUE' => 'Not',
 				'LABEL' => Loc::getMessage('BT_COND_LOGIC_NOT_EQ_LABEL')
 			),
@@ -190,6 +204,7 @@ class CGlobalCondCtrl
 					'Y' => 'CGlobalCondCtrl::LogicContain(#FIELD#, #VALUE#)'
 				),
 				'PARENT' => ' || ',
+				'MULTI_SEP' => ' || ',
 				'VALUE' => 'Contain',
 				'LABEL' => Loc::getMessage('BT_COND_LOGIC_CONT_LABEL')
 			),
@@ -200,6 +215,7 @@ class CGlobalCondCtrl
 					'Y' => 'CGlobalCondCtrl::LogicNotContain(#FIELD#, #VALUE#)'
 				),
 				'PARENT' => ' && ',
+				'MULTI_SEP' => ' && ',
 				'VALUE' => 'NotCont',
 				'LABEL' => Loc::getMessage('BT_COND_LOGIC_NOT_CONT_LABEL')
 			)
@@ -222,6 +238,11 @@ class CGlobalCondCtrl
 		return ($boolSearch ? $arSearch : $arOperatorsList);
 	}
 
+	/**
+	 * @param bool|array $arOperators
+	 * @param bool|array $arLabels
+	 * @return array
+	 */
 	public static function GetLogicEx($arOperators = false, $arLabels = false)
 	{
 		$arOperatorsList = static::GetLogic($arOperators);
@@ -2163,14 +2184,9 @@ class CGlobalCondCtrl
 
 class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
 	public static function GetControlDescr()
 	{
-		$strClassName = static::GetClassName();
+		$strClassName = get_called_class();
 		return array(
 			'COMPLEX' => 'Y',
 			'GetControlShow' => array($strClassName, 'GetControlShow'),
@@ -2209,6 +2225,7 @@ class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
 		$strResult = '';
+		$resultValues = array();
 		$arValues = false;
 
 		if (is_string($arControl))
@@ -2241,16 +2258,66 @@ class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 				{
 					case 'int':
 					case 'double':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							if (!isset($arLogic['MULTI_SEP']))
+							{
+								$boolError = true;
+							}
+							else
+							{
+								foreach ($arValues['value'] as &$value)
+								{
+									$resultValues[] = str_replace(
+										array('#FIELD#', '#VALUE#'),
+										array($strField, $value),
+										$arLogic['OP'][$arControl['MULTIPLE']]
+									);
+								}
+								unset($value);
+								$strResult = '('.implode($arLogic['MULTI_SEP'], $resultValues).')';
+								unset($resultValues);
+							}
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'char':
 					case 'string':
 					case 'text':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, '"'.EscapePHPString($arValues['value']).'"'),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'date':
 					case 'datetime':
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 				}
 			}
@@ -2259,6 +2326,10 @@ class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 		return (!$boolError ? $strResult : false);
 	}
 
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
 		return false;
@@ -2267,17 +2338,12 @@ class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 
 class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
 	public static function GetControlDescr()
 	{
-		$strClassName = static::GetClassName();
+		$strClassName = get_called_class();
 		return array(
 			'ID' => static::GetControlID(),
-			'GROUP' => "Y",
+			'GROUP' => 'Y',
 			'GetControlShow' => array($strClassName, 'GetControlShow'),
 			'GetConditionShow' => array($strClassName, 'GetConditionShow'),
 			'IsGroup' => array($strClassName, 'IsGroup'),
@@ -2338,6 +2404,9 @@ class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 		return $arResult;
 	}
 
+	/**
+	 * @return string|array
+	 */
 	public static function GetControlID()
 	{
 		return 'CondGroup';
@@ -2524,36 +2593,21 @@ class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 
 class CCatalogCondCtrl extends CGlobalCondCtrl
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
 }
 
 class CCatalogCondCtrlComplex extends CGlobalCondCtrlComplex
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
 }
 
 class CCatalogCondCtrlGroup extends CGlobalCondCtrlGroup
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
 }
 
 class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
+	/**
+	 * @return string|array
+	 */
 	public static function GetControlID()
 	{
 		return array(
@@ -2593,8 +2647,6 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 		);
 		foreach ($arControls as &$arOneControl)
 		{
-			$arLogic = static::GetLogicAtom($arOneControl['LOGIC']);
-			$arValue = static::GetValueAtom($arOneControl['JS_VALUE']);
 			$arResult['children'][] = array(
 				'controlId' => $arOneControl['ID'],
 				'group' => false,
@@ -2606,8 +2658,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 						'type' => 'prefix',
 						'text' => $arOneControl['PREFIX']
 					),
-					$arLogic,
-					$arValue
+					static::GetLogicAtom($arOneControl['LOGIC']),
+					static::GetValueAtom($arOneControl['JS_VALUE'])
 				)
 			);
 		}
@@ -2617,34 +2669,36 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 		return $arResult;
 	}
 
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
-		$arVatList = array();
-		$arFilter = array();
-		$rsVats = CCatalogVat::GetListEx(array(), $arFilter, false, false, array('ID', 'NAME'));
-		while ($arVat = $rsVats->Fetch())
+		$vatList = array();
+		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME'), 'order' => array('SORT' => 'ASC')));
+		while ($vat = $vatIterator->fetch())
 		{
-			$arVatList[$arVat['ID']] = $arVat['NAME'];
+			$vat['ID'] = (int)$vat['ID'];
+			$vatList[$vat['ID']] = $vat['NAME'];
 		}
-		unset($arVat, $rsVats);
+		unset($vat, $vatIterator);
 
 		$arControlList = array(
 			'CondIBElement' => array(
 				'ID' => 'CondIBElement',
-				'PARENT' => true,
 				'FIELD' => 'ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
-					'type' => 'popup',
-					'popup_url' =>  '/bitrix/admin/iblock_element_search.php',
+					'type' => 'dialog',
+					'popup_url' =>  '/bitrix/admin/cat_product_search_dialog.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
-						'discount' => 'Y'
+						'caller' => 'discount_rules',
+						'allow_select_parent' => 'Y'
 					),
 					'param_id' => 'n',
 					'show_value' => 'Y'
@@ -2655,11 +2709,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBIBlock' => array(
 				'ID' => 'CondIBIBlock',
-				'PARENT' => true,
 				'FIELD' => 'IBLOCK_ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_IBLOCK_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_IBLOCK_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2682,8 +2733,6 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 				'PARENT' => false,
 				'FIELD' => 'SECTION_ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'Y',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SECTION_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SECTION_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2703,12 +2752,9 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBCode' => array(
 				'ID' => 'CondIBCode',
-				'PARENT' => true,
 				'FIELD' => 'CODE',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CODE_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CODE_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2719,12 +2765,9 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBXmlID' => array(
 				'ID' => 'CondIBXmlID',
-				'PARENT' => true,
 				'FIELD' => 'XML_ID',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_XML_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_XML_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2735,12 +2778,9 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBName' => array(
 				'ID' => 'CondIBName',
-				'PARENT' => true,
 				'FIELD' => 'NAME',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_NAME_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2751,11 +2791,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBActive' => array(
 				'ID' => 'CondIBActive',
-				'PARENT' => true,
 				'FIELD' => 'ACTIVE',
 				'FIELD_TYPE' => 'char',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ACTIVE_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ACTIVE_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2772,11 +2809,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBDateActiveFrom' => array(
 				'ID' => 'CondIBDateActiveFrom',
-				'PARENT' => true,
 				'FIELD' => 'DATE_ACTIVE_FROM',
 				'FIELD_TYPE' => 'datetime',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_FROM_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_FROM_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2788,11 +2822,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBDateActiveTo' => array(
 				'ID' => 'CondIBDateActiveTo',
-				'PARENT' => true,
 				'FIELD' => 'DATE_ACTIVE_TO',
 				'FIELD_TYPE' => 'datetime',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_TO_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_ACTIVE_TO_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2804,11 +2835,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBSort' => array(
 				'ID' => 'CondIBSort',
-				'PARENT' => true,
 				'FIELD' => 'SORT',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SORT_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_SORT_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2819,11 +2847,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBPreviewText' => array(
 				'ID' => 'CondIBPreviewText',
-				'PARENT' => true,
 				'FIELD' => 'PREVIEW_TEXT',
 				'FIELD_TYPE' => 'text',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_PREVIEW_TEXT_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2834,11 +2859,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBDetailText' => array(
 				'ID' => 'CondIBDetailText',
-				'PARENT' => true,
 				'FIELD' => 'DETAIL_TEXT',
 				'FIELD_TYPE' => 'text',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DETAIL_TEXT_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2849,11 +2871,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBDateCreate' => array(
 				'ID' => 'CondIBDateCreate',
-				'PARENT' => true,
 				'FIELD' => 'DATE_CREATE',
 				'FIELD_TYPE' => 'datetime',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_CREATE_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_DATE_CREATE_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2865,11 +2884,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBCreatedBy' => array(
 				'ID' => 'CondIBCreatedBy',
-				'PARENT' => true,
 				'FIELD' => 'CREATED_BY',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CREATED_BY_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_CREATED_BY_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2882,11 +2898,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBTimestampX' => array(
 				'ID' => 'CondIBTimestampX',
-				'PARENT' => true,
 				'FIELD' => 'TIMESTAMP_X',
 				'FIELD_TYPE' => 'datetime',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TIMESTAMP_X_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TIMESTAMP_X_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2898,11 +2911,8 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBModifiedBy' => array(
 				'ID' => 'CondIBModifiedBy',
-				'PARENT' => true,
 				'FIELD' => 'MODIFIED_BY',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_MODIFIED_BY_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_MODIFIED_BY_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2915,12 +2925,9 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			),
 			'CondIBTags' => array(
 				'ID' => 'CondIBTags',
-				'PARENT' => true,
 				'FIELD' => 'TAGS',
 				'FIELD_TYPE' => 'string',
 				'FIELD_LENGTH' => 255,
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TAGS_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_TAGS_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_CONT, BT_COND_LOGIC_NOT_CONT)),
@@ -2932,10 +2939,11 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			'CondCatQuantity' => array(
 				'ID' => 'CondCatQuantity',
 				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
 				'FIELD' => 'CATALOG_QUANTITY',
+				'FIELD_TABLE' => 'QUANTITY',
 				'FIELD_TYPE' => 'double',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_QUANTITY_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_QUANTITY_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2946,10 +2954,11 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			'CondCatWeight' => array(
 				'ID' => 'CondCatWeight',
 				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
 				'FIELD' => 'CATALOG_WEIGHT',
+				'FIELD_TABLE' => 'WEIGHT',
 				'FIELD_TYPE' => 'double',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_WEIGHT_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_WEIGHT_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS)),
@@ -2961,16 +2970,17 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			'CondCatVatID' => array(
 				'ID' => 'CondCatVatID',
 				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
 				'FIELD' => 'CATALOG_VAT_ID',
+				'FIELD_TABLE' => 'VAT_ID',
 				'FIELD_TYPE' => 'int',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_ID_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
 					'type' => 'select',
-					'values' => $arVatList
+					'values' => $vatList
 				),
 				'PHP_VALUE' => array(
 					'VALIDATE' => 'list'
@@ -2979,10 +2989,11 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			'CondCatVatIncluded' => array(
 				'ID' => 'CondCatVatIncluded',
 				'PARENT' => false,
+				'MODULE_ENTITY' => 'catalog',
+				'ENTITY' => 'PRODUCT',
 				'FIELD' => 'CATALOG_VAT_INCLUDED',
+				'FIELD_TABLE' => 'VAT_INCLUDED',
 				'FIELD_TYPE' => 'char',
-				'MULTIPLE' => 'N',
-				'GROUP' => 'N',
 				'LABEL' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_LABEL'),
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_CATALOG_VAT_INCLUDED_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
@@ -2998,6 +3009,28 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 				)
 			)
 		);
+		if (empty($vatList))
+		{
+			unset($arControlList['CondCatVatID']);
+			unset($arControlList['CondCatVatIncluded']);
+		}
+		foreach ($arControlList as &$control)
+		{
+			if (!isset($control['PARENT']))
+				$control['PARENT'] = true;
+			$control['EXIST_HANDLER'] = 'Y';
+			$control['MODULE_ID'] = 'catalog';
+			if (!isset($control['MODULE_ENTITY']))
+				$control['MODULE_ENTITY'] = 'iblock';
+			if (!isset($control['ENTITY']))
+				$control['ENTITY'] = 'ELEMENT';
+			if (!isset($control['FIELD_TABLE']))
+				$control['FIELD_TABLE'] = false;
+			$control['MULTIPLE'] = 'N';
+			$control['GROUP'] = 'N';
+		}
+		unset($control);
+		$arControlList['CondIBSection']['MULTIPLE'] = 'Y';
 
 		if ($strControlID === false)
 		{
@@ -3015,7 +3048,10 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
+		$strParentResult = '';
 		$strResult = '';
+		$parentResultValues = array();
+		$resultValues = array();
 
 		if (is_string($arControl))
 		{
@@ -3043,36 +3079,101 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 			}
 			else
 			{
-				if ($arControl['PARENT'] && !isset($arLogic['PARENT']))
-					$arControl['PARENT'] = false;
+				$useParent = ($arControl['PARENT'] && isset($arLogic['PARENT']));
 				$strParent = $arParams['FIELD'].'[\'PARENT_'.$arControl['FIELD'].'\']';
 				$strField = $arParams['FIELD'].'[\''.$arControl['FIELD'].'\']';
 				switch ($arControl['FIELD_TYPE'])
 				{
 					case 'int':
 					case 'double':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							if (!isset($arLogic['MULTI_SEP']))
+							{
+								$boolError = true;
+							}
+							else
+							{
+								foreach ($arValues['value'] as &$value)
+								{
+									if ($useParent)
+										$parentResultValues[] = str_replace(
+											array('#FIELD#', '#VALUE#'),
+											array($strParent, $value),
+											$arLogic['OP'][$arControl['MULTIPLE']]
+										);
+									$resultValues[] = str_replace(
+										array('#FIELD#', '#VALUE#'),
+										array($strField, $value),
+										$arLogic['OP'][$arControl['MULTIPLE']]
+									);
+								}
+								unset($value);
+								if ($useParent)
+									$strParentResult = '('.implode($arLogic['MULTI_SEP'], $parentResultValues).')';
+								$strResult = '('.implode($arLogic['MULTI_SEP'], $resultValues).')';
+								unset($resultValues, $parentResultValues);
+							}
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(
+									array('#FIELD#', '#VALUE#'),
+									array($strParent, $arValues['value']),
+									$arLogic['OP'][$arControl['MULTIPLE']]
+								);
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, $arValues['value']),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'char':
 					case 'string':
 					case 'text':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, '"'.EscapePHPString($arValues['value']).'"'), $arLogic['OP'][$arControl['MULTIPLE']]);
+						if (is_array($arValues['value']))
+						{
+							$boolError = true;
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(
+									array('#FIELD#', '#VALUE#'),
+									array($strParent, '"'.EscapePHPString($arValues['value']).'"'),
+									$arLogic['OP'][$arControl['MULTIPLE']]
+								);
+							$strResult = str_replace(
+								array('#FIELD#', '#VALUE#'),
+								array($strField, '"'.EscapePHPString($arValues['value']).'"'),
+								$arLogic['OP'][$arControl['MULTIPLE']]
+							);
+						}
 						break;
 					case 'date':
 					case 'datetime':
-						$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
-						$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
-						if (!(BT_COND_LOGIC_EQ == $arLogic['ID'] || BT_COND_LOGIC_NOT_EQ == $arLogic['ID']))
+						if (is_array($arValues['value']))
 						{
-							$strParentResult = 'null !== '.$strParent.' && \'\' !== '.$strParent.' && '.$strResult;
-							$strResult = 'null !== '.$strField.' && \'\' !== '.$strField.' && '.$strResult;
+							$boolError = true;
+						}
+						else
+						{
+							if ($useParent)
+								$strParentResult = str_replace(array('#FIELD#', '#VALUE#'), array($strParent, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+							$strResult = str_replace(array('#FIELD#', '#VALUE#'), array($strField, $arValues['value']), $arLogic['OP'][$arControl['MULTIPLE']]);
+							if (!(BT_COND_LOGIC_EQ == $arLogic['ID'] || BT_COND_LOGIC_NOT_EQ == $arLogic['ID']))
+							{
+								if ($useParent)
+									$strParentResult = 'null !== '.$strParent.' && \'\' !== '.$strParent.' && '.$strResult;
+								$strResult = 'null !== '.$strField.' && \'\' !== '.$strField.' && '.$strResult;
+							}
 						}
 						break;
 				}
 				$strResult = 'isset('.$strField.') && ('.$strResult.')';
-				if ($arControl['PARENT'])
+				if ($useParent)
 				{
 					$strResult = '(isset('.$strParent.') ? (('.$strResult.')'.$arLogic['PARENT'].$strParentResult.') : ('.$strResult.'))';
 				}
@@ -3127,11 +3228,10 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 
 class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 {
-	public static function GetClassName()
-	{
-		return __CLASS__;
-	}
-
+	/**
+	 * @param bool|string $strControlID
+	 * @return bool|array
+	 */
 	public static function GetControls($strControlID = false)
 	{
 		$arControlList = array();
@@ -3226,8 +3326,8 @@ class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 									}
 									if (isset($arOnePropValue))
 										unset($arOnePropValue);
-									break;
 									$arPhpValue = array('VALIDATE' => 'list');
+									break;
 								case 'E':
 									$strFieldType = 'int';
 									$arLogic = static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ));
@@ -3260,11 +3360,17 @@ class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 									break;
 							}
 						}
-						$arControlList["CondIBProp:".$intIBlockID.':'.$arProp['ID']] = array(
-							"ID" => "CondIBProp:".$intIBlockID.':'.$arProp['ID'],
-							"IBLOCK_ID" => $intIBlockID,
-							"FIELD" => "PROPERTY_".$arProp['ID']."_VALUE",
-							"FIELD_TYPE" => $strFieldType,
+						$arControlList['CondIBProp:'.$intIBlockID.':'.$arProp['ID']] = array(
+							'ID' => 'CondIBProp:'.$intIBlockID.':'.$arProp['ID'],
+							'PARENT' => false,
+							'EXIST_HANDLER' => 'Y',
+							'MODULE_ID' => 'catalog',
+							'MODULE_ENTITY' => 'iblock',
+							'ENTITY' => 'ELEMENT_PROPERTY',
+							'IBLOCK_ID' => $intIBlockID,
+							'FIELD' => 'PROPERTY_'.$arProp['ID'].'_VALUE',
+							'FIELD_TABLE' => $intIBlockID.':'.$arProp['ID'],
+							'FIELD_TYPE' => $strFieldType,
 							'MULTIPLE' => 'Y',
 							'GROUP' => 'N',
 							'SEP' => ($boolSep ? 'Y' : 'N'),
@@ -3436,6 +3542,7 @@ class CGlobalCondTree
 	protected $arControlList = null;					// control list cache
 	protected $arShowControlList = null;				// control show method list
 	protected $arShowInGroups = null;					// showin group list
+	protected $forcedShowInGroup = null;				// forced showin list
 	protected $arInitControlList = null;				// control init list
 
 	protected $arDefaultControl = array(
@@ -3447,6 +3554,7 @@ class CGlobalCondTree
 
 	protected $usedModules = array();					// modules for real conditions
 	protected $usedExtFiles = array();					// files from AddEventHandler
+	protected $usedEntity = array();					// entity list in conditions
 
 	protected $arConditions = null;						// conditions array
 
@@ -3462,23 +3570,20 @@ class CGlobalCondTree
 
 	public function OnConditionAtomBuildList()
 	{
-		if (!$this->boolError)
+		if (!$this->boolError && !isset($this->arAtomList))
 		{
-			if (!isset($this->arAtomList))
+			$this->arAtomList = array();
+			$this->arAtomJSPath = array();
+			foreach (GetModuleEvents($this->arEvents['ATOMS']['MODULE_ID'], $this->arEvents['ATOMS']['EVENT_ID'], true) as $arEvent)
 			{
-				$this->arAtomList = array();
-				$this->arAtomJSPath = array();
-				foreach (GetModuleEvents($this->arEvents['ATOMS']['MODULE_ID'], $this->arEvents['ATOMS']['EVENT_ID'], true) as $arEvent)
+				$arRes = ExecuteModuleEventEx($arEvent);
+				if (!isset($arRes['ID']))
+					continue;;
+				$this->arAtomList[$arRes["ID"]] = $arRes;
+				if (isset($arRes['JS_SRC']))
 				{
-					$arRes = ExecuteModuleEventEx($arEvent);
-					if (!isset($arRes['ID']))
-						continue;;
-					$this->arAtomList[$arRes["ID"]] = $arRes;
-					if (isset($arRes['JS_SRC']))
-					{
-						if (!in_array($arRes['JS_SRC'], $this->arAtomJSPath))
-							$this->arAtomJSPath[] = $arRes['JS_SRC'];
-					}
+					if (!in_array($arRes['JS_SRC'], $this->arAtomJSPath))
+						$this->arAtomJSPath[] = $arRes['JS_SRC'];
 				}
 			}
 		}
@@ -3486,169 +3591,210 @@ class CGlobalCondTree
 
 	public function OnConditionControlBuildList()
 	{
-		if (!$this->boolError)
+		if (!$this->boolError && !isset($this->arControlList))
 		{
-			if (!isset($this->arControlList))
+			$this->arControlList = array();
+			$this->arShowInGroups = array();
+			$this->forcedShowInGroup = array();
+			$this->arShowControlList = array();
+			$this->arInitControlList = array();
+			foreach (GetModuleEvents($this->arEvents['CONTROLS']['MODULE_ID'], $this->arEvents['CONTROLS']['EVENT_ID'], true) as $arEvent)
 			{
-				$this->arControlList = array();
-				$this->arShowInGroups = array();
-				$this->arShowControlList = array();
-				$this->arInitControlList = array();
-				foreach (GetModuleEvents($this->arEvents['CONTROLS']['MODULE_ID'], $this->arEvents['CONTROLS']['EVENT_ID'], true) as $arEvent)
+				$arRes = ExecuteModuleEventEx($arEvent);
+				if (!is_array($arRes))
+					continue;
+				if (isset($arRes['ID']))
 				{
-					$arRes = ExecuteModuleEventEx($arEvent);
-					if (!is_array($arRes))
-						continue;
-					if (isset($arRes['ID']))
+					if (isset($arRes['EXIST_HANDLER']) && $arRes['EXIST_HANDLER'] === 'Y')
 					{
-						if (isset($arRes['EXIST_HANDLER']) && $arRes['EXIST_HANDLER'] === 'Y')
-						{
-							if (!isset($arRes['MODULE_ID']) && !isset($arRes['EXT_FILE']))
-								continue;
-						}
-						else
-						{
-							$arRes['MODULE_ID'] = '';
-							$arRes['EXT_FILE'] = '';
-						}
-						if (array_key_exists('EXIST_HANDLER', $arRes))
-							unset($arRes['EXIST_HANDLER']);
-						$arRes['GROUP'] = (isset($arRes['GROUP']) && 'Y' == $arRes['GROUP'] ? 'Y' : 'N');
-						if (isset($this->arControlList[$arRes['ID']]))
-						{
-							$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $arRes['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
-							$this->boolError = true;
-						}
-						else
-						{
-							if (!$this->CheckControl($arRes))
-								continue;
-							$this->arControlList[$arRes["ID"]] = $arRes;
-							if ('Y' == $arRes['GROUP'])
-								$this->arShowInGroups[] = $arRes["ID"];
-							if (isset($arRes['GetControlShow']) && !empty($arRes['GetControlShow']))
-							{
-								if (!in_array($arRes['GetControlShow'], $this->arShowControlList))
-									$this->arShowControlList[] = $arRes['GetControlShow'];
-							}
-							if (isset($arRes['InitParams']) && !empty($arRes['InitParams']))
-							{
-								if (!in_array($arRes['InitParams'], $this->arInitControlList))
-									$this->arInitControlList[] = $arRes['InitParams'];
-							}
-						}
-					}
-					elseif (isset($arRes['COMPLEX']) && 'Y' == $arRes['COMPLEX'])
-					{
-						$complexModuleID = '';
-						$complexExtFiles = '';
-						if (isset($arRes['EXIST_HANDLER']) && $arRes['EXIST_HANDLER'] === 'Y')
-						{
-							if (isset($arRes['MODULE_ID']))
-								$complexModuleID = $arRes['MODULE_ID'];
-							if (isset($arRes['EXT_FILE']))
-								$complexExtFiles = $arRes['EXT_FILE'];
-						}
-						if (isset($arRes['CONTROLS']) && !empty($arRes['CONTROLS']) && is_array($arRes['CONTROLS']))
-						{
-							if (array_key_exists('EXIST_HANDLER', $arRes))
-								unset($arRes['EXIST_HANDLER']);
-							$arInfo = $arRes;
-							unset($arInfo['COMPLEX']);
-							unset($arInfo['CONTROLS']);
-							foreach ($arRes['CONTROLS'] as &$arOneControl)
-							{
-								if (isset($arOneControl['ID']))
-								{
-									if (isset($arOneControl['EXIST_HANDLER']) && $arOneControl['EXIST_HANDLER'] === 'Y')
-									{
-										if (!isset($arOneControl['MODULE_ID']) && !isset($arOneControl['EXT_FILE']))
-											continue;
-									}
-									$arInfo['ID'] = $arOneControl['ID'];
-									$arInfo['GROUP'] = 'N';
-									$arInfo['MODULE_ID'] = isset($arOneControl['MODULE_ID']) ? $arOneControl['MODULE_ID'] : $complexModuleID;
-									$arInfo['EXT_FILE'] = isset($arOneControl['EXT_FILE']) ? $arOneControl['EXT_FILE'] : $complexExtFiles;
-									if (isset($this->arControlList[$arInfo['ID']]))
-									{
-										$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $arInfo['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
-										$this->boolError = true;
-									}
-									else
-									{
-										if (!$this->CheckControl($arInfo))
-											continue;
-										$this->arControlList[$arInfo['ID']] = $arInfo;
-									}
-								}
-							}
-							if (isset($arOneControl))
-								unset($arOneControl);
-							if (isset($arRes['GetControlShow']) && !empty($arRes['GetControlShow']))
-							{
-								if (!in_array($arRes['GetControlShow'], $this->arShowControlList))
-									$this->arShowControlList[] = $arRes['GetControlShow'];
-							}
-							if (isset($arRes['InitParams']) && !empty($arRes['InitParams']))
-							{
-								if (!in_array($arRes['InitParams'], $this->arInitControlList))
-									$this->arInitControlList[] = $arRes['InitParams'];
-							}
-						}
+						if (!isset($arRes['MODULE_ID']) && !isset($arRes['EXT_FILE']))
+							continue;
 					}
 					else
 					{
-						foreach ($arRes as &$arOneRes)
+						$arRes['MODULE_ID'] = '';
+						$arRes['EXT_FILE'] = '';
+					}
+					if (array_key_exists('EXIST_HANDLER', $arRes))
+						unset($arRes['EXIST_HANDLER']);
+					$arRes['GROUP'] = (isset($arRes['GROUP']) && $arRes['GROUP'] == 'Y' ? 'Y' : 'N');
+					if (isset($this->arControlList[$arRes['ID']]))
+					{
+						$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $arRes['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
+						$this->boolError = true;
+					}
+					else
+					{
+						if (!$this->CheckControl($arRes))
+							continue;
+						$this->arControlList[$arRes["ID"]] = $arRes;
+						if ($arRes['GROUP'] == 'Y')
 						{
-							if (is_array($arOneRes) && isset($arOneRes['ID']))
+							if (empty($arRes['FORCED_SHOW_LIST']))
 							{
-								if (isset($arOneRes['EXIST_HANDLER']) && $arOneRes['EXIST_HANDLER'] === 'Y')
+								$this->arShowInGroups[] = $arRes['ID'];
+							}
+							else
+							{
+								$forcedList = (!is_array($arRes['FORCED_SHOW_LIST']) ? array($arRes['FORCED_SHOW_LIST']) : $arRes['FORCED_SHOW_LIST']);
+								foreach ($forcedList as &$forcedId)
 								{
-									if (!isset($arOneRes['MODULE_ID']) && !isset($arOneRes['EXT_FILE']))
+									if (is_array($forcedId))
+										continue;
+									$forcedId = trim($forcedId);
+									if ($forcedId == '')
+										continue;
+									if (!isset($this->forcedShowInGroup[$forcedId]))
+										$this->forcedShowInGroup[$forcedId] = array();
+									$this->forcedShowInGroup[$forcedId][] = $arRes['ID'];
+								}
+								unset($forcedId);
+							}
+						}
+						if (isset($arRes['GetControlShow']) && !empty($arRes['GetControlShow']))
+						{
+							if (!in_array($arRes['GetControlShow'], $this->arShowControlList))
+								$this->arShowControlList[] = $arRes['GetControlShow'];
+						}
+						if (isset($arRes['InitParams']) && !empty($arRes['InitParams']))
+						{
+							if (!in_array($arRes['InitParams'], $this->arInitControlList))
+								$this->arInitControlList[] = $arRes['InitParams'];
+						}
+					}
+				}
+				elseif (isset($arRes['COMPLEX']) && 'Y' == $arRes['COMPLEX'])
+				{
+					$complexModuleID = '';
+					$complexExtFiles = '';
+					if (isset($arRes['EXIST_HANDLER']) && $arRes['EXIST_HANDLER'] === 'Y')
+					{
+						if (isset($arRes['MODULE_ID']))
+							$complexModuleID = $arRes['MODULE_ID'];
+						if (isset($arRes['EXT_FILE']))
+							$complexExtFiles = $arRes['EXT_FILE'];
+					}
+					if (isset($arRes['CONTROLS']) && !empty($arRes['CONTROLS']) && is_array($arRes['CONTROLS']))
+					{
+						if (array_key_exists('EXIST_HANDLER', $arRes))
+							unset($arRes['EXIST_HANDLER']);
+						$arInfo = $arRes;
+						unset($arInfo['COMPLEX'], $arInfo['CONTROLS']);
+						foreach ($arRes['CONTROLS'] as &$arOneControl)
+						{
+							if (isset($arOneControl['ID']))
+							{
+								if (isset($arOneControl['EXIST_HANDLER']) && $arOneControl['EXIST_HANDLER'] === 'Y')
+								{
+									if (!isset($arOneControl['MODULE_ID']) && !isset($arOneControl['EXT_FILE']))
 										continue;
 								}
-								else
+								$arInfo['GROUP'] = 'N';
+								$arInfo['MODULE_ID'] = isset($arOneControl['MODULE_ID']) ? $arOneControl['MODULE_ID'] : $complexModuleID;
+								$arInfo['EXT_FILE'] = isset($arOneControl['EXT_FILE']) ? $arOneControl['EXT_FILE'] : $complexExtFiles;
+								$control = array_merge($arOneControl, $arInfo);
+								if (isset($this->arControlList[$control['ID']]))
 								{
-									$arOneRes['MODULE_ID'] = '';
-									$arOneRes['EXT_FILE'] = '';
-								}
-								if (array_key_exists('EXIST_HANDLER', $arOneRes))
-									unset($arOneRes['EXIST_HANDLER']);
-								$arOneRes['GROUP'] = (isset($arOneRes['GROUP']) && 'Y' == $arOneRes['GROUP'] ? 'Y' : 'N');
-								if (isset($this->arControlList[$arOneRes['ID']]))
-								{
-									$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $arOneRes['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
+									$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $control['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
 									$this->boolError = true;
 								}
 								else
 								{
-									if (!$this->CheckControl($arOneRes))
+									if (!$this->CheckControl($control))
 										continue;
-									$this->arControlList[$arOneRes["ID"]] = $arOneRes;
-									if ('Y' == $arOneRes['GROUP'])
-										$this->arShowInGroups[] = $arOneRes["ID"];
-									if (isset($arOneRes['GetControlShow']) && !empty($arOneRes['GetControlShow']))
+									$this->arControlList[$control['ID']] = $control;
+								}
+								unset($control);
+							}
+						}
+						if (isset($arOneControl))
+							unset($arOneControl);
+						if (isset($arRes['GetControlShow']) && !empty($arRes['GetControlShow']))
+						{
+							if (!in_array($arRes['GetControlShow'], $this->arShowControlList))
+								$this->arShowControlList[] = $arRes['GetControlShow'];
+						}
+						if (isset($arRes['InitParams']) && !empty($arRes['InitParams']))
+						{
+							if (!in_array($arRes['InitParams'], $this->arInitControlList))
+								$this->arInitControlList[] = $arRes['InitParams'];
+						}
+					}
+				}
+				else
+				{
+					if (empty($arRes))
+						continue;
+					foreach ($arRes as &$arOneRes)
+					{
+						if (is_array($arOneRes) && isset($arOneRes['ID']))
+						{
+							if (isset($arOneRes['EXIST_HANDLER']) && $arOneRes['EXIST_HANDLER'] === 'Y')
+							{
+								if (!isset($arOneRes['MODULE_ID']) && !isset($arOneRes['EXT_FILE']))
+									continue;
+							}
+							else
+							{
+								$arOneRes['MODULE_ID'] = '';
+								$arOneRes['EXT_FILE'] = '';
+							}
+							if (array_key_exists('EXIST_HANDLER', $arOneRes))
+								unset($arOneRes['EXIST_HANDLER']);
+							$arOneRes['GROUP'] = (isset($arOneRes['GROUP']) && $arOneRes['GROUP'] == 'Y' ? 'Y' : 'N');
+							if (isset($this->arControlList[$arOneRes['ID']]))
+							{
+								$this->arMsg[] = array('id' => 'CONTROLS', 'text' => str_replace('#CONTROL#', $arOneRes['ID'], Loc::getMessage('BT_MOD_COND_ERR_CONTROL_DOUBLE')));
+								$this->boolError = true;
+							}
+							else
+							{
+								if (!$this->CheckControl($arOneRes))
+									continue;
+								$this->arControlList[$arOneRes['ID']] = $arOneRes;
+								if ($arOneRes['GROUP'] == 'Y')
+								{
+									if (empty($arOneRes['FORCED_SHOW_LIST']))
 									{
-										if (!in_array($arOneRes['GetControlShow'], $this->arShowControlList))
-											$this->arShowControlList[] = $arOneRes['GetControlShow'];
+										$this->arShowInGroups[] = $arOneRes['ID'];
 									}
-									if (isset($arOneRes['InitParams']) && !empty($arOneRes['InitParams']))
+									else
 									{
-										if (!in_array($arOneRes['InitParams'], $this->arInitControlList))
-											$this->arInitControlList[] = $arOneRes['InitParams'];
+										$forcedList = (!is_array($arOneRes['FORCED_SHOW_LIST']) ? array($arOneRes['FORCED_SHOW_LIST']) : $arOneRes['FORCED_SHOW_LIST']);
+										foreach ($forcedList as &$forcedId)
+										{
+											if (is_array($forcedId))
+												continue;
+											$forcedId = trim($forcedId);
+											if ($forcedId == '')
+												continue;
+											if (!isset($this->forcedShowInGroup[$forcedId]))
+												$this->forcedShowInGroup[$forcedId] = array();
+											$this->forcedShowInGroup[$forcedId][] = $arOneRes['ID'];
+										}
+										unset($forcedId);
 									}
+								}
+								if (isset($arOneRes['GetControlShow']) && !empty($arOneRes['GetControlShow']))
+								{
+									if (!in_array($arOneRes['GetControlShow'], $this->arShowControlList))
+										$this->arShowControlList[] = $arOneRes['GetControlShow'];
+								}
+								if (isset($arOneRes['InitParams']) && !empty($arOneRes['InitParams']))
+								{
+									if (!in_array($arOneRes['InitParams'], $this->arInitControlList))
+										$this->arInitControlList[] = $arOneRes['InitParams'];
 								}
 							}
 						}
-						if (isset($arOneRes))
-							unset($arOneRes);
 					}
+					unset($arOneRes);
 				}
-				if (empty($this->arControlList))
-				{
-					$this->arMsg[] = array('id' => 'CONTROLS', 'text' => Loc::getMessage('BT_MOD_COND_ERR_CONTROLS_EMPTY'));
-					$this->boolError = true;
-				}
+			}
+			if (empty($this->arControlList))
+			{
+				$this->arMsg[] = array('id' => 'CONTROLS', 'text' => Loc::getMessage('BT_MOD_COND_ERR_CONTROLS_EMPTY'));
+				$this->boolError = true;
 			}
 		}
 	}
@@ -3664,9 +3810,7 @@ class CGlobalCondTree
 				break;
 			}
 		}
-		if (isset($strKey))
-			unset($strKey);
-
+		unset($strKey);
 		return $boolResult;
 	}
 
@@ -3715,7 +3859,6 @@ class CGlobalCondTree
 				)
 			)
 		);
-
 		return (isset($arEventList[$intEventID]) ? $arEventList[$intEventID] : false);
 	}
 
@@ -4085,48 +4228,41 @@ class CGlobalCondTree
 
 	public function ShowControls()
 	{
-		if (!$this->boolError)
-		{
-			$arResult = array();
-			if (isset($this->arShowControlList))
-			{
-				foreach ($this->arShowControlList as &$arOneControl)
-				{
-					$arShowControl = call_user_func_array($arOneControl,
-						array(
-							array(
-								'SHOW_IN_GROUPS' => $this->arShowInGroups
-							)
-						)
-					);
-					if (!empty($arShowControl) && is_array($arShowControl))
-					{
-						if (isset($arShowControl['controlId']) || isset($arShowControl['controlgroup']))
-						{
-							$arResult[] = $arShowControl;
-						}
-						else
-						{
-							$arResult = array_merge($arResult, $arShowControl);
-						}
+		if ($this->boolError)
+			return '';
 
+		$result = array();
+		if (!empty($this->arShowControlList))
+		{
+			foreach ($this->arShowControlList as &$arOneControl)
+			{
+				$arShowControl = call_user_func_array($arOneControl, array(
+					array('SHOW_IN_GROUPS' => $this->arShowInGroups)
+				));
+				if (!empty($arShowControl) && is_array($arShowControl))
+				{
+					$this->fillForcedShow($arShowControl);
+					if (isset($arShowControl['controlId']) || isset($arShowControl['controlgroup']))
+					{
+						$result[] = $arShowControl;
+					}
+					else
+					{
+						foreach ($arShowControl as &$oneControl)
+							$result[] = $oneControl;
+						unset($oneControl);
 					}
 				}
-				if (isset($arOneControl))
-					unset($arOneControl);
 			}
+			unset($arOneControl);
+		}
 
-			return CUtil::PhpToJSObject($arResult);
-		}
-		else
-		{
-			return '';
-		}
+		return CUtil::PhpToJSObject($result);
 	}
 
 	public function ShowLevel(&$arLevel, $boolFirst = false)
 	{
-		$boolFirst = (true === $boolFirst ? true : false);
+		$boolFirst = ($boolFirst === true);
 		$arResult = array();
 		if (empty($arLevel) || !is_array($arLevel))
 			return $arResult;
@@ -4215,14 +4351,15 @@ class CGlobalCondTree
 	{
 		$this->usedModules = array();
 		$this->usedExtFiles = array();
+		$this->usedEntity = array();
 
 		$strResult = '';
 		if (!$this->boolError)
 		{
-			if (is_array($arConditions) && !empty($arConditions))
+			if (!empty($arConditions) && is_array($arConditions))
 			{
 				$arResult = $this->GenerateLevel($arConditions, $arParams, true);
-				if (false === $arResult || empty($arResult))
+				if (empty($arResult))
 				{
 					$strResult = '';
 					$this->boolError = true;
@@ -4243,8 +4380,8 @@ class CGlobalCondTree
 	public function GenerateLevel(&$arLevel, $arParams, $boolFirst = false)
 	{
 		$arResult = array();
-		$boolFirst = (true === $boolFirst);
-		if (!is_array($arLevel) || empty($arLevel))
+		$boolFirst = ($boolFirst === true);
+		if (empty($arLevel) || !is_array($arLevel))
 		{
 			return $arResult;
 		}
@@ -4275,38 +4412,7 @@ class CGlobalCondTree
 						return false;
 					}
 					$arResult[] = '('.$strEval.')';
-					if (isset($arOneControl['MODULE_ID']) && !empty($arOneControl['MODULE_ID']))
-					{
-						if (is_array($arOneControl['MODULE_ID']))
-						{
-							foreach ($arOneControl['MODULE_ID'] as &$oneModuleID)
-							{
-								if ($oneModuleID != $this->arEvents['CONTROLS']['MODULE_ID'])
-									$this->usedModules[$oneModuleID] = true;
-							}
-							unset($oneModuleID);
-						}
-						else
-						{
-							if ($arOneControl['MODULE_ID'] != $this->arEvents['CONTROLS']['MODULE_ID'])
-								$this->usedModules[$arOneControl['MODULE_ID']] = true;
-						}
-					}
-					if (isset($arOneControl['EXT_FILE']) && !empty($arOneControl['EXT_FILE']))
-					{
-						if (is_array($arOneControl['EXT_FILE']))
-						{
-							foreach ($arOneControl['EXT_FILE'] as &$oneExtFile)
-							{
-								$this->usedExtFiles[$oneExtFile] = true;
-							}
-							unset($oneExtFile);
-						}
-						else
-						{
-							$this->usedExtFiles[$arOneControl['EXT_FILE']] = true;
-						}
-					}
+					$this->fillUsedData($arOneControl);
 				}
 			}
 		}
@@ -4340,38 +4446,7 @@ class CGlobalCondTree
 							return false;
 						}
 						$arResult[] = '('.$strEval.')';
-						if (isset($arOneControl['MODULE_ID']) && !empty($arOneControl['MODULE_ID']))
-						{
-							if (is_array($arOneControl['MODULE_ID']))
-							{
-								foreach ($arOneControl['MODULE_ID'] as &$oneModuleID)
-								{
-									if ($oneModuleID != $this->arEvents['CONTROLS']['MODULE_ID'])
-										$this->usedModules[$oneModuleID] = true;
-								}
-								unset($oneModuleID);
-							}
-							else
-							{
-								if ($arOneControl['MODULE_ID'] != $this->arEvents['CONTROLS']['MODULE_ID'])
-									$this->usedModules[$arOneControl['MODULE_ID']] = true;
-							}
-						}
-						if (isset($arOneControl['EXT_FILE']) && !empty($arOneControl['EXT_FILE']))
-						{
-							if (is_array($arOneControl['EXT_FILE']))
-							{
-								foreach ($arOneControl['EXT_FILE'] as &$oneExtFile)
-								{
-									$this->usedExtFiles[$oneExtFile] = true;
-								}
-								unset($oneExtFile);
-							}
-							else
-							{
-								$this->usedExtFiles[$arOneControl['EXT_FILE']] = true;
-							}
-						}
+						$this->fillUsedData($arOneControl);
 					}
 				}
 			}
@@ -4410,7 +4485,7 @@ class CGlobalCondTree
 
 	public function GetConditionValuesLevel(&$arLevel, &$arResult, $boolFirst = false)
 	{
-		$boolFirst = (true === $boolFirst);
+		$boolFirst = ($boolFirst === true);
 		if (is_array($arLevel) && !empty($arLevel))
 		{
 			if ($boolFirst)
@@ -4491,6 +4566,19 @@ class CGlobalCondTree
 		}
 	}
 
+	public function GetConditionHandlers()
+	{
+		return array(
+			'MODULES' => (!empty($this->usedModules) ? array_keys($this->usedModules) : array()),
+			'EXT_FILES' => (!empty($this->usedExtFiles) ? array_keys($this->usedExtFiles) : array())
+		);
+	}
+
+	public function GetUsedEntityList()
+	{
+		return $this->usedEntity;
+	}
+
 	protected function __ConvertKey($strKey)
 	{
 		if ('' !== $strKey)
@@ -4554,18 +4642,108 @@ class CGlobalCondTree
 		}
 	}
 
-	public function GetConditionHandlers()
+	protected function fillUsedData(&$control)
 	{
-		if (empty($this->usedModules) && empty($this->usedExtFiles))
+		if (!empty($control['MODULE_ID']))
 		{
-			return array();
+			if (is_array($control['MODULE_ID']))
+			{
+				foreach ($control['MODULE_ID'] as &$oneModuleID)
+				{
+					if ($oneModuleID != $this->arEvents['CONTROLS']['MODULE_ID'])
+						$this->usedModules[$oneModuleID] = true;
+				}
+				unset($oneModuleID);
+			}
+			else
+			{
+				if ($control['MODULE_ID'] != $this->arEvents['CONTROLS']['MODULE_ID'])
+					$this->usedModules[$control['MODULE_ID']] = true;
+			}
+		}
+		if (!empty($control['EXT_FILE']))
+		{
+			if (is_array($control['EXT_FILE']))
+			{
+				foreach ($control['EXT_FILE'] as &$oneExtFile)
+					$this->usedExtFiles[$oneExtFile] = true;
+				unset($oneExtFile);
+			}
+			else
+			{
+				$this->usedExtFiles[$control['EXT_FILE']] = true;
+			}
+		}
+
+		if (!empty($control['ENTITY']))
+		{
+			$entityID = $control['ENTITY'].'|';
+			$entityID .= (is_array($control['FIELD']) ? implode('-', $control['FIELD']) : $control['FIELD']);
+			if (!isset($this->usedEntity[$entityID]))
+			{
+				$this->usedEntity[$entityID] = array(
+					'MODULE' => (!empty($control['MODULE_ID']) ? $control['MODULE_ID'] : $control['MODULE_ENTITY']),
+					'ENTITY' => $control['ENTITY'],
+					'FIELD_ENTITY' => $control['FIELD'],
+					'FIELD_TABLE' => (!empty($control['FIELD_TABLE']) ? $control['FIELD_TABLE'] : $control['FIELD'])
+				);
+			}
+			unset($entityID);
+		}
+	}
+
+	protected function fillForcedShow(&$showControl)
+	{
+		if (empty($this->forcedShowInGroup))
+			return;
+		if (isset($showControl['controlId']) || isset($showControl['controlgroup']))
+		{
+			if (!isset($showControl['controlgroup']))
+			{
+				if (isset($this->forcedShowInGroup[$showControl['controlId']]))
+					$showControl['showIn'] = array_values(array_unique(array_merge(
+						$showControl['showIn'], $this->forcedShowInGroup[$showControl['controlId']]
+					)));
+			}
+			else
+			{
+				$forcedGroup = array();
+				foreach ($showControl['children'] as &$oneControl)
+				{
+					if (isset($oneControl['controlId']))
+					{
+						if (isset($this->forcedShowInGroup[$oneControl['controlId']]))
+						{
+							$oneControl['showIn'] = array_values(array_unique(array_merge(
+								$oneControl['showIn'], $this->forcedShowInGroup[$oneControl['controlId']]
+							)));
+							$forcedGroup = array_merge($forcedGroup, $this->forcedShowInGroup[$oneControl['controlId']]);
+						}
+					}
+				}
+				unset($oneControl);
+				if (!empty($forcedGroup))
+				{
+					$forcedGroup = array_values(array_unique($forcedGroup));
+					$showControl['showIn'] = array_values(array_unique(array_merge($showControl['showIn'], $forcedGroup)));
+				}
+				unset($forcedGroup);
+
+			}
 		}
 		else
 		{
-			return array(
-				'MODULES' => (!empty($this->usedModules) ? array_keys($this->usedModules) : array()),
-				'EXT_FILES' => (!empty($this->usedExtFiles) ? array_keys($this->usedExtFiles) : array())
-			);
+			foreach ($showControl as &$oneControl)
+			{
+				if (isset($oneControl['controlId']))
+				{
+					if (isset($this->forcedShowInGroup[$oneControl['controlId']]))
+						$oneControl['showIn'] = array_values(array_unique(array_merge(
+							$oneControl['showIn'], $this->forcedShowInGroup[$oneControl['controlId']]
+						)));
+				}
+			}
+			unset($oneControl);
 		}
 	}
 }

@@ -5,9 +5,7 @@
 
 
 /**
- * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. </body> </html>
- *
- *
+ * <b>CFormStatus</b> - класс для работы со <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусами</a>. 
  *
  *
  * @return mixed 
@@ -18,7 +16,7 @@
  */
 class CFormStatus extends CAllFormStatus
 {
-	public static function err_mess()
+	fpublic static unction err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -31,11 +29,7 @@ class CFormStatus extends CAllFormStatus
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусов</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $form_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
-	*
-	*
 	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
 	* списка, может принимать значения: <ul> <li> <b>s_id</b> - ID <a
@@ -47,13 +41,9 @@ class CFormStatus extends CAllFormStatus
 	* количество результатов находящихся в данном <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статусе</a>. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки, может принимать
 	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
 	* </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации. Необязательный параметр. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID <a
@@ -73,16 +63,11 @@ class CFormStatus extends CAllFormStatus
 	* "Y", то при фильтрации по <b>DESCRIPTION</b> будет искаться точное
 	* совпадение. </li> </ul> * - допускается сложная логика
 	*
-	*
-	*
 	* @param bool &$is_filtered  Ссылка на переменную хранящую флаг отфильтрованности
 	* результирующего списка. Если значение равно "true", то список был
 	* отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -114,7 +99,6 @@ class CFormStatus extends CAllFormStatus
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -220,14 +204,9 @@ class CFormStatus extends CAllFormStatus
 	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $status_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -238,7 +217,6 @@ class CFormStatus extends CAllFormStatus
 	* echo "&lt;pre&gt;"; print_r($arStatus); echo "&lt;/pre";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

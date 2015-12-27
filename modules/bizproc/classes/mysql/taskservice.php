@@ -34,14 +34,16 @@ class CBPTaskService
 					continue;
 
 				$DB->Query(
-					"INSERT INTO b_bp_task_user (USER_ID, TASK_ID) ".
-					"VALUES (".intval($userId).", ".intval($taskId).") "
+					"INSERT INTO b_bp_task_user (USER_ID, TASK_ID, ORIGINAL_USER_ID) ".
+					"VALUES (".intval($userId).", ".intval($taskId).", ".intval($userId).") "
 				);
 
 				CUserCounter::Increment($userId, 'bp_tasks', '**');
 
 				$ar[] = $userId;
 			}
+
+			self::onTaskChange($taskId, $arFields, CBPTaskChangedStatus::Add);
 
 			foreach (GetModuleEvents("bizproc", "OnTaskAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($taskId, $arFields));
@@ -69,12 +71,16 @@ class CBPTaskService
 			"WHERE ID = ".intval($id)." ";
 		$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
+		$removedUsers = array();
+
 		if (is_set($arFields, "USERS"))
 		{
 			$dbResUser = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
 			while ($arResUser = $dbResUser->Fetch())
+			{
 				CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
-
+				$removedUsers[] = $arResUser["USER_ID"];
+			}
 			$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".intval($id)." ");
 
 			$ar = array();
@@ -85,8 +91,8 @@ class CBPTaskService
 					continue;
 
 				$DB->Query(
-					"INSERT INTO b_bp_task_user (USER_ID, TASK_ID) ".
-					"VALUES (".intval($userId).", ".intval($id).") "
+					"INSERT INTO b_bp_task_user (USER_ID, TASK_ID, ORIGINAL_USER_ID) ".
+					"VALUES (".intval($userId).", ".intval($id).", ".intval($userId).") "
 				);
 
 				CUserCounter::Increment($userId, 'bp_tasks', '**');
@@ -95,9 +101,37 @@ class CBPTaskService
 			}
 		}
 
+		$userStatuses = array();
+		if (isset($arFields['STATUS']) && $arFields['STATUS'] > CBPTaskStatus::Running)
+		{
+			$dbResUser = $DB->Query("SELECT USER_ID FROM b_bp_task_user WHERE TASK_ID = ".$id." AND STATUS = ".CBPTaskUserStatus::Waiting);
+			while ($arResUser = $dbResUser->Fetch())
+			{
+				CUserCounter::Decrement($arResUser["USER_ID"], 'bp_tasks', '**');
+
+				if ($arFields['STATUS'] == CBPTaskStatus::Timeout)
+					$userStatuses[$arResUser["USER_ID"]] = CBPTaskUserStatus::No;
+				else
+					$removedUsers[] = $arResUser["USER_ID"];
+			}
+			if ($arFields['STATUS'] == CBPTaskStatus::Timeout)
+			{
+				$DB->Query("UPDATE b_bp_task_user SET STATUS = ".CBPTaskUserStatus::No.", DATE_UPDATE = ".$DB->CurrentTimeFunction()
+					." WHERE TASK_ID = ".$id." AND STATUS = ".CBPTaskUserStatus::Waiting);
+			}
+			else
+				$DB->Query("DELETE FROM b_bp_task_user WHERE TASK_ID = ".$id." AND STATUS = ".CBPTaskUserStatus::Waiting);
+		}
+
 		foreach (GetModuleEvents("bizproc", "OnTaskUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 
+		if ($removedUsers)
+			$arFields['USERS_REMOVED'] = $removedUsers;
+		if ($userStatuses)
+			$arFields['USERS_STATUSES'] = $userStatuses;
+
+		self::onTaskChange($id, $arFields, CBPTaskChangedStatus::Update);
 		return $id;
 	}
 
@@ -118,10 +152,23 @@ class CBPTaskService
 			"NAME" => Array("FIELD" => "T.NAME", "TYPE" => "string"),
 			"DESCRIPTION" => Array("FIELD" => "T.DESCRIPTION", "TYPE" => "string"),
 			"PARAMETERS" => Array("FIELD" => "T.PARAMETERS", "TYPE" => "string"),
+			"IS_INLINE" => Array("FIELD" => "T.IS_INLINE", "TYPE" => "string"),
+			"STATUS" => Array("FIELD" => "T.STATUS", "TYPE" => "int"),
+			'DOCUMENT_NAME' => Array("FIELD" => "T.DOCUMENT_NAME", "TYPE" => "string"),
 			"USER_ID" => Array("FIELD" => "TU.USER_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_task_user TU ON (T.ID = TU.TASK_ID)"),
+			"USER_STATUS" => Array("FIELD" => "TU.STATUS", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_task_user TU ON (T.ID = TU.TASK_ID)"),
 			"WORKFLOW_TEMPLATE_ID" => Array("FIELD" => "WS.WORKFLOW_TEMPLATE_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
-			"WORKFLOW_TEMPLATE_NAME" => Array("FIELD" => "WT.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID) INNER JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID)"),
-			"WORKFLOW_TEMPLATE_TEMPLATE_ID" => Array("FIELD" => "WT.ID", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID) INNER JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID)"),
+			"MODULE_ID" => Array("FIELD" => "WS.MODULE_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
+			"ENTITY" => Array("FIELD" => "WS.ENTITY", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
+			"WORKFLOW_TEMPLATE_NAME" => Array("FIELD" => "WT.NAME", "TYPE" => "string",
+											"FROM" => array("INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)",
+												"INNER JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID)")),
+			"WORKFLOW_TEMPLATE_TEMPLATE_ID" => Array("FIELD" => "WT.ID", "TYPE" => "int",
+													"FROM" => array("INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)",
+														"INNER JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID)")),
+			'WORKFLOW_STATE' => array("FIELD" => "WS.STATE_TITLE", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
+			'WORKFLOW_STARTED' => array("FIELD" => "WS.STARTED", "TYPE" => "datetime", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
+			'WORKFLOW_STARTED_BY' => array("FIELD" => "WS.STARTED_BY", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
 		);
 
 		$arSqls = CBPHelper::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
@@ -138,8 +185,6 @@ class CBPTaskService
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-
-			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -170,8 +215,6 @@ class CBPTaskService
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
-			//echo "!2.1!=".htmlspecialcharsbx($strSql_tmp)."<br>";
-
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
 			if (strlen($arSqls["GROUPBY"]) <= 0)
@@ -185,18 +228,12 @@ class CBPTaskService
 			}
 
 			$dbRes = new CDBResult();
-
-			//echo "!2.3!=".htmlspecialcharsbx($strSql)."<br>";
-
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
 		{
 			if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) > 0)
 				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
-			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
-
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 

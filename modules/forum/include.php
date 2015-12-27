@@ -62,19 +62,17 @@ $GLOBALS["FORUM_CACHE"] = array(
 	path to clear cache
 */
 if(!defined("CACHED_b_forum_group"))
-;// define("CACHED_b_forum_group", 3600);
+	// define("CACHED_b_forum_group", 3600);
 if(!defined("CACHED_b_forum"))
-;// define("CACHED_b_forum", 3600);
+	// define("CACHED_b_forum", 3600);
 if(!defined("CACHED_b_forum_perms"))
-;// define("CACHED_b_forum_perms", 3600);
+	// define("CACHED_b_forum_perms", 3600);
 if(!defined("CACHED_b_forum2site"))
-;// define("CACHED_b_forum2site", 3600);
-if(!defined("CACHED_b_forum_smile"))
-;// define("CACHED_b_forum_smile", 3600);
+	// define("CACHED_b_forum2site", 3600);
 if(!defined("CACHED_b_forum_filter"))
-;// define("CACHED_b_forum_filter", 3600);
+	// define("CACHED_b_forum_filter", 3600);
 if(!defined("CACHED_b_forum_user"))
-;// define("CACHED_b_forum_user", 3600);
+	// define("CACHED_b_forum_user", 3600);
 
 CModule::AddAutoloadClasses(
 	"forum",
@@ -84,7 +82,7 @@ CModule::AddAutoloadClasses(
 
 		"CForumNew" =>   "classes/".$DBType."/forum_new.php",
 		"CForumGroup" => "classes/".$DBType."/forum_new.php",
-		"CForumSmile" => "classes/".$DBType."/forum_new.php",
+		"CForumSmile" => "classes/general/forum_new.php",
 		"_CForumDBResult"=>"classes/general/forum_new.php",
 
 		"CForumTopic" => "classes/".$DBType."/topic.php",
@@ -399,7 +397,7 @@ function ForumAddMessage(
 
 	if ($MESSAGE_TYPE == "NEW" ||
 		($MESSAGE_TYPE == "EDIT" && array_intersect_key($arFieldsG,
-			array("TITLE"=>"", "DESCRIPTION"=>"", "ICON_ID"=>"", "TAGS"=>"",
+			array("TITLE"=>"", "DESCRIPTION"=>"", "ICON"=>"", "TAGS"=>"",
 				"OWNER_ID"=>"", "SOCNET_GROUP_ID"=>"")) &&
 			CForumTopic::CanUserUpdateTopic($TID, $arUserGroups, $USER->GetID(), $arParams["PERMISSION"])))
 	{
@@ -574,7 +572,7 @@ function ForumAddMessage(
 		if ($bUpdateTopic)
 		{
 			$arFields = array();
-			foreach (array("TITLE", "TITLE_SEO", "DESCRIPTION", "ICON_ID", "TAGS") as $key)
+			foreach (array("TITLE", "TITLE_SEO", "DESCRIPTION", "ICON", "TAGS") as $key)
 				if (is_set($arFieldsG, $key))
 					$arFields[$key] = $arFieldsG[$key];
 
@@ -851,12 +849,12 @@ function ForumModerateMessage($message, $TYPE, &$strErrorMessage, &$strOKMessage
 					$ID = CForumMessage::Update($arMessage["ID"], $arFields);
 					if ($ID > 0)
 					{
-						/***************** Events onMessageModerate ************************/
-						foreach (GetModuleEvents("forum", "onMessageModerate", true) as $arEvent)
-							ExecuteModuleEventEx($arEvent, array($ID, $TYPE, $arMessage));
-						/***************** /Events *****************************************/
 						$TID = $arMessage["TOPIC_ID"];
 						$arTopic = CForumTopic::GetByID($TID);
+						/***************** Events onMessageModerate ************************/
+						foreach (GetModuleEvents("forum", "onMessageModerate", true) as $arEvent)
+							ExecuteModuleEventEx($arEvent, array($ID, $TYPE, $arMessage, $arTopic));
+						/***************** /Events *****************************************/
 						$res =  array(
 								"ID" => $arMessage["ID"],
 								"AUTHOR_NAME" => $arMessage["AUTHOR_NAME"],
@@ -1404,7 +1402,7 @@ function ForumMoveMessage($FID, $TID, $Message, $NewTID = 0, $arFields, &$strErr
 				"TITLE"			=> $arFields["TITLE"],
 				"TITLE_SEO"			=> $arFields["TITLE_SEO"],
 				"DESCRIPTION"	=> $arFields["DESCRIPTION"],
-				"ICON_ID"		=> $arFields["ICON_ID"],
+				"ICON"		=> $arFields["ICON"],
 				"TAGS"		=> $arFields["TAGS"],
 				"FORUM_ID"		=> $FID,
 				"USER_START_ID" => $arRes["ID"],
@@ -1528,83 +1526,60 @@ function ForumMoveMessage($FID, $TID, $Message, $NewTID = 0, $arFields, &$strErr
 	return false;
 }
 
-function ForumPrintIconsList($num_cols, $varField, $varValue, $defValue, $strLang = False, $strPath2Icons = False)
+/**
+ * @param $num_cols
+ * @deprecated
+ * @return string
+ */
+function ForumPrintIconsList($num_cols, $value = "")
 {
-	$strLang = ($strLang === false ? LANGUAGE_ID : $strLang);
-	$strPath2Icons = ($strPath2Icons === false ? "/bitrix/images/forum/icon/" : $strPath2Icons);
-	if (strrpos($strPath2Icons, "/") != (strLen($strPath2Icons)-1))
-		$strPath2Icons .= "/";
-	$arSmile = CForumSmile::GetByType("I", $strLang);
+	$arSmile = CForumSmile::getByType("I", LANGUAGE_ID);
+	$arSmile[] = array('TYPING' => '', 'IMAGE' => '/bitrix/images/1.gif', 'NAME' => '', 'CLASS' => 'forum-icon-empty');
+	$strPath2Icons = "/bitrix/images/forum/icon/";
+	$num_cols = ($num_cols > 0 ? $num_cols : 7);
+	$ind = $num_cols;
+	$res_str = '<table border="0" class="forum-icons"><tr>';
 
-	$ind = 0;
-	$res_str = "<table width=\"0%\" align=\"left\" cellspacing=\"1\" cellpadding=\"5\" border=\"0\" class=\"forum-icons\">\n";
 	foreach ($arSmile as $res)
 	{
-		if ($ind == 0)
-			$res_str .= "<tr align=\"left\">\n";
-		$res_str .= "<td width=\"".IntVal(100/$num_cols)."%\" nowrap=\"nowrap\">\n";
-		$res_str .= "<img src=\"".$strPath2Icons.$res['IMAGE']."\" alt=\"".$res['NAME']."\" border=\"0\" class=\"icons\"";
-		if (IntVal($res['IMAGE_WIDTH'])>0) $res_str .= " width=\"".$res['IMAGE_WIDTH']."\"";
-		if (IntVal($res['IMAGE_HEIGHT'])>0) $res_str .= " height=\"".$res['IMAGE_HEIGHT']."\"";
-		$res_str .= "/>\n";
-		$res_str .= "<input type=\"radio\" name=\"".$varField."\" value=\"".$res['ID']."\"";
-		if (IntVal($res['ID'])==IntVal($varValue)) $res_str .= " checked";
-		$res_str .= "/>\n&nbsp;\n";
-		$res_str .= "</td>\n";
-		$ind++;
-		if ($ind >= $num_cols)
+		$width = ($res["IMAGE_WIDTH"] > 0 ? 'width="{$res["IMAGE_WIDTH"]}"' : '');
+		$height = ($res["IMAGE_HEIGHT"] > 0 ? 'width="{$res["IMAGE_HEIGHT"]}"' : '');
+		$checked = '';
+		if (trim($res['TYPING']) == trim($value))
 		{
-			$ind = 0;
-			$res_str .= "</tr>";
+			$checked = 'checked="checked"';
+		}
+
+		$res_str .= <<<HTML
+		<td>
+			<img src="{$strPath2Icons}{$res["IMAGE"]}" alt="{$res["NAME"]}" border="0" class="icons {$res["CLASS"]}" $width $height />
+			<input type="radio" name="ICON" value="{$res["TYPING"]}" $checked />
+		</td>
+HTML;
+
+		if (--$ind <= 0)
+		{
+			$ind = $num_cols;
+			$res_str .= "</tr><tr>";
 		}
 	}
-	if (($ind==0) || ($num_cols-$ind)<3)
-	{
-		if (($num_cols-$ind)<3)
-		{
-			for ($i=0; $i<$num_cols-$ind; $i++)
-			{
-				$res_str .= "<td width='10%'> </td>";
-			}
-			$res_str .= "</tr>";
-			$ind = 0;
-		}
-		$res_str .= "<tr align=\"left\">";
-	}
-
-	$res_str .= "<td colspan=\"3\" nowrap><font class=\"forumbodytext\">";
-	$res_str .= $defValue;
-	$res_str .= "<input type=\"radio\" name=\"".$varField."\" value=\"0\"";
-	if (0==IntVal($varValue)) $res_str .= " checked ";
-	$res_str .= "/>\n&nbsp;\n</font>";
-	$res_str .= "</td>\n";
-
-	$ind = $ind + 3;
-	if ($ind >= $num_cols)
-	{
-		$ind = 0;
-		$res_str .= "</tr>";
-	}
-	else
-	{
-		for ($i=0; $i<$num_cols-$ind; $i++)
-		{
-			$res_str .= "<td width='10%'> </td>";
-		}
-		$res_str .= "</tr>";
-	}
-	$res_str .= "</table>";
-
+	$res_str .= '</tr></table>';
 	return $res_str;
 }
 
-function ForumPrintSmilesList($num_cols, $strLang = false, $strPath2Icons = false)
+/**
+ * @deprecated
+ * @param $num_cols
+ * @param bool $strLang
+ * @return string
+ */
+function ForumPrintSmilesList($num_cols, $strLang = false)
 {
 	$num_cols = intVal($num_cols);
 	$num_cols = $num_cols > 0 ? $num_cols : 3;
 	$strLang = ($strLang === false ? LANGUAGE_ID : $strLang);
-	$strPath2Icons = (empty($strPath2Icons)? "/bitrix/images/forum/smile/" : $strPath2Icons);
-	$arSmile = CForumSmile::GetByType("S", $strLang);
+	$strPath2Icons = "/bitrix/images/forum/smile/";
+	$arSmile = CForumSmile::getByType("S", $strLang);
 
 	$res_str = "";
 	$ind = 0;

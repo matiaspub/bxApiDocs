@@ -35,7 +35,8 @@ if ($bShowStat || $bShowTime || $bShowCacheStat)
 
 $r = $APPLICATION->EndBufferContentMan();
 $main_exec_time = round(microtime(true) - START_EXEC_TIME, 4);
-echo $r;
+
+\Bitrix\Main\Context::getCurrent()->getResponse()->flush($r);
 
 if(defined("HTML_PAGES_FILE") && !defined("ERROR_404"))
 	CHTMLPagesCache::writeFile(HTML_PAGES_FILE, $r);

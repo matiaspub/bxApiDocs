@@ -1,6 +1,9 @@
 <?
 class CBackup
 {
+	static $DOCUMENT_ROOT_SITE;
+	static $REAL_DOCUMENT_ROOT_SITE;
+
 	public static function CheckDumpClouds()
 	{
 		$arRes = array();
@@ -47,9 +50,8 @@ class CBackup
 		if (!file_exists($path)) // in case of wrong symlinks
 			return true;
 
-		static $REAL_DOCUMENT_ROOT_SITE;
-		if (!$REAL_DOCUMENT_ROOT_SITE)
-			$REAL_DOCUMENT_ROOT_SITE = realpath(DOCUMENT_ROOT_SITE);
+		if (!self::$REAL_DOCUMENT_ROOT_SITE)
+			self::$REAL_DOCUMENT_ROOT_SITE = realpath(self::$DOCUMENT_ROOT_SITE);
 
 		## Ignore paths
 		static $ignore_path;
@@ -70,19 +72,19 @@ class CBackup
 			);
 
 		foreach($ignore_path as $value)
-			if(DOCUMENT_ROOT_SITE.$value == $path)
+			if(self::$DOCUMENT_ROOT_SITE.$value == $path)
 				return true;
 
 		## Clouds
 		if (IntOption('dump_do_clouds'))
 		{
-			$clouds = DOCUMENT_ROOT_SITE.BX_ROOT.'/backup/clouds/';
+			$clouds = self::$DOCUMENT_ROOT_SITE.BX_ROOT.'/backup/clouds/';
 			if (strpos($path, $clouds) === 0 || strpos($clouds, $path) === 0)
 				return false;
 		}
 		
 		## Backups
-		if (strpos($path, DOCUMENT_ROOT_SITE.BX_ROOT.'/backup/') === 0)
+		if (strpos($path, self::$DOCUMENT_ROOT_SITE.BX_ROOT.'/backup/') === 0)
 			return true;
 
 		## Symlinks
@@ -93,7 +95,7 @@ class CBackup
 				if (IntOption("skip_symlinks"))
 					return true;
 
-				if (strpos(realpath($path), $REAL_DOCUMENT_ROOT_SITE) !== false) // РµСЃР»Рё СЃРёРјР»РёРЅРє РІРµРґРµС‚ РЅР° РїР°РїРєСѓ РІРЅСѓС‚СЂРё СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃР°Р№С‚Р°
+				if (strpos(realpath($path), self::$REAL_DOCUMENT_ROOT_SITE) !== false) // РµСЃР»Рё СЃРёРјР»РёРЅРє РІРµРґРµС‚ РЅР° РїР°РїРєСѓ РІРЅСѓС‚СЂРё СЃС‚СЂСѓРєС‚СѓСЂС‹ СЃР°Р№С‚Р°
 					return true;
 			}
 		} ## File size
@@ -111,13 +113,13 @@ class CBackup
 		if ($dump_file_public == $dump_file_kernel) // РµСЃР»Рё РѕР±Рµ РѕРїС†РёРё Р»РёР±Рѕ РІРєР»СЋС‡РµРЅС‹ Р»РёР±Рѕ РІС‹РєР»СЋС‡РµРЅС‹
 			return !$dump_file_public;
 
-		if (strpos(DOCUMENT_ROOT_SITE.BX_ROOT, $path) !== false) // РЅР° РїСѓС‚Рё Рє /bitrix
+		if (strpos(self::$DOCUMENT_ROOT_SITE.BX_ROOT, $path) !== false) // РЅР° РїСѓС‚Рё Рє /bitrix
 			return false;
 
-		if (strpos($path, DOCUMENT_ROOT_SITE.BX_ROOT) === false) // Р·Р° РїСЂРµРґРµР»Р°РјРё /bitrix 
+		if (strpos($path, self::$DOCUMENT_ROOT_SITE.BX_ROOT) === false) // Р·Р° РїСЂРµРґРµР»Р°РјРё /bitrix 
 			return !$dump_file_public;
 
-		$path_root = substr($path, strlen(DOCUMENT_ROOT_SITE));
+		$path_root = substr($path, strlen(self::$DOCUMENT_ROOT_SITE));
 		if (preg_match('#^/bitrix/(.settings.php|php_interface|templates)/([^/]*)#',$path_root.'/',$regs))
 			return !$dump_file_public;
 	
@@ -162,7 +164,7 @@ public static 	function skipMask($abs_path)
 
 		global $skip_mask_array;
 		
-		$path = substr($abs_path,strlen(DOCUMENT_ROOT_SITE));
+		$path = substr($abs_path,strlen(self::$DOCUMENT_ROOT_SITE));
 		$path = str_replace('\\','/',$path);
 		
 		static $preg_mask_array;
@@ -220,18 +222,20 @@ public static 	function GetArcName($prefix = '')
 		return $arc_name;
 	}
 
-public static 	function MakeDump($strDumpFile, &$arState)
+public 	function MakeDump($strDumpFile, &$arState)
 	{
 		global $DB;
 
+		$B = new CBackup;
+
 		if (!$arState)
 		{
-			if(!file_put_contents($strDumpFile, "-- Started: ".date('Y-m-d H:i:s')."\n", 8))
+			if(!$B->file_put_contents_ex($strDumpFile, "-- Started: ".date('Y-m-d H:i:s')."\n"))
 				return false;
 
 			$rs = $DB->Query('SHOW VARIABLES LIKE "character_set_results"');
 			if (($f = $rs->Fetch()) && array_key_exists ('Value', $f))
-				if (!file_put_contents($strDumpFile, "SET NAMES '".$f['Value']."';\n", 8))
+				if (!$B->file_put_contents_ex($strDumpFile, "SET NAMES '".$f['Value']."';\n"))
 					return false;
 
 			$arState = array('TABLES' => array());
@@ -298,18 +302,21 @@ public static 	function MakeDump($strDumpFile, &$arState)
 		{
 			if(!$arTable["LAST_ID"])
 			{
-				$rs = $DB->Query("SHOW CREATE TABLE `".$DB->ForSQL($table)."`");
+				$rs = $DB->Query("SHOW CREATE TABLE `".$DB->ForSQL($table)."`", true);
+				if ($rs === false)
+					RaiseErrorAndDie(GetMessage('DUMP_TABLE_BROKEN', array('#TABLE#' => $table)));
+
 				$row = $rs->Fetch();
 				$string = $row['Create Table'];
 				if (!$string) // VIEW
 				{
 					$string = $row['Create View'];
-					if (!file_put_contents($strDumpFile,  
+					if (!$B->file_put_contents_ex($strDumpFile,  
 						"-- -----------------------------------\n".
 						"-- Creating view ".$DB->ForSQL($table)."\n".
 						"-- -----------------------------------\n".
 						"DROP VIEW IF EXISTS `".$DB->ForSQL($table)."`;\n".
-						$string.";\n\n", 8))
+						$string.";\n\n"))
 							return false;
 					unset($arState['TABLES'][$table]);
 					continue;
@@ -317,23 +324,23 @@ public static 	function MakeDump($strDumpFile, &$arState)
 				elseif (CBackup::SkipTableData($table))
 				{
 					$string = str_replace('CREATE TABLE', 'CREATE TABLE IF NOT EXISTS', $string);
-					if (!file_put_contents($strDumpFile,  
+					if (!$B->file_put_contents_ex($strDumpFile,  
 						"-- -----------------------------------\n".
 						"-- Creating empty table ".$DB->ForSQL($table)."\n".
 						"-- -----------------------------------\n".
-						$string.";\n\n", 8))
+						$string.";\n\n"))
 							return false;
 					unset($arState['TABLES'][$table]);
 					continue;
 				}
 
 
-				if (!file_put_contents($strDumpFile,  
+				if (!$B->file_put_contents_ex($strDumpFile,  
 					"-- -----------------------------------\n".
 					"-- Dumping table ".$DB->ForSQL($table)."\n".
 					"-- -----------------------------------\n".
 					"DROP TABLE IF EXISTS `".$DB->ForSQL($table)."`;\n".
-					$string.";\n\n", 8))
+					$string.";\n\n"))
 						return false;
 
 				$arState['TABLES'][$table]['COLUMNS'] = $arTable["COLUMNS"] = CBackup::GetTableColumns($table);
@@ -400,28 +407,52 @@ public static 	function MakeDump($strDumpFile, &$arState)
 
 					if (CTar::strlen($strInsert) > 1000000)
 					{
-						if(!file_put_contents($strDumpFile, $strInsert.";\n", 8))
+						if(!$B->file_put_contents_ex($strDumpFile, $strInsert.";\n"))
 							return false;
 						$strInsert = "";
 					}
 
 					if (!haveTime())
-						return $strInsert ? file_put_contents($strDumpFile, $strInsert.";\n", 8) : true;
+						return $strInsert ? $B->file_put_contents_ex($strDumpFile, $strInsert.";\n") : true;
 				}
 			}
 
-			if($strInsert && !file_put_contents($strDumpFile, $strInsert.";\n", 8))
+			if($strInsert && !$B->file_put_contents_ex($strDumpFile, $strInsert.";\n"))
 				return false;
 
 			if ($cnt < $LIMIT)
 				unset($arState['TABLES'][$table]);
 		}
 		
-		if(!file_put_contents($strDumpFile, "-- Finished: ".date('Y-m-d H:i:s'), 8))
+		if(!$B->file_put_contents_ex($strDumpFile, "-- Finished: ".date('Y-m-d H:i:s')))
 			return false;
 
 		$arState['end'] = true;
 		return true;
+	}
+
+public 	function file_put_contents_ex($strDumpFile, $str)
+	{
+		$LIMIT = 2000000000;
+		if (!$this->strLastFile)
+		{
+			$this->strLastFile = $strNextFile = $strDumpFile;
+			$this->LastFileSize = 0;
+			while(file_exists($strNextFile))
+			{
+				$this->LastFileSize = filesize($this->strLastFile = $strNextFile);
+				$strNextFile = self::getNextName($strNextFile);
+			}
+		}
+
+		$c = CTar::strlen($str);
+		if ($this->LastFileSize + $c >= $LIMIT)
+		{
+			$this->strLastFile = self::getNextName($this->strLastFile);
+			$this->LastFileSize = 0;
+		}
+		$this->LastFileSize += $c;
+		return file_put_contents($this->strLastFile, $str, 8);
 	}
 
 public static 	function GetTableColumns($TableName)
@@ -447,13 +478,31 @@ public static 	function GetTableColumns($TableName)
 public static 	function SkipTableData($table)
 	{
 		$table = strtolower($table);
-		if (preg_match("#^b_stat#",$table) && IntOption('dump_base_skip_stat'))
+		if (preg_match("#^b_stat#", $table) && IntOption('dump_base_skip_stat'))
 			return true;
-		elseif (preg_match("#^b_search_%#", $table) && !preg_match('^(b_search_custom_rank|b_search_phrase)$') && IntOption('dump_base_skip_search'))
+		elseif (preg_match("#^b_search_%#", $table) && !preg_match('^(b_search_custom_rank|b_search_phrase)$', $table) && IntOption('dump_base_skip_search'))
 			return true;
 		elseif($table == 'b_event_log' && IntOption('dump_base_skip_log'))
 			return true;
 		return false;
+	}
+
+public static 	function getNextName($file)
+	{
+		static $CACHE;
+		$c = &$CACHE[$file];
+
+		if (!$c)
+		{
+			$l = strrpos($file, '.');
+			$num = CTar::substr($file,$l+1);
+			if (is_numeric($num))
+				$file = CTar::substr($file,0,$l+1).++$num;
+			else
+				$file .= '.1';
+			$c = $file;
+		}
+		return $c;
 	}
 }
 
@@ -472,12 +521,12 @@ public 	function __construct()
 	{
 	}
 
-	public function ProcessDirBefore($f)
+	fupublic nction ProcessDirBefore($f)
 	{
 		return true;
 	}
 
-	public static function ProcessDirAfter($f)
+	funpublic static ction ProcessDirAfter($f)
 	{
 		return true;
 	}
@@ -508,7 +557,10 @@ public 	function Scan($dir)
 		$dir = str_replace('\\','/',$dir);
 
 		if ($this->Skip($dir))
+		{
+			// echo $dir."<br>\n";
 			return;
+		}
 
 		$this->nextPath = $dir;
 
@@ -570,6 +622,7 @@ public 	function Scan($dir)
 
 class CDirRealScan extends CDirScan
 {
+	var $arSkip = array();
 	public function ProcessFile($f)
 	{
 		global $tar;
@@ -642,13 +695,13 @@ class CDirRealScan extends CDirScan
 		return 'BREAK';
 	}
 
-public static 	function ProcessDirBefore($f)
+	public static function ProcessDirBefore($f)
 	{
 		global $tar;
 		return $tar->addFile($f);
 	}
 
-public static 	function Skip($f)
+	function Skip($f)
 	{
 		static $bFoundDocumentRoot;
 		$res = false;
@@ -663,6 +716,8 @@ public static 	function Skip($f)
 			else
 				return true;
 		}
+		elseif ($this->arSkip[$f])
+			return true;
 		elseif ($bFoundDocumentRoot)
 			$res = CBackup::ignorePath($f);
 
@@ -696,7 +751,7 @@ public static 	function getEncryptKey()
 		return $LICENSE_KEY;
 	}
 
-public static function Set($strName, $strVal)
+public static 	static function Set($strName, $strVal)
 	{
 		if (!self::Init())
 			return false;
@@ -705,7 +760,7 @@ public static function Set($strName, $strVal)
 		return COption::SetOptionString('main', $strName, base64_encode($temporary_cache));
 	}
 
-public static function Get($strName)
+public static 	static function Get($strName)
 	{
 		if (!self::Init())
 			return false;
@@ -741,6 +796,7 @@ class CTar
 	var $Buffer;
 	var $dataSizeCache = array();
 	var $EncryptKey;
+	var $prefix = '';
 
 	##############
 	# READ
@@ -1197,7 +1253,7 @@ public 	function addFile($f)
 		if ($ar['type'] == 0 && $ar['size'] > 0) // File
 		{
 			if (!($rs = fopen($f, 'rb')))
-				return $this->Error('Error reading file: '.$f);
+				return $this->Error('Error opening file: '.$f);
 
 			if ($this->ReadBlockCurrent)
 				fseek($rs, $this->ReadBlockCurrent * 512);
@@ -1210,6 +1266,8 @@ public 	function addFile($f)
 				$this->ReadBlockCurrent++;
 				if (feof($rs))
 					$str = pack("a512", $str);
+				elseif (self::strlen($str) != 512)
+					return $this->Error('Error reading from file: '.$f);
 
 				if (!$this->writeBlock($str))
 				{
@@ -1300,7 +1358,7 @@ public 	function close()
 		clearstatcache();
 	}
 
-	public function getNextName($file = '')
+	fpublic unction getNextName($file = '')
 	{
 		if (!$file)
 			$file = $this->file;
@@ -1321,7 +1379,7 @@ public 	function close()
 		return $c;
 	}
 
-	public function checksum($s)
+	funpublic ction checksum($s)
 	{
 		$chars = count_chars(self::substr($s,0,148).'        '.self::substr($s,156,356));
 		$sum = 0;
@@ -1389,7 +1447,7 @@ public static 	function Error($str = '', $code = '')
 		return false;
 	}
 
-public static 	function ErrorAndSkip($str = '', $code = '')
+public 	function ErrorAndSkip($str = '', $code = '')
 	{
 		$this->Error($str, $code);
 		$this->SkipFile();
@@ -1448,7 +1506,7 @@ public 	function getFileInfo($f)
 		$ar['gid'] = $info['gid'];
 		$ar['size'] = $ar['type']==5 ? 0 : $info['size'];
 		$ar['mtime'] = $info['mtime'];
-		$ar['filename'] = $path;
+		$ar['filename'] = $this->prefix.$path;
 
 		return $ar;
 	}

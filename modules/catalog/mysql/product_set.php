@@ -416,10 +416,21 @@ class CCatalogProductSet extends CCatalogProductSetAll
 		$intSetType = (int)$intSetType;
 		if (self::TYPE_SET != $intSetType && self::TYPE_GROUP != $intSetType)
 			return false;
+
+		foreach (GetModuleEvents('catalog', 'OnBeforeProductAllSetsDelete', true) as $arEvent)
+		{
+			if (ExecuteModuleEventEx($arEvent, array($intProductID, $intSetType)) === false)
+				return false;
+		}
+
 		$strSql = 'delete from b_catalog_product_sets where OWNER_ID='.$intProductID.' and TYPE='.$intSetType;
 		$DB->Query($strSql, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		if (self::TYPE_SET == $intSetType)
 			CCatalogProduct::SetProductType($intProductID, CCatalogProduct::TYPE_PRODUCT);
+
+		foreach (GetModuleEvents('catalog', 'OnProductAllSetsDelete', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($intProductID, $intSetType));
+
 		return true;
 	}
 
@@ -597,11 +608,11 @@ class CCatalogProductSet extends CCatalogProductSetAll
 
 		$update = $DB->PrepareUpdate('b_catalog_product', $fields);
 
-		if (!empty($update))
-		{
-			$query = "update b_catalog_product set ".$update." where ID = ".$productID;
-			$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-		}
+		$query = "update b_catalog_product set ".$update." where ID = ".$productID;
+		$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
+
+		foreach (GetModuleEvents('catalog', 'OnProductSetAvailableUpdate', true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($productID, $fields));
 
 		$query = "delete from b_catalog_measure_ratio where PRODUCT_ID = ".$productID;
 		$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);

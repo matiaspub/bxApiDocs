@@ -107,7 +107,7 @@ class IblockValues extends BaseValues
 						"IBLOCK_ID" => $this->iblockId,
 						"IPROP_ID" => $row["ID"],
 						"VALUE" => $row["VALUE"],
-					));
+					), null);
 				}
 			}
 		}

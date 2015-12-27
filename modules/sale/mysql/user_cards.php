@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/user_cards.
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,14 +16,10 @@ class CSaleUserCards extends CAllSaleUserCards
 {
 	
 	/**
-	* <p>Метод возвращает параметры пластиковой карты с кодом ID</p>
-	*
-	*
+	* <p>Метод возвращает параметры пластиковой карты с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код пластиковой карты.
-	*
-	*
 	*
 	* @return array <p>Метод возвращает ассоциативный массив параметров пластиковой
 	* карты с ключами:</p> <ul> <li> <b>ID</b> - код пластиковой карты;</li> <li>
@@ -79,9 +73,7 @@ class CSaleUserCards extends CAllSaleUserCards
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей пластиковых карт в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей пластиковых карт в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -96,8 +88,6 @@ class CSaleUserCards extends CAllSaleUserCards
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи карт. Массив
 	* имеет вид: <pre class="syntax">array( "[модификатор1][оператор1]название_поля1"
@@ -124,8 +114,6 @@ class CSaleUserCards extends CAllSaleUserCards
 	* пустой массив array() - означает, что результат отфильтрован не
 	* будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи карт. Массив имеет
 	* вид: <pre class="syntax">array("название_поля1", "группирующая_функция2" =&gt;
 	* "название_поля2", . . .)</pre> В качестве "название_поля<i>N</i>" может
@@ -133,29 +121,23 @@ class CSaleUserCards extends CAllSaleUserCards
 	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
 	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
 	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то метод
 	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
 	* умолчанию - <i>false</i> - означает, что результат группироваться не
 	* будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов параметров карт.</p> <ul> <li> <b>ID</b> - код
@@ -177,8 +159,8 @@ class CSaleUserCards extends CAllSaleUserCards
 	* суммы;</li> <li> <b>ACTIVE</b> - флаг активности;</li> <li> <b>TIMESTAMP_X</b> - дата
 	* изменения;</li> <li> <b>LAST_DATE</b> - дата последнего использования
 	* карты.</li> </ul> <p>Если в качестве параметра arGroupBy передается пустой
-	* массив, то функция вернет число записей, удовлетворяющих
-	* фильтру.</p> <br><br>
+	* массив, то метод вернет число записей, удовлетворяющих фильтру.</p>
+	* <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.getlist.php
@@ -307,9 +289,7 @@ class CSaleUserCards extends CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод сохраняет информацию о новой пластиковой карте пользователя.</p>
-	*
-	*
+	* <p>Метод сохраняет информацию о новой пластиковой карте пользователя. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров пластиковой карты с ключами: <ul>
@@ -329,15 +309,12 @@ class CSaleUserCards extends CAllSaleUserCards
 	* платежной системы;</li> <li> <b>LAST_SUM</b> - последняя снятая с карты
 	* сумма;</li> <li> <b>LAST_CURRENCY</b> - валюта последней снятой с карты суммы;</li>
 	* <li> <b>ACTIVE</b> - флаг активности;</li> <li> <b>LAST_DATE</b> - дата последнего
-	* использования карты.</li> </ul> <p class="note"><b>Замечание</b><br> Перед
+	* использования карты.</li> </ul> <p></p> <div class="note"> <b>Замечание:</b> перед
 	* добавлением записи номер карты должен быть зашифрован методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
-	*
-	*
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</div>
 	*
 	* @return int <p>Метод возвращает код добавленной записи или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -396,14 +373,10 @@ class CSaleUserCards extends CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод изменяет информацию о новой пластиковой карте пользователя.</p>
-	*
-	*
+	* <p>Метод изменяет информацию о новой пластиковой карте пользователя. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код изменяемой записи. </htm
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров пластиковой карты с
 	* ключами: <ul> <li> <b>USER_ID</b> - код пользователя;</li> <li> <b>SORT</b> - индекс
@@ -422,12 +395,10 @@ class CSaleUserCards extends CAllSaleUserCards
 	* платежной системы;</li> <li> <b>LAST_SUM</b> - последняя снятая с карты
 	* сумма;</li> <li> <b>LAST_CURRENCY</b> - валюта последней снятой с карты суммы;</li>
 	* <li> <b>ACTIVE</b> - флаг активности;</li> <li> <b>LAST_DATE</b> - дата последнего
-	* использования карты.</li> </ul> <p class="note"><b>Замечание</b><br> Если
+	* использования карты.</li> </ul> <p></p> <div class="note"> <b>Замечание:</b> если
 	* меняется номер карты, то перед добавлением записи этот номер
 	* должен быть зашифрован методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</p>
-	*
-	*
+	* href="http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php">CSaleUserCards::CryptData</a>.</div>
 	*
 	* @return int <p>Метод возвращает код обновленной записи или <i>false</i> в случае
 	* ошибки.</p> <br><br>

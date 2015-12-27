@@ -16,7 +16,7 @@ class EventResult extends \Bitrix\Main\EventResult
 	/** @var string[] */
 	protected $unset = array();
 
-	/** @var FieldError[] */
+	/** @var EntityError[] */
 	protected $errors = array();
 
 	static public function __construct()
@@ -26,7 +26,7 @@ class EventResult extends \Bitrix\Main\EventResult
 
 	/**
 	 * Sets the errors array and changes the event type to ERROR
-	 * @param FieldError[] $errors
+	 * @param EntityError[] $errors
 	 */
 	public function setErrors(array $errors)
 	{
@@ -35,14 +35,17 @@ class EventResult extends \Bitrix\Main\EventResult
 	}
 
 	/**
-	 * @param FieldError $error
+	 * @param EntityError $error
 	 */
-	public function addError(FieldError $error)
+	public function addError(EntityError $error)
 	{
 		$this->errors[] = $error;
 		$this->type = parent::ERROR;
 	}
 
+	/**
+	 * @return EntityError[]|FieldError[]
+	 */
 	public function getErrors()
 	{
 		return $this->errors;

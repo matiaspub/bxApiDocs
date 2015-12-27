@@ -5,15 +5,13 @@ $GLOBALS["SONET_GROUP_CACHE"] = array();
 
 
 /**
- * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/index.php
  * @author Bitrix
  */
 class CAllSocNetGroup
@@ -379,16 +377,10 @@ class CAllSocNetGroup
 	* <p>Метод возвращает параметры рабочей группы с заданным идентификатором.</p> <p><b>Примечание</b>: при многократном вызове метода для одного и того же идентификатора рабочей группы в рамках одного хита запрос к базе направляется только один раз. В дальнейшем результат возвращается без запроса к базе.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор рабочей группы
-	*
-	*
 	*
 	* @param bool $bCheckPermissions = false Флаг проверки прав доступа. Необязательный параметр. По
 	* умолчанию равен false.
-	*
-	*
 	*
 	* @return array <p>Возвращается массив с ключами:<br><b>ID</b> - идентификатор рабочей
 	* группы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название
@@ -405,7 +397,6 @@ class CAllSocNetGroup
 	* дата последней активности в группе,<br><b>SUBJECT_NAME</b> - название темы
 	* группы.</p>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
@@ -415,15 +406,14 @@ class CAllSocNetGroup
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/GetList.php">CSocNetGroup::GetList</a> </li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/GetList.php">CSocNetGroup::GetList</a> </li>
 	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/getbyid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/getbyid.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID, $bCheckPermissions = false)
@@ -431,15 +421,21 @@ class CAllSocNetGroup
 		global $DB, $USER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
+		{
 			return false;
+		}
 
 		$ID = IntVal($ID);
+		$cacheArrayKey = ($bCheckPermissions ? "Y" : "N");
 
 		if (
 			is_array($GLOBALS["SONET_GROUP_CACHE"])
 			&& is_array($GLOBALS["SONET_GROUP_CACHE"][$ID])
+			&& is_array($GLOBALS["SONET_GROUP_CACHE"][$cacheArrayKey])
 		)
-			return $GLOBALS["SONET_GROUP_CACHE"][$ID];
+		{
+			return $GLOBALS["SONET_GROUP_CACHE"][$ID][$cacheArrayKey];
+		}
 		else
 		{
 			if (!$bCheckPermissions)
@@ -461,16 +457,26 @@ class CAllSocNetGroup
 			else
 			{
 				if (is_object($cache))
+				{
 					$cache->StartDataCache($cache_time, $cache_id, $cache_path);
+				}
 
 				$arFilter = array("ID" => $ID);
 				if (
 					$bCheckPermissions 
 					&& ($USER->GetID() > 0)
 				)
+				{
 					$arFilter["CHECK_PERMISSIONS"] = $USER->GetID();
+				}
 
-				$dbResult = CSocNetGroup::GetList(Array(), $arFilter, false, false, array("ID", "SITE_ID", "NAME", "DESCRIPTION", "DATE_CREATE", "DATE_UPDATE", "ACTIVE", "VISIBLE", "OPENED", "CLOSED", "SUBJECT_ID", "OWNER_ID", "KEYWORDS", "IMAGE_ID", "NUMBER_OF_MEMBERS", "NUMBER_OF_MODERATORS", "INITIATE_PERMS", "SPAM_PERMS", "DATE_ACTIVITY", "SUBJECT_NAME", "UF_*"));
+				$dbResult = CSocNetGroup::GetList(
+					Array(), 
+					$arFilter, 
+					false, 
+					false, 
+					array("ID", "SITE_ID", "NAME", "DESCRIPTION", "DATE_CREATE", "DATE_UPDATE", "ACTIVE", "VISIBLE", "OPENED", "CLOSED", "SUBJECT_ID", "OWNER_ID", "KEYWORDS", "IMAGE_ID", "NUMBER_OF_MEMBERS", "NUMBER_OF_MODERATORS", "INITIATE_PERMS", "SPAM_PERMS", "DATE_ACTIVITY", "SUBJECT_NAME", "UF_*")
+				);
 				if ($arResult = $dbResult->GetNext())
 				{
 					if (defined("BX_COMP_MANAGED_CACHE"))
@@ -483,7 +489,9 @@ class CAllSocNetGroup
 					$arResult["NAME_FORMATTED"] = $arResult["NAME"];
 				}
 				else
+				{
 					$arResult = false;
+				}
 
 				if (is_object($cache))
 				{
@@ -491,15 +499,30 @@ class CAllSocNetGroup
 						"FIELDS" => $arResult
 					);
 					$cache->EndDataCache($arCacheData);
-					if(defined("BX_COMP_MANAGED_CACHE"))
+					if (defined("BX_COMP_MANAGED_CACHE"))
+					{
 						$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+					}
 				}
 			}
 
-			if (!array_key_exists("SONET_GROUP_CACHE", $GLOBALS) || !is_array($GLOBALS["SONET_GROUP_CACHE"]))
+			if (
+				!array_key_exists("SONET_GROUP_CACHE", $GLOBALS)
+				|| !is_array($GLOBALS["SONET_GROUP_CACHE"])
+			)
+			{
 				$GLOBALS["SONET_GROUP_CACHE"] = array();
+			}
 
-			$GLOBALS["SONET_GROUP_CACHE"][$ID] = $arResult;
+			if (
+				!array_key_exists($ID, $GLOBALS["SONET_GROUP_CACHE"])
+				|| !is_array($GLOBALS["SONET_GROUP_CACHE"][$cacheArrayKey])
+			)
+			{
+				$GLOBALS["SONET_GROUP_CACHE"][$ID] = array();
+			}
+
+			$GLOBALS["SONET_GROUP_CACHE"][$ID][$cacheArrayKey] = $arResult;
 
 			return $arResult;
 		}
@@ -513,21 +536,15 @@ class CAllSocNetGroup
 	* <p>Проверяет, может ли пользователь принимать в группу новых членов.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя </h
 	*
-	*
-	*
 	* @param int $groupID  Код группы
-	*
-	*
 	*
 	* @return bool <p>True, если пользователь может принимать в группу новых членов.
 	* Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserInitiate.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserInitiate.php
 	* @author Bitrix
 	*/
 	public static function CanUserInitiate($userID, $groupID)
@@ -575,21 +592,15 @@ class CAllSocNetGroup
 	* <p>Проверяет, может ли пользователь видеть группу в списке групп. Пользователь может видеть группу с списке групп, если группа видимая, либо пользователь является ее членом.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя </h
 	*
-	*
-	*
 	* @param int $groupID  Код группы
-	*
-	*
 	*
 	* @return bool <p>True, если пользователь имеет право видеть группу. Иначе - false.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserViewGroup.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserViewGroup.php
 	* @author Bitrix
 	*/
 	public static function CanUserViewGroup($userID, $groupID)
@@ -623,21 +634,15 @@ class CAllSocNetGroup
 	* <p>Проверяет, может ли пользователь просматривать групу. Пользователь может просматривать группу, если она открытая, либо если этот пользователь является членом группы.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя </h
 	*
-	*
-	*
 	* @param int $groupID  Код группы
-	*
-	*
 	*
 	* @return bool <p>True, если пользователь может просматривать группу. Иначе - false.</p>
 	* <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/CanUserReadGroup.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserReadGroup.php
 	* @author Bitrix
 	*/
 	public static function CanUserReadGroup($userID, $groupID)
@@ -674,11 +679,7 @@ class CAllSocNetGroup
 	* <p>Метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li> <li> <b>K</b> (Все члены группы ).</li> </ul> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $ownerID  Код пользователя - владельца новой рабочей группы.
-	*
-	*
 	*
 	* @param array $arFields  Массив параметров новой группы. Допустимые ключи
 	* массива:<br><b>SITE_ID</b> - код сайта (обязательное поле),<br><b>NAME</b> -
@@ -696,16 +697,11 @@ class CAllSocNetGroup
 	* модераторы группы, SONET_ROLES_USER - все члены группы, SONET_ROLES_ALL - все
 	* пользователи.
 	*
-	*
-	*
 	* @param bool $bAutoSubscribe = true Атоподписывание на созданную тему. Необязательный параметр. По
 	* умолчанию имеет значение True.
 	*
-	*
-	*
 	* @return int <p>Метод возвращает код вновь созданной группы или false в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -739,7 +735,7 @@ class CAllSocNetGroup
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetGroup/creategroup.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/creategroup.php
 	* @author Bitrix
 	*/
 	public static function CreateGroup($ownerID, $arFields, $bAutoSubscribe = true)
@@ -1164,6 +1160,31 @@ class CAllSocNetGroup
 		global $DB;
 		$strSql = "SELECT L.*, SGS.* FROM b_sonet_group_site SGS, b_lang L WHERE L.LID=SGS.SITE_ID AND SGS.GROUP_ID=".IntVal($group_id);
 		return $DB->Query($strSql);
+	}
+
+	public static function GetDefaultSiteId($groupId, $siteId = false)
+	{
+		$groupSiteId = ($siteId ? $siteId : SITE_ID);
+
+		if (CModule::IncludeModule("extranet"))
+		{
+			$extranetSiteId = CExtranet::GetExtranetSiteID();
+
+			$rsGroupSite = CSocNetGroup::GetSite($groupId);
+			while ($arGroupSite = $rsGroupSite->Fetch())
+			{
+				if (
+					!$extranetSiteId 
+					|| $arGroupSite["LID"] != $extranetSiteId
+				)
+				{
+					$groupSiteId = $arGroupSite["LID"];
+					break;
+				}
+			}
+		}
+
+		return $groupSiteId;
 	}
 
 	public static function OnBeforeLangDelete($lang)

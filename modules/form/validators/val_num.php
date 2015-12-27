@@ -20,7 +20,7 @@ class CFormValidatorNumber
 		foreach ($arValues as $value)
 		{
 			// empty string is not a number but we won't return error - crossing with "required" mark
-			if ($value != "" && (($value !==0  && intval($value) == 0) || strval(intval($value)) != strval($value)))
+			if ($value != "" && (($value !==0  && intval($value) == 0) || strval($value + 0) != strval($value)))
 			{
 				$APPLICATION->ThrowException(GetMessage("FORM_VALIDATOR_VAL_NUM_ERROR"));
 				return false;

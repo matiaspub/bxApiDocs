@@ -3,11 +3,14 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage seo
- * @copyright 2001-2013 Bitrix
+ * @copyright 2001-2014 Bitrix
  */
 namespace Bitrix\Seo;
 
-abstract class Engine
+use Bitrix\Main\SystemException;
+use Bitrix\Seo\SearchEngineTable;
+
+class Engine
 {
 	const HTTP_STATUS_OK = 200;
 	const HTTP_STATUS_CREATED = 201;
@@ -23,11 +26,14 @@ abstract class Engine
 
 	public function __construct()
 	{
-		$dbEngine = SearchEngineTable::getByCode($this->engineId);
-		$this->engine = $dbEngine->fetch();
+		if(!$this->engine)
+		{
+			$this->engine = static::getEngine($this->engineId);
+		}
+
 		if(!is_array($this->engine))
 		{
-			throw new \Exception();
+			throw new SystemException("Unknown search engine");
 		}
 		else
 		{
@@ -38,8 +44,48 @@ abstract class Engine
 		}
 	}
 
-	abstract public function getInterface();
-	abstract public function getAuthSettings();
-	abstract public function setAuthSettings($settings);
+	public function getId()
+	{
+		return $this->engine['ID'];
+	}
+
+	public function getCode()
+	{
+		return $this->engine['CODE'];
+	}
+
+	public function getSettings()
+	{
+		return $this->engineSettings;
+	}
+
+	public function getClientId()
+	{
+		return $this->engine['CLIENT_ID'];
+	}
+
+	public function getAuthSettings()
+	{
+		return $this->engineSettings['AUTH'];
+	}
+
+	public function clearAuthSettings()
+	{
+		unset($this->engineSettings['AUTH']);
+		$this->saveSettings();
+	}
+
+	protected function saveSettings()
+	{
+		SearchEngineTable::update($this->engine['ID'], array(
+			'SETTINGS' => serialize($this->engineSettings)
+		));
+	}
+
+	protected static function getEngine($engineId)
+	{
+		$dbEngine = SearchEngineTable::getByCode($engineId);
+		return $dbEngine->fetch();
+	}
 }
-?>
+

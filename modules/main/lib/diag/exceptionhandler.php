@@ -208,10 +208,13 @@ class ExceptionHandler
 		unset($this->memoryReserve);
 		if ($error = error_get_last())
 		{
-			if (in_array($error['type'], array(E_ERROR, E_USER_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_RECOVERABLE_ERROR)))
+			if (($error['type'] & (E_ERROR | E_USER_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR)))
 			{
-				$exception = new \ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
-				$this->writeToLog($exception, ExceptionHandlerLog::FATAL);
+				if(($error['type'] & $this->handledErrorsTypes))
+				{
+					$exception = new \ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+					$this->writeToLog($exception, ExceptionHandlerLog::FATAL);
+				}
 			}
 		}
 	}

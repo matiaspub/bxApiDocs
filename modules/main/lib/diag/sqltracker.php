@@ -82,6 +82,8 @@ class SqlTracker implements \Iterator
 	}
 
 	/**
+	 * Returns backtrace depth for writing into log.
+	 *
 	 * @return int
 	 */
 	public function getDepthBackTrace()
@@ -90,7 +92,11 @@ class SqlTracker implements \Iterator
 	}
 
 	/**
-	 * @param int $depthBackTrace
+	 * Sets backtrace depth for writing into log.
+	 *
+	 * @param int $depthBackTrace Desired backtrace depth.
+	 *
+	 * @return void
 	 */
 	public function setDepthBackTrace($depthBackTrace)
 	{
@@ -130,7 +136,7 @@ class SqlTracker implements \Iterator
 			$header = "TIME: ".round($executionTime, 6)." SESSION: ".session_id()." ".$additional."\n";
 			$headerLength = strlen($header);
 			$body = $this->formatSql($sql);
-			$trace = $this->formatTrace(\Bitrix\Main\Diag\Helper::getBackTrace($this->depthBackTrace, null, $traceSkip), $headerLength);
+			$trace = $this->formatTrace(\Bitrix\Main\Diag\Helper::getBackTrace($this->depthBackTrace, null, $traceSkip));
 			$footer = str_repeat("-", $headerLength);
 			$message =
 				"\n".$header.
@@ -196,49 +202,35 @@ class SqlTracker implements \Iterator
 	/**
 	 * Returns formatted backtrace for log writing.
 	 * Format is multi line. Line separator is "\n".
-	 * When line length is more than $length parameter
-	 * new line starts.
 	 *
 	 * @param array $trace Backtrace.
-	 * @param int $length Desired length.
 	 *
 	 * @return string
 	 */
-	protected function formatTrace(array $trace = null, $length = 0)
+	protected function formatTrace(array $trace = null)
 	{
 		if ($trace)
 		{
 			$traceLines = array();
-			$traceLine = '';
-			$delimiter = ' < ';
 			foreach ($trace as $traceNum => $traceInfo)
 			{
-				$calledFrom = '';
+				$traceLine = '';
 
 				if (array_key_exists('class', $traceInfo))
-					$calledFrom .= $traceInfo['class'].$traceInfo['type'];
+					$traceLine .= $traceInfo['class'].$traceInfo['type'];
 
 				if (array_key_exists('function', $traceInfo))
-					$calledFrom .= $traceInfo['function'];
+					$traceLine .= $traceInfo['function'].'()';
 
-				if ($length <= 0 || strlen($traceLine) > $length)
+				if (array_key_exists('file', $traceInfo))
 				{
-					$traceLines[] = $traceLine;
-					$traceLine = $calledFrom;
+					$traceLine .= ' '.$traceInfo['file'];
+					if (array_key_exists('line', $traceInfo))
+					$traceLine .= ':'.$traceInfo['line'];
 				}
-				elseif ($traceLine)
-				{
-					$traceLine .= $delimiter.$calledFrom;
-				}
-				else
-				{
-					$traceLine = $calledFrom;
-				}
-			}
 
-			if ($length > 0 && $traceLine)
-			{
-				$traceLines [] = $traceLine;
+				if ($traceLine)
+					$traceLines[] = ' from '.$traceLine;
 			}
 
 			return implode("\n", $traceLines);

@@ -444,20 +444,28 @@ class CIBlockParameters
 				),
 			),
 		);
+		$catalog = false;
+		$showCatalogSeo = false;
 		if (self::$catalogIncluded === null)
 			self::$catalogIncluded = Loader::includeModule('catalog');
 		if (self::$catalogIncluded)
 		{
-			$result["store"] = array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
-				"MENU" => array(),
-			);
-			foreach (self::getCatalogStores() as $store)
+			if ($iblock_id > 0)
+				$catalog = CCatalogSKU::GetInfoByIBlock($iblock_id);
+			$showCatalogSeo = (is_array($catalog) && $catalog['CATALOG_TYPE'] != \CCatalogSKU::TYPE_PRODUCT);
+			if ($showCatalogSeo)
 			{
-				$result["store"]["MENU"][] = array(
-					"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
-					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
+				$result["store"] = array(
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
+					"MENU" => array(),
 				);
+				foreach (self::getCatalogStores() as $store)
+				{
+					$result["store"]["MENU"][] = array(
+						"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
+						"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
+					);
+				}
 			}
 		}
 		$result["misc"] = array(
@@ -468,14 +476,15 @@ class CIBlockParameters
 			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
 			"ONCLICK" => "$action_function('{=concat this.sections.name this.name \" / \"}', '$menuID', '$inputID')",
 		);
-		if (self::$catalogIncluded === null)
-			self::$catalogIncluded = Loader::includeModule('catalog');
 		if (self::$catalogIncluded)
 		{
-			$result["misc"]["MENU"][] =  array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
-				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
-			);
+			if ($showCatalogSeo)
+			{
+				$result["misc"]["MENU"][] = array(
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+					"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
+				);
+			}
 		}
 		$r = array();
 		foreach($result as $category)
@@ -568,100 +577,109 @@ class CIBlockParameters
 				),
 			),
 		);
+		$arCatalog = false;
+		$showCatalogSeo = false;
 		if (self::$catalogIncluded === null)
 			self::$catalogIncluded = Loader::includeModule('catalog');
 		if (self::$catalogIncluded)
 		{
-			$arCatalog = \CCatalogSKU::GetInfoByProductIBlock($iblock_id);
+			if ($iblock_id > 0)
+				$arCatalog = \CCatalogSKU::GetInfoByIBlock($iblock_id);
 			if (is_array($arCatalog))
 			{
-				$result["sku_properties"] = array(
-					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
-					"MENU" => array(
-					),
-				);
-				$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $arCatalog["IBLOCK_ID"]));
-				while($property = $rsProperty->fetch())
+				$showCatalogSeo = ($arCatalog['CATALOG_TYPE'] != \CCatalogSKU::TYPE_PRODUCT);
+				if ($arCatalog['CATALOG_TYPE'] == \CCatalogSKU::TYPE_PRODUCT || $arCatalog['CATALOG_TYPE'] == \CCatalogSKU::TYPE_FULL)
 				{
-					if ($property["PROPERTY_TYPE"] != "F")
+					$result["sku_properties"] = array(
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
+						"MENU" => array(),
+					);
+					$rsProperty = CIBlockProperty::GetList(array(), array("IBLOCK_ID" => $arCatalog["IBLOCK_ID"]));
+					while ($property = $rsProperty->fetch())
 					{
-						$result["sku_properties"]["MENU"][] = array(
-							"TEXT" => $property["NAME"],
-							"ONCLICK" => "$action_function('{=concat {=distinct this.catalog.sku.property.".($property["CODE"]!=""? $property["CODE"]: $property["ID"])." \", \"}}', '$menuID', '$inputID')",
-						);
+						if ($property["PROPERTY_TYPE"] != "F")
+						{
+							$result["sku_properties"]["MENU"][] = array(
+								"TEXT" => $property["NAME"],
+								"ONCLICK" => "$action_function('{=concat {=distinct this.catalog.sku.property.".($property["CODE"] != "" ? $property["CODE"] : $property["ID"])." \", \"}}', '$menuID', '$inputID')",
+							);
+						}
+					}
+					$result["sku_price"] = array(
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PRICE"),
+						"MENU" => array(),
+					);
+					foreach (self::getCatalogPrices() as $price)
+					{
+						if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
+						{
+							$result["sku_price"]["MENU"][] = array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+								"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+							);
+							$result["sku_price"]["MENU"][] = array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+								"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+							);
+						}
+						else
+						{
+							$result["sku_price"]["MENU"][] = array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
+								"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
+							);
+							$result["sku_price"]["MENU"][] = array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
+								"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
+							);
+						}
 					}
 				}
-				$result["sku_price"] = array(
-					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PRICE"),
-					"MENU" => array(),
-				);
-				foreach (self::getCatalogPrices() as $price)
-				{
-					if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
-					{
-						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
-							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
-						);
-						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
-							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["NAME"]."}', '$menuID', '$inputID')",
-						);
-					}
-					else
-					{
-						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MIN_PRICE")." ".$price["NAME"],
-							"ONCLICK" => "$action_function('{=min this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
-						);
-						$result["sku_price"]["MENU"][] = array(
-							"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_MAX_PRICE")." ".$price["NAME"],
-							"ONCLICK" => "$action_function('{=max this.catalog.sku.price.".$price["ID"]."}', '$menuID', '$inputID')",
-						);
-					}
-				}
-			}
 
-			$result["catalog"] = array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG"),
-				"MENU" => array(
-					array(
-						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_WEIGHT"),
-						"ONCLICK" => "$action_function('{=this.catalog.weight}', '$menuID', '$inputID')",
-					),
-					array(
-						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_MEASURE"),
-						"ONCLICK" => "$action_function('{=this.catalog.measure}', '$menuID', '$inputID')",
-					),
-				),
-			);
-			$result["price"] = array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PRICE"),
-				"MENU" => array(),
-			);
-			foreach (self::getCatalogPrices() as $price)
-			{
-				if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
-					$result["price"]["MENU"][] = array(
-						"TEXT" => $price["NAME"],
-						"ONCLICK" => "$action_function('{=this.catalog.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+				if ($showCatalogSeo)
+				{
+					$result["catalog"] = array(
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG"),
+						"MENU" => array(
+							array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_WEIGHT"),
+								"ONCLICK" => "$action_function('{=this.catalog.weight}', '$menuID', '$inputID')",
+							),
+							array(
+								"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_CATALOG_MEASURE"),
+								"ONCLICK" => "$action_function('{=this.catalog.measure}', '$menuID', '$inputID')",
+							),
+						),
 					);
-				else
-					$result["price"]["MENU"][] = array(
-						"TEXT" => $price["NAME"],
-						"ONCLICK" => "$action_function('{=this.catalog.price.".$price["ID"]."}', '$menuID', '$inputID')",
+					$result["price"] = array(
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_PRICE"),
+						"MENU" => array(),
 					);
-			}
-			$result["store"] = array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
-				"MENU" => array(),
-			);
-			foreach (self::getCatalogStores() as $store)
-			{
-				$result["store"]["MENU"][] = array(
-					"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
-					"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
-				);
+					foreach (self::getCatalogPrices() as $price)
+					{
+						if (preg_match("/^[a-zA-Z0-9]+\$/", $price["NAME"]))
+							$result["price"]["MENU"][] = array(
+								"TEXT" => $price["NAME"],
+								"ONCLICK" => "$action_function('{=this.catalog.price.".$price["NAME"]."}', '$menuID', '$inputID')",
+							);
+						else
+							$result["price"]["MENU"][] = array(
+								"TEXT" => $price["NAME"],
+								"ONCLICK" => "$action_function('{=this.catalog.price.".$price["ID"]."}', '$menuID', '$inputID')",
+							);
+					}
+					$result["store"] = array(
+						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE"),
+						"MENU" => array(),
+					);
+					foreach (self::getCatalogStores() as $store)
+					{
+						$result["store"]["MENU"][] = array(
+							"TEXT" => ($store["TITLE"] != '' ? $store["TITLE"] : $store["ADDRESS"]),
+							"ONCLICK" => "$action_function('{=catalog.store.".$store["ID"].".name}', '$menuID', '$inputID')",
+						);
+					}
+				}
 			}
 		}
 		$result["misc"] = array(
@@ -672,14 +690,15 @@ class CIBlockParameters
 			"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SECTIONS_PATH"),
 			"ONCLICK" => "$action_function('{=concat this.sections.name \" / \"}', '$menuID', '$inputID')",
 		);
-		if (self::$catalogIncluded === null)
-			self::$catalogIncluded = Loader::includeModule('catalog');
 		if (self::$catalogIncluded)
 		{
-			$result["misc"]["MENU"][] =  array(
-				"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
-				"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
-			);
+			if ($showCatalogSeo)
+			{
+				$result["misc"]["MENU"][] = array(
+					"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_STORE_LIST"),
+					"ONCLICK" => "$action_function('{=concat catalog.store \", \"}', '$menuID', '$inputID')",
+				);
+			}
 		}
 		$r = array();
 		foreach($result as $category)
@@ -709,7 +728,7 @@ class CIBlockParameters
 		);
 	}
 
-	public static function AddPagerSettings(&$arComponentParameters, $pager_title, $bDescNumbering=true, $bShowAllParam=false)
+	public static function AddPagerSettings(&$arComponentParameters, $pager_title, $bDescNumbering=true, $bShowAllParam=false, $bBaseLink=false, $bBaseLinkEnabled=false)
 	{
 		$arHiddenTemplates = array(
 			'js' => true
@@ -828,8 +847,90 @@ class CIBlockParameters
 				"DEFAULT" => "N"
 			);
 		}
+
+		if($bBaseLink)
+		{
+			$arComponentParameters["PARAMETERS"]["PAGER_BASE_LINK_ENABLE"] = Array(
+				"PARENT" => "PAGER_SETTINGS",
+				"NAME" => Loc::getMessage("T_IBLOCK_DESC_BASE_LINK_ENABLE"),
+				"TYPE" => "CHECKBOX",
+				"REFRESH" => "Y",
+				"DEFAULT" => "N",
+			);
+			if($bBaseLinkEnabled)
+			{
+				$arComponentParameters["PARAMETERS"]["PAGER_BASE_LINK"] = Array(
+					"PARENT" => "PAGER_SETTINGS",
+					"NAME" => Loc::getMessage("T_IBLOCK_DESC_BASE_LINK"),
+					"TYPE" => "STRING",
+					"DEFAULT" => ""
+				);
+				$arComponentParameters["PARAMETERS"]["PAGER_PARAMS_NAME"] = Array(
+					"PARENT" => "PAGER_SETTINGS",
+					"NAME" => Loc::getMessage("T_IBLOCK_DESC_PARAMS_NAME"),
+					"TYPE" => "STRING",
+					"DEFAULT" => "arrPager"
+				);
+			}
+		}
 	}
 
+	public static function Add404Settings(&$arComponentParameters, $arCurrentValues, $bStatus = true, $bPage = true)
+	{
+		if (!isset($arComponentParameters['GROUPS']))
+			$arComponentParameters['GROUPS'] = array();
+		$arComponentParameters["GROUPS"]["404_SETTINGS"] = array(
+			"NAME" => Loc::getMessage("IB_COMPLIB_PARAMETER_GROUP_404_SETTINGS"),
+		);
+
+		if ($bStatus)
+		{
+			$arComponentParameters["PARAMETERS"]["SET_STATUS_404"] = array(
+				"PARENT" => "404_SETTINGS",
+				"NAME" => Loc::getMessage("IB_COMPLIB_PARAMETER_SET_STATUS_404"),
+				"TYPE" => "CHECKBOX",
+				"DEFAULT" => "N",
+			);
+		}
+
+		if ($bPage)
+		{
+			$arComponentParameters["PARAMETERS"]["SHOW_404"] = array(
+				"PARENT" => "404_SETTINGS",
+				"NAME" => Loc::getMessage("IB_COMPLIB_PARAMETER_SHOW_404"),
+				"TYPE" => "CHECKBOX",
+				"DEFAULT" => "N",
+				"REFRESH" => "Y",
+			);
+		}
+
+		if ($arCurrentValues["SHOW_404"] === "Y")
+		{
+			if ($bPage)
+			{
+				$arComponentParameters["PARAMETERS"]["FILE_404"] = array(
+					"PARENT" => "404_SETTINGS",
+					"NAME" => Loc::getMessage("IB_COMPLIB_PARAMETER_FILE_404"),
+					"TYPE" => "STRING",
+					"DEFAULT" => "",
+				);
+			}
+		}
+		else
+		{
+			$arComponentParameters["PARAMETERS"]["MESSAGE_404"] = array(
+				"PARENT" => "404_SETTINGS",
+				"NAME" => Loc::getMessage("IB_COMPLIB_PARAMETER_MESSAGE_404"),
+				"TYPE" => "STRING",
+				"DEFAULT" => "",
+			);
+		}
+	}
+
+	/**
+	 * @param bool|array $arTop
+	 * @return array
+	 */
 	public static function GetIBlockTypes($arTop = false)
 	{
 		if(is_array($arTop))
@@ -921,6 +1022,29 @@ class CIBlockParameters
 		return $arResult;
 	}
 
+	
+	/**
+	* <p>Проверяет значение параметра. Метод статический.</p>
+	*
+	*
+	* @param  $value  Проверяемое значение
+	*
+	* @return mixed <p>Возвращает <i>true</i>, если значение не может быть приведено к
+	* <i>false</i>.</p>
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* $arCodes = array('', 0, 'ARTICUL');
+	* $arCodes = array_filter($arCodes, 'CIBlockParameters::checkParamValues');После этого в $arCodes будет выглядеть так:
+	* 
+	* $arCodes = array(2 =&gt; 'ARTICUL');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockparameters/checkparamvalues.php
+	* @author Bitrix
+	*/
 	public static function checkParamValues($value)
 	{
 		return ($value !== null && $value !== '' && $value !== false);

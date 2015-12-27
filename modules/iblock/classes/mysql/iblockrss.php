@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br> </body> </html>
- *
- *
+ * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br> 
  *
  *
  * @return mixed 

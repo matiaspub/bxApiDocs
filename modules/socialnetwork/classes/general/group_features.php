@@ -5,15 +5,13 @@ $GLOBALS["SONET_FEATURES_CACHE"] = array();
 
 
 /**
- * <b>CSocNetFeatures</b> - класс для работы с дополнительным функционалом групп и пользователей социальной сети.</body> </html>
- *
- *
+ * <b>CSocNetFeatures</b> - класс для работы с дополнительным функционалом групп и пользователей социальной сети. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/index.php
  * @author Bitrix
  */
 class CAllSocNetFeatures
@@ -134,16 +132,12 @@ class CAllSocNetFeatures
 	* <p>Метод удаляет запись дополнительного функционала из базы.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Код записи
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/Delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -213,21 +207,15 @@ class CAllSocNetFeatures
 	* <p>Изменяет параметры сохраненного дополнительного функционала.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Код записи
 	*
-	*
-	*
 	* @param array $arFields  Массив новых параметров </htm
-	*
-	*
 	*
 	* @return int <p>Код записи в случае успешного изменения и false - в случае
 	* ошибки.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Update.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/Update.php
 	* @author Bitrix
 	*/
 	public static function Update($ID, $arFields)
@@ -275,7 +263,9 @@ class CAllSocNetFeatures
 			$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			if (array_key_exists("ENTITY_TYPE", $arFields) && array_key_exists("ENTITY_ID", $arFields))
+			{
 				unset($GLOBALS["SONET_FEATURES_CACHE"][$arFields["ENTITY_TYPE"]][$arFields["ENTITY_ID"]]);
+			}
 
 			$events = GetModuleEvents("socialnetwork", "OnSocNetFeaturesUpdate");
 			while ($arEvent = $events->Fetch())
@@ -294,46 +284,33 @@ class CAllSocNetFeatures
 
 	
 	/**
-	* <p>Метод устанавливает настройки дополнительного функционала для группы или пользователя. Если запись для функционала существует, то она изменяется. Иначе создается новая запись.</p> <p><b>Примечание</b>: новая запись создается методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a>.</p>
-	*
-	*
+	* <p>Метод устанавливает настройки дополнительного функционала для группы или пользователя. Если запись для функционала существует, то она изменяется. Иначе создается новая запись.</p> <p><b>Примечание</b>: новая запись создается методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/csocnetfeatures.add.php">CSocNetFeatures::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/Update.php">CSocNetFeatures::Update</a>.</p>
 	*
 	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	*
-	*
 	* @param int $id  Идентификатор объекта (пользователя или группы).
-	*
-	*
 	*
 	* @param string $feature  Внутреннее название дополнительного функционала.
 	*
-	*
-	*
 	* @param char $active  Флаг активности (Y/N). </h
 	*
-	*
-	*
 	* @param string $featureName = false Название дополнительного функционала.
-	*
-	*
 	*
 	* @return int <p>Возвращается идентификатор записи дополнительного
 	* функционала.</p>
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Add.php">CSocNetFeatures::Add</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/csocnetfeatures.add.php">CSocNetFeatures::Add</a></li>
 	* <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/Update.php">CSocNetFeatures::Update</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/Update.php">CSocNetFeatures::Update</a></li>
 	* </ul><br><br>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/SetFeature.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/SetFeature.php
 	* @author Bitrix
 	*/
 	public static function SetFeature($type, $id, $feature, $active, $featureName = false)
@@ -417,11 +394,7 @@ class CAllSocNetFeatures
 	* <p>Метод возвращает массив параметров дополнительного функционала.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Код записи
-	*
-	*
 	*
 	* @return array <p>Массив с ключами:<br><b>ID</b> - код записи,<br><b>ENTITY_TYPE</b> - тип объекта:
 	* SONET_ENTITY_GROUP - группа, SONET_ENTITY_USER - пользователь,<br><b>ENTITY_ID</b> - код
@@ -432,7 +405,7 @@ class CAllSocNetFeatures
 	* изменения записи.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/GetByID.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/GetByID.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)
@@ -461,21 +434,13 @@ class CAllSocNetFeatures
 	* <p>Метод проверяет, активен ли функционал группы или пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа, <br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
-	*
-	*
 	*
 	* @param mixed $id  Идентификатор объекта (пользователя или группы), либо (с версии
 	* 8.6.4) массив идентификаторов объектов.
 	*
-	*
-	*
 	* @param string $feature  Название дополнительного функционала.
-	*
-	*
 	*
 	* @return mixed <p>Если в параметре id передано скалярное значение, true, если
 	* дополнительный функционал активен. Иначе - false. Если (с версии 8.6.4)
@@ -485,7 +450,7 @@ class CAllSocNetFeatures
 	* логике.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/IsActiveFeature.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/IsActiveFeature.php
 	* @author Bitrix
 	*/
 	public static function IsActiveFeature($type, $id, $feature)
@@ -528,10 +493,8 @@ class CAllSocNetFeatures
 				else
 				{
 					if (array_key_exists("SONET_FEATURES_CACHE", $GLOBALS)
-						&& is_array($GLOBALS["SONET_FEATURES_CACHE"])
-						&& array_key_exists($type, $GLOBALS["SONET_FEATURES_CACHE"])
-						&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type])
-						&& array_key_exists($group_id, $GLOBALS["SONET_FEATURES_CACHE"][$type])
+						&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type])
+						&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type][$group_id])
 						&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type][$group_id]))
 					{
 						$arFeatures[$group_id] = $GLOBALS["SONET_FEATURES_CACHE"][$type][$group_id];
@@ -592,10 +555,8 @@ class CAllSocNetFeatures
 			}
 			
 			if (array_key_exists("SONET_FEATURES_CACHE", $GLOBALS)
-				&& is_array($GLOBALS["SONET_FEATURES_CACHE"])
-				&& array_key_exists($type, $GLOBALS["SONET_FEATURES_CACHE"])
-				&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type])
-				&& array_key_exists($id, $GLOBALS["SONET_FEATURES_CACHE"][$type])
+				&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type])
+				&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type][$id])
 				&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type][$id]))
 			{
 				$arFeatures = $GLOBALS["SONET_FEATURES_CACHE"][$type][$id];
@@ -626,21 +587,15 @@ class CAllSocNetFeatures
 	* <p>Метод возвращает список активных дополнительных функционалов группы или пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	*
-	*
 	* @param int $id  Идентификатор объекта (пользователя или группы).
-	*
-	*
 	*
 	* @return array <p>Массив названий активных дополнительных функционалов.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/GetActiveFeatures.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/GetActiveFeatures.php
 	* @author Bitrix
 	*/
 	public static function GetActiveFeatures($type, $id)
@@ -666,10 +621,8 @@ class CAllSocNetFeatures
 		$arFeatures = array();
 
 		if (array_key_exists("SONET_FEATURES_CACHE", $GLOBALS)
-			&& is_array($GLOBALS["SONET_FEATURES_CACHE"])
-			&& array_key_exists($type, $GLOBALS["SONET_FEATURES_CACHE"])
-			&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type])
-			&& array_key_exists($id, $GLOBALS["SONET_FEATURES_CACHE"][$type])
+			&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type])
+			&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type][$id])
 			&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type][$id]))
 		{
 			$arFeatures = $GLOBALS["SONET_FEATURES_CACHE"][$type][$id];
@@ -716,22 +669,15 @@ class CAllSocNetFeatures
 	* <p>Пользователь в своем профайле и владелец группы могут задавать пользовательские названия для дополнительного функционала (названия вкладок). Метод служит для получения пользовательских названий дополнительного функционала, если они заданы. </p>
 	*
 	*
-	*
-	*
 	* @param char $type  Тип объекта:<br><b>SONET_ENTITY_USER</b> - профиль
 	* пользователя,<br><b>SONET_ENTITY_GROUP</b> - группа.
 	*
-	*
-	*
 	* @param int $id  Код объекта (пользователя или группы).
-	*
-	*
 	*
 	* @return array <p>Метод вернет массив пользовательских названий для
 	* дополнительного функционала, которые были заданы. Если
 	* пользовательские названия не были заданы, то они не будут
 	* возвращены.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -751,7 +697,7 @@ class CAllSocNetFeatures
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetFeatures/GetActiveFeaturesNames.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/GetActiveFeaturesNames.php
 	* @author Bitrix
 	*/
 	public static function GetActiveFeaturesNames($type, $id)
@@ -776,10 +722,8 @@ class CAllSocNetFeatures
 		$arFeatures = array();
 
 		if (array_key_exists("SONET_FEATURES_CACHE", $GLOBALS)
-			&& is_array($GLOBALS["SONET_FEATURES_CACHE"])
-			&& array_key_exists($type, $GLOBALS["SONET_FEATURES_CACHE"])
-			&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type])
-			&& array_key_exists($id, $GLOBALS["SONET_FEATURES_CACHE"][$type])
+			&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type])
+			&& isset($GLOBALS["SONET_FEATURES_CACHE"][$type][$id])
 			&& is_array($GLOBALS["SONET_FEATURES_CACHE"][$type][$id]))
 		{
 			$arFeatures = $GLOBALS["SONET_FEATURES_CACHE"][$type][$id];
@@ -802,6 +746,7 @@ class CAllSocNetFeatures
 				if (defined("BX_COMP_MANAGED_CACHE"))
 				{
 					$GLOBALS["CACHE_MANAGER"]->StartTagCache($cache_path);
+					$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_features_".$type."_".$id);
 				}
 
 				$dbResult = CSocNetFeatures::GetList(Array(), Array("ENTITY_ID" => $id, "ENTITY_TYPE" => $type));

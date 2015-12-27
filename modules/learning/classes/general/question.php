@@ -5,8 +5,6 @@
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -47,8 +45,8 @@ class CLQuestion
 				if($arRes = $res->Fetch())
 				{
 					$oAccess = CLearnAccess::GetInstance($USER->GetID());
-					
-					$bAccessLessonModify = 
+
+					$bAccessLessonModify =
 						$oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_WRITE)
 						|| $oAccess->IsLessonAccessible ($arFields["LESSON_ID"], CLearnAccess::OP_LESSON_WRITE);
 
@@ -99,18 +97,13 @@ class CLQuestion
 	* <p>Метод добавляет новый вопрос.</p>
 	*
 	*
-	*
-	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">всех полей</a> вопроса.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return int <p>Метод возвращает идентификатор добавленного вопроса, если
 	* добавление прошло успешно. При возникновении ошибки метод вернет
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -146,7 +139,6 @@ class CLQuestion
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -203,22 +195,15 @@ class CLQuestion
 	* <p>Метод изменяет параметры вопроса с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор вопроса.
-	*
-	*
 	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#question">всех полей</a> вопроса.
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	*
-	*
 	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
-	* возникновении ошибки функция вернёт <i>false</i>. При возникновении
+	* возникновении ошибки метод вернёт <i>false</i>. При возникновении
 	* ошибки в исключениях будет содержаться текст ошибки.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -249,7 +234,6 @@ class CLQuestion
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -328,15 +312,10 @@ class CLQuestion
 	* <p>Метод удаляет вопрос с идентификатором ID.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор вопроса.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления вопроса, в
 	* противном случае возвращает <i>false</i>.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -361,7 +340,6 @@ class CLQuestion
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -437,15 +415,10 @@ class CLQuestion
 	* <p>Возвращает вопрос по идентификатору.</p>
 	*
 	*
-	*
-	*
 	* @param int $ID  Идентификатор вопроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -463,7 +436,6 @@ class CLQuestion
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -527,7 +499,7 @@ class CLQuestion
 							CONNECT BY NOCYCLE PRIOR TLE.TARGET_NODE = TLE.SOURCE_NODE";
 
 						// But we need also $courseLessonId itself, so final clause will be:
-						$arSqlSearch[] = '(CQ.LESSON_ID IN (' . $subQuery . ') 
+						$arSqlSearch[] = '(CQ.LESSON_ID IN (' . $subQuery . ')
 							OR CQ.LESSON_ID = ' . ($courseLessonId + 0) . ')';
 					}
 					elseif (($DBType === 'mysql') || ($DBType === 'mssql'))
@@ -547,7 +519,7 @@ class CLQuestion
 						$arChildLessonForCourseEscaped = array_map('intval', $arChildLessonForCourse);
 
 						$sqlCourseLessonsIdsList = implode (', ', $arChildLessonForCourseEscaped);
-						
+
 						if (strlen($sqlCourseLessonsIdsList) > 0)
 							$arSqlSearch[] = 'CQ.LESSON_ID IN (' . $sqlCourseLessonsIdsList . ')';
 					}
@@ -579,8 +551,6 @@ class CLQuestion
 	* <p>Возвращает список вопросов по фильтру arFilter, отсортированный в порядке arOrder.</p>
 	*
 	*
-	*
-	*
 	* @param array $arrayarOrder = Array("TIMESTAMP_X"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
 	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
 	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
@@ -590,9 +560,7 @@ class CLQuestion
 	* <b>TIMESTAMP_X</b> - дата изменения вопроса.</li> </ul> Направление сортировки
 	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li>
 	* <b>desc</b> - по убыванию;</li> </ul> Необязательный. По умолчанию
-	* фильтруется по убыванию даты изменения вопроса.
-	*
-	*
+	* сортируется по убыванию даты изменения вопроса.
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
@@ -608,11 +576,8 @@ class CLQuestion
 	* "<i>значения фильтра</i>" - одиночное значение или массив.<br><br>
 	* Необязательный. По умолчанию записи не фильтруются.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -689,7 +654,6 @@ class CLQuestion
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/index.php">CLQuestion</a>::<a
@@ -728,7 +692,10 @@ class CLQuestion
 		else
 			$strSqlFrom .= ' 1=1 ';
 
-		$strSql = "SELECT CQ.*, "
+		$strSql = "SELECT CQ.ID, CQ.ACTIVE, CQ.LESSON_ID, CQ.QUESTION_TYPE,
+				CQ.NAME, CQ.SORT, CQ.DESCRIPTION, CQ.DESCRIPTION_TYPE,
+				CQ.COMMENT_TEXT, CQ.FILE_ID, CQ.SELF, CQ.POINT, CQ.DIRECTION,
+				CQ.CORRECT_REQUIRED, CQ.EMAIL_ANSWER, CQ.INCORRECT_MESSAGE,"
 			. $DB->DateToCharFunction("CQ.TIMESTAMP_X")." as TIMESTAMP_X "
 			. $obUserFieldsSql->GetSelect()
 			. " "
@@ -810,17 +777,12 @@ class CLQuestion
 	* <p>Метод возвращает количество вопросов по заданному фильтру.</p>
 	*
 	*
-	*
-	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
 	* Описание фильтра см. в <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clquestion/getlist.php">CLQuestion::GetList</a>.<br> По
 	* умолчанию вопросы не фильтруются.
 	*
-	*
-	*
 	* @return int <p>Число - количество вопросов.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -848,7 +810,6 @@ class CLQuestion
 	* 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

@@ -84,10 +84,7 @@ class CSOAPParameter
  * 
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>

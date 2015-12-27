@@ -17,6 +17,8 @@ class CSiteTemplate
 
 		if(isset($arFilter["ID"]) && !is_array($arFilter["ID"]))
 			$arFilter["ID"] = array($arFilter["ID"]);
+		if(isset($arFilter["TYPE"]) && !is_array($arFilter["TYPE"]))
+			$arFilter["TYPE"] = array($arFilter["TYPE"]);
 
 		$folders = array(
 			"/local/templates",
@@ -54,6 +56,10 @@ class CSiteTemplate
 
 						if(file_exists(($fname = $path."/".$file."/description.php")))
 							include($fname);
+
+						if(!isset($arTemplate["TYPE"])) $arTemplate["TYPE"] = '';
+						if(isset($arFilter["TYPE"]) && !in_array($arTemplate["TYPE"], $arFilter["TYPE"]))
+							continue;
 
 						$arTemplate["ID"] = $file;
 						$arTemplate["PATH"] = $folder."/".$file;
@@ -128,7 +134,8 @@ class CSiteTemplate
 
 	public static function __GetByStylesTitle($file)
 	{
-		if(file_exists($file))
+		$io = CBXVirtualIo::GetInstance();
+		if ($io->FileExists($file))
 			return include($file);
 		return false;
 	}
@@ -188,48 +195,33 @@ class CSiteTemplate
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
-		CheckDirPath($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]);
+		$path = BX_PERSONAL_ROOT."/templates/".$arFields["ID"];
+		CheckDirPath($_SERVER["DOCUMENT_ROOT"].$path);
+
 		if(isset($arFields["CONTENT"]))
 		{
 			$p = strpos($arFields["CONTENT"], "#WORK_AREA#");
 			$header = substr($arFields["CONTENT"], 0, $p);
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/header.php", $header);
+			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/header.php", $header);
 			$footer = substr($arFields["CONTENT"], $p + strlen("#WORK_AREA#"));
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/footer.php", $footer);
+			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/footer.php", $footer);
 		}
 		if(isset($arFields["STYLES"]))
 		{
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/styles.css", $arFields["STYLES"]);
+			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/styles.css", $arFields["STYLES"]);
 		}
 
 		if(isset($arFields["TEMPLATE_STYLES"]))
 		{
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/template_styles.css", $arFields["TEMPLATE_STYLES"]);
+			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/template_styles.css", $arFields["TEMPLATE_STYLES"]);
 		}
 
 		if(isset($arFields["NAME"]) || isset($arFields["DESCRIPTION"]) || isset($arFields["SORT"]))
 		{
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/description.php",
-				'<'.'?'.
-				'$arTemplate = array('."\n".
-				'	"NAME" => "'.EscapePHPString($arFields['NAME']).'",'."\n".
-				'	"DESCRIPTION" => "'.EscapePHPString($arFields['DESCRIPTION']).'",'."\n".
-				'	"SORT" => '.(intval($arFields['SORT']) > 0? intval($arFields['SORT']) : '""').','."\n".
-				');'."\n".
-				'?'.'>'
-			);
+			self::SaveDescription($arFields, $_SERVER["DOCUMENT_ROOT"].$path."/description.php");
 		}
 
-		if(isset($arFields["STYLES_DESCRIPTION"]) && is_array($arFields["STYLES_DESCRIPTION"]))
-		{
-			$str = '<'.'?'."\nreturn array(\n";
-			foreach($arFields["STYLES_DESCRIPTION"] as $code => $val)
-			{
-				$str .= "\t\"".EscapePHPString($code).'" => "'.EscapePHPString($val)."\",\n";
-			}
-			$str .= ");\n".'?'.'>';
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$arFields["ID"]."/.styles.php", $str);
-		}
+		self::SaveStyleDescription($arFields["STYLES_DESCRIPTION"], $_SERVER["DOCUMENT_ROOT"].$path."/.styles.php");
 
 		return $arFields["ID"];
 	}
@@ -268,7 +260,7 @@ class CSiteTemplate
 			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/template_styles.css", $arFields["TEMPLATE_STYLES"]);
 		}
 
-		if(isset($arFields["NAME"]) || isset($arFields["DESCRIPTION"]) || isset($arFields["SORT"]))
+		if(isset($arFields["NAME"]) || isset($arFields["DESCRIPTION"]) || isset($arFields["SORT"]) || isset($arFields["TYPE"]))
 		{
 			$db_t = CSiteTemplate::GetList(array(), array("ID" => $ID), array("NAME", "DESCRIPTION", "SORT"));
 			$ar_t = $db_t->Fetch();
@@ -279,28 +271,15 @@ class CSiteTemplate
 				$arFields["DESCRIPTION"] = $ar_t["DESCRIPTION"];
 			if(!isset($arFields["SORT"]))
 				$arFields["SORT"] = $ar_t["SORT"];
+			if(!isset($arFields["TYPE"]))
+				$arFields["TYPE"] = $ar_t["TYPE"];
+			if(!isset($arFields["EDITOR_STYLES"]))
+				$arFields["EDITOR_STYLES"] = $ar_t["EDITOR_STYLES"];
 
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/description.php",
-				'<'.'?'.
-				'$arTemplate = array('."\n".
-				'	"NAME" => "'.EscapePHPString($arFields['NAME']).'",'."\n".
-				'	"DESCRIPTION" => "'.EscapePHPString($arFields['DESCRIPTION']).'",'."\n".
-				'	"SORT" => '.(intval($arFields['SORT']) > 0? intval($arFields['SORT']) : '""').','."\n".
-				');'."\n".
-				'?'.'>'
-			);
+			self::SaveDescription($arFields, $_SERVER["DOCUMENT_ROOT"].$path."/description.php");
 		}
 
-		if(isset($arFields["STYLES_DESCRIPTION"]) && is_array($arFields["STYLES_DESCRIPTION"]))
-		{
-			$str = '<'.'?'."\nreturn array(\n";
-			foreach($arFields["STYLES_DESCRIPTION"] as $code => $val)
-			{
-				$str .= "\t\"".EscapePHPString($code).'" => "'.EscapePHPString($val)."\",\n";
-			}
-			$str .= ");\n".'?'.'>';
-			$APPLICATION->SaveFileContent($_SERVER["DOCUMENT_ROOT"].$path."/.styles.php", $str);
-		}
+		self::SaveStyleDescription($arFields["STYLES_DESCRIPTION"], $_SERVER["DOCUMENT_ROOT"].$path."/.styles.php");
 
 		return true;
 	}
@@ -388,4 +367,48 @@ class CSiteTemplate
 		}
 		return $arRes;
 	}
+
+	public static function SaveStyleDescription($stylesDesc = array(), $stylesPath)
+	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		if(isset($stylesDesc) && is_array($stylesDesc))
+		{
+			$curStylesDesc = CSiteTemplate::__GetByStylesTitle($stylesPath);
+			if (is_array($curStylesDesc))
+			{
+				foreach($curStylesDesc as $code => $val)
+				{
+					if (!is_array($curStylesDesc[$code]))
+						unset($curStylesDesc[$code]);
+				}
+			}
+			foreach($stylesDesc as $code => $val)
+			{
+				if (!isset($curStylesDesc[EscapePHPString($code)]) || !is_array($curStylesDesc[EscapePHPString($code)]))
+				{
+					$curStylesDesc[EscapePHPString($code)] = EscapePHPString($val);
+				}
+			}
+			$APPLICATION->SaveFileContent($stylesPath, '<'.'?'."\nreturn ".var_export($curStylesDesc, 1).";\n".'?'.'>');
+		}
+	}
+
+	public static function SaveDescription($arFields = array(), $descPath)
+	{
+		/** @global CMain $APPLICATION */
+		global $APPLICATION;
+
+		$arDescription = array(
+			"NAME" => EscapePHPString($arFields['NAME']),
+			"DESCRIPTION" => EscapePHPString($arFields['DESCRIPTION']),
+			"SORT" => (intval($arFields['SORT']) > 0? intval($arFields['SORT']) : ''),
+			"TYPE" => $arFields['TYPE']
+		);
+		if (isset($arFields['EDITOR_STYLES']))
+			$arDescription["EDITOR_STYLES"] = $arFields['EDITOR_STYLES'];
+		$APPLICATION->SaveFileContent($descPath, '<'.'?'."\n\$arTemplate = ".var_export($arDescription, 1).";\n".'?'.'>');
+	}
+
 }

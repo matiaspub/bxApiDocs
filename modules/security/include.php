@@ -1,8 +1,8 @@
 <?
-if(!defined("CACHED_b_sec_iprule")) ;// define("CACHED_b_sec_iprule", 36000);
-if(!defined("CACHED_b_sec_filter_mask")) ;// define("CACHED_b_sec_filter_mask", 36000);
-if(!defined("CACHED_b_sec_frame_mask")) ;// define("CACHED_b_sec_frame_mask", 36000);
-if(!defined("CACHED_b_sec_redirect_url")) ;// define("CACHED_b_sec_redirect_url", 36000);
+if(!defined("CACHED_b_sec_iprule")) // define("CACHED_b_sec_iprule", 36000);
+if(!defined("CACHED_b_sec_filter_mask")) // define("CACHED_b_sec_filter_mask", 36000);
+if(!defined("CACHED_b_sec_frame_mask")) // define("CACHED_b_sec_frame_mask", 36000);
+if(!defined("CACHED_b_sec_redirect_url")) // define("CACHED_b_sec_redirect_url", 36000);
 
 global $DB;
 CModule::AddAutoloadClasses(

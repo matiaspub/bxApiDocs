@@ -665,12 +665,12 @@ class CAllBlogUser
 
 		return array($clientIP, $clientProxy);
 	}
-	
+
 	public static function GetUserInfo($id, $path, $arParams = array())
 	{
-		if (isset($GLOBALS["BLOG_POST"]["BLOG_U_".$id]) && !empty($GLOBALS["BLOG_POST"]["BLOG_U_".$id]))
+		if (!empty(CBlogPost::$arBlogUCache[$id]))
 		{
-			$arResult["arUser"] = $GLOBALS["BLOG_POST"]["BLOG_U_".$id];
+			$arResult["arUser"] = CBlogPost::$arBlogUCache[$id];
 		}
 		else
 		{
@@ -705,8 +705,92 @@ class CAllBlogUser
 				}
 				$arResult["arUser"]["url"] = CComponentEngine::MakePathFromTemplate($path, array("user_id" => $id));
 			}
-			$GLOBALS["BLOG_POST"]["BLOG_U_".$id] = $arResult["arUser"];
+			CBlogPost::$arBlogUCache[$id] = $arResult["arUser"];
 		}
+
+		return $arResult["arUser"];
+	}
+
+	public static function GetUserInfoArray($arId, $path, $arParams = array())
+	{
+		if (
+			!is_array($arId)
+			&& intval($arId) > 0
+		)
+		{
+			$arId = array(
+				intval($arId)
+			);
+		}
+
+		$arId = array_unique($arId);
+
+		$arIdToGet = array();
+		$arResult["arUser"] = array();
+
+		foreach ($arId as $userId)
+		{
+			if (!empty(CBlogPost::$arBlogUCache[$userId]))
+			{
+				$arResult["arUser"][$userId] = CBlogPost::$arBlogUCache[$userId];
+			}
+			else
+			{
+				$arIdToGet[] = $userId;
+			}
+		}
+
+		if (!empty($arIdToGet))
+		{
+			if (intval($arParams["AVATAR_SIZE"]) <= 0)
+			{
+				$arParams["AVATAR_SIZE"] = 42;
+			}
+
+			if (intval($arParams["AVATAR_SIZE_COMMENT"]) <= 0)
+			{
+				$arParams["AVATAR_SIZE_COMMENT"] = 30;
+			}
+
+			$dbUser = CUser::GetList(
+				($sort_by = Array('ID'=>'desc')),
+				($dummy=''),
+				Array("ID" => implode(" | ", $arIdToGet)),
+				Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER"))
+			);
+			while ($arUser = $dbUser->GetNext())
+			{
+				if(IntVal($arUser["PERSONAL_PHOTO"]) > 0)
+				{
+					$arUser["PERSONAL_PHOTO_file"] = CFile::GetFileArray($arUser["PERSONAL_PHOTO"]);
+					$arUser["PERSONAL_PHOTO_resized"] = CFile::ResizeImageGet(
+						$arUser["PERSONAL_PHOTO_file"],
+						array("width" => $arParams["AVATAR_SIZE"], "height" => $arParams["AVATAR_SIZE"]),
+						BX_RESIZE_IMAGE_EXACT,
+						false
+					);
+					if ($arUser["PERSONAL_PHOTO_resized"] !== false)
+					{
+						$arUser["PERSONAL_PHOTO_img"] = CFile::ShowImage($arUser["PERSONAL_PHOTO_resized"]["src"], $arParams["AVATAR_SIZE"], $arParams["AVATAR_SIZE"], "border=0 align='right'");
+					}
+
+					$arUser["PERSONAL_PHOTO_resized_30"] = CFile::ResizeImageGet(
+						$arUser["PERSONAL_PHOTO_file"],
+						array("width" => $arParams["AVATAR_SIZE_COMMENT"], "height" => $arParams["AVATAR_SIZE_COMMENT"]),
+						BX_RESIZE_IMAGE_EXACT,
+						false
+					);
+					if ($arUser["PERSONAL_PHOTO_resized_30"] !== false)
+					{
+						$arUser["PERSONAL_PHOTO_img_30"] = CFile::ShowImage($arUser["PERSONAL_PHOTO_resized_30"]["src"], $arParams["AVATAR_SIZE_COMMENT"], $arParams["AVATAR_SIZE_COMMENT"], "border=0 align='right'");
+					}
+				}
+				$arUser["url"] = CComponentEngine::MakePathFromTemplate($path, array("user_id" => $arUser["ID"]));
+
+				$arResult["arUser"][$arUser["ID"]] = CBlogPost::$arBlogUCache[$arUser["ID"]] = $arUser;
+			}
+		}
+
 		return $arResult["arUser"];
 	}
 }

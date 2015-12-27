@@ -307,7 +307,7 @@ class CBlogPost extends CAllBlogPost
 				"WHERE ID = ".$ID." ";
 			$DB->Query($strSql, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			unset($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID]);
+			unset(static::$arBlogPostCache[$ID]);
 
 			foreach(GetModuleEvents("blog", "OnBeforePostUserFieldUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array("BLOG_POST", $ID, $arFields));
@@ -538,7 +538,7 @@ class CBlogPost extends CAllBlogPost
 			}
 		}
 
-		BXClearCache(true, '/blog/socnet_post/gen/'.$ID);
+		BXClearCache(true, '/blog/socnet_post/gen/'.intval($ID / 100)."/".$ID);
 
 		return $ID;
 	}
@@ -550,9 +550,12 @@ class CBlogPost extends CAllBlogPost
 
 		$ID = IntVal($ID);
 
-		if (isset($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID]) && is_array($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID]) && is_set($GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID], "ID"))
+		if (
+			!empty(static::$arBlogPostCache[$ID])
+			&& is_set(static::$arBlogPostCache[$ID], "ID")
+		)
 		{
-			return $GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID];
+			return static::$arBlogPostCache[$ID];
 		}
 		else
 		{
@@ -567,7 +570,7 @@ class CBlogPost extends CAllBlogPost
 			$dbResult = $DB->Query($strSql.$ID, False, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arResult = $dbResult->Fetch())
 			{
-				$GLOBALS["BLOG_POST"]["BLOG_POST_CACHE_".$ID] = $arResult;
+				static::$arBlogPostCache[$ID] = $arResult;
 				return $arResult;
 			}
 		}
@@ -694,8 +697,11 @@ class CBlogPost extends CAllBlogPost
 			"BLOG_SOCNET_GROUP_ID" => array("FIELD" => "B.SOCNET_GROUP_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog B ON (P.BLOG_ID = B.ID)"),
 			"SOCNET_GROUP_ID" => array("FIELD" => "SR1.ENTITY_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog_socnet_rights SR1 ON (P.ID = SR1.POST_ID AND SR1.ENTITY_TYPE = 'SG')"),
 			"SOCNET_SITE_ID" => array("FIELD" => "SLS.SITE_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_sonet_log BSL ON (BSL.EVENT_ID in ('blog_post', 'blog_post_micro', 'blog_post_important') AND BSL.SOURCE_ID = P.ID) ".
-				"LEFT JOIN b_sonet_log_site SLS ON BSL.ID = SLS.LOG_ID")
+				"LEFT JOIN b_sonet_log_site SLS ON BSL.ID = SLS.LOG_ID"),
+
+			"COMMENT_ID" => array("FIELD" => "PC.ID", "TYPE" => "string", "FROM" => "INNER JOIN b_blog_comment PC ON (P.ID = PC.POST_ID)"),
 		);
+		$ii = 0;
 		foreach ($arFilter as $key => $val)
 		{
 			$key_res = CBlog::GetFilterOperation($key);

@@ -12,6 +12,9 @@
  * @global CMain $APPLICATION
  * @global $SiteExpireDate
  */
+
+use Bitrix\Main;
+
 global $USER, $APPLICATION;
 
 // define("START_EXEC_PROLOG_AFTER_1", microtime());
@@ -67,17 +70,23 @@ if(defined("DEMO") && DEMO=="Y")
 
 if(COption::GetOptionString("main", "site_stopped", "N")=="Y" && !$USER->CanDoOperation('edit_other_settings'))
 {
-	if(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/site_closed.php"))
-		include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/".LANG."/site_closed.php");
-	elseif(file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/include/site_closed.php"))
-		include($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/php_interface/include/site_closed.php");
+	if(($siteClosed = getLocalPath("php_interface/".LANG."/site_closed.php", BX_PERSONAL_ROOT)) !== false)
+	{
+		include($_SERVER["DOCUMENT_ROOT"].$siteClosed);
+	}
+	elseif(($siteClosed = getLocalPath("php_interface/include/site_closed.php", BX_PERSONAL_ROOT)) !== false)
+	{
+		include($_SERVER["DOCUMENT_ROOT"].$siteClosed);
+	}
 	else
+	{
 		include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/site_closed.php");
+	}
 	die();
 }
 
 $sPreviewFile = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/tmp/templates/__bx_preview/header.php";
-if($_GET['bx_template_preview_mode'] == 'Y' && $USER->CanDoOperation('edit_other_settings') && file_exists($sPreviewFile))
+if(defined("SITE_TEMPLATE_PREVIEW_MODE") && file_exists($sPreviewFile))
 {
 	include_once($sPreviewFile);
 }
@@ -126,3 +135,22 @@ if($APPLICATION->GetShowIncludeAreas())
 }
 // define("START_EXEC_PROLOG_AFTER_2", microtime());
 $GLOBALS["BX_STATE"] = "WA";
+$APPLICATION->RestartWorkarea(true);
+
+//magically replacing the current file with another one
+$event = new Main\Event("main", "OnFileRewrite", array("path" => Main\Context::getCurrent()->getRequest()->getScriptFile()));
+$event->send();
+
+foreach($event->getResults() as $evenResult)
+{
+	if(($result = $evenResult->getParameters()) <> '')
+	{
+		$file = new Main\IO\File($_SERVER["DOCUMENT_ROOT"].$result);
+		if($file->isExists())
+		{
+			//only the first result matters
+			include($file->getPhysicalPath());
+			die();
+		}
+	}
+}

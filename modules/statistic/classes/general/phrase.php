@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>.</body> </html>
- *
- *
+ * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>. 
  *
  *
  * @return mixed 
@@ -17,8 +15,6 @@ class CPhrase
 	
 	/**
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковых фраз</a> с возможностью группировки по поисковое фразе или <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a>.</p>
-	*
-	*
 	*
 	*
 	* @param string &$by = "s_id" Поле для сортировки. В зависимости от группировки списка, набор
@@ -40,12 +36,8 @@ class CPhrase
 	* страница на которую пришли; </li> <li> <b>s_session_id</b> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>. </li> </ul> </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b> - ID записи; </li> <li>
@@ -75,37 +67,25 @@ class CPhrase
 	* группировка по поисковой системе. </li> </ul> </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @param int &$total  Суммарное количество поисковых фраз. Принимает значение только
 	* при установленной группировке.
-	*
-	*
 	*
 	* @param string &$group_by  Группировка списка поисковых фраз. Возможные значения: <ul> <li> <b>P</b>
 	* - группировка по поисковой фразе; </li> <li> <b>S</b> - группировка по
 	* поисковой системе. </li> </ul>
 	*
-	*
-	*
 	* @param int &$max  Количество заходов по самой популярной поисковой фразе.
 	* Принимает значение только при установленной группировке.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>// отфильтруем только те поисковые фразы<br>// которые искали на сайте с помощью внутреннего поиска<br>$arFilter = array(<br>    "SEARCHER_ID"  =&gt; 1<br>    );<br><br>// получим список записей<br>$rs = <b>CPhrase::GetList</b>(<br>    ($by = "s_id"), <br>    ($order = "desc"), <br>    $arFilter, <br>    $is_filtered,<br>    $total,<br>    $group_by,<br>    $max<br>    );<br><br>// выведем все записи<br>while ($ar = $rs-&gt;Fetch())<br>{<br>    echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    <br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

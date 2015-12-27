@@ -1,11 +1,10 @@
 <?
+use Bitrix\Main\Loader;
 IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlock</b> - класс для работы с информационными блоками</body> </html>
- *
- *
+ * <b>CIBlock</b> - класс для работы с информационными блоками 
  *
  *
  * @return mixed 
@@ -18,11 +17,14 @@ class CAllIBlock
 {
 	public $LAST_ERROR = "";
 	protected static $disabledCacheTag = array();
+	protected static $enableClearTagCache = 0;
+
+	protected static $catalogIncluded = null;
+	protected static $workflowIncluded = null;
+
 	
 	/**
-	* <p>Добавляет в административную панель кнопки для быстрого перехода к редактированию объектов модуля информационных блоков, с учётом прав доступа. Также состав кнопок различен для разных режимов панели. <br></p>
-	*
-	*
+	* <p>Добавляет в административную панель кнопки для быстрого перехода к редактированию объектов модуля информационных блоков, с учётом прав доступа. Также состав кнопок различен для разных режимов панели. Метод статический. <br></p>
 	*
 	*
 	* @param int $IBLOCK_ID = 0 Код информационного блока. <br> если задан (больше нуля), то в панель
@@ -30,35 +32,23 @@ class CAllIBlock
 	* информационного блока, на добавление в него разделов и элементов.
 	* <br>
 	*
-	*
-	*
 	* @param int $ELEMENT_ID = 0 Код элемента информационного блока. <br> если задан (больше нуля),
 	* то в панель добавляются кнопки на редактирование этого элемента
 	* и просмотр его истории изменений (при установленном модуле
 	* документооборота).
 	*
-	*
-	*
 	* @param int $SECTION_ID = "" Код раздела информационного блока. <br> если задан, то в панель
 	* добавляются кнопки на изменение свойств этого раздела. <br>
-	*
-	*
 	*
 	* @param string $type = "news" Тип информационного блока. <br> если задан, то в панель добавляется
 	* кнопка добавления нового информационного блока.
 	*
-	*
-	*
 	* @param bool $bGetIcons = false Если параметр равен true, то вместо добавления кнопок в панель
-	* функция возвращает массив описывающий кнопки.
-	*
-	*
+	* метод возвращает массив описывающий кнопки.
 	*
 	* @param string $componentName = "" Если задан, то будет выводиться соответствующая подпись
 	* группирующая действия. Если не задан, то название будет
-	* определено из описания компонента 2.0 вызвавшего эту функцию.
-	*
-	*
+	* определено из описания компонента 2.0, вызвавшего этот метод.
 	*
 	* @param array $arLabels = array() Если задан, то элементы этого массива будут использованы для
 	* вывода названий кнопок и всплывающих подсказок. Возможны
@@ -76,16 +66,12 @@ class CAllIBlock
 	* списка разделов;</li> <li>SECTIONS_NAME_TITLE - всплывающая подсказка кнопки
 	* просмотра списка разделов.</li> </ul>
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$IBLOCK_TYPE = 'catalog';<br>if(CModule::IncludeModule('iblock')):<br>	if($arIBlockElement = GetIBlockElement($_GET['ID'], $IBLOCK_TYPE)):<br>		CIBlock::ShowPanel($arIBlockElement['IBLOCK_ID'], $_GET['ID'], 0, $IBLOCK_TYPE);<br>		$APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>		$APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], $arIBlockElement['LIST_PAGE_URL']);<br>		?&gt;<br>		&lt;?=$arIBlockElement['NAME']?&gt;&lt;br&gt;<br>		&lt;?=$arIBlockElement['DETAIL_TEXT']?&gt;<br>		&lt;?<br>	endif;<br>endif;<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -131,27 +117,19 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Метод добавляет в панель управления кнопки, отвечающие за управление элементами инфоблока (в методе производится вызов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a>). </p>
-	*
-	*
+	* <p>Метод добавляет в панель управления кнопки, отвечающие за управление элементами инфоблока (в методе производится вызов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a>). Метод динамичный.</p>
 	*
 	*
 	* @param string $mode  Режим отображения административной панели. Возвращается методом
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php">CMain::GetPublicShowMode</a>.
 	*
-	*
-	*
 	* @param string $componentName  Название компонента, который регистрирует кнопки. Возвращается
 	* методом <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponent/getname.php">CBitrixComponent::GetName</a>.
 	*
-	*
-	*
 	* @param array $arButtons  Массив кнопок, которые можно зарегистрировать с учётом текущих
 	* прав пользователя. Формируется методом <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpanelbuttons.php">CIBlock::GetPanelButtons</a>.
-	*
-	*
 	*
 	* @return mixed 
 	*
@@ -282,22 +260,14 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Метод возвращает массив, описывающий набор кнопок для управления элементами инфоблока. </p>
-	*
-	*
+	* <p>Метод возвращает массив, описывающий набор кнопок для управления элементами инфоблока. Метод статический.</p>
 	*
 	*
 	* @param int $IBLOCK_ID = 0 Идентификатор инфоблока, которому принадлежит элемент.
 	*
-	*
-	*
 	* @param int $ELEMENT_ID = 0 Идентификатор текущего элемента информационного блока.
 	*
-	*
-	*
 	* @param int $SECTION_ID = 0 Идентификатор раздела инфоблока (при наличии).
-	*
-	*
 	*
 	* @param array $arOptions = array() Массив, содержащий локализацию названий и <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">всплывающих подсказок к
@@ -307,8 +277,6 @@ class CAllIBlock
 	* <br><br> Если массив отсутствует, то настройки локализации берутся
 	* из настроек информационных блоков, которые возвращаются методом
 	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetArrayByID.php">CIBlock::GetArrayByID</a>.
-	*
-	*
 	*
 	* @return array <p>Массив, описывающий набор кнопок (добавление, редактирование,
 	* настройка и пр.) с учётом уровней права доступа к информационным
@@ -327,6 +295,8 @@ class CAllIBlock
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;
 
+		$windowParams = array('width' => 700, 'height' => 400, 'resize' => false);
+
 		$arButtons = array(
 			"view" => array(),
 			"edit" => array(),
@@ -334,19 +304,12 @@ class CAllIBlock
 			"submenu" => array(),
 		);
 
-		if(array_key_exists("SECTION_BUTTONS", $arOptions) && $arOptions["SECTION_BUTTONS"] === false)
-			$bSectionButtons = false;
-		else
-			$bSectionButtons = true;
+		$bSectionButtons = !(isset($arOptions['SECTION_BUTTONS']) && $arOptions['SECTION_BUTTONS'] === false);
+		$bSessID = !(isset($arOptions['SESSID']) && $arOptions['SESSID'] === false);
 
-		if(array_key_exists("SESSID", $arOptions) && $arOptions["SESSID"] === false)
-			$bSessID = false;
-		else
-			$bSessID = true;
-
-		$IBLOCK_ID = intval($IBLOCK_ID);
-		$ELEMENT_ID = intval($ELEMENT_ID);
-		$SECTION_ID = intval($SECTION_ID);
+		$IBLOCK_ID = (int)$IBLOCK_ID;
+		$ELEMENT_ID = (int)$ELEMENT_ID;
+		$SECTION_ID = (int)$SECTION_ID;
 
 		if(($ELEMENT_ID > 0) && (($IBLOCK_ID <= 0) || ($bSectionButtons && $SECTION_ID == 0)))
 		{
@@ -367,10 +330,25 @@ class CAllIBlock
 			return $arButtons;
 
 		$bCatalog = false;
-		if(isset($arOptions["CATALOG"]) && $arOptions["CATALOG"] == true)
+		$useCatalogButtons = (($ELEMENT_ID <= 0 || isset($arOptions['SHOW_CATALOG_BUTTONS'])) && !empty($arOptions['USE_CATALOG_BUTTONS']) && is_array($arOptions['USE_CATALOG_BUTTONS']));
+		$catalogButtons = array();
+		if ($useCatalogButtons || (isset($arOptions["CATALOG"]) && $arOptions["CATALOG"] == true))
 		{
-			if(CModule::IncludeModule('catalog'))
-				$bCatalog = true;
+			if (self::$catalogIncluded === null)
+				self::$catalogIncluded = \Bitrix\Main\Loader::includeModule('catalog');
+			$bCatalog = self::$catalogIncluded;
+			if (!self::$catalogIncluded)
+				$useCatalogButtons = false;
+		}
+
+		if ($useCatalogButtons)
+		{
+			if (isset($arOptions['USE_CATALOG_BUTTONS']['add_product']) && $arOptions['USE_CATALOG_BUTTONS']['add_product'] == true)
+				$catalogButtons['add_product'] = true;
+			if (isset($arOptions['USE_CATALOG_BUTTONS']['add_sku']) && $arOptions['USE_CATALOG_BUTTONS']['add_sku'] == true)
+				$catalogButtons['add_sku'] = true;
+			if (empty($catalogButtons))
+				$useCatalogButtons = false;
 		}
 
 		$return_url = array(
@@ -386,7 +364,7 @@ class CAllIBlock
 			"section_list" => "",
 		);
 
-		if(array_key_exists("RETURN_URL", $arOptions))
+		if(isset($arOptions['RETURN_URL']))
 		{
 			if(is_array($arOptions["RETURN_URL"]))
 			{
@@ -408,10 +386,9 @@ class CAllIBlock
 			{
 				if(empty($str))
 				{
+					$str = \Bitrix\Main\Context::getCurrent()->getServer()->getRequestUri();
 					if(defined("BX_AJAX_PARAM_ID"))
-						$str = $APPLICATION->GetCurPageParam("", array(BX_AJAX_PARAM_ID));
-					else
-						$str = $APPLICATION->GetCurPageParam();
+						$str = CHTTP::urlDeleteParams($str, array(BX_AJAX_PARAM_ID));
 				}
 
 				$return_url[$key] = $str;
@@ -419,7 +396,9 @@ class CAllIBlock
 		}
 
 		$arIBlock = CIBlock::GetArrayByID($IBLOCK_ID);
-		$bWorkflow = CModule::IncludeModule("workflow") && ($arIBlock["WORKFLOW"] !== "N");
+		if (self::$workflowIncluded === null)
+			self::$workflowIncluded = \Bitrix\Main\Loader::includeModule('workflow');
+		$bWorkflow = self::$workflowIncluded && ($arIBlock["WORKFLOW"] !== "N");
 		$s = $bWorkflow? "&WF=Y": "";
 
 		$arLabels = $arOptions["LABELS"];
@@ -437,9 +416,7 @@ class CAllIBlock
 			$action = $APPLICATION->GetPopupLink(
 				array(
 					"URL" => $url,
-					"PARAMS" => array(
-						"width" => 700, 'height' => 400, 'resize' => false,
-					),
+					"PARAMS" => $windowParams,
 				)
 			);
 
@@ -477,48 +454,53 @@ class CAllIBlock
 
 		if(CIBlockSectionRights::UserHasRightTo($IBLOCK_ID, $SECTION_ID, "section_element_bind"))
 		{
-			$url = "/bitrix/admin/".CIBlock::GetAdminElementEditLink($IBLOCK_ID, null, array(
+			$params = array(
 				"force_catalog" => $bCatalog,
 				"filter_section" => $SECTION_ID,
 				"IBLOCK_SECTION_ID" => $SECTION_ID,
 				"bxpublic" => "Y",
 				"from_module" => "iblock",
 				"return_url" => $return_url["add_element"],
-			));
-
-			$action = $APPLICATION->GetPopupLink(
-				array(
-					"URL" => $url,
-					"PARAMS" => array(
-						"width" => 700,
-						'height' => 400,
-						'resize' => false,
-					),
-				)
-			);
-			$arButton = array(
-				"TEXT" => (strlen($arLabels["ELEMENT_ADD_TEXT"])? $arLabels["ELEMENT_ADD_TEXT"]: $arIBlock["ELEMENT_ADD"]),
-				"TITLE" => (strlen($arLabels["ELEMENT_ADD_TITLE"])? $arLabels["ELEMENT_ADD_TITLE"]: $arIBlock["ELEMENT_ADD"]),
-				"ACTION" => 'javascript:'.$action,
-				"ACTION_URL" => $url,
-				"ONCLICK" => $action,
-				"ICON" => "bx-context-toolbar-create-icon",
-				"ID" => "bx-context-toolbar-add-element",
-			);
-			$arButtons["edit"]["add_element"] = $arButton;
-			$arButtons["configure"]["add_element"] = $arButton;
-			$arButtons["intranet"][] = array(
-				'TEXT' => $arButton["TEXT"],
-				'TITLE' => $arButton["TITLE"],
-				'ICON'	=> 'add',
-				'ONCLICK' => $arButton["ACTION"],
-				'SORT' => 1000,
 			);
 
-			$url = str_replace("&bxpublic=Y&from_module=iblock", "", $url);
-			$arButton["ACTION"] = "javascript:jsUtils.Redirect([], '".CUtil::JSEscape($url)."')";
-			unset($arButton["ONCLICK"]);
-			$arButtons["submenu"]["add_element"] = $arButton;
+			if ($useCatalogButtons)
+			{
+				CCatalogAdminTools::setProductFormParams();
+				CCatalogAdminTools::setCatalogPanelButtons($arButtons, $IBLOCK_ID, $catalogButtons, $params, $windowParams);
+			}
+			else
+			{
+				$url = "/bitrix/admin/".CIBlock::GetAdminElementEditLink($IBLOCK_ID, null, $params);
+				$action = $APPLICATION->GetPopupLink(
+					array(
+						"URL" => $url,
+						"PARAMS" => $windowParams,
+					)
+				);
+				$arButton = array(
+					"TEXT" => (strlen($arLabels["ELEMENT_ADD_TEXT"]) ? $arLabels["ELEMENT_ADD_TEXT"] : $arIBlock["ELEMENT_ADD"]),
+					"TITLE" => (strlen($arLabels["ELEMENT_ADD_TITLE"]) ? $arLabels["ELEMENT_ADD_TITLE"] : $arIBlock["ELEMENT_ADD"]),
+					"ACTION" => 'javascript:'.$action,
+					"ACTION_URL" => $url,
+					"ONCLICK" => $action,
+					"ICON" => "bx-context-toolbar-create-icon",
+					"ID" => "bx-context-toolbar-add-element",
+				);
+				$arButtons["edit"]["add_element"] = $arButton;
+				$arButtons["configure"]["add_element"] = $arButton;
+				$arButtons["intranet"][] = array(
+					'TEXT' => $arButton["TEXT"],
+					'TITLE' => $arButton["TITLE"],
+					'ICON' => 'add',
+					'ONCLICK' => $arButton["ACTION"],
+					'SORT' => 1000,
+				);
+
+				$url = str_replace("&bxpublic=Y&from_module=iblock", "", $url);
+				$arButton["ACTION"] = "javascript:jsUtils.Redirect([], '".CUtil::JSEscape($url)."')";
+				unset($arButton["ONCLICK"]);
+				$arButtons["submenu"]["add_element"] = $arButton;
+			}
 		}
 
 		if($ELEMENT_ID > 0 && CIBlockElementRights::UserHasRightTo($IBLOCK_ID, $ELEMENT_ID, "element_delete"))
@@ -575,9 +557,7 @@ class CAllIBlock
 					$action = $APPLICATION->GetPopupLink(
 						array(
 							"URL" => $url,
-							"PARAMS" => array(
-								"width" => 700, 'height' => 400, 'resize' => false,
-							),
+							"PARAMS" => $windowParams,
 						)
 					);
 
@@ -614,9 +594,7 @@ class CAllIBlock
 					$action = $APPLICATION->GetPopupLink(
 						array(
 							"URL" => $url,
-							"PARAMS" => array(
-								"width" => 700, 'height' => 400, 'resize' => false,
-							),
+							"PARAMS" => $windowParams,
 						)
 					);
 
@@ -727,24 +705,18 @@ class CAllIBlock
 	 */
 	
 	/**
-	* <p>Функция возвращает список сайтов к которым привязан инфоблок. <br></p>
-	*
-	*
+	* <p>Метод возвращает список сайтов к которым привязан инфоблок. Метод статический. <br></p>
 	*
 	*
 	* @param int $iblock_id  Идентификатор информационного блока. <br>
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a></p> </h
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$SITES = '';<br>$rsSites = CIBlock::GetSite($IBLOCK_ID);<br>while($arSite = $rsSites-&gt;Fetch())<br>	$SITES .= ($SITES!=""?" / ":"").htmlspecialchars($arSite["SITE_ID"]);<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -771,17 +743,12 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает информационный блок по его коду <i>ID</i>.</p>
-	*
-	*
+	* <p>Возвращает информационный блок по его коду <i>ID</i>. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код информационного блока.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -791,7 +758,6 @@ class CAllIBlock
 	*   echo $ar_res['NAME'];
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -816,28 +782,20 @@ class CAllIBlock
 	 */
 	
 	/**
-	* <p>Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей</a> информационного блока.</p> <p><b>Примечание</b>: если инфоблока с таким ID не существует, то функция вернет false.</p>
-	*
-	*
+	* <p>Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей</a> информационного блока. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: если инфоблока с таким ID не существует, то метод вернет false.</div>
 	*
 	*
 	* @param int $ID  Идентификатор информационного блока <br>
 	*
-	*
-	*
-	* @param string $FIELD = "" Идентификатор поля. Если этот параметр задан, то функция вернет
+	* @param string $FIELD = "" Идентификатор поля. Если этот параметр задан, то метод вернет
 	* значение конкретного поля. <br>
 	*
-	*
-	*
 	* @return array <p>Массив полей инфоблока.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>echo CIBlock::GetArrayByID($IBLOCK_ID, "NAME");<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -914,7 +872,10 @@ class CAllIBlock
 					CIBlock::CleanCache($ID);
 				}
 
-				if(!array_key_exists("FIELDS", $arResult))
+				if (
+					!array_key_exists("FIELDS", $arResult)
+					|| !is_array($arResult["FIELDS"]["IBLOCK_SECTION"]["DEFAULT_VALUE"])
+				)
 				{
 					$arResult["FIELDS"] = CIBlock::GetFields($ID);
 					CIBlock::CleanCache($ID);
@@ -955,9 +916,7 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Метод добавляет новый информационный блок. Модифицировать поля, а также отменить создание инфоблока можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a>.</p>
-	*
-	*
+	* <p>Метод добавляет новый информационный блок. Модифицировать поля, а также отменить создание инфоблока можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
@@ -979,16 +938,12 @@ class CAllIBlock
 	* следует указать два дополнительных поля: <i>BIZPROC</i>, принимающее
 	* значение <b>Y</b>, и <i>WORKFLOW</i>, принимающее значение <b>N</b>.
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1199,14 +1154,10 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция изменяет параметры информационного блока с кодом <i>ID</i>. Модифицировать поля, а также отменить изменение параметров можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>.</p>
-	*
-	*
+	* <p>Метод изменяет параметры информационного блока с кодом <i>ID</i>. Модифицировать поля, а также отменить изменение параметров можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  ID изменяемого информационного блока.
-	*
-	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">всех полей</a> информационного
@@ -1221,16 +1172,12 @@ class CAllIBlock
 	* задано поле "FIELDS", то будут выполнены настройки полей инфоблока
 	* (см. <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>). <br>
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1248,11 +1195,9 @@ class CAllIBlock
 	*/
 	public function Update($ID, $arFields)
 	{
-		/** @global CCacheManager $CACHE_MANAGER */
-		global $CACHE_MANAGER;
 		/** @global CDatabase $DB */
 		global $DB;
-		$ID = intval($ID);
+		$ID = (int)$ID;
 		$SAVED_PICTURE = null;
 
 		if(is_set($arFields, "EXTERNAL_ID"))
@@ -1299,6 +1244,9 @@ class CAllIBlock
 
 		if(is_set($arFields, "SECTION_PROPERTY"))
 			$arFields["SECTION_PROPERTY"] = "Y";
+
+		if(is_set($arFields, "PROPERTY_INDEX") && $arFields["PROPERTY_INDEX"]!="I" && $arFields["PROPERTY_INDEX"]!="Y")
+			$arFields["SECTION_PROPERTY"] = "N";
 
 		$RIGHTS_MODE = CIBlock::GetArrayByID($ID, "RIGHTS_MODE");
 
@@ -1436,8 +1384,7 @@ class CAllIBlock
 		foreach (GetModuleEvents("iblock", "OnAfterIBlockUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
-			$CACHE_MANAGER->ClearByTag("iblock_id_".$ID);
+		self::clearIblockTagCache($ID);
 
 		return $Result;
 	}
@@ -1447,18 +1394,13 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Функция удаляет информационный блок.</p>
-	*
-	*
+	* <p>Метод удаляет информационный блок. Метод статический.</p>
 	*
 	*
 	* @param int $ID  Код информационного блока.
 	*
-	*
-	*
 	* @return bool <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockdelete.php">OnBeforeIBlockDelete</a><a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1479,10 +1421,8 @@ class CAllIBlock
 		global $APPLICATION;
 		/** @global CUserTypeManager $USER_FIELD_MANAGER */
 		global $USER_FIELD_MANAGER;
-		/** @global CCacheManager $CACHE_MANAGER */
-		global $CACHE_MANAGER;
 
-		$ID = IntVal($ID);
+		$ID = (int)$ID;
 
 		$APPLICATION->ResetException();
 		foreach(GetModuleEvents("iblock", "OnBeforeIBlockDelete", true) as $arEvent)
@@ -1570,8 +1510,10 @@ class CAllIBlock
 
 		CIBlock::CleanCache($ID);
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
-			$CACHE_MANAGER->ClearByTag("iblock_id_".$ID);
+		foreach(GetModuleEvents("iblock", "OnAfterIBlockDelete", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($ID));
+
+		self::clearIblockTagCache($ID);
 
 		$_SESSION["SESS_RECOUNT_DB"] = "Y";
 		return true;
@@ -1708,30 +1650,22 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Функция устанавливает права доступа <span class="syntax"><i>arPERMISSIONS</i> для информационного блока <i>IBLOCK_ID</i></span>. Перед этим все права установленные ранее снимаются. <br></p>
-	*
-	*
+	* <p>Метод устанавливает права доступа <span class="syntax"><i>arPERMISSIONS</i> для информационного блока <i>IBLOCK_ID</i></span>. Перед этим все права установленные ранее снимаются. Метод динамичный. <br></p>
 	*
 	*
 	* @param int $IBLOCK_ID  Код информационного блока.
-	*
-	*
 	*
 	* @param array $arPERMISSIONS  Массив вида Array("код группы"=&gt;"право доступа", ....), где <i>право
 	* доступа</i>: <br> D - доступ запрещён, <br> R - чтение, <br> U - редактирование
 	* через документооборот, <br> W - запись, <br> X - полный доступ (запись +
 	* назначение прав доступа на данный инфоблок).
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>CIBlock::SetPermission($IBLOCK_ID, Array("1"=&gt;"X", "2"=&gt;"R", "3"=&gt;"W"));<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1824,21 +1758,14 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Функция устанавливает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update.</a></p> <p><b>Примечание</b>: Значения полей не указанных в параметре arFields сохраняются.</p>
-	*
-	*
+	* <p>Метод устанавливает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: значения полей не указанных в параметре arFields сохраняются.</div>
 	*
 	*
 	* @param int $ID  Код инфоблока <br>
 	*
-	*
-	*
 	* @param array $arFields  Массив вида array("Поле" =&gt; "Значение" ...) <br>
 	*
-	*
-	*
-	* @return mixed <p>Эта функция ничего не возвращает.</p>
-	*
+	* @return mixed <p>Метод ничего не возвращает.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
@@ -1901,26 +1828,19 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Функция возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока.</p>
-	*
-	*
+	* <p>Метод возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Метод статический.</p>
 	*
 	*
 	* @param int $ID  Код инфоблока.
-	*
-	*
 	*
 	* @param string $type = "" Код типа инфоблоков. <br><br> Параметр используется только тогда,
 	* когда инфоблок с указанным ID не найден или указан 0. В этом случае
 	* берутся значения дополнительных полей из этого типа. <br> Если ID
 	* задан и такой инфоблок есть, то параметр type игнорируется.
 	*
-	*
-	*
 	* @return array <p>Массив значений <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a>
 	* инфоблока.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetMessages.php">CIBlock::SetMessages</a></li>
@@ -2009,198 +1929,214 @@ REQ
 +	CODE 			varchar(255),
 +	TAGS 			varchar(255),
 **************/
-		$jpgQuality = intval(COption::GetOptionString('main', 'image_resize_quality', '95'));
-		if($jpgQuality <= 0 || $jpgQuality > 100)
-			$jpgQuality = 95;
-
 		static $res = false;
-		if(!$res)
-		$res = array(
-			"IBLOCK_SECTION" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_SECTIONS"),
-				"IS_REQUIRED" => false,
-			),
-			"ACTIVE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE"),
-				"IS_REQUIRED" => "Y",
-			),
-			"ACTIVE_FROM" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE_PERIOD_FROM"),
-				"IS_REQUIRED" => false,
-			),
-			"ACTIVE_TO" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE_PERIOD_TO"),
-				"IS_REQUIRED" => false,
-			),
-			"SORT" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_SORT"),
-				"IS_REQUIRED" => false,
-			),
-			"NAME" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
-				"IS_REQUIRED" => "Y",
-			),
-			"PREVIEW_PICTURE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"METHOD" => "resample",
-					"COMPRESSION" => $jpgQuality,
-				)),
-			),
-			"PREVIEW_TEXT_TYPE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_TEXT_TYPE"),
-				"IS_REQUIRED" => "Y",
-			),
-			"PREVIEW_TEXT" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_TEXT"),
-				"IS_REQUIRED" => false,
-			),
-			"DETAIL_PICTURE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"METHOD" => "resample",
-					"COMPRESSION" => $jpgQuality,
-				)),
-			),
-			"DETAIL_TEXT_TYPE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_TEXT_TYPE"),
-				"IS_REQUIRED" => "Y",
-			),
-			"DETAIL_TEXT" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_TEXT"),
-				"IS_REQUIRED" => false,
-			),
-			"XML_ID" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_XML_ID"),
-				"IS_REQUIRED" => false,
-			),
-			"CODE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_CODE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"UNIQUE" => "N",
-					"TRANSLITERATION" => "N",
-					"TRANS_LEN" => 100,
-					"TRANS_CASE" => "L",
-					"TRANS_SPACE" => "-",
-					"TRANS_OTHER" => "-",
-					"TRANS_EAT" => "Y",
-					"USE_GOOGLE" => "N",
-				)),
-			),
-			"TAGS" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_TAGS"),
-				"IS_REQUIRED" => false,
-			),
+		if (!$res)
+		{
+			$jpgQuality = intval(COption::GetOptionString('main', 'image_resize_quality', '95'));
+			if($jpgQuality <= 0 || $jpgQuality > 100)
+				$jpgQuality = 95;
 
-			"SECTION_NAME" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
-				"IS_REQUIRED" => "Y",
-			),
-			"SECTION_PICTURE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"METHOD" => "resample",
-					"COMPRESSION" => $jpgQuality,
-				)),
-			),
-			"SECTION_DESCRIPTION_TYPE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_SECTION_DESCRIPTION_TYPE"),
-				"IS_REQUIRED" => "Y",
-			),
-			"SECTION_DESCRIPTION" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_SECTION_DESCRIPTION"),
-				"IS_REQUIRED" => false,
-			),
-			"SECTION_DETAIL_PICTURE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"METHOD" => "resample",
-					"COMPRESSION" => $jpgQuality,
-				)),
-			),
-			"SECTION_XML_ID" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_XML_ID"),
-				"IS_REQUIRED" => false,
-			),
-			"SECTION_CODE" => array(
-				"NAME" => GetMessage("IBLOCK_FIELD_CODE"),
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => serialize(array(
-					"UNIQUE" => "N",
-					"TRANSLITERATION" => "N",
-					"TRANS_LEN" => 100,
-					"TRANS_CASE" => "L",
-					"TRANS_SPACE" => "-",
-					"TRANS_OTHER" => "-",
-					"TRANS_EAT" => "Y",
-					"USE_GOOGLE" => "N",
-				)),
-			),
-			"LOG_SECTION_ADD" => array(
-				"NAME" => "LOG_SECTION_ADD",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"LOG_SECTION_EDIT" => array(
-				"NAME" => "LOG_SECTION_EDIT",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"LOG_SECTION_DELETE" => array(
-				"NAME" => "LOG_SECTION_DELETE",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"LOG_ELEMENT_ADD" => array(
-				"NAME" => "LOG_ELEMENT_ADD",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"LOG_ELEMENT_EDIT" => array(
-				"NAME" => "LOG_ELEMENT_EDIT",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"LOG_ELEMENT_DELETE" => array(
-				"NAME" => "LOG_ELEMENT_DELETE",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-			),
-			"XML_IMPORT_START_TIME" => array(
-				"NAME" => "XML_IMPORT_START_TIME",
-				"IS_REQUIRED" => false,
-				"DEFAULT_VALUE" => false,
-				"VISIBLE" => "N",
-			),
-		);
+			$res = array(
+				"IBLOCK_SECTION" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_SECTIONS"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"KEEP_IBLOCK_SECTION_ID" => "N",
+					)),
+				),
+				"ACTIVE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE"),
+					"IS_REQUIRED" => "Y",
+				),
+				"ACTIVE_FROM" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE_PERIOD_FROM"),
+					"IS_REQUIRED" => false,
+				),
+				"ACTIVE_TO" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_ACTIVE_PERIOD_TO"),
+					"IS_REQUIRED" => false,
+				),
+				"SORT" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_SORT"),
+					"IS_REQUIRED" => false,
+				),
+				"NAME" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
+					"IS_REQUIRED" => "Y",
+				),
+				"PREVIEW_PICTURE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"METHOD" => "resample",
+						"COMPRESSION" => $jpgQuality,
+					)),
+				),
+				"PREVIEW_TEXT_TYPE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_TEXT_TYPE"),
+					"IS_REQUIRED" => "Y",
+				),
+				"PREVIEW_TEXT" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_TEXT"),
+					"IS_REQUIRED" => false,
+				),
+				"DETAIL_PICTURE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"METHOD" => "resample",
+						"COMPRESSION" => $jpgQuality,
+					)),
+				),
+				"DETAIL_TEXT_TYPE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_TEXT_TYPE"),
+					"IS_REQUIRED" => "Y",
+				),
+				"DETAIL_TEXT" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_TEXT"),
+					"IS_REQUIRED" => false,
+				),
+				"XML_ID" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_XML_ID"),
+					"IS_REQUIRED" => false,
+				),
+				"CODE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_CODE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"UNIQUE" => "N",
+						"TRANSLITERATION" => "N",
+						"TRANS_LEN" => 100,
+						"TRANS_CASE" => "L",
+						"TRANS_SPACE" => "-",
+						"TRANS_OTHER" => "-",
+						"TRANS_EAT" => "Y",
+						"USE_GOOGLE" => "N",
+					)),
+				),
+				"TAGS" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_TAGS"),
+					"IS_REQUIRED" => false,
+				),
+
+				"SECTION_NAME" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_NAME"),
+					"IS_REQUIRED" => "Y",
+				),
+				"SECTION_PICTURE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_PREVIEW_PICTURE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"METHOD" => "resample",
+						"COMPRESSION" => $jpgQuality,
+					)),
+				),
+				"SECTION_DESCRIPTION_TYPE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_SECTION_DESCRIPTION_TYPE"),
+					"IS_REQUIRED" => "Y",
+				),
+				"SECTION_DESCRIPTION" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_SECTION_DESCRIPTION"),
+					"IS_REQUIRED" => false,
+				),
+				"SECTION_DETAIL_PICTURE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_DETAIL_PICTURE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"METHOD" => "resample",
+						"COMPRESSION" => $jpgQuality,
+					)),
+				),
+				"SECTION_XML_ID" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_XML_ID"),
+					"IS_REQUIRED" => false,
+				),
+				"SECTION_CODE" => array(
+					"NAME" => GetMessage("IBLOCK_FIELD_CODE"),
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => serialize(array(
+						"UNIQUE" => "N",
+						"TRANSLITERATION" => "N",
+						"TRANS_LEN" => 100,
+						"TRANS_CASE" => "L",
+						"TRANS_SPACE" => "-",
+						"TRANS_OTHER" => "-",
+						"TRANS_EAT" => "Y",
+						"USE_GOOGLE" => "N",
+					)),
+				),
+				"LOG_SECTION_ADD" => array(
+					"NAME" => "LOG_SECTION_ADD",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"LOG_SECTION_EDIT" => array(
+					"NAME" => "LOG_SECTION_EDIT",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"LOG_SECTION_DELETE" => array(
+					"NAME" => "LOG_SECTION_DELETE",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"LOG_ELEMENT_ADD" => array(
+					"NAME" => "LOG_ELEMENT_ADD",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"LOG_ELEMENT_EDIT" => array(
+					"NAME" => "LOG_ELEMENT_EDIT",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"LOG_ELEMENT_DELETE" => array(
+					"NAME" => "LOG_ELEMENT_DELETE",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+				),
+				"XML_IMPORT_START_TIME" => array(
+					"NAME" => "XML_IMPORT_START_TIME",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => false,
+					"VISIBLE" => "N",
+				),
+				"DETAIL_TEXT_TYPE_ALLOW_CHANGE" => array(
+					"NAME" => "DETAIL_TEXT_TYPE_ALLOW_CHANGE",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => "Y",
+					"VISIBLE" => "N",
+				),
+				"PREVIEW_TEXT_TYPE_ALLOW_CHANGE" => array(
+					"NAME" => "PREVIEW_TEXT_TYPE_ALLOW_CHANGE",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => "Y",
+					"VISIBLE" => "N",
+				),
+				"SECTION_DESCRIPTION_TYPE_ALLOW_CHANGE" => array(
+					"NAME" => "SECTION_DESCRIPTION_TYPE_ALLOW_CHANGE",
+					"IS_REQUIRED" => false,
+					"DEFAULT_VALUE" => "Y",
+					"VISIBLE" => "N",
+				),
+			);
+		}
 		return $res;
 	}
 
 	
 	/**
-	* <p>Функция изменяет описание полей элементов инфоблоков. С ее помощью можно отметить поля как обязательные для заполнения, а также установить значение по умолчанию для новых элементов. <br></p> <p><b>Примечание</b>: обязательность полей будет проверена в функциях <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>, а значение по умолчанию будет установлено только в форме редактирования элемента в административной части сайта. <br></p>
-	*
-	*
+	* <p>Метод изменяет описание полей элементов инфоблоков. С ее помощью можно отметить поля как обязательные для заполнения, а также установить значение по умолчанию для новых элементов. Метод статический. <br></p> <p></p> <div class="note"> <b>Примечание</b>: обязательность полей будет проверена в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>, а значение по умолчанию будет установлено только в форме редактирования элемента в административной части сайта.</div>
 	*
 	*
 	* @param int $ID  Код информационного блока. <br>
-	*
-	*
 	*
 	* @param array $arFields  Массив вида array("код поля" =&gt; "значение" ...), где значение это массив
 	* содержащий следующие элементы: <br><ul> <li>IS_REQUIRED - признак
 	* обязательности заполнения (Y|N).</li> <li>DEFAULT_VALUE - значение поля по
 	* умолчанию. <br> </li> </ul>
 	*
-	*
-	*
-	* @return mixed <p>Функция ничего не возвращает.</p>
-	*
+	* @return mixed <p>Метод ничего не возвращает.</p>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -2220,7 +2156,6 @@ REQ
 	* 
 	* //Подсказка: настройки для всех полей можно подсмотреть в исходном html-коде страницы с формой редактирования инфоблока.
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -2429,6 +2364,20 @@ REQ
 			{
 				$arFields["SORT"]["DEFAULT_VALUE"] = intval($arFields["SORT"]["DEFAULT_VALUE"]);
 			}
+			if(array_key_exists("IBLOCK_SECTION", $arFields))
+			{
+				$arDef = &$arFields["IBLOCK_SECTION"]["DEFAULT_VALUE"];
+				if(is_array($arDef))
+				{
+					$arDef = serialize(array(
+						"KEEP_IBLOCK_SECTION_ID" => $arDef["KEEP_IBLOCK_SECTION_ID"] === "Y"? "Y": "N",
+					));
+				}
+				else
+				{
+					$arDef = "";
+				}
+			}
 
 			while($ar = $res->Fetch())
 			{
@@ -2523,17 +2472,12 @@ REQ
 
 	
 	/**
-	* <p>Функция возвращает описание полей элементов инфоблоков. Структура массива описана в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields.</a></p>
+	* <p>Метод возвращает описание полей элементов инфоблоков. Структура массива описана в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>. Метод статический.</p>
 	*
 	*
-	*
-	*
-	* @param int $ID  Код информациооного блока<br>
-	*
-	*
+	* @param int $ID  Код информационного блока.<br>
 	*
 	* @return array <p>Массив.</p></bo
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
@@ -2580,6 +2524,7 @@ REQ
 				|| $FIELD_ID == "SECTION_PICTURE"
 				|| $FIELD_ID == "SECTION_DETAIL_PICTURE"
 				|| $FIELD_ID == "SECTION_CODE"
+				|| $FIELD_ID == "IBLOCK_SECTION"
 			)
 			{
 				$a = &$arDefFields[$FIELD_ID]["DEFAULT_VALUE"];
@@ -2602,31 +2547,22 @@ REQ
 
 	
 	/**
-	* Возвращает свойства информационного блока <span class="syntax"><i>iblock_id</i></span> с возможностью сортировки и дополнительной фильтрации. <br>
-	*
-	*
+	* Возвращает свойства информационного блока <span class="syntax"><i>iblock_id</i></span> с возможностью сортировки и дополнительной фильтрации. Метод динамичный. <br><p></p> <div class="note"> <b>Примечание:</b> по умолчанию метод учитывает права доступа к информационному блоку. Для отключения проверки необходимо в параметре arFilter передать ключ "CHECK_PERMISSIONS" со значением "N".</div> <br>
 	*
 	*
 	* @param int $iblock_id  Код информационного блока.
-	*
-	*
 	*
 	* @param array $arOrder = Array() Массив для сортировки результата. Содержит пары "поле
 	* сортировки"=&gt;"направление сортировки". Поля сортировки см. <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/getlist.php">GetList()</a>.
 	*
-	*
-	*
 	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение фильтра" [, ...]).
 	* Фильтруемые поля и их значения смотрите в <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/getlist.php">GetList()</a>.
 	*
-	*
-	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -2634,7 +2570,6 @@ REQ
 	* 
 	* </ht
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -2657,24 +2592,18 @@ REQ
 
 	
 	/**
-	* <p>Возвращает права доступа к информационному блоку ID для всех групп пользователей.</p>
-	*
-	*
+	* <p>Возвращает права доступа к информационному блоку ID для всех групп пользователей. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код информационного блока.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
 	* // выбор списка пользователей, имеющих право доступа на чтение инфоблока $IBLOCK_ID<br>$gr_res = CIBlock::GetGroupPermissions($IBLOCK_ID);<br>$res = Array(1);<br>foreach($gr_res as $group_id=&gt;$perm)<br>if($perm&gt;"R")<br>   $res[] = $group_id;<br>$res = CUser::GetList($by="NAME", $order="ASC", Array("GROUP_MULTI"=&gt;$res));<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -2705,30 +2634,22 @@ REQ
 
 	
 	/**
-	* <p>Возвращает право доступа к информационному блоку <i>IBLOCK_ID</i> для пользователя с кодом <i>FOR_USER_ID</i> или для текущего пользователя (если код не задан).</p> <p><b>Примечание:</b> метод считается устаревшим (не работает при использовании расширенных прав). Рекомендуется использовать <b>CIBlockElementRights::UserHasRightTo</b> и <b>CIBlockSectionRights::UserHasRightTo</b>.</p>
-	*
-	*
+	* <p>Возвращает право доступа к информационному блоку <i>IBLOCK_ID</i> для пользователя с кодом <i>FOR_USER_ID</i> или для текущего пользователя (если код не задан). Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> метод считается устаревшим (не работает при использовании расширенных прав). Рекомендуется использовать <b>CIBlockElementRights::UserHasRightTo</b> и <b>CIBlockSectionRights::UserHasRightTo</b>.</div>
 	*
 	*
 	* @param int $IBLOCK_ID  Код информационного блока.
 	*
-	*
-	*
 	* @param int $FOR_USER_ID = false Код пользователя. Необязательный параметр.<br><br> До версии 11.5.1
 	* параметр назывался USER_ID.
-	*
-	*
 	*
 	* @return string <p>Символ права доступа: "D" - запрещён, "R" - чтение, "U" - изменение
 	* через документооборот, "W" - изменение, "X" - полный доступ (изменение
 	* + право изменять права доступа).</p>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$iblock_permission = CIBlock::GetPermission($id);<br>if($iblock_permission&lt;"X")<br>		return false;<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -2862,14 +2783,20 @@ REQ
 			"<"=>"L", //less
 			"!"=>"N", // not field LIKE val
 		);
-		if(array_key_exists($op = substr($key,0,3), $triple_char))
-			return Array("FIELD"=>substr($key,3), "OPERATION"=>$triple_char[$op]);
-		elseif(array_key_exists($op = substr($key,0,2), $double_char))
-			return Array("FIELD"=>substr($key,2), "OPERATION"=>$double_char[$op]);
-		elseif(array_key_exists($op = substr($key,0,1), $single_char))
-			return Array("FIELD"=>substr($key,1), "OPERATION"=>$single_char[$op]);
-		else
-			return Array("FIELD"=>$key, "OPERATION"=>"E"); // field LIKE val
+		$key = (string)$key;
+		if ($key == '')
+			return array("FIELD"=>$key, "OPERATION"=>"E"); // zero key
+		$op = substr($key,0,3);
+		if($op && isset($triple_char[$op]))
+			return array("FIELD"=>substr($key,3), "OPERATION"=>$triple_char[$op]);
+		$op = substr($key,0,2);
+		if($op && isset($double_char[$op]))
+			return array("FIELD"=>substr($key,2), "OPERATION"=>$double_char[$op]);
+		$op = substr($key,0,1);
+		if($op && isset($single_char[$op]))
+			return array("FIELD"=>substr($key,1), "OPERATION"=>$single_char[$op]);
+
+		return array("FIELD"=>$key, "OPERATION"=>"E"); // field LIKE val
 	}
 
 	public static function FilterCreate($field_name, $values, $type, $cOperationType=false, $bSkipEmpty = true)
@@ -3168,30 +3095,24 @@ REQ
 		static $arElementCache = array();
 
 		$product_url = "";
-		$OF_ELEMENT_ID = intval($OF_ELEMENT_ID);
-		$OF_IBLOCK_ID = intval($OF_IBLOCK_ID);
+		$OF_ELEMENT_ID = (int)$OF_ELEMENT_ID;
+		$OF_IBLOCK_ID = (int)$OF_IBLOCK_ID;
 
 		if(
 			$arrType === "E"
 			&& $OF_IBLOCK_ID > 0
 			&& $OF_ELEMENT_ID > 0
-			&& CModule::IncludeModule("catalog")
+			&& Loader::includeModule('catalog')
 		)
 		{
-			if(!array_key_exists($OF_IBLOCK_ID, $arIBlockCache))
+			if (!isset($arIBlockCache[$OF_IBLOCK_ID]))
 			{
-				$rsProducts = CCatalog::GetList(
-					array(),
-					array('IBLOCK_ID' => $OF_IBLOCK_ID),
-					false, false,
-					array('IBLOCK_ID', 'PRODUCT_IBLOCK_ID', 'SKU_PROPERTY_ID')
-				);
-				$arIBlockCache[$OF_IBLOCK_ID] = $rsProducts->Fetch();
-				if(is_array($arIBlockCache[$OF_IBLOCK_ID]))
+				$arIBlockCache[$OF_IBLOCK_ID] = CCatalogSku::GetInfoByOfferIBlock($OF_IBLOCK_ID);
+				if (is_array($arIBlockCache[$OF_IBLOCK_ID]))
 					$arIBlockCache[$OF_IBLOCK_ID]["PRODUCT_IBLOCK"] = CIBlock::GetArrayByID($arIBlockCache[$OF_IBLOCK_ID]["PRODUCT_IBLOCK_ID"]);
 			}
 
-			if(is_array($arIBlockCache[$OF_IBLOCK_ID]))
+			if (is_array($arIBlockCache[$OF_IBLOCK_ID]))
 			{
 				if(!array_key_exists($OF_ELEMENT_ID, $arElementCache))
 				{
@@ -3255,8 +3176,6 @@ REQ
 	{
 		/** @global CDatabase $DB */
 		global $DB;
-		static $arSectionCache = array();
-		static $arSectionPathCache = array();
 
 		if($server_name)
 		{
@@ -3317,68 +3236,40 @@ REQ
 			$arReplace[] = intval($arr["ID"]) > 0? intval($arr["ID"]): "";
 			$arReplace[] = urlencode(isset($arr["~CODE"])? $arr["~CODE"]: $arr["CODE"]);
 			#Deal with symbol codes
-			$SECTION_CODE = "";
 			$SECTION_ID = intval($arr["IBLOCK_SECTION_ID"]);
+
+			$SECTION_CODE = "";
 			if(
 				$SECTION_ID > 0
-				&& (
-					strpos($url, "#SECTION_CODE#") !== false
-					|| strpos($url, "#SECTION_CODE_PATH#") !== false
-				)
+				&& strpos($url, "#SECTION_CODE#") !== false
 			)
 			{
-				if(!array_key_exists($SECTION_ID, $arSectionCache))
-				{
-					$res = $DB->Query("SELECT IBLOCK_ID, CODE FROM b_iblock_section WHERE ID = ".$SECTION_ID);
-					$arSectionCache[$SECTION_ID] = $res->Fetch();
-				}
-				if(is_array($arSectionCache[$SECTION_ID]))
-					$SECTION_CODE = $arSectionCache[$SECTION_ID]["CODE"];
+				$SECTION_CODE = CIBlockSection::getSectionCode($SECTION_ID);
 			}
+
 			$SECTION_CODE_PATH = "";
 			if(
 				$SECTION_ID > 0
-				&& array_key_exists($SECTION_ID, $arSectionCache)
 				&& strpos($url, "#SECTION_CODE_PATH#") !== false
 			)
 			{
-				if(!array_key_exists($SECTION_ID, $arSectionPathCache))
-				{
-					$res = CIBlockSection::GetNavChain($arSectionCache[$SECTION_ID]["IBLOCK_ID"], $SECTION_ID, array("ID", "IBLOCK_SECTION_ID", "CODE"));
-					while ($a = $res->Fetch())
-						$arSectionPathCache[$SECTION_ID] .= urlencode($a["CODE"])."/";
-
-				}
-				if(isset($arSectionCache[$SECTION_ID]))
-					$SECTION_CODE_PATH = rtrim($arSectionPathCache[$SECTION_ID], "/");
+				$SECTION_CODE_PATH = CIBlockSection::getSectionCodePath($SECTION_ID);
 			}
+
 			$arReplace[] = $SECTION_ID > 0? $SECTION_ID: "";
-			$arReplace[] = urlencode($SECTION_CODE);
+			$arReplace[] = $SECTION_CODE;
 			$arReplace[] = $SECTION_CODE_PATH;
 		}
 		elseif($arrType === "S")
 		{
 			$SECTION_ID = intval($arr["ID"]);
 			$SECTION_CODE_PATH = "";
-			if(strpos($url, "#SECTION_CODE_PATH#") !== false && $SECTION_ID > 0)
+			if(
+				$SECTION_ID > 0
+				&& strpos($url, "#SECTION_CODE_PATH#") !== false
+			)
 			{
-				if(!array_key_exists($SECTION_ID, $arSectionCache))
-				{
-					$res = $DB->Query("SELECT IBLOCK_ID, CODE FROM b_iblock_section WHERE ID = ".$SECTION_ID);
-					$arSectionCache[$SECTION_ID] = $res->Fetch();
-				}
-				if(is_array($arSectionCache[$SECTION_ID]))
-				{
-					if(!array_key_exists($SECTION_ID, $arSectionPathCache))
-					{
-						$res = CIBlockSection::GetNavChain($arSectionCache[$SECTION_ID]["IBLOCK_ID"], $SECTION_ID, array("ID", "IBLOCK_SECTION_ID", "CODE"));
-						while ($a = $res->Fetch())
-							$arSectionPathCache[$SECTION_ID] .= urlencode($a["CODE"])."/";
-
-					}
-					if(isset($arSectionCache[$SECTION_ID]))
-						$SECTION_CODE_PATH = rtrim($arSectionPathCache[$SECTION_ID], "/");
-				}
+				$SECTION_CODE_PATH = CIBlockSection::getSectionCodePath($SECTION_ID);
 			}
 			$arReplace[] = "";
 			$arReplace[] = "";
@@ -3510,14 +3401,14 @@ REQ
 				while($arIBlockElement = $dbrIBlockElement->Fetch())
 				{
 					$DETAIL_URL =
-							"=ID=".$arIBlockElement["ID"].
-							"&EXTERNAL_ID=".$arIBlockElement["EXTERNAL_ID"].
-							"&CODE=".$arIBlockElement["CODE"].
-							"&IBLOCK_SECTION_ID=".$arIBlockElement["IBLOCK_SECTION_ID"].
-							"&IBLOCK_TYPE_ID=".$arIBlock["IBLOCK_TYPE_ID"].
-							"&IBLOCK_ID=".$IBLOCK_ID.
-							"&IBLOCK_CODE=".$arIBlock["IBLOCK_CODE"].
-							"&IBLOCK_EXTERNAL_ID=".$arIBlock["IBLOCK_EXTERNAL_ID"];
+							"=ID=".urlencode($arIBlockElement["ID"]).
+							"&EXTERNAL_ID=".urlencode($arIBlockElement["EXTERNAL_ID"]).
+							"&CODE=".urlencode($arIBlockElement["CODE"]).
+							"&IBLOCK_SECTION_ID=".urlencode($arIBlockElement["IBLOCK_SECTION_ID"]).
+							"&IBLOCK_TYPE_ID=".urlencode($arIBlock["IBLOCK_TYPE_ID"]).
+							"&IBLOCK_ID=".urlencode($IBLOCK_ID).
+							"&IBLOCK_CODE=".urlencode($arIBlock["IBLOCK_CODE"]).
+							"&IBLOCK_EXTERNAL_ID=".urlencode($arIBlock["IBLOCK_EXTERNAL_ID"]);
 
 					$BODY =
 						($arIBlockElement["PREVIEW_TEXT_TYPE"]=="html" ?
@@ -3711,15 +3602,11 @@ REQ
 
 	
 	/**
-	* <p>Функция возвращает количество элементов информационного блока.</p> <p><b>Примечание</b>: активность элементов и права доступа не учитываются.</p>
-	*
-	*
+	* <p>Метод возвращает количество элементов информационного блока. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: активность элементов и права доступа не учитываются.</div>
 	*
 	*
 	* @param int $iblock_id  Код информационного блока. <br><br> До версии 7.1.5 параметр назывался
 	* BID.
-	*
-	*
 	*
 	* @return int <p>Целое число.</p><p> <br></p>
 	*
@@ -3747,18 +3634,14 @@ REQ
 
 	
 	/**
-	* <p>Функция выполняет масштабирование файла.</p> <p><b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан. <br></p>
-	*
-	*
+	* <p>Метод выполняет масштабирование файла. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан.</div> <br>
 	*
 	*
 	* @param array $arFile  Массив, описывающий файл. Это может быть элемент массива $_FILES[имя]
-	* (или $HTTP_POST_FILES[имя]), а также результат функции <a
+	* (или $HTTP_POST_FILES[имя]), а также результат метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a>. <br><br> С
 	* версии модуля <b>14.0.0</b> массив файла передается в ключе <i>VALUE</i>, а
 	* описание - в ключе <i>DESCRIPTION</i>.
-	*
-	*
 	*
 	* @param array $arResize  Массив параметров масштабирования. Содержит следующие ключи:
 	* <br><ul> <li>WIDTH - целое число. Размер картинки будет изменен таким
@@ -3776,16 +3659,12 @@ REQ
 	* картинка вписывается в ограничения WIDTH и HEIGHT, то никаких действий
 	* над файлом выполнено не будет. <br><br>
 	*
-	*
-	*
 	* @return array <p>Массив описывающий файл или строка с сообщением об ошибке.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("MyHandlers", "ResizeElementProperty"));<br>AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", Array("MyHandlers", "ResizeElementProperty"));<br><br>class MyHandlers<br>{<br>	function ResizeElementProperty(&amp;$arFields)<br>	{<br>		global $APPLICATION;<br>		//Код инфоблока свойство каторого нуждается в масштабировании<br>		$IBLOCK_ID = 1;<br>		//Идентификатор свойства<br>		$PROPERTY_ID = 15;<br>		//Наш инфоблок и значения свойства в наличии<br>		if(<br>			$arFields["IBLOCK_ID"] == $IBLOCK_ID<br>			&amp;&amp; is_array($arFields["PROPERTY_VALUES"])<br>			&amp;&amp; array_key_exists(15, $arFields["PROPERTY_VALUES"])<br>		)<br>		{<br>			foreach($arFields["PROPERTY_VALUES"][$PROPERTY_ID] as $key =&gt; $arFile)<br>			{<br>				//Изменяем размеры картинки<br>				$arNewFile = CIBlock::ResizePicture($arFile, array(<br>					"WIDTH" =&gt; 100,<br>					"HEIGHT" =&gt; 100,<br>					"METHOD" =&gt; "resample",<br>				));<br>				if(is_array($arNewFile))<br>					$arFields["PROPERTY_VALUES"][$PROPERTY_ID][$key] = $arNewFile;<br>				else<br>				{<br>					//Можно вернуть ошибку<br>					$APPLICATION-&gt;throwException("Ошибка масштабирования изображения в свойстве \"Файлы\":".$arNewFile);<br>					return false;<br>				}<br>			}<br>		}<br>	}<br>}<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -3863,10 +3742,10 @@ REQ
 
 			$height_new = $height_orig;
 			if($width_orig > $width)
-				$height_new = ($width / $width_orig) * $height_orig;
+				$height_new = $width * $height_orig  / $width_orig;
 
 			if($height_new > $height)
-				$width = ($height / $height_orig) * $width_orig;
+				$width = $height * $width_orig / $height_orig;
 			else
 				$height = $height_new;
 
@@ -3874,6 +3753,12 @@ REQ
 			if($image_type == IMAGETYPE_JPEG)
 			{
 				$image = imagecreatefromjpeg($file);
+				if ($image === false)
+				{
+					ini_set('gd.jpeg_ignore_warning', 1);
+					$image = imagecreatefromjpeg($file);
+				}
+
 				if ($orientation > 1)
 				{
 					if ($orientation == 7 || $orientation == 8)
@@ -4101,11 +3986,17 @@ REQ
 			(defined("CATALOG_PRODUCT") || $arParams["force_catalog"] || array_key_exists('catalog', $arParams))
 			&& !array_key_exists("menu", $arParams)
 		)
+		{
 			$url = "cat_catalog_edit.php";
+			$param = "IBLOCK_ID";
+		}
 		else
+		{
 			$url = "iblock_edit.php";
+			$param = "ID";
+		}
 
-		$url.= "?ID=".intval($IBLOCK_ID);
+		$url.= "?".$param."=".intval($IBLOCK_ID);
 		$url.= "&type=".urlencode(CIBlock::GetArrayByID($IBLOCK_ID, "IBLOCK_TYPE_ID"));
 		$url.= "&admin=Y";
 		$url.= "&lang=".urlencode(LANGUAGE_ID);
@@ -4400,13 +4291,19 @@ REQ
 		if (is_set($options["allow_file_id"]) && $options["allow_file_id"] === true)
 		{
 			$result = CFile::MakeFileArray($file_id);
-			if (is_array($result))
-			{
-				if (!is_null($description))
-					$result["description"] = $description;
-			}
 		}
 
+		if (!is_null($description))
+		{
+			$result = ($result === false ? array(
+				"name" => null,
+				"type" => null,
+				"tmp_name" => null,
+				"error" => 4,
+				"size" => 0,
+			) : $result);
+			$result["description"] = $description;
+		}
 		return $result;
 	}
 
@@ -4452,6 +4349,38 @@ REQ
 			if (!is_null($description))
 				$result["description"] = $description;
 		}
+		elseif (
+			strlen($file_array["tmp_name"]) > 0
+			&& strpos($file_array["tmp_name"], CTempFile::GetAbsoluteRoot()) === 0
+		)
+		{
+			$io = CBXVirtualIo::GetInstance();
+			$absPath = $io->CombinePath("/", $file_array["tmp_name"]);
+			$tmpPath = CTempFile::GetAbsoluteRoot()."/";
+			if (strpos($absPath, $tmpPath) === 0)
+			{
+				$result = $file_array;
+				$result["tmp_name"] = $absPath;
+				$result["error"] = intval($result["error"]);
+				if (!is_null($description))
+					$result["description"] = $description;
+			}
+		}
+		elseif (strlen($file_array["tmp_name"]) > 0)
+		{
+			$io = CBXVirtualIo::GetInstance();
+			$normPath = $io->CombinePath("/", $file_array["tmp_name"]);
+			$absPath = $io->CombinePath($_SERVER["DOCUMENT_ROOT"], $normPath);
+			$tmpPath = CTempFile::GetAbsoluteRoot()."/";
+			if (strpos($absPath, $tmpPath) === 0)
+			{
+				$result = $file_array;
+				$result["tmp_name"] = $absPath;
+				$result["error"] = intval($result["error"]);
+				if (!is_null($description))
+					$result["description"] = $description;
+			}
+		}
 		else
 		{
 			$emptyFile = array(
@@ -4474,17 +4403,46 @@ REQ
 
 	public static function disableTagCache($iblock_id)
 	{
-		$iblock_id = intval($iblock_id);
-		self::$disabledCacheTag[$iblock_id] = $iblock_id;
+		$iblock_id = (int)$iblock_id;
+		if ($iblock_id > 0)
+			self::$disabledCacheTag[$iblock_id] = $iblock_id;
+	}
+
+	public static function enableTagCache($iblock_id)
+	{
+		$iblock_id = (int)$iblock_id;
+		if (isset(self::$disabledCacheTag[$iblock_id]))
+			unset(self::$disabledCacheTag[$iblock_id]);
+	}
+
+	public static function clearIblockTagCache($iblock_id)
+	{
+		global $CACHE_MANAGER;
+		$iblock_id = (int)$iblock_id;
+		if (defined("BX_COMP_MANAGED_CACHE") && $iblock_id > 0 && self::isEnabledClearTagCache())
+			$CACHE_MANAGER->ClearByTag('iblock_id_'.$iblock_id);
 	}
 
 	public  static function registerWithTagCache($iblock_id)
 	{
 		global $CACHE_MANAGER;
-		$iblock_id = intval($iblock_id);
-		if (!isset(self::$disabledCacheTag[$iblock_id]))
-		{
+		$iblock_id = (int)$iblock_id;
+		if ($iblock_id > 0 && !isset(self::$disabledCacheTag[$iblock_id]))
 			$CACHE_MANAGER->RegisterTag("iblock_id_".$iblock_id);
-		}
+	}
+
+	public static function enableClearTagCache()
+	{
+		self::$enableClearTagCache++;
+	}
+
+	public static function disableClearTagCache()
+	{
+		self::$enableClearTagCache--;
+	}
+
+	public static function isEnabledClearTagCache()
+	{
+		return (self::$enableClearTagCache >= 0);
 	}
 }

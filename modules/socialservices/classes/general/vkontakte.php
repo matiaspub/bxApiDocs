@@ -6,6 +6,7 @@ class CSocServVKontakte extends CSocServAuth
 	const ID = "VKontakte";
 	const CONTROLLER_URL = "https://www.bitrix24.ru/controller";
 
+	protected $entityOAuth = null;
 
 	static public function GetSettings()
 	{
@@ -26,11 +27,17 @@ class CSocServVKontakte extends CSocServAuth
 		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 660, 425)" class="bx-ss-button vkontakte-button"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
 	}
 
-	static public function getUrl($arParams)
+	public function GetOnClickJs($arParams)
+	{
+		$url = $this->getUrl($arParams);
+		return "BX.util.popup('".CUtil::JSEscape($url)."', 660, 425)";
+	}
+
+	public function getUrl($arParams)
 	{
 		global $APPLICATION;
 
-		$gAuth = new CVKontakteOAuthInterface();
+		$gAuth = $this->getEntityOAuth();
 
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
@@ -55,6 +62,85 @@ class CSocServVKontakte extends CSocServAuth
 		return $gAuth->GetAuthUrl($redirect_uri, $state);
 	}
 
+	public function getEntityOAuth($code = false)
+	{
+		if(!$this->entityOAuth)
+		{
+			$this->entityOAuth = new CVKontakteOAuthInterface();
+		}
+
+		if($code !== false)
+		{
+			$this->entityOAuth->setCode($code);
+		}
+
+		return $this->entityOAuth;
+	}
+
+	public function prepareUser($arVkUser, $short = false)
+	{
+		$first_name = $last_name = $gender = "";
+
+		if($arVkUser['response']['0']['first_name'] <> '')
+		{
+			$first_name = $arVkUser['response']['0']['first_name'];
+		}
+
+		if($arVkUser['response']['0']['last_name'] <> '')
+		{
+			$last_name = $arVkUser['response']['0']['last_name'];
+		}
+
+		if(isset($arVkUser['response']['0']['sex']) && $arVkUser['response']['0']['sex'] != '')
+		{
+			if ($arVkUser['response']['0']['sex'] == '2')
+				$gender = 'M';
+			elseif ($arVkUser['response']['0']['sex'] == '1')
+				$gender = 'F';
+		}
+
+		$arFields = array(
+			'EXTERNAL_AUTH_ID' => self::ID,
+			'XML_ID' => $arVkUser['response']['0']['uid'],
+			'LOGIN' => "VKuser".$arVkUser['response']['0']['uid'],
+			'EMAIL' => $this->entityOAuth->GetCurrentUserEmail(),
+			'NAME'=> $first_name,
+			'LAST_NAME'=> $last_name,
+			'PERSONAL_GENDER' => $gender,
+			'OATOKEN' => $this->entityOAuth->getToken(),
+			'OATOKEN_EXPIRES' => $this->entityOAuth->getAccessTokenExpires(),
+		);
+
+		if(isset($arVkUser['response']['0']['photo_max_orig']) && self::CheckPhotoURI($arVkUser['response']['0']['photo_max_orig']))
+		{
+			if(!$short)
+			{
+				$arPic = CFile::MakeFileArray($arVkUser['response']['0']['photo_max_orig']);
+				if($arPic)
+				{
+					$arFields["PERSONAL_PHOTO"] = $arPic;
+				}
+			}
+
+			if(isset($arVkUser['response']['0']['bdate']))
+			{
+				if($date = MakeTimeStamp($arVkUser['response']['0']['bdate'], "DD.MM.YYYY"))
+				{
+					$arFields["PERSONAL_BIRTHDAY"] = ConvertTimeStamp($date);
+				}
+			}
+
+			$arFields["PERSONAL_WWW"] = self::getProfileUrl($arVkUser['response']['0']['uid']);
+
+			if(strlen(SITE_ID) > 0)
+			{
+				$arFields["SITE_ID"] = SITE_ID;
+			}
+		}
+
+		return $arFields;
+	}
+
 	public function Authorize()
 	{
 		$GLOBALS["APPLICATION"]->RestartBuffer();
@@ -67,53 +153,13 @@ class CSocServVKontakte extends CSocServAuth
 			else
 				$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage().'?auth_service_id='.self::ID;
 
-			$appID = trim(self::GetOption("vkontakte_appid"));
-			$appSecret = trim(self::GetOption("vkontakte_appsecret"));
-
-			$gAuth = new CVKontakteOAuthInterface($appID, $appSecret, $_REQUEST["code"]);
-			if($gAuth->GetAccessToken($redirect_uri) !== false)
+			$this->entityOAuth = $this->getEntityOAuth($_REQUEST['code']);
+			if($this->entityOAuth->GetAccessToken($redirect_uri) !== false)
 			{
-				$arVkUser = $gAuth->GetCurrentUser();
-
+				$arVkUser = $this->entityOAuth->GetCurrentUser();
 				if(is_array($arVkUser) && ($arVkUser['response']['0']['uid'] <> ''))
 				{
-					$first_name = $last_name = $gender = "";
-					if($arVkUser['response']['0']['first_name'] <> '')
-					{
-						$first_name = $arVkUser['response']['0']['first_name'];
-					}
-					if($arVkUser['response']['0']['last_name'] <> '')
-					{
-						$last_name = $arVkUser['response']['0']['last_name'];
-					}
-
-					if(isset($arVkUser['response']['0']['sex']) && $arVkUser['response']['0']['sex'] != '')
-					{
-						if ($arVkUser['response']['0']['sex'] == '2')
-							$gender = 'M';
-						elseif ($arVkUser['response']['0']['sex'] == '1')
-							$gender = 'F';
-					}
-
-					$arFields = array(
-						'EXTERNAL_AUTH_ID' => self::ID,
-						'XML_ID' => $arVkUser['response']['0']['uid'],
-						'LOGIN' => "VKuser".$arVkUser['response']['0']['uid'],
-						'NAME'=> $first_name,
-						'LAST_NAME'=> $last_name,
-						'PERSONAL_GENDER' => $gender,
-					);
-
-					if(isset($arVkUser['response']['0']['photo_max_orig']) && self::CheckPhotoURI($arVkUser['response']['0']['photo_max_orig']))
-						if ($arPic = CFile::MakeFileArray($arVkUser['response']['0']['photo_max_orig']))
-							$arFields["PERSONAL_PHOTO"] = $arPic;
-					if(isset($arVkUser['response']['0']['bdate']))
-						if ($date = MakeTimeStamp($arVkUser['response']['0']['bdate'], "DD.MM.YYYY"))
-							$arFields["PERSONAL_BIRTHDAY"] = ConvertTimeStamp($date);
-					$arFields["PERSONAL_WWW"] = "http://vk.com/id".$arVkUser['response']['0']['uid'];
-					if(strlen(SITE_ID) > 0)
-						$arFields["SITE_ID"] = SITE_ID;
-
+					$arFields = $this->prepareUser($arVkUser);
 					$bSuccess = $this->AuthorizeUser($arFields);
 				}
 			}
@@ -171,14 +217,14 @@ window.close();
 		die();
 	}
 
-	static public function getFriendsList($limit, &$next)
+	public function getFriendsList($limit, &$next)
 	{
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 		else
 			$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage().'?auth_service_id='.self::ID;
 
-		$vk = new CVKontakteOAuthInterface();
+		$vk = $this->getEntityOAuth();
 		if($vk->GetAccessToken($redirect_uri) !== false)
 		{
 			$res = $vk->getCurrentUserFriends($limit, $next);
@@ -199,9 +245,9 @@ window.close();
 		return false;
 	}
 
-	static public function sendMessage($uid, $message)
+	public function sendMessage($uid, $message)
 	{
-		$vk = new CVKontakteOAuthInterface();
+		$vk = $this->getEntityOAuth();
 
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
@@ -222,21 +268,23 @@ window.close();
 	}
 }
 
-class CVKontakteOAuthInterface
+class CVKontakteOAuthInterface extends CSocServOAuthTransport
 {
+	const SERVICE_ID = "VKontakte";
+
 	const AUTH_URL = "https://oauth.vk.com/authorize";
 	const TOKEN_URL = "https://oauth.vk.com/access_token";
 	const CONTACTS_URL = "https://api.vk.com/method/users.get";
 	const FRIENDS_URL = "https://api.vk.com/method/friends.get";
 	const MESSAGE_URL = "https://api.vk.com/method/messages.send";
+	const APP_URL = "https://api.vk.com/method/apps.get";
 
-	protected $appID;
-	protected $appSecret;
-	protected $code = false;
-	protected $access_token = false;
 	protected $userID = false;
+	protected $userEmail = false;
 
-	public function __construct($appID=false, $appSecret=false, $code=false)
+	protected $scope = "friends,notify,offline,email";
+
+	static public function __construct($appID=false, $appSecret=false, $code=false)
 	{
 		if($appID === false)
 		{
@@ -248,25 +296,7 @@ class CVKontakteOAuthInterface
 			$appSecret = trim(CSocServVKontakte::GetOption("vkontakte_appsecret"));
 		}
 
-		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
-		$this->appID = $appID;
-		$this->appSecret = $appSecret;
-		$this->code = $code;
-	}
-
-	public function getAppID()
-	{
-		return $this->appID;
-	}
-
-	public function getAppSecret()
-	{
-		return $this->appSecret;
-	}
-
-	public function getToken()
-	{
-		return $this->access_token;
+		parent::__construct($appID, $appSecret, $code);
 	}
 
 	public function GetAuthUrl($redirect_uri, $state='')
@@ -274,7 +304,7 @@ class CVKontakteOAuthInterface
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
 			"&redirect_uri=".urlencode($redirect_uri).
-			"&scope=friends,notify,offline,email".
+			"&scope=".$this->getScope().
 			"&response_type=code".
 			($state <> ''? '&state='.urlencode($state):'');
 	}
@@ -293,18 +323,22 @@ class CVKontakteOAuthInterface
 			return false;
 		}
 
-		$result = CHTTP::sPostHeader(self::TOKEN_URL, array(
+		$query = array(
 			"client_id"=>$this->appID,
 			"client_secret"=>$this->appSecret,
 			"code"=>$this->code,
 			"redirect_uri"=>$redirect_uri,
-		), array(), $this->httpTimeout);
+		);
+
+		$result = CHTTP::sPostHeader(self::TOKEN_URL, $query, array(), $this->httpTimeout);
 
 		$arResult = CUtil::JsObjectToPhp($result);
+
 		if((isset($arResult["access_token"]) && $arResult["access_token"] <> '') && isset($arResult["user_id"]) && $arResult["user_id"] <> '')
 		{
 			$this->access_token = $arResult["access_token"];
 			$this->userID = $arResult["user_id"];
+			$this->userEmail = $arResult["email"];
 
 			$_SESSION["OAUTH_DATA"] = array("OATOKEN" => $this->access_token);
 			return true;
@@ -317,12 +351,32 @@ class CVKontakteOAuthInterface
 		if($this->access_token === false)
 			return false;
 
-		$result = CHTTP::sGetHeader(self::CONTACTS_URL.'?uids='.$this->userID.'&fields=uid,first_name,last_name,nickname,screen_name,sex,bdate,city,country,timezone,photo,photo_medium,photo_max_orig,photo_rec,email&access_token='.urlencode($this->access_token), array(), $this->httpTimeout);
+		$result = CHTTP::sGetHeader(self::CONTACTS_URL.'?fields=uid,first_name,last_name,nickname,screen_name,sex,bdate,city,country,timezone,photo,photo_medium,photo_max_orig,photo_rec,email&access_token='.urlencode($this->access_token), array(), $this->httpTimeout);
 
 		if(!defined("BX_UTF"))
 			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
 
 		return CUtil::JsObjectToPhp($result);
+	}
+
+	public function GetAppInfo()
+	{
+		if($this->access_token === false)
+			return false;
+
+		$h = new \Bitrix\Main\Web\HttpClient();
+		$h->setTimeout($this->httpTimeout);
+
+		$result = $h->get(self::APP_URL.'?fields=id&access_token='.urlencode($this->access_token));
+
+		$result = \Bitrix\Main\Web\Json::decode($result);
+
+		return $result['response'];
+	}
+
+	public function GetCurrentUserEmail()
+	{
+		return $this->userEmail;
 	}
 
 	public function GetCurrentUserFriends($limit, &$next)
@@ -368,26 +422,6 @@ class CVKontakteOAuthInterface
 
 		$ob = new \Bitrix\Main\Web\HttpClient();
 		return $ob->post($url, $arPost);
-	}
-
-	private function getStorageTokens()
-	{
-		global $USER;
-
-		$accessToken = '';
-		if(is_object($USER) && $USER->IsAuthorized())
-		{
-			$dbSocservUser = CSocServAuthDB::GetList(
-				array(),
-				array(
-					'USER_ID' => $USER->GetID(),
-					"EXTERNAL_AUTH_ID" => CSocServVKontakte::ID
-				), false, false, array("USER_ID", "XML_ID", "OATOKEN")
-			);
-
-			$accessToken = $dbSocservUser->Fetch();
-		}
-		return $accessToken;
 	}
 }
 ?>

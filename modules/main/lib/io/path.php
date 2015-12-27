@@ -26,15 +26,26 @@ class Path
 			return null;
 
 		//slashes doesn't matter for Windows
-		static $pattern = null;
+		static $pattern = null, $tailPattern;
 		if (!$pattern)
-			$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0 ? "'[\\\\/]+'" : "'[/]+'");
+		{
+			if(strncasecmp(PHP_OS, "WIN", 3) == 0)
+			{
+				//windows
+				$pattern = "'[\\\\/]+'";
+				$tailPattern = "\0.\\/+ ";
+			}
+			else
+			{
+				//unix
+				$pattern = "'[/]+'";
+				$tailPattern = "\0/";
+			}
+		}
 		$pathTmp = preg_replace($pattern, "/", $path);
 
-		if (($p = strpos($pathTmp, "\0")) !== false)
-			$pathTmp = substr($pathTmp, 0, $p);
-		if (($p = strpos($pathTmp, self::PATH_SEPARATOR)) !== false)
-			$pathTmp = substr($pathTmp, 0, $p);
+		if (strpos($pathTmp, "\0") !== false)
+			throw new InvalidPathException($path);
 
 		if (preg_match("#(^|/)(\\.|\\.\\.)(/|\$)#", $pathTmp))
 		{
@@ -58,7 +69,7 @@ class Path
 			$pathTmp = implode("/", $arPathStack);
 		}
 
-		$pathTmp = rtrim($pathTmp, "\0.\\/+ ");
+		$pathTmp = rtrim($pathTmp, $tailPattern);
 
 		if (substr($path, 0, 1) === "/" && substr($pathTmp, 0, 1) !== "/")
 			$pathTmp = "/".$pathTmp;
@@ -264,7 +275,7 @@ class Path
 		if (strpos($path, "\0") !== false)
 			return false;
 
-		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+/?)*$#is", $path) > 0);
+		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+/?)*$#isD", $path) > 0);
 	}
 
 	public static function validateFilename($filename)
@@ -279,7 +290,7 @@ class Path
 		if (strpos($filename, "\0") !== false)
 			return false;
 
-		return (preg_match("#^[^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+$#is", $filename) > 0);
+		return (preg_match("#^[^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+$#isD", $filename) > 0);
 	}
 
 	public static function randomizeInvalidFilename($filename)

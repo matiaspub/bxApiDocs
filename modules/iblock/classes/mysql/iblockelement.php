@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков. </body> </html>
- *
- *
+ * <b>CIBlockElement</b> - класс для работы с элементами информационных блоков. 
  *
  *
  * @return mixed 
@@ -250,9 +248,7 @@ class CIBlockElement extends CAllIBlockElement
 	 */
 	
 	/**
-	* <p>Возвращает список элементов по фильтру <i>arFilter</i>.</p> <p><b>Примечания</b>:</p> <ol> <li>Внутренние ограничения Oracle и MSSQL не позволяют использовать DISTINCT при фильтрации по полям типа blob, поэтому фильтрация по нескольким значениям множественного свойства может дать дублирование.   </li> <li>Поля перечисленные для сортировки будут автоматически добавлены в параметр arSelectFields или в arGroupBy, если указана группировка записей. <br> </li> </ol>
-	*
-	*
+	* <p>Возвращает список элементов по фильтру <i>arFilter</i>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечания</b>: <ol> <li>Внутренние ограничения Oracle и MSSQL не позволяют использовать DISTINCT при фильтрации по полям типа blob, поэтому фильтрация по нескольким значениям множественного свойства может дать дублирование.   </li> <li>Поля перечисленные для сортировки будут автоматически добавлены в параметр arSelectFields или в arGroupBy, если указана группировка записей. <br> </li> </ol> </div>
 	*
 	*
 	* @param array $arOrder = Array("SORT"=>"ASC") Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> -
@@ -266,12 +262,11 @@ class CIBlockElement extends CAllIBlockElement
 	* <b>iblock_id</b> - числовой код информационного блока; </li> <li> <b>modified_by</b> -
 	* код последнего изменившего пользователя; </li> <li> <b>active</b> - признак
 	* активности элемента; </li> <li> <i>show_counter </i>- количество показов
-	* элемента (учитывается функцией <a
+	* элемента (учитывается методом <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
 	* <b>show_counter_start</b> - время первого показа элемента (учитывается
-	* функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
+	* методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/counterinc.php">CounterInc</a>); </li> <li>
 	* <b>shows</b> - усредненное количество показов (количество показов /
 	* продолжительность показа); </li> <li> <b>rand</b> - случайный порядок;</li> <li>
@@ -291,7 +286,10 @@ class CIBlockElement extends CAllIBlockElement
 	* товара;</li> <li> <b>CATALOG_AVAILABLE</b> - признак доступности к покупке (Y|N).
 	* Товар считается недоступным, если его количество меньше либо
 	* равно нулю, включен количественный учет и запрещена покупка при
-	* нулевом количестве.</li> <li> <span style="font-weight:
+	* нулевом количестве.</li> <li>
+	* <b>CATALOG_STORE_AMOUNT_<i>&lt;идентификатор_склада&gt;</i></b> - сортировка по
+	* количеству товара на конкретном складе (доступно с версии 15.5.5
+	* модуля <b>Торговый каталог</b>).</li> <li> <span style="font-weight:
 	* bold;">PROPERTY_&lt;PROPERTY_CODE&gt;.&lt;FIELD&gt;</span> - по значению поля элемента
 	* указанного в качестве привязки. PROPERTY_CODE - символьный код свойства
 	* типа привязка к элементам. FIELD может принимать значения:</li> <ul> <li>ID
@@ -313,15 +311,13 @@ class CIBlockElement extends CAllIBlockElement
 	* bold;">nulls,desc</span> - по убыванию с пустыми значениями в начале
 	* выборки;</li> <li> <span style="font-weight: bold;">desc,nulls</span> - по убыванию с пустыми
 	* значениями в конце выборки; <br> </li> </ul> Необязательный. По
-	* умолчанию равен <i>Array("sort"=&gt;"asc")</i> </li> </ul> <br><b>Примечание:</b> если
-	* задать разным свойствам одинаковый символьный код, но в разном
-	* регистре, то при работе сортировки по одному из свойств (например,
-	* PROPERTY_rating) будет возникать ошибочная ситуация (элементы в списке
-	* задублируются, сортировки не будет). <br> Примечание 2: указанные
-	* поля сортировки автоматически добавляются в arGroupBy (если он задан)
-	* и arSelectFields.
-	*
-	*
+	* умолчанию равен <i>Array("sort"=&gt;"asc")</i> </li> </ul> <div class="note"> <b>Примечание
+	* 1:</b> если задать разным свойствам одинаковый символьный код, но в
+	* разном регистре, то при работе сортировки по одному из свойств
+	* (например, PROPERTY_rating) будет возникать ошибочная ситуация (элементы
+	* в списке задублируются, сортировки не будет). </div> <br><div class="note">
+	* <b>Примечание 2:</b> указанные поля сортировки автоматически
+	* добавляются в arGroupBy (если он задан) и arSelectFields.</div>
 	*
 	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]).
 	* "фильтруемое поле" может принимать значения: <ul> <li> <b>ID</b> - по
@@ -437,7 +433,11 @@ class CIBlockElement extends CAllIBlockElement
 	* <b>CATALOG_CATALOG_GROUP_ID_N</b> - по типу цен; </li> <li> <b>CATALOG_SHOP_QUANTITY_N</b> -
 	* фильтрация по диапазону количества в цене; </li> <li> <b>CATALOG_QUANTITY</b> - по
 	* общему количеству товара; </li> <li> <b>CATALOG_WEIGHT</b> - по весу товара; </li>
-	* <li> <b>SHOW_COUNTER</b> - по количеству показов (фильтр <a
+	* <li> <b>CATALOG_STORE_AMOUNT_<i>&lt;идентификатор_склада&gt;</i></b> - фильтрация по
+	* наличию товара на конкретном складе (доступно с версии 15.0.2 модуля
+	* <b>Торговый каталог</b>). В качестве значения фильтр принимает
+	* количество товара на складе либо <i>false</i>.</li> <li> <b>SHOW_COUNTER</b> - по
+	* количеству показов (фильтр <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li> <b>SHOW_COUNTER_START</b>
 	* - по времени первого показа (фильтр <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/filters/date.php">Дата</a>); </li> <li> <b>WF_COMMENTS</b> - по
@@ -447,8 +447,9 @@ class CIBlockElement extends CAllIBlockElement
 	* (фильтр <a href="http://dev.1c-bitrix.ru/api_help/iblock/filters/number.php">Число</a>); </li> <li>
 	* <b>SHOW_HISTORY</b> - если установлен в значение "Y", то вместе с элементами
 	* будут выводится и их архив (история), по умолчанию выводятся
-	* только опубликованные элементы; </li> <li> <b>SHOW_NEW</b> - если <b>SHOW_HISTORY</b>
-	* не установлен или не равен Y и <b>SHOW_NEW</b>=Y, то будут показываться ещё
+	* только опубликованные элементы. Для фильтрации по WF_STATUS_ID
+	* <b>SHOW_HISTORY</b> должен стоять в "Y".</li> <li> <b>SHOW_NEW</b> - если <b>SHOW_HISTORY</b> не
+	* установлен или не равен Y и <b>SHOW_NEW</b>=Y, то будут показываться ещё
 	* неопубликованные элементы вместе с опубликованными; </li> <li>
 	* <b>WF_PARENT_ELEMENT_ID</b> - по коду элемента-родителя в документообороте для
 	* выборки истории изменений (фильтр <a
@@ -482,31 +483,27 @@ class CIBlockElement extends CAllIBlockElement
 	* между</li> <li>и т.д. <br> </li> </ul> <i>Значения фильтра</i> - одиночное
 	* значение или массив значений. Для исключения пустых значений
 	* необходимо использовать <i>false</i>. <br><br> Необязательное. По
-	* умолчанию записи не фильтруются. <br><br><b>Примечание</b> (по
+	* умолчанию записи не фильтруются. <br><div class="note"> <b>Примечание 1:</b> (по
 	* настройке фильтра для свойства типа "Дата/Время"): свойство типа
 	* Дата/Время хранится как строковое с датой в формате YYYY-MM-DD HH:MI:SS.
 	* Соответственно сортировка по значению такого свойства будет
 	* работать корректно, а вот значение для фильтрации формируется
-	* примерно так: $cat_filter["&gt;"."PROPERTY_available"] = date("Y-m-d"); <br><br><b>Примечание:</b>
-	* при использовании типа проверки фильтра "&gt;&lt;" для целых чисел,
-	* заканчивающихся нулем, необходимо использовать тип поля
-	* <i>число</i> или разделительный знак "," для десятичных значений
-	* (например, 20000,00). Иначе работает не корректно.
-	*
-	*
+	* примерно так: $cat_filter["&gt;"."PROPERTY_available"] = date("Y-m-d"); </div> <br><div class="note">
+	* <b>Примечание 2:</b> при использовании типа проверки фильтра "&gt;&lt;"
+	* для целых чисел, заканчивающихся нулем, необходимо использовать
+	* тип поля <i>число</i> или разделительный знак "," для десятичных
+	* значений (например, 20000,00). Иначе работает не корректно.</div>
 	*
 	* @param mixed $arGroupBy = false Массив полей для группировки элемента. Если поля указаны, то
 	* выборка по ним группируется (при этом параметр arSelectFields будет
 	* проигнорирован), а в результат добавляется поле CNT - количество
 	* сгруппированных элементов. Если указать в качестве arGroupBy пустой
-	* массив, то функция вернет количество элементов CNT по фильтру.
+	* массив, то метод вернет количество элементов CNT по фильтру.
 	* Группировать можно по полям элемента, а также по значениям его
 	* свойств. Для этого в качестве одного из полей группировки
 	* необходимо указать <i>PROPERTY_&lt;PROPERTY_CODE&gt;</i>, где PROPERTY_CODE - ID или
 	* символьный код свойства. <br> Необязательное. По умолчанию false -
 	* записи не группируются.
-	*
-	*
 	*
 	* @param mixed $arNavStartParams = false Параметры для постраничной навигации и ограничения количества
 	* выводимых элементов. массив вида "Название
@@ -530,8 +527,6 @@ class CIBlockElement extends CAllIBlockElement
 	* Необязательное. По умолчанию <i>false</i> - не ограничивать выводимые
 	* элементы. <br> Если передать в параметр <i>arNavStartParams</i> пустой массив,
 	* то ставится ограничение на 10 выводимых элементов. <br>
-	*
-	*
 	*
 	* @param array $arSelectFields = Array() Массив возвращаемых полей элемента. Список полей элемента, а
 	* также можно сразу выводить значения его свойств. Обязательно
@@ -558,8 +553,8 @@ class CIBlockElement extends CAllIBlockElement
 	* символьный код свойства привязки, а PROPERTY_CODE2 - свойство указанного
 	* в привязке элемента. <br><br> По умолчанию выводить все поля.
 	* Значения параметра игнорируются, если используется параметр
-	* группировки <i>arGroupBy</i>. <br><br><b>Примечание 1</b>: если в массиве
-	* используются свойство, являющееся множественным, то для
+	* группировки <i>arGroupBy</i>. <br><div class="note"> <b>Примечание 1</b>: если в
+	* массиве используются свойство, являющееся множественным, то для
 	* элементов, где используются несколько значений этого свойства,
 	* будет возвращено несколько записей вместо одной. Для решения
 	* этой проблемы инфоблоки нужно перевести в <a
@@ -567,20 +562,17 @@ class CIBlockElement extends CAllIBlockElement
 	* свойств в отдельных таблицах</a>, в этом случае для свойства будет
 	* отдаваться массив значений. Либо можно не указывать свойства в
 	* параметрах выборки, а получать их значения на каждом шаге
-	* перебора выборки с помощью _CIBElement::GetProperties(). <br><br><b>Примечание 2</b>:
-	* Если в массиве указаны поля DETAIL_PAGE_URL, SECTION_PAGE_URL или LIST_PAGE_URL, то поля
-	* необходимые для правильной подстановки шаблонов URL'ов будут
-	* выбраны автоматически. Но только если не была задана группировка.
-	* <p><b>Примечание 3</b>: если необходимо выбрать данные о рейтингах для
-	* выбранных элементов, то для этого в массиве необходимо указать
-	* следующие <a href="http://dev.1c-bitrix.ru/api_help/main/general/ratings/rating_vote.php">поля</a>:
-	* RATING_TOTAL_VALUE, RATING_TOTAL_VOTES, RATING_TOTAL_POSITIVE_VOTES, RATING_TOTAL_NEGATIVE_VOTES,
-	* RATING_USER_VOTE_VALUE.</p>
-	*
-	*
+	* перебора выборки с помощью _CIBElement::GetProperties(). </div> <br><div class="note">
+	* <b>Примечание 2</b>: Если в массиве указаны поля DETAIL_PAGE_URL, SECTION_PAGE_URL
+	* или LIST_PAGE_URL, то поля необходимые для правильной подстановки
+	* шаблонов URL'ов будут выбраны автоматически. Но только если не была
+	* задана группировка. </div> <br><div class="note"> <b>Примечание 3</b>: если
+	* необходимо выбрать данные о рейтингах для выбранных элементов,
+	* то для этого в массиве необходимо указать следующие <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/ratings/rating_vote.php">поля</a>: RATING_TOTAL_VALUE,
+	* RATING_TOTAL_VOTES, RATING_TOTAL_POSITIVE_VOTES, RATING_TOTAL_NEGATIVE_VOTES, RATING_USER_VOTE_VALUE.</div>
 	*
 	* @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -693,7 +685,7 @@ class CIBlockElement extends CAllIBlockElement
 	* 
 	* //вывод:
 	* &lt;noindex&gt;
-	* &lt;div class="navElement" st yle="float:right; clear:both;"&gt;
+	* &lt;div class="navElement" style="float:right; clear:both;"&gt;
 	*    &lt;span class="l"&gt;
 	*       &lt;small&gt;&lt;a href="&lt;?=$navElement[0]['DETAIL_PAGE_URL']?&gt;?&lt;?=$sort_url?&gt;"&gt;Предыдущий товар&lt;/a&gt;&lt;/small&gt;
 	*    &lt;/span&gt;  
@@ -715,7 +707,6 @@ class CIBlockElement extends CAllIBlockElement
 	*     ));
 	*   ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -799,7 +790,7 @@ class CIBlockElement extends CAllIBlockElement
 				"WF_COMMENTS"=>"BE.WF_COMMENTS",
 				"IN_SECTIONS"=>"BE.IN_SECTIONS",
 				"SHOW_COUNTER"=>"BE.SHOW_COUNTER",
-				"SHOW_COUNTER_START"=>"BE.SHOW_COUNTER_START",
+				"SHOW_COUNTER_START"=>$DB->DateToCharFunction("BE.SHOW_COUNTER_START"),
 				"CODE"=>"BE.CODE",
 				"TAGS"=>"BE.TAGS",
 				"XML_ID"=>"BE.XML_ID",
@@ -816,6 +807,7 @@ class CIBlockElement extends CAllIBlockElement
 				"IBLOCK_EXTERNAL_ID"=>"B.XML_ID",
 				"DETAIL_PAGE_URL"=>"B.DETAIL_PAGE_URL",
 				"LIST_PAGE_URL"=>"B.LIST_PAGE_URL",
+				"CANONICAL_PAGE_URL"=>"B.CANONICAL_PAGE_URL",
 				"CREATED_DATE"=>$DB->DateFormatToDB("YYYY.MM.DD", "BE.DATE_CREATE"),
 				"BP_PUBLISHED"=>"if(BE.WF_STATUS_ID = 1, 'Y', 'N')",
 			);
@@ -1037,6 +1029,12 @@ class CIBlockElement extends CAllIBlockElement
 			$sFrom .= "\t\t\t".$arJoinProps["BES"]."\n";
 		}
 
+		if(strlen($arJoinProps["FC"]))
+		{
+			$sFrom .= "\t\t\t".$arJoinProps["FC"]."\n";
+			$bDistinct = $bDistinct || (isset($arJoinProps["FC_DISTINCT"]) && $arJoinProps["FC_DISTINCT"] == "Y");
+		}
+
 		if($arJoinProps["RV"])
 			$sFrom .= "\t\t\tLEFT JOIN b_rating_voting RV ON RV.ENTITY_TYPE_ID = 'IBLOCK_ELEMENT' AND RV.ENTITY_ID = BE.ID\n";
 		if($arJoinProps["RVU"])
@@ -1101,7 +1099,8 @@ class CIBlockElement extends CAllIBlockElement
 			}
 		}
 
-		if(strlen(trim($sSelect))<=0)
+		$sSelect = trim($sSelect, ", \t\n\r");
+		if(strlen($sSelect) <= 0)
 			$sSelect = "0 as NOP ";
 
 		$bDistinct = $bDistinct || (isset($arFilter["INCLUDE_SUBSECTIONS"]) && $arFilter["INCLUDE_SUBSECTIONS"] == "Y");
@@ -1244,14 +1243,10 @@ class CIBlockElement extends CAllIBlockElement
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Метод изменяет параметры элемента с кодом <i>ID</i>. Перед изменением элемента вызываются обработчики события  <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/OnStartIBlockElementUpdate.php">OnStartIBlockElementUpdate</a> из которых можно изменить значения полей или отменить изменение элемента вернув сообщение об ошибке. После изменения элемента вызывается само событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a>. </p> <p>Если изменяется свойство типа <b>файл</b>, то необходимо сформировать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">массив</a>. </p>
-	*
-	*
+	* <p>Метод изменяет параметры элемента с кодом <i>ID</i>. Перед изменением элемента вызываются обработчики события  <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/OnStartIBlockElementUpdate.php">OnStartIBlockElementUpdate</a> из которых можно изменить значения полей или отменить изменение элемента вернув сообщение об ошибке. После изменения элемента вызывается само событие <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">OnAfterIBlockElementUpdate</a>. Метод динамичный.</p> <p>Если изменяется свойство типа <b>файл</b>, то необходимо сформировать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">массив</a>. </p>
 	*
 	*
 	* @param int $ID  ID изменяемой записи. </htm
-	*
-	*
 	*
 	* @param array $arFields  Массив вида Array("поле"=&gt;"значение", ...), содержащий значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей элемента</a> инфоблоков
@@ -1270,21 +1265,18 @@ class CIBlockElement extends CAllIBlockElement
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvalues.php">SetPropertyValues()</a>, <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/setpropertyvaluecode.php">SetPropertyValueCode().</a>
-	* <br><br><b>Примечание:</b> нельзя изменить значения полей ID и IBLOCK_ID.
-	* <br><br><b>Примечание:</b> чтобы при обновлении элемента поле TIMESTAMP_X не
-	* обновилось на текущее время, в arFields необходимо передать: <pre
-	* class="syntax">'TIMESTAMP_X' =&gt; FALSE, // или NULL</pre>
-	*
-	*
+	* <br><br><div class="note"> <b>Примечание 1:</b> нельзя изменить значения полей ID
+	* и IBLOCK_ID. </div> <br><div class="note"> <b>Примечание 2:</b> чтобы при обновлении
+	* элемента поле TIMESTAMP_X не обновилось на текущее время, в arFields
+	* необходимо передать: <pre class="syntax">'TIMESTAMP_X' =&gt; FALSE, // или NULL</pre> </div>
 	*
 	* @param bool $bWorkFlow = false Изменение в режиме документооборота. Если true и модуль
 	* документооборота установлен, то данное изменение будет учтено в
 	* журнале изменений элемента. Не обязательный параметр, по
-	* умолчанию изменение в режиме документооборота отключено.
-	* <br><br><b>Примечание</b>: в режиме документооборота можно передавать
-	* значения не всех свойств в PROPERTY_VALUES, а только необходимых.
-	*
-	*
+	* умолчанию изменение в режиме документооборота отключено. <br><div
+	* class="note"> <b>Примечание:</b> в режиме документооборота можно
+	* передавать значения не всех свойств в PROPERTY_VALUES, а только
+	* необходимых.</div>
 	*
 	* @param bool $bUpdateSearch = true Индексировать элемент для поиска. Для повышения
 	* производительности можно отключать этот параметр во время серии
@@ -1292,24 +1284,17 @@ class CIBlockElement extends CAllIBlockElement
 	* поиск. Не обязательный параметр, по умолчанию элемент после
 	* изменения будет автоматически проиндексирован в поиске.
 	*
-	*
-	*
 	* @param bool $bResizePictures = false Использовать настройки инфоблока для обработки изображений. По
 	* умолчанию настройки не применяются. Если этот параметр имеет
 	* значение true, то к полям PREVIEW_PICTURE и DETAIL_PICTURE будут применены правила
 	* генерации и масштабирования в соответствии с настройками
 	* информационного блока.
 	*
-	*
-	*
 	* @param bool $bCheckDiskQuota = true Проверять ограничение по месту занимаемому базой данных и
 	* файлами или нет (настройка главного модуля). Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1323,7 +1308,6 @@ class CIBlockElement extends CAllIBlockElement
 	* Смотрите также
 	* <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=5534#%22value_del">Удаление одного из значений множественного свойства элементов инфоблока</a></li>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1352,6 +1336,7 @@ class CIBlockElement extends CAllIBlockElement
 				"DATE_CREATE",
 				"CREATED_BY",
 				"IBLOCK_ID",
+				"IBLOCK_SECTION_ID",
 				"ACTIVE",
 				"ACTIVE_FROM",
 				"ACTIVE_TO",
@@ -1477,6 +1462,7 @@ class CIBlockElement extends CAllIBlockElement
 				$ar_wf_element["DATE_ACTIVE_TO"],
 				$ar_wf_element["EXTERNAL_ID"],
 				$ar_wf_element["TIMESTAMP_X"],
+				$ar_wf_element["IBLOCK_SECTION_ID"],
 				$ar_wf_element["ID"]
 			);
 
@@ -1562,7 +1548,15 @@ class CIBlockElement extends CAllIBlockElement
 				{
 					$arNewPreview = $arFields["DETAIL_PICTURE"];
 					$arNewPreview["COPY_FILE"] = "Y";
-					$arNewPreview["description"] = $arFields["PREVIEW_PICTURE"]["description"];
+					if (
+						isset($arFields["PREVIEW_PICTURE"])
+						&& is_array($arFields["PREVIEW_PICTURE"])
+						&& isset($arFields["PREVIEW_PICTURE"]["description"])
+					)
+					{
+						$arNewPreview["description"] = $arFields["PREVIEW_PICTURE"]["description"];
+					}
+
 					$arFields["PREVIEW_PICTURE"] = $arNewPreview;
 				}
 			}
@@ -1800,8 +1794,17 @@ class CIBlockElement extends CAllIBlockElement
 			($DETAIL_TYPE_tmp=="html"? HTMLToTxt($DETAIL_tmp): $DETAIL_tmp)
 		);
 
-		if(is_set($arFields["IBLOCK_SECTION_ID"]) && !is_set($arFields, "IBLOCK_SECTION"))
-			$arFields["IBLOCK_SECTION"] = Array($arFields["IBLOCK_SECTION_ID"]);
+		if(array_key_exists("IBLOCK_SECTION_ID", $arFields))
+		{
+			if (!array_key_exists("IBLOCK_SECTION", $arFields))
+			{
+				$arFields["IBLOCK_SECTION"] = array($arFields["IBLOCK_SECTION_ID"]);
+			}
+			elseif (is_array($arFields["IBLOCK_SECTION"]) && !in_array($arFields["IBLOCK_SECTION_ID"], $arFields["IBLOCK_SECTION"]))
+			{
+				unset($arFields["IBLOCK_SECTION_ID"]);
+			}
+		}
 
 		$arFields["IBLOCK_ID"] = $ar_element["IBLOCK_ID"];
 
@@ -2028,6 +2031,7 @@ class CIBlockElement extends CAllIBlockElement
 					CFile::SaveForDB($arFields, "DETAIL_PICTURE", "iblock");
 			}
 
+			$IBLOCK_SECTION_ID = $arFields["IBLOCK_SECTION_ID"];
 			unset($arFields["IBLOCK_ID"], $arFields["WF_NEW"], $arFields["IBLOCK_SECTION_ID"]);
 
 			$bTimeStampNA = false;
@@ -2053,7 +2057,7 @@ class CIBlockElement extends CAllIBlockElement
 				CIBlockElement::SetPropertyValues($ID, $ar_element["IBLOCK_ID"], $arFields["PROPERTY_VALUES"]);
 
 			if(is_set($arFields, "IBLOCK_SECTION"))
-				CIBlockElement::SetElementSection($ID, $arFields["IBLOCK_SECTION"], false, $arIBlock["RIGHTS_MODE"] === "E"? $arIBlock["ID"]: 0);
+				CIBlockElement::SetElementSection($ID, $arFields["IBLOCK_SECTION"], false, $arIBlock["RIGHTS_MODE"] === "E"? $arIBlock["ID"]: 0, $IBLOCK_SECTION_ID);
 
 			if($arIBlock["RIGHTS_MODE"] === "E")
 			{
@@ -2072,6 +2076,8 @@ class CIBlockElement extends CAllIBlockElement
 			{
 				CIBlockElement::UpdateSearch($ID, true);
 			}
+
+			\Bitrix\Iblock\PropertyIndex\Manager::updateElementIndex($arIBlock["ID"], $ID);
 
 			if($bWorkFlow)
 			{
@@ -2163,26 +2169,19 @@ class CIBlockElement extends CAllIBlockElement
 		foreach (GetModuleEvents("iblock", "OnAfterIBlockElementUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arFields));
 
-		if(defined("BX_COMP_MANAGED_CACHE"))
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("iblock_id_".$arIBlock["ID"]);
+		CIBlock::clearIblockTagCache($arIBlock['ID']);
 
 		return $Result;
 	}
 
 	
 	/**
-	* <p>Функция сохраняет значения всех свойств элемента информационного блока.</p>
-	*
-	*
+	* <p>Метод сохраняет значения всех свойств элемента информационного блока. Метод динамичный.</p>
 	*
 	*
 	* @param int $ELEMENT_ID  Код элемента, значения свойств которого необходимо установить.
 	*
-	*
-	*
 	* @param int $IBLOCK_ID  Код информационного блока.
-	*
-	*
 	*
 	* @param array $PROPERTY_VALUES  Массив значений свойств, в котором коду свойства ставится в
 	* соответствие значение свойства. <br> Если <i>PROPERTY_CODE</i> установлен,
@@ -2199,19 +2198,15 @@ class CIBlockElement extends CAllIBlockElement
 	* Файлы надо удалять через массив с параметром "del"=&gt;"Y". <br> Если
 	* свойство типа <b>файл</b> множественное, то файл будет удален в
 	* случае присутствия параметра del, независимо от принимаемого им
-	* значения.<br><br><b>Примечание:</b> для свойства типа "Список" следует
-	* передавать идентификатор значения свойства, а не значение.
-	*
-	*
+	* значения.<br><br><div class="note"> <b>Примечание:</b> для свойства типа "Список"
+	* следует передавать идентификатор значения свойства, а не
+	* значение.</div>
 	*
 	* @param string $PROPERTY_CODE = false Код изменяемого свойства. Если этот параметр отличен от false, то
 	* изменяется только свойство с таким кодом. Не обязательный
 	* параметр, по умолчанию равен false.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -2249,7 +2244,6 @@ class CIBlockElement extends CAllIBlockElement
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
 	* </li> <li> <a
@@ -2264,161 +2258,235 @@ class CIBlockElement extends CAllIBlockElement
 	public static function SetPropertyValues($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUES, $PROPERTY_CODE = false)
 	{
 		global $DB;
-		$ELEMENT_ID = intVal($ELEMENT_ID);
-		if(!is_array($PROPERTY_VALUES))
-			$PROPERTY_VALUES = Array($PROPERTY_VALUES);
+		global $BX_IBLOCK_PROP_CACHE;
 
-		$arFilter = Array(
-			"IBLOCK_ID"=>$IBLOCK_ID,
-			"CHECK_PERMISSIONS"=>"N",
+		$ELEMENT_ID = intVal($ELEMENT_ID);
+		$IBLOCK_ID = intval($IBLOCK_ID);
+
+		if (!is_array($PROPERTY_VALUES))
+			$PROPERTY_VALUES = array($PROPERTY_VALUES);
+
+		$uniq_flt = $IBLOCK_ID;
+		$arFilter = array(
+			"IBLOCK_ID" => $IBLOCK_ID,
+			"CHECK_PERMISSIONS" => "N",
 		);
-		if($PROPERTY_CODE!==false)
-		{
-			if(IntVal($PROPERTY_CODE)>0)
-				$arFilter["ID"] = IntVal($PROPERTY_CODE);
-			else
-				$arFilter["CODE"] = $PROPERTY_CODE;
-		}
-		else
+
+		if ($PROPERTY_CODE === false)
 		{
 			$arFilter["ACTIVE"] = "Y";
+			$uniq_flt .= "|ACTIVE:".$arFilter["ACTIVE"];
 		}
-
-		$uniq_flt = md5(serialize($arFilter));
-		global $BX_IBLOCK_PROP_CACHE;
-		if(!is_set($BX_IBLOCK_PROP_CACHE, $IBLOCK_ID))
-			$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID] = Array();
-		if(is_set($BX_IBLOCK_PROP_CACHE[$IBLOCK_ID], $uniq_flt))
-			$ar_prop = &$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt];
+		elseif(intval($PROPERTY_CODE) > 0)
+		{
+			$arFilter["ID"] = intval($PROPERTY_CODE);
+			$uniq_flt .= "|ID:".$arFilter["ID"];
+		}
 		else
 		{
-			$db_prop = CIBlockProperty::GetList(array(), $arFilter);
-			$ar_prop = Array();
-			while($prop = $db_prop->Fetch())
-				$ar_prop[] = $prop;
-
-			$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt] = &$ar_prop;
+			$arFilter["CODE"] = $PROPERTY_CODE;
+			$uniq_flt .= "|CODE:".$arFilter["CODE"];
 		}
-		Reset($ar_prop);
 
-		$bRecalcSections = false;
-		$arPROP_ID = array_keys($PROPERTY_VALUES);
+		if (!isset($BX_IBLOCK_PROP_CACHE[$IBLOCK_ID]))
+			$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID] = array();
 
-		$cacheValues=false;
-		if(count($ar_prop)>1)
+		if (!isset($BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt]))
 		{
-			$cacheValues = Array();
-			$strSql =
-				"SELECT ep.ID, ep.VALUE, ep.IBLOCK_PROPERTY_ID ".
-				"FROM b_iblock_element_property ep, b_iblock_property p ".
-				"WHERE ep.IBLOCK_ELEMENT_ID=".$ELEMENT_ID.
-				"	AND ep.IBLOCK_PROPERTY_ID = p.ID ".
-				"	AND p.PROPERTY_TYPE <> 'L' ".
-				"	AND p.PROPERTY_TYPE <> 'G' ";
+			$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt] = array();
 
-			$db_res = $DB->Query($strSql);
-			while($res = $db_res->Fetch())
+			$db_prop = CIBlockProperty::GetList(array(), $arFilter);
+			while($prop = $db_prop->Fetch())
 			{
-				if(!isset($cacheValues[$res["IBLOCK_PROPERTY_ID"]]))
-					$cacheValues[$res["IBLOCK_PROPERTY_ID"]] = Array();
-				$cacheValues[$res["IBLOCK_PROPERTY_ID"]][] = $res;
+				$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt][] = $prop;
 			}
 		}
 
-		$ids = "0";
-		foreach($ar_prop as $prop)
+		$ar_prop = &$BX_IBLOCK_PROP_CACHE[$IBLOCK_ID][$uniq_flt];
+		reset($ar_prop);
+
+		$bRecalcSections = false;
+
+		//Read current property values from database
+		$arDBProps = array();
+		if (CIBLock::GetArrayByID($IBLOCK_ID, "VERSION") == 2)
 		{
-			if($PROPERTY_CODE)
+			$rs = $DB->Query("
+				select *
+				from b_iblock_element_prop_m".$IBLOCK_ID."
+				where IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+				order by ID asc
+			");
+			while ($ar = $rs->Fetch())
+			{
+				$property_id = $ar["IBLOCK_PROPERTY_ID"];
+				if (!isset($arDBProps[$property_id]))
+					$arDBProps[$property_id] = array();
+
+				$arDBProps[$property_id][$ar["ID"]] = $ar;
+			}
+
+			$rs = $DB->Query("
+				select *
+				from b_iblock_element_prop_s".$IBLOCK_ID."
+				where IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+			");
+			if ($ar = $rs->Fetch())
+			{
+				foreach($ar_prop as $property)
+				{
+					$property_id = $property["ID"];
+					if(
+						$property["MULTIPLE"] == "N"
+						&& isset($ar["PROPERTY_".$property_id])
+						&& strlen($ar["PROPERTY_".$property_id])
+					)
+					{
+						if (!isset($arDBProps[$property_id]))
+							$arDBProps[$property_id] = array();
+
+						$arDBProps[$property_id][$ELEMENT_ID.":".$property_id] = array(
+							"ID" => $ELEMENT_ID.":".$property_id,
+							"IBLOCK_PROPERTY_ID" => $property_id,
+							"VALUE" => $ar["PROPERTY_".$property_id],
+							"DESCRIPTION" => $ar["DESCRIPTION_".$property_id],
+						);
+					}
+				}
+			}
+		}
+		else
+		{
+			$rs = $DB->Query("
+				select *
+				from b_iblock_element_property
+				where IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+				order by ID asc
+			");
+			while ($ar = $rs->Fetch())
+			{
+				$property_id = $ar["IBLOCK_PROPERTY_ID"];
+				if (!isset($arDBProps[$property_id]))
+					$arDBProps[$property_id] = array();
+
+				$arDBProps[$property_id][$ar["ID"]] = $ar;
+			}
+		}
+
+		$arFilesToDelete = array();
+		$arV2ClearCache = array();
+		foreach ($ar_prop as $prop)
+		{
+			if ($PROPERTY_CODE)
+			{
 				$PROP = $PROPERTY_VALUES;
+			}
 			else
 			{
-				if(strlen($prop["CODE"])>0 && in_array($prop["CODE"], $arPROP_ID, TRUE))
+				if (strlen($prop["CODE"]) > 0 && array_key_exists($prop["CODE"], $PROPERTY_VALUES))
 					$PROP = $PROPERTY_VALUES[$prop["CODE"]];
 				else
 					$PROP = $PROPERTY_VALUES[$prop["ID"]];
 			}
-			if($prop["PROPERTY_TYPE"]=="F")
-			{
-				if(
-					!is_array($PROP)
-					|| (is_array($PROP) && (is_set($PROP, "tmp_name") || is_set($PROP, "del")))
-					|| (count($PROP)==2 && is_set($PROP, "VALUE") && is_set($PROP, "DESCRIPTION"))
-				)
-					$PROP = Array($PROP);
-			}
-			elseif(!is_array($PROP) || (count($PROP)==2 && is_set($PROP, "VALUE") && is_set($PROP, "DESCRIPTION")))
-				$PROP = Array($PROP);
 
-			if($prop["USER_TYPE"]!="")
+			if (
+				!is_array($PROP)
+				|| (
+					$prop["PROPERTY_TYPE"] == "F"
+					&& (
+						array_key_exists("tmp_name", $PROP)
+						|| array_key_exists("del", $PROP)
+					)
+				)
+				|| (
+					count($PROP) == 2
+					&& array_key_exists("VALUE", $PROP)
+					&& array_key_exists("DESCRIPTION", $PROP)
+				)
+			)
+			{
+				$PROP = array($PROP);
+			}
+
+			if ($prop["USER_TYPE"] != "")
 			{
 				$arUserType = CIBlockProperty::GetUserType($prop["USER_TYPE"]);
-
-				if(array_key_exists("ConvertToDB", $arUserType))
+				if (array_key_exists("ConvertToDB", $arUserType))
 				{
-					foreach($PROP as $key=>$value)
+					foreach ($PROP as $key => $value)
 					{
-						if(!is_array($value))
-							$value=array("VALUE"=>$value);
-						elseif(!array_key_exists("VALUE", $value))
-							$value=array("VALUE"=>$value);
+						if(
+							!is_array($value)
+							|| !array_key_exists("VALUE", $value)
+						)
+						{
+							$value = array("VALUE"=>$value);
+						}
+						$prop["ELEMENT_ID"] = $ELEMENT_ID;
 						$PROP[$key] = call_user_func_array($arUserType["ConvertToDB"], array($prop, $value));
 					}
 				}
 			}
 
-			if($prop["VERSION"]==2)
+			if ($prop["VERSION"] == 2)
 			{
-				if($prop["MULTIPLE"]=="Y")
+				if ($prop["MULTIPLE"] == "Y")
 					$strTable = "b_iblock_element_prop_m".$prop["IBLOCK_ID"];
 				else
 					$strTable = "b_iblock_element_prop_s".$prop["IBLOCK_ID"];
 			}
 			else
-				$strTable = "b_iblock_element_property";
-
-			if($prop["PROPERTY_TYPE"]=="L")
 			{
-				$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID), false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
+				$strTable = "b_iblock_element_property";
+			}
+
+			if ($prop["PROPERTY_TYPE"] == "L")
+			{
+				$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID));
+				if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
 				{
-					$strSql = "
-						UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-						SET PROPERTY_".$prop["ID"]."=NULL
-						".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-						WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-					";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$arV2ClearCache[$prop["ID"]] =
+						"PROPERTY_".$prop["ID"]." = NULL"
+						.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+					;
 				}
+
 				$ids = "0";
-				foreach($PROP as $key=>$value)
+				foreach ($PROP as $key => $value)
 				{
-					if(is_array($value))
-						$value = $value["VALUE"];
+					if (is_array($value))
+						$value = intval($value["VALUE"]);
+					else
+						$value = intval($value);
 
-					if(IntVal($value)<=0) continue;
-					$ids .= ",".IntVal($value);
-					if($prop["MULTIPLE"]!="Y") break;
+					if ($value <= 0)
+						continue;
+
+					$ids .= ",".$value;
+
+					if ($prop["MULTIPLE"] != "Y")
+						break;
 				}
 
-				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
+				if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 				{
-					$strSql = "
+					$DB->Query("
 						UPDATE
 							b_iblock_element_prop_s".$prop["IBLOCK_ID"]." E
 							,b_iblock_property P
 							,b_iblock_property_enum PEN
 						SET
-							E.PROPERTY_".$prop["ID"]."=PEN.ID
+							E.PROPERTY_".$prop["ID"]." = PEN.ID
 						WHERE
-							E.IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-							AND P.ID=".$prop["ID"]."
-							AND P.ID=PEN.PROPERTY_ID
+							E.IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+							AND P.ID = ".$prop["ID"]."
+							AND P.ID = PEN.PROPERTY_ID
 							AND PEN.ID IN (".$ids.")
-					";
+					");
 				}
 				else
 				{
-					$strSql = "
+					$DB->Query("
 						INSERT INTO ".$strTable."
 						(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_ENUM)
 						SELECT ".$ELEMENT_ID.", P.ID, PEN.ID, PEN.ID
@@ -2426,59 +2494,70 @@ class CIBlockElement extends CAllIBlockElement
 							b_iblock_property P
 							,b_iblock_property_enum PEN
 						WHERE
-							P.ID=".$prop["ID"]."
-							AND P.ID=PEN.PROPERTY_ID
+							P.ID = ".$prop["ID"]."
+							AND P.ID = PEN.PROPERTY_ID
 							AND PEN.ID IN (".$ids.")
-					";
+					");
 				}
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			}
-			elseif($prop["PROPERTY_TYPE"]=="G")
+			elseif ($prop["PROPERTY_TYPE"] == "G")
 			{
 				$bRecalcSections = true;
-				$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID), false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
+				$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID));
+				if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
 				{
-					$strSql = "
-						UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-						SET PROPERTY_".$prop["ID"]."=NULL
-						".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-						WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-					";
-					$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					$arV2ClearCache[$prop["ID"]] =
+						"PROPERTY_".$prop["ID"]." = NULL"
+						.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+					;
 				}
-				$DB->Query("DELETE FROM b_iblock_section_element WHERE ADDITIONAL_PROPERTY_ID=".$prop["ID"]." AND IBLOCK_ELEMENT_ID=".$ELEMENT_ID, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$DB->Query("
+					DELETE FROM b_iblock_section_element
+					WHERE ADDITIONAL_PROPERTY_ID = ".$prop["ID"]."
+					AND IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+				");
+
 				$ids = "0";
-				foreach($PROP as $key=>$value)
+				foreach ($PROP as $key => $value)
 				{
-					if(is_array($value))
-						$value = $value["VALUE"];
+					if (is_array($value))
+						$value = intval($value["VALUE"]);
+					else
+						$value = intval($value);
 
-					if(IntVal($value)<=0) continue;
-					$ids .= ",".IntVal($value);
-					if($prop["MULTIPLE"]!="Y") break;
+					if ($value <= 0)
+						continue;
+
+					$ids .= ",".$value;
+
+					if ($prop["MULTIPLE"] != "Y")
+						break;
 				}
 
-				if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
+				if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 				{
-					$strSql = "
+					$DB->Query("
 						UPDATE
 							b_iblock_element_prop_s".$prop["IBLOCK_ID"]." E
 							,b_iblock_property P
 							,b_iblock_section S
 						SET
-							E.PROPERTY_".$prop["ID"]."=S.ID
+							E.PROPERTY_".$prop["ID"]." = S.ID
 							".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
 						WHERE
-							E.IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-							AND P.ID=".$prop["ID"]."
-							AND S.IBLOCK_ID = P.LINK_IBLOCK_ID
+							E.IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+							AND P.ID = ".$prop["ID"]."
+							AND (
+								P.LINK_IBLOCK_ID IS NULL
+								OR P.LINK_IBLOCK_ID = 0
+								OR S.IBLOCK_ID = P.LINK_IBLOCK_ID
+							)
 							AND S.ID IN (".$ids.")
-					";
+					");
 				}
 				else
 				{
-					$strSql = "
+					$DB->Query("
 						INSERT INTO ".$strTable."
 						(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM)
 						SELECT ".$ELEMENT_ID.", P.ID, S.ID, S.ID
@@ -2487,56 +2566,122 @@ class CIBlockElement extends CAllIBlockElement
 							,b_iblock_section S
 						WHERE
 							P.ID=".$prop["ID"]."
-							AND S.IBLOCK_ID = P.LINK_IBLOCK_ID
+							AND (
+								P.LINK_IBLOCK_ID IS NULL
+								OR P.LINK_IBLOCK_ID = 0
+								OR S.IBLOCK_ID = P.LINK_IBLOCK_ID
+							)
 							AND S.ID IN (".$ids.")
-					";
+					");
 				}
-				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				$DB->Query(
-					"INSERT INTO b_iblock_section_element(IBLOCK_ELEMENT_ID, IBLOCK_SECTION_ID, ADDITIONAL_PROPERTY_ID) ".
-					"SELECT ".$ELEMENT_ID.", S.ID, P.ID ".
-					"FROM b_iblock_property P, b_iblock_section S ".
-					"WHERE P.ID=".$prop["ID"]." ".
-					"	AND S.IBLOCK_ID = P.LINK_IBLOCK_ID ".
-					"	AND S.ID IN (".$ids.") "
-					, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				$DB->Query("
+					INSERT INTO b_iblock_section_element
+					(IBLOCK_ELEMENT_ID, IBLOCK_SECTION_ID, ADDITIONAL_PROPERTY_ID)
+					SELECT ".$ELEMENT_ID.", S.ID, P.ID
+					FROM
+						b_iblock_property P
+						,b_iblock_section S
+					WHERE
+						P.ID = ".$prop["ID"]."
+						AND (
+							P.LINK_IBLOCK_ID IS NULL
+							OR P.LINK_IBLOCK_ID = 0
+							OR S.IBLOCK_ID = P.LINK_IBLOCK_ID
+						)
+						AND S.ID IN (".$ids.")
+				");
 			}
-			else
+			elseif ($prop["PROPERTY_TYPE"] == "E")
 			{
-				$ids = "0";
-				$arV = Array();
-				if($cacheValues===false || $prop["VERSION"]==2)
+				$arWas = array();
+				if ($arDBProps[$prop["ID"]])
 				{
-					if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
+					foreach($arDBProps[$prop["ID"]] as $res)
 					{
-						$strSql = "
-							SELECT	concat(IBLOCK_ELEMENT_ID,':','".$prop["ID"]."') ID, PROPERTY_".$prop["ID"]." VALUE
-							FROM	b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-							WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
-					}
-					else
-					{
-						$strSql = "
-							SELECT	ID, VALUE
-							FROM	".$strTable."
-							WHERE	IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								AND IBLOCK_PROPERTY_ID=".$prop["ID"];
-					}
-					$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					while($res = $db_res->Fetch())
-						$arV[] = $res;
-				}
-				elseif(is_set($cacheValues, $prop["ID"]))
-				{
-					$arV = $cacheValues[$prop["ID"]];
+						$val = $PROP[$res["ID"]];
+						if (is_array($val))
+						{
+							$val_desc = $val["DESCRIPTION"];
+							$val = $val["VALUE"];
+						}
+						else
+						{
+							$val_desc = false;
+						}
+
+						if (isset($arWas[$val]))
+							$val = "";
+						else
+							$arWas[$val] = true;
+
+						if (strlen($val) <= 0) //Delete property value
+						{
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
+							{
+								$DB->Query($s="
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]." = null
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+								");
+							}
+							else
+							{
+								$DB->Query($s="
+									DELETE FROM ".$strTable."
+									WHERE ID=".$res["ID"]."
+								");
+							}
+
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
+							{
+								$arV2ClearCache[$prop["ID"]] =
+									"PROPERTY_".$prop["ID"]." = NULL"
+									.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+								;
+							}
+						}
+						elseif (
+							$res["VALUE"] !== $val
+							|| $res["DESCRIPTION"].'' !== $val_desc.''
+						) //Update property value
+						{
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
+							{
+								$DB->Query("
+									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+									SET PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
+									WHERE IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+								");
+							}
+							else
+							{
+								$DB->Query("
+									UPDATE ".$strTable."
+									SET VALUE = '".$DB->ForSql($val)."'
+										,VALUE_NUM = ".CIBlock::roundDB($val)."
+										".($val_desc!==false ? ",DESCRIPTION = '".$DB->ForSql($val_desc, 255)."'" : "")."
+									WHERE ID=".$res["ID"]."
+								");
+							}
+
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
+							{
+								$arV2ClearCache[$prop["ID"]] =
+									"PROPERTY_".$prop["ID"]." = NULL"
+									.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+								;
+							}
+						}
+
+						unset($PROP[$res["ID"]]);
+					} //foreach($arDBProps[$prop["ID"]] as $res)
 				}
 
-				$arFilesToDelete = array();
-				$arWas = Array();
-				foreach($arV as $res)
+				foreach ($PROP as $val)
 				{
-					$val = $PROP[$res["ID"]];
-					if(is_array($val) && !is_set($val, "tmp_name") && !is_set($val, "del"))
+					if (is_array($val))
 					{
 						$val_desc = $val["DESCRIPTION"];
 						$val = $val["VALUE"];
@@ -2546,220 +2691,376 @@ class CIBlockElement extends CAllIBlockElement
 						$val_desc = false;
 					}
 
-					if($prop["PROPERTY_TYPE"]=="E")
+					if (isset($arWas[$val]))
+						$val = "";
+					else
+						$arWas[$val] = true;
+
+					if (strlen($val) <= 0)
+						continue;
+
+					if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 					{
-						if(in_array($val, $arWas))
-							$val = "";
-						else
-							$arWas[] = $val;
+						$DB->Query("
+							UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+							SET
+								PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
+								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
+							WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+						");
+					}
+					else
+					{
+						$DB->Query("
+							INSERT INTO ".$strTable."
+							(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM".($val_desc!==false?", DESCRIPTION":"").")
+							SELECT
+								".$ELEMENT_ID."
+								,P.ID
+								,'".$DB->ForSql($val)."'
+								,".CIBlock::roundDB($val)."
+								".($val_desc!==false?", '".$DB->ForSQL($val_desc, 255)."'":"")."
+							FROM
+								b_iblock_property P
+							WHERE
+								ID = ".IntVal($prop["ID"])."
+						");
 					}
 
-					if($prop["PROPERTY_TYPE"]=="S" || $prop["PROPERTY_TYPE"]=="N" || $prop["PROPERTY_TYPE"]=="E")
+					if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
 					{
-						if(strlen($val)<=0)
+						$arV2ClearCache[$prop["ID"]] =
+							"PROPERTY_".$prop["ID"]." = NULL"
+							.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+						;
+					}
+
+					if ($prop["MULTIPLE"] != "Y")
+						break;
+				} //foreach($PROP as $value)
+			}
+			elseif ($prop["PROPERTY_TYPE"] == "F")
+			{
+				//We'll be adding values from the database into the head
+				//for multiple values and into tje tail for single
+				//these values were not passed into API call.
+				if ($prop["MULTIPLE"] == "Y")
+					$orderedPROP = array_reverse($PROP, true);
+				else
+					$orderedPROP = $PROP;
+
+				if ($arDBProps[$prop["ID"]])
+				{
+					//Go from high ID to low
+					foreach (array_reverse($arDBProps[$prop["ID"]], true) as $res)
+					{
+						//Preserve description from database
+						if (strlen($res["DESCRIPTION"]))
+							$description = $res["DESCRIPTION"];
+						else
+							$description = false;
+
+						if (!array_key_exists($res["ID"], $orderedPROP))
 						{
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
-							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET
-										PROPERTY_".$prop["ID"]."=null
-										".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
-							}
-							else
-							{
-								$strSql = "DELETE FROM ".$strTable." WHERE ID=".$res["ID"];
-							}
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
-							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							}
+							$orderedPROP[$res["ID"]] = array(
+								"VALUE" => $res["VALUE"],
+								"DESCRIPTION" => $description,
+							);
 						}
 						else
 						{
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
+							$val = $orderedPROP[$res["ID"]];
+							if (
+								is_array($val)
+								&& !array_key_exists("tmp_name", $val)
+								&& !array_key_exists("del", $val)
+							)
+								$val = $val["VALUE"];
+
+							//Check if no new file and no delete command
+							if (
+								!strlen($val["tmp_name"])
+								&& !strlen($val["del"])
+							) //Overwrite with database value
 							{
-								if($prop["PROPERTY_TYPE"]=="N")
-									$val = CIBlock::roundDB($val);
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."='".$DB->ForSql($val)."'
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
-							}
-							else
-							{
-								$strSql = "
-									UPDATE ".$strTable."
-									SET 	VALUE='".$DB->ForSql($val)."'
-										,VALUE_NUM=".CIBlock::roundDB($val)."
-										".($val_desc!==false ? ",DESCRIPTION='".$DB->ForSql($val_desc, 255)."'" : "")."
-									WHERE ID=".$res["ID"];
-							}
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
-							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+								//But save description from incoming value
+								if (array_key_exists("description", $val))
+									$description = trim($val["description"]);
+
+								$orderedPROP[$res["ID"]] = array(
+									"VALUE" => $res["VALUE"],
+									"DESCRIPTION" => $description,
+								);
 							}
 						}
 					}
-					elseif($prop["PROPERTY_TYPE"]=="F")
-					{
-						if(is_array($val))
-						{
-							if(strlen($val["del"]) > 0)
-							{
-								$val = "NULL";
-							}
-							else
-							{
-								$val["MODULE_ID"] = "iblock";
-								if($val_desc!==false)
-									$val["description"] = $val_desc;
+				}
 
-								if(
-									$val_desc !== false
-									&& (strlen($val["name"]) <= 0)
-								)
-								{//update description only
-									if($res["VALUE"] > 0)
-										CFile::UpdateDesc($res["VALUE"], $val_desc);
-									$val = false;
-								}
-								else
-								{//register new file
-									$val = CFile::SaveFile($val, "iblock");
-								}
-							}
+				//Restore original order
+				if ($prop["MULTIPLE"] == "Y")
+					$orderedPROP = array_reverse($orderedPROP, true);
+
+				$preserveID = array();
+				//Now delete from database all marked for deletion  records
+				if ($arDBProps[$prop["ID"]])
+				{
+					foreach ($arDBProps[$prop["ID"]] as $res)
+					{
+						$val = $orderedPROP[$res["ID"]];
+						if (
+							is_array($val)
+							&& !array_key_exists("tmp_name", $val)
+							&& !array_key_exists("del", $val)
+						)
+						{
+							$val = $val["VALUE"];
 						}
 
-						if($val=="NULL")
+						if (is_array($val) && strlen($val["del"]))
 						{
-							$arFilesToDelete[] = array(
+							unset($orderedPROP[$res["ID"]]);
+							$arFilesToDelete[$res["VALUE"]] = array(
 								"FILE_ID" => $res["VALUE"],
 								"ELEMENT_ID" => $ELEMENT_ID,
 								"IBLOCK_ID" => $prop["IBLOCK_ID"],
 							);
+						}
+						elseif ($prop["MULTIPLE"] != "Y")
+						{
+							//Delete all stored in database for replacement.
+							$arFilesToDelete[$res["VALUE"]] = array(
+								"FILE_ID" => $res["VALUE"],
+								"ELEMENT_ID" => $ELEMENT_ID,
+								"IBLOCK_ID" => $prop["IBLOCK_ID"],
+							);
+						}
 
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
+						if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
+						{
+							$DB->Query("
+								UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+								SET PROPERTY_".$prop["ID"]." = null
+								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+								WHERE IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+							");
+						}
+						else
+						{
+							$DB->Query("DELETE FROM ".$strTable." WHERE ID = ".$res["ID"]);
+							$preserveID[$res["ID"]] = $res["ID"];
+						}
+
+						if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
+						{
+							$arV2ClearCache[$prop["ID"]] =
+								"PROPERTY_".$prop["ID"]." = NULL"
+								.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+							;
+						}
+					} //foreach($arDBProps[$prop["ID"]] as $res)
+				}
+
+				//Check if we have to save property values id's
+				if ($preserveID)
+				{
+					//Find tail mark where all added files started
+					$tailStart = null;
+					foreach (array_reverse($orderedPROP, true) as $propertyValueId => $val)
+					{
+						if (intval($propertyValueId) > 0)
+							break;
+						$tailStart = $propertyValueId;
+					}
+
+					$prevId = 0;
+					foreach ($orderedPROP as $propertyValueId => $val)
+					{
+						if ($propertyValueId === $tailStart)
+							break;
+
+						if (intval($propertyValueId) < $prevId)
+						{
+							$preserveID = array();
+							break;
+						}
+						$prevId = $propertyValueId;
+					}
+				}
+
+				//Write new values into database in specified order
+				foreach ($orderedPROP as $propertyValueId => $val)
+				{
+					if(
+						is_array($val)
+						&& !array_key_exists("tmp_name", $val)
+					)
+					{
+						$val_desc = $val["DESCRIPTION"];
+						$val = $val["VALUE"];
+					}
+					else
+					{
+						$val_desc = false;
+					}
+
+					if (is_array($val))
+					{
+						$val["MODULE_ID"] = "iblock";
+						if ($val_desc !== false)
+							$val["description"] = $val_desc;
+
+						$val = CFile::SaveFile($val, "iblock");
+					}
+					elseif (
+						$val > 0
+						&& $val_desc !== false
+					)
+					{
+						CFile::UpdateDesc($val, $val_desc);
+					}
+
+					if (intval($val) <= 0)
+						continue;
+
+					if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
+					{
+						$DB->Query($s="
+							UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+							SET
+								PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
+								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
+							WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+						");
+					}
+					elseif (array_key_exists($propertyValueId, $preserveID))
+					{
+						$DB->Query("
+							INSERT INTO ".$strTable."
+							(ID, IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM".($val_desc!==false?", DESCRIPTION":"").")
+							SELECT
+								".$preserveID[$propertyValueId]."
+								,".$ELEMENT_ID."
+								,P.ID
+								,'".$DB->ForSql($val)."'
+								,".CIBlock::roundDB($val)."
+								".($val_desc!==false?", '".$DB->ForSQL($val_desc, 255)."'":"")."
+							FROM
+								b_iblock_property P
+							WHERE
+								ID = ".IntVal($prop["ID"])."
+						");
+					}
+					else
+					{
+						$DB->Query("
+							INSERT INTO ".$strTable."
+							(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM".($val_desc!==false?", DESCRIPTION":"").")
+							SELECT
+								".$ELEMENT_ID."
+								,P.ID
+								,'".$DB->ForSql($val)."'
+								,".CIBlock::roundDB($val)."
+								".($val_desc!==false?", '".$DB->ForSQL($val_desc, 255)."'":"")."
+							FROM
+								b_iblock_property P
+							WHERE
+								ID = ".IntVal($prop["ID"])."
+						");
+					}
+
+					if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
+					{
+						$arV2ClearCache[$prop["ID"]] =
+							"PROPERTY_".$prop["ID"]." = NULL"
+							.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+						;
+					}
+
+					if ($prop["MULTIPLE"] != "Y")
+						break;
+
+				} //foreach($PROP as $value)
+			}
+			else //if($prop["PROPERTY_TYPE"] == "S" || $prop["PROPERTY_TYPE"] == "N")
+			{
+				if ($arDBProps[$prop["ID"]])
+				{
+					foreach ($arDBProps[$prop["ID"]] as $res)
+					{
+						$val = $PROP[$res["ID"]];
+						if (is_array($val))
+						{
+							$val_desc = $val["DESCRIPTION"];
+							$val = $val["VALUE"];
+						}
+						else
+						{
+							$val_desc = false;
+						}
+
+						if (strlen($val) <= 0)
+						{
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 							{
-								$strSql = "
+								$DB->Query("
 									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=null
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
+									SET
+										PROPERTY_".$prop["ID"]." = null
+										".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+								");
 							}
 							else
 							{
-								$strSql = "DELETE FROM ".$strTable." WHERE ID=".$res["ID"];
+								$DB->Query("DELETE FROM ".$strTable." WHERE ID=".$res["ID"]);
 							}
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
 							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+								$arV2ClearCache[$prop["ID"]] =
+									"PROPERTY_".$prop["ID"]." = NULL"
+									.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+								;
 							}
 						}
-						elseif(IntVal($val)>0)
+						else
 						{
-							if(intval($val) != $res["VALUE"])
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 							{
-								$arFilesToDelete[] = array(
-									"FILE_ID" => $res["VALUE"],
-									"ELEMENT_ID" => $ELEMENT_ID,
-									"IBLOCK_ID" => $prop["IBLOCK_ID"],
-								);
-							}
+								if($prop["PROPERTY_TYPE"]=="N")
+									$val = CIBlock::roundDB($val);
 
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
-							{
-								$strSql = "
+								$DB->Query("
 									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."='".intval($val)."'
-									".($val_desc!==false? self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc): "")."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
-							}
-							else
-							{
-								$strSql = "
-									UPDATE ".$strTable."
-									SET 	VALUE='".intval($val)."'
-										,VALUE_NUM='".intval($val)."'
-										".($val_desc!==false ? ",DESCRIPTION='".$DB->ForSql($val_desc, 255)."'" : "")."
-									WHERE ID=".$res["ID"];
-							}
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
-							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
+									SET PROPERTY_".$prop["ID"]."='".$DB->ForSql($val)."'
+									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
 									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							}
-						}
-						elseif($val_desc!==false)
-						{
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
-							{
-								if (self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"]))
-								{
-									$DB->Query("
-										UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-										SET DESCRIPTION_".$prop["ID"]."='".$DB->ForSql($val_desc, 255)."'
-										WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-									");
-								}
+								");
 							}
 							else
 							{
 								$DB->Query("
 									UPDATE ".$strTable."
-									SET DESCRIPTION='".$DB->ForSql($val_desc, 255)."'
+									SET 	VALUE='".$DB->ForSql($val)."'
+										,VALUE_NUM=".CIBlock::roundDB($val)."
+										".($val_desc!==false ? ",DESCRIPTION='".$DB->ForSql($val_desc, 255)."'" : "")."
 									WHERE ID=".$res["ID"]."
 								");
 							}
 
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
+							if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
 							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+								$arV2ClearCache[$prop["ID"]] =
+									"PROPERTY_".$prop["ID"]." = NULL"
+									.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+								;
 							}
 						}
-					}
-					$ids .= ",".$res["ID"];
-					unset($PROP[$res["ID"]]);
-				} //foreach($arV as $res)
+						unset($PROP[$res["ID"]]);
+					} //foreach ($arDBProps[$prop["ID"]] as $res)
+				}
 
-				foreach($PROP as $key=>$val)
+				foreach($PROP as $val)
 				{
 					if(is_array($val) && !is_set($val, "tmp_name"))
 					{
@@ -2767,132 +3068,75 @@ class CIBlockElement extends CAllIBlockElement
 						$val = $val["VALUE"];
 					}
 					else
+					{
 						$val_desc = false;
-
-					if($prop["PROPERTY_TYPE"]=="F")
-					{
-						if(is_array($val))
-						{
-							$val["MODULE_ID"] = "iblock";
-							if($val_desc!==false)
-								$val["description"] = $val_desc;
-
-							$val = CFile::SaveFile($val, "iblock");
-						}
-
-						if(intval($val)<=0)
-						{
-							$val = false;
-						}
-						elseif($prop["MULTIPLE"]!="Y" && strlen($val)>0)
-						{
-							$strSql = "
-								SELECT VALUE
-								FROM b_iblock_element_property
-								WHERE
-									IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-									AND IBLOCK_PROPERTY_ID=".IntVal($prop["ID"])."
-							";
-							if($prop["VERSION"]==2)
-							{
-								if($prop["MULTIPLE"]=="Y")
-									$strSql = "
-										SELECT PROPERTY_".$prop["ID"]." VALUE
-										FROM b_iblock_element_prop_m".$prop["IBLOCK_ID"]."
-										WHERE
-										IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-										AND IBLOCK_PROPERTY_ID=".IntVal($prop["ID"])."
-									";
-								else
-									$strSql = "
-										SELECT PROPERTY_".$prop["ID"]." VALUE
-										FROM b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-										WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-									";
-							}
-							$pfres = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							while($pfar = $pfres->Fetch())
-							{
-								$arFilesToDelete[] = array(
-									"FILE_ID" => $pfar["VALUE"],
-									"ELEMENT_ID" => $ELEMENT_ID,
-									"IBLOCK_ID" => $prop["IBLOCK_ID"],
-								);
-							}
-
-							$DB->Query(CIBLockElement::DeletePropertySQL($prop, $ELEMENT_ID), false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
-							{
-								$strSql = "
-									UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-									SET PROPERTY_".$prop["ID"]."=NULL
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-									WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-								";
-								$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-							}
-						}
-					}
-					elseif($prop["PROPERTY_TYPE"]=="E")
-					{
-						if(in_array($val, $arWas))
-							$val = "";
-						else
-							$arWas[] = $val;
 					}
 
-					if(strlen($val)>0)
+					if (strlen($val) <= 0)
+						continue;
+
+					if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "N")
 					{
-						if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="N")
-						{
-							$strSql = "
-								UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-								SET
-									PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
-									".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
-								WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID;
-						}
-						else
-						{
-							$strSql = "
-								INSERT INTO ".$strTable."
-								(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM".($val_desc!==false?", DESCRIPTION":"").")
-								SELECT
-									".$ELEMENT_ID."
-									,P.ID
-									,'".$DB->ForSql($val)."'
-									,".CIBlock::roundDB($val)."
-									".($val_desc!==false?", '".$DB->ForSQL($val_desc, 255)."'":"")."
-								FROM	b_iblock_property P
-								WHERE	ID=".IntVal($prop["ID"]);
-						}
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-						if($prop["VERSION"]==2 && $prop["MULTIPLE"]=="Y")
-						{
-							$strSql = "
-								UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
-								SET PROPERTY_".$prop["ID"]."=NULL
-								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])."
-								WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
-							";
-							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-						}
+						if ($prop["PROPERTY_TYPE"]=="N")
+							$val = CIBlock::roundDB($val);
 
-						if($prop["MULTIPLE"]!="Y") break;
+						$DB->Query("
+							UPDATE b_iblock_element_prop_s".$prop["IBLOCK_ID"]."
+							SET
+								PROPERTY_".$prop["ID"]." = '".$DB->ForSql($val)."'
+								".self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"], $val_desc)."
+							WHERE IBLOCK_ELEMENT_ID=".$ELEMENT_ID."
+						");
 					}
-					$ids .= ",".$prop["ID"];
-				} //foreach($PROP as $key=>$value)
+					else
+					{
+						$DB->Query("
+							INSERT INTO ".$strTable."
+							(IBLOCK_ELEMENT_ID, IBLOCK_PROPERTY_ID, VALUE, VALUE_NUM".($val_desc!==false?", DESCRIPTION":"").")
+							SELECT
+								".$ELEMENT_ID."
+								,P.ID
+								,'".$DB->ForSql($val)."'
+								,".CIBlock::roundDB($val)."
+								".($val_desc!==false?", '".$DB->ForSQL($val_desc, 255)."'":"")."
+							FROM
+								b_iblock_property P
+							WHERE
+								ID = ".IntVal($prop["ID"])."
+						");
+					}
 
-				foreach ($arFilesToDelete as $deleteTask)
-				{
-					CIBLockElement::DeleteFile(
-						$deleteTask["FILE_ID"],
-						$deleteTask["ELEMENT_ID"],
-						"PROPERTY", -1,
-						$deleteTask["IBLOCK_ID"]
-					);
-				}
-			} //if($prop["PROPERTY_TYPE"]=="L")
+					if ($prop["VERSION"] == 2 && $prop["MULTIPLE"] == "Y")
+					{
+						$arV2ClearCache[$prop["ID"]] =
+							"PROPERTY_".$prop["ID"]." = NULL"
+							.self::__GetDescriptionUpdateSql($prop["IBLOCK_ID"], $prop["ID"])
+						;
+					}
+
+					if ($prop["MULTIPLE"] != "Y")
+						break;
+				} //foreach($PROP as $value)
+			} //if($prop["PROPERTY_TYPE"]=="F")
+		}
+
+		if ($arV2ClearCache)
+		{
+			$DB->Query("
+				UPDATE b_iblock_element_prop_s".$IBLOCK_ID."
+				SET ".implode(",", $arV2ClearCache)."
+				WHERE IBLOCK_ELEMENT_ID = ".$ELEMENT_ID."
+			");
+		}
+
+		foreach ($arFilesToDelete as $deleteTask)
+		{
+			CIBLockElement::DeleteFile(
+				$deleteTask["FILE_ID"],
+				false,
+				"PROPERTY", $deleteTask["ELEMENT_ID"],
+				$deleteTask["IBLOCK_ID"]
+			);
 		}
 
 		if($bRecalcSections)

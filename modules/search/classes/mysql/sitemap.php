@@ -1,9 +1,7 @@
 <?
 
 /**
- * Класс поддержки Google Sitemap.</body> <
- *
- *
+ * Класс поддержки Google Sitemap. <
  *
  *
  * @return mixed 

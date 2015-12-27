@@ -67,7 +67,7 @@ class ElementPrice extends Base
 			while ($priceInfo = $pricesList->fetch())
 			{
 				$priceId = $priceInfo["CATALOG_GROUP_ID"];
-				$price = \FormatCurrency($priceInfo["PRICE"], $priceInfo["CURRENCY"]);
+				$price = \CCurrencyLang::currencyFormat($priceInfo["PRICE"], $priceInfo["CURRENCY"], true);
 				$this->addField($priceId, $priceId, $price);
 				$this->addField($priceInfo["CATALOG_GROUP_CODE"], $priceId, $price);
 			}

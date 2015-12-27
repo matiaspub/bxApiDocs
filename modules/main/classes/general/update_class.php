@@ -5,7 +5,7 @@
 /**********************************************************************/
 
 if (!defined("BX_DIR_PERMISSIONS"))
-	;// define("BX_DIR_PERMISSIONS", 0755);
+	// define("BX_DIR_PERMISSIONS", 0755);
 
 if (!function_exists("file_get_contents"))
 {
@@ -19,7 +19,7 @@ if (!function_exists("file_get_contents"))
 }
 
 if (!defined("US_SHARED_KERNEL_PATH"))
-	;// define("US_SHARED_KERNEL_PATH", "/bitrix");
+	// define("US_SHARED_KERNEL_PATH", "/bitrix");
 
 class CUpdateSystem
 {
@@ -2856,7 +2856,7 @@ public static 	function UpdateHelp($updates_dir, $arHelp, &$strError, &$arErrorH
 
 
 
-	public static function Report2Server($arServerReport)
+	funpublic static ction Report2Server($arServerReport)
 	{
 		$strError_tmp = "";
 
@@ -3053,7 +3053,7 @@ public static 	function AddMessage2Log($sText, $sErrorCode = "")
 
 
 	/** Собирает из массива модулей строку запроса **/
-	public static function ModulesArray2Query($arClientModules, $pref = "bitm_")
+	fpublic static unction ModulesArray2Query($arClientModules, $pref = "bitm_")
 	{
 		$strRes = "";
 		if (is_array($arClientModules))
@@ -3803,13 +3803,13 @@ public static 	function GetLicenseKey()
 		return $GLOBALS["CACHE4UPDATESYS_LICENSE_KEY"];
 	}
 
-	public static function getmicrotime()
+	fupublic static nction getmicrotime()
 	{
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
 	}
 
-	public static function InsertSpaces($sText, $iMaxChar=80)
+	fupublic static nction InsertSpaces($sText, $iMaxChar=80)
 	{
 		$iMaxChar = IntVal($iMaxChar);
 		if ($iMaxChar>0 && strlen($sText)>$iMaxChar)

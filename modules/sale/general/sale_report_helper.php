@@ -61,8 +61,39 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			}
 			unset($i, $row, $result);
 
+			// hack, add virtual ID field into StatusLang entity for filtering
+			$statusEntity = Entity\Base::getInstance('\Bitrix\Sale\Internals\StatusLang');
+			if ($statusEntity instanceof \Bitrix\Main\Entity\Base)
+			{
+				$statusEntity->addField(
+					array(
+						'data_type' => 'string',
+						'expression' => array('%s', 'STATUS_ID')
+					),
+					'ID'
+				);
+			}
+			unset($statusEntity);
+
+			// hack, add virtual REPS_ORDER field into Shipment entity for filtering system records
+			$shipmentEntity = Entity\Base::getInstance('\Bitrix\Sale\Internals\Shipment');
+			if ($shipmentEntity instanceof \Bitrix\Main\Entity\Base)
+			{
+				$shipmentEntity->addField(
+					array(
+						'data_type' => 'Order',
+						'reference' => array(
+							'=ref.ID' => 'this.ORDER_ID',
+							'!=this.SYSTEM' => array('?', 'Y')
+						)
+					),
+					'REPS_ORDER'
+				);
+			}
+			unset($shipmentEntity);
+
 			// Initializing list of statuses of orders.
-			$result = Bitrix\Sale\StatusLangTable::getList(array(
+			$result = Bitrix\Sale\Internals\StatusLangTable::getList(array(
 				'select' => array('STATUS_ID', 'NAME'),
 				'filter' => array('=LID' => LANGUAGE_ID)
 			));
@@ -75,7 +106,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			self::$genders = array('M' => GetMessage('USER_MALE'), 'F' => GetMessage('USER_FEMALE'));
 
 			// Initializing list of person types.
-			$result = Bitrix\Sale\PersonTypeTable::getList(array(
+			$result = Bitrix\Sale\Internals\PersonTypeTable::getList(array(
 				'select' => array('ID', 'LID', 'NAME')/*,
 				'filter' => array('=ACTIVE', 'Y')*/
 			));
@@ -97,26 +128,18 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 			unset($row, $result);
 
 			// Initializing list of services and methods of delivery.
-			$result = Bitrix\Sale\DeliveryTable::getList(array(
-				'select' => array('ID', 'NAME', 'LID')/*,
+			$result = \Bitrix\Sale\Delivery\Services\Table::getList(array(
+				'select' => array('ID', 'NAME')/*,
 				'filter' => array('=ACTIVE', 'Y')*/
 			));
 			while ($row = $result->fetch())
 			{
-				self::$deliveryList[$row['ID']] = array('value' => $row['NAME'], 'site_id' => $row['LID']);
-			}
-			unset($row, $result);
-			$result = Bitrix\Sale\DeliveryHandlerTable::getList(array(
-				'select' => array('HID', 'NAME', 'LID')
-			));
-			while ($row = $result->fetch())
-			{
-				self::$deliveryList[$row['HID']] = array('value' => $row['NAME'], 'site_id' => $row['LID']);
+				self::$deliveryList[$row['ID']] = array('value' => $row['NAME'], 'site_id' => '');
 			}
 			unset($row, $result);
 
 			// Obtaining table of correspondences of iblocks to sites.
-			$result = Bitrix\Iblock\SiteTable::getList();
+			$result = Bitrix\Iblock\IblockSiteTable::getList();
 			while ($row = $result->fetch()) self::$iblockSite[$row['SITE_ID']][] = $row['IBLOCK_ID'];
 			unset($row, $result);
 
@@ -334,36 +357,6 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 		return self::$deliveryList;
 	}
 
-	public static function prepareDeliveryId($delivery_id)
-	{
-		$id = null;
-		if (is_numeric($delivery_id)) $id = $delivery_id;
-		else
-		{
-			if (is_string($delivery_id))
-			{
-				$pos = strpos($delivery_id, ':');
-				if ($pos) $id = substr($delivery_id, 0, $pos);
-			}
-		}
-		return $id;
-	}
-
-	public static function getDeliveryByExtId($delivery_id)
-	{
-		$val = null;
-		$id = self::prepareDeliveryId($delivery_id);
-		if (!is_null($id))
-		{
-			$arVal = self::$deliveryList[$id];
-			if ($arVal['site_id'] === '' || $arVal['site_id'] === self::$defaultSiteId)
-			{
-				$val = self::$deliveryList[$id]['value'];
-			}
-		}
-		return $val;
-	}
-
 	protected static function addOwner($ownerName)
 	{
 		if (!in_array($ownerName, self::$owners)) self::$owners[] = $ownerName;
@@ -431,9 +424,9 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 						's:13:"SUMMARY_PRICE";s:5:"alias";s:5:"xxxxx";s:4:"aggr";s:3:"SUM";}}s:6:"filter";a:1:{i:0;'.
 						'a:6:{i:0;a:5:{s:4:"type";s:5:"field";s:4:"name";s:11:"ORDER.PAYED";s:7:"compare";s:5:"EQUAL";'.
 						's:5:"value";s:4:"true";s:10:"changeable";s:1:"0";}i:1;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-						's:14:"ORDER.DATE_INS";s:7:"compare";s:16:"GREATER_OR_EQUAL";s:5:"value";s:8:"-29 days";'.
+						's:24:"ORDER.DATE_INSERT_FORMAT";s:7:"compare";s:16:"GREATER_OR_EQUAL";s:5:"value";s:8:"-29 days";'.
 						's:10:"changeable";s:1:"1";}i:2;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-						's:14:"ORDER.DATE_INS";s:7:"compare";s:13:"LESS_OR_EQUAL";s:5:"value";s:5:"1 day";'.
+						's:24:"ORDER.DATE_INSERT_FORMAT";s:7:"compare";s:13:"LESS_OR_EQUAL";s:5:"value";s:5:"1 day";'.
 						's:10:"changeable";s:1:"1";}i:3;a:5:{s:4:"type";s:5:"field";s:4:"name";s:4:"NAME";'.
 						's:7:"compare";s:8:"CONTAINS";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}i:4;'.
 						'a:5:{s:4:"type";s:5:"field";s:4:"name";s:33:"PRODUCT.GoodsSection:PRODUCT.SECT";'.
@@ -477,16 +470,16 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'mark_default' => 4,
 					'settings' => unserialize(
 						'a:7:{s:6:"entity";s:9:"SaleOrder";s:6:"period";a:2:{s:4:"type";s:5:"month";s:5:"value";N;}'.
-						's:6:"select";a:7:{i:7;a:1:{s:4:"name";s:8:"BUYER.ID";}i:6;a:1:{s:4:"name";'.
-						's:16:"BUYER.SHORT_NAME";}i:0;a:3:{s:4:"name";s:2:"ID";s:5:"alias";s:14:"xxxxxxxxxxxxxx";'.
+						's:6:"select";a:7:{i:7;a:1:{s:4:"name";s:7:"USER.ID";}i:6;a:1:{s:4:"name";'.
+						's:15:"USER.SHORT_NAME";}i:0;a:3:{s:4:"name";s:2:"ID";s:5:"alias";s:14:"xxxxxxxxxxxxxx";'.
 						's:4:"aggr";s:14:"COUNT_DISTINCT";}i:2;a:3:{s:4:"name";s:14:"PRODUCTS_QUANT";s:5:"alias";'.
 						's:14:"xxxxxxxxxxxxxx";s:4:"aggr";s:3:"SUM";}i:3;a:3:{s:4:"name";s:12:"DISCOUNT_ALL";'.
 						's:5:"alias";s:15:"xxxxxxxxxxxxxxx";s:4:"aggr";s:3:"SUM";}i:14;a:3:{s:4:"name";'.
 						's:15:"SUM_PAID_FORREP";s:5:"alias";s:13:"xxxxxxxxxxxxx";s:4:"aggr";s:3:"AVG";}i:5;'.
 						'a:3:{s:4:"name";s:15:"SUM_PAID_FORREP";s:5:"alias";s:16:"xxxxxxxxxxxxxxxx";s:4:"aggr";'.
 						's:3:"SUM";}}s:6:"filter";a:1:{i:0;a:4:{i:0;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-						's:5:"BUYER";s:7:"compare";s:5:"EQUAL";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}i:1;'.
-						'a:5:{s:4:"type";s:5:"field";s:4:"name";s:26:"BUYER.UserGroup:USER.GROUP";s:7:"compare";'.
+						's:4:"USER";s:7:"compare";s:5:"EQUAL";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}i:1;'.
+						'a:5:{s:4:"type";s:5:"field";s:4:"name";s:25:"USER.UserGroup:USER.GROUP";s:7:"compare";'.
 						's:5:"EQUAL";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}i:2;a:5:{s:4:"type";'.
 						's:5:"field";s:4:"name";s:5:"PAYED";s:7:"compare";s:5:"EQUAL";s:5:"value";s:4:"true";'.
 						's:10:"changeable";s:1:"1";}s:5:"LOGIC";s:3:"AND";}}s:4:"sort";i:5;s:9:"sort_type";'.
@@ -498,16 +491,16 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_NEW_CLIENTS'),
 					'description' => GetMessage('SALE_REPORT_DEFAULT_NEW_CLIENTS_DESCR'),
 					'mark_default' => 5,
-					'settings' => unserialize('a:7:{s:6:"entity";s:4:"User";s:6:"period";a:2:{s:4:"type";s:5:"month";'.
+					'settings' => unserialize('a:7:{s:6:"entity";s:16:"Bitrix\Main\User";s:6:"period";a:2:{s:4:"type";s:5:"month";'.
 							's:5:"value";N;}s:6:"select";a:7:{i:11;a:1:{s:4:"name";s:14:"DATE_REG_SHORT";}i:0;'.
 							'a:3:{s:4:"name";s:2:"ID";s:5:"alias";s:18:"xxxxxxxxxxxxxxxxxx";s:4:"aggr";'.
-							's:14:"COUNT_DISTINCT";}i:3;a:3:{s:4:"name";s:26:"Bitrix\Sale\Order:BUYER.ID";s:5:"alias";'.
+							's:14:"COUNT_DISTINCT";}i:3;a:3:{s:4:"name";s:35:"Bitrix\Sale\Internals\Order:USER.ID";s:5:"alias";'.
 							's:14:"xxxxxxxxxxxxxx";s:4:"aggr";s:14:"COUNT_DISTINCT";}i:4;a:3:{s:4:"name";'.
-							's:36:"Bitrix\Sale\Order:BUYER.DISCOUNT_ALL";s:5:"alias";s:15:"xxxxxxxxxxxxxxx";'.
-							's:4:"aggr";s:3:"SUM";}i:9;a:3:{s:4:"name";s:29:"Bitrix\Sale\Order:BUYER.PRICE";'.
+							's:45:"Bitrix\Sale\Internals\Order:USER.DISCOUNT_ALL";s:5:"alias";s:15:"xxxxxxxxxxxxxxx";'.
+							's:4:"aggr";s:3:"SUM";}i:9;a:3:{s:4:"name";s:38:"Bitrix\Sale\Internals\Order:USER.PRICE";'.
 							's:5:"alias";s:13:"xxxxxxxxxxxxx";s:4:"aggr";s:3:"AVG";}i:5;a:3:{s:4:"name";'.
-							's:29:"Bitrix\Sale\Order:BUYER.PRICE";s:5:"alias";s:16:"xxxxxxxxxxxxxxxx";s:4:"aggr";'.
-							's:3:"SUM";}i:6;a:3:{s:4:"name";s:39:"Bitrix\Sale\Order:BUYER.SUM_PAID_FORREP";'.
+							's:38:"Bitrix\Sale\Internals\Order:USER.PRICE";s:5:"alias";s:16:"xxxxxxxxxxxxxxxx";s:4:"aggr";'.
+							's:3:"SUM";}i:6;a:3:{s:4:"name";s:48:"Bitrix\Sale\Internals\Order:USER.SUM_PAID_FORREP";'.
 							's:5:"alias";s:8:"xxxxxxxx";s:4:"aggr";s:3:"SUM";}}s:6:"filter";a:1:{i:0;a:2:{i:0;'.
 							'a:5:{s:4:"type";s:5:"field";s:4:"name";s:20:"UserGroup:USER.GROUP";s:7:"compare";'.
 							's:5:"EQUAL";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}s:5:"LOGIC";s:3:"AND";}}'.
@@ -520,7 +513,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'description' => GetMessage('SALE_REPORT_DEFAULT_SALES_DESCR'),
 					'mark_default' => 6,
 					'settings' => unserialize('a:7:{s:6:"entity";s:9:"SaleOrder";s:6:"period";a:2:{s:4:"type";'.
-							's:5:"month";s:5:"value";N;}s:6:"select";a:8:{i:1;a:2:{s:4:"name";s:8:"DATE_INS";'.
+							's:5:"month";s:5:"value";N;}s:6:"select";a:8:{i:1;a:2:{s:4:"name";s:18:"DATE_INSERT_FORMAT";'.
 							's:5:"alias";s:4:"xxxx";}i:0;a:3:{s:4:"name";s:2:"ID";s:5:"alias";s:14:"xxxxxxxxxxxxxx";'.
 							's:4:"aggr";s:14:"COUNT_DISTINCT";}i:13;a:3:{s:4:"name";s:14:"PRODUCTS_QUANT";s:5:"alias";'.
 							's:13:"xxxxxxxxxxxxx";s:4:"aggr";s:3:"SUM";}i:2;a:3:{s:4:"name";s:9:"TAX_VALUE";'.
@@ -530,7 +523,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 							's:5:"alias";s:16:"xxxxxxxxxxxxxxxx";s:4:"aggr";s:3:"SUM";}i:6;a:3:{s:4:"name";'.
 							's:15:"SUM_PAID_FORREP";s:5:"alias";s:8:"xxxxxxxx";s:4:"aggr";s:3:"SUM";}}s:6:"filter";'.
 							'a:1:{i:0;a:2:{i:0;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-							's:26:"BUYER.UserGroup:USER.GROUP";s:7:"compare";s:5:"EQUAL";s:5:"value";s:0:"";'.
+							's:25:"USER.UserGroup:USER.GROUP";s:7:"compare";s:5:"EQUAL";s:5:"value";s:0:"";'.
 							's:10:"changeable";s:1:"1";}s:5:"LOGIC";s:3:"AND";}}s:4:"sort";i:1;s:9:"sort_type";'.
 							's:4:"DESC";s:5:"limit";N;}'
 					)
@@ -592,7 +585,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES__12_5'),
 					'description' => '',
 					'mark_default' => 9,
-					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:29:"Bitrix\Sale\Internals\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:6:{i:2;a:4:{s:4:"name";'.
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";'.
 						's:5:"alias";s:9:"xxxxxxxxx";s:4:"aggr";s:12:"GROUP_CONCAT";s:8:"grouping";'.
@@ -615,7 +608,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST__12_5'),
 					'description' => '',
 					'mark_default' => 10,
-					'settings' => unserialize('a:12:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
+					'settings' => unserialize('a:12:{s:6:"entity";s:29:"Bitrix\Sale\Internals\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:2:{i:4;a:4:{s:4:"name";'.
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";'.
 						's:5:"alias";s:9:"xxxxxxxxx";s:4:"aggr";s:12:"GROUP_CONCAT";s:8:"grouping";'.
@@ -633,7 +626,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_PROFIT__12_5'),
 					'description' => '',
 					'mark_default' => 11,
-					'settings' => unserialize('a:11:{s:6:"entity";s:18:"Bitrix\Sale\Basket";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:28:"Bitrix\Sale\Internals\Basket";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:6:{i:6;a:2:{s:4:"name";'.
 						's:15:"NAME_WITH_IDENT";s:8:"grouping";b:1;}i:7;a:4:{s:4:"name";s:8:"QUANTITY";'.
 						's:5:"alias";s:10:"xxxxxxxxxx";s:4:"aggr";s:3:"SUM";s:17:"grouping_subtotal";'.
@@ -659,7 +652,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_CLIENTS_PROFIT__12_5'),
 					'description' => '',
 					'mark_default' => 12,
-					'settings' => unserialize('a:11:{s:6:"entity";s:18:"Bitrix\Sale\Basket";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:28:"Bitrix\Sale\Internals\Basket";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:7:{i:9;a:2:{s:4:"name";'.
 						's:21:"FUSER.USER.SHORT_NAME";s:8:"grouping";b:1;}i:6;a:2:{s:4:"name";s:15:"NAME_WITH_IDENT";'.
 						's:8:"grouping";b:1;}i:7;a:4:{s:4:"name";s:8:"QUANTITY";s:5:"alias";s:10:"xxxxxxxxxx";'.
@@ -688,7 +681,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_MOB__12_5'),
 					'description' => '',
 					'mark_default' => 13,
-					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:29:"Bitrix\Sale\Internals\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:3:{i:2;a:4:{s:4:"name";'.
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";s:5:"alias";'.
 						's:9:"xxxxxxxxx";s:4:"aggr";s:12:"GROUP_CONCAT";s:8:"grouping";b:1;}i:8;a:2:{s:4:"name";'.
@@ -707,7 +700,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_PRICE_LIST_MOB__12_5'),
 					'description' => '',
 					'mark_default' => 14,
-					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:29:"Bitrix\Sale\Internals\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:3:{i:4;a:4:{s:4:"name";'.
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";s:5:"alias";'.
 						's:9:"xxxxxxxxx";s:4:"aggr";s:12:"GROUP_CONCAT";s:8:"grouping";b:1;}i:12;'.
@@ -727,7 +720,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'title' => GetMessage('SALE_REPORT_DEFAULT_GOODS_INVENTORIES_BY_STORE__12_5_1'),
 					'description' => '',
 					'mark_default' => 15,
-					'settings' => unserialize('a:11:{s:6:"entity";s:19:"Bitrix\Sale\Product";s:6:"period";'.
+					'settings' => unserialize('a:11:{s:6:"entity";s:29:"Bitrix\Sale\Internals\Product";s:6:"period";'.
 						'a:2:{s:4:"type";s:5:"month";s:5:"value";N;}s:6:"select";a:7:{i:16;a:2:{s:4:"name";'.
 						's:37:"StoreProduct:SALE_PRODUCT.STORE.TITLE";s:8:"grouping";b:1;}i:2;a:4:{s:4:"name";'.
 						's:56:"IBLOCK.SectionElement:IBLOCK_ELEMENT.IBLOCK_SECTION.NAME";s:5:"alias";'.
@@ -1027,7 +1020,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		'PRICE_DELIVERY',
 		'DISCOUNT_ALL',
 		'PRICE',
-		'SUM_PAID_FORREP'
+		'SUM_PAID_FORREP',
+		'PAYMENT_ORDER_SUM'
 	);
 
 	private static $goodsQuantityFields = array(
@@ -1042,7 +1036,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 	public static function getEntityName()
 	{
-		return 'Bitrix\Sale\Order';
+		return 'Bitrix\Sale\Internals\Order';
 	}
 
 	public static function getOwnerId()
@@ -1056,7 +1050,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 		return array(
 			'ID',
-			'DATE_INS',
+			'DATE_INSERT_FORMAT',
 			'DATE_UPDATE_SHORT',
 			'STATUS' => array(
 				'STATUS_ID',
@@ -1072,40 +1066,79 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 				'PERSONAL_PHONE'
 			),
 			'DATE_STATUS_SHORT',
-			'ALLOW_DELIVERY',
-			'EMP_ALLOW_DELIVERY_BY' => array(
-				'ID',
-				'NAME',
-				'LAST_NAME',
-				'SHORT_NAME',
-				'EMAIL',
-				'PERSONAL_PHONE'
-			),
-			'DATE_ALLOW_DELIVERY_SHORT',
-			'DELIVERY_ID',
-			'DELIVERY_DOC_NUM',
-			'DELIVERY_DOC_DATE_SHORT',
 			'PRICE_DELIVERY',
 			'PAYED',
-			'EMP_PAYED_BY' => array(
+			'SUM_PAID_FORREP',
+			'Payment:ORDER' => array(
 				'ID',
-				'NAME',
-				'LAST_NAME',
-				'SHORT_NAME',
-				'EMAIL',
-				'PERSONAL_PHONE'
+				'DATE_BILL',
+				'DATE_PAY_BEFORE',
+				'DATE_PAID',
+				'EMP_PAID_BY' => array(
+					'ID',
+					'NAME',
+					'LAST_NAME',
+					'SHORT_NAME',
+					'EMAIL',
+					'PERSONAL_PHONE'
+				),
+				'PAY_VOUCHER_NUM',
+				'PAY_VOUCHER_DATE',
+				'PAY_SYSTEM_ID',
+				'PAY_SYSTEM_NAME',
+				'PAY_RETURN_NUM',
+				'PAY_RETURN_DATE',
+				'SUM',
+				'CURRENCY',
+				'RESPONSIBLE_BY' => array(
+					'ID',
+					'NAME',
+					'LAST_NAME',
+					'SHORT_NAME',
+					'EMAIL',
+					'PERSONAL_PHONE'
+				)
 			),
 			'DEDUCTED',
-			'PAY_SYSTEM' => array(
+			'Shipment:REPS_ORDER' => array(
 				'ID',
-				'NAME',
-				'DESCRIPTION',
-				'ACTIVE',
-				'CURRENCY'
+				'ALLOW_DELIVERY',
+				'DELIVERY_ID',
+				'DELIVERY_NAME',
+				'EMP_ALLOW_DELIVERY_BY' => array(
+					'ID',
+					'NAME',
+					'LAST_NAME',
+					'SHORT_NAME',
+					'EMAIL',
+					'PERSONAL_PHONE'
+				),
+				'DATE_ALLOW_DELIVERY_SHORT',
+				'DELIVERY_DOC_NUM',
+				'DELIVERY_DOC_DATE_SHORT',
+				'DEDUCTED',
+				'EMP_DEDUCTED_BY' => array(
+					'ID',
+					'NAME',
+					'LAST_NAME',
+					'SHORT_NAME',
+					'EMAIL',
+					'PERSONAL_PHONE'
+				),
+				'DATE_DEDUCTED_SHORT',
+				'RESERVED',
+				'TRACKING_NUMBER',
+				'PRICE_DELIVERY',
+				'CURRENCY',
+				'RESPONSIBLE_BY' => array(
+					'ID',
+					'NAME',
+					'LAST_NAME',
+					'SHORT_NAME',
+					'EMAIL',
+					'PERSONAL_PHONE'
+				)
 			),
-			'PAY_VOUCHER_NUM',
-			'PAY_VOUCHER_DATE_SHORT',
-			'SUM_PAID_FORREP',
 			'CANCELED',
 			'EMP_CANCELED_BY' => array(
 				'ID',
@@ -1123,7 +1156,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 			'DISCOUNT_ALL',
 			/*'LID',*/
 			'PERSON_TYPE_ID',
-			'BUYER' => array(
+			'USER' => array(
 				'ID',
 				'NAME',
 				'LAST_NAME',
@@ -1143,18 +1176,23 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 	{
 		return array(
 			array('name' => 'ID'),
-			array('name' => 'DATE_INS')
+			array('name' => 'DATE_INSERT_FORMAT')
 		);
 	}
 
 	public static function getCalcVariations()
 	{
 		return array_merge(parent::getCalcVariations(), array(
-			'BUYER.UserGroup:USER.GROUP.ID' => array(
+			'date' => array(
+				'MIN',
+				'MAX',
+				'COUNT_DISTINCT'
+			),
+			'USER.UserGroup:USER.GROUP.ID' => array(
 				'COUNT_DISTINCT',
 				'GROUP_CONCAT'
 			),
-			'BUYER.UserGroup:USER.GROUP.NAME' => array(
+			'USER.UserGroup:USER.GROUP.NAME' => array(
 				'COUNT_DISTINCT',
 				'GROUP_CONCAT'
 			)
@@ -1164,6 +1202,14 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 	public static function getCompareVariations()
 	{
 		return array_merge(parent::getCompareVariations(), array(
+			'date' => array(
+				'EQUAL',
+				'GREATER_OR_EQUAL',
+				'GREATER',
+				'LESS',
+				'LESS_OR_EQUAL',
+				'NOT_EQUAL'
+			),
 			'LID' => array(
 				'EQUAL',
 				'NOT_EQUAL'
@@ -1176,15 +1222,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'PAY_SYSTEM' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'DELIVERY_ID' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'BUYER.UserGroup:USER.GROUP' => array(
+			'USER.UserGroup:USER.GROUP' => array(
 				'EQUAL',
 				'NOT_EQUAL'
 			),
@@ -1207,8 +1245,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		{
 			$filter[] = array(
 				'LOGIC' => 'OR',
-				'<=DATE_INS' => $date_to,
-				'=DATE_INS' => null
+				'<=DATE_INSERT_FORMAT' => $date_to,
+				'=DATE_INSERT_FORMAT' => null
 			);
 		}
 
@@ -1216,8 +1254,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		{
 			$filter[] = array(
 				'LOGIC' => 'OR',
-				'>=DATE_INS' => $date_from,
-				'=DATE_INS' => null
+				'>=DATE_INSERT_FORMAT' => $date_from,
+				'=DATE_INSERT_FORMAT' => null
 			);
 		}
 
@@ -1227,40 +1265,6 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		);
 
 		return $filter;
-	}
-
-	private static function rewriteDeliveryFilter(&$filter)
-	{
-		foreach ($filter as $k => &$v)
-		{
-			if ($k === 'LOGIC') continue;
-			if (is_array($v)) self::rewriteDeliveryFilter($v);
-			else if ($k === '=DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter['=%DELIVERY_ID'] = $v.':%';
-					unset($filter[$k]);
-				}
-			}
-			else if ($k === '!DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter[] = array(
-						'LOGIC' => 'OR',
-						'!=%DELIVERY_ID' => $v.':%',
-						'=DELIVERY_ID' => null
-					);
-					unset($filter[$k]);
-				}
-			}
-		}
-	}
-
-	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
-	{
-		self::rewriteDeliveryFilter($filter);
 	}
 
 	public static function fillFilterReferenceColumn(&$filterElement, Entity\ReferenceField $field)
@@ -1346,8 +1350,10 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
+		$dataType = self::getFieldDataType($cInfo['field']);
+
 		/** @var Bitrix\Main\Entity\Field[] $cInfo */
-		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
+		if ($dataType !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -1360,24 +1366,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		{
 			$v = self::$sitelist[$v];
 		}
-		else if ($k === 'DELIVERY_ID')
-		{
-			$id = self::prepareDeliveryId($v);
-			if (!is_null($id))
-			{
-				if (is_numeric($id))
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_edit.php?ID='.$id.'&lang='.LANGUAGE_ID.'&filter=Y&set_filter=Y';
-				}
-				else
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_handler_edit.php?SID='.$id.'&lang='.LANGUAGE_ID;
-				}
-			}
-			$v = self::getDeliveryByExtId($v);
-		}
 		// Removing the link from the email field if is empty.
-		else if ($k === 'SALE_ORDER_BUYER_EMAIL')
+		else if ($k === 'SALE_ORDER_USER_EMAIL')
 		{
 			if (is_null($v) || empty($v) || $v == '&nbsp;') unset($row['__HREF_'.$k]);
 		}
@@ -1385,11 +1375,25 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		// Inserting zero in numerical fields with null value.
 		if (empty($v))
 		{
-			if (in_array($cInfo['field']->getDataType(), array('integer', 'float')))
+			if (in_array($dataType, array('integer', 'float')))
 			{
 				$v = 0;
 			}
 			//else $v = '&nbsp;';
+		}
+
+		if (empty($cInfo['aggr']))
+		{
+			if (($cInfo['field']->getEntity()->getName() === 'Shipment'
+					&& in_array($cInfo['field']->getName(), array('ID', 'DELIVERY_ID', 'DELIVERY_NAME'), true))
+				|| ($cInfo['field']->getEntity()->getName() === 'Payment'
+					&& in_array($cInfo['field']->getName(), array('ID', 'PAY_SYSTEM_ID', 'PAY_SYSTEM_NAME'), true)))
+			{
+				if (is_null($v) || empty($v) || $v == '&nbsp;')
+				{
+					unset($row['__HREF_'.$k]);
+				}
+			}
 		}
 
 		// Formatting of monetary fields.
@@ -1398,7 +1402,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 			if (preg_match('/'.$monField.'$/', $k))
 			{
 				$v = self::calculateInReportCurrency($v);
-				$v = number_format($v, 2, '.', ' ');
+				$v = number_format(doubleval($v), 2, '.', ' ');
 				break;
 			}
 		}
@@ -1450,7 +1454,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 				if (preg_match('/'.$monField.'$/', $k))
 				{
 					if (!$bFormatOnly) $v = self::calculateInReportCurrency($v);
-					$v = number_format($v, 2, '.', ' ');
+					$v = number_format(doubleval($v), 2, '.', ' ');
 					break;
 				}
 			}
@@ -1490,64 +1494,69 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 			if ($field->getEntity()->getName() == 'User')
 			{
-				if ($elem['name'] == 'BUYER.SHORT_NAME')
+				if (in_array(
+							$elem['name'],
+							array(
+								'USER.EMAIL',
+								'EMP_CANCELED_BY.EMAIL',
+								'EMP_STATUS_BY.EMAIL',
+								'Payment:ORDER.EMP_PAID_BY.EMAIL',
+								'Payment:ORDER.RESPONSIBLE_BY.EMAIL',
+								'Shipment:REPS_ORDER.EMP_ALLOW_DELIVERY_BY.EMAIL',
+								'Shipment:REPS_ORDER.EMP_DEDUCTED_BY.EMAIL',
+								'Shipment:REPS_ORDER.RESPONSIBLE_BY.EMAIL'
+							),
+							true))
 				{
-					//$href = array('pattern' => '/bitrix/admin/user_edit.php?ID=#BUYER.ID#&lang='.LANG);
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#BUYER.ID#&lang='.LANG);
+					$href = array('pattern' => 'mailto:#'.$elem['name'].'#');
 				}
-				else if ($elem['name'] == 'BUYER.EMAIL')
+				else if (in_array(
+							$elem['name'],
+							array(
+								'USER.SHORT_NAME',
+								'EMP_CANCELED_BY.SHORT_NAME',
+								'EMP_STATUS_BY.SHORT_NAME',
+								'Payment:ORDER.EMP_PAID_BY.SHORT_NAME',
+								'Payment:ORDER.RESPONSIBLE_BY.SHORT_NAME',
+								'Shipment:REPS_ORDER.EMP_ALLOW_DELIVERY_BY.SHORT_NAME',
+								'Shipment:REPS_ORDER.EMP_DEDUCTED_BY.SHORT_NAME',
+								'Shipment:REPS_ORDER.RESPONSIBLE_BY.SHORT_NAME'
+							),
+							true))
 				{
-					$href = array('pattern' => 'mailto:#BUYER.EMAIL#');
-				}
-				else if ($elem['name'] == 'EMP_PAYED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#EMP_PAYED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'EMP_PAYED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#EMP_PAYED_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'EMP_CANCELED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#EMP_CANCELED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'EMP_CANCELED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#EMP_CANCELED_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'EMP_STATUS_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#EMP_STATUS_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'EMP_STATUS_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#EMP_STATUS_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'EMP_ALLOW_DELIVERY_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#EMP_ALLOW_DELIVERY_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'EMP_ALLOW_DELIVERY_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#EMP_ALLOW_DELIVERY_BY.EMAIL#');
+					$userDef = substr($elem['name'], 0, -11);
+					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#'.$userDef.'.ID#&lang='.LANG);
 				}
 			}
 			else if ($field->getEntity()->getName() == 'Order')
 			{
 				if ($elem['name'] === 'ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_order_detail.php?ID=#ID#&lang='.LANG);
-				}
-				else if ($elem['name'] === 'DELIVERY_ID')
-				{
-					$href = array('pattern' => '/404.php?DELIVERY_ID=#DELIVERY_ID#&lang='.LANG);
+					$href = array('pattern' => '/bitrix/admin/sale_order_view.php?ID=#ID#&lang='.LANG);
 				}
 			}
-			else if ($field->getEntity()->getName() == 'PaySystem')
+			else if ($field->getEntity()->getName() === 'Payment')
 			{
-				if ($elem['name'] == 'PAY_SYSTEM.NAME')
+				if ($elem['name'] === 'Payment:ORDER.ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_pay_system_edit.php?ID=#PAY_SYSTEM.ID#&lang='.LANG.'&filter=Y&set_filter=Y');
+					$href = array('pattern' => '/bitrix/admin/sale_order_payment_edit.php?order_id=#Payment:ORDER.ORDER_ID#&payment_id=#Payment:ORDER.ID#&lang='.LANG);
+				}
+				else if ($elem['name'] === 'Payment:ORDER.PAY_SYSTEM_ID'
+					|| $elem['name'] === 'Payment:ORDER.PAY_SYSTEM_NAME')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_pay_system_edit.php?ID=#Payment:ORDER.PAY_SYSTEM_ID#&lang='.LANG);
+				}
+			}
+			else if ($field->getEntity()->getName() === 'Shipment')
+			{
+				if ($elem['name'] === 'Shipment:REPS_ORDER.ID')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_order_shipment_edit.php?order_id=#Shipment:REPS_ORDER.ORDER_ID#&shipment_id=#Shipment:REPS_ORDER.ID#&lang='.LANG);
+				}
+				else if ($elem['name'] === 'Shipment:REPS_ORDER.DELIVERY_ID'
+					|| $elem['name'] === 'Shipment:REPS_ORDER.DELIVERY_NAME')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_delivery_service_edit.php?ID=#Shipment:REPS_ORDER.DELIVERY_ID#&lang='.LANG);
 				}
 			}
 		}
@@ -1571,7 +1580,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 	);
 
 	private static $goodsQuantityFields = array(
-		'SALE_ORDER_BUYER_PRODUCTS_QUANT',
+		'SALE_ORDER_USER_PRODUCTS_QUANT',
 		// Order fields
 		'PRODUCTS_QUANT'
 	);
@@ -1610,8 +1619,8 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 			'PERSONAL_GENDER',
 			'EMAIL',
 			'PERSONAL_PHONE',
-			'Bitrix\Sale\Order:BUYER' => array(
-				'DATE_INS',
+			'Bitrix\Sale\Internals\Order:USER' => array(
+				'DATE_INSERT_FORMAT',
 				'DATE_UPDATE_SHORT',
 				'STATUS' => array(
 					'STATUS_ID',
@@ -1627,39 +1636,9 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 					'PERSONAL_PHONE'
 				),
 				'DATE_STATUS_SHORT',
-				'ALLOW_DELIVERY',
-				'EMP_ALLOW_DELIVERY_BY' => array(
-					'ID',
-					'NAME',
-					'LAST_NAME',
-					'SHORT_NAME',
-					'EMAIL',
-					'PERSONAL_PHONE'
-				),
-				'DATE_ALLOW_DELIVERY_SHORT',
-				'DELIVERY_ID',
-				'DELIVERY_DOC_NUM',
-				'DELIVERY_DOC_DATE_SHORT',
 				'PRICE_DELIVERY',
 				'PAYED',
-				'EMP_PAYED_BY' => array(
-					'ID',
-					'NAME',
-					'LAST_NAME',
-					'SHORT_NAME',
-					'EMAIL',
-					'PERSONAL_PHONE'
-				),
 				'DEDUCTED',
-				'PAY_SYSTEM' => array(
-					'ID',
-					'NAME',
-					'DESCRIPTION',
-					'ACTIVE',
-					'CURRENCY'
-				),
-				'PAY_VOUCHER_NUM',
-				'PAY_VOUCHER_DATE_SHORT',
 				'PRICE',
 				'SUM_PAID_FORREP',
 				'CANCELED',
@@ -1703,19 +1682,11 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 	{
 		return array_merge(parent::getCompareVariations(), array(
 			// Order
-			'\Bitrix\Sale\StatusLang' => array(
+			'\Bitrix\Sale\Internals\StatusLang' => array(
 				'EQUAL',
 				'NOT_EQUAL'
 			),
-			'Bitrix\Sale\Order:BUYER.DELIVERY_ID' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'Bitrix\Sale\Order:BUYER.PAY_SYSTEM' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'Bitrix\Sale\Order:BUYER.PERSON_TYPE_ID' => array(
+			'Bitrix\Sale\Internals\Order:USER.PERSON_TYPE_ID' => array(
 				'EQUAL',
 				'NOT_EQUAL'
 			),
@@ -1825,8 +1796,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 
 	public static function confirmFilterBackReferenceRewrite($fElem, $chain)
 	{
-		//if ($chain->getLastElement()->getValue()->getEntity() instanceof \Bitrix\Sale\OrderEntity)
-		if (strncasecmp($fElem['name'], 'Bitrix\Sale\Order:BUYER', 23) === 0)
+		if (strncasecmp($fElem['name'], 'Bitrix\Sale\Internals\Order:USER', 23) === 0)
 		{
 			return false;
 		}
@@ -1836,7 +1806,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 
 	public static function confirmSelectBackReferenceRewrite($elem, $chain)
 	{
-		if (strncasecmp($elem['name'], 'Bitrix\Sale\Order:BUYER', 23) === 0)
+		if (strncasecmp($elem['name'], 'Bitrix\Sale\Internals\Order:USER', 23) === 0)
 		{
 			return false;
 		}
@@ -1861,7 +1831,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		$bResult = false;
 		foreach (array_keys($select) as $k)
 		{
-			if (strpos($k, '_SALE_ORDER_BUYER_') !== false)
+			if (strpos($k, '_SALE_ORDER_USER_') !== false)
 			{
 				$bResult = true;
 				break;
@@ -1869,46 +1839,15 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		}
 		if (!$bResult)
 		{
-			if (self::fieldInFilter($filter, 'Bitrix\Sale\Order:BUYER.')) $bResult = true;
+			if (self::fieldInFilter($filter, 'Bitrix\Sale\Internals\Order:USER.')) $bResult = true;
 		}
 
 		return $bResult;
 	}
 
-	private static function rewriteDeliveryFilter(&$filter)
-	{
-		foreach ($filter as $k => &$v)
-		{
-			if ($k === 'LOGIC') continue;
-			if (is_array($v)) self::rewriteDeliveryFilter($v);
-			else if ($k === '=Bitrix\Sale\Order:BUYER.DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter['=%Bitrix\Sale\Order:BUYER.DELIVERY_ID'] = $v.':%';
-					unset($filter[$k]);
-				}
-			}
-			else if ($k === '!Bitrix\Sale\Order:BUYER.DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter[] = array(
-						'LOGIC' => 'OR',
-						'!=%Bitrix\Sale\Order:BUYER.DELIVERY_ID' => $v.':%',
-						'=Bitrix\Sale\Order:BUYER.DELIVERY_ID' => null
-					);
-					unset($filter[$k]);
-				}
-			}
-		}
-	}
-
 	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
 	{
 		global $DB;
-
-		self::rewriteDeliveryFilter($filter);
 
 		// Rewrite filter by Site.
 		if (self::filterBySiteNeeded($select, $filter))
@@ -1917,11 +1856,12 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 			{
 				$filter[] = array(
 					'LOGIC' => 'OR',
-					array('=Bitrix\Sale\Order:BUYER.LID' => $DB->ForSql(self::getDefaultSiteId())),
-					array('=Bitrix\Sale\Order:BUYER.LID' => null)
+					array('=Bitrix\Sale\Internals\Order:USER.LID' => $DB->ForSql(self::getDefaultSiteId())),
+					array('=Bitrix\Sale\Internals\Order:USER.LID' => null)
 				);
 			}
-			else {
+			else
+			{
 				$subFilter = $filter;
 				foreach (array_keys($filter) as $k)
 				{
@@ -1931,8 +1871,8 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 				$filter[] = $subFilter;
 				$filter[] = array(
 					'LOGIC' => 'OR',
-					array('=Bitrix\Sale\Order:BUYER.LID' => $DB->ForSql(self::getDefaultSiteId())),
-					array('=Bitrix\Sale\Order:BUYER.LID' => null)
+					array('=Bitrix\Sale\Internals\Order:USER.LID' => $DB->ForSql(self::getDefaultSiteId())),
+					array('=Bitrix\Sale\Internals\Order:USER.LID' => null)
 				);
 			}
 		}
@@ -1973,8 +1913,10 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
+		$dataType = self::getFieldDataType($cInfo['field']);
+
 		/** @var Bitrix\Main\Entity\Field[] $cInfo */
-		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
+		if ($dataType !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -1987,28 +1929,12 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		{
 			$v = self::$genders[$v];
 		}
-		else if ($k === 'MAIN_USER_SALE_ORDER_BUYER_DELIVERY_ID')
-		{
-			$id = self::prepareDeliveryId($v);
-			if (!is_null($id))
-			{
-				if (is_numeric($id))
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_edit.php?ID='.$id.'&lang='.LANGUAGE_ID.'&filter=Y&set_filter=Y';
-				}
-				else
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_handler_edit.php?SID='.$id.'&lang='.LANGUAGE_ID;
-				}
-			}
-			$v = self::getDeliveryByExtId($v);
-		}
 		// Removing the link from the email field if is empty.
 		else if ($k === 'EMAIL')
 		{
 			if (is_null($v) || empty($v) || $v == '&nbsp;') unset($row['__HREF_'.$k]);
 		}
-		else if ($k === 'MAIN_USER_SALE_ORDER_BUYER_PERSON_TYPE_ID')
+		else if ($k === 'MAIN_USER_SALE_ORDER_USER_PERSON_TYPE_ID')
 		{
 			$v = self::$personTypes[$v]['NAME'];
 		}
@@ -2016,7 +1942,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		// Inserting zero in numerical fields with null value.
 		if (empty($v))
 		{
-			if (in_array($cInfo['field']->getDataType(), array('integer', 'float')))
+			if (in_array($dataType, array('integer', 'float')))
 			{
 				$v = 0;
 			}
@@ -2026,11 +1952,11 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		// Formatting of monetary fields.
 		foreach (self::$monetaryFields as $monField)
 		{
-			if ($cInfo['field']->getEntity()->getDataClass() === 'Bitrix\\Sale\\OrderTable'
+			if ($cInfo['field']->getEntity()->getDataClass() === 'Bitrix\\Sale\\Internals\\OrderTable'
 				&& preg_match('/'.$monField.'$/', $cInfo['field']->getName()))
 			{
 				$v = self::calculateInReportCurrency($v);
-				$v = number_format($v, 2, '.', ' ');
+				$v = number_format(doubleval($v), 2, '.', ' ');
 				break;
 			}
 		}
@@ -2082,7 +2008,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 				if (preg_match('/'.$monField.'$/', $k))
 				{
 					if (!$bFormatOnly) $v = self::calculateInReportCurrency($v);
-					$v = number_format($v, 2, '.', ' ');
+					$v = number_format(doubleval($v), 2, '.', ' ');
 					break;
 				}
 			}
@@ -2130,55 +2056,28 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 				{
 					$href = array('pattern' => 'mailto:#EMAIL#');
 				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_STATUS_BY.SHORT_NAME')
+				else if ($elem['name'] == 'Bitrix\Sale\Internals\Order:USER.EMP_STATUS_BY.SHORT_NAME')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Order:BUYER.EMP_STATUS_BY.ID#&lang='.LANG);
+					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Internals\Order:USER.EMP_STATUS_BY.ID#&lang='.LANG);
 				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_STATUS_BY.EMAIL')
+				else if ($elem['name'] == 'Bitrix\Sale\Internals\Order:USER.EMP_STATUS_BY.EMAIL')
 				{
-					$href = array('pattern' => 'mailto:#Bitrix\Sale\Order:BUYER.EMP_STATUS_BY.EMAIL#');
+					$href = array('pattern' => 'mailto:#Bitrix\Sale\Internals\Order:USER.EMP_STATUS_BY.EMAIL#');
 				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_ALLOW_DELIVERY_BY.SHORT_NAME')
+				else if ($elem['name'] == 'Bitrix\Sale\Internals\Order:USER.EMP_CANCELED_BY.SHORT_NAME')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Order:BUYER.EMP_ALLOW_DELIVERY_BY.ID#&lang='.LANG);
+					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Internals\Order:USER.EMP_CANCELED_BY.ID#&lang='.LANG);
 				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_ALLOW_DELIVERY_BY.EMAIL')
+				else if ($elem['name'] == 'Bitrix\Sale\Internals\Order:USER.EMP_CANCELED_BY.EMAIL')
 				{
-					$href = array('pattern' => 'mailto:#Bitrix\Sale\Order:BUYER.EMP_ALLOW_DELIVERY_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_PAYED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Order:BUYER.EMP_PAYED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_PAYED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#Bitrix\Sale\Order:BUYER.EMP_PAYED_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_CANCELED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#Bitrix\Sale\Order:BUYER.EMP_CANCELED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.EMP_CANCELED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#Bitrix\Sale\Order:BUYER.EMP_CANCELED_BY.EMAIL#');
+					$href = array('pattern' => 'mailto:#Bitrix\Sale\Internals\Order:USER.EMP_CANCELED_BY.EMAIL#');
 				}
 			}
 			elseif ($field->getEntity()->getName() == 'Order')
 			{
-				if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.ID')
+				if ($elem['name'] == 'Bitrix\Sale\Internals\Order:USER.ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_order_detail.php?ID=#Bitrix\Sale\Order:BUYER.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] === 'Bitrix\Sale\Order:BUYER.DELIVERY_ID')
-				{
-					$href = array('pattern' => '/404.php?DELIVERY_ID=#Bitrix\Sale\Order:BUYER.DELIVERY_ID#&lang='.LANG);
-				}
-			}
-			else if ($field->getEntity()->getName() == 'PaySystem')
-			{
-				if ($elem['name'] == 'Bitrix\Sale\Order:BUYER.PAY_SYSTEM.NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_pay_system_edit.php?ID=#Bitrix\Sale\Order:BUYER.PAY_SYSTEM.ID#&lang='.LANG.'&filter=Y&set_filter=Y');
+					$href = array('pattern' => '/bitrix/admin/sale_order_view.php?ID=#Bitrix\Sale\Internals\Order:USER.ID#&lang='.LANG);
 				}
 			}
 		}
@@ -2200,6 +2099,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		'DISCOUNT_ALL',
 		'PRICE',
 		'SUM_PAID_FORREP',
+		'PAYMENT_ORDER_SUM',
 		'PRODUCT_PURCHASING_PRICE_IN_SITE_CURRENCY',
 		'GROSS_PROFIT',
 		'PROFITABILITY'
@@ -2235,7 +2135,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 
 	public static function getEntityName()
 	{
-		return 'Bitrix\Sale\Basket';
+		return 'Bitrix\Sale\Internals\Basket';
 	}
 
 	public static function getOwnerId()
@@ -2267,7 +2167,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 			'DELAY',
 			'ORDER_ID',
 			'ORDER' => array(
-				'DATE_INS',
+				'DATE_INSERT_FORMAT',
 				'DATE_UPDATE_SHORT',
 				'STATUS' => array(
 					'STATUS_ID',
@@ -2283,39 +2183,78 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 					'PERSONAL_PHONE'
 				),
 				'DATE_STATUS_SHORT',
-				'ALLOW_DELIVERY',
-				'EMP_ALLOW_DELIVERY_BY' => array(
-					'ID',
-					'NAME',
-					'LAST_NAME',
-					'SHORT_NAME',
-					'EMAIL',
-					'PERSONAL_PHONE'
-				),
-				'DATE_ALLOW_DELIVERY_SHORT',
-				'DELIVERY_ID',
-				'DELIVERY_DOC_NUM',
-				'DELIVERY_DOC_DATE_SHORT',
 				'PRICE_DELIVERY',
 				'PAYED',
-				'EMP_PAYED_BY' => array(
+				'Payment:ORDER' => array(
 					'ID',
-					'NAME',
-					'LAST_NAME',
-					'SHORT_NAME',
-					'EMAIL',
-					'PERSONAL_PHONE'
+					'DATE_BILL',
+					'DATE_PAY_BEFORE',
+					'DATE_PAID',
+					'EMP_PAID_BY' => array(
+						'ID',
+						'NAME',
+						'LAST_NAME',
+						'SHORT_NAME',
+						'EMAIL',
+						'PERSONAL_PHONE'
+					),
+					'PAY_VOUCHER_NUM',
+					'PAY_VOUCHER_DATE',
+					'PAY_SYSTEM_ID',
+					'PAY_SYSTEM_NAME',
+					'PAY_RETURN_NUM',
+					'PAY_RETURN_DATE',
+					'SUM',
+					'CURRENCY',
+					'RESPONSIBLE_BY' => array(
+						'ID',
+						'NAME',
+						'LAST_NAME',
+						'SHORT_NAME',
+						'EMAIL',
+						'PERSONAL_PHONE'
+					)
 				),
 				'DEDUCTED',
-				'PAY_SYSTEM' => array(
+				'Shipment:REPS_ORDER' => array(
 					'ID',
-					'NAME',
-					'DESCRIPTION',
-					'ACTIVE',
-					'CURRENCY'
+					'ALLOW_DELIVERY',
+					'DELIVERY_ID',
+					'DELIVERY_NAME',
+					'EMP_ALLOW_DELIVERY_BY' => array(
+						'ID',
+						'NAME',
+						'LAST_NAME',
+						'SHORT_NAME',
+						'EMAIL',
+						'PERSONAL_PHONE'
+					),
+					'DATE_ALLOW_DELIVERY_SHORT',
+					'DELIVERY_DOC_NUM',
+					'DELIVERY_DOC_DATE_SHORT',
+					'DEDUCTED',
+					'EMP_DEDUCTED_BY' => array(
+						'ID',
+						'NAME',
+						'LAST_NAME',
+						'SHORT_NAME',
+						'EMAIL',
+						'PERSONAL_PHONE'
+					),
+					'DATE_DEDUCTED_SHORT',
+					'RESERVED',
+					'TRACKING_NUMBER',
+					'PRICE_DELIVERY',
+					'CURRENCY',
+					'RESPONSIBLE_BY' => array(
+						'ID',
+						'NAME',
+						'LAST_NAME',
+						'SHORT_NAME',
+						'EMAIL',
+						'PERSONAL_PHONE'
+					)
 				),
-				'PAY_VOUCHER_NUM',
-				'PAY_VOUCHER_DATE_SHORT',
 				'PRICE',
 				'SUM_PAID_FORREP',
 				'CANCELED',
@@ -2370,6 +2309,11 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 	public static function getCalcVariations()
 	{
 		return array_merge(parent::getCalcVariations(), array(
+			'date' => array(
+				'MIN',
+				'MAX',
+				'COUNT_DISTINCT'
+			),
 			'FUSER.USER.UserGroup:USER.GROUP.ID' => array(
 				'COUNT_DISTINCT',
 				'GROUP_CONCAT'
@@ -2392,6 +2336,14 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 	public static function getCompareVariations()
 	{
 		return array_merge(parent::getCompareVariations(), array(
+			'date' => array(
+				'EQUAL',
+				'GREATER_OR_EQUAL',
+				'GREATER',
+				'LESS',
+				'LESS_OR_EQUAL',
+				'NOT_EQUAL'
+			),
 			// Order
 			'ORDER.LID' => array(
 				'EQUAL',
@@ -2402,14 +2354,6 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				'NOT_EQUAL'
 			),
 			'ORDER.STATUS' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'ORDER.PAY_SYSTEM' => array(
-				'EQUAL',
-				'NOT_EQUAL'
-			),
-			'ORDER.DELIVERY_ID' => array(
 				'EQUAL',
 				'NOT_EQUAL'
 			),
@@ -2501,7 +2445,8 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 									// to the catalog is necessary
 									unset($arFilterValues[$l]);
 								}
-								else{
+								else
+								{
 									$sections = array();
 									foreach (parent::$catalogSections as $sectKey => $sect)
 									{
@@ -2538,35 +2483,6 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		// </editor-fold>
 	}
 
-	private static function rewriteDeliveryFilter(&$filter)
-	{
-		foreach ($filter as $k => &$v)
-		{
-			if ($k === 'LOGIC') continue;
-			if (is_array($v)) self::rewriteDeliveryFilter($v);
-			else if ($k === '=ORDER.DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter['=%ORDER.DELIVERY_ID'] = $v.':%';
-					unset($filter[$k]);
-				}
-			}
-			else if ($k === '!ORDER.DELIVERY_ID')
-			{
-				if (!is_numeric($v))
-				{
-					$filter[] = array(
-						'LOGIC' => 'OR',
-						'!=%ORDER.DELIVERY_ID' => $v.':%',
-						'=ORDER.DELIVERY_ID' => null
-					);
-					unset($filter[$k]);
-				}
-			}
-		}
-	}
-
 	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
 	{
 		if (self::$currentIblockFilter['value'])
@@ -2578,8 +2494,6 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		}
 		self::$currentIblockFilter['value'] = null;
 		self::$currentIblockFilter['compare'] = null;
-
-		self::rewriteDeliveryFilter($filter);
 	}
 
 	public static function fillFilterReferenceColumn(&$filterElement, Entity\ReferenceField $field)
@@ -2665,8 +2579,10 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
+		$dataType = self::getFieldDataType($cInfo['field']);
+
 		/** @var Bitrix\Main\Entity\Field[] $cInfo */
-		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
+		if ($dataType !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -2674,22 +2590,6 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		if ($k === 'SALE_BASKET_ORDER_PERSON_TYPE_ID')
 		{
 			$v = self::$personTypes[$v]['NAME'];
-		}
-		else if ($k === 'SALE_BASKET_ORDER_DELIVERY_ID')
-		{
-			$id = self::prepareDeliveryId($v);
-			if (!is_null($id))
-			{
-				if (is_numeric($id))
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_edit.php?ID='.$id.'&lang='.LANGUAGE_ID.'&filter=Y&set_filter=Y';
-				}
-				else
-				{
-					$row['__HREF_'.$k] = '/bitrix/admin/sale_delivery_handler_edit.php?SID='.$id.'&lang='.LANGUAGE_ID;
-				}
-			}
-			$v = self::getDeliveryByExtId($v);
 		}
 		// Removing the link from the email field if is empty.
 		else if ($k === 'SALE_BASKET_FUSER_USER_EMAIL')
@@ -2705,11 +2605,25 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		// Inserting zero in numerical fields with null value.
 		if (empty($v))
 		{
-			if (in_array($cInfo['field']->getDataType(), array('integer', 'float')))
+			if (in_array($dataType, array('integer', 'float')))
 			{
 				$v = 0;
 			}
 			//else $v = '&nbsp;';
+		}
+
+		if (empty($cInfo['aggr']))
+		{
+			if (($cInfo['field']->getEntity()->getName() === 'Shipment'
+					&& in_array($cInfo['field']->getName(), array('ID', 'DELIVERY_ID', 'DELIVERY_NAME'), true))
+				|| ($cInfo['field']->getEntity()->getName() === 'Payment'
+					&& in_array($cInfo['field']->getName(), array('ID', 'PAY_SYSTEM_ID', 'PAY_SYSTEM_NAME'), true)))
+			{
+				if (is_null($v) || empty($v) || $v == '&nbsp;')
+				{
+					unset($row['__HREF_'.$k]);
+				}
+			}
 		}
 
 		// Formatting of monetary fields.
@@ -2718,7 +2632,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 			if (preg_match('/'.$monField.'$/', $k))
 			{
 				$v = self::calculateInReportCurrency($v);
-				$v = number_format($v, 2, '.', ' ');
+				$v = number_format(doubleval($v), 2, '.', ' ');
 				break;
 			}
 		}
@@ -2783,7 +2697,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				if (preg_match('/'.$monField.'$/', $k))
 				{
 					if (!$bFormatOnly) $v = self::calculateInReportCurrency($v);
-					$v = number_format($v, 2, '.', ' ');
+					$v = number_format(doubleval($v), 2, '.', ' ');
 					break;
 				}
 			}
@@ -2823,46 +2737,38 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 
 			if ($field->getEntity()->getName() == 'User')
 			{
-				if ($elem['name'] == 'FUSER.USER.SHORT_NAME')
+				if (in_array(
+					$elem['name'],
+					array(
+						'FUSER.USER.EMAIL',
+						'ORDER.EMP_CANCELED_BY.EMAIL',
+						'ORDER.EMP_STATUS_BY.EMAIL',
+						'ORDER.Payment:ORDER.EMP_PAID_BY.EMAIL',
+						'ORDER.Payment:ORDER.RESPONSIBLE_BY.EMAIL',
+						'ORDER.Shipment:REPS_ORDER.EMP_ALLOW_DELIVERY_BY.EMAIL',
+						'ORDER.Shipment:REPS_ORDER.EMP_DEDUCTED_BY.EMAIL',
+						'ORDER.Shipment:REPS_ORDER.RESPONSIBLE_BY.EMAIL'
+					),
+					true))
 				{
-					//$href = array('pattern' => '/bitrix/admin/user_edit.php?ID=#FUSER.USER.ID#&lang='.LANG);
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#FUSER.USER.ID#&lang='.LANG);
+					$href = array('pattern' => 'mailto:#'.$elem['name'].'#');
 				}
-				elseif ($elem['name'] == 'FUSER.USER.EMAIL')
+				else if (in_array(
+					$elem['name'],
+					array(
+						'FUSER.USER.SHORT_NAME',
+						'ORDER.EMP_CANCELED_BY.SHORT_NAME',
+						'ORDER.EMP_STATUS_BY.SHORT_NAME',
+						'ORDER.Payment:ORDER.EMP_PAID_BY.SHORT_NAME',
+						'ORDER.Payment:ORDER.RESPONSIBLE_BY.SHORT_NAME',
+						'ORDER.Shipment:REPS_ORDER.EMP_ALLOW_DELIVERY_BY.SHORT_NAME',
+						'ORDER.Shipment:REPS_ORDER.EMP_DEDUCTED_BY.SHORT_NAME',
+						'ORDER.Shipment:REPS_ORDER.RESPONSIBLE_BY.SHORT_NAME'
+					),
+					true))
 				{
-					$href = array('pattern' => 'mailto:#FUSER.USER.EMAIL#');
-				}
-				else if ($elem['name'] == 'ORDER.EMP_STATUS_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#ORDER.EMP_STATUS_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'ORDER.EMP_STATUS_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#ORDER.EMP_STATUS_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'ORDER.EMP_ALLOW_DELIVERY_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#ORDER.EMP_ALLOW_DELIVERY_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'ORDER.EMP_ALLOW_DELIVERY_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#ORDER.EMP_ALLOW_DELIVERY_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'ORDER.EMP_PAYED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#ORDER.EMP_PAYED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'ORDER.EMP_PAYED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#ORDER.EMP_PAYED_BY.EMAIL#');
-				}
-				else if ($elem['name'] == 'ORDER.EMP_CANCELED_BY.SHORT_NAME')
-				{
-					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#ORDER.EMP_CANCELED_BY.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] == 'ORDER.EMP_CANCELED_BY.EMAIL')
-				{
-					$href = array('pattern' => 'mailto:#ORDER.EMP_CANCELED_BY.EMAIL#');
+					$userDef = substr($elem['name'], 0, -11);
+					$href = array('pattern' => '/bitrix/admin/sale_buyers_profile.php?USER_ID=#'.$userDef.'.ID#&lang='.LANG);
 				}
 			}
 			elseif ($field->getEntity()->getName() == 'Basket')
@@ -2875,25 +2781,38 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 				}
 				elseif ($elem['name'] == 'ORDER_ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_order_detail.php?ID=#ORDER_ID#&lang='.LANG);
+					$href = array('pattern' => '/bitrix/admin/sale_order_view.php?ID=#ORDER_ID#&lang='.LANG);
 				}
 			}
 			else if ($field->getEntity()->getName() == 'Order')
 			{
 				if ($elem['name'] === 'ORDER.ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_order_detail.php?ID=#ORDER.ID#&lang='.LANG);
-				}
-				else if ($elem['name'] === 'ORDER.DELIVERY_ID')
-				{
-					$href = array('pattern' => '/404.php?DELIVERY_ID=#ORDER.DELIVERY_ID#&lang='.LANG);
+					$href = array('pattern' => '/bitrix/admin/sale_order_view.php?ID=#ORDER.ID#&lang='.LANG);
 				}
 			}
-			else if ($field->getEntity()->getName() == 'PaySystem')
+			else if ($field->getEntity()->getName() === 'Payment')
 			{
-				if ($elem['name'] == 'ORDER.PAY_SYSTEM.NAME')
+				if ($elem['name'] === 'ORDER.Payment:ORDER.ID')
 				{
-					$href = array('pattern' => '/bitrix/admin/sale_pay_system_edit.php?ID=#ORDER.PAY_SYSTEM.ID#&lang='.LANG.'&filter=Y&set_filter=Y');
+					$href = array('pattern' => '/bitrix/admin/sale_order_payment_edit.php?order_id=#ORDER.Payment:ORDER.ORDER_ID#&payment_id=#ORDER.Payment:ORDER.ID#&lang='.LANG);
+				}
+				else if ($elem['name'] === 'ORDER.Payment:ORDER.PAY_SYSTEM_ID'
+					|| $elem['name'] === 'ORDER.Payment:ORDER.PAY_SYSTEM_NAME')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_pay_system_edit.php?ID=#ORDER.Payment:ORDER.PAY_SYSTEM_ID#&lang='.LANG);
+				}
+			}
+			else if ($field->getEntity()->getName() === 'Shipment')
+			{
+				if ($elem['name'] === 'ORDER.Shipment:REPS_ORDER.ID')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_order_shipment_edit.php?order_id=#ORDER.Shipment:REPS_ORDER.ORDER_ID#&shipment_id=#ORDER.Shipment:REPS_ORDER.ID#&lang='.LANG);
+				}
+				else if ($elem['name'] === 'ORDER.Shipment:REPS_ORDER.DELIVERY_ID'
+					|| $elem['name'] === 'ORDER.Shipment:REPS_ORDER.DELIVERY_NAME')
+				{
+					$href = array('pattern' => '/bitrix/admin/sale_delivery_service_edit.php?ID=#ORDER.Shipment:REPS_ORDER.DELIVERY_ID#&lang='.LANG);
 				}
 			}
 		}
@@ -2948,7 +2867,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 
 	public static function getEntityName()
 	{
-		return 'Bitrix\Sale\Product';
+		return 'Bitrix\Sale\Internals\Product';
 	}
 
 	public static function getOwnerId()
@@ -3243,7 +3162,8 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 									// to the catalog is necessary
 									unset($arFilterValues[$l]);
 								}
-								else{
+								else
+								{
 									$sections = array();
 									foreach (parent::$catalogSections as $sectKey => $sect)
 									{
@@ -3390,8 +3310,10 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 
 	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
 	{
+		$dataType = self::getFieldDataType($cInfo['field']);
+
 		/** @var Bitrix\Main\Entity\Field[] $cInfo */
-		if ($cInfo['field']->getDataType() !== 'float' )    // skip base rounding
+		if ($dataType !== 'float' )    // skip base rounding
 		{
 			parent::formatResultValue($k, $v, $row, $cInfo, $total);
 		}
@@ -3399,7 +3321,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 		// Inserting zero in numerical fields with null value.
 		if (empty($v))
 		{
-			if (in_array($cInfo['field']->getDataType(), array('integer', 'float')))
+			if (in_array($dataType, array('integer', 'float')))
 			{
 				$v = 0;
 			}
@@ -3412,7 +3334,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 			if (preg_match('/'.$monField.'$/', $k))
 			{
 				$v = self::calculateInReportCurrency($v);
-				$v = number_format($v, 2, '.', ' ');
+				$v = number_format(doubleval($v), 2, '.', ' ');
 				break;
 			}
 		}
@@ -3455,7 +3377,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 		{
 			$v = trim($v);
 			$spacePos = strpos(trim($v), ' ');
-			$v = number_format(floatval(substr($v, 0, $spacePos)), 2, '.', ' ').substr($v, $spacePos);
+			$v = number_format(doubleval(substr($v, 0, $spacePos)), 2, '.', ' ').substr($v, $spacePos);
 		}
 	}
 
@@ -3478,7 +3400,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 				if (preg_match('/'.$monField.'$/', $k))
 				{
 					if (!$bFormatOnly) $v = self::calculateInReportCurrency($v);
-					$v = number_format($v, 2, '.', ' ');
+					$v = number_format(doubleval($v), 2, '.', ' ');
 					break;
 				}
 			}
@@ -3514,7 +3436,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 				{
 					$v = trim($v);
 					$spacePos = strpos($v, ' ');
-					$v = number_format(floatval(substr($v, 0, $spacePos)), 2, '.', ' ').substr($v, $spacePos);
+					$v = number_format(doubleval(substr($v, 0, $spacePos)), 2, '.', ' ').substr($v, $spacePos);
 				}
 			}
 		}

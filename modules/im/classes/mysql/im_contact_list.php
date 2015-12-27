@@ -1,28 +1,46 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/im/classes/general/im_contact_list.php");
 
+use Bitrix\Im as IM;
+
 class CIMContactList extends CAllIMContactList
 {
-	public static function SetRecent($entityId, $messageId, $isChat = false, $userId = false)
+	public static function SetRecent($arParams)
 	{
-		$entityId = intval($entityId);
-		$messageId = intval($messageId);
-		if ($entityId <= 0)
+		$itemId = intval($arParams['ENTITY_ID']);
+		$messageId = intval($arParams['MESSAGE_ID']);
+		if ($itemId <= 0)
 			return false;
 
-		$userId = intval($userId);
+		$userId = intval($arParams['USER_ID']);
 		if ($userId <= 0)
-			$userId = $GLOBALS['USER']->GetID();
+			$userId = (int)$GLOBALS['USER']->GetID();
 
-		if (!$isChat && $userId == $entityId)
+		$chatType = IM_MESSAGE_PRIVATE;
+		if (isset($arParams['CHAT_TYPE']) && in_array($arParams['CHAT_TYPE'], Array(IM_MESSAGE_OPEN, IM_MESSAGE_CHAT)))
+		{
+			$chatType = $arParams['CHAT_TYPE'];
+		}
+		else if (isset($arParams['CHAT_ID']))
+		{
+			$orm = IM\ChatTable::getById($arParams['CHAT_ID']);
+			if ($chatData = $orm->fetch())
+			{
+				$chatType = $chatData['TYPE'];
+			}
+		}
+
+		$isChat = in_array($chatType, Array(IM_MESSAGE_OPEN, IM_MESSAGE_CHAT));
+		if (!$isChat && $userId == $itemId)
 			return false;
 
 		global $DB;
 
 		$strSQL = "
 			INSERT INTO b_im_recent (USER_ID, ITEM_TYPE, ITEM_ID, ITEM_MID)
-			VALUES (".$userId.", '".($isChat? IM_MESSAGE_GROUP: IM_MESSAGE_PRIVATE)."', ".$entityId.", ".$messageId.")
-			ON DUPLICATE KEY UPDATE ITEM_MID = ".$messageId;
+			VALUES (".$userId.", '".$chatType."', ".$itemId.", ".$messageId.")
+			ON DUPLICATE KEY UPDATE ITEM_MID = ".$messageId."
+		";
 		$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 		$obCache = new CPHPCache();

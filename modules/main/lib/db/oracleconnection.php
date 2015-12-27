@@ -49,7 +49,7 @@ class OracleConnection extends Connection
 		if (($this->options & self::PERSISTENT) != 0)
 			$connection = oci_pconnect($this->login, $this->password, $this->database);
 		else
-			$connection = oci_connect($this->login, $this->password, $this->database);
+			$connection = oci_new_connect($this->login, $this->password, $this->database);
 
 		if (!$connection)
 			throw new ConnectionException('Oracle connect error', $this->getErrorMessage());
@@ -125,9 +125,8 @@ class OracleConnection extends Connection
 			$executionMode = OCI_DEFAULT;
 			foreach ($binds as $key => $val)
 			{
-				$descriptor = oci_new_descriptor($this->resource, OCI_DTYPE_LOB);
-				oci_bind_by_name($result, ":".$key, $descriptor, -1, OCI_B_CLOB);
-				$clob[$key] = $descriptor;
+				$clob[$key] = oci_new_descriptor($this->resource, OCI_DTYPE_LOB);
+				oci_bind_by_name($result, ":".$key, $clob[$key], -1, OCI_B_CLOB);
 			}
 		}
 
@@ -147,7 +146,10 @@ class OracleConnection extends Connection
 			{
 				foreach ($binds as $key => $val)
 				{
-					$clob[$key]->save($binds[$key]);
+					if($clob[$key])
+					{
+						$clob[$key]->save($binds[$key]);
+					}
 				}
 			}
 
@@ -158,7 +160,10 @@ class OracleConnection extends Connection
 
 			foreach ($binds as $key => $val)
 			{
-				$clob[$key]->free();
+				if($clob[$key])
+				{
+					$clob[$key]->free();
+				}
 			}
 		}
 
@@ -452,7 +457,9 @@ class OracleConnection extends Connection
 				));
 			}
 
-			$sqlFields[] = $this->getSqlHelper()->quote($columnName)
+			$realColumnName = $field->getColumnName();
+
+			$sqlFields[] = $this->getSqlHelper()->quote($realColumnName)
 				. ' ' . $this->getSqlHelper()->getColumnTypeByField($field)
 				. ' ' . (in_array($columnName, $primary, true) ? 'NOT NULL' : 'NULL')
 			;
@@ -464,7 +471,8 @@ class OracleConnection extends Connection
 		{
 			foreach ($primary as &$primaryColumn)
 			{
-				$primaryColumn = $this->getSqlHelper()->quote($primaryColumn);
+				$realColumnName = $fields[$primaryColumn]->getColumnName();
+				$primaryColumn = $this->getSqlHelper()->quote($realColumnName);
 			}
 
 			$sql .= ', PRIMARY KEY('.join(', ', $primary).')';
@@ -479,6 +487,8 @@ class OracleConnection extends Connection
 		{
 			foreach ($autoincrement as $autoincrementColumn)
 			{
+				$autoincrementColumn = $fields[$autoincrementColumn]->getColumnName();
+
 				if ($autoincrementColumn == 'ID')
 				{
 					// old-school hack

@@ -13,8 +13,8 @@
 class CSecurityEnvironmentTest
 	extends CSecurityBaseTest
 {
-	const MIN_UID = 100;
-	const MIN_GID = 100;
+	const MIN_UID = 10;
+	const MIN_GID = 10;
 
 	protected $internalName = "EnvironmentTest";
 	protected $tests = array(
@@ -30,6 +30,12 @@ class CSecurityEnvironmentTest
 		"uploadNegotiationEnabled" => array(
 			"method" => "checkUploadNegotiationEnabled"
 		),
+		"privilegedPhpUserOrGroup" => array(
+			"method" => "checkPhpUserAndGroup"
+		),
+		"bitrixTempPath" => array(
+			"method" => "checkBitrixTempPath"
+		)
 	);
 	//TODO: check custom php/py/perl/etc handlers in .htaccess files
 
@@ -146,6 +152,44 @@ HTACCESS;
 			unlink($_SERVER['DOCUMENT_ROOT'].$uploadPathTestFile);
 		}
 		return $result;
+	}
+
+	/**
+	 * Check minimal UID and GID
+	 *
+	 * @param int $minUid
+	 * @param int $minGid
+	 * @return bool
+	 */
+	protected function checkPhpUserAndGroup($minUid = self::MIN_UID, $minGid = self::MIN_GID)
+	{
+		if(self::isRunOnWin())
+			return self::STATUS_PASSED;
+
+		$uid = self::getCurrentUID();
+		$uidCheckFailed = false;
+		if($uid !== null && $uid < $minUid)
+			$uidCheckFailed = true;
+
+		$gid = self::getCurrentGID();
+		$gidCheckFailed = false;
+		if($gid !== null && $gid < $minGid)
+			$gidCheckFailed = true;
+
+		if ($uidCheckFailed || $gidCheckFailed)
+		{
+			$this->addUnformattedDetailError(
+					'SECURITY_SITE_CHECKER_PHP_PRIVILEGED_USER',
+					($uid == 0 || $gid == 0 ? CSecurityCriticalLevel::HIGHT: CSecurityCriticalLevel::MIDDLE),
+					getMessage('SECURITY_SITE_CHECKER_PHP_PRIVILEGED_USER_ADDITIONAL', array(
+						'#UID#' => static::formatUID($uid),
+						'#GID#' => static::formatGID($gid)
+					))
+			);
+			return self::STATUS_FAILED;
+		}
+
+		return self::STATUS_PASSED;
 	}
 
 	/**
@@ -431,25 +475,37 @@ HTACCESS;
 	}
 
 	/**
-	 * Check minimal UID and GID
+	 * Format system user ID, e.g. $uid 0 = root(0)
 	 *
-	 * @param int $pMinUid
-	 * @param int $pMinGid
-	 * @return bool
+	 * @param int $uid
+	 * @return string
 	 */
-	protected function checkUserAndGroup($pMinUid = self::MIN_UID, $pMinGid = self::MIN_GID)
+	protected static function formatUID($uid)
 	{
-		if(self::isRunOnWin())
-			return true;
+		if(is_callable("posix_getpwuid"))
+		{
+			$uid = posix_getpwuid($uid);
+			return sprintf('%s(%s)', $uid['name'], $uid['uid']);
+		}
 
-		$result = true;
-		$uid = self::getCurrentUID();
-		if($uid !== null && $uid < $pMinUid)
-			$result = false;
-		$gid = self::getCurrentGID();
-		if($gid !== null && $gid < $pMinGid)
-			$result = false;
-		return $result;
+		return $uid;
+	}
+
+	/**
+	 * Format system user group ID, e.g. $gid 0 = root(0)
+	 *
+	 * @param int $gid
+	 * @return string
+	 */
+	protected static function formatGID($gid)
+	{
+		if(is_callable("posix_getgrgid"))
+		{
+			$gid = posix_getgrgid($gid);
+			return sprintf('%s(%s)', $gid['name'], $gid['gid']);
+		}
+
+		return $gid;
 	}
 
 	protected static function formatFilePermissions($perms)
@@ -519,5 +575,37 @@ HTACCESS;
 			(($perms & 0x0200) ? 'T' : '-'));
 
 		return $info;
+	}
+
+	/**
+	 * Check Bitrix temporary directory path.
+	 *
+	 * @since 15.5.4
+	 * @return string
+	 */
+	protected function checkBitrixTempPath()
+	{
+		$io = CBXVirtualIo::GetInstance();
+
+		$path = CTempFile::GetAbsoluteRoot();
+		$path = $io->CombinePath($path);
+
+		$documentRoot = self::getParam("DOCUMENT_ROOT", $_SERVER["DOCUMENT_ROOT"]);
+		$documentRoot = $io->CombinePath($documentRoot);
+
+		if (strpos($path, $documentRoot) === 0)
+		{
+			$this->addUnformattedDetailError(
+					"SECURITY_SITE_CHECKER_BITRIX_TMP_DIR",
+					CSecurityCriticalLevel::MIDDLE,
+					getMessage("SECURITY_SITE_CHECKER_BITRIX_TMP_DIR_ADDITIONAL", array(
+							"#DIR#" => $path
+					))
+			);
+
+			return static::STATUS_FAILED;
+		}
+
+		return static::STATUS_PASSED;
 	}
 }

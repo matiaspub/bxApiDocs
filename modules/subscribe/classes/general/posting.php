@@ -157,8 +157,9 @@ class CPostingGeneral
 
 	public function SaveFile($ID, $file)
 	{
-		global $DB;
+		global $DB, $APPLICATION;
 		$ID = intval($ID);
+		$filesSize = 0;
 
 		$arFileName = CPosting::SplitFileName($file["name"]);
 		//Check if file with this name already exists
@@ -166,18 +167,36 @@ class CPostingGeneral
 		$rsFile = CPosting::GetFileList($ID);
 		while($arFile = $rsFile->Fetch())
 		{
+			$filesSize += $arFile["FILE_SIZE"];
 			$arSavedName = CPosting::SplitFileName($arFile["ORIGINAL_NAME"]);
 			if($arFileName[0] == $arSavedName[0] && $arFileName[1] == $arSavedName[1])
 				$arSameNames[$arSavedName[2]] = true;
 		}
+
+		$max_files_size = COption::GetOptionString("subscribe", "max_files_size") * 1024 *1024;
+		if ($max_files_size > 0)
+		{
+			$filesSize += $file["size"];
+			if ($filesSize > $max_files_size)
+			{
+				$this->LAST_ERROR = GetMessage("class_post_err_files_size", array(
+					"#MAX_FILES_SIZE#" => CFile::FormatSize($max_files_size),
+				));
+				$APPLICATION->ThrowException($this->LAST_ERROR);
+				return false;
+			}
+		}
+
 		while(array_key_exists($arFileName[2], $arSameNames))
 		{
 			$arFileName[2]++;
 		}
+
 		if($arFileName[2] > 0)
 		{
 			$file["name"] = $arFileName[0]."(".($arFileName[2]).")".$arFileName[1];
 		}
+
 		//save file
 		$file["MODULE_ID"] = "subscribe";
 		$fid = intval(CFile::SaveFile($file, "subscribe", true, true));
@@ -188,6 +207,7 @@ class CPostingGeneral
 		else
 		{
 			$this->LAST_ERROR = GetMessage("class_post_err_att");
+			$APPLICATION->ThrowException($this->LAST_ERROR);
 			return false;
 		}
 	}

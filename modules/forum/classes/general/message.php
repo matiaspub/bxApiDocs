@@ -457,7 +457,7 @@ class CAllForumMessage
 			"TITLE" => $arMessage["TOPIC_INFO"]["TITLE"].($arMessage["NEW_TOPIC"] == "Y" && !empty($arMessage["TOPIC_INFO"]["DESCRIPTION"]) ?
 					", ".$arMessage["TOPIC_INFO"]["DESCRIPTION"] : ""),
 			"TAGS" => (($arMessage["NEW_TOPIC"] == "Y") ? $arMessage["TOPIC_INFO"]["TAGS"] : ""),
-			"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(textParser::killAllTags($arMessage["POST_MESSAGE"])),
+			"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(forumTextParser::clearAllTags($arMessage["POST_MESSAGE"])),
 			"ENTITY_TYPE_ID"  => $arMessage["NEW_TOPIC"] == "Y"? "FORUM_TOPIC": "FORUM_POST",
 			"ENTITY_ID"  => $arMessage["NEW_TOPIC"] == "Y"? $arMessage["TOPIC_ID"]: $arMessage["ID"],
 			"USER_ID" => $arMessage["AUTHOR_ID"],
@@ -612,6 +612,41 @@ class CAllForumMessage
 		return $res;
 	}
 
+	
+	/**
+	* <p>Возвращает массив параметров сообщения, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
+	*
+	*
+	* @param int $ID  Код сообщения.
+	*
+	* @param array $arAddParams = Array() Массив добавления параметров.
+	*
+	* @return mixed 
+	*
+	* <h4>Example</h4> 
+	* <pre>
+	* &lt;?
+	* // Распечатаем на экран все возвращаемые параметры сообщения
+	* $arMessage = CForumMessage::GetByIDEx($MID);
+	* if ($arMessage)
+	* {
+	*   echo "&lt;pre&gt;";
+	*   print_r($arMessage);
+	*   echo "&lt;/pre&gt;";
+	* }
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	* </li></ul> <a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyidex.php
+	* @author Bitrix
+	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -662,7 +697,7 @@ class CAllForumMessage
 			"SELECT FM.*, ".$DB->DateToCharFunction("FM.POST_DATE", "FULL")." as POST_DATE,
 				FU.SHOW_NAME, FU.DESCRIPTION, FU.NUM_POSTS, FU.POINTS as NUM_POINTS, FU.SIGNATURE, FU.AVATAR, FU.RANK_ID,
 				".$DB->DateToCharFunction("FU.DATE_REG", "SHORT")." as DATE_REG,
-				U.EMAIL, U.PERSONAL_ICQ, U.LOGIN, U.NAME, U.SECOND_NAME, U.LAST_NAME".
+				U.EMAIL, U.PERSONAL_ICQ, U.LOGIN, U.NAME, U.SECOND_NAME, U.LAST_NAME, U.PERSONAL_PHOTO".
 				(!empty($arSqlSelect) ? ", ".implode(", ", $arSqlSelect) : "")."
 			FROM b_forum_message FM
 				LEFT JOIN b_forum_user FU ON (FM.AUTHOR_ID = FU.USER_ID)
@@ -1319,6 +1354,7 @@ class _CMessageDBResult extends CDBResult
 					foreach($arUF as $k => $v)
 					{
 						$res[$k] = $this->arUserFields[$k];
+						$res[$k]["ENTITY_VALUE_ID"] = $res["ID"];
 						$res[$k]["VALUE"] = $v;
 					}
 				}

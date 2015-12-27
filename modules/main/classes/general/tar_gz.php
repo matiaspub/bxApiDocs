@@ -161,9 +161,6 @@ class CArchiver implements IBXArchive
 	*/
 	public function Unpack($strPath)
 	{
-		if (strpos($strPath, $_SERVER["DOCUMENT_ROOT"]) === false)
-			return false;
-
 		$this->_arErrors = array();
 
 		$v_list_detail = array();

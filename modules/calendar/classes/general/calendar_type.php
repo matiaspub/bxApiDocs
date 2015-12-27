@@ -266,7 +266,7 @@ class CCalendarType
 	public static function CanDo($operation, $xmlId = 0, $userId = false)
 	{
 		global $USER;
-		if ($USER->CanDoOperation('edit_php'))
+		if ((!$USER || !is_object($USER)) || $USER->CanDoOperation('edit_php'))
 			return true;
 
 		if (($xmlId == 'group' || $xmlId == 'user') && CCalendar::IsSocNet() && CCalendar::IsSocnetAdmin())

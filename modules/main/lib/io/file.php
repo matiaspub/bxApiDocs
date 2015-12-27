@@ -8,18 +8,44 @@ class File
 	const REWRITE = 0;
 	const APPEND = 1;
 
+	/** @var resource */
+	protected $filePointer;
+
 	static public function __construct($path, $siteId = null)
 	{
 		parent::__construct($path, $siteId);
 	}
 
+	/**
+	 * Opens the file and returns the file pointer.
+	 *
+	 * @param string $mode
+	 * @return resource
+	 * @throws FileOpenException
+	 */
 	public function open($mode)
 	{
-		$fd = fopen($this->getPhysicalPath(), $mode."b");
-		if (!$fd)
+		$this->filePointer = fopen($this->getPhysicalPath(), $mode."b");
+		if (!$this->filePointer)
+		{
 			throw new FileOpenException($this->originalPath);
+		}
+		return $this->filePointer;
+	}
 
-		return $fd;
+	/**
+	 * Closes the file.
+	 *
+	 * @throws FileNotOpenedException
+	 */
+	public function close()
+	{
+		if(!$this->filePointer)
+		{
+			throw new FileNotOpenedException($this->originalPath);
+		}
+		fclose($this->filePointer);
+		$this->filePointer = null;
 	}
 
 	public function isExists()
@@ -36,7 +62,7 @@ class File
 		return file_get_contents($this->getPhysicalPath());
 	}
 
-	public function putContents($data, $flags=self::REWRITE)
+	public function putContents($data, $flags = self::REWRITE)
 	{
 		$dir = $this->getDirectory();
 		if (!$dir->isExists())
@@ -45,17 +71,102 @@ class File
 		if ($this->isExists() && !$this->isWritable())
 			$this->markWritable();
 
-		return $flags&self::APPEND
+		return $flags & self::APPEND
 			? file_put_contents($this->getPhysicalPath(), $data, FILE_APPEND)
 			: file_put_contents($this->getPhysicalPath(), $data);
 	}
 
+	/**
+	 * Returns the file size.
+	 *
+	 * @return float|int
+	 * @throws FileNotFoundException
+	 * @throws FileOpenException
+	 */
 	public function getSize()
 	{
 		if (!$this->isExists())
+		{
 			throw new FileNotFoundException($this->originalPath);
+		}
 
-		return intval(filesize($this->getPhysicalPath()));
+		static $supportLarge32 = null;
+		if($supportLarge32 === null)
+		{
+			$supportLarge32 = (\Bitrix\Main\Config\Configuration::getValue("large_files_32bit_support") === true);
+		}
+
+		$size = 0;
+		if(PHP_INT_SIZE < 8 && $supportLarge32)
+		{
+			// 32bit
+			$this->open(FileStreamOpenMode::READ);
+
+			if(fseek($this->filePointer, 0, SEEK_END) === 0)
+			{
+				$size = 0.0;
+				$step = 0x7FFFFFFF;
+				while($step > 0)
+				{
+					if (fseek($this->filePointer, -$step, SEEK_CUR) === 0)
+					{
+						$size += floatval($step);
+					}
+					else
+					{
+						$step >>= 1;
+					}
+				}
+			}
+
+			$this->close();
+		}
+		else
+		{
+			// 64bit
+			$size = filesize($this->getPhysicalPath());
+		}
+
+	    return $size;
+	}
+
+	/**
+	 * Seeks on the file pointer from the beginning (SEEK_SET only).
+	 *
+	 * @param int|float $position
+	 * @return int
+	 * @throws FileNotOpenedException
+	 */
+	public function seek($position)
+	{
+		if(!$this->filePointer)
+		{
+			throw new FileNotOpenedException($this->originalPath);
+		}
+
+		if($position <= PHP_INT_MAX)
+		{
+			return fseek($this->filePointer, $position, SEEK_SET);
+		}
+		else
+		{
+			$res = fseek($this->filePointer, 0, SEEK_SET);
+			if($res === 0)
+			{
+				do
+				{
+					$offset = ($position < PHP_INT_MAX? $position : PHP_INT_MAX);
+					$res = fseek($this->filePointer, $offset, SEEK_CUR);
+					if($res !== 0)
+					{
+						break;
+					}
+					$position -= PHP_INT_MAX;
+				}
+				while($position > 0);
+			}
+			return $res;
+		}
 	}
 
 	public function isWritable()
@@ -163,6 +274,6 @@ class File
 	public static function deleteFile($path)
 	{
 		$f = new self($path);
-		$f->delete();
+		return $f->delete();
 	}
 }

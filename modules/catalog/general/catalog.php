@@ -1,12 +1,13 @@
 <?
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Main,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Catalog;
+
 Loc::loadMessages(__FILE__);
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -22,9 +23,7 @@ class CAllCatalog
 
 	
 	/**
-	* <p>Метод служит для проверки (и корректировки, если это возможно) параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a>.</p>
-	*
-	*
+	* <p>Метод служит для проверки (и корректировки, если это возможно) параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__add.cee81079.php">CCatalog::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
@@ -34,45 +33,37 @@ class CAllCatalog
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__update.c1202733.php">CCatalog::Update</a>.</li>
 	* </ul>
 	*
-	*
-	*
 	* @param array &$arFields  Ассоциативный массив параметров привязки инфоблока к модулю
 	* Торгового каталога. Массив передается по ссылке и его значения
-	* могут быть изменены функцией. <br> Допустимые ключи: <ul> <li> <b>IBLOCK_ID</b>
-	* - код (ID) инфоблока;</li> <li> <b>SUBSCRIPTION</b> - флаг "Продажа контента" (Y/N);</li>
+	* могут быть изменены методом. <br> Допустимые ключи: <ul> <li> <b>IBLOCK_ID</b> -
+	* код (ID) инфоблока;</li> <li> <b>SUBSCRIPTION</b> - флаг "Продажа контента" (Y/N);</li>
 	* <li> <b>YANDEX_EXPORT</b> - флаг "Экспортировать в Яндекс.Товары" (Y/N);</li> <li>
 	* <b>VAT_ID</b> - код (ID) типа НДС;</li> <li> <b>PRODUCT_IBLOCK_ID</b> - код (ID) инфоблока
 	* товаров (для инфоблока торговых предложений);</li> <li> <b>SKU_PROPERTY_ID</b> -
 	* код (ID) свойства привязки к инфоблоку товаров (для инфоблока
 	* торговых предложений);</li> </ul>
 	*
-	*
-	*
 	* @param int $ID = 0] Код (ID) инфоблока.
 	*
-	*
-	*
 	* @return bool <p> В случае корректности переданных параметров возвращает true,
-	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
-	* можно получить текст ошибок.</p> <p><b>Обязательные проверки</b></p>
-	* </htm<ul> <li>для <b>CCatalog::Add</b> <ul> <li>ключ IBLOCK_ID присутствует и содержит
-	* код (ID) существующего инфоблока;</li> <li>если ключ SUBSCRIPTION не
+	* иначе - false. Если метод вернул false, с помощью $APPLICATION-&gt;GetException() можно
+	* получить текст ошибок.</p> <p><b>Обязательные проверки</b></p> </htm<ul>
+	* <li>для <b>CCatalog::Add</b> <ul> <li>ключ IBLOCK_ID присутствует и содержит код (ID)
+	* существующего инфоблока;</li> <li>если ключ SUBSCRIPTION не существует или
+	* не равен Y, ему присваивается значение N;</li> <li>если ключ YANDEX_EXPORT не
 	* существует или не равен Y, ему присваивается значение N;</li> <li>если
-	* ключ YANDEX_EXPORT не существует или не равен Y, ему присваивается
-	* значение N;</li> <li>если ключ VAT_ID не существует или меньше 0, ему
-	* присваивается значение 0;</li> <li>PRODUCT_IBLOCK_ID и SKU_PROPERTY_ID оба
-	* отсутствуют, оба равны нулю, либо отвечают правилу: <ul> <li>PRODUCT_IBLOCK_ID
-	* - код (ID) существующего инфоблока;</li> <li>SKU_PROPERTY_ID - код (ID)
-	* существующего свойства инфоблока IBLOCK_ID. Тип свойства - "SKU",
-	* свойство одиночное, поле LINK_IBLOCK_ID свойства = PRODUCT_IBLOCK_ID.</li> </ul> </li>
-	* </ul> <br> </li> <li>для <b>CCatalog::Update</b> <ul> <li>инфоблок с кодом ID должен
-	* являться торговым каталогом;</li> <li>если ключ SUBSCRIPTION существует и
-	* не равен Y, ему присваивается значение N;</li> <li>если ключ YANDEX_EXPORT
-	* существует и не равен Y, ему присваивается значение N;</li> <li>если
-	* ключ VAT_ID существует и меньше 0, ему присваивается значение 0;</li>
-	* <li>PRODUCT_IBLOCK_ID и SKU_PROPERTY_ID оба отсутствуют либо оба заданы;</li> </ul> </li>
-	* </ul>
-	*
+	* ключ VAT_ID не существует или меньше 0, ему присваивается значение
+	* 0;</li> <li>PRODUCT_IBLOCK_ID и SKU_PROPERTY_ID оба отсутствуют, оба равны нулю, либо
+	* отвечают правилу: <ul> <li>PRODUCT_IBLOCK_ID - код (ID) существующего
+	* инфоблока;</li> <li>SKU_PROPERTY_ID - код (ID) существующего свойства
+	* инфоблока IBLOCK_ID. Тип свойства - "SKU", свойство одиночное, поле
+	* LINK_IBLOCK_ID свойства = PRODUCT_IBLOCK_ID.</li> </ul> </li> </ul> <br> </li> <li>для
+	* <b>CCatalog::Update</b> <ul> <li>инфоблок с кодом ID должен являться торговым
+	* каталогом;</li> <li>если ключ SUBSCRIPTION существует и не равен Y, ему
+	* присваивается значение N;</li> <li>если ключ YANDEX_EXPORT существует и не
+	* равен Y, ему присваивается значение N;</li> <li>если ключ VAT_ID
+	* существует и меньше 0, ему присваивается значение 0;</li> <li>PRODUCT_IBLOCK_ID
+	* и SKU_PROPERTY_ID оба отсутствуют либо оба заданы;</li> </ul> </li> </ul>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -92,7 +83,6 @@ class CAllCatalog
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -356,14 +346,10 @@ class CAllCatalog
 
 	
 	/**
-	* <p>Возвращает массив параметров каталога, включая некоторые параметры, относящиеся к информационному блоку. Если инфоблок с кодом $ID не существует или не является торговым каталогом, вернет false.</p>
-	*
-	*
+	* <p>Возвращает массив параметров каталога, включая некоторые параметры, относящиеся к информационному блоку. Если инфоблок с кодом $ID не существует или не является торговым каталогом, вернет false. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код каталога - инфоблока.
-	*
-	*
 	*
 	* @return array <p>Если инфоблок с кодом $ID не существует или не является торговым
 	* каталогом, вернет false. Иначе возвращает ассоциативный массив с
@@ -394,7 +380,6 @@ class CAllCatalog
 	* предложений" рекомендуется использовать метод
 	* <b>Catalog::GetByIDExt()</b>.</td> </tr> <tr> <td>OFFERS</td> <td>Флаг наличия инфоблока
 	* торговых предложений (Y/N).</td> </tr> </tbody> </table>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> </ul>
@@ -465,10 +450,15 @@ class CAllCatalog
 			'=' => '='
 		);
 
+		$key = (string)$key;
+		if ($key == '')
+			return false;
 		if (0 == strncmp($key, '!', 1))
 		{
 			$arResult['NEGATIVE'] = 'Y';
 			$key = substr($key, 1);
+			if ($key == '')
+				return false;
 			if (0 == strncmp($key, '+', 1))
 			{
 				$arResult['OR_NULL'] = 'Y';
@@ -479,13 +469,16 @@ class CAllCatalog
 		{
 			$arResult['OR_NULL'] = 'Y';
 			$key = substr($key, 1);
+			if ($key == '')
+				return false;
 			if (0 == strncmp($key, '!', 1))
 			{
 				$arResult['NEGATIVE'] = 'Y';
 				$key = substr($key, 1);
 			}
 		}
-
+		if ($key == '')
+			return false;
 		$strKeyOp = substr($key, 0, 2);
 		if ('' != $strKeyOp && isset($arDoubleModify[$strKeyOp]))
 		{
@@ -676,6 +669,8 @@ class CAllCatalog
 
 			$key = $filter_keys[$i];
 			$key_res = CCatalog::GetFilterOperation($key);
+			if (empty($key_res))
+				continue;
 			$key = $key_res["FIELD"];
 			$strNegative = $key_res["NEGATIVE"];
 			$strOperation = $key_res["OPERATION"];
@@ -1112,6 +1107,8 @@ class CAllCatalog
 
 			$key = $filter_keys[$i];
 			$key_res = CCatalog::GetFilterOperation($key);
+			if (empty($key_res))
+				continue;
 			$key = $key_res["FIELD"];
 			$strNegative = $key_res["NEGATIVE"];
 			$strOperation = $key_res["OPERATION"];
@@ -1316,9 +1313,7 @@ class CAllCatalog
 
 	
 	/**
-	* <p>Метод служит для добавления новой записи в таблицу привязывания информационного блока к модулю торгового каталога. </p>
-	*
-	*
+	* <p>Метод служит для добавления новой записи в таблицу привязывания информационного блока к модулю торгового каталога. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров привязки, который может содержать следующие
@@ -1335,8 +1330,6 @@ class CAllCatalog
 	* Необязательные ключи, отсутствующие в массиве, получат значения
 	* по умолчанию.
 	*
-	*
-	*
 	* @return bool <p>Возвращает <i>true</i>, если запись успешно добавлена и <i>false</i> - если
 	* произошла ошибка. Текстовое сообщение об ошибках можно получить
 	* через $APPLICATION-&gt;GetException().</p> <p>Перед добавлением записи в таблицу
@@ -1346,7 +1339,6 @@ class CAllCatalog
 	* прошла успешно, производится запись в базу. Попытка добавить
 	* больше одной записи с одинаковым IBLOCK_ID вызовет ошибку базы
 	* данных.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1389,7 +1381,6 @@ class CAllCatalog
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/checkfields.php">CCatalog::CheckFields</a></li> <li><a
@@ -1422,14 +1413,10 @@ class CAllCatalog
 
 	
 	/**
-	* <p>Функция изменяет параметры записи с кодом ID в таблице привязывания информационного блока к модулю Торгового Каталога. </p>
-	*
-	*
+	* <p>Метод изменяет параметры записи с кодом ID в таблице привязывания информационного блока к модулю <b>Торговый каталог</b>. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код записи для изменения.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров записи, ключами с котором
 	* являются названия параметров, а значениями - новые
@@ -1441,11 +1428,8 @@ class CAllCatalog
 	* свойства привязки к инфоблоку товаров (для инфоблока торговых
 	* предложений, только вместе с PRODUCT_IBLOCK_ID);</li> </ul>
 	*
-	*
-	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного изменения записи и <i>false</i> -
 	* в противном случае. </p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
@@ -1484,9 +1468,7 @@ class CAllCatalog
 				}
 			}
 			if (isset(self::$catalogVatCache[$ID]))
-			{
 				unset(self::$catalogVatCache[$ID]);
-			}
 		}
 		CCatalogSKU::ClearCache();
 		return true;
@@ -1494,14 +1476,10 @@ class CAllCatalog
 
 	
 	/**
-	* <p>Метод удаляет привязку информационного блока с кодом ID к торговому каталогу. При этом удаляются также параметры товаров и ценовые предложения, относящиеся к этому каталогу. Описания товаров, относящиеся к элементу информационного блока, остаются неизменными.</p> <p>Перед удалением происходит вызов обработчиков события <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogdelete.php">OnBeforeCatalogDelete</a>.</p>
-	*
-	*
+	* <p>Метод удаляет привязку информационного блока с кодом ID к торговому каталогу. При этом удаляются также параметры товаров и ценовые предложения, относящиеся к этому каталогу. Описания товаров, относящиеся к элементу информационного блока, остаются неизменными. Метод динамичный.</p> <p>Перед удалением происходит вызов обработчиков события <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogdelete.php">OnBeforeCatalogDelete</a>.</p>
 	*
 	*
 	* @param int $ID  Код информационного блока - каталога.
-	*
-	*
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления записи и <i>false</i> -
 	* в противном случае. </p> <br><br>
@@ -1562,12 +1540,12 @@ class CAllCatalog
 		return CCatalog::Delete($ID);
 	}
 
-	static public function PreGenerateXML($xml_type = "yandex")
+	static public function PreGenerateXML($xml_type = 'yandex')
 	{
-		if ($xml_type=="yandex")
+		if ($xml_type == 'yandex')
 		{
-			$strYandexAgent = COption::GetOptionString('catalog','yandex_agent_file','');
-			if (strlen($strYandexAgent) > 0)
+			$strYandexAgent = (string)Main\Config\Option::get('catalog','yandex_agent_file');
+			if ($strYandexAgent != '')
 			{
 				if (file_exists($_SERVER['DOCUMENT_ROOT'].$strYandexAgent) && is_file($_SERVER['DOCUMENT_ROOT'].$strYandexAgent))
 				{
@@ -1586,8 +1564,8 @@ class CAllCatalog
 		}
 
 		global $pPERIOD;
-		$pPERIOD = (int)COption::GetOptionString("catalog", "yandex_xml_period", "24")*60*60;
-		return "CCatalog::PreGenerateXML(\"".$xml_type."\");";
+		$pPERIOD = (int)Main\Config\Option::get('catalog', 'yandex_xml_period')*3600;
+		return 'CCatalog::PreGenerateXML("'.$xml_type.'");';
 	}
 
 /*
@@ -1611,7 +1589,6 @@ class CAllCatalog
 	static public function OnBeforeIBlockElementDelete($ID)
 	{
 		global $APPLICATION;
-		global $DB;
 
 		$ID = (int)$ID;
 		if (0 < $ID)
@@ -1622,13 +1599,13 @@ class CAllCatalog
 				$arCatalog = CCatalogSKU::GetInfoByProductIBlock($intIBlockID);
 				if (!empty($arCatalog) && is_array($arCatalog) && 0 < $arCatalog['IBLOCK_ID'] && 0 < $arCatalog['SKU_PROPERTY_ID'])
 				{
-					$arFilter = array('IBLOCK_ID' => $arCatalog['IBLOCK_ID'],'=PROPERTY_'.$arCatalog['SKU_PROPERTY_ID'] => $ID,'ACTIVE' => '');
-					$rsOffers = CIBlockElement::GetList(array(),$arFilter,false,false,array('ID','IBLOCK_ID'));
+					$arFilter = array('IBLOCK_ID' => $arCatalog['IBLOCK_ID'],'=PROPERTY_'.$arCatalog['SKU_PROPERTY_ID'] => $ID);
+					$rsOffers = CIBlockElement::GetList(array(), $arFilter, false, false, array('ID', 'IBLOCK_ID'));
 					while($arOffer = $rsOffers->Fetch())
 					{
 						foreach(GetModuleEvents("iblock", "OnBeforeIBlockElementDelete", true) as $arEvent)
 						{
-							if(ExecuteModuleEventEx($arEvent, array($arOffer['ID']))===false)
+							if (ExecuteModuleEventEx($arEvent, array($arOffer['ID']))===false)
 							{
 								$err = Loc::getMessage("BT_MOD_CATALOG_ERR_BEFORE_DEL_TITLE").' '.$arEvent['TO_NAME'];
 								$err_id = false;
@@ -1641,7 +1618,7 @@ class CAllCatalog
 								return false;
 							}
 						}
-						if (false == CIBlockElement::Delete($arOffer['ID']))
+						if (!CIBlockElement::Delete($arOffer['ID']))
 						{
 							$APPLICATION->ThrowException(Loc::getMessage('BT_MOD_CATALOG_ERR_CANNOT_DELETE_OFFERS'));
 							return false;
@@ -1704,21 +1681,26 @@ class CAllCatalog
 		global $APPLICATION;
 
 		$intPropertyID = (int)$intPropertyID;
-		if (0 >= $intPropertyID)
+		if ($intPropertyID <= 0)
 			return true;
-		$arSkuInfo = CCatalogSKU::GetInfoByLinkProperty($intPropertyID);
-		if (!empty($arSkuInfo))
+		$propertyIterator = Catalog\CatalogIblockTable::getList(array(
+			'select' => array('IBLOCK_ID', 'PRODUCT_IBLOCK_ID', 'SKU_PROPERTY_ID'),
+			'filter' => array('=SKU_PROPERTY_ID' => $intPropertyID)
+		));
+		if ($property = $propertyIterator->fetch())
 		{
 			$APPLICATION->ThrowException(Loc::getMessage(
 				'BT_MOD_CATALOG_ERR_CANNOT_DELETE_SKU_PROPERTY',
 				array(
-					'#SKU_PROPERTY_ID#' => $arSkuInfo['SKU_PROPERTY_ID'],
-					'#PRODUCT_IBLOCK_ID#' => $arSkuInfo['PRODUCT_IBLOCK_ID'],
-					'#IBLOCK_ID#' => $arSkuInfo['IBLOCK_ID'],
+					'#SKU_PROPERTY_ID#' => $property['SKU_PROPERTY_ID'],
+					'#PRODUCT_IBLOCK_ID#' => $property['PRODUCT_IBLOCK_ID'],
+					'#IBLOCK_ID#' => $property['IBLOCK_ID'],
 				)
 			));
+			unset($property, $propertyIterator);
 			return false;
 		}
+		unset($property, $propertyIterator);
 		return true;
 	}
 
@@ -1941,4 +1923,3 @@ class CAllCatalog
 		self::$catalogVatCache = array();
 	}
 }
-?>

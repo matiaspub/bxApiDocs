@@ -17,6 +17,11 @@ class CCatalogStoreDocsBarcodeAll
 	public static function update($id, $arFields)
 	{
 		$id=intval($id);
+
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsBarcodeUpdate", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+				return false;
+
 		if($id < 0 || !self::checkFields('UPDATE', $arFields))
 			return false;
 		global $DB;
@@ -24,6 +29,9 @@ class CCatalogStoreDocsBarcodeAll
 		$strSql = "UPDATE b_catalog_docs_barcode SET ".$strUpdate." WHERE ID = ".$id;
 		if(!$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__))
 			return false;
+
+		foreach(GetModuleEvents("catalog", "OnStoreDocsBarcodeUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($id, $arFields));
 		return true;
 	}
 
@@ -33,7 +41,14 @@ class CCatalogStoreDocsBarcodeAll
 		$id = intval($id);
 		if ($id > 0)
 		{
+			foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreDocsBarcodeDelete", true) as $arEvent)
+				if(ExecuteModuleEventEx($arEvent, array($id)) === false)
+					return false;
+
 			$DB->Query("DELETE FROM b_catalog_docs_barcode WHERE ID = ".$id." ", true);
+
+			foreach(GetModuleEvents("OnCatalogStoreDocsBarcodeDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id));
 			return true;
 		}
 		return false;
@@ -50,10 +65,8 @@ class CCatalogStoreDocsBarcodeAll
 				return false;
 		}
 
-		$events = GetModuleEvents("catalog", "OnDocumentBarcodeDelete");
-		while ($arEvent = $events->Fetch())
+		foreach(GetModuleEvents("catalog", "OnDocumentBarcodeDelete", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($id));
-
 	}
 
 }

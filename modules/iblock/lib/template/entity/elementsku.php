@@ -91,7 +91,7 @@ class ElementSku extends Base
 			if ($this->elementFields)
 			{
 				$catalog = \CCatalogSKU::getInfoByProductIBlock($this->elementFields["IBLOCK_ID"]);
-				if (is_array($catalog))
+				if (!empty($catalog))
 				{
 					$this->skuIblockId = $catalog["IBLOCK_ID"];
 					$skuList = \CIBlockElement::getList(array(), array(

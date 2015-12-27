@@ -68,7 +68,7 @@ abstract class CDatabaseMysql extends CAllDatabase
 		$this->bConnected = false;
 
 		if (!defined("DBPersistent"))
-			;// define("DBPersistent",true);
+			// define("DBPersistent",true);
 
 		if(defined("DELAY_DB_CONNECT") && DELAY_DB_CONNECT===true)
 			return true;
@@ -182,7 +182,7 @@ abstract class CDatabaseMysql extends CAllDatabase
 				if ($this->DebugToFile)
 					$this->startSqlTracker()->writeFileLog("ERROR: ".$this->db_Error, 0, "CONN: ".$this->getThreadId());
 
-				if($this->debug || (@session_start() && $_SESSION["SESS_AUTH"]["ADMIN"]))
+				if($this->debug || (isset($_SESSION["SESS_AUTH"]["ADMIN"]) && $_SESSION["SESS_AUTH"]["ADMIN"]))
 					echo $error_position."<br><font color=#ff0000>MySQL Query Error: ".htmlspecialcharsbx($strSql)."</font>[".htmlspecialcharsbx($this->db_Error)."]<br>";
 
 				$error_position = preg_replace("#<br[^>]*>#i","\n",$error_position);
@@ -268,7 +268,6 @@ abstract class CDatabaseMysql extends CAllDatabase
 			"G",
 			"SS",
 			"TT",
-			"T"
 		);
 		static $replace = array(
 			"%Y",
@@ -281,7 +280,6 @@ abstract class CDatabaseMysql extends CAllDatabase
 			"%l",
 			"%s",
 			"%p",
-			"%p"
 		);
 
 		$format = str_replace($search, $replace, $format);
@@ -296,22 +294,36 @@ abstract class CDatabaseMysql extends CAllDatabase
 			$format = str_replace("M", "%b", $format);
 		}
 
+		$lowerAmPm = false;
+		if(strpos($format, 'T') !== false)
+		{
+			//lowercase am/pm
+			$lowerAmPm = true;
+			$format = str_replace("T", "%p", $format);
+		}
+
 		if($field === false)
 		{
-			return $format;
+			$field = "#FIELD#";
 		}
-		else
+
+		if($lowerAmPm)
 		{
-			return "DATE_FORMAT(".$field.", '".$format."')";
+			return "REPLACE(REPLACE(DATE_FORMAT(".$field.", '".$format."'), 'PM', 'pm'), 'AM', 'am')";
 		}
+
+		return "DATE_FORMAT(".$field.", '".$format."')";
 	}
 
 	public function DateToCharFunction($strFieldName, $strType="FULL", $lang=false, $bSearchInSitesOnly=false)
 	{
-		static $CACHE=array();
+		static $CACHE = array();
+
 		$id = $strType.",".$lang.",".$bSearchInSitesOnly;
-		if(!array_key_exists($id,$CACHE))
-			$CACHE[$id] = $this->DateFormatToDB(CLang::GetDateFormat($strType, $lang, $bSearchInSitesOnly));
+		if(!isset($CACHE[$id]))
+		{
+			$CACHE[$id] = $this->DateFormatToDB(CLang::GetDateFormat($strType, $lang, $bSearchInSitesOnly), false);
+		}
 
 		$sFieldExpr = $strFieldName;
 
@@ -326,12 +338,12 @@ abstract class CDatabaseMysql extends CAllDatabase
 				$sFieldExpr = "DATE_ADD(".$strFieldName.", INTERVAL ".$diff." SECOND)";
 		}
 
-		return "DATE_FORMAT(".$sFieldExpr.", '".$CACHE[$id]."')";
+		return str_replace("#FIELD#", $sFieldExpr, $CACHE[$id]);
 	}
 
 	public static function CharToDateFunction($strValue, $strType="FULL", $lang=false)
 	{
-		$sFieldExpr = "'".CDatabase::FormatDate($strValue, CLang::GetDateFormat($strType, $lang), ($strType=="SHORT"? "Y-M-D":"Y-M-D H:I:S"))."'";
+		$sFieldExpr = "'".CDatabase::FormatDate($strValue, CLang::GetDateFormat($strType, $lang), ($strType=="SHORT"? "YYYY-MM-DD":"YYYY-MM-DD HH:MI:SS"))."'";
 
 		//time zone
 		if($strType == "FULL" && CTimeZone::Enabled())

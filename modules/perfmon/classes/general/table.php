@@ -25,7 +25,7 @@ class CAllPerfomanceTable
 			if (array_key_exists($strColumn, $arFields))
 			{
 				$arSelect[] = $strColumn;
-				if ($arFields[$strColumn] == "datetime")
+				if ($arFields[$strColumn] == "datetime" || $arFields[$strColumn] == "date")
 					$arQueryOrder[$strColumn] = $this->escapeColumn("TMP_".$strColumn)." ".$strDirection;
 				else
 					$arQueryOrder[$strColumn] = $this->escapeColumn($strColumn)." ".$strDirection;
@@ -39,14 +39,14 @@ class CAllPerfomanceTable
 			{
 				if ($arFields[$strColumn] == "datetime" || $arFields[$strColumn] == "date")
 				{
-					$arQuerySelect["TMP_".$strColumn] = "t.".$strColumn." TMP_".$strColumn;
-					$arQuerySelect[$strColumn] = $DB->DateToCharFunction("t.".$strColumn, "SHORT")." ".$strColumn;
-					$arQuerySelect["FULL_".$strColumn] = $DB->DateToCharFunction("t.".$strColumn, "FULL")." FULL_".$strColumn;
-					$arQuerySelect["SHORT_".$strColumn] = $DB->DateToCharFunction("t.".$strColumn, "SHORT")." SHORT_".$strColumn;
+					$arQuerySelect["TMP_".$strColumn] = "t.".$this->escapeColumn($strColumn)." TMP_".$strColumn;
+					$arQuerySelect[$strColumn] = $DB->DateToCharFunction("t.".$this->escapeColumn($strColumn), "SHORT")." ".$this->escapeColumn($strColumn);
+					$arQuerySelect["FULL_".$strColumn] = $DB->DateToCharFunction("t.".$this->escapeColumn($strColumn), "FULL")." FULL_".$strColumn;
+					$arQuerySelect["SHORT_".$strColumn] = $DB->DateToCharFunction("t.".$this->escapeColumn($strColumn), "SHORT")." SHORT_".$strColumn;
 				}
 				else
 				{
-					$arQuerySelect[$strColumn] = "t.".$strColumn;
+					$arQuerySelect[$strColumn] = "t.".$this->escapeColumn($strColumn);
 				}
 			}
 		}
@@ -55,7 +55,7 @@ class CAllPerfomanceTable
 		{
 			$arFields[$FIELD_NAME] = array(
 				"TABLE_ALIAS" => "t",
-				"FIELD_NAME" => $FIELD_NAME,
+				"FIELD_NAME" => "t.".$this->escapeColumn($FIELD_NAME),
 				"FIELD_TYPE" => $FIELD_TYPE,
 				"JOIN" => false,
 				//"LEFT_JOIN" => "lt",
@@ -77,7 +77,7 @@ class CAllPerfomanceTable
 				SELECT
 				".implode(", ", $arQuerySelect)."
 				FROM
-					".$this->TABLE_NAME." t
+					".$this->escapeTable($this->TABLE_NAME)." t
 			";
 			if ($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
 			{
@@ -98,7 +98,7 @@ class CAllPerfomanceTable
 		}
 	}
 
-	public static function NavQuery($arNavParams, $arQuerySelect, $strTableName, $strQueryWhere, $arQueryOrder)
+	public function NavQuery($arNavParams, $arQuerySelect, $strTableName, $strQueryWhere, $arQueryOrder)
 	{
 		global $DB;
 		if (IntVal($arNavParams["nTopCount"]) <= 0)
@@ -107,7 +107,7 @@ class CAllPerfomanceTable
 				SELECT
 					count(1) C
 				FROM
-					".$strTableName." t
+					".$this->escapeTable($strTableName)." t
 			";
 			if ($strQueryWhere)
 			{
@@ -124,7 +124,7 @@ class CAllPerfomanceTable
 				SELECT
 				".implode(", ", $arQuerySelect)."
 				FROM
-					".$strTableName." t
+					".$this->escapeTable($strTableName)." t
 			";
 			if ($strQueryWhere)
 			{
@@ -152,7 +152,7 @@ class CAllPerfomanceTable
 				SELECT
 				".implode(", ", $arQuerySelect)."
 				FROM
-					".$strTableName." t
+					".$this->escapeTable($strTableName)." t
 			";
 			if ($strQueryWhere)
 			{
@@ -178,11 +178,21 @@ class CAllPerfomanceTable
 		return $column;
 	}
 
+	public static function escapeTable($tableName)
+	{
+		return $tableName;
+	}
+
 	public static function GetTableFields($TABLE_NAME = false, $bExtended = false)
 	{
 		if ($TABLE_NAME && $bExtended)
 			return array();
 		else
 			return array();
+	}
+
+	public static function getCreateIndexDDL($TABLE_NAME, $INDEX_NAME, $INDEX_COLUMNS)
+	{
+		return "CREATE INDEX ".$INDEX_NAME." ON ".$TABLE_NAME." (".implode(", ", $INDEX_COLUMNS).")";
 	}
 }

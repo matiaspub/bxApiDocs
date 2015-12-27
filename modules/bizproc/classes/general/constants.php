@@ -186,4 +186,61 @@ class CBPCanUserOperateOperation
 	const WriteDocument = 2;
 	const ReadDocument = 3;
 }
-?>
+
+class CBPSetPermissionsMode
+{
+	const Hold = 1;
+	const Rewrite = 2;
+	const Clear = 3;
+
+	const ScopeWorkflow = 1;
+	const ScopeDocument = 2;
+
+	public static function outMode($v)
+	{
+		$result = "";
+		switch ($v)
+		{
+			case self::Rewrite:
+				$result = "Rewrite";
+				break;
+			case self::Clear:
+				$result = "Clear";
+				break;
+			default:
+				$result = "Hold";
+		}
+		return $result;
+	}
+	public static function outScope($v)
+	{
+		if ($v == self::ScopeDocument)
+			return "ScopeDocument";
+		return "ScopeWorkflow";
+	}
+}
+
+class CBPTaskStatus
+{
+	const Running = 0;
+	const CompleteYes = 1;
+	const CompleteNo = 2;
+	const CompleteOk = 3;
+	const Timeout = 4;
+}
+
+class CBPTaskUserStatus
+{
+	const Waiting = 0;
+	const Yes = 1;
+	const No = 2;
+	const Ok = 3;
+}
+
+class CBPTaskChangedStatus
+{
+	const Add = 1;
+	const Update = 2;
+	const Delegate = 3;
+	const Delete = 4;
+}

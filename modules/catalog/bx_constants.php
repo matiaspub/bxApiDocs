@@ -247,7 +247,7 @@ define('NO_AGENT_CHECK', true);
 /**
  * SITE_ID
  */
-define('SITE_ID', 's1');
+define('SITE_ID', $siteID);
 
 /**
  * STOP_STATISTICS
@@ -258,56 +258,6 @@ define('STOP_STATISTICS', true);
  * BX_SECURITY_SHOW_MESSAGE
  */
 define('BX_SECURITY_SHOW_MESSAGE', true);
-
-/**
- * CML_DEBUG
- */
-define('CML_DEBUG', false);
-
-/**
- * CML_MEMORY_DEBUG
- */
-define('CML_MEMORY_DEBUG', false);
-
-/**
- * CML_DEBUG_FILE_NAME
- */
-define('CML_DEBUG_FILE_NAME', "/__cml_time_mark.dat");
-
-/**
- * CML_GROUP_OPERATION_CNT
- */
-define('CML_GROUP_OPERATION_CNT', 100);
-
-/**
- * CML_CLEAR_TEMP_TABLES
- */
-define('CML_CLEAR_TEMP_TABLES', false);
-
-/**
- * CML_DELETE_COMMENTS
- */
-define('CML_DELETE_COMMENTS', false);
-
-/**
- * CML_KEEP_EXISTING_PROPERTIES
- */
-define('CML_KEEP_EXISTING_PROPERTIES', true);
-
-/**
- * CML_KEEP_EXISTING_DATA
- */
-define('CML_KEEP_EXISTING_DATA', false);
-
-/**
- * CML_ACTIVATE_FILE_DATA
- */
-define('CML_ACTIVATE_FILE_DATA', true);
-
-/**
- * CML_USE_SYSTEM_DELETE
- */
-define('CML_USE_SYSTEM_DELETE', false);
 
 /**
  * CATALOG_NEW_OFFERS_IBLOCK_NEED
@@ -323,11 +273,6 @@ define('ADMIN_MODULE_NAME', "catalog");
  * ADMIN_MODULE_ICON
  */
 define('ADMIN_MODULE_ICON', '<a href="/bitrix/admin/cat_index.php?lang='.LANGUAGE_ID.'"><img src="/bitrix/images/catalog/catalog.gif" width="48" height="48" border="0" alt="'.GetMessage("CATALOG_ICON_TITLE").'" title="'.GetMessage("CATALOG_ICON_TITLE").'"></a>');
-
-/**
- * NO_AGENT_STATISTIC
- */
-define('NO_AGENT_STATISTIC', true);
 
 
 ?>

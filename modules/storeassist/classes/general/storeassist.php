@@ -137,6 +137,9 @@ class CStoreAssist
 
 	public static function onPrologAdminTitle($pageUrl, $pageId = "")
 	{
+		if (!in_array(LANGUAGE_ID, array("ru", "ua")))
+			return;
+
 		global $APPLICATION, $bxProductConfig;
 
 		$ST_RIGHT = $APPLICATION->GetGroupRight("storeassist");
@@ -224,6 +227,9 @@ class CStoreAssist
 
 	public static function onBuildGlobalMenu(&$arGlobalMenu, &$arModuleMenu)
 	{
+		if (!in_array(LANGUAGE_ID, array("ru", "ua")))
+			return;
+
 		global $APPLICATION;
 
 		if ($APPLICATION->GetGroupRight("storeassist") >= "R")

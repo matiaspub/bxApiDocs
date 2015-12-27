@@ -3,9 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.</body> </html>
- *
- *
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>. 
  *
  *
  * @return mixed 
@@ -21,15 +19,10 @@ class CAllStatEventType
 	* <p>Удаляет указанный <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a>, вместе со всеми событиями данного типа.</p>
 	*
 	*
-	*
-	*
 	* @param int $type_id  ID типа события.
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает "true" в случае успешного удаления типа
-	* события, либо "false" в противном случае.</p>
-	*
+	* @return bool <p>Метод возвращает "true" в случае успешного удаления типа события,
+	* либо "false" в противном случае.</p>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -39,7 +32,6 @@ class CAllStatEventType
 	*     echo "Тип события #".$type_id." успешно удалено.";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -157,15 +149,9 @@ class CAllStatEventType
 	* <p>Находит <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>, либо создает новый тип события если такого ещё не существует.</p>
 	*
 	*
-	*
-	*
 	* @param string $event1  Идентификатор event1 типа события.
 	*
-	*
-	*
 	* @param string $event2  Идентификатор event2 типа события.
-	*
-	*
 	*
 	* @param array &$type  Ссылка на массив описывающий найденный, либо созданный тип
 	* события. Структура данного массива: <pre style="font-size:95%"> Array ( [TYPE_ID] =&gt; ID
@@ -174,11 +160,8 @@ class CAllStatEventType
 	* [KEEP_DAYS] =&gt; количество дней, отведенное для хранения событий
 	* данного типа [DATE_ENTER_STR] =&gt; дата создания события )</pre>
 	*
-	*
-	*
-	* @return int <p>Функция возвращает ID найденного типа события, либо вновь
+	* @return int <p>Метод возвращает ID найденного типа события, либо вновь
 	* созданного.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -188,7 +171,6 @@ class CAllStatEventType
 	* $TYPE_ID = <b>CStatEventType::ConditionSet</b>("softkey", "order", $arEventType);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -233,18 +215,11 @@ class CAllStatEventType
 	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">тип события</a> по указанным <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификаторам</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string $event1  Идентификатор event1 типа события.
-	*
-	*
 	*
 	* @param string $event2  Идентификатор event2 типа события.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -274,7 +249,6 @@ class CAllStatEventType
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

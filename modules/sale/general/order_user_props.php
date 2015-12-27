@@ -6,8 +6,6 @@ IncludeModuleLangFile(__FILE__);
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -16,6 +14,30 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllSaleOrderUserProps
 {
+	/*
+	public static function TranslateLocationPropertyValues($personTypeId, &$orderProps)
+	{
+		if(CSaleLocation::isLocationProMigrated())
+		{
+			// location ID to CODE
+			$dbOrderProps = CSaleOrderProps::GetList(
+				array("SORT" => "ASC"),
+				array(
+					'PERSON_TYPE_ID' => $personTypeId
+				),
+				false,
+				false,
+				array("ID", "NAME", "TYPE", "IS_LOCATION", "IS_LOCATION4TAX", "IS_PROFILE_NAME", "IS_PAYER", "IS_EMAIL", "REQUIED", "SORT", "IS_ZIP", "CODE", "MULTIPLE")
+			);
+			while($item = $dbOrderProps->fetch())
+			{
+				if($item['TYPE'] == 'LOCATION' && strlen($orderProps[$item['ID']]))
+					$orderProps[$item['ID']] = CSaleLocation::getLocationCodeByID($orderProps[$item['ID']]);
+			}
+		}
+	}
+	*/
+
 	static function DoSaveUserProfile($userId, $profileId, $profileName, $personTypeId, $orderProps, &$arErrors)
 	{
 		$profileId = intval($profileId);
@@ -73,6 +95,14 @@ class CAllSaleOrderUserProps
 			while ($arOrderPropsValue = $dbOrderPropsValues->Fetch())
 				$orderProps[$arOrderPropsValue["ORDER_PROPS_ID"]] = $arOrderPropsValue["VALUE"];
 		}
+		/*
+		TRANSLATION_CUT_OFF
+		else
+		{
+			// map location ID to CODE, if taken from parameters
+			static::TranslateLocationPropertyValues($personTypeId, $orderProps);
+		}
+		*/
 
 		$dbOrderProperties = CSaleOrderProps::GetList(
 			array(),
@@ -131,12 +161,13 @@ class CAllSaleOrderUserProps
 	public static function DoLoadProfiles($userId, $personTypeId = null)
 	{
 		$userId = intval($userId);
+
 		if ($userId <= 0)
 			return null;
 
 		$arResult = array();
-
 		$arFilter = array("USER_ID" => $userId);
+
 		if ($personTypeId != null)
 			$arFilter["PERSON_TYPE_ID"] = $personTypeId;
 
@@ -147,22 +178,28 @@ class CAllSaleOrderUserProps
 			false,
 			array("ID", "NAME", "PERSON_TYPE_ID", "DATE_UPDATE")
 		);
+
 		while ($arProfile = $dbProfile->GetNext())
 		{
 			if (!array_key_exists($arProfile["PERSON_TYPE_ID"], $arResult))
 				$arResult[$arProfile["PERSON_TYPE_ID"]] = array();
 
-			$arResult[$arProfile["PERSON_TYPE_ID"]][$arProfile["ID"]] = array("NAME" => $arProfile["NAME"], "VALUES" => array());
+			$arResult[$arProfile["PERSON_TYPE_ID"]][$arProfile["ID"]] = array("NAME" => $arProfile["NAME"], "VALUES" => array(), "VALUES_ORIG" => array());
 
 			$dbProps = CSaleOrderUserPropsValue::GetList(
 				array(),
 				array("USER_PROPS_ID" => $arProfile["ID"]),
 				false,
 				false,
-				array("ORDER_PROPS_ID", "NAME", "VALUE")
+				array("ORDER_PROPS_ID", "NAME", "VALUE", "VALUE_ORIG")
 			);
 			while ($arProps = $dbProps->GetNext())
+			{
 				$arResult[$arProfile["PERSON_TYPE_ID"]][$arProfile["ID"]]["VALUES"][$arProps["ORDER_PROPS_ID"]] = $arProps["VALUE"];
+
+				if(isset($arProps["VALUE_ORIG"]))
+					$arResult[$arProfile["PERSON_TYPE_ID"]][$arProfile["ID"]]["VALUES_ORIG"][$arProps["ORDER_PROPS_ID"]] = $arProps["VALUE_ORIG"];
+			}
 		}
 
 		if (count($arResult) > 0)
@@ -176,14 +213,10 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Функция возвращает параметры профиля покупателя с кодом ID </p>
-	*
-	*
+	* <p>Метод возвращает параметры профиля покупателя с кодом ID. Метод динамичный. </p>
 	*
 	*
 	* @param int $ID  Код профиля покупателя.
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров профиля
 	* покупателя с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
@@ -192,7 +225,6 @@ class CAllSaleOrderUserProps
 	* которому принадлежит профиль.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
 	* плательщика.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
 	* профиля.</td> </tr> </table> <p>  </p<a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -259,14 +291,10 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Функция обновляет параметры профиля покупателя с кодом ID на значения из массива arFields </p>
-	*
-	*
+	* <p>Метод обновляет параметры профиля покупателя с кодом ID на значения из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код профиля покупателя.
-	*
-	*
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров профиля. Ключами являются
 	* названия параметров, а значениями - соответствующие
@@ -275,11 +303,8 @@ class CAllSaleOrderUserProps
 	* принадлежит профиль;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li>
 	* <b>DATE_UPDATE</b> - дата последнего изменения.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код измененного профиля или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -320,9 +345,7 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Функция удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). </p> <br><br>
-	*
-	*
+	* <p>Метод удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). Метод динамичный.</p> <br><br>
 	*
 	*
 	* @return mixed 
@@ -348,18 +371,14 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Функция удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. </p>
-	*
-	*
+	* <p>Метод удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код профиля покупателя.
 	*
-	*
-	*
-	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <a name="examples"></a>
-	*
+	* @return bool <p>Возвращается объект <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> в случае
+	* успешного удаления и <i>false</i> - в противном случае.</p> <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>

@@ -28,13 +28,15 @@ class GroupTable extends Entity\DataManager
 				'data_type' => 'datetime'
 			),
 			'ACTIVE' => array(
-				'data_type' => 'boolean'
+				'data_type' => 'boolean',
+				'values' => array('N', 'Y')
 			),
 			'C_SORT' => array(
 				'data_type' => 'integer'
 			),
 			'ANONYMOUS' => array(
-				'data_type' => 'boolean'
+				'data_type' => 'boolean',
+				'values' => array('N', 'Y')
 			),
 			'NAME' => array(
 				'data_type' => 'string'

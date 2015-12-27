@@ -4,6 +4,7 @@ abstract class CPushMessage
 {
 	protected $deviceTokens = array();
 	protected $text;
+	protected $category;
 	protected $badge;
 	protected $sound = "default";
 	protected $expiryValue = 7200;
@@ -119,6 +120,22 @@ abstract class CPushMessage
 	}
 
 	abstract function getBatch();
+
+	/**
+	 * @return mixed
+	 */
+	public function getCategory()
+	{
+		return $this->category;
+	}
+
+	/**
+	 * @param mixed $category
+	 */
+	public function setCategory($category)
+	{
+		$this->category = $category;
+	}
 
 }
 

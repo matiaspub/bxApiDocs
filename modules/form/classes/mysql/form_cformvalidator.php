@@ -6,9 +6,7 @@
 
 
 /**
- * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидаторами</a>.</body> </html>
- *
- *
+ * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидаторами</a>. 
  *
  *
  * @return mixed 

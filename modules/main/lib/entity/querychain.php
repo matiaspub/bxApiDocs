@@ -421,9 +421,7 @@ class QueryChain
 
 		if ($with_alias)
 		{
-			$connection = Main\Application::getConnection();
-			$helper = $connection->getSqlHelper();
-
+			$helper = $this->getLastElement()->getValue()->getEntity()->getConnection()->getSqlHelper();
 			$sql_def .= ' AS ' . $helper->quote($this->getAlias());
 		}
 

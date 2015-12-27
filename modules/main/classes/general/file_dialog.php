@@ -14,19 +14,14 @@ class CAdminFileDialog
 {
 	
 	/**
-	* <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога.</p>
-	*
-	*
+	* <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога. Динамичный метод.</p>
 	*
 	*
 	* @param Array $arConfig  Строка, содержащая имя Javascript-функции, которая вызывает файловый
 	* диалог. Функция должна быть задана в глобальной области
 	* видимости.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -68,7 +63,6 @@ class CAdminFileDialog
 		$bCloudsBrowse = is_object($USER) && $USER->CanDoOperation("clouds_browse") && $arConfig["operation"] === "O";
 
 		CUtil::InitJSCore(array('ajax', 'window'));
-		$APPLICATION->AddHeadScript("/bitrix/js/main/file_dialog.js");
 
 		$io = CBXVirtualIo::GetInstance();
 		$rootPath = "";
@@ -195,6 +189,8 @@ class CAdminFileDialog
 					if ($res[1])
 						$arConfig['path'] = rtrim($res[1], " /\\");
 
+					$rootPath = CSite::GetSiteDocRoot($arConfig['site']);
+
 					if (!$io->DirectoryExists($rootPath.$arConfig['path']))
 						$arConfig['path'] = '/';
 					?>
@@ -209,6 +205,12 @@ class CAdminFileDialog
 					<?
 				}
 				?>
+				if (!window.BXFileDialog)
+				{
+					if (bLoadJS !== false)
+						BX.loadScript('<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/file_dialog.js")?>');
+					return setTimeout(function(){window['<?= CUtil::JSEscape($arConfig['event'])?>'](false, Params)}, 50);
+				}
 
 				var oConfig =
 				{
@@ -291,12 +293,26 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 					BX.fireEvent(BX('<?= CUtil::JSEscape($arConfig['arResultDest']["ELEMENT_ID"])?>'), 'change');
 				<?endif;?>
 			};
+			<?self::AttachJSScripts();?>
 			</script>
 			<?
 		}
 		else
 		{
 			echo "<font color=\"#FF0000\">".htmlspecialcharsbx($functionError)."</font>";
+		}
+	}
+	public static function AttachJSScripts()
+	{
+		if(!defined("BX_B_FILE_DIALOG_SCRIPT_LOADED"))
+		{
+			// define("BX_B_FILE_DIALOG_SCRIPT_LOADED", true);
+?>
+if (window.jsUtils)
+{
+	jsUtils.addEvent(window, 'load', function(){jsUtils.loadJSFile('<?=CUtil::GetAdditionalFileURL("/bitrix/js/main/file_dialog.js")?>');}, false);
+}
+<?
 		}
 	}
 
@@ -402,7 +418,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 		$arSites = $Params['arSites'];
 		if (count($arSites) > 1) // Site selector
 		{
-			$u = new CAdminPopup("fd_site_list", "fd_site_list", $Params['arSitesPP'], array('zIndex' => 3500, 'dxShadow' => 0));
+			$u = new CAdminPopup("fd_site_list", "fd_site_list", $Params['arSitesPP'], array('zIndex' => 3520, 'dxShadow' => 0));
 			$u->Show();
 		}
 		?>
@@ -543,7 +559,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 							<td align="right"><?=GetMessage("FD_MENU_TYPE")?></td>
 							<td>
 								<select id="__bx_fd_menutype" name="menutype">
-								<?for($i = 0; $i < count($Params['arMenuTypes']); $i++): ?>
+								<?for($i = 0, $n = count($Params['arMenuTypes']); $i < $n; $i++): ?>
 								<option value='<?= CUtil::JSEscape($Params['arMenuTypes'][$i]['key'])?>'><?= CUtil::JSEscape($Params['arMenuTypes'][$i]['title'])?></option>
 								<? endfor;?>
 								</select>
@@ -564,7 +580,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 							<td align="right"><?=GetMessage("FD_ATTACH_BEFORE")?></td>
 							<td>
 								<select name="newppos" id="__bx_fd_newppos">
-									<?for($i = 0; $i < count($Params['menuItems']); $i++):?>
+									<?for($i = 0, $n = count($Params['menuItems']); $i < $n; $i++):?>
 									<option value="<?= $i + 1 ?>"><?= CUtil::JSEscape($Params['menuItems'][$i])?></option>
 									<?endfor;?>
 									<option value="0" selected="selected"><?=GetMessage("FD_LAST_POINT")?></option>
@@ -575,7 +591,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 							<td  align="right"><?=GetMessage("FD_ATTACH_2_ITEM")?></td>
 							<td>
 								<select name="menuitem" id="__bx_fd_menuitem">
-									<?for($i = 0; $i < count($Params['menuItems']); $i++):?>
+									<?for($i = 0; $i < $n; $i++):?>
 									<option value="<?= $i + 1 ?>"><?= CUtil::JSEscape($Params['menuItems'][$i])?></option>
 									<?endfor;?>
 								</select>
@@ -761,8 +777,7 @@ var FD_MESS =
 		}
 
 		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($path));
-		$path = CFileMan::SecurePathVar($path);
-		$path = rtrim($path, " /\\");
+		$path = rtrim($path, "/")."/";
 
 		$armt = GetMenuTypes($site);
 		$arAllItems = Array();
@@ -772,7 +787,7 @@ var FD_MESS =
 
 		foreach($armt as $key => $title)
 		{
-			$menuname = $path."/.".$key.".menu.php";
+			$menuname = $path.".".$key.".menu.php";
 			if(!$USER->CanDoFileOperation('fm_view_file', Array($site, $menuname)))
 				continue;
 
@@ -953,7 +968,7 @@ arFDPermission['<?=$path_js?>'] = {
 		}
 
 		$arDirs = array(); $arFiles = array();
-		GetDirList(array($site, $path), $arDirs, $arFiles, array(), array("name" => "asc"), "DF", false, true);
+		GetDirList(array($site, $path), $arDirs, $arFiles, array(), array("name_nat" => "asc"), "DF", false, true);
 ?>
 arFDDirs['<?=$path_js?>'] = [];
 arFDFiles['<?=$path_js?>'] = [];
@@ -1023,7 +1038,8 @@ arFDDirs['<?=$path_js?>'][<?=$ind?>] =
 					$ext = strtolower(GetFileExtension($name));
 					if (in_array($ext, array('gif','jpg','jpeg','png','jpe','bmp'))) // It is image
 					{
-						$tmbPath = BX_PERSONAL_ROOT."/tmp/fd_tmb".$path_i;
+						$upload_dir = COption::GetOptionString("main", "upload_dir", "upload");
+						$tmbPath = "/".$upload_dir."/tmp/fd_tmb".$path_i;
 						$destinationFile = $rootPath.$tmbPath;
 						if (!file_exists($destinationFile))
 						{
@@ -1159,13 +1175,15 @@ arFDPermission['<?=$path_js?>'] = {
 	{
 		global $USER, $APPLICATION;
 
-		$io = CBXVirtualIo::GetInstance();
-		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
-		$path = CFileMan::SecurePathVar($path);
-		$site = $Params['site'];
+		$path = $site = '';
 
 		if(CModule::IncludeModule("fileman"))
 		{
+			$io = CBXVirtualIo::GetInstance();
+			$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
+			$path = CFileMan::SecurePathVar($path);
+			$site = $Params['site'];
+
 			$arPath = Array($site, $path);
 			$DOC_ROOT = CSite::GetSiteDocRoot($site);
 			$abs_path = $DOC_ROOT.$path;
@@ -1204,13 +1222,14 @@ arFDPermission['<?=$path_js?>'] = {
 	{
 		global $USER, $APPLICATION;
 
-		$io = CBXVirtualIo::GetInstance();
-		$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
-		$path = CFileMan::SecurePathVar($path);
-		$site = $Params['site'];
+		$path = $site = '';
 
 		if(CModule::IncludeModule("fileman"))
 		{
+			$io = CBXVirtualIo::GetInstance();
+			$path = Rel2Abs("/", $APPLICATION->UnJSEscape($Params['path']));
+			$path = CFileMan::SecurePathVar($path);
+			$site = $Params['site'];
 
 			$name = str_replace("/", "_", $APPLICATION->UnJSEscape($Params['name']));
 			$oldName = str_replace("/", "_", $APPLICATION->UnJSEscape($Params['old_name']));
@@ -1433,7 +1452,7 @@ arFDPermission['<?=$path_js?>'] = {
 			if($strWarning == '')
 			{
 				$fn = $io->ExtractNameFromPath($pathto);
-				if($APPLICATION->GetFileAccessPermission(array($site, $pathto)) > "R" &&
+				if($USER->CanDoFileOperation('fm_upload_file', array($site, $pathto)) &&
 					($USER->IsAdmin() || (!HasScriptExtension($fn) && substr($fn, 0, 1) != "." && $io->ValidateFilenameString($fn)))
 				)
 				{

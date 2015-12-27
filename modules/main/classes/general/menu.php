@@ -33,15 +33,11 @@ class CMenu
 
 	
 	/**
-	* <p>Инициализирует (заполняет пунктами) объект класса CMenu. Возвращает "true" если в каталоге сайта найден файл меню <nobr><b>.</b><i>тип меню</i><b>.menu.php</b></nobr> (поиск идет вверх по иерархии начиная с каталога <i>dir</i>), и "false" в противном случае.</p>
-	*
-	*
+	* <p>Инициализирует (заполняет пунктами) объект класса CMenu. Возвращает "true" если в каталоге сайта найден файл меню <nobr><b>.</b><i>тип меню</i><b>.menu.php</b></nobr> (поиск идет вверх по иерархии начиная с каталога <i>dir</i>), и "false" в противном случае. Динамичный метод.</p>
 	*
 	*
 	* @param string $InitDir  Папка, начиная с которой, объект будет искать файл <nobr><b>.</b><i>тип
 	* меню</i><b>.menu.php</b></nobr> (файл с параметрами и пунктами меню).
-	*
-	*
 	*
 	* @param bool $MenuExt = false Если значение - "true", то для формирования массива меню, помимо
 	* файлов <nobr><b>.</b><i>тип меню</i><b>.menu.php</b></nobr> будут также подключаться
@@ -49,8 +45,6 @@ class CMenu
 	* вы можете манипулировать массивом меню <b>$aMenuLinks</b> произвольно, по
 	* вашему усмотрению (например, дополнять пункты меню значениями из
 	* инфо-блоков).<br>Необязателен. По умолчанию - "false".
-	*
-	*
 	*
 	* @param string $template = false Шаблон для вывода меню. <br>Необязателен. По умолчанию - "false", что
 	* означает искать шаблон меню сначала в файле <nobr><b>/bitrix/templates/</b><i>ID
@@ -78,17 +72,12 @@ class CMenu
 	* <li> <b>$sMenuEpilog</b> - HTML который будет добавлен после пунктов меню </li> <li>
 	* <b>$sMenuBody</b> - HTML представляющий из себя один пункт меню </li> <li>
 	* <b>$sMenu</b> - HTML представляющий из себя все меню целиком (только для
-	* функций GetMenuHtmlEx) </li> </ul>
-	*
-	*
+	* метода GetMenuHtmlEx) </li> </ul>
 	*
 	* @param onlyCurrentDi $r = false Если значение - "true", то отключается поиск файла меню в
 	* родительских каталогах.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -99,7 +88,6 @@ class CMenu
 	* echo $lm-&gt;GetMenuHtml();
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -270,10 +258,10 @@ class CMenu
 
 		$arMenuCache = false;
 		$bCached = false;
-		$bCacheIsAllowed = CACHED_menu!==false && !$USER->IsAuthorized() && !$this->MenuExtDir;
+		$bCacheIsAllowed = CACHED_menu!==false && !$USER->IsAuthorized() && $this->MenuExtDir == '';
 		if($bCacheIsAllowed)
 		{
-			$cache_id = $_SERVER["DOCUMENT_ROOT"].",".$this->MenuDir.",".$this->MenuExtDir.",".$this->type;
+			$cache_id = $_SERVER["DOCUMENT_ROOT"].",".$this->MenuDir.",,".$this->type;
 			if($CACHE_MANAGER->Read(CACHED_menu, $cache_id, "menu"))
 			{
 				$arMenuCache = $CACHE_MANAGER->Get($cache_id);
@@ -316,7 +304,7 @@ class CMenu
 			$PARAMS = $MenuItem[3];
 
 			//Calculate menu items stack for iblock items only
-			if($this->MenuExtDir && is_array($PARAMS) && isset($PARAMS["FROM_IBLOCK"]))
+			if($this->MenuExtDir <> '' && is_array($PARAMS) && isset($PARAMS["FROM_IBLOCK"]))
 			{
 				if($previousDepthLevel == -1)
 					$previousDepthLevel = $PARAMS["DEPTH_LEVEL"];
@@ -351,7 +339,7 @@ class CMenu
 			if(count($MenuItem)>4)
 			{
 				$CONDITION = $MenuItem[4];
-				if(strlen($CONDITION)>0 && (!eval("return ".$CONDITION.";")))
+				if($CONDITION <> '' && (!eval("return ".$CONDITION.";")))
 					$bSkipMenuItem = true;
 			}
 
@@ -435,7 +423,7 @@ class CMenu
 			//Adjust selection for iblock sections tree
 			if(
 				$SELECTED
-				&& $this->MenuExtDir
+				&& $this->MenuExtDir <> ''
 				&& is_array($PARAMS)
 				&& isset($PARAMS["FROM_IBLOCK"])
 			)
@@ -528,13 +516,10 @@ class CMenu
 
 	
 	/**
-	* <p>Возвращает HTML представляющий из себя меню. В отличие от функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> шаблон меню будет подключаться только один раз.</p> <p class="note">В шаблоне меню, используемом данной функцией, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
-	*
-	*
+	* <p>Возвращает HTML представляющий из себя меню. В отличие от метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/getmenuhtml.php">CMenu::GetMenuHtml</a> шаблон меню будет подключаться только один раз. Динамичный метод.</p> <p class="note"><b>Примечание</b>. В шаблоне меню, используемом методом, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -545,7 +530,6 @@ class CMenu
 	* echo <b>$lm-&gt;GetMenuHtmlEx</b>();
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -625,13 +609,10 @@ class CMenu
 
 	
 	/**
-	* <p>Возвращает HTML представляющий из себя меню.</p>
-	*
-	*
+	* <p>Возвращает HTML представляющий из себя меню. Динамичный метод.</p>
 	*
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -642,7 +623,6 @@ class CMenu
 	* echo <b>$lm-&gt;GetMenuHtml</b>();
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

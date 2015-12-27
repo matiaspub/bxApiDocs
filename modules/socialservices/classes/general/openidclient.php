@@ -269,6 +269,15 @@ class COpenIDClient
 				}
 				elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
 					$errorCode = 2;
+
+				if (intval($USER_ID) > 0)
+				{
+					if($arUser && $arUser["XML_ID"] !== $arFields['XML_ID'])
+					{
+						$USER_ID = 0;
+					}
+				}
+
 				if (intval($USER_ID) > 0)
 				{
 					$arGroups = $USER->GetUserGroup($USER_ID);

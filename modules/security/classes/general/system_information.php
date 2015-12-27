@@ -34,16 +34,27 @@ class CSecuritySystemInformation
 	}
 
 	/**
-	 * Return current domain name (in puny code for cyrillic domain)
+	 * Return current host/port (in puny code for cyrillic domain)
 	 *
 	 * @return string
 	 */
 	public static function getCurrentHost()
 	{
 		$host = COption::GetOptionString("main", "server_name", $_SERVER["HTTP_HOST"]);
-		if($host == "")
+		if (!$host)
 			$host = $_SERVER["HTTP_HOST"];
-		return CBXPunycode::ToASCII($host, $arErrors);
+		return trim(CBXPunycode::ToASCII($host, $arErrors));
+	}
+
+	/**
+	 * Return current host name (in puny code for cyrillic domain)
+	 *
+	 * @return string
+	 */
+	public static function getCurrentHostName()
+	{
+		$host = static::getCurrentHost();
+		return preg_replace('#:\d+$#D', '', $host);
 	}
 
 	/**
@@ -64,6 +75,60 @@ class CSecuritySystemInformation
 		return PHP_SAPI === 'cli';
 	}
 
+	/**
+	 * Validates IP address (IPv4 only).
+	 *
+	 * @since 15.5.0
+	 * @param string $ip IP address for checking.
+	 * @param bool $allowPrivate Fails or not for the following private IPv4 ranges: 10.0.0.0/8, 172.16.0.0/12 and 192.168.0.0/16.
+	 * @param bool $allowRes Fails or not for the following reserved IPv4 ranges: 0.0.0.0/8, 169.254.0.0/16, 192.0.2.0/24, 127.0.0.0/24 and 224.0.0.0/4.
+	 * @return bool
+	 */
+	public static function isIpValid($ip, $allowPrivate = false, $allowRes = false)
+	{
+		// ToDo: what about PHP filters?
+		if (ip2long($ip) === false)
+			return false;
+
+		$ipOctets = explode('.', $ip);
+		if (!$allowPrivate)
+		{
+			// php/ext/filter/logical_filters.c, FILTER_FLAG_NO_PRIV_RANGE
+			if ($ipOctets[0] == 10)
+				return false;
+
+			if ($ipOctets[0] == 172 && $ipOctets[1] >= 16 && $ipOctets[1] <= 31)
+				return false;
+
+			if ($ipOctets[0] == 192 && $ipOctets[1] == 168)
+				return false;
+
+		}
+
+		if (!$allowRes)
+		{
+			// php/ext/filter/logical_filters.c, FILTER_FLAG_NO_RES_RANGE
+			if ($ipOctets[0] == 0)
+				return false;
+
+			if ($ipOctets[0] == 100 && $ipOctets[1] >= 64 && $ipOctets[1] <= 127)
+				return false;
+
+			if ($ipOctets[0] == 169 && $ipOctets[1] == 254)
+				return false;
+
+			if ($ipOctets[0] == 192 && $ipOctets[1] == 0 && $ipOctets[2] == 2)
+				return false;
+
+			if ($ipOctets[0] == 127 && $ipOctets[1] == 0 && $ipOctets[2] == 0)
+				return false;
+
+			if ($ipOctets[0] >= 224 && $ipOctets[0] <= 255)
+				return false;
+		}
+
+		return true;
+	}
 	/**
 	 * Return all sites (and domains) on current kernel
 	 *

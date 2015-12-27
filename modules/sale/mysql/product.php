@@ -290,8 +290,6 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 	static public function Add($arFields)
 	{
 		global $DB;
-		global $USER;
-		global $APPLICATION;
 
 		foreach(GetModuleEvents("sale", "OnBeforeViewedAdd", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, array(&$arFields))===false)
@@ -308,16 +306,19 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 			$arFields["CALLBACK_FUNC"] = "CatalogViewedProductCallback";
 		if (strlen($arFields["MODULE"]) <= 0)
 			$arFields["MODULE"] = "catalog";
-		if (strlen($arFields["PRODUCT_PROVIDER_CLASS"]) <= 0 && $arFields["MODULE"] == "catalog")
+		if (strlen($arFields["PRODUCT_PROVIDER_CLASS"]) <= 0 && $arFields["MODULE"] == 'catalog')
 			$arFields["PRODUCT_PROVIDER_CLASS"] = "CCatalogProductProvider";
 		if ($arFields["PRODUCT_ID"] <= 0)
 			return false;
 		if (strlen($arFields["LID"]) <= 0)
 			return false;
 
-		if(\Bitrix\Main\Loader::includeModule("catalog"))
+		if (\Bitrix\Main\Loader::includeModule('statistic') && isset($_SESSION['SESS_SEARCHER_ID']) && (int)$_SESSION['SESS_SEARCHER_ID'] > 0)
+			return false;
+
+		if ((string)\Bitrix\Main\Config\Option::get('sale', 'viewed_capability') == 'Y')
 		{
-			if(\Bitrix\Main\Config\Option::get("sale", "viewed_capability", "") == "Y")
+			if (\Bitrix\Main\Loader::includeModule('catalog'))
 			{
 				return \Bitrix\Catalog\CatalogViewedProductTable::refresh($arFields["PRODUCT_ID"], CSaleBasket::GetBasketUserID(), $arFields["LID"]);
 			}
@@ -331,10 +332,11 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 			$arFuserItems = CSaleUser::GetList(array("USER_ID" => $arFields["USER_ID"]));
 			$FUSER_ID = $arFuserItems["ID"];
 		}
-		elseif (IntVal($arFields["FUSER_ID"]) > 0)
+		elseif ((int)$arFields["FUSER_ID"] > 0)
 			$FUSER_ID = $arFields["FUSER_ID"];
 		else
 			$FUSER_ID = CSaleBasket::GetBasketUserID();
+		$FUSER_ID = (int)$FUSER_ID;
 
 		$arFilter["FUSER_ID"] = $FUSER_ID;
 		$arFields["FUSER_ID"] = $FUSER_ID;
@@ -348,7 +350,7 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 		);
 		if (!$arItems = $db_res->Fetch())//insert
 		{
-			if (CModule::IncludeModule('catalog'))
+			if (\Bitrix\Main\Loader::includeModule('catalog'))
 			{
 				/** @var $productProvider IBXSaleProductProvider */
 				if ($productProvider = CSaleBasket::GetProductProvider($arFields))
@@ -406,9 +408,7 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 		else//update
 		{
 			$ID = IntVal($arItems["ID"]);
-			$arFields["DATE_VISIT"] = $DB->GetNowFunction();
-			$arInsert = $DB->PrepareInsert("b_sale_viewed_product", $arFields);
-
+			$arFields["~DATE_VISIT"] = $DB->GetNowFunction();
 			CSaleViewedProduct::Update($ID, $arFields);
 		}
 
@@ -419,15 +419,15 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 	}
 
 	/**
-	* The function select viewed product
-	*
-	* @param array $arOrder - array to sort
-	* @param array $arFilter - array to filter
-	* @param array $arGroupBy - array to group records
-	* @param array $arNavStartParams - array to parameters
-	* @param array $arSelectFields - array to selectes fields
-	* @return object $dbRes - object result
-	*/
+	 * Return viewed products.
+	 *
+	 * @param array $arOrder				Sorting params.
+	 * @param array $arFilter				Filter params.
+	 * @param bool|array $arGroupBy			Group params.
+	 * @param bool|array $arNavStartParams	Navy params.
+	 * @param array $arSelectFields			Select fields.
+	 * @return bool|CDBResult
+	 */
 	static public function GetList($arOrder = array("ID"=>"DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
@@ -446,9 +446,9 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 		if (!$arSelectFields || count($arSelectFields) <= 0 || in_array("*", $arSelectFields))
 			$arSelectFields = array("ID", "FUSER_ID", "DATE_VISIT", "PRODUCT_ID", "MODULE", "LID", "NAME", "DETAIL_PAGE_URL", "CURRENCY", "PRICE", "NOTES", "PREVIEW_PICTURE", "DETAIL_PICTURE", "CALLBACK_FUNC", "PRODUCT_PROVIDER_CLASS");
 
-		if(\Bitrix\Main\Loader::includeModule("catalog"))
+		if ((string)\Bitrix\Main\Config\Option::get('sale', 'viewed_capability') == 'Y')
 		{
-			if(\Bitrix\Main\Config\Option::get("sale", "viewed_capability", "") == "Y")
+			if(\Bitrix\Main\Loader::includeModule('catalog'))
 			{
 				foreach($arFilter as $key => $value)
 				{
@@ -488,7 +488,7 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 					$viewed[$row['PRODUCT_ID']] = $row;
 				}
 
-				if(count($viewed))
+				if(!empty($viewed))
 				{
 					// Map to parent sku
 					$newIds = array();
@@ -602,9 +602,7 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);
 
-		$strSql =
-			"SELECT ".$arSqls["SELECT"]." ".
-			"FROM b_sale_viewed_product V ";
+		$strSql = "SELECT ".$arSqls["SELECT"]." FROM b_sale_viewed_product V ";
 		if (strlen($arSqls["WHERE"]) > 0)
 			$strSql .= "WHERE ".$arSqls["WHERE"]." ";
 		if (strlen($arSqls["GROUPBY"]) > 0)
@@ -623,9 +621,7 @@ class CSaleViewedProduct extends CAllSaleViewedProduct
 
 		if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) <= 0 )
 		{
-			$strSql_tmp =
-				"SELECT COUNT('x') as CNT ".
-				"FROM b_sale_viewed_product B ";
+			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_sale_viewed_product B ";
 			if (strlen($arSqls["WHERE"]) > 0)
 				$strSql_tmp .= "WHERE ".$arSqls["WHERE"]." ";
 			if (strlen($arSqls["GROUPBY"]) > 0)

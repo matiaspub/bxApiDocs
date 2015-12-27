@@ -1,4 +1,5 @@
 <?
+use Bitrix\Main\Security\Sign;
 IncludeModuleLangFile(__FILE__);
 
 class CPullChannel
@@ -78,7 +79,10 @@ class CPullChannel
 				$arMessage = Array(
 					'module_id' => 'pull',
 					'command' => 'channel_die',
-					'params' => Array('from' => 'delete by channel')
+					'params' => Array(
+						'replace' => $channelType == 'shared'? Array('PREV_CHANNEL_ID' => self::SignChannel($arResult['CHANNEL_ID']), 'CHANNEL_ID' => self::SignChannel($channelId), 'CHANNEL_DIE' => time()): '',
+						'from' => $channelType == 'shared'? 'replace by channel': 'delete by channel'
+					)
 				);
 				CPullStack::AddByChannel($arResult['CHANNEL_ID'], $arMessage);
 			}
@@ -99,7 +103,7 @@ class CPullChannel
 					'command' => 'reopen',
 					'params' => Array(),
 				);
-				self::Send($arResult['CHANNEL_ID'], CUtil::PhpToJsObject(Array('MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($arResult['CHANNEL_ID'], CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 			return Array(
 				'CHANNEL_ID' => $arResult['CHANNEL_ID'],
@@ -108,6 +112,23 @@ class CPullChannel
 				'LAST_ID' => $arResult['LAST_ID'],
 			);
 		}
+	}
+
+	public static function SignChannel($channelId)
+	{
+		$signatureKey = COption::GetOptionString("pull", "signature_key", "");
+		if ($signatureKey === "" || !is_string($channelId))
+		{
+			return $channelId;
+		}
+
+		$signatureAlgo = COption::GetOptionString("pull", "signature_algo", "sha1");
+		$hmac = new Sign\HmacAlgorithm();
+		$hmac->setHashAlgorithm($signatureAlgo);
+		$signer = new Sign\Signer($hmac);
+		$signer->setKey($signatureKey);
+
+		return $signer->sign($channelId);
 	}
 
 	// create a channel for the user
@@ -144,7 +165,7 @@ class CPullChannel
 					'command' => 'open',
 					'params' => Array(),
 				);
-				self::Send($channelId, CUtil::PhpToJsObject(Array('MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 		}
 		else
@@ -168,7 +189,7 @@ class CPullChannel
 					'command' => 'open_exists',
 					'params' => Array(),
 				);
-				self::Send($channelId, CUtil::PhpToJsObject(Array('MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 		}
 
@@ -190,10 +211,25 @@ class CPullChannel
 
 			$CACHE_MANAGER->Clean("b_pchc_".$arRes['USER_ID']."_".$arRes['CHANNEL_TYPE'], "b_pull_channel");
 
+			$newChannelId = '';
+			$newChannelDesc = 'delete by channel';
+			if ($arRes['CHANNEL_TYPE'] == 'shared')
+			{
+				$result = self::GetShared(false);
+				if ($result)
+				{
+					$newChannelId = Array('PREV_CHANNEL_ID' => self::SignChannel($channelId), 'CHANNEL_ID' => self::SignChannel($result['CHANNEL_ID']), 'CHANNEL_DIE' => $result['CHANNEL_DT']);
+					$newChannelDesc = 'replace by channel';
+				}
+			}
+
 			$arMessage = Array(
 				'module_id' => 'pull',
 				'command' => 'channel_die',
-				'params' => Array('from' => 'delete by channel')
+				'params' => Array(
+					'replace' => $newChannelId,
+					'from' => $newChannelDesc
+				)
 			);
 			CPullStack::AddByChannel($channelId, $arMessage);
 		}
@@ -223,26 +259,41 @@ class CPullChannel
 		}
 
 		if (strlen($channelType) <= 0)
-			$channelType = "(CHANNEL_TYPE = '' OR CHANNEL_TYPE IS NULL)";
+			$channelTypeSql = "(CHANNEL_TYPE = '' OR CHANNEL_TYPE IS NULL)";
 		else
-			$channelType = "CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'";
+			$channelTypeSql = "CHANNEL_TYPE = '".$DB->ForSQL($channelType)."'";
 
-		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId." AND ".$channelType;
+		$strSql = "DELETE FROM b_pull_channel WHERE USER_ID = ".$userId." AND ".$channelTypeSql;
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$CACHE_MANAGER->Clean("b_pchc_".$userId."_".$channelType, "b_pull_channel");
 
+		$newChannelId = '';
+		$newChannelDesc = 'delete by user';
+		if ($channelType == 'shared')
+		{
+			$result = self::GetShared(false);
+			if ($result)
+			{
+				$newChannelId = Array('PREV_CHANNEL_ID' => self::SignChannel($channelId), 'CHANNEL_ID' => self::SignChannel($result['CHANNEL_ID']), 'CHANNEL_DIE' => $result['CHANNEL_DT']);
+				$newChannelDesc = 'replace by user';
+			}
+		}
+
 		$arMessage = Array(
 			'module_id' => 'pull',
 			'command' => 'channel_die',
-			'params' => Array('from' => 'delete by user')
+			'params' => Array(
+				'replace' => $newChannelId,
+				'from' => $newChannelDesc
+			)
 		);
 		CPullStack::AddByChannel($channelId, $arMessage);
 
 		return true;
 	}
 
-	public static function Send($channelId, $message, $method = 'POST', $timeout = 5, $dont_wait_answer = true)
+	public static function Send($channelId, $message, $options = array())
 	{
 		$result_start = '{"infos": ['; $result_end = ']}';
 		if (is_array($channelId) && CPullOptions::GetQueueServerVersion() == 1)
@@ -250,7 +301,7 @@ class CPullChannel
 			$results = Array();
 			foreach ($channelId as $channel)
 			{
-				$results[] = self::SendCommand($channel, $message, $method, $timeout, $dont_wait_answer);
+				$results[] = self::SendCommand($channel, $message, $options);
 			}
 			$result = json_decode($result_start.implode(',', $results).$result_end);
 		}
@@ -271,7 +322,7 @@ class CPullChannel
 				$results = Array();
 				foreach($arGroup as $channels)
 				{
-					$result = self::SendCommand($channels, $message, $method, $timeout, $dont_wait_answer);
+					$result = self::SendCommand($channels, $message, $options);
 					$subresult = json_decode($result);
 					$results = array_merge($results, $subresult->infos);
 				}
@@ -279,19 +330,19 @@ class CPullChannel
 			}
 			else
 			{
-				$result = self::SendCommand($channelId, $message, $method, $timeout, $dont_wait_answer);
+				$result = self::SendCommand($channelId, $message, $options);
 				$result = json_decode($result);
 			}
 		}
 		else
 		{
-			$result = self::SendCommand($channelId, $message, $method, $timeout, $dont_wait_answer);
+			$result = self::SendCommand($channelId, $message, $options);
 			$result = json_decode($result_start.$result.$result_end);
 		}
 
 		return $result;
 	}
-	private static function SendCommand($channelId, $message, $method = 'POST', $timeout = 5, $dont_wait_answer = true)
+	private static function SendCommand($channelId, $message, $options = array())
 	{
 		if (!is_array($channelId))
 			$channelId = Array($channelId);
@@ -301,7 +352,15 @@ class CPullChannel
 		if (strlen($channelId) <=0 || strlen($message) <= 0)
 			return false;
 
-		if (!in_array($method, Array('POST', 'GET')))
+		$defaultOptions = array(
+			"method" => "POST",
+			"timeout" => 5,
+			"dont_wait_answer" => true
+		);
+
+		$options = array_merge($defaultOptions, $options);
+
+		if (!in_array($options["method"], Array('POST', 'GET')))
 			return false;
 
 		$nginx_error = COption::GetOptionString("pull", "nginx_error", "N");
@@ -329,11 +388,25 @@ class CPullChannel
 		$postdata = CHTTP::PrepareData($message);
 
 		$CHTTP = new CHTTP();
-		$CHTTP->http_timeout = intval($timeout);
-		$arUrl = $CHTTP->ParseURL(CPullOptions::GetPublishUrl($channelId), false);
-		if ($CHTTP->Query($method, $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $postdata, $arUrl['proto'], 'N', $dont_wait_answer))
+		$CHTTP->http_timeout = intval($options["timeout"]);
+		if (isset($options["expiry"]))
 		{
-			$result = $dont_wait_answer? '{}': $CHTTP->result;
+			$CHTTP->SetAdditionalHeaders(array("Message-Expiry" => intval($options["expiry"])));
+		}
+
+		$arUrl = $CHTTP->ParseURL(CPullOptions::GetPublishUrl($channelId), false);
+		try
+		{
+			$sendResult = $CHTTP->Query($options["method"], $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $postdata, $arUrl['proto'], 'N', $options["dont_wait_answer"]);
+		}
+		catch(Exception $e)
+		{
+			$sendResult = false;
+		}
+
+		if ($sendResult)
+		{
+			$result = $options["dont_wait_answer"] ? '{}': $CHTTP->result;
 		}
 		else
 		{
@@ -448,13 +521,17 @@ class CPullChannel
 			}
 
 			$arOnline = Array();
-			$result = CPullChannel::Send(array_keys($arUser), 'ping', 'GET', 5, false);
+			$options = array(
+				"method" => "GET",
+				"dont_wait_answer" => false
+			);
+			$result = CPullChannel::Send(array_keys($arUser), 'ping', $options);
 			if (is_object($result) && isset($result->infos))
 			{
 				foreach ($result->infos as $info)
 				{
 					$userId = $arUser[$info->channel];
-					if ($userId <= 0 || $agentUserId == $userId)
+					if ($userId == 0 || $agentUserId == $userId)
 						continue;
 					if ($info->subscribers > 0)
 						$arOnline[$userId] = $userId;
@@ -492,74 +569,13 @@ class CPullChannel
 		CPullStack::AddShared(Array(
 			'module_id' => 'online',
 			'command' => 'online_list',
+			'expiry' => 120,
 			'params' => Array(
 				'USERS' => $arSend
 			),
 		));
 
 		return "CPullChannel::CheckOnlineChannel();";
-	}
-
-	public static function GetUserConfig($userId)
-	{
-		$pullConfig = Array();
-
-		if (defined('BX_PULL_SKIP_LS'))
-			$pullConfig['LOCAL_STORAGE'] = 'N';
-
-		if (IsModuleInstalled('bitrix24'))
-			$pullConfig['BITRIX24'] = 'Y';
-
-		$pullChannel = CPullChannel::Get($userId);
-		if (is_array($pullChannel))
-		{
-			$pullWebSocketStatus = false;
-			$pullNginxStatus = CPullOptions::GetQueueServerStatus();
-
-			$pullChannels = Array($pullChannel['CHANNEL_ID']);
-			if ($pullNginxStatus)
-			{
-				if (defined('BX_PULL_SKIP_WEBSOCKET'))
-				{
-					$pullWebSocketStatus = false;
-					$pullConfig['WEBSOCKET'] = 'N';
-				}
-				else
-				{
-					$pullWebSocketStatus = CPullOptions::GetWebSocketStatus();
-				}
-
-				$pullChannelShared = CPullChannel::GetShared();
-				if (is_array($pullChannelShared))
-				{
-					$pullChannels[] = $pullChannelShared['CHANNEL_ID'];
-					if ($pullChannel['CHANNEL_DT'] > $pullChannelShared['CHANNEL_DT'])
-						$pullChannel['CHANNEL_DT'] = $pullChannelShared['CHANNEL_DT'];
-				}
-			}
-
-			if (defined('BX_MOBILE') || defined('BX_PULL_MOBILE')) // TODO delete BX_PULL_MOBILE in 15.5
-			{
-				$pullConfig['MOBILE'] = 'Y';
-				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels, true): CPullOptions::GetListenUrl($pullChannels, true)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
-			}
-			else
-			{
-				$pullPath = ($pullNginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($pullChannels): CPullOptions::GetListenUrl($pullChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
-			}
-
-			$pullConfig = $pullConfig+Array(
-				'CHANNEL_ID' => implode('/', $pullChannels),
-				'LAST_ID' => $pullChannel['LAST_ID'],
-				'CHANNEL_DT' => $pullChannel['CHANNEL_DT'],
-				'PATH' => $pullPath,
-				'PATH_WS' => ($pullNginxStatus && $pullWebSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($pullChannels): CPullOptions::GetWebSocketUrl($pullChannels)): ''),
-				'PATH_COMMAND' => defined('BX_PULL_COMMAND_PATH')? BX_PULL_COMMAND_PATH: '',
-				'METHOD' => ($pullNginxStatus? 'LONG': 'PULL'),
-			);
-		}
-
-		return $pullConfig;
 	}
 
 	public static function OnAfterUserAuthorize($arParams)
@@ -587,21 +603,25 @@ class CPullChannel
 		unset($_SESSION['USER_LAST_LOGOUT_'.$arParams['user_fields']['ID']]);
 
 		$userStatus = 'online';
+		$userMobileStatus = '0';
 		if (CModule::IncludeModule('im'))
 		{
 			$res = Bitrix\Im\StatusTable::getById($arParams['user_fields']['ID']);
 			if ($status = $res->fetch())
 			{
 				$userStatus = $status['STATUS'];
+				$userMobileStatus = is_object($status['MOBILE_LAST_DATE'])? $status['MOBILE_LAST_DATE']->getTimestamp(): 0;
 			}
 		}
 
 		CPullStack::AddShared(Array(
 			'module_id' => 'online',
-			'command' => 'user_authorize',
+			'command' => 'user_online',
+			'expiry' => 120,
 			'params' => Array(
 				'USER_ID' => $arParams['user_fields']['ID'],
-				'STATUS' => $userStatus
+				'STATUS' => $userStatus,
+				'MOBILE_LAST_DATE' => $userMobileStatus
 			),
 		));
 
@@ -610,6 +630,9 @@ class CPullChannel
 
 	public static function OnAfterUserLogout($arParams)
 	{
+		if (!CPullOptions::GetQueueServerStatus())
+			return false;
+
 		if ($arParams['USER_ID'] <= 0)
 			return false;
 
@@ -622,13 +645,105 @@ class CPullChannel
 		$_SESSION['USER_LAST_LOGOUT_'.$arParams['USER_ID']] = time();
 		unset($_SESSION['USER_LAST_AUTH_'.$arParams['USER_ID']]);
 
-		CPullStack::AddShared(Array(
-			'module_id' => 'online',
-			'command' => 'user_logout',
-			'params' => Array(
-				'USER_ID' => $arParams['USER_ID']
-			),
-		));
+		$arChannel = CPullChannel::GetChannel($arParams['USER_ID']);
+		$options = array(
+			"method" => "GET",
+			"dont_wait_answer" => false
+		);
+		$result = CPullChannel::Send($arChannel['CHANNEL_ID'], 'ping', $options);
+		if (is_object($result) && isset($result->infos[0]))
+		{
+			$sendOffline = $result->infos[0]->subscribers > 0? false: true;
+		}
+		else
+		{
+			$sendOffline = true;
+		}
+
+		if ($sendOffline)
+		{
+			CPullStack::AddShared(Array(
+				'module_id' => 'online',
+				'command' => 'user_offline',
+				'expiry' => 120,
+				'params' => Array(
+					'USER_ID' => $arParams['USER_ID']
+				),
+			));
+		}
+
+		return true;
+	}
+
+	public static function GetConfig($userId, $cache = true, $reopen = false, $mobile = false)
+	{
+		$pullConfig = Array();
+
+		if (defined('BX_PULL_SKIP_LS'))
+			$pullConfig['LOCAL_STORAGE'] = 'N';
+
+		if (IsModuleInstalled('bitrix24'))
+			$pullConfig['BITRIX24'] = 'Y';
+
+		if (!CPullOptions::GetQueueServerHeaders())
+			$pullConfig['HEADERS'] = 'N';
+
+		$arChannel = CPullChannel::Get($userId, $cache, $reopen);
+		if (!is_array($arChannel))
+		{
+			return false;
+		}
+
+		$arChannel["CHANNEL_ID"] = self::SignChannel($arChannel["CHANNEL_ID"]);
+		$nginxStatus = CPullOptions::GetQueueServerStatus();
+		$webSocketStatus = false;
+
+		$arChannels = Array($arChannel['CHANNEL_ID']);
+		if ($nginxStatus)
+		{
+			if (defined('BX_PULL_SKIP_WEBSOCKET'))
+			{
+				$pullConfig['WEBSOCKET'] = 'N';
+			}
+			else
+			{
+				$webSocketStatus = CPullOptions::GetWebSocketStatus();
+			}
+
+			$arChannelShared = CPullChannel::GetShared($cache, $reopen);
+			if (is_array($arChannelShared))
+			{
+				$arChannelShared["CHANNEL_ID"] = self::SignChannel($arChannelShared["CHANNEL_ID"]);
+				$arChannels[] = $arChannelShared['CHANNEL_ID'];
+				$arChannel['CHANNEL_DT'] = $arChannel['CHANNEL_DT'].'/'.$arChannelShared['CHANNEL_DT'];
+			}
+		}
+		if ($mobile || defined('BX_MOBILE') || defined('BX_PULL_MOBILE'))
+		{
+			$pullConfig['MOBILE'] = 'Y';
+			$pullPath = ($nginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($arChannels, true): CPullOptions::GetListenUrl($arChannels, true)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
+			$pullPathMod = "";
+		}
+		else
+		{
+			$pullPath = ($nginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($arChannels): CPullOptions::GetListenUrl($arChannels)): '/bitrix/components/bitrix/pull.request/ajax.php?UPDATE_STATE');
+			$pullPathMod = ($nginxStatus? (CMain::IsHTTPS()? CPullOptions::GetListenSecureUrl($arChannels, false, true): CPullOptions::GetListenUrl($arChannels, false, true)): '');
+		}
+
+		$pullPathWs = ($nginxStatus && $webSocketStatus? (CMain::IsHTTPS()? CPullOptions::GetWebSocketSecureUrl($arChannels): CPullOptions::GetWebSocketUrl($arChannels)): '');
+
+		return $pullConfig+Array(
+			'CHANNEL_ID' => implode('/', $arChannels),
+			'CHANNEL_DT' => $arChannel['CHANNEL_DT'],
+			'LAST_ID' => $arChannel['LAST_ID'],
+			'PATH' => $pullPath,
+			'PATH_MOD' => $pullPathMod,
+			'PATH_WS' => $pullPathWs,
+			'PATH_COMMAND' => defined('BX_PULL_COMMAND_PATH')? BX_PULL_COMMAND_PATH: '',
+			'METHOD' => ($nginxStatus? 'LONG': 'PULL'),
+			'REVISION' => PULL_REVISION,
+			'ERROR' => '',
+		);
 	}
 }
 ?>

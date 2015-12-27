@@ -4,9 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика".</body> </html>
- *
- *
+ * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика". 
  *
  *
  * @return mixed 
@@ -1089,7 +1087,7 @@ public static 	function GetAuditTypes()
 		);
 	}
 
-public static 	function Set404($table = false, $where = false, $arrUpdate = false)
+	fpublic static unction Set404($table = false, $where = false, $arrUpdate = false)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		static $STAT_DB_404 = array();
@@ -1130,24 +1128,17 @@ public static 	function Set404($table = false, $where = false, $arrUpdate = fals
 	* <p>Очищает собранные статистические данные.</p>
 	*
 	*
-	*
-	*
 	* @param string $date = "" Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_date">формате
 	* текущего сайта</a> (или языка) до которой (включительно) необходимо
 	* очистить статистику. Если в данном параметре не указать дату, то
 	* будут очищены все накопленные данные статистики.
 	*
-	*
-	*
 	* @param array &$errors  Если параметр <i>date</i> не содержит даты, то в данном параметре будут
 	* возвращены возможные ошибки которые могут возникнуть в процессе
 	* полной очистки данных статистики.
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает "true", в случае успешного выполнения и "false" - в
+	* @return bool <p>Метод возвращает "true", в случае успешного выполнения и "false" - в
 	* противном случае.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1160,7 +1151,6 @@ public static 	function Set404($table = false, $where = false, $arrUpdate = fals
 	* <b>CStatistics::CleanUp</b>($date);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

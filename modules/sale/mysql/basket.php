@@ -2,10 +2,11 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/basket.php");
 
 
+use \Bitrix\Main\Localization;
+
+
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -42,9 +43,7 @@ class CSaleBasket extends CAllSaleBasket
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из корзины в соответствии со своими параметрами. </p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из корзины в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -59,8 +58,6 @@ class CSaleBasket extends CAllSaleBasket
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи корзины.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -91,8 +88,6 @@ class CSaleBasket extends CAllSaleBasket
 	* реальный идентификатор пользователя. Например вот так: <pre
 	* class="syntax">'!USER_ID' =&gt; false</pre>
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи корзины. Массив
 	* имеет вид: <pre class="syntax">array("название_поля1", "группирующая_функция2"
 	* =&gt; "название_поля2", ...)</pre> В качестве "название_поля<i>N</i>" может
@@ -100,29 +95,23 @@ class CSaleBasket extends CAllSaleBasket
 	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
 	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
 	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то метод
 	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
 	* умолчанию - <i>false</i> - означает, что результат группироваться не
 	* будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа<br> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса <b>CDBResult</b>, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -162,15 +151,14 @@ class CSaleBasket extends CAllSaleBasket
 	* каталог записывает в это поле имя класса <b>CCatalogProductProvider</b>.</td> </tr>
 	* <tr> <td>DISCOUNT_PRICE</td> <td>Скидка на товар. Значение устанавливается
 	* только после оформления заказа. </td> </tr> </table> <p>Если в качестве
-	* параметра arGroupBy передается пустой массив, то функция вернет число
+	* параметра arGroupBy передается пустой массив, то метод вернет число
 	* записей, удовлетворяющих фильтру.</p> <p><b><font color="#FF0000">*</font></b> - ключи
 	* считаются устаревшими, начиная с версии 12.5.<br><b><font
-	* color="#0000FF">**</font></b> - ключ доступен, начиная с версии 12.5.</p>
-	* <p><b>Обратите внимание, что</b> в корзине могут быть не только товары
-	* из инфоблока (вполне может какой-то иной модуль добавлять в
-	* корзину товары со своим PRODUCT_ID), поэтому надо смотреть еще поле MODULE
-	* (для товаров из инфоблоков оно равно catalog)</p> <a name="examples"></a>
-	*
+	* color="#0000FF">**</font></b> - ключ доступен, начиная с версии 12.5.</p> <p></p><div
+	* class="note"> <b>Обратите внимание, что</b> в корзине могут быть не только
+	* товары из инфоблока (вполне может какой-то иной модуль добавлять
+	* в корзину товары со своим PRODUCT_ID), поэтому надо смотреть еще поле
+	* MODULE (для товаров из инфоблоков оно равно catalog).</div> <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -299,6 +287,8 @@ class CSaleBasket extends CAllSaleBasket
 	{
 		global $DB, $USER;
 
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
+
 		if (!is_array($arOrder) && !is_array($arFilter))
 		{
 			$arOrder = strval($arOrder);
@@ -318,6 +308,15 @@ class CSaleBasket extends CAllSaleBasket
 				$arFilter["ORDER_ID"] = 0;
 			}
 		}
+
+		if ($isOrderConverted == "Y")
+		{
+			$result = \Bitrix\Sale\Compatible\BasketCompatibility::getList($arOrder, $arFilter, $arGroupBy, $arNavStartParams, $arSelectFields);
+			$result->addFetchAdapter(new \Bitrix\Sale\Compatible\BasketFetchAdapter());
+			return $result;
+		}
+
+
 
 		if (count($arSelectFields) <= 0)
 		{
@@ -360,7 +359,8 @@ class CSaleBasket extends CAllSaleBasket
 				"CUSTOM_PRICE",
 				"DIMENSIONS",
 				"TYPE",
-				"SET_PARENT_ID"
+				"SET_PARENT_ID",
+				"RECOMMENDATION"
 			);
 		}
 		elseif (in_array("*", $arSelectFields))
@@ -415,7 +415,8 @@ class CSaleBasket extends CAllSaleBasket
 				"TYPE",
 				"SET_PARENT_ID",
 				"MEASURE_CODE",
-				"MEASURE_NAME"
+				"MEASURE_NAME",
+				"RECOMMENDATION"
 			);
 		}
 
@@ -462,9 +463,11 @@ class CSaleBasket extends CAllSaleBasket
 				"SET_PARENT_ID" => array("FIELD" => "B.SET_PARENT_ID", "TYPE" => "int"),
 				"MEASURE_CODE" => array("FIELD" => "B.MEASURE_CODE", "TYPE" => "int"),
 				"MEASURE_NAME" => array("FIELD" => "B.MEASURE_NAME", "TYPE" => "string"),
+				"RECOMMENDATION" => array("FIELD" => "B.RECOMMENDATION", "TYPE" => "string"),
 
 				"ORDER_ALLOW_DELIVERY" => array("FIELD" => "O.ALLOW_DELIVERY", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
 				"ORDER_DATE_ALLOW_DELIVERY" => array("FIELD" => "O.DATE_ALLOW_DELIVERY", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
+
 				"ORDER_STATUS" => array("FIELD" => "O.STATUS_ID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
 				"ORDER_CANCELED" => array("FIELD" => "O.CANCELED", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
 				"ORDER_DATE" => array("FIELD" => "O.DATE_INSERT", "TYPE" => "datetime", "FROM" => "LEFT JOIN b_sale_order O ON (O.ID = B.ORDER_ID)"),
@@ -561,9 +564,7 @@ class CSaleBasket extends CAllSaleBasket
 
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из свойств корзины в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из свойств корзины в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -578,8 +579,6 @@ class CSaleBasket extends CAllSaleBasket
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи корзины.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -609,8 +608,6 @@ class CSaleBasket extends CAllSaleBasket
 	* умолчанию - пустой массив array() - означает, что результат
 	* отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи корзины. Массив
 	* имеет вид: <pre class="syntax">array("название_поля1", "группирующая_функция2"
 	* =&gt; "название_поля2", ...)</pre> В качестве "название_поля<i>N</i>" может
@@ -618,29 +615,23 @@ class CSaleBasket extends CAllSaleBasket
 	* стоять: <ul> <li> <b> COUNT</b> - подсчет количества;</li> <li> <b>AVG</b> - вычисление
 	* среднего значения;</li> <li> <b>MIN</b> - вычисление минимального
 	* значения;</li> <li> <b> MAX</b> - вычисление максимального значения;</li> <li>
-	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то функция
+	* <b>SUM</b> - вычисление суммы.</li> </ul> Если массив пустой, то метод
 	* вернет число записей, удовлетворяющих фильтру.<br><br> Значение по
 	* умолчанию - <i>false</i> - означает, что результат группироваться не
 	* будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа<br> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса <b>CDBResult</b>, содержащий набор
 	* ассоциативных массивов с ключами: </p> <table class="tnormal" width="100%"> <tr> <th
@@ -649,9 +640,8 @@ class CSaleBasket extends CAllSaleBasket
 	* свойство.</td> </tr> <tr> <td>NAME</td> <td>Название свойства.</td> </tr> <tr> <td>VALUE</td>
 	* <td>Значение свойства. </td> </tr> <tr> <td>CODE</td> <td>Символьный код свойства.
 	* </td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки свойства. </td> </tr> </table> <p>Если
-	* в качестве параметра arGroupBy передается пустой массив, то функция
+	* в качестве параметра arGroupBy передается пустой массив, то метод
 	* вернет число записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -796,9 +786,7 @@ class CSaleBasket extends CAllSaleBasket
 	*/
 	
 	/**
-	* <p>Функция добавляет товар в корзину, если его ещё нет, и обновляет параметры товара с увеличением количества, если он уже находится в корзине. В массиве <b>arFields</b> перечисляются все параметры товара, которые нужны для работы модуля Интернет-магазина (т.е. этот модуль не зависит от других модулей и работает полностью самостоятельно).</p> <p>Интернет-магазин не зависит от других модулей, поэтому товары в корзину модуля продаж могут добавляться из любого места (например, из торгового каталога или со статической страницы). Для некоторых модулей существуют функции - оболочки, облегчающие добавление товара в корзину (например, для модуля <b>catalog</b> существуют функции <b>Add2Basket</b> и <b>Add2BasketByProductID</b>). </p>
-	*
-	*
+	* <p>Метод добавляет товар в корзину, если его ещё нет, и обновляет параметры товара с увеличением количества, если он уже находится в корзине. В массиве <b>arFields</b> перечисляются все параметры товара, которые нужны для работы модуля Интернет-магазина (т.е. этот модуль не зависит от других модулей и работает полностью самостоятельно). Метод динамичный.</p> <p>Интернет-магазин не зависит от других модулей, поэтому товары в корзину модуля продаж могут добавляться из любого места (например, из торгового каталога или со статической страницы). Для некоторых модулей существуют функции - оболочки, облегчающие добавление товара в корзину (например, для модуля <b>catalog</b> существуют функции <b>Add2Basket</b> и <b>Add2BasketByProductID</b>). </p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров элемента корзины, содержащий
@@ -848,11 +836,8 @@ class CSaleBasket extends CAllSaleBasket
 	* пусто, то возникает попытка использовать старые поля:<b>CALLBACK_FUNC</b>,
 	* <b>ORDER_CALLBACK_FUNC</b>, <b>CANCEL_CALLBACK_FUNC</b> и <b>PAY_CALLBACK_FUNC</b>.</li> </ul>
 	*
-	*
-	*
-	* @return int <p>Функция возвращает код элемента корзины, в который попал данный
+	* @return int <p>Метод возвращает код элемента корзины, в который попал данный
 	* товар.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -889,15 +874,16 @@ class CSaleBasket extends CAllSaleBasket
 	*/
 	public static function Add($arFields)
 	{
-		global $DB;
+		global $DB, $APPLICATION;
 
 		if (isset($arFields["ID"]))
 			unset($arFields["ID"]);
 
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
+
 		CSaleBasket::Init();
 		if (!CSaleBasket::CheckFields("ADD", $arFields))
 			return false;
-
 
 		if (!array_key_exists('IGNORE_CALLBACK_FUNC', $arFields) || 'Y' != $arFields['IGNORE_CALLBACK_FUNC'])
 		{
@@ -941,182 +927,205 @@ class CSaleBasket extends CAllSaleBasket
 			}
 		}
 
-		foreach(GetModuleEvents("sale", "OnBeforeBasketAdd", true) as $arEvent)
-			if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
-				return false;
+		if ($isOrderConverted != "Y")
+		{
+			foreach(GetModuleEvents("sale", "OnBeforeBasketAdd", true) as $arEvent)
+				if (ExecuteModuleEventEx($arEvent, Array(&$arFields))===false)
+					return false;
+		}
 
 		$bFound = false;
 		$bEqAr = false;
 
-		$boolProps = (array_key_exists('PROPS', $arFields) && !empty($arFields["PROPS"]) && is_array($arFields["PROPS"]));
-
-		// check if this item is already in the basket
-		$arDuplicateFilter = array(
-			"FUSER_ID" => $arFields["FUSER_ID"],
-			"PRODUCT_ID" => $arFields["PRODUCT_ID"],
-			"LID" => $arFields["LID"],
-			"ORDER_ID" => "NULL"
-		);
-
-		if (!(isset($arFields["TYPE"]) && $arFields["TYPE"] == CSaleBasket::TYPE_SET))
+		//TODO: is order converted?
+		if ($isOrderConverted == "Y")
 		{
-			if (isset($arFields["SET_PARENT_ID"]))
-				$arDuplicateFilter["SET_PARENT_ID"] = $arFields["SET_PARENT_ID"];
-			else
-				$arDuplicateFilter["SET_PARENT_ID"] = "NULL";
-		}
-
-		$db_res = CSaleBasket::GetList(
-			array(),
-			$arDuplicateFilter,
-			false,
-			false,
-			array("ID", "QUANTITY")
-		);
-		while($res = $db_res->Fetch())
-		{
-			if(!$bEqAr)
+			/** @var \Bitrix\Sale\BasketItem $basketItem */
+			if (!($basketItem = \Bitrix\Sale\Compatible\BasketCompatibility::add($arFields)))
 			{
-				$arPropsCur = array();
-				$arPropsOld = array();
+				$APPLICATION->ThrowException(Localization\Loc::getMessage('BT_MOD_SALE_BASKET_ERR_ID_ABSENT'), "BASKET_ITEM");
+				return false;
+			}
 
-				if ($boolProps)
+			$ID = $basketItem->getId();
+			$arFields['QUANTITY'] = $basketItem->getQuantity();
+		}
+		else
+		{
+			$boolProps = (!empty($arFields["PROPS"]) && is_array($arFields["PROPS"]));
+
+			// check if this item is already in the basket
+			$arDuplicateFilter = array(
+				"FUSER_ID" => $arFields["FUSER_ID"],
+				"PRODUCT_ID" => $arFields["PRODUCT_ID"],
+				"LID" => $arFields["LID"],
+				"ORDER_ID" => "NULL"
+			);
+
+			if (!(isset($arFields["TYPE"]) && $arFields["TYPE"] == CSaleBasket::TYPE_SET))
+			{
+				if (isset($arFields["SET_PARENT_ID"]))
+					$arDuplicateFilter["SET_PARENT_ID"] = $arFields["SET_PARENT_ID"];
+				else
+					$arDuplicateFilter["SET_PARENT_ID"] = "NULL";
+			}
+
+			$db_res = CSaleBasket::GetList(
+				array(),
+				$arDuplicateFilter,
+				false,
+				false,
+				array("ID", "QUANTITY")
+			);
+			while($res = $db_res->Fetch())
+			{
+				if(!$bEqAr)
 				{
-					foreach($arFields["PROPS"] as &$arProp)
+					$arPropsCur = array();
+					$arPropsOld = array();
+
+					if ($boolProps)
 					{
-						if (array_key_exists('VALUE', $arProp)&& '' != $arProp["VALUE"])
+						foreach($arFields["PROPS"] as &$arProp)
+						{
+							if (array_key_exists('VALUE', $arProp)&& '' != $arProp["VALUE"])
+							{
+								$propID = '';
+								if (array_key_exists('CODE', $arProp) && '' != $arProp["CODE"])
+								{
+									$propID = $arProp["CODE"];
+								}
+								elseif (array_key_exists('NAME', $arProp) && '' != $arProp["NAME"])
+								{
+									$propID = $arProp["NAME"];
+								}
+								if ('' == $propID)
+									continue;
+								$arPropsCur[$propID] = $arProp["VALUE"];
+							}
+						}
+						if (isset($arProp))
+							unset($arProp);
+					}
+
+					$dbProp = CSaleBasket::GetPropsList(
+						array(),
+						array("BASKET_ID" => $res["ID"]),
+						false,
+						false,
+						array('NAME', 'VALUE', 'CODE')
+					);
+					while ($arProp = $dbProp->Fetch())
+					{
+						if ('' != $arProp["VALUE"])
 						{
 							$propID = '';
-							if (array_key_exists('CODE', $arProp) && '' != $arProp["CODE"])
+							if ('' != $arProp["CODE"])
 							{
 								$propID = $arProp["CODE"];
 							}
-							elseif (array_key_exists('NAME', $arProp) && '' != $arProp["NAME"])
+							elseif ('' != $arProp["NAME"])
 							{
 								$propID = $arProp["NAME"];
 							}
 							if ('' == $propID)
 								continue;
-							$arPropsCur[$propID] = $arProp["VALUE"];
+							$arPropsOld[$propID] = $arProp["VALUE"];
 						}
 					}
-					if (isset($arProp))
-						unset($arProp);
-				}
 
-				$dbProp = CSaleBasket::GetPropsList(
-					array(),
-					array("BASKET_ID" => $res["ID"]),
-					false,
-					false,
-					array('NAME', 'VALUE', 'CODE')
-				);
-				while ($arProp = $dbProp->Fetch())
-				{
-					if ('' != $arProp["VALUE"])
+					$bEqAr = false;
+					if (count($arPropsCur) == count($arPropsOld))
 					{
-						$propID = '';
-						if ('' != $arProp["CODE"])
+						$bEqAr = true;
+						foreach($arPropsCur as $key => $val)
 						{
-							$propID = $arProp["CODE"];
+							if (!array_key_exists($key, $arPropsOld) || $arPropsOld[$key] != $val)
+							{
+								$bEqAr = false;
+								break;
+							}
 						}
-						elseif ('' != $arProp["NAME"])
-						{
-							$propID = $arProp["NAME"];
-						}
-						if ('' == $propID)
-							continue;
-						$arPropsOld[$propID] = $arProp["VALUE"];
 					}
-				}
 
-				$bEqAr = false;
-				if (count($arPropsCur) == count($arPropsOld))
-				{
-					$bEqAr = true;
-					foreach($arPropsCur as $key => $val)
+					if ($bEqAr)
 					{
-						if (!array_key_exists($key, $arPropsOld) || $arPropsOld[$key] != $val)
-						{
-							$bEqAr = false;
-							break;
-						}
+						$ID = $res["ID"];
+						$arFields["QUANTITY"] += $res["QUANTITY"];
+						CSaleBasket::Update($ID, $arFields);
+						$bFound = true;
+						continue;
 					}
-				}
-
-				if ($bEqAr)
-				{
-					$ID = $res["ID"];
-					$arFields["QUANTITY"] += $res["QUANTITY"];
-					CSaleBasket::Update($ID, $arFields);
-					$bFound = true;
-					continue;
 				}
 			}
 		}
 
 		if (!$bFound)
 		{
-			$arInsert = $DB->PrepareInsert("b_sale_basket", $arFields);
-
-			$strSql = "INSERT INTO b_sale_basket(".$arInsert[0].", DATE_INSERT, DATE_UPDATE) VALUES(".$arInsert[1].", ".$DB->GetNowFunction().", ".$DB->GetNowFunction().")";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-			$ID = intval($DB->LastID());
-
-			$boolOrder = false;
-			if (array_key_exists('ORDER_ID', $arFields))
+			//TODO: is order converted?
+			if ($isOrderConverted != "Y")
 			{
-				$boolOrder = (0 < intval($arFields['ORDER_ID']));
-			}
+				$arInsert = $DB->PrepareInsert("b_sale_basket", $arFields);
 
-			if (!$boolOrder && !CSaleBasketHelper::isSetItem($arFields))
-			{
-				$siteID = (isset($arFields["LID"])) ? $arFields["LID"] : SITE_ID;
-				$_SESSION["SALE_BASKET_NUM_PRODUCTS"][$siteID]++;
-			}
+				$strSql = "INSERT INTO b_sale_basket(".$arInsert[0].", DATE_INSERT, DATE_UPDATE) VALUES(".$arInsert[1].", ".$DB->GetNowFunction().", ".$DB->GetNowFunction().")";
+				$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-			if ($boolProps)
-			{
-				foreach ($arFields["PROPS"] as &$prop)
+				$ID = intval($DB->LastID());
+
+				$boolOrder = false;
+				if (isset($arFields['ORDER_ID']))
 				{
-					if ('' != $prop["NAME"])
-					{
-						$arInsert = $DB->PrepareInsert("b_sale_basket_props", $prop);
-
-						$strSql = "INSERT INTO b_sale_basket_props(BASKET_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
-						$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					}
+					$boolOrder = (0 < (int)$arFields['ORDER_ID']);
 				}
-				if (isset($prop))
-					unset($prop);
-			}
 
-			// if item is set parent
-			if (isset($arFields["TYPE"]) && $arFields["TYPE"] == CSaleBasket::TYPE_SET)
-			{
-				CSaleBasket::Update($ID, array("SET_PARENT_ID" => $ID));
-
-				if (!isset($arFields["MANUAL_SET_ITEMS_INSERTION"])) // set items will be added separately (from admin form data)
+				if (!$boolOrder && !CSaleBasketHelper::isSetItem($arFields))
 				{
-					/** @var $productProvider IBXSaleProductProvider */
-					if ($productProvider = CSaleBasket::GetProductProvider($arFields))
+					$siteID = (isset($arFields["LID"])) ? $arFields["LID"] : SITE_ID;
+					$_SESSION["SALE_BASKET_NUM_PRODUCTS"][$siteID]++;
+				}
+
+				if ($boolProps)
+				{
+					foreach ($arFields["PROPS"] as &$prop)
 					{
-						if (method_exists($productProvider, "GetSetItems"))
+						if ('' != $prop["NAME"])
 						{
-							$arSets = $productProvider::GetSetItems($arFields["PRODUCT_ID"], CSaleBasket::TYPE_SET);
+							$arInsert = $DB->PrepareInsert("b_sale_basket_props", $prop);
 
-							if (is_array($arSets))
+							$strSql = "INSERT INTO b_sale_basket_props(BASKET_ID, ".$arInsert[0].") VALUES(".$ID.", ".$arInsert[1].")";
+							$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+						}
+					}
+					if (isset($prop))
+						unset($prop);
+				}
+
+				// if item is set parent
+				if (isset($arFields["TYPE"]) && $arFields["TYPE"] == CSaleBasket::TYPE_SET)
+				{
+					CSaleBasket::Update($ID, array("SET_PARENT_ID" => $ID));
+
+					if (!isset($arFields["MANUAL_SET_ITEMS_INSERTION"])) // set items will be added separately (from admin form data)
+					{
+						/** @var $productProvider IBXSaleProductProvider */
+						if ($productProvider = CSaleBasket::GetProductProvider($arFields))
+						{
+							if (method_exists($productProvider, "GetSetItems"))
 							{
-								foreach ($arSets as $arSetData)
-								{
-									foreach ($arSetData["ITEMS"] as $setItem)
-									{
-										$setItem["SET_PARENT_ID"] = $ID;
-										$setItem["LID"] = $arFields["LID"];
-										$setItem["QUANTITY"] = $setItem["QUANTITY"] * $arFields["QUANTITY"];
+								$arSets = $productProvider::GetSetItems($arFields["PRODUCT_ID"], CSaleBasket::TYPE_SET, array('BASKET_ID' => $ID));
 
-										CSaleBasket::Add($setItem);
+								if (is_array($arSets))
+								{
+									foreach ($arSets as $arSetData)
+									{
+										foreach ($arSetData["ITEMS"] as $setItem)
+										{
+											$setItem["SET_PARENT_ID"] = $ID;
+											$setItem["LID"] = $arFields["LID"];
+											$setItem["QUANTITY"] = $setItem["QUANTITY"] * $arFields["QUANTITY"];
+											$setItem['FUSER_ID'] = $arFields['FUSER_ID'];
+											CSaleBasket::Add($setItem);
+										}
 									}
 								}
 							}
@@ -1139,25 +1148,23 @@ class CSaleBasket extends CAllSaleBasket
 			}
 		}
 
-		foreach(GetModuleEvents("sale", "OnBasketAdd", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
+		if ($isOrderConverted != "Y")
+		{
+			foreach(GetModuleEvents("sale", "OnBasketAdd", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, Array($ID, $arFields));
+		}
 
 		return $ID;
 	}
 
 	
 	/**
-	* <p>Функция удаляет запись корзины с кодом ID. </p> <a name="examples"></a>
-	*
-	*
+	* <p>Метод удаляет запись корзины с кодом ID. Метод динамичный.</p> <a name="examples"></a>
 	*
 	*
 	* @param int $ID  
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1165,7 +1172,7 @@ class CSaleBasket extends CAllSaleBasket
 	* if (CSaleBasket::Delete(22))
 	*     echo "Запись успешно удалена";
 	* ?&gt;
-	* </htmМетод может использоваться и для удаления записей корзин, которые уже превращены в заказы. То есть, мы можем удалить запись из состава заказа. Но следует помнить, что после использования функции необходимо обновлять итоговую сумму заказа, например, так: 
+	* </htmМетод может использоваться и для удаления записей корзин, которые уже превращены в заказы. То есть, мы можем удалить запись из состава заказа. Но следует помнить, что после использования метода необходимо обновлять итоговую сумму заказа, например, так: 
 	* 
 	* 
 	*  $contents = array();
@@ -1203,11 +1210,30 @@ class CSaleBasket extends CAllSaleBasket
 	*/
 	public static function Delete($ID)
 	{
-		global $DB;
+		global $DB, $APPLICATION;
+
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
 
 		$ID = intval($ID);
 		if (0 >= $ID)
 			return false;
+
+		if ($isOrderConverted == "Y")
+		{
+			/** @var \Bitrix\Sale\Result $r */
+			$r = \Bitrix\Sale\Compatible\BasketCompatibility::delete($ID);
+			if (!$r->isSuccess(true))
+			{
+				foreach($r->getErrorMessages() as $error)
+				{
+					$APPLICATION->ThrowException($error);
+				}
+
+				return false;
+			}
+
+			return true;
+		}
 
 		$rsBaskets = CSaleBasket::GetList(
 			array(),
@@ -1288,27 +1314,18 @@ class CSaleBasket extends CAllSaleBasket
 
 	
 	/**
-	* <p>Функция удаляет из корзины все записи с внутренним кодом владельца fUserID. </p>
-	*
-	*
+	* <p>Метод удаляет из корзины все записи с внутренним кодом владельца fUserID. Метод динамичный.</p>
 	*
 	*
 	* @param int $fUserID  Внутренний код владельца.
-	*
-	*
 	*
 	* @param  $bool  Если флаг равен false (по-умолчанию), то удаляются только записи из
 	* корзины. Если флаг равен true, то удаляются и те записи, которые
 	* относятся к уже сделанным заказам.
 	*
-	*
-	*
 	* @param bIncOrdere $d = false] 
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1333,6 +1350,8 @@ class CSaleBasket extends CAllSaleBasket
 	{
 		global $DB, $APPLICATION;
 
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
+
 		$bIncOrdered = ($bIncOrdered ? True : False);
 		$FUSER_ID = intval($FUSER_ID);
 		if ($FUSER_ID <= 0)
@@ -1356,12 +1375,29 @@ class CSaleBasket extends CAllSaleBasket
 		);
 		while ($arBasket = $dbBasket->Fetch())
 		{
-			if (0 < intval($arBasket["ORDER_ID"]))
-				CSaleOrderChange::AddRecord($arBasket["ORDER_ID"], "BASKET_REMOVED", array("PRODUCT_ID" => $arBasket["PRODUCT_ID"], "NAME" => $arBasket["NAME"]));
+			if ($isOrderConverted == "Y")
+			{
+				/** @var \Bitrix\Sale\Result $r */
+				$r = \Bitrix\Sale\Compatible\BasketCompatibility::delete($arBasket["ID"]);
+				if (!$r->isSuccess(true))
+				{
+					foreach($r->getErrorMessages() as $error)
+					{
+						$APPLICATION->ThrowException($error);
+					}
 
-			$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$arBasket["ID"], true);
-			$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$arBasket["ID"], true);
-			$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$arBasket["ID"], true);
+					return false;
+				}
+			}
+			else
+			{
+				if (0 < intval($arBasket["ORDER_ID"]))
+					CSaleOrderChange::AddRecord($arBasket["ORDER_ID"], "BASKET_REMOVED", array("PRODUCT_ID" => $arBasket["PRODUCT_ID"], "NAME" => $arBasket["NAME"]));
+
+				$DB->Query("DELETE FROM b_sale_basket_props WHERE BASKET_ID = ".$arBasket["ID"], true);
+				$DB->Query("DELETE FROM b_sale_store_barcode WHERE BASKET_ID = ".$arBasket["ID"], true);
+				$DB->Query("DELETE FROM b_sale_basket WHERE ID = ".$arBasket["ID"], true);
+			}
 		}
 
 
@@ -1369,27 +1405,6 @@ class CSaleBasket extends CAllSaleBasket
 
 		return true;
 	}
-/*
-	public static function TransferBasket($FROM_FUSER_ID, $TO_FUSER_ID)
-	{
-		global $DB;
-
-		$FROM_FUSER_ID = IntVal($FROM_FUSER_ID);
-		$TO_FUSER_ID = IntVal($TO_FUSER_ID);
-
-		if (($TO_FUSER_ID>0) && (CSaleUser::GetList(array("ID"=>$TO_FUSER_ID))))
-		{
-			$strSql =
-				"UPDATE b_sale_basket SET ".
-				"	FUSER_ID = ".$TO_FUSER_ID." ".
-				"WHERE FUSER_ID = ".$FROM_FUSER_ID." ";
-			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-			return true;
-		}
-		return false;
-	}
-*/
 
 	public static function GetLeave($arOrder = Array(), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = Array())
 	{
@@ -1522,8 +1537,6 @@ class CSaleBasket extends CAllSaleBasket
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -1769,4 +1782,6 @@ class CSaleUser extends CAllSaleUser
 		return false;
 	}
 }
+
+
 ?>

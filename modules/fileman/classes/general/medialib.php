@@ -8,7 +8,7 @@ class CMedialib
 		$cachePath = "medialib/";
 
 	function Init(){}
-	public static function GetOperations($collectionId)
+	public static function GetOperations($collectionId, $menu = false)
 	{
 		global $USER;
 		static $oCollections;
@@ -24,7 +24,7 @@ class CMedialib
 
 			if (!is_array($oCollections))
 			{
-				$res = CMedialib::GetCollectionTree();
+				$res = CMedialib::GetCollectionTree(array('menu' => $menu));
 				$oCollections = $res['Collections'];
 			}
 
@@ -41,12 +41,12 @@ class CMedialib
 		return $arOp[$key];
 	}
 
-	public static function CanDoOperation($operation, $collectionId=0, $userId = false)
+	public static function CanDoOperation($operation, $collectionId=0, $userId = false, $menu = false)
 	{
 		if ($GLOBALS["USER"]->IsAdmin())
 			return true;
 
-		$arOp = CMedialib::GetOperations($collectionId);
+		$arOp = CMedialib::GetOperations($collectionId, $menu);
 		return in_array($operation, $arOp);
 	}
 
@@ -98,7 +98,7 @@ class CMedialib
 		global $DB;
 
 		$s = '0';
-		for($i=0; $i < count($arCols); $i++)
+		for($i = 0, $l = count($arCols); $i < $l; $i++)
 			$s .= ",".IntVal($arCols[$i]);
 
 		$strSql = 'SELECT *
@@ -119,6 +119,11 @@ class CMedialib
 		}
 
 		return $arResult;
+	}
+
+	public static function getMaximumFileUploadSize()
+	{
+		return min(CUtil::Unformat(ini_get('post_max_size')), CUtil::Unformat(ini_get('upload_max_filesize')));
 	}
 
 	public static function ShowDialogScript($arConfig = array())
@@ -254,7 +259,7 @@ class CMedialib
 		}
 	}
 
-	public static function AttachJSScripts()
+	static function AttachJSScripts()
 	{
 		if(!defined("BX_B_MEDIALIB_SCRIPT_LOADED"))
 		{
@@ -293,6 +298,7 @@ if (typeof ML_MESS === "undefined")
 		ImageSize : '<?= GetMessageJS('ML_IMAGE_SIZE')?>',
 		CheckedColTitle : '<?= GetMessageJS('ML_CHECKED_COL_TITLE')?>',
 		ItSourceError : '<?= GetMessageJS('ML_SOURCE_ERROR')?>',
+		ItFileSizeError : '<?= GetMessageJS('ML_FILESIZE_ERROR')?>',
 		ItNameError : '<?= GetMessageJS('ML_NAME_ERROR')?>',
 		ItCollsError : '<?= GetMessageJS('ML_COLLS_ERROR')?>',
 		ColNameError : '<?= GetMessageJS('ML_COL_NAME_ERROR')?>',
@@ -483,7 +489,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 			</div>
 			<div id="mlsd_load_cont">
 				<b><label for="ml_load_file"><?=GetMessage('ML_FILE')?>:</label></b>
-				<input id="ml_load_file" type="file" name="load_file" style="margin-left: 15px; width:180px;">
+				<input id="ml_load_file" type="file" name="load_file" style="margin-left: 15px; width:200px;">
 			</div>
 			<div id="mlsd_select_cont" style="display: none;">
 				<b><label for="mlsd_item_path"><?=GetMessage('ML_FILE')?>:</label></b>
@@ -609,7 +615,8 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 			</div>
 			<div id="mlsd_load_cont">
 				<b><label for="ml_load_file"><?=GetMessage('ML_FILE')?>:</label></b>
-				<input id="ml_load_file" type="file" name="load_file" style="margin-left: 15px; width:180px;">
+				<input id="ml_load_file" type="file" name="load_file" style="margin-left: 15px; width:200px;">
+				<input id="ml_load_max_size" type="hidden" name="ml_load_max_size" value="<?=CMedialib::getMaximumFileUploadSize()?>">
 			</div>
 			<div id="mlsd_select_cont" style="display: none;">
 				<b><label for="mlsd_item_path"><?=GetMessage('ML_FILE')?>:</label></b>
@@ -677,6 +684,8 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 				<table class="mlvi-info-tbl">
 					<tr><td><div class="mlvi-info-name" id="mlvi_info_name"></div></td></tr>
 					<tr><td><a id="mlvi_info_link" href="javascript: void(0);" title="<?= GetMessage("ML_DOWNLOAD_LINK")?>"><?= GetMessage('ML_DOWNLOAD_LINK')?></a></td></tr>
+					<tr><td><a id="mlvi_info_copy_link" href="javascript: void(0);" title="<?= GetMessage("ML_DOWNLOAD_LINK_TITLE")?>"><?= GetMessage("ML_DOWNLOAD_LINK_TITLE")?></a></td></tr>
+					<tr><td><input style="display:none;" id="mlvi_info_copy_input" value></td></tr>
 					<tr><td class="mlvi-new-row">
 						<div class="mlvi-info-details" id="mlvi_info_details"></div>
 					</td></tr>
@@ -914,7 +923,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 		$arColTree = array();
 		$arColTemp = array();
 		$Collections = array();
-		$arCol = CMedialibCollection::GetList(array('arFilter' => array('ACTIVE' => 'Y')));
+		$arCol = $Params['menu'] ? CMedialibCollection::GetList(array('arFilter' => array('ACTIVE' => 'Y', 'PARENT_ID' => 0))) : CMedialibCollection::GetList(array('arFilter' => array('ACTIVE' => 'Y')));
 		$iter = 0;
 
 		for ($i = 0, $l = count($arCol); $i < $l; $i++)
@@ -1137,7 +1146,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 					return false;
 
 				$strItems = "0";
-				for($i=0; $i < count($arItems); $i++)
+				for($i = 0, $l = count($arItems); $i < $l; $i++)
 					$strItems .= ",".IntVal($arItems[$i]);
 
 				$strSql = "DELETE FROM b_medialib_collection_item WHERE ITEM_ID IN (".$strItems.") AND COLLECTION_ID=".$colId;
@@ -1191,7 +1200,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 		elseif ($mode == 'file_dialog')
 		{
 			$title = isset($Params['title']) ? $Params['title'] : GetMessage('ML_BR_BUT_FD_TITLE');
-			?><input type="button" value="<?= $value?>" id="<?= $inputId?>" title="<?= $title?>" /><?
+			?><input type="button" class="adm-btn" style="float:left;" value="<?= $value?>" id="<?= $inputId?>" title="<?= $title?>" onclick="<?= $Params['event']?>();"/><?
 		}
 		else
 		{
@@ -1199,6 +1208,7 @@ ML_MESS.Save = '<?= GetMessageJS('ML_SAVE')?>';
 		?>
 
 <script>
+<?=self::AttachJSScripts();?>
 if (!window.<?= $cid?>_onclick)
 {
 	window.<?= $cid?>_onclick = function (pEl)
@@ -1792,8 +1802,8 @@ class CMedialibCollection
 				$val = $arFilter[$filter_keys[$i]];
 				if(is_string($val)  && strlen($val) <=0 || strval($val)=="NOT_REF")
 					continue;
-				if ($n == 'ID')
-					$arSqlSearch[] = GetFilterQuery("MLC.ID", $val, 'N');
+				if ($n == 'ID' || $n == 'PARENT_ID' || $n == 'OWNER_ID')
+					$arSqlSearch[] = GetFilterQuery($arFields[$n]["FIELD_NAME"], $val, 'N');
 				elseif(isset($arFields[$n]))
 					$arSqlSearch[] = GetFilterQuery($arFields[$n]["FIELD_NAME"], $val);
 			}
@@ -1811,7 +1821,7 @@ class CMedialibCollection
 		if (isset($arFilter['TYPES']) && is_array($arFilter['TYPES']))
 		{
 			$strTypes = "";
-			for($i=0; $i < count($arFilter['TYPES']); $i++)
+			for($i = 0, $l = count($arFilter['TYPES']); $i < $l; $i++)
 				$strTypes .= ",".IntVal($arFilter['TYPES'][$i]);
 			$strSqlSearch .= "\n AND ML_TYPE in (".trim($strTypes, ", ").")";
 		}
@@ -1964,7 +1974,7 @@ class CMedialibCollection
 		if (count($Params['childCols']) > 0 && $res)
 		{
 			$strIds = "0";
-			for($i=0; $i < count($Params['childCols']); $i++)
+			for($i = 0, $l = count($Params['childCols']); $i < $l; $i++)
 				$strIds .= ",".IntVal($Params['childCols'][$i]);
 
 			$strUpdate = $DB->PrepareUpdate("b_medialib_collection", array('ML_TYPE' => $Params['type']));
@@ -2004,7 +2014,7 @@ class CMedialibItem
 			elseif (count($Params['arCollections']) > 1)
 			{
 				$strCollections = "0";
-				for($i=0; $i < count($Params['arCollections']); $i++)
+				for($i = 0, $l = count($Params['arCollections']); $i < $l; $i++)
 					$strCollections .= ",".IntVal($Params['arCollections'][$i]);
 				$q = 'WHERE MCI.COLLECTION_ID in ('.$strCollections.')';
 			}
@@ -2141,6 +2151,7 @@ class CMedialibItem
 			unset($arFields['ID']);
 			$arFields['SOURCE_ID'] = $source_id;
 			$arFields['~DATE_CREATE'] = $arFields['~DATE_UPDATE'];
+			$arFields['ITEM_TYPE'] = '';
 			$ID = CDatabase::Add("b_medialib_item", $arFields, array("DESCRIPTION","SEARCHABLE_CONTENT"));
 		}
 		else // Update
@@ -2173,7 +2184,7 @@ class CMedialibItem
 
 		$strCollections = "0";
 
-		for($i=0; $i < count($Params['arCollections']); $i++)
+		for($i = 0, $l = count($Params['arCollections']); $i < $l; $i++)
 			$strCollections .= ",".IntVal($Params['arCollections'][$i]);
 
 		$strSql =
@@ -2313,7 +2324,7 @@ class CMedialibItem
 			return array();
 
 		for ($i = 0; $i < $l; $i++)
-			$strSql .= " AND MI.SEARCHABLE_CONTENT LIKE '%{".$DB->ForSql($arQuery[$i])."}%'";
+			$strSql .= " AND MI.SEARCHABLE_CONTENT LIKE '%".$DB->ForSql($arQuery[$i])."%'";
 
 		$strSql .= " ORDER BY MI.ID DESC";
 

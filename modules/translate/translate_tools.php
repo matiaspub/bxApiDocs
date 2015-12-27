@@ -166,7 +166,7 @@ function GetTDirList($path, $subDirs = false)
 		$arList = array();
 		while (false!==($file=readdir($handle)))
 		{
-			if ($file!="." && $file!=".." && $file!=".access.php" && $file!=".htaccess")
+			if ($file != "." && $file != ".." && $file != ".access.php" && $file != ".htaccess" && $file != '.svn' && $file != '.hg')
 			{
 				$IS_DIR = (is_dir($abs_parent.$file) ? "Y" : "N");
 				$path_prepared = $parent.$file;
@@ -235,11 +235,13 @@ function GetTCSVArray()
 		$lang_id = get_lang_id($f['PATH']);
 		include($_SERVER["DOCUMENT_ROOT"] . $f['PATH']);
 
-		if(is_array($MESS))
+		if (!empty($MESS) && is_array($MESS))
 		{
 			foreach ($MESS as $m => $v)
 			{
-				$arr[$key][$m][$lang_id] = $v;
+				$m = (string)$m;
+				if ($m != '')
+					$arr[$key][$m][$lang_id] = $v;
 			}
 		}
 	}
@@ -248,8 +250,9 @@ function GetTCSVArray()
 
 function SaveTCSVFile()
 {
+	global $APPLICATION;
 	$errors = array();
-	if ($GLOBALS['APPLICATION']->GetGroupRight("translate") == 'W' && check_bitrix_sessid())
+	if ($APPLICATION->GetGroupRight("translate") == 'W' && check_bitrix_sessid())
 	{
 		if (
 			array_key_exists('csvfile', $_FILES) &&
@@ -266,23 +269,56 @@ function SaveTCSVFile()
 				$i = 0;
 				$arr = array();
 				$arErrLineFile = array();
+				$arColNames = array();
 				while ($arData = fgetcsv($fp, 10000, ';'))
 				{
 					if ($i == 0)
 					{
-						//$arData = array_filter($arData);
+						if (!is_array($arData) || (count($arData) == 1 && $arData[0] === null))
+						{
+							$arErrLineFile[] = 0;
+							break;
+						}
 						$arColNames = array_flip($arData);
+						foreach ($arTLangs as $keyLang => $langID)
+						{
+							if (!isset($arColNames[$langID]))
+								unset($arTLangs[$keyLang]);
+						}
+						if (!isset($arColNames['file']) || !isset($arColNames['key']) || empty($arTLangs))
+						{
+							$arErrLineFile[] = 0;
+							break;
+						}
 					}
 					else
 					{
+						if (!is_array($arData) || (count($arData) == 1 && $arData[0] === null))
+						{
+							$arErrLineFile[$i+1] = $i + 1;
+							continue;
+						}
 						$file = $arData[$arColNames['file']];
 						$key = $arData[$arColNames['key']];
+						if ($file == '' || $key == '')
+						{
+							$arErrLineFile[$i+1] = $i + 1;
+							continue;
+						}
+						if (!isset($arr[$file]))
+							$arr[$file] = array();
 
 						foreach ($arTLangs as $lang_id)
 						{
-							if (array_key_exists($arColNames[$lang_id], $arData) && strlen($arData[$arColNames[$lang_id]]) > 0)
+							if (!isset($arr[$file][$lang_id]))
+								$arr[$file][$lang_id] = array();
+
+							if (isset($arData[$arColNames[$lang_id]]))
 							{
-								$arr[$file][$lang_id][$key] = str_replace("\\\\", "\\", $arData[$arColNames[$lang_id]]);
+								if ($arData[$arColNames[$lang_id]] !== '')
+								{
+									$arr[$file][$lang_id][$key] = str_replace("\\\\", "\\", $arData[$arColNames[$lang_id]]);
+								}
 							}
 							else
 							{
@@ -290,26 +326,25 @@ function SaveTCSVFile()
 							}
 						}
 					}
-
 					$i++;
 				}
 				fclose($fp);
-				
-				if (count($arErrLineFile) > 0)
+
+				if (!empty($arErrLineFile))
 				{
 					foreach($arErrLineFile as $val)
 					{
 						$errors[] = str_replace("#LINE#", $val, GetMessage("TR_TOOLS_ERROR_LINE_FILE"));
 					}
 				}
-				
+
 				foreach ($arr as $file_patt => $arTranslations)
 				{
 					if (is_lang_dir($file_patt, true))
 					{
 						foreach ($arTranslations as $lang_id => $arMessages)
 						{
-							if (count($arMessages) < 1)
+							if (empty($arMessages))
 							{
 								continue;
 							}
@@ -317,7 +352,7 @@ function SaveTCSVFile()
 							$MESS = array();
 							if (!$rewrite && file_exists($_SERVER['DOCUMENT_ROOT'] . $file))
 							{
-								include($_SERVER['DOCUMENT_ROOT'] . $file);
+								include($_SERVER['DOCUMENT_ROOT'].$file);
 								if (!is_array($MESS))
 								{
 									$MESS = array();
@@ -326,7 +361,7 @@ function SaveTCSVFile()
 
 							$MESS = array_merge($MESS, $arMessages);
 
-							if(count($MESS) > 0)
+							if(!empty($MESS))
 							{
 								$strMess = "";
 								foreach ($MESS as $key => $value)
@@ -335,7 +370,8 @@ function SaveTCSVFile()
 									$strMess .= '$MESS["'.EscapePHPString($key).'"] = "'.EscapePHPString($value).'";'."\n";
 								}
 
-								if (!TR_BACKUP($file)) {
+								if (!TR_BACKUP($file))
+								{
 									$errors[] = GetMessage("TR_TOOLS_ERROR_CREATE_BACKUP", array('%FILE%' => $file));
 								}
 								else
@@ -365,9 +401,9 @@ function SaveTCSVFile()
 		$errors[] = GetMessage('TR_TOOLS_ERROR_RIGHTS');
 	}
 
-	if (count($errors) > 0)
+	if (!empty($errors))
 	{
-		$GLOBALS['APPLICATION']->ThrowException(implode('<br>', $errors));
+		$APPLICATION->ThrowException(implode('<br>', $errors));
 		return false;
 	}
 	return true;
@@ -376,8 +412,11 @@ function SaveTCSVFile()
 function GetTLangList()
 {
 	$arTLangs = array();
-	$ln = @CLanguage::GetList($o, $b, Array("ACTIVE"=>"Y"));
-	while ($lnr = $ln->Fetch())	$arTLangs[] = $lnr["LID"];
+	$o = 'sort';
+	$b = 'asc';
+	$ln = CLanguage::GetList($o, $b, array("ACTIVE"=>"Y"));
+	while ($lnr = $ln->Fetch())
+		$arTLangs[] = $lnr["LID"];
 	return $arTLangs;
 }
 
@@ -438,9 +477,8 @@ function TSEARCH($file, &$count)
 
 	$_mess = __IncludeLang($file, true);
 
-	if (!is_array($_mess)) {
+	if (!is_array($_mess))
 		return false;
-	}
 
 	$_phrase = $phrase = $arSearchParam['search'];
 	if (!$arSearchParam['bCaseSens'])
@@ -549,12 +587,10 @@ function TR_BACKUP($file)
 {
 	$bReturn = true;
 
-	if (COption::GetOptionString('translate', 'BACKUP_FILES', 'N') == 'Y') {
-
+	if (COption::GetOptionString('translate', 'BACKUP_FILES', 'N') == 'Y')
+	{
 		if (strpos($file, $_SERVER["DOCUMENT_ROOT"]) === 0)
-		{
 			$file = str_replace($_SERVER["DOCUMENT_ROOT"], '', $file);
-		}
 
 		$backUPPath = $_SERVER["DOCUMENT_ROOT"].'/bitrix/tmp/translate/_backup'.dirname($file).'/';
 
@@ -567,7 +603,8 @@ function TR_BACKUP($file)
 			if (file_exists($backUPPath.$_backUPFile))
 			{
 				$i = 1;
-				while (file_exists($backUPPath.'/'.$_backUPFile)) {
+				while (file_exists($backUPPath.'/'.$_backUPFile))
+				{
 					$i++;
 					$_backUPFile = $prfx.'_'.$i.'_'.$backUPFile;
 				}
@@ -575,7 +612,9 @@ function TR_BACKUP($file)
 
 			@copy($_SERVER['DOCUMENT_ROOT'].$file, $backUPPath.$_backUPFile);
 			@chmod($backUPPath.$_backUPFile, BX_FILE_PERMISSIONS);
-		} else {
+		}
+		else
+		{
 			$bReturn = false;
 		}
 	}

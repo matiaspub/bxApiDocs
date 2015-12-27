@@ -136,6 +136,11 @@ class CAllForumUser
 
 	public static function CheckFields($ACTION, &$arFields, $ID=false)
 	{
+		if (is_set($arFields, "AVATAR") && strlen($arFields["AVATAR"]["name"]) <= 0 && strlen($arFields["AVATAR"]["del"]) <= 0)
+		{
+			unset($arFields["AVATAR"]);
+		}
+
 		$aMsg = array();
 		// Checking user for updating or adding
 		// USER_ID as value
@@ -147,25 +152,36 @@ class CAllForumUser
 		}
 		elseif (is_set($arFields, "USER_ID"))
 		{
-			$db_res = CUser::GetByID($arFields["USER_ID"]);
-			if (!$db_res->Fetch())
+			$user = CUser::GetByID($arFields["USER_ID"])->fetch();
+			if (empty($user))
 			{
 				$aMsg[] = array(
-					"id" => 'USER_IS_NOT_EXIST',
+					"id" => 'USER_DOES_NOT_EXIST',
 					"text" => GetMessage("F_GL_ERR_USER_NOT_EXIST", array("#UID#" => htmlspecialcharsbx($arFields["USER_ID"]))));
 			}
 
-			$res = CForumUser::GetByUSER_ID(intVal($arFields["USER_ID"]));
+			$res = CForumUser::GetByUSER_ID($arFields["USER_ID"]);
 
-			if ($ACTION == "ADD" && intVal($res["ID"]) > 0)
-			{
-				$aMsg[] = array(
-					"id" => 'USER_IS_EXIST',
-					"text" => GetMessage("F_GL_ERR_USER_IS_EXIST", array("#UID#" => htmlspecialcharsbx($arFields["USER_ID"]))));
-			}
-			elseif ($ACTION == "UPDATE")
+			if ($ACTION == "UPDATE")
 			{
 				unset($arFields["USER_ID"]);
+			}
+			else if (!empty($res))
+			{
+				$aMsg[] = array(
+					"id" => 'USER_EXISTS',
+					"text" => GetMessage("F_GL_ERR_USER_IS_EXIST", array("#UID#" => htmlspecialcharsbx($arFields["USER_ID"]))));
+			}
+			else if (!array_key_exists("AVATAR", $arFields) && $user["PERSONAL_PHOTO"] > 0)
+			{
+				$arFields["AVATAR"] = CFile::MakeFileArray($user["PERSONAL_PHOTO"]);
+				if (!$arFields["AVATAR"] || CFile::ResizeImage($arFields["AVATAR"], array(
+					"width" => COption::GetOptionInt("forum", "avatar_max_width", 100),
+					"height" => COption::GetOptionInt("forum", "avatar_max_height", 100)))
+				)
+				{
+					unset($arFields["AVATAR"]);
+				}
 			}
 		}
 		// last visit
@@ -203,17 +219,20 @@ class CAllForumUser
 			}
 		}
 		// avatar
-		if (is_set($arFields, "AVATAR") && strLen($arFields["AVATAR"]["name"]) <= 0 && strLen($arFields["AVATAR"]["del"]) <= 0)
-		{
-			unset($arFields["AVATAR"]);
-		}
 		if (is_set($arFields, "AVATAR"))
 		{
-			$max_size = COption::GetOptionInt("forum", "avatar_max_size", 10000);
-			$max_width = COption::GetOptionInt("forum", "avatar_max_width", 90);
-			$max_height = COption::GetOptionInt("forum", "avatar_max_height", 90);
-			$res = CFile::CheckImageFile($arFields["AVATAR"], $max_size, $max_width, $max_height);
-			if (strLen($res) > 0)
+			$max_size = COption::GetOptionInt("forum", "file_max_size", 5242880);
+			$size = array(
+				"width" => COption::GetOptionInt("forum", "avatar_max_width", 100),
+				"height" => COption::GetOptionInt("forum", "avatar_max_height", 100));
+			$res = CFile::CheckImageFile($arFields["AVATAR"], $max_size);
+			if (strlen($res) <= 0)
+			{
+				$res = CFile::CheckImageFile($arFields["AVATAR"], $max_size, $size["width"], $size["height"]);
+				if (strlen($res) > 0 && CFile::ResizeImage($arFields["AVATAR"], $size))
+					$res = '';
+			}
+			if (strlen($res) > 0)
 			{
 				$aMsg[] = array(
 					"id" => 'AVATAR',
@@ -243,6 +262,35 @@ class CAllForumUser
 		return True;
 	}
 
+	
+	/**
+	* <p>Создает новый профайл с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного профайла.</p>
+	*
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">списке полей
+	* профайла пользователя</a>. Обязательные поля должны быть
+	* заполнены.
+	*
+	* @param string $strUploadDir = false Каталог для загрузки файлов. Должен быть задан относительно
+	* главного каталога для загрузки. Необязательный. По умолчанию
+	* равен "forum".
+	*
+	* @return int 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumuser">Поля профайла</a> </li>
+	* <li>Перед добавлением профайла следует проверить возможность
+	* добавления методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/canuseradduser.php">CForumUser::CanUserAddUser</a>
+	* </li> </ul> <br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumuser/add.php
+	* @author Bitrix
+	*/
 	public static function Add($arFields, $strUploadDir = false)
 	{
 		global $DB;
@@ -1166,8 +1214,8 @@ class CAllForumUser
 			".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO,
 			".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE,
 			FT.USER_START_NAME,	FT.USER_START_ID, FT.POSTS, FT.LAST_POSTER_NAME,
-			FT.LAST_MESSAGE_ID, FS.IMAGE, '' as IMAGE_DESCR,
-			FT.APPROVED, FT.STATE, FT.FORUM_ID, FT.ICON_ID, FT.SORT, FT.HTML
+			FT.LAST_MESSAGE_ID, '' as IMAGE, '' as IMAGE_DESCR,
+			FT.APPROVED, FT.STATE, FT.FORUM_ID, FT.ICON, FT.SORT, FT.HTML
 		FROM
 		(
 			SELECT FM.TOPIC_ID, COUNT(FM.ID) AS COUNT_MESSAGE, MIN(FM.ID) AS FIRST_POST, MAX(FM.ID) AS LAST_POST
@@ -1178,7 +1226,6 @@ class CAllForumUser
 			GROUP BY FM.TOPIC_ID
 		) FMM
 		LEFT JOIN b_forum_topic FT ON (FT.ID = FMM.TOPIC_ID)
-		LEFT JOIN b_forum_smile FS ON (FT.ICON_ID = FS.ID)
 		".$strSqlOrder;
 
 
@@ -1212,9 +1259,8 @@ class CAllForumUser
 			$db_res = new CDBResult();
 			$db_res->NavQuery($strSql, $cnt, $arNavigation);
 		}
-		$db_res = new _CTopicDBResult($db_res, $arNavigation);
 
-		return $db_res;
+		return new _CTopicDBResult($db_res, $arNavigation);
 	}
 	// <-- Using for private message
 
@@ -1235,6 +1281,16 @@ class CAllForumUser
 			}
 		}
 		return true;
+	}
+
+	public static function OnAfterUserUpdate($arFields = array())
+	{
+		if ($arFields["RESULT"] &&
+			array_key_exists("PERSONAL_PHOTO", $arFields) && $arFields["PERSONAL_PHOTO"] > 0 &&
+			($user = CForumUser::GetByUSER_ID($arFields["ID"])) && $user)
+		{
+			self::Update($user["ID"], array( "AVATAR" => CFile::MakeFileArray($arFields["PERSONAL_PHOTO"]) ));
+		}
 	}
 }
 

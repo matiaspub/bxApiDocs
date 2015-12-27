@@ -28,12 +28,14 @@ class CMailRestService extends IRestService
 			'ID'         => 'ID',
 			'SITE_ID'    => GetMessage('MAIL_MAILSERVICE_SITE_ID'),
 			'ACTIVE'     => GetMessage('MAIL_MAILSERVICE_ACTIVE'),
+			//'SERVICE_TYPE' => GetMessage('MAIL_MAILSERVICE_TYPE'),
 			'NAME'       => GetMessage('MAIL_MAILSERVICE_NAME'),
 			'SERVER'     => GetMessage('MAIL_MAILSERVICE_SERVER'),
 			'PORT'       => GetMessage('MAIL_MAILSERVICE_PORT'),
 			'ENCRYPTION' => GetMessage('MAIL_MAILSERVICE_ENCRYPTION'),
 			'LINK'       => GetMessage('MAIL_MAILSERVICE_LINK'),
 			'ICON'       => GetMessage('MAIL_MAILSERVICE_ICON'),
+			//'TOKEN'      => GetMessage('MAIL_MAILSERVICE_TOKEN'),
 			'SORT'       => GetMessage('MAIL_MAILSERVICE_SORT'),
 		);
 	}
@@ -50,8 +52,8 @@ class CMailRestService extends IRestService
 		$data = array();
 		while ($row = $result->fetch())
 		{
-			$icon = CFile::GetFileArray($row['ICON']);
-			$row['ICON'] = $icon['SRC'];
+			unset($row['SERVICE_TYPE'], $row['TOKEN'], $row['FLAGS']);
+			$row['ICON'] = Bitrix\Mail\MailServicesTable::getIconSrc($row['NAME'], $row['ICON']);
 
 			$data[] = $row;
 		}
@@ -75,8 +77,8 @@ class CMailRestService extends IRestService
 
 		if ($data = $result->fetch())
 		{
-			$icon = CFile::GetFileArray($data['ICON']);
-			$data['ICON'] = $icon['SRC'];
+			unset($data['SERVICE_TYPE'], $data['TOKEN'], $data['FLAGS']);
+			$data['ICON'] = Bitrix\Mail\MailServicesTable::getIconSrc($data['NAME'], $data['ICON']);
 		}
 
 		if (empty($data))
@@ -95,12 +97,14 @@ class CMailRestService extends IRestService
 		$arFields = array(
 			'SITE_ID'    => SITE_ID,
 			'ACTIVE'     => $arParams['ACTIVE'] ?: 'Y',
+			'SERVICE_TYPE' => 'imap',
 			'NAME'       => $arParams['NAME'],
 			'SERVER'     => $arParams['SERVER'],
 			'PORT'       => $arParams['PORT'],
 			'ENCRYPTION' => $arParams['ENCRYPTION'],
 			'LINK'       => $arParams['LINK'],
 			'ICON'       => CRestUtil::saveFile($arParams['ICON']) ?: $arParams['ICON'],
+			//'TOKEN'      => $arParams['TOKEN'],
 			'SORT'       => $arParams['SORT'] ?: 100
 		);
 
@@ -139,6 +143,7 @@ class CMailRestService extends IRestService
 			'ENCRYPTION' => $arParams['ENCRYPTION'],
 			'LINK'       => $arParams['LINK'],
 			'ICON'       => CRestUtil::saveFile($arParams['ICON']) ?: $arParams['ICON'],
+			//'TOKEN'      => $arParams['TOKEN'],
 			'SORT'       => $arParams['SORT']
 		);
 

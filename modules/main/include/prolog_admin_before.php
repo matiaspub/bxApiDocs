@@ -13,7 +13,7 @@ unset($_FILES["BX_STATE"]);
 // define("ADMIN_SECTION", true);
 
 if (isset($_REQUEST['bxpublic']) && $_REQUEST['bxpublic'] == 'Y' && !defined('BX_PUBLIC_MODE'))
-	;// define('BX_PUBLIC_MODE', 1);
+	// define('BX_PUBLIC_MODE', 1);
 
 require_once(dirname(__FILE__)."/../include.php");
 if(!headers_sent())

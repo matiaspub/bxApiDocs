@@ -193,7 +193,9 @@ class CListFieldList
 			$arFormLayout[] = "SECTIONS--#--".CIBlock::GetArrayByID($this->iblock_id, "SECTION_NAME");
 			$tab2 = implode("--,--", $arFormLayout);
 
-			CUserOptions::DeleteOption("form", $form_id); //This clears custom user settings
+			global $USER;
+			if (is_object($USER) && ((get_class($USER) === 'CUser') || ($USER instanceof CUser)))
+				CUserOptions::DeleteOption("form", $form_id); //This clears custom user settings
 			CUserOptions::SetOption("form", $form_id, array("tabs" => $tab1."--;--".$tab2."--;--"), true);
 		}
 	}

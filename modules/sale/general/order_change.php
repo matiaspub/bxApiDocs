@@ -65,9 +65,10 @@ class CAllSaleOrderChange
 	 * @param int $orderId - order ID
 	 * @param string $type - operation type (@see CSaleOrderChangeFormat for full list of supported operations)
 	 * @param array $data - array of information relevant for the record type (will be used in the record description)
+	 * @param null|string $entityName -
 	 * @return bool
 	 */
-	public static function AddRecord($orderId, $type, $data = array())
+	public static function AddRecord($orderId, $type, $data = array(), $entityName = null, $entityId = null)
 	{
 		global $USER;
 
@@ -80,7 +81,9 @@ class CAllSaleOrderChange
 			"ORDER_ID" => intval($orderId),
 			"TYPE" => $type,
 			"DATA" => (is_array($data) ? serialize($data) : $data),
-			"USER_ID" => $userId
+			"USER_ID" => $userId,
+			"ENTITY" => $entityName,
+			"ENTITY_ID" => $entityId,
 		);
 
 		return CSaleOrderChange::Add($arParams);
@@ -96,15 +99,16 @@ class CAllSaleOrderChange
 	 * @param array $OldFields - old fields with values (retrieved by entity GetById method)
 	 * @param array $NewFields - new array of fields and their values
 	 * @param array $arDeleteFields - array of fields to be ignored
-	 * @param string $entity - name of the entity (empty for order, "BASKET" for basket items etc). Used in filtering operations when creating records automatically
+	 * @param string $entityName - name of the entity (empty for order, "BASKET" for basket items etc). Used in filtering operations when creating records automatically
+	 * @param $entity - entity
 	 * @return bool
 	 */
-	public static function AddRecordsByFields($orderId, $arOldFields, $arNewFields, $arDeleteFields = array(), $entity = "")
+	public static function AddRecordsByFields($orderId, array $arOldFields, array $arNewFields, $arDeleteFields = array(), $entityName = "", $entityId = null, $entity = null, array $data = array())
 	{
 		if ($orderId <= 0)
 			return false;
 
-		if ($entity == "") // for order
+		if ($entityName == "") // for order
 		{
 			if (isset($arNewFields["ID"]))
 				unset($arNewFields["ID"]);
@@ -117,9 +121,12 @@ class CAllSaleOrderChange
 
 			if (!array_key_exists($key, $arOldFields) || (array_key_exists($key, $arOldFields) && strlen($val) > 0 && $val != $arOldFields[$key]) && !in_array($key, $arDeleteFields))
 			{
-				$arRecord = CSaleOrderChange::MakeRecordFromField($key, $arNewFields, $entity);
+				$arRecord = CSaleOrderChange::MakeRecordFromField($key, $arNewFields, $entityName, $entity);
 				if ($arRecord)
-					CSaleOrderChange::AddRecord($orderId, $arRecord["TYPE"], serialize($arRecord["DATA"]));
+				{
+					$data = array_merge($data, $arRecord["DATA"]);
+					CSaleOrderChange::AddRecord($orderId, $arRecord["TYPE"], $data, $entityName, $entityId);
+				}
 			}
 		}
 
@@ -135,18 +142,32 @@ class CAllSaleOrderChange
 	 * @param string $entity - name of the entity (empty for order, "BASKET" for basket items etc). Used in filtering operations when creating records automatically
 	 * @return array with keys: TYPE - operation type @see CSaleOrderChangeFormat, DATA - array of the relevant parameters based on the DATA_FIELDS
 	 */
-	public static function MakeRecordFromField($field, $arFields, $entity = "")
+	public static function MakeRecordFromField($field, $arFields, $entityName = "", $entity = null)
 	{
-		foreach (CSaleOrderChangeFormat::$arOperationTypes as $code => $arInfo)
+		foreach (CSaleOrderChangeFormat::$operationTypes as $code => $arInfo)
 		{
-			if ($entity != "" && (!isset($arInfo["ENTITY"]) || (isset($arInfo["ENTITY"]) && $arInfo["ENTITY"] != $entity)))
+			if ($entityName != "" && (!isset($arInfo["ENTITY"]) || (isset($arInfo["ENTITY"]) && $arInfo["ENTITY"] != $entityName)))
 				continue;
 
 			if (in_array($field, $arInfo["TRIGGER_FIELDS"]))
 			{
 				$arData = array();
-				foreach ($arInfo["DATA_FIELDS"] as $fieldname)
-					$arData[$fieldname] = TruncateText($arFields["$fieldname"], 128);
+				foreach ($arInfo["DATA_FIELDS"] as $fieldName)
+				{
+					if (array_key_exists($fieldName, $arFields))
+					{
+						$value = $arFields[$fieldName];
+					}
+					elseif ($entity !== null)
+					{
+						$value = $entity->getField($fieldName);
+
+						if ($value === null)
+							continue;
+					}
+
+					$arData[$fieldName] = TruncateText($value, 128);
+				}
 
 				return array(
 					"TYPE" => $code,
@@ -170,7 +191,7 @@ class CAllSaleOrderChange
 	 */
 	static public function GetRecordDescription($type, $data)
 	{
-		foreach (CSaleOrderChangeFormat::$arOperationTypes as $typeCode => $arInfo)
+		foreach (CSaleOrderChangeFormat::$operationTypes as $typeCode => $arInfo)
 		{
 			if ($type == $typeCode)
 			{
@@ -188,108 +209,127 @@ class CAllSaleOrderChange
 
 class CSaleOrderChangeFormat
 {
-	public static $arOperationTypes = array(
+	public static $operationTypes = array(
 		"ORDER_DEDUCTED" => array(
 			"TRIGGER_FIELDS" => array("DEDUCTED"),
 			"FUNCTION" => "FormatOrderDeducted",
-			"DATA_FIELDS"   => array("DEDUCTED", "REASON_UNDO_DEDUCTED")
+			"DATA_FIELDS"   => array("DEDUCTED", "REASON_UNDO_DEDUCTED"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_MARKED" => array(
 			"TRIGGER_FIELDS" => array("MARKED"),
 			"FUNCTION" => "FormatOrderMarked",
-			"DATA_FIELDS"   => array("REASON_MARKED", "MARKED")
+			"DATA_FIELDS"   => array("REASON_MARKED", "MARKED"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_RESERVED" => array(
 			"TRIGGER_FIELDS" => array("RESERVED"),
 			"FUNCTION" => "FormatOrderReserved",
-			"DATA_FIELDS" => array("RESERVED")
+			"DATA_FIELDS" => array("RESERVED"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_CANCELED" => array(
 			"TRIGGER_FIELDS" => array("CANCELED"),
 			"FUNCTION" => "FormatOrderCanceled",
-			"DATA_FIELDS"   => array("CANCELED", "REASON_CANCELED")
+			"DATA_FIELDS"   => array("CANCELED", "REASON_CANCELED"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_COMMENTED" => array(
 			"TRIGGER_FIELDS" => array("COMMENTS"),
 			"FUNCTION" => "FormatOrderCommented",
-			"DATA_FIELDS" => array("COMMENTS")
+			"DATA_FIELDS" => array("COMMENTS"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_STATUS_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("STATUS_ID"),
 			"FUNCTION" => "FormatOrderStatusChanged",
-			"DATA_FIELDS" => array("STATUS_ID")
+			"DATA_FIELDS" => array("STATUS_ID"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_DELIVERY_ALLOWED" => array(
 			"TRIGGER_FIELDS" => array("ALLOW_DELIVERY"),
 			"FUNCTION" => "FormatOrderDeliveryAllowed",
-			"DATA_FIELDS" => array("ALLOW_DELIVERY")
+			"DATA_FIELDS" => array("ALLOW_DELIVERY"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_DELIVERY_DOC_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("DELIVERY_DOC_NUM"),
 			"FUNCTION" => "FormatOrderDeliveryDocChanged",
-			"DATA_FIELDS" => array("DELIVERY_DOC_NUM", "DELIVERY_DOC_DATE")
+			"DATA_FIELDS" => array("DELIVERY_DOC_NUM", "DELIVERY_DOC_DATE"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_PAYMENT_SYSTEM_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("PAY_SYSTEM_ID"),
 			"FUNCTION" => "FormatOrderPaymentSystemChanged",
-			"DATA_FIELDS" => array("PAY_SYSTEM_ID")
+			"DATA_FIELDS" => array("PAY_SYSTEM_ID"),
+			"ENTITY" => 'PAYMENT',
 		),
 		"ORDER_PAYMENT_VOUCHER_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("PAY_VOUCHER_NUM"),
 			"FUNCTION" => "FormatOrderPaymentVoucherChanged",
-			"DATA_FIELDS" => array("PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE")
+			"DATA_FIELDS" => array("PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE"),
+			"ENTITY" => 'PAYMENT',
 		),
 		"ORDER_DELIVERY_SYSTEM_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("DELIVERY_ID"),
 			"FUNCTION" => "FormatOrderDeliverySystemChanged",
-			"DATA_FIELDS" => array("DELIVERY_ID")
+			"DATA_FIELDS" => array("DELIVERY_ID"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_PERSON_TYPE_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("PERSON_TYPE_ID"),
 			"FUNCTION" => "FormatOrderPersonTypeChanged",
-			"DATA_FIELDS" => array("PERSON_TYPE_ID")
+			"DATA_FIELDS" => array("PERSON_TYPE_ID"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_PAYED" => array(
 			"TRIGGER_FIELDS" => array("PAYED"),
 			"FUNCTION" => "FormatOrderPayed",
-			"DATA_FIELDS" => array("PAYED")
+			"DATA_FIELDS" => array("PAYED"),
+			"ENTITY" => 'PAYMENT',
 		),
 		"ORDER_TRACKING_NUMBER_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("TRACKING_NUMBER"),
 			"FUNCTION" => "FormatOrderTrackingNumberChanged",
-			"DATA_FIELDS" => array("TRACKING_NUMBER")
+			"DATA_FIELDS" => array("TRACKING_NUMBER"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_USER_DESCRIPTION_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("USER_DESCRIPTION"),
 			"FUNCTION" => "FormatOrderUserDescriptionChanged",
-			"DATA_FIELDS" => array("USER_DESCRIPTION")
+			"DATA_FIELDS" => array("USER_DESCRIPTION"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_PRICE_DELIVERY_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("PRICE_DELIVERY"),
 			"FUNCTION" => "FormatOrderPriceDeliveryChanged",
-			"DATA_FIELDS" => array("PRICE_DELIVERY", "CURRENCY")
+			"DATA_FIELDS" => array("PRICE_DELIVERY", "CURRENCY"),
+			"ENTITY" => 'SHIPMENT',
 		),
 		"ORDER_PRICE_CHANGED" => array(
 			"TRIGGER_FIELDS" => array("PRICE"),
 			"FUNCTION" => "FormatOrderPriceChanged",
-			"DATA_FIELDS" => array("PRICE", "CURRENCY")
+			"DATA_FIELDS" => array("PRICE", "OLD_PRICE", "CURRENCY"),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_1C_IMPORT" => array(
 			"TRIGGER_FIELDS" => array(),
 			"FUNCTION" => "FormatOrder1CImport",
-			"DATA_FIELDS" => array()
+			"DATA_FIELDS" => array(),
+			"ENTITY" => 'ORDER',
 		),
 		"ORDER_ADDED" => array(
 			"TRIGGER_FIELDS" => array(),
 			"FUNCTION" => "FormatOrderAdded",
-			"DATA_FIELDS" => array()
+			"DATA_FIELDS" => array(),
+			"ENTITY" => 'ORDER',
 		),
 
 		"BASKET_ADDED" => array(
 			"ENTITY" => "BASKET",
 			"TRIGGER_FIELDS" => array(),
 			"FUNCTION" => "FormatBasketAdded",
-			"DATA_FIELDS" => array("PRODUCT_ID", "NAME", "QUANTITY")
+			"DATA_FIELDS" => array("PRODUCT_ID", "NAME", "QUANTITY"),
 		),
 		"BASKET_REMOVED" => array(
 			"ENTITY" => "BASKET",
@@ -313,6 +353,153 @@ class CSaleOrderChangeFormat
 			"TRIGGER_FIELDS" => array(),
 			"FUNCTION" => "FormatOrderDeliveryRequestSent",
 			"DATA_FIELDS" => array()
+		),
+
+		"PAYMENT_ADDED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatPaymentAdded",
+			"DATA_FIELDS" => array("PAY_SYSTEM_NAME", "SUM"),
+			"ENTITY" => 'PAYMENT'
+		),
+
+		"PAYMENT_REMOVED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatPaymentRemoved",
+			"DATA_FIELDS" => array("PAY_SYSTEM_ID", "PAY_SYSTEM_NAME"),
+			"ENTITY" => "PAYMENT",
+		),
+
+		"PAYMENT_PAID" => array(
+			"TRIGGER_FIELDS" => array("PAID"),
+			"FUNCTION" => "FormatPaymentPaid",
+			"DATA_FIELDS" => array("PAID", "ID", "PAY_SYSTEM_NAME"),
+			"ENTITY" => 'PAYMENT'
+		),
+
+		"PAYMENT_SYSTEM_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("PAY_SYSTEM_ID"),
+			"FUNCTION" => "FormatPaymentSystemChanged",
+			"DATA_FIELDS" => array("PAY_SYSTEM_ID"),
+			"ENTITY" => 'PAYMENT'
+		),
+		"PAYMENT_VOUCHER_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("PAY_VOUCHER_NUM"),
+			"FUNCTION" => "FormatPaymentVoucherChanged",
+			"DATA_FIELDS" => array("PAY_VOUCHER_NUM", "PAY_VOUCHER_DATE"),
+			"ENTITY" => 'PAYMENT'
+		),
+
+		"PAYMENT_PRICE_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("PRICE"),
+			"FUNCTION" => "FormatPaymentPriceChanged",
+			"DATA_FIELDS" => array("PRICE", "CURRENCY"),
+			"ENTITY" => 'PAYMENT'
+		),
+
+		"SHIPMENT_ADDED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatShipmentAdded",
+			"DATA_FIELDS" => array('DELIVERY_NAME'),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_REMOVED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatShipmentRemoved",
+			"DATA_FIELDS" => array("ID", "DELIVERY_NAME"),
+			"ENTITY" => "SHIPMENT",
+		),
+
+		"SHIPMENT_ITEM_BASKET_ADDED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatShipmentItemBasketAdded",
+			"DATA_FIELDS" => array("PRODUCT_ID", "NAME", "QUANTITY"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_ITEM_BASKET_REMOVED" => array(
+			"TRIGGER_FIELDS" => array(),
+			"FUNCTION" => "FormatShipmentItemBasketRemoved",
+			"DATA_FIELDS" => array("PRODUCT_ID", "NAME", "QUANTITY"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+
+		"SHIPMENT_DELIVERY_ALLOWED" => array(
+			"TRIGGER_FIELDS" => array("ALLOW_DELIVERY"),
+			"FUNCTION" => "FormatShipmentDeliveryAllowed",
+			"DATA_FIELDS" => array("ALLOW_DELIVERY"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_SHIPPED" => array(
+			"TRIGGER_FIELDS" => array("DEDUCTED"),
+			"FUNCTION" => "FormatShipmentDeducted",
+			"DATA_FIELDS" => array("DELIVERY_NAME", "DEDUCTED"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_MARKED" => array(
+			"TRIGGER_FIELDS" => array("MARKED"),
+			"FUNCTION" => "FormatShipmentMarked",
+			"DATA_FIELDS" => array("REASON_MARKED", "MARKED"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_RESERVED" => array(
+			"TRIGGER_FIELDS" => array("RESERVED"),
+			"FUNCTION" => "FormatShipmentReserved",
+			"DATA_FIELDS" => array("RESERVED"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_CANCELED" => array(
+			"TRIGGER_FIELDS" => array("CANCELED"),
+			"FUNCTION" => "FormatShipmentCanceled",
+			"DATA_FIELDS"   => array("CANCELED", "REASON_CANCELED"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_STATUS_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("STATUS_ID"),
+			"FUNCTION" => "FormatShipmentStatusChanged",
+			"DATA_FIELDS" => array("STATUS_ID"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_DELIVERY_DOC_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("DELIVERY_DOC_NUM"),
+			"FUNCTION" => "FormatShipmentDeliveryDocChanged",
+			"DATA_FIELDS" => array("DELIVERY_DOC_NUM", "DELIVERY_DOC_DATE"),
+			"ENTITY" => 'SHIPMENT'
+		),
+
+		"SHIPMENT_TRACKING_NUMBER_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("TRACKING_NUMBER"),
+			"FUNCTION" => "FormatShipmentTrackingNumberChanged",
+			"DATA_FIELDS" => array("TRACKING_NUMBER"),
+			"ENTITY" => 'SHIPMENT',
+		),
+
+		"SHIPMENT_PRICE_DELIVERY_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("PRICE_DELIVERY"),
+			"FUNCTION" => "FormatShipmentPriceDeliveryChanged",
+			"DATA_FIELDS" => array("PRICE_DELIVERY", "CURRENCY"),
+			"ENTITY" => 'SHIPMENT',
+		),
+
+		"SHIPMENT_AMOUNT_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("QUANTITY"),
+			"FUNCTION" => "FormatShipmentQuantityChanged",
+			"DATA_FIELDS" => array("QUANTITY"),
+			"ENTITY" => 'SHIPMENT_ITEM_STORE',
+		),
+
+		"SHIPMENT_QUANTITY_CHANGED" => array(
+			"TRIGGER_FIELDS" => array("QUANTITY"),
+			"FUNCTION" => "FormatShipmentQuantityChanged",
+			"DATA_FIELDS" => array("QUANTITY", "ORDER_DELIVERY_ID", "NAME", "PRODUCT_ID"),
+			"ENTITY" => 'SHIPMENT_ITEM',
 		),
 
 	);
@@ -580,7 +767,7 @@ class CSaleOrderChangeFormat
 
 	public static function FormatOrderPriceDeliveryChanged($arData)
 	{
-		$info = GetMessage("SOC_ORDER_PRICE_DELIVERY_CHANGED_INFO", array("#AMOUNT#" => CurrencyFormat($arData["PRICE_DELIVERY"], $arData["CURRENCY"])));
+		$info = GetMessage("SOC_ORDER_PRICE_DELIVERY_CHANGED_INFO", array("#AMOUNT#" => CCurrencyLang::CurrencyFormat($arData["PRICE_DELIVERY"], $arData["CURRENCY"], true)));
 
 		return array(
 			"NAME" => GetMessage("SOC_ORDER_PRICE_DELIVERY_CHANGED"),
@@ -590,7 +777,11 @@ class CSaleOrderChangeFormat
 
 	public static function FormatOrderPriceChanged($arData)
 	{
-		$info = GetMessage("SOC_ORDER_PRICE_CHANGED_INFO", array("#AMOUNT#" => CurrencyFormat($arData["PRICE"], $arData["CURRENCY"])));
+		$info = GetMessage("SOC_ORDER_PRICE_CHANGED_INFO",
+						   array(
+							   "#AMOUNT#" => CCurrencyLang::CurrencyFormat($arData["PRICE"], $arData["CURRENCY"], true),
+							   "#OLD_AMOUNT#" => CCurrencyLang::CurrencyFormat($arData["OLD_PRICE"], $arData["CURRENCY"], true),
+						   ));
 
 		return array(
 			"NAME" => GetMessage("SOC_ORDER_PRICE_CHANGED"),
@@ -634,7 +825,7 @@ class CSaleOrderChangeFormat
 		foreach ($arData as $param => $value)
 			$info = str_replace("#".$param."#", $value, $info);
 
-		$info = str_replace("#AMOUNT#", CurrencyFormat($arData["PRICE"], $arData["CURRENCY"]), $info);
+		$info = str_replace("#AMOUNT#", CCurrencyLang::CurrencyFormat($arData["PRICE"], $arData["CURRENCY"], true), $info);
 
 		return array(
 			"NAME" => GetMessage("SOC_BASKET_PRICE_CHANGED"),
@@ -665,4 +856,194 @@ class CSaleOrderChangeFormat
 		);
 	}
 
+
+	public static function FormatPaymentPaid($arData)
+	{
+		$info = ($arData["PAID"] == "Y") ? GetMessage("SOC_PAYMENT_PAID_Y") : GetMessage("SOC_PAYMENT_PAID_N");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_PAYMENT_PAID"),
+			"INFO" => $info
+		);
+	}
+
+	public static function FormatShipmentDeliveryAllowed($arData)
+	{
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_ALLOWED"),
+			"INFO" => ($arData["ALLOW_DELIVERY"] == "Y") ? GetMessage("SOC_SHIPMENT_ALLOWED_Y") : GetMessage("SOC_SHIPMENT_ALLOWED_N")
+		);
+	}
+
+	public static function FormatShipmentAdded($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_CREATE_INFO");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_CREATE"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatShipmentItemBasketAdded($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_ITEM_BASKET_ADDED_INFO");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_ITEM_BASKET_ADDED"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatShipmentItemBasketRemoved($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_ITEM_BASKET_REMOVED_INFO");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_ITEM_BASKET_REMOVED"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatShipmentRemoved($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_REMOVED_INFO");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_REMOVED"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatPaymentAdded($arData)
+	{
+		$info = GetMessage("SOC_PAYMENT_CREATE_INFO");
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_PAYMENT_CREATE"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatPaymentRemoved($data)
+	{
+		$info = GetMessage("SOC_PAYMENT_REMOVED_INFO");
+		foreach ($data as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_PAYMENT_REMOVED"),
+			"INFO" => $info,
+		);
+	}
+
+	public static function FormatShipmentDeducted($arData)
+	{
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_DEDUCTED"),
+			"INFO" => ($arData["DEDUCTED"] == "Y") ? GetMessage("SOC_SHIPMENT_DEDUCTED_Y") : GetMessage("SOC_SHIPMENT_DEDUCTED_N")
+		);
+	}
+
+	public static function FormatShipmentReserved($arData)
+	{
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_RESERVED"),
+			"INFO" => ($arData["RESERVED"] == "Y") ? GetMessage("SOC_SHIPMENT_RESERVED_Y") : GetMessage("SOC_SHIPMENT_RESERVED_N")
+		);
+	}
+
+	public static function FormatPaymentSystemChanged($arData)
+	{
+		$info = GetMessage("SOC_PAYMENT_PAY_SYSTEM_CHANGE_INFO");
+
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_PAYMENT_PAY_SYSTEM_CHANGE"),
+			"INFO" => $info
+		);
+	}
+
+	public static function FormatShipmentPriceDeliveryChanged($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_PRICE_DELIVERY_CHANGED_INFO");
+
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_PRICE_DELIVERY_CHANGED"),
+			"INFO" => $info
+		);
+	}
+
+	public static function FormatPaymentVoucherChanged($arData)
+	{
+		return self::FormatOrderPaymentVoucherChanged($arData);
+	}
+
+	public static function FormatPaymentPriceChanged($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_PRICE_DELIVERY_CHANGED_INFO");
+
+		foreach ($arData as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_PRICE_DELIVERY_CHANGED"),
+			"INFO" => $info
+		);
+	}
+
+	public static function FormatShipmentTrackingNumberChanged($arData)
+	{
+		return self::FormatOrderTrackingNumberChanged($arData);
+	}
+
+	public static function FormatShipmentDeliveryDocChanged($arData)
+	{
+		return self::FormatOrderDeliveryDocChanged($arData);
+	}
+
+	public static function FormatShipmentStatusChanged($arData)
+	{
+		$info = GetMessage("SOC_SHIPMENT_STATUS_CHANGE_INFO");
+
+		foreach ($arData as $param => $value)
+		{
+			$status = \Bitrix\Sale\Helpers\Admin\Blocks\OrderShipmentStatus::getShipmentStatusList();
+			$info = str_replace("#".$param."#", $status[$value], $info);
+		}
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_STATUS_CHANGE"),
+			"INFO" => $info
+		);
+	}
+	public static function FormatShipmentQuantityChanged($data)
+	{
+		$info = GetMessage("SOC_SHIPMENT_ITEM_QUANTITY_CHANGE_INFO");
+
+		foreach ($data as $param => $value)
+			$info = str_replace("#".$param."#", $value, $info);
+
+		return array(
+			"NAME" => GetMessage("SOC_SHIPMENT_ITEM_QUANTITY_CHANGE"),
+			"INFO" => $info
+		);
+	}
 }

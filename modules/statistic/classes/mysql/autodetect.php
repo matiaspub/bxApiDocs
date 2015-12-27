@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>.</body> </html>
- *
- *
+ * <b>CAutoDetect</b> - класс для поиска неизвестных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>. 
  *
  *
  * @return mixed 
@@ -16,20 +14,14 @@ class CAutoDetect
 {
 	
 	/**
-	* <p>Возвращает список незнакомых <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>. Функция анализирует список сессий, и собирает все UserAgent'ы которые не принадлежат ни одной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a> и ни одному браузеру (UserAgent'ы браузеров задаются в настройках модуля "Статистика").</p>
-	*
-	*
+	* <p>Возвращает список незнакомых <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent'ов</a>. Метод анализирует список сессий, и собирает все UserAgent'ы которые не принадлежат ни одной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a> и ни одному браузеру (UserAgent'ы браузеров задаются в настройках модуля "Статистика").</p>
 	*
 	*
 	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_user_agent</b> - UserAgent;
 	* </li> <li> <b>s_counter</b> - количество сессий. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>LAST</b> - флаг определяющий какие
@@ -43,15 +35,10 @@ class CAutoDetect
 	* сессий". </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка UserAgent'ов. Если значение равно "true",
 	* то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -76,7 +63,6 @@ class CAutoDetect
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

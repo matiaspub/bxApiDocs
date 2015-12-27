@@ -1,31 +1,25 @@
 <?
 class CAllUserCounter
 {
+	const ALL_SITES = '**';
+	const SYSTEM_USER_ID = 0;
+
 	protected static $counters = false;
 
 	
 	/**
-	* <p>Функция предназначена для получения определенного счетчика пользователя.</p>
-	*
-	*
+	* <p>Метод предназначена для получения определенного счетчика пользователя. Статичный метод.</p>
 	*
 	*
 	* @param user_i $d  Идентификатор пользователя
 	*
-	*
-	*
 	* @param cod $e  Код счётчика
-	*
-	*
 	*
 	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
 	* подставляется текущий сайт.
 	*
-	*
-	*
 	* @return mixed <p>Возвращаются данные определенного счетчика пользователя.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -41,7 +35,7 @@ class CAllUserCounter
 	{
 		$user_id = intval($user_id);
 
-		if ($user_id <= 0)
+		if ($user_id < 0)
 			return false;
 
 		$arCodes = self::GetValues($user_id, $site_id);
@@ -53,23 +47,16 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Функция позволяет получить список всех счетчиков пользователя.</p>
+	* <p>Метод позволяет получить список всех счетчиков пользователя. Статичный метод.</p>
 	*
 	*
+	* @param mixed $user_id  Идентификатор пользователя, обязательный параметр.
 	*
-	*
-	* @param $user_i $d  Идентификатор пользователя, обязательный параметр.
-	*
-	*
-	*
-	* @param $site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* @param mixed $site_id = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
 	* принимает значение текущего сайта.
-	*
-	*
 	*
 	* @return mixed <p>Список счётчиков конкретного пользователя на сайте.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -82,13 +69,26 @@ class CAllUserCounter
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getvalues.php
 	* @author Bitrix
 	*/
-	public static function GetValues($user_id, $site_id = SITE_ID)
+	public static function GetValues($user_id, $site_id = SITE_ID, &$arLastDate = array())
 	{
 		global $DB, $CACHE_MANAGER;
+		static $diff;
 
 		$user_id = intval($user_id);
-		if ($user_id <= 0)
+		if ($user_id < 0)
+		{
 			return array();
+		}
+
+		if (!is_array($arLastDate))
+		{
+			$arLastDate = array();
+		}
+
+		if ($diff === false)
+		{
+			$diff = CTimeZone::GetOffset();
+		}
 
 		if(!isset(self::$counters[$user_id][$site_id]))
 		{
@@ -102,11 +102,29 @@ class CAllUserCounter
 				{
 					foreach($arAll as $arItem)
 					{
-						if ($arItem["SITE_ID"] == $site_id || $arItem["SITE_ID"] == '**')
+						if (
+							$arItem["SITE_ID"] == $site_id
+							|| $arItem["SITE_ID"] == self::ALL_SITES
+						)
 						{
 							if (!isset(self::$counters[$user_id][$site_id][$arItem["CODE"]]))
+							{
 								self::$counters[$user_id][$site_id][$arItem["CODE"]] = 0;
+							}
 							self::$counters[$user_id][$site_id][$arItem["CODE"]] += $arItem["CNT"];
+
+							if (isset($arItem["LAST_DATE_TS"]))
+							{
+								if (!isset($arLastDate[$user_id]))
+								{
+									$arLastDate[$user_id] = array();
+								}
+								if (!isset($arLastDate[$user_id][$site_id]))
+								{
+									$arLastDate[$user_id][$site_id] = array();
+								}
+								$arLastDate[$user_id][$site_id][$arItem["CODE"]] = $arItem["LAST_DATE_TS"] - $diff;
+							}
 						}
 					}
 				}
@@ -114,24 +132,41 @@ class CAllUserCounter
 			else
 			{
 				$strSQL = "
-					SELECT CODE, SITE_ID, CNT
+					SELECT CODE, SITE_ID, CNT, ".$DB->DatetimeToTimestampFunction("LAST_DATE")." LAST_DATE_TS
 					FROM b_user_counter
 					WHERE USER_ID = ".$user_id;
 
 				$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$arAll = array();
+
 				while ($arRes = $dbRes->Fetch())
 				{
+					$code = (strpos($arRes["CODE"], "**") === 0 ? "**" : $arRes["CODE"]);
+					$arRes["CODE"] = $code;
+
 					$arAll[] = $arRes;
-					if ($arRes["SITE_ID"] == $site_id || $arRes["SITE_ID"] == '**')
+					if ($arRes["SITE_ID"] == $site_id || $arRes["SITE_ID"] == self::ALL_SITES)
 					{
 						if (!isset(self::$counters[$user_id][$site_id][$arRes["CODE"]]))
+						{
 							self::$counters[$user_id][$site_id][$arRes["CODE"]] = 0;
+						}
 						self::$counters[$user_id][$site_id][$arRes["CODE"]] += $arRes["CNT"];
+						if (!isset($arLastDate[$user_id]))
+						{
+							$arLastDate[$user_id] = array();
+						}
+						if (!isset($arLastDate[$user_id][$site_id]))
+						{
+							$arLastDate[$user_id][$site_id] = array();
+						}
+						$arLastDate[$user_id][$site_id][$arRes["CODE"]] = $arRes["LAST_DATE_TS"]  - $diff;
 					}
 				}
 				if (CACHED_b_user_counter !== false)
+				{
 					$CACHE_MANAGER->Set("user_counter".$user_id, $arAll);
+				}
 			}
 		}
 
@@ -140,14 +175,10 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Функция позволяет получить все значения для всех доступных сайтов.</p>
+	* <p>Метод позволяет получить все значения для всех доступных сайтов. Статичный метод.</p>
 	*
 	*
-	*
-	*
-	* @param $user_i $d  Идентификатор пользователя, обязательный параметр.
-	*
-	*
+	* @param mixed $user_id  Идентификатор пользователя, обязательный параметр.
 	*
 	* @return mixed <p>Возвращает все значения для всех доступных сайтов.</p> <br><br>
 	*
@@ -161,7 +192,7 @@ class CAllUserCounter
 
 		$arCounters = Array();
 		$user_id = intval($user_id);
-		if ($user_id <= 0)
+		if ($user_id < 0)
 			return $arCounters;
 
 		$arSites = Array();
@@ -191,7 +222,7 @@ class CAllUserCounter
 
 		foreach($arAll as $arItem)
 		{
-			if ($arItem['SITE_ID'] == '**')
+			if ($arItem['SITE_ID'] == self::ALL_SITES)
 			{
 				foreach ($arSites as $siteId)
 				{
@@ -218,14 +249,14 @@ class CAllUserCounter
 		global $DB;
 
 		$user_id = intval($user_id);
-		if ($user_id <= 0 || strlen($code) <= 0)
+		if ($user_id < 0 || strlen($code) <= 0)
 			return 0;
 
 		$strSQL = "
 			SELECT ".$DB->DateToCharFunction("LAST_DATE", "FULL")." LAST_DATE
 			FROM b_user_counter
 			WHERE USER_ID = ".$user_id."
-			AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')
+			AND (SITE_ID = '".$site_id."' OR SITE_ID = '".self::ALL_SITES."')
 			AND CODE = '".$DB->ForSql($code)."'
 		";
 
@@ -239,14 +270,10 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Функция позволяет обнулить все счётчики пользователя.</p>
-	*
-	*
+	* <p>Метод позволяет обнулить все счётчики пользователя. Статичный метод.</p>
 	*
 	*
 	* @param user_i $d  Идентификатор пользователя
-	*
-	*
 	*
 	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
 	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
@@ -255,11 +282,8 @@ class CAllUserCounter
 	* данный счетчик не требуется пробрасывать, необходимо указать
 	* <i>false</i>. По умолчанию <i>true</i>.
 	*
-	*
-	*
 	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -276,17 +300,17 @@ class CAllUserCounter
 		global $DB, $CACHE_MANAGER;
 
 		$user_id = intval($user_id);
-		if ($user_id <= 0)
+		if ($user_id < 0)
 			return false;
 
 		$strSQL = "
 			UPDATE b_user_counter SET
 			CNT = 0
 			WHERE USER_ID = ".$user_id."
-			AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
+			AND (SITE_ID = '".$site_id."' OR SITE_ID = '".self::ALL_SITES."')";
 		$DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		if ($site_id == '**')
+		if ($site_id == self::ALL_SITES)
 		{
 			if (self::$counters)
 				unset(self::$counters[$user_id]);
@@ -307,22 +331,14 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод производит удаление счетчиков по тегу.</p>
-	*
-	*
+	* <p>Метод производит удаление счетчиков по тегу. Статичный метод.</p>
 	*
 	*
 	* @param ta $g  Тег, по которому будут удалены счётчики.
 	*
-	*
-	*
 	* @param cod $e  Код удаляемого счётчика. </htm
 	*
-	*
-	*
 	* @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
-	*
-	*
 	*
 	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
 	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
@@ -331,11 +347,8 @@ class CAllUserCounter
 	* данный счетчик не требуется пробрасывать, необходимо указать
 	* <i>false</i>. По умолчанию <i>true</i>.
 	*
-	*
-	*
 	* @return mixed <p>Возвращает <i>true</i> если успешно, <i>false</i> если какая то ошибка.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -358,7 +371,7 @@ class CAllUserCounter
 			UPDATE b_user_counter SET
 			CNT = 0
 			WHERE TAG = '".$DB->ForSQL($tag)."' AND CODE = '".$DB->ForSQL($code)."'
-			AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
+			AND (SITE_ID = '".$site_id."' OR SITE_ID = '".self::ALL_SITES."')";
 		$DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		self::$counters = false;
@@ -374,18 +387,22 @@ class CAllUserCounter
 				$arSites[] = $row['ID'];
 
 			$strSQL = "
-				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				SELECT pc.CHANNEL_ID, pc.CHANNEL_TYPE, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
 				FROM b_user_counter uc
 				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
 				WHERE TAG = '".$DB->ForSQL($tag)."' AND CODE = '".$DB->ForSQL($code)."'
-				AND (SITE_ID = '".$site_id."' OR SITE_ID = '**')";
+				AND (SITE_ID = '".$site_id."' OR SITE_ID = '".self::ALL_SITES."')";
 
 			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 			$pullMessage = Array();
 			while ($row = $res->Fetch())
 			{
-				if ($row['SITE_ID'] == '**')
+				if (!($row['CHANNEL_TYPE'] == 'private' || $row['CHANNEL_TYPE'] == 'shared' && $row['USER_ID'] == 0))
+				{
+					continue;
+				}
+				if ($row['SITE_ID'] == self::ALL_SITES)
 				{
 					foreach ($arSites as $siteId)
 					{
@@ -422,10 +439,10 @@ class CAllUserCounter
 		return CModule::IncludeModule('pull') && CPullOptions::GetNginxStatus();
 	}
 
-	protected static function SendPullEvent($user_id, $code = "")
+	protected static function SendPullEvent($user_id, $code = "", $bMultiple = false)
 	{
 		$user_id = intval($user_id);
-		if ($user_id <= 0)
+		if ($user_id < 0)
 			return false;
 
 		if (self::CheckLiveMode())
@@ -438,32 +455,46 @@ class CAllUserCounter
 				$arSites[] = $row['ID'];
 
 			$strSQL = "
-				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				SELECT pc.CHANNEL_ID, pc.CHANNEL_TYPE, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
 				FROM b_user_counter uc
 				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
-				WHERE uc.USER_ID = ".intval($user_id).(strlen($code) > 0? " AND uc.CODE = '".$DB->ForSQL($code)."'": "")."
+				WHERE uc.USER_ID = ".intval($user_id).(
+					strlen($code) > 0
+					? (
+						$bMultiple
+						? " AND uc.CODE LIKE '".$DB->ForSQL($code)."%'"
+						: " AND uc.CODE = '".$DB->ForSQL($code)."'"
+					)
+					: ""
+				)."
 			";
 			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
 			$pullMessage = Array();
 			while ($row = $res->Fetch())
 			{
-				if ($row['SITE_ID'] == '**')
+				$key = (strlen($code) > 0 ? $code : $row['CODE']);
+
+				if (!($row['CHANNEL_TYPE'] == 'private' || $row['CHANNEL_TYPE'] == 'shared' && $row['USER_ID'] == 0))
+				{
+					continue;
+				}
+				if ($row['SITE_ID'] == self::ALL_SITES)
 				{
 					foreach ($arSites as $siteId)
 					{
-						if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']]))
-							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] += intval($row['CNT']);
+						if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$key]))
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$key] += intval($row['CNT']);
 						else
-							$pullMessage[$row['CHANNEL_ID']][$siteId][$row['CODE']] = intval($row['CNT']);
+							$pullMessage[$row['CHANNEL_ID']][$siteId][$key] = intval($row['CNT']);
 					}
 				}
 				else
 				{
-					if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']]))
-						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] += intval($row['CNT']);
+					if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$key]))
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$key] += intval($row['CNT']);
 					else
-						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$row['CODE']] = intval($row['CNT']);
+						$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$key] = intval($row['CNT']);
 				}
 			}
 
@@ -478,8 +509,49 @@ class CAllUserCounter
 		}
 	}
 
+	public static function addValueToPullMessage($row, $arSites = array(), &$pullMessage = array())
+	{
+		$code = (strpos($row["CODE"], "**") === 0 ? "**" : $row["CODE"]);
+
+		if ($row['SITE_ID'] == self::ALL_SITES)
+		{
+			foreach($arSites as $siteId)
+			{
+				if (isset($pullMessage[$row['CHANNEL_ID']][$siteId][$code]))
+				{
+					$pullMessage[$row['CHANNEL_ID']][$siteId][$code] += intval($row['CNT']);
+				}
+				else
+				{
+					$pullMessage[$row['CHANNEL_ID']][$siteId][$code] = intval($row['CNT']);
+				}
+			}
+		}
+		else
+		{
+			if (isset($pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$code]))
+			{
+				$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$code] += intval($row['CNT']);
+			}
+			else
+			{
+				$pullMessage[$row['CHANNEL_ID']][$row['SITE_ID']][$code] = intval($row['CNT']);
+			}
+		}
+	}
+
+	public static function OnSocNetLogCommentDelete($commentId)
+	{
+		CUserCounter::DeleteByCode("**LC".intval($commentId));
+	}
+
+	public static function OnSocNetLogDelete($logId)
+	{
+		CUserCounter::DeleteByCode("**L".intval($logId));
+	}
+
 	// legacy function
-	public static function GetValueByUserID($user_id, $site_id = SITE_ID, $code = "**")
+	public static function GetValueByUserID($user_id, $site_id = SITE_ID, $code = self::ALL_SITES)
 	{
 		return self::GetValue($user_id, $code, $site_id);
 	}
@@ -487,7 +559,7 @@ class CAllUserCounter
 	{
 		return self::GetValues($user_id, $site_id);
 	}
-	public static function GetLastDateByUserAndCode($user_id, $site_id = SITE_ID, $code = "**")
+	public static function GetLastDateByUserAndCode($user_id, $site_id = SITE_ID, $code = self::ALL_SITES)
 	{
 		return self::GetLastDate($user_id, $code, $site_id);
 	}

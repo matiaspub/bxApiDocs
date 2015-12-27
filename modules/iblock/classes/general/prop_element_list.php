@@ -101,7 +101,11 @@ class CIBlockPropertyElementList
 		{
 			foreach($value as $property_value_id => $arValue)
 			{
-				$values[$property_value_id] = $arValue["VALUE"];
+				if (is_array($arValue))
+					$values[$property_value_id] = $arValue["VALUE"];
+				else
+					$values[$property_value_id] = $arValue;
+
 				if(preg_match("/^n(\\d+)$/", $property_value_id, $match))
 				{
 					if($match[1] > $max_n)
@@ -226,7 +230,7 @@ class CIBlockPropertyElementList
 				}
 				else
 				{
-					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.htmlspecialcharsEx($cache[$arValue['VALUE']]["NAME"]).'</a>';;
+					$strResult = '<a href="'.$cache[$arValue['VALUE']]["DETAIL_PAGE_URL"].'">'.$cache[$arValue['VALUE']]["NAME"].'</a>';;
 				}
 			}
 		}

@@ -260,9 +260,19 @@ class CUserAuthProvider extends CAuthProvider implements IProviderInterface
 
 		$nameFormat = CSite::GetNameFormat(false);
 
+		$arFilter = array('ACTIVE' => 'Y', 'NAME_SEARCH' => $search);
+
+		if (
+			IsModuleInstalled('intranet')
+			|| COption::GetOptionString("main", "new_user_registration_email_confirmation", "N") == "Y"
+		)
+		{
+			$arFilter['CONFIRM_CODE'] = false;
+		}
+
 		//be careful with field list because of CUser::FormatName()
 		$dbRes = CUser::GetList(($by = 'last_name'), ($order = 'asc'),
-			array('ACTIVE' => 'Y', 'NAME_SEARCH' => $search),
+			$arFilter,
 			array("FIELDS" => array('ID', 'NAME', 'LAST_NAME', 'SECOND_NAME', 'LOGIN', 'EMAIL')),
 			array('NAV_PARAMS' => array('nTopCount' => 20))
 		);
@@ -336,9 +346,13 @@ class CUserAuthProvider extends CAuthProvider implements IProviderInterface
 	{
 		$aID = array();
 		foreach($arCodes as $code)
-			if(preg_match('/^U[0-9]+$/', $code))
-				$aID[] = substr($code, 1);
-		
+		{
+			if(!isset($aID[$code]) && preg_match('/^U[0-9]+$/', $code))
+			{
+				$aID[$code] = substr($code, 1);
+			}
+		}
+
 		if(!empty($aID))
 		{
 			$nameFormat = CSite::GetNameFormat(false);
@@ -351,9 +365,12 @@ class CUserAuthProvider extends CAuthProvider implements IProviderInterface
 			);
 			while($arUser = $res->Fetch())
 			{
-				$arResult["U".$arUser["ID"]] = array("provider"=>GetMessage("authprov_user1"), "name"=>CUser::FormatName($nameFormat, $arUser, true, false));
+				$arResult["U".$arUser["ID"]] = array(
+					"provider" => GetMessage("authprov_user1"),
+					"name" => CUser::FormatName($nameFormat, $arUser, true, false),
+				);
 			}
-				
+
 			return $arResult;
 		}
 		return false;

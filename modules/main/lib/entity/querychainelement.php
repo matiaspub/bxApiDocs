@@ -191,8 +191,7 @@ class QueryChainElement
 		}
 		else
 		{
-			$connection = \Bitrix\Main\Application::getConnection();
-			$helper = $connection->getSqlHelper();
+			$helper = $this->value->getEntity()->getConnection()->getSqlHelper();
 
 			$sql = $helper->quote($this->getParameter('talias')) . '.';
 			$sql .= $helper->quote($this->value->getColumnName());

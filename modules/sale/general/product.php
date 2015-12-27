@@ -1,4 +1,6 @@
 <?
+use Bitrix\Iblock;
+use Bitrix\Main;
 IncludeModuleLangFile(__FILE__);
 
 class CALLSaleProduct
@@ -99,24 +101,26 @@ class CALLSaleProduct
 
 
 	/**
-	 * get sku for product
+	 * get sku for product.
 	 *
-	 * @param integer $USER_ID
-	 * @param string  $LID
-	 * @param integer $PRODUCT_ID
-	 * @param string  $PRODUCT_NAME
-	 * @return array
+	 * @param integer $USER_ID				User.
+	 * @param string  $LID					Site.
+	 * @param integer $PRODUCT_ID			Product id.
+	 * @param string  $PRODUCT_NAME			Product name.
+	 * @param string CURRENCY				Currency.
+	 * @param array $arProduct				Iblock list.
+	 * @return array|false
 	 */
 	public static function GetProductSku($USER_ID, $LID, $PRODUCT_ID, $PRODUCT_NAME = '', $CURRENCY = '', $arProduct = array())
 	{
-		$USER_ID = IntVal($USER_ID);
+		$USER_ID = (int)$USER_ID;
 
-		$PRODUCT_ID = IntVal($PRODUCT_ID);
+		$PRODUCT_ID = (int)$PRODUCT_ID;
 		if ($PRODUCT_ID <= 0)
 			return false;
 
 		$LID = trim($LID);
-		if (strlen($LID) <= 0)
+		if ($LID == '')
 			return false;
 
 		$PRODUCT_NAME = trim($PRODUCT_NAME);
@@ -300,7 +304,7 @@ class CALLSaleProduct
 				$arSkuTmp["DISCOUNT_PRICE"] = '';
 				$arSkuTmp["DISCOUNT_PRICE_FORMATED"] = '';
 				$arSkuTmp["PRICE"] = $arPrice["PRICE"]["PRICE"];
-				$arSkuTmp["PRICE_FORMATED"] = CurrencyFormatNumber($arPrice["PRICE"]["PRICE"], $arPrice["PRICE"]["CURRENCY"]);
+				$arSkuTmp["PRICE_FORMATED"] = CCurrencyLang::CurrencyFormat($arPrice["PRICE"]["PRICE"], $arPrice["PRICE"]["CURRENCY"], false);
 
 				$arPriceType = GetCatalogGroup($arPrice["PRICE"]["CATALOG_GROUP_ID"]);
 				$arSkuTmp["PRICE_TYPE"] = $arPriceType["NAME_LANG"];
@@ -311,7 +315,7 @@ class CALLSaleProduct
 					$discountPercent = IntVal($arPrice["DISCOUNT"]["VALUE"]);
 
 					$arSkuTmp["DISCOUNT_PRICE"] = $arPrice["DISCOUNT_PRICE"];
-					$arSkuTmp["DISCOUNT_PRICE_FORMATED"] = CurrencyFormatNumber($arPrice["DISCOUNT_PRICE"], $arPrice["PRICE"]["CURRENCY"]);
+					$arSkuTmp["DISCOUNT_PRICE_FORMATED"] = CCurrencyLang::CurrencyFormat($arPrice["DISCOUNT_PRICE"], $arPrice["PRICE"]["CURRENCY"], false);
 				}
 
 				$arCurFormat = CCurrencyLang::GetCurrencyFormat($arPrice["PRICE"]["CURRENCY"]);
@@ -347,7 +351,8 @@ class CALLSaleProduct
 	 */
 	public static function GetProductListIblockInfo($arProductId)
 	{
-		CModule::IncludeModule('iblock');
+		if (!CModule::IncludeModule('iblock'))
+			return false;
 		$arNewProductId = array();
 		$arResult = array();
 
@@ -356,11 +361,11 @@ class CALLSaleProduct
 
 		foreach ($arProductId as $productId)
 		{
-			$productId = intval($productId);
+			$productId = (int)$productId;
 			if ($productId <= 0)
 				return false;
 
-			if (!array_key_exists($productId, self::$arProductIblockInfoCache))
+			if (!isset(self::$arProductIblockInfoCache[$productId]))
 				$arNewProductId[$productId] = $productId;
 		}
 
@@ -379,7 +384,7 @@ class CALLSaleProduct
 
 		foreach ($arProductId as $productId)
 		{
-			if (array_key_exists($productId, self::$arProductIblockInfoCache))
+			if (isset(self::$arProductIblockInfoCache[$productId]))
 				$arResult[$productId] = self::$arProductIblockInfoCache[$productId];
 		}
 
@@ -406,44 +411,98 @@ class CALLSaleProduct
 		return "CSaleProduct::RefreshProductList();";
 	}
 
-
-
 	/**
-	 * Returns list of recommended products for specific product
+	 * Returns list of recommended products for specific product.
 	 *
-	 * @param integer $USER_ID
-	 * @param string $LID
-	 * @param array $arFilterRecomendet
-	 * @param bool $recomMore
-	 * @param integer $cntProductDefault
+	 * @param int $USER_ID							User id.
+	 * @param string $LID							Site id.
+	 * @param array $arFilterRecomendet				Recomendation filter.
+	 * @param string $recomMore						Get more.
+	 * @param int $cntProductDefault				Max count.
 	 * @return array
 	 */
 	public static function GetRecommendetProduct($USER_ID, $LID, $arFilterRecomendet = array(), $recomMore = 'N', $cntProductDefault = 2)
 	{
 		$arRecomendetResult = array();
 
-		if (CModule::IncludeModule('catalog') && CModule::IncludeModule('iblock') && count($arFilterRecomendet) > 0)
+		if (CModule::IncludeModule('catalog') && !empty($arFilterRecomendet))
 		{
-			$rsIblock = CIBlock::GetList(array(), array('TYPE'=>'catalog', 'SITE_ID' => $LID, 'ACTIVE'=>'Y', 'CODE' => 'furniture'));
-			$arIblock = $rsIblock->Fetch();
+			$arRecomendet = array();
+			if (!is_array($arFilterRecomendet))
+				$arFilterRecomendet = array($arFilterRecomendet);
+			Main\Type\Collection::normalizeArrayValuesByInt($arFilterRecomendet);
+			if (empty($arFilterRecomendet))
+				return $arRecomendetResult;
 
-			$arFilter = array("ACTIVE"=>"Y", "IBLOCK_ID" => $arIblock["ID"], "ID" => $arFilterRecomendet);
-			$rsElement = CIBlockElement::GetList(array(), $arFilter, false, false);
-			while ($obElement = $rsElement->GetNextElement())
+			$iblockRecommended = array();
+			$productIterator = Iblock\ElementTable::getList(array(
+				'select' => array('ID', 'IBLOCK_ID'),
+				'filter' => array('@ID' => $arFilterRecomendet, '=ACTIVE' => 'Y')
+			));
+			while ($product = $productIterator->fetch())
 			{
-				$arElementProps = $obElement->GetProperties();
-				if (isset($arElementProps["RECOMMEND"]) && is_array($arElementProps["RECOMMEND"]["VALUE"]) > 0)
+				$product['ID'] = (int)$product['ID'];
+				$product['IBLOCK_ID'] = (int)$product['IBLOCK_ID'];
+				if (!isset($iblockRecommended[$product['IBLOCK_ID']]))
+					$iblockRecommended[$product['IBLOCK_ID']] = array();
+				$iblockRecommended[$product['IBLOCK_ID']][] = $product['ID'];
+			}
+			unset($product, $productIterator);
+			if (empty($iblockRecommended))
+				return $arRecomendetResult;
+
+			$propertyList = array();
+			$propertyIterator = Iblock\PropertyTable::getList(array(
+				'select' => array('ID', 'IBLOCK_ID'),
+				'filter' => array('@IBLOCK_ID' => array_keys($iblockRecommended), '=CODE' => 'RECOMMEND', '=PROPERTY_TYPE' => Iblock\PropertyTable::TYPE_ELEMENT)
+			));
+			while ($property = $propertyIterator->fetch())
+			{
+				$property['ID'] = (int)$property['ID'];
+				$property['IBLOCK_ID'] = (int)$property['IBLOCK_ID'];
+				$propertyList[$property['IBLOCK_ID']] = $property['ID'];
+			}
+			unset($property, $propertyIterator);
+			if (empty($propertyList))
+				return $arRecomendetResult;
+
+			foreach ($propertyList as $iblockID => $propertyID)
+			{
+				$propertyValue = 'PROPERTY_'.$propertyID;
+				$filter = array('ID' => $iblockRecommended[$iblockID], 'IBLOCK_ID' => $iblockID);
+				$select = array('ID', 'IBLOCK_ID', $propertyValue);
+				$propertyValue .= '_VALUE';
+				$elementIterator = CIBlockElement::GetList(array(), $filter, false, false, $select);
+				while ($element = $elementIterator->Fetch())
 				{
-					foreach($arElementProps["RECOMMEND"]["VALUE"] as $val)
-						$arRecomendet[$val] = $val;
+					if (empty($element[$propertyValue]))
+						continue;
+					if (is_array($element[$propertyValue]))
+					{
+						foreach ($element[$propertyValue] as &$recId)
+						{
+							$recId = (int)$recId;
+							if ($recId > 0)
+								$arRecomendet[$recId] = true;
+						}
+						unset($recId);
+					}
+					else
+					{
+						$recId = (int)$element[$propertyValue];
+						if ($recId > 0)
+							$arRecomendet[$recId] = true;
+					}
 				}
 			}
+			unset($element, $elementIterator, $select, $filter, $propertyValue, $propertyID, $iblockID, $propertyList);
 
-			if (count($arRecomendet) > 0)
+			if (!empty($arRecomendet))
 			{
+				$arRecomendet = array_keys($arRecomendet);
 				$arBuyerGroups = CUser::GetUserGroup($USER_ID);
 
-				$arFilter = array("ACTIVE"=>"Y", "ID" => $arRecomendet);
+				$arFilter = array("ID" => $arRecomendet, "ACTIVE"=>"Y");
 				$rsElement = CIBlockElement::GetList(
 					array(),
 					$arFilter,
@@ -452,39 +511,48 @@ class CALLSaleProduct
 					array("NAME", "ID", "LID", 'IBLOCK_ID', 'IBLOCK_SECTION_ID', "DETAIL_PICTURE", "PREVIEW_PICTURE", "DETAIL_PAGE_URL")
 				);
 
+				$currentVatMode = CCatalogProduct::getPriceVatIncludeMode();
+				$currentUseDiscount = CCatalogProduct::getUseDiscount();
+				CCatalogProduct::setUseDiscount(true);
+				CCatalogProduct::setPriceVatIncludeMode(true);
+				CCatalogProduct::setUsedCurrency(CSaleLang::GetLangCurrency($LID));
+				$i = 0;
 				while ($arElement = $rsElement->GetNext())
 				{
-					if (!in_array($arElement["ID"], $arFilterRecomendet))
+					if (in_array($arElement["ID"], $arFilterRecomendet))
+						continue;
+					if (($recomMore == "N" && $i < $cntProductDefault) || $recomMore == "Y")
 					{
-						if (($recomMore == "N" && $i < $cntProductDefault) || $recomMore == "Y")
+						$arElement["MODULE"] = "catalog";
+						$arElement["PRODUCT_PROVIDER_CLASS"] = "CCatalogProductProvider";
+						$arElement["PRODUCT_ID"] = $arElement["ID"];
+
+						$arPrice = CCatalogProduct::GetOptimalPrice($arElement["ID"], 1, $arBuyerGroups, "N", array(), $LID, array());
+
+						$currentPrice = $arPrice['RESULT_PRICE']['DISCOUNT_PRICE'];
+						$arElement["PRICE"] = $currentPrice;
+						$arElement["CURRENCY"] = $arPrice["RESULT_PRICE"]["CURRENCY"];
+						$arElement["DISCOUNT_PRICE"] = $arPrice['RESULT_PRICE']['DISCOUNT'];
+
+						if ($arElement["IBLOCK_ID"] > 0 && $arElement["IBLOCK_SECTION_ID"] > 0)
 						{
-							$arElement["MODULE"] = "catalog";
-							$arElement["PRODUCT_PROVIDER_CLASS"] = "CCatalogProductProvider";
-							$arElement["PRODUCT_ID"] = $arElement["ID"];
-
-							$arPrice = CCatalogProduct::GetOptimalPrice($arElement["ID"], 1, $arBuyerGroups, "N", array(), $LID);
-
-							$currentPrice = $arPrice["DISCOUNT_PRICE"];
-							$arElement["PRICE"] = $currentPrice;
-							$arElement["CURRENCY"] = $arPrice["PRICE"]["CURRENCY"];
-							$arElement["DISCOUNT_PRICE"] = $arPrice["PRICE"]["PRICE"] - $arPrice["DISCOUNT_PRICE"];
-
-							if ($arElement["IBLOCK_ID"] > 0 && $arElement["IBLOCK_SECTION_ID"] > 0)
-							{
-								$arElement["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arElement["IBLOCK_ID"], $arElement["PRODUCT_ID"], array(
-									"find_section_section" => $arElement["IBLOCK_SECTION_ID"],
-									'WF' => 'Y',
-								));
-							}
-
-							$arRecomendetResult[] = $arElement;
+							$arElement["EDIT_PAGE_URL"] = CIBlock::GetAdminElementEditLink($arElement["IBLOCK_ID"], $arElement["PRODUCT_ID"], array(
+								"find_section_section" => $arElement["IBLOCK_SECTION_ID"],
+								'WF' => 'Y',
+							));
 						}
+
+						$arRecomendetResult[] = $arElement;
+						$i++;
 					}
 				}
+				CCatalogProduct::clearUsedCurrency();
+				CCatalogProduct::setPriceVatIncludeMode($currentVatMode);
+				CCatalogProduct::setUseDiscount($currentUseDiscount);
+				unset($currentUseDiscount, $currentVatMode);
 			}
-
-			return $arRecomendetResult;
 		}
+		return $arRecomendetResult;
 	}
 }
 
@@ -509,10 +577,15 @@ class CAllSaleViewedProduct
 			unset($arFields["ID"]);
 
 		$strUpdateSql = "";
-		if (isset($arFields["DATE_VISIT"]))
+		if (!empty($arFields["~DATE_VISIT"]))
+		{
+			$strUpdateSql .= ", DATE_VISIT = ".$DB->ForSql($arFields["~DATE_VISIT"])." ";
+			unset($arFields["DATE_VISIT"]);
+			unset($arFields["~DATE_VISIT"]);
+		}
+		else
 		{
 			$strUpdateSql .= ", DATE_VISIT = ".$DB->GetNowFunction()." ";
-			unset($arFields["DATE_VISIT"]);
 		}
 
 		$ID = IntVal($ID);

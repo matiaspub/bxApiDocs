@@ -209,14 +209,11 @@ class CComponentEngine
 	 */
 	public function guessComponentPath($folder404, $arUrlTemplates, &$arVariables, $requestURL = false)
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-
 		if (!isset($arVariables) || !is_array($arVariables))
 			$arVariables = array();
 
 		if ($requestURL === false)
-			$requestURL = $APPLICATION->GetCurPage(true);
+			$requestURL = Bitrix\Main\Context::getCurrent()->getRequest()->getRequestedPage();
 
 		$folder404 = str_replace("\\", "/", $folder404);
 		if ($folder404 != "/")
@@ -227,6 +224,7 @@ class CComponentEngine
 			return false;
 
 		$currentPageUrl = substr($requestURL, strlen($folder404));
+
 		$pageCandidates = array();
 		$arUrlTemplates = $this->sortUrlTemplates($arUrlTemplates, $bHasGreedyPartsInTemplates);
 		if (

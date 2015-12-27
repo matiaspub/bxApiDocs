@@ -1,4 +1,4 @@
-<?
+<?php
 class CAllCloudStorageBucket
 {
 	protected/*.int.*/$_ID = 0;
@@ -10,7 +10,7 @@ class CAllCloudStorageBucket
 	public function SetFileCounter($file_size, $file_count)
 	{
 		global $DB, $CACHE_MANAGER;
-		$res = $DB->Query($s="
+		$res = $DB->Query("
 			UPDATE b_clouds_file_bucket
 			SET FILE_COUNT = ".intval($file_count)."
 			,FILE_SIZE = ".roundDB($file_size)."
@@ -50,4 +50,3 @@ class CAllCloudStorageBucket
 		return $res;
 	}
 }
-?>

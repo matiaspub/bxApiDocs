@@ -641,7 +641,7 @@ class CAllBlogComment
 
 	public static function GetSocNetUserPerms($postId = 0, $authorId = 0)
 	{
-		global $APPLICATION, $USER, $AR_BLOG_PERMS, $BLOG_POST;
+		global $APPLICATION, $USER, $AR_BLOG_PERMS;
 
 		$userId = IntVal($USER->GetID());
 		$postId = IntVal($postId);
@@ -665,29 +665,30 @@ class CAllBlogComment
 		{
 			$arPerms = CBlogPost::GetSocNetPerms($postId);
 			$arEntities = Array();
-			if (isset($BLOG_POST["UAC_CACHE_".$userId]) && !empty($BLOG_POST["UAC_CACHE_".$userId]))
+
+			if (!empty(CBlogPost::$arUACCache[$userId]))
 			{
-				$arEntities = $BLOG_POST["UAC_CACHE_".$userId];
+				$arEntities = CBlogPost::$arUACCache[$userId];
 			}
 			else
 			{
-				$dbA = CAccess::GetUserCodes($userId);
-				while($arA = $dbA->Fetch())
+				$arCodes = CAccess::GetUserCodesArray($userId);
+				foreach($arCodes as $code)
 				{
-					if($arA["PROVIDER_ID"] == "intranet")
+					if (
+						preg_match('/^DR([0-9]+)/', $code, $match)
+						|| preg_match('/^D([0-9]+)/', $code, $match)
+						|| preg_match('/^IU([0-9]+)/', $code, $match)
+					)
 					{
-						$arEntities["DR"][$arA["ACCESS_CODE"]] = $arA["ACCESS_CODE"];
+						$arEntities["DR"][$code] = $code;
 					}
-					elseif($arA["PROVIDER_ID"] == "socnetgroup")
+					elseif (preg_match('/^SG([0-9]+)_([A-Z])/', $code, $match))
 					{
-						$g = substr($arA["ACCESS_CODE"], 2);
-						$gId = IntVal($g);
-						$gR = substr($g, strpos($g, "_")+1);
-
-						$arEntities["SG"][$gId][$gR] = $gR;
+						$arEntities["SG"][$match[1]][$match[2]] = $match[2];
 					}
 				}
-				$BLOG_POST["UAC_CACHE_".$userId] = $arEntities;
+				CBlogPost::$arUACCache[$userId] = $arEntities;
 			}
 
 			if(!empty($arEntities["DR"]) && !empty($arPerms["DR"]))
@@ -803,43 +804,258 @@ class CAllBlogComment
 		return $arMentionedUserID;
 	}
 
-	public static function AddLiveComment($commentId = 0, $path = "")
+	/**
+	 * Use component main.post.list to work with LiveFeed
+	 * @param int $commentId Comment ID which needs to send.
+	 * @param array $arParams Array of settings (DATE_TIME_FORMAT, SHOW_RATING, PATH_TO_USER, AVATAR_SIZE, NAME_TEMPLATE, SHOW_LOGIN)
+	 * @return string
+	 */
+	public static function addLiveComment($commentId = 0, $arParams = array())
 	{
-		if(IntVal($commentId) <= 0)
-			return;
-		if(CModule::IncludeModule("pull") && CPullOptions::GetNginxStatus())
+		$res = "";
+		if(
+			$commentId > 0 &&
+			CModule::IncludeModule("pull")
+			&& \CPullOptions::GetNginxStatus()
+			&& ($comment = CBlogComment::GetByID($commentId))
+			&& ($arPost = CBlogPost::GetByID($comment["POST_ID"]))
+		)
 		{
-			if($arComment = CBlogComment::GetByID($commentId))
-			{
-				if(strlen($path) <= 0 && strlen($arComment["PATH"]) > 0)
-					$path = CComponentEngine::MakePathFromTemplate($arComment["PATH"], array("post_id"   =>$arComment["POST_ID"], "comment_id"=>$arComment["ID"]));
-				if(strlen($path) <= 0)
-				{
-					$arPost = CBlogPost::GetByID($arComment["POST_ID"]);
-					$path = $path = CComponentEngine::MakePathFromTemplate($arPost["PATH"], array("post_id"   =>$arComment["POST_ID"], "comment_id"=>$arComment["ID"]))."?commentId=".$arComment["ID"];
-				}
+			global $DB, $APPLICATION;
 
-				CPullWatch::AddToStack("UNICOMMENTSBLOG_".$arComment["POST_ID"],
+			$arParams["DATE_TIME_FORMAT"] = (isset($arParams["DATE_TIME_FORMAT"]) ? $arParams["DATE_TIME_FORMAT"] : $DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
+			$arParams["SHOW_RATING"] = ($arParams["SHOW_RATING"] == "N" ? "N" : "Y");
+
+			$arParams["PATH_TO_USER"] = (isset($arParams["PATH_TO_USER"]) ? $arParams["PATH_TO_USER"] : '');
+			$arParams["AVATAR_SIZE_COMMENT"] = ($arParams["AVATAR_SIZE_COMMENT"] > 0 ? $arParams["AVATAR_SIZE_COMMENT"] : ($arParams["AVATAR_SIZE"] > $arParams["AVATAR_SIZE"] ? $arParams["AVATAR_SIZE"] : 58));
+			$arParams["NAME_TEMPLATE"] = isset($arParams["NAME_TEMPLATE"]) ? $arParams["NAME_TEMPLATE"] : CSite::GetNameFormat();
+			$arParams["SHOW_LOGIN"] = ($arParams["SHOW_LOGIN"] == "N" ? "N" : "Y");
+
+
+			$comment["DateFormated"] = FormatDateFromDB($comment["DATE_CREATE"], $arParams["DATE_TIME_FORMAT"], true);
+			$timestamp = MakeTimeStamp($comment["DATE_CREATE"]);
+
+			if (
+				strcasecmp(LANGUAGE_ID, 'EN') !== 0
+				&& strcasecmp(LANGUAGE_ID, 'DE') !== 0
+			)
+			{
+				$comment["DateFormated"] = ToLower($comment["DateFormated"]);
+			}
+
+			$comment["UF"] = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("BLOG_COMMENT", $commentId, LANGUAGE_ID);
+
+			$arAuthor = CBlogUser::GetUserInfo(
+				$comment["AUTHOR_ID"],
+				$arParams["PATH_TO_USER"],
+				array(
+					"AVATAR_SIZE_COMMENT" => $arParams["AVATAR_SIZE_COMMENT"]
+				)
+			);
+
+
+			if (intval($arAuthor["PERSONAL_PHOTO"]) > 0)
+			{
+				$image_resize = CFile::ResizeImageGet(
+					$arAuthor["PERSONAL_PHOTO"],
 					array(
-						'module_id'	=> "unicomments",
-						'command'	=> "comment",
-						'params'	=> Array(
-							"AUTHOR_ID"		=> $arComment["AUTHOR_ID"],
-							"ID"			=> $arComment["ID"],
-							"POST_ID"		=> $arComment["POST_ID"],
-							"TS"			=> time(),
-							"ACTION"		=> "REPLY",
-							"URL"			=> array(
-								"LINK" => $path,
-							),
-							"ENTITY_XML_ID"	=> "BLOG_".$arComment["POST_ID"],
-							"APPROVED"		=> "Y",
-							"NEED_REQUEST"	=> "Y",
-						),
-					)
+						"width" => $arParams["AVATAR_SIZE_COMMENT"],
+						"height" => $arParams["AVATAR_SIZE_COMMENT"]
+					),
+					BX_RESIZE_IMAGE_EXACT
 				);
+				$arAuthor["PERSONAL_PHOTO_RESIZED"] = array("src" => $image_resize["src"]);
+			}
+
+			$p = new blogTextParser(false, '');
+
+			$ufCode = "UF_BLOG_COMMENT_FILE";
+			if (is_array($comment["UF"][$ufCode]))
+			{
+				$p->arUserfields = array($ufCode => array_merge($comment["UF"][$ufCode], array("TAG" => "DOCUMENT ID")));
+			}
+
+			$arAllow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "SHORT_ANCHOR" => "Y");
+			$arParserParams = Array(
+				"imageWidth" => 800,
+				"imageHeight" => 800,
+			);
+			$comment["TextFormated"] = $p->convert($comment["POST_TEXT"], false, array(), $arAllow, $arParserParams);
+
+			$p->bMobile = true;
+			$comment["TextFormatedMobile"] = $p->convert($comment["POST_TEXT"], false, array(), $arAllow, $arParserParams);
+			$comment["TextFormatedJS"] = CUtil::JSEscape(htmlspecialcharsBack($comment["POST_TEXT"]));
+			$comment["TITLE"] = CUtil::JSEscape(htmlspecialcharsBack($comment["TITLE"]));
+
+			$eventHandlerID = AddEventHandler("main", "system.field.view.file", Array("CSocNetLogTools", "logUFfileShow"));
+			$res = $APPLICATION->IncludeComponent(
+				"bitrix:main.post.list",
+				"",
+				array(
+					"TEMPLATE_ID" => 'BLOG_COMMENT_BG_',
+					"RATING_TYPE_ID" => ($arParams["SHOW_RATING"] == "Y" ? "BLOG_COMMENT" : ""),
+					"ENTITY_XML_ID" => "BLOG_".$arPost["ID"],
+					"RECORDS" => array(
+						$commentId => array(
+							"ID" => $comment["ID"],
+							"NEW" => ($arParams["FOLLOW"] != "N" && $comment["NEW"] == "Y" ? "Y" : "N"),
+							"APPROVED" => ($comment["PUBLISH_STATUS"] == BLOG_PUBLISH_STATUS_PUBLISH ? "Y" : "N"),
+							"POST_TIMESTAMP" => $timestamp,
+							"POST_TIME" => $comment["DATE_CREATE_TIME"],
+							"POST_DATE" => $comment["DateFormated"],
+							"AUTHOR" => array(
+								"ID" => $arAuthor["ID"],
+								"NAME" => $arAuthor["~NAME"],
+								"LAST_NAME" => $arAuthor["~LAST_NAME"],
+								"SECOND_NAME" => $arAuthor["~SECOND_NAME"],
+								"AVATAR" => $arAuthor["PERSONAL_PHOTO_resized"]["src"]
+							),
+							"FILES" => false,
+							"UF" => $comment["UF"],
+							"~POST_MESSAGE_TEXT" => $comment["POST_TEXT"],
+							"WEB" => array(
+								"POST_TIME" => $comment["DATE_CREATE_TIME"],
+								"POST_DATE" => $comment["DateFormated"],
+								"CLASSNAME" => "",
+								"POST_MESSAGE_TEXT" => $comment["TextFormated"],
+								"AFTER" => <<<HTML
+<script>top.text{$commentId} = text{$commentId} = '{$comment["TextFormatedJS"]}';top.title{$commentId} = title{$commentId} = '{$comment["TITLE"]}';top.arComFiles{$commentId} = [];</script>
+HTML
+							),
+							"MOBILE" => array(
+								"POST_TIME" => $comment["DATE_CREATE_TIME"],
+								"POST_DATE" => $comment["DateFormated"],
+								"CLASSNAME" => "",
+								"POST_MESSAGE_TEXT" => $comment["TextFormatedMobile"]
+							)
+						)
+					),
+					"NAV_STRING" => "",
+					"NAV_RESULT" => "",
+					"PREORDER" => "N",
+					"RIGHTS" => array(
+						"MODERATE" => "N",
+						"EDIT" => "N",
+						"DELETE" => "N"
+					),
+					"VISIBLE_RECORDS_COUNT" => 1,
+
+					"ERROR_MESSAGE" => "",
+					"OK_MESSAGE" => "",
+					"RESULT" => $commentId,
+					"PUSH&PULL" => array(
+						"ACTION" => "REPLY",
+						"ID" => $commentId
+					),
+					"MODE" => "PULL_MESSAGE",
+					"VIEW_URL" => "",
+					"EDIT_URL" => "",
+					"MODERATE_URL" => "",
+					"DELETE_URL" => "",
+					"AUTHOR_URL" => "",
+
+					"AVATAR_SIZE" => $arParams["AVATAR_SIZE_COMMENT"],
+					"NAME_TEMPLATE" => $arParams["NAME_TEMPLATE"],
+					"SHOW_LOGIN" => $arParams["SHOW_LOGIN"],
+
+					"DATE_TIME_FORMAT" => "",
+					"LAZYLOAD" => "",
+
+					"NOTIFY_TAG" => "",
+					"NOTIFY_TEXT" => "",
+					"SHOW_MINIMIZED" => "Y",
+					"SHOW_POST_FORM" => "",
+
+					"IMAGE_SIZE" => "",
+					"mfi" => ""
+				),
+				array(),
+				null
+			);
+			if (
+				$eventHandlerID !== false
+				&& intval($eventHandlerID) > 0
+			)
+			{
+				RemoveEventHandler('main', 'system.field.view.file', $eventHandlerID);
 			}
 		}
+		return $res;
+	}
+
+	public static function BuildUFFields($arUF)
+	{
+		$arResult = array(
+			"AFTER" => "",
+			"AFTER_MOBILE" => ""
+		);
+
+		if (
+			is_array($arUF)
+			&& count($arUF) > 0
+		)
+		{
+			ob_start();
+
+			$eventHandlerID = AddEventHandler("main", "system.field.view.file", Array("CSocNetLogTools", "logUFfileShow"));
+
+			foreach ($arUF as $FIELD_NAME => $arUserField)
+			{
+				if(!empty($arUserField["VALUE"]))
+				{
+					$GLOBALS["APPLICATION"]->IncludeComponent(
+						"bitrix:system.field.view",
+						$arUserField["USER_TYPE"]["USER_TYPE_ID"],
+						array(
+							"arUserField" => $arUserField,
+							"MOBILE" => "Y"
+						),
+						null,
+						array("HIDE_ICONS"=>"Y")
+					);
+				}
+			}
+			if (
+				$eventHandlerID !== false
+				&& intval($eventHandlerID) > 0
+			)
+			{
+				RemoveEventHandler('main', 'system.field.view.file', $eventHandlerID);
+			}
+
+			$arResult["AFTER_MOBILE"] = ob_get_clean();
+
+			ob_start();
+
+			$eventHandlerID = AddEventHandler("main", "system.field.view.file", Array("CSocNetLogTools", "logUFfileShow"));
+
+			foreach ($arUF as $FIELD_NAME => $arUserField)
+			{
+				if(!empty($arUserField["VALUE"]))
+				{
+					$GLOBALS["APPLICATION"]->IncludeComponent(
+						"bitrix:system.field.view",
+						$arUserField["USER_TYPE"]["USER_TYPE_ID"],
+						array(
+							"arUserField" => $arUserField
+						),
+						null,
+						array("HIDE_ICONS"=>"Y")
+					);
+				}
+			}
+			if (
+				$eventHandlerID !== false
+				&& intval($eventHandlerID) > 0
+			)
+			{
+				RemoveEventHandler('main', 'system.field.view.file', $eventHandlerID);
+			}
+
+			$arResult["AFTER"] .= ob_get_clean();
+		}
+
+		return $arResult;
 	}
 }
 ?>

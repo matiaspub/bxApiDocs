@@ -1,11 +1,11 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/location.php");
 
+use Bitrix\Sale\Location;
+
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -13,14 +13,13 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/location.ph
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocation/index.php
  * @author Bitrix
+ * @deprecated
  */
 class CSaleLocation extends CAllSaleLocation
 {
 	
 	/**
-	* <p>Функция возвращает набор местоположений, удовлетворяющих фильтру arFilter. Возвращаются так же параметры стран и городов местоположений. Набор отсортирован в соответствии с массивом arOrder. Языкозависимые параметры выбираются для языка strLang. </p>
-	*
-	*
+	* <p>Метод возвращает набор местоположений, удовлетворяющих фильтру arFilter. Возвращаются так же параметры стран и городов местоположений. Набор отсортирован в соответствии с массивом arOrder. Языкозависимые параметры выбираются для языка strLang. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array("SORT"=>"ASC" Массив, в соответствии с которым сортируются результирующие
@@ -33,8 +32,6 @@ class CSaleLocation extends CAllSaleLocation
 	* имеет несколько элементов, то результирующий набор сортируется
 	* последовательно по каждому элементу (т.е. сначала сортируется по
 	* первому элементу, потом результат сортируется по второму и т.д.).
-	*
-	*
 	*
 	* @param COUNTRY_NAME_LAN $G  Массив, в соответствии с которым фильтруются записи
 	* местоположений. Массив имеет вид: <pre class="syntax">array(
@@ -50,19 +47,15 @@ class CSaleLocation extends CAllSaleLocation
 	* поля строго больше передаваемой в фильтр величины;</li> <li><b> -
 	* значение поля меньше или равно передаваемой в фильтр
 	* величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
-	* фильтр величины;</b></li> <li> <b>@</b> - значение поля находится в
-	* передаваемом в фильтр разделенном запятой списке значений;</li> <li>
-	* <b>~</b> - значение поля проверяется на соответствие передаваемому в
-	* фильтр шаблону;</li> <li> <b>%</b> - значение поля проверяется на
-	* соответствие передаваемой в фильтр строке в соответствии с
-	* языком запросов.</li> </ul> В качестве "название_поляX" может стоять
-	* любое поле местоположения.<br><br> Пример фильтра: <pre
-	* class="syntax">array("COUNTRY_ID" =&gt; 15)</pre> Этот фильтр означает "выбрать все
-	* записи, в которых значение в поле COUNTRY_ID (код страны) равно 15".<br><br>
-	* Значение по умолчанию - пустой массив array() - означает, что
-	* результат отфильтрован не будет.
-	*
-	*
+	* фильтр величины;</b></li> <li> <b>~</b> - значение поля проверяется на
+	* соответствие передаваемому в фильтр шаблону;</li> <li> <b>%</b> -
+	* значение поля проверяется на соответствие передаваемой в фильтр
+	* строке в соответствии с языком запросов.</li> </ul> В качестве
+	* "название_поляX" может стоять любое поле местоположения.<br><br>
+	* Пример фильтра: <pre class="syntax">array("COUNTRY_ID" =&gt; 15)</pre> Этот фильтр
+	* означает "выбрать все записи, в которых значение в поле COUNTRY_ID (код
+	* страны) равно 15".<br><br> Значение по умолчанию - пустой массив array() -
+	* означает, что результат отфильтрован не будет.
 	*
 	* @param AS $C  Массив полей, по которым группируются записи местоположений.
 	* Массив имеет вид: <pre class="syntax">array("название_поля1",
@@ -72,48 +65,32 @@ class CSaleLocation extends CAllSaleLocation
 	* подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
 	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
 	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
+	* суммы.</li> </ul> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param CITY_NAME_LAN $G  Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param AS $C  Массив полей записей, которые будут возвращены функцией. Можно
+	* @param AS $C  Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
-	*
-	*
 	* @param  $array  
-	*
-	*
 	*
 	* @param arFilte $r = array() Код местоположения. </h
 	*
-	*
-	*
 	* @param array $arGroupBy = false Код страны.
-	*
-	*
 	*
 	* @param array $arNavStartParams = false Код региона.
 	*
-	*
-	*
 	* @param array $arSelectFields = array() Код города.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -138,7 +115,6 @@ class CSaleLocation extends CAllSaleLocation
 	* установлено. Иначе - языконезависимое название города.</td> </tr> <tr>
 	* <td>LOC_DEFAULT</td> <td>Флаг "Выводить по умолчанию".</td> </tr> </table> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -187,51 +163,18 @@ class CSaleLocation extends CAllSaleLocation
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "COUNTRY_ID", "REGION_ID", "CITY_ID", "SORT", "COUNTRY_NAME_ORIG", "COUNTRY_SHORT_NAME", "REGION_NAME_ORIG", "CITY_NAME_ORIG", "REGION_SHORT_NAME", "CITY_SHORT_NAME", "COUNTRY_LID", "COUNTRY_NAME", "REGION_LID", "CITY_LID", "REGION_NAME", "CITY_NAME", "LOC_DEFAULT");
 
-		$additionalFilter = "";
-		if (isset($arFilter["LID"]) || strlen($arFilter["LID"]) > 0)
+		if(!is_array($arOrder))
+			$arOrder = array();
+
+		foreach ($arOrder as $key => $dir)
 		{
-			$additionalFilterLCL = " AND LCL.LID = '".$DB->ForSql($arFilter["LID"], 2)."'";
-			$additionalFilterLRL = " AND LRL.LID = '".$DB->ForSql($arFilter["LID"], 2)."'";
-			$additionalFilterLGL = " AND LGL.LID = '".$DB->ForSql($arFilter["LID"], 2)."'";
+			if (!in_array($key, $arSelectFields))
+				$arSelectFields[] = $key;
 		}
 
-		// FIELDS -->
-		$arFields = array(
-				"ID" => array("FIELD" => "L.ID", "TYPE" => "int"),
-				"LOC_DEFAULT" => array("FIELD" => "L.LOC_DEFAULT", "TYPE" => "string"),
-				"COUNTRY_ID" => array("FIELD" => "L.COUNTRY_ID", "TYPE" => "int"),
-				"CITY_ID" => array("FIELD" => "L.CITY_ID", "TYPE" => "int"),
-				"REGION_ID" => array("FIELD" => "L.REGION_ID", "TYPE" => "int"),
-				"SORT" => array("FIELD" => "L.SORT", "TYPE" => "int"),
+		$arFilter = self::getFilterForGetList($arFilter);
+		$arFields = self::getFieldMapForGetList($arFilter);
 
-				"COUNTRY_NAME_ORIG" => array("FIELD" => "LC.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country LC ON (L.COUNTRY_ID = LC.ID)"),
-				"COUNTRY_SHORT_NAME" => array("FIELD" => "LC.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country LC ON (L.COUNTRY_ID = LC.ID)"),
-
-				"CITY_NAME_ORIG" => array("FIELD" => "LG.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city LG ON (L.CITY_ID = LG.ID)"),
-				"CITY_SHORT_NAME" => array("FIELD" => "LG.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city LG ON (L.CITY_ID = LG.ID)"),
-			
-				"REGION_NAME_ORIG" => array("FIELD" => "LR.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region LR ON (L.REGION_ID = LR.ID)"),
-				"REGION_SHORT_NAME" => array("FIELD" => "LR.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region LR ON (L.REGION_ID = LR.ID)"),
-			
-				"COUNTRY_LID" => array("FIELD" => "LCL.LID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country_lang LCL ON (L.COUNTRY_ID = LCL.COUNTRY_ID".$additionalFilterLCL.")"),
-				"COUNTRY_NAME" => array("FIELD" => "LCL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country_lang LCL ON (L.COUNTRY_ID = LCL.COUNTRY_ID".$additionalFilterLCL.")"),
-				"COUNTRY_NAME_LANG" => array("FIELD" => "LCL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country_lang LCL ON (L.COUNTRY_ID = LCL.COUNTRY_ID".$additionalFilterLCL.")"),
-				"COUNTRY_SHORT_NAME_LANG" => array("FIELD" => "LCL.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country_lang LCL ON (L.COUNTRY_ID = LCL.COUNTRY_ID".$additionalFilterLCL.")"),
-
-				"REGION_LID" => array("FIELD" => "LRL.LID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region_lang LRL ON (L.REGION_ID = LRL.REGION_ID".$additionalFilterLRL.")"),
-				"REGION_NAME" => array("FIELD" => "LRL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region_lang LRL ON (L.REGION_ID = LRL.REGION_ID".$additionalFilterLRL.")"),
-				"REGION_NAME_LANG" => array("FIELD" => "LRL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region_lang LRL ON (L.REGION_ID = LRL.REGION_ID".$additionalFilterLRL.")"),
-				"REGION_SHORT_NAME_LANG" => array("FIELD" => "LRL.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region_lang LRL ON (L.REGION_ID = LRL.REGION_ID".$additionalFilterLRL.")"),
-			
-				"CITY_LID" => array("FIELD" => "LGL.LID", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city_lang LGL ON (L.CITY_ID = LGL.CITY_ID".$additionalFilterLGL.")"),
-				"CITY_NAME" => array("FIELD" => "LGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city_lang LGL ON (L.CITY_ID = LGL.CITY_ID".$additionalFilterLGL.")"),
-				"CITY_NAME_LANG" => array("FIELD" => "LGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city_lang LGL ON (L.CITY_ID = LGL.CITY_ID".$additionalFilterLGL.")"),
-				"CITY_SHORT_NAME_LANG" => array("FIELD" => "LGL.SHORT_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city_lang LGL ON (L.CITY_ID = LGL.CITY_ID".$additionalFilterLGL.")"),
-
-				"COUNTRY" => array("FIELD" => "LCL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_country_lang LCL ON (L.COUNTRY_ID = LCL.COUNTRY_ID".$additionalFilterLCL.")"),
-				"CITY" => array("FIELD" => "LGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_city_lang LGL ON (L.CITY_ID = LGL.CITY_ID".$additionalFilterLGL.")"),
-				"REGION" => array("FIELD" => "LRL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_sale_location_region_lang LRL ON (L.REGION_ID = LRL.REGION_ID".$additionalFilterLRL.")")
-			);
 		// <-- FIELDS
 
 		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
@@ -258,7 +201,7 @@ class CSaleLocation extends CAllSaleLocation
 				return False;
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT ".$arSqls["SELECT"]." ".
 			"FROM b_sale_location L ".
 			"	".$arSqls["FROM"]." ";
@@ -314,22 +257,15 @@ class CSaleLocation extends CAllSaleLocation
 		return $dbRes;
 	}
 
-
 	
 	/**
-	* <p>Функция возвращает параметры местоположения с кодом ID, включая параметры страны и города. Параметры, зависящие от языка возвращаются для языка strLang</p>
-	*
-	*
+	* <p>Метод возвращает параметры местоположения с кодом ID, включая параметры страны и города. Параметры, зависящие от языка, возвращаются для языка strLang. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код местоположения. </h
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Язык параметров, зависящих от языка. По умолчанию равен текущему
 	* языку.
-	*
-	*
 	*
 	* @return array <p>Возвращает ассоциативный массив с ключами:</p> <table class="tnormal"
 	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> <th>С версии</th> </tr> <tr>
@@ -355,7 +291,6 @@ class CSaleLocation extends CAllSaleLocation
 	* языконезависимое название региона.</td> <td>12.5 </td> </tr> </table> <p>  </p<a
 	* name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
@@ -370,6 +305,9 @@ class CSaleLocation extends CAllSaleLocation
 	*/
 	public static function GetByID($ID, $strLang = LANGUAGE_ID)
 	{
+		if(self::isLocationProMigrated())
+			return parent::GetByID($ID, $strLang);
+
 		global $DB;
 
 		$ID = IntVal($ID);
@@ -385,23 +323,23 @@ class CSaleLocation extends CAllSaleLocation
 			"	LEFT JOIN b_sale_location_country_lang LCL ON (LC.ID = LCL.COUNTRY_ID AND LCL.LID = '".$DB->ForSql($strLang, 2)."') ".
 			"	LEFT JOIN b_sale_location_city_lang LGL ON (LG.ID = LGL.CITY_ID AND LGL.LID = '".$DB->ForSql($strLang, 2)."') ".
 			"WHERE L.ID = ".$ID." ";*/
-		
+
 		$strSql = "
-		SELECT L.ID, L.COUNTRY_ID, L.CITY_ID, L.SORT, LC.NAME as COUNTRY_NAME_ORIG, LC.SHORT_NAME as COUNTRY_SHORT_NAME, LCL.NAME as COUNTRY_NAME_LANG, 
-		LG.NAME as CITY_NAME_ORIG, LG.SHORT_NAME as CITY_SHORT_NAME, LGL.NAME as CITY_NAME_LANG, 
-		L.REGION_ID, LR.NAME as REGION_NAME_ORIG, LR.SHORT_NAME as REGION_SHORT_NAME, LRL.NAME as REGION_NAME_LANG, 
-		IF(LCL.ID IS NULL, LC.NAME, LCL.NAME) as COUNTRY_NAME, 
+		SELECT L.ID, L.COUNTRY_ID, L.CITY_ID, L.SORT, LC.NAME as COUNTRY_NAME_ORIG, LC.SHORT_NAME as COUNTRY_SHORT_NAME, LCL.NAME as COUNTRY_NAME_LANG,
+		LG.NAME as CITY_NAME_ORIG, LG.SHORT_NAME as CITY_SHORT_NAME, LGL.NAME as CITY_NAME_LANG,
+		L.REGION_ID, LR.NAME as REGION_NAME_ORIG, LR.SHORT_NAME as REGION_SHORT_NAME, LRL.NAME as REGION_NAME_LANG,
+		IF(LCL.ID IS NULL, LC.NAME, LCL.NAME) as COUNTRY_NAME,
 		IF(LGL.ID IS NULL, LG.NAME, LGL.NAME) as CITY_NAME,
-		IF(LRL.ID IS NULL, LR.NAME, LRL.NAME) as REGION_NAME 
-		FROM b_sale_location L 
-			LEFT JOIN b_sale_location_country LC ON (L.COUNTRY_ID = LC.ID) 
-			LEFT JOIN b_sale_location_city LG ON (L.CITY_ID = LG.ID) 
-			LEFT JOIN b_sale_location_country_lang LCL ON (LC.ID = LCL.COUNTRY_ID AND LCL.LID = '".$DB->ForSql($strLang, 2)."') 
-			LEFT JOIN b_sale_location_city_lang LGL ON (LG.ID = LGL.CITY_ID AND LGL.LID = '".$DB->ForSql($strLang, 2)."') 
-			LEFT JOIN b_sale_location_region LR ON (L.REGION_ID = LR.ID) 
+		IF(LRL.ID IS NULL, LR.NAME, LRL.NAME) as REGION_NAME
+		FROM b_sale_location L
+			LEFT JOIN b_sale_location_country LC ON (L.COUNTRY_ID = LC.ID)
+			LEFT JOIN b_sale_location_city LG ON (L.CITY_ID = LG.ID)
+			LEFT JOIN b_sale_location_country_lang LCL ON (LC.ID = LCL.COUNTRY_ID AND LCL.LID = '".$DB->ForSql($strLang, 2)."')
+			LEFT JOIN b_sale_location_city_lang LGL ON (LG.ID = LGL.CITY_ID AND LGL.LID = '".$DB->ForSql($strLang, 2)."')
+			LEFT JOIN b_sale_location_region LR ON (L.REGION_ID = LR.ID)
 			LEFT JOIN b_sale_location_region_lang LRL ON (LR.ID = LRL.REGION_ID AND LRL.LID = '".$DB->ForSql($strLang, 2)."')
 		WHERE L.ID = ".$ID." ";
-		
+
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if ($res = $db_res->Fetch())
@@ -413,9 +351,7 @@ class CSaleLocation extends CAllSaleLocation
 
 	
 	/**
-	* <p>Функция возвращает набор стран по фильтру arFilter, отсортированный по массиву arOrder. Языкозависимые параметры берутся для языка strLang </p>
-	*
-	*
+	* <p>Метод возвращает набор стран по фильтру arFilter, отсортированный по массиву arOrder. Языкозависимые параметры берутся для языка strLang. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = Array("NAME_LANG"=>"ASC") Ассоциативный массив для сортировки записей. Сортировка
@@ -428,20 +364,14 @@ class CSaleLocation extends CAllSaleLocation
 	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
 	* убыванию.</li> </ul>
 	*
-	*
-	*
 	* @param array $arFilter = Array() Ассоциативный массив для фильтрации записей - выбираются только
 	* те записи, которые удовлетворяют фильтру. Ключами являются
 	* названия параметров, а значениями - условия на значения.<br><br>
 	* Допустимые ключи: <ul> <li> <b>ID</b> - код страны;</li> <li> <b>NAME</b> -
 	* языконезависимое название страны.</li> </ul>
 	*
-	*
-	*
 	* @param string $strLang = LANGUAGE_ID Язык, на котором выбираются языкозависимые параметры. По
 	* умолчанию равен текущему языку.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -458,10 +388,13 @@ class CSaleLocation extends CAllSaleLocation
 	*/
 	public static function GetCountryList($arOrder = Array("NAME_LANG"=>"ASC"), $arFilter=Array(), $strLang = LANGUAGE_ID)
 	{
+		if(self::isLocationProMigrated())
+			return self::GetLocationTypeList('COUNTRY', $arOrder, $arFilter, $strLang);
+
 		global $DB;
 		$arSqlSearch = Array();
 
-		if(!is_array($arFilter)) 
+		if(!is_array($arFilter))
 			$filter_keys = Array();
 		else
 			$filter_keys = array_keys($arFilter);
@@ -500,7 +433,7 @@ class CSaleLocation extends CAllSaleLocation
 			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT DISTINCT C.ID, C.NAME as NAME_ORIG, C.SHORT_NAME, CL.NAME as NAME, ".
 			"	IF(CL.ID IS NULL, C.NAME, CL.NAME) as NAME_LANG ".
 			"FROM b_sale_location_country C ".
@@ -509,7 +442,7 @@ class CSaleLocation extends CAllSaleLocation
 				strlen($arOrder["SORT"]) > 0
 				?
 				"	LEFT JOIN b_sale_location SL ON (SL.COUNTRY_ID = C.ID AND (SL.CITY_ID = 0 OR ISNULL(SL.CITY_ID))) "
-				: 
+				:
 				""
 			).
 			"WHERE 1 = 1 ".
@@ -551,10 +484,10 @@ class CSaleLocation extends CAllSaleLocation
 		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		return $db_res;
 	}
-	
+
 	/**
 	* The function select all region
-	* 
+	*
 	* @param array $arOrder sorting an array of results
 	* @param array $arFilter filtered an array of results
 	* @param string $strLang language regions of the sample
@@ -562,10 +495,13 @@ class CSaleLocation extends CAllSaleLocation
 	*/
 	public static function GetRegionList($arOrder = Array("NAME_LANG"=>"ASC"), $arFilter=Array(), $strLang = LANGUAGE_ID)
 	{
+		if(self::isLocationProMigrated())
+			return self::GetLocationTypeList('REGION', $arOrder, $arFilter, $strLang);
+
 		global $DB;
 		$arSqlSearch = Array();
 
-		if(!is_array($arFilter)) 
+		if(!is_array($arFilter))
 			$filter_keys = Array();
 		else
 			$filter_keys = array_keys($arFilter);
@@ -607,7 +543,7 @@ class CSaleLocation extends CAllSaleLocation
 			$strSqlSearch .= " (".$arSqlSearch[$i].") ";
 		}
 
-		$strSql = 
+		$strSql =
 			"SELECT C.ID, C.NAME as NAME_ORIG, C.SHORT_NAME, CL.NAME as NAME, ".
 			"	IF(CL.ID IS NULL, C.NAME, CL.NAME) as NAME_LANG ".
 			"FROM b_sale_location_region C ".
@@ -663,6 +599,9 @@ class CSaleLocation extends CAllSaleLocation
 	 */
 	public static function GetCityList($arOrder = Array("NAME_LANG"=>"ASC"), $arFilter=Array(), $strLang = LANGUAGE_ID)
 	{
+		if(self::isLocationProMigrated())
+			return self::GetLocationTypeList('CITY', $arOrder, $arFilter, $strLang);
+
 		global $DB;
 		$arSqlSearch = Array();
 
@@ -754,16 +693,15 @@ class CSaleLocation extends CAllSaleLocation
 		return $db_res;
 	}
 
+	// have to use old table as a temporal place to store countries, kz add of a country doesn`t mean add of a location
 	
 	/**
-	* <p>Функция добавляет новую страну с параметрами из массива <i> arFields</i>. </p>
-	*
-	*
+	* <p>Метод добавляет новую страну с параметрами из массива <i> arFields</i>. Метод динамичный.</p> <p class="note"><b>Внимание!</b> Начиная с версии 14.10.0 метод не обновляется и обратная совместимость не поддерживается. Рекомендуется использовать методы нового ядра D7. Примеры работы с новым ядром можно увидеть <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3570" >здесь</a>.</p>
 	*
 	*
 	* @param array $arFields  Массив с параметрами страны должен содержать ключи: <ul> <li> <b>NAME</b> -
 	* название страны (не зависящее от языка);</li> <li> <b>SHORT_NAME</b> -
-	* сокращенное название страны - абревиатура (не зависящее от
+	* сокращенное название страны - аббревиатура (не зависящее от
 	* языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код языка, а
 	* значением ассоциативный массив вида <pre class="syntax"> array("LID" =&gt; "код
 	* языка", "NAME" =&gt; "название страны на этом языке", "SHORT_NAME" =&gt;
@@ -771,14 +709,39 @@ class CSaleLocation extends CAllSaleLocation
 	* пара ключ-значение должна присутствовать для каждого языка
 	* системы.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного местоположения или <i>false</i> у
 	* случае ошибки.</p> <a name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
+	* Параметры вызова
+	* </h
+	* <tr>
+	* <th width="15%">Параметр</th>
+	* <th>Описание</th>
+	* </tr>
+	* <tr>
+	* <td>arFields</td>
+	* <td>Массив с параметрами страны должен содержать ключи:
+	* <ul>
+	* <li>
+	* <b>NAME</b> - название страны (не зависящее от языка);</li>
+	* 	<li>
+	* <b>SHORT_NAME</b> - сокращенное название страны - аббревиатура (не зависящее от языка);</li>
+	* 	<li>
+	* <b>&lt;код языка&gt;</b> - ключем является код языка, а значением ассоциативный массив вида
+	* <pre class="syntax">
+	* array("LID" =&gt; "код языка",
+	*       "NAME" =&gt; "название страны на этом языке",
+	*       "SHORT_NAME" =&gt; "сокращенное название страны
+	*                        (аббревиатура) на этом языке")</pre>
+	* 	Эта пара ключ-значение должна присутствовать для каждого языка системы.</li>
+	* </ul>
+	* </td>
+	* </tr>
+	* 
+	* 
+	* 
 	* &lt;?
 	* $arCountry = array(
 	*    "NAME" =&gt; "Russian Federation",
@@ -813,10 +776,16 @@ class CSaleLocation extends CAllSaleLocation
 		if (!CSaleLocation::CountryCheckFields("ADD", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCountryAdd");
-		while ($arEvent = $db_events->Fetch())
+		if(self::isLocationProMigrated())
+		{
+			return self::AddLocationUnattached('COUNTRY', $arFields);
+		}
+
+		foreach (GetModuleEvents('sale', 'OnBeforeCountryAdd', true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_sale_location_country", $arFields);
 		$strSql =
@@ -826,7 +795,9 @@ class CSaleLocation extends CAllSaleLocation
 
 		$ID = IntVal($DB->LastID());
 
-		$db_lang = CLangAdmin::GetList(($b="sort"), ($o="asc"), array("ACTIVE" => "Y"));
+		$b = "sort";
+		$o = "asc";
+		$db_lang = CLangAdmin::GetList($b, $o, array("ACTIVE" => "Y"));
 		while ($arLang = $db_lang->Fetch())
 		{
 			if ($arFields[$arLang['LID']])
@@ -839,23 +810,21 @@ class CSaleLocation extends CAllSaleLocation
 			}
 		}
 
-		$events = GetModuleEvents("sale", "OnCountryAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents('sale', 'OnCountryAdd', true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
 	}
 
+	// have to use old table as a temporal place to store cities, kz we don`t know yet which country\region a newly-created city belongs to
 	
 	/**
-	* <p>Функция добавляет новый город с параметрами из массива <i> arFields</i>. </p>
-	*
-	*
+	* <p>Метод добавляет новый город с параметрами из массива <i> arFields</i>. Метод динамичный.</p> <p class="note"><b>Внимание!</b> Начиная с версии 14.10.0 метод не обновляется и обратная совместимость не поддерживается. Рекомендуется использовать методы нового ядра D7. Примеры работы с новым ядром можно увидеть <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3570" >здесь</a>.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив с параметрами города должен содержать
 	* ключи: <ul> <li> <b>NAME</b> - название города (не зависящее от языка);</li> <li>
-	* <b>SHORT_NAME</b> - сокращенное название города - абревиатура (не
+	* <b>SHORT_NAME</b> - сокращенное название города - аббревиатура (не
 	* зависящее от языка);</li> <li> <b>&lt;код языка&gt;</b> - ключем является код
 	* языка, а значением ассоциативный массив вида <pre class="syntax"> array("LID"
 	* =&gt; "код языка", "NAME" =&gt; "название города на этом языке", "SHORT_NAME" =&gt;
@@ -863,14 +832,39 @@ class CSaleLocation extends CAllSaleLocation
 	* пара ключ-значение должна присутствовать для каждого языка
 	* системы.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного города или <i>false</i> в случае
 	* ошибки.</p> <a name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
+	* Параметры вызова
+	* </h
+	* <tr>
+	* <th width="15%">Параметр</th>
+	* <th>Описание</th>
+	* </tr>
+	* <tr>
+	* <td>arFields</td>
+	* 	<td>Ассоциативный массив с параметрами города должен содержать ключи:
+	* <ul>
+	* <li>
+	* <b>NAME</b> - название города (не зависящее от языка);</li>
+	* 	<li>
+	* <b>SHORT_NAME</b> - сокращенное название города - аббревиатура (не зависящее от языка);</li>
+	* 	<li>
+	* <b>&lt;код языка&gt;</b> - ключем является код языка, а значением ассоциативный массив вида
+	* <pre class="syntax">
+	* array("LID" =&gt; "код языка",
+	*       "NAME" =&gt; "название города на этом языке",
+	*       "SHORT_NAME" =&gt; "сокращенное название города
+	*                        (аббревиатура) на этом языке")</pre>
+	* Эта пара ключ-значение должна присутствовать для каждого языка системы.</li>
+	* </ul>
+	* </td>
+	* </tr>
+	* 
+	* 
+	* 
 	* &lt;?
 	* $arCity = array(
 	*    "NAME" =&gt; "Kaliningrad",
@@ -905,10 +899,16 @@ class CSaleLocation extends CAllSaleLocation
 		if (!CSaleLocation::CityCheckFields("ADD", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeCityAdd");
-		while ($arEvent = $db_events->Fetch())
+		if(self::isLocationProMigrated())
+		{
+			return self::AddLocationUnattached('CITY', $arFields);
+		}
+
+		foreach (GetModuleEvents('sale', 'OnBeforeCityAdd', true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_sale_location_city", $arFields);
 		$strSql =
@@ -918,7 +918,9 @@ class CSaleLocation extends CAllSaleLocation
 
 		$ID = IntVal($DB->LastID());
 
-		$db_lang = CLangAdmin::GetList(($b="sort"), ($o="asc"), array("ACTIVE" => "Y"));
+		$b = "sort";
+		$o = "asc";
+		$db_lang = CLangAdmin::GetList($b, $o, array("ACTIVE" => "Y"));
 		while ($arLang = $db_lang->Fetch())
 		{
 			if ($arFields[$arLang["LID"]])
@@ -931,19 +933,13 @@ class CSaleLocation extends CAllSaleLocation
 			}
 		}
 
-		$events = GetModuleEvents("sale", "OnCityAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents('sale', 'OnCityAdd', true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
 	}
 
-	/**
-	* The function adds a new region
-	* 
-	* @param array $arFields array with parameters region
-	* @return int $ID code region
-	*/
+	// have to use old table as a temporal place to store region, kz we don`t know yet which country a newly-created region belongs to
 	public static function AddRegion($arFields)
 	{
 		global $DB;
@@ -951,10 +947,16 @@ class CSaleLocation extends CAllSaleLocation
 		if (!CSaleLocation::RegionCheckFields("ADD", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeRegionAdd");
-		while ($arEvent = $db_events->Fetch())
+		if(self::isLocationProMigrated())
+		{
+			return self::AddLocationUnattached('REGION', $arFields);
+		}
+
+		foreach (GetModuleEvents('sale', 'OnBeforeRegionAdd', true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_sale_location_region", $arFields);
 		$strSql =
@@ -964,7 +966,9 @@ class CSaleLocation extends CAllSaleLocation
 
 		$ID = IntVal($DB->LastID());
 
-		$db_lang = CLangAdmin::GetList(($b="sort"), ($o="asc"), array("ACTIVE" => "Y"));
+		$b = "sort";
+		$o = "asc";
+		$db_lang = CLangAdmin::GetList($b, $o, array("ACTIVE" => "Y"));
 		while ($arLang = $db_lang->Fetch())
 		{
 			if ($arFields[$arLang["LID"]])
@@ -977,33 +981,50 @@ class CSaleLocation extends CAllSaleLocation
 			}
 		}
 
-		$events = GetModuleEvents("sale", "OnRegionAdd");
-		while ($arEvent = $events->Fetch())
+		foreach (GetModuleEvents('sale', 'OnRegionAdd', true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
 	}
-	
-	
+
 	
 	/**
-	* <p>Функция добавляет новое местоположение на основании параметров массива <i> arFields</i>. </p>
-	*
-	*
+	* <p>Метод добавляет новое местоположение на основании параметров массива <i> arFields</i>. Метод динамичный.</p> <p class="note"><b>Внимание!</b> Начиная с версии 14.10.0 метод не обновляется и обратная совместимость не поддерживается. Рекомендуется использовать методы нового ядра D7. Примеры работы с новым ядром можно увидеть <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3570" >здесь</a>.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров местоположения с ключами: <ul> <li>
 	* <b>SORT</b> - индекс сортировки; </li> <li> <b>COUNTRY_ID</b> - код страны;</li> <li>
 	* <b>REGION_ID</b> - код региона;</li> <li> <b>CITY_ID</b> - код города.</li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленного местоположения или <i>false</i> у
 	* случае ошибки.</p> <a name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
+	* Параметры вызова
+	* </h
+	* <tr>
+	* <th width="15%">Параметр</th>
+	* <th>Описание</th>
+	* </tr>
+	* <tr>
+	* <td>arFields</td>
+	* <td>Ассоциативный массив параметров местоположения с ключами:
+	* <ul>
+	* <li>
+	* <b>SORT</b> - индекс сортировки; </li>
+	* 	<li>
+	* <b>COUNTRY_ID</b> - код страны;</li>
+	* 	<li>
+	* <b>REGION_ID</b> - код региона;</li>
+	* 	<li>
+	* <b>CITY_ID</b> - код города.</li>
+	* </ul>
+	* </td>
+	* </tr>
+	* 
+	* 
+	* 
 	* &lt;?
 	* // Добавим местоположение из страны с кодом 2 и города с кодом 10
 	* $ID = CSaleLocation::AddLocation(
@@ -1027,10 +1048,19 @@ class CSaleLocation extends CAllSaleLocation
 		if (!CSaleLocation::LocationCheckFields("ADD", $arFields))
 			return false;
 
-		$db_events = GetModuleEvents("sale", "OnBeforeLocationAdd");
-		while ($arEvent = $db_events->Fetch())
+		if(self::isLocationProMigrated())
+		{
+			return self::RebindLocationTriplet($arFields);
+		}
+
+		// make IX_B_SALE_LOC_CODE feel happy
+		$arFields['CODE'] = 'randstr'.rand(999, 99999);
+
+		foreach (GetModuleEvents('sale', 'OnBeforeLocationAdd', true) as $arEvent)
+		{
 			if (ExecuteModuleEventEx($arEvent, array($arFields))===false)
 				return false;
+		}
 
 		$arInsert = $DB->PrepareInsert("b_sale_location", $arFields);
 		$strSql =
@@ -1040,11 +1070,12 @@ class CSaleLocation extends CAllSaleLocation
 
 		$ID = IntVal($DB->LastID());
 
-		$events = GetModuleEvents("sale", "OnLocationAdd");
-		while ($arEvent = $events->Fetch())
+		// make IX_B_SALE_LOC_CODE feel happy
+		Location\LocationTable::update($ID, array('CODE' => $ID));
+
+		foreach (GetModuleEvents('sale', 'OnLocationAdd', true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
 
 		return $ID;
 	}
 }
-?>

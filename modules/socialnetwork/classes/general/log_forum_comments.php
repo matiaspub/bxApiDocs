@@ -56,15 +56,21 @@ class CSocNetForumComments
 
 		$entityId = intval($entityId);
 		if ($entityId <= 0)
+		{
 			return;
+		}
 
 		$messageId = $arData['MESSAGE_ID'];
 		if ($messageId <= 0)
+		{
 			return;
+		}
 
 		$arMessage = CForumMessage::GetByID($messageId);
 		if (!$arMessage)
+		{
 			return;
+		}
 
 		$strURL = $GLOBALS['APPLICATION']->GetCurPageParam("", array("IFRAME", "MID", "SEF_APPLICATION_CUR_PAGE_URL", BX_AJAX_PARAM_ID, "result", "sessid"));
 		$strURL = ForumAddPageParams(
@@ -125,14 +131,20 @@ class CSocNetForumComments
 			$ufFileID = array();
 			$dbAddedMessageFiles = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => $messageId));
 			while ($arAddedMessageFiles = $dbAddedMessageFiles->Fetch())
+			{
 				$ufFileID[] = $arAddedMessageFiles["FILE_ID"];
+			}
 
 			if (count($ufFileID) > 0)
+			{
 				$arFieldsForSocnet["UF_SONET_COM_FILE"] = $ufFileID;
+			}
 
 			$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $messageId, LANGUAGE_ID);
 			if ($ufDocID)
+			{
 				$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
+			}
 
 			$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
 			CSocNetLog::CounterIncrement(
@@ -157,7 +169,9 @@ class CSocNetForumComments
 				$entityType,
 				$entityId,
 				array(
+					"LOG_ID" => $log_id,
 					"USER_ID" => $arMessage["AUTHOR_ID"],
+					"MESSAGE_ID" => $messageId,
 					"MESSAGE" => $sText,
 					"URL" => $strURL
 				)

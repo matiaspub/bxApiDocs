@@ -312,40 +312,6 @@ class MssqlSqlHelper extends SqlHelper
 	}
 
 	/**
-	 * Returns $value converted to an type according to $field type.
-	 * <p>
-	 * For example if $field is Entity\DatetimeField then returned value will be instance of Type\DateTime.
-	 *
-	 * @param mixed $value Value to be converted.
-	 * @param Entity\ScalarField $field Type "source".
-	 *
-	 * @return mixed
-	 */
-	static public function convertFromDb($value, Entity\ScalarField $field)
-	{
-		if($value !== null)
-		{
-			if($field instanceof Entity\DatetimeField)
-			{
-				$value = new Type\DateTime(substr($value, 0, 19), "Y-m-d H:i:s");
-			}
-			elseif($field instanceof Entity\DateField)
-			{
-				$value = new Type\Date($value, "Y-m-d");
-			}
-			elseif($field instanceof Entity\StringField)
-			{
-				if(preg_match("#^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$#", $value))
-				{
-					$value = new Type\DateTime($value, "Y-m-d H:i:s");
-				}
-			}
-		}
-
-		return $value;
-	}
-
-	/**
 	 * Returns callback to be called for a field value on fetch.
 	 *
 	 * @param Entity\ScalarField $field Type "source".
@@ -468,7 +434,7 @@ class MssqlSqlHelper extends SqlHelper
 		{
 			$values = $field->getValues();
 
-			if (ctype_digit($values[0]) && ctype_digit($values[1]))
+			if (preg_match('/^[0-9]+$/', $values[0]) && preg_match('/^[0-9]+$/', $values[1]))
 			{
 				return 'int';
 			}
@@ -626,5 +592,74 @@ class MssqlSqlHelper extends SqlHelper
 			}
 		}
 		return $sql;
+	}
+
+	/**
+	 * Builds the strings for the SQL MERGE command for the given table.
+	 *
+	 * @param string $tableName A table name.
+	 * @param array $primaryFields Array("column")[] Primary key columns list.
+	 * @param array $insertFields Array("column" => $value)[] What to insert.
+	 * @param array $updateFields Array("column" => $value)[] How to update.
+	 *
+	 * @return array (merge)
+	 */
+	public function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
+	{
+		$insert = $this->prepareInsert($tableName, $insertFields);
+
+		$updateColumns = array();
+		$sourceSelectValues = array();
+		$sourceSelectColumns = array();
+		$targetConnectColumns = array();
+		$tableFields = $this->connection->getTableFields($tableName);
+		foreach($tableFields as $columnName => $tableField)
+		{
+			$quotedName = $this->quote($columnName);
+			if (in_array($columnName, $primaryFields))
+			{
+				$sourceSelectValues[] = $this->convertToDb($insertFields[$columnName], $tableField);
+				$sourceSelectColumns[] = $quotedName;
+				$targetConnectColumns[] = "source.".$quotedName." = target.".$quotedName;
+			}
+
+			if (isset($updateFields[$columnName]) || array_key_exists($columnName, $updateFields))
+			{
+				$updateColumns[] = "target.".$quotedName.' = '.$this->convertToDb($updateFields[$columnName], $tableField);
+			}
+		}
+
+		if (
+			$insert && $insert[0] != "" && $insert[1] != ""
+			&& $updateColumns
+			&& $sourceSelectValues && $sourceSelectColumns && $targetConnectColumns
+		)
+		{
+			$sql = "
+				MERGE INTO ".$this->quote($tableName)." AS target USING (
+					SELECT ".implode(", ", $sourceSelectValues)."
+				) AS source (
+					".implode(", ", $sourceSelectColumns)."
+				)
+				ON
+				(
+					".implode(" AND ", $targetConnectColumns)."
+				)
+				WHEN MATCHED THEN
+					UPDATE SET ".implode(", ", $updateColumns)."
+				WHEN NOT MATCHED THEN
+					INSERT (".$insert[0].")
+					VALUES (".$insert[1].")
+				;
+			";
+		}
+		else
+		{
+			$sql = "";
+		}
+
+		return array(
+			$sql
+		);
 	}
 }

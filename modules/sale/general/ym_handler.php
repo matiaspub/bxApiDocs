@@ -1,4 +1,9 @@
 <?
+
+use \Bitrix\Sale\DiscountCouponsManager;
+use \Bitrix\Sale\Compatible\DiscountCompatibility;
+use \Bitrix\Sale\TradingPlatform\YandexMarket;
+
 IncludeModuleLangFile(__FILE__);
 
 /**
@@ -115,10 +120,9 @@ class CSaleYMHandler
 		$this->locationMapper = new CSaleYMLocation;
 	}
 
-	public static function isActive($cached = true)
+	public static function isActive()
 	{
-		$settings = static::getSettings($cached);
-		return isset($settings["ACTIVE"]) && $settings["ACTIVE"] == "Y";
+		return YandexMarket::getInstance()->isActive();
 	}
 
 	/**
@@ -140,9 +144,16 @@ class CSaleYMHandler
 		}
 
 		if(!empty($settings))
-			$result = Bitrix\Sale\TradingPlatformTable::update($settings["ID"], array("ACTIVE" => ($activity ? "Y" : "N")));
+		{
+			if($activity)
+				$result = YandexMarket::getInstance()->setActive();
+			else
+				$result = YandexMarket::getInstance()->unsetActive();
+		}
 		else
+		{
 			$result = false;
+		}
 
 		return $result;
 	}
@@ -209,13 +220,7 @@ class CSaleYMHandler
 			$settings = $settingsRes->fetch();
 
 			if(!$settings)
-			{
 				$settings = array();
-			}
-			elseif(isset($settings["SETTINGS"]))
-			{
-				$settings["SETTINGS"] = unserialize($settings["SETTINGS"]);
-			}
 		}
 
 		return $settings;
@@ -261,7 +266,11 @@ class CSaleYMHandler
 
 		if(!empty($settings))
 		{
-			$result = Bitrix\Sale\TradingPlatformTable::update($settings["ID"], array("SETTINGS" => serialize($arSettings)));
+			if(is_array($settings))
+			$result = Bitrix\Sale\TradingPlatformTable::update(
+				YandexMarket::getInstance()->getId(),
+				array("SETTINGS" => $arSettings)
+			);
 		}
 		else
 		{
@@ -304,6 +313,19 @@ class CSaleYMHandler
 		$arResult = array();
 		$arProduct = $this->getProductById($arItem["offerId"], $arItem["count"]);
 
+		if($arProduct["CURRENCY"] != $currency && \Bitrix\Main\Loader::includeModule('currency'))
+		{
+				$price = \CCurrencyRates::convertCurrency(
+					$arProduct["PRICE"],
+					$arProduct["CURRENCY"],
+					$currency
+				);
+		}
+		else
+		{
+			$price = $arProduct["PRICE"];
+		}
+
 		if(isset($arProduct["error"]))
 		{
 			$arResult = $arProduct;
@@ -313,7 +335,7 @@ class CSaleYMHandler
 			$arResult = array(
 				"feedId" => $arItem["feedId"],
 				"offerId" => $arItem["offerId"],
-				"price" => round(floatval($arProduct["PRICE"]), 2),
+				"price" => round(floatval($price), 2),
 				"count" => $arProduct["QUANTITY"],
 				"weight" => $arProduct["WEIGHT"]
 			);
@@ -671,17 +693,19 @@ class CSaleYMHandler
 
 		$arResult = array();
 
+		DiscountCompatibility::reInit(DiscountCompatibility::MODE_EXTERNAL, array('SITE_ID' => $this->siteId));
+
 		if( $this->checkOrderAcceptStructure($arPostData))
 		{
-			$dbOrder = CSaleOrder::GetList(
-				array(),
-				array("XML_ID" => self::XML_ID_PREFIX.$arPostData["order"]["id"]),
-				false,
-				false,
-				array("ID")
-			);
 
-			if(!$arOrder = $dbOrder->Fetch())
+			$dbRes = \Bitrix\Sale\TradingPlatform\OrderTable::getList(array(
+				"filter" => array(
+					"TRADING_PLATFORM_ID" => YandexMarket::getInstance()->getId(),
+					"EXTERNAL_ORDER_ID" => $arPostData["order"]["id"]
+				)
+			));
+
+			if(!$orderCorrespondence = $dbRes->fetch())
 			{
 
 				require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/admin_tool.php");
@@ -762,7 +786,6 @@ class CSaleYMHandler
 				$arErrors = array();
 				$arAdditionalFields = array(
 					"XML_ID" => self::XML_ID_PREFIX.$arPostData["order"]["id"],
-					"EXTERNAL_ORDER" => "Y",
 				);
 
 				$arOrder["LID"] = $this->siteId;
@@ -772,10 +795,28 @@ class CSaleYMHandler
 
 				$orderID = $CSaleOrder->DoSaveOrder($arOrder, $arAdditionalFields, 0, $arErrors);
 
+				$res = \Bitrix\Sale\TradingPlatform\OrderTable::add(array(
+					"ORDER_ID" => $orderID,
+					"TRADING_PLATFORM_ID" => YandexMarket::getInstance()->getId(),
+					"EXTERNAL_ORDER_ID" => $arPostData["order"]["id"]
+				));
+
+				if(!$res->isSuccess())
+				{
+					foreach($res->getErrors() as $error)
+					{
+						$this->log(
+							self::LOG_LEVEL_ERROR,
+							"YMARKET_PLATFORM_ORDER_ADD_ERROR",
+							$orderID,
+							$error
+						);
+					}
+				}
 			}
 			else
 			{
-				$orderID = $arOrder["ID"];
+				$orderID = $orderCorrespondence["ORDER_ID"];
 			}
 
 			if(intval($orderID > 0))
@@ -1021,6 +1062,7 @@ class CSaleYMHandler
 		{
 			self::$isYandexRequest = true;
 			$arPostData = $this->extractPostData($postData);
+			DiscountCouponsManager::init(DiscountCouponsManager::MODE_EXTERNAL);
 
 			switch ($reqObject)
 			{
@@ -1161,27 +1203,33 @@ class CSaleYMHandler
 
 	static public function getOrderInfo($orderId)
 	{
-		$arOrder = array();
+		$res = \Bitrix\Sale\Internals\OrderTable::getList(array(
+			'filter' => array(
+				'=ID' => $orderId,
+				'=SOURCE.TRADING_PLATFORM_ID' => YandexMarket::getInstance()->getId()
+			),
+			'select' => array("LID", "XML_ID", "YANDEX_ID" => "SOURCE.EXTERNAL_ORDER_ID"),
+			'runtime' => array(
+				'SOURCE' => array(
+					'data_type' => '\Bitrix\Sale\TradingPlatform\OrderTable',
+					'reference' => array(
+						'ref.ORDER_ID' => 'this.ID',
+					),
+				'join_type' => 'left'
+				)
+			)
+		));
 
-		$dbOrder = CSaleOrder::GetList(
-			array(),
-			array("ID" => $orderId),
-			false,
-			false,
-			array("XML_ID", "LID")
-		);
+		if($arOrder = $res->fetch())
+				return $arOrder;
 
-		if($arOrder = $dbOrder->Fetch())
-			if(!is_null($arOrder["XML_ID"]) && strpos($arOrder["XML_ID"], self::XML_ID_PREFIX) !== false)
-				$arOrder["YANDEX_ID"] = substr($arOrder["XML_ID"], strlen(self::XML_ID_PREFIX));
-
-		return $arOrder;
+		return array();
 	}
 
 	public static function isOrderFromYandex($orderId)
 	{
 		$arOrder = self::getOrderInfo($orderId);
-		return isset($arOrder["YANDEX_ID"]);
+		return !empty($arOrder["YANDEX_ID"]);
 	}
 
 	/**
@@ -1525,7 +1573,7 @@ class CSaleYMHandler
 		if(!empty($settings))
 		{
 			if($deleteRecord)
-				Bitrix\Sale\TradingPlatformTable::delete($settings["ID"]);
+				Bitrix\Sale\TradingPlatformTable::delete(static::TRADING_PLATFORM_CODE);
 			else
 				static::setActivity(false);
 		}
@@ -1695,5 +1743,53 @@ class CSaleYMHandler
 		\Bitrix\Main\Config\Option::set("sale", $tag, 0, $this->siteId);
 
 		return true;
+	}
+
+	/*
+	 * Take out correnspondence to
+	 */
+	public static function takeOutOrdersToCorrespondentTable()
+	{
+		$platformId = \Bitrix\Sale\TradingPlatform\YandexMarket::getInstance()->getId();
+		$conn = \Bitrix\Main\Application::getConnection();
+		$helper = $conn->getSqlHelper();
+
+		$correspondence = $conn->query(
+			'SELECT ID
+				FROM '.$helper->quote(\Bitrix\Sale\TradingPlatform\OrderTable::getTableName()).'
+				WHERE '.$helper->quote('TRADING_PLATFORM_ID').'='.$platformId
+		);
+
+		//check if we already tried to convert
+		if ($correspondence->fetch())
+			return;
+
+		if($conn->getType() == "mssql")
+			$lenOpName = "LEN";
+		else
+			$lenOpName = "LENGTH";
+
+		//take out correspondence to
+		$sql = 'INSERT INTO '.\Bitrix\Sale\TradingPlatform\OrderTable::getTableName().' (ORDER_ID, EXTERNAL_ORDER_ID, TRADING_PLATFORM_ID)
+				SELECT ID, RIGHT(XML_ID, '.$lenOpName.'(XML_ID)-'.strlen(self::XML_ID_PREFIX).'), '.$platformId.'
+					FROM '.\Bitrix\Sale\Internals\OrderTable::getTableName().'
+					WHERE XML_ID LIKE "'.self::XML_ID_PREFIX.'%"';
+
+		try
+		{
+			$conn->queryExecute($sql);
+		}
+		catch(\Bitrix\Main\DB\SqlQueryException $e)
+		{
+			CEventLog::Add(array(
+				"SEVERITY" => "ERROR",
+				"AUDIT_TYPE_ID" => "YMARKET_XML_ID_CONVERT_INSERT_ERROR",
+				"MODULE_ID" => "sale",
+				"ITEM_ID" => "YMARKET",
+				"DESCRIPTION" => __FILE__.': '.$e->getMessage(),
+			));
+		}
+
+		return "";
 	}
 }

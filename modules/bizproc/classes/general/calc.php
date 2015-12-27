@@ -12,7 +12,7 @@ class CBPCalc
 	private function GetVariableValue($variable)
 	{
 		$variable = trim($variable);
-		if (!preg_match("#^\{=[a-z0-9_]+:[a-z0-9_]+\}$#i", $variable))
+		if (!preg_match(CBPActivity::ValuePattern, $variable))
 			return null;
 
 		return $this->activity->ParseValue($variable);
@@ -39,6 +39,12 @@ class CBPCalc
 		$text = trim($text);
 		if (substr($text, 0, 1) === '=')
 			$text = substr($text, 1);
+		if (strpos($text, '{{=') === 0 && substr($text, -2) == '}}')
+		{
+			$text = substr($text, 3);
+			$text = substr($text, 0, -2);
+		}
+
 		if (strlen($text) <= 0)
 		{
 			$this->SetError(1);
@@ -71,14 +77,14 @@ class CBPCalc
 			\s*\'[^\']*\'\s*                  | # String constants in apostrophes
 			\s*"[^"]*"\s*                     | # String constants in quotes
 			(\s*\w+\s*\(\s*)                  | # Function names
-			\s*\{=[a-z0-9_]+:[a-z0-9_]+\}\s*  | # Variables
-			(.+)                                # Any erroneous substring
+			\s*'.CBPActivity::ValueInternalPattern.'\s*  | # Variables
+			(?<error>.+)                                # Any erroneous substring
 			/xi';
 		while (preg_match($preg, $text, $match))
 		{
-			if (isset($match[3]))
+			if (isset($match['error']))
 			{
-				$this->SetError(2, $match[3]);
+				$this->SetError(2, $match['error']);
 				return false;
 			}
 
@@ -405,15 +411,15 @@ class CBPCalc
 		}
 
 		static $arMap = array("y" => "YYYY", "year" => "YYYY", "years" => "YYYY",
-		                      "m" => "MM", "month" => "MM", "months" => "MM",
-		                      "d" => "DD", "day" => "DD", "days" => "DD",
-		                      "h" => "HH", "hour" => "HH", "hours" => "HH",
-		                      "i" => "MI", "min" => "MI", "minute" => "MI", "minutes" => "MI",
-		                      "s" => "SS", "sec" => "SS", "second" => "SS", "seconds" => "SS",
+							"m" => "MM", "month" => "MM", "months" => "MM",
+							"d" => "DD", "day" => "DD", "days" => "DD",
+							"h" => "HH", "hour" => "HH", "hours" => "HH",
+							"i" => "MI", "min" => "MI", "minute" => "MI", "minutes" => "MI",
+							"s" => "SS", "sec" => "SS", "second" => "SS", "seconds" => "SS",
 		);
 
 		$arInterval = array();
-		while (preg_match("/\s*([\d]+)\s*([a-z]+)\s*/i", $interval, $match))
+		while (preg_match('/\s*([\d]+)\s*([a-z]+)\s*/i', $interval, $match))
 		{
 			$match2 = strtolower($match[2]);
 			if (array_key_exists($match2, $arMap))
@@ -442,12 +448,19 @@ class CBPCalc
 			return null;
 
 		$df = $GLOBALS["DB"]->DateFormatToPHP(FORMAT_DATETIME);
+		$df2 = $GLOBALS["DB"]->DateFormatToPHP(FORMAT_DATE);
 		$date1Formatted = \DateTime::createFromFormat($df, $date1);
+		if ($date1Formatted === false)
+			$date1Formatted = \DateTime::createFromFormat($df2, $date1);
 		$date2Formatted = \DateTime::createFromFormat($df, $date2);
+		if ($date2Formatted === false)
+			$date2Formatted = \DateTime::createFromFormat($df2, $date2);
+		if ($date1Formatted === false || $date2Formatted === false)
+			return null;
 
 		$interval = $date1Formatted->diff($date2Formatted);
 
-		return $interval->format($format);
+		return $interval === false? null : $interval->format($format);
 	}
 
 	private function FunctionFalse()
@@ -525,17 +538,87 @@ class CBPCalc
 		return substr($str, $pos);
 	}
 
+	private function FunctionConvert($args)
+	{
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$val = array_shift($ar);
+		$type = array_shift($ar);
+		$attr = array_shift($ar);
+
+		$type = strtolower($type);
+		if ($type === 'printableuserb24')
+		{
+			$result = array();
+
+			$users = CBPHelper::StripUserPrefix($val);
+			if (!is_array($users))
+				$users = array($users);
+
+			foreach ($users as $userId)
+			{
+				$db = CUser::GetByID($userId);
+				if ($ar = $db->GetNext())
+				{
+					$ix = randString(5);
+					$attr = (!empty($attr) ? 'href="'.$attr.'"' : 'href="#" onClick="return false;"');
+					$result[] = '<a class="feed-post-user-name" id="bp_'.$userId.'_'.$ix.'" '.$attr.' bx-post-author-id="'.$userId.'">'.CUser::FormatName(CSite::GetNameFormat(false), $ar, false).'</a><script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$userId.'_'.$ix.'", "");</script>';
+				}
+			}
+
+			$result = implode(", ", $result);
+		}
+		elseif ($type == 'printableuser')
+		{
+			$result = array();
+
+			$users = CBPHelper::StripUserPrefix($val);
+			if (!is_array($users))
+				$users = array($users);
+
+			foreach ($users as $userId)
+			{
+				$db = CUser::GetByID($userId);
+				if ($ar = $db->GetNext())
+					$result[] = CUser::FormatName(CSite::GetNameFormat(false), $ar, false);
+			}
+
+			$result = implode(", ", $result);
+
+		}
+		else
+		{
+			$result = $val;
+		}
+
+		return $result;
+	}
+
 	private function FunctionTrue()
 	{
 		return true;
 	}
 
+	private function FunctionMerge($args)
+	{
+		if (!is_array($args))
+			$args = array();
+
+		foreach ($args as &$a)
+		{
+			$a = (array)$a;
+		}
+		return call_user_func_array('array_merge', $args);
+	}
+
 	// Operation priority
 	private $arPriority = array(
-		'(' => 0,       ')' => 1,       ';' => 2,       '=' => 3,       '<' => 3,       '>' => 3,
-		'<=' => 3,      '>=' => 3,      '<>' => 3,      '&' => 4,       '+' => 5,       '-' => 5,
-		'*' => 6,       '/' => 6,       '^' => 7,       '%' => 8,       '-m' => 9,      '+m' => 9,
-		' ' => 10,      ':' => 11,      'f' => 12,
+		'('  => 0,   ')'  => 1,     ';'   => 2,   '=' => 3,     '<' => 3,   '>' => 3,
+		'<=' => 3,   '>=' => 3,     '<>'  => 3,   '&' => 4,     '+' => 5,   '-' => 5,
+		'*'  => 6,   '/'  => 6,     '^'   => 7,   '%' => 8,     '-m' => 9,  '+m' => 9,
+		' '  => 10,  ':'  => 11,    'f'   => 12,
 	);
 
 	// Allowable functions
@@ -552,20 +635,22 @@ class CBPCalc
 		'or' => array('args' => true, 'func' => 'FunctionOr'),
 		'substr' => array('args' => true, 'func' => 'FunctionSubstr'),
 		'true' => array('args' => false, 'func' => 'FunctionTrue'),
+		'convert' => array('args' => true, 'func' => 'FunctionConvert'),
+		'merge' => array('args' => true, 'func' => 'FunctionMerge'),
 	);
 
-    // Allowable errors
-    private $arAvailableErrors = array(
-        0 => 'Incorrect variable name - "#STR#"',
-        1 => 'Empty',
-        2 => 'Syntax error "#STR#"',
-        3 => 'Unknown function "#STR#"',
-        4 => 'Unmatched closing bracket ")"',
-        5 => 'Unmatched opening bracket "("',
-        6 => 'Division by zero',
-        7 => 'Incorrect order of operands',
-        8 => 'Incorrect arguments of function "#STR#"',
-    );
+	// Allowable errors
+	private $arAvailableErrors = array(
+		0 => 'Incorrect variable name - "#STR#"',
+		1 => 'Empty',
+		2 => 'Syntax error "#STR#"',
+		3 => 'Unknown function "#STR#"',
+		4 => 'Unmatched closing bracket ")"',
+		5 => 'Unmatched opening bracket "("',
+		6 => 'Division by zero',
+		7 => 'Incorrect order of operands',
+		8 => 'Incorrect arguments of function "#STR#"',
+	);
 
 	const Operation = 0;
 	const Variable = 1;

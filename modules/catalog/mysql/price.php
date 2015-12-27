@@ -1,11 +1,10 @@
 <?
+use Bitrix\Main\Config\Option;
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/price.php");
 
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -18,9 +17,7 @@ class CPrice extends CAllPrice
 {
 	
 	/**
-	* <p>Метод добавляет новое ценовое предложение (новую цену) для товара</p>
-	*
-	*
+	* <p>Метод добавляет новое ценовое предложение (новую цену) для товара. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров ценового предложения.
@@ -30,15 +27,13 @@ class CPrice extends CAllPrice
 	* <li> <b>CURRENCY</b> - валюта цены (обязательный параметр);</li> <li> <b>QUANTITY_FROM</b>
 	* - количество товара, начиная с приобретения которого действует
 	* эта цена;</li> <li> <b>QUANTITY_TO</b> - количество товара, при приобретении
-	* которого заканчивает действие эта цена. <p class="note">Если необходимо,
-	* чтобы значения параметров <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы,
-	* необходимо указать у них в качестве значения false либо не задавать
-	* поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в Update вообще. </p> </li> </ul> Если
-	* установлен код наценки, то появляется возможность автоматически
-	* пересчитывать эту цену при изменении базовой цены или процента
-	* наценки.
-	*
-	*
+	* которого заканчивает действие эта цена. <p></p> <div class="note">
+	* <b>Примечание:</b> если необходимо, чтобы значения параметров
+	* <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы, необходимо указать у них в
+	* качестве значения false либо не задавать поля <b>QUANTITY_FROM</b> и
+	* <b>QUANTITY_TO</b> в Update вообще.</div> </li> </ul> Если установлен код наценки, то
+	* появляется возможность автоматически пересчитывать эту цену при
+	* изменении базовой цены или процента наценки.
 	*
 	* @param boolean $boolRecalc = false Пересчитать цены. Если передать true, то включается механизм
 	* пересчета цен. <br> Если добавляется базовая цена (в <b>CATALOG_GROUP_ID</b>
@@ -48,22 +43,19 @@ class CPrice extends CAllPrice
 	* и уже существует базовая - значения <b>PRICE</b> и <b>CURRENCY</b> буду
 	* пересчитаны. <br> Необязательный параметр. По умолчанию - <i>false</i>.
 	*
-	*
-	*
 	* @return mixed <p>Возвращает идентификатор добавленной цены в случае успешного
 	* сохранения и <i>false</i> - в противном случае. Для получения детальной
 	* информации об ошибке следует вызвать <b>$APPLICATION-&gt;GetException()</b>.</p>
-	* <h4>События</h4><p>Метод работает с событиями <a
+	* <h4>События</h4></bod<p>Метод работает с событиями <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceadd.php">OnBeforePriceAdd</a> и <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceadd.php">OnPriceAdd</a>.</p>
-	* <h4>Примечания</h4><p>Если параметр <b>$boolRecalc = true</b>, все равно
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceadd.php">OnPriceAdd</a>.</p> <p></p><div class="note">
+	* <b>Примечания:</b> <ul> <li>Если параметр <b>$boolRecalc = true</b>, все равно
 	* необходимо указывать цену и валюту (в том случае, когда тип цены -
 	* не базовый). Если существует базовая цена, значения цены и валюты
-	* будут изменены, если нет - код наценки будет изменен на ноль.</p> <p>В
-	* обработчиках события <b>OnBeforePriceAdd</b> можно запретить или, наоборот,
-	* включить пересчет цены. За это отвечает ключ <b>RECALC</b> массива
-	* данных, передаваемых в обработчик.</p>
-	*
+	* будут изменены, если нет - код наценки будет изменен на ноль.</li>
+	* <li>В обработчиках события <b>OnBeforePriceAdd</b> можно запретить или,
+	* наоборот, включить пересчет цены. За это отвечает ключ <b>RECALC</b>
+	* массива данных, передаваемых в обработчик.</li> </ul> </div>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -121,10 +113,9 @@ class CPrice extends CAllPrice
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
-	* <li>CPrice::CheckFields</li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/checkfields.php">CPrice::CheckFields</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceadd.php">Событие OnBeforePriceAdd</a></li>
 	* <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceadd.php">Событие OnPriceAdd</a></li> </ul> <a
@@ -140,7 +131,7 @@ class CPrice extends CAllPrice
 		global $DB;
 
 		$boolBase = false;
-		$arFields['RECALC'] = ($boolRecalc === true ? true : false);
+		$arFields['RECALC'] = ($boolRecalc === true);
 
 		foreach (GetModuleEvents("catalog", "OnBeforePriceAdd", true) as $arEvent)
 		{
@@ -153,7 +144,7 @@ class CPrice extends CAllPrice
 		if (isset($arFields['RECALC']) && $arFields['RECALC'] === true)
 		{
 			CPrice::ReCountFromBase($arFields, $boolBase);
-			if (!$boolBase && 0 >= $arFields['EXTRA_ID'])
+			if (!$boolBase && $arFields['EXTRA_ID'] <= 0)
 			{
 				return false;
 			}
@@ -164,7 +155,7 @@ class CPrice extends CAllPrice
 		$strSql = "INSERT INTO b_catalog_price(".$arInsert[0].") VALUES(".$arInsert[1].")";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$ID = intval($DB->LastID());
+		$ID = (int)$DB->LastID();
 
 		if ($ID > 0 && $boolBase)
 		{
@@ -187,14 +178,10 @@ class CPrice extends CAllPrice
 
 	
 	/**
-	* <p>Функция возвращает ценовое предложение по его коду ID </p>
-	*
-	*
+	* <p>Метод возвращает ценовое предложение по его коду ID. Метод динамичный. </p>
 	*
 	*
 	* @param int $ID  Код ценового предложения.
-	*
-	*
 	*
 	* @return array <p>Возвращается ассоциативный массив с ключами</p> <table class="tnormal"
 	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
@@ -210,7 +197,6 @@ class CPrice extends CAllPrice
 	* приобретения которого действует эта цена. </td> </tr> <tr> <td>QUANTITY_TO </td>
 	* <td>Количество товара, при приобретении которого заканчивает
 	* действие эта цена. </td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -247,7 +233,7 @@ class CPrice extends CAllPrice
 			"FROM b_catalog_price CP, b_catalog_group CG ".
 			"	LEFT JOIN b_catalog_group2group CGG ON (CG.ID = CGG.CATALOG_GROUP_ID AND CGG.GROUP_ID IN (".$strUserGroups.") AND CGG.BUY <> 'Y') ".
 			"	LEFT JOIN b_catalog_group2group CGG1 ON (CG.ID = CGG1.CATALOG_GROUP_ID AND CGG1.GROUP_ID IN (".$strUserGroups.") AND CGG1.BUY = 'Y') ".
-			"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".LANGUAGE_ID."') ".
+			"	LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".LANGUAGE_ID."') ".
 			"WHERE CP.ID = ".$ID." ".
 			"	AND CP.CATALOG_GROUP_ID = CG.ID ".
 			"GROUP BY CP.ID, CP.PRODUCT_ID, CP.EXTRA_ID, CP.CATALOG_GROUP_ID, CP.PRICE, CP.CURRENCY, CP.QUANTITY_FROM, CP.QUANTITY_TO, CP.TIMESTAMP_X ";
@@ -258,11 +244,17 @@ class CPrice extends CAllPrice
 		return false;
 	}
 
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array $arGroupBy
+	 * @param bool|array $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|CDBResult
+	 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей цен в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей цен в соответствии со своими параметрами. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: Если выборку нужно произвести без учёта прав доступа, то лучше использовать метод <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/90252.php">CPrice::GetListEx</a>.</div>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -277,8 +269,6 @@ class CPrice extends CAllPrice
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи типов цены.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -308,33 +298,25 @@ class CPrice extends CAllPrice
 	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи типов цены. Массив
 	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
 	* качестве "название_поля<i>N</i>" может стоять любое поле типов цены.
-	* <br><br> Если массив пустой, то функция вернет число записей,
+	* <br><br> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -351,9 +333,8 @@ class CPrice extends CAllPrice
 	* приобретения которого действует эта цена. </td> </tr> <tr> <td>QUANTITY_TO </td>
 	* <td>Количество товара, при приобретении которого заканчивает
 	* действие эта цена.</td> </tr> </table> <p> Если в качестве параметра arGroupBy
-	* передается пустой массив, то функция вернет число записей,
+	* передается пустой массив, то метод вернет число записей,
 	* удовлетворяющих фильтру. </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -390,16 +371,10 @@ class CPrice extends CAllPrice
 		// for old execution style
 		if (!is_array($arOrder) && !is_array($arFilter))
 		{
-			$arOrder = strval($arOrder);
-			$arFilter = strval($arFilter);
-			if ('' != $arOrder && '' != $arFilter)
-				$arOrder = array($arOrder => $arFilter);
-			else
-				$arOrder = array();
-			if (is_array($arGroupBy))
-				$arFilter = $arGroupBy;
-			else
-				$arFilter = array();
+			$arOrder = (string)$arOrder;
+			$arFilter = (string)$arFilter;
+			$arOrder = ($arOrder != '' && $arFilter != '' ? array($arOrder => $arFilter) : array());
+			$arFilter = (is_array($arGroupBy) ? $arGroupBy : array());
 			$arGroupBy = false;
 		}
 
@@ -419,19 +394,16 @@ class CPrice extends CAllPrice
 			"QUANTITY_FROM" => array("FIELD" => "P.QUANTITY_FROM", "TYPE" => "int"),
 			"QUANTITY_TO" => array("FIELD" => "P.QUANTITY_TO", "TYPE" => "int"),
 			"TMP_ID" => array("FIELD" => "P.TMP_ID", "TYPE" => "string"),
-
+			"PRICE_BASE_RATE" => array("FIELD" => "P.PRICE*CC.CURRENT_BASE_RATE", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_currency CC ON (P.CURRENCY = CC.CURRENCY)"),
 			"BASE" => array("FIELD" => "CG.BASE", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_group CG ON (P.CATALOG_GROUP_ID = CG.ID)"),
 			"SORT" => array("FIELD" => "CG.SORT", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group CG ON (P.CATALOG_GROUP_ID = CG.ID)"),
-
 			"PRODUCT_QUANTITY" => array("FIELD" => "CP.QUANTITY", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql((string)Option::get('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql((string)Option::get('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql((string)Option::get('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
 			"PRODUCT_WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-
 			"ELEMENT_IBLOCK_ID" => array("FIELD" => "IE.IBLOCK_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock_element IE ON (P.PRODUCT_ID = IE.ID)"),
-
-			"CATALOG_GROUP_NAME" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (CG.ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".LANGUAGE_ID."')"),
+			"CATALOG_GROUP_NAME" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (P.CATALOG_GROUP_ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".LANGUAGE_ID."')"),
 		);
 
 		$arFields["CAN_ACCESS"] = array(
@@ -477,11 +449,11 @@ class CPrice extends CAllPrice
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
+		if ($boolNavStartParams && isset($arNavStartParams['nTopCount']))
 		{
-			$intTopCount = intval($arNavStartParams["nTopCount"]);
+			$intTopCount = (int)$arNavStartParams["nTopCount"];
 		}
-		if ($boolNavStartParams && 0 >= $intTopCount)
+		if ($boolNavStartParams && $intTopCount <= 0)
 		{
 			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_price P ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
@@ -502,12 +474,11 @@ class CPrice extends CAllPrice
 			}
 
 			$dbRes = new CDBResult();
-
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
 		{
-			if ($boolNavStartParams && 0 < $intTopCount)
+			if ($boolNavStartParams && $intTopCount > 0)
 			{
 				$strSql .= " LIMIT ".$intTopCount;
 			}
@@ -517,11 +488,17 @@ class CPrice extends CAllPrice
 		return $dbRes;
 	}
 
+	/**
+	 * @param array $arOrder
+	 * @param array $arFilter
+	 * @param bool|array $arGroupBy
+	 * @param bool|array $arNavStartParams
+	 * @param array $arSelectFields
+	 * @return bool|CDBResult
+	 */
 	
 	/**
-	* <p>Функция возвращает результат выборки записей цен в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей цен в соответствии со своими параметрами. Отличается от обычного <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__getlist.8f7c2a3e.php">GetList</a> отсутствием безусловной проверкой прав на типы цен для групп текущего пользователя. Метод необходимо использовать везде, где эта проверка не требуется (будет гораздо производительнее). Метод динамичный. </p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -536,8 +513,6 @@ class CPrice extends CAllPrice
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи типов цены.
 	* Массив имеет вид: <pre class="syntax">array(
@@ -567,33 +542,25 @@ class CPrice extends CAllPrice
 	* Значение по умолчанию - пустой массив array() - означает, что
 	* результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи типов цены. Массив
 	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
 	* качестве "название_поля<i>N</i>" может стоять любое поле типов цены.
-	* <br><br> Если массив пустой, то функция вернет число записей,
+	* <br><br> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -610,9 +577,8 @@ class CPrice extends CAllPrice
 	* группы цен на текущем языке.</td> </tr> <tr> <td>CATALOG_GROUP_SORT</td> <td>Индекс
 	* сортировки типа цены.</td> </tr> <tr> <td>GROUP_BUY</td> <td>Флаг "Разрешена
 	* покупка по этой цене"</td> </tr> </table> <p> Если в качестве параметра
-	* arGroupBy передается пустой массив, то функция вернет число записей,
+	* arGroupBy передается пустой массив, то метод вернет число записей,
 	* удовлетворяющих фильтру. </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -650,22 +616,18 @@ class CPrice extends CAllPrice
 			"QUANTITY_FROM" => array("FIELD" => "P.QUANTITY_FROM", "TYPE" => "int"),
 			"QUANTITY_TO" => array("FIELD" => "P.QUANTITY_TO", "TYPE" => "int"),
 			"TMP_ID" => array("FIELD" => "P.TMP_ID", "TYPE" => "string"),
-
+			"PRICE_BASE_RATE" => array("FIELD" => "P.PRICE*CC.CURRENT_BASE_RATE", "TYPE" => "double", "FROM" => "LEFT JOIN b_catalog_currency CC ON (P.CURRENCY = CC.CURRENCY)"),
 			"PRODUCT_QUANTITY" => array("FIELD" => "CP.QUANTITY", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-			"PRODUCT_NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql(COption::GetOptionString('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_QUANTITY_TRACE" => array("FIELD" => "IF (CP.QUANTITY_TRACE = 'D', '".$DB->ForSql((string)Option::get('catalog','default_quantity_trace','N'))."', CP.QUANTITY_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_CAN_BUY_ZERO" => array("FIELD" => "IF (CP.CAN_BUY_ZERO = 'D', '".$DB->ForSql((string)Option::get('catalog','default_can_buy_zero','N'))."', CP.CAN_BUY_ZERO)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
+			"PRODUCT_NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$DB->ForSql((string)Option::get('catalog','allow_negative_amount','N'))."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
 			"PRODUCT_WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_product CP ON (P.PRODUCT_ID = CP.ID)"),
-
 			"ELEMENT_IBLOCK_ID" => array("FIELD" => "IE.IBLOCK_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_iblock_element IE ON (P.PRODUCT_ID = IE.ID)"),
 			"ELEMENT_NAME" => array("FIELD" => "IE.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_iblock_element IE ON (P.PRODUCT_ID = IE.ID)"),
-
 			"CATALOG_GROUP_CODE" => array("FIELD" => "CG.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_catalog_group CG ON (P.CATALOG_GROUP_ID = CG.ID)"),
 			"CATALOG_GROUP_BASE" => array("FIELD" => "CG.BASE", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_group CG ON (P.CATALOG_GROUP_ID = CG.ID)"),
 			"CATALOG_GROUP_SORT" => array("FIELD" => "CG.SORT", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group CG ON (P.CATALOG_GROUP_ID = CG.ID)"),
-
-			"CATALOG_GROUP_NAME" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (P.CATALOG_GROUP_ID = CGL.CATALOG_GROUP_ID AND CGL.LID = '".LANGUAGE_ID."')"),
-
+			"CATALOG_GROUP_NAME" => array("FIELD" => "CGL.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_catalog_group_lang CGL ON (P.CATALOG_GROUP_ID = CGL.CATALOG_GROUP_ID AND CGL.LANG = '".LANGUAGE_ID."')"),
 			"GROUP_GROUP_ID" => array("FIELD" => "CGG.GROUP_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_catalog_group2group CGG ON (P.CATALOG_GROUP_ID = CGG.CATALOG_GROUP_ID)"),
 			"GROUP_BUY" => array("FIELD" => "CGG.BUY", "TYPE" => "char", "FROM" => "INNER JOIN b_catalog_group2group CGG ON (P.CATALOG_GROUP_ID = CGG.CATALOG_GROUP_ID)")
 		);
@@ -699,11 +661,11 @@ class CPrice extends CAllPrice
 
 		$intTopCount = 0;
 		$boolNavStartParams = (!empty($arNavStartParams) && is_array($arNavStartParams));
-		if ($boolNavStartParams && array_key_exists('nTopCount', $arNavStartParams))
+		if ($boolNavStartParams && isset($arNavStartParams['nTopCount']))
 		{
-			$intTopCount = intval($arNavStartParams["nTopCount"]);
+			$intTopCount = (int)$arNavStartParams["nTopCount"];
 		}
-		if ($boolNavStartParams && 0 >= $intTopCount)
+		if ($boolNavStartParams && $intTopCount <= 0)
 		{
 			$strSql_tmp = "SELECT COUNT('x') as CNT FROM b_catalog_price P ".$arSqls["FROM"];
 			if (!empty($arSqls["WHERE"]))
@@ -724,12 +686,11 @@ class CPrice extends CAllPrice
 			}
 
 			$dbRes = new CDBResult();
-
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
 		{
-			if ($boolNavStartParams && 0 < $intTopCount)
+			if ($boolNavStartParams && $intTopCount > 0)
 			{
 				$strSql .= " LIMIT ".$intTopCount;
 			}

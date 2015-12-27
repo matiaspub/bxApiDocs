@@ -6,10 +6,7 @@ IncludeModuleLangFile(__FILE__);
  * <p>Непосредственно от абстрактного класса CBPActivity наследуются действия, которые не могут содержать внутри себя другие действия. Этот класс определяет набор базовых методов, которые необходимы любому действию. Некоторые методы, определенные в классе CBPActivity могут или должны быть переопределены в классе-наследнике.</p> <p>Составные действия наследуются от абстрактного класса <b>CBPCompositeActivity</b>, который в свою очередь наследуется от класса CBPActivity. Класс <b>CBPCompositeActivity</b> обеспечивает поддержку возможности включать внутрь действия дочерние действия. Например, составным действием является стандартное действие <b>CBPParallelActivity</b> (параллельное выполнение), которое содержит в себе дочерние действия, соответствующие веткам параллельного выполнения.</p> <p>Класс <b>CBPCompositeActivity</b> содержит член <b>arActivities</b>, с помощью которого можно обращаться к дочерним действиям.</p> <p>Класс <b>CBPActivity</b> содержит следующие члены, которые можно применять в действиях-наследниках:</p> <ul> <li> <b>workflow</b> – содержит объект-оболочку типа CBPWorkflow для данного бизнес-процесса,</li> <li> <b>parent</b> – содержит родительское действие,</li> <li> <b>executionStatus</b> – статус выполнения действия,</li> <li> <b>executionResult</b> – результат выполнения действия.</li> </ul> <br>
  *
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -36,10 +33,19 @@ abstract class CBPActivity
 	const ClosedEvent = 3;
 	const FaultingEvent = 4;
 
+	const ValuePattern = '#^\s*\{=\s*(?<object>[a-z0-9_]+)\s*\:\s*(?<field>[a-z0-9_]+)(\s*>\s*(?<mod1>[a-z0-9_\:]+)(\s*,\s*(?<mod2>[a-z0-9_]+))?)?\s*\}\s*$#i';
+	const ValueInlinePattern = '#\{=\s*(?<object>[a-z0-9_]+)\s*\:\s*(?<field>[a-z0-9_]+)(\s*>\s*(?<mod1>[a-z0-9_\:]+)(\s*,\s*(?<mod2>[a-z0-9_]+))?)?\s*\}#i';
+	/** Internal pattern used in calc.php */
+	const ValueInternalPattern = '\{=\s*([a-z0-9_]+)\s*\:\s*([a-z0-9_]+)(\s*>\s*([a-z0-9_\:]+)(\s*,\s*([a-z0-9_]+))?)?\s*\}';
+
+	const CalcPattern = '#^\s*(=\s*(.*)|\{\{=\s*(.*)\s*\}\})\s*$#is';
+	const CalcInlinePattern = '#\{\{=\s*(.*?)\s*\}\}([^\}]|$)#is';
+
 	protected $arProperties = array();
 	protected $arPropertiesTypes = array();
 
 	protected $name = "";
+	/** @var CBPWorkflow $workflow */
 	public $workflow = null;
 
 	public $arEventsMap = array();
@@ -101,6 +107,11 @@ abstract class CBPActivity
 	protected function ClearProperties()
 	{
 		$rootActivity = $this->GetRootActivity();
+		$documentId = $rootActivity->GetDocumentId();
+		$documentType = $this->GetDocumentType();
+		/** @var CBPDocumentService $documentService */
+		$documentService = $this->workflow->GetService("DocumentService");
+
 		if (is_array($rootActivity->arPropertiesTypes) && count($rootActivity->arPropertiesTypes) > 0
 			&& is_array($rootActivity->arFieldTypes) && count($rootActivity->arFieldTypes) > 0)
 		{
@@ -117,6 +128,11 @@ abstract class CBPActivity
 					{
 						CFile::Delete($rootActivity->arProperties[$key]);
 					}
+				}
+				if ($fieldTypeObject = $documentService->getFieldTypeObject($documentType, $value))
+				{
+					$fieldTypeObject->setDocumentId($documentId)
+									->clearValue($rootActivity->arProperties[$key]);
 				}
 			}
 		}
@@ -150,6 +166,11 @@ abstract class CBPActivity
 	protected function ClearVariables()
 	{
 		$rootActivity = $this->GetRootActivity();
+		$documentId = $rootActivity->GetDocumentId();
+		$documentType = $this->GetDocumentType();
+		/** @var CBPDocumentService $documentService */
+		$documentService = $this->workflow->GetService("DocumentService");
+
 		if (is_array($rootActivity->arVariablesTypes) && count($rootActivity->arVariablesTypes) > 0
 			&& is_array($rootActivity->arFieldTypes) && count($rootActivity->arFieldTypes) > 0)
 		{
@@ -167,6 +188,12 @@ abstract class CBPActivity
 						CFile::Delete($rootActivity->arVariables[$key]);
 					}
 				}
+				if ($fieldTypeObject = $documentService->getFieldTypeObject($documentType, $value))
+				{
+					$fieldTypeObject->setDocumentId($documentId)
+						->clearValue($rootActivity->arVariables[$key]);
+				}
+
 			}
 		}
 	}
@@ -211,8 +238,42 @@ abstract class CBPActivity
 			return $rootActivity->arVariables[$name];
 
 		return null;
-		//else
-		//	throw new Exception(str_replace("#NAME#", htmlspecialcharsbx($name), GetMessage("BPSWA_EMPTY_NAME")));
+	}
+
+	public function getVariableType($name)
+	{
+		$rootActivity = $this->GetRootActivity();
+		return isset($rootActivity->arVariablesTypes[$name]) ? $rootActivity->arVariablesTypes[$name] : null;
+	}
+
+	private function GetConstantTypes()
+	{
+		$rootActivity = $this->GetRootActivity();
+		if (method_exists($rootActivity, 'GetWorkflowTemplateId'))
+		{
+			$templateId = $rootActivity->GetWorkflowTemplateId();
+			if ($templateId > 0)
+			{
+				return CBPWorkflowTemplateLoader::getTemplateConstants($templateId);
+			}
+		}
+		return null;
+	}
+
+	public function GetConstant($name)
+	{
+		$constants = $this->GetConstantTypes();
+		if (isset($constants[$name]['Default']))
+			return $constants[$name]['Default'];
+		return null;
+	}
+
+	public function GetConstantType($name)
+	{
+		$constants = $this->GetConstantTypes();
+		if (isset($constants[$name]))
+			return $constants[$name];
+		return array('Type' => null, 'Multiple' => false, 'Required' => false, 'Options' => null);
 	}
 
 	public function IsVariableExists($name)
@@ -222,46 +283,12 @@ abstract class CBPActivity
 	}
 
 	/************************************************/
-	
-	/**
-	* <p>Метод возвращает имя действия. Имя действия уникально в рамках бизнес-процесса.</p>
-	*
-	*
-	*
-	*
-	* @return string <p>Строка, содержащая имя действия.</p> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetName.php
-	* @author Bitrix
-	*/
 	public function GetName()
 	{
 		return $this->name;
 	}
 
-	
-	/**
-	* <p>Метод возвращает корневое действие бизнес-процесса. Корневое действие реализует интерфейс <b>IBPRootActivity</b>.</p>
-	*
-	*
-	*
-	*
-	* @return CBPActivity <p>Объект типа <i>CBPActivity</i>, представляющий корневое действие
-	* бизнес-процесса.</p> <a name="examples"></a>
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?<br>$rootActivity = $this-&gt;GetRootActivity();<br>$documentId = $rootActivity-&gt;GetDocumentId();<br>?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetRootActivity.php
-	* @author Bitrix
-	*/
-	static public function GetRootActivity()
+	public function GetRootActivity()
 	{
 		$p = $this;
 		while ($p->parent != null)
@@ -274,26 +301,6 @@ abstract class CBPActivity
 		$this->workflow = $workflow;
 	}
 
-	
-	/**
-	* <p>Метод возвращает код бизнес-процесса.</p>
-	*
-	*
-	*
-	*
-	* @return string <p>Строка, содержащая идентификатор экземпляра бизнес-процесса.</p>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetInstanceId.php">CBPWorkflow::GetInstanceId</a>
-	* </li> </ul><br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/GetWorkflowInstanceId.php
-	* @author Bitrix
-	*/
 	public function GetWorkflowInstanceId()
 	{
 		return $this->workflow->GetInstanceId();
@@ -373,17 +380,23 @@ abstract class CBPActivity
 		$stateService->SetStateTitle($this->GetWorkflowInstanceId(), $result);
 	}
 
-	private function GetPropertyValueRecursive($val)
+	private function GetPropertyValueRecursive($val, $convertToType = null)
 	{
 		// array(2, 5, array("SequentialWorkflowActivity1", "DocumentApprovers"))
 		// array("Document", "IBLOCK_ID")
 		// array("Workflow", "id")
 		// "Hello, {=SequentialWorkflowActivity1:DocumentApprovers}, {=Document:IBLOCK_ID}!"
 
-		if (is_string($val) && preg_match("/^\{=([A-Za-z0-9_]+)\:([A-Za-z0-9_]+)\}$/i", $val, $arMatches))
-			$val = array($arMatches[1], $arMatches[2]);
-
-		if (is_array($val))
+		$parsed = $this->parseValueExpression($val);
+		if ($parsed)
+		{
+			$result = null;
+			if ($convertToType)
+				$parsed['modifiers'][] = $convertToType;
+			$this->GetRealParameterValue($parsed['object'], $parsed['field'], $result, $parsed['modifiers']);
+			return array(1, $result);
+		}
+		elseif (is_array($val))
 		{
 			$b = true;
 			$r = array();
@@ -403,7 +416,7 @@ abstract class CBPActivity
 
 			foreach ($keys as $key)
 			{
-				list($t, $a) = $this->GetPropertyValueRecursive($val[$key]);
+				list($t, $a) = $this->GetPropertyValueRecursive($val[$key], $convertToType);
 				if ($b)
 				{
 					if ($t == 1 && is_array($a))
@@ -423,7 +436,8 @@ abstract class CBPActivity
 				if ($keys[0] == 0 && $keys[1] == 1 && is_string($r[0]) && is_string($r[1]))
 				{
 					$result = null;
-					if ($this->GetRealParameterValue($r[0], $r[1], $result, false))
+					$modifiers = $convertToType ? array($convertToType) : array();
+					if ($this->GetRealParameterValue($r[0], $r[1], $result, $modifiers))
 						return array(1, $result);
 				}
 			}
@@ -433,173 +447,315 @@ abstract class CBPActivity
 		{
 			if (is_string($val))
 			{
-				if (substr($val, 0, 1) === "=")
+				$typeClass = null;
+				$fieldTypeObject = null;
+				if ($convertToType)
 				{
-					$calc = new CBPCalc($this);
-					$r = $calc->Calculate($val);
-					if ($r != null)
-						return array(2, $r);
+					/** @var CBPDocumentService $documentService */
+					$documentService = $this->workflow->GetService("DocumentService");
+					$documentType = $this->GetDocumentType();
+
+					$typesMap = $documentService->getTypesMap($documentType);
+					$convertToType = strtolower($convertToType);
+					if (isset($typesMap[$convertToType]))
+					{
+						$typeClass = $typesMap[$convertToType];
+						$fieldTypeObject = $documentService->getFieldTypeObject(
+							$documentType,
+							array('Type' => \Bitrix\Bizproc\FieldType::STRING)
+						);
+					}
 				}
 
+				$calc = new CBPCalc($this);
+				if (preg_match(self::CalcPattern, $val))
+				{
+					$r = $calc->Calculate($val);
+					if ($r !== null)
+					{
+						if ($typeClass && $fieldTypeObject)
+						{
+							if (is_array($r))
+								$fieldTypeObject->setMultiple(true);
+							$r = $fieldTypeObject->convertValue($r, $typeClass);
+						}
+						return array(is_array($r)? 1 : 2, $r);
+					}
+				}
+
+				//parse inline calculator
 				$val = preg_replace_callback(
-					"/\{=([A-Za-z0-9_]+)\:([A-Za-z0-9_]+)\}/i",
+					static::CalcInlinePattern,
+					function($matches) use ($calc)
+					{
+						$r = $calc->Calculate($matches[1]);
+						if (is_array($r))
+							$r = implode(', ', $r);
+						return $r !== null? $r : $matches[0];
+					},
+					$val
+				);
+
+				//parse properties
+				$val = preg_replace_callback(
+					static::ValueInlinePattern,
 					array($this, "ParseStringParameter"),
 					$val
 				);
+
+				//converting...
+				if ($typeClass && $fieldTypeObject)
+				{
+					$val = $fieldTypeObject->convertValue($val, $typeClass);
+				}
 			}
 
 			return array(2, $val);
 		}
 	}
 
-	private function GetRealParameterValue($objectName, $fieldName, &$result)
+	private function GetRealParameterValue($objectName, $fieldName, &$result, array $modifiers = null)
 	{
-		$return = false;
+		$return = true;
+		$property = null;
 
 		if ($objectName == "Document")
 		{
 			$rootActivity = $this->GetRootActivity();
 			$documentId = $rootActivity->GetDocumentId();
 
+			/** @var CBPDocumentService $documentService */
 			$documentService = $this->workflow->GetService("DocumentService");
 			$document = $documentService->GetDocument($documentId);
 
-			if (array_key_exists($fieldName, $document))
+			$result = '';
+
+			if (isset($document[$fieldName]))
 			{
 				$result = $document[$fieldName];
-				$return = true;
-			}
-		}
-		elseif ($objectName == "Template")
-		{
-			$rootActivity = $this->GetRootActivity();
-			if (substr($fieldName, -strlen("_printable")) == "_printable")
-			{
-				$fieldNameTmp = substr($fieldName, 0, strlen($fieldName) - strlen("_printable"));
-				$result = $rootActivity->{$fieldNameTmp};
-
-				$rootActivity = $this->GetRootActivity();
-				$documentId = $rootActivity->GetDocumentId();
-
-				$documentService = $this->workflow->GetService("DocumentService");
-				$result = $documentService->GetFieldValuePrintable($documentId, $fieldNameTmp, $rootActivity->arPropertiesTypes[$fieldNameTmp]["Type"], $result, $rootActivity->arPropertiesTypes[$fieldNameTmp]);
-
-				if (is_array($result))
+				if (is_array($result) && strtoupper(substr($fieldName, -strlen('_PRINTABLE'))) == '_PRINTABLE')
 					$result = implode(", ", $result);
-			}
-			else
-			{
-				$result = $rootActivity->{$fieldName};
-			}
 
-			$return = true;
+				if (!empty($modifiers))
+				{
+					$documentType = $this->GetDocumentType();
+					$fields = $documentService->GetDocumentFields($documentType);
+					$property = isset($fields[$fieldName]) ? $fields[$fieldName] : null;
+				}
+			}
 		}
-		elseif ($objectName == "Variable")
+		elseif ($objectName == 'Template' || $objectName == 'Variable' || $objectName == 'Constant')
 		{
 			$rootActivity = $this->GetRootActivity();
 
 			if (substr($fieldName, -strlen("_printable")) == "_printable")
 			{
-				$fieldNameTmp = substr($fieldName, 0, strlen($fieldName) - strlen("_printable"));
-				$result = $rootActivity->GetVariable($fieldNameTmp);
-
-				$rootActivity = $this->GetRootActivity();
-				$documentId = $rootActivity->GetDocumentId();
-
-				$documentService = $this->workflow->GetService("DocumentService");
-				$result = $documentService->GetFieldValuePrintable($documentId, $fieldNameTmp, $rootActivity->arVariablesTypes[$fieldNameTmp]["Type"], $result, $rootActivity->arVariablesTypes[$fieldNameTmp]);
-
-				if (is_array($result))
-					$result = implode(", ", $result);
+				$fieldName = substr($fieldName, 0, strlen($fieldName) - strlen("_printable"));
+				$modifiers = array('printable');
 			}
-			else
+
+			switch ($objectName)
 			{
-				$result = $rootActivity->GetVariable($fieldName);
+				case 'Variable':
+					$result = $rootActivity->GetVariable($fieldName);
+					$property = $rootActivity->arVariablesTypes[$fieldName];
+					break;
+				case 'Constant':
+					$result = $rootActivity->GetConstant($fieldName);
+					$property = $rootActivity->GetConstantType($fieldName);
+					break;
+				default:
+					$result = $rootActivity->{$fieldName};
+					$property = $rootActivity->arPropertiesTypes[$fieldName];
 			}
-
-			$return = true;
 		}
 		elseif ($objectName == "Workflow")
 		{
 			$result = $this->GetWorkflowInstanceId();
-			$return = true;
+			$property = array('Type' => 'string');
 		}
 		elseif ($objectName == "User")
 		{
 			$result = 0;
-			if ($GLOBALS["USER"]->IsAuthorized())
+			if (isset($GLOBALS["USER"]) && is_object($GLOBALS["USER"]) && $GLOBALS["USER"]->isAuthorized())
 				$result = "user_".$GLOBALS["USER"]->GetID();
-
-			$return = true;
+			$property = array('Type' => 'user');
 		}
 		elseif ($objectName == "System")
 		{
 			global $DB;
 
 			$result = null;
+			$property = array('Type' => 'datetime');
 			if ($fieldName == "Now")
 				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
+			elseif ($fieldName == "NowLocal")
+			{
+				$result = time();
+				if (CTimeZone::Enabled())
+					$result += CTimeZone::GetOffset();
+				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), $result);
+			}
 			elseif ($fieldName == "Date")
+			{
 				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")));
-			if ($result !== null)
-				$return = true;
+				$property = array('Type' => 'date');
+			}
+			if ($result === null)
+				$return = false;
 		}
-		else
+		elseif ($objectName)
 		{
 			$activity = $this->workflow->GetActivityByName($objectName);
 			if ($activity)
 			{
-				// _printable is not supported because mapping between activity property types
-				// and document property types is not supported
 				$result = $activity->{$fieldName};
-				$return = true;
+				//if mapping is set, we can apply modifiers (type converting & formating like `printable`, `bool` etc.)
+				if (isset($activity->arPropertiesTypes[$fieldName]))
+				{
+					$property = $activity->arPropertiesTypes[$fieldName];
+				}
 			}
+			else
+				$return = false;
+		}
+		else
+			$return = false;
+
+		if ($return)
+			$result = $this->applyPropertyValueModifiers($fieldName, $property, $result, $modifiers);
+		return $return;
+	}
+
+	private function applyPropertyValueModifiers($fieldName, $property, $value, array $modifiers)
+	{
+		if (empty($property) || empty($modifiers) || !is_array($property))
+			return $value;
+
+		$typeClass = null;
+		$format = null;
+
+		$rootActivity = $this->GetRootActivity();
+		$documentId = $rootActivity->GetDocumentId();
+		/** @var CBPDocumentService $documentService */
+		$documentService = $this->workflow->GetService("DocumentService");
+		$documentType = $this->GetDocumentType();
+
+		$typesMap = $documentService->getTypesMap($documentType);
+		foreach ($modifiers as $m)
+		{
+			$m = strtolower($m);
+			if (isset($typesMap[$m]))
+				$typeClass = $typesMap[$m];
+			else
+				$format = $m;
 		}
 
-		return $return;
+		if ($typeClass || $format)
+		{
+			$fieldTypeObject = $documentService->getFieldTypeObject($documentType, $property);
+
+			if ($fieldTypeObject)
+			{
+				$fieldTypeObject->setDocumentId($documentId);
+				if ($typeClass)
+					$value = $fieldTypeObject->convertValue($value, $typeClass);
+				if ($format)
+					$value = $fieldTypeObject->formatValue($value, $format);
+			}
+			elseif ($format == 'printable') // compatibility: old printable style
+			{
+				$value = $documentService->GetFieldValuePrintable(
+					$documentId,
+					$fieldName,
+					$property['Type'],
+					$value,
+					$property
+				);
+
+				if (is_array($value))
+					$value = implode(", ", $value);
+			}
+		}
+		return $value;
 	}
 
 	private function ParseStringParameter($matches)
 	{
-		$objectName = $matches[1];
-		$fieldName = $matches[2];
-
 		$result = "";
+		$modifiers = array();
+		if (!empty($matches['mod1']))
+			$modifiers[] = $matches['mod1'];
+		if (!empty($matches['mod2']))
+			$modifiers[] = $matches['mod2'];
 
-		if ($this->GetRealParameterValue($objectName, $fieldName, $result))
+		if (empty($modifiers))
+			$modifiers[] = \Bitrix\Bizproc\FieldType::STRING;
+
+		if ($this->GetRealParameterValue($matches['object'], $matches['field'], $result, $modifiers))
 		{
 			if (is_array($result))
 				$result = implode(", ", $result);
 		}
 		else
 		{
-			$result = "{=".$objectName.":".$fieldName."}";
+			$result = $matches[0];
 		}
 
 		return $result;
 	}
 
-	public function ParseValue($value)
+	/**
+	 * @param $text
+	 * @return array|bool
+	 */
+	private function parseValueExpression($text)
 	{
-		list($t, $r) = $this->GetPropertyValueRecursive($value);
+		$matches = null;
+		if (is_string($text) && preg_match(static::ValuePattern, $text, $matches))
+		{
+			$result = array(
+				'object' => $matches['object'],
+				'field' => $matches['field'],
+				'modifiers' => array()
+			);
+			if (!empty($matches['mod1']))
+				$result['modifiers'][] = $matches['mod1'];
+			if (!empty($matches['mod2']))
+				$result['modifiers'][] = $matches['mod2'];
+
+			return $result;
+		}
+		return false;
+	}
+
+	public function ParseValue($value, $convertToType = null)
+	{
+		list($t, $r) = $this->GetPropertyValueRecursive($value, $convertToType);
 		return $r;
 	}
 
-	public function __get($name)
+	protected function getRawProperty($name)
 	{
-		if (array_key_exists($name, $this->arProperties))
+		if (isset($this->arProperties[$name]))
 		{
-			list($t, $r) = $this->GetPropertyValueRecursive($this->arProperties[$name]);
-			return $r;
+			return $this->arProperties[$name];
 		}
-		else
-		{
-			return null;
-			//throw new Exception(str_replace("#NAME#", htmlspecialcharsbx($name), GetMessage("BPCGACT_NO_PROPERTY")));
-		}
+		return null;
 	}
 
-	public function __set($name, $val)
+	function __get($name)
+	{
+		$property = $this->getRawProperty($name);
+		if ($property !== null)
+		{
+			list($t, $r) = $this->GetPropertyValueRecursive($property);
+			return $r;
+		}
+		return null;
+	}
+
+	function __set($name, $val)
 	{
 		if (array_key_exists($name, $this->arProperties))
 			$this->arProperties[$name] = $val;
@@ -612,7 +768,7 @@ abstract class CBPActivity
 		return array_key_exists($name, $this->arProperties);
 	}
 
-	static public function CollectNestedActivities()
+	public function CollectNestedActivities()
 	{
 		return null;
 	}
@@ -657,7 +813,7 @@ abstract class CBPActivity
 	{
 	}
 
-	static public function Execute()
+	public function Execute()
 	{
 		return CBPActivityExecutionStatus::Closed;
 	}
@@ -668,19 +824,19 @@ abstract class CBPActivity
 		$this->executionResult = CBPActivityExecutionResult::None;
 	}
 
-	static public function Cancel()
+	public function Cancel()
 	{
 		return CBPActivityExecutionStatus::Closed;
 	}
 
-	static public function HandleFault(Exception $exception)
+	public function HandleFault(Exception $exception)
 	{
 		return CBPActivityExecutionStatus::Closed;
 	}
 
 	/************************  LOAD / SAVE  *******************************************************/
 
-	static public function FixUpParentChildRelationship(CBPActivity $nestedActivity)
+	public function FixUpParentChildRelationship(CBPActivity $nestedActivity)
 	{
 		$nestedActivity->parent = $this;
 	}
@@ -724,7 +880,7 @@ abstract class CBPActivity
 		}
 	}
 
-	static public function Save()
+	public function Save()
 	{
 		$arUsedActivities = array();
 		self::SearchUsedActivities($this, $arUsedActivities);
@@ -734,44 +890,6 @@ abstract class CBPActivity
 
 	/************************  STATUS CHANGE HANDLERS  **********************************************/
 
-	
-	/**
-	* <p>Метод добавляет новый обработчик события изменения статуса действия.</p>
-	*
-	*
-	*
-	*
-	* @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
-	* <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
-	* будет вызываться обработчик.
-	*
-	*
-	*
-	* @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
-	* <b>IBPActivityEventListener</b>.
-	*
-	*
-	*
-	* @return void 
-	*
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?<br>class CBPMyActivity<br>	extends CBPCompositeActivity    // наследуем, так как составное действие<br>	implements IBPEventActivity	// обработка события завершения дочернего действия<br>{<br>	// Исполняемый метод действия<br>	public function Execute()<br>	{<br>		// Возьмем первое дочернее действие<br>		$activity = $this-&gt;arActivities[0];<br>		// Подпишемся на событие изменения статуса дочернего действия (завершение)<br>		$activity-&gt;AddStatusChangeHandler(self::ClosedEvent, $this);<br>		// Отправим дочернее действие исполняющей среде на выполнение<br>		$this-&gt;workflow-&gt;ExecuteActivity($activity);<br><br>		// Вернем указание исполняющей среде, что действие еще выполняется<br>		return CBPActivityExecutionStatus::Executing;<br>	}<br><br>	// Обработчик события изменения статуса интерфейса IBPEventActivity<br>	// Параметром передается действие, изменившее статус<br>	protected function OnEvent(CBPActivity $sender)<br>	{<br>		// Отпишемся от события изменения статуса дочернего действия (завершения)<br>		$sender-&gt;RemoveStatusChangeHandler(self::ClosedEvent, $this);<br>		// Дочернее действие завершено, выполняем другой необходимый нам код<br>		// Например завершаем действие<br>		$this-&gt;workflow-&gt;CloseActivity($this);<br>	}<br>}<br>?&gt;
-	* </pre>
-	*
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php">RemoveStatusChangeHandler</a>
-	* </li> </ul><a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php
-	* @author Bitrix
-	*/
 	public function AddStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
@@ -783,37 +901,6 @@ abstract class CBPActivity
 		$this->arStatusChangeHandlers[$event][] = $eventHandler;
 	}
 
-	
-	/**
-	* <p>Метод удаляет обработчик события изменения статуса действия.</p>
-	*
-	*
-	*
-	*
-	* @param int $event  Одна из констант <b>CBPActivity::ExecutingEvent</b>, <b>CBPActivity::ClosedEvent</b>,
-	* <b>CBPActivity::FaultingEvent</b>, определяющая, на какое изменение статуса
-	* будет вызываться обработчик.
-	*
-	*
-	*
-	* @param IBPActivityEventListener $eventHandler  Обработчик события, который реализует интерфейс
-	* <b>IBPActivityEventListener</b>.
-	*
-	*
-	*
-	* @return void 
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/AddStatusChangeHandler.php">AddStatusChangeHandler</a></li>
-	* </ul><br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPActivity/RemoveStatusChangeHandler.php
-	* @author Bitrix
-	*/
 	public function RemoveStatusChangeHandler($event, $eventHandler)
 	{
 		if (!is_array($this->arStatusChangeHandlers))
@@ -891,14 +978,16 @@ abstract class CBPActivity
 	{
 		$runtime = CBPRuntime::GetRuntime();
 		if (!$runtime->IncludeActivityFile($code))
-			return array(array("code" => "ActivityNotFound", "parameter" => $code, "message" => GetMessage("BPGA_ACTIVITY_NOT_FOUND")));
+			return array(array("code" => "ActivityNotFound", "parameter" => $code, "message" => GetMessage("BPGA_ACTIVITY_NOT_FOUND", array('#ACTIVITY#' => htmlspecialcharsbx($code)))));
 
 		if (preg_match("#[^a-zA-Z0-9_]#", $code))
 			throw new Exception("Activity '".$code."' is not valid");
 
 		$classname = 'CBP'.$code;
 
-		return call_user_func_array(array($classname, $method), $arParameters);
+		if (method_exists($classname,$method))
+			return call_user_func_array(array($classname, $method), $arParameters);
+		return false;
 	}
 
 	public function InitializeFromArray($arParams)
@@ -995,6 +1084,17 @@ abstract class CBPActivity
 	public static function &FindActivityInTemplate(&$arWorkflowTemplate, $activityName)
 	{
 		return CBPWorkflowTemplateLoader::FindActivityByName($arWorkflowTemplate, $activityName);
+	}
+
+	public static function isExpression($text)
+	{
+		if (is_string($text))
+		{
+			$text = trim($text);
+			if (preg_match(static::CalcPattern, $text) || preg_match(static::ValuePattern, $text))
+				return true;
+		}
+		return false;
 	}
 }
 ?>

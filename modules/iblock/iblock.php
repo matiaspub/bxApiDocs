@@ -1,11 +1,11 @@
 <?php
 IncludeModuleLangFile(__FILE__);
 
-if(!defined("CACHED_b_iblock_type"));// define("CACHED_b_iblock_type", 36000);
-if(!defined("CACHED_b_iblock"));// define("CACHED_b_iblock", 36000);
-if(!defined("CACHED_b_iblock_bucket_size"));// define("CACHED_b_iblock_bucket_size", 20);
-if(!defined("CACHED_b_iblock_property_enum"));// define("CACHED_b_iblock_property_enum", 36000);
-if(!defined("CACHED_b_iblock_property_enum_bucket_size"));// define("CACHED_b_iblock_property_enum_bucket_size", 100);
+if(!defined("CACHED_b_iblock_type")) // define("CACHED_b_iblock_type", 36000);
+if(!defined("CACHED_b_iblock")) // define("CACHED_b_iblock", 36000);
+if(!defined("CACHED_b_iblock_bucket_size")) // define("CACHED_b_iblock_bucket_size", 20);
+if(!defined("CACHED_b_iblock_property_enum")) // define("CACHED_b_iblock_property_enum", 36000);
+if(!defined("CACHED_b_iblock_property_enum_bucket_size")) // define("CACHED_b_iblock_property_enum_bucket_size", 100);
 
 /** @global string $DBType */
 global $DBType;
@@ -28,6 +28,7 @@ $arClasses = array(
 	"CAllIBlockRSS" => "classes/general/iblockrss.php",
 	"CIBlockRSS" => "classes/".$DBType."/iblockrss.php",
 	"CIBlockPropertyDateTime" => "classes/general/prop_datetime.php",
+	"CIBlockPropertyDate" => "classes/general/prop_date.php",
 	"CIBlockPropertyXmlID" => "classes/general/prop_xmlid.php",
 	"CIBlockPropertyFileMan" => "classes/general/prop_fileman.php",
 	"CIBlockPropertyHTML" => "classes/general/prop_html.php",
@@ -53,16 +54,78 @@ $arClasses = array(
 	"CIBlockElementRights" => "classes/general/iblock_rights.php",
 	"CIBlockRightsStorage" => "classes/general/iblock_rights.php",
 	"CIBlockPropertyTools" => "classes/general/iblockproptools.php",
-	"Bitrix\\Iblock\\IblockTable" => "lib/iblock.php",
-	"Bitrix\\Iblock\\ElementTable" => "lib/element.php",
-	"Bitrix\\Iblock\\SectionElementTable" => "lib/sectionelement.php",
-	"Bitrix\\Iblock\\SectionTable" => "lib/section.php",
-	"Bitrix\\Iblock\\SiteTable" => "lib/site.php",
 	"CIBlockSectionPropertyLink" => "classes/general/section_property.php",
-	"Bitrix\\Iblock\\Template\\NodeRoot" => "lib/template/engine.php",
-	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyEnum" => "lib/template/entity/elementproperty.php",
-	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertyElement" => "lib/template/entity/elementproperty.php",
-	"Bitrix\\Iblock\\Template\\Entity\\ElementPropertySection" => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\ElementTable' => "lib/element.php",
+	'\Bitrix\Iblock\IblockTable' => "lib/iblock.php",
+	'\Bitrix\Iblock\IblockFieldTable' => "lib/iblockfield.php",
+	'\Bitrix\Iblock\IblockGroupTable' => "lib/iblockgroup.php",
+	'\Bitrix\Iblock\IblockMessageTable' => "lib/iblockmessage.php",
+	'\Bitrix\Iblock\IblockRssTable' => "lib/iblockrss.php",
+	'\Bitrix\Iblock\IblockSiteTable' => "lib/iblocksite.php",
+	'\Bitrix\Iblock\InheritedPropertyTable' => "lib/inheritedproperty.php",
+	'\Bitrix\Iblock\PropertyTable' => "lib/property.php",
+	'\Bitrix\Iblock\PropertyEnumerationTable' => "lib/propertyenumeration.php",
+	'\Bitrix\Iblock\SectionTable' => "lib/section.php",
+	'\Bitrix\Iblock\SectionElementTable' => "lib/sectionelement.php",
+	'\Bitrix\Iblock\SectionPropertyTable' => "lib/sectionproperty.php",
+	'\Bitrix\Iblock\SequenceTable' => "lib/sequence.php",
+	'\Bitrix\Iblock\SiteTable' => "lib/site.php",
+	'\Bitrix\Iblock\TypeTable' => "lib/type.php",
+	'\Bitrix\Iblock\TypeLanguageTable' => "lib/typelanguage.php",
+	'\Bitrix\Iblock\InheritedProperty\BaseTemplate' => "lib/inheritedproperty/basetemplate.php",
+	'\Bitrix\Iblock\InheritedProperty\BaseValues' => "lib/inheritedproperty/basevalues.php",
+	'\Bitrix\Iblock\InheritedProperty\ElementTemplates' => "lib/inheritedproperty/elementtemplates.php",
+	'\Bitrix\Iblock\InheritedProperty\ElementValues' => "lib/inheritedproperty/elementvalues.php",
+	'\Bitrix\Iblock\InheritedProperty\IblockTemplates' => "lib/inheritedproperty/iblocktemplates.php",
+	'\Bitrix\Iblock\InheritedProperty\IblockValues' => "lib/inheritedproperty/iblockvalues.php",
+	'\Bitrix\Iblock\InheritedProperty\SectionTemplates' => "lib/inheritedproperty/sectiontemplates.php",
+	'\Bitrix\Iblock\InheritedProperty\SectionValues' => "lib/inheritedproperty/sectionvalues.php",
+	'\Bitrix\Iblock\PropertyIndex\Dictionary' => "lib/propertyindex/dictionary.php",
+	'\Bitrix\Iblock\PropertyIndex\Element' => "lib/propertyindex/element.php",
+	'\Bitrix\Iblock\PropertyIndex\Facet' => "lib/propertyindex/facet.php",
+	'\Bitrix\Iblock\PropertyIndex\Indexer' => "lib/propertyindex/indexer.php",
+	'\Bitrix\Iblock\PropertyIndex\Manager' => "lib/propertyindex/manager.php",
+	'\Bitrix\Iblock\PropertyIndex\QueryBuilder' => "lib/propertyindex/querybuilder.php",
+	'\Bitrix\Iblock\PropertyIndex\Storage' => "lib/propertyindex/storage.php",
+	'\Bitrix\Iblock\Template\Engine' => "lib/template/engine.php",
+	'\Bitrix\Iblock\Template\NodeRoot' => "lib/template/engine.php",
+	'\Bitrix\Iblock\Template\NodeText' => "lib/template/engine.php",
+	'\Bitrix\Iblock\Template\NodeEntityField' => "lib/template/engine.php",
+	'\Bitrix\Iblock\Template\NodeFunction' => "lib/template/engine.php",
+	'\Bitrix\Iblock\Template\Helper' => "lib/template/helper.php",
+	'\Bitrix\Iblock\Template\Entity\Base' => "lib/template/entity/base.php",
+	'\Bitrix\Iblock\Template\Entity\LazyValueLoader' => "lib/template/entity/base.php",
+	'\Bitrix\Iblock\Template\Entity\CatalogStore' => "lib/template/entity/catalogstore.php",
+	'\Bitrix\Iblock\Template\Entity\Element' => "lib/template/entity/element.php",
+	'\Bitrix\Iblock\Template\Entity\ElementCatalog' => "lib/template/entity/elementcatalog.php",
+	'\Bitrix\Iblock\Template\Entity\ElementCatalogMeasure' => "lib/template/entity/elementcatalog.php",
+	'\Bitrix\Iblock\Template\Entity\ElementCatalogStoreList' => "lib/template/entity/elementcatalog.php",
+	'\Bitrix\Iblock\Template\Entity\ElementPrice' => "lib/template/entity/elementprice.php",
+	'\Bitrix\Iblock\Template\Entity\ElementProperty' => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\Template\Entity\ElementPropertyUserField' => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\Template\Entity\ElementPropertyEnum' => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\Template\Entity\ElementPropertyElement' => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\Template\Entity\ElementPropertySection' => "lib/template/entity/elementproperty.php",
+	'\Bitrix\Iblock\Template\Entity\ElementSku' => "lib/template/entity/elementsku.php",
+	'\Bitrix\Iblock\Template\Entity\ElementSkuPrice' => "lib/template/entity/elementskuprice.php",
+	'\Bitrix\Iblock\Template\Entity\ElementSkuProperty' => "lib/template/entity/elementskuproperty.php",
+	'\Bitrix\Iblock\Template\Entity\Iblock' => "lib/template/entity/iblock.php",
+	'\Bitrix\Iblock\Template\Entity\Section' => "lib/template/entity/section.php",
+	'\Bitrix\Iblock\Template\Entity\SectionPath' => "lib/template/entity/sectionpath.php",
+	'\Bitrix\Iblock\Template\Entity\SectionProperty' => "lib/template/entity/sectionproperty.php",
+	'\Bitrix\Iblock\Template\Functions\Fabric' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionBase' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionUpper' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionLower' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionTranslit' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionConcat' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionLimit' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionContrast' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionMin' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionMax' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\Template\Functions\FunctionDistinct' => "lib/template/functions/fabric.php",
+	'\Bitrix\Iblock\SenderEventHandler' => "lib/senderconnector.php",
+	'\Bitrix\Iblock\SenderConnectorIblock' => "lib/senderconnector.php",
 );
 if(IsModuleInstalled('bizproc'))
 {
@@ -192,28 +255,22 @@ function GetIBlockListLang($lang, $type, $arTypesInc = array(), $arTypesExc = ar
  * <p>Функция возвращает информационный блок по коду <i>ID</i>, но только если он активен (ACTIVE равно Y) и имеет привязку к текущему сайту. <br></p>
  *
  *
- *
- *
  * @param string $ID  ID информационного блока.
- *
- *
  *
  * @param typ $e = "" Тип информационного блока. Устанавливается в настройках модуля.
  * Если задан, то при выборке проверяется чтобы информационный блок
  * соответствовал этому типу. <br> Необязательный. По умолчанию на
  * информационный блок не накладываются ограничения по типу.
  *
- *
- *
  * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей информационного
- * блока</a> <code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><h4>Примечание</h4>
- *
+ * блока</a> <code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><p></p><div class="note"> <b>Примечание:</b>
+ * функция вернет поля информационного блока только в том случае,
+ * если информационный блок активен и привязан к текущему сайту.</div>
  *
  * <h4>Example</h4> 
  * <pre>
  * &lt;?<br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");<br><br>$APPLICATION-&gt;SetTitle("Продукты");<br><br>// проверим установлен ли модуль и получим блок с кодом $BID и типом catalog<br>if(CModule::IncludeModule("iblock") &amp;&amp; ($arIBlock = GetIBlock($_GET["BID"], "catalog")))<br>{<br>   // сделаем заголовок страницы таким же как название инф. блока<br>   $APPLICATION-&gt;SetTitle($arIBlock["NAME"]);<br>   //добавим название в навигационную цепочку<br>   $APPLICATION-&gt;AddChainItem($arIBlock["NAME"], $arIBlock["LIST_PAGE_URL"]);<br><br>   //работаем дальше с информационным блоком<br>   // ....<br>}<br>else<br>   ShowError("Информационный блок не найден.");<br><br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -460,22 +517,16 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  */
 
 /**
- * <p>Функция возвращает активные элементы из информационного блока <i>iblock_id</i>. </p> <p><b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</p>
- *
- *
+ * <p>Функция возвращает активные элементы из информационного блока <i>iblock_id</i>. </p> <p></p> <div class="note"> <b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</div>
  *
  *
  * @param int $iblock_id  ID информационного блока из которого будут выбраны элементы.
- *
- *
  *
  * @param int $section_id = false ID раздела, из которой требуется получить элементы. Для получения
  * элементов из корня информационного блока (не привязанные ни к
  * одному разделу) установите параметр <i>section_id</i> =
  * 0.<br><br>Необязательный. По умолчанию (false) выбираются все записи без
  * ограничения по папкам.
- *
- *
  *
  * @param array $order = Array("SORT"=>"ASC") Порядок сортировки - массив вида Array(<i>by1</i>=&gt;<i>order1</i>[,
  * <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> - поле для сортировки, может
@@ -491,12 +542,8 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>
  *
- *
- *
  * @param int $cnt = 0 Максимальное количество записей, которые вернет функция.
  * <br>Необязательный. По умолчанию выбираются все записи.
- *
- *
  *
  * @param array $arFilter = Array() Дополнительный фильтр по произвольным полям вида
  * Array("Фильтруемое поле"=&gt;"Значение", ...). <br><i>Фильтруемое поле</i>
@@ -543,16 +590,13 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>.</b>
  *
- *
- *
  * @return CIBlockResult <p>Функция возвращает объект класса <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> с активными
  * элементами (у которых установлен флаг "Активен", выполняется
  * условие периода активности и находящиеся в активных
- * информационных блоках для текущего сайта).</p>
- * <h4>Примечание</h4><p>При работе с результатом рекомендуется
- * применять метод класса <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
+ * информационных блоках для текущего сайта).</p> <p></p><div class="note">
+ * <b>Примечание:</b> при работе с результатом рекомендуется применять
+ * метод класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>, результатом
  * которого будет массив с полями элемента информационного блока.
  * Все поля при этом будут преобразованы в "HTML безопасный" вид, а в
@@ -567,8 +611,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * полях LIST_PAGE_URL и DETAIL_PAGE_URL будут оригинальные (как они введены в
  * форме редактирования информационного блока) шаблоны URL-ов, а не с
  * замененными параметрами <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>,
- * <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. </p>
- *
+ * <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. </div>
  *
  * <h4>Example</h4> 
  * <pre>
@@ -589,7 +632,6 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * </pre>
  *
  *
- *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов
  * информационного блока</a> </li> <li> <a
@@ -600,6 +642,7 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php
  * @author Bitrix
+ * @deprecated No longer used by internal code and not recommended.
  */
 function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("sort"=>"asc"), $cnt = 0, $arFilter = array(), $arSelect = array())
 {
@@ -633,21 +676,15 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  */
 
 /**
- * <p>Функция возвращает информационный элемент с кодом <i>ID</i>. Функция-помошник, которая выбирает все базовые поля элемента, его свойства и информацию об инфоблоке. Использует <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>. </p> <p><b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</p>
- *
- *
+ * <p>Функция возвращает информационный элемент с кодом <i>ID</i>. Функция-помошник, которая выбирает все базовые поля элемента, его свойства и информацию об инфоблоке. Использует <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>. </p> <p></p> <div class="note"> <b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</div>
  *
  *
  * @param int $ID  ID элемента.
- *
- *
  *
  * @param string $type = "" Тип информационного блока. Устанавливается в настройках модуля.
  * Если задан, то при выборке проверяется чтобы элемент
  * соответствовал этому типу. <br> Необязательный. По умолчанию на
  * элемент не накладываются ограничения по типу.
- *
- *
  *
  * @return array <p>Функция возвращает массив <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей информационного
@@ -664,18 +701,16 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * &lt;Список&gt;" )</pre> </td> </tr> </tbody></table> <p> Если заданным параметрам не
  * найден элемент, функция вернет <i>false</i>. <br> Выборка элемента
  * происходит только из активных элементов инфоблока, неактивный
- * элемент выбран быть не может. </p> <h4>Примечание</h4><p> Все
+ * элемент выбран быть не может. </p> <p></p><div class="note"> <b>Примечание:</b> все
  * возвращаемые поля преобразованы в "HTML безопасный" вид, а в полях
  * (LIST_PAGE_URL - списка элементов и DETAIL_PAGE_URL - детального просмотра) с
  * шаблонами URL-ов к страницам будут заменены параметры
- * <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>.</p>
- *
+ * <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>.</div>
  *
  * <h4>Example</h4> 
  * <pre>
  * &lt;?<br>require($_SERVER['DOCUMENT_ROOT'].'/bitrix/header.php');<br><br>$APPLICATION-&gt;SetTitle('Карточка товара');<br><br>// подключим модуль и выберем элемент ID типа product<br>$arIBlockElement = false;<br>if(CModule::IncludeModule('iblock') &amp;&amp; ($arIBlockElement = GetIBlockElement($ID, 'product')))<br>{<br>   // В заголовок страницы вставим название элемента<br>   $APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>   // В навигационную цепочку вставим название и ссылку на текущий информационный блок<br>   $APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], 'products.php?ID='.$arIBlockElement['IBLOCK_ID']);<br><br>   // выведем детальную картинку<br>   echo ShowImage($arIBlockElement['DETAIL_PICTURE'], 150, 150, 'border="0"', '', true);<br>   // выведем детальное описание<br>   echo $arIBlockElement['DETAIL_TEXT'].'&lt;br&gt;';<br>   // выведем значение свойства с кодом PRICE<br>   echo $arIBlockElement['PROPERTIES']['PRICE']['VALUE'].'&lt;br&gt;';<br><br>   // вывeдем оставшиеся свойсва<br>   $arProps = $arIBlockElement['PROPERTIES'];<br>   foreach($arProps as $property_code=&gt;$arValue)<br>   {<br>      // если это свойство с кодом PRICE или значение свойства не введено - пропустим<br>      if($property_code=='PRICE' <br>			|| (!is_array($arValue['VALUE']) &amp;&amp; strlen($arValue['VALUE'])&lt;=0) <br>			|| (is_array($arValue['VALUE']) &amp;&amp; count($arValue['VALUE'])&lt;=0)<br>			)<br>         continue;<br><br>      // выведем пару "Название: значение"<br>      if(!is_array($arValue['VALUE']))<br>         echo $arValue['NAME'].": ".$arValue['VALUE'];<br>      else<br>      {<br>         echo $arValue['NAME'].': ';<br>         foreach($arValue['VALUE'] as $val)<br>         {<br>            echo $val.'&lt;br&gt;';<br>         }<br>      }<br>   }<br>}<br>else<br>   echo ShowError('Новость не найдена');<br><br>require($_SERVER["DOCUMENT_ROOT"].'/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -686,6 +721,7 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelement.php
  * @author Bitrix
+ * @deprecated No longer used by internal code and not recommended.
  */
 function GetIBlockElement($ID, $TYPE = "")
 {
@@ -789,11 +825,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * <p>Функция возвращает раздел информационного блока. </p>
  *
  *
- *
- *
  * @param int $ID  ID раздела.</bod
- *
- *
  *
  * @param string $type = "" Тип информационного блока, в котором размещён раздел.
  * Устанавливается в настройках модуля. Если задан, то при выборке
@@ -801,11 +833,11 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * <br>Необязательный. По умолчанию на раздел не накладываются
  * ограничения по типу.
  *
- *
- *
  * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей раздела</a>
- * <i>IBLOCK_NAME</i><br><h4>Примечание</h4>
- *
+ * <i>IBLOCK_NAME</i><br><p></p><div class="note"> <b>Примечание:</b> функция вернет поля
+ * раздела информационного блока только в том случае, если раздел
+ * "активен" и находится в информационный блоке, который также
+ * "активен" и привязан к текущему сайту. </div>
  *
  * <h4>Example</h4> 
  * <pre>
@@ -834,7 +866,6 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * </pre>
  *
  *
- *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
  * информационного блока</a></li> </ul> <a name="examples"></a>
@@ -843,6 +874,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblocksection.php
  * @author Bitrix
+ * @deprecated No longer used by internal code and not recommended.
  */
 function GetIBlockSection($ID, $TYPE = "")
 {
@@ -979,7 +1011,7 @@ function xml_depth_rss($values, &$i)
  * @param int $IBLOCK_ID Selected iblock
  * @param string $strTypeName Name of the iblock type select
  * @param string $strIBlockName Name of the iblock name select
- * @param bool $arFilter Additional filter for iblock list
+ * @param bool|array $arFilter Additional filter for iblock list
  * @param string $onChangeType Additional JS handler for type select
  * @param string $onChangeIBlock Additional JS handler for iblock select
  * @param string $strAddType Additional html inserted into type select
@@ -1086,7 +1118,7 @@ function GetIBlockDropDownListEx($IBLOCK_ID, $strTypeName, $strIBlockName, $arFi
  * @param int $IBLOCK_ID Selected iblock
  * @param string $strTypeName Name of the iblock type select
  * @param string $strIBlockName Name of the iblock name select
- * @param bool $arFilter Additional filter for iblock list
+ * @param bool|array $arFilter Additional filter for iblock list
  * @param string $strAddType Additional html inserted into type select
  * @param string $strAddIBlock Additional html inserted into iblock select
  * @return string
@@ -1119,55 +1151,33 @@ function GetIBlockDropDownList($IBLOCK_ID, $strTypeName, $strIBlockName, $arFilt
  * <p>Функция выполняет импорт xml-файла в инфоблок.</p>
  *
  *
- *
- *
  * @param string $file_name  Путь к xml-файлу.
- *
- *
  *
  * @param string $iblock_type = "-" Тип инфоблока, в который импортировать.
  *
- *
- *
  * @param array $site_id = '' Сайт, к которому будет привязан инфоблок.
- *
- *
  *
  * @param string $section_action = "D" Действие, которое осуществляется с секциями, отсутствующими в
  * файле импорта ("N" - ничего; "A" - деактивировать; "D" - удалить,
  * используется по умолчанию).
  *
- *
- *
  * @param string $element_action = "D" Действие, которое осуществляется с элементами, отсутствующими в
  * файле импорта ("N" - ничего; "A" - деактивировать; "D" - удалить,
  * используется по умолчанию).
  *
- *
- *
  * @param bool $use_crc = false Использование контрольных сумм при импорте для увеличения
  * производительности и избежания лишних обновлений элементов.
- *
- *
  *
  * @param bool $preview = false Если <i>true</i>, то формировать картинку анонса из детальной
  * картинки.
  *
- *
- *
  * @param bool $sync = false Позволяет разнести процесс синхронизации с 1С и обмен новостями
  * через контроллер.
  *
- *
- *
  * @param bool $return_last_error = false Если <i>true</i>, то функция в случае ошибки вернёт строку, иначе null.
- *
- *
  *
  * @param bool $return_iblock_id = false Если <i>true</i>, то функция в случае успеха вернёт идентификатор
  * инфоблока (нового или обновлённого).
- *
- *
  *
  * @return mixed <p>Возвращает <i>true</i> в случае успешного импорта или строку с
  * сообщением об ошибке.</p> <br><br>

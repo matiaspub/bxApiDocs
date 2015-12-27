@@ -16,8 +16,6 @@ if (!CCatalog::IsUserExists())
 	$USER = new CUser();
 }
 
-CCatalogDiscountSave::Disable();
-
 if (!function_exists('__sortCSVOrder'))
 {
 	function __sortCSVOrder($a, $b)
@@ -103,11 +101,11 @@ if (!function_exists('__CSVExportFile'))
 
 $strCatalogDefaultFolder = COption::GetOptionString("catalog", "export_default_path", CATALOG_DEFAULT_EXPORT_PATH);
 
-$NUM_CATALOG_LEVELS = intval(COption::GetOptionString("catalog", "num_catalog_levels"));
-if (0 >= $NUM_CATALOG_LEVELS)
+$NUM_CATALOG_LEVELS = (int)COption::GetOptionInt("catalog", "num_catalog_levels");
+if ($NUM_CATALOG_LEVELS <= 0)
 	$NUM_CATALOG_LEVELS = 3;
 
-$strExportErrorMessage = "";
+$strExportErrorMessage = '';
 $arRunErrors = array();
 
 global
@@ -148,13 +146,13 @@ if (!isset($defCatalogAvailCurrencies))
 	$defCatalogAvailCurrencies = CCatalogCSVSettings::getDefaultSettings(CCatalogCSVSettings::FIELDS_CURRENCY);
 
 $IBLOCK_ID = intval($IBLOCK_ID);
-if ($IBLOCK_ID<=0)
+if ($IBLOCK_ID <= 0)
 {
 	$arRunErrors[] = GetMessage("CATI_NO_IBLOCK");
 }
 else
 {
-	$arIBlockres = CIBlock::GetList(Array("sort"=>"asc"), Array("ID"=>$IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'));
+	$arIBlockres = CIBlock::GetList(array(), array("ID"=>$IBLOCK_ID, 'CHECK_PERMISSIONS' => 'N'));
 	if (!($arIBlock = $arIBlockres->Fetch()))
 	{
 		$arRunErrors[] = GetMessage("CATI_NO_IBLOCK");
@@ -162,12 +160,35 @@ else
 }
 
 $boolCatalog = false;
+$arSku = false;
+$skuPropertyID = 0;
 if (empty($arRunErrors))
 {
-	$arCatalog = CCatalog::GetByID($IBLOCK_ID);
-	if (!empty($arCatalog))
+	$rsCatalogs = CCatalog::GetList(
+		array(),
+		array('IBLOCK_ID' => $IBLOCK_ID),
+		false,
+		false,
+		array('IBLOCK_ID', 'PRODUCT_IBLOCK_ID', 'SKU_PROPERTY_ID')
+	);
+	if ($arCatalog = $rsCatalogs->Fetch())
+	{
 		$boolCatalog = true;
+		$arCatalog['IBLOCK_ID'] = (int)$arCatalog['IBLOCK_ID'];
+		$arCatalog['PRODUCT_IBLOCK_ID'] = (int)$arCatalog['PRODUCT_IBLOCK_ID'];
+		$arCatalog['SKU_PROPERTY_ID'] = (int)$arCatalog['SKU_PROPERTY_ID'];
+		if ($arCatalog['PRODUCT_IBLOCK_ID'] > 0 && $arCatalog['SKU_PROPERTY_ID'] > 0)
+		{
+			$arSku = $arCatalog;
+			$skuPropertyID = $arCatalog['SKU_PROPERTY_ID'];
+		}
+	}
+
 }
+
+$CML2_LINK_IS_XML = (isset($CML2_LINK_IS_XML) && $CML2_LINK_IS_XML == 'Y' ? 'Y' : 'N');
+if (empty($arSku))
+	$CML2_LINK_IS_XML = 'N';
 
 if (empty($arRunErrors))
 {
@@ -180,10 +201,10 @@ if (empty($arRunErrors))
 
 	$csvFile->SetFieldsType($fields_type);
 
-	$first_line_names = (isset($first_line_names) && $first_line_names == 'Y' ? true : false);
+	$first_line_names = (isset($first_line_names) && $first_line_names == 'Y');
 	$csvFile->SetFirstHeader($first_line_names);
 
-	$delimiter_r_char = "";
+	$delimiter_r_char = '';
 	if (isset($delimiter_r))
 	{
 		switch ($delimiter_r)
@@ -221,11 +242,11 @@ if (empty($arRunErrors))
 	if (!isset($export_from_clouds) || $export_from_clouds != 'Y')
 		$export_from_clouds = 'N';
 
-	if (!isset($SETUP_FILE_NAME) || strlen($SETUP_FILE_NAME) <= 0)
+	if (!isset($SETUP_FILE_NAME) || $SETUP_FILE_NAME == '')
 	{
 		$arRunErrors[] = GetMessage("CATI_NO_SAVE_FILE");
 	}
-	elseif (preg_match(BX_CATALOG_FILENAME_REG,$SETUP_FILE_NAME))
+	elseif (preg_match(BX_CATALOG_FILENAME_REG, $SETUP_FILE_NAME))
 	{
 		$arRunErrors[] = GetMessage("CES_ERROR_BAD_EXPORT_FILENAME");
 	}
@@ -307,7 +328,7 @@ if (empty($arRunErrors))
 					$arSortFields[$arOneCatalogAvailProdFields['value']] = array(
 						'CODE' => $arOneCatalogAvailProdFields['value'],
 						'ID' => $intCount,
-						'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+						'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 					);
 					$selectArray[] = $arOneCatalogAvailProdFields["field"];
 				}
@@ -326,7 +347,7 @@ if (empty($arRunErrors))
 				$arSortFields['IP_PROP'.$arProp['ID']] = array(
 					'CODE' => 'IP_PROP'.$arProp['ID'],
 					'ID' => $intCount,
-					'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+					'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 				);
 				$bNeedProps = true;
 				$arElementProps[] = $arProp['ID'];
@@ -365,7 +386,7 @@ if (empty($arRunErrors))
 						$arSortFields[$strKey.$i] = array(
 							'CODE' => $strKey.$i,
 							'ID' => $intCount,
-							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 						);
 						$bNeedGroups = true;
 						$arGroupProps[$i][] = $strKey;
@@ -406,7 +427,7 @@ if (empty($arRunErrors))
 						$arSortFields[$arOneCatalogAvailPriceFields['value']] = array(
 							'CODE' => $arOneCatalogAvailPriceFields['value'],
 							'ID' => $intCount,
-							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 						);
 						$bNeedProducts = true;
 						$selectArray[] = 'CATALOG_'.$iblockField;
@@ -435,7 +456,7 @@ if (empty($arRunErrors))
 						$arSortFields[$arOneCatalogAvailQuantityFields['value']] = array(
 							'CODE' => $arOneCatalogAvailQuantityFields['value'],
 							'ID' => $intCount,
-							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+							'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 						);
 						$bNeedCounts = true;
 						$arCountFields[] = $arOneCatalogAvailQuantityFields['value'];
@@ -479,7 +500,7 @@ if (empty($arRunErrors))
 							$arSortFields[$strKey.'_'.$arPriceType['ID']] = array(
 								'CODE' => $strKey.'_'.$arPriceType['ID'],
 								'ID' => $intCount,
-								'SORT' => (!empty($field_num[$mxSelKey]) && 0 < intval($field_num[$mxSelKey]) ? intval($field_num[$mxSelKey]) : ($intCount+1)*10),
+								'SORT' => (!empty($field_num[$mxSelKey]) && 0 < (int)$field_num[$mxSelKey] ? (int)$field_num[$mxSelKey] : ($intCount+1)*10),
 							);
 							$bNeedPrices = true;
 							$arCatalogGroups[] = intval($arPriceType['ID']);
@@ -549,20 +570,18 @@ if (empty($arRunErrors))
 						$arIBlockElement["~DETAIL_PICTURE"] = $arIBlockElement["DETAIL_PICTURE"]["SRC"];
 				}
 			}
-			if($bNeedProps)
-				$arProperties = $obIBlockElement->GetProperties();
-			else
-				$arProperties = array();
+			$arProperties = ($bNeedProps ? $obIBlockElement->GetProperties() : array());
 
 			if($arUserTypeFormat === false)
 			{
 				$arUserTypeFormat = array();
 				foreach($arProperties as $prop_id => $arProperty)
 				{
-					if (in_array($arProperty["ID"],$arElementProps))
+					if (in_array($arProperty["ID"], $arElementProps))
 					{
 						$arUserTypeFormat[$arProperty["ID"]] = false;
-						if(strlen($arProperty["USER_TYPE"]))
+						$arProperty["USER_TYPE"] = (string)$arProperty["USER_TYPE"];
+						if ($arProperty["USER_TYPE"] != '')
 						{
 							$arUserType = CIBlockProperty::GetUserType($arProperty["USER_TYPE"]);
 							if (isset($arUserType["GetPublicViewHTML"]))
@@ -579,6 +598,7 @@ if (empty($arRunErrors))
 				{
 					if($arUserTypeFormat[$arProperty["ID"]])
 					{
+						$exportMode = ($CML2_LINK_IS_XML == 'Y' && $arProperty['ID'] == $skuPropertyID ? 'EXTERNAL_ID' : 'CSV_EXPORT');
 						if ($arProperty['MULTIPLE'] == 'Y' && is_array($arProperty["~VALUE"]))
 						{
 							$arValues = array();
@@ -587,7 +607,7 @@ if (empty($arRunErrors))
 									array(
 										$arProperty,
 										array("VALUE" => $value),
-										array("MODE" => "CSV_EXPORT"),
+										array("MODE" => $exportMode)
 									));
 						}
 						else
@@ -596,7 +616,7 @@ if (empty($arRunErrors))
 								array(
 									$arProperty,
 									array("VALUE" => $arProperty["~VALUE"]),
-									array("MODE" => "CSV_EXPORT"),
+									array("MODE" => $exportMode),
 								));
 						}
 					}
@@ -812,8 +832,6 @@ if (empty($arRunErrors))
 
 if (!empty($arRunErrors))
 	$strExportErrorMessage = implode('<br />',$arRunErrors);
-
-CCatalogDiscountSave::Enable();
 
 if ($bTmpUserCreated)
 {

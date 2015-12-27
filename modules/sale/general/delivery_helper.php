@@ -19,15 +19,77 @@ class CSaleDeliveryHelper
 		if(isset($arRegions[$countryId][$flipIndex]))
 			return $arRegions[$countryId][$flipIndex];
 
-		$arFilterRegion = array();
-		if (intval($countryId) > 0)
-			$arFilterRegion["COUNTRY_ID"] = $countryId;
+		if(CSaleLocation::isLocationProMigrated())
+		{
+			$types = array();
+			$res = \Bitrix\Sale\Location\TypeTable::getList(array(
+				'select' => array('ID', 'CODE')
+			));
+			while($item = $res->fetch())
+				$types[$item['CODE']] = $item['ID'];
 
-		$dbRegionList = CSaleLocation::GetRegionList(array("NAME_LANG"=>"ASC"), $arFilterRegion, LANGUAGE_ID);
+			$filter = array(
+				array(
+					'LOGIC' => 'OR',
+					array(
+						'=TYPE_ID' => $types['CITY'], 
+						'=NAME.LANGUAGE_ID' => LANGUAGE_ID,
+						array(
+							'LOGIC' => 'OR',
+							array(
+								'=PARENT.TYPE_ID' => $types['COUNTRY']
+							),
+							array(
+								'=PARENT.TYPE_ID' => $types['COUNTRY_DISTRICT']
+							),
+							array(
+								'=PARENT_ID' => '0'
+							)
+						)
+					),
+					array(
+						'=TYPE_ID' => $types['REGION'],
+					)
+				)
+			);
+
+			if(intval($countryId))
+			{
+				$filter['=PARENTS.TYPE_ID'] = $types['COUNTRY'];
+				$filter['=PARENTS.ID'] = $countryId;
+			}
+
+			$dbRegionList = \Bitrix\Sale\Location\LocationTable::getList(array(
+				'filter' => $filter,
+				'select' => array('ID', 'CODE', 'NAME_LANG' => 'NAME.NAME'),
+				'order' => array('NAME.NAME' => 'asc')
+			));
+		}
+		else
+		{
+			$arFilterRegion = array();
+			if (intval($countryId) > 0)
+				$arFilterRegion["COUNTRY_ID"] = $countryId;
+
+			$dbRegionList = CSaleLocation::GetRegionList(array("NAME_LANG"=>"ASC"), $arFilterRegion, LANGUAGE_ID);
+		}
+
+		$key = 'ID';
+
 		while ($arRegionList = $dbRegionList->Fetch())
 		{
-				$arRegions[$countryId][0][$arRegionList['ID']] = $arRegionList["NAME_LANG"]; // $bFlip == false
-				$arRegions[$countryId][1][$arRegionList["NAME_LANG"]] = $arRegionList['ID']; // $bFlip == true
+			if($key == 'ID' && isset($arRegionList['CODE']))
+			{
+				$key = 'CODE';
+			}
+
+			if($key == 'CODE' && strlen($arRegionList['CODE']) <= 0)
+			{
+				continue;
+			}
+
+			$arRegions[$countryId][0][$arRegionList[$key]] = $arRegionList["NAME_LANG"]; // $bFlip == false
+			$arRegions[$countryId][1][$arRegionList["NAME_LANG"]] = $arRegionList[$key]; // $bFlip == true
 		}
 
 		return isset($arRegions[$countryId][$flipIndex]) ? $arRegions[$countryId][$flipIndex] : array();
@@ -256,7 +318,7 @@ class CSaleDeliveryHelper
 		return $arResultPacksParams;
 	}
 
-	public static function makeBoxConfig($boxId, $arBox, $group, &$arConfig)
+	public static function 	makeBoxConfig($boxId, $arBox, $group, &$arConfig)
 	{
 		if(
 			!isset($arBox['NAME'])

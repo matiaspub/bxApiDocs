@@ -1,11 +1,14 @@
 <?
 class CSecuritySessionDB
 {
+	protected static $isReadOnly = false;
+
 	/**
 	 * @return bool
 	 */
 	public static function Init()
 	{
+		self::$isReadOnly = defined('BX_SECURITY_SESSION_READONLY');
 		return CSecurityDB::Init();
 	}
 
@@ -24,7 +27,9 @@ class CSecuritySessionDB
 	 */
 	public static function close()
 	{
-		CSecurityDB::Lock(false);
+		if (!self::$isReadOnly)
+			CSecurityDB::Lock(false);
+
 		CSecurityDB::Disconnect();
 		return true;
 	}
@@ -38,7 +43,7 @@ class CSecuritySessionDB
 		if(!self::isValidId($id))
 			return "";
 
-		if(!CSecurityDB::Lock($id, 60/*TODO: timelimit from php.ini?*/))
+		if(!self::$isReadOnly && !CSecurityDB::Lock($id, 60/*TODO: timelimit from php.ini?*/))
 			CSecuritySession::triggerFatalError('Unable to get session lock within 60 seconds.');
 
 		$rs = CSecurityDB::Query("
@@ -58,15 +63,19 @@ class CSecuritySessionDB
 
 	/**
 	 * @param string $id - session id, must be valid hash
-	 * @param array $sessionData
+	 * @param string $sessionData
+	 * @return bool
 	 */
 	public static function write($id, $sessionData)
 	{
 		if(!self::isValidId($id))
-			return;
+			return false;
+
+		if (self::$isReadOnly)
+			return true;
 
 		if(CSecuritySession::isOldSessionIdExist())
-			$oldSessionId = CSecuritySession::getOldSessionId();
+			$oldSessionId = CSecuritySession::getOldSessionId(true);
 		else
 			$oldSessionId = $id;
 
@@ -82,15 +91,21 @@ class CSecuritySessionDB
 			('".$id."', ".CSecurityDB::CurrentTimeFunction().", :SESSION_DATA)
 		", array("SESSION_DATA" => base64_encode($sessionData))
 		, "Module: security; Class: CSecuritySession; Function: write; File: ".__FILE__."; Line: ".__LINE__);
+
+		return true;
 	}
 
 	/**
 	 * @param string $id - session id, must be valid hash
+	 * @return bool
 	 */
 	public static function destroy($id)
 	{
 		if(!self::isValidId($id))
-			return;
+			return false;
+
+		if (self::$isReadOnly)
+			return false;
 
 		CSecurityDB::Query("
 			delete from b_sec_session
@@ -100,12 +115,15 @@ class CSecuritySessionDB
 		if(CSecuritySession::isOldSessionIdExist())
 			CSecurityDB::Query("
 				delete from b_sec_session
-				where SESSION_ID = '".CSecuritySession::getOldSessionId()."'
+				where SESSION_ID = '".CSecuritySession::getOldSessionId(true)."'
 			", "Module: security; Class: CSecuritySession; Function: destroy; File: ".__FILE__."; Line: ".__LINE__);
+
+		return true;
 	}
 
 	/**
 	 * @param int $maxLifeTime
+	 * @return bool
 	 */
 	public static function gc($maxLifeTime)
 	{
@@ -113,6 +131,8 @@ class CSecuritySessionDB
 			delete from b_sec_session
 			where TIMESTAMP_X < ".CSecurityDB::SecondsAgo($maxLifeTime)."
 			", "Module: security; Class: CSecuritySession; Function: gc; File: ".__FILE__."; Line: ".__LINE__);
+
+		return true;
 	}
 
 	/**
@@ -121,7 +141,11 @@ class CSecuritySessionDB
 	 */
 	protected static function isValidId($pId)
 	{
-		return (bool) preg_match("/^[\\da-z]{6,32}$/iD", $pId);
+		return (
+			$pId
+			&& is_string($pId)
+			&& preg_match('/^[\da-z\-,]{6,}$/iD', $pId)
+		);
 	}
 
 }

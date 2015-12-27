@@ -23,7 +23,17 @@ foreach(GetModuleEvents("main", "OnEpilog", true) as $arEvent)
 
 $r = $APPLICATION->EndBufferContentMan();
 $main_exec_time = round((getmicrotime()-START_EXEC_TIME), 4);
-echo $r;
+
+//it's possible to have no response on update
+$response = \Bitrix\Main\Context::getCurrent()->getResponse();
+if($response)
+{
+	$response->flush($r);
+}
+else
+{
+	echo $r;
+}
 
 $arAllEvents = GetModuleEvents("main", "OnAfterEpilog", true);
 
@@ -38,8 +48,9 @@ foreach($arAllEvents as $arEvent)
 
 if(!IsModuleInstalled("compression") && !defined("ADMIN_AJAX_MODE") && ($_REQUEST["mode"] != 'excel'))
 {
+	$canEditPHP = $USER->CanDoOperation('edit_php');
 	$bShowTime = ($_SESSION["SESS_SHOW_TIME_EXEC"] == 'Y');
-	$bShowStat = ($DB->ShowSqlStat && $USER->CanDoOperation('edit_php'));
+	$bShowStat = ($DB->ShowSqlStat && $canEditPHP);
 	$bShowCacheStat = (\Bitrix\Main\Data\Cache::getShowCacheStat() && ($canEditPHP || $_SESSION["SHOW_CACHE_STAT"]=="Y"));
 
 	if($bShowTime || $bShowStat || $bShowCacheStat)

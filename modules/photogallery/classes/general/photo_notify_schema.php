@@ -13,13 +13,8 @@ class CPhotogalleryNotifySchema
 			"photogallery" => array(
 				"comment" => Array(
 					"NAME" => GetMessage("PHOTO_NS_COMMENT"),
-				),
-/*
-				"mention" => Array(
-					"NAME" => GetMessage("PHOTO_NS_MENTION"),
-				),
-*/
-			),
+				)
+			)
 		);
 	}
 }

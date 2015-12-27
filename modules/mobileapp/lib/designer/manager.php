@@ -6,6 +6,7 @@ use Bitrix\Main\Application;
 use Bitrix\Main\Entity\FieldError;
 use Bitrix\Main\IO\Directory;
 use Bitrix\Main\IO\File;
+use Bitrix\Main\Text\Encoding;
 
 class Manager
 {
@@ -142,7 +143,7 @@ class Manager
 		$fields = array(
 			"APP_CODE" => $appCode,
 			"PLATFORM" => $platform,
-			"PARAMS" => serialize($config)
+			"PARAMS" => $config
 		);
 
 		$result = ConfigTable::add($fields);
@@ -201,7 +202,7 @@ class Manager
 		}
 
 		$data = array(
-			"PARAMS" => serialize($config)
+			"PARAMS" => $config
 		);
 
 		$result = ConfigTable::update(array("APP_CODE" => $appCode, "PLATFORM" => $platform), $data);
@@ -245,13 +246,11 @@ class Manager
 			}
 		}
 
-		$params = $targetConfig["PARAMS"];
-
-
+		$params = array_key_exists("PARAMS", $targetConfig) ? $targetConfig["PARAMS"]: array() ;
 		$imageParamList = $map->getParamsByType(ParameterType::IMAGE);
 		$imageSetParamList = $map->getParamsByType(ParameterType::IMAGE_SET);
-
 		$structuredConfig = array();
+
 		foreach ($params as $key => $value)
 		{
 			if (!$map->has($key))
@@ -281,9 +280,16 @@ class Manager
 				}
 				$value = $tmpValue;
 			}
-
-
 			$structuredConfig = array_merge_recursive(self::nameSpaceToArray($key, $value), $structuredConfig);
+		}
+
+		$structuredConfig["info"] = array(
+			"designer_version"=> ConfigMap::VERSION,
+			"platform"=>$platform
+		);
+		if(toUpper(SITE_CHARSET) != "UTF-8")
+		{
+			$structuredConfig = Encoding::convertEncodingArray($structuredConfig, SITE_CHARSET, "UTF-8");
 		}
 
 		return json_encode($structuredConfig);
@@ -292,12 +298,12 @@ class Manager
 	/**
 	 * Checks if the configuration is already exists
 	 *
+	 * @param $folder
 	 * @param $appCode - application code
-	 * @param $platform - platform code
+	 *
+	 * @return bool
 	 *
 	 * @see ConfigTable::getSupportedPlatforms for details on availible platforms
-	 * @return bool
-	 * @throws \Bitrix\Main\ArgumentException
 	 */
 
 	public static function copyFromTemplate($folder, $appCode)

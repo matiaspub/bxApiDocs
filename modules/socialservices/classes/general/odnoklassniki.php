@@ -6,55 +6,87 @@ class CSocServOdnoklassniki extends CSocServAuth
 	const ID = "Odnoklassniki";
 	const CONTROLLER_URL = "https://www.bitrix24.ru/controller";
 
+	protected $entityOAuth = null;
+
 	static public function GetSettings()
 	{
 		return array(
 			array("odnoklassniki_appid", GetMessage("socserv_odnoklassniki_client_id"), "", Array("text", 40)),
 			array("odnoklassniki_appkey", GetMessage("socserv_odnoklassniki_client_key"), "", Array("text", 40)),
 			array("odnoklassniki_appsecret", GetMessage("socserv_odnoklassniki_client_secret"), "", Array("text", 40)),
-			array("note"=>GetMessage("socserv_odnoklassniki_form_note", array('#URL#'=>CSocServUtil::ServerName()))),
+			array("note"=>GetMessage("socserv_odnoklassniki_form_note", array('#URL#'=>CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php"))),
 		);
 	}
 
-	static public function GetFormHtml($arParams)
+	public function getEntityOAuth()
 	{
-		$appID = trim(self::GetOption("odnoklassniki_appid"));
-		$appSecret = trim(self::GetOption("odnoklassniki_appsecret"));
-		$appKey = trim(self::GetOption("odnoklassniki_appkey"));
+		return $this->entityOAuth;
+	}
 
-		$gAuth = new COdnoklassnikiInterface($appID, $appSecret, $appKey);
-
-		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
-		{
-			$redirect_uri = self::CONTROLLER_URL."/redirect.php?redirect_to=".urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"]));
-		}
-		else
-		{
-			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"]);
-			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('', array("logout", "auth_service_error", "auth_service_id")));
-		}
-		$url = $gAuth->GetAuthUrl($redirect_uri, $state);
+	public function GetFormHtml($arParams)
+	{
+		$url = $this->getUrl('opener', null, $arParams);
 		$phrase = ($arParams["FOR_INTRANET"]) ? GetMessage("MAIN_OPTION_COMMENT1_INTRANET") : GetMessage("MAIN_OPTION_COMMENT1");
+
 		if($arParams["FOR_INTRANET"])
 			return array("ON_CLICK" => 'onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)"');
 		return '<a href="javascript:void(0)" onclick="BX.util.popup(\''.htmlspecialcharsbx(CUtil::JSEscape($url)).'\', 580, 400)" class="bx-ss-button odnoklassniki-button"></a><span class="bx-spacer"></span><span>'.$phrase.'</span>';
-
 	}
-	
+
+	public function GetOnClickJs($arParams)
+	{
+		$url = $this->getUrl('opener', null, $arParams);
+		return "BX.util.popup('".CUtil::JSEscape($url)."', 580, 400)";
+	}
+
+
+	public function getUrl($location = 'opener', $addScope = null, $arParams = array())
+	{
+		global $APPLICATION;
+
+		$this->entityOAuth = new COdnoklassnikiInterface();
+
+		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
+		{
+			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
+			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php?state=";
+			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;
+			$state .= urlencode(urlencode("backurl=".$backurl));
+		}
+		else
+		{
+			$backurl = $APPLICATION->GetCurPageParam(
+				'check_key='.$_SESSION["UNIQUE_KEY"],
+				array("logout", "auth_service_error", "auth_service_id", "backurl")
+			);
+			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php";
+			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($backurl).(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '').'&mode='.$location;
+		}
+
+		return $this->entityOAuth->GetAuthUrl($redirect_uri, $state);
+	}
+
 	public function Authorize()
 	{
-		$GLOBALS["APPLICATION"]->RestartBuffer();
-		$bSuccess = 1;
+		global $APPLICATION;
+
+		$APPLICATION->RestartBuffer();
+		$bSuccess = SOCSERV_AUTHORISATION_ERROR;
+		$bProcessState = false;
 
 		if((isset($_REQUEST["code"]) && $_REQUEST["code"] <> '') && CSocServAuthManager::CheckUniqueKey())
 		{
+			$bProcessState = true;
+
 			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
-				$redirect_uri = self::CONTROLLER_URL."/redirect.php?redirect_to=".urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code")));
+				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 			else
-				$redirect_uri= CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code"));
+				$redirect_uri= CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php";
+
 			$appID = trim(self::GetOption("odnoklassniki_appid"));
 			$appSecret = trim(self::GetOption("odnoklassniki_appsecret"));
 			$appKey = trim(self::GetOption("odnoklassniki_appkey"));
+
 			$gAuth = new COdnoklassnikiInterface($appID, $appSecret, $appKey, $_REQUEST["code"]);
 
 			if($gAuth->GetAccessToken($redirect_uri) !== false)
@@ -98,28 +130,73 @@ class CSocServOdnoklassniki extends CSocServAuth
 				}
 			}
 		}
-		$url = ($GLOBALS["APPLICATION"]->GetCurDir() == "/login/") ? "" : $GLOBALS["APPLICATION"]->GetCurDir();
+
+		if(!$bProcessState)
+		{
+			unset($_REQUEST["state"]);
+		}
+
+		$url = ($APPLICATION->GetCurDir() == "/login/") ? "" : $APPLICATION->GetCurDir();
+		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
+
+		$mode = 'opener';
 		if(isset($_REQUEST["state"]))
 		{
 			$arState = array();
 			parse_str($_REQUEST["state"], $arState);
+			if(isset($arState['backurl']) || isset($arState['redirect_url']))
+			{
+				$parseUrl = parse_url(!empty($arState['redirect_url']) ? $arState['redirect_url'] : $arState['backurl']);
+				$urlPath = $parseUrl["path"];
+				$arUrlQuery = explode('&', $parseUrl["query"]);
 
-			if(isset($arState['backurl']))
-				$url = parse_url($arState['backurl'], PHP_URL_PATH);
+				foreach($arUrlQuery as $key => $value)
+				{
+					foreach($aRemove as $param)
+					{
+						if(strpos($value, $param."=") === 0)
+						{
+							unset($arUrlQuery[$key]);
+							break;
+						}
+					}
+				}
+
+				$url = (!empty($arUrlQuery)) ? $urlPath.'?'.implode("&", $arUrlQuery) : $urlPath;
+			}
+
+			if(isset($arState['mode']))
+			{
+				$mode = $arState['mode'];
+			}
 		}
-		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
-		if(isset($_REQUEST["current_fieldset"]))
-			$url = $GLOBALS['APPLICATION']->GetCurPageParam(('current_fieldset='.$_REQUEST["current_fieldset"]), $aRemove);
-		if($bSuccess !== true)
-			$url = $GLOBALS['APPLICATION']->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
 
-		echo '
-<script type="text/javascript">
-if(window.opener)
-	window.opener.location = \''.CUtil::JSEscape($url).'\';
-window.close();
-</script>
-';
+		if($bSuccess === SOCSERV_REGISTRATION_DENY)
+		{
+			$url = (preg_match("/\?/", $url)) ? $url.'&' : $url.'?';
+			$url .= 'auth_service_id='.self::ID.'&auth_service_error='.SOCSERV_REGISTRATION_DENY;
+		}
+		elseif($bSuccess !== true)
+		{
+			$url = (isset($parseUrl))
+				? $urlPath.'?auth_service_id='.self::ID.'&auth_service_error='.$bSuccess
+				: $APPLICATION->GetCurPageParam(('auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
+		}
+
+		if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
+			$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
+
+		$url = CUtil::JSEscape($url);
+		$location = ($mode == "opener") ? 'if(window.opener) window.opener.location = \''.$url.'\'; window.close();' : ' window.location = \''.$url.'\';';
+
+		$JSScript = '
+		<script type="text/javascript">
+		'.$location.'
+		</script>
+		';
+
+		echo $JSScript;
+
 		die();
 	}
 
@@ -149,9 +226,24 @@ class COdnoklassnikiInterface
 	protected $sign = false;
 	protected $refresh_token = '';
 	protected $userId = 0;
-	
-	public function __construct($appID, $appSecret, $appKey, $code=false)
+
+	public function __construct($appID = false, $appSecret = false, $appKey = false, $code=false)
 	{
+		if($appID === false)
+		{
+			$appID = trim(CSocServLiveIDOAuth::GetOption("odnoklassniki_appid"));
+		}
+
+		if($appSecret === false)
+		{
+			$appSecret = trim(CSocServLiveIDOAuth::GetOption("odnoklassniki_appsecret"));
+		}
+
+		if($appKey === false)
+		{
+			$appKey = trim(CSocServLiveIDOAuth::GetOption("odnoklassniki_appkey"));
+		}
+
 		$this->httpTimeout = SOCSERV_DEFAULT_HTTP_TIMEOUT;
 		$this->appID = $appID;
 		$this->appSecret = $appSecret;
@@ -164,10 +256,10 @@ class COdnoklassnikiInterface
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
 			"&redirect_uri=".urlencode($redirect_uri).
-			"&response_type=code";
-		//	($state <> ''? '&state='.urlencode($state):'');
+			"&response_type=code".
+			($state <> ''? '&state='.urlencode($state):'');
 	}
-	
+
 	public function GetAccessToken($redirect_uri)
 	{
 		if($this->code === false)
@@ -202,7 +294,7 @@ class COdnoklassnikiInterface
 		}
 		return false;
 	}
-	
+
 	public function GetCurrentUser()
 	{
 		if($this->access_token === false)

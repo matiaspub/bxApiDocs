@@ -3,32 +3,15 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage main
- * @copyright 2001-2012 Bitrix
+ * @copyright 2001-2015 Bitrix
  */
 
 namespace Bitrix\Main\Entity;
 
-class EntityError
+class EntityError extends \Bitrix\Main\Error
 {
-	/** @var string */
-	protected $code;
-
-	/** @var string */
-	protected $message;
-
-	public function __construct($message, $code='BX_ERROR')
+	static public function __construct($message, $code='BX_ERROR')
 	{
-		$this->message = $message;
-		$this->code = $code;
-	}
-
-	public function getCode()
-	{
-		return $this->code;
-	}
-
-	public function getMessage()
-	{
-		return $this->message;
+		parent::__construct($message, $code);
 	}
 }

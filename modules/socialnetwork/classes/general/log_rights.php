@@ -1,122 +1,140 @@
 <?
 class CSocNetLogRights
 {
-	public static function Add($LOG_ID, $GROUP_CODE, $bShare = false)
+	public static function Add($LOG_ID, $GROUP_CODE, $bShare = false, $followSet = true)
 	{
 		global $DB;
 
 		if (is_array($GROUP_CODE))
 		{
 			foreach($GROUP_CODE as $GROUP_CODE_TMP)
-				CSocNetLogRights::Add($LOG_ID, $GROUP_CODE_TMP);
+			{
+				CSocNetLogRights::Add($LOG_ID, $GROUP_CODE_TMP, $bShare, $followSet);
+			}
 			return false;
 		}
 		else
 		{
 			$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetLogRightsAdd");
 			while ($arEvent = $db_events->Fetch())
-				if (ExecuteModuleEventEx($arEvent, array($LOG_ID, $GROUP_CODE))===false)
+			{
+				if (ExecuteModuleEventEx($arEvent, array($LOG_ID, $GROUP_CODE)) === false)
+				{
 					return false;
-
-			$NEW_RIGHT_ID = $DB->Add("b_sonet_log_right", array(
-				"LOG_ID" => $LOG_ID,
-				"GROUP_CODE" => $GROUP_CODE,
-			));
-
-			if (preg_match('/^U(\d+)$/', $GROUP_CODE, $matches))
-			{
-				CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
-			}
-			elseif (
-				$bShare 
-				&& preg_match('/^SG(\d+)$/', $GROUP_CODE, $matches)
-			)
-			{
-				// get all members who unfollow and set'em unfollow from the date
-
-				$arUserIDToCheck = array();
-				$arUserFollow = array();
-
-				$rsGroupMembers = CSocNetUserToGroup::GetList(
-					array(),
-					array(
-						"GROUP_ID" => $matches[1],
-						"USER_ACTIVE" => "Y",
-						"<=ROLE" => SONET_ROLES_USER
-					),
-					false,
-					false,
-					array("USER_ID")
-				);
-
-				while ($arGroupMembers = $rsGroupMembers->Fetch())
-				{
-					$arUserIDToCheck[] = $arGroupMembers["USER_ID"];
 				}
+			}
 
-				if (!empty($arUserIDToCheck))
+			$NEW_RIGHT_ID = $DB->Add(
+				"b_sonet_log_right",
+				array(
+					"LOG_ID" => $LOG_ID,
+					"GROUP_CODE" => $GROUP_CODE,
+				),
+				array(),
+				"",
+				true // ignore errors
+			);
+
+			if ($NEW_RIGHT_ID)
+			{
+				if (preg_match('/^U(\d+)$/', $GROUP_CODE, $matches))
 				{
-					$arUserIDFollowDefault = array(
-						"Y" => array(),
-						"N" => array()
-					);
-					$arUserIDAlreadySaved = array();
-					$default_follow_type = COption::GetOptionString("socialnetwork", "follow_default_type", "Y");
-
-					$rsFollow = CSocNetLogFollow::GetList(
-						array(
-							"USER_ID" => $arUserIDToCheck, 
-							"CODE" => "**"
-						),
-						array("USER_ID", "TYPE")
-					);
-					while($arFollow = $rsFollow->Fetch())
+					if($followSet)
 					{
-						$arUserIDFollowDefault[$arFollow["TYPE"]][] = $arFollow["USER_ID"];
+						CSocNetLogFollow::Set($matches[1], "L".$LOG_ID, "Y", ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID));
 					}
+				}
+				elseif (
+					$bShare
+					&& preg_match('/^SG(\d+)$/', $GROUP_CODE, $matches)
+				)
+				{
+					// get all members who unfollow and set'em unfollow from the date
+					$arUserIDToCheck = array();
 
-					$rsFollow = CSocNetLogFollow::GetList(
+					$rsGroupMembers = CSocNetUserToGroup::GetList(
+						array(),
 						array(
-							"USER_ID" => $arUserIDToCheck, 
-							"CODE" => "L".$LOG_ID
+							"GROUP_ID" => $matches[1],
+							"USER_ACTIVE" => "Y",
+							"<=ROLE" => SONET_ROLES_USER
 						),
+						false,
+						false,
 						array("USER_ID")
 					);
-					while($arFollow = $rsFollow->Fetch())
+
+					while ($arGroupMembers = $rsGroupMembers->Fetch())
 					{
-						$arUserIDAlreadySaved[] = $arFollow["USER_ID"];
+						$arUserIDToCheck[] = $arGroupMembers["USER_ID"];
 					}
 
-					foreach($arUserIDToCheck as $iUserID)
+					if (!empty($arUserIDToCheck))
 					{
-						// for them who not followed by default and not already saved follow/unfollow for the log entry
-						if (
-							!in_array($iUserID, $arUserIDAlreadySaved)
-							&& (
-								(
-									$default_follow_type == "N" 
-									&& !in_array($iUserID, $arUserIDFollowDefault["Y"])
-								)
-								|| (
-									$default_follow_type == "Y" 
-									&& in_array($iUserID, $arUserIDFollowDefault["N"])
+						$arUserIDFollowDefault = array(
+							"Y" => array(),
+							"N" => array()
+						);
+						$arUserIDAlreadySaved = array();
+						$default_follow_type = COption::GetOptionString("socialnetwork", "follow_default_type", "Y");
+
+						$rsFollow = CSocNetLogFollow::GetList(
+							array(
+								"USER_ID" => $arUserIDToCheck,
+								"CODE" => "**"
+							),
+							array("USER_ID", "TYPE")
+						);
+						while($arFollow = $rsFollow->Fetch())
+						{
+							$arUserIDFollowDefault[$arFollow["TYPE"]][] = $arFollow["USER_ID"];
+						}
+
+						$rsFollow = CSocNetLogFollow::GetList(
+							array(
+								"USER_ID" => $arUserIDToCheck,
+								"CODE" => "L".$LOG_ID
+							),
+							array("USER_ID")
+						);
+						while($arFollow = $rsFollow->Fetch())
+						{
+							$arUserIDAlreadySaved[] = $arFollow["USER_ID"];
+						}
+
+						foreach($arUserIDToCheck as $iUserID)
+						{
+							// for them who not followed by default and not already saved follow/unfollow for the log entry
+							if (
+								!in_array($iUserID, $arUserIDAlreadySaved)
+								&& (
+									(
+										$default_follow_type == "N"
+										&& !in_array($iUserID, $arUserIDFollowDefault["Y"])
+									)
+									|| (
+										$default_follow_type == "Y"
+										&& in_array($iUserID, $arUserIDFollowDefault["N"])
+									)
 								)
 							)
-						)
-						{
-							CSocNetLogFollow::Add(
-								$iUserID, 
-								"L".$LOG_ID, 
-								"N", 
-								ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID)
-							);
+							{
+								CSocNetLogFollow::Add(
+									$iUserID,
+									"L".$LOG_ID,
+									"N",
+									ConvertTimeStamp(time() + CTimeZone::GetOffset(), "FULL", SITE_ID)
+								);
+							}
 						}
 					}
 				}
 			}
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
+			{
 				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".intval($LOG_ID));
+			}
 
 			return $NEW_RIGHT_ID;
 		}
@@ -130,15 +148,22 @@ class CSocNetLogRights
 		if (is_array($GROUP_CODE))
 		{
 			foreach($GROUP_CODE as $GROUP_CODE_TMP)
+			{
 				CSocNetLogRights::Update($RIGHT_ID, $GROUP_CODE_TMP);
+			}
+
 			return false;
 		}
 		else
 		{
 			$db_events = GetModuleEvents("socialnetwork", "OnBeforeSocNetLogRightsUpdate");
 			while ($arEvent = $db_events->Fetch())
-				if (ExecuteModuleEventEx($arEvent, array($RIGHT_ID, &$GROUP_CODE))===false)
+			{
+				if (ExecuteModuleEventEx($arEvent, array($RIGHT_ID, &$GROUP_CODE)) === false)
+				{
 					return false;
+				}
+			}
 
 			$strUpdate = $DB->PrepareUpdate("b_sonet_log_right", array(
 				"GROUP_CODE" => $GROUP_CODE
@@ -177,8 +202,11 @@ class CSocNetLogRights
 		foreach($aFilter as $key=>$val)
 		{
 			$val = $DB->ForSql($val);
-			if(strlen($val)<=0)
+			if(strlen($val) <= 0)
+			{
 				continue;
+			}
+
 			switch(strtoupper($key))
 			{
 				case "ID":
@@ -237,7 +265,9 @@ class CSocNetLogRights
 		{
 			$rsRights = CSocNetLogRights::GetList(array(), array("LOG_ID" => $logID));
 			if ($arRights = $rsRights->Fetch())
+			{
 				$bFlag = false;
+			}
 		}
 
 		if ($bFlag)
@@ -251,10 +281,14 @@ class CSocNetLogRights
 					$arLogSites = array();
 					$rsLogSite = CSocNetLog::GetSite($logID);
 					while($arLogSite = $rsLogSite->Fetch())
+					{
 						$arLogSites[] = $arLogSite["LID"];
+					}
 
 					if (in_array($extranet_site_id, $arLogSites))
+					{
 						$bExtranet = true;
+					}
 				}
 
 				if ($bExtranet)
@@ -286,7 +320,9 @@ class CSocNetLogRights
 								array("ID", "GROUP_ID")
 							);
 							while ($arUsersInGroup = $dbUsersInGroup->Fetch())
+							{
 								if (!in_array("S".SONET_ENTITY_GROUP.$arUsersInGroup["GROUP_ID"]."_".SONET_ROLES_USER, $arCode))
+								{
 									$arCode = array_merge(
 										$arCode,
 										array(
@@ -295,6 +331,8 @@ class CSocNetLogRights
 											"S".SONET_ENTITY_GROUP.$arUsersInGroup["GROUP_ID"]."_".SONET_ROLES_USER
 										)
 									);
+								}
+							}
 
 							CSocNetLogRights::Add($logID, $arCode);
 						}
@@ -311,8 +349,6 @@ class CSocNetLogRights
 					elseif ($entity_type == SONET_ENTITY_USER && in_array($perm, array(SONET_RELATIONS_TYPE_FRIENDS, SONET_RELATIONS_TYPE_FRIENDS2)))
 					{
 						$arCodes = array("SA", "U".$entity_id, "S".$entity_type.$entity_id."_".SONET_RELATIONS_TYPE_FRIENDS);
-						if ($perm == SONET_RELATIONS_TYPE_FRIENDS2)
-							$arCodes[] = "S".$entity_type.$entity_id."_".SONET_RELATIONS_TYPE_FRIENDS2;
 						CSocNetLogRights::Add($logID, $arCodes);
 					}
 					elseif ($entity_type == SONET_ENTITY_USER && $perm == SONET_RELATIONS_TYPE_NONE)
@@ -341,8 +377,10 @@ class CSocNetLogRights
 			WHERE SLR.LOG_ID = ".intval($logID);
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-		if($ar = $result->Fetch())
+		if ($ar = $result->Fetch())
+		{
 			return true;
+		}
 
 		return false;
 	}
@@ -359,7 +397,9 @@ class CSocNetLogRights
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
+		{
 			return true;
+		}
 
 		return false;
 	}
@@ -378,7 +418,9 @@ class CSocNetLogRights
 
 		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
+		{
 			return true;
+		}
 
 		return false;
 	}	

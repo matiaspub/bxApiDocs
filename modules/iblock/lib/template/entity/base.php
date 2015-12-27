@@ -29,6 +29,16 @@ class Base
 	}
 
 	/**
+	 * Returns entity identifier.
+	 *
+	 * @return integer
+	 */
+	public function getId()
+	{
+		return $this->id;
+	}
+
+	/**
 	 * Used to find entity for template processing.
 	 *
 	 * @param string $entity What to find.

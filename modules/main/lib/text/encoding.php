@@ -112,7 +112,11 @@ class Encoding
 			{
 				$s = '';
 
-				$arData[$key] = self::convertEncodingArray($value, $charsetFrom, $charsetTo, $s);
+				$newKey = self::convertEncoding($key, $charsetFrom, $charsetTo, $s);
+				$arData[$newKey] = self::convertEncodingArray($value, $charsetFrom, $charsetTo, $s);
+
+				if($newKey != $key)
+					unset($arData[$key]);
 
 				if($s!=='')
 				{
@@ -167,34 +171,37 @@ class Encoding
 	public static function detectUtf8($string)
 	{
 		//http://mail.nl.linux.org/linux-utf8/1999-09/msg00110.html
-		$arBytes = array();
-		if (preg_match_all("/(%[0-9A-F]{2})/i", $string, $match))
+
+		if(preg_match_all("/(?:%)([0-9A-F]{2})/i", $string, $match))
 		{
-			foreach ($match[1] as $hex)
-				$arBytes[] = hexdec(substr($hex, 1));
-		}
-		else
-		{
-			for ($i = 0, $n = strlen($string); $i < $n; $i++)
-				$arBytes[] = ord($string[$i]);
+			$string = pack("H*", strtr(implode('', $match[1]), 'abcdef', 'ABCDEF'));
 		}
 
-		$is_utf = 0;
-		foreach ($arBytes as $i => $byte)
+		//valid UTF-8 octet sequences
+		//0xxxxxxx
+		//110xxxxx 10xxxxxx
+		//1110xxxx 10xxxxxx 10xxxxxx
+		//11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+
+		$prevBits8and7 = 0;
+		$isUtf = 0;
+		foreach(unpack("C*", $string) as $byte)
 		{
-			if (($byte & 0xC0) == 0x80)
+			$hiBits8and7 = $byte & 0xC0;
+			if ($hiBits8and7 == 0x80)
 			{
-				if (($i > 0) && (($arBytes[$i-1] & 0xC0) == 0xC0))
-					$is_utf++;
-				elseif (($i > 0) && (($arBytes[$i-1] & 0x80) == 0x00))
-					$is_utf--;
+				if ($prevBits8and7 == 0xC0)
+					$isUtf++;
+				elseif (($prevBits8and7 & 0x80) == 0x00)
+					$isUtf--;
 			}
-			elseif (($i > 0) && (($arBytes[$i-1] & 0xC0) == 0xC0))
+			elseif ($prevBits8and7 == 0xC0)
 			{
-				$is_utf--;
+					$isUtf--;
 			}
+			$prevBits8and7 = $hiBits8and7;
 		}
-		return $is_utf > 0;
+		return ($isUtf > 0);
 	}
 
 	/**

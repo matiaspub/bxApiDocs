@@ -6,8 +6,6 @@ IncludeModuleLangFile(__FILE__);
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -58,14 +56,10 @@ class CAllSaleUserTransact
 
 	
 	/**
-	* <p>Метод удаляет транзакцию с кодом ID.</p>
-	*
-	*
+	* <p>Метод удаляет транзакцию с кодом ID. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Номер транзакции.
-	*
-	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
 	* противном случае.</p> <br><br>

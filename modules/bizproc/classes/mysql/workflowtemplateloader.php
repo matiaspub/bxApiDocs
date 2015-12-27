@@ -8,7 +8,13 @@ class CBPWorkflowTemplateLoader
 
 	private function __construct()
 	{
-		$this->useGZipCompression = function_exists("gzcompress");
+		$useGZipCompressionOption = \Bitrix\Main\Config\Option::get("bizproc", "use_gzip_compression", "");
+		if ($useGZipCompressionOption === "Y")
+			$this->useGZipCompression = true;
+		elseif ($useGZipCompressionOption === "N")
+			$this->useGZipCompression = false;
+		else
+			$this->useGZipCompression = function_exists("gzcompress");
 	}
 
 	/**
@@ -29,10 +35,10 @@ class CBPWorkflowTemplateLoader
 
 	public function GetTemplatesList($arOrder = array("ID" => "DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
- 		global $DB;
+		global $DB;
 
 		if (count($arSelectFields) <= 0)
-			$arSelectFields = array("ID", "MODULE_ID", "ENTITY", "DOCUMENT_TYPE", "AUTO_EXECUTE", "NAME", "DESCRIPTION", "TEMPLATE", "PARAMETERS", "VARIABLES", "MODIFIED", "USER_ID", "ACTIVE");
+			$arSelectFields = array("ID", "MODULE_ID", "ENTITY", "DOCUMENT_TYPE", "AUTO_EXECUTE", "NAME", "DESCRIPTION", "TEMPLATE", "PARAMETERS", "VARIABLES", "CONSTANTS", "MODIFIED", "USER_ID", "ACTIVE", "IS_MODIFIED");
 
 		if (count(array_intersect($arSelectFields, array("MODULE_ID", "ENTITY", "DOCUMENT_TYPE"))) > 0)
 		{
@@ -79,10 +85,12 @@ class CBPWorkflowTemplateLoader
 			"TEMPLATE" => Array("FIELD" => "T.TEMPLATE", "TYPE" => "string"),
 			"PARAMETERS" => Array("FIELD" => "T.PARAMETERS", "TYPE" => "string"),
 			"VARIABLES" => Array("FIELD" => "T.VARIABLES", "TYPE" => "string"),
+			"CONSTANTS" => Array("FIELD" => "T.CONSTANTS", "TYPE" => "string"),
 			"MODIFIED" => Array("FIELD" => "T.MODIFIED", "TYPE" => "datetime"),
- 			"USER_ID" => Array("FIELD" => "T.USER_ID", "TYPE" => "int"),
+			"USER_ID" => Array("FIELD" => "T.USER_ID", "TYPE" => "int"),
 			"SYSTEM_CODE" => Array("FIELD" => "T.SYSTEM_CODE", "TYPE" => "string"),
 			"ACTIVE" => Array("FIELD" => "T.ACTIVE", "TYPE" => "string"),
+			"IS_MODIFIED" => Array("FIELD" => "T.IS_MODIFIED", "TYPE" => "string"),
 
 			"USER_NAME" => Array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user U ON (T.USER_ID = U.ID)"),
 			"USER_LAST_NAME" => Array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "LEFT JOIN b_user U ON (T.USER_ID = U.ID)"),
@@ -147,14 +155,11 @@ class CBPWorkflowTemplateLoader
 			}
 			else
 			{
-				// ТОЛЬКО ДЛЯ MYSQL!!! ДЛЯ ORACLE ДРУГОЙ КОД
+				// not for Oracle!
 				$cnt = $dbRes->SelectedRowsCount();
 			}
 
 			$dbRes = new CDBResult();
-
-			//echo "!2.3!=".htmlspecialcharsbx($strSql)."<br>";
-
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
@@ -171,11 +176,11 @@ class CBPWorkflowTemplateLoader
 		return $dbRes;
 	}
 
-public static function AddTemplate($arFields)
+	static public function AddTemplate($arFields, $systemImport = false)
 	{
 		global $DB;
 
-		self::ParseFields($arFields, 0);
+		self::ParseFields($arFields, 0, $systemImport);
 
 		$arInsert = $DB->PrepareInsert("b_bp_workflow_template", $arFields);
 
@@ -187,7 +192,7 @@ public static function AddTemplate($arFields)
 		return intval($DB->LastID());
 	}
 
-public static function UpdateTemplate($id, $arFields)
+	static public function UpdateTemplate($id, $arFields, $systemImport = false)
 	{
 		global $DB;
 
@@ -195,7 +200,7 @@ public static function UpdateTemplate($id, $arFields)
 		if ($id <= 0)
 			throw new CBPArgumentNullException("id");
 
-		self::ParseFields($arFields, $id);
+		self::ParseFields($arFields, $id, $systemImport);
 
 		$strUpdate = $DB->PrepareUpdate("b_bp_workflow_template", $arFields);
 

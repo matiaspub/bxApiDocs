@@ -5,24 +5,21 @@ use Bitrix\Main;
 
 abstract class FileSystemEntry
 {
-	protected $path = null;
-	protected $originalPath = null;
-	protected $documentRoot = null;
-	protected $pathPhysical = null;
+	protected $path;
+	protected $originalPath;
+	protected $pathPhysical;
+	protected $siteId;
 
 	public function __construct($path, $siteId = null)
 	{
-		if (empty($path))
+		if ($path == '')
 			throw new InvalidPathException($path);
 
 		$this->originalPath = $path;
 		$this->path = Path::normalize($path);
-		if ($siteId === null)
-			$this->documentRoot = Main\Application::getDocumentRoot();
-		else
-			$this->documentRoot = Main\SiteTable::getDocumentRoot($siteId);
+		$this->siteId = $siteId;
 
-		if (empty($this->path))
+		if ($this->path == '')
 			throw new InvalidPathException($path);
 	}
 
@@ -31,9 +28,11 @@ abstract class FileSystemEntry
 		if (preg_match("#/\\.#", $this->path))
 			return true;
 
-		if (substr($this->path, 0, strlen($this->documentRoot)) === $this->documentRoot)
+		$documentRoot = static::getDocumentRoot($this->siteId);
+
+		if (substr($this->path, 0, strlen($documentRoot)) === $documentRoot)
 		{
-			$relativePath = substr($this->path, strlen($this->documentRoot));
+			$relativePath = substr($this->path, strlen($documentRoot));
 			$relativePath = ltrim($relativePath, "/");
 			if (($pos = strpos($relativePath, "/")) !== false)
 				$s = substr($relativePath, 0, $pos);
@@ -87,7 +86,7 @@ abstract class FileSystemEntry
 	public abstract function getPermissions();
 	public abstract function delete();
 
-	protected function getPhysicalPath()
+	public function getPhysicalPath()
 	{
 		if (is_null($this->pathPhysical))
 			$this->pathPhysical = Path::convertLogicalToPhysical($this->path);
@@ -111,5 +110,18 @@ abstract class FileSystemEntry
 		}
 
 		return $success;
+	}
+
+	protected static function getDocumentRoot($siteId)
+	{
+		if($siteId === null)
+		{
+			$documentRoot = Main\Application::getDocumentRoot();
+		}
+		else
+		{
+			$documentRoot = Main\SiteTable::getDocumentRoot($siteId);
+		}
+		return $documentRoot;
 	}
 }

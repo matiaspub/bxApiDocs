@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CIBlockResult</b> - вспомогательный класс для работы с объектами результатов выборок, наследуется от класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> и содержит все его параметры и методы. Объекты данного класса возвращают функции: <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getbyid.php">GetByID</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php">GetIBlockElementList</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">GetIBlockElementListEx</a>. Использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. </body> </html>
- *
- *
+ * <b>CIBlockResult</b> - вспомогательный класс для работы с объектами результатов выборок, наследуется от класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> и содержит все его параметры и методы. Объекты данного класса возвращают методы <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getbyid.php">GetByID</a> и функции <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlist.php">GetIBlockElementList</a>, <a href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">GetIBlockElementListEx</a>. Использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. 
  *
  *
  * @return mixed 
@@ -39,34 +37,24 @@ class CIBlockResult extends CDBResult
 
 	
 	/**
-	* <p>Устанавливает шаблоны путей для элементов, разделов и списка элементов вместо тех которые указаны в настройках информационного блока. Шаблоны будут использованы функцией  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. </p> <p><b>Примечание</b>: Используется в компонентах для корректного формирования путей, если соответствующие параметры указаны.</p>
-	*
-	*
+	* <p>Устанавливает шаблоны путей для элементов, разделов и списка элементов вместо тех которые указаны в настройках информационного блока. Шаблоны будут использованы методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: используется в компонентах для корректного формирования путей, если соответствующие параметры указаны.</div>
 	*
 	*
 	* @param array $DetailUrl = "" Шаблон для пути к элементу. Если не задан, то путь будет взят из
 	* настроек инфоблока. <br>
 	*
-	*
-	*
 	* @param array $SectionUrl = "" Шаблон для пути к разделу. Если не задан, то путь будет взят из
 	* настроек инфоблока.
-	*
-	*
 	*
 	* @param array $ListUrl = "" Шаблон для пути к списку элементов. Если не задан, то путь будет
 	* взят из настроек инфоблока.
 	*
-	*
-	*
 	* @return void <p>Ничего.</p></b
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -89,24 +77,18 @@ class CIBlockResult extends CDBResult
 
 	
 	/**
-	* <p>Функция устанавливает поля раздела в качестве родителя элемента для подстановки в шаблоны путей функцией <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. Если родительский раздел не определен с помощью вызова этого метода, то для подстановки шаблона будут использованы поля из раздела с минимальным ID к которому привязан элемент. <br></p> <p><b>Примечание</b>: Используется в компонентах для сохранения текущего просматриваемого пользователем раздела в случае множественной привязки элементов.</p>
-	*
-	*
+	* <p>Метод устанавливает поля раздела в качестве родителя элемента для подстановки в шаблоны путей методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnext.php">CIBlockResult::GetNext</a>. Если родительский раздел не определен с помощью вызова этого метода, то для подстановки шаблона будут использованы поля из раздела с минимальным ID к которому привязан элемент. Метод динамичный. <br></p> <p></p> <div class="note"> <b>Примечание</b>: Используется в компонентах для сохранения текущего просматриваемого пользователем раздела в случае множественной привязки элементов.</div>
 	*
 	*
 	* @param array $arSection  Массив полей раздела поля которого будут использованы для
 	* подстановки значений в шаблон пути. <br>
 	*
-	*
-	*
-	* @return void <p>Функция ничего не возвращает.</p>
-	*
+	* @return void <p>Метод ничего не возвращает.</p>
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$rsElements = CIBlockElement::GetList(array(), array("ID" =&gt; $ID), false, false, array("ID", "NAME", "DETAIL_PAGE_URL"));<br>$rsElements-&gt;SetUrlTemplates("/catalog/#SECTION_CODE#/#ELEMENT_CODE#.php");<br>$rsElements-&gt;SetSectionContext($arSection);<br>$arElement = $rsElements-&gt;GetNext();<br>?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -141,19 +123,12 @@ class CIBlockResult extends CDBResult
 		if(is_array($iblock_id))
 		{
 			foreach($iblock_id as $id)
-			{
-				if(!is_array($id))
-				{
-					$id = intval($id);
-					if($id > 0)
-						$this->_FILTER_IBLOCK_ID[$id] = true;
-				}
-			}
+				$this->SetIBlockTag($id);
 		}
 		else
 		{
 			$id = intval($iblock_id);
-			if($id > 0)
+			if ($id > 0)
 				$this->_FILTER_IBLOCK_ID[$id] = true;
 		}
 	}
@@ -343,31 +318,23 @@ class CIBlockResult extends CDBResult
 
 	
 	/**
-	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. <br></p> <p>Если выборка была из инфоблока свойства которого хранятся отдельно (<a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2723" >Режим хранения свойств в отдельных таблицах</a>), то для правильной обработки значений множественных свойств требуется наличие полей ID и IBLOCK_ID. <br></p>
-	*
-	*
+	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. <br></p> <p>Если выборка была из инфоблока свойства которого хранятся отдельно (<a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2723" >Режим хранения свойств в отдельных таблицах</a>), то для правильной обработки значений множественных свойств требуется наличие полей ID и IBLOCK_ID. Метод динамичный. <br></p>
 	*
 	*
 	* @param bool $bTextHtmlAuto = true Параметр передается в <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.
 	* Необязательный, по умолчанию принимает <i>true</i>.
 	*
-	*
-	*
 	* @param bool $use_tilda = true 
-	*
-	*
 	*
 	* @return mixed <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
 	* информационного блока</a> <br>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($ar_res = $res-&gt;GetNext())<br>  echo '&lt;a href="'.$ar_res['DETAIL_PAGE_URL'].'"&gt;'.$ar_res['NAME'].'&lt;/a&gt;';<br>else<br>  echo 'Элемент не найден.';<br>?&gt;
 	* </h
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -507,29 +474,42 @@ class CIBlockResult extends CDBResult
 					}
 				}
 			}
+
+			if(array_key_exists("~CANONICAL_PAGE_URL", $res))
+				$TEMPLATE = $res["~CANONICAL_PAGE_URL"];
+			elseif(!$use_tilda && array_key_exists("CANONICAL_PAGE_URL", $res))
+				$TEMPLATE = $res["CANONICAL_PAGE_URL"];
+			else
+				$TEMPLATE = "";
+
+			if($TEMPLATE)
+			{
+				if($use_tilda)
+				{
+					$res["~CANONICAL_PAGE_URL"] = CIBlock::ReplaceDetailUrl($TEMPLATE, $res, true, "E");
+					$res["CANONICAL_PAGE_URL"] = htmlspecialcharsbx($res["~CANONICAL_PAGE_URL"]);
+				}
+				else
+				{
+					$res["CANONICAL_PAGE_URL"] = CIBlock::ReplaceDetailUrl($TEMPLATE, $res, true, "E");
+				}
+			}
 		}
 		return $res;
 	}
 
 	
 	/**
-	* <p>Метод возвращает из выборки объект <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a>.</p>
-	*
-	*
+	* <p>Метод возвращает из выборки объект <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a>. Метод динамичный.</p>
 	*
 	*
 	* @param bool $bTextHtmlAuto = true Параметр передается в <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.
 	* Необязательный, по умолчанию принимает <i>true</i>.
 	*
-	*
-	*
 	* @param bool $use_tilda = true 
 	*
-	*
-	*
 	* @return _CIBElement <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/_cibelement/index.php">_CIBElement</a><br>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -553,7 +533,6 @@ class CIBlockResult extends CDBResult
 	* //Примечание: в данном случае в $arSelect ничего задавать не нужно (можно его вообще не писать). Так как функции GetFields и GetProperties выбирает все свойства, которые есть у элемента.
 	* //Этот способ нужно использовать для выборки элементов, у которых есть множественные свойства, чтобы избежать дублирования элементов, которое наблюдается при стандартном вызове GetNext.
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

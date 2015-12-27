@@ -1,9 +1,7 @@
 <?
 
 /**
- * Класс поддержки тегов.</body> </html
- *
- *
+ * Класс поддержки тегов. </html
  *
  *
  * @return mixed 
@@ -16,9 +14,7 @@ class CSearchTags
 {
 	
 	/**
-	* <p>Получение списка тегов элементов поискового индекса.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
-	*
-	*
+	* <p>Получение списка тегов элементов поискового индекса. Метод динамичный.</p> <p>Данный метод использует технологию управляемого кеширования в случае соответствующей настройки <a href="http://dev.1c-bitrix.ru/api_help/search/constants.php">констант модуля поиска</a>: CACHED_b_search_tags и CACHED_b_search_tags_len.</p>
 	*
 	*
 	* @param array $arSelect = array() Массив, содержащий поля для выборки. <br><br> Название поля может
@@ -29,8 +25,6 @@ class CSearchTags
 	* обязательный параметр. По умолчанию равен: <pre class="syntax"> array(<br>
 	* "NAME",<br> "CNT",<br> )<br></pre>
 	*
-	*
-	*
 	* @param array $arFilter = array() Массив, содержащий фильтр в виде наборов "название
 	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
 	* значение: <ul> <li> <b>SITE_ID</b> - массив идентификаторов сайтов;</li> <li>
@@ -39,8 +33,6 @@ class CSearchTags
 	* <b>PARAM1</b> - первый параметр элемента;</li> <li> <b>PARAM2</b> - второй параметр
 	* элемента;</li> </ul> Пример: <pre class="syntax"> array(<br> "SITE_ID"=&gt;array("s1"),<br>
 	* "TAG"=&gt;"We",<br> "MODULE_ID"=&gt;"iblock",<br> )<br></pre>
-	*
-	*
 	*
 	* @param array $arOrder = array() Массив, содержащий признак сортировки в виде наборов "название
 	* поля"=&gt;"направление". <br><br> Название поля может принимать
@@ -52,23 +44,17 @@ class CSearchTags
 	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Не обязательный
 	* параметр. По умолчанию равен: <pre class="syntax"> array(<br> "NAME"=&gt;"ASC",<br> )<br></pre>
 	*
-	*
-	*
 	* @param int $limit = 100 Ограничение количества тегов в результатах.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны поля
 	* перечисленные в параметре arSelect.</p>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?<br>//подключение модуля поиска<br>if(CModule::IncludeModule('search'))<br>{<br>	$rsTags = CSearchTags::GetList(<br>		array(),<br>		array(<br>			"MODULE_ID" =&gt; "iblock",<br>		),<br>		array(<br>			"CNT" =&gt; "DESC",<br>		),<br>		10<br>	);<br>	while($arTag = $rsTags-&gt;Fetch())<br>		print_r($arTag);<br>}<br>?&gt;<br>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -180,10 +166,7 @@ class CSearchTags
 			default:
 				if(!is_array($arFilterEvents))
 				{
-					$arFilterEvents = array();
-					$events = GetModuleEvents("search", "OnSearchPrepareFilter");
-					while($arEvent = $events->Fetch())
-						$arFilterEvents[] = $arEvent;
+					$arFilterEvents = GetModuleEvents("search", "OnSearchPrepareFilter", true);
 				}
 				//Try to get someone to make the filter sql
 				foreach($arFilterEvents as $arEvent)

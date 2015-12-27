@@ -179,7 +179,19 @@ class CBXVirtualIoFileSystem
 			return null;
 
 		//slashes doesn't matter for Windows
-		$pattern = (strncasecmp(PHP_OS, "WIN", 3) == 0? "'[\\\\/]+'" : "'[/]+'");
+		if(strncasecmp(PHP_OS, "WIN", 3) == 0)
+		{
+			//windows
+			$pattern = "'[\\\\/]+'";
+			$tailPattern = "\0.\\/+ ";
+		}
+		else
+		{
+			//unix
+			$pattern = "'[/]+'";
+			$tailPattern = "\0/";
+		}
+
 		$res = preg_replace($pattern, "/", $path);
 
 		if (($p = strpos($res, "\0")) !== false)
@@ -204,7 +216,7 @@ class CBXVirtualIoFileSystem
 
 		$res = implode("/", $pathStack);
 
-		$res = rtrim($res, "\0.\\/+ ");
+		$res = rtrim($res, $tailPattern);
 
 		if(substr($path, 0, 1) === "/" && substr($res, 0, 1) !== "/")
 			$res = "/".$res;
@@ -230,7 +242,7 @@ class CBXVirtualIoFileSystem
 		if(defined("BX_UTF") && !mb_check_encoding($path, "UTF-8"))
 			return false;
 
-		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+/?)*$#is", $path) > 0);
+		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+/?)*$#isD", $path) > 0);
 	}
 
 	public static function ValidateFilenameString($filename)
@@ -245,7 +257,7 @@ class CBXVirtualIoFileSystem
 		if(defined("BX_UTF") && !mb_check_encoding($filename, "UTF-8"))
 			return false;
 
-		return (preg_match("#^[^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+$#is", $filename) > 0);
+		return (preg_match("#^[^\x01-\x1F".preg_quote(self::invalidChars, "#")."]+$#isD", $filename) > 0);
 	}
 
 	public static function RandomizeInvalidFilename($filename)

@@ -35,6 +35,11 @@ define('CACHED_b_iblock_property_enum', 36000);
 define('CACHED_b_iblock_property_enum_bucket_size', 100);
 
 /**
+ * ERROR_404
+ */
+define('ERROR_404', "Y");
+
+/**
  * ADMIN_MODULE_NAME
  */
 define('ADMIN_MODULE_NAME', "iblock");

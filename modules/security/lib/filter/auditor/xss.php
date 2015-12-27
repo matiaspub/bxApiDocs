@@ -44,26 +44,26 @@ class Xss
 		$this->setFilteredValue('');
 		$found = false;
 
-		$str1 = $this->processWhiteList($value, 'store');
+		$targetValue = $this->processWhiteList($value, 'store');
 
-		$str2 = '';
-		$strX = $str1;
-		while ($str2 != $strX)
+		$last = '';
+		$current = $targetValue;
+		while ($last != $current)
 		{
+			$last = $current;
 			foreach ($this->filters as $searchChar => $filters)
 			{
-				if ($searchChar && strpos($strX, $searchChar) === false)
+				if ($searchChar && strpos($current, $searchChar) === false)
 					continue;
 
-				$str2 = $strX;
-				$strX = preg_replace($filters['search'], $filters['replace'], $str2);
+				$current = preg_replace($filters['search'], $filters['replace'], $current);
 			}
 		}
 
-		if ($str2 != $str1)
+		if ($last != $targetValue)
 		{
-			$str2 = $this->processWhiteList($str2, 'restore');
-			$this->setFilteredValue($str2);
+			$last = $this->processWhiteList($last, 'restore');
+			$this->setFilteredValue($last);
 			$found = true;
 		} 
 
@@ -160,7 +160,7 @@ class Xss
 						)
 					/xis",
 					"/{$_Al}(f{$_M}o{$_M}r{$_M})(m{$_M}a{$_M}c{$_M}t{$_M}i{$_M}o{$_M}n{$_WS_OPT}=)/is",
-					"/{$_Al}(o{$_M}n{$_M})(([a-z]{$_M}){3,}{$_WS_OPT}=)/is"
+					"/{$_Al}(o{$_M}n{$_M}(?:[a-z]{$_M})*?)(([a-z]{$_M}){3}{$_WS_OPT}=)/is"
 				),
 				'replace' => $replacePattern
 			),
@@ -227,9 +227,9 @@ class Xss
 		while ($result != $value)
 		{
 			$result = $value;
-			foreach ($this->whiteList as $arWhiteListElement)
+			foreach ($this->whiteList as $whiteListElement)
 			{
-				$result = preg_replace($arWhiteListElement[$action.'_match'], $arWhiteListElement[$action.'_replacement'], $value);
+				$result = preg_replace($whiteListElement[$action.'_match'], $whiteListElement[$action.'_replacement'], $value);
 			}
 		}
 		return $result;

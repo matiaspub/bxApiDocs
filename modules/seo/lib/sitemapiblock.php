@@ -21,16 +21,21 @@ class SitemapIblockTable extends Entity\DataManager
 
 	protected static $iblockCache = array();
 
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
+	/**
+	 * Returns DB table name for entity.
+	 *
+	 * @return string
+	 */
 	public static function getTableName()
 	{
 		return 'b_seo_sitemap_iblock';
 	}
 
+	/**
+	 * Returns entity map definition.
+	 *
+	 * @return array
+	 */
 	public static function getMap()
 	{
 		$fieldsMap = array(
@@ -60,6 +65,13 @@ class SitemapIblockTable extends Entity\DataManager
 		return $fieldsMap;
 	}
 
+	/**
+	 * Clears all iblock links on sitemap settings deletion.
+	 *
+	 * @param int $sitemapId Sitemap settings ID.
+	 *
+	 * @return void
+	 */
 	public static function clearBySitemap($sitemapId)
 	{
 		$connection = \Bitrix\Main\Application::getConnection();
@@ -70,17 +82,26 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 ");
 	}
 
-	public static function getByIblock($arFields, $itemType)
+	/**
+	 * Returns array of data for sitemap update due to some iblock action.
+	 *
+	 * @param array $fields Iblock element or section fields array.
+	 * @param string $itemType SitemapIblockTable::TYPE_ELEMENT || SitemapIblockTable::TYPE_SECTION.
+	 *
+	 * @return array Array of sitemap settings
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getByIblock($fields, $itemType)
 	{
-		$arSitemaps = array();
+		$sitemaps = array();
 
-		if(!isset(self::$iblockCache[$arFields['IBLOCK_ID']]))
+		if(!isset(self::$iblockCache[$fields['IBLOCK_ID']]))
 		{
-			self::$iblockCache[$arFields['IBLOCK_ID']] = array();
+			self::$iblockCache[$fields['IBLOCK_ID']] = array();
 
 			$dbRes = self::getList(array(
 				'filter' => array(
-					'IBLOCK_ID' => $arFields['IBLOCK_ID']
+					'IBLOCK_ID' => $fields['IBLOCK_ID']
 				),
 				'select' => array('SITEMAP_ID',
 					'SITE_ID' => 'SITEMAP.SITE_ID', 'SITEMAP_SETTINGS' => 'SITEMAP.SETTINGS',
@@ -90,37 +111,39 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 				)
 			));
 
-			while($arRes = $dbRes->fetch())
+			while($res = $dbRes->fetch())
 			{
-				self::$iblockCache[$arFields['IBLOCK_ID']][] = $arRes;
+				self::$iblockCache[$fields['IBLOCK_ID']][] = $res;
 			}
 		}
 
-		foreach(self::$iblockCache[$arFields['IBLOCK_ID']] as $arRes)
+		foreach(self::$iblockCache[$fields['IBLOCK_ID']] as $res)
 		{
-			$arSitemapSettings = unserialize($arRes['SITEMAP_SETTINGS']);
+			$sitemapSettings = unserialize($res['SITEMAP_SETTINGS']);
+
+			$add = false;
 
 			if($itemType == self::TYPE_SECTION)
 			{
-				$bAdd = self::checkSection(
-					$arFields['ID'],
-					$arSitemapSettings['IBLOCK_SECTION_SECTION'][$arFields['IBLOCK_ID']],
-					$arSitemapSettings['IBLOCK_SECTION'][$arFields['IBLOCK_ID']]
+				$add = self::checkSection(
+					$fields['ID'],
+					$sitemapSettings['IBLOCK_SECTION_SECTION'][$fields['IBLOCK_ID']],
+					$sitemapSettings['IBLOCK_SECTION'][$fields['IBLOCK_ID']]
 				);
 			}
 			else
 			{
-				if(is_array($arFields['IBLOCK_SECTION']) && count($arFields['IBLOCK_SECTION']) > 0)
+				if(is_array($fields['IBLOCK_SECTION']) && count($fields['IBLOCK_SECTION']) > 0)
 				{
-					foreach($arFields['IBLOCK_SECTION'] as $sectionId)
+					foreach($fields['IBLOCK_SECTION'] as $sectionId)
 					{
-						$bAdd = self::checkSection(
+						$add = self::checkSection(
 							$sectionId,
-							$arSitemapSettings['IBLOCK_SECTION_ELEMENT'][$arFields['IBLOCK_ID']],
-							$arSitemapSettings['IBLOCK_ELEMENT'][$arFields['IBLOCK_ID']]
+							$sitemapSettings['IBLOCK_SECTION_ELEMENT'][$fields['IBLOCK_ID']],
+							$sitemapSettings['IBLOCK_ELEMENT'][$fields['IBLOCK_ID']]
 						);
 
-						if($bAdd)
+						if($add)
 						{
 							break;
 						}
@@ -128,49 +151,58 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 				}
 				else
 				{
-					$bAdd = $arSitemapSettings['IBLOCK_ELEMENT'][$arFields['IBLOCK_ID']] == 'Y';
+					$add = $sitemapSettings['IBLOCK_ELEMENT'][$fields['IBLOCK_ID']] == 'Y';
 				}
 			}
 
-			if($bAdd)
+			if($add)
 			{
-				$arSitemaps[] = array(
-					'IBLOCK_CODE' => $arRes['IBLOCK_CODE'],
-					'IBLOCK_XML_ID' => $arRes['IBLOCK_XML_ID'],
-					'DETAIL_PAGE_URL' => $arRes['DETAIL_PAGE_URL'],
-					'SECTION_PAGE_URL' => $arRes['SECTION_PAGE_URL'],
-					'SITE_ID' => $arRes['SITE_ID'],
-					'PROTOCOL' => $arSitemapSettings['PROTO'] == 1 ? 'https' : 'http',
-					'DOMAIN' => $arSitemapSettings['DOMAIN'],
-					'ROBOTS' => $arSitemapSettings['ROBOTS'],
-					'SITEMAP_DIR' => $arSitemapSettings['DIR'],
-					'SITEMAP_FILE' => $arSitemapSettings['FILENAME_INDEX'],
-					'SITEMAP_FILE_IBLOCK' => $arSitemapSettings['FILENAME_IBLOCK'],
+				$sitemaps[] = array(
+					'IBLOCK_CODE' => $res['IBLOCK_CODE'],
+					'IBLOCK_XML_ID' => $res['IBLOCK_XML_ID'],
+					'DETAIL_PAGE_URL' => $res['DETAIL_PAGE_URL'],
+					'SECTION_PAGE_URL' => $res['SECTION_PAGE_URL'],
+					'SITE_ID' => $res['SITE_ID'],
+					'PROTOCOL' => $sitemapSettings['PROTO'] == 1 ? 'https' : 'http',
+					'DOMAIN' => $sitemapSettings['DOMAIN'],
+					'ROBOTS' => $sitemapSettings['ROBOTS'],
+					'SITEMAP_DIR' => $sitemapSettings['DIR'],
+					'SITEMAP_FILE' => $sitemapSettings['FILENAME_INDEX'],
+					'SITEMAP_FILE_IBLOCK' => $sitemapSettings['FILENAME_IBLOCK'],
 				);
 			}
 		}
 
-		return $arSitemaps;
+		return $sitemaps;
 	}
 
-	public static function checkSection($SECTION_ID, $arSectionSettings, $defaultValue)
+	/**
+	 * Checks if section $sectionId should be added to sitemap.
+	 *
+	 * @param int $sectionId Section ID.
+	 * @param array $sectionSettings Sitemap section settings array.
+	 * @param bool $defaultValue Default value for situation of settings absence.
+	 *
+	 * @return bool
+	 */
+	public static function checkSection($sectionId, $sectionSettings, $defaultValue)
 	{
 		$value = $defaultValue;
 
-		if(is_array($arSectionSettings) && count($arSectionSettings) > 0)
+		if(is_array($sectionSettings) && count($sectionSettings) > 0)
 		{
-			while ($SECTION_ID > 0)
+			while ($sectionId > 0)
 			{
-				if(isset($arSectionSettings[$SECTION_ID]))
+				if(isset($sectionSettings[$sectionId]))
 				{
-					$value = $arSectionSettings[$SECTION_ID];
+					$value = $sectionSettings[$sectionId];
 					break;
 				}
 
-				$dbRes = \CIBlockSection::getList(array(), array('ID' => $SECTION_ID), false, array('ID', 'IBLOCK_SECTION_ID'));
-				$arSection = $dbRes->fetch();
+				$dbRes = \CIBlockSection::getList(array(), array('ID' => $sectionId), false, array('ID', 'IBLOCK_SECTION_ID'));
+				$section = $dbRes->fetch();
 
-				$SECTION_ID = $arSection["IBLOCK_SECTION_ID"];
+				$sectionId = $section["IBLOCK_SECTION_ID"];
 			}
 		}
 
@@ -180,13 +212,16 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 
 class SitemapIblock
 {
-	private static $arBeforeActions = array(
+	private static $beforeActions = array(
 		'BEFOREDELETEELEMENT' => array(array(),array()),
 		'BEFOREDELETESECTION' => array(array(),array()),
 		'BEFOREUPDATEELEMENT' => array(array(),array()),
 		'BEFOREUPDATESECTION' => array(array(),array()),
 	);
 
+	/**
+	 * Event handler for multiple IBlock events
+	 */
 	public static function __callStatic($name, $arguments)
 	{
 		$name = ToUpper($name);
@@ -205,13 +240,18 @@ class SitemapIblock
 				)
 				{
 					// we recieve array reference here
-					$arFields = array();
+					$fields = array();
 					foreach($arguments[0] as $key => $value)
 					{
-						$arFields[$key] = $value;
+						$fields[$key] = $value;
 					}
 
-					self::actionAdd($name, $arFields);
+					if(!isset($fields['EXTERNAL_ID']) && isset($fields['XML_ID']))
+					{
+						$fields['EXTERNAL_ID'] = $fields['XML_ID'];
+					}
+
+					self::actionAdd($name, $fields);
 				}
 			break;
 
@@ -225,33 +265,33 @@ class SitemapIblock
 
 				if($ID > 0)
 				{
-					$bElement = $name == 'BEFOREDELETEELEMENT' || $name == 'BEFOREUPDATEELEMENT';
+					$element = $name == 'BEFOREDELETEELEMENT' || $name == 'BEFOREUPDATEELEMENT';
 
-					$dbFields = $bElement
+					$dbFields = $element
 						? \CIBlockElement::getByID($ID)
 						: \CIBlockSection::getByID($ID);
 
-					$arFields = $dbFields->getNext();
-					if($arFields)
+					$fields = $dbFields->getNext();
+					if($fields)
 					{
-						if($bElement && !self::checkElement($arFields))
+						if($element && !self::checkElement($fields))
 						{
 							return;
 						}
 
-						$arSitemaps = SitemapIblockTable::getByIblock(
-							$arFields,
-							$bElement ? SitemapIblockTable::TYPE_ELEMENT : SitemapIblockTable::TYPE_SECTION
+						$sitemaps = SitemapIblockTable::getByIblock(
+							$fields,
+							$element ? SitemapIblockTable::TYPE_ELEMENT : SitemapIblockTable::TYPE_SECTION
 						);
 
-						if(count($arSitemaps) > 0)
+						if(count($sitemaps) > 0)
 						{
-							self::$arBeforeActions[$name][intval($bElement)][$ID] = array(
-								'URL' => $bElement
-									? $arFields['~DETAIL_PAGE_URL']
-									: $arFields['~SECTION_PAGE_URL'],
-								'FIELDS' => $arFields,
-								'SITEMAPS' => $arSitemaps,
+							self::$beforeActions[$name][intval($element)][$ID] = array(
+								'URL' => $element
+									? $fields['~DETAIL_PAGE_URL']
+									: $fields['~SECTION_PAGE_URL'],
+								'FIELDS' => $fields,
+								'SITEMAPS' => $sitemaps,
 							);
 						}
 					}
@@ -263,23 +303,28 @@ class SitemapIblock
 			case 'UPDATEELEMENT':
 			case 'UPDATESECTION':
 
-				$arFields = $arguments[0];
-				$bElement = $name == 'DELETEELEMENT' || $name == 'UPDATEELEMENT';
+				$fields = $arguments[0];
+				$element = $name == 'DELETEELEMENT' || $name == 'UPDATEELEMENT';
 
 				if(
-					is_array($arFields)
-					&& $arFields['ID'] > 0
-					&& isset(self::$arBeforeActions['BEFORE'.$name][intval($bElement)][$arFields['ID']])
+					is_array($fields)
+					&& $fields['ID'] > 0
+					&& isset(self::$beforeActions['BEFORE'.$name][intval($element)][$fields['ID']])
 				)
 				{
-					if($name == 'DELETEELEMENT' || $name == 'DELETESECTION')
+					if($fields['RESULT'] !== false)
 					{
-						self::actionDelete(self::$arBeforeActions['BEFORE'.$name][intval($bElement)][$arFields['ID']]);
+						if($name == 'DELETEELEMENT' || $name == 'DELETESECTION')
+						{
+							self::actionDelete(self::$beforeActions['BEFORE'.$name][intval($element)][$fields['ID']]);
+						}
+						else
+						{
+							self::actionUpdate(self::$beforeActions['BEFORE'.$name][intval($element)][$fields['ID']], $element);
+						}
 					}
-					else
-					{
-						self::actionUpdate(self::$arBeforeActions['BEFORE'.$name][intval($bElement)][$arFields['ID']], $bElement);
-					}
+
+					unset(self::$beforeActions['BEFORE'.$name][intval($element)][$fields['ID']]);
 				}
 
 			break;
@@ -287,17 +332,24 @@ class SitemapIblock
 		}
 	}
 
-	protected static function checkElement(&$arFields)
+	/**
+	 * Checks if element is a real element, not a workflow item
+	 *
+	 * @param array $fields Element fields.
+	 *
+	 * @return bool
+	 */
+	protected static function checkElement(&$fields)
 	{
-		if($arFields['WF'] === 'Y')
+		if($fields['WF'] === 'Y')
 		{
 			if(
-				$arFields['WF_PARENT_ELEMENT_ID'] > 0
-				&& $arFields['WF_PARENT_ELEMENT_ID'] != $arFields['ID']
-				&& $arFields['WF_STATUS_ID'] == 1
+				$fields['WF_PARENT_ELEMENT_ID'] > 0
+				&& $fields['WF_PARENT_ELEMENT_ID'] != $fields['ID']
+				&& $fields['WF_STATUS_ID'] == 1
 			)
 			{
-				$arFields['ID'] = $arFields['WF_PARENT_ELEMENT_ID'];
+				$fields['ID'] = $fields['WF_PARENT_ELEMENT_ID'];
 			}
 			else
 			{
@@ -308,93 +360,129 @@ class SitemapIblock
 		return true;
 	}
 
-	protected static function actionUpdate($arData, $bElement)
+	/**
+	 * Processes actions on IBlock element or section update
+	 *
+	 * @param array $data Data got from SitemapIblockTable::getByIblock() + element/section data + prev link data got from event handler.
+	 * @param bool $element Element or section.
+	 */
+	protected static function actionUpdate($data, $element)
 	{
-		$arFields = $arData['FIELDS'];
-		foreach($arData['SITEMAPS'] as $arSitemap)
+		$fields = $data['FIELDS'];
+		foreach($data['SITEMAPS'] as $sitemap)
 		{
 			$fileName = str_replace(
 				array('#IBLOCK_ID#', '#IBLOCK_CODE#', '#IBLOCK_XML_ID#'),
-				array($arFields['IBLOCK_ID'], $arSitemap['IBLOCK_CODE'], $arSitemap['IBLOCK_XML_ID']),
-				$arSitemap['SITEMAP_FILE_IBLOCK']
+				array($fields['IBLOCK_ID'], $sitemap['IBLOCK_CODE'], $sitemap['IBLOCK_XML_ID']),
+				$sitemap['SITEMAP_FILE_IBLOCK']
 			);
+
+			if($element)
+			{
+				$dbRes = \CIBlockElement::getByID($fields["ID"]);
+			}
+			else
+			{
+				$dbRes = \CIBlockSection::getByID($fields["ID"]);
+			}
+
+			$newFields = $dbRes->fetch();
 
 			$rule = array(
-				'url' => $bElement
-					? $arFields['DETAIL_PAGE_URL']
-					: $arFields['SECTION_PAGE_URL'],
-				'lastmod' => MakeTimeStamp($arFields['TIMESTAMP_X'])
+				'url' => $element
+					? \CIBlock::replaceDetailUrl($sitemap['DETAIL_PAGE_URL'], $newFields, false, "E")
+					: \CIBlock::replaceDetailUrl($sitemap['SECTION_PAGE_URL'], $newFields, false, "S"),
+				'lastmod' => MakeTimeStamp($fields['TIMESTAMP_X'])
 			);
 
-			$sitemapFile = new SitemapFile($fileName, $arSitemap);
-			$sitemapFile->removeEntry($arData['URL']);
+			$sitemapFile = new SitemapFile($fileName, $sitemap);
+			$sitemapFile->removeEntry($data['URL']);
 			$sitemapFile->appendIblockEntry($rule['url'], $rule['lastmod']);
 
-			$sitemapIndex = new SitemapIndex($arSitemap['SITEMAP_FILE'], $arSitemap);
+			$sitemapIndex = new SitemapIndex($sitemap['SITEMAP_FILE'], $sitemap);
 			$sitemapIndex->appendIndexEntry($sitemapFile);
 
-			if($arSitemap['ROBOTS'] == 'Y')
+			if($sitemap['ROBOTS'] == 'Y')
 			{
-				$robotsFile = new RobotsFile($arSitemap['SITE_ID']);
+				$robotsFile = new RobotsFile($sitemap['SITE_ID']);
 				$robotsFile->addRule(
 					array(RobotsFile::SITEMAP_RULE, $sitemapIndex->getUrl())
 				);
 			}
+
+			unset($sitemapFile);
+			unset($sitemapIndex);
+			unset($robotsFile);
 		}
 	}
 
-	protected static function actionDelete($arData)
+	/**
+	 * Processes actions on IBlock element or section delete.
+	 *
+	 * @param array $data Data got from SitemapIblockTable::getByIblock() + element/section data + prev link data got from event handler.
+	 */
+	protected static function actionDelete($data)
 	{
-		$arFields = $arData['FIELDS'];
-		foreach($arData['SITEMAPS'] as $arSitemap)
+		$fields = $data['FIELDS'];
+		foreach($data['SITEMAPS'] as $sitemap)
 		{
 			$fileName = str_replace(
 				array('#IBLOCK_ID#', '#IBLOCK_CODE#', '#IBLOCK_XML_ID#'),
-				array($arFields['IBLOCK_ID'], $arSitemap['IBLOCK_CODE'], $arSitemap['IBLOCK_XML_ID']),
-				$arSitemap['SITEMAP_FILE_IBLOCK']
+				array($fields['IBLOCK_ID'], $sitemap['IBLOCK_CODE'], $sitemap['IBLOCK_XML_ID']),
+				$sitemap['SITEMAP_FILE_IBLOCK']
 			);
 
-			$sitemapFile = new SitemapFile($fileName, $arSitemap);
-			$sitemapFile->removeEntry($arData['URL']);
+			$sitemapFile = new SitemapFile($fileName, $sitemap);
+			$sitemapFile->removeEntry($data['URL']);
 
-			$sitemapIndex = new SitemapIndex($arSitemap['SITEMAP_FILE'], $arSitemap);
+			$sitemapIndex = new SitemapIndex($sitemap['SITEMAP_FILE'], $sitemap);
 			$sitemapIndex->appendIndexEntry($sitemapFile);
 		}
 	}
 
-	protected static function actionAdd($name, $arFields)
+	/**
+	 * Processes actions on IBlock element or section add.
+	 *
+	 * @param string $name Event handler name.
+	 * @param array $fields Element/section fields.
+	 */
+	protected static function actionAdd($name, $fields)
 	{
 		if($name == 'ADDELEMENT')
 		{
-			if(!self::checkElement($arFields))
+			if(!self::checkElement($fields))
 			{
 				return;
 			}
 
-			// we don't have the GLOBAL_ACTIVE flag in $arFields so we should check it manually
-			if(is_array($arFields['IBLOCK_SECTION']) && count($arFields['IBLOCK_SECTION']) > 0)
+			// we don't have the GLOBAL_ACTIVE flag in fields so we should check it manually
+			if(is_array($fields['IBLOCK_SECTION']) && count($fields['IBLOCK_SECTION']) > 0)
 			{
-				$arNewSections = array();
-				$arFilter = array('ID' => $arFields['IBLOCK_SECTION'], 'IBLOCK_ID' => $arFields['IBLOCK_ID'], 'GLOBAL_ACTIVE' => 'Y');
+				$newSections = array();
+				$filter = array(
+					'ID' => $fields['IBLOCK_SECTION'],
+					'IBLOCK_ID' => $fields['IBLOCK_ID'],
+					'GLOBAL_ACTIVE' => 'Y'
+				);
 
-				$dbRes = \CIBlockSection::getList(array(), $arFilter, false, array('ID'));
+				$dbRes = \CIBlockSection::getList(array(), $filter, false, array('ID'));
 				while($ar = $dbRes->fetch())
 				{
-					$arNewSections[] = $ar['ID'];
+					$newSections[] = $ar['ID'];
 				}
 
-				if(count($arNewSections) <= 0)
+				if(count($newSections) <= 0)
 				{
 					// element is added to inactive sections
 					return;
 				}
 
-				$arFields['IBLOCK_SECTION'] = $arNewSections;
+				$fields['IBLOCK_SECTION'] = $newSections;
 			}
 		}
 		elseif($name == 'ADDSECTION')
 		{
-			$dbRes = \CIBlockSection::getList(array(), array('ID' => $arFields['ID'], 'GLOBAL_ACTIVE' => 'Y'), false, array('ID'));
+			$dbRes = \CIBlockSection::getList(array(), array('ID' => $fields['ID'], 'GLOBAL_ACTIVE' => 'Y'), false, array('ID'));
 			if(!$dbRes->fetch())
 			{
 				// section is added to inactive branch
@@ -402,53 +490,53 @@ class SitemapIblock
 			}
 		}
 
-		$arSitemaps = SitemapIblockTable::getByIblock(
-			$arFields,
+		$sitemaps = SitemapIblockTable::getByIblock(
+			$fields,
 			$name == 'ADDSECTION' ? SitemapIblockTable::TYPE_SECTION : SitemapIblockTable::TYPE_ELEMENT
 		);
 
-		$arFields['TIMESTAMP_X'] = ConvertTimeStamp(false, "FULL");
+		$fields['TIMESTAMP_X'] = ConvertTimeStamp(false, "FULL");
 
-		if(isset($arFields['IBLOCK_SECTION']) && is_array($arFields['IBLOCK_SECTION']) && count($arFields['IBLOCK_SECTION']) > 0)
+		if(isset($fields['IBLOCK_SECTION']) && is_array($fields['IBLOCK_SECTION']) && count($fields['IBLOCK_SECTION']) > 0)
 		{
-			$arFields['IBLOCK_SECTION_ID'] = min($arFields['IBLOCK_SECTION']);
+			$fields['IBLOCK_SECTION_ID'] = min($fields['IBLOCK_SECTION']);
 		}
 
-		if(count($arSitemaps) > 0)
+		if(count($sitemaps) > 0)
 		{
-			$arSiteDirs = array();
+			$siteDirs = array();
 			$dbSite = SiteTable::getList(array('select' => array('LID', 'DIR')));
-			while($arSite = $dbSite->fetch())
+			while($site = $dbSite->fetch())
 			{
-				$arSiteDirs[$arSite['LID']] = $arSite['DIR'];
+				$siteDirs[$site['LID']] = $site['DIR'];
 			}
 
-			foreach($arSitemaps as $arSitemap)
+			foreach($sitemaps as $sitemap)
 			{
-				$arFields['LANG_DIR'] = $arSiteDirs[$arSitemap['SITE_ID']];
+				$fields['LANG_DIR'] = $siteDirs[$sitemap['SITE_ID']];
 
 				$rule = array(
 					'url' => $name == 'ADDSECTION'
-						? \CIBlock::replaceDetailUrl($arSitemaps[0]['SECTION_PAGE_URL'], $arFields, false, "S")
-						: \CIBlock::replaceDetailUrl($arSitemaps[0]['DETAIL_PAGE_URL'], $arFields, false, "E"),
-					'lastmod' => MakeTimeStamp($arFields['TIMESTAMP_X'])
+						? \CIBlock::replaceDetailUrl($sitemaps[0]['SECTION_PAGE_URL'], $fields, false, "S")
+						: \CIBlock::replaceDetailUrl($sitemaps[0]['DETAIL_PAGE_URL'], $fields, false, "E"),
+					'lastmod' => MakeTimeStamp($fields['TIMESTAMP_X'])
 				);
 
 				$fileName = str_replace(
 					array('#IBLOCK_ID#', '#IBLOCK_CODE#', '#IBLOCK_XML_ID#'),
-					array($arFields['IBLOCK_ID'], $arSitemap['IBLOCK_CODE'], $arSitemap['IBLOCK_XML_ID']),
-					$arSitemap['SITEMAP_FILE_IBLOCK']
+					array($fields['IBLOCK_ID'], $sitemap['IBLOCK_CODE'], $sitemap['IBLOCK_XML_ID']),
+					$sitemap['SITEMAP_FILE_IBLOCK']
 				);
 
-				$sitemapFile = new SitemapFile($fileName, $arSitemap);
+				$sitemapFile = new SitemapFile($fileName, $sitemap);
 				$sitemapFile->appendIblockEntry($rule['url'], $rule['lastmod']);
 
-				$sitemapIndex = new SitemapIndex($arSitemap['SITEMAP_FILE'], $arSitemap);
+				$sitemapIndex = new SitemapIndex($sitemap['SITEMAP_FILE'], $sitemap);
 				$sitemapIndex->appendIndexEntry($sitemapFile);
 
-				if($arSitemap['ROBOTS'] == 'Y')
+				if($sitemap['ROBOTS'] == 'Y')
 				{
-					$robotsFile = new RobotsFile($arSitemap['SITE_ID']);
+					$robotsFile = new RobotsFile($sitemap['SITE_ID']);
 					$robotsFile->addRule(
 						array(RobotsFile::SITEMAP_RULE, $sitemapIndex->getUrl())
 					);

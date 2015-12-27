@@ -74,6 +74,20 @@ class CComponentParamsManager
 			'templates' => array()
 		);
 
+		$arSiteTemplates = array(".default" => GetMessage("PAR_MAN_DEFAULT"));
+		if(!empty($siteTemplate))
+		{
+			$dbst = CSiteTemplate::GetList(array(), array("ID" => $siteTemplate), array());
+			while($siteTempl = $dbst->Fetch())
+				$arSiteTemplates[$siteTempl['ID']] = $siteTempl['NAME'];
+ 		}
+
+ 		foreach($arTemplates as $k => $templ)
+		{
+			$showTemplateName = ($templ["TEMPLATE"] !== '' && $arSiteTemplates[$templ["TEMPLATE"]] <> '') ? 				$arSiteTemplates[$templ["TEMPLATE"]] : GetMessage("PAR_MAN_DEF_TEMPLATE");
+			$arTemplates[$k]['DISPLAY_NAME'] = $templ['NAME'].' ('.$showTemplateName.')';
+		}
+
 		$arTemplateProps = array();
 		if (is_array($arTemplates))
 		{
@@ -81,6 +95,7 @@ class CComponentParamsManager
 			{
 				$result['templates'][] = $arTemplate;
 				$tName = (!$arTemplate['NAME'] || $arTemplate['NAME'] == '.default') ? '' : $arTemplate['NAME'];
+
 				if ($tName == $template)
 				{
 					$arTemplateProps = CComponentUtil::GetTemplateProps($name, $arTemplate['NAME'], $siteTemplate, $currentValues);
@@ -129,6 +144,16 @@ class CComponentParamsManager
 					'ML_TYPES' => isset($arParam['FD_MEDIALIB_TYPES']) ? $arParam['FD_MEDIALIB_TYPES'] : false
 				);
 			}
+
+			// TOOLTIPS FROM .parameters langs
+			if (!isset($result['tooltips'][$arParam['ID'].'_TIP']))
+			{
+				$tip = GetMessage($arParam['ID'].'_TIP');
+				if ($tip)
+				{
+					$result['tooltips'][$arParam['ID'].'_TIP'] = $tip;
+				}
+			}
 		}
 
 		return $result;
@@ -171,7 +196,7 @@ class CComponentParamsManager
 		return $messages;
 	}
 
-	public static function DisplayFileDialogsScripts($params = array())
+	public static function DisplayFileDialogsScripts()
 	{
 		for($i = 0, $l = count(self::$fileDialogs); $i < $l; $i++)
 		{

@@ -7,17 +7,12 @@ class CAllRatings
 	// get specified rating record
 	
 	/**
-	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор рейтинга
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -28,7 +23,6 @@ class CAllRatings
 	* echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -67,17 +61,12 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива.</p>
-	*
-	*
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива. Динамичный метод.</p>
 	*
 	*
 	* @param int $ID  Идентификатор рейтинга
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -87,7 +76,6 @@ class CAllRatings
 	* echo "&lt;pre&gt;"; print_r($arRating); echo "&lt;/pre&gt;";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -154,9 +142,7 @@ class CAllRatings
 	// get rating record list
 	
 	/**
-	* <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
 	*
 	*
 	* @param  $array  Порядок сортировки возвращаемого списка, заданный в виде
@@ -164,24 +150,15 @@ class CAllRatings
 	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, NAME,
 	* CREATED, LAST_MODIFIED, LAST_CALCILATED, ACTIVE, STATUS, CALCULATED, CALCULATION_METHOD, ENTITY_ID.
 	*
-	*
-	*
 	* @param arSor $t  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: ID, ACTIVE, CALCULATED, NAME, ENTITY_ID
 	*
-	*
-	*
 	* @param  $array  
-	*
-	*
 	*
 	* @param arFilte $r  
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -196,7 +173,6 @@ class CAllRatings
 	* echo '&lt;pre&gt;'.print_r($arRatings, true).'&lt;/pre&gt;';
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -318,9 +294,7 @@ class CAllRatings
 	//Addition rating
 	
 	/**
-	* <p>Метод добавляет новый рейтинг.</p>
-	*
-	*
+	* <p>Метод добавляет новый рейтинг. Динамичный метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
@@ -331,10 +305,7 @@ class CAllRatings
 	* критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
 	* рейтингования.</li> </ul> Все поля являются обязательными.
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -403,7 +374,6 @@ class CAllRatings
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li>Метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php">CRating::Update</a>
 	* </li> </ul></bo<a name="examples"></a>
@@ -460,14 +430,10 @@ class CAllRatings
 	//Update rating
 	
 	/**
-	* <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>.</p>
-	*
-	*
+	* <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>. Динамичный метод.</p>
 	*
 	*
 	* @param int $id  Идентификатор рейтинга.
-	*
-	*
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
 	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
@@ -478,10 +444,7 @@ class CAllRatings
 	* рейтингования</li> <li> <b>NEW_CALC</b> – обнуляет предыдущее значение
 	* рейтинга</li> </ul>
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -496,7 +459,6 @@ class CAllRatings
 	*     echo "Рейтинг успешно обновлен.";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -576,17 +538,12 @@ class CAllRatings
 	// delete rating
 	
 	/**
-	* <p>Метод удаляет рейтинг с идентификатором ID.</p>
-	*
-	*
+	* <p>Метод удаляет рейтинг с идентификатором ID. Динамичный метод.</p>
 	*
 	*
 	* @param int $id  Идентификатор рейтинга
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -630,23 +587,16 @@ class CAllRatings
 	// start calculation rating-component
 	
 	/**
-	* <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>.</p>
-	*
-	*
+	* <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>. Динамичный метод.</p>
 	*
 	*
 	* @param int $id  Идентификатор рейтинга
-	*
-	*
 	*
 	* @param bool $forceRecalc  Принудительный пересчет. Если данный параметр установлен в
 	* <b>true</b>, то критерии рейтинга будут пересчитаны без учета времени
 	* следующего запуска.
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -717,13 +667,10 @@ class CAllRatings
 	// queries modules and get all the available objects
 	
 	/**
-	* <p>Метод возвращает все доступные объекты рейтинговая.</p>
-	*
-	*
+	* <p>Метод возвращает все доступные объекты рейтинговая. Динамичный метод.</p>
 	*
 	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -786,21 +733,14 @@ class CAllRatings
 	// queries modules and assemble an array of settings
 	
 	/**
-	* <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта.</p>
-	*
-	*
+	* <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта. Динамичный метод.</p>
 	*
 	*
 	* @param int $objectType  Имя оцениваемого объекта.
 	*
-	*
-	*
 	* @param bool $withRatingType  Учитывать тип рейтингования.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -859,9 +799,7 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>.</p>
-	*
-	*
+	* <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>. Динамичный метод.</p>
 	*
 	*
 	* @param int $entityTypeId  Название сущности голосования. Например: FORUM_TOPIC для тем форума,
@@ -869,20 +807,13 @@ class CAllRatings
 	* комментариев в блоге. Сам список кодов не регламентирован, можно
 	* использовать любой удобный.
 	*
-	*
-	*
 	* @param mixed $entityId  Идентификатор сущности голосования (можно выбрать несколько
 	* результатов, указав в этом параметре массив идентификаторов)
-	*
-	*
 	*
 	* @param int $user_Id  Идентификатор пользователя (если не указывать, подставляется
 	* текущий пользователь)
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -896,7 +827,6 @@ class CAllRatings
 	*     echo "Форум: за выбранную тему ещё не голосовали"; 
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1010,22 +940,15 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>.</p>
-	*
-	*
+	* <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>. Динамичный метод.</p>
 	*
 	*
 	* @param int $Id  идентификатор рейтинга
 	*
-	*
-	*
 	* @param mixed $entityId  идентификатор оцениваемого объекта (можно выбрать несколько
 	* результатов, указав в этом параметре массив идентификаторов)
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1039,7 +962,6 @@ class CAllRatings
 	*     echo "Указанный идентификатор не участвует в рейтинге";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1136,9 +1058,7 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод добавляет голос к рейтинговому голосованию.</p>
-	*
-	*
+	* <p>Метод добавляет голос к рейтинговому голосованию. Динамичный метод.</p>
 	*
 	*
 	* @param array $Param  Массив значений параметров. В качестве ключей данного массива
@@ -1151,10 +1071,7 @@ class CAllRatings
 	* пользователя</li> <li> <b>USER_IP</b> – IP-адрес пользователя</li> </ul> Все поля
 	* являются обязательными.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -1187,6 +1104,8 @@ class CAllRatings
 			else
 				$_SESSION['RATING_VOTE_COUNT']++;
 		}
+
+		$arParam['ENTITY_TYPE_ID'] = substr($arParam['ENTITY_TYPE_ID'], 0, 50);
 
 		CRatings::CancelRatingVote($arParam);
 
@@ -1860,7 +1779,15 @@ class CAllRatings
 		$ID = intval($ID);
 		$err_mess = (CRatings::err_mess())."<br>Function: __AddComponents<br>Line: ";
 		foreach ($arFields['CONFIGS'] as $MODULE_ID => $RAT_ARRAY)
+		{
+			if (!is_array($RAT_ARRAY))
+				continue;
+
 			foreach ($RAT_ARRAY as $RAT_TYPE => $COMPONENT)
+			{
+				if (!is_array($COMPONENT))
+					continue;
+
 				foreach ($COMPONENT as $COMPONENT_NAME => $COMPONENT_VALUE)
 				{
 					if (!isset($arRatingConfigs[$MODULE_ID][$MODULE_ID."_".$RAT_TYPE."_".$COMPONENT_NAME]))
@@ -1886,6 +1813,8 @@ class CAllRatings
 
 					$DB->Add("b_rating_component", $arFields_i, array(), "", false, $err_mess.__LINE__);
 				}
+			}
+		}
 
 
 		return true;

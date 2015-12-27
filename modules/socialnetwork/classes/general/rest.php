@@ -10,7 +10,9 @@ class CSocNetLogRestService extends IRestService
 	{
 		return array(
 			"log" => array(
-				"log.blogpost.add" => array("CSocNetLogRestService", "AddBlogPost"),
+				"log.blogpost.get" => array("CSocNetLogRestService", "getBlogPost"),
+				"log.blogpost.add" => array("CSocNetLogRestService", "addBlogPost"),
+				"log.blogpost.getusers.important" => array("CSocNetLogRestService", "getBlogPostUsersImprtnt"),
 			),
 			"sonet_group" => array(
 				"sonet_group.get" => array("CSocNetLogRestService", "getGroup"),
@@ -26,12 +28,156 @@ class CSocNetLogRestService extends IRestService
 		);
 	}
 
-	public static function AddBlogPost($arFields)
+	public static function getBlogPost($arFields, $n, $server)
+	{
+		$result = array();
+		if (!CModule::IncludeModule("blog"))
+		{
+			return $result;
+		}
+
+		$tzOffset = CTimeZone::GetOffset();
+		$arOrder = array("LOG_UPDATE" => "DESC");
+
+		$arAccessCodes = $GLOBALS["USER"]->GetAccessCodes();
+		foreach ($arAccessCodes as $i => $code)
+		{
+			if (!preg_match("/^(U|D|DR)/", $code)) //Users and Departments
+			{
+				unset($arAccessCodes[$i]);
+			}
+		}
+
+		$arEventId = array("blog_post", "blog_post_important");
+		$arEventIdFullset = array();
+		foreach($arEventId as $eventId)
+		{
+			$arEventIdFullset = array_merge($arEventIdFullset, CSocNetLogTools::FindFullSetByEventID($eventId));
+		}
+
+		$arFilter = array(
+			"LOG_RIGHTS" => $arAccessCodes,
+			"EVENT_ID" => array_unique($arEventIdFullset),
+			"SITE_ID" => array('s1', false),
+			"<=LOG_DATE" => "NOW"
+		);
+
+		$arListParams = array(
+			"CHECK_RIGHTS" => "Y",
+			"USE_FOLLOW" => "N",
+			"USE_SUBSCRIBE" => "N"
+		);
+
+		$dbLog = CSocNetLog::GetList(
+			$arOrder,
+			$arFilter,
+			false,
+			self::getNavData($n),
+			array("ID", "SOURCE_ID"),
+			$arListParams
+		);
+
+		while($arLog = $dbLog->Fetch())
+		{
+			$arPostId[] = $arLog["SOURCE_ID"];
+		}
+
+		$arPostIdToGet = array();
+		$cacheTtl = 2592000;
+
+		foreach ($arPostId as $key => $postId)
+		{
+			$cacheId = 'blog_post_socnet_rest_'.$postId.'_ru'.($tzOffset <> 0 ? '_'.$tzOffset : '');
+			$cacheDir = '/blog/socnet_post/gen/'.intval($postId / 100).'/'.$postId;
+			$obCache = new CPHPCache;
+			if ($obCache->InitCache($cacheTtl, $cacheId, $cacheDir))
+			{
+				$result[$key] = $obCache->GetVars();
+			}
+			else
+			{
+				$arPostIdToGet[$key] = $postId;
+			}
+			$obCache->EndDataCache();
+		}
+
+		if (!empty($arPostIdToGet))
+		{
+			foreach ($arPostIdToGet as $key => $postId)
+			{
+				$cacheId = 'blog_post_socnet_rest_'.$postId.'_ru'.($tzOffset <> 0 ? '_'.$tzOffset : '');
+				$cacheDir = '/blog/socnet_post/gen/'.intval($postId / 100).'/'.$postId;
+				$obCache = new CPHPCache;
+				$obCache->InitCache($cacheTtl, $cacheId, $cacheDir);
+
+				$obCache->StartDataCache();
+
+				$dbPost = CBlogPost::GetList(
+					array(),
+					array("ID" => $postId),
+					false,
+					false,
+					array(
+						"ID",
+						"BLOG_ID",
+						"PUBLISH_STATUS",
+						"TITLE",
+						"AUTHOR_ID",
+						"ENABLE_COMMENTS",
+						"NUM_COMMENTS",
+						"VIEWS",
+						"CODE",
+						"MICRO",
+						"DETAIL_TEXT",
+						"DATE_PUBLISH",
+						"CATEGORY_ID",
+						"HAS_SOCNET_ALL",
+						"HAS_TAGS",
+						"HAS_IMAGES",
+						"HAS_PROPS",
+						"HAS_COMMENT_IMAGES"
+					)
+				);
+
+				if ($arPost = $dbPost->Fetch())
+				{
+					if ($arPost["PUBLISH_STATUS"] != BLOG_PUBLISH_STATUS_PUBLISH)
+					{
+						unset($arPost);
+					}
+					else
+					{
+						if($arPost["HAS_PROPS"] != "N")
+						{
+							$arPostFields = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("BLOG_POST", $arPost["ID"], LANGUAGE_ID);
+							$arPost = array_merge($arPost, $arPostFields);
+						}
+
+						$result[$key] = $arPost;
+					}
+				}
+
+				$obCache->EndDataCache($arPost);
+			}
+		}
+
+		ksort($result);
+
+		return self::setNavData($result, $dbLog);
+	}
+
+	public static function addBlogPost($arFields)
 	{
 		if (!is_array($_POST))
+		{
 			$_POST = array();
+		}
 
-		$_POST = array_merge($_POST, array("apply" => "Y", "decode" => "Y"), $arFields);
+		$_POST = array_merge($_POST, array("apply" => "Y", "decode" => "N"), $arFields);
+		if (isset($arFields["UF_BLOG_POST_IMPRTNT"]))
+		{
+			$GLOBALS["UF_BLOG_POST_IMPRTNT"] = $arFields["UF_BLOG_POST_IMPRTNT"];
+		}
 
 		$strPathToPost = COption::GetOptionString("socialnetwork", "userblogpost_page", false, SITE_ID);
 		$strPathToSmile = COption::GetOptionString("socialnetwork", "smile_page", false, SITE_ID);
@@ -59,9 +205,141 @@ class CSocNetLogRestService extends IRestService
 		ob_end_clean();
 
 		if (!$result)
+		{
 			throw new Exception('Error');
+		}
 		else
-			return true;
+		{
+
+			if (
+				isset($arFields["FILES"])
+				&& \Bitrix\Main\Config\Option::get('disk', 'successfully_converted', false)
+				&& CModule::includeModule('disk')
+				&& ($storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId($GLOBALS["USER"]->GetID()))
+				&& ($folder = $storage->getFolderForUploadedFiles($GLOBALS["USER"]->GetID()))
+			)
+			{
+				// upload to storage
+				$arResultFile = array();
+
+				foreach($arFields["FILES"] as $tmp)
+				{
+					$arFile = CRestUtil::saveFile($tmp);
+
+					if(is_array($arFile))
+					{
+						$file = $folder->uploadFile(
+							$arFile, // file array
+							array(
+								'NAME' => $arFile["name"],
+								'CREATED_BY' => $GLOBALS["USER"]->GetID()
+							),
+							array(),
+							true
+						);
+
+						if ($file)
+						{
+							$arResultFile[] = \Bitrix\Disk\Uf\FileUserType::NEW_FILE_PREFIX.$file->getId();
+						}
+					}
+				}
+
+				if (!empty($arResultFile)) // update post
+				{
+					CBlogPost::Update($result, array("HAS_PROPS" => "Y", "UF_BLOG_POST_FILE" => $arResultFile));
+				}
+			}
+
+			return $result;
+		}
+	}
+
+	public static function getBlogPostUsersImprtnt($arFields)
+	{
+		if (!is_array($arFields))
+		{
+			throw new Exception('Incorrect input data');
+		}
+
+		$arParams["postId"] = intval($arFields['POST_ID']);
+
+		if($arParams["postId"] <= 0)
+		{
+			throw new Exception('Wrong post ID');
+		}
+
+		$arParams["nTopCount"] = 500;
+		$arParams["paramName"] = 'BLOG_POST_IMPRTNT';
+		$arParams["paramValue"] = 'Y';
+
+		$arResult = array();
+
+		$cache = new CPHPCache();
+		$cache_id = "blog_post_param_".serialize(array(
+			$arParams["postId"],
+			$arParams["nTopCount"],
+			$arParams["paramName"],
+			$arParams["paramValue"]
+		));
+		$cache_path = $GLOBALS["CACHE_MANAGER"]->GetCompCachePath(CComponentEngine::MakeComponentPath("socialnetwork.blog.blog"))."/".$arParams["postId"];
+		$cache_time = (defined("BX_COMP_MANAGED_CACHE") ? 3600*24*365 : 600);
+
+		if ($cache->InitCache($cache_time, $cache_id, $cache_path))
+		{
+			$arResult = $cache->GetVars();
+		}
+		else
+		{
+			$cache->StartDataCache($cache_time, $cache_id, $cache_path);
+
+			if (CModule::IncludeModule("blog"))
+			{
+				if (defined("BX_COMP_MANAGED_CACHE"))
+				{
+					$GLOBALS["CACHE_MANAGER"]->StartTagCache($cache_path);
+					$GLOBALS["CACHE_MANAGER"]->RegisterTag($arParams["paramName"].$arParams["postId"]);
+				}
+
+				if ($arBlogPost = CBlogPost::GetByID($arParams["postId"]))
+				{
+					$postPerms = CBlogPost::GetSocNetPostPerms($arParams["postId"], true, $GLOBALS["USER"]->GetID(), $arBlogPost["AUTHOR_ID"]);
+					if ($postPerms >= BLOG_PERMS_READ)
+					{
+						$db_res = CBlogUserOptions::GetList(
+							array(
+							),
+							array(
+								'POST_ID' => $arParams["postId"],
+								'NAME' => $arParams["paramName"],
+								'VALUE' => $arParams["paramValue"],
+								'USER_ACTIVE' => 'Y'
+							),
+							array(
+								"nTopCount" => $arParams["nTopCount"],
+								"SELECT" => array("USER_ID")
+							)
+						);
+						if ($db_res)
+						{
+							while ($res = $db_res->Fetch())
+							{
+								$arResult[] = $res["USER_ID"];
+							}
+						}
+					}
+				}
+
+				if(defined("BX_COMP_MANAGED_CACHE"))
+				{
+					$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+				}
+
+				$cache->EndDataCache($arResult);
+			}
+		}
+
+		return $arResult;
 	}
 
 	public static function createGroup($arFields)
@@ -88,7 +366,7 @@ class CSocNetLogRestService extends IRestService
 		}
 
 		if (
-			!is_set($arFields, "SITE_ID") 
+			!is_set($arFields, "SITE_ID")
 			|| strlen($arFields["SITE_ID"]) <= 0
 		)
 		{
@@ -96,7 +374,7 @@ class CSocNetLogRestService extends IRestService
 		}
 
 		if (
-			!is_set($arFields, "SUBJECT_ID") 
+			!is_set($arFields, "SUBJECT_ID")
 			|| intval($arFields["SUBJECT_ID"]) <= 0
 		)
 		{
@@ -232,7 +510,7 @@ class CSocNetLogRestService extends IRestService
 		{
 			$arOrder = array("ID" => "DESC");
 		}
-		
+
 		if ($arFields['IS_ADMIN'] == 'Y')
 		{
 			if (!CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, false))
@@ -280,7 +558,7 @@ class CSocNetLogRestService extends IRestService
 			unset($arRes['INITIATE_PERMS']);
 			unset($arRes['SPAM_PERMS']);
 			unset($arRes['IMAGE_ID']);
-			
+
 			$result[] = $arRes;
 		}
 

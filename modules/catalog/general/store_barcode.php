@@ -23,6 +23,10 @@ class CAllCatalogStoreBarCode
 		global $DB;
 		$id = intval($id);
 
+		foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreBarCodeUpdate", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array($id, &$arFields)) === false)
+				return false;
+
 		if(array_key_exists('DATE_CREATE',$arFields))
 			unset($arFields['DATE_CREATE']);
 		if(array_key_exists('DATE_MODIFY', $arFields))
@@ -44,6 +48,10 @@ class CAllCatalogStoreBarCode
 			if(!$DB->Query($strSql, true, "File: ".__FILE__."<br>Line: ".__LINE__))
 				return false;
 		}
+
+		foreach(GetModuleEvents("catalog", "OnCatalogStoreBarCodeUpdate", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($id, $arFields));
+
 		return $id;
 	}
 
@@ -53,7 +61,14 @@ class CAllCatalogStoreBarCode
 		$id = intval($id);
 		if ($id > 0)
 		{
+			foreach(GetModuleEvents("catalog", "OnBeforeCatalogStoreBarCodeDelete", true) as $event)
+				ExecuteModuleEventEx($event, array($id));
+
 			$DB->Query("DELETE FROM b_catalog_store_barcode WHERE ID = ".$id." ", true);
+
+			foreach(GetModuleEvents("catalog", "OnCatalogStoreBarCodeDelete", true) as $arEvent)
+				ExecuteModuleEventEx($arEvent, array($id));
+
 			return true;
 		}
 		return false;

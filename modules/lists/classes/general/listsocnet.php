@@ -97,6 +97,7 @@ waiting for integration lists into events_user_view
 				"group_bizproc_task" => "page=group_bizproc_task&group_id=#group_id#&list_id=#list_id#&section_id=#section_id#&element_id=#element_id#&task_id=#task_id#",
 				"group_bizproc_workflow_admin" => "page=group_bizproc_workflow_admin&group_id=#group_id#&list_id=#list_id#",
 				"group_bizproc_workflow_edit" => "page=group_bizproc_workflow_admin&group_id=#group_id#&list_id=#list_id#&ID=#ID#",
+				"group_bizproc_workflow_delete" => "page=group_bizproc_workflow_delete&group_id=#group_id#&list_id=#list_id#&section_id=#section_id#&element_id=#element_id#"
 			);
 		}
 		else
@@ -115,6 +116,8 @@ waiting for integration lists into events_user_view
 				"group_bizproc_task" => "group/#group_id#/lists/#list_id#/bp_task/#section_id#/#element_id#/#task_id#/",
 				"group_bizproc_workflow_admin" => "group/#group_id#/lists/#list_id#/bp_admin/",
 				"group_bizproc_workflow_edit" => "group/#group_id#/lists/#list_id#/bp_edit/#ID#/",
+				"group_bizproc_workflow_delete" => "group/#group_id#/lists/#list_id#/bp_delete/#element_id#/",
+				"group_list_export_excel" => "group/#group_id#/lists/#list_id#/excel/",
 			);
 		}
 

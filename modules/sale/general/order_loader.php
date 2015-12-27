@@ -240,11 +240,22 @@ class CSaleOrderLoader
 						if($arOrder["TRAITS"][GetMessage("CC_BSC1_CANCELED")] == "true")
 						{
 							if($orderInfo["CANCELED"] == "N")
+							{
 								CSaleOrder::CancelOrder($orderInfo["ID"], "Y", $arOrder["COMMENT"]);
-							$arAditFields["UPDATED_1C"] = "Y";
+								$arAditFields["UPDATED_1C"] = "Y";
+							}
 						}
 						else
 						{
+							if($arOrder["TRAITS"][GetMessage("CC_BSC1_CANCELED")] != "true")
+							{
+								if($orderInfo["CANCELED"] == "Y")
+								{
+									CSaleOrder::CancelOrder($orderInfo["ID"], "N", $arOrder["COMMENT"]);
+									$arAditFields["UPDATED_1C"] = "Y";
+								}
+							}
+
 							if(strlen($arOrder["TRAITS"][GetMessage("CC_BSC1_1C_PAYED_DATE")])>1)
 							{
 								if($orderInfo["PAYED"]=="N")
@@ -260,8 +271,21 @@ class CSaleOrderLoader
 								if($orderInfo["ALLOW_DELIVERY"]=="N")
 									CSaleOrder::DeliverOrder($orderInfo["ID"], "Y");
 								$arAditFields["DATE_ALLOW_DELIVERY"] = CDatabase::FormatDate(str_replace("T", " ", $arOrder["TRAITS"][GetMessage("CC_BSC1_1C_DELIVERY_DATE")]), "YYYY-MM-DD HH:MI:SS", CLang::GetDateFormat("FULL", LANG));
+								$arAditFields["DELIVERY_DOC_DATE"] = $arAditFields["DATE_ALLOW_DELIVERY"];
+
 								if(strlen($this->arParams["FINAL_STATUS_ON_DELIVERY"])>0 && $orderInfo["STATUS_ID"] != "F" && $orderInfo["STATUS_ID"] != $this->arParams["FINAL_STATUS_ON_DELIVERY"])
 									CSaleOrder::StatusOrder($orderInfo["ID"], $this->arParams["FINAL_STATUS_ON_DELIVERY"]);
+								if(strlen($arOrder["TRAITS"][GetMessage("CC_BSC1_1C_DELIVERY_NUM")])>0)
+									$arAditFields["DELIVERY_DOC_NUM"] = $arOrder["TRAITS"][GetMessage("CC_BSC1_1C_DELIVERY_NUM")];
+								$arAditFields["UPDATED_1C"] = "Y";
+							}
+						}
+
+						if($this->arParams["CHANGE_STATUS_FROM_1C"] && strlen($arOrder["TRAITS"][GetMessage("CC_BSC1_1C_STATUS_ID")])>0)
+						{
+							if($orderInfo["STATUS_ID"] != $arOrder["TRAITS"][GetMessage("CC_BSC1_1C_STATUS_ID")])
+							{
+								CSaleOrder::StatusOrder($orderInfo["ID"], $arOrder["TRAITS"][GetMessage("CC_BSC1_1C_STATUS_ID")]);
 								$arAditFields["UPDATED_1C"] = "Y";
 							}
 						}
@@ -323,6 +347,7 @@ class CSaleOrderLoader
 									$arUser["NAME"] = $arOrder["AGENT"]["CONTACT"]["CONTACT_PERSON"];
 								if (strlen($arUser["EMAIL"]) <= 0)
 									$arUser["EMAIL"] = "buyer".time().GetRandomCode(2)."@".$_SERVER["SERVER_NAME"];
+
 								$arOrder["USER_ID"] = CSaleUser::DoAutoRegisterUser($arUser["EMAIL"], $arUser["NAME"], $this->arParams["SITE_NEW_ORDERS"], $arErrors);
 							}
 						}
@@ -362,7 +387,14 @@ class CSaleOrderLoader
 							$arAgent = $this->arExportInfo[$arOrder["PERSON_TYPE_ID"]];
 							foreach($arAgent as $k => $v)
 							{
-								if((strlen($v["VALUE"]) <= 0 || $v["TYPE"] != "PROPERTY") && (empty($arOrder["USER_PROPS"]) || empty($arOrder["USER_PROPS"][$v["VALUE"]])))
+								if(empty($v) ||
+									(
+										(empty($v["VALUE"]) || $v["TYPE"] != "PROPERTY") &&
+										(empty($arOrder["USER_PROPS"])
+											|| (is_array($v) && is_string($v["VALUE"]) && empty($arOrder["USER_PROPS"][$v["VALUE"]]))
+										)
+									)
+								)
 									unset($arAgent[$k]);
 							}
 
@@ -388,7 +420,7 @@ class CSaleOrderLoader
 									"ID_1C" => $arOrder["ID_1C"],
 									"VERSION_1C" => $arOrder["VERSION_1C"],
 									"UPDATED_1C" => "Y",
-									"DATE_INSERT" => CDatabase::FormatDate($arOrder["DATE"], "YYYY-MM-DD", CLang::GetDateFormat("FULL", LANG)),
+									"DATE_INSERT" => CDatabase::FormatDate($arOrder["DATE"]." ".$arOrder["TIME"], "YYYY-MM-DD HH:MI:SS", CLang::GetDateFormat("FULL", LANG)),
 								);
 
 								foreach($arOrder["items"] as $productID => $val)
@@ -647,7 +679,7 @@ class CSaleOrderLoader
 							);
 							while ($arOrderProperties = $dbOrderProperties->Fetch())
 							{
-								$this->arOrderProps[$arAgentInfo["PERSON_TYPE_ID"]] = $arOrderProperties;
+								$this->arOrderProps[$arAgentInfo["PERSON_TYPE_ID"]][] = $arOrderProperties;
 							}
 						}
 

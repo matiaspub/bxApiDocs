@@ -31,10 +31,13 @@ class CForumTopic extends CAllForumTopic
 				case "STATE":
 				case "APPROVED":
 				case "XML_ID":
-					if (strlen($val)<=0)
+					$val = CForumNew::prepareField($strOperation, "string", $val);
+					if ($val == '')
 						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FT.".$key." IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(FT.".$key.")<=0)";
+					else if ($strOperation == "IN")
+						$arSqlSearch[] = ($strNegative=="Y"?" NOT ":"")."(FT.".$key." IN (".$val.") )";
 					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FT.".$key." IS NULL OR NOT ":"")."(FT.".$key." ".$strOperation." '".$DB->ForSql($val)."' )";
+						$arSqlSearch[] = ($strNegative=="Y"?" FT.".$key." IS NULL OR NOT ":"")."(FT.".$key." ".$strOperation." '".$val."' )";
 					break;
 				case "ID":
 				case "USER_START_ID":
@@ -110,7 +113,7 @@ class CForumTopic extends CAllForumTopic
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
 			if ($order!="ASC") $order = "DESC";
-			if (in_array($by, array("ID", "FORUM_ID", "TOPIC_ID", "TITLE", "TAGS", "DESCRIPTION", "ICON_ID", 
+			if (in_array($by, array("ID", "FORUM_ID", "TOPIC_ID", "TITLE", "TAGS", "DESCRIPTION", "ICON",
 					"STATE", "APPROVED", "SORT", "VIEWS", "USER_START_ID", "USER_START_NAME", "START_DATE", 
 					"POSTS", "LAST_POSTER_ID", "LAST_POSTER_NAME", "LAST_POST_DATE", "LAST_MESSAGE_ID", 
 					"POSTS_UNAPPROVED", "ABS_LAST_POSTER_ID", "ABS_LAST_POSTER_NAME", "ABS_LAST_POST_DATE", "ABS_LAST_MESSAGE_ID", 
@@ -172,7 +175,7 @@ class CForumTopic extends CAllForumTopic
 		if ($UseGroup)
 		{
 			$strSql = 
-				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
+				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
 				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
@@ -195,7 +198,7 @@ class CForumTopic extends CAllForumTopic
 		else
 		{
 			$strSql = 
-				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
+				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
 				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
@@ -227,8 +230,6 @@ class CForumTopic extends CAllForumTopic
 		{
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		if (is_set($arAddParams, 'NoFilter') && $arAddParams['NoFilter'] == true)
-			return $db_res;
 		return new _CTopicDBResult($db_res, $arAddParams);
 	}
 
@@ -256,16 +257,18 @@ class CForumTopic extends CAllForumTopic
 			$key = strtoupper($key_res["FIELD"]);
 			$strNegative = $key_res["NEGATIVE"];
 			$strOperation = $key_res["OPERATION"];
-
 			switch ($key)
 			{
 				case "STATE":
 				case "XML_ID":
 				case "APPROVED":
-					if (strlen($val)<=0)
+					$val = CForumNew::prepareField($strOperation, "string", $val);
+					if ($val == '')
 						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FT.".$key." IS NULL OR ".($DB->type == "MSSQL" ? "LEN" : "LENGTH")."(FT.".$key.")<=0)";
+					else if ($strOperation == "IN")
+						$arSqlSearch[] = ($strNegative=="Y"?" NOT ":"")."(FT.".$key." IN (".$val.") )";
 					else
-						$arSqlSearch[] = ($strNegative=="Y"?" FT.".$key." IS NULL OR NOT ":"")."(FT.".$key." ".$strOperation." '".$DB->ForSql($val)."' )";
+						$arSqlSearch[] = ($strNegative=="Y"?" FT.".$key." IS NULL OR NOT ":"")."(FT.".$key." ".$strOperation." '".$val."' )";
 					break;
 				case "ID":
 				case "FORUM_ID":
@@ -287,7 +290,7 @@ class CForumTopic extends CAllForumTopic
 						$val = implode(", ", $val_int);
 						$arSqlSearch[] = ($strNegative=="Y"?" NOT ":"")."(FT.".$key." IN (".$DB->ForSql($val).") )";
 					}
-					else 
+					else
 						$arSqlSearch[] = ($strNegative=="Y"?"NOT":"")."(FT.".$key." IS NULL OR FT.".$key."<=0)";
 					break;
 				case "TITLE_ALL":
@@ -487,7 +490,7 @@ class CForumTopic extends CAllForumTopic
 		{
 			$by = strtoupper($by); $order = strtoupper($order);
 			if ($order!="ASC") $order = "DESC";
-			if (in_array($by, array("ID", "FORUM_ID", "TOPIC_ID", "TITLE", "TAGS", "DESCRIPTION", "ICON_ID", 
+			if (in_array($by, array("ID", "FORUM_ID", "TOPIC_ID", "TITLE", "TAGS", "DESCRIPTION", "ICON",
 					"STATE", "APPROVED", "SORT", "VIEWS", "USER_START_ID", "USER_START_NAME", "START_DATE", 
 					"POSTS", "LAST_POSTER_ID", "LAST_POSTER_NAME", "LAST_POST_DATE", "LAST_MESSAGE_ID", 
 					"POSTS_UNAPPROVED", "ABS_LAST_POSTER_ID", "ABS_LAST_POSTER_NAME", "ABS_LAST_POST_DATE", "ABS_LAST_MESSAGE_ID", 
@@ -555,7 +558,7 @@ class CForumTopic extends CAllForumTopic
 		if ($UseGroup)
 		{
 			$strSql =
-				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
+				" SELECT F_T.*, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
 				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
@@ -567,7 +570,7 @@ class CForumTopic extends CAllForumTopic
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
 				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID, \n".
 				"	F.NAME as FORUM_NAME, \n".
-				"	FS.IMAGE, '' as IMAGE_DESCR ".$arSQL["select"]." \n".
+				"	'' as IMAGE, '' as IMAGE_DESCR ".$arSQL["select"]." \n".
 				" FROM \n".
 				"	( \n".
 				"		SELECT FT.ID".$strSqlSelect." \n".
@@ -578,14 +581,13 @@ class CForumTopic extends CAllForumTopic
 				"		GROUP BY FT.ID".$strSqlGroup." \n".
 				"	) F_T \n".
 				" INNER JOIN b_forum_topic FT ON (F_T.ID = FT.ID) \n".
-				" LEFT JOIN b_forum F ON (FT.FORUM_ID = F.ID) \n".
-				" LEFT JOIN b_forum_smile FS ON (FT.ICON_ID = FS.ID) ".$arSQL["join"]." \n".
+				" LEFT JOIN b_forum F ON (FT.FORUM_ID = F.ID) ".$arSQL["join"]." \n".
 				$strSqlOrder;
 		}
 		else
 		{
 			$strSql = 
-				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON_ID, \n".
+				" SELECT FT.ID, FT.FORUM_ID, FT.TOPIC_ID, FT.TITLE, FT.TAGS, FT.DESCRIPTION, FT.ICON, \n".
 				"	FT.STATE, FT.APPROVED, FT.SORT, FT.VIEWS, FT.USER_START_ID, FT.USER_START_NAME, \n".
 				"	".CForumNew::Concat("-", array("FT.ID", "FT.TITLE_SEO"))." as TITLE_SEO, \n".
 				"	".$DB->DateToCharFunction("FT.START_DATE", "FULL")." as START_DATE, \n".
@@ -597,10 +599,9 @@ class CForumTopic extends CAllForumTopic
 				"	FT.ABS_LAST_POST_DATE AS ABS_LAST_POST_DATE_ORIGINAL, FT.ABS_LAST_MESSAGE_ID, \n".
 				"	FT.SOCNET_GROUP_ID, FT.OWNER_ID, FT.HTML, FT.XML_ID, \n".
 				"	F.NAME as FORUM_NAME, \n".
-				"	FS.IMAGE, '' as IMAGE_DESCR".$strSqlSelect.$arSQL["select"]." \n".
+				"	'' as IMAGE, '' as IMAGE_DESCR".$strSqlSelect.$arSQL["select"]." \n".
 				" FROM b_forum_topic FT \n".
 				"	LEFT JOIN b_forum F ON (FT.FORUM_ID = F.ID) \n".
-				"	LEFT JOIN b_forum_smile FS ON (FT.ICON_ID = FS.ID) \n".
 				"	".$strSqlFrom.$arSQL["join"]." \n".
 				" WHERE 1 = 1 ".$strSqlSearch." \n".
 				$strSqlOrder;
@@ -621,8 +622,6 @@ class CForumTopic extends CAllForumTopic
 		{
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
-		if (is_set($arAddParams, 'NoFilter') && $arAddParams['NoFilter'] == true)
-			return $db_res;
 		return new _CTopicDBResult($db_res, $arAddParams);
 	}
 }

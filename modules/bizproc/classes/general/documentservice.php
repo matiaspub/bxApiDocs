@@ -1,10 +1,14 @@
 <?
 include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/runtimeservice.php");
 
+use Bitrix\Bizproc\FieldType;
+
 class CBPDocumentService
 	extends CBPRuntimeService
 {
 	private $arDocumentsCache = array();
+	private $documentTypesCache = array();
+	private $typesMapCache = array();
 
 	public function GetDocument($parameterDocumentId)
 	{
@@ -177,20 +181,27 @@ class CBPDocumentService
 		CBPRuntime::SendExternalEvent($workflowId, $eventName, array());
 	}
 
-	static public function GetDocumentType($parameterDocumentId)
+	public function GetDocumentType($parameterDocumentId)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
+
+		$k = $moduleId."@".$entity."@".$documentId;
+		if (isset($this->documentTypesCache[$k]))
+			return $this->documentTypesCache[$k];
 
 		if (strlen($moduleId) > 0)
 			CModule::IncludeModule($moduleId);
 
 		if (class_exists($entity) && method_exists($entity, "GetDocumentType"))
-			return array($moduleId, $entity, call_user_func_array(array($entity, "GetDocumentType"), array($documentId)));
+		{
+			$this->documentTypesCache[$k] = array($moduleId, $entity, call_user_func_array(array($entity, "GetDocumentType"), array($documentId)));
+			return $this->documentTypesCache[$k];
+		}
 
 		return null;
 	}
 
-	static public function GetDocumentFields($parameterDocumentType)
+	static public function GetDocumentFields($parameterDocumentType, $additionalInfo = false)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
@@ -199,7 +210,7 @@ class CBPDocumentService
 
 		if (class_exists($entity))
 		{
-			$ar = call_user_func_array(array($entity, "GetDocumentFields"), array($documentType));
+			$ar = call_user_func_array(array($entity, "GetDocumentFields"), array($documentType, $additionalInfo));
 			if (is_array($ar))
 			{
 				$arKeys = array_keys($ar);
@@ -207,7 +218,9 @@ class CBPDocumentService
 				{
 					foreach ($arKeys as $key)
 					{
-						if (in_array($ar[$key]["Type"], array("int", "datetime", "user", "string", "bool", "file", "text", "select")))
+						if ($ar[$key]["Type"] == 'integer')
+							$ar[$key]["Type"] = 'int';
+						if (in_array($ar[$key]["Type"], array("int", "double", "date", "datetime", "user", "string", "bool", "file", "text", "select")))
 							$ar[$key]["BaseType"] = $ar[$key]["Type"];
 						else
 							$ar[$key]["BaseType"] = "string";
@@ -627,45 +640,22 @@ EOS;
 		return $result;
 	}
 
-	static public function GetFieldInputControlOptions($parameterDocumentType, &$fieldType, $jsFunctionName, &$value)
+	public function GetFieldInputControlOptions($parameterDocumentType, &$fieldType, $jsFunctionName, &$value)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
 		if (strlen($moduleId) > 0)
 			CModule::IncludeModule($moduleId);
 
-		if (is_array($fieldType))
-		{
-			$arFieldType = array("Type" => null, "Multiple" => false, "Required" => false, "Options" => null);
-			foreach ($fieldType as $key => $val)
-			{
-				switch (strtoupper($key))
-				{
-					case "TYPE":
-					case "0":
-						$arFieldType["Type"] = strval($val);
-						break;
-					case "MULTIPLE":
-					case "1":
-						$arFieldType["Multiple"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "REQUIRED":
-					case "2":
-						$arFieldType["Required"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "OPTIONS":
-					case "3":
-						$arFieldType["Options"] = $val;
-						break;
-				}
-			}
-		}
-		else
-		{
-			$arFieldType = array("Type" => strval($fieldType), "Multiple" => false, "Required" => false, "Options" => null);
-		}
+		$arFieldType = FieldType::normalizeProperty($fieldType);
 		if ((string) $arFieldType["Type"] == "")
 			return "";
+
+		$fieldTypeObject = $this->getFieldTypeObject($parameterDocumentType, $arFieldType);
+		if ($fieldTypeObject)
+		{
+			return $fieldTypeObject->renderControlOptions($jsFunctionName, $value);
+		}
 
 		$fieldType = $arFieldType;
 
@@ -675,43 +665,14 @@ EOS;
 		return "";
 	}
 
-	static public function GetFieldInputControl($parameterDocumentType, $fieldType, $fieldName, $fieldValue, $bAllowSelection = false, $publicMode = false)
+	public function GetFieldInputControl($parameterDocumentType, $fieldType, $fieldName, $fieldValue, $bAllowSelection = false, $publicMode = false)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
 		if (strlen($moduleId) > 0)
 			CModule::IncludeModule($moduleId);
 
-		if (is_array($fieldType))
-		{
-			$arFieldType = array("Type" => null, "Multiple" => false, "Required" => false, "Options" => null);
-			foreach ($fieldType as $key => $val)
-			{
-				switch (strtoupper($key))
-				{
-					case "TYPE":
-					case "0":
-						$arFieldType["Type"] = strval($val);
-						break;
-					case "MULTIPLE":
-					case "1":
-						$arFieldType["Multiple"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "REQUIRED":
-					case "2":
-						$arFieldType["Required"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "OPTIONS":
-					case "3":
-						$arFieldType["Options"] = $val;
-						break;
-				}
-			}
-		}
-		else
-		{
-			$arFieldType = array("Type" => strval($fieldType), "Multiple" => false, "Required" => false, "Options" => null);
-		}
+		$arFieldType = FieldType::normalizeProperty($fieldType);
 		if ((string) $arFieldType["Type"] == "")
 			return "";
 
@@ -748,6 +709,16 @@ EOS;
 			CBPDocument::AddShowParameterInit($moduleId, "only_users", $documentType, $entity);
 		}
 
+		$fieldTypeObject = $this->getFieldTypeObject($parameterDocumentType, $arFieldType);
+		if ($fieldTypeObject)
+		{
+			$renderMode = $publicMode? 0 : FieldType::RENDER_MODE_DESIGNER;
+			if (defined('ADMIN_SECTION') && ADMIN_SECTION)
+				$renderMode = $renderMode | FieldType::RENDER_MODE_ADMIN;
+
+			return $fieldTypeObject->renderControl($arFieldName, $fieldValue, $bAllowSelection, $renderMode);
+		}
+
 		if (class_exists($entity))
 		{
 			if (method_exists($entity, "GetFieldInputControl"))
@@ -760,44 +731,14 @@ EOS;
 		return CBPHelper::GetFieldInputControl($parameterDocumentType, $arFieldType, $arFieldName, $fieldValue, $bAllowSelection);
 	}
 
-	static public function GetFieldInputValue($parameterDocumentType, $fieldType, $fieldName, $arRequest, &$arErrors)
+	public function GetFieldInputValue($parameterDocumentType, $fieldType, $fieldName, $arRequest, &$arErrors)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
 		if (strlen($moduleId) > 0)
 			CModule::IncludeModule($moduleId);
 
-		if (is_array($fieldType))
-		{
-			$arFieldType = array("Type" => null, "Multiple" => false, "Required" => false, "Options" => null);
-			foreach ($fieldType as $key => $val)
-			{
-				switch (strtoupper($key))
-				{
-					case "TYPE":
-					case "0":
-						$arFieldType["Type"] = strval($val);
-						break;
-					case "MULTIPLE":
-					case "1":
-						$arFieldType["Multiple"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "REQUIRED":
-					case "2":
-						$arFieldType["Required"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "OPTIONS":
-					case "3":
-						if (is_array($val))
-							$arFieldType["Options"] = $val;
-						break;
-				}
-			}
-		}
-		else
-		{
-			$arFieldType = array("Type" => strval($fieldType), "Multiple" => false, "Required" => false, "Options" => null);
-		}
+		$arFieldType = FieldType::normalizeProperty($fieldType);
 		if ((string) $arFieldType["Type"] == "")
 			return "";
 
@@ -828,6 +769,12 @@ EOS;
 		if ((string) $arFieldName["Form"] != "" && preg_match("#[^a-z0-9_]#i", $arFieldName["Form"]))
 			return "";
 
+		$fieldTypeObject = $this->getFieldTypeObject($parameterDocumentType, $arFieldType);
+		if ($fieldTypeObject)
+		{
+			return $fieldTypeObject->extractValue($arFieldName, $arRequest, $arErrors);
+		}
+
 		if (class_exists($entity))
 		{
 			if (method_exists($entity, "GetFieldInputValue"))
@@ -840,46 +787,22 @@ EOS;
 		return CBPHelper::GetFieldInputValue($parameterDocumentType, $arFieldType, $arFieldName, $arRequest, $arErrors);
 	}
 
-	static public function GetFieldInputValuePrintable($parameterDocumentType, $fieldType, $fieldValue)
+	public function GetFieldInputValuePrintable($parameterDocumentType, $fieldType, $fieldValue)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
 
 		if (strlen($moduleId) > 0)
 			CModule::IncludeModule($moduleId);
 
-		if (is_array($fieldType))
-		{
-			$arFieldType = array("Type" => null, "Multiple" => false, "Required" => false, "Options" => null);
-			foreach ($fieldType as $key => $val)
-			{
-				switch (strtoupper($key))
-				{
-					case "TYPE":
-					case "0":
-						$arFieldType["Type"] = strval($val);
-						break;
-					case "MULTIPLE":
-					case "1":
-						$arFieldType["Multiple"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "REQUIRED":
-					case "2":
-						$arFieldType["Required"] = ((!$val || is_int($val) && ($val == 0) || (strtoupper($val) == "N")) ? false : true);
-						break;
-					case "OPTIONS":
-					case "3":
-						if (is_array($val))
-							$arFieldType["Options"] = $val;
-						break;
-				}
-			}
-		}
-		else
-		{
-			$arFieldType = array("Type" => strval($fieldType), "Multiple" => false, "Required" => false, "Options" => null);
-		}
+		$arFieldType = FieldType::normalizeProperty($fieldType);
 		if ((string) $arFieldType["Type"] == "")
 			return "";
+
+		$fieldTypeObject = $this->getFieldTypeObject($parameterDocumentType, $arFieldType);
+		if ($fieldTypeObject)
+		{
+			return $fieldTypeObject->formatValue($fieldValue, 'printable');
+		}
 
 		if (class_exists($entity))
 		{
@@ -906,7 +829,73 @@ EOS;
 		return CBPHelper::GetFieldValuePrintable($fieldName, $fieldType, $fieldValue, $arFieldType);
 	}
 
-	// Deprecated
+	/**
+	 * @param array $parameterDocumentType
+	 * @return array
+	 */
+	public function getTypesMap(array $parameterDocumentType)
+	{
+
+		$k = implode('@', $parameterDocumentType);
+
+		if (isset($this->typesMapCache[$k]))
+			return $this->typesMapCache[$k];
+
+		$result = FieldType::getBaseTypesMap();
+
+		$documentFieldTypes = $this->GetDocumentFieldTypes($parameterDocumentType);
+		foreach ($documentFieldTypes as $name => $field)
+		{
+			if (isset($field['typeClass']))
+				$result[strtolower($name)] = $field['typeClass'];
+		}
+
+		$this->typesMapCache[$k] = $result;
+		return $result;
+	}
+
+	/**
+	 * @param array $parameterDocumentType
+	 * @param string $type
+	 * @return null|string
+	 */
+	public function getTypeClass(array $parameterDocumentType, $type)
+	{
+		$typeClass = null;
+		$map = $this->getTypesMap($parameterDocumentType);
+		$type = strtolower($type);
+		if (isset($map[$type]))
+			$typeClass = $map[$type];
+
+		return $typeClass;
+	}
+
+	/**
+	 * @param array $parameterDocumentType
+	 * @param array $property
+	 * @return null|FieldType
+	 */
+	public function getFieldTypeObject(array $parameterDocumentType, array $property)
+	{
+		$typeClass = $this->getTypeClass($parameterDocumentType, $property['Type']);
+		if ($typeClass && class_exists($typeClass))
+		{
+			return new FieldType($property, $parameterDocumentType, $typeClass);
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated
+	 * @param $parameterDocumentType
+	 * @param $formName
+	 * @param $fieldName
+	 * @param $fieldValue
+	 * @param array $arDocumentField
+	 * @param bool $bAllowSelection
+	 * @return mixed|string
+	 * @throws CBPArgumentNullException
+	 */
 	public function GetGUIFieldEdit($parameterDocumentType, $formName, $fieldName, $fieldValue, $arDocumentField = array(), $bAllowSelection = false)
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
@@ -932,7 +921,16 @@ EOS;
 		return CBPHelper::GetGUIFieldEdit($parameterDocumentType, $formName, $fieldName, $fieldValue, $arDocumentField, $bAllowSelection);
 	}
 
-	// Deprecated
+	/**
+	 * @deprecated
+	 * @param $parameterDocumentType
+	 * @param $fieldName
+	 * @param $arRequest
+	 * @param $arErrors
+	 * @param array $arDocumentField
+	 * @return array|mixed|null
+	 * @throws CBPArgumentNullException
+	 */
 	public function SetGUIFieldEdit($parameterDocumentType, $fieldName, $arRequest, &$arErrors, $arDocumentField = array())
 	{
 		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
@@ -963,6 +961,32 @@ EOS;
 			return call_user_func_array(array($entity, "GetDocumentAdminPage"), array($documentId));
 
 		return "";
+	}
+
+	static public function getDocumentName($parameterDocumentId)
+	{
+		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "getDocumentName"))
+			return call_user_func_array(array($entity, "getDocumentName"), array($documentId));
+
+		return "";
+	}
+
+	static public function getDocumentIcon($parameterDocumentId)
+	{
+		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, 'getDocumentIcon'))
+			return call_user_func_array(array($entity, 'getDocumentIcon'), array($documentId));
+
+		return null;
 	}
 
 	static public function GetDocumentForHistory($parameterDocumentId, $historyIndex)
@@ -1004,7 +1028,7 @@ EOS;
 		return array();
 	}
 
-	static public function GetAllowableUserGroups($parameterDocumentId)
+	static public function GetAllowableUserGroups($parameterDocumentId, $withExtended = false)
 	{
 		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
 
@@ -1013,7 +1037,7 @@ EOS;
 
 		if (class_exists($entity))
 		{
-			$result = call_user_func_array(array($entity, "GetAllowableUserGroups"), array($documentId));
+			$result = call_user_func_array(array($entity, "GetAllowableUserGroups"), array($documentId, $withExtended));
 			$result1 = array();
 			foreach ($result as $key => $value)
 				$result1[strtolower($key)] = $value;
@@ -1045,6 +1069,71 @@ EOS;
 
 		if (class_exists($entity) && method_exists($entity, "SetPermissions"))
 			return call_user_func_array(array($entity, "SetPermissions"), array($documentId, $workflowId, $arPermissions, $bRewrite));
+
+		return false;
+	}
+
+	static public function isExtendedPermsSupported($parameterDocumentType)
+	{
+		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "isExtendedPermsSupported"))
+			return call_user_func_array(array($entity, "isExtendedPermsSupported"), array($documentType));
+
+		return false;
+	}
+
+	static public function toInternalOperations($parameterDocumentType, $permissions)
+	{
+		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "toInternalOperations"))
+			return call_user_func_array(array($entity, "toInternalOperations"), array($documentType, $permissions));
+
+		return $permissions;
+	}
+
+	static public function toExternalOperations($parameterDocumentType, $permissions)
+	{
+		list($moduleId, $entity, $documentType) = CBPHelper::ParseDocumentId($parameterDocumentType);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "toExternalOperations"))
+			return call_user_func_array(array($entity, "toExternalOperations"), array($documentType, $permissions));
+
+		return $permissions;
+	}
+
+	static public function onTaskChange($parameterDocumentId, $taskId, $taskData, $status)
+	{
+		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "onTaskChange"))
+			return call_user_func_array(array($entity, "onTaskChange"), array($documentId, $taskId, $taskData, $status));
+
+		return false;
+	}
+
+	static public function onWorkflowStatusChange($parameterDocumentId, $workflowId, $status)
+	{
+		list($moduleId, $entity, $documentId) = CBPHelper::ParseDocumentId($parameterDocumentId);
+
+		if (strlen($moduleId) > 0)
+			CModule::IncludeModule($moduleId);
+
+		if (class_exists($entity) && method_exists($entity, "onWorkflowStatusChange"))
+			return call_user_func_array(array($entity, "onWorkflowStatusChange"), array($documentId, $workflowId, $status));
 
 		return false;
 	}

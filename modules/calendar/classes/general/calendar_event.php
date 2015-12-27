@@ -57,6 +57,7 @@ class CCalendarEvent
 		$getUF = $Params['getUserfields'] !== false;
 		$checkPermissions = $Params['checkPermissions'] !== false;
 		$bCache = CCalendar::CacheTime() > 0;
+		$bCache = false;
 		$Params['setDefaultLimit'] = $Params['setDefaultLimit'] === true;
 		$userId = isset($Params['userId']) ? intVal($Params['userId']) : CCalendar::GetCurUserId();
 
@@ -65,7 +66,7 @@ class CCalendarEvent
 		{
 			$cache = new CPHPCache;
 			if ($checkPermissions)
-				$cacheId = 'event_list_'.md5(serialize(array($Params, $userId)));
+				$cacheId = 'event_list_'.md5(serialize(array($Params, CCalendar::GetCurUserId())));
 			else
 				$cacheId = 'event_list_'.md5(serialize(array($Params)));
 
@@ -134,20 +135,20 @@ class CCalendarEvent
 					if($n == 'FROM_LIMIT')
 					{
 						if (strtoupper($DB->type) == "MYSQL")
-							$arSqlSearch[] = "CE.DT_TO>=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y"),"d.m.Y")."')";
+							$arSqlSearch[] = "CE.DT_TO>=FROM_UNIXTIME('".CCalendar::Timestamp($val, false)."')";
 						elseif(strtoupper($DB->type) == "MSSQL")
 							$arSqlSearch[] = "CE.DT_TO>=".$DB->CharToDateFunction($val, "SHORT");
 						elseif(strtoupper($DB->type) == "ORACLE")
-							$arSqlSearch[] = "CE.DT_TO>=TO_DATE('".FmtDate($val, "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
+							$arSqlSearch[] = "CE.DT_TO>=TO_DATE('".$DB->FormatDate($val, CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
 					}
 					elseif($n == 'TO_LIMIT')
 					{
 						if (strtoupper($DB->type) == "MYSQL")
-							$arSqlSearch[] = "CE.DT_FROM<=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y")." 23:59:59","d.m.Y H:i:s")."')";
+							$arSqlSearch[] = "CE.DT_FROM<=FROM_UNIXTIME('".(CCalendar::Timestamp($val, false) + 86399)."')";
 						elseif(strtoupper($DB->type) == "MSSQL")
 							$arSqlSearch[] = "CE.DT_FROM<=dateadd(day, 1, ".$DB->CharToDateFunction($val, "SHORT").")";
 						elseif(strtoupper($DB->type) == "ORACLE")
-							$arSqlSearch[] = "CE.DT_FROM<=TO_DATE('".FmtDate($val, "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
+							$arSqlSearch[] = "CE.DT_FROM<=TO_DATE('".$DB->FormatDate($val, CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
 					}
 					elseif($n == 'TIMESTAMP_X')
 					{
@@ -546,7 +547,7 @@ class CCalendarEvent
 				CCalendar::SetUserDepartment($attendee["USER_ID"], (empty($attendee['UF_DEPARTMENT']) ? array() : unserialize($attendee['UF_DEPARTMENT'])));
 				$attendee['DISPLAY_NAME'] = CCalendar::GetUserName($attendee);
 				$attendee['URL'] = CCalendar::GetUserUrl($attendee["USER_ID"]);
-				$attendee['AVATAR'] = CCalendar::GetUserAvatar($attendee);
+				$attendee['AVATAR'] = CCalendar::GetUserAvatarSrc($attendee);
 				$arAttendees[$attendee['EVENT_ID']][] = $attendee;
 			}
 		}
@@ -640,11 +641,15 @@ class CCalendarEvent
 			$y = date("Y", $fromTS);
 			$toTS = mktime($hour, $min, $sec + $length, $m, $d, $y);
 
-			if (($rrule['COUNT'] > 0 && $count >= $rrule['COUNT']) || (!$rrule['COUNT'] && $fromTS >= $limitToTS))
+			if (
+				(!$fromTS || $fromTS < $evFromTS - CCalendar::GetDayLen()) || // Emergensy exit (mantis: 56981)
+				($rrule['COUNT'] > 0 && $count >= $rrule['COUNT']) ||
+				(!$rrule['COUNT'] && $fromTS >= $limitToTS) ||
+				($instanceCount && $dispCount >= $instanceCount)
+			)
+			{
 				break;
-
-			if($instanceCount && $dispCount >= $instanceCount)
-				break;
+			}
 
 			if ($rrule['FREQ'] == 'WEEKLY')
 			{
@@ -694,6 +699,7 @@ class CCalendarEvent
 						'RINDEX' => $count,
 						'RRULE' => $rrule
 					));
+
 					$dispCount++;
 				}
 				$realCount++;
@@ -819,6 +825,12 @@ class CCalendarEvent
 	{
 		$offset = CCalendar::GetOffset();
 
+		if ($item['RRULE'] || $item['DT_SKIP_TIME'] == 'Y')
+		{
+			$item['DT_FROM_TS'] += date("Z", $item['DT_FROM_TS']) - date("Z");
+			$item['DT_TO_TS'] += date("Z", $item['DT_TO_TS']) - date("Z");
+		}
+
 		if ($item['DT_SKIP_TIME'] == 'N' && $offset != 0)
 		{
 			$item['DT_FROM_TS'] += $offset;
@@ -941,7 +953,10 @@ class CCalendarEvent
 			if (!is_object(self::$TextParser))
 			{
 				self::$TextParser = new CTextParser();
-				self::$TextParser->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "N", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "Y", "USERFIELDS" => self::__GetUFForParseText($eventId, $arUFWDValue));
+				//self::$TextParser->pathToUser = CCalendar::pathToUser;
+
+
+				self::$TextParser->allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "ALIGN" => "Y", "USER" => "Y", "USERFIELDS" => self::__GetUFForParseText($eventId, $arUFWDValue));
 			}
 
 			self::$TextParser->allow["USERFIELDS"] = self::__GetUFForParseText($eventId, $arUFWDValue);
@@ -1658,6 +1673,7 @@ class CCalendarEvent
 
 		// 2. Set new reminders
 		$startTs = $arFields['DT_FROM_TS'];
+		$agentTime = 0;
 
 		foreach($reminders as $reminder)
 		{
@@ -1667,9 +1683,10 @@ class CCalendarEvent
 			elseif ($reminder['type'] == 'day')
 				$delta =  $delta * 60 * 24; //Day
 
+			$agentTime = $startTs + CCalendar::GetOffset($userId);
 			if (($startTs - $delta) >= (time() - 60 * 5)) // Inaccuracy - 5 min
 			{
-				CCalendar::AddAgent(CCalendar::Date($startTs - $delta + CCalendar::GetOffset($userId)), $remAgentParams);
+				CCalendar::AddAgent(CCalendar::Date($agentTime - $delta), $remAgentParams);
 			}
 			elseif($arFields['RRULE'] != '')
 			{
@@ -1681,6 +1698,7 @@ class CCalendarEvent
 							"FROM_LIMIT" => CCalendar::Date(time() - 3600, false),
 							"TO_LIMIT" => CCalendar::Date(2145938400, false)
 						),
+						'userId' => $userId,
 						'parseRecursion' => true,
 						'maxInstanceCount' => 2,
 						'preciseLimits' => true,
@@ -1693,6 +1711,11 @@ class CCalendarEvent
 				if ($arEvents && is_array($arEvents[0]))
 				{
 					$nextEvent = $arEvents[0];
+					if (($arEvents[0]['DT_FROM_TS']) < (time() - 60 * 5) && $arEvents[1]) // Inaccuracy - 5 min)
+					{
+						$nextEvent = $arEvents[1];
+					}
+
 					$startTs = $nextEvent['DT_FROM_TS'];
 					$reminder = $nextEvent['REMIND'][0];
 					if ($reminder)
@@ -1703,8 +1726,9 @@ class CCalendarEvent
 						elseif ($reminder['type'] == 'day')
 							$delta =  $delta * 60 * 24; //Day
 
+						$agentTime = $startTs - CCalendar::GetOffset($userId);
 						if (($startTs - $delta) >= (time() - 60 * 5)) // Inaccuracy - 5 min
-							CCalendar::AddAgent(CCalendar::Date($startTs - $delta + CCalendar::GetOffset($userId)), $remAgentParams);
+							CCalendar::AddAgent(CCalendar::Date($agentTime - $delta), $remAgentParams);
 					}
 				}
 			}
@@ -1737,7 +1761,7 @@ class CCalendarEvent
 						$delta =  $delta * 60 * 24; //Day
 
 					if (($startTs - $delta) >= (time() - 60 * 5)) // Inaccuracy - 5 min
-						CCalendar::AddAgent(CCalendar::Date($startTs - $delta + CCalendar::GetOffset($userId)), $remAgentParams);
+						CCalendar::AddAgent(CCalendar::Date($agentTime - $delta), $remAgentParams);
 				}
 			}
 		}
@@ -2123,11 +2147,11 @@ class CCalendarEvent
 			$from_ts = CCalendar::Timestamp($val);
 
 			if (strtoupper($DB->type) == "MYSQL")
-				$arSqlSearch[] = "CE.DT_TO>=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y"),"d.m.Y")."')";
+				$arSqlSearch[] = "CE.DT_TO>=FROM_UNIXTIME('".CCalendar::Timestamp($val, false)."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
 				$arSqlSearch[] = "CE.DT_TO>=".$DB->CharToDateFunction($val, "SHORT");
 			elseif(strtoupper($DB->type) == "ORACLE")
-				$arSqlSearch[] = "CE.DT_TO>=TO_DATE('".FmtDate($val, "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
+				$arSqlSearch[] = "CE.DT_TO>=TO_DATE('".$DB->FormatDate($val, CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
 		}
 		if ($Params['to'])
 		{
@@ -2137,11 +2161,11 @@ class CCalendarEvent
 				$to_ts += CCalendar::DAY_LENGTH;
 
 			if (strtoupper($DB->type) == "MYSQL")
-				$arSqlSearch[] = "CE.DT_FROM<=FROM_UNIXTIME('".MkDateTime(FmtDate($val,"D.M.Y")." 23:59:59","d.m.Y H:i:s")."')";
+				$arSqlSearch[] = "CE.DT_FROM<=FROM_UNIXTIME('".(CCalendar::Timestamp($val, false) + 86399)."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
 				$arSqlSearch[] = "CE.DT_FROM<dateadd(day, 1, ".$DB->CharToDateFunction($val, "SHORT").")";
 			elseif(strtoupper($DB->type) == "ORACLE")
-				$arSqlSearch[] = "CE.DT_FROM<=TO_DATE('".FmtDate($val, "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
+				$arSqlSearch[] = "CE.DT_FROM<=TO_DATE('".$DB->FormatDate($val, CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
 		}
 		$arSqlSearch[] = GetFilterQuery("DELETED", "N");
 
@@ -2252,8 +2276,19 @@ class CCalendarEvent
 		if (CModule::IncludeModule('intranet') && $event['CAL_TYPE'] == 'user' && $settings['dep_manager_sub'])
 			$bManager = in_array($userId, CCalendar::GetUserManagers($event['OWNER_ID'], true));
 
-		if ($event['CAL_TYPE'] == 'user' && $event['IS_MEETING'] && $event['OWNER_ID'] != $userId && $bAttendee)
-			$sectId = CCalendar::GetMeetingSection($userId);
+		if ($event['CAL_TYPE'] == 'user' && $event['IS_MEETING'] && $event['OWNER_ID'] != $userId)
+		{
+			if ($bAttendee)
+			{
+				$sectId = CCalendar::GetMeetingSection($userId);
+			}
+			elseif (isset($event['USER_MEETING']['ATTENDEE_ID']) && $event['USER_MEETING']['ATTENDEE_ID'] !== $userId)
+			{
+				$sectId = CCalendar::GetMeetingSection($event['USER_MEETING']['ATTENDEE_ID']);
+				$event['SECT_ID'] = $sectId;
+				$event['OWNER_ID'] = $event['USER_MEETING']['ATTENDEE_ID'];
+			}
+		}
 
 		if ($private || (!CCalendarSect::CanDo('calendar_view_full', $sectId, $userId) && !$bManager && !$bAttendee))
 		{
@@ -2280,8 +2315,9 @@ class CCalendarEvent
 			$event['~IS_MEETING'] = $event['IS_MEETING'];
 
 			// Clear information about
-			unset($event['DESCRIPTION'], $event['IS_MEETING'],$event['MEETING_HOST'],$event['MEETING'],$event['LOCATION'],$event['REMIND'],$event['USER_MEETING'],$event['~ATTENDEES']);
+			unset($event['DESCRIPTION'], $event['IS_MEETING'],$event['MEETING_HOST'],$event['MEETING'],$event['LOCATION'],$event['REMIND'],$event['USER_MEETING'],$event['~ATTENDEES'],$event['ATTENDEES_CODES']);
 		}
+
 		return $event;
 	}
 
@@ -2361,22 +2397,22 @@ class CCalendarEvent
 		{
 			$strSql .= "AND ";
 			if (strtoupper($DB->type) == "MYSQL")
-				$strSql .= "CE.DT_TO>=FROM_UNIXTIME('".MkDateTime(FmtDate($arFilter['FROM_LIMIT'],"D.M.Y"),"d.m.Y")."')";
+				$strSql .= "CE.DT_TO>=FROM_UNIXTIME('".CCalendar::Timestamp($arFilter['FROM_LIMIT'], false)."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
 				$strSql .= "CE.DT_TO>=".$DB->CharToDateFunction($arFilter['FROM_LIMIT'], "SHORT");
 			elseif(strtoupper($DB->type) == "ORACLE")
-				$strSql .= "CE.DT_TO>=TO_DATE('".FmtDate($arFilter['FROM_LIMIT'], "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
+				$strSql .= "CE.DT_TO>=TO_DATE('".$DB->FormatDate($arFilter['FROM_LIMIT'], CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 00:00:00','dd.mm.yyyy hh24:mi:ss')";
 		}
 
 		if($arFilter['TO_LIMIT'])
 		{
 			$strSql .= "AND ";
 			if (strtoupper($DB->type) == "MYSQL")
-				$strSql .= "CE.DT_FROM<=FROM_UNIXTIME('".MkDateTime(FmtDate($arFilter['TO_LIMIT'],"D.M.Y")." 23:59:59","d.m.Y H:i:s")."')";
+				$strSql .= "CE.DT_FROM<=FROM_UNIXTIME('".(CCalendar::Timestamp($arFilter['TO_LIMIT'], false) + 86399)."')";
 			elseif(strtoupper($DB->type) == "MSSQL")
 				$strSql .= "CE.DT_FROM<=dateadd(day, 1, ".$DB->CharToDateFunction($arFilter['TO_LIMIT'], "SHORT").")";
 			elseif(strtoupper($DB->type) == "ORACLE")
-				$strSql .= "CE.DT_FROM<=TO_DATE('".FmtDate($arFilter['TO_LIMIT'], "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
+				$strSql .= "CE.DT_FROM<=TO_DATE('".$DB->FormatDate($arFilter['TO_LIMIT'], CSite::GetDateFormat("SHORT", SITE_ID), "D.M.Y")." 23:59:59','dd.mm.yyyy hh24:mi:ss')";
 		}
 
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -2497,8 +2533,12 @@ class CCalendarEvent
 		{
 			$event['ATTENDEES_CODES'] = array();
 			foreach($event['~ATTENDEES'] as $attendee)
+			{
 				if (intval($attendee['USER_ID']) > 0)
+				{
 					$event['ATTENDEES_CODES'][] = 'U'.IntVal($attendee['USER_ID']);
+				}
+			}
 			$event['ATTENDEES_CODES'] = array_unique($event['ATTENDEES_CODES']);
 
 			global $DB;
@@ -2521,19 +2561,17 @@ class CCalendarEvent
 					"ID" => $eventId,
 				),
 				'parseRecursion' => false,
-				'fetchAttendees' => false,
+				'fetchAttendees' => true,
 				'checkPermissions' => true,
 				'userId' => $userId,
 			)
 		);
 		if ($Event && is_array($Event[0]))
 		{
-			// Event partly accessible
-			if (!isset($Event[0]['DESCRIPTION'], $Event[0]['IS_MEETING'], $Event[0]['LOCATION']))
-				return false;
-			return true;
+			// Event is not partly accessible - so it was not cleaned before by ApplyAccessRestrictions
+			if (isset($Event[0]['DESCRIPTION']) || isset($Event[0]['IS_MEETING']) || isset($Event[0]['LOCATION']))
+				return true;
 		}
-
 		return false;
 	}
 }

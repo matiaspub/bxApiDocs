@@ -11,6 +11,11 @@ class CSecurityXSSDetect
 	/** @var CSecurityXSSDetectVariables */
 	private $variables = null;
 
+	/** @var string[] */
+	private $searches = null;
+	/** @var string[] */
+	private $quotedSearches = null;
+
 	public function __construct($options = array())
 	{
 		if(isset($options["action"]))
@@ -43,30 +48,30 @@ class CSecurityXSSDetect
 		if (CSecurityFilterMask::Check(SITE_ID, $_SERVER["REQUEST_URI"]))
 			return;
 
+		if (!preg_match('#</script#', $content)) // Probably does not include the scripts
+			return;
+
 		$filter = new CSecurityXSSDetect();
-		$content = $filter->process($content);
+		$filter->process($content);
 	}
 
 	/**
 	 * @param string $content
-	 * @return string
+	 * @return void
 	 */
-	public function process($content)
+	public function process(&$content)
 	{
-		if(!preg_match('#</script#' ,$content))
-		{
-			// Probably does not include the scripts
-			return $content;
-		}
-
 		$this->variables = new CSecurityXSSDetectVariables();
 		$this->extractVariablesFromArray("\$_GET", $_GET);
 		$this->extractVariablesFromArray("\$_POST", $_POST);
-		$this->extractVariablesFromArray("\$_COOKIE", $_COOKIE);
+
 		if(!$this->variables->isEmpty())
-			return $this->filter($content);
-		else
-			return $content;
+		{
+			$this->searches = $this->variables->getSearchValues();
+			$this->quotedSearches = $this->variables->getQuoteSearchValues();
+			$content = $this->filter($content);
+		}
+
 	}
 
 	/**
@@ -85,6 +90,7 @@ class CSecurityXSSDetect
 	public function removeQuotedStrings($string, $isSaveQuotes = true)
 	{
 		// http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
+		// ToDo: R&D, what about JS comments?
 		if($isSaveQuotes)
 		{
 			$this->quotes = array();
@@ -92,12 +98,6 @@ class CSecurityXSSDetect
 				"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"                           # match double quoted string
 				|
 				\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'                       # match single quoted string
-				|
-				(?s:\\/\\*.*?\\*\\/)                                     # multiline comments
-				|
-				\\/\\/.*?(?:\\n|$)                                       # singleline comments
-				|
-				string.replace\\(\\/[^\\/\\\\]*(?:\\\\.[^\\/\\\\]*)*\\/  # an JS regexp
 			)/x', array($this, "pushQuote"), $string);
 		}
 		else
@@ -106,12 +106,6 @@ class CSecurityXSSDetect
 				"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"                           # match double quoted string
 				|
 				\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'                       # match single quoted string
-				|
-				(?s:\\/\\*.*?\\*\\/)                                     # multiline comments
-				|
-				\\/\\/.*?(?:\\n|$)                                       # singleline comments
-				|
-				string.replace\\(\\/[^\\/\\\\]*(?:\\\\.[^\\/\\\\]*)*\\/  # an JS regexp
 			)/x', '', $string);
 		}
 	}
@@ -190,17 +184,19 @@ class CSecurityXSSDetect
 
 	/**
 	 * @param string $string
-	 * @param array $patterns
+	 * @param array $searches
 	 * @return bool
 	 */
-	protected static function isFoundInString($string, $patterns)
+	protected static function isFoundInString($string, $searches)
 	{
-		foreach($patterns as $pattern)
+		foreach($searches as $search)
 		{
-			if(isset($pattern["variable_len"]))
-				$isFound = strlen($string) > $pattern["variable_len"] && preg_match($pattern["pattern"], $string);
-			else
-				$isFound = preg_match($pattern, $string);
+			$pos = static::fastStrpos($string, $search);
+
+			$isFound = (
+				$pos !== false
+				&& (static::fastSubstr($string, $pos - 1, 1) !== '\\')
+			);
 
 			if($isFound)
 				return true;
@@ -214,18 +210,19 @@ class CSecurityXSSDetect
 	 */
 	protected function isDangerBody($body)
 	{
-		if(self::isFoundInString($body ,$this->variables->getQuoteSearchPattern()))
+		if (self::isFoundInString($body, $this->quotedSearches))
 		{
 			return true;
 		}
-		else
+		else if (!empty($this->searches))
 		{
 			$bodyWithoutQuotes = $this->removeQuotedStrings($body, false);
-			if(self::isFoundInString($bodyWithoutQuotes, $this->variables->getSearchPattern()))
+			if (self::isFoundInString($bodyWithoutQuotes, $this->searches))
 			{
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -284,12 +281,10 @@ class CSecurityXSSDetect
 			return;
 		if(strlen($value) <= 2)
 			return; //too short
-		if(preg_match("/^[^,;\'\"+\-*\/\{\}\[\]\(\)&\\|=\\\\]*\$/D", $value))
+		if(preg_match("/^(?P<quot>[\"']?)[^`,;+\-*\/\{\}\[\]\(\)&\\|=\\\\]*(?P=quot)\$/D", $value))
 			return; //there is no potantially dangerous code
 		if(preg_match("/^[,0-9_-]*\$/D", $value))
 			return; //there is no potantially dangerous code
-		if($name === '$_COOKIE[__utmz]' && preg_match("/^[0-9.]++(utm[a-z]{3}=\(?([a-z\/0-1.]++|\(not provided\))\)?\|?)++\$/iD", $value))
-			return; //there is no potantially dangerous code, google analytics
 
 		$this->variables->addVariable($name, str_replace(chr(0), "", $value));
 	}
@@ -300,11 +295,37 @@ class CSecurityXSSDetect
 	 */
 	protected function extractVariablesFromArray($name, $array)
 	{
-		if(is_array($array))
+		if(!is_array($array))
+			return;
+
+		foreach($array as $key => $value)
 		{
-			foreach($array as $key => $value)
-				$this->addVariable($name."[".$key."]", $value);
+			$variableName = sprintf('%s[%s]', $name, $key);
+			if (is_array($value))
+				$this->extractVariablesFromArray($variableName, $value);
+			else
+				$this->addVariable($variableName, $value);
 		}
+	}
+
+	protected static function fastStrpos($haystack, $needle)
+	{
+		if (function_exists("mb_orig_strpos"))
+		{
+			return mb_orig_strpos($haystack, $needle);
+		}
+
+		return strpos($haystack, $needle);
+	}
+
+	protected static function fastSubstr($string, $start, $length = null)
+	{
+		if (function_exists("mb_orig_substr"))
+		{
+			return mb_orig_substr($string, $start, $length);
+		}
+
+		return substr($string, $start, $length);
 	}
 
 }

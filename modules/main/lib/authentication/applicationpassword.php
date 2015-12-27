@@ -93,6 +93,14 @@ class ApplicationPasswordTable extends Entity\DataManager
 		return \randString(16, "qwertyuiopasdfghjklzxcvbnm");
 	}
 
+	/**
+	 * Finds the application by the user's password.
+	 *
+	 * @param int $userId
+	 * @param string $password
+	 * @param bool $passwordOriginal
+	 * @return array|false
+	 */
 	public static function findPassword($userId, $password, $passwordOriginal = true)
 	{
 		$encodedPassword = substr($password, 32);
@@ -119,6 +127,38 @@ class ApplicationPasswordTable extends Entity\DataManager
 			if($dbPassword === $userPassword)
 			{
 				//bingo, application password
+				return $appPassword;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Finds the application by the user's digest authentication.
+	 *
+	 * @param int $userId
+	 * @param array $digest See CHTTP::ParseDigest() for the array structure.
+	 * @return array|false
+	 */
+	public static function findDigestPassword($userId, array $digest)
+	{
+		$appPasswords = static::getList(array(
+			'select' => array('PASSWORD', 'DIGEST_PASSWORD', 'APPLICATION_ID'),
+			'filter' => array('=USER_ID' => $userId),
+		));
+
+		$server = Main\Context::getCurrent()->getServer();
+		$method = ($server['REDIRECT_REQUEST_METHOD'] !== null? $server['REDIRECT_REQUEST_METHOD'] : $server['REQUEST_METHOD']);
+		$HA2 = md5($method.':'.$digest['uri']);
+
+		while(($appPassword = $appPasswords->fetch()))
+		{
+			$HA1 = $appPassword["DIGEST_PASSWORD"];
+			$valid_response = md5($HA1.':'.$digest['nonce'].':'.$HA2);
+
+			if($digest["response"] === $valid_response)
+			{
+				//application password
 				return $appPassword;
 			}
 		}

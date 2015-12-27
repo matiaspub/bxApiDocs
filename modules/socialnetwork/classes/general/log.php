@@ -610,30 +610,74 @@ class CAllSocNetLog
 		return true;
 	}
 
-	public static function CounterIncrement($log_id, $event_id = false, $arOfEntities = false, $type = "L", $bForAllAccess = false)
+	public static function CounterIncrement($entityId, $event_id = false, $arOfEntities = false, $type = "L", $bForAllAccess = false)
 	{
-		if (intval($log_id) <= 0)
+		if (intval($entityId) <= 0)
+		{
 			return false;
+		}
 
-		CUserCounter::IncrementWithSelect(
-			CSocNetLogCounter::GetSubSelect2(
-				$log_id, 
-				array(
-					"TYPE" => $type,
-					"FOR_ALL_ACCESS" => $bForAllAccess
+		if (
+			!$bForAllAccess
+			|| strtolower($GLOBALS["DB"]->type) != "mysql"
+		)
+		{
+			CUserCounter::IncrementWithSelect(
+				CSocNetLogCounter::GetSubSelect2(
+					$entityId,
+					array(
+						"TYPE" => $type,
+						"FOR_ALL_ACCESS" => $bForAllAccess,
+						"MULTIPLE" => "Y"
+					)
 				)
-			)
-		);
+			);
+		}
+		else // for all, mysql only
+		{
+			$tag = time();
+			CUserCounter::IncrementWithSelect(
+				CSocNetLogCounter::GetSubSelect2(
+					$entityId,
+					array(
+						"TYPE" => $type,
+						"FOR_ALL_ACCESS_ONLY" => true,
+						"TAG_SET" => $tag,
+						"MULTIPLE" => "Y"
+					)
+				),
+				false, // sendpull
+				array(
+					"TAG_SET" => $tag
+				)
+			);
+
+			CUserCounter::IncrementWithSelect(
+				CSocNetLogCounter::GetSubSelect2(
+					$entityId,
+					array(
+						"TYPE" => $type,
+						"FOR_ALL_ACCESS_ONLY" => false,
+						"MULTIPLE" => "Y"
+					)
+				),
+				true, // sendpull
+				array(
+					"TAG_CHECK" => $tag
+				)
+			);
+		}
 
 		if ($event_id == "blog_post_important")
 		{
 			CUserCounter::IncrementWithSelect(
 				CSocNetLogCounter::GetSubSelect2(
-					$log_id, 
+					$entityId,
 					array(
 						"TYPE" => "L", 
 						"CODE" => "'BLOG_POST_IMPORTANT'",
-						"FOR_ALL_ACCESS" => $bForAllAccess
+						"FOR_ALL_ACCESS" => $bForAllAccess,
+						"MULTIPLE" => "N"
 					)
 				)
 			);

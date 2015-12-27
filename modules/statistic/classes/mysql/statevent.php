@@ -2,9 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/statevent.php");
 
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.</body> </html>
- *
- *
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>. 
  *
  *
  * @return mixed 
@@ -20,30 +18,19 @@ class CStatEvent extends CAllStatEvent
 	* <p>Возвращает список идентификаторов <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> по указанному ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a> сайта.</p>
 	*
 	*
-	*
-	*
 	* @param int $guest_id  ID посетителя.
-	*
-	*
 	*
 	* @param mixed $type_id = false ID типа события. Если значение равно "false", то фильтрации по типу
 	* события не будет.
-	*
-	*
 	*
 	* @param mixed $event3 = false <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Дополнительный параметр
 	* event3</a> события. Если значение равно "false", то фильтрации по event3 не
 	* будет.
 	*
-	*
-	*
 	* @param mixed $time = false Количество секунд, прошедших с текущего момента. Если значение
 	* равно "false", то фильтрации по времени не будет.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -76,7 +63,6 @@ class CStatEvent extends CAllStatEvent
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -122,47 +108,30 @@ class CStatEvent extends CAllStatEvent
 	* <p>Добавляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу</a> и <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальному параметру</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	*
 	*
-	*
-	*
 	* @param int $type_id  ID типа события.
-	*
-	*
 	*
 	* @param string $event3  <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Дополнительный параметр
 	* event3</a> события.
 	*
-	*
-	*
 	* @param string $date  Дата в <a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#format_datetime">текущем
 	* формате</a>.
-	*
-	*
 	*
 	* @param string $gid  <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Специальный параметр</a> в
 	* котором закодированы все необходимые данные для добавления
 	* события.
 	*
-	*
-	*
 	* @param mixed $money = "" Денежная сумма.
-	*
-	*
 	*
 	* @param string $currency = "" Трехсимвольный идентификатор валюты. Идентификаторы валют
 	* задаются в модуле "Валюты".
-	*
-	*
 	*
 	* @param string $chargeback = "N" Флаг отрицательной суммы. Используется, когда необходимо
 	* зафиксировать событие о возврате денег (chargeback). Возможные
 	* значения: <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li> <li> <b>N</b> -
 	* денежная сумма положительная. </li> </ul>
 	*
-	*
-	*
 	* @return int <p>Функция возвращает ID добавленного события в случае успеха и 0
 	* если событие не было добавлено по каким либо причинам.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -192,7 +161,6 @@ class CStatEvent extends CAllStatEvent
 	* <b>CStatEvent::Add</b>(2, "", $date, $gid, "199", "EUR");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -446,8 +414,6 @@ class CStatEvent extends CAllStatEvent
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID события;
 	* </li> <li> <b>s_site_id</b> - ID сайта; </li> <li> <b>s_type_id</b> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a>; </li> <li>
@@ -467,12 +433,8 @@ class CStatEvent extends CAllStatEvent
 	* фиксации события; </li> <li> <b>s_country_id</b> - ID страны посетителя; </li> <li>
 	* <b>s_money</b> - денежная сумма. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID события; </li> <li>
@@ -529,15 +491,10 @@ class CStatEvent extends CAllStatEvent
 	* * - допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	* логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -562,7 +519,6 @@ class CStatEvent extends CAllStatEvent
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -781,15 +737,10 @@ class CStatEvent extends CAllStatEvent
 	* <p>Удаляет указанное <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $event_id  ID удаляемого события. </htm
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает "true" в случае успешного удаления и "false" в
-	* случае неудачи.</p>
-	*
+	* @return bool <p>Метод возвращает "true" в случае успешного удаления и "false" в случае
+	* неудачи.</p>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -799,7 +750,6 @@ class CStatEvent extends CAllStatEvent
 	*     echo "Событие #".$event_id." успешно удалено.";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

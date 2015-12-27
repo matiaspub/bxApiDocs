@@ -47,8 +47,7 @@ class MysqliResult extends Result
 					$helper = $this->connection->getSqlHelper();
 					foreach ($fields as $field)
 					{
-						$name = strtoupper($field->name);
-						$this->resultFields[$name] = $helper->getFieldByColumnType($name, $field->type);
+						$this->resultFields[$field->name] = $helper->getFieldByColumnType($field->name, $field->type);
 					}
 				}
 			}

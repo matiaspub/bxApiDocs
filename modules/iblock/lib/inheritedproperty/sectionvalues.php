@@ -124,7 +124,7 @@ class SectionValues extends BaseValues
 						"SECTION_ID" => $this->sectionId,
 						"IPROP_ID" => $row["ID"],
 						"VALUE" => $row["VALUE"],
-					));
+					), null);
 				}
 			}
 		}

@@ -83,13 +83,19 @@ class PHPParser
 				$p = strpos($el, "=>");
 				if ($p === false)
 				{
-					PHPParser::GetParamsRec($el, $arAllStr, $arResult[$i]);
+					if(is_array($arResult))
+					{
+						PHPParser::GetParamsRec($el, $arAllStr, $arResult[$i]);
+					}
+					else
+					{
+						$arResult = PHPParser::ReplString($el, $arAllStr);
+					}
 				}
 				else
 				{
 					$el_ind = PHPParser::ReplString(substr($el, 0, $p), $arAllStr);
 					$el_val = substr($el, $p + 2);
-
 					PHPParser::GetParamsRec($el_val, $arAllStr, $arResult[$el_ind]);
 				}
 			}
@@ -529,25 +535,35 @@ class PHPParser
 			self::$arAllStr = $arAllStr;
 			$func_name = preg_replace_callback("'\x01([0-9]+)\x02's", "PHPParser::getString", $func_name);
 
-			switch (strtoupper($func_name))
+			$isComponent2Begin = false;
+			$arIncludeComponentFunctionStrings = self::getComponentFunctionStrings();
+			foreach($arIncludeComponentFunctionStrings as $functionName)
 			{
-				case '$APPLICATION->INCLUDECOMPONENT(':
-					$params = substr($new_str, $pos + 1);
-					$arParams = PHPParser::GetParams($params);
+				$component2Begin = strtoupper($functionName).'(';
+				if(strtoupper($func_name) == $component2Begin)
+				{
+					$isComponent2Begin = true;
+					break;
+				}
+			}
+			if($isComponent2Begin)
+			{
+				$params = substr($new_str, $pos + 1);
+				$arParams = PHPParser::GetParams($params);
 
-					$arIncludeParams = array();
-					$arFuncParams = array();
-					PHPParser::GetParamsRec($arParams[2], $arAllStr, $arIncludeParams);
-					PHPParser::GetParamsRec($arParams[4], $arAllStr, $arFuncParams);
+				$arIncludeParams = array();
+				$arFuncParams = array();
+				PHPParser::GetParamsRec($arParams[2], $arAllStr, $arIncludeParams);
+				PHPParser::GetParamsRec($arParams[4], $arAllStr, $arFuncParams);
 
-					return array(
-						"COMPONENT_NAME" => PHPParser::ReplString($arParams[0], $arAllStr),
-						"TEMPLATE_NAME" => PHPParser::ReplString($arParams[1], $arAllStr),
-						"PARAMS" => $arIncludeParams,
-						"PARENT_COMP" => $arParams[3],
-						"VARIABLE" => $var_name,
-						"FUNCTION_PARAMS" => $arFuncParams,
-					);
+				return array(
+					"COMPONENT_NAME" => PHPParser::ReplString($arParams[0], $arAllStr),
+					"TEMPLATE_NAME" => PHPParser::ReplString($arParams[1], $arAllStr),
+					"PARAMS" => $arIncludeParams,
+					"PARENT_COMP" => $arParams[3],
+					"VARIABLE" => $var_name,
+					"FUNCTION_PARAMS" => $arFuncParams,
+				);
 			}
 		}
 		return false;
@@ -765,7 +781,7 @@ public static 	function FindComponent($component_name, $filesrc, $src_line)
 		return $arComponent;
 	}
 
-	public static function getPhpChunks($filesrc, $limit = false)
+	fupublic static nction getPhpChunks($filesrc, $limit = false)
 	{
 		$chunks = array();
 		$chunk = '';
@@ -846,5 +862,13 @@ public static 	function getPageTitle($filesrc, $prolog = false)
 			$title = $regs[1];
 
 		return $title;
+	}
+
+public static 	function getComponentFunctionStrings()
+	{
+		return array(
+			'$APPLICATION->IncludeComponent',
+			'EventMessageThemeCompiler::includeComponent'
+		);
 	}
 }

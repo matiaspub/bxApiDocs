@@ -42,6 +42,17 @@ class OrderDeliveryTable extends Entity\DataManager
 				'required' => true,
 				'title' => Loc::getMessage('ORDERDELIVERY_ENTITY_ORDER_ID_FIELD'),
 			),
+
+			'STATUS_ID' => array(
+				'data_type' => 'string',
+			),
+			'PRICE_DELIVERY' => array(
+				'data_type' => 'float',
+			),
+			'ALLOW_DELIVERY' => array(
+				'data_type' => 'boolean',
+				'values' => array('N','Y')
+			),
 			'DELIVERY_LOCATION' => array(
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'validateLocation'),
@@ -57,6 +68,7 @@ class OrderDeliveryTable extends Entity\DataManager
 			),
 		);
 	}
+
 	public static function validateLocation()
 	{
 		return array(

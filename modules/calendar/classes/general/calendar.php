@@ -162,13 +162,13 @@ class CCalendar
 		// *** Video meeting room params ***
 		$VMiblockId = self::$settings['vr_iblock_id'];
 		self::$allowVideoMeeting = $Params["allowVideoMeeting"] && $VMiblockId > 0;
-		if(self::$allowVideoMeeting && !$USER->IsAdmin() && (CIBlock::GetPermission($VMiblockId) < "R") && !CModule::IncludeModule("video"))
+		if((self::$allowVideoMeeting && !$USER->IsAdmin() && (CIBlock::GetPermission($VMiblockId) < "R")) || !CModule::IncludeModule("video"))
 			self::$allowVideoMeeting = false;
 	}
 
 	public function Show($Params = array())
 	{
-		global $APPLICATION, $USER, $EC_UserFields;
+		global $APPLICATION, $USER;
 		$arType = false;
 
 		foreach(self::$arTypes as $t)
@@ -229,7 +229,7 @@ class CCalendar
 		$id = 'EC'.rand();
 
 		$weekHolidays = array();
-		if (isset(self::$settings['year_holidays']))
+		if (isset(self::$settings['week_holidays']))
 		{
 			$days = array('MO' => 0, 'TU' => 1, 'WE' => 2,'TH' => 3,'FR' => 4,'SA' => 5,'SU' => 6);
 			foreach(self::$settings['week_holidays'] as $day)
@@ -528,18 +528,11 @@ class CCalendar
 					$login = $arUser['LOGIN'];
 			}
 
-			if (CCalendar::IsBitrix24())
-				$JSConfig['caldav_link_one'] = "https://".CCalendar::GetServerName().":1443/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
-			else
-				$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
-
+			$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/".$login."/calendar/#CALENDAR_ID#/";
 		}
 		else if (self::$type == 'group')
 		{
-			if (CCalendar::IsBitrix24())
-				$JSConfig['caldav_link_one'] = "https://".CCalendar::GetServerName().":1443/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
-			else
-				$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
+			$JSConfig['caldav_link_one'] = CCalendar::GetServerPath()."/bitrix/groupdav.php/".SITE_ID."/group-".self::$ownerId."/calendar/#CALENDAR_ID#/";
 		}
 
 		if (self::$type == 'user')
@@ -703,6 +696,7 @@ class CCalendar
 				$APPLICATION->RestartBuffer();
 				if (CCalendarSect::CheckSign($_GET['sign'], intVal($_GET['user']), $sectId > 0 ? $sectId : 'superposed_calendars'))
 					echo 'BEGIN:VCALENDAR';
+				CMain::FinalActions();
 				die();
 			}
 
@@ -1387,7 +1381,7 @@ class CCalendar
 						$result[] = array(
 							'USER_ID' => $user['USER_ID'],
 							'DISPLAY_NAME' => CCalendar::GetUserName($user),
-							'AVATAR' => CCalendar::GetUserAvatar($user),
+							'AVATAR' => CCalendar::GetUserAvatarSrc($user),
 							'ACC' => '',
 							'URL' => CCalendar::GetUserUrl($user['USER_ID'], self::$pathToUser)
 						);
@@ -1429,8 +1423,9 @@ class CCalendar
 		}
 
 		if($ex = $APPLICATION->GetException())
-			return ShowError($ex->GetString());
+			ShowError($ex->GetString());
 
+		CMain::FinalActions();
 		die();
 	}
 
@@ -1503,7 +1498,7 @@ class CCalendar
 
 				if (is_array($res_i) && count($res_i) > 0)
 				{
-					foreach($res_i as $i => $event)
+					foreach($res_i as $event)
 					{
 						if (($event['IS_MEETING'] || $event['~IS_MEETING']) && $event['SECT_ID'] != intVal($spUser['SECTION_ID']) && !$resEventInd[$event['ID']])
 						{
@@ -1519,34 +1514,16 @@ class CCalendar
 								}
 							}
 
-//							$checkPermissionsForEvent = $userId != $event['CREATED_BY']; // It's creator
-//							// It's event in user's calendar
-//							if ($checkPermissionsForEvent && $event['CAL_TYPE'] == 'user' && $userId == $event['OWNER_ID'])
-//								$checkPermissionsForEvent = false;
-//							if ($checkPermissionsForEvent && $event['IS_MEETING'] && $event['USER_MEETING'] && $event['USER_MEETING']['ATTENDEE_ID'] == $userId)
-//								$checkPermissionsForEvent = false;
-//							if ($checkPermissionsForEvent && $event['IS_MEETING'] && is_array($event['~ATTENDEES']))
-//							{
-//								foreach($event['~ATTENDEES'] as $att)
-//								{
-////									if ($att['USER_ID'] == $userId)
-////									{
-////										$checkPermissionsForEvent = false;
-////										//break;
-////									}
-//									if ($att['USER_ID'] == $spUser['ID'])
-//									{
-//										$status = $att['STATUS'];
-//										break;
-//									}
-//								}
-//							}
-
 							if ($status == 'Y')
 							{
 								$event = CCalendarEvent::ApplyAccessRestrictions($event, $userId);
 								$resAdd[] = $event;
 							}
+						}
+						// Already cleaned events
+						elseif (!is_array($event['~ATTENDEES']) && !isset($event['IS_MEETING']) && $event['~IS_MEETING'])
+						{
+							$resAdd[] = $event;
 						}
 					}
 				}
@@ -1776,11 +1753,20 @@ class CCalendar
 			return false;
 		$res = array();
 		$str = CUserOptions::GetOption("calendar", "superpose_displayed", false, $userId);
-		$arIds = unserialize($str);
-		if (is_array($arIds) && count($arIds) > 0)
-			foreach($arIds as $id)
-				if (intVal($id) > 0)
-					$res[] = intVal($id);
+		if (CheckSerializedData($str))
+		{
+			$arIds = unserialize($str);
+			if (is_array($arIds) && count($arIds) > 0)
+			{
+				foreach($arIds as $id)
+				{
+					if (intVal($id) > 0)
+					{
+						$res[] = intVal($id);
+					}
+				}
+			}
+		}
 		return $res;
 	}
 
@@ -1864,7 +1850,7 @@ class CCalendar
 			$res = array();
 			$str = CUserOptions::GetOption("calendar", "superpose_tracking_users", false, $userId);
 
-			if ($str !== false)
+			if ($str !== false && CheckSerializedData($str))
 			{
 				$arIds = unserialize($str);
 				if (is_array($arIds) && count($arIds) > 0)
@@ -1976,6 +1962,7 @@ class CCalendar
 		$sectionId = (is_array($arFields['SECTIONS']) && count($arFields['SECTIONS']) > 0) ? $arFields['SECTIONS'][0] : 0;
 		$bPersonal = self::IsPersonal($arFields['CAL_TYPE'], $arFields['OWNER_ID'], $userId);
 
+		// Fetch current event
 		// Fetch current event
 		$oCurEvent = false;
 		$bNew = !isset($arFields['ID']) || !$arFields['ID'];
@@ -2123,6 +2110,30 @@ class CCalendar
 		{
 			return CCalendar::ThrowError(GetMessage('EC_ACCESS_DENIED'));
 		}
+
+		if ($Params['autoDetectSection'] && $sectionId <= 0)
+		{
+			$res = CCalendarSect::GetList(array('arFilter' => array('CAL_TYPE' => $arFields['CAL_TYPE'],'OWNER_ID' => $arFields['OWNER_ID']), 'checkPermissions' => false));
+			if ($res && is_array($res) && isset($res[0]))
+			{
+				$sectionId = $res[0]['ID'];
+			}
+			elseif ($Params['autoCreateSection'])
+			{
+				$defCalendar = CCalendarSect::CreateDefault(array(
+					'type' => $arFields['CAL_TYPE'],
+					'ownerId' => $arFields['OWNER_ID']
+				));
+				$sectionId = $defCalendar['ID'];
+
+				$Params['bAffectToDav'] = false;
+			}
+			if ($sectionId > 0)
+				$arFields['SECTIONS'] = array($sectionId);
+			else
+				return false;
+		}
+
 
 		if (isset($arFields["RRULE"]))
 			$arFields["RRULE"] = CCalendarEvent::CheckRRULE($arFields["RRULE"]);
@@ -2295,7 +2306,7 @@ class CCalendar
 		$fromUser = intVal($Params["userId"]);
 		$toUser = intVal($Params["guestId"]);
 		if (!$fromUser || !$toUser || $toUser == $fromUser)
-			return;
+			return false;
 
 		$fromTs = CCalendar::Timestamp($Params["from"]);
 		$toTs = CCalendar::Timestamp($Params["to"]);
@@ -2339,11 +2350,11 @@ class CCalendar
 
 		// Don't send messages for events in the past
 		if ($toTs < time())
-			return;
+			return false;
 
 		$rs = CUser::GetList(($by="id"), ($order="asc"), array("ID_EQUAL_EXACT"=>$toUser, "ACTIVE" => "Y"));
 		if (!$rs->Fetch())
-			return;
+			return false;
 
 		$eventId = intVal($Params["eventId"]);
 		$calendarUrl = self::GetPathForCalendarEx($arNotifyFields['TO_USER_ID']);
@@ -2723,7 +2734,7 @@ class CCalendar
 		if ($forSite === false)
 		{
 			$arAffectedSites = COption::GetOptionString('calendar', 'pathes_sites', false);
-			if ($arAffectedSites != false)
+			if ($arAffectedSites != false && CheckSerializedData($arAffectedSites))
 				$arAffectedSites = unserialize($arAffectedSites);
 		}
 		else
@@ -2739,7 +2750,7 @@ class CCalendar
 			foreach($arAffectedSites as $s)
 			{
 				$ar = COption::GetOptionString("calendar", 'pathes_'.$s, false);
-				if ($arAffectedSites != false)
+				if ($ar != false && CheckSerializedData($ar))
 				{
 					$ar = unserialize($ar);
 					if(is_array($ar))
@@ -2979,7 +2990,8 @@ class CCalendar
 					'DATE_START' => $from,
 					'DATE_FINISH' => $to,
 					'USERS' => $userIds,
-					'PER_USER' => true
+					'PER_USER' => true,
+					'SELECT' => array('ID', 'DATE_ACTIVE_FROM', 'DATE_ACTIVE_TO')
 				),
 				BX_INTRANET_ABSENCE_HR
 			);
@@ -3051,7 +3063,7 @@ class CCalendar
 
 	public static function ReminderAgent($eventId = 0, $userId = 0, $viewPath = '', $calendarType = '', $ownerId = 0)
 	{
-		if ($eventId > 0 && $userId > 0 && $calendarType != '' && $ownerId > 0)
+		if ($eventId > 0 && $userId > 0 && $calendarType != '')
 		{
 			if (!CModule::IncludeModule("im"))
 				return false;
@@ -3132,6 +3144,7 @@ class CCalendar
 
 					if ($viewPath != '')
 						$arNotifyFields['MESSAGE'] .= "\n".GetMessage('EC_EVENT_REMINDER_DETAIL', Array('#URL_VIEW#' => $viewPath));
+
 					CIMNotify::Add($arNotifyFields);
 
 					foreach(GetModuleEvents("calendar", "OnRemindEvent", true) as $arEvent)
@@ -3259,7 +3272,8 @@ class CCalendar
 					'DATE_START' => $Params['from'],
 					'DATE_FINISH' => $Params['to'],
 					'USERS' => $Params['users'],
-					'PER_USER' => true
+					'PER_USER' => true,
+					'SELECT' => array('ID', 'DATE_ACTIVE_FROM', 'DATE_ACTIVE_TO')
 				),
 				BX_INTRANET_ABSENCE_HR
 			);
@@ -3315,7 +3329,7 @@ class CCalendar
 		if ($Params['bCurUserList'])
 			$arFilter['OWNER_ID'] = $curUserId;
 
-		if (isset($Params['sectionId']))
+		if (isset($Params['sectionId']) && $Params['sectionId'])
 			$arFilter["SECTION"] = $Params['sectionId'];
 
 		if ($type == 'user')
@@ -3399,7 +3413,7 @@ class CCalendar
 		}
 
 		$MRList = Array();
-		if (IntVal($RMiblockId) > 0 && CIBlock::GetPermission($RMiblockId) >= "R")
+		if (IntVal($RMiblockId) > 0 && CIBlock::GetPermission($RMiblockId) >= "R" && self::$allowReserveMeeting)
 		{
 			$arOrderBy = array("NAME" => "ASC", "ID" => "DESC");
 			$arFilter = array("IBLOCK_ID" => $RMiblockId, "ACTIVE" => "Y");
@@ -3418,7 +3432,7 @@ class CCalendar
 			}
 		}
 
-		if(IntVal($VMiblockId) > 0 && CIBlock::GetPermission($VMiblockId) >= "R")
+		if(IntVal($VMiblockId) > 0 && CIBlock::GetPermission($VMiblockId) >= "R" && self::$allowVideoMeeting)
 		{
 			$arFilter = array("IBLOCK_ID" => $VMiblockId, "ACTIVE" => "Y");
 			$arSelectFields = array("ID", "NAME", "DESCRIPTION", "IBLOCK_ID");
@@ -4730,7 +4744,9 @@ class CCalendar
 		if (!empty($arUser["PERSONAL_PHOTO"]))
 		{
 			if (empty($arParams['AVATAR_SIZE']))
+			{
 				$arParams['AVATAR_SIZE'] = 42;
+			}
 			$arFileTmp = CFile::ResizeImageGet(
 				$arUser["PERSONAL_PHOTO"],
 				array('width' => $arParams['AVATAR_SIZE'], 'height' => $arParams['AVATAR_SIZE']),
@@ -4741,8 +4757,16 @@ class CCalendar
 		}
 		else
 		{
-			$avatar_src = '/bitrix/images/1.gif';
+			$avatar_src = false;
 		}
+		return $avatar_src;
+	}
+
+	public static function GetUserAvatarSrc($arUser = array(), $arParams = array())
+	{
+		$avatar_src = self::GetUserAvatar($arUser, $arParams);
+		if ($avatar_src === false)
+			$avatar_src = '/bitrix/images/1.gif';
 		return $avatar_src;
 	}
 
@@ -4824,20 +4848,32 @@ class CCalendar
 	{
 		foreach($arCodes as $code)
 		{
-			if (empty(self::$accessNames[$code]))
+			if (!array_key_exists($code, self::$accessNames))
 			{
-				$access = new CAccess();
-				$arNames = $access->GetNames($arCodes);
-				foreach($arNames as $c => $val)
-					self::$accessNames[$c] = trim(htmlspecialcharsbx($val['provider'].' '.$val['name']));
-
-				break;
+				self::$accessNames[$code] = null;
 			}
 		}
 	}
 
 	public static function GetAccessNames()
 	{
+		$arCodes = array();
+		foreach (self::$accessNames as $code => $name)
+		{
+			if ($name === null)
+				$arCodes[] = $code;
+		}
+
+		if ($arCodes)
+		{
+			$access = new CAccess();
+			$arNames = $access->GetNames($arCodes);
+			foreach($arNames as $code => $name)
+			{
+				self::$accessNames[$code] = trim(htmlspecialcharsbx($name['provider'].' '.$name['name']));
+			}
+		}
+
 		return self::$accessNames;
 	}
 
@@ -4861,9 +4897,9 @@ class CCalendar
 					$pathes = self::GetPathes();
 					if (isset($pathes[$siteId]))
 					{
-						if ($type == 'user')
+						if ($type == 'user' && isset($pathes[$siteId]['path_to_user_calendar']))
 							$path = $pathes[$siteId]['path_to_user_calendar'];
-						elseif($type == 'group')
+						elseif($type == 'group' && isset($pathes[$siteId]['path_to_group_calendar']))
 							$path = $pathes[$siteId]['path_to_group_calendar'];
 					}
 				}
@@ -5460,9 +5496,13 @@ class CCalendar
 		$obUserFieldsSql->SetFilter(array(
 			"!UF_DEPARTMENT" => false
 		));
-
 		$where = $obUserFieldsSql->GetFilter();
 		$join = $obUserFieldsSql->GetJoin("UA.USER_ID");
+
+		if ($where == '')
+		{
+			$where = '1=1';
+		}
 
 		$strCodes = in_array('UA', $arCodes2) ? "'G2'" : "'".join("','", $arCodes2)."'";
 
@@ -5640,7 +5680,7 @@ class CCalendar
 
 		$cacheTtl = defined("BX_COMP_MANAGED_CACHE") ? 3153600 : 3600*4;
 		$cacheId = 'blog_post_form_dest_'.$user_id;
-		$cacheDir = '/blog/form/dest/'.$user_id;
+		$cacheDir = '/blog/form/dest/'.SITE_ID.'/'.$user_id;
 
 		$obCache = new CPHPCache;
 		if($obCache->InitCache($cacheTtl, $cacheId, $cacheDir))
@@ -5714,6 +5754,14 @@ class CCalendar
 			$DESTINATION['USERS'] = CSocNetLogDestination::GetUsers(Array('id' => $arDestUser));
 		}
 
+		$users = array();
+		foreach ($DESTINATION['USERS'] as $key => $entry)
+		{
+			if ($entry['isExtranet'] == 'N')
+				$users[$key] = $entry;
+		}
+		$DESTINATION['USERS'] = $users;
+
 		return $DESTINATION;
 	}
 
@@ -5730,7 +5778,7 @@ class CCalendar
 			$files = array($files);
 		if (sizeof($files) <= 0)
 			return false;
-		if (!CModule::IncludeModule('iblock'))
+		if (!CModule::IncludeModule('iblock') || !CModule::IncludeModule('webdav'))
 			return false;
 
 		$arFiles = array();

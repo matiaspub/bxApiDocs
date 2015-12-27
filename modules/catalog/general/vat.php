@@ -4,9 +4,7 @@ Loc::loadMessages(__FILE__);
 
 
 /**
- * <b>CCatalogVat</b> - класс для работы со ставками НДС.</body> </html>
- *
- *
+ * <b>CCatalogVat</b> - класс для работы со ставками НДС. 
  *
  *
  * @return mixed 
@@ -27,9 +25,7 @@ class CAllCatalogVat
 
 	
 	/**
-	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/add.php">CCatalogVat::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/update.php">CCatalogVat::Update</a>.</p>
-	*
-	*
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/add.php">CCatalogVat::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/update.php">CCatalogVat::Update</a>. Метод динамичный.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения:
@@ -38,24 +34,17 @@ class CAllCatalogVat
 	* <b>UPDATE</b> - для метода <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/update.php">CCatalogVat::Update</a>.</li> </ul>
 	*
-	*
-	*
 	* @param array &$arFields  Ассоциативный массив параметров ставки НДС. Допустимые ключи: <ul>
 	* <li>ACTIVE - активность ставки НДС ('Y' - активна, 'N' - неактивна);</li> <li>SORT -
 	* индекс сортировки (до версии 12.5.6 использовалось поле C_SORT);</li> <li>NAME
 	* - название ставки НДС;</li> <li>RATE - величина ставки НДС.</li> </ul>
 	*
-	*
-	*
 	* @param int $ID = 0 Код ставки НДС. Параметр является необязательным и имеет смысл
 	* только для $ACTION = 'UPDATE'.
 	*
-	*
-	*
 	* @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
-	* иначе - <i>false</i>. Если функция вернула <i>false</i>, с помощью
+	* иначе - <i>false</i>. Если метод вернула <i>false</i>, с помощью
 	* <i>$APPLICATION-&gt;GetException()</i> можно получить текст ошибок.</p>
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/add.php">CCatalogVat::Add</a> </li> <li>
@@ -155,18 +144,13 @@ class CAllCatalogVat
 
 	
 	/**
-	* <p>Метод возвращает ставку НДС по ее коду <i>ID</i>.</p>
-	*
-	*
+	* <p>Метод возвращает ставку НДС по ее коду <i>ID</i>. Метод динамичный.</p>
 	*
 	*
 	* @param int $ID  Код ставки НДС.
 	*
-	*
-	*
 	* @return CDBResult <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li></ul><br><br>
@@ -183,9 +167,7 @@ class CAllCatalogVat
 
 	
 	/**
-	* <p>Метод возвращает результат выборки записей из таблицы ставок НДС в соответствии со своими параметрами.</p> <p><b>Примечание:</b> начиная с версии модуля <b>12.5.6</b>, метод считается устаревшим. Вместо него рекомендуется использовать <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/getlistex.php">CCatalogVat::GetListEx</a>.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из таблицы ставок НДС в соответствии со своими параметрами. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> начиная с версии модуля <b>12.5.6</b>, метод считается устаревшим. Вместо него рекомендуется использовать <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/getlistex.php">CCatalogVat::GetListEx</a>.</div>
 	*
 	*
 	* @param array $arrayarOrder = array('CSORT' => 'ASC') Массив, в соответствии с которым сортируются результирующие
@@ -198,8 +180,6 @@ class CAllCatalogVat
 	* имеет несколько элементов, то результирующий набор сортируется
 	* последовательно по каждому элементу (т.е. сначала сортируется по
 	* первому элементу, потом результат сортируется по второму и т.д.).
-	*
-	*
 	*
 	* @param array $arrayarFilter = array() Массив, в соответствии с которым фильтруются записи. Массив имеет
 	* вид: <pre class="syntax">array( "[оператор1]название_поля1" =&gt; "значение1",
@@ -223,13 +203,9 @@ class CAllCatalogVat
 	* <i>RATE</i>. <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отфильтрован не будет.
 	*
-	*
-	*
-	* @param array $arrayarFields = array() Массив полей записей, которые будут возвращены функцией.<br><br>
+	* @param array $arrayarFields = array() Массив полей записей, которые будут возвращены методом.<br><br>
 	* Возможные поля выборки: <i>ID</i>, <i>TIMESTAMP_X</i>, <i>ACTIVE</i>, <i>C_SORT</i>, <i>NAME</i> и
 	* <i>RATE</i>.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращает объект класса <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
@@ -263,9 +239,7 @@ class CAllCatalogVat
 */
 	
 	/**
-	* <p>Метод добавляет новую ставку НДС или обновляет существующую в зависимости от передаваемых данных в массиве <i>arFields</i>.</p> <p><b>Примечание:</b> метод устарел, вместо него рекомендуется использоваться <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/add.php">CCatalogVat::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/update.php">CCatalogVat::Update</a> соответственно.</p>
-	*
-	*
+	* <p>Метод добавляет новую ставку НДС или обновляет существующую в зависимости от передаваемых данных в массиве <i>arFields</i>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> метод устарел, вместо него рекомендуется использоваться <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/add.php">CCatalogVat::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/update.php">CCatalogVat::Update</a> соответственно.</div>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров ставки НДС. Допустимые ключи: <ul>
@@ -274,14 +248,13 @@ class CAllCatalogVat
 	* - индекс сортировки;</li> <li>NAME - название ставки НДС;</li> <li>RATE -
 	* величина ставки НДС.</li> </ul>
 	*
-	*
-	*
 	* @return mixed <p>Метод возвращает <i>ID</i> созданной или измененной ставки НДС,
 	* либо <i>false</i> в случае ошибки.</p> <br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogvat/set.php
 	* @author Bitrix
+	* @deprecated deprecated since catalog 12.5.6  ->  CCatalogVat::Add()
 	*/
 	public static function Set($arFields)
 	{

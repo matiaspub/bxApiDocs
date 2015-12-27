@@ -21,7 +21,7 @@ class Server
 	implements IRequestFilter
 {
 
-	protected $interestingKeys = array('REQUEST_URI', 'QUERY_STRING', 'SCRIPT_URL', 'SCRIPT_URI');
+	protected $interestingKeys = array('REQUEST_URI', 'QUERY_STRING', 'SCRIPT_URL', 'SCRIPT_URI', 'PHP_SELF');
 
 	/**
 	 * Return filtered values or null if auditors not triggered (by default)

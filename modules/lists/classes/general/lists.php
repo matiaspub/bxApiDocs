@@ -252,11 +252,16 @@ class CLists
 		CListFieldList::DeleteFields($iblock_id);
 	}
 
+	public static function OnAfterIBlockDelete($iblock_id)
+	{
+		if(CModule::includeModule('bizproc'))
+			BizProcDocument::deleteDataIblock($iblock_id);
+	}
+
 	public static function IsEnabledSocnet()
 	{
 		$bActive = false;
-		$rsEvents = GetModuleEvents("socialnetwork", "OnFillSocNetFeaturesList");
-		while($arEvent = $rsEvents->Fetch())
+		foreach (GetModuleEvents("socialnetwork", "OnFillSocNetFeaturesList", true) as $arEvent)
 		{
 			if(
 				$arEvent["TO_MODULE_ID"] == "lists"
@@ -348,6 +353,67 @@ class CLists
 					return false;
 			}
 		}
+	}
+
+	public static function setLiveFeed($checked, $iblockId)
+	{
+		global $DB;
+		$iblockId = intval($iblockId);
+		$checked = intval($checked);
+
+		$resultQuery = $DB->Query("SELECT LIVE_FEED FROM b_lists_url WHERE IBLOCK_ID = ".$iblockId);
+		$resultData = $resultQuery->fetch();
+
+		if($resultData)
+		{
+			if($resultData["LIVE_FEED"] != $checked)
+				$DB->Query("UPDATE b_lists_url SET LIVE_FEED = '".$checked."' WHERE IBLOCK_ID = ".$iblockId);
+		}
+		else
+		{
+			$url = '/'.$iblockId.'/element/#section_id#/#element_id#/';
+			$DB->Query("INSERT INTO b_lists_url (IBLOCK_ID, URL, LIVE_FEED) values (".$iblockId.", '".$DB->ForSQL($url)."', ".$checked.")");
+		}
+	}
+
+    public static function getLiveFeed($iblockId)
+	{
+		global $DB;
+		$iblockId = intval($iblockId);
+
+		$resultQuery = $DB->Query("SELECT LIVE_FEED FROM b_lists_url WHERE IBLOCK_ID = ".$iblockId);
+		$resultData = $resultQuery->fetch();
+
+		if ($resultData)
+			return $resultData["LIVE_FEED"];
+		else
+			return "";
+	}
+
+	public static function getCountProcessesUser($userId, $iblockTypeId)
+	{
+		$userId = intval($userId);
+		return CIBlockElement::getList(
+			array(),
+			array('CREATED_BY' => $userId, 'IBLOCK_TYPE' => $iblockTypeId),
+			true,
+			false,
+			array('ID')
+		);
+	}
+
+	public static function generateMnemonicCode($integerCode = 0)
+	{
+		if(!$integerCode)
+			$integerCode = time();
+
+		$code = '';
+		for ($i = 1; $integerCode >= 0 && $i < 10; $i++)
+		{
+			$code = chr(0x41 + ($integerCode % pow(26, $i) / pow(26, $i - 1))) . $code;
+			$integerCode -= pow(26, $i);
+		}
+		return $code;
 	}
 }
 ?>

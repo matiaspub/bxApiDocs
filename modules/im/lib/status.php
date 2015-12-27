@@ -58,6 +58,11 @@ class StatusTable extends Entity\DataManager
 				'primary' => true,
 				'title' => Loc::getMessage('STATUS_ENTITY_USER_ID_FIELD'),
 			),
+			'COLOR' => array(
+				'data_type' => 'string',
+				'validation' => array(__CLASS__, 'validateColor'),
+				'title' => Loc::getMessage('STATUS_ENTITY_COLOR_FIELD'),
+			),
 			'STATUS' => array(
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'validateStatus'),
@@ -107,6 +112,13 @@ class StatusTable extends Entity\DataManager
 	 * @return array
 	 */
 	public static function validateStatusText()
+	{
+		return array(
+			new Entity\Validator\Length(null, 255),
+		);
+	}
+
+	public static function validateColor()
 	{
 		return array(
 			new Entity\Validator\Length(null, 255),

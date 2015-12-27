@@ -4,18 +4,16 @@ namespace Bitrix\Main;
 use Bitrix\Main\Config;
 use Bitrix\Main\Web;
 
-class HttpResponse
-	extends Response
+class HttpResponse extends Response
 {
-	/**
-	 * @var \Bitrix\Main\Web\Cookie[]
-	 */
-	private $cookies = array();
+	/** @var \Bitrix\Main\Web\Cookie[] */
+	protected $cookies = array();
 
-	/**
-	 * @var array
-	 */
-	private $headers = array();
+	/** @var array */
+	protected $headers = array();
+
+	/** @var \Bitrix\Main\Type\DateTime */
+	protected $lastModified;
 
 	public function addHeader($name, $value = '')
 	{
@@ -57,7 +55,7 @@ class HttpResponse
 		$_SESSION['SPREAD_COOKIE'] = $storedCookies;
 	}
 
-	private function createStandardHeaders()
+	protected function createStandardHeaders()
 	{
 		$server = $this->context->getServer();
 		if (($server->get("REDIRECT_STATUS") != null) && ($server->get("REDIRECT_STATUS") == 404))
@@ -76,8 +74,13 @@ class HttpResponse
 
 	protected function writeHeaders()
 	{
-		$this->createStandardHeaders();
+//not yet
+//		$this->createStandardHeaders();
 
+		if($this->lastModified !== null)
+		{
+			$this->setHeader(array("Last-Modified", gmdate("D, d M Y H:i:s", $this->lastModified->getTimestamp())." GMT"));
+		}
 		if (is_array($this->headers))
 		{
 			foreach ($this->headers as $header)
@@ -130,5 +133,16 @@ class HttpResponse
 		}
 	}
 
-
+	/**
+	 * Sets the latest time for the Last-Modified header field.
+	 *
+	 * @param Type\DateTime $time
+	 */
+	public function setLastModified(Type\DateTime $time)
+	{
+		if($this->lastModified === null || $time->getTimestamp() > $this->lastModified->getTimestamp())
+		{
+			$this->lastModified = $time;
+		}
+	}
 }

@@ -12,6 +12,11 @@ class CCatalogDocs
 	static function add($arFields)
 	{
 		global $DB;
+
+		foreach(GetModuleEvents("catalog", "OnBeforeDocumentAdd", true) as $arEvent)
+			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
+				return false;
+
 		if(array_key_exists('DATE_CREATE', $arFields))
 			unset($arFields['DATE_CREATE']);
 		if(array_key_exists('DATE_MODIFY', $arFields))
@@ -49,6 +54,10 @@ class CCatalogDocs
 				}
 			}
 		}
+
+		foreach(GetModuleEvents("catalog", "OnDocumentAdd", true) as $arEvent)
+			ExecuteModuleEventEx($arEvent, array($lastId, $arFields));
+
 		return $lastId;
 	}
 

@@ -6,9 +6,7 @@
 
 
 /**
- * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>.</body> </html>
- *
- *
+ * <b>CFormResult</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатами</a>. 
  *
  *
  * @return mixed 
@@ -29,14 +27,10 @@ public static 	function err_mess()
 	// список результатов
 
 	/**
-	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
-	*
-	*
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p class="note"><b>Примечание</b> <br> Возвращаемый список содержит только <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php">поля результата</a>. Значения ответов и полей можно получить с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getresultanswerarray.php">CForm::GetResultAnswerArray</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/getdatabyid.php">CFormResult::GetDataByID</a>.</p>
 	*
 	*
 	* @param int $form_id  ID веб-формы.</bod
-	*
-	*
 	*
 	* @param string &$by = "s_timestamp" Ссылка на переменную с полем для сортировки; может принимать
 	* значения: <ul> <li> <b>s_id</b> - ID результата; </li> <li> <b>s_date_create</b> - дата
@@ -46,13 +40,9 @@ public static 	function err_mess()
 	* <b>s_session_id</b> - ID сессии, в которой был создан результат; </li> <li>
 	* <b>s_status</b> - ID статуса. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Ссылка на переменную с порядком сортировки. Допустимы следующие
 	* значения: <ul> <li> <b>desc</b> - по убыванию (значение по умолчанию); </li> <li>
 	* <b>asc</b> - по возрастанию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив содержащий параметры фильтра. Необязательный параметр. В
 	* массиве допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID результата (по
@@ -100,10 +90,10 @@ public static 	function err_mess()
 	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; синоним -
 	* <b>CODE</b>;</li> <li> <b>PARAMETER_NAME</b> - тип данных по которым фильтруем,
 	* допустимы следующие значения: <ul> <li> <b>USER</b> - фильтруем по ответам
-	* введенных авторами с клавиатуры; </li> <li> <b>ANSWER_TEXT</b> - фильтруем по
-	* параметру <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> - фильтруем по
-	* параметру <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> - значение, по
-	* которому фильтруем (допускается <a
+	* введенных авторами с клавиатуры (по умолчанию); </li> <li> <b>ANSWER_TEXT</b> -
+	* фильтруем по параметру <font color="green">ANSWER_TEXT</font>; </li> <li> <b>ANSWER_VALUE</b> -
+	* фильтруем по параметру <font color="red">ANSWER_VALUE.</font> </li> </ul> </li> <li> <b>VALUE</b> -
+	* значение, по которому фильтруем (допускается <a
 	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>); </li> <li>
 	* <b>FILTER_TYPE</b> - тип фильтра, определяет, как интерпретировать данные
 	* по которым фильтруем: <ul> <li> <b>integer</b> - означает, что данные, по
@@ -126,13 +116,9 @@ public static 	function err_mess()
 	* совпадение; </li> <li> <b>N</b> - будет искаться вхождение (по умолчанию).
 	* </li> </ul> </li> </ul> </li> </ul>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Ссылка на переменную хранящую флаг отфильтрованности
 	* результирующего списка. Если значение равно "true", то список был
 	* отфильтрован.
-	*
-	*
 	*
 	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
 	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
@@ -150,16 +136,11 @@ public static 	function err_mess()
 	* <br><br><b>[DELETE] удаление</b> </li> </ol> Параметр необязательный. По
 	* умолчанию - "Y" (права необходимо проверить).
 	*
-	*
-	*
 	* @param mixed $limit = false Максимальное количество результатов, которые войдут в
-	* результирующий список. <br><br> Параметр необязательный. По
-	* умолчанию - "false" (без ограничений).
-	*
-	*
+	* результирующий список. По умолчанию ограничивает выборку 5000
+	* строками. <br><br> Параметр необязательный.
 	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -234,7 +215,6 @@ public static 	function err_mess()
 	*     echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
 	* }
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -603,17 +583,12 @@ public static 	function err_mess()
 
 	
 	/**
-	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данной функцией: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
-	*
-	*
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformresult/index.php#field">поля результата</a>, а также некоторые <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/index.php">поля веб-формы</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformstatus/index.php">поля статуса</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> <p> Структура массива в объекте, возвращаемого данным методом: </p> <pre class="syntax">Array ( [ID] =&gt; ID результата [TIMESTAMP_X] =&gt; время изменения результата [DATE_CREATE] =&gt; дата создания результата [FORM_ID] =&gt; ID веб-формы [USER_ID] =&gt; ID пользователя создавшего результат (автор) [USER_AUTH] =&gt; флаг авторизованности автора при создании результата [Y|N] [STAT_GUEST_ID] =&gt; ID посетителя создавшего результат [STAT_SESSION_ID] =&gt; ID сессии в которой был создан результат [STATUS_ID] =&gt; ID статуса в котором находится результат [STATUS_TITLE] =&gt; заголовок статуса в котором находится результат [STATUS_DESCRIPTION] =&gt; описание статуса в котором находится результат [STATUS_CSS] =&gt; имя CSS класса в котором находится результат [SID] =&gt; символьный идентификатор веб-формы [NAME] =&gt; заголовок веб-формы [IMAGE_ID] =&gt; ID изображения веб-формы [DESCRIPTION] =&gt; описание веб-формы [DESCRIPTION_TYPE] =&gt; тип описания веб-формы [text|html] )</pre>
 	*
 	*
 	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -623,7 +598,6 @@ public static 	function err_mess()
 	* echo "&lt;pre&gt;"; print_r($arResult); echo "&lt;/pre&gt;";
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -672,23 +646,16 @@ public static 	function err_mess()
 	// права на результат
 
 	/**
-	* <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, функция возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
-	*
-	*
+	* <p>Возвращает массив символьных обозначений <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php">прав</a>, которыми обладает текущий пользователь для указанного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>. Помимо этого, метод возвращает ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a> в котором находится указанный результат.</p> <p>В результирующем массиве могут быть следующие символьные обозначения прав: </p> <ul> <li> <b>VIEW</b> - право на просмотр результата; </li> <li> <b>EDIT</b> - право на редактирование результата; </li> <li> <b>DELETE</b> - право на удаление результата. </li> </ul> <p class="note"><b>Примечание</b><br>Права на результат, по сути, являются правами на статус, в котором находится данный результат.</p>
 	*
 	*
 	* @param int $result_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результата</a>.
-	*
-	*
 	*
 	* @param int &$current_status_id  Ссылка на переменную, в которую будет сохранен ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#status">статуса</a>, указанного
 	* результата <i>result_id</i>.
 	*
-	*
-	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -710,7 +677,6 @@ public static 	function err_mess()
 	*     echo "У вас есть право на удаление результата #".$RESULT_ID;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

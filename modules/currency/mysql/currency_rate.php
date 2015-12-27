@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/currency/general/currenc
 
 
 /**
- * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр.</body> </html>
- *
- *
+ * <b>CCurrencyRates</b> - класс для работы с курсами валют: сохранение, конвертация и пр. 
  *
  *
  * @return mixed 
@@ -18,31 +16,20 @@ class CCurrencyRates extends CAllCurrencyRates
 {
 	
 	/**
-	* <p>Функция переводит сумму valSum из валюты curFrom в валюту curTo по курсу, установленному на дату valDate </p>
-	*
-	*
+	* <p>Метод переводит сумму valSum из валюты curFrom в валюту curTo по курсу, установленному на дату valDate. Метод динамичный. </p>
 	*
 	*
 	* @param float $valSum  Сумма в валюте curFrom, которую нужно перевести в валюту curTo
 	*
-	*
-	*
 	* @param string $curFrom  Исходная валюта.
 	*
-	*
-	*
 	* @param string $curTo  Конечная валюта.
-	*
-	*
 	*
 	* @param string $valDate = "" Дата, по курсу на которую нужно осуществить перевод. Если дата
 	* пуста, то перевод идет по текущему курсу. Необязательный
 	* параметр.
 	*
-	*
-	*
 	* @return float <p>Сумма в новой валюте </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -80,27 +67,18 @@ class CCurrencyRates extends CAllCurrencyRates
 
 	
 	/**
-	* <p>Функция возвращает коэффициент для перевода сумм из валюты curFrom в валюту curTo по курсу, установленному на дату valDate.</p>
-	*
-	*
+	* <p>Метод возвращает коэффициент для перевода сумм из валюты curFrom в валюту curTo по курсу, установленному на дату valDate. Метод динамичный.</p>
 	*
 	*
 	* @param string $curFrom  Исходная валюта.
 	*
-	*
-	*
 	* @param string $curTo  Валюта назначения. </h
-	*
-	*
 	*
 	* @param string $valDate = "" Дата, по курсу на которую нужно осуществить перевод. Если дата
 	* пуста, то перевод идет по текущему курсу. Необязательный
 	* параметр.<br><br> Дата должна быть указана в формате <b>YYYY-MM-DD</b>.
 	*
-	*
-	*
 	* @return float <p>Коэффициент для перевода. </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

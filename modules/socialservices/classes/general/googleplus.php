@@ -15,12 +15,7 @@ class CSocServGooglePlusOAuth extends CSocServGoogleOAuth
 			$this->entityOAuth = new CGooglePlusOAuthInterface();
 		}
 
-		if($code !== false)
-		{
-			$this->entityOAuth->setCode($code);
-		}
-
-		return $this->entityOAuth;
+		return parent::getEntityOAuth($code);
 	}
 
 	static public function GetSettings()

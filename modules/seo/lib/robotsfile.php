@@ -16,6 +16,12 @@ class RobotsFile
 	const ROBOTS_FILE_NAME = 'robots.txt';
 	const SECTION_RULE = 'User-Agent';
 	const SITEMAP_RULE = 'Sitemap';
+
+	/**
+	 * Standard robots.txt rules tell us that at least one Disallow instruction should be put in robots.txt for its correct interpretation. But Yandex interprets empty Disallow rule as total allowance and skips all further Disallow rules.
+	 *
+	 * @deprecated
+	 */
 	const EMPTY_DISALLOW_RULE = 'Disallow: # empty Disallow instruction SHOULD be there';
 
 	protected $siteId = '';
@@ -134,7 +140,7 @@ class RobotsFile
 				{
 					$line = trim($line);
 
-					if(strlen($line) > 0 && $line != self::EMPTY_DISALLOW_RULE)
+					if(strlen($line) > 0)
 					{
 						$rule = $this->parseRule($line);
 						if(ToUpper($rule[0]) == $strSectionCompare)
@@ -171,8 +177,7 @@ class RobotsFile
 				{
 					$strContent .=
 						($strContent == '' ? '' : $nn)
-						.$this->getRuleText(array(self::SECTION_RULE, $currentAgent)).$nn
-						.self::EMPTY_DISALLOW_RULE.$nn;
+						.$this->getRuleText(array(self::SECTION_RULE, $currentAgent)).$nn;
 
 					foreach ($arRules as $rule)
 					{

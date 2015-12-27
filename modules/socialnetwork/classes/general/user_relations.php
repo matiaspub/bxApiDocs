@@ -3,15 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.</body> </html>
- *
- *
+ * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями. 
  *
  *
  * @return mixed 
  *
  * @static
- * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/index.php
+ * @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/index.php
  * @author Bitrix
  */
 class CAllSocNetUserRelations
@@ -69,6 +67,11 @@ class CAllSocNetUserRelations
 			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["RELATION"], GetMessage("SONET_UR_ERROR_NO_RELATION")), "ERROR_NO_RELATION");
 			return false;
 		}
+		elseif (is_set($arFields, "RELATION") && $arFields["RELATION"] == SONET_RELATIONS_TYPE_FRIENDS2)
+		{
+			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_ERROR_RELATION_FRIENDS2"), "ERROR_RELATION_FRIENDS2");
+			return false;
+		}
 
 		if ((is_set($arFields, "INITIATED_BY") || $ACTION=="ADD") && !in_array($arFields["INITIATED_BY"], array("F", "S")))
 			$arFields["INITIATED_BY"] = "F";
@@ -93,16 +96,12 @@ class CAllSocNetUserRelations
 	* <p>Метод удаляет связь между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код связи.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/delete.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/delete.php
 	* @author Bitrix
 	*/
 	public static function Delete($ID)
@@ -197,11 +196,7 @@ class CAllSocNetUserRelations
 	* <p>Метод возвращает параметры связи.</p>
 	*
 	*
-	*
-	*
 	* @param int $id  Код связи.
-	*
-	*
 	*
 	* @return array <p>Массив с ключами:<br><b>ID</b>- код связи,<br><b>FIRST_USER_ID</b> - код первого
 	* пользователя,<br><b>SECOND_USER_ID</b> - код второго пользователя,<br><b>RELATION</b>
@@ -214,7 +209,7 @@ class CAllSocNetUserRelations
 	* инициирована связь: F - первым пользователем, S - вторым.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getbyid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getbyid.php
 	* @author Bitrix
 	*/
 	public static function GetByID($ID)
@@ -240,15 +235,9 @@ class CAllSocNetUserRelations
 	* <p>Метод возвращает связь между пользователями на основании их идентификаторов.</p>
 	*
 	*
-	*
-	*
 	* @param int $user1ID  Код первого пользователя.
 	*
-	*
-	*
 	* @param int $user2ID  Код второго пользователя.
-	*
-	*
 	*
 	* @return array <p>В случае отсутствия связи возвращается false. В случае наличия
 	* связи возвращается массив с ключами:<br><b>ID</b> - код
@@ -263,7 +252,7 @@ class CAllSocNetUserRelations
 	* пользователем, S - вторым.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getbyuserid.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getbyuserid.php
 	* @author Bitrix
 	*/
 	public static function GetByUserID($user1ID, $user2ID)
@@ -295,30 +284,19 @@ class CAllSocNetUserRelations
 	* <p>Метод возвращает список пользователей, связанных с указанным пользователем связью указанного типа.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя. </h
-	*
-	*
 	*
 	* @param char $relation  Тип связи: SONET_RELATIONS_FRIEND - друзья, SONET_RELATIONS_REQUEST - запрос на дружбу,
 	* SONET_RELATIONS_BAN - черный список.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив, определяющий список возвращаемых значений для
 	* постраничной навигации.
 	*
-	*
-	*
 	* @param bool $bActiveOnly = N Флаг активности. Необязательный параметр. По умолчанию равен N.
-	*
-	*
 	*
 	* @return CDBResult <p>Метод возвращает объект типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, содержащий
 	* список связей указанного типа.</p>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -338,14 +316,13 @@ class CAllSocNetUserRelations
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getrelatedusers.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getrelatedusers.php
 	* @author Bitrix
 	*/
 	public static function GetRelatedUsers($userID, $relation, $arNavStartParams = false, $bActiveOnly = "N")
@@ -394,15 +371,9 @@ class CAllSocNetUserRelations
 	* <p>Метод возвращает тип связи между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $firstUserID  Первый пользователь. </ht
 	*
-	*
-	*
 	* @param int $secondUserID  Второй пользователь. </htm
-	*
-	*
 	*
 	* @return char <p>Возвращается одно из следующих значений:<br><b>SONET_RELATIONS_FRIEND</b> -
 	* пользователи являются друзьями,<br><b>SONET_RELATIONS_REQUEST</b> - один из
@@ -411,7 +382,7 @@ class CAllSocNetUserRelations
 	* черный список,<br><b>false</b> - связи между пользователями нет.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/getrelation.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getrelation.php
 	* @author Bitrix
 	*/
 	public static function GetRelation($firstUserID, $secondUserID)
@@ -518,20 +489,14 @@ class CAllSocNetUserRelations
 	* <p>Проверяет, являются ли указанные пользователи друзьями.</p>
 	*
 	*
-	*
-	*
 	* @param int $firstUserID  Первый пользователь. </ht
 	*
-	*
-	*
 	* @param int $secondUserID  Второй пользователь. </htm
-	*
-	*
 	*
 	* @return bool <p>True, если пользователи являются друзьями. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/isfriends.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/isfriends.php
 	* @author Bitrix
 	*/
 	public static function IsFriends($firstUserID, $secondUserID)
@@ -585,20 +550,14 @@ class CAllSocNetUserRelations
 	* <p>Метод проверяет, являются ли указанные пользователи друзьями друзей. То есть есть ли у них хотя бы один общий друг.</p>
 	*
 	*
-	*
-	*
 	* @param int $firstUserID  Код первого пользователя.
 	*
-	*
-	*
 	* @param int $secondUserID  Код второго пользователя.
-	*
-	*
 	*
 	* @return bool <p>True, если пользователи имеют общего друга. Иначе - false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/isfriends2.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/isfriends2.php
 	* @author Bitrix
 	*/
 	public static function IsFriends2($firstUserID, $secondUserID)
@@ -742,25 +701,17 @@ class CAllSocNetUserRelations
 	* <p>Метод отправляет запрос на дружбу от одного пользователя другому.</p>
 	*
 	*
-	*
-	*
 	* @param int $senderUserID  Код пользователя, который направляет предложение дружбы.
-	*
-	*
 	*
 	* @param int $targetUserID  Код пользователя, которому направляют предложение дружбы.
 	*
-	*
-	*
 	* @param string $message  
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/sendrequesttobefriend.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/sendrequesttobefriend.php
 	* @author Bitrix
 	*/
 	public static function SendRequestToBeFriend($senderUserID, $targetUserID, $message)
@@ -880,27 +831,19 @@ class CAllSocNetUserRelations
 	* <p>Метод для принятия предложения дружбы.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя, которому было направлено предложение дружбы и
 	* который принимает это предложение.
 	*
-	*
-	*
 	* @param int $relationID  Код отношения между пользователями.
-	*
-	*
 	*
 	* @param bool $bAutoSubscribe = true Флаг автоподписки на события пользователя. Необязательный
 	* парамтер. По умолчанию равен true.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/confirmrequesttobefriend.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/confirmrequesttobefriend.php
 	* @author Bitrix
 	*/
 	public static function ConfirmRequestToBeFriend($senderUserID, $relationID, $bAutoSubscribe = true)
@@ -1022,22 +965,16 @@ class CAllSocNetUserRelations
 	* <p>Метод служит для отклонения запроса на дружбу.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя, которому был направлен запрос и который его
 	* отклоняет.
 	*
-	*
-	*
 	* @param int $relationID  Код связи.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/RejectRequestToBeFriend.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/RejectRequestToBeFriend.php
 	* @author Bitrix
 	*/
 	public static function RejectRequestToBeFriend($senderUserID, $relationID)
@@ -1118,21 +1055,15 @@ class CAllSocNetUserRelations
 	* <p>Метод удаляет отношение между пользователями.</p>
 	*
 	*
-	*
-	*
 	* @param int $senderUserID  Пользователь, удаляющий отношение.
 	*
-	*
-	*
 	* @param int $targetUserID  Пользователь, отношение с котором удаляется.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/deleterelation.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/deleterelation.php
 	* @author Bitrix
 	*/
 	public static function DeleteRelation($senderUserID, $targetUserID)
@@ -1227,21 +1158,15 @@ class CAllSocNetUserRelations
 	* <p>Метод заносит пользователя в черный список другого пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $senderUserID  Пользователь, который заносит в черный список.
 	*
-	*
-	*
 	* @param int $targetUserID  Пользователь, которого заносят в черный список.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/banuser.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/banuser.php
 	* @author Bitrix
 	*/
 	public static function BanUser($senderUserID, $targetUserID)
@@ -1375,22 +1300,16 @@ class CAllSocNetUserRelations
 	* <p>Метод исключает пользователя из черного списка другого пользователя.</p>
 	*
 	*
-	*
-	*
 	* @param int $senderUserID  Пользователь, который управляет черным списком.
-	*
-	*
 	*
 	* @param int $relationID  Код отношения между пользователем, который управляет черным
 	* списком, и пользователем, находящимся в черном списке.
-	*
-	*
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
 	* случае.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/unbanmember.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/unbanmember.php
 	* @author Bitrix
 	*/
 	public static function UnBanMember($senderUserID, $relationID)
@@ -1521,17 +1440,13 @@ class CAllSocNetUserRelations
 	* <p>Метод проверяет, есть ли новые изменения отношений у заданного пользователя. Проверка осуществляется без обращения к базе данных.</p>
 	*
 	*
-	*
-	*
 	* @param int $userID  Код пользователя. </h
-	*
-	*
 	*
 	* @return bool <p>True, если у пользователя есть новые изменения отношений. Иначе -
 	* false.</p> <br><br>
 	*
 	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/CSocNetUserRelations/speedfileexists.php
+	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/speedfileexists.php
 	* @author Bitrix
 	*/
 	public static function SpeedFileExists($userID)

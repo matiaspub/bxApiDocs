@@ -2,9 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/stateventtype.php");
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.</body> </html>
- *
- *
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>. 
  *
  *
  * @return mixed 
@@ -20,14 +18,9 @@ class CStatEventType extends CAllStatEventType
 	* <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу события</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $type_id  ID типа события.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -41,7 +34,6 @@ class CStatEventType extends CAllStatEventType
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -82,8 +74,6 @@ class CStatEventType extends CAllStatEventType
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a>.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_today_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID типа
 	* события; </li> <li> <b>s_date_last</b> - дата последнего <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> данного типа; </li> <li>
@@ -101,12 +91,8 @@ class CStatEventType extends CAllStatEventType
 	* "DIAGRAM_DEFAULT desc, TOTAL_COUNTER"; </li> <li> <b>s_stat</b> - сортировка по "TODAY_COUNTER desc,
 	* YESTERDAY_COUNTER desc, B_YESTERDAY_COUNTER desc, TOTAL_COUNTER desc, PERIOD_COUNTER". </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID типа события; </li> <li>
@@ -157,12 +143,8 @@ class CStatEventType extends CAllStatEventType
 	* <i>event2</i>. </li> </ul> </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
-	*
-	*
 	*
 	* @param mixed $limit = false Максимальное число типов событий которые будут выбраны в списке.
 	* Если значение равно "false", то кол-во РК будет ограничено в
@@ -170,10 +152,7 @@ class CStatEventType extends CAllStatEventType
 	* показываемых записей в таблицах</b> из настроек модуля
 	* "Статистика".
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -202,7 +181,6 @@ class CStatEventType extends CAllStatEventType
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -577,8 +555,6 @@ class CStatEventType extends CAllStatEventType
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a> в упрощённом виде.</p>
 	*
 	*
-	*
-	*
 	* @param string &$by = "s_event1" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID типа
 	* события; </li> <li> <b>s_event1</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
@@ -586,12 +562,8 @@ class CStatEventType extends CAllStatEventType
 	* <b>s_name</b> - название типа события; </li> <li> <b>s_description</b> - описание типа
 	* события. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID типа события; </li> <li>
@@ -611,15 +583,10 @@ class CStatEventType extends CAllStatEventType
 	* фильтрации по <b>KEYWORDS</b> будет искаться точное совпадение. </li> </ul> * -
 	* допускается <a href="http://www.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -644,7 +611,6 @@ class CStatEventType extends CAllStatEventType
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -761,20 +727,12 @@ public static 	function GetDropDownList($strSqlOrder="ORDER BY EVENT1, EVENT2")
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> указанного <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа</a> в разрезе по дням.</p>
 	*
 	*
-	*
-	*
 	* @param int $type_id  ID типа события.
-	*
-	*
 	*
 	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul><li> <b>s_date</b> - дата. </li></ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $max_min  Ссылка на массив содержащий максимальную и минимальную даты
 	* результирующего списка. Структура данного массива: <pre
@@ -784,17 +742,12 @@ public static 	function GetDropDownList($strSqlOrder="ORDER BY EVENT1, EVENT2")
 	* день максимальной даты (1-31) [MAX_MONTH] =&gt; месяц максимальной даты (1-12)
 	* [MAX_YEAR] =&gt; год максимальной даты )</pre>
 	*
-	*
-	*
 	* @param array $filter  Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>DATE1</b> - начальное значение
 	* интервала для поля "дата"; </li> <li> <b>DATE2</b> - конечное значение
 	* интервала для поля "дата". </li> </ul>
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -826,7 +779,6 @@ public static 	function GetDropDownList($strSqlOrder="ORDER BY EVENT1, EVENT2")
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

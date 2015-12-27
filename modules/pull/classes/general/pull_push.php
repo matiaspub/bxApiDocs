@@ -304,6 +304,10 @@ class CPullPush
 
 class CPushManager
 {
+	const SEND_IMMEDIATELY = 0;
+	const SEND_DEFERRED = 1;
+	const SEND_SKIP = 2;
+
 	public static $pushServices = false;
 	private static $remoteProviderUrl = "https://cloud-messaging.bitrix24.com/send/";
 
@@ -324,7 +328,6 @@ class CPushManager
 						self::$pushServices[$serv["ID"]] = $serv;
 				}
 			}
-
 		}
 	}
 
@@ -335,7 +338,7 @@ class CPushManager
 
 		global $DB;
 
-		if (isset($arParams['USER_ID']) && intval($arParams['USER_ID']) > 0)
+		if (isset($arParams['USER_ID']) && intval($arParams['USER_ID']) != 0)
 			$arFields['USER_ID'] = intval($arParams['USER_ID']);
 		else
 			return false;
@@ -343,8 +346,6 @@ class CPushManager
 		if (isset($arParams['MESSAGE']) && strlen(trim($arParams['MESSAGE'])) > 0)
 		{
 			$arFields['MESSAGE'] = str_replace(Array("\r\n", "\n\r", "\n", "\r"), " ", trim($arParams['MESSAGE']));
-			if (strlen($arFields['MESSAGE'])>110)
-				$arFields['MESSAGE'] = substr($arFields['MESSAGE'], 0, 105).' ...';
 		}
 
 		$arFields['TAG'] = '';
@@ -360,38 +361,57 @@ class CPushManager
 			$arFields['BADGE'] = intval($arParams['BADGE']);
 
 		$arFields['PARAMS'] = '';
-		if (isset($arParams['PARAMS']) && strlen(trim($arParams['PARAMS'])) > 0)
-			$arFields['PARAMS'] = $arParams['PARAMS'];
+		if (isset($arParams['PARAMS']))
+		{
+			if (is_array($arParams['PARAMS']) || strlen(trim($arParams['PARAMS'])) > 0)
+			{
+				$arFields['PARAMS'] = $arParams['PARAMS'];
+			}
+		}
+
 		if (strlen($arParams['SOUND']) > 0)
 			$arFields['SOUND'] = $arParams['SOUND'];
 
+		$arFields['APP_ID'] = (strlen($arParams['APP_ID']) > 0)? $arParams['APP_ID']: "Bitrix24";
 
-		if (isset($arParams['SEND_IMMEDIATELY']) && $arParams['SEND_IMMEDIATELY'] == 'Y' || !CUser::IsOnLine($arFields['USER_ID'], 120))
+		$sendMode = self::GetSendMode($arFields['USER_ID']);
+		if (isset($arParams['SEND_IMMEDIATELY']) && $arParams['SEND_IMMEDIATELY'] == 'Y' || $sendMode == self::SEND_IMMEDIATELY)
 		{
 			$arAdd = Array(
 				'USER_ID' => $arFields['USER_ID'],
 			);
+			if (is_array($arFields['PARAMS']))
+			{
+				if (isset($arFields['PARAMS']['CATEGORY']))
+				{
+					$arAdd['CATEGORY'] = $arFields['PARAMS']['CATEGORY'];
+					unset($arFields['PARAMS']['CATEGORY']);
+				}
+				$arAdd['PARAMS'] = json_encode($arFields['PARAMS']);
+			}
+			elseif (strlen($arFields['PARAMS']) > 0)
+			{
+				$arAdd['PARAMS'] = $arFields['PARAMS'];
+			}
 			if (strlen($arFields['MESSAGE']) > 0)
 				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
-			if (strlen($arFields['PARAMS']) > 0)
-				$arAdd['PARAMS'] = $arFields['PARAMS'];
 			if (intval($arFields['BADGE']) >= 0)
 				$arAdd['BADGE'] = $arFields['BADGE'];
-			if (strlen($arFields['APP_ID']) > 0)
-				$arAdd['APP_ID'] = $arFields['APP_ID'];
-			else
-				$arAdd['APP_ID'] = "Bitrix24";
-
 			if (strlen($arFields['SOUND']) > 0)
 				$arAdd['SOUND'] = $arFields['SOUND'];
 			if(strlen($arParams['EXPIRY']) > 0)
 				$arAdd['EXPIRY'] = $arParams['EXPIRY'];
 
+			$arAdd['APP_ID'] = $arFields['APP_ID'];
+
 			$CPushManager = new CPushManager();
 			$CPushManager->SendMessage(Array($arAdd));
 		}
-		else
+		else if ($sendMode == self::SEND_DEFERRED)
 		{
+			if (strlen($arFields['MESSAGE'])>250)
+				$arFields['MESSAGE'] = substr($arFields['MESSAGE'], 0, 250).' ...';
+
 			$arAdd = Array(
 				'USER_ID' => $arFields['USER_ID'],
 				'TAG' => $arFields['TAG'],
@@ -401,18 +421,18 @@ class CPushManager
 
 			if (strlen($arFields['MESSAGE']) > 0)
 				$arAdd['MESSAGE'] = $arFields['MESSAGE'];
-			if (strlen($arFields['PARAMS']) > 0)
+			if (is_array($arFields['PARAMS']))
+				$arAdd['PARAMS'] = json_encode($arFields['PARAMS']);
+			else if (strlen($arFields['PARAMS']) > 0)
 				$arAdd['PARAMS'] = $arFields['PARAMS'];
 			if (intval($arFields['BADGE']) >= 0)
 				$arAdd['BADGE'] = $arFields['BADGE'];
-			if (strlen($arFields['APP_ID']) > 0)
-				$arAdd['APP_ID'] = $arFields['APP_ID'];
-			else
-				$arAdd['APP_ID'] = "Bitrix24";
+
+			$arAdd['APP_ID'] = $arFields['APP_ID'];
 
 			$DB->Add("b_pull_push_queue", $arAdd, Array("PARAMS"));
 
-			CAgent::AddAgent("CPushManager::SendAgent();", "pull", "N", 30, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+30, "FULL"));
+			CAgent::AddAgent("CPushManager::SendAgent();", "pull", "N", 30, "", "Y", ConvertTimeStamp(time()+CTimeZone::GetOffset()+30, "FULL"), 100, false, false);
 		}
 
 		return true;
@@ -421,7 +441,7 @@ class CPushManager
 	public static function DeleteFromQueueByTag($userId, $tag)
 	{
 		global $DB;
-		if (strlen($tag) <= 0 || intval($userId) <= 0)
+		if (strlen($tag) <= 0 || intval($userId) == 0)
 			return false;
 
 		$strSql = "DELETE FROM b_pull_push_queue WHERE USER_ID = ".intval($userId)." AND TAG = '".$DB->ForSQL($tag)."'";
@@ -433,13 +453,61 @@ class CPushManager
 	public static function DeleteFromQueueBySubTag($userId, $tag)
 	{
 		global $DB;
-		if (strlen($tag) <= 0 || intval($userId) <= 0)
+		if (strlen($tag) <= 0 || intval($userId) == 0)
 			return false;
 
 		$strSql = "DELETE FROM b_pull_push_queue WHERE USER_ID = ".intval($userId)." AND SUB_TAG = '".$DB->ForSQL($tag)."'";
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
+	}
+
+	public static function GetSendMode($userId)
+	{
+		$result = self::SEND_IMMEDIATELY;
+
+		$isMobile = false;
+		if (CModule::IncludeModule('mobile'))
+		{
+			$isMobile = Bitrix\Mobile\User::checkOnline($userId);
+		}
+
+		$isDesktop = false;
+		$isDesktopIdle = false;
+		if (CModule::IncludeModule('im'))
+		{
+			$arOnline = CIMStatus::GetList(Array('ID' => $userId, 'SKIP_CHECK' => 'Y'));
+			$isOnline = isset($arOnline['users'][$userId]) && $arOnline['users'][$userId]['status'] != 'offline';
+
+			$isDesktop = CIMMessenger::CheckDesktopStatusOnline($userId);
+			if ($isDesktop && intval($arOnline['users'][$userId]['idle']) > 0)
+			{
+				$isDesktopIdle = true;
+			}
+		}
+		else
+		{
+			$isOnline = CUser::IsOnLine($userId, 120);
+		}
+
+		if ($isMobile)
+		{
+			$result = self::SEND_IMMEDIATELY;
+		}
+		else if ($isOnline)
+		{
+			$result = self::SEND_DEFERRED;
+			if ($isDesktop)
+			{
+				$result = self::SEND_SKIP;
+				if ($isDesktopIdle)
+				{
+					$result = self::SEND_IMMEDIATELY;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	public static function SendAgent()
@@ -469,6 +537,17 @@ class CPushManager
 		{
 			if ($arRes['BADGE'] == '')
 				unset($arRes['BADGE']);
+
+			$arRes['PARAMS'] = json_decode($arRes['PARAMS'], true);
+			if (is_array($arRes['PARAMS']))
+			{
+				if (isset($arRes['PARAMS']['CATEGORY']))
+				{
+					$arRes['CATEGORY'] = $arRes['PARAMS']['CATEGORY'];
+					unset($arRes['PARAMS']['CATEGORY']);
+				}
+				$arRes['PARAMS'] = json_encode($arRes['PARAMS']);
+			}
 
 			$arPush[$count][] = $arRes;
 			if ($pushLimit <= count($arPush[$count]))
@@ -537,7 +616,6 @@ class CPushManager
 		$arPushMessages = Array();
 		while($arDevice = $dbDevices->Fetch())
 		{
-
 			if(in_array($arDevice["DEVICE_TYPE"], $arServicesIDs))
 			{
 				$tmpMessage = $arTmpMessages["USER_" . $arDevice["USER_ID"]];

@@ -8,70 +8,36 @@
 
 class CSecurityXSSDetectVariables
 {
-
-	const PATTERN_DELIMITER = '~';
-
-	private $searchPatternsWithQuotes = array();
-	private $searchPatternsWithoutQuotes = array();
+	private $parsed = false;
+	private $searchValuesWithQuotes = array();
+	private $searchValuesWithoutQuotes = array();
 	private $originalValues = array();
 
 	/**
-	 * @param string $pName
-	 * @param string $pValue
+	 * @param string $name
+	 * @param string $value
 	 */
-	public function addVariable($pName, $pValue)
+	public function addVariable($name, $value)
 	{
-		$this->originalValues[$pName] = $pValue;
+		$this->originalValues[$name] = $value;
 	}
 
 	/**
-	 * @param string $pKey
 	 * @return array
 	 */
-	public function getQuoteSearchPattern($pKey = "")
+	public function getQuoteSearchValues()
 	{
 		$this->lazyParseVariables();
-		if(is_string($pKey) && $pKey != "")
-		{
-			return $this->searchPatternsWithQuotes[$pKey];
-		}
-		else
-		{
-			return $this->searchPatternsWithQuotes;
-		}
+		return $this->searchValuesWithQuotes;
 	}
 
 	/**
-	 * @param string $pKey
 	 * @return array
 	 */
-	public function getSearchPattern($pKey = "")
+	public function getSearchValues()
 	{
 		$this->lazyParseVariables();
-		if(is_string($pKey) && $pKey != "")
-		{
-			return $this->searchPatternsWithoutQuotes[$pKey];
-		}
-		else
-		{
-			return $this->searchPatternsWithoutQuotes;
-		}
-	}
-
-	/**
-	 * @param string $pKey
-	 * @return array
-	 */
-	public function getOriginalValue($pKey = "")
-	{
-		if(is_string($pKey) && $pKey != "")
-		{
-			return $this->originalValues[$pKey];
-		}
-		else
-		{
-			return $this->originalValues;
-		}
+		return $this->searchValuesWithoutQuotes;
 	}
 
 	/**
@@ -83,106 +49,67 @@ class CSecurityXSSDetectVariables
 	}
 
 	/**
-	 * @param string $pString
-	 * @return mixed
-	 */
-	protected static function removeComments($pString)
-	{
-		return preg_replace('/(
-				(?s:\\/\\*.*?\\*\\/)                                     # multiline comments
-				|
-				\\/\\/.*?(?:\\n|$)                                       # singleline comments
-			)/x', '', $pString);
-	}
-
-	/**
-	 * @param string $pString
-	 * @return string
-	 */
-	protected static function pregQuote($pString)
-	{
-		return preg_quote($pString, self::PATTERN_DELIMITER);
-	}
-
-	/**
-	 * @param string|array $pNeedle
-	 * @param bool $pIsQuotePattern
-	 * @return string
-	 */
-	protected static function getPattern($pNeedle, $pIsQuotePattern = false)
-	{
-		if(!is_array($pNeedle))
-		{
-			$needles = array($pNeedle);
-		}
-		else
-		{
-			$needles = $pNeedle;
-		}
-		$needles = array_map(array(__CLASS__,"pregQuote"), $needles);
-		$needles = array_filter($needles);
-
-		$pattern = self::PATTERN_DELIMITER;
-		if($pIsQuotePattern)
-			$pattern .= "(?<!\\\)";
-
-		$pattern .= "(".implode("|",$needles).")";
-		$pattern .= self::PATTERN_DELIMITER."i";
-		return $pattern;
-	}
-
-	/**
-	 * @param string $pName
-	 * @param string $pOriginalValue
-	 * @param string $pSearchPattern
-	 * @param bool $pIsEscapeVariable
+	 * @param string $value
+	 * @param bool $containsQuote
 	 * @return bool
 	 */
-	protected function pushVariable($pName, $pOriginalValue, $pSearchPattern, $pIsEscapeVariable = false)
+	protected function pushValue($value, $containsQuote = false)
 	{
-		if($pIsEscapeVariable)
-			$this->searchPatternsWithQuotes[$pName] = array("variable_len" => strlen($pOriginalValue), "pattern" => $pSearchPattern);
+		if($containsQuote)
+			$this->searchValuesWithQuotes[] = $value;
 		else
-			$this->searchPatternsWithoutQuotes[$pName] = array("variable_len" => strlen($pOriginalValue), "pattern" => $pSearchPattern);
+			$this->searchValuesWithoutQuotes[] = $value;
+
 		return true;
 	}
 
 	/**
-	 * @param string $pName
-	 * @param string $pValue
-	 * @return bool
+	 * @param string $name
+	 * @param string $value
 	 */
-	protected function parseVariable($pName, $pValue)
+	protected function parseVariable($name, $value)
 	{
-		if(!$pValue)
-			return true;
+		if(!$value)
+			return;
 
-		if(preg_match("/[^\\\](((\\\)(\\\))*+')+/s"," ".$pValue))
+		if(preg_match("/[^\\\](((\\\)(\\\))*+')+/s"," ".$value))
 		{
-			return $this->pushVariable(
-				$pName,
-				$pValue,
-				self::getPattern(array($pValue, htmlspecialcharsbx($pValue)), true),
+			$encodedValue = htmlspecialcharsbx($value);
+			$this->pushValue(
+				$value,
 				true
 			);
+
+			if ($encodedValue && $encodedValue !== $value)
+			{
+				$this->pushValue(
+					$encodedValue,
+					true
+				);
+			}
 		}
-		elseif(preg_match("/[^\\\](((\\\)(\\\))*+\")+/s"," ".$pValue))
+		elseif(preg_match("/[^\\\](((\\\)(\\\))*+\")+/s"," ".$value))
 		{
-			return $this->pushVariable(
-				$pName,
-				$pValue,
-				self::getPattern($pValue, true),
+			$this->pushValue(
+				$value,
 				true
 			);
 		}
 		else
 		{
-//			$value = self::removeComments($pValue);
-			return $this->pushVariable(
-				$pName,
-				$pValue,
-				self::getPattern(array($pValue, htmlspecialcharsbx($pValue)))
+			$encodedValue = htmlspecialcharsbx($value);
+			$this->pushValue(
+					$value,
+					false
 			);
+
+			if ($encodedValue && $encodedValue !== $value)
+			{
+				$this->pushValue(
+					$encodedValue,
+					false
+				);
+			}
 		}
 	}
 
@@ -191,14 +118,13 @@ class CSecurityXSSDetectVariables
 	 */
 	protected function lazyParseVariables()
 	{
-		$isVariablesNotParsed = empty($this->searchPatternsWithQuotes) && empty($this->searchPatternsWithoutQuotes);
-		$isAnyVariableExist = !empty($this->originalValues);
-		if($isVariablesNotParsed && $isAnyVariableExist)
+		if ($this->parsed)
+			return;
+
+		$this->parsed = true;
+		foreach($this->originalValues as $name => $value)
 		{
-			foreach($this->originalValues as $name => $value)
-			{
-				$this->parseVariable($name, $value);
-			}
+			$this->parseVariable($name, $value);
 		}
 	}
 }

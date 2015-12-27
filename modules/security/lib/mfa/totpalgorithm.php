@@ -174,11 +174,14 @@ class TotpAlgorithm
 		if ($offset === self::SYNC_WINDOW)
 			throw new OtpException('Cannot synchronize this secret key with the provided password values.');
 
-		return $offset;
+		return sprintf('%d:%d', $offset, 0);
 	}
 
 	/**
-	 * {@inheritdoc}
+	 * Returns algorithm description:
+	 *  string type
+	 *  string title
+	 *  bool required_two_code
 	 *
 	 * @return array
 	 */
@@ -186,7 +189,8 @@ class TotpAlgorithm
 	{
 		return array(
 			'type' => static::$type,
-			'title' => Loc::getMessage('SECURITY_TOTP_TITLE')
+			'title' => Loc::getMessage('SECURITY_TOTP_TITLE'),
+			'required_two_code' => false
 		);
 	}
 }

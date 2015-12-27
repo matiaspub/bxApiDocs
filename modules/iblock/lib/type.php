@@ -123,4 +123,39 @@ class TypeTable extends Entity\DataManager
 			new Entity\Validator\Length(null, 255),
 		);
 	}
+
+	/**
+	 * Deletes information blocks of given type
+	 * and language messages from TypeLanguageTable
+	 *
+	 * @param \Bitrix\Main\Entity\Event $event Contains information about iblock type being deleted.
+	 *
+	 * @return \Bitrix\Main\Entity\EventResult
+	 */
+	public static function onDelete(\Bitrix\Main\Entity\Event $event)
+	{
+		$id = $event->getParameter("id");
+
+		//Delete information blocks
+		$iblockList = IblockTable::getList(array(
+			"select" => array("ID"),
+			"filter" => array(
+				"=IBLOCK_TYPE_ID" => $id["ID"],
+			),
+			"order" => array("ID" => "DESC")
+		));
+		while ($iblock = $iblockList->fetch())
+		{
+			$iblockDeleteResult = IblockTable::delete($iblock["ID"]);
+			if (!$iblockDeleteResult->isSuccess())
+			{
+				return $iblockDeleteResult;
+			}
+		}
+
+		//Delete language messages
+		$result = TypeLanguageTable::deleteByIblockTypeId($id["ID"]);
+
+		return $result;
+	}
 }

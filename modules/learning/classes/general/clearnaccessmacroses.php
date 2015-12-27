@@ -338,7 +338,9 @@ class CLearnAccessMacroses
 	{
 		static $arCache = array();
 
-		$cacheKey = ((int) $courseLessonId) . '|' . ((int) $userId);
+		$userId = intval($userId);
+		$courseLessonId = intval($courseLessonId);
+		$cacheKey = $courseLessonId."|".$userId;
 
 		if ( ! array_key_exists($cacheKey, $arCache) )
 		{
@@ -348,44 +350,58 @@ class CLearnAccessMacroses
 					'ACTIVE'           => 'Y',
 					'MEMBER_ID'        => $userId,
 					'COURSE_LESSON_ID' => $courseLessonId,
-					'<=ACTIVE_FROM'    => ConvertTimeStamp(false,'FULL'),
-					'>=ACTIVE_TO'      => ConvertTimeStamp(false,'FULL')
+					'ACTIVE_DATE'      => 'Y'
 				),
 				array('ID', 'MEMBER_ID', 'ACTIVE_FROM', 'ACTIVE_TO')	// $arSelect
 			);
 
+			$minActiveFrom = null;
+			$minActiveFromFound = false;
 			$minActiveFromTs = PHP_INT_MAX;
-			$maxActiveToTs   = 0;
-			$minActiveFrom   = null;
-			$maxActiveTo     = null;
+			$maxActiveTo = null;
+			$maxActiveToFound = false;
+			$maxActiveToTs = 0;
 
+			$exists = false;
 			$arGroupsActiveFrom = array();
 			while ($ar = $rs->fetch())
 			{
-				$activeToTs   = MakeTimeStamp($ar['ACTIVE_TO']);
-				$activeFromTs = MakeTimeStamp($ar['ACTIVE_FROM']);
-
-				if ($activeFromTs < $minActiveFromTs)
-				{
-					$minActiveFrom   = $ar['ACTIVE_FROM'];
-					$minActiveFromTs = $activeFromTs;
-				}
-
-				if ($activeToTs > $maxActiveToTs)
-				{
-					$maxActiveTo   = $ar['ACTIVE_TO'];
-					$maxActiveToTs = $activeToTs;
-				}
-
+				$exists = true;
 				$arGroupsActiveFrom[$ar['ID']] = $ar['ACTIVE_FROM'];
+
+				if ($ar['ACTIVE_FROM'] === null)
+				{
+					$minActiveFrom = null;
+					$minActiveFromFound = true;
+				}
+				elseif (!$minActiveFromFound)
+				{
+					$activeFromTs = MakeTimeStamp($ar['ACTIVE_FROM']);
+					if ($activeFromTs < $minActiveFromTs)
+					{
+						$minActiveFrom   = $ar['ACTIVE_FROM'];
+						$minActiveFromTs = $activeFromTs;
+					}
+				}
+
+				if ($ar['ACTIVE_TO'] === null)
+				{
+					$maxActiveTo = null;
+					$maxActiveToFound = true;
+				}
+				elseif (!$maxActiveToFound)
+				{
+					$activeToTs = MakeTimeStamp($ar['ACTIVE_TO']);
+					if ($activeToTs > $maxActiveToTs)
+					{
+						$maxActiveTo   = $ar['ACTIVE_TO'];
+						$maxActiveToTs = $activeToTs;
+					}
+				}
 			}
 
-			$bExists = false;
-			if (($minActiveFrom !== null) && ($maxActiveTo !== null))
-				$bExists = true;
-
 			$arPeriod = array(
-				'IS_EXISTS'   => $bExists,
+				'IS_EXISTS'   => $exists,
 				'ACTIVE_FROM' => $minActiveFrom,
 				'ACTIVE_TO'   => $maxActiveTo,
 				'GROUPS_ACTIVE_FROM' => $arGroupsActiveFrom
@@ -403,12 +419,12 @@ class CLearnAccessMacroses
 	public static function getActiveLearningChaptersPeriod($courseLessonId, $userId)
 	{
 		$arGroupsPeriods = self::getActiveLearningGroupsPeriod($courseLessonId, $userId);
-
 		if (!$arGroupsPeriods['IS_EXISTS'])
+		{
 			return false;
+		}
 
 		$arChaptersActiveFrom = array();
-
 		$arGroupsActiveFrom = $arGroupsPeriods['GROUPS_ACTIVE_FROM'];
 
 		$arLessons = array();
@@ -419,6 +435,7 @@ class CLearnAccessMacroses
 			array('LESSON_ID')
 		);
 
+		$arMinChaptersActiveFromTimestamp = array();
 		while ($ar = $rs->fetch())
 		{
 			$arLessons[$ar['LESSON_ID']] = $ar['NAME'];
@@ -429,6 +446,10 @@ class CLearnAccessMacroses
 		// Get the nearest dates, when lesson can be opened
 		foreach ($arGroupsActiveFrom as $groupId => $groupActiveFrom)
 		{
+			if ($groupActiveFrom === null)
+			{
+				continue;
+			}
 
 			$arDelays = CLearningGroupLesson::getDelays($groupId, array_keys($arLessons));
 			$groupActiveFromTs = MakeTimeStamp($groupActiveFrom);
@@ -447,5 +468,58 @@ class CLearnAccessMacroses
 		}
 
 		return ($arChaptersActiveFrom);
+	}
+
+	public static function CanViewAdminMenu()
+    {
+		global $USER;
+
+		if ($USER->IsAdmin())
+		{
+			return true;
+		}
+
+		$oAccess = CLearnAccess::GetInstance($USER->GetID());
+		if (
+			$oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_READ)
+			&& (
+				$oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_CREATE)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_WRITE)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_REMOVE)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_CREATE)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_LINK_TO_PARENTS)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_UNLINK_FROM_PARENTS)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_LINK_DESCENDANTS)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_UNLINK_DESCENDANTS)
+				|| $oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_MANAGE_RIGHTS)
+			)
+		)
+		{
+			return true;
+		}
+
+		if ($oAccess->IsBaseAccess(CLearnAccess::OP_LESSON_CREATE))
+		{
+			return true;
+		}
+
+		$db = CCourse::GetList(
+			array(),
+			array(
+				"CHECK_PERMISSIONS" => "Y",
+				"ACCESS_OPERATIONS" =>
+					CLearnAccess::OP_LESSON_CREATE |
+					CLearnAccess::OP_LESSON_WRITE |
+					CLearnAccess::OP_LESSON_REMOVE |
+					CLearnAccess::OP_LESSON_LINK_TO_PARENTS |
+					CLearnAccess::OP_LESSON_UNLINK_FROM_PARENTS |
+					CLearnAccess::OP_LESSON_LINK_DESCENDANTS |
+					CLearnAccess::OP_LESSON_UNLINK_DESCENDANTS |
+					CLearnAccess::OP_LESSON_MANAGE_RIGHTS
+			),
+			array("nTopCount" => 1)
+		);
+
+		return $db->Fetch() !== false;
 	}
 }

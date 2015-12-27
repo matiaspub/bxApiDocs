@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/s
 
 
 /**
- * Класс для индексирования сайта и осуществления поиска по индексу</body> </html>
- *
- *
+ * Класс для индексирования сайта и осуществления поиска по индексу 
  *
  *
  * @return mixed 
@@ -406,8 +404,6 @@ class CSearch extends CAllSearch
 		if($limit < 1)
 			$limit = 500;
 
-		$strSelect = "SELECT ".($bDistinct? "DISTINCT": "")."\n".implode("\n,", $arSelect);
-
 		$strRatingJoin = "";
 		if(
 			($this->flagsUseRatingSort & 0x01)
@@ -430,8 +426,22 @@ class CSearch extends CAllSearch
 			}
 
 			if($RATING_MAX != 0 || $RATING_MIN != 0)
+			{
+				$arSelectOuter = array();
+				$arSelectOuterFields = array(
+					"BODY",
+				);
+				foreach ($arSelectOuterFields as $outerField)
+				{
+					$arSelectOuter[$outerField] = $arSelect[$outerField];
+					unset($arSelect[$outerField]);
+				}
+
+				$strSelectOuter = "SELECT sc0.*".($arSelectOuter? ", ".implode(", ", $arSelectOuter): "");
+				$strSelectInner = "SELECT ".($bDistinct? "DISTINCT": "")."\n".implode("\n,", $arSelect);
+
 				return "
-					SELECT sc.*, sc.RANK +
+					".$strSelectOuter.", sc0.RANK +
 						if(rv.TOTAL_VALUE > 0, ".($RATING_MAX > 0? "rv.TOTAL_VALUE/".$RATING_MAX: "0").",
 						if(rv.TOTAL_VALUE < 0, ".($RATING_MIN < 0? "rv.TOTAL_VALUE/".abs($RATING_MIN): "0").",
 						0
@@ -444,14 +454,17 @@ class CSearch extends CAllSearch
 					,rv.TOTAL_NEGATIVE_VOTES RATING_TOTAL_NEGATIVE_VOTES
 					,rv.TOTAL_VALUE RATING_TOTAL_VALUE
 					FROM (
-					".$strSelect."
-					,sc.ENTITY_TYPE_ID, sc.ENTITY_ID
+					".$strSelectInner."
 					".$strSql.$strSort."\nLIMIT ".$limit."
-					) sc
+					) sc0
+					INNER JOIN b_search_content sc ON sc.ID = sc0.ID
 					LEFT JOIN b_rating_voting rv ON rv.ENTITY_TYPE_ID = sc.ENTITY_TYPE_ID AND rv.ENTITY_ID = sc.ENTITY_ID
 					LEFT JOIN b_rating_vote rvv ON rvv.ENTITY_TYPE_ID = sc.ENTITY_TYPE_ID AND rvv.ENTITY_ID = sc.ENTITY_ID AND rvv.USER_ID = ".intval($USER->GetId())."
 				".str_replace(" RANK", " SRANK", $strSort);
+			}
 		}
+
+		$strSelect = "SELECT ".($bDistinct? "DISTINCT": "")."\n".implode("\n,", $arSelect);
 
 		return $strSelect."\n".$strSql.$strSort."\nLIMIT ".$limit;
 	}

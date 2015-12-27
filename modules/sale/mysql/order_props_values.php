@@ -6,21 +6,18 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/order_props
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsvalue/index.php
  * @author Bitrix
+ * @deprecated
  */
 class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 {
 	
 	/**
-	* <p>Функция возвращает результат выборки записей из заказов в соответствии со своими параметрами.</p>
-	*
-	*
+	* <p>Метод возвращает результат выборки записей из заказов в соответствии со своими параметрами. Метод динамичный.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
@@ -35,8 +32,6 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* первому элементу, потом результат сортируется по второму и
 	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
-	*
-	*
 	*
 	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи значений
 	* свойств. Массив имеет вид: <pre class="syntax">array(
@@ -63,8 +58,6 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* свойства) начинается с SH".<br><br> Значение по умолчанию - пустой
 	* массив array() - означает, что результат отфильтрован не будет.
 	*
-	*
-	*
 	* @param array $arGroupBy = false Массив полей, по которым группируются записи значений свойств.
 	* Массив имеет вид: <pre class="syntax"> array("название_поля1",
 	* "группирующая_функция2" =&gt; "название_поля2", . . .)</pre> В качестве
@@ -73,28 +66,22 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* подсчет количества;</li> <li> <b>AVG</b> - вычисление среднего значения;</li>
 	* <li> <b>MIN</b> - вычисление минимального значения;</li> <li> <b> MAX</b> -
 	* вычисление максимального значения;</li> <li> <b>SUM</b> - вычисление
-	* суммы.</li> </ul> Если массив пустой, то функция вернет число записей,
+	* суммы.</li> </ul> Если массив пустой, то метод вернет число записей,
 	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
 	* означает, что результат группироваться не будет.
 	*
-	*
-	*
 	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
-	* <li>"<b>nTopCount</b>" - количество возвращаемых функцией записей будет
+	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
 	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
 	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
-	*
-	*
-	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены функцией. Можно
+	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
 	* присутствует значение "*", то будут возвращены все доступные
 	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий набор
 	* ассоциативных массивов параметров значений свойств с ключами:</p>
@@ -103,9 +90,8 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* заказа.</td> </tr> <tr> <td>ORDER_PROPS_ID</td> <td>Код свойства.</td> </tr> <tr> <td>NAME</td>
 	* <td>Название свойства.</td> </tr> <tr> <td>VALUE</td> <td>Значение свойства.</td> </tr>
 	* <tr> <td>CODE</td> <td>Символьный код свойства.</td> </tr> </table> <p>Если в качестве
-	* параметра arGroupBy передается пустой массив, то функция вернет число
+	* параметра arGroupBy передается пустой массив, то метод вернет число
 	* записей, удовлетворяющих фильтру.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -178,7 +164,6 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 				"ORDER_ID" => array("FIELD" => "V.ORDER_ID", "TYPE" => "int"),
 				"ORDER_PROPS_ID" => array("FIELD" => "V.ORDER_PROPS_ID", "TYPE" => "int"),
 				"NAME" => array("FIELD" => "V.NAME", "TYPE" => "string"),
-				"VALUE" => array("FIELD" => "V.VALUE", "TYPE" => "string"),
 				"CODE" => array("FIELD" => "V.CODE", "TYPE" => "string"),
 				"PROP_ID" => array("FIELD" => "P.ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_sale_order_props P ON (V.ORDER_PROPS_ID = P.ID)"),
 				"PROP_PERSON_TYPE_ID" => array("FIELD" => "P.PERSON_TYPE_ID", "TYPE" => "int", "FROM" => "LEFT JOIN b_sale_order_props P ON (V.ORDER_PROPS_ID = P.ID)"),
@@ -203,6 +188,8 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 				"PROP_UTIL" => array("FIELD" => "P.UTIL", "TYPE" => "char", "FROM" => "LEFT JOIN b_sale_order_props P ON (V.ORDER_PROPS_ID = P.ID)"),
 			);
 		// <-- FIELDS
+
+		CSaleOrderPropsValue::addPropertyValueField('V', $arFields, $arSelectFields);
 
 		$arSqls = CSaleOrder::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 
@@ -285,9 +272,7 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 
 	
 	/**
-	* <p>Функция добавляет новое значение свойства к заказу на основании параметров arFields </p>
-	*
-	*
+	* <p>Метод добавляет новое значение свойства к заказу на основании параметров arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров значения свойства, ключами в
@@ -298,11 +283,8 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* (обязательное);</li> <li> <b>VALUE</b> - значение свойства;</li> <li> <b>CODE</b> -
 	* символьный код свойства.</li> </ul>
 	*
-	*
-	*
-	* @return int <p>Функция возвращает код добавленного значения свойства или
-	* <i>false</i> в случае ошибки.</p> <a name="examples"></a>
-	*
+	* @return int <p>Метод возвращает код добавленного значения свойства или <i>false</i>
+	* в случае ошибки.</p> <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -350,6 +332,9 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 		if (!CSaleOrderPropsValue::CheckFields("ADD", $arFields, 0))
 			return false;
 
+		// translate here
+		$arFields['VALUE'] = self::translateLocationIDToCode($arFields['VALUE'], $arFields['ORDER_PROPS_ID']);
+
 		$arInsert = $DB->PrepareInsert("b_sale_order_props_value", $arFields);
 
 		$strSql =
@@ -365,14 +350,10 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 
 	
 	/**
-	* <p>Функция возвращает набор значений свойств для заказа с кодом ORDER_ID. Кроме параметров значений свойств возвращаются также некоторые связанные значения. </p>
-	*
-	*
+	* <p>Метод возвращает набор значений свойств для заказа с кодом ORDER_ID. Кроме параметров значений свойств возвращаются также некоторые связанные значения. Метод динамичный.</p>
 	*
 	*
 	* @param int $ORDER_ID  Код заказа.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы параметров значений свойств заказа (и сопутствующие
@@ -396,7 +377,6 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 	* сортировки группы свойств заказа, названию группы свойств
 	* заказа, индексу сортировки свойства заказа, названию свойства
 	* заказа.</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -472,12 +452,13 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 		$ORDER_ID = IntVal($ORDER_ID);
 
 		$strSql =
-			"SELECT PV.ID, PV.ORDER_ID, PV.ORDER_PROPS_ID, PV.NAME, PV.VALUE, PV.CODE, ".
+			"SELECT PV.ID, PV.ORDER_ID, PV.ORDER_PROPS_ID, PV.NAME, ".self::getPropertyValueFieldSelectSql().", PV.CODE, ".
 			"	P.NAME as PROPERTY_NAME, P.TYPE, P.PROPS_GROUP_ID, P.INPUT_FIELD_LOCATION, PG.NAME as GROUP_NAME, ".
 			"	P.IS_LOCATION, P.IS_EMAIL, P.IS_PROFILE_NAME, P.IS_PAYER, PG.SORT as GROUP_SORT, P.ACTIVE, P.UTIL ".
 			"FROM b_sale_order_props_value PV ".
 			"	LEFT JOIN b_sale_order_props P ON (PV.ORDER_PROPS_ID = P.ID) ".
 			"	LEFT JOIN b_sale_order_props_group PG ON (P.PROPS_GROUP_ID = PG.ID) ".
+			self::getLocationTableJoinSql().
 			"WHERE PV.ORDER_ID = ".$ORDER_ID." ".
 			"ORDER BY PG.SORT, PG.NAME, P.SORT, P.NAME, P.ID ";
 
@@ -511,13 +492,17 @@ class CSaleOrderPropsValue extends CAllSaleOrderPropsValue
 		if (strlen($strWhere) > 0)
 			$strWhere = " AND (".$strWhere.") ";
 
+		// locations kept in CODEs, but must be shown as IDs
+		$lMig = CSaleLocation::isLocationProMigrated();
+
 		$strSql =
-			"SELECT DISTINCT PV.ID, PV.ORDER_ID, PV.ORDER_PROPS_ID, PV.NAME, PV.VALUE, PV.CODE, ".
+			"SELECT DISTINCT PV.ID, PV.ORDER_ID, PV.ORDER_PROPS_ID, PV.NAME, ".self::getPropertyValueFieldSelectSql().", PV.CODE, ".
 			"	P.NAME as PROPERTY_NAME, P.TYPE, P.PROPS_GROUP_ID, P.INPUT_FIELD_LOCATION, PG.NAME as GROUP_NAME, ".
 			"	P.IS_LOCATION, P.IS_EMAIL, P.IS_PROFILE_NAME, P.IS_PAYER, PG.SORT as GROUP_SORT, P.ACTIVE, P.UTIL ".
 			"FROM b_sale_order_props_value PV ".
 			"	LEFT JOIN b_sale_order_props P ON (PV.ORDER_PROPS_ID = P.ID) ".
 			"	LEFT JOIN b_sale_order_props_group PG ON (P.PROPS_GROUP_ID = PG.ID) ".
+			self::getLocationTableJoinSql().
 			$strJoin.
 			"WHERE PV.ORDER_ID = ".$ORDER_ID." ".
 			$strWhere.

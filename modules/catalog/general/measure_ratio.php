@@ -1,5 +1,8 @@
 <?
-IncludeModuleLangFile(__FILE__);
+use Bitrix\Main,
+	Bitrix\Main\Localization\Loc;
+
+Loc::getMessage(__FILE__);
 
 class CCatalogMeasureRatioAll
 {
@@ -22,7 +25,7 @@ class CCatalogMeasureRatioAll
 
 	public static function update($id, $arFields)
 	{
-		$id = intval($id);
+		$id = (int)$id;
 		if($id < 0 || !self::checkFields('UPDATE', $arFields))
 			return false;
 		global $DB;
@@ -39,7 +42,7 @@ class CCatalogMeasureRatioAll
 	public static function delete($id)
 	{
 		global $DB;
-		$id = intval($id);
+		$id = (int)$id;
 		if($id > 0)
 		{
 			if($DB->Query("DELETE FROM b_catalog_measure_ratio WHERE ID = ".$id, true))

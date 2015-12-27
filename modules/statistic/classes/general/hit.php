@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</body> </html>
- *
- *
+ * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>. 
  *
  *
  * @return mixed 
@@ -16,9 +14,7 @@ class CHit
 {
 	
 	/**
-	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.</p>
-	*
-	*
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>. Число выводимых строк определяется в поле <b>Максимальное кол-во показываемых записей в таблицах</b> в <a href="http://dev.1c-bitrix.ru/user_help/statistic/settings.php" >настройках модуля</a> Веб-аналитика.</p>
 	*
 	*
 	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID хита; </li>
@@ -32,12 +28,8 @@ class CHit
 	* посетителя; </li> <li> <b>s_url</b> - страница хита; </li> <li> <b>s_country_id</b> - ID
 	* страны посетителя. </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID хита; </li> <li> <b>ID_EXACT_MATCH</b> -
@@ -85,15 +77,10 @@ class CHit
 	* <b>SITE_ID</b> будет искаться вхождение. </li> </ul> <br> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка хитов. Если значение равно "true", то
 	* список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -118,7 +105,6 @@ class CHit
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -292,14 +278,9 @@ class CHit
 	* <p>Возвращает данные по указанному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хиту</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>.</p>
 	*
 	*
-	*
-	*
 	* @param int $hit_id  ID хита.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -313,7 +294,6 @@ class CHit
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

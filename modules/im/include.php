@@ -1,11 +1,13 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 42);
+// define("IM_REVISION", 61);
+// define("IM_MOBILE_REVISION", 3);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
-// define("IM_MESSAGE_GROUP", "G");
+// define("IM_MESSAGE_CHAT", "C");
+// define("IM_MESSAGE_OPEN", "O");
 
 // define("IM_NOTIFY_CONFIRM", 1);
 // define("IM_NOTIFY_FROM", 2);
@@ -36,9 +38,13 @@ IncludeModuleLangFile(__FILE__);
 // define("IM_SPEED_MESSAGE", 2);
 // define("IM_SPEED_GROUP", 3);
 
-// define("IM_FEATURE_DESKTOP", "DESKTOP");
-// define("IM_FEATURE_XMPP", "XMPP");
-// define("IM_FEATURE_MAIL", "MAIL");
+// define("IM_NOTIFY_FEATURE_SITE", "site");
+// define("IM_NOTIFY_FEATURE_XMPP", "xmpp");
+// define("IM_NOTIFY_FEATURE_MAIL", "mail");
+// define("IM_NOTIFY_FEATURE_PUSH", "push");
+
+//legacy
+// define("IM_MESSAGE_GROUP", "C");
 
 global $DBType;
 
@@ -67,23 +73,47 @@ CModule::AddAutoloadClasses(
 	)
 );
 
-$jsCoreRel = array('popup', 'ajax', 'fx', 'ls', 'date', 'json', 'webrtc', 'uploader', 'canvas');
+CJSCore::RegisterExt('im_common', array(
+	'js' => '/bitrix/js/im/common.js',
+	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_common.php',
+	'rel' => array('ls', 'ajax', 'date')
+));
+
+$jsCoreRel = array('im_common', 'popup', 'fx', 'json');
 if (IsModuleInstalled('voximplant'))
+{
 	$jsCoreRel[] = 'voximplant';
+}
 if (IsModuleInstalled('disk'))
+{
 	$jsCoreRel[] = 'file_dialog';
+}
+if (IsModuleInstalled('pull'))
+{
+	$jsCoreRel[] = 'webrtc';
+}
+if (IsModuleInstalled('pull') || IsModuleInstalled('disk'))
+{
+	$jsCoreRel[] = 'uploader';
+}
 
 CJSCore::RegisterExt('im', array(
 	'js' => '/bitrix/js/im/im.js',
-	'css' => '/bitrix/js/im/css/messenger.css',
+	'css' => '/bitrix/js/im/css/im.css',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_im.php',
 	'rel' => $jsCoreRel
 ));
 
-CJSCore::RegisterExt('desktop', array(
+CJSCore::RegisterExt('im_mobile', array(
+	'js' => '/bitrix/js/im/mobile.js',
+	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_mobile.php',
+	'rel' => array('im_common', 'uploader')
+));
+
+CJSCore::RegisterExt('im_desktop', array(
 	'js' => '/bitrix/js/im/desktop.js',
 	'css' => '/bitrix/js/im/css/desktop.css',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_desktop.php',
-	'rel' => array('popup', 'ajax', 'fx', 'ls', 'date', 'json'),
+	'rel' => array('ls', 'ajax', 'date', 'popup', 'fx', 'json'),
 ));
 ?>

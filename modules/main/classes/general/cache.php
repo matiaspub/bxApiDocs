@@ -42,23 +42,16 @@ class CPHPCache
 
 	
 	/**
-	* <p>Функция очищает кеш по параметру <b>basedir</b>. Она подходит для сброса memcached-данных.</p>
+	* <p>Метод очищает кеш по параметру <b>basedir</b>. Она подходит для сброса memcached-данных. Динамичный метод.</p>
 	*
 	*
+	* @param mixed $initdir = false По умолчанию <i>false</i>
 	*
-	*
-	* @param $initdi $r = false По умолчанию <i>false</i>
-	*
-	*
-	*
-	* @param $basedi $r = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
+	* @param mixed $basedir = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
 	* сохраняется в <code>/BX_PERSONAL_ROOT/cache/</code>, где <b>BX_PERSONAL_ROOT</b> по умолчанию
 	* равен <b>bitrix</b>.
 	*
-	*
-	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -77,36 +70,25 @@ class CPHPCache
 
 	
 	/**
-	* <p>Инициализирует ряд свойств объекта класса CPHPCache. Если файл кеша отсутствует или истек период его жизни, то функция вернет "false", в противном случае функция вернет "true".</p>
-	*
-	*
+	* <p>Инициализирует ряд свойств объекта класса CPHPCache. Если файл кеша отсутствует или истек период его жизни, то метод вернет "false", в противном случае метод вернет "true". Динамичный метод.</p>
 	*
 	*
 	* @param int $TTL  Время жизни кеша в секундах.
 	*
-	*
-	*
 	* @param string $uniq_str  Уникальный идентификатор кеша. В этот идентификатор должны
 	* входить все параметры которые могут повлиять на результат
 	* исполнения кешируемого кода.
-	*
-	*
 	*
 	* @param mixed $initdir = false Папка, в которой хранится кеш компонента, относительно
 	* <i>/bitrix/cache/</i>. Если значение - "/", то кеш будет действительным для
 	* всех каталогов сайта. <br>Необязательный. По умолчанию - текущий
 	* каталог.
 	*
-	*
-	*
 	* @param string $basedir = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
 	* сохраняется в <code>/BX_PERSONAL_ROOT/cache/</code>, где BX_PERSONAL_ROOT по умолчанию
 	* равен bitrix.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -153,7 +135,6 @@ class CPHPCache
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a></li> <li><a
@@ -173,13 +154,10 @@ class CPHPCache
 
 	
 	/**
-	* <p>Выводит HTML содержимое кеша.</p>
-	*
-	*
+	* <p>Выводит HTML содержимое кеша. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -235,7 +213,6 @@ class CPHPCache
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li><a
@@ -255,13 +232,10 @@ class CPHPCache
 
 	
 	/**
-	* <p>Возвращает PHP переменные сохраненные в кеше.</p>
-	*
-	*
+	* <p>Возвращает PHP переменные сохраненные в кеше. Динамичный метод.</p>
 	*
 	*
 	* @return array 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -308,7 +282,6 @@ class CPHPCache
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li><a
@@ -328,50 +301,37 @@ class CPHPCache
 
 	
 	/**
-	* <p>Начинает буферизацию выводимого HTML, либо выводит содержимое кеша если он ещё не истек. Если файл кеша истек, то функция возвращает "true", в противном случае - "false".</p>
-	*
-	*
+	* <p>Начинает буферизацию выводимого HTML, либо выводит содержимое кеша если он ещё не истек. Если файл кеша истек, то метод возвращает "true", в противном случае - "false". Динамичный метод.</p>
 	*
 	*
 	* @param int $TTL = false Время жизни кеша в секундах.<br> Необязательный. По умолчанию -
-	* время жизни кеша предварительно заданное в функции <a
+	* время жизни кеша предварительно заданное в методе <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">InitCache</a>.
-	*
-	*
 	*
 	* @param string $uniq_str = false Уникальный идентификатор кеша. В этот идентификатор должны
 	* входить все параметры которые могут повлиять на результат
 	* исполнения кешируемого кода.<br> Необязательный. По умолчанию -
-	* уникальный идентификатор кеша предварительно заданный в функции
+	* уникальный идентификатор кеша предварительно заданный в методе
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
-	*
-	*
 	*
 	* @param mixed $initdir = false Папка, в которой хранится кеш компонента, относительно
 	* <i>/bitrix/cache/</i>. Если значение - "/", то кеш будет действительным для
 	* всех каталогов сайта.<br> Необязательный. По умолчанию - имя
-	* каталога предварительно заданное в функции <a
+	* каталога предварительно заданное в методе <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/initcache.php">CPHPCache::InitCache</a>.
-	*
-	*
 	*
 	* @param array $vars = array() Массив переменных, которые необходимо закешировать, вида: <pre>array(
 	* "ИМЯ ПЕРЕМЕННОЙ 1" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 1", "ИМЯ ПЕРЕМЕННОЙ 2" =&gt;
 	* "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 2", ...)</pre> Непосредственно запись переменных
-	* в файл кеша осуществляется функцией <a
+	* в файл кеша осуществляется методом <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/enddatacache.php">CPHPCache::EndDataCache</a>.<br>
 	* Необязательный. По умолчанию - пустой массив.
-	*
-	*
 	*
 	* @param string $basedir = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
 	* сохраняется в <code>/BX_PERSONAL_ROOT/cache/</code>, где BX_PERSONAL_ROOT по умолчанию
 	* равен bitrix.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -418,7 +378,6 @@ class CPHPCache
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li> <a
@@ -460,21 +419,16 @@ class CPHPCache
 	 */
 	
 	/**
-	* <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске вместе с заданным массивом переменных в файл кеша.</p>
-	*
-	*
+	* <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске вместе с заданным массивом переменных в файл кеша. Динамичный метод.</p>
 	*
 	*
 	* @param mixed $vars = false Массив переменных, значения которых необходимо записать в файл
 	* кэша, вида: <pre>array( "ИМЯ ПЕРЕМЕННОЙ 1" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 1", "ИМЯ
 	* ПЕРЕМЕННОЙ 2" =&gt; "ЗНАЧЕНИЕ ПЕРЕМЕННОЙ 2", ...)</pre>Необязательный. По
-	* умолчанию - массив переменных предварительно заданный в функции
-	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a>.
-	*
-	*
+	* умолчанию - массив переменных предварительно заданный в методе <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/startdatacache.php">CPHPCache::StartDataCache</a>.
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -521,7 +475,6 @@ class CPHPCache
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
 	* >Кеширование</a> </li> <li> <a
@@ -540,17 +493,12 @@ class CPHPCache
 
 	
 	/**
-	* <p>Проверяет не истек ли период жизни кеша. Функция как правило используется для удаления файлов кеша, период жизни которых истек.</p> <p class="note">Файл кеша создаваемый функциями класса CPHPCache имеет расширение ".php"</p>
-	*
-	*
+	* <p>Проверяет не истек ли период жизни кеша. Метод как правило используется для удаления файлов кеша, период жизни которых истек. Динамичный метод.</p> <p class="note"><b>Примечание</b>. Файл кеша создаваемый методами класса CPHPCache имеет расширение ".php"</p>
 	*
 	*
 	* @param string $path  Полный путь к файлу кеша.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -572,7 +520,6 @@ class CPHPCache
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -650,36 +597,25 @@ class CPageCache
 
 	
 	/**
-	* <p>Инициализирует ряд свойств объекта класса CPageCache. Если файл кеша отсутствует или истек период его жизни, то функция вернет "false", в противном случае функция вернет "true".</p>
-	*
-	*
+	* <p>Инициализирует ряд свойств объекта класса CPageCache. Если файл кеша отсутствует или истек период его жизни, то метод вернет "false", в противном случае метод вернет "true". Динамичный метод.</p>
 	*
 	*
 	* @param int $TTL  Время жизни кеша в секундах.
 	*
-	*
-	*
 	* @param string $uniq_str  Уникальный идентификатор кеша. В этот идентификатор должны
 	* входить все параметры которые могут повлиять на результат
 	* исполнения кешируемого кода.
-	*
-	*
 	*
 	* @param mixed $initdir = false Папка, в которой хранится кеш компонента, относительно
 	* <i>/bitrix/cache/</i>. Если значение - "/", то кеш будет действительным для
 	* всех каталогов сайта. <br>Необязательный. По умолчанию - текущий
 	* каталог.
 	*
-	*
-	*
 	* @param string $basedir = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
 	* сохраняется в <code>/BX_PERSONAL_ROOT/cache/</code>, где BX_PERSONAL_ROOT по умолчанию
 	* равен bitrix.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
@@ -756,13 +692,10 @@ class CPageCache
 
 	
 	/**
-	* <p>Выводит содержимое кеша. HTML-содержимое кэша доступно, только если файл кеша существует и предварительно был вызван метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>.</p>
-	*
-	*
+	* <p>Выводит содержимое кеша. HTML-содержимое кэша доступно, только если файл кеша существует и предварительно был вызван метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/initcache.php">CPageCache::InitCache</a> или <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">CPageCache::StartDataCache</a>. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3485"
@@ -783,36 +716,25 @@ class CPageCache
 
 	
 	/**
-	* <p>Начинает буферизацию выводимого HTML, либо выводит содержимое кеша если он ещё не истек. Если файл кеша истек, то функция возвращает "true", в противном случае - "false".</p>
-	*
-	*
+	* <p>Начинает буферизацию выводимого HTML, либо выводит содержимое кеша если он ещё не истек. Если файл кеша истек, то метод возвращает "true", в противном случае - "false". Динамичный метод.</p>
 	*
 	*
 	* @param int $TTL  Время жизни кеша в секундах.
 	*
-	*
-	*
 	* @param string $uniq_str  Уникальный идентификатор кеша. В этот идентификатор должны
 	* входить все параметры которые могут повлиять на результат
 	* исполнения кэшируемого кода.
-	*
-	*
 	*
 	* @param mixed $initdir = false Папка, в которой хранится кеш компонента, относительно
 	* <i>/bitrix/cache/</i>. Если значение - "/", то кеш будет действительным для
 	* всех каталогов сайта. <br>Необязательный. По умолчанию - текущий
 	* каталог.
 	*
-	*
-	*
 	* @param string $basedir = "cache" Базовая директория кеша. По умолчанию равен <b>cache</b>, то есть все
 	* сохраняется в <code>/BX_PERSONAL_ROOT/cache/</code>, где BX_PERSONAL_ROOT по умолчанию
 	* равен bitrix.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -838,7 +760,6 @@ class CPageCache
 	* endif;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -881,13 +802,10 @@ class CPageCache
 
 	
 	/**
-	* <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске в файл кеша.</p>
-	*
-	*
+	* <p>Выводит <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/startdatacache.php">буферизированный HTML</a> и сохраняет его на диске в файл кеша. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -913,7 +831,6 @@ class CPageCache
 	* endif;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -966,17 +883,12 @@ class CPageCache
 
 	
 	/**
-	* <p>Проверяет не истек ли период жизни кеша. Функция как правило используется для удаления файлов кеша, период жизни которых истек.</p> <p class="note">Файл кеша создаваемый функциями класса CPageCache имеет расширение ".html"</p>
-	*
-	*
+	* <p>Проверяет не истек ли период жизни кеша. Метод как правило используется для удаления файлов кеша, период жизни которых истек. Динамичный метод.</p> <p class="note"><b>Примечание</b>. Файл кеша создаваемый методами класса CPageCache имеет расширение ".html"</p>
 	*
 	*
 	* @param string $path  Полный путь к файлу кеша.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -998,7 +910,6 @@ class CPageCache
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -1032,22 +943,15 @@ class CPageCache
  * <p>Удаляет все (либо только устаревшие) файлы кеша по указанному пути. Возвращает "true" в случае успешного завершения. В противном случае возвращает "false".</p>
  *
  *
- *
- *
  * @param bool $delete_all = false Если значение равно "true", то будут удалены все файлы кеша, если
  * значение равно "false", то будут удалены только устаревшие файлы
  * кеша.
- *
- *
  *
  * @param string $dir = "" Каталог, начиная с которого производить обработку. Применяется
  * для частичной обработки кеша. Задается относительно корневой
  * папки кеша - <b>/bitrix/cache/</b>.
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1106,7 +1010,8 @@ function BXClearCache($full=false, $initdir="")
 			}
 			elseif(substr($file, -5)==".html")
 			{
-				if(CPageCache::IsCacheExpired($path."/".$file))
+				$obCache = new CPHPCache();
+				if($obCache->IsCacheExpired($path."/".$file))
 				{
 					@chmod($path."/".$file, BX_FILE_PERMISSIONS);
 					if(!unlink($path."/".$file))
@@ -1115,7 +1020,8 @@ function BXClearCache($full=false, $initdir="")
 			}
 			elseif(substr($file, -4)==".php")
 			{
-				if(CPHPCache::IsCacheExpired($path."/".$file))
+				$obCache = new CPHPCache();
+				if($obCache->IsCacheExpired($path."/".$file))
 				{
 					@chmod($path."/".$file, BX_FILE_PERMISSIONS);
 					if(!unlink($path."/".$file))
@@ -1153,7 +1059,7 @@ class CCacheManager
 
 	// Tries to read cached variable value from the file
 	// Returns true on success
-	// overwise returns false
+	// otherwise returns false
 	public function Read($ttl, $uniqid, $table_id=false)
 	{
 		return $this->managedCache->read($ttl, $uniqid, $table_id);
@@ -1165,7 +1071,7 @@ class CCacheManager
 	}
 
 	// This method is used to read the variable value
-	// from the cache after successfull Read
+	// from the cache after successful Read
 	public function Get($uniqid)
 	{
 		return $this->managedCache->get($uniqid);
@@ -1305,7 +1211,7 @@ class CStackCacheEntry
 	public function Load()
 	{
 		global $DB;
-		$objCache = new CPHPCache;
+		$objCache = \Bitrix\Main\Data\Cache::createInstance();
 		if($objCache->InitCache($this->ttl, $this->entity, $DB->type."/".$this->entity, "stack_cache"))
 		{
 			$this->values = $objCache->GetVars();
@@ -1327,7 +1233,7 @@ class CStackCacheEntry
 	{
 		global $DB;
 
-		$objCache = new CPHPCache;
+		$objCache = \Bitrix\Main\Data\Cache::createInstance();
 		$objCache->Clean($this->entity, $DB->type."/".$this->entity, "stack_cache");
 
 		$this->values = array();
@@ -1389,11 +1295,15 @@ class CStackCacheEntry
 			)
 		)
 		{
-			$objCache = new CPHPCache;
-			$objCache->Clean($this->entity, $DB->type."/".$this->entity, "stack_cache");
+			$objCache = \Bitrix\Main\Data\Cache::createInstance();
+			//Force cache rewrite
+			$saveClearState = $objCache->setClearCache(true);
 
 			if($objCache->StartDataCache($this->ttl, $this->entity, $DB->type."/".$this->entity,  $this->values, "stack_cache"))
+			{
 				$objCache->EndDataCache();
+			}
+			$objCache->setClearCache($saveClearState);
 
 			$this->cleanGet = true;
 			$this->cleanSet = true;
@@ -1546,14 +1456,14 @@ class CStackCacheManager
 		}
 	}
 
-	public static function MakeIDFromArray($arVals)
+	public static function MakeIDFromArray($values)
 	{
 		$id = "id";
 
-		sort($arVals);
+		sort($values);
 
-		for ($i = 0, $c = count($arVals); $i < $c; $i++)
-			$id .= "_".$arVals[$i];
+		for ($i = 0, $c = count($values); $i < $c; $i++)
+			$id .= "_".$values[$i];
 
 		return $id;
 	}

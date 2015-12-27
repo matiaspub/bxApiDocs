@@ -4,6 +4,7 @@ namespace Bitrix\Main\Analytics;
 use Bitrix\Main\Context;
 use Bitrix\Main\Page\Asset;
 use Bitrix\Main\Page\AssetLocation;
+use Bitrix\Main\Text\JsExpression;
 
 class Counter
 {
@@ -111,8 +112,20 @@ JS;
 		{
 			foreach ($arItem as $key => $value)
 			{
-				$jsValue = is_array($value) ? \CUtil::PhpToJSObject($value) : \CUtil::JSEscape($value);
-				$result .= '_ba.push(["ad['.$index.']['.\CUtil::JSEscape($key).']", "'.$jsValue.'"]);';
+				if (is_array($value))
+				{
+					$jsValue = '"'.\CUtil::PhpToJSObject($value).'"';
+				}
+				elseif ($value instanceof JsExpression)
+				{
+					$jsValue = $value;
+				}
+				else
+				{
+					$jsValue = '"'.\CUtil::JSEscape($value).'"';
+				}
+
+				$result .= '_ba.push(["ad['.$index.']['.\CUtil::JSEscape($key).']", '.$jsValue.']);';
 			}
 		}
 

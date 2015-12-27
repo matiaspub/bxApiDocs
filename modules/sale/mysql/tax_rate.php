@@ -6,8 +6,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/sale/general/tax_rate.ph
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -18,9 +16,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 {
 	
 	/**
-	* <p>Функция добавляет новую ставку налога с параметрами из массива arFields </p>
-	*
-	*
+	* <p>Метод добавляет новую ставку налога с параметрами из массива arFields. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой ставки налога. Ключами
@@ -37,8 +33,6 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* местоположений;</li> <li> <b>LOCATION_TYPE</b> - "L" для местоположения и "G" для
 	* группы местоположений.</li> </ul> </li> </ul>
 	*
-	*
-	*
 	* @return int <p>Возвращается код добавленной ставки налога или <i>false</i> в случае
 	* ошибки.</p> <br><br>
 	*
@@ -46,7 +40,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletaxrate/csaletaxrate__add.40a40d86.php
 	* @author Bitrix
 	*/
-	public static function Add($arFields)
+	public static function Add($arFields, $arOptions = array())
 	{
 		global $DB;
 		if (!CSaleTaxRate::CheckFields("ADD", $arFields))
@@ -62,7 +56,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 
 		if (is_set($arFields, "TAX_LOCATION"))
 		{
-			CSaleTaxRate::SetTaxRateLocation($ID, $arFields["TAX_LOCATION"]);
+			CSaleTaxRate::SetTaxRateLocation($ID, $arFields["TAX_LOCATION"], $arOptions);
 		}
 
 		return $ID;
@@ -70,9 +64,7 @@ class CSaleTaxRate extends CAllSaleTaxRate
 
 	
 	/**
-	* <p>Функция возвращает набор ставок налога, удовлетворяющих фильтру arFilter. Набор упорядочен в соответствии с массивом arOrder. </p>
-	*
-	*
+	* <p>Метод возвращает набор ставок налога, удовлетворяющих фильтру arFilter. Набор упорядочен в соответствии с массивом arOrder. Метод динамичный.</p>
 	*
 	*
 	* @param array $arrayarOrder = array("APPLY_ORDER"=>"ASC") Ассоциативный массив для сортировки результирующего набора
@@ -89,8 +81,6 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* налога в цену</li> </ul> Допустимые значения: <ul> <li>ASC - по
 	* возрастанию;</li> <li>DESC - по убыванию.</li> </ul>
 	*
-	*
-	*
 	* @param array $arrayarFilter = array() Ассоциативный массив условий для отбора (фильтрации) ставок
 	* налогов. Ключами являются названия фильтруемых параметров
 	* ставки налога, а значениями - условия на значения.<br><br> Допустимые
@@ -100,8 +90,6 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* флаг (Y/N) входит ли налог в цену;</li> <li> <b>ACTIVE</b> - флаг (Y/N) активности
 	* ставки налога;</li> <li> <b>APPLY_ORDER</b> - порядок применения;</li> <li> <b>LOCATION</b>
 	* - код местоположения, в котором действует ставка.</li> </ul>
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
 	* массивы параметров ставок налогов с ключами:</p> <table class="tnormal"
@@ -116,7 +104,6 @@ class CSaleTaxRate extends CAllSaleTaxRate
 	* <td>CODE</td> <td>Символьный код налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание
 	* налога.</td> </tr> <tr> <td>ACTIVE</td> <td>Флаг (Y/N) активности ставки.</td> </tr> </table>
 	* <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -205,13 +192,29 @@ class CSaleTaxRate extends CAllSaleTaxRate
 					$arSqlSearch[] = "TR.APPLY_ORDER ".($bInvert?"<>":"=")." ".IntVal($val)." ";
 					break;
 				case "LOCATION":
-					$arSqlSearch[] = 
-						"	TR.ID = TR2L.TAX_RATE_ID ".
-						"	AND (TR2L.LOCATION_ID = ".IntVal($val)." AND TR2L.LOCATION_TYPE = 'L' ".
-						"		OR L2LG.LOCATION_ID = ".IntVal($val)." AND TR2L.LOCATION_TYPE = 'G') ";
-					$arSqlSearchFrom[] = 
-						", b_sale_tax2location TR2L ".
-						"	LEFT JOIN b_sale_location2location_group L2LG ON (TR2L.LOCATION_TYPE = 'G' AND TR2L.LOCATION_ID = L2LG.LOCATION_GROUP_ID) ";
+
+					if(CSaleLocation::isLocationProMigrated())
+					{
+						try
+						{
+							$class = self::CONN_ENTITY_NAME.'Table';
+							$arSqlSearch[] = "	TR.ID in (".$class::getConnectedEntitiesQuery(IntVal($val), 'id', array('select' => array('ID'))).") ";
+						}
+						catch(Exception $e)
+						{
+						}
+					}
+					else
+					{
+						$arSqlSearch[] = 
+							"	TR.ID = TR2L.TAX_RATE_ID ".
+							"	AND (TR2L.LOCATION_CODE = ".IntVal($val)." AND TR2L.LOCATION_TYPE = 'L' ".
+							"		OR L2LG.LOCATION_ID = ".IntVal($val)." AND TR2L.LOCATION_TYPE = 'G') ";
+						$arSqlSearchFrom[] = 
+							", b_sale_tax2location TR2L ".
+							"	LEFT JOIN b_sale_location2location_group L2LG ON (TR2L.LOCATION_TYPE = 'G' AND TR2L.LOCATION_CODE = L2LG.LOCATION_GROUP_ID) ";
+					}
+
 					break;
 			}
 		}

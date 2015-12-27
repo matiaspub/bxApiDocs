@@ -18,6 +18,9 @@ class CSmile
 	const CHECK_TYPE_ADD = 1;
 	const CHECK_TYPE_UPDATE = 2;
 	const GET_ALL_LANGUAGE = false;
+	const IMAGE_SD = 'SD';
+	const IMAGE_HD = 'HD';
+	const IMAGE_UHD = 'UHD';
 
 	private static function checkFields(&$arFields, $actionType = self::CHECK_TYPE_ADD)
 	{
@@ -45,8 +48,11 @@ class CSmile
 		if(isset($arFields['CLICKABLE']) && $arFields['CLICKABLE'] != 'N')
 			$arFields['CLICKABLE'] = 'Y';
 
-		if(isset($arFields['IMAGE_HR']) && $arFields['IMAGE_HR'] != 'Y')
-			$arFields['IMAGE_HR'] = 'N';
+		if(isset($arFields['IMAGE_DEFINITION']) && !in_array($arFields['IMAGE_DEFINITION'], Array(self::IMAGE_SD, self::IMAGE_HD, self::IMAGE_UHD)))
+			$arFields['IMAGE_DEFINITION'] = self::IMAGE_SD;
+
+		if(isset($arFields['HIDDEN']) && $arFields['HIDDEN'] != 'Y')
+			$arFields['HIDDEN'] = 'N';
 
 		if($actionType == self::CHECK_TYPE_ADD && (!isset($arFields['IMAGE']) || strlen($arFields['IMAGE']) <= 0))
 			$aMsg[] = array("id"=>"IMAGE", "text"=> GetMessage("MAIN_SMILE_IMAGE_ERROR"));
@@ -86,11 +92,19 @@ class CSmile
 			'IMAGE_HEIGHT' => intval($arFields['IMAGE_HEIGHT']),
 		);
 
-		if (isset($arFields['IMAGE_HR']) && $arFields['IMAGE_HR'] == 'Y')
+		if (isset($arFields['IMAGE_DEFINITION']))
 		{
-			$arInsert['IMAGE_HR'] = $arFields['IMAGE_HR'];
-			$arInsert['IMAGE_WIDTH'] = $arInsert['IMAGE_WIDTH']/2;
-			$arInsert['IMAGE_HEIGHT'] = $arInsert['IMAGE_HEIGHT']/2;
+			$arInsert['IMAGE_DEFINITION'] = $arFields['IMAGE_DEFINITION'];
+			if ($arInsert['IMAGE_DEFINITION'] == self::IMAGE_UHD)
+			{
+				$arInsert['IMAGE_WIDTH'] = $arInsert['IMAGE_WIDTH']/4;
+				$arInsert['IMAGE_HEIGHT'] = $arInsert['IMAGE_HEIGHT']/4;
+			}
+			else if ($arInsert['IMAGE_DEFINITION'] == self::IMAGE_HD)
+			{
+				$arInsert['IMAGE_WIDTH'] = $arInsert['IMAGE_WIDTH']/2;
+				$arInsert['IMAGE_HEIGHT'] = $arInsert['IMAGE_HEIGHT']/2;
+			}
 		}
 
 		if (isset($arFields['TYPING']))
@@ -98,6 +112,9 @@ class CSmile
 
 		if (isset($arFields['CLICKABLE']))
 			$arInsert['CLICKABLE'] = $arFields['CLICKABLE'];
+
+		if (isset($arFields['HIDDEN']))
+			$arInsert['HIDDEN'] = $arFields['HIDDEN'];
 
 		$setId = IntVal($DB->Add("b_smile", $arInsert));
 
@@ -155,11 +172,19 @@ class CSmile
 			$arUpdate['IMAGE_WIDTH'] = intval($arFields['IMAGE_WIDTH']);
 			$arUpdate['IMAGE_HEIGHT'] = intval($arFields['IMAGE_HEIGHT']);
 
-			if (isset($arFields['IMAGE_HR']) && $arFields['IMAGE_HR'] == 'Y')
+			if (isset($arFields['IMAGE_DEFINITION']))
 			{
-				$arUpdate['IMAGE_HR'] = "'".$arFields['IMAGE_HR']."'";
-				$arUpdate['IMAGE_WIDTH'] = $arUpdate['IMAGE_WIDTH']/2;
-				$arUpdate['IMAGE_HEIGHT'] = $arUpdate['IMAGE_HEIGHT']/2;
+				$arUpdate['IMAGE_DEFINITION'] = "'".$DB->ForSql($arFields['IMAGE_DEFINITION'])."'";
+				if ($arFields['IMAGE_DEFINITION'] == self::IMAGE_UHD)
+				{
+					$arUpdate['IMAGE_WIDTH'] = $arUpdate['IMAGE_WIDTH']/4;
+					$arUpdate['IMAGE_HEIGHT'] = $arUpdate['IMAGE_HEIGHT']/4;
+				}
+				else if ($arFields['IMAGE_DEFINITION'] == self::IMAGE_HD)
+				{
+					$arUpdate['IMAGE_WIDTH'] = $arUpdate['IMAGE_WIDTH']/2;
+					$arUpdate['IMAGE_HEIGHT'] = $arUpdate['IMAGE_HEIGHT']/2;
+				}
 			}
 		}
 
@@ -168,6 +193,9 @@ class CSmile
 
 		if (isset($arFields['CLICKABLE']))
 			$arUpdate['CLICKABLE'] = "'".$arFields['CLICKABLE']."'";
+
+		if (isset($arFields['HIDDEN']))
+			$arUpdate['HIDDEN'] = "'".$arFields['HIDDEN']."'";
 
 		if (!empty($arUpdate))
 			$DB->Update("b_smile", $arUpdate, "WHERE ID = ".intval($id));
@@ -201,13 +229,19 @@ class CSmile
 		return true;
 	}
 
-	public static function delete($id)
+	public static function delete($id, $removeFile = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
 		$id = intval($id);
 		if ($id <= 0)
 			return false;
+
+		if ($removeFile)
+		{
+			$arSmile = CSmile::getByID($id);
+			@unlink($_SERVER["DOCUMENT_ROOT"].($arSmile['TYPE'] == CSmile::TYPE_ICON? CSmile::PATH_TO_ICON: CSmile::PATH_TO_SMILE).$arSmile['SET_ID'].'/'.$arSmile['IMAGE']);
+		}
 
 		$DB->Query("DELETE FROM b_smile WHERE ID = ".$id, true);
 		$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SMILE."' AND SID = ".$id, true);
@@ -217,7 +251,7 @@ class CSmile
 		return true;
 	}
 
-	public static function deleteBySet($id)
+	public static function deleteBySet($id, $removeFile = true)
 	{
 		global $DB, $CACHE_MANAGER;
 
@@ -227,11 +261,59 @@ class CSmile
 
 		$arDelete = Array();
 		$arSmiles = self::getList(Array(
-			'SELECT' => Array('ID'),
+			'SELECT' => Array('ID', 'SET_ID', 'TYPE', 'IMAGE'),
 			'FILTER' => Array('SET_ID' => $id),
 		));
-		foreach ($arSmiles as $key => $value)
+		foreach ($arSmiles as $key => $arSmile)
+		{
 			$arDelete[] = intval($key);
+		}
+
+		if ($removeFile)
+		{
+			DeleteDirFilesEx(CSmile::PATH_TO_ICON.$id.'/');
+			DeleteDirFilesEx(CSmile::PATH_TO_SMILE.$id.'/');
+		}
+
+		if (!empty($arDelete))
+		{
+			$DB->Query("DELETE FROM b_smile WHERE ID IN (".implode(',', $arDelete).")", true);
+			$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SMILE."' AND SID IN (".implode(',', $arDelete).")", true);
+
+			$CACHE_MANAGER->CleanDir("b_smile");
+		}
+
+		return true;
+	}
+
+	public static function deleteByGallery($id, $removeFile = true)
+	{
+		global $DB, $CACHE_MANAGER;
+
+		$id = intval($id);
+		if ($id <= 0)
+			return false;
+
+		$arDelete = Array();
+		$arDir = Array();
+		$arSmiles = self::getList(Array(
+			'SELECT' => Array('ID', 'SET_ID', 'TYPE', 'IMAGE'),
+			'FILTER' => Array('PARENT_ID' => $id),
+		));
+
+		foreach ($arSmiles as $key => $arSmile)
+		{
+			$arDelete[] = intval($key);
+			$arDir[$arSmile['SET_ID']] = ($arSmile['TYPE'] == CSmile::TYPE_ICON? CSmile::PATH_TO_ICON: CSmile::PATH_TO_SMILE).$arSmile['SET_ID'].'/';
+
+		}
+		if ($removeFile)
+		{
+			foreach ($arDir as $path)
+			{
+				DeleteDirFilesEx($path);
+			}
+		}
 
 		if (!empty($arDelete))
 		{
@@ -252,7 +334,7 @@ class CSmile
 		$arResult = Array();
 
 		$strSql = "
-			SELECT s.ID, s.SET_ID, s.TYPE, s.SORT, s.TYPING, s.CLICKABLE, s.IMAGE, s.IMAGE_HR, s.IMAGE_WIDTH, s.IMAGE_HEIGHT, sl.NAME, sl.LID
+			SELECT s.*, sl.NAME, sl.LID
 			FROM b_smile s
 			LEFT JOIN b_smile_lang sl ON sl.TYPE = '".self::TYPE_SMILE."' AND sl.SID = s.ID".($lang !== false? " AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'": "")."
 			WHERE s.ID = ".$id."";
@@ -285,17 +367,12 @@ class CSmile
 
 		$arResult = $arSelect = $arOrder = $arFilter = $arJoin = Array();
 		if (!isset($arParams['SELECT']) || !is_array($arParams['SELECT']))
-			$arParams['SELECT'] = Array('ID', 'SET_ID',  'TYPE', 'NAME', 'SORT', 'TYPING', 'CLICKABLE', 'IMAGE', 'IMAGE_HR', 'IMAGE_WIDTH', 'IMAGE_HEIGHT');
+			$arParams['SELECT'] = Array('ID', 'SET_ID',  'TYPE', 'NAME', 'SORT', 'TYPING', 'CLICKABLE', 'HIDDEN', 'IMAGE', 'IMAGE_DEFINITION', 'IMAGE_WIDTH', 'IMAGE_HEIGHT');
 
 		// select block
 		foreach ($arParams['SELECT'] as $fieldName)
 		{
-			if ($fieldName == 'ID' || $fieldName == 'TYPE' || $fieldName == 'SET_ID' || $fieldName == 'SORT' || $fieldName == 'TYPING' || $fieldName == 'CLICKABLE'
-			|| $fieldName == 'IMAGE' || $fieldName == 'IMAGE_HR' || $fieldName == 'IMAGE_WIDTH' || $fieldName == 'IMAGE_HEIGHT')
-			{
-				$arSelect[$fieldName] = 's.'.$fieldName;
-			}
-			elseif ($fieldName == 'NAME')
+			if ($fieldName == 'NAME')
 			{
 				$arSelect['NAME'] = 'sl.'.$fieldName;
 				$arJoin['LANG'] = "LEFT JOIN b_smile_lang sl ON sl.TYPE = '".self::TYPE_SMILE."' AND sl.SID = s.ID AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'";
@@ -305,6 +382,10 @@ class CSmile
 				$arSelect['SET_ID'] = 's.SET_ID';
 				$arSelect['SET_NAME'] = 'sl2.NAME as SET_NAME';
 				$arJoin['LANG2'] = "LEFT JOIN b_smile_lang sl2 ON sl2.TYPE = '".CSmileSet::TYPE_SET."' AND sl2.SID = s.SET_ID AND sl2.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'";
+			}
+			else
+			{
+				$arSelect[$fieldName] = 's.'.$fieldName;
 			}
 		}
 		$arSelect['ID'] = 's.ID';
@@ -346,6 +427,11 @@ class CSmile
 		{
 			$arFilter[] = "s.TYPE = '".$arParams['FILTER']['TYPE']."'";
 		}
+		if (isset($arParams['FILTER']['PARENT_ID']))
+		{
+			$arFilter[] = "ss2.PARENT_ID = ".intval($arParams['FILTER']['PARENT_ID']);
+			$arJoin['PARENT'] = "LEFT JOIN b_smile_set ss2 ON ss2.ID = s.SET_ID";
+		}
 
 		// order block
 		if (isset($arParams['ORDER']) && is_array($arParams['ORDER']))
@@ -354,7 +440,7 @@ class CSmile
 			{
 				$order = strtoupper($order) == 'ASC'? 'ASC': 'DESC';
 				$by = strtoupper($by);
-				if (in_array($by, Array('ID', 'SET_ID', 'SORT', 'IMAGE_HR')))
+				if (in_array($by, Array('ID', 'SET_ID', 'SORT', 'IMAGE_DEFINITION', 'HIDDEN')))
 				{
 					$arOrder[$by] = 's.'.$by.' '.$order;
 				}
@@ -416,21 +502,57 @@ class CSmile
 		}
 	}
 
+	/**
+	 * @deprecated Use CSmile::getBySetId
+	 */
 	public static function getByType($type = self::TYPE_ALL, $setId = CSmileSet::SET_ID_BY_CONFIG, $lang = LANGUAGE_ID)
+	{
+		return self::getBySetId($type, $setId, $lang);
+	}
+
+	
+	/**
+	* <p> Получение данных о смайлах или иконках по ID набора. Статичный метод.</p>
+	*
+	*
+	* @param mixed $type = self::TYPE_ALL константа типа
+	*
+	* @param mixed $setId = CSmileSet::SET_ID_BY_CONFIG идентификатор набора (по умолчанию CSmileSet::SET_ID_ALL - все наборы)
+	*
+	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
+	* LANGUAGE_ID
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmile/getbysetid.php
+	* @author Bitrix
+	*/
+	public static function getBySetId($type = self::TYPE_ALL, $setId = CSmileSet::SET_ID_BY_CONFIG, $lang = LANGUAGE_ID)
 	{
 		$arFilter = array();
 		if (in_array($type, array(self::TYPE_SMILE, self::TYPE_ICON)))
 			$arFilter["TYPE"] = $type;
 
 		$setId = intval($setId);
+
 		if ($setId == CSmileSet::SET_ID_BY_CONFIG)
-			$setId = CSmileSet::getConfigSetId();
+		{
+			$arFilter['PARENT_ID'] = CSmileGallery::getDefaultId();
+			$cacheSetId = 'p'.$arFilter['PARENT_ID'];
+		}
+		else
+		{
+			$cacheSetId = $setId;
+			if ($setId != CSmileSet::SET_ID_ALL)
+				$arFilter['SET_ID'] = $setId;
+		}
 
 		if ($lang <> '')
 			$arFilter["LID"] = htmlspecialcharsbx($lang);
 
 		global $CACHE_MANAGER;
-		$cache_id = "b_smile_".$arFilter["TYPE"]."_".$setId."_".$arFilter["LID"];
+		$cache_id = "b_smile_set_2_".$arFilter["TYPE"]."_".$cacheSetId."_".$lang;
 
 		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile"))
 		{
@@ -438,8 +560,66 @@ class CSmile
 		}
 		else
 		{
-			if ($setId != CSmileSet::SET_ID_ALL)
-				$arFilter['SET_ID'] = $setId;
+			$arResult = self::getList(Array(
+				'ORDER' => Array('SORT' => 'ASC'),
+				'FILTER' => $arFilter,
+			));
+
+			if (CACHED_b_smile !== false)
+				$CACHE_MANAGER->Set($cache_id, $arResult);
+		}
+
+		return $arResult;
+
+	}
+
+	
+	/**
+	* <p>Вывод информации о смайлах и иконках по ID галереи. Статичный метод.</p>
+	*
+	*
+	* @param mixed $type = self::TYPE_ALL константа типа
+	*
+	* @param mixed $galleryId = CSmileGallery::GALLERY_DEFAULT идентификатор галереи (по умолчанию CSmileGallery::GALLERY_DEFAULT - все наборы)
+	*
+	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
+	* LANGUAGE_ID
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmile/getbygalleryid.php
+	* @author Bitrix
+	*/
+	public static function getByGalleryId($type = self::TYPE_ALL, $galleryId = CSmileGallery::GALLERY_DEFAULT, $lang = LANGUAGE_ID)
+	{
+		$arFilter = array();
+		if (in_array($type, array(self::TYPE_SMILE, self::TYPE_ICON)))
+			$arFilter["TYPE"] = $type;
+
+		$galleryId = intval($galleryId);
+		if ($galleryId == CSmileGallery::GALLERY_DEFAULT)
+			$galleryId = CSmileGallery::getDefaultId();
+
+		if ($lang <> '')
+			$arFilter["LID"] = htmlspecialcharsbx($lang);
+
+		global $CACHE_MANAGER;
+		$cache_id = "b_smile_gallery_".$arFilter["TYPE"]."_".$galleryId."_".$arFilter["LID"];
+
+		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile"))
+		{
+			$arResult = $CACHE_MANAGER->Get($cache_id);
+		}
+		else
+		{
+			$arSets = CSmileSet::getList(Array(
+				'FILTER' => Array('PARENT_ID' => $galleryId)
+			));
+			foreach ($arSets as $set)
+			{
+				$arFilter['SET_ID'][] = $set['ID'];
+			}
 
 			$arResult = self::getList(Array(
 				'ORDER' => Array('SORT' => 'ASC'),
@@ -452,6 +632,7 @@ class CSmile
 
 		return $arResult;
 	}
+
 
 	public static function import($arParams)
 	{
@@ -522,31 +703,45 @@ class CSmile
 			$csvFile->LoadFile($sUnpackDir.'install.csv');
 			$csvFile->SetFieldsType("R");
 			$csvFile->SetFirstHeader(false);
-			while($smile = $csvFile->Fetch())
+			while($smileRes = $csvFile->Fetch())
 			{
-				if (!in_array($smile[0], Array(CSmile::TYPE_SMILE, CSmile::TYPE_ICON)))
+				$smile = Array(
+					'TYPE' => $smileRes[0],
+					'CLICKABLE' => $smileRes[1] == 'Y'? 'Y': 'N',
+					'SORT' => intval($smileRes[2]),
+					'IMAGE' => $smileRes[3],
+					'IMAGE_WIDTH' => intval($smileRes[4]),
+					'IMAGE_HEIGHT' => intval($smileRes[5]),
+					'IMAGE_DEFINITION' => in_array($smileRes[6], Array(self::IMAGE_SD, self::IMAGE_HD, self::IMAGE_UHD))? $smileRes[6]: ($smileRes[6] == 'Y'? self::IMAGE_HD: self::IMAGE_SD),
+					'HIDDEN' => in_array($smileRes[7], Array('Y', 'N'))? $smileRes[7]: 'N',
+					'IMAGE_LANG' => in_array($smileRes[7], Array('Y', 'N'))? $smileRes[8]: $smileRes[7], // for legacy
+					'TYPING' => in_array($smileRes[7], Array('Y', 'N'))? $smileRes[9]: $smileRes[8]
+				);
+
+				if (!in_array($smile['TYPE'], Array(CSmile::TYPE_SMILE, CSmile::TYPE_ICON)))
 					continue;
 
-				$smile[3] = GetFileName($smile[3]);
+				$smile['IMAGE'] = GetFileName($smile['IMAGE']);
 
-				$imgArray = CFile::GetImageSize($sUnpackDir.$smile[3]);
+				$imgArray = CFile::GetImageSize($sUnpackDir.$smile['IMAGE']);
 				if (!is_array($imgArray))
 					continue;
 
 				$arInsert = Array(
-					'TYPE' => $smile[0],
+					'TYPE' => $smile['TYPE'],
 					'SET_ID' => $arParams['SET_ID'],
-					'CLICKABLE' => $smile[1] == 'Y'? 'Y': 'N',
-					'SORT' => intval($smile[2]),
-					'IMAGE' => $smile[3],
-					'IMAGE_WIDTH' => intval($smile[4]),
-					'IMAGE_HEIGHT' => intval($smile[5]),
-					'IMAGE_HR' => $smile[6] == 'Y'? 'Y': 'N',
-					'TYPING' => $smile[8],
+					'CLICKABLE' => $smile['CLICKABLE'],
+					'SORT' => $smile['SORT'],
+					'IMAGE' => $smile['IMAGE'],
+					'IMAGE_WIDTH' => $smile['IMAGE_WIDTH'],
+					'IMAGE_HEIGHT' => $smile['IMAGE_HEIGHT'],
+					'IMAGE_DEFINITION' => $smile['IMAGE_DEFINITION'],
+					'HIDDEN' => $smile['HIDDEN'],
+					'TYPING' => $smile['TYPING'],
 				);
 
-				if (isset($smile[7]) && isset($arLang[$smile[7]]))
-					$arInsert['LANG'] = $arLang[$smile[7]];
+				if (isset($arLang[$smile['IMAGE_LANG']]))
+					$arInsert['LANG'] = $arLang[$smile['IMAGE_LANG']];
 
 				$arSmiles[] = $arInsert;
 			}
@@ -567,14 +762,14 @@ class CSmile
 						$imgArray = CFile::GetImageSize($sUnpackDir.$file);
 						if (is_array($imgArray))
 						{
-							$smileHR = 'N';
+							$smileHR = self::IMAGE_SD;
 							$smileType = CSmile::TYPE_SMILE;
 							$smileCode = GetFileNameWithoutExtension($file);
 							if (strpos($file, 'smile_') !== false && strpos($file, 'smile_') == 0)
 							{
 								$smileCode = substr($smileCode, 6);
 							}
-							else if (strpos($file, 'smile') !== false && strpos($file, 'smile') == 0)
+							elseif (strpos($file, 'smile') !== false && strpos($file, 'smile') == 0)
 							{
 								$smileCode = substr($smileCode, 5);
 							}
@@ -590,13 +785,12 @@ class CSmile
 							}
 							if (strrpos($smileCode, '_hr') !== false && strrpos($smileCode, '_hr') == strlen($smileCode)-3)
 							{
-								$smileHR = 'Y';
+								$smileHR = self::IMAGE_HD;
 								$smileCode = substr($smileCode, 0, strrpos($smileCode, '_hr'));
 							}
 							if (($pos = strpos($smileCode, '_hr_')))
 							{
-								echo substr($smileCode, 0, $pos);
-								$smileHR = 'Y';
+								$smileHR = self::IMAGE_HD;
 								$smileCode = substr($smileCode, 0, $pos).'_'.substr($smileCode, $pos+4);
 							}
 
@@ -608,13 +802,12 @@ class CSmile
 								'IMAGE' => $file,
 								'IMAGE_WIDTH' => intval($imgArray[0]),
 								'IMAGE_HEIGHT' => intval($imgArray[1]),
-								'IMAGE_HR' => $smileHR,
+								'IMAGE_DEFINITION' => $smileHR,
 								'TYPING' => ':'.(isset($smileSet['STRING_ID'])? $smileSet['STRING_ID']: $smileSet['ID']).'/'.$smileCode.':',
 							);
 							$sort = $sort+5;
 						}
 					}
-
 				}
 				@closedir($handle);
 			}
@@ -654,9 +847,594 @@ class CSmile
 	}
 }
 
+class CSmileGallery
+{
+	const GALLERY_DEFAULT = 0;
+	const GET_ALL_LANGUAGE = false;
+
+	
+	/**
+	* <p>Добавление галереи смайлов. Статичный метод.</p>
+	*
+	*
+	* @param Arra $y  Строковый ключ, для поиска и импорта
+	*
+	* @param STRING_I $D  Сортировка
+	*
+	* @param new_categor $y  Название смайла
+	*
+	* @param SOR $T  
+	*
+	* @param  $300  
+	*
+	* @param LAN $G  
+	*
+	* @param  $Array  
+	*
+	* @param r $u  
+	*
+	* @param e $n  
+	*
+	* @param New $category  
+	*
+	* @return mixed <p>Возвращает $ID в случае удачного добавления и <i>false</i> в случае
+	* возникновения ошибки (создается <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
+	* CApplicationException</a>) </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/add.php
+	* @author Bitrix
+	*/
+	public static function add($arFields)
+	{
+		$arFields['TYPE'] = CSmileSet::TYPE_GALLERY;
+		return CSmileSet::add($arFields);
+	}
+
+	
+	/**
+	* <p>Обновление данных галереи смайлов. Статичный метод.</p>
+	*
+	*
+	* @param i $d  идентификатор смайла
+	*
+	* @param Arra $y  
+	*
+	* @param STRING_I $D  
+	*
+	* @param new_categor $y  Строковый ключ, для поиска и импорта
+	*
+	* @param SOR $T  Сортировка
+	*
+	* @param  $300  Название смайла
+	*
+	* @param LAN $G  
+	*
+	* @param  $Array  
+	*
+	* @param r $u  
+	*
+	* @param e $n  
+	*
+	* @param New $category  
+	*
+	* @return mixed <p>Возвращает <i>true</i> в случае удачного добавления и <i>false</i> в
+	* случае возникновения ошибки (создается <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
+	* CApplicationException</a>) </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/update.php
+	* @author Bitrix
+	*/
+	public static function update($id, $arFields)
+	{
+		return CSmileSet::update($id, $arFields);
+	}
+
+	
+	/**
+	* <p>Метод удаляет галерею вместе с наборами и смайлами (записи в базе и сами файлы). Статичный метод.</p>
+	*
+	*
+	* @param mixed $id  Идентификатор галереи, обязательный параметр.
+	*
+	* @param mixed $removeFile  По умолчанию true, удаляет файл.
+	*
+	* @return mixed <p>Возвращает <i>true</i> в случае удачного удаления и <i>false</i> в случае
+	* возникновения ошибки </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/delete.php
+	* @author Bitrix
+	*/
+	public static function delete($id)
+	{
+		global $DB, $CACHE_MANAGER;
+
+		$id = intval($id);
+
+		$res = $DB->Query("SELECT ID, TYPE FROM b_smile_set WHERE ID = ".$id);
+		if ($smileGallery = $res->Fetch())
+		{
+			CSmile::deleteByGallery($smileGallery['ID']);
+
+			$DB->Query("DELETE FROM b_smile_set WHERE ID = ".$smileGallery['ID'], true);
+			$DB->Query("DELETE FROM b_smile_set WHERE PARENT_ID = ".$smileGallery['ID'], true);
+			$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".$smileGallery['TYPE']."' AND SID = ".$smileGallery['ID'], true);
+		}
+
+		$CACHE_MANAGER->CleanDir("b_smile_set");
+
+	}
+
+	
+	/**
+	* <p>Получение данных о галереях по ID. Статичный метод.</p>
+	*
+	*
+	* @param mixed $id  идентификатор галереи
+	*
+	* @param mixed $lang = LANGUAGE_ID Идентификатор языка для получения локализации, по умолчанию
+	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
+	* всех локализаций)
+	*
+	* @return mixed <p>Возвращает массив с данными о галерее. </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getbyid.php
+	* @author Bitrix
+	*/
+	public static function getById($id, $lang = LANGUAGE_ID)
+	{
+		return CSmileSet::getById($id, $lang);
+	}
+
+	
+	/**
+	* <p>Получение данных о галереях по STRING_ID. Статичный метод.</p>
+	*
+	*
+	* @param mixed $stringId  строковый идентификатор идентификатор галереи
+	*
+	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
+	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
+	* всех локализаций
+	*
+	* @return mixed <p>Возвращает массив с данными о галерее. </p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getbystringid.php
+	* @author Bitrix
+	*/
+	public static function getByStringId($stringId, $lang = LANGUAGE_ID)
+	{
+		return CSmileSet::getByStringId($stringId, CSmileSet::TYPE_GALLERY, $lang);
+	}
+
+	
+	/**
+	* <p> Получение данных о галереях смайлов. Все параметры являются не обязательными. Статичный метод.</p>
+	*
+	*
+	* @param Arra $y  Поля выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
+	* <b>STRING_ID</b> - строковый идентификатор галереи</li> <li> <b>SORT</b> -
+	* сортировка;</li> <li> <b>NAME</b> - имя галереи;</li> <li> <b>SMILE_COUNT</b> - число
+	* смайлов.</li> </ul>
+	*
+	* @param SELEC $T  Фильтр выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
+	* <b>STRING_ID</b> - строковый идентификатор галереи</li> </ul> Могут быть
+	* множественным, представленным массивом идентификаторов.
+	*
+	* @param  $Array  Поля сортировки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li>
+	* <li> <b>SORT</b> - сортировка;</li> </ul> по умолчанию сортировка ID =&gt; DESC.
+	*
+	* @param I $D  Передаются параметры массива для CDBResult::NavQuery.
+	*
+	* @param FILTE $R  Может быть Y или N - метод вернет в виде результата сформированный
+	* запрос.
+	*
+	* @param  $Array  Может быть Y или N - метод вернет в виде результата ресурс на
+	* отработанный запрос.
+	*
+	* @param SET_I $D  Значения языка, хранимое в константе LANGUAGE_ID.
+	*
+	* @param  $id  
+	*
+	* @param ORDE $R  
+	*
+	* @param  $Array  
+	*
+	* @param I $D  
+	*
+	* @param DES $C  
+	*
+	* @param NAV_PARAM $S  
+	*
+	* @param  $Array  
+	*
+	* @param RETURN_SQ $L  
+	*
+	* @param  $N  
+	*
+	* @param RETURN_RE $S  
+	*
+	* @param  $N  
+	*
+	* @param  $lang = LANGUAGE_ID 
+	*
+	* @return mixed <p>Если не заданы RETURN_SQL или RETURN_RES метод возвращает массив.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getlist.php
+	* @author Bitrix
+	*/
+	public static function getList($arParams = Array(), $lang = LANGUAGE_ID)
+	{
+		$arParams['FILTER']['TYPE'] = CSmileSet::TYPE_GALLERY;
+		return CSmileSet::getList($arParams, $lang);
+	}
+
+	
+	/**
+	* <p>Производит выборку всех галерей (с использованием кеша). Статичный метод.</p>
+	*
+	*
+	* @param mixed $lang = LANGUAGE_ID Значения языка, хранимое в константе LANGUAGE_ID.
+	*
+	* @return result_type <p></p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getlistcache.php
+	* @author Bitrix
+	*/
+	public static function getListCache($lang = LANGUAGE_ID)
+	{
+		if (strlen($lang) > 0)
+			$lang = htmlspecialcharsbx($lang);
+
+		global $CACHE_MANAGER;
+		$cache_id = "b_smile_gallery_".$lang;
+
+		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile_set"))
+		{
+			$arResult = $CACHE_MANAGER->Get($cache_id);
+		}
+		else
+		{
+			$arResult = self::getList(Array('ORDER' => Array('SORT' => 'ASC')), $lang);
+			if (CACHED_b_smile !== false)
+				$CACHE_MANAGER->Set($cache_id, $arResult);
+		}
+
+		return $arResult;
+	}
+
+	
+	/**
+	* <p>Производит выборку всех галерей для построения списка. Статичный метод.</p>
+	*
+	*
+	* @param mixed $lang = LANGUAGE_ID Значения языка, хранимое в константе LANGUAGE_ID.
+	*
+	* @return result_type <p></p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getlistforform.php
+	* @author Bitrix
+	*/
+	public static function getListForForm($lang = LANGUAGE_ID)
+	{
+		$arSetList = Array();
+		foreach (self::getListCache($lang) as $key => $value)
+			$arSetList[$key] = !empty($value['NAME'])? $value['NAME']: GetMessage('MAIN_SMILE_GALLERY_NAME', Array('#ID#' => $key));
+
+		return $arSetList;
+	}
+
+	
+	/**
+	* <p>Позволяет получить идентификатор галереи по умолчанию. Статичный метод.</p>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getdefaultid.php
+	* @author Bitrix
+	*/
+	public static function getDefaultId()
+	{
+		$galleryId = COption::GetOptionString("main", "smile_gallery_id", self::GALLERY_DEFAULT);
+		if ($galleryId == 0)
+		{
+			$gallery = CSmileGallery::getByStringId('bitrix');
+
+			if ($gallery)
+			{
+				$galleryId = $gallery['ID'];
+				self::setDefaultId($galleryId);
+			}
+		}
+
+		$eventGalleryId = -1;
+		foreach(GetModuleEvents("main", "OnBeforeSmileGalleryGetDefaultId", true) as $arEvent)
+			$eventGalleryId = intval(ExecuteModuleEventEx($arEvent, array($galleryId)));
+
+		return $eventGalleryId > 0 && $eventGalleryId != $galleryId? $eventGalleryId: $galleryId;
+	}
+
+	
+	/**
+	* <p>Устанавливает галерею по умолчанию. Статичный метод.</p>
+	*
+	*
+	* @param mixed $id  Идентификатор галереи
+	*
+	* @return result_type <p></p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/setdefaultid.php
+	* @author Bitrix
+	*/
+	public static function setDefaultId($id)
+	{
+		return COption::SetOptionString("main", "smile_gallery_id", $id);
+	}
+
+	
+	/**
+	* <p>Возвращает смайлы и наборы на основе галереи для последующего использования в модулях при построении списка доступных смайлов. Статичный метод.</p>
+	*
+	*
+	* @param mixed $galleryId = self::GALLERY_DEFAULT по умолчанию CSmileGallery::GALLERY_DEFAULT
+	*
+	* @return result_type <p>Возвращает массив Array('SMILE' =&gt; Array(...), 'SMILE_SET' =&gt; Array(...)) </p> </ht<br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getsmileswithsets.php
+	* @author Bitrix
+	*/
+	public static function getSmilesWithSets($galleryId = self::GALLERY_DEFAULT)
+	{
+		if ($galleryId == self::GALLERY_DEFAULT)
+		{
+			$galleryId = self::getDefaultId();
+		}
+
+		$result = array('SMILE' => Array(), 'SMILE_SET' => Array());
+
+		$smiles = CSmile::getByGalleryId(CSmile::TYPE_SMILE, $galleryId);
+
+		$smilesSet = CSmileSet::getListCache();
+
+		$userSets = Array();
+		foreach ($smiles as $smile)
+		{
+			if ($smile['HIDDEN'] == 'Y')
+				continue;
+
+			$typing = explode(" ", $smile['TYPING']);
+			if (isset($result['SMILE'][$typing[0]]))
+				continue;
+
+			$result['SMILE'][$smile['ID']] = Array(
+				'SET_ID' => $smile['SET_ID'],
+				'NAME' => $smile['NAME'],
+				'IMAGE' => CSmile::PATH_TO_SMILE.$smile["SET_ID"]."/".$smile["IMAGE"],
+				'TYPING' => $typing[0],
+				'WIDTH' => $smile['IMAGE_WIDTH'],
+				'HEIGHT' => $smile['IMAGE_HEIGHT'],
+			);
+			$userSets[$smile['SET_ID']] = true;
+		}
+		foreach ($smilesSet as $key => $value)
+		{
+			if (!$userSets[$value['ID']])
+				continue;
+
+			unset($value['STRING_ID']);
+			unset($value['SORT']);
+			if (empty($value['NAME']))
+				$value['NAME'] = GetMessage('MAIN_SMILE_SET_NAME', Array('#ID#' => $key));
+
+			$result['SMILE_SET'][] = $value;
+		}
+
+		return $result;
+	}
+
+	public static function installGallery()
+	{
+		$smileGalleryId = 0;
+
+		$arLang = Array();
+		$arLang2 = Array();
+		$langs = CLanguage::GetList($b="", $o="");
+		while($language = $langs->Fetch())
+		{
+			$lid = $language["LID"];
+			$MESS = IncludeModuleLangFile(__FILE__, $lid, true);
+			if ($MESS && isset($MESS['MAIN_SMILE_DEF_GALLERY_NAME']))
+				$arLang[$lid] = $MESS['MAIN_SMILE_DEF_GALLERY_NAME'];
+			if ($MESS && isset($MESS['MAIN_SMILE_DEF_SET_NAME']))
+				$arLang2[$lid] = $MESS['MAIN_SMILE_DEF_SET_NAME'];
+		}
+
+		$gallery = CSmileGallery::getByStringId('bitrix');
+		if (!$gallery)
+		{
+
+			$smileGalleryId = CSmileGallery::add(Array(
+				'STRING_ID' => 'bitrix',
+				'LANG' => $arLang,
+			));
+		}
+		else
+		{
+			$smileGalleryId = $gallery['ID'];
+		}
+
+		if ($smileGalleryId)
+		{
+			$smileSet = CSmileSet::getByStringId('bitrix_main');
+			if ($smileSet)
+			{
+				$smileSetId = $smileSet['ID'];
+				CSmile::deleteBySet($smileSet['ID']);
+			}
+			else
+			{
+				$smileSetId = CSmileSet::add(Array(
+					'STRING_ID' => 'bitrix_main',
+					'PARENT_ID' => $smileGalleryId,
+					'LANG' => $arLang2,
+				));
+			}
+
+			CSmile::import(array('FILE' => $_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/main/install/smiles/smiles_default.zip', 'SET_ID' => $smileSetId, 'IMPORT_IF_FILE_EXISTS' => 'Y'));
+		}
+	}
+
+	public static function convertGallery()
+	{
+		global $DB;
+
+		$arLang = Array();
+		$arLang2 = Array();
+		$arLang3 = Array();
+		$langs = CLanguage::GetList($b="", $o="");
+		while($language = $langs->Fetch())
+		{
+			$lid = $language["LID"];
+			$MESS = IncludeModuleLangFile(__FILE__, $lid, true);
+			if ($MESS && isset($MESS['MAIN_SMILE_DEF_GALLERY_NAME']))
+				$arLang[$lid] = $MESS['MAIN_SMILE_DEF_GALLERY_NAME'];
+			if ($MESS && isset($MESS['MAIN_SMILE_DEF_SET_NAME']))
+				$arLang2[$lid] = $MESS['MAIN_SMILE_DEF_SET_NAME'];
+			if ($MESS && isset($MESS['MAIN_SMILE_USER_GALLERY_NAME']))
+				$arLang3[$lid] = $MESS['MAIN_SMILE_USER_GALLERY_NAME'];
+		}
+
+		$smileGalleryId = 0;
+
+		$gallery = CSmileGallery::getByStringId('bitrix');
+		if (!$gallery)
+		{
+			$smileGalleryId = CSmileGallery::add(Array(
+				'STRING_ID' => 'bitrix',
+				'LANG' => $arLang,
+			));
+		}
+		else
+		{
+			$smileGalleryId = $gallery['ID'];
+		}
+
+		if (COption::GetOptionInt("main", "smile_gallery_converted", 0) == 0)
+		{
+			$res = $DB->Query('SELECT * FROM b_smile');
+
+			$smileOriginalSet = Array(
+				'smile_smile.png' => array('TYPING' => ':) :-)', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_wink.png' => array('TYPING' => ';) ;-)', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_biggrin.png' => array('TYPING' => ':D :-D', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_cool.png' => array('TYPING' => '8) 8-)', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_sad.png' => array('TYPING' => ':( :-(', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_neutral.png' => array('TYPING' => ':| :-|', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_redface.png' => array('TYPING' => ':oops:', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_cry.png' => array('TYPING' => ':cry: :~(', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_evil.png' => array('TYPING' => ':evil: >:-<', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_eek.png' => array('TYPING' => ':o :-o :shock:', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_confuse.png' => array('TYPING' => ':/ :-/', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_kiss.png' => array('TYPING' => ':{} :-{}', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_idea.png' => array('TYPING' => ':idea:', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_question.png' => array('TYPING' => ':?:', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+				'smile_exclaim.png' => array('TYPING' => ':!:', 'IMAGE_WIDTH' => '16', 'IMAGE_HEIGHT' => '16'),
+			);
+			$smileCount = 0;
+			$smileOriginalCount = 0;
+			while ($smile = $res->fetch())
+			{
+				if ($smile['TYPE'] != CSmile::TYPE_SMILE)
+				{
+					continue;
+				}
+
+				if (
+					$smileOriginalSet[$smile['IMAGE']]
+					&& $smileOriginalSet[$smile['IMAGE']]['IMAGE_WIDTH'] == $smile['IMAGE_WIDTH']
+					&& $smileOriginalSet[$smile['IMAGE']]['IMAGE_HEIGHT'] == $smile['IMAGE_HEIGHT']
+					&& $smileOriginalSet[$smile['IMAGE']]['TYPING'] == $smile['TYPING']
+				)
+				{
+					$smileOriginalCount++;
+				}
+
+				$smileCount++;
+			}
+
+			if (!(($smileCount == 0 || $smileCount == 15) && $smileCount == $smileOriginalCount))
+			{
+				$smileCustomGalleryId = 0;
+				$smileSet = CSmileGallery::getByStringId('bitrix_convert');
+				if (!$smileSet)
+				{
+					$smileCustomGalleryId = CSmileGallery::add(Array(
+						'STRING_ID' => 'bitrix_convert',
+						'SORT' => 300,
+						'LANG' => $arLang3,
+					));
+
+				}
+				else
+				{
+					$smileCustomGalleryId = $smileSet['ID'];
+				}
+				CSmileGallery::setDefaultId($smileCustomGalleryId);
+				$DB->Query("UPDATE b_smile_set SET PARENT_ID = ".$smileCustomGalleryId." WHERE TYPE = 'G' AND PARENT_ID = 0");
+			}
+			else
+			{
+				$smileSet = CSmileSet::getByStringId('main');
+				if ($smileSet)
+				{
+					CSmileSet::delete($smileSet['ID']);
+				}
+			}
+			COption::SetOptionInt("main", "smile_gallery_converted", 1);
+		}
+
+		if ($smileGalleryId)
+		{
+			$smileSet = CSmileSet::getByStringId('bitrix_main');
+			if ($smileSet)
+			{
+				$smileSetId = $smileSet['ID'];
+				CSmile::deleteBySet($smileSet['ID']);
+			}
+			else
+			{
+				$smileSetId = CSmileSet::add(Array(
+					'STRING_ID' => 'bitrix_main',
+					'PARENT_ID' => $smileGalleryId,
+					'LANG' => $arLang2,
+				));
+			}
+
+			CSmile::import(array('FILE' => $_SERVER["DOCUMENT_ROOT"].'/bitrix/modules/main/install/smiles/smiles_default.zip', 'SET_ID' => $smileSetId, 'IMPORT_IF_FILE_EXISTS' => 'Y'));
+		}
+
+		return false;
+	}
+}
+
 class CSmileSet
 {
 	const TYPE_SET = 'G';
+	const TYPE_GALLERY = 'P';
+
 	const SET_ID_ALL = 0;
 	const SET_ID_BY_CONFIG = -1;
 	const GET_ALL_LANGUAGE = false;
@@ -667,11 +1445,21 @@ class CSmileSet
 
 		$arInsert = array();
 
+		$arFields['PARENT_ID'] = intval($arFields['PARENT_ID']);
+		$arInsert['PARENT_ID'] = $arFields['PARENT_ID'];
+
+		$arFields['TYPE'] = isset($arFields['TYPE']) && $arFields['TYPE'] == self::TYPE_GALLERY? self::TYPE_GALLERY: self::TYPE_SET;
+
+		if ($arFields['TYPE'] != self::TYPE_GALLERY && !$arFields['PARENT_ID'] )
+			return false;
+
 		if (isset($arFields['STRING_ID']))
 			$arInsert['STRING_ID'] = $arFields['STRING_ID'];
 
 		if (isset($arFields['SORT']))
 			$arInsert['SORT'] = intval($arFields['SORT']);
+
+		$arInsert['TYPE'] = $arFields['TYPE'];
 
 		$setId = IntVal($DB->Add("b_smile_set", $arInsert));
 
@@ -686,7 +1474,7 @@ class CSmileSet
 			foreach ($arLang as $lang => $name)
 			{
 				$arInsert = array(
-					'TYPE' => self::TYPE_SET,
+					'TYPE' => $arFields['TYPE'],
 					'SID' => $setId,
 					'LID' => htmlspecialcharsbx($lang),
 					'NAME' => $name,
@@ -715,7 +1503,7 @@ class CSmileSet
 			$arUpdate['SORT'] = intval($arFields['SORT']);
 
 		if (!empty($arUpdate))
-			$DB->Update("b_smile_set", $arUpdate, "WHERE ID = ".intval($id));
+			$DB->Update("b_smile_set", $arUpdate, "WHERE ID = ".$id);
 
 		if (isset($arFields['LANG']))
 		{
@@ -725,11 +1513,14 @@ class CSmileSet
 			else
 				$arLang[LANG] = $arFields['LANG'];
 
+			$res = $DB->Query("SELECT TYPE FROM b_smile_set WHERE ID = ".$id);
+			$smileSet = $res->Fetch();
+
 			foreach ($arLang as $lang => $name)
 			{
-				$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SET."' AND SID = ".$id." AND LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'", true);
+				$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".$smileSet['TYPE']."' AND SID = ".$id." AND LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'", true);
 				$arInsert = array(
-					'TYPE' => self::TYPE_SET,
+					'TYPE' => $smileSet['TYPE'],
 					'SID' => $id,
 					'LID' => htmlspecialcharsbx($lang),
 					'NAME' => $name,
@@ -749,10 +1540,14 @@ class CSmileSet
 
 		$id = intval($id);
 
-		$DB->Query("DELETE FROM b_smile_set WHERE ID = ".$id, true);
-		$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".self::TYPE_SET."' AND SID = ".$id, true);
+		$res = $DB->Query("SELECT ID, TYPE FROM b_smile_set WHERE ID = ".$id);
+		if ($smileSet = $res->Fetch())
+		{
+			$DB->Query("DELETE FROM b_smile_set WHERE ID = ".$smileSet['ID'], true);
+			$DB->Query("DELETE FROM b_smile_lang WHERE TYPE = '".$smileSet['TYPE']."' AND SID = ".$smileSet['ID'], true);
 
-		CSmile::deleteBySet($id);
+			CSmile::deleteBySet($smileSet['ID']);
+		}
 
 		$CACHE_MANAGER->CleanDir("b_smile_set");
 
@@ -767,9 +1562,9 @@ class CSmileSet
 		$arResult = Array();
 
 		$strSql = "
-			SELECT ss.ID, ss.STRING_ID, ss.SORT, sl.NAME, sl.LID
+			SELECT ss.*, sl.NAME, sl.LID
 			FROM b_smile_set ss
-			LEFT JOIN b_smile_lang sl ON sl.TYPE = '".self::TYPE_SET."' AND sl.SID = ss.ID".($lang !== false? " AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'": "")."
+			LEFT JOIN b_smile_lang sl ON sl.TYPE = ss.TYPE AND sl.SID = ss.ID".($lang !== false? " AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'": "")."
 			WHERE ss.ID = ".$id."";
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -794,17 +1589,23 @@ class CSmileSet
 		return $arResult;
 	}
 
-	public static function getByStringId($id, $lang = LANGUAGE_ID)
+	public static function getByStringId($stringId, $type = self::TYPE_SET, $lang = LANGUAGE_ID)
 	{
 		global $DB;
 
 		$arResult = Array();
 
+		if (!in_array($type, Array(self::TYPE_SET, self::TYPE_GALLERY))) // for legacy
+		{
+			$lang = $type;
+			$type = self::TYPE_SET;
+		}
+
 		$strSql = "
-			SELECT ss.ID, ss.STRING_ID, ss.SORT, sl.NAME, sl.LID
+			SELECT ss.*, sl.NAME, sl.LID
 			FROM b_smile_set ss
-			LEFT JOIN b_smile_lang sl ON sl.TYPE = '".self::TYPE_SET."' AND sl.SID = ss.ID".($lang !== false? " AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'": "")."
-			WHERE ss.STRING_ID = '".$DB->ForSql($id)."'";
+			LEFT JOIN b_smile_lang sl ON sl.TYPE = ss.TYPE AND sl.SID = ss.ID".($lang !== false? " AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'": "")."
+			WHERE ss.STRING_ID = '".$DB->ForSql($stringId)."' AND ss.TYPE = '".$DB->ForSql($type)."'";
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		if ($lang !== false)
@@ -848,26 +1649,40 @@ class CSmileSet
 
 		$arResult = $arSelect = $arOrder = $arFilter = $arJoin = Array();
 		if (!isset($arParams['SELECT']) || !is_array($arParams['SELECT']))
-			$arParams['SELECT'] = Array('ID', 'STRING_ID', 'SORT', 'NAME');
+			$arParams['SELECT'] = Array('ID', 'STRING_ID', 'SORT', 'NAME', 'TYPE', 'PARENT_ID');
 
 		if (isset($arParams['ORDER']['SMILE_COUNT']))
 			$arParams['SELECT'][] = 'SMILE_COUNT';
 
 		// select block
+
+		if (!in_array($arParams['FILTER']['TYPE'], Array(CSmileSet::TYPE_SET, CSmileSet::TYPE_GALLERY)))
+		{
+			$arParams['FILTER']['TYPE'] = CSmileSet::TYPE_SET;
+		}
+
+
 		foreach ($arParams['SELECT'] as $fieldName)
 		{
-			if ($fieldName == 'ID' || $fieldName == 'STRING_ID' || $fieldName == 'SORT')
-			{
-				$arSelect[$fieldName] = 'ss.'.$fieldName;
-			}
-			elseif ($fieldName == 'NAME')
+			if ($fieldName == 'NAME')
 			{
 				$arSelect['NAME'] = 'sl.'.$fieldName;
-				$arJoin['LANG'] = "LEFT JOIN b_smile_lang sl ON sl.TYPE = '".self::TYPE_SET."' AND sl.SID = ss.ID AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'";
+				$arJoin['LANG'] = "LEFT JOIN b_smile_lang sl ON sl.TYPE = ss.TYPE AND sl.SID = ss.ID AND sl.LID = '".$DB->ForSql(htmlspecialcharsbx($lang))."'";
 			}
 			elseif ($fieldName == 'SMILE_COUNT')
 			{
-				$arSelect['SMILE_COUNT'] = '(SELECT COUNT(s.ID) FROM b_smile s WHERE s.SET_ID = ss.ID) as SMILE_COUNT';
+				if ($arParams['FILTER']['TYPE'] == CSmileSet::TYPE_SET)
+				{
+					$arSelect['SMILE_COUNT'] = '(SELECT COUNT(s.ID) FROM b_smile s WHERE s.SET_ID = ss.ID) as SMILE_COUNT';
+				}
+				else
+				{
+					$arSelect['SMILE_COUNT'] = '(SELECT COUNT(s.ID) FROM b_smile_set ss1 LEFT JOIN b_smile s ON ss1.ID = s.SET_ID WHERE ss1.PARENT_ID = ss.ID) as SMILE_COUNT';
+				}
+			}
+			else
+			{
+				$arSelect[$fieldName] = 'ss.'.$fieldName;
 			}
 		}
 		$arSelect['ID'] = 'ss.ID';
@@ -889,6 +1704,10 @@ class CSmileSet
 				$arFilter[] = "ss.ID = ".intval($arParams['FILTER']['ID']);
 			}
 		}
+		if (isset($arParams['FILTER']['PARENT_ID']))
+		{
+			$arFilter[] = "ss.PARENT_ID = ".intval($arParams['FILTER']['PARENT_ID']);
+		}
 		if (isset($arParams['FILTER']['STRING_ID']))
 		{
 			if (is_array($arParams['FILTER']['STRING_ID']))
@@ -905,6 +1724,8 @@ class CSmileSet
 				$arFilter[] = "ss.STRING_ID = ".intval($arParams['FILTER']['STRING_ID']);
 			}
 		}
+
+		$arFilter[] = "ss.TYPE = '".$arParams['FILTER']['TYPE']."'";
 
 		// order block
 		if (isset($arParams['ORDER']) && is_array($arParams['ORDER']))
@@ -983,7 +1804,7 @@ class CSmileSet
 			$lang = htmlspecialcharsbx($lang);
 
 		global $CACHE_MANAGER;
-		$cache_id = "b_smile_set_".$lang;
+		$cache_id = "b_smile_set_2_".$lang;
 
 		if (CACHED_b_smile !== false && $CACHE_MANAGER->Read(CACHED_b_smile, $cache_id, "b_smile_set"))
 		{
@@ -999,26 +1820,64 @@ class CSmileSet
 		return $arResult;
 	}
 
+	/**
+	 * @deprecated Use CSmileSet::getListForForm
+	 */
 	public static function getFormList($bWithOptionAll = false, $lang = LANGUAGE_ID)
 	{
-		$arSetList = Array();
-		if ($bWithOptionAll)
-			$arSetList[0] = GetMessage('MAIN_SMILE_ALL_SET');
+		return self::getListForForm(0, $lang);
+	}
 
+	
+	/**
+	* <p>Получение списка наборов. Использовать вместо <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/getformlist.php">CSmileSet::getFormList</a>. Статичный метод.</p>
+	*
+	*
+	* @param mixed $galleryId = 0 Идентификатор галереи. Не обязательный, по умолчанию использует
+	* настройку главного модуля.
+	*
+	* @param mixed $lang = LANGUAGE_ID Идентификатор языка для получения локализации, по умолчанию
+	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
+	* всех локализаций).
+	*
+	* @return mixed <p>Возвращает массив с данными о наборе.</p> <br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/getlistforform.php
+	* @author Bitrix
+	*/
+	public static function getListForForm($galleryId = 0, $lang = LANGUAGE_ID)
+	{
+		$arGalleryList = Array();
+		if (!$galleryId)
+		{
+			$arGalleryList = CSmileGallery::getListForForm($lang);
+		}
+
+		$arSetList = Array();
 		foreach (CSmileSet::getListCache($lang) as $key => $value)
+		{
+			if ($galleryId > 0 && $value['PARENT_ID'] != $galleryId)
+				continue;
+
 			$arSetList[$key] = !empty($value['NAME'])? $value['NAME']: GetMessage('MAIN_SMILE_SET_NAME', Array('#ID#' => $key));
+			if (count($arGalleryList) > 1)
+			{
+				$arSetList[$key] = $arGalleryList[$value['PARENT_ID']].' > '.$arSetList[$key];
+			}
+		}
 
 		return $arSetList;
 	}
 
+	/**
+	 * @deprecated Use CSmileGallery::getDefaultId()
+	 */
 	public static function getConfigSetId()
 	{
 		$setId = COption::GetOptionString("main", "smile_set_id", self::SET_ID_ALL);
-		$eventSetId = -1;
-		foreach(GetModuleEvents("main", "OnBeforeSmileGetConfigSetId", true) as $arEvent)
-			$eventSetId = intval(ExecuteModuleEventEx($arEvent, array($setId)));
 
-		return $eventSetId >= self::SET_ID_ALL? $eventSetId: $setId;
+		return $setId;
 	}
 }
 

@@ -9,5 +9,5 @@
 // define('BX_PULL_SKIP_LS', true);
 // define('BX_PULL_SKIP_WEBSOCKET', true);
 if (!defined('BX_DONT_SKIP_PULL_INIT'))
-	;// define("BX_PULL_SKIP_INIT", true);
+	// define("BX_PULL_SKIP_INIT", true);
 ?>

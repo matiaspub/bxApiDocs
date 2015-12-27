@@ -1,6 +1,97 @@
 <?
+IncludeModuleLangFile(__FILE__);
+
 class CIBlockSectionPropertyLink
 {
+	public static function Set($SECTION_ID, $PROPERTY_ID, $arLink = array())
+	{
+		global $DB;
+		$SECTION_ID = intval($SECTION_ID);
+		$PROPERTY_ID = intval($PROPERTY_ID);
+		$rs = $DB->Query("
+			SELECT *
+			FROM b_iblock_section_property
+			WHERE SECTION_ID = ".$SECTION_ID." AND PROPERTY_ID = ".$PROPERTY_ID."
+		");
+
+		$sectionProperty = $rs->Fetch();
+		if ($sectionProperty)
+		{
+			$ar = self::CheckProperty($SECTION_ID, $PROPERTY_ID);
+			if (is_array($ar))
+			{
+				$arUpdate = array();
+
+				if (
+					array_key_exists("SMART_FILTER", $arLink)
+					&& $arLink["SMART_FILTER"] !== $sectionProperty["SMART_FILTER"]
+				)
+				{
+					$arUpdate["SMART_FILTER"] = $arLink["SMART_FILTER"] === "Y"? "Y": false;
+				}
+
+				if (
+					array_key_exists("DISPLAY_TYPE", $arLink)
+					&& $arLink["DISPLAY_TYPE"] !== $sectionProperty["DISPLAY_TYPE"]
+				)
+				{
+					$arUpdate["DISPLAY_TYPE"] = $arLink["DISPLAY_TYPE"];
+				}
+
+				if (
+					array_key_exists("DISPLAY_EXPANDED", $arLink)
+					&& $arLink["DISPLAY_EXPANDED"] !== $sectionProperty["DISPLAY_EXPANDED"]
+				)
+				{
+					$arUpdate["DISPLAY_EXPANDED"] = $arLink["DISPLAY_EXPANDED"] === "Y"? "Y": false;
+				}
+
+				if (
+					array_key_exists("FILTER_HINT", $arLink)
+					&& $arLink["FILTER_HINT"] !== $sectionProperty["FILTER_HINT"]
+				)
+				{
+					$arUpdate["FILTER_HINT"] = $arLink["FILTER_HINT"];
+				}
+
+				if (
+					array_key_exists("IBLOCK_ID", $arLink)
+					&& $arLink["IBLOCK_ID"] !== $sectionProperty["IBLOCK_ID"]
+				)
+				{
+					$arUpdate["IBLOCK_ID"] = $arLink["IBLOCK_ID"];
+				}
+
+				if (!empty($arUpdate))
+					$strUpdate = $DB->PrepareUpdate("b_iblock_section_property", $arUpdate);
+				else
+					$strUpdate = "";
+
+				if (strlen($strUpdate) > 0)
+				{
+					$DB->Query("
+						UPDATE b_iblock_section_property
+						SET ".$strUpdate."
+						WHERE SECTION_ID = ".$ar["SECTION_ID"]."
+						AND PROPERTY_ID = ".$ar["PROPERTY_ID"]."
+					");
+
+					if (
+						array_key_exists("SMART_FILTER", $arUpdate)
+						&& $arUpdate["SMART_FILTER"] === "Y"
+					)
+					{
+						\Bitrix\Iblock\PropertyIndex\Manager::markAsInvalid($arUpdate["IBLOCK_ID"]? $arUpdate["IBLOCK_ID"]: $ar["IBLOCK_ID"]);
+					}
+				}
+			}
+		}
+		else
+		{
+			self::Add($SECTION_ID, $PROPERTY_ID, $arLink);
+		}
+	}
+
 	public static function Add($SECTION_ID, $PROPERTY_ID, $arLink = array())
 	{
 		global $DB;
@@ -11,37 +102,24 @@ class CIBlockSectionPropertyLink
 			FROM b_iblock_section_property
 			WHERE SECTION_ID = ".$SECTION_ID." AND PROPERTY_ID = ".$PROPERTY_ID."
 		");
+
 		if (!$rs->Fetch())
 		{
-			if ($SECTION_ID == 0)
-				$rs = $DB->Query("
-					SELECT 1 ID, bp.IBLOCK_ID, 0 SECTION_ID, bp.ID PROPERTY_ID
-					FROM b_iblock_property bp
-					WHERE bp.ID = ".$PROPERTY_ID."
-				");
-			elseif ($SECTION_ID > 0)
-				$rs = $DB->Query("
-					SELECT 1 ID, bs.IBLOCK_ID, bs.ID SECTION_ID, bp.ID PROPERTY_ID
-					FROM b_iblock_property bp
-					,b_iblock_section bs
-					WHERE bp.ID = ".$PROPERTY_ID."
-					AND bs.ID = ".$SECTION_ID."
-				");
-			else
-				$rs = false;
-
-			if (is_object($rs))
-				$ar = $rs->Fetch();
-			else
-				$ar = false;
-
+			$ar = self::CheckProperty($SECTION_ID, $PROPERTY_ID);
 			if (is_array($ar))
 			{
+				$ar["ID"] = 1;
 				$DB->Add("b_iblock_section_property", $ar);
 
 				$arUpdate = array();
 				if (array_key_exists("SMART_FILTER", $arLink))
 					$arUpdate["SMART_FILTER"] = $arLink["SMART_FILTER"];
+				if (array_key_exists("DISPLAY_TYPE", $arLink))
+					$arUpdate["DISPLAY_TYPE"] = $arLink["DISPLAY_TYPE"];
+				if (array_key_exists("DISPLAY_EXPANDED", $arLink))
+					$arUpdate["DISPLAY_EXPANDED"] = $arLink["DISPLAY_EXPANDED"];
+				if (array_key_exists("FILTER_HINT", $arLink))
+					$arUpdate["FILTER_HINT"] = $arLink["FILTER_HINT"];
 				if (array_key_exists("IBLOCK_ID", $arLink))
 					$arUpdate["IBLOCK_ID"] = $arLink["IBLOCK_ID"];
 
@@ -50,7 +128,7 @@ class CIBlockSectionPropertyLink
 				else
 					$strUpdate = "";
 
-				if (strlen($strUpdate))
+				if (strlen($strUpdate) > 0)
 				{
 					$DB->Query("
 						UPDATE b_iblock_section_property
@@ -59,8 +137,49 @@ class CIBlockSectionPropertyLink
 						AND SECTION_ID = ".$ar["SECTION_ID"]."
 						AND PROPERTY_ID = ".$ar["PROPERTY_ID"]."
 					");
+
+					if (
+						array_key_exists("SMART_FILTER", $arUpdate)
+						&& $arUpdate["SMART_FILTER"] === "Y"
+						&& $arLink["INVALIDATE"] !== "N"
+					)
+					{
+						\Bitrix\Iblock\PropertyIndex\Manager::markAsInvalid($arUpdate["IBLOCK_ID"]? $arUpdate["IBLOCK_ID"]: $ar["IBLOCK_ID"]);
+					}
 				}
 			}
+		}
+	}
+
+	public static function CheckProperty($SECTION_ID, $PROPERTY_ID)
+	{
+		global $DB;
+		$SECTION_ID = intval($SECTION_ID);
+		$PROPERTY_ID = intval($PROPERTY_ID);
+
+		if ($SECTION_ID == 0)
+		{
+			$rs = $DB->Query("
+				SELECT bp.IBLOCK_ID, 0 SECTION_ID, bp.ID PROPERTY_ID
+				FROM b_iblock_property bp
+				WHERE bp.ID = ".$PROPERTY_ID."
+			");
+			return $rs->Fetch();
+		}
+		elseif ($SECTION_ID > 0)
+		{
+			$rs = $DB->Query("
+				SELECT bs.IBLOCK_ID, bs.ID SECTION_ID, bp.ID PROPERTY_ID
+				FROM b_iblock_property bp
+				,b_iblock_section bs
+				WHERE bp.ID = ".$PROPERTY_ID."
+				AND bs.ID = ".$SECTION_ID."
+			");
+			return $rs->Fetch();
+		}
+		else
+		{
+			return false;
 		}
 	}
 
@@ -78,14 +197,24 @@ class CIBlockSectionPropertyLink
 		$IBLOCK_ID = intval($IBLOCK_ID);
 		$DB->Query("DELETE FROM b_iblock_section_property WHERE IBLOCK_ID = ".$IBLOCK_ID);
 		$DB->Query("UPDATE b_iblock SET SECTION_PROPERTY = 'N' WHERE ID = ".$IBLOCK_ID);
+		\Bitrix\Iblock\PropertyIndex\Manager::deleteIndex($IBLOCK_ID);
 		CIBlock::CleanCache($IBLOCK_ID);
 	}
 
-	public static function DeleteBySection($SECTION_ID)
+	public static function DeleteBySection($SECTION_ID, $PROPERTY_ID = null)
 	{
 		global $DB;
 		$SECTION_ID = intval($SECTION_ID);
-		$DB->Query("DELETE FROM b_iblock_section_property WHERE SECTION_ID = ".$SECTION_ID);
+		if (is_array($PROPERTY_ID))
+			$PROPERTY_ID = array_map("intval", $PROPERTY_ID);
+		elseif ($PROPERTY_ID !== null)
+			$PROPERTY_ID = array(intval($PROPERTY_ID));
+
+		$DB->Query("
+			DELETE FROM b_iblock_section_property
+			WHERE SECTION_ID = ".$SECTION_ID."
+			".($PROPERTY_ID? "AND PROPERTY_ID NOT IN (".implode(", ", $PROPERTY_ID).")": "")."
+		");
 	}
 
 	public static function DeleteByProperty($PROPERTY_ID)
@@ -123,6 +252,67 @@ class CIBlockSectionPropertyLink
 		$IBLOCK_ID = intval($IBLOCK_ID);
 		$SECTION_ID = intval($SECTION_ID);
 		$result = array();
+		$rs = $DB->Query("
+			SELECT
+				B.SECTION_PROPERTY,
+				BP.ID PROPERTY_ID,
+				BSP.SECTION_ID LINK_ID,
+				BSP.SMART_FILTER,
+				BSP.DISPLAY_TYPE,
+				BSP.DISPLAY_EXPANDED,
+				BSP.FILTER_HINT,
+				BP.SORT,
+				0 LEFT_MARGIN,
+				B.NAME LINK_TITLE,
+				BP.PROPERTY_TYPE,
+				BP.USER_TYPE
+			FROM
+				b_iblock B
+				INNER JOIN b_iblock_property BP ON BP.IBLOCK_ID = B.ID
+				LEFT JOIN b_iblock_section_property BSP ON BSP.SECTION_ID = 0 AND BSP.PROPERTY_ID = BP.ID
+			WHERE
+				B.ID = ".$IBLOCK_ID."
+			ORDER BY
+				BP.SORT ASC, BP.ID ASC
+		");
+		while ($ar = $rs->Fetch())
+		{
+			if ($ar["SECTION_PROPERTY"] === "Y")
+			{
+				if (strlen($ar["LINK_ID"]))
+					$result[$ar["PROPERTY_ID"]] = array(
+						"PROPERTY_ID" => $ar["PROPERTY_ID"],
+						"SMART_FILTER" => $ar["SMART_FILTER"],
+						"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+						"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
+						"FILTER_HINT" => $ar["FILTER_HINT"],
+						"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
+						"INHERITED_FROM" => 0,
+						"SORT" => $ar["SORT"],
+						"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
+						"LINK_TITLE" => $ar["LINK_TITLE"],
+						"PROPERTY_TYPE" => $ar["PROPERTY_TYPE"],
+						"USER_TYPE" => $ar["USER_TYPE"],
+					);
+			}
+			else
+			{
+				$result[$ar["PROPERTY_ID"]] = array(
+					"PROPERTY_ID" => $ar["PROPERTY_ID"],
+					"SMART_FILTER" => "N",
+					"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+					"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
+					"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
+					"INHERITED_FROM" => 0,
+					"SORT" => $ar["SORT"],
+					"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
+					"LINK_TITLE" => $ar["LINK_TITLE"],
+					"PROPERTY_TYPE" => $ar["PROPERTY_TYPE"],
+					"USER_TYPE" => $ar["USER_TYPE"],
+				);
+			}
+		}
+
 		if ($SECTION_ID > 0)
 		{
 			$rs = $DB->Query($s = "
@@ -131,9 +321,14 @@ class CIBlockSectionPropertyLink
 					BP.ID PROPERTY_ID,
 					BSP.SECTION_ID LINK_ID,
 					BSP.SMART_FILTER,
+					BSP.DISPLAY_TYPE,
+					BSP.DISPLAY_EXPANDED,
+					BSP.FILTER_HINT,
 					BP.SORT,
 					BS.LEFT_MARGIN,
-					BS.NAME LINK_TITLE
+					BS.NAME LINK_TITLE,
+					BP.PROPERTY_TYPE,
+					BP.USER_TYPE
 				FROM
 					b_iblock B
 					INNER JOIN b_iblock_property BP ON BP.IBLOCK_ID = B.ID
@@ -145,73 +340,158 @@ class CIBlockSectionPropertyLink
 				WHERE
 					B.ID = ".$IBLOCK_ID."
 				ORDER BY
-					BP.SORT ASC, BP.ID ASC, BS.LEFT_MARGIN DESC
+					BP.SORT ASC, BP.ID ASC, BS.LEFT_MARGIN ASC
 			");
 			while ($ar = $rs->Fetch())
 			{
 				$result[$ar["PROPERTY_ID"]] = array(
 					"PROPERTY_ID" => $ar["PROPERTY_ID"],
 					"SMART_FILTER" => $ar["SMART_FILTER"],
+					"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+					"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
+					"FILTER_HINT" => $ar["FILTER_HINT"],
 					"INHERITED" => $SECTION_ID == $ar["LINK_ID"] ? "N" : "Y",
 					"INHERITED_FROM" => $ar["LINK_ID"],
 					"SORT" => $ar["SORT"],
 					"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
 					"LINK_TITLE" => $ar["LINK_TITLE"],
+					"PROPERTY_TYPE" => $ar["PROPERTY_TYPE"],
 				);
 			}
 		}
-		if ($SECTION_ID >= 0)
+
+		if ($result)
 		{
-			$rs = $DB->Query("
-				SELECT
-					B.SECTION_PROPERTY,
-					BP.ID PROPERTY_ID,
-					BSP.SECTION_ID LINK_ID,
-					BSP.SMART_FILTER,
-					BP.SORT,
-					0 LEFT_MARGIN,
-					B.NAME LINK_TITLE
-				FROM
-					b_iblock B
-					INNER JOIN b_iblock_property BP ON BP.IBLOCK_ID = B.ID
-					LEFT JOIN b_iblock_section_property BSP ON BSP.SECTION_ID = 0 AND BSP.PROPERTY_ID = BP.ID
-				WHERE
-					B.ID = ".$IBLOCK_ID."
-				ORDER BY
-					BP.SORT ASC, BP.ID ASC
-			");
-			while ($ar = $rs->Fetch())
-			{
-				if ($ar["SECTION_PROPERTY"] === "Y")
-				{
-					if (strlen($ar["LINK_ID"]))
-						$result[$ar["PROPERTY_ID"]] = array(
-							"PROPERTY_ID" => $ar["PROPERTY_ID"],
-							"SMART_FILTER" => $ar["SMART_FILTER"],
-							"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
-							"INHERITED_FROM" => 0,
-							"SORT" => $ar["SORT"],
-							"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
-							"LINK_TITLE" => $ar["LINK_TITLE"],
-						);
-				}
-				else
-				{
-					$result[$ar["PROPERTY_ID"]] = array(
-						"PROPERTY_ID" => $ar["PROPERTY_ID"],
-						"SMART_FILTER" => "N",
-						"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
-						"INHERITED_FROM" => 0,
-						"SORT" => $ar["SORT"],
-						"LEFT_MARGIN" => $ar["LEFT_MARGIN"],
-						"LINK_TITLE" => $ar["LINK_TITLE"],
-					);
-				}
-			}
-			if (!empty($result))
-				\Bitrix\Main\Type\Collection::sortByColumn($result, array("SORT" => SORT_ASC, "PROPERTY_ID" => SORT_ASC), '', null, true);
+			\Bitrix\Main\Type\Collection::sortByColumn(
+				$result,
+				array(
+					"SORT" => SORT_ASC,
+					"PROPERTY_ID" => SORT_ASC,
+				),
+				'',
+				null,
+				true
+			);
 		}
 		return $result;
+	}
+
+	public static function getDisplayTypes($property_type, $user_type)
+	{
+		//ABCDE - for numbers
+		//FGHIJ - for checkboxes
+		//KLMNO - for radio buttons
+		//PQRST - for drop down
+		//UWXYZ - reserved
+		if (
+			$property_type == "S"
+			&& $user_type == "directory"
+		)
+		{
+			$result = array(
+				"F" => GetMessage("SP_DISPLAY_TYPE_F"),
+				"G" => GetMessage("SP_DISPLAY_TYPE_G"),
+				"H" => GetMessage("SP_DISPLAY_TYPE_H"),
+				"K" => GetMessage("SP_DISPLAY_TYPE_K"),
+				"P" => GetMessage("SP_DISPLAY_TYPE_P"),
+				"R" => GetMessage("SP_DISPLAY_TYPE_R"),
+			);
+		}
+		elseif (
+			$property_type == "S"
+			&& $user_type == "DateTime"
+		)
+		{
+			$result = array(
+				"U" => GetMessage("SP_DISPLAY_TYPE_U"),
+				"F" => GetMessage("SP_DISPLAY_TYPE_F"),
+				"K" => GetMessage("SP_DISPLAY_TYPE_K"),
+				"P" => GetMessage("SP_DISPLAY_TYPE_P"),
+			);
+		}
+		elseif (
+			$property_type == "S"
+			|| $property_type == "L"
+			|| $property_type == "E"
+			|| $property_type == "G"
+		)
+		{
+			$result = array(
+				"F" => GetMessage("SP_DISPLAY_TYPE_F"),
+				"K" => GetMessage("SP_DISPLAY_TYPE_K"),
+				"P" => GetMessage("SP_DISPLAY_TYPE_P"),
+			);
+		}
+		elseif (
+			$property_type == "N"
+		)
+		{
+			$result = array(
+				"A" => GetMessage("SP_DISPLAY_TYPE_A"),
+				"B" => GetMessage("SP_DISPLAY_TYPE_B"),
+			);
+		}
+		else
+		{
+			$result = array();
+		}
+		return $result;
+	}
+
+	public static function getDisplayTypesJsFunction()
+	{
+		//ABCDE - for numbers
+		//FGHIJ - for checkboxes
+		//KLMNO - for radio buttons
+		//PQRST - for drop down
+		//UWXYZ - reserved
+		$js = '
+		public static function getDisplayTypes(property_type, user_type)
+		{
+			if (
+				property_type == "S"
+				&& user_type == "directory"
+			)
+			{
+				result = {
+					"F": "'.GetMessageJS("SP_DISPLAY_TYPE_F").'",
+					"G": "'.GetMessageJS("SP_DISPLAY_TYPE_G").'",
+					"H": "'.GetMessageJS("SP_DISPLAY_TYPE_H").'",
+					"K": "'.GetMessageJS("SP_DISPLAY_TYPE_K").'",
+					"P": "'.GetMessageJS("SP_DISPLAY_TYPE_P").'",
+					"R": "'.GetMessageJS("SP_DISPLAY_TYPE_R").'"
+				};
+			}
+			else if (
+				property_type == "S"
+				|| property_type == "L"
+				|| property_type == "E"
+				|| property_type == "G"
+			)
+			{
+				result = {
+					"F": "'.GetMessageJS("SP_DISPLAY_TYPE_F").'",
+					"K": "'.GetMessageJS("SP_DISPLAY_TYPE_K").'",
+					"P": "'.GetMessageJS("SP_DISPLAY_TYPE_P").'"
+				};
+			}
+			else if (
+				property_type == "N"
+			)
+			{
+				result = {
+					"A": "'.GetMessageJS("SP_DISPLAY_TYPE_A").'",
+					"B": "'.GetMessageJS("SP_DISPLAY_TYPE_B").'"
+				};
+			}
+			else
+			{
+				result = false;
+			}
+			return result;
+		}
+		';
+		return $js;
 	}
 
 	public static function _sort($a, $b)

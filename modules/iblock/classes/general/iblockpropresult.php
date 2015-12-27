@@ -7,6 +7,7 @@ class CIBlockPropertyResult extends CDBResult
 	protected $IBLOCK_ID = 0;
 	protected $VERSION = 0;
 	protected $arProperties = array();
+	protected static $propertiesCache = array();
 	protected $arPropertiesValues = array();
 	protected $lastRes = null;
 	protected $extMode = false;
@@ -248,34 +249,48 @@ class CIBlockPropertyResult extends CDBResult
 			Collection::normalizeArrayValuesByInt($propertyID);
 		}
 		$this->arProperties = array();
-		$propertyIterator = PropertyTable::getList(array(
-			'select' => array(
-				'ID', 'IBLOCK_ID', 'NAME', 'ACTIVE', 'SORT', 'CODE', 'DEFAULT_VALUE', 'PROPERTY_TYPE',
-				'MULTIPLE', 'LINK_IBLOCK_ID', 'VERSION', 'USER_TYPE', 'USER_TYPE_SETTINGS'
-			),
-			'filter' => (empty($propertyID) ? array('IBLOCK_ID' => $IBLOCK_ID) : array('ID' => $propertyID, 'IBLOCK_ID' => $IBLOCK_ID)),
-			'order' => array('ID' => 'ASC')
-		));
-		while ($property = $propertyIterator->fetch())
+		if (
+			!empty($propertyID)
+			|| (empty($propertyID) && !isset(self::$propertiesCache[$IBLOCK_ID]))
+		)
 		{
-			if ($property['USER_TYPE'])
+			$propertyIterator = PropertyTable::getList(array(
+				'select' => array(
+					'ID', 'IBLOCK_ID', 'NAME', 'ACTIVE', 'SORT', 'CODE', 'DEFAULT_VALUE', 'PROPERTY_TYPE',
+					'MULTIPLE', 'LINK_IBLOCK_ID', 'VERSION', 'USER_TYPE', 'USER_TYPE_SETTINGS'
+				),
+				'filter' => (empty($propertyID) ? array('IBLOCK_ID' => $IBLOCK_ID) : array('ID' => $propertyID, 'IBLOCK_ID' => $IBLOCK_ID)),
+				'order' => array('ID' => 'ASC')
+			));
+			while ($property = $propertyIterator->fetch())
 			{
-				$userType = CIBlockProperty::GetUserType($property['USER_TYPE']);
-				if (isset($userType["ConvertFromDB"]))
+				if ($property['USER_TYPE'])
 				{
-					if(array_key_exists("DEFAULT_VALUE", $property))
+					$userType = CIBlockProperty::GetUserType($property['USER_TYPE']);
+					if (isset($userType["ConvertFromDB"]))
 					{
-						$value = array("VALUE" => $property["DEFAULT_VALUE"], "DESCRIPTION" => "");
-						$value = call_user_func_array($userType["ConvertFromDB"], array($property, $value));
-						$property["DEFAULT_VALUE"] = $value["VALUE"];
+						if (array_key_exists("DEFAULT_VALUE", $property))
+						{
+							$value = array("VALUE" => $property["DEFAULT_VALUE"], "DESCRIPTION" => "");
+							$value = call_user_func_array($userType["ConvertFromDB"], array($property, $value));
+							$property["DEFAULT_VALUE"] = $value["VALUE"];
+						}
 					}
 				}
+				if ($property['USER_TYPE_SETTINGS'] !== '' || $property['USER_TYPE_SETTINGS'] !== null)
+					$property['USER_TYPE_SETTINGS'] = unserialize($property['USER_TYPE_SETTINGS']);
+				$this->arProperties[$property['ID']] = $property;
 			}
-			if ($property['USER_TYPE_SETTINGS'] !== '' || $property['USER_TYPE_SETTINGS'] !== null)
-				$property['USER_TYPE_SETTINGS'] = unserialize($property['USER_TYPE_SETTINGS']);
-			$this->arProperties[$property['ID']] = $property;
+			unset($property, $propertyIterator);
+			if (empty($propertyID))
+			{
+				self::$propertiesCache[$IBLOCK_ID] = $this->arProperties;
+			}
 		}
-		unset($property, $propertyIterator);
+		else
+		{
+			$this->arProperties = self::$propertiesCache[$IBLOCK_ID];
+		}
 	}
 
 	public function setMode($extMode)

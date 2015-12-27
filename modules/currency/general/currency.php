@@ -1,46 +1,32 @@
 <?
-use Bitrix\Main\Config\Option;
+use Bitrix\Main;
 use Bitrix\Main\ModuleManager;
-use Bitrix\Main\Type\DateTime;
-use Bitrix\Main\Localization\LanguageTable;
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Currency;
 
-IncludeModuleLangFile(__FILE__);
+Loc::loadMessages(__FILE__);
 
-
-/**
- * <b>CCurrency</b> - класс для управления валютами: добавление, удаление, перечисление.</body> </html>
- *
- *
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/index.php
- * @author Bitrix
- */
 class CAllCurrency
 {
+	protected static $currencyCache = array();
+
 /*
-* @deprecated deprecated since catalog 9.0.0
+* @deprecated deprecated since currency 9.0.0
 * @see CCurrency::GetByID()
 */
 	
 	/**
-	* <p>Функция возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>. Функция является оболочкой функции <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getbyid.a0947d8b.php">CCurrency::GetByID</a>.</p>
-	*
-	*
+	* <p>Метод возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>. Метод является оболочкой метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getbyid.a0947d8b.php">CCurrency::GetByID</a>. Метод динамичный.</p> <p></p> <div class="note"> <b>Важно!</b> Метод устарел и не поддерживается с версии 9.0.0.</div>
 	*
 	*
 	* @param string $currency  
-	*
-	*
 	*
 	* @return array 
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__getcurrency.205e6985.php
 	* @author Bitrix
+	* @deprecated deprecated since currency 9.0.0  ->  CCurrency::GetByID()
 	*/
 	static public function GetCurrency($currency)
 	{
@@ -49,18 +35,14 @@ class CAllCurrency
 
 	
 	/**
-	* <p>Выполняет проверку полей валюты при добавлении или изменении.</p>
+	* <p>Выполняет проверку полей валюты при добавлении или изменении. Метод динамичный.</p>
 	*
 	*
-	*
-	*
-	* @param $ACTIO $N  Равен <b>ADD</b> или <b>UPDATE</b> с учетом регистра. Если значение в другом
+	* @param mixed $ACTION  Равен <b>ADD</b> или <b>UPDATE</b> с учетом регистра. Если значение в другом
 	* регистре или другое значение - вернет <i>false</i> без текста ошибки
 	* (exception). Если значение равно <b>UPDATE</b>, то дополнительно проверяется
 	* <b>CurrencyID</b>. Если значение пустое - вернет ошибку, если не пустое, то
 	* обрежет до 3 символов.
-	*
-	*
 	*
 	* @param &$arField $s  Ключи: <ul> <li> <b>CURRENCY</b> - (обязательный), обрезается до 3 символов.
 	* Обязательно будет проверен, если присутствует в массиве (даже
@@ -81,16 +63,11 @@ class CAllCurrency
 	* валюту.</li> <li> <b>DATE_UPDATE</b> - время обновления - задается системой.
 	* Если есть такой ключ в массиве - удаляется.</li> </ul>
 	*
-	*
-	*
-	* @param $strCurrencyI $D = false Код обновляемой валюты. Необязательный параметр.
-	*
-	*
+	* @param mixed $strCurrencyID = false Код обновляемой валюты. Необязательный параметр.
 	*
 	* @return boolean <p>В случае успеха возвращает <i>true</i>. В случае ошибки - <i>false</i>.
 	* Текст ошибки можно получить через <code>$APPLICATION-&gt;GetException()</code>.</p> <a
 	* name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -165,18 +142,18 @@ class CAllCurrency
 		{
 			if (!isset($arFields['CURRENCY']))
 			{
-				$arMsg[] = array('id' => 'CURRENCY', 'text' => GetMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_ABSENT'));
+				$arMsg[] = array('id' => 'CURRENCY', 'text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_ABSENT'));
 			}
 			elseif (!preg_match("~^[a-z]{3}$~i", $arFields['CURRENCY']))
 			{
-				$arMsg[] = array('id' => 'CURRENCY','text' => GetMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_LAT_EXT'));
+				$arMsg[] = array('id' => 'CURRENCY','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_LAT_EXT'));
 			}
 			else
 			{
 				$db_result = $DB->Query("select 'x' FROM b_catalog_currency where UPPER(CURRENCY) = UPPER('".$DB->ForSql($arFields['CURRENCY'])."')");
 				if ($db_result->Fetch())
 				{
-					$arMsg[] = array('id' => 'CURRENCY','text' => GetMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_EXISTS'));
+					$arMsg[] = array('id' => 'CURRENCY','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_EXISTS'));
 				}
 				else
 				{
@@ -186,20 +163,20 @@ class CAllCurrency
 			$arFields = array_merge($defaultValues, $arFields);
 			if (!isset($arFields['AMOUNT_CNT']))
 			{
-				$arMsg[] = array('id' => 'AMOUNT_CNT','text' => GetMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_CNT_ABSENT'));
+				$arMsg[] = array('id' => 'AMOUNT_CNT','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_CNT_ABSENT'));
 			}
 			if (!isset($arFields['AMOUNT']))
 			{
-				$arMsg[] = array('id' => 'AMOUNT','text' => GetMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_ABSENT'));
+				$arMsg[] = array('id' => 'AMOUNT','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_ABSENT'));
 			}
 		}
 
 		if ($ACTION == 'UPDATE')
 		{
-			$strCurrencyID = self::checkCurrencyID($strCurrencyID);
+			$strCurrencyID = Currency\CurrencyManager::checkCurrencyID($strCurrencyID);
 			if ($strCurrencyID === false)
 			{
-				$arMsg[] = array('id' => 'CURRENCY','text' => GetMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_BAD'));
+				$arMsg[] = array('id' => 'CURRENCY','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_CUR_ID_BAD'));
 			}
 			if (isset($arFields['CURRENCY']))
 				unset($arFields['CURRENCY']);
@@ -212,7 +189,7 @@ class CAllCurrency
 				$arFields['AMOUNT_CNT'] = (int)$arFields['AMOUNT_CNT'];
 				if ($arFields['AMOUNT_CNT'] <= 0)
 				{
-					$arMsg[] = array('id' => 'AMOUNT_CNT','text' => GetMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_CNT_BAD'));
+					$arMsg[] = array('id' => 'AMOUNT_CNT','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_CNT_BAD'));
 				}
 			}
 			if (isset($arFields['AMOUNT']))
@@ -220,7 +197,7 @@ class CAllCurrency
 				$arFields['AMOUNT'] = (float)$arFields['AMOUNT'];
 				if ($arFields['AMOUNT'] <= 0)
 				{
-					$arMsg[] = array('id' => 'AMOUNT','text' => GetMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_BAD'));
+					$arMsg[] = array('id' => 'AMOUNT','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_AMOUNT_BAD'));
 				}
 			}
 			if (isset($arFields['SORT']))
@@ -244,7 +221,7 @@ class CAllCurrency
 				}
 				elseif (!preg_match("~^[0-9]{3}$~", $arFields['NUMCODE']))
 				{
-					$arMsg[] = array('id' => 'NUMCODE','text' => GetMessage('BT_MOD_CURR_ERR_CURR_NUMCODE_IS_BAD'));
+					$arMsg[] = array('id' => 'NUMCODE','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_NUMCODE_IS_BAD'));
 				}
 			}
 		}
@@ -280,7 +257,7 @@ class CAllCurrency
 		{
 			if (empty($arFields['LANG']) || !is_array($arFields['LANG']))
 			{
-				$arMsg[] = array('id' => 'LANG','text' => GetMessage('BT_MOD_CURR_ERR_CURR_LANG_BAD'));
+				$arMsg[] = array('id' => 'LANG','text' => Loc::getMessage('BT_MOD_CURR_ERR_CURR_LANG_BAD'));
 			}
 			else
 			{
@@ -295,9 +272,9 @@ class CAllCurrency
 					{
 						$langAction = (CCurrencyLang::isExistCurrencyLanguage($currency, $lang) ? 'UPDATE' : 'ADD');
 					}
+					$checkLang = CCurrencyLang::checkFields($langAction, $settings, $currency, $lang, true);
 					$settings['CURRENCY'] = $currency;
 					$settings['LID'] = $lang;
-					$checkLang = CCurrencyLang::checkFields($ACTION, $settings, $currency, $lang, true);
 					$settings['IS_EXIST'] = ($langAction == 'ADD' ? 'N' : 'Y');
 					$langSettings[$lang] = $settings;
 					if (is_array($checkLang))
@@ -322,9 +299,7 @@ class CAllCurrency
 
 	
 	/**
-	* <p>Функция добавляет новую валюту, если ее еще не было. После добавления новой валюты необходимо установить ее языкозависимые параметры в помощью метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__add.7ce2349e.php">CCurrencyLang::Add</a>.</p>
-	*
-	*
+	* <p>Метод добавляет новую валюту, если ее еще не было. После добавления новой валюты необходимо установить ее языкозависимые параметры в помощью метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__add.7ce2349e.php">CCurrencyLang::Add</a>. Метод динамичный.</p>
 	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив параметров валюты, в котором ключами
@@ -344,13 +319,10 @@ class CAllCurrency
 	* <li> <b>CREATED_BY</b> - ID пользователя, добавившего валюту;</li> <li> <b>MODIFIED_BY</b>
 	* - ID последнего пользователя, изменившего валюту.</li> </ul>
 	*
-	*
-	*
-	* @return string <p>Функция возвращает код добавленной валюты (сбрасывает кеш
+	* @return string <p>Метод возвращает код добавленной валюты (сбрасывает кеш
 	* <b>currency_currency_list</b> и <b>currency_base_currency</b> в случае успешного добавления).
 	* Или <i>false</i> в случае ошибки (текст ошибки берётся через
 	* <code>$APPLICATION-&gt;GetException()</code>).</p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -406,26 +378,23 @@ class CAllCurrency
 		}
 
 		self::updateBaseRates('', $arFields['CURRENCY']);
-		self::clearCurrencyCache();
+		Currency\CurrencyManager::clearCurrencyCache();
 
 		foreach (GetModuleEvents("currency", "OnCurrencyAdd", true) as $arEvent)
 		{
 			ExecuteModuleEventEx($arEvent, array($arFields['CURRENCY'], $arFields));
 		}
-
+		if (isset(self::$currencyCache[$arFields['CURRENCY']]))
+			unset(self::$currencyCache[$arFields['CURRENCY']]);
 		return $arFields["CURRENCY"];
 	}
 
 	
 	/**
-	* <p>Функция изменяет параметры валюты <b>currency</b> на параметры, указанные в массиве <i>arFields</i>. Языкозависимые параметры (название, формат и прочее) обновляются отдельно, через класс <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__update.8a1e7a7b.php">CCurrencyLang</a></p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b> в случае успешного обновления (только если произошел запрос к базе). Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
-	*
-	*
+	* <p>Метод изменяет параметры валюты <b>currency</b> на параметры, указанные в массиве <i>arFields</i>. Языкозависимые параметры (название, формат и прочее) обновляются отдельно, через класс <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__update.8a1e7a7b.php">CCurrencyLang</a>. Метод динамичный.</p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b> в случае успешного обновления (только если произошел запрос к базе). Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	*
 	*
 	* @param string $currency  Код валюты, параметры которой нужно изменить.
-	*
-	*
 	*
 	* @param array $arFields  Массив новых параметров валюты. <ul> <li> <b>CURRENCY</b> - трехсимвольный
 	* код валюты (обязательный). Должно совпадать с кодом <b>currency</b>
@@ -440,8 +409,6 @@ class CAllCurrency
 	* <b>MODIFIED_BY</b> - ID последнего пользователя, изменившего валюту.</li>
 	* <p>Если в массиве нет ни одного из полей, то обращения к базе данных
 	* не будет, но вернет код валюты.</p> </ul>
-	*
-	*
 	*
 	* @return bool <p>Код валюты, параметры которой изменили, или <i>false</i> в случае
 	* ошибки (текст получается через <code>$APPLICATION-&gt;GetException()</code>).</p> <br><br>
@@ -460,7 +427,7 @@ class CAllCurrency
 				return false;
 		}
 
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if (!CCurrency::CheckFields('UPDATE', $arFields, $currency))
 			return false;
 
@@ -471,8 +438,9 @@ class CAllCurrency
 			$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 			self::updateBaseRates('', $currency);
-			self::clearCurrencyCache();
-			self::clearTagCache($currency);
+			Currency\CurrencyManager::clearTagCache($currency);
+			if (isset(self::$currencyCache[$currency]))
+				unset(self::$currencyCache[$currency]);
 		}
 		if (isset($arFields['LANG']))
 		{
@@ -489,6 +457,10 @@ class CAllCurrency
 			}
 			unset($settings, $lang);
 		}
+		if (!empty($strUpdate) || isset($arFields['LANG']))
+		{
+			Currency\CurrencyManager::clearCurrencyCache();
+		}
 
 		foreach (GetModuleEvents("currency", "OnCurrencyUpdate", true) as $arEvent)
 		{
@@ -500,18 +472,24 @@ class CAllCurrency
 
 	
 	/**
-	* <p>Функция удаляет валюту с кодом <b>currency</b>. Удаляются в том числе все введенные курсы для этой валюты, а так же языкозависимые свойства валюты. </p> <p>Перед удалением вызывает событие <b>OnBeforeCurrencyDelete</b>, где можно отменить удаление. Формат обработчика: <code>boolean Handler($currency)</code>.</p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b>. Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
-	*
-	*
+	* <p>Метод удаляет валюту с кодом <b>currency</b>. Удаляются в том числе все введенные курсы для этой валюты, а так же языкозависимые свойства валюты. Метод динамичный.</p> <p>Перед удалением вызывает событие <b>OnBeforeCurrencyDelete</b>, где можно отменить удаление. Формат обработчика: <code>boolean Handler($currency)</code>.</p> <p>Сбрасывает кеш <b>currency_currency_list</b> и <b>currency_base_currency</b>. Так же сбросит тегированный кеш <b>currency_id_КОД_ВАЛЮТЫ</b>.</p>
 	*
 	*
 	* @param string $currency  Код валюты.
 	*
-	*
-	*
-	* @return bool <p>Функция возвращает <i>True</i> в случае успешного удаления и <i>False</i> -
-	* в противном случае </p> <a name="examples"></a>
-	*
+	* @return bool <p>Метод возвращает <i>True</i> в случае успешного удаления и <i>False</i> - в
+	* прот
+/**
+ * <b>CCurrency</b> - класс для управления валютами: добавление, удаление, перечисление. 
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/index.php
+ * @author Bitrix
+ */
+ивном случае </p> <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -527,9 +505,9 @@ class CAllCurrency
 	*/
 	static public function Delete($currency)
 	{
-		global $DB, $stackCacheManager;
+		global $DB;
 
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return false;
 
@@ -558,29 +536,24 @@ class CAllCurrency
 			ExecuteModuleEventEx($arEvent, array($currency));
 		}
 
-		$stackCacheManager->Clear("currency_currency_lang");
-		$stackCacheManager->Clear("currency_rate");
-
-		self::clearCurrencyCache();
+		Currency\CurrencyManager::clearCurrencyCache();
 
 		$DB->Query("delete from b_catalog_currency_lang where CURRENCY = '".$sqlCurrency."'", true);
 		$DB->Query("delete from b_catalog_currency_rate where CURRENCY = '".$sqlCurrency."'", true);
 
-		self::clearTagCache($currency);
+		Currency\CurrencyManager::clearTagCache($currency);
 
+		if (isset(self::$currencyCache[$currency]))
+			unset(self::$currencyCache[$currency]);
 		return $DB->Query("delete from b_catalog_currency where CURRENCY = '".$sqlCurrency."'", true);
 	}
 
 	
 	/**
-	* <p>Функция возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>.</p>
-	*
-	*
+	* <p>Метод возвращает массив языконезависимых параметров валюты по ее коду <b>currency</b>. Метод динамичный.</p>
 	*
 	*
 	* @param string $currency  Код валюты.
-	*
-	*
 	*
 	* @return array <p>Ассоциативный массив с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
 	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENCY</td> <td>Код валюты
@@ -597,7 +570,6 @@ class CAllCurrency
 	* пользователя, изменившего валюту.</td> </tr> <tr> <td>DATE_UPDATE_FORMAT</td>
 	* <td>Отформатированная в соответствии с настройками сайта дата
 	* последнего изменения записи.</td> </tr> </table> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -622,29 +594,37 @@ class CAllCurrency
 	*/
 	static public function GetByID($currency)
 	{
-		global $DB;
-
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return false;
 
-		$strSql = "select CUR.CURRENCY, CUR.AMOUNT_CNT, CUR.AMOUNT, CUR.SORT, CUR.BASE, CUR.NUMCODE, CUR.CREATED_BY, CUR.MODIFIED_BY, ".
-			$DB->DateToCharFunction('CUR.DATE_UPDATE', 'FULL').' as DATE_UPDATE_FORMAT, '.
-			$DB->DateToCharFunction('CUR.DATE_CREATE', 'FULL').' as DATE_CREATE_FORMAT '.
-			"from b_catalog_currency CUR where CUR.CURRENCY = '".$DB->ForSQL($currency)."'";
-		$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-
-		if ($res = $db_res->Fetch())
-			return $res;
-
-		return false;
+		if (!isset(self::$currencyCache[$currency]))
+		{
+			self::$currencyCache[$currency] = false;
+			$currencyIterator = Currency\CurrencyTable::getById($currency);
+			if ($currencyData = $currencyIterator->fetch())
+			{
+				$currencyData['DATE_UPDATE_FORMAT'] = (
+					$currencyData['DATE_UPDATE'] instanceof Main\Type\DateTime
+					? $currencyData['DATE_UPDATE']->toString()
+					: null
+				);
+				$currencyData['DATE_CREATE_FORMAT'] = (
+					$currencyData['DATE_CREATE'] instanceof Main\Type\DateTime
+					? $currencyData['DATE_CREATE']->toString()
+					: null
+				);
+				unset($currencyData['DATE_UPDATE'], $currencyData['DATE_CREATE']);
+				self::$currencyCache[$currency] = $currencyData;
+			}
+			unset($currencyData, $currencyIterator);
+		}
+		return self::$currencyCache[$currency];
 	}
 
 	
 	/**
-	* <p>Функция возвращает код базовой валюты.</p> <p>Одна из валют сайта должна иметь курс "по-умолчанию" равный 1. Эта валюта называется базовой. Курс всех валют, кроме базовой, задается относительно базовой валюты.</p>
-	*
-	*
+	* <p>Метод возвращает код базовой валюты.</p> <p>Одна из валют сайта должна иметь курс "по-умолчанию" равный 1. Эта валюта называется базовой. Курс всех валют, кроме базовой, задается относительно базовой валюты. Метод динамичный.</p>
 	*
 	*
 	* @return string 
@@ -655,59 +635,26 @@ class CAllCurrency
 	*/
 	static public function GetBaseCurrency()
 	{
-		global $DB, $CACHE_MANAGER;
-
-		$baseCurrency = '';
-
-		if (defined("CURRENCY_SKIP_CACHE") && CURRENCY_SKIP_CACHE)
-		{
-			$strSql = "select CURRENCY from b_catalog_currency where BASE = 'Y' and AMOUNT = 1";
-			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-			if ($arRes = $dbRes->Fetch())
-				$baseCurrency = $arRes['CURRENCY'];
-		}
-		else
-		{
-			$cacheTime = CURRENCY_CACHE_DEFAULT_TIME;
-			if (defined("CURRENCY_CACHE_TIME"))
-				$cacheTime = (int)CURRENCY_CACHE_TIME;
-
-			if ($CACHE_MANAGER->Read($cacheTime, "currency_base_currency"))
-			{
-				$baseCurrency = $CACHE_MANAGER->Get("currency_base_currency");
-			}
-			else
-			{
-				$strSql = "select CURRENCY from b_catalog_currency where BASE = 'Y' and AMOUNT = 1";
-				$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-				if ($arRes = $dbRes->Fetch())
-					$baseCurrency = $arRes['CURRENCY'];
-
-				$CACHE_MANAGER->Set("currency_base_currency", $baseCurrency);
-			}
-		}
-
-		return $baseCurrency;
+		return Currency\CurrencyManager::getBaseCurrency();
 	}
 
 	static public function SetBaseCurrency($currency)
 	{
-		global $DB;
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return false;
-		$currency = $DB->ForSql($currency);
-		$query = "select CURRENCY, BASE from b_catalog_currency where CURRENCY = '".$currency."'";
-		$currencyIterator = $DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
-		if ($existCurrency = $currencyIterator->Fetch())
+
+		$currencyIterator = Currency\CurrencyTable::getList(array(
+			'select' => array('CURRENCY', 'BASE'),
+			'filter' => array('=CURRENCY' => $currency)
+		));
+		if ($existCurrency = $currencyIterator->fetch())
 		{
 			if ($existCurrency['BASE'] == 'Y')
 				return true;
 			$result = self::updateBaseCurrency($currency);
 			if ($result)
-			{
-				self::clearCurrencyCache();
-			}
+				Currency\CurrencyManager::clearCurrencyCache();
 			return $result;
 		}
 		return false;
@@ -715,45 +662,30 @@ class CAllCurrency
 
 	
 	/**
-	* <p>Функция для формирования готового кода выпадающего списка (select) валют. Список валют при построении списка кэшируется. Поэтому вывод дополнительных выпадающих списков в рамках одной страницы не приводит к дополнительным запросам к базе данных. </p>
-	*
-	*
+	* <p>Метод для формирования готового кода выпадающего списка (select) валют. Список валют при построении списка кешируется. Поэтому вывод дополнительных выпадающих списков в рамках одной страницы не приводит к дополнительным запросам к базе данных. Метод динамичный.</p>
 	*
 	*
 	* @param string $sFieldName  Название выпадающего списка.
 	*
-	*
-	*
 	* @param string $sValue  Код валюты, которую нужно установить в списке выбранной.
-	*
-	*
 	*
 	* @param string $sDefaultValue = "" Особое значение в списке, которое не соответствует ни одной
 	* валюте. Например, значение "Все" или "Не установлено". В этом случае
 	* код валюты в списке будет пустым. Если параметр пуст, то особое
 	* значение не отображается. Необязательный параметр.
 	*
-	*
-	*
 	* @param bool $bFullName = True Выводить ли полное имя валюты. Если параметр равен False, то в списке
 	* выводятся только коды валют. Необязательный параметр.
-	*
-	*
 	*
 	* @param string $JavaFunc = "" Название JavaScript функции, которая вызывается на событие OnChange
 	* списка. Если значение пустое, то функция не вызывается.
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @param string $sAdditionalParams = "" Строка произвольных дополнительных атрибутов тега &lt;select&gt;
 	* Необязательный параметр.
 	*
-	*
-	*
 	* @return string <p>Строка, содержащая код для формирования выпадающего списка
 	* валют </p> <a name="examples"></a>
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -765,26 +697,23 @@ class CAllCurrency
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__selectbox.a14c0d6e.php
 	* @author Bitrix
 	*/
-	static public function SelectBox($sFieldName, $sValue, $sDefaultValue = "", $bFullName = true, $JavaFunc = "", $sAdditionalParams = "")
+	static public function SelectBox($sFieldName, $sValue, $sDefaultValue = '', $bFullName = true, $JavaFunc = '', $sAdditionalParams = '')
 	{
 		$s = '<select name="'.$sFieldName.'"';
 		if ('' != $JavaFunc) $s .= ' onchange="'.$JavaFunc.'"';
 		if ('' != $sAdditionalParams) $s .= ' '.$sAdditionalParams.' ';
 		$s .= '>';
+		$s1 = '';
 		$found = false;
 
-		$by = "sort";
-		$order = "asc";
-		$s1 = '';
-		$dbCurrencyList = CCurrency::GetList($by, $order);
-		while ($arCurrency = $dbCurrencyList->Fetch())
+		$currencyList = Currency\CurrencyManager::getCurrencyList();
+		if (!empty($currencyList) && is_array($currencyList))
 		{
-			$title = $arCurrency["CURRENCY"];
-			if ($bFullName)
-				$title .= ' ('.$arCurrency["FULL_NAME"].')';
-
-			$found = ($arCurrency["CURRENCY"] == $sValue);
-			$s1 .= '<option value="'.$arCurrency["CURRENCY"].'"'.($found ? ' selected':'').'>'.htmlspecialcharsex($title).'</option>';
+			foreach ($currencyList as $currency => $title)
+			{
+				$found = ($currency == $sValue);
+				$s1 .= '<option value="'.$currency.'"'.($found ? ' selected' : '').'>'.($bFullName ? htmlspecialcharsex($title) : $currency).'</option>';
+			}
 		}
 		if ('' != $sDefaultValue)
 			$s .= '<option value=""'.($found ? '' : ' selected').'>'.htmlspecialcharsex($sDefaultValue).'</option>';
@@ -793,27 +722,19 @@ class CAllCurrency
 
 	
 	/**
-	* <p>Функция возвращает список валют, отсортированный по полю из параметра by в направлении order. Языкозависимые параметры валют берутся для языка, указанного в параметре lang (по умолчанию равен текущему языку). </p>
-	*
-	*
+	* <p>Метод возвращает список валют, отсортированный по полю из параметра by в направлении order. Языкозависимые параметры валют берутся для языка, указанного в параметре lang (по умолчанию равен текущему языку). Метод динамичный.</p>
 	*
 	*
 	* @param string &$by  Переменная, содержащая порядок сортировки валют. Допустимые
 	* значения переменной:<br> currency - код валюты<br> name - название валюты на
 	* языке lang<br> sort - индекс сортировки (по-умолчанию)
 	*
-	*
-	*
 	* @param string &$order  Переменная, содержащая направление сортировки. Допустимые
 	* значения:<br> asc - по возрастанию значений (по-умолчанию) <br> desc - по
 	* убыванию значений.
 	*
-	*
-	*
 	* @param string $lang = LANGUAGE_ID Код языка, для которого выбираются языкозависимые параметры
 	* валют. Необязательный параметр.
-	*
-	*
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, каждая запись в котором
 	* представляет собой массив с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
@@ -842,7 +763,6 @@ class CAllCurrency
 	* <td>Флаг (Y/N) убирает показ в публичной части незначащих нулей у
 	* дробной части цены.</td> </tr> </table> <a name="examples"></a>
 	*
-	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
@@ -867,24 +787,19 @@ class CAllCurrency
 		global $CACHE_MANAGER;
 
 		if (defined("CURRENCY_SKIP_CACHE") && CURRENCY_SKIP_CACHE
-			|| StrToLower($by) == "name"
-			|| StrToLower($by) == "currency"
-			|| StrToLower($order) == "desc")
+			|| strtolower($by) == "name"
+			|| strtolower($by) == "currency"
+			|| strtolower($order) == "desc")
 		{
 			$dbCurrencyList = CCurrency::__GetList($by, $order, $lang);
 		}
 		else
 		{
-			$by = "sort";
-			$order = "asc";
-
-			$lang = substr($lang, 0, 2);
-
-			$cacheTime = CURRENCY_CACHE_DEFAULT_TIME;
+			$cacheTime = (int)CURRENCY_CACHE_DEFAULT_TIME;
 			if (defined("CURRENCY_CACHE_TIME"))
 				$cacheTime = (int)CURRENCY_CACHE_TIME;
 
-			if ($CACHE_MANAGER->Read($cacheTime, "currency_currency_list_".$lang))
+			if ($CACHE_MANAGER->Read($cacheTime, "currency_currency_list_".$lang, 'b_catalog_currency'))
 			{
 				$arCurrencyList = $CACHE_MANAGER->Get("currency_currency_list_".$lang);
 				$dbCurrencyList = new CDBResult();
@@ -907,6 +822,71 @@ class CAllCurrency
 		return $dbCurrencyList;
 	}
 
+	static public function __GetList(&$by, &$order, $lang = LANGUAGE_ID)
+	{
+		$lang = substr((string)$lang, 0, 2);
+		$normalBy = strtolower($by);
+		if ($normalBy != 'currency' && $normalBy != 'name')
+		{
+			$normalBy = 'sort';
+			$by = 'sort';
+		}
+		$normalOrder = strtoupper($order);
+		if ($normalOrder != 'DESC')
+		{
+			$normalOrder = 'ASC';
+			$order = 'asc';
+		}
+		switch($normalBy)
+		{
+			case 'currency':
+				$currencyOrder = array('CURRENCY' => $normalOrder);
+				break;
+			case 'name':
+				$currencyOrder = array('FULL_NAME' => $normalOrder);
+				break;
+			case 'sort':
+			default:
+				$currencyOrder = array('SORT' => $normalOrder);
+				break;
+		}
+		unset($normalOrder, $normalBy);
+
+		$datetimeField = Currency\CurrencyManager::getDatetimeExpressionTemplate();
+		$currencyIterator = Currency\CurrencyTable::getList(array(
+			'select' => array(
+				'CURRENCY', 'AMOUNT_CNT', 'AMOUNT', 'SORT', 'BASE', 'NUMCODE', 'CREATED_BY', 'MODIFIED_BY',
+				new Main\Entity\ExpressionField('DATE_UPDATE_FORMAT', $datetimeField,  array('DATE_UPDATE'), array('data_type' => 'datetime')),
+				new Main\Entity\ExpressionField('DATE_CREATE_FORMAT', $datetimeField,  array('DATE_CREATE'), array('data_type' => 'datetime')),
+				'FULL_NAME' => 'RT_LANG.FULL_NAME', 'LID' => 'RT_LANG.LID', 'FORMAT_STRING' => 'RT_LANG.FORMAT_STRING',
+				'DEC_POINT' => 'RT_LANG.DEC_POINT', 'THOUSANDS_SEP' => 'RT_LANG.THOUSANDS_SEP',
+				'DECIMALS' => 'RT_LANG.DECIMALS', 'HIDE_ZERO' => 'RT_LANG.HIDE_ZERO'
+			),
+			'order' => $currencyOrder,
+			'runtime' => array(
+				'RT_LANG' => array(
+					'data_type' => 'Bitrix\Currency\CurrencyLang',
+					'reference' => array(
+						'=this.CURRENCY' => 'ref.CURRENCY',
+						'=ref.LID' => new Main\DB\SqlExpression('?', $lang)
+					)
+				)
+			)
+		));
+		unset($datetimeField);
+		$currencyList = array();
+		while ($currency = $currencyIterator->fetch())
+		{
+			$currency['DATE_UPDATE'] = $currency['DATE_UPDATE_FORMAT'];
+			$currency['DATE_CREATE'] = $currency['DATE_CREATE_FORMAT'];
+			$currencyList[] = $currency;
+		}
+		unset($currency, $currencyIterator);
+		$result = new CDBResult();
+		$result->InitFromArray($currencyList);
+		return $result;
+	}
+
 	public static function isUserExists()
 	{
 		global $USER;
@@ -915,80 +895,29 @@ class CAllCurrency
 
 	public static function getInstalledCurrencies()
 	{
-		$installedCurrencies = (string)Option::get('currency', 'installed_currencies', '');
-		if ($installedCurrencies === '')
-		{
-			$searched = false;
-			$languageIterator = LanguageTable::getList(array(
-				'select' => array('ID'),
-				'filter' => array('ID' => 'ua')
-			));
-			if ($oneLanguage = $languageIterator->fetch())
-			{
-				$currencyList = array('RUB', 'USD', 'EUR', 'UAH');
-				$searched = true;
-			}
-			if (!$searched)
-			{
-				$languageIterator = LanguageTable::getList(array(
-					'select' => array('ID'),
-					'filter' => array('ID' => 'ru')
-				));
-				if ($oneLanguage = $languageIterator->fetch())
-				{
-					$currencyList = array('RUB', 'USD', 'EUR', 'UAH');
-					$searched = true;
-				}
-			}
-			if (!$searched)
-			{
-				$currencyList = array('USD', 'EUR');
-			}
-			Option::set('currency', 'installed_currencies', implode(',', $currencyList), '');
-			return $currencyList;
-		}
-		else
-		{
-			return explode(',', $installedCurrencies);
-		}
+		return Currency\CurrencyManager::getInstalledCurrencies();
 	}
 
 	public static function clearCurrencyCache()
 	{
-		global $CACHE_MANAGER, $stackCacheManager;
-
-		$CACHE_MANAGER->Clean('currency_currency_list');
-		$languageIterator = LanguageTable::getList(array(
-			'select' => array('ID')
-		));
-		while ($oneLanguage = $languageIterator->fetch())
-		{
-			$CACHE_MANAGER->Clean('currency_currency_list_'.$oneLanguage['ID']);
-		}
-		unset($oneLanguage, $languageIterator);
-		$CACHE_MANAGER->Clean('currency_base_currency');
-		$stackCacheManager->Clear('currency_rate');
+		Currency\CurrencyManager::clearCurrencyCache();
 	}
 
 	public static function clearTagCache($currency)
 	{
-		global $CACHE_MANAGER;
-
-		if (defined('BX_COMP_MANAGED_CACHE'))
-			$CACHE_MANAGER->ClearByTag('currency_id_'.$currency);
+		Currency\CurrencyManager::clearTagCache($currency);
 	}
 
 	public static function checkCurrencyID($currency)
 	{
-		$currency = (string)$currency;
-		return ($currency === '' || strlen($currency) > 3 ? false : $currency);
+		return Currency\CurrencyManager::checkCurrencyID($currency);
 	}
 
 	public static function updateCurrencyBaseRate($currency)
 	{
 		global $DB;
 
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return;
 		$query = "select CURRENCY from b_catalog_currency where CURRENCY = '".$currency."'";
@@ -1003,7 +932,7 @@ class CAllCurrency
 	{
 		global $DB;
 
-		$baseCurrency = (string)self::GetBaseCurrency();
+		$baseCurrency = (string)Currency\CurrencyManager::getBaseCurrency();
 		if ($baseCurrency === '')
 			return;
 
@@ -1028,7 +957,7 @@ class CAllCurrency
 				if (!($currencyAgent = $agentIterator->Fetch()))
 				{
 					self::updateAllCurrencyBaseRate();
-					$checkDate = DateTime::createFromTimestamp(strtotime('tomorrow 00:01:00'));;
+					$checkDate = Main\Type\DateTime::createFromTimestamp(strtotime('tomorrow 00:01:00'));;
 					CAgent::AddAgent('\Bitrix\Currency\CurrencyTable::currencyBaseRateAgent();', 'currency', 'Y', 86400, '', 'Y', $checkDate->toString(), 100, false, true);
 				}
 			}
@@ -1039,7 +968,7 @@ class CAllCurrency
 	protected static function updateBaseCurrency($currency)
 	{
 		global $DB, $USER;
-		$currency = self::checkCurrencyID($currency);
+		$currency = Currency\CurrencyManager::checkCurrencyID($currency);
 		if ($currency === false)
 			return false;
 		$userID = (self::isUserExists() ? (int)$USER->GetID() : false);
@@ -1070,9 +999,7 @@ class CAllCurrency
 	{
 		global $DB;
 		if ($currency === '')
-		{
-			$currency = (string)self::GetBaseCurrency();
-		}
+			$currency = (string)Currency\CurrencyManager::getBaseCurrency();
 		if ($currency === '')
 			return;
 
@@ -1080,10 +1007,8 @@ class CAllCurrency
 		{
 			$factor = 1;
 			if ($updateCurrency != $currency)
-			{
 				$factor = CCurrencyRates::GetConvertFactor($updateCurrency, $currency);
-			}
-			$query = "update b_catalog_currency set CURRENT_BASE_RATE = ".doubleval($factor)." where CURRENCY = '".$updateCurrency."'";
+			$query = "update b_catalog_currency set CURRENT_BASE_RATE = ".(float)$factor." where CURRENCY = '".$updateCurrency."'";
 			$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 		}
 		else
@@ -1094,10 +1019,8 @@ class CAllCurrency
 			{
 				$factor = 1;
 				if ($oneCurrency['CURRENCY'] != $currency)
-				{
 					$factor = CCurrencyRates::GetConvertFactor($oneCurrency['CURRENCY'], $currency);
-				}
-				$query = "update b_catalog_currency set CURRENT_BASE_RATE = ".doubleval($factor)." where CURRENCY = '".$oneCurrency['CURRENCY']."'";
+				$query = "update b_catalog_currency set CURRENT_BASE_RATE = ".(float)$factor." where CURRENCY = '".$oneCurrency['CURRENCY']."'";
 				$DB->Query($query, false, 'File: '.__FILE__.'<br>Line: '.__LINE__);
 			}
 		}
@@ -1107,5 +1030,10 @@ class CAllCurrency
 	{
 		return ($value !== null);
 	}
+}
+
+class CCurrency extends CAllCurrency
+{
+
 }
 ?>

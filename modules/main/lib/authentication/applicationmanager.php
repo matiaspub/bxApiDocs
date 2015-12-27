@@ -22,21 +22,18 @@ class ApplicationManager
 		$event = new Main\Event("main", "OnApplicationsBuildList");
 		$event->send();
 
-		if(($results = $event->getResults()) != null)
+		foreach($event->getResults() as $eventResult)
 		{
-			foreach($results as $eventResult)
+			$result = $eventResult->getParameters();
+			if(is_array($result))
 			{
-				$result = $eventResult->getParameters();
-				if(is_array($result))
+				if(!is_array($result[0]))
 				{
-					if(!is_array($result[0]))
-					{
-						$result = array($result);
-					}
-					foreach($result as $app)
-					{
-						$this->applications[$app["ID"]] = $app;
-					}
+					$result = array($result);
+				}
+				foreach($result as $app)
+				{
+					$this->applications[$app["ID"]] = $app;
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 <?php
 namespace Bitrix\Currency;
 
-use Bitrix\Main\Entity;
+use Bitrix\Main;
 use Bitrix\Main\Localization\Loc;
 Loc::loadMessages(__FILE__);
 
@@ -10,8 +10,8 @@ Loc::loadMessages(__FILE__);
  *
  * Fields:
  * <ul>
- * <li> CURRENCY string(3) mandatory
- * <li> LID string(2) mandatory
+ * <li> CURRENCY string(3) mandatory primary
+ * <li> LID string(2) mandatory primary
  * <li> FORMAT_STRING string(50) mandatory
  * <li> FULL_NAME string(50) optional
  * <li> DEC_POINT string(5) optional default '.'
@@ -25,12 +25,13 @@ Loc::loadMessages(__FILE__);
  * <li> TIMESTAMP_X datetime optional
  * <li> CREATED_BY_USER reference to {@link \Bitrix\Main\UserTable}
  * <li> MODIFIED_BY_USER reference to {@link \Bitrix\Main\UserTable}
+ * <li> LANGUAGE reference to {@link \Bitrix\Main\Localization\LanguageTable}
  * </ul>
  *
  * @package Bitrix\Currency
  **/
 
-class CurrencyLangTable extends Entity\DataManager
+class CurrencyLangTable extends Main\Entity\DataManager
 {
 	/**
 	 * Returns DB table name for entity
@@ -50,70 +51,62 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function getMap()
 	{
 		return array(
-			'CURRENCY' => array(
-				'data_type' => 'string',
+			'CURRENCY' => new Main\Entity\StringField('CURRENCY', array(
 				'primary' => true,
 				'validation' => array(__CLASS__, 'validateCurrency'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_CURRENCY_FIELD'),
-			),
-			'LID' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_CURRENCY_FIELD')
+			)),
+			'LID' => new Main\Entity\StringField('LID', array(
 				'primary' => true,
 				'validation' => array(__CLASS__, 'validateLid'),
 				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_LID_FIELD'),
-			),
-			'FORMAT_STRING' => array(
-				'data_type' => 'string',
+			)),
+			'FORMAT_STRING' => new Main\Entity\StringField('FORMAT_STRING', array(
 				'required' => true,
 				'validation' => array(__CLASS__, 'validateFormatString'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_FORMAT_STRING_FIELD'),
-			),
-			'FULL_NAME' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_FORMAT_STRING_FIELD')
+			)),
+			'FULL_NAME' => new Main\Entity\StringField('FULL_NAME', array(
 				'validation' => array(__CLASS__, 'validateFullName'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_FULL_NAME_FIELD'),
-			),
-			'DEC_POINT' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_FULL_NAME_FIELD')
+			)),
+			'DEC_POINT' => new Main\Entity\StringField('DEC_POINT', array(
+				'default_value' => '.',
 				'validation' => array(__CLASS__, 'validateDecPoint'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DEC_POINT_FIELD'),
-			),
-			'THOUSANDS_SEP' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DEC_POINT_FIELD')
+			)),
+			'THOUSANDS_SEP' => new Main\Entity\StringField('THOUSANDS_SEP', array(
+				'default_value' => ' ',
 				'validation' => array(__CLASS__, 'validateThousandsSep'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_THOUSANDS_SEP_FIELD'),
-			),
-			'DECIMALS' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DECIMALS_FIELD'),
-			),
-			'THOUSANDS_VARIANT' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_THOUSANDS_SEP_FIELD')
+			)),
+			'DECIMALS' => new Main\Entity\IntegerField('DECIMALS', array(
+				'default_value' => 2,
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DECIMALS_FIELD')
+			)),
+			'THOUSANDS_VARIANT' => new Main\Entity\StringField('THOUSANDS_VARIANT', array(
 				'validation' => array(__CLASS__, 'validateThousandsVariant'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_THOUSANDS_VARIANT_FIELD'),
-			),
-			'HIDE_ZERO' => array(
-				'data_type' => 'boolean',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_THOUSANDS_VARIANT_FIELD')
+			)),
+			'HIDE_ZERO' => new Main\Entity\BooleanField('HIDE_ZERO', array(
 				'values' => array('N', 'Y'),
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_HIDE_ZERO_FIELD'),
-			),
-			'CREATED_BY' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_CREATED_BY_FIELD'),
-			),
-			'DATE_CREATE' => array(
-				'data_type' => 'datetime',
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DATE_CREATE_FIELD'),
-			),
-			'MODIFIED_BY' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_MODIFIED_BY_FIELD'),
-			),
-			'TIMESTAMP_X' => array(
-				'data_type' => 'datetime',
+				'default_value' => 'N',
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_HIDE_ZERO_FIELD')
+			)),
+			'CREATED_BY' => new Main\Entity\IntegerField('CREATED_BY', array(
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_CREATED_BY_FIELD')
+			)),
+			'DATE_CREATE' => new Main\Entity\DatetimeField('DATE_CREATE', array(
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_DATE_CREATE_FIELD')
+			)),
+			'MODIFIED_BY' => new Main\Entity\IntegerField('MODIFIED_BY', array(
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_MODIFIED_BY_FIELD')
+			)),
+			'TIMESTAMP_X' => new Main\Entity\DatetimeField('TIMESTAMP_X', array(
 				'required' => true,
-				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_TIMESTAMP_X_FIELD'),
-			),
+				'default_value' => new Main\Type\DateTime(),
+				'title' => Loc::getMessage('CURRENCY_LANG_ENTITY_TIMESTAMP_X_FIELD')
+			)),
 			'CREATED_BY_USER' => array(
 				'data_type' => 'Bitrix\Main\User',
 				'reference' => array('=this.CREATED_BY' => 'ref.ID'),
@@ -137,7 +130,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateCurrency()
 	{
 		return array(
-			new Entity\Validator\Length(null, 3),
+			new Main\Entity\Validator\Length(null, 3),
 		);
 	}
 
@@ -149,7 +142,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateLid()
 	{
 		return array(
-			new Entity\Validator\Length(null, 2),
+			new Main\Entity\Validator\Length(2, 2),
 		);
 	}
 
@@ -161,7 +154,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateFormatString()
 	{
 		return array(
-			new Entity\Validator\Length(null, 50),
+			new Main\Entity\Validator\Length(null, 50),
 		);
 	}
 
@@ -173,7 +166,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateFullName()
 	{
 		return array(
-			new Entity\Validator\Length(null, 50),
+			new Main\Entity\Validator\Length(null, 50),
 		);
 	}
 
@@ -185,7 +178,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateDecPoint()
 	{
 		return array(
-			new Entity\Validator\Length(null, 5),
+			new Main\Entity\Validator\Length(null, 5),
 		);
 	}
 
@@ -197,7 +190,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateThousandsSep()
 	{
 		return array(
-			new Entity\Validator\Length(null, 5),
+			new Main\Entity\Validator\Length(null, 5),
 		);
 	}
 
@@ -209,7 +202,7 @@ class CurrencyLangTable extends Entity\DataManager
 	public static function validateThousandsVariant()
 	{
 		return array(
-			new Entity\Validator\Length(null, 1),
+			new Main\Entity\Validator\Length(null, 1),
 		);
 	}
 }

@@ -17,41 +17,24 @@ class CAllOption
 
 	
 	/**
-	* <p>Возвращает строковое значение параметра <i>option_id</i>, принадлежащего модулю <i>module_id</i>. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов.</p>
-	*
-	*
+	* <p>Возвращает строковое значение параметра <i>option_id</i>, принадлежащего модулю <i>module_id</i>. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
+	* @param string $name  Идентификатор параметра.
 	*
-	*
-	* @param string $COption  Идентификатор параметра.
-	*
-	*
-	*
-	* @param GetOptionStrin $g  Значение по умолчанию.<br>Если <i>default_value</i> не задан, то значение для
+	* @param mixed $def = false Значение по умолчанию.<br>Если <i>default_value</i> не задан, то значение для
 	* <i>default_value</i> будет браться из массива с именем ${<i>module_id</i>."_default_option"}
 	* заданного в файле <b>/bitrix/modules/</b><i>module_id</i><b>/default_option.php</b>.
 	*
-	*
-	*
-	* @param mixed $def = false Идентификатор сайта для которого будут возвращены параметры.
+	* @param string $site = false Идентификатор сайта для которого будут возвращены параметры.
 	* Необязательный. По умолчанию - false (для текущего сайта или если не
 	* установлены то общие для всех сайтов)
 	*
-	*
-	*
-	* @param string $site = false Необязательный. По умолчанию "false".
-	*
-	*
-	*
-	* @param bool $ExactSite = false 
-	*
-	*
+	* @param bool $ExactSite = false Необязательный. По умолчанию "false".
 	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -62,8 +45,10 @@ class CAllOption
 	* if($default_group!="")
 	*     $arrGroups = explode(",",$default_group);
 	* ?&gt;
+	* 
+	* Смотрите также
+	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/7799/">В многосайтовой конфигурации на втором сайте сделаем e-mail НЕ уникальным при регистрации. </a></li>
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -102,38 +87,25 @@ class CAllOption
 
 	
 	/**
-	* <p>Устанавливает строковое значение параметра <i>option_id</i> для модуля <i>module_id</i>. Если указан <i>site_id</i>, параметр установится только для этого сайта и не будет влиять на аналогичный параметр другого сайта. Возвращает <i>true</i>, если операция прошла успешна, в противном случае - <i>false</i>.</p>
-	*
-	*
+	* <p>Устанавливает строковое значение параметра <i>option_id</i> для модуля <i>module_id</i>. Если указан <i>site_id</i>, параметр установится только для этого сайта и не будет влиять на аналогичный параметр другого сайта. Возвращает <i>true</i>, если операция прошла успешна, в противном случае - <i>false</i>. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	* Длина не более 50 символов.
 	*
-	*
-	*
 	* @param string $name  Идентификатор параметра. Длина не более 50 символов.
-	*
-	*
 	*
 	* @param string $value = "" Значение параметра. <br> Необязательный. По умолчанию - "".
 	* Максимальная сохраняемая длина значения - 2000 символов.
 	*
-	*
-	*
 	* @param mixed $desc = false Описание параметра. <br> Необязательный. По умолчанию - "false"
-	* (описание отсутствует). Начиная с версии 14.0.0 не используется.
-	*
-	*
+	* (описание отсутствует).
 	*
 	* @param string $site = "" Идентификатор сайта, для которого устанавливается параметр.
 	* Необязательный. Если установлен <i>false</i>, то будет текущий сайт (с
 	* 14.0).
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -144,7 +116,6 @@ class CAllOption
 	* <b>COption::SetOptionString</b>("main","email_from","admin@site.com");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -167,28 +138,19 @@ class CAllOption
 
 	
 	/**
-	* <p>Удаляет значение одного (<i>option_id</i>) или всех параметров модуля <i>module_id</i> из базы. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов.</p>
-	*
-	*
+	* <p>Удаляет значение одного (<i>option_id</i>) или всех параметров модуля <i>module_id</i> из базы. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name = "" Идентификатор параметра.<br>Необязательный. По умолчанию - ""
 	* (удалить все значения параметров модуля).
-	*
-	*
 	*
 	* @param string $site = false Идентификатор сайта для которого будут возвращены параметры.
 	* Необязательный. По умолчанию - false (для текущего сайта или если не
 	* установлены то общие для всех сайтов)
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -198,7 +160,6 @@ class CAllOption
 	* <b>COption::RemoveOption</b>("form", "RESULTS_PAGEN");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -224,35 +185,24 @@ class CAllOption
 
 	
 	/**
-	* <p>Возвращает числовое значение параметра <i>option_id</i>, принадлежащего модулю <i>module_id</i>. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов.</p> <p>Метод - обёртка над методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/getoptionstring.php">GetOptionString</a>.</p>
-	*
-	*
+	* <p>Возвращает числовое значение параметра <i>option_id</i>, принадлежащего модулю <i>module_id</i>. Если не установлен параметр <i>site_id</i> то делается попытка найти числовой параметр <i>option_id</i>, принадлежащий модулю <i>module_id</i> для текущего сайта. Если такого параметра нет, возвращается параметр, общий для всех сайтов. Статичный метод.</p> <p>Метод - обёртка над методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/coption/getoptionstring.php">GetOptionString</a>.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	* Длина не более 50 символов.
 	*
-	*
-	*
 	* @param string $name  Идентификатор параметра. Длина не более 50 символов.
-	*
-	*
 	*
 	* @param mixed $def = false Значение по умолчанию. <br> Если <i>default_value</i> не задан, то значение
 	* для <i>default_value</i> будет браться из массива с именем
 	* ${<i>module_id</i>."_default_option"} заданного в файле
-	* <b>/bitrix/modules/</b><i>module_id</i><b>/default_option.php</b>.
-	*
-	*
+	* <code>/bitrix/modules/<i>module_id</i>/default_option.php</code>.
 	*
 	* @param string $site = false Идентификатор сайта для которого будут возвращены параметры.
 	* Необязательный. По умолчанию - false (для текущего сайта или если не
 	* установлены то общие для всех сайтов)
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -262,7 +212,6 @@ class CAllOption
 	* $RESPONSIBLE_USER_ID = <b>COption::GetOptionInt</b>("support", "DEFAULT_RESPONSIBLE_ID");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -284,36 +233,23 @@ class CAllOption
 
 	
 	/**
-	* <p>Устанавливает числовое значение параметра <i>option_id</i> для модуля <i>module_id</i>. Если указан <i>site_id</i>, параметр установится только для этого сайта и не будет влиять на аналогичный параметр другого сайта. Возвращает "true", если операция прошла успешна, в противном случае - "false".</p>
-	*
-	*
+	* <p>Устанавливает числовое значение параметра <i>option_id</i> для модуля <i>module_id</i>. Если указан <i>site_id</i>, параметр установится только для этого сайта и не будет влиять на аналогичный параметр другого сайта. Возвращает "true", если операция прошла успешна, в противном случае - "false". Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name  Идентификатор параметра.
-	*
-	*
 	*
 	* @param mixed $value = "" Значение параметра.<br>Необязательный. По умолчанию - "".
 	*
-	*
-	*
 	* @param mixed $desc = false Описание параметра.<br>Необязательный. По умолчанию - "false"
 	* (описание отсутствует).
-	*
-	*
 	*
 	* @param string $site = false Идентификатор сайта, для которого устанавливается параметр.
 	* Необязательный. По умолчанию - false (общий для всех сайтов
 	* параметр).
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -324,7 +260,6 @@ class CAllOption
 	* <b>COption::SetOptionInt</b>("fileman", "num_menu_param", 2);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -351,29 +286,18 @@ class CAllPageOption
 {
 	
 	/**
-	* <p>Возвращает строковое значение параметра <i>page_option_id</i>, принадлежащего модулю <i>module_id</i>.</p>
-	*
-	*
+	* <p>Возвращает строковое значение параметра <i>page_option_id</i>, принадлежащего модулю <i>module_id</i>. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name  Произвольный идентификатор параметра страницы.
-	*
-	*
 	*
 	* @param mixed $def = false Значение по умолчанию. </ht
 	*
-	*
-	*
 	* @param string $site = false Идентификатор сайта. Значение по умолчанию - "false".
 	*
-	*
-	*
 	* @return string 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -381,7 +305,6 @@ class CAllPageOption
 	* $my_parameter = <b>CPageOption::GetOptionString</b>("main", "MY_PARAMETER", "Y");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -411,29 +334,18 @@ class CAllPageOption
 
 	
 	/**
-	* <p>Устанавливает строковое значение параметра <i>page_option_id</i> для модуля <i>module_id</i>. Возвращает "true", если операция прошла успешна, в противном случае - "false".</p>
-	*
-	*
+	* <p>Устанавливает строковое значение параметра <i>page_option_id</i> для модуля <i>module_id</i>. Возвращает "true", если операция прошла успешна, в противном случае - "false". Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name  Произвольный идентификатор параметра страницы.
-	*
-	*
 	*
 	* @param string $value = "" Значение параметра.<br>Необязательный. По умолчанию - "".
 	*
-	*
-	*
 	* @param des $c = false Необязательный. Значение по умолчанию - "false".
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#params"
@@ -461,27 +373,18 @@ class CAllPageOption
 
 	
 	/**
-	* <p>Удаляет значение одного (<i>page_option_id</i>) или всех параметров модуля <i>module_id</i> для данной страницы.</p>
-	*
-	*
+	* <p>Удаляет значение одного (<i>page_option_id</i>) или всех параметров модуля <i>module_id</i> для данной страницы. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
-	*
-	*
 	*
 	* @param string $name = "" Произвольный идентификатор параметра
 	* страницы.<br>Необязательный. По умолчанию - "" (удалить все значения
 	* параметров страницы для модуля <i>module_id</i>).
 	*
-	*
-	*
 	* @param string $site = false Идентификатор сайта. Значение по умолчанию - "false".
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -490,7 +393,6 @@ class CAllPageOption
 	* <b>CPageOption::RemoveOption</b>("main", "MY_PARAMETER");
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -527,29 +429,18 @@ class CAllPageOption
 
 	
 	/**
-	* <p>Возвращает числовое значение параметра <i>page_option_id</i>, принадлежащего модулю <i>module_id</i>.</p>
-	*
-	*
+	* <p>Возвращает числовое значение параметра <i>page_option_id</i>, принадлежащего модулю <i>module_id</i>. Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name  Произвольный идентификатор параметра страницы.
-	*
-	*
 	*
 	* @param mixed $def = false Значение по умолчанию. </ht
 	*
-	*
-	*
 	* @param string $site = false Идентификатор сайта. Значение по умолчанию - "false".
 	*
-	*
-	*
 	* @return int 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -557,7 +448,6 @@ class CAllPageOption
 	* $my_parameter = <b>CPageOption::GetOptionInt</b>("main", "MY_PARAMETER", 21);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -578,33 +468,20 @@ class CAllPageOption
 
 	
 	/**
-	* <p>Устанавливает числовое значение параметра <i>page_option_id</i> для модуля <i>module_id</i>. Возвращает "true", если операция прошла успешна, в противном случае - "false".</p>
-	*
-	*
+	* <p>Устанавливает числовое значение параметра <i>page_option_id</i> для модуля <i>module_id</i>. Возвращает "true", если операция прошла успешна, в противном случае - "false". Статичный метод.</p>
 	*
 	*
 	* @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
 	*
-	*
-	*
 	* @param string $name  Произвольный идентификатор параметра страницы.
-	*
-	*
 	*
 	* @param mixed $value = "" Значение параметра.<br>Необязательный. По умолчанию - "".
 	*
-	*
-	*
 	* @param des $c = "" 
-	*
-	*
 	*
 	* @param string $site = false Идентификатор сайта. Значение по умолчанию - "false".
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -612,7 +489,6 @@ class CAllPageOption
 	* <b>CPageOption::SetOptionInt</b>("main", "MY_PARAMETER", 2);
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

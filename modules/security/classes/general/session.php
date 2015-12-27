@@ -8,57 +8,15 @@ class CSecuritySession
 	{
 		if(CSecuritySessionVirtual::isStorageEnabled())
 		{
-			if(!CSecuritySessionVirtual::init())
-				self::triggerFatalError("Failed to initialize Virtual session handler");
-
-			//may return false with session.auto_start is set to On
-			if(session_set_save_handler(
-				array("CSecuritySessionVirtual", "open"),
-				array("CSecuritySessionVirtual", "close"),
-				array("CSecuritySessionVirtual", "read"),
-				array("CSecuritySessionVirtual", "write"),
-				array("CSecuritySessionVirtual", "destroy"),
-				array("CSecuritySessionVirtual", "gc")
-			))
-			{
-				register_shutdown_function("session_write_close");
-			};
+			static::registerHandler('CSecuritySessionVirtual');
 		}
 		elseif(CSecuritySessionMC::isStorageEnabled())
 		{
-			if(!CSecuritySessionMC::Init())
-				self::triggerFatalError("Failed to initialize Memcache session handler");
-
-			//may return false with session.auto_start is set to On
-			if(session_set_save_handler(
-				array("CSecuritySessionMC", "open"),
-				array("CSecuritySessionMC", "close"),
-				array("CSecuritySessionMC", "read"),
-				array("CSecuritySessionMC", "write"),
-				array("CSecuritySessionMC", "destroy"),
-				array("CSecuritySessionMC", "gc")
-			))
-			{
-				register_shutdown_function("session_write_close");
-			}
+			static::registerHandler('CSecuritySessionMC');
 		}
 		else
 		{
-			if(!CSecuritySessionDB::Init())
-				self::triggerFatalError("Failed to initialize DB session handler");
-
-			//may return false with session.auto_start is set to On
-			if(session_set_save_handler(
-				array("CSecuritySessionDB", "open"),
-				array("CSecuritySessionDB", "close"),
-				array("CSecuritySessionDB", "read"),
-				array("CSecuritySessionDB", "write"),
-				array("CSecuritySessionDB", "destroy"),
-				array("CSecuritySessionDB", "gc")
-			))
-			{
-				register_shutdown_function("session_write_close");
-			}
+			static::registerHandler('CSecuritySessionDB');
 		}
 	}
 
@@ -115,11 +73,16 @@ class CSecuritySession
 	}
 
 	/**
+	 * @param bool $cleanUp
 	 * @return string
 	 */
-	public static function getOldSessionId()
+	public static function getOldSessionId($cleanUp = false)
 	{
-		return self::$oldSessionId;
+		$result = self::$oldSessionId;
+		if ($cleanUp)
+			self::$oldSessionId = null;
+
+		return $result;
 	}
 
 	/**
@@ -128,7 +91,11 @@ class CSecuritySession
 	 */
 	public static function checkSessionId($id)
 	{
-		return (bool) preg_match("/^[\da-z]{10,32}$/iD", $id);
+		return (
+			$id
+			&& is_string($id)
+			&& preg_match('/^[\da-z\-,]{6,}$/iD', $id)
+		);
 	}
 
 	public static function activate()
@@ -149,5 +116,49 @@ class CSecuritySession
 	{
 		COption::SetOptionString("security", "session", "N");
 		CAgent::RemoveAgent(self::GC_AGENT_NAME, "security");
+	}
+
+	protected static function registerHandler($class)
+	{
+		if(!class_exists($class))
+		{
+			self::triggerFatalError(
+				sprintf('Session handler "%s" was not found.', $class)
+			);
+		}
+
+		if(!$class::Init())
+		{
+			self::triggerFatalError(
+				sprintf('Failed to initialize "%s" session handler.', $class)
+			);
+		}
+
+		//may return false with session.auto_start is set to On
+		// ToDo: change to SessionHandlerInterface when Bitrix reached PHP 5.4.0
+		$params = array(
+			array($class, "open"),
+			array($class, "close"),
+			array($class, "read"),
+			array($class, "write"),
+			array($class, "destroy"),
+			array($class, "gc")
+		);
+
+		if (version_compare(phpversion(),"5.5.0",">"))
+		{
+			// Due to PHP bug we must always set all 7 handlers
+			$params[] = array('CSecuritySession', 'createSid');
+		}
+
+		if (call_user_func_array('session_set_save_handler', $params))
+		{
+			register_shutdown_function("session_write_close");
+		}
+	}
+
+	public static function createSid()
+	{
+		return \Bitrix\Main\Security\Random::getString(32, true);
 	}
 }

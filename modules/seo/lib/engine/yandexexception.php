@@ -13,7 +13,7 @@ class YandexException
 	{
 		$this->result = $queryResult;
 
-		if($this->result)
+		if(!$this->result)
 		{
 			parent::__construct('no result', 0, $previous);
 		}

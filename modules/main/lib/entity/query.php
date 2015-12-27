@@ -77,7 +77,11 @@ class Query
 	/** @var string Last executed SQL query */
 	protected static $last_query;
 
+	/** @var array Replaced field aliases */
 	protected $replaced_aliases;
+
+	/** @var array Replaced table aliases */
+	protected $replaced_taliases;
 
 	/** @var callable[] */
 	protected $selectFetchModifiers = array();
@@ -287,7 +291,7 @@ class Query
 			throw new Main\ArgumentException(sprintf('Invalid order "%s"', $order));
 		}
 
-		$connection = Main\Application::getConnection();
+		$connection = $this->init_entity->getConnection();
 		$helper = $connection->getSqlHelper();
 
 		if ($order == 'ASC')
@@ -578,6 +582,10 @@ class Query
 				// scalar field that defined in entity
 				$this->registerChain('select', $chain);
 
+				// it would be nice here to register field as a runtime when it has custom alias
+				// it will make possible to use aliased fields as a native init entity fields
+				// e.g. in expressions or in data_doubling=off filter
+
 				// collect buildFrom fields (recursively)
 				if ($chain->getLastElement()->getValue() instanceof ExpressionField)
 				{
@@ -828,12 +836,10 @@ class Query
 
 	protected function buildJoinMap($chains = null)
 	{
-		$connection = Main\Application::getConnection();
+		$connection = $this->init_entity->getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$aliasLength = $helper->getAliasLength();
-
-		$talias_count = 0;
 
 		if (empty($chains))
 		{
@@ -898,7 +904,16 @@ class Query
 				else
 				{
 					// scalar field
-					$element->setParameter('talias', $prev_alias.$this->table_alias_postfix);
+					// if it's a field of the init entity, use getInitAlias to use 'base' alias
+					if ($prev_alias === $this->getInitAlias(false))
+					{
+						$element->setParameter('talias', $this->getInitAlias());
+					}
+					else
+					{
+						$element->setParameter('talias', $prev_alias.$this->table_alias_postfix);
+					}
+
 					continue;
 				}
 
@@ -931,7 +946,9 @@ class Query
 
 							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
-								$table_alias = 'TALIAS_' . (++$talias_count);
+								$old_table_alias = $table_alias;
+								$table_alias = 'TALIAS_' . (count($this->replaced_taliases) + 1);
+								$this->replaced_taliases[$table_alias] = $old_table_alias;
 							}
 						}
 
@@ -952,7 +969,9 @@ class Query
 
 							if (strlen($table_alias.$this->table_alias_postfix) > $aliasLength)
 							{
-								$table_alias = 'TALIAS_' . (++$talias_count);
+								$old_table_alias = $table_alias;
+								$table_alias = 'TALIAS_' . (count($this->replaced_taliases) + 1);
+								$this->replaced_taliases[$table_alias] = $old_table_alias;
 							}
 						}
 
@@ -1025,7 +1044,7 @@ class Query
 		$sql = array();
 		$csw = new \CSQLWhere;
 
-		$connection = Main\Application::getConnection();
+		$connection = $this->init_entity->getConnection();
 		$helper = $connection->getSqlHelper();
 
 		foreach ($this->join_map as $join)
@@ -1158,7 +1177,7 @@ class Query
 
 	protected function buildQuery()
 	{
-		$connection = Main\Application::getConnection();
+		$connection = $this->init_entity->getConnection();
 		$helper = $connection->getSqlHelper();
 
 		if ($this->query_build_parts === null)
@@ -1694,7 +1713,8 @@ class Query
 	protected function query($query)
 	{
 		// check nosql configuration
-		$configuration = $this->init_entity->getConnection()->getConfiguration();
+		$connection = $this->init_entity->getConnection();
+		$configuration = $connection->getConfiguration();
 
 		if (isset($configuration['handlersocket']['read']))
 		{
@@ -1711,29 +1731,36 @@ class Query
 			}
 		}
 
-/*
-Vadim: this is for paging but currently is not used
-		if ($this->count_total || !is_null($this->offset))
+		$cnt = null;
+		if ($this->count_total)
 		{
-			$cnt_body_elements = $build_parts;
+			$buildParts = $this->query_build_parts;
 
-			// remove order
-			unset($cnt_body_elements['ORDER BY']);
+			//remove order
+			unset($buildParts['ORDER BY']);
 
-			$cnt_query = join("\n", $cnt_body_elements);
+			//remove select
+			$buildParts['SELECT'] = "1";
 
-			// remove long aliases
-			list($cnt_query, ) = $this->replaceSelectAliases($cnt_query);
+			foreach ($buildParts as $k => &$v)
+			{
+				$v = $k . ' ' . $v;
+			}
+
+			$cntQuery = join("\n", $buildParts);
 
 			// select count
-			$cnt_query = 'SELECT COUNT(1) AS TMP_ROWS_CNT FROM ('.$cnt_query.') xxx';
-			$cnt = $connection->queryScalar($cnt_query);
+			$cntQuery = 'SELECT COUNT(1) AS TMP_ROWS_CNT FROM ('.$cntQuery.') xxx';
+			$cnt = $connection->queryScalar($cntQuery);
 		}
-*/
-		$connection = Main\Application::getConnection();
 
 		$result = $connection->query($query);
 		$result->setReplacedAliases($this->replaced_aliases);
+
+		if($this->count_total)
+		{
+			$result->setCount($cnt);
+		}
 
 		if ($this->isFetchModificationRequired())
 		{
@@ -1780,10 +1807,9 @@ Vadim: this is for paging but currently is not used
 		return !empty($this->selectFetchModifiers) || !empty($this->files);
 	}
 
-
 	protected function replaceSelectAliases($query)
 	{
-		$connection = Main\Application::getConnection();
+		$connection = $this->init_entity->getConnection();
 		$helper = $connection->getSqlHelper();
 
 		$length = (int) $helper->getAliasLength();
@@ -1815,12 +1841,12 @@ Vadim: this is for paging but currently is not used
 		return array($query, $replaced);
 	}
 
-	static public function quoteTableSource($source)
+	public function quoteTableSource($source)
 	{
 		// don't quote subqueries
 		if (!preg_match('/\s*\(\s*SELECT.*\)\s*/is', $source))
 		{
-			$source =  Main\Application::getConnection()->getSqlHelper()->quote($source);
+			$source =  $this->init_entity->getConnection()->getSqlHelper()->quote($source);
 		}
 
 		return $source;
@@ -1934,24 +1960,32 @@ Vadim: this is for paging but currently is not used
 	}
 
 	/**
-	 * @param bool $withPrefix
+	 * @param bool $withPostfix
 	 * @return string
 	 */
-	public function getInitAlias($withPrefix = true)
+	public function getInitAlias($withPostfix = true)
 	{
 		$init_alias = strtolower($this->init_entity->getCode());
 
-		if ($withPrefix)
+		// add postfix
+		if ($withPostfix)
 		{
 			$init_alias .= $this->table_alias_postfix;
 		}
 
-		$connection = Main\Application::getConnection();
+		// check length
+		$connection = $this->init_entity->getConnection();
 		$aliasLength = $connection->getSqlHelper()->getAliasLength();
 
 		if (strlen($init_alias) > $aliasLength)
 		{
 			$init_alias = 'base';
+
+			// add postfix
+			if ($withPostfix)
+			{
+				$init_alias .= $this->table_alias_postfix;
+			}
 		}
 
 		return $init_alias;

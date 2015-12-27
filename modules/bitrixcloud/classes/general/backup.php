@@ -140,6 +140,7 @@ class CBitrixCloudBackup
 			$obXML = $web_service->actionReadFile($check_word, $file_name);
 
 		$bucket_name = (is_object($node = $obXML->SelectNodes("/control/bucket/bucket_name")))? $node->textContent(): "";
+		$bucket_location = (is_object($node = $obXML->SelectNodes("/control/bucket/bucket_location")))? $node->textContent(): "";
 		$prefix = (is_object($node = $obXML->SelectNodes("/control/bucket/prefix")))? $node->textContent(): "";
 		$access_key = (is_object($node = $obXML->SelectNodes("/control/bucket/access_key")))? $node->textContent(): "";
 		$secret_key = (is_object($node = $obXML->SelectNodes("/control/bucket/secret_key")))? $node->textContent(): "";
@@ -153,7 +154,8 @@ class CBitrixCloudBackup
 			$secret_key,
 			$session_token,
 			$check_word,
-			$file_name
+			$file_name,
+			$bucket_location
 		);
 	}
 	/**

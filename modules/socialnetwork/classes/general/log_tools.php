@@ -171,8 +171,7 @@ class CSocNetLogTools
 		{
 			if (
 				array_key_exists("COMMENT_EVENT", $arEventTmp)
-				&& is_array($arEventTmp["COMMENT_EVENT"])
-				&& array_key_exists("EVENT_ID", $arEventTmp["COMMENT_EVENT"])
+				&& isset($arEventTmp["COMMENT_EVENT"]["EVENT_ID"])
 				&& $arEventTmp["COMMENT_EVENT"]["EVENT_ID"] == $event_id
 			)
 			{
@@ -193,8 +192,7 @@ class CSocNetLogTools
 					{
 						if (
 							array_key_exists("COMMENT_EVENT", $arEventTmp)
-							&& is_array($arEventTmp["COMMENT_EVENT"])
-							&& array_key_exists("EVENT_ID", $arEventTmp["COMMENT_EVENT"])
+							&& isset($arEventTmp["COMMENT_EVENT"]["EVENT_ID"])
 							&& $arEventTmp["COMMENT_EVENT"]["EVENT_ID"] == $event_id
 						)
 						{
@@ -685,7 +683,9 @@ class CSocNetLogTools
 			$bMail
 			&& strlen($arFields["MAIL_LANGUAGE_ID"]) > 0
 		)
+		{
 			IncludeModuleLangFile(__FILE__, $arFields["MAIL_LANGUAGE_ID"]);
+		}
 
 		$arResult = array(
 			"EVENT" => $arFields,
@@ -696,29 +696,33 @@ class CSocNetLogTools
 		$arResult["CREATED_BY"]["ACTION_TYPE"] = "wrote";
 
 		if (!$bMail)
+		{
 			$arResult["AVATAR_SRC"] = CSocNetLogTools::FormatEvent_CreateAvatar($arFields, $arParams);
+		}
 
 		if ($bMail)
 		{
 			$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_BLOG_POST_MAIL");
 
 			//if the title duplicates message, don't show it
-			if (strpos($arFields["MESSAGE"], $arFields["TITLE"]) === 0)
-				$arFields["TITLE"] = "";
-			else
-				$arFields["TITLE"] = ' "'.$arFields["TITLE"].'"';
+			$arFields["TITLE"] = (
+				strpos($arFields["MESSAGE"], $arFields["TITLE"]) === 0
+					? ""
+					: ' "'.$arFields["TITLE"].'"'
+			);
 		}
 		else
+		{
 			$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_BLOG_POST");
+		}
 
-		if (
+		$post_tmp = (
 			!$bMail
 			&& array_key_exists("URL", $arFields)
 			&& strlen($arFields["URL"]) > 0
-		)
-			$post_tmp = '<a href="'.$arFields["URL"].'">'.$arFields["TITLE"].'</a>';
-		else
-			$post_tmp = $arFields["TITLE"];
+				? '<a href="'.$arFields["URL"].'">'.$arFields["TITLE"].'</a>'
+				: $arFields["TITLE"]
+		);
 
 		$title = str_replace(
 			array("#TITLE#", "#ENTITY#", "#CREATED_BY#"),
@@ -763,39 +767,6 @@ class CSocNetLogTools
 				}
 
 				$arAllow = array(
-					"HTML" => "N",
-					"ALIGN" => "Y",
-					"ANCHOR" => "Y", "BIU" => "Y",
-					"IMG" => "Y", "QUOTE" => "Y",
-					"CODE" => "Y", "FONT" => "Y",
-					"LIST" => "Y", "SMILES" => "Y",
-					"NL2BR" => "Y", "MULTIPLE_BR" => "N",
-					"VIDEO" => "Y", "LOG_VIDEO" => "N",
-					"SHORT_ANCHOR" => "Y",
-					"USERFIELDS" => $arFields["UF"]
-				);
-
-				if (get_class($parserLog) == "blogTextParser")
-				{
-					$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
-						$parserLog->convert(
-							htmlspecialcharsback(str_replace("#CUT#", "", $arResult["EVENT_FORMATTED"]["MESSAGE"])), 
-							true,
-							$arImages, 
-							$arAllow
-						),
-						1000
-					);
-				}
-				else
-				{
-					$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
-						$parserLog->convert(htmlspecialcharsback(str_replace("#CUT#", "", $arResult["EVENT_FORMATTED"]["MESSAGE"])), array(), $arAllow),
-						1000
-					);
-				}
-
-				$arAllow = array(
 					"HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", 
 					"IMG" => "Y",
 					"QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "MULTIPLE_BR" => "N", "VIDEO" => "Y", "LOG_VIDEO" => "N", "SHORT_ANCHOR" => "Y"
@@ -810,7 +781,7 @@ class CSocNetLogTools
 							$arImages, 
 							$arAllow
 						),
-						1000
+						10000
 					);
 				}
 				else
@@ -845,22 +816,31 @@ class CSocNetLogTools
 
 			$dbRight = CSocNetLogRights::GetList(array(), array("LOG_ID" => $arFields["ID"]));
 			while ($arRight = $dbRight->Fetch())
+			{
 				$arRights[] = $arRight["GROUP_CODE"];
+			}
 
 			if ($arParams["MOBILE"] == "Y")
 			{					
 				$arResult["EVENT_FORMATTED"]["DESTINATION"] = CSocNetLogTools::FormatDestinationFromRights($arRights, array_merge($arParams, array("CREATED_BY" => $arFields["USER_ID"], "USE_ALL_DESTINATION" => true)), $iMoreCount);
 				if (intval($iMoreCount) > 0)
+				{
 					$arResult["EVENT_FORMATTED"]["DESTINATION_MORE"] = $iMoreCount;
+				}
+
 			}
 			else
+			{
 				$arResult["EVENT_FORMATTED"]["DESTINATION_CODE"] = CSocNetLogTools::GetDestinationFromRights($arRights, array_merge($arParams, array("CREATED_BY" => $arFields["USER_ID"])));
+			}
 		}
 		else
 		{
 			$url = CSocNetLogTools::FormatEvent_GetURL($arFields);
 			if (strlen($url) > 0)
+			{
 				$arResult["EVENT_FORMATTED"]["URL"] = $url;
+			}
 		}
 
 		$arResult["HAS_COMMENTS"] = (intval($arFields["SOURCE_ID"]) > 0 ? "Y" : "N");
@@ -869,7 +849,9 @@ class CSocNetLogTools
 			$bMail
 			&& strlen($arFields["MAIL_LANGUAGE_ID"]) > 0
 		)
+		{
 			IncludeModuleLangFile(__FILE__, LANGUAGE_ID);
+		}
 
 		return $arResult;
 	}
@@ -1192,7 +1174,9 @@ class CSocNetLogTools
 			$bMail
 			&& strlen($arFields["MAIL_LANGUAGE_ID"]) > 0
 		)
+		{
 			IncludeModuleLangFile(__FILE__, $arFields["MAIL_LANGUAGE_ID"]);
+		}
 
 		$arResult = array(
 			"EVENT" => $arFields,
@@ -1202,31 +1186,34 @@ class CSocNetLogTools
 		);
 
 		if (!$bMail)
+		{
 			$arResult["AVATAR_SRC"] = CSocNetLogTools::FormatEvent_CreateAvatar($arFields, $arParams);
+		}
 
 		if ($arFields["PARAMS"] == "type=M")
 		{
-			if ($bMail)
-				$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_MESSAGE_MAIL");
-			else
-				$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_FORUM_MESSAGE");
+			$title_tmp = (
+				$bMail
+					? GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_MESSAGE_MAIL")
+					: GetMessage("SONET_GL_EVENT_TITLE_FORUM_MESSAGE")
+			);
 		}
 		else
 		{
-			if ($bMail)
-				$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_TOPIC_MAIL");
-			else
-				$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_FORUM_TOPIC");
+			$title_tmp = (
+				$bMail
+					? GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_TOPIC_MAIL")
+					: GetMessage("SONET_GL_EVENT_TITLE_FORUM_TOPIC")
+			);
 		}
 
-		if (
+		$topic_tmp = (
 			!$bMail
 			&& array_key_exists("URL", $arFields)
 			&& strlen($arFields["URL"]) > 0
-		)
-			$topic_tmp = '<a href="'.$arFields["URL"].'">'.$arFields["TITLE"].'</a>';
-		else
-			$topic_tmp = $arFields["TITLE"];
+				? '<a href="'.$arFields["URL"].'">'.$arFields["TITLE"].'</a>'
+				: $arFields["TITLE"]
+		);
 
 		$title = str_replace(
 			array("#TITLE#", "#ENTITY#", "#CREATED_BY#"),
@@ -1238,9 +1225,14 @@ class CSocNetLogTools
 		if (CModule::IncludeModule("forum"))
 		{
 			if (!$parser)
+			{
 				$parser = new forumTextParser(LANGUAGE_ID);
+			}
 
 			$parser->pathToUser = $arParams["PATH_TO_USER"];
+			$parser->LAZYLOAD = (isset($arParams["LAZYLOAD"]) && $arParams["LAZYLOAD"] == "Y" ? "Y" : "N");
+			$parser->bMobile = ($arParams["MOBILE"] == "Y");
+
 			$arFields["FILES"] = CForumFiles::getByMessageID($arFields["SOURCE_ID"]);
 		}
 
@@ -1258,7 +1250,9 @@ class CSocNetLogTools
 			if ($arParams["MOBILE"] != "Y") 
 			{
 				if (!$parserLog)
+				{
 					$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+				}
 
 				$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
 					$parserLog->convert(
@@ -1303,6 +1297,7 @@ class CSocNetLogTools
 				$arResult["EVENT_FORMATTED"]["PARSED_FILES"] = $parser->arFilesParsed;
 			}
 			else
+			{
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = $parser->convert(
 					$arResult["EVENT_FORMATTED"]["MESSAGE"],
 					array(),
@@ -1319,6 +1314,7 @@ class CSocNetLogTools
 						"USERFIELDS" => $arFields["UF"]
 					)
 				);
+			}
 
 			$arResult["EVENT_FORMATTED"]["MESSAGE"] = str_replace(
 				"#CUT#",
@@ -1366,11 +1362,13 @@ class CSocNetLogTools
 			$bMail
 			&& strlen($arFields["MAIL_LANGUAGE_ID"]) > 0
 		)
+		{
 			IncludeModuleLangFile(__FILE__, $arFields["MAIL_LANGUAGE_ID"]);
+		}
 
 		$arResult = array(
-				"EVENT_FORMATTED"	=> array(),
-			);
+			"EVENT_FORMATTED"	=> array(),
+		);
 
 		if ($bMail)
 		{
@@ -1378,21 +1376,23 @@ class CSocNetLogTools
 			$arResult["ENTITY"] = CSocNetLogTools::FormatEvent_GetEntity($arLog, $arParams, $bMail);
 		}
 		elseif($arParams["USE_COMMENT"] != "Y")
+		{
 			$arResult["ENTITY"] = CSocNetLogTools::FormatEvent_GetEntity($arFields, $arParams, false);
+		}
 
-		if ($bMail)
-			$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_MESSAGE_MAIL");
-		else
-			$title_tmp = GetMessage("SONET_GL_EVENT_TITLE_FORUM_MESSAGE");
+		$title_tmp = (
+			$bMail
+				? GetMessage("SONET_GL_EVENT_TITLE_".($arFields["ENTITY_TYPE"] == SONET_SUBSCRIBE_ENTITY_GROUP ? "GROUP" : "USER")."_FORUM_MESSAGE_MAIL")
+				: GetMessage("SONET_GL_EVENT_TITLE_FORUM_MESSAGE")
+		);
 
-		if (
+		$topic_tmp = (
 			!$bMail
 			&& array_key_exists("URL", $arLog)
 			&& strlen($arLog["URL"]) > 0
-		)
-			$topic_tmp = '<a href="'.$arLog["URL"].'">'.$arLog["TITLE"].'</a>';
-		else
-			$topic_tmp = $arLog["TITLE"];
+				? '<a href="'.$arLog["URL"].'">'.$arLog["TITLE"].'</a>'
+				: $arLog["TITLE"]
+		);
 
 		$title = str_replace(
 			array("#TITLE#", "#ENTITY#", "#CREATED_BY#"),
@@ -1404,9 +1404,14 @@ class CSocNetLogTools
 		if (CModule::IncludeModule("forum"))
 		{
 			if (!$parser)
+			{
 				$parser = new forumTextParser(LANGUAGE_ID);
+			}
 
-			$parser->pathToUser = $arParams["PATH_TO_USER"];
+			$parser->pathToUser = $parser->userPath = $arParams["PATH_TO_USER"];
+			$parser->bMobile = ($arParams["MOBILE"] == "Y");
+			$parser->LAZYLOAD = (isset($arParams["LAZYLOAD"]) && $arParams["LAZYLOAD"] == "Y" ? "Y" : "N");
+
 			$arFields["FILES"] = CForumFiles::GetByMessageID($arFields["SOURCE_ID"]);
 		}
 
@@ -1422,7 +1427,9 @@ class CSocNetLogTools
 			{
 				static $parserLog = false;
 				if (!$parserLog)
+				{
 					$parserLog = new logTextParser(false, $arParams["PATH_TO_SMILE"]);
+				}
 
 				$arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"] = $parserLog->html_cut(
 					$parserLog->convert(
@@ -1470,6 +1477,7 @@ class CSocNetLogTools
 				$arResult["EVENT_FORMATTED"]["PARSED_FILES"] = $parser->arFilesIDParsed;
 			}
 			else
+			{
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parser->convert(
 					$arResult["EVENT_FORMATTED"]["MESSAGE"],
 					array(),
@@ -1485,17 +1493,19 @@ class CSocNetLogTools
 						"USERFIELDS" => $arFields["UF"]
 					)
 				));
+			}
 
 			if ($arParams["MOBILE"] != "Y" && $arParams["NEW_TEMPLATE"] != "Y")
 			{
-				$arResult["EVENT_FORMATTED"]["IS_MESSAGE_SHORT"] = CSocNetLogTools::FormatEvent_IsMessageShort(
-					$arResult["EVENT_FORMATTED"]["MESSAGE"], $arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"]);
+				$arResult["EVENT_FORMATTED"]["IS_MESSAGE_SHORT"] = CSocNetLogTools::FormatEvent_IsMessageShort($arResult["EVENT_FORMATTED"]["MESSAGE"], $arResult["EVENT_FORMATTED"]["SHORT_MESSAGE"]);
 			}
 		}
 		else
 		{
 			if (strlen($arFields["URL"]) > 0)
+			{
 				$url = $arFields["URL"];
+			}
 			elseif (
 				strlen($arLog["PARAMS"]) > 0
 				&& unserialize($arLog["PARAMS"])
@@ -1506,23 +1516,30 @@ class CSocNetLogTools
 					array_key_exists("PATH_TO_MESSAGE", $arTmp)
 					&& strlen($arTmp["PATH_TO_MESSAGE"]) > 0
 				)
+				{
 					$url = CComponentEngine::MakePathFromTemplate($arTmp["PATH_TO_MESSAGE"], array("MID" => $arFields["SOURCE_ID"]));
+				}
 			}
 
-			if (strlen($url) > 0)
-				$url = CSocNetLogTools::FormatEvent_GetURL(array("ID" => $arLog["ID"], "URL" => $url));
-			else
-				$url = CSocNetLogTools::FormatEvent_GetURL($arLog);
+			$url = (
+				strlen($url) > 0
+					? CSocNetLogTools::FormatEvent_GetURL(array("ID" => $arLog["ID"], "URL" => $url))
+					: CSocNetLogTools::FormatEvent_GetURL($arLog)
+			);
 
 			if (strlen($url) > 0)
+			{
 				$arResult["EVENT_FORMATTED"]["URL"] = $url;
+			}
 		}
 
 		if (
 			$bMail
 			&& strlen($arFields["MAIL_LANGUAGE_ID"]) > 0
 		)
+		{
 			IncludeModuleLangFile(__FILE__, LANGUAGE_ID);
+		}
 
 		return $arResult;
 	}
@@ -1878,8 +1895,8 @@ class CSocNetLogTools
 					$parserLog = new forumTextParser(LANGUAGE_ID);
 
 				$parserLog->arUserfields = $arFields["UF"];
-				$parserLog->pathToUser = $arParams["PATH_TO_USER"];
-				
+				$parserLog->pathToUser = $parserLog->userPath = $arParams["PATH_TO_USER"];
+				$parserLog->bMobile = ($arParams["MOBILE"] == "Y");
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = preg_replace("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER, "\\2", $arResult["EVENT_FORMATTED"]["MESSAGE"]);
 			}
@@ -1979,8 +1996,8 @@ class CSocNetLogTools
 					$parserLog = new forumTextParser(LANGUAGE_ID);
 
 				$parserLog->arUserfields = $arFields["UF"];
-				$parserLog->pathToUser = $arParams["PATH_TO_USER"];
-				
+				$parserLog->pathToUser = $parserLog->userPath = $arParams["PATH_TO_USER"];
+				$parserLog->bMobile = ($arParams["MOBILE"] == "Y");
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = htmlspecialcharsbx($parserLog->convert(htmlspecialcharsback($arResult["EVENT_FORMATTED"]["MESSAGE"]), $arAllow));
 				$arResult["EVENT_FORMATTED"]["MESSAGE"] = preg_replace("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER, "\\2", $arResult["EVENT_FORMATTED"]["MESSAGE"]);
 			}
@@ -2426,7 +2443,7 @@ class CSocNetLogTools
 						$message = str_replace("#CHANGES#", implode(", ", CTaskNotifications::__Fields2Names($arChangesFields)), GetMessage("SONET_GL_TASKS2_TASK_CHANGED_MESSAGE"));
 						$message_24_1 = GetMessage("SONET_GL_TASKS2_TASK_CHANGED_MESSAGE_24_1");
 						$message_24_2 = GetMessage("SONET_GL_TASKS2_TASK_CHANGED_MESSAGE_24_2");
-					}				
+					}
 				}
 				elseif ($arFields["PARAMS"]["TYPE"] == "status")
 				{
@@ -2445,7 +2462,9 @@ class CSocNetLogTools
 						$changes_24 = GetMessage("SONET_GL_TASKS2_TASK_STATUS_MESSAGE_4_24_CHANGES");
 					}
 					else
+					{
 						$message_24_2 = $changes_24 = "";
+					}
 				}
 
 				ob_start();
@@ -2752,13 +2771,16 @@ class CSocNetLogTools
 			}
 
 			$suffix = (is_array($GLOBALS["arExtranetUserID"]) && in_array($messageUserID, $GLOBALS["arExtranetUserID"]) ? GetMessage("SONET_LOG_EXTRANET_SUFFIX") : "");
+			$user_tmp = '';
 
 			if ($bMail)
 			{
-				if (strlen($arUser["NAME"]) > 0 || strlen($arUser["LAST_NAME"]) > 0)
-					$user_tmp .= $arUser["NAME"]." ".$arUser["LAST_NAME"].$suffix;
-				else
-					$user_tmp .= $arUser["LOGIN"].$suffix;
+				$user_tmp .= (
+					strlen($arUser["NAME"]) > 0
+					|| strlen($arUser["LAST_NAME"]) > 0
+						? $arUser["NAME"]." ".$arUser["LAST_NAME"].$suffix
+						: $arUser["LOGIN"].$suffix
+				);
 			}
 			else
 			{
@@ -3196,11 +3218,24 @@ class CSocNetLogTools
 			if ($arMessage)
 			{
 				$userID = $GLOBALS["USER"]->GetID();
+				$notificationSiteId = false;
 
 				$arLogSites = array();
 				$rsLogSite = CSocNetLog::GetSite($arLog["ID"]);
 				while ($arLogSite = $rsLogSite->Fetch())
+				{
 					$arLogSites[] = $arLogSite["LID"];
+					if (
+						!$notificationSiteId
+						&& (
+							!CModule::IncludeModule('extranet')
+							|| $arLogSite["LID"] != CExtranet::GetExtranetSiteID()
+						)
+					)
+					{
+						$notificationSiteId = $arLogSite["LID"];
+					}
+				}
 
 				$bCurrentUserIsAdmin = CSocNetUser::IsCurrentUserModuleAdmin($arLogSites);
 
@@ -3239,17 +3274,24 @@ class CSocNetLogTools
 				if (is_array($arTmp))
 				{
 					if (array_key_exists("UF_SONET_COM_DOC", $arTmp))
+					{
 						$GLOBALS["UF_FORUM_MESSAGE_DOC"] = $arTmp["UF_SONET_COM_DOC"];
+					}
 					elseif (array_key_exists("UF_SONET_COM_FILE", $arTmp))
 					{
 						$arFieldsMessage["FILES"] = array();
 						foreach($arTmp["UF_SONET_COM_FILE"] as $file_id)
+						{
 							$arFieldsMessage["FILES"][$file_id] = array("FILE_ID" => $file_id);
+						}
+
 						if (!empty($arFieldsMessage["FILES"]))
 						{
 							$arFileParams = array("FORUM_ID" => $arMessage["FORUM_ID"], "TOPIC_ID" => $arMessage["TOPIC_ID"]);
-							if(CForumFiles::CheckFields($arFieldsMessage["FILES"], $arFileParams, "NOT_CHECK_DB"))
+							if (CForumFiles::CheckFields($arFieldsMessage["FILES"], $arFileParams, "NOT_CHECK_DB"))
+							{
 								CForumFiles::Add(array_keys($arFieldsMessage["FILES"]), $arFileParams);
+							}
 						}
 					}
 				}
@@ -3262,7 +3304,9 @@ class CSocNetLogTools
 				{
 					$dbAddedMessageFiles = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => $messageID));
 					while ($arAddedMessageFiles = $dbAddedMessageFiles->Fetch())
+					{
 						$ufFileID[] = $arAddedMessageFiles["FILE_ID"];
+					}
 
 					$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $messageID, LANGUAGE_ID);
 				}
@@ -3314,7 +3358,7 @@ class CSocNetLogTools
 								);
 						}
 
-						$arTmp = CSocNetLogTools::ProcessPath(array("MESSAGE_URL" => $arParams["URL"]), $arMessage["AUTHOR_ID"]);
+						$arTmp = CSocNetLogTools::ProcessPath(array("MESSAGE_URL" => $arParams["URL"]), $arMessage["AUTHOR_ID"], $notificationSiteId);
 						$serverName = $arTmp["SERVER_NAME"];
 						$url = $arTmp["URLS"]["MESSAGE_URL"];
 
@@ -3339,10 +3383,14 @@ class CSocNetLogTools
 				}
 			}
 			else
+			{
 				$sError = GetMessage("SONET_ADD_COMMENT_SOURCE_ERROR");
+			}
 		}
 		else
+		{
 			$sError = GetMessage("SONET_ADD_COMMENT_SOURCE_ERROR");
+		}
 
 		return array(
 			"SOURCE_ID" => $messageID,
@@ -3443,27 +3491,149 @@ class CSocNetLogTools
 
 	public static function DeleteComment_Forum($arFields)
 	{
-		if (!CModule::IncludeModule("forum"))
-		{
-			return false;
-		}
+		$arRes = array();
 
 		if (
-			!isset($arFields["SOURCE_ID"])
-			|| intval($arFields["SOURCE_ID"]) <= 0
+			CModule::IncludeModule("forum")
+			&& isset($arFields["SOURCE_ID"])
+			&& intval($arFields["SOURCE_ID"]) > 0
+			&& isset($arFields["EVENT_ID"])
+			&& strlen($arFields["EVENT_ID"]) > 0
+			&& isset($arFields["LOG_SOURCE_ID"])
+			&& intval($arFields["LOG_SOURCE_ID"]) > 0
 		)
 		{
-			return false;
+			$logEventMeta = CSocNetLogTools::FindLogEventByCommentID($arFields["EVENT_ID"]);
+
+			if (
+				true || // we are not ready to use \Bitrix\Forum\Comments\Feed yet
+				$logEventMeta["EVENT_ID"] == "forum"
+			)
+			{
+				if (CModule::IncludeModule("forum"))
+				{
+					ForumActions("DEL", array(
+						"MID" => intval($arFields["SOURCE_ID"]),
+						"PERMISSION" => "Y"
+					), $strErrorMessage, $strOKMessage);
+
+					$arRes["ERROR"] = $strErrorMessage;
+					$arRes["NOTES"] = $strOKMessage;
+				}
+			}
+			else
+			{
+				if ($logEventMeta)
+				{
+					$arForumMetaData = CSocNetLogTools::GetForumCommentMetaData($logEventMeta["EVENT_ID"]);
+				}
+
+				if ($arForumMetaData)
+				{
+					$messageId = intval($arFields["SOURCE_ID"]);
+
+					$rsMessage = CForumMessage::GetList(
+						array(),
+						array("ID" => $messageId),
+						false,
+						0,
+						array(
+							"SELECT" => array("FORUM_ID")
+						)
+					);
+					if ($arMessage = $rsMessage->Fetch())
+					{
+						$forumId = intval($arMessage["FORUM_ID"]);
+					}
+
+					if (
+						$forumId
+						&& intval($forumId) > 0
+					)
+					{
+						if (
+							(
+								$arForumMetaData[0] == 'WF'
+								|| $arForumMetaData[0] == 'FORUM'
+							)
+							&& isset($arFields["LOG_ID"])
+							&& intval($arFields["LOG_ID"]) > 0
+						)
+						{
+							$rsLog = CSocNetLog::GetList(
+								array(),
+								array("ID" => intval($arFields["LOG_ID"])),
+								false,
+								false,
+								array("MESSAGE", "RATING_ENTITY_ID")
+							);
+							if ($arLog = $rsLog->Fetch())
+							{
+								if ($arForumMetaData[0] == 'WF')
+								{
+									$entityId = $arLog["MESSAGE"];
+								}
+								elseif ($arForumMetaData[0] == 'FORUM')
+								{
+									$entityId = $arLog["RATING_ENTITY_ID"];
+								}
+							}
+						}
+						elseif (
+							$arForumMetaData[0] == 'FORUM'
+							&& isset($arFields["LOG_ID"])
+							&& intval($arFields["LOG_ID"]) > 0
+						)
+						{
+							$rsLog = CSocNetLog::GetList(
+								array(),
+								array("ID" => intval($arFields["LOG_ID"])),
+								false,
+								false,
+								array("MESSAGE")
+							);
+							if ($arLog = $rsLog->Fetch())
+							{
+								$entityId = $arLog["MESSAGE"];
+							}
+						}
+						else
+						{
+							$entityId = $arFields["LOG_SOURCE_ID"];
+						}
+
+						$feed = new \Bitrix\Forum\Comments\Feed(
+							intval($forumId),
+							array(
+								"type" => $arForumMetaData[1],
+								"id" => intval($arFields["LOG_SOURCE_ID"]),
+								"xml_id" => $arForumMetaData[0]."_".$entityId
+							)
+						);
+
+						if (!$feed->delete($messageId))
+						{
+							$arRes["ERROR"] = "";
+							foreach($feed->getErrors() as $error)
+							{
+								$arRes["ERROR"] .= $error->getMessage();
+							}
+						}
+						else
+						{
+							$arRes["NOTES"] = GetMessage("SONET_DELETE_COMMENT_SOURCE_SUCCESS");
+						}
+					}
+				}
+			}
 		}
 
-		$messageId = intval($arFields["SOURCE_ID"]);
+		if (!isset($arRes["NOTES"]))
+		{
+			$arRes["ERROR"] = GetMessage("SONET_DELETE_COMMENT_SOURCE_ERROR");
+		}
 
-		$res = ForumActions("DEL", array("MID" => $messageId), $strErrorMessage, $strOKMessage);
-
-		return array(
-			"ERROR" => $strErrorMessage,
-			"NOTES" => $strOKMessage
-		);
+		return $arRes;
 	}
 
 	public static function AddComment_Blog($arFields)
@@ -4039,8 +4209,20 @@ class CSocNetLogTools
 			"USER_START_ID" => $arUserStart["ID"],
 			"USER_START_NAME" => $arUserStart["NAME"],
 			"LAST_POSTER_NAME" => $arUserStart["NAME"],
-			"APPROVED" => "Y"
+			"APPROVED" => "Y",
+			"XML_ID" => "IBLOCK_".$arElement["ID"]
 		);
+
+		if (
+			isset($arElement["ENTITY_TYPE"])
+			&& $arElement["ENTITY_TYPE"] == SONET_ENTITY_GROUP
+			&& isset($arElement["ENTITY_ID"])
+			&& intval($arElement["ENTITY_ID"]) > 0
+		)
+		{
+			$arFields["SOCNET_GROUP_ID"] = intval($arElement["ENTITY_ID"]);
+		}
+
 		$TOPIC_ID = CForumTopic::Add($arFields);
 
 		if ($bPostFirstMessage && intVal($TOPIC_ID) > 0)
@@ -4067,8 +4249,8 @@ class CSocNetLogTools
 				$arError[] = array(
 					"code" => "message is not added 1",
 					"title" => GetMessage("F_ERR_ADD_MESSAGE"));
-				CForumTopic::Delete($TID);
-				$TID = 0;
+				CForumTopic::Delete($TOPIC_ID);
+				$TOPIC_ID = 0;
 			}
 			elseif ($arParams["SUBSCRIBE_AUTHOR_ELEMENT"] == "Y" && intVal($arResult["ELEMENT"]["~CREATED_BY"]) > 0)
 			{
@@ -4497,7 +4679,16 @@ class CSocNetLogTools
 									
 									$messageUrl .= "MID=" . $messageID;
 
-									$MESSAGE_SITE = preg_replace(array('|\[\/USER\]|', '|\[USER=\d+\]|'), '', $arFields['TEXT_MESSAGE']);
+									$MESSAGE_SITE = preg_replace(
+										array(
+											'|\[\/USER\]|', 
+											'|\[USER=\d+\]|',
+											'|\[DISK\sFILE\sID=[n]*\d+\]|',
+											'|\[DOCUMENT\sID=\d+\]|'
+										), 
+										'', 
+										$arFields['TEXT_MESSAGE']
+									);
 
 									if (strlen($MESSAGE_SITE) >= 100)
 									{
@@ -4562,7 +4753,8 @@ class CSocNetLogTools
 											array("#TASK_TITLE#", "#TASK_COMMENT_TEXT#"), 
 											array(htmlspecialcharsbx($arTask["TITLE"]), $MESSAGE_SITE . ' #BR# ' . tasksServerName() . $messageUrl . "#message" . $messageID . ' '), 
 											($MESSAGE_TYPE != "EDIT" ? $strMsgAddComment : $strMsgEditComment)
-										)."#BR##BR#".$arFields["TEXT_MESSAGE"]
+										)."#BR##BR#".$arFields["TEXT_MESSAGE"],
+										"NOTIFY_TAG" => "TASKS|COMMENT|".intval($arTask["ID"])."|".intval($recipientUserID)
 									);
 
 									CIMNotify::Add($arMessageFields);
@@ -4580,7 +4772,7 @@ class CSocNetLogTools
 							CTaskComments::fireOnAfterCommentAddEvent($messageID, $arTask['ID'], $arFields["TEXT_MESSAGE"], $arFilesIds);
 						}
 					}
-				}				
+				}
 			}
 		}
 
@@ -5230,7 +5422,8 @@ class CSocNetLogTools
 
 		return array(
 			"SERVER_NAME" => $server_name, 
-			"URLS" => $arUrl
+			"URLS" => $arUrl,
+			"DOMAIN" => (count($arSiteData) > 1 ? $arSiteData[$user_site_id]["SERVER_NAME"] : false)
 		);
 	}
 
@@ -5316,7 +5509,7 @@ class CSocNetLogTools
 				break;
 			case "FORUM_POST":
 				$log_type = "comment";
-				$log_event_id = array("forum", "photo_comment", "files_comment", "commondocs_comment", "tasks_comment", "wiki_comment");
+				$log_event_id = array("forum", "photo_comment", "files_comment", "commondocs_comment", "tasks_comment", "wiki_comment", "news_comment", "lists_new_element_comment");
 				break;
 			case "IBLOCK_ELEMENT":
 				$log_type = "log";
@@ -5357,6 +5550,10 @@ class CSocNetLogTools
 					}
 				}
 				break;
+			case "LISTS_NEW_ELEMENT":
+				$log_type = "log";
+				$log_event_id = array("lists_new_element");
+				break;
 			case "LOG_ENTRY":
 				$log_type = "log_entry";
 				break;
@@ -5383,7 +5580,9 @@ class CSocNetLogTools
 				)
 			);
 			if ($arLogSrc = $rsLogSrc->Fetch())
+			{
 				$log_id = $arLogSrc["ID"];
+			}
 		}
 		elseif ($log_type == "log_entry")
 		{
@@ -5694,6 +5893,144 @@ class CSocNetLogTools
 			return $arSonetGroupIDAvailable;
 		}
 	}
+
+	public static function CanEditComment_Task($arParams)
+	{
+		$res = false;
+
+		$forumId = COption::GetOptionString("tasks", "task_forum_id", 0, '');
+
+		if (
+			!empty($arParams)
+			&& !empty($arParams["LOG_SOURCE_ID"])
+			&& intval($arParams["LOG_SOURCE_ID"]) > 0
+			&& intval($forumId) > 0
+			&& CModule::IncludeModule('forum')
+		)
+		{
+			try
+			{
+				$feed = new \Bitrix\Forum\Comments\Feed(
+					intval($forumId),
+					array(
+						"type" => 'tk',
+						"id" => intval($arParams["LOG_SOURCE_ID"]),
+						"xml_id" => "TASK_".$arParams["LOG_SOURCE_ID"]
+					)
+				);
+				$res = $feed->getEntity()->canEdit();
+			}
+			catch (Exception $e){
+			}
+		}
+
+		return $res;
+	}
+
+	public static function CanEditOwnComment_Task($arParams)
+	{
+		$res = false;
+
+		$forumId = COption::GetOptionString("tasks", "task_forum_id", 0, '');
+
+		if (
+			!empty($arParams)
+			&& !empty($arParams["LOG_SOURCE_ID"])
+			&& intval($arParams["LOG_SOURCE_ID"]) > 0
+			&& intval($forumId) > 0
+			&& CModule::IncludeModule('forum')
+		)
+		{
+			try
+			{
+				$feed = new \Bitrix\Forum\Comments\Feed(
+					intval($forumId),
+					array(
+						"type" => 'tk',
+						"id" => intval($arParams["LOG_SOURCE_ID"]),
+						"xml_id" => "TASK_".$arParams["LOG_SOURCE_ID"]
+					)
+				);
+				$res = $feed->getEntity()->canEditOwn();
+			}
+			catch (Exception $e){
+
+			}
+		}
+
+		return $res;
+	}
+
+	public static function DeleteComment_Task($arFields)
+	{
+		$arRes = array();
+
+		$messageId = intval($arFields["SOURCE_ID"]);
+		$forumId = COption::GetOptionString("tasks", "task_forum_id", 0, '');
+
+		if (
+			!empty($arFields)
+			&& !empty($arFields["LOG_SOURCE_ID"])
+			&& intval($arFields["LOG_SOURCE_ID"]) > 0
+			&& intval($forumId) > 0
+			&& CModule::IncludeModule('forum')
+		)
+		{
+			$feed = new \Bitrix\Forum\Comments\Feed(
+				intval($forumId),
+				array(
+					"type" => 'tk',
+					"id" => intval($arFields["LOG_SOURCE_ID"]),
+					"xml_id" => "TASK_".$arFields["LOG_SOURCE_ID"]
+				)
+			);
+
+			if (!$feed->delete($messageId))
+			{
+				$arRes["ERROR"] = "";
+				foreach($feed->getErrors() as $error)
+				{
+					$arRes["ERROR"] .= $error->getMessage();
+				}
+			}
+			else
+			{
+				$arRes["NOTES"] = GetMessage("SONET_DELETE_COMMENT_SOURCE_SUCCESS");
+			}
+		}
+		else
+		{
+			$arRes["ERROR"] = GetMessage("SONET_DELETE_COMMENT_SOURCE_ERROR");
+		}
+
+		return $arRes;
+	}
+
+	public static function GetForumCommentMetaData($logEventId)
+	{
+		static $arData = array(
+//			"blog_post" => array("BLOG", "BG"),
+			"tasks" => array("TASK", "TK", "FORUM|COMMENT"),
+			"forum" => array("FORUM", "FM", "FORUM|COMMENT"),
+			"photo_photo" => array("PHOTO", "PH", "FORUM|COMMENT"),
+			"sonet" => array("SOCNET", "SC", ""),
+			"calendar" => array("EVENT", "EV", ""),
+			"lists_new_element" => array("WF", "WF", ""),
+			"news" => array("IBLOCK", "IB", ""),
+			"wiki" => array("IBLOCK", "IB", ""),
+			"timeman_entry"=> array("TIMEMAN_ENTRY", "TE", ""),
+			"report"=> array("TIMEMAN_REPORT", "TR", ""),
+		);
+
+		$arRes = false;
+
+		if (isset($arData[$logEventId]))
+		{
+			$arRes = $arData[$logEventId];
+		}
+
+		return $arRes;
+	}
 }
 
 class logTextParser extends CTextParser
@@ -5943,7 +6280,9 @@ class logTextParser extends CTextParser
 			return $text;
 		}
 		else
+		{
 			return parent::convert_font_attr($attr, $value, $text);
+		}
 	}
 
 	public function convert_video($params, $path)
@@ -5980,7 +6319,11 @@ class logTextParser extends CTextParser
 			$anchor_id = RandString(8);
 			return
 				'<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.
-				(!defined("BX_MOBILE_LOG") ? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>' : '');
+				(
+					!$this->bMobile
+						? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>'
+						: ''
+				);
 		}
 		return;
 	}
@@ -6004,8 +6347,8 @@ class CSocNetLogComponent
 	{
 		$arItems = $this->arItems;
 	}
-	
-	public static function ConvertPresetToFilters($arPreset)
+
+	public static function ConvertPresetToFilters($arPreset, $arParams = array())
 	{
 		$arFilter = array();
 
@@ -6015,12 +6358,46 @@ class CSocNetLogComponent
 
 			if (
 				is_array($arPresetFilterTmp["FILTER"])
-				&& is_array($arPresetFilterTmp["FILTER"]["EVENT_ID"])
-				&& count(array_diff($arPresetFilterTmp["FILTER"]["EVENT_ID"], array("tasks", "timeman_entry", "report"))) <= 0
-				&& !IsModuleInstalled("tasks")
-				&& !IsModuleInstalled("timeman")
+				&& (
+					(
+						!empty($arPresetFilterTmp["FILTER"]["EVENT_ID"])
+						&& is_array($arPresetFilterTmp["FILTER"]["EVENT_ID"])
+						&& count(array_diff($arPresetFilterTmp["FILTER"]["EVENT_ID"], array("tasks", "timeman_entry", "report"))) <= 0
+						&& !IsModuleInstalled("tasks")
+						&& !IsModuleInstalled("timeman")
+					)
+					|| (
+						!empty($arPresetFilterTmp["FILTER"]["EXACT_EVENT_ID"])
+						&& $arPresetFilterTmp["FILTER"]["EXACT_EVENT_ID"] == "lists_new_element"
+						&& (
+							!IsModuleInstalled("lists")
+							|| !IsModuleInstalled("bizproc")
+							|| !IsModuleInstalled("intranet")
+							|| COption::GetOptionString("lists", "turnProcessesOn", "Y") != 'Y'
+							|| (
+								isset($arParams["GROUP_ID"])
+								&& intval($arParams["GROUP_ID"]) > 0
+							)
+							|| (
+								CModule::IncludeModule('extranet')
+								&& CExtranet::IsExtranetSite()
+							)
+						)
+					)
+					|| (
+						!empty($arPresetFilterTmp["ID"])
+						&& $arPresetFilterTmp["ID"] == "extranet"
+						&& (
+							!IsModuleInstalled("extranet")
+							|| !COption::GetOptionString("extranet", "extranet_site", false)
+							|| COption::GetOptionString("extranet", "extranet_site") == SITE_ID
+						)
+					)
+				)
 			)
+			{
 				continue;
+			}
 
 			if (array_key_exists("NAME", $arPresetFilterTmp))
 			{
@@ -6038,6 +6415,12 @@ class CSocNetLogComponent
 					case "#MY#":
 						$arPresetFilterTmp["NAME"] = GetMessage("SONET_INSTALL_LOG_PRESET_MY");
 						break;
+					case "#BIZPROC#":
+						$arPresetFilterTmp["NAME"] = GetMessage("SONET_INSTALL_LOG_PRESET_BIZPROC");
+						break;
+					case "#EXTRANET#":
+						$arPresetFilterTmp["NAME"] = GetMessage("SONET_INSTALL_LOG_PRESET_EXTRANET");
+						break;
 				}
 			}
 
@@ -6049,8 +6432,14 @@ class CSocNetLogComponent
 				foreach($arPresetFilterTmp["FILTER"] as $tmp_id_2 => $filterTmp)
 				{
 					if (
-						(!is_array($filterTmp) && $filterTmp == "#CURRENT_USER_ID#")
-						|| (is_array($filterTmp) && in_array("#CURRENT_USER_ID#", $filterTmp))
+						(
+							!is_array($filterTmp)
+							&& $filterTmp == "#CURRENT_USER_ID#"
+						)
+						|| (
+							is_array($filterTmp)
+							&& in_array("#CURRENT_USER_ID#", $filterTmp)
+						)
 					)
 					{
 						if (!$GLOBALS["USER"]->IsAuthorized())
@@ -6059,11 +6448,53 @@ class CSocNetLogComponent
 							break;
 						}
 						elseif (!is_array($filterTmp))
+						{
 							$arPresetFilterTmp["FILTER"][$tmp_id_2] = $GLOBALS["USER"]->GetID();
+						}
 						elseif (is_array($filterTmp))
+						{
 							foreach($filterTmp as $tmp_id_3 => $valueTmp)
+							{
 								if ($valueTmp == "#CURRENT_USER_ID#")
+								{
 									$arPresetFilterTmp["FILTER"][$tmp_id_2][$tmp_id_3] = $GLOBALS["USER"]->GetID();
+								}
+							}
+						}
+					}
+					elseif (
+						(
+							!is_array($filterTmp)
+							&& $filterTmp == "#EXTRANET_SITE_ID#"
+						)
+						|| (
+							is_array($filterTmp)
+							&& in_array("#EXTRANET_SITE_ID#", $filterTmp)
+						)
+					)
+					{
+						if (
+							!IsModuleInstalled("extranet")
+							|| !COption::GetOptionString("extranet", "extranet_site", false)
+						)
+						{
+							$bCorrect = false;
+							break;
+						}
+						elseif (!is_array($filterTmp))
+						{
+							$arPresetFilterTmp["FILTER"][$tmp_id_2] = COption::GetOptionString("extranet", "extranet_site");
+						}
+						elseif (is_array($filterTmp))
+						{
+							foreach($filterTmp as $tmp_id_3 => $valueTmp)
+							{
+								if ($valueTmp == "#EXTRANET_SITE_ID#")
+								{
+									$arPresetFilterTmp["FILTER"][$tmp_id_2][$tmp_id_3] = COption::GetOptionString("extranet", "extranet_site");
+								}
+							}
+						}
 					}
 				}
 			}
@@ -6084,8 +6515,7 @@ class CSocNetLogComponent
 		if (
 			strlen($preset_filter_id) > 0
 			&& array_key_exists($preset_filter_id, $arResultPresetFilters)
-			&& is_array($arResultPresetFilters[$preset_filter_id])
-			&& array_key_exists("FILTER", $arResultPresetFilters[$preset_filter_id])
+			&& isset($arResultPresetFilters[$preset_filter_id]["FILTER"])
 			&& is_array($arResultPresetFilters[$preset_filter_id]["FILTER"])
 		)
 		{
@@ -6094,6 +6524,13 @@ class CSocNetLogComponent
 				$arResult["PARAMS"]["EXACT_EVENT_ID"] = $arResultPresetFilters[$preset_filter_id]["FILTER"]["EXACT_EVENT_ID"];
 				$arResult["GET_COMMENTS"] = false;
 			}
+
+			if (array_key_exists("!EXACT_EVENT_ID", $arResultPresetFilters[$preset_filter_id]["FILTER"]))
+			{
+				$arResult["PARAMS"]["!EXACT_EVENT_ID"] = $arResultPresetFilters[$preset_filter_id]["FILTER"]["!EXACT_EVENT_ID"];
+				$arResult["GET_COMMENTS"] = false;
+			}
+
 			if (array_key_exists("EVENT_ID", $arResultPresetFilters[$preset_filter_id]["FILTER"]))
 			{
 				$arResult["PARAMS"]["EVENT_ID"] = $arResultPresetFilters[$preset_filter_id]["FILTER"]["EVENT_ID"];
@@ -6101,7 +6538,9 @@ class CSocNetLogComponent
 			}
 
 			if (array_key_exists("CREATED_BY_ID", $arResultPresetFilters[$preset_filter_id]["FILTER"]))
+			{
 				$arResult["PARAMS"]["CREATED_BY_ID"] = $arResultPresetFilters[$preset_filter_id]["FILTER"]["CREATED_BY_ID"];
+			}
 
 			if (
 				array_key_exists("FAVORITES_USER_ID", $arResultPresetFilters[$preset_filter_id]["FILTER"])
@@ -6114,9 +6553,782 @@ class CSocNetLogComponent
 
 			$arResult["PARAMS"]["SET_LOG_COUNTER"] = $arParams["SET_LOG_PAGE_CACHE"] = "N";
 			$arResult["PARAMS"]["USE_FOLLOW"] = "N";
+
+			if (array_key_exists("SITE_ID", $arResultPresetFilters[$preset_filter_id]["FILTER"]))
+			{
+				$arResult["PARAMS"]["FILTER_SITE_ID"] = $arResultPresetFilters[$preset_filter_id]["FILTER"]["SITE_ID"];
+			}
 		}
 
 		return $arResult;
+	}
+
+	public static function GetSiteByDepartmentId($arDepartmentId)
+	{
+		if (!is_array($arDepartmentId))
+		{
+			$arDepartmentId = array($arDepartmentId);
+		}
+
+		$bFound = false;
+		$arDefaultSite = false;
+
+		$dbSitesList = CSite::GetList($b = "SORT", $o = "asc", array("ACTIVE" => "Y")); // cache used
+		while ($arSite = $dbSitesList->GetNext())
+		{
+			if (
+				!$arDefaultSite
+				&& $arSite['DEF'] == 'Y'
+			)
+			{
+				$arDefaultSite = $arSite;
+			}
+
+			$siteRootDepartmentId = COption::GetOptionString("main", "wizard_departament", false, $arSite["LID"], true);
+			if ($siteRootDepartmentId)
+			{
+				if (in_array($siteRootDepartmentId, $arDepartmentId))
+				{
+					$arResult = $arSite;
+					$bFound = true;
+				}
+				else
+				{
+					$arSubStructure = CIntranetUtils::getSubStructure($siteRootDepartmentId);
+					$arSiteDepartmentId = array_keys($arSubStructure["DATA"]);
+
+					foreach($arDepartmentId as $userDepartmentId)
+					{
+						if(in_array($userDepartmentId, $arSiteDepartmentId))
+						{
+							$arResult = $arSite;
+							$bFound = true;
+							break;
+						}
+					}
+				}
+
+				if($bFound)
+				{
+					break;
+				}
+			}
+		}
+
+		if (!$bFound)
+		{
+			$arResult = $arDefaultSite;
+		}
+
+		return $arResult;
+	}
+
+	public static function saveRawFilesToUF($arAttachedFilesRaw, $ufCode, &$arFields)
+	{
+		static $isDiskEnabled = false;
+		static $isWebDavEnabled = false;
+
+		if ($isDiskEnabled === false)
+		{
+			$isDiskEnabled = (
+				\Bitrix\Main\Config\Option::get('disk', 'successfully_converted', false)
+				&& CModule::includeModule('disk')
+				&& ($storage = \Bitrix\Disk\Driver::getInstance()->getStorageByUserId($GLOBALS["USER"]->GetID()))
+				&& ($folder = $storage->getFolderForUploadedFiles($GLOBALS["USER"]->GetID()))
+					? "Y"
+					: "N"
+			);
+		}
+
+		if ($isWebDavEnabled === false)
+		{
+			$isWebDavEnabled = (
+				IsModuleInstalled('webdav')
+					? "Y"
+					: "N"
+			);
+		}
+
+		if (empty($arFields[$ufCode]))
+		{
+			$arFields[$ufCode] = array();
+		}
+
+		$arRelation = array();
+
+		foreach ($arAttachedFilesRaw as $attachedFileRow)
+		{
+			if (
+				!empty($attachedFileRow["base64"])
+				&& !empty($attachedFileRow["url"])
+			)
+			{
+				$fileContent = base64_decode($attachedFileRow["base64"]);
+				$arUri = parse_url($attachedFileRow["url"]);
+				if (
+					!empty($arUri)
+					&& !empty($arUri["path"])
+				)
+				{
+					$fileName = $arUri["path"];
+				}
+
+				if (
+					!empty($fileContent)
+					&& !empty($fileName)
+				)
+				{
+					$fileName = CTempFile::GetFileName($fileName);
+
+					if(CheckDirPath($fileName))
+					{
+						file_put_contents($fileName, $fileContent);
+						$arFile = CFile::MakeFileArray($fileName);
+
+						if(is_array($arFile))
+						{
+							$resultId = false;
+							if ($isDiskEnabled == "Y")
+							{
+								$file = $folder->uploadFile(
+									$arFile, // file array
+									array(
+										'NAME' => $arFile["name"],
+										'CREATED_BY' => $GLOBALS["USER"]->GetID()
+									),
+									array(),
+									true
+								);
+
+								if ($file)
+								{
+									$resultId = \Bitrix\Disk\Uf\FileUserType::NEW_FILE_PREFIX.$file->getId();
+								}
+							}
+							elseif ($isWebDavEnabled == "Y")
+							{
+								$webDavData = CWebDavIblock::getRootSectionDataForUser($GLOBALS["USER"]->GetID());
+								if (is_array($webDavData))
+								{
+									$webDavObject = new CWebDavIblock(
+										$webDavData["IBLOCK_ID"],
+										"",
+										array(
+											"ROOT_SECTION_ID" => $webDavData["SECTION_ID"],
+											"DOCUMENT_TYPE" => array("webdav", 'CIBlockDocumentWebdavSocnet', 'iblock_'.$webDavData['SECTION_ID'].'_user_'.intval($GLOBALS["USER"]->GetID()))
+										)
+									);
+
+									if ($webDavObject)
+									{
+										$arParent = $webDavObject->GetObject(
+											array(
+												"section_id" => $webDavObject->GetMetaID("DROPPED")
+											)
+										);
+
+										if (!$arParent["not_found"])
+										{
+											$path = $webDavObject->_get_path($arParent["item_id"], false);
+											$tmpName = str_replace(array(":", ".", "/", "\\"), "_", ConvertTimeStamp(time(), "FULL"));
+											$tmpOptions = array("path" => str_replace("//", "/", $path."/".$tmpName));
+											$arParent = $webDavObject->GetObject($tmpOptions);
+											if ($arParent["not_found"])
+											{
+												$rMKCOL = $webDavObject->MKCOL($tmpOptions);
+												if (intval($rMKCOL) == 201)
+												{
+													$webDavData["SECTION_ID"] = $webDavObject->arParams["changed_element_id"];
+												}
+											}
+											else
+											{
+												$webDavData["SECTION_ID"] = $arParent['item_id'];
+												if (!$webDavObject->CheckUniqueName($tmpName, $webDavData["SECTION_ID"], $tmpRes))
+												{
+													$path = $webDavObject->_get_path($webDavData["SECTION_ID"], false);
+													$tmpName = randString(6);
+													$tmpOptions = array("path" => str_replace("//", "/", $path."/".$tmpName));
+													$rMKCOL = $webDavObject->MKCOL($tmpOptions);
+													if (intval($rMKCOL) == 201)
+													{
+														$webDavData["SECTION_ID"] = $webDavData->arParams["changed_element_id"];
+													}
+												}
+											}
+										}
+
+										$options = array(
+											"new" => true,
+											'dropped' => true,
+											"arFile" => $arFile,
+											"arDocumentStates" => false,
+											"arUserGroups" => array_merge($webDavObject->USER["GROUPS"], array("Author")),
+											"FILE_NAME" => $arFile["name"],
+											"IBLOCK_ID" => $webDavData["IBLOCK_ID"],
+											"IBLOCK_SECTION_ID" => $webDavData["SECTION_ID"],
+											"USER_FIELDS" => array()
+										);
+
+										$GLOBALS['USER_FIELD_MANAGER']->EditFormAddFields($webDavObject->GetUfEntity(), $options['USER_FIELDS']);
+
+										$GLOBALS["DB"]->StartTransaction();
+
+										if (!$webDavObject->put_commit($options))
+										{
+											$GLOBALS["DB"]->Rollback();
+										}
+										else
+										{
+											$GLOBALS["DB"]->Commit();
+											$resultId = $options['ELEMENT_ID'];
+										}
+									}
+								}
+							}
+							else // for main
+							{
+								$resultId = CFile::SaveFile($arFile, $arFile["MODULE_ID"]);
+							}
+
+							if ($resultId)
+							{
+								$arFields[$ufCode][] = $resultId;
+							}
+
+							if (!empty($attachedFileRow["id"]))
+							{
+								$arRelation[$attachedFileRow["id"]] = $resultId;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (!empty($arRelation))
+		{
+			$arFields["DETAIL_TEXT"] = preg_replace_callback(
+				"/\[DISK\s+FILE\s+ID\s*=\s*pseudo@([\d]+)\]/is".BX_UTF_PCRE_MODIFIER,
+				function ($matches) use ($arRelation, $isDiskEnabled, $isWebDavEnabled)
+				{
+					if (isset($arRelation[intval($matches[1])]))
+					{
+						if ($isDiskEnabled == "Y")
+						{
+							return "[DISK FILE ID=".$arRelation[intval($matches[1])]."]";
+						}
+						elseif ($isWebDavEnabled == "Y")
+						{
+							return "[DOCUMENT ID=".intval($arRelation[intval($matches[1])])."]";
+						}
+						else
+						{
+							return "[DISK FILE ID=pseudo@".$matches[1]."]";
+						}
+					}
+					else
+					{
+						return "[DISK FILE ID=pseudo@".$matches[1]."]";
+					}
+				},
+				$arFields["DETAIL_TEXT"]
+			);
+		}
+	}
+
+	public static function checkEmptyUFValue($fieldName)
+	{
+		if (
+			isset($GLOBALS[$fieldName])
+			&& is_array($GLOBALS[$fieldName])
+			&& count($GLOBALS[$fieldName]) == 1
+			&& $GLOBALS[$fieldName][0] == 'empty'
+		)
+		{
+			$GLOBALS[$fieldName] = array();
+		}
+	}
+
+	public static function isSetTrafficNeeded($arParams)
+	{
+		if (
+			!isset($arParams["TRAFFIC_SET_PERIOD"])
+			|| intval($arParams["TRAFFIC_SET_PERIOD"]) <= 0
+		)
+		{
+			$arParams["TRAFFIC_SET_PERIOD"] = 60*60*24;
+		}
+
+		return (
+			intval($arParams["PAGE_NUMBER"]) == 1
+			&& $arParams["GROUP_CODE"] == '**'
+			&& (time() - $arParams['TRAFFIC_LAST_DATE_TS']) > $arParams["TRAFFIC_SET_PERIOD"]
+		);
+	}
+
+	public static function processDateTimeFormatParams(&$arParams = array())
+	{
+		global $DB;
+
+		if (
+			!is_array($arParams)
+			|| empty($arParams)
+		)
+		{
+			return;
+		}
+
+		$arParams["DATE_TIME_FORMAT"] = trim(
+			!empty($arParams['DATE_TIME_FORMAT'])
+				? ($arParams['DATE_TIME_FORMAT'] == 'FULL'
+					? $DB->DateFormatToPHP(FORMAT_DATETIME)
+					: $arParams['DATE_TIME_FORMAT']
+				)
+				: $DB->DateFormatToPHP(FORMAT_DATETIME)
+		);
+		$arParams["DATE_TIME_FORMAT"] = preg_replace('/[\/.,\s:][s]/', '', $arParams["DATE_TIME_FORMAT"]);
+		$arParams["DATE_TIME_FORMAT_WITHOUT_YEAR"] = (
+			isset($arParams["DATE_TIME_FORMAT_WITHOUT_YEAR"])
+				? $arParams["DATE_TIME_FORMAT_WITHOUT_YEAR"]
+				: preg_replace('/[\/.,\s-][Yyo]/', '', $arParams["DATE_TIME_FORMAT"])
+		);
+		$arParams["TIME_FORMAT"] = (
+			isset($arParams["TIME_FORMAT"])
+				? $arParams["TIME_FORMAT"]
+				: preg_replace('/[\/.,\s]+$/', '', preg_replace('/^[\/.,\s]+/', '', preg_replace('/[dDjlFmMnYyo]/', '', $arParams["DATE_TIME_FORMAT"])))
+		);
+	}
+
+	public static function getDateTimeFormatted($timestamp, $arFormatParams)
+	{
+		$arFormat = Array(
+			"tommorow" => "tommorow, ".$arFormatParams["TIME_FORMAT"],
+			"today" => "today, ".$arFormatParams["TIME_FORMAT"],
+			"yesterday" => "yesterday, ".$arFormatParams["TIME_FORMAT"],
+			"" => (
+				date("Y", $timestamp) == date("Y")
+					? $arFormatParams["DATE_TIME_FORMAT_WITHOUT_YEAR"]
+					: $arFormatParams["DATE_TIME_FORMAT"]
+			)
+		);
+
+		return (
+			strcasecmp(LANGUAGE_ID, 'EN') !== 0
+			&& strcasecmp(LANGUAGE_ID, 'DE') !== 0
+				? ToLower(FormatDate($arFormat, $timestamp, time()+CTimeZone::GetOffset()))
+				: FormatDate($arFormat, $timestamp, time()+CTimeZone::GetOffset())
+		);
+	}
+
+	public static function getCommentRights($arParams)
+	{
+		$arResult = array(
+			"COMMENT_RIGHTS_EDIT" => "N",
+			"COMMENT_RIGHTS_DELETE" => "N"
+		);
+
+		$logEventId = (
+			isset($arParams["EVENT_ID"])
+			&& strlen($arParams["EVENT_ID"]) > 0
+				? $arParams["EVENT_ID"]
+				: false
+		);
+
+		$logSourceId = (
+			isset($arParams["SOURCE_ID"])
+			&& intval($arParams["SOURCE_ID"]) > 0
+				? intval($arParams["SOURCE_ID"])
+				: false
+		);
+
+		$bCheckAdminSession = (
+			!isset($arParams["CHECK_ADMIN_SESSION"])
+			|| $arParams["CHECK_ADMIN_SESSION"] != "N"
+		);
+
+		$arCommentEventMeta = CSocNetLogTools::FindLogCommentEventByLogEventID($logEventId);
+
+		$bHasEditCallback = (
+			is_array($arCommentEventMeta)
+			&& isset($arCommentEventMeta["UPDATE_CALLBACK"])
+			&& (
+				$arCommentEventMeta["UPDATE_CALLBACK"] == "NO_SOURCE"
+				|| is_callable($arCommentEventMeta["UPDATE_CALLBACK"])
+			)
+		);
+
+		$bHasDeleteCallback = (
+			is_array($arCommentEventMeta)
+			&& isset($arCommentEventMeta["DELETE_CALLBACK"])
+			&& (
+				$arCommentEventMeta["DELETE_CALLBACK"] == "NO_SOURCE"
+				|| is_callable($arCommentEventMeta["DELETE_CALLBACK"])
+			)
+		);
+
+		if (
+			$bHasEditCallback
+			|| $bHasDeleteCallback
+		)
+		{
+			$arEventMeta = CSocNetLogTools::FindLogEventByID($logEventId);
+
+			if (
+				!empty($arEventMeta)
+				&& !empty($arEventMeta["COMMENT_EVENT"])
+				&& !empty($arEventMeta["COMMENT_EVENT"]["METHOD_CANEDIT"])
+			)
+			{
+				$res = call_user_func($arEventMeta["COMMENT_EVENT"]["METHOD_CANEDIT"], array(
+					"LOG_SOURCE_ID" => $logSourceId
+				));
+
+				if ($res)
+				{
+					$arResult["COMMENT_RIGHTS_EDIT"] = ($bHasEditCallback ? "ALL" : "N");
+					$arResult["COMMENT_RIGHTS_DELETE"] = ($bHasDeleteCallback ? "ALL" : "N");
+				}
+				else
+				{
+					if (!empty($arEventMeta["COMMENT_EVENT"]["METHOD_CANEDITOWN"]))
+					{
+						$res = call_user_func($arEventMeta["COMMENT_EVENT"]["METHOD_CANEDITOWN"], array(
+							"LOG_SOURCE_ID" => $logSourceId
+						));
+
+						if ($res)
+						{
+							$arResult["COMMENT_RIGHTS_EDIT"] = ($bHasEditCallback ? "OWN" : "N");
+							$arResult["COMMENT_RIGHTS_DELETE"] = ($bHasDeleteCallback ? "OWN" : "N");
+						}
+					}
+					elseif ($GLOBALS["USER"]->IsAuthorized())
+					{
+						$arResult["COMMENT_RIGHTS_EDIT"] = (
+							$bHasEditCallback
+								? (IsModuleInstalled("intranet") ? "OWN" : "OWNLAST")
+								: "N"
+						);
+						$arResult["COMMENT_RIGHTS_DELETE"] = (
+							$bHasDeleteCallback
+								? (IsModuleInstalled("intranet") ? "OWN" : "OWNLAST")
+								: "N"
+						);
+					}
+				}
+			}
+			elseif (CSocNetUser::IsCurrentUserModuleAdmin(SITE_ID, $bCheckAdminSession))
+			{
+				$arResult["COMMENT_RIGHTS_EDIT"] = ($bHasEditCallback ? "ALL" : "N");
+				$arResult["COMMENT_RIGHTS_DELETE"] = ($bHasDeleteCallback ? "ALL" : "N");
+			}
+			elseif ($GLOBALS["USER"]->IsAuthorized())
+			{
+				$arResult["COMMENT_RIGHTS_EDIT"] = (
+					$bHasEditCallback
+						? (IsModuleInstalled("intranet") ? "OWN" : "OWNLAST")
+						: "N"
+				);
+				$arResult["COMMENT_RIGHTS_DELETE"] = (
+					$bHasDeleteCallback
+						? (IsModuleInstalled("intranet") ? "OWN" : "OWNLAST")
+						: "N"
+				);
+			}
+		}
+
+		return $arResult;
+	}
+
+	public static function canUserChangeComment($arParams)
+	{
+		$res = false;
+
+		if (!is_array($arParams))
+		{
+			$arParams = array();
+		}
+
+		if (empty($arParams["LOG_EVENT_ID"]))
+		{
+			return $res;
+		}
+
+		if (
+			!isset($arParams["USER_ID"])
+			|| intval($arParams["USER_ID"]) <= 0
+		)
+		{
+			$arParams["USER_ID"] = $GLOBALS["USER"]->GetId();
+		}
+
+		if (!isset($arParams["ACTION"]))
+		{
+			$arParams["ACTION"] = "edit";
+		}
+
+		$arParams["ACTION"] = ToUpper($arParams["ACTION"]);
+
+		$rights = CSocNetLogComponent::getCommentRights(array(
+			"EVENT_ID" => $arParams["LOG_EVENT_ID"],
+			"SOURCE_ID" => (isset($arParams["LOG_SOURCE_ID"]) ? intval($arParams["LOG_SOURCE_ID"]) : false),
+			"CHECK_ADMIN_SESSION" => (isset($arParams["CHECK_ADMIN_SESSION"]) && $arParams["CHECK_ADMIN_SESSION"] == "N" ? "N" : "Y")
+		));
+
+		$key = ($arParams["ACTION"] == "EDIT" ? "COMMENT_RIGHTS_EDIT" : "COMMENT_RIGHTS_DELETE");
+
+		if (
+			$rights[$key] == "OWNLAST"
+			&& !empty($arParams["LOG_ID"])
+			&& intval($arParams["LOG_ID"]) > 0
+			&& !empty($arParams["COMMENT_ID"])
+			&& intval($arParams["COMMENT_ID"]) > 0
+		)
+		{
+			$rsResCheck = CSocNetLogComments::GetList(
+				array("ID" => "DESC"),
+				array(
+					"LOG_ID" => intval($arParams["LOG_ID"])
+				),
+				false,
+				false,
+				array("ID")
+			);
+			if (
+				($arResCheck = $rsResCheck->Fetch())
+				&& ($arResCheck["ID"] == intval($arParams["COMMENT_ID"]))
+				&& !empty($arParams["COMMENT_USER_ID"])
+				&& intval($arParams["COMMENT_USER_ID"]) > 0
+				&& intval($arParams["COMMENT_USER_ID"]) == intval($arParams["USER_ID"])
+			)
+			{
+				$res = true;
+			}
+		}
+		elseif (
+			$rights[$key] == "ALL"
+			|| (
+				$rights[$key] == "OWN"
+				&& !empty($arParams["COMMENT_USER_ID"])
+				&& intval($arParams["COMMENT_USER_ID"]) > 0
+				&& intval($arParams["COMMENT_USER_ID"]) == intval($arParams["USER_ID"])
+			)
+		)
+		{
+			$res = true;
+		}
+
+		return $res;
+	}
+
+	public static function getExtranetRedirectSite($extranetSiteId)
+	{
+		global $USER;
+
+		$arRedirectSite = false;
+
+		if ($USER->IsAuthorized())
+		{
+			$rsCurrentUser = CUser::GetById($USER->GetId());
+			if ($arCurrentUser = $rsCurrentUser->Fetch())
+			{
+				$bCurrentUserIntranet = (
+					!empty($arCurrentUser["UF_DEPARTMENT"])
+					&& is_array($arCurrentUser["UF_DEPARTMENT"])
+					&& intval($arCurrentUser["UF_DEPARTMENT"][0]) > 0
+				);
+
+				if (
+					SITE_ID == $extranetSiteId
+					&& $bCurrentUserIntranet
+					&& !CSocNetUser::IsCurrentUserModuleAdmin()
+				) // extranet -> intranet
+				{
+					$arRedirectSite = CSocNetLogComponent::GetSiteByDepartmentId($arCurrentUser["UF_DEPARTMENT"]);
+					if ($arRedirectSite["LID"] == SITE_ID)
+					{
+						$arRedirectSite = false;
+					}
+				}
+
+				if (
+					SITE_ID != $extranetSiteId
+					&& !$bCurrentUserIntranet
+				) // intranet -> extranet
+				{
+					$rsRedirectSite = CSite::GetList($b = "SORT", $o = "asc", array("ACTIVE" => "Y", "LID" => $extranetSiteId)); // cache used
+					$arRedirectSite = $rsRedirectSite->Fetch();
+				}
+			}
+		}
+
+		return $arRedirectSite;
+	}
+
+	public static function redirectExtranetSite($arRedirectSite, $componentPage, $arVariables, $arDefaultUrlTemplates404, $entity = "user")
+	{
+		if ($entity != "user")
+		{
+			$entity = "workgroup";
+		}
+
+		$url = (
+			strlen(trim($arRedirectSite["SERVER_NAME"])) > 0
+			&& $arRedirectSite["SERVER_NAME"] != SITE_SERVER_NAME
+				? (CMain::IsHTTPS() ? "https" : "http")."://".$arRedirectSite["SERVER_NAME"]
+				: ''
+		).
+		COption::GetOptionString("socialnetwork", ($entity == "user" ? "user_page" : "workgroups_page"), false, $arRedirectSite["LID"]).
+		CComponentEngine::MakePathFromTemplate(
+			$arDefaultUrlTemplates404[$componentPage],
+			$arVariables
+		);
+
+		LocalRedirect($url);
+	}
+
+	public static function getCommentByRequest($commentId, $postId, $action = false, $checkPerms = true, $checkAdminSession = true)
+	{
+		$commentId = intval($commentId);
+		$postId = intval($postId);
+
+		$arOrder = array();
+
+		$rsLog = CSocNetLog::GetList(
+			array(),
+			array(
+				"ID" => $postId
+			),
+			false,
+			false,
+			array("EVENT_ID", "SOURCE_ID")
+		);
+
+		if ($arLog = $rsLog->Fetch())
+		{
+			$arCommentEvent = CSocNetLogTools::FindLogCommentEventByLogEventID($arLog["EVENT_ID"]);
+
+			$arFilter = array(
+				"EVENT_ID" => $arCommentEvent["EVENT_ID"]
+			);
+
+			if (
+				isset($arCommentEvent["DELETE_CALLBACK"])
+				&& $arCommentEvent["DELETE_CALLBACK"] != "NO_SOURCE"
+			)
+			{
+				$arFilter["SOURCE_ID"] = $commentId; // forum etc.
+			}
+			else
+			{
+				$arFilter["ID"] = $commentId; // socialnetwork
+			}
+
+			$dbRes = CSocNetLogComments::GetList(
+				$arOrder,
+				$arFilter,
+				false,
+				false,
+				array("ID", "EVENT_ID", "MESSAGE", "USER_ID", "SOURCE_ID", "LOG_SOURCE_ID", "UF_*")
+			);
+
+			if ($arRes = $dbRes->Fetch())
+			{
+				if ($checkPerms)
+				{
+					$bAllow = CSocNetLogComponent::canUserChangeComment(array(
+						"ACTION" => $action,
+						"LOG_ID" => $postId,
+						"LOG_EVENT_ID" => $arLog["EVENT_ID"],
+						"LOG_SOURCE_ID" => $arLog["SOURCE_ID"],
+						"COMMENT_ID" => $arRes["ID"],
+						"COMMENT_USER_ID" => $arRes["USER_ID"],
+						"CHECK_ADMIN_SESSION" => ($checkAdminSession ? "Y" : "N")
+					));
+				}
+				else
+				{
+					$bAllow = true;
+				}
+
+				if (!$bAllow)
+				{
+					$arRes = false;
+				}
+				else
+				{
+					if ($action == "edit") // data needed only for edit
+					{
+						$arUFMeta = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("SONET_COMMENT", 0, LANGUAGE_ID);
+						$arRes["UF"] = array();
+
+						foreach($arUFMeta as $field_name => $arUF)
+						{
+							if (
+								array_key_exists($field_name, $arRes)
+								&& !empty($arRes[$field_name])
+							)
+							{
+								$arRes["UF"][$field_name] = $arUFMeta[$field_name];
+								$arRes["UF"][$field_name]["VALUE"] = $arRes[$field_name];
+								$arRes["UF"][$field_name]["ENTITY_VALUE_ID"] = $arRes["ID"];
+								unset($arRes[$field_name]);
+							}
+						}
+					}
+				}
+			}
+
+			return $arRes;
+		}
+
+		return false;
+	}
+
+	public static function getCommentRatingType($logEventId, $logId = false)
+	{
+		$res = "LOG_COMMENT";
+
+		$arCommentEventMeta = CSocNetLogTools::FindLogCommentEventByLogEventID($logEventId);
+		if (
+			$arCommentEventMeta
+			&& isset($arCommentEventMeta["RATING_TYPE_ID"])
+		)
+		{
+			$res = $arCommentEventMeta["RATING_TYPE_ID"];
+		}
+		elseif (
+			$logEventId == "photo_photo"
+			&& intval($logId) > 0
+		)
+		{
+			$commentType = CSocNetPhotoCommentEvent::FindLogType($logId);
+			if (
+				$commentType
+				&& isset($commentType["TYPE"])
+			)
+			{
+				if ($commentType["TYPE"] == "FORUM")
+				{
+					$res = "FORUM_POST";
+				}
+				elseif ($commentType["TYPE"] == "BLOG")
+				{
+					$res = "BLOG_COMMENT";
+				}
+			}
+		}
+		elseif (in_array($logEventId, array("wiki", "calendar", "news", "lists_new_element", "timeman_entry", "report")))
+		{
+			$res = "FORUM_POST";
+		}
+		elseif (in_array($logEventId, array("idea")))
+		{
+			$res = "BLOG_COMMENT";
+		}
+
+		return $res;
 	}
 }
 ?>

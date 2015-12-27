@@ -29,6 +29,16 @@ class CBPStateService
 
 		if ($arStatePermissions !== false)
 		{
+			$arState = self::GetWorkflowState($workflowId);
+			$runtime = $this->runtime;
+			if (!isset($runtime) || !is_object($runtime))
+				$runtime = CBPRuntime::GetRuntime();
+			$documentService = $runtime->GetService("DocumentService");
+			$documentService->SetPermissions($arState["DOCUMENT_ID"], $workflowId, $arStatePermissions, true);
+			$documentType = $documentService->GetDocumentType($arState["DOCUMENT_ID"]);
+			if ($documentType)
+				$arStatePermissions = $documentService->toInternalOperations($documentType, $arStatePermissions);
+
 			$DB->Query(
 				"DELETE FROM b_bp_workflow_permissions ".
 				"WHERE WORKFLOW_ID = '".$DB->ForSql($workflowId)."' "
@@ -44,14 +54,6 @@ class CBPStateService
 					);
 				}
 			}
-
-			$arState = self::GetWorkflowState($workflowId);
-
-			$runtime = $this->runtime;
-			if (!isset($runtime) || !is_object($runtime))
-				$runtime = CBPRuntime::GetRuntime();
-			$documentService = $runtime->GetService("DocumentService");
-			$documentService->SetPermissions($arState["DOCUMENT_ID"], $workflowId, $arStatePermissions, true);
 		}
 	}
 

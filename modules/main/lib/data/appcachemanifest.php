@@ -2,11 +2,13 @@
 namespace Bitrix\Main\Data;
 
 use Bitrix\Main\Application;
+use Bitrix\Main\Page\Asset;
 
 class AppCacheManifest
 {
 
 	const MANIFEST_CHECK_FILE = "/bitrix/tools/check_appcache.php";
+	private static $debug;
 
 	private static $instance;
 
@@ -32,6 +34,14 @@ class AppCacheManifest
 	/**
 	 * @return boolean
 	 */
+	public static function getDebug()
+	{
+		return self::$debug;
+	}
+
+	/**
+	 * @return boolean
+	 */
 	static public function isEnabled()
 	{
 		return self::$isEnabled;
@@ -49,6 +59,7 @@ class AppCacheManifest
 		if (is_null(self::$instance))
 		{
 			self::$instance = new  AppCacheManifest();
+			self::$debug = (defined("BX_APPCACHE_DEBUG") && BX_APPCACHE_DEBUG);
 		}
 
 		return self::$instance;
@@ -86,7 +97,7 @@ class AppCacheManifest
 
 		$currentHashSum = md5(serialize($files["FULL_FILE_LIST"]) . serialize($this->fallbackPages) . serialize($this->network));
 		$manifestCache = $this->readManifestCache($manifestId);
-		if (!$manifestCache || $manifestCache["FILE_HASH"] != $currentHashSum)
+		if (!$manifestCache || $manifestCache["FILE_HASH"] != $currentHashSum || self::$debug)
 		{
 			$this->isModified = true;
 			$this->setFiles($files["FULL_FILE_LIST"]);
@@ -101,7 +112,36 @@ class AppCacheManifest
 				)
 			);
 
-			$this->writeManifestCache($arFields);
+			if (!self::$debug)
+			{
+				$this->writeManifestCache($arFields);
+			}
+			else
+			{
+				$jsFields = json_encode($arFields);
+				$fileCount = count($this->files);
+				$params = json_encode($this->params);
+				$detailInfo = json_encode($arFields["FILE_DATA"]);
+				$fileCountImages = 0;
+				foreach ($arFields["FILE_DATA"]["CSS_FILE_IMAGES"] as $file=>$images)
+				{
+					$fileCountImages += count($images);
+				}
+
+
+				$debugOutput = <<<JS
+
+					console.log("-------APPLICATION CACHE DEBUG INFO------");
+					console.log("File count:", $fileCount);
+					console.log("Image file count:", $fileCountImages);
+					console.log("Params:", $params);
+					console.log("Detail:", $jsFields);
+					console.log("--------------------------------------------");
+JS;
+
+				$jsContent = str_replace(array("\n", "\t"), "", $debugOutput);
+				$content = str_replace("__DEBUG_HOLDER__", $jsContent, $content);
+			}
 		}
 
 		return $this->getIsModified();
@@ -139,7 +179,16 @@ class AppCacheManifest
 		else
 		{
 			$selfObject->setPageURI($server->get("REQUEST_URI"));
-			$APPLICATION->SetPageProperty("manifest", " manifest=\"" . self::getManifestCheckFile() . "?manifest_id=" . $selfObject->getCurrentManifestID() . "\"");
+
+			if(!self::$debug)
+			{
+				$APPLICATION->SetPageProperty("manifest", " manifest=\"" . self::getManifestCheckFile() . "?manifest_id=" . $selfObject->getCurrentManifestID() . "\"");
+			}
+			else
+			{
+				Asset::getInstance()->addString("<script type=\"text/javascript\">__DEBUG_HOLDER__</script>");
+			}
+
 			$params = Array(
 				"PAGE_URL" => $selfObject->getPageURI(),
 				"PARAMS" => $selfObject->getAdditionalParams(),
@@ -249,6 +298,7 @@ class AppCacheManifest
 		}
 
 		$manifestCache = $this->readManifestCache($this->getCurrentManifestID());
+
 		if (array_key_exists("css", $arFilesByType))
 		{
 			$cssCount = count($arFilesByType["css"]);
@@ -441,7 +491,7 @@ class AppCacheManifest
 
 	public function getIsModified()
 	{
-		return $this->isModified;
+		return $this->isModified && !self::$debug;
 	}
 
 	private function getManifestDescription()

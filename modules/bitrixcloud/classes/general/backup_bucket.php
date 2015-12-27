@@ -12,8 +12,9 @@ class CBitrixCloudBackupBucket extends CCloudStorageBucket
 	 * @param string $session_token
 	 * @param string $check_word
 	 * @param string $file_name
+	 * @param string $location
 	 */
-	public function __construct($bucket_name, $prefix, $access_key, $secret_key, $session_token, $check_word, $file_name)
+	public function __construct($bucket_name, $prefix, $access_key, $secret_key, $session_token, $check_word, $file_name, $location = "")
 	{
 		parent::__construct(0);
 		$this->arBucket = array(
@@ -22,7 +23,7 @@ class CBitrixCloudBackupBucket extends CCloudStorageBucket
 			"READ_ONLY" => "N",
 			"SERVICE_ID" => "amazon_s3",
 			"BUCKET" => $bucket_name,
-			"LOCATION" => "",
+			"LOCATION" => (string)$location,
 			"CNAME" => "",
 			"FILE_COUNT" => 0,
 			"FILE_SIZE" => 0,

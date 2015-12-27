@@ -4,6 +4,8 @@ use Bitrix\Im as IM;
 class CIMStatus
 {
 	public static $AVAILABLE_STATUSES = Array('online', 'dnd', 'away');
+	public static $ONLINE_USERS = null;
+	public static $FRIENDS_USERS = null;
 
 	public static function Set($userId, $params)
 	{
@@ -16,7 +18,7 @@ class CIMStatus
 
 		$needToUpdate = false;
 
-		$params = self::PrepereFields($params);
+		$params = self::PrepareFields($params);
 		$res = IM\StatusTable::getById($userId);
 		if ($status = $res->fetch())
 		{
@@ -50,25 +52,48 @@ class CIMStatus
 			CPullStack::AddShared(Array(
 				'module_id' => 'online',
 				'command' => 'user_status',
-				'params' => self::PrepereToPush($status)
+				'expiry' => 120,
+				'params' => self::PrepareToPush($status)
 			));
 		}
 
 		return true;
 	}
 
-	public static function SetIdle($userId, $result)
+	public static function SetIdle($userId, $result = true, $min = 10)
+	{
+		$date = null;
+		$min = intval($min);
+		if ($result && $min > 0)
+		{
+			$date = new Bitrix\Main\Type\DateTime();
+			$date->add('-'.$min.' MINUTE');
+		}
+		CIMStatus::Set($userId, Array('IDLE' => $date));
+	}
+
+	public static function SetMobile($userId, $result = true)
 	{
 		$date = null;
 		if ($result)
 		{
 			$date = new Bitrix\Main\Type\DateTime();
-			$date->add('-10 MINUTE');
 		}
-		CIMStatus::Set($userId, Array('IDLE' => $date));
+		CIMStatus::Set($userId, Array('MOBILE_LAST_DATE' => $date));
 	}
 
-	private static function PrepereToPush($params)
+	public static function SetColor($userId, $color)
+	{
+		CIMStatus::Set($userId, Array('COLOR' => $color));
+
+		if(defined("BX_COMP_MANAGED_CACHE"))
+		{
+			global $CACHE_MANAGER;
+			$CACHE_MANAGER->ClearByTag('IM_CONTACT_LIST');
+		}
+	}
+
+	private static function PrepareToPush($params)
 	{
 		foreach($params as $key => $value)
 		{
@@ -78,7 +103,11 @@ class CIMStatus
 			}
 			else if (in_array($key, Array('IDLE', 'DESKTOP_LAST_DATE', 'MOBILE_LAST_DATE', 'EVENT_UNTIL_DATE')))
 			{
-				$params[$key] = $value? $value->getTimestamp(): 0;
+				$params[$key] = is_object($value)? $value->getTimestamp(): 0;
+			}
+			else if ($key == 'COLOR')
+			{
+				$params[$key] = IM\Color::getColor($value);
 			}
 			else
 			{
@@ -89,7 +118,7 @@ class CIMStatus
 		return $params;
 	}
 
-	private static function PrepereFields($params)
+	private static function PrepareFields($params)
 	{
 		$arValues = Array();
 
@@ -102,6 +131,14 @@ class CIMStatus
 			if ($key == 'STATUS')
 			{
 				$arValues[$key] = in_array($value, self::$AVAILABLE_STATUSES)? $value: 'online';
+			}
+			else if ($key == 'COLOR')
+			{
+				$colors = IM\Color::getSafeColors();
+				if (isset($colors[$value]))
+				{
+					$arValues[$key] = $value;
+				}
 			}
 			else
 			{
@@ -128,53 +165,112 @@ class CIMStatus
 			$arID[] = intval($arParams['ID']);
 		}
 
+		$arParams['GET_OFFLINE'] = !empty($arID) && isset($arParams['GET_OFFLINE']) && $arParams['GET_OFFLINE'] == 'Y'? 'Y': 'N';
+
 		global $USER;
-		if(!isset($arParams['ID']) && !IsModuleInstalled('intranet') && is_object($USER))
+		$userId = is_object($USER)? intval($USER->GetID()): 0;
+
+		$bBusShowAll = !IsModuleInstalled('intranet') && COption::GetOptionInt('im', 'contact_list_show_all_bus');
+		if (!$bBusShowAll && !isset($arParams['ID']) && $userId > 0 && !isset($arParams['SKIP_CHECK']))
 		{
-			$arID[] = $USER->GetID();
-			if (CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
+			if (isset(self::$FRIENDS_USERS[$userId]))
 			{
-				$dbFriends = CSocNetUserRelations::GetList(array(),array("USER_ID" => $USER->GetID(), "RELATION" => SONET_RELATIONS_FRIEND), false, false, array("ID", "FIRST_USER_ID", "SECOND_USER_ID"));
+				$arID = self::$FRIENDS_USERS[$userId];
+			}
+			else if (CModule::IncludeModule('socialnetwork') && CSocNetUser::IsFriendsAllowed())
+			{
+				$arID = Array($userId);
+				$dbFriends = CSocNetUserRelations::GetList(array(),array("USER_ID" => $userId, "RELATION" => SONET_RELATIONS_FRIEND), false, false, array("ID", "FIRST_USER_ID", "SECOND_USER_ID"));
 				if ($dbFriends)
 				{
-					while ($arFriends = $dbFriends->GetNext(true, false))
+					while ($arFriends = $dbFriends->Fetch())
 					{
-						$friendId = $pref = (IntVal($USER->GetID()) == $arFriends["FIRST_USER_ID"]) ? $arFriends["SECOND_USER_ID"] : $arFriends["FIRST_USER_ID"];
-						$arID[] = $friendId;
+						$arID[] = ($userId == $arFriends["FIRST_USER_ID"]) ? $arFriends["SECOND_USER_ID"] : $arFriends["FIRST_USER_ID"];
 					}
+				}
+				self::$FRIENDS_USERS[$userId] = $arID;
+			}
+		}
+
+		$arUsers = Array();
+		if (self::$ONLINE_USERS && $arParams['GET_OFFLINE'] == 'N')
+		{
+			$arUsers = self::$ONLINE_USERS;
+		}
+		else if (!self::$ONLINE_USERS || $arParams['GET_OFFLINE'] == 'Y')
+		{
+			$enable = self::Enable();
+
+			$arUsers = Array();
+			$query = new \Bitrix\Main\Entity\Query(\Bitrix\Main\UserTable::getEntity());
+			$query->registerRuntimeField('', new \Bitrix\Main\Entity\ReferenceField('ref', 'Bitrix\Im\StatusTable', array('=this.ID' => 'ref.USER_ID')));
+			$query->addSelect('ID')->addSelect('ref.COLOR', 'COLOR')->addSelect('PERSONAL_GENDER');
+			if ($enable)
+			{
+				$query->addSelect('ref.STATUS', 'STATUS')->addSelect('ref.IDLE', 'IDLE')->addSelect('ref.MOBILE_LAST_DATE', 'MOBILE_LAST_DATE');
+			}
+			if ($arParams['GET_OFFLINE'] == 'N')
+			{
+				$query->addFilter('>LAST_ACTIVITY_DATE', new \Bitrix\Main\DB\SqlExpression(Bitrix\Main\Application::getConnection()->getSqlHelper()->addSecondsToDateTime('-180')));
+			}
+			else
+			{
+				$sago = Bitrix\Main\Application::getConnection()->getSqlHelper()->addSecondsToDateTime('-180');
+				$query->registerRuntimeField('', new \Bitrix\Main\Entity\ExpressionField('IS_ONLINE_CUSTOM', 'CASE WHEN LAST_ACTIVITY_DATE > '.$sago.' THEN \'Y\' ELSE \'N\' END'));
+
+				$query->addSelect('IS_ONLINE_CUSTOM');
+				$query->addFilter('=ID', $arID);
+			}
+			$result = $query->exec();
+
+			while ($arUser = $result->fetch())
+			{
+				$color = null;
+				if (isset($arUser['COLOR']) && strlen($arUser['COLOR']) > 0)
+				{
+					$color = IM\Color::getColor($arUser['COLOR']);
+				}
+				if (!$color)
+				{
+					$color = \CIMContactList::GetUserColor($arUser["ID"], $arUser['PERSONAL_GENDER'] == 'M'? 'M': 'F');
+				}
+				$arUsers[$arUser["ID"]] = Array(
+					'id' => $arUser["ID"],
+					'status' => $enable && in_array($arUser['STATUS'], self::$AVAILABLE_STATUSES)? $arUser['STATUS']: 'online',
+					'color' => $color,
+					'idle' => $enable && is_object($arUser['IDLE'])? $arUser['IDLE']->getTimestamp(): 0,
+					'mobileLastDate' => $enable && is_object($arUser['MOBILE_LAST_DATE'])? $arUser['MOBILE_LAST_DATE']->getTimestamp(): 0,
+				);
+				if ($arParams['GET_OFFLINE'] == 'Y' && $arUser['IS_ONLINE_CUSTOM'] == 'N')
+				{
+					$arUsers[$arUser["ID"]]['status'] = 'offline';
+					$arUsers[$arUser["ID"]]['idle'] = 0;
+					$arUsers[$arUser["ID"]]['mobileLastDate'] = 0;
+				}
+			}
+			if ($arParams['GET_OFFLINE'] == 'N')
+			{
+				self::$ONLINE_USERS = $arUsers;
+			}
+		}
+
+		$arResult = Array();
+		if (empty($arID))
+		{
+			$arResult = $arUsers;
+		}
+		else
+		{
+			foreach	($arID as $userId)
+			{
+				if (isset($arUsers[$userId]))
+				{
+					$arResult[$userId] = $arUsers[$userId];
 				}
 			}
 		}
 
-		$enable = self::Enable();
-
-		$arUsers = Array();
-		$query = new \Bitrix\Main\Entity\Query(\Bitrix\Main\UserTable::getEntity());
-		if ($enable)
-		{
-			$query->registerRuntimeField('', new \Bitrix\Main\Entity\ReferenceField('ref', 'Bitrix\Im\StatusTable', array('=this.ID' => 'ref.USER_ID')));
-		}
-		$query->addSelect('ID');
-		if ($enable)
-		{
-			$query->addSelect('ref.STATUS', 'STATUS')->addSelect('ref.IDLE', 'IDLE');
-		}
-		$query->addFilter('>LAST_ACTIVITY_DATE', new \Bitrix\Main\DB\SqlExpression(Bitrix\Main\Application::getConnection()->getSqlHelper()->addSecondsToDateTime('-180')));
-		$result = $query->exec();
-
-		while ($arUser = $result->fetch())
-		{
-			if (!empty($arID) && !in_array($arUser["ID"], $arID))
-				continue;
-
-			$arUsers[$arUser["ID"]] = Array(
-				'id' => $arUser["ID"],
-				'status' => $enable && in_array($arUser['STATUS'], self::$AVAILABLE_STATUSES)? $arUser['STATUS']: 'online',
-				'idle' => $enable && is_object($arUser['IDLE'])? $arUser['IDLE']->getTimestamp(): 0,
-			);
-		}
-
-		return Array('users' => $arUsers);
+		return Array('users' => $arResult);
 	}
 
 	public static function Enable()

@@ -14,17 +14,29 @@ class CacheEngineFiles
 	private $read = false;
 	private $path = '';
 
+	/**
+	 * Returns number of bytes read from disk or false if there was no read operation.
+	 *
+	 * @return integer|false
+	 */
 	public function getReadBytes()
 	{
 		return $this->read;
 	}
 
+	/**
+	 * Returns number of bytes written to disk or false if there was no write operation.
+	 *
+	 * @return integer|false
+	 */
 	public function getWrittenBytes()
 	{
 		return $this->written;
 	}
 
 	/**
+	 * Returns physical file path after read or write operation.
+	 *
 	 * @return string
 	 */
 	public function getCachePath()
@@ -32,11 +44,23 @@ class CacheEngineFiles
 		return $this->path;
 	}
 
+	/**
+	 * Returns true if cache can be read or written.
+	 *
+	 * @return bool
+	 */
 	static public function isAvailable()
 	{
 		return true;
 	}
 
+	/**
+	 * Deletes physical file. Returns true on success.
+	 *
+	 * @param string $fileName Absolute physical path.
+	 *
+	 * @return boolean
+	 */
 	private static function unlink($fileName)
 	{
 		//This checks for Zend Server CE in order to suppress warnings
@@ -58,16 +82,21 @@ class CacheEngineFiles
 		return false;
 	}
 
+	/**
+	 * Adds delayed delete worker agent.
+	 *
+	 * @return void
+	 */
 	private static function addAgent()
 	{
 		global $APPLICATION;
 
-		static $bAgentAdded = false;
-		if (!$bAgentAdded)
+		static $agentAdded = false;
+		if (!$agentAdded)
 		{
-			$bAgentAdded = true;
-			$rsAgents = \CAgent::GetList(array("ID"=>"DESC"), array("NAME" => "\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete(%"));
-			if (!$rsAgents->Fetch())
+			$agentAdded = true;
+			$agents = \CAgent::GetList(array("ID"=>"DESC"), array("NAME" => "\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete(%"));
+			if (!$agents->Fetch())
 			{
 				$res = \CAgent::AddAgent(
 					"\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete();",
@@ -82,6 +111,14 @@ class CacheEngineFiles
 		}
 	}
 
+	/**
+	 * Generates very temporary file name by adding some random suffix to the file path.
+	 * Returns empty string on failure.
+	 *
+	 * @param string $fileName File path within document root.
+	 *
+	 * @return string
+	 */
 	private static function randomizeFile($fileName)
 	{
 		$documentRoot = Main\Loader::getDocumentRoot();
@@ -94,14 +131,25 @@ class CacheEngineFiles
 		return "";
 	}
 
-	static public function clean($baseDir, $initDir = false, $filename = false)
+	/**
+	 * Cleans (removes) cache directory or file.
+	 *
+	 * @param string $baseDir Base cache directory (usually /bitrix/cache).
+	 * @param string $initDir Directory within base.
+	 * @param string $filename File name.
+	 *
+	 * @return void
+	 */
+	static public function clean($baseDir, $initDir = '', $filename = '')
 	{
 		$documentRoot = Main\Loader::getDocumentRoot();
 		if (($filename !== false) && ($filename !== ""))
 		{
 			$result = static::unlink($documentRoot.$baseDir.$initDir.$filename);
-			Main\Application::resetAccelerator();
-			return $result;
+			if ($result)
+			{
+				Main\Application::resetAccelerator();
+			}
 		}
 		else
 		{
@@ -131,7 +179,7 @@ class CacheEngineFiles
 			{
 				$source = "/".trim($baseDir, "/")."/".$initDir;
 				$source = rtrim($source, "/");
-				$bDelayedDelete = false;
+				$delayedDelete = false;
 
 				if (!preg_match("/^(\\.|\\.\\.|.*\\.~\\d+)\$/", $source) && file_exists($documentRoot.$source))
 				{
@@ -141,11 +189,11 @@ class CacheEngineFiles
 						$con = Main\Application::getConnection();
 						$con->queryExecute("INSERT INTO b_cache_tag (SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG) VALUES ('*', '*', '".$con->getSqlHelper()->forSql($target)."', '*')");
 						if (@rename($documentRoot.$source, $documentRoot.$target))
-							$bDelayedDelete = true;
+							$delayedDelete = true;
 					}
 				}
 
-				if ($bDelayedDelete)
+				if ($delayedDelete)
 					static::addAgent();
 				else
 					DeleteDirFilesEx($baseDir.$initDir);
@@ -155,6 +203,17 @@ class CacheEngineFiles
 		}
 	}
 
+	/**
+	 * Reads cache from the file. Returns true if file exists, not expired, and successfully read.
+	 *
+	 * @param mixed &$arAllVars Cached result.
+	 * @param string $baseDir Base cache directory (usually /bitrix/cache).
+	 * @param string $initDir Directory within base.
+	 * @param string $filename File name.
+	 * @param integer $TTL Expiration period in seconds.
+	 *
+	 * @return boolean
+	 */
 	public function read(&$arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
 		$documentRoot = Main\Loader::getDocumentRoot();
@@ -214,8 +273,21 @@ class CacheEngineFiles
 		return true;
 	}
 
+	/**
+	 * Writes cache into the file.
+	 *
+	 * @param mixed $arAllVars Cached result.
+	 * @param string $baseDir Base cache directory (usually /bitrix/cache).
+	 * @param string $initDir Directory within base.
+	 * @param string $filename File name.
+	 * @param integer $TTL Expiration period in seconds.
+	 *
+	 * @return void
+	 */
 	public function write($arAllVars, $baseDir, $initDir, $filename, $TTL)
 	{
+		static $search  = array(  "\\",   "'",         "\0");
+		static $replace = array("\\\\", "\\'", "'.chr(0).'");
 		$documentRoot = Main\Loader::getDocumentRoot();
 		$folder = $documentRoot."/".ltrim($baseDir.$initDir, "/");
 		$fn = $folder.$filename;
@@ -232,7 +304,7 @@ class CacheEngineFiles
 				$contents .= "\nif(\$INCLUDE_FROM_CACHE!='Y')return false;";
 				$contents .= "\n\$datecreate = '".str_pad(mktime(), 12, "0", STR_PAD_LEFT)."';";
 				$contents .= "\n\$dateexpire = '".str_pad(mktime() + intval($TTL), 12, "0", STR_PAD_LEFT)."';";
-				$contents .= "\n\$ser_content = '".str_replace("'", "\'", str_replace("\\", "\\\\", serialize($arAllVars)))."';";
+				$contents .= "\n\$ser_content = '".str_replace($search, $replace, serialize($arAllVars))."';";
 				$contents .= "\nreturn true;";
 				$contents .= "\n?>";
 			}
@@ -257,137 +329,164 @@ class CacheEngineFiles
 		}
 	}
 
+	/**
+	 * Returns true if cache file has expired.
+	 *
+	 * @param string $path Absolute physical path.
+	 *
+	 * @return boolean
+	 */
 	static public function isCacheExpired($path)
 	{
-		if(!file_exists($path))
+		if (!file_exists($path))
+		{
 			return true;
+		}
 
-		$dateexpire = 0;
+		$fileHandler = fopen($path, "rb");
+		if ($fileHandler)
+		{
+			$header = fread($fileHandler, 150);
+			fclose($fileHandler);
+		}
+		else
+		{
+			return true;
+		}
 
-		$INCLUDE_FROM_CACHE='Y';
-
-		$dfile = fopen($path, "rb");
-		$str_tmp = fread($dfile, 150);
-		fclose($dfile);
-
-		if(
-			preg_match("/dateexpire\s*=\s*'([\d]+)'/im", $str_tmp, $arTmp)
-			|| preg_match("/^BX\\d{12}(\\d{12})/", $str_tmp, $arTmp)
-			|| preg_match("/^(\\d{12})/", $str_tmp, $arTmp)
+		if (
+			preg_match("/dateexpire\\s*=\\s*'([\\d]+)'/im", $header, $match)
+			|| preg_match("/^BX\\d{12}(\\d{12})/", $header, $match)
+			|| preg_match("/^(\\d{12})/", $header, $match)
 		)
 		{
-			if (strlen($arTmp[1]) <= 0 || doubleval($arTmp[1]) < mktime())
+			if (strlen($match[1]) <= 0 || doubleval($match[1]) < mktime())
 				return true;
 		}
 
 		return false;
 	}
 
-	protected function deleteOneDir($etime = 0)
+	/**
+	 * Deletes one cache directory. Works no longer than etime.
+	 *
+	 * @param integer $etime Timestamp when to stop working.
+	 * @param boolean $ar Record from b_cache_tag.
+	 *
+	 * @return void
+	 */
+	protected function deleteOneDir($etime = 0, $ar = false)
 	{
-		$bDeleteFromQueue = false;
-
-		$con = Main\Application::getConnection();
-		$rs = $con->query("SELECT SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG from b_cache_tag WHERE TAG='*'", 0, 1);
-		if ($ar = $rs->fetch())
+		$deleteFromQueue = false;
+		$dirName = Main\Loader::getDocumentRoot().$ar["RELATIVE_PATH"];
+		if ($ar["RELATIVE_PATH"] != '' && file_exists($dirName))
 		{
-			$dirName = Main\Loader::getDocumentRoot().$ar["RELATIVE_PATH"];
-			if ($ar["RELATIVE_PATH"] != '' && file_exists($dirName))
+			$dh = opendir($dirName);
+			if (is_resource($dh))
 			{
-				$dh = opendir($dirName);
-				if (is_resource($dh))
+				$counter = 0;
+				while (($file = readdir($dh)) !== false)
 				{
-					$counter = 0;
-					while (($file = readdir($dh)) !== false)
+					if ($file != "." && $file != "..")
 					{
-						if ($file != "." && $file != "..")
-						{
-							DeleteDirFilesEx($ar["RELATIVE_PATH"]."/".$file);
-							$counter++;
-							if (time() > $etime)
-								break;
-						}
-					}
-					closedir($dh);
-
-					if ($counter == 0)
-					{
-						rmdir($dirName);
-						$bDeleteFromQueue = true;
+						DeleteDirFilesEx($ar["RELATIVE_PATH"]."/".$file);
+						$counter++;
+						if (time() > $etime)
+							break;
 					}
 				}
-			}
-			else
-			{
-				$bDeleteFromQueue = true;
-			}
+				closedir($dh);
 
-			if ($bDeleteFromQueue)
-			{
-				$con->queryExecute(
-					"DELETE FROM b_cache_tag
-					WHERE SITE_ID = '".$con->getSqlHelper()->forSql($ar["SITE_ID"])."'
-					AND CACHE_SALT = '".$con->getSqlHelper()->forSql($ar["CACHE_SALT"])."'
-					AND RELATIVE_PATH = '".$con->getSqlHelper()->forSql($ar["RELATIVE_PATH"])."'");
+				if ($counter == 0)
+				{
+					rmdir($dirName);
+					$deleteFromQueue = true;
+				}
 			}
+		}
+		else
+		{
+			$deleteFromQueue = true;
+		}
+
+		if ($deleteFromQueue)
+		{
+			$con = Main\Application::getConnection();
+			$con->queryExecute(
+				"DELETE FROM b_cache_tag
+				WHERE SITE_ID = '".$con->getSqlHelper()->forSql($ar["SITE_ID"])."'
+				AND CACHE_SALT = '".$con->getSqlHelper()->forSql($ar["CACHE_SALT"])."'
+				AND RELATIVE_PATH = '".$con->getSqlHelper()->forSql($ar["RELATIVE_PATH"])."'");
 		}
 	}
 
-	public static function delayedDelete($count = 1, $level = 1)
+	/**
+	 * Agent function which deletes marked cache directories.
+	 *
+	 * @param integer $count Desired delete count.
+	 *
+	 * @return string
+	 */
+	public static function delayedDelete($count = 1)
 	{
+		$con = Main\Application::getConnection();
+
 		$etime = time()+2;
-		for ($i = 0; $i < $count; $i++)
+		if ($count > 0)
 		{
-			static::deleteOneDir($etime);
-			if (time() > $etime)
-				break;
+			$rs = $con->query("SELECT SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG from b_cache_tag WHERE TAG='*'", 0, $count);
+			while ($ar = $rs->fetch())
+			{
+				static::deleteOneDir($etime, $ar);
+				if (time() > $etime)
+					break;
+			}
 		}
 
-		$con = Main\Application::getConnection();
 		//try to adjust cache cleanup speed to cache cleanups
 		$rs = $con->query("SELECT SITE_ID, CACHE_SALT, RELATIVE_PATH, TAG from b_cache_tag WHERE TAG='**'");
 		if ($ar = $rs->fetch())
 		{
-			$last_count = intval($ar["RELATIVE_PATH"]);
+			$statRecFound = true;
+			$lastCount = intval($ar["RELATIVE_PATH"]);
 			if (preg_match("/:(\\d+)$/", $ar["RELATIVE_PATH"], $m))
-				$last_time = intval($m[1]);
+				$lastTime = intval($m[1]);
 			else
-				$last_time = 0;
+				$lastTime = 0;
 		}
 		else
 		{
-			$last_count = 0;
-			$last_time = 0;
+			$statRecFound = false;
+			$lastCount = 0;
+			$lastTime = 0;
 		}
-		$bWasStatRecFound = is_array($ar);
 
-		$this_count = $con->queryScalar("SELECT count(1) CNT from b_cache_tag WHERE TAG='*'");
+		$toDeleteCount = $con->queryScalar("SELECT count(1) CNT from b_cache_tag WHERE TAG='*'");
 
-		$delta = $this_count - $last_count;
+		$delta = $toDeleteCount - $lastCount;
 		if ($delta > 0)
 		{
-			if($last_time > 0)
-				$time_step = time() - $last_time;
-			if ($time_step <= 0)
-				$time_step = 1;
-			$count = intval($this_count * $time_step / 3600) + 1; //Rest of the queue in an hour
+			$timeStep = ($lastTime > 0? time() - $lastTime: 0);
+			if ($timeStep <= 0)
+				$timeStep = 1;
+			$count = intval($toDeleteCount * $timeStep / 3600) + 1; //Rest of the queue in an hour
 		}
 		elseif ($count < 1)
 		{
 			$count = 1;
 		}
 
-		if ($bWasStatRecFound)
+		if ($statRecFound)
 		{
-			if ($last_count != $this_count)
-				$con->queryExecute("UPDATE b_cache_tag SET RELATIVE_PATH='".$this_count.":".time()."' WHERE TAG='**'");
+			if ($lastCount != $toDeleteCount)
+				$con->queryExecute("UPDATE b_cache_tag SET RELATIVE_PATH='".$toDeleteCount.":".time()."' WHERE TAG='**'");
 		}
 		else
 		{
-			$con->queryExecute("INSERT INTO b_cache_tag (TAG, RELATIVE_PATH) VALUES ('**', '".$this_count.":".time()."')");
+			$con->queryExecute("INSERT INTO b_cache_tag (TAG, RELATIVE_PATH) VALUES ('**', '".$toDeleteCount.":".time()."')");
 		}
 
-		if($this_count > 0)
+		if($toDeleteCount > 0)
 			return "\\Bitrix\\Main\\Data\\CacheEngineFiles::delayedDelete(".$count.");";
 		else
 			return "";

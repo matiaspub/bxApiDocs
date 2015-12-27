@@ -188,8 +188,10 @@ class CSecurityEvent
 	private function initializeFileEngine()
 	{
 		$this->filePath = COption::getOptionString("security", "security_event_file_path");
-		if (checkDirPath($this->filePath))
+		if ($this->filePath && checkDirPath($this->filePath))
+		{
 			$this->isFileEngineActive = true;
+		}
 	}
 
 	private function initializeDBEngine()

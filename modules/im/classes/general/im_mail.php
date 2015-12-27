@@ -95,7 +95,7 @@ class CIMMail
 				"USER_NAME" => $arNotify["TO_USER_NAME"],
 				"USER_LAST_NAME" => $arNotify["TO_USER_LAST_NAME"],
 				"USER_SECOND_NAME" => $arNotify["TO_USER_SECOND_NAME"],
-				"DATE_CREATE" => $arNotify["DATE_CREATE"],
+				"DATE_CREATE" => FormatDate("FULL", $arNotify["DATE_CREATE"]),
 				"FROM_USER_ID" => $arNotify["FROM_USER_ID"],
 				"FROM_USER_LOGIN" => $arNotify["FROM_USER_LOGIN"],
 				"FROM_USER" => $arNotify["FROM_USER"],
@@ -212,7 +212,7 @@ class CIMMail
 				);
 			}
 			$arDialog[$arMessage["TO_USER_ID"]][$arMessage["FROM_USER_ID"]][] = Array(
-				'DATE_CREATE' => $arMessage["DATE_CREATE"],
+				'DATE_CREATE' => FormatDate("FULL", $arMessage["DATE_CREATE"]),
 				'MESSAGE' => CTextParser::convert4mail(str_replace("#BR#", "\n", strip_tags($arMessage["MESSAGE_OUT"])))
 			);
 		}
@@ -329,6 +329,49 @@ class CIMMail
 			return false;
 
 		return true;
+	}
+
+	public static function GetUserOffset($params)
+	{
+		$userOffset = 0;
+		$localOffset = 0;
+
+		if (!CTimeZone::Enabled())
+			return 0;
+
+		try //possible DateTimeZone incorrect timezone
+		{
+			$localTime = new DateTime();
+			$localOffset = $localTime->getOffset();
+
+			$autoTimeZone = trim($params["AUTO_TIME_ZONE"]);
+			$userZone = $params["TIME_ZONE"];
+			$factOffset = $params["TIME_ZONE_OFFSET"];
+
+			if($autoTimeZone == "N")
+			{
+				$userTime = ($userZone <> ""? new DateTime(null, new DateTimeZone($userZone)) : $localTime);
+				$userOffset = $userTime->getOffset();
+			}
+			else
+			{
+				if(CTimeZone::IsAutoTimeZone($autoTimeZone))
+				{
+					return intval($factOffset);
+				}
+				else
+				{
+					$serverZone = COption::GetOptionString("main", "default_time_zone", "");
+					$serverTime = ($serverZone <> ""? new DateTime(null, new DateTimeZone($serverZone)) : $localTime);
+					$userOffset = $serverTime->getOffset();
+				}
+			}
+		}
+		catch(Exception $e)
+		{
+			return 0;
+		}
+		return intval($userOffset) - intval($localOffset);
 	}
 }
 

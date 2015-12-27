@@ -10,8 +10,6 @@ $componentContext = array();
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -66,8 +64,6 @@ class CWebServiceDesc
  * 
  *
  *
- *
- *
  * @return mixed 
  *
  * @static
@@ -79,9 +75,7 @@ class IWebService
 	// May be called by Event to collect CWebServiceDesc on configuring WS.Server
 	
 	/**
-	* <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. </p> <br><br>
-	*
-	*
+	* <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. Метод динамичный.</p> <br><br>
 	*
 	*
 	* @return CWebServiceDesc 
@@ -106,8 +100,6 @@ class IWebService
 
 /**
  * 
- *
- *
  *
  *
  * @return mixed 
@@ -144,17 +136,12 @@ class CWebService
 
 	
 	/**
-	* <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается <i>true</i>, иначе <i>false</i>. </p> <p>Если веб-сервис реализован через систему компонентов, то <b>RegisterWebService </b>вызывается автоматически в компоненте <b>webservice.server</b>. В этом случае <i>className = $arParams["WEBSERVICE_NAME"]</i>.</p>
-	*
-	*
+	* <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается <i>true</i>, иначе <i>false</i>. Метод динамичный.</p> <p>Если веб-сервис реализован через систему компонентов, то <b>RegisterWebService </b>вызывается автоматически в компоненте <b>webservice.server</b>. В этом случае <i>className = $arParams["WEBSERVICE_NAME"]</i>.</p>
 	*
 	*
 	* @param string $className  Название класса веб-сервиса. реализующего интерфейс <b>IWebService</b>.
 	*
-	*
-	*
 	* @return boolean 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>

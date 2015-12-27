@@ -75,13 +75,10 @@ class CModule
 
 	
 	/**
-	* <p>Запускает процедуру инсталляции модуля.</p>
-	*
-	*
+	* <p>Запускает процедуру инсталляции модуля. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -100,7 +97,6 @@ class CModule
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -265,13 +261,10 @@ class CModule
 
 	
 	/**
-	* <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае.</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
-	*
-	*
+	* <p>Определяет установлен ли модуль. Возвращает "true", если модуль установлен и "false" - в противном случае. Динамичный метод.</p> <p class="note"><b>Примечание</b>. Для использования функций и методов того или иного модуля, его необходимо предварительно подключить с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -290,7 +283,6 @@ class CModule
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -312,13 +304,10 @@ class CModule
 
 	
 	/**
-	* <p>Запускает процедуру деинсталляции модуля.</p>
-	*
-	*
+	* <p>Запускает процедуру деинсталляции модуля. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -339,7 +328,6 @@ class CModule
 	* </pre>
 	*
 	*
-	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/unregistermodule.php">UnRegisterModule</a>
 	* </li></ul><a name="examples"></a>
@@ -355,13 +343,10 @@ class CModule
 
 	
 	/**
-	* <p>Удаляет регистрационную запись о модуле из базы данных.</p>
-	*
-	*
+	* <p>Удаляет регистрационную запись о модуле из базы данных. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -375,7 +360,6 @@ class CModule
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -395,13 +379,10 @@ class CModule
 
 	
 	/**
-	* <p>Вставляет идентификатор модуля в таблицу b_module.</p>
-	*
-	*
+	* <p>Вставляет идентификатор модуля в таблицу <b>b_module</b>. Динамичный метод.</p>
 	*
 	*
 	* @return mixed 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -411,7 +392,6 @@ class CModule
 	* <b>$m-&gt;Add</b>();
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -431,13 +411,10 @@ class CModule
 
 	
 	/**
-	* <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
-	*
-	*
+	* <p>Возвращает список модулей в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Статичный метод.</p>
 	*
 	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -449,7 +426,6 @@ class CModule
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -477,29 +453,23 @@ class CModule
 	 */
 	
 	/**
-	* <p>Проверяет установлен ли модуль и если установлен, то подключает его (точнее подключает файл <nobr><b>/bitrix/modules/</b><i>ID модуля</i><b>/include.php</b></nobr>). Возвращает "true", если модуль установлен, иначе - "false".</p>
-	*
-	*
+	* <p>Проверяет установлен ли модуль и если установлен, то подключает его (точнее подключает файл <code>/bitrix/modules/<i>ID модуля</i>/include.php</code>). Возвращает "true", если модуль установлен, иначе - "false". Статичный метод.</p>
 	*
 	*
 	* @param string $module_name  Идентификатор модуля.
 	*
-	*
-	*
 	* @return bool 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
 	* &lt;?
 	* // проверим установлен ли модуль "Информационные блоки" и если да то подключим его
 	* if (<b>CModule::IncludeModule</b>("iblock")):
-	*     // здесь необходимо использовать функции модуля "Информационные блоки"
+	*     // здесь необходимо использовать метода модуля "Информационные блоки"
 	*     ...
 	* endif;
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -574,18 +544,11 @@ class CModule
  * <p>Регистрация модуля в системе. Как правило регистрация модуля является неотъемлемой частью процесса <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3475" >инсталляции модуля</a>.</p>
  *
  *
- *
- *
  * @param string $m  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
- *
- *
  *
  * @param dule_i $d  
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -594,7 +557,6 @@ class CModule
  * <b>RegisterModule</b>("statistic");
  * ?&gt;</b
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -617,14 +579,9 @@ function RegisterModule($id)
  * <p>Удаляет регистрационную запись, а также все настройки модуля из базы данных. Как правило удаление регистрационной записи модуля является неотъемлемой частью процесса <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3475" >деинсталляции модуля</a>.</p>
  *
  *
- *
- *
  * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -633,7 +590,6 @@ function RegisterModule($id)
  * <b>UnRegisterModule</b>("statistic");
  * ?&gt;</b
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -656,35 +612,22 @@ function UnRegisterModule($id)
  * <p>Регистрирует произвольный обработчик <i>callback</i> события <i>event_id</i> модуля <i>from_module_id</i>. Если указан полный путь к файлу с обработчиком <i>full_path</i>, то он будет автоматически подключен перед вызовом обработчика. Вызывается на каждом хите и работает до момента окончания работы скрипта.</p>
  *
  *
- *
- *
  * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * который будет инициировать событие.
  *
- *
- *
  * @param string $MESSAGE_ID  Идентификатор события.
- *
- *
  *
  * @param mixed $callback  Название функции обработчика. Если это метод класса, то массив
  * вида Array(класс(объект), название метода).
- *
- *
  *
  * @param int $sort = 100 Очередность (порядок), в котором выполняется данный обработчик
  * (обработчиков данного события может быть больше
  * одного).<br>Необязательный параметр, по умолчанию равен 100.
  *
- *
- *
  * @param mixed $full_path = false Полный путь к файлу для подключения при возникновении события
  * перед вызовом <i>callback</i>.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -703,8 +646,13 @@ function UnRegisterModule($id)
  *   }
  * }
  * ?&gt;
+ * 
+ * Смотрите также
+ * 
+ * <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/8096/">Заголовок страницы при постраничной навигации</a></li>
+ * <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/9746/">Отправка логина/пароля при создании заказа</a></li>
+ * <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/81099/blog/bitrix-i-oshibka-404/">Ошибка 404</a></li>
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -735,22 +683,15 @@ function RemoveEventHandler($FROM_MODULE_ID, $MESSAGE_ID, $iEventHandlerKey)
  * <p>Возвращает список обработчиков события <i>event_id</i> модуля <i>module_id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
  *
  *
- *
- *
  * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
- *
- *
  *
  * @param string $event_id  Идентификатор события.
  *
- *
- *
- * @param bReturnArra $y = false Необязательный. По умолчанию "false".
- *
- *
+ * @param bReturnArra $y = false Необязательный. По умолчанию "false". Рекомендуется использовать
+ * "true". В этом случае вернёт массив параметров, а не <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.
  *
  * @return CDBResult 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -778,7 +719,6 @@ function RemoveEventHandler($FROM_MODULE_ID, $MESSAGE_ID, $iEventHandlerKey)
  * </pre>
  *
  *
- *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/executemoduleevent.php">ExecuteModuleEvent</a>
  * </li></ul><a name="examples"></a>
@@ -792,6 +732,12 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
 {
 	$eventManager = \Bitrix\Main\EventManager::getInstance();
 	$arrResult = $eventManager->findEventHandlers($MODULE_ID, $MESSAGE_ID);
+
+	foreach($arrResult as $k => $event)
+	{
+		$arrResult[$k]['FROM_MODULE_ID'] = $MODULE_ID;
+		$arrResult[$k]['MESSAGE_ID'] = $MESSAGE_ID;
+	}
 
 	if($bReturnArray)
 	{
@@ -826,8 +772,6 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
  * <p>Запускает обработчик события на выполнение. Возвращает то значение, которое возвращает конкретный обработчик события.</p>
  *
  *
- *
- *
  * @param array $event  Массив описывающий одну регистрационную запись хранящую связь
  * между событием и обработчиком этого события (подобные записи
  * хранятсяв таблице b_module_to_module). Ключи данного массива: <ul> <li> <b>ID</b> -
@@ -838,51 +782,28 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
  * класс содержит обработчик события </li> <li> <b>TO_METHOD</b> - метод класса
  * являющийся по сути обработчиком события </li> </ul>
  *
- *
- *
  * @param mixed $param1 = NULL Произвольный набор значений, которые передаются в качестве
  * параметров в обработчик события.
  *
- *
- *
  * @param mixed $param2 = NULL 
- *
- *
  *
  * @param mixed $param3 = NULL 
  *
- *
- *
  * @param mixed $param4 = NULL 
- *
- *
  *
  * @param mixed $param5 = NULL 
  *
- *
- *
  * @param mixed $param6 = NULL 
- *
- *
  *
  * @param mixed $param7 = NULL 
  *
- *
- *
  * @param mixed $param8 = NULL 
- *
- *
  *
  * @param mixed $param9 = NULL 
  *
- *
- *
  * @param mixed $param10 = NULL 
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -910,7 +831,6 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
  * </pre>
  *
  *
- *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php">GetModuleEvents</a>
  * </li></ul><a name="examples"></a>
@@ -919,6 +839,7 @@ function GetModuleEvents($MODULE_ID, $MESSAGE_ID, $bReturnArray = false)
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/main/functions/module/executemoduleevent.php
  * @author Bitrix
+ * @deprecated
  */
 function ExecuteModuleEvent($arEvent, $param1=NULL, $param2=NULL, $param3=NULL, $param4=NULL, $param5=NULL, $param6=NULL, $param7=NULL, $param8=NULL, $param9=NULL, $param10=NULL)
 {
@@ -960,6 +881,10 @@ function ExecuteModuleEvent($arEvent, $param1=NULL, $param2=NULL, $param3=NULL, 
 	for($i = $CNT_PREDEF + 1; $i < $nArgs; $i++)
 		$args[] = func_get_arg($i);
 
+	//TODO: Возможно заменить на EventManager::getInstance()->getLastEvent();
+	global $BX_MODULE_EVENT_LAST;
+	$BX_MODULE_EVENT_LAST = $arEvent;
+
 	if(is_set($arEvent, "CALLBACK"))
 	{
 		$resmod = call_user_func_array($arEvent["CALLBACK"], $args);
@@ -974,6 +899,40 @@ function ExecuteModuleEvent($arEvent, $param1=NULL, $param2=NULL, $param3=NULL, 
 	return $resmod;
 }
 
+
+/**
+ * <p>Запускает обработчик события на выполнение.</p>
+ *
+ *
+ * @param mixed $arEvent  Структура данных описывающая один обработчик события. Массив
+ * описаний обработчиков возвращает метод <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php">GetModuleEvents</a>
+ *
+ * @param mixed $arParams = array() Перечень параметров передаваемых в обработчики события. Этот
+ * перечень определяется автором события и индивидуален для
+ * каждого события. Параметры могут передаваться как по ссылке так и
+ * по значению. Параметры переданные по значению могут быть
+ * изменены внутри обработчика. Для передачи параметра по значению
+ * в массив должна быть добавлена ссылка на него.
+ *
+ * @return mixed 
+ *
+ * <h4>Example</h4> 
+ * <pre>
+ * ExecuteModuleEventEx($arEvent, array($ID, &amp;$arFields))
+ * В этом случае обработчик получит два параметра - $ID и $arFields. Значения второго он может менять, так как передан по ссылке.
+ * </pre>
+ *
+ *
+ * <h4>See Also</h4> 
+ * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/functions/module/getmoduleevents.php">GetModuleEvents</a></li>
+ * </ul><a name="examples"></a>
+ *
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/functions/module/executemoduleeventex.php
+ * @author Bitrix
+ */
 function ExecuteModuleEventEx($arEvent, $arParams = array())
 {
 	$r = true;
@@ -1006,6 +965,10 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
 
 	if(array_key_exists("CALLBACK", $arEvent))
 	{
+		//TODO: Возможно заменить на EventManager::getInstance()->getLastEvent();
+		global $BX_MODULE_EVENT_LAST;
+		$BX_MODULE_EVENT_LAST = $arEvent;
+
 		if(isset($arEvent["TO_METHOD_ARG"]) && is_array($arEvent["TO_METHOD_ARG"]) && count($arEvent["TO_METHOD_ARG"]))
 			$args = array_merge($arEvent["TO_METHOD_ARG"], $arParams);
 		else
@@ -1015,6 +978,10 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
 	}
 	elseif($arEvent["TO_CLASS"] != "" && $arEvent["TO_METHOD"] != "")
 	{
+		//TODO: Возможно заменить на EventManager::getInstance()->getLastEvent();
+		global $BX_MODULE_EVENT_LAST;
+		$BX_MODULE_EVENT_LAST = $arEvent;
+
 		if(is_array($arEvent["TO_METHOD_ARG"]) && count($arEvent["TO_METHOD_ARG"]))
 			$args = array_merge($arEvent["TO_METHOD_ARG"], $arParams);
 		else
@@ -1035,44 +1002,27 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  * <p>Удаляет регистрационную запись обработчика события.</p>
  *
  *
- *
- *
  * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * который инициирует событие.
  *
- *
- *
  * @param string $MESSAGE_ID  Идентификатор события.
- *
- *
  *
  * @param string $to_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>
  * содержащий функцию-обработчик события.
- *
- *
  *
  * @param string $to_class = "" Класс принадлежащий модулю <i>module</i>, метод которого является
  * функцией-обработчиком события.<br>Необязательный параметр. По
  * умолчанию - "".
  *
- *
- *
  * @param string $to_method = "" Метод класса <i>to_class</i> являющийся функцией-обработчиком
  * события.<br>Необязательный параметр. По умолчанию - "".
  *
- *
- *
  * @param string $TO_PATH = "" Необязательный параметр, по умолчанию пустой.
- *
- *
  *
  * @param array $TO_METHOD_ARG = array() Массив аргументов для функции-обработчика событий. <br>
  * Необязательный параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1080,7 +1030,6 @@ function ExecuteModuleEventEx($arEvent, $arParams = array())
  * <b>UnRegisterModuleDependences</b>("main", "OnUserDelete", "forum", "CForum", "OnUserDelete");
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1105,58 +1054,38 @@ function UnRegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID
  * <p>Регистрирует обработчик события. Выполняется один раз (при установке модуля) и этот обработчик события действует до момента вызова события <b>UnRegisterModuleDependences</b>. </p>
  *
  *
- *
- *
  * @param string $from_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * который будет инициировать событие.
  *
- *
- *
  * @param string $MESSAGE_ID  Идентификатор события.
- *
- *
  *
  * @param string $to_module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>,
  * содержащий функцию-обработчик события.
- *
- *
  *
  * @param string $to_class = "" Класс принадлежащий модулю <i>module</i>, метод которого является
  * функцией-обработчиком события. <br> Необязательный параметр. По
  * умолчанию - "" (будет просто подключен файл
  * /bitrix/modules/<i>to_module_id</i>/include.php).
  *
- *
- *
  * @param string $to_method = "" Метод класса <i>to_class</i> являющийся функцией-обработчиком события.
  * <br> Необязательный параметр. По умолчанию - "" (будет просто
  * подключен файл /bitrix/modules/<i>to_module_id</i>/include.php).
- *
- *
  *
  * @param int $sort = 100 Очередность (порядок), в котором выполняется данный обработчик
  * (обработчиков данного события может быть больше одного). <br>
  * Необязательный параметр, по умолчанию равен 100.
  *
- *
- *
  * @param TO_PAT $H = "" Необязательный параметр, по умолчанию пустой.
- *
- *
  *
  * @param TO_METHOD_AR $G = array() Массив аргументов для функции-обработчика событий. <br>
  * Необязательный параметр.
  *
- *
- *
  * @return mixed 
- *
  *
  * <h4>Example</h4> 
  * <pre>
  * &lt;?<br>// Для того, чтобы при удалении пользователя сайта <br>// производилась соответствующая очистка данных форума, <br>// при установке форума выполняется регистрация нового <br>// обработчика события "OnUserDelete" модуля main. <br>// Этим обработчиком является метод OnUserDelete класса CForum модуля forum.<br><br><b>RegisterModuleDependences</b>("main", "OnUserDelete", "forum", "CForum", "OnUserDelete");<br>?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1178,17 +1107,12 @@ function RegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID, 
 
 
 /**
- * <p>Проверяет установлен ли модуль. Возвращает "true", если модуль установлен. Иначе - "false".</p> <p class="note">Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
- *
- *
+ * <p>Проверяет установлен ли модуль. Возвращает "true", если модуль установлен. Иначе - "false".</p> <p class="note"><b>Примечание</b>. Для использования функций и классов того или иного модуля, его необходимо предварительно подключить с помощью функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php">CModule::IncludeModule</a>.</p>
  *
  *
  * @param string $module_id  <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">Идентификатор модуля</a>.
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1200,7 +1124,6 @@ function RegisterModuleDependences($FROM_MODULE_ID, $MESSAGE_ID, $TO_MODULE_ID, 
  * endif;
  * ?&gt;
  * </pre>
- *
  *
  *
  * <h4>See Also</h4> 
@@ -1224,14 +1147,9 @@ function IsModuleInstalled($module_id)
  * <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/main/general/identifiers.php">идентификатор модуля</a>, которому принадлежит файл.</p>
  *
  *
- *
- *
  * @param string $path  Путь к файлу лежащему в каталоге <b>/bitrix/modules/</b>.
  *
- *
- *
  * @return string 
- *
  *
  * <h4>Example</h4> 
  * <pre>
@@ -1262,18 +1180,11 @@ function GetModuleID($str)
  * <p>Сравнивает версии в форматах <b>XX.XX.XX</b>. Возвращает true, если первая версия, переданная в параметре <i>version1</i>, больше или равна второй версии, переданной в параметре <i>version2</i>, иначе - false.</p>
  *
  *
- *
- *
  * @param string $version1  Первая версия в формате "XX.XX.XX"
- *
- *
  *
  * @param string $version2  Вторая версия в формате "XX.XX.XX"
  *
- *
- *
  * @return bool 
- *
  *
  * <h4>Example</h4> 
  * <pre>

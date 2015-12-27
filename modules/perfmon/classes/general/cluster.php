@@ -144,6 +144,11 @@ class CPerfCluster
 		if ($iteration_timeout <= 0)
 			$iteration_timeout = 30;
 
+		if ($port == 443)
+			$proto = "ssl://";
+		else
+			$proto = "";
+
 		$start = getmicrotime();
 		$end = $start + $iterations;
 		$end_after_end = $start + $iteration_timeout;
@@ -166,7 +171,7 @@ class CPerfCluster
 					if (!isset($arConnections[$j]))
 					{
 						$arStartTimes[$j] = getmicrotime();
-						$socket = fsockopen($host, $port, $errno, $errstr, $socket_timeout);
+						$socket = fsockopen($proto.$host, $port, $errno, $errstr, $socket_timeout);
 						if ($socket)
 						{
 							$request = str_replace("#thread#", $j, $strRequest);
@@ -174,9 +179,10 @@ class CPerfCluster
 								$request .= "Cookie: ".implode(';', $arCookie[$j])."\n";
 							$request .= "\r\n";
 
-							stream_set_blocking($socket, false);
+							stream_set_blocking($socket, true);
 							stream_set_timeout($socket, $rw_timeout);
 							fputs($socket, $request);
+							stream_set_blocking($socket, false);
 							$arConnections[$j] = $socket;
 							$Pages++;
 						}

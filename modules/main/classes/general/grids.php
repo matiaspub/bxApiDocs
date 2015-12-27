@@ -8,6 +8,7 @@ class CGridOptions
 	protected $options;
 	protected $filter;
 	protected $filterPresets;
+	protected $currentView;
 
 	public function __construct($grid_id, array $filterPresets = array())
 	{
@@ -47,10 +48,11 @@ class CGridOptions
 		}
 
 		$this->all_options = $aOptions;
+		$this->currentView = $aOptions["current_view"];
 
-		if(isset($aOptions["views"][$aOptions["current_view"]]))
+		if(isset($aOptions["views"][$this->currentView]))
 		{
-			$this->options = $aOptions["views"][$aOptions["current_view"]];
+			$this->options = $aOptions["views"][$this->currentView];
 		}
 	}
 
@@ -95,7 +97,13 @@ class CGridOptions
 		{
 			if($this->options["sort_by"] <> '')
 			{
+				//sorting explicitly set in the view
 				$key = $this->options["sort_by"];
+			}
+			elseif($this->options["last_sort_by"] <> '')
+			{
+				//last saved user sorting
+				$key = $this->options["last_sort_by"];
 			}
 		}
 		if(isset($_SESSION["main.interface.grid"][$this->grid_id]["sort_by"]))
@@ -112,6 +120,10 @@ class CGridOptions
 				if($this->options["sort_order"] <> '')
 				{
 					$arResult["sort"] = array($key => $this->options["sort_order"]);
+				}
+				elseif($this->options["last_sort_order"] <> '')
+				{
+					$arResult["sort"] = array($key => $this->options["last_sort_order"]);
 				}
 				else
 				{
@@ -269,7 +281,13 @@ class CGridOptions
 		foreach($aColsTmp as $col)
 			if(($col = trim($col)) <> "")
 				$aCols[] = $col;
-		$this->all_options["views"][$this->all_options["current_view"]]["columns"] = implode(",", $aCols);
+		$this->all_options["views"][$this->currentView]["columns"] = implode(",", $aCols);
+	}
+
+	public function SetSorting($by, $order)
+	{
+		$this->all_options["views"][$this->currentView]["last_sort_by"] = $by;
+		$this->all_options["views"][$this->currentView]["last_sort_order"] = $order;
 	}
 
 	public function SetTheme($theme)
@@ -286,6 +304,7 @@ class CGridOptions
 			"sort_order"=>$settings["sort_order"],
 			"page_size"=>$settings["page_size"],
 			"saved_filter"=>$settings["saved_filter"],
+			"custom_names"=>$settings["custom_names"],
 		);
 	}
 
@@ -338,13 +357,11 @@ class CGridOptions
 			$view_id = "default";
 
 		$this->all_options["current_view"] = $view_id;
-		
-		//get sorting from view, not session
-		if($this->all_options["views"][$view_id]["sort_by"] <> '')
-			unset($_SESSION["main.interface.grid"][$this->grid_id]["sort_by"]);
+		$this->currentView = $view_id;
 
-		if($this->all_options["views"][$view_id]["sort_order"] <> '')
-			unset($_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]);
+		//get sorting from view, not session
+		unset($_SESSION["main.interface.grid"][$this->grid_id]["sort_by"]);
+		unset($_SESSION["main.interface.grid"][$this->grid_id]["sort_order"]);
 	}
 	
 	public function SetFilterRows($rows, $filter_id='')

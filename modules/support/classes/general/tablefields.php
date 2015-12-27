@@ -232,7 +232,7 @@ class CSupportTableFields
 	/* заполнить поля из массива
 		$sf = "Имя поля,Имя поля2,..."
 		$sf = array("Имя поля", "Имя поля2",...) */
-public function SortRow($sf)
+public 	public function SortRow($sf)
 	{
 		$this->_sortFields = CSupportTools::prepareParamArray($sf);
 		$arr = $this->_arFields;
@@ -241,7 +241,7 @@ public function SortRow($sf)
 	}
 		
 	//$notNull = array(self::NOT_NULL, self::MORE0, self::NOT_EMTY_STR)
-public function Set($name, $value, $notNull = array(), $row = null, $isModified = true)
+public 	public function Set($name, $value, $notNull = array(), $row = null, $isModified = true)
 	{
 		if(!array_key_exists($name, $this->_arFieldsTypes)) return;
 		$row = $this->checkRow($row);
@@ -261,7 +261,7 @@ public function Set($name, $value, $notNull = array(), $row = null, $isModified 
 		$this->_arModifiedFields[$row][$name] = $isModified;
 	}
 	
-public function SetCurrentTime($name, $row = null)
+public 	public function SetCurrentTime($name, $row = null)
 	{
 		global $DB;
 		$row = $this->checkRow($row);
@@ -288,7 +288,7 @@ public function SetCurrentTime($name, $row = null)
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)
 		$notNull = array(self::NOT_EMTY_STR, self::MORE0, self::NOT_EMTY_STR) */
-public function FromArray($arr, $fields = self::ALL, $notNull = array(), $row = null) //setFromArr
+public 	public function FromArray($arr, $fields = self::ALL, $notNull = array(), $row = null) //setFromArr
 	{
 		if(!is_array($arr)) return;
 		$row = $this->checkRow($row);
@@ -306,7 +306,7 @@ public function FromArray($arr, $fields = self::ALL, $notNull = array(), $row = 
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)
 		$notNull = array(self::NOT_EMTY_STR, self::MORE0, self::NOT_EMTY_STR) */
-public function FromTable($table, $fields = self::ALL, $notNull = array(), $removeExistingRows = false) //setFromTable
+public 	public function FromTable($table, $fields = self::ALL, $notNull = array(), $removeExistingRows = false) //setFromTable
 	{
 		if($removeExistingRows)
 		{
@@ -323,12 +323,12 @@ public function FromTable($table, $fields = self::ALL, $notNull = array(), $remo
 		}
 	}
 	
-public function __get($name)
+public static 	public function __get($name)
 	{
 		return $this->Get($name);
 	}
 	
-public function Get($name, $row = null)
+public 	public function Get($name, $row = null)
 	{
 		if(!array_key_exists($name, $this->_arFieldsTypes)) return null;
 		$row = $this->checkRow($row);
@@ -341,7 +341,7 @@ public function Get($name, $row = null)
 		$fields = "Имя поля,Имя поля2,..."
 		$fields = array("Имя поля", "Имя поля2",...)
 		$fields = array("Имя поля" => "Имя поля в массиве", "Имя поля2" => "Имя поля в массиве2",...)*/
-public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false, $row = null)  //getArr
+public 	public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false, $row = null)  //getArr
 	{
 		$row = $this->checkRow($row);
 		$res = array();		
@@ -374,7 +374,7 @@ public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false
 		return $res;
 	}
 		
-	public function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
+	pubpublic lic function GetFieldForOutput($name, $place, $whiteList = array("http", "ftp", "/"), $row = null)
 	{
 		$row = $this->checkRow($row);
 		if(!array_key_exists($name, $this->_arFieldsTypes))
@@ -390,7 +390,7 @@ public function ToArray($fields = self::ALL, $notNull = array(), $forSQL = false
 		return self::ConvertForHTML($ft["TYPE"], $place, $value, $op);
 	}
 	
-	public function GetColumn($name)
+public static 	public function GetColumn($name)
 	{
 		$res = array();
 		if(!array_key_exists($name, $this->_arFieldsTypes))

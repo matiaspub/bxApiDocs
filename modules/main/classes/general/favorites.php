@@ -23,16 +23,21 @@ class CAllFavorites extends CDBResult
 			return 0;
 
 		$paresedUrl = CBXFavUrls::ParseDetail($url);
-		$pathInfo = pathinfo($paresedUrl["path"]);
+		if($paresedUrl !== false)
+		{
+			$pathInfo = pathinfo($paresedUrl["path"]);
 
-		$dbFav = CFavorites::GetList(array(),array(
-			"URL" => "'%".$pathInfo["basename"]."%'",
-			"MENU_FOR_USER" => $USER->GetID(),
-			"LANGUAGE_ID" => LANGUAGE_ID,
-		));
-		while($arFav = $dbFav->Fetch())
-			if(CBXFavUrls::Compare($paresedUrl, $arFav["URL"]))
-				return $arFav["ID"];
+			$dbFav = CFavorites::GetList(array(), array(
+				"URL" => "'%".$pathInfo["basename"]."%'",
+				"MENU_FOR_USER" => $USER->GetID(),
+				"LANGUAGE_ID" => LANGUAGE_ID,
+			));
+			while($arFav = $dbFav->Fetch())
+				if(CBXFavUrls::Compare($paresedUrl, $arFav["URL"]))
+				{
+					return $arFav["ID"];
+				}
+		}
 
 		return 0;
 	}

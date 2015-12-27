@@ -1,9 +1,7 @@
 <?
 
 /**
- * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту.</body> </html>
- *
- *
+ * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту. 
  *
  *
  * @return mixed 
@@ -19,17 +17,11 @@ class CPath
 	* <p>Возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
 	*
 	*
-	*
-	*
 	* @param int $parent_id = "" ID "родительского" отрезка пути (предшествовавшему текущему).
-	*
-	*
 	*
 	* @param string $counter_type = "COUNTER_FULL_PATH" Тип счетчика, возможные значения: <ul> <li> <b>COUNTER_FULL_PATH</b> - количество
 	* переходов по полному пути; </li> <li> <b>COUNTER</b> - количество переходов
 	* по отрезку пути. </li> </ul>
-	*
-	*
 	*
 	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_counter</b> - значение
 	* счетчика тип которого задается в <i>counter_type</i>; </li> <li> <b>s_last_page</b> -
@@ -37,12 +29,8 @@ class CPath
 	* <i>counter_type</i>=<b>COUNTER</b>); </li> <li> <b>s_pages</b> - набор всех страниц полного
 	* пути (используется только если <i>counter_type</i>=<b>COUNTER_FULL_PATH</b>). </li> </ul>
 	*
-	*
-	*
 	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
 	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
-	*
-	*
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
 	* допустимы следующие ключи: <ul> <li> <b>PATH_ID</b>* - ID отрезка пути; </li> <li>
@@ -85,15 +73,10 @@ class CPath
 	* поля "количество страниц в пути". </li> </ul> * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
-	*
-	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка записей. Если значение равно "true",
 	* то список был отфильтрован.
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -121,7 +104,6 @@ class CPath
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 
@@ -299,17 +281,12 @@ class CPath
 
 	
 	/**
-	* <p>По указанному ID записи, функция возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
-	*
-	*
+	* <p>По указанному ID записи, метод возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
 	*
 	*
 	* @param int $id  ID записи из таблицы. </h
 	*
-	*
-	*
 	* @return CDBResult 
-	*
 	*
 	* <h4>Example</h4> 
 	* <pre>
@@ -323,7 +300,6 @@ class CPath
 	* }
 	* ?&gt;
 	* </pre>
-	*
 	*
 	*
 	* <h4>See Also</h4> 

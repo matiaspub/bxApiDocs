@@ -3,9 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/genera
 
 
 /**
- * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика".</body> </html>
- *
- *
+ * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика". 
  *
  *
  * @return mixed 
@@ -374,7 +372,7 @@ class CStatistics extends CAllStatistics
 		ignore_user_abort(true);
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
-		$DAYS = COption::GetOptionInt("statistic", "CITY_DAYS");
+		$DAYS = intval(COption::GetOptionString("statistic", "CITY_DAYS"));
 		if($DAYS >= 0)
 		{
 			$strSql = "
@@ -395,7 +393,7 @@ class CStatistics extends CAllStatistics
 		ignore_user_abort(true);
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
-		$DAYS = COption::GetOptionInt("statistic", "COUNTRY_DAYS");
+		$DAYS = intval(COption::GetOptionString("statistic", "COUNTRY_DAYS"));
 		if($DAYS >= 0)
 		{
 			$strSql = "

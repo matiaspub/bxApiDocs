@@ -29,15 +29,13 @@ class CHTMLEditor
 
 	private function Init($arParams)
 	{
-		global $USER, $APPLICATION;
-
+		global $USER;
 		?>
 		<script>
-			(function() {
+			(function(window) {
 				if (!window.BXHtmlEditor)
 				{
 					var BXHtmlEditor = {
-						ajaxResponse: {},
 						editors: {},
 						configs: {},
 						dialogs: {},
@@ -67,8 +65,6 @@ class CHTMLEditor
 										if (!BXHtmlEditor.editors[config.id] || !BXHtmlEditor.editors[config.id].Check())
 										{
 											BXHtmlEditor.editors[config.id] = new window.BXEditor(config);
-											BXHtmlEditor.editors[config.id].Show();
-											BX.onCustomEvent(BXHtmlEditor, 'OnEditorCreated',[BXHtmlEditor.editors[config.id]]);
 										}
 										else
 										{
@@ -100,16 +96,83 @@ class CHTMLEditor
 									!BXHtmlEditor.editors[id].IsSubmited() &&
 									BXHtmlEditor.editors[id].beforeUnloadHandlerAllowed !== false)
 								{
+									if (typeof(BX.PULL) != 'undefined' && typeof(BX.PULL.tryConnectDelay) == 'function') // TODO change to right code in near future (e.shelenkov)
+									{
+										BX.PULL.tryConnectDelay();
+									}
+									if(typeof(BX.desktopUtils) != 'undefined' && typeof(BX.desktopUtils.isChangedLocationToBx) == 'function' && BX.desktopUtils.isChangedLocationToBx())
+									{
+										return;
+									}
 									return BXHtmlEditor.editors[id].config.beforeUnloadMessage || BX.message('BXEdExitConfirm');
 								}
 							}
+						},
+
+						ReplaceNewLines : function(content)
+						{
+							content = content.replace(/<[^<>]*br>\n/ig, '#BX_BR#');
+							var contentTmp;
+							while (true)
+							{
+								contentTmp = content.replace(/([\s|\S]+)\n([\s|\S]+)/gi, function (s, s1, s2)
+									{
+										if (s1.match(/>\s*$/) || s2.match(/^\s*</))
+											return s;
+										return s1 + '#BX_BR#' + s2;
+									}
+								);
+								if (contentTmp == content)
+								{
+									break;
+								}
+								else
+								{
+									content = contentTmp;
+								}
+							}
+
+							content = content.replace(/#BX_BR#/ig, "<br>\n");
+
+							return content;
+						},
+
+						ReplaceNewLinesBack: function(content)
+						{
+							content = content.replace(/<[^<>]*br>\n/ig, '#BX_BR#');
+							var contentTmp;
+							while (true)
+							{
+								contentTmp = content.replace(/([\s|\S]+)#BX_BR#([\s|\S]+)/gi, function (s, s1, s2)
+									{
+										if (s1.match(/>\s*$/) || s2.match(/^\s*</))
+											return s;
+										return s1 + '\n' + s2;
+									}
+								);
+								if (contentTmp == content)
+								{
+									break;
+								}
+								else
+								{
+									content = contentTmp;
+								}
+							}
+
+							content = content.replace(/#BX_BR#/ig, "<br>\n");
+
+							return content;
 						}
 					};
-					top.BXHtmlEditor = window.BXHtmlEditor = BXHtmlEditor;
+
+					window.BXHtmlEditor = BXHtmlEditor;
 					window.onbeforeunload = BXHtmlEditor.OnBeforeUnload;
 				}
+
 				BX.onCustomEvent(window, "OnBXHtmlEditorInit");
-			})();
+				top.BXHtmlEditorAjaxResponse = {};
+			})(window);
 		</script><?
 
 		$basePath = '/bitrix/js/fileman/html_editor/';
@@ -144,11 +207,8 @@ class CHTMLEditor
 		));
 		CUtil::InitJSCore(array('html_editor'));
 
-		$db_events = GetModuleEvents("fileman", "OnBeforeHTMLEditorScriptRuns");
-		while($arEvent = $db_events->Fetch())
-		{
+		foreach(GetModuleEvents("fileman", "OnBeforeHTMLEditorScriptRuns", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent);
-		}
 
 		$this->bAutorized = is_object($USER) && $USER->IsAuthorized();
 		if (isset($arParams['allowPhp']) && !isset($arParams['bAllowPhp']))
@@ -164,7 +224,7 @@ class CHTMLEditor
 		$arParams["bodyId"] = COption::GetOptionString("fileman", "editor_body_id", "");
 
 		$this->content = $arParams['content'];
-		$this->inputName = isset($arParams['inputName']) ? $arParams['inputName'] : 'html_editor_content';
+		$this->inputName = isset($arParams['inputName']) ? $arParams['inputName'] : $this->name;
 		$this->inputId = isset($arParams['inputId']) ? $arParams['inputId'] : 'html_editor_content_id';
 
 		$arParams["bbCode"] = (isset($arParams["bbCode"]) && $arParams["bbCode"]) || (isset($arParams["BBCode"]) && $arParams["BBCode"]);
@@ -198,9 +258,14 @@ class CHTMLEditor
 		{
 			$templateId = $arParams['templateId'];
 		}
-		elseif (defined(SITE_TEMPLATE_ID))
+		elseif (defined('SITE_TEMPLATE_ID'))
 		{
 			$templateId = SITE_TEMPLATE_ID;
+		}
+
+		if (!isset($templateId) && isset($_GET['siteTemplateId']))
+		{
+			$templateId = $_GET['siteTemplateId'];
 		}
 
 		if ($arParams["bbCode"])
@@ -239,7 +304,7 @@ class CHTMLEditor
 
 				if (!isset($templateId))
 				{
-					$templateId = $first;
+					$templateId = $first ? $first : '';
 				}
 			}
 
@@ -254,9 +319,15 @@ class CHTMLEditor
 			'taskbar_shown' => 0,
 			'taskbar_width' => 250,
 			'specialchars' => false,
-			'clean_empty_spans' => 'Y'
+			'clean_empty_spans' => 'Y',
+			'paste_clear_colors' => 'Y',
+			'paste_clear_borders' => 'Y',
+			'paste_clear_decor' => 'Y',
+			'paste_clear_table_dimen' => 'Y',
+			'show_snippets' => 'Y',
+			'link_dialog_type' => 'internal'
 		);
-		$settingsKey = "user_settings_".$arParams["bbCode"];
+		$settingsKey = "user_settings_".$arParams["bbCode"]."_".$this->id;
 
 		$curSettings = CUserOptions::GetOption("html_editor", $settingsKey, false, $USER->GetId());
 		if (is_array($curSettings))
@@ -282,15 +353,18 @@ class CHTMLEditor
 
 		$arParams["showComponents"] = isset($arParams["showComponents"]) ? $arParams["showComponents"] : true;
 		$arParams["showSnippets"] = isset($arParams["showSnippets"]) ? $arParams["showSnippets"] : true;
+		$arParams["showSnippets"] = $arParams["showSnippets"] && $userSettings['show_snippets'] != 'N';
 
 		if(!isset($arParams["initConponentParams"]))
 			$arParams["initConponentParams"] = $arParams["showTaskbars"] !== false && $arParams["showComponents"] && ($arParams['limitPhpAccess'] || $arParams['bAllowPhp']);
 
 		$arParams["actionUrl"] = $arParams["bbCode"] ? '/bitrix/tools/html_editor_action.php' : '/bitrix/admin/fileman_html_editor_action.php';
 
+		$arParams["lazyLoad"] = isset($arParams["lazyLoad"]) ? $arParams["lazyLoad"] : false;
+
 		$this->jsConfig = array(
 			'id' => $this->id,
-			'inputName' => $this->name,
+			'inputName' => $this->inputName,
 			'content' => $this->content,
 			'width' => $arParams['width'],
 			'height' => $arParams['height'],
@@ -299,6 +373,7 @@ class CHTMLEditor
 			'templates' => $arTemplates,
 			'templateId' => $templateId,
 			'templateParams' => $templateParams,
+			'componentFilter' => $arParams['componentFilter'],
 			'snippets' => $arSnippets,
 			'placeholder' => isset($arParams['placeholder']) ? $arParams['placeholder'] : 'Text here...',
 			'actionUrl' => $arParams["actionUrl"],
@@ -320,12 +395,25 @@ class CHTMLEditor
 			'taskbarShown' => $userSettings['taskbar_shown'] ? true : false,
 			'taskbarWidth' => $userSettings['taskbar_width'],
 			'lastSpecialchars' => $userSettings['specialchars'] ? explode('|', $userSettings['specialchars']) : false,
-			'cleanEmptySpans' => $userSettings['clean_empty_spans'] != 'N'
+			'cleanEmptySpans' => $userSettings['clean_empty_spans'] != 'N',
+			'pasteSetColors' => $userSettings['paste_clear_colors'] != 'N',
+			'pasteSetBorders' => $userSettings['paste_clear_borders'] != 'N',
+			'pasteSetDecor' => $userSettings['paste_clear_decor'] != 'N',
+			'pasteClearTableDimen' => $userSettings['paste_clear_table_dimen'] != 'N',
+			'linkDialogType' => $userSettings['link_dialog_type'],
+			'lazyLoad' => $arParams["lazyLoad"]
 		);
+
 		if (($this->bAllowPhp || $arParams['limitPhpAccess']) && $arParams["showTaskbars"] !== false)
 		{
-			$this->jsConfig['components'] = self::GetComponents($templateId);
+			$this->jsConfig['components'] = self::GetComponents($templateId, false, $arParams['componentFilter']);
 		}
+
+		if (isset($arParams["initAutosave"]))
+			$this->jsConfig["initAutosave"] = $arParams["initAutosave"];
+
+		if (isset($arParams["useFileDialogs"]))
+			$this->jsConfig["useFileDialogs"] = $arParams["useFileDialogs"];
 
 		if (isset($arParams["showTaskbars"]))
 			$this->jsConfig["showTaskbars"] = $arParams["showTaskbars"];
@@ -339,14 +427,21 @@ class CHTMLEditor
 		if (isset($arParams["arSmiles"]))
 			$this->jsConfig["smiles"] = $arParams["arSmiles"];
 
+		if (isset($arParams["arSmilesSet"]))
+			$this->jsConfig["smileSets"] = $arParams["arSmilesSet"];
+
 		if (isset($arParams["iframeCss"]))
 			$this->jsConfig["iframeCss"] = $arParams["iframeCss"];
+
 
 		if (isset($arParams["beforeUnloadMessage"]))
 			$this->jsConfig["beforeUnloadMessage"] = $arParams["beforeUnloadMessage"];
 
 		if (isset($arParams["setFocusAfterShow"]))
 			$this->jsConfig["setFocusAfterShow"] = $arParams["setFocusAfterShow"];
+
+		if (isset($arParams["relPath"]))
+			$this->jsConfig["relPath"] = $arParams["relPath"];
 
 		// autoresize
 		if (isset($arParams["autoResize"]))
@@ -431,53 +526,7 @@ class CHTMLEditor
 					<div class="bxhtmled-search-cancel" data-bx-type="taskbar_search_cancel" title="<?= GetMessage('HTMLED_SEARCH_CANCEL')?>"></div>
 				</div>
 			</div>
-		</div>
-		<div style="display: none;">
-			<?
-			CAdminFileDialog::ShowScript(Array
-				(
-					"event" => "BxOpenFileBrowserWindFile".$this->id,
-					"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogSelect".$this->id),
-					"arPath" => Array("SITE" => SITE_ID),
-					"select" => 'F',
-					"operation" => 'O',
-					"showUploadTab" => true,
-					"showAddToMenuTab" => false,
-					"fileFilter" => '',
-					"allowAllFiles" => true,
-					"SaveConfig" => true
-				)
-			);
-
-			CAdminFileDialog::ShowScript(Array
-				(
-					"event" => "BxOpenFileBrowserImgFile".$this->id,
-					"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogImgSelect".$this->id),
-					//"arPath" => Array("SITE" => $_GET["site"], "PATH" =>(strlen($str_FILENAME) > 0 ? GetDirPath($str_FILENAME) : '')),
-					"select" => 'F',
-					"operation" => 'O',
-					"showUploadTab" => true,
-					"showAddToMenuTab" => false,
-					"fileFilter" => 'image',
-					"allowAllFiles" => true,
-					"SaveConfig" => true
-				)
-			);
-
-			CMedialib::ShowBrowseButton(
-				array(
-					'value' => '...',
-					'event' => "BxOpenFileBrowserImgFile".$this->id,
-					'button_id' => "bx-open-file-medialib-but-".$this->id,
-					'id' => "bx_open_file_medialib_button_".$this->id,
-					'MedialibConfig' => array(
-						"event" => "BxOpenFileBrowserImgFileMl".$this->id,
-						"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogImgSelect".$this->id),
-						"types" => array('image')
-					)
-				)
-			);
-			?>
+			<div id="bx-html-editor-file-dialogs-<?=$this->id?>" style="display: none;"></div>
 		</div>
 	<?
 	}
@@ -523,7 +572,7 @@ class CHTMLEditor
 		);
 	}
 
-	public static function GetComponents($Params, $bClearCache = false)
+	public static function GetComponents($Params, $bClearCache = false, $arFilter = array())
 	{
 		global $CACHE_MANAGER;
 
@@ -531,7 +580,11 @@ class CHTMLEditor
 		$mask = $allowed === '' ? 0 : substr(md5($allowed), 0, 10);
 
 		$lang = isset($Params['lang']) ? $Params['lang'] : LANGUAGE_ID;
-		$cache_name = 'component_tree_array_'.$lang.'_'.$mask;
+		$component_type = '';
+		if(isset($arFilter['TYPE']))
+			$component_type = '_'.$arFilter['TYPE'];
+
+		$cache_name = 'component_tree_array_'.$lang.'_'.$mask.$component_type;
 		$table_id = "fileman_component_tree";
 
 		if ($bClearCache)
@@ -567,7 +620,7 @@ class CHTMLEditor
 				$namespace = false;
 			}
 
-			$arTree = CComponentUtil::GetComponentsTree($namespace, $arAllowed);
+			$arTree = CComponentUtil::GetComponentsTree($namespace, $arAllowed, $arFilter);
 			self::$arComponents = array(
 				'items' => array(),
 				'groups' => array()
@@ -600,6 +653,7 @@ class CHTMLEditor
 						self::$arComponents['items'][] = array(
 							"path" => $path,
 							"name" => $name,
+							"type" => $comp['TYPE'],
 							"title" => $comp['TITLE'],
 							"complex" => $comp['COMPLEX'],
 							"params" => array("DESCRIPTION" => $comp['DESCRIPTION']),
@@ -630,6 +684,7 @@ class CHTMLEditor
 					self::$arComponents['items'][] = array(
 						"path" => $realPath,
 						"name" => $name,
+						"type" => $comp['TYPE'],
 						"title" => $comp['TITLE'],
 						"complex" => $comp['COMPLEX'],
 						"params" => array("DESCRIPTION" => $comp['DESCRIPTION']),
@@ -670,7 +725,8 @@ class CHTMLEditor
 				if (!$USER->CanDoOperation('fileman_view_file_structure'))
 					break;
 				$siteTemplate = $_REQUEST['site_template'];
-				$result = self::GetComponents($siteTemplate, true);
+				$componentFilter = isset($_REQUEST['componentFilter']) ? $_REQUEST['componentFilter'] : false;
+				$result = self::GetComponents($siteTemplate, true, $componentFilter);
 				break;
 
 			case "video_oembed":
@@ -843,6 +899,55 @@ class CHTMLEditor
 				}
 				break;
 			// END *** spellcheck
+			case "load_file_dialogs":
+				$editorId = $_REQUEST['editor_id'];
+				$editorId = preg_replace("/[^a-zA-Z0-9_-]/is", "_", $editorId);
+
+				CAdminFileDialog::ShowScript(Array
+					(
+						"event" => "BxOpenFileBrowserWindFile".$editorId,
+						"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogSelect".$editorId),
+						"arPath" => Array("SITE" => SITE_ID),
+						"select" => 'F',
+						"operation" => 'O',
+						"showUploadTab" => true,
+						"showAddToMenuTab" => false,
+						"fileFilter" => 'image',
+						"allowAllFiles" => true,
+						"SaveConfig" => true
+					)
+				);
+				CMedialib::ShowBrowseButton(
+					array(
+						'value' => '...',
+						'event' => "BxOpenFileBrowserWindFile".$editorId,
+						'button_id' => "bx-open-file-link-medialib-but-".$editorId,
+						'id' => "bx_open_file_link_medialib_button_".$editorId,
+						'MedialibConfig' => array(
+							"event" => "BxOpenFileBrowserFileMl".$editorId,
+							"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogSelect".$editorId)
+						),
+						'useMLDefault' => false
+					)
+				);
+
+				CMedialib::ShowBrowseButton(
+					array(
+						'value' => '...',
+						'event' => "BxOpenFileBrowserWindFile".$editorId,
+						'button_id' => "bx-open-file-medialib-but-".$editorId,
+						'id' => "bx_open_file_medialib_button_".$editorId,
+						'MedialibConfig' => array(
+							"event" => "BxOpenFileBrowserImgFileMl".$editorId,
+							"arResultDest" => Array("FUNCTION_NAME" => "OnFileDialogImgSelect".$editorId),
+							"types" => array('image')
+						)
+					)
+				);
+
+
+				$result = array('result' => true);
+				break;
 		}
 
 		self::ShowResponse(intVal($_REQUEST['reqId']), $result);
@@ -860,7 +965,7 @@ class CHTMLEditor
 			if ($reqId)
 			{
 				?>
-				<script>top.BXHtmlEditor.ajaxResponse['<?= $reqId?>'] = <?= CUtil::PhpToJSObject($Res)?>;</script>
+				<script>top.BXHtmlEditorAjaxResponse['<?= $reqId?>'] = <?= CUtil::PhpToJSObject($Res)?>;</script>
 			<?
 			}
 		}
@@ -971,7 +1076,19 @@ class CHTMLEditor
 
 	public static function GetSiteTemplateParams($templateId, $siteId)
 	{
-		return CFileman::GetAllTemplateParams($templateId, $siteId);
+		$params = CFileman::GetAllTemplateParams($templateId, $siteId);
+
+		$params["STYLES"] = preg_replace("/(url\(\"?)images\//is", "\\1".$params['SITE_TEMPLATE_PATH'].'/images/', $params["STYLES"]);
+
+		if (is_array($params['EDITOR_STYLES']))
+		{
+			for ($i = 0, $l = count($params['EDITOR_STYLES']); $i < $l; $i++)
+			{
+				$params['EDITOR_STYLES'][$i] = $params['EDITOR_STYLES'][$i].'?'.@filemtime($_SERVER['DOCUMENT_ROOT'].$params['EDITOR_STYLES'][$i]);
+			}
+		}
+
+		return $params;
 	}
 
 	public static function GetVideoOembed($url = '')
@@ -979,14 +1096,50 @@ class CHTMLEditor
 		// Get oembed url
 		$oembed = self::GetOembedUrlInfo($url);
 		$output = array('result' => false, 'error' => "");
+
 		$http = new \Bitrix\Main\Web\HttpClient();
 		$resp = $http->get($oembed['url']);
 		if ($resp === false)
 		{
-			$error = $http->getError();
-			foreach($error as $errorCode => $errorMessage)
+			$io = CBXVirtualIo::GetInstance();
+			$path = $url;
+			$serverPath = self::GetServerPath();
+
+			if (strpos($path, $serverPath) !== false)
 			{
-				$output['error'] .=  '['.$errorCode.'] '.$errorMessage.";\n";
+				$path = str_replace($serverPath, '', $path);
+			}
+
+			if ($io->FileExists($io->RelativeToAbsolutePath($path)))
+			{
+				$output['data'] = array(
+					'local' => true,
+					'path' => $path
+				);
+				$output['result'] = true;
+			}
+			else
+			{
+				$path = $url;
+				$http = new \Bitrix\Main\Web\HttpClient();
+				$resp1 = $http->get($path);
+				if ($resp1 !== false)
+				{
+					$output['data'] = array(
+						'local' => true,
+						'path' => $url
+					);
+				}
+				$output['result'] = true;
+			}
+
+			if (!$output['result'])
+			{
+				$error = $http->getError();
+				foreach($error as $errorCode => $errorMessage)
+				{
+					$output['error'] .=  '['.$errorCode.'] '.$errorMessage.";\n";
+				}
 			}
 		}
 		else
@@ -1019,6 +1172,29 @@ class CHTMLEditor
 		}
 
 		return $output;
+	}
+
+	public static function GetServerPath()
+	{
+		if (defined("SITE_SERVER_NAME") && strlen(SITE_SERVER_NAME) > 0)
+			$server_name = SITE_SERVER_NAME;
+		if (!$server_name)
+			$server_name = COption::GetOptionString("main", "server_name", "");
+		if (!$server_name)
+			$server_name = $_SERVER['HTTP_HOST'];
+		$server_name = rtrim($server_name, '/');
+		if (!preg_match('/^[a-z0-9\.\-]+$/i', $server_name)) // cyrillic domain hack
+		{
+			$converter = new CBXPunycode(defined('BX_UTF') && BX_UTF === true ? 'UTF-8' : 'windows-1251');
+			$host = $converter->Encode($server_name);
+			if (!preg_match('#--p1ai$#', $host)) // trying to guess
+				$host = $converter->Encode(CharsetConverter::ConvertCharset($server_name, 'utf-8', 'windows-1251'));
+			$server_name = $host;
+		}
+
+		$serverPath = (CMain::IsHTTPS() ? "https://" : "http://").$server_name;
+
+		return $serverPath;
 	}
 
 	public static function GetOembedUrlInfo($url = '')

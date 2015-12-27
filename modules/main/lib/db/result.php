@@ -33,6 +33,9 @@ abstract class Result
 	/** @var callable[] */
 	protected $fetchDataModifiers = array();
 
+	/** @var int */
+	protected $count;
+
 	/**
 	 * @param resource $result Database-specific query result.
 	 * @param Connection $dbConnection Connection object.
@@ -128,7 +131,34 @@ abstract class Result
 	}
 
 	/**
-	 * Fetches one row of the query result and returns it in the associative array or false on empty data.
+	 * Fetches one row of the query result and returns it in the associative array of raw DB data or false on empty data.
+	 *
+	 * @return array|false
+	 */
+	public function fetchRaw()
+	{
+		if ($this->trackerQuery != null)
+		{
+			$this->trackerQuery->restartQuery();
+		}
+
+		$data = $this->fetchRowInternal();
+
+		if ($this->trackerQuery != null)
+		{
+			$this->trackerQuery->refinishQuery();
+		}
+
+		if (!$data)
+		{
+			return false;
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Fetches one row of the query result and returns it in the associative array of converted data or false on empty data.
 	 *
 	 * @param \Bitrix\Main\Text\Converter $converter Optional converter to encode data on fetching.
 	 *
@@ -136,16 +166,12 @@ abstract class Result
 	 */
 	public function fetch(\Bitrix\Main\Text\Converter $converter = null)
 	{
-		if ($this->trackerQuery != null)
-			$this->trackerQuery->restartQuery();
-
-		$data = $this->fetchRowInternal();
-
-		if ($this->trackerQuery != null)
-			$this->trackerQuery->refinishQuery();
+		$data = $this->fetchRaw();
 
 		if (!$data)
+		{
 			return false;
+		}
 
 		if ($this->converters)
 		{
@@ -247,5 +273,28 @@ abstract class Result
 	public function getTrackerQuery()
 	{
 		return $this->trackerQuery;
+	}
+
+	/**
+	 * Sets record count.
+	 * @param int $n
+	 */
+	public function setCount($n)
+	{
+		$this->count = (int)$n;
+	}
+
+	/**
+	 * Returns record count. It's required to set record count explicitly before.
+	 * @return int
+	 * @throws \Bitrix\Main\ObjectPropertyException
+	 */
+	public function getCount()
+	{
+		if($this->count !== null)
+		{
+			return $this->count;
+		}
+		throw new \Bitrix\Main\ObjectPropertyException("count");
 	}
 }

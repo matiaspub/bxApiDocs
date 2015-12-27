@@ -936,7 +936,7 @@ public static 		function GetSID()
 			return $this->sid;
 		}
 
-		public static function GetCodeCrypt()
+		fupublic static nction GetCodeCrypt()
 		{
 			if (!defined("CAPTCHA_COMPATIBILITY"))
 				return $this->sid;
@@ -1089,7 +1089,7 @@ public static 		function Add($arFields)
 
 			$arInsert = $DB->PrepareInsert("b_captcha", $arFields);
 
-			if (!$DB->Query("INSERT INTO b_captcha (".$arInsert[0].") VALUES (".$arInsert[1].")", true));
+			if (!$DB->Query("INSERT INTO b_captcha (".$arInsert[0].") VALUES (".$arInsert[1].")", true))
 				return false;
 
 			return $arFields["ID"];
