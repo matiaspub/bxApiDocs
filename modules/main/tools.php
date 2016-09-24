@@ -7782,7 +7782,7 @@ class CUtil
 	* умолчанию - "true"</li>  <li> <b>safe_chars</b> строка из символов, замена которых
 	* не производится</li>   </ul>
 	*
-	* @return result_type 
+	* @return string
 	*
 	* <h4>Example</h4> 
 	* <pre bgcolor="#323232" style="padding:5px;">
