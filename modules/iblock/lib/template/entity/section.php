@@ -39,6 +39,19 @@ class Section extends Base
 	 *
 	 * @return \Bitrix\Iblock\Template\Entity\Base
 	 */
+	
+	/**
+	* <p>Метод используется для поиска секции для обработки шаблона. Нестатический метод.</p>
+	*
+	*
+	* @param string $entity  Параметр определяет, что необходимо найти.
+	*
+	* @return \Bitrix\Iblock\Template\Entity\Base 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/section/resolve.php
+	* @author Bitrix
+	*/
 	public function resolve($entity)
 	{
 		if ($entity === "property")
@@ -111,6 +124,19 @@ class Section extends Base
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Используется для инициализации полей секции из некоторого внешнего источника. Нестатический метод.</p>
+	*
+	*
+	* @param array $fields  Массив полей секции.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/section/setfields.php
+	* @author Bitrix
+	*/
 	public function setFields(array $fields)
 	{
 		parent::setFields($fields);

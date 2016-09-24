@@ -26,10 +26,10 @@ class CAllSaleAuxiliary
 	//********** CHECK **************//
 	
 	/**
-	* <p>Метод проверяет, может ли посетитель с кодом userID получить доступ к ресурсу с идентифицирующей строкой itemMD5. Период, в течение которого пользователь имеет доступ к ресурсу, задается длиной periodLength и типом periodType. Метод динамичный.</p>
+	* <p>Метод проверяет, может ли посетитель с кодом userID получить доступ к ресурсу с идентифицирующей строкой itemMD5. Период, в течение которого пользователь имеет доступ к ресурсу, задается длиной periodLength и типом periodType. Нестатический метод.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @param string $itemMD5  Строка, однозначно идентифицирующая ресурс (идентификатор
 	* ресурса).
@@ -42,10 +42,10 @@ class CAllSaleAuxiliary
 	* - месяц, Q - квартал, S - полугодие, Y - год.
 	*
 	* @return bool <p><i>true</i>, если пользователь может получить доступ к данному
-	* ресурсу, и <i>false</i> - в противном случае.</p> <a name="examples"></a>
+	* ресурсу, и <i>false</i> - в противном случае.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CSaleAuxiliary::CheckAccess($USER-&gt;GetID(), "pict.jpg", 2, "D"))
 	* {
@@ -164,13 +164,13 @@ class CAllSaleAuxiliary
 
 	
 	/**
-	* <p>Метод удаляет информацию о временном доступе с кодом ID. Метод динамичный.</p>
+	* <p>Метод удаляет информацию о временном доступе с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код записи.
+	* @param mixed $intID  Код записи.
 	*
 	* @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.delete.php
@@ -189,13 +189,13 @@ class CAllSaleAuxiliary
 
 	
 	/**
-	* <p>Метод удаляет всю информацию о временном доступе пользователя с кодом userID. Метод динамичный.</p>
+	* <p>Метод удаляет всю информацию о временном доступе пользователя с кодом userID. Нестатический метод.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @return bool <p><i>true</i> в случае успешного удаления и <i>false</i> в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleauxiliary/csaleauxiliary.deletebyuserid.php

@@ -28,6 +28,14 @@ CModule::AddAutoloadClasses(
 		"BizprocDocument" => "lib/bizprocdocument.php",
 
 		"bitrix\\lists\\importer" => "lib/importer.php",
+		"bitrix\\lists\\bizprocdocumentlists" => "lib/bizprocdocumentlists.php",
 	)
 );
+
+CJSCore::RegisterExt('lists', array(
+	'js' => '/bitrix/js/lists/js/lists.js',
+	'css' => '/bitrix/js/lists/css/lists.css',
+	'lang' => BX_ROOT.'/modules/lists/lang/'.LANGUAGE_ID.'/install/js/lists.php',
+	'rel' => array('core', 'popup', 'json', 'ajax')
+));
 ?>

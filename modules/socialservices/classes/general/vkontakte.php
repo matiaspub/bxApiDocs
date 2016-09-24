@@ -42,14 +42,15 @@ class CSocServVKontakte extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php?state=";
+			// error, but this code is not working at all
+			$state = \CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php")."?state=";
 			$backurl = urlencode($APPLICATION->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl")));
 			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
 		else
 		{
 			//$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID);
-			$redirect_uri = CSocServUtil::ServerName().$APPLICATION->GetCurPage().'?auth_service_id='.self::ID;
+			$redirect_uri = \CHTTP::URN2URI($APPLICATION->GetCurPage()).'?auth_service_id='.self::ID;
 
 			$backurl = $APPLICATION->GetCurPageParam(
 				'check_key='.$_SESSION["UNIQUE_KEY"],
@@ -151,7 +152,7 @@ class CSocServVKontakte extends CSocServAuth
 			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 			else
-				$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage().'?auth_service_id='.self::ID;
+				$redirect_uri = \CHTTP::URN2URI($GLOBALS['APPLICATION']->GetCurPage()).'?auth_service_id='.self::ID;
 
 			$this->entityOAuth = $this->getEntityOAuth($_REQUEST['code']);
 			if($this->entityOAuth->GetAccessToken($redirect_uri) !== false)
@@ -217,12 +218,17 @@ window.close();
 		die();
 	}
 
+	public function setUser($userId)
+	{
+		$this->getEntityOAuth()->setUser($userId);
+	}
+
 	public function getFriendsList($limit, &$next)
 	{
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 		else
-			$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage().'?auth_service_id='.self::ID;
+			$redirect_uri = \CHTTP::URN2URI($GLOBALS['APPLICATION']->GetCurPage()).'?auth_service_id='.self::ID;
 
 		$vk = $this->getEntityOAuth();
 		if($vk->GetAccessToken($redirect_uri) !== false)
@@ -235,7 +241,6 @@ window.close();
 					$res['response'][$key]['name'] = $contact["first_name"];
 					$res['response'][$key]['url'] = "https://vk.com/id".$contact["uid"];
 					$res['response'][$key]['picture'] = $contact['photo_200_orig'];
-
 				}
 
 				return $res['response'];
@@ -252,7 +257,7 @@ window.close();
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 		else
-			$redirect_uri = CSocServUtil::ServerName().$GLOBALS['APPLICATION']->GetCurPage().'?auth_service_id='.self::ID;
+			$redirect_uri = \CHTTP::URN2URI($GLOBALS['APPLICATION']->GetCurPage()).'?auth_service_id='.self::ID;
 
 		if($vk->GetAccessToken($redirect_uri) !== false)
 		{
@@ -282,7 +287,12 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 	protected $userID = false;
 	protected $userEmail = false;
 
-	protected $scope = "friends,notify,offline,email";
+	protected $scope = array(
+		"friends",
+		"notify",
+		"offline",
+		"email"
+	);
 
 	static public function __construct($appID=false, $appSecret=false, $code=false)
 	{
@@ -304,7 +314,7 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 		return self::AUTH_URL.
 			"?client_id=".urlencode($this->appID).
 			"&redirect_uri=".urlencode($redirect_uri).
-			"&scope=".$this->getScope().
+			"&scope=".$this->getScopeEncode().
 			"&response_type=code".
 			($state <> ''? '&state='.urlencode($state):'');
 	}
@@ -330,9 +340,21 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 			"redirect_uri"=>$redirect_uri,
 		);
 
-		$result = CHTTP::sPostHeader(self::TOKEN_URL, $query, array(), $this->httpTimeout);
+		$h = new \Bitrix\Main\Web\HttpClient(array(
+			"socketTimeout" => $this->httpTimeout,
+			"streamTimeout" => $this->httpTimeout,
+		));
 
-		$arResult = CUtil::JsObjectToPhp($result);
+		$result = $h->post(self::TOKEN_URL, $query);
+
+		try
+		{
+			$arResult = \Bitrix\Main\Web\Json::decode($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$arResult = array();
+		}
 
 		if((isset($arResult["access_token"]) && $arResult["access_token"] <> '') && isset($arResult["user_id"]) && $arResult["user_id"] <> '')
 		{
@@ -349,14 +371,28 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 	public function GetCurrentUser()
 	{
 		if($this->access_token === false)
+		{
 			return false;
+		}
 
-		$result = CHTTP::sGetHeader(self::CONTACTS_URL.'?fields=uid,first_name,last_name,nickname,screen_name,sex,bdate,city,country,timezone,photo,photo_medium,photo_max_orig,photo_rec,email&access_token='.urlencode($this->access_token), array(), $this->httpTimeout);
+		$h = new \Bitrix\Main\Web\HttpClient(array(
+			"socketTimeout" => $this->httpTimeout,
+			"streamTimeout" => $this->httpTimeout,
+		));
 
-		if(!defined("BX_UTF"))
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
 
-		return CUtil::JsObjectToPhp($result);
+		$result = $h->get(self::CONTACTS_URL.'?fields=uid,first_name,last_name,nickname,screen_name,sex,bdate,city,country,timezone,photo,photo_medium,photo_max_orig,photo_rec,email&access_token='.urlencode($this->access_token));
+
+		try
+		{
+			$result = \Bitrix\Main\Web\Json::decode($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$result = array();
+		}
+
+		return $result;
 	}
 
 	public function GetAppInfo()
@@ -369,7 +405,14 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 
 		$result = $h->get(self::APP_URL.'?fields=id&access_token='.urlencode($this->access_token));
 
-		$result = \Bitrix\Main\Web\Json::decode($result);
+		try
+		{
+			$result = \Bitrix\Main\Web\Json::decode($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$result = array();
+		}
 
 		return $result['response'];
 	}
@@ -382,7 +425,9 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 	public function GetCurrentUserFriends($limit, &$next)
 	{
 		if($this->access_token === false)
+		{
 			return false;
+		}
 
 		$url = self::FRIENDS_URL.'?uids='.$this->userID.'&fields=uid,first_name,last_name,nickname,screen_name,photo_200_orig,contacts,email&access_token='.urlencode($this->access_token);
 
@@ -391,14 +436,19 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 			$url .= "&count=".intval($limit)."&offset=".intval($next);
 		}
 
-		$result = CHTTP::sGetHeader($url, array(), $this->httpTimeout);
+		$h = new \Bitrix\Main\Web\HttpClient();
+		$h->setTimeout($this->httpTimeout);
 
-		if(!defined("BX_UTF"))
+		$result = $h->get($url);
+
+		try
 		{
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
+			$result = \Bitrix\Main\Web\Json::decode($result);
 		}
-
-		$result = CUtil::JsObjectToPhp($result);
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$result = array();
+		}
 
 		$next = $limit + $next;
 
@@ -408,11 +458,13 @@ class CVKontakteOAuthInterface extends CSocServOAuthTransport
 	public function sendMessage($uid, $message)
 	{
 		if($this->access_token === false)
+		{
 			return false;
+		}
 
 		$url = self::MESSAGE_URL;
 
-		$message = CharsetConverter::ConvertCharset($message, LANG_CHARSET, "utf-8");
+		$message = \Bitrix\Main\Text\Encoding::convertEncoding($message, LANG_CHARSET, "utf-8");
 
 		$arPost = array(
 			"user_id" => $uid,

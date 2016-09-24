@@ -6,7 +6,7 @@ $arSocNetUserInRoleCache = array();
 
 
 /**
- * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети. 
+ * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.
  *
  *
  * @return mixed 
@@ -22,17 +22,17 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB, $arSocNetAllowedRolesForUserInGroup, $arSocNetAllowedInitiatedByType;
+		global $APPLICATION, $DB, $arSocNetAllowedRolesForUserInGroup, $arSocNetAllowedInitiatedByType;
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("System error 870164", "ERROR");
+			$APPLICATION->ThrowException("System error 870164", "ERROR");
 			return false;
 		}
 
 		if ((is_set($arFields, "USER_ID") || $ACTION=="ADD") && IntVal($arFields["USER_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_USER_ID"), "EMPTY_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_USER_ID"), "EMPTY_USER_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "USER_ID"))
@@ -40,14 +40,14 @@ class CAllSocNetUserToGroup
 			$dbResult = CUser::GetByID($arFields["USER_ID"]);
 			if (!$dbResult->Fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_USER_ID"), "ERROR_NO_USER_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_USER_ID"), "ERROR_NO_USER_ID");
 				return false;
 			}
 		}
 
 		if ((is_set($arFields, "GROUP_ID") || $ACTION=="ADD") && IntVal($arFields["GROUP_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_GROUP_ID"), "EMPTY_GROUP_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_GROUP_ID"), "EMPTY_GROUP_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "GROUP_ID"))
@@ -55,36 +55,36 @@ class CAllSocNetUserToGroup
 			$arResult = CSocNetGroup::GetByID($arFields["GROUP_ID"]);
 			if ($arResult == false)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP_ID");
 				return false;
 			}
 		}
 
 		if ((is_set($arFields, "ROLE") || $ACTION=="ADD") && strlen($arFields["ROLE"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_ROLE"), "EMPTY_ROLE");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_ROLE"), "EMPTY_ROLE");
 			return false;
 		}
 		elseif (is_set($arFields, "ROLE") && !in_array($arFields["ROLE"], $arSocNetAllowedRolesForUserInGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["ROLE"], GetMessage("SONET_UG_ERROR_NO_ROLE")), "ERROR_NO_ROLE");
+			$APPLICATION->ThrowException(str_replace("#ID#", $arFields["ROLE"], GetMessage("SONET_UG_ERROR_NO_ROLE")), "ERROR_NO_ROLE");
 			return false;
 		}
 
 		if ((is_set($arFields, "INITIATED_BY_TYPE") || $ACTION=="ADD") && strlen($arFields["INITIATED_BY_TYPE"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATED_BY_TYPE"), "EMPTY_INITIATED_BY_TYPE");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATED_BY_TYPE"), "EMPTY_INITIATED_BY_TYPE");
 			return false;
 		}
 		elseif (is_set($arFields, "INITIATED_BY_TYPE") && !in_array($arFields["INITIATED_BY_TYPE"], $arSocNetAllowedInitiatedByType))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["INITIATED_BY_TYPE"], GetMessage("SONET_UG_ERROR_NO_INITIATED_BY_TYPE")), "ERROR_NO_INITIATED_BY_TYPE");
+			$APPLICATION->ThrowException(str_replace("#ID#", $arFields["INITIATED_BY_TYPE"], GetMessage("SONET_UG_ERROR_NO_INITIATED_BY_TYPE")), "ERROR_NO_INITIATED_BY_TYPE");
 			return false;
 		}
 
 		if ((is_set($arFields, "INITIATED_BY_USER_ID") || $ACTION=="ADD") && IntVal($arFields["INITIATED_BY_USER_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATED_BY_USER_ID"), "EMPTY_INITIATED_BY_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATED_BY_USER_ID"), "EMPTY_INITIATED_BY_USER_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "INITIATED_BY_USER_ID"))
@@ -92,20 +92,20 @@ class CAllSocNetUserToGroup
 			$dbResult = CUser::GetByID($arFields["INITIATED_BY_USER_ID"]);
 			if (!$dbResult->Fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_INITIATED_BY_USER_ID"), "ERROR_NO_INITIATED_BY_USER_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_INITIATED_BY_USER_ID"), "ERROR_NO_INITIATED_BY_USER_ID");
 				return false;
 			}
 		}
 
 		if (is_set($arFields, "DATE_CREATE") && (!$DB->IsDate($arFields["DATE_CREATE"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_DATE_CREATE"), "EMPTY_DATE_CREATE");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_DATE_CREATE"), "EMPTY_DATE_CREATE");
 			return false;
 		}
 
 		if (is_set($arFields, "DATE_UPDATE") && (!$DB->IsDate($arFields["DATE_UPDATE"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_DATE_UPDATE"), "EMPTY_DATE_UPDATE");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_DATE_UPDATE"), "EMPTY_DATE_UPDATE");
 			return false;
 		}
 
@@ -117,13 +117,13 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод удаляет связь между пользователем и рабочей группой.</p>
+	* <p>Метод удаляет связь между пользователем и рабочей группой. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код связи.
+	* @param int $intid  Код связи.
 	*
-	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
-	* <br><br>
+	* @return bool <p>True в случае успешного выполнения и false - в противном
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/Delete.php
@@ -131,18 +131,17 @@ class CAllSocNetUserToGroup
 	*/
 	public static function Delete($ID, $bSendExclude = false)
 	{
-		global $DB;
+		global $APPLICATION, $DB, $USER, $CACHE_MANAGER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
 
 		$ID = IntVal($ID);
-		$bSuccess = True;
 
 		$arUser2Group = CSocNetUserToGroup::GetByID($ID);
 		if (!$arUser2Group)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_USER2GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_USER2GROUP");
 			return false;
 		}
 
@@ -171,9 +170,9 @@ class CAllSocNetUserToGroup
 
 		if($bSuccess && defined("BX_COMP_MANAGED_CACHE"))
 		{
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arUser2Group["GROUP_ID"]);
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$arUser2Group["USER_ID"]);
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
+			$CACHE_MANAGER->ClearByTag("sonet_user2group_G".$arUser2Group["GROUP_ID"]);
+			$CACHE_MANAGER->ClearByTag("sonet_user2group_U".$arUser2Group["USER_ID"]);
+			$CACHE_MANAGER->ClearByTag("sonet_user2group");
 		}
 
 		if (
@@ -201,9 +200,9 @@ class CAllSocNetUserToGroup
 				"TYPE" => "exclude",
 				"RELATION_ID" => $arUser2Group["ID"],
 				"USER_ID" => $arUser2Group["USER_ID"],
-				"GROUP_ID" => $arUser2Group["GROUP_ID"],		
+				"GROUP_ID" => $arUser2Group["GROUP_ID"],
 				"GROUP_NAME" => $arUser2Group["GROUP_NAME"],
-				"EXCLUDE_USERS" => array($GLOBALS["USER"]->GetID())
+				"EXCLUDE_USERS" => array($USER->GetID())
 			);
 			CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 		}
@@ -247,10 +246,10 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает параметры связи между пользователем и группой.</p>
+	* <p>Метод возвращает параметры связи между пользователем и группой. Метод статический.</p>
 	*
 	*
-	* @param int $id  Код связи.
+	* @param int $intid  Код связи.
 	*
 	* @return array <p>Массив параметров связи с ключами:<br><b>ID</b> - код записи,<br><b>USER_ID</b>
 	* - код пользователя,<br><b>GROUP_ID</b> - код группы,<br><b>ROLE</b> - роль
@@ -260,7 +259,7 @@ class CAllSocNetUserToGroup
 	* изменения записи,<br><b>INITIATED_BY_TYPE</b> - кем инициализирована связь:
 	* SONET_INITIATED_BY_USER - пользователем, <b>SONET_INITIATED_BY_GROUP</b> -
 	* группой,<br><b>INITIATED_BY_USER_ID</b> - код пользователя, инициализировавшего
-	* связь,<br><b>MESSAGE</b> - сообщение при запросе на создание связи.</p> <br><br>
+	* связь,<br><b>MESSAGE</b> - сообщение при запросе на создание связи.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/GetByID.php
@@ -268,8 +267,6 @@ class CAllSocNetUserToGroup
 	*/
 	public static function GetByID($ID)
 	{
-		global $DB;
-
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
 
@@ -293,10 +290,10 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает роль пользователя в группе. В случае повторных вызовов метод не порождает дополнительных запросов к базе данных.</p>
+	* <p>Метод возвращает роль пользователя в группе. В случае повторных вызовов метод не порождает дополнительных запросов к базе данных. Метод статический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @param mixed $groupID  Код группы, либо (с версии 8.6.4) массив кодов групп.
 	*
@@ -307,23 +304,19 @@ class CAllSocNetUserToGroup
 	* пользователь в черном списке группы,<br><b>SONET_ROLES_REQUEST</b> - направлен
 	* запрос на вступление в группу,<br><b>SONET_ROLES_OWNER</b> - пользователь
 	* является владельцем группы,<br><b>false</b> - пользователь не связан с
-	* данной группой.</p> <p>Если (с версии 8.6.4) в параметре groupID передан
+	* данной группой.</p><p>Если (с версии 8.6.4) в параметре groupID передан
 	* массив кодов групп, то возвращается ассоциативный массив,
 	* ключами для которого являются коды групп, а значения
-	* соответствуют вышеописанной логике. <a name="examples"></a> </p>
+	* соответствуют вышеописанной логике. <a name="examples"></a>  </p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Возвращает значение констант -  $Role вернет "E", т.е. значение SONET_ROLES_MODERATOR.
-	* 
-	* 
 	* &lt;? 
 	*     // $UserID - модератор группы $GroupID
 	*     $Role=CSocNetUserToGroup::GetUserRole($UserID,$GroupID);
 	*     echo $Role;
 	* ?&gt;
-	* 
-	* </h
 	* </pre>
 	*
 	*
@@ -333,8 +326,6 @@ class CAllSocNetUserToGroup
 	*/
 	public static function GetUserRole($userID, $groupID)
 	{
-		global $DB;
-
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 			return false;
@@ -346,6 +337,8 @@ class CAllSocNetUserToGroup
 
 		if (is_array($groupID))
 		{
+			$arReturn = false;
+
 			$arGroupToGet = array();
 			foreach($groupID as $TmpGroupID)
 				if (!array_key_exists($userID."_".$TmpGroupID, $arSocNetUserInRoleCache))
@@ -374,7 +367,13 @@ class CAllSocNetUserToGroup
 			}
 
 			foreach($groupID as $TmpGroupID)
+			{
+				if ($arReturn === false)
+				{
+					$arReturn = array();
+				}
 				$arReturn[$TmpGroupID] = $arSocNetUserInRoleCache[$userID."_".$TmpGroupID];
+			}
 
 			return $arReturn;
 		}
@@ -424,13 +423,18 @@ class CAllSocNetUserToGroup
 		if (!$arRelation)
 			return false;
 
+		$arUserGroup = array();
+
 		if (CModule::IncludeModule("extranet"))
 			$arUserGroup = CUser::GetUserGroup($arRelation["USER_ID"]);
+
+		$bExtranetInstalled = IsModuleInstalled("extranet");
+		$siteID = false;
 
 		$rsGroupSite = CSocNetGroup::GetSite($arRelation["GROUP_ID"]);
 		while ($arGroupSite = $rsGroupSite->Fetch())
 		{
-			if (IsModuleInstalled("extranet"))
+			if ($bExtranetInstalled)
 			{
 				if (
 					(
@@ -503,12 +507,12 @@ class CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод отправляет запрос от пользователя на вступление в рабочую группу.</p>
+	* <p>Метод отправляет запрос от пользователя на вступление в рабочую группу. Метод статический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, отправляющего запрос.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param string $message  Дополнительный текст запроса.
 	*
@@ -518,7 +522,7 @@ class CAllSocNetUserToGroup
 	* умолчанию равен true.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/SendRequestToBeMember.php
@@ -526,26 +530,26 @@ class CAllSocNetUserToGroup
 	*/
 	public static function SendRequestToBeMember($userID, $groupID, $message, $RequestConfirmUrl = "", $bAutoSubscribe = true)
 	{
-		global $APPLICATION;
+		global $APPLICATION, $DB;
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup) || $arGroup["ACTIVE"] != "Y"/* || $arGroup["VISIBLE"] != "Y"*/)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -553,8 +557,8 @@ class CAllSocNetUserToGroup
 			"USER_ID" => $userID,
 			"GROUP_ID" => $groupID,
 			"ROLE" => SONET_ROLES_REQUEST,
-			"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-			"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+			"=DATE_CREATE" => $DB->CurrentTimeFunction(),
+			"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			"MESSAGE" => $message,
 			"INITIATED_BY_TYPE" => SONET_INITIATED_BY_USER,
 			"INITIATED_BY_USER_ID" => $userID
@@ -577,7 +581,7 @@ class CAllSocNetUserToGroup
 				$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 			}
 
-			$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CREATE_USER2GROUP");
+			$APPLICATION->ThrowException($errorMessage, "ERROR_CREATE_USER2GROUP");
 			return false;
 		}
 
@@ -589,12 +593,12 @@ class CAllSocNetUserToGroup
 			}
 
 			if (IsModuleInstalled("im"))
-			{			
+			{
 				$arNotifyParams = array(
 					"TYPE" => "join",
 					"RELATION_ID" => $ID,
 					"USER_ID" => $userID,
-					"GROUP_ID" => $groupID,		
+					"GROUP_ID" => $groupID,
 					"GROUP_NAME" => $arGroup["NAME"],
 				);
 				CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
@@ -722,14 +726,14 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Отправляет пользователю предложение присоединиться к рабочей группе.</p>
+	* <p>Отправляет пользователю предложение присоединиться к рабочей группе. Метод статический.</p>
 	*
 	*
 	* @param int $senderID  Код пользователя, осуществляющего действие.
 	*
 	* @param int $userID  Код пользователя, которому направляется предложение.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param string $message  Дополнительный текст предложения.
 	*
@@ -737,7 +741,7 @@ class CAllSocNetUserToGroup
 	* true .
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/SendRequestToJoinGroup.php
@@ -745,33 +749,33 @@ class CAllSocNetUserToGroup
 	*/
 	public static function SendRequestToJoinGroup($senderID, $userID, $groupID, $message, $bMail = true)
 	{
-		global $APPLICATION;
+		global $APPLICATION, $DB, $USER;
 
 		$senderID = IntVal($senderID);
 		if ($senderID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDERID");
 			return false;
 		}
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -785,7 +789,7 @@ class CAllSocNetUserToGroup
 		$userRole = CSocNetUserToGroup::GetUserRole($senderID, $groupID);
 		$bUserIsMember = ($userRole && in_array($userRole, array(SONET_ROLES_OWNER, SONET_ROLES_MODERATOR, SONET_ROLES_USER)));
 		$bCanInitiate = (
-			$GLOBALS["USER"]->IsAdmin()
+			$USER->IsAdmin()
 			|| CSocNetUser::IsCurrentUserModuleAdmin($arGroupSites)
 			|| (
 				$userRole
@@ -808,7 +812,7 @@ class CAllSocNetUserToGroup
 
 		if (!$bCanInitiate)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
@@ -816,8 +820,8 @@ class CAllSocNetUserToGroup
 			"USER_ID" => $userID,
 			"GROUP_ID" => $groupID,
 			"ROLE" => SONET_ROLES_REQUEST,
-			"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-			"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+			"=DATE_CREATE" => $DB->CurrentTimeFunction(),
+			"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			"MESSAGE" => str_replace(Array("#TEXT#", "#GROUP_NAME#"), Array($message, $arGroup["NAME"]), (empty($message)?GetMessage("SONET_UG_INVITE_CONFIRM_TEXT_EMPTY"):GetMessage("SONET_UG_INVITE_CONFIRM_TEXT"))),
 			"INITIATED_BY_TYPE" => SONET_INITIATED_BY_GROUP,
 			"INITIATED_BY_USER_ID" => $senderID,
@@ -832,7 +836,7 @@ class CAllSocNetUserToGroup
 			if (StrLen($errorMessage) <= 0)
 				$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-			$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CREATE_USER2GROUP");
+			$APPLICATION->ThrowException($errorMessage, "ERROR_CREATE_USER2GROUP");
 			return false;
 		}
 
@@ -935,12 +939,12 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод служит для принятия запросов на вступление в группу.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	* <p>Метод служит для принятия запросов на вступление в группу. Метод статический.</p> <p><b>Примечание</b>: возможное примечание.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
 	*
@@ -948,7 +952,7 @@ class CAllSocNetUserToGroup
 	* параметр. По умолчанию равен true.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/ConfirmRequestToBeMember.php
@@ -956,19 +960,19 @@ class CAllSocNetUserToGroup
 	*/
 	public static function ConfirmRequestToBeMember($userID, $groupID, $arRelationID, $bAutoSubscribe = true) // request from a user confirmed by a moderator
 	{
-		global $APPLICATION, $DB;
+		global $APPLICATION, $DB, $USER;
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -980,7 +984,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -994,7 +998,7 @@ class CAllSocNetUserToGroup
 		$userRole = CSocNetUserToGroup::GetUserRole($userID, $groupID);
 		$bUserIsMember = ($userRole && in_array($userRole, array(SONET_ROLES_OWNER, SONET_ROLES_MODERATOR, SONET_ROLES_USER)));
 		$bCanInitiate = (
-			$GLOBALS["USER"]->IsAdmin() 
+			$USER->IsAdmin()
 			|| CSocNetUser::IsCurrentUserModuleAdmin($arGroupSites) 
 			|| (
 				$userRole
@@ -1008,7 +1012,7 @@ class CAllSocNetUserToGroup
 
 		if (!$bCanInitiate)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
@@ -1040,7 +1044,7 @@ class CAllSocNetUserToGroup
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_USER,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
@@ -1050,7 +1054,7 @@ class CAllSocNetUserToGroup
 				{
 					CSocNetLogEvents::AutoSubscribe($arRelation["USER_ID"], SONET_ENTITY_GROUP, $groupID);
 				}
-					
+
 				if (CModule::IncludeModule("im"))
 				{
 					$groupSiteId = CSocNetGroup::GetDefaultSiteId($groupID, $arGroup["SITE_ID"]);
@@ -1121,7 +1125,7 @@ class CAllSocNetUserToGroup
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 				}
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CONFIRM_MEMBER");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_CONFIRM_MEMBER");
 				$bSuccess = false;
 			}
 		}
@@ -1132,9 +1136,9 @@ class CAllSocNetUserToGroup
 				"TYPE" => "join",
 				"RELATION_ID" => $arRel["ID"],
 				"USER_ID" => $arRel["USER_ID"],
-				"GROUP_ID" => $arRel["GROUP_ID"],		
+				"GROUP_ID" => $arRel["GROUP_ID"],
 				"GROUP_NAME" => $arRel["GROUP_NAME"],
-				"EXCLUDE_USERS" => array($GLOBALS["USER"]->GetID())				
+				"EXCLUDE_USERS" => array($USER->GetID())
 			);
 			CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 		}
@@ -1144,17 +1148,17 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод служит для отклонения запросов на вступление в группу.</p>
+	* <p>Метод служит для отклонения запросов на вступление в группу. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между рабочей группой и пользователями.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/RejectRequestToBeMember.php
@@ -1162,19 +1166,19 @@ class CAllSocNetUserToGroup
 	*/
 	public static function RejectRequestToBeMember($userID, $groupID, $arRelationID)
 	{
-		global $APPLICATION, $DB;
+		global $APPLICATION, $DB, $USER;
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -1184,7 +1188,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -1195,14 +1199,14 @@ class CAllSocNetUserToGroup
 
 		$userRole = CSocNetUserToGroup::GetUserRole($userID, $groupID);
 		$bUserIsMember = ($userRole && in_array($userRole, array(SONET_ROLES_OWNER, SONET_ROLES_MODERATOR, SONET_ROLES_USER)));
-		$bCanInitiate = ($GLOBALS["USER"]->IsAdmin() || CSocNetUser::IsCurrentUserModuleAdmin($arGroupSites) || ($userRole
+		$bCanInitiate = ($USER->IsAdmin() || CSocNetUser::IsCurrentUserModuleAdmin($arGroupSites) || ($userRole
 			&& (($arGroup["INITIATE_PERMS"] == SONET_ROLES_OWNER && $userID == $arGroup["OWNER_ID"])
 				|| ($arGroup["INITIATE_PERMS"] == SONET_ROLES_MODERATOR && in_array($userRole, array(SONET_ROLES_OWNER, SONET_ROLES_MODERATOR)))
 				|| ($arGroup["INITIATE_PERMS"] == SONET_ROLES_USER && $bUserIsMember))));
 
 		if (!$bCanInitiate)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
@@ -1227,7 +1231,7 @@ class CAllSocNetUserToGroup
 					"FROM_USER_ID" => $userID,
 					"TO_USER_ID" => $arRelation["USER_ID"],
 					"MESSAGE" => str_replace("#NAME#", $arGroup["NAME"], GetMessage("SONET_UG_REJECT_MEMBER_MESSAGE_G")),
-					"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+					"=DATE_CREATE" => $DB->CurrentTimeFunction(),
 					"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM
 				);
 				CSocNetMessages::Add($arMessageFields);
@@ -1240,7 +1244,7 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CONFIRM_MEMBER");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_CONFIRM_MEMBER");
 				$bSuccess = false;
 			}
 		}
@@ -1250,7 +1254,7 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод служит для принятия предложения вступить в группу.</p>
+	* <p>Метод служит для принятия предложения вступить в группу. Метод статический.</p>
 	*
 	*
 	* @param int $targetUserID  Код пользователя, которому было направлено предложение на
@@ -1263,7 +1267,7 @@ class CAllSocNetUserToGroup
 	* @param bool $bAutoSubscribe = true Код связи между группой и пользователем.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/UserConfirmRequestToBeMember.php
@@ -1271,19 +1275,19 @@ class CAllSocNetUserToGroup
 	*/
 	public static function UserConfirmRequestToBeMember($targetUserID, $relationID, $bAutoSubscribe = true) // request from group confirmed by a user
 	{
-		global $APPLICATION;
+		global $APPLICATION, $DB;
 
 		$targetUserID = IntVal($targetUserID);
 		if ($targetUserID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDER_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDER_USER_ID");
 			return false;
 		}
 
 		$relationID = IntVal($relationID);
 		if ($relationID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_RELATIONID"), "ERROR_RELATION_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_RELATIONID"), "ERROR_RELATION_ID");
 			return false;
 		}
 
@@ -1304,7 +1308,7 @@ class CAllSocNetUserToGroup
 		{
 			$arFields = array(
 				"ROLE" => SONET_ROLES_USER,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arResult["ID"], $arFields))
 			{
@@ -1398,7 +1402,7 @@ class CAllSocNetUserToGroup
 						"TYPE" => "join",
 						"RELATION_ID" => $arResult["ID"],
 						"USER_ID" => $arResult["USER_ID"],
-						"GROUP_ID" => $arResult["GROUP_ID"],		
+						"GROUP_ID" => $arResult["GROUP_ID"],
 						"GROUP_NAME" => htmlspecialcharsbx($arResult["GROUP_NAME"]),
 						"EXCLUDE_USERS" => array($arResult["INITIATED_BY_USER_ID"])
 					);
@@ -1413,13 +1417,13 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CREATE_RELATION");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_CREATE_RELATION");
 				return false;
 			}
 		}
 		else
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_GROUP_REQUEST");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_GROUP_REQUEST");
 			return false;
 		}
 
@@ -1430,7 +1434,7 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод служит для отклонения предложения вступить в группу.</p>
+	* <p>Метод служит для отклонения предложения вступить в группу. Метод нестатический.</p>
 	*
 	*
 	* @param int $targetUserID  Код пользователя, которому было направлено предложение на
@@ -1441,7 +1445,7 @@ class CAllSocNetUserToGroup
 	* вступление в группу и который отклоняет это предложение.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/UserRejectRequestToBeMember.php
@@ -1454,14 +1458,14 @@ class CAllSocNetUserToGroup
 		$targetUserID = IntVal($targetUserID);
 		if ($targetUserID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDER_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_SENDER_USER_ID");
 			return false;
 		}
 
 		$relationID = IntVal($relationID);
 		if ($relationID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_RELATIONID"), "ERROR_RELATION_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_RELATIONID"), "ERROR_RELATION_ID");
 			return false;
 		}
 
@@ -1491,7 +1495,7 @@ class CAllSocNetUserToGroup
 				if (CModule::IncludeModule("im"))
 				{
 					$groupSiteId = CSocNetGroup::GetDefaultSiteId($arResult["GROUP_ID"], $arResult["GROUP_SITE_ID"]);
-					$groupUrl = $serverName.str_replace(array("#group_id#", "#GROUP_ID#"), $arResult["GROUP_ID"], COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", $groupSiteId));
+					$groupUrl = str_replace(array("#group_id#", "#GROUP_ID#"), $arResult["GROUP_ID"], COption::GetOptionString("socialnetwork", "group_path_template", "/workgroups/group/#group_id#/", $groupSiteId));
 					$arTmp = CSocNetLogTools::ProcessPath(
 						array(
 							"GROUP_URL" => $groupUrl
@@ -1548,13 +1552,13 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_DELETE_RELATION");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_DELETE_RELATION");
 				return false;
 			}
 		}
 		else
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_MEMBER_REQUEST");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_MEMBER_REQUEST");
 			return false;
 		}
 
@@ -1565,12 +1569,12 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод снимает пользователей с должности модераторов группы.</p>
+	* <p>Метод снимает пользователей с должности модераторов группы. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
 	*
@@ -1578,7 +1582,7 @@ class CAllSocNetUserToGroup
 	* действие.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/TransferModerator2Member.php
@@ -1586,19 +1590,19 @@ class CAllSocNetUserToGroup
 	*/
 	public static function TransferModerator2Member($userID, $groupID, $arRelationID, $currentUserIsAdmin)
 	{
-		global $APPLICATION, $DB;
+		global $APPLICATION, $DB, $USER;
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -1608,7 +1612,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -1616,13 +1620,15 @@ class CAllSocNetUserToGroup
 
 		if (!$arUserPerms["UserCanModifyGroup"])
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
 		$bSuccess = true;
 		$arSuccessRelations = array();
 		$tmp_count = count($arRelationID);
+		$bIMIncluded = false;
+		$groupSiteId = SITE_ID;
 
 		if (CModule::IncludeModule("im"))
 		{
@@ -1655,7 +1661,7 @@ class CAllSocNetUserToGroup
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_USER,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
@@ -1719,7 +1725,7 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_MOD2MEMBER");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_MOD2MEMBER");
 				$bSuccess = false;
 			}
 		}
@@ -1730,16 +1736,19 @@ class CAllSocNetUserToGroup
 				"TYPE" => "unmoderate",
 				"RELATION_ID" => $arRel["ID"],
 				"USER_ID" => $arRel["USER_ID"],
-				"GROUP_ID" => $arRel["GROUP_ID"],		
+				"GROUP_ID" => $arRel["GROUP_ID"],
 				"GROUP_NAME" => $arRel["GROUP_NAME"],
-				"EXCLUDE_USERS" => array($GLOBALS["USER"]->GetID())				
+				"EXCLUDE_USERS" => array($USER->GetID())
 			);
 			CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 		}
 
-		if (count($arSuccessRelations) <= 0)
+		if (
+			$bSuccess
+			&& count($arSuccessRelations) <= 0
+		)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_ERROR_MOD2MEM_INCORRECT_PARAMS"), "MOD2MEM_INCORRECT_PARAMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_ERROR_MOD2MEM_INCORRECT_PARAMS"), "MOD2MEM_INCORRECT_PARAMS");
 			$bSuccess = false;
 		}
 
@@ -1748,12 +1757,12 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод назначает пользователей группы на должность модераторов.</p>
+	* <p>Метод назначает пользователей группы на должность модераторов. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
 	*
@@ -1774,14 +1783,14 @@ class CAllSocNetUserToGroup
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -1791,7 +1800,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -1799,13 +1808,15 @@ class CAllSocNetUserToGroup
 
 		if (!$arUserPerms["UserCanModifyGroup"])
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
 		$bSuccess = true;
 		$arSuccessRelations = array();
 		$tmp_count = count($arRelationID);
+		$bIMIncluded = false;
+		$groupSiteId = SITE_ID;
 
 		if (CModule::IncludeModule("im"))
 		{
@@ -1838,7 +1849,7 @@ class CAllSocNetUserToGroup
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_MODERATOR,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
@@ -1903,29 +1914,34 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_MEMBER2MOD");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_MEMBER2MOD");
 				$bSuccess = false;
 			}
 		}
 
 		foreach($arSuccessRelations as $arRel)
 		{
+			global $APPLICATION, $USER;
+
 			$arNotifyParams = array(
 				"TYPE" => "moderate",
 				"RELATION_ID" => $arRel["ID"],
 				"USER_ID" => $arRel["USER_ID"],
-				"GROUP_ID" => $arRel["GROUP_ID"],		
+				"GROUP_ID" => $arRel["GROUP_ID"],
 				"GROUP_NAME" => $arRel["GROUP_NAME"],
-				"EXCLUDE_USERS" => array($arRel["USER_ID"], $GLOBALS["USER"]->GetID())
+				"EXCLUDE_USERS" => array($arRel["USER_ID"], $USER->GetID())
 			);
 			CSocNetUserToGroup::NotifyImToModerators($arNotifyParams);
 
 			CSocNetSubscription::Set($arRel["USER_ID"], "SG".$arRel["GROUP_ID"], "Y");
 		}
 
-		if (count($arSuccessRelations) <= 0)
+		if (
+			$bSuccess
+			&& count($arSuccessRelations) <= 0
+		)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_ERROR_MEM2MOD_INCORRECT_PARAMS"), "MEM2MOD_INCORRECT_PARAMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_ERROR_MEM2MOD_INCORRECT_PARAMS"), "MEM2MOD_INCORRECT_PARAMS");
 			$bSuccess = false;
 		}
 
@@ -1934,12 +1950,12 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод заносит пользователя в черный список группы.</p>
+	* <p>Метод заносит пользователя в черный список группы. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
 	*
@@ -1947,7 +1963,7 @@ class CAllSocNetUserToGroup
 	* действие.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/BanMember.php
@@ -1960,14 +1976,14 @@ class CAllSocNetUserToGroup
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -1977,7 +1993,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -1985,7 +2001,7 @@ class CAllSocNetUserToGroup
 
 		if (!$arUserPerms["UserCanModifyGroup"] && !$arUserPerms["UserCanModerateGroup"])
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
@@ -2006,7 +2022,7 @@ class CAllSocNetUserToGroup
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_BAN,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
@@ -2014,7 +2030,7 @@ class CAllSocNetUserToGroup
 					"FROM_USER_ID" => $userID,
 					"TO_USER_ID" => $arRelation["USER_ID"],
 					"MESSAGE" => str_replace("#NAME#", $arGroup["NAME"], GetMessage("SONET_UG_BANMEMBER_MESSAGE")),
-					"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+					"=DATE_CREATE" => $DB->CurrentTimeFunction(),
 					"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM
 				);
 				CSocNetMessages::Add($arMessageFields);
@@ -2029,7 +2045,7 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_BANMEMBER");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_BANMEMBER");
 				$bSuccess = false;
 			}
 		}
@@ -2039,12 +2055,12 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод исключает пользователя из черного списка группы.</p>
+	* <p>Метод исключает пользователя из черного списка группы. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, осуществляющего действие.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
 	* @param array $arRelationID  Массив кодов связей между группой и пользователями.
 	*
@@ -2052,7 +2068,7 @@ class CAllSocNetUserToGroup
 	* действие.
 	*
 	* @return bool <p>True в случае успешного выполнения метода и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/UnBanMember.php
@@ -2065,14 +2081,14 @@ class CAllSocNetUserToGroup
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USERID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -2082,7 +2098,7 @@ class CAllSocNetUserToGroup
 		$arGroup = CSocNetGroup::GetByID($groupID);
 		if (!$arGroup || !is_array($arGroup))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_GROUP_ID"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -2090,7 +2106,7 @@ class CAllSocNetUserToGroup
 
 		if (!$arUserPerms["UserCanModifyGroup"] && !$arUserPerms["UserCanModerateGroup"])
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_ERROR_NO_PERMS"), "ERROR_NO_PERMS");
 			return false;
 		}
 
@@ -2111,7 +2127,7 @@ class CAllSocNetUserToGroup
 
 			$arFields = array(
 				"ROLE" => SONET_ROLES_USER,
-				"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+				"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			);
 			if (CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
@@ -2119,7 +2135,7 @@ class CAllSocNetUserToGroup
 					"FROM_USER_ID" => $userID,
 					"TO_USER_ID" => $arRelation["USER_ID"],
 					"MESSAGE" => str_replace("#NAME#", $arGroup["NAME"], GetMessage("SONET_UG_UNBANMEMBER_MESSAGE")),
-					"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+					"=DATE_CREATE" => $DB->CurrentTimeFunction(),
 					"MESSAGE_TYPE" => SONET_MESSAGE_SYSTEM
 				);
 				CSocNetMessages::Add($arMessageFields);
@@ -2132,7 +2148,7 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_UNBANMEMBER");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_UNBANMEMBER");
 				$bSuccess = false;
 			}
 		}
@@ -2154,8 +2170,9 @@ class CAllSocNetUserToGroup
 			return false;
 		}
 
+		$errorMessage = "";
 		$DB->StartTransaction();
-				
+
 		// setting relations for the old owner
 		$dbRelation = CSocNetUserToGroup::GetList(
 			array(), 
@@ -2178,7 +2195,6 @@ class CAllSocNetUserToGroup
 
 			if (!CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 			{
-				$errorMessage = "";
 				if ($e = $APPLICATION->GetException())
 				{
 					$errorMessage = $e->GetString();
@@ -2195,7 +2211,7 @@ class CAllSocNetUserToGroup
 		}
 		else
 		{
-			$errorMessage = "";
+
 			if ($e = $APPLICATION->GetException())
 			{
 				$errorMessage = $e->GetString();
@@ -2229,7 +2245,6 @@ class CAllSocNetUserToGroup
 
 				if (!CSocNetUserToGroup::Update($arRelation["ID"], $arFields))
 				{
-					$errorMessage = "";
 					if ($e = $APPLICATION->GetException())
 						$errorMessage = $e->GetString();
 					if (StrLen($errorMessage) <= 0)
@@ -2255,7 +2270,6 @@ class CAllSocNetUserToGroup
 
 				if (!CSocNetUserToGroup::Add($arFields))
 				{
-					$errorMessage = "";
 					if ($e = $APPLICATION->GetException())
 						$errorMessage = $e->GetString();
 					if (StrLen($errorMessage) <= 0)
@@ -2273,7 +2287,6 @@ class CAllSocNetUserToGroup
 			$GROUP_ID = CSocNetGroup::Update($groupID, array("OWNER_ID" => $userID));
 			if (!$GROUP_ID || IntVal($GROUP_ID) <= 0)
 			{
-				$errorMessage = "";
 				if ($e = $APPLICATION->GetException())
 					$errorMessage = $e->GetString();
 				if (StrLen($errorMessage) <= 0)
@@ -2284,6 +2297,10 @@ class CAllSocNetUserToGroup
 				return false;
 			}
 		}
+
+		$bIMIncluded = false;
+		$groupUrl = "";
+		$groupSiteId = SITE_ID;
 
 		if (CModule::IncludeModule("im"))
 		{
@@ -2403,14 +2420,14 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Удаляет связь между пользователем и рабочей группой.</p>
+	* <p>Удаляет связь между пользователем и рабочей группой. Метод нестатический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
-	* @param int $groupID  Код рабочей группы. </h
+	* @param int $groupID  Код рабочей группы.
 	*
-	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/DeleteRelation.php
@@ -2423,14 +2440,14 @@ class CAllSocNetUserToGroup
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_USERID"), "ERROR_USER_ID");
 			return false;
 		}
 
 		$groupID = IntVal($groupID);
 		if ($groupID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_GROUPID"), "ERROR_GROUPID");
 			return false;
 		}
 
@@ -2474,13 +2491,13 @@ class CAllSocNetUserToGroup
 				if (StrLen($errorMessage) <= 0)
 					$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_USER2GROUP");
 
-				$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_DELETE_RELATION");
+				$APPLICATION->ThrowException($errorMessage, "ERROR_DELETE_RELATION");
 				return false;
 			}
 		}
 		else
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_MEMBER_REQUEST");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_MEMBER_REQUEST");
 			return false;
 		}
 
@@ -2491,10 +2508,10 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод возвращает массив прав пользователя на действия в рамках текущей группы.</p>
+	* <p>Метод возвращает массив прав пользователя на действия в рамках текущей группы. Метод статический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @param array $arGroup  Массив, содержащий параметры группы. Этот массив возвращается
 	* методом <a
@@ -2505,20 +2522,20 @@ class CAllSocNetUserToGroup
 	* @param bool $bCurrentUserIsAdmin  Флаг, является ли пользователь администратором модуля
 	* социальной сети или администратором сайта.
 	*
-	* @return array <p>Возвращается массив вида:<br> array<br> (<br> [UserRole] =&gt; A // роль
-	* пользователя в группе <br> [UserIsMember] =&gt; true // является ли
-	* пользователь членом группы <br> [UserIsOwner] =&gt; false // является ли
-	* пользователь владельцем группы <br> [UserCanInitiate] =&gt; false // может ли
-	* пользователь принимать новых членов в группу <br> [UserCanViewGroup] =&gt; true
-	* // может ли пользователь видеть группу <br> [UserCanAutoJoinGroup] =&gt; true //
-	* может ли пользователь вступить в группу без одобрения <br>
+	* @return array <p>Возвращается массив вида:<br> array<br> (<br>     [UserRole] =&gt; A  // роль
+	* пользователя в группе <br>     [UserIsMember] =&gt; true // является ли
+	* пользователь членом группы <br>     [UserIsOwner] =&gt; false // является ли
+	* пользователь владельцем группы <br>     [UserCanInitiate] =&gt; false // может ли
+	* пользователь принимать новых членов в группу <br>     [UserCanViewGroup] =&gt;
+	* true // может ли пользователь видеть группу <br>     [UserCanAutoJoinGroup] =&gt; true //
+	* может ли пользователь вступить в группу без одобрения <br>    
 	* [UserCanModifyGroup] =&gt; false // может ли пользователь изменять параметры
-	* группы <br> [UserCanModerateGroup] =&gt; true // является ли пользователь
-	* модератором группы <br> [UserCanSpamGroup] =&gt; true // может ли пользователь
+	* группы <br>     [UserCanModerateGroup] =&gt; true // является ли пользователь
+	* модератором группы <br>     [UserCanSpamGroup] =&gt; true // может ли пользователь
 	* отправлять сообщения в чат всем участникам <br> )</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Получим массив прав текущего пользователя на группу $ID
 	* $arGroup = CSocNetGroup::GetByID($ID); 
@@ -2660,17 +2677,19 @@ class CAllSocNetUserToGroup
 
 	public static function __SpeedFileCheckMessages($userID)
 	{
+		global $DB;
+
 		$userID = IntVal($userID);
 		if ($userID <= 0)
 			return;
 
 		$cnt = 0;
-		$dbResult = $GLOBALS["DB"]->Query(
+		$dbResult = $DB->Query(
 			"SELECT COUNT(ID) as CNT ".
 			"FROM b_sonet_user2group ".
 			"WHERE USER_ID = ".$userID." ".
-			"	AND ROLE = '".$GLOBALS["DB"]->ForSql(SONET_ROLES_REQUEST, 1)."' ".
-			"	AND INITIATED_BY_TYPE = '".$GLOBALS["DB"]->ForSql(SONET_INITIATED_BY_GROUP, 1)."' "
+			"	AND ROLE = '".$DB->ForSql(SONET_ROLES_REQUEST, 1)."' ".
+			"	AND INITIATED_BY_TYPE = '".$DB->ForSql(SONET_INITIATED_BY_GROUP, 1)."' "
 		);
 		if ($arResult = $dbResult->Fetch())
 			$cnt = IntVal($arResult["CNT"]);
@@ -2707,13 +2726,13 @@ class CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод проверяет, существуют ли приглашения данного пользователя в группы.</p>
+	* <p>Метод проверяет, существуют ли приглашения данного пользователя в группы. Метод нестатический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @return bool <p>True, если есть приглашения пользователя к рабочим группам. Иначе
-	* - False.</p> <br><br>
+	* - False.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/SpeedFileExists.php
@@ -2725,7 +2744,7 @@ class CAllSocNetUserToGroup
 
 		$userID = IntVal($userID);
 		if ($userID <= 0)
-			return;
+			return false;
 
 		return (!$CACHE_MANAGER->Read(86400*30, "socnet_cg_".$userID));
 	}
@@ -2733,6 +2752,8 @@ class CAllSocNetUserToGroup
 	/* Module IM callback */
 	public static function OnBeforeConfirmNotify($module, $tag, $value, $arParams)
 	{
+		global $USER;
+
 		if ($module == "socialnetwork")
 		{
 			$arTag = explode("|", $tag);
@@ -2753,11 +2774,11 @@ class CAllSocNetUserToGroup
 			{
 				if ($value == "Y")
 				{
-					self::ConfirmRequestToBeMember($GLOBALS["USER"]->GetID(), $arTag[3], array($arTag[4]));
+					self::ConfirmRequestToBeMember($USER->GetID(), $arTag[3], array($arTag[4]));
 				}
 				else
 				{
-					self::RejectRequestToBeMember($GLOBALS["USER"]->GetID(), $arTag[3], array($arTag[4]));
+					self::RejectRequestToBeMember($USER->GetID(), $arTag[3], array($arTag[4]));
 				}
 
 				if (CModule::IncludeModule('im'))
@@ -2788,12 +2809,14 @@ class CAllSocNetUserToGroup
 			|| !array_key_exists("RELATION_ID", $arNotifyParams)
 			|| intval($arNotifyParams["RELATION_ID"]) <= 0
 			|| !array_key_exists("GROUP_NAME", $arNotifyParams)
-			|| strlen($arNotifyParams["GROUP_NAME"]) <= 0			
+			|| strlen($arNotifyParams["GROUP_NAME"]) <= 0
 		)
 		{
 			return;
 		}
-			
+
+		$from_user_id = $message_code = $schema_code = $notify_tag = false;
+
 		switch ($arNotifyParams["TYPE"])
 		{
 			case "join":
@@ -2835,6 +2858,7 @@ class CAllSocNetUserToGroup
 			default:
 		}
 
+		$gender_suffix = "";
 		$rsUser = CUser::GetByID($arNotifyParams["USER_ID"]);
 		if ($arUser = $rsUser->Fetch())
 		{
@@ -2852,7 +2876,7 @@ class CAllSocNetUserToGroup
 		}
 
 		$arToUserID = array();
-		
+
 		$rsUserToGroup = CSocNetUserToGroup::GetList(
 			array(),
 			array(
@@ -2875,7 +2899,6 @@ class CAllSocNetUserToGroup
 			"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 			"NOTIFY_MODULE" => "socialnetwork",
 			"NOTIFY_EVENT" => $schema_code,
-			"LOG_ID" => $arEntry["LOG_ID"],
 			"NOTIFY_TAG" => "SOCNET|".$notify_tag."|".intval($arNotifyParams["USER_ID"])."|".intval($arNotifyParams["GROUP_ID"])."|".intval($arNotifyParams["RELATION_ID"]),
 		);
 

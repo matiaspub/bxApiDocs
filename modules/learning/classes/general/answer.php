@@ -53,19 +53,19 @@ class CLAnswer
 
 	
 	/**
-	* <p>Метод добавляет новый ответ на вопрос.</p>
+	* <p>Метод добавляет новый ответ на вопрос. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). 	Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">всех полей</a> ответа.
-	* Обязательные поля должны быть заполнены. <br>
+	* Обязательные поля должны быть заполнены. 	<br>
 	*
 	* @return int <p>Метод возвращает идентификатор добавленного ответа, если
 	* добавление прошло успешно. При возникновении ошибки метод вернет
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -126,21 +126,21 @@ class CLAnswer
 
 	
 	/**
-	* <p>Метод изменяет параметры ответа с идентификатором ID.</p>
+	* <p>Метод изменяет параметры ответа с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор ответа. </htm
+	* @param int $intID  Идентификатор ответа.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">всех полей</a> ответа.
-	* Обязательные поля должны быть заполнены. <br>
+	* Обязательные        поля должны быть заполнены. <br>
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернет <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -170,7 +170,7 @@ class CLAnswer
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/add.php">Add</a> </li> </ul><a name="examples"></a>
 	*
@@ -209,16 +209,16 @@ class CLAnswer
 
 	
 	/**
-	* <p>Метод удаляет ответ с идентификатором ID.</p>
+	* <p>Метод удаляет ответ с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор ответа. </htm
+	* @param int $intID  Идентификатор ответа.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления ответа, в
-	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	* противном случае возвращает <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -264,16 +264,16 @@ class CLAnswer
 
 	
 	/**
-	* <p>Возвращает ответ по его коду ID.</p>
+	* <p>Возвращает ответ по его коду ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор ответа. </htm
+	* @param int $intID  Идентификатор ответа.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -291,8 +291,8 @@ class CLAnswer
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#answer">Поля ответа</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/index.php">CLAnswer</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/clanswer/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
@@ -348,35 +348,35 @@ class CLAnswer
 
 	
 	/**
-	* <p>Возвращает список ответов по фильтру arFilter, отсортированный в порядке arOrder.</p>
+	* <p>Возвращает список ответов по фильтру arFilter, отсортированный в порядке arOrder. Метод нестатический.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* ответа;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>CORRECT</b> -
-	* правильность ответа;</li> <li> <b>ANSWER</b> - текст ответа;</li> <li> <b>RAND</b> -
-	* случайный порядок;</li> </ul> Направление сортировки может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
-	* убыванию;</li> </ul> Необязательный. По умолчанию фильтруется по
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> 		Поле для
+	* сортировки может принимать значения: 		<ul> <li> <b>ID</b> - идентификатор
+	* ответа;</li> 			<li> <b>SORT</b> - индекс сортировки;</li> 			<li> <b>CORRECT</b> -
+	* правильность ответа;</li> 			<li> <b>ANSWER</b> - текст ответа;</li> 			<li> <b>RAND</b> -
+	* случайный порядок;</li> 		</ul> 		Направление сортировки может
+	* принимать значения: 		<ul> <li> <b>asc</b> - по возрастанию;</li> 		<li> <b>desc</b> -
+	* по убыванию;</li> 		</ul> 	Необязательный. По умолчанию фильтруется по
 	* убыванию идентификатора ответа.
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	* идентификатор ответа;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li>
-	* <b>QUESTION_ID</b> - идентификатор вопроса;</li> <li> <b>ANSWER</b> - текст ответа
-	* (можно искать по шаблону [%_]);</li> <li> <b>CORRECT</b> - правильность ответа
-	* (Y|N);</li> </ul> Перед названием фильтруемого поля можно указать тип
-	* фильтрации: <ul> <li>"!" - не равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше
-	* либо равно</li> <li>"&gt;" - больше</li> <li>"&gt;=" - больше либо равно</li> </ul> <br>
-	* "<i>значения фильтра</i>" - одиночное значение или массив.<br><br>
-	* Необязательный. По умолчанию записи не фильтруются.
+	* 		Фильтруемое поле может принимать значения: 		<ul> <li> <b>ID</b> -
+	* идентификатор ответа;</li> 		<li> <b>SORT</b> - индекс сортировки;</li> 		<li>
+	* <b>QUESTION_ID</b> - идентификатор вопроса;</li> 		<li> <b>ANSWER</b> - текст ответа
+	* (можно искать по шаблону [%_]);</li> 		<li> <b>CORRECT</b> - правильность ответа
+	* (Y|N);</li> 		</ul> 		Перед названием фильтруемого поля можно указать тип
+	* фильтрации: 		<ul> <li>"!" - не равно</li> 		<li>"&lt;" - меньше</li> 		<li>"&lt;=" -
+	* меньше либо равно</li> 		<li>"&gt;" - больше</li> 		<li>"&gt;=" - больше либо
+	* равно</li> 		</ul> <br> "<i>значения фильтра</i>" - одиночное значение или
+	* массив.<br><br> Необязательный. По умолчанию записи не фильтруются.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

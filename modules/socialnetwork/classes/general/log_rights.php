@@ -3,7 +3,7 @@ class CSocNetLogRights
 {
 	public static function Add($LOG_ID, $GROUP_CODE, $bShare = false, $followSet = true)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (is_array($GROUP_CODE))
 		{
@@ -133,7 +133,7 @@ class CSocNetLogRights
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_".intval($LOG_ID));
+				$CACHE_MANAGER->ClearByTag("SONET_LOG_".intval($LOG_ID));
 			}
 
 			return $NEW_RIGHT_ID;
@@ -276,6 +276,7 @@ class CSocNetLogRights
 			$perm = CSocNetFeaturesPerms::GetOperationPerm($entity_type, $entity_id, $feature, $operation);
 			if ($perm)
 			{
+				$extranet_site_id = false;
 				if (CModule::IncludeModule("extranet") && $extranet_site_id = CExtranet::GetExtranetSiteID())
 				{
 					$arLogSites = array();
@@ -291,7 +292,7 @@ class CSocNetLogRights
 					}
 				}
 
-				if ($bExtranet)
+				if ($bExtranet && $extranet_site_id)
 				{
 					if ($entity_type == SONET_ENTITY_GROUP && $perm == SONET_ROLES_OWNER)
 						CSocNetLogRights::Add($logID, array("SA", "S".SONET_ENTITY_GROUP.$entity_id, "S".SONET_ENTITY_GROUP.$entity_id."_".SONET_ROLES_OWNER));
@@ -366,17 +367,18 @@ class CSocNetLogRights
 		}
 	}
 
-	public static function CheckForUser($logID, $userID, $siteID = SITE_ID)
+	public static function CheckForUser($logID, $userID)
 	{
+		global $DB;
+
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
 			INNER JOIN b_user_access UA ON 0=1 ".
-//			(CSocNetUser::IsUserModuleAdmin($userID, $siteID) ? " OR SLR.GROUP_CODE = 'SA'" : "").
 			(intval($userID) > 0 ? " OR (SLR.GROUP_CODE = 'AU')" : "").
 			" OR (SLR.GROUP_CODE = 'G2')".
 			(intval($userID) > 0 ? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).")" : "")."
 			WHERE SLR.LOG_ID = ".intval($logID);
 
-		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if ($ar = $result->Fetch())
 		{
 			return true;
@@ -387,6 +389,8 @@ class CSocNetLogRights
 	
 	public static function CheckForUserAll($logID)
 	{
+		global $DB;
+
 		$strSql = "SELECT SLR.ID FROM b_sonet_log_right SLR
 			WHERE 
 			SLR.LOG_ID = ".intval($logID)." 
@@ -395,7 +399,7 @@ class CSocNetLogRights
 				OR (SLR.GROUP_CODE = 'G2')
 			)";
 
-		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
 		{
 			return true;
@@ -406,6 +410,8 @@ class CSocNetLogRights
 	
 	public static function CheckForUserOnly($logID, $userID)
 	{
+		global $DB;
+
 		if (
 			intval($logID) <= 0
 			|| intval($userID) <= 0
@@ -416,14 +422,14 @@ class CSocNetLogRights
 			INNER JOIN b_user_access UA ON 0=1 OR (UA.ACCESS_CODE = SLR.GROUP_CODE AND UA.USER_ID = ".intval($userID).") 
 			WHERE SLR.LOG_ID = ".intval($logID);
 
-		$result = $GLOBALS["DB"]->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+		$result = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		if($ar = $result->Fetch())
 		{
 			return true;
 		}
 
 		return false;
-	}	
+	}
 
 }
 ?>

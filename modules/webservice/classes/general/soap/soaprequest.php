@@ -8,7 +8,7 @@
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * <code>// Формируем запрос к веб-сервису ws.strikeiron.com/relauto/iplookup/DNS $request = new CSOAPRequest( "DNSLookup", "http://tempuri.org/"); $request-&gt;addSOAPHeader( "LicenseInfo xmlns=\"http://ws.strikeiron.com\"", array("UnregisteredUser" =&gt; array( "EmailAddress" =&gt; "qwerty@mail.ru" )) ); $request-&gt;addParameter("server", "www.yandex.ru");</code>
  * </pre>
  *
@@ -69,18 +69,15 @@ class CSOAPRequest extends CSOAPEnvelope
     
     
     /**
-    * <p>Метод добавляет в SOAP запрос часть заголовка. Метод динамичный.</p>
+    * <p>Метод добавляет в SOAP запрос часть заголовка. Нестатический метод.</p>
     *
     *
     * @param string $name  Название сообщения в заголовке soap запроса.
     *
-    * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
-    * заголовке запроса. См. CXMLCreator::encodeValueLight.
-    *
     * @return void 
     *
     * <h4>Example</h4> 
-    * <pre>
+    * <pre bgcolor="#323232" style="padding:5px;">
     * $request-&gt;addSOAPHeader( 
     *     "LicenseInfo xmlns=\"http://ws.strikeiron.com\"",
     *     array(
@@ -100,12 +97,12 @@ class CSOAPRequest extends CSOAPEnvelope
 	//     Adds a new attribute to the body element.
     
     /**
-    * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. Метод динамичный.</p>
+    * <p>Метод добавляет атрибут к тегу <b>body</b> SOAP запроса. Нестатический метод.</p>
     *
     *
-    * @param string $name  Название атрибута. </ht
+    * @param string $name  Название атрибута.
     *
-    * @param string $value  Значение атрибута. </ht
+    * @param string $value  Значение атрибута.
     *
     * @return void 
     *
@@ -121,14 +118,10 @@ class CSOAPRequest extends CSOAPEnvelope
 	//      and value.
     
     /**
-    * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса - параметры вызываемого метода. Метод динамичный.</p>
+    * <p>Метод добавляет данные для передачи в SOAP запрос. Для веб-сервиса -  параметры вызываемого метода. Нестатический метод.</p>
     *
     *
-    * @param string $name  Название параметра. </ht
-    *
-    * @param  $value  Обычно - ассоциативный массив описывающий содержание сообщения в
-    * заголовке запроса. См. <a
-    * href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cxmlcreator/index.php">CXMLCreator::encodeValueLight</a>.
+    * @param string $name  Название параметра.
     *
     * @return void 
     *

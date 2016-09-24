@@ -35,19 +35,11 @@ class CSecuritySession
 	 */
 	public static function CleanUpAgent()
 	{
-		global $DB;
 		$maxlifetime = intval(ini_get("session.gc_maxlifetime"));
 
 		if($maxlifetime && !CSecuritySessionMC::isStorageEnabled())
 		{
-			$strSql = "
-				delete from b_sec_session
-				where TIMESTAMP_X < ".CSecurityDB::SecondsAgo($maxlifetime)."
-			";
-			if(CSecurityDB::Init())
-				CSecurityDB::Query($strSql, "Module: security; Class: CSecuritySession; Function: CleanUpAgent; File: ".__FILE__."; Line: ".__LINE__);
-			else
-				$DB->Query($strSql, false, "Module: security; Class: CSecuritySession; Function: CleanUpAgent; File: ".__FILE__."; Line: ".__LINE__);
+			CSecuritySessionDB::gc($maxlifetime);
 		}
 
 		return self::GC_AGENT_NAME;

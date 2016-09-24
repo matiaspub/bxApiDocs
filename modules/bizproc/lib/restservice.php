@@ -2,9 +2,10 @@
 namespace Bitrix\Bizproc;
 
 use \Bitrix\Main\Loader;
+use \Bitrix\Rest\AppLangTable;
+use \Bitrix\Rest\AppTable;
 use \Bitrix\Rest\RestException;
 use \Bitrix\Rest\AccessException;
-use \Bitrix\OAuth\ClientTable;
 
 Loader::includeModule('rest');
 
@@ -12,6 +13,7 @@ class RestService extends \IRestService
 {
 	const SCOPE = 'bizproc';
 	protected static $app;
+	private static $allowedOperations = array('', '!', '<', '<=', '>', '>=');//, '><', '!><', '?', '=', '!=', '%', '!%', ''); May be later?
 
 	const ERROR_UNSUPPORTED_PROTOCOL = 'ERROR_UNSUPPORTED_PROTOCOL';
 	const ERROR_WRONG_HANDLER_URL = 'ERROR_WRONG_HANDLER_URL';
@@ -33,7 +35,12 @@ class RestService extends \IRestService
 				'bizproc.activity.delete' => array(__CLASS__, 'deleteActivity'),
 				'bizproc.activity.log' => array(__CLASS__, 'writeActivityLog'),
 				'bizproc.activity.list' => array(__CLASS__, 'getActivityList'),
+				
 				'bizproc.event.send' => array(__CLASS__, 'sendEvent'),
+				
+				'bizproc.task.list' =>  array(__CLASS__, 'getTaskList'),
+
+				'bizproc.workflow.instances' => array(__CLASS__, 'getWorkflowInstances')
 			),
 		);
 	}
@@ -43,19 +50,37 @@ class RestService extends \IRestService
 	 * @param array $fields Fields describes application.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Обработчик, вызываемый при удалении приложения. Удаляет связанные с приложением действия. Метод статический.</p>
+	*
+	*
+	* @param array $fields  Поля, описывающие приложение.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/restservice/onrestappdelete.php
+	* @author Bitrix
+	*/
 	public static function onRestAppDelete(array $fields)
 	{
 		$fields = array_change_key_case($fields, CASE_UPPER);
 		if (empty($fields['APP_ID']))
 			return;
 
-		$app = \CBitrix24App::getByID($fields['APP_ID']);
+		if (!Loader::includeModule('rest'))
+			return;
+
+		$dbRes = AppTable::getById($fields['APP_ID']);
+		$app = $dbRes->fetch();
+
 		if(!$app)
 			return;
 
 		$iterator = RestActivityTable::getList(array(
 			'select' => array('ID'),
-			'filter' => array('=APP_ID' => $app['APP_ID'])
+			'filter' => array('=APP_ID' => $app['CLIENT_ID'])
 		));
 
 		while ($activity = $iterator->fetch())
@@ -69,6 +94,19 @@ class RestService extends \IRestService
 	 * @param array $fields Fields describes application.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Обработчик, вызываемый при обновлении приложения. Удаляет связанные с приложением действия. Метод статический.</p>
+	*
+	*
+	* @param array $fields  Поля, описывающие приложение.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/restservice/onrestappupdate.php
+	* @author Bitrix
+	*/
 	public static function onRestAppUpdate(array $fields)
 	{
 		static::onRestAppDelete($fields);
@@ -220,12 +258,195 @@ class RestService extends \IRestService
 		return $result;
 	}
 
+	/**
+	 * @param array $params Input params.
+	 * @param int $n Offset.
+	 * @param \CRestServer $server Rest server instance.
+	 * @return array
+	 * @throws AccessException
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getWorkflowInstances($params, $n, $server)
+	{
+		self::checkAdminPermissions();
+		$params = array_change_key_case($params, CASE_UPPER);
+
+		$fields = array(
+			'ID' => 'ID',
+			'MODIFIED' => 'MODIFIED',
+			'OWNED_UNTIL' => 'OWNED_UNTIL',
+			'MODULE_ID' => 'STATE.MODULE_ID',
+			'ENTITY' => 'STATE.ENTITY',
+			'DOCUMENT_ID' => 'STATE.DOCUMENT_ID',
+			'STARTED' => 'STATE.STARTED',
+			'STARTED_BY' => 'STATE.STARTED_BY',
+			'TEMPLATE_ID' => 'STATE.WORKFLOW_TEMPLATE_ID',
+		);
+
+		$select = static::getSelect($params['SELECT'], $fields, array('ID', 'MODIFIED', 'OWNED_UNTIL'));
+		$filter = static::getFilter($params['FILTER'], $fields, array('MODIFIED', 'OWNED_UNTIL'));
+		$order = static::getOrder($params['ORDER'], $fields, array('MODIFIED' => 'DESC'));
+
+		$iterator = WorkflowInstanceTable::getList(array(
+			'select' => $select,
+			'filter' => $filter,
+			'order' => $order,
+			'limit' => static::LIST_LIMIT,
+			'offset' => (int) $n
+		));
+
+		$result = array();
+		while ($row = $iterator->fetch())
+		{
+			if (isset($row['MODIFIED']))
+				$row['MODIFIED'] = \CRestUtil::convertDateTime($row['MODIFIED']);
+			if (isset($row['OWNED_UNTIL']))
+				$row['OWNED_UNTIL'] = \CRestUtil::convertDateTime($row['OWNED_UNTIL']);
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param array $params Input params.
+	 * @param int $n Offset.
+	 * @param \CRestServer $server Rest server instance.
+	 * @return array
+	 * @throws AccessException
+	 */
+	public static function getTaskList($params, $n, $server)
+	{
+		global $USER;
+		self::checkAdminPermissions();
+		$params = array_change_key_case($params, CASE_UPPER);
+
+		$fields = array(
+			'ID' => 'ID',
+			'WORKFLOW_ID' => 'WORKFLOW_ID',
+			'DOCUMENT_NAME' => 'DOCUMENT_NAME',
+			'DESCRIPTION' => 'DESCRIPTION',
+			'NAME' => 'NAME',
+			'MODIFIED' => 'MODIFIED',
+			'WORKFLOW_STARTED' => 'WORKFLOW_STARTED',
+			'WORKFLOW_STARTED_BY' => 'WORKFLOW_STARTED_BY',
+			'OVERDUE_DATE' => 'OVERDUE_DATE',
+			'WORKFLOW_TEMPLATE_ID' => 'WORKFLOW_TEMPLATE_ID',
+			'WORKFLOW_TEMPLATE_NAME' => 'WORKFLOW_TEMPLATE_NAME',
+			'WORKFLOW_STATE' => 'WORKFLOW_STATE',
+			'STATUS' => 'STATUS',
+			'USER_ID' => 'USER_ID',
+			'USER_STATUS' => 'USER_STATUS',
+			'MODULE_ID' => 'MODULE_ID',
+			'ENTITY' => 'ENTITY',
+			'DOCUMENT_ID' => 'DOCUMENT_ID',
+		);
+
+		$select = static::getSelect($params['SELECT'], $fields, array('ID', 'WORKFLOW_ID', 'DOCUMENT_NAME', 'NAME'));
+		$select = array_merge(array('MODULE', 'ENTITY', 'DOCUMENT_ID'), $select);
+		$filter = static::getFilter($params['FILTER'], $fields, array('MODIFIED', 'WORKFLOW_STARTED', 'OVERDUE_DATE'));
+		$order = static::getOrder($params['ORDER'], $fields, array('ID' => 'DESC'));
+
+		$currentUserId = (int) $USER->getId();
+		$targetUserId = isset($filter['USER_ID'])? (int)$filter['USER_ID'] : 0;
+
+		if ($targetUserId !== $currentUserId && !\CBPHelper::checkUserSubordination($currentUserId, $targetUserId))
+		{
+			self::checkAdminPermissions();
+		}
+
+		$iterator = \CBPTaskService::getList(
+			$order,
+			$filter,
+			false,
+			static::getNavData($n),
+			$select
+		);
+
+		$result = array();
+		while ($row = $iterator->fetch())
+		{
+			if (isset($row['MODIFIED']))
+				$row['MODIFIED'] = \CRestUtil::convertDateTime($row['MODIFIED']);
+			if (isset($row['WORKFLOW_STARTED']))
+				$row['WORKFLOW_STARTED'] = \CRestUtil::convertDateTime($row['WORKFLOW_STARTED']);
+			if (isset($row['OVERDUE_DATE']))
+				$row['OVERDUE_DATE'] = \CRestUtil::convertDateTime($row['OVERDUE_DATE']);
+			$row['DOCUMENT_URL'] = \CBPDocument::getDocumentAdminPage(array(
+				$row['MODULE_ID'], $row['ENTITY'], $row['DOCUMENT_ID']
+			));
+
+			$result[] = $row;
+		}
+
+		return $result;
+	}
+
+	private static function getSelect($rules, $fields, $default = array())
+	{
+		$select = array();
+		if (!empty($rules) && is_array($rules))
+		{
+			foreach ($rules as $field)
+			{
+				$field = strtoupper($field);
+				if (isset($fields[$field]) && !in_array($field, $select))
+					$select[$field] = $fields[$field];
+			}
+		}
+
+		return $select ? $select : $default;
+	}
+
+	private static function getOrder($rules, $fields, array $default = array())
+	{
+		$order = array();
+		if (!empty($rules) && is_array($rules))
+		{
+			foreach ($rules as $field => $ordering)
+			{
+				$field = strtoupper($field);
+				$ordering = strtoupper($ordering);
+				if (isset($fields[$field]))
+					$order[$fields[$field]] = $ordering == 'DESC' ? 'DESC' : 'ASC';
+			}
+		}
+
+		return $order ? $order : $default;
+	}
+
+	private static function getFilter($rules, $fields, array $datetimeFieldsList = array())
+	{
+		$filter = array();
+		if (!empty($rules) && is_array($rules))
+		{
+			foreach ($rules as $key => $value)
+			{
+				if (preg_match('/^([^a-zA-Z]*)(.*)/', $key, $matches))
+				{
+					$operation = $matches[1];
+					$field = $matches[2];
+
+					if (in_array($operation, static::$allowedOperations, true) && isset($fields[$field]))
+					{
+						if (in_array($field, $datetimeFieldsList))
+							$value = \CRestUtil::unConvertDateTime($value);
+
+						$filter[$operation.$fields[$field]] = $value;
+					}
+				}
+			}
+		}
+
+		return $filter;
+	}
+
 	private static function checkAdminPermissions()
 	{
 		global $USER;
 		if (!isset($USER)
 			|| !is_object($USER)
-			|| (!$USER->isAdmin() && !(Loader::includeModule("bitrix24") && \CBitrix24::isPortalAdmin($USER->getID())))
+			|| (!$USER->isAdmin() && !(Loader::includeModule('bitrix24') && \CBitrix24::isPortalAdmin($USER->getID())))
 		)
 		{
 			throw new AccessException();
@@ -239,11 +460,26 @@ class RestService extends \IRestService
 
 	private static function getAppName($appId)
 	{
-		$iterator = \CBitrix24App::getList(array(), array('APP_ID' => $appId));
-		$app = $iterator->fetch();
-		$result = array('*' => $app['APP_NAME']);
+		if (!Loader::includeModule('rest'))
+			return array('*' => 'No app');
 
-		$iterator = \CBitrix24AppLang::getList($appId);
+		$iterator = AppTable::getList(
+			array(
+				'filter' => array(
+					'=CLIENT_ID' => $appId
+				),
+				'select' => array('ID', 'APP_NAME', 'CODE'),
+			)
+		);
+		$app = $iterator->fetch();
+		$result = array('*' => $app['APP_NAME'] ? $app['APP_NAME'] : $app['CODE']);
+
+		$iterator = AppLangTable::getList(array(
+			'filter' => array(
+				'=APP_ID' => $app['ID'],
+			),
+			'select' => array('LANGUAGE_ID', 'MENU_NAME')
+		));
 		while($lang = $iterator->fetch())
 		{
 			$result[strtoupper($lang['LANGUAGE_ID'])] = $lang['MENU_NAME'];
@@ -364,7 +600,11 @@ class RestService extends \IRestService
 	{
 		try
 		{
-			\CBPHelper::parseDocumentId($documentType);
+			$runtime = \CBPRuntime::getRuntime();
+			$runtime->startRuntime();
+			/** @var \CBPDocumentService $documentService */
+			$documentService = $runtime->getService('DocumentService');
+			$documentService->getDocumentFieldTypes($documentType);
 		}
 		catch (\CBPArgumentNullException $e)
 		{
@@ -381,28 +621,25 @@ class RestService extends \IRestService
 	}
 
 	/**
-	 * @param $server
+	 * @param \CRestServer $server
 	 * @return array|bool|false|mixed|null
 	 * @throws \Bitrix\Main\ArgumentException
 	 * @throws \Bitrix\Main\LoaderException
 	 */
 	private static function getApp($server)
 	{
-		if (self::$app == null)
+		if(self::$app == null)
 		{
-			if (Loader::includeModule('bitrix24'))
+			if (Loader::includeModule('rest'))
 			{
-				$result = \CBitrix24App::getList(array(), array('APP_ID' => $server->getAppId()));
+				$result = AppTable::getList(
+					array(
+						'filter' => array(
+							'=CLIENT_ID' => $server->getAppId()
+						)
+					)
+				);
 				self::$app = $result->fetch();
-			}
-			elseif (Loader::includeModule('oauth'))
-			{
-				$result = ClientTable::getList(array('filter' => array('=CLIENT_ID' => $server->getAppId())));
-				self::$app = $result->fetch();
-				if (is_array(self::$app) && is_array(self::$app['SCOPE']))
-				{
-					self::$app['SCOPE'] = implode(',', self::$app['SCOPE']);
-				}
 			}
 		}
 

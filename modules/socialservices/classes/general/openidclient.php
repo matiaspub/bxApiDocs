@@ -228,7 +228,7 @@ class COpenIDClient
 			{
 				$dbUsersOld = $GLOBALS["USER"]->GetList($by, $ord, array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
 				$dbUsersNew = $GLOBALS["USER"]->GetList($by, $ord, array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-				$dbSocUser = CSocServAuthDB::GetList(array(),array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']),false,false,array("USER_ID", "ACTIVE"));
+				$dbSocUser = CSocServAuthDB::GetList(array(),array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']),false,false,array("USER_ID", "ACTIVE", "XML_ID"));
 				if($arUser = $dbSocUser->Fetch())
 				{
 					if($arUser["ACTIVE"] === 'Y')

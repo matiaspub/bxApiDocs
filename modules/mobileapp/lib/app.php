@@ -40,6 +40,7 @@ class AppTable extends Entity\DataManager
 		return 'b_mobileapp_app';
 	}
 
+
 	public static function getMap()
 	{
 		return array(
@@ -51,7 +52,7 @@ class AppTable extends Entity\DataManager
 			new Entity\StringField('SHORT_NAME', array(
 				'validation' => array(__CLASS__, 'validateShortName'),
 				'title' => Loc::getMessage('APP_ENTITY_SHORT_NAME_FIELD'),
-				'default_value' => ""
+				'default_value' => "AppName"
 			)),
 			new Entity\StringField('NAME', array(
 				'validation' => array(__CLASS__, 'validateName'),
@@ -59,7 +60,7 @@ class AppTable extends Entity\DataManager
 				'title' => Loc::getMessage('APP_ENTITY_NAME_FIELD'),
 			)),
 			new Entity\TextField('DESCRIPTION', array(
-				'default_value' => "",
+				'default_value' => "App description placeholder",
 				'title' => Loc::getMessage('APP_ENTITY_DESCRIPTION_FIELD'),
 			)),
 			new Entity\TextField('FILES', array(

@@ -18,6 +18,23 @@ class ActionModifyer
 	 * @return array - modifyed action params
 	 * @throws NeedMoreUserInfoException
 	 */
+	
+	/**
+	* <p>Модификатор параметра <b>MYSQL_ADD_SLAVE</b> (добавить slave БД) задания <i>BitrixVM</i>. Метод статический.</p>
+	*
+	*
+	* @param string $actionId  ID задания <i>BitrixVM</i>.
+	*
+	* @param array $actionParams  Параметры задания.
+	*
+	* @param string $hostname  Имя хоста.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/actionmodifyer/mysqladdslave.php
+	* @author Bitrix
+	*/
 	public static function mysqlAddSlave($actionId, $actionParams, $hostname)
 	{
 		$action =  new Action("MYSQL_ADD_SLAVE_MODIFYER", array(
@@ -76,6 +93,23 @@ class ActionModifyer
 	 * @return array - modifyed action params
 	 * @throws NeedMoreUserInfoException
 	 */
+	
+	/**
+	* <p>Проверяет, существует ли дополнительные ядра сайтов. Если существуют, добавляет к параметрам <code>CHECK_EXTRA_DB_USER_ASK" = "Y"</code>. Метод статический.</p>
+	*
+	*
+	* @param string $actionId  ID задания <i>BitrixVM</i>.
+	*
+	* @param array $actionParams  Массив параметров задания.
+	*
+	* @param string $hostname  Имя хоста.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/actionmodifyer/checkextradbexist.php
+	* @author Bitrix
+	*/
 	public static function checkExtraDbExist($actionId, $actionParams, $hostname)
 	{
 		if($actionId == "MYSQL_ADD_SLAVE" || $actionId == "MYSQL_CHANGE_MASTER")

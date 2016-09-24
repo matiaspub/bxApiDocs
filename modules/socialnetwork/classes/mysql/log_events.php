@@ -262,7 +262,7 @@ class CSocNetLogEvents extends CAllSocNetLogEvents
 		return $dbRes;
 	}
 
-public static 	function GetUserLogEvents($userID, $arFilter = array())
+	public static function GetUserLogEvents($userID, $arFilter = array())
 	{
 		global $DB;
 
@@ -290,7 +290,7 @@ public static 	function GetUserLogEvents($userID, $arFilter = array())
 						{
 							if (!function_exists('__tmp_str_apos'))
 							{
-public static 								function __tmp_str_apos(&$tmpval, $tmpind)
+								public static function __tmp_str_apos(&$tmpval, $tmpind)
 								{
 									if (strlen($tmpval) > 0)
 										$tmpval = "'".$GLOBALS["DB"]->ForSql($tmpval, 50)."'";

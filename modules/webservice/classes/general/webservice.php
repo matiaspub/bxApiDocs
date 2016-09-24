@@ -75,7 +75,7 @@ class IWebService
 	// May be called by Event to collect CWebServiceDesc on configuring WS.Server
 	
 	/**
-	* <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя веб-сервиса. Метод динамичный.</p> <br><br>
+	* <p>Метод возвращает экземпляр класса <a href="http://dev.1c-bitrix.ru/api_help/webservice/classes/cwebservicedesc/index.php">CWebServiceDesc</a> - описателя  веб-сервиса. Нестатический метод.</p> <br><br>
 	*
 	*
 	* @return CWebServiceDesc 
@@ -136,15 +136,15 @@ class CWebService
 
 	
 	/**
-	* <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается <i>true</i>, иначе <i>false</i>. Метод динамичный.</p> <p>Если веб-сервис реализован через систему компонентов, то <b>RegisterWebService </b>вызывается автоматически в компоненте <b>webservice.server</b>. В этом случае <i>className = $arParams["WEBSERVICE_NAME"]</i>.</p>
+	* <p>Метод регистрирует веб-сервис. Если операция проведена успешно, возвращается  <i>true</i>, иначе <i>false</i>. Нестатический метод.</p> <p>Если веб-сервис реализован через систему компонентов, то  <b>RegisterWebService </b>вызывается автоматически в компоненте  <b>webservice.server</b>. В этом случае <i>className =  $arParams["WEBSERVICE_NAME"]</i>.</p>
 	*
 	*
-	* @param string $className  Название класса веб-сервиса. реализующего интерфейс <b>IWebService</b>.
+	* @param string $className  Название класса веб-сервиса. реализующего интерфейс  			<b>IWebService</b>.
 	*
 	* @return boolean 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <buttononclick>
 	* // В компоненте webservice.server
 	* CWebService::RegisterWebService($arParams["WEBSERVICE_CLASS"]);
@@ -282,7 +282,10 @@ class CWebService
 		global $USER;
 
 		if (!$USER->IsAuthorized())
-			return $USER->RequiredHTTPAuthBasic("Bitrix.{$class}.{$method}");
+		{
+			\CHTTP::SetAuthHeader(true);
+			return false;
+		}
 
 		return true;
 	}
@@ -310,13 +313,15 @@ class CWebService
 	public static function GetDefaultEndpoint()
 	{
 		global $APPLICATION;
-		return "http://".$_SERVER["HTTP_HOST"].
+		return ($APPLICATION->IsHTTPS() ? "https" : "http")."://".$_SERVER["HTTP_HOST"].
 				$APPLICATION->GetCurPage();
 	}
 
 	public static function GetDefaultTargetNS()
 	{
-		return "http://".$_SERVER["HTTP_HOST"]."/";
+		global $APPLICATION;
+
+		return ($APPLICATION->IsHTTPS() ? "https" : "http")."://".$_SERVER["HTTP_HOST"]."/";
 	}
 
 	function &GetWebServiceDeclaration($className)

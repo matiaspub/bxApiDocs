@@ -13,6 +13,27 @@ class Constraint extends BaseObject
 	 *
 	 * @return Constraint
 	 */
+	
+	/**
+	* <p>Статический метод создает объект ограничений из токенов.</p> <p></p> <p> Если параметр <code>$constraintName</code> не пропущен, то текущая позиция будет указывать на имя ограничения.</p>
+	*
+	*
+	* @param mixed $Bitrix  Набор токенов.
+	*
+	* @param Bitri $Perfmon  Необязательный параметр: имя ограничения.
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @param string $constraintName = '' 
+	*
+	* @return \Bitrix\Perfmon\Sql\Constraint 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/create.php
+	* @author Bitrix
+	*/
 	public static function create(Tokenizer $tokenizer, $constraintName = '')
 	{
 		if ($constraintName === false)
@@ -56,12 +77,25 @@ class Constraint extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для создания ограничения.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/getcreateddl.php
+	* @author Bitrix
+	*/
 	public function getCreateDdl($dbType = '')
 	{
 		switch ($dbType)
 		{
 		case "MYSQL":
-			return "// ".get_class($this).":getCreateDdl for database type [".$dbType."] not implemented";
+			return "ALTER TABLE ".$this->parent->name." ADD CONSTRAINT ".$this->name." ".$this->body;
 		case "MSSQL":
 			return "ALTER TABLE ".$this->parent->name." ADD CONSTRAINT ".$this->name." ".$this->body;
 		case "ORACLE":
@@ -78,6 +112,19 @@ class Constraint extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для снятия отграничения.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/getdropddl.php
+	* @author Bitrix
+	*/
 	public function getDropDdl($dbType = '')
 	{
 		switch ($dbType)
@@ -101,6 +148,27 @@ class Constraint extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для модификации ограничений.</p>
+	*
+	*
+	* @param mixed $Bitrix  Целевой объект.
+	*
+	* @param Bitri $Perfmon  Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param BaseObject $target  
+	*
+	* @param string $dbType = '' 
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/getmodifyddl.php
+	* @author Bitrix
+	*/
 	public function getModifyDdl(BaseObject $target, $dbType = '')
 	{
 		return array(

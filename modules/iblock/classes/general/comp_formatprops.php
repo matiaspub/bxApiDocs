@@ -16,11 +16,11 @@ class CIBlockFormatProperties
 	* @param string $event1  Метка для создания события перехода по ссылке в случае, когда
 	* установлен модуль <b>Веб-аналитика</b>.
 	*
-	* @return array <p>Массив полей элемента.</p> <p></p><div class="note"> <b>Примечание:</b> метод в
+	* @return array <p>Массив полей элемента.</p><p></p><div class="note"> <b>Примечание:</b> метод в
 	* поле DISPLAY_VALUE выводит только активные по дате элементы
 	* (используется фильтр на уровне ядра, поэтому вывести ссылки на
-	* неактивные элементы не получится стандартными средствами). </div>
-	* <br><br>
+	* неактивные элементы не получится стандартными средствами).
+	* </div><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockformatproperties/getdisplayvalue.php
@@ -89,7 +89,7 @@ class CIBlockFormatProperties
 							$arLinkFilter,
 							false,
 							false,
-							array("ID","IBLOCK_ID","NAME","DETAIL_PAGE_URL", "PREVIEW_PICTURE", "DETAIL_PICTURE")
+							array("ID", "IBLOCK_ID", "NAME", "DETAIL_PAGE_URL", "PREVIEW_PICTURE", "DETAIL_PICTURE", "SORT")
 						);
 						$CACHE["E"][$val] = $rsLink->GetNext();
 					}
@@ -114,7 +114,7 @@ class CIBlockFormatProperties
 							array(),
 							$arSectionFilter,
 							false,
-							array("ID", "IBLOCK_ID", "NAME", "SECTION_PAGE_URL", "PICTURE", "DETAIL_PICTURE")
+							array("ID", "IBLOCK_ID", "NAME", "SECTION_PAGE_URL", "PICTURE", "DETAIL_PICTURE", "SORT")
 						);
 						$CACHE["G"][$val] = $rsSection->GetNext();
 					}
@@ -208,7 +208,7 @@ class CIBlockFormatProperties
 	*
 	* @param string $timestamp  Метка времени в Unix формате.
 	*
-	* @return string <p>Отформатированная строка.</p> <br><br>
+	* @return string <p>Отформатированная строка.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockformatproperties/dateformat.php
@@ -221,12 +221,11 @@ class CIBlockFormatProperties
 		switch($format)
 		{
 		case "SHORT":
-			return FormatDate($DB->dateFormatToPHP(FORMAT_DATE), $timestamp);
+			return FormatDate($DB->DateFormatToPHP(FORMAT_DATE), $timestamp);
 		case "FULL":
-			return FormatDate($DB->dateFormatToPHP(FORMAT_DATETIME), $timestamp);
+			return FormatDate($DB->DateFormatToPHP(FORMAT_DATETIME), $timestamp);
 		default:
 			return FormatDate($format, $timestamp);
 		}
 	}
 }
-?>

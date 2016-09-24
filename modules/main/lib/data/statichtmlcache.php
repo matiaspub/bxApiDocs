@@ -40,6 +40,23 @@ class StaticHtmlCache
 	 * @param $host
 	 * @param null $privateKey
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести  при создании объекта какие-то действия.</p>
+	*
+	*
+	* @param mixed $requestUri  
+	*
+	* @param $requestUr $host = null 
+	*
+	* @param null $privateKey = null 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($requestUri, $host = null, $privateKey = null)
 	{
 		$this->cacheKey = static::convertUriToPath($requestUri, $host, $privateKey);
@@ -54,6 +71,17 @@ class StaticHtmlCache
 	 *
 	 * @return StaticHtmlCache
 	 */
+	
+	/**
+	* <p>Статический метод возвращает текущий экземпляр класса <code>\StaticHtmlCache</code>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Data\StaticHtmlCache 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/getinstance.php
+	* @author Bitrix
+	*/
 	public static function getInstance()
 	{
 		if (!isset(static::$instance))
@@ -98,6 +126,15 @@ class StaticHtmlCache
 
 		return null;
 	}
+
+	/*
+	 * Returns private cache key
+	 */
+	public static function getPrivateKey()
+	{
+		$cacheProvider = static::getCacheProvider();
+		return $cacheProvider !== null ? $cacheProvider->getCachePrivateKey() : null;
+	}
 	/**
 	 * Converts request uri into path safe file with .html extention.
 	 * Returns empty string if fails.
@@ -106,11 +143,47 @@ class StaticHtmlCache
 	 * @param string $privateKey
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод конвертирует URI запроса в путь сохранения файла с расширением <b>.html</b>.</p> <p>В случае неудачи возвращает пустую строку.</p>
+	*
+	*
+	* @param string $uri  Uri
+	*
+	* @param string $host = null Имя хоста.
+	*
+	* @param string $privateKey = null 
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/converturitopath.php
+	* @author Bitrix
+	*/
 	public static function convertUriToPath($uri, $host = null, $privateKey = null)
 	{
 		return \CHTMLPagesCache::convertUriToPath($uri, $host, $privateKey);
 	}
 
+	/**
+	 * Returns cache key
+	 * @return string
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает ключ кеша.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/getcachekey.php
+	* @author Bitrix
+	*/
+	public function getCacheKey()
+	{
+		return $this->cacheKey;
+	}
 	/**
 	 * Writes the content to the storage
 	 * @param string $content the string that is to be written
@@ -118,6 +191,21 @@ class StaticHtmlCache
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический записывает контент в кеш. Возвращает записанную строку, либо <i>false</i> в случае неудачной попытки записи.</p>
+	*
+	*
+	* @param string $content  Строка, которая должна быть записана
+	*
+	* @param string $md5  хэш контента
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/write.php
+	* @author Bitrix
+	*/
 	public function write($content, $md5)
 	{
 		if ($this->storage === null)
@@ -127,10 +215,15 @@ class StaticHtmlCache
 
 		$this->writeDebug();
 
+		$cacheSize = $this->storage->getSize();
 		$written = $this->storage->write($content."<!--".$md5."-->", $md5);
 		if ($written !== false && $this->storage->shouldCountQuota())
 		{
-			\CHTMLPagesCache::writeStatistic(0, 1, 0, 0, $written);
+			$delta = $cacheSize !== false ? $written - $cacheSize : $written;
+			if ($delta !== 0)
+			{
+				\CHTMLPagesCache::writeStatistic(0, 1, 0, 0, $delta);
+			}
 		}
 
 		return $written;
@@ -141,6 +234,17 @@ class StaticHtmlCache
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает контент из кеша. Возвращает записанную строку, либо <i>false</i> в случае неудачной попытки чтения.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/read.php
+	* @author Bitrix
+	*/
 	public function read()
 	{
 		if ($this->storage !== null)
@@ -156,6 +260,17 @@ class StaticHtmlCache
 	 *
 	 * @return bool|int
 	 */
+	
+	/**
+	* <p>Нестатический метод удаляет кеш. Возвращает количество удалённых байтов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/delete.php
+	* @author Bitrix
+	*/
 	public function delete()
 	{
 		if ($this->storage === null)
@@ -178,6 +293,17 @@ class StaticHtmlCache
 	 * Deletes all cache data
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод удаляет весь кеш из хранилища.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/deleteall.php
+	* @author Bitrix
+	*/
 	public function deleteAll()
 	{
 		if ($this->storage === null)
@@ -196,10 +322,46 @@ class StaticHtmlCache
 	}
 
 	/**
+	 * Returns the time the cache was last modified
+	 * @return int|false
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает время последней модификации кеша, либо <i>false</i> в противном случае.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/getlastmodified.php
+	* @author Bitrix
+	*/
+	public function getLastModified()
+	{
+		if ($this->storage !== null)
+		{
+			return $this->storage->getLastModified();
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns true if the cache exists
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>true</i> если кеш существует.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/exists.php
+	* @author Bitrix
+	*/
 	public function exists()
 	{
 		if ($this->storage !== null)
@@ -214,6 +376,17 @@ class StaticHtmlCache
 	 * Returns hash of the cache
 	 * @return string|false
 	 */
+	
+	/**
+	* <p>Нестатический абстрактный метод возвращает <i>md5</i> кеша. Возвращает записанную строку, либо <i>false</i> в случае неудачной попытки чтения.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/getmd5.php
+	* @author Bitrix
+	*/
 	public function getMd5()
 	{
 		if ($this->storage !== null)
@@ -229,6 +402,17 @@ class StaticHtmlCache
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>true</i> если текущий запрос может быть закеширован.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/iscacheable.php
+	* @author Bitrix
+	*/
 	public function isCacheable()
 	{
 		if ($this->storage === null)
@@ -268,6 +452,17 @@ class StaticHtmlCache
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод отмечает текущую страницу как не кешируемую.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/marknoncacheable.php
+	* @author Bitrix
+	*/
 	public function markNonCacheable()
 	{
 		$this->canCache = false;
@@ -295,6 +490,19 @@ class StaticHtmlCache
 	 *
 	 * @return StaticHtmlStorage|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает экземпляр <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlstorage/index.php">\Bitrix\Main\Data\StaticHtmlStorage</a>.</p>
+	*
+	*
+	* @param string $cacheKey  Уникальный идентификатор кэша.
+	*
+	* @return \Bitrix\Main\Data\StaticHtmlStorage|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/getstatichtmlstorage.php
+	* @author Bitrix
+	*/
 	public static function getStaticHtmlStorage($cacheKey)
 	{
 		$configuration = array();
@@ -380,6 +588,19 @@ class StaticHtmlCache
 	 * Checks component frame mode
 	 * @param string $context
 	 */
+	
+	/**
+	* <p>Статический метод проверяет использует ли компонент режим  Checks component frame mode</p>
+	*
+	*
+	* @param string $context = "" 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlcache/applycomponentframemode.php
+	* @author Bitrix
+	*/
 	public static function applyComponentFrameMode($context = "")
 	{
 		if (

@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети. 
+ * <b>CSocNetGroupSubject</b> - класс для работы с темами рабочих групп социальной сети.
  *
  *
  * @return mixed 
@@ -19,11 +19,11 @@ class CAllSocNetGroupSubject
 	/***************************************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB;
+		global $APPLICATION;
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("System error 870164", "ERROR");
+			$APPLICATION->ThrowException("System error 870164", "ERROR");
 			return false;
 		}
 
@@ -35,7 +35,7 @@ class CAllSocNetGroupSubject
 			)
 		)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GS_EMPTY_SITE_ID"), "EMPTY_SITE_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GS_EMPTY_SITE_ID"), "EMPTY_SITE_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "SITE_ID"))
@@ -48,7 +48,7 @@ class CAllSocNetGroupSubject
 				$dbResult = CSite::GetByID($v);
 				if (!$dbResult->Fetch())
 				{
-					$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $v, GetMessage("SONET_GS_ERROR_NO_SITE")), "ERROR_NO_SITE");
+					$APPLICATION->ThrowException(str_replace("#ID#", $v, GetMessage("SONET_GS_ERROR_NO_SITE")), "ERROR_NO_SITE");
 					return false;
 				}
 			}
@@ -56,7 +56,7 @@ class CAllSocNetGroupSubject
 
 		if ((is_set($arFields, "NAME") || $ACTION=="ADD") && strlen($arFields["NAME"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GS_EMPTY_NAME"), "EMPTY_NAME");
+			$APPLICATION->ThrowException(GetMessage("SONET_GS_EMPTY_NAME"), "EMPTY_NAME");
 			return false;
 		}
 
@@ -68,12 +68,12 @@ class CAllSocNetGroupSubject
 
 	
 	/**
-	* <p>Метод удаляет тему рабочих групп. Если есть группы с этой темой, то тема удалена не будет.</p>
+	* <p>Метод удаляет тему рабочих групп. Если есть группы с этой темой, то тема удалена не будет. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код темы.</bod
+	* @param int $intid  Код темы.
 	*
-	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/delete.php
@@ -81,7 +81,7 @@ class CAllSocNetGroupSubject
 	*/
 	public static function Delete($ID)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER, $APPLICATION;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
@@ -99,7 +99,7 @@ class CAllSocNetGroupSubject
 
 		if (!$bCanDelete)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GS_NOT_EMPTY_SUBJECT"), "NOT_EMPTY_SUBJECT");
+			$APPLICATION->ThrowException(GetMessage("SONET_GS_NOT_EMPTY_SUBJECT"), "NOT_EMPTY_SUBJECT");
 			return false;
 		}
 
@@ -116,16 +116,16 @@ class CAllSocNetGroupSubject
 	
 	
 	/**
-	* <p>Изменяет параметры темы.</p>
+	* <p>Изменяет параметры темы. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код темы.</bod
+	* @param int $intid  Код темы.
 	*
 	* @param array $arFields  Массив новых параметров темы. Ключами массива являются названия
 	* полей темы, а значениями - их значения. Допустимые ключи: <b>SITE_ID</b> -
 	* код сайта, <b>NAME</b> - название.
 	*
-	* @return int <p>Возвращается код измененной темы или false в случае ошибки.</p> <br><br>
+	* @return int <p>Возвращается код измененной темы или false в случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/update.php
@@ -216,13 +216,13 @@ class CAllSocNetGroupSubject
 	/***************************************/
 	
 	/**
-	* <p>Возвращает параметры темы. Не порождает запросов к базе данных.</p>
+	* <p>Возвращает параметры темы. Не порождает запросов к базе данных. Метод статический.</p>
 	*
 	*
-	* @param int $id  Код темы.</bod
+	* @param int $intid  Код темы.
 	*
 	* @return array <p>Массив параметров темы. Массив имеет ключи:<br><b>ID</b> - код
-	* темы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название. </p> <br><br>
+	* темы,<br><b>SITE_ID</b> - код сайта,<br><b>NAME</b> - название. </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroupsubject/GetByID.php
@@ -230,8 +230,6 @@ class CAllSocNetGroupSubject
 	*/
 	public static function GetByID($ID)
 	{
-		global $DB;
-
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
 

@@ -10,6 +10,17 @@ class OtpEvents
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Агент активации временно отключенных пользовательских OTP. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpevents/onrecheckdeactivate.php
+	* @author Bitrix
+	*/
 	public static function onRecheckDeactivate()
 	{
 		$users = UserTable::query()

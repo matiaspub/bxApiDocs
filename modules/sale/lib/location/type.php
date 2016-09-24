@@ -28,7 +28,7 @@ class TypeTable extends Entity\DataManager
 		return 'b_sale_loc_type';
 	}
 
-	public static function add($data = array())
+	public static function add(array $data)
 	{
 		if(isset($data['NAME']))
 		{
@@ -56,7 +56,7 @@ class TypeTable extends Entity\DataManager
 		return $addResult;
 	}
 	
-	public static function update($primary, $data = array())
+	public static function update($primary, array $data)
 	{
 		$primary = Assert::expectIntegerPositive($primary, '$primary');
 

@@ -27,7 +27,7 @@ class StatusGroupTaskTable extends Main\Entity\DataManager
 
 			new Main\Entity\StringField('STATUS_ID', array(
 				'primary' => true,
-				'format'  => '/^[A-Za-z]{1,2}$/',
+				'format'  => '/^[A-Za-z?0-9]{1,2}$/',
 			)),
 
 			new Main\Entity\IntegerField('GROUP_ID', array(

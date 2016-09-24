@@ -3,7 +3,7 @@
  * Bitrix Framework
  * @package bitrix
  * @subpackage main
- * @copyright 2001-2013 Bitrix
+ * @copyright 2001-2015 Bitrix
  */
 
 IncludeModuleLangFile(__FILE__);
@@ -27,12 +27,12 @@ class CComponentUtil
 
 	public static function PrepareVariables(&$arData)
 	{
-		UnSet($arData["NEW_COMPONENT_TEMPLATE"]);
+		unset($arData["NEW_COMPONENT_TEMPLATE"]);
 
 		if ($arData["SEF_MODE"] == "Y")
 		{
-			UnSet($arData["VARIABLE_ALIASES"]);
-			UnSet($arData["SEF_URL_TEMPLATES"]);
+			unset($arData["VARIABLE_ALIASES"]);
+			unset($arData["SEF_URL_TEMPLATES"]);
 
 			foreach ($arData as $dataKey => $dataValue)
 			{
@@ -55,8 +55,8 @@ class CComponentUtil
 		}
 		else
 		{
-			UnSet($arData["VARIABLE_ALIASES"]);
-			UnSet($arData["SEF_URL_TEMPLATES"]);
+			unset($arData["VARIABLE_ALIASES"]);
+			unset($arData["SEF_URL_TEMPLATES"]);
 
 			foreach ($arData as $dataKey => $dataValue)
 			{
@@ -148,148 +148,151 @@ class CComponentUtil
 
 		foreach($folders as $componentFolder)
 		{
-			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
+			if(file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 			{
-				while (($file = readdir($handle)) !== false)
+				if ($handle = opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 				{
-					if ($file == "." || $file == "..")
-						continue;
-
-					if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
+					while (($file = readdir($handle)) !== false)
 					{
-						if (CComponentUtil::isComponent($componentFolder."/".$file))
+						if ($file == "." || $file == "..")
+							continue;
+
+						if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
 						{
-							// It's component
-							if ($filterNamespace !== false && strlen($filterNamespace) > 0)
-								continue;
-							if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file, $arNameFilter))
-								continue;
-
-							if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php"))
+							if (CComponentUtil::isComponent($componentFolder."/".$file))
 							{
-								CComponentUtil::__IncludeLang($componentFolder."/".$file, ".description.php");
-
-								$arComponentDescription = array();
-								include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php");
-
-								if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
+								// It's component
+								if ($filterNamespace !== false && strlen($filterNamespace) > 0)
+									continue;
+								if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file, $arNameFilter))
 									continue;
 
-								if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
+								if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php"))
 								{
-									$arComponent = array();
-									$arComponent["NAME"] = $file;
-									$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
-									$arComponent["NAMESPACE"] = "";
-									$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
-									$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+									CComponentUtil::__IncludeLang($componentFolder."/".$file, ".description.php");
 
-									if (array_key_exists("ICON", $arComponentDescription))
-									{
-										$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
-										if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$arComponentDescription["ICON"])))
-											$arComponent["ICON"] = $componentFolder."/".$file."/".$arComponentDescription["ICON"];
-										else
-											$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
-									}
-									if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
-										$arComponent["COMPLEX"] = "Y";
-									else
-										$arComponent["COMPLEX"] = "N";
-									$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
-									if ($arComponent["SORT"] <= 0)
-										$arComponent["SORT"] = 100;
+									$arComponentDescription = array();
+									include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/.description.php");
 
-									$arComponent["SCREENSHOT"] = array();
-									if (array_key_exists("SCREENSHOT", $arComponentDescription))
-									{
-										if (!is_array($arComponentDescription["SCREENSHOT"]))
-											$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
-
-										for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
-											$arComponent["SCREENSHOT"][] = $componentFolder."/".$file.$arComponentDescription["SCREENSHOT"][$i];
-									}
-
-									CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
-								}
-							}
-						}
-						else
-						{
-							// It's not a component
-							if ($filterNamespace !== false && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
-								continue;
-
-							if ($handle1 = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
-							{
-								while (($file1 = readdir($handle1)) !== false)
-								{
-									if ($file1 == "." || $file1 == "..")
+									if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
 										continue;
 
-									if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1))
+									if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 									{
-										if (CComponentUtil::isComponent($componentFolder."/".$file."/".$file1))
+										$arComponent = array();
+										$arComponent["NAME"] = $file;
+										$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
+										$arComponent["NAMESPACE"] = "";
+										$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
+										$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+
+										if (array_key_exists("ICON", $arComponentDescription))
 										{
-											if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
-												continue;
-											// It's component
-											if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php"))
+											$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
+											if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$arComponentDescription["ICON"])))
+												$arComponent["ICON"] = $componentFolder."/".$file."/".$arComponentDescription["ICON"];
+											else
+												$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+										}
+										if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
+											$arComponent["COMPLEX"] = "Y";
+										else
+											$arComponent["COMPLEX"] = "N";
+										$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
+										if ($arComponent["SORT"] <= 0)
+											$arComponent["SORT"] = 100;
+
+										$arComponent["SCREENSHOT"] = array();
+										if (array_key_exists("SCREENSHOT", $arComponentDescription))
+										{
+											if (!is_array($arComponentDescription["SCREENSHOT"]))
+												$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
+
+											for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
+												$arComponent["SCREENSHOT"][] = $componentFolder."/".$file.$arComponentDescription["SCREENSHOT"][$i];
+										}
+
+										CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
+									}
+								}
+							}
+							else
+							{
+								// It's not a component
+								if ($filterNamespace !== false && (strlen($filterNamespace) <= 0 || $filterNamespace != $file))
+									continue;
+
+								if ($handle1 = opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file))
+								{
+									while (($file1 = readdir($handle1)) !== false)
+									{
+										if ($file1 == "." || $file1 == "..")
+											continue;
+
+										if (is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1))
+										{
+											if (CComponentUtil::isComponent($componentFolder."/".$file."/".$file1))
 											{
-												CComponentUtil::__IncludeLang($componentFolder."/".$file."/".$file1, ".description.php");
-
-												$arComponentDescription = array();
-												include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php");
-
-												if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
+												if ($arNameFilter !== false && !CComponentUtil::CheckComponentName($file1, $arNameFilter))
 													continue;
-
-												if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
+												// It's component
+												if (file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php"))
 												{
-													$arComponent = array();
-													$arComponent["NAME"] = $file.":".$file1;
-													$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
-													$arComponent["NAMESPACE"] = $file;
-													$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
-													$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
-													if (array_key_exists("ICON", $arComponentDescription))
+													CComponentUtil::__IncludeLang($componentFolder."/".$file."/".$file1, ".description.php");
+
+													$arComponentDescription = array();
+													include($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file."/".$file1."/.description.php");
+
+													if (isset($arFilter["TYPE"]) && $arFilter["TYPE"] != $arComponentDescription["TYPE"])
+														continue;
+
+													if (array_key_exists("PATH", $arComponentDescription) && array_key_exists("ID", $arComponentDescription["PATH"]))
 													{
-														$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
-														if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"])))
-															$arComponent["ICON"] = $componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"];
+														$arComponent = array();
+														$arComponent["NAME"] = $file.":".$file1;
+														$arComponent["TYPE"] = (array_key_exists("TYPE", $arComponentDescription) ? $arComponentDescription["TYPE"] : "");
+														$arComponent["NAMESPACE"] = $file;
+														$arComponent["TITLE"] = trim($arComponentDescription["NAME"]);
+														$arComponent["DESCRIPTION"] = $arComponentDescription["DESCRIPTION"];
+														if (array_key_exists("ICON", $arComponentDescription))
+														{
+															$arComponentDescription["ICON"] = ltrim($arComponentDescription["ICON"], "/");
+															if($arComponentDescription["ICON"] != "" && $io->FileExists($io->RelativeToAbsolutePath($componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"])))
+																$arComponent["ICON"] = $componentFolder."/".$file."/".$file1."/".$arComponentDescription["ICON"];
+															else
+																$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+														}
+														if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
+															$arComponent["COMPLEX"] = "Y";
 														else
-															$arComponent["ICON"] = "/bitrix/images/fileman/htmledit2/component.gif";
+															$arComponent["COMPLEX"] = "N";
+														$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
+														if ($arComponent["SORT"] <= 0)
+															$arComponent["SORT"] = 100;
+
+														$arComponent["SCREENSHOT"] = array();
+														if (array_key_exists("SCREENSHOT", $arComponentDescription))
+														{
+															if (!is_array($arComponentDescription["SCREENSHOT"]))
+																$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
+
+															for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
+																$arComponent["SCREENSHOT"][] = $componentFolder."/".$file."/".$file1.$arComponentDescription["SCREENSHOT"][$i];
+														}
+
+														CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 													}
-													if (array_key_exists("COMPLEX", $arComponentDescription) && $arComponentDescription["COMPLEX"] == "Y")
-														$arComponent["COMPLEX"] = "Y";
-													else
-														$arComponent["COMPLEX"] = "N";
-													$arComponent["SORT"] = IntVal($arComponentDescription["SORT"]);
-													if ($arComponent["SORT"] <= 0)
-														$arComponent["SORT"] = 100;
-
-													$arComponent["SCREENSHOT"] = array();
-													if (array_key_exists("SCREENSHOT", $arComponentDescription))
-													{
-														if (!is_array($arComponentDescription["SCREENSHOT"]))
-															$arComponentDescription["SCREENSHOT"] = array($arComponentDescription["SCREENSHOT"]);
-
-														for ($i = 0, $cnt = count($arComponentDescription["SCREENSHOT"]); $i < $cnt; $i++)
-															$arComponent["SCREENSHOT"][] = $componentFolder."/".$file."/".$file1.$arComponentDescription["SCREENSHOT"][$i];
-													}
-
-													CComponentUtil::__BuildTree($arComponentDescription["PATH"], $arTree, $arComponent);
 												}
 											}
 										}
 									}
+									closedir($handle1);
 								}
-								@closedir($handle1);
 							}
 						}
 					}
+					closedir($handle);
 				}
-				@closedir($handle);
 			}
 		}
 
@@ -358,22 +361,25 @@ class CComponentUtil
 
 		foreach($folders as $componentFolder)
 		{
-			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
+			if(file_exists($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 			{
-				while (($file = readdir($handle)) !== false)
+				if ($handle = opendir($_SERVER["DOCUMENT_ROOT"].$componentFolder))
 				{
-					if ($file == "." || $file == "..")
-						continue;
-
-					if (
-						is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file)
-						&& !CComponentUtil::isComponent($componentFolder."/".$file)
-					)
+					while (($file = readdir($handle)) !== false)
 					{
-						$arNamespaces[] = $file;
+						if ($file == "." || $file == "..")
+							continue;
+
+						if (
+							is_dir($_SERVER["DOCUMENT_ROOT"].$componentFolder."/".$file)
+							&& !CComponentUtil::isComponent($componentFolder."/".$file)
+						)
+						{
+							$arNamespaces[] = $file;
+						}
 					}
+					closedir($handle);
 				}
-				@closedir($handle);
 			}
 		}
 
@@ -472,7 +478,9 @@ class CComponentUtil
 		}
 
 		if (!array_key_exists("PARAMETERS", $arComponentParameters) || !is_array($arComponentParameters["PARAMETERS"]))
-			return false;
+		{
+			$arComponentParameters["PARAMETERS"] = array();
+		}
 
 		if (!array_key_exists("GROUPS", $arComponentParameters) || !is_array($arComponentParameters["GROUPS"]))
 			$arComponentParameters["GROUPS"] = array();
@@ -788,6 +796,49 @@ class CComponentUtil
 			}
 		}
 
+		if (CHTMLPagesCache::isOn())
+		{
+			$arComponentParameters["GROUPS"]["COMPOSITE_SETTINGS"] = array(
+				"NAME" => GetMessage("COMP_GROUP_COMPOSITE_SETTINGS"),
+				"SORT" => 800
+			);
+
+			$arComponentParameters["PARAMETERS"]["COMPOSITE_FRAME_MODE"] = array(
+				"PARENT" => "COMPOSITE_SETTINGS",
+				"NAME" => GetMessage("COMP_PROP_COMPOSITE_FRAME_MODE"),
+				"TYPE" => "LIST",
+				"VALUES" => array(
+					"A" => GetMessage("COMP_PROP_COMPOSITE_FRAME_MODE_AUTO"),
+					"Y" => GetMessage("COMP_PROP_COMPOSITE_FRAME_MODE_PRO"),
+					"N" => GetMessage("COMP_PROP_COMPOSITE_FRAME_MODE_CONTRA")
+				),
+				"DEFAULT" => "A",
+				"REFRESH" => "Y",
+				"ADDITIONAL_VALUES" => "N"
+			);
+
+			if (
+				!isset($arCurrentValues["COMPOSITE_FRAME_MODE"]) ||
+				in_array($arCurrentValues["COMPOSITE_FRAME_MODE"], array("A", "Y")))
+			{
+				$arComponentParameters["PARAMETERS"]["COMPOSITE_FRAME_TYPE"] = array(
+					"PARENT" => "COMPOSITE_SETTINGS",
+					"NAME" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE"),
+					"TYPE" => "LIST",
+					"VALUES" => array(
+						"AUTO" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE_AUTO"),
+						"STATIC" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE_STATIC"),
+						"DYNAMIC_WITH_STUB" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE_DYNAMIC_WITH_STUB"),
+						"DYNAMIC_WITHOUT_STUB" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE_DYNAMIC_WITHOUT_STUB"),
+						"DYNAMIC_WITH_STUB_LOADING" => GetMessage("COMP_PROP_COMPOSITE_FRAME_TYPE_DYNAMIC_WITH_STUB_LOADING")
+					),
+					"DEFAULT" => "A",
+					"ADDITIONAL_VALUES" => "N"
+				);
+			}
+
+		}
+
 		if(
 			(CPageOption::GetOptionString("main","tips_creation","no")=="allowed")
 			&& (strpos($componentPath, "/forum")!==false)
@@ -944,32 +995,35 @@ class CComponentUtil
 
 		foreach($folders as $folder)
 		{
-			if ($handle = @opendir($_SERVER["DOCUMENT_ROOT"].$folder))
+			if(file_exists($_SERVER["DOCUMENT_ROOT"].$folder))
 			{
-				while (($file = readdir($handle)) !== false)
+				if ($handle = opendir($_SERVER["DOCUMENT_ROOT"].$folder))
 				{
-					if ($file == "." || $file == "..")
-						continue;
+					while (($file = readdir($handle)) !== false)
+					{
+						if ($file == "." || $file == "..")
+							continue;
 
-					if ($currentTemplate !== false && $currentTemplate != $file || $file == ".default")
-						continue;
+						if ($currentTemplate !== false && $currentTemplate != $file || $file == ".default")
+							continue;
 
-					if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/".$file."/components".$path2Comp))
+						if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/".$file."/components".$path2Comp))
+						{
+							$templateFolders[] = array(
+								"path" => $folder."/".$file."/components".$path2Comp,
+								"template" => $file,
+							);
+						}
+					}
+					closedir($handle);
+
+					if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/.default/components".$path2Comp))
 					{
 						$templateFolders[] = array(
-							"path" => $folder."/".$file."/components".$path2Comp,
-							"template" => $file,
+							"path" => $folder."/.default/components".$path2Comp,
+							"template" => ".default",
 						);
 					}
-				}
-				@closedir($handle);
-
-				if (file_exists($_SERVER["DOCUMENT_ROOT"].$folder."/.default/components".$path2Comp))
-				{
-					$templateFolders[] = array(
-						"path" => $folder."/.default/components".$path2Comp,
-						"template" => ".default",
-					);
 				}
 			}
 		}
@@ -1337,5 +1391,55 @@ class CComponentUtil
 		global $DB;
 
 		return $DB->DateFormatToPHP(CSite::GetDateFormat("FULL"));
+	}
+
+	public static function GetDateTimeFormatted($timestamp, $dateTimeFormat = false, $offset = 0)
+	{
+		static $arFormatWOYear = array();
+		static $arFormatTime = array();
+		static $defaultDateTimeFormat = false;
+
+		if (
+			empty($dateTimeFormat)
+			|| $dateTimeFormat == "FULL"
+		)
+		{
+			if (!$defaultDateTimeFormat)
+			{
+				$defaultDateTimeFormat = $GLOBALS["DB"]->DateFormatToPHP(FORMAT_DATETIME);
+			}
+			$dateTimeFormat = $defaultDateTimeFormat;
+		}
+		$dateTimeFormat = preg_replace('/[\/.,\s:][s]/', '', $dateTimeFormat);
+
+		if (empty($arFormatWOYear[$dateTimeFormat]))
+		{
+			$arFormatWOYear[$dateTimeFormat] = preg_replace('/[\/.,\s-][Yyo]/', '', $dateTimeFormat);
+		}
+		$dateTimeFormatWOYear = $arFormatWOYear[$dateTimeFormat];
+
+		if (empty($arFormatTime[$dateTimeFormat]))
+		{
+			$arFormatTime[$dateTimeFormat] = preg_replace('/[\/.,\s]+$/', '', preg_replace('/^[\/.,\s]+/', '', preg_replace('/[dDjlFmMnYyo]/', '', $dateTimeFormat)));
+		}
+		$timeFormat = $arFormatTime[$dateTimeFormat];
+
+		$arFormat = Array(
+			"tomorrow" => "tomorrow, ".$timeFormat,
+			"today" => "today, ".$timeFormat,
+			"yesterday" => "yesterday, ".$timeFormat,
+			"" => (
+				date("Y", $timestamp) == date("Y")
+					? $dateTimeFormatWOYear
+					: $dateTimeFormat
+			)
+		);
+
+		return (
+			strcasecmp(LANGUAGE_ID, 'EN') !== 0
+			&& strcasecmp(LANGUAGE_ID, 'DE') !== 0
+				? ToLower(FormatDate($arFormat, $timestamp, (time() + $offset)))
+				: FormatDate($arFormat, $timestamp, (time() + $offset))
+		);
 	}
 }

@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/traffic.php");
 
 /**
- * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта. 
+ * <b>CTraffic</b> - класс для получения общих данных по посещаемости сайта.
  *
  *
  * @return mixed 
@@ -18,19 +18,21 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> в разрезе по часам, дням недели и месяцам.</p>
 	*
 	*
-	* @param string $data_type  Тип данных. Возможные значения: <ul> <li> <b>hour</b> - данные в разрезе по
-	* часам; </li> <li> <b>weekday</b> - данные в разрезе по дням недели; </li> <li>
-	* <b>month</b> - данные в разрезе по месяцам. </li> </ul>
+	* @param string $data_type  Тип данных. Возможные значения:          <ul> <li> <b>hour</b> - данные в
+	* разрезе по часам; </li>                    <li> <b>weekday</b> - данные в разрезе по
+	* дням недели; </li>                    <li> <b>month</b> - данные в разрезе по месяцам.
+	* </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
-	* необходимо получить статистику по ссылающимся сайтам; </li> <li>
-	* <b>DATE1</b> - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
+	* допустимы следующие ключи:          <ul> <li> <b>SITE_ID</b> - ID сайта для
+	* которого необходимо получить статистику по ссылающимся сайтам;
+	* </li>                    <li> <b>DATE1</b> - начальная дата; </li>                    <li> <b>DATE2</b> -
+	* конечная дата. </li>         </ul>
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим данные по посещаемости в разрезе по дням недели
 	* $rs = <b>CTraffic::GetSumList</b>("weekday");
@@ -61,7 +63,7 @@ class CTraffic extends CAllTraffic
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/traffic.php">Отчет
-	* "Посещаемость"</a> </li> </ul> </ht<a name="examples"></a>
+	* "Посещаемость"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -206,53 +208,58 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>, коэфициенты оценки внимательности посетителей в разрезе по дням.</p>
 	*
 	*
-	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID записи;
-	* </li> <li> <b>s_date</b> - дата; </li> <li> <b>s_hits</b> - количество хитов; </li> <li>
-	* <b>s_hosts</b> - количество хостов; </li> <li> <b>s_sessions</b> - количество сессий;
-	* </li> <li> <b>s_events</b> - количество событий; </li> <li> <b>s_guests</b> - количество
-	* посетителей; </li> <li> <b>s_new_guests</b> - количество <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a>; </li> <li>
-	* <b>s_favorites</b> - количество посетителей, добавивших сайт в "<a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>". </li> </ul>
+	* @param string &$by = "s_date" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID
+	* записи; </li>                     <li> <b>s_date</b> - дата; </li>                     <li> <b>s_hits</b> -
+	* количество хитов; </li>                     <li> <b>s_hosts</b> - количество хостов;
+	* </li>                     <li> <b>s_sessions</b> - количество сессий; </li>                     <li>
+	* <b>s_events</b> - количество событий; </li>                     <li> <b>s_guests</b> -
+	* количество посетителей; </li>                     <li> <b>s_new_guests</b> - количество
+	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a>; </li>   
+	*                  <li> <b>s_favorites</b> - количество посетителей, добавивших сайт в
+	* "<a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>". </li>          </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                     <li> <b>desc</b> - по убыванию. </li>          </ul>
 	*
 	* @param array &$max_min  Ссылка на массив содержащий максимальную и минимальную даты из
-	* выбранного результирующего списка. Структура данного массива: <pre
-	* style="font-size: 95%;">Array ( [DATE_FIRST] =&gt; минимальная дата [MIN_DAY] =&gt; день
-	* минимальной даты (1-31) [MIN_MONTH] =&gt; месяц минимальной даты (1-12) [MIN_YEAR]
-	* =&gt; год минимальной даты [DATE_LAST] =&gt; максимальная дата [MAX_DAY] =&gt;
-	* день максимальной даты (1-31) [MAX_MONTH] =&gt; месяц максимальной даты (1-12)
-	* [MAX_YEAR] =&gt; год максимальной даты )</pre>
+	* выбранного результирующего списка. Структура данного массива:     
+	*     <pre style="font-size: 95%;">Array (     [DATE_FIRST] =&gt; минимальная дата     [MIN_DAY] =&gt;
+	* день минимальной даты (1-31)     [MIN_MONTH] =&gt; месяц минимальной даты (1-12) 
+	*    [MIN_YEAR] =&gt; год минимальной даты     [DATE_LAST] =&gt; максимальная дата    
+	* [MAX_DAY] =&gt; день максимальной даты (1-31)     [MAX_MONTH] =&gt; месяц
+	* максимальной даты (1-12)     [MAX_YEAR] =&gt; год максимальной даты  )</pre>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID записи; </li> <li>
-	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	* будет искаться вхождение; </li> <li> <b>DATE1</b> - начальное значение
-	* интервала для поля "дата"; </li> <li> <b>DATE2</b> - конечное значение
-	* интервала для поля "дата"; </li> <li> <b>HITS_1</b> - начальное значение
-	* интервала для поля "количество хитов"; </li> <li> <b>HITS_2</b> - конечное
-	* значение интервала для поля "количество хитов"; </li> <li> <b>HOSTS_1</b> -
-	* начальное значение интервала для поля "количество хостов"; </li> <li>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID записи; </li>                
+	*     <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>ID</b> будет искаться вхождение; </li>                     <li> <b>DATE1</b> -
+	* начальное значение интервала для поля "дата"; </li>                     <li>
+	* <b>DATE2</b> - конечное значение интервала для поля "дата"; </li>                   
+	*  <li> <b>HITS_1</b> - начальное значение интервала для поля "количество
+	* хитов"; </li>                     <li> <b>HITS_2</b> - конечное значение интервала для
+	* поля "количество хитов"; </li>                     <li> <b>HOSTS_1</b> - начальное
+	* значение интервала для поля "количество хостов"; </li>                     <li>
 	* <b>HOSTS_2</b> - начальное значение интервала для поля "количество
-	* хостов"; </li> <li> <b>SESSIONS_1</b> - начальное значение интервала для поля
-	* "количество сессий"; </li> <li> <b>SESSIONS_2</b> - конечное значение интервала
-	* для поля "количество сессий"; </li> <li> <b>EVENTS_1</b> - начальное значение
-	* интервала для поля "количество событий"; </li> <li> <b>EVENTS_2</b> - конечное
-	* значение интервала для поля "количество событий"; </li> <li> <b>GUESTS_1</b> -
+	* хостов"; </li>                     <li> <b>SESSIONS_1</b> - начальное значение интервала
+	* для поля "количество сессий"; </li>                     <li> <b>SESSIONS_2</b> - конечное
+	* значение интервала для поля "количество сессий"; </li>                     <li>
+	* <b>EVENTS_1</b> - начальное значение интервала для поля "количество
+	* событий"; </li>                     <li> <b>EVENTS_2</b> - конечное значение интервала
+	* для поля "количество событий"; </li>                     <li> <b>GUESTS_1</b> -
 	* начальное значение интервала для поля "количество посетителей";
-	* </li> <li> <b>GUESTS_2</b> - конечное значение интервала для поля "количество
-	* посетителей"; </li> <li> <b>NEW_GUESTS_1</b> - начальное значение интервала для
-	* поля "количество новых посетителей"; </li> <li> <b>NEW_GUESTS_2</b> - конечное
-	* значение интервала для поля "количество новых посетителей"; </li> <li>
-	* <b>FAVORITES_1</b> - начальное значение интервала для поля "количество
-	* посетителей добавивших сайт в "Избранное""; </li> <li> <b>FAVORITES_2</b> -
+	* </li>                     <li> <b>GUESTS_2</b> - конечное значение интервала для поля
+	* "количество посетителей"; </li>                     <li> <b>NEW_GUESTS_1</b> - начальное
+	* значение интервала для поля "количество новых посетителей"; </li>     
+	*                <li> <b>NEW_GUESTS_2</b> - конечное значение интервала для поля
+	* "количество новых посетителей"; </li>                     <li> <b>FAVORITES_1</b> -
+	* начальное значение интервала для поля "количество посетителей
+	* добавивших сайт в "Избранное""; </li>                     <li> <b>FAVORITES_2</b> -
 	* конечное значение интервала для поля "количество посетителей
-	* добавивших сайт в "Избранное"; </li> <li> <b>SITE_ID</b>* - ID сайта; </li> <li>
-	* <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>SITE_ID</b> будет искаться вхождение. </li> </ul> * - допускается <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
+	* добавивших сайт в "Избранное"; </li>                     <li> <b>SITE_ID</b>* - ID сайта;
+	* </li>                     <li> <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при
+	* фильтрации по <b>SITE_ID</b> будет искаться вхождение. </li>          </ul>        * -
+	* допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
+	* логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
@@ -264,7 +271,7 @@ class CTraffic extends CAllTraffic
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // ограничимся данными только за декабрь 2007 года
 	* $arFilter = array(
@@ -297,8 +304,8 @@ class CTraffic extends CAllTraffic
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/ctraffic/getcommonvalues.php">CTraffic::GetCommonValues</a>
-	* </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/traffic.php">Отчет "Динамика
-	* посещаемости"</a> </li> </ul> <a name="examples"></a>
+	* </li>     <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/traffic.php">Отчет
+	* "Динамика посещаемости"</a> </li>  </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -495,51 +502,55 @@ class CTraffic extends CAllTraffic
 	*
 	*
 	* @param array $arrayfilter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
-	* необходимо получить статистику; </li> <li> <b>DATE1</b> - начальная дата; </li>
-	* <li> <b>DATE2</b> - конечная дата. </li> </ul>
+	* допустимы следующие ключи:          <ul> <li> <b>SITE_ID</b> - ID сайта для
+	* которого необходимо получить статистику; </li>                    <li> <b>DATE1</b>
+	* - начальная дата; </li>                    <li> <b>DATE2</b> - конечная дата. </li>        
+	* </ul>
 	*
 	* @return array <p>В случае если не установлена фильтрация по сайту, то структура
-	* возвращаемого массива будет следующей:</p> <pre class="syntax">Array ( [TOTAL_HITS]
-	* =&gt; суммарное количество хитов за все время ведения статистики
+	* возвращаемого массива будет следующей:</p><pre class="syntax">Array (     [TOTAL_HITS]
+	* =&gt; суммарное количество хитов за все время ведения статистики    
 	* [TOTAL_SESSIONS] =&gt; суммарное количество сессий за все время ведения
-	* статистики [TOTAL_EVENTS] =&gt; суммарное количество событий за все время
-	* ведения статистики [TOTAL_HOSTS] =&gt; суммарное количество хостов за все
-	* время ведения статистики [TOTAL_GUESTS] =&gt; суммарное количество
-	* посетителей за все время ведения статистики [TOTAL_FAVORITES] =&gt;
-	* суммарное количество посетителей, добавивших сайт в "<a
+	* статистики     [TOTAL_EVENTS] =&gt; суммарное количество событий за все
+	* время ведения статистики     [TOTAL_HOSTS] =&gt; суммарное количество
+	* хостов за все время ведения статистики     [TOTAL_GUESTS] =&gt; суммарное
+	* количество посетителей за все время ведения статистики    
+	* [TOTAL_FAVORITES] =&gt; суммарное количество посетителей, добавивших сайт в
+	*                          "<a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>" за все время
-	* ведения статистики [TODAY_HITS] =&gt; количество хитов за сегодня
-	* [TODAY_SESSIONS] =&gt; количество сессий за сегодня [TODAY_EVENTS] =&gt; количество
-	* событий за сегодня [TODAY_HOSTS] =&gt; количество хостов за сегодня
-	* [TODAY_GUESTS] =&gt; суммарное количество посетителей за сегодня
-	* [TODAY_NEW_GUESTS] =&gt; количество <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> за
-	* сегодня [TODAY_FAVORITES] =&gt; количество посетителей, добавивших сайт в
-	* "Избранное", за сегодня [YESTERDAY_HITS] =&gt; количество хитов за вчера
-	* [YESTERDAY_SESSIONS] =&gt; количество сессий за вчера [YESTERDAY_EVENTS] =&gt;
-	* количество событий за вчера [YESTERDAY_HOSTS] =&gt; количество хостов за
-	* вчера [YESTERDAY_GUESTS] =&gt; суммарное количество посетителей за вчера
-	* [YESTERDAY_NEW_GUESTS] =&gt; количество новых посетителей за вчера
-	* [YESTERDAY_FAVORITES] =&gt; количество посетителей, добавивших сайт в
-	* "Избранное", за вчера [B_YESTERDAY_HITS] =&gt; количество хитов за позавчера
-	* [B_YESTERDAY_SESSIONS] =&gt; количество сессий за позавчера [B_YESTERDAY_EVENTS] =&gt;
-	* количество событий за позавчера [B_YESTERDAY_HOSTS] =&gt; количество хостов
-	* за позавчера [B_YESTERDAY_GUESTS] =&gt; суммарное количество посетителей за
-	* позавчера [B_YESTERDAY_NEW_GUESTS] =&gt; количество новых посетителей за
-	* позавчера [B_YESTERDAY_FAVORITES] =&gt; количество посетителей, добавивших
-	* сайт в "Избранное", за позавчера [PERIOD_HITS] =&gt; количество хитов за
-	* установленный период времени (<i>filter</i>[<b>DATE1</b>], <i>filter</i>[<b>DATE2</b>])
-	* [PERIOD_SESSIONS] =&gt; количество сессий за установленный период времени
-	* [PERIOD_EVENTS] =&gt; количество событий за установленный период времени
-	* [PERIOD_NEW_GUESTS] =&gt; количество новых посетителей за установленный
-	* период времени [PERIOD_FAVORITES] =&gt; количество посетителей, добавивших
-	* сайт в "Избранное", за установленный период времени [ONLINE_GUESTS] =&gt;
-	* количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в
-	* online</a> )</pre> <p></p>
+	* ведения статистики     [TODAY_HITS] =&gt; количество хитов за сегодня    
+	* [TODAY_SESSIONS] =&gt; количество сессий за сегодня     [TODAY_EVENTS] =&gt;
+	* количество событий за сегодня     [TODAY_HOSTS] =&gt; количество хостов за
+	* сегодня     [TODAY_GUESTS] =&gt; суммарное количество посетителей за
+	* сегодня     [TODAY_NEW_GUESTS] =&gt; количество <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a>  за
+	* сегодня     [TODAY_FAVORITES] =&gt; количество посетителей, добавивших сайт в
+	*                          "Избранное", за сегодня     [YESTERDAY_HITS] =&gt; количество
+	* хитов за вчера     [YESTERDAY_SESSIONS] =&gt; количество сессий за вчера    
+	* [YESTERDAY_EVENTS] =&gt; количество событий за вчера     [YESTERDAY_HOSTS] =&gt;
+	* количество хостов за вчера     [YESTERDAY_GUESTS] =&gt; суммарное количество
+	* посетителей за вчера     [YESTERDAY_NEW_GUESTS] =&gt; количество новых
+	* посетителей за вчера     [YESTERDAY_FAVORITES] =&gt; количество посетителей,
+	* добавивших сайт в                              "Избранное", за вчера    
+	* [B_YESTERDAY_HITS] =&gt; количество хитов за позавчера     [B_YESTERDAY_SESSIONS] =&gt;
+	* количество сессий за позавчера     [B_YESTERDAY_EVENTS] =&gt; количество
+	* событий за позавчера     [B_YESTERDAY_HOSTS] =&gt; количество хостов за
+	* позавчера     [B_YESTERDAY_GUESTS] =&gt; суммарное количество посетителей за
+	* позавчера     [B_YESTERDAY_NEW_GUESTS] =&gt; количество новых посетителей за
+	* позавчера     [B_YESTERDAY_FAVORITES] =&gt; количество посетителей, добавивших
+	* сайт в                                "Избранное", за позавчера     [PERIOD_HITS] =&gt;
+	* количество хитов за установленный период времени                     
+	* (<i>filter</i>[<b>DATE1</b>], <i>filter</i>[<b>DATE2</b>])     [PERIOD_SESSIONS] =&gt; количество сессий
+	* за установленный период времени     [PERIOD_EVENTS] =&gt; количество
+	* событий за установленный период времени     [PERIOD_NEW_GUESTS] =&gt;
+	* количество новых посетителей за установленный                           
+	* период времени     [PERIOD_FAVORITES] =&gt; количество посетителей,
+	* добавивших сайт в                           "Избранное", за установленный
+	* период времени     [ONLINE_GUESTS] =&gt; количество <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a> )</pre><p></p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим данные по посещаемости сайта
 	* $arr = <b>CTraffic::GetCommonValues</b>();
@@ -560,8 +571,8 @@ class CTraffic extends CAllTraffic
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cuseronline/getguestcount.php">CUserOnline::GetGuestCount</a>
-	* </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
-	* статистика"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
+	* статистика"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -689,23 +700,24 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	*
 	*
-	* @param string &$by = "ref_today" Поле для сортировки. Возможные значения: <ul> <li> <b>ref_server</b> -
-	* ссылающийся сайт; </li> <li> <b>ref_today</b> - количество заходов с
-	* ссылающегося сайта за сегодня; </li> <li> <b>ref_yesterday</b> - количество
-	* заходов с ссылающегося сайта за вчера; </li> <li> <b>ref_bef_yesterday</b> -
-	* количество заходов с ссылающегося сайта за позавчера; </li> <li>
-	* <b>ref_total</b> - суммарное количество заходов с ссылающегося сайта; </li>
-	* <li> <b>ref_period</b> - количество заходов с ссылающегося сайта за
-	* установленный период времени <nobr>(<i>filter</i>[<b>DATE1</b>],
-	* <i>filter</i>[<b>DATE2</b>])</nobr>. </li> </ul>
+	* @param string &$by = "ref_today" Поле для сортировки. Возможные значения:          <ul> <li> <b>ref_server</b> -
+	* ссылающийся сайт; </li>                    <li> <b>ref_today</b> - количество заходов с
+	* ссылающегося сайта за сегодня; </li>                    <li> <b>ref_yesterday</b> -
+	* количество заходов с ссылающегося сайта за вчера; </li>                   
+	* <li> <b>ref_bef_yesterday</b> - количество заходов с ссылающегося сайта за
+	* позавчера; </li>                    <li> <b>ref_total</b> - суммарное количество
+	* заходов с ссылающегося сайта; </li>                    <li> <b>ref_period</b> -
+	* количество заходов с ссылающегося сайта за установленный период
+	* времени <nobr>(<i>filter</i>[<b>DATE1</b>], <i>filter</i>[<b>DATE2</b>])</nobr>. </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
-	* необходимо получить статистику по ссылающимся сайтам; </li> <li>
-	* <b>DATE1</b> - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
+	* допустимы следующие ключи:          <ul> <li> <b>SITE_ID</b> - ID сайта для
+	* которого необходимо получить статистику по ссылающимся сайтам;
+	* </li>                    <li> <b>DATE1</b> - начальная дата; </li>                    <li> <b>DATE2</b> -
+	* конечная дата. </li>         </ul>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка ссылающихся сайтов. Если значение
 	* равно "true", то список был отфильтрован.
@@ -717,7 +729,7 @@ class CTraffic extends CAllTraffic
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим дополнительные данные за декабрь 2007 года
 	* $arFilter = array(
@@ -751,8 +763,8 @@ class CTraffic extends CAllTraffic
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/creferer/index.php">Класс "CReferer"</a>
-	* </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
-	* статистика"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
+	* статистика"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -853,21 +865,23 @@ class CTraffic extends CAllTraffic
 	* <p>Возвращает количество <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковых фраз</a> за весь период ведения статистики, за последние 3 дня, а также за произвольный указанный интервал времени.</p>
 	*
 	*
-	* @param string &$by = "s_today" Поле для сортировки. Возможные значения: <ul> <li> <b>s_phrase</b> -
-	* поисковая фраза; </li> <li> <b>s_today</b> - количество поисковых фраз за
-	* сегодня; </li> <li> <b>s_yesterday</b> - количество поисковых фраз за вчера; </li>
-	* <li> <b>s_bef_yesterday</b> - количество поисковых фраз за позавчера; </li> <li>
-	* <b>s_total</b> - суммарное количество поисковых фраз; </li> <li> <b>s_period</b> -
-	* количество поисковых фраз за установленный период времени
-	* <nobr>(<i>filter</i>[<b>DATE1</b>], <i>filter</i>[<b>DATE2</b>])</nobr>. </li> </ul>
+	* @param string &$by = "s_today" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_phrase</b> -
+	* поисковая фраза; </li>                    <li> <b>s_today</b> - количество поисковых
+	* фраз за сегодня; </li>                    <li> <b>s_yesterday</b> - количество поисковых
+	* фраз за вчера; </li>                    <li> <b>s_bef_yesterday</b> - количество поисковых
+	* фраз за позавчера; </li>                    <li> <b>s_total</b> - суммарное количество
+	* поисковых фраз; </li>                    <li> <b>s_period</b> - количество поисковых
+	* фраз за установленный период времени <nobr>(<i>filter</i>[<b>DATE1</b>],
+	* <i>filter</i>[<b>DATE2</b>])</nobr>. </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>SITE_ID</b> - ID сайта для которого
-	* необходимо получить статистику по поисковым фразам; </li> <li> <b>DATE1</b>
-	* - начальная дата; </li> <li> <b>DATE2</b> - конечная дата. </li> </ul>
+	* допустимы следующие ключи:          <ul> <li> <b>SITE_ID</b> - ID сайта для
+	* которого необходимо получить статистику по поисковым фразам; </li> 
+	*                   <li> <b>DATE1</b> - начальная дата; </li>                    <li> <b>DATE2</b> -
+	* конечная дата. </li>         </ul>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка поисковых фраз. Если значение
 	* равно "true", то список был отфильтрован.
@@ -879,7 +893,7 @@ class CTraffic extends CAllTraffic
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим дополнительные данные за декабрь 2007 года
 	* $arFilter = array(
@@ -910,9 +924,9 @@ class CTraffic extends CAllTraffic
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cphrase/index.php">Класс "CPhrase"</a> </li>
-	* <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
-	* статистика"</a> </li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cphrase/index.php">Класс "CPhrase"</a> </li> 
+	*  <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/stat_list.php">Отчет "Сводная
+	* статистика"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static

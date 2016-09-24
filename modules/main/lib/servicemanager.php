@@ -18,7 +18,7 @@ final class ServiceManager
 		// событие на регистрацию сервисов
 	}
 
-public 	public function register($name, $tool)
+	public function register($name, $tool)
 	{
 		if (!isset($this->tools[$name]))
 			$this->tools[$name] = array();
@@ -26,7 +26,7 @@ public 	public function register($name, $tool)
 		array_unshift($this->tools[$name], $tool);
 	}
 
-public 	public function unregister($name)
+	public function unregister($name)
 	{
 		if (!isset($this->tools[$name]))
 			$this->tools[$name] = array();
@@ -34,7 +34,7 @@ public 	public function unregister($name)
 		array_shift($this->tools[$name]);
 	}
 
-	public public function get($name)
+	public function get($name)
 	{
 		if (isset($this->tools[$name]) && count($this->tools[$name]) > 0)
 		{
@@ -63,7 +63,7 @@ public 	public function unregister($name)
 		return null;
 	}
 
-public 	public function offsetExists($name)
+	public function offsetExists($name)
 	{
 		return isset($this->tools[$name]) && count($this->tools[$name]) > 0;
 	}
@@ -73,7 +73,7 @@ public 	public function offsetExists($name)
 		return $this->get($name);
 	}
 
-public 	public function offsetSet($name, $tool)
+	public function offsetSet($name, $tool)
 	{
 		$this->register($name, $tool);
 	}
@@ -83,7 +83,7 @@ public 	public function offsetSet($name, $tool)
 		$this->unregister($name);
 	}
 
-public 	public function __set($name, $tool)
+	public function __set($name, $tool)
 	{
 		$this->register($name, $tool);
 	}
@@ -93,7 +93,7 @@ public 	public function __set($name, $tool)
 		return $this->get($name);
 	}
 
-public 	public function getToolDb()
+	public function getToolDb()
 	{
 		return $this->get("DB");
 	}

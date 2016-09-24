@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице. 
+ * <b>CWikiParser</b> - Класс обрабатывающий вики-разметку в странице.
  *
  *
  * @return mixed 
@@ -32,21 +32,21 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы. Динамичный метод.</p>
+	* <p>Метод обрабатывает содержимое Wiki-страницы. Нестатический метод.</p>
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы </ht
+	* @param string $text  Содержимое Wiki-страницы
 	*
-	* @param typ $e = 'text' Тип содержимого Wiki-страницы (html|text). Необязательный.
+	* @param  $type = 'text' Тип содержимого Wiki-страницы (html|text). Необязательный.
 	*
-	* @param arFil $e = array() Массив изображений. Необязательный.
+	* @param  $arFile = array() Массив изображений. Необязательный.
 	*
-	* @param arParam $s = array() Путь до папки. Необязательный.
+	* @param  $arParams = array() Путь до папки. Необязательный.
 	*
-	* @return string <p>Возвращает обработанную Wiki-страницу, без Wiki-разметки. <br></p>
+	* @return string <p>Возвращает обработанную Wiki-страницу, без Wiki-разметки.    <br></p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>
 	* // Обработаем содержимое страницы "Тестовая страница" инфо.блока с идентификатором 2
 	* $IBLOCK_ID = 2;
@@ -65,7 +65,7 @@ class CWikiParser
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikisecurity/clear.php">CWikiSecurity::clear</a> </li>
-	* </ul><a name="examples"></a>
+	*  </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -155,7 +155,7 @@ class CWikiParser
 
 		if ($type == 'text')
 		{
-			$text = preg_replace("/(<\s*\/(h(\d+)|li|ul|p)\s*>)\s*(<\s*br\s*\/*\s*>){0,1}(\s*(\r*\n)\s*){1,2}/ism", "$1##NN##", $text);
+			$text = preg_replace("/(<\s*\/?(h(\d+)|li|ul|ol|p|table|tbody|td|tr|hr|div|span)\s*>)\s*(<\s*br\s*\/*\s*>){0,1}(\s*(\r*\n)\s*){1,2}/ism", "$1##NN##", $text);
 			$text = preg_replace("/(<\s*(ul)\s*>)\s*(<\s*br\s*\/*\s*>){0,1}(\s*(\r*\n)\s*){1,2}/ism", "$1##NN##", $text);
 			$text = preg_replace("/<\s*br\s*\/*\s*>\s*(\r*\n)/ismU", "##BR##", $text);
 			$text = self::NToBr($text);
@@ -198,12 +198,12 @@ class CWikiParser
 			'dt'		=> array('style','id','class'),
 			'dd'		=> array('style','id','class'),
 			'font'		=> array('color','size','face','style','id','class'),
-			'h1'		=> array('style','id','class','align'),
-			'h2'		=> array('style','id','class','align'),
-			'h3'		=> array('style','id','class','align'),
-			'h4'		=> array('style','id','class','align'),
-			'h5'		=> array('style','id','class','align'),
-			'h6'		=> array('style','id','class','align'),
+			'h1'		=> array('id','class','align'),
+			'h2'		=> array('id','class','align'),
+			'h3'		=> array('id','class','align'),
+			'h4'		=> array('id','class','align'),
+			'h5'		=> array('id','class','align'),
+			'h6'		=> array('id','class','align'),
 			'hr'		=> array('style','id','class'),
 			'i'			=> array('style','id','class'),
 			'img'		=> array('src','alt','height','width','title'),
@@ -256,7 +256,7 @@ class CWikiParser
 			$bLink = true;
 
 		// if the internal file then get it
-		$sFile = $sFileName = $sPath = trim($matches[3]);
+		$sFile = $sFileName = $sPath = CWikiUtils::htmlspecialcharsback(trim($matches[3]));
 		$bOur = false;
 
 		if (is_numeric($sFile) && in_array($sFile, $this->arFile))
@@ -318,7 +318,9 @@ class CWikiParser
 						'border="0" align="'.$sImageAlign.'"'
 					);
 				}
-			} else {
+			}
+			else
+			{
 				if ($bLink)
 					$sReturn = '<a href="'.htmlspecialcharsbx($sPath).'" title="'.($s = htmlspecialcharsbx($sName)).'">'.$s.'</a>';
 				else
@@ -435,7 +437,8 @@ class CWikiParser
 	public function processToc($text)
 	{
 		$matches = array();
-		if (preg_match_all('/<H(\d{1})>(.*)<\/H\\1>/isU'.BX_UTF_PCRE_MODIFIER, $text, $matches, PREG_SET_ORDER))
+		$sToc = '';
+		if (preg_match_all('/<H(?<level>\d)(?<parameters>.*)>(?<innerHtml>.*)<\/H\g<level>>/isU'.BX_UTF_PCRE_MODIFIER, $text, $matches, PREG_SET_ORDER))
 		{
 			if (count($matches) > 4)
 			{
@@ -448,14 +451,13 @@ class CWikiParser
 				$iPrevItemTocLevel = 0;
 				// current user defined the level of TOC
 				$iRealItemTocLevel = 1;
-				$sToc = '';
 
 				$bfirst = true;
 				$aNumToc = array();
 				foreach ($matches as $_m =>  $arMatch)
 				{
-					$iRealItemTocLevel = (int)$arMatch[1];
-					$sItemToc = trim($arMatch[2]);
+					$iRealItemTocLevel = (int)$arMatch['level'];
+					$sItemToc = trim($arMatch['innerHtml']);
 					// normalize levels
 					if ($bfirst && $iRealPrevItemTocLevel < $iRealItemTocLevel)
 						$iItemTocLevel = 1;
@@ -517,25 +519,23 @@ class CWikiParser
 						$sToc.= $this->postUrl;
 
 					$sToc .= '#'.$sItemTocId.'">'.$sNumToc.' '.strip_tags($sItemToc).'</a></li>';
-					$matches[$_m][2] = $sItemToc;
-					$matches[$_m][3] = $sItemTocId;
+					$matches[$_m]['innerHtml'] = $sItemToc;
+					$matches[$_m]['tocId'] = $sItemTocId;
 				}
-			}
 
-			for ($i = $iCurrentTocLevel; $i > 0; $i--)
-				$sToc .= '</ul>';
+				for ($i = $iCurrentTocLevel; $i > 0; $i--)
+					$sToc .= '</ul>';
 
-			reset($matches);
-			$bfirst = true;
-
-			foreach ($matches as $arMatch)
-			{
-				$sReplase = '<H'.$arMatch[1].'><span id="'.$arMatch[3].'">'.$arMatch[2].'</span></H'.$arMatch[1].'>';
-				if ($bfirst)
-					$sReplase = $sToc.'<br/>'.$sReplase;
-				// so as not to replace all of the same titles
-				$text = preg_replace('/'.preg_quote($arMatch[0], '/').'/'.BX_UTF_PCRE_MODIFIER, $sReplase, $text, 1);
-				$bfirst = false;
+				$bfirst = true;
+				foreach ($matches as $arMatch)
+				{
+					$sReplase = '<H'.$arMatch['level'].$arMatch['parameters'].'><span id="'.$arMatch['tocId'].'">'.$arMatch['innerHtml'].'</span></H'.$arMatch['level'].'>';
+					if ($bfirst)
+						$sReplase = $sToc.'<br/>'.$sReplase;
+					// so as not to replace all of the same titles
+					$text = preg_replace('/'.preg_quote($arMatch[0], '/').'/'.BX_UTF_PCRE_MODIFIER, $sReplase, $text, 1);
+					$bfirst = false;
+				}
 			}
 		}
 
@@ -582,19 +582,18 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением. Динамичный метод.</p>
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением.  Нестатический метод.</p>
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы </ht
+	* @param string $text  Содержимое Wiki-страницы
 	*
 	* @param array &$arCat  Массив будет заполнен категориями, указанными в тексте страницы
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br><br>$IBLOCK_ID = 2;<br>$NAME = 'Тестовая страница';<br>$arFilter = array(<br>	'ACTIVE' =&gt; 'Y',<br>	'CHECK_PERMISSIONS' =&gt; 'N',<br>	'IBLOCK_ID' =&gt; $IBLOCK_ID<br>);<br>$arElement = CWiki::GetElementByName($NAME, $arFilter);<br>$arCat = array();<br><br>$CWikiParser = new CWikiParser();<br>echo $CWikiParser-&gt;parseBeforeSave($arElement['~DETAIL_TEXT'], $arCat);<br><br>?&gt;
-	* </htm
 	* </pre>
 	*
 	*
@@ -613,7 +612,8 @@ class CWikiParser
 
 		// Category
 		$matches = array();
-		if (preg_match_all('/\[\[(Category|'.GetMessage('CATEGORY_NAME').'):(.+)\]\]/iU'.BX_UTF_PCRE_MODIFIER, $text, $matches))
+		$textWithoutNowiki = preg_replace('/(<nowiki>(.*)<\/nowiki>)/isU'.BX_UTF_PCRE_MODIFIER, '', $text);
+		if (preg_match_all('/\[\[(Category|'.GetMessage('CATEGORY_NAME').'):(.+)\]\]/iU'.BX_UTF_PCRE_MODIFIER, $textWithoutNowiki, $matches))
 			$arCat = array_unique($matches[2]);
 
 		//$text = preg_replace_callback('/(##NOWIKI(\d+)##)/isU'.BX_UTF_PCRE_MODIFIER, array(&$this, '_noWikiReturn2Callback'), $text);
@@ -623,10 +623,10 @@ class CWikiParser
 
 	
 	/**
-	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением. Динамичный метод.</p>
+	* <p>Метод обрабатывает содержимое Wiki-страницы перед сохранением.  Нестатический метод.</p>
 	*
 	*
-	* @param string $text  Содержимое Wiki-страницы </ht
+	* @param string $text  Содержимое Wiki-страницы
 	*
 	* @return string 
 	*

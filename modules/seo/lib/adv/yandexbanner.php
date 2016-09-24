@@ -59,6 +59,17 @@ class YandexBannerTable extends AdvEntity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает путь к файлу, содержащему определение класса. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/getfilepath.php
+	* @author Bitrix
+	*/
 	public static function getFilePath()
 	{
 		return __FILE__;
@@ -69,6 +80,17 @@ class YandexBannerTable extends AdvEntity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы, содержащей локальную копию объявлений в Яндекс.Директ. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_seo_adv_banner';
@@ -79,6 +101,17 @@ class YandexBannerTable extends AdvEntity
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей таблицы, содержащей локальную копию объявлений в Яндекс.Директ. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array_merge(
@@ -120,6 +153,17 @@ class YandexBannerTable extends AdvEntity
 	 *
 	 * @return Engine\YandexDirect|null
 	 */
+	
+	/**
+	* <p>Метод возвращает ссылку на экземпляр класса <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/index.php">\Bitrix\Seo\Engine\YandexDirect</a>, отвечающего за подготовку и отправку запросов к Яндекс.Директ. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Seo\Engine\YandexDirect|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/getengine.php
+	* @author Bitrix
+	*/
 	public static function getEngine()
 	{
 		if(!self::$engine)
@@ -140,6 +184,25 @@ class YandexBannerTable extends AdvEntity
 	 * @throws Main\ArgumentException
 	 * @throws Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Метод выполняет проверку полей и добавляет новый баннер Яндекс.Директ.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные для добавления.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/onbeforeadd.php
+	* @author Bitrix
+	*/
 	public static function onBeforeAdd(Entity\Event $event)
 	{
 		$result = new Entity\EventResult();
@@ -205,6 +268,25 @@ class YandexBannerTable extends AdvEntity
 	 * @throws Main\ArgumentException
 	 * @throws Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Метод выполняет проверку полей и обновляет баннер Яндекс.Директ. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Обновляемые данные.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/onbeforeupdate.php
+	* @author Bitrix
+	*/
 	public static function onBeforeUpdate(Entity\Event $event)
 	{
 		$result = new Entity\EventResult();
@@ -306,6 +388,25 @@ class YandexBannerTable extends AdvEntity
 	 * @throws Engine\YandexException
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод удаляет баннер из Яндекс.Директ. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Удаляемые данные.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexbannertable/ondelete.php
+	* @author Bitrix
+	*/
 	public static function onDelete(Entity\Event $event)
 	{
 		if(!static::$skipRemoteUpdate)

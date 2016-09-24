@@ -15,6 +15,17 @@ class ABTestTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает имя таблицы базы данных, соответствующей данной сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/abtesttable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_abtest';
@@ -25,6 +36,17 @@ class ABTestTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод возвращает список полей с типами.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/abtesttable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(

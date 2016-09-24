@@ -6,7 +6,7 @@ class CBlogPost extends CAllBlogPost
 	/*************** ADD, UPDATE, DELETE *****************/
 	public static function Add($arFields)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$arFields1 = array();
 
@@ -21,7 +21,7 @@ class CBlogPost extends CAllBlogPost
 
 		if (!CBlogPost::CheckFields("ADD", $arFields))
 			return false;
-		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_POST", 0, $arFields))
+		elseif(!$USER_FIELD_MANAGER->CheckFields("BLOG_POST", 0, $arFields, (isset($arFields["AUTHOR_ID"]) && intval($arFields["AUTHOR_ID"]) > 0 ? intval($arFields["AUTHOR_ID"]) : false)))
 			return false;
 
 		foreach(GetModuleEvents("blog", "OnBeforePostAdd", true) as $arEvent)
@@ -71,7 +71,7 @@ class CBlogPost extends CAllBlogPost
 			foreach(GetModuleEvents("blog", "OnBeforePostUserFieldUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array("BLOG_POST", $ID, $arFields));
 
-			$GLOBALS["USER_FIELD_MANAGER"]->Update("BLOG_POST", $ID, $arFields);
+			$USER_FIELD_MANAGER->Update("BLOG_POST", $ID, $arFields, (isset($arFields["AUTHOR_ID"]) && intval($arFields["AUTHOR_ID"]) > 0 ? intval($arFields["AUTHOR_ID"]) : false));
 		}
 
 		if ($ID)
@@ -84,7 +84,9 @@ class CBlogPost extends CAllBlogPost
 
 			$arFields["SC_PERM"] = Array();
 			if(array_key_exists("SOCNET_RIGHTS", $arFields))
+			{
 				$arFields["SC_PERM"] = CBlogPost::AddSocNetPerms($ID, $arFields["SOCNET_RIGHTS"], $arPost);
+			}
 
 			foreach(GetModuleEvents("blog", "OnPostAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array($ID, &$arFields));
@@ -159,7 +161,7 @@ class CBlogPost extends CAllBlogPost
 						}
 
 						$searchContent = blogTextParser::killAllTags($arPost["DETAIL_TEXT"]);
-						$searchContent .= "\r\n" . $GLOBALS["USER_FIELD_MANAGER"]->OnSearchIndex("BLOG_POST", $arPost["ID"]);
+						$searchContent .= "\r\n" . $USER_FIELD_MANAGER->OnSearchIndex("BLOG_POST", $arPost["ID"]);
 
 						$authorName = "";
 						if(IntVal($arPost["AUTHOR_ID"]) > 0)
@@ -168,11 +170,11 @@ class CBlogPost extends CAllBlogPost
 							if($arUser = $dbUser->Fetch())
 							{
 								$arTmpUser = array(
-										"NAME" => $arUser["NAME"],
-										"LAST_NAME" => $arUser["LAST_NAME"],
-										"SECOND_NAME" => $arUser["SECOND_NAME"],
-										"LOGIN" => $arUser["LOGIN"],
-									);
+									"NAME" => $arUser["NAME"],
+									"LAST_NAME" => $arUser["LAST_NAME"],
+									"SECOND_NAME" => $arUser["SECOND_NAME"],
+									"LOGIN" => $arUser["LOGIN"],
+								);
 								$authorName = CUser::FormatName(CSite::GetNameFormat(), $arTmpUser, false, false);
 								if(strlen($authorName) > 0)
 									$searchContent .= "\r\n".$authorName;
@@ -245,7 +247,7 @@ class CBlogPost extends CAllBlogPost
 
 	public static function Update($ID, $arFields, $bSearchIndex = true)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER, $CACHE_MANAGER;
 
 		$ID = IntVal($ID);
 		if(strlen($arFields["PATH"]) > 0)
@@ -263,7 +265,7 @@ class CBlogPost extends CAllBlogPost
 
 		if (!CBlogPost::CheckFields("UPDATE", $arFields, $ID))
 			return false;
-		elseif(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("BLOG_POST", $ID, $arFields))
+		elseif(!$USER_FIELD_MANAGER->CheckFields("BLOG_POST", $ID, $arFields, (isset($arFields["AUTHOR_ID"]) && intval($arFields["AUTHOR_ID"]) > 0 ? intval($arFields["AUTHOR_ID"]) : false)))
 			return false;
 
 		foreach(GetModuleEvents("blog", "OnBeforePostUpdate", true) as $arEvent)
@@ -312,7 +314,7 @@ class CBlogPost extends CAllBlogPost
 			foreach(GetModuleEvents("blog", "OnBeforePostUserFieldUpdate", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, Array("BLOG_POST", $ID, $arFields));
 
-			$GLOBALS["USER_FIELD_MANAGER"]->Update("BLOG_POST", $ID, $arFields);
+			$USER_FIELD_MANAGER->Update("BLOG_POST", $ID, $arFields, (isset($arFields["AUTHOR_ID"]) && intval($arFields["AUTHOR_ID"]) > 0 ? intval($arFields["AUTHOR_ID"]) : false));
 		}
 		else
 		{
@@ -433,7 +435,7 @@ class CBlogPost extends CAllBlogPost
 					}
 
 					$searchContent = blogTextParser::killAllTags($arNewPost["DETAIL_TEXT"]);
-					$searchContent .= "\r\n" . $GLOBALS["USER_FIELD_MANAGER"]->OnSearchIndex("BLOG_POST", $arNewPost["ID"]);
+					$searchContent .= "\r\n" . $USER_FIELD_MANAGER->OnSearchIndex("BLOG_POST", $arNewPost["ID"]);
 
 					$authorName = "";
 					if(IntVal($arNewPost["AUTHOR_ID"]) > 0)
@@ -460,8 +462,8 @@ class CBlogPost extends CAllBlogPost
 						"PARAM2" => $arNewPost["BLOG_ID"],
 						"PARAM3" => $arNewPost["ID"],
 						"PERMISSIONS" => array(2),
-						"TITLE" => $arNewPost["TITLE"],
-						"BODY" => $searchContent,
+						"TITLE" => CSearch::KillTags($arNewPost["MICRO"] == "Y" ? $arNewPost["TITLE"] : htmlspecialcharsEx($arNewPost["TITLE"])),
+						"BODY" => CSearch::KillTags($searchContent),
 						"TAGS" => $tag,
 						"USER_ID" => $arNewPost["AUTHOR_ID"],
 						"ENTITY_TYPE_ID" => "BLOG_POST",
@@ -525,7 +527,7 @@ class CBlogPost extends CAllBlogPost
 							"BLOG_ID" => $arBlog["ID"],
 							"POST_ID" => $ID,
 							"SITE_ID" => $arGroup["SITE_ID"],
-							"PATH" => $arPostSite[$arGroup["SITE_ID"]]."?commentId=#comment_id###comment_id#",
+							"PATH" => $arPostSite[$arGroup["SITE_ID"]]."?commentId=#comment_id##com#comment_id#",
 							"BLOG_URL" => $arBlog["URL"],
 							"OWNER_ID" => $arBlog["OWNER_ID"],
 							"SOCNET_GROUP_ID" => $arBlog["SOCNET_GROUP_ID"],
@@ -539,6 +541,10 @@ class CBlogPost extends CAllBlogPost
 		}
 
 		BXClearCache(true, '/blog/socnet_post/gen/'.intval($ID / 100)."/".$ID);
+		if(defined("BX_COMP_MANAGED_CACHE"))
+		{
+			$CACHE_MANAGER->ClearByTag("blog_post_".$ID);
+		}
 
 		return $ID;
 	}
@@ -580,7 +586,7 @@ class CBlogPost extends CAllBlogPost
 
 	public static function GetList($arOrder = Array("ID" => "DESC"), $arFilter = Array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
-		global $DB, $USER_FIELD_MANAGER, $USER;
+		global $DB, $USER_FIELD_MANAGER, $USER, $APPLICATION;
 
 		$obUserFieldsSql = new CUserTypeSQL;
 		$obUserFieldsSql->SetEntity("BLOG_POST", "P.ID");
@@ -793,12 +799,12 @@ class CBlogPost extends CAllBlogPost
 
 		// <-- FIELDS
 		$bNeedDistinct = false;
-		$blogModulePermissions = $GLOBALS["APPLICATION"]->GetGroupRight("blog");
+		$blogModulePermissions = $APPLICATION->GetGroupRight("blog");
 		if ($blogModulePermissions < "W")
 		{
 			$user_id = 0;
 			if(isset($USER) && is_object($USER) && $USER->IsAuthorized())
-				$user_id = $GLOBALS["USER"]->GetID();
+				$user_id = $USER->GetID();
 
 			if(!CBlog::IsBlogOwner($arFilter["BLOG_ID"], $user_id))
 			{
@@ -980,13 +986,17 @@ class CBlogPost extends CAllBlogPost
 
 	public static function GetListCalendar($blogID, $year = false, $month = false, $day = false)
 	{
-		global $DB;
+		global $DB, $USER, $APPLICATION;
 
 		$blogID = IntVal($blogID);
 
-		if ($year)
-			if (strlen($year) == 2)
-				$year = "20".$year;
+		if (
+			$year
+			&& strlen($year) == 2
+		)
+		{
+			$year = "20".$year;
+		}
 
 		if ($year && $month && $day)
 		{
@@ -1006,7 +1016,7 @@ class CBlogPost extends CAllBlogPost
 		$datePublishFrom = ConvertTimeStamp($date1, "SHORT", SITE_ID);
 		$datePublishTo = ConvertTimeStamp($date2, "SHORT", SITE_ID);
 
-		$arUserGroups = CBlogUser::GetUserGroups(($GLOBALS["USER"]->IsAuthorized() ? $GLOBALS["USER"]->GetID() : 0), $arFilter["BLOG_ID"], "Y", BLOG_BY_USER_ID);
+		$arUserGroups = CBlogUser::GetUserGroups(($USER->IsAuthorized() ? $USER->GetID() : 0), $blogID, "Y", BLOG_BY_USER_ID);
 		$strUserGroups = "0";
 		foreach($arUserGroups as $v)
 			$strUserGroups .= ",".IntVal($v);
@@ -1019,7 +1029,7 @@ class CBlogPost extends CAllBlogPost
 			"			AND UGP.PERMS_TYPE = '".$DB->ForSql(BLOG_PERMS_POST)."') ";
 		$strWherePerms = " AND (UGP.PERMS > 'D') ";
 
-		$blogModulePermissions = $GLOBALS["APPLICATION"]->GetGroupRight("blog");
+		$blogModulePermissions = $APPLICATION->GetGroupRight("blog");
 		if ($blogModulePermissions >= "W")
 		{
 			$strFromPerms = "";

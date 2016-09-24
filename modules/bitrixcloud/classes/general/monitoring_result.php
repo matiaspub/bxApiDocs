@@ -1,4 +1,5 @@
 <?php
+
 interface CBitrixCloudMonitoring_Access extends Iterator, ArrayAccess
 {
 	// new stuff
@@ -11,6 +12,7 @@ class CBitrixCloudMonitoringTest
 	private $time = 0;
 	private $uptime = "";
 	private $result = "";
+
 	/**
 	 *
 	 * @param string $name
@@ -28,6 +30,7 @@ class CBitrixCloudMonitoringTest
 		$this->uptime = $uptime;
 		$this->result = $result;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -37,6 +40,7 @@ class CBitrixCloudMonitoringTest
 	{
 		return $this->name;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -46,6 +50,7 @@ class CBitrixCloudMonitoringTest
 	{
 		return $this->status;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -55,6 +60,7 @@ class CBitrixCloudMonitoringTest
 	{
 		return $this->result;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -64,6 +70,7 @@ class CBitrixCloudMonitoringTest
 	{
 		return $this->uptime;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -73,6 +80,7 @@ class CBitrixCloudMonitoringTest
 	{
 		return $this->time;
 	}
+
 	/**
 	 *
 	 * @param CDataXMLNode $node
@@ -90,12 +98,15 @@ class CBitrixCloudMonitoringTest
 		);
 	}
 }
+
 class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Access
 {
 	/** @var string $name */
 	private $name = "";
 	/** @var array[int]CBitrixCloudMonitoringTest $tests */
-	private $tests = /*.(array[int]CBitrixCloudMonitoringTest.*/ array();
+	private $tests = /*.(array[int]CBitrixCloudMonitoringTest.*/
+		array();
+
 	/**
 	 *
 	 * @return string
@@ -105,6 +116,7 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 	{
 		return $this->name;
 	}
+
 	/**
 	 *
 	 * @return string
@@ -119,10 +131,11 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 		}
 		return CBitrixCloudMonitoringResult::GREEN_LAMP;
 	}
+
 	/**
 	 *
 	 * @param string $name
-	 * @param array[int]CBitrixCloudMonitoringTest $tests
+	 * @param array [int]CBitrixCloudMonitoringTest $tests
 	 * @return void
 	 *
 	 */
@@ -131,6 +144,7 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 		$this->name = $name;
 		$this->setTests($tests);
 	}
+
 	/**
 	 *
 	 * @param string $testName
@@ -141,6 +155,7 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 	{
 		return $this->tests[$testName];
 	}
+
 	/**
 	 *
 	 * @return array[int]CBitrixCloudMonitoringTest
@@ -150,9 +165,10 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 	{
 		return $this->tests;
 	}
+
 	/**
 	 *
-	 * @param array[int]CBitrixCloudMonitoringTest $tests
+	 * @param array [int]CBitrixCloudMonitoringTest $tests
 	 * @return CBitrixCloudMonitoringDomainResult
 	 *
 	 */
@@ -170,6 +186,7 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 		}
 		return $this;
 	}
+
 	public function saveToOptions(CBitrixCloudOption $option)
 	{
 		$tests = array();
@@ -184,10 +201,11 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 		}
 		$option->setArrayValue($tests);
 	}
+
 	public static function loadFromOptions($name, CBitrixCloudOption $option)
 	{
 		$tests = array();
-		foreach($option->getArrayValue() as $testName => $testResult)
+		foreach ($option->getArrayValue() as $testName => $testResult)
 		{
 			$testResult = unserialize($testResult);
 			if (is_array($testResult))
@@ -204,6 +222,7 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 		}
 		return new CBitrixCloudMonitoringDomainResult($name, $tests);
 	}
+
 	/**
 	 *
 	 * @param CDataXMLNode $node
@@ -225,45 +244,63 @@ class CBitrixCloudMonitoringDomainResult implements CBitrixCloudMonitoring_Acces
 	{
 		reset($this->tests);
 	}
+
 	public function current()
 	{
 		return current($this->tests);
 	}
+
 	public function key()
 	{
 		return key($this->tests);
 	}
+
 	public function next()
 	{
 		next($this->tests);
 	}
+
 	public function valid()
 	{
 		return key($this->tests) !== null;
 	}
-	public function offsetSet($offset, $value) {
-		if (is_null($offset)) {
+
+	public function offsetSet($offset, $value)
+	{
+		if (is_null($offset))
+		{
 			$this->tests[] = $value;
-		} else {
+		}
+		else
+		{
 			$this->tests[$offset] = $value;
 		}
 	}
-	public function offsetExists($offset) {
+
+	public function offsetExists($offset)
+	{
 		return isset($this->tests[$offset]);
 	}
-	public function offsetUnset($offset) {
+
+	public function offsetUnset($offset)
+	{
 		unset($this->tests[$offset]);
 	}
-	public function offsetGet($offset) {
-		return isset($this->tests[$offset]) ? $this->tests[$offset] : null;
+
+	public function offsetGet($offset)
+	{
+		return isset($this->tests[$offset])? $this->tests[$offset]: null;
 	}
 }
+
 class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 {
 	const GREEN_LAMP = 'green';
 	const RED_LAMP = 'red';
 
-	private $domains = /*.(array[string]CBitrixCloudMonitoringDomainResult).*/ array();
+	private $domains = /*.(array[string]CBitrixCloudMonitoringDomainResult).*/
+		array();
+
 	/**
 	 *
 	 * @param CBitrixCloudMonitoringDomainResult $domainResult
@@ -275,6 +312,7 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 		$this->domains[$domainResult->getName()] = $domainResult;
 		return $this;
 	}
+
 	/**
 	 *
 	 * @param string $domainName
@@ -285,6 +323,7 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 	{
 		return $this->domains[$domainName];
 	}
+
 	/**
 	 *
 	 * @return string
@@ -299,25 +338,29 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 		}
 		return CBitrixCloudMonitoringResult::GREEN_LAMP;
 	}
+
 	public static function isExpired()
 	{
 		$time = CBitrixCloudOption::getOption("monitoring_expire_time")->getIntegerValue();
 		return ($time < time());
 	}
+
 	public static function getExpirationTime()
 	{
 		return CBitrixCloudOption::getOption("monitoring_expire_time")->getIntegerValue();
 	}
+
 	public static function setExpirationTime($time)
 	{
 		$time = intval($time);
 		CBitrixCloudOption::getOption("monitoring_expire_time")->setStringValue($time);
 		return $time;
 	}
-	static public function loadFromOptions()
+
+	public static function loadFromOptions()
 	{
 		$domains = new CBitrixCloudMonitoringResult;
-		foreach(CBitrixCloudOption::getOption("monitoring_result")->getArrayValue() as $i => $domainName)
+		foreach (CBitrixCloudOption::getOption("monitoring_result")->getArrayValue() as $i => $domainName)
 		{
 			$domains->addDomainResult(CBitrixCloudMonitoringDomainResult::loadFromOptions(
 				$domainName,
@@ -326,6 +369,7 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 		}
 		return $domains;
 	}
+
 	public function saveToOptions()
 	{
 		$domainNames = array_keys($this->domains);
@@ -337,6 +381,7 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 			);
 		}
 	}
+
 	/**
 	 *
 	 * @param CDataXMLNode $node
@@ -355,40 +400,56 @@ class CBitrixCloudMonitoringResult implements CBitrixCloudMonitoring_Access
 		}
 		return $domains;
 	}
+
 	public function rewind()
 	{
 		reset($this->domains);
 	}
+
 	public function current()
 	{
 		return current($this->domains);
 	}
+
 	public function key()
 	{
 		return key($this->domains);
 	}
+
 	public function next()
 	{
 		next($this->domains);
 	}
+
 	public function valid()
 	{
 		return key($this->domains) !== null;
 	}
-	public function offsetSet($offset, $value) {
-		if (is_null($offset)) {
+
+	public function offsetSet($offset, $value)
+	{
+		if (is_null($offset))
+		{
 			$this->domains[] = $value;
-		} else {
+		}
+		else
+		{
 			$this->domains[$offset] = $value;
 		}
 	}
-	public function offsetExists($offset) {
+
+	public function offsetExists($offset)
+	{
 		return isset($this->domains[$offset]);
 	}
-	public function offsetUnset($offset) {
+
+	public function offsetUnset($offset)
+	{
 		unset($this->domains[$offset]);
 	}
-	public function offsetGet($offset) {
-		return isset($this->domains[$offset]) ? $this->domains[$offset] : null;
+
+	public function offsetGet($offset)
+	{
+		return isset($this->domains[$offset])? $this->domains[$offset]: null;
 	}
 }

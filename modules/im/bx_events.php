@@ -6,59 +6,7 @@
  */
 class _CEventsIm {
 /**
- * Вызывается после подтверждения уведомления
- * 
- * 
- * <i>Вызывается в методе:</i><br>
- * CIMNotify::Confirm<br><br>
- * 
- * 
- * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
- * @author Bitrix
- */
-	public static function OnAfterConfirmNotify(){}
-
-/**
- * Вызывается после получения контакт листа
- * 
- * 
- * <i>Вызывается в методе:</i><br>
- * CIMContactList::GetList<br><br>
- * 
- * 
- * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
- * @author Bitrix
- */
-	public static function OnAfterContactListGetList(){}
-
-/**
- * Вызывается после удаления сообщения
- * </html
- * <i>Вызывается в методе:</i><br>
- * CIMMessage::Delete<br><br>
- * 
- * 
- * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
- * @author Bitrix
- */
-	public static function OnAfterDeleteMessage(){}
-
-/**
- * Вызывается после удаления уведомления
- * 
- * 
- * <i>Вызывается в методе:</i><br>
- * CIMNotify::DeleteWithCheck<br><br>
- * 
- * 
- * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
- * @author Bitrix
- */
-	public static function OnAfterDeleteNotify(){}
-
-/**
- * Вызывается после добавления сообщения
- * 
+ * после добавления сообщения
  * <i>Вызывается в методе:</i><br>
  * CIMMessenger::Add<br><br>
  * 
@@ -69,22 +17,29 @@ class _CEventsIm {
 	public static function OnAfterMessagesAdd(){}
 
 /**
- * Вызывается после добавления уведомления
- * 
- * 
+ * перед добавлением сообщения
  * <i>Вызывается в методе:</i><br>
- * CIMMessenger::Add<br><br>
+ * CIMMessage::Add<br><br>
  * 
  * 
  * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
  * @author Bitrix
  */
-	public static function OnAfterNotifyAdd(){}
+	public static function OnBeforeMessagesAdd(){}
 
 /**
- * Вызывается перед подтверждением уведомления
+ * после подтверждения уведомления
+ * <i>Вызывается в методе:</i><br>
+ * CIMNotify::Confirm<br><br>
  * 
  * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterConfirmNotify(){}
+
+/**
+ * перед подтверждением уведомления
  * <i>Вызывается в методе:</i><br>
  * CIMNotify::Confirm<br><br>
  * 
@@ -95,13 +50,57 @@ class _CEventsIm {
 	public static function OnBeforeConfirmNotify(){}
 
 /**
- * <p>Результат:</p> <p><img src="/upload/api_help/main/OnBeforeMessageNotifyAdd.png"></p> <br><br>
+ * после удаления уведомления
+ * <i>Вызывается в методе:</i><br>
+ * CIMNotify::DeleteWithCheck<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterDeleteNotify(){}
+
+/**
+ * после добавления уведомления
+ * <i>Вызывается в методе:</i><br>
+ * CIMMessenger::Add<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterNotifyAdd(){}
+
+/**
+ * после удаления сообщения
+ * <i>Вызывается в методе:</i><br>
+ * CIMMessage::Delete<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterDeleteMessage(){}
+
+/**
+ * после получения контакт листа
+ * <i>Вызывается в методе:</i><br>
+ * CIMContactList::GetList<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterContactListGetList(){}
+
+/**
+ * <p>Результат:</p> <p><img src="//opt-560835.ssl.1c-bitrix-cdn.ru/upload/api_help/main/OnBeforeMessageNotifyAdd.png?145018767331985"></p> <br><br>
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * AddEventHandler("im", "OnBeforeMessageNotifyAdd", "___OnBeforeMessageNotifyAdd");
  * function ___OnBeforeMessageNotifyAdd($arFields)
  * {
@@ -121,9 +120,7 @@ class _CEventsIm {
  *             );
  *         }
  *     }
- * }
- * 
- * Результат:<img src="/upload/api_help/main/OnBeforeMessageNotifyAdd.png">
+ * }Результат:<img src="//opt-560835.ssl.1c-bitrix-cdn.ru/upload/api_help/main/OnBeforeMessageNotifyAdd.png?145018767331985">
  * </pre>
  *
  *
@@ -132,6 +129,53 @@ class _CEventsIm {
  * @author Bitrix
  */
 	public static function OnBeforeMessageNotifyAdd(){}
+
+/**
+ * после редактирования сообщения
+ * <i>Вызывается в методе:</i><br>
+ * CIMMessenger::Update<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterMessagesUpdate(){}
+
+/**
+ * после удаления сообщения
+ * <i>Вызывается в методе:</i><br>
+ * CIMMessenger::Delete<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterMessagesDelete(){}
+
+/**
+ * после загрузки файла
+ * <i>Вызывается в методе:</i><br>
+ * CIMDisk::UploadFile<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/index.php
+ * @author Bitrix
+ */
+	public static function OnAfterFileUpload(){}
+
+/**
+ * Событие вызывается после прочтения чата.
+ *
+ *
+ * @param array $arFields  Массив параметров чата.
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/im/events/onafterchatread.php
+ * @author Bitrix
+ */
+	public static function OnAfterChatRead($arFields){}
 
 
 }

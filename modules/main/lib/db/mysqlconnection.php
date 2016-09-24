@@ -31,25 +31,37 @@ class MysqlConnection extends MysqlCommonConnection
 	 */
 	protected function connectInternal()
 	{
-		if ($this->isConnected)
+		if($this->isConnected)
+		{
 			return;
+		}
 
-		if (($this->options & self::PERSISTENT) != 0)
+		if(($this->options & self::PERSISTENT) != 0)
+		{
 			$connection = mysql_pconnect($this->host, $this->login, $this->password);
+		}
 		else
+		{
 			$connection = mysql_connect($this->host, $this->login, $this->password, true);
+		}
 
-		if (!$connection)
+		if(!$connection)
+		{
 			throw new ConnectionException('Mysql connect error ['.$this->host.', '.gethostbyname($this->host).']', mysql_error());
+		}
 
-		if (!mysql_select_db($this->database, $connection))
-			throw new ConnectionException('Mysql select db error ['.$this->database.']', mysql_error($connection));
+		if($this->database !== null)
+		{
+			if(!mysql_select_db($this->database, $connection))
+			{
+				throw new ConnectionException('Mysql select db error ['.$this->database.']', mysql_error($connection));
+			}
+		}
 
 		$this->resource = $connection;
 		$this->isConnected = true;
 
-		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
-			include($fn);
+		$this->afterConnected();
 	}
 
 	/**
@@ -58,6 +70,17 @@ class MysqlConnection extends MysqlCommonConnection
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод отключает БД. Если связи не было установлено, ничего не производит.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlconnection/disconnectinternal.php
+	* @author Bitrix
+	*/
 	public function disconnectInternal()
 	{
 		if (!$this->isConnected)
@@ -133,6 +156,17 @@ class MysqlConnection extends MysqlCommonConnection
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает количество поражённых строк из последнего невыполненного запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlconnection/getaffectedrowscount.php
+	* @author Bitrix
+	*/
 	public function getAffectedRowsCount()
 	{
 		return mysql_affected_rows($this->getResource());
@@ -151,6 +185,23 @@ class MysqlConnection extends MysqlCommonConnection
 	 * @return string
 	 * @see \Bitrix\Main\DB\Connection::getType
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает тип БД:</p> <p></p> <ul><li> mysql </li></ul> <p>Без параметров</p>
+	*
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/gettype.php">\Bitrix\Main\DB\Connection::getType</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlconnection/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "mysql";
@@ -165,6 +216,17 @@ class MysqlConnection extends MysqlCommonConnection
 	 * @return array
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает версию подключённой БД.</p> <p>Версия представляется в виде массива из двух элементов:</p> - Первый (с индексом 0) - версия БД.<br> - Второй (с индексом 1) выводится, если используется light или express версия БД.<br><p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlconnection/getversion.php
+	* @author Bitrix
+	*/
 	public function getVersion()
 	{
 		if ($this->version == null)
@@ -189,5 +251,29 @@ class MysqlConnection extends MysqlCommonConnection
 	protected function getErrorMessage()
 	{
 		return sprintf("[%s] %s", mysql_errno($this->resource), mysql_error($this->resource));
+	}
+
+	/**
+	 * Selects the default database for database queries.
+	 *
+	 * @param string $database Database name.
+	 * @return bool
+	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает БД по умолчанию для запросов.</p>
+	*
+	*
+	* @param string $database  Имя БД.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlconnection/selectdatabase.php
+	* @author Bitrix
+	*/
+	public function selectDatabase($database)
+	{
+		return mysql_select_db($database, $this->resource);
 	}
 }

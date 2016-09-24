@@ -177,20 +177,24 @@ class CCalendarWebService extends IWebService
 		$bRecurrent = (isset($event['RRULE']) && $event['RRULE'] != "") ? 1 : 0;
 		$rrule = CCalendarEvent::ParseRRULE($event['RRULE']);
 
-		$ts_start = $event['DT_FROM_TS'];
-		$ts_finish = $event['DT_TO_TS'];
-		$bAllDay = $event['DT_SKIP_TIME'] == 'Y' ? 1 : 0;
+		$bAllDay = $event['DT_SKIP_TIME'] !== 'N' ? 1 : 0;
+		$ts_start = CCalendar::Timestamp($event['DATE_FROM'], false, !$bAllDay);
+		$ts_finish = CCalendar::Timestamp($event['DATE_TO'], false, !$bAllDay);
+		if (!$bAllDay)
+		{
+			$ts_start -= $event['~USER_OFFSET_FROM'];
+			$ts_finish -= $event['~USER_OFFSET_FROM'];
+		}
 
 		$TZBias = intval(date('Z'));
-		$offset = CCalendar::GetOffset();
 		$duration = $event['DT_LENGTH'];
 		if ($bAllDay)
 			$duration -= 20;
 
 		if (!$bAllDay || defined('OLD_OUTLOOK_VERSION'))
 		{
-			$ts_start = $ts_start - $TZBias - $offset; // We need time in UTC
-			$ts_finish = $ts_finish - $TZBias - $offset;
+			$ts_start = $event['DATE_FROM_TS_UTC']; // We need time in UTC
+			$ts_finish = $event['DATE_TO_TS_UTC'];
 		}
 
 		$obRow = new CXMLCreator('z:row');
@@ -217,7 +221,7 @@ class CCalendarWebService extends IWebService
 		$obRow->setAttribute('ows_MetaInfo_BusyStatus', $status === null ? -1 : $status);
 		$obRow->setAttribute('ows_MetaInfo_Priority', intval($arPriorityValues[$event['IMPORTANCE']]));
 		$obRow->setAttribute('ows_Created', $this->__makeDateTime(MakeTimeStamp($event['DATE_CREATE'])-$TZBias));
-		$obRow->setAttribute('ows_Modified', $this->__makeDateTime($change-$TZBias));
+		$obRow->setAttribute('ows_Modified', $this->__makeDateTime($change - $TZBias));
 		$obRow->setAttribute('ows_EventType', $bRecurrent ? 1 : 0);
 		$obRow->setAttribute('ows_Location', CCalendar::GetTextLocation($event['LOCATION']));
 		$obRow->setAttribute('ows_Description', $event['~DESCRIPTION']); // Description parsed from BB-codes to HTML
@@ -396,7 +400,7 @@ class CCalendarWebService extends IWebService
 		$count = 0;
 		foreach ($arEvents as  $event)
 		{
-			if ($event['DELETED'] != 'N' || ($event['IS_MEETING'] && $event['USER_MEETING']['STATUS'] == 'N'))
+			if ($event['DELETED'] != 'N' || ($event['IS_MEETING'] && $event['MEETING_STATUS'] == 'N'))
 			{
 				$obId = new CXMLCreator('Id');
 				$obId->setAttribute('ChangeType', 'Delete');
@@ -419,7 +423,7 @@ class CCalendarWebService extends IWebService
 		if ($last_change > 0)
 			$obChanges->setAttribute('LastChangeToken', $last_change);
 
-
+		CCalendar::SaveSyncDate($userId, 'outlook');
 		return array('GetListItemChangesSinceTokenResult' => $data);
 	}
 
@@ -508,8 +512,10 @@ class CCalendarWebService extends IWebService
 			elseif ($arData['_command'] == 'New' || $arData['_command'] == 'Update')
 			{
 				$q = ToLower($arData['Description']);
-				if (($pos = strrpos($q, '</body>')) !== false) $arData['Description'] = substr($arData['Description'], 0, $pos);
-				if (($pos = strpos($q, '<body>')) !== false) $arData['Description'] = substr($arData['Description'], $pos + 6);
+				if (($pos = strrpos($q, '</body>')) !== false)
+					$arData['Description'] = substr($arData['Description'], 0, $pos);
+				if (($pos = strpos($q, '<body>')) !== false)
+					$arData['Description'] = substr($arData['Description'], $pos + 6);
 
 				$arData['Description'] = str_replace('</DIV>', "\r\n</DIV>", $arData['Description']);
 				$arData['Description'] = str_replace(array("&#10;", "&#13;"), "", $arData['Description']);
@@ -521,9 +527,9 @@ class CCalendarWebService extends IWebService
 
 				if (isset($arData['EventDate']))
 				{
-					$arData['EventDate'] = $this->__makeTS($arData['EventDate']);
-					$arData['EndDate'] = $this->__makeTS($arData['EndDate']) + ($arData['fAllDayEvent'] ? -86340 : 0);
-					$TZBias = intval(date('Z', $arData['EventDate']));
+					$fromTsUTC = $this->__makeTS($arData['EventDate']);
+					$toTsUTC = $this->__makeTS($arData['EndDate']) + ($arData['fAllDayEvent'] ? -86340 : 0);
+					$TZBias = intval(date('Z', $fromTsUTC));
 				}
 
 				$arData['EventType'] = intval($arData['EventType']);
@@ -543,26 +549,9 @@ class CCalendarWebService extends IWebService
 				$id = $arData['_command'] == 'New' ? 0 : intVal($arData['ID']);
 				if ($arData['RecurrenceData'])
 				{
-					//$xmlstr = $arData['XMLTZone'];
-					//$arData['XMLTZone'] = new CDataXML();
-					//$arData['XMLTZone']->LoadString($xmlstr);
-
 					$xmlstr = $arData['RecurrenceData'];
 					$obRecurData = new CDataXML();
 					$obRecurData->LoadString($xmlstr);
-
-/*
-<recurrence>
-		<rule>
-			<firstDayOfWeek>mo</firstDayOfWeek>
-			<repeat>
-				<weekly mo='TRUE' tu='TRUE' th='TRUE' sa='TRUE' weekFrequency='1' />
-			</repeat>
-			<repeatForever>FALSE</repeatForever>
-		</rule>
-</recurrence>
-<deleteExceptions>true</deleteExceptions>
-*/
 
 					$obRecurRule = $obRecurData->tree->children[0]->children[0];
 					$obRecurRepeat = $obRecurRule->children[1];
@@ -586,10 +575,10 @@ class CCalendarWebService extends IWebService
 							}
 
 							$time_end = strtotime(
-								date(date('Y-m-d', $arData['EventDate']).' H:i:s', $arData['EndDate'])
+								date(date('Y-m-d', $fromTsUTC).' H:i:s', $toTsUTC)
 							);
 
-							$arData['DT_LENGTH'] = $time_end - $arData['EventDate'];
+							$arData['DT_LENGTH'] = $time_end - $fromTsUTC;
 						break;
 
 						case 'weekly':
@@ -606,26 +595,26 @@ class CCalendarWebService extends IWebService
 							$arData['RRULE']['BYDAY'] = implode(',', $arData['RRULE']['BYDAY']);
 							$arData['RRULE']['INTERVAL'] = $obNode->getAttribute('weekFrequency');
 
-							$time_end = strtotime(date(date('Y-m-d', $arData['EventDate']).' H:i:s', $arData['EndDate']));
+							$time_end = strtotime(date(date('Y-m-d', $fromTsUTC).' H:i:s', $toTsUTC));
 
-							$arData['DT_LENGTH'] = $time_end - $arData['EventDate'];
+							$arData['DT_LENGTH'] = $time_end - $fromTsUTC;
 						break;
 
 						case 'monthly':
 							$arData['RRULE']['FREQ'] = 'MONTHLY';
 							$arData['RRULE']['INTERVAL'] = $obNode->getAttribute('monthFrequency');
-							$time_end = strtotime(date(date('Y-m', $arData['EventDate']).'-d H:i:s', $arData['EndDate']));
+							$time_end = strtotime(date(date('Y-m', $fromTsUTC).'-d H:i:s', $toTsUTC));
 
-							$arData['DT_LENGTH'] = $time_end - $arData['EventDate'];
+							$arData['DT_LENGTH'] = $time_end - $fromTsUTC;
 						break;
 
 						case 'yearly':
 							$arData['RRULE']['FREQ'] = 'YEARLY';
 							$arData['RRULE']['INTERVAL'] = $obNode->getAttribute('yearFrequency');
 
-							$time_end = strtotime(date(date('Y', $arData['EventDate']).'-m-d H:i:s', $arData['EndDate']));
+							$time_end = strtotime(date(date('Y', $fromTsUTC).'-m-d H:i:s', $toTsUTC));
 
-							$arData['DT_LENGTH'] = $time_end - $arData['EventDate'];
+							$arData['DT_LENGTH'] = $time_end - $fromTsUTC;
 						break;
 					}
 
@@ -635,12 +624,12 @@ class CCalendarWebService extends IWebService
 					$obWhile = $obRecurRule->children[2];
 					if ($obWhile->name == 'repeatForever')
 					{
-						$arData['EndDate'] = MakeTimeStamp('');
+						$arData['RRULE']['UNTIL'] = MakeTimeStamp('');;
 					}
 					elseif ($obWhile->name == 'windowEnd')
 					{
-						$arData['EndDate'] = $this->__makeTS($obWhile->textContent());
-						$arData['RRULE']['UNTIL'] = ConvertTimeStamp($arData['EndDate'], 'FULL');
+						$toTsUTC = $this->__makeTS($obWhile->textContent());
+						$arData['RRULE']['UNTIL'] = ConvertTimeStamp($toTsUTC, 'FULL');
 					}
 				}
 				elseif($arData['fRecurrence'] == -1 && $id > 0)
@@ -648,17 +637,13 @@ class CCalendarWebService extends IWebService
 					$arData['RRULE'] = -1;
 				}
 
-				if (isset($arData['EventDate']))
+				$skipTime = $arData['fAllDayEvent'] ? 'Y' : 'N';
+				$fromTs = $fromTsUTC;
+				$toTs = $toTsUTC;
+				if (!$arData['fAllDayEvent'])
 				{
-					$skipTime = $arData['fAllDayEvent'] ? 'Y' : 'N';
-					$TZBias = $arData['fAllDayEvent'] ? 0 : $TZBias;
-					$arData['EventDate'] += $TZBias;
-					$arData['EndDate'] += $TZBias;
-				}
-				else
-				{
-					$arData["DT_FROM"] = -1;
-					$arData["DT_TO"] = -1;
+					$fromTs += CCalendar::GetCurrentOffsetUTC($userId);
+					$toTs += CCalendar::GetCurrentOffsetUTC($userId);
 				}
 
 				// fields
@@ -667,11 +652,11 @@ class CCalendarWebService extends IWebService
 					'CAL_TYPE' => $calType,
 					'OWNER_ID' => $ownerId,
 					'CREATED_BY' => $userId,
-					'DT_FROM_TS' => $arData['EventDate'],
-					'DT_TO_TS' => $arData['EndDate'],
+					'DATE_FROM' => CCalendar::Date($fromTs, $skipTime == 'N'),
+					'DATE_TO' => CCalendar::Date($toTs, $skipTime == 'N'),
 					'DT_SKIP_TIME' => $skipTime,
 					'NAME' => $arData['Title'],
-					'DESCRIPTION' => CCalendar::ParseHTMLToBB($arData['Description']),
+					'DESCRIPTION' => self::clearOutlookHtml($arData['Description']),
 					'SECTIONS' => array($arSection['ID']),
 					'ACCESSIBILITY' => $arStatusValues[$arData['MetaInfo_BusyStatus']],
 					'IMPORTANCE' => $arPriorityValues[$arData['MetaInfo_Priority']],
@@ -747,7 +732,6 @@ class CCalendarWebService extends IWebService
 		$wsdesc->wsdlauto = true;
 		$wsdesc->wsendpoint = CWebService::GetDefaultEndpoint();
 		$wsdesc->wstargetns = CWebService::GetDefaultTargetNS();
-
 		$wsdesc->classTypes = array();
 		$wsdesc->structTypes = array();
 
@@ -764,7 +748,6 @@ class CCalendarWebService extends IWebService
 					),
 					'httpauth' => 'Y'
 				),
-
 				'GetListItemChanges' => array(
 					'type' => 'public',
 					'name' => 'GetListItemChanges',
@@ -778,7 +761,6 @@ class CCalendarWebService extends IWebService
 					),
 					'httpauth' => 'Y'
 				),
-
 				'GetListItemChangesSinceToken' => array(
 					'type' => 'public',
 					'name' => 'GetListItemChangesSinceToken',
@@ -794,7 +776,6 @@ class CCalendarWebService extends IWebService
 					),
 					'httpauth' => 'Y'
 				),
-
 				'UpdateListItems' => array(
 					'type' => 'public',
 					'name' => 'UpdateListItems',
@@ -812,6 +793,15 @@ class CCalendarWebService extends IWebService
 		);
 
 		return $wsdesc;
+	}
+
+	public static function clearOutlookHtml($html)
+	{
+		$html = preg_replace("/(\s|\S)*<a\s*name=\"bm_begin\"><\/a>/is".BX_UTF_PCRE_MODIFIER,"", $html);
+		$html = preg_replace("/<br>(\n|\r)+/is".BX_UTF_PCRE_MODIFIER,"<br>", $html);
+		// mantis: 75493
+		$html = preg_replace("/.*\/\*\s*Style\s*Definitions\s*\*\/\s.+?;\}/is".BX_UTF_PCRE_MODIFIER,"", $html);
+		return CCalendar::ParseHTMLToBB($html);
 	}
 }
 ?>

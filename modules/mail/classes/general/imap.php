@@ -38,6 +38,15 @@ class CMailImap
 
 			throw new Exception(GetMessage('MAIL_IMAP_ERR_CONNECT').': '.GetMessage('MAIL_IMAP_ERR_BAD_SERVER'));
 		}
+/*
+		$tag = $this->sendCommand("STARTTLS\r\n");
+		$res = $this->readResponse($tag);
+
+		if (strpos($res, $tag.' OK') !== false)
+		{
+			$a = stream_socket_enable_crypto($this->imap_stream, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+		}
+*/
 	}
 
 	public function authenticate($login, $password)

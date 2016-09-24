@@ -36,6 +36,17 @@ class Indexer
 	 * @throws \Bitrix\Main\LoaderException
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод инициализирует внутреннее состояние объекта. Должен быть вызван перед началом использования объекта. Нестатический метод.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/init.php
+	* @author Bitrix
+	*/
 	public function init()
 	{
 		$this->dictionary = new Dictionary($this->iblockId);
@@ -62,6 +73,17 @@ class Indexer
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод проверяет существуют ли в базе данных таблица индексов и словарь. Возвращает <i>true</i> в случае успеха. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/isexists.php
+	* @author Bitrix
+	*/
 	public function isExists()
 	{
 		return $this->storage->isExists() && $this->dictionary->isExists();
@@ -72,6 +94,17 @@ class Indexer
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод сбрасывает и пересоздает индекс. Таким образом, запускает процесс индексации. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/startindex.php
+	* @author Bitrix
+	*/
 	public function startIndex()
 	{
 		if ($this->storage->isExists())
@@ -90,6 +123,17 @@ class Indexer
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод заканчивает создание индексов и помечает инфоблок как проиндексированный. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/endindex.php
+	* @author Bitrix
+	*/
 	public function endIndex()
 	{
 		\Bitrix\Iblock\IblockTable::update($this->iblockId, array(
@@ -111,6 +155,19 @@ class Indexer
 	 * @param integer $interval Time limit for execution.
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Метод выполняет один шаг индексации. Возвращает количество проиндексированных элементов. Нестатический метод.</p>
+	*
+	*
+	* @param integer $interval  Время выполнения одного шага.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/continueindex.php
+	* @author Bitrix
+	*/
 	public function continueIndex($interval = 0)
 	{
 		if ($interval > 0)
@@ -136,6 +193,17 @@ class Indexer
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Метод возвращает количество элементов, которые будут индексироваться. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/estimateelementcount.php
+	* @author Bitrix
+	*/
 	public function estimateElementCount()
 	{
 		$filter = array(
@@ -154,6 +222,19 @@ class Indexer
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод индексирует один элемент. Нестатический метод.</p>
+	*
+	*
+	* @param integer $elementId  Идентификатор элемента.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/indexelement.php
+	* @author Bitrix
+	*/
 	public function indexElement($elementId)
 	{
 		$element = new Element($this->iblockId, $elementId);
@@ -203,6 +284,19 @@ class Indexer
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод удаляет элемент из индекса. Нестатический метод.</p>
+	*
+	*
+	* @param integer $elementId  Идентификатор элемента.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/deleteelement.php
+	* @author Bitrix
+	*/
 	public function deleteElement($elementId)
 	{
 		$this->storage->deleteIndexElement($elementId);

@@ -45,20 +45,21 @@ Loc::loadMessages(__FILE__);
 class SectionTable extends Entity\DataManager
 {
 	/**
-	 * Returns path to the file which contains definition of the class.
-	 *
-	 * @return string
-	 */
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
-
-	/**
 	 * Returns DB table name for entity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы разделов инфоблоков в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock_section';
@@ -69,6 +70,17 @@ class SectionTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы разделов инфоблоков. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -203,6 +215,17 @@ class SectionTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (название раздела). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -215,6 +238,17 @@ class SectionTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CODE</code> (символьный идентификатор раздела). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/validatecode.php
+	* @author Bitrix
+	*/
 	public static function validateCode()
 	{
 		return array(
@@ -227,6 +261,17 @@ class SectionTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>XML_ID</code> (внешний код). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/validatexmlid.php
+	* @author Bitrix
+	*/
 	public static function validateXmlId()
 	{
 		return array(
@@ -239,6 +284,17 @@ class SectionTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>TMP_ID</code> (временный символьный идентификатор, используемый для служебных целей). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sectiontable/validatetmpid.php
+	* @author Bitrix
+	*/
 	public static function validateTmpId()
 	{
 		return array(

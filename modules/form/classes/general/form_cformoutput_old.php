@@ -12,7 +12,7 @@ class CFormOutput_old
 	 * @param array $arParams
 	 * @return bool
 	 */
-public 	function Init($arParams, $admin = false)
+	public function Init($arParams, $admin = false)
 	{
 		global $APPLICATION, $USER;
 
@@ -160,7 +160,7 @@ public 	function Init($arParams, $admin = false)
 /*****************************************/
 	/*              Filter methods. Move to component     */
 	/*****************************************/
-public static 	function __checkFilter(&$str_error) // check of filter values
+	public static function __checkFilter(&$str_error) // check of filter values
 	{
 		global $strError, $MESS, $HTTP_GET_VARS, $arrFORM_FILTER;
 		global $find_date_create_1, $find_date_create_2;
@@ -211,7 +211,7 @@ public static 	function __checkFilter(&$str_error) // check of filter values
 		if (strlen($str)>0) return false; else return true;
 	}
 
-public 	function __prepareFilter()
+	public function __prepareFilter()
 	{
 		$FilterArr = Array(
 			"find_id",
@@ -325,7 +325,7 @@ public 	function __prepareFilter()
 	 * Use: $FORM->Out();
 	 *
 	 */
-public 	function Out()
+	public function Out()
 	{
 		global $APPLICATION, $USER;
 
@@ -489,7 +489,7 @@ public 	function Out()
 		echo $strReturn;
 	}
 
-	fpublic unction getData(&$arResult)
+	public function getData(&$arResult)
 	{
 		global $APPLICATION, $USER;
 
@@ -603,7 +603,7 @@ public 	function Out()
 		return $arResult;
 	}
 
-public 	function getListData()
+	public function getListData()
 	{
 		$arFilter = $this->__prepareFilter();
 		$arResult = $this->__prepareDataForTpl();
@@ -611,7 +611,7 @@ public 	function getListData()
 		return $arResult;
 	}
 
-public 	function __prepareDataForTpl()
+	public function __prepareDataForTpl()
 	{
 		global $APPLICATION;
 
@@ -638,7 +638,7 @@ public 	function __prepareDataForTpl()
 	 * Initialize Captcha
 	 *
 	 */
-	fpublic unction CaptchaInitialize()
+	public function CaptchaInitialize()
 	{
 		$this->CAPTCHACode = $GLOBALS["APPLICATION"]->CaptchaGetCode();
 		//echo $this->CAPTCHACode;

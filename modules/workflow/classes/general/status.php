@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CWorkflowStatus
@@ -228,7 +228,7 @@ class CWorkflowStatus
 			".(strlen($strSqlSearch_h) > 0? "HAVING ".$strSqlSearch_h: "")."
 			$strSqlOrder
 			";
-		//echo "<pre>".htmlspecialcharsbx($strSql)."</pre>";
+
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 		$is_filtered = strlen($strSqlSearch) > 0;
 		return $res;
@@ -274,7 +274,6 @@ class CWorkflowStatus
 	//check fields before writing
 	public static function CheckFields($ID, $arFields)
 	{
-		global $DB;
 		$aMsg = array();
 
 		$ID = intval($ID);
@@ -353,4 +352,3 @@ class CWorkflowStatus
 		}
 	}
 }
-?>

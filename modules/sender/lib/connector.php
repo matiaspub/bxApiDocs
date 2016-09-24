@@ -10,14 +10,15 @@ namespace Bitrix\Sender;
 
 abstract class Connector
 {
-	var $fieldPrefix;
-	var $fieldPrefixExtended;
-	var $fieldValues;
-	var $fieldFormName;
-	var $moduleId;
+	protected $fieldPrefix;
+	protected $fieldPrefixExtended;
+	protected $fieldValues;
+	protected $fieldFormName;
+	protected $moduleId;
 
 	/**
-	 * @param $moduleId
+	 * @param string $moduleId
+	 * @return void
 	 */
 	public function setModuleId($moduleId)
 	{
@@ -33,7 +34,8 @@ abstract class Connector
 	}
 
 	/**
-	 * @param $fieldFormName
+	 * @param string $fieldFormName
+	 * @return void
 	 */
 	public function setFieldFormName($fieldFormName)
 	{
@@ -46,7 +48,8 @@ abstract class Connector
 	}
 
 	/**
-	 * @param $fieldPrefix
+	 * @param string $fieldPrefix
+	 * @return void
 	 */
 	public function setFieldPrefix($fieldPrefix)
 	{
@@ -59,7 +62,8 @@ abstract class Connector
 	}
 
 	/**
-	 * @param $fieldPrefixExtended
+	 * @param string $fieldPrefixExtended
+	 * @return void
 	 */
 	public function setFieldPrefixExtended($fieldPrefixExtended)
 	{
@@ -73,6 +77,7 @@ abstract class Connector
 
 	/**
 	 * @param array $fieldValues
+	 * @return void
 	 */
 	public function setFieldValues(array $fieldValues = null)
 	{
@@ -97,7 +102,8 @@ abstract class Connector
 		$fieldPrefixExtended = $this->getFieldPrefixExtended();
 		if($fieldPrefix)
 		{
-			return $fieldPrefix.'_'.$this->getModuleId().'_'.$this->getCode().'_%CONNECTOR_NUM%_'.$id;
+			$moduleId = str_replace('.', '_', $this->getModuleId());
+			return $fieldPrefix . '_' . $moduleId . '_' . $this->getCode() . '_%CONNECTOR_NUM%_' . $id;
 		}
 		elseif($fieldPrefixExtended)
 		{
@@ -152,25 +158,39 @@ abstract class Connector
 	/** @return integer */
 	public function getDataCount()
 	{
-		$dataDb = $this->getData();
-		/** @var \CDBResult $dataDb */
-		if(!($dataDb instanceof \CDBResultMysql))
-		{
-			$dataDb->NavStart(0);
-		}
-
-		return $dataDb->SelectedRowsCount();
+		return $this->getResult()->getSelectedRowsCount();
 	}
 
-	public static final function getResult()
+	public final function getResult()
 	{
+		$personalizeList = array();
+		$personalizeListTmp = $this->getPersonalizeList();
+		foreach($personalizeListTmp as $tag)
+		{
+			if(strlen($tag['CODE']) > 0)
+			{
+				$personalizeList[] = $tag['CODE'];
+			}
+		}
 
+		$result = new ConnectorResult($this->getData());
+		$result->setFilterFields($personalizeList);
+
+		return $result;
 	}
 
 	/** @return bool */
 	static public function requireConfigure()
 	{
 		return false;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getPersonalizeList()
+	{
+		return array();
 	}
 
 	/** @return string */

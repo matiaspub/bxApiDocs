@@ -5,7 +5,7 @@ $GLOBALS["arSonetFeaturesPermsCache"] = array();
 
 
 /**
- * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей. 
+ * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей.
  *
  *
  * @return mixed 
@@ -164,12 +164,12 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Удаляет право.</p>
+	* <p>Удаляет право. Метод статический.</p>
 	*
 	*
-	* @param int $id  Идентификатор записи. </htm
+	* @param int $intid  Идентификатор записи.
 	*
-	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p> <br><br>
+	* @return bool <p>True в случае успешного удаления и false - в противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Delete.php
@@ -215,7 +215,7 @@ class CAllSocNetFeaturesPerms
 					if ($arGroupFeaturePerm = $dbGroupFeaturePerm->Fetch())
 					{
 						$cache = new CPHPCache;
-						$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."_".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
+						$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."/".intval($arGroupFeaturePerm["FEATURE_ENTITY_ID"] / 1000)."/".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
 					}
 				}
 			}
@@ -226,21 +226,21 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Изменяет параметры права.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
+	* <p>Изменяет параметры права. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</div>
 	*
 	*
-	* @param int $id  Идентификатор записи </htm
+	* @param int $intid  Идентификатор записи
 	*
 	* @param array $arFields  Массив новых значений параметров. Допустимые ключи:<br><b>FEATURE_ID</b> -
 	* код дополнительного функционала,<br><b>OPERATION_ID</b> - код
 	* операции,<br><b>ROLE</b> - роль.
 	*
-	* @return int <p>Код измененной записи.</p> </htm
+	* @return int <p>Код измененной записи.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
-	* <li><a
+	*   <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a></li>
 	* </ul><br><br>
 	*
@@ -313,7 +313,7 @@ class CAllSocNetFeaturesPerms
 				if ($arGroupFeaturePerm = $dbGroupFeaturePerm->Fetch())
 				{
 					$cache = new CPHPCache;
-					$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."_".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
+					$cache->CleanDir("/sonet/features_perms/".$arGroupFeaturePerm["FEATURE_ENTITY_TYPE"]."/".intval($arGroupFeaturePerm["FEATURE_ENTITY_ID"] / 1000)."/".$arGroupFeaturePerm["FEATURE_ENTITY_ID"]."/");
 				}
 			}
 		}
@@ -325,19 +325,19 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется.</p> <p><b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a>.</p>
+	* <p>Метод устанавливает права для дополнительного функционала. Если запись существует в базе данных, то она изменяется. Если запись не существует, то она добавляется. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: для добавления записи используется метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a>, обновляется методом <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a>.</div>
 	*
 	*
 	* @param int $featureID  Идентификатор дополнительного функционала.
 	*
-	* @param string $operation  Название операции. </ht
+	* @param string $operation  Название операции.
 	*
 	* @param string $perm  Право на операцию.
 	*
 	* @return int <p>Возвращается идентификатор записи.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $idTmp = CSocNetFeatures::SetFeature(
 	* 	SONET_ENTITY_GROUP,
@@ -371,7 +371,7 @@ class CAllSocNetFeaturesPerms
 	* <h4>See Also</h4> 
 	* <ul> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Add.php">CSocNetFeaturesPerms::Add</a></li>
-	* <li><a
+	*   <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a></li>
 	* </ul><a name="examples"></a>
 	*
@@ -478,10 +478,10 @@ class CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	* <p>Возвращает параметры права.</p>
+	* <p>Возвращает параметры права. Метод статический.</p>
 	*
 	*
-	* @param int $id  Идентификатор записи </htm
+	* @param int $intid  Идентификатор записи
 	*
 	* @return array <p>Возвращается массив с ключами:<br><b>ID</b> - код записи,<br><b>FEATURE_ID</b> -
 	* код дополнительного функционала,<br><b>OPERATION_ID</b> - код
@@ -520,22 +520,22 @@ class CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	* <p>Проверяет, имеет ли текущий пользователь право на совершение операции.</p>
+	* <p>Проверяет, имеет ли текущий пользователь право на совершение операции. Метод статический.</p>
 	*
 	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	* @param int $id  Код объекта (пользователя или группы).
+	* @param int $intid  Код объекта (пользователя или группы).
 	*
 	* @param string $feature  Название дополнительного функционала.
 	*
-	* @param string $operation  Название операции. </ht
+	* @param string $operation  Название операции.
 	*
 	* @param bool $site_id = SITE_ID Код сайта. Необязательный.
 	*
 	* @return bool <p>True, если текущий пользователь имеет право на совершение
-	* операции. Иначе - false.</p> <br><br>
+	* операции. Иначе - false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/currentusercanperformperation.php
@@ -554,7 +554,7 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Метод проверяет, может ли указанный пользователь совершать указанное действие над указанным дополнительным функционалом. Например, метод может проверить, может ли указанный пользователь добавлять записи в отчеты указанной рабочей группы.</p>
+	* <p>Метод проверяет, может ли указанный пользователь совершать указанное действие над указанным дополнительным функционалом. Например, метод может проверить, может ли указанный пользователь добавлять записи в отчеты указанной рабочей группы. Метод статический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, права которого проверяются.
@@ -562,12 +562,12 @@ class CAllSocNetFeaturesPerms
 	* @param char $type  Тип объекта:<br><b>SONET_ENTITY_GROUP</b> - группа,<br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	* @param mixed $id  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
+	* @param mixed $mixedid  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
 	* кодов объектов.
 	*
 	* @param string $feature  Название дополнительного функционала.
 	*
-	* @param string $operation  Название операции. </ht
+	* @param string $operation  Название операции.
 	*
 	* @param bool $bUserIsAdmin = false Является ли пользователь администратором сайта или модуля
 	* социальной сети.
@@ -577,24 +577,24 @@ class CAllSocNetFeaturesPerms
 	* операцию и false - в обратном случае. Если (с версии 8.6.4) в параметре id
 	* передан массив кодов объектов, то возвращается ассоциативный
 	* массив, ключами для которого являются коды объектов, а значениями
-	* - true/false по вышеописанной логике.</p> <h4>Стандартный дополнительный
-	* функционал и его операции</h4> <p> </p><ul> <li>forum - форум <ul> <li>full - полный
-	* доступ</li> <li>newtopic - создание новой темы</li> <li>answer - ответ в
-	* существующей теме</li> <li>view - просмотр</li> </ul> </li> <li>photo - фотогалерея
-	* <ul> <li>write - полный доступ</li> <li>view - просмотр</li> </ul> </li> <li>calendar -
-	* календарь <ul> <li>write - полный доступ</li> <li>view - просмотр</li> </ul> </li>
-	* <li>tasks - задачи <ul> <li>view_all - просмотр всех задач</li> <li>create_tasks -
-	* создание новых задач</li> <li>delete_tasks - удаление новых задач</li>
-	* <li>modify_folders - изменение папок задач</li> </ul> </li> <li>files - файлы <ul> <li>write -
-	* полный доступ</li> <li>write_limited - запись с ограничениями</li> <li>view -
-	* просмотр</li> </ul> </li> <li>blog - блоги <ul> <li>view_post - просмотр сообщений</li>
-	* <li>write_post - создание сообщений</li> <li>full_post - полный доступ</li>
-	* <li>view_comment - просмотр комментариев</li> <li>write_comment - создание
-	* комментариев</li> <li>full_comment - полный доступ к комментариям</li> </ul> </li>
-	* </ul> <a name="examples"></a>
+	* - true/false по вышеописанной логике.</p><h4>Стандартный дополнительный
+	* функционал и его операции</h4><p> </p><ul> <li>forum - форум    <ul> <li>full - полный
+	* доступ</li>    <li>newtopic - создание новой темы</li>    <li>answer - ответ в
+	* существующей теме</li>    <li>view - просмотр</li>    </ul> </li> <li>photo -
+	* фотогалерея    <ul> <li>write - полный доступ</li>    <li>view - просмотр</li>    </ul>
+	* </li> <li>calendar - календарь    <ul> <li>write - полный доступ</li>    <li>view -
+	* просмотр</li>    </ul> </li> <li>tasks - задачи    <ul> <li>view_all - просмотр всех
+	* задач</li>    <li>create_tasks - создание новых задач</li>    <li>delete_tasks - удаление
+	* новых задач</li>    <li>modify_folders - изменение папок задач</li>    </ul> </li>
+	* <li>files - файлы    <ul> <li>write - полный доступ</li>    <li>write_limited - запись с
+	* ограничениями</li>    <li>view - просмотр</li>    </ul> </li> <li>blog - блоги    <ul>
+	* <li>view_post - просмотр сообщений</li>    <li>write_post - создание сообщений</li>   
+	* <li>full_post - полный доступ</li>    <li>view_comment - просмотр комментариев</li>   
+	* <li>write_comment - создание комментариев</li>    <li>full_comment - полный доступ к
+	* комментариям</li>    </ul> </li> </ul><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CSocNetFeaturesPerms::CanPerformOperation($GLOBALS["USER"]-&gt;GetID(), SONET_ENTITY_GROUP, $ID, "blog", "write_post"))
 	* {
@@ -973,24 +973,24 @@ class CAllSocNetFeaturesPerms
 
 	
 	/**
-	* <p>Возвращает права на операцию.</p>
+	* <p>Возвращает права на операцию. Метод статический.</p>
 	*
 	*
 	* @param char $type  Тип объекта: <br><b>SONET_ENTITY_GROUP</b> - группа, <br><b>SONET_ENTITY_USER</b> -
 	* пользователь.
 	*
-	* @param mixed $id  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
+	* @param mixed $mixedid  Код объекта (пользователя или группы), либо (с версии 8.6.4) массив
 	* кодов объектов.
 	*
 	* @param string $feature  Название дополнительного функционала.
 	*
-	* @param string $operation  Название операции. </ht
+	* @param string $operation  Название операции.
 	*
 	* @return mixed <p>Строка, содержащая право на операцию. Если (с версии 8.6.4) в
 	* параметре id передан массив кодов объектов, то возвращается
 	* ассоциативный массив, ключами для которого являются коды
 	* объектов, а значениями - права на операцию по вышеописанной
-	* логике.</p> <br><br>
+	* логике.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/GetOperationPerm.php
@@ -1172,7 +1172,7 @@ class CAllSocNetFeaturesPerms
 				$cache = new CPHPCache;
 				$cache_time = 31536000;
 				$cache_id = "entity_"."_".$type."_".$id;
-				$cache_path = "/sonet/features_perms/".$type."_".$id."/";
+				$cache_path = "/sonet/features_perms/".$type."/".intval($id / 1000)."/".$id."/";
 
 				$arTmp = array();
 
@@ -1286,4 +1286,3 @@ class CAllSocNetFeaturesPerms
 		}
 	}
 }
-?>

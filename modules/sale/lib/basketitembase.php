@@ -62,13 +62,10 @@ abstract class BasketItemBase
 		$result = array(
 			"PRICE", "CURRENCY", "BASE_PRICE",  "WEIGHT", "QUANTITY", "DELAY", "NAME", "CAN_BUY", "NOTES", "DETAIL_PAGE_URL", "DISCOUNT_PRICE", "CATALOG_XML_ID", "PRODUCT_XML_ID", "DISCOUNT_NAME", "DISCOUNT_VALUE", "DISCOUNT_COUPON", "VAT_RATE", "BARCODE_MULTI", "SUBSCRIBE", "CUSTOM_PRICE", "DIMENSIONS",
 			"CALLBACK_FUNC", "ORDER_CALLBACK_FUNC", "CANCEL_CALLBACK_FUNC", "PAY_CALLBACK_FUNC", "PRODUCT_PROVIDER_CLASS", "PRODUCT_ID", "PRODUCT_PRICE_ID", "BARCODE_MULTI", "TYPE", "SET_PARENT_ID", "MEASURE_CODE", "MEASURE_NAME",
-			'AVAILABLE_QUANTITY', 'LID', "VAT_INCLUDED"
+			'LID', "VAT_INCLUDED", "SORT"
 		);
 
 		return array_merge($result, static::getCalculatedFields());
-		// ID, FUSER_ID, ORDER_ID, LID, DATE_INSERT, DATE_UPDATE
-		// DEDUCTED, RESERVED, RESERVE_QUANTITY
-		// PRODUCT_ID, MODULE
 	}
 
 	/**
@@ -100,16 +97,6 @@ abstract class BasketItemBase
 		return array('QUANTITY', 'PRICE', 'CUSTOM_PRICE');
 	}
 
-	/**
-	 * @return array
-	 */
-	public static function getAllFields()
-	{
-		static $fields = null;
-		if ($fields == null)
-			$fields = array_keys(Internals\BasketTable::getMap());
-		return $fields;
-	}
 
 	/**
 	 * @param array $fields				Data.
@@ -201,7 +188,8 @@ abstract class BasketItemBase
 	{
 		if ($this->isCalculatedField($name))
 		{
-			if (isset($this->calculatedFields[$name]) || array_key_exists($name, $this->calculatedFields))
+			if (isset($this->calculatedFields[$name])
+					|| (is_array($this->calculatedFields) && array_key_exists($name, $this->calculatedFields)))
 			{
 				return $this->calculatedFields->get($name);
 			}
@@ -209,7 +197,13 @@ abstract class BasketItemBase
 			return null;
 		}
 
-		return parent::getField($name);
+		$value = parent::getField($name);
+		if ($name == "BASE_PRICE" && $value === null)
+		{
+			$value = PriceMaths::roundPrecision($this->getField('PRICE') + $this->getField('DISCOUNT_PRICE'));
+		}
+
+		return $value;
 	}
 
 	/**
@@ -237,9 +231,31 @@ abstract class BasketItemBase
 			$this->setField('VAT_RATE', $fields['VAT_RATE']);
 		}
 
+		if (array_key_exists('VAT_INCLUDED', $fields) && strval($fields['VAT_INCLUDED']) != '')
+		{
+			$this->setField('VAT_INCLUDED', $fields['VAT_INCLUDED']);
+		}
+		
+		if (array_key_exists('PRODUCT_PROVIDER_CLASS', $fields) && strval($fields['PRODUCT_PROVIDER_CLASS']) != '')
+		{
+			$this->setField('PRODUCT_PROVIDER_CLASS', $fields['PRODUCT_PROVIDER_CLASS']);
+		}
+
+		if (array_key_exists('SUBSCRIBE', $fields) && strval($fields['SUBSCRIBE']) != '')
+		{
+			$this->setField('SUBSCRIBE', $fields['SUBSCRIBE']);
+		}
+
 		return parent::setFields($fields);
 	}
 
+	/**
+	 * @param string $name
+	 * @param mixed $oldValue
+	 * @param mixed $value
+	 *
+	 * @return Result
+	 */
 	protected function onFieldModify($name, $oldValue, $value)
 	{
 		$r = parent::onFieldModify($name, $oldValue, $value);
@@ -250,7 +266,9 @@ abstract class BasketItemBase
 			{
 				if ($this->getField('CUSTOM_PRICE') !== 'Y')
 				{
-					$r1 = $this->setField('PRICE', $this->getField('BASE_PRICE') - $this->getField('DISCOUNT_PRICE'));
+					$basePrice = $this->getField('BASE_PRICE');
+
+					$r1 = $this->setField('PRICE', $basePrice - $this->getField('DISCOUNT_PRICE'));
 					if (!$r1->isSuccess())
 						$r->addErrors($r1->getErrors());
 				}
@@ -260,27 +278,36 @@ abstract class BasketItemBase
 		return $r;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isVatInPrice()
 	{
 		return $this->getField('VAT_INCLUDED') === 'Y';
 	}
 
+	/**
+	 * @return float|int
+	 */
 	public function getVat()
 	{
 		if ($this->getVatRate() == 0)
 			return 0;
 
 		if ($this->isVatInPrice())
-			$vat = roundEx(($this->getPrice() * $this->getQuantity() * $this->getVatRate() / ($this->getVatRate() + 1)), SALE_VALUE_PRECISION);
+			$vat = PriceMaths::roundPrecision(($this->getPrice() * $this->getQuantity() * $this->getVatRate() / ($this->getVatRate() + 1)));
 		else
-			$vat = roundEx(($this->getPrice() * $this->getQuantity() * $this->getVatRate()), SALE_VALUE_PRECISION);
+			$vat = PriceMaths::roundPrecision(($this->getPrice() * $this->getQuantity() * $this->getVatRate()));
 
 		return $vat;
 	}
 
+	/**
+	 * @return float|int
+	 */
 	public function getInitialPrice()
 	{
-		$price = roundEx($this->getPrice() * $this->getQuantity(), SALE_VALUE_PRECISION);
+		$price = PriceMaths::roundPrecision($this->getPrice() * $this->getQuantity());
 
 		if ($this->isVatInPrice())
 			$price -= $this->getVat();
@@ -288,9 +315,12 @@ abstract class BasketItemBase
 		return $price;
 	}
 
+	/**
+	 * @return float|int
+	 */
 	public function getFinalPrice()
 	{
-		$price = roundEx($this->getPrice() * $this->getQuantity(), SALE_VALUE_PRECISION);
+		$price = PriceMaths::roundPrecision($this->getPrice() * $this->getQuantity());
 
 		if (!$this->isVatInPrice())
 			$price += $this->getVat();
@@ -348,37 +378,11 @@ abstract class BasketItemBase
 	}
 
 	/**
-	 * @param float $price			Price value.
-	 * @return void
-	 */
-	protected function setPrice($price)
-	{
-		$this->setField('PRICE', floatval($price));
-	}
-
-	/**
-	 * @param float $quantity		Quantity value.
-	 * @return void
-	 */
-	protected function setQuantity($quantity)
-	{
-		$this->setField('QUANTITY', floatval($quantity));
-	}
-
-	/**
 	 * @return float
 	 */
 	public function getDiscountPrice()
 	{
 		return $this->getField('DISCOUNT_PRICE');
-	}
-
-	/**
-	 * @return float
-	 */
-	public function getDiscountPricePercent()
-	{
-		return $this->getField('DISCOUNT_PRICE_PERCENT');
 	}
 
 	/**
@@ -423,14 +427,6 @@ abstract class BasketItemBase
 		return $this->getField('VAT_RATE');
 	}
 
-//	/**
-//	 * @return int
-//	 */
-//	public function getVatValue()
-//	{
-//		return $this->getField('VAT_VALUE');
-//	}
-
 	/**
 	 * @return int
 	 */
@@ -474,12 +470,6 @@ abstract class BasketItemBase
 
 
 	/**
-	 * @param OrderBase $order
-	 * @return \Bitrix\Main\Entity\AddResult|\Bitrix\Main\Entity\UpdateResult
-	 */
-	//abstract public function saveForOrder(OrderBase $order = null);
-
-	/**
 	 * @return collection
 	 */
 	abstract public function getPropertyCollection();
@@ -517,5 +507,6 @@ abstract class BasketItemBase
 
 		return false;
 	}
+
 
 }

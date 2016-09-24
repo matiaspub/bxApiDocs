@@ -53,7 +53,7 @@ class CWizard
 	var $__obLastStep = null;
 	var $__obFirstStep = null;
 
-	public function CWizard($wizardName)
+	public function __construct($wizardName)
 	{
 		$this->name = $wizardName;
 
@@ -75,6 +75,12 @@ class CWizard
 		$this->__GetDescription();
 		$this->__CheckDepends();
 		$this->__GetInstallationScript();
+	}
+
+	/** @deprecated */
+	static public function CWizard($wizardName)
+	{
+		self::__construct($wizardName);
 	}
 
 	public function Install()

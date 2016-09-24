@@ -13,6 +13,8 @@ abstract class CollectableEntity
 
 	protected $internalIndex = null;
 
+	protected $isClone = false;
+
 	protected function onFieldModify($name, $oldValue, $value)
 	{
 		$collection = $this->getCollection();
@@ -142,6 +144,37 @@ abstract class CollectableEntity
 			return false;
 
 		return $parent->isMathActionOnly();
+	}
+
+	/**
+	 * @internal
+	 * @param array $map
+	 *
+	 * @return array
+	 */
+	public static function getAllFieldsByMap(array $map)
+	{
+		$fields = array();
+		foreach ($map as $key => $value)
+		{
+			if (is_array($value) && !array_key_exists('expression', $value))
+			{
+				$fields[] = $key;
+			}
+			elseif ($value instanceof Main\Entity\ScalarField)
+			{
+				$fields[] = $value->getName();
+			}
+		}
+		return $fields;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isClone()
+	{
+		return $this->isClone;
 	}
 
 }

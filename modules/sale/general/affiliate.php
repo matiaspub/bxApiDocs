@@ -296,6 +296,9 @@ class CAllSaleAffiliate
 		if (!$arAffiliate)
 			return False;
 
+		// If not fixed plan
+		$affiliateID = IntVal($arAffiliate["ID"]);
+
 		// If fixed plan
 		if ($arAffiliate["FIX_PLAN"] == "Y")
 		{
@@ -326,9 +329,6 @@ class CAllSaleAffiliate
 			return $arAffiliatePlan;
 		}
 
-		// If not fixed plan
-		$affiliateID = IntVal($arAffiliate["ID"]);
-
 		if (!$dateFrom || StrLen($dateFrom) <= 0)
 		{
 			if (StrLen($arAffiliate["LAST_CALCULATE"]) > 0)
@@ -345,71 +345,79 @@ class CAllSaleAffiliate
 
 		if ($affiliatePlanType == "N")
 		{
-			$dbOrders = CSaleOrder::GetList(
-				array(),
+			$dbOrders = \Bitrix\Sale\Internals\OrderTable::getList(
 				array(
-					"ALLOW_DELIVERY" => "Y",
-					">=DATE_ALLOW_DELIVERY" => $dateFrom,
-					"<DATE_ALLOW_DELIVERY" => $dateTo,
-					"AFFILIATE_ID" => $affiliateID,
-					"LID" => $arAffiliate["SITE_ID"]
-				),
-				array(
-					"SUM" => "BASKET_QUANTITY"
+					'filter' => array(
+						"=ALLOW_DELIVERY" => "Y",
+						">=DATE_ALLOW_DELIVERY" => $dateFrom,
+						"<DATE_ALLOW_DELIVERY" => $dateTo,
+						"=AFFILIATE_ID" => $affiliateID,
+						"=LID" => $arAffiliate["SITE_ID"],
+					),
+					'runtime' => array(
+						new \Bitrix\Main\Entity\ExpressionField('BASKET_QUANTITY', 'SUM(%s)', array('BASKET.QUANTITY'))
+					),
+					'select' => array('BASKET_QUANTITY')
 				)
 			);
-			if ($arOrder = $dbOrders->Fetch())
+			if ($arOrder = $dbOrders->fetch())
 				$itemsValue = $arOrder["BASKET_QUANTITY"];
 		}
 		else
 		{
-			$dbOrders = CSaleOrder::GetList(
-				array(),
+			$dbOrders = \Bitrix\Sale\Internals\OrderTable::getList(
 				array(
-					"ALLOW_DELIVERY" => "Y",
-					">=DATE_ALLOW_DELIVERY" => $dateFrom,
-					"<DATE_ALLOW_DELIVERY" => $dateTo,
-					"AFFILIATE_ID" => $affiliateID,
-					"LID" => $arAffiliate["SITE_ID"]
-				),
-				array(
-					"SUM" => "PRICE",
+					'filter' => array(
+						"=ALLOW_DELIVERY" => "Y",
+						">=DATE_ALLOW_DELIVERY" => $dateFrom,
+						"<DATE_ALLOW_DELIVERY" => $dateTo,
+						"=AFFILIATE_ID" => $affiliateID,
+						"=LID" => $arAffiliate["SITE_ID"],
+					),
+					'runtime' => array(
+						new \Bitrix\Main\Entity\ExpressionField('ORDER_SUM_PRICE', 'SUM(%s)', array('PRICE'))
+					),
+					'select' => array('ORDER_SUM_PRICE')
 				)
 			);
-			if ($arOrder = $dbOrders->Fetch())
-				$price = $arOrder["PRICE"];
+			if ($arOrder = $dbOrders->fetch())
+				$price = $arOrder["ORDER_SUM_PRICE"];
 
-			$dbOrders = CSaleOrder::GetList(
-				array(),
+			$dbOrders = \Bitrix\Sale\Internals\OrderTable::getList(
 				array(
-					"ALLOW_DELIVERY" => "Y",
-					">=DATE_ALLOW_DELIVERY" => $dateFrom,
-					"<DATE_ALLOW_DELIVERY" => $dateTo,
-					"AFFILIATE_ID" => $affiliateID,
-					"LID" => $arAffiliate["SITE_ID"]
-				),
-				array(
-					"SUM" => "PRICE_DELIVERY",
+					'filter' => array(
+						"=ALLOW_DELIVERY" => "Y",
+						">=DATE_ALLOW_DELIVERY" => $dateFrom,
+						"<DATE_ALLOW_DELIVERY" => $dateTo,
+						"=AFFILIATE_ID" => $affiliateID,
+						"=LID" => $arAffiliate["SITE_ID"],
+					),
+					'runtime' => array(
+						new \Bitrix\Main\Entity\ExpressionField('ORDER_PRICE_DELIVERY', 'SUM(%s)', array('PRICE_DELIVERY'))
+					),
+					'select' => array('ORDER_PRICE_DELIVERY')
 				)
 			);
-			if ($arOrder = $dbOrders->Fetch())
-				$priceDelivery = $arOrder["PRICE_DELIVERY"];
+			if ($arOrder = $dbOrders->fetch())
+				$priceDelivery = $arOrder["ORDER_PRICE_DELIVERY"];
 
-			$dbOrders = CSaleOrder::GetList(
-				array(),
+			$dbOrders = \Bitrix\Sale\Internals\OrderTable::getList(
 				array(
-					"ALLOW_DELIVERY" => "Y",
-					">=DATE_ALLOW_DELIVERY" => $dateFrom,
-					"<DATE_ALLOW_DELIVERY" => $dateTo,
-					"AFFILIATE_ID" => $affiliateID,
-					"LID" => $arAffiliate["SITE_ID"]
-				),
-				array(
-					"SUM" => "TAX_VALUE",
+					'filter' => array(
+						"=ALLOW_DELIVERY" => "Y",
+						">=DATE_ALLOW_DELIVERY" => $dateFrom,
+						"<DATE_ALLOW_DELIVERY" => $dateTo,
+						"=AFFILIATE_ID" => $affiliateID,
+						"=LID" => $arAffiliate["SITE_ID"],
+					),
+					'runtime' => array(
+						new \Bitrix\Main\Entity\ExpressionField('ORDER_TAX_VALUE', 'SUM(%s)', array('TAX_VALUE'))
+					),
+					'select' => array('ORDER_TAX_VALUE')
 				)
 			);
-			if ($arOrder = $dbOrders->Fetch())
-				$priceTax = $arOrder["TAX_VALUE"];
+			if ($arOrder = $dbOrders->fetch())
+				$priceTax = $arOrder["ORDER_TAX_VALUE"];
 
 			$itemsValue = $price - $priceDelivery - $priceTax;
 		}
@@ -549,37 +557,36 @@ class CAllSaleAffiliate
 		$affiliateSum = 0;
 		$affiliateCurrency = CSaleLang::GetLangCurrency($arAffiliate["SITE_ID"]);
 
-		$dbOrders = CSaleOrder::GetList(
-			array("ID" => "ASC"),
+		$dbOrders = \Bitrix\Sale\Internals\OrderTable::getList(
 			array(
-				"ALLOW_DELIVERY" => "Y",
-				">=DATE_ALLOW_DELIVERY" => $dateFrom,
-				"<DATE_ALLOW_DELIVERY" => $dateTo,
-				"AFFILIATE_ID" => $affiliateID,
-				"LID" => $arAffiliate["SITE_ID"],
-				"CANCELED" => "N"
-			),
-			false,
-			false,
-			array(
-				"ID",
-				"LID",
-				"PRICE_DELIVERY",
-				"PRICE",
-				"CURRENCY",
-				"TAX_VALUE",
-				"AFFILIATE_ID",
-				"BASKET_QUANTITY",
-				"BASKET_PRODUCT_ID",
-				"BASKET_MODULE",
-				"BASKET_PRICE",
-				"BASKET_CURRENCY",
-				"BASKET_DISCOUNT_PRICE"
+				'filter' => array(
+					"=ALLOW_DELIVERY" => 'Y',
+					">=DATE_ALLOW_DELIVERY" => $dateFrom,
+					"<DATE_ALLOW_DELIVERY" => $dateTo,
+					"=AFFILIATE_ID" => $affiliateID,
+					"=LID" => $arAffiliate["SITE_ID"],
+					"=CANCELED" => 'N',
+				),
+				'select' => array(
+					"ID",
+					"LID",
+					"PRICE_DELIVERY",
+					"PRICE",
+					"CURRENCY",
+					"TAX_VALUE",
+					"AFFILIATE_ID",
+					"BASKET_QUANTITY" => 'BASKET.QUANTITY',
+					"BASKET_PRODUCT_ID" => 'BASKET.PRODUCT_ID',
+					"BASKET_MODULE" => 'BASKET.MODULE',
+					"BASKET_PRICE" => 'BASKET.PRICE',
+					"BASKET_CURRENCY" => 'BASKET.CURRENCY',
+					"BASKET_DISCOUNT_PRICE" => 'BASKET.DISCOUNT_PRICE'
+				),
+				'order' => array('ID' => 'ASC')
 			)
 		);
-
 		$fOrderId = "";
-		while ($arOrder = $dbOrders->Fetch())
+		while ($arOrder = $dbOrders->fetch())
 		{
 			$arProductSections = array();
 
@@ -646,7 +653,7 @@ class CAllSaleAffiliate
 
 					if ($fOrderId != $arOrder["ID"])
 					{
-						$affiliateSum += roundEx((($arOrder["PRICE"] - $arOrder["PRICE_DELIVERY"]) * $GLOBALS["SALE_CONVERT_CURRENCY_CACHE"][$arOrder["CURRENCY"]."-".$affiliateCurrency] * $realRate) / 100, SALE_VALUE_PRECISION);
+						$affiliateSum += \Bitrix\Sale\PriceMaths::roundPrecision((($arOrder["PRICE"] - $arOrder["PRICE_DELIVERY"]) * $GLOBALS["SALE_CONVERT_CURRENCY_CACHE"][$arOrder["CURRENCY"]."-".$affiliateCurrency] * $realRate) / 100);
 						$fOrderId = $arOrder["ID"];
 					}
 				}
@@ -654,7 +661,7 @@ class CAllSaleAffiliate
 				{
 					if ($fOrderId != $arOrder["ID"])
 					{
-						$affiliateSum += roundEx((($arOrder["PRICE"] - $arOrder["PRICE_DELIVERY"]) * $realRate) / 100, SALE_VALUE_PRECISION);
+						$affiliateSum += \Bitrix\Sale\PriceMaths::roundPrecision((($arOrder["PRICE"] - $arOrder["PRICE_DELIVERY"]) * $realRate) / 100);
 						$fOrderId = $arOrder["ID"];
 					}
 				}

@@ -28,6 +28,17 @@ class VatTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы ставок НДС в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/vattable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_catalog_vat';
@@ -38,6 +49,17 @@ class VatTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы ставок НДС. Статический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/vattable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -48,6 +70,7 @@ class VatTable extends Main\Entity\DataManager
 			)),
 			'TIMESTAMP_X' => new Main\Entity\DatetimeField('TIMESTAMP_X', array(
 				'required' => true,
+				'default_value' => new Main\Type\DateTime(),
 				'title' => Loc::getMessage('VAT_ENTITY_TIMESTAMP_X_FIELD'),
 			)),
 			'ACTIVE' => new Main\Entity\BooleanField('ACTIVE', array(
@@ -76,6 +99,17 @@ class VatTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (название ставки). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/vattable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(

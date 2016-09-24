@@ -3,6 +3,7 @@ namespace Bitrix\Sale\Delivery\Restrictions;
 
 use Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Internals\CollectableEntity;
 
 Loc::loadMessages(__FILE__);
 
@@ -29,29 +30,7 @@ class ByMaxSize extends Restrictions\Base
 	 * @param int $deliveryId
 	 * @return bool
 	 */
-	static public function check($dimensions, array $restrictionParams, $deliveryId = 0)
-	{
-		$maxSize = intval($restrictionParams["MAX_SIZE"]);
-
-		foreach($dimensions as $dimension)
-		{
-			if(intval($dimension) <= 0)
-				continue;
-
-			if(intval($dimension) > $maxSize)
-				return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param \Bitrix\Sale\Shipment $shipment
-	 * @param array $restrictionParams
-	 * @param int $deliveryId
-	 * @return bool
-	 */
-	public function checkByShipment(\Bitrix\Sale\Shipment $shipment, array $restrictionParams, $deliveryId = 0)
+	public static function check($dimensionsList, array $restrictionParams, $deliveryId = 0)
 	{
 		if(empty($restrictionParams))
 			return true;
@@ -61,6 +40,28 @@ class ByMaxSize extends Restrictions\Base
 		if($maxSize <= 0)
 			return true;
 
+		foreach($dimensionsList as $dimensions)
+		{
+			if(!is_array($dimensions))
+				continue;
+
+			foreach($dimensions as $dimension)
+			{
+				if(intval($dimension) <= 0)
+					continue;
+
+				if(intval($dimension) > $maxSize)
+					return false;
+			}
+		}
+
+		return true;
+	}
+
+	protected static function extractParams(CollectableEntity $shipment)
+	{
+		$result = array();
+
 		foreach($shipment->getShipmentItemCollection() as $shipmentItem)
 		{
 			$basketItem = $shipmentItem->getBasketItem();
@@ -69,17 +70,13 @@ class ByMaxSize extends Restrictions\Base
 			if(is_string($dimensions))
 				$dimensions = unserialize($dimensions);
 
-			if(!is_array($dimensions))
-				return true;
-
-			if(!$this->check($dimensions, $restrictionParams, $deliveryId))
-				return false;
+			$result[] = $dimensions;
 		}
 
-		return true;
+		return $result;
 	}
 
-	public static function getParamsStructure()
+	public static function getParamsStructure($entityId = 0)
 	{
 		return array(
 			"MAX_SIZE" => array(

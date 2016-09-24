@@ -11,7 +11,7 @@ namespace Bitrix\Sender;
 abstract class TriggerConnector extends Trigger
 {
 	/** @var \Bitrix\Sender\Connector $connector */
-	var $connector;
+	public $connector;
 
 	/** @return string */
 	final protected function getConnectorForm()
@@ -101,6 +101,7 @@ abstract class TriggerConnector extends Trigger
 		return $this->filterConnectorData();
 	}
 
+	/** @return mixed */
 	public function getRecipient()
 	{
 		return $this->recipient;
@@ -114,11 +115,47 @@ abstract class TriggerConnector extends Trigger
 	}
 
 	/**
+	 * @return \Bitrix\Sender\ConnectorResult
+	 */
+	public function getRecipientResult()
+	{
+		$result = parent::getRecipientResult();
+		if(!$this->connector)
+		{
+			return $result;
+		}
+
+		$personalizeList = array();
+		$connectorPersonalizeList = $this->connector->getPersonalizeList();
+		foreach($connectorPersonalizeList as $tag)
+		{
+			if(strlen($tag['CODE']) > 0)
+			{
+				$personalizeList[] = $tag['CODE'];
+			}
+		}
+		$result->setFilterFields(array_merge($result->getFilterFields(),  $personalizeList));
+
+		return $result;
+	}
+
+	/**
 	 * return filled array('MODULE_ID' => '', 'CODE' => '') that describes connector
 	 * or return object \Bitrix\Sender\Connector
 	 *
 	 * @return array|\Bitrix\Sender\Connector
 	 */
+	
+	/**
+	* <p>Возвращает массив с данными о коннекторе с ключами: <b>MODULE_ID</b> - модуль коннектора, <b>CODE</b> - код коннектора или объект  <code>\Bitrix\Sender\Connector</code>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array|\Bitrix\Sender\Connector 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/triggerconnector/getconnector.php
+	* @author Bitrix
+	*/
 	static public function getConnector()
 	{
 		return array(

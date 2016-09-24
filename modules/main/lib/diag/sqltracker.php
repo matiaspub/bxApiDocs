@@ -19,6 +19,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод очищает все собранные запросы и сбрасывает время выполнения.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/reset.php
+	* @author Bitrix
+	*/
 	public function reset()
 	{
 		$this->queries = array();
@@ -31,6 +42,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод создаёт новый экземпляр объекта <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/index.php">SqlTrackerQuery</a>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/getnewtrackerquery.php
+	* @author Bitrix
+	*/
 	public function getNewTrackerQuery()
 	{
 		$query = new SqlTrackerQuery($this);
@@ -46,6 +68,19 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод используется <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/index.php">SqlTrackerQuery</a> для отслеживания общего времени выполнения.</p>
+	*
+	*
+	* @param float $time  Время в секундах
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/addtime.php
+	* @author Bitrix
+	*/
 	public function addTime($time)
 	{
 		$this->time += $time;
@@ -56,6 +91,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает количество выполненных запросов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/getcounter.php
+	* @author Bitrix
+	*/
 	public function getCounter()
 	{
 		return $this->counter;
@@ -66,6 +112,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return float
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает общее время выполнения запросов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return float 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/gettime.php
+	* @author Bitrix
+	*/
 	public function getTime()
 	{
 		return $this->time;
@@ -76,6 +133,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив до сих пор собираемых объектов <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/index.php">SqlTrackerQuery</a>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/getqueries.php
+	* @author Bitrix
+	*/
 	public function getQueries()
 	{
 		return $this->queries;
@@ -86,6 +154,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return int
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает глубину трассировки для записи в лог файл.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/getdepthbacktrace.php
+	* @author Bitrix
+	*/
 	public function getDepthBackTrace()
 	{
 		return $this->depthBackTrace;
@@ -98,6 +177,19 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает глубину трассировки для записи в лог файл.</p>
+	*
+	*
+	* @param integer $depthBackTrace  Необходимая глубина трассировки.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/setdepthbacktrace.php
+	* @author Bitrix
+	*/
 	public function setDepthBackTrace($depthBackTrace)
 	{
 		$this->depthBackTrace = (int)$depthBackTrace;
@@ -112,6 +204,27 @@ class SqlTracker implements \Iterator
 	 * @see \Bitrix\Main\Diag\SqlTracker->stopFileLog
 	 * @see \Bitrix\Main\Diag\SqlTracker->writeFileLog
 	 */
+	
+	/**
+	* <p>Нестатический метод запускает запрись запросов в лог файл.</p>
+	*
+	*
+	* @param string $filePath  Абсолютный путь к лог файлу.
+	*
+	* @return void 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/stopfilelog.php">\Bitrix\Main\Diag\SqlTracker::stopFileLog</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/writefilelog.php">\Bitrix\Main\Diag\SqlTracker::writeFileLog</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/startfilelog.php
+	* @author Bitrix
+	*/
 	public function startFileLog($filePath)
 	{
 		$this->logFilePath = (string)$filePath;
@@ -129,6 +242,34 @@ class SqlTracker implements \Iterator
 	 * @see \Bitrix\Main\Diag\SqlTracker->startFileLog
 	 * @see \Bitrix\Main\Diag\SqlTracker->stopFileLog
 	 */
+	
+	/**
+	* <p>Нестатический метод записывает в лог файл текст запроса и часть трассировки.</p>
+	*
+	*
+	* @param string $sql  Запрос для записи.
+	*
+	* @param float $executionTime = 0.0 Время выполнения
+	*
+	* @param string $additional = "" ДОполнительная информационная строка, которая будет добавлена в
+	* заголовок.
+	*
+	* @param integer $traceSkip = 2 Сколько фрагментов трассировки пропустить при выходе.
+	*
+	* @return void 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/startfilelog.php">\Bitrix\Main\Diag\SqlTracker::startFileLog</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/stopfilelog.php">\Bitrix\Main\Diag\SqlTracker::stopFileLog</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/writefilelog.php
+	* @author Bitrix
+	*/
 	public function writeFileLog($sql, $executionTime = 0.0, $additional = "", $traceSkip = 2)
 	{
 		if ($this->logFilePath)
@@ -155,6 +296,25 @@ class SqlTracker implements \Iterator
 	 * @see \Bitrix\Main\Diag\SqlTracker->startFileLog
 	 * @see \Bitrix\Main\Diag\SqlTracker->writeFileLog
 	 */
+	
+	/**
+	* <p>Нестатический метод останавливает запись запросов в лог файл.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/startfilelog.php">\Bitrix\Main\Diag\SqlTracker::startFileLog</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/writefilelog.php">\Bitrix\Main\Diag\SqlTracker::writeFileLog</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/stopfilelog.php
+	* @author Bitrix
+	*/
 	public function stopFileLog()
 	{
 		$this->logFilePath = "";
@@ -246,6 +406,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод. Часть реализации <code>\Iterator</code>, сделана для сохранения обратной совместимости.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/rewind.php
+	* @author Bitrix
+	*/
 	public function rewind()
 	{
 		reset($this->queries);
@@ -256,6 +427,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод. Часть реализации <code>\Iterator</code>, сделана для сохранения обратной совместимости.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/current.php
+	* @author Bitrix
+	*/
 	public function current()
 	{
 		return current($this->queries);
@@ -266,6 +448,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод. Часть реализации <code>\Iterator</code>, сделана для сохранения обратной совместимости.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/key.php
+	* @author Bitrix
+	*/
 	public function key()
 	{
 		return key($this->queries);
@@ -276,6 +469,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод. Часть реализации <code>\Iterator</code>, сделана для сохранения обратной совместимости.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/next.php
+	* @author Bitrix
+	*/
 	public function next()
 	{
 		next($this->queries);
@@ -286,6 +490,17 @@ class SqlTracker implements \Iterator
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Нестатический метод. Часть реализации <code>\Iterator</code>, сделана для сохранения обратной совместимости.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltracker/valid.php
+	* @author Bitrix
+	*/
 	public function valid()
 	{
 		return key($this->queries) !== null;

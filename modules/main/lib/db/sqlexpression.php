@@ -27,6 +27,9 @@ class SqlExpression
 
 	protected $i;
 
+	/** @var  Connection */
+	protected $connection;
+
 	/**
 	 * @param string $expression Sql expression.
 	 * @param string,... $args Substitutes.
@@ -55,6 +58,17 @@ class SqlExpression
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает переменную <code>$expression</code> с перемещёнными плейсхолдерами.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlexpression/compile.php
+	* @author Bitrix
+	*/
 	public function compile()
 	{
 		$this->i = -1;
@@ -92,7 +106,7 @@ class SqlExpression
 	 */
 	protected function execPlaceholders($matches)
 	{
-		$sqlHelper = Application::getConnection()->getSqlHelper();
+		$sqlHelper = $this->getConnection()->getSqlHelper();
 
 		$this->i++;
 
@@ -124,5 +138,31 @@ class SqlExpression
 		}
 
 		return $matches[0];
+	}
+
+	public function __toString()
+	{
+		return $this->compile();
+	}
+
+	/**
+	 * @return Connection
+	 */
+	public function getConnection()
+	{
+		if ($this->connection === null)
+		{
+			$this->connection = Application::getConnection();
+		}
+
+		return $this->connection;
+	}
+
+	/**
+	 * @param Connection $connection
+	 */
+	public function setConnection($connection)
+	{
+		$this->connection = $connection;
 	}
 }

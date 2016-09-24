@@ -233,7 +233,7 @@ class CBXFavAdmMenu
 
 	private function Init()
 	{
-		global $USER, $adminPage, $adminMenu;
+		global $APPLICATION, $USER, $adminPage, $adminMenu;
 
 		//for ajax requests, and menu autoupdates
 		$adminPage->Init();
@@ -251,7 +251,14 @@ class CBXFavAdmMenu
 		);
 
 		while ($arFav = $dbFav->GetNext())
+		{
+			if($arFav["COMMON"] == "Y" && $arFav["MODULE_ID"] <> "" && $APPLICATION->GetGroupRight($arFav["MODULE_ID"]) < "R")
+			{
+				continue;
+			}
+
 			$this->arItems[] = $arFav;
+		}
 
 		return true;
 	}
@@ -467,7 +474,7 @@ class CBXFavUrls
 	const FILTER_ID_VALUE = "adm_filter_applied";
 	const PRESET_ID_VALUE = "adm_filter_preset";
 
-	static public function Compare($url1, $url2, $arReqVals=array(), $arSkipVals=array())
+	public static function Compare($url1, $url2, $arReqVals=array(), $arSkipVals=array())
 	{
 		if($url1=='' && $url2 == '')
 			return false;
@@ -552,7 +559,7 @@ class CBXFavUrls
 		return true;
 	}
 
-	static public function ParseDetail($url)
+	public static function ParseDetail($url)
 	{
 		$parts = parse_url($url);
 
@@ -562,7 +569,7 @@ class CBXFavUrls
 		return $parts;
 	}
 
-	static public function GetFilterId($url)
+	public static function GetFilterId($url)
 	{
 		$urlParams = self::ParseDetail($url);
 
@@ -572,7 +579,7 @@ class CBXFavUrls
 		return false;
 	}
 
-	static public function GetPresetId($url)
+	public static function GetPresetId($url)
 	{
 		$urlParams = self::ParseDetail($url);
 

@@ -66,7 +66,7 @@ abstract class Platform
 	 * @return \Bitrix\Sale\TradingPlatform\Platform
 	 * @throws ArgumentNullException
 	 */
-	public static function getInstance($code)
+	public static function getInstanceByCode($code)
 	{
 		if(strlen($code) <=0)
 			throw new ArgumentNullException("code");
@@ -108,6 +108,17 @@ abstract class Platform
 	 * Sets the platform active.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Устанавливает активной торговую платформу. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/platform/setactive.php
+	* @author Bitrix
+	*/
 	public function setActive()
 	{
 		if($this->isActive())
@@ -131,6 +142,17 @@ abstract class Platform
 	 * Sets  the platform inactive.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Устанавливает неактивной торговую платформу. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/platform/unsetactive.php
+	* @author Bitrix
+	*/
 	public function unsetActive()
 	{
 		$this->isActive = false;
@@ -259,6 +281,17 @@ abstract class Platform
 	 * Installs platform
 	 * @return int Platform Id.
 	 */
+	
+	/**
+	* <p>Устанавливает торговую платформу. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/platform/install.php
+	* @author Bitrix
+	*/
 	public function install()
 	{
 		$res = TradingPlatformTable::add(array(

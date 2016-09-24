@@ -11,7 +11,13 @@ class ExceptionHandlerFormatter
 
 	const DELIMITER = '----------';
 
-	public static function format(\Exception $exception, $htmlMode = false, $level = 0)
+	/**
+	 * @param \Error|\Exception $exception
+	 * @param bool $htmlMode
+	 * @param int $level
+	 * @return string
+	 */
+	public static function format($exception, $htmlMode = false, $level = 0)
 	{
 		$result = '['.get_class($exception).'] ';
 
@@ -27,7 +33,7 @@ class ExceptionHandlerFormatter
 		$result .= $fileLink.(empty($fileLink) ? "" : "\n");
 
 		if ($htmlMode)
-			$result = Main\Text\String::htmlEncode($result);
+			$result = Main\Text\HtmlFilter::encode($result);
 
 		$prevArg = null;
 		$trace = static::getTrace($exception);
@@ -40,11 +46,14 @@ class ExceptionHandlerFormatter
 			if (array_key_exists('function', $traceInfo))
 			{
 				$traceLine .= $traceInfo['function'];
-				$traceLine .= static::getArguments($traceInfo['args'], $level);
+				if(isset($traceInfo['args']))
+				{
+					$traceLine .= static::getArguments($traceInfo['args'], $level);
+				}
 			}
 
 			if ($htmlMode)
-				$traceLine = Main\Text\String::htmlEncode($traceLine);
+				$traceLine = Main\Text\HtmlFilter::encode($traceLine);
 
 			if (array_key_exists('file', $traceInfo))
 				$traceLine .= "\n\t".static::getFileLink($traceInfo['file'], $traceInfo['line']);
@@ -62,7 +71,11 @@ class ExceptionHandlerFormatter
 		return $result;
 	}
 
-	protected static function getTrace(\Exception $exception)
+	/**
+	 * @param \Error|\Exception $exception
+	 * @return array
+	 */
+	protected static function getTrace($exception)
 	{
 		$backtrace = $exception->getTrace();
 
@@ -80,7 +93,11 @@ class ExceptionHandlerFormatter
 		return $result;
 	}
 
-	protected static function getMessage(\Exception $exception)
+	/**
+	 * @param \Error|\Exception $exception
+	 * @return string
+	 */
+	protected static function getMessage($exception)
 	{
 		return $exception->getMessage().' ('.$exception->getCode().')';
 	}

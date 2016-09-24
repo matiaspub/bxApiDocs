@@ -33,6 +33,17 @@ interface IBXGetErrors
 /**
  * Proxy class for file IO. Provides a set of methods to retrieve resources from a file system.
  */
+
+/**
+ * Поддержка <b>Bitrix Framework</b> русских (и прочих) символов в названиях публичных файлов накладывает определённые ограничения на работу: <br> недопустимы прямые вызовы
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualio/index.php
+ * @author Bitrix
+ */
 class CBXVirtualIo
 	implements IBXVirtualIO, IBXGetErrors
 {
@@ -71,23 +82,19 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Объединяет части пути в единый путь. Параметров может быть произвольное число. После объединения путь приводится к нормальной форме. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Объединяет части пути в единый путь. Параметров может быть произвольное число. После объединения путь приводится к нормальной форме. Нестатический метод.</p>  <a name="examples"></a>
 	*
 	*
 	* @param string $path1  
 	*
-	* @param  $string  
+	* @param string $path2  
 	*
-	* @param mixed $path2  
-	*
-	* @param  $string  
-	*
-	* @param mixed $path3  
+	* @param string $path3  
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* echo $io-&gt;CombinePath("/", "index.php");  // вернет /index.php
 	* echo $io-&gt;CombinePath("/", "/path1/", "\\path2/", "path3\\. ./path4/");  // вернет /path1/path2/path4
 	* </pre>
@@ -136,18 +143,16 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Приводит путь относительно корня продукта к абсолютному пути. Путь приводится к нормальной форме. Динамичный метод.</p>
+	* <p>Приводит путь относительно корня продукта к абсолютному пути. Путь приводится к нормальной форме. Нестатический метод.</p>
 	*
 	*
-	* @param array $string  Относительный путь </ht
-	*
-	* @param mixed $relativePath  
+	* @param string $relativePath  Относительный путь
 	*
 	* @return result_type 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* echo $io-&gt;RelativeToAbsolutePath("/path1/index.php");  // вернет c:/Projects/site1/path1/index.php </bo
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* echo $io-&gt;RelativeToAbsolutePath("/path1/index.php");  // вернет c:/Projects/site1/path1/index.php
 	* </pre>
 	*
 	*
@@ -162,18 +167,18 @@ class CBXVirtualIo
 
 	
 	/**
-	* <p>Приводит путь относительно корня указанного сайта к абсолютному пути. Путь приводится к нормальной форме. Динамичный метод.</p>
+	* <p>Приводит путь относительно корня указанного сайта к абсолютному пути. Путь приводится к нормальной форме. Нестатический метод.</p>
 	*
 	*
-	* @param string $relativePath  Относительный путь </ht
+	* @param string $relativePath  Относительный путь
 	*
 	* @param string $site = null домен сайта
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* echo $io-&gt;SiteRelativeToAbsolutePath("/path1/index.php", "s1");  // вернет c:/Projects/site1/s1/path1/index.php</bo
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* echo $io-&gt;SiteRelativeToAbsolutePath("/path1/index.php", "s1");  // вернет c:/Projects/site1/s1/path1/index.php
 	* </pre>
 	*
 	*
@@ -210,16 +215,16 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Возвращает имя файла или папки принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме. Динамичный метод.</p>
+	* <p>Возвращает имя файла или папки принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* echo $io-&gt;ExtractNameFromPath("/path1/index.php");   // вернет index.php </bo
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* echo $io-&gt;ExtractNameFromPath("/path1/index.php");   // вернет index.php
 	* </pre>
 	*
 	*
@@ -240,16 +245,16 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Возвращает путь к файлу или папке принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме. Динамичный метод.</p>
+	* <p>Возвращает путь к файлу или папке принимая на вход путь. Хорошо, если путь сначала приведен к нормальной форме. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return result_type 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* echo $io-&gt;ExtractPathFromPath("/path1/index.php");   // вернет /path1</bo
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* echo $io-&gt;ExtractPathFromPath("/path1/index.php");   // вернет /path1
 	* </pre>
 	*
 	*
@@ -268,15 +273,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Проверяет, является ли путь корректным. Динамичный метод.</p>
+	* <p>Проверяет, является ли путь корректным. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* echo $io-&gt;ValidatePathString("/path1/путь2/файл.php");  // вернет 1
 	* echo $io-&gt;ValidatePathString("/path1/пу*ть2/файл.php?"); // вернет 0
 	* </pre>
@@ -317,15 +322,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Проверяет, существует ли указанная папка. На вход принимает абсолютный путь. Динамичный метод.</p>
+	* <p>Проверяет, существует ли указанная папка. На вход принимает абсолютный путь.  Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* echo $io-&gt;DirectoryExists($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
 	* </pre>
 	*
@@ -347,15 +352,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Проверяет, существует ли указанный файл. На вход принимает абсолютный путь. Динамичный метод.</p>
+	* <p>Проверяет, существует ли указанный файл. На вход принимает абсолютный путь. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* echo $io-&gt;FileExists($io-&gt;RelativeToAbsolutePath("папка1/файл.php"));
 	* </pre>
 	*
@@ -377,15 +382,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Возвращает объект класса папки для указанного пути. На вход принимает абсолютный путь. При этом существование папки не проверяется. Динамичный метод.</p>
+	* <p>Возвращает объект класса папки для указанного пути. На вход принимает абсолютный путь. При этом существование папки не проверяется. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return CBXVirtualDirectory 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $dir = $io-&gt;GetDirectory($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
 	* $arChildren = $dir-&gt;GetChildren();
 	* foreach ($arChildren as $child)
@@ -413,19 +418,19 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Возвращает объект класса файла для указанного пути. На вход принимает абсолютный путь. При этом существование файла не проверяется. Динамичный метод.</p>
+	* <p>Возвращает объект класса файла для указанного пути. На вход принимает абсолютный путь. При этом существование файла не проверяется. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return CBXVirtualFile 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $fp = $io-&gt;RelativeToAbsolutePath("/папка1/.access.php");
 	* $f = $io-&gt;GetFile($fp);
 	* $f-&gt;MarkWritable();
-	* $io-&gt;Delete($fp);</bo
+	* $io-&gt;Delete($fp);
 	* </pre>
 	*
 	*
@@ -458,15 +463,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Удаляет файл или папку. Динамичный метод.</p>
+	* <p>Удаляет файл или папку.  Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $path = $io-&gt;RelativeToAbsolutePath($path);
 	* $flTmp = $io-&gt;GetFile($path);
 	* $flSzTmp = $flTmp-&gt;GetFileSize();
@@ -497,12 +502,12 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Копирует файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь. Динамичный метод.</p>
+	* <p>Копирует файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь. Нестатический метод.</p>
 	*
 	*
 	* @param string $source  Путь к источнику.
 	*
-	* @param string $target  Путь к целевой папке. </ht
+	* @param string $target  Путь к целевой папке.
 	*
 	* @param bool $bRewrite = true] Если файл существует переписывать или нет? По умолчанию <i>true</i>.
 	*
@@ -527,7 +532,7 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Перемещает файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь. Динамичный метод.</p>
+	* <p>Перемещает файл или папку. Дополнительный параметр указывает, перетирать ли существующие файлы. На вход принимает абсолютный путь. Нестатический метод.</p>
 	*
 	*
 	* @param string $source  Исходное местоположение.
@@ -570,15 +575,15 @@ class CBXVirtualIo
 	 */
 	
 	/**
-	* <p>Создает указанную папку, если ее нет. Возвращает объект созданной или существующей папки или null в случае ошибки. На вход принимает абсолютный путь. Динамичный метод.</p>
+	* <p>Создает указанную папку, если ее нет. Возвращает объект созданной или существующей папки или null в случае ошибки. На вход принимает абсолютный путь.  Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь</bo
+	* @param string $path  Путь
 	*
 	* @return CBXVirtualDirectory 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (!$io-&gt;CreateDirectory($io-&gt;RelativeToAbsolutePath($path)))
 	*  die();
 	* </pre>

@@ -75,41 +75,42 @@ WHERE USER_ID='".intval($userId)."' AND SOCSERV_USER_ID='".intval($socservProfil
 ");
 	}
 
-	public static function compareUserLinks($userId, $socservUserId, $arLinks)
+	public static function compareUserLinks($userId, $socservUserId, $links)
 	{
-		$dbRes = self::getList(array(
+		$dbRes = static::getList(array(
 			'filter' => array(
 				//'USER_ID' => $userId, // link USER_ID doesn't update with socserv_user
-				'SOCSERV_USER_ID' => $socservUserId,
-			)
+				'=SOCSERV_USER_ID' => $socservUserId,
+			),
+			'select' => array('ID', 'LINK_UID')
 		));
 
-		$arCurrentList = array();
-		while($arRes = $dbRes->fetch())
+		$currentList = array();
+		while($linkInfo = $dbRes->fetch())
 		{
-			$arCurrentList[$arRes['LINK_UID']] = $arRes['ID'];
+			$currentList[$linkInfo['LINK_UID']] = $linkInfo['ID'];
 		}
 
-		foreach($arLinks as $key => $link)
+		foreach($links as $key => $link)
 		{
-			if(array_key_exists($link['uid'], $arCurrentList))
+			if(array_key_exists($link['uid'], $currentList))
 			{
-				unset($arCurrentList[$link['uid']]);
-				unset($arLinks[$key]);
+				unset($currentList[$link['uid']]);
+				unset($links[$key]);
 			}
 		}
 
-		foreach($arCurrentList as $linkId)
+		foreach($currentList as $linkId)
 		{
-			self::delete($linkId);
+			static::delete($linkId);
 		}
 
-		foreach($arLinks as $link)
+		foreach($links as $link)
 		{
-			self::add(array(
+			static::add(array(
 				'USER_ID' => $userId,
 				'SOCSERV_USER_ID' => $socservUserId,
-				'LINK_USER_ID' => null,
+				'LINK_USER_ID' => null, // !!!!!!
 				'LINK_UID' => $link['uid'],
 				'LINK_NAME' => $link['first_name'],
 				'LINK_LAST_NAME' => $link['last_name'],
@@ -121,19 +122,22 @@ WHERE USER_ID='".intval($userId)."' AND SOCSERV_USER_ID='".intval($socservProfil
 	public static function checkUserLinks($socservUserId)
 	{
 		$dbRes = UserTable::getByPrimary($socservUserId);
-		$arUser = $dbRes->fetch();
-		if($arUser)
+		$socservUserInfo = $dbRes->fetch();
+		if($socservUserInfo)
 		{
+			$connection = \Bitrix\Main\Application::getConnection();
+			$sqlHelper = $connection->getSqlHelper();
+
 			$sql = "
 SELECT sul.ID, su_link.USER_ID
-FROM ".self::getTableName()." sul
+FROM ".static::getTableName()." sul
 LEFT JOIN ".SocservUserTable::getTableName()." su_link ON sul.LINK_UID=su_link.XML_ID
 WHERE (1=1)
-AND sul.SOCSERV_USER_ID='".$arUser['ID']."'
-AND su_link.EXTERNAL_AUTH_ID='".$arUser['EXTERNAL_AUTH_ID']."'
+AND sul.SOCSERV_USER_ID='".intval($socservUserInfo['ID'])."'
+AND su_link.EXTERNAL_AUTH_ID='".$sqlHelper->forSql($socservUserInfo['EXTERNAL_AUTH_ID'])."'
 AND sul.LINK_USER_ID IS NULL
 ";
-			$connection = \Bitrix\Main\Application::getConnection();
+
 			return $connection->query($sql);
 		}
 		else

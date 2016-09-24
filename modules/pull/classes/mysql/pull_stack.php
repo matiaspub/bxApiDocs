@@ -8,9 +8,6 @@ class CPullStack extends CAllPullStack
 	public static function CheckExpireAgent()
 	{
 		global $DB, $pPERIOD;
-		if (!CPullOptions::ModuleEnable())
-			return false;
-
 		$pPERIOD = 86400;
 
 		$strSql = "SELECT count(ID) CNT FROM b_pull_stack WHERE DATE_CREATE < DATE_SUB(NOW(), INTERVAL 1 DAY)";

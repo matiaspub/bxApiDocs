@@ -32,7 +32,7 @@ class InternalSelect extends Select
 		$result = '';
 		$selectedField = $fieldType->getOptions();
 
-		$fields = self::getDocumentSelectFields($fieldType);
+		$fields = self::getDocumentSelectFields($fieldType, true);
 		if (!empty($fields))
 		{
 			$result .= '<select onchange="'.htmlspecialcharsbx($callbackFunctionName).'(this.options[this.selectedIndex].value)">';
@@ -75,9 +75,10 @@ class InternalSelect extends Select
 
 	/**
 	 * @param FieldType $fieldType
+	 * @param bool $ignoreAliases
 	 * @return array
 	 */
-	private static function getDocumentSelectFields(FieldType $fieldType)
+	private static function getDocumentSelectFields(FieldType $fieldType, $ignoreAliases = false)
 	{
 		$runtime = \CBPRuntime::getRuntime();
 		$runtime->startRuntime();
@@ -90,6 +91,8 @@ class InternalSelect extends Select
 			if ($field['Type'] == 'select' && substr($key, -10) != '_PRINTABLE')
 			{
 				$result[$key] = $field;
+				if (isset($field['Alias']) && !$ignoreAliases)
+					$result[$field['Alias']] = $field;
 			}
 		}
 		return $result;

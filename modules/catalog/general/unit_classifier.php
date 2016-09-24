@@ -3803,25 +3803,20 @@ class CCatalogMeasureClassifier
 	 */
 	public static function getMeasureClassifier()
 	{
-		if (null === self::$unitsClassifier)
-		{
+		if (self::$unitsClassifier === null)
 			self::initMeasureClassifier();
-		}
 		return self::$unitsClassifier;
 	}
 
 	/**
-	 * @deprecated deprecated since catalog 14.5.0
+	 * @deprecated deprecated since catalog 14.5.0 - not needed, compatibility only
 	 * @return array
 	 */
 	protected function measureStore()
 	{
-		if (null === self::$unitsClassifier)
-		{
-			self::initMeasureClassifier();
-		}
-		return self::$unitsClassifier;
+		return static::getMeasureClassifier();
 	}
+
 	/**
 	 * @param $findId
 	 * @param string $findValue
@@ -3833,7 +3828,8 @@ class CCatalogMeasureClassifier
 		$findValue = (string)$findValue;
 		if ($findValue === '')
 			$findValue = 'MEASURE_TITLE';
-		if (0 < $findId)
+		$result = '';
+		if ($findId > 0)
 		{
 			self::initMeasureClassifier();
 			foreach (self::$unitsClassifier as $subSection)
@@ -3849,12 +3845,15 @@ class CCatalogMeasureClassifier
 						&& isset($measureList[$findId][$findValue])
 					)
 					{
-						return $measureList[$findId][$findValue];
+						$result = $measureList[$findId][$findValue];
+						break 2;
 					}
 				}
+				unset($measureList);
 			}
+			unset($subSection);
 		}
-		return '';
+		return $result;
 	}
 
 	public static function getMeasureInfoByCode($findCode)
@@ -3881,4 +3880,3 @@ class CCatalogMeasureClassifier
 		return $result;
 	}
 }
-?>

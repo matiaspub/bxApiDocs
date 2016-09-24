@@ -14,7 +14,7 @@ use Bitrix\Seo\IEngine;
 
 if(!defined("BITRIX_CLOUD_ADV_URL"))
 {
-	// define("BITRIX_CLOUD_ADV_URL", 'http://cloud-adv.bitrix.info');
+	// define("BITRIX_CLOUD_ADV_URL", 'https://cloud-adv.bitrix.info');
 }
 
 if(!defined("SEO_BITRIX_API_URL"))
@@ -46,6 +46,17 @@ class Bitrix extends Engine implements IEngine
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод проверяет, зарегистрирован ли домен. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/bitrix/isregistered.php
+	* @author Bitrix
+	*/
 	public function isRegistered()
 	{
 		return $this->engineRegistered;
@@ -58,13 +69,6 @@ class Bitrix extends Engine implements IEngine
 			if(Loader::includeModule('socialservices'))
 			{
 				$this->authInterface = new \CBitrixSeoOAuthInterface($this->engine['CLIENT_ID'], $this->engine['CLIENT_SECRET']);
-
-				if($this->engineSettings['AUTH'])
-				{
-					$this->authInterface->setToken($this->engineSettings['AUTH']['access_token']);
-					$this->authInterface->setRefreshToken($this->engineSettings['AUTH']['refresh_token']);
-					$this->authInterface->setAccessTokenExpires($this->engineSettings['AUTH']['expires_in']);
-				}
 			}
 		}
 

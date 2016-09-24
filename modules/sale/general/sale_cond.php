@@ -1,5 +1,6 @@
 <?
-use Bitrix\Main\Loader,
+use Bitrix\Main,
+	Bitrix\Main\Loader,
 	Bitrix\Main\Localization\Loc,
 	Bitrix\Sale;
 
@@ -1536,38 +1537,72 @@ class CSaleCondCtrlOrderFields extends CSaleCondCtrlComplex
 			$arSalePaySystemList[$arPaySystem['ID']] = $arPaySystem['NAME'];
 		}
 
-		$arSaleDeliveryList = array();
-		$arFilter = array();
-		if (static::$boolInit)
-		{
-			if (isset(static::$arInitParams['SITE_ID']))
-				$arFilter['LID'] = static::$arInitParams['SITE_ID'];
-		}
+		$linearDeliveryList = array();
+		$deliveryList = array();
+		$groupIds = array();
+		$iterator = Sale\Delivery\Services\Table::getList(array(
+			'select' => array('ID', 'CLASS_NAME'),
+			'filter' => array('=CLASS_NAME' => '\Bitrix\Sale\Delivery\Services\Group')
+		));
+		while ($row = $iterator->fetch())
+			$groupIds[] = (int)$row['ID'];
+		unset($row, $iterator);
 
-		$rsDeliverySystems = CSaleDelivery::GetList(array(), $arFilter, false, false, array('ID', 'NAME'));
-		while ($arDelivery = $rsDeliverySystems->Fetch())
-			$arSaleDeliveryList[$arDelivery['ID']] = $arDelivery['NAME'];
-		unset($arDelivery, $rsDeliverySystems);
-
-		$arFilter = array();
-		if (static::$boolInit)
+		$deliveryIterator = Sale\Delivery\Services\Table::getList(array(
+			'select' => array('ID', 'CODE', 'NAME', 'PARENT_ID', 'SORT', 'CLASS_NAME'),
+			'order' => array('ID' => 'ASC')
+		));
+		while ($delivery = $deliveryIterator->fetch())
 		{
-			if (isset(static::$arInitParams['SITE_ID']))
-				$arFilter['SITE'] = static::$arInitParams['SITE_ID'];
-		}
-
-		$rsDeliveryHandlers = CSaleDeliveryHandler::GetList(array(),$arFilter);
-		while ($arDeliveryHandler = $rsDeliveryHandlers->Fetch())
-		{
-			$boolSep = true;
-			if (!empty($arDeliveryHandler['PROFILES']) && is_array($arDeliveryHandler['PROFILES']))
+			if ($delivery['CLASS_NAME'] == '\Bitrix\Sale\Delivery\Services\Group')
+				continue;
+			$deliveryId = (int)$delivery['ID'];
+			$parentId = (int)$delivery['PARENT_ID'];
+			if ($parentId > 0 && !in_array($parentId, $groupIds))
 			{
-				foreach ($arDeliveryHandler['PROFILES'] as $key => $arProfile)
+				if (isset($deliveryList[$parentId]))
 				{
-					$arSaleDeliveryList[$arDeliveryHandler['SID'].':'.$key] = $arDeliveryHandler['NAME'];
+					$deliveryList[$parentId]['PROFILES'][$deliveryId] = array(
+						'ID' => $deliveryId,
+						'TITLE' => $delivery['NAME'],
+						'SORT' => (int)$delivery['SORT']
+					);
 				}
 			}
+			else
+			{
+				$deliveryList[$deliveryId] = array(
+					'ID' => $deliveryId,
+					'TITLE' => $delivery['NAME'],
+					'SORT' => (int)$delivery['SORT'],
+					'PROFILES' => array()
+				);
+			}
+			unset($parentId, $deliveryId);
 		}
+		unset($delivery, $deliveryIterator);
+		unset($groupIds);
+		if (!empty($deliveryList))
+		{
+			Main\Type\Collection::sortByColumn($deliveryList, array('SORT' => SORT_ASC, 'TITLE' => SORT_ASC, 'ID' => SORT_ASC));
+			foreach ($deliveryList as $delivery)
+			{
+				if (empty($delivery['PROFILES']))
+				{
+					$linearDeliveryList[$delivery['ID']] = $delivery['TITLE'];
+				}
+				else
+				{
+					$profileList = $delivery['PROFILES'];
+					Main\Type\Collection::sortByColumn($profileList, array('SORT' => SORT_ASC, 'TITLE' => SORT_ASC, 'ID' => SORT_ASC));
+					foreach ($profileList as $profile)
+						$linearDeliveryList[$profile['ID']] = $delivery['TITLE'].': '.$profile['TITLE'];
+					unset($profile, $profileList);
+				}
+			}
+			unset($delivery);
+		}
+		unset($deliveryList);
 
 		$arLabels = array(
 			BT_COND_LOGIC_EQ => Loc::getMessage('BT_SALE_AMOUNT_LOGIC_EQ_LABEL'),
@@ -1643,7 +1678,7 @@ class CSaleCondCtrlOrderFields extends CSaleCondCtrlComplex
 				'JS_VALUE' => array(
 					'type' => 'select',
 					'multiple' => 'Y',
-					'values' => $arSaleDeliveryList,
+					'values' => $linearDeliveryList,
 					'show_value' => 'Y'
 				),
 				'PHP_VALUE' => array(

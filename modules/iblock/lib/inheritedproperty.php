@@ -12,6 +12,17 @@ class InheritedPropertyTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает путь к файлу, содержащему определение класса. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedpropertytable/getfilepath.php
+	* @author Bitrix
+	*/
 	public static function getFilePath()
 	{
 		return __FILE__;
@@ -22,6 +33,17 @@ class InheritedPropertyTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы шаблонов вычисляемых наследуемых свойств. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedpropertytable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock_iproperty';
@@ -32,6 +54,17 @@ class InheritedPropertyTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы шаблонов вычисляемых наследуемых свойств. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedpropertytable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(

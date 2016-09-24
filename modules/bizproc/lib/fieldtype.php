@@ -119,6 +119,15 @@ class FieldType
 	/**
 	 * @return string
 	 */
+	public function getBaseType()
+	{
+		$class = $this->typeClass;
+		return $class::getType();
+	}
+
+	/**
+	 * @return string
+	 */
 	public function getTypeClass()
 	{
 		return $this->typeClass;
@@ -130,6 +139,19 @@ class FieldType
 	 * @return $this
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Менеджер установки типа класса.</p>
+	*
+	*
+	* @param string $typeClass  Имя типа класса.
+	*
+	* @return \Bitrix\Bizproc\FieldType 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/fieldtype/settypeclass.php
+	* @author Bitrix
+	*/
 	public function setTypeClass($typeClass)
 	{
 		if (is_subclass_of($typeClass, '\Bitrix\Bizproc\BaseType\Base'))
@@ -347,17 +369,28 @@ class FieldType
 	 * Get list of supported base types.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод возвращает список поддерживаемых базовых типов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/fieldtype/getbasetypesmap.php
+	* @author Bitrix
+	*/
 	public static function getBaseTypesMap()
 	{
 		return array(
-			static::BOOL => '\Bitrix\Bizproc\BaseType\Bool',
+			static::BOOL => '\Bitrix\Bizproc\BaseType\BoolType',
 			static::DATE => '\Bitrix\Bizproc\BaseType\Date',
 			static::DATETIME => '\Bitrix\Bizproc\BaseType\Datetime',
 			static::DOUBLE => '\Bitrix\Bizproc\BaseType\Double',
 			static::FILE => '\Bitrix\Bizproc\BaseType\File',
-			static::INT => '\Bitrix\Bizproc\BaseType\Int',
+			static::INT => '\Bitrix\Bizproc\BaseType\IntType',
 			static::SELECT => '\Bitrix\Bizproc\BaseType\Select',
-			static::STRING => '\Bitrix\Bizproc\BaseType\String',
+			static::STRING => '\Bitrix\Bizproc\BaseType\StringType',
 			static::TEXT => '\Bitrix\Bizproc\BaseType\Text',
 			static::USER => '\Bitrix\Bizproc\BaseType\User',
 			static::INTERNALSELECT => '\Bitrix\Bizproc\BaseType\InternalSelect',
@@ -369,6 +402,21 @@ class FieldType
 	 * @param string|array $property Document property.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод нормализует структуру свойства.</p>
+	*
+	*
+	* @param mixed $string  Свойство документа.
+	*
+	* @param array $property  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/fieldtype/normalizeproperty.php
+	* @author Bitrix
+	*/
 	public static function normalizeProperty($property)
 	{
 		$normalized = array('Type' => null, 'Multiple' => false, 'Required' => false, 'Options' => null);

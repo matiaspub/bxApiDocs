@@ -24,7 +24,7 @@ class PostDecodeFilter implements Type\IRequestFilter
 		}
 
 		return array(
-			'post' => Encoding::convertEncodingArray($values['post'], 'UTF-8', SITE_CHARSET),
+			'post' => Encoding::convertEncoding($values['post'], 'UTF-8', SITE_CHARSET),
 		);
 	}
 }

@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiUtils</b> - Класс дополнительных функций. 
+ * <b>CWikiUtils</b> - Класс дополнительных функций.
  *
  *
  * @return mixed 
@@ -219,18 +219,19 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на чтение. Статичный метод.</p>
+	* <p>Метод проверяет доступ пользователя на чтение. Статический метод.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	* </li> </ul><br><br>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a> </li> 
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -244,18 +245,19 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на запись. Статичный метод.</p>
+	* <p>Метод проверяет доступ пользователя на запись. Статический метод.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	* </li> </ul><br><br>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::isDeleteable</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a> </li> 
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -280,18 +282,19 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя на удаление. Статичный метод.</p>
+	* <p>Метод проверяет доступ пользователя на удаление. Статический метод.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a>
-	* </li> </ul><br><br>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckAccess.php">CWikiUtils::CheckAccess</a> </li> 
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -305,7 +308,7 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет доступ пользователя. Статичный метод.</p>
+	* <p>Метод проверяет доступ пользователя. Статический метод.</p>
 	*
 	*
 	* @param string $access  Тип проверяемого доступа (view, write, delete)
@@ -314,11 +317,12 @@ class CWikiUtils
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsReadable.php">CWikiUtils::isReadable</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a>
-	* </li> </ul><br><br>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsWriteable.php">CWikiUtils::isWriteable</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsDeleteable.php">CWikiUtils::IsDeleteable</a>
+	* </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsAllowHTML.php">CWikiUtils::isAllowHTML</a> </li> 
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -362,7 +366,7 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет, является ли запрашиваемая страница сервисной. Статичный метод.</p>
+	* <p>Метод проверяет, является ли запрашиваемая страница сервисной. Статический метод.</p>
 	*
 	*
 	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>
@@ -373,7 +377,7 @@ class CWikiUtils
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li>
+	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/IsCategoryPage.php">CWikiUtils::IsCategoryPage</a> </li> 
 	* </ul><br><br>
 	*
 	*
@@ -383,12 +387,12 @@ class CWikiUtils
 	*/
 	static function CheckServicePage($NAME, &$SERVICE_NAME)
 	{
-		$arStream = array('category', strtolower(GetMessage('CATEGORY_NAME')));
+		$arStream = array('category', ToLower(GetMessage('CATEGORY_NAME')));
 		$arSplit = explode(':', $NAME);
 
 		if (count($arSplit) >= 2)
 		{
-			$SERVICE_PAGE = strtolower($arSplit[0]);
+			$SERVICE_PAGE = ToLower($arSplit[0]);
 			if (in_array($SERVICE_PAGE, $arStream))
 			{
 				unset($arSplit[0]);
@@ -404,7 +408,7 @@ class CWikiUtils
 
 	
 	/**
-	* <p>Метод проверяет, является ли запрашиваемая страница страницей категории. Статичный метод.</p>
+	* <p>Метод проверяет, является ли запрашиваемая страница страницей категории. Статический метод.</p>
 	*
 	*
 	* @param string $NAME  Наименование страницы. До версии 10.0.0 назывался <b>ELEMENT_NAME</b>.
@@ -416,7 +420,7 @@ class CWikiUtils
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiutils/CheckServicePage.php">CWikiUtils::CheckServicePage</a>
-	* </li> </ul><br><br>
+	* </li>  </ul><br><br>
 	*
 	*
 	* @static
@@ -426,7 +430,7 @@ class CWikiUtils
 	static function IsCategoryPage($NAME, &$CATEGORY_NAME)
 	{
 		$sServiceName = self::CheckServicePage($NAME, $CATEGORY_NAME);
-		return $sServiceName == 'category' || $sServiceName == strtolower(GetMessage('CATEGORY_NAME'));
+		return ($sServiceName == 'category' || $sServiceName == ToLower(GetMessage('CATEGORY_NAME')));
 	}
 
 	static function OnBeforeIndex($arFields)
@@ -471,7 +475,7 @@ class CWikiUtils
 
 	static function htmlspecialcharsback($str, $end = true)
 	{
-		$str = urldecode($str);
+		$str = rawurldecode($str);
 		while(strpos($str, '&amp;') !== false)
 			$str = self::htmlspecialchars_decode($str);
 		if($end)

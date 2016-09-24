@@ -6,7 +6,7 @@
  */
 class _CEventsFileman {
 /**
- * Событие "OnBeforeHTMLEditorScriptsGet" вызывается перед загрузкой JavaScript и CSS файлов редактора и позволяет добавить пользовательские файлы, которые будут подгружаться после файлов визуального редактора. Создание обработчика данного представляет собой простейший способ модифицировать встроенный визуальный редактор путём расширения или переопределения текущего функционала.
+ * Событие "OnBeforeHTMLEditorScriptsGet" вызывается перед загрузкой  JavaScript и CSS файлов редактора и позволяет добавить пользовательские файлы,  которые будут подгружаться после файлов визуального редактора. Создание  обработчика данного представляет собой простейший способ модифицировать  встроенный визуальный редактор путём расширения или переопределения текущего  функционала.
  *
  *
  * @param string $editorName  Имя подключаемого редактора.
@@ -16,7 +16,7 @@ class _CEventsFileman {
  * @return array 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -59,8 +59,8 @@ class _CEventsFileman {
  *
  *
  * <h4>See Also</h4> 
- * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/fileman/events/onincludehtmleditorscript.php">Событие
- * "OnIncludeHTMLEditorScript"</a> </li></ul></bod<a name="examples"></a>
+ * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/fileman/events/onincludehtmleditorscript.php">Событие 
+ * "OnIncludeHTMLEditorScript"</a> </li></ul><a name="examples"></a>
  *
  *
  * @static
@@ -70,9 +70,7 @@ class _CEventsFileman {
 	public static function OnBeforeHTMLEditorScriptsGet($editorName, $arEditorParams){}
 
 /**
- * Вызывается перед подключением JavaScript-файлов упрощенного редактора.
- * 
- * 
+ * перед подключением JavaScript-файлов упрощенного редактора.
  * <i>Вызывается в методе:</i><br>
  * CLightHTMLEditor::Init<br><br>
  * 
@@ -89,7 +87,7 @@ class _CEventsFileman {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -114,7 +112,7 @@ class _CEventsFileman {
  *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/fileman/events/onbeforehtmleditorscriptsget.php">Событие
- * "OnBeforeHTMLEditorScriptsGet"</a> </li></ul></bod<a name="examples"></a>
+ * "OnBeforeHTMLEditorScriptsGet"</a> </li></ul><a name="examples"></a>
  *
  *
  * @static
@@ -124,9 +122,7 @@ class _CEventsFileman {
 	public static function OnIncludeHTMLEditorScript(){}
 
 /**
- * Вызывается непосредственно после подключения упрощенного редактора, на странице вызова, но до его инициализации.
- * 
- * 
+ * непосредственно после подключения упрощенного редактора, на странице вызова, но до его инициализации.
  * <i>Вызывается в методе:</i><br>
  * CLightHTMLEditor::InitScripts<br><br>
  * 
@@ -137,9 +133,7 @@ class _CEventsFileman {
 	public static function OnIncludeLightEditorScript(){}
 
 /**
- * Вызывается происходит перед созданием и выдачей элемента медиабиблиотеки в виде HTML для показа пользователю.
- * 
- * 
+ * происходит перед созданием и выдачей элемента медиабиблиотеки в виде HTML для показа пользователю.
  * <i>Вызывается в методе:</i><br>
  * CMedialib::GetItemViewHTML<br><br>
  * 

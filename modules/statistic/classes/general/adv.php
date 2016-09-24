@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>. 
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.
  *
  *
  * @return mixed 
@@ -269,12 +269,12 @@ class CAllAdv
 	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламную кампанию</a>.</p>
 	*
 	*
-	* @param int $adv_id  ID рекламной кампании. </htm
+	* @param int $adv_id  ID рекламной кампании.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $adv_id = 1;
 	* if (<b>CAdv::Delete</b>($adv_id)) 
@@ -285,8 +285,8 @@ class CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/reset.php">CAdv::Reset</a> </li> </ul> <a
+	* кампания"</a> 	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/reset.php">CAdv::Reset</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -313,15 +313,15 @@ class CAllAdv
 
 	
 	/**
-	* <p>Обнуляет статистические данные <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	* <p>Обнуляет статистические данные <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	*
 	*
-	* @param int $adv_id  ID рекламной кампании. </htm
+	* @param int $adv_id  ID рекламной кампании.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $adv_id = 1;
 	* if (<b>CAdv::Reset</b>($adv_id)) 
@@ -332,8 +332,8 @@ class CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/delete.php">CAdv::Delete</a> </li> </ul> <a
+	* кампания"</a> 	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/delete.php">CAdv::Delete</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*

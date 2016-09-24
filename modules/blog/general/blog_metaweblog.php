@@ -441,19 +441,20 @@ class CBlogMetaWeblog
 				if($arBlog = $dbBlog->GetNext())
 				{
 					$filename = trim(str_replace("\\", "/", trim($arImageInfo["name"])), "/");
-					$DIR_NAME = CTempFile::GetDirectoryName(12);
-					$FILE_NAME = rel2abs($DIR_NAME, "/".$filename);
-					if((strlen($FILE_NAME) > 1) && ($FILE_NAME === "/".$filename))
-						$ABS_FILE_NAME = $DIR_NAME.$FILE_NAME;
+					if (strlen($filename) > 0)
+					{
+						$TEMP_FILE_NAME = CTempFile::GetFileName(md5($filename).'.'.GetFileExtension($filename));
+						CheckDirPath($TEMP_FILE_NAME);
+					}
 					else
-						$ABS_FILE_NAME = "";
+					{
+						$TEMP_FILE_NAME = '';
+					}
 
-					CheckDirPath($DIR_NAME);
-
-					if((strlen($ABS_FILE_NAME) > 0) && ($fp = fopen($ABS_FILE_NAME, "ab")))
+					if((strlen($TEMP_FILE_NAME) > 0) && ($fp = fopen($TEMP_FILE_NAME, "ab")))
 					{
 						$result = fwrite($fp, $arImageInfo["bits"]);
-						if($result !== (function_exists("mb_strlen")? mb_strlen($arImageInfo["bits"], 'latin1'): strlen($arImageInfo["bits"])))
+						if($result !== CUtil::BinStrlen($arImageInfo["bits"]))
 						{
 							return '<fault>
 									<value>
@@ -461,14 +462,14 @@ class CBlogMetaWeblog
 											<member>
 												<name>faultCode</name>
 												<value><int>3</int></value>
-												</member>
+											</member>
 											<member>
 												<name>faultString</name>
 												<value><string>Error on saving media object</string></value>
-												</member>
-											</struct>
-										</value>
-									</fault>';
+											</member>
+										</struct>
+									</value>
+								</fault>';
 						}
 						fclose($fp);
 					}
@@ -480,14 +481,14 @@ class CBlogMetaWeblog
 										<member>
 											<name>faultCode</name>
 											<value><int>3</int></value>
-											</member>
+										</member>
 										<member>
 											<name>faultString</name>
 											<value><string>Error on saving media object</string></value>
-											</member>
-										</struct>
-									</value>
-								</fault>';
+										</member>
+									</struct>
+								</value>
+							</fault>';
 					}
 
 					$arFields = array(
@@ -496,8 +497,7 @@ class CBlogMetaWeblog
 						"=TIMESTAMP_X"	=> $DB->GetNowFunction(),
 						"FILE_ID" => Array(
 							"name" => $arImageInfo["name"],
-							"tmp_name" => $ABS_FILE_NAME,
-							//"content" => $arImageInfo["bits"],
+							"tmp_name" => $TEMP_FILE_NAME,
 							"MODULE_ID" => "blog",
 							"type" => $arImageInfo["type"],
 						)
@@ -533,7 +533,7 @@ class CBlogMetaWeblog
 									</struct>
 								</value>
 							</param>
-						</params>';
+							</params>';
 					}
 				}
 			}
@@ -543,13 +543,13 @@ class CBlogMetaWeblog
 						<member>
 							<name>faultCode</name>
 							<value><int>3</int></value>
-							</member>
+						</member>
 						<member>
 							<name>faultString</name>
 							<value><string>Error on saving media object</string></value>
-							</member>
-						</struct>
-					</value>
+						</member>
+					</struct>
+				</value>
 				</fault>';
 		}
 		else
@@ -560,13 +560,13 @@ class CBlogMetaWeblog
 						<member>
 							<name>faultCode</name>
 							<value><int>3</int></value>
-							</member>
+						</member>
 						<member>
 							<name>faultString</name>
 							<value><string>'.$arAuthResult["MESSAGE"].'</string></value>
-							</member>
-						</struct>
-					</value>
+						</member>
+					</struct>
+				</value>
 				</fault>';
 		}
 

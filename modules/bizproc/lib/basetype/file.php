@@ -22,6 +22,44 @@ class File extends Base
 	}
 
 	/**
+	 * Normalize single value.
+	 *
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @return mixed Normalized value
+	 */
+	
+	/**
+	* <p>Статический метод нормализует одиночное значение.</p>
+	*
+	*
+	* @param mixed $Bitrix  Тип поля документа.
+	*
+	* @param Bitri $Bizproc  Значение поля.
+	*
+	* @param FieldType $fieldType  
+	*
+	* @param mixed $value  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/file/tosinglevalue.php
+	* @author Bitrix
+	*/
+	public static function toSingleValue(FieldType $fieldType, $value)
+	{
+		if (is_array($value))
+		{
+			if (\CBPHelper::isAssociativeArray($value))
+				$value = array_keys($value);
+			reset($value);
+			$value = current($value);
+		}
+		return $value;
+	}
+
+	/**
 	 * @param FieldType $fieldType
 	 * @param $value
 	 * @return string
@@ -32,10 +70,72 @@ class File extends Base
 		$iterator = \CFile::getByID($value);
 		if ($file = $iterator->fetch())
 		{
-			return '[url=/bitrix/tools/bizproc_show_file.php?f='.urlencode($file['FILE_NAME'])
-			.'&i='.$value.'&h='.md5($file['SUBDIR']).']'.htmlspecialcharsbx($file['ORIGINAL_NAME']).'[/url]';
+			return '[url=/bitrix/tools/bizproc_show_file.php?f='.urlencode($file['FILE_NAME']).'&hash='
+				.md5($file['FILE_NAME'])
+				.'&i='.$value.'&h='.md5($file['SUBDIR']).']'.htmlspecialcharsbx($file['ORIGINAL_NAME']).'[/url]';
 		}
 		return '';
+	}
+
+	/**
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @param string $toTypeClass Type class name.
+	 * @return null
+	 */
+	public static function convertTo(FieldType $fieldType, $value, $toTypeClass)
+	{
+		/** @var Base $toTypeClass */
+		$type = $toTypeClass::getType();
+		switch ($type)
+		{
+			case FieldType::FILE:
+				$value = (int) $value;
+				break;
+			default:
+				$value = null;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Return conversion map for current type.
+	 * @return array Map.
+	 */
+	
+	/**
+	* <p>Статический метод возвращает таблицу преобразования для текущего типа.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/file/getconversionmap.php
+	* @author Bitrix
+	*/
+	public static function getConversionMap()
+	{
+		return array(
+			array(
+				FieldType::FILE
+			)
+		);
+	}
+
+	/**
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @param string $toTypeClass Type class name.
+	 * @return array
+	 */
+	public static function convertValueMultiple(FieldType $fieldType, $value, $toTypeClass)
+	{
+		$value = (array) $value;
+		if (\CBPHelper::isAssociativeArray($value))
+			$value = array_keys($value);
+
+		return parent::convertValueMultiple($fieldType, $value, $toTypeClass);
 	}
 
 	/**
@@ -103,7 +203,7 @@ class File extends Base
 				if (!array_key_exists('MODULE_ID', $value) || strlen($value['MODULE_ID']) <= 0)
 					$value['MODULE_ID'] = 'bizproc';
 
-				$value = \CFile::saveFile($value, 'bizproc_wf', true, true);
+				$value = \CFile::saveFile($value, 'bizproc_wf', true);
 				if (!$value)
 				{
 					$value = null;

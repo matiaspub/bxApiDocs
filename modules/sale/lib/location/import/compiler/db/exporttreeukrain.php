@@ -42,7 +42,7 @@ class ExportTreeUkrainTable extends ExportTreeTable
 		12 => 'VILLAGE', 	//| РїРѕСЃРµР»РµРЅРЅСЏ          | РїРѕСЃРµР»РµРЅРёРµ              |
 	);
 
-public 	public function getMappedType($typeId)
+	public function getMappedType($typeId)
 	{
 		$dbConnection = Main\HttpApplication::getConnection();
 
@@ -61,7 +61,7 @@ public 	public function getMappedType($typeId)
 		return $this->typeMap[$typeId];
 	}
 
-public 	public function addNode($data)
+	public function addNode($data)
 	{
 		$data['LANGNAMES'] = serialize($data['NAME']);
 		$data['NAME'] = $data['NAME']['ru']['NAME'];
@@ -87,7 +87,7 @@ public 	public function addNode($data)
 		return false;
 	}
 
-public 	public function addRegion($params)
+	public function addRegion($params)
 	{
 		$dbConnection = Main\HttpApplication::getConnection();
 		$item = $dbConnection->query("select NAME, NAME_RU from b_tmp_ukrain_region where ID = '".intval($params['ID'])."'")->fetch();
@@ -100,7 +100,7 @@ public 	public function addRegion($params)
 		));
 	}
 
-	ppublic ublic function addArea($params)
+	public function addArea($params)
 	{
 		$dbConnection = Main\HttpApplication::getConnection();
 		$item = $dbConnection->query("select NAME, NAME_RU from b_tmp_ukrain_area where ID = '".intval($params['ID'])."'")->fetch();
@@ -113,7 +113,7 @@ public 	public function addRegion($params)
 		));
 	}
 
-public 	public function getNames($id, $type)
+	static public function getNames($id, $type)
 	{
 		$dbConnection = Main\HttpApplication::getConnection();
 
@@ -144,7 +144,7 @@ public 	public function getNames($id, $type)
 		);
 	}
 
-	public public function getSettlementParentCode($params)
+	public function getSettlementParentCode($params)
 	{
 		$key = intval($params['AREA_ID']) ? $params['AREA_ID'] : $params['REGION_ID'];
 
@@ -179,7 +179,7 @@ public 	public function getNames($id, $type)
 		return $this->settlementParent[$key];
 	}
 
-public 	public function buildFromUADB($options)
+	public function buildFromUADB($options)
 	{
 		if(isset($options['NEXT_FREE_CODE']))
 			$this->exportOffset = intval($options['NEXT_FREE_CODE']);
@@ -227,7 +227,7 @@ public 	public function buildFromUADB($options)
 
 	}
 
-public 	public function create()
+	public function create()
 	{
 		$dbConnection = Main\HttpApplication::getConnection();
 
@@ -273,7 +273,7 @@ public 	public function create()
 	}
 
 	/*
-public 	public function dropCodeIndex()
+	public function dropCodeIndex()
 	{
 		unset($this->codeIndex);
 
@@ -281,7 +281,7 @@ public 	public function dropCodeIndex()
 			$this->codeIndex = $this->regionCodeIndex;
 	}
 
-public 	public function insert($data)
+	public function insert($data)
 	{
 		if(isset($this->codeIndex[$data['SYS_CODE']])) // already in there
 			return;
@@ -318,7 +318,7 @@ public 	public function insert($data)
 	}
 	*/
 
-public static 	public static function getMap()
+	public static function getMap()
 	{
 		$map = parent::getMap();
 

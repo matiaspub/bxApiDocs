@@ -528,15 +528,15 @@ class CCourseImport
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод импортирует курс.</p>
+	* <p>Метод импортирует курс. Метод нестатический.</p>
 	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если создание курса прошло успешно. При
-	* возникновении ошибки метод вернёт <i>false</i>, а в свойстве объекта
-	* LAST_ERROR будет содержаться текст ошибки.</p>
+	*  возникновении ошибки метод вернёт <i>false</i>, а в свойстве объекта
+	* LAST_ERROR  будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

@@ -1,20 +1,5 @@
 <?
 /**
- * 3.3.1
- */
-define('B_PROLOG_INCLUDED', null);
-
-/**
- * 9.0.0
- */
-define('BX_MAIL_DEFAULT_CHARSET', null);
-
-/**
- * 7.0.1
- */
-define('BX_UTF', null);
-
-/**
  * B_MAIL_TIMEOUT
  */
 define('B_MAIL_TIMEOUT', 30);

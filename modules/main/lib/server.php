@@ -14,6 +14,19 @@ class Server
 	 *
 	 * @param array $arServer
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия.</p>
+	*
+	*
+	* @param array $arServer  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct(array $arServer)
 	{
 		if (isset($arServer["DOCUMENT_ROOT"]))
@@ -35,6 +48,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DOCUMENT_ROOT сервера.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getdocumentroot.php
+	* @author Bitrix
+	*/
 	public function getDocumentRoot()
 	{
 		return $this->get("DOCUMENT_ROOT");
@@ -46,6 +70,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает установленную папку <code>root</code>. Используется серверная переменнтая BX_PERSONAL_ROOT. Если переменная пустая - возвращается <code>/bitrix</code>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getpersonalroot.php
+	* @author Bitrix
+	*/
 	public function getPersonalRoot()
 	{
 		$r = $this->get("BX_PERSONAL_ROOT");
@@ -60,6 +95,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает http хост сервера.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/gethttphost.php
+	* @author Bitrix
+	*/
 	public function getHttpHost()
 	{
 		return $this->get("HTTP_HOST");
@@ -70,6 +116,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает имя сервера.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getservername.php
+	* @author Bitrix
+	*/
 	public function getServerName()
 	{
 		return $this->get("SERVER_NAME");
@@ -80,6 +137,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает адрес сервера.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getserveraddr.php
+	* @author Bitrix
+	*/
 	public function getServerAddr()
 	{
 		return $this->get("SERVER_ADDR");
@@ -90,6 +158,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает порт сервера.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getserverport.php
+	* @author Bitrix
+	*/
 	public function getServerPort()
 	{
 		return $this->get("SERVER_PORT");
@@ -101,6 +180,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает запрошенный uri вида: <code>/index.php/test1/test2?login=yes&amp;back_url_admin=/</code></p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getrequesturi.php
+	* @author Bitrix
+	*/
 	public function getRequestUri()
 	{
 		return $this->get("REQUEST_URI");
@@ -111,6 +201,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает запрошенный метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getrequestmethod.php
+	* @author Bitrix
+	*/
 	public function getRequestMethod()
 	{
 		return $this->get("REQUEST_METHOD");
@@ -122,6 +223,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает PHP_SELF вида <code>/index.php/test1/test2</code></p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getphpself.php
+	* @author Bitrix
+	*/
 	public function getPhpSelf()
 	{
 		return $this->get("PHP_SELF");
@@ -133,6 +245,17 @@ class Server
 	 *
 	 * @return string | null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает SCRIPT_NAME вида <code>/index.php</code></p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/server/getscriptname.php
+	* @author Bitrix
+	*/
 	public function getScriptName()
 	{
 		return $this->get("SCRIPT_NAME");

@@ -110,6 +110,7 @@ class CCloudStorageUpload
 					"ID" => $this->_ID,
 					"~TIMESTAMP_X" => $DB->CurrentTimeFunction(),
 					"FILE_PATH" => $this->_filePath,
+					"FILE_SIZE" => $fileSize,
 					"TMP_FILE" => $tmpFileName,
 					"BUCKET_ID" => intval($obBucket->ID),
 					"PART_SIZE" => $obBucket->GetService()->GetMinUploadPartSize(),
@@ -214,6 +215,14 @@ class CCloudStorageUpload
 
 			$this->DeleteOld();
 
+			if ($bSuccess)
+			{
+				foreach(GetModuleEvents("clouds", "OnAfterCompleteMultipartUpload", true) as $arEvent)
+				{
+					ExecuteModuleEventEx($arEvent, array($obBucket, array("size" => $ar["FILE_SIZE"]), $this->_filePath));
+				}
+			}
+			
 			return $bSuccess;
 		}
 

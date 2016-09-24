@@ -57,7 +57,7 @@ class CUserTypeString
 	 * @return string
 	 * @static
 	 */
-public static 	function GetDBColumnType($arUserField)
+	public static function GetDBColumnType($arUserField)
 	{
 		global $DB;
 		switch(strtolower($DB->type))
@@ -80,7 +80,7 @@ public static 	function GetDBColumnType($arUserField)
 	 * @return array Массив который в дальнейшем будет сериализован и сохранен в БД.
 	 * @static
 	 */
-public static 	function PrepareSettings($arUserField)
+	public static function PrepareSettings($arUserField)
 	{
 		$size = intval($arUserField["SETTINGS"]["SIZE"]);
 		$rows = intval($arUserField["SETTINGS"]["ROWS"]);
@@ -108,7 +108,7 @@ public static 	function PrepareSettings($arUserField)
 	 * @return string HTML для вывода.
 	 * @static
 	 */
-public static 	function GetSettingsHTML($arUserField = false, $arHtmlControl, $bVarsFromForm)
+	public static function GetSettingsHTML($arUserField = false, $arHtmlControl, $bVarsFromForm)
 	{
 		$result = '';
 		if($bVarsFromForm)
@@ -210,7 +210,7 @@ public static 	function GetSettingsHTML($arUserField = false, $arHtmlControl, $b
 	 * @return string HTML для вывода.
 	 * @static
 	 */
-public static 	function GetEditFormHTML($arUserField, $arHtmlControl)
+	public static function GetEditFormHTML($arUserField, $arHtmlControl)
 	{
 		if($arUserField["ENTITY_VALUE_ID"]<1 && strlen($arUserField["SETTINGS"]["DEFAULT_VALUE"])>0)
 			$arHtmlControl["VALUE"] = htmlspecialcharsbx($arUserField["SETTINGS"]["DEFAULT_VALUE"]);
@@ -252,7 +252,7 @@ public static 	function GetEditFormHTML($arUserField, $arHtmlControl)
 	 * @static
 	 */
 /*
-public static 	function GetEditFormHTMLMulty($arUserField, $arHtmlControl)
+	public static function GetEditFormHTMLMulty($arUserField, $arHtmlControl)
 	{
 		if($arUserField["VALUE"]===false && strlen($arUserField["SETTINGS"]["DEFAULT_VALUE"])>0)
 			$arHtmlControl["VALUE"] = array(htmlspecialcharsbx($arUserField["SETTINGS"]["DEFAULT_VALUE"]));
@@ -289,7 +289,7 @@ public static 	function GetEditFormHTMLMulty($arUserField, $arHtmlControl)
 	 * @return string HTML для вывода.
 	 * @static
 	 */
-public static 	function GetFilterHTML($arUserField, $arHtmlControl)
+	public static function GetFilterHTML($arUserField, $arHtmlControl)
 	{
 		return '<input type="text" '.
 			'name="'.$arHtmlControl["NAME"].'" '.
@@ -308,7 +308,7 @@ public static 	function GetFilterHTML($arUserField, $arHtmlControl)
 	 * @return string HTML для вывода.
 	 * @static
 	 */
-public static 	function GetAdminListViewHTML($arUserField, $arHtmlControl)
+	public static function GetAdminListViewHTML($arUserField, $arHtmlControl)
 	{
 		if(strlen($arHtmlControl["VALUE"])>0)
 			return $arHtmlControl["VALUE"];
@@ -330,7 +330,7 @@ public static 	function GetAdminListViewHTML($arUserField, $arHtmlControl)
 	 * @static
 	 */
 /*
-public static 	function GetAdminListViewHTMLMulty($arUserField, $arHtmlControl)
+	public static function GetAdminListViewHTMLMulty($arUserField, $arHtmlControl)
 	{
 		return implode(", ", $arHtmlControl["VALUE"]);
 	}
@@ -345,7 +345,7 @@ public static 	function GetAdminListViewHTMLMulty($arUserField, $arHtmlControl)
 	 * @return string HTML для вывода.
 	 * @static
 	 */
-public static 	function GetAdminListEditHTML($arUserField, $arHtmlControl)
+	public static function GetAdminListEditHTML($arUserField, $arHtmlControl)
 	{
 		if($arUserField["SETTINGS"]["ROWS"] < 2)
 			return '<input type="text" '.
@@ -377,7 +377,7 @@ public static 	function GetAdminListEditHTML($arUserField, $arHtmlControl)
 	 * @static
 	 */
 /*
-public static 	function GetAdminListEditHTMLMulty($arUserField, $arHtmlControl)
+	public static function GetAdminListEditHTMLMulty($arUserField, $arHtmlControl)
 	{
 		$result = array();
 		foreach($arHtmlControl["VALUE"] as $value)
@@ -415,7 +415,7 @@ public static 	function GetAdminListEditHTMLMulty($arUserField, $arHtmlControl)
 	 * @return array массив массивов ("id","text") ошибок.
 	 * @static
 	 */
-public static 	function CheckFields($arUserField, $value)
+	public static function CheckFields($arUserField, $value)
 	{
 		$aMsg = array();
 		if(strlen($value)<$arUserField["SETTINGS"]["MIN_LENGTH"])
@@ -469,7 +469,7 @@ public static 	function CheckFields($arUserField, $value)
 	 * @return string посковое содержимое.
 	 * @static
 	 */
-public static 	function OnSearchIndex($arUserField)
+	public static function OnSearchIndex($arUserField)
 	{
 		if(is_array($arUserField["VALUE"]))
 			return implode("\r\n", $arUserField["VALUE"]);
@@ -488,7 +488,7 @@ public static 	function OnSearchIndex($arUserField)
 	 * @static
 	 */
 /*
-public static 	function OnBeforeSave($arUserField, $value)
+	public static function OnBeforeSave($arUserField, $value)
 	{
 		if(strlen($value)>0)
 			return "".round(doubleval($value), $arUserField["SETTINGS"]["PRECISION"]);

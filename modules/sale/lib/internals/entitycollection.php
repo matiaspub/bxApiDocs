@@ -9,6 +9,8 @@ abstract class EntityCollection
 {
 	private $index = -1;
 
+	protected $isClone = false;
+
 	protected function __construct()
 	{
 
@@ -89,7 +91,7 @@ abstract class EntityCollection
 	/**
 	 * @param $id
 	 *
-	 * @return bool
+	 * @return CollectableEntity|bool
 	 * @throws Main\ArgumentNullException
 	 */
 	public function getItemById($id)
@@ -228,5 +230,21 @@ abstract class EntityCollection
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @return Sale\Result
+	 */
+	static public function verify()
+	{
+		return new Sale\Result();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isClone()
+	{
+		return $this->isClone;
 	}
 }

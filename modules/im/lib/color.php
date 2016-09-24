@@ -1,11 +1,4 @@
 <?php
-/**
- * Bitrix Framework
- * @package bitrix
- * @subpackage bitrix24
- * @copyright 2001-2015 Bitrix
- */
-
 namespace Bitrix\Im;
 
 use Bitrix\Main\Localization\Loc;
@@ -27,7 +20,7 @@ class Color
 		'LIGHT_BLUE' => '#6fc8e5',
 		'DARK_BLUE' => '#3e99ce',
 		'PURPLE' => '#8474c8',
-		'AQUA' => '#42bcbe',
+		'AQUA' => '#1eb4aa',
 		'PINK' => '#e98fa6',
 		'LIME' => '#85cb7b',
 		'BROWN' => '#ab7761',
@@ -192,5 +185,12 @@ class Color
 		$colors = self::getSafeColors();
 
 		return isset($colors[$code]);
+	}
+
+	public static function getRandomColor()
+	{
+		$colors = array_values(self::getColors());
+
+		return $colors[mt_rand(0, count($colors)-1)];
 	}
 }

@@ -1,8 +1,9 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
-// define("IM_REVISION", 61);
-// define("IM_MOBILE_REVISION", 3);
+// define("IM_REVISION", 76);
+// define("IM_MOBILE_REVISION", 6);
+// define("IM_MOBILE_CACHE_VERSION", 1);
 
 // define("IM_MESSAGE_SYSTEM", "S");
 // define("IM_MESSAGE_PRIVATE", "P");
@@ -57,7 +58,9 @@ CModule::AddAutoloadClasses(
 		"CIMContactList" => "classes/".$DBType."/im_contact_list.php",
 		"CIMChat" => "classes/general/im_chat.php",
 		"CIMMessage" => "classes/general/im_message.php",
+		"CIMMessageLink" => "classes/general/im_message_param.php",
 		"CIMMessageParam" => "classes/general/im_message_param.php",
+		"CIMMessageParamAttach" => "classes/general/im_message_param.php",
 		"CIMHistory" => "classes/general/im_history.php",
 		"CIMEvent" => "classes/general/im_event.php",
 		"CIMCall" => "classes/general/im_call.php",
@@ -70,19 +73,33 @@ CModule::AddAutoloadClasses(
 		"DesktopApplication" => "classes/general/im_event.php",
 		"CIMStatus" => "classes/general/im_status.php",
 		"CIMDisk" => "classes/general/im_disk.php",
+		"\\Bitrix\\Im\\ChatTable" => "lib/model/chat.php",
+		"\\Bitrix\\Im\\MessageTable" => "lib/model/message.php",
+		"\\Bitrix\\Im\\MessageParamTable" => "lib/model/messageparam.php",
+		"\\Bitrix\\Im\\RecentTable" => "lib/model/recent.php",
+		"\\Bitrix\\Im\\RelationTable" => "lib/model/relation.php",
+		"\\Bitrix\\Im\\StatusTable" => "lib/model/status.php",
+		"\\Bitrix\\Im\\BotTable" => "lib/model/bot.php",
+		"\\Bitrix\\Im\\BotChatTable" => "lib/model/botchat.php",
+		"\\Bitrix\\Im\\BotTokenTable" => "lib/model/bottoken.php",
+		"\\Bitrix\\Im\\CommandTable" => "lib/model/command.php",
+		"\\Bitrix\\Im\\CommandLangTable" => "lib/model/commandlang.php",
 	)
 );
 
 CJSCore::RegisterExt('im_common', array(
 	'js' => '/bitrix/js/im/common.js',
+	'css' => '/bitrix/js/im/css/common.css',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_common.php',
 	'rel' => array('ls', 'ajax', 'date')
 ));
 
-$jsCoreRel = array('im_common', 'popup', 'fx', 'json');
+$jsCoreRel = array('im_common', 'popup', 'fx', 'json', 'translit', 'date');
+$jsCoreRelMobile = array('im_common', 'uploader');
 if (IsModuleInstalled('voximplant'))
 {
 	$jsCoreRel[] = 'voximplant';
+	$jsCoreRelMobile[] = 'mobile_voximplant';
 }
 if (IsModuleInstalled('disk'))
 {
@@ -107,7 +124,7 @@ CJSCore::RegisterExt('im', array(
 CJSCore::RegisterExt('im_mobile', array(
 	'js' => '/bitrix/js/im/mobile.js',
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_mobile.php',
-	'rel' => array('im_common', 'uploader')
+	'rel' => $jsCoreRelMobile
 ));
 
 CJSCore::RegisterExt('im_desktop', array(
@@ -116,4 +133,19 @@ CJSCore::RegisterExt('im_desktop', array(
 	'lang' => '/bitrix/modules/im/lang/'.LANGUAGE_ID.'/js_desktop.php',
 	'rel' => array('ls', 'ajax', 'date', 'popup', 'fx', 'json'),
 ));
+
+
+$GLOBALS["APPLICATION"]->AddJSKernelInfo(
+	'im',
+	array(
+		'/bitrix/js/im/common.js', '/bitrix/js/im/im.js',
+	)
+);
+
+$GLOBALS["APPLICATION"]->AddCSSKernelInfo(
+	'im',
+	array(
+		'/bitrix/js/im/css/common.css', '/bitrix/js/im/css/im.css',
+	)
+);
 ?>

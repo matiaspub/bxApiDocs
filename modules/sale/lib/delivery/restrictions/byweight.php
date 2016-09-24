@@ -2,7 +2,7 @@
 namespace Bitrix\Sale\Delivery\Restrictions;
 
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\SystemException;
+use Bitrix\Sale\Internals\CollectableEntity;
 
 Loc::loadMessages(__FILE__);
 
@@ -23,8 +23,11 @@ class ByWeight extends Base
 		return Loc::getMessage("SALE_DLVR_RSTR_BY_WEIGHT_DESCRIPT");
 	}
 
-	static public function check($weight, array $restrictionParams, $deliveryId = 0)
+	public static function check($weight, array $restrictionParams, $deliveryId = 0)
 	{
+		if(empty($restrictionParams))
+			return true;
+
 		$weight = floatval($weight);
 
 		if(isset($restrictionParams["MIN_WEIGHT"]) && floatval($restrictionParams["MIN_WEIGHT"]) > 0  && $weight < floatval($restrictionParams["MIN_WEIGHT"]))
@@ -36,16 +39,12 @@ class ByWeight extends Base
 		return true;
 	}
 
-	public function checkByShipment(\Bitrix\Sale\Shipment $shipment, array $restrictionParams, $deliveryId = 0)
+	protected static function extractParams(CollectableEntity $shipment)
 	{
-		if(empty($restrictionParams))
-			return true;
-
-		$weight = $shipment->getWeight();
-		return $this->check($weight, $restrictionParams, $deliveryId);
+		return $shipment->getWeight();
 	}
 
-	public static function getParamsStructure()
+	public static function getParamsStructure($entityId = 0)
 	{
 		return array(
 			"MIN_WEIGHT" => array(

@@ -7,6 +7,7 @@
  */
 namespace Bitrix\Sender;
 
+use Bitrix\Main\Config\Option;
 use Bitrix\Main\Event;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\Type;
@@ -20,10 +21,13 @@ class PostingManager
 	const SEND_RESULT_SENT = true;
 	const SEND_RESULT_CONTINUE = 'CONTINUE';
 
+	protected static $checkStatusStep = 20;
 	protected static $emailSentPerIteration = 0;
 	protected static $currentMailingChainFields = null;
 
 	/**
+	 * Handler of read event
+	 *
 	 * @param array $data
 	 * @return array
 	 */
@@ -37,6 +41,8 @@ class PostingManager
 	}
 
 	/**
+	 * Handler of click event
+	 *
 	 * @param array $data
 	 * @return array
 	 */
@@ -51,7 +57,10 @@ class PostingManager
 	}
 
 	/**
+	 * Do read actions
+	 *
 	 * @param $recipientId
+	 * @return void
 	 */
 	public static function read($recipientId)
 	{
@@ -67,8 +76,11 @@ class PostingManager
 	}
 
 	/**
+	 * Do click actions
+	 *
 	 * @param $recipientId
 	 * @param $url
+	 * @return void
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
 	public static function click($recipientId, $url)
@@ -93,14 +105,8 @@ class PostingManager
 			));
 			if ($postingDb->fetch())
 			{
-				$fixedUrl = str_replace(
-					array(
-						'&bx_sender_conversion_id=' . $recipient['ID'],
-						'?bx_sender_conversion_id=' . $recipient['ID']
-					),
-					array('', ''),
-					$url
-				);
+				$uri = new \Bitrix\Main\Web\Uri($url);
+				$fixedUrl = $uri->deleteParams(array('bx_sender_conversion_id'))->getLocator();
 				$addClickDb = PostingClickTable::add(array(
 					'POSTING_ID' => $recipient['POSTING_ID'],
 					'RECIPIENT_ID' => $recipient['ID'],
@@ -124,6 +130,8 @@ class PostingManager
 
 
 	/**
+	 * Get chain list for resending
+	 *
 	 * @param $mailingId
 	 * @return array|null
 	 * @throws \Bitrix\Main\ArgumentException
@@ -149,6 +157,7 @@ class PostingManager
 	}
 
 	/**
+	 *
 	 * @param $mailingChainId
 	 * @param array $params
 	 * @return string
@@ -157,6 +166,27 @@ class PostingManager
 	 */
 	protected static function sendInternal($mailingChainId, array $params)
 	{
+		// event before sending
+		$eventSendParams = $params;
+		$eventSendParams['MAILING_CHAIN_ID'] = $mailingChainId;
+		$event = new Event('sender', 'OnBeforePostingSendRecipient', array($eventSendParams));
+		$event->send();
+		foreach ($event->getResults() as $eventResult)
+		{
+			if($eventResult->getType() == \Bitrix\Main\EventResult::ERROR)
+			{
+				return PostingRecipientTable::SEND_RESULT_ERROR;
+			}
+
+			if(is_array($eventResult->getParameters()))
+			{
+				$eventSendParams = array_merge($eventSendParams, $eventResult->getParameters());
+			}
+		}
+		unset($eventSendParams['MAILING_CHAIN_ID']);
+		$params = $eventSendParams;
+
+		// prepare common params
 		if(static::$currentMailingChainFields !== null)
 		{
 			if(static::$currentMailingChainFields['ID'] != $mailingChainId)
@@ -167,16 +197,18 @@ class PostingManager
 		{
 			$mailingChainDb = MailingChainTable::getList(array(
 				'select' => array('*', 'SITE_ID' => 'MAILING.SITE_ID'),
-				'filter' => array('ID' => $mailingChainId)
+				'filter' => array('=ID' => $mailingChainId)
 			));
 			if(!($mailingChain = $mailingChainDb->fetch()))
+			{
 				return PostingRecipientTable::SEND_RESULT_ERROR;
+			}
 
 
 			$charset = false;
 			$siteDb = \Bitrix\Main\SiteTable::getList(array(
 				'select'=>array('SERVER_NAME', 'NAME', 'CULTURE_CHARSET'=>'CULTURE.CHARSET'),
-				'filter' => array('LID' => $mailingChain['SITE_ID'])
+				'filter' => array('=LID' => $mailingChain['SITE_ID'])
 			));
 			if($site = $siteDb->fetch())
 			{
@@ -210,10 +242,37 @@ class PostingManager
 				'FILE' => $attachmentList
 			);
 			static::$currentMailingChainFields['ID'] = $mailingChain['ID'];
+
+			// create final mail-text due to filling template by blocks
+			static::$currentMailingChainFields['IS_MESSAGE_WITH_TEMPLATE'] = false;
+			if($mailingChain['TEMPLATE_TYPE'] && $mailingChain['TEMPLATE_ID'])
+			{
+				$chainTemplate = \Bitrix\Sender\Preset\Template::getById($mailingChain['TEMPLATE_TYPE'], $mailingChain['TEMPLATE_ID']);
+				if($chainTemplate && $chainTemplate['HTML'])
+				{
+					$document = new \Bitrix\Main\Web\DOM\Document;
+					$document->loadHTML($chainTemplate['HTML']);
+					\Bitrix\Main\Loader::includeModule('fileman');
+					if(\Bitrix\Fileman\Block\Editor::fillDocumentBySliceContent($document, $mailingChain['MESSAGE']))
+					{
+						\Bitrix\Main\Web\DOM\StyleInliner::inlineDocument($document);
+						$mailingChain['MESSAGE'] = $document->saveHTML();
+
+						static::$currentMailingChainFields['IS_MESSAGE_WITH_TEMPLATE'] = true;
+					}
+					else
+					{
+						unset($document);
+					}
+				}
+			}
+
+
 			static::$currentMailingChainFields['MESSAGE'] = array(
 				'BODY_TYPE' => 'html',
 				'EMAIL_FROM' => $mailingChain['EMAIL_FROM'],
 				'EMAIL_TO' => '#EMAIL_TO#',
+				'PRIORITY' => $mailingChain['PRIORITY'],
 				'SUBJECT' => $mailingChain['SUBJECT'],
 				'MESSAGE' => $mailingChain['MESSAGE'],
 				'MESSAGE_PHP' => \Bitrix\Main\Mail\Internal\EventMessageTable::replaceTemplateToPhp($mailingChain['MESSAGE']),
@@ -222,9 +281,28 @@ class PostingManager
 			static::$currentMailingChainFields['CHARSET'] = $charset;
 			static::$currentMailingChainFields['SERVER_NAME'] = $serverName;
 			static::$currentMailingChainFields['LINK_PROTOCOL'] = \Bitrix\Main\Config\Option::get("sender", "link_protocol", 'http');
+
+			static::$currentMailingChainFields['LINK_PARAMS'] = $mailingChain['LINK_PARAMS'];
 		}
 
 
+		$trackClick = isset($params['TRACK_CLICK']) ? $params['TRACK_CLICK'] : null;
+		if($trackClick && static::$currentMailingChainFields['LINK_PARAMS'])
+		{
+			if(!is_array($trackClick['URL_PARAMS']))
+			{
+				$trackClick['URL_PARAMS'] = array();
+			}
+
+			parse_str(static::$currentMailingChainFields['LINK_PARAMS'], $trackClickTmp);
+			if(is_array($trackClickTmp))
+			{
+				$trackClick['URL_PARAMS'] = array_merge($trackClick['URL_PARAMS'], $trackClickTmp);
+			}
+		}
+
+
+		// prepare params for send email
 		$messageParams = array(
 			'EVENT' => static::$currentMailingChainFields['EVENT'],
 			'FIELDS' => $params['FIELDS'],
@@ -251,9 +329,33 @@ class PostingManager
 			}
 		}
 
+		// event on sending
+		$eventMessageParams = $messageParams;
+		$eventMessageParams['MAILING_CHAIN_ID'] = $mailingChainId;
+		$eventMessageParams['IS_MESSAGE_WITH_TEMPLATE'] = static::$currentMailingChainFields['IS_MESSAGE_WITH_TEMPLATE'];
+		$event = new Event('sender', 'OnPostingSendRecipient', array($eventMessageParams));
+		$event->send();
+		foreach ($event->getResults() as $eventResult)
+		{
+			if($eventResult->getType() == \Bitrix\Main\EventResult::ERROR)
+			{
+				return PostingRecipientTable::SEND_RESULT_ERROR;
+			}
+
+			if(is_array($eventResult->getParameters()))
+			{
+				$eventMessageParams = array_merge($eventMessageParams, $eventResult->getParameters());
+			}
+		}
+		static::$currentMailingChainFields['IS_MESSAGE_WITH_TEMPLATE'] = $eventMessageParams['IS_MESSAGE_WITH_TEMPLATE'];
+		unset($eventMessageParams['IS_MESSAGE_WITH_TEMPLATE']);
+		unset($eventMessageParams['MAILING_CHAIN_ID']);
+		$messageParams = $eventMessageParams;
+
 		$message = Mail\EventMessageCompiler::createInstance($messageParams);
 		$message->compile();
 
+		// add unsubscribe info to header
 		$mailHeaders = $message->getMailHeaders();
 		if(!empty($params['FIELDS']['UNSUBSCRIBE_LINK']))
 		{
@@ -261,11 +363,24 @@ class PostingManager
 			$mailHeaders['List-Unsubscribe'] = '<'.$unsubUrl.'>';
 		}
 
-		// send mail
-		$result = Mail\Mail::send(array(
+		$mailBody = null;
+		if(static::$currentMailingChainFields['IS_MESSAGE_WITH_TEMPLATE'] && Option::get('sender', 'use_inliner_for_each_template_mail', 'N') == 'Y')
+		{
+			// inline styles
+			$mailBody = \Bitrix\Main\Web\DOM\StyleInliner::inlineHtml($message->getMailBody());
+		}
+
+		if(!$mailBody)
+		{
+			$mailBody = $message->getMailBody();
+		}
+
+
+		// set email params
+		$mailParams = array(
 			'TO' => $message->getMailTo(),
 			'SUBJECT' => $message->getMailSubject(),
-			'BODY' => $message->getMailBody(),
+			'BODY' => $mailBody,
 			'HEADER' => $mailHeaders,
 			'CHARSET' => $message->getMailCharset(),
 			'CONTENT_TYPE' => $message->getMailContentType(),
@@ -274,9 +389,31 @@ class PostingManager
 			'LINK_PROTOCOL' => static::$currentMailingChainFields['LINK_PROTOCOL'],
 			'LINK_DOMAIN' => static::$currentMailingChainFields['SERVER_NAME'],
 			'TRACK_READ' => (isset($params['TRACK_READ']) ? $params['TRACK_READ'] : null),
-			'TRACK_CLICK' => (isset($params['TRACK_CLICK']) ? $params['TRACK_CLICK'] : null)
-		));
+			'TRACK_CLICK' => $trackClick
+		);
 
+		// event on sending email
+		$eventMailParams = $mailParams;
+		$eventMailParams['MAILING_CHAIN_ID'] = $mailingChainId;
+		$event = new Event('sender', 'OnPostingSendRecipientEmail', array($eventMailParams));
+		$event->send();
+		foreach ($event->getResults() as $eventResult)
+		{
+			if($eventResult->getType() == \Bitrix\Main\EventResult::ERROR)
+			{
+				return PostingRecipientTable::SEND_RESULT_ERROR;
+			}
+
+			if(is_array($eventResult->getParameters()))
+			{
+				$eventMailParams = array_merge($eventMailParams, $eventResult->getParameters());
+			}
+		}
+		unset($eventMailParams['MAILING_CHAIN_ID']);
+		$mailParams = $eventMailParams;
+
+		// send mail
+		$result = Mail\Mail::send($mailParams);
 		if($result)
 			return PostingRecipientTable::SEND_RESULT_SUCCESS;
 		else
@@ -284,6 +421,8 @@ class PostingManager
 	}
 
 	/**
+	 * Send letter by message from posting to address.
+	 *
 	 * @param $mailingChainId
 	 * @param $address
 	 * @return bool
@@ -303,6 +442,7 @@ class PostingManager
 				'NAME' => $recipientName,
 				'EMAIL_TO' => $address,
 				'USER_ID' => $USER->GetID(),
+				'SENDER_CHAIN_ID' => $mailingChain["ID"],
 				'SENDER_CHAIN_CODE' => 'sender_chain_item_' . $mailingChain["ID"],
 				'UNSUBSCRIBE_LINK' => Subscription::getLinkUnsub(array(
 					'MAILING_ID' => !empty($mailingChain) ? $mailingChain['MAILING_ID'] : 0,
@@ -339,6 +479,8 @@ class PostingManager
 	}
 
 	/**
+	 * Send posting.
+	 *
 	 * @param $id
 	 * @param int $timeout
 	 * @param int $maxMailCount
@@ -365,9 +507,9 @@ class PostingManager
 				'MAILING_CHAIN_IS_TRIGGER' => 'MAILING_CHAIN.IS_TRIGGER',
 			),
 			'filter' => array(
-				'ID' => $id,
-				'MAILING.ACTIVE' => 'Y',
-				'MAILING_CHAIN.STATUS' => MailingChainTable::STATUS_SEND,
+				'=ID' => $id,
+				'=MAILING.ACTIVE' => 'Y',
+				'=MAILING_CHAIN.STATUS' => MailingChainTable::STATUS_SEND,
 			)
 		));
 		$postingData = $postingDb->fetch();
@@ -414,17 +556,39 @@ class PostingManager
 		}
 
 
+		$isStopped = false;
+		$checkStatusCounter = 0;
+		static::$checkStatusStep = intval(Option::get('sender', 'send_check_status_step', static::$checkStatusStep));
+
 		// select all recipients of posting, only not processed
 		$recipientDataDb = PostingRecipientTable::getList(array(
 			'filter' => array(
-				'POSTING_ID' => $postingData['ID'],
-				'STATUS' => PostingRecipientTable::SEND_RESULT_NONE
+				'=POSTING_ID' => $postingData['ID'],
+				'=STATUS' => PostingRecipientTable::SEND_RESULT_NONE
 			),
 			'limit' => $maxMailCount
 		));
 
 		while($recipientData = $recipientDataDb->fetch())
 		{
+			// check pause or stop status
+			if(++$checkStatusCounter >= static::$checkStatusStep)
+			{
+				$checkStatusDb = MailingChainTable::getList(array(
+					'select' => array('ID'),
+					'filter' => array(
+						'=ID' => $postingData["MAILING_CHAIN_ID"],
+						'=STATUS' => MailingChainTable::STATUS_SEND
+					)
+				));
+				if(!$checkStatusDb->fetch())
+				{
+					break;
+				}
+
+				$checkStatusCounter = 0;
+			}
+
 			// create name from email
 			$recipientEmail = $recipientData["EMAIL"];
 			if(empty($recipientData["NAME"]))
@@ -444,6 +608,7 @@ class PostingManager
 					'EMAIL_TO' => $recipientEmail,
 					'NAME' => $recipientName,
 					'USER_ID' => $recipientData["USER_ID"],
+					'SENDER_CHAIN_ID' => $postingData["MAILING_CHAIN_ID"],
 					'SENDER_CHAIN_CODE' => 'sender_chain_item_' . $postingData["MAILING_CHAIN_ID"],
 					'UNSUBSCRIBE_LINK' => Subscription::getLinkUnsub(array(
 						'MAILING_ID' => $postingData['MAILING_ID'],
@@ -466,7 +631,16 @@ class PostingManager
 				$sendParams['FIELDS'] = $sendParams['FIELDS'] + $recipientData['FIELDS'];
 
 			// set sending result to recipient
-			$mailSendResult = static::sendInternal($postingData['MAILING_CHAIN_ID'], $sendParams);
+			try
+			{
+				$mailSendResult = static::sendInternal($postingData['MAILING_CHAIN_ID'], $sendParams);
+			}
+			catch(\Bitrix\Main\Mail\StopException $e)
+			{
+				$isStopped = true;
+				break;
+			}
+
 			PostingRecipientTable::update(array('ID' => $recipientData["ID"]), array('STATUS' => $mailSendResult, 'DATE_SENT' => new Type\DateTime()));
 
 			// send event
@@ -489,7 +663,12 @@ class PostingManager
 
 		//set status and delivered and error emails
 		$statusList = PostingTable::getRecipientCountByStatus($id);
-		if(!array_key_exists(PostingRecipientTable::SEND_RESULT_NONE, $statusList))
+		if($isStopped)
+		{
+			$STATUS = PostingTable::STATUS_ABORT;
+			$DATE = new Type\DateTime();
+		}
+		elseif(!array_key_exists(PostingRecipientTable::SEND_RESULT_NONE, $statusList))
 		{
 			if(array_key_exists(PostingRecipientTable::SEND_RESULT_ERROR, $statusList))
 				$STATUS = PostingTable::STATUS_SENT_WITH_ERRORS;
@@ -510,7 +689,27 @@ class PostingManager
 
 
 		// update status of posting
-		PostingTable::update(array('ID' => $id), array('STATUS' => $STATUS, 'DATE_SENT' => $DATE));
+		$postingUpdateFields = array(
+			'STATUS' => $STATUS,
+			'DATE_SENT' => $DATE,
+			'COUNT_SEND_ALL' => 0
+		);
+		$recipientStatusToPostingFieldMap = PostingTable::getRecipientStatusToPostingFieldMap();
+		foreach($recipientStatusToPostingFieldMap as $recipientStatus => $postingFieldName)
+		{
+			if(!array_key_exists($recipientStatus, $statusList))
+			{
+				$postingCountFieldValue = 0;
+			}
+			else
+			{
+				$postingCountFieldValue = $statusList[$recipientStatus];
+			}
+
+			$postingUpdateFields['COUNT_SEND_ALL'] += $postingCountFieldValue;
+			$postingUpdateFields[$postingFieldName] = $postingCountFieldValue;
+		}
+		PostingTable::update(array('ID' => $id), $postingUpdateFields);
 
 		// return status to continue or end of sending
 		if($STATUS == PostingTable::STATUS_PART)
@@ -520,6 +719,8 @@ class PostingManager
 	}
 
 	/**
+	 * Lock posting for preventing double sending
+	 *
 	 * @param $id
 	 * @return bool
 	 * @throws \Bitrix\Main\Db\SqlQueryException
@@ -597,6 +798,8 @@ class PostingManager
 	}
 
 	/**
+	 * UnLock posting that was locking for preventing double sending
+	 *
 	 * @param $id
 	 * @return bool
 	 */

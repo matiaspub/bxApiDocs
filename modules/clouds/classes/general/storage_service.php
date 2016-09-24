@@ -3,8 +3,16 @@ abstract class CCloudStorageService
 {
 	/**
 	 * @return CCloudStorageService
+	 * @deprecated
 	*/
 	abstract public function GetObject();
+	/**
+	 * @return CCloudStorageService
+	*/
+	public static function GetObjectInstance()
+	{
+		return new static;
+	}
 	/**
 	 * @return string
 	*/
@@ -65,6 +73,55 @@ abstract class CCloudStorageService
 	 * @return bool
 	*/
 	abstract public function FileCopy($arBucket, $arFile, $filePath);
+	/**
+	 * @param array[string]string $arBucket
+	 * @param string $sourcePath
+	 * @param string $targetPath
+	 * @param bool $overwrite
+	 * @return bool
+	*/
+	public function FileRename($arBucket, $sourcePath, $targetPath, $overwrite = true)
+	{
+		if ($this->FileExists($arBucket, $sourcePath))
+		{
+			$contentType = $this->headers["Content-Type"];
+		}
+		else
+		{
+			return false;
+		}
+
+		if ($this->FileExists($arBucket, $targetPath))
+		{
+			if (!$overwrite)
+			{
+				return false;
+			}
+
+			if (!$this->DeleteFile($arBucket, $targetPath))
+			{
+				return false;
+			}
+		}
+
+		$arFile = array(
+			"SUBDIR" => 0,
+			"FILE_NAME" => ltrim($sourcePath, "/"),
+			"CONTENT_TYPE" => $contentType,
+		);
+
+		if (!$this->FileCopy($arBucket, $arFile, $targetPath))
+		{
+			return false;
+		}
+
+		if (!$this->DeleteFile($arBucket, $sourcePath))
+		{
+			return false;
+		}
+
+		return true;
+	}
 	/**
 	 * @param array[string]string $arBucket
 	 * @param mixed $arFile

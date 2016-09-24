@@ -370,4 +370,3 @@ class CIBlockPropertyElementList
 		return $cache[$IBLOCK_ID];
 	}
 }
-?>

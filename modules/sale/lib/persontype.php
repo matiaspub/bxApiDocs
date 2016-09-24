@@ -45,11 +45,11 @@ class PersonType
 		$personType = new static();
 		$personType->siteId = $siteId;
 
-		$filter = array("ACTIVE" => "Y");
+		$filter = array("=ACTIVE" => "Y");
 
 		if (strval($siteId) != "")
 		{
-			$filter['LID'] = $siteId;
+			$filter['=PERSON_TYPE_SITE.SITE_ID'] = $siteId;
 		}
 
 		if ($id > 0)

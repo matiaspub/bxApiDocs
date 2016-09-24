@@ -38,7 +38,7 @@ class CAllCatalogDocs
 
 		$arFields['~DATE_MODIFY'] = $DB->GetNowFunction();
 
-		if ($id <= 0 || !self::CheckFields('UPDATE', $arFields))
+		if ($id <= 0 || !static::checkFields('UPDATE', $arFields))
 			return false;
 		$strUpdate = $DB->PrepareUpdate("b_catalog_store_docs", $arFields);
 
@@ -172,7 +172,7 @@ class CAllCatalogDocs
 					{
 						$arDocFields["STATUS_BY"] = $arDocFields["MODIFIED_BY"] = $userId;
 					}
-					if(!self::Update($documentId, $arDocFields))
+					if(!self::update($documentId, $arDocFields))
 						return false;
 				}
 			}
@@ -217,7 +217,7 @@ class CAllCatalogDocs
 
 				if($userId > 0)
 					$arDocFields["STATUS_BY"] = $userId;
-				if(!self::Update($documentId, $arDocFields))
+				if(!self::update($documentId, $arDocFields))
 					return false;
 			}
 		}
@@ -237,16 +237,17 @@ class CAllCatalogDocs
 			}
 			return $DB->Query("delete from b_catalog_store_barcode where PRODUCT_ID = ".$productID, true);
 		}
+		return true;
 	}
 
 	public static function OnCatalogStoreDelete($storeID)
 	{
 		global $DB;
 		$storeID = (int)$storeID;
-		if ($storeID > 0)
-		{
-			return $DB->Query("delete from b_catalog_store_barcode where STORE_ID = ".$storeID, true);
-		}
+		if ($storeID <= 0)
+			return false;
+
+		return $DB->Query("delete from b_catalog_store_barcode where STORE_ID = ".$storeID, true);
 	}
 
 	public static function OnBeforeIBlockElementDelete($productID)
@@ -259,7 +260,7 @@ class CAllCatalogDocs
 			$dbStoreDocs = CCatalogDocs::getList(array(), array("PRODUCTS_ELEMENT_ID" => $productID, "STATUS" => "Y"), false, false, array('ID'));
 			if ($arStoreDocs = $dbStoreDocs->fetch())
 			{
-				$APPLICATION->ThrowException(GetMessage("CAT_DOC_ERROR_ELEMENT_IN_DOCUMENT"));
+				$APPLICATION->ThrowException(GetMessage("CAT_DOC_ERROR_ELEMENT_IN_DOCUMENT_EXT"));
 				return false;
 			}
 		}

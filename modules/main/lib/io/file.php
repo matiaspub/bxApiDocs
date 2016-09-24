@@ -11,6 +11,27 @@ class File
 	/** @var resource */
 	protected $filePointer;
 
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести  при создании объекта какие-то действия.</p>
+	*
+	*
+	* @param string $path  Полный путь к файлу
+	*
+	* @param string $siteId = null Идентификатор сайта
+	*
+	* @return resource 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Создаем экземпляр класса:$file=new \Bitrix\Main\IO\File($path, $siteId = null);Теперь с файлом, путь до которого был передан в конструктор класса можно сделать следующее:Открыть файл. Параметром указывается тип доступа, который запрашивается у потока. Этот параметр аналогичен функции <b>php fopen</b>. $file-&gt;open($mode)Проверить его существование.$file-&gt;isExists()Записать данные в файл аналогично статическому методу  <a href="/api_d7/bitrix/main/io/file/putfilecontents.php">putFileContents</a>.$file-&gt;putContents($data, $flags=self::REWRITE)Получить размер файла.$file-&gt;getSize()Понять, доступен ли файл для записи.$file-&gt;isWritable()Понять, доступен ли файл для чтения.$file-&gt;isReadable()Прочесть файл и записать его в буфер вывода. Получить количество прочитанных из файла байт.$file-&gt;readFile()Получить дату создания файла.$file-&gt;getCreationTime()Получить время последнего доступа к файлу.$file-&gt;getLastAccessTime()Получить время последнего изменения файла.$file-&gt;getModificationTime()Установить на файл права на запись$file-&gt;markWritable()Узнать права доступа к файлу$file-&gt;getPermissions()Удалить файл.$file-&gt;delete()Получить тип контента файла.$file-&gt;getContentType()
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($path, $siteId = null)
 	{
 		parent::__construct($path, $siteId);
@@ -23,6 +44,19 @@ class File
 	 * @return resource
 	 * @throws FileOpenException
 	 */
+	
+	/**
+	* <p>Нестатический метод открывает файл и возвращает указатель файла.</p>
+	*
+	*
+	* @param string $mode  
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/open.php
+	* @author Bitrix
+	*/
 	public function open($mode)
 	{
 		$this->filePointer = fopen($this->getPhysicalPath(), $mode."b");
@@ -38,6 +72,17 @@ class File
 	 *
 	 * @throws FileNotOpenedException
 	 */
+	
+	/**
+	* <p>Нестатический метод закрывает файл.</p> <p>Без параметров</p>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/close.php
+	* @author Bitrix
+	*/
 	public function close()
 	{
 		if(!$this->filePointer)
@@ -83,6 +128,17 @@ class File
 	 * @throws FileNotFoundException
 	 * @throws FileOpenException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает размер файла.</p> <p>Без параметров</p>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/getsize.php
+	* @author Bitrix
+	*/
 	public function getSize()
 	{
 		if (!$this->isExists())
@@ -137,6 +193,21 @@ class File
 	 * @return int
 	 * @throws FileNotOpenedException
 	 */
+	
+	/**
+	* <p>Нестатический метод ищет указатель файла от начала (только SEEK_SET).</p>
+	*
+	*
+	* @param mixed $integer  
+	*
+	* @param float $position  
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/seek.php
+	* @author Bitrix
+	*/
 	public function seek($position)
 	{
 		if(!$this->filePointer)
@@ -253,24 +324,80 @@ class File
 		return $contentType;
 	}
 
+	
+	/**
+	* <p>Статический метод определяет существует ли файл. </p>
+	*
+	*
+	* @param string $path  Полный путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/isfileexists.php
+	* @author Bitrix
+	*/
 	public static function isFileExists($path)
 	{
 		$f = new self($path);
 		return $f->isExists();
 	}
 
+	
+	/**
+	* <p>Статический метод возвращает содержимое файла в виде одной строки.</p>
+	*
+	*
+	* @param string $path  Полный путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/getfilecontents.php
+	* @author Bitrix
+	*/
 	public static function getFileContents($path)
 	{
 		$f = new self($path);
 		return $f->getContents();
 	}
 
+	
+	/**
+	* <p>Статический метод записывает данные в файл. Если флаг указан, то данные будут дописаны в конец. В противном случае файл будет перезаписан полностью. Если файла нет, то он будет создан. При создании не только создаёт сам файл, но и все директории на пути к нему.</p> <p>Аналог метода в старом ядре: <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php" >RewriteFile</a>.</p>
+	*
+	*
+	* @param string $path  Полный путь к файлу
+	*
+	* @param string $data  Данные для записи
+	*
+	* @param $dat $flags = self::REWRITE флаг
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/putfilecontents.php
+	* @author Bitrix
+	*/
 	public static function putFileContents($path, $data, $flags=self::REWRITE)
 	{
 		$f = new self($path);
 		return $f->putContents($data, $flags);
 	}
 
+	
+	/**
+	* <p>Статический метод удаляет файл. </p>
+	*
+	*
+	* @param string $path  Полный путь к файлу.
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/file/deletefile.php
+	* @author Bitrix
+	*/
 	public static function deleteFile($path)
 	{
 		$f = new self($path);

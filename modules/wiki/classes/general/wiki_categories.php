@@ -55,7 +55,7 @@ class CWikiCategoryParams
 
 		$this->sLink = CComponentEngine::MakePathFromTemplate($sTemplate != "" ? $sTemplate : $this->sPathTemplate,
 						array(
-						'wiki_name' => urlencode('category:'.$this->sName),
+						'wiki_name' => urlencode('Category:'.$this->sName),
 						'group_id' => CWikiSocnet::$iSocNetId
 						));
 		return true;

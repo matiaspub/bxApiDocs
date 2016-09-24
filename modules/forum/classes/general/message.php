@@ -209,13 +209,14 @@ class CAllForumMessage
 			}
 		}
 
+		global $APPLICATION, $USER_FIELD_MANAGER;
 		if(!empty($aMsg))
 		{
 			$e = new CAdminException(array_reverse($aMsg));
-			$GLOBALS["APPLICATION"]->ThrowException($e);
+			$APPLICATION->ThrowException($e);
 			return false;
 		}
-		else if(!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("FORUM_MESSAGE", $ID, $arFields))
+		else if(!$USER_FIELD_MANAGER->CheckFields("FORUM_MESSAGE", $ID, $arFields, (array_key_exists("USER_ID", $arFields) ? $arFields["USER_ID"] : false)))
 			return false;
 
 		if (is_set($arFields, "AUTHOR_ID") || $ACTION=="ADD") $arFields["AUTHOR_ID"] = intVal($arFields["AUTHOR_ID"]) <= 0 ? false : $arFields["AUTHOR_ID"];
@@ -236,9 +237,66 @@ class CAllForumMessage
 		return True;
 	}
 
+	
+	/**
+	* <p>Изменяет параметры существующего сообщения с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого сообщения. Метод статический.</p>
+	*
+	*
+	* @param int $intID  Код сообщения, параметры которого необходимо изменить.
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]),  		где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> 		Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">списке
+	* полей сообщения</a>.
+	*
+	* @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
+	* сообщения не будут автоматически обсчитаны статистические
+	* данные. 		Это ускоряет работу функции, но создает логические
+	* ошибки в данных. 		Необязательный. По умолчанию равен False.
+	*
+	* @param string $strUploadDir  Каталог для загрузки файлов. Должен быть задан относительно
+	* главного каталога для загрузки. 		Необязательный. По умолчанию
+	* равен "forum".
+	*
+	* @return int <p>Возвращает код измененного сообщения. В случае ошибки
+	* изменения возвращает False.</p><h4>Примечания</h4><p>Перед изменением
+	* сообщения следует проверить возможность изменения методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/canuserupdatemessage.php">CForumMessage::CanUserUpdateMessage</a>.</p><p>Для
+	* добавления и изменения сообщения и темы рекомендуется
+	* пользоваться высокоуровневой функцией <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a>.</p>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* // Добавление информации о редактировании на форумах, где есть только логины: 
+	* // 1. Не стоит использовать время PHP (время PHP и БД довольно часто различается, а сейчас в форуме, практически, везде используется время БД);
+	* // 2. Нельзя показывать логин пользователя без его разрешения.
+	* 
+	* &lt;?
+	* $arUser = CForumUser::GetByUSER_ID($USER-&gt;GetID());
+	* $arFields = array( 
+	*    "POST_MESSAGE" =&gt; $_POST["POST_MESSAGE"], 
+	*    "EDIT_DATE" =&gt; "", 
+	*    "EDITOR_ID" =&gt; $USER-&gt;GetID(), 
+	*    "EDITOR_NAME" =&gt; trim($arUser["SHOW_NAME"] == "Y" ? $USER-&gt;GetFullName() : $USER-&gt;GetLogin()));
+	* $arFields["EDITOR_NAME"] = (empty($arFields["EDITOR_NAME"]) ? $USER-&gt;GetLogin() : $arFields["EDITOR_NAME"]);
+	* CForumMessage::Update($MID, $arFields);
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
+	* </li></ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $skip_counts = false, $strUploadDir = false)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 		$ID = intVal($ID);
 		$strSql = "";
 		$strUploadDir = ($strUploadDir === false ? "forum" : $strUploadDir);
@@ -355,7 +413,7 @@ class CAllForumMessage
 /***************** Quota *******************************************/
 		$_SESSION["SESS_RECOUNT_DB"] = "Y";
 
-		$GLOBALS["USER_FIELD_MANAGER"]->Update("FORUM_MESSAGE", $ID, $arFields);
+		$USER_FIELD_MANAGER->Update("FORUM_MESSAGE", $ID, $arFields, (array_key_exists("USER_ID", $arFields) ? $arFields["USER_ID"] : false));
 /***************** Event onAfterMessageUpdate **********************/
 		foreach (GetModuleEvents("forum", "onAfterMessageUpdate", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$ID, &$arFields, $arMessage_prev));
@@ -457,7 +515,7 @@ class CAllForumMessage
 			"TITLE" => $arMessage["TOPIC_INFO"]["TITLE"].($arMessage["NEW_TOPIC"] == "Y" && !empty($arMessage["TOPIC_INFO"]["DESCRIPTION"]) ?
 					", ".$arMessage["TOPIC_INFO"]["DESCRIPTION"] : ""),
 			"TAGS" => (($arMessage["NEW_TOPIC"] == "Y") ? $arMessage["TOPIC_INFO"]["TAGS"] : ""),
-			"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(forumTextParser::clearAllTags($arMessage["POST_MESSAGE"])),
+			"BODY" => GetMessage("AVTOR_PREF")." ".$arMessage["AUTHOR_NAME"].". ".(CSearch::KillTags(forumTextParser::clearAllTags($arMessage["POST_MESSAGE"]))),
 			"ENTITY_TYPE_ID"  => $arMessage["NEW_TOPIC"] == "Y"? "FORUM_TOPIC": "FORUM_POST",
 			"ENTITY_ID"  => $arMessage["NEW_TOPIC"] == "Y"? $arMessage["TOPIC_ID"]: $arMessage["ID"],
 			"USER_ID" => $arMessage["AUTHOR_ID"],
@@ -511,7 +569,7 @@ class CAllForumMessage
 
 	public static function Delete($ID)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 		$ID = intVal($ID);
 		$arMessage = array();
 		if ($ID > 0)
@@ -552,7 +610,7 @@ class CAllForumMessage
 		endif;
 		$DB->Commit();
 
-		$GLOBALS["USER_FIELD_MANAGER"]->Delete("FORUM_MESSAGE", $ID);
+		$USER_FIELD_MANAGER->Delete("FORUM_MESSAGE", $ID);
 
 		if ($AUTHOR_ID > 0):
 			CForumUser::SetStat($AUTHOR_ID);
@@ -585,7 +643,8 @@ class CAllForumMessage
 
 		if (!array_key_exists($ID, $GLOBALS["FORUM_CACHE"]["MESSAGE"]))
 		{
-			$strSql = "SELECT FM.*, ".$DB->DateToCharFunction("FM.POST_DATE", "FULL")." as POST_DATE
+			$strSql = "SELECT FM.*, ".$DB->DateToCharFunction("FM.POST_DATE", "FULL")." as POST_DATE,
+					".$DB->DateToCharFunction("FM.EDIT_DATE", "FULL")." as EDIT_DATE
 				FROM b_forum_message FM
 				WHERE FM.ID = ".$ID;
 			$db_res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
@@ -612,41 +671,6 @@ class CAllForumMessage
 		return $res;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров сообщения, а так же сопутствующие параметры, по его коду <i>ID</i>.</p>
-	*
-	*
-	* @param int $ID  Код сообщения.
-	*
-	* @param array $arAddParams = Array() Массив добавления параметров.
-	*
-	* @return mixed 
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Распечатаем на экран все возвращаемые параметры сообщения
-	* $arMessage = CForumMessage::GetByIDEx($MID);
-	* if ($arMessage)
-	* {
-	*   echo "&lt;pre&gt;";
-	*   print_r($arMessage);
-	*   echo "&lt;/pre&gt;";
-	* }
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforummessage">Поля сообщения</a>
-	* </li></ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforummessage/getbyidex.php
-	* @author Bitrix
-	*/
 	public static function GetByIDEx($ID, $arAddParams = array())
 	{
 		global $DB;
@@ -695,6 +719,7 @@ class CAllForumMessage
 
 		$strSql =
 			"SELECT FM.*, ".$DB->DateToCharFunction("FM.POST_DATE", "FULL")." as POST_DATE,
+				".$DB->DateToCharFunction("FM.EDIT_DATE", "FULL")." as EDIT_DATE,
 				FU.SHOW_NAME, FU.DESCRIPTION, FU.NUM_POSTS, FU.POINTS as NUM_POINTS, FU.SIGNATURE, FU.AVATAR, FU.RANK_ID,
 				".$DB->DateToCharFunction("FU.DATE_REG", "SHORT")." as DATE_REG,
 				U.EMAIL, U.PERSONAL_ICQ, U.LOGIN, U.NAME, U.SECOND_NAME, U.LAST_NAME, U.PERSONAL_PHOTO".
@@ -1195,7 +1220,8 @@ class _CMessageDBResult extends CDBResult
 		$this->arUserFields = false;
 		if (array_key_exists("SELECT", $params))
 		{
-			$this->arUserFields = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("FORUM_MESSAGE", 0, LANGUAGE_ID);
+			global $USER_FIELD_MANAGER;
+			$this->arUserFields = $USER_FIELD_MANAGER->GetUserFields("FORUM_MESSAGE", 0, LANGUAGE_ID);
 			$this->checkUserFields = (!empty($this->arUserFields));
 		}
 		parent::CDBResult($res);
@@ -1614,4 +1640,3 @@ class CALLForumFiles
 		return $result;
 	}
 }
-?>

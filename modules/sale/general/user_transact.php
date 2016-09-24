@@ -56,13 +56,13 @@ class CAllSaleUserTransact
 
 	
 	/**
-	* <p>Метод удаляет транзакцию с кодом ID. Метод динамичный.</p>
+	* <p>Метод удаляет транзакцию с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Номер транзакции.
+	* @param mixed $intID  Номер транзакции.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusertransact/csaleusertransact.delete.php

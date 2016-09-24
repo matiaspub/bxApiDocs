@@ -90,7 +90,7 @@ CModule::AddAutoloadClasses(
 		
 		"CRatingsComponentsBlog" => $DBType."/ratings_components.php",
 		"CBlogNotifySchema" => "general/blog_notify_schema.php",
-		"CBlogUserOptions" => "general/blog_post_param.php"
-		)
-	);
+		"CBlogUserOptions" => "general/blog_post_param.php",
+	)
+);
 ?>

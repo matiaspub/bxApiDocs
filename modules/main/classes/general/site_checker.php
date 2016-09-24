@@ -21,6 +21,7 @@ class CSiteCheckerTest
 		$this->strResult = '';
 		$this->fix_mode = intval($fix_mode);
 		$this->cafile = $_SERVER['DOCUMENT_ROOT'].'/bitrix/tmp/cacert.pem';
+		$this->force_repair = defined('SITE_CHECKER_FORCE_REPAIR') && SITE_CHECKER_FORCE_REPAIR === true;
 
 		$this->host = $_REQUEST['HTTP_HOST'] ? $_REQUEST['HTTP_HOST'] : 'localhost';
 		if (!$fix_mode) // no need to know the host in fix mode
@@ -28,7 +29,7 @@ class CSiteCheckerTest
 			if (!preg_match('/^[a-z0-9\.\-]+$/i', $this->host)) // cyrillic domain hack
 			{
 				$host = $this->host;
-				$host0 = CharsetConverter::ConvertCharset($host, 'utf8', 'cp1251');
+				$host0 = \Bitrix\Main\Text\Encoding::convertEncoding($host, 'utf8', 'cp1251');
 				if (preg_match("/[\xC0-\xFF]/",$host0))
 				{
 					// utf-8;
@@ -39,7 +40,7 @@ class CSiteCheckerTest
 				{
 					// windows-1251
 					if (defined('BX_UTF') && BX_UTF === true)
-						$host = CharsetConverter::ConvertCharset($host, 'cp1251', 'utf8');
+						$host = \Bitrix\Main\Text\Encoding::convertEncoding($host, 'cp1251', 'utf8');
 				}
 				$converter = new CBXPunycode();
 				$host = $converter->Encode($host);
@@ -387,6 +388,25 @@ class CSiteCheckerTest
 		return $res;
 	}
 
+	public function TableFieldCanBeAltered($f, $f_tmp)
+	{
+		if ($f['Type'] == str_replace(array('long','medium'), '', $f_tmp['Type']) || $this->force_repair)
+			return true;
+		if (
+			preg_match('#^([a-z]+)\(([0-9]+)\)(.*)$#i',$f['Type'],$regs)
+			&&
+			preg_match('#^([a-z]+)\(([0-9]+)\)(.*)$#i',$f_tmp['Type'],$regs_tmp)
+			&&
+			str_replace('varchar','char',strtolower($regs[1])) == str_replace('varchar','char',strtolower($regs_tmp[1]))
+			&&
+			$regs[2] <= $regs_tmp[2]
+			&&
+			$regs[3] == $regs_tmp[3] // signed || unsigned
+		)
+			return true;
+		return false;
+	}
+
 	###### TESTS #######
 	# {
 	#
@@ -518,7 +538,7 @@ class CSiteCheckerTest
 			if (!$str)
 				return $this->Result(false, GetMessage('SC_CHECK_FILES'));
 
-			$body = str_repeat($str, 10);
+			$body = str_repeat($str, 2);
 		}
 
 		list($usec0, $sec0) = explode(" ", microtime());
@@ -626,16 +646,10 @@ class CSiteCheckerTest
 
 	public function check_socket_ssl()
 	{
-		$strRequest = "GET "."/bitrix/admin/site_checker.php?test_type=socket_test&unique_id=".checker_get_unique_id()." HTTP/1.1\r\n";
-		$strRequest.= "Host: ".$this->host."\r\n";
-		$strRequest.= "\r\n";
-		if (!($res = $this->ConnectToHost('ssl://'.$this->host, 443)) || !IsHttpResponseSuccess($res, $strRequest))
-			return $this->Result(null, GetMessage('MAIN_SC_TEST_SSL_WARN'));
-
 		if (!file_exists($this->cafile) || filesize($this->cafile) == 0)
 			return $this->Result(null, GetMessage("MAIN_SC_TEST_SSL1"));
 
-		$context = stream_context_create(
+		if (!$context = stream_context_create(
 			array(
 				'ssl' => array(
 					'verify_peer' => true,
@@ -643,19 +657,38 @@ class CSiteCheckerTest
 					'cafile' => $this->cafile,
 				)
 			)
-		);
-		if (!$context)
-			return null;
+		))
+			return false;
 
-		echo "Validation HTTPS on ssl://{$this->host}:443	";
-		if (!$res = stream_socket_client('ssl://'.$this->host.':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $context))
+		echo "Connection to ssl://{$this->host}:443 (certificate check enabled)	";
+		if ($res = stream_socket_client('ssl://'.$this->host.':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $context))
 		{
-			echo "Fail\n";
+			echo "Success\n";
+			fclose($res);
+			return true;
+		}
+		echo "Fail\n";
+
+		if (!$context = stream_context_create(
+			array(
+				'ssl' => array(
+					'verify_peer' => false,
+					'allow_self_signed' => true,
+					'cafile' => $this->cafile,
+				)
+			)
+		))
+			return false;
+
+		echo "Connection to ssl://{$this->host}:443	";
+		if ($res = stream_socket_client('ssl://'.$this->host.':443', $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $context))
+		{
+			echo "Success\n";
+			fclose($res);
 			return $this->Result(null, GetMessage("MAIN_SC_SSL_NOT_VALID"));
 		}
-		fclose($res);
-
-		return true;
+		echo "Fail\n";
+		return $this->Result(null, GetMessage("MAIN_SC_NO_CONNECTTO", array('#HOST#' => 'https://'.$this->host)));
 	}
 
 	public function check_ad()
@@ -1256,7 +1289,7 @@ class CSiteCheckerTest
 
 	public function check_webdav()
 	{
-		if (!CModule::IncludeModule('webdav'))
+		if (!CModule::IncludeModule('webdav') && !CModule::IncludeModule('disk'))
 			return $this->Result(false, GetMessage("MAIN_SC_NO_WEBDAV_MODULE"));
 
 		if ($this->arTestVars['check_socket_fail'])
@@ -1692,7 +1725,11 @@ class CSiteCheckerTest
 
 		$bCron = COption::GetOptionString("main", "agents_use_crontab", "N") == 'Y' || defined('BX_CRONTAB_SUPPORT') && BX_CRONTAB_SUPPORT === true || COption::GetOptionString("main", "check_agents", "Y") != 'Y';
 		if ($bCron)
+		{
+			if (!$GLOBALS['DB']->Query('SELECT LAST_EXEC FROM b_agent WHERE LAST_EXEC > NOW() - INTERVAL 1 DAY LIMIT 1')->Fetch())
+				return $this->Result(false, GetMessage("MAIN_CRON_NO_START"));
 			return true;
+		}
 		return $this->Result(null, GetMessage("MAIN_AGENTS_HITS"));
 	}
 
@@ -1740,7 +1777,7 @@ class CSiteCheckerTest
 		$s++;
 		$res = $DB->Query('SELECT NOW() AS A');
 		$f = $res->Fetch();
-		if (($diff = abs($s - strtotime($f['A']))) == 0)
+		if (($diff = abs($s - strtotime($f['A']))) <= 1)
 			return true;
 		return $this->Result(false, GetMessage('SC_TIME_DIFF', array('#VAL#' => $diff)));
 	}
@@ -1995,6 +2032,13 @@ class CSiteCheckerTest
 				{
 					$strError .= GetMessage('SC_DB_MISC_CHARSET',array('#TABLE#' => $table,'#VAL1#' => $t_charset,'#VAL0#'=>$charset)) . "<br>";
 					$this->arTestVars['iError']++;
+					if ($this->force_repair)
+						$this->arTestVars['iErrorAutoFix']++;
+				}
+				elseif ($this->force_repair && !$DB->Query($sql = 'ALTER TABLE `' . $table . '` CHARACTER SET ' . $charset, true))
+				{
+					$strError .= $sql . ' [' . $DB->db_Error . ']';
+					break;
 				}
 			}
 			elseif ($t_collation != $collation)
@@ -2029,7 +2073,12 @@ class CSiteCheckerTest
 					{
 						$strError .= GetMessage('SC_TABLE_CHARSET_WARN',array('#TABLE#' => $table, '#VAL0#' => $charset, '#VAL1#' => $f_charset, '#FIELD#' => $f0['Field'])) . "<br>";
 						$this->arTestVars['iError']++;
+						if ($this->force_repair)
+							$this->arTestVars['iErrorAutoFix']++;
 					}
+					elseif ($this->force_repair)
+						$arFix[] = ' MODIFY `'.$f0['Field'].'` '.$f0['Type'].' CHARACTER SET '.$charset.($f0['Null'] == 'YES' ? ' NULL' : ' NOT NULL').
+							($f0['Default'] === NULL ? ($f0['Null'] == 'YES' ? ' DEFAULT NULL ' : '') : ' DEFAULT '.($f0['Type'] == 'timestamp' && $f0['Default'] == 'CURRENT_TIMESTAMP' ? $f0['Default'] : '"'.$DB->ForSQL($f0['Default']).'"')).' '.$f0['Extra'];
 				}
 				elseif ($collation != $f_collation)
 				{
@@ -2259,7 +2308,7 @@ class CSiteCheckerTest
 								$sql = 'ALTER TABLE `'.$table.'` MODIFY `'.$f_tmp['Field'].'` '.$tmp;
 								if ($this->fix_mode)
 								{
-									if (TableFieldCanBeAltered($f, $f_tmp))
+									if ($this->TableFieldCanBeAltered($f, $f_tmp))
 									{
 										if (!$DB->Query($sql, true))
 											return $this->Result(false, 'Mysql Query Error: '.$sql.' ['.$DB->db_Error.']');
@@ -2272,7 +2321,7 @@ class CSiteCheckerTest
 									$_SESSION['FixQueryList'][] = $sql;
 									$strError .= GetMessage('SC_ERR_FIELD_DIFFERS', array('#TABLE#' => $table, '#FIELD#' => $f['Field'], '#CUR#' => $cur, '#NEW#' => $tmp))."<br>";
 									$this->arTestVars['iError']++;
-									if (TableFieldCanBeAltered($f, $f_tmp))
+									if ($this->TableFieldCanBeAltered($f, $f_tmp))
 										$this->arTestVars['iErrorAutoFix']++;
 									$this->arTestVars['cntDiffFields']++;
 								}
@@ -2392,7 +2441,7 @@ class CSiteCheckerTest
 
 	public static function CommonTest()
 	{
-		if (defined('BX_CRONTAB') || (defined('CHK_EVENT') && CHK_EVENT === true)) // can't get real HTTP server vars from cron
+		if (defined('BX_CRONTAB') || (defined('CHK_EVENT') && CHK_EVENT === true) || !$_SERVER['HTTP_HOST']) // can't get real HTTP server vars from cron
 			return "CSiteCheckerTest::CommonTest();";
 		if (($ntlm_varname = COption::GetOptionString('ldap', 'ntlm_varname', 'REMOTE_USER')) && ($user = trim($_SERVER[$ntlm_varname])))
 			return "CSiteCheckerTest::CommonTest();"; // Server NTLM is enabled, no way to connect through a socket
@@ -2406,9 +2455,19 @@ class CSiteCheckerTest
 				$ar = $oTest->arTestVars;
 			$oTest = new CSiteCheckerTest($step, $fast = 1);
 			$oTest->arTestVars = $ar;
-			$oTest->host = $_SERVER['HTTP_HOST'] ? $_SERVER['HTTP_HOST'] : 'localhost';
-			$oTest->ssl = $_SERVER['HTTPS'] == 'on';
-			$oTest->port = $_SERVER['SERVER_PORT'] ? $_SERVER['SERVER_PORT'] : ($oTest->ssl ? 443 : 80);
+			$oTest->ssl = $_SERVER['HTTPS'] == 'on' || $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https' || $_SERVER["SERVER_PORT"] == 443;
+			if (preg_match('#^(.+):([0-9]+)$#', $_SERVER['HTTP_HOST'], $regs))
+			{
+				$oTest->host = $regs[1];
+				$oTest->port = $regs[2];
+				if ($oTest->port == 443)
+					$oTest->ssl = true;
+			}
+			else
+			{
+				$oTest->host = $_SERVER['HTTP_HOST'];
+				$oTest->port = $_SERVER['SERVER_PORT'] ? $_SERVER['SERVER_PORT'] : ($oTest->ssl ? 443 : 80);
+			}
 			$oTest->Start();
 			if ($oTest->result === false)
 			{
@@ -2438,7 +2497,7 @@ class CSiteCheckerTest
 
 class CSearchFiles
 {
-	public function CSearchFiles()
+	public function __construct()
 	{
 		$this->StartTime = time();
 		$this->arFail = array();
@@ -2640,7 +2699,7 @@ function InitPureDB()
 	{
 
 		/**
-		* <p>Отсылает по E-Mail сообщение об ошибке.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>ERROR_EMAIL</b>, содержащая E-Mail адрес на который будут отправляться сообщения об ошибках. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>ERROR_EMAIL</b> при необходимости определяется в начале текущей страницы или в одном из файлов: </p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> </li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> </li> </ul> <p>Помимо текста ошибки, в письмо будут включены: </p> <ul> <li> <b>HTTP_GET_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа GET </li> <li> <b>HTTP_POST_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа POST </li> <li> <b>HTTP_COOKIE_VARS</b> - массив переменных хранящихся у посетителя на локальной машине (cookie) </li> <li> <b>HTTP_SERVER_VARS</b> - массив стандартных серверных переменных </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDataBase::Connect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> (только для Oracle версии) </li> </ul>
+		* <p>Отсылает по E-Mail сообщение об ошибке.</p> <p>Для работы функции необходимо, чтобы до ее вызова была определена константа <b>ERROR_EMAIL</b>, содержащая E-Mail адрес на который будут отправляться сообщения об ошибках. Если эта константа не определена, то функция не выполняет никаких действий. Константа <b>ERROR_EMAIL</b> при необходимости определяется в начале текущей страницы или в одном из файлов: 	</p> <ul> <li> <b>/bitrix/php_interface/dbconn.php</b> 		</li> <li> <b>/bitrix/php_interface/</b><i>ID сайта</i><b>/init.php</b> 	</li> </ul> <p>Помимо текста ошибки, в письмо будут включены: </p> <ul> <li> <b>HTTP_GET_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа GET 	</li> <li> <b>HTTP_POST_VARS</b> - массив переменных пришедших на страницу в HTTP запросе типа POST 	</li> <li> <b>HTTP_COOKIE_VARS</b> - массив переменных хранящихся у посетителя на локальной машине (cookie) 	</li> <li> <b>HTTP_SERVER_VARS</b> - массив стандартных серверных переменных </li> </ul> <p>Данная функция вызывается в случае ошибки в следующих функциях: 	</p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/connect.php">CDataBase::Connect</a> 		</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDataBase::Query</a> 		</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDataBase::QueryBind</a> 		</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDataBase::QueryBindSelect</a>		 		</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> (только для Oracle версии) 	</li> </ul>
 		*
 		*
 		* @param string $text  Текст сообщения.
@@ -2652,15 +2711,13 @@ function InitPureDB()
 		* @return mixed 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* &lt;?
 		* // файл /bitrix/php_interface/dbconn.php
 		* 
 		* // определим константу ERROR_EMAIL, в которой зададим E-Mail администратора
 		* define("ERROR_EMAIL", "admin@site.ru");
 		* ?&gt;
-		* 
-		* 
 		* &lt;?
 		* <b>SendError</b>("Произвольное текстовое сообщение");
 		* ?&gt;
@@ -2687,7 +2744,7 @@ function InitPureDB()
 		* @return bool 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* &lt;?
 		* if (<b>IsModuleInstalled</b>("iblock")):
 		* 	
@@ -2716,7 +2773,7 @@ function InitPureDB()
 			return false;
 		}
 	}
-	global $DB, $DBType, $DBDebug, $DBDebugToFile, $DBHost, $DBName, $DBLogin, $DBPassword, $DBSQLServerType;
+	global $DB, $DBType, $DBDebug, $DBDebugToFile, $DBHost, $DBName, $DBLogin, $DBPassword;
 
 	/**
 	 * Defined in dbconn.php
@@ -2730,9 +2787,9 @@ function InitPureDB()
 	 */
 	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/php_interface/dbconn.php");
 	if(defined('BX_UTF'))
-		define('BX_UTF_PCRE_MODIFIER', 'u');
+		// define('BX_UTF_PCRE_MODIFIER', 'u');
 	else
-		// define('BX_UTF_PCRE_MODIFIER', '');
+		define('BX_UTF_PCRE_MODIFIER', '');
 
 	include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/lib/loader.php");
 	$application = \Bitrix\Main\HttpApplication::getInstance();
@@ -2762,25 +2819,6 @@ function TableFieldConstruct($f0)
 {
 	global $DB;
 	return $f0['Type'].($f0['Null'] == 'YES' ? ' NULL' : ' NOT NULL').($f0['Default'] === NULL ? ($f0['Null'] == 'YES' ? ' DEFAULT NULL ' : '') : ' DEFAULT '.($f0['Type'] == 'timestamp' && $f0['Default'] == 'CURRENT_TIMESTAMP' ? $f0['Default'] : '"'.$DB->ForSQL($f0['Default']).'"')).' '.$f0['Extra'];
-}
-
-function TableFieldCanBeAltered($f, $f_tmp)
-{
-	if ($f['Type'] == str_replace(array('long','medium'), '', $f_tmp['Type']) || defined('SITE_CHECKER_FORCE_REPAIR') && SITE_CHECKER_FORCE_REPAIR === true)
-		return true;
-	if (
-		preg_match('#^([a-z]+)\(([0-9]+)\)(.*)$#i',$f['Type'],$regs)
-		&&
-		preg_match('#^([a-z]+)\(([0-9]+)\)(.*)$#i',$f_tmp['Type'],$regs_tmp)
-		&&
-		str_replace('varchar','char',strtolower($regs[1])) == str_replace('varchar','char',strtolower($regs_tmp[1]))
-		&&
-		$regs[2] <= $regs_tmp[2]
-		&&
-		$regs[3] == $regs_tmp[3] // signed || unsigned
-	)
-		return true;
-	return false;
 }
 
 function fix_link($mode = 2)

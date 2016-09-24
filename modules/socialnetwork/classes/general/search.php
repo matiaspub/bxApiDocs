@@ -179,8 +179,13 @@ class CSocNetSearch
 					break;
 				case "K"://Group members includes moderators and admins
 					$arResult[] = $prefix.'K';
+					$arResult[] = $prefix.'E';
+					$arResult[] = $prefix.'A';
+					break;
 				case "E"://Moderators includes admins
 					$arResult[] = $prefix.'E';
+					$arResult[] = $prefix.'A';
+					break;
 				case "A"://Admins
 					$arResult[] = $prefix.'A';
 					break;
@@ -201,6 +206,8 @@ class CSocNetSearch
 				case "E"://Friends of friends (has no rights yet) so it counts as
 				case "M"://Friends
 					$arResult[] = $prefix.'M';
+				$arResult[] = $prefix.'Z';
+					break;
 				case "Z"://Personal
 					$arResult[] = $prefix.'Z';
 					break;
@@ -219,6 +226,9 @@ class CSocNetSearch
 			$id = intval($NS["ID"]);
 		else
 			$id = 0;//very first id
+
+		$strNSJoin1 = "";
+		$strNSFilter1 = "";
 
 		if($NS["SITE_ID"]!="")
 		{
@@ -298,11 +308,13 @@ class CSocNetSearch
 
 	public static function OnSearchPrepareFilter($strSearchContentAlias, $field, $val)
 	{
+		global $CACHE_MANAGER;
+
 		if(defined("BX_COMP_MANAGED_CACHE") && in_array($field, array("SOCIAL_NETWORK_USER", "SOCIAL_NETWORK_GROUP")))
 		{
 			$tag_val = (is_array($val) ? serialize($val) : $val);
 			$tag_field = ($field == "SOCIAL_NETWORK_GROUP" ? SONET_ENTITY_GROUP : SONET_ENTITY_USER);
-			$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_search_".$tag_field."_".$tag_val);
+			$CACHE_MANAGER->RegisterTag("sonet_search_".$tag_field."_".$tag_val);
 		}
 	}
 
@@ -734,6 +746,8 @@ class CSocNetSearch
 
 	public function IndexIBlockElement($arFields, $entity_id, $entity_type, $feature, $operation, $path_template, $arFieldList)
 	{
+		global $CACHE_MANAGER;
+
 		$ID = intval($arFields["ID"]);
 		$IBLOCK_ID = intval($arFields["IBLOCK_ID"]);
 		$IBLOCK_SECTION_ID = (is_array($arFields["IBLOCK_SECTION"])) ? $arFields["IBLOCK_SECTION"][0] : $arFields["IBLOCK_SECTION"];
@@ -808,7 +822,7 @@ class CSocNetSearch
 
 		if(defined("BX_COMP_MANAGED_CACHE"))
 		{
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
+			$CACHE_MANAGER->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
 		}
 	}
 
@@ -973,6 +987,8 @@ class CSocNetSearch
 
 	public function IndexIBlockSection($arFields, $entity_id, $entity_type, $feature, $operation, $path_template)
 	{
+		global $CACHE_MANAGER;
+
 		$rSection = CIBlockSection::GetByID($arFields['ID']);
 		$arSection = $rSection->Fetch();
 
@@ -1037,7 +1053,9 @@ class CSocNetSearch
 		), true);
 
 		if(defined("BX_COMP_MANAGED_CACHE"))
-			$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
+		{
+			$CACHE_MANAGER->ClearByTag("sonet_search_".$entity_type."_".$entity_id);
+		}
 	}
 
 	public function IBlockSectionUpdate(&$arFields)

@@ -1,6 +1,7 @@
 <?
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale;
+use Bitrix\Sale\PriceMaths;
 
 Loc::loadMessages(__FILE__);
 
@@ -106,7 +107,7 @@ class CAllSaleOrder
 				{
 					if (in_array($fieldName, $roundOrderFields))
 					{
-						$arOrder[$fieldName] = roundEx($arOrder[$fieldName], SALE_VALUE_PRECISION);
+						$arOrder[$fieldName] = PriceMaths::roundPrecision($arOrder[ $fieldName ]);
 					}
 				}
 			}
@@ -123,7 +124,7 @@ class CAllSaleOrder
 						{
 							if (isset($basketItem[$fieldName]))
 							{
-								$basketItem[$fieldName] = roundEx($basketItem[$fieldName], SALE_VALUE_PRECISION);
+								$basketItem[$fieldName] = PriceMaths::roundPrecision($basketItem[ $fieldName ]);
 							}
 						}
 					}
@@ -156,8 +157,9 @@ class CAllSaleOrder
 		foreach(GetModuleEvents("sale", "OnSaleCalculateOrder", true) as $arEvent)
 			ExecuteModuleEventEx($arEvent, array(&$arOrder));
 
-		$arOrder["PRICE"] = roundEx($arOrder["PRICE"], SALE_VALUE_PRECISION);
-		$arOrder["TAX_VALUE"] = roundEx($arOrder["TAX_VALUE"], SALE_VALUE_PRECISION);
+		$arOrder["PRICE"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["PRICE"]);
+		$arOrder["TAX_VALUE"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["TAX_VALUE"]);
+
 		return $arOrder;
 	}
 
@@ -208,8 +210,8 @@ class CAllSaleOrder
 			"DELIVERY_ID" => false,
 		);
 
-		if(isset($arOptions["DELIVERY_EXTRA_SERVICES"]))
-			$arOrder["DELIVERY_EXTRA_SERVICES"] = $arOptions["DELIVERY_EXTRA_SERVICES"];
+		if(isset($options["DELIVERY_EXTRA_SERVICES"]))
+			$arOrder["DELIVERY_EXTRA_SERVICES"] = $options["DELIVERY_EXTRA_SERVICES"];
 
 		$orderPrices = CSaleOrder::CalculateOrderPrices($shoppingCart);
 
@@ -274,15 +276,15 @@ class CAllSaleOrder
 						$arResult['VAT_RATE'] = $arItem["VAT_RATE"];
 
 					$v = CSaleBasketHelper::getVat($arItem);
-					$arItem["VAT_VALUE"] = roundEx($v / $arItem["QUANTITY"], SALE_VALUE_PRECISION);
+					$arItem["VAT_VALUE"] = \Bitrix\Sale\PriceMaths::roundPrecision($v / $arItem["QUANTITY"]);
 					$arResult["VAT_SUM"] += $v;
 
 				}
 			}
 		}
 
-		$arResult['ORDER_PRICE'] = roundEx($arResult['ORDER_PRICE'], SALE_VALUE_PRECISION);
-		$arResult['VAT_SUM'] = roundEx($arResult['VAT_SUM'], SALE_VALUE_PRECISION);
+		$arResult['ORDER_PRICE'] = \Bitrix\Sale\PriceMaths::roundPrecision($arResult['ORDER_PRICE']);
+		$arResult['VAT_SUM'] = \Bitrix\Sale\PriceMaths::roundPrecision($arResult['VAT_SUM']);
 		unset($arItem);
 
 		return $arResult;
@@ -342,12 +344,12 @@ class CAllSaleOrder
 	*
 	* @param array $arCoupons  Массив скидочных купонов.
 	*
-	* @param int $arStoreBarcodeOrderFormData  Массив штрих-кодов. </h
+	* @param int $arStoreBarcodeOrderFormData  Массив штрих-кодов.
 	*
 	* @param bool $bSaveBarcodes  Флаг (<i>true/false</i>) добавления новых штрих-кодов.
 	*
-	* @return int <p>Возвращается идентификатор заказа или <i>null</i> в случае ошибки.</p>
-	* <br><br>
+	* @return int <p>Возвращается идентификатор заказа или <i>null</i> в случае
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorder/dosaveorder.php
@@ -482,47 +484,8 @@ class CAllSaleOrder
 		$ID = IntVal($ID);
 		$userID = IntVal($userID);
 
-		$userRights = CMain::GetUserRight("sale", $arUserGroups, "Y", "Y");
-		if ($userRights >= "W")
-			return True;
-
-		$arOrder = CSaleOrder::GetByID($ID);
-		if ($arOrder)
-		{
-			if (IntVal($arOrder["USER_ID"]) == $userID)
-				return True;
-
-			if ($userRights == "U")
-			{
-				$num = CSaleGroupAccessToSite::GetList(
-						array(),
-						array(
-								"SITE_ID" => $arOrder["LID"],
-								"GROUP_ID" => $arUserGroups
-							),
-						array()
-					);
-
-				if (IntVal($num) > 0)
-				{
-					$dbStatusPerms = CSaleStatus::GetPermissionsList(
-						array(),
-						array(
-							"STATUS_ID" => $arOrder["STATUS_ID"],
-							"GROUP_ID" => $arUserGroups
-						),
-						array("MAX" => "PERM_VIEW")
-					);
-					if ($arStatusPerms = $dbStatusPerms->Fetch())
-					{
-						if ($arStatusPerms["PERM_VIEW"] == "Y")
-							return True;
-					}
-				}
-			}
-		}
-
-		return False;
+		$permList = static::checkUserPermissionOrderList(array($ID), 'view', $arUserGroups, $userID);
+		return (isset($permList[$ID]) && $permList[$ID] === true);
 	}
 
 	/**
@@ -531,10 +494,11 @@ class CAllSaleOrder
 	 * @param bool $siteID
 	 * @return bool
 	 */
-	public static function CanUserUpdateOrder($ID, $arUserGroups = false, $siteID = false)
+	static function CanUserUpdateOrder($ID, $arUserGroups = false, $siteID = false)
 	{
 		$ID = IntVal($ID);
 
+		static $cacheGroupAccess = array();
 		$userRights = CMain::GetUserRight("sale", $arUserGroups, "Y", "Y");
 
 		if ($userRights >= "W")
@@ -544,46 +508,31 @@ class CAllSaleOrder
 		{
 			if ($ID > 0)
 			{
-				$arOrder = CSaleOrder::GetByID($ID);
-				if ($arOrder)
-				{
-					$num = CSaleGroupAccessToSite::GetList(
-							array(),
-							array(
-									"SITE_ID" => $arOrder["LID"],
-									"GROUP_ID" => $arUserGroups
-								),
-							array()
-						);
-
-					if (IntVal($num) > 0)
-					{
-						$dbStatusPerms = CSaleStatus::GetPermissionsList(
-							array(),
-							array(
-								"STATUS_ID" => $arOrder["STATUS_ID"],
-								"GROUP_ID" => $arUserGroups
-							),
-							array("MAX" => "PERM_UPDATE")
-						);
-						if ($arStatusPerms = $dbStatusPerms->Fetch())
-							if ($arStatusPerms["PERM_UPDATE"] == "Y")
-								return True;
-					}
-				}
+				$permList = static::checkUserPermissionOrderList(array($ID), 'update', $arUserGroups);
+				return (isset($permList[$ID]) && $permList[$ID] === true);
 			}
 			else // order not created yet
 			{
 				if ($siteID)
 				{
-					$num = CSaleGroupAccessToSite::GetList(
-							array(),
-							array(
-									"SITE_ID" => $siteID,
-									"GROUP_ID" => $arUserGroups
-								),
-							array()
-						);
+					$hashGroupAccess = md5($siteID. "|" . join(', ', $arUserGroups));
+					if (array_key_exists($hashGroupAccess, $cacheGroupAccess))
+					{
+						$num = $cacheGroupAccess[$hashGroupAccess];
+					}
+					else
+					{
+						$num = CSaleGroupAccessToSite::GetList(
+								array(),
+								array(
+										"SITE_ID" => $siteID,
+										"GROUP_ID" => $arUserGroups
+									),
+								array()
+							);
+
+						$cacheGroupAccess[$hashGroupAccess] = $num;
+					}
 
 					if (IntVal($num) > 0)
 						return True;
@@ -600,50 +549,13 @@ class CAllSaleOrder
 	 * @param int $userID
 	 * @return bool
 	 */
-	public static function CanUserCancelOrder($ID, $arUserGroups = false, $userID = 0)
+	static function CanUserCancelOrder($ID, $arUserGroups = false, $userID = 0)
 	{
 		$ID = IntVal($ID);
 		$userID = IntVal($userID);
 
-		$userRights = CMain::GetUserRight("sale", $arUserGroups, "Y", "Y");
-		if ($userRights >= "W")
-			return True;
-
-		$arOrder = CSaleOrder::GetByID($ID);
-		if ($arOrder)
-		{
-			if (IntVal($arOrder["USER_ID"]) == $userID)
-				return True;
-
-			if ($userRights == "U")
-			{
-				$num = CSaleGroupAccessToSite::GetList(
-						array(),
-						array(
-								"SITE_ID" => $arOrder["LID"],
-								"GROUP_ID" => $arUserGroups
-							),
-						array()
-					);
-
-				if (IntVal($num) > 0)
-				{
-					$dbStatusPerms = CSaleStatus::GetPermissionsList(
-						array(),
-						array(
-							"STATUS_ID" => $arOrder["STATUS_ID"],
-							"GROUP_ID" => $arUserGroups
-						),
-						array("MAX" => "PERM_CANCEL")
-					);
-					if ($arStatusPerms = $dbStatusPerms->Fetch())
-						if ($arStatusPerms["PERM_CANCEL"] == "Y")
-							return True;
-				}
-			}
-		}
-
-		return False;
+		$permList = static::checkUserPermissionOrderList(array($ID), 'cancel', $arUserGroups, $userID);
+		return (isset($permList[$ID]) && $permList[$ID] === true);
 	}
 
 	/**
@@ -656,46 +568,9 @@ class CAllSaleOrder
 	{
 		$ID = IntVal($ID);
 		$userID = IntVal($userID);
-
-		$userRights = CMain::GetUserRight("sale", $arUserGroups, "Y", "Y");
-		if ($userRights >= "W")
-			return True;
-
-		$arOrder = CSaleOrder::GetByID($ID);
-		if ($arOrder)
-		{
-			if (IntVal($arOrder["USER_ID"]) == $userID)
-				return True;
-
-			if ($userRights == "U")
-			{
-				$num = CSaleGroupAccessToSite::GetList(
-						array(),
-						array(
-								"SITE_ID" => $arOrder["LID"],
-								"GROUP_ID" => $arUserGroups
-							),
-						array()
-					);
-
-				if (IntVal($num) > 0)
-				{
-					$dbStatusPerms = CSaleStatus::GetPermissionsList(
-						array(),
-						array(
-							"STATUS_ID" => $arOrder["STATUS_ID"],
-							"GROUP_ID" => $arUserGroups
-						),
-						array("MAX" => "PERM_MARK")
-					);
-					if ($arStatusPerms = $dbStatusPerms->Fetch())
-						if ($arStatusPerms["PERM_MARK"] == "Y")
-							return True;
-				}
-			}
-		}
-
-		return False;
+		
+		$permList = static::checkUserPermissionOrderList(array($ID), 'mark', $arUserGroups, $userID);
+		return (isset($permList[$ID]) && $permList[$ID] === true);
 	}
 
 	/**
@@ -823,47 +698,13 @@ class CAllSaleOrder
 	 * @param int $userID
 	 * @return bool
 	 */
-	public static function CanUserDeleteOrder($ID, $arUserGroups = false, $userID = 0)
+	static function CanUserDeleteOrder($ID, $arUserGroups = false, $userID = 0)
 	{
 		$ID = IntVal($ID);
 		$userID = IntVal($userID);
 
-		$userRights = CMain::GetUserRight("sale", $arUserGroups, "Y", "Y");
-		if ($userRights >= "W")
-			return True;
-
-		if ($userRights == "U")
-		{
-			$arOrder = CSaleOrder::GetByID($ID);
-			if ($arOrder)
-			{
-				$num = CSaleGroupAccessToSite::GetList(
-						array(),
-						array(
-								"SITE_ID" => $arOrder["LID"],
-								"GROUP_ID" => $arUserGroups
-							),
-						array()
-					);
-
-				if (IntVal($num) > 0)
-				{
-					$dbStatusPerms = CSaleStatus::GetPermissionsList(
-						array(),
-						array(
-							"STATUS_ID" => $arOrder["STATUS_ID"],
-							"GROUP_ID" => $arUserGroups
-						),
-						array("MAX" => "PERM_DELETE")
-					);
-					if ($arStatusPerms = $dbStatusPerms->Fetch())
-						if ($arStatusPerms["PERM_DELETE"] == "Y")
-							return True;
-				}
-			}
-		}
-
-		return False;
+		$permList = static::checkUserPermissionOrderList(array($ID), 'delete', $arUserGroups, $userID);
+		return (isset($permList[$ID]) && $permList[$ID] === true);
 	}
 
 
@@ -1107,16 +948,16 @@ class CAllSaleOrder
 
 	
 	/**
-	* <p>Метод удаляет заказ с кодом <i>ID</i>. При этом заказ отменяется, если не был отменён, снимается флаг оплаты с возвращением денег на счет покупателя, если он был оплачен, и снимается флаг разрешения доставки, если он был установлен. Метод динамичный.</p> <p>Перед удалением заказа вызываются обработчики события <b>OnBeforeOrderDelete</b> модуля магазина, в которых можно отменить удаление вернув значение <i>false</i>. Сразу после удаления вызываются обработчики события <b>OnOrderDelete</b> модуля магазина.</p> <p></p> <div class="note"> <b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
+	* <p>Метод удаляет заказ с кодом <i>ID</i>. При этом заказ отменяется, если не был отменён, снимается флаг оплаты с возвращением денег на счет покупателя, если он был оплачен, и снимается флаг разрешения доставки, если он был установлен. Нестатический метод.</p> <p>Перед удалением заказа вызываются обработчики события <b>OnBeforeOrderDelete</b> модуля магазина, в которых можно отменить удаление вернув значение <i>false</i>. Сразу после удаления вызываются обработчики события <b>OnOrderDelete</b> модуля магазина.</p> <p></p> <div class="note"> <b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
 	* @return bool <p>Возвращается <i>true</i> при успешном удалении и <i>false</i> - в противном
-	* случае.</p> <a name="examples"></a>
+	* случае.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* CSaleOrder::Delete(23);
 	* ?&gt;
@@ -1747,60 +1588,62 @@ class CAllSaleOrder
 	//*************** SELECT *********************/
 	
 	/**
-	* <p>Метод возвращает параметры заказа с кодом ID. Метод динамичный.</p>
+	* <p>Метод возвращает параметры заказа с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
-	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
-	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	* заказа.</td> </tr> <tr> <td>LID</td> <td>Код сайта, на котором сделан заказ.</td>
-	* </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип плательщика, к которому принадлежит
-	* посетитель, сделавший заказ (заказчик)</td> </tr> <tr> <td>PAYED</td> <td>Флаг (Y/N)
-	* оплачен ли заказ.</td> </tr> <tr> <td>DATE_PAYED</td> <td>Дата оплаты заказа.</td> </tr>
-	* <tr> <td>EMP_PAYED_ID</td> <td>Код пользователя (сотрудника магазина), который
-	* установил флаг оплаченности.</td> </tr> <tr> <td>CANCELED</td> <td>Флаг (Y/N)
-	* отменён ли заказ.</td> </tr> <tr> <td>DATE_CANCELED</td> <td>Дата отмены заказа.</td>
-	* </tr> <tr> <td>EMP_CANCELED_ID</td> <td>Код пользователя, который установил флаг
-	* отмены заказа.</td> </tr> <tr> <td>RESPONSIBLE_ID</td> <td>ID ответственного лица.</td>
-	* </tr> <tr> <td>REASON_CANCELED</td> <td>Текстовое описание причины отмены
-	* заказа.</td> </tr> <tr> <td>STATUS_ID</td> <td>Код статуса заказа.</td> </tr> <tr>
-	* <td>DATE_STATUS</td> <td>Дата изменения статуса заказа.</td> </tr> <tr> <td>EMP_STATUS_ID</td>
-	* <td>Код пользователя (сотрудника магазина), который установил
-	* текущий статус заказа.</td> </tr> <tr> <td>PRICE_DELIVERY</td> <td>Стоимость
-	* доставки заказа.</td> </tr> <tr> <td>ALLOW_DELIVERY</td> <td>Флаг (Y/N) разрешена ли
-	* доставка (отгрузка) заказа.</td> </tr> <tr> <td>DATE_ALLOW_DELIVERY</td> <td>Дата, когда
-	* была разрешена доставка заказа.</td> </tr> <tr> <td>EMP_ALLOW_DELIVERY_ID</td> <td>Код
-	* пользователя (сотрудника магазина), который разрешил доставку
-	* заказа.</td> </tr> <tr> <td>PRICE</td> <td>Общая стоимость заказа.</td> </tr> <tr>
-	* <td>CURRENCY</td> <td>Валюта стоимости заказа.</td> </tr> <tr> <td>DISCOUNT_VALUE</td>
-	* <td>Общая величина скидки.</td> </tr> <tr> <td>USER_ID</td> <td>Код пользователя
-	* заказчика.</td> </tr> <tr> <td>PAY_SYSTEM_ID</td> <td>Платежная система, которой
-	* (будет) оплачен заказа.</td> </tr> <tr> <td>DELIVERY_ID</td> <td>Способ (служба)
-	* доставки заказа.</td> </tr> <tr> <td>DATE_INSERT</td> <td>Дата добавления заказа.</td>
-	* </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения заказа.</td> </tr> <tr>
-	* <td>USER_DESCRIPTION</td> <td>Описание заказа заказчиком.</td> </tr> <tr>
-	* <td>ADDITIONAL_INFO</td> <td>Дополнительная информация по заказу.</td> </tr> <tr>
-	* <td>PS_STATUS</td> <td>Флаг (Y/N) статуса платежной системы - успешно ли
-	* оплачен заказ (для платежных систем, которые позволяют
-	* автоматически получать данные по проведенным через них
-	* заказам)</td> </tr> <tr> <td>PS_STATUS_CODE</td> <td>Код статуса платежной системы
-	* (значение зависит от системы)</td> </tr> <tr> <td>PS_STATUS_DESCRIPTION</td>
-	* <td>Описание результата работы платежной системы.</td> </tr> <tr>
-	* <td>PS_STATUS_MESSAGE</td> <td>Сообщение от платежной системы.</td> </tr> <tr>
-	* <td>PS_SUM</td> <td>Сумма, которая была реально оплачена через платежную
-	* систему.</td> </tr> <tr> <td>PS_CURRENCY</td> <td>Валюта суммы.</td> </tr> <tr>
-	* <td>PS_RESPONSE_DATE</td> <td>Дата получения статуса платежной системы.</td> </tr>
-	* <tr> <td>COMMENTS</td> <td>Произвольные комментарии.</td> </tr> <tr> <td>TAX_VALUE</td>
-	* <td>Общая сумма налогов.</td> </tr> <tr> <td>STAT_GID</td> <td>Параметр события в
-	* статистике.</td> </tr> <tr> <td>SUM_PAID</td> <td>Сумма, которая уже была оплачена
-	* покупателем по данному счету (например, с внутреннего счета).</td>
-	* </tr> <tr> <td>PAY_VOUCHER_NUM</td> <td>Номер платежного поручения.</td> </tr> <tr>
-	* <td>PAY_VOUCHER_DATE</td> <td>Дата платежного поручения.</td> </tr> </table> <a
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th>     <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код
+	* заказа.</td> </tr> <tr> <td>LID</td>     <td>Код сайта, на котором сделан заказ.</td> 
+	*  </tr> <tr> <td>PERSON_TYPE_ID</td>     <td>Тип плательщика, к которому принадлежит
+	* посетитель, сделавший заказ (заказчик)</td>   </tr> <tr> <td>PAYED</td>     <td>Флаг
+	* (Y/N) оплачен ли заказ.</td>   </tr> <tr> <td>DATE_PAYED</td>     <td>Дата оплаты
+	* заказа.</td>   </tr> <tr> <td>EMP_PAYED_ID</td>     <td>Код пользователя (сотрудника
+	* магазина), который установил флаг оплаченности.</td>   </tr> <tr>
+	* <td>CANCELED</td>     <td>Флаг (Y/N) отменён ли заказ.</td>   </tr> <tr> <td>DATE_CANCELED</td>    
+	* <td>Дата отмены заказа.</td>   </tr> <tr> <td>EMP_CANCELED_ID</td>     <td>Код
+	* пользователя, который установил флаг отмены заказа.</td>   </tr> <tr>
+	* <td>RESPONSIBLE_ID</td>     <td>ID ответственного лица.</td>   </tr> <tr> <td>REASON_CANCELED</td>    
+	* <td>Текстовое описание причины отмены заказа.</td>   </tr> <tr> <td>STATUS_ID</td>  
+	*   <td>Код статуса заказа.</td>   </tr> <tr> <td>DATE_STATUS</td>     <td>Дата изменения
+	* статуса заказа.</td>   </tr> <tr> <td>EMP_STATUS_ID</td>     <td>Код пользователя
+	* (сотрудника магазина), который установил текущий статус
+	* заказа.</td>   </tr> <tr> <td>PRICE_DELIVERY</td>     <td>Стоимость доставки заказа.</td>  
+	* </tr> <tr> <td>ALLOW_DELIVERY</td>     <td>Флаг (Y/N) разрешена ли доставка (отгрузка)
+	* заказа.</td>   </tr> <tr> <td>DATE_ALLOW_DELIVERY</td>     <td>Дата, когда была разрешена
+	* доставка заказа.</td>   </tr> <tr> <td>EMP_ALLOW_DELIVERY_ID</td>     <td>Код пользователя
+	* (сотрудника магазина), который разрешил доставку заказа.</td>   </tr>
+	* <tr> <td>PRICE</td>     <td>Общая стоимость заказа.</td>   </tr> <tr> <td>CURRENCY</td>    
+	* <td>Валюта стоимости заказа.</td>   </tr> <tr> <td>DISCOUNT_VALUE</td>     <td>Общая
+	* величина скидки.</td>   </tr> <tr> <td>USER_ID</td>     <td>Код пользователя
+	* заказчика.</td>   </tr> <tr> <td>PAY_SYSTEM_ID</td>     <td>Платежная система, которой
+	* (будет) оплачен заказа.</td>   </tr> <tr> <td>DELIVERY_ID</td>     <td>Способ (служба)
+	* доставки заказа.</td>   </tr> <tr> <td>DATE_INSERT</td>     <td>Дата добавления
+	* заказа.</td>   </tr> <tr> <td>DATE_UPDATE</td>     <td>Дата последнего изменения
+	* заказа.</td>   </tr> <tr> <td>USER_DESCRIPTION</td>     <td>Описание заказа
+	* заказчиком.</td>   </tr> <tr> <td>ADDITIONAL_INFO</td>     <td>Дополнительная
+	* информация по заказу.</td>   </tr> <tr> <td>PS_STATUS</td>     <td>Флаг (Y/N) статуса
+	* платежной системы - успешно ли оплачен заказ (для платежных
+	* систем, которые позволяют автоматически получать данные по
+	* проведенным через них заказам)</td>   </tr> <tr> <td>PS_STATUS_CODE</td>     <td>Код
+	* статуса платежной системы (значение зависит от системы)</td>   </tr> <tr>
+	* <td>PS_STATUS_DESCRIPTION</td>     <td>Описание результата работы платежной
+	* системы.</td>   </tr> <tr> <td>PS_STATUS_MESSAGE</td>     <td>Сообщение от платежной
+	* системы.</td>   </tr> <tr> <td>PS_SUM</td>     <td>Сумма, которая была реально
+	* оплачена через платежную систему.</td>   </tr> <tr> <td>PS_CURRENCY</td>    
+	* <td>Валюта суммы.</td>   </tr> <tr> <td>PS_RESPONSE_DATE</td>     <td>Дата получения
+	* статуса платежной системы.</td> </tr> <tr> <td>COMMENTS</td>     <td>Произвольные
+	* комментарии.</td>   </tr> <tr> <td>TAX_VALUE</td>     <td>Общая сумма налогов.</td>   </tr>
+	* <tr> <td>STAT_GID</td>     <td>Параметр события в статистике.</td>   </tr> <tr>
+	* <td>SUM_PAID</td>     <td>Сумма, которая уже была оплачена покупателем по
+	* данному счету (например, с внутреннего счета).</td>   </tr> <tr>
+	* <td>PAY_VOUCHER_NUM</td>     <td>Номер платежного поручения.</td>   </tr> <tr>
+	* <td>PAY_VOUCHER_DATE</td>     <td>Дата платежного поручения.</td>   </tr> </table><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!($arOrder = CSaleOrder::GetByID($ORDER_ID)))
 	* {
@@ -1823,8 +1666,9 @@ class CAllSaleOrder
 	public static function GetByID($ID)
 	{
 		global $DB;
-
-		$ID = IntVal($ID);
+		
+		if (intval($ID) <= 0)
+			return false;
 
 		if (isset($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID]) && is_array($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID]) && is_set($GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID], "ID"))
 		{
@@ -1836,8 +1680,7 @@ class CAllSaleOrder
 
 			if ($isOrderConverted == "Y")
 			{
-				$db_res = \Bitrix\Sale\Compatible\OrderCompatibility::getList(array("ID" => "DESC"), array('ID' => $ID), false, false, array('*'));
-				$db_res->addFetchAdapter(new \Bitrix\Sale\Compatible\OrderFetchAdapter());
+				$db_res = \Bitrix\Sale\Compatible\OrderCompatibility::getById($ID);
 			}
 			else
 			{
@@ -1855,37 +1698,42 @@ class CAllSaleOrder
 
 			if ($res = $db_res->Fetch())
 			{
-				$dataKeys = array_keys($res);
-				foreach ($dataKeys as $key)
+				if ($isOrderConverted == "Y")
 				{
-					if (strpos($key, '~') === 0)
-						continue;
-
-					if (!empty($res['~'.$key])
-						&& (($res['~'.$key] instanceof \Bitrix\Main\Type\DateTime)
-							|| ($res['~'.$key] instanceof \Bitrix\Main\Type\Date)))
+					$dataKeys = array_keys($res);
+					foreach ($dataKeys as $key)
 					{
-						/** @var \Bitrix\Main\Type\Date|\Bitrix\Main\Type\DateTime $dateObject */
-						$dateObject = $res['~'.$key];
 
-						if ($key == "DATE_STATUS")
+						if (!empty($res[$key])
+							&& (($res[$key] instanceof \Bitrix\Main\Type\DateTime)
+								|| ($res[$key] instanceof \Bitrix\Main\Type\Date)))
 						{
-							$res['DATE_STATUS_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
-						}
-						elseif ($key == "DATE_UPDATE")
-						{
-							$res['DATE_UPDATE_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
-						}
-						elseif ($key == "DATE_LOCK")
-						{
-							$res['DATE_LOCK_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
-						}
+							/** @var \Bitrix\Main\Type\Date|\Bitrix\Main\Type\DateTime $dateObject */
+							$dateObject = $res[$key];
 
-						$res[$key] = $dateObject->format('Y-m-d H:i:s');
-						unset($res['~'.$key]);
+							if ($key == "DATE_INSERT")
+							{
+								$res['DATE_INSERT_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATE);
+							}
+							elseif ($key == "DATE_STATUS")
+							{
+								$res['DATE_STATUS_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
+							}
+							elseif ($key == "DATE_UPDATE")
+							{
+								$res['DATE_UPDATE_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
+							}
+							elseif ($key == "DATE_LOCK")
+							{
+								$res['DATE_LOCK_FORMAT'] = Sale\Compatible\OrderCompatibility::convertDateFieldToFormat($dateObject, FORMAT_DATETIME);
+							}
 
+							$res[$key] = $dateObject->format('Y-m-d H:i:s');
+						}
 					}
+					$res = \Bitrix\Sale\Compatible\OrderFetchAdapter::convertRowData($res);
 				}
+
 				$GLOBALS["SALE_ORDER"]["SALE_ORDER_CACHE_".$ID] = $res;
 				return $res;
 			}
@@ -1935,37 +1783,35 @@ class CAllSaleOrder
 	//*************** ACTIONS *********************/
 	
 	/**
-	* <p>Метод меняет значение флага "заказ оплачен" (поле <b>PAYED</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме флага оплаты заказа, устанавливаются также поля даты изменения значения флага (<b>DATE_PAYED</b>) и кода пользователя, изменившего значение флага (<b>EMP_PAYED_ID</b>). Метод динамичный.</p> <p>Перед изменением флага вызываются обработчики события OnSaleBeforePayOrder модуля магазина, в которых можно отменить изменение флага вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSalePayOrder модуля магазина.</p> <p>В случае установки флага генерируется почтовое событие типа <b>SALE_ORDER_PAID</b>.</p>
+	* <p>Метод меняет значение флага "заказ оплачен" (поле <b>PAYED</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме флага оплаты заказа, устанавливаются также поля даты изменения значения флага (<b>DATE_PAYED</b>) и кода пользователя, изменившего значение флага (<b>EMP_PAYED_ID</b>). Нестатический метод.</p> <p>Перед изменением флага вызываются обработчики события OnSaleBeforePayOrder модуля магазина, в которых можно отменить изменение флага вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSalePayOrder модуля магазина.</p> <p>В случае установки флага генерируется почтовое событие типа <b>SALE_ORDER_PAID</b>.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
-	* @param string $val  Новое значение флага оплаты заказа (Y/N).
+	* @param string $val  Новое значение флага оплаты 		заказа (Y/N).
 	*
-	* @param  $bool  Значение <i>true </i>отражает изменение флага на внутреннем счете
-	* пользователя. Значение <i>false</i> изменяет только флаг, не
+	* @param bool $bWithdraw = True[ Значение <i>true </i>отражает 		изменение флага на внутреннем счете
+	* пользователя. 		Значение <i>false</i> изменяет только флаг, не
 	* затрагивая счет.
 	*
-	* @param bWithdra $w = True[ Если параметр <b> bWithdraw </b> установлен в <i>true</i>, то установка
-	* параметра <b> bPay </b> в <i>true</i> приведет к тому, что необходимая сумма
+	* @param bool $bPay = True[ Если параметр <b> bWithdraw </b> установлен в <i>true</i>, то установка
+	* параметра 		<b> bPay </b> в <i>true</i> приведет к тому, что необходимая сумма
 	* денег будет внесена на счет покупателя перед оплатой, а установка
 	* в <i>false</i> приведет к тому, что оплата будет происходить целиком с
-	* внутреннего счета.<br><br> Если параметр bWithdraw установлен в <i>false</i>,
+	* внутреннего счета.<br><br> 		Если параметр bWithdraw установлен в <i>false</i>,
 	* то операции со счетом не производятся и значение параметра bPay не
 	* играет роли.
 	*
-	* @param bool $bPay = True[ Должен быть равен 0. </ht
+	* @param int $recurringID = 0[ Должен быть равен 0.
 	*
-	* @param int $recurringID = 0[ Массив дополнительно обновляемых параметров (обычно это номер и
+	* @param array $arAdditionalFields = array()]]]] Массив дополнительно обновляемых параметров (обычно это номер и
 	* дата платежного поручения).
 	*
-	* @param array $arAdditionalFields = array()]]]] 
-	*
 	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки. Повторная
-	* оплата заказа невозможна.</p> <a name="examples"></a>
+	* оплата заказа невозможна.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!CSaleOrder::PayOrder($ID, "Y", True, True, 0, array("PAY_VOUCHER_NUM" =&gt; "19210")))
 	* {
@@ -2118,25 +1964,28 @@ class CAllSaleOrder
 					$userEMail = $arUser["EMAIL"];
 			}
 
-			$arFields = Array(
-				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
-				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
-				"EMAIL" => $userEMail,
-				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
-			);
-			$eventName = "SALE_ORDER_PAID";
-
-			$bSend = true;
-			foreach(GetModuleEvents("sale", "OnOrderPaySendEmail", true) as $arEvent)
+			if ($isOrderConverted != "Y")
 			{
-				if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
-					$bSend = false;
-			}
+				$arFields = Array(
+						"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
+						"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
+						"EMAIL" => $userEMail,
+						"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
+				);
+				$eventName = "SALE_ORDER_PAID";
 
-			if($bSend)
-			{
-				$event = new CEvent;
-				$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				$bSend = true;
+				foreach(GetModuleEvents("sale", "OnOrderPaySendEmail", true) as $arEvent)
+				{
+					if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
+						$bSend = false;
+				}
+
+				if($bSend)
+				{
+					$event = new CEvent;
+					$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				}
 			}
 
 			CSaleMobileOrderPush::send("ORDER_PAYED", array("ORDER" => $arOrder));
@@ -2178,25 +2027,23 @@ class CAllSaleOrder
 
 	
 	/**
-	* <p>Метод меняет значение флага "доставка разрешена" (поле <b>ALLOW_DELIVERY</b>) на значение параметра <i>val</i> для заказа с кодом <i>ID</i>. Метод динамичный.</p> <p>Кроме флага разрешения доставки, устанавливаются также поля даты изменения значения флага (<b>DATE_ALLOW_DELIVERY</b>) и кода пользователя, изменившего значение флага (<b>EMP_ALLOW_DELIVERY_ID</b>).</p> <p>При изменении флага "Доставка разрешена" для каждого элемента заказа (товара) вызывается функция обратного вызова из поля <b> PAY_CALLBACK_FUNC </b> корзины (если она установлена).</p> <p>Перед изменением флага вызываются обработчики события OnSaleBeforeDeliveryOrder модуля магазина, в которых можно отменить изменение флага вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSaleDeliveryOrder модуля магазина.</p> <p>В случае разрешения доставки генерируется почтовое событие типа <b>SALE_ORDER_DELIVERY</b>.</p>
+	* <p>Метод меняет значение флага "доставка разрешена" (поле <b>ALLOW_DELIVERY</b>) на значение параметра <i>val</i> для заказа с кодом <i>ID</i>. Нестатический метод.</p> <p>Кроме флага разрешения доставки, устанавливаются также поля даты изменения значения флага (<b>DATE_ALLOW_DELIVERY</b>) и кода пользователя, изменившего значение флага (<b>EMP_ALLOW_DELIVERY_ID</b>).</p> <p>При изменении флага "Доставка разрешена" для каждого элемента заказа (товара) вызывается функция обратного вызова из поля <b> PAY_CALLBACK_FUNC </b> корзины (если она установлена).</p> <p>Перед изменением флага вызываются обработчики события OnSaleBeforeDeliveryOrder модуля магазина, в которых можно отменить изменение флага вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSaleDeliveryOrder модуля магазина.</p> <p>В случае разрешения доставки генерируется почтовое событие типа <b>SALE_ORDER_DELIVERY</b>.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
-	* @param string $val  Новое значение флага р<span class="style1">азрешения доставки </span>(Y/N).
+	* @param string $val  Новое значение флага р<span class="style1">азрешения  	доставки </span>(Y/N).
 	*
-	* @param  $int  Код продления подписки (если он есть).
+	* @param int $recurringID = 0[ Код продления подписки (если он есть).
 	*
-	* @param recurringI $D = 0[ Массив дополнительно обновляемых параметров (обычно это номер и
+	* @param array $arAdditionalFields = array()]] Массив дополнительно обновляемых параметров (обычно это номер и
 	* дата платежного поручения).
 	*
-	* @param array $arAdditionalFields = array()]] 
-	*
-	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p> <a
+	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!CSaleOrder::DeliverOrder(23, "Y"))
 	*    echo "Ошибка изменения заказа 23";
@@ -2335,23 +2182,26 @@ class CAllSaleOrder
 					$userEMail = $arUser["EMAIL"];
 			}
 
-			$eventName = "SALE_ORDER_DELIVERY";
-			$arFields = Array(
-				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
-				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
-				"EMAIL" => $userEMail,
-				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
-			);
-
-			$bSend = true;
-			foreach(GetModuleEvents("sale", "OnOrderDeliverSendEmail", true) as $arEvent)
-				if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
-					$bSend = false;
-
-			if($bSend)
+			if ($isOrderConverted != "Y")
 			{
-				$event = new CEvent;
-				$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				$eventName = "SALE_ORDER_DELIVERY";
+				$arFields = Array(
+						"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
+						"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
+						"EMAIL" => $userEMail,
+						"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
+				);
+
+				$bSend = true;
+				foreach(GetModuleEvents("sale", "OnOrderDeliverSendEmail", true) as $arEvent)
+					if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
+						$bSend = false;
+
+				if($bSend)
+				{
+					$event = new CEvent;
+					$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				}
 			}
 
 			CSaleMobileOrderPush::send("ORDER_DELIVERY_ALLOWED", array("ORDER" => $arOrder));
@@ -2581,24 +2431,23 @@ class CAllSaleOrder
 
 	
 	/**
-	* <p>Метод меняет значение флага "заказ отменён" (поле <b>CANCELED</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме флага отмены заказа, устанавливаются также поля даты изменения значения флага (<b>DATE_CANCELED</b>) и кода пользователя, изменившего значение флага (<b>EMP_CANCELED_ID</b>). Поле с описанием причины отмены заказа (<b>REASON_CANCELED</b>) заполняется значением параметра <i>Descr</i>.</p> <p>Если заказ был оплачен, то при отмене снимается флаг оплаты с возвращением денег на счет покупателя. Если заказ был частично оплачен, то при отмене внесённая сумма возвращается на счет покупателя.</p> <p>Перед отменой заказа вызываются обработчики события OnSaleBeforeCancelOrder модуля магазина, в которых можно отменить отмену заказа, вернув значение <i>false</i>. После отмены вызываются обработчики события OnSaleCancelOrder модуля магазина.</p> <p>В случае отмены заказа генерируется почтовое событие типа <b>SALE_ORDER_CANCEL</b>. Метод динамичный.</p>
+	* <p>Метод меняет значение флага "заказ отменён" (поле <b>CANCELED</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме флага отмены заказа, устанавливаются также поля даты изменения значения флага (<b>DATE_CANCELED</b>) и кода пользователя, изменившего значение флага (<b>EMP_CANCELED_ID</b>). Поле с описанием причины отмены заказа (<b>REASON_CANCELED</b>) заполняется значением параметра <i>Descr</i>.</p> <p>Если заказ был оплачен, то при отмене снимается флаг оплаты с возвращением денег на счет покупателя. Если заказ был частично оплачен, то при отмене внесённая сумма возвращается на счет покупателя.</p> <p>Перед отменой заказа вызываются обработчики события OnSaleBeforeCancelOrder модуля магазина, в которых можно отменить отмену заказа, вернув значение <i>false</i>. После отмены вызываются обработчики события OnSaleCancelOrder модуля магазина.</p> <p>В случае отмены заказа генерируется почтовое событие типа <b>SALE_ORDER_CANCEL</b>. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
 	* @param string $val  Новое значение флага отмены заказа (Y/N).
 	*
 	* @param string $description = "" Описание причины отмены заказа.
 	*
-	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p> <a
+	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* CSaleOrder::CancelOrder(25, "Y", "Потому что передумал");
 	* ?&gt;
-	* </htm
 	* </pre>
 	*
 	*
@@ -2637,7 +2486,7 @@ class CAllSaleOrder
 
 		if ($isOrderConverted == "Y")
 		{
-			$r = \Bitrix\Sale\Compatible\OrderCompatibility::cancel($ID, $val);
+			$r = \Bitrix\Sale\Compatible\OrderCompatibility::cancel($ID, $val, $description);
 			if ($r->isSuccess(true))
 			{
 				$res = true;
@@ -2743,30 +2592,6 @@ class CAllSaleOrder
 					$userEmail = $arUser["EMAIL"];
 			}
 
-			$event = new CEvent;
-			$arFields = Array(
-				"ORDER_ID" => $arOrder["ACCOUNT_NUMBER"],
-				"ORDER_DATE" => $arOrder["DATE_INSERT_FORMAT"],
-				"EMAIL" => $userEmail,
-				"ORDER_CANCEL_DESCRIPTION" => $description,
-				"SALE_EMAIL" => COption::GetOptionString("sale", "order_email", "order@".$_SERVER["SERVER_NAME"])
-			);
-
-			$eventName = "SALE_ORDER_CANCEL";
-
-			$bSend = true;
-			foreach(GetModuleEvents("sale", "OnOrderCancelSendEmail", true) as $arEvent)
-				if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields))===false)
-					$bSend = false;
-
-			if($bSend)
-			{
-				$event = new CEvent;
-				$event->Send($eventName, $arOrder["LID"], $arFields, "N");
-			}
-
-			CSaleMobileOrderPush::send("ORDER_CANCELED", array("ORDER" => $arOrder));
-
 			if (CModule::IncludeModule("statistic"))
 			{
 				CStatEvent::AddByEvents("eStore", "order_cancel", $ID, "", $arOrder["STAT_GID"]);
@@ -2778,18 +2603,18 @@ class CAllSaleOrder
 
 	
 	/**
-	* <p>Метод меняет значение статуса заказа (поле <b>STATUS_ID</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме статуса заказа устанавливаются так же поля даты изменения статуса заказа (<b>DATE_STATUS</b>) и кода пользователя, изменившего статус заказа (<b>EMP_STATUS_ID</b>). Метод динамичный.</p> <p>Перед изменением статуса вызываются обработчики события OnSaleBeforeStatusOrder модуля магазина, в которых можно отменить изменение статуса вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSaleStatusOrder модуля магазина.</p> <p>Генерируется почтовое событие типа <b> SALE_STATUS_CHANGED_&lt;код статуса&gt;</b>, если есть подходящий почтовый шаблон. Иначе генерируется почтовое событие типа <b>SALE_STATUS_CHANGED</b>.</p>
+	* <p>Метод меняет значение статуса заказа (поле <b>STATUS_ID</b>) на значение параметра <i> Val </i> для заказа с кодом <i>ID</i>. Кроме статуса заказа устанавливаются так же поля даты изменения статуса заказа (<b>DATE_STATUS</b>) и кода пользователя, изменившего статус заказа (<b>EMP_STATUS_ID</b>). Нестатический метод.</p> <p>Перед изменением статуса вызываются обработчики события OnSaleBeforeStatusOrder модуля магазина, в которых можно отменить изменение статуса вернув значение <i>false</i>. После изменения флага вызываются обработчики события OnSaleStatusOrder модуля магазина.</p> <p>Генерируется почтовое событие типа <b> SALE_STATUS_CHANGED_&lt;код статуса&gt;</b>, если есть подходящий почтовый шаблон. Иначе генерируется почтовое событие типа <b>SALE_STATUS_CHANGED</b>.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
-	* @param string $Val  Код статуса заказа. </htm
+	* @param string $Val  Код статуса заказа.
 	*
-	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p> <a
+	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!CSaleOrder::StatusOrder($ID, "F"))
 	*    echo "Ошибка установки нового статуса заказа";
@@ -2803,10 +2628,31 @@ class CAllSaleOrder
 	*/
 	public static function StatusOrder($ID, $val)
 	{
-		global $DB, $USER;
+		global $DB, $USER, $APPLICATION;
+
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
 
 		$ID = IntVal($ID);
 		$val = trim($val);
+
+		if ($ID <= 0)
+		{
+			$APPLICATION->ThrowException(Loc::getMessage("SKGO_NO_ORDER_ID1"), "NO_ORDER_ID");
+			return false;
+		}
+
+		$arOrder = CSaleOrder::GetByID($ID);
+		if (!$arOrder)
+		{
+			$APPLICATION->ThrowException(str_replace("#ID#", $ID, Loc::getMessage("SKGO_NO_ORDER")), "NO_ORDER");
+			return false;
+		}
+
+		if ($arOrder["STATUS_ID"] == $val)
+		{
+			$APPLICATION->ThrowException(str_replace("#ID#", $ID, Loc::getMessage("SKGO_DUB_STATUS")), "ALREADY_FLAG");
+			return false;
+		}
 
 		foreach(GetModuleEvents("sale", "OnSaleBeforeStatusOrder", true) as $arEvent)
 			if (ExecuteModuleEventEx($arEvent, Array($ID, $val))===false)
@@ -2859,32 +2705,35 @@ class CAllSaleOrder
 			foreach(GetModuleEvents("sale", "OnSaleStatusEMail", true) as $arEvent)
 				$arFields["TEXT"] = ExecuteModuleEventEx($arEvent, Array($ID, $arStatus["ID"]));
 
-			$eventName = "SALE_STATUS_CHANGED_".$arOrder["STATUS_ID"];
-
-			$bSend = true;
-			foreach(GetModuleEvents("sale", "OnOrderStatusSendEmail", true) as $arEvent)
-				if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields, $arOrder["STATUS_ID"]))===false)
-					$bSend = false;
-
-			if($bSend)
+			if ($isOrderConverted != "Y")
 			{
-				$b = '';
-				$o = '';
-				$eventMessage = new CEventMessage;
-				$dbEventMessage = $eventMessage->GetList(
-					$b,
-					$o,
-					array(
-						"EVENT_NAME" => $eventName,
-						"SITE_ID" => $arOrder["LID"],
-						'ACTIVE' => 'Y'
-					)
-				);
-				if (!($arEventMessage = $dbEventMessage->Fetch()))
-					$eventName = "SALE_STATUS_CHANGED";
-				unset($o, $b);
-				$event = new CEvent;
-				$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				$eventName = "SALE_STATUS_CHANGED_".$arOrder["STATUS_ID"];
+
+				$bSend = true;
+				foreach(GetModuleEvents("sale", "OnOrderStatusSendEmail", true) as $arEvent)
+					if (ExecuteModuleEventEx($arEvent, Array($ID, &$eventName, &$arFields, $arOrder["STATUS_ID"]))===false)
+						$bSend = false;
+
+				if($bSend)
+				{
+					$b = '';
+					$o = '';
+					$eventMessage = new CEventMessage;
+					$dbEventMessage = $eventMessage->GetList(
+							$b,
+							$o,
+							array(
+									"EVENT_NAME" => $eventName,
+									"SITE_ID" => $arOrder["LID"],
+									'ACTIVE' => 'Y'
+							)
+					);
+					if (!($arEventMessage = $dbEventMessage->Fetch()))
+						$eventName = "SALE_STATUS_CHANGED";
+					unset($o, $b);
+					$event = new CEvent;
+					$event->Send($eventName, $arOrder["LID"], $arFields, "N");
+				}
 			}
 		}
 
@@ -2893,18 +2742,18 @@ class CAllSaleOrder
 
 	
 	/**
-	* <p>Метод устанавливает новое значение <i> Val</i> комментария (поле <b>COMMENTS</b>) к заказу с кодом <i> ID</i>. Метод динамичный.</p>
+	* <p>Метод устанавливает новое значение <i> Val</i> комментария (поле <b>COMMENTS</b>) к заказу с кодом <i> ID</i>. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код заказа.
+	* @param mixed $intID  Код заказа.
 	*
 	* @param string $Val  Новое значение комментария.
 	*
-	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p> <a
+	* @return int <p>Возвращается код заказа или <i>false</i> в случае ошибки.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!CSaleOrder::CommentsOrder(12, "Не отгружать до оплаты!"))
 	*    echo "Ошибка изменения комментария к заказу";
@@ -3120,8 +2969,13 @@ class CAllSaleOrder
 			$strCurrency = strval($strCurrency);
 			$mxLastOrderDate = '';
 			$intMaxTimestamp = 0;
-			$intTimeStamp = 0;
-			$rsSaleOrders = CSaleOrder::GetList(array(),$arFilter,false,false,array('ID','PRICE','CURRENCY','DATE_INSERT'));
+			$rsSaleOrders = CSaleOrder::GetList(
+				array(),
+				$arFilter,
+				false,
+				false,
+				array('ID','PRICE','CURRENCY','DATE_INSERT')
+			);
 			while ($arSaleOrder = $rsSaleOrders->Fetch())
 			{
 				$intTimeStamp = MakeTimeStamp($arSaleOrder['DATE_INSERT']);
@@ -3137,16 +2991,15 @@ class CAllSaleOrder
 				}
 				else
 				{
-					if ($strCurrency != $arSaleOrder['CURRENCY'])
-					{
-						$dblPrice += $arSaleOrder['PRICE'];
-					}
-					else
-					{
-						$dblPrice += $arSaleOrder['PRICE'];
-					}
+					$dblPrice += (
+						$strCurrency != $arSaleOrder['CURRENCY']
+						? CCurrencyRates::ConvertCurrency($arSaleOrder['PRICE'], $arSaleOrder['CURRENCY'], $strCurrency)
+						: $arSaleOrder['PRICE']
+					);
 				}
+				unset($intTimeStamp);
 			}
+			unset($arSaleOrder, $rsSaleOrders);
 			$mxResult = array(
 				'PRICE' => $dblPrice,
 				'CURRENCY' => $strCurrency,
@@ -3164,8 +3017,8 @@ class CAllSaleOrder
 	*
 	* @param array $arOrder - array to sort
 	* @param array $arFilter - array to filter
-	* @param array $arGroupBy - array to group records
-	* @param array $arNavStartParams - array to parameters
+	* @param array|false $arGroupBy - array to group records
+	* @param array|false $arNavStartParams - array to parameters
 	* @param array $arSelectFields - array to selectes fields
 	* @return object $dbRes - object result
 	*/
@@ -3623,15 +3476,23 @@ class CAllSaleOrder
 		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
 		if ($isOrderConverted == "Y")
 		{
-			try
+			$accountNumber = $id;
+			for ($i = 1; $i <= 10; $i++)
 			{
-				/** @var \Bitrix\Sale\Result $r */
-				$r = \Bitrix\Sale\Internals\OrderTable::update($id, array("ACCOUNT_NUMBER" => $id));
-				$res = $r->isSuccess(true);
-			}
-			catch (\Bitrix\Main\DB\SqlQueryException $exception)
-			{
-				$res = false;
+				try
+				{
+					/** @var \Bitrix\Sale\Result $r */
+					$r = \Bitrix\Sale\Internals\OrderTable::update($id, array("ACCOUNT_NUMBER" => $accountNumber));
+					$res = $r->isSuccess(true);
+				}
+				catch (\Bitrix\Main\DB\SqlQueryException $exception)
+				{
+					$res = false;
+					$accountNumber = $id."-".$i;
+				}
+
+				if ($res)
+					break;
 			}
 
 		}
@@ -3811,51 +3672,119 @@ class CAllSaleOrder
 
 		if ($days_ago > 0)
 		{
-			$date = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), time() - $days_ago*24*60*60);
 
-			$arFilter = array(
-				"<=DATE_INSERT" => $date,
-				"RESERVED" => "Y",
-				"DEDUCTED" => "N",
-				"PAYED" => "N",
-				"ALLOW_DELIVERY" => "N",
-				"CANCELED" => "N"
+			$shipmentList = array();
+			$date = new \Bitrix\Main\Type\DateTime();
+
+			$filter = array(
+				'filter' => array(
+					"<=DATE_INSERT" => $date->add('-'.$days_ago.' day'),
+					"=SHIPMENT.RESERVED" => "Y",
+					"=SHIPMENT.DEDUCTED" => "N",
+					"=SHIPMENT.MARKED" => "N",
+					"=SHIPMENT.ALLOW_DELIVERY" => "N",
+					"=PAYED" => "N",
+					"=CANCELED" => "N",
+				),
+				'select' => array(
+					"ID",
+					"SHIPMENT_ID" => "SHIPMENT.ID",
+					"SHIPMENT_RESERVED" => "SHIPMENT.RESERVED",
+					"SHIPMENT_DEDUCTED" => "SHIPMENT.DEDUCTED",
+					"DATE_INSERT", "PAYED", "CANCELED", "MARKED"
+				)
 			);
 
-			$dbRes = CSaleOrder::GetList(
-				array(),
-				$arFilter,
-				false,
-				false,
-				array("ID", "RESERVED", "DATE_INSERT", "DEDUCTED", "PAYED", "CANCELED", "MARKED")
-			);
-			while ($arRes = $dbRes->GetNext())
+			$res = \Bitrix\Sale\Internals\OrderTable::getList($filter);
+			while($data = $res->fetch())
 			{
-				foreach(GetModuleEvents("sale", "OnSaleBeforeReserveOrder", true) as $arEvent)
-						if (ExecuteModuleEventEx($arEvent, array($arRes["ID"], "N", $arRes))===false)
-							return false;
-
-				// undoing reservation
-				$res = CSaleBasket::OrderReservation($arRes["ID"], true);
-
-				if (array_key_exists("ERROR", $res))
+				if (!array_key_exists($data['ID'], $shipmentList))
 				{
-					$errorMessage = '';
-					foreach ($res["ERROR"] as $productId => $arError)
-						$errorMessage .= " ".$arError["MESSAGE"];
-
-					CSaleOrder::SetMark($arRes["ID"], Loc::getMessage("SKGB_RESERVE_ERROR", array("#MESSAGE#" => $errorMessage)));
-				}
-				else
-				{
-					if ($arRes["MARKED"] == "Y")
-						CSaleOrder::UnsetMark($arRes["ID"]);
+					$shipmentList[$data['ID']] = array();
 				}
 
-				$res = CSaleOrder::Update($arRes["ID"], array("RESERVED" => "N"), false);
+				if (in_array($data['SHIPMENT_ID'], $shipmentList[$data['ID']]))
+				{
+					continue;
+				}
 
-				foreach(GetModuleEvents("sale", "OnSaleReserveOrder", true) as $arEvent)
-					ExecuteModuleEventEx($arEvent, Array($arRes["ID"], "N"));
+				$shipmentList[$data['ID']][] = $data['SHIPMENT_ID'];
+			}
+
+
+			if (!empty($shipmentList))
+			{
+				foreach ($shipmentList as $orderId => $shipmentData)
+				{
+					/** @var Sale\Order $order */
+					$order = Sale\Order::load($orderId);
+					$orderSaved = false;
+					$errors = array();
+
+					try
+					{
+						/** @var Sale\ShipmentCollection $shipmentCollection */
+						if ($shipmentCollection = $order->getShipmentCollection())
+						{
+							foreach ($shipmentData as $shipmentId)
+							{
+								/** @var Sale\Shipment $shipment */
+								if ($shipment = $shipmentCollection->getItemById($shipmentId))
+								{
+									$r = $shipment->tryUnreserve();
+									if (!$r->isSuccess())
+									{
+										if (!$shipment->isMarked())
+										{
+											$shipment->setField('MARKED', 'Y');
+											if (is_array($r->getErrorMessages()))
+											{
+												$oldErrorText = $shipment->getField('REASON_MARKED');
+												foreach($r->getErrorMessages() as $error)
+												{
+													$oldErrorText .= (strval($oldErrorText) != '' ? "\n" : ""). $error;
+												}
+
+												$shipment->setField('REASON_MARKED', $oldErrorText);
+											}
+										}
+									}
+								}
+							}
+						}
+
+						$r = $order->save();
+						if ($r->isSuccess())
+						{
+							$orderSaved = true;
+						}
+						else
+						{
+							$errors = $r->getErrorMessages();
+						}
+					}
+					catch(Exception $e)
+					{
+						$errors[] = $e->getMessage();
+					}
+
+					if (!$orderSaved)
+					{
+						if (!empty($errors))
+						{
+							$oldErrorText = $order->getField('REASON_MARKED');
+							foreach($errors as $error)
+							{
+								$oldErrorText .= (strval($oldErrorText) != '' ? "\n" : ""). $error;
+							}
+
+							Sale\Internals\OrderTable::update($order->getId(), array(
+								"MARKED" => "Y",
+								"REASON_MARKED" => $oldErrorText
+							));
+						}
+					}
+				}
 			}
 		}
 
@@ -3933,6 +3862,181 @@ class CAllSaleOrder
 			'VAT_RATE',
 			'VAT_SUM',
 		);
+	}
+
+	/**
+	 * @internal
+	 * @param array $list
+	 * @param $perm
+	 * @param bool $userGroups
+	 * @param bool $userId
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\SystemException
+	 */
+	public static function checkUserPermissionOrderList(array $list, $perm, $userGroups = false, $userId = false)
+	{
+		$output = array();
+
+		$userRights = CMain::GetUserRight("sale", $userGroups, "Y", "Y");
+		foreach ($list as $orderId)
+		{
+			$output[$orderId] = ($userRights >= "W") ? true: false;
+		}
+
+		if ($userRights >= "W")
+			return $output;
+
+		$orderList = array();
+		$siteList = array();
+		$statusList = array();
+		$accessSiteList = array();
+		$statusPermissionList = array();
+		$statusIndexList = array();
+
+		$cacheAccessSite = array();
+		$cacheStatusGroupOperation = array();
+
+		$selectOrder = array('ID', 'LID', 'STATUS_ID');
+
+		if ($userId > 0)
+		{
+			$selectOrder[] = 'USER_ID';
+		}
+
+		$res = Sale\Order::getList(array(
+									   'filter' => array(
+										   '=ID' => $list
+									   ),
+									   'select' => $selectOrder
+								   ));
+		while($orderData = $res->fetch())
+		{
+			if (!in_array($orderData['LID'], array_keys($siteList)))
+			{
+				$siteList[$orderData['LID']][] = $orderData['ID'];
+			}
+
+			if ($userId > 0 && $orderData['USER_ID'] == $userId)
+			{
+				$output[$orderData['ID']] = true;
+				continue;
+			}
+
+			$orderList[$orderData['ID']] = $orderData;
+		}
+
+		if ($userRights == "U" && !empty($orderList))
+		{
+			$hashAccessSite = md5(join(',', array_keys($siteList))."|". join(', ', $userGroups));
+
+			if (array_key_exists($hashAccessSite, $cacheAccessSite))
+			{
+				$accessSiteList = $cacheAccessSite[$hashAccessSite];
+			}
+			else
+			{
+				$accessSiteRes = CSaleGroupAccessToSite::GetList(
+					array(),
+					array(
+						"@SITE_ID" => array_keys($siteList),
+						"GROUP_ID" => $userGroups
+					),
+					false,
+					false,
+					array('SITE_ID')
+				);
+				while($accessSiteData = $accessSiteRes->Fetch())
+				{
+					$accessSiteList[] = $accessSiteData['SITE_ID'];
+				}
+
+				$cacheAccessSite[$hashAccessSite] = $accessSiteList;
+			}
+
+			foreach ($siteList as $siteId => $orderIdList)
+			{
+				if (!in_array($siteId, $accessSiteList))
+				{
+					foreach ($siteList[$siteId] as $orderId)
+					{
+						if (!empty($orderList[$orderId]))
+						{
+							unset($orderList[$orderId]);
+						}
+					}
+					unset($siteList[$siteId]);
+				}
+			}
+
+			if (!empty($orderList))
+			{
+				foreach ($orderList as $orderId => $orderData)
+				{
+					if (!in_array($orderData['STATUS_ID'], $statusList))
+					{
+						$statusList[$orderData['STATUS_ID']] = $orderData['STATUS_ID'];
+					}
+
+					$statusIndexList[$orderData['STATUS_ID']][] = $orderData['ID'];
+				}
+
+				$statusIdList = array_keys($statusList);
+
+				if (!empty($statusIdList))
+				{
+					foreach ($statusIdList as $statusId)
+					{
+						$hashStatusGroupOperation = md5($statusId . "|" . join(',', $userGroups)."|". $perm);
+						if (array_key_exists($hashStatusGroupOperation, $cacheStatusGroupOperation))
+						{
+							$statusPermissionList[$statusId] = $cacheStatusGroupOperation[$hashAccessSite];
+						}
+						else
+						{
+							if (Sale\OrderStatus::canGroupDoOperations($userGroups, $statusId, array($perm)))
+							{
+								$statusPermissionList[$statusId] = true;
+								$cacheStatusGroupOperation[$hashStatusGroupOperation] = true;
+							}
+						}
+					}
+				}
+
+				foreach ($statusIndexList as $statusId => $orderIdList)
+				{
+					if (!array_key_exists($statusId, $statusPermissionList))
+					{
+						foreach ($orderIdList as $orderId)
+						{
+							if (!empty($orderList[$orderId]))
+							{
+								unset($orderList[$orderId]);
+							}
+						}
+						unset($statusList[$statusId]);
+					}
+				}
+			}
+		}
+
+		if (!empty($orderList))
+		{
+			$orderIdList = array_keys($orderList);
+
+			foreach ($list as $orderId)
+			{
+				if (in_array($orderId, $orderIdList))
+				{
+					if (isset($output[$orderId]))
+					{
+						$output[$orderId] = true;
+					}
+				}
+			}
+		}
+
+		return $output;
 	}
 }
 ?>

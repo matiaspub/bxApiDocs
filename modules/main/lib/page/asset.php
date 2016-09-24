@@ -4,7 +4,7 @@ namespace Bitrix\Main\Page;
 use Bitrix\Main;
 use Bitrix\Main\IO;
 use Bitrix\Main\Config\Option;
-use Bitrix\Main\Text\String;
+use Bitrix\Main\Text\BinaryString;
 
 class AssetMode
 {
@@ -20,6 +20,14 @@ class AssetLocation
 	const AFTER_CSS = 'AFTER_CSS';
 	const AFTER_JS_KERNEL = 'AFTER_JS_KERNEL';
 	const AFTER_JS = 'AFTER_JS';
+}
+
+class AssetShowTargetType
+{
+    const ALL = 0;
+    const KERNEL = 1;
+    const TEMPLATE_PAGE = 2;
+    const BODY = 3;
 }
 
 class Asset
@@ -556,6 +564,25 @@ class Asset
 	 * @param null $mode
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет строку в секцию <code>&lt;head&gt;…&lt;/head&gt;</code> сайта.</p> <p>Аналог метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadstring.php" >CMain::AddHeadString</a> в старом ядре.</p>
+	*
+	*
+	* @param mixed $str  Строка, которая будет добавлена
+	*
+	* @param boolean $unique = false 
+	*
+	* @param string $location = \Bitrix\Main\Page\AssetLocation::AFTER_JS_KERNEL 
+	*
+	* @param null $mode = null 
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addstring.php
+	* @author Bitrix
+	*/
 	public function addString($str, $unique = false, $location = AssetLocation::AFTER_JS_KERNEL, $mode = null)
 	{
 		if($str == '')
@@ -617,6 +644,21 @@ class Asset
 	 * @param bool $additional
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет <b>css</b> в секцию <code>&lt;head&gt;…&lt;/head&gt;</code> сайта.</p> <p>Аналог метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php" >CMain::SetAdditionalCSS</a> в старом ядре.</p>
+	*
+	*
+	* @param mixed $path  
+	*
+	* @param boolean $additional = false 
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addcss.php
+	* @author Bitrix
+	*/
 	public function addCss($path, $additional = false)
 	{
 		if(strlen($path) <= 0)
@@ -636,6 +678,21 @@ class Asset
 	 * @param bool $additional
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет <b>js</b> в секцию <code>&lt;head&gt;…&lt;/head&gt;</code> сайта.</p> <p>Аналог <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php" >CMain::AddHeadScript</a> в старом ядре.</p>
+	*
+	*
+	* @param mixed $path  
+	*
+	* @param boolean $additional = false 
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addjs.php
+	* @author Bitrix
+	*/
 	public function addJs($path, $additional = false)
 	{
 		if(strlen($path) <= 0)
@@ -821,13 +878,13 @@ class Asset
 		$areas = $this->getScriptAreas($content);
 		foreach ($areas as $area)
 		{
-			if (String::getBinaryStrpos($area->attrs, "data-skip-moving") !== false || !self::isValidScriptType($area->attrs))
+			if (BinaryString::getPosition($area->attrs, "data-skip-moving") !== false || !self::isValidScriptType($area->attrs))
 			{
 				continue;
 			}
 
-			$js .= String::getBinarySubstring($content, $area->openTagStart, $area->closingTagEnd - $area->openTagStart);
-			$newContent .= String::getBinarySubstring($content, $offset, $area->openTagStart - $offset);
+			$js .= BinaryString::getSubstring($content, $area->openTagStart, $area->closingTagEnd - $area->openTagStart);
+			$newContent .= BinaryString::getSubstring($content, $offset, $area->openTagStart - $offset);
 			$offset = $area->closingTagEnd;
 		}
 
@@ -836,8 +893,8 @@ class Asset
 			return;
 		}
 
-		$newContent .= String::getBinarySubstring($content, $offset);
-		$bodyEnd = String::getBinaryStrripos($newContent, "</body>");
+		$newContent .= BinaryString::getSubstring($content, $offset);
+		$bodyEnd = BinaryString::getLastPositionIgnoreCase($newContent, "</body>");
 		if ($bodyEnd === false)
 		{
 			$content = $newContent.$js;
@@ -862,21 +919,21 @@ class Asset
 
 		$offset = 0;
 		$areas = array();
-		$content = String::getBinaryStrtolower($content);
-		while (($openTagStart = String::getBinaryStrpos($content, $openTag, $offset)) !== false)
+		$content = BinaryString::changeCaseToLower($content);
+		while (($openTagStart = BinaryString::getPosition($content, $openTag, $offset)) !== false)
 		{
-			$endingPos = String::getBinaryStrpos($content, $ending, $openTagStart);
+			$endingPos = BinaryString::getPosition($content, $ending, $openTagStart);
 			if ($endingPos === false)
 			{
 				break;
 			}
 
 			$attrsStart = $openTagStart + strlen($openTag);
-			$attrs = String::getBinarySubstring($content, $attrsStart, $endingPos - $attrsStart);
+			$attrs = BinaryString::getSubstring($content, $attrsStart, $endingPos - $attrsStart);
 			$openTagEnd = $endingPos + strlen($ending);
 
 			$realClosingTag = $closingTag.$ending;
-			$closingTagStart = String::getBinaryStrpos($content, $realClosingTag, $openTagEnd);
+			$closingTagStart = BinaryString::getPosition($content, $realClosingTag, $openTagEnd);
 			if ($closingTagStart === false)
 			{
 				$offset = $openTagEnd;
@@ -1471,7 +1528,7 @@ class Asset
 	 * Return css page assets
 	 * @return string
 	 */
-	public function getCss()
+    public function getCss($type = AssetShowTargetType::ALL)
 	{
 		$res = $res_content = '';
 		$cnt = $ruleCount = 0;
@@ -1569,15 +1626,35 @@ class Asset
 			$res .= '<script type="text/javascript">'."BX.loadCSS(['".implode("','", $arAjaxList)."']);".'</script>';
 		}
 
-		foreach($this->targetList as $setName => $set)
-		{
-			if($setName != 'TEMPLATE')
-			{
-				$res .= $this->showAsset($setList, 'css', $setName);
-			}
-		}
+        if($type == AssetShowTargetType::KERNEL)
+        {
+            $res .= $this->showAsset($setList, 'css', 'KERNEL');
+        }
+        elseif($type == AssetShowTargetType::TEMPLATE_PAGE)
+        {
+            foreach($this->targetList as $setName => $set)
+            {
+                if($setName != 'TEMPLATE' && $setName != 'KERNEL')
+                {
+                    $res .= $this->showAsset($setList, 'css', $setName);
+                }
+            }
 
-		$res .= $this->showAsset($setList, 'css', 'TEMPLATE');
+            $res .= $this->showAsset($setList, 'css', 'TEMPLATE');
+        }
+        else
+        {
+            foreach($this->targetList as $setName => $set)
+            {
+                if($setName != 'TEMPLATE')
+                {
+                    $res .= $this->showAsset($setList, 'css', $setName);
+                }
+            }
+
+            $res .= $this->showAsset($setList, 'css', 'TEMPLATE');
+        }
+
 		return $res;
 	}
 
@@ -1586,18 +1663,17 @@ class Asset
 	 * @param int $type
 	 * @return string
 	 */
-	function getJs($type = 0)
+	function getJs($type = AssetShowTargetType::ALL)
 	{
 		static $firstExec = true;
 		static $setList = array();
 
 		$res = '';
 		$type = (int) $type;
-		$type = (($type == 1 && $this->headString && !$this->headScript) ? 0 : $type);
+		$type = (($type == AssetShowTargetType::KERNEL && $this->headString && !$this->headScript) ? AssetShowTargetType::ALL : $type);
 		$optimize = $this->optimizeJs();
 		if($firstExec)
 		{
-			//if(!empty($arScripts) || !empty($additionalJS) || !empty($this->sCssJsFList['CSS'])) { CJSCore::Init(); }
 			$this->prepareJs();
 			$setList = $this->getTargetList('JS');
 
@@ -1639,7 +1715,7 @@ class Asset
 			$firstExec = false;
 		}
 
-		if($type == 1 && ($this->mode & $this->targetList['KERNEL']['MODE']))
+		if($type == AssetShowTargetType::KERNEL && ($this->mode & $this->targetList['KERNEL']['MODE']))
 		{
 			$setName = 'KERNEL';
 			$res .= $this->getStrings(AssetLocation::AFTER_CSS);
@@ -1647,7 +1723,7 @@ class Asset
 			$res .= $this->showFilesList();
 			$res .= $this->getStrings(AssetLocation::AFTER_JS_KERNEL);
 		}
-		elseif($type == 2)
+		elseif($type == AssetShowTargetType::TEMPLATE_PAGE)
 		{
 			foreach($this->targetList as $setName => $set)
 			{
@@ -1659,7 +1735,7 @@ class Asset
 			}
 			$res .= $this->getStrings(AssetLocation::AFTER_JS);
 		}
-		elseif($type == 3 && ($this->mode & $this->targetList['BODY']['MODE']))
+		elseif($type == AssetShowTargetType::BODY && ($this->mode & $this->targetList['BODY']['MODE']))
 		{
 			$setName = 'BODY';
 			$res .= $this->showAsset($setList,'js', $setName);
@@ -1786,6 +1862,8 @@ class Asset
 		{
 			$this->kernelAsset['CSS'][$key] = $module;
 		}
+
+		$this->moduleInfo['CSS'][$module]['FILES_INFO'] = true;
 	}
 
 	/**
@@ -1809,6 +1887,8 @@ class Asset
 		{
 			$this->kernelAsset['JS'][$key] = $module;
 		}
+
+		$this->moduleInfo['JS'][$module]['FILES_INFO'] = true;
 	}
 
 	/**
@@ -2353,23 +2433,23 @@ class Asset
 	{
 		$sourceMapName = "";
 
-		$length = String::getBinaryLength($content);
+		$length = BinaryString::getLength($content);
 		$position = $length > 512 ? $length - 512 : 0;
-		$lastLine = String::getBinaryStrpos($content, self::SOURCE_MAP_TAG, $position);
+		$lastLine = BinaryString::getPosition($content, self::SOURCE_MAP_TAG, $position);
 		if ($lastLine !== false)
 		{
 			$nameStart = $lastLine + strlen(self::SOURCE_MAP_TAG);
-			if (($newLinePos = String::getBinaryStrpos($content, "\n", $nameStart)) !== false)
+			if (($newLinePos = BinaryString::getPosition($content, "\n", $nameStart)) !== false)
 			{
-				$sourceMapName = String::getBinarySubstring($content, $nameStart, $newLinePos - $nameStart);
+				$sourceMapName = BinaryString::getSubstring($content, $nameStart, $newLinePos - $nameStart);
 			}
 			else
 			{
-				$sourceMapName = String::getBinarySubstring($content, $nameStart);
+				$sourceMapName = BinaryString::getSubstring($content, $nameStart);
 			}
 
 			$sourceMapName = trim($sourceMapName);
-			$content = String::getBinarySubstring($content, 0, $lastLine);
+			$content = BinaryString::getSubstring($content, 0, $lastLine);
 		}
 
 		return $sourceMapName;
@@ -2386,20 +2466,20 @@ class Asset
 		$line = 0;
 
 		$arResult = array();
-		while (($newLinePos = String::getBinaryStrpos($content, "\n", $offset)) !== false)
+		while (($newLinePos = BinaryString::getPosition($content, "\n", $offset)) !== false)
 		{
 			$line++;
 			$offset = $newLinePos + 1;
-			if (String::getBinarySubstring($content, $offset, strlen(self::HEADER_START_TAG)) === self::HEADER_START_TAG)
+			if (BinaryString::getSubstring($content, $offset, strlen(self::HEADER_START_TAG)) === self::HEADER_START_TAG)
 			{
-				$endingPos = String::getBinaryStrpos($content, self::HEADER_END_TAG, $offset);
+				$endingPos = BinaryString::getPosition($content, self::HEADER_END_TAG, $offset);
 				if ($endingPos === false)
 				{
 					break;
 				}
 
 				$startData = $offset + strlen(self::HEADER_START_TAG);
-				$data = unserialize(String::getBinarySubstring($content, $startData, $endingPos - $startData));
+				$data = unserialize(BinaryString::getSubstring($content, $startData, $endingPos - $startData));
 
 				if (is_array($data))
 				{
@@ -2474,7 +2554,7 @@ class Asset
 		}
 
 		$written = fwrite($fh, $content);
-		$len = Main\Text\String::getBinaryLength($content);
+		$len = Main\Text\BinaryString::getLength($content);
 		fclose($fh);
 
 		self::unlink($filePath);

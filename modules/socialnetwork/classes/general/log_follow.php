@@ -5,6 +5,8 @@ class CSocNetLogFollow
 {
 	public static function Set($user_id, $code = "**", $type = "Y", $follow_date = false, $site_id = SITE_ID, $bByWF = false)
 	{
+		global $USER;
+
 		static $LOG_CACHE;
 
 		if (strlen($code) <= 0)
@@ -19,7 +21,7 @@ class CSocNetLogFollow
 
 		if (intval($user_id) <= 0)
 		{
-			$user_id = $GLOBALS["USER"]->GetID();
+			$user_id = $USER->GetID();
 		}
 
 		$arFollows = array();
@@ -43,6 +45,8 @@ class CSocNetLogFollow
 				? $arFollows["**"]["TYPE"]
 				: COption::GetOptionString("socialnetwork", "follow_default_type", "Y")
 		);
+
+		$res = false;
 
 		if (preg_match('/^L(\d+)$/', $code, $matches))
 		{
@@ -132,7 +136,7 @@ class CSocNetLogFollow
 	
 	public static function Add($user_id, $code, $type, $follow_date = false, $bByWF = false)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (
 			intval($user_id) <= 0 
@@ -161,7 +165,7 @@ class CSocNetLogFollow
 				&& $code === "**"
 			)
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+				$CACHE_MANAGER->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
 			}
 
 			return true;
@@ -172,7 +176,7 @@ class CSocNetLogFollow
 
 	public static function Update($user_id, $code, $type, $follow_date = false, $bByWF = false)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (intval($user_id) <= 0 || strlen($code) <= 0)
 			return false;
@@ -188,17 +192,21 @@ class CSocNetLogFollow
 				&& intval($user_id) > 0 
 				&& $code === "**"
 			)
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+			{
+				$CACHE_MANAGER->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+			}
 
 			return true;
 		}
 		else
+		{
 			return false;
+		}
 	}
 
 	public static function Delete($user_id, $code, $type = false)
 	{
-		global $DB;
+		global $DB, $CACHE_MANAGER;
 
 		if (intval($user_id) <= 0 || strlen($code) <= 0)
 			return false;
@@ -211,18 +219,22 @@ class CSocNetLogFollow
 		if ($DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__))
 		{
 			if (
-				defined("BX_COMP_MANAGED_CACHE") 
-				&& intval($user_id) > 0 
+				defined("BX_COMP_MANAGED_CACHE")
+				&& intval($user_id) > 0
 				&& $code === "**"
 			)
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+			{
+				$CACHE_MANAGER->ClearByTag("SONET_LOG_FOLLOW_".$user_id);
+			}
 
 			return true;
 		}
 		else
+		{
 			return false;
+		}
 	}
-	
+
 	public static function DeleteByLogID($log_id, $type = false, $bUseSmartLogic = false)
 	{
 		global $DB;
@@ -358,6 +370,8 @@ class CSocNetLogFollow
 			"LOG_COMMENT"
 		);
 
+		$strRes = false;
+
 		if (
 			in_array($rating_type_id, $arCommentTypeID)
 			|| 
@@ -378,7 +392,9 @@ class CSocNetLogFollow
 
 			$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
+			{
 				$strRes = $arRes["TYPE"];
+			}
 		}
 
 		if (
@@ -402,7 +418,9 @@ class CSocNetLogFollow
 
 			$dbRes = $DB->Query($strSQL, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
+			{
 				$strRes = $arRes["TYPE"];
+			}
 		}
 
 		return $strRes;
@@ -474,8 +492,8 @@ class CSocNetLogFollow
 
 			if (defined("BX_COMP_MANAGED_CACHE"))
 			{
-				$GLOBALS["CACHE_MANAGER"]->StartTagCache($cache_dir);
-				$GLOBALS["CACHE_MANAGER"]->RegisterTag("SONET_LOG_FOLLOW_".$user_id);
+				$CACHE_MANAGER->StartTagCache($cache_dir);
+				$CACHE_MANAGER->RegisterTag("SONET_LOG_FOLLOW_".$user_id);
 			}
 
 			$rsFollow = CSocNetLogFollow::GetList(
@@ -498,7 +516,7 @@ class CSocNetLogFollow
 				$obCache->EndDataCache($arCacheData);
 				if (defined("BX_COMP_MANAGED_CACHE"))
 				{
-					$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+					$CACHE_MANAGER->EndTagCache();
 				}
 			}
 		}
@@ -514,6 +532,8 @@ class CSocNetLogFollow
 
 	public static function OnBlogPostMentionNotifyIm($ID, $arMessageFields)
 	{
+		$res = false;
+
 		if (
 			is_array($arMessageFields)
 			&& intval($arMessageFields["TO_USER_ID"]) > 0
@@ -533,6 +553,8 @@ class CSocNetLogFollow
 
 	public static function checkAutoUnfollow($traffic_cnt, $traffic_avg, $userId = false)
 	{
+		global $USER;
+
 		if (
 			intval($traffic_cnt) > 10
 			&& intval($traffic_avg) < 60*60*4 // 4 hours
@@ -541,14 +563,14 @@ class CSocNetLogFollow
 			$userId = (
 				!$userId
 				|| intval($userId) <= 0
-					? $GLOBALS["USER"]->GetID()
+					? $USER->GetID()
 					: intval($userId)
 			);
 
 			$default_follow = CSocNetLogFollow::GetDefaultValue($userId);
 			if ($default_follow == 'Y')
 			{
-				$isAlreadyChecked = CUserOptions::GetOption("socialnetwork", "~log_autofollow_checked", "N", false, $userId);
+				$isAlreadyChecked = CUserOptions::GetOption("socialnetwork", "~log_autofollow_checked", "N", $userId);
 				if ($isAlreadyChecked != 'Y')
 				{
 					if (CModule::IncludeModule('im'))
@@ -579,6 +601,8 @@ class CSocNetLogFollow
 
 	public static function OnBeforeConfirmNotify($module, $tag, $value, $arParams)
 	{
+		global $USER;
+
 		if ($module == "socialnetwork")
 		{
 			$arTag = explode("|", $tag);
@@ -589,12 +613,13 @@ class CSocNetLogFollow
 			{
 				if ($value == 'Y')
 				{
-					CSocNetLogFollow::Set($GLOBALS["USER"]->GetID(), "**", "N");
+					CSocNetLogFollow::Set($USER->GetID(), "**", "N");
 				}
 				return true;
 			}
 		}
-	}
 
+		return null;
+	}
 }
 ?>

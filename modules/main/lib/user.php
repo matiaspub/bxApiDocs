@@ -73,6 +73,36 @@ class UserTable extends Entity\DataManager
 			'NAME' => array(
 				'data_type' => 'string'
 			),
+			'SECOND_NAME' => array(
+				'data_type' => 'string'
+			),
+			'LAST_NAME' => array(
+				'data_type' => 'string'
+			),
+			'TITLE' => array(
+				'data_type' => 'string'
+			),
+			'EXTERNAL_AUTH_ID' => array(
+				'data_type' => 'string'
+			),
+			'XML_ID' => array(
+				'data_type' => 'string'
+			),
+			'BX_USER_ID' => array(
+				'data_type' => 'string'
+			),
+			'CONFIRM_CODE' => array(
+				'data_type' => 'string'
+			),
+			'LID' => array(
+				'data_type' => 'string'
+			),
+			'TIME_ZONE_OFFSET' => array(
+				'data_type' => 'integer'
+			),
+			'PERSONAL_PROFESSION' => array(
+				'data_type' => 'string'
+			),
 			'PERSONAL_PHONE' => array(
 				'data_type' => 'string'
 			),
@@ -92,6 +122,9 @@ class UserTable extends Entity\DataManager
 				'data_type' => 'string'
 			),
 			'PERSONAL_STREET' => array(
+				'data_type' => 'text'
+			),
+			'PERSONAL_MAILBOX' => array(
 				'data_type' => 'string'
 			),
 			'PERSONAL_CITY' => array(
@@ -106,27 +139,6 @@ class UserTable extends Entity\DataManager
 			'PERSONAL_COUNTRY' => array(
 				'data_type' => 'string'
 			),
-			'WORK_COMPANY' => array(
-				'data_type' => 'string'
-			),
-			'PERSONAL_PROFESSION' => array(
-				'data_type' => 'string'
-			),
-			'SECOND_NAME' => array(
-				'data_type' => 'string'
-			),
-			'LAST_NAME' => array(
-				'data_type' => 'string'
-			),
-			'LID' => array(
-				'data_type' => 'string'
-			),
-			'WORK_PHONE' => array(
-				'data_type' => 'string'
-			),
-			'WORK_POSITION' => array(
-				'data_type' => 'string'
-			),
 			'PERSONAL_BIRTHDAY' => array(
 				'data_type' => 'date'
 			),
@@ -135,6 +147,57 @@ class UserTable extends Entity\DataManager
 			),
 			'PERSONAL_PHOTO' => array(
 				'data_type' => 'integer'
+			),
+			'PERSONAL_NOTES' => array(
+				'data_type' => 'text'
+			),
+			'WORK_COMPANY' => array(
+				'data_type' => 'string'
+			),
+			'WORK_DEPARTMENT' => array(
+				'data_type' => 'string'
+			),
+			'WORK_PHONE' => array(
+				'data_type' => 'string'
+			),
+			'WORK_POSITION' => array(
+				'data_type' => 'string'
+			),
+			'WORK_WWW' => array(
+				'data_type' => 'string'
+			),
+			'WORK_FAX' => array(
+				'data_type' => 'string'
+			),
+			'WORK_PAGER' => array(
+				'data_type' => 'string'
+			),
+			'WORK_STREET' => array(
+				'data_type' => 'text'
+			),
+			'WORK_MAILBOX' => array(
+				'data_type' => 'string'
+			),
+			'WORK_CITY' => array(
+				'data_type' => 'string'
+			),
+			'WORK_STATE' => array(
+				'data_type' => 'string'
+			),
+			'WORK_ZIP' => array(
+				'data_type' => 'string'
+			),
+			'WORK_COUNTRY' => array(
+				'data_type' => 'string'
+			),
+			'WORK_PROFILE' => array(
+				'data_type' => 'text'
+			),
+			'WORK_LOGO' => array(
+				'data_type' => 'integer'
+			),
+			'WORK_NOTES' => array(
+				'data_type' => 'text'
 			),
 			'SHORT_NAME' => array(
 				'data_type' => 'string',
@@ -150,21 +213,6 @@ class UserTable extends Entity\DataManager
 					'CASE WHEN %s > '.$helper->addSecondsToDateTime('(-120)').' THEN \'Y\' ELSE \'N\' END',
 					'LAST_ACTIVITY_DATE',
 				)
-			),
-			'EXTERNAL_AUTH_ID' => array(
-				'data_type' => 'string'
-			),
-			'XML_ID' => array(
-				'data_type' => 'string'
-			),
-			'TITLE' => array(
-				'data_type' => 'string'
-			),
-			'BX_USER_ID' => array(
-				'data_type' => 'string'
-			),
-			'CONFIRM_CODE' => array(
-				'data_type' => 'string'
 			),
 		);
 	}

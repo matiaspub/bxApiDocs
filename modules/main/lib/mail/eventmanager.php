@@ -146,8 +146,21 @@ class EventManager
 				$arMail['FILE'] = $arFiles;
 
 				if(!is_array($arMail['C_FIELDS'])) $arMail['C_FIELDS'] = array();
-				$flag = Event::handleEvent($arMail);
-				EventTable::update($arMail["ID"], array('SUCCESS_EXEC' => $flag, 'DATE_EXEC' => new Type\DateTime));
+				try
+				{
+					$flag = Event::handleEvent($arMail);
+					EventTable::update($arMail["ID"], array('SUCCESS_EXEC' => $flag, 'DATE_EXEC' => new Type\DateTime));
+				}
+				catch (\Exception $e)
+				{
+					EventTable::update($arMail["ID"], array('SUCCESS_EXEC' => "E", 'DATE_EXEC' => new Type\DateTime));
+
+					$application = \Bitrix\Main\Application::getInstance();
+					$exceptionHandler = $application->getExceptionHandler();
+					$exceptionHandler->writeToLog($e);
+
+					break;
+				}
 
 				$cnt++;
 				if($cnt >= $bulk)

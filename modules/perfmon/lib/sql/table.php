@@ -35,6 +35,30 @@ class Table extends BaseObject
 	 * @return Table
 	 * @see Constraint::create
 	 */
+	
+	/**
+	* <p>Нестатический метод создает объект триггера из токенов. Также регистрирует триггер в таблице регистрации триггеров.</p>
+	*
+	*
+	* @param mixed $Bitrix  Поток токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return \Bitrix\Perfmon\Sql\Table 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/create.php">Constraint::create</a>
+	* (<code>\Bitrix\Perfmon\Sql\Constraint::create</code>)</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/createtrigger.php
+	* @author Bitrix
+	*/
 	public function createTrigger(Tokenizer $tokenizer)
 	{
 		$trigger = Trigger::create($tokenizer);
@@ -54,6 +78,32 @@ class Table extends BaseObject
 	 * @return Table
 	 * @see Constraint::create
 	 */
+	
+	/**
+	* <p>Нестатический метод создает объект ограничения из токенов. Также регистрирует ограничение в таблице регистрации ограничений.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Поток токенов.
+	*
+	* @param Bitri $Perfmon  Имя ограничения.
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @param string $constraintName = '' 
+	*
+	* @return \Bitrix\Perfmon\Sql\Table 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/constraint/create.php">Constraint::create</a>
+	* (<code>\Bitrix\Perfmon\Sql\Constraint::create</code>)</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/createconstraint.php
+	* @author Bitrix
+	*/
 	public function createConstraint(Tokenizer $tokenizer, $constraintName = '')
 	{
 		$constraint = Constraint::create($tokenizer, $constraintName);
@@ -74,6 +124,34 @@ class Table extends BaseObject
 	 * @return Table
 	 * @see Index::create
 	 */
+	
+	/**
+	* <p>Нестатический момент создает объект индекса из токенов. Также регистрирует индекс в таблице регистраций индексов.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Поток токенов.
+	*
+	* @param Bitri $Perfmon  Флаг уникальности.
+	*
+	* @param Perfmo $Sql  Имя индекса.
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @param boolean $unique = false 
+	*
+	* @param string $indexName = '' 
+	*
+	* @return \Bitrix\Perfmon\Sql\Table 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/index/create.php">Index::create</a>
+	* (<code>\Bitrix\Perfmon\Sql\Index::create</code>)</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/createindex.php
+	* @author Bitrix
+	*/
 	public function createIndex(Tokenizer $tokenizer, $unique = false, $indexName = '')
 	{
 		$index = Index::create($tokenizer, $unique, $indexName);
@@ -92,6 +170,30 @@ class Table extends BaseObject
 	 * @return Table
 	 * @see Column::create
 	 */
+	
+	/**
+	* <p>Нестатический метод создает колонку таблицы из токенов. Также регистрирует колонку в таблице регистрации колонок.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Поток токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return \Bitrix\Perfmon\Sql\Table 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/create.php">Column::create</a>
+	* (<code>\Bitrix\Perfmon\Sql\Column::create</code>)</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/createcolumn.php
+	* @author Bitrix
+	*/
 	public function createColumn(Tokenizer $tokenizer)
 	{
 		$column = Column::create($tokenizer);
@@ -110,6 +212,25 @@ class Table extends BaseObject
 	 * @return Table
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Статический метод создает объект таблица из токенов. Текущая позиция должна указывать на название последовательности или на условие <code>'if not exists'</code>.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Поток токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return \Bitrix\Perfmon\Sql\Table 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/create.php
+	* @author Bitrix
+	*/
 	public static function create(Tokenizer $tokenizer)
 	{
 		$tokenizer->skipWhiteSpace();
@@ -244,6 +365,19 @@ class Table extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для создания таблицы.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/getcreateddl.php
+	* @author Bitrix
+	*/
 	public function getCreateDdl($dbType = '')
 	{
 		$result = array();
@@ -286,6 +420,19 @@ class Table extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для удаления таблицы.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/table/getdropddl.php
+	* @author Bitrix
+	*/
 	public function getDropDdl($dbType = '')
 	{
 		return "DROP TABLE ".$this->name;

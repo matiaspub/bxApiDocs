@@ -435,4 +435,3 @@ class CRatingRule
 		return "<br>Class: CRatingRule<br>File: ".__FILE__;
 	}
 }
-?>

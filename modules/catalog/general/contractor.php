@@ -38,7 +38,7 @@ class CAllCatalogContractor
 
 		$arFields['~DATE_MODIFY'] = $DB->GetNowFunction();
 
-		if($id <= 0 || !self::CheckFields('UPDATE', $arFields))
+		if($id <= 0 || !self::checkFields('UPDATE', $arFields))
 			return false;
 		$strUpdate = $DB->PrepareUpdate("b_catalog_contractor", $arFields);
 

@@ -557,6 +557,17 @@ class UrlRewriterRuleMaker
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает поле CONDITION из правила SEF на основе того, что было обработано.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/urlrewriterrulemaker/getcondition.php
+	* @author Bitrix
+	*/
 	public function getCondition()
 	{
 		return $this->condition;
@@ -567,6 +578,17 @@ class UrlRewriterRuleMaker
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает поле RULE из правила SEF на основе того, что было обработано.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/urlrewriterrulemaker/getrule.php
+	* @author Bitrix
+	*/
 	public function getRule()
 	{
 		return $this->rule;

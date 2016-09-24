@@ -9,11 +9,22 @@ use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
+
+/**
+ * <b>CAgent</b> - класс для работы с функциями-агентами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/index.php
+ * @author Bitrix
+ */
 class CAllAgent
 {
 	
 	/**
-	* <p>Метод регистрирует новую функцию-агента. Динамичный метод.</p> <p> </p>
+	* <p>Метод регистрирует новую функцию-агента. Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $name  PHP строка для запуска функции-агента.
@@ -22,19 +33,19 @@ class CAllAgent
 	* модуля.<br>Необязательный. По умолчанию пустой.
 	*
 	* @param string $period = "N" <p>Если значение - "Y", то очередная дата запуска агента (<i>next_exec</i>)
-	* будет рассчитываться как:</p> <pre><i>next_exec</i> = <i>next_exec</i> + <i>interval</i></pre>
-	* Т.е. при очередном запуске, если прошло уже больше времени чем
+	* будет рассчитываться как:</p> <pre bgcolor="#323232" style="padding:5px;"><i>next_exec</i> = <i>next_exec</i> + <i>interval</i></pre>
+	* 	Т.е. при очередном запуске, если прошло уже больше времени чем
 	* указано в параметре <i>interval</i>, агент сначала будет запускаться
 	* ровно столько раз сколько он должен был запуститься (т.е. столько
 	* раз сколько он "пропустил"), а затем, когда <i>next_exec</i> достигнет либо
 	* превысит текущую дату, он будет в дальнейшем запускаться с
 	* периодичностью указанной в параметре <i>interval</i>. Как правило,
 	* подобное используется в агентах которые должны гарантированно
-	* запуститься определённое количество раз. <p>Если значение - "N", то
+	* запуститься определённое количество раз. 	 	<p>Если значение - "N", то
 	* очередная дата запуска агента (<i>next_exec</i>) будет рассчитываться
-	* как:</p> <pre><i>next_exec</i> = дата последнего запуска + <i>interval</i></pre>Т.е.
+	* как:</p> <pre bgcolor="#323232" style="padding:5px;"><i>next_exec</i> = дата последнего запуска + <i>interval</i></pre>Т.е.
 	* агент после первого запуска будет в дальнейшем запускаться с
-	* периодичностью указанной в параметре <i>interval</i>. Параметр
+	* периодичностью указанной в параметре <i>interval</i>. 	Параметр
 	* необязательный, по умолчанию - "N".
 	*
 	* @param int $interval = 86400 Интервал (в секундах), с какой периодичностью запускать агента.<br>
@@ -58,7 +69,7 @@ class CAllAgent
 	* удаляется. Как правило он должен вернуть вызов самого себя.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // добавим агент модуля "Статистика"
 	* <b>CAgent::AddAgent</b>(
@@ -71,8 +82,6 @@ class CAllAgent
 	*     "07.04.2005 20:03:26",                // дата первого запуска
 	*     30);
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // добавим агент модуля "Техподдержка"
 	* <b>CAgent::AddAgent</b>(
@@ -85,8 +94,6 @@ class CAllAgent
 	*     "",                       // дата первого запуска - текущее
 	*     30);
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // добавим произвольный агент не принадлежащий ни одному модулю
 	* <b>CAgent::AddAgent</b>("My_Agent_Function();");
@@ -101,8 +108,6 @@ class CAllAgent
 	*    return "My_Agent_Function();";
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // добавим произвольный агент принадлежащий модулю
 	* // с идентификатором my_module
@@ -138,7 +143,7 @@ class CAllAgent
 	* <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
 	* <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2823" >Структура
-	* файлов</a></li> </ul> <a name="examples"></a>
+	* файлов</a></li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -228,7 +233,7 @@ class CAllAgent
 
 	
 	/**
-	* <p>Метод удаляет функцию-агента из таблицы зарегистрированных агентов. Динамичный метод.</p>
+	* <p>Метод удаляет функцию-агента из таблицы зарегистрированных агентов. Нестатический метод.</p>
 	*
 	*
 	* @param string $name  Функция-агент.
@@ -241,7 +246,7 @@ class CAllAgent
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>CAgent::RemoveAgent</b>("CCatalog::PreGenerateXML(\"yandex\");", "catalog");
 	* if ($bNeedAgent)
@@ -256,7 +261,7 @@ class CAllAgent
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul></bod<a
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -284,15 +289,15 @@ class CAllAgent
 
 	
 	/**
-	* <p>Метод удаляет функцию-агент из таблицы зарегистрированных агентов. Динамичный метод.</p> <p> </p>
+	* <p>Метод удаляет функцию-агент из таблицы зарегистрированных агентов. Нестатический метод.</p> <p> </p>
 	*
 	*
-	* @param int $id  ID функции-агента.
+	* @param mixed $intid  ID функции-агента.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (<b>CAgent::Delete</b>(34)) echo "Агент #34 успешно удален.";
 	* ?&gt;
@@ -304,7 +309,7 @@ class CAllAgent
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removemoduleagents.php">CAgent::RemoveModuleAgents</a></li>
-	* </ul></bod<a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -326,7 +331,7 @@ class CAllAgent
 
 	
 	/**
-	* <p>Метод удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. Динамичный метод.</p>
+	* <p>Метод удаляет все функции-агенты указанного модуля из таблицы зарегистрированных агентов. Нестатический метод.</p>
 	*
 	*
 	* @param string $module  Идентификатор модуля.
@@ -334,7 +339,7 @@ class CAllAgent
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>CAgent::RemoveModuleAgents</b>("statistic");
 	* ?&gt;
@@ -345,7 +350,7 @@ class CAllAgent
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436"
 	* >Агенты</a></li> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/removeagent.php">CAgent::RemoveAgent</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul></bod<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cagent/delete.php">CAgent::Delete</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*

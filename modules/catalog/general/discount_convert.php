@@ -646,6 +646,7 @@ class CCatalogDiscountConvert
 
 		if ($row = $res->Fetch())
 			return (int)$row['CNT'];
+		return 0;
 	}
 
 	public static function GetCountFormat()

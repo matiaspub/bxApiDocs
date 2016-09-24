@@ -1,11 +1,88 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * <b>CSubscriptionGeneral</b> - класс для работы с подписками на рассылки.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/index.php
+ * @author Bitrix
+ */
 class CSubscriptionGeneral
 {
 	var $LAST_ERROR="";
 	var $LAST_MESSAGE="";
 
+	
+	/**
+	* <p>Метод выбирает список подписок (подписчиков) по фильтру. Метод статический.</p>   <p>Если параметр aFilter не задан, то сортировки будет выполнена в порядке убывания поля ID.</p>   <p> </p>
+	*
+	*
+	* @param array $aSort = Array() Массив, содержащий признак сортировки в виде наборов "название
+	* поля"=&gt;"направление".          <br><br>        	Название поля может
+	* принимать значение:          <br><ul> <li> <b>ID</b> - идентификатор
+	* подписки;</li>          	            <li> <b>DATE_INSERT</b> - дата добавления;</li>          	   
+	*         <li> <b>DATE_UPDATE</b> - дата изменения;</li>          	            <li> <b>DATE_CONFIRM</b> -
+	* дата подтверждения;</li>          	            <li> <b>ACT</b> - флаг активности;</li>   
+	*       	            <li> <b>CONF</b> - флаг подтверждения;</li>          	            <li> <b>EMAIL</b>
+	* - адрес подписки;</li>          	            <li> <b>FMT</b> - формат подписки;</li>         
+	* 	            <li> <b>USER</b> - идентификатор пользователя.</li>          	            <li>
+	* <b>CONFIRM_CODE</b> - код подтверждения подписки.</li>          	           
+	* <li>Направление сортировки может принимать значение:</li>          	         
+	*   <li> <b>ASC</b> - по возрастанию;</li>          	            <li> <b>DESC</b> - по
+	* убыванию.</li>          </ul>        	Например: <code>array("EMAIL"=&gt;"ASC", "ACT"=&gt;"DESC")</code>
+	*
+	* @param array $arFilter = Array() Массив, содержащий фильтр в виде наборов "название
+	* поля"=&gt;"значение фильтра".          <br><br>        	Название поля может
+	* принимать значение:          <br><ul> <li> <sup>1</sup><b>ID</b> - идентификатор
+	* подписки;</li>          	            <li> <sup>1</sup><b>EMAIL</b> - адрес;</li>          	            <li>
+	* <b>UPDATE_1</b> - дата модификации (начало периода);</li>          	            <li>
+	* <b>UPDATE_2</b> - дата модификации (конец периода);</li>          	            <li>
+	* <b>INSERT_1</b> - дата добавления (начало периода);</li>          	            <li>
+	* <b>INSERT_2</b> - дата добавления (конец периода);</li>          	            <li>
+	* <sup>2</sup><b>USER</b> - пользователь;</li>          	            <li> <sup>1</sup><b>USER_ID</b> -
+	* идентификатор пользователя;</li>          	            <li> <b>ANONYMOUS</b> - флаг
+	* анонимности подписки;</li>          	            <li> <b>CONFIRMED</b> - флаг
+	* подтверждения подписки;</li>          	            <li> <b>ACTIVE</b> - флаг
+	* активности подписки;</li>          	            <li> <b>FORMAT</b> - формат
+	* подписки;</li>          	            <li> <b>RUBRIC</b> - рубрики подписки в виде
+	* массива идентификаторов или строки, сформированной по правилам
+	* логики фильтра.</li>          </ul>        	Например: <code>array("CONFIRMED"=&gt;"Y",
+	* "ACTIVE"=&gt;"Y")</code>  <br><sup>1</sup> - допускаются <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложные условия</a>         
+	* <br><sup>2</sup> - допускаются <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложные условия</a> по полям
+	* пользователя ID, LOGIN, NAME, LAST_NAME
+	*
+	* @param array $arNavStartParams = false Параметры для постраничной навигации и ограничения количества
+	* выводимых элементов. массив вида "Название
+	* параметра"=&gt;"Значение", где название параметра          <br><br>       
+	* "bShowAll" - разрешить вывести все элементы при постраничной
+	* навигации          <br>        "iNumPage" - номер страницы при постраничной
+	* навигации          <br>        "nPageSize" - количество элементов на странице
+	* при постраничной навигации          <br><br>        Необязательное. По
+	* умолчанию false - не ограничивать выборку.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongeneralfields.php">поля
+	* объекта "Подписка"</a>.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //в какие рубрики отправлять<br>$aPostRub = array();<br>$post_rub = CPosting::GetRubricList($post_arr["ID"]);<br>while($post_rub_arr = $post_rub-&gt;Fetch())<br>    $aPostRub[] = $post_rub_arr["ID"];<br><br>//активные и подтвержденные адреса, подписанные на рубрики<br>$subscr = <b>CSubscription::GetList</b>(<br>    array("ID"=&gt;"ASC"),<br>    array("RUBRIC"=&gt;$aPostRub, "CONFIRMED"=&gt;"Y", "ACTIVE"=&gt;"Y",<br>        "FORMAT"=&gt;$post_arr["SUBSCR_FORMAT"], "EMAIL"=&gt;$post_arr["EMAIL_FILTER"])<br>);<br>while(($subscr_arr = $subscr-&gt;Fetch()))<br>    $aEmail[] = $subscr_arr["EMAIL"];<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongetlist.php
+	* @author Bitrix
+	*/
 	public static function GetList($aSort=Array(), $arFilter=Array(), $arNavStartParams=false)
 	{
 		global $DB;
@@ -174,6 +251,32 @@ class CSubscriptionGeneral
 	}
 
 	//list of subscribed categories
+	
+	/**
+	* <p>Метод возвращает выборку рассылок, на которые подписан данный адрес. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны некоторые <a
+	* href="../crubric/crubric.fields.php">поля объекта "Рассылка"</a>. А именно: </p><ul> <li>ID -
+	* Идентификатор рассылки;</li>     <li>NAME - Название рассылки;</li>     <li>SORT -
+	* Сортировка в списке;</li>     <li>LID - Идентификатор сайта;</li>     <li>ACTIVE -
+	* Признак активности рассылки (Y/N).</li>   <li>VISIBLE - Выводить в списке
+	* публичных рассылок (Y/N).     <br> </li>  </ul><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //array of subscribed categories<br>function GetRubricArray($ID)<br>{<br>    $aSubscrRub = array();<br>    if($ID&gt;0)<br>    {<br>        $subscr_rub = <b>CSubscription::GetRubricList</b>($ID);<br>        while($subscr_rub_arr = $subscr_rub-&gt;Fetch())<br>            $aSubscrRub[] = $subscr_rub_arr["ID"];<br>    }<br>    return $aSubscrRub;<br>}<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongetrubriclist.php
+	* @author Bitrix
+	*/
 	public static function GetRubricList($ID)
 	{
 		global $DB;
@@ -187,6 +290,41 @@ class CSubscriptionGeneral
 	}
 
 	//array of subscribed categories
+	
+	/**
+	* <p>Метод возвращает массив идентификаторов рассылок, на которые подписан данный адрес. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @return array <p>Массив целых чисел, идентификаторы рассылок.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* &lt;?
+	* //shows all subscription categories and checks subscribed one
+	* $aSubscrRub = <b>CSubscription::GetRubricArray</b>($ID);
+	* $rub = CRubric::GetList(
+	*     array("LID"=&gt;"ASC", "SORT"=&gt;"ASC", "NAME"=&gt;"ASC"),
+	*     array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG)
+	* );
+	* while($rub-&gt;ExtractFields("r_")):
+	*     $bChecked = in_array($r_ID, $aSubscrRub);
+	* ?&gt;
+	* &lt;input type="checkbox"
+	*        name="RUB_ID[]"
+	*        value="&lt;?echo $r_ID?&gt;"&lt;?if($bChecked) echo " checked"?&gt;&gt;
+	* &lt;?echo $r_NAME?&gt;&lt;br&gt;
+	* &lt;?
+	* endwhile;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongetrubricarray.php
+	* @author Bitrix
+	*/
 	public static function GetRubricArray($ID)
 	{
 		$ID = intval($ID);
@@ -201,6 +339,33 @@ class CSubscriptionGeneral
 	}
 
 	//subscription of current user from cookies
+	
+	/**
+	* <p>Метод возвращает массив полей подписки текущего пользователя.  Подписка определяется по Email, сохраненному в куках посетителя,  либо по Email авторизованного пользователя.  Метод статический.</p>
+	*
+	*
+	* @return array <p>Возвращается массив <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongeneralfields.php">полей
+	* объекта "Подписка"</a>. Если подписка посетителя не найдена, то
+	* возвращается массив array("ID"=&gt;0, "EMAIL"=&gt;"").</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //get current user subscription from cookies
+	* $aSubscr = <b>CSubscription::GetUserSubscription</b>();
+	* 
+	* //get user's newsletter categories
+	* $aSubscrRub = CSubscription::GetRubricArray(intval($aSubscr["ID"]));
+	* 
+	* //show subscription form
+	* //.....
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongetusersubscription.php
+	* @author Bitrix
+	*/
 	public static function GetUserSubscription()
 	{
 		global $USER;
@@ -217,6 +382,44 @@ class CSubscriptionGeneral
 	}
 
 	//get by ID
+	
+	/**
+	* <p>Метод выбирает подписку по ее идентификатору. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongeneralfields.php">поля
+	* объекта "Подписка"</a>.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //new or existing subscription?
+	* //ID==0 indicates new subscription
+	* if(strlen($sf_EMAIL) &gt; 0 || $ID &gt; 0)
+	* {
+	*     if($ID &gt; 0)
+	*         $subscription = <b>CSubscription::GetByID</b>($ID);
+	*     else
+	*         $subscription = CSubscription::GetByEmail($sf_EMAIL);
+	* 
+	*     if($subscription-&gt;ExtractFields("str_"))
+	*         $ID = (integer)$str_ID;
+	*     else
+	*         $ID=0;
+	* }
+	* else
+	*     $ID = 0;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongetbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -234,6 +437,32 @@ class CSubscriptionGeneral
 	}
 
 	// deletion
+	
+	/**
+	* <p>Метод удаляет подписку. Метод статический.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @return mixed <p>В случае успешного удаления возвращается результат типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
+	* случае возвращается false.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* if (($res = <b>CSubscription::Delete</b>($ID)) &amp;&amp;
+	*      $res-&gt;AffectedRowsCount() &lt; 1 ||
+	*      $res == false)
+	*     echo "Error deleting subscription.";
+	* else
+	*     echo "Subscription deleted.";
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiondelete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -421,6 +650,62 @@ class CSubscriptionGeneral
 	}
 
 	//adding
+	
+	/**
+	* <p>Метод добавляет подписку на рассылки и отправляет подписчику письмо с кодом подтверждения подписки (если не указано не отправлять). Метод нестатический.</p>
+	*
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongeneralfields.php">полей
+	* объекта "Подписка"</a>. 	Дополнительно могут быть указаны поля:        
+	* <br><ul> <li> <b>RUB_ID</b> - массив идентификаторов рассылок, на которые
+	* подписывается адрес;</li>          	           <li> <b>SEND_CONFIRM</b> - отправлять ли
+	* письмо с кодом подтверждения подписчику (Y/N).</li>          	           <li>
+	* <b>ALL_SITES</b> - отписать подписчика от рассылок всех сайтов или только
+	* от заданного SITE_ID (Y/N).</li>                    <li> <b>USER_ID</b> - необязательный.
+	* Идентификатор зарегистрированного пользователя.</li>          </ul>
+	*
+	* @param string $SITE_ID = SITE_ID Идентификатор сайта, по которому определяется шаблон письма о
+	* подтверждении подписки. 	По умолчанию параметр принимает
+	* значение текущего сайта.
+	*
+	* @return int <p>В случае успешного добавления возвращается ID подписки. В
+	* противном случает возвращается false, и переменная класса LAST_ERROR
+	* содержит сообщение об ошибке (так же возбуждается исключение <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p><a
+	* name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //there must be at least one newsletter category
+	* if(!is_array($RUB_ID) || count($RUB_ID) == 0)
+	*     $strWarning .= "There must be at least one category."."&lt;br&gt;";
+	* 
+	* if($strWarning == "")
+	* {
+	*     $arFields = Array(
+	*         "USER_ID" =&gt; ($USER-&gt;IsAuthorized()? $USER-&gt;GetID():false),
+	*         "FORMAT" =&gt; ($FORMAT &lt;&gt; "html"? "text":"html"),
+	*         "EMAIL" =&gt; $EMAIL,
+	*         "ACTIVE" =&gt; "Y",
+	*         "RUB_ID" =&gt; $RUB_ID
+	*     );
+	*     $subscr = new CSubscription;
+	* 
+	*     //can add without authorization
+	*     $ID = <b>$subscr-&gt;Add</b>($arFields);
+	*     if($ID&gt;0)
+	*         CSubscription::Authorize($ID);
+	*     else
+	*         $strWarning .= "Error adding subscription: ".$subscr-&gt;LAST_ERROR."&lt;br&gt;";
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptionadd.php
+	* @author Bitrix
+	*/
 	public function Add($arFields, $SITE_ID=SITE_ID)
 	{
 		global $DB;
@@ -452,6 +737,81 @@ class CSubscriptionGeneral
 	}
 
 	//Updating record
+	
+	/**
+	* <p>Метод изменяет данные подписки. Если изменяется адрес подписки, то метод снимает подтверждение с подписки и  генерирует событие для отправки письма с кодом подтверждения подписки (если это явно не запрещено).  Если подписка не подтверждена, а массив полей включает в себя правильный CONFIRM_CODE, то подписка  подтверждается. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptiongeneralfields.php">полей
+	* объекта "Подписка"</a>. 	Дополнительно могут быть указаны поля:<br>
+	* 	   RUB_ID - массив идентификаторов рассылок, на которые
+	* подписывается адрес;<br> 	   SEND_CONFIRM - отправлять ли письмо с кодом
+	* подтверждения подписчику при изменениии адреса (Y/N).
+	*
+	* @param string $SITE_ID = SITE_ID Идентификатор сайта, по которому определяется шаблон письма о
+	* подтверждении подписки. По умолчанию параметр принимает
+	* значение текущего сайта. Обязателен при использовании RUB_ID. Если
+	* ALL_SITES указан в массиве <b>$arFields</b>, то SITE_ID можно не указывать
+	*
+	* @return mixed <p>В случае успешного изменения возвращается true. В противном
+	* случает возвращается false,  и переменная класса LAST_ERROR содержит
+	* сообщение об ошибке (так же возбуждается исключение <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).  <br><br> 
+	* При успешном результате переменная класса LAST_MESSAGE содержит
+	* строку-код информационного сообщения.  Возможные значения:<br> 
+	*    "CONF" - подписка подтверждена;<br>     "SENT" - сгенерировано событие
+	* для отправки письма с кодом подтверждения.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $subscr = new CSubscription;
+	* //confirmation code from letter or confirmation form
+	* if($CONFIRM_CODE &lt;&gt; "" &amp;&amp; $ID &gt; 0 &amp;&amp; empty($action))
+	* {
+	*     if($str_CONFIRMED &lt;&gt; "Y")
+	*     {
+	*         //subscribtion confirmation
+	*         if(<b>$subscr-&gt;Update</b>($ID, array("CONFIRM_CODE"=&gt;$CONFIRM_CODE)))
+	*             $str_CONFIRMED = "Y";
+	*         $strWarning .= $subscr-&gt;LAST_ERROR;
+	*         $iMsg = $subscr-&gt;LAST_MESSAGE;
+	*     }
+	* }
+	* 
+	* ///<************************
+	* //form actions processing
+	* ///<************************
+	* if($ID &gt; 0)
+	* {
+	*     if($action == "unsubscribe" &amp;&amp; CSubscription::IsAuthorized($ID))
+	*     {
+	*         //unsubscription
+	*         if(<b>$subscr-&gt;Update</b>($ID, array("ACTIVE"=&gt;"N")))
+	*         {
+	*             $str_ACTIVE = "N";
+	*             $iMsg = "UNSUBSCR";
+	*         }
+	*     }
+	*     if($action == "activate" &amp;&amp; CSubscription::IsAuthorized($ID))
+	*     {
+	*         //activation
+	*         if(<b>$subscr-&gt;Update</b>($ID, array("ACTIVE"=&gt;"Y")))
+	*         {
+	*             $str_ACTIVE = "Y";
+	*             $iMsg = "ACTIVE";
+	*         }
+	*     }
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptionupdate.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields, $SITE_ID=SITE_ID)
 	{
 		global $DB;
@@ -538,6 +898,39 @@ class CSubscriptionGeneral
 	}
 
 	//message with subscription confirmation
+	
+	/**
+	* <p>Метод добавляет событие SUBSCRIBE_CONFIRM для отправки подписчику письма с кодом подтверждения подписки.  Письмо формируется по шаблону типа "SUBSCRIBE_CONFIRM - Подтверждение подписки". Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @param string $SITE_ID = SITE_ID Идентификатор сайта, по которому определяется шаблон письма о
+	* подтверждении подписки. 	По умолчанию параметр принимает
+	* значение текущего сайта.
+	*
+	* @return bool <p>При успешном добавлении события возвращается true, иначе
+	* false.</p><p>Так же false возвращается если подписка уже подтверждена
+	* (CONFIRMED равно Y).</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* if($ID &gt; 0)
+	* {
+	*     //confirmation code request
+	*     if($action == "sendcode")
+	*     {
+	*         if(<b>CSubscription::ConfirmEvent</b>($ID))
+	*             echo "Subscription confirmation was sent successfully";
+	*     }
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptionconfirmevent.php
+	* @author Bitrix
+	*/
 	public static function ConfirmEvent($ID, $SITE_ID=SITE_ID)
 	{
 		static $SITE_DIR_CACHE = array();
@@ -586,6 +979,46 @@ class CSubscriptionGeneral
 	}
 
 	//checks and set user authorization
+	
+	/**
+	* <p>Авторизует посетителя для доступа к редактированию подписки.  Признак успешной авторизации сохраняется в PHP-сессии ($_SESSION["SESS_SUBSCR_AUTH"][$ID]). </p> <p>Если подписка анонимная, то авторизация проверяется по  коду подтверждения подписки. Если подписка принадлежит зарегистрированному пользователю, то доступ предоставляется  только авторизованному пользователю-владельцу подписки.  Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @param string $CONFIRM_CODE = false Пароль для авторизации доступа, должен совпадать с кодом
+	* подтверждения подписки, 	сгенерированным при добавлении или
+	* изменении адреса подписки. 	Если параметр принимает значение false,
+	* то производится безусловная авторизация.
+	*
+	* @return bool <p>При успешной авторизации доступа к подписке возвращается true,
+	* иначе false.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //try to authorize subscription by CONFIRM_CODE or user password AUTH_PASS
+	* if($ID &gt; 0 &amp;&amp; !CSubscription::IsAuthorized($ID))
+	* {
+	*     if($str_USER_ID &gt; 0 &amp;&amp; !empty($AUTH_PASS))
+	*     {
+	*         //trying to login user
+	*         $usr = CUser::GetByID($str_USER_ID);
+	*         if(($usr_arr = $usr-&gt;Fetch()))
+	*         {
+	*             $res = $USER-&gt;Login($usr_arr["LOGIN"], $AUTH_PASS);
+	*             if($res["TYPE"] == "ERROR")
+	*                 $strWarning .= $res["MESSAGE"];
+	*         }
+	*     }
+	*     <b>CSubscription::Authorize</b>($ID, (empty($AUTH_PASS)? $CONFIRM_CODE:$AUTH_PASS));
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptionauthorize.php
+	* @author Bitrix
+	*/
 	public static function Authorize($ID, $CONFIRM_CODE=false)
 	{
 		global $USER;
@@ -624,6 +1057,37 @@ class CSubscriptionGeneral
 	}
 
 	//retuns user's subscription authorization
+	
+	/**
+	* <p>Метод проверяет, авторизован ли текущий посетитель для доступа к информации о подписке. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор подписки.
+	*
+	* @return bool <p>Если посетитель авторизован для доступа к данной подписке, то
+	* возвращается true, иначе false.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //check whether already authorized to show password field
+	* $bShowPass = true;
+	* $aSubscr = CSubscription::GetUserSubscription();
+	* if($aSubscr["ID"] &gt; 0)
+	* {
+	*     //try to authorize user account's subscription
+	*     if($aSubscr["USER_ID"]&gt;0 &amp;&amp; !<b>CSubscription::IsAuthorized</b>($aSubscr["ID"]))
+	*         CSubscription::Authorize($aSubscr["ID"], "");
+	*     //check authorization
+	*     if(<b>CSubscription::IsAuthorized</b>($aSubscr["ID"]))
+	*         $bShowPass = false;
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/csubscriptiongeneral/csubscriptionisauthorized.php
+	* @author Bitrix
+	*/
 	public static function IsAuthorized($ID)
 	{
 		return ($_SESSION["SESS_SUBSCR_AUTH"][$ID] == "YES");
@@ -690,4 +1154,3 @@ class CSubscriptionGeneral
 		return "CSubscription::CleanUp();";
 	}
 }
-?>

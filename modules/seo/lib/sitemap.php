@@ -105,6 +105,19 @@ class SitemapTable extends Entity\DataManager
 	 * @param $arSettings
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод получает настройки со страницы администратора и возвращает фильтрованную версию. Метод статический.</p>
+	*
+	*
+	* @param array $arSettings  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemaptable/preparesettings.php
+	* @author Bitrix
+	*/
 	public static function prepareSettings($arSettings)
 	{
 		if(is_array($arSettings))

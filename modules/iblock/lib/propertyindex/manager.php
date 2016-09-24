@@ -19,6 +19,19 @@ class Manager
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Если передается идентификатор инфоблока торговых предложений, то метод вернет идентификатор соответствующего ему инфоблока товаров. В противном случае метод вернет искомый идентификатор <code>$iblockId</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/resolveiblock.php
+	* @author Bitrix
+	*/
 	public static function resolveIblock($iblockId)
 	{
 		if (self::$catalog === null)
@@ -47,6 +60,21 @@ class Manager
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Если передается идентификатор торгового предложения, то метод вернет идентификатор соответствующего ему товара. В противном случае метод вернет искомый идентификатор <code>$elementId</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @param integer $elementId  Идентификатор элемента.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/resolveelement.php
+	* @author Bitrix
+	*/
 	public static function resolveElement($iblockId, $elementId)
 	{
 		if (self::$catalog === null)
@@ -74,6 +102,19 @@ class Manager
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Метод удаляет из базы данных все таблицы, связанные с индексом заданного инфоблока. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/dropifexists.php
+	* @author Bitrix
+	*/
 	public static function dropIfExists($iblockId)
 	{
 		$storage = new Storage($iblockId);
@@ -93,6 +134,19 @@ class Manager
 	 * @return \Bitrix\Iblock\PropertyIndex\Indexer
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Метод создает и инициализирует новый экземпляр класса <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/indexer/index.php">PropertyIndex\Indexer</a>. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return \Bitrix\Iblock\PropertyIndex\Indexer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/createindexer.php
+	* @author Bitrix
+	*/
 	public static function createIndexer($iblockId)
 	{
 		$indexer = new Indexer($iblockId);
@@ -107,11 +161,33 @@ class Manager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод проставляет отметку для инфоблока, что ему необходима переиндексация. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/markasinvalid.php
+	* @author Bitrix
+	*/
 	public static function markAsInvalid($iblockId)
 	{
 		\Bitrix\Iblock\IblockTable::update($iblockId, array(
 			"PROPERTY_INDEX" => "I",
 		));
+
+		$productIblock = self::resolveIblock($iblockId);
+		if ($iblockId != $productIblock)
+		{
+			\Bitrix\Iblock\IblockTable::update($productIblock, array(
+				"PROPERTY_INDEX" => "I",
+			));
+		}
+
 		self::checkAdminNotification(true);
 	}
 
@@ -122,6 +198,20 @@ class Manager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод добавляет уведомление пользователям группы <b>Администраторы</b> о необходимости пересоздания индекса. Метод статический.</p>
+	*
+	*
+	* @param boolean $force = false Параметр принимает значение <i>false</i>, если проверка на
+	* необходимость переиндексации не выполнялась.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/checkadminnotification.php
+	* @author Bitrix
+	*/
 	public static function checkAdminNotification($force = false)
 	{
 		if ($force)
@@ -167,6 +257,19 @@ class Manager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод удаляет индекс и проставляет отметку для инфоблока, что у него нет индекса. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/deleteindex.php
+	* @author Bitrix
+	*/
 	public static function deleteIndex($iblockId)
 	{
 		self::dropIfExists($iblockId);
@@ -183,6 +286,21 @@ class Manager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод удаляет всю связанную с элементом информацию, если индекс существует. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @param integer $elementId  Идентификатор элемента.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/deleteelementindex.php
+	* @author Bitrix
+	*/
 	public static function deleteElementIndex($iblockId, $elementId)
 	{
 		$elementId = intval($elementId);
@@ -210,6 +328,21 @@ class Manager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод обновляет всю связанную с элементом информацию, если индекс существует. Метод статический.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @param integer $elementId  Идентификатор элемента.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/manager/updateelementindex.php
+	* @author Bitrix
+	*/
 	public static function updateElementIndex($iblockId, $elementId)
 	{
 		$elementId = intval($elementId);

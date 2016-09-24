@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/
 
 
 /**
- * <b>CTicket</b> - класс для работы с обращениями. 
+ * <b>CTicket</b> - класс для работы с обращениями.
  *
  *
  * @return mixed 
@@ -14,8 +14,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/support/classes/general/
  */
 class CTicket extends CAllTicket
 {
-
-	static function isnull( $field, $alternative )
+	public static function isnull( $field, $alternative )
 	{
 		return "ifnull(" . $field . "," . $alternative . ")";
 	}
@@ -118,12 +117,12 @@ class CTicket extends CAllTicket
 
 	
 	/**
-	* <p>Метод удаляет сообщение.</p>
+	* <p>Метод удаляет сообщение. Метод нестатический.</p>
 	*
 	*
-	* @param int $MESSAGE_ID  ID сообщения.</bod
+	* @param int $MESSAGE_ID  ID сообщения.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
+	* @param (1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
 	* пользователя (по умолчанию); "N" - прав проверять не надо.
 	* Необязательный параметр. С версии 12.0.0 изменен на <b>checkRights</b>.
 	*
@@ -339,7 +338,7 @@ class CTicket extends CAllTicket
 		}
 	}
 
-public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRights="Y")
+	public static function AddMessage($ticketID, $arFields, &$arrFILES, $checkRights="Y")
 	{
 		if (strlen($arFields["MESSAGE"])>0 || (is_array($arFields["FILES"]) && count($arFields["FILES"])>0))
 		{
@@ -661,151 +660,164 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 		return false;
 	}
 
-
+	
 	/**
-	* <p>Метод предназначен для получения списка обращений в техподдержку.</p>
+	* <p>Метод предназначен для получения списка обращений в техподдержку. Метод нестатический.</p>
 	*
 	*
 	* @param varchar &$by  Идентификатор, позволяющий задать имя поля для сортировки.
-	* Допустимы следующие значения: <ul> <li>s_id - по ID </li> <li>s_lid - по сайту,
-	* для которого было создано обращение </li> <li>s_lamp - по индикатору </li>
-	* <li>s_date_create - по дате создания </li> <li>s_timestamp - по дате изменения </li>
-	* <li>s_date_close - по дате закрытия </li> <li>s_owner - по автору </li> <li>s_modified_by - по
-	* ID пользователя - изменившего обращение </li> <li>s_title - по заголовку
-	* </li> <li>s_responsible - по ID ответственного </li> <li>s_messages - по количеству
-	* сообщений </li> <li>s_category - по ID категории </li> <li>s_criticality - по ID
-	* критичности </li> <li>s_status - по ID статуса </li> <li>s_mark - по ID оценки </li>
-	* <li>s_online - по количеству пользователей </li> </ul>
+	* Допустимы следующие значения: 	         <ul> <li>s_id - по ID 		</li>                   
+	* <li>s_lid - по сайту, для которого было создано обращение 		</li>                 
+	*   <li>s_lamp - по индикатору 		</li>                    <li>s_date_create - по дате создания
+	* 		</li>                    <li>s_timestamp - по дате изменения 		</li>                   
+	* <li>s_date_close - по дате закрытия 		</li>                    <li>s_owner - по автору 		</li>    
+	*                <li>s_modified_by - по ID пользователя - изменившего обращение 		</li> 
+	*                   <li>s_title - по заголовку 		</li>                    <li>s_responsible - по ID
+	* ответственного 		</li>                    <li>s_messages - по количеству сообщений
+	* 		</li>                    <li>s_category - по ID категории 		</li>                    <li>s_criticality -
+	* по ID критичности 		</li>                    <li>s_status - по ID статуса 		</li>                 
+	*   <li>s_mark - по ID оценки 		</li>                    <li>s_online - по количеству
+	* пользователей 	</li>         </ul>
 	*
-	* @param varchar &$order  Порядок сортировки. Допустимы следующие значения: <ul> <li>desc - по
-	* убыванию (значение по умолчанию) </li> <li>asc - по возрастанию </li> </ul>
+	* @param varchar &$order  Порядок сортировки. Допустимы следующие значения: 	         <ul> <li>desc -
+	* по убыванию (значение по умолчанию) 		</li>                    <li>asc - по
+	* возрастанию 	</li>         </ul>
 	*
 	* @param array $arFilter = array() Массив для фильтрации значений. Необязательный параметр. В
-	* массиве допустимы следующие индексы: <ul> <li>ID - ID обращения
-	* (допускается сложная логика) </li> <li>ID_EXACT_MATCH - "Y" - при фильтрации по
-	* ID обращения будет искаться точное совпадение (по умолчанию); "N" - в
-	* противном случае будет искаться вхождение </li> <li>LID - ID сайта </li>
-	* <li>LID_EXACT_MATCH - "Y" - при фильтрации по ID языка будет искаться точное
-	* совпадение (по умолчанию); "N" - в противном случае будет искаться
-	* вхождение </li> <li>LAMP - массив индикаторов: "red", "yellow", "green", "green_s", "grey"
-	* </li> <li>DATE_CREATE_1 - левая часть интервала для даты создания обращения
-	* </li> <li>DATE_CREATE_2 - правая часть интервала для даты создания обращения
-	* </li> <li>DATE_TIMESTAMP_1 - левая часть интервала для даты модификации
-	* обращения </li> <li>DATE_TIMESTAMP_2 - правая часть интервала для даты
-	* модификации обращения </li> <li>DATE_CLOSE_1 - левая часть интервала для
-	* даты закрытия обращения </li> <li>DATE_CLOSE_2 - правая часть интервала для
-	* даты закрытия обращения </li> <li>AUTO_CLOSE_DAYS1 - левая часть интервала
-	* для количества дней по истечении которых обращение будет
-	* автоматически закрыто при отсутствии ответа от автора </li>
-	* <li>AUTO_CLOSE_DAYS2 - правая часть интервала для количества дней по
-	* истечении которых обращение будет автоматически закрыто при
-	* отсутствии ответа от автора </li> <li>TICKET_TIME_1 - левая часть интервала
-	* для количества дней прошедших с даты создания до даты закрытия
-	* обращения </li> <li>TICKET_TIME_2 - правая часть интервала для количества
-	* дней прошедших с даты создания до даты закрытия обращения </li>
-	* <li>TITLE - заголовок обращения (допускается сложная логика) </li>
-	* <li>TITLE_EXACT_MATCH - "Y" - при фильтрации по заголовку обращения будет
-	* искаться точное совпадение (по умолчанию); "N" - в противном случае
-	* будет искаться вхождение </li> <li>MESSAGES1 - левая часть интервала для
-	* количества сообщений в обращении </li> <li>MESSAGES2 - правая часть
-	* интервала для количества сообщений в обращении </li> <li>OWNER - автор
-	* обращения, поиск осуществляется по ID пользователя, логину, имени,
-	* фамилии, символному коду (допускается сложная логика) </li>
+	* массиве допустимы следующие индексы: 	         <ul> <li>ID - ID обращения
+	* (допускается сложная логика) 		</li>                    <li>ID_EXACT_MATCH - "Y" - при
+	* фильтрации по ID обращения будет искаться точное совпадение (по
+	* умолчанию); "N" - в противном случае будет искаться вхождение 		</li>    
+	*                <li>LID - ID сайта 		</li>                    <li>LID_EXACT_MATCH - "Y" - при
+	* фильтрации по ID языка будет искаться точное совпадение (по
+	* умолчанию); "N" - в противном случае будет искаться вхождение 		</li>    
+	*                <li>LAMP - массив индикаторов: "red", "yellow", "green", "green_s", "grey" 		</li>      
+	*              <li>DATE_CREATE_1 - левая часть интервала для даты создания
+	* обращения 		</li>                    <li>DATE_CREATE_2 - правая часть интервала для
+	* даты создания обращения 		</li>                    <li>DATE_TIMESTAMP_1 - левая часть
+	* интервала для даты модификации обращения 		</li>                   
+	* <li>DATE_TIMESTAMP_2 - правая часть интервала для даты модификации
+	* обращения 		</li>                    <li>DATE_CLOSE_1 - левая часть интервала для
+	* даты закрытия обращения 		</li>                    <li>DATE_CLOSE_2 - правая часть
+	* интервала для даты закрытия обращения 		</li>                    <li>AUTO_CLOSE_DAYS1 -
+	* левая часть интервала для количества дней по истечении которых
+	* обращение будет автоматически закрыто при отсутствии ответа от
+	* автора 		</li>                    <li>AUTO_CLOSE_DAYS2 - правая часть интервала для
+	* количества дней по истечении которых обращение будет
+	* автоматически закрыто при отсутствии ответа от автора 		</li>            
+	*        <li>TICKET_TIME_1 - левая часть интервала для количества дней
+	* прошедших с даты создания до даты закрытия обращения 		</li>               
+	*     <li>TICKET_TIME_2 - правая часть интервала для количества дней
+	* прошедших с даты создания до даты закрытия обращения 		</li>               
+	*     <li>TITLE - заголовок обращения (допускается сложная логика) 		</li>      
+	*              <li>TITLE_EXACT_MATCH - "Y" - при фильтрации по заголовку обращения
+	* будет искаться точное совпадение (по умолчанию); "N" - в противном
+	* случае будет искаться вхождение 		</li>                    <li>MESSAGES1 - левая
+	* часть интервала для количества сообщений в обращении 		</li>              
+	*      <li>MESSAGES2 - правая часть интервала для количества сообщений в
+	* обращении 		</li>                    <li>OWNER - автор обращения, поиск
+	* осуществляется по ID пользователя, логину, имени, фамилии,
+	* символному коду (допускается сложная логика) 		</li>                   
 	* <li>OWNER_EXACT_MATCH - "Y" - при фильтрации по автору обращения будет
 	* искаться точное совпадение (по умолчанию); "N" - в противном случае
-	* будет искаться вхождение </li> <li>CREATED_BY - кем было создано обращение,
-	* поиск осуществляется по ID пользователя, логину, имени, фамилии,
-	* названии модуля из которого было создано обращение (допускается
-	* сложная логика) </li> <li>CREATED_BY_EXACT_MATCH - "Y" - при фильтрации по
-	* создателю обращения будет искаться точное совпадение (по
-	* умолчанию); "N" - в противном случае будет искаться вхождение </li>
-	* <li>MODIFIED_BY - изменивший обращение, поиск осуществляется по ID
-	* пользователя, логину, имени, фамилии, названии модуля из которого
-	* было изменено обращение (допускается сложная логика) </li>
-	* <li>MODIFIED_BY_EXACT_MATCH - "Y" - при фильтрации по символьному коду статуса
-	* будет искаться точное совпадение (по умолчанию); "N" - в противном
-	* случае будет искаться вхождение </li> <li>RESPONSIBLE - ответственный за
+	* будет искаться вхождение 		</li>                    <li>CREATED_BY - кем было
+	* создано обращение, поиск осуществляется по ID пользователя,
+	* логину, имени, фамилии, названии модуля из которого было создано
+	* обращение (допускается сложная логика) 		</li>                   
+	* <li>CREATED_BY_EXACT_MATCH - "Y" - при фильтрации по создателю обращения будет
+	* искаться точное совпадение (по умолчанию); "N" - в противном случае
+	* будет искаться вхождение 		</li>                    <li>MODIFIED_BY - изменивший
 	* обращение, поиск осуществляется по ID пользователя, логину, имени,
-	* фамилии (допускается сложная логика) </li> <li>RESPONSIBLE_EXACT_MATCH - "Y" - при
-	* фильтрации по ответственному за обращение будет искаться точное
+	* фамилии, названии модуля из которого было изменено обращение
+	* (допускается сложная логика) 		</li>                    <li>MODIFIED_BY_EXACT_MATCH - "Y" -
+	* при фильтрации по символьному коду статуса будет искаться точное
 	* совпадение (по умолчанию); "N" - в противном случае будет искаться
-	* вхождение </li> <li>RESPONSIBLE_ID - ID пользователя ответственного за
-	* обращение, при задании "0" будут выбраны только те обращения у
-	* которых нет ответственного </li> <li>CATEGORY - ID категории обращения (0 -
-	* без категории) </li> <li>CATEGORY_SID - символьный код категории обращения
-	* (допускается сложная логика) </li> <li>CATEGORY_SID_EXACT_MATCH - "Y" - при
-	* фильтрации по символьному коду категории будет искаться точное
-	* совпадение (по умолчанию); "N" - в противном случае будет искаться
-	* вхождение </li> <li>CRITICALITY - ID критичности обращения (0 - без
-	* критичности) </li> <li>CRITICALITY_SID - символьный код критичности
-	* обращения (допускается сложная логика) </li> <li>CRITICALITY_SID_EXACT_MATCH - "Y" -
-	* при фильтрации по символьному коду критичности будет искаться
+	* вхождение 		</li>                    <li>RESPONSIBLE - ответственный за обращение,
+	* поиск осуществляется по ID пользователя, логину, имени, фамилии
+	* (допускается сложная логика) 		</li>                    <li>RESPONSIBLE_EXACT_MATCH - "Y" -
+	* при фильтрации по ответственному за обращение будет искаться
 	* точное совпадение (по умолчанию); "N" - в противном случае будет
-	* искаться вхождение </li> <li>STATUS - ID статуса обращения (0 - без статуса)
-	* </li> <li>STATUS_SID - символьный код статуса обращения (допускается
-	* сложная логика) </li> <li>STATUS_SID_EXACT_MATCH - "Y" - при фильтрации по
-	* символьному коду статуса будет искаться точное совпадение (по
-	* умолчанию); "N" - в противном случае будет искаться вхождение </li>
-	* <li>STATUS_SID_EXACT_MATCH - "Y" - при фильтрации по символьному коду оценки
-	* ответа будет искаться точное совпадение (по умолчанию); "N" - в
-	* противном случае будет искаться вхождение </li> <li>MARK - ID оценки
-	* ответов (0 - без оценки) </li> <li>MARK_SID - символьный код оценки ответов
-	* (допускается сложная логика) </li> <li>SOURCE - ID источника (0 - источник
-	* "web") </li> <li>SOURCE_SID - символьный код источника (допускается сложная
-	* логика) </li> <li>SOURCE_SID_EXACT_MATCH - "Y" - при фильтрации по символьному коду
-	* источника будет искаться точное совпадение (по умолчанию); "N" - в
-	* противном случае будет искаться вхождение </li> <li>MESSAGE - текст
-	* сообщения (допускается сложная логика) </li> <li>MESSAGE_EXACT_MATCH - "Y" - при
+	* искаться вхождение 		</li>                    <li>RESPONSIBLE_ID - ID пользователя
+	* ответственного за обращение, при задании "0" будут выбраны только
+	* те обращения у которых нет ответственного 		</li>                    <li>CATEGORY -
+	* ID категории обращения (0 - без категории) 		</li>                    <li>CATEGORY_SID -
+	* символьный код категории обращения (допускается сложная логика)
+	* 		</li>                    <li>CATEGORY_SID_EXACT_MATCH - "Y" - при фильтрации по символьному
+	* коду категории будет искаться точное совпадение (по умолчанию); "N"
+	* - в противном случае будет искаться вхождение 		</li>                   
+	* <li>CRITICALITY - ID критичности обращения (0 - без критичности) 		</li>              
+	*      <li>CRITICALITY_SID - символьный код критичности обращения (допускается
+	* сложная логика) 		</li>                    <li>CRITICALITY_SID_EXACT_MATCH - "Y" - при
+	* фильтрации по символьному коду критичности будет искаться
+	* точное совпадение (по умолчанию); "N" - в противном случае будет
+	* искаться вхождение 		</li>                    <li>STATUS - ID статуса обращения (0 -
+	* без статуса) 		</li>                    <li>STATUS_SID - символьный код статуса
+	* обращения (допускается сложная логика) 		</li>                   
+	* <li>STATUS_SID_EXACT_MATCH - "Y" - при фильтрации по символьному коду статуса
+	* будет искаться точное совпадение (по умолчанию); "N" - в противном
+	* случае будет искаться вхождение 		</li>                    <li>STATUS_SID_EXACT_MATCH - "Y"
+	* - при фильтрации по символьному коду оценки ответа будет искаться
+	* точное совпадение (по умолчанию); "N" - в противном случае будет
+	* искаться вхождение 		</li>                    <li>MARK - ID оценки ответов (0 - без
+	* оценки) 		</li>                    <li>MARK_SID - символьный код оценки ответов
+	* (допускается сложная логика) 		</li>                    <li>SOURCE - ID источника (0 -
+	* источник "web") 		</li>                    <li>SOURCE_SID - символьный код источника
+	* (допускается сложная логика) 		</li>                    <li>SOURCE_SID_EXACT_MATCH - "Y" -
+	* при фильтрации по символьному коду источника будет искаться
+	* точное совпадение (по умолчанию); "N" - в противном случае будет
+	* искаться вхождение 		</li>                    <li>MESSAGE - текст сообщения
+	* (допускается сложная логика) 		</li>                    <li>MESSAGE_EXACT_MATCH - "Y" - при
 	* фильтрации по сообщению будет искаться точное совпадение (по
-	* умолчанию); "N" - в противном случае будет искаться вхождение </li>
-	* <li>LAST_MESSAGE_USER_ID - ID пользователя написавшего последнее сообщение в
-	* обращении (допускается сложная логика) </li> <li>LAST_MESSAGE_USER_ID_EXACT_MATCH - "Y"
-	* - при фильтрации по ID пользователя написавшего последнее
-	* сообщение в обращении будет искаться точное совпадение (по
-	* умолчанию); "N" - в противном случае будет искаться вхождение </li>
-	* <li>LAST_MESSAGE_SID - символьный идентификатор написавшего последнее
-	* сообщение в обращении (если источник "email", то это может быть email,
-	* если источник "телефон", то это может быть номер телефона)
-	* (допускается сложная логика) </li> <li>LAST_MESSAGE_SID_EXACT_MATCH - "Y" - при
-	* фильтрации по символьному идентификатору пользователя
+	* умолчанию); "N" - в противном случае будет искаться вхождение 		</li>    
+	*                <li>LAST_MESSAGE_USER_ID - ID пользователя написавшего последнее
+	* сообщение в обращении (допускается сложная логика) 		</li>                   
+	* <li>LAST_MESSAGE_USER_ID_EXACT_MATCH - "Y" - при фильтрации по ID пользователя
 	* написавшего последнее сообщение в обращении будет искаться
 	* точное совпадение (по умолчанию); "N" - в противном случае будет
-	* искаться вхождение </li> <li>SUPPORT_COMMENTS - комментарий техподдержки,
-	* видимый в стандартных формах только для пользователей входящих в
-	* группу техподдержки </li> <li>SUPPORT_COMMENTS_EXACT_MATCH - "Y" - при фильтрации по ID
+	* искаться вхождение 		</li>                    <li>LAST_MESSAGE_SID - символьный
+	* идентификатор написавшего последнее сообщение в обращении (если
+	* источник "email", то это может быть email, если источник "телефон", то это
+	* может быть номер телефона) (допускается сложная логика) 		</li>           
+	*         <li>LAST_MESSAGE_SID_EXACT_MATCH - "Y" - при фильтрации по символьному
+	* идентификатору пользователя написавшего последнее сообщение в
+	* обращении будет искаться точное совпадение (по умолчанию); "N" - в
+	* противном случае будет искаться вхождение 		</li>                   
+	* <li>SUPPORT_COMMENTS - комментарий техподдержки, видимый в стандартных
+	* формах только для пользователей входящих в группу техподдержки
+	* 		</li>                    <li>SUPPORT_COMMENTS_EXACT_MATCH - "Y" - при фильтрации по ID
 	* пользователя написавшего последнее сообщение в обращении будет
 	* искаться точное совпадение (по умолчанию); "N" - в противном случае
-	* будет искаться вхождение </li> <li>SITE_ID - идентификатор сайта</li> <li>CLOSE
+	* будет искаться вхождение 	</li> <li>SITE_ID - идентификатор сайта</li> <li>CLOSE
 	* - Y\N - закрыт тикет, или нет</li> <li>S_SPAM - Y\N - флаг, является ли тикет
 	* спамом</li> <li>IS_OVERDUE - Y\N - флаг, просрочен ли тикет.</li> <li>SLA_ID - по ID
 	* уровня техподдержки (допускается сложная логика).</li>
 	* <li>SUPPORTTEAM_GROUP_ID - по ID группы техподдержки (число или массив
 	* чисел).</li> <li>CLIENT_GROUP_ID - Y\N - по ID группы клиентов (число или массив
-	* чисел).</li> </ul>
+	* чисел).</li>         </ul>
 	*
 	* @param boolean &$is_filtered  Переменная возвращающая true в том случае если список результатов
 	* отфильтрован по какому либо критерию; либо false в противном случае.
 	* Изменен на <b>isFiltered</b> c 12.0.0
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Необязательный параметр. "Y" - будут выбраны только те обращения
+	* @param (1) $CHECK_RIGHTS = "Y" Необязательный параметр. "Y" - будут выбраны только те обращения
 	* которые текущий пользователь может просматривать (по умолчанию);
 	* "N" - выбирать все обращения независимо от прав текущего
 	* пользователя. Изменен на <b>checkRights</b> c 12.0.0
 	*
-	* @param char(1) $get_user_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
+	* @param (1) $get_user_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
 	* выбраны такие поля как OWNER_LOGIN, OWNER_NAME, RESPONSIBLE_LOGIN, RESPONSIBLE_NAME, MODIFIED_LOGIN,
 	* MODIFIED_NAME, LAST_MESSAGE_LOGIN, LAST_MESSAGE_NAME, CREATED_LOGIN, CREATED_EMAIL, CREATED_NAME, описывающие
 	* параметры пользователей имевших отношение к данному обращению
 	* (по умолчанию); "N" - вышеперечисленные поля не будут выбраны, но
 	* зато это ускорит работу метода. Изменен на <b>getUserName</b> c 12.0.0
 	*
-	* @param char(1) $get_dictionary_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
-	* выбраны такие поля как CATEGORY_NAME, CATEGORY_SID, CRITICALITY_NAME, CRITICALITY_SID, STATUS_NAME,
+	* @param (1) $get_dictionary_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
+	* выбраны такие поля как 	CATEGORY_NAME, CATEGORY_SID, CRITICALITY_NAME, CRITICALITY_SID, STATUS_NAME,
 	* STATUS_SID, MARK_NAME, MARK_SID, SOURCE_NAME, SOURCE_SID, описывающие поля из справочника
 	* техподдержки (по умолчанию); "N" - вышеперечисленные поля не будут
 	* выбраны, но зато это ускорит работу метода. Удален с 4.0.6
 	*
-	* @param char(2) $lang = LANG Двухсимвольный код языка в формате которого необходимо выбрать
+	* @param (2) $lang = LANG Двухсимвольный код языка в формате которого необходимо выбрать
 	* временные параметры обращения (время создания, изменения,
 	* закрытия); необязательный параметр, по умолчанию - код текущего
 	* сайта. Удален с 4.0.0
@@ -813,7 +825,7 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$FilterArr = Array(<br>	"find_id",<br>	"find_lid",<br>	"find_lamp",<br>	"find_date_create1",<br>	"find_date_create2",<br>	"find_date_timestamp1",<br>	"find_date_timestamp2",<br>	"find_date_close1",<br>	"find_date_close2",<br>	"find_close",<br>	"find_ticket_time_1",<br>	"find_ticket_time_2",<br>	"find_title",<br>	"find_messages1",<br>	"find_messages2",<br>	"find_owner",<br>	"find_created_by",<br>	"find_responsible",<br>	"find_responsible_id",<br>	"find_category_id",<br>	"find_criticality_id",<br>	"find_status_id",<br>	"find_mark_id",<br>	"find_source_id",<br>	"find_modified_by",<br>	"find_message"<br>	);<br>if (strlen($set_filter)&gt;0) InitFilterEx($FilterArr,"TICKET_LIST","set",true); else InitFilterEx($FilterArr,"TICKET_LIST","get",true);<br>if (strlen($del_filter)&gt;0) DelFilterEx($FilterArr,"TICKET_LIST",true);<br>if (CheckFilter())<br>{<br>	$arFilter = Array(<br>		"ID"                =&gt; $find_id,<br>		"LID"               =&gt; $find_lid,<br>		"LAMP"              =&gt; $find_lamp,<br>		"DATE_CREATE_1"     =&gt; $find_date_create1,<br>		"DATE_CREATE_2"     =&gt; $find_date_create2,<br>		"DATE_TIMESTAMP_1"  =&gt; $find_date_timestamp1,<br>		"DATE_TIMESTAMP_2"  =&gt; $find_date_timestamp2,<br>		"DATE_CLOSE_1"      =&gt; $find_date_close1,<br>		"DATE_CLOSE_2"      =&gt; $find_date_close2,<br>		"CLOSE"             =&gt; $find_close,<br>		"TICKET_TIME_1"     =&gt; $find_ticket_time_1,<br>		"TICKET_TIME_2"     =&gt; $find_ticket_time_2,<br>		"TITLE"             =&gt; $find_title,<br>		"MESSAGES1"         =&gt; $find_messages1,<br>		"MESSAGES2"         =&gt; $find_messages2,<br>		"OWNER"             =&gt; $find_owner,<br>		"CREATED_BY"        =&gt; $find_created_by,<br>		"RESPONSIBLE"       =&gt; $find_responsible,<br>		"RESPONSIBLE_ID"    =&gt; $find_responsible_id,<br>		"CATEGORY"          =&gt; $find_category_id,<br>		"CRITICALITY"       =&gt; $find_criticality_id,<br>		"STATUS"            =&gt; $find_status_id,<br>		"MARK"              =&gt; $find_mark_id,<br>		"SOURCE"            =&gt; $find_source_id,<br>		"MODIFIED_BY"       =&gt; $find_modified_by,<br>		"MESSAGE"           =&gt; $find_message<br>		);<br>}<br>$tickets = <b>CTicket::GetList</b>($by, $order, $arFilter, $is_filtered);<br>?&gt;<br>
 	* </pre>
 	*
@@ -822,7 +834,7 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/getlist.php
 	* @author Bitrix
 	*/
-	public static 	function GetList(&$by, &$order, $arFilter=Array(), &$isFiltered, $checkRights="Y", $getUserName="Y", $getExtraNames="Y", $siteID=false, $arParams = Array() )
+	public static function GetList(&$by, &$order, $arFilter=Array(), &$isFiltered, $checkRights="Y", $getUserName="Y", $getExtraNames="Y", $siteID=false, $arParams = Array() )
 	{
 		$err_mess = (CTicket::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $USER, $USER_FIELD_MANAGER;
@@ -1574,7 +1586,7 @@ public static 	function AddMessage($ticketID, $arFields, &$arrFILES, $checkRight
 		return $res;
 	}
 
-public static 	function GetSupportTeamList()
+	public static function GetSupportTeamList()
 	{
 		$err_mess = (CTicket::err_mess())."<br>Function: GetSupportTeamList<br>Line: ";
 		global $DB;
@@ -1641,50 +1653,51 @@ public static 	function GetSupportTeamList()
 		return $res;
 	}*/
 
-
+	
 	/**
-	* <p>Метод предназначен для получения списка сообщений в одном обращении.</p>
+	* <p>Метод предназначен для получения списка сообщений в одном обращении. Метод нестатический.</p>
 	*
 	*
 	* @param varchar &$by  
 	*
 	* @param varchar &$order  Идентификатор позволяющий задать имя поля для сортировки.
-	* Допустимы следующие значения: <ul> <li>s_id - по ID </li> <li>s_number - по
-	* порядковому номеру </li> </ul>
+	* Допустимы следующие значения: 	<ul> <li>s_id - по ID 		</li> <li>s_number - по
+	* порядковому номеру 	</li> </ul>
 	*
-	* @param array $arFilter = array() Порядок сортировки. Допустимы следующие значения: <ul> <li>desc - по
-	* убыванию (значение по умолчанию) </li> <li>asc - по возрастанию </li> </ul>
+	* @param array $arFilter = array() Порядок сортировки. Допустимы следующие значения: 	<ul> <li>desc - по
+	* убыванию (значение по умолчанию) 		</li> <li>asc - по возрастанию 	</li> </ul>
 	*
 	* @param boolean &$is_filtered  Массив для фильтрации значений. В массиве допустимы следующие
-	* индексы: <ul> <li>ID - ID сообщения (допускается сложная логика); </li>
-	* <li>TICKET_ID - ID обращения; </li> <li>TICKET - (допускается сложная логика); </li>
-	* <li>IS_MESSAGE - Позволяет получить список именно сообщений. В противном
-	* случае в списке сообщений будет много мусора, например, сообщения
-	* об изменении статуса. </li> <li>IS_HIDDEN - "Y" - будут выбраны только
-	* скрытые сообщения; "N" - будут выбраны все не скрытые сообщения; </li>
-	* <li>IS_LOG - "Y" - будут выбраны только лог-записи (записи изменений); "N" -
-	* будут выбраны не лог-записи; </li> <li>IS_OVERDUE - "Y" - будут выбраны только
-	* просроченные сообщения; "N" - будут выбраны не просроченные
-	* сообщения; </li> <li>NOT_CHANGE_STATUS - "Y" - будут выбраны только неизменённые
-	* сообщения; "N" - будут выбраны изменённые сообщения; </li>
-	* <li>MESSAGE_BY_SUPPORT_TEAM - "Y" - будут выбраны сообщения от сотрудников
-	* техподдержки; "N" - будут выбраны все сообщения; </li> <li>EXTERNAL_FIELD_1 -
-	* (допускается сложная логика) </li> </ul> Необязательный параметр.
+	* индексы: 	<ul> <li>ID - ID сообщения (допускается сложная логика); 		</li>
+	* <li>TICKET_ID - ID обращения; 		</li> <li>TICKET - (допускается сложная логика);
+	* 		</li> <li>IS_MESSAGE - Позволяет получить список именно сообщений. В
+	* противном случае в списке сообщений будет много мусора, например,
+	* сообщения об изменении статуса. 		</li> <li>IS_HIDDEN - "Y" - будут выбраны
+	* только скрытые сообщения; "N" - будут выбраны все не скрытые
+	* сообщения; 		</li> <li>IS_LOG - "Y" - будут выбраны только лог-записи (записи
+	* изменений); "N" - будут выбраны не лог-записи; 		</li> <li>IS_OVERDUE - "Y" - будут
+	* выбраны только просроченные сообщения; "N" - будут выбраны не
+	* просроченные сообщения; 		</li> <li>NOT_CHANGE_STATUS - "Y" - будут выбраны
+	* только неизменённые сообщения; "N" - будут выбраны изменённые
+	* сообщения; 		</li> <li>MESSAGE_BY_SUPPORT_TEAM - "Y" - будут выбраны сообщения от
+	* сотрудников техподдержки; "N" - будут выбраны все сообщения; 		</li>
+	* <li>EXTERNAL_FIELD_1 - (допускается сложная логика) 	</li> </ul> Необязательный
+	* параметр.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Переменная возвращающая true в том случае если список результатов
+	* @param (1) $CHECK_RIGHTS = "Y" Переменная возвращающая true в том случае если список результатов
 	* отфильтрован по какому либо критерию; либо false в противном случае.
 	* Изменен на <b>isFiltered</b> с версии 12.0.0
 	*
-	* @param char(1) $get_user_name = "Y" Флаг необходимости проверки прав текущего пользователя: <ul> <li>Y -
+	* @param (1) $get_user_name = "Y" Флаг необходимости проверки прав текущего пользователя: 	<ul> <li>Y -
 	* будут выбраны только те сообщения которые данные пользователь
-	* может просматривать (по умолчанию) </li> <li>N - выбирать все сообщения
-	* независимо от прав текущего пользователя </li> </ul> Необязательный
-	* параметр. Изменен на <b>checkRights</b> с версии 12.0.0
+	* может просматривать (по умолчанию) 		</li> <li>N - выбирать все
+	* сообщения независимо от прав текущего пользователя 	</li> </ul>
+	* Необязательный параметр. Изменен на <b>checkRights</b> с версии 12.0.0
 	*
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $mess = <b>CTicket::GetMessageList</b>($a, $b, array("TICKET_ID" =&gt; $ID, "TICKET_ID_EXACT_MATCH" =&gt; "Y"), $c, $CHECK_RIGHTS);
 	* $mess-&gt;NavStart(50);
@@ -1697,7 +1710,7 @@ public static 	function GetSupportTeamList()
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/getmessagelist.php
 	* @author Bitrix
 	*/
-	public static 	function GetMessageList(&$by, &$order, $arFilter=Array(), &$isFiltered, $checkRights="Y", $getUserName="Y")
+	public static function GetMessageList(&$by, &$order, $arFilter=Array(), &$isFiltered, $checkRights="Y", $getUserName="Y")
 	{
 		$err_mess = (CTicket::err_mess())."<br>Function: GetMessageList<br>Line: ";
 		global $DB, $USER, $APPLICATION;
@@ -1838,7 +1851,7 @@ public static 	function GetSupportTeamList()
 		return $res;
 	}
 
-public static 	function GetDynamicList(&$by, &$order, $arFilter=Array())
+	public static function GetDynamicList(&$by, &$order, $arFilter=Array())
 	{
 		$err_mess = (CTicket::err_mess())."<br>Function: GetDynamicList<br>Line: ";
 		global $DB;
@@ -1947,7 +1960,7 @@ public static 	function GetDynamicList(&$by, &$order, $arFilter=Array())
 		return $res;
 	}
 
-public static 	function GetMessageDynamicList(&$by, &$order, $arFilter=Array())
+	public static function GetMessageDynamicList(&$by, &$order, $arFilter=Array())
 	{
 		$err_mess = (CTicket::err_mess())."<br>Function: GetMessageDynamicList<br>Line: ";
 		global $DB;
@@ -2066,5 +2079,3 @@ public static 	function GetMessageDynamicList(&$by, &$order, $arFilter=Array())
 		return $res;
 	}
 }
-
-?>

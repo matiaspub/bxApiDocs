@@ -33,75 +33,75 @@ function GetVoteDiagramList()
  * <p>Функция возвращает ID опроса в случае, если такой опрос был найден в базе, а также массивы описывающие опрос.</p>
  *
  *
- * @param int $VOTE_ID  ID опроса.</bo
+ * @param int $VOTE_ID  ID опроса.
  *
- * @param array &$arChannel  Массив описывающий группу заданного опроса. <br>Индексы массива:
- * <li> <b>ID</b> - ID группы </li> <li> <b>SYMBOLIC_NAME</b> - символическое имя </li> <li>
- * <b>ACTIVE</b> - флаг активности ["Y"|"N"] </li> <li> <b>TITLE</b> - заголовок группы </li>
- * <li> <b>LID</b> - ID сайта </li> <li> <b>C_SORT</b> - порядок сортировки </li> <li>
+ * @param array &$arChannel  Массив описывающий группу заданного опроса. <br>Индексы массива: 
+ * <li> <b>ID</b> - ID группы </li> <li> <b>SYMBOLIC_NAME</b> - символическое имя  </li> <li>
+ * <b>ACTIVE</b> - флаг активности ["Y"|"N"]  </li> <li> <b>TITLE</b> - заголовок группы 
+ * </li> <li> <b>LID</b> - ID сайта  </li> <li> <b>C_SORT</b> - порядок сортировки  </li> <li>
  * <b>TIMESTAMP_X</b> - время изменения записи в базе данных </li>
  *
- * @param array &$arVote  Массив описывающий заданный опрос. <br>Индексы массива: <li> <b>ID</b> - ID
- * опроса </li> <li> <b>CHANNEL_ID</b> - ID группы опроса </li> <li> <b>C_SORT</b> - порядок
- * сортировки </li> <li> <b>ACTIVE</b> - флаг активности ["Y"|"N"] </li> <li> <b>TIMESTAMP_X</b> -
- * время изменения записи в базе данных </li> <li> <b>DATE_START</b> - время
- * начала опроса </li> <li> <b>DATE_END</b> - время окончания опроса </li> <li>
- * <b>COUNTER</b> - количество голосований по опросу </li> <li> <b>TITLE</b> -
- * заголовок опроса </li> <li> <b>DESCRIPTION</b> - описание опроса </li> <li>
- * <b>DESCRIPTION_TYPE</b> - тип описания опроса ["html"|"text"] </li> <li> <b>IMAGE_ID</b> - ID
- * изображения </li> <li> <b> <code>EVENT1</code></b> - идентификатор типа события - "
- * <code>event1</code>" </li> <li> <b> <code>EVENT2</code></b> - идентификатор типа события - "
- * <code>event2</code>" </li> <li> <b> <code>EVENT3</code></b> - дополнительный параметр типа
- * события - " <code>event3</code>" </li> <li> <b>UNIQUE_TYPE</b> - тип уникальности
+ * @param array &$arVote  Массив описывающий заданный опрос. <br>Индексы массива:  <li> <b>ID</b> - ID
+ * опроса  </li> <li> <b>CHANNEL_ID</b> - ID группы опроса  </li> <li> <b>C_SORT</b> - порядок
+ * сортировки  </li> <li> <b>ACTIVE</b> - флаг активности ["Y"|"N"]  </li> <li> <b>TIMESTAMP_X</b>
+ * - время изменения записи в базе данных  </li> <li> <b>DATE_START</b> - время
+ * начала опроса  </li> <li> <b>DATE_END</b> - время окончания опроса  </li> <li>
+ * <b>COUNTER</b> - количество голосований по опросу  </li> <li> <b>TITLE</b> -
+ * заголовок опроса  </li> <li> <b>DESCRIPTION</b> - описание опроса  </li> <li>
+ * <b>DESCRIPTION_TYPE</b> - тип описания опроса ["html"|"text"]  </li> <li> <b>IMAGE_ID</b> - ID
+ * изображения  </li> <li> <b> <code>EVENT1</code></b> - идентификатор типа события - "
+ * <code>event1</code>"  </li> <li> <b> <code>EVENT2</code></b> - идентификатор типа события - "
+ * <code>event2</code>"  </li> <li> <b> <code>EVENT3</code></b> - дополнительный параметр типа
+ * события - " <code>event3</code>"  </li> <li> <b>UNIQUE_TYPE</b> - тип уникальности
  * посетителей: 0 - не ограничено; 1 - не голосовать дважды в одной
  * сессии; 2 - не голосовать дважды в одной сессии либо с одним cookie; 3 -
  * не голосовать дважды в одной сессии либо с одним cookie либо с одного
- * IP; </li> <li> <b>KEEP_IP_SEC</b> - количество секунд в течении которых нельзя
- * голосовать с одного IP </li> <li> <b>TEMPLATE</b> - шаблон для показа формы
- * опроса </li> <li> <b>RESULT_TEMPLATE</b> - шаблон для показа результатов опроса
- * </li> <li> <b>QUESTIONS</b> - количество вопросов </li> <li> <b>LAMP</b> - индикатор: "red" -
- * флаг активности опроса снят либо текущая дата не попадает в
+ * IP;  </li> <li> <b>KEEP_IP_SEC</b> - количество секунд в течении которых нельзя
+ * голосовать с одного IP  </li> <li> <b>TEMPLATE</b> - шаблон для показа формы
+ * опроса  </li> <li> <b>RESULT_TEMPLATE</b> - шаблон для показа результатов опроса 
+ * </li> <li> <b>QUESTIONS</b> - количество вопросов  </li> <li> <b>LAMP</b> - индикатор: "red"
+ * - флаг активности опроса снят либо текущая дата не попадает в
  * интервал проведения опроса; "green" - флаг активности опроса
  * установлен и текущая дата попадает в интервал проведения опроса.
  * </li>
  *
  * @param array &$arQuestions  Массив состоящий из массивов каждый из которых описывает один
- * вопрос. <br>Индексы массива: <li> <b>ID</b> - ID вопроса </li> <li> <b>ACTIVE</b> - флаг
- * активности ["Y"|"N"] </li> <li> <b>C_SORT</b> - порядок сортировки </li> <li> <b>QUESTION</b>
- * - текст вопроса </li> <li> <b>QUESTION_TYPE</b> - тип текста вопроса ["html"|"text"] </li>
- * <li> <b>IMAGE_ID</b> - ID изображения </li> <li> <b>DIAGRAM</b> - флаг включения вопроса
- * в результирующую диаграмму ["Y"|"N"] </li> <li> <b>TEMPLATE</b> - шаблон для
- * показа результатов вопроса </li> <li> <b>TIMESTAMP_X</b> - дата изменения
- * записи в базе данных </li>
+ * вопрос. <br>Индексы массива:  <li> <b>ID</b> - ID вопроса  </li> <li> <b>ACTIVE</b> -
+ * флаг активности ["Y"|"N"]  </li> <li> <b>C_SORT</b> - порядок сортировки  </li> <li>
+ * <b>QUESTION</b> - текст вопроса  </li> <li> <b>QUESTION_TYPE</b> - тип текста вопроса
+ * ["html"|"text"]  </li> <li> <b>IMAGE_ID</b> - ID изображения  </li> <li> <b>DIAGRAM</b> - флаг
+ * включения вопроса в результирующую диаграмму ["Y"|"N"]  </li> <li>
+ * <b>TEMPLATE</b> - шаблон для показа результатов вопроса  </li> <li> <b>TIMESTAMP_X</b>
+ * - дата изменения записи в базе данных </li>
  *
  * @param array &$arAnswers  Массив ответов, его индексами являются ID вопросов, а значениями -
  * список массивов, каждый из которых описывает один ответ.
- * <br>Индексы массива описывающего один ответ: <li> <b>ID</b> - ID ответа </li>
- * <li> <b>ACTIVE</b> - флаг активности ["Y"|"N"] </li> <li> <b>TIMESTAMP_X</b> - дата изменения
- * записи в базе данных </li> <li> <b>QUESTION_ID</b> - ID вопроса </li> <li> <b>C_SORT</b> -
- * порядок сортировки </li> <li> <b>MESSAGE</b> - текст сообщения который будет
- * выдан рядом с ответом в форме опроса и в качестве ответа в
- * диаграмме опроса </li> <li> <b>COUNTER</b> - количество раз когда был выбран
- * данный ответ </li> <li> <b>FIELD_TYPE</b> - тип поля ввода: 0 - radio, 1 - checkbox, 2 - dropdown
- * list; 3 - multiselect list, 4 - text; 5 - textarea </li> <li> <b>FIELD_WIDTH</b> - ширина поля ввода
- * </li> <li> <b>FIELD_HEIGHT</b> - высота поля ввода </li> <li> <b>FIELD_PARAM</b> -
- * дополнительные параметры поля ввода: стиль, класс </li> <li> <b>COLOR</b> -
+ * <br>Индексы массива описывающего один ответ:  <li> <b>ID</b> - ID ответа  </li>
+ * <li> <b>ACTIVE</b> - флаг активности ["Y"|"N"]  </li> <li> <b>TIMESTAMP_X</b> - дата
+ * изменения записи в базе данных  </li> <li> <b>QUESTION_ID</b> - ID вопроса  </li> <li>
+ * <b>C_SORT</b> - порядок сортировки  </li> <li> <b>MESSAGE</b> - текст сообщения
+ * который будет выдан рядом с ответом в форме опроса и в качестве
+ * ответа в диаграмме опроса  </li> <li> <b>COUNTER</b> - количество раз когда
+ * был выбран данный ответ  </li> <li> <b>FIELD_TYPE</b> - тип поля ввода: 0 - radio, 1 -
+ * checkbox, 2 - dropdown list; 3 - multiselect list, 4 - text; 5 - textarea  </li> <li> <b>FIELD_WIDTH</b> - ширина
+ * поля ввода  </li> <li> <b>FIELD_HEIGHT</b> - высота поля ввода  </li> <li> <b>FIELD_PARAM</b> -
+ * дополнительные параметры поля ввода: стиль, класс  </li> <li> <b>COLOR</b> -
  * RGB цвета элемента диаграммы (например: #FFOOCC) </li>
  *
  * @param array &$arDropDown  Массив с всеми элементами типа "2" (dropdown list) одного вопроса.
  * Индексом массива является ID вопроса, а значением - массив со
- * следующими индексами: <li> <b>REFERENCE</b> - текст ответа </li> <li> <b>REFERENCE_ID</b>
- * - ID ответа </li>
+ * следующими индексами:  <li> <b>REFERENCE</b> - текст ответа  </li> <li>
+ * <b>REFERENCE_ID</b> - ID ответа </li>
  *
  * @param array &$arMultiSelect  Массив с всеми элементами типа "3" (multiselect list) одного вопроса.
  * Индексом массива является ID вопроса, а значением - массив со
- * следующими индексами: <li> <b>REFERENCE</b> - текст ответа </li> <li> <b>REFERENCE_ID</b>
- * - ID ответа </li>
+ * следующими индексами:  <li> <b>REFERENCE</b> - текст ответа  </li> <li>
+ * <b>REFERENCE_ID</b> - ID ответа </li>
  *
  * @param array &$arGroupAnswers  Массив описывающий варианты ответов для элементов ввода типа "4"
  * (text) и "5" (textarea). Индексом массива является ID вопроса, а значением -
- * список массивов со следующими индексами: <li> <b>MESSAGE</b> - текст
- * ответа </li> <li> <b>COUNTER</b> - количество таких ответов </li>
+ * список массивов со следующими индексами:  <li> <b>MESSAGE</b> - текст
+ * ответа  </li> <li> <b>COUNTER</b> - количество таких ответов </li>
  *
  * @param string $getGroupAnswers  Флаг принимающий следующие значения: "Y" - собирать массив arGroupAnswers;
  * "N" - собирать массив arGroupAnswers не нужно.
@@ -109,7 +109,7 @@ function GetVoteDiagramList()
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // возвращает форму заданного опроса с учётом прав пользователя
  * function ShowVote($VOTE_ID, $template1="")
@@ -132,8 +132,6 @@ function GetVoteDiagramList()
  * 	}
  * }
  * ?&gt;
- * 
- * 
  * 
  * &lt;?
  * // получаем данные по опросу
@@ -305,23 +303,12 @@ function GetVoteDataByID($VOTE_ID, &$arChannel, &$arVote, &$arQuestions, &$arAns
  * <p>Функция возвращает ID текущего опроса в группе.</p>
  *
  *
- * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- * @param  $lid  ID сайта. По умолчанию - текущий - константа "LANG". Необязательный
- * параметр.
- *
- * @param  $access  Минимальный уровень доступа к опросу для текущего
- * пользователя:<li>0 - доступ закрыт</li> <li>1 - право на просмотр
- * результатов опроса</li> <li>2 - право на участие в опросе<br>По
- * умолчанию access = 1, т.е. для того чтобы функция GetCurrentVote возвратила ID
- * текущего опроса группы, у пользователя на данную группу должно
- * быть, как минимум, право на просмотр результатов. Необязательный
- * параметр.</li>
+ * @param mixed $GROUP_SYMBOLIC_NAME  Символическое имя группы.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // возвращает форму текущего опроса для заданной группы
  * function ShowCurrentVote($GROUP_SYMBOLIC_NAME, $lid=LANG)
@@ -358,18 +345,12 @@ function GetCurrentVote($GROUP_SID, $site_id=SITE_ID, $access=1)
  * <p>Функция возвращает ID предыдущего опроса в группе.</p>
  *
  *
- * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- * @param  $level  Уровень предыдущего опроса (1 - предыдущий, 2 - пред- предыдущий и
- * т.д.). По умолчанию - 1. Необязательный параметр.
- *
- * @param  $lid  ID сайта. По умолчанию - текущий (константа LANG). Необязательный
- * параметр.
+ * @param mixed $GROUP_SYMBOLIC_NAME  Символическое имя группы.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // возвращает диаграмму результатов предыдущего опроса
  * function ShowPrevVoteResults($GROUP_SYMBOLIC_NAME, $level=1, $lid=LANG)
@@ -425,7 +406,7 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * Файл в публичной части сайта - "vote_list.php":
  * &lt;?
  * // Отображает список опросов (архив)
@@ -441,8 +422,6 @@ function GetPrevVote($GROUP_SID, $level=1, $site_id=SITE_ID, $access=1)
  * }
  * require_once ($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog.php");
  * ?&gt;
- * 
- * 
  * 
  * &lt;?
  * 
@@ -589,13 +568,13 @@ function IsUserVoted($PUBLIC_VOTE_ID)
  * <p>Функция возвращает ID первого попавшегося опроса по которому пользователь ещё не голосовал, с учётом прав пользователя, у которого должно быть право "на участие в опросе" (&gt;=2)</p>
  *
  *
- * @param li $d  Сайт группы опросов. По умолчанию - текущий (константа LANG).
+ * @param mixed $lid  Сайт группы опросов. По умолчанию - текущий (константа LANG).
  * Необязательный параметр.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * Файл в публичной части сайта - "vote_any.php":
  * &lt;?
  * require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
@@ -735,15 +714,12 @@ function arrAnswersSort(&$arr, $order="desc")
  * <p>Функция выводит HTML-код текущего опроса группы.</p>
  *
  *
- * @param GROUP_SYMBOLIC_NAM $E  Символическое имя группы.
- *
- * @param  $lid  ID сайта. Необязательный параметр. По умолчанию - текущий
- * (константа LANG).
+ * @param mixed $GROUP_SYMBOLIC_NAME  Символическое имя группы.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * Файл в публичной части сайта - "vote_current.php":
  * &lt;?
  * require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
@@ -796,16 +772,12 @@ function ShowCurrentVoteResults($GROUP_SID, $site_id=SITE_ID)
  * <p>Функция выводит HTML-код формы опроса.</p>
  *
  *
- * @param VOTE_I $D  ID опроса.</bo
- *
- * @param  $template  Имя файла - шаблона для показа опроса. По умолчанию будет
- * использован шаблон, заданный в параметрах опроса. Необязательный
- * параметр.
+ * @param mixed $VOTE_ID  ID опроса.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * Файл в публичной части сайта - "vote.php":
  * &lt;?
  * // Отображает форму опроса по заданному ID
@@ -897,16 +869,12 @@ function ShowVote($VOTE_ID, $template1="")
  * <p>Функция выводит HTML-код с диаграммой результатов опроса.</p>
  *
  *
- * @param VOTE_I $D  ID опроса.</bo
- *
- * @param  $template  Имя файла - шаблона для показа результатов опроса. По умолчанию
- * будет использован шаблон, заданный в параметрах опроса.
- * Необязательный параметр.
+ * @param mixed $VOTE_ID  ID опроса.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * Файл в публичной части сайта - "vote_result.php":
  * &lt;?
  * // Отображает результат опроса по заданному ID

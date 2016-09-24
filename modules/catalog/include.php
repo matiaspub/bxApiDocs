@@ -1,7 +1,9 @@
 <?
-use Bitrix\Main\Loader;
-use Bitrix\Main\Localization\Loc;
-use Bitrix\Iblock;
+use Bitrix\Main\Loader,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Main,
+	Bitrix\Iblock,
+	Bitrix\Catalog;
 
 Loc::loadMessages(__FILE__);
 
@@ -103,13 +105,14 @@ Loader::registerAutoLoadClasses(
 		'CCatalogDiscountCoupon' => $strDBType.'/discount_coupon.php',
 		'CCatalogVat' => $strDBType.'/vat.php',
 		'CCatalogEvent' => 'general/catalog_event.php',
-		'CCatalogSKU' => 'general/catalog_sku.php',
+		'CCatalogSku' => 'general/catalog_sku.php',
 		'CCatalogDiscountSave' => $strDBType.'/discount_save.php',
 		'CCatalogStore' => $strDBType.'/store.php',
 		'CCatalogStoreProduct' => $strDBType.'/store_product.php',
 		'CCatalogAdmin' => 'general/admin.php',
 		'CGlobalCondCtrl' => 'general/catalog_cond.php',
 		'CGlobalCondCtrlComplex' => 'general/catalog_cond.php',
+		'CGlobalCondCtrlAtoms' => 'general/catalog_cond.php',
 		'CGlobalCondCtrlGroup' => 'general/catalog_cond.php',
 		'CGlobalCondTree' => 'general/catalog_cond.php',
 		'CCatalogCondCtrl' => 'general/catalog_cond.php',
@@ -123,6 +126,7 @@ Loader::registerAutoLoadClasses(
 		'CCatalogCondCtrlCatalogSettings' => 'general/sale_cond.php',
 		'CCatalogActionCtrlBasketProductFields' => 'general/sale_act.php',
 		'CCatalogActionCtrlBasketProductProps' => 'general/sale_act.php',
+		'CCatalogGifterProduct' => 'general/sale_act.php',
 		'CCatalogDiscountConvert' => 'general/discount_convert.php',
 		'CCatalogDiscountConvertTmp' => $strDBType.'/discount_convert.php',
 		'CCatalogProductProvider' => 'general/product_provider.php',
@@ -144,26 +148,53 @@ Loader::registerAutoLoadClasses(
 		'CCatalogMeasureAdminResult' => 'general/measure_result.php',
 		'CCatalogMeasureRatio' => $strDBType.'/measure_ratio.php',
 		'CCatalogProductSet' => $strDBType.'/product_set.php',
-		'CCatalogAdminTools' => $strDBType.'/admin_tools.php',
-		'CCatalogAdminProductSetEdit' => $strDBType.'/admin_tools.php',
+		'CCatalogAdminTools' => 'general/admin_tools.php',
+		'CCatalogAdminProductSetEdit' => 'general/admin_tools.php',
 		'CCatalogMenu' => 'general/catalog_menu.php',
 		'CCatalogCSVSettings' => 'general/csv_settings.php',
 		'CCatalogStepOperations' => 'general/step_operations.php',
 		'CCatalogProductSetAvailable' => 'general/step_operations.php',
+		'CCatalogProductAvailable' => 'general/step_operations.php',
+		'CCatalogProductSettings' => 'general/step_operations.php',
 		'CCatalogTools' => 'general/tools.php',
 		'\Bitrix\Catalog\Discount\DiscountManager' => 'lib/discount/discountmanager.php',
+		'\Bitrix\Catalog\Ebay\EbayXMLer' => 'lib/ebay/ebayxmler.php',
+		'\Bitrix\Catalog\Ebay\ExportOffer' => 'lib/ebay/exportoffer.php',
+		'\Bitrix\Catalog\Ebay\ExportOfferCreator' => 'lib/ebay/exportoffercreator.php',
+		'\Bitrix\Catalog\Ebay\ExportOfferSKU' => 'lib/ebay/exportoffersku.php',
+		'\Bitrix\Catalog\Helpers\Admin\CatalogEdit' => 'lib/helpers/admin/catalogedit.php',
+		'\Bitrix\Catalog\Helpers\Admin\IblockPriceChanger' => 'lib/helpers/admin/iblockpricechanger.php',
+		'\Bitrix\Catalog\Helpers\Tools' => 'lib/helpers/tools.php',
+		'\Bitrix\Catalog\Product\Price' => 'lib/product/price.php',
+		'\Bitrix\Catalog\Product\Search' => 'lib/product/search.php',
+		'\Bitrix\Catalog\Product\Sku' => 'lib/product/sku.php',
+		'\Bitrix\Catalog\Product\SubscribeManager' => 'lib/product/subscribemanager.php',
+		'\Bitrix\Catalog\Product\Viewed' => 'lib/product/viewed.php',
 		'\Bitrix\Catalog\CatalogIblockTable' => 'lib/catalogiblock.php',
+		'\Bitrix\Catalog\CatalogViewedProductTable' => 'lib/catalogviewedproduct.php',
 		'\Bitrix\Catalog\DiscountTable' => 'lib/discount.php',
 		'\Bitrix\Catalog\DiscountCouponTable' => 'lib/discountcoupon.php',
+		'\Bitrix\Catalog\DiscountRestrictionTable' => 'lib/discountrestriction.php',
+		'\Bitrix\Catalog\ExtraTable' => 'lib/extra.php',
 		'\Bitrix\Catalog\GroupTable' => 'lib/group.php',
+		'\Bitrix\Catalog\GroupAccessTable' => 'lib/groupaccess.php',
 		'\Bitrix\Catalog\GroupLangTable' => 'lib/grouplang.php',
 		'\Bitrix\Catalog\MeasureRatioTable' => 'lib/measureratio.php',
+		'\Bitrix\Catalog\PriceTable' => 'lib/price.php',
 		'\Bitrix\Catalog\ProductTable' => 'lib/product.php',
+		'\Bitrix\Catalog\RoundingTable' => 'lib/rounding.php',
 		'\Bitrix\Catalog\StoreTable' => 'lib/store.php',
-		'\Bitrix\Catalog\CatalogViewedProductTable' => 'lib/catalogviewedproduct.php',
+		'\Bitrix\Catalog\StoreProductTable' => 'lib/storeproduct.php',
 		'\Bitrix\Catalog\VatTable' => 'lib/vat.php',
+		//deprecated
+		'\Bitrix\Catalog\EbayXMLer' => 'lib/ebay/old.php',
+		'\Bitrix\Catalog\ExportOffer' => 'lib/ebay/old.php',
+		'\Bitrix\Catalog\ExportOfferCreator' => 'lib/ebay/old.php',
+		'\Bitrix\Catalog\ExportOfferSKU' => 'lib/ebay/old.php',
+		'\Bitrix\Catalog\SearchHandlers' => 'lib/product/old.php'
 	)
 );
+unset($strDBType);
 
 if (defined('CATALOG_GLOBAL_VARS') && CATALOG_GLOBAL_VARS == 'Y')
 {
@@ -272,19 +303,18 @@ function GetCatalogProductPriceList($PRODUCT_ID, $by = "SORT", $order = "ASC")
 	return $arPrice;
 }
 
+/**
+ * @deprecated
+ *
+ * @param $IBLOCK
+ * @param bool $SECT_ID
+ * @param array $arOrder
+ * @param int $cnt
+ * @return bool
+ */
 function GetCatalogProductTable($IBLOCK, $SECT_ID=false, $arOrder=array("sort"=>"asc"), $cnt=0)
 {
 	return false;
-	$arFilter = array("IBLOCK_ID"=>intval($IBLOCK), "ACTIVE"=>"Y", "ACTIVE_DATE"=>"Y");
-	if ($SECT_ID!==false)
-		$arFilter["SECTION_ID"]=intval($SECT_ID);
-
-	$res = CCatalogProduct::GetListEx($arOrder, $arFilter);
-	$dbr = new CIBlockResult($res->result);
-	if ($cnt>0)
-		$dbr->NavStart($cnt);
-
-	return $dbr;
 }
 
 /*
@@ -929,7 +959,7 @@ function CatalogRecurringCallback($productID, $userID)
 
 	//SIGURD: logic change. see mantiss 5036.
 	// discount applied to a final price with VAT already included.
-	if (doubleval($arPrice['PRICE']['VAT_RATE']) > 0)
+	if (doubleval($arPrice['PRICE']['VAT_RATE']) > 0 && $arPrice['PRICE']['VAT_INCLUDED'] != 'Y')
 		$currentPrice *= (1 + $arPrice['PRICE']['VAT_RATE']);
 
 	$arDiscountList = array();
@@ -1152,6 +1182,14 @@ function Add2Basket($PRICE_ID, $QUANTITY = 1, $arRewriteFields = array(), $arPro
 		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_NO_PRODUCT'), "NO_PRODUCT");
 		return false;
 	}
+	if (
+		($arCatalogProduct['TYPE'] == Catalog\ProductTable::TYPE_SKU || $arCatalogProduct['TYPE'] == Catalog\ProductTable::TYPE_EMPTY_SKU)
+		&& (string)Main\Config\Option::get('catalog', 'show_catalog_tab_with_offers') != 'Y'
+	)
+	{
+		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_CANNOT_ADD_SKU'), "NO_PRODUCT");
+		return false;
+	}
 	$arCatalogProduct['MEASURE'] = (int)$arCatalogProduct['MEASURE'];
 	$arCatalogProduct['MEASURE_NAME'] = '';
 	$arCatalogProduct['MEASURE_CODE'] = 0;
@@ -1315,6 +1353,7 @@ function Add2Basket($PRICE_ID, $QUANTITY = 1, $arRewriteFields = array(), $arPro
  */
 function Add2BasketByProductID($PRODUCT_ID, $QUANTITY = 1, $arRewriteFields = array(), $arProductParams = false)
 {
+	/** @global CMain $APPLICATION */
 	global $APPLICATION;
 
 	/* for old use */
@@ -1375,6 +1414,14 @@ function Add2BasketByProductID($PRODUCT_ID, $QUANTITY = 1, $arRewriteFields = ar
 	if (!($arCatalogProduct = $rsProducts->Fetch()))
 	{
 		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_NO_PRODUCT'), "NO_PRODUCT");
+		return false;
+	}
+	if (
+		($arCatalogProduct['TYPE'] == Catalog\ProductTable::TYPE_SKU || $arCatalogProduct['TYPE'] == Catalog\ProductTable::TYPE_EMPTY_SKU)
+		&& (string)Main\Config\Option::get('catalog', 'show_catalog_tab_with_offers') != 'Y'
+	)
+	{
+		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_CANNOT_ADD_SKU'), "NO_PRODUCT");
 		return false;
 	}
 	$arCatalogProduct['MEASURE'] = (int)$arCatalogProduct['MEASURE'];
@@ -1648,6 +1695,7 @@ function SubscribeProduct($intProductID, $arRewriteFields = array(), $arProductP
 		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_NO_PRODUCT'), "NO_PRODUCT");
 		return false;
 	}
+
 	if ($arCatalogProduct['SUBSCRIBE'] == 'N')
 	{
 		$APPLICATION->ThrowException(Loc::getMessage('CATALOG_ERR_NO_SUBSCRIBE'), 'SUBSCRIBE');
@@ -1842,20 +1890,20 @@ function SubscribeProduct($intProductID, $arRewriteFields = array(), $arProductP
  * 
  *
  *
- * @param mixed $ID  Код товара. (ID элемента инфоблока, для которого запрашиваются
+ * @param int $ID  Код товара. (ID элемента инфоблока, для которого запрашиваются
  * цены.)
  *
- * @param mixed $filterQauntity = 0 Если значение больше 0, то выводится диапазон цен,
+ * @param $I $filterQauntity = 0 Если значение больше 0, то выводится диапазон цен,
  * соответствующий этому количеству. Имеет смысл только при
  * расширенном режиме управления ценами.
  *
- * @param mixed $arFilterType = array() Массив ID типов цен. Если не задан, то выбираются все типы цен,
+ * @param array $arFilterType = array() Массив ID типов цен. Если не задан, то выбираются все типы цен,
  * которые может просматривать пользователь.
  *
- * @param mixed $VAT_INCLUDE = 'Y' (Y/N) НДС включён.</bod
+ * @param mixed $VAT_INCLUDE = 'Y' (Y/N) НДС включён.
  *
- * @param mixed $arCurrencyParams = array() Массив параметров для показа цен в одной валюте. Если в
- * переданном массиве заполнено поле CURRENCY_ID, то произойдет
+ * @param array $arCurrencyParams = array() Массив параметров для показа цен в одной валюте. Если в
+ * переданном массиве заполнено поле CURRENCY_ID, то  произойдет
  * конвертация цен в валюту CURRENCY_ID по текущему курсу. Необязательный
  * параметр.
  *
@@ -2318,24 +2366,15 @@ function __GetCatLangMessages($strBefore, $strAfter, $MessID, $strDefMess = fals
 	return $arResult;
 }
 
+/**
+ * @deprecated deprecated since catalog 16.0.0
+ * @see \Bitrix\Main\Type\Collection::normalizeArrayValuesByInt
+ *
+ * @param array &$arMap
+ * @param bool $boolSort
+ * @return void
+ */
 function CatalogClearArray(&$arMap, $boolSort = true)
 {
-	if (empty($arMap) || !is_array($arMap))
-		return;
-
-	$arValues = array();
-	foreach ($arMap as &$intOneValue)
-	{
-		$intOneValue = (int)$intOneValue;
-		if (0 < $intOneValue)
-			$arValues[$intOneValue] = true;
-	}
-	unset($intOneValue);
-	$arMap = array();
-	if (!empty($arValues))
-	{
-		$arMap = array_keys($arValues);
-		if ($boolSort)
-			sort($arMap);
-	}
+	Main\Type\Collection::normalizeArrayValuesByInt($arMap, $boolSort);
 }

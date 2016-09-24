@@ -15,6 +15,23 @@ final class DayContext extends Internals\BaseContext
 	 * @param string    $name  - counter name
 	 * @param int|float $value - number to add
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет значение к счетчику. Если счетчик не существует, то создается.</p>
+	*
+	*
+	* @param string $name  Имя счетчика.
+	*
+	* @param string $integer  Добавляемое значение.
+	*
+	* @param float $value  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/addcounter.php
+	* @author Bitrix
+	*/
 	public function addCounter($name, $value)
 	{
 		if (($id = $this->id) === null)
@@ -40,21 +57,39 @@ final class DayContext extends Internals\BaseContext
 	 * @param string    $name  - counter name
 	 * @param int|float $value - number to add
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет значение к счетчику (раз в день одному человеку). Если счетчик не существует, то создается.</p>
+	*
+	*
+	* @param string $name  Имя счетчика.
+	*
+	* @param string $integer  Добавляемое значение.
+	*
+	* @param float $value  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/adddaycounter.php
+	* @author Bitrix
+	*/
 	public function addDayCounter($name, $value)
 	{
 		$session =& self::$session;
-		$unique =& $session['UNIQUE'];
 
-		if (! in_array($name, $unique, true))
+		if (($id = $this->id) === null)
 		{
-			$unique []= $name;
+			$session['PENDING_DAY_COUNTERS'][$name] = $value;
+		}
+		else
+		{
+			$unique =& $session['UNIQUE'];
 
-			if (($id = $this->id) === null)
+			if (! in_array($name, $unique, true))
 			{
-				$session['PENDING_DAY_COUNTERS'][$name] = $value;
-			}
-			else
-			{
+				$unique [] = $name;
+
 				$this->addCounter($name, $value);
 				$this->setCookie(); // TODO HACK save to database into session
 			}
@@ -66,6 +101,27 @@ final class DayContext extends Internals\BaseContext
 	 * @param int|float|string $value    - numeric value
 	 * @param string           $currency - currency code (eg: RUB)
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет значение (в валюте) к счетчику. Если счетчик не существует, то создается.</p>
+	*
+	*
+	* @param string $name  Имя счетчика.
+	*
+	* @param string $integer  Числовое значение.
+	*
+	* @param intege $float  Код валюты (например, RUB).
+	*
+	* @param string $value  
+	*
+	* @param string $currency  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/addcurrencycounter.php
+	* @author Bitrix
+	*/
 	public function addCurrencyCounter($name, $value, $currency)
 	{
 		$this->addCounter($name, Utils::convertToBaseCurrency($value, $currency));
@@ -76,6 +132,23 @@ final class DayContext extends Internals\BaseContext
 	 * @param string|int $item
 	 * @throws ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет сущность к контексту.</p>
+	*
+	*
+	* @param string $entity  Тип сущности.
+	*
+	* @param string $string  ID сущности.
+	*
+	* @param integer $item  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/attachentityitem.php
+	* @author Bitrix
+	*/
 	public function attachEntityItem($entity, $item)
 	{
 		if (! is_string($entity))
@@ -112,6 +185,21 @@ final class DayContext extends Internals\BaseContext
 	 * @param $item
 	 * @return self
 	 */
+	
+	/**
+	* <p>Статический метод получает контекст, закрепленный за сущностью.</p>
+	*
+	*
+	* @param mixed $entity  Тип сущности.
+	*
+	* @param $entit $item  ID сущности.
+	*
+	* @return \Bitrix\Conversion\DayContext 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/getentityiteminstance.php
+	* @author Bitrix
+	*/
 	static public function getEntityItemInstance($entity, $item)
 	{
 		$instance = new self;
@@ -140,6 +228,17 @@ final class DayContext extends Internals\BaseContext
 	/** Get day context singleton instance.
 	 * @return self
 	 */
+	
+	/**
+	* <p>Статический метод возвращает экземпляр уникального дневного контекста.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Conversion\DayContext 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/daycontext/getinstance.php
+	* @author Bitrix
+	*/
 	static public function getInstance()
 	{
 		if (! self::$instance)

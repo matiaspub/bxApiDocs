@@ -47,10 +47,14 @@ class Mobile
 		self::$isDev = (isset($_COOKIE["MOBILE_DEV"]) && $_COOKIE["MOBILE_DEV"] == "Y");
 
 		$this->setDevice($_COOKIE["MOBILE_DEVICE"]);
-		if($_COOKIE["IS_WEBRTC_SUPPORTED"] && $_COOKIE["IS_WEBRTC_SUPPORTED"] == "Y")
+		if ($_COOKIE["IS_WEBRTC_SUPPORTED"] && $_COOKIE["IS_WEBRTC_SUPPORTED"] == "Y")
+		{
 			$this->setWebRtcSupport(true);
+		}
 		if ($_COOKIE["IS_BXSCRIPT_SUPPORTED"] && $_COOKIE["IS_BXSCRIPT_SUPPORTED"] == "Y")
+		{
 			$this->setBXScriptSupported(true);
+		}
 
 		if ($this->getDevice() == "iPad")
 		{
@@ -61,7 +65,6 @@ class Mobile
 				$this->setDeviceHeight($_COOKIE["MOBILE_RESOLUTION_HEIGHT"] / 2);
 			}
 		}
-
 		//detecting OS
 		if (array_key_exists("MOBILE_DEVICE", $_COOKIE))
 		{
@@ -81,7 +84,7 @@ class Mobile
 			self::$platform = "android";
 		}
 
-		if(array_key_exists("emulate_platform", $_REQUEST))
+		if (array_key_exists("emulate_platform", $_REQUEST))
 		{
 			self::$platform = $_REQUEST["emulate_platform"];
 		}
@@ -95,7 +98,7 @@ class Mobile
 		{
 			self::$apiVersion = $APPLICATION->get_cookie("MOBILE_APP_VERSION");
 		}
-		elseif(array_key_exists("api_version", $_REQUEST))
+		elseif (array_key_exists("api_version", $_REQUEST))
 		{
 			self::$apiVersion = intval($_REQUEST["api_version"]);
 		}
@@ -108,6 +111,27 @@ class Mobile
 	public function isWebRtcSupported()
 	{
 		return $this->isWebRtcSupported;
+	}
+
+	/**
+	 * Returns true if mobile application made this request in background
+	 * @return bool
+	 */
+	
+	/**
+	* <p>Возвращает <code>true</code>, если запрос был сделан мобильным приложением в фоновом режиме. Метод статический. </p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/isappbackground.php
+	* @author Bitrix
+	*/
+	public static function isAppBackground()
+	{
+		$isBackground = Context::getCurrent()->getServer()->get("HTTP_BX_MOBILE_BACKGROUND");
+		return ($isBackground === "true");
 	}
 
 	/**
@@ -163,7 +187,7 @@ class Mobile
 	 */
 	public function setUserScalable($userScalable)
 	{
-		$this->userScalable = ($userScalable === false?"no":"yes");
+		$this->userScalable = ($userScalable === false ? "no" : "yes");
 	}
 
 	private function __clone()
@@ -198,7 +222,7 @@ class Mobile
 
 		\CJSCore::Init();
 		$APPLICATION->AddHeadString("<script type=\"text/javascript\">var mobileSiteDir=\"" . SITE_DIR . "\"; var appVersion = " . self::$apiVersion . ";var platform = \"" . self::$platform . "\";</script>", false, true);
-		if(self::$platform == "android")
+		if (self::$platform == "android")
 		{
 			/**
 			 * This is workaround for android
@@ -206,7 +230,7 @@ class Mobile
 			 */
 			$APPLICATION->AddHeadString("<script type=\"text/javascript\">console.log(\"bxdata://success\")</script>", false, true);
 		}
-		if(self::getInstance()->getBXScriptSupported())
+		if (self::getInstance()->getBXScriptSupported())
 		{
 			/**
 			 * If the application tells us bxscript-feature is available
@@ -246,6 +270,19 @@ class Mobile
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Конвертирует строку в UTF-8 и возвращает ее. Метод статический.</p>
+	*
+	*
+	* @param mixed $strings = '' Возвращаемая строка в UTF-8 кодировке.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/preparestrtojson.php
+	* @author Bitrix
+	*/
 	public static function PrepareStrToJson($s = '')
 	{
 		return (Application::isUtfMode() ? $s : Encoding::convertEncoding($s, SITE_CHARSET, 'UTF-8'));
@@ -283,13 +320,15 @@ class Mobile
 	}
 
 
-	static public function onMobileInit()
+	public static function onMobileInit()
 	{
-		if(!defined("MOBILE_INIT_EVENT_SKIP"))
+		if (!defined("MOBILE_INIT_EVENT_SKIP"))
 		{
 			$db_events = getModuleEvents("mobileapp", "OnMobileInit");
 			while ($arEvent = $db_events->Fetch())
+			{
 				ExecuteModuleEventEx($arEvent);
+			}
 		}
 	}
 
@@ -298,6 +337,17 @@ class Mobile
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Получает значение dpi для метатега <code>viewport</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/gettargetdpi.php
+	* @author Bitrix
+	*/
 	public function getTargetDpi()
 	{
 		$targetDpi = "medium-dpi";
@@ -334,6 +384,19 @@ class Mobile
 	 *
 	 * @return mixed|string
 	 */
+	
+	/**
+	* <p>Используется для получения текущего значения <code>content=""</code> метатега <code>viewport</code>. Метод нестатический.</p>
+	*
+	*
+	* @param string $width = "" Ширина viewport.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getviewport.php
+	* @author Bitrix
+	*/
 	public function getViewPort($width = "")
 	{
 
@@ -373,8 +436,7 @@ class Mobile
 		}
 
 
-
-		if($this->getWidth())
+		if ($this->getWidth())
 		{
 			$contentAttributes[] = "width=" . $this->getWidth();
 		}
@@ -387,12 +449,14 @@ class Mobile
 		if (toUpper($this->getPlatform()) == "ANDROID")
 		{
 			if (!$this->getWidth())
+			{
 				$contentAttributes[] = "width=device-width";
+			}
 			$contentAttributes[] = "target-densitydpi=" . $this->getTargetDpi();
 		}
 
 
-		$contentAttributes[] = "user-scalable=".$this->getUserScalable();
+		$contentAttributes[] = "user-scalable=" . $this->getUserScalable();
 
 		return str_replace("#content_value#", implode(", ", $contentAttributes), $viewPortMeta);
 	}
@@ -400,6 +464,17 @@ class Mobile
 	/**
 	 * Use it to get value of viewport-metadata for large screen of android based device.
 	 */
+	
+	/**
+	* <p>Возвращает значение метатега <code>viewport</code> для планшетов на базе Android. Метод нестатический. </p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getlargescreenviewport.php
+	* @author Bitrix
+	*/
 	public function getLargeScreenViewPort()
 	{
 		return "<meta id=\"bx_mobile_viewport\" name=\"viewport\" content=\"user-scalable=no width=device-width target-densitydpi=" . $this->getTargetDpi() . "\">";
@@ -412,6 +487,19 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>viewport-metadata</code> для Apple iPad. Метод нестатический.</p>
+	*
+	*
+	* @param integer $width = 320 Ширина экрана устройства.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getipadviewport.php
+	* @author Bitrix
+	*/
 	public function getIPadViewPort($width = 320)
 	{
 		if ($width == false)
@@ -436,6 +524,17 @@ class Mobile
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Используется для получения  значения метатега <code>viewport</code> для portrait режима. Метод нестатичный.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getviewportportrait.php
+	* @author Bitrix
+	*/
 	public function getViewPortPortrait()
 	{
 		return $this->getViewPort($this->deviceWidth);
@@ -446,6 +545,17 @@ class Mobile
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Используется для получения  значения метатега <code>viewport</code> для landscape режима. Метод нестатичный.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getviewportlandscape.php
+	* @author Bitrix
+	*/
 	public function getViewPortLandscape()
 	{
 		return $this->getViewPort($this->deviceHeight);
@@ -466,6 +576,20 @@ class Mobile
 	 *
 	 * @param mixed $minScale the minScale
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>minScale</code> (параметр <code>minimum-scale</code> в метатеге <code>viewport</code>). Метод нестатический.</p>
+	*
+	*
+	* @param mixed $minScale  Минимальный масштаб viewport. Число с точкой (от 0.1 до 10), 1.0 - не
+	* масштабировать. По-умолчанию 0.25 в мобильном Safari.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setminscale.php
+	* @author Bitrix
+	*/
 	public function setMinScale($minScale)
 	{
 		$this->minScale = $minScale;
@@ -487,6 +611,19 @@ class Mobile
 	 *
 	 * @param mixed $iniScale the iniScale
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>iniScale</code> (параметр <code>initial-scale</code> метатега <code>viewport</code> - начальный масштаб страницы). Метод нестатический.</p>
+	*
+	*
+	* @param mixed $iniScale  Начальный масштаб страницы. Чем больше число, тем выше масштаб.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setiniscale.php
+	* @author Bitrix
+	*/
 	public function setIniScale($iniScale)
 	{
 		$this->iniScale = $iniScale;
@@ -497,6 +634,20 @@ class Mobile
 	 *
 	 * @param mixed $maxScale the maxScale
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>maxScale</code> (параметр <code>maximum-scale</code> в метатеге <code>viewport</code>). Метод нестатический.</p>
+	*
+	*
+	* @param mixed $maxScale  Максимальный масштаб viewport. Число с точкой (от 0.1 до 10), 1.0 - не
+	* масштабировать. По-умолчанию 1.6 в мобильном Safari.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setmaxscale.php
+	* @author Bitrix
+	*/
 	public function setMaxScale($maxScale)
 	{
 		$this->maxScale = $maxScale;
@@ -507,6 +658,19 @@ class Mobile
 	 *
 	 * @param mixed $deviceWidth the deviceWidth
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>deviceWidth</code>. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $deviceWidth  Значение <code>deviceWidth</code> - ширина viewport.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setdevicewidth.php
+	* @author Bitrix
+	*/
 	public function setDeviceWidth($deviceWidth)
 	{
 		$this->deviceWidth = $deviceWidth;
@@ -517,6 +681,19 @@ class Mobile
 	 *
 	 * @param mixed $deviceHeight the deviceHeight
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>deviceHeight</code>. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $deviceHeight  Значение <code>deviceHeight</code> - высота viewport.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setdeviceheight.php
+	* @author Bitrix
+	*/
 	public function setDeviceHeight($deviceHeight)
 	{
 		$this->deviceHeight = $deviceHeight;
@@ -527,6 +704,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>pixelRatio</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getpixelratio.php
+	* @author Bitrix
+	*/
 	public function getPixelRatio()
 	{
 		return $this->pixelRatio;
@@ -537,6 +725,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Возвращает значение <code>minScale</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getminscale.php
+	* @author Bitrix
+	*/
 	public function getMinScale()
 	{
 		return $this->minScale;
@@ -547,6 +746,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>iniScale</code> (параметр <code>initial-scale</code> метатега <code>viewport</code> - начальный масштаб страницы). Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getiniscale.php
+	* @author Bitrix
+	*/
 	public function getIniScale()
 	{
 		return $this->iniScale;
@@ -557,6 +767,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Возвращает значение <code>maxScale</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getmaxscale.php
+	* @author Bitrix
+	*/
 	public function getMaxScale()
 	{
 		return $this->maxScale;
@@ -567,6 +788,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>deviceWidth</code> - ширина экрана устройства. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getdevicewidth.php
+	* @author Bitrix
+	*/
 	public function getDeviceWidth()
 	{
 		return $this->deviceWidth;
@@ -577,6 +809,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>deviceHeight</code> - высоту экрана устройства. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getdeviceheight.php
+	* @author Bitrix
+	*/
 	public function getDeviceHeight()
 	{
 		return $this->deviceHeight;
@@ -592,6 +835,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>deviceDpi</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getscreencategory.php
+	* @author Bitrix
+	*/
 	public function getScreenCategory()
 	{
 		return $this->screenCategory;
@@ -612,6 +866,19 @@ class Mobile
 	 *
 	 * @param mixed $largeScreenSupport the $largeScreenSupport
 	 */
+	
+	/**
+	* <p>Устанавливает значение <code>largeScreenSupport</code>. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $largeScreenSupport  the $largeScreenSupport
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setlargescreensupport.php
+	* @author Bitrix
+	*/
 	public function setLargeScreenSupport($largeScreenSupport)
 	{
 		$this->largeScreenSupport = $largeScreenSupport;
@@ -622,6 +889,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>largeScreenSupport</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getlargescreensupport.php
+	* @author Bitrix
+	*/
 	public function getLargeScreenSupport()
 	{
 		return $this->largeScreenSupport;
@@ -632,6 +910,17 @@ class Mobile
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Получает значение <code>scale</code>. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getscale.php
+	* @author Bitrix
+	*/
 	public function getScale()
 	{
 		return $this->scale;
@@ -643,6 +932,19 @@ class Mobile
 	 * @param $scale
 	 */
 
+	
+	/**
+	* <p>Устанавливает значение <code>scale</code>. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $scale  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/setscale.php
+	* @author Bitrix
+	*/
 	public function setScale($scale)
 	{
 		$this->scale = $scale;
@@ -652,6 +954,17 @@ class Mobile
 	 * gets the value of  self::platform
 	 * @return string
 	 */
+	
+	/**
+	* <p>Получает значение <code>self::platform</code>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getplatform.php
+	* @author Bitrix
+	*/
 	public static function getPlatform()
 	{
 		return self::$platform;
@@ -672,6 +985,17 @@ class Mobile
 	 *
 	 * @return int
 	 */
+	
+	/**
+	* <p>Метод устанавливает значение <code>self::$apiVersion</code> - версия API. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getapiversion.php
+	* @author Bitrix
+	*/
 	public static function getApiVersion()
 	{
 		return self::$apiVersion;
@@ -691,6 +1015,17 @@ class Mobile
 	 * Returns phonegap version
 	 * @return string
 	 */
+	
+	/**
+	* <p>Возвращает версию <b>PhoneGap</b>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/getpgversion.php
+	* @author Bitrix
+	*/
 	public static function getPgVersion()
 	{
 		return self::$pgVersion;
@@ -712,6 +1047,17 @@ class Mobile
 	 *  Returns true if device has a large screen
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Возвращает <code>true</code>, если устройство имеет большой экран (<code>LARGE</code> или <code>XLARGE</code>). Метод нестатичный.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/mobileapp/mobile/islarge.php
+	* @author Bitrix
+	*/
 	public function isLarge()
 	{
 		return ($this->getScreenCategory() == "LARGE" || $this->getScreenCategory() == "XLARGE");

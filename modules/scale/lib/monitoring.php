@@ -17,6 +17,17 @@ class Monitoring
 	 * Checks if database files are created
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Проверяет созданы ли файлы мониторинга базы данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/monitoring/isdatabasecreated.php
+	* @author Bitrix
+	*/
 	public static function isDatabaseCreated($hostname)
 	{
 		$dir = new \Bitrix\Main\IO\Directory(static::$rrdPath."/".$hostname);
@@ -27,6 +38,17 @@ class Monitoring
 	 * Checks if monitoring is enabled
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Проверяет включен ли мониторинг. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/monitoring/isenabled.php
+	* @author Bitrix
+	*/
 	public static function isEnabled()
 	{
 		$result = false;
@@ -71,6 +93,21 @@ class Monitoring
 	 * @throws \Exception
 	 * @throws \Bitrix\Main\IO\FileNotFoundException
 	 */
+	
+	/**
+	* <p>Возвращает значение для индикатора загрузки роли сервера в административном интерфейсе Панели управления масштабированием. Метод статический.</p>
+	*
+	*
+	* @param mixed $hostname  Имя хоста.
+	*
+	* @param $hostnam $roleId  ID роли.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/monitoring/getloadbarvalue.php
+	* @author Bitrix
+	*/
 	public static function getLoadBarValue($hostname, $roleId)
 	{
 		if (!extension_loaded('rrd'))

@@ -9,7 +9,9 @@ namespace Bitrix\Sale\Internals;
 
 use Bitrix\Main;
 use Bitrix\Main\Application;
+use Bitrix\Main\Entity\Event;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Discount\Gift;
 
 Loc::loadMessages(__FILE__);
 
@@ -37,7 +39,7 @@ Loc::loadMessages(__FILE__);
  * <li> CREATED_BY int optional
  * <li> PRIORITY int optional default 1
  * <li> LAST_DISCOUNT bool optional default 'Y'
- * <li> VERSION int optional default 1
+ * <li> VERSION int optional default 3
  * <li> CONDITIONS text optional
  * <li> CONDITIONS_LIST text optional
  * <li> UNPACK text optional
@@ -56,6 +58,7 @@ class DiscountTable extends Main\Entity\DataManager
 {
 	const VERSION_OLD = 0x0001;
 	const VERSION_NEW = 0x0002;
+	const VERSION_15 = 0x0003;
 
 	protected static $deleteCoupons = false;
 
@@ -64,6 +67,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы правил работы с корзиной базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sale_discount';
@@ -74,6 +88,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы правил работы с корзиной. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -148,8 +173,8 @@ class DiscountTable extends Main\Entity\DataManager
 				'title' => Loc::getMessage('DISCOUNT_ENTITY_LAST_DISCOUNT_FIELD')
 			)),
 			'VERSION' => new Main\Entity\EnumField('VERSION', array(
-				'values' => array(self::VERSION_OLD, self::VERSION_NEW),
-				'default_value' => self::VERSION_NEW,
+				'values' => array(self::VERSION_OLD, self::VERSION_NEW, self::VERSION_15),
+				'default_value' => self::VERSION_15,
 				'title' => Loc::getMessage('DISCOUNT_ENTITY_VERSION_FIELD')
 			)),
 			'CONDITIONS_LIST' => new Main\Entity\TextField('CONDITIONS_LIST', array(
@@ -192,6 +217,12 @@ class DiscountTable extends Main\Entity\DataManager
 				'Bitrix\Sale\Internals\DiscountCoupon',
 				array('=this.ID' => 'ref.DISCOUNT_ID'),
 				array('join_type' => 'LEFT')
+			),
+			'DISCOUNT_ENTITY' => new Main\Entity\ReferenceField(
+				'DISCOUNT_ENTITY',
+				'Bitrix\Sale\Internals\DiscountEntities',
+				array('=this.ID' => 'ref.DISCOUNT_ID'),
+				array('join_type' => 'LEFT')
 			)
 		);
 	}
@@ -200,6 +231,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>XML_ID</b> (внешний код). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validatexmlid.php
+	* @author Bitrix
+	*/
 	public static function validateXmlId()
 	{
 		return array(
@@ -211,6 +253,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>LID</b> (идентификатор сайта). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validatelid.php
+	* @author Bitrix
+	*/
 	public static function validateLid()
 	{
 		return array(
@@ -222,6 +275,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>NAME</b> (название правила). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -233,6 +297,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>CURRENCY</b> (код валюты). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validatecurrency.php
+	* @author Bitrix
+	*/
 	public static function validateCurrency()
 	{
 		return array(
@@ -244,6 +319,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>DISCOUNT_TYPE</b> (тип правила). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validatediscounttype.php
+	* @author Bitrix
+	*/
 	public static function validateDiscountType()
 	{
 		return array(
@@ -256,6 +342,17 @@ class DiscountTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <b>EXECUTE_MODULE</b>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/validateexecutemodule.php
+	* @author Bitrix
+	*/
 	public static function validateExecuteModule()
 	{
 		return array(
@@ -269,6 +366,25 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param Main\Entity\Event $event		Event object.
 	 * @return Main\Entity\EventResult
 	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onBeforeAdd</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные для добавления.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/onbeforeadd.php
+	* @author Bitrix
+	*/
 	public static function onBeforeAdd(Main\Entity\Event $event)
 	{
 		$result = new Main\Entity\EventResult;
@@ -295,11 +411,68 @@ class DiscountTable extends Main\Entity\DataManager
 	}
 
 	/**
+	 * Default onAfterAdd handler. Absolutely necessary.
+	 *
+	 * @param Main\Entity\Event $event		Event object.
+	 * @return void
+	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onAfterAdd</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные для добавления.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/onafteradd.php
+	* @author Bitrix
+	*/
+	public static function onAfterAdd(Main\Entity\Event $event)
+	{
+		$fields = $event->getParameter('fields');
+		if(isset($fields['ACTIONS_LIST']))
+		{
+			$giftManager = Gift\Manager::getInstance();
+			if(!$giftManager->existsDiscountsWithGift() && $giftManager->isContainGiftAction($fields))
+			{
+				$giftManager->enableExistenceDiscountsWithGift();
+			}
+		}
+	}
+
+	/**
 	 * Default onBeforeUpdate handler. Absolutely necessary.
 	 *
 	 * @param Main\Entity\Event $event		Event object.
 	 * @return Main\Entity\EventResult
 	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onBeforeUpdate</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные для изменения.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/onbeforeupdate.php
+	* @author Bitrix
+	*/
 	public static function onBeforeUpdate(Main\Entity\Event $event)
 	{
 		$result = new Main\Entity\EventResult;
@@ -326,6 +499,25 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param Main\Entity\Event $event		Event object.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onAfterUpdate</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные события.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/onafterupdate.php
+	* @author Bitrix
+	*/
 	public static function onAfterUpdate(Main\Entity\Event $event)
 	{
 		$id = $event->getParameter('id');
@@ -333,6 +525,15 @@ class DiscountTable extends Main\Entity\DataManager
 		$data = $event->getParameter('fields');
 		if (isset($data['ACTIVE']))
 			DiscountGroupTable::changeActiveByDiscount($id, $data['ACTIVE']);
+
+		if(isset($fields['ACTIONS_LIST']))
+		{
+			$giftManager = Gift\Manager::getInstance();
+			if(!$giftManager->existsDiscountsWithGift() && $giftManager->isContainGiftAction($data))
+			{
+				$giftManager->enableExistenceDiscountsWithGift();
+			}
+		}
 		unset($data, $id);
 	}
 
@@ -342,6 +543,25 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param Main\Entity\Event $event		Event object.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onDelete</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные события.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/ondelete.php
+	* @author Bitrix
+	*/
 	public static function onDelete(Main\Entity\Event $event)
 	{
 		$id = $event->getParameter('id');
@@ -363,6 +583,25 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param Main\Entity\Event $event		Event object.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Является обработчиком по умолчанию события <i>onAfterDelete</i>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные события.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/onafterdelete.php
+	* @author Bitrix
+	*/
 	public static function onAfterDelete(Main\Entity\Event $event)
 	{
 		$id = $event->getParameter('id');
@@ -375,6 +614,8 @@ class DiscountTable extends Main\Entity\DataManager
 			DiscountCouponTable::deleteByDiscount(self::$deleteCoupons);
 			self::$deleteCoupons = false;
 		}
+		Gift\RelatedDataTable::deleteByDiscount($id);
+
 		unset($id);
 	}
 
@@ -385,6 +626,21 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param string $use				Value for update use coupons.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод устанавливает флаг наличия купонов для перечисленных в списке правил корзины. Метод статический.</p>
+	*
+	*
+	* @param array $discountList  Массив идентификаторов правил корзины.
+	*
+	* @param string $use  Значение для обновления флага использования купонов.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/setusecoupons.php
+	* @author Bitrix
+	*/
 	public static function setUseCoupons($discountList, $use)
 	{
 		if (!is_array($discountList))
@@ -402,6 +658,11 @@ class DiscountTable extends Main\Entity\DataManager
 			' set '.$helper->quote('USE_COUPONS').' = \''.$use.'\' where '.
 			$helper->quote('ID').' in ('.implode(',', $discountList).')'
 		);
+
+		if($use === 'Y')
+		{
+			Gift\RelatedDataTable::deleteByDiscounts($discountList);
+		}
 	}
 
 	/**
@@ -410,6 +671,20 @@ class DiscountTable extends Main\Entity\DataManager
 	 * @param string $use				Value for update use coupons for all discount.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод устанавливает флаг наличия купонов для всех правил корзины. Метод статический.</p>
+	*
+	*
+	* @param string $use  Значение для обновления флага использования купонов для всех
+	* правил.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discounttable/setallusecoupons.php
+	* @author Bitrix
+	*/
 	public static function setAllUseCoupons($use)
 	{
 		$use = (string)$use;

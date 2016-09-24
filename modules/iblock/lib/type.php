@@ -28,6 +28,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает путь к файлу, содержащему определение класса. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/getfilepath.php
+	* @author Bitrix
+	*/
 	public static function getFilePath()
 	{
 		return __FILE__;
@@ -38,6 +49,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы типов инфоблоков в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock_type';
@@ -48,6 +70,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы типов инфоблоков. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -93,6 +126,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>ID</code> (идентификатор типа инфоблоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/validateid.php
+	* @author Bitrix
+	*/
 	public static function validateId()
 	{
 		return array(
@@ -105,6 +149,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>EDIT_FILE_BEFORE</code> (полный путь к файлу-обработчику массива полей элемента перед сохранением на странице редактирования элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/validateeditfilebefore.php
+	* @author Bitrix
+	*/
 	public static function validateEditFileBefore()
 	{
 		return array(
@@ -117,6 +172,17 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>EDIT_FILE_AFTER</code> (полный путь к файлу-обработчику вывода интерфейса редактирования элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/validateeditfileafter.php
+	* @author Bitrix
+	*/
 	public static function validateEditFileAfter()
 	{
 		return array(
@@ -132,6 +198,25 @@ class TypeTable extends Entity\DataManager
 	 *
 	 * @return \Bitrix\Main\Entity\EventResult
 	 */
+	
+	/**
+	* <p>Обработчик удаляет информационные блоки заданного типа и языковые сообщения из базы данных. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Содержит информацию о типе, инфоблоки которого будут удалены.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typetable/ondelete.php
+	* @author Bitrix
+	*/
 	public static function onDelete(\Bitrix\Main\Entity\Event $event)
 	{
 		$id = $event->getParameter("id");

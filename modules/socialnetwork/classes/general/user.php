@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети. 
+ * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.
  *
  *
  * @return mixed 
@@ -16,7 +16,7 @@ class CAllSocNetUser
 {
 	public static function OnUserDelete($ID)
 	{
-		global $DB;
+		global $APPLICATION;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
@@ -26,9 +26,10 @@ class CAllSocNetUser
 
 		if (!CSocNetGroup::DeleteNoDemand($ID))
 		{
-			if($ex = $GLOBALS["APPLICATION"]->GetException())
-				$err = $ex->GetString();
-			$GLOBALS["APPLICATION"]->ThrowException($err);				
+			if($ex = $APPLICATION->GetException())
+			{
+				$APPLICATION->ThrowException($ex->GetString());
+			}
 			$bSuccess = false;
 		}
 
@@ -87,23 +88,24 @@ class CAllSocNetUser
 	
 	public static function OnBeforeProlog()
 	{
-		if (!$GLOBALS["USER"]->IsAuthorized())
+		global $USER;
+
+		if (!$USER->IsAuthorized())
 			return;
 
-		CUser::SetLastActivityDate($GLOBALS["USER"]->GetID());
+		CUser::SetLastActivityDate($USER->GetID());
 	}
 
 	public static function OnUserInitialize($user_id, $arFields = array())
 	{
+		global $CACHE_MANAGER;
+
 		if (intval($user_id) <= 0)
 		{
 			return false;
 		}
 
-		if (CModule::IncludeModule("im"))
-		{
-			$bIM = true;
-		}
+		$bIM = (CModule::IncludeModule("im"));
 
 		$dbRelation = CSocNetUserToGroup::GetList(
 			array(), 
@@ -123,9 +125,9 @@ class CAllSocNetUser
 				&& defined("BX_COMP_MANAGED_CACHE")
 			)
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arRelation["GROUP_ID"]);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$user_id);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_G".$arRelation["GROUP_ID"]);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_U".$user_id);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group");
 				if ($bIM)
 				{
 					CIMNotify::DeleteByTag("SOCNET|INVITE_GROUP|".$user_id."|".intval($arRelation["ID"]));
@@ -136,12 +138,12 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Метод проверяет, находится ли сейчас пользователь на сайте. Пользователь находится на сайте, если он совершал на сайте какие-либо действия за последние 2 минуты.</p>
+	* <p>Метод проверяет, находится ли сейчас пользователь на сайте. Пользователь находится на сайте, если он совершал на сайте какие-либо действия за последние 2 минуты. Метод статический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
-	* @return bool <p>True, если пользователь сейчас на сайте. Иначе - false.</p> <br><br>
+	* @return bool <p>True, если пользователь сейчас на сайте. Иначе - false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/IsOnLine.php
@@ -158,10 +160,10 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Проверяет, разрешен ли функционал друзей.</p>
+	* <p>Проверяет, разрешен ли функционал друзей. Метод статический.</p>
 	*
 	*
-	* @return bool <p>True, если функционал друзей включен на сайте. Иначе - false.</p> <br><br>
+	* @return bool <p>True, если функционал друзей включен на сайте. Иначе - false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/isfriendsallowed.php
@@ -179,10 +181,10 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Метод проверяет, есть ли у текущего пользователя административные права на доступ к модулю социальной сети.</p>
+	* <p>Метод проверяет, есть ли у текущего пользователя административные права на доступ к модулю социальной сети. Метод статический.</p>
 	*
 	*
-	* @param ) $;  Идентификатор сайта, необязательный параметр. По умолчанию
+	* @param mixed $mixed);  Идентификатор сайта, необязательный параметр. По умолчанию
 	* подставляется текущий сайт.
 	*
 	* @param string $site_id = SITE_ID Параметр, указывающий использовать текущую сессию авторизации
@@ -192,10 +194,10 @@ class CAllSocNetUser
 	*
 	* @return bool <p>Если пользователь является администратором или имеет права
 	* записи на модуль социальной сети, то метод возвращает true, иначе -
-	* false.</p> <a name="examples"></a>
+	* false.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CSocNetUser::IsCurrentUserModuleAdmin())
 	* {
@@ -211,20 +213,22 @@ class CAllSocNetUser
 	*/
 	public static function IsCurrentUserModuleAdmin($site_id = SITE_ID, $bUseSession = true)
 	{
-		if (!is_object($GLOBALS["USER"]) || !$GLOBALS["USER"]->IsAuthorized())
+		global $APPLICATION, $USER;
+
+		if (!is_object($USER) || !$USER->IsAuthorized())
 			return false;
-			
+
 		if ($bUseSession && !isset($_SESSION["SONET_ADMIN"]))
 			return false;
 
-		if ($GLOBALS["USER"]->IsAdmin())
+		if ($USER->IsAdmin())
 			return true;
 
 		if (is_array($site_id))
 		{
 			foreach ($site_id as $site_id_tmp)
 			{
-				$modulePerms = $GLOBALS["APPLICATION"]->GetGroupRight("socialnetwork", false, "Y", "Y", array($site_id_tmp, false));
+				$modulePerms = $APPLICATION->GetGroupRight("socialnetwork", false, "Y", "Y", array($site_id_tmp, false));
 				if ($modulePerms >= "W")
 					return true;
 			}
@@ -232,16 +236,13 @@ class CAllSocNetUser
 		}
 		else
 		{
-			$modulePerms = $GLOBALS["APPLICATION"]->GetGroupRight("socialnetwork", false, "Y", "Y", ($site_id ? array($site_id, false) : false));
+			$modulePerms = $APPLICATION->GetGroupRight("socialnetwork", false, "Y", "Y", ($site_id ? array($site_id, false) : false));
 			return ($modulePerms >= "W");
 		}
 	}
 
 	public static function IsUserModuleAdmin($userID, $site_id = SITE_ID)
 	{
-		global $DB, $CACHE_MANAGER;
-		static $arSocnetModuleAdminsCache = array();
-
 		if ($userID <= 0)
 		{
 			return false;
@@ -256,104 +257,9 @@ class CAllSocNetUser
 			$site_id = array_merge($site_id, array(false));
 		}
 
-		$cache_key = serialize($site_id);
-		if (!array_key_exists($cache_key, $arSocnetModuleAdminsCache))
-		{
-			$cache = new CPHPCache;
-			$cache_time = 31536000;
-			$cache_id = 'site'.($site_id ? '_'.implode('|', $site_id) : '');
-			$cache_path = "/sonet/user_admin/";
+		$arModuleAdmin = \Bitrix\Socialnetwork\User::getModuleAdminList($site_id);
 
-			$arModuleAdmins = array();
-
-			if ($cache->InitCache($cache_time, $cache_id, $cache_path))
-			{
-				$arCacheVars = $cache->GetVars();
-				$arModuleAdmins = $arCacheVars["RESULT"];
-			}
-			else
-			{
-				$cache->StartDataCache($cache_time, $cache_id, $cache_path);
-
-				if(!$site_id)
-				{
-					$strSqlSite = "AND MG.SITE_ID IS NULL";
-				}
-				else
-				{
-					$strSqlSite = " AND (";
-					foreach($site_id as $i => $site_id_tmp)
-					{
-						if($i > 0)
-						{
-							$strSqlSite .= " OR ";
-						}
-
-						$strSqlSite .= "MG.SITE_ID " . ($site_id_tmp ? "= '" . $DB->ForSQL($site_id_tmp) . "'" : "IS NULL");
-					}
-					$strSqlSite .= ")";
-				}
-
-				$strSql = "SELECT " .
-					"UG.USER_ID U_ID, " .
-					"G.ID G_ID, " .
-					"MAX(".CDatabase::DatetimeToTimestampFunction("UG.DATE_ACTIVE_FROM").") UG_DATE_FROM_TS, " .
-					"MAX(".CDatabase::DatetimeToTimestampFunction("UG.DATE_ACTIVE_TO").") UG_DATE_TO_TS, " .
-					"MAX(MG.G_ACCESS) G_ACCESS " .
-					"FROM b_user_group UG, b_module_group MG, b_group G  " .
-					"WHERE " .
-					"	(G.ID = MG.GROUP_ID or G.ID = 1) " .
-					"	AND MG.MODULE_ID = 'socialnetwork' " .
-					"	AND G.ID = UG.GROUP_ID " .
-					"	AND G.ACTIVE = 'Y' " .
-					"	AND G_ACCESS >= 'W' " .
-					"	AND (G.ANONYMOUS<>'Y' OR G.ANONYMOUS IS NULL) " .
-						$strSqlSite .
-					" " .
-					"GROUP BY " .
-					"	UG.USER_ID, G.ID";
-
-				$result = $DB->Query($strSql, false, "FILE: " . __FILE__ . "<br> LINE: " . __LINE__);
-				while($ar = $result->Fetch())
-				{
-					if(!array_key_exists($ar["U_ID"], $arModuleAdmins))
-					{
-						$arModuleAdmins[$ar["U_ID"]] = array(
-							"USER_ID" => $ar["U_ID"],
-							"DATE_FROM_TS" => $ar["UG_DATE_FROM_TS"],
-							"DATE_TO_TS" => $ar["UG_DATE_TO_TS"]
-						);
-					}
-				}
-			}
-
-			$arCacheData = Array(
-				"RESULT" => $arModuleAdmins
-			);
-
-			$cache->EndDataCache($arCacheData);
-
-			foreach ($arModuleAdmins as $key => $arUserData)
-			{
-				if (
-					(
-						!empty($arUserData["DATE_FROM_TS"])
-						&& $arUserData["DATE_FROM_TS"] > time()
-					)
-					|| (
-						!empty($arUserData["DATE_TO_TS"])
-						&& $arUserData["DATE_TO_TS"] < time()
-					)
-				)
-				{
-					unset($arModuleAdmins[$key]);
-				}
-			}
-
-			$arSocnetModuleAdminsCache[$cache_key] = $arModuleAdmins;
-		}
-
-		return (array_key_exists($userID, $arSocnetModuleAdminsCache[$cache_key]));
+		return (array_key_exists($userID, $arModuleAdmin));
 	}
 
 	public static function DeleteUserAdminCache()
@@ -363,17 +269,17 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Метод подготавливает имя пользователя для вывода.</p>
+	* <p>Метод подготавливает имя пользователя для вывода. Метод статический.</p>
 	*
 	*
 	* @param string $name  Имя пользователя.
 	*
-	* @param string $lastName  Фамилия пользователя. </htm
+	* @param string $lastName  Фамилия пользователя.
 	*
-	* @param string $login  Логин пользователя. </h
+	* @param string $login  Логин пользователя.
 	*
 	* @return string <p>Возвращается строка, содержащая отформатированное имя
-	* пользователя.</p> <br><br>
+	* пользователя.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/formatname.php
@@ -397,23 +303,23 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Метод подготавливает имя пользователя для вывода в расширенном виде.</p>
+	* <p>Метод подготавливает имя пользователя для вывода в расширенном виде. Метод статический.</p>
 	*
 	*
 	* @param string $name  Имя пользователя.
 	*
-	* @param string $secondName  Отчество пользователя. </htm
+	* @param string $secondName  Отчество пользователя.
 	*
-	* @param string $lastName  Фамилия пользователя. </htm
+	* @param string $lastName  Фамилия пользователя.
 	*
-	* @param string $login  Логин пользователя </h
+	* @param string $login  Логин пользователя
 	*
 	* @param string $email  E-Mail пользователя.
 	*
-	* @param string $id  Код пользователя. </h
+	* @param string $stringid  Код пользователя.
 	*
 	* @return string <p>Возвращается строка, содержащая отформатированное имя
-	* пользователя.</p> <br><br>
+	* пользователя.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/formatnameex.php
@@ -447,7 +353,7 @@ class CAllSocNetUser
 
 	
 	/**
-	* <p>Метод ищет пользователя по его имени или коду.</p>
+	* <p>Метод ищет пользователя по его имени или коду. Метод статический.</p>
 	*
 	*
 	* @param string $user  Имя или код пользователя. Если параметр является числом или
@@ -459,7 +365,7 @@ class CAllSocNetUser
 	* @param bool $bIntranet = false Флаг, определяющий, осуществляется ли работа в рамках решения
 	* интранет. Необязательный параметр. По умолчанию равен false.
 	*
-	* @return array <p>Массив пользователей, удовлетворяющих условию поиска.</p> <br><br>
+	* @return array <p>Массив пользователей, удовлетворяющих условию поиска.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuser/searchuser.php
@@ -658,5 +564,237 @@ class CAllSocNetUser
 		return array_keys($arUserFields);
 	}
 
+	public static function CanProfileView($currentUserId, $arUser, $siteId = SITE_ID, $arContext = array())
+	{
+		global $USER;
+
+		if (
+			!is_array($arUser)
+			&& intval($arUser) > 0
+		)
+		{
+			$dbUser = CUser::GetByID(intval($arUser));
+			$arUser = $dbUser->Fetch();
+		}
+
+		if (
+			!is_array($arUser)
+			|| !isset($arUser["ID"])
+			|| intval($arUser["ID"]) <= 0
+		)
+		{
+			return false;
+		}
+
+		if (
+			$currentUserId == $USER->GetId()
+			&& self::IsCurrentUserModuleAdmin()
+		)
+		{
+			return true;
+		}
+
+		if (self::OnGetProfileView($currentUserId, $arUser, $siteId, $arContext)) // only for email users
+		{
+			return true;
+		}
+
+		$bFound = false;
+		foreach(GetModuleEvents("socialnetwork", "OnGetProfileView", true) as $arEvent)
+		{
+			if (IsModuleInstalled($arEvent["TO_MODULE_ID"]))
+			{
+				$bFound = true;
+				if (ExecuteModuleEventEx($arEvent, Array($currentUserId, $arUser, $siteId, $arContext, false)) === true)
+				{
+					return true;
+				}
+			}
+		}
+
+		return (!$bFound);
+	}
+
+	public static function OnGetProfileView($currentUserId, $arUser, $siteId, $arContext)
+	{
+		if (!IsModuleInstalled('mail'))
+		{
+			return false;
+		}
+
+		if (
+			intval($currentUserId) <= 0
+			|| !isset($arContext)
+			|| !isset($arContext["ENTITY_TYPE"])
+			|| !in_array($arContext["ENTITY_TYPE"], array("LOG_ENTRY"))
+			|| !isset($arContext["ENTITY_ID"])
+			|| intval($arContext["ENTITY_ID"]) <= 0
+			|| !is_array($arUser)
+			|| !isset($arUser["ID"])
+			|| intval($arUser["ID"]) <= 0
+		)
+		{
+			return false;
+		}
+
+		if (
+			(
+				isset($arUser["EXTERNAL_AUTH_ID"])
+				&& $arUser["EXTERNAL_AUTH_ID"] == 'email'
+			) // -> email user
+			||
+			(
+				($rsCurrentUser = CUser::GetByID(intval($currentUserId)))
+				&& ($arCurrentUser = $rsCurrentUser->Fetch())
+				&& ($arCurrentUser["EXTERNAL_AUTH_ID"] == 'email')
+			) // email user ->
+		)
+		{
+			return self::CheckContext($currentUserId, $arUser["ID"], $arContext);
+		}
+
+		return false;
+	}
+
+	public static function CheckContext($currentUserId = false, $userId = false, $arContext = array())
+	{
+		if (
+			intval($currentUserId) <= 0
+			|| intval($userId) <= 0
+			|| !is_array($arContext)
+			|| empty($arContext["ENTITY_TYPE"])
+			|| empty($arContext["ENTITY_ID"])
+		)
+		{
+			return false;
+		}
+
+		if ($arContext["ENTITY_TYPE"] == "LOG_ENTRY")
+		{
+			$dbRes = CSocNetLogRights::GetList(
+				array(),
+				array(
+					"LOG_ID" => intval($arContext["ENTITY_ID"])
+				)
+			);
+
+			$arLogEntryUserId = $arSonetGroupId = $arDepartmentId = array();
+			$bIntranetInstalled = IsModuleInstalled('intranet');
+
+			while ($arRes = $dbRes->Fetch())
+			{
+				if (preg_match('/^U(\d+)$/', $arRes["GROUP_CODE"], $matches))
+				{
+					$arLogEntryUserId[] = $matches[1];
+				}
+				elseif (
+					preg_match('/^SG(\d+)$/', $arRes["GROUP_CODE"], $matches)
+					|| preg_match('/^SG(\d+)_'.SONET_ROLES_USER.'$/', $arRes["GROUP_CODE"], $matches)
+					&& !in_array($matches[1], $arSonetGroupId)
+				)
+				{
+					$arSonetGroupId[] = $matches[1];
+				}
+				elseif (
+					$bIntranetInstalled
+					&& preg_match('/^DR(\d+)$/', $arRes["GROUP_CODE"], $matches)
+					&& !in_array($matches[1], $arDepartmentId)
+				)
+				{
+					$arDepartmentId[] = $matches[1];
+				}
+				elseif ($arRes["GROUP_CODE"] == 'G2')
+				{
+					if (!empty($arContext['SITE_ID']))
+					{
+						$arLogSite = array();
+						$rsSite = CSocNetLog::GetSite(intval($arContext["ENTITY_ID"]));
+						while ($arSite = $rsSite->Fetch())
+						{
+							$arLogSite[] = $arSite["SITE_ID"];
+						}
+
+						return in_array($arContext['SITE_ID'], $arLogSite);
+					}
+				}
+			}
+
+			if (
+				in_array($currentUserId, $arLogEntryUserId)
+				&& in_array($userId, $arLogEntryUserId)
+			)
+			{
+				return true;
+			}
+			else // check by log USER_ID field / author
+			{
+				if (in_array($userId, $arLogEntryUserId))
+				{
+					if (!empty($arSonetGroupId))
+					{
+						foreach($arSonetGroupId as $groupId)
+						{
+							if (CSocNetUserToGroup::GetUserRole($currentUserId, $groupId) <= SONET_ROLES_USER)
+							{
+								return true;
+							}
+						}
+					}
+
+					if (
+						!empty($arDepartmentId)
+						&& CModule::IncludeModule('intranet')
+					)
+					{
+						$arDepartmentUserId = array();
+
+						$rsDepartmentUserId = \Bitrix\Intranet\Util::getDepartmentEmployees(array(
+							'DEPARTMENTS' => $arDepartmentId,
+							'RECURSIVE' => 'Y',
+							'ACTIVE' => 'Y',
+							'CONFIRMED' => 'Y',
+							'SELECT' => array('ID')
+						));
+
+						while ($arUser = $rsDepartmentUserId->Fetch())
+						{
+							$arDepartmentUserId[] = $arUser["ID"];
+						}
+
+						if (in_array($currentUserId, $arDepartmentUserId))
+						{
+							return true;
+						}
+					}
+				}
+
+				$rsLog = CSocNetLog::GetList(
+					array(),
+					array(
+						"ID" => intval($arContext["ENTITY_ID"])
+					),
+					false,
+					false,
+					array(
+						"USER_ID"
+					)
+				);
+				if ($arLog = $rsLog->Fetch())
+				{
+					return (
+						(
+							in_array($currentUserId, $arLogEntryUserId)
+							&& ($userId == $arLog["USER_ID"])
+						)
+						|| (
+							in_array($userId, $arLogEntryUserId)
+							&& ($currentUserId == $arLog["USER_ID"])
+						)
+					);
+				}
+			}
+		}
+
+		return false;
+	}
 }
-?>

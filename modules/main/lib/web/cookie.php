@@ -6,14 +6,14 @@ class Cookie
 	const SPREAD_SITES = 1;
 	const SPREAD_DOMAIN = 2;
 
-	private $domain;
-	private $expires;
-	private $httpOnly = false;
-	private $spread;
-	private $name;
-	private $path = '/';
-	private $secure = false;
-	private $value;
+	protected $domain;
+	protected $expires;
+	protected $httpOnly = true;
+	protected $spread;
+	protected $name;
+	protected $path = '/';
+	protected $secure = false;
+	protected $value;
 
 	public function __construct($name, $value, $expires = null)
 	{
@@ -27,7 +27,7 @@ class Cookie
 		$this->setDefaultsFromConfig();
 	}
 
-	private static function generateCookieName($name)
+	protected static function generateCookieName($name)
 	{
 		$cookiePrefix = \Bitrix\Main\Config\Option::get("main", "cookie_name", "BITRIX_SM")."_";
 		if (strpos($name, $cookiePrefix) !== 0)
@@ -35,7 +35,7 @@ class Cookie
 		return $name;
 	}
 
-	private function setDefaultsFromConfig()
+	protected function setDefaultsFromConfig()
 	{
 		$cookiesSettings = \Bitrix\Main\Config\Configuration::getValue("cookies");
 

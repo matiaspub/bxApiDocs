@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту. 
+ * <b>CPath</b> - класс для получения данных о <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">путях</a> по сайту.
  *
  *
  * @return mixed 
@@ -19,58 +19,64 @@ class CPath
 	*
 	* @param int $parent_id = "" ID "родительского" отрезка пути (предшествовавшему текущему).
 	*
-	* @param string $counter_type = "COUNTER_FULL_PATH" Тип счетчика, возможные значения: <ul> <li> <b>COUNTER_FULL_PATH</b> - количество
-	* переходов по полному пути; </li> <li> <b>COUNTER</b> - количество переходов
-	* по отрезку пути. </li> </ul>
+	* @param string $counter_type = "COUNTER_FULL_PATH" Тип счетчика, возможные значения:          <ul> <li> <b>COUNTER_FULL_PATH</b> -
+	* количество переходов по полному пути; </li>                    <li> <b>COUNTER</b> -
+	* количество переходов по отрезку пути. </li>         </ul>
 	*
-	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_counter</b> - значение
-	* счетчика тип которого задается в <i>counter_type</i>; </li> <li> <b>s_last_page</b> -
-	* последняя страница отрезка пути (используется только если
-	* <i>counter_type</i>=<b>COUNTER</b>); </li> <li> <b>s_pages</b> - набор всех страниц полного
-	* пути (используется только если <i>counter_type</i>=<b>COUNTER_FULL_PATH</b>). </li> </ul>
+	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_counter</b> -
+	* значение счетчика тип которого задается в <i>counter_type</i>; </li>                
+	*    <li> <b>s_last_page</b> - последняя страница отрезка пути (используется
+	* только если <i>counter_type</i>=<b>COUNTER</b>); </li>                    <li> <b>s_pages</b> - набор
+	* всех страниц полного пути (используется только если
+	* <i>counter_type</i>=<b>COUNTER_FULL_PATH</b>). </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>PATH_ID</b>* - ID отрезка пути; </li> <li>
-	* <b>PATH_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>PATH_ID</b> будет искаться вхождение; </li> <li> <b>DATE1</b> - начальное
-	* значение для интервала даты; </li> <li> <b>DATE2</b> - конечное значение для
-	* интервала даты; </li> <li> <b>FIRST_PAGE</b>* - первая страница пути; </li> <li>
-	* <b>FIRST_PAGE_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>FIRST_PAGE</b> будет искаться точное совпадение; </li> <li> <b>FIRST_PAGE_SITE_ID</b> -
-	* ID сайта первой страницы пути; </li> <li> <b>FIRST_PAGE_SITE_ID_EXACT_MATCH</b> - если
-	* значение равно "N", то при фильтрации по <b>FIRST_PAGE_SITE_ID</b> будет
-	* искаться вхождение; </li> <li> <b>FIRST_PAGE_404</b> - была ли <a
+	* допустимы следующие ключи:          <ul> <li> <b>PATH_ID</b>* - ID отрезка пути; </li>
+	*                    <li> <b>PATH_ID_EXACT_MATCH</b> - если значение равно "N", то при
+	* фильтрации по <b>PATH_ID</b> будет искаться вхождение; </li>                    <li>
+	* <b>DATE1</b> - начальное значение для интервала даты; </li>                    <li>
+	* <b>DATE2</b> - конечное значение для интервала даты; </li>                    <li>
+	* <b>FIRST_PAGE</b>* - первая страница пути; </li>                    <li> <b>FIRST_PAGE_EXACT_MATCH</b>
+	* - если значение равно "Y", то при фильтрации по <b>FIRST_PAGE</b> будет
+	* искаться точное совпадение; </li>                    <li> <b>FIRST_PAGE_SITE_ID</b> - ID
+	* сайта первой страницы пути; </li>                    <li> <b>FIRST_PAGE_SITE_ID_EXACT_MATCH</b> -
+	* если значение равно "N", то при фильтрации по <b>FIRST_PAGE_SITE_ID</b> будет
+	* искаться вхождение; </li>                    <li> <b>FIRST_PAGE_404</b> - была ли <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на первой странице
-	* пути, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> - не была. </li>
-	* </ul> </li> <li> <b>LAST_PAGE</b>* - последняя страница пути; </li> <li>
-	* <b>LAST_PAGE_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>LAST_PAGE</b> будет искаться точное совпадение; </li> <li> <b>LAST_PAGE_SITE_ID</b>* -
-	* ID сайта последней страницы пути; </li> <li> <b>LAST_PAGE_SITE_ID_EXACT_MATCH</b> - если
-	* значение равно "N", то при фильтрации по <b>LAST_PAGE_SITE_ID</b> будет
-	* искаться вхождение; </li> <li> <b>LAST_PAGE_404</b> - была ли <a
+	* пути, возможные значения:              <ul> <li> <b>Y</b> - была; </li>                        
+	*    <li> <b>N</b> - не была. </li>             </ul> </li>                    <li> <b>LAST_PAGE</b>* -
+	* последняя страница пути; </li>                    <li> <b>LAST_PAGE_EXACT_MATCH</b> - если
+	* значение равно "Y", то при фильтрации по <b>LAST_PAGE</b> будет искаться
+	* точное совпадение; </li>                    <li> <b>LAST_PAGE_SITE_ID</b>* - ID сайта
+	* последней страницы пути; </li>                    <li> <b>LAST_PAGE_SITE_ID_EXACT_MATCH</b> -
+	* если значение равно "N", то при фильтрации по <b>LAST_PAGE_SITE_ID</b> будет
+	* искаться вхождение; </li>                    <li> <b>LAST_PAGE_404</b> - была ли <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на последней
-	* странице пути, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> -
-	* не была. </li> </ul> </li> <li> <b>PAGE</b>* - произвольная страница пути </li> <li>
-	* <b>PAGE_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>PAGE</b>
-	* будет искаться вхождение </li> <li> <b>PAGE_SITE_ID</b> - ID сайта произвольной
-	* страницы пути </li> <li> <b>PAGE_404</b> - была ли <a
+	* странице пути, возможные значения:              <ul> <li> <b>Y</b> - была; </li>       
+	*                     <li> <b>N</b> - не была. </li>             </ul> </li>                    <li> <b>PAGE</b>* -
+	* произвольная страница пути </li>                    <li> <b>PAGE_EXACT_MATCH</b> - если
+	* значение равно "N", то при фильтрации по <b>PAGE</b> будет искаться
+	* вхождение </li>                    <li> <b>PAGE_SITE_ID</b> - ID сайта произвольной
+	* страницы пути </li>                    <li> <b>PAGE_404</b> - была ли <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на произвольной
-	* странице пути, возможные значения: <ul> <li> <b>Y</b> - была </li> <li> <b>N</b> - не
-	* была. </li> </ul> </li> <li> <b>ADV</b>* - ID рекламной кампании, по посетителям
-	* которой надо получить данные; </li> <li> <b>ADV_EXACT_MATCH</b> - если значение
-	* равно "N", то при фильтрации по <b>ADV</b> будет искаться вхождение; </li>
-	* <li> <b>ADV_DATA_TYPE</b> - флаг типа данных для рекламной кампании,
-	* возможные значения: <ul> <li> <b>P</b> - только по <a
+	* странице пути, возможные значения:              <ul> <li> <b>Y</b> - была </li>        
+	*                    <li> <b>N</b> - не была. </li>             </ul> </li>                    <li> <b>ADV</b>* - ID
+	* рекламной кампании, по посетителям которой надо получить данные;
+	* </li>                    <li> <b>ADV_EXACT_MATCH</b> - если значение равно "N", то при
+	* фильтрации по <b>ADV</b> будет искаться вхождение; </li>                    <li>
+	* <b>ADV_DATA_TYPE</b> - флаг типа данных для рекламной кампании, возможные
+	* значения:              <ul> <li> <b>P</b> - только по <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямым заходам</a> по
-	* рекламной кампании; </li> <li> <b>B</b> - только по <a
+	* рекламной кампании; </li>                            <li> <b>B</b> - только по <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возвратам</a> по рекламной
-	* кампании; </li> <li> <b>S</b> - сумма по прямым заходам и возвратам. </li> </ul>
-	* </li> <li> <b>STEPS1</b> - начальное значение интервала для поля "количество
-	* страниц в пути"; </li> <li> <b>STEPS2</b> - конечное значение интервала для
-	* поля "количество страниц в пути". </li> </ul> * - допускается <a
+	* кампании; </li>                            <li> <b>S</b> - сумма по прямым заходам и
+	* возвратам. </li>             </ul> </li>                    <li> <b>STEPS1</b> - начальное
+	* значение интервала для поля "количество страниц в пути"; </li>            
+	*        <li> <b>STEPS2</b> - конечное значение интервала для поля "количество
+	* страниц в пути". </li>         </ul>       * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка записей. Если значение равно "true",
@@ -79,7 +85,7 @@ class CPath
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем данные по полным путям пройденных посетителями
 	* // рекламной кампании #1 или #2
@@ -108,8 +114,8 @@ class CPath
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">Термин "Полный путь"</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
-	* пути"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
+	* пути"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -284,12 +290,12 @@ class CPath
 	* <p>По указанному ID записи, метод возвращает данные из таблицы, хранящей статистическую информацию как по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">полным путям</a>, так и по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">отрезкам путей</a> в разрезе по дням.</p>
 	*
 	*
-	* @param int $id  ID записи из таблицы. </h
+	* @param mixed $intid  ID записи из таблицы.
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $path_id = 1;
 	* if ($rs = <b>CPath::GetByID</b>($path_id))
@@ -304,8 +310,8 @@ class CPath
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path">Термин "Полный путь"</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
-	* пути"</a> </li> </ul> <a name="examples"></a>
+	* 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#path_step">Термин "Отрезок
+	* пути"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static

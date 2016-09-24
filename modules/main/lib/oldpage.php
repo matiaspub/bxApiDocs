@@ -72,7 +72,7 @@ class OldPage extends \Bitrix\Main\Page
 	}
 
 
-public static 	public function init()
+	static public function init()
 	{
 		//language independed classes
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/punycode.php");
@@ -90,7 +90,7 @@ public static 	public function init()
 		$GLOBALS["APPLICATION"] = new \CMain;
 
 		if(defined("SITE_ID"))
-			define("LANG", SITE_ID);
+			// define("LANG", SITE_ID);
 
 		if(defined("LANG"))
 		{
@@ -104,7 +104,7 @@ public static 	public function init()
 		else
 		{
 			$arLang = $GLOBALS["APPLICATION"]->getLang();
-			// define("LANG", $arLang["LID"]);
+			define("LANG", $arLang["LID"]);
 		}
 
 		$lang = $arLang["LID"];
@@ -231,7 +231,7 @@ public static 	public function init()
 		$GLOBALS["arCustomTemplateEngines"] = array();
 	}
 
-public static 	public function authorizeUser()
+	static public function authorizeUser()
 	{
 		// раскомментировать когда уберем из CurrentUser вызовы USER
 		//$GLOBALS["USER"] = new \CUser;

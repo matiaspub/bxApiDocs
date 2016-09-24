@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями. 
+ * <b>CSocNetUserRelations</b> - класс для работы со связями между пользователями.
  *
  *
  * @return mixed 
@@ -19,7 +19,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	/***************************************/
 	
 	/**
-	* <p>Метод создает новую связь между пользователями.</p>
+	* <p>Метод создает новую связь между пользователями. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
@@ -33,13 +33,11 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* инициирована связь: F - первым пользователем, S - вторым.
 	*
 	* @return int <p>Код связи в случае успешного выполнения или false в случае
-	* ошибки.</p> <a name="examples"></a>
+	* ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* В случае успеха возвращает ID пользователя в соцсети.
-	* 
-	* 
 	* &lt;?
 	* // Добавление связей
 	* $arFields = array(
@@ -54,8 +52,6 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* $userAdd = CSocNetUserRelations::Add($arFields);
 	* echo '=&lt;pre&gt;'; print_r($userAdd); echo '&lt;/pre&gt;=';
 	* ?&gt;
-	* 
-	* </ht
 	* </pre>
 	*
 	*
@@ -142,10 +138,10 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 
 	
 	/**
-	* <p>Метод изменяет связь между пользователями.</p>
+	* <p>Метод изменяет связь между пользователями. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код связи.
+	* @param int $intid  Код связи.
 	*
 	* @param array $arFields  Массив параметров связи. Может иметь ключи:<br><b>FIRST_USER_ID</b> - код
 	* первого пользователя,<br><b>SECOND_USER_ID</b> - код второго
@@ -158,7 +154,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* инициирована связь: F - первым пользователем, S - вторым.
 	*
 	* @return int <p>Код связи в случае успешного выполнения или false в случае
-	* ошибки.</p> <br><br>
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/update.php
@@ -245,14 +241,14 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает список связей между пользователями в соответствии с фильтром.</p>
+	* <p>Метод возвращает список связей между пользователями в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения.
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
@@ -514,9 +510,9 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		return $dbRes;
 	}
 
-
+	
 	/**
-	* <p>Метод возвращает список друзей, упорядоченный по дню рождения.</p>
+	* <p>Метод возвращает список друзей, упорядоченный по дню рождения. Метод нестатический.</p>
 	*
 	*
 	* @param int $userID  Код пользователя, друзья которого выбираются.
@@ -542,7 +538,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserrelations/getlistbirthday.php
 	* @author Bitrix
 	*/
-	public static 	function GetListBirthday($userID, $number = 5, $online_interval = 120)
+	public static function GetListBirthday($userID, $number = 5, $online_interval = 120)
 	{
 		global $DB;
 
@@ -575,7 +571,7 @@ class CSocNetUserRelations extends CAllSocNetUserRelations
 		return $DB->Query($strSql);
 	}
 	
-public static 	function GetRelationsTop($userID, $number = 100)
+	public static function GetRelationsTop($userID, $number = 100)
 	{
 		global $DB;
 

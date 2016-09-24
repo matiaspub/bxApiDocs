@@ -159,4 +159,3 @@ class CForumPMFolder extends CAllForumPMFolder
 {
 	// 
 }
-?>

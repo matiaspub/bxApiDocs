@@ -162,6 +162,9 @@ class CBPAllStateService
 			{
 				self::cleanRunningCountersCache($userId);
 			}
+
+			foreach (GetModuleEvents('bizproc', 'OnWorkflowComplete', true) as $event)
+				ExecuteModuleEventEx($event, array($workflowId, $status));
 		}
 	}
 
@@ -225,6 +228,13 @@ class CBPAllStateService
 
 		$arDocumentId = CBPHelper::ParseDocumentId($documentId);
 
+		$ids = (array) $arDocumentId[2];
+		$idsCondition = array();
+		foreach ($ids as $id)
+		{
+			$idsCondition[] = 'WS.DOCUMENT_ID = \''.$DB->ForSql($id).'\'';
+		}
+
 		$sqlAdditionalFilter = "";
 		$workflowId = trim($workflowId);
 		if (strlen($workflowId) > 0)
@@ -240,7 +250,7 @@ class CBPAllStateService
 			"	LEFT JOIN b_bp_workflow_permissions WP ON (WS.ID = WP.WORKFLOW_ID) ".
 			"	LEFT JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID) ".
 			"	LEFT JOIN b_bp_workflow_instance WI ON (WS.ID = WI.ID) ".
-			"WHERE WS.DOCUMENT_ID = '".$DB->ForSql($arDocumentId[2])."' ".
+			"WHERE (".implode(' OR ', $idsCondition).") ".
 			"	AND WS.ENTITY = '".$DB->ForSql($arDocumentId[1])."' ".
 			"	AND WS.MODULE_ID ".((strlen($arDocumentId[0]) > 0) ? "= '".$DB->ForSql($arDocumentId[0])."'" : "IS NULL")." ".
 			$sqlAdditionalFilter

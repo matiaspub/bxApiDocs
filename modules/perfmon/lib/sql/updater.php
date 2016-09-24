@@ -25,6 +25,19 @@ class Updater
 	 *
 	 * @return Updater
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает тип базы данных. На данный момент поддерживаются <i>MYSQL</i>, <i>ORACLE</i> и <i>MSSQL</i>.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных.
+	*
+	* @return \Bitrix\Perfmon\Sql\Updater 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/updater/setdbtype.php
+	* @author Bitrix
+	*/
 	public function setDbType($dbType = '')
 	{
 		$this->dbType = (string)$dbType;
@@ -38,6 +51,19 @@ class Updater
 	 *
 	 * @return Updater
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает DDL-разделитель для анализа.</p>
+	*
+	*
+	* @param string $delimiter = '' Разделитель DDL-выражений.
+	*
+	* @return \Bitrix\Perfmon\Sql\Updater 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/updater/setdelimiter.php
+	* @author Bitrix
+	*/
 	public function setDelimiter($delimiter = '')
 	{
 		$this->delimiter = (string)$delimiter;
@@ -63,6 +89,21 @@ class Updater
 	 * @return string
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Нестатический метод создает код обновления.</p>
+	*
+	*
+	* @param string $sourceSql  Исходные DDL выражения.
+	*
+	* @param string $targetSql  Целевые DDL выражения.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/updater/generate.php
+	* @author Bitrix
+	*/
 	public function generate($sourceSql, $targetSql)
 	{
 		$source = new Schema;

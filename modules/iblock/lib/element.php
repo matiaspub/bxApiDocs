@@ -67,6 +67,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы элементов инфоблоков в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock_element';
@@ -77,6 +88,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы элементов инфоблоков. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -240,6 +262,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (название элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -252,6 +285,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>XML_ID</code> (внешний код элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/validatexmlid.php
+	* @author Bitrix
+	*/
 	public static function validateXmlId()
 	{
 		return array(
@@ -263,6 +307,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CODE</code> (символьный идентификатор элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/validatecode.php
+	* @author Bitrix
+	*/
 	public static function validateCode()
 	{
 		return array(
@@ -274,6 +329,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>TAGS</code> (теги элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/validatetags.php
+	* @author Bitrix
+	*/
 	public static function validateTags()
 	{
 		return array(
@@ -285,6 +351,17 @@ class ElementTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>TMP_ID</code> (временный символьный идентификатор, используемый для служебных целей). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/validatetmpid.php
+	* @author Bitrix
+	*/
 	public static function validateTmpId()
 	{
 		return array(
@@ -298,6 +375,19 @@ class ElementTable extends Main\Entity\DataManager
 	 * @param array $data			Element data.
 	 * @return Main\Entity\AddResult
 	 */
+	
+	/**
+	* <p>Метод добавляет новый элемент информационного блока. Метод статический.</p>
+	*
+	*
+	* @param array $data  Массив, содержащий значения полей элемента инфоблока.
+	*
+	* @return \Bitrix\Main\Entity\AddResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/add.php
+	* @author Bitrix
+	*/
 	public static function add(array $data)
 	{
 		$result = new Main\Entity\AddResult();
@@ -314,6 +404,21 @@ class ElementTable extends Main\Entity\DataManager
 	 * @param array $data			Element data.
 	 * @return Main\Entity\UpdateResult
 	 */
+	
+	/**
+	* <p>Метод изменяет параметры элемента с ключом <code>$primary</code>.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ. Идентификатор элемента.
+	*
+	* @param array $data  Массив, содержащий значения полей элемента инфоблока.
+	*
+	* @return \Bitrix\Main\Entity\UpdateResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/update.php
+	* @author Bitrix
+	*/
 	public static function update($primary, array $data)
 	{
 		$result = new Main\Entity\UpdateResult();
@@ -329,6 +434,19 @@ class ElementTable extends Main\Entity\DataManager
 	 * @param mixed $primary		Element primary key.
 	 * @return Main\Entity\DeleteResult
 	 */
+	
+	/**
+	* <p>Метод удаляет элемент информационного блока с ключом <code>$primary</code>.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ. Идентификатор элемента.
+	*
+	* @return \Bitrix\Main\Entity\DeleteResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/elementtable/delete.php
+	* @author Bitrix
+	*/
 	public static function delete($primary)
 	{
 		$result = new Main\Entity\DeleteResult();

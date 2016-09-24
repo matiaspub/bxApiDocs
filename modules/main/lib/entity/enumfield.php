@@ -25,16 +25,16 @@ class EnumField extends ScalarField
 		if (empty($parameters['values']))
 		{
 			throw new SystemException(sprintf(
-				'Required parameter "values" for %s field in %s entity not found',
-				$this->name, $this->entity->getNamespace().$this->entity->getName()
+				'Required parameter "values" for %s field is not found',
+				$this->name
 			));
 		}
 
 		if (!is_array($parameters['values']))
 		{
 			throw new SystemException(sprintf(
-				'Parameter "values" for %s field in %s entity should be an array',
-				$this->name, $this->entity->getNamespace().$this->entity->getName()
+				'Parameter "values" for %s field should be an array',
+				$this->name
 			));
 		}
 

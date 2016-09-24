@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети. 
+ * <b>CSocNetUser</b> - класс, содержащий вспомогательные методы для работы с пользователями социальной сети.
  *
  *
  * @return mixed 
@@ -51,4 +51,3 @@ class CSocNetUser extends CAllSocNetUser
 		return $DB->Query($strSql, false, "Function CSocNetUser::SearchUsers: ".__LINE__);
 	}
 }
-?>

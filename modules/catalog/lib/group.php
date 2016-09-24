@@ -1,9 +1,8 @@
 <?php
 namespace Bitrix\Catalog;
 
-use Bitrix\Main;
-use Bitrix\Main\Type;
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Main,
+	Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
@@ -35,6 +34,17 @@ class GroupTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы типов цен в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/grouptable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_catalog_group';
@@ -45,6 +55,17 @@ class GroupTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы типов цен. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/grouptable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -71,14 +92,14 @@ class GroupTable extends Main\Entity\DataManager
 			)),
 			'TIMESTAMP_X' => new Main\Entity\DatetimeField('TIMESTAMP_X', array(
 				'title' => Loc::getMessage('GROUP_ENTITY_TIMESTAMP_X_FIELD'),
-				'default_value' => new Type\DateTime()
+				'default_value' => new Main\Type\DateTime()
 			)),
 			'MODIFIED_BY' => new Main\Entity\IntegerField('MODIFIED_BY', array(
 				'title' => Loc::getMessage('GROUP_ENTITY_MODIFIED_BY_FIELD'),
 			)),
 			'DATE_CREATE' => new Main\Entity\DatetimeField('DATE_CREATE', array(
 				'title' => Loc::getMessage('GROUP_ENTITY_DATE_CREATE_FIELD'),
-				'default_value' => new Type\DateTime()
+				'default_value' => new Main\Type\DateTime()
 			)),
 			'CREATED_BY' => new Main\Entity\IntegerField('CREATED_BY', array(
 				'title' => Loc::getMessage('GROUP_ENTITY_CREATED_BY_FIELD'),
@@ -114,6 +135,17 @@ class GroupTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (внутреннее название типа цены). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/grouptable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -125,6 +157,17 @@ class GroupTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>XML_ID</code> (внешний код). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/grouptable/validatexmlid.php
+	* @author Bitrix
+	*/
 	public static function validateXmlId()
 	{
 		return array(

@@ -241,8 +241,10 @@ class CBitrixCloudBackup
 	 *
 	 * @return void
 	 */
-	static public function OnAdminInformerInsertItems()
+	public static function OnAdminInformerInsertItems()
 	{
+		global $USER;
+
 		$CDNAIParams = array(
 			"TITLE" => GetMessage("BCL_BACKUP_AI_TITLE"),
 			"COLOR" => "peach",
@@ -280,7 +282,10 @@ class CBitrixCloudBackup
 			$ALLOWED = CFile::FormatSize($backup->getQuota(), 0);
 			$CDNAIParams["ALERT"] = true;
 			$MESS = '<span class="adm-informer-strong-text">'.GetMessage("BCL_BACKUP_AI_NO_FILES").'</span>';
-			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP_STRONGLY").'</a>';
+			if ($USER->CanDoOperation("bitrixcloud_backup") && $USER->CanDoOperation('edit_php'))
+			{
+				$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP_STRONGLY").'</a>';
+			}
 		}
 		elseif($backup->getLastTimeBackup() < (time()-7*24*3600))
 		{
@@ -296,7 +301,10 @@ class CBitrixCloudBackup
 					"yesterday" => "yesterday",
 					"" => "dago",
 				), $backup->getLastTimeBackup()).'.</span>';
-			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP_STRONGLY").'</a>';
+			if ($USER->CanDoOperation("bitrixcloud_backup") && $USER->CanDoOperation('edit_php'))
+			{
+				$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP_STRONGLY").'</a>';
+			}
 		}
 		else
 		{
@@ -312,7 +320,10 @@ class CBitrixCloudBackup
 					"yesterday" => "yesterday",
 					"" => "dago",
 				), $backup->getLastTimeBackup());
-			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP").'</a>';
+			if ($USER->CanDoOperation("bitrixcloud_backup") && $USER->CanDoOperation('edit_php'))
+			{
+				$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/dump.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_BACKUP_AI_DO_BACKUP").'</a>';
+			}
 		}
 
 		if(isset($CDNAIParams["ALERT"]))

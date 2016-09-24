@@ -38,12 +38,14 @@ class CSocServDescription
 				"NAME" => "OpenID",
 				"ICON" => "openid",
 			),
+/*
 			array(
 				"ID" => "YandexOpenID",
 				"CLASS" => "CSocServYandex",
 				"NAME" => GetMessage("socserv_openid_yandex_openid"),
 				"ICON" => "yandex",
 			),
+*/
 			array(
 				"ID" => "MailRuOpenID",
 				"CLASS" => "CSocServMailRu",
@@ -98,6 +100,12 @@ class CSocServDescription
 				"CLASS" => "CSocServLiveIDOAuth",
 				"NAME" => "LiveID",
 				"ICON" => "liveid",
+			),
+			array(
+				"ID" => "Office365",
+				"CLASS" => "CSocServOffice365OAuth",
+				"NAME" => "Office365",
+				"ICON" => "office365",
 			),
 			array(
 				"ID" => "Odnoklassniki",

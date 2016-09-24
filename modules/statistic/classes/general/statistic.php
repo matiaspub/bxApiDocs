@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика". 
+ * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика".
  *
  *
  * @return mixed 
@@ -333,7 +333,7 @@ class CAllStatistics extends CKeepStatistics
 
 	}
 
-public static 	function DBDateCompare($FIELD_NAME, $DATE=false, $DATE_FORMAT="SHORT")
+	public static function DBDateCompare($FIELD_NAME, $DATE=false, $DATE_FORMAT="SHORT")
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		if($DATE === false)
@@ -351,7 +351,7 @@ public static 	function DBDateCompare($FIELD_NAME, $DATE=false, $DATE_FORMAT="SH
 		return " $FIELD_NAME = $date ";
 	}
 
-public static 	function CleanUpStatistics_1()
+	public static function CleanUpStatistics_1()
 	{
 		__SetNoKeepStatistics();
 		if ($_SESSION["SESS_NO_AGENT_STATISTIC"]!="Y" && !defined("NO_AGENT_STATISTIC"))
@@ -375,7 +375,7 @@ public static 	function CleanUpStatistics_1()
 		return "CStatistics::CleanUpStatistics_1();";
 	}
 
-public static 	function CleanUpStatistics_2()
+	public static function CleanUpStatistics_2()
 	{
 		__SetNoKeepStatistics();
 		if ($_SESSION["SESS_NO_AGENT_STATISTIC"]!="Y" && !defined("NO_AGENT_STATISTIC"))
@@ -389,7 +389,7 @@ public static 	function CleanUpStatistics_2()
 	///////////////////////////////////////////////////////////////////
 	// This is deprecated and unused method to handle internal search
 	///////////////////////////////////////////////////////////////////
-public static 	function OnSearch($search_phrase)
+	public static function OnSearch($search_phrase)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		if(intval($_SESSION["SESS_SEARCHER_ID"]) > 0)
@@ -447,7 +447,7 @@ public static 	function OnSearch($search_phrase)
 	///////////////////////////////////////////////////////////////////
 	// Обновляем счетчик по рекламной кампании
 	///////////////////////////////////////////////////////////////////
-public static 	function Update_Adv()
+	public static function Update_Adv()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 
@@ -689,7 +689,7 @@ public static 	function Update_Adv()
 	///////////////////////////////////////////////////////////////////
 	// Устанавливаем рекламную кампанию
 	///////////////////////////////////////////////////////////////////
-public static 	function Set_Adv()
+	public static function Set_Adv()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		stat_session_register("SESS_ADV_ID"); // ID рекламной кампании
@@ -792,7 +792,7 @@ public static 	function Set_Adv()
 	///////////////////////////////////////////////////////////////////
 	// Устанавливаем ID гостя
 	///////////////////////////////////////////////////////////////////
-public static 	function Set_Guest()
+	public static function Set_Guest()
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		stat_session_register("SESS_GUEST_ID");			// ID гостя
@@ -1080,14 +1080,14 @@ public static 	function Set_Guest()
 		return false;
 	}
 
-public static 	function GetAuditTypes()
+	public static function GetAuditTypes()
 	{
 		return array(
 			"STAT_ACTIVITY_LIMIT" => "[STAT_ACTIVITY_LIMIT] ".GetMessage("STAT_DEFENCE_LOG_EVENT"),
 		);
 	}
 
-	fpublic static unction Set404($table = false, $where = false, $arrUpdate = false)
+	public static function Set404($table = false, $where = false, $arrUpdate = false)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		static $STAT_DB_404 = array();
@@ -1123,7 +1123,7 @@ public static 	function GetAuditTypes()
 	///////////////////////////////////////////////////////////////////
 	// очистка статистики до определенной даты
 	///////////////////////////////////////////////////////////////////
-
+	
 	/**
 	* <p>Очищает собранные статистические данные.</p>
 	*
@@ -1141,7 +1141,7 @@ public static 	function GetAuditTypes()
 	* противном случае.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // дата в формате текущего сайта или языка
 	* // до которой включительно будет очищена вся собранная статистика
@@ -1155,14 +1155,14 @@ public static 	function GetAuditTypes()
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/settings.php">Настройки модуля
-	* "Статистика"</a> </li> </ul> <a name="examples"></a>
+	* "Статистика"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatistics/cleanup.php
 	* @author Bitrix
 	*/
-	public static 	function CleanUp($cleanup_date="", &$arErrors)
+	public static function CleanUp($cleanup_date="", &$arErrors)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -1224,7 +1224,7 @@ public static 	function GetAuditTypes()
 	///////////////////////////////////////////////////////////////////
 	// пересчет финансовых показателей при смене базовой валюты
 	///////////////////////////////////////////////////////////////////
-public static 	function RecountBaseCurrency($new_base_currency)
+	public static function RecountBaseCurrency($new_base_currency)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -1269,9 +1269,9 @@ public static 	function RecountBaseCurrency($new_base_currency)
 	}
 
 	// функции для совместимости
-public static 	function GetEventParam($site_id=false) { return CStatEvent::GetGID($site_id); }
-public static 	function Set_Event($event1, $event2="", $event3="", $goto="", $money="", $currency="", $chargeback="N", $site_id=false) { return CStatEvent::AddCurrent($event1, $event2, $event3, $money, $currency, $goto, $chargeback, $site_id); }
-public static 	function CheckForDDL()
+	public static function GetEventParam($site_id=false) { return CStatEvent::GetGID($site_id); }
+	public static function Set_Event($event1, $event2="", $event3="", $goto="", $money="", $currency="", $chargeback="N", $site_id=false) { return CStatEvent::AddCurrent($event1, $event2, $event3, $money, $currency, $goto, $chargeback, $site_id); }
+	public static function CheckForDDL()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$rs=$DB->Query("select count(*) CNT from b_stat_ddl", true);
@@ -1285,7 +1285,7 @@ public static 	function CheckForDDL()
 		}
 		return false;
 	}
-public static 	function GetDDL()
+	public static function GetDDL()
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$result = array();
@@ -1297,7 +1297,7 @@ public static 	function GetDDL()
 		}
 		return $result;
 	}
-public static 	function ExecuteDDL($ID)
+	public static function ExecuteDDL($ID)
 	{
 		$ID = intval($ID);
 		$DB = CDatabase::GetModuleConnection('statistic');

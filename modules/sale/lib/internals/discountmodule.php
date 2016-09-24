@@ -27,6 +27,17 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы c модулями, необходимыми для работы правил корзины. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sale_discount_module';
@@ -37,6 +48,17 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы с модулями, необходимыми для работы правил корзины. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -61,6 +83,17 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>MODULE_ID</code> (идентификатор модуля). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/validatemoduleid.php
+	* @author Bitrix
+	*/
 	public static function validateModuleId()
 	{
 		return array(
@@ -74,6 +107,19 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 * @param int $discount				Discount id.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод удаляет модули, необходимые для работы правила с кодом <code>$discount</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $discount  Идентификатор правила.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/deletebydiscount.php
+	* @author Bitrix
+	*/
 	public static function deleteByDiscount($discount)
 	{
 		$discount = (int)$discount;
@@ -94,6 +140,23 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 * @param bool $clear			Clear old values.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод обновляет параметры списка модулей, необходимых для работы правила с кодом <code>$discount</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $discount  Идентификатор правила.
+	*
+	* @param array $moduleList  Массив идентификаторов модулей.
+	*
+	* @param boolean $clear  Если параметр принимает <i>true</i>, то будут очищены старые значения.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/updatebydiscount.php
+	* @author Bitrix
+	*/
 	public static function updateByDiscount($discount, $moduleList, $clear)
 	{
 		$discount = (int)$discount;
@@ -126,6 +189,21 @@ class DiscountModuleTable extends Main\Entity\DataManager
 	 * @param array $filter				Additional filter.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список модулей, необходимых для работы перечисленных в массиве <code>$discountList</code> правил. Метод статический.</p>
+	*
+	*
+	* @param array $discountList  Массив правил.
+	*
+	* @param array $filter = array() Дополнительный фильтр.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountmoduletable/getbydiscount.php
+	* @author Bitrix
+	*/
 	public static function getByDiscount($discountList, $filter = array())
 	{
 		$result = array();

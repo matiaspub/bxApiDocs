@@ -6,20 +6,18 @@
 
 
 /**
- * <p>Если не предполагается использование страниц редактирования результата формы или просмотра списка результатов, то имеет смысл вставить в шаблон ответ веб-формы в обход основного шаблона:</p> <pre class="syntax" id="xmp4A9A280C"><buttononclick> &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt; &lt;?if($FORM-&gt;isFormNote()):?&gt; &lt;?=$FORM-&gt;ShowFormNote()?&gt; &lt;?else:?&gt; &lt;!-- здесь остальной шаблон веб-формы --&gt; &lt;?endif?&gt; </buttononclick></pre> <br><br>
+ * <p>Если не предполагается использование страниц редактирования результата формы  или просмотра списка результатов, то имеет смысл вставить в шаблон ответ  веб-формы в обход основного шаблона:</p> <pre class="syntax" id="xmp4A9A280C"><buttononclick> &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt; &lt;?if($FORM-&gt;isFormNote()):?&gt; &lt;?=$FORM-&gt;ShowFormNote()?&gt; &lt;?else:?&gt; &lt;!-- здесь остальной шаблон веб-формы --&gt; &lt;?endif?&gt; </buttononclick></pre> <br><br>
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * <code><b>$FORM</b></code> - экземпляр класса <code>CFormOutput</code> - 
  * создаётся и инициализируется автоматически вне шаблона. Вызов методов 
  * <code>CFormOutput::ShowFormHeader()</code> и 
  * <code>CFormOutput::ShowFormFooter()</code> также добавляется к шаблону 
- * автоматически.
- * 
- * <buttononclick>
+ * автоматически.<buttononclick>
  * &lt;!-- Выведем описание формы --&gt;
  * &lt;table width="100%" cellpadding="2" cellspacing="0" border="0"&gt;
  *     &lt;tr&gt;
@@ -80,13 +78,9 @@
  *         &lt;/td&gt;
  *     &lt;/tr&gt;
  * &lt;/table&gt;
- * </buttononclick>
- * 
- * Если не предполагается использование страниц редактирования результата формы 
+ * </buttononclick>Если не предполагается использование страниц редактирования результата формы 
  * или просмотра списка результатов, то имеет смысл вставить в шаблон ответ 
- * веб-формы в обход основного шаблона:
- * 
- * <buttononclick>
+ * веб-формы в обход основного шаблона:<buttononclick>
  * &lt;!-- Если есть ответ формы - выведем его в обход шаблона --&gt;
  * &lt;?if($FORM-&gt;isFormNote()):?&gt;
  * &lt;?=$FORM-&gt;ShowFormNote()?&gt;

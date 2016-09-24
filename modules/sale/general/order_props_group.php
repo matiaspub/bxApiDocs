@@ -16,19 +16,19 @@ class CAllSaleOrderPropsGroup
 {
 	
 	/**
-	* <p>Метод возвращает параметры группы свойств заказа с кодом ID. Метод динамичный.</p>
+	* <p>Метод возвращает параметры группы свойств заказа с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код группы заказов. </ht
+	* @param mixed $intID  Код группы заказов.
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров группы свойств с
-	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	* </tr> <tr> <td>ID</td> <td>Код группы заказов.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
-	* плательщика.</td> </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>SORT</td>
-	* <td>Индекс сортировки.</td> </tr> </table> <p>  </p<a name="examples"></a>
+	* ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>     <th>Описание</th>
+	*   </tr> <tr> <td>ID</td>     <td>Код группы заказов.</td> </tr> <tr> <td>PERSON_TYPE_ID</td>    
+	* <td>Тип плательщика.</td>   </tr> <tr> <td>NAME</td>     <td>Название группы.</td>   </tr>
+	* <tr> <td>SORT</td>     <td>Индекс сортировки.</td>   </tr> </table><p>  </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if ($arPropsGroup = CSaleOrderPropsGroup::GetByID(3))
 	*    echo $arPropsGroup["NAME"];
@@ -90,21 +90,21 @@ class CAllSaleOrderPropsGroup
 
 	
 	/**
-	* <p>Метод обновляет параметры группы заказов с кодом ID на параметры из массива arFields. Метод динамичный.</p>
+	* <p>Метод обновляет параметры группы заказов с кодом ID на параметры из массива arFields. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код группы заказов. </ht
+	* @param mixed $intID  Код группы заказов.
 	*
 	* @param array $arFields  Ассоциативный массив параметров группы свойств, в котором
 	* ключами являются названия параметров, а значениями - новые
 	* значения.<br><br> Допустимые ключи: <ul> <li> <b>PERSON_TYPE_ID</b> - тип
-	* плательщика;</li> <li> <b>NAME</b> - название группы (группа привязывается
+	* плательщика;</li> 	<li> <b>NAME</b> - название группы (группа привязывается
 	* к типу плательщика, тип плательщика привязывается к сайту, сайт
-	* привязывается к языку, название задается на этом языке);</li> <li>
+	* привязывается к языку, название задается на этом языке);</li> 	<li>
 	* <b>SORT</b> - индекс сортировки.</li> </ul>
 	*
 	* @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
-	* ошибки.</p> <br><br>
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__update.169e4e27.php
@@ -128,13 +128,13 @@ class CAllSaleOrderPropsGroup
 
 	
 	/**
-	* <p>Метод удаляет группу свойств с кодом ID. Так же удаляются свойства этой группы и другие сопутствующие данные. Значения свойств этой группы, привязанные к заказам, отвязываются от удаляемых свойств. <br> Если необходимо удалить только группу, то сначала от нее необходимо отвязать все свойства. Метод динамичный.</p>
+	* <p>Метод удаляет группу свойств с кодом ID. Так же удаляются свойства этой группы и другие сопутствующие данные. Значения свойств этой группы, привязанные к заказам, отвязываются от удаляемых свойств. <br>   Если необходимо удалить только группу, то сначала от нее необходимо отвязать все свойства. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код группы свойств. </ht
+	* @param mixed $intID  Код группы свойств.
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderpropsgroup/csaleorderpropsgroup__delete.cae2758a.php
@@ -152,9 +152,8 @@ class CAllSaleOrderPropsGroup
 			$DB->Query("DELETE FROM b_sale_order_props_variant WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("UPDATE b_sale_order_props_value SET ORDER_PROPS_ID = NULL WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 			$DB->Query("DELETE FROM b_sale_order_props_relation WHERE PROPERTY_ID = ".$arOrderProps["ID"]."", true);
-			$DB->Query("DELETE FROM b_sale_user_props_value WHERE ORDER_PROPS_ID = ".$arOrderProps["ID"]."", true);
 		}
-		$DB->Query("DELETE FROM b_sale_order_props WHERE PROPS_GROUP_ID = ".$ID."", true);
+		$DB->Query("UPDATE b_sale_order_props SET PROPS_GROUP_ID = NULL WHERE PROPS_GROUP_ID = ".$ID."", true);
 		CSaleOrderUserProps::ClearEmpty();
 
 		return $DB->Query("DELETE FROM b_sale_order_props_group WHERE ID = ".$ID."", true);

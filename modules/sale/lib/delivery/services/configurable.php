@@ -18,7 +18,8 @@ Loc::loadMessages(__FILE__);
  */
 class Configurable extends Base
 {
-	public $countPriceImmediately = true;
+	protected static $isCalculatePriceImmediately = true;
+	protected  static $whetherAdminExtraServicesShow = true;
 
 	/**
 	 * @param array $initParams Initial data params from table record.
@@ -71,15 +72,17 @@ class Configurable extends Base
 		{
 			$result = "";
 
-			if (IntVal($this->config["MAIN"]["PERIOD"]["FROM"]) > 0)
+			if(IntVal($this->config["MAIN"]["PERIOD"]["FROM"]) > 0)
 				$result .= " ".Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_FROM")." ".IntVal($this->config["MAIN"]["PERIOD"]["FROM"]);
 
-			if (IntVal($this->config["MAIN"]["PERIOD"]["TO"]) > 0)
+			if(IntVal($this->config["MAIN"]["PERIOD"]["TO"]) > 0)
 				$result .= " ".Loc::getMessage("SOA_TO")." ".IntVal($this->config["MAIN"]["PERIOD"]["TO"]);
 
-			if ($this->config["MAIN"]["PERIOD"]["TYPE"] == "H")
+			if($this->config["MAIN"]["PERIOD"]["TYPE"] == "MIN")
+				$result .= " ".Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_MIN")." ";
+			elseif($this->config["MAIN"]["PERIOD"]["TYPE"] == "H")
 				$result .= " ".Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_HOUR")." ";
-			elseif ($this->config["MAIN"]["PERIOD"]["TYPE"] == "M")
+			elseif($this->config["MAIN"]["PERIOD"]["TYPE"] == "M")
 				$result .= " ".Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_MONTH")." ";
 			else
 				$result .= " ".Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_DAY")." ";
@@ -165,6 +168,7 @@ class Configurable extends Base
 							"TYPE" => array(
 								"TYPE" => "ENUM",
 								"OPTIONS" => array(
+									"MIN" => Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_MIN"),
 									"H" => Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_HOUR"),
 									"D" => Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_DAY"),
 									"M" => Loc::getMessage("SALE_DLVR_HANDL_CONF_PERIOD_MONTH")
@@ -192,17 +196,22 @@ class Configurable extends Base
 		return parent::prepareFieldsForSaving($fields);
 	}
 
-	public static function whetherAdminExtraServicesShow()
-	{
-		return true;
-	}
-
 	public static function onAfterAdd($serviceId, array $fields = array())
 	{
 		if($serviceId <= 0)
 			return false;
 
-		$res = \Bitrix\Sale\Delivery\Services\Table::update($serviceId, array('CODE' => $serviceId));
+		$res = Manager::update($serviceId, array('CODE' => $serviceId));
 		return $res->isSuccess();
+	}
+
+	static public function isCalculatePriceImmediately()
+	{
+		return self::$isCalculatePriceImmediately;
+	}
+
+	public static function whetherAdminExtraServicesShow()
+	{
+		return self::$whetherAdminExtraServicesShow;
 	}
 }

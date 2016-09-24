@@ -8,7 +8,7 @@ use \Bitrix\Bizproc\RestActivityTable;
 */
 
 /**
- * <b>CBPRuntime</b> - класс исполняющей среды. Он создает бизнес-процессы, а так же инфраструктуру для их исполнения. 
+ * <b>CBPRuntime</b> - класс исполняющей среды. Он создает бизнес-процессы, а так же инфраструктуру для их исполнения.
  *
  *
  * @return mixed 
@@ -37,6 +37,7 @@ class CBPRuntime
 	private $arLoadedActivities = array();
 
 	private $arActivityFolders = array();
+	private $workflowChains = array();
 
 	/*********************  SINGLETON PATTERN  **************************************************/
 
@@ -72,14 +73,14 @@ class CBPRuntime
 	*/
 	
 	/**
-	* <p>Статический метод возвращает экземпляр класса, представляющего текущую исполняющую среду.</p> <p></p> <div class="note"> <b>Примечание</b>: в рамках хита должен быть только один экземпляр класса исполняющей среды (шаблон <b>Одиночка</b>). Этот метод возвращает данный экземпляр.</div> <p></p>
+	* <p>Статический метод возвращает экземпляр класса, представляющего текущую исполняющую среду.</p>   <p></p> <div class="note"> <b>Примечание</b>: в рамках хита должен быть только один экземпляр класса исполняющей среды (шаблон <b>Одиночка</b>). Этот метод возвращает данный экземпляр.</div>   <p></p>
 	*
 	*
 	* @return CBPRuntime <p>Возвращается экземпляр класса, представляющего текущую
-	* исполняющую среду.</p> <p></p><a name="examples"></a>
+	* исполняющую среду.</p><p></p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br>$runtime-&gt;StartRuntime();<br>$documentService = $runtime-&gt;GetService("DocumentService");<br>
 	* $arDocumentFields = $documentService-&gt;GetDocumentFields($documentType);<br>foreach ($arDocumentFields as $key =&gt; $value)<br>{<br>  print_r($value);<br>}<br>?&gt;
 	* </pre>
@@ -113,15 +114,15 @@ class CBPRuntime
 	*/
 	
 	/**
-	* <p>Метод запускает исполняющую среду. Исполняющая среда должна быть запущена перед любым ее использованием.</p> <p></p> <div class="note"> <b>Примечание</b>: некоторые методы автоматически запускают окружающую среду. При этом повторный запуск исполняющей среды безопасен.</div>
+	* <p>Метод запускает исполняющую среду. Исполняющая среда должна быть запущена перед любым ее использованием.</p>   <p></p> <div class="note"> <b>Примечание</b>: некоторые методы автоматически запускают окружающую среду. При этом повторный запуск исполняющей среды безопасен.</div>
 	*
 	*
-	* @param voi $d  
+	* @param mixed $void  
 	*
 	* @return public 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br>$runtime-&gt;StartRuntime();<br>$documentService = $runtime-&gt;GetService("DocumentService");<br><br>$arDocumentFields = $documentService-&gt;GetDocumentFields($documentType);<br>foreach ($arDocumentFields as $key =&gt; $value)<br>  $arSelectFields[] = $key;<br>?&gt;
 	* </pre>
 	*
@@ -163,6 +164,7 @@ class CBPRuntime
 		if (!$this->isStarted)
 			return;
 
+		/** @var CBPWorkflow $workflow */
 		foreach ($this->arWorkflows as $key => $workflow)
 			$workflow->OnRuntimeStopped();
 
@@ -175,16 +177,21 @@ class CBPRuntime
 	/*******************  PROCESS WORKFLOWS  *********************************************************/
 
 	/**
-	* Creates new workflow instance from the specified template.
-	* 
-	* @param int $workflowTemplateId - ID of the workflow template
-	* @param string $documentId - ID of the document
-	* @param mixed $workflowParameters - Optional parameters of the created workflow instance
-	* @return CBPWorkflow
-	*/
+	 * Creates new workflow instance from the specified template.
+	 *
+	 * @param int $workflowTemplateId - ID of the workflow template
+	 * @param string $documentId - ID of the document
+	 * @param mixed $workflowParameters - Optional parameters of the created workflow instance
+	 * @param array|null $parentWorkflow - Parent Workflow information.
+	 * @return CBPWorkflow
+	 * @throws CBPArgumentNullException
+	 * @throws CBPArgumentOutOfRangeException
+	 * @throws Exception
+	 * @throws \Bitrix\Main\ArgumentNullException
+	 */
 	
 	/**
-	* <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p> <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
+	* <p>Метод создает новый экземпляр бизнес-процесса над указанным документом. Экземпляр бизнес-процесса создается на основании шаблона бизнес-процесса. Метод при необходимости автоматически запускает исполняющую среду.</p>   <p>Это низкоуровневый метод. Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPDocument/StartWorkflow.php">CBPDocument::StartWorkflow</a>.</p>
 	*
 	*
 	* @param int $workflowTemplateId  Код шаблона бизнес-процесса
@@ -195,20 +202,20 @@ class CBPRuntime
 	*
 	* @param array $workflowParameters = array() Массив параметров запуска бизнес-процесса
 	*
-	* @return CBPWorkflow <p>Возвращается запущенный экземпляр бизнес-процесса.</p>
-	* <h4>Исключения</h4></bod<table width="100%" class="tnormal"><tbody> <tr> <th width="15%">Код</th>
-	* <th>Описание</th> </tr> <tr> <td><i>workflowTemplateId</i></td> <td>Не указан код шаблона
-	* бизнес-процесса</td> </tr> <tr> <td><i>EmptyRootActivity</i></td> <td>Не удалось создать
-	* экземпляр бизнес-процесса</td> </tr> </tbody></table>
+	* @return CBPWorkflow <p>Возвращается запущенный экземпляр
+	* бизнес-процесса.</p><h4>Исключения</h4><table width="100%" class="tnormal"><tbody> <tr> <th
+	* width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowTemplateId</i></td> <td>Не указан
+	* код шаблона бизнес-процесса</td> </tr> <tr> <td><i>EmptyRootActivity</i></td> <td>Не
+	* удалось создать экземпляр бизнес-процесса</td> </tr> </tbody></table>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br><br>try<br>{<br>  $wi = $runtime-&gt;CreateWorkflow($workflowTemplateId, $documentId, $arParameters);<br>  $wi-&gt;Start();<br>}<br>catch (Exception $e)<br>{<br>  // <br>}<br>?&gt;<br>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> </ul><a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>  </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -216,7 +223,7 @@ class CBPRuntime
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/CreateWorkflow.php
 	* @author Bitrix
 	*/
-	public function CreateWorkflow($workflowTemplateId, $documentId, $workflowParameters = array())
+	public function CreateWorkflow($workflowTemplateId, $documentId, $workflowParameters = array(), $parentWorkflow = null)
 	{
 		$workflowTemplateId = intval($workflowTemplateId);
 		if ($workflowTemplateId <= 0)
@@ -236,6 +243,13 @@ class CBPRuntime
 
 		$workflowId = uniqid("", true);
 
+		if ($parentWorkflow)
+		{
+			$this->addWorkflowToChain($workflowId, $parentWorkflow);
+			if ($this->checkWorkflowRecursion($workflowId, $workflowTemplateId))
+				throw new Exception(GetMessage("BPCGDOC_WORKFLOW_RECURSION_LOCK"));
+		}
+
 		$workflow = new CBPWorkflow($workflowId, $this);
 
 		$loader = CBPWorkflowTemplateLoader::GetLoader();
@@ -253,8 +267,8 @@ class CBPRuntime
 		$workflow->Initialize($rootActivity, $arDocumentId, $workflowParameters, $workflowVariablesTypes, $workflowParametersTypes, $workflowTemplateId);
 
 		$starterUserId = 0;
-		if (array_key_exists("TargetUser", $workflowParameters))
-			$starterUserId = intval(substr($workflowParameters["TargetUser"], strlen("user_")));
+		if (isset($workflowParameters[CBPDocument::PARAM_TAGRET_USER]))
+			$starterUserId = intval(substr($workflowParameters[CBPDocument::PARAM_TAGRET_USER], strlen("user_")));
 
 		$this->arServices["StateService"]->AddWorkflow($workflowId, $workflowTemplateId, $arDocumentId, $starterUserId);
 
@@ -263,11 +277,13 @@ class CBPRuntime
 	}
 
 	/**
-	* Returns existing workflow instance by its ID
-	* 
-	* @param mixed $instanceId - ID of the workflow instance
-	* @return CBPWorkflow
-	*/
+	 * Returns existing workflow instance by its ID
+	 *
+	 * @param string $workflowId ID of the workflow instance.
+	 * @param bool $silent
+	 * @return CBPWorkflow
+	 * @throws Exception
+	 */
 	
 	/**
 	* <p>Метод возвращает экземпляр бизнес-процесса по его идентификатору.</p>
@@ -278,14 +294,14 @@ class CBPRuntime
 	* @return CBPWorkflow <p>Возвращается экземпляр класса <a
 	* href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/index.php">CBPWorkflow</a>,
 	* представляющий собой экземпляр
-	* существующего бизнес-процесса.</p> <h4>Исключения</h4></bod<table width="100%"
+	* существующего бизнес-процесса.</p><h4>Исключения</h4><table width="100%"
 	* class="tnormal"><tbody> <tr> <th width="15%">Код</th> <th>Описание</th> </tr> <tr> <td><i>workflowId</i></td>
 	* <td>Не указан код бизнес-процесса</td> </tr> <tr> <td><i>Empty root activity</i></td> <td>Не
-	* удалось восстановить экземпляр бизнес-процесса</td> </tr> </tbody></table> <a
+	* удалось восстановить экземпляр бизнес-процесса</td> </tr> </tbody></table><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br><br>// Получим код документа, над которым запущен бизнес-процесс с указаным идентификатором<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>  $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>  $d = $workflow-&gt;GetDocumentId();<br>}<br>catch(Exception $e)<br>{<br>  //<br>}<br>?&gt;<br>
 	* </pre>
 	*
@@ -294,7 +310,7 @@ class CBPRuntime
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/GetWorkflow.php
 	* @author Bitrix
 	*/
-	public function GetWorkflow($workflowId)
+	public function GetWorkflow($workflowId, $silent = false)
 	{
 		if (strlen($workflowId) <= 0)
 			throw new Exception("workflowId");
@@ -308,7 +324,7 @@ class CBPRuntime
 		$workflow = new CBPWorkflow($workflowId, $this);
 
 		$persister = CBPWorkflowPersister::GetPersister();
-		$rootActivity = $persister->LoadWorkflow($workflowId);
+		$rootActivity = $persister->LoadWorkflow($workflowId, $silent);
 		if ($rootActivity == null)
 			throw new Exception("Empty root activity");
 
@@ -427,12 +443,9 @@ class CBPRuntime
 				'filter' => array('=INTERNAL_CODE' => $code)
 			));
 			$activity = $result->fetch();
-			if ($activity)
-			{
-				eval('class CBP'.static::REST_ACTIVITY_PREFIX.$code.' extends CBPRestActivity {const REST_ACTIVITY_ID = '.$activity['ID'].';}');
-				$this->arLoadedActivities[] = static::REST_ACTIVITY_PREFIX.$code;
-				return true;
-			}
+			eval('class CBP'.static::REST_ACTIVITY_PREFIX.$code.' extends CBPRestActivity {const REST_ACTIVITY_ID = '.($activity? $activity['ID'] : 0).';}');
+			$this->arLoadedActivities[] = static::REST_ACTIVITY_PREFIX.$code;
+			return true;
 		}
 
 		return false;
@@ -587,6 +600,7 @@ class CBPRuntime
 		if ($type == 'activity')
 		{
 			$arProcessedDirs = array_merge($arProcessedDirs, $this->getRestActivities(false, $documentType));
+			\Bitrix\Main\Type\Collection::sortByColumn($arProcessedDirs, 'NAME');
 		}
 
 		return $arProcessedDirs;
@@ -703,22 +717,24 @@ class CBPRuntime
 		return false;
 	}
 
-//	public function GetAvailableStateEvents($workflowId, $workflowTemplateId)
-//	{
-//		$workflowId = trim($workflowId);
+	private function addWorkflowToChain($childId, $parent)
+	{
+		$this->workflowChains[$childId] = $parent;
+		return $this;
+	}
 
-//		if (strlen($workflowId) > 0)
-//		{
-//			$workflow = $this->GetWorkflow($workflowId);
-//			$arResult = $workflow->GetAvailableStateEvents();
-//		}
-//		else
-//		{
-//			$loader = CBPWorkflowTemplateLoader::GetLoader();
-//			$arResult = $loader->GetAvailableStateEvents($workflowTemplateId);
-//		}
-
-//		return $arResult;
-//	}
+	private function checkWorkflowRecursion($workflowId, $currentTemplateId)
+	{
+		$templates = array($currentTemplateId);
+		while (isset($this->workflowChains[$workflowId]))
+		{
+			$parent = $this->workflowChains[$workflowId];
+			if (in_array($parent['templateId'], $templates))
+				return true;
+			$templates[] = $parent['templateId'];
+			$workflowId = $parent['workflowId'];
+		}
+		return false;
+	}
 }
 ?>

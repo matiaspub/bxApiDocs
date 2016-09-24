@@ -217,6 +217,21 @@ class Provider {
 	 * @return int
 	 * @throws \Bitrix\Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Добавляет хост из заказа в пул серверов. Метод статический.</p>
+	*
+	*
+	* @param string $providerId  ID провайдера.
+	*
+	* @param string $taskId  ID задания.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/provider/addtopullfromorder.php
+	* @author Bitrix
+	*/
 	public static function addToPullFromOrder($providerId, $taskId)
 	{
 		if(strlen($providerId) <= 0 )

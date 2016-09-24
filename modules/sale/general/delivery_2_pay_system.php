@@ -101,23 +101,81 @@ class CSaleDelivery2PaySystem
 		$params["select"] = array(
 			"DELIVERY_ID",
 			"PAYSYSTEM_ID",
-			"DELIVERY_SERVICE_CODE" => "DELIVERY_SERVICE.CODE"
+			"LINK_DIRECTION"
 		);
 
-		$params["runtime"] = array( new \Bitrix\Main\Entity\ReferenceField('DELIVERY_SERVICE', 'Bitrix\Sale\Delivery\Services\Table',
-			array('=this.DELIVERY_ID' => 'ref.ID')
-		));
+		$deliveryChildrenList = self::getDeliveryChildrenList();
 
 		$records = array();
 		$res = DeliveryPaySystemTable::getList($params);
 
+		$restricted = array(
+				'D' => array(),
+				'P' => array()
+		);
+
 		while($record = $res->fetch())
 		{
-			$delivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($record["DELIVERY_SERVICE_CODE"]);
+			if($record['LINK_DIRECTION'] == 'D')
+			{
+				if(!in_array($record["DELIVERY_ID"], $restricted['D']))
+					$restricted['D'][] = $record["DELIVERY_ID"];
+			}
+			elseif($record['LINK_DIRECTION'] == 'P')
+			{
+				if(!in_array($record["DELIVERY_ID"], $restricted['P']))
+					$restricted['P'][] = $record["PAYSYSTEM_ID"];
+			}
+
+			$deliveryId = $record["DELIVERY_ID"];
+			$linkDirection = $record["LINK_DIRECTION"];
+			unset($record["LINK_DIRECTION"]);
+			$deliveryCode = \CSaleDelivery::getCodeById($record["DELIVERY_ID"]);
+			$delivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryCode);
 			$record["DELIVERY_ID"] = $delivery["SID"];
 			$record["DELIVERY_PROFILE_ID"] = isset($delivery["PROFILE"]) ? $delivery["PROFILE"] : null;
-			unset($record["DELIVERY_SERVICE_CODE"]);
 			$records[] = $record;
+
+			if(!empty($deliveryChildrenList[$deliveryId]))
+			{
+				foreach($deliveryChildrenList[$deliveryId] as $childrenId)
+				{
+					if($linkDirection == 'D' && !in_array($childrenId, $restricted['D']))
+						$restricted['D'][] = $childrenId;
+
+					$deliveryCode = \CSaleDelivery::getCodeById($childrenId);
+					$delivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryCode);
+					$record["DELIVERY_ID"] = $delivery["SID"];
+					$record["DELIVERY_PROFILE_ID"] = isset($delivery["PROFILE"]) ? $delivery["PROFILE"] : null;
+					$records[] = $record;
+				}
+			}
+		}
+
+		foreach(self::getFullDeliveryList() as $dlvId)
+		{
+			if(in_array($dlvId, $restricted['D']))
+				continue;
+
+			$deliveryCode = \CSaleDelivery::getCodeById($dlvId);
+			$delivery = CSaleDeliveryHelper::getDeliverySIDAndProfile($deliveryCode);
+
+			$record = array(
+				"DELIVERY_ID" => $delivery["SID"],
+				"DELIVERY_PROFILE_ID" => isset($delivery["PROFILE"]) ? $delivery["PROFILE"] : null
+			);
+
+			foreach(self::getFullPaySystemList() as $psId)
+			{
+				if(in_array($psId, $restricted['P']))
+					continue;
+
+				if(self::isRecordExists($record["DELIVERY_ID"], $record["DELIVERY_PROFILE_ID"], $psId, $records))
+					continue;
+
+				$record["PAYSYSTEM_ID"] = $psId;
+				$records[] = $record;
+			}
 		}
 
 		$result = new \CDBResult;
@@ -125,6 +183,72 @@ class CSaleDelivery2PaySystem
 		return $result;
 	}
 
+	protected static function isRecordExists($dlvId, $profile, $paySystemId, $records)
+	{
+		return in_array(
+			array(
+				"DELIVERY_ID" => $dlvId,
+				"DELIVERY_PROFILE_ID" => $profile,
+				"PAYSYSTEM_ID" => $paySystemId
+			),
+			$records
+		);
+	}
+
+	protected static function getFullDeliveryList()
+	{
+		static $result = null;
+
+		if($result === null)
+		{
+			$result = array();
+
+			foreach(Delivery\Services\Manager::getActiveList() as $dlvId => $dlvParams)
+				$result[] = $dlvId;
+		}
+
+		return $result;
+	}
+
+	protected static function getDeliveryChildrenList()
+	{
+		static $result = null;
+
+		if($result === null)
+		{
+			$result = array();
+
+			foreach(Delivery\Services\Manager::getActiveList() as $dlvId => $dlvParams)
+			{
+				$parentId = intval($dlvParams["PARENT_ID"]);
+
+				if(!isset($result[$parentId]))
+					$result[$parentId] = array();
+
+				$result[$parentId][] = $dlvId;
+			}
+		}
+
+		return $result;
+	}
+
+	protected static function getFullPaySystemList()
+	{
+		static $result = null;
+
+		if($result === null)
+		{
+			$result = array();
+			$dbRes = Bitrix\Sale\PaySystem\Manager::getList(array(
+				'filter' => array('ACTIVE' => 'Y')
+			));
+
+			while($ps = $dbRes->fetch())
+				$result[] = $ps['ID'];
+		}
+
+		return $result;
+	}
 	public static function isPaySystemApplicable($paySystemId, $deliveryId)
 	{
 		if(strlen($deliveryId) <= 0)
@@ -262,7 +386,7 @@ class CSaleDelivery2PaySystem
 		$deliveryId = 0;
 
 		if(strlen($code) > 0)
-			$deliveryId = Delivery\Services\Table::getIdByCode($code);
+			$deliveryId = \CSaleDelivery::getIdByCode($code);
 
 		if(intval($deliveryId) > 0)
 			$delParams .= "DELIVERY_ID=".$sqlHelper->forSql($deliveryId);
@@ -293,9 +417,14 @@ class CSaleDelivery2PaySystem
 			unset($arFields["DELIVERY_PROFILE_ID"]);
 		}
 
-		$arFields["DELIVERY_ID"] = Delivery\Services\Table::getIdByCode($arFields["DELIVERY_ID"]);
+		$arFields["DELIVERY_ID"] = \CSaleDelivery::getIdByCode($arFields["DELIVERY_ID"]);
 		$res = DeliveryPaySystemTable::add($arFields);
 		return new CDBResult($res);
+	}
+
+	public static function convertEmptyAllAgent()
+	{
+		return "";
 	}
 }
 ?>

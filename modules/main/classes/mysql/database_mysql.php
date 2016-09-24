@@ -9,6 +9,17 @@
 /********************************************************************
 *	MySQL database classes
 ********************************************************************/
+
+/**
+ * <b>CDatabase</b> - класс для работы с базой данной.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/index.php
+ * @author Bitrix
+ */
 class CDatabase extends CDatabaseMysql
 {
 	public function ConnectInternal()
@@ -59,13 +70,13 @@ class CDatabase extends CDatabaseMysql
 
 	
 	/**
-	* <p>Метод возвращает ID последней вставленной записи. Динамичный метод.</p> <p> </p>
+	* <p>Метод возвращает ID последней вставленной записи. Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function AddResultAnswer($arFields)
 	* {
@@ -97,18 +108,18 @@ class CDatabase extends CDatabaseMysql
 
 	
 	/**
-	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>. Динамичный метод.</p> <p> </p>
+	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>. Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $value  Исходная строка.
 	*
-	* @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
-	* обрезается).
+	* @param int $max_length = 0 Максимальная длина. 		<br>Необязательный. По умолчанию - "0" (строка
+	* не обрезается).
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $strSql = "
 	*     SELECT 
@@ -200,11 +211,28 @@ class CDatabase extends CDatabaseMysql
 	}
 }
 
+
+/**
+ * <b>CDBResult</b> - класс результата выполнения запроса.<br><br>Содержит в  себе методы для постраничной навигации и работы с результатом запроса.  Автоматически создаётся как результат работы метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a>.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php
+ * @author Bitrix
+ */
 class CDBResult extends CDBResultMysql
 {
-	public static function CDBResult($res = null)
+	static public function __construct($res = null)
 	{
-		parent::CDBResultMysql($res);
+		parent::__construct($res);
+	}
+
+	/** @deprecated */
+	static public function CDBResult($res = null)
+	{
+		self::__construct($res);
 	}
 
 	protected function FetchRow()
@@ -214,13 +242,13 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Метод возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ..."). Динамичный метод.</p> <p class="note"><b>Примечание</b>. Для Oracle версии данный метод будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	* <p>Метод возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ..."). Нестатический метод.</p> <p class="note"><b>Примечание</b>. Для Oracle версии данный метод будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
 	* $rsBanners-&gt;NavStart(20);
@@ -258,13 +286,13 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Метод возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>. Динамичный метод.</p> <br>
+	* <p>Метод возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>. Нестатический метод.</p> <br>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $strSql = "
 	* 	INSERT INTO b_stat_day(
@@ -324,13 +352,13 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Метод возвращает количество полей результата выборки. Динамичный метод.</p>
+	* <p>Метод возвращает количество полей результата выборки. Нестатический метод.</p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rs = $DB-&gt;Query($query,true);
 	* $intNumFields = <b>$rs-&gt;FieldsCount</b>();
@@ -363,7 +391,7 @@ class CDBResult extends CDBResultMysql
 
 	
 	/**
-	* <p>Метод возвращает название поля по его номеру. Динамичный метод.</p>
+	* <p>Метод возвращает название поля по его номеру. Нестатический метод.</p>
 	*
 	*
 	* @param int $column  
@@ -371,7 +399,7 @@ class CDBResult extends CDBResultMysql
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rs = $DB-&gt;Query($query,true);
 	* $intNumFields = $rs-&gt;FieldsCount();

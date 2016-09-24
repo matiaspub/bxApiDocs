@@ -57,12 +57,7 @@ class OracleConnection extends Connection
 		$this->isConnected = true;
 		$this->resource = $connection;
 
-		/** @noinspection PhpUnusedLocalVariableInspection */
-		global $DB, $USER, $APPLICATION;
-		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
-		{
-			include($fn);
-		}
+		$this->afterConnected();
 	}
 
 	/**
@@ -201,13 +196,32 @@ class OracleConnection extends Connection
 	 * - query($sql, $binds, $offset, $limit)
 	 *
 	 * @param string $sql Sql query.
-	 * @param array $binds,... Array of binds.
-	 * @param int $offset,... Offset of first row returned.
-	 * @param int $limit,... Limit rows count.
+	 * @param array $binds Array of binds.
+	 * @param int $offset Offset of the first row to return, starting from 0.
+	 * @param int $limit Limit rows count.
 	 *
 	 * @return Result
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод выполняет запросы:</p> <ul> <li>query($sql)</li> <li>query($sql, $limit)</li>  <li>query($sql, $offset, $limit)</li>   <li>query($sql, $binds)</li> <li>query($sql, $binds, $limit)</li>  <li>query($sql, $binds, $offset, $limit)</li> </ul> <p>Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/query.php">Connection::query</a>.</p>
+	*
+	*
+	* @param string $sql  Sql запрос.
+	*
+	* @param array $binds  Связанный массив.
+	*
+	* @param integer $offset  Смещение первой строки для возврата, начиная с 0.
+	*
+	* @param integer $limit  Ограничение на количество строк.
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/query.php
+	* @author Bitrix
+	*/
 	static public function query($sql)
 	{
 		list($sql, $binds, $offset, $limit) = self::parseQueryFunctionArgs(func_get_args());
@@ -249,6 +263,23 @@ class OracleConnection extends Connection
 	 * @return integer
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет строку таблицы и возвращает ID добавленной строки. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/add.php">Connection::add</a>.</p> <p>Параметр <code>$identity</code> должен быть равен нулю, если таблица не имеет автоинкрементированных колонок.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы, куда добавляется новая строка.
+	*
+	* @param array $data  Массив имя колонки =&gt; значение.
+	*
+	* @param string $identity = "ID" Только для Oracle.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/add.php
+	* @author Bitrix
+	*/
 	public function add($tableName, array $data, $identity = "ID")
 	{
 		if($identity !== null && !isset($data[$identity]))
@@ -279,6 +310,19 @@ class OracleConnection extends Connection
 	 * @return null|string
 	 * @throws \Bitrix\Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает следующее значение в сгенерированной последовательности БД.</p> <p>Последовательнность имён может содержать только: A-Z, a-z, 0-9 и символ подчёркивания "_".</p>
+	*
+	*
+	* @param string $name = "" Имя в последовательности.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/getnextid.php
+	* @author Bitrix
+	*/
 	public function getNextId($name = "")
 	{
 		$name = preg_replace("/[^A-Za-z0-9_]+/i", "", $name);
@@ -311,6 +355,17 @@ class OracleConnection extends Connection
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает количество поражённых строк из последнего невыполненного запроса. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/getaffectedrowscount.php">Connection::getAffectedRowsCount</a>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/getaffectedrowscount.php
+	* @author Bitrix
+	*/
 	public function getAffectedRowsCount()
 	{
 		return oci_num_rows($this->lastQueryResult);
@@ -323,6 +378,19 @@ class OracleConnection extends Connection
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет существование таблицы. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/istableexists.php">Connection::isTableExists</a>.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/istableexists.php
+	* @author Bitrix
+	*/
 	public function isTableExists($tableName)
 	{
 		if (empty($tableName))
@@ -347,6 +415,21 @@ class OracleConnection extends Connection
 	 * @return boolean
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет существование индекса. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/isindexexists.php">Connection::isIndexExists</a>.</p> <p>Актуально содержание колонок в индексе может отличаться от запрошенных. В <code>$columns</code> можно использовать префикс столбцов актуального индекса.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы.
+	*
+	* @param array $columns  Массив столбцов в индексе.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/isindexexists.php
+	* @author Bitrix
+	*/
 	public function isIndexExists($tableName, array $columns)
 	{
 		return $this->getIndexName($tableName, $columns) !== null;
@@ -362,6 +445,24 @@ class OracleConnection extends Connection
 	 * @return string|null Name of the index or null if the index doesn't exist.
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает имя индекса. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/getindexname.php">Connection::getIndexName</a>.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы
+	*
+	* @param array $columns  Массив колонок индекса.
+	*
+	* @param boolean $strict = false Флаг, устанавливающий, что колонки в индексе должны точно
+	* соответствовать колонкам в параметре $Columns.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/getindexname.php
+	* @author Bitrix
+	*/
 	public function getIndexName($tableName, array $columns, $strict = false)
 	{
 		if (!is_array($columns) || empty($columns))
@@ -418,6 +519,19 @@ class OracleConnection extends Connection
 	 * @return Entity\ScalarField[] An array of objects with columns information.
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает объекты полей соответствующие колонкам таблицы. Таблица должна существовать. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/gettablefields.php">Connection::getTableFields</a>.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/gettablefields.php
+	* @author Bitrix
+	*/
 	public function getTableFields($tableName)
 	{
 		if (!isset($this->tableColumnsCache[$tableName]))
@@ -525,6 +639,21 @@ class OracleConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод переименовывает таблицу. Таблица обязательно должна существовать, и новое имя не должно встречаться в БД. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/renametable.php">Connection::renameTable</a>.</p>
+	*
+	*
+	* @param string $currentName  Текущее имя таблицы
+	*
+	* @param string $newName  Новое имя таблицы
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/renametable.php
+	* @author Bitrix
+	*/
 	public function renameTable($currentName, $newName)
 	{
 		$this->query('RENAME '.$this->getSqlHelper()->quote($currentName).' TO '.$this->getSqlHelper()->quote($newName));
@@ -566,6 +695,19 @@ class OracleConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод удаляет таблицу. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/droptable.php">Connection::dropTable</a>.</p>
+	*
+	*
+	* @param string $tableName  Имя удаляемой таблицы.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/droptable.php
+	* @author Bitrix
+	*/
 	public function dropTable($tableName)
 	{
 		$this->query('DROP TABLE '.$this->getSqlHelper()->quote($tableName).' CASCADE CONSTRAINTS');
@@ -590,6 +732,17 @@ class OracleConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод производит запуск новой транзакции базы данных. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/starttransaction.php">Connection::startTransaction</a>. </p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/starttransaction.php
+	* @author Bitrix
+	*/
 	public function startTransaction()
 	{
 		$this->transaction = OCI_DEFAULT;
@@ -601,6 +754,17 @@ class OracleConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод останавливает начатую транзакцию Базы данных. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/committransaction.php">Connection::commitTransaction</a>.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/committransaction.php
+	* @author Bitrix
+	*/
 	public function commitTransaction()
 	{
 		$this->connectInternal();
@@ -614,6 +778,17 @@ class OracleConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод откатывает начатую транзакцию. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/rollbacktransaction.php">Connection::rollbackTransaction</a>.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/rollbacktransaction.php
+	* @author Bitrix
+	*/
 	public function rollbackTransaction()
 	{
 		$this->connectInternal();
@@ -634,6 +809,17 @@ class OracleConnection extends Connection
 	 * @return string
 	 * @see \Bitrix\Main\DB\Connection::getType
 	 */
+	
+	/**
+	* <p>Нестатический абстрактный метод возвращает тип БД. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/gettype.php">Connection::getType</a>.</p> <p></p> <ul><li> oracle </li></ul> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "oracle";
@@ -648,6 +834,17 @@ class OracleConnection extends Connection
 	 * @return array
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический  метод возвращает версию подключённой БД. Расширение <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/getversion.php">Connection::getVersion</a>.</p> <p>Версия представляется в виде массива из двух элементов:</p> - Первый (с индексом 0) - версия БД.<br> - Второй (с индексом 1) выводится, если используется light или express версия БД.<br><p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/oracleconnection/getversion.php
+	* @author Bitrix
+	*/
 	public function getVersion()
 	{
 		if ($this->version == null)

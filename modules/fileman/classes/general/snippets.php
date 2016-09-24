@@ -57,12 +57,11 @@ class CSnippets
 
 	public static function ReadDir(&$arSNIPPETS, &$arKeys, $path, $template, $level = 0, $parent = "")
 	{
-		$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
-
+		$basePath = self::GetBasePath($template);
 		$io = CBXVirtualIo::GetInstance();
-
 		if(!$io->DirectoryExists($basePath))
 			return;
+
 		$imagesPath = $basePath."/images";
 
 		CSnippets::WriteHtaccess($imagesPath);
@@ -140,11 +139,11 @@ class CSnippets
 
 	public static function UpdateContentInfo(&$ar, &$arKeys, $template)
 	{
-		$path = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		$basePath = self::GetBasePath($template);
 
-		if (file_exists($path."/.content.php"))
+		if (file_exists($basePath."/.content.php"))
 		{
-			@include($path."/.content.php");
+			@include($basePath."/.content.php");
 			$arK = array_keys($SNIPPETS);
 			for ($i=0, $len = count($arK); $i<$len;$i++)
 			{
@@ -190,10 +189,11 @@ class CSnippets
 		$template = CFileMan::SecurePathVar($Params['template']);
 		$site = $Params['site'];
 		$code = $Params['code'];
-		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		$basePath = self::GetBasePath($template);
+		$templatePath = substr($basePath, 0, -9);
 		$thumb = $Params['thumb'] === false ? false : CFileMan::SecurePathVar($Params['thumb']);
 
-		if (!file_exists($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template))
+		if (!file_exists($templatePath))
 		{
 			?><script>alert('Error: Incorrect template Id: <?= CUtil::JSEscape($template)?>');</script><?
 			return;
@@ -207,7 +207,7 @@ class CSnippets
 
 			if ($name == '')
 			{
-				$name = CSnippets::GetDefaultFileName($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets/".$path);
+				$name = CSnippets::GetDefaultFileName($basePath."/".$path);
 				?><script>window.__bx_res_sn_filename = "<?= CUtil::JSEscape($name);?>";</script><?
 			}
 			$name = $name.'.snp';
@@ -216,13 +216,13 @@ class CSnippets
 
 		// 1. Save new snippet with new content
 		if ($code)
-			$APPLICATION->SaveFileContent($contPath.'/'.$key, $code);
+			$APPLICATION->SaveFileContent($basePath.'/'.$key, $code);
 
 		// 2. Rewrite title & description in .content.php
 		if ($title || $description)
 		{
-			if (file_exists($contPath."/.content.php"))
-				@include($contPath."/.content.php");
+			if (file_exists($basePath."/.content.php"))
+				@include($basePath."/.content.php");
 			else
 				$SNIPPETS = array();
 
@@ -240,7 +240,7 @@ class CSnippets
 			}
 			$contentSrc .= '?>';
 
-			$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+			$APPLICATION->SaveFileContent($basePath."/.content.php", $contentSrc);
 		}
 
 		CSnippets::ClearCache();
@@ -292,8 +292,17 @@ class CSnippets
 	{
 		global $APPLICATION;
 
-		$snPath = BX_PERSONAL_ROOT."/templates/".CFileMan::SecurePathVar($Params['template'])."/snippets";
-		$contPath = $_SERVER["DOCUMENT_ROOT"].$snPath;
+		$io = CBXVirtualIo::GetInstance();
+		if($io->DirectoryExists($_SERVER["DOCUMENT_ROOT"]."/local/templates/".$Params['template']."/snippets"))
+		{
+			$snPath = "/local/templates/".$Params['template']."/snippets";
+		}
+		else
+		{
+			$snPath = BX_PERSONAL_ROOT."/templates/".$Params['template']."/snippets";
+		}
+
+		$basePath = $_SERVER["DOCUMENT_ROOT"].$snPath;
 		$path = CFileMan::SecurePathVar($Params["path"]);
 		$key = $Params["path"].($Params["path"] == '' ? '' : '/').CFileMan::SecurePathVar($Params["name"]);
 
@@ -306,9 +315,9 @@ class CSnippets
 			CFileman::DeleteFile(Array($Params["site"], $snPath.'/images/'.$path.($path == '' ?  '' : '/').CFileMan::SecurePathVar($Params["thumb"])));
 		}
 
-		if (file_exists($contPath."/.content.php"))
+		if (file_exists($basePath."/.content.php"))
 		{
-			@include($contPath."/.content.php");
+			@include($basePath."/.content.php");
 			$contentSrc = '<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>'.chr(10);
 			$contentSrc .= '<?'.chr(10).'$SNIPPETS = Array();'.chr(10);
 			foreach ($SNIPPETS as $k=>$_arSn)
@@ -317,7 +326,7 @@ class CSnippets
 					$contentSrc .= '$SNIPPETS[\''.CUtil::JSEscape($k).'\'] = Array("title"=>\''.CUtil::JSEscape($_arSn['title']).'\', "description"=>\''.CUtil::JSEscape($_arSn['description']).'\');'.chr(10);
 			}
 			$contentSrc .= '?>';
-			$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+			$APPLICATION->SaveFileContent($basePath."/.content.php", $contentSrc);
 		}
 
 		CSnippets::ClearCache();
@@ -330,8 +339,8 @@ window.operation_success = true;
 
 	public static function CheckFile($params)
 	{
-		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$params['template']."/snippets";
-		return file_exists(CFileMan::SecurePathVar($contPath.'/'.$params['path']));
+		$basePath = self::GetBasePath($params['template']);
+		return file_exists(CFileMan::SecurePathVar($basePath.'/'.$params['path']));
 	}
 
 	public static function GetGroups($Params)
@@ -379,8 +388,7 @@ window.operation_success = true;
 	public static function InspectDir(&$arSnGroups, $path, $template, $level = 0, $parent = '')
 	{
 		$io = CBXVirtualIo::GetInstance();
-
-		$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		$basePath = self::GetBasePath($template);
 		if(!$io->DirectoryExists($basePath))
 			return;
 
@@ -425,9 +433,10 @@ window.operation_success = true;
 	public static function DisplayJSGroups($template, $ar = array())
 	{
 		$template = CUtil::JSEscape(htmlspecialcharsex($template));
+		$basePath = self::GetBasePath($template);
 		?><script>
 		window.arSnGroups['<?= $template?>'] = {};
-		window.rootDefaultName['<?= $template?>'] = '<?= CSnippets::GetDefaultFileName($_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets")?>';
+		window.rootDefaultName['<?= $template?>'] = '<?= CSnippets::GetDefaultFileName($basePath)?>';
 		<?
 		for($i=0,$len = count($ar); $i < $len; $i++)
 		{
@@ -473,13 +482,13 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		$path = CFileMan::SecurePathVar($params['path']);
 		$template = CFileMan::SecurePathVar($params['template']);
 		$code = $params['code'];
-		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
-		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
+		$basePath = self::GetBasePath($template);
+		$snippetPath = $basePath.($path == '' ? '' : '/'.$path);
 
 		$io = CBXVirtualIo::GetInstance();
-		if(!$io->DirectoryExists($contPath))
+		if(!$io->DirectoryExists($basePath))
 		{
-			$io->CreateDirectory($contPath);
+			$io->CreateDirectory($basePath);
 		}
 
 		if ($params['new'])
@@ -488,7 +497,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		}
 		else
 		{
-			$currentPath = $contPath.'/'.$currentPath;
+			$currentPath = $basePath.'/'.$currentPath;
 			$oldSnippetPath = $io->ExtractPathFromPath($currentPath);
 
 			if ($snippetPath !== $oldSnippetPath && $io->FileExists($currentPath))
@@ -520,8 +529,8 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		if ($title || $description)
 		{
 			$SNIPPETS = array();
-			if ($io->FileExists($contPath."/.content.php"))
-				@include($contPath."/.content.php");
+			if ($io->FileExists($basePath."/.content.php"))
+				@include($basePath."/.content.php");
 
 			if ($title)
 				$SNIPPETS[$key]['title'] = $title;
@@ -532,7 +541,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 			$contentSrc .= '<?'.chr(10).'$SNIPPETS = Array();'.chr(10);
 			foreach ($SNIPPETS as $k => $snip)
 			{
-				if($io->FileExists(CFileMan::SecurePathVar($contPath.'/'.$k)))
+				if($io->FileExists(CFileMan::SecurePathVar($basePath.'/'.$k)))
 				{
 					$contentSrc .= '$SNIPPETS[\''.CUtil::addslashes($k).'\'] = Array(';
 
@@ -551,7 +560,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 			}
 			$contentSrc .= '?>';
 
-			$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+			$APPLICATION->SaveFileContent($basePath."/.content.php", $contentSrc);
 		}
 		$res = array('result' => true);
 
@@ -572,8 +581,8 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		$res = false;
 		$template = CFileMan::SecurePathVar($params['template']);
 		$path = CFileMan::SecurePathVar($params["path"]);
-		$contPath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
-		$snippetPath = $contPath.($path == '' ? '' : '/'.$path);
+		$basePath = self::GetBasePath($template);
+		$snippetPath = $basePath.($path == '' ? '' : '/'.$path);
 
 		$io = CBXVirtualIo::GetInstance();
 
@@ -591,14 +600,14 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		}
 
 		$SNIPPETS = array();
-		if ($io->FileExists($contPath."/.content.php"))
-			@include($contPath."/.content.php");
+		if ($io->FileExists($basePath."/.content.php"))
+			@include($basePath."/.content.php");
 
 		$contentSrc = '<?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>'.chr(10);
 		$contentSrc .= '<?'.chr(10).'$SNIPPETS = Array();'.chr(10);
 		foreach ($SNIPPETS as $k => $snip)
 		{
-			if($io->FileExists(CFileMan::SecurePathVar($contPath.'/'.$k)))
+			if($io->FileExists(CFileMan::SecurePathVar($basePath.'/'.$k)))
 			{
 				$contentSrc .= '$SNIPPETS[\''.CUtil::addslashes($k).'\'] = Array(';
 
@@ -616,7 +625,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 			}
 		}
 		$contentSrc .= '?>';
-		$APPLICATION->SaveFileContent($contPath."/.content.php", $contentSrc);
+		$APPLICATION->SaveFileContent($basePath."/.content.php", $contentSrc);
 
 		CSnippets::ClearCache();
 
@@ -630,8 +639,8 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		{
 			$name = CFileMan::SecurePathVar($params['name']);
 			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
-			$templatePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template;
-			$basePath = $templatePath."/snippets";
+			$basePath = self::GetBasePath($template);
+			$templatePath = substr($basePath, 0, -9);
 
 			$io = CBXVirtualIo::GetInstance();
 			if($io->DirectoryExists($templatePath))
@@ -660,7 +669,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		{
 			$path = CFileMan::SecurePathVar($params['path']);
 			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
-			$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+			$basePath = self::GetBasePath($template);
 			$categoryPath = $basePath.'/'.$path;
 
 			$io = CBXVirtualIo::GetInstance();
@@ -682,7 +691,7 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 		{
 			$path = CFileMan::SecurePathVar($params['path']);
 			$template = (isset($params['template']) && $params['template'] !== '') ? CFileMan::SecurePathVar($params['template']) : '.default';
-			$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+			$basePath = self::GetBasePath($template);
 			$categoryPath = $basePath.'/'.$path;
 
 			$io = CBXVirtualIo::GetInstance();
@@ -694,6 +703,21 @@ window.arSnGroups['<?=$template?>']['<?= $key?>'] =
 			CSnippets::ClearCache();
 		}
 		return $res;
+	}
+
+	private static function GetBasePath($template)
+	{
+		$io = CBXVirtualIo::GetInstance();
+		if($io->DirectoryExists($_SERVER["DOCUMENT_ROOT"]."/local/templates/".$template."/snippets"))
+		{
+			$basePath = $_SERVER["DOCUMENT_ROOT"]."/local/templates/".$template."/snippets";
+		}
+		else
+		{
+			$basePath = $_SERVER["DOCUMENT_ROOT"].BX_PERSONAL_ROOT."/templates/".$template."/snippets";
+		}
+
+		return $basePath;
 	}
 }
 ?>

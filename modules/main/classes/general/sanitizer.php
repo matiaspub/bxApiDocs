@@ -20,6 +20,17 @@
 	*
 	* @version $rev 021
 	*/
+
+	/**
+	* <b>CBXSanitizer</b> - класс для очистки введённого пользователем HTML - текста от тэгов и атрибутов которые не содержатся в "белом списке" разрешенных к использованию.
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxsanitizer/index.php
+	* @author Bitrix
+	*/
 	class CBXSanitizer
 	{
 		/**
@@ -90,19 +101,20 @@
 		 */
 		
 		/**
-		* <p>Добавляет тэги и их атрибуты в список разрешенных к использованию.</p> <p>Возвращает количество добавленных в список тэгов.</p> <p><b>CBXSanitizer::AddTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		* <p>Добавляет тэги и их атрибуты в список  разрешенных к использованию.</p> <p>Возвращает количество добавленных в список тэгов.</p> <p><b>CBXSanitizer::AddTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
 		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
-		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
-		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
-		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
-		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
+		* использованию. Имеет следующую структуру:       <ul> <li>Имя
+		* разрешенного тэга 1</li>         <ul> <li>Имя атрибута 1</li>           <li>Имя
+		* атрибута 2</li>           <li>...</li>         </ul> <li>Имя разрешенного тэга 2</li>        
+		* <ul> <li>Имя атрибута 1</li>           <li>Имя атрибута 2</li>           <li>...</li>        
+		* </ul> <li>...</li>         <ul> <li>...</li>         </ul> </ul>
 		*
 		* @return int 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;AddTags( array (
 		*                   'a' = &gt; array('href','id','style','alt'...),
 		*                   'br' =&gt; array()
@@ -138,19 +150,20 @@
 		 */
 		
 		/**
-		* <p>Обновляет тэги и их атрибуты в списоке разрешенных к использованию.</p> <p>Возвращает количество обновленных в списке тэгов.</p> <p><b>CBXSanitizer::UpdateTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
+		* <p>Обновляет тэги и их атрибуты в списоке  разрешенных к использованию.</p> <p>Возвращает количество обновленных в списке тэгов.</p> <p><b>CBXSanitizer::UpdateTags()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
 		* @param array $arTags  Массив содержащий тэги и атрибуты тэгов разрешенные к
-		* использованию. Имеет следующую структуру: <ul> <li>Имя разрешенного
-		* тэга 1</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li> <li>...</li> </ul> <li>Имя
-		* разрешенного тэга 2</li> <ul> <li>Имя атрибута 1</li> <li>Имя атрибута 2</li>
-		* <li>...</li> </ul> <li>...</li> <ul> <li>...</li> </ul> </ul>
+		* использованию. Имеет следующую структуру:       <ul> <li>Имя
+		* разрешенного тэга 1</li>         <ul> <li>Имя атрибута 1</li>           <li>Имя
+		* атрибута 2</li>           <li>...</li>         </ul> <li>Имя разрешенного тэга 2</li>        
+		* <ul> <li>Имя атрибута 1</li>           <li>Имя атрибута 2</li>           <li>...</li>        
+		* </ul> <li>...</li>         <ul> <li>...</li>         </ul> </ul>
 		*
 		* @return int 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;UpdateTags( array (
 		*                   'a' = &gt; array('href','id','style','alt'...),
 		*                   'br' =&gt; array()
@@ -178,13 +191,13 @@
 		*
 		*
 		* @param array $arTagsNames  Массив содержащий имена тэгов, которые необходимо удалить из
-		* списка разрешенных тэгов. <ul> <li>Имя тэга 1</li> <li>Имя тэга 2</li> <li>...</li>
-		* </ul>
+		* списка разрешенных тэгов.       <ul> <li>Имя тэга 1</li>         <li>Имя тэга 2</li>
+		*         <li>...</li>       </ul>
 		*
 		* @return int 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;DelTags( array ( 'a', 'br' ));
 		* </pre>
 		*
@@ -224,7 +237,7 @@
 		* @return void 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;DelAllTags();
 		* </pre>
 		*
@@ -270,7 +283,7 @@
 		* @return void 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;ApplyHtmlSpecChars(true);
 		* </pre>
 		*
@@ -303,7 +316,7 @@
 		* @return void 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;DeleteSanitizedTags(true);
 		* </pre>
 		*
@@ -331,52 +344,66 @@
 		* <p>Заполняет массив тэгов, разрешенных к использованию в соответствии с выбранным уровнем.</p> <p>Метод ничего не возвращает.</p> <p><b>CBXSanitizer::SetLevel()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		* @param bool $secLevel  <p>Может принимать следующие значения: </p> <ul> <li>CBXSanitizer::SECURE_LEVEL_HIGH</li>
-		* <li>CBXSanitizer::SECURE_LEVEL_MIDDLE</li> <li>CBXSanitizer::SECURE_LEVEL_LOW</li> </ul> <p>При этом в
-		* список разрешенных будут добавлены следующие тэги и атрибуты:</p>
-		* <pre> CBXSanitizer::SECURE_LEVEL_HIGH $arTags = array( 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt; array(),
-		* 'blockquote' =&gt; array(), 'code' =&gt; array(), 'del' =&gt; array(), 'dt' =&gt; array(), 'dd' =&gt; array(), 'font'
-		* =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt; array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6'
-		* =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'ins' =&gt; array(), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
-		* =&gt; array(), 'small' =&gt; array(), 's' =&gt; array(), 'sub' =&gt; array(), 'sup' =&gt; array(), 'strong' =&gt;
-		* array(), 'pre' =&gt; array(), 'u' =&gt; array(), 'ul' =&gt; array() ); </pre> <pre> CBXSanitizer::SECURE_LEVEL_MIDDLE
-		* $arTags = array( 'a' =&gt; array('href', 'title','name','alt'), 'b' =&gt; array(), 'br' =&gt; array(), 'big' =&gt;
-		* array(), 'code' =&gt; array(), 'caption' =&gt; array(), 'del' =&gt; array('title'), 'dt' =&gt; array(), 'dd' =&gt;
-		* array(), 'font' =&gt; array('color','size'), 'color' =&gt; array(), 'h1' =&gt; array(), 'h2' =&gt; array(), 'h3' =&gt;
-		* array(), 'h4' =&gt; array(), 'h5' =&gt; array(), 'h6' =&gt; array(), 'hr' =&gt; array(), 'i' =&gt; array(), 'img' =&gt;
-		* array('src','alt','height','width','title'), 'ins' =&gt; array('title'), 'li' =&gt; array(), 'ol' =&gt; array(), 'p'
-		* =&gt; array(), 'pre' =&gt; array(), 's' =&gt; array(), 'small' =&gt; array(), 'strong' =&gt; array(), 'sub' =&gt;
-		* array(), 'sup' =&gt; array(), 'table' =&gt; array('border','width'), 'tbody' =&gt; array('align','valign'), 'td' =&gt;
-		* array('width','height','align','valign'), 'tfoot' =&gt; array('align','valign'), 'th' =&gt; array('width','height'),
-		* 'thead' =&gt; array('align','valign'), 'tr' =&gt; array('align','valign'), 'u' =&gt; array(), 'ul' =&gt; array() </pre>
-		* <pre> CBXSanitizer::SECURE_LEVEL_LOW $arTags = array( 'a' =&gt; array('href',
-		* 'title','name','style','id','class','shape','coords','alt','target'), 'b' =&gt; array('style','id','class'), 'br' =&gt;
-		* array('style','id','class'), 'big' =&gt; array('style','id','class'), 'caption' =&gt; array('style','id','class'),
-		* 'code' =&gt; array('style','id','class'), 'del' =&gt; array('title','style','id','class'), 'div' =&gt;
-		* array('title','style','id','class','align'), 'dt' =&gt; array('style','id','class'), 'dd' =&gt;
-		* array('style','id','class'), 'font' =&gt; array('color','size','face','style','id','class'), 'h1' =&gt;
-		* array('style','id','class','align'), 'h2' =&gt; array('style','id','class','align'), 'h3' =&gt;
-		* array('style','id','class','align'), 'h4' =&gt; array('style','id','class','align'), 'h5' =&gt;
-		* array('style','id','class','align'), 'h6' =&gt; array('style','id','class','align'), 'hr' =&gt;
-		* array('style','id','class'), 'i' =&gt; array('style','id','class'), 'img' =&gt;
-		* array('src','alt','height','width','title'), 'ins' =&gt; array('title','style','id','class'), 'li' =&gt;
-		* array('style','id','class'), 'map' =&gt; array('shape','coords','href','alt','title','style','id','class','name'), 'ol'
-		* =&gt; array('style','id','class'), 'p' =&gt; array('style','id','class','align'), 'pre' =&gt;
-		* array('style','id','class'), 's' =&gt; array('style','id','class'), 'small' =&gt; array('style','id','class'), 'strong'
-		* =&gt; array('style','id','class'), 'span' =&gt; array('title','style','id','class','align'), 'sub'
-		* =&gt;array('style','id','class'), 'sup' =&gt;array('style','id','class'), 'table' =&gt;
-		* array('border','width','style','id','class','cellspacing','cellpadding'), 'tbody' =&gt;
-		* array('align','valign','style','id','class'), 'td' =&gt;
-		* array('width','height','style','id','class','align','valign','colspan','rowspan'), 'tfoot' =&gt;
-		* array('align','valign','style','id','class','align','valign'), 'th' =&gt;
-		* array('width','height','style','id','class','colspan','rowspan'), 'thead' =&gt;
-		* array('align','valign','style','id','class'), 'tr' =&gt; array('align','valign','style','id','class'), 'u' =&gt;
-		* array('style','id','class'), 'ul' =&gt; array('style','id','class') ); </pre>
+		* @param bool $secLevel  <p>Может принимать следующие значения:       </p> <ul>
+		* <li>CBXSanitizer::SECURE_LEVEL_HIGH</li>       <li>CBXSanitizer::SECURE_LEVEL_MIDDLE</li>      
+		* <li>CBXSanitizer::SECURE_LEVEL_LOW</li>       </ul> <p>При этом в список разрешенных будут
+		* добавлены следующие тэги и атрибуты:</p>       <pre bgcolor="#323232" style="padding:5px;">      
+		* CBXSanitizer::SECURE_LEVEL_HIGH         $arTags = array(             'b'     =&gt; array(),             'br'    =&gt;
+		* array(),             'big'   =&gt; array(),             'blockquote'    =&gt; array(),             'code'    =&gt;
+		* array(),             'del'   =&gt; array(),             'dt'    =&gt; array(),             'dd'    =&gt; array(),       
+		*      'font'    =&gt; array(),             'h1'    =&gt; array(),             'h2'    =&gt; array(),             'h3'   
+		* =&gt; array(),             'h4'    =&gt; array(),             'h5'    =&gt; array(),             'h6'    =&gt; array(), 
+		*            'hr'    =&gt; array(),             'i'     =&gt; array(),             'ins'   =&gt; array(),             'li'
+		*    =&gt; array(),             'ol'    =&gt; array(),             'p'     =&gt; array(),             'small'   =&gt;
+		* array(),             's'     =&gt; array(),             'sub'   =&gt; array(),             'sup'   =&gt; array(),       
+		*      'strong'  =&gt; array(),             'pre'   =&gt; array(),             'u'     =&gt; array(),             'ul'   
+		* =&gt; array()           );       </pre>             <pre bgcolor="#323232" style="padding:5px;">       CBXSanitizer::SECURE_LEVEL_MIDDLE         $arTags =
+		* array(             'a'     =&gt; array('href', 'title','name','alt'),             'b'     =&gt; array(),            
+		* 'br'    =&gt; array(),             'big'   =&gt; array(),             'code'    =&gt; array(),             'caption'
+		* =&gt; array(),             'del'   =&gt; array('title'),             'dt'    =&gt; array(),             'dd'    =&gt;
+		* array(),             'font'    =&gt; array('color','size'),             'color'   =&gt; array(),             'h1'   
+		* =&gt; array(),             'h2'    =&gt; array(),             'h3'    =&gt; array(),             'h4'    =&gt; array(), 
+		*            'h5'    =&gt; array(),             'h6'    =&gt; array(),             'hr'    =&gt; array(),             'i' 
+		*    =&gt; array(),             'img'   =&gt; array('src','alt','height','width','title'),             'ins'   =&gt;
+		* array('title'),             'li'    =&gt; array(),             'ol'    =&gt; array(),             'p'     =&gt; array(),
+		*             'pre'   =&gt; array(),             's'     =&gt; array(),             'small'   =&gt; array(),            
+		* 'strong'  =&gt; array(),             'sub'   =&gt; array(),             'sup'   =&gt; array(),             'table'  
+		* =&gt; array('border','width'),             'tbody'   =&gt; array('align','valign'),             'td'    =&gt;
+		* array('width','height','align','valign'),             'tfoot'   =&gt; array('align','valign'),             'th'    =&gt;
+		* array('width','height'),             'thead'   =&gt; array('align','valign'),             'tr'    =&gt;
+		* array('align','valign'),             'u'     =&gt; array(),             'ul'    =&gt; array()       </pre>       <pre bgcolor="#323232" style="padding:5px;">  
+		*     CBXSanitizer::SECURE_LEVEL_LOW         $arTags = array(             'a'     =&gt; array('href',
+		* 'title','name','style','id','class','shape','coords','alt','target'),             'b'     =&gt;
+		* array('style','id','class'),             'br'    =&gt; array('style','id','class'),             'big'   =&gt;
+		* array('style','id','class'),             'caption' =&gt; array('style','id','class'),             'code'    =&gt;
+		* array('style','id','class'),             'del'   =&gt; array('title','style','id','class'),             'div'   =&gt;
+		* array('title','style','id','class','align'),             'dt'    =&gt; array('style','id','class'),             'dd'   
+		* =&gt; array('style','id','class'),             'font'    =&gt; array('color','size','face','style','id','class'),       
+		*      'h1'    =&gt; array('style','id','class','align'),             'h2'    =&gt; array('style','id','class','align'),  
+		*           'h3'    =&gt; array('style','id','class','align'),             'h4'    =&gt;
+		* array('style','id','class','align'),             'h5'    =&gt; array('style','id','class','align'),             'h6'   
+		* =&gt; array('style','id','class','align'),             'hr'    =&gt; array('style','id','class'),             'i'    
+		* =&gt; array('style','id','class'),             'img'   =&gt; array('src','alt','height','width','title'),            
+		* 'ins'   =&gt; array('title','style','id','class'),             'li'    =&gt; array('style','id','class'),            
+		* 'map'   =&gt; array('shape','coords','href','alt','title','style','id','class','name'),             'ol'    =&gt;
+		* array('style','id','class'),             'p'     =&gt; array('style','id','class','align'),             'pre'   =&gt;
+		* array('style','id','class'),             's'     =&gt; array('style','id','class'),             'small'   =&gt;
+		* array('style','id','class'),             'strong'  =&gt; array('style','id','class'),             'span'    =&gt;
+		* array('title','style','id','class','align'),             'sub'   =&gt;array('style','id','class'),             'sup'  
+		* =&gt;array('style','id','class'),             'table'   =&gt;
+		* array('border','width','style','id','class','cellspacing','cellpadding'),             'tbody'   =&gt;
+		* array('align','valign','style','id','class'),             'td'    =&gt;
+		* array('width','height','style','id','class','align','valign','colspan','rowspan'),             'tfoot'   =&gt;
+		* array('align','valign','style','id','class','align','valign'),             'th'    =&gt;
+		* array('width','height','style','id','class','colspan','rowspan'),             'thead'   =&gt;
+		* array('align','valign','style','id','class'),             'tr'    =&gt; array('align','valign','style','id','class'),   
+		*          'u'     =&gt; array('style','id','class'),             'ul'    =&gt; array('style','id','class')           );  
+		*     </pre>
 		*
 		* @return void 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $Sanitizer-&gt;SetLevel(CBXSanitizer::SECURE_LEVEL_LOW);
 		* </pre>
 		*
@@ -586,7 +613,7 @@
 		* @return void 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* echo $Sanitizer-&gt;GetTags();
 		* </pre>
 		*
@@ -661,12 +688,12 @@
 		* <p>Очищает HTML переданный в качестве параметра от тэгов и атрибутов не содержащихся в списке разрешенных.</p> <p>Возвращает очищенный html.</p> <p><b>CBXSanitizer::SanitizeHtml()</b> можно вызывать только как метод инициализированного объекта, а не как статический метод класса <b>CBXSanitizer</b>. </p>
 		*
 		*
-		* @param string $html  текст в формате html. </h
+		* @param string $html  текст в формате html.
 		*
 		* @return string 
 		*
 		* <h4>Example</h4> 
-		* <pre>
+		* <pre bgcolor="#323232" style="padding:5px;">
 		* $filteredHtml = $Sanitizer-&gt;SanitizeHtml("Sanitize me please!");
 		* </pre>
 		*

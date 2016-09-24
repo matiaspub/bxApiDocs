@@ -81,9 +81,9 @@ final class CCalendarRestService extends IRestService
 		$from = false;
 		$to = false;
 		if (isset($arParams['from']))
-			$from = CRestUtil::unConvertDate($arParams['from']);
+			$from = CRestUtil::unConvertDateTime($arParams['from']);
 		if (isset($arParams['to']))
-			$to = CRestUtil::unConvertDate($arParams['to']);
+			$to = CRestUtil::unConvertDateTime($arParams['to']);
 
 		// Default values for from-to period
 		if ($from === false && $to === false)
@@ -204,18 +204,18 @@ final class CCalendarRestService extends IRestService
 		$methodName = "calendar.event.add";
 
 		if (isset($arParams['from']))
-		{
-			$from = CRestUtil::unConvertDate($arParams['from']);
-			$arParams['from_ts'] = CCalendar::Timestamp($from);
-		}
+			$arParams['from'] = CRestUtil::unConvertDateTime($arParams['from']);
 
 		if (isset($arParams['to']))
-		{
-			$to = CRestUtil::unConvertDate($arParams['to']);
-			$arParams['to_ts'] = CCalendar::Timestamp($to);
-		}
+			$arParams['to'] = CRestUtil::unConvertDateTime($arParams['to']);
 
-		$necessaryParams = array('from_ts', 'to_ts', 'name', 'ownerId', 'type', 'section');
+		if (isset($arParams['from_ts']) && !isset($arParams['from']))
+			$arParams['from'] = CCalendar::Date($arParams['from_ts']);
+
+		if (isset($arParams['to_ts']) && !isset($arParams['to']))
+			$arParams['to'] = CCalendar::Date($arParams['to_ts']);
+
+		$necessaryParams = array('from', 'to', 'name', 'ownerId', 'type', 'section');
 		foreach ($necessaryParams as $param)
 		{
 			if (!isset($arParams[$param]) || empty($arParams[$param]))
@@ -241,8 +241,8 @@ final class CCalendarRestService extends IRestService
 			"CAL_TYPE" => $type,
 			"OWNER_ID" => $ownerId,
 			"NAME" => trim($arParams['name']),
-			"DT_FROM_TS" => $arParams['from_ts'],
-			"DT_TO_TS" => $arParams['to_ts'],
+			"DATE_FROM" => $arParams['from'],
+			"DATE_TO" => $arParams['to'],
 			"SECTIONS" => $sectionId
 		);
 
@@ -391,10 +391,10 @@ final class CCalendarRestService extends IRestService
 		);
 
 		if (isset($arParams['from_ts']))
-			$arFields["DT_FROM_TS"] = intVal($arParams['from_ts']);
+			$arFields["DATE_FROM"] = CCalendar::Date($arParams['from_ts']);
 
 		if (isset($arParams['to_ts']))
-			$arFields["DT_TO_TS"] = intVal($arParams['to_ts']);
+			$arFields["DATE_TO"] = CCalendar::Date($arParams['to_ts']);
 
 		if (isset($arParams['skip_time']))
 			$arFields["SKIP_TIME"] = $arParams['skip_time'] == 'Y';

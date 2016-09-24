@@ -38,6 +38,19 @@ class Element extends Base
 	 *
 	 * @return \Bitrix\Iblock\Template\Entity\Base
 	 */
+	
+	/**
+	* <p>Метод используется для поиска элемента для обработки шаблона. Нестатический метод.</p>
+	*
+	*
+	* @param string $entity  Элемент для поиска.
+	*
+	* @return \Bitrix\Iblock\Template\Entity\Base 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/element/resolve.php
+	* @author Bitrix
+	*/
 	public function resolve($entity)
 	{
 		if ($entity === "property")
@@ -108,6 +121,19 @@ class Element extends Base
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Используется для инициализации полей элемента из некоторого внешнего источника. Нестатический метод.</p>
+	*
+	*
+	* @param array $fields  Массив, содержащий поля элемента.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/element/setfields.php
+	* @author Bitrix
+	*/
 	public function setFields(array $fields)
 	{
 		parent::setFields($fields);

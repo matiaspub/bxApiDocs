@@ -2,6 +2,8 @@
 
 namespace Bitrix\Sale\Compatible;
 
+use Bitrix\Main\Application;
+use Bitrix\Main\DB;
 use	Bitrix\Main\Entity,
 	Bitrix\Main\Entity\Query,
 	Bitrix\Main\Entity\Field,
@@ -575,9 +577,9 @@ class OrderQuery extends AliasedQuery
 			$result->addFetchAdapter(new AggregateAdapter($this->aggregated));
 		}
 
-		if (is_array($navStart) && isset($navStart['nTopCount']))
+		if (!empty($navStart) && is_array($navStart))
 		{
-			if ($navStart['nTopCount'] > 0)
+			if (!empty($navStart['nTopCount']))
 			{
 				$this->setLimit($navStart['nTopCount']);
 			}
@@ -588,24 +590,8 @@ class OrderQuery extends AliasedQuery
 			}
 		}
 
-		// Do not remove!!!
-//		file_put_contents('/var/www/log', "\n\n\n\n".$this->getQuery()."\n", FILE_APPEND); // $this->dump()
-
 		$rows = $this->exec()->fetchAll();
-
-		// Do not remove!!!
-//		foreach ($rows as $row)
-//		{
-//			file_put_contents('/var/www/log', "\n".print_r($row, true), FILE_APPEND);
-//		}
-
 		$result->InitFromArray($rows);
-
-		// Do not remove!!!
-//		while ($row = $result->Fetch())
-//		{
-//			file_put_contents('/var/www/log', "\n".print_r($row, true), FILE_APPEND);
-//		}
 
 		return $result;
 	}
@@ -620,6 +606,7 @@ class OrderQueryLocation extends OrderQuery
 		if((string) $fieldName == '')
 			return false;
 
+
 		$this->registerRuntimeField(
 			'LOCATION',
 			array(
@@ -631,12 +618,24 @@ class OrderQueryLocation extends OrderQuery
 			)
 		);
 
+		$fieldType = "CHAR";
+		/** @var DB\Connection $connection */
+		$connection = Application::getConnection();
+		if ($connection instanceof DB\MssqlConnection)
+		{
+			$fieldType = "VARCHAR";
+		}
+		elseif($connection instanceof DB\OracleConnection)
+		{
+			$fieldType = "VARCHAR2";
+		}
+
 		$this->registerRuntimeField(
 			'PROXY_'.$fieldName.'_LINK',
 			array(
 				'data_type' => 'string',
 				'expression' => array(
-					"CASE WHEN %s = 'LOCATION' THEN CAST(%s AS CHAR) ELSE %s END",
+					"CASE WHEN %s = 'LOCATION' THEN CAST(%s AS ".$fieldType."(500)) ELSE %s END",
 					($ref !== false ? $ref.'.' : '').'TYPE',
 					'LOCATION.ID',
 					$fieldName

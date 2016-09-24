@@ -21,9 +21,9 @@ class CBPAllWorkflowPersister
 		return time() + $this->ownershipDelta;
 	}
 
-	public function LoadWorkflow($instanceId)
+	public function LoadWorkflow($instanceId, $silent = false)
 	{
-		$state = $this->RetrieveWorkflow($instanceId);
+		$state = $this->RetrieveWorkflow($instanceId, $silent);
 		if (strlen($state) > 0)
 			return $this->RestoreFromSerializedForm($state);
 

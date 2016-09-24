@@ -1,10 +1,9 @@
 <?
 IncludeModuleLangFile(__FILE__);
-// define("POSTING_TEMPLATE_DIR", substr(BX_PERSONAL_ROOT, 1)."/php_interface/subscribe/templates");
 
 
 /**
- * <b>CPostingTemplate</b> - класс для работы с шаблонами генерации выпусков подписки. 
+ * <b>CPostingTemplate</b> - класс для работы с шаблонами генерации выпусков подписки.
  *
  *
  * @return mixed 
@@ -15,18 +14,19 @@ IncludeModuleLangFile(__FILE__);
  */
 class CPostingTemplate
 {
-	var $LAST_ERROR="";
+	var $LAST_ERROR = "";
+
 	//Get list
 	
 	/**
-	* <p>Метод возвращает список шаблонов.</p>
+	* <p>Метод возвращает список шаблонов. Метод статический.</p>
 	*
 	*
 	* @return array <p>Возвращается массив относительных путей к подкаталогам
-	* каталога <code>/bitrix/php_interface/subscribe/templates</code>.</p> <a name="examples"></a>
+	* каталога <code>/bitrix/php_interface/subscribe/templates</code>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* //get template directories
 	* $arTemplates = <b>CPostingTemplate::GetList</b>();
@@ -45,31 +45,39 @@ class CPostingTemplate
 	*/
 	public static function GetList()
 	{
+		$io = CBXVirtualIo::GetInstance();
 		$arTemplates = array();
-		$dir = $_SERVER["DOCUMENT_ROOT"]."/".POSTING_TEMPLATE_DIR;
-		if(is_dir($dir) && ($dh = opendir($dir)))
+
+		$dir = substr(getLocalPath("php_interface/subscribe/templates", BX_PERSONAL_ROOT), 1); //cut leading slash
+		$abs_dir = $_SERVER["DOCUMENT_ROOT"]."/".$dir;
+		if ($io->DirectoryExists($abs_dir))
 		{
-			while (($file = readdir($dh)) !== false)
-				if(is_dir($dir."/".$file) && $file!="." && $file!="..")
-					$arTemplates[]=POSTING_TEMPLATE_DIR."/".$file;
-			closedir($dh);
+			$d = $io->GetDirectory($abs_dir);
+			foreach ($d->GetChildren() as $dir_entry)
+			{
+				if ($dir_entry->IsDirectory())
+				{
+					$arTemplates[] = $dir."/".$dir_entry->GetName();
+				}
+			}
 		}
+
 		return $arTemplates;
 	}
 
 	
 	/**
-	* <p>Метод возвращает шаблон по его идентификатору (относительному пути).</p>
+	* <p>Метод возвращает шаблон по его идентификатору (относительному пути). Метод статический.</p>
 	*
 	*
 	* @param string $path = "" Относительный путь к каталогу шаблона.
 	*
 	* @return array <p>Возвращается массив формируемый в файле description.php дополненный
-	* элементом "path" равным относительному пути к каталогу шаблона. </p> <a
+	* элементом "path" равным относительному пути к каталогу шаблона. </p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arTemplate =
 	* 	Array(
@@ -87,29 +95,36 @@ class CPostingTemplate
 	public static function GetByID($path="")
 	{
 		global $MESS;
+
 		if(!CPostingTemplate::IsExists($path))
 			return false;
+
 		$arTemplate = array();
+
 		$strFileName= $_SERVER["DOCUMENT_ROOT"]."/".$path."/lang/".LANGUAGE_ID."/description.php";
-		if(file_exists($strFileName)) include($strFileName);
+		if(file_exists($strFileName))
+			include($strFileName);
+
 		$strFileName= $_SERVER["DOCUMENT_ROOT"]."/".$path."/description.php";
-		if(file_exists($strFileName)) include($strFileName);
+		if(file_exists($strFileName))
+			include($strFileName);
+
 		$arTemplate["PATH"] = $path;
 		return $arTemplate;
 	}
 
 	
 	/**
-	* <p>Метод проверяет существование каталога шаблона.</p>
+	* <p>Метод проверяет существование каталога шаблона. Метод статический.</p>
 	*
 	*
 	* @param string $path = "" Относительный путь к каталогу шаблона.
 	*
-	* @return bool <p>true, если каталог шаблона существует, и false в противном случае. </p>
-	* <a name="examples"></a>
+	* @return bool <p>true, если каталог шаблона существует, и false в противном случае.
+	* </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if(!CPostingTemplate::IsExists("bitrix/php_interface/subscribe/templates/news"))
 	* 	echo "Указанный шаблон не существует.";
@@ -123,34 +138,38 @@ class CPostingTemplate
 	*/
 	public static function IsExists($path="")
 	{
-		if(substr($path, 0, strlen(POSTING_TEMPLATE_DIR)+1) !== POSTING_TEMPLATE_DIR."/")
-			return false;
+		$io = CBXVirtualIo::GetInstance();
 
-		$template = substr($path, strlen(POSTING_TEMPLATE_DIR)+1);
-		if(
-			strpos($template, "\0") !== false
-			|| strpos($template, "\\") !== false
-			|| strpos($template, "/") !== false
-			|| strpos($template, "..") !== false
-		)
+		$dir = substr(getLocalPath("php_interface/subscribe/templates", BX_PERSONAL_ROOT), 1);
+		if (strpos($path, $dir."/") === 0)
 		{
-			return false;
-		}
+			$template = substr($path, strlen($dir) + 1);
+			if(
+				strpos($template, "\0") !== false
+				|| strpos($template, "\\") !== false
+				|| strpos($template, "/") !== false
+				|| strpos($template, "..") !== false
+			)
+			{
+				return false;
+			}
 
-		return is_dir($_SERVER["DOCUMENT_ROOT"]."/".$path);
+			return $io->DirectoryExists($_SERVER["DOCUMENT_ROOT"]."/".$path);
+		}
+		return false;
 	}
 
 	
 	/**
-	* <p>Метод выбирает шаблон для генерации выпуска рассылки в соответствии с расписанием.</p> <p>Сначала делается выборка всех рассылок отмеченных как активные и автоматические. Затем для каждой из них выполняется проверка на необходимость генерации выпуска. Как только найдена такая рассылка для нее вызывается метод CPostingTemplate::AddPosting и на этом функция Execute завершает свою работу.</p> <p>Этот метод предназначен для вызова из сценария cron'а или агента.</p>
+	* <p>Метод выбирает шаблон для генерации выпуска рассылки в соответствии с расписанием.</p> <p>Сначала делается выборка всех рассылок отмеченных как активные и автоматические. Затем для каждой из них выполняется проверка на необходимость генерации выпуска. Как только найдена такая рассылка для нее вызывается метод CPostingTemplate::AddPosting и на этом функция Execute завершает свою работу.</p> <p>Этот метод предназначен для вызова из сценария cron'а или агента.  Метод статический.</p>
 	*
 	*
 	* @return string <p>Если была найдена хотя бы одна активная и автоматическая
 	* рассылка, то возвращается строка для вызова из агента, иначе
-	* возвращается пустая строка.</p> <a name="examples"></a>
+	* возвращается пустая строка.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* #!/usr/bin/php
 	* &lt;?php
 	* //Здесь необходимо указать ваш DOCUMENT_ROOT!
@@ -174,8 +193,6 @@ class CPostingTemplate
 	*/
 	public static function Execute()
 	{
-		global $DB;
-
 		$rubrics = CRubric::GetList(array(), array("ACTIVE"=>"Y", "AUTO"=>"Y"));
 		$current_time = time();
 		$time_of_exec = false;
@@ -240,20 +257,21 @@ class CPostingTemplate
 
 	
 	/**
-	* <p>Метод генерации выпуска на основании шаблона.</p> <p>Сначала ищется и подключается языковой файл шаблона. Поиск осуществляется по пути &lt;шаблон&gt;&gt;/lang/&lt;идентификатор языка сайта к которому привязана рассылка&gt;/template.php. Затем исполняется (подключается файл &lt;шаблон&gt;&gt;/lang/template.php) шаблон. Весь вывод шаблона становится телом письма, а массив возвращаемый из него становится полями выпуска.</p> <p>Если шаблон вернул не массив, а false, то выпуск не будет создан. При этом отметка времени о формировании будет сделана. <br></p> <p> </p> <p>Если в этом массиве есть элемент FILES, к выпуску добавляются вложения. Элементами этого массива должны быть массивы формата: <br></p> <pre>Array(<br> "name" =&gt; "название файла",<br> "size" =&gt; "размер",<br> "tmp_name" =&gt; "временный путь на сервере",<br> "type" =&gt; "тип загружаемого файла");</pre> Массив такого вида может быть сформирован с помощью функии <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a>. <p></p> <p>А если в этом массиве есть элемент DO_NOT_SEND и его значение равно "Y", то выпуск не будет отправлен. Может быть использовано для отладки генерации или премодерации автоматических выпусков.</p>
+	* <p>Метод генерации выпуска на основании шаблона. Метод статический.</p>   <p>Сначала ищется и подключается языковой файл шаблона. Поиск осуществляется по пути &lt;шаблон&gt;&gt;/lang/&lt;идентификатор языка сайта к которому привязана рассылка&gt;/template.php. Затем исполняется (подключается файл &lt;шаблон&gt;&gt;/lang/template.php) шаблон. Весь вывод шаблона становится телом письма, а массив возвращаемый из него становится полями выпуска.</p> <p>Если шаблон вернул не массив, а false, то выпуск не будет создан. При этом отметка времени о формировании будет сделана.   <br></p> <p> </p> <p>Если в этом массиве есть элемент FILES, к выпуску добавляются вложения. Элементами этого массива должны быть массивы формата:   <br></p> <pre bgcolor="#323232" style="padding:5px;">Array(<br>    "name" =&gt; "название файла",<br>    "size" =&gt; "размер",<br>    "tmp_name" =&gt; "временный путь на сервере",<br>    "type" =&gt; "тип загружаемого файла");</pre>  Массив такого вида может быть сформирован с помощью функии <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a>. <p></p>   <p>А если в этом массиве есть элемент DO_NOT_SEND и его значение равно "Y", то выпуск не будет отправлен. Может быть использовано для отладки генерации или премодерации автоматических выпусков.</p>
 	*
 	*
 	* @param array $arRubric  Массив со значениями <a
 	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
-	* "Рассылка"</a>. и дополнительными полями: <br> SITE_ID - идентификатор
-	* сайта рассылки; <br> START_TIME - время предыдущего запуска шаблона в
-	* формате "FULL" текущего сайта; <br> END_TIME - время текущего запуска
-	* шаблона в формате "FULL" текущего сайта.
+	* "Рассылка"</a>. 	и дополнительными полями:         <br>        	SITE_ID -
+	* идентификатор сайта рассылки;         <br>        	START_TIME - время
+	* предыдущего запуска шаблона в формате "FULL" текущего сайта;         <br> 
+	*       	END_TIME - время текущего запуска шаблона в формате "FULL" текущего
+	* сайта.
 	*
-	* @return void <p>Нет.</p></bo<a name="examples"></a>
+	* @return void <p>Нет.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $rubrics = CRubric::GetList(array(), array("ID"=&gt;$ID));<br>if($arRubric=$rubrics-&gt;Fetch())<br>{<br>    $arRubric["START_TIME"] = $START_TIME;<br>    $arRubric["END_TIME"] = $END_TIME;<br>    $arRubric["SITE_ID"] = $arRubric["LID"];<br>    CPostingTemplate::AddPosting($arRubric);<br>}<br>
 	* </pre>
 	*
@@ -272,6 +290,7 @@ class CPostingTemplate
 		$rsLang = CLanguage::GetByID($arSite["LANGUAGE_ID"]);
 		$arLang = $rsLang->Fetch();
 
+		$strBody="";
 		$arFields=false;
 		if(CPostingTemplate::IsExists($arRubric["TEMPLATE"]))
 		{

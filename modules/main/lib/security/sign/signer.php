@@ -22,6 +22,27 @@ class Signer
 	 *
 	 * @param SigningAlgorithm $algorithm Custom signing algorithm.
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия. Если необходимо использовать свой алгоритм подписи, используйте этот метод.</p>
+	*
+	*
+	* @param mixed $Bitrix  Пользовательский алгоритм подписи.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Security  
+	*
+	* @param Securit $Sign  
+	*
+	* @param SigningAlgorithm $algorithm = null 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct(SigningAlgorithm $algorithm = null)
 	{
 		if ($algorithm !== null)
@@ -31,12 +52,25 @@ class Signer
 	}
 
 	/**
-	 * Set key for singing
+	 * Set key for signing
 	 *
 	 * @param string $value Key.
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает ключ для подписи.</p>
+	*
+	*
+	* @param string $value  Ключ.
+	*
+	* @return \Bitrix\Main\Security\Sign\Signer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/setkey.php
+	* @author Bitrix
+	*/
 	public function setKey($value)
 	{
 		if (!is_string($value))
@@ -51,6 +85,17 @@ class Signer
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает сепаратор, используемый для упаковки/распаковки.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/getseparator.php
+	* @author Bitrix
+	*/
 	public function getSeparator()
 	{
 		return $this->separator;
@@ -63,6 +108,19 @@ class Signer
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает сепаратор для упаковки/распаковки.</p>
+	*
+	*
+	* @param string $value  Сепаратор
+	*
+	* @return \Bitrix\Main\Security\Sign\Signer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/setseparator.php
+	* @author Bitrix
+	*/
 	public function setSeparator($value)
 	{
 		if (!is_string($value))
@@ -80,6 +138,23 @@ class Signer
 	 * @return string
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает подпись сообщения.</p>
+	*
+	*
+	* @param string $value  Сообщение
+	*
+	* @param string $string  Соль
+	*
+	* @param null $salt = null 
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/getsignature.php
+	* @author Bitrix
+	*/
 	public function getSignature($value, $salt = null)
 	{
 		if (!is_string($value))
@@ -108,6 +183,33 @@ class Signer
 	 * @return string
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод подписывает сообщение, возвращает строку в формате: <code>"{message}{separator}{signature}"</code>.</p>
+	*
+	*
+	* @param string $value  Message for signing.
+	*
+	* @param string $string  Salt, if needed.
+	*
+	* @param null $salt = null 
+	*
+	* @return string 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* // If salt needed
+	*  $foo = (new Signer)-&gt;sign('test', 'my_salt');
+	* 
+	*  // Otherwise
+	*  $bar = (new Signer)-&gt;sign('test');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/sign.php
+	* @author Bitrix
+	*/
 	public function sign($value, $salt = null)
 	{
 		if (!is_string($value))
@@ -150,6 +252,48 @@ class Signer
 	 * @throws BadSignatureException
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет подпись и возвращает оригинальное сообщение.</p>
+	*
+	*
+	* @param string $signedValue  Подписанное значение, должно быть в формате:
+	* <code>"{message}{separator}{signature}"</code>.
+	*
+	* @param string $string  Соль, если необходимо.
+	*
+	* @param null $salt = null 
+	*
+	* @return string 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $signer = new Signer;
+	* 
+	*  // Sing message
+	*  $signedValue = $signer-&gt;sign('test');
+	* 
+	*  // Get original message with checking
+	*  echo $signer-&gt;unsign($signedValue);
+	*  // Output: 'test'
+	* 
+	*  // Try to unsigning not signed value
+	*  echo $signer-&gt;unsign('test');
+	*  //throw BadSignatureException with message 'Separator not found in value'
+	* 
+	*  // Or with invalid sign
+	*  echo $signer-&gt;unsign('test.invalid_sign');
+	* 
+	*  // Or invalid salt
+	*  //throw BadSignatureException with message 'Signature does not match'
+	*  echo $signer-&gt;unsign($signedValue, 'invalid_salt');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/unsign.php
+	* @author Bitrix
+	*/
 	public function unsign($signedValue, $salt = null)
 	{
 		if (!is_string($signedValue))
@@ -170,6 +314,25 @@ class Signer
 	 * @param string|null $salt Salt, if used while signing.
 	 * @return bool True if OK, otherwise - false.
 	 */
+	
+	/**
+	* <p>Нестатический метод выполняет простую валидацию подписи сообщения.</p>
+	*
+	*
+	* @param string $value  Сообщение.
+	*
+	* @param string $signature  Подпись.
+	*
+	* @param string $string  Соль, если необходимо.
+	*
+	* @param null $salt = null 
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/validate.php
+	* @author Bitrix
+	*/
 	public function validate($value, $signature, $salt = null)
 	{
 		return $this->verifySignature($value, $signature, $salt);
@@ -191,7 +354,7 @@ class Signer
 	}
 
 	/**
-	 * Return salted key for singing.
+	 * Return salted key for signing.
 	 * If key was set by setKey - use it
 	 * Otherwise - used default (if default key does not exists - automatically generate it)
 	 *
@@ -241,7 +404,20 @@ class Signer
 	 * @param array $values Values for packing.
 	 * @return string
 	 */
-	protected function pack(array $values)
+	
+	/**
+	* <p>Нестатический метод упаковывает массив значений в простую строку вида: <code>pack(['test', 'all', 'values']) -&gt; 'test.all.values'</code></p>
+	*
+	*
+	* @param array $values  Значения для упаковки
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/pack.php
+	* @author Bitrix
+	*/
+	public function pack(array $values)
 	{
 		return join($this->separator, $values);
 	}
@@ -265,7 +441,35 @@ class Signer
 	 * @return array
 	 * @throws BadSignatureException
 	 */
-	protected function unpack($value, $limit = 2)
+	
+	/**
+	* <p>Нестатический метод распаковывает значения из строки (подобно <b>rsplit</b>).</p>
+	*
+	*
+	* @param string $value  Строка для распаковки.
+	*
+	* @param integer $limit = 2 Если <code>$limit === 0</code> - распаковывает все значения, по умолчанию - 2.
+	*
+	* @return array 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* // Unpack all values:
+	*  unpack('test.all.values', 0) -&gt; ['test', 'all', 'values']
+	* 
+	*  // Unpack 2 values (by default). First element containing the rest of string.
+	*  unpack('test.all.values') -&gt; ['test.all', 'values']
+	* 
+	*  // Exception if separator is missing
+	*  unpack('test.all values', 3) -&gt; throws BadSignatureException
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/signer/unpack.php
+	* @author Bitrix
+	*/
+	public function unpack($value, $limit = 2)
 	{
 		// Some kind of optimization
 		if ($limit === 0)
@@ -283,8 +487,8 @@ class Signer
 			if ($pos === false)
 				throw new BadSignatureException('Separator not found in value');
 
-			$result[] = \CUtil::binSubstr($value, $pos + 1);
-			$value = \CUtil::binSubstr($value, 0, $pos);
+			$result[] = substr($value, $pos + 1);
+			$value = substr($value, 0, $pos);
 		}
 		$result[] = $value;
 

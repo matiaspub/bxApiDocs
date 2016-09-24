@@ -28,8 +28,7 @@ class CBPHistoryService
 			"ID" => $ID,
 			"DOCUMENT_ID" => array($arFields['MODULE_ID'], $arFields['ENTITY'], $arFields['DOCUMENT_ID']),
 		);
-		$rsEvents = GetModuleEvents('bizproc', 'OnAddToHistory');
-		while ($arEvent = $rsEvents->Fetch())
+		foreach (GetModuleEvents('bizproc', 'OnAddToHistory', true) as $arEvent)
 			$result = ExecuteModuleEventEx($arEvent, array($arEventParams));
 
 		return $ID;
@@ -59,7 +58,7 @@ class CBPHistoryService
 
 	public function GetHistoryList($arOrder = array("ID" => "DESC"), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
- 		global $DB;
+		global $DB;
 
 		if (count($arSelectFields) <= 0)
 			$arSelectFields = array("ID", "MODULE_ID", "ENTITY", "DOCUMENT_ID", "NAME", "DOCUMENT", "MODIFIED", "USER_ID");
@@ -90,7 +89,7 @@ class CBPHistoryService
 			"NAME" => Array("FIELD" => "H.NAME", "TYPE" => "string"),
 			"DOCUMENT" => Array("FIELD" => "H.DOCUMENT", "TYPE" => "string"),
 			"MODIFIED" => Array("FIELD" => "H.MODIFIED", "TYPE" => "datetime"),
- 			"USER_ID" => Array("FIELD" => "H.USER_ID", "TYPE" => "int"),
+			"USER_ID" => Array("FIELD" => "H.USER_ID", "TYPE" => "int"),
 
 			"USER_NAME" => Array("FIELD" => "U.NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (H.USER_ID = U.ID)"),
 			"USER_LAST_NAME" => Array("FIELD" => "U.LAST_NAME", "TYPE" => "string", "FROM" => "INNER JOIN b_user U ON (H.USER_ID = U.ID)"),
@@ -112,8 +111,6 @@ class CBPHistoryService
 				$strSql .= "WHERE ".$arSqls["WHERE"]." ";
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql .= "GROUP BY ".$arSqls["GROUPBY"]." ";
-
-			//echo "!1!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			if ($arRes = $dbRes->Fetch())
@@ -144,8 +141,6 @@ class CBPHistoryService
 			if (strlen($arSqls["GROUPBY"]) > 0)
 				$strSql_tmp .= "GROUP BY ".$arSqls["GROUPBY"]." ";
 
-			//echo "!2.1!=".htmlspecialcharsbx($strSql_tmp)."<br>";
-
 			$dbRes = $DB->Query($strSql_tmp, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			$cnt = 0;
 			if (strlen($arSqls["GROUPBY"]) <= 0)
@@ -155,22 +150,17 @@ class CBPHistoryService
 			}
 			else
 			{
-				// ТОЛЬКО ДЛЯ MYSQL!!! ДЛЯ ORACLE ДРУГОЙ КОД
+				// only for MySQL
 				$cnt = $dbRes->SelectedRowsCount();
 			}
 
 			$dbRes = new CDBResult();
-
-			//echo "!2.3!=".htmlspecialcharsbx($strSql)."<br>";
-
 			$dbRes->NavQuery($strSql, $cnt, $arNavStartParams);
 		}
 		else
 		{
 			if (is_array($arNavStartParams) && IntVal($arNavStartParams["nTopCount"]) > 0)
 				$strSql .= "LIMIT ".intval($arNavStartParams["nTopCount"]);
-
-			//echo "!3!=".htmlspecialcharsbx($strSql)."<br>";
 
 			$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}

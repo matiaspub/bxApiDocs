@@ -99,6 +99,20 @@ class ConnectorManager
 	 * @param array
 	 * @return \Bitrix\Sender\Connector|null
 	 */
+	
+	/**
+	* <p>Метод возвращает объект коннектора по параметрам. Метод статический.</p>
+	*
+	*
+	* @param array $array  Массив с данными о коннекторе: модуль коннектора - <b>MODULE_ID</b>, код
+	* коннектора - <b>CODE</b>.
+	*
+	* @return \Bitrix\Sender\Connector|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/connectormanager/getconnector.php
+	* @author Bitrix
+	*/
 	public static function getConnector(array $endpoint)
 	{
 		$connector = null;
@@ -118,6 +132,23 @@ class ConnectorManager
 	 * @param array|null
 	 * @return \Bitrix\Sender\Connector[]
 	 */
+	
+	/**
+	* <p>Метод возвращает массив объектов коннектора по параметрам. Метод статический.</p>
+	*
+	*
+	* @param array $array  Массив объектов коннектора. Ключи массива: 			<ul> <li> <b>MODULE_ID</b> -
+	* модуль коннектора;</li> 				<li> <b>CLASS_NAME</b> - имя класса коннектора.</li>
+	* 			</ul>
+	*
+	* @param arra $null  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/connectormanager/getconnectorlist.php
+	* @author Bitrix
+	*/
 	public static function getConnectorList(array $endpointList = null)
 	{
 		$connectorList = array();
@@ -140,6 +171,25 @@ class ConnectorManager
 	 * @param array|null
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список коннекторов по параметрам. Метод статический.</p>
+	*
+	*
+	* @param array $array  Массив со списком коннекторов. Ключи массива: <ul> <li> <b>MODULE_ID</b> -
+	* модуль коннектора;</li> <li> <b>CLASS_NAME</b> - имя класса коннектора;</li> <li>
+	* <b>CODE</b> - код коннектора;</li> <li> <b>NAME</b> - название коннектора;</li> <li>
+	* <b>REQUIRE_CONFIGURE</b> - флаг, обозначающий нужна ли настройка коннектора -
+	* <code>true<code>|<code>false</code>.</code></code> </li> </ul>
+	*
+	* @param arra $null  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/connectormanager/getconnectorclasslist.php
+	* @author Bitrix
+	*/
 	public static function getConnectorClassList(array $endpointList = null)
 	{
 		$resultList = array();

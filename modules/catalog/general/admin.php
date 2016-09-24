@@ -118,12 +118,12 @@ class CCatalogAdmin
 			else
 			{
 				$arSectionTmp = array(
-					"text" => htmlspecialcharsex($arSection["NAME"]),
+					"text" => htmlspecialcharsEx($arSection["NAME"]),
 					"url" => $urlSectionAdminPage."&find_section_section=".$arSection["ID"],
 					"more_url" => array(
 						CIBlock::GetAdminSectionEditLink($IBLOCK_ID, $arSection["ID"], array('catalog' => null)),
 					),
-					"title" => htmlspecialcharsex($arSection["NAME"]),
+					"title" => htmlspecialcharsEx($arSection["NAME"]),
 					"icon" => "iblock_menu_icon_sections",
 					"page_icon" => "iblock_page_icon_sections",
 					"skip_chain" => true,
@@ -153,12 +153,12 @@ class CCatalogAdmin
 		return $arSections;
 	}
 
-	public static function OnBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
+	public static function OnBuildGlobalMenu(/** @noinspection PhpUnusedParameterInspection */&$aGlobalMenu, &$aModuleMenu)
 	{
-		if (defined("BX_CATALOG_UNINSTALLED"))
+		if (defined('BX_CATALOG_UNINSTALLED'))
 			return;
 
-		if (!Loader::includeModule("iblock"))
+		if (!Loader::includeModule('iblock'))
 			return;
 
 		$aMenu = array(
@@ -191,9 +191,8 @@ class CCatalogAdmin
 			}
 		}
 		if (empty($arCatalogs))
-		{
 			return;
-		}
+
 		$rsIBlocks = CIBlock::GetList(
 			array("SORT" => "ASC", "NAME" => "ASC"),
 			array('ID' => array_keys($arCatalogs), "MIN_PERMISSION" => "S")
@@ -220,7 +219,7 @@ class CCatalogAdmin
 					"module_id" => "catalog",
 				),
 				array(
-					"text" => htmlspecialcharsex(CIBlock::GetArrayByID($arIBlock["ID"], "SECTIONS_NAME")),
+					"text" => htmlspecialcharsEx(CIBlock::GetArrayByID($arIBlock["ID"], "SECTIONS_NAME")),
 					"url" => "cat_section_admin.php?lang=".LANGUAGE_ID."&type=".$arIBlock["IBLOCK_TYPE_ID"]."&IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
 					"more_url" => array(
 						"cat_section_admin.php?IBLOCK_ID=".$arIBlock["ID"]."&find_section_section=0",
@@ -317,7 +316,7 @@ class CCatalogAdmin
 
 		if(!is_object($USER) || !$USER->CanDoOperation("clouds_upload"))
 			return;
-
+		/** @var CAdminList $obList */
 		foreach($obList->aRows as $obRow)
 		{
 			$obRow->aActions[] = array("SEPARATOR"=>true);
@@ -339,18 +338,18 @@ class CCatalogAdmin
 		}
 	}
 
-	public static function OnBuildSaleMenu(&$arGlobalMenu, &$arModuleMenu)
+	public static function OnBuildSaleMenu(/** @noinspection PhpUnusedParameterInspection */&$arGlobalMenu, &$arModuleMenu)
 	{
-		if (defined("BX_CATALOG_UNINSTALLED"))
+		if (defined('BX_CATALOG_UNINSTALLED'))
 			return;
 
 		global $USER;
 		if (!CCatalog::IsUserExists())
 			return;
-		if (!Loader::includeModule("sale"))
+		if (!Loader::includeModule('sale'))
 			return;
 
-		if (!defined("BX_SALE_MENU_CATALOG_CLEAR") || BX_SALE_MENU_CATALOG_CLEAR != 'Y')
+		if (!defined('BX_SALE_MENU_CATALOG_CLEAR') || BX_SALE_MENU_CATALOG_CLEAR != 'Y')
 			return;
 
 		self::$catalogRead = $USER->CanDoOperation('catalog_read');
@@ -365,11 +364,14 @@ class CCatalogAdmin
 		self::$catalogExportExec = $USER->CanDoOperation('catalog_export_exec');
 		self::$catalogImportEdit = $USER->CanDoOperation('catalog_import_edit');
 		self::$catalogImportExec = $USER->CanDoOperation('catalog_import_exec');
-		CCatalogAdmin::OnBuildSaleMenuItem($arModuleMenu);
+		static::OnBuildSaleMenuItem($arModuleMenu);
 	}
 
-	public static function OnBuildSaleMenuItem(&$arMenu)
+	protected static function OnBuildSaleMenuItem(&$arMenu)
 	{
+		if (empty($arMenu) || !is_array($arMenu))
+			return;
+
 		$arMenuID = array(
 			'menu_sale_discounts',
 			'menu_sale_taxes',
@@ -390,33 +392,32 @@ class CCatalogAdmin
 				case 'menu_sale_discounts':
 					$useSaleDiscountOnly = (string)Option::get('sale', 'use_sale_discount_only');
 					if ($useSaleDiscountOnly != 'Y')
-						CCatalogAdmin::OnBuildSaleDiscountMenu($arMenuItem['items']);
+						static::OnBuildSaleDiscountMenu($arMenuItem['items']);
 					break;
 				case 'menu_sale_taxes':
-					CCatalogAdmin::OnBuildSaleTaxMenu($arMenuItem['items']);
+					static::OnBuildSaleTaxMenu($arMenuItem['items']);
 					break;
 				case 'menu_sale_settings':
-					CCatalogAdmin::OnBuildSaleSettingsMenu($arMenuItem['items']);
+					static::OnBuildSaleSettingsMenu($arMenuItem['items']);
 					break;
 				case 'menu_catalog_store':
-					CCatalogAdmin::OnBuildSaleStoreMenu($arMenuItem['items']);
+					static::OnBuildSaleStoreMenu($arMenuItem['items']);
 					break;
 			}
 
-			CCatalogAdmin::OnBuildSaleMenuItem($arMenuItem['items']);
+			static::OnBuildSaleMenuItem($arMenuItem['items']);
 		}
-		if (isset($arMenuItem))
-			unset($arMenuItem);
+		unset($arMenuItem);
 	}
 
-	public static function OnBuildSaleDiscountMenu(&$arItems)
+	protected static function OnBuildSaleDiscountMenu(&$arItems)
 	{
 		if (self::$catalogRead || self::$catalogDiscount)
 		{
 			$arItems[] = array(
-				"text" => GetMessage("CM_DISCOUNTS3"),
-				"title" => GetMessage("CM_DISCOUNTS_ALT2"),
-				"items_id" => "menu_sale_discount",
+				"text" => Loc::getMessage("CM_DISCOUNTS3"),
+				"title" => Loc::getMessage("CM_DISCOUNTS_ALT2"),
+				"items_id" => "menu_catalog_discount",
 				"items" => array(
 					array(
 						"text" => Loc::getMessage("CM_DISCOUNTS3"),
@@ -447,7 +448,7 @@ class CCatalogAdmin
 		}
 	}
 
-	public static function OnBuildSaleTaxMenu(&$arItems)
+	protected static function OnBuildSaleTaxMenu(&$arItems)
 	{
 		if (self::$catalogRead || self::$catalogVat)
 		{
@@ -461,32 +462,49 @@ class CCatalogAdmin
 		}
 	}
 
-	public static function OnBuildSaleSettingsMenu(&$arItems)
+	protected static function OnBuildSaleSettingsMenu(&$arItems)
 	{
-		if (self::$catalogRead || self::$catalogGroup)
+		$showPrices = self::$catalogRead || self::$catalogGroup;
+		$showExtra = (CBXFeatures::IsFeatureEnabled('CatMultiPrice') && (self::$catalogRead || self::$catalogExtra));
+		if ($showPrices || $showExtra)
 		{
-			$arItems[] = array(
-				"text" => Loc::getMessage("GROUP"),
-				"url" => "cat_group_admin.php?lang=".LANGUAGE_ID,
-				"more_url" => array("cat_group_edit.php"),
-				"title" => Loc::getMessage("GROUP_ALT"),
-				"readonly" => !self::$catalogGroup,
+			$section = array(
+				'text' => Loc::getMessage('PRICES_SECTION'),
+				'title' => Loc::getMessage('PRICES_SECTION_TITLE'),
+				'items_id' => 'menu_catalog_prices',
+				'items' => array()
 			);
-		}
-
-		if (CBXFeatures::IsFeatureEnabled('CatMultiPrice'))
-		{
-			if (self::$catalogRead || self::$catalogExtra)
+			if ($showPrices)
 			{
-				$arItems[] = array(
-					"text" => Loc::getMessage("EXTRA"),
-					"url" => "cat_extra.php?lang=".LANGUAGE_ID,
-					"more_url" => array("cat_extra_edit.php"),
-					"title" => Loc::getMessage("EXTRA_ALT"),
-					"readonly" => !self::$catalogExtra,
+				$section['items'][] = array(
+					'text' => Loc::getMessage('GROUP'),
+					'title' => Loc::getMessage('GROUP_ALT'),
+					'url' => 'cat_group_admin.php?lang='.LANGUAGE_ID,
+					'more_url' => array('cat_group_edit.php'),
+					'readonly' => !self::$catalogGroup
+				);
+				$section['items'][] = array(
+					'text' => Loc::getMessage('PRICE_ROUND'),
+					'title' => Loc::getMessage('PRICE_ROUND_TITLE'),
+					'url' => 'cat_round_list.php?lang='.LANGUAGE_ID,
+					'more_url' => array('cat_round_edit.php'),
+					'readonly' => !self::$catalogGroup
 				);
 			}
+			if ($showExtra)
+			{
+				$section['items'][] = array(
+					'text' => Loc::getMessage('EXTRA'),
+					'title' => Loc::getMessage('EXTRA_ALT'),
+					'url' => 'cat_extra.php?lang='.LANGUAGE_ID,
+					'more_url' => array('cat_extra_edit.php'),
+					'readonly' => !self::$catalogExtra
+				);
+			}
+			$arItems[] = $section;
+			unset($section);
 		}
+		unset($showExtra, $showPrices);
 
 		if (self::$catalogRead || self::$catalogMeasure)
 		{
@@ -510,7 +528,7 @@ class CCatalogAdmin
 				"module_id" => "sale",
 				"items_id" => "mnu_catalog_exp",
 				"readonly" => !self::$catalogExportEdit && !self::$catalogExportExec,
-				"items" => CCatalogAdmin::OnBuildSaleExportMenu("mnu_catalog_exp"),
+				"items" => static::OnBuildSaleExportMenu("mnu_catalog_exp"),
 			);
 		}
 
@@ -525,12 +543,12 @@ class CCatalogAdmin
 				"module_id" => "sale",
 				"items_id" => "mnu_catalog_imp",
 				"readonly" => !self::$catalogImportEdit && !self::$catalogImportExec,
-				"items" => CCatalogAdmin::OnBuildSaleImportMenu("mnu_catalog_imp"),
+				"items" => static::OnBuildSaleImportMenu("mnu_catalog_imp"),
 			);
 		}
 	}
 
-	public static function OnBuildSaleStoreMenu(&$arItems)
+	protected static function OnBuildSaleStoreMenu(&$arItems)
 	{
 		if (self::$catalogRead || self::$catalogStore)
 		{
@@ -564,7 +582,7 @@ class CCatalogAdmin
 		}
 	}
 
-	public static function OnBuildSaleExportMenu($strItemID)
+	protected static function OnBuildSaleExportMenu($strItemID)
 	{
 		global $adminMenu;
 
@@ -606,7 +624,7 @@ class CCatalogAdmin
 		return $arProfileList;
 	}
 
-	public static function OnBuildSaleImportMenu($strItemID)
+	protected static function OnBuildSaleImportMenu($strItemID)
 	{
 		global $adminMenu;
 
@@ -649,4 +667,3 @@ class CCatalogAdmin
 		return $arProfileList;
 	}
 }
-?>

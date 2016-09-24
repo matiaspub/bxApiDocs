@@ -36,9 +36,21 @@ abstract class DataManager
 	 *
 	 * @return Base
 	 */
+	
+	/**
+	* <p>Статический метод возвращает объект сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Entity\Base 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getentity.php
+	* @author Bitrix
+	*/
 	public static function getEntity()
 	{
 		$class = get_called_class();
+		$class = Base::normalizeEntityClass($class);
 
 		if (!isset(static::$entity[$class]))
 		{
@@ -48,11 +60,33 @@ abstract class DataManager
 		return static::$entity[$class];
 	}
 
+	public static function unsetEntity($class)
+	{
+		$class = Base::normalizeEntityClass($class);
+
+		if (isset(static::$entity[$class]))
+		{
+			unset(static::$entity[$class]);
+			return true;
+		}
+	}
+
 	/**
 	 * Returns DB table name for entity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает имя таблицы БД для сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return null;
@@ -63,6 +97,17 @@ abstract class DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает имя соединения для сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getconnectionname.php
+	* @author Bitrix
+	*/
 	public static function getConnectionName()
 	{
 		return 'default';
@@ -71,6 +116,17 @@ abstract class DataManager
 	/**
 	 * Returns entity map definition
 	 */
+	
+	/**
+	* <p>Статический метод возвращает описание карты сущностей.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array();
@@ -98,6 +154,22 @@ abstract class DataManager
 	 * @param array $parameters Additional parameters for getList()
 	 * @return Main\DB\Result
 	 */
+	
+	/**
+	* <p>Статический метод возвращает выборку по первичному ключу сущности и по опциональным параметрам <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getlist.php">\Bitrix\Main\Entity\DataManager::getList</a>.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ сущности
+	*
+	* @param array $parameters = array() Дополнительные параметры <a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getlist.php">\Bitrix\Main\Entity\DataManager::getList</a>
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getbyprimary.php
+	* @author Bitrix
+	*/
 	public static function getByPrimary($primary, array $parameters = array())
 	{
 		static::normalizePrimary($primary);
@@ -128,6 +200,19 @@ abstract class DataManager
 	 * @param mixed $id Primary key of the entity
 	 * @return Main\DB\Result
 	 */
+	
+	/**
+	* <p>Статический метод возвращает выборку по первичному ключу сущности.</p>
+	*
+	*
+	* @param mixed $id  Первичный ключ сущности.
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getbyid.php
+	* @author Bitrix
+	*/
 	public static function getById($id)
 	{
 		return static::getByPrimary($id);
@@ -139,6 +224,19 @@ abstract class DataManager
 	 * @param mixed $id Primary key of the entity
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает один столбец (или <i>null</i>) по первичному ключу сущности.</p>
+	*
+	*
+	* @param mixed $id  Первичный ключ сущности.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getrowbyid.php
+	* @author Bitrix
+	*/
 	public static function getRowById($id)
 	{
 		$result = static::getByPrimary($id);
@@ -153,6 +251,19 @@ abstract class DataManager
 	 * @param array $parameters Primary key of the entity
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает один столбец (или <i>null</i>) по параметрам для <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getlist.php">\Bitrix\Main\Entity\DataManager::getList</a>.</p>
+	*
+	*
+	* @param array $parameters  Первичный ключ сущности
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getrow.php
+	* @author Bitrix
+	*/
 	public static function getRow(array $parameters)
 	{
 		$parameters['limit'] = 1;
@@ -176,6 +287,28 @@ abstract class DataManager
 	 * @return Main\DB\Result
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Статический метод выполняет запрос и возвращает отобранные по параметрам запроса данные. Этот метод - алиас методов функций объектов <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/index.php">\Bitrix\Main\Entity\Query</a>.</p>
+	*
+	*
+	* @param array $arrayparameters = array() Массив параметров запроса. Возможные ключи: <ul> <li> <b>select</b> - массив
+	* фильтров в части SELECT запроса,  алиасы возможны в виде:
+	* <code>"alias"=&gt;"field"</code>.</li> <li> <b>filter</b> - массив фильтров в части WHERE
+	* запроса в виде: <code>"(condition)field"=&gt;"value"</code>.</li>  <li> <b>group</b> - массив
+	* полей в части GROUP BY запроса.</li>  <li> <b>order</b> - массив полей в части ORDER
+	* BY запроса в виде: <code>"field"=&gt;"asc|desc"</code>.</li>  <li> <b>limit</b> - целое число,
+	* указывающее максимальное число столбцов в выборке (Подобно LIMIT n в
+	* MySql)</li>  <li> <b>offset</b> - целое число, указывающее номер первого столбца
+	* в результате. (Подобно LIMIT n, 100 в MySql)</li>  <li> <b>runtime</b> - массив полей
+	* сущности, создающихся динамически.</li>   </ul>
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getlist.php
+	* @author Bitrix
+	*/
 	public static function getList(array $parameters = array())
 	{
 		$query = static::query();
@@ -236,6 +369,19 @@ abstract class DataManager
 	 * @param array $filter
 	 * @return int
 	 */
+	
+	/**
+	* <p>Статический метод выполняет COUNT запрос к сущности и возвращает результат.</p>
+	*
+	*
+	* @param array $arrayfilter = array() 
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/getcount.php
+	* @author Bitrix
+	*/
 	public static function getCount(array $filter = array())
 	{
 		$query = static::query();
@@ -253,6 +399,17 @@ abstract class DataManager
 	 *
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Статический метод создаёт и возвращает объект запроса для сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/query.php
+	* @author Bitrix
+	*/
 	public static function query()
 	{
 		return new Query(static::getEntity());
@@ -370,6 +527,29 @@ abstract class DataManager
 	 * @param array $data
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Статический метод проверяет поля данных перед записью в БД. Результат проверки храниться в объекте <code>$result</code>.</p>
+	*
+	*
+	* @param mixed $Bitrix  
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Result $result  
+	*
+	* @param mixed $primary  
+	*
+	* @param array $data  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/checkfields.php
+	* @author Bitrix
+	*/
 	public static function checkFields(Result $result, $primary, array $data)
 	{
 		//checks required fields
@@ -431,6 +611,19 @@ abstract class DataManager
 	 *
 	 * @throws \Exception
 	 */
+	
+	/**
+	* <p>Статический метод добавляет строку в таблицу сущностей.</p>
+	*
+	*
+	* @param array $data  
+	*
+	* @return \Bitrix\Main\Entity\AddResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/add.php
+	* @author Bitrix
+	*/
 	public static function add(array $data)
 	{
 		global $USER_FIELD_MANAGER, $APPLICATION;
@@ -596,6 +789,21 @@ abstract class DataManager
 	 *
 	 * @throws \Exception
 	 */
+	
+	/**
+	* <p>Статический метод обновляет строку в таблице объекта по первичному ключу.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ.
+	*
+	* @param array $data  Данные для обновления.
+	*
+	* @return \Bitrix\Main\Entity\UpdateResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/update.php
+	* @author Bitrix
+	*/
 	public static function update($primary, array $data)
 	{
 		global $USER_FIELD_MANAGER, $APPLICATION;
@@ -692,26 +900,30 @@ abstract class DataManager
 			}
 
 			// save data
-			$connection = $entity->getConnection();
-			$helper = $connection->getSqlHelper();
-
-			$tableName = $entity->getDBTableName();
-
-			$dataReplacedColumn = static::replaceFieldName($data);
-			$update = $helper->prepareUpdate($tableName, $dataReplacedColumn);
-
-			$replacedPrimary = static::replaceFieldName($primary);
-			$id = array();
-			foreach ($replacedPrimary as $k => $v)
+			if (!empty($data))
 			{
-				$id[] = $helper->prepareAssignment($tableName, $k, $v);
+				$connection = $entity->getConnection();
+				$helper = $connection->getSqlHelper();
+
+				$tableName = $entity->getDBTableName();
+
+				$dataReplacedColumn = static::replaceFieldName($data);
+				$update = $helper->prepareUpdate($tableName, $dataReplacedColumn);
+
+				$replacedPrimary = static::replaceFieldName($primary);
+				$id = array();
+				foreach ($replacedPrimary as $k => $v)
+				{
+					$id[] = $helper->prepareAssignment($tableName, $k, $v);
+				}
+				$where = implode(' AND ', $id);
+
+				$sql = "UPDATE ".$tableName." SET ".$update[0]." WHERE ".$where;
+				$connection->queryExecute($sql, $update[1]);
+
+				$result->setAffectedRowsCount($connection);
 			}
-			$where = implode(' AND ', $id);
 
-			$sql = "UPDATE ".$tableName." SET ".$update[0]." WHERE ".$where;
-			$connection->queryExecute($sql, $update[1]);
-
-			$result->setAffectedRowsCount($connection);
 			$result->setData($data);
 			$result->setPrimary($primary);
 
@@ -749,6 +961,19 @@ abstract class DataManager
 	 *
 	 * @throws \Exception
 	 */
+	
+	/**
+	* <p>Статический метод удаляет строку в таблице сущности по первичному ключу.</p>
+	*
+	*
+	* @param mixed $primary  
+	*
+	* @return \Bitrix\Main\Entity\DeleteResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanager/delete.php
+	* @author Bitrix
+	*/
 	public static function delete($primary)
 	{
 		global $USER_FIELD_MANAGER;

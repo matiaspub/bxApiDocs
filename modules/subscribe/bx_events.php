@@ -6,22 +6,24 @@
  */
 class _CEventsSubscribe {
 /**
- * Событие "BeforePostingSendMail" вызывается перед отправкой выпуска из метода <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingsendmessage.php">CPosting::SendMessage</a>.
+ * Событие "BeforePostingSendMail" вызывается перед отправкой выпуска из метода <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingsendmessage.php">CPosting::SendMessage</a>.
  *
  *
- * @param array $arFields  Массив следующего содержания: <ul> <li>POSTING_ID - идентификатор
- * выпуска.</li> <li>EMAIL - адрес на который будет отправлен выпуск.</li>
- * <li>SUBJECT - заголовок письма (в кодированном виде, если установлена
- * соответсветствующая настройка модуля).</li> <li>BODY - тело письма уже
- * отформатированное в соответствии со стандартом MIME.</li> <li>HEADER -
- * служебные заголовки.</li> <li>EMAIL_EX - расширенная информация о
+ * @param array $arFields  Массив следующего содержания: 	          <ul> <li>POSTING_ID - идентификатор
+ * выпуска.</li>          	            <li>EMAIL - адрес на который будет отправлен
+ * выпуск.</li>          	            <li>SUBJECT - заголовок письма (в кодированном
+ * виде, если установлена соответсветствующая настройка модуля).</li> 
+ *         	            <li>BODY - тело письма уже отформатированное в
+ * соответствии со стандартом MIME.</li>          	            <li>HEADER - служебные
+ * заголовки.</li>                     <li>EMAIL_EX - расширенная информация о
  * получателе, см. <a
- * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingfields.php">Поля CPosting.</a> </li> </ul>
+ * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">Поля CPosting.</a>
+ * </li>          	</ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>// файл /bitrix/php_interface/init.php<br>// регистрируем обработчик<br>AddEventHandler("subscribe", "<b>BeforePostingSendMail</b>", Array("MyClass", "BeforePostingSendMailHandler"));<br>
  * class MyClass
  * {
@@ -48,9 +50,9 @@ class _CEventsSubscribe {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingsendmessage.php">CPosting::SendMessage</a></li>
- * <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a></li> </ul> </htm<a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingsendmessage.php">CPosting::SendMessage</a></li>
+ *     <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
+ * событий</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -60,8 +62,7 @@ class _CEventsSubscribe {
 	public static function BeforePostingSendMail($arFields){}
 
 /**
- * Вызывается при удалении сообщения.
- * </htm
+ * при удалении сообщения.
  * <i>Вызывается в методе:</i><br>
  * subscribe::UnInstallDB<br><br>
  * 
@@ -72,9 +73,7 @@ class _CEventsSubscribe {
 	public static function OnEventMessageDelete(){}
 
 /**
- * Вызывается перед удалением подписки.
- * 
- * 
+ * перед удалением подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::Delete<br><br>
  * 
@@ -85,8 +84,7 @@ class _CEventsSubscribe {
 	public static function OnBeforeSubscriptionDelete(){}
 
 /**
- * Вызывается после удаления подписки.
- * 
+ * после удаления подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::Delete<br><br>
  * 
@@ -97,9 +95,7 @@ class _CEventsSubscribe {
 	public static function OnAfterSubscriptionDelete(){}
 
 /**
- * Вызывается при обновлении подписки.
- * 
- * 
+ * при обновлении подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::CheckFields<br><br>
  * 
@@ -110,9 +106,7 @@ class _CEventsSubscribe {
 	public static function OnStartSubscriptionUpdate(){}
 
 /**
- * Вызывается перед обновлением подписки.
- * 
- * 
+ * перед обновлением подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::CheckFields<br><br>
  * 
@@ -123,9 +117,7 @@ class _CEventsSubscribe {
 	public static function OnBeforeSubscriptionUpdate(){}
 
 /**
- * Вызывается при добавлении подписки.
- * 
- * 
+ * при добавлении подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::CheckFields<br><br>
  * 
@@ -136,9 +128,7 @@ class _CEventsSubscribe {
 	public static function OnStartSubscriptionAdd(){}
 
 /**
- * Вызывается перед добавлением подписки.
- * 
- * 
+ * перед добавлением подписки.
  * <i>Вызывается в методе:</i><br>
  * CSubscriptionGeneral::CheckFields<br><br>
  * 

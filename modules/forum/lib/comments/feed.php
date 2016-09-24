@@ -34,7 +34,6 @@ class Feed extends BaseObject
 	 */
 	public function canAdd()
 	{
-		global $USER;
 		return $this->entity->canAdd();
 	}
 
@@ -88,7 +87,6 @@ class Feed extends BaseObject
 	 */
 	public function canModerate()
 	{
-		global $USER;
 		return $this->entity->canModerate();
 	}
 

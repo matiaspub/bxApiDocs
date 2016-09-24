@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CTicketDictionary</b> - класс для работы со справочником обращений. 
+ * <b>CTicketDictionary</b> - класс для работы со справочником обращений.
  *
  *
  * @return mixed 
@@ -220,15 +220,15 @@ class CAllTicketDictionary
 
 	
 	/**
-	* <p>Метод возвращает данные по одной записи справочника.</p>
+	* <p>Метод возвращает данные по одной записи справочника. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  ID записи.</bo
+	* @param int $intID  ID записи.
 	*
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Array
 	* (
 	*     [ID] =&gt; 3

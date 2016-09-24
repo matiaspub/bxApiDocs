@@ -35,6 +35,17 @@ class QueryBuilder
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если изменение фильтра возможно. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/querybuilder/isvalid.php
+	* @author Bitrix
+	*/
 	public function isValid()
 	{
 		return $this->facet->isValid();
@@ -45,6 +56,17 @@ class QueryBuilder
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если запрос нуждается в дополнительной обработке записей с целью удаления дубликатов. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/querybuilder/getdistinct.php
+	* @author Bitrix
+	*/
 	public function getDistinct()
 	{
 		return $this->distinct;
@@ -58,6 +80,21 @@ class QueryBuilder
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Возвращает соединение с таблицами индекса для фильтрации. Нестатический метод.</p>
+	*
+	*
+	* @param array &$filter  Фильтр, который может быть изменен.
+	*
+	* @param array &$sqlSearch  Дополнительный результат изменения.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/propertyindex/querybuilder/getfiltersql.php
+	* @author Bitrix
+	*/
 	public function getFilterSql(&$filter, &$sqlSearch)
 	{
 		if (array_key_exists("FACET_OPTIONS", $filter))

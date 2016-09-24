@@ -26,6 +26,37 @@ class QueryChainElement
 	 * @param array $parameters
 	 * @throws \Exception
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести  при создании объекта какие-то действия.</p> <p>Значения формата:</p> <ol> <li> <code>Field</code> - обычное скалярное поле;</li> <li> <code>ReferenceField</code> - указание на другой объект;</li>  <li> <code>array(Base, ReferenceField)</code> - указание от другого объект к этому;</li>  <li> <code>Base</code> - все поля объекта</li>   </ol>
+	*
+	*
+	* @param mixed $Bitrix  
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Entit $Field  
+	*
+	* @param Fiel $array  
+	*
+	* @param arra $Bitrix  
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Base $element  
+	*
+	* @param array $parameters = array() 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/querychainelement/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($element, $parameters = array())
 	{
 		if ($element instanceof ReferenceField)

@@ -13,6 +13,7 @@ use Bitrix\Main\EventResult as SystemEventResult;
 use Bitrix\Main\SystemException;
 use Bitrix\Main\Mail\Internal as MailInternal;
 use Bitrix\Main\Config as Config;
+use Bitrix\Main\Application;
 
 class Event
 {
@@ -35,16 +36,52 @@ class Event
 	}
 
 	/**
-	 * @param array $data
+	 * Send mail event
+	 *
+	 * @param array $data Params of event
 	 * @return Main\Entity\AddResult
 	 */
+	
+	/**
+	* <p>Статический метод отсылает почтовое событие. Возвращает объект <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/addresult/index.php">Main\Entity\AddResult</a>.</p> <p>Аналог метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cevent/send.php" >CEvent::Send</a> старого ядра.</p>
+	*
+	*
+	* @param array $data  Массив параметров события.
+	*
+	* @return \Bitrix\Main\Entity\AddResult 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* // D7
+	* use Bitrix\Main\Mail\Event;
+	* Event::send(array(
+	*     "EVENT_NAME" =&gt; "NEW_USER",
+	*     "LID" =&gt; "s1",
+	*     "C_FIELDS" =&gt; array(
+	*         "EMAIL" =&gt; "info@intervolga.ru",
+	*         "USER_ID" =&gt; 42
+	*     ),
+	* ));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/mail/event/send.php
+	* @author Bitrix
+	*/
 	public static function send(array $data)
 	{
-		$arFiles = array();
+		$manageCache = Application::getInstance()->getManagedCache();
+		if(CACHED_b_event !== false && $manageCache->read(CACHED_b_event, "events"))
+		{
+			$manageCache->clean('events');
+		}
+
+		$fileList = array();
 		if(isset($data['FILE']))
 		{
 			if(is_array($data['FILE']))
-				$arFiles = $data['FILE'];
+				$fileList = $data['FILE'];
 
 			unset($data['FILE']);
 		}
@@ -53,15 +90,24 @@ class Event
 		if ($result->isSuccess())
 		{
 			$id = $result->getId();
-			foreach($arFiles as $file)
+			foreach($fileList as $file)
 			{
-				$arFile = \CFile::MakeFileArray($file);
-				$arFile["MODULE_ID"] = "main";
-				$fid = \CFile::SaveFile($arFile, "main");
 				$dataAttachment = array(
 					'EVENT_ID' => $id,
-					'FILE_ID' => $fid,
+					'FILE_ID' => null,
+					'IS_FILE_COPIED' => 'Y',
 				);
+				if(is_numeric($file) && \CFile::GetFileArray($file))
+				{
+					$dataAttachment['FILE_ID'] = $file;
+					$dataAttachment['IS_FILE_COPIED'] = 'N';
+				}
+				else
+				{
+					$fileArray = \CFile::MakeFileArray($file);
+					$fileArray["MODULE_ID"] = "main";
+					$dataAttachment['FILE_ID'] = \CFile::SaveFile($fileArray, "main");
+				}
 
 				MailInternal\EventAttachmentTable::add($dataAttachment);
 			}
@@ -101,15 +147,17 @@ class Event
 			return $flag;
 
 
-		// get charset for languages of event
+		// get charset and server name for languages of event
 		$charset = false;
+		$serverName = null;
 		$siteDb = Main\SiteTable::getList(array(
-			'select'=>array('CULTURE_CHARSET'=>'CULTURE.CHARSET'),
+			'select'=>array('SERVER_NAME', 'CULTURE_CHARSET'=>'CULTURE.CHARSET'),
 			'filter' => array('LID' => $arSites)
 		));
 		if($arSiteDb = $siteDb->fetch())
 		{
 			$charset = $arSiteDb['CULTURE_CHARSET'];
+			$serverName = $arSiteDb['SERVER_NAME'];
 		}
 
 		if(!$charset)
@@ -176,7 +224,17 @@ class Event
 				'CHARSET' => $charset,
 			);
 			$message = EventMessageCompiler::createInstance($arMessageParams);
-			$message->compile();
+			try
+			{
+				$message->compile();
+			}
+			catch(StopException $e)
+			{
+				$arResult["Was"] = true;
+				$arResult["Fail"] = true;
+				continue;
+			}
+
 
 			// send mail
 			$result = Main\Mail\Mail::send(array(
@@ -189,7 +247,9 @@ class Event
 				'MESSAGE_ID' => $message->getMailId(),
 				'ATTACHMENT' => $message->getMailAttachment(),
 				'TRACK_READ' => $trackRead,
-				'TRACK_CLICK' => $trackClick
+				'TRACK_CLICK' => $trackClick,
+				'LINK_PROTOCOL' => \Bitrix\Main\Config\Option::get("main", "mail_link_protocol", ''),
+				'LINK_DOMAIN' => $serverName
 			));
 			if($result)
 				$arResult["Success"] = true;

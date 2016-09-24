@@ -248,11 +248,13 @@ class CPerfomanceComponent
 		{
 			$strSql = "
 				SELECT count('x') CNT
-				FROM b_perf_component c
-				".$obQueryWhere->GetJoins()."
-				".($strQueryWhere? "WHERE ".$strQueryWhere: "")."
-				".($bGroup? "GROUP BY ".implode(", ", $arQueryGroup): "")."
-				".$strHaving."
+				FROM (
+					SELECT 1 FROM b_perf_component c
+					".$obQueryWhere->GetJoins()."
+					".($strQueryWhere? "WHERE ".$strQueryWhere: "")."
+					".($bGroup? "GROUP BY ".implode(", ", $arQueryGroup): "")."
+					".$strHaving."
+				) t
 			";
 			$res_cnt = $DB->Query($strSql);
 			$ar_cnt = $res_cnt->Fetch();

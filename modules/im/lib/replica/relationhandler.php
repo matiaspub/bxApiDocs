@@ -5,7 +5,7 @@ class RelationHandler extends \Bitrix\Replica\Client\BaseHandler
 {
 	protected $tableName = "b_im_relation";
 	protected $moduleId = "im";
-	protected $className = "\\Bitrix\\Im\\RelationTable";
+	protected $className = "\\Bitrix\\Im\\Model\\RelationTable";
 	protected $primary = array(
 		"ID" => "auto_increment",
 	);
@@ -24,6 +24,71 @@ class RelationHandler extends \Bitrix\Replica\Client\BaseHandler
 	protected $fields = array(
 		"LAST_READ" => "datetime",
 	);
+
+	/**
+	 * Method will be invoked before new database record inserted.
+	 * When an array returned the insert will be cancelled and map for
+	 * returned record will be added.
+	 *
+	 * @param array &$newRecord All fields of inserted record.
+	 *
+	 * @return null|array
+	 */
+	static public function beforeInsertTrigger(array &$newRecord)
+	{
+		if (
+			isset($newRecord["MESSAGE_TYPE"])
+			&& $newRecord["MESSAGE_TYPE"] === "S"
+		)
+		{
+			$chatList = \Bitrix\Im\Model\RelationTable::getList(array(
+				"filter" => array(
+					"=USER_ID" => $newRecord["USER_ID"],
+					"=CHAT_ID" => $newRecord["CHAT_ID"],
+					"=MESSAGE_TYPE" => "S",
+				),
+			));
+			$oldRecord = $chatList->fetch();
+			if ($oldRecord)
+			{
+				return $oldRecord;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Called before update operation log write. You may return false and not log write will take place.
+	 *
+	 * @param array $record Database record.
+	 *
+	 * @return boolean
+	 */
+	static public function beforeLogUpdate(array $record)
+	{
+		if ($record["MESSAGE_TYPE"] === "S")
+			return false;
+		else
+			return true;
+	}
+
+	/**
+	 * Called before log write. You may return false and not log write will take place.
+	 *
+	 * @param array $record Database record.
+	 * @return boolean
+	 */
+	static public function beforeLogInsert(array $record)
+	{
+		if (\Bitrix\Im\User::getInstance($record["USER_ID"])->isBot())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 
 	/**
 	 * Method will be invoked after an database record updated.
@@ -46,7 +111,7 @@ class RelationHandler extends \Bitrix\Replica\Client\BaseHandler
 			{
 				if (\Bitrix\Main\Loader::includeModule('pull'))
 				{
-					$relationList = \Bitrix\IM\RelationTable::getList(array(
+					$relationList = \Bitrix\IM\Model\RelationTable::getList(array(
 						"select" => array("ID", "USER_ID"),
 						"filter" => array(
 							"=CHAT_ID" => $newRecord["CHAT_ID"],

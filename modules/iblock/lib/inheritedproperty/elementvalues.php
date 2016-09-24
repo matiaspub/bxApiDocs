@@ -26,6 +26,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы, в которой будут сохранены значения наследуемых вычисляемых свойств. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/getvaluetablename.php
+	* @author Bitrix
+	*/
 	static public function getValueTableName()
 	{
 		return "b_iblock_section_iprop";
@@ -36,6 +47,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает тип сущности, который будет храниться в базе данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "E";
@@ -46,6 +68,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Метод возвращает уникальный идентификатор элемента. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/getid.php
+	* @author Bitrix
+	*/
 	public function getId()
 	{
 		return $this->elementId;
@@ -68,6 +101,29 @@ class ElementValues extends BaseValues
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Если на вход передается массив идентификаторов секций, то метод в качестве родителя устанавливает секцию с минимальным идентификатором. Если на вход передается число, то в качестве родителя будет установлена секция с кодом <code>sectionId</code>. Нестатический метод.</p>
+	*
+	*
+	* @param mixed $Bitrix  Идентификатор секции или массив идентификаторов.
+	*
+	* @param Bitri $Iblock  
+	*
+	* @param Ibloc $InheritedProperty  
+	*
+	* @param InheritedPropert $array  
+	*
+	* @param arra $integer  
+	*
+	* @param integer $sectionId  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/setparents.php
+	* @author Bitrix
+	*/
 	public function setParents($sectionId)
 	{
 		if (is_array($sectionId))
@@ -90,6 +146,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return array[]\Bitrix\Iblock\InheritedProperty\BaseValues
 	 */
+	
+	/**
+	* <p>Метод возвращает массив всех родителей элемента, где в качестве значений массива выступает родительская секция с минимальным идентификатором или инфоблок. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[]\Bitrix\Iblock\InheritedProperty\BaseValues 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/getparents.php
+	* @author Bitrix
+	*/
 	public function getParents()
 	{
 		$parents = array();
@@ -122,6 +189,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return array[string]string
 	 */
+	
+	/**
+	* <p>Метод возвращает все вычисленные значения наследуемых свойств для элемента. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[string]string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/queryvalues.php
+	* @author Bitrix
+	*/
 	public function queryValues()
 	{
 		$result = array();
@@ -199,6 +277,17 @@ class ElementValues extends BaseValues
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает значения сущности из кеша базы данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/elementvalues/clearvalues.php
+	* @author Bitrix
+	*/
 	public function clearValues()
 	{
 		$connection = \Bitrix\Main\Application::getConnection();

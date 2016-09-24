@@ -91,23 +91,19 @@ class CSecurityXSSDetect
 	{
 		// http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
 		// ToDo: R&D, what about JS comments?
-		if($isSaveQuotes)
+		static $regexp = '/(
+				"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"                           # match double quoted string
+				|
+				\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'                       # match single quoted string
+			)/xs';
+
+		if ($isSaveQuotes)
 		{
 			$this->quotes = array();
-			return preg_replace_callback('/(
-				"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"                           # match double quoted string
-				|
-				\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'                       # match single quoted string
-			)/x', array($this, "pushQuote"), $string);
+			return preg_replace_callback($regexp, array($this, "pushQuote"), $string);
 		}
-		else
-		{
-			return preg_replace('/(
-				"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"                           # match double quoted string
-				|
-				\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'                       # match single quoted string
-			)/x', '', $string);
-		}
+
+		return preg_replace($regexp, '', $string);
 	}
 
 	/**

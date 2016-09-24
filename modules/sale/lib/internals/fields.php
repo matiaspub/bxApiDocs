@@ -13,6 +13,9 @@ class Fields
 	/** @var  array */
 	private $originalValues = array();
 
+	/** @var bool  */
+	protected $isClone = false;
+
 
 	public function __construct(array $values = null)
 	{
@@ -121,7 +124,8 @@ class Fields
 	 */
 	protected function markChanged($name, $value)
 	{
-		if ($this->get($name) != $value)
+		$oldValue = $this->get($name);
+		if ($oldValue != $value || ($oldValue === null && $value !== null))
 		{
 			if (!array_key_exists($name, $this->originalValues))
 				$this->originalValues[$name] = $this->get($name);
@@ -198,6 +202,10 @@ class Fields
 
 	/**
 	 * Whether a offset exists
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return bool
 	 */
 	public function offsetExists($offset)
 	{
@@ -206,6 +214,10 @@ class Fields
 
 	/**
 	 * Offset to retrieve
+	 *
+	 * @param mixed $offset
+	 *
+	 * @return null|string
 	 */
 	public function offsetGet($offset)
 	{
@@ -214,6 +226,9 @@ class Fields
 
 	/**
 	 * Offset to set
+	 *
+	 * @param mixed $offset
+	 * @param mixed $value
 	 */
 	public function offsetSet($offset, $value)
 	{
@@ -222,6 +237,8 @@ class Fields
 
 	/**
 	 * Offset to unset
+	 *
+	 * @param mixed $offset
 	 */
 	public function offsetUnset($offset)
 	{
@@ -236,5 +253,37 @@ class Fields
 	public function count()
 	{
 		return count($this->values);
+	}
+
+	/**
+	 * @internal
+	 * @param \SplObjectStorage $cloneEntity
+	 *
+	 * @return Fields
+	 */
+	public function createClone(\SplObjectStorage $cloneEntity)
+	{
+		if ($this->isClone() && $cloneEntity->contains($this))
+		{
+			return $cloneEntity[$this];
+		}
+
+		$fieldsClone = clone $this;
+		$fieldsClone->isClone = true;
+
+		if (!$cloneEntity->contains($this))
+		{
+			$cloneEntity[$this] = $fieldsClone;
+		}
+		
+		return $fieldsClone;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isClone()
+	{
+		return $this->isClone;
 	}
 }

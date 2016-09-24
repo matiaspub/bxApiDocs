@@ -40,7 +40,7 @@ class CComponentAjax
 
 	var $__nav_params = null;
 
-	public function CComponentAjax($componentName, $componentTemplate, &$arParams, $parentComponent)
+	public function __construct($componentName, $componentTemplate, &$arParams, $parentComponent)
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION, $USER;
@@ -370,7 +370,7 @@ class CComponentAjax
 
 			if ($url_key >= 0 && !$bIgnoreLink)
 			{
-				$url = str_replace('&amp;', '&', $arLinkParams[3][$url_key]);
+				$url = \Bitrix\Main\Text\Converter::getHtmlConverter()->decode($arLinkParams[3][$url_key]);
 				$url = str_replace($arSearch, '', $url);
 
 				if ($this->__isAjaxURL($url))
@@ -384,7 +384,7 @@ class CComponentAjax
 					$real_url .= strpos($url, '?') === false ? '?' : '&';
 					$real_url .= $add_param;
 
-					$url_str = CAjax::GetLinkEx($real_url, $url, $match[2], 'comp_'.$this->componentID, $strAdditional, true, $this->bShadow);
+					$url_str = CAjax::GetLinkEx($real_url, $url, $match[2], 'comp_'.$this->componentID, $strAdditional);
 
 					$arData[$iData] = $url_str;
 					$bDataChanged = true;

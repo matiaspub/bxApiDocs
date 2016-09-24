@@ -1,4 +1,4 @@
 <?
-// define("SM_VERSION","15.5.10");
-// define("SM_VERSION_DATE","2015-10-19 13:46:00"); // YYYY-MM-DD HH:MI:SS
+// define("SM_VERSION","16.5.5");
+// define("SM_VERSION_DATE","2016-08-23 10:00:00"); // YYYY-MM-DD HH:MI:SS
 ?>

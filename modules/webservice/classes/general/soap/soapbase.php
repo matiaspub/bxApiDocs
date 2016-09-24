@@ -87,7 +87,7 @@ class CSOAPParameter
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * <buttononclick><code>// Часть кода обработчика веб-сервисов SOAP сервера
  * $this-&gt;ShowResponse( $cserver, $functionName, $namespaceURI,
  * 	new CSOAPFault( 

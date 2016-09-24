@@ -10,21 +10,32 @@
 
 // ***** CAdminFileDialog *****
 IncludeModuleLangFile(__FILE__);
+
+/**
+ * <b>CAdminFileDialog</b> - класс для работы с файловым диалогом в административной части системы
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminfiledialog/index.php
+ * @author Bitrix
+ */
 class CAdminFileDialog
 {
 	
 	/**
-	* <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога. Динамичный метод.</p>
+	* <p>Метод принимает массив конфигурационных параметров и генерирует скрипты, необходимые для показа файлового диалога. Нестатический метод.</p>
 	*
 	*
-	* @param Array $arConfig  Строка, содержащая имя Javascript-функции, которая вызывает файловый
-	* диалог. Функция должна быть задана в глобальной области
+	* @param Array $arConfig  Строка, содержащая имя Javascript-функции, которая вызывает файловый   
+	*     диалог. Функция должна быть задана в глобальной области
 	* видимости.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <buttononclick>
 	* CAdminFileDialog::ShowScript(Array
 	* 	(
@@ -302,6 +313,7 @@ if($bCloudsBrowse && CModule::IncludeModule('clouds'))
 			echo "<font color=\"#FF0000\">".htmlspecialcharsbx($functionError)."</font>";
 		}
 	}
+
 	public static function AttachJSScripts()
 	{
 		if(!defined("BX_B_FILE_DIALOG_SCRIPT_LOADED"))

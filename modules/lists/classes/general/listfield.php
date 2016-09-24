@@ -159,7 +159,10 @@ abstract class CListField
 					"WIDTH" => $width,
 					"HEIGHT" => $height,
 					"SHOW_ADD_FORM" => $arSettings["SHOW_ADD_FORM"],
-					"SHOW_EDIT_FORM" => $arSettings["SHOW_EDIT_FORM"]
+					"SHOW_EDIT_FORM" => $arSettings["SHOW_EDIT_FORM"],
+					"ADD_READ_ONLY_FIELD" => $arSettings["ADD_READ_ONLY_FIELD"],
+					"EDIT_READ_ONLY_FIELD" => $arSettings["EDIT_READ_ONLY_FIELD"],
+					"SHOW_FIELD_PREVIEW" => $arSettings["SHOW_FIELD_PREVIEW"]
 				);
 				break;
 			default:
@@ -452,6 +455,26 @@ class CListPropertyField extends CListField
 		return true;
 	}
 
+	private static function generatePropertyCode($name, $code, $iblockId, $propertyId = 0)
+	{
+		if(empty($code))
+		{
+			$code = CUtil::translit($name, LANGUAGE_ID, array("change_case" => "U"));
+		}
+
+		$object = CIBlockProperty::getList(array(), array("IBLOCK_ID" => $iblockId));
+		while($property = $object->fetch())
+		{
+			if($property["CODE"] == $code && $property["ID"] != $propertyId)
+			{
+				$code = $code.'_'.CLists::generateMnemonicCode();
+				break;
+			}
+		}
+
+		return $code;
+	}
+
 	public function Update($arFields)
 	{
 		if(isset($arFields["TYPE"]))
@@ -509,7 +532,6 @@ class CListPropertyField extends CListField
 					$arFields["PROPERTY_TYPE"] = $arFields["TYPE"];
 				$arFields["MULTIPLE_CNT"] = 1;
 				$arFields["CHECK_PERMISSIONS"] = "N";
-				$arFields["CODE"] = $arFields["CODE"] ? $arFields["CODE"] : CLists::generateMnemonicCode();
 
 				$obProperty = new CIBlockProperty;
 				$res = $obProperty->Add($arFields);

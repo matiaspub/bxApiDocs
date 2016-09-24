@@ -5,7 +5,7 @@ use Bitrix\Main\Web\Json;
 
 class YandexJson extends Json
 {
-	public static function encode($data)
+	public static function encode($data, $options = null)
 	{
 		// php 5.4.0+
 		if(defined('JSON_UNESCAPED_UNICODE'))

@@ -26,6 +26,17 @@ class MeasureRatioTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы единиц измерения товаров. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/measureratiotable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_catalog_measure_ratio';
@@ -36,6 +47,17 @@ class MeasureRatioTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы единиц измерения товаров. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/measureratiotable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -62,6 +84,21 @@ class MeasureRatioTable extends Main\Entity\DataManager
 	 * @return array|bool
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод возвращает массив коэффициентов единиц измерения для заданного списка товаров. Метод статический.</p>
+	*
+	*
+	* @param array $array  Массив идентификаторов товаров.
+	*
+	* @param integer $product  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/measureratiotable/getcurrentratio.php
+	* @author Bitrix
+	*/
 	public static function getCurrentRatio($product)
 	{
 		if (!is_array($product))
@@ -72,7 +109,7 @@ class MeasureRatioTable extends Main\Entity\DataManager
 
 		$result = array_fill_keys($product, 1);
 		$ratioRows = array_chunk($product, 500);
-		foreach ($ratioRows as &$row)
+		foreach ($ratioRows as $row)
 		{
 			$ratioIterator = self::getList(array(
 				'select' => array('PRODUCT_ID', 'RATIO'),
@@ -84,7 +121,7 @@ class MeasureRatioTable extends Main\Entity\DataManager
 				$ratioInt = (int)$ratio['RATIO'];
 				$ratioFloat = (float)$ratio['RATIO'];
 				$ratioResult  = ($ratioFloat > $ratioInt ? $ratioFloat : $ratioInt);
-				if (abs($ratioResult) < CATALOG_VALUE_EPSILON || $ratioResult < 0)
+				if ($ratioResult < CATALOG_VALUE_EPSILON)
 					continue;
 				$result[$ratio['PRODUCT_ID']] = $ratioResult;
 			}

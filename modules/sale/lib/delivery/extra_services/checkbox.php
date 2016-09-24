@@ -55,7 +55,8 @@ class Checkbox extends Base
 
 	protected function createJSOnchange($id, $price)
 	{
-		return 'BX.onCustomEvent("onDeliveryExtraServiceValueChange", [{"id" : "'.$id.'", "value": this.checked, "price": this.checked ? "'.$price.'" : "0"}]);';
+		$price = roundEx(floatval($price), SALE_VALUE_PRECISION);
+		return "BX.onCustomEvent('onDeliveryExtraServiceValueChange', [{'id' : '".$id."', 'value': this.checked, 'price': this.checked ? '".$price."' : '0'}]);";
 	}
 
 }

@@ -103,7 +103,7 @@ class CPullChannel
 					'command' => 'reopen',
 					'params' => Array(),
 				);
-				self::Send($arResult['CHANNEL_ID'], CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($arResult['CHANNEL_ID'], CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'SERVER_NAME' => COption::GetOptionString('main', 'server_name', $_SERVER['SERVER_NAME']), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 			return Array(
 				'CHANNEL_ID' => $arResult['CHANNEL_ID'],
@@ -165,7 +165,7 @@ class CPullChannel
 					'command' => 'open',
 					'params' => Array(),
 				);
-				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'SERVER_NAME' => COption::GetOptionString('main', 'server_name', $_SERVER['SERVER_NAME']), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 		}
 		else
@@ -189,7 +189,7 @@ class CPullChannel
 					'command' => 'open_exists',
 					'params' => Array(),
 				);
-				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'MESSAGE' => Array($arData), 'ERROR' => '')));
+				self::Send($channelId, CUtil::PhpToJsObject(Array('SERVER_TIME_WEB' => time(), 'SERVER_NAME' => COption::GetOptionString('main', 'server_name', $_SERVER['SERVER_NAME']), 'MESSAGE' => Array($arData), 'ERROR' => '')));
 			}
 		}
 
@@ -324,7 +324,10 @@ class CPullChannel
 				{
 					$result = self::SendCommand($channels, $message, $options);
 					$subresult = json_decode($result);
-					$results = array_merge($results, $subresult->infos);
+					if (is_array($subresult->infos))
+					{
+						$results = array_merge($results, $subresult->infos);
+					}
 				}
 				$result = json_decode('{"infos":'.json_encode($results).'}');
 			}
@@ -452,9 +455,6 @@ class CPullChannel
 	public static function CheckExpireAgent()
 	{
 		global $DB;
-		if (!CPullOptions::ModuleEnable())
-			return false;
-
 		$sqlDateFunction = null;
 		$dbType = strtolower($DB->type);
 		if ($dbType== "mysql")
@@ -481,7 +481,7 @@ class CPullChannel
 	public static function CheckOnlineChannel()
 	{
 		if (!CPullOptions::GetQueueServerStatus())
-			return false;
+			return "CPullChannel::CheckOnlineChannel();";
 
 		global $DB;
 		$arUser = Array();
@@ -520,7 +520,6 @@ class CPullChannel
 				$arOnline[$agentUserId] = $agentUserId;
 			}
 
-			$arOnline = Array();
 			$options = array(
 				"method" => "GET",
 				"dont_wait_answer" => false
@@ -533,6 +532,7 @@ class CPullChannel
 					$userId = $arUser[$info->channel];
 					if ($userId == 0 || $agentUserId == $userId)
 						continue;
+
 					if ($info->subscribers > 0)
 						$arOnline[$userId] = $userId;
 					else
@@ -550,7 +550,7 @@ class CPullChannel
 		$arSend = Array();
 		if (CModule::IncludeModule('im'))
 		{
-			$ar = CIMStatus::GetList();
+			$ar = CIMStatus::GetList(Array('CLEAR_CACHE' => 'Y'));
 			$arSend = $ar['users'];
 		}
 		else
@@ -606,7 +606,7 @@ class CPullChannel
 		$userMobileStatus = '0';
 		if (CModule::IncludeModule('im'))
 		{
-			$res = Bitrix\Im\StatusTable::getById($arParams['user_fields']['ID']);
+			$res = Bitrix\Im\Model\StatusTable::getById($arParams['user_fields']['ID']);
 			if ($status = $res->fetch())
 			{
 				$userStatus = $status['STATUS'];
@@ -710,12 +710,15 @@ class CPullChannel
 				$webSocketStatus = CPullOptions::GetWebSocketStatus();
 			}
 
-			$arChannelShared = CPullChannel::GetShared($cache, $reopen);
-			if (is_array($arChannelShared))
+			if ($userId > 0)
 			{
-				$arChannelShared["CHANNEL_ID"] = self::SignChannel($arChannelShared["CHANNEL_ID"]);
-				$arChannels[] = $arChannelShared['CHANNEL_ID'];
-				$arChannel['CHANNEL_DT'] = $arChannel['CHANNEL_DT'].'/'.$arChannelShared['CHANNEL_DT'];
+				$arChannelShared = CPullChannel::GetShared($cache, $reopen);
+				if (is_array($arChannelShared))
+				{
+					$arChannelShared["CHANNEL_ID"] = self::SignChannel($arChannelShared["CHANNEL_ID"]);
+					$arChannels[] = $arChannelShared['CHANNEL_ID'];
+					$arChannel['CHANNEL_DT'] = $arChannel['CHANNEL_DT'].'/'.$arChannelShared['CHANNEL_DT'];
+				}
 			}
 		}
 		if ($mobile || defined('BX_MOBILE') || defined('BX_PULL_MOBILE'))
@@ -735,6 +738,7 @@ class CPullChannel
 		return $pullConfig+Array(
 			'CHANNEL_ID' => implode('/', $arChannels),
 			'CHANNEL_DT' => $arChannel['CHANNEL_DT'],
+			'USER_ID' => $userId,
 			'LAST_ID' => $arChannel['LAST_ID'],
 			'PATH' => $pullPath,
 			'PATH_MOD' => $pullPathMod,

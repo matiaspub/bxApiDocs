@@ -44,6 +44,7 @@ class Select extends Base
 	{
 		/** @var Base $toTypeClass */
 		$type = $toTypeClass::getType();
+		$options = static::getFieldOptions($fieldType);
 
 		$key = $originalValue = $value;
 		if (is_array($value))
@@ -53,6 +54,10 @@ class Select extends Base
 				$key = $k;
 				$originalValue = $v;
 			}
+		}
+		elseif (isset($options[$key]))
+		{
+			$originalValue = $options[$value];
 		}
 
 		switch ($type)
@@ -73,6 +78,9 @@ class Select extends Base
 			case FieldType::TEXT:
 				$value = (string) $originalValue;
 				break;
+			case FieldType::SELECT:
+				$value = (string) $key;
+				break;
 			case FieldType::USER:
 				$value = trim($key);
 				if (strpos($value, 'user_') === false
@@ -88,6 +96,36 @@ class Select extends Base
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Return conversion map for current type.
+	 * @return array Map.
+	 */
+	
+	/**
+	* <p>Статический метод возвращает таблицу преобразования для текущего типа.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/select/getconversionmap.php
+	* @author Bitrix
+	*/
+	public static function getConversionMap()
+	{
+		return array(
+			array(
+				FieldType::BOOL,
+				FieldType::DOUBLE,
+				FieldType::INT,
+				FieldType::STRING,
+				FieldType::TEXT,
+				FieldType::SELECT,
+				FieldType::USER
+			)
+		);
 	}
 
 	/**
@@ -121,7 +159,7 @@ class Select extends Base
 			.'" name="'.htmlspecialcharsbx(static::generateControlName($field))
 			.($fieldType->isMultiple() ? '[]' : '').'"'.($fieldType->isMultiple() ? ' size="5" multiple' : '').'>';
 
-		if (!$fieldType->isRequired())
+		if (!$fieldType->isRequired() || $allowSelection)
 			$renderResult .= '<option value="">['.Loc::getMessage('BPCGHLP_NOT_SET').']</option>';
 
 		$options = static::getFieldOptions($fieldType);
@@ -136,7 +174,7 @@ class Select extends Base
 
 		if ($allowSelection)
 		{
-			$renderResult .= static::renderControlSelector($field, $selectorValue, true);
+			$renderResult .= static::renderControlSelector($field, $selectorValue, true, '', $fieldType);
 		}
 
 		return $renderResult;
@@ -291,6 +329,49 @@ class Select extends Base
 		$request[$name] = $value;
 		return parent::extractValueMultiple($fieldType, $field, $request);
 	}
+
+	/**
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @param string $format Format name.
+	 * @return string
+	 */
+	public static function formatValueMultiple(FieldType $fieldType, $value, $format = 'printable')
+	{
+		if (is_array($value) && \CBPHelper::isAssociativeArray($value))
+			$value = array_keys($value);
+		return parent::formatValueMultiple($fieldType, $value, $format);
+	}
+
+	/**
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @param string $format Format name.
+	 * @return mixed|null
+	 */
+	public static function formatValueSingle(FieldType $fieldType, $value, $format = 'printable')
+	{
+		if (is_array($value) && \CBPHelper::isAssociativeArray($value))
+		{
+			$keys = array_keys($value);
+			$value = isset($keys[0]) ? $keys[0] : null;
+		}
+		return parent::formatValueSingle($fieldType, $value, $format);
+	}
+
+	/**
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @param string $toTypeClass Type class name.
+	 * @return array
+	 */
+	public static function convertValueMultiple(FieldType $fieldType, $value, $toTypeClass)
+	{
+		if (is_array($value) && \CBPHelper::isAssociativeArray($value))
+			$value = array_keys($value);
+		return parent::convertValueMultiple($fieldType, $value, $toTypeClass);
+	}
+
 
 	/**
 	 * @param FieldType $fieldType

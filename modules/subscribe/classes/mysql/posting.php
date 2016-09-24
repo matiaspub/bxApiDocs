@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/subscribe/classes/genera
 
 
 /**
- * <b>CPosting</b> - класс для работы с выпусками новостей подписки. 
+ * <b>CPosting</b> - класс для работы с выпусками новостей подписки.
  *
  *
  * @return mixed 
@@ -16,50 +16,56 @@ class CPosting extends CPostingGeneral
 {
 	
 	/**
-	* <p>Метод возвращает список выпусков по фильтру.</p>
+	* <p>Метод возвращает список выпусков по фильтру. Метод нестатический.</p>
 	*
 	*
 	* @param array $arrayaSort = Array() Массив, содержащий признак сортировки в виде наборов "название
-	* поля"=&gt;"направление". <br><br> Название поля может принимать
-	* значение: <ul> <li> <b>ID</b> - идентификатор выпуска;</li> <li> <b>TIMESTAMP</b> - дата
-	* изменения;</li> <li> <b>SUBJECT</b> - тема письма;</li> <li> <b>BODY_TYPE</b> - тип
-	* текста;</li> <li> <b>STATUS</b> - статус выпуска;</li> <li> <b>DATE_SENT</b> - дата
-	* отправки выпуска;</li> <li> <b>AUTO_SEND_TIME</b> - время автоматической
-	* отправки выпуска;</li> </ul> Направление сортировки может принимать
-	* значение: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
-	* убыванию.</li> </ul> Пример: <pre class="syntax"><code>array("STATUS"=&gt;"ASC", <br>
+	* поля"=&gt;"направление".          <br><br>        	Название поля может
+	* принимать значение:          <ul> <li> <b>ID</b> - идентификатор выпуска;</li>     
+	*     	           <li> <b>TIMESTAMP</b> - дата изменения;</li>          	           <li> <b>SUBJECT</b> -
+	* тема письма;</li>          	           <li> <b>BODY_TYPE</b> - тип текста;</li>          	          
+	* <li> <b>STATUS</b> - статус выпуска;</li>          	           <li> <b>DATE_SENT</b> - дата
+	* отправки выпуска;</li>          	           <li> <b>AUTO_SEND_TIME</b> - время
+	* автоматической отправки выпуска;</li>          </ul>        	Направление
+	* сортировки может принимать значение:          <ul> <li> <b>ASC</b> - по
+	* возрастанию;</li>          	           <li> <b>DESC</b> - по убыванию.</li>          </ul>       
+	* 	Пример: 	         <pre class="syntax"><code>array("STATUS"=&gt;"ASC",             <br>           
 	* "DATE_SENT"=&gt;"DESC")</code></pre>
 	*
 	* @param array $arrayaFilter = Array() Массив, содержащий фильтр в виде наборов "название
-	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
-	* значение: <ul> <li> <b>ID</b> - идентификатор выпуска (возможны сложные
-	* условия);</li> <li> <b>TIMESTAMP_1</b> - дата изменения (начало периода);</li> <li>
-	* <b>TIMESTAMP_2</b> - дата изменения (конец периода);</li> <li> <b>DATE_SENT_1</b> - дата
-	* отправки (начало периода);</li> <li> <b>DATE_SENT_2</b> - дата отправки (конец
-	* периода);</li> <li> <b>AUTO_SEND_TIME_1</b> - дата или время автоматической
-	* отправки (начало периода);</li> <li> <b>AUTO_SEND_TIME_2</b> - дата или время
-	* автоматической отправки (конец периода);</li> <li> <b>STATUS</b> - статус
-	* выпуска строкой (возможны сложные условия);</li> <li> <b>STATUS_ID</b> -
-	* статус выпуска символом (возможны сложные условия);</li> <li> <b>SUBJECT</b>
-	* - тема письма (возможны сложные условия);</li> <li> <b>FROM</b> - поле "от
-	* кого" письма (возможны сложные условия);</li> <li> <b>TO</b> - кому
-	* отправлен выпуск (возможны сложные условия);</li> <li> <b>BODY_TYPE</b> - тип
-	* текста письма;</li> <li> <b>BODY</b> - текст письма (возможны сложные
-	* условия);</li> <li> <b>RUB_ID</b> - масив идентификаторов рассылок с
-	* которыми связан выпуск; <br> </li> <li> <b>MSG_CHARSET</b> - кодировка в которой
-	* был составлен выпуск (точное совпадение).</li> </ul> Пример: <pre
-	* class="syntax"><code>array("SUBJECT"=&gt;"test | тест", <br> "TO"=&gt;"@bitrixsoft.ru")</code></pre>
+	* поля"=&gt;"значение фильтра".          <br><br>        	Название поля может
+	* принимать значение:          <ul> <li> <b>ID</b> - идентификатор выпуска
+	* (возможны сложные условия);</li>          	           <li> <b>TIMESTAMP_1</b> - дата
+	* изменения (начало периода);</li>          	           <li> <b>TIMESTAMP_2</b> - дата
+	* изменения (конец периода);</li>          	           <li> <b>DATE_SENT_1</b> - дата
+	* отправки (начало периода);</li>          	           <li> <b>DATE_SENT_2</b> - дата
+	* отправки (конец периода);</li>          	           <li> <b>AUTO_SEND_TIME_1</b> - дата или
+	* время автоматической отправки (начало периода);</li>          	           <li>
+	* <b>AUTO_SEND_TIME_2</b> - дата или время автоматической отправки (конец
+	* периода);</li>          	           <li> <b>STATUS</b> - статус выпуска строкой
+	* (возможны сложные условия);</li>          	           <li> <b>STATUS_ID</b> - статус
+	* выпуска символом (возможны сложные условия);</li>          	           <li>
+	* <b>SUBJECT</b> - тема письма (возможны сложные условия);</li>          	           <li>
+	* <b>FROM</b> - поле "от кого" письма (возможны сложные условия);</li>          	   
+	*        <li> <b>TO</b> - кому отправлен выпуск (возможны сложные условия);</li> 
+	*         	           <li> <b>BODY_TYPE</b> - тип текста письма;</li>          	           <li> <b>BODY</b>
+	* - текст письма (возможны сложные условия);</li>                    <li> <b>RUB_ID</b> -
+	* масив идентификаторов рассылок с которыми связан выпуск;            
+	* <br> </li>          	           <li> <b>MSG_CHARSET</b> - кодировка в которой был составлен
+	* выпуск (точное совпадение).</li>          </ul>        	Пример: 	         <pre
+	* class="syntax"><code>array("SUBJECT"=&gt;"test | тест",             <br>           
+	* "TO"=&gt;"@bitrixsoft.ru")</code></pre>
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны <a
-	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingfields.php">поля объекта
-	* "Выпуск"</a>, за исключением полей типа text. <br><br> Если поля фильтра
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">поля объекта
+	* "Выпуск"</a>, за исключением полей типа text.    <br><br>  Если поля фильтра
 	* содержат ошибку, то переменная LAST_ERROR класса содержит сообщение
-	* об ошибке. </p> <a name="examples"></a>
+	* об ошибке. </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $cPosting = new CPosting;<br>$arFilter = Array(<br>    "ID" =&gt; $find_id,<br>    "TIMESTAMP_1" =&gt; $find_timestamp_1,<br>    "TIMESTAMP_2" =&gt; $find_timestamp_2,<br>    "DATE_SENT_1" =&gt; $find_date_sent_1,<br>    "DATE_SENT_2" =&gt; $find_date_sent_2,<br>    "STATUS" =&gt; $find_status,<br>    "STATUS_ID" =&gt; $find_status_id,<br>    "SUBJECT" =&gt; $find_subject,<br>    "FROM" =&gt; $find_from,<br>    "TO" =&gt; $find_to,<br>    "BODY" =&gt; $find_body,<br>    "BODY_TYPE" =&gt; $find_body_type<br>);<br>$rsPosting = <b>$cPosting-&gt;GetList</b>(array($by=&gt;$order), $arFilter);<br>$strError .= $cPosting-&gt;LAST_ERROR;<br><br>$rsPosting-&gt;NavStart(50);<br>echo $rsPosting-&gt;NavPrint("Issues");<br>while($rsPosting-&gt;NavNext(true, "f_"))<br>{<br>    //...<br>}<br>
 	* </pre>
 	*
@@ -226,7 +232,7 @@ class CPosting extends CPostingGeneral
 			$strSql = $strSql." HAVING ".$strSqlSearch_h;
 		}
 		$strSql.=$strSqlOrder;
-//		echo htmlspecialcharsbx($strSql);
+
 		$res = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		$res->is_filtered = (IsFiltered($strSqlSearch));
 		return $res;
@@ -234,20 +240,20 @@ class CPosting extends CPostingGeneral
 
 	
 	/**
-	* <p>Метод возвращает true при успешной блокировке выпуска и false при не успешной. Используется при автоматической отправке выпусков.</p>
+	* <p>Метод возвращает true при успешной блокировке выпуска и false при не успешной. Используется при автоматической отправке выпусков. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор выпуска.
+	* @param mixed $intID  Идентификатор выпуска.
 	*
 	* @return bool <p>В случае успешной блокировки возвращается true. В противном
 	* случае возвращается false. Если блокировку не удалось получить
 	* из-за ошибки базы данных, то возвращается false и возбуждает
 	* исключение (<a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if(<b>CPosting::Lock</b>($ID)===false)<br>{<br>	if($e = $APPLICATION-&gt;GetException())<br>		echo "Произошла ошибка БД: ".$e-&gt;GetString();<br>	else<br>		return;<br>}<br>else<br>{<br>	//Выпуск успешно заблокирован<br>	//можно продолжать обработку<br>}<br>
 	* </pre>
 	*
@@ -268,18 +274,19 @@ class CPosting extends CPostingGeneral
 		else
 			return false;
 	}
+
 	
 	/**
-	* <p>Метод возвращает true при успешном снятии блокировки выпуска и false при неуспешном. Используется при отправке выпусков.</p>
+	* <p>Метод возвращает true при успешном снятии блокировки выпуска и false при неуспешном. Используется при отправке выпусков. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор выпуска.
+	* @param mixed $intID  Идентификатор выпуска.
 	*
 	* @return bool <p>В случае успешного снятия блокировки возвращается true. В
-	* противном случае возвращается false.</p> <a name="examples"></a>
+	* противном случае возвращается false.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <b>CPosting::UnLock</b>($ID);
 	* </pre>
 	*

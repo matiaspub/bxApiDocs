@@ -1,12 +1,35 @@
 <?
+use Bitrix\Main\Web\HttpClient;
+use Bitrix\Main\Web\Json;
+
 IncludeModuleLangFile(__FILE__);
 
 class CSocServFacebook extends CSocServAuth
 {
 	const ID = "Facebook";
 	const CONTROLLER_URL = "https://www.bitrix24.ru/controller";
+	const LOGIN_PREFIX = "FB_";
 
 	protected $entityOAuth = null;
+
+	/**
+	 * @param string $code =false
+	 * @return CFacebookInterface
+	 */
+	public function getEntityOAuth($code = false)
+	{
+		if(!$this->entityOAuth)
+		{
+			$this->entityOAuth = new CFacebookInterface();
+		}
+
+		if($code !== false)
+		{
+			$this->entityOAuth->setCode($code);
+		}
+
+		return $this->entityOAuth;
+	}
 
 	static public function GetSettings()
 	{
@@ -38,6 +61,7 @@ class CSocServFacebook extends CSocServAuth
 
 	public function getUrl($arParams)
 	{
+		CSocServAuthManager::SetUniqueKey();
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php?redirect_to=".urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID.'&check_key='.$_SESSION["UNIQUE_KEY"]));
@@ -55,21 +79,6 @@ class CSocServFacebook extends CSocServAuth
 		return $this->getEntityOAuth()->GetAuthUrl($redirect_uri);
 	}
 
-	public function getEntityOAuth($code = false)
-	{
-		if(!$this->entityOAuth)
-		{
-			$this->entityOAuth = new CFacebookInterface();
-		}
-
-		if($code !== false)
-		{
-			$this->entityOAuth->setCode($code);
-		}
-
-		return $this->entityOAuth;
-	}
-
 	public function addScope($scope)
 	{
 		return $this->getEntityOAuth()->addScope($scope);
@@ -80,7 +89,7 @@ class CSocServFacebook extends CSocServAuth
 		$arFields = array(
 			'EXTERNAL_AUTH_ID' => self::ID,
 			'XML_ID' => $arFBUser["id"],
-			'LOGIN' => "FB_".$arFBUser["id"],
+			'LOGIN' => static::LOGIN_PREFIX.$arFBUser["id"],
 			'EMAIL' => ($arFBUser["email"] != '') ? $arFBUser["email"] : '',
 			'NAME'=> $arFBUser["first_name"],
 			'LAST_NAME'=> $arFBUser["last_name"],
@@ -93,7 +102,7 @@ class CSocServFacebook extends CSocServAuth
 			$picture_url = CFacebookInterface::GRAPH_URL.'/'.$arFBUser['id'].'/picture?type=large';
 			$temp_path = CFile::GetTempName('', 'picture.jpg');
 
-			$ob = new \Bitrix\Main\Web\HttpClient(array(
+			$ob = new HttpClient(array(
 				"redirect" => true
 			));
 			$ob->download($picture_url, $temp_path);
@@ -232,10 +241,13 @@ window.close();
 		die();
 	}
 
+	public function setUser($userId)
+	{
+		$this->getEntityOAuth()->setUser($userId);
+	}
+
 	public function getFriendsList($limit, &$next)
 	{
-		$fb = new CFacebookInterface();
-
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php?redirect_to=".urlencode(CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code")));
@@ -245,6 +257,7 @@ window.close();
 			$redirect_uri = CSocServUtil::GetCurUrl('auth_service_id='.self::ID, array("code"));
 		}
 
+		$fb = $this->getEntityOAuth();
 		if($fb->GetAccessToken($redirect_uri) !== false)
 		{
 			$res = $fb->GetCurrentUserFriends($limit, $next);
@@ -340,7 +353,11 @@ class CFacebookInterface extends CSocServOAuthTransport
 
 	protected $userId = false;
 
-	protected $scope = "email,publish_actions";
+	protected $scope = array(
+		"email",
+		"publish_actions",
+		"user_friends",
+	);
 
 	static public function __construct($appID = false, $appSecret = false, $code=false)
 	{
@@ -361,7 +378,7 @@ class CFacebookInterface extends CSocServOAuthTransport
 	{
 		$_SESSION["FACEBOOK_OAUTH_LAST_REDIRECT_URI"] = $redirect_uri;
 
-		return self::AUTH_URL."?client_id=".$this->appID."&redirect_uri=".urlencode($redirect_uri)."&scope=".$this->getScope()."&display=popup";
+		return self::AUTH_URL."?client_id=".$this->appID."&redirect_uri=".urlencode($redirect_uri)."&scope=".$this->getScopeEncode()."&display=popup";
 	}
 
 	public function GetAccessToken($redirect_uri)
@@ -415,12 +432,12 @@ class CFacebookInterface extends CSocServOAuthTransport
 		if($this->access_token === false)
 			return false;
 
-		$result = CHTTP::sGetHeader(self::GRAPH_URL.'/me?access_token='.$this->access_token."&fields=picture,id,name,first_name,last_name,gender,birthday,email", array(), $this->httpTimeout);
+		$http = new HttpClient();
+		$http->setTimeout($this->httpTimeout);
 
-		if(!defined("BX_UTF"))
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
+		$result = $http->get(self::GRAPH_URL.'/me?access_token='.$this->access_token."&fields=picture,id,name,first_name,last_name,gender,email");
 
-		return CUtil::JsObjectToPhp($result);
+		return Json::decode($result);
 	}
 
 	public function GetAppInfo()
@@ -428,11 +445,11 @@ class CFacebookInterface extends CSocServOAuthTransport
 		if($this->access_token === false)
 			return false;
 
-		$h = new \Bitrix\Main\Web\HttpClient();
-		$h->setTimeout($this->httpTimeout);
+		$http = new HttpClient();
+		$http->setTimeout($this->httpTimeout);
 
-		$result = $h->get(self::GRAPH_URL.'/debug_token?input_token='.$this->access_token.'&access_token='.$this->appID."|".$this->appSecret);
-		$result = \Bitrix\Main\Web\Json::decode($result);
+		$result = $http->get(self::GRAPH_URL.'/debug_token?input_token='.$this->access_token.'&access_token='.$this->appID."|".$this->appSecret);
+		$result = Json::decode($result);
 
 		if($result["data"]["app_id"])
 		{
@@ -449,7 +466,7 @@ class CFacebookInterface extends CSocServOAuthTransport
 
 		if(empty($next))
 		{
-			$url = self::GRAPH_URL.'/me/friends?access_token='.$this->access_token."&fields=picture,id,name,first_name,last_name,gender,birthday,email";
+			$url = self::GRAPH_URL.'/me/friends?access_token='.$this->access_token."&fields=picture,id,name,first_name,last_name,gender,email";
 
 			if($limit > 0)
 			{
@@ -461,12 +478,12 @@ class CFacebookInterface extends CSocServOAuthTransport
 			$url = $next;
 		}
 
-		$result = CHTTP::sGetHeader($url, array(), $this->httpTimeout);
+		$http = new HttpClient();
+		$http->setTimeout($this->httpTimeout);
 
-		if(!defined("BX_UTF"))
-			$result = CharsetConverter::ConvertCharset($result, "utf-8", LANG_CHARSET);
+		$result = $http->get($url);
 
-		$result = CUtil::JsObjectToPhp($result);
+		$result = Json::decode($result);
 
 		if(is_array($result['paging']) && !empty($result['paging']['next']))
 		{
@@ -515,7 +532,7 @@ class CFacebookInterface extends CSocServOAuthTransport
 		$message = CharsetConverter::ConvertCharset($message, LANG_CHARSET, "utf-8");
 		$arPost = array("access_token" => $this->access_token, "message"=> $message);
 
-		$ob = new \Bitrix\Main\Web\HttpClient();
+		$ob = new HttpClient();
 		return $ob->post($url, $arPost);
 	}
 
@@ -526,7 +543,7 @@ class CFacebookInterface extends CSocServOAuthTransport
 
 		$url = self::GRAPH_URL.'/'.$uid.'/apprequests?access_token='.$this->access_token;
 
-		$ob = new \Bitrix\Main\Web\HttpClient();
+		$ob = new HttpClient();
 		return $ob->get($url);
 	}
 

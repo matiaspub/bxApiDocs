@@ -311,49 +311,6 @@ class CAllForumTopic
 		return $ID;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующей темы с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой темы.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
-	*
-	*
-	* @param int $ID  Код темы, параметры которой необходимо изменить.
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">списке
-	* полей темы</a>.
-	*
-	* @param bool $skip_counts  Если этот параметр установлен в значение true, то при изменении
-	* темы не будут автоматически обсчитаны статистические данные. Это
-	* ускоряет работу функции, но создает логические ошибки в данных.
-	* Необязательный. По умолчанию равен False.
-	*
-	* @return int <a name="examples"></a>
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* // Для того, чтобы прикрепить тему, ставим SORT=100.
-	* 
-	* CForumTopic::Update($TOPIC_ID,Array("SORT" =&gt;100))
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumtopic">Поля темы</a> </li>
-	* <li>Перед изменением темы следует проверить возможность изменения
-	* методом <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/canuserupdatetopic.php">CanUserUpdateTopic</a> </li>
-	* <li>Для добавления и изменения сообщения и темы можно
-	* воспользоваться высокоуровневой функцией <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/functions/forumaddmessage.php">ForumAddMessage</a> </li> </ul> <br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumtopic/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields, $skip_counts = False)
 	{
 		global $DB;
@@ -1410,4 +1367,3 @@ class _CTopicDBResult extends CDBResult
 		return $res;
 	}
 }
-?>

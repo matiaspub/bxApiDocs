@@ -24,6 +24,24 @@ abstract class OtpAlgorithm
 	 *  string newParams (Updated user params for this OtpAlgorithm)
 	 * ]
 	 */
+	
+	/**
+	* <p>Нестатический метод подтверждает введенную информацию.</p>
+	*
+	*
+	* @param string $input  Полученная информация от пользователя.
+	*
+	* @param string $params = null Синхронизированные пользовательские параметры, сохраненные для
+	* алгоритма (см. <a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getsyncparameters.php">getSyncParameters</a> -
+	* <code>\Bitrix\Security\Mfa\OtpAlgorithm::getSyncParameters</code>).
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/verify.php
+	* @author Bitrix
+	*/
 	abstract public function verify($input, $params = null);
 
 	/**
@@ -34,6 +52,24 @@ abstract class OtpAlgorithm
 	 * @throws OtpException
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает синхронизированные пользовательские параметры для предоставляемого ввода.</p>
+	*
+	*
+	* @param string $inputA  Первый код.
+	*
+	* @param string $string  Второй код. Должен быть предоставлен, если текущий алгоритм OTP его
+	* требует (см. <code>TwoCodeRequired</code>).
+	*
+	* @param null $inputB  
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getsyncparameters.php
+	* @author Bitrix
+	*/
 	abstract public function getSyncParameters($inputA, $inputB);
 
 	/**
@@ -46,6 +82,17 @@ abstract class OtpAlgorithm
 	 * @return array
 	 * @throws NotImplementedException
 	 */
+	
+	/**
+	* <p>Статический метод возвращает описание алгоритма. Каждый алгоритм должен предоставить: <code>string type</code>, <code>string title</code>, <code>bool required_two_code</code>.</p> <p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getdescription.php
+	* @author Bitrix
+	*/
 	public static function getDescription()
 	{
 		throw new NotImplementedException('Method getDescription must be overridden');
@@ -56,6 +103,17 @@ abstract class OtpAlgorithm
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод определяет, требуется ли два кода для инициализации алгоритма или достаточно только одного.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/istwocoderequired.php
+	* @author Bitrix
+	*/
 	public function isTwoCodeRequired()
 	{
 		return $this->requireTwoCode;
@@ -67,9 +125,27 @@ abstract class OtpAlgorithm
 	 * @param string $secret Secret (binary).
 	 * @return $this
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает новый секрет.</p>
+	*
+	*
+	* @param string $secret  Секрет.
+	*
+	* @return \Bitrix\Security\Mfa\OtpAlgorithm 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/setsecret.php
+	* @author Bitrix
+	*/
 	public function setSecret($secret)
 	{
 		$this->secret = $secret;
+
+		// Backward compatibility. Use sha256 for eToken with 256bits key
+		if (\Bitrix\Main\Text\BinaryString::getLength($this->secret) > 25)
+			$this->digest = 'sha256';
+
 		return $this;
 	}
 
@@ -78,6 +154,17 @@ abstract class OtpAlgorithm
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает сгенерированный секрет.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getsecret.php
+	* @author Bitrix
+	*/
 	public function getSecret()
 	{
 		return $this->secret;
@@ -92,6 +179,21 @@ abstract class OtpAlgorithm
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод генерирует URI для подключения мобильного приложения в соответствии с <i>KeyUriFormat</i>.</p>
+	*
+	*
+	* @param string $label  Метка пользователя.
+	*
+	* @param array $opts = array() Дополнительные параметры URI .
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/generateuri.php
+	* @author Bitrix
+	*/
 	public function generateUri($label, array $opts = array())
 	{
 		$positionalOpts = array(
@@ -136,6 +238,21 @@ abstract class OtpAlgorithm
 	 * @param string|int $counter Counter.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Главный метод, генерирует значение OTP для указанного счетчика. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $string  Счетчик.
+	*
+	* @param integer $counter  
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/generateotp.php
+	* @author Bitrix
+	*/
 	public function generateOTP($counter)
 	{
 		$hash = hash_hmac($this->getDigest(), static::toByte($counter), $this->getSecret());
@@ -144,7 +261,8 @@ abstract class OtpAlgorithm
 		{
 			$hmac[] = hexdec($hex);
 		}
-		$offset = $hmac[19] & 0xf;
+
+		$offset = $hmac[count($hmac)  - 1] & 0xf;
 		$code = ($hmac[$offset + 0] & 0x7F) << 24;
 		$code |= ($hmac[$offset + 1] & 0xFF) << 16;
 		$code |= ($hmac[$offset + 2] & 0xFF) << 8;
@@ -214,11 +332,22 @@ abstract class OtpAlgorithm
 	}
 
 	/**
-	 * Return used digest
+	 * Returns digest algorithm used to calculate the OTP.
 	 * Mostly used for generate provision URI
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает алгоритм хеширования используемый при генерации OTP кода. Наиболее часто используется для генерации запасного URI.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getdigest.php
+	* @author Bitrix
+	*/
 	public function getDigest()
 	{
 		return $this->digest;
@@ -229,6 +358,17 @@ abstract class OtpAlgorithm
 	 *
 	 * @return int
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает цифры (длину пароля).</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getdigits.php
+	* @author Bitrix
+	*/
 	public function getDigits()
 	{
 		return $this->digits;
@@ -239,6 +379,17 @@ abstract class OtpAlgorithm
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает тип алгоритма OTP.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/gettype.php
+	* @author Bitrix
+	*/
 	public function getType()
 	{
 		return static::$type;
@@ -250,6 +401,17 @@ abstract class OtpAlgorithm
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает схему алгоритма. Наиболее часто используется для генерации запасного URI.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/otpalgorithm/getappscheme.php
+	* @author Bitrix
+	*/
 	public function getAppScheme()
 	{
 		return $this->appScheme;

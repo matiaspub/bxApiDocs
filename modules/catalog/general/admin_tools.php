@@ -162,12 +162,13 @@ class CCatalogAdminToolsAll
 		if (CCatalogSKU::TYPE_FULL == $arCatalog['CATALOG_TYPE'])
 			$boolExistOffers = CCatalogSKU::IsExistOffers($intID, $intIBlockID);
 		$boolExistSet = CCatalogProductSet::isProductHaveSet($intProductID, CCatalogProductSet::TYPE_SET);
+		$existInSet = CCatalogProductSet::isProductInSet($intProductID, CCatalogProductSet::TYPE_SET);
 		$boolExistGroup = CCatalogProductSet::isProductHaveSet($intProductID, CCatalogProductSet::TYPE_GROUP);
 
 		$arItems = array();
 		if (CCatalogSKU::TYPE_OFFERS != $arCatalog['CATALOG_TYPE'])
 		{
-			if (!$boolExistOffers && !$boolExistSet)
+			if (!$boolExistOffers && !$boolExistSet && !$existInSet)
 			{
 				//product
 				$arItems[] = array(
@@ -259,7 +260,8 @@ class CCatalogAdminToolsAll
 		//group
 		if ($boolFeatureSet && self::TAB_GROUP != $strProductType)
 		{
-			$arItems[] = array('SEPARATOR' => 'Y');
+			if (!empty($arItems))
+				$arItems[] = array('SEPARATOR' => 'Y');
 			if (!$boolExistGroup)
 			{
 				$arNewParams = $arParams;
@@ -612,7 +614,65 @@ class CCatalogAdminToolsAll
 	{
 		if (array_key_exists(self::$strMainPrefix.self::TAB_KEY, $_REQUEST))
 			unset($_REQUEST[self::$strMainPrefix.self::TAB_KEY]);
+		if (array_key_exists(self::$strMainPrefix.self::TAB_KEY, $_POST))
+			unset($_POST[self::$strMainPrefix.self::TAB_KEY]);
 	}
+
+	public static function getIblockProductTypeList($iblockId, $withDescr = false)
+	{
+		$result = array();
+		$iblockId = (int)$iblockId;
+		if ($iblockId <= 0)
+			return $result;
+		$withDescr = ($withDescr === true);
+
+		$iblockData = CCatalogSKU::GetInfoByIBlock($iblockId);
+		if (empty($iblockData))
+			return $result;
+
+		$data = array(
+			CCatalogSKU::TYPE_CATALOG => array(
+				Catalog\ProductTable::TYPE_PRODUCT
+			),
+			CCatalogSKU::TYPE_PRODUCT => array(
+				Catalog\ProductTable::TYPE_SKU
+			),
+			CCatalogSKU::TYPE_FULL => array(
+				Catalog\ProductTable::TYPE_PRODUCT,
+				Catalog\ProductTable::TYPE_SKU
+			),
+			CCatalogSKU::TYPE_OFFERS => array(
+				Catalog\ProductTable::TYPE_OFFER,
+				Catalog\ProductTable::TYPE_FREE_OFFER
+			)
+		);
+		if (CBXFeatures::IsFeatureEnabled('CatCompleteSet'))
+		{
+			$data[CCatalogSKU::TYPE_CATALOG][] = Catalog\ProductTable::TYPE_SET;
+			$data[CCatalogSKU::TYPE_FULL][] = Catalog\ProductTable::TYPE_SET;
+		}
+		if (!isset($data[$iblockData['CATALOG_TYPE']]))
+			return $result;
+
+		$result = $data[$iblockData['CATALOG_TYPE']];
+		if ($withDescr)
+		{
+			$productList = Catalog\ProductTable::getProductTypes(true);
+			$extResult = array();
+			foreach ($result as &$type)
+				$extResult[$type] = $productList[$type];
+			unset($type);
+			$result = $extResult;
+			unset($extResult, $productList);
+		}
+
+		return $result;
+	}
+}
+
+class CCatalogAdminTools extends CCatalogAdminToolsAll
+{
+
 }
 
 class CCatalogAdminProductSetEdit
@@ -1124,21 +1184,28 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 					'ITEMS' => array()
 				);
 
+				$removeSet = true;
 				if (CCatalogProductSet::TYPE_SET == self::$intTypeID)
 				{
 					foreach ($arOneSet['ITEMS'] as $keyItem => $arOneItem)
 					{
 						if ('Y' == $arOneItem['DEL'])
 							continue;
+						$itemId = (isset($arOneItem['ITEM_ID']) ? (int)$arOneItem['ITEM_ID'] : 0);
+						if ($itemId <= 0)
+							continue;
+						$removeSet = false;
 						$arOneItem['DISCOUNT_PERCENT'] = trim($arOneItem['DISCOUNT_PERCENT']);
 						$arSaveItem = array(
-							'ITEM_ID' => $arOneItem['ITEM_ID'],
+							'ITEM_ID' => $itemId,
 							'QUANTITY' => $arOneItem['QUANTITY'],
 							'DISCOUNT_PERCENT' => ('' == $arOneItem['DISCOUNT_PERCENT'] ? false : $arOneItem['DISCOUNT_PERCENT']),
 							'SORT' => $arOneItem['SORT']
 						);
+						unset($itemId);
 						$arSaveSet['ITEMS'][] = $arSaveItem;
 					}
+					unset($keyItem, $arOneItem);
 				}
 				else
 				{
@@ -1146,8 +1213,12 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 					{
 						if ('Y' == $arOneItem['DEL'])
 							continue;
+						$itemId = (isset($arOneItem['ITEM_ID']) ? (int)$arOneItem['ITEM_ID'] : 0);
+						if ($itemId <= 0)
+							continue;
+						$removeSet = false;
 						$arSaveItem = array(
-							'ITEM_ID' => $arOneItem['ITEM_ID'],
+							'ITEM_ID' => $itemId,
 							'QUANTITY' => $arOneItem['QUANTITY'],
 							'SORT' => $arOneItem['SORT']
 						);
@@ -1155,13 +1226,24 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 							$arSaveItem['QUANTITY'] = 1;
 						$arSaveSet['ITEMS'][] = $arSaveItem;
 					}
+					unset($keyItem, $arOneItem);
 				}
-				$arTestSet = $arSaveSet;
-				$boolCheck = (
-					$boolNew
-					? CCatalogProductSet::checkFields('TEST', $arTestSet, 0)
-					: CCatalogProductSet::checkFields('UPDATE', $arTestSet, $key)
-				);
+				if ($removeSet)
+				{
+					$boolCheck = true;
+					$arSaveSet['DEL'] = 'Y';
+				}
+				else
+				{
+					$arTestSet = $arSaveSet;
+					$boolCheck = (
+						$boolNew
+						? CCatalogProductSet::checkFields('TEST', $arTestSet, 0)
+						: CCatalogProductSet::checkFields('UPDATE', $arTestSet, $key)
+					);
+					unset($arTestSet);
+				}
+				unset($removeSet);
 				if (!$boolCheck)
 				{
 					$ex = new CAdminException(CCatalogProductSet::getErrors());
@@ -1193,18 +1275,25 @@ var ob<? echo self::$strMainPrefix; ?> = new JCCatTblEditExt(<? echo CUtil::PhpT
 		{
 			foreach (self::$arCheckValues[self::$strMainPrefix] as $key => $arSaveSet)
 			{
+
 				if (0 >= $arSaveSet['ITEM_ID'])
 					$arSaveSet['ITEM_ID'] = $arItem['PRODUCT_ID'];
 				$boolNew = (0 >= (int)$key);
 				if ($boolNew)
 				{
-					CCatalogProductSet::add($arSaveSet);
+					if (!isset($arSaveSet['DEL']) || $arSaveSet['DEL'] != 'Y')
+						CCatalogProductSet::add($arSaveSet);
 				}
 				else
 				{
-					CCatalogProductSet::update($key, $arSaveSet);
+					if (isset($arSaveSet['DEL']) && $arSaveSet['DEL'] == 'Y')
+						CCatalogProductSet::delete($key);
+					else
+						CCatalogProductSet::update($key, $arSaveSet);
 				}
+				unset($boolNew);
 			}
+			unset($key, $arSaveSet);
 		}
 	}
 

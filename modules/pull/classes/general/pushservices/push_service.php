@@ -9,24 +9,29 @@ abstract class CPushService
 	{
 		global $APPLICATION;
 		$batch = "";
-		if(!is_array($appMessages) || count($appMessages) <= 0)
+		if (!is_array($appMessages) || count($appMessages) <= 0)
+		{
 			return $batch;
+		}
 		foreach ($appMessages as $appID => $arMessages)
 		{
 			$appModifier = ";tkey=" . $appID . ";";
 			foreach ($arMessages as $token => $messages)
 			{
 				if (!count($messages))
+				{
 					continue;
+				}
 				$mess = 0;
 				$messCount = count($messages);
 				while ($mess < $messCount)
 				{
 					/**
-					 * @var CPushMessage $message;
+					 * @var CPushMessage $message ;
 					 */
 
-					if (!$this->allowEmptyMessage && strlen(trim($messages[$mess]["MESSAGE"])) <= 0)
+					$messageArray = $messages[$mess];
+					if (!$this->allowEmptyMessage && strlen(trim($messageArray["MESSAGE"])) <= 0)
 					{
 						$mess++;
 						continue;
@@ -36,37 +41,23 @@ abstract class CPushService
 					$id = rand(1, 10000);
 					$message->setCustomIdentifier($id);
 					if ("UTF-8" != toupper(SITE_CHARSET))
-						$text = $APPLICATION->ConvertCharset($messages[$mess]["MESSAGE"], SITE_CHARSET, "utf-8");
+					{
+						$text = $APPLICATION->ConvertCharset($messageArray["MESSAGE"], SITE_CHARSET, "utf-8");
+					}
 					else
-						$text = $messages[$mess]["MESSAGE"];
+					{
+						$text = $messageArray["MESSAGE"];
+					}
+					$message->setSound('');
 					$message->setText($text);
-					$message->setTitle($messages[$mess]["TITLE"]);
+					$message->setTitle($messageArray["TITLE"]);
 					if (strlen($text) > 0)
 					{
-						if(strlen($messages[$mess]["SOUND"])>0)
-							$message->setSound($messages[$mess]["SOUND"]);
-					}
-					else
-					{
-						$message->setSound('');
-					}
-
-					if ($messages[$mess]["PARAMS"])
-					{
-						$params = $messages[$mess]["PARAMS"];
-						if (is_array($messages[$mess]["PARAMS"]))
-							$params = json_encode($messages[$mess]["PARAMS"]);
-						$message->setCustomProperty('params', $params);
-					}
-
-					if ($messages[$mess]["ACTION"])
-					{
-						$message->setCustomProperty('action', $messages[$mess]["ACTION"] );
-					}
-
-					if ($messages[$mess]["JSEVENT"])
-					{
-						$message->setCustomProperty('jsevent', $messages[$mess]["JSEVENT"] );
+						$message->setSound(
+							(strlen($messageArray["SOUND"]) > 0)
+								? $messageArray["SOUND"]
+								: "default"
+						);
 					}
 
 					if ($messages[$mess]["CATEGORY"])
@@ -74,32 +65,56 @@ abstract class CPushService
 						$message->setCategory($messages[$mess]["CATEGORY"]);
 					}
 
-					$message->setCustomProperty('target', md5($messages[$mess]["USER_ID"] . CMain::GetServerUniqID()));
-
-					if(array_key_exists("EXPIRY", $messages[$mess]))
+					if (array_key_exists("EXPIRY", $messageArray))
 					{
-						$expiry = $messages[$mess]["EXPIRY"];
-						if ($expiry === 0 || $expiry === "0")
+						$expiry = intval($messageArray["EXPIRY"]);
+						$message->setExpiry((intval($expiry) > 0)
+							? intval($expiry)
+							: self::DEFAULT_EXPIRY
+						);
+					}
+
+
+					if ($messageArray["PARAMS"])
+					{
+						$message->setCustomProperty(
+							'params',
+							(is_array($messageArray["PARAMS"]))
+								? json_encode($messageArray["PARAMS"])
+								: $messageArray["PARAMS"]
+						);
+					}
+
+
+					if ($messageArray["ADVANCED_PARAMS"] && is_array($messageArray["ADVANCED_PARAMS"]))
+					{
+//						$messageArray["ADVANCED_PARAMS"] = array_change_key_case($messageArray["ADVANCED_PARAMS"], CASE_LOWER);
+						foreach ($messageArray["ADVANCED_PARAMS"] as $param => $value)
 						{
-							$message->setExpiry(0);
-						}
-						else
-						{
-							$message->setExpiry((intval($expiry)>0)
-													? intval($expiry)
-													:self::DEFAULT_EXPIRY
-							);
+							$message->setCustomProperty($param, $value);
 						}
 					}
 
+					$message->setCustomProperty('target', md5($messages[$mess]["USER_ID"] . CMain::GetServerUniqID()));
+
 					$badge = intval($messages[$mess]["BADGE"]);
 					if (array_key_exists("BADGE", $messages[$mess]) && $badge >= 0)
+					{
 						$message->setBadge($badge);
+					}
+
 
 					if (strlen($batch) > 0)
+					{
 						$batch .= ";";
+					}
 
-					$batch .= $message->getBatch();
+					$messageBatch = $message->getBatch();
+					if($messageBatch && strlen($messageBatch)>0)
+					{
+						$batch .= $messageBatch;
+					}
+
 					$mess++;
 				}
 			}
@@ -107,7 +122,9 @@ abstract class CPushService
 		}
 
 		if (strlen($batch) == 0)
+		{
 			return $batch;
+		}
 
 		return $modifier . $batch;
 	}
@@ -149,6 +166,7 @@ abstract class CPushService
 	}
 
 	abstract function getMessageInstance($token);
-	abstract function getBatch();
+
+	abstract function getBatch($messages);
 
 }

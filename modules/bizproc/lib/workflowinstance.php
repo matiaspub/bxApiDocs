@@ -7,6 +7,8 @@ use Bitrix\Main\Entity;
 
 class WorkflowInstanceTable extends Entity\DataManager
 {
+	const LOCKED_TIME_INTERVAL = 300;
+
 	/**
 	 * @return string
 	 */

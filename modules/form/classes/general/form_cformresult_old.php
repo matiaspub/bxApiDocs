@@ -5,10 +5,10 @@
 
 class CFormResult_old
 {
-public static 	function GetDataByIDForWeb($RESULT_ID, $GET_ADDITIONAL="N")
+	public static function GetDataByIDForWeb($RESULT_ID, $GET_ADDITIONAL="N")
 	{ return CFormResult::GetDataByIDForHTML($RESULT_ID, $GET_ADDITIONAL); }
 
-public static 	function GetMaxPermissions()
+	public static function GetMaxPermissions()
 	{ return CFormStatus::GetMaxPermissions(); }
 
 	/*
@@ -18,7 +18,7 @@ public static 	function GetMaxPermissions()
 		arrVALUES - массив значений для полей ввода
 		TEMPLATE - шаблон для редактирования результата
 	*/
-public static 	function Edit($RESULT_ID, $arrVALUES, $TEMPLATE="", $EDIT_ADDITIONAL="N", $EDIT_STATUS="N")
+	public static function Edit($RESULT_ID, $arrVALUES, $TEMPLATE="", $EDIT_ADDITIONAL="N", $EDIT_STATUS="N")
 	{
 		global $DB, $MESS, $APPLICATION, $USER, $HTTP_POST_VARS, $HTTP_GET_VARS, $arrFIELDS, $arrRESULT_PERMISSION;
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: Edit<br>Line: ";
@@ -94,7 +94,7 @@ public static 	function Edit($RESULT_ID, $arrVALUES, $TEMPLATE="", $EDIT_ADDITIO
 			если "show" тогда берется шаблон для показа,
 			если "print" тогда берется шаблон для печати
 	*/
-public static 	function Show($RESULT_ID, $TEMPLATE="", $TEMPLATE_TYPE="show", $SHOW_ADDITIONAL="N", $SHOW_ANSWER_VALUE="Y", $SHOW_STATUS="N")
+	public static function Show($RESULT_ID, $TEMPLATE="", $TEMPLATE_TYPE="show", $SHOW_ADDITIONAL="N", $SHOW_ANSWER_VALUE="Y", $SHOW_STATUS="N")
 	{
 		global $DB, $MESS, $APPLICATION, $USER, $HTTP_POST_VARS, $HTTP_GET_VARS, $arrRESULT_PERMISSION, $arrFIELDS;
 		$err_mess = (CAllFormResult::err_mess())."<br>Function: Show<br>Line: ";

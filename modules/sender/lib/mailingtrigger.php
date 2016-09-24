@@ -50,7 +50,7 @@ class MailingTriggerTable extends Entity\DataManager
 				'required' => true,
 			),
 			'ENDPOINT' => array(
-				'data_type' => 'string',
+				'data_type' => 'text',
 				'serialized' => true,
 				'required' => true,
 			),

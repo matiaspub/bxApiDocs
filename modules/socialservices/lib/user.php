@@ -1,15 +1,18 @@
 <?
 namespace Bitrix\Socialservices;
 
-use \Bitrix\Main\Entity\DataManager;
+use \Bitrix\Main\Entity;
 
-class UserTable extends DataManager
+
+class UserTable extends Entity\DataManager
 {
 	const ALLOW = 'Y';
 	const DISALLOW = 'N';
 
 	const INITIALIZED = 'Y';
 	const NOT_INITIALIZED = 'N';
+
+	private static $deletedList = array();
 
 	public static function getFilePath()
 	{
@@ -66,6 +69,7 @@ class UserTable extends DataManager
 			),
 			'PERMISSIONS' => array(
 				'data_type' => 'string',
+				'serizalized' => true,
 			),
 			'OATOKEN' => array(
 				'data_type' => 'string',
@@ -97,4 +101,55 @@ class UserTable extends DataManager
 		);
 
 		return $fieldsMap;
-	}}
+	}
+
+	public static function filterFields($fields)
+	{
+		$map = static::getMap();
+		foreach($fields as $key => $value)
+		{
+			if(!array_key_exists($key, $map))
+			{
+				unset($fields[$key]);
+			}
+			elseif($map[$key]['required'] && empty($fields[$key]))
+			{
+				unset($fields[$key]);
+			}
+		}
+
+		return $fields;
+	}
+
+	public static function onBeforeDelete(Entity\Event $event)
+	{
+		$primary = $event->getParameter("primary");
+		$ID = $primary["ID"];
+		$dbRes = static::getByPrimary($ID);
+		self::$deletedList[$ID] = $dbRes->fetch();
+	}
+
+	public static function onAfterDelete(Entity\Event $event)
+	{
+		$primary = $event->getParameter("primary");
+		$ID = $primary["ID"];
+		$userInfo = self::$deletedList[$ID];
+		if($userInfo)
+		{
+			UserLinkTable::deleteBySocserv($userInfo["USER_ID"], $userInfo["ID"]);
+
+			if($userInfo["EXTERNAL_AUTH_ID"] === \CSocServBitrix24Net::ID)
+			{
+				$interface = new \CBitrix24NetOAuthInterface();
+				$interface->setToken($userInfo["OATOKEN"]);
+				$interface->setAccessTokenExpires($userInfo["OATOKEN_EXPIRES"]);
+				$interface->setRefreshToken($userInfo["REFRESH_TOKEN"]);
+
+				if($interface->checkAccessToken() || $interface->getNewAccessToken())
+				{
+					$interface->RevokeAuth();
+				}
+			}
+		}
+	}
+}

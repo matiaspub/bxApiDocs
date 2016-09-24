@@ -61,7 +61,7 @@ class SiteSpeed
 
 	public static function canGatherStat()
 	{
-		return Option::get("main", "gather_user_stat", "Y") === "Y" && defined("LICENSE_KEY") && LICENSE_KEY !== "DEMO";
+		return defined("LICENSE_KEY") && LICENSE_KEY !== "DEMO";
 	}
 
 	public static function isOn()

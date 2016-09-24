@@ -78,6 +78,19 @@ class ActionsData
 	 * @param string $bid -     action bitrix idetifyer
 	 * @return array
 	 */
+	
+	/**
+	* <p>Возвращает состояние заданий. Метод статический.</p>
+	*
+	*
+	* @param string $bid  Cтрока с ID задания.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/actionsdata/getactionstate.php
+	* @author Bitrix
+	*/
 	public static function getActionState($bid)
 	{
 		$result = array();
@@ -110,6 +123,19 @@ class ActionsData
 	 * @return array of all actions defenitions
 	 * @throws \Bitrix\Main\IO\FileNotFoundException
 	 */
+	
+	/**
+	* <p>Возвращает список заданий <i>BitrixVM</i>. Метод статический.</p>
+	*
+	*
+	* @param boolean $checkConditions = false Массив состояний заданий.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/actionsdata/getlist.php
+	* @author Bitrix
+	*/
 	public static function getList($checkConditions = false)
 	{
 		static $def = null;
@@ -218,6 +244,17 @@ class ActionsData
 	 * during the action running.
 	 * @return array - Action params
 	 */
+	
+	/**
+	* <p>Проверяет выполняется ли какое-либо задание <i>BitrixVM</i> после обновления страницы или при переходе на страницу. Метод статический. </p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/actionsdata/checkrunningaction.php
+	* @author Bitrix
+	*/
 	public static function checkRunningAction()
 	{
 		$result = array();

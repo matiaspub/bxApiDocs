@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>. 
+ * <b>CHit</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитами</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>.
  *
  *
  * @return mixed 
@@ -17,65 +17,72 @@ class CHit
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a>. Число выводимых строк определяется в поле <b>Максимальное кол-во показываемых записей в таблицах</b> в <a href="http://dev.1c-bitrix.ru/user_help/statistic/settings.php" >настройках модуля</a> Веб-аналитика.</p>
 	*
 	*
-	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID хита; </li>
-	* <li> <b>s_site_id</b> - ID сайта; </li> <li> <b>s_session_id</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li> <li> <b>s_date_hit</b> -
-	* время хита; </li> <li> <b>s_user_id</b> - ID <a
+	* @param string &$by = "s_id" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID хита;
+	* </li>                    <li> <b>s_site_id</b> - ID сайта; </li>                    <li> <b>s_session_id</b> - ID
+	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li>                    <li>
+	* <b>s_date_hit</b> - время хита; </li>                    <li> <b>s_user_id</b> - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user">пользователя</a> под которым
-	* был авторизован посетитель (в момент хита или до того); </li> <li>
-	* <b>s_guest_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>;
-	* </li> <li> <b>s_ip</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#ip">IP адрес</a>
-	* посетителя; </li> <li> <b>s_url</b> - страница хита; </li> <li> <b>s_country_id</b> - ID
-	* страны посетителя. </li> </ul>
+	* был авторизован посетитель (в момент хита или до того); </li>               
+	*     <li> <b>s_guest_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>; </li>                   
+	* <li> <b>s_ip</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#ip">IP адрес</a>
+	* посетителя; </li>                    <li> <b>s_url</b> - страница хита; </li>                   
+	* <li> <b>s_country_id</b> - ID страны посетителя. </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID хита; </li> <li> <b>ID_EXACT_MATCH</b> -
-	* если значение равно "N", то при фильтрации по <b>ID</b> будет искаться
-	* вхождение; </li> <li> <b>GUEST_ID</b>* - ID посетителя; </li> <li> <b>GUEST_ID_EXACT_MATCH</b> -
-	* если значение равно "N", то при фильтрации по <b>GUEST_ID</b> будет
-	* искаться вхождение; </li> <li> <b>NEW_GUEST</b> - флаг "новый посетитель",
-	* возможные значения: <ul> <li> <b>Y</b> - посетитель впервые на портале; </li>
-	* <li> <b>N</b> - посетитель уже посещал ранее портал. </li> </ul> </li> <li>
-	* <b>SESSION_ID</b>* - ID сессии; </li> <li> <b>SESSION_ID_EXACT_MATCH</b> - если значение равно
-	* "N", то при фильтрации по <b>SESSION_ID</b> будет искаться вхождение; </li> <li>
-	* <b>STOP_LIST_ID</b>* - ID записи <a
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID хита; </li>                   
+	* <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
+	* будет искаться вхождение; </li>                    <li> <b>GUEST_ID</b>* - ID
+	* посетителя; </li>                    <li> <b>GUEST_ID_EXACT_MATCH</b> - если значение равно
+	* "N", то при фильтрации по <b>GUEST_ID</b> будет искаться вхождение; </li>        
+	*            <li> <b>NEW_GUEST</b> - флаг "новый посетитель", возможные значения:     
+	*         <ul> <li> <b>Y</b> - посетитель впервые на портале; </li>                           
+	* <li> <b>N</b> - посетитель уже посещал ранее портал. </li>             </ul> </li>       
+	*             <li> <b>SESSION_ID</b>* - ID сессии; </li>                    <li> <b>SESSION_ID_EXACT_MATCH</b> -
+	* если значение равно "N", то при фильтрации по <b>SESSION_ID</b> будет
+	* искаться вхождение; </li>                    <li> <b>STOP_LIST_ID</b>* - ID записи <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#stop_list">стоп-листа</a> под которую
-	* попал посетитель (если это имело место быть); </li> <li>
+	* попал посетитель (если это имело место быть); </li>                    <li>
 	* <b>STOP_LIST_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>STOP_LIST_ID</b> будет искаться вхождение; </li> <li> <b>URL</b>* - страница хита;
-	* </li> <li> <b>URL_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>URL</b> будет искаться точное совпадение; </li> <li> <b>URL_404</b> - была ли <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на странице хита <ul>
-	* <li> <b>Y</b> - была; </li> <li> <b>N</b> - не было. </li> </ul> </li> <li> <b>USER</b>* - ID, логин,
-	* имя, фамилия пользователя под которым был авторизован посетитель
-	* в момент хита или до него; </li> <li> <b>USER_EXACT_MATCH</b> - если значение равно
-	* "Y", то при фильтрации по <b>USER</b> будет искаться точное совпадение;
-	* </li> <li> <b>REGISTERED</b> - флаг "был ли авторизован посетитель в момент
-	* хита или до этого", возможные значения: <ul> <li> <b>Y</b> - был; </li> <li> <b>N</b>
-	* - не был. </li> </ul> </li> <li> <b>DATE_1</b> - начальное значение интервала даты
-	* хита; </li> <li> <b>DATE_2</b> - конечное значение интервала даты хита; </li> <li>
-	* <b>IP</b>* - IP адрес посетителя в момент хита; </li> <li> <b>IP_EXACT_MATCH</b> - если
+	* <b>STOP_LIST_ID</b> будет искаться вхождение; </li>                    <li> <b>URL</b>* -
+	* страница хита; </li>                    <li> <b>URL_EXACT_MATCH</b> - если значение равно
+	* "Y", то при фильтрации по <b>URL</b> будет искаться точное совпадение;
+	* </li>                    <li> <b>URL_404</b> - была ли <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на странице хита     
+	*         <ul> <li> <b>Y</b> - была; </li>                            <li> <b>N</b> - не было. </li>            
+	* </ul> </li>                    <li> <b>USER</b>* - ID, логин, имя, фамилия пользователя
+	* под которым был авторизован посетитель в момент хита или до него;
+	* </li>                    <li> <b>USER_EXACT_MATCH</b> - если значение равно "Y", то при
+	* фильтрации по <b>USER</b> будет искаться точное совпадение; </li>              
+	*      <li> <b>REGISTERED</b> - флаг "был ли авторизован посетитель в момент хита
+	* или до этого", возможные значения:              <ul> <li> <b>Y</b> - был; </li>           
+	*                 <li> <b>N</b> - не был. </li>             </ul> </li>                    <li> <b>DATE_1</b> -
+	* начальное значение интервала даты хита; </li>                    <li> <b>DATE_2</b> -
+	* конечное значение интервала даты хита; </li>                    <li> <b>IP</b>* - IP
+	* адрес посетителя в момент хита; </li>                    <li> <b>IP_EXACT_MATCH</b> - если
 	* значение равно "Y", то при фильтрации по <b>IP</b> будет искаться
-	* точное совпадение; </li> <li> <b>USER_AGENT</b>* - <a
+	* точное совпадение; </li>                    <li> <b>USER_AGENT</b>* - <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#user_agent">UserAgent</a> посетителя в
-	* момент хита; </li> <li> <b>USER_AGENT_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>USER_AGENT</b> будет искаться точное совпадение; </li> <li>
-	* <b>COUNTRY_ID</b>* - ID страны посетителя в момент хита; </li> <li>
-	* <b>COUNTRY_ID_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>COUNTRY_ID</b> будет искаться точное совпадение; </li> <li> <b>COUNTRY</b>* -
-	* название страны; </li> <li> <b>COUNTRY_EXACT_MATCH</b> - если значение равно "Y", то
-	* при фильтрации по <b>COUNTRY</b> будет искаться точное совпадение; </li>
-	* <li> <b>COOKIE</b>* - содержимое <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#cookie">Cookie</a> в момент хита; </li> <li>
-	* <b>COOKIE_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>COOKIE</b> будет искаться точное совпадение; </li> <li> <b>STOP</b> - <ul> <li> <b>Y</b>
-	* - был; </li> <li> <b>N</b> - не был. </li> </ul> </li> <li> <b>SITE_ID</b>* - ID сайта; </li> <li>
-	* <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>SITE_ID</b> будет искаться вхождение. </li> </ul> <br> * - допускается <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
+	* момент хита; </li>                    <li> <b>USER_AGENT_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>USER_AGENT</b> будет искаться точное
+	* совпадение; </li>                    <li> <b>COUNTRY_ID</b>* - ID страны посетителя в
+	* момент хита; </li>                    <li> <b>COUNTRY_ID_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>COUNTRY_ID</b> будет искаться точное
+	* совпадение; </li>                    <li> <b>COUNTRY</b>* - название страны; </li>              
+	*      <li> <b>COUNTRY_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>COUNTRY</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>COOKIE</b>* - содержимое <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#cookie">Cookie</a>
+	* в момент хита; </li>                    <li> <b>COOKIE_EXACT_MATCH</b> - если значение равно
+	* "Y", то при фильтрации по <b>COOKIE</b> будет искаться точное совпадение;
+	* </li>                    <li> <b>STOP</b> -              <ul> <li> <b>Y</b> - был; </li>                           
+	* <li> <b>N</b> - не был. </li>             </ul> </li>                    <li> <b>SITE_ID</b>* - ID сайта;
+	* </li>                    <li> <b>SITE_ID_EXACT_MATCH</b> - если значение равно "N", то при
+	* фильтрации по <b>SITE_ID</b> будет искаться вхождение. </li>         </ul> <br>      
+	* * - допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
+	* логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка хитов. Если значение равно "true", то
 	* список был отфильтрован.
@@ -83,7 +90,7 @@ class CHit
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем хиты сессии #1056
 	* $arFilter = array(
@@ -108,7 +115,7 @@ class CHit
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">Термин "Хит"</a> </li> </ul> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">Термин "Хит"</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -283,7 +290,7 @@ class CHit
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $hit_id = 1;
 	* if ($rs = <b>CHit::GetByID</b>($hit_id))
@@ -297,7 +304,7 @@ class CHit
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">Термин "Хит"</a> </li></ul> <a
+	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">Термин "Хит"</a> </li></ul><a
 	* name="examples"></a>
 	*
 	*

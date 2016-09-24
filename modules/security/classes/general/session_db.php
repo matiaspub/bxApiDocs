@@ -1,7 +1,11 @@
 <?
+
+use Bitrix\Security\SessionTable;
+
 class CSecuritySessionDB
 {
 	protected static $isReadOnly = false;
+	protected static $sessionId = null;
 
 	/**
 	 * @return bool
@@ -9,7 +13,7 @@ class CSecuritySessionDB
 	public static function Init()
 	{
 		self::$isReadOnly = defined('BX_SECURITY_SESSION_READONLY');
-		return CSecurityDB::Init();
+		return true;
 	}
 
 	/**
@@ -19,7 +23,7 @@ class CSecuritySessionDB
 	 */
 	public static function open($savePath, $sessionName)
 	{
-		return CSecurityDB::Init();
+		return true;
 	}
 
 	/**
@@ -27,10 +31,12 @@ class CSecuritySessionDB
 	 */
 	public static function close()
 	{
-		if (!self::$isReadOnly)
-			CSecurityDB::Lock(false);
+		if (!self::$isReadOnly && static::isValidId(static::$sessionId))
+		{
+			SessionTable::unlock(static::$sessionId);
+		}
 
-		CSecurityDB::Disconnect();
+
 		return true;
 	}
 
@@ -40,25 +46,24 @@ class CSecuritySessionDB
 	 */
 	public static function read($id)
 	{
-		if(!self::isValidId($id))
+		if (!self::isValidId($id))
 			return "";
 
-		if(!self::$isReadOnly && !CSecurityDB::Lock($id, 60/*TODO: timelimit from php.ini?*/))
+		if (!self::$isReadOnly && !SessionTable::lock($id, 60/*TODO: timelimit from php.ini?*/))
 			CSecuritySession::triggerFatalError('Unable to get session lock within 60 seconds.');
 
-		$rs = CSecurityDB::Query("
-			select SESSION_DATA
-			from b_sec_session
-			where SESSION_ID = '".$id."'
-		", "Module: security; Class: CSecuritySession; Function: read; File: ".__FILE__."; Line: ".__LINE__);
-		$ar = CSecurityDB::Fetch($rs);
-		if($ar)
+		self::$sessionId = $id;
+		$sessionRow = SessionTable::getRow(array(
+			'select' => array('SESSION_DATA'),
+			'filter' => array('=SESSION_ID' => $id)
+		));
+
+		if ($sessionRow && isset($sessionRow['SESSION_DATA']))
 		{
-			$res = base64_decode($ar["SESSION_DATA"]);
-			return $res;
+			return base64_decode($sessionRow['SESSION_DATA']);
 		}
 
-		return "";
+		return '';
 	}
 
 	/**
@@ -72,27 +77,26 @@ class CSecuritySessionDB
 			return false;
 
 		if (self::$isReadOnly)
-			return true;
+		{
+			if (!CSecuritySession::isOldSessionIdExist())
+			{
+				return true;
+			}
+		}
 
 		if(CSecuritySession::isOldSessionIdExist())
 			$oldSessionId = CSecuritySession::getOldSessionId(true);
 		else
 			$oldSessionId = $id;
 
-		CSecurityDB::Query("
-			delete from b_sec_session
-			where SESSION_ID = '".$oldSessionId."'
-		", "Module: security; Class: CSecuritySession; Function: write; File: ".__FILE__."; Line: ".__LINE__);
+		SessionTable::delete($oldSessionId);
+		$result = SessionTable::add(array(
+			'SESSION_ID' => $id,
+			'TIMESTAMP_X' => new Bitrix\Main\Type\DateTime,
+			'SESSION_DATA' => base64_encode($sessionData),
+		));
 
-		CSecurityDB::QueryBind("
-			insert into b_sec_session
-			(SESSION_ID, TIMESTAMP_X, SESSION_DATA)
-			values
-			('".$id."', ".CSecurityDB::CurrentTimeFunction().", :SESSION_DATA)
-		", array("SESSION_DATA" => base64_encode($sessionData))
-		, "Module: security; Class: CSecuritySession; Function: write; File: ".__FILE__."; Line: ".__LINE__);
-
-		return true;
+		return $result->isSuccess();
 	}
 
 	/**
@@ -107,16 +111,10 @@ class CSecuritySessionDB
 		if (self::$isReadOnly)
 			return false;
 
-		CSecurityDB::Query("
-			delete from b_sec_session
-			where SESSION_ID = '".$id."'
-		", "Module: security; Class: CSecuritySession; Function: destroy; File: ".__FILE__."; Line: ".__LINE__);
+		SessionTable::delete($id);
 
 		if(CSecuritySession::isOldSessionIdExist())
-			CSecurityDB::Query("
-				delete from b_sec_session
-				where SESSION_ID = '".CSecuritySession::getOldSessionId(true)."'
-			", "Module: security; Class: CSecuritySession; Function: destroy; File: ".__FILE__."; Line: ".__LINE__);
+			SessionTable::delete(CSecuritySession::getOldSessionId(true));
 
 		return true;
 	}
@@ -127,11 +125,7 @@ class CSecuritySessionDB
 	 */
 	public static function gc($maxLifeTime)
 	{
-		CSecurityDB::Query("
-			delete from b_sec_session
-			where TIMESTAMP_X < ".CSecurityDB::SecondsAgo($maxLifeTime)."
-			", "Module: security; Class: CSecuritySession; Function: gc; File: ".__FILE__."; Line: ".__LINE__);
-
+		SessionTable::deleteOlderThan($maxLifeTime);
 		return true;
 	}
 

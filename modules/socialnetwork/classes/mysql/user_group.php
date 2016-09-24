@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети. 
+ * <b>CSocNetUserToGroup</b> - класс для работы с членством пользователей в группах социальной сети.
  *
  *
  * @return mixed 
@@ -19,7 +19,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод добавляет новую связь между пользователем и группой.</p>
+	* <p>Метод добавляет новую связь между пользователем и группой. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
@@ -38,7 +38,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* случае.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CSocNetUserToGroup::Add(
 	*       array(
 	*       "USER_ID" =&gt; $GLOBALS["USER"]-&gt;GetID(), 
@@ -147,10 +147,10 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 
 	
 	/**
-	* <p>Метод изменяет параметры связи между пользователем и группой.</p>
+	* <p>Метод изменяет параметры связи между пользователем и группой. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код связи.
+	* @param int $intid  Код связи.
 	*
 	* @param array $arFields  Массив параметров связи, в котором ключами являются названия
 	* параметров, а значениями - их значения. Может содержать следующие
@@ -165,7 +165,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* создание связи.
 	*
 	* @return int <p>Код связи в случае успешного выполнения и false - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetusertogroup/Update.php
@@ -173,7 +173,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	*/
 	public static function Update($ID, $arFields)
 	{
-		global $DB;
+		global $DB, $APPLICATION, $CACHE_MANAGER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
@@ -183,7 +183,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 		$arUser2GroupOld = CSocNetUserToGroup::GetByID($ID);
 		if (!$arUser2GroupOld)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_USER2GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_USER2GROUP"), "ERROR_NO_USER2GROUP");
 			return false;
 		}
 
@@ -239,9 +239,9 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$arUser2GroupOld["GROUP_ID"]);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_U".$arUser2GroupOld["USER_ID"]);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_G".$arUser2GroupOld["GROUP_ID"]);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_U".$arUser2GroupOld["USER_ID"]);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group");
 			}
 		}
 		else
@@ -255,27 +255,30 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод выбирает список отношений между пользователями и группами в соответствии с фильтром.</p>
+	* <p>Метод выбирает список отношений между пользователями и группами в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
-	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: <b>ID</b>,
-	* <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>, <b>INITIATED_BY_TYPE</b>,
-	* <b>INITIATED_BY_USER_ID</b>, <b>GROUP_NAME</b>, <b>GROUP_SITE_ID</b>, <b>GROUP_VISIBLE</b>, <b>GROUP_OWNER_ID</b>,
-	* <b>GROUP_OPENED</b>, <b>GROUP_NUMBER_OF_MEMBERS</b>, <b>GROUP_DATE_ACTIVITY</b>, <b>USER_NAME</b>,
-	* <b>USER_LAST_NAME</b>, <b>USER_LOGIN</b>, <b>USER_EMAIL</b>, <b>USER_PERSONAL_PHOTO</b>, <b>USER_LID</b>,
-	* <b>INITIATED_BY_USER_NAME</b>, <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>,
-	* <b>INITIATED_BY_USER_EMAIL</b>, <b>RAND</b>.
+	* значениями - ASC/DESC - порядок сортировки. <br> Допустимые
+	* ключи:<br><b>ID</b>,<br><b>USER_ID</b>,<br><b>GROUP_ID</b>,<br><b>ROLE</b>,
+	* <br><b>DATE_CREATE</b>,<br><b>DATE_UPDATE</b>,<br><b>INITIATED_BY_TYPE</b>,
+	* <br><b>INITIATED_BY_USER_ID</b>,<br><b>GROUP_NAME</b>,<br><b>GROUP_SITE_ID</b>, <br><b>GROUP_VISIBLE</b>,
+	* <br><b>GROUP_OWNER_ID</b>, <br><b>GROUP_OPENED</b>,<br><b>GROUP_NUMBER_OF_MEMBERS</b>, <br><b>GROUP_DATE_ACTIVITY</b>,
+	* <br><b>USER_NAME</b>, <br><b>USER_LAST_NAME</b>, <br><b>USER_LOGIN</b>, <br><b>USER_EMAIL</b>,
+	* <br><b>USER_PERSONAL_PHOTO</b>,<br><b>USER_LID</b>,<br><b>INITIATED_BY_USER_NAME</b>,
+	* <br><b>INITIATED_BY_USER_LAST_NAME</b>, <br><b>INITIATED_BY_USER_LOGIN</b>, <br><b>INITIATED_BY_USER_EMAIL</b>,
+	* <br><b>RAND</b>.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
-	* являются названия полей, а значениями - их значения. Допустимые
-	* поля: <b>ID</b>, <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
-	* <b>INITIATED_BY_TYPE</b>, <b>INITIATED_BY_USER_ID</b>, <b>GROUP_NAME</b>, <b>GROUP_SITE_ID</b>, <b>GROUP_ACTIVE</b>,
-	* <b>GROUP_VISIBLE</b>, <b>GROUP_OWNER_ID</b>, <b>GROUP_INITIATE_PERMS</b>, <b>GROUP_OPENED</b>,
-	* <b>GROUP_NUMBER_OF_MEMBERS</b>, <b>GROUP_DATE_ACTIVITY</b>, <b>USER_ACTIVE</b>, <b>USER_NAME</b>, <b>USER_LAST_NAME</b>,
-	* <b>USER_LOGIN</b>, <b>USER_EMAIL</b>, <b>USER_LID</b>, <b>INITIATED_BY_USER_NAME</b>,
-	* <b>INITIATED_BY_USER_LAST_NAME</b>, <b>INITIATED_BY_USER_LOGIN</b>, <b>INITIATED_BY_USER_EMAIL</b>.
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* являются названия полей, а значениями - их значения. <br> Допустимые
+	* поля: <br><b>ID</b>,<br><b>USER_ID</b>,<br><b>GROUP_ID</b>, <br><b>ROLE</b>, <br><b>DATE_CREATE</b>,
+	* <br><b>DATE_UPDATE</b>, <br><b>INITIATED_BY_TYPE</b>, <br><b>INITIATED_BY_USER_ID</b>, <br><b>GROUP_NAME</b>,
+	* <br><b>GROUP_SITE_ID</b>,<br><b>GROUP_ACTIVE</b>,<br><b>GROUP_VISIBLE</b>, <br><b>GROUP_OWNER_ID</b>,
+	* <br><b>GROUP_INITIATE_PERMS</b>, <br><b>GROUP_OPENED</b>, <br><b>GROUP_NUMBER_OF_MEMBERS</b>,
+	* <br><b>GROUP_DATE_ACTIVITY</b>, <br><b>USER_ACTIVE</b>, <br><b>USER_NAME</b>, <br><b>USER_LAST_NAME</b>,
+	* <br><b>USER_LOGIN</b>,<br><b>USER_EMAIL</b>,<br><b>USER_LID</b>, <br><b>INITIATED_BY_USER_NAME</b>,
+	* <br><b>INITIATED_BY_USER_LAST_NAME</b>,<br><b>INITIATED_BY_USER_LOGIN</b>,<br><b>INITIATED_BY_USER_EMAIL</b>.
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
 	* параметр содержит массив названий полей, то по этим полям будет
@@ -288,9 +291,9 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	*
 	* @param array $arNavStartParams = false Массив, задающий выбираемые поля. Содержит список полей, которые
 	* должны быть возвращены методом. Если массив пустой, то выбираются
-	* поля <b>ID</b>, <b>USER_ID</b>, <b>GROUP_ID</b>, <b>ROLE</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>,
-	* <b>INITIATED_BY_TYPE</b>, <b>INITIATED_BY_USER_ID</b>, <b>MESSAGE</b>. В массиве допустимы любые
-	* поля из списка полей.
+	* поля:<br><b>ID</b>, <br><b>USER_ID</b>, <br><b>GROUP_ID</b>, <br><b>ROLE</b>,
+	* <br><b>DATE_CREATE</b>,<br><b>DATE_UPDATE</b>, <br><b>INITIATED_BY_TYPE</b>, <br><b>INITIATED_BY_USER_ID</b>,
+	* <br><b>MESSAGE</b>.<br>  В массиве допустимы любые поля из списка полей.
 	*
 	* @param array $arSelectFields = array() 
 	*
@@ -298,7 +301,7 @@ class CSocNetUserToGroup extends CAllSocNetUserToGroup
 	* удовлетворяющие условию выборки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $dbRequests = CSocNetUserToGroup::GetList(
 	* 	array("USER_LAST_NAME" =&gt; "ASC", "USER_NAME" =&gt; "ASC"),

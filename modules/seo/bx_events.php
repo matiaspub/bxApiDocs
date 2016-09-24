@@ -24,7 +24,7 @@ class _CEventsSeo {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function MyOnSeoCountersGetList() 
  * { 
  *   $value = rand(100, 500); 

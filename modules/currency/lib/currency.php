@@ -37,6 +37,17 @@ class CurrencyTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы валют в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencytable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_catalog_currency';
@@ -47,6 +58,17 @@ class CurrencyTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы валют. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencytable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -128,6 +150,17 @@ class CurrencyTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CURRENCY</code> (код валюты). Метод статический и используется для валидации новых значений полей при добавлении валюты или изменении параметров уже существующей.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencytable/validatecurrency.php
+	* @author Bitrix
+	*/
 	public static function validateCurrency()
 	{
 		return array(
@@ -140,6 +173,17 @@ class CurrencyTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NUMCODE</code> (цифровой код валюты). Метод статический и используется для валидации новых значений полей при добавлении валюты или изменении параметров уже существующей.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencytable/validatenumcode.php
+	* @author Bitrix
+	*/
 	public static function validateNumcode()
 	{
 		return array(
@@ -148,11 +192,13 @@ class CurrencyTable extends Main\Entity\DataManager
 	}
 
 	/**
+	 * @deprecated deprecated since currency 16.0.0
+	 * @see \Bitrix\Currency\CurrencyManager::currencyBaseRateAgent();
+	 *
 	 * @return string
 	 */
 	public static function currencyBaseRateAgent()
 	{
-		\CCurrency::updateAllCurrencyBaseRate();
-		return '\Bitrix\Currency\CurrencyTable::currencyBaseRateAgent();';
+		return CurrencyManager::currencyBaseRateAgent();
 	}
 }

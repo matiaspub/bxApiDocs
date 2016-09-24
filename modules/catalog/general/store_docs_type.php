@@ -88,10 +88,11 @@ abstract class CCatalogDocsTypes
 						{
 							$arFields = array();
 							if (isset($arElement["PURCHASING_INFO"]))
-							{
 								$arFields = $arElement["PURCHASING_INFO"];
-							}
+							if(!empty($arElements["SUBSCRIBE"]))
+								$arFields["SUBSCRIBE"] = $arElements["SUBSCRIBE"];
 							$arFields["QUANTITY"] = doubleval($arAmount["SUM"] - $arAmount["RESERVED"]);
+
 							if (!CCatalogProduct::Update($arElement["PRODUCT_ID"], $arFields))
 							{
 								$APPLICATION->ThrowException(GetMessage("CAT_DOC_PURCHASING_INFO_ERROR"));
@@ -375,7 +376,7 @@ class CAllCatalogArrivalDocsType extends CCatalogDocsTypes
 			array('ID' => array_keys($arElement)),
 			false,
 			false,
-			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID')
+			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID', 'SUBSCRIBE')
 		);
 
 		while ($arProductInfo = $dbProductInfo->Fetch())
@@ -388,6 +389,7 @@ class CAllCatalogArrivalDocsType extends CCatalogDocsTypes
 			$arResult["ELEMENTS"][$id]["OLD_QUANTITY"] = $arProductInfo["QUANTITY"];
 			$arResult["ELEMENTS"][$id]["IBLOCK_ID"] = $arProductInfo["ELEMENT_IBLOCK_ID"];
 			$arResult["ELEMENTS"][$id]["ELEMENT_NAME"] = $arProductInfo["ELEMENT_NAME"];
+			$arResult["ELEMENTS"][$id]["SUBSCRIBE"] = $arProductInfo["SUBSCRIBE"];
 
 			if($arProductInfo["BARCODE_MULTI"] == 'Y')
 			{
@@ -467,7 +469,7 @@ class CAllCatalogArrivalDocsType extends CCatalogDocsTypes
 			array('ID' => array_keys($arElement)),
 			false,
 			false,
-			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID')
+			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID', 'SUBSCRIBE')
 		);
 		while($arProductInfo = $dbProductInfo->Fetch())
 		{
@@ -478,6 +480,7 @@ class CAllCatalogArrivalDocsType extends CCatalogDocsTypes
 			$arResult["ELEMENTS"][$id]["OLD_QUANTITY"] = $arProductInfo["QUANTITY"];
 			$arResult["ELEMENTS"][$id]["IBLOCK_ID"] = $arProductInfo["ELEMENT_IBLOCK_ID"];
 			$arResult["ELEMENTS"][$id]["ELEMENT_NAME"] = $arProductInfo["ELEMENT_NAME"];
+			$arResult["ELEMENTS"][$id]["SUBSCRIBE"] = $arProductInfo["SUBSCRIBE"];
 
 			if ($arProductInfo["BARCODE_MULTI"] == 'Y')
 			{
@@ -978,7 +981,7 @@ class CAllCatalogDeductDocsType extends CCatalogDocsTypes
 			array('ID' => array_keys($arElement)),
 			false,
 			false,
-			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID')
+			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID', 'SUBSCRIBE')
 		);
 
 		while($arProductInfo = $dbProductInfo->Fetch())
@@ -991,6 +994,7 @@ class CAllCatalogDeductDocsType extends CCatalogDocsTypes
 			$arResult["ELEMENTS"][$id]["OLD_QUANTITY"] = $arProductInfo["QUANTITY"];
 			$arResult["ELEMENTS"][$id]["IBLOCK_ID"] = $arProductInfo["ELEMENT_IBLOCK_ID"];
 			$arResult["ELEMENTS"][$id]["ELEMENT_NAME"] = $arProductInfo["ELEMENT_NAME"];
+			$arResult["ELEMENTS"][$id]["SUBSCRIBE"] = $arProductInfo["SUBSCRIBE"];
 
 			if($arProductInfo["BARCODE_MULTI"] == 'Y')
 			{
@@ -1071,7 +1075,7 @@ class CAllCatalogDeductDocsType extends CCatalogDocsTypes
 			array('ID' => array_keys($arElement)),
 			false,
 			false,
-			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID')
+			array('ID', 'NEGATIVE_AMOUNT_TRACE', 'BARCODE_MULTI', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO', 'ELEMENT_NAME', 'ELEMENT_IBLOCK_ID', 'SUBSCRIBE')
 		);
 		while($arProductInfo = $dbProductInfo->Fetch())
 		{
@@ -1082,6 +1086,7 @@ class CAllCatalogDeductDocsType extends CCatalogDocsTypes
 			$arResult["ELEMENTS"][$id]["OLD_QUANTITY"] = $arProductInfo["QUANTITY"];
 			$arResult["ELEMENTS"][$id]["IBLOCK_ID"] = $arProductInfo["ELEMENT_IBLOCK_ID"];
 			$arResult["ELEMENTS"][$id]["ELEMENT_NAME"] = $arProductInfo["ELEMENT_NAME"];
+			$arResult["ELEMENTS"][$id]["SUBSCRIBE"] = $arProductInfo["SUBSCRIBE"];
 
 			if($arProductInfo["BARCODE_MULTI"] == 'Y')
 			{

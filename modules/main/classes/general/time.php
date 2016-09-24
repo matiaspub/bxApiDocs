@@ -13,19 +13,22 @@ class CTimeZone
 
 	public static function Possible()
 	{
-		return class_exists('DateTime');
+		//since PHP 5.2
+		return true;
 	}
 
 	public static function Enabled()
 	{
-		if(self::$enabled > 0 && self::Possible())
+		return (self::$enabled > 0 && self::OptionEnabled());
+	}
+
+	public static function OptionEnabled()
+	{
+		if(self::$useTimeZones === false)
 		{
-			if(self::$useTimeZones === false)
-				self::$useTimeZones = COption::GetOptionString("main", "use_time_zones", "N");
-			if(self::$useTimeZones == "Y")
-				return true;
+			self::$useTimeZones = COption::GetOptionString("main", "use_time_zones", "N");
 		}
-		return false;
+		return (self::$useTimeZones == "Y");
 	}
 
 	public static function Disable()
@@ -142,12 +145,29 @@ class CTimeZone
 		$_COOKIE[$cookie_prefix."_TIME_ZONE"] = $timezoneOffset;
 	}
 
-	public static function GetOffset($USER_ID = null)
+	/**
+	 * @param int|null $USER_ID If USER_ID is set offset is taken from DB
+	 * @param bool $forced If set, offset is calculated regardless enabling/disabling by functions Enable()/Disable().
+	 * @return int
+	 */
+	public static function GetOffset($USER_ID = null, $forced = false)
 	{
 		global $USER;
 
-		if(!self::Enabled())
-			return 0;
+		if($forced)
+		{
+			if(!self::OptionEnabled())
+			{
+				return 0;
+			}
+		}
+		else
+		{
+			if(!self::Enabled())
+			{
+				return 0;
+			}
+		}
 
 		try //possible DateTimeZone incorrect timezone
 		{

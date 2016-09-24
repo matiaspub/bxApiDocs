@@ -123,13 +123,13 @@ class CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод удаляет информацию о пластиковой карте пользователя. Метод динамичный.</p>
+	* <p>Метод удаляет информацию о пластиковой карте пользователя. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код удаляемой информации о карте.
+	* @param mixed $intID  Код удаляемой информации о карте.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	* случае ошибки.</p> <br><br>
+	* случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.delete.php
@@ -156,11 +156,11 @@ class CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод проверяет, установлен ли пароль для шифрации номеров карт. Метод динамичный.</p>
+	* <p>Метод проверяет, установлен ли пароль для шифрации номеров карт. Нестатический метод.</p>
 	*
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если пароль установлен, и <i>false</i> в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.checkpassword.php
@@ -185,15 +185,14 @@ class CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод изменяет шифрует и расшифровывает номер пластиковой карты. Метод динамичный.</p>
+	* <p>Метод изменяет шифрует и расшифровывает номер пластиковой карты. Нестатический метод.</p>
 	*
 	*
 	* @param string $data  Шифруемые (расшифровываемые) данные.
 	*
-	* @param string $type  Для шифрования данных значение "E", для расшифровки - "D"
+	* @param string $type  Для шифрования данных значение "E", для расшифровки - 		"D"
 	*
-	* @return string <p>Метод возвращает результат шифрования (расшифровывания).</p>
-	* <br><br>
+	* @return string <p>Метод возвращает результат шифрования (расшифровывания).</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleusercards/csaleusercards.cryptdata.php
@@ -311,15 +310,15 @@ class CAllSaleUserCards
 
 	
 	/**
-	* <p>Метод определяет тип пластиковой карты по ее номеру. Метод динамичный.</p>
+	* <p>Метод определяет тип пластиковой карты по ее номеру. Нестатический метод.</p>
 	*
 	*
 	* @param string $ccNum  Номер карты.
 	*
-	* @return string <p>Метод возвращает тип карты.</p> <a name="examples"></a>
+	* @return string <p>Метод возвращает тип карты.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Сохраним новую карту текущего пользователя
 	* 

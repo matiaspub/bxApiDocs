@@ -290,7 +290,7 @@ final class Compiler {
 	private $eTreeDB = null;
 	private $eTreeDBRussia = null;
 
-public 	public function __construct($options)
+	public function __construct($options)
 	{
 		$this->workDir = $options['workDir'];
 		$this->grabbedStuffDir = $options['grabbedStuffDir'];
@@ -328,7 +328,7 @@ public 	public function __construct($options)
 		$this->cleanOutput();
 	}
 
-public 	public function compile()
+	public function compile()
 	{
 		// step 1: build main tree from yandex market data
 		//$this->buildMainTree();
@@ -494,7 +494,7 @@ public 	public function compile()
 	private $allowedForDemo = array('COUNTRY' => 1, 'COUNTRY_DISTRICT' => 1, 'REGION' => 1, 'SUBREGION' => 1, 'CITY' => 1);
 	private $demoCategory = false;
 
-public 	public function generateDemoFilesWorld($item, $table)
+	public function generateDemoFilesWorld($item, $table)
 	{
 		if(!isset($this->allowedForDemo[$item['TYPE_CODE']]))
 			return;
@@ -524,7 +524,7 @@ public 	public function generateDemoFilesWorld($item, $table)
 			$this->addItemToCSV($this->demoCategory, 'demo', $item);
 	}
 
-public 	public function generateDemoFilesRussia($item, $table)
+	public function generateDemoFilesRussia($item, $table)
 	{
 		if(!isset($this->allowedForDemo[$item['TYPE_CODE']]))
 			return;
@@ -535,7 +535,7 @@ public 	public function generateDemoFilesRussia($item, $table)
 		$this->addItemToCSV('russia', 'demo', $item);//done
 	}
 
-public 	private function createExportTables()
+	private function createExportTables()
 	{
 		$this->eTreeDB = new Db\ExportTreeTable();
 		$this->eTreeDB->create();
@@ -544,7 +544,7 @@ public 	private function createExportTables()
 		$this->eTreeDBRussia->create();
 	}
 
-public static 	private function cleanUpExportTables()
+	private function cleanUpExportTables()
 	{
 		$this->eTreeDB->cleanup();
 		$this->eTreeDB->dropIndexes();
@@ -553,13 +553,13 @@ public static 	private function cleanUpExportTables()
 		$this->eTreeDBRussia->dropIndexes();
 	}
 
-public 	private function restoreExportTablesIndexes()
+	private function restoreExportTablesIndexes()
 	{
 		$this->eTreeDB->restoreIndexes();
 		$this->eTreeDBRussia->restoreIndexes();
 	}
 
-public 	private function copyStaticCSV()
+	private function copyStaticCSV()
 	{
 		$workDir = $_SERVER['DOCUMENT_ROOT'].'/'.$this->workDir;
 
@@ -569,7 +569,7 @@ public 	private function copyStaticCSV()
 
 	private $currentParentGroup = '';
 
-public 	private function addItemToCSV($fName, $group, $item)
+	private function addItemToCSV($fName, $group, $item)
 	{
 		$data = array(
 			'CODE' => 			$item['CODE'],
@@ -621,7 +621,7 @@ public 	private function addItemToCSV($fName, $group, $item)
 		);
 	}
 
-public 	public function generateExportFilesFromTableBundle($item, $table)
+	public function generateExportFilesFromTableBundle($item, $table)
 	{
 		if(in_array($item['TYPE_CODE'], $this->typeGroups['LAYOUT']['TYPES']))
 			$this->currentParentGroup = $item['CODE'];
@@ -679,7 +679,7 @@ public 	public function generateExportFilesFromTableBundle($item, $table)
 		########################################################
 	}
 
-public 	public function generateExportFilesFromTableBundle_Standard_YandexOnly($item, $table)
+	public function generateExportFilesFromTableBundle_Standard_YandexOnly($item, $table)
 	{
 		if(in_array($item['TYPE_CODE'], $this->typeGroups['LAYOUT']['TYPES']))
 			$this->currentParentGroup = $item['CODE'];
@@ -716,7 +716,7 @@ public 	public function generateExportFilesFromTableBundle_Standard_YandexOnly($
 		return true;
 	}
 
-	public private function generateExportTreeRussia()
+	private function generateExportTreeRussia()
 	{
 		$this->fiasDB = new Db\FiasTable();
 
@@ -736,7 +736,7 @@ public 	public function generateExportFilesFromTableBundle_Standard_YandexOnly($
 		$this->eTreeDBRussia->switchIndexes(true);
 	}
 
-public 	private function getYandexToFiasCityMap($yandexRegionId)
+	private function getYandexToFiasCityMap($yandexRegionId)
 	{
 		$result = array();
 		$fias2yandex = $this->getDataFromCSV('fias_yamarket_links', 'region_'.$yandexRegionId);
@@ -749,7 +749,7 @@ public 	private function getYandexToFiasCityMap($yandexRegionId)
 		return $result;
 	}
 
-	prpublic ivate function generateExportTreePutRussiaInner()
+	private function generateExportTreePutRussiaInner()
 	{
 		// get yandex-to-fias region code map
 		$links = $this->getFias2YamarketRootLinks(false, true);
@@ -778,7 +778,7 @@ public 	private function getYandexToFiasCityMap($yandexRegionId)
 		}
 	}
 
-public 	private function checkIsAllowedCityVillage($item)
+	private function checkIsAllowedCityVillage($item)
 	{
 		$baseType = $this->sysMaps['FIAS2BASETYPE'][$item['SHORTNAME']];
 
@@ -797,14 +797,14 @@ public 	private function checkIsAllowedCityVillage($item)
 				);
 	}
 
-public 	private function checkIsAllowedStreet($item)
+	private function checkIsAllowedStreet($item)
 	{
 		$baseType = $this->sysMaps['FIAS2BASETYPE'][$item['SHORTNAME']];
 
 		return ($baseType == 'STREET' && $this->fiasToBaseType[$baseType][$item['SHORTNAME']]['U']); /*street code is in a list of allowed types for export*/
 	}
 
-public 	public function generateExportTreePutRussiaFiasPathCutForbidden($path)
+	public function generateExportTreePutRussiaFiasPathCutForbidden($path)
 	{
 		/*
 		$object = $path[count($path) - 1];
@@ -855,7 +855,7 @@ public 	public function generateExportTreePutRussiaFiasPathCutForbidden($path)
 		return $newPath;
 	}
 
-public 	private function generateExportTreePutRussiaFiasPath($targetItem)
+	private function generateExportTreePutRussiaFiasPath($targetItem)
 	{
 		// pre-process, cut off unwanted types (actually, streets)
 		$newPath = $this->generateExportTreePutRussiaFiasPathCutForbidden($this->fiasPath);
@@ -892,7 +892,7 @@ public 	private function generateExportTreePutRussiaFiasPath($targetItem)
 		}
 	}
 
-public 	private function generateExportTreePutRussiaStreets($parentGuid)
+	private function generateExportTreePutRussiaStreets($parentGuid)
 	{
 		if(!strlen($parentGuid))
 			return;
@@ -925,7 +925,7 @@ public 	private function generateExportTreePutRussiaStreets($parentGuid)
 		}
 	}
 
-public 	private function generateExportTreePutRussiaInnerBundle($parentGuid)
+	private function generateExportTreePutRussiaInnerBundle($parentGuid)
 	{
 		if(!strlen($parentGuid))
 			return;
@@ -951,7 +951,7 @@ public 	private function generateExportTreePutRussiaInnerBundle($parentGuid)
 		
 	}
 
-	public private function generateExportTreePutRussiaBundle($bundle, $regions, $dl = 0)
+	private function generateExportTreePutRussiaBundle($bundle, $regions, $dl = 0)
 	{
 		foreach($bundle as $id)
 		{
@@ -1002,7 +1002,7 @@ public 	private function generateExportTreePutRussiaInnerBundle($parentGuid)
 
 	#########################
 
-public 	private function generateExportTreeWorld()
+	private function generateExportTreeWorld()
 	{
 		$this->eTreeDB->dropCodeIndex();
 		$this->eTreeDB->restoreExportOffset();
@@ -1050,7 +1050,7 @@ public 	private function generateExportTreeWorld()
 
 	#########################
 
-public 	private function generateExportTreeLegacy($source)
+	private function generateExportTreeLegacy($source)
 	{
 		$this->eTreeDB->dropCodeIndex();
 		$this->eTreeDB->restoreExportOffset();
@@ -1120,7 +1120,7 @@ public 	private function generateExportTreeLegacy($source)
 
 	#########################
 
-	public private function generateExportTreeUSA()
+	private function generateExportTreeUSA()
 	{
 		$this->eTreeDB->dropCodeIndex();
 		$this->eTreeDB->restoreExportOffset();
@@ -1187,7 +1187,7 @@ public 	private function generateExportTreeLegacy($source)
 
 	#########################
 
-public static 	private function generateExportTreeBelorussia()
+	private function generateExportTreeBelorussia()
 	{
 		$this->eTreeDB->dropCodeIndex();
 		$this->eTreeDB->restoreExportOffset();
@@ -1200,7 +1200,7 @@ public static 	private function generateExportTreeBelorussia()
 		$this->eTreeDB->switchIndexes(true);
 	}
 
-public 	private function generateExportTreePutBelorussiaBundle($bundle)
+	private function generateExportTreePutBelorussiaBundle($bundle)
 	{
 		foreach($bundle as $id)
 		{
@@ -1236,7 +1236,7 @@ public 	private function generateExportTreePutBelorussiaBundle($bundle)
 
 	#########################
 
-public 	private function generateExportTreeUkrain()
+	private function generateExportTreeUkrain()
 	{
 		$this->eTreeDB->dropCodeIndex();
 		$this->eTreeDB->restoreExportOffset();
@@ -1375,7 +1375,7 @@ public 	private function generateExportTreeUkrain()
 		$this->eTreeDB->doneInsert();
 	}
 
-public 	private function generateExportTreePutUkrainBundle($bundle)
+	private function generateExportTreePutUkrainBundle($bundle)
 	{
 		foreach($bundle as $id)
 		{
@@ -1413,22 +1413,22 @@ public 	private function generateExportTreePutUkrainBundle($bundle)
 
 
 
-public static 	private function mapETCodeAsYandex($code)
+	private function mapETCodeAsYandex($code)
 	{
 		return 'Y_'.$code;
 	}
 
-public 	private function mapETCodeAsFias($code)
+	private function mapETCodeAsFias($code)
 	{
 		return 'F_'.$code;
 	}
 
-public 	private function mapETCodeAsUkrainian($name)
+	private function mapETCodeAsUkrainian($name)
 	{
 		return 'U_'.md5($name);
 	}
 
-public 	private function mapETCodeAsLegacy($name)
+	private function mapETCodeAsLegacy($name)
 	{
 		return 'L_'.md5($name);
 	}
@@ -1437,7 +1437,7 @@ public 	private function mapETCodeAsLegacy($name)
 	### ABOUT EXPORT TREE GENERATION
 	#######################################################
 
-public 	private function mapETCodeBySource($value, $source)
+	private function mapETCodeBySource($value, $source)
 	{
 		if($source == self::SOURCE_YANDEX)
 			return 'Y_'.$value;
@@ -1449,7 +1449,7 @@ public 	private function mapETCodeBySource($value, $source)
 			return 'K_'.md5($name);
 	}
 
-	ppublic rivate function startExportFromScratch()
+	private function startExportFromScratch()
 	{
 		$this->cleanTemporalData(self::TMP_DATA_RUS_EXPORT_INDEX);
 		$this->cleanTemporalData(self::TMP_DATA_RUS_GLOBAL_INDEX);
@@ -1457,7 +1457,7 @@ public 	private function mapETCodeBySource($value, $source)
 		$this->cleanPoolDir('assets');
 	}
 
-public 	private function generateExportTreeRussiaRoot()
+	private function generateExportTreeRussiaRoot()
 	{
 		$this->restoreTDRusExpIndex();
 
@@ -1470,7 +1470,7 @@ public 	private function generateExportTreeRussiaRoot()
 		$this->storeTemporalData(self::TMP_DATA_RUS_EXPORT_INDEX, $this->alreadyDumped);
 	}
 
-public 	private function restoreTDRusExpIndex()
+	private function restoreTDRusExpIndex()
 	{
 		if(!empty($this->alreadyDumped))
 			return;
@@ -1478,12 +1478,12 @@ public 	private function restoreTDRusExpIndex()
 		$this->alreadyDumped = $this->getStoredTemporalData(self::TMP_DATA_RUS_EXPORT_INDEX);
 	}
 
-public 	private function storeTDGlobalExpIndex()
+	private function storeTDGlobalExpIndex()
 	{
 		$this->storeTemporalData(self::TMP_DATA_RUS_GLOBAL_INDEX, array('I' => $this->exportOffset));
 	}
 
-public 	private function restoreTDGlobalExpIndex()
+	private function restoreTDGlobalExpIndex()
 	{
 		if($this->exportOffset == 0)
 		{
@@ -1492,7 +1492,7 @@ public 	private function restoreTDGlobalExpIndex()
 		}
 	}
 
-public 	private function generateExportTreePutRussiaBundleOld($bundle, $regions, $dl = 0)
+	private function generateExportTreePutRussiaBundleOld($bundle, $regions, $dl = 0)
 	{
 		foreach($bundle as $id)
 		{
@@ -1539,7 +1539,7 @@ public 	private function generateExportTreePutRussiaBundleOld($bundle, $regions,
 
 	private $currentRegion = false;
 
-public 	private function generateExportTreeRussiaInner()
+	private function generateExportTreeRussiaInner()
 	{
 		$links = $this->getFias2YamarketRootLinks(false, true);
 
@@ -1581,7 +1581,7 @@ public 	private function generateExportTreeRussiaInner()
 		}
 	}
 
-public 	private function generateExportTreeRussiaInnerBundle($parentGuid)
+	private function generateExportTreeRussiaInnerBundle($parentGuid)
 	{
 		if(!strlen($parentGuid))
 			return;
@@ -1610,7 +1610,7 @@ public 	private function generateExportTreeRussiaInnerBundle($parentGuid)
 	}
 
 
-public 	private function addItemToExportTree($item)
+	private function addItemToExportTree($item)
 	{
 		$this->exportOffset++;
 
@@ -1683,7 +1683,7 @@ public 	private function addItemToExportTree($item)
 	#######################################################
 
 	// map yandex cities to fias cities
-static 	public function buildMainTree()
+	public function buildMainTree()
 	{
 		$this->queue = false;
 		$this->data['TREES']['MAIN'] = array();
@@ -1698,7 +1698,7 @@ static 	public function buildMainTree()
 		$this->buildRussiaPathIndex($this->data['TREES']['MAIN']['EDGES'][self::RUSSIA_YANDEX_CODE], array());
 	}
 
-public static 	private function buildMainTreeNext()
+	private function buildMainTreeNext()
 	{
 		$next = $this->queueShift();
 		$bundle = $this->getBundleFromFile($next);
@@ -1724,7 +1724,7 @@ public static 	private function buildMainTreeNext()
 	#######################################################
 
 	// temporal function
-public 	private function checkFiasMaps()
+	private function checkFiasMaps()
 	{
 		$links = $res = $this->getDataFromCSV('fias_yamarket_links', 'rootv2');
 		$uTotal = 0;
@@ -1766,7 +1766,7 @@ public 	private function checkFiasMaps()
 		$this->output('TOTAL: '.$uTotal);
 	}
 
-public 	private function showChildren($pId)
+	private function showChildren($pId)
 	{
 		$res = DB\FiasTable::getList(array('filter' => array(
 			'PARENTGUID' => $pId,
@@ -1779,7 +1779,7 @@ public 	private function showChildren($pId)
 		}
 	}
 
-public 	private function findPathes()
+	private function findPathes()
 	{
 		$pathes = array(
 			'aea7bac4-f9b4-4160-95f2-3d667b4d3f92', // РѕС‚СЂР°РґРЅРѕРµ, РєР°Р»РёРЅРёРіСЂР°РґСЃРєР°СЏ РѕР±Р»Р°СЃС‚СЊ, 10857
@@ -1794,7 +1794,7 @@ public 	private function findPathes()
 		}
 	}
 
-public 	private function fiasFindPath($aoguid)
+	private function fiasFindPath($aoguid)
 	{
 		$pId = $aoguid;
 
@@ -1812,7 +1812,7 @@ public 	private function fiasFindPath($aoguid)
 		}
 	}
 
-	prpublic ivate function fiasFind2()
+	private function fiasFind2()
 	{
 		$res = DB\FiasTable::getList(array('filter' => array(
 			'FORMALNAME' => array(
@@ -1828,7 +1828,7 @@ public 	private function fiasFindPath($aoguid)
 		}
 	}
 
-public 	private function fiasFind()
+	private function fiasFind()
 	{
 		$findInFias = array(
 			//РЎРЎ Рђ Р Р Р  Р“Р“Р“ Р’Р’Р’ РџРџРџ РЈРЈРЈРЈ Р­Р­Р­Р­ Р¦Р¦Р¦
@@ -1859,7 +1859,7 @@ public 	private function fiasFind()
 		}
 	}
 
-public 	private function fiasGetByAOGUID($fiasId)
+	private function fiasGetByAOGUID($fiasId)
 	{
 		return DB\FiasTable::getList(array('filter' => array(
 			'=AOGUID' => $fiasId,
@@ -1867,7 +1867,7 @@ public 	private function fiasGetByAOGUID($fiasId)
 	}
 
 	/*
-public 	private function parseFiasCode($code)
+	private function parseFiasCode($code)
 	{
 		//РЎРЎ(0) Рђ(1) Р Р Р (2) Р“Р“Р“(3) Р’Р’Р’(4) РџРџРџ(5) РЈРЈРЈРЈ(6) Р­Р­Р­Р­(7) Р¦Р¦Р¦(8)
 		$code = explode(' ', $code);
@@ -1884,7 +1884,7 @@ public 	private function parseFiasCode($code)
 		);
 	}
 
-	public private function checkFitItemByCode($code, $item)
+	private function checkFitItemByCode($code, $item)
 	{
 		$code = $this->parseFiasCode($code);
 
@@ -1910,7 +1910,7 @@ public 	private function parseFiasCode($code)
 	}
 	*/
 
-public 	private function mapFiasCities()
+	private function mapFiasCities()
 	{
 		//$this->output($this->data['MAPS']['REGIONS']);
 		$links = $this->getFias2YamarketRootLinks();
@@ -2020,17 +2020,17 @@ public 	private function mapFiasCities()
 		}
 	}
 
-public static 	private function checkAllowedState($node)
+	private function checkAllowedState($node)
 	{
 		return $node['ACTSTATUS'] == '1' && $node['LIVESTATUS'] == '1';
 	}
 
-public 	private function mb_str_replace($needle, $replace_text, $haystack)
+	private function mb_str_replace($needle, $replace_text, $haystack)
 	{
 		return implode($replace_text, mb_split($needle, $haystack));
 	}
 
-public 	private function checkNamesEqual($one, $two)
+	private function checkNamesEqual($one, $two)
 	{
 		// try trim-lc
 		$one = $this->makeNameIndexKey($one);
@@ -2063,7 +2063,7 @@ public 	private function checkNamesEqual($one, $two)
 		return false;
 	}
 
-public 	private function checkNamesAlmostEqual($one, $two)
+	private function checkNamesAlmostEqual($one, $two)
 	{
 		$one = $this->makeNameIndexKey($one);
 		$two = $this->makeNameIndexKey($two);
@@ -2093,7 +2093,7 @@ public 	private function checkNamesAlmostEqual($one, $two)
 		return false;
 	}
 
-public 	private function walkFiasTreeAndKeepFollowing($node, &$toBeFound, $typesToSearch)
+	private function walkFiasTreeAndKeepFollowing($node, &$toBeFound, $typesToSearch)
 	{
 		$bundle = $this->getDataFromCSV('fias_tree', $node);
 
@@ -2139,7 +2139,7 @@ public 	private function walkFiasTreeAndKeepFollowing($node, &$toBeFound, $types
 		}
 	}
 
-public 	private function getFias2YamarketRootLinks($skipMapped = true, $skipCompiled = false)
+	private function getFias2YamarketRootLinks($skipMapped = true, $skipCompiled = false)
 	{
 		$res = $this->getDataFromCSV('fias_yamarket_links', 'rootv2');
 
@@ -2170,13 +2170,13 @@ public 	private function getFias2YamarketRootLinks($skipMapped = true, $skipComp
 		return $result;
 	}
 
-public static 	public function splitFiasOnRegions()
+	public function splitFiasOnRegions()
 	{
 		$this->cleanPoolDir('fias_tree');
 		$this->walkFias('fiasGotOneSplit');
 	}
 
-public 	public function copyFias2DB()
+	public function copyFias2DB()
 	{
 		$this->fiasDB = new Db\FiasTable();
 		$this->fiasDB->create();
@@ -2189,7 +2189,7 @@ public 	public function copyFias2DB()
 	}
 
 	/*
-public 	public function dropFiasTreeDuplicates()
+	public function dropFiasTreeDuplicates()
 	{
 		foreach(new \DirectoryIterator($this->getPoolDirName('fias_tree')) as $file)
 		{
@@ -2218,7 +2218,7 @@ public 	public function dropFiasTreeDuplicates()
 	}
 	*/
 
-public 	public function fiasGotOneSplit($data)
+	public function fiasGotOneSplit($data)
 	{
 		$item = $data['__ATTR'];
 
@@ -2244,7 +2244,7 @@ public 	public function fiasGotOneSplit($data)
 		);
 	}
 
-public 	public function fiasGotOneAdd2DB($data)
+	public function fiasGotOneAdd2DB($data)
 	{
 		$item = $data['__ATTR'];
 
@@ -2290,12 +2290,12 @@ public 	public function fiasGotOneAdd2DB($data)
 		));
 	}
 
-static 	private function getByAOID($aoid)
+	private function getByAOID($aoid)
 	{
 		$id = explode('-', $aoid);
 	}
 
-public 	private function printCurrentFiasPath()
+	private function printCurrentFiasPath()
 	{
 		$path = array();
 		foreach($this->fiasCPath as $item)
@@ -2304,7 +2304,7 @@ public 	private function printCurrentFiasPath()
 		return implode('>', $path);
 	}
 
-public 	private function manageFiasPath($item)
+	private function manageFiasPath($item)
 	{
 		$guid = $item['AOGUID'];
 		$parentGUID = $item['PARENTGUID'];
@@ -2313,7 +2313,7 @@ public 	private function manageFiasPath($item)
 		//$this->fiasCPath[] = array('GUID' => $guid, 'NAME' => $item['FORMALNAME']);
 	}
 
-public 	private function truncateCurrentFiasPath($guid)
+	private function truncateCurrentFiasPath($guid)
 	{
 		foreach($this->fiasCPath as $i => $node)
 		{
@@ -2329,7 +2329,7 @@ public 	private function truncateCurrentFiasPath($guid)
 	### ABOUT FIAS PROCESS ROOT v2
 	#######################################################
 
-public 	public function mapFiasRootV2()
+	public function mapFiasRootV2()
 	{
 		$this->cleanUpFile('fias_yamarket_links', 'rootv2');
 		$this->walkFias('fiasGotOneMapRootV2');
@@ -2371,7 +2371,7 @@ public 	public function mapFiasRootV2()
 		}
 	}
 
-public 	public function fiasGotOneMapRootV2($data)
+	public function fiasGotOneMapRootV2($data)
 	{
 		$item = $data['__ATTR'];
 
@@ -2396,7 +2396,7 @@ public 	public function fiasGotOneMapRootV2($data)
 		}
 	}
 
-public static 	private function readFiasRootMapV2()
+	private function readFiasRootMapV2()
 	{
 		try
 		{
@@ -2414,7 +2414,7 @@ public static 	private function readFiasRootMapV2()
 		}
 	}
 
-public 	private function walkFias($callback, $limit = -1)
+	private function walkFias($callback, $limit = -1)
 	{
 		$sax = new SAXParser(array(
 			'watch4Tag' => 'Object',
@@ -2437,7 +2437,7 @@ public 	private function walkFias($callback, $limit = -1)
 	### ABOUT MAIN DATA
 	#######################################################
 
-public 	private function buildRussiaPathIndex($bundle, $parentPath = array())
+	private function buildRussiaPathIndex($bundle, $parentPath = array())
 	{
 		foreach($bundle as $id)
 		{
@@ -2453,7 +2453,7 @@ public 	private function buildRussiaPathIndex($bundle, $parentPath = array())
 		}
 	}
 
-public 	private function getMainTreeNodesOfType($bundle, $types = array(), &$buffer)
+	private function getMainTreeNodesOfType($bundle, $types = array(), &$buffer)
 	{
 		foreach($bundle as $id)
 		{
@@ -2474,7 +2474,7 @@ public 	private function getMainTreeNodesOfType($bundle, $types = array(), &$buf
 	### ABOUT FILE POOL
 	#######################################################
 
-public 	private function putToFile($data, $poolName, $fileSubname)
+	private function putToFile($data, $poolName, $fileSubname)
 	{
 		$dir = $_SERVER['DOCUMENT_ROOT'].$this->workDir.$this->filePools[$poolName]['DIR'];
 		if(!file_exists($dir))
@@ -2492,7 +2492,7 @@ public 	private function putToFile($data, $poolName, $fileSubname)
 		fputs($this->filePoolsp[$poolName][$fileSubname], implode(';', $data).PHP_EOL);
 	}
 
-public 	private function putToFile2($data, $poolName, $fileSubname, $checkDir = false)
+	private function putToFile2($data, $poolName, $fileSubname, $checkDir = false)
 	{
 		$dir = $_SERVER['DOCUMENT_ROOT'].$this->workDir.$this->filePools[$poolName]['DIR'];
 		$fName = $dir.$fileSubname.'.csv';
@@ -2506,7 +2506,7 @@ public 	private function putToFile2($data, $poolName, $fileSubname, $checkDir = 
 		file_put_contents($fName, implode(';', $data).PHP_EOL, FILE_APPEND);
 	}
 
-public static 	private function cleanUpFile($poolName, $fileSubname)
+	private function cleanUpFile($poolName, $fileSubname)
 	{
 		$name = $_SERVER['DOCUMENT_ROOT'].$this->workDir.$this->filePools[$poolName]['DIR'].$fileSubname.'.csv';
 
@@ -2514,17 +2514,17 @@ public static 	private function cleanUpFile($poolName, $fileSubname)
 			unlink($name);
 	}
 
-public static 	private function getPoolFileName($poolName, $fileSubname, $docRoot = true)
+	private function getPoolFileName($poolName, $fileSubname, $docRoot = true)
 	{
 		return ($docRoot ? $_SERVER['DOCUMENT_ROOT'] : '/').$this->workDir.$this->filePools[$poolName]['DIR'].$fileSubname.'.csv';
 	}
 
-public 	private function getPoolDirName($poolName, $docRoot = true)
+	private function getPoolDirName($poolName, $docRoot = true)
 	{
 		return ($docRoot ? $_SERVER['DOCUMENT_ROOT'] : '/').$this->workDir.$this->filePools[$poolName]['DIR'];
 	}
 
-public static 	private function cleanPoolDir($poolName)
+	private function cleanPoolDir($poolName)
 	{
 		$dir = $_SERVER['DOCUMENT_ROOT'].$this->workDir.$this->filePools[$poolName]['DIR'];
 		if(file_exists($dir))
@@ -2533,7 +2533,7 @@ public static 	private function cleanPoolDir($poolName)
 		mkdir($dir, 0755, true);
 	}
 
-public 	private function getDataFromCSV($poolName, $fileSubname)
+	private function getDataFromCSV($poolName, $fileSubname)
 	{
 		try
 		{
@@ -2546,7 +2546,7 @@ public 	private function getDataFromCSV($poolName, $fileSubname)
 		}
 	}
 
-public 	private function putDataToCSV($data, $poolName, $fileSubname)
+	private function putDataToCSV($data, $poolName, $fileSubname)
 	{
 		$fName = $this->getPoolFileName($poolName, $fileSubname);
 		if(file_exists($fName))
@@ -2562,17 +2562,17 @@ public 	private function putDataToCSV($data, $poolName, $fileSubname)
 	### ABOUT COMPILER
 	#######################################################
 
-public 	private function mapFiasTypeToMain($fiasType)
+	private function mapFiasTypeToMain($fiasType)
 	{
 		return isset($this->sysMaps['FIAS2BASETYPE'][$fiasType]) ? $this->sysMaps['FIAS2BASETYPE'][$fiasType] : false;
 	}
 
-public static 	private function makeNameIndexKey($name)
+	private function makeNameIndexKey($name)
 	{
 		return trim(mb_strtolower($name, 'UTF-8'));
 	}
 
-public 	private function makeTypeGroupFile($file = '')
+	private function makeTypeGroupFile($file = '')
 	{
 		$fd = $this->fileOpen(strlen($file) ? $file : self::GROUP_FILE);
 
@@ -2608,7 +2608,7 @@ public 	private function makeTypeGroupFile($file = '')
 		return empty($this->queue);
 	}
 
-	public private function queueShift()
+	private function queueShift()
 	{
 		if($this->queue !== false)
 			return array_shift($this->queue);
@@ -2666,7 +2666,7 @@ public 	private function makeTypeGroupFile($file = '')
 		return $data;
 	}
 
-public static 	private function getParentOfType($code, $types)
+	private function getParentOfType($code, $types)
 	{
 		if(empty($types))
 			return '';
@@ -2689,7 +2689,7 @@ public static 	private function getParentOfType($code, $types)
 		return '';
 	}
 
-public static 	private function putToGroups($item)
+	private function putToGroups($item)
 	{
 		foreach($this->typeGroups as $gCode => &$group)
 		{
@@ -2727,12 +2727,12 @@ public static 	private function putToGroups($item)
 		}
 	}
 
-public static 	private function fileOpen($name)
+	private function fileOpen($name)
 	{
 		return fopen($_SERVER['DOCUMENT_ROOT'].$this->workDir.self::OUTPUT_DIR.$name, 'w');
 	}
 
-public static 	private static function addLeadingZero($value, $length)
+	private static function addLeadingZero($value, $length)
 	{
 		if(strlen($value) >= $length)
 			return $value;
@@ -2749,7 +2749,7 @@ public static 	private static function addLeadingZero($value, $length)
 	### ABOUT DATA
 	#######################################################
 
-public static 	private function storeTemporalData($dataCode, $data)
+	private function storeTemporalData($dataCode, $data)
 	{
 		$dir = $_SERVER['DOCUMENT_ROOT'].$this->workDir.self::TMP_DATA_DIR;
 		if(!file_exists($dir))
@@ -2758,7 +2758,7 @@ public static 	private function storeTemporalData($dataCode, $data)
 		file_put_contents($dir.$dataCode, serialize($data));
 	}
 
-public static 	private function getStoredTemporalData($dataCode)
+	private function getStoredTemporalData($dataCode)
 	{
 		$file = $_SERVER['DOCUMENT_ROOT'].$this->workDir.self::TMP_DATA_DIR.$dataCode;
 
@@ -2768,7 +2768,7 @@ public static 	private function getStoredTemporalData($dataCode)
 			return array();
 	}
 
-public static 	private function cleanTemporalData($dataCode)
+	private function cleanTemporalData($dataCode)
 	{
 		$file = $_SERVER['DOCUMENT_ROOT'].$this->workDir.self::TMP_DATA_DIR.$dataCode;
 
@@ -2777,7 +2777,7 @@ public static 	private function cleanTemporalData($dataCode)
 	}
 
 	/*
-public static 	private function dropTemporalFile()
+	private function dropTemporalFile()
 	{
 		$file = $_SERVER['DOCUMENT_ROOT'].$this->workDir.self::TMP_DATA_FILE;
 
@@ -2786,7 +2786,7 @@ public static 	private function dropTemporalFile()
 	}
 	*/
 
-public static 	public function cleanOutput()
+	public function cleanOutput()
 	{
 		$file = $_SERVER['DOCUMENT_ROOT'].$this->workDir.self::OUTPUT_FILE;
 
@@ -2794,7 +2794,7 @@ public static 	public function cleanOutput()
 			unlink($file);
 	}
 
-public static 	public function output($data, $important = true)
+	public function output($data, $important = true)
 	{
 		if(!$important)
 			return false;

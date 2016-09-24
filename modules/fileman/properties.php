@@ -95,6 +95,32 @@ class CIBlockPropertyMapGoogle extends CIBlockPropertyMapInterface
 			"GetPublicViewHTML" => array("CIBlockPropertyMapGoogle","GetPublicViewHTML"),
 			"ConvertToDB" => array("CIBlockPropertyMapGoogle","ConvertToDB"),
 			"ConvertFromDB" => array("CIBlockPropertyMapGoogle","ConvertFromDB"),
+			"GetSettingsHTML" => array("CIBlockPropertyMapGoogle", "GetSettingsHTML"),
+			"PrepareSettings" => array("CIBlockPropertyMapGoogle", "PrepareSettings"),
+		);
+	}
+
+	public static function GetSettingsHTML($arProperty, $strHTMLControlName, &$arPropertyFields)
+	{
+		$settings = \CIBlockPropertyMapGoogle::PrepareSettings($arProperty);
+		$settings = $settings['USER_TYPE_SETTINGS'];
+		$apiKey = isset($settings['API_KEY']) ? htmlspecialcharsbx($settings['API_KEY']) : '';
+
+		return '
+			<tr>
+				<td>'.GetMessage('IBLOCK_PROP_G_MAP_API_KEY').':</td>
+				<td>
+					<input  name="'.$strHTMLControlName['NAME'].'[API_KEY]" value="'.$apiKey.'">
+				</td>
+			</tr>';
+	}
+
+	public static function PrepareSettings($arProperty)
+	{
+		return array(
+			'USER_TYPE_SETTINGS' => array(
+				'API_KEY' => isset($arProperty['USER_TYPE_SETTINGS']['API_KEY']) ? $arProperty['USER_TYPE_SETTINGS']['API_KEY'] : ''
+			)
 		);
 	}
 
@@ -110,6 +136,8 @@ class CIBlockPropertyMapGoogle extends CIBlockPropertyMapInterface
 
 		if ($arProperty['MULTIPLE'] == 'Y')
 			$googleMapID = $arProperty['ID'];
+
+		$apiKey = isset($arProperty['USER_TYPE_SETTINGS']['API_KEY']) ? $arProperty['USER_TYPE_SETTINGS']['API_KEY'] : '';
 
 		if ($strHTMLControlName["MODE"] != "FORM_FILL")
 			return '<input type="text" name="'.htmlspecialcharsbx($strHTMLControlName['VALUE']).'" value="'.htmlspecialcharsbx($value['VALUE']).'" />';
@@ -167,6 +195,7 @@ class CIBlockPropertyMapGoogle extends CIBlockPropertyMapInterface
 				'MAP_HEIGHT' => 400,
 				'MAP_ID' => $MAP_ID,
 				'DEV_MODE' => 'Y',
+				'API_KEY' => $apiKey
 			),
 			false, array('HIDE_ICONS' => 'Y')
 		);
@@ -175,9 +204,12 @@ class CIBlockPropertyMapGoogle extends CIBlockPropertyMapInterface
 ?>
 <script type="text/javascript">
 	BX.ready(function(){
-		var tabArea = BX.findParent(BX("BX_GMAP_<?=$MAP_ID?>"),{className:"adm-detail-content"});
-		var tabButton = BX("tab_cont_"+tabArea.id);
-		BX.bind(tabButton,"click", function() { BXMapGoogleAfterShow("<?=$MAP_ID?>"); });
+		var tabArea = BX.findParent(BX("BX_GMAP_<?=$MAP_ID?>"), {className: "adm-detail-content"});
+		if (tabArea && tabArea.id)
+		{
+			var tabButton = BX("tab_cont_" + tabArea.id);
+			BX.bind(tabButton, "click", function() { BXMapGoogleAfterShow("<?=$MAP_ID?>"); });
+		}
 	});
 
 	<?if($arProperty['MULTIPLE'] == 'N'):?>
@@ -627,7 +659,7 @@ var jsGoogleCESearch_<?echo $MAP_ID;?> = {
 			else
 			{
 				$googleMapLastNumber = 0;
-
+				$apiKey = isset($arProperty['USER_TYPE_SETTINGS']['API_KEY']) ? $arProperty['USER_TYPE_SETTINGS']['API_KEY'] : '';
 				$arCoords = explode(',', $value['VALUE']);
 				ob_start();
 				$GLOBALS['APPLICATION']->IncludeComponent(
@@ -646,6 +678,7 @@ var jsGoogleCESearch_<?echo $MAP_ID;?> = {
 						)),
 						'MAP_ID' => 'MAP_GOOGLE_VIEW_'.$arProperty['IBLOCK_ID'].'_'.$arProperty['ID'].'__n'.$googleMapLastNumber.'_',
 						'DEV_MODE' => 'Y',
+						'API_KEY' => $apiKey
 					),
 					false, array('HIDE_ICONS' => 'Y')
 				);
@@ -798,9 +831,12 @@ function saveYandexKey(domain, input)
 ?>
 <script type="text/javascript">
 	BX.ready(function(){
-		var tabArea = BX.findParent(BX("BX_YMAP_<?=$MAP_ID?>"),{className:"adm-detail-content"});
-		var tabButton = BX("tab_cont_"+tabArea.id);
-		BX.bind(tabButton,"click", function() { BXMapYandexAfterShow("<?=$MAP_ID?>"); });
+		var tabArea = BX.findParent(BX("BX_YMAP_<?=$MAP_ID?>"), {className: "adm-detail-content"});
+		if (tabArea && tabArea.id)
+		{
+			var tabButton = BX("tab_cont_" + tabArea.id);
+			BX.bind(tabButton, "click", function() { BXMapYandexAfterShow("<?=$MAP_ID?>"); });
+		}
 	});
 
 	<?if($arProperty['MULTIPLE'] == 'N'):?>
@@ -1290,9 +1326,12 @@ function saveYandexKey(domain, input)
 ?>
 <script type="text/javascript">
 	BX.ready(function(){
-		var tabArea = BX.findParent(BX("BX_YMAP_<?=$MAP_ID?>"),{className:"adm-detail-content"});
-		var tabButton = BX("tab_cont_"+tabArea.id);
-		BX.bind(tabButton,"click", function() { BXMapYandexAfterShow("<?=$MAP_ID?>"); });
+		var tabArea = BX.findParent(BX("BX_YMAP_<?=$MAP_ID?>"), {className: "adm-detail-content"});
+		if (tabArea && tabArea.id)
+		{
+			var tabButton = BX("tab_cont_" + tabArea.id);
+			BX.bind(tabButton, "click", function() { BXMapYandexAfterShow("<?=$MAP_ID?>"); });
+		}
 	});
 
 	<?if($arProperty['MULTIPLE'] == 'N'):?>
@@ -2784,4 +2823,3 @@ class CUserTypeVideo extends CVideoProperty
 		return CUserTypeVideo::BaseGetPublicHTML($arUserField["SETTINGS"], $val);
 	}
 }
-?>

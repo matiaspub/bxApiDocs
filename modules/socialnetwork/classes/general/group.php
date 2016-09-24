@@ -5,7 +5,7 @@ $GLOBALS["SONET_GROUP_CACHE"] = array();
 
 
 /**
- * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети. 
+ * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.
  *
  *
  * @return mixed 
@@ -21,11 +21,11 @@ class CAllSocNetGroup
 	/***************************************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB, $arSocNetAllowedInitiatePerms, $arSocNetAllowedSpamPerms;
+		global $DB, $APPLICATION, $USER_FIELD_MANAGER, $arSocNetAllowedInitiatePerms, $arSocNetAllowedSpamPerms;
 
 		if ($ACTION != "ADD" && IntVal($ID) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException("System error 870164", "ERROR");
+			$APPLICATION->ThrowException("System error 870164", "ERROR");
 			return false;
 		}
 
@@ -42,7 +42,7 @@ class CAllSocNetGroup
 			)
 		)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GG_EMPTY_SITE_ID"), "EMPTY_SITE_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GG_EMPTY_SITE_ID"), "EMPTY_SITE_ID");
 			return false;
 		}
 		elseif(is_set($arFields, "SITE_ID"))
@@ -55,7 +55,7 @@ class CAllSocNetGroup
 				$r = CSite::GetByID($v);
 				if(!$r->Fetch())
 				{
-					$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $v, GetMessage("SONET_GG_ERROR_NO_SITE")), "ERROR_NO_SITE");				
+					$APPLICATION->ThrowException(str_replace("#ID#", $v, GetMessage("SONET_GG_ERROR_NO_SITE")), "ERROR_NO_SITE");				
 					return false;
 				}
 			}
@@ -63,31 +63,31 @@ class CAllSocNetGroup
 
 		if ((is_set($arFields, "NAME") || $ACTION=="ADD") && strlen($arFields["NAME"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_NAME"), "EMPTY_NAME");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_NAME"), "EMPTY_NAME");
 			return false;
 		}
 
 		if (is_set($arFields, "DATE_CREATE") && (!$DB->IsDate($arFields["DATE_CREATE"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_CREATE"), "EMPTY_DATE_CREATE");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_CREATE"), "EMPTY_DATE_CREATE");
 			return false;
 		}
 
 		if (is_set($arFields, "DATE_UPDATE") && (!$DB->IsDate($arFields["DATE_UPDATE"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_UPDATE"), "EMPTY_DATE_UPDATE");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_UPDATE"), "EMPTY_DATE_UPDATE");
 			return false;
 		}
 
 		if (is_set($arFields, "DATE_ACTIVITY") && (!$DB->IsDate($arFields["DATE_ACTIVITY"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_ACTIVITY"), "EMPTY_DATE_ACTIVITY");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_DATE_ACTIVITY"), "EMPTY_DATE_ACTIVITY");
 			return false;
 		}
 
 		if ((is_set($arFields, "OWNER_ID") || $ACTION=="ADD") && IntVal($arFields["OWNER_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_OWNER_ID"), "EMPTY_OWNER_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_OWNER_ID"), "EMPTY_OWNER_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "OWNER_ID"))
@@ -95,14 +95,14 @@ class CAllSocNetGroup
 			$dbResult = CUser::GetByID($arFields["OWNER_ID"]);
 			if (!$dbResult->Fetch())
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_ERROR_NO_OWNER_ID"), "ERROR_NO_OWNER_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_GB_ERROR_NO_OWNER_ID"), "ERROR_NO_OWNER_ID");
 				return false;
 			}
 		}
 
 		if ((is_set($arFields, "SUBJECT_ID") || $ACTION=="ADD") && IntVal($arFields["SUBJECT_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_EMPTY_SUBJECT_ID"), "EMPTY_SUBJECT_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GB_EMPTY_SUBJECT_ID"), "EMPTY_SUBJECT_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "SUBJECT_ID"))
@@ -110,7 +110,7 @@ class CAllSocNetGroup
 			$arResult = CSocNetGroupSubject::GetByID($arFields["SUBJECT_ID"]);
 			if ($arResult == false)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GB_ERROR_NO_SUBJECT_ID"), "ERROR_NO_SUBJECT_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_GB_ERROR_NO_SUBJECT_ID"), "ERROR_NO_SUBJECT_ID");
 				return false;
 			}
 		}
@@ -129,23 +129,23 @@ class CAllSocNetGroup
 
 		if ((is_set($arFields, "INITIATE_PERMS") || $ACTION=="ADD") && strlen($arFields["INITIATE_PERMS"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATE_PERMS"), "EMPTY_INITIATE_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_INITIATE_PERMS"), "EMPTY_INITIATE_PERMS");
 			return false;
 		}
 		elseif (is_set($arFields, "INITIATE_PERMS") && !in_array($arFields["INITIATE_PERMS"], $arSocNetAllowedInitiatePerms))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["INITIATE_PERMS"], GetMessage("SONET_UG_ERROR_NO_INITIATE_PERMS")), "ERROR_NO_INITIATE_PERMS");
+			$APPLICATION->ThrowException(str_replace("#ID#", $arFields["INITIATE_PERMS"], GetMessage("SONET_UG_ERROR_NO_INITIATE_PERMS")), "ERROR_NO_INITIATE_PERMS");
 			return false;
 		}
 
 		if ((is_set($arFields, "SPAM_PERMS") || $ACTION=="ADD") && strlen($arFields["SPAM_PERMS"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UG_EMPTY_SPAM_PERMS"), "EMPTY_SPAM_PERMS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UG_EMPTY_SPAM_PERMS"), "EMPTY_SPAM_PERMS");
 			return false;
 		}
 		elseif (is_set($arFields, "SPAM_PERMS") && !in_array($arFields["SPAM_PERMS"], $arSocNetAllowedSpamPerms))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["SPAM_PERMS"], GetMessage("SONET_UG_ERROR_NO_SPAM_PERMS")), "ERROR_NO_SPAM_PERMS");
+			$APPLICATION->ThrowException(str_replace("#ID#", $arFields["SPAM_PERMS"], GetMessage("SONET_UG_ERROR_NO_SPAM_PERMS")), "ERROR_NO_SPAM_PERMS");
 			return false;
 		}
 
@@ -157,12 +157,12 @@ class CAllSocNetGroup
 			$arResult = CFile::CheckImageFile($arFields["IMAGE_ID"], 0, 0, 0);
 			if (strlen($arResult) > 0)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GP_ERROR_IMAGE_ID").": ".$arResult, "ERROR_IMAGE_ID");
+				$APPLICATION->ThrowException(GetMessage("SONET_GP_ERROR_IMAGE_ID").": ".$arResult, "ERROR_IMAGE_ID");
 				return false;
 			}
 		}
 
-		if (!$GLOBALS["USER_FIELD_MANAGER"]->CheckFields("SONET_GROUP", $ID, $arFields))
+		if (!$USER_FIELD_MANAGER->CheckFields("SONET_GROUP", $ID, $arFields))
 			return false;
 
 		return True;
@@ -170,7 +170,7 @@ class CAllSocNetGroup
 
 	public static function Delete($ID)
 	{
-		global $DB;
+		global $DB, $APPLICATION, $CACHE_MANAGER, $USER_FIELD_MANAGER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
@@ -186,7 +186,7 @@ class CAllSocNetGroup
 		$arGroup = CSocNetGroup::GetByID($ID);
 		if (!$arGroup)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_GROUP"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_GROUP"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -274,10 +274,10 @@ class CAllSocNetGroup
 			unset($GLOBALS["SONET_GROUP_CACHE"][$ID]);
 			if(defined("BX_COMP_MANAGED_CACHE"))
 			{
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$ID);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_G".$ID);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group");
+				$CACHE_MANAGER->ClearByTag("sonet_group_".$ID);
+				$CACHE_MANAGER->ClearByTag("sonet_group");
 			}
 		}
 
@@ -288,13 +288,15 @@ class CAllSocNetGroup
 			$DB->Query("DELETE FROM b_sonet_event_user_view WHERE ENTITY_TYPE = '".SONET_ENTITY_GROUP."' AND ENTITY_ID = ".$ID, true);
 
 		if ($bSuccess)
-			$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_GROUP", $ID);
+			$USER_FIELD_MANAGER->Delete("SONET_GROUP", $ID);
 
 		return $bSuccess;
 	}
 
 	public static function DeleteNoDemand($userID)
 	{
+		global $APPLICATION;
+
 		if (!CSocNetGroup::__ValidateID($userID))
 			return false;
 
@@ -311,15 +313,13 @@ class CAllSocNetGroup
 		{
 			$err = GetMessage("SONET_GG_ERROR_CANNOT_DELETE_USER_1").$err;
 			$err .= GetMessage("SONET_GG_ERROR_CANNOT_DELETE_USER_2");
-			$GLOBALS["APPLICATION"]->ThrowException($err);
+			$APPLICATION->ThrowException($err);
 			return false;
 		}
 	}
 
 	public static function SetStat($ID)
 	{
-		global $DB;
-
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
 		
@@ -354,19 +354,25 @@ class CAllSocNetGroup
 			true,
 			false
 		);
+
+		return false;
 	}
 
 	public static function SetLastActivity($ID, $date = false)
 	{
+		global $DB;
+
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
 
 		$ID = IntVal($ID);
 
 		if ($date == false)
-			CSocNetGroup::Update($ID, array("=DATE_ACTIVITY" => $GLOBALS["DB"]->CurrentTimeFunction()));
+			CSocNetGroup::Update($ID, array("=DATE_ACTIVITY" => $DB->CurrentTimeFunction()), true, false);
 		else
-			CSocNetGroup::Update($ID, array("DATE_ACTIVITY" => $date));
+			CSocNetGroup::Update($ID, array("DATE_ACTIVITY" => $date), true, false);
+
+		return false;
 	}
 
 	/***************************************/
@@ -374,10 +380,10 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает параметры рабочей группы с заданным идентификатором.</p> <p><b>Примечание</b>: при многократном вызове метода для одного и того же идентификатора рабочей группы в рамках одного хита запрос к базе направляется только один раз. В дальнейшем результат возвращается без запроса к базе.</p>
+	* <p>Метод возвращает параметры рабочей группы с заданным идентификатором. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: при многократном вызове метода для одного и того же идентификатора рабочей группы в рамках одного хита запрос к базе направляется только один раз. В дальнейшем результат возвращается без запроса к базе.</div>
 	*
 	*
-	* @param int $ID  Идентификатор рабочей группы
+	* @param int $intID  Идентификатор рабочей группы
 	*
 	* @param bool $bCheckPermissions = false Флаг проверки прав доступа. Необязательный параметр. По
 	* умолчанию равен false.
@@ -398,7 +404,7 @@ class CAllSocNetGroup
 	* группы.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arGroup = CSocNetGroup::GetByID(5);
 	* print_r($arGroup);
@@ -418,7 +424,7 @@ class CAllSocNetGroup
 	*/
 	public static function GetByID($ID, $bCheckPermissions = false)
 	{
-		global $DB, $USER;
+		global $USER, $CACHE_MANAGER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 		{
@@ -481,9 +487,9 @@ class CAllSocNetGroup
 				{
 					if (defined("BX_COMP_MANAGED_CACHE"))
 					{
-						$GLOBALS["CACHE_MANAGER"]->StartTagCache($cache_path);
-						$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_group_".$ID);
-						$GLOBALS["CACHE_MANAGER"]->RegisterTag("sonet_group");
+						$CACHE_MANAGER->StartTagCache($cache_path);
+						$CACHE_MANAGER->RegisterTag("sonet_group_".$ID);
+						$CACHE_MANAGER->RegisterTag("sonet_group");
 					}
 
 					$arResult["NAME_FORMATTED"] = $arResult["NAME"];
@@ -501,7 +507,7 @@ class CAllSocNetGroup
 					$cache->EndDataCache($arCacheData);
 					if (defined("BX_COMP_MANAGED_CACHE"))
 					{
-						$GLOBALS["CACHE_MANAGER"]->EndTagCache();
+						$CACHE_MANAGER->EndTagCache();
 					}
 				}
 			}
@@ -533,15 +539,15 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	* <p>Проверяет, может ли пользователь принимать в группу новых членов.</p>
+	* <p>Проверяет, может ли пользователь принимать в группу новых членов. Метод статический. </p>
 	*
 	*
-	* @param int $userID  Код пользователя </h
+	* @param int $userID  Код пользователя
 	*
 	* @param int $groupID  Код группы
 	*
 	* @return bool <p>True, если пользователь может принимать в группу новых членов.
-	* Иначе - false.</p> <br><br>
+	* Иначе - false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserInitiate.php
@@ -589,15 +595,15 @@ class CAllSocNetGroup
 
 	
 	/**
-	* <p>Проверяет, может ли пользователь видеть группу в списке групп. Пользователь может видеть группу с списке групп, если группа видимая, либо пользователь является ее членом.</p>
+	* <p>Проверяет, может ли пользователь видеть группу в списке групп. Пользователь может видеть группу с списке групп, если группа видимая, либо пользователь является ее членом. Метод статический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя </h
+	* @param int $userID  Код пользователя
 	*
 	* @param int $groupID  Код группы
 	*
-	* @return bool <p>True, если пользователь имеет право видеть группу. Иначе - false.</p>
-	* <br><br>
+	* @return bool <p>True, если пользователь имеет право видеть группу. Иначе -
+	* false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserViewGroup.php
@@ -625,21 +631,19 @@ class CAllSocNetGroup
 			return true;
 		else
 			return false;
-
-		return false;
 	}
 
 	
 	/**
-	* <p>Проверяет, может ли пользователь просматривать групу. Пользователь может просматривать группу, если она открытая, либо если этот пользователь является членом группы.</p>
+	* <p>Проверяет, может ли пользователь просматривать групу. Пользователь может просматривать группу, если она открытая, либо если этот пользователь является членом группы. Метод статический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя </h
+	* @param int $userID  Код пользователя
 	*
 	* @param int $groupID  Код группы
 	*
-	* @return bool <p>True, если пользователь может просматривать группу. Иначе - false.</p>
-	* <br><br>
+	* @return bool <p>True, если пользователь может просматривать группу. Иначе -
+	* false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/CanUserReadGroup.php
@@ -667,8 +671,6 @@ class CAllSocNetGroup
 			return true;
 		else
 			return false;
-
-		return false;
 	}
 
 	/***************************************/
@@ -676,7 +678,7 @@ class CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	* <p>Метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li> <li> <b>K</b> (Все члены группы ).</li> </ul> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</p>
+	* <p>Статический метод создает новую рабочую группу. Для создания группы необходимо задать права пользователей (Параметры <b> INITIATE_PERMS</b> и <b>SPAM_PERMS</b>). Лучше использовать константы (см. ключи массива), но можно использовать и символы:</p> <ul> <li> <b>A</b> (Только владелец группы),</li> <li> <b>E</b> (Владелец группы и модераторы группы),</li>  <li> <b>K</b> (Все члены группы ).</li>   </ul> <p></p> <div class="note"> <b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupAdd.php">OnBeforeSocNetGroupAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupAdd.php">OnSocNetGroupAdd</a>.</div>
 	*
 	*
 	* @param int $ownerID  Код пользователя - владельца новой рабочей группы.
@@ -701,10 +703,10 @@ class CAllSocNetGroup
 	* умолчанию имеет значение True.
 	*
 	* @return int <p>Метод возвращает код вновь созданной группы или false в случае
-	* ошибки.</p> <a name="examples"></a>
+	* ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arImageID = $GLOBALS["HTTP_POST_FILES"]["GROUP_IMAGE_ID"];
 	* if (StrLen($arImageID["tmp_name"]) &gt; 0)
@@ -745,48 +747,68 @@ class CAllSocNetGroup
 		$ownerID = IntVal($ownerID);
 		if ($ownerID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_OWNERID").". ", "ERROR_OWNERID");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_OWNERID").". ", "ERROR_OWNERID");
 			return false;
 		}
 
 		if (!isset($arFields) || !is_array($arFields))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_UR_EMPTY_FIELDS").". ", "ERROR_FIELDS");
+			$APPLICATION->ThrowException(GetMessage("SONET_UR_EMPTY_FIELDS").". ", "ERROR_FIELDS");
 			return false;
 		}
 
 		$DB->StartTransaction();
 
-		$arFields["=DATE_CREATE"] = $GLOBALS["DB"]->CurrentTimeFunction();
-		$arFields["=DATE_UPDATE"] = $GLOBALS["DB"]->CurrentTimeFunction();
-		$arFields["=DATE_ACTIVITY"] = $GLOBALS["DB"]->CurrentTimeFunction();
+		if (!isset($arFields["DATE_CREATE"]))
+		{
+			$arFields["=DATE_CREATE"] = $DB->CurrentTimeFunction();
+		}
+
+		if (!isset($arFields["DATE_UPDATE"]))
+		{
+			$arFields["=DATE_UPDATE"] = $DB->CurrentTimeFunction();
+		}
+
+		if (!isset($arFields["DATE_ACTIVITY"]))
+		{
+			$arFields["=DATE_ACTIVITY"] = $DB->CurrentTimeFunction();
+		}
+
 		$arFields["ACTIVE"] = "Y";
 		$arFields["OWNER_ID"] = $ownerID;
 
 		if (!is_set($arFields, "SPAM_PERMS") || strlen($arFields["SPAM_PERMS"]) <= 0)
+		{
 			$arFields["SPAM_PERMS"] = SONET_ROLES_OWNER;
+		}
 
 		$groupID = CSocNetGroup::Add($arFields);
 
 		if (!$groupID || IntVal($groupID) <= 0)
 		{
-			$errorMessage = "";
+			$errorMessage = $errorID = "";
 			if ($e = $APPLICATION->GetException())
 			{
 				$errorMessage = $e->GetString();
 				$errorID = $e->GetID();
 
 				if (StrLen($errorID) <= 0 && isset($e->messages) && is_array($e->messages) && is_array($e->messages[0]) && array_key_exists("id", $e->messages[0]))
+				{
 					$errorID = $e->messages[0]["id"];
+				}
 			}
 
 			if (StrLen($errorMessage) <= 0)
+			{
 				$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_GROUP").". ";
+			}
 
 			if (StrLen($errorID) <= 0)
+			{
 				$errorID = "ERROR_CREATE_GROUP";
+			}
 
-			$GLOBALS["APPLICATION"]->ThrowException($errorMessage, $errorID);
+			$APPLICATION->ThrowException($errorMessage, $errorID);
 			$DB->Rollback();
 			return false;
 		}
@@ -795,8 +817,8 @@ class CAllSocNetGroup
 			"USER_ID" => $ownerID,
 			"GROUP_ID" => $groupID,
 			"ROLE" => SONET_ROLES_OWNER,
-			"=DATE_CREATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
-			"=DATE_UPDATE" => $GLOBALS["DB"]->CurrentTimeFunction(),
+			"=DATE_CREATE" => $DB->CurrentTimeFunction(),
+			"=DATE_UPDATE" => $DB->CurrentTimeFunction(),
 			"INITIATED_BY_TYPE" => SONET_INITIATED_BY_USER,
 			"INITIATED_BY_USER_ID" => $ownerID,
 			"MESSAGE" => false
@@ -810,7 +832,7 @@ class CAllSocNetGroup
 			if (StrLen($errorMessage) <= 0)
 				$errorMessage = GetMessage("SONET_UR_ERROR_CREATE_U_GROUP").". ";
 
-			$GLOBALS["APPLICATION"]->ThrowException($errorMessage, "ERROR_CREATE_GROUP");
+			$APPLICATION->ThrowException($errorMessage, "ERROR_CREATE_GROUP");
 			$DB->Rollback();
 			return false;
 		}
@@ -830,10 +852,12 @@ class CAllSocNetGroup
 	/***************************************/
 	public static function __ValidateID($ID)
 	{
+		global $APPLICATION;
+
 		if (IntVal($ID)."|" == $ID."|")
 			return true;
 
-		$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
+		$APPLICATION->ThrowException(GetMessage("SONET_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
 		return false;
 	}
 
@@ -915,7 +939,6 @@ class CAllSocNetGroup
 		$strSqlFrom = "";
 		$strSqlWhere = "";
 		$strSqlGroupBy = "";
-		$strSqlOrderBy = "";
 
 		$arGroupByFunct = array("COUNT", "AVG", "MIN", "MAX", "SUM");
 
@@ -1158,7 +1181,31 @@ class CAllSocNetGroup
 	public static function GetSite($group_id)
 	{
 		global $DB;
-		$strSql = "SELECT L.*, SGS.* FROM b_sonet_group_site SGS, b_lang L WHERE L.LID=SGS.SITE_ID AND SGS.GROUP_ID=".IntVal($group_id);
+
+		if (is_array($group_id))
+		{
+			if (empty($group_id))
+			{
+				return false;
+			}
+
+			$strVal = "";
+
+			foreach ($group_id as $val)
+			{
+				if (strlen($strVal) > 0)
+				{
+					$strVal .= ', ';
+				}
+				$strVal .= intval($val);
+			}
+			$strSql = "SELECT L.*, SGS.* FROM b_sonet_group_site SGS, b_lang L WHERE L.LID=SGS.SITE_ID AND SGS.GROUP_ID IN (".$strVal.")";
+		}
+		else
+		{
+			$strSql = "SELECT L.*, SGS.* FROM b_sonet_group_site SGS, b_lang L WHERE L.LID=SGS.SITE_ID AND SGS.GROUP_ID=".IntVal($group_id);
+		}
+
 		return $DB->Query($strSql);
 	}
 
@@ -1208,4 +1255,3 @@ class CAllSocNetGroup
 			return true;
 	}
 }
-?>

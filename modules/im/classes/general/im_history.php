@@ -73,7 +73,7 @@ class CIMHistory
 					M.CHAT_ID = '".$arRelation['CHAT_ID']."'
 				AND M.MESSAGE like '%".$DB->ForSql($searchText)."%'
 					".$limitById."
-				ORDER BY DATE_CREATE DESC, ID DESC
+				ORDER BY M.DATE_CREATE DESC, M.ID DESC
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -82,7 +82,7 @@ class CIMHistory
 
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N",  "USER" => "N",  "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			while ($arRes = $dbRes->Fetch())
 			{
 				if ($fromUserId == $arRes['AUTHOR_ID'])
@@ -125,8 +125,11 @@ class CIMHistory
 						$arFiles[$fileId] = $fileId;
 					}
 				}
+				if (isset($arMessages[$messageId]['params']['URL_ID']))
+					unset($arMessages[$messageId]['params']['URL_ID']);
 			}
 			$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+			$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 		}
 
 		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $arUsers, 'files' => $arMessageFiles);
@@ -196,7 +199,7 @@ class CIMHistory
 					M.CHAT_ID = ".$arRelation['CHAT_ID']."
 				AND M.DATE_CREATE >= ".$sqlDateStart." AND M.DATE_CREATE <=  ".$sqlDateEnd."
 					".$limitById."
-				ORDER BY DATE_CREATE DESC, ID DESC
+				ORDER BY M.DATE_CREATE DESC, M.ID DESC
 			";
 			if (!$bTimeZone)
 				CTimeZone::Enable();
@@ -204,7 +207,7 @@ class CIMHistory
 
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink ? "N" : "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink ? "N" : "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N",  "USER" => "N",  "ANCHOR" => $this->bHideLink ? "N" : "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink ? "N" : "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			while ($arRes = $dbRes->Fetch())
 			{
 				if ($fromUserId == $arRes['AUTHOR_ID'])
@@ -239,8 +242,11 @@ class CIMHistory
 						$arFiles[$fileId] = $fileId;
 					}
 				}
+				if (isset($arMessages[$messageId]['params']['URL_ID']))
+					unset($arMessages[$messageId]['params']['URL_ID']);
 			}
 			$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+			$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 		}
 
 		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $arUsers, 'files' => $arMessageFiles);
@@ -317,7 +323,7 @@ class CIMHistory
 
 				$CCTP = new CTextParser();
 				$CCTP->MaxStringLen = 200;
-				$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+				$CCTP->allow = array("HTML" => "N", "USER" => "N",  "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 				while ($arRes = $dbRes->Fetch())
 				{
 					if ($fromUserId == $arRes['AUTHOR_ID'])
@@ -358,8 +364,11 @@ class CIMHistory
 							$arFiles[$fileId] = $fileId;
 						}
 					}
+					if (isset($arMessages[$messageId]['params']['URL_ID']))
+						unset($arMessages[$messageId]['params']['URL_ID']);
 				}
 				$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+				$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 			}
 		}
 
@@ -405,7 +414,7 @@ class CIMHistory
 
 			if ($arRes['MAX_ID'] >= $arRes['R2_START_ID'] && $arRes['R2_START_ID'] > 0)
 			{
-				$messages = IM\MessageTable::getList(array(
+				$messages = IM\Model\MessageTable::getList(array(
 					'select' => array('ID'),
 					'filter' => array(
 						'<ID' => $arRes['R2_START_ID'],
@@ -414,7 +423,7 @@ class CIMHistory
 				));
 				while ($messageInfo = $messages->fetch())
 				{
-					IM\MessageParamTable::delete($messageInfo['ID']);
+					IM\Model\MessageParamTable::delete($messageInfo['ID']);
 				}
 			}
 			$obCache = new CPHPCache();
@@ -513,7 +522,7 @@ class CIMHistory
 
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "USER" => "N",  "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		while ($arRes = $dbRes->Fetch())
 		{
 			$arMessages[$arRes['ID']] = Array(
@@ -540,8 +549,11 @@ class CIMHistory
 					$arFiles[$fileId] = $fileId;
 				}
 			}
+			if (isset($arMessages[$messageId]['params']['URL_ID']))
+				unset($arMessages[$messageId]['params']['URL_ID']);
 		}
 		$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+		$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 
 		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $usersMessage, 'files' => $arMessageFiles);
 	}
@@ -604,7 +616,7 @@ class CIMHistory
 
 		$CCTP = new CTextParser();
 		$CCTP->MaxStringLen = 200;
-		$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+		$CCTP->allow = array("HTML" => "N", "USER" => "N",  "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 		while ($arRes = $dbRes->Fetch())
 		{
 			$arMessages[$arRes['ID']] = Array(
@@ -631,12 +643,21 @@ class CIMHistory
 					$arFiles[$fileId] = $fileId;
 				}
 			}
+			if (isset($arMessages[$messageId]['params']['URL_ID']))
+				unset($arMessages[$messageId]['params']['URL_ID']);
 		}
 		$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+		$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 
 		return Array('chatId' => $chatId, 'message' => $arMessages, 'unreadMessage' => $arUnreadMessage, 'usersMessage' => $usersMessage, 'files' => $arMessageFiles);
 	}
 
+	/**
+	 * @param $pageId
+	 * @param $chatId
+	 * @param bool $bTimeZone
+	 * @return array
+	 */
 	public function GetMoreChatMessage($pageId, $chatId, $bTimeZone = true)
 	{
 		global $DB;
@@ -691,7 +712,7 @@ class CIMHistory
 
 			$CCTP = new CTextParser();
 			$CCTP->MaxStringLen = 200;
-			$CCTP->allow = array("HTML" => "N", "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
+			$CCTP->allow = array("HTML" => "N", "USER" => "N",  "ANCHOR" => $this->bHideLink? "N": "Y", "BIU" => "Y", "IMG" => "N", "QUOTE" => "N", "CODE" => "N", "FONT" => "N", "LIST" => "N", "SMILES" => $this->bHideLink? "N": "Y", "NL2BR" => "Y", "VIDEO" => "N", "TABLE" => "N", "CUT_ANCHOR" => "N", "ALIGN" => "N");
 			while ($arRes = $dbRes->Fetch())
 			{
 				$arMessages[$arRes['ID']] = Array(
@@ -720,8 +741,11 @@ class CIMHistory
 						$arFiles[$fileId] = $fileId;
 					}
 				}
+				if (isset($arMessages[$messageId]['params']['URL_ID']))
+					unset($arMessages[$messageId]['params']['URL_ID']);
 			}
 			$arMessageFiles = CIMDisk::GetFiles($chatId, $arFiles);
+			$arMessages = CIMMessageLink::prepareShow($arMessages, $params);
 		}
 
 		return Array('chatId' => $chatId, 'message' => $arMessages, 'usersMessage' => $usersMessage, 'files' => $arMessageFiles);

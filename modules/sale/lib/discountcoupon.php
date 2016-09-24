@@ -62,6 +62,7 @@ class DiscountCouponsManager
 	protected static $orderId = null;
 	protected static $allowedSave = false;
 	protected static $checkActivity = true;
+	protected static $useOrderCoupons = true;
 
 	protected static $clearFields = array(
 		'STATUS', 'CHECK_CODE',
@@ -77,7 +78,7 @@ class DiscountCouponsManager
 	 * Init use mode and user id.
 	 *
 	 * @param int $mode			Discount manager mode.
-	 * @param array $params		Initial params (userId, orderId).
+	 * @param array $params		Initial params (userId, orderId, oldUserId)
 	 * 		keys are case sensitive:
 	 * 			<ul>
 	 * 			<li>int userId		Order owner (for MODE_MANAGER or MODE_ORDER only)
@@ -86,6 +87,28 @@ class DiscountCouponsManager
 	 * 			</ul>.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод устанавливает режим работы с купонами и идентификатор пользователя. Метод статический.</p>
+	*
+	*
+	* @param integer $mode = self::MODE_CLIENT Режим работы.
+	*
+	* @param array $params = array() Массив первоначальных параметров. Ключи чувствительны к
+	* регистру: <br><ul> <li> <b>userId</b> - идентификатор владельца заказа (только
+	* для режимов <code>MODE_MANAGER</code> или <code>MODE_ORDER</code>);</li> <li> <b>orderId</b> -
+	* идентификатор заказа, необходим только для режима работы с
+	* купонами существующего заказа (только для режима
+	* <code>MODE_ORDER</code>);</li> <li> <b>oldUserId</b> - старый владелец заказа, если в
+	* форме редактирования сменили клиента  (только для режимов
+	* <code>MODE_MANAGER</code> или <code>MODE_ORDER</code>). </li> </ul>
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/initusemode.php
+	* @author Bitrix
+	*/
 	public static function initUseMode($mode = self::MODE_CLIENT, $params = array())
 	{
 		$adminSection = (defined('ADMIN_SECTION') && ADMIN_SECTION === true);
@@ -96,6 +119,7 @@ class DiscountCouponsManager
 		self::$userId = null;
 		self::$orderId = null;
 		self::$allowedSave = false;
+		self::$useOrderCoupons = true;
 
 		if ($adminSection)
 		{
@@ -170,6 +194,17 @@ class DiscountCouponsManager
 	 *
 	 * @return int
 	 */
+	
+	/**
+	* <p>Метод возвращает режим работы с купонами. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getusemode.php
+	* @author Bitrix
+	*/
 	public static function getUseMode()
 	{
 		return self::$useMode;
@@ -180,6 +215,17 @@ class DiscountCouponsManager
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если менеджер купонов запущен из публичного раздела сайта. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/usedbyclient.php
+	* @author Bitrix
+	*/
 	public static function usedByClient()
 	{
 		return (self::$useMode == self::MODE_CLIENT);
@@ -190,6 +236,17 @@ class DiscountCouponsManager
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если работа с купонами ведется из административного раздела сайта. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/usedbymanager.php
+	* @author Bitrix
+	*/
 	public static function usedByManager()
 	{
 		return (self::$useMode == self::MODE_MANAGER || self::$useMode == self::MODE_ORDER);
@@ -200,6 +257,17 @@ class DiscountCouponsManager
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если заказ был оформлен во внешней торговой платформе. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/usedbyexternal.php
+	* @author Bitrix
+	*/
 	public static function usedByExternal()
 	{
 		return (self::$useMode == self::MODE_EXTERNAL);
@@ -210,6 +278,17 @@ class DiscountCouponsManager
 	 *
 	 * @return null|int
 	 */
+	
+	/**
+	* <p>Метод возвращает идентификатор пользователя. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getuserid.php
+	* @author Bitrix
+	*/
 	public static function getUserId()
 	{
 		if ((self::$userId === null || self::$userId === 0) && self::usedByClient())
@@ -225,6 +304,17 @@ class DiscountCouponsManager
 	 *
 	 * @return null|int
 	 */
+	
+	/**
+	* <p>В случае работы с купонами сохраненного заказа (сохраненного) метод вернет идентификатор этого заказа. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getorderid.php
+	* @author Bitrix
+	*/
 	public static function getOrderId()
 	{
 		return self::$orderId;
@@ -235,6 +325,17 @@ class DiscountCouponsManager
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если проводимая операция выполнена успешно. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/issuccess.php
+	* @author Bitrix
+	*/
 	public static function isSuccess()
 	{
 		return empty(self::$errors);
@@ -245,6 +346,17 @@ class DiscountCouponsManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список ошибок. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/geterrors.php
+	* @author Bitrix
+	*/
 	public static function getErrors()
 	{
 		return self::$errors;
@@ -255,6 +367,17 @@ class DiscountCouponsManager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает список ошибок. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/clearerrors.php
+	* @author Bitrix
+	*/
 	public static function clearErrors()
 	{
 		self::$errors = array();
@@ -266,6 +389,20 @@ class DiscountCouponsManager
 	 * @param bool $extendedMode	Get status Ids or Ids with description.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список статусов купона. Метод статический.</p>
+	*
+	*
+	* @param boolean $extendedMode = false Параметр определяет возвращать только идентификаторы статусов
+	* или идентификаторы с описанием.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getstatuslist.php
+	* @author Bitrix
+	*/
 	public static function getStatusList($extendedMode = false)
 	{
 		$extendedMode = ($extendedMode === true);
@@ -294,6 +431,20 @@ class DiscountCouponsManager
 	 * @param bool $extendedMode	Get codes or codes with description.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список кодов состояния купона. Метод статический.</p>
+	*
+	*
+	* @param boolean $extendedMode = false Параметр определяет возвращать просто список кодов или список
+	* кодов с описанием.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getcheckcodelist.php
+	* @author Bitrix
+	*/
 	public static function getCheckCodeList($extendedMode = false)
 	{
 		$extendedMode = ($extendedMode === true);
@@ -333,10 +484,33 @@ class DiscountCouponsManager
 	}
 
 	/**
+	 * Set use ordered coupons for apply.
+	 *
+	 * @param bool $state		Use state.
+	 * @return void
+	 */
+	public static function useSavedCouponsForApply($state)
+	{
+		if ($state !== true && $state !== false)
+			return;
+		self::$useOrderCoupons = $state;
+	}
+
+	/**
+	 * Return use ordered coupons for apply.
+	 *
+	 * @return bool
+	 */
+	public static function isUsedOrderCouponsForApply()
+	{
+		return self::$useOrderCoupons;
+	}
+
+	/**
 	 * Initialization coupon manager.
 	 *
 	 * @param int $mode				Discount manager mode.
-	 * @param array $params			Initial params (userId, orderId).
+	 * @param array $params			Initial params (userId, orderId, oldUserId)
 	 * 		keys are case sensitive:
 	 * 			<ul>
 	 * 			<li>int userId		Order owner (for MODE_MANAGER or MODE_ORDER only)
@@ -346,6 +520,31 @@ class DiscountCouponsManager
 	 * @param bool $clearStorage	Clear coupon session storage.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод инициализирует менеджер купонов. Метод статический.</p>
+	*
+	*
+	* @param integer $mode = self::MODE_CLIENT Режим работы.
+	*
+	* @param array $params = array() Массив первоначальных параметров. Ключи чувствительны к
+	* регистру: <br><ul> <li> <b>userId</b> - идентификатор владельца заказа (только
+	* для режимов <code>MODE_MANAGER</code> или <code>MODE_ORDER</code>);</li> <li> <b>orderId</b> -
+	* идентификатор заказа, необходим только для режима работы с
+	* купонами существующего заказа (только для режима
+	* <code>MODE_ORDER</code>);</li> <li> <b>oldUserId</b> - старый владелец заказа, если в
+	* форме редактирования сменили клиента  (только для режимов
+	* <code>MODE_MANAGER</code> или <code>MODE_ORDER</code>). </li> </ul>
+	*
+	* @param boolean $clearStorage = false Если принимает <i>true</i>, то будут убраны введенные купоны на
+	* текущем хите.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/init.php
+	* @author Bitrix
+	*/
 	public static function init($mode = self::MODE_CLIENT, $params = array(), $clearStorage = false)
 	{
 		if (self::$init)
@@ -391,10 +590,34 @@ class DiscountCouponsManager
 	 * Unconditional reinitialization coupon manager.
 	 *
 	 * @param int $mode				Discount manager mode.
-	 * @param array $params			Initial params (userId, orderId).
+	 * @param array $params			Initial params (userId, orderId, oldUserId)
+	 * 		keys are case sensitive:
+	 * 			<ul>
+	 * 			<li>int userId		Order owner (for MODE_MANAGER or MODE_ORDER only)
+	 * 			<li>int orderId		Edit order id (for MODE_ORDER only(!))
+	 * 			<li>int oldUserId	Old order owner for MODE_MANAGER or MODE_ORDER only)
+	 * 			</ul>.
 	 * @param bool $clearStorage	Clear coupon session storage.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод реинициализирует менеджер купонов. Метод статический.</p>
+	*
+	*
+	* @param integer $mode = self::MODE_CLIENT Режим работы.
+	*
+	* @param array $params = array() Массив первоначальных параметров.
+	*
+	* @param boolean $clearStorage = false Если принимает <i>true</i>, то будут убраны введенные купоны на
+	* текущем хите.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/reinit.php
+	* @author Bitrix
+	*/
 	public static function reInit($mode = self::MODE_CLIENT, $params = array(), $clearStorage = false)
 	{
 		self::$init = false;
@@ -406,6 +629,17 @@ class DiscountCouponsManager
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Если купон вводили, то метод возвращает <i>true</i>, в противном случае - <i>false</i>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/isentered.php
+	* @author Bitrix
+	*/
 	public static function isEntered()
 	{
 		return !empty(self::$coupons);
@@ -417,6 +651,19 @@ class DiscountCouponsManager
 	 * @param string $coupon	Added coupon.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод добавляет купон, чтобы учесть его в расчетах. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код добавляемого купона.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/add.php
+	* @author Bitrix
+	*/
 	public static function add($coupon)
 	{
 		if (!self::$init)
@@ -466,6 +713,19 @@ class DiscountCouponsManager
 	 * @param string $coupon	Deleted coupon.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод удаляет купон из проводимых расчетов. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код удаляемого купона.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/delete.php
+	* @author Bitrix
+	*/
 	public static function delete($coupon)
 	{
 		if (!self::$init)
@@ -508,6 +768,20 @@ class DiscountCouponsManager
 	 * @param bool $clearStorage		Clear coupon session storage.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод убирает введенные купоны на текущем хите. Метод статический.</p>
+	*
+	*
+	* @param boolean $clearStorage = false Если параметр принимает значение <i>true</i>, то введенные купоны
+	* будут убраны из сессии.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/clear.php
+	* @author Bitrix
+	*/
 	public static function clear($clearStorage = false)
 	{
 		if (self::$useMode == self::MODE_SYSTEM || !self::isSuccess())
@@ -526,6 +800,19 @@ class DiscountCouponsManager
 	 * @param int $order			Order id.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод убирает введенные купоны в заказе. Метод статический.</p>
+	*
+	*
+	* @param integer $order  Идентификатор заказа.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/clearbyorder.php
+	* @author Bitrix
+	*/
 	public static function clearByOrder($order)
 	{
 		if (!self::isSuccess())
@@ -558,6 +845,19 @@ class DiscountCouponsManager
 	 * @param int $oldUser				Old user id.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод изменяет идентификатор хранилища после смены клиента в заказе в административной части. Метод статический.</p>
+	*
+	*
+	* @param integer $oldUser  Старый идентификатор пользователя.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/migratestorage.php
+	* @author Bitrix
+	*/
 	public static function migrateStorage($oldUser)
 	{
 		if (self::$useMode != self::MODE_MANAGER && self::$useMode != self::MODE_ORDER || self::$userId === null)
@@ -582,6 +882,17 @@ class DiscountCouponsManager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод загружает купоны для существующего заказа. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/load.php
+	* @author Bitrix
+	*/
 	public static function load()
 	{
 		if (self::$useMode != self::MODE_ORDER)
@@ -592,7 +903,7 @@ class DiscountCouponsManager
 		$couponIterator = Internals\OrderCouponsTable::getList(array(
 			'select' => array(
 				'*',
-				'MODULE' => 'ORDER_DISCOUNT.MODULE_ID',
+				'MODULE_ID' => 'ORDER_DISCOUNT.MODULE_ID',
 				'DISCOUNT_ID' => 'ORDER_DISCOUNT.DISCOUNT_ID',
 				'DISCOUNT_NAME' => 'ORDER_DISCOUNT.NAME'
 			),
@@ -605,7 +916,8 @@ class DiscountCouponsManager
 			$couponData['COUPON'] = $coupon['COUPON'];
 			$couponData['STATUS'] = self::STATUS_ENTERED;
 			$couponData['CHECK_CODE'] = self::COUPON_CHECK_OK;
-			$couponData['MODULE'] = $coupon['MODULE'];
+			$couponData['MODULE'] = $coupon['MODULE_ID'];
+			$couponData['MODULE_ID'] = $coupon['MODULE_ID'];
 			$couponData['ID'] = $coupon['COUPON_ID'];
 			$couponData['DISCOUNT_ID'] = $coupon['DISCOUNT_ID'];
 			$couponData['DISCOUNT_NAME'] = (string)$coupon['DISCOUNT_NAME'];
@@ -659,6 +971,33 @@ class DiscountCouponsManager
 	 * @param bool $final			Change status ENTERED to NOT_APPLIED.
 	 * @return array|bool
 	 */
+	
+	/**
+	* <p>Метод возвращает список купонов. Метод статический.</p>
+	*
+	*
+	* @param boolean $extMode = true Если принимает значение <i>true</i>, то будет возвращена полная
+	* информация по купонам. В противном случае - массив только кодов
+	* купонов.
+	*
+	* @param array $filter = array() Массив с фильтром по купонам.
+	*
+	* @param boolean $show = false Если принимает значение <i>true</i>, то будут выбраны все имеющиеся
+	* купоны для показа клиенту или менеджеру в корзине, форме
+	* оформления заказа и т.д. <br> Если принимает значение <i>false</i>, то
+	* будут выбраны купоны для применения. Купоны, которые имеют
+	* неверный статус, не найденные, но вбитые, с закончившимся сроком,
+	* не будут возвращены.
+	*
+	* @param boolean $final = false Если принимает значение <i>false</i>, то изменяет статус <code>ENTERED</code> на
+	* <code>NOT_APPLIED</code>.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/get.php
+	* @author Bitrix
+	*/
 	public static function get($extMode = true, $filter = array(), $show = false, $final = false)
 	{
 		if (self::$useMode == self::MODE_SYSTEM)
@@ -666,6 +1005,7 @@ class DiscountCouponsManager
 		$extMode = ($extMode === true);
 		if (!is_array($filter))
 			$filter = array();
+		static::convertOldFilterFields($filter);
 		$show = ($show === true);
 		if (!self::$init)
 			self::init();
@@ -702,11 +1042,32 @@ class DiscountCouponsManager
 	 * @param bool $uniqueDiscount			Get one coupon for discount.
 	 * @return array|bool
 	 */
+	
+	/**
+	* <p>Метод возвращает с учетом фильтра список купонов для применения. Метод статический.</p>
+	*
+	*
+	* @param array $filter  Массив с фильтром по купонам.
+	*
+	* @param array $product = array() Массив параметров товара.
+	*
+	* @param boolean $uniqueDiscount = false Если принимает <i>true</i>, то будет возвращен один купон для скидки.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getforapply.php
+	* @author Bitrix
+	*/
 	public static function getForApply($filter, $product = array(), $uniqueDiscount = false)
 	{
 		if (self::$useMode == self::MODE_SYSTEM)
 			return array();
-		$filter['SAVED'] = 'N';
+		if (self::$useMode == self::MODE_ORDER && static::isUsedOrderCouponsForApply())
+			$filter['SAVED'] = array('Y', 'N');
+		else
+			$filter['SAVED'] = 'N';
+
 		$couponsList = self::get(true, $filter, false);
 		if ($couponsList === false)
 			return array();
@@ -739,10 +1100,55 @@ class DiscountCouponsManager
 	}
 
 	/**
+	 * Return coupons for current order.
+	 *
+	 * @param bool $extMode					Get full information or coupons only.
+	 * @param array $filter					Coupons filter.
+	 * @return array
+	 */
+	public static function getOrderedCoupons($extMode = true, $filter = array())
+	{
+		$extMode = ($extMode === true);
+		$result = array();
+		if (self::$useMode != self::MODE_ORDER)
+			return $result;
+		if (!self::isSuccess())
+			return $result;
+
+		if (!self::isEntered())
+			return $result;
+
+		$result = array_filter(self::$coupons, '\Bitrix\Sale\DiscountCouponsManager::filterFreezeCoupons');
+		if (empty($result))
+			return $result;
+		$result = array_filter($result, '\Bitrix\Sale\DiscountCouponsManager::filterFreezeOrderedCoupons');
+		if (empty($result))
+			return $result;
+
+		$filter['SAVED'] = 'Y';
+		static::filterArrayCoupons($result, $filter);
+		if (!empty($result))
+			static::clearSystemData($result);
+
+		return ($extMode ? $result : array_keys($result));
+	}
+
+	/**
 	 * Save applied coupons.
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод сохраняет примененные купоны. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/saveapplied.php
+	* @author Bitrix
+	*/
 	public static function saveApplied()
 	{
 		if (
@@ -759,7 +1165,7 @@ class DiscountCouponsManager
 		$userId = self::getUserId();
 
 		$appliedCoupons = self::filterCoupons(
-			array('STATUS' => self::STATUS_APPLYED, 'MODULE' => 'sale', 'SAVED' => 'N'),
+			array('STATUS' => self::STATUS_APPLYED, 'MODULE_ID' => 'sale', 'SAVED' => 'N'),
 			true
 		);
 
@@ -787,7 +1193,7 @@ class DiscountCouponsManager
 			foreach (self::$couponProviders as &$provider)
 			{
 				$appliedCoupons = self::filterCoupons(
-					array('STATUS' => self::STATUS_APPLYED, 'MODULE' => $provider['module'], 'SAVED' => 'N'),
+					array('STATUS' => self::STATUS_APPLYED, 'MODULE_ID' => $provider['module'], 'SAVED' => 'N'),
 					true
 				);
 				if (empty($appliedCoupons))
@@ -830,6 +1236,24 @@ class DiscountCouponsManager
 	 * @param bool $oldMode			Compatibility mode with old custom providers.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод сохраняет в памяти информацию о применении купонов к товару. Метод статический и используется в модуле <b>Торговый каталог</b>.</p>
+	*
+	*
+	* @param array $product  Массив параметров товара.
+	*
+	* @param array $couponsList  Массив купонов.
+	*
+	* @param boolean $oldMode = false Если параметр принимает <i>true</i>, то будет использоваться режим
+	* совместимости со старыми пользовательскими провайдерами.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/setapplybyproduct.php
+	* @author Bitrix
+	*/
 	public static function setApplyByProduct($product, $couponsList, $oldMode = false)
 	{
 		static $count = null;
@@ -890,6 +1314,21 @@ class DiscountCouponsManager
 	 * @param array $data				Apply data (basket, delivery).
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод сохраняет в памяти информацию о том, к чему применился купон на хите. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код купона.
+	*
+	* @param array $data  Массив с данными для применения купона.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/setapply.php
+	* @author Bitrix
+	*/
 	public static function setApply($coupon, $data)
 	{
 		if (self::$useMode == self::MODE_SYSTEM)
@@ -947,6 +1386,19 @@ class DiscountCouponsManager
 	 * @param array $product		Product description.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод убирает примененную информацию для товара. Метод статический.</p>
+	*
+	*
+	* @param array $product  Описание товара.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/deleteapplybyproduct.php
+	* @author Bitrix
+	*/
 	public static function deleteApplyByProduct($product)
 	{
 		if (self::$useMode == self::MODE_SYSTEM || empty($product))
@@ -978,6 +1430,17 @@ class DiscountCouponsManager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод изменяет статус сохраняемых купонов. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/finalapply.php
+	* @author Bitrix
+	*/
 	public static function finalApply()
 	{
 		if (self::$useMode == self::MODE_SYSTEM || !self::isSuccess() || empty(self::$coupons))
@@ -1000,6 +1463,19 @@ class DiscountCouponsManager
 	 * @param string $coupon			Coupon.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод убирает примененные данные купона. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код купона.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/clearapplycoupon.php
+	* @author Bitrix
+	*/
 	public static function clearApplyCoupon($coupon)
 	{
 		if (self::$useMode == self::MODE_SYSTEM || !self::isSuccess())
@@ -1025,6 +1501,20 @@ class DiscountCouponsManager
 	 * @param bool $all					Clear for coupons or not saved.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод убирает примененные данные купонов. Метод статический.</p>
+	*
+	*
+	* @param boolean $all = true Если параметр принимает <i>true</i>, то убираются данные для всех
+	* купонов. В противном случае только для не сохраненных.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/clearapply.php
+	* @author Bitrix
+	*/
 	public static function clearApply($all = true)
 	{
 		if (self::$useMode == self::MODE_SYSTEM || !self::isSuccess())
@@ -1052,6 +1542,22 @@ class DiscountCouponsManager
 	 * @param bool $checkCoupon			Check coupon data.
 	 * @return array|false
 	 */
+	
+	/**
+	* <p>Метод возвращает информацию по купону. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код купона.
+	*
+	* @param boolean $checkCoupon = true Если параметр принимает значение <i>true</i>, то дополнительно будет
+	* осуществляться проверка данных.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getdata.php
+	* @author Bitrix
+	*/
 	public static function getData($coupon, $checkCoupon = true)
 	{
 		$currentTime = new Main\Type\DateTime();
@@ -1062,20 +1568,9 @@ class DiscountCouponsManager
 		if ($coupon === '')
 			return false;
 		$checkCoupon = ($checkCoupon === true);
-		$result = array(
-			'COUPON' => $coupon,
-			'MODE' => self::COUPON_MODE_SIMPLE,
-			'STATUS' => self::STATUS_NOT_FOUND,
-			'CHECK_CODE' => self::COUPON_CHECK_NOT_FOUND,
-			'MODULE' => '',
-			'ID' => 0,
-			'DISCOUNT_ID' => 0,
-			'DISCOUNT_NAME' => '',
-			'TYPE' => Internals\DiscountCouponTable::TYPE_UNKNOWN,
-			'ACTIVE' => '',
-			'USER_INFO' => array(),
-			'SAVED' => 'N'
-		);
+
+		$result = static::getEmptyCouponFields($coupon);
+
 		$resultKeyList = array(
 			'ID', 'COUPON', 'DISCOUNT_ID', 'TYPE', 'ACTIVE', 'DISCOUNT_NAME',
 			'DISCOUNT_ACTIVE', 'DISCOUNT_ACTIVE_FROM', 'DISCOUNT_ACTIVE_TO'
@@ -1094,6 +1589,7 @@ class DiscountCouponsManager
 		{
 			$result['MODE'] = self::COUPON_MODE_FULL;
 			$result['MODULE'] = 'sale';
+			$result['MODULE_ID'] = 'sale';
 			$checkCode = self::checkBaseData($existCoupon, self::COUPON_CHECK_OK);
 			foreach ($resultKeyList as &$resultKey)
 				$result[$resultKey] = $existCoupon[$resultKey];
@@ -1122,6 +1618,7 @@ class DiscountCouponsManager
 				{
 					$result['MODE'] = $provider['mode'];
 					$result['MODULE'] = $provider['module'];
+					$result['MODULE_ID'] = $provider['module'];
 					$checkCode = self::checkBaseData($existCoupon, self::COUPON_CHECK_OK);
 					foreach ($resultKeyList as &$resultKey)
 						$result[$resultKey] = $existCoupon[$resultKey];
@@ -1149,6 +1646,19 @@ class DiscountCouponsManager
 	 * @param string $coupon		Coupon for check.
 	 * @return array|bool
 	 */
+	
+	/**
+	* <p>Если купон с кодом <code>$coupon</code> существует, то метод возвращает массив параметров купона с ключами:</p> <ul> <li> <b>ID</b> - идентификатор купона;</li> <li> <b>COUPON</b> - код купона;</li> <li> <b>MODULE_ID</b> - идентификатор модуля.</li> </ul> <p>Метод статический и используется при проверке уникальности купонов среди всех модулей.</p>
+	*
+	*
+	* @param string $coupon  Код купона для проверки.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/isexist.php
+	* @author Bitrix
+	*/
 	public static function isExist($coupon)
 	{
 		$coupon = trim((string)$coupon);
@@ -1166,7 +1676,8 @@ class DiscountCouponsManager
 			return array(
 				'ID' => $existCoupon['ID'],
 				'COUPON' => $existCoupon['COUPON'],
-				'MODULE' => 'sale'
+				'MODULE' => 'sale',
+				'MODULE_ID' => 'sale',
 			);
 		}
 		else
@@ -1188,7 +1699,8 @@ class DiscountCouponsManager
 						return array(
 							'ID' => $existCoupon['ID'],
 							'COUPON' => $existCoupon['COUPON'],
-							'MODULE' => $provider['module']
+							'MODULE' => $provider['module'],
+							'MODULE_ID' => $provider['module']
 						);
 					}
 				}
@@ -1205,6 +1717,22 @@ class DiscountCouponsManager
 	 * @param bool $clearData			Clear data for save order coupon.
 	 * @return bool|array
 	 */
+	
+	/**
+	* <p>Если купон еще не добавлен, то метод выполнит попытку его добавления и, в случае успеха, вернет данные купона. Метод статический.</p>
+	*
+	*
+	* @param string $coupon  Код купона.
+	*
+	* @param boolean $clearData = false Если принимает значение <i>true</i>, то перед возвращением данных
+	* будут очищены системные поля.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/getenteredcoupon.php
+	* @author Bitrix
+	*/
 	public static function getEnteredCoupon($coupon, $clearData = false)
 	{
 		if (!self::$init)
@@ -1241,7 +1769,6 @@ class DiscountCouponsManager
 				unset($fieldName);
 				foreach (self::$timeFields as $fieldName)
 				{
-					/** @var Main\Type\Date $result[$fieldName] */
 					if (isset($result[$fieldName]) && $result[$fieldName] instanceof Main\Type\DateTime)
 						$result[$fieldName] = $result[$fieldName]->getTimestamp();
 				}
@@ -1266,6 +1793,17 @@ class DiscountCouponsManager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает хранилище купонов при выходе из авторизованного сеанса в публичном разделе сайта. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/discountcouponsmanager/logout.php
+	* @author Bitrix
+	*/
 	public static function logout()
 	{
 		if (!self::$init)
@@ -1274,6 +1812,17 @@ class DiscountCouponsManager
 			return;
 		if (self::isSuccess())
 			self::clear(true);
+	}
+
+	/**
+	 * Return is coupon used in order.
+	 *
+	 * @param array $coupon			Coupon data.
+	 * @return bool
+	 */
+	public static function filterOrderCoupons($coupon)
+	{
+		return (isset($coupon['SAVED']) && $coupon['SAVED'] == 'Y');
 	}
 
 	/**
@@ -1642,6 +2191,35 @@ class DiscountCouponsManager
 	}
 
 	/**
+	 * Clear freeze ordered coupons.
+	 *
+	 * @param array $coupon		Coupon data.
+	 * @return bool
+	 */
+	protected static function filterFreezeOrderedCoupons($coupon)
+	{
+		static $currentTimeStamp = null;
+		if ($currentTimeStamp === null)
+			$currentTimeStamp = time();
+		if (!isset($coupon['SAVED']) || $coupon['SAVED'] != 'Y')
+			return true;
+		if (isset($coupon['MODE']) && $coupon['MODE'] == self::COUPON_MODE_FULL)
+		{
+			if (
+				isset($coupon['ACTIVE_FROM']) && $coupon['ACTIVE_FROM'] instanceof Main\Type\DateTime
+				&& $coupon['ACTIVE_FROM']->getTimestamp() > $currentTimeStamp
+			)
+				return false;
+			if (
+				isset($coupon['ACTIVE_TO']) && $coupon['ACTIVE_TO'] instanceof Main\Type\DateTime
+				&& $coupon['ACTIVE_TO']->getTimestamp() < $currentTimeStamp
+			)
+				return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Clear one row coupons.
 	 *
 	 * @param array $coupon		Coupon data.
@@ -1671,7 +2249,7 @@ class DiscountCouponsManager
 		$hash = '';
 		foreach ($coupons as $key => $oneCoupon)
 		{
-			$hash = $oneCoupon['MODULE'].':'.$oneCoupon['DISCOUNT_ID'];
+			$hash = $oneCoupon['MODULE_ID'].':'.$oneCoupon['DISCOUNT_ID'];
 			if (
 				isset($existDiscount[$hash])
 				&&
@@ -1737,7 +2315,7 @@ class DiscountCouponsManager
 						}
 					}
 					$compare = (
-						$logic
+						$logic == 'and'
 						? !in_array(false, $subresult, true)
 						: in_array(true, $subresult, true)
 					);
@@ -1819,7 +2397,7 @@ class DiscountCouponsManager
 						}
 					}
 					$compare = (
-					$logic
+						$logic == 'and'
 						? !in_array(false, $subresult, true)
 						: in_array(true, $subresult, true)
 					);
@@ -1868,7 +2446,11 @@ class DiscountCouponsManager
 		$hash = '';
 		if (!empty($product) && is_array($product))
 		{
-			$module = (isset($product['MODULE']) ? trim((string)$product['MODULE']) : '');
+			$module = '';
+			if (isset($product['MODULE_ID']))
+				$module = trim((string)$product['MODULE_ID']);
+			elseif (isset($product['MODULE']))
+				$module = trim((string)$product['MODULE']);
 			$productId = (isset($product['PRODUCT_ID']) ? (int)$product['PRODUCT_ID'] : 0);
 			$basketId = (isset($product['BASKET_ID']) ? trim((string)$product['BASKET_ID']) : '0');
 			if ($productId > 0 && $basketId !== '')
@@ -1891,7 +2473,9 @@ class DiscountCouponsManager
 		$basketId = '';
 		if (!empty($product) && is_array($product))
 		{
-			if (isset($product['MODULE']))
+			if (isset($product['MODULE_ID']))
+				$module = trim((string)$product['MODULE_ID']);
+			elseif (isset($product['MODULE']))
 				$module = trim((string)$product['MODULE']);
 			if (isset($product['PRODUCT_ID']))
 				$productId = (int)$product['PRODUCT_ID'];
@@ -2004,6 +2588,7 @@ class DiscountCouponsManager
 	/**
 	 * Clear order saved coupons.
 	 *
+	 * @internal
 	 * @param array $coupon		Coupon data.
 	 * @return bool
 	 */
@@ -2015,6 +2600,7 @@ class DiscountCouponsManager
 	/**
 	 * Clear system data.
 	 *
+	 * @internal
 	 * @param array &$coupons			Coupons.
 	 * @return void
 	 */
@@ -2029,5 +2615,55 @@ class DiscountCouponsManager
 		}
 		unset($couponIndex, $couponData);
 		$coupons = $result;
+	}
+
+	/**
+	 * Convert old filter fields.
+	 *
+	 * @internal
+	 * @param array &$filter		Coupons filter.
+	 * @return void
+	 */
+	protected static function convertOldFilterFields(array &$filter)
+	{
+		if (array_key_exists('MODULE', $filter))
+		{
+			if (!isset($filter['MODULE_ID']))
+				$filter['MODULE_ID'] = $filter['MODULE'];
+			unset($filter['MODULE']);
+		}
+		if (array_key_exists('!MODULE', $filter))
+		{
+			if (!isset($filter['!MODULE_ID']))
+				$filter['!MODULE_ID'] = $filter['!MODULE'];
+			unset($filter['!MODULE']);
+		}
+	}
+
+	/**
+	 * Return empty coupon (default field values).
+	 *
+	 * @internal
+	 * @param string $coupon		Coupon code.
+	 * @return array
+	 */
+	protected static function getEmptyCouponFields($coupon)
+	{
+		/* field MODULE - unused, for compatibility only */
+		return array(
+			'COUPON' => $coupon,
+			'MODE' => self::COUPON_MODE_SIMPLE,
+			'STATUS' => self::STATUS_NOT_FOUND,
+			'CHECK_CODE' => self::COUPON_CHECK_NOT_FOUND,
+			'MODULE' => '',
+			'MODULE_ID' => '',
+			'ID' => 0,
+			'DISCOUNT_ID' => 0,
+			'DISCOUNT_NAME' => '',
+			'TYPE' => Internals\DiscountCouponTable::TYPE_UNKNOWN,
+			'ACTIVE' => '',
+			'USER_INFO' => array(),
+			'SAVED' => 'N'
+		);
 	}
 }

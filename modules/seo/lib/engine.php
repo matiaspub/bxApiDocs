@@ -64,6 +64,11 @@ class Engine
 		return $this->engine['CLIENT_ID'];
 	}
 
+	public function getClientSecret()
+	{
+		return $this->engine['CLIENT_SECRET'];
+	}
+
 	public function getAuthSettings()
 	{
 		return $this->engineSettings['AUTH'];

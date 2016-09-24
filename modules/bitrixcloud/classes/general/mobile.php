@@ -16,12 +16,16 @@ class CBitrixCloudMobile
 	 * 	"OnBeforeAdminMobileMenuBuild"
 	 * );
 	 */
-	static public function OnBeforeAdminMobileMenuBuild()
+	public static function OnBeforeAdminMobileMenuBuild()
 	{
-		$arMenu = array(
-			array(
+		global $USER;
+
+		if ($USER->CanDoOperation("bitrixcloud_monitoring"))
+		{
+			CAdminMobileMenu::addItem(array(
 				"text" => GetMessage("BCL_MON_MOB_INSPECTOR"),
 				"type" => "section",
+				"sort" => 300,
 				"items" => array(
 					array(
 						"text" => GetMessage("BCL_MON_MOB_MENU_IPAGE"),
@@ -34,23 +38,12 @@ class CBitrixCloudMobile
 						"data-url" => "/bitrix/admin/mobile/bitrixcloud_monitoring_push.php",
 						"data-pageid" => "bitrix_cloud_monitoring_push",
 					),
-
 				),
-			),
-		);
-
-		$startSortMenuPosition = 300;
-
-		foreach ($arMenu as $key => $item)
-		{
-			$item["sort"] = $key+$startSortMenuPosition;
-			CAdminMobileMenu::addItem($item);
+			));
 		}
-
-		return true;
 	}
 
-	static public function getUserDevices($userId)
+	public static function getUserDevices($userId)
 	{
 		$arResult = array();
 

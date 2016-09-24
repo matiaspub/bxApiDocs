@@ -74,4 +74,3 @@ class CRatingsComponentsMain extends CAllRatingsComponentsMain
 		return true;
 	}
 }
-?>

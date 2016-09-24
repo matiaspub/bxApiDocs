@@ -42,6 +42,17 @@ abstract class Connector extends Entity\DataManager
 	*
 	* @return string field name
 	*/
+	
+	/**
+	* <p>Метод возвращает имя столбца таблицы, содержащей связи таблиц местоположений и сущностей. Например, для доставки она должна вернуть <code>DELIVERY_ID</code>. Ограничение: механизм не поддерживает составные первичные ключи. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/getlinkfield.php
+	* @author Bitrix
+	*/
 	abstract public function getLinkField();
 
 	/** Method should return a name of the "target" entity plus namespace but without trailing 'Table'. For example, for delivery this should be 'Bitrix\Sale\Delivery\Delivery'
@@ -64,6 +75,17 @@ abstract class Connector extends Entity\DataManager
 	* Returns a name of the filed that keep location id or code. By default 'LOCATION_ID' is used for the most. For newly-created entites this should be LOCATION_CODE (string)
 	* 
 	* @return string
+	*/
+	
+	/**
+	* <p>Метод возвращает название поля, которое содержит идентификатор или код местоположения. По умолчанию для большинства сущностей используется <code>LOCATION_ID</code>. Для вновь созданных сущностей - должно быть <code>LOCATION_CODE</code> (строка). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/getlocationlinkfield.php
+	* @author Bitrix
 	*/
 	public static function getLocationLinkField()
 	{
@@ -107,6 +129,17 @@ abstract class Connector extends Entity\DataManager
 	* 
 	* @return integer
 	*/
+	
+	/**
+	* <p>Метод возвращает тип связи для текущей сущности (строковая константа <code>L</code> или <code>G</code>). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/getconnecttype.php
+	* @author Bitrix
+	*/
 	public static function getConnectType()
 	{
 		$map = static::getMap();
@@ -139,7 +172,20 @@ abstract class Connector extends Entity\DataManager
 	* 
 	* @return Bitrix\Main\Entity\AddResult
 	*/
-	public static function add($data = array())
+	
+	/**
+	* <p>Метод добавляет новую связь между местоположением и сущностью. Метод статический.</p>
+	*
+	*
+	* @param array $data  Массив с данными для добавления.
+	*
+	* @return \Bitrix\Sale\Location\Bitrix\Main\Entity\AddResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/add.php
+	* @author Bitrix
+	*/
+	public static function add(array $data)
 	{
 		$res = parent::add($data);
 		if($res->isSuccess())
@@ -159,7 +205,22 @@ abstract class Connector extends Entity\DataManager
 	* 
 	* @return Bitrix\Main\Entity\UpdateResult
 	*/
-	public static function update($primary, $data = array())
+	
+	/**
+	* <p>Метод обновляет параметры связи между местоположением и сущностью. Метод статический.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ.
+	*
+	* @param array $data = array() Массив с обновляемыми данными.
+	*
+	* @return \Bitrix\Sale\Location\Bitrix\Main\Entity\UpdateResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/update.php
+	* @author Bitrix
+	*/
+	public static function update($primary, array $data)
 	{
 		$linkFld = static::getLinkField();
 
@@ -185,6 +246,19 @@ abstract class Connector extends Entity\DataManager
 	* @param mixed $primary relation primary key value
 	* 
 	* @return Bitrix\Main\Entity\DeleteResult
+	*/
+	
+	/**
+	* <p>Метод удаляет связь между местоположением и сущностью. Метод статический.</p>
+	*
+	*
+	* @param mixed $primary  Первичный ключ.
+	*
+	* @return \Bitrix\Sale\Location\Bitrix\Main\Entity\DeleteResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/delete.php
+	* @author Bitrix
 	*/
 	public static function delete($primary)
 	{
@@ -635,7 +709,22 @@ abstract class Connector extends Entity\DataManager
 	* @throws ArgumentNullException
 	* @throws NotImplementedException
 	*
-	* @return Bitrix\Main\DB\Result list of locations
+	* @return \Bitrix\Main\DB\Result list of locations
+	*/
+	
+	/**
+	* <p>Метод возвращает набор групп местоположений, которые связаны с заданной сущностью. Метод статический.</p>
+	*
+	*
+	* @param mixed $entityPrimary  Первичный ключ сущности.
+	*
+	* @param array $parameters = array() Массив параметров выборки.
+	*
+	* @return \Bitrix\Sale\Location\Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/getconnectedgroups.php
+	* @author Bitrix
 	*/
 	public static function getConnectedGroups($entityPrimary, $parameters = array())
 	{
@@ -961,6 +1050,25 @@ abstract class Connector extends Entity\DataManager
 	 * 
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Метод проверяет связано ли указанное местоположение с заданной сущностью. Метод статический.</p>
+	*
+	*
+	* @param mixed $entityPrimary  Сущность, которая проверяется.
+	*
+	* @param mixed $locationPrimary  Идентификатор или код местоположения, которое проверяется.
+	*
+	* @param mixed $behaviour = array('LOCATION_LINK_TYPE' Набор флагов, которые изменяют поведение метода.
+	*
+	* @param mixed $intID  
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/location/connector/checkconnectionexists.php
+	* @author Bitrix
+	*/
 	public static function checkConnectionExists($entityPrimary, $locationPrimary, array $behaviour = array('LOCATION_LINK_TYPE' => 'ID'))
 	{
 		$entityPrimary = Assert::expectStringNotNull($entityPrimary, '$entityPrimary');

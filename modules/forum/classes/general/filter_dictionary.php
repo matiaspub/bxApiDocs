@@ -9,7 +9,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CFilterDictionary</b> - класс для работы cо словарями нецензурных слов. 
+ * <b>CFilterDictionary</b> - класс для работы cо словарями нецензурных слов.
  *
  *
  * @return mixed 
@@ -36,12 +36,12 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	* <p>Создает новый словарь с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного словаря.</p>
+	* <p>Создает новый словарь с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного словаря. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где         
+	* <br><br><i>field</i> - название поля;          <br><i>value</i> - значение поля.         
+	* <br><br>       Поля перечислены в списке полей таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
 	* Обязательные поля должны быть заполнены.
 	*
@@ -49,7 +49,7 @@ class CAllFilterDictionary
 	* возвращает False.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = Array(
 	* 	TITLE        - &gt; $TITLE,
@@ -64,7 +64,7 @@ class CAllFilterDictionary
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li>поля таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul> </htm<a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>. </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -85,21 +85,21 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	* <p>Изменяет параметры существующего словаря с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого словаря.</p>
+	* <p>Изменяет параметры существующего словаря с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого словаря. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Код записи, параметры которой необходимо изменить.
+	* @param int $intID  Код записи, параметры которой необходимо изменить.
 	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где         
+	* <br><br><i>field</i> - название поля;          <br><i>value</i> - значение поля.         
+	* <br><br>       Поля перечислены в списке полей таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a>.
 	*
 	* @return int 
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li>поля таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul> </htm<br>
+	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterdictionary">"Словарь"</a> </li> </ul><br>
 	*
 	*
 	* @static
@@ -128,13 +128,13 @@ class CAllFilterDictionary
 	}
 	
 	/**
-	* <p>Удаляет папку с кодом <i>ID</i>.</p>
+	* <p>Удаляет папку с кодом <i>ID</i>. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Код записи, которую необходимо удалить.
+	* @param int $intID  Код записи, которую необходимо удалить.
 	*
 	* @return bool <p>Возвращает True в случае успешного удаления, в противном случае
-	* возвращает False. </p> <br>
+	* возвращает False. </p><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterdictionary/delete.php
@@ -212,7 +212,7 @@ class CAllFilterDictionary
 
 
 /**
- * <b>CFilterLetter</b> - класс для работы cо словарями букв. 
+ * <b>CFilterLetter</b> - класс для работы cо словарями букв.
  *
  *
  * @return mixed 
@@ -240,12 +240,12 @@ class CAllFilterLetter
 
 	
 	/**
-	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
+	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где         
+	* <br><br><i>field</i> - название поля;          <br><i>value</i> - значение поля.         
+	* <br><br>       Поля перечислены в списке полей таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
 	* Обязательные поля должны быть заполнены.
 	*
@@ -253,7 +253,7 @@ class CAllFilterLetter
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
-	* транслита"</a> </li> </ul> <br>
+	* транслита"</a> </li> </ul><br>
 	*
 	*
 	* @static
@@ -280,21 +280,21 @@ class CAllFilterLetter
 
 	
 	/**
-	* <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
+	* <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Код записи, параметры которой необходимо изменить.
+	* @param int $intID  Код записи, параметры которой необходимо изменить.
 	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где         
+	* <br><br><i>field</i> - название поля;          <br><i>value</i> - значение поля.         
+	* <br><br>       Поля перечислены в списке полей таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь транслита"</a>.
 	*
 	* @return int 
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li>таблица <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterletter">"Словарь
-	* транслита"</a> </li> </ul> <br>
+	* транслита"</a> </li> </ul><br>
 	*
 	*
 	* @static
@@ -347,10 +347,10 @@ class CAllFilterLetter
 
 	
 	/**
-	* <p>Удаляет запись с кодом <i>ID</i>.</p>
+	* <p>Удаляет запись с кодом <i>ID</i>. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Код записи, которую необходимо удалить.
+	* @param int $intID  Код записи, которую необходимо удалить.
 	*
 	* @return bool <br>
 	*
@@ -378,7 +378,7 @@ class CAllFilterLetter
 
 
 /**
- * <b>CFilterUnquotableWords</b> - класс для работы cо словарями слов. 
+ * <b>CFilterUnquotableWords</b> - класс для работы cо словарями слов.
  *
  *
  * @return mixed 
@@ -473,12 +473,12 @@ class CAllFilterUnquotableWords
 
 	
 	/**
-	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи.</p>
+	* <p>Создает новую запись с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной записи. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где         
+	* <br><br><i>field</i> - название поля;          <br><i>value</i> - значение поля.         
+	* <br><br>       Поля перечислены в списке полей таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
 	* Обязательные поля должны быть заполнены.
 	*
@@ -487,7 +487,7 @@ class CAllFilterUnquotableWords
 	* <h4>See Also</h4> 
 	* <ul> <li>таблица <a
 	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
-	* </ul> </htm<br><br>
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -515,30 +515,6 @@ class CAllFilterUnquotableWords
 		return false;
 	}
 
-	
-	/**
-	* <p>Изменяет параметры существующей записи с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемой записи.</p>
-	*
-	*
-	* @param int $ID  Код записи, параметры которой необходимо изменить.
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a>.
-	*
-	* @return int 
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cfilterunquotablewords">"Словарь слов"</a> </li>
-	* </ul> </htm<br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/update.php
-	* @author Bitrix
-	*/
 	public static function Update($ID, $arFields)
 	{
 		global $DB;
@@ -584,19 +560,6 @@ class CAllFilterUnquotableWords
 		return false;
 	}
 
-	
-	/**
-	* <p>Удаляет запись с кодом <i>ID</i>.</p>
-	*
-	*
-	* @param int $ID  Код записи, которую необходимо удалить.
-	*
-	* @return bool <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cfilterunquotablewords/delete.php
-	* @author Bitrix
-	*/
 	public static function Delete($ID)
 	{
 		global $DB, $USER;

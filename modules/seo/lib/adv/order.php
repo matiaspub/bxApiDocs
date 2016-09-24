@@ -35,6 +35,17 @@ class OrderTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы прибыли при переходах по объявлениям Яндекс.Директа. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/ordertable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_seo_adv_order';
@@ -45,6 +56,17 @@ class OrderTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей таблицы прибыли при переходах по объявлениям Яндекс.Директа. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/ordertable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(

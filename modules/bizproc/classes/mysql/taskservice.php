@@ -160,6 +160,7 @@ class CBPTaskService
 			"WORKFLOW_TEMPLATE_ID" => Array("FIELD" => "WS.WORKFLOW_TEMPLATE_ID", "TYPE" => "int", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
 			"MODULE_ID" => Array("FIELD" => "WS.MODULE_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
 			"ENTITY" => Array("FIELD" => "WS.ENTITY", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
+			"DOCUMENT_ID" => Array("FIELD" => "WS.DOCUMENT_ID", "TYPE" => "string", "FROM" => "INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)"),
 			"WORKFLOW_TEMPLATE_NAME" => Array("FIELD" => "WT.NAME", "TYPE" => "string",
 											"FROM" => array("INNER JOIN b_bp_workflow_state WS ON (T.WORKFLOW_ID = WS.ID)",
 												"INNER JOIN b_bp_workflow_template WT ON (WS.WORKFLOW_TEMPLATE_ID = WT.ID)")),

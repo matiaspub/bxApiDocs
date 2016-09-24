@@ -1,11 +1,4 @@
 <?php
-/**
- * Bitrix Framework
- * @package bitrix
- * @subpackage bitrix24
- * @copyright 2001-2015 Bitrix
- */
-
 namespace Bitrix\Im;
 
 class User
@@ -56,13 +49,93 @@ class User
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getFullName()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['name']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getName()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['firstName']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getLastName()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['lastName']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAvatar()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['avatar']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getAvatarId()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['avatarId']: 0;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getWorkPosition()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['workPosition']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getGender()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['gender']: '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getColor()
+	{
+		$fields = $this->getFields();
+
+		return $fields? $fields['color']: '';
+	}
+
+	/**
 	 * @return bool
 	 */
 	public function isExtranet()
 	{
 		$fields = $this->getFields();
 
-		return $fields? (bool)$fields['extranet']: false;
+		return $fields? (bool)$fields['extranet']: null;
 	}
 
 	/**
@@ -72,7 +145,37 @@ class User
 	{
 		$fields = $this->getFields();
 
-		return $fields? (bool)$fields['network']: false;
+		return $fields? (bool)$fields['network']: null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isBot()
+	{
+		$fields = $this->getFields();
+
+		return $fields? (bool)$fields['bot']: null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isConnector()
+	{
+		$fields = $this->getFields();
+
+		return $fields? (bool)$fields['connector']: null;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isExists()
+	{
+		$fields = $this->getFields();
+
+		return $fields? true: false;
 	}
 
 	/**
@@ -102,6 +205,48 @@ class User
 			}
 		}
 		return $this->userData;
+	}
+
+	public static function uploadAvatar($avatarUrl = '')
+	{
+		if (strlen($avatarUrl) <= 4)
+			return '';
+
+		if (!in_array(\GetFileExtension($avatarUrl), Array('png', 'jpg', 'gif')))
+			return '';
+
+		$orm = \Bitrix\Im\Model\ExternalAvatarTable::getList(Array(
+			'filter' => Array('LINK_MD5' => md5($avatarUrl))
+		));
+		if ($cache = $orm->fetch())
+		{
+			return $cache['AVATAR_ID'];
+		}
+
+		$recordFile = \CFile::MakeFileArray($avatarUrl);
+		if (!\CFile::IsImage($recordFile['name'], $recordFile['type']))
+			return '';
+
+		if (is_array($recordFile) && $recordFile['size'] && $recordFile['size'] > 0 && $recordFile['size'] < 1000000)
+		{
+			$recordFile = array_merge($recordFile, array('MODULE_ID' => 'imbot'));
+		}
+		else
+		{
+			$recordFile = 0;
+		}
+
+		if ($recordFile)
+		{
+			$recordFile = \CFile::SaveFile($recordFile, 'botcontroller');
+		}
+
+		\Bitrix\Im\Model\ExternalAvatarTable::add(Array(
+			'LINK_MD5' => md5($avatarUrl),
+			'AVATAR_ID' => intval($recordFile)
+		));
+
+		return $recordFile;
 	}
 
 	/**

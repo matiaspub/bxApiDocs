@@ -638,7 +638,7 @@ class CImageUploader
 	public static function StrangeUrlEncode($url)
 	{
 		if (!defined('BX_UTF'))
-			$url = CharsetConverter::ConvertCharset($url, SITE_CHARSET, "UTF-8");
+			$url = \Bitrix\Main\Text\Encoding::convertEncoding($url, SITE_CHARSET, "UTF-8");
 
 		$ind = strpos($url, "?");
 		$url = str_replace("%2F", "/", rawurlencode(substr($url, 0, $ind))).substr($url, $ind);

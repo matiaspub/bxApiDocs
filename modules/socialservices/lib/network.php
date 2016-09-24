@@ -33,8 +33,12 @@ class Network
 
 	const EXTERNAL_AUTH_ID = 'replica';
 
+	const ADMIN_SESSION_KEY = "SS_B24NET_STATE";
+
 	/** @var  ErrorCollection */
 	public $errorCollection = null;
+
+	protected static $lastUserStatus = null;
 
 	public function __construct()
 	{
@@ -359,7 +363,7 @@ class Network
 		$searchArray = Array();
 		foreach ($networkIds as $networkId)
 		{
-			$searchArray[] = intval($networkId)."|%";
+			$searchArray[] = substr($networkId, 0, 1).intval(substr($networkId, 1))."|%";
 		}
 
 		$result = \Bitrix\Main\UserTable::getList(Array(
@@ -388,7 +392,7 @@ class Network
 	 *
 	 * @return array|false
 	 */
-	private static function formatUserParam($params)
+	public static function formatUserParam($params)
 	{
 		if (empty($params['NAME']))
 		{
@@ -424,5 +428,210 @@ class Network
 		);
 
 		return $result;
+	}
+
+	/**
+	 * Prepares and shows popup offerring current user to attach bitrix24.net account
+	 */
+	public static function displayAdminPopup(array $params = array())
+	{
+		global $USER;
+		if(static::getAdminPopupSession()) // duplicated check, just to be clear
+		{
+			$dbRes = UserTable::getList(array(
+				'filter' => array(
+					'=USER_ID' => $USER->GetID(),
+					'=EXTERNAL_AUTH_ID' => \CSocServBitrix24Net::ID
+				)
+			));
+			if(!$dbRes->fetch())
+			{
+				static::initAdminPopup($params);
+			}
+			else
+			{
+				static::setAdminPopupSession();
+			}
+		}
+	}
+
+	public static function initAdminPopup(array $params = array())
+	{
+		$option = static::getShowOptions();
+		\CJSCore::registerExt("socialservices_admin", array(
+			'js' => "/bitrix/js/socialservices/ss_admin.js",
+			'css' => "/bitrix/js/socialservices/css/ss_admin.css",
+			'rel' => array("ajax", "window"),
+			'lang_additional' => array(
+				"SS_NETWORK_DISPLAY" => $params["SHOW"] ? "Y" : "N",
+				"SS_NETWORK_URL" => static::getAuthUrl("popup", array("admin")),
+				"SS_NETWORK_POPUP_TITLE" => Loc::getMessage('B24NET_POPUP_TITLE'),
+				"SS_NETWORK_POPUP_CONNECT" => Loc::getMessage('B24NET_POPUP_CONNECT'),
+				"SS_NETWORK_POPUP_TEXT" => Loc::getMessage('B24NET_POPUP_TEXT'),
+				"SS_NETWORK_POPUP_DONTSHOW" => Loc::getMessage('B24NET_POPUP_DONTSHOW'),
+				"SS_NETWORK_POPUP_COUNT" => $option["showcount"],
+			)
+		));
+		\CJSCore::init(array("socialservices_admin"));
+	}
+
+	public static function getAuthUrl($mode = "page", $addScope = null)
+	{
+		if(Option::get("socialservices", "bitrix24net_id", "") != "")
+		{
+			$o = new \CSocServBitrix24Net();
+
+			if($addScope !== null)
+			{
+				$o->addScope($addScope);
+			}
+
+			return $o->getUrl($mode);
+		}
+
+		return false;
+	}
+
+	public static function setAdminPopupSession()
+	{
+		global $USER;
+		$_SESSION[static::ADMIN_SESSION_KEY] = $USER->GetID();
+	}
+
+	public static function clearAdminPopupSession($userId)
+	{
+		global $USER, $CACHE_MANAGER;
+
+		$CACHE_MANAGER->Clean("sso_portal_list_".$userId);
+		if($userId == $USER->GetID())
+		{
+			unset($_SESSION[static::ADMIN_SESSION_KEY]);
+		}
+	}
+
+	protected static function getShowOptions()
+	{
+		return \CUserOptions::GetOption("socialservices", "networkPopup", array("dontshow" => "N", "showcount" => 0));
+	}
+
+	public static function getAdminPopupSession()
+	{
+		global $USER;
+
+		$result = !isset($_SESSION[static::ADMIN_SESSION_KEY]) || $_SESSION[static::ADMIN_SESSION_KEY] !== $USER->GetID();
+		if($result)
+		{
+			$option = static::getShowOptions();
+			$result = $option["dontshow"] !== "Y";
+			if(!$result)
+			{
+				static::setAdminPopupSession();
+			}
+		}
+
+		return $result;
+	}
+
+	public static function setRegisterSettings($settings = array())
+	{
+		if(isset($settings["REGISTER"]))
+		{
+			Option::set("socialservices", "new_user_registration_network", $settings["REGISTER"] == "Y" ? "Y" : "N");
+		}
+
+		if(isset($settings["REGISTER_CONFIRM"]))
+		{
+			Option::set("socialservices", "new_user_registration_confirm", $settings["REGISTER_CONFIRM"] == "Y" ? "Y" : "N");
+		}
+
+		if(isset($settings["REGISTER_WHITELIST"]))
+		{
+			$value = preg_split("/[^a-z0-9\-\.]+/", ToLower($settings["REGISTER_WHITELIST"]));
+			Option::set("socialservices", "new_user_registration_whitelist", serialize($value));
+		}
+
+		if(isset($settings["REGISTER_TEXT"]))
+		{
+			Option::set("socialservices", "new_user_registration_text", trim($settings["REGISTER_TEXT"]));
+		}
+
+		if(isset($settings["REGISTER_SECRET"]))
+		{
+			Option::set("socialservices", "new_user_registration_secret", trim($settings["REGISTER_SECRET"]));
+		}
+
+		static::updateRegisterSettings();
+	}
+
+	public static function getRegisterSettings()
+	{
+		return array(
+			"REGISTER" => Option::get("socialservices", "new_user_registration_network", "N"),
+			"REGISTER_CONFIRM" => Option::get("socialservices", "new_user_registration_confirm", "N"),
+			"REGISTER_WHITELIST" => implode(';', unserialize(Option::get("socialservices", "new_user_registration_whitelist", serialize(array())))),
+			"REGISTER_TEXT" => Option::get("socialservices", "new_user_registration_text", ""),
+			"REGISTER_SECRET" => Option::get("socialservices", "new_user_registration_secret", ""),
+		);
+	}
+
+	protected static function updateRegisterSettings()
+	{
+		$query = \CBitrix24NetPortalTransport::init();
+		if($query)
+		{
+			$options = static::getRegisterSettings();
+
+			$query->call("portal.option.set", array('options' => array(
+				'REGISTER' => $options["REGISTER"] === "Y",
+				'REGISTER_TEXT' => $options["REGISTER_TEXT"],
+				"REGISTER_SECRET" => $options["REGISTER_SECRET"],
+			)));
+		}
+	}
+
+	public static function getLastBroadcastCheck()
+	{
+		return Option::get("socialservices", "network_last_update_check", 0);
+	}
+
+	public static function setLastBroadcastCheck()
+	{
+		Option::set("socialservices", "network_last_update_check", time());
+	}
+
+	public static function checkBroadcastData()
+	{
+		$query = \CBitrix24NetPortalTransport::init();
+		if ($query)
+		{
+			$query->call(
+				"broadcast.check",
+				array(
+					"broadcast_last_check" => static::getLastBroadcastCheck()
+				)
+			);
+		}
+	}
+
+	public static function processBroadcastData($data)
+	{
+		ContactTable::onNetworkBroadcast($data);
+
+		foreach(GetModuleEvents("socialservices", "OnNetworkBroadcast", true) as $eventHandler)
+		{
+			ExecuteModuleEventEx($eventHandler, array($data));
+		}
+
+		static::setLastBroadcastCheck();
+	}
+
+	public static function setLastUserStatus($status)
+	{
+		static::$lastUserStatus = $status;
+	}
+
+	public static function getLastUserStatus()
+	{
+		return static::$lastUserStatus;
 	}
 }

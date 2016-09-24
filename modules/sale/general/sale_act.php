@@ -1,41 +1,52 @@
 <?
-use Bitrix\Main\Loader;
-use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Config\Option;
-use Bitrix\Sale;
+use Bitrix\Main\Loader,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Sale;
 
 if (!Loader::includeModule('catalog'))
 	return;
 
 Loc::loadMessages(__FILE__);
 
+/**
+ * @deprecated deprecated since sale 16.0.10
+ * @see \Bitrix\Sale\Discount\Actions
+ */
 class CSaleDiscountActionApply
 {
-	const VALUE_TYPE_FIX = 'F';
-	const VALUE_TYPE_PERCENT = 'P';
-	const VALUE_TYPE_SUMM = 'S';
+	const VALUE_TYPE_FIX = Sale\Discount\Actions::VALUE_TYPE_FIX;
+	const VALUE_TYPE_PERCENT = Sale\Discount\Actions::VALUE_TYPE_PERCENT;
+	const VALUE_TYPE_SUMM = Sale\Discount\Actions::VALUE_TYPE_SUMM;
+
+	const GIFT_SELECT_TYPE_ONE = Sale\Discount\Actions::GIFT_SELECT_TYPE_ONE;
+	const GIFT_SELECT_TYPE_ALL = Sale\Discount\Actions::GIFT_SELECT_TYPE_ALL;
 
 	const ORDER_MANUAL_MODE_FIELD = 'ORDER_MANUAL_MODE';
-	const BASKET_APPLIED_FIELD = 'DISCOUNT_APPLIED';
+	const BASKET_APPLIED_FIELD = Sale\Discount\Actions::BASKET_APPLIED_FIELD;
 
-	const EPS = 1E-12;
+	const EPS = Sale\Discount\Actions::VALUE_EPS;
 
-	private static $resetFields = array('DISCOUNT_PRICE', 'PRICE', 'VAT_VALUE', 'PRICE_DEFAULT');
 	protected static $getPercentFromBasePrice = null;
 
 	/**
 	 * Check discount calculate mode field for order.
 	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::isManualMode
+	 *
 	 * @param array $order			Order data.
 	 * @return bool
 	 */
-	public static function isManualMode($order)
+	public static function isManualMode(/** @noinspection PhpUnusedParameterInspection */$order)
 	{
-		return (isset($order[self::ORDER_MANUAL_MODE_FIELD]) && $order[self::ORDER_MANUAL_MODE_FIELD] === true);
+		return Sale\Discount\Actions::isManualMode();
 	}
 
 	/**
 	 * Set discount calculate mode field for order.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::setUseMode
 	 *
 	 * @param array &$order			Order data.
 	 * @return void
@@ -44,11 +55,21 @@ class CSaleDiscountActionApply
 	{
 		if (empty($order) || empty($order['ID']))
 			return;
-		$order[self::ORDER_MANUAL_MODE_FIELD] = true;
+		Sale\Discount\Actions::setUseMode(
+			Sale\Discount\Actions::MODE_MANUAL,
+			array(
+				'USE_BASE_PRICE' => $order['USE_BASE_PRICE'],
+				'SITE_ID' => $order['SITE_ID'],
+				'CURRENCY' => $order['CURRENCY']
+			)
+		);
 	}
 
 	/**
 	 * Erase discount calculate mode field for order.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::setUseMode
 	 *
 	 * @param array &$order			Order data.
 	 * @return void
@@ -57,23 +78,27 @@ class CSaleDiscountActionApply
 	{
 		if (empty($order) || !is_array($order))
 			return;
-		if (array_key_exists(self::ORDER_MANUAL_MODE_FIELD, $order))
-			unset($order[self::ORDER_MANUAL_MODE_FIELD]);
+		Sale\Discount\Actions::setUseMode(Sale\Discount\Actions::MODE_CALCULATE);
 	}
 
 	/**
 	 * Return true, if discount already applied by basket item.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
 	 *
 	 * @param array $row			Basket row.
 	 * @return bool
 	 */
 	public static function filterApplied($row)
 	{
+		/* @noinspection PhpDeprecationInspection */
 		return (isset($row[self::BASKET_APPLIED_FIELD]));
 	}
 
 	/**
 	 * Fill basket applied information.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
 	 *
 	 * @param array &$order			Order data.
 	 * @param array $basket			Applied information (key - BASKET_ID, value - Y/N).
@@ -93,6 +118,7 @@ class CSaleDiscountActionApply
 				if (isset($basketRow['ID']) && $basketRow['ID'] == $itemId)
 				{
 					$founded = true;
+					/* @noinspection PhpDeprecationInspection */
 					$basketRow[self::BASKET_APPLIED_FIELD] = $value;
 					break;
 				}
@@ -101,11 +127,14 @@ class CSaleDiscountActionApply
 		}
 		unset($value, $itemId);
 		if ($founded)
+			/* @noinspection PhpDeprecationInspection */
 			self::setManualMode($order);
 	}
 
 	/**
 	 * Clear basket applied information.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
 	 *
 	 * @param array &$order				Order data.
 	 * @return void
@@ -116,7 +145,9 @@ class CSaleDiscountActionApply
 			return;
 		foreach ($order['BASKET_ITEMS'] as &$basketRow)
 		{
+			/* @noinspection PhpDeprecationInspection */
 			if (array_key_exists(self::BASKET_APPLIED_FIELD, $basketRow))
+				/* @noinspection PhpDeprecationInspection */
 				unset($basketRow[self::BASKET_APPLIED_FIELD]);
 		}
 		unset($basketRow);
@@ -125,25 +156,22 @@ class CSaleDiscountActionApply
 	/**
 	 * Filter for undiscount basket items.
 	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::filterBasketForAction
+	 *
 	 * @param array $row		Basket item.
 	 * @return bool
 	 */
 	public static function ClearBasket($row)
 	{
-		return (
-			(!isset($row['CUSTOM_PRICE']) || $row['CUSTOM_PRICE'] != 'Y') &&
-			(
-				(isset($row['TYPE']) && (int)$row['TYPE'] == CSaleBasket::TYPE_SET) ||
-				(!isset($row['SET_PARENT_ID']) || (int)$row['SET_PARENT_ID'] <= 0)
-			) &&
-			(!isset($row['ITEM_FIX']) || $row['ITEM_FIX'] != 'Y') &&
-			(!isset($row['LAST_DISCOUNT']) || $row['LAST_DISCOUNT'] != 'Y') &&
-			(!isset($row['IN_SET']) || $row['IN_SET'] != 'Y')
-		);
+		return Sale\Discount\Actions::filterBasketForAction($row);
 	}
 
 	/**
 	 * Apply discount to delivery price.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::applyToDelivery
 	 *
 	 * @param array &$order				Order data.
 	 * @param float $value				Discount value.
@@ -153,89 +181,25 @@ class CSaleDiscountActionApply
 	 */
 	public static function ApplyDelivery(&$order, $value, $unit, $extMode = false)
 	{
-		$unit = (string)$unit;
-		if ($unit != self::VALUE_TYPE_PERCENT && $unit != self::VALUE_TYPE_FIX)
-			return;
-		if (isset($order['CUSTOM_PRICE_DELIVERY']) && $order['CUSTOM_PRICE_DELIVERY'] == 'Y')
-			return;
-		if (isset($order['PRICE_DELIVERY']))
-		{
-			$extMode = ($extMode === true);
-			$type = ($extMode ? Sale\OrderDiscountManager::DESCR_TYPE_MAX_BOUND : Sale\OrderDiscountManager::DESCR_TYPE_VALUE);
-			$value = (float)$value;
-			$discountDescr = array(
-				'VALUE' => abs($value),
-				'VALUE_ACTION' => (
-					$value < 0
-					? Sale\OrderDiscountManager::DESCR_VALUE_ACTION_DISCOUNT
-					: Sale\OrderDiscountManager::DESCR_VALUE_ACTION_EXTRA
-				)
-			);
-
-			if ($unit == self::VALUE_TYPE_PERCENT)
-			{
-				$value = roundEx(($order['PRICE_DELIVERY']*$value)/100, SALE_VALUE_PRECISION);
-				$type = Sale\OrderDiscountManager::DESCR_TYPE_VALUE;
-				$discountDescr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_PERCENT;
-			}
-			else
-			{
-				$discountDescr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_CURRENCY;
-				if (isset($order['CURRENCY']))
-					$discountDescr['VALUE_UNIT'] = $order['CURRENCY'];
-			}
-			if ($value == 0)
-				return;
-
-			$resultValue = $order['PRICE_DELIVERY'] + $value;
-			if ($extMode && $resultValue < 0)
-			{
-				$resultValue = 0;
-				$value = $order['PRICE_DELIVERY'];
-			}
-			if (abs($resultValue) < self::EPS)
-				$resultValue = 0;
-			if ($resultValue >= 0)
-			{
-				if (!isset($order['PRICE_DELIVERY_DIFF']))
-					$order['PRICE_DELIVERY_DIFF'] = 0;
-				$order['PRICE_DELIVERY_DIFF'] -= $value;
-				$order['PRICE_DELIVERY'] = $resultValue;
-
-				if (!self::isManualMode($order))
-				{
-					$prepareResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $discountDescr);
-					if ($prepareResult->isSuccess())
-					{
-						if (!isset($order['DISCOUNT_DESCR']))
-							$order['DISCOUNT_DESCR'] = array();
-						if (!isset($order['DISCOUNT_DESCR']['DELIVERY']))
-							$order['DISCOUNT_DESCR']['DELIVERY'] = array();
-						$order['DISCOUNT_DESCR']['DELIVERY'][] = $prepareResult->getData();
-					}
-					unset($prepareResult);
-				}
-				$discountDescr['RESULT_VALUE'] = abs($value);
-				if (isset($order['CURRENCY']))
-					$discountDescr['RESULT_UNIT'] = $order['CURRENCY'];
-
-				$prepareResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $discountDescr);
-				if ($prepareResult->isSuccess(true))
-				{
-					if (!isset($order['DISCOUNT_RESULT']))
-						$order['DISCOUNT_RESULT'] = array();
-					if (!isset($order['DISCOUNT_RESULT']['DELIVERY']))
-						$order['DISCOUNT_RESULT']['DELIVERY'] = array();
-					$order['DISCOUNT_RESULT']['DELIVERY'][] = $prepareResult->getData();
-				}
-				unset($prepareResult);
-			}
-			unset($discountDescr);
-		}
+		$extMode = ($extMode === true);
+		$params = array(
+			'VALUE' => $value,
+			'UNIT' => $unit,
+		);
+		if ($extMode)
+			$params['MAX_BOUND'] = 'Y';
+		Sale\Discount\Actions::applyToDelivery(
+			$order,
+			$params
+		);
+		unset($params);
 	}
 
 	/**
 	 * Apply discount to basket.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::applyToBasket
 	 *
 	 * @param array &$order			Order data.
 	 * @param callable $func		Filter function.
@@ -245,187 +209,29 @@ class CSaleDiscountActionApply
 	 */
 	public static function ApplyBasketDiscount(&$order, $func, $value, $unit)
 	{
-		if (empty($order['BASKET_ITEMS']) || !is_array($order['BASKET_ITEMS']))
-			return;
-
-		$manualMode = self::isManualMode($order);
-		if (self::$getPercentFromBasePrice === null)
-		{
-			if ($manualMode)
-				self::$getPercentFromBasePrice = (isset($order['USE_BASE_PRICE']) && $order['USE_BASE_PRICE'] == 'Y');
-			else
-				self::$getPercentFromBasePrice = (string)Option::get('sale', 'get_discount_percent_from_base_price') == 'Y';
-		}
-
-		if ($manualMode)
-			$discountBasket = array_filter($order['BASKET_ITEMS'], 'CSaleDiscountActionApply::filterApplied');
-		else
-			$discountBasket = (is_callable($func) ? array_filter($order['BASKET_ITEMS'], $func) : $order['BASKET_ITEMS']);
-		if (empty($discountBasket))
-			return;
-
-		$allBasket = (count($order['BASKET_ITEMS']) == count($discountBasket));
-
-		$clearBasket = array_filter($discountBasket, 'CSaleDiscountActionApply::ClearBasket');
-		if (empty($clearBasket))
-			return;
-		unset($discountBasket);
-
-		$unit = (string)$unit;
-		$value = (float)$value;
-		$type = Sale\OrderDiscountManager::DESCR_TYPE_VALUE;
-		$discountDescr = array(
-			'VALUE' => abs($value),
-			'VALUE_ACTION' => (
-				$value < 0
-				? Sale\OrderDiscountManager::DESCR_VALUE_ACTION_DISCOUNT
-				: Sale\OrderDiscountManager::DESCR_VALUE_ACTION_EXTRA
+		Sale\Discount\Actions::applyToBasket(
+			$order,
+			array(
+				'VALUE' => $value,
+				'UNIT' => $unit
 			),
+			$func
 		);
-		switch ($unit)
-		{
-			case self::VALUE_TYPE_SUMM:
-				$discountDescr['VALUE_TYPE'] = (
-					$allBasket
-					? Sale\OrderDiscountManager::DESCR_VALUE_TYPE_SUMM_BASKET
-					: Sale\OrderDiscountManager::DESCR_VALUE_TYPE_SUMM
-				);
-				if (isset($order['CURRENCY']))
-					$discountDescr['VALUE_UNIT'] = $order['CURRENCY'];
-				break;
-			case self::VALUE_TYPE_PERCENT:
-				$discountDescr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_PERCENT;
-				break;
-			case self::VALUE_TYPE_FIX:
-			default:
-				$discountDescr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_CURRENCY;
-				if (isset($order['CURRENCY']))
-					$discountDescr['VALUE_UNIT'] = $order['CURRENCY'];
-				break;
-		}
-		unset($allBasket);
-		if ($unit == self::VALUE_TYPE_SUMM)
-		{
-			$dblSumm = 0.0;
-			if (self::$getPercentFromBasePrice)
-			{
-				foreach ($clearBasket as &$arOneRow)
-				{
-					if (!isset($arOneRow['DISCOUNT_PRICE']))
-						$arOneRow['DISCOUNT_PRICE'] = 0;
-					$dblSumm += (float)(isset($arOneRow['BASE_PRICE'])
-							? $arOneRow['BASE_PRICE']
-							: $arOneRow['PRICE'] + $arOneRow['DISCOUNT_PRICE']
-						) * (float)$arOneRow['QUANTITY'];
-				}
-				unset($arOneRow);
-			}
-			else
-			{
-				foreach ($clearBasket as &$arOneRow)
-					$dblSumm += (float)$arOneRow['PRICE'] * (float)$arOneRow['QUANTITY'];
-				unset($arOneRow);
-			}
+	}
 
-			$value = ($dblSumm > 0 ? ($value*100)/$dblSumm : 0.0);
-			$unit = self::VALUE_TYPE_PERCENT;
-		}
-		if ($value != 0)
-		{
-			if (!$manualMode)
-			{
-				$prepareResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $discountDescr);
-				if ($prepareResult->isSuccess())
-				{
-					if (!isset($order['DISCOUNT_DESCR']))
-						$order['DISCOUNT_DESCR'] = array();
-					if (!isset($order['DISCOUNT_DESCR']['BASKET']))
-						$order['DISCOUNT_DESCR']['BASKET'] = array();
-					$order['DISCOUNT_DESCR']['BASKET'][] = $prepareResult->getData();
-				}
-				unset($prepareResult);
-			}
-			$applyResultList = array();
-			foreach ($clearBasket as $basketCode => $arOneRow)
-			{
-				$calculateValue = $value;
-				if ($unit == self::VALUE_TYPE_PERCENT)
-				{
-					if (self::$getPercentFromBasePrice)
-					{
-						if (!isset($arOneRow['DISCOUNT_PRICE']))
-							$arOneRow['DISCOUNT_PRICE'] = 0;
-						$calculateValue = ((isset($arOneRow['BASE_PRICE'])
-							? $arOneRow['BASE_PRICE']
-							: $arOneRow['PRICE'] + $arOneRow['DISCOUNT_PRICE']
-						)*$value)/100;
-					}
-					else
-					{
-						$calculateValue = ($arOneRow['PRICE']*$value)/100;
-					}
-					$calculateValue = roundEx($calculateValue, SALE_VALUE_PRECISION);
-				}
-
-				$dblResult = $arOneRow['PRICE'] + $calculateValue;
-				if (abs($dblResult) < self::EPS)
-					$dblResult = 0;
-				if ($dblResult >= 0 && (!$manualMode || isset($arOneRow[self::BASKET_APPLIED_FIELD])))
-				{
-					$arOneRow['PRICE'] = $dblResult;
-					if (isset($arOneRow['PRICE_DEFAULT']))
-						$arOneRow['PRICE_DEFAULT'] = $dblResult;
-					if (isset($arOneRow['DISCOUNT_PRICE']))
-					{
-						$arOneRow['DISCOUNT_PRICE'] = (float)$arOneRow['DISCOUNT_PRICE'];
-						$arOneRow['DISCOUNT_PRICE'] -= $calculateValue;
-					}
-					else
-					{
-						$arOneRow['DISCOUNT_PRICE'] = -$calculateValue;
-					}
-					if ($arOneRow['DISCOUNT_PRICE'] < 0)
-						$arOneRow['DISCOUNT_PRICE'] = 0;
-					if (isset($arOneRow['VAT_RATE']))
-					{
-						$dblVatRate = (float)$arOneRow['VAT_RATE'];
-						if ($dblVatRate > 0)
-							$arOneRow['VAT_VALUE'] = (($arOneRow['PRICE'] / ($dblVatRate + 1)) * $dblVatRate);
-					}
-
-					foreach (self::$resetFields as &$fieldName)
-					{
-						if (isset($arOneRow[$fieldName]) && !is_array($arOneRow[$fieldName]))
-							$arOneRow['~'.$fieldName] = $arOneRow[$fieldName];
-					}
-					unset($fieldName);
-
-					$order['BASKET_ITEMS'][$basketCode] = $arOneRow;
-
-					$applyResultList[$basketCode] = $discountDescr;
-					$applyResultList[$basketCode]['RESULT_VALUE'] = abs($calculateValue);
-					if (isset($arOneRow['CURRENCY']))
-						$applyResultList[$basketCode]['RESULT_UNIT'] = $arOneRow['CURRENCY'];
-				}
-			}
-			unset($basketCode);
-			if (!isset($order['DISCOUNT_RESULT']))
-				$order['DISCOUNT_RESULT'] = array();
-			if (!isset($order['DISCOUNT_RESULT']['BASKET']))
-				$order['DISCOUNT_RESULT']['BASKET'] = array();
-			foreach ($applyResultList as $basketCode => $applyResult)
-			{
-				$prepareResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $applyResult);
-				if ($prepareResult->isSuccess())
-				{
-					if (!isset($order['DISCOUNT_RESULT']['BASKET'][$basketCode]))
-						$order['DISCOUNT_RESULT']['BASKET'][$basketCode] = array();
-					$order['DISCOUNT_RESULT']['BASKET'][$basketCode][] = $prepareResult->getData();
-				}
-				unset($prepareResult);
-			}
-			unset($basketCode, $applyResult, $applyResultList);
-		}
+	/**
+	 * Apply simple gift discount.
+	 *
+	 * @deprecated deprecated since sale 16.0.10
+	 * @see \Bitrix\Sale\Discount\Actions::applySimpleGift
+	 *
+	 * @param array &$order				Order data.
+	 * @param callable $callableFilter	Filter function.
+	 * @return void
+	 */
+	public static function ApplyGiftDiscount(&$order, $callableFilter)
+	{
+		Sale\Discount\Actions::applySimpleGift($order, $callableFilter);
 	}
 }
 
@@ -534,6 +340,175 @@ class CSaleActionCtrlGroup extends CGlobalCondCtrlGroup
 		return $mxResult;
 	}
 }
+
+class CSaleActionGiftCtrlGroup extends CSaleActionCtrlGroup
+{
+	public static function GetClassName()
+	{
+		return __CLASS__;
+	}
+
+	public static function GetShowIn($arControls)
+	{
+		$arControls = array(
+			'CondGroup'
+		);
+		return $arControls;
+	}
+
+	public static function GetControlID()
+	{
+		return 'GiftCondGroup';
+	}
+
+	public static function GetAtoms()
+	{
+		return static::GetAtomsEx(false, false);
+	}
+
+	public static function GetAtomsEx($strControlID = false, $boolEx = false)
+	{
+		$boolEx = (true === $boolEx ? true : false);
+		$arAtomList = array();
+
+		if (!$boolEx)
+		{
+			foreach ($arAtomList as &$arOneAtom)
+			{
+				$arOneAtom = $arOneAtom['JS'];
+			}
+				if (isset($arOneAtom))
+					unset($arOneAtom);
+		}
+
+		return $arAtomList;
+	}
+
+	public static function GetControlDescr()
+	{
+		$controlDescr = parent::GetControlDescr();
+		$controlDescr['FORCED_SHOW_LIST'] = array(
+			'GifterCondIBElement',
+			'GifterCondIBSection',
+		);
+
+		return $controlDescr;
+	}
+
+	public static function GetControlShow($arParams)
+	{
+		return array(
+			'controlId' => static::GetControlID(),
+			'group' => true,
+			'containsOneAction' => true,
+			'label' => Loc::getMessage('BT_SALE_ACT_GIFT_LABEL'),
+			'defaultText' => '',
+			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
+			'control' => array(
+				Loc::getMessage('BT_SALE_ACT_GIFT_GROUP_PRODUCT_PREFIX'),
+			)
+		);
+	}
+
+	public static function Parse($arOneCondition)
+	{
+		return array(
+			'All' => 'AND'
+		);
+	}
+
+	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
+	{
+		//I have to notice current method can work only with Gifter's. For example, it is CCatalogGifterProduct.
+		//Probably in future we'll add another gifter's and create interface or class, which will tell about attitude to CSaleActionGiftCtrlGroup.
+		$mxResult = '';
+		$boolError = false;
+
+		if (!isset($arSubs) || !is_array($arSubs) || empty($arSubs))
+		{
+			$boolError = true;
+		}
+		else
+		{
+			$mxResult = '\Bitrix\Sale\Discount\Actions::applySimpleGift(' . $arParams['ORDER'] . ', ' . implode('; ',$arSubs) . ');';
+		}
+		return $mxResult;
+	}
+
+	public static function ProvideGiftProductData(array $fields)
+	{
+		if(isset($fields['ACTIONS']) && is_array($fields['ACTIONS']))
+		{
+			$fields['ACTIONS_LIST'] = $fields['ACTIONS'];
+		}
+
+		if (
+				(empty($fields['ACTIONS_LIST']) || !is_array($fields['ACTIONS_LIST']))
+				&& CheckSerializedData($fields['ACTIONS']))
+		{
+			$actions = unserialize($fields['ACTIONS']);
+		}
+		else
+		{
+			$actions = $fields['ACTIONS_LIST'];
+		}
+
+		if (!is_array($actions) || empty($actions) || empty($actions['CHILDREN']))
+		{
+			return array();
+		}
+
+		$giftCondGroups = array();
+		foreach($actions['CHILDREN'] as $child)
+		{
+			if(isset($child['CLASS_ID']) && isset($child['DATA']) && $child['CLASS_ID'] === static::GetControlID())
+			{
+				//we know that in GiftCondGroup may be only once child. See 'containsOneAction' option in method GetControlShow().
+				$giftCondGroups[] = reset($child['CHILDREN']);
+			}
+		}
+		unset($child);
+
+		$giftsData = array();
+		foreach($giftCondGroups as $child)
+		{
+			//todo so hard, but we can't made abstraction every time.
+			if(isset($child['CLASS_ID']) && isset($child['DATA']))
+			{
+				$gifter = static::getGifter($child);
+				if(!$gifter)
+				{
+					continue;
+				}
+				$giftsData[] = $gifter->ProvideGiftData($child);
+			}
+		}
+		unset($child);
+
+		return $giftsData;
+	}
+
+	protected static function getGifter(array $data)
+	{
+		if(in_array($data['CLASS_ID'], array('GifterCondIBElement', 'GifterCondIBSection')))
+		{
+			return new CCatalogGifterProduct;
+		}
+		return null;
+	}
+
+	/**
+	 * Extends list of products by base product, if we have SKU in list.
+	 *
+	 * @param array $productIds
+	 * @return array
+	 */
+	public static function ExtendProductIds(array $productIds)
+	{
+		return CCatalogGifterProduct::ExtendProductIds($productIds);
+	}
+}
+
 
 class CSaleActionCtrlAction extends CGlobalCondCtrlGroup
 {
@@ -755,14 +730,210 @@ class CSaleActionCtrlDelivery extends CSaleActionCtrl
 
 		if (!$boolError)
 		{
-			$arOneCondition['Value'] = doubleval($arOneCondition['Value']);
-			$dblVal = ('Extra' == $arOneCondition['Type'] ? $arOneCondition['Value'] : -$arOneCondition['Value']);
-			$strUnit = ('Cur' == $arOneCondition['Unit'] ? CSaleDiscountActionApply::VALUE_TYPE_FIX : CSaleDiscountActionApply::VALUE_TYPE_PERCENT);
-			$extMode = ('DiscountZero' == $arOneCondition['Type'] && $arOneCondition['Unit'] == 'Cur' ? 'true' : 'false');
-			$mxResult = 'CSaleDiscountActionApply::ApplyDelivery('.$arParams['ORDER'].', '.$dblVal.', "'.$strUnit.'", '.$extMode.');';
+			$arOneCondition['Value'] = (float)$arOneCondition['Value'];
+			$actionParams = array(
+				'VALUE' => ($arOneCondition['Type'] == 'Extra' ? $arOneCondition['Value'] : -$arOneCondition['Value']),
+				'UNIT' => ($arOneCondition['Unit'] == 'Cur' ? Sale\Discount\Actions::VALUE_TYPE_FIX : Sale\Discount\Actions::VALUE_TYPE_PERCENT)
+			);
+			if ($arOneCondition['Type'] == 'DiscountZero' && $arOneCondition['Unit'] == 'Cur')
+				$actionParams['MAX_BOUND'] = 'Y';
+
+			$mxResult = '\Bitrix\Sale\Discount\Actions::applyToDelivery('.$arParams['ORDER'].', '.var_export($actionParams, true).')';
+			unset($actionParams);
 		}
 
 		return $mxResult;
+	}
+}
+
+class CSaleActionGift extends CSaleActionCtrl
+{
+	public static function GetControlDescr()
+	{
+		$controlDescr = parent::GetControlDescr();
+
+		$controlDescr['PARENT'] = true;
+		$controlDescr['EXIST_HANDLER'] = 'Y';
+		$controlDescr['MODULE_ID'] = 'catalog';
+		$controlDescr['MODULE_ENTITY'] = 'iblock';
+		$controlDescr['ENTITY'] = 'ELEMENT';
+		$controlDescr['FIELD'] = 'ID';
+
+		return $controlDescr;
+	}
+
+	public static function GetClassName()
+	{
+		return __CLASS__;
+	}
+
+	public static function GetControlID()
+	{
+		return 'ActSaleGift';
+	}
+
+	public static function GetControlShow($arParams)
+	{
+		$arAtoms = static::GetAtomsEx(false, false);
+		if (static::$boolInit)
+		{
+			//here initialize
+		}
+		$arResult = array(
+			'controlId' => static::GetControlID(),
+			'group' => false,
+			'label' => Loc::getMessage('BT_SALE_ACT_GIFT_LABEL'),
+			'defaultText' => Loc::getMessage('BT_SALE_ACT_GIFT_DEF_TEXT'),
+			'showIn' => static::GetShowIn($arParams['SHOW_IN_GROUPS']),
+			'control' => array(
+				Loc::getMessage('BT_SALE_ACT_GIFT_GROUP_PRODUCT_PREFIX'),
+				$arAtoms['Type'],
+				$arAtoms['GiftValue'],
+			),
+		);
+
+		return $arResult;
+	}
+
+	public static function GetAtoms()
+	{
+		return static::GetAtomsEx(false, false);
+	}
+
+	public static function GetAtomsEx($strControlID = false, $boolEx = false)
+	{
+		$boolEx = (true === $boolEx ? true : false);
+		$arAtomList = array(
+			'Type' => array(
+				'JS' => array(
+					'id' => 'Type',
+					'name' => 'extra',
+					'type' => 'select',
+					'values' => array(
+						Sale\Discount\Actions::GIFT_SELECT_TYPE_ONE => Loc::getMessage('BT_SALE_ACT_GIFT_SELECT_TYPE_SELECT_ONE'),
+						Sale\Discount\Actions::GIFT_SELECT_TYPE_ALL => Loc::getMessage('BT_SALE_ACT_GIFT_SELECT_TYPE_SELECT_ALL'),
+					),
+					'defaultText' => Loc::getMessage('BT_SALE_ACT_GIFT_SELECT_TYPE_SELECT_DEF'),
+					'defaultValue' => 'one',
+					'first_option' => '...'
+				),
+				'ATOM' => array(
+					'ID' => 'Type',
+					'FIELD_TYPE' => 'string',
+					'FIELD_LENGTH' => 255,
+					'MULTIPLE' => 'N',
+					'VALIDATE' => 'list'
+				)
+			),
+			'GiftValue' => array(
+				'JS' => array(
+					'id' => 'GiftValue',
+					'name' => 'gifts_value',
+					'type' => 'multiDialog',
+					'popup_url' =>  '/bitrix/admin/cat_product_search_dialog.php',
+					'popup_params' => array(
+						'lang' => LANGUAGE_ID,
+						'caller' => 'discount'
+					),
+					'param_id' => 'n',
+					'show_value' => 'Y'
+				),
+				'ATOM' => array(
+					'ID' => 'GiftValue',
+
+					'PARENT' => true,
+					'EXIST_HANDLER' => 'Y',
+					'MODULE_ID' => 'catalog',
+					'MODULE_ENTITY' => 'iblock',
+					'ENTITY' => 'ELEMENT',
+					'FIELD' => 'ID',
+
+					'FIELD_TYPE' => 'int',
+					'VALIDATE' => 'element',
+					'PHP_VALUE' => array(
+						'VALIDATE' => 'element'
+					)
+				)
+			),
+		);
+
+		if (!$boolEx)
+		{
+			foreach ($arAtomList as &$arOneAtom)
+			{
+				$arOneAtom = $arOneAtom['JS'];
+			}
+				if (isset($arOneAtom))
+					unset($arOneAtom);
+		}
+
+		return $arAtomList;
+	}
+
+	public static function GetShowIn($arControls)
+	{
+		return array(CSaleActionCtrlGroup::GetControlID());
+	}
+
+	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
+	{
+		$mxResult = '';
+		if (is_string($arControl) && $arControl == static::GetControlID())
+		{
+			$arControl = array(
+				'ID' => static::GetControlID(),
+				'ATOMS' => static::GetAtoms()
+			);
+		}
+		$boolError = !is_array($arControl);
+
+		if (!$boolError)
+		{
+			$arControl['ATOMS'] = static::GetAtomsEx($arControl['ID'], true);
+			$arValues = static::CheckAtoms($arOneCondition, $arOneCondition, $arControl, true);
+			$boolError = ($arValues === false);
+		}
+
+		if (!$boolError)
+		{
+			$stringArray = 'array(' . implode(',', array_map('intval', $arOneCondition['GiftValue'])) . ')';
+			$type = $arOneCondition['Type'];
+
+			$mxResult = "CSaleDiscountActionApply::ApplyGiftDiscount({$arParams['ORDER']}, $stringArray, '{$type}');";
+		}
+
+		return $mxResult;
+	}
+
+	public static function getGiftDataByDiscount($fields)
+	{
+		if (
+				(empty($fields['ACTIONS_LIST']) || !is_array($fields['ACTIONS_LIST']))
+				&& CheckSerializedData($fields['ACTIONS']))
+		{
+			$actions = unserialize($fields['ACTIONS']);
+		}
+		else
+		{
+			$actions = $fields['ACTIONS_LIST'];
+		}
+
+		if (!is_array($actions) || empty($actions) || empty($actions['CHILDREN']))
+		{
+			return null;
+		}
+
+		$result = null;
+		foreach($actions['CHILDREN'] as $child)
+		{
+			if(isset($child['CLASS_ID']) && isset($child['DATA']) && $child['CLASS_ID'] === CSaleActionGift::GetControlID())
+			{
+				$result[] = $child['DATA'];
+			}
+		}
+		unset($child);
+
+		return $result;
 	}
 }
 
@@ -947,31 +1118,38 @@ class CSaleActionCtrlBasketGroup extends CSaleActionCtrlAction
 		if (!$boolError)
 		{
 			$arOneCondition['Value'] = doubleval($arOneCondition['Value']);
-			$dblVal = ('Extra' == $arOneCondition['Type'] ? $arOneCondition['Value'] : -$arOneCondition['Value']);
-			$strUnit = CSaleDiscountActionApply::VALUE_TYPE_PERCENT;
-			if ('CurEach' == $arOneCondition['Unit'])
+			switch ($arOneCondition['Unit'])
 			{
-				$strUnit = CSaleDiscountActionApply::VALUE_TYPE_FIX;
+				case 'CurEach':
+					$unit = Sale\Discount\Actions::VALUE_TYPE_FIX;
+					break;
+				case 'CurAll':
+					$unit = Sale\Discount\Actions::VALUE_TYPE_SUMM;
+					break;
+				default:
+					$unit = Sale\Discount\Actions::VALUE_TYPE_PERCENT;
+					break;
 			}
-			elseif ('CurAll' == $arOneCondition['Unit'])
-			{
-				$strUnit = CSaleDiscountActionApply::VALUE_TYPE_SUMM;
-			}
+			$discountParams = array(
+				'VALUE' => ($arOneCondition['Type'] == 'Extra' ? $arOneCondition['Value'] : -$arOneCondition['Value']),
+				'UNIT' => $unit
+			);
 
 			if (!empty($arSubs))
 			{
-				$strFuncName = '$saleact'.$arParams['FUNC_ID'];
-				$strLogic = ('AND' == $arOneCondition['All'] ? '&&' : '||');
+				$filter = '$saleact'.$arParams['FUNC_ID'];
 
-				$mxResult = $strFuncName.'=function($row){';
-				$mxResult .= 'return ('.implode(') '.$strLogic.' (', $arSubs).');';
+				$mxResult = $filter.'=function($row){';
+				$mxResult .= 'return ('.implode(') '.($arOneCondition['All'] == 'AND' ? '&&' : '||').' (', $arSubs).');';
 				$mxResult .= '};';
-				$mxResult .= 'CSaleDiscountActionApply::ApplyBasketDiscount('.$arParams['ORDER'].', '.$strFuncName.', '.$dblVal.', "'.$strUnit.'");';
+				$mxResult .= '\Bitrix\Sale\Discount\Actions::applyToBasket('.$arParams['ORDER'].', '.var_export($discountParams, true).', '.$filter.');';
+				unset($filter);
 			}
 			else
 			{
-				$mxResult = 'CSaleDiscountActionApply::ApplyBasketDiscount('.$arParams['ORDER'].', "", '.$dblVal.', "'.$strUnit.'");';
+				$mxResult = '\Bitrix\Sale\Discount\Actions::applyToBasket('.$arParams['ORDER'].', '.var_export($discountParams, true).', "");';
 			}
+			unset($discountParams, $unit);
 		}
 		return (!$boolError ? $mxResult : false);
 	}

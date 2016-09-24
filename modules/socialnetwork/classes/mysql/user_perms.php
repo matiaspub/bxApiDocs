@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя. 
+ * <b>CSocNetUserPerms</b> - класс для работы с правами на доступ к профилю пользователя.
  *
  *
  * @return mixed 
@@ -19,14 +19,14 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	* <p>Метод добавляет новую запись в таблицу прав на доступ к профайлу пользователя.</p>
+	* <p>Метод добавляет новую запись в таблицу прав на доступ к профайлу пользователя. Метод статический.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров записи с ключами<br><b>USER_ID</b> - код
 	* пользователя,<br><b>OPERATION_ID</b> - операция,<br><b>RELATION_TYPE</b> - тип отношений
 	* между пользователями.
 	*
-	* @return int <p>Код добавленной записи или false в случае ошибки.</p> <br><br>
+	* @return int <p>Код добавленной записи или false в случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetuserperms/Add.php
@@ -81,14 +81,14 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает список прав в соответствии с фильтром.</p>
+	* <p>Метод возвращает список прав в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения.
 	*
 	* @param array $arFilter = array() Массив, задающий группировку результирующего списка. Если
@@ -215,4 +215,3 @@ class CSocNetUserPerms extends CAllSocNetUserPerms
 		return $dbRes;
 	}
 }
-?>

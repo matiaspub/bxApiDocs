@@ -1,10 +1,12 @@
 <?
-use Bitrix\Main\Loader;
+use Bitrix\Main\Loader,
+	Bitrix\Main;
+
 IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CIBlock</b> - класс для работы с информационными блоками 
+ * <b>CIBlock</b> - класс для работы с информационными блоками
  *
  *
  * @return mixed 
@@ -24,24 +26,25 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Добавляет в административную панель кнопки для быстрого перехода к редактированию объектов модуля информационных блоков, с учётом прав доступа. Также состав кнопок различен для разных режимов панели. Метод статический. <br></p>
+	* <p>Добавляет в административную панель кнопки для быстрого перехода к редактированию объектов модуля информационных блоков, с учётом прав доступа. Также состав кнопок различен для разных режимов панели. Метод статический.   <br></p>
 	*
 	*
-	* @param int $IBLOCK_ID = 0 Код информационного блока. <br> если задан (больше нуля), то в панель
-	* добавляются кнопки на изменение параметров этого
+	* @param int $IBLOCK_ID = 0 Код информационного блока.          <br>        	 если задан (больше нуля),
+	* то в панель добавляются кнопки на изменение параметров этого
 	* информационного блока, на добавление в него разделов и элементов.
-	* <br>
+	*          <br>
 	*
-	* @param int $ELEMENT_ID = 0 Код элемента информационного блока. <br> если задан (больше нуля),
-	* то в панель добавляются кнопки на редактирование этого элемента
-	* и просмотр его истории изменений (при установленном модуле
-	* документооборота).
+	* @param int $ELEMENT_ID = 0 Код элемента информационного блока.          <br>        	 если задан
+	* (больше нуля), то в панель добавляются кнопки на редактирование
+	* этого элемента и просмотр его истории изменений (при
+	* установленном модуле документооборота).
 	*
-	* @param int $SECTION_ID = "" Код раздела информационного блока. <br> если задан, то в панель
-	* добавляются кнопки на изменение свойств этого раздела. <br>
+	* @param int $SECTION_ID = "" Код раздела информационного блока.          <br>        	 если задан, то в
+	* панель добавляются кнопки на изменение свойств этого раздела.      
+	*    <br>
 	*
-	* @param string $type = "news" Тип информационного блока. <br> если задан, то в панель добавляется
-	* кнопка добавления нового информационного блока.
+	* @param string $type = "news" Тип информационного блока.          <br>        	 если задан, то в панель
+	* добавляется кнопка добавления нового информационного блока.
 	*
 	* @param bool $bGetIcons = false Если параметр равен true, то вместо добавления кнопок в панель
 	* метод возвращает массив описывающий кнопки.
@@ -52,32 +55,34 @@ class CAllIBlock
 	*
 	* @param array $arLabels = array() Если задан, то элементы этого массива будут использованы для
 	* вывода названий кнопок и всплывающих подсказок. Возможны
-	* следующие ключи: <br><ul> <li>ELEMENT_ADD_TEXT - текст кнопки добавления
-	* элемента;</li> <li>ELEMENT_ADD_TITLE - всплывающая подсказка кнопки
-	* добавления элемента;</li> <li>ELEMENT_EDIT_TEXT - текст кнопки редактирования
-	* элемента;</li> <li>ELEMENT_EDIT_TITLE - всплывающая подсказка кнопки
-	* редактирования элемента;</li> <li>ELEMENTS_NAME_TEXT - текст кнопки просмотра
-	* списка элементов;</li> <li> ELEMENTS_NAME_TITLE - всплывающая подсказка кнопки
-	* просмотра списка элементов;</li> <li>SECTION_ADD_TEXT - текст кнопки
-	* добавления раздела;</li> <li>SECTION_ADD_TITLE - всплывающая подсказка кнопки
-	* добавления раздела;</li> <li>SECTION_EDIT_TEXT - текст кнопки редактирования
-	* раздела;</li> <li>SECTION_EDIT_TITLE - всплывающая подсказка кнопки
-	* редактирования раздела;</li> <li>SECTIONS_NAME_TEXT - текст кнопки просмотра
-	* списка разделов;</li> <li>SECTIONS_NAME_TITLE - всплывающая подсказка кнопки
-	* просмотра списка разделов.</li> </ul>
+	* следующие ключи:         <br><ul> <li>ELEMENT_ADD_TEXT - текст кнопки добавления
+	* элемента;</li>                    <li>ELEMENT_ADD_TITLE - всплывающая подсказка кнопки
+	* добавления элемента;</li>                    <li>ELEMENT_EDIT_TEXT - текст кнопки
+	* редактирования элемента;</li>                    <li>ELEMENT_EDIT_TITLE - всплывающая
+	* подсказка кнопки редактирования элемента;</li>                   
+	* <li>ELEMENTS_NAME_TEXT - текст кнопки просмотра списка элементов;</li>               
+	*     <li> ELEMENTS_NAME_TITLE - всплывающая подсказка кнопки просмотра списка
+	* элементов;</li>                    <li>SECTION_ADD_TEXT - текст кнопки добавления
+	* раздела;</li>                    <li>SECTION_ADD_TITLE - всплывающая подсказка кнопки
+	* добавления раздела;</li>                    <li>SECTION_EDIT_TEXT - текст кнопки
+	* редактирования раздела;</li>                    <li>SECTION_EDIT_TITLE - всплывающая
+	* подсказка кнопки редактирования раздела;</li>                   
+	* <li>SECTIONS_NAME_TEXT - текст кнопки просмотра списка разделов;</li>                 
+	*   <li>SECTIONS_NAME_TITLE - всплывающая подсказка кнопки просмотра списка
+	* разделов.</li>         </ul>
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$IBLOCK_TYPE = 'catalog';<br>if(CModule::IncludeModule('iblock')):<br>	if($arIBlockElement = GetIBlockElement($_GET['ID'], $IBLOCK_TYPE)):<br>		CIBlock::ShowPanel($arIBlockElement['IBLOCK_ID'], $_GET['ID'], 0, $IBLOCK_TYPE);<br>		$APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>		$APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], $arIBlockElement['LIST_PAGE_URL']);<br>		?&gt;<br>		&lt;?=$arIBlockElement['NAME']?&gt;&lt;br&gt;<br>		&lt;?=$arIBlockElement['DETAIL_TEXT']?&gt;<br>		&lt;?<br>	endif;<br>endif;<br>?&gt;<br>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php">CMain</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">ShowPanel</a> </li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php">CMain::GetPublicShowMode</a></li>
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">ShowPanel</a> </li>     <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php">CMain::GetPublicShowMode</a></li> 
 	* </ul><a name="examples"></a>
 	*
 	*
@@ -117,7 +122,7 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Метод добавляет в панель управления кнопки, отвечающие за управление элементами инфоблока (в методе производится вызов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a>). Метод динамичный.</p>
+	* <p>Метод добавляет в панель управления кнопки, отвечающие за управление элементами инфоблока (в методе производится вызов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a>). Нестатический метод.</p>
 	*
 	*
 	* @param string $mode  Режим отображения административной панели. Возвращается методом
@@ -280,11 +285,11 @@ class CAllIBlock
 	*
 	* @return array <p>Массив, описывающий набор кнопок (добавление, редактирование,
 	* настройка и пр.) с учётом уровней права доступа к информационным
-	* блокам. </p> <h4>Смотрите также</h4> <ul> <li><a
+	* блокам. </p><h4>Смотрите также</h4><ul> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные параметры
 	* информационных блоков</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetArrayByID.php">CIBlock::GetArrayByID</a></li> </ul>
-	* <br><br>
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetArrayByID.php">CIBlock::GetArrayByID</a></li>
+	* </ul><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpanelbuttons.php
@@ -705,23 +710,23 @@ class CAllIBlock
 	 */
 	
 	/**
-	* <p>Метод возвращает список сайтов к которым привязан инфоблок. Метод статический. <br></p>
+	* <p>Метод возвращает список сайтов к которым привязан инфоблок. Метод статический.   <br></p>
 	*
 	*
-	* @param int $iblock_id  Идентификатор информационного блока. <br>
+	* @param int $iblock_id  Идентификатор информационного блока.         <br>
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a></p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult.</a></p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$SITES = '';<br>$rsSites = CIBlock::GetSite($IBLOCK_ID);<br>while($arSite = $rsSites-&gt;Fetch())<br>	$SITES .= ($SITES!=""?" / ":"").htmlspecialchars($arSite["SITE_ID"]);<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a></li> </ul></b<a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li>   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a></li>  </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -743,15 +748,15 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает информационный блок по его коду <i>ID</i>. Метод динамичный.</p>
+	* <p>Возвращает информационный блок по его коду <i>ID</i>. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Код информационного блока.
+	* @param int $intID  Код информационного блока.
 	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $res = CIBlock::GetByID($_GET["BID"]);
 	* if($ar_res = $res-&gt;GetNext())
@@ -762,7 +767,7 @@ class CAllIBlock
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля результата</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля результата</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -782,25 +787,25 @@ class CAllIBlock
 	 */
 	
 	/**
-	* <p>Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей</a> информационного блока. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: если инфоблока с таким ID не существует, то метод вернет false.</div>
+	* <p>Возвращает массив <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей</a> информационного блока. Метод статический.</p>   <p></p> <div class="note"> <b>Примечание</b>: если инфоблока с таким ID не существует, то метод вернет false.</div>
 	*
 	*
-	* @param int $ID  Идентификатор информационного блока <br>
+	* @param int $intID  Идентификатор информационного блока          <br>
 	*
 	* @param string $FIELD = "" Идентификатор поля. Если этот параметр задан, то метод вернет
-	* значение конкретного поля. <br>
+	* значение конкретного поля.          <br>
 	*
 	* @return array <p>Массив полей инфоблока.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>echo CIBlock::GetArrayByID($IBLOCK_ID, "NAME");<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля инфоблока</a></li> </ul>
-	* <a name="examples"></a>
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля инфоблока</a></li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -916,43 +921,44 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Метод добавляет новый информационный блок. Модифицировать поля, а также отменить создание инфоблока можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a>. Метод динамичный.</p>
+	* <p>Метод добавляет новый информационный блок. Модифицировать поля, а также отменить создание инфоблока можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a>. Нестатический метод.</p>
 	*
 	*
-	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). 	Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">всех полей</a> информационного
-	* блока. <br><br> Дополнительно в поле SITE_ID должен находиться массив
-	* идентификаторов сайтов, к которым привязан добавляемый
-	* информационный блок. <br><br> Кроме того, с помощью поля "GROUP_ID",
-	* значением которого должен быть массив соответствий кодов групп
-	* правам доступа, можно установить права для разных групп на доступ
-	* к информационному блоку(см. <a
+	* блока. 	          <br><br>        	Дополнительно в поле SITE_ID должен находиться
+	* массив идентификаторов сайтов, к которым привязан добавляемый
+	* информационный блок.          <br><br>        	Кроме того, с помощью поля
+	* "GROUP_ID", значением которого должен быть массив соответствий кодов
+	* групп правам доступа, можно установить права для разных групп на
+	* доступ к информационному блоку(см. <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php">SetPermission()</a>). <br><br> Если
-	* задано поле "FIELDS", то будут выполнены настройки полей инфоблока
-	* (см. <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>). <br><br>
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php">SetPermission()</a>).          <br><br>
+	*        Если задано поле "FIELDS", то будут выполнены настройки полей
+	* инфоблока (см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>).          <br><br>
 	* Кроме того, предусмотрено поле "VERSION", определяющее способ
 	* хранения значений свойств элементов инфоблока (1 - в общей таблице
-	* | 2 - в отдельной). По умолчанию принимает значение <b>1</b>. <br><br> Если
-	* необходимо добавить инфоблок с поддержкой бизнес-процессов, то
-	* следует указать два дополнительных поля: <i>BIZPROC</i>, принимающее
+	* | 2 - в отдельной). По умолчанию принимает значение <b>1</b>.     <br><br>
+	* Если необходимо добавить инфоблок с поддержкой бизнес-процессов,
+	* то следует указать два дополнительных поля: <i>BIZPROC</i>, принимающее
 	* значение <b>Y</b>, и <i>WORKFLOW</i>, принимающее значение <b>N</b>.
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;<br>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a> </li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационного
-	* блока</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li> </ul> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a> </li>    
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационного
+	* блока</a></li>     <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">OnBeforeIBlockAdd</a></li>     <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">OnAfterIBlockAdd</a></li>   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li>   </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1154,39 +1160,40 @@ class CAllIBlock
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Метод изменяет параметры информационного блока с кодом <i>ID</i>. Модифицировать поля, а также отменить изменение параметров можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>. Метод динамичный.</p>
+	* <p>Метод изменяет параметры информационного блока с кодом <i>ID</i>. Модифицировать поля, а также отменить изменение параметров можно добавив обработчик события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>. После успешного добавления инфоблока вызываются обработчики события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  ID изменяемого информационного блока.
+	* @param int $intID  ID изменяемого информационного блока.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">всех полей</a> информационного
-	* блока. <br> Дополнительно в поле SITE_ID должен находиться массив
-	* идентификаторов сайтов, к которым привязан изменяемый
-	* информационный блок. <br> Кроме того, с помощью поля "GROUP_ID",
+	* блока.          <br>       Дополнительно в поле SITE_ID должен находиться
+	* массив идентификаторов сайтов, к которым привязан изменяемый
+	* информационный блок.          <br>       Кроме того, с помощью поля "GROUP_ID",
 	* значением которого должен быть массив соответствий кодов групп
 	* правам доступа, можно установить права для разных групп на доступ
 	* к информационному блоку(см. <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php">SetPermission()</a>). <br> Если
-	* задано поле "FIELDS", то будут выполнены настройки полей инфоблока
-	* (см. <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>). <br>
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/setpermission.php">SetPermission()</a>).          <br>    
+	*   Если задано поле "FIELDS", то будут выполнены настройки полей
+	* инфоблока (см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>).          <br>
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arPICTURE = $_FILES["PICTURE"];<br>$ib = new CIBlock;<br>$arFields = Array(<br>  "ACTIVE" =&gt; $ACTIVE,<br>  "NAME" =&gt; $NAME,<br>  "CODE" =&gt; $CODE,<br>  "LIST_PAGE_URL" =&gt; $LIST_PAGE_URL,<br>  "DETAIL_PAGE_URL" =&gt; $DETAIL_PAGE_URL,<br>  "IBLOCK_TYPE_ID" =&gt; $type,<br>  "SITE_ID" =&gt; Array("en", "de"),<br>  "SORT" =&gt; $SORT,<br>  "PICTURE" =&gt; $arPICTURE,<br>  "DESCRIPTION" =&gt; $DESCRIPTION,<br>  "DESCRIPTION_TYPE" =&gt; $DESCRIPTION_TYPE,<br>  "GROUP_ID" =&gt; Array("2"=&gt;"D", "3"=&gt;"R")<br>  );<br>if ($ID &gt; 0)<br>  $res = $ib-&gt;Update($ID, $arFields);<br>else<br>{<br>  $ID = $ib-&gt;Add($arFields);<br>  $res = ($ID&gt;0);<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационного блока</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a> </li>
-	* </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">OnBeforeIBlockUpdate</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">OnAfterIBlockUpdate</a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1397,13 +1404,13 @@ class CAllIBlock
 	* <p>Метод удаляет информационный блок. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Код информационного блока.
+	* @param int $intID  Код информационного блока.
 	*
 	* @return bool <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockdelete.php">OnBeforeIBlockDelete</a><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>if($USER-&gt;IsAdmin())<br>{<br>	$DB-&gt;StartTransaction();<br>	if(!CIBlock::Delete($iblock_id))<br>	{<br>		$strWarning .= GetMessage("IBLOCK_DELETE_ERROR");<br>		$DB-&gt;Rollback();<br>	}<br>	else<br>		$DB-&gt;Commit();<br>}<br>?&gt;<br>
 	* </pre>
 	*
@@ -1472,6 +1479,8 @@ class CAllIBlock
 			if(!CIBlockProperty::Delete($property["ID"]))
 				return false;
 		}
+
+		CFile::Delete(self::GetArrayByID($ID , "PICTURE"));
 
 		$seq = new CIBlockSequence($ID);
 		$seq->Drop(true);
@@ -1650,27 +1659,28 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Метод устанавливает права доступа <span class="syntax"><i>arPERMISSIONS</i> для информационного блока <i>IBLOCK_ID</i></span>. Перед этим все права установленные ранее снимаются. Метод динамичный. <br></p>
+	* <p>Метод устанавливает права доступа <span class="syntax"><i>arPERMISSIONS</i> для информационного блока <i>IBLOCK_ID</i></span>. Перед этим все права установленные ранее снимаются. Нестатический метод.   <br></p>
 	*
 	*
 	* @param int $IBLOCK_ID  Код информационного блока.
 	*
 	* @param array $arPERMISSIONS  Массив вида Array("код группы"=&gt;"право доступа", ....), где <i>право
-	* доступа</i>: <br> D - доступ запрещён, <br> R - чтение, <br> U - редактирование
-	* через документооборот, <br> W - запись, <br> X - полный доступ (запись +
-	* назначение прав доступа на данный инфоблок).
+	* доступа</i>:         <br>        	 D - доступ запрещён,          <br>        	 R - чтение,   
+	*      <br>        	 U - редактирование через документооборот,         <br>        	 W -
+	* запись,         <br>        	 X - полный доступ (запись + назначение прав
+	* доступа на данный инфоблок).
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>CIBlock::SetPermission($IBLOCK_ID, Array("1"=&gt;"X", "2"=&gt;"R", "3"=&gt;"W"));<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpermission.php">GetPermission()</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getpermission.php">GetPermission()</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/index.php">CIBlock</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">Update()</a> </li> </ul><a
 	* name="examples"></a>
@@ -1758,18 +1768,18 @@ class CAllIBlock
 
 	
 	/**
-	* <p>Метод устанавливает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: значения полей не указанных в параметре arFields сохраняются.</div>
+	* <p>Метод устанавливает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>. Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание</b>: значения полей не указанных в параметре arFields сохраняются.</div>
 	*
 	*
-	* @param int $ID  Код инфоблока <br>
+	* @param int $intID  Код инфоблока         <br>
 	*
-	* @param array $arFields  Массив вида array("Поле" =&gt; "Значение" ...) <br>
+	* @param array $arFields  Массив вида array("Поле" =&gt; "Значение" ...)         <br>
 	*
 	* @return mixed <p>Метод ничего не возвращает.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
-	* поля</a> </li> </ul> </h<br>
+	* поля</a> </li>  </ul><br>
 	*
 	*
 	* @static
@@ -1831,7 +1841,7 @@ class CAllIBlock
 	* <p>Метод возвращает значения <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">дополнительных полей</a> инфоблока. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Код инфоблока.
+	* @param int $intID  Код инфоблока.
 	*
 	* @param string $type = "" Код типа инфоблоков. <br><br> Параметр используется только тогда,
 	* когда инфоблок с указанным ID не найден или указан 0. В этом случае
@@ -1844,8 +1854,8 @@ class CAllIBlock
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetMessages.php">CIBlock::SetMessages</a></li>
-	* <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
-	* поля</a></li> </ul> </h<br><br>
+	*   <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblocklang">Дополнительные
+	* поля</a></li>  </ul><br><br>
 	*
 	*
 	* @static
@@ -1998,7 +2008,7 @@ REQ
 				),
 				"XML_ID" => array(
 					"NAME" => GetMessage("IBLOCK_FIELD_XML_ID"),
-					"IS_REQUIRED" => false,
+					"IS_REQUIRED" => "Y",
 				),
 				"CODE" => array(
 					"NAME" => GetMessage("IBLOCK_FIELD_CODE"),
@@ -2126,20 +2136,20 @@ REQ
 
 	
 	/**
-	* <p>Метод изменяет описание полей элементов инфоблоков. С ее помощью можно отметить поля как обязательные для заполнения, а также установить значение по умолчанию для новых элементов. Метод статический. <br></p> <p></p> <div class="note"> <b>Примечание</b>: обязательность полей будет проверена в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>, а значение по умолчанию будет установлено только в форме редактирования элемента в административной части сайта.</div>
+	* <p>Метод изменяет описание полей элементов инфоблоков. С ее помощью можно отметить поля как обязательные для заполнения, а также установить значение по умолчанию для новых элементов. Метод статический.   <br></p>   <p></p> <div class="note"> <b>Примечание</b>: обязательность полей будет проверена в методах <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>, а значение по умолчанию будет установлено только в форме редактирования элемента в административной части сайта.</div>
 	*
 	*
-	* @param int $ID  Код информационного блока. <br>
+	* @param int $intID  Код информационного блока.          <br>
 	*
 	* @param array $arFields  Массив вида array("код поля" =&gt; "значение" ...), где значение это массив
-	* содержащий следующие элементы: <br><ul> <li>IS_REQUIRED - признак
-	* обязательности заполнения (Y|N).</li> <li>DEFAULT_VALUE - значение поля по
-	* умолчанию. <br> </li> </ul>
+	* содержащий следующие элементы:          <br><ul> <li>IS_REQUIRED - признак
+	* обязательности заполнения (Y|N).</li>                     <li>DEFAULT_VALUE - значение
+	* поля по умолчанию.              <br> </li>          </ul>
 	*
 	* @return mixed <p>Метод ничего не возвращает.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* //Как сделать поле "Символьный код" обязательным
 	* if (CModule::IncludeModule('iblock'))
 	* {
@@ -2148,9 +2158,7 @@ REQ
 	* $fields["CODE"]["IS_REQUIRED"] = "Y";
 	* CIBlock::setFields($Id, $fields);
 	* ;
-	* }
-	* 
-	* //Дополнительные настройки для поля "Символьный код" 
+	* }//Дополнительные настройки для поля "Символьный код" 
 	* $arFields["CODE"]["DEFAULT_VALUE"]["UNIQUE"] = "Y";//Если код задан, то проверять на уникальность
 	* $arFields["CODE"]["DEFAULT_VALUE"]["TRANSLITERATION"] = "Y";//Транслитерировать из названия при добавлении элемента
 	* 
@@ -2160,7 +2168,7 @@ REQ
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblockfields">Поля элемента</a> </li>
-	* </ul> <br>
+	*  </ul><br>
 	*
 	*
 	* @static
@@ -2475,12 +2483,12 @@ REQ
 	* <p>Метод возвращает описание полей элементов инфоблоков. Структура массива описана в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a>. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Код информационного блока.<br>
+	* @param int $intID  Код информационного блока.<br>
 	*
-	* @return array <p>Массив.</p></bo
+	* @return array <p>Массив.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a> </li> 
 	* </ul><br>
 	*
 	*
@@ -2547,7 +2555,7 @@ REQ
 
 	
 	/**
-	* Возвращает свойства информационного блока <span class="syntax"><i>iblock_id</i></span> с возможностью сортировки и дополнительной фильтрации. Метод динамичный. <br><p></p> <div class="note"> <b>Примечание:</b> по умолчанию метод учитывает права доступа к информационному блоку. Для отключения проверки необходимо в параметре arFilter передать ключ "CHECK_PERMISSIONS" со значением "N".</div> <br>
+	* Возвращает свойства информационного блока <span class="syntax"><i>iblock_id</i></span> с возможностью сортировки и дополнительной фильтрации. Нестатический метод. <br><p></p> <div class="note"> <b>Примечание:</b> по умолчанию метод учитывает права доступа к информационному блоку. Для отключения проверки необходимо в параметре arFilter передать ключ "CHECK_PERMISSIONS" со значением "N".</div> <br>
 	*
 	*
 	* @param int $iblock_id  Код информационного блока.
@@ -2565,17 +2573,15 @@ REQ
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$res = CIBlock::GetProperties($IBLOCK_ID, Array(), Array("CODE"=&gt;"SRC"));<br>if($res_arr = $res-&gt;Fetch())<br>	$SrcPropID = $res_arr["ID"];<br>else<br>{<br>	$arFields = Array(<br>		"NAME" 			=&gt; "Источник импорта",<br>		"ACTIVE" 		=&gt; "Y",<br>		"SORT" 			=&gt; "1000",<br>		"DEFAULT_VALUE" =&gt; "",<br>		"CODE" 			=&gt; "SRC",<br>		"ROW_COUNT" 	=&gt; "1",<br>		"COL_COUNT" 	=&gt; "10",<br>		"MULTIPLE"	 	=&gt; "N",<br>		"MULTIPLE_CNT" 	=&gt; "",<br>		"PROPERTY_TYPE"	=&gt; "S",<br>		"LIST_TYPE" 	=&gt; "L",<br>		"IBLOCK_ID" 	=&gt; $IBLOCK_ID<br>		);<br>	$ibp = new CIBlockProperty;<br>	$SrcPropID = $ibp-&gt;Add($arFields);<br>	if(IntVal($SrcPropID)&lt;=0)<br>		$strWarning .= $ibp-&gt;LAST_ERROR."&lt;br&gt;";<br>}<br>?&gt;<br>
-	* 
-	* </ht
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойств</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/getlist.php">GetList()</a> </li> </ul> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">Поля свойств</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/index.php">CIBlockProperty</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/getlist.php">GetList()</a> </li>  </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -2583,7 +2589,7 @@ REQ
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getproperties.php
 	* @author Bitrix
 	*/
-	public static function GetProperties($ID, $arOrder=Array(), $arFilter=Array())
+	public static function GetProperties($ID, $arOrder = array(), $arFilter = array())
 	{
 		$props = new CIBlockProperty();
 		$arFilter["IBLOCK_ID"] = $ID;
@@ -2592,15 +2598,15 @@ REQ
 
 	
 	/**
-	* <p>Возвращает права доступа к информационному блоку ID для всех групп пользователей. Метод динамичный.</p>
+	* <p>Возвращает права доступа к информационному блоку ID для всех групп пользователей. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код информационного блока.
+	* @param mixed $intID  Код информационного блока.
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выбор списка пользователей, имеющих право доступа на чтение инфоблока $IBLOCK_ID<br>$gr_res = CIBlock::GetGroupPermissions($IBLOCK_ID);<br>$res = Array(1);<br>foreach($gr_res as $group_id=&gt;$perm)<br>if($perm&gt;"R")<br>   $res[] = $group_id;<br>$res = CUser::GetList($by="NAME", $order="ASC", Array("GROUP_MULTI"=&gt;$res));<br>?&gt;
 	* </pre>
@@ -2620,21 +2626,26 @@ REQ
 		/** @global CDatabase $DB */
 		global $DB;
 		$arRes = array();
+		$ID = (int)$ID;
+		if ($ID <= 0)
+			return $arRes;
 
 		$dbres = $DB->Query("
 			SELECT GROUP_ID, PERMISSION
 			FROM b_iblock_group
-			WHERE IBLOCK_ID = ".intval($ID)."
+			WHERE IBLOCK_ID = ".$ID."
 		");
 		while($res = $dbres->Fetch())
 			$arRes[$res["GROUP_ID"]] = $res["PERMISSION"];
+		unset($res);
+		unset($dbres);
 
 		return $arRes;
 	}
 
 	
 	/**
-	* <p>Возвращает право доступа к информационному блоку <i>IBLOCK_ID</i> для пользователя с кодом <i>FOR_USER_ID</i> или для текущего пользователя (если код не задан). Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> метод считается устаревшим (не работает при использовании расширенных прав). Рекомендуется использовать <b>CIBlockElementRights::UserHasRightTo</b> и <b>CIBlockSectionRights::UserHasRightTo</b>.</div>
+	* <p>Возвращает право доступа к информационному блоку <i>IBLOCK_ID</i> для пользователя с кодом <i>FOR_USER_ID</i> или для текущего пользователя (если код не задан). Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание:</b> метод считается устаревшим (не работает при использовании расширенных прав). Рекомендуется использовать <b>CIBlockElementRights::UserHasRightTo</b> и <b>CIBlockSectionRights::UserHasRightTo</b>.</div>
 	*
 	*
 	* @param int $IBLOCK_ID  Код информационного блока.
@@ -2647,7 +2658,7 @@ REQ
 	* + право изменять права доступа).</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$iblock_permission = CIBlock::GetPermission($id);<br>if($iblock_permission&lt;"X")<br>		return false;<br>?&gt;<br>
 	* </pre>
 	*
@@ -2655,7 +2666,7 @@ REQ
 	* <h4>See Also</h4> 
 	* <ul> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/getgrouppermissions.php">CIBlock::GetGroupPermissions</a></li>
-	* <li><a
+	*   <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getusergroupstring.php">CUser::GetUserGroupString</a></li>
 	* </ul><a name="examples"></a>
 	*
@@ -3602,13 +3613,13 @@ REQ
 
 	
 	/**
-	* <p>Метод возвращает количество элементов информационного блока. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: активность элементов и права доступа не учитываются.</div>
+	* <p>Метод возвращает количество элементов информационного блока. Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание</b>: активность элементов и права доступа не учитываются.</div>
 	*
 	*
-	* @param int $iblock_id  Код информационного блока. <br><br> До версии 7.1.5 параметр назывался
-	* BID.
+	* @param int $iblock_id  Код информационного блока.         <br><br> До версии 7.1.5 параметр
+	* назывался BID.
 	*
-	* @return int <p>Целое число.</p><p> <br></p>
+	* @return int <p>Целое число.</p><p>   <br></p>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/GetElementCount.php
@@ -3634,7 +3645,7 @@ REQ
 
 	
 	/**
-	* <p>Метод выполняет масштабирование файла. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан.</div> <br>
+	* <p>Метод выполняет масштабирование файла. Метод статический.</p>   <p></p> <div class="note"> <b>Примечание</b>: обрабатываются только файлы JPEG, GIF и PNG (зависит от используемой библиотеки GD). Файл указанный в параметре arFile будет перезаписан.</div>    <br>
 	*
 	*
 	* @param array $arFile  Массив, описывающий файл. Это может быть элемент массива $_FILES[имя]
@@ -3643,34 +3654,35 @@ REQ
 	* версии модуля <b>14.0.0</b> массив файла передается в ключе <i>VALUE</i>, а
 	* описание - в ключе <i>DESCRIPTION</i>.
 	*
-	* @param array $arResize  Массив параметров масштабирования. Содержит следующие ключи:
-	* <br><ul> <li>WIDTH - целое число. Размер картинки будет изменен таким
-	* образом, что ее ширина не будет превышать значения этого поля. <br>
-	* </li> <li>HEIGHT - целое число. Размер картинки будет изменен таким
-	* образом, что ее высота не будет превышать значения этого поля. </li>
-	* <li>METHOD - возможные значения: resample или пусто. Значение поля равное
-	* "resample" приведет к использованию функции масштабирования
-	* imagecopyresampled, а не imagecopyresized. Это более качественный метод, но требует
-	* больше серверных ресурсов. <br> </li> <li>COMPRESSION - целое от 0 до 100. Если
-	* значение больше 0, то для изображений jpeg оно будет использовано
-	* как параметр компрессии. 100 соответствует наилучшему качеству
-	* при большем размере файла. </li> </ul> Параметры METHOD и COMPRESSION
-	* применяются только если происходит изменение размера. Если
-	* картинка вписывается в ограничения WIDTH и HEIGHT, то никаких действий
-	* над файлом выполнено не будет. <br><br>
+	* @param array $arResize  Массив параметров масштабирования. Содержит следующие ключи:       
+	*   <br><ul> <li>WIDTH - целое число. Размер картинки будет изменен таким
+	* образом, что ее ширина не будет превышать значения этого поля.       
+	*       <br> </li>                     <li>HEIGHT - целое число. Размер картинки будет
+	* изменен таким образом, что ее высота не будет превышать значения
+	* этого поля. </li>                              <li>METHOD - возможные значения: resample
+	* или пусто. Значение поля равное "resample" приведет к использованию
+	* функции масштабирования imagecopyresampled, а не imagecopyresized. Это более
+	* качественный метод, но требует больше серверных ресурсов.             
+	* <br> </li>                     <li>COMPRESSION - целое от 0 до 100. Если значение больше 0,
+	* то для изображений jpeg оно будет использовано как параметр
+	* компрессии. 100 соответствует наилучшему качеству при большем
+	* размере файла. </li>          </ul>       Параметры METHOD и COMPRESSION применяются
+	* только если происходит изменение размера. Если картинка
+	* вписывается в ограничения WIDTH и HEIGHT, то никаких действий над
+	* файлом выполнено не будет.         <br><br>
 	*
 	* @return array <p>Массив описывающий файл или строка с сообщением об ошибке.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("MyHandlers", "ResizeElementProperty"));<br>AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", Array("MyHandlers", "ResizeElementProperty"));<br><br>class MyHandlers<br>{<br>	function ResizeElementProperty(&amp;$arFields)<br>	{<br>		global $APPLICATION;<br>		//Код инфоблока свойство каторого нуждается в масштабировании<br>		$IBLOCK_ID = 1;<br>		//Идентификатор свойства<br>		$PROPERTY_ID = 15;<br>		//Наш инфоблок и значения свойства в наличии<br>		if(<br>			$arFields["IBLOCK_ID"] == $IBLOCK_ID<br>			&amp;&amp; is_array($arFields["PROPERTY_VALUES"])<br>			&amp;&amp; array_key_exists(15, $arFields["PROPERTY_VALUES"])<br>		)<br>		{<br>			foreach($arFields["PROPERTY_VALUES"][$PROPERTY_ID] as $key =&gt; $arFile)<br>			{<br>				//Изменяем размеры картинки<br>				$arNewFile = CIBlock::ResizePicture($arFile, array(<br>					"WIDTH" =&gt; 100,<br>					"HEIGHT" =&gt; 100,<br>					"METHOD" =&gt; "resample",<br>				));<br>				if(is_array($arNewFile))<br>					$arFields["PROPERTY_VALUES"][$PROPERTY_ID][$key] = $arNewFile;<br>				else<br>				{<br>					//Можно вернуть ошибку<br>					$APPLICATION-&gt;throwException("Ошибка масштабирования изображения в свойстве \"Файлы\":".$arNewFile);<br>					return false;<br>				}<br>			}<br>		}<br>	}<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a></li>
-	* <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li> </ul><a
-	* name="examples"></a>
+	*     <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/SetFields.php">CIBlock::SetFields</a></li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -4151,7 +4163,6 @@ REQ
 		)
 			$DB->DDL("create index ix_iblock_section_code on b_iblock_section (IBLOCK_ID, CODE)");
 	}
-
 
 	public static function GetAuditTypes()
 	{

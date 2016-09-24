@@ -2,20 +2,31 @@
 
 IncludeModuleLangFile($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/ratings.php");
 
+
+/**
+ * <b>CRatings</b> - класс для работы с рейтингами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/index.php
+ * @author Bitrix
+ */
 class CAllRatings
 {
 	// get specified rating record
 	
 	/**
-	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.  Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рейтинга
+	* @param int $intID  Идентификатор рейтинга
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $ID = 4;
 	* $rsRating = CRatings::GetByID($ID);
@@ -26,10 +37,10 @@ class CAllRatings
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
-	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li>
-	* </ul></b<a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>  
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a></li>   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a></li> </ul><a
+	* name="examples"></a>
 	*
 	*
 	* @static
@@ -61,15 +72,15 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива. Динамичный метод.</p>
+	* <p>Метод возвращает параметры рейтинга с идентификатором id в виде массива. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рейтинга
+	* @param int $intID  Идентификатор рейтинга
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $ID = 4;
 	* $arRating = CRatings::GetArrayByID($ID);
@@ -79,7 +90,7 @@ class CAllRatings
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getlist.php">CRatings::GetList</a> </li>  
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> </ul><a
 	* name="examples"></a>
 	*
@@ -142,26 +153,22 @@ class CAllRatings
 	// get rating record list
 	
 	/**
-	* <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
+	* <p>Метод возвращает список рейтингов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Cтатический метод.</p>
 	*
 	*
-	* @param  $array  Порядок сортировки возвращаемого списка, заданный в виде
+	* @param array $arSort  Порядок сортировки возвращаемого списка, заданный в виде
 	* массива. Ключами в массиве являются поля для сортировки, а
 	* значениями - ASC/DESC - порядок сортировки. Допустимые ключи: ID, NAME,
 	* CREATED, LAST_MODIFIED, LAST_CALCILATED, ACTIVE, STATUS, CALCULATED, CALCULATION_METHOD, ENTITY_ID.
 	*
-	* @param arSor $t  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param array $arFilter  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: ID, ACTIVE, CALCULATED, NAME, ENTITY_ID
-	*
-	* @param  $array  
-	*
-	* @param arFilte $r  
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arRatings = array(); 
 	* $rsRatings = CRatings::GetList( 
@@ -176,10 +183,10 @@ class CAllRatings
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li>
-	* </ul></b<a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">Класс CDBResult</a> </li>  
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getbyid.php">CRatings::GetByID</a> </li>   <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/getarraybyid.php">CRatings::GetArrayByID</a> </li>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -294,21 +301,21 @@ class CAllRatings
 	//Addition rating
 	
 	/**
-	* <p>Метод добавляет новый рейтинг. Динамичный метод.</p>
+	* <p>Метод добавляет новый рейтинг. Нестатический метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
-	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
-	* объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
-	* рейтинга (SUM -суммирование критериев, AVG – средние значение
-	* критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
-	* рейтингования.</li> </ul> Все поля являются обязательными.
+	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li>     <li>
+	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li>     <li> <b>ENTITY_ID</b> – оцениваемый
+	* объект (например: USER, BLOG, и т.д.)</li>     <li> <b>CALCULATION_METHOD</b> – тип
+	* подсчета рейтинга (SUM -суммирование критериев, AVG – средние
+	* значение критериев)</li>     <li> <b>CONFIGS</b> – массив, описывающий
+	* критерии рейтингования.</li> </ul> Все поля являются обязательными.
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // создадим рейтинг с критериями рейтингования от модуля форум и блог
 	* // учитывать будем только рейтинговые голосования, активность учитывать не будем
@@ -376,7 +383,7 @@ class CAllRatings
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li>Метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cratings/update.php">CRating::Update</a>
-	* </li> </ul></bo<a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -430,24 +437,24 @@ class CAllRatings
 	//Update rating
 	
 	/**
-	* <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>. Динамичный метод.</p>
+	* <p>Метод изменяет параметры рейтинга с идентификатором <i>id</i>. Нестатический метод.</p>
 	*
 	*
-	* @param int $id  Идентификатор рейтинга.
+	* @param int $intid  Идентификатор рейтинга.
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
-	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li> <li>
-	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li> <li> <b>ENTITY_ID</b> – оцениваемый
-	* объект (например: USER, BLOG, и т.д.)</li> <li> <b>CALCULATION_METHOD</b> – тип подсчета
-	* рейтинга (SUM-суммирование критериев, AVG – средние значение
-	* критериев)</li> <li> <b>CONFIGS</b> – массив, описывающий критерии
-	* рейтингования</li> <li> <b>NEW_CALC</b> – обнуляет предыдущее значение
-	* рейтинга</li> </ul>
+	* допустимо использовать: <ul> <li> <b>NAME</b> – название рейтинга</li>     <li>
+	* <b>ACTIVE</b> – активность рейтинга (Y|N)</li>     <li> <b>ENTITY_ID</b> – оцениваемый
+	* объект (например: USER, BLOG, и т.д.)</li>      <li> <b>CALCULATION_METHOD</b> – тип
+	* подсчета рейтинга (SUM-суммирование критериев, AVG – средние
+	* значение критериев)</li>      <li> <b>CONFIGS</b> – массив, описывающий
+	* критерии рейтингования</li>       <li> <b>NEW_CALC</b>  –  обнуляет предыдущее
+	* значение рейтинга</li> </ul>
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // изменим название рейтинга и сделаем его не активным
 	* $arUpdateRating = array(
@@ -538,15 +545,15 @@ class CAllRatings
 	// delete rating
 	
 	/**
-	* <p>Метод удаляет рейтинг с идентификатором ID. Динамичный метод.</p>
+	* <p>Метод удаляет рейтинг с идентификатором ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $id  Идентификатор рейтинга
+	* @param int $intid  Идентификатор рейтинга
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // удаление рейтинга
 	* $ID = 1;
@@ -587,10 +594,10 @@ class CAllRatings
 	// start calculation rating-component
 	
 	/**
-	* <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>. Динамичный метод.</p>
+	* <p>Метод подсчитывает результаты рейтинга с идентификатором <i>id</i>. Нестатический метод.</p>
 	*
 	*
-	* @param int $id  Идентификатор рейтинга
+	* @param int $intid  Идентификатор рейтинга
 	*
 	* @param bool $forceRecalc  Принудительный пересчет. Если данный параметр установлен в
 	* <b>true</b>, то критерии рейтинга будут пересчитаны без учета времени
@@ -599,7 +606,7 @@ class CAllRatings
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // принудительно пересчитаем все критерии рейтинга
 	* $ID = 4;
@@ -667,13 +674,13 @@ class CAllRatings
 	// queries modules and get all the available objects
 	
 	/**
-	* <p>Метод возвращает все доступные объекты рейтинговая. Динамичный метод.</p>
+	* <p>Метод возвращает все доступные объекты рейтинговая. Нестатический метод.</p>
 	*
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arObjects = CRatings:: GetRatingObjects();
 	* echo "&lt;pre&gt;"; print_r($arObjects); echo "&lt;/pre&gt;";
@@ -733,7 +740,7 @@ class CAllRatings
 	// queries modules and assemble an array of settings
 	
 	/**
-	* <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта. Динамичный метод.</p>
+	* <p>Метод возвращает все доступные критерии рейтингования и их настройки для указанного оцениваемого объекта. Нестатический метод.</p>
 	*
 	*
 	* @param int $objectType  Имя оцениваемого объекта.
@@ -743,7 +750,7 @@ class CAllRatings
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $objectType = 'USER';
 	* $arRatinConfigs = CRatings::GetRatingConfigs($objectType);
@@ -799,7 +806,7 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>. Динамичный метод.</p>
+	* <p>Метод возвращает результаты рейтингового голосования для сущности с именем <i>entityTypeId</i> и идентификатором <i>entityId</i>. Нестатический метод.</p>
 	*
 	*
 	* @param int $entityTypeId  Название сущности голосования. Например: FORUM_TOPIC для тем форума,
@@ -816,7 +823,7 @@ class CAllRatings
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $entityTypeId = 'FORUM_TOPIC';
 	* $entityId = 38;
@@ -940,10 +947,10 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>. Динамичный метод.</p>
+	* <p>Метод возвращает результаты рейтинга для оцениваемой сущности с идентификатором <i>entityId</i>. Нестатический метод.</p>
 	*
 	*
-	* @param int $Id  идентификатор рейтинга
+	* @param int $intId  идентификатор рейтинга
 	*
 	* @param mixed $entityId  идентификатор оцениваемого объекта (можно выбрать несколько
 	* результатов, указав в этом параметре массив идентификаторов)
@@ -951,7 +958,7 @@ class CAllRatings
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $ratingId = 4;
 	* $entityId = 1;
@@ -1058,23 +1065,23 @@ class CAllRatings
 
 	
 	/**
-	* <p>Метод добавляет голос к рейтинговому голосованию. Динамичный метод.</p>
+	* <p>Метод добавляет голос к рейтинговому голосованию.  Нестатический метод.</p>
 	*
 	*
 	* @param array $Param  Массив значений параметров. В качестве ключей данного массива
 	* допустимо использовать: <ul> <li> <b>ENTITY_TYPE_ID</b> – объект голосования.
 	* Например: FORUM_TOPIC для тем форума, FORUM_POST для сообщений форума, BLOG_POST
 	* для постов в блоге, BLOG_COMMENT для комментариев в блоге. Сам список
-	* кодов не регламентирован, можно использовать любой удобный.</li> <li>
-	* <b>ENTITY_ID</b> – идентификатор объекта голосования</li> <li> <b>VALUE</b> –
-	* выставленная оценка</li> <li> <b>USER_ID</b> – идентификатор
-	* пользователя</li> <li> <b>USER_IP</b> – IP-адрес пользователя</li> </ul> Все поля
-	* являются обязательными.
+	* кодов не регламентирован, можно использовать любой удобный.</li>    
+	* <li> <b>ENTITY_ID</b> – идентификатор объекта голосования</li>     <li> <b>VALUE</b> 
+	* – выставленная оценка</li>     <li> <b>USER_ID</b> – идентификатор
+	* пользователя</li>     <li> <b>USER_IP</b> – IP-адрес пользователя</li> </ul> Все
+	* поля являются обязательными.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // добавляем теме отрицательную оценку.
 	* $arAddVote = array(
@@ -1838,5 +1845,153 @@ class CAllRatings
 	{
 		return "<br>Class: CRatings<br>File: ".__FILE__;
 	}
+
+	public static function GetRatingVoteList($arParam)
+	{
+		global $DB, $USER;
+
+		$bplus = true;
+		if (strtoupper($arParam['LIST_TYPE']) == 'MINUS')
+			$bplus = false;
+
+		$sqlStr = "
+			SELECT
+				COUNT(RV.ID) as CNT
+			FROM
+				b_rating_vote RV
+			WHERE
+				RV.ENTITY_TYPE_ID = '".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."'
+			and RV.ENTITY_ID = ".intval($arParam['ENTITY_ID'])."
+			".($bplus? " and RV.VALUE > 0 ": " and RV.VALUE < 0 ");
+		$res_cnt = $DB->Query($sqlStr);
+		$res_cnt = $res_cnt->Fetch();
+		$cnt = $res_cnt["CNT"];
+
+		$bIntranetInstalled = IsModuleInstalled("intranet");
+
+		$bExtended = false;
+		$arUserID = array();
+
+		if (
+			(
+				array_key_exists("USER_FIELDS", $arParam)
+				&& is_array($arParam["USER_FIELDS"])
+			)
+			|| (
+				array_key_exists("USER_SELECT", $arParam)
+				&& is_array($arParam["USER_SELECT"])
+			)
+		)
+		{
+			$bExtended = true;
+			$sqlStr = CRatings::GetRatingVoteListSQLExtended($arParam, $bplus, $bIntranetInstalled);
+		}
+		else
+		{
+			$sqlStr = CRatings::GetRatingVoteListSQL($arParam, $bplus, $bIntranetInstalled);
+		}
+
+		$arList = Array();
+		$arVoteList = Array();
+		if ($arParam['LIST_LIMIT'] != 0 && ceil($cnt/intval($arParam['LIST_LIMIT'])) >= intval($arParam['LIST_PAGE']))
+		{
+			$res = new CDBResult();
+			$res->NavQuery($sqlStr, $cnt, Array('iNumPage' => intval($arParam['LIST_PAGE']), 'nPageSize' => intval($arParam['LIST_LIMIT'])));
+
+			while ($row = $res->Fetch())
+			{
+				$ar = $row;
+
+				if (!$bExtended)
+				{
+					$ar["PHOTO"] = $ar["PHOTO_SRC"] = '';
+					if (!empty($ar["PERSONAL_PHOTO"]))
+					{
+						$arFileTmp = CFile::ResizeImageGet(
+							$row["PERSONAL_PHOTO"],
+							array('width' => 58, 'height' => 58),
+							BX_RESIZE_IMAGE_EXACT,
+							false
+						);
+						$ar['PHOTO'] = CFile::ShowImage($arFileTmp['src'], 21, 21, 'border=0');
+						$ar['PHOTO_SRC'] = $arFileTmp['src'];
+					}
+					$ar['FULL_NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $row, $bIntranetInstalled);
+				}
+				else
+					$arUserID[] = $row["ID"];
+
+				if ($ar['ID'] != $USER->GetId())
+					$arList[$ar['ID']] = $ar;
+				else
+					$arVoteList[$ar['ID']] = $ar;
+			}
+			foreach ($arList as $ar)
+				$arVoteList[$ar['ID']] = $ar;
+
+			if (
+				$bExtended
+				&& count($arUserID) > 0
+			)
+			{
+				$arUserListParams = array();
+				$arUsers = array();
+
+				if (
+					array_key_exists("USER_FIELDS", $arParam)
+					&& is_array($arParam["USER_FIELDS"])
+				)
+					$arUserListParams["FIELDS"] = $arParam["USER_FIELDS"];
+				else
+					$arUserListParams["FIELDS"] = array("NAME", "LAST_NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO");
+
+				$arUserListParams["FIELDS"] = array_unique(array_merge(array("ID"), $arUserListParams["FIELDS"]));
+
+				if (
+					array_key_exists("USER_SELECT", $arParam)
+					&& is_array($arParam["USER_SELECT"])
+				)
+				{
+					$arUserListParams["SELECT"] = $arParam["USER_SELECT"];
+				}
+
+				$rsUser = CUser::GetList(
+					($by = "ID"),
+					($order = "ASC"),
+					array("ID" => implode("|", $arUserID)),
+					$arUserListParams
+				);
+
+				while ($arUser = $rsUser->Fetch())
+				{
+					$arUser["PHOTO"] = $arUser["PHOTO_SRC"] = '';
+					if (array_key_exists("PERSONAL_PHOTO", $arUser))
+					{
+						$arFileTmp = CFile::ResizeImageGet(
+							$arUser["PERSONAL_PHOTO"],
+							array("width" => 58, "height" => 58),
+							BX_RESIZE_IMAGE_EXACT,
+							false
+						);
+						$arUser["PHOTO_SRC"] = $arFileTmp["src"];
+						$arUser["PHOTO"] = CFile::ShowImage($arFileTmp["src"], 21, 21, "border=0");
+					}
+					$arUser["FULL_NAME"] = CUser::FormatName(CSite::GetNameFormat(false), $arUser, $bIntranetInstalled);
+					$arUsers[$arUser["ID"]] = $arUser;
+				}
+
+				foreach($arVoteList as $i => $arVoteUser)
+					if (array_key_exists($arVoteUser["ID"], $arUsers))
+						foreach($arUsers[$arVoteUser["ID"]] as $key => $value)
+							$arVoteList[$i][$key] = $value;
+
+			}
+		}
+
+		return Array(
+			'items_all' => $cnt,
+			'items_page' => count($arVoteList),
+			'items' => $arVoteList
+		);
+	}
 }
-?>

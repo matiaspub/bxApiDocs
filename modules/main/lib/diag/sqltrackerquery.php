@@ -39,6 +39,21 @@ class SqlTrackerQuery
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод запускает sql таймер.</p>
+	*
+	*
+	* @param string $sql  Текст запроса.
+	*
+	* @param array $binds = null Привязать переменные используемые в запросе.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/startquery.php
+	* @author Bitrix
+	*/
 	public function startQuery($sql, array $binds = null)
 	{
 		$this->sql = $sql;
@@ -53,6 +68,19 @@ class SqlTrackerQuery
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод завершает работу таймера sql.</p>
+	*
+	*
+	* @param integer $skip = 3 Сколько трассировок пропустить. По умолчанию - 3.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/finishquery.php
+	* @author Bitrix
+	*/
 	public function finishQuery($skip = 3)
 	{
 		$this->finishTime = Helper::getCurrentMicrotime();
@@ -70,6 +98,23 @@ class SqlTrackerQuery
 	 * @return void
 	 * @see \Bitrix\Main\Diag\SqlTrackerQuery::refinishQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод сбрасывает старт таймера sql запроса. В сочетании с <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/refinishquery.php">refinishQuery</a> добавляет дополнительное время при выполнении запроса.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/refinishquery.php">\Bitrix\Main\Diag\SqlTrackerQuery::refinishQuery</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/restartquery.php
+	* @author Bitrix
+	*/
 	public function restartQuery()
 	{
 		$this->startTime = Helper::getCurrentMicrotime();
@@ -82,6 +127,23 @@ class SqlTrackerQuery
 	 * @return void
 	 * @see \Bitrix\Main\Diag\SqlTrackerQuery::restartQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод ещё раз завершает таймер запроса. Используется в паре с <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/restartquery.php">restartQuery</a>.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/restartquery.php">\Bitrix\Main\Diag\SqlTrackerQuery::restartQuery</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/refinishquery.php
+	* @author Bitrix
+	*/
 	public function refinishQuery()
 	{
 		$this->finishTime = Helper::getCurrentMicrotime();
@@ -93,6 +155,17 @@ class SqlTrackerQuery
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает текст отслеживаемого sql запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/getsql.php
+	* @author Bitrix
+	*/
 	public function getSql()
 	{
 		return $this->sql;
@@ -106,6 +179,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает  текст отслеживаемого sql запроса.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param string $sql  Текст sql.
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/setsql.php
+	* @author Bitrix
+	*/
 	public function setSql($sql)
 	{
 		$this->sql = (string)$sql;
@@ -117,6 +203,17 @@ class SqlTrackerQuery
 	 *
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает список sql связей используемых для выполнения запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/getbinds.php
+	* @author Bitrix
+	*/
 	public function getBinds()
 	{
 		return $this->binds;
@@ -130,6 +227,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает связи отслеживаемого sql запроса.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param array $binds  Sql связи
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/setbinds.php
+	* @author Bitrix
+	*/
 	public function setBinds(array $binds)
 	{
 		$this->binds = $binds;
@@ -141,6 +251,17 @@ class SqlTrackerQuery
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает состояние страницы запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/getstate.php
+	* @author Bitrix
+	*/
 	public function getState()
 	{
 		return $this->state;
@@ -154,6 +275,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает состояние  отслеживаемой sql страницы.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param string $state  Состояние страницы
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/setstate.php
+	* @author Bitrix
+	*/
 	public function setState($state)
 	{
 		$this->state = (string)$state;
@@ -165,6 +299,17 @@ class SqlTrackerQuery
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает ID ноды sql соединения запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/getnode.php
+	* @author Bitrix
+	*/
 	public function getNode()
 	{
 		return $this->node;
@@ -178,6 +323,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает ID отслеживаемой ноды соединения.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param string $node  Идентификатор кластера ноды.
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/setnode.php
+	* @author Bitrix
+	*/
 	public function setNode($node)
 	{
 		$this->node = (string)$node;
@@ -189,6 +347,17 @@ class SqlTrackerQuery
 	 *
 	 * @return float
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает время выполнения запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return float 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/gettime.php
+	* @author Bitrix
+	*/
 	public function getTime()
 	{
 		return $this->time;
@@ -202,6 +371,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает времея выполнения отслеживаемого sql запроса.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param float $time  Время выполнения запроса в секундах.
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/settime.php
+	* @author Bitrix
+	*/
 	public function setTime($time)
 	{
 		$this->tracker->addTime(-$this->time);
@@ -217,6 +399,19 @@ class SqlTrackerQuery
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет время для выполнения запроса.</p>
+	*
+	*
+	* @param float $time  Время в секундах для выполнения.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/addtime.php
+	* @author Bitrix
+	*/
 	public function addTime($time)
 	{
 		$time = (float)$time;
@@ -229,6 +424,17 @@ class SqlTrackerQuery
 	 *
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает трассировку запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/gettrace.php
+	* @author Bitrix
+	*/
 	public function getTrace()
 	{
 		return $this->trace;
@@ -242,6 +448,19 @@ class SqlTrackerQuery
 	 *
 	 * @return \Bitrix\Main\Diag\SqlTrackerQuery
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает трассировку отслеживаемого sql запроса.</p> <p>Возвращает объект для построения цепочки вызовов.</p>
+	*
+	*
+	* @param array $trace  Трассировка запроса
+	*
+	* @return \Bitrix\Main\Diag\SqlTrackerQuery 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/settrace.php
+	* @author Bitrix
+	*/
 	public function setTrace(array $trace)
 	{
 		$this->trace = $this->filterTrace($trace);
@@ -256,6 +475,19 @@ class SqlTrackerQuery
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет существование смещения. Часть реализации <code>\ArrayAccess</code> сделана для обеспечения обратной совместимости.</p>
+	*
+	*
+	* @param mixed $offset  Массив ключей.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/offsetexists.php
+	* @author Bitrix
+	*/
 	static public function offsetExists($offset)
 	{
 		switch ((string)$offset)
@@ -283,6 +515,19 @@ class SqlTrackerQuery
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод. Получаемое смещение.</p> <p>Часть реализации <code>\ArrayAccess</code> сделана для обеспечения обратной совместимости.</p>
+	*
+	*
+	* @param mixed $offset  Массив ключей
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/offsetget.php
+	* @author Bitrix
+	*/
 	public function offsetGet($offset)
 	{
 		switch ($offset)
@@ -311,6 +556,21 @@ class SqlTrackerQuery
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод. Включаемое смещение. Часть реализации <code>\ArrayAccess</code> сделана для обеспечения обратной совместимости.</p>
+	*
+	*
+	* @param mixed $offset  Массив ключей
+	*
+	* @param mixed $value  Массив значений.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/offsetset.php
+	* @author Bitrix
+	*/
 	static public function offsetSet($offset, $value)
 	{
 	}
@@ -323,6 +583,19 @@ class SqlTrackerQuery
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод. Отключаемое смещение. Часть реализации <code>\ArrayAccess</code> сделана для обеспечения обратной совместимости.</p>
+	*
+	*
+	* @param mixed $offset  Массив ключей.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/diag/sqltrackerquery/offsetunset.php
+	* @author Bitrix
+	*/
 	static public function offsetUnset($offset)
 	{
 	}

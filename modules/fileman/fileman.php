@@ -91,8 +91,6 @@ $GLOBALS['arFilemanPredifinedFileTypes'] = array(
 
 class CFileMan
 {
-	var $arFILE_TYPES;
-
 	public static function OnPanelCreate()
 	{
 		global $APPLICATION, $REQUEST_URI;
@@ -239,11 +237,6 @@ class CFileMan
 			));
 			CSticker::Init(array('curPageCount' => $curPageCount));
 		}
-	}
-
-	public function CFileMan()
-	{
-		$this->arFILE_TYPES = Array("SOURCE"=>GetMessage("FILEMAN_FILEMAN_SCRIPT_TEXT"), "IMAGE"=>GetMessage("FILEMAN_FILEMAN_PIC"), "UNKNOWN"=>GetMessage("FILEMAN_FILEMAN_UNK"));
 	}
 
 	public static function OnGroupDelete($group_id)
@@ -2215,4 +2208,3 @@ function _replace_br_($str)
 	}
 	return $str;
 }
-?>

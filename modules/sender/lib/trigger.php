@@ -10,20 +10,21 @@ namespace Bitrix\Sender;
 
 abstract class Trigger
 {
-	var $fieldPrefix;
-	var $fieldValues;
-	var $fieldFormName;
-	var $moduleId;
-	var $siteId;
+	protected $fieldPrefix;
+	protected $fieldValues;
+	protected $fieldFormName;
+	protected $moduleId;
+	protected $siteId;
 
-	var $fields;
-	var $params;
-	var $isRunForOldData = false;
-	var $recipient;
+	protected $fields;
+	protected $params;
+	protected $isRunForOldData = false;
+	protected $recipient;
 
 
 	/**
-	 * @param $moduleId
+	 * @param string $moduleId
+	 * @return void
 	 */
 	public function setModuleId($moduleId)
 	{
@@ -39,7 +40,8 @@ abstract class Trigger
 	}
 
 	/**
-	 * @param $siteId
+	 * @param string $siteId
+	 * @return void
 	 */
 	public function setSiteId($siteId)
 	{
@@ -108,6 +110,7 @@ abstract class Trigger
 
 	/**
 	 * @param array $fieldValues
+	 * @return void
 	 */
 	public function setFields(array $fieldValues = null)
 	{
@@ -136,6 +139,7 @@ abstract class Trigger
 
 	/**
 	 * @param array $fieldValues
+	 * @return void
 	 */
 	public function setParams(array $fieldValues = null)
 	{
@@ -163,7 +167,8 @@ abstract class Trigger
 	}
 
 	/**
-	 * @param $fieldFormName
+	 * @param string $fieldFormName
+	 * @return void
 	 */
 	public function setFieldFormName($fieldFormName)
 	{
@@ -177,7 +182,8 @@ abstract class Trigger
 	}
 
 	/**
-	 * @param $fieldPrefix
+	 * @param string $fieldPrefix
+	 * @return void
 	 */
 	public function setFieldPrefix($fieldPrefix)
 	{
@@ -253,6 +259,31 @@ abstract class Trigger
 	static public function getForm()
 	{
 		return '';
+	}
+
+	/**
+	 * @return \Bitrix\Sender\ConnectorResult
+	 */
+	public function getRecipientResult()
+	{
+		$result = new ConnectorResult($this->getRecipient());
+
+		// set fields that will be added in each item of result set
+		$personalizeList = array();
+		$personalizeListTmp = $this->getPersonalizeList();
+		foreach($personalizeListTmp as $tag)
+		{
+			if(strlen($tag['CODE']) > 0)
+			{
+				$personalizeList[] = $tag['CODE'];
+			}
+		}
+		$result->setFilterFields($personalizeList);
+
+		// set same fields for all items in each item of result set
+		$result->setAdditionalFields($this->getPersonalizeFields());
+
+		return $result;
 	}
 
 	/**

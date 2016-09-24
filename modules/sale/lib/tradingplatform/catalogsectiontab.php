@@ -126,6 +126,10 @@ class CatalogSectionTab
 				/** @var  TabHandler $handler*/
 				$header = '<tr class="heading" id="tr_'.$tradingPlatformCode.'"><td colspan="2">'.$handler->name.'</td></tr>';
 				$body = $handler->showTabSection($divName, $arArgs, $bVarsFromForm);
+
+				if(strlen($body) <= 0)
+					$body = '<tr><td colspan="2">'.Loc::getMessage('SALE_TRADING_PLATFORMS_NOT_ACTIVE').'</td></tr>';
+
 				$result .= $header.$body;
 			}
 

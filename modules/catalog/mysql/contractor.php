@@ -21,7 +21,7 @@ class CCatalogContractor
 		$arFields['~DATE_MODIFY'] = $DB->GetNowFunction();
 		$arFields['~DATE_CREATE'] = $DB->GetNowFunction();
 
-		if(!self::CheckFields('ADD', $arFields))
+		if(!self::checkFields('ADD', $arFields))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_catalog_contractor", $arFields);

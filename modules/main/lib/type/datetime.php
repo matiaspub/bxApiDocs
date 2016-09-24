@@ -67,6 +67,25 @@ class DateTime extends Date
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод конвертирует дату в строку с использованием <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=2071#local_settings" >региональных настроек</a> и настроек глобальных временных зон.</p>
+	*
+	*
+	* @param mixed $Bitrix  Формат даты и времени для региональных настроек.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Context  
+	*
+	* @param Culture $culture = null 
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/tostring.php
+	* @author Bitrix
+	*/
 	static public function toString(Context\Culture $culture = null)
 	{
 		if(\CTimeZone::Enabled())
@@ -88,6 +107,17 @@ class DateTime extends Date
 	 *
 	 * @return \DateTimeZone
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает объект временной зоны.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \DateTimeZone 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/gettimezone.php
+	* @author Bitrix
+	*/
 	public function getTimeZone()
 	{
 		return $this->value->getTimezone();
@@ -100,6 +130,19 @@ class DateTime extends Date
 	 *
 	 * @return DateTime
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает объект временной зоны.</p>
+	*
+	*
+	* @param DateTimeZone $timezone  Объект временной зоны.
+	*
+	* @return \Bitrix\Main\Type\DateTime 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/settimezone.php
+	* @author Bitrix
+	*/
 	public function setTimeZone(\DateTimeZone $timezone)
 	{
 		$this->value->setTimezone($timezone);
@@ -111,6 +154,17 @@ class DateTime extends Date
 	 *
 	 * @return DateTime
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает временную зону по умолчанию.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Type\DateTime 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/setdefaulttimezone.php
+	* @author Bitrix
+	*/
 	public function setDefaultTimeZone()
 	{
 		$time = new \DateTime();
@@ -136,6 +190,17 @@ class DateTime extends Date
 	 *
 	 * @return DateTime
 	 */
+	
+	/**
+	* <p>Нестатический метод изменяет время с серверного на время пользователя с использованием настроек глабальных временных зон.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\Type\DateTime 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/tousertime.php
+	* @author Bitrix
+	*/
 	public function toUserTime()
 	{
 		//first, move to server timezone
@@ -161,6 +226,33 @@ class DateTime extends Date
 	 *
 	 * @return DateTime
 	 */
+	
+	/**
+	* <p>Статический метод создаёт объект класса <code>\DateTime</code> из локального времени пользователя с использованием глобальных настроек временной зоны и региональных настроек по умолчанию.</p>
+	*
+	*
+	* @param string $timeString  Полное или краткое форматированное время.
+	*
+	* @return \Bitrix\Main\Type\DateTime 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //время из формата текущего сайта, в случае отсутствия время подставляет 00:00:00
+	* \Bitrix\Main\Type\DateTime::createFromUserTime("16.08.2014 15:30:10"); 
+	* 
+	* //время из формата текущего сайта 
+	* $date = new \Bitrix\Main\Type\DateTime("16.08.2014 15:30:10");
+	* 
+	* $arFields = Array(
+	*    'DATE_START' =&gt; \Bitrix\Main\Type\DateTime::createFromUserTime("16.08.2014 15:30:10"); 
+	* );
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/createfromusertime.php
+	* @author Bitrix
+	*/
 	public static function createFromUserTime($timeString)
 	{
 		/** @var DateTime $time */
@@ -210,6 +302,19 @@ class DateTime extends Date
 	 *
 	 * @return static
 	 */
+	
+	/**
+	* <p>Статический метод создаёт объект класса <code>\DateTime</code> из объекта <a href="http://php.net/manual/ru/class.datetime.php" >\DateTime</a> PHP.</p>
+	*
+	*
+	* @param DateTime $datetime  Объект источника.
+	*
+	* @return static 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/createfromphp.php
+	* @author Bitrix
+	*/
 	public static function createFromPhp(\DateTime $datetime)
 	{
 		/** @var DateTime $d */
@@ -225,6 +330,34 @@ class DateTime extends Date
 	 *
 	 * @return static
 	 */
+	
+	/**
+	* <p>Статический метод создаёт объект класса <code>\DateTime</code> из временной метки Unix.</p>
+	*
+	*
+	* @param integer $timestamp  Временная метка источника.
+	*
+	* @return static 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Создание объекта по timestamp\Bitrix\Main\Type\DateTime::createFromTimestamp(strtotime("+5 days"));//<$date = Bitrix\Main\Type\DateTime Object 
+	*                         ( [value:protected] =&gt; DateTime Object
+	*                                 (
+	*                                     [date] =&gt; 2014-09-02 12:00:00
+	*                                     [timezone_type] =&gt; 3
+	*                                     [timezone] =&gt; Europe/Minsk
+	*                                 )
+	* 
+	*                         );>//
+	* echo $date-&gt;toString(new \Bitrix\Main\Context\Culture(array("FORMAT_DATETIME" =&gt; "HH:MI"))); // на выходе 12:00
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/createfromtimestamp.php
+	* @author Bitrix
+	*/
 	public static function createFromTimestamp($timestamp)
 	{
 		/** @var DateTime $d */

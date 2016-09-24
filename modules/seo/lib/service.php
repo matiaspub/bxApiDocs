@@ -19,7 +19,7 @@ Loc::loadMessages(__FILE__);
 
 if(!defined("BITRIX_CLOUD_ADV_URL"))
 {
-	// define("BITRIX_CLOUD_ADV_URL", 'http://cloud-adv.bitrix.info');
+	// define("BITRIX_CLOUD_ADV_URL", 'https://cloud-adv.bitrix.info');
 }
 
 if(!defined("SEO_SERVICE_URL"))
@@ -29,11 +29,10 @@ if(!defined("SEO_SERVICE_URL"))
 
 class Service
 {
-	const OPT_ACCESS = "access_params";
-
 	const SERVICE_URL = SEO_SERVICE_URL;
-	const REGISTER = "/register/";
-	const AUTHORIZE = "/oauth/authorize/";
+	const REGISTER = "/oauth/register/";
+	const AUTHORIZE = "/register/";
+	const REDIRECT_URI = "/bitrix/tools/seo_client.php";
 
 	protected static $engine = null;
 	protected static $auth = null;
@@ -43,26 +42,14 @@ class Service
 		return static::getEngine()->isRegistered();
 	}
 
-	public static function isAuthorized($engineCode = null)
-	{
-		if($engineCode === null)
-		{
-			$authSettings = static::getEngine()->getAuthSettings();
-			return is_array($authSettings) && $authSettings["access_token"];
-		}
-
-		return static::isRegistered() && static::getAuth($engineCode);
-	}
-
 	public static function getAuth($engineCode)
 	{
 		global $CACHE_MANAGER;
-
 		if(static::$auth === null)
 		{
 			$cache_id = 'seo|service_auth';
 
-			if ($CACHE_MANAGER->Read(86400, $cache_id))
+			if($CACHE_MANAGER->Read(86400, $cache_id))
 			{
 				static::$auth = $CACHE_MANAGER->Get($cache_id);
 			}
@@ -81,7 +68,7 @@ class Service
 		return false;
 	}
 
-	public static function clearAuth($engineCode, $localOnly = false)
+	public static function clearLocalAuth()
 	{
 		global $CACHE_MANAGER;
 
@@ -89,6 +76,11 @@ class Service
 		$CACHE_MANAGER->Clean($cache_id);
 
 		static::$auth = null;
+	}
+
+	public static function clearAuth($engineCode, $localOnly = false)
+	{
+		static::clearLocalAuth();
 
 		if(!$localOnly)
 		{
@@ -122,6 +114,7 @@ class Service
 
 		if($result->isSuccess())
 		{
+			static::clearAuth(Bitrix::ENGINE_ID, true);
 			static::$engine = null;
 		}
 	}
@@ -141,13 +134,13 @@ class Service
 
 	public static function register()
 	{
+		static::clearLocalAuth();
+
 		$httpClient = new HttpClient();
 
-		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/update_client.php");
-
 		$queryParams = array(
-			"action" => "register",
-			"key" => md5(\CUpdateClient::GetLicenseKey()),
+			"key" => static::getLicense(),
+			"scope" => static::getEngine()->getInterface()->getScopeEncode(),
 			"redirect_uri" => static::getRedirectUri(),
 		);
 
@@ -164,52 +157,37 @@ class Service
 		}
 	}
 
-	public static function authorize()
+	public static function unregister()
 	{
-		\CSocServAuthManager::SetUniqueKey();
-
-		$redirectUri = static::getRedirectUri();
-
-		$url = static::getEngine()->getInterface()->GetAuthUrl(
-			$redirectUri,
-			"backurl=".urlencode($redirectUri.'?check_key='.$_SESSION["UNIQUE_KEY"])
-		);
-
-		$httpClient = new HttpClient(array(
-			"redirect" => false,
-		));
-
-		$result = $httpClient->get($url);
-
-		if($httpClient->getStatus() == 302)
+		if(static::isRegistered())
 		{
-			return array(
-				"location" => $httpClient->getHeaders()->get("Location"),
-			);
+			$id = static::getEngine()->getId();
+			SearchEngineTable::delete($id);
+			static::clearLocalAuth();
 		}
-
-		throw new SystemException("Wrong response: ".$result);
 	}
 
-
-	public static function getAuthorizeLink($engine)
+	public static function getAuthorizeLink()
 	{
-		$interface = static::getEngine()->getInterface();
-		if(!$interface->checkAccessToken())
-		{
-			if($interface->getNewAccessToken())
-			{
-				static::getEngine()->setAuthSettings($interface->getResult());
-			}
-		}
+		return static::SERVICE_URL.static::AUTHORIZE;
+	}
 
+	public static function getAuthorizeData($engine)
+	{
 		$checkKey = "";
 		if(Loader::includeModule("socialservices"))
 		{
 			$checkKey = \CSocServAuthManager::GetUniqueKey();
 		}
 
-		return static::SERVICE_URL.static::REGISTER."?action=authorize&engine=".urlencode($engine)."&client_id=".urlencode(static::getEngine()->getClientId())."&auth=".urlencode($interface->getToken())."&check_key=".urlencode($checkKey);
+		return array(
+			"action" => "authorize",
+			"engine" => $engine,
+			"client_id" => static::getEngine()->getClientId(),
+			"client_secret" => static::getEngine()->getClientSecret(),
+			"key" => static::getLicense(),
+			"check_key" => urlencode($checkKey)
+		);
 	}
 
 	protected static function getRedirectUri()
@@ -219,6 +197,11 @@ class Service
 		$host = $request->getHttpHost();
 		$isHttps = $request->isHttps();
 
-		return ($isHttps ? 'https' : 'http').'://'.$host."/bitrix/tools/seo_client.php";
+		return ($isHttps ? 'https' : 'http').'://'.$host.static::REDIRECT_URI;
+	}
+
+	protected static function getLicense()
+	{
+		return md5(LICENSE_KEY);
 	}
 }

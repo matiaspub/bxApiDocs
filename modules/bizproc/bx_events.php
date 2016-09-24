@@ -6,9 +6,7 @@
  */
 class _CEventsBizproc {
 /**
- * Вызывается перед добавлением записи в историю.
- * 
- * 
+ * перед добавлением записи в историю.
  * <i>Вызывается в методе:</i><br>
  * CBPHistoryService::AddHistory<br><br>
  * 
@@ -19,9 +17,7 @@ class _CEventsBizproc {
 	public static function OnAddToHistory(){}
 
 /**
- * Вызывается перед удалением файла из истории.
- * 
- * 
+ * перед удалением файла из истории.
  * <i>Вызывается в методе:</i><br>
  * CBPAllHistoryService::DeleteHistory<br><br>
  * 
@@ -32,9 +28,7 @@ class _CEventsBizproc {
 	public static function OnBeforeDeleteFileFromHistory(){}
 
 /**
- * Вызывается при создании экземпляра бизнес-процесса.
- * 
- * 
+ * при создании экземпляра бизнес-процесса.
  * <i>Вызывается в методе:</i><br>
  * CBPRuntime::CreateWorkflow<br><br>
  * 
@@ -45,9 +39,7 @@ class _CEventsBizproc {
 	public static function OnCreateWorkflow(){}
 
 /**
- * Вызывается при создании задания бизнес-процесса.
- * 
- * 
+ * при создании задания бизнес-процесса.
  * <i>Вызывается в методе:</i><br>
  * CBPTaskService::Add<br><br>
  * 
@@ -58,9 +50,7 @@ class _CEventsBizproc {
 	public static function OnTaskAdd(){}
 
 /**
- * Вызывается при удалении задания бизнес-процесса.
- * 
- * 
+ * при удалении задания бизнес-процесса.
  * <i>Вызывается в методе:</i><br>
  * CBPAllTaskService::DeleteByWorkflow<br><br>
  * 
@@ -71,9 +61,7 @@ class _CEventsBizproc {
 	public static function OnTaskDelete(){}
 
 /**
- * Вызывается после того, как производится удаление записи о задании пользователя. Если в БП несколько заданий (для разных пользователей) событие вызовется несколько раз.
- * 
- * 
+ * после того, как производится удаление записи о задании пользователя. Если в БП несколько заданий (для разных пользователей) событие вызовется несколько раз.
  * <i>Вызывается в методе:</i><br>
  * CBPAllTaskService::MarkCompleted<br><br>
  * 
@@ -84,9 +72,7 @@ class _CEventsBizproc {
 	public static function OnTaskMarkCompleted(){}
 
 /**
- * Вызывается при обновлении задания бизнес-процесса.
- * 
- * 
+ * при обновлении задания бизнес-процесса.
  * <i>Вызывается в методе:</i><br>
  * CBPTaskService::Update<br><br>
  * 
@@ -95,6 +81,17 @@ class _CEventsBizproc {
  * @author Bitrix
  */
 	public static function OnTaskUpdate(){}
+
+/**
+ * при делегировании задачи.
+ * <i>Вызывается в методе:</i><br>
+ * CBPTaskService::delegateTask<br><br>
+ * 
+ * 
+ * @link http://dev.1c-bitrix.ru/api_help/bizproc/events/index.php
+ * @author Bitrix
+ */
+	public static function OnTaskDelegate(){}
 
 
 }

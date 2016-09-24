@@ -23,7 +23,7 @@ class Caller
 		));
 
 		if(!isset($params["COMPATIBILITY-LEVEL"]))
-			$params["COMPATIBILITY-LEVEL"] = 885;
+			$params["COMPATIBILITY-LEVEL"] = 945;
 
 		if(!isset($params["EBAY_SITE_ID"]))
 			$params["EBAY_SITE_ID"] = 215;  //RU

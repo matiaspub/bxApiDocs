@@ -119,7 +119,7 @@ class CSocNetLogToolsPhoto
 				"ENTITY_ID" => $entity_id,
 				"EVENT_ID" => "photo",
 				"EXTERNAL_ID" => $arFields["IBLOCK_SECTION"]."_".$arFields["MODIFIED_BY"],
-				">=LOG_UPDATE" => ConvertTimeStamp(AddToTimeStamp(array("MI" => -5))+CTimeZone::GetOffset(), "FULL")
+				">=LOG_UPDATE" => ConvertTimeStamp(AddToTimeStamp(array("MI" => -30))+CTimeZone::GetOffset(), "FULL")
 			)
 		);
 
@@ -995,6 +995,8 @@ class CSocNetPhotoCommentEvent
 
 	public static function AddComment_Photo_Blog($arFields, $BLOG_ID, $arLog)
 	{
+		global $USER;
+
 		if (!CModule::IncludeModule("blog"))
 			return false;
 
@@ -1040,8 +1042,8 @@ class CSocNetPhotoCommentEvent
 					"PARENT_ID" => false
 				);
 
-				if($GLOBALS["USER"]->IsAuthorized())
-					$arFieldsComment["AUTHOR_ID"] = $GLOBALS["USER"]->GetID();
+				if($USER->IsAuthorized())
+					$arFieldsComment["AUTHOR_ID"] = $USER->GetID();
 
 				$commentID = CBlogComment::Add($arFieldsComment);
 				if (!$commentID)
@@ -1368,9 +1370,9 @@ class CSocNetPhotoCommentEvent
 			{
 				$arForum = CForumNew::GetByID($this->ForumID);
 				
-				$parser = new textParser(LANGUAGE_ID, $this->arPath["PATH_TO_SMILE"]);
-				$parser->image_params["width"] = false;
-				$parser->image_params["height"] = false;
+				$parser = new forumTextParser(LANGUAGE_ID, $this->arPath["PATH_TO_SMILE"]);
+				$parser->imageWidth = false;
+				$parser->imageHeight = false;
 				
 				$arAllow = array(
 					"HTML" => "N",

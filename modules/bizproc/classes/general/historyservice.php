@@ -42,7 +42,7 @@ class CBPAllHistoryService
 
 		if (is_set($arFields, "NAME") || $addMode)
 		{
-			$arFields["NAME"] = trim($arFields["NAME"]);
+			$arFields["NAME"] = (string) $arFields["NAME"];
 			if (strlen($arFields["NAME"]) <= 0)
 				throw new CBPArgumentNullException("NAME");
 		}

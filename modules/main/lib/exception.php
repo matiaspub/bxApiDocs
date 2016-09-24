@@ -15,6 +15,28 @@ class SystemException extends \Exception
 	 * @param int $line
 	 * @param \Exception $previous
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия.</p>
+	*
+	*
+	* @param string $message = "" Сообщение исключения
+	*
+	* @param integer $code  Код, вызвавший исключение
+	*
+	* @param string $file = "" Файл вызвавший исключение
+	*
+	* @param integer $line  Строка в файле
+	*
+	* @param Exception $previous = null Предыдущее исключение. Используется для построения цепочки
+	* исключений.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/systemexception/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($message = "", $code = 0, $file = "", $line = 0, \Exception $previous = null)
 	{
 		parent::__construct($message, $code, $previous);
@@ -34,12 +56,41 @@ class ArgumentException extends SystemException
 {
 	protected $parameter;
 
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести какие-то действия, при создании объекта. Код ошибки конструктор задает как 100.</p>
+	*
+	*
+	* @param mixed $message = "" Сообщение.
+	*
+	* @param mixed $parameter = "" Параметр. Должен быть не пустым.
+	*
+	* @param Exception $previous = null Предыдущее исключение. Используется для построения цепочки
+	* исключений.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumentexception/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($message = "", $parameter = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 100, '', 0, $previous);
 		$this->parameter = $parameter;
 	}
 
+	
+	/**
+	* <p>Нестатический метод возвращает переданный в конструктор параметр.</p>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumentexception/getparameter.php
+	* @author Bitrix
+	*/
 	public function getParameter()
 	{
 		return $this->parameter;
@@ -52,6 +103,22 @@ class ArgumentException extends SystemException
  */
 class ArgumentNullException extends ArgumentException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести какие-то действия, при создании объекта. Конструктор принимает параметр и автоматически формирует сообщение. </p>
+	*
+	*
+	* @param mixed $parameter  Параметр. Должен быть не пустым.
+	*
+	* @param Exception $previous = null Предыдущее исключение. Используется для построения цепочки
+	* исключений.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumentnullexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($parameter, \Exception $previous = null)
 	{
 		$message = sprintf("Argument '%s' is null or empty", $parameter);
@@ -76,6 +143,26 @@ class ArgumentOutOfRangeException extends ArgumentException
 	 * @param null $upperLimit Upper limit of the allowable values
 	 * @param \Exception $previous
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести какие-то действия, при создании объекта.</p>
+	*
+	*
+	* @param string $parameter  Аргумент, который создал исключение.
+	*
+	* @param null $lowerLimit = null Нижний предел возможных значений или массив возможных значений.
+	*
+	* @param null $upperLimit = null Верхний предел возможных значений.
+	*
+	* @param Exception $previous = null Предыдущее исключение. Используется для построения цепочки
+	* исключений.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumentoutofrangeexception/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($parameter, $lowerLimit = null, $upperLimit = null, \Exception $previous = null)
 	{
 		if (is_array($lowerLimit))
@@ -100,6 +187,17 @@ class ArgumentOutOfRangeException extends ArgumentException
 		return $this->lowerLimit;
 	}
 
+	
+	/**
+	* <p>Нестатический метод возвращает верхний предел.</p>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumentoutofrangeexception/getuppertype.php
+	* @author Bitrix
+	*/
 	public function getUpperType()
 	{
 		return $this->upperLimit;
@@ -121,6 +219,24 @@ class ArgumentTypeException	extends ArgumentException
 	 * @param string $requiredType Required type
 	 * @param \Exception $previous
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести какие-то действия, при создании объекта.</p>
+	*
+	*
+	* @param string $parameter  Аргумент, который создал исключение
+	*
+	* @param string $requiredType = "" Требуемый тип
+	*
+	* @param Exception $previous = null Предыдущее исключение. Используется для построения цепочки
+	* исключений.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumenttypeexception/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($parameter, $requiredType = "", \Exception $previous = null)
 	{
 		if (!empty($requiredType))
@@ -133,6 +249,17 @@ class ArgumentTypeException	extends ArgumentException
 		parent::__construct($message, $parameter, $previous);
 	}
 
+	
+	/**
+	* <p>Нестатический метод возвращает тип, который пришел в конструктор.</p>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/argumenttypeexception/getrequiredtype.php
+	* @author Bitrix
+	*/
 	public function getRequiredType()
 	{
 		return $this->requiredType;
@@ -145,6 +272,17 @@ class ArgumentTypeException	extends ArgumentException
  */
 class NotImplementedException extends SystemException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия. Устанавливает код ошибки 140.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/notimplementedexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($message = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 140, '', 0, $previous);
@@ -157,6 +295,17 @@ class NotImplementedException extends SystemException
  */
 class NotSupportedException extends SystemException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия. Конструктор принимает только сообщение и устанавливает код ошибки 150.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/notsupportedexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($message = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 150, '', 0, $previous);
@@ -179,6 +328,17 @@ class InvalidOperationException extends SystemException
  */
 class ObjectPropertyException extends ArgumentException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия./p&gt; </p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/objectpropertyexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($parameter = "", \Exception $previous = null)
 	{
 		parent::__construct("Object property \"".$parameter."\" not found.", $parameter, $previous);
@@ -190,6 +350,17 @@ class ObjectPropertyException extends ArgumentException
  */
 class ObjectException extends SystemException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/objectexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($message = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 500, '', 0, $previous);
@@ -201,6 +372,17 @@ class ObjectException extends SystemException
  */
 class ObjectNotFoundException extends SystemException
 {
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести при создании объекта какие-то действия.</p> <p> </p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/objectnotfoundexception/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct($message = "", \Exception $previous = null)
 	{
 		parent::__construct($message, 510, '', 0, $previous);

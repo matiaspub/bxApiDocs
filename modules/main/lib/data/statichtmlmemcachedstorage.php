@@ -106,6 +106,17 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 	 * Returns the md5 hash of the cache
 	 * @return string|false
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>md5</i> кеша. Возвращает записанную строку, либо <i>false</i> в случае неудачной попытки чтения.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlmemcachedstorage/getmd5.php
+	* @author Bitrix
+	*/
 	public function getMd5()
 	{
 		return $this->getProp("md5");
@@ -115,17 +126,48 @@ final class StaticHtmlMemcachedStorage extends StaticHtmlStorage
 	 * Should we count a quota limit
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает должен ли считаться лимит квот.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlmemcachedstorage/shouldcountquota.php
+	* @author Bitrix
+	*/
 	static public function shouldCountQuota()
 	{
 		return false;
 	}
 
 	/**
+	 * Returns the time the cache was last modified
+	 * @return int|false
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает время последнего изменения кеша.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlmemcachedstorage/getlastmodified.php
+	* @author Bitrix
+	*/
+	public function getLastModified()
+	{
+		return $this->getProp("mtime");
+	}
+	
+	/**
 	 * Returns the size of the cache
 	 *
 	 * @return int|false
 	 */
-	protected function getSize()
+	public function getSize()
 	{
 		return $this->getProp("size");
 	}

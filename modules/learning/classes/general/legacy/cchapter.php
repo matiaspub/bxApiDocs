@@ -26,10 +26,10 @@ class CChapter
 	* @param int $chapterId  Идентификатор главы.<br><br> До версии 12.0.0 параметр назывался CHAPTER_ID.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

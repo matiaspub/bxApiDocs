@@ -14,6 +14,7 @@ class Manager
 	const SUCCESS = 1;
 	const FAIL = 0;
 	const EMPTY_REQUIRED = 4;
+	const APP_TEMPLATE_IS_NOT_EXISTS = 5;
 	const PREVIEW_IMAGE_SIZE = 150;
 
 	const SIMPLE_APP_TEMPLATE = "simple";
@@ -23,12 +24,13 @@ class Manager
 	 *
 	 * @param string $appCode - application code
 	 * @param array $data - application data (name, short name, folder and etc)
+	 * @param array $initConfig
 	 *
-	 * @see AppTable::getMap to get a bit more  information about possible keys in $data
 	 * @return int
-	 *
+	 * @throws \Exception
+	 * @see AppTable::getMap to get a bit more  information about possible keys in $data
 	 */
-	public static function createApp($appCode = "", $data = array())
+	public static function createApp($appCode = "", $data = array(), $initConfig = array())
 	{
 		$result = self::SUCCESS;
 		$fields = $data;
@@ -36,7 +38,6 @@ class Manager
 		$dbResult = AppTable::add($fields);
 		if (!$dbResult->isSuccess())
 		{
-
 			$errors = $dbResult->getErrors();
 			if ($errors[0]->getCode() == FieldError::INVALID_VALUE)
 			{
@@ -50,27 +51,35 @@ class Manager
 		else
 		{
 
-			self::addConfig($appCode, "global", array());
+			self::addConfig($appCode, "global", $initConfig);
 		}
 
 		return $result;
 	}
 
+	private static function getTemplateList()
+	{
+		return array(
+			"simple",
+			"api"
+		);
+	}
+
 	/**
-	 * Removes application by given code
+	 * Removes application by code
 	 *
-	 * @param $appCode application code
+	 * @param string $appCode application code
 	 *
 	 * @return bool
 	 */
 	public static function removeApp($appCode)
 	{
 		$result = AppTable::delete($appCode);
-		return ($result->isSuccess()) ? true : false;
+		return $result->isSuccess();
 	}
 
 	/**
-	 * Binds the given file to the application
+	 * Binds file to the application
 	 *
 	 * @param $fileArray - file array
 	 * @param $appCode - application code
@@ -97,7 +106,7 @@ class Manager
 	}
 
 	/**
-	 *  Unbinds the file with given ID
+	 *  Unbinds file
 	 *
 	 * @param $fileId - identifier of file in b_file table
 	 * @param $appCode - application code
@@ -122,7 +131,7 @@ class Manager
 	}
 
 	/**
-	 * Add configuration to the application
+	 * Add configuration to application
 	 *
 	 * @param string $appCode - application code
 	 * @param $platform - platform code
@@ -148,7 +157,7 @@ class Manager
 
 		$result = ConfigTable::add($fields);
 
-		return ($result->isSuccess()) ? true : false;
+		return $result->isSuccess();
 
 	}
 
@@ -170,28 +179,28 @@ class Manager
 
 		$result = ConfigTable::delete($filter);
 
-		return ($result->isSuccess()) ? true : false;
+		return $result->isSuccess();
 
 	}
 
 	/**
 	 * Updates configuration
 	 *
-	 * @param string $appCode - application code
-	 * @param array $platform - platform code
+	 * @param string $appCode  application code
+	 * @param array $platform  platform code
+	 * @param array $config  new configuration
 	 *
-	 * @see ConfigTable::getSupportedPlatforms for details on availible platforms
-	 *
-	 * @param array $config - new configuration
+	 * @see ConfigTable::getSupportedPlatforms
 	 *
 	 * @return bool
 	 */
-	public static function updateConfig($appCode = "", $platform = array(), $config = array())
+	public static function updateConfig($appCode = "", $platform = "", $config = array())
 	{
 		if (!ConfigTable::isExists($appCode, $platform))
 		{
 			return false;
 		}
+
 		$map = new ConfigMap();
 		foreach ($config as $paramName => $value)
 		{
@@ -207,7 +216,7 @@ class Manager
 
 		$result = ConfigTable::update(array("APP_CODE" => $appCode, "PLATFORM" => $platform), $data);
 
-		return ($result->isSuccess()) ? true : false;
+		return $result->isSuccess();
 
 	}
 
@@ -283,14 +292,12 @@ class Manager
 			$structuredConfig = array_merge_recursive(self::nameSpaceToArray($key, $value), $structuredConfig);
 		}
 
-		$structuredConfig["info"] = array(
-			"designer_version"=> ConfigMap::VERSION,
-			"platform"=>$platform
-		);
 		if(toUpper(SITE_CHARSET) != "UTF-8")
 		{
 			$structuredConfig = Encoding::convertEncodingArray($structuredConfig, SITE_CHARSET, "UTF-8");
 		}
+
+		self::addVirtualParams($structuredConfig, $platform);
 
 		return json_encode($structuredConfig);
 	}
@@ -300,34 +307,56 @@ class Manager
 	 *
 	 * @param $folder
 	 * @param $appCode - application code
-	 *
+	 * @param bool $useOffline
+	 * @param string $templateCode
 	 * @return bool
-	 *
+	 * @throws \Bitrix\Main\IO\FileNotFoundException
 	 * @see ConfigTable::getSupportedPlatforms for details on availible platforms
 	 */
 
-	public static function copyFromTemplate($folder, $appCode)
+	public static function copyFromTemplate($folder, $appCode, $useOffline = false, $templateCode = "simple")
 	{
-		$appFolderPath = Application::getDocumentRoot() . "/" . $folder . "/";
-		$templatePath = Application::getDocumentRoot() . "/bitrix/modules/mobileapp/templates_app/simple/";
-		$fileList = array(
-			"config.php",
-			".mobile_menu.php",
-			"settings.php",
-			"index.php",
-			"menu.php",
-		);
-
-		if (!Directory::isDirectoryExists($appFolderPath))
+		if(!in_array($templateCode, self::getTemplateList()))
 		{
+			$templateCode = "simple";
+		}
 
-			for ($i = 0; $i < count($fileList); $i++)
+		$appFolderPath = Application::getDocumentRoot() . "/" . $folder . "/";
+		$offlineTemplate = Application::getDocumentRoot() . "/bitrix/modules/mobileapp/templates_app/offline/";
+		$templatePath = Application::getDocumentRoot() . "/bitrix/modules/mobileapp/templates_app/".$templateCode."/";
+
+		$directory = new Directory($templatePath);
+		if($directory->isExists())
+		{
+			if (!Directory::isDirectoryExists($appFolderPath))
 			{
-				File::putFileContents(
-					$appFolderPath . $fileList[$i],
-					str_replace(Array("#folder#", "#code#"), Array($folder, $appCode), File::getFileContents($templatePath . $fileList[$i]))
-				);
+				if($useOffline)
+				{
+					CopyDirFiles($offlineTemplate, $appFolderPath."/offline");
+				}
 
+				$items = $directory->getChildren();
+				foreach ($items as $entry)
+				{
+					/**
+					 * @var $entry \Bitrix\Main\IO\FileSystemEntry
+					 */
+					$filePath = $entry->getPath();
+					$appFilePath = $appFolderPath . $entry->getName();
+
+					if($entry instanceof Directory)
+					{
+						CopyDirFiles($filePath, $appFolderPath."/".$entry->getName(),true,true);
+					}
+					else
+					{
+						$file = new File($entry->getPath());
+						File::putFileContents(
+							$appFilePath,
+							str_replace(Array("#folder#", "#code#"), Array($folder, $appCode),$file->getContents())
+						);
+					}
+				}
 			}
 		}
 	}
@@ -436,6 +465,7 @@ class Manager
 	 * @param $value - value
 	 *
 	 * <br>
+	 *
 	 * Here is an example:
 	 * <code>
 	 * $namespace = "\depth0\depth1\depth3"
@@ -469,6 +499,28 @@ class Manager
 
 		return $result;
 
+	}
+
+	private static function addVirtualParams(&$structuredConfig, $platform)
+	{
+		if($structuredConfig["offline"] && !empty($structuredConfig["offline"]["file_list"]))
+		{
+			$offlineParams = &$structuredConfig["offline"];
+			$offlineParams["file_list"]["bitrix_mobile_core.js"] = Tools::getMobileJSCorePath();
+			$changeMark = Tools::getArrayFilesHash($offlineParams["file_list"]);
+			$offlineParams["change_mark"] = $changeMark;
+		}
+
+		if($structuredConfig["buttons"]["badge"])
+		{
+			$structuredConfig["buttons_badge"] = $structuredConfig["buttons"]["badge"];
+			unset($structuredConfig["buttons"]["badge"]);
+		}
+
+		$structuredConfig["info"] = array(
+			"designer_version"=> ConfigMap::VERSION,
+			"platform"=>$platform
+		);
 	}
 
 

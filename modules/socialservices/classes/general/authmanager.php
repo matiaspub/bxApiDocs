@@ -1,5 +1,8 @@
 <?php
+use Bitrix\Main\Config\Option;
 use Bitrix\Main\Context;
+use Bitrix\Socialservices\ContactTable;
+use Bitrix\Socialservices\UserTable;
 
 IncludeModuleLangFile(__FILE__);
 
@@ -11,27 +14,40 @@ class CSocServAuthManager
 	/** @var array  */
 	protected static $arAuthServices = false;
 
-	static public function __construct()
+	protected $userId = null;
+
+	public function __construct($userId = null)
 	{
+		global $USER;
+
 		if(!is_array(self::$arAuthServices))
 		{
 			self::$arAuthServices = array();
 
-			$db_events = GetModuleEvents("socialservices", "OnAuthServicesBuildList");
-			while($arEvent = $db_events->Fetch())
+			foreach(GetModuleEvents("socialservices", "OnAuthServicesBuildList", true) as $arEvent)
 			{
 				$res = ExecuteModuleEventEx($arEvent);
 				if(is_array($res))
 				{
 					if(!is_array($res[0]))
+					{
 						$res = array($res);
+					}
 					foreach($res as $serv)
+					{
 						self::$arAuthServices[$serv["ID"]] = $serv;
+					}
 				}
 			}
 			//services depend on current site
 			$suffix = CSocServAuth::OptionsSuffix();
 			self::$arAuthServices = self::AppyUserSettings($suffix);
+		}
+
+		$this->userId = $userId;
+		if($this->userId === null && is_object($USER))
+		{
+			$this->userId = $USER->GetID();
 		}
 	}
 
@@ -89,10 +105,8 @@ class CSocServAuthManager
 		return $aServ;
 	}
 
-	static public function GetProfileUrl($service, $uid, $arService = false)
+	public function GetProfileUrl($service, $uid, $arService = false)
 	{
-		global $USER;
-
 		if(isset(self::$arAuthServices[$service]))
 		{
 			if(!is_array($arService))
@@ -100,7 +114,7 @@ class CSocServAuthManager
 				$dbSocservUser = \CSocServAuthDB::getList(
 					array(),
 					array(
-						'USER_ID' => $USER->GetID(),
+						'USER_ID' => $this->userId,
 						'EXTERNAL_AUTH_ID' => $service,
 					)
 				);
@@ -125,21 +139,18 @@ class CSocServAuthManager
 		return false;
 	}
 
-	static public function GetFriendsList($service, $limit, &$next)
+	public function GetFriendsList($service, $limit, &$next)
 	{
-		global $USER;
-
 		if(isset(self::$arAuthServices[$service]))
 		{
 			$dbSocservUser = \CSocServAuthDB::getList(
 				array(),
 				array(
-					'USER_ID' => $USER->GetID(),
+					'USER_ID' => $this->userId,
 					'EXTERNAL_AUTH_ID' => $service,
 				)
 			);
 			$arService = $dbSocservUser->fetch();
-
 			if(
 				is_array($arService)
 				&& self::$arAuthServices[$service]["__active"] === true
@@ -148,9 +159,22 @@ class CSocServAuthManager
 			{
 				/** @var \CSocServFacebook $cl */
 				$cl = new self::$arAuthServices[$service]["CLASS"];
+
+				if(is_callable(array($cl, "setUser")))
+				{
+					$cl->setUser($this->userId);
+				}
+
 				if(is_callable(array($cl, "getFriendsList")))
 				{
-					return $cl->getFriendsList($limit, $next);
+					$result = $cl->getFriendsList($limit, $next);
+
+					if($next === "__finish__")
+					{
+						$next = null;
+					}
+
+					return $result;
 				}
 			}
 		}
@@ -166,7 +190,7 @@ class CSocServAuthManager
 			if(is_callable(array($service["CLASS"], "GetSettings")))
 			{
 				$arOptions[] = htmlspecialcharsbx($service["NAME"]);
-				$options = call_user_func_array(array($service["CLASS"], "GetSettings"), array());
+				$options = call_user_func_array(array(new $service["CLASS"](), "GetSettings"), array());
 				if(is_array($options))
 					foreach($options as $opt)
 						$arOptions[] = $opt;
@@ -186,7 +210,18 @@ class CSocServAuthManager
 		if(isset(self::$arAuthServices[$service_id]))
 		{
 			$service = self::$arAuthServices[$service_id];
-			if($service["__active"] === true && $service["DISABLED"] !== true)
+
+			if(
+				(
+					$service["__active"] === true
+					&& $service["DISABLED"] !== true
+				)
+				|| (
+					$service_id == CSocServBitrix24Net::ID
+					&& defined('ADMIN_SECTION')
+					&& ADMIN_SECTION == true
+				)
+			)
 			{
 				$cl = new $service["CLASS"];
 				if(is_callable(array($cl, "Authorize")))
@@ -790,6 +825,28 @@ class CSocServAuth
 {
 	protected static $settingsSuffix = false;
 
+	protected $checkRestrictions = true;
+	protected $allowChangeOwner = true;
+
+	protected $userId = null;
+
+	public function __construct($userId = null)
+	{
+		global $USER;
+
+		if($userId === null)
+		{
+			if(is_object($USER) && $USER->IsAuthorized())
+			{
+				$this->userId = $USER->GetID();
+			}
+		}
+		else
+		{
+			$this->userId = $userId;
+		}
+	}
+
 	static public function GetSettings()
 	{
 		return false;
@@ -880,7 +937,7 @@ class CSocServAuth
 		return $id;
 	}
 
-	public static function Delete($id)
+	public static  function Delete($id)
 	{
 		global $DB;
 		$id = intval($id);
@@ -1047,6 +1104,14 @@ class CSocServAuth
 		return COption::GetOptionString("socialservices", $opt.self::$settingsSuffix);
 	}
 
+	public static function SetOption($opt, $value)
+	{
+		if(self::$settingsSuffix === false)
+			self::$settingsSuffix = self::OptionsSuffix();
+
+		return COption::SetOptionString("socialservices", $opt.self::$settingsSuffix, $value);
+	}
+
 	public static function getGroupsDenyAuth()
 	{
 		return explode(',', (\COption::GetOptionString("socialservices", "group_deny_auth", "")));
@@ -1087,75 +1152,95 @@ class CSocServAuth
 		return count(array_intersect(self::getGroupsDenyAuth(), $arGroups)) > 0;
 	}
 
-	static public function AuthorizeUser($arFields)
+	public function AuthorizeUser($socservUserFields)
 	{
 		global $USER, $APPLICATION;
 
-		if(!isset($arFields['XML_ID']) || $arFields['XML_ID'] == '')
+		if(!isset($socservUserFields['XML_ID']) || $socservUserFields['XML_ID'] == '')
+		{
 			return false;
-		if(!isset($arFields['EXTERNAL_AUTH_ID']) || $arFields['EXTERNAL_AUTH_ID'] == '')
-			return false;
+		}
 
-		$arOAuthKeys = array();
-		if(isset($arFields["OATOKEN"]))
-			$arOAuthKeys["OATOKEN"] = $arFields["OATOKEN"];
-		if(isset($arFields["REFRESH_TOKEN"]) && $arFields["REFRESH_TOKEN"] !== '')
-			$arOAuthKeys["REFRESH_TOKEN"] = $arFields["REFRESH_TOKEN"];
-		if(isset($arFields["OATOKEN_EXPIRES"]))
-			$arOAuthKeys["OATOKEN_EXPIRES"] = $arFields["OATOKEN_EXPIRES"];
+		if(!isset($socservUserFields['EXTERNAL_AUTH_ID']) || $socservUserFields['EXTERNAL_AUTH_ID'] == '')
+		{
+			return false;
+		}
+
+		$oauthKeys = array();
+		if(isset($socservUserFields["OATOKEN"]))
+		{
+			$oauthKeys["OATOKEN"] = $socservUserFields["OATOKEN"];
+		}
+		if(isset($socservUserFields["REFRESH_TOKEN"]) && $socservUserFields["REFRESH_TOKEN"] !== '')
+		{
+			$oauthKeys["REFRESH_TOKEN"] = $socservUserFields["REFRESH_TOKEN"];
+		}
+		if(isset($socservUserFields["OATOKEN_EXPIRES"]))
+		{
+			$oauthKeys["OATOKEN_EXPIRES"] = $socservUserFields["OATOKEN_EXPIRES"];
+		}
 
 		$errorCode = SOCSERV_AUTHORISATION_ERROR;
 
-		$dbSocUser = CSocServAuthDB::GetList(
-			array(),
-			array(
-				'XML_ID'=>$arFields['XML_ID'],
-				'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']
-			), false, false, array("ID", "USER_ID", "ACTIVE")
-		);
-		$arUser = $dbSocUser->Fetch();
+		$dbSocUser = UserTable::getList(array(
+			'filter' => array(
+				'=XML_ID'=>$socservUserFields['XML_ID'],
+				'=EXTERNAL_AUTH_ID'=>$socservUserFields['EXTERNAL_AUTH_ID']
+			),
+			'select' => array("ID", "USER_ID", "ACTIVE" => "USER.ACTIVE"),
+		));
+		$socservUser = $dbSocUser->fetch();
 
 		if($USER->IsAuthorized())
 		{
-			if(!self::isSplitDenied())
+			if(!$this->checkRestrictions || !self::isSplitDenied())
 			{
-				if(!$arUser)
+				if(!$socservUser)
 				{
-					$id = CSocServAuthDB::Add($arFields);
+					$socservUserFields["USER_ID"] = $USER->GetID();
+					$result = UserTable::add(UserTable::filterFields($socservUserFields));
+					$id = $result->getId();
 				}
 				else
 				{
-					$id = $arUser['ID'];
+					$id = $socservUser['ID'];
 
 					// socservice link split
-					if($arUser['USER_ID'] != $USER->GetID())
+					if($socservUser['USER_ID'] != $USER->GetID())
 					{
-						$dbRes = CSocServAuthDB::GetList(
-							array(),
-							array(
-								'USER_ID'=>$USER->GetID(),
-								'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID']
-							), false, false, array("ID")
-						);
-						if($dbRes->Fetch())
+						if($this->allowChangeOwner)
 						{
-							return SOCSERV_AUTHORISATION_ERROR;
+							$dbSocUser = UserTable::getList(array(
+									'filter' => array(
+											'=USER_ID' => $USER->GetID(),
+											'=EXTERNAL_AUTH_ID' => $socservUserFields['EXTERNAL_AUTH_ID']
+									),
+									'select' => array("ID")
+							));
+							if($dbSocUser->fetch())
+							{
+								return SOCSERV_AUTHORISATION_ERROR;
+							}
+							else
+							{
+								$oauthKeys['USER_ID'] = $USER->GetID();
+								$oauthKeys['CAN_DELETE'] = 'Y';
+							}
 						}
 						else
 						{
-							$arOAuthKeys['USER_ID'] = $USER->GetID();
-							$arOAuthKeys['CAN_DELETE'] = 'Y';
+							return SOCSERV_AUTHORISATION_ERROR;
 						}
 					}
 				}
 
 				if($_SESSION["OAUTH_DATA"] && is_array($_SESSION["OAUTH_DATA"]))
 				{
-					$arOAuthKeys = array_merge($arOAuthKeys, $_SESSION['OAUTH_DATA']);
+					$oauthKeys = array_merge($oauthKeys, $_SESSION['OAUTH_DATA']);
 					unset($_SESSION["OAUTH_DATA"]);
 				}
 
-				CSocServAuthDB::Update($id, $arOAuthKeys);
+				UserTable::update($id, $oauthKeys);
 			}
 			else
 			{
@@ -1167,32 +1252,32 @@ class CSocServAuth
 			$entryId = 0;
 			$USER_ID = 0;
 
-			if($arUser)
+			if($socservUser)
 			{
-				$entryId = $arUser['ID'];
-				if($arUser["ACTIVE"] === 'Y')
+				$entryId = $socservUser['ID'];
+				if($socservUser["ACTIVE"] === 'Y')
 				{
-					$USER_ID = $arUser["USER_ID"];
+					$USER_ID = $socservUser["USER_ID"];
 				}
 			}
 			else
 			{
 				// check for user with old socialservices linking system (socservice ID in user's EXTERNAL_AUTH_ID)
-				$dbUsersOld = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$arFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-				$arUser = $dbUsersOld->Fetch();
-				if($arUser)
+				$dbUsersOld = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$socservUserFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>$socservUserFields['EXTERNAL_AUTH_ID'], 'ACTIVE'=>'Y'), array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+				$socservUser = $dbUsersOld->Fetch();
+				if($socservUser)
 				{
-					$USER_ID = $arUser["ID"];
+					$USER_ID = $socservUser["ID"];
 				}
 				else
 				{
 					// theoretically possible situation with abandoned external user w/o b_socialservices_user entry
-					$dbUsersNew = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$arFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
-					$arUser = $dbUsersNew->Fetch();
+					$dbUsersNew = CUser::GetList($by='ID', $ord='ASC', array('XML_ID'=>$socservUserFields['XML_ID'], 'EXTERNAL_AUTH_ID'=>'socservices', 'ACTIVE'=>'Y'),  array('NAV_PARAMS'=>array("nTopCount"=>"1")));
+					$socservUser = $dbUsersNew->Fetch();
 
-					if($arUser)
+					if($socservUser)
 					{
-						$USER_ID = $arUser["ID"];
+						$USER_ID = $socservUser["ID"];
 					}
 					elseif
 					(
@@ -1200,48 +1285,51 @@ class CSocServAuth
 						&& COption::GetOptionString("socialservices", "allow_registration", "Y") == "Y"
 					)
 					{
-						$arFields['PASSWORD'] = randString(30); //not necessary but...
-						$arFields['LID'] = SITE_ID;
+						$socservUserFields['PASSWORD'] = randString(30); //not necessary but...
+						$socservUserFields['LID'] = SITE_ID;
 
-						$def_group = COption::GetOptionString('main', 'new_user_registration_def_group', '');
+						$def_group = Option::get('main', 'new_user_registration_def_group', '');
 						if($def_group <> '')
 						{
-							$arFields['GROUP_ID'] = explode(',', $def_group);
+							$socservUserFields['GROUP_ID'] = explode(',', $def_group);
 						}
 
 
-						if(!empty($arFields['GROUP_ID']) && self::isAuthDenied($arFields['GROUP_ID']))
+						if(
+							$this->checkRestrictions
+							&& !empty($socservUserFields['GROUP_ID'])
+							&& self::isAuthDenied($socservUserFields['GROUP_ID'])
+						)
 						{
 							$errorCode = SOCSERV_REGISTRATION_DENY;
 						}
 						else
 						{
-							$arFieldsUser = $arFields;
-							$arFieldsUser["EXTERNAL_AUTH_ID"] = "socservices";
+							$userFields = $socservUserFields;
+							$userFields["EXTERNAL_AUTH_ID"] = "socservices";
 
-							if(isset($arFieldsUser['PERSONAL_PHOTO']) && is_array($arFieldsUser['PERSONAL_PHOTO']))
+							if(isset($userFields['PERSONAL_PHOTO']) && is_array($userFields['PERSONAL_PHOTO']))
 							{
-								$res = CFile::CheckImageFile($arFieldsUser["PERSONAL_PHOTO"]);
+								$res = CFile::CheckImageFile($userFields["PERSONAL_PHOTO"]);
 								if($res <> '')
 								{
-									unset($arFieldsUser['PERSONAL_PHOTO']);
+									unset($userFields['PERSONAL_PHOTO']);
 								}
 							}
 
-							$USER_ID = $USER->Add($arFieldsUser);
+							$USER_ID = $USER->Add($userFields);
 							if($USER_ID <= 0)
 							{
 								$errorCode = SOCSERV_AUTHORISATION_ERROR;
 							}
 						}
 					}
-					elseif(COption::GetOptionString("main", "new_user_registration", "N") == "N")
+					elseif(Option::get("main", "new_user_registration", "N") == "N")
 					{
 						$errorCode = SOCSERV_REGISTRATION_DENY;
 					}
 
-					$arFields['CAN_DELETE'] = 'N';
-
+					$socservUserFields['CAN_DELETE'] = 'N';
 				}
 			}
 
@@ -1249,7 +1337,7 @@ class CSocServAuth
 			{
 				foreach ($_SESSION['OAUTH_DATA'] as $key => $value)
 				{
-					$arFields[$key] = $value;
+					$socservUserFields[$key] = $value;
 				}
 				unset($_SESSION["OAUTH_DATA"]);
 			}
@@ -1257,22 +1345,36 @@ class CSocServAuth
 			if($USER_ID > 0)
 			{
 				$arGroups = $USER->GetUserGroup($USER_ID);
-				if(self::isAuthDenied($arGroups))
+				if($this->checkRestrictions && self::isAuthDenied($arGroups))
 				{
 					return SOCSERV_AUTHORISATION_ERROR;
 				}
 
 				if($entryId > 0)
 				{
-					CSocServAuthDB::Update($entryId, $arFields);
+					UserTable::update($entryId, UserTable::filterFields($socservUserFields));
 				}
 				else
 				{
-					$arFields['USER_ID'] = $USER_ID;
-					CSocServAuthDB::Add($arFields);
+					$socservUserFields['USER_ID'] = $USER_ID;
+					UserTable::add(UserTable::filterFields($socservUserFields));
+				}
+
+				if(isset($socservUserFields["TIME_ZONE_OFFSET"]) && $socservUserFields["TIME_ZONE_OFFSET"] !== null)
+				{
+					CTimeZone::SetCookieValue($socservUserFields["TIME_ZONE_OFFSET"]);
 				}
 
 				$USER->AuthorizeWithOtp($USER_ID);
+
+				if($USER->IsJustAuthorized())
+				{
+					ContactTable::onUserLoginSocserv($socservUserFields);
+					foreach(GetModuleEvents("socialservices", "OnUserLoginSocserv", true) as $arEvent)
+					{
+						ExecuteModuleEventEx($arEvent, array($socservUserFields));
+					}
+				}
 			}
 			else
 			{
@@ -1301,6 +1403,11 @@ WHERE bsu.LOGIN='".$DB->ForSql($login)."' AND bu.ACTIVE='Y'
 			return $user["USER_ID"];
 		}
 		return 0;
+	}
+
+	public function setAllowChangeOwner($value)
+	{
+		$this->allowChangeOwner = (bool)$value;
 	}
 }
 
@@ -1338,9 +1445,12 @@ class CSocServUtil
 				$addParam .= ($addParam == "" ? "" : "&").self::packOAuthProxyString($proxyString);
 			}
 		}
-		return self::ServerName().$APPLICATION->GetCurPageParam($addParam, $arRemove);
+		return \CHTTP::URN2URI($APPLICATION->GetCurPageParam($addParam, $arRemove));
 	}
 
+	/**
+	 * @deprecated Use \CHTTP::URN2URI instead
+	 */
 	public static function ServerName($forceHttps = false)
 	{
 		$request = Context::getCurrent()->getRequest();
@@ -1360,6 +1470,11 @@ class CSocServUtil
 	public static function packOAuthProxyString($proxyString)
 	{
 		return self::OAUTH_PACK_PARAM."=".urlencode(base64_encode($proxyString));
+	}
+
+	public static function getOAuthProxyString()
+	{
+		return isset($_REQUEST[self::OAUTH_PACK_PARAM]) ? self::OAUTH_PACK_PARAM."=".urlencode($_REQUEST[self::OAUTH_PACK_PARAM]) : '';
 	}
 
 	public static function checkOAuthProxyParams()

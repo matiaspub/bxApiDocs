@@ -382,7 +382,7 @@ class CAdminSubList extends CAdminList
 		return $arID;
 	}
 
-	public function ActionPost($url = false)
+	public function ActionPost($url = false, $action_name = false, $action_value = 'Y')
 	{
 		return $this->table_id.".FormSubmit();";
 	}

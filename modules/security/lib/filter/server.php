@@ -27,10 +27,27 @@ class Server
 	 * Return filtered values or null if auditors not triggered (by default)
 	 *
 	 * @example tests/security/filter/serverfilter.php
-	 * @param array $values
-	 * @param bool $isReturnChangedOnly if true - return values only if it changed by some auditors, otherwise return null
+	 * @param array $values Array of values to be checked.
+	 * @param bool $isReturnChangedOnly If true - return values only if it changed by some auditors, otherwise return null.
 	 * @return array|null
 	 */
+	
+	/**
+	* <p4>Нестатический метод возвращает отфильтрованные значения. Если ни один из аудиторов не сработал, то возвращает пустое значение.
+	*
+	*
+	* @param array $values  Значения.
+	*
+	* @param boolean $isReturnChangedOnly = true Если значение параметра равно <code>true</code>, то возвращает значения,
+	* если они были изменены контроллерами. В противном случае
+	* возвращает пустое значение.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/server/filter.php
+	* @author Bitrix
+	*/
 	public function filter(array $values, $isReturnChangedOnly = true)
 	{
 		$this->onFilterStarted();

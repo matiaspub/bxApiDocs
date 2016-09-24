@@ -12,7 +12,7 @@ class CCatalogStoreDocsBarcode
 			if(ExecuteModuleEventEx($arEvent, array(&$arFields)) === false)
 				return false;
 
-		if (!self::CheckFields('ADD',$arFields))
+		if (!self::checkFields('ADD',$arFields))
 			return false;
 
 		$arInsert = $DB->PrepareInsert("b_catalog_docs_barcode", $arFields);

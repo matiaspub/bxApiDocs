@@ -37,6 +37,17 @@ class AdvEntity extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы сущностей внешнего сервиса рекламы. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adventity/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(

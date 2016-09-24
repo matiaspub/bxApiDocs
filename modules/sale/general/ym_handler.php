@@ -1184,8 +1184,23 @@ class CSaleYMHandler
 				$res = 	$http->getResult();
 				$message = "HTTP error code: ".$headerStatus."(".$res.")";
 
-				if($headerStatus =="403")
+				if($headerStatus == 403)
 					$this->notifyAdmin("SEND_STATUS_ERROR_403");
+
+				if($headerStatus == 500)
+				{
+					$intervalSeconds = 3600;
+					$timeToStart = ConvertTimeStamp(strtotime(date('Y-m-d H:i:s', time() + $intervalSeconds)), 'FULL');
+					\CAgent::AddAgent(
+						'\CSaleYMHandler::sendStatusAgent("'.$orderId.'","'.$status.'", "'.$substatus.'", "'.$this->siteId.'");',
+						'sale',
+						"N",
+						$intervalSeconds,
+						$timeToStart,
+						"Y",
+						$timeToStart
+					);
+				}
 
 				$bResult = false;
 			}
@@ -1199,6 +1214,17 @@ class CSaleYMHandler
 		);
 
 		return $bResult;
+	}
+
+	public static function sendStatusAgent($yandexOrderId, $yandexStatus, $substatus, $siteId)
+	{
+		$YMHandler = new CSaleYMHandler(
+			array("SITE_ID"=> $siteId)
+		);
+
+		$YMHandler->sendStatus($yandexOrderId, $yandexStatus, $substatus);
+
+		return '';
 	}
 
 	static public function getOrderInfo($orderId)
@@ -1751,6 +1777,10 @@ class CSaleYMHandler
 	public static function takeOutOrdersToCorrespondentTable()
 	{
 		$platformId = \Bitrix\Sale\TradingPlatform\YandexMarket::getInstance()->getId();
+
+		if(intval($platformId) <= 0)
+			return "";
+
 		$conn = \Bitrix\Main\Application::getConnection();
 		$helper = $conn->getSqlHelper();
 
@@ -1762,18 +1792,23 @@ class CSaleYMHandler
 
 		//check if we already tried to convert
 		if ($correspondence->fetch())
-			return;
+			return "";
 
 		if($conn->getType() == "mssql")
 			$lenOpName = "LEN";
 		else
 			$lenOpName = "LENGTH";
 
+		if($conn->getType() == "oracle")
+			$right = 'SUBSTR(XML_ID, -('.$lenOpName.'(XML_ID)-'.strlen(self::XML_ID_PREFIX).'))';
+		else
+			$right = 'RIGHT(XML_ID, '.$lenOpName.'(XML_ID)-'.strlen(self::XML_ID_PREFIX).')';
+
 		//take out correspondence to
 		$sql = 'INSERT INTO '.\Bitrix\Sale\TradingPlatform\OrderTable::getTableName().' (ORDER_ID, EXTERNAL_ORDER_ID, TRADING_PLATFORM_ID)
-				SELECT ID, RIGHT(XML_ID, '.$lenOpName.'(XML_ID)-'.strlen(self::XML_ID_PREFIX).'), '.$platformId.'
+				SELECT ID, '.$right.', '.$platformId.'
 					FROM '.\Bitrix\Sale\Internals\OrderTable::getTableName().'
-					WHERE XML_ID LIKE "'.self::XML_ID_PREFIX.'%"';
+					WHERE XML_ID LIKE '."'".self::XML_ID_PREFIX."%'";
 
 		try
 		{

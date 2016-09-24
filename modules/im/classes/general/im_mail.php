@@ -19,6 +19,12 @@ class CIMMail
 			if (!isset($arMark[$arNotify["CHAT_ID"]]) || $arMark[$arNotify["CHAT_ID"]] < $arNotify["ID"])
 				$arMark[$arNotify["CHAT_ID"]] = $arNotify["ID"];
 
+			if ($arNotify['TO_EXTERNAL_AUTH_ID'] == \Bitrix\Im\Bot::EXTERNAL_AUTH_ID || $arNotify['TO_EXTERNAL_AUTH_ID'] == "network")
+			{
+				unset($arUnsendNotify[$id]);
+				continue;
+			}
+
 			if ($arNotify['TO_USER_ACTIVE'] != 'Y')
 			{
 				unset($arUnsendNotify[$id]);
@@ -145,6 +151,12 @@ class CIMMail
 		{
 			if (!isset($arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]]) || $arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]] < $arMessage["ID"])
 				$arMark[$arMessage["TO_USER_ID"]][$arMessage["CHAT_ID"]] = $arMessage["ID"];
+
+			if ($arMessage['TO_EXTERNAL_AUTH_ID'] == \Bitrix\Im\Bot::EXTERNAL_AUTH_ID || $arMessage['TO_EXTERNAL_AUTH_ID'] == "network")
+			{
+				unset($arUnsendMessage[$id]);
+				continue;
+			}
 
 			if ($arMessage['TO_USER_ACTIVE'] != 'Y')
 			{

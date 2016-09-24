@@ -22,9 +22,10 @@ class Sql
 
 	protected function getFilters()
 	{
-		$sqlStart = '(?<![a-z0-9_-])';
+		$sqlStart = '(?:(?<![a-z0-9_-])|\/\*M?!\d+?)\K';
 		$sqlEnd = '(?![a-z_])';
-		$sqlSpace = "(?:[\\x00-\\x20\(\)\'\"\`*@\+\-\.~\\\ed!\d{}]|(?:\\/\\*.*?\\*\\/)|(?:\\/\\*!\d*)|(?:\\*\\/)|(?:#[^\\n]*[\\n]+))+";
+		$sqlSpace = "(?:[\\x00-\\x20\(\)\'\"\`*@\+\-\.~\\\ed!\d{}]|(?:\\/\\*.*?\\*\\/)|(?:\\/\\*M?!\d*)|(?:\\*\\/)|(?:#[^\\n]*[\\n]+))+";
+		$sqlExpEnd = "[\\x00-\\x20\(\)\'\"\`*@\+\-\.~\\\ed!\d{}\\/]";
 		$sqlFunctionsSpace="[\\x00-\\x20]*";
 		$sqlSplitTo2 = $this->getSplittingString(2);
 		$sqlSplitTo3 = $this->getSplittingString(3);
@@ -33,20 +34,20 @@ class Sql
 
 		global $DBType;
 		$filters = array(
-			"/{$sqlStart}(uni)(on{$sqlSpace}.+{$sqlSpace}sel)(ect){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(uni)(on{$sqlSpace}.+{$sqlExpEnd}sel)(ect){$sqlEnd}/is" => $sqlSplitTo3,
 			"/{$sqlStart}(uni)(on{$sqlSpace}sel)(ect){$sqlEnd}/is" => $sqlSplitTo3,
 
-			"/{$sqlStart}(sel)(ect{$sqlSpace}.+{$sqlSpace}fr)(om){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(sel)(ect{$sqlSpace}.+{$sqlExpEnd}fr)(om){$sqlEnd}/is" => $sqlSplitTo3,
 			"/{$sqlStart}(sel)(ect{$sqlSpace}fr)(om){$sqlEnd}/is" => $sqlSplitTo3,
-			"/{$sqlStart}(fr)(om{$sqlSpace}.+{$sqlSpace}wh)(ere){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(fr)(om{$sqlSpace}.+{$sqlExpEnd}wh)(ere){$sqlEnd}/is" => $sqlSplitTo3,
 
 			"/{$sqlStart}(alt)(er)({$sqlSpace})(database|table|function|procedure|server|event|view|index){$sqlEnd}/is" => $sqlSplitTo4,
 			"/{$sqlStart}(cre)(ate)({$sqlSpace})(database|table|function|procedure|server|event|view|index){$sqlEnd}/is" => $sqlSplitTo4,
 			"/{$sqlStart}(dr)(op)({$sqlSpace})(database|table|function|procedure|server|event|view|index){$sqlEnd}/is" => $sqlSplitTo4,
 
-			"/{$sqlStart}(upd)(ate{$sqlSpace}.+{$sqlSpace}se)(t){$sqlEnd}/is" => $sqlSplitTo3,
-			"/{$sqlStart}(ins)(ert{$sqlSpace}.+{$sqlSpace}val)(ue){$sqlEnd}/is" => $sqlSplitTo3,
-			"/{$sqlStart}(ins)(ert{$sqlSpace}.+{$sqlSpace}se)(t){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(upd)(ate{$sqlSpace}.+{$sqlExpEnd}se)(t){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(ins)(ert{$sqlSpace}.+{$sqlExpEnd}val)(ue){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(ins)(ert{$sqlSpace}.+{$sqlExpEnd}se)(t){$sqlEnd}/is" => $sqlSplitTo3,
 			"/{$sqlStart}(i)(nto{$sqlSpace}out)(file){$sqlEnd}/is" => $sqlSplitTo3,
 			"/{$sqlStart}(i)(nto{$sqlSpace}dump)(file){$sqlEnd}/is" => $sqlSplitTo3,
 
@@ -56,7 +57,7 @@ class Sql
 
 			"/{$sqlStart}(load_)(file{$sqlFunctionsSpace}\()/is" => $sqlSplitTo2,
 
-			"/{$sqlStart}(fr)(om{$sqlSpace}.+{$sqlSpace}lim)(it){$sqlEnd}/is" => $sqlSplitTo3,
+			"/{$sqlStart}(fr)(om{$sqlSpace}.+{$sqlExpEnd}lim)(it){$sqlEnd}/is" => $sqlSplitTo3,
 		);
 
 		$dbt = strtolower($DBType);
@@ -72,7 +73,7 @@ class Sql
 		elseif ($dbt === 'oracle')
 		{
 			$filters += array(
-				"/(ex)(ecute{$sqlSpace}.+{$sqlSpace}imme)(diate)/is" => $sqlSplitTo3,
+				"/(ex)(ecute{$sqlSpace}.+{$sqlExpEnd}imme)(diate)/is" => $sqlSplitTo3,
 				"/(ex)(ecute{$sqlSpace}imme)(diate)/is" => $sqlSplitTo3,
 			);
 		}

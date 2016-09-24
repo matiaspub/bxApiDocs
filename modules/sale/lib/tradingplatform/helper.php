@@ -27,6 +27,23 @@ class Helper
 	 * @return array.
 	 * @throws \Bitrix\Main\SystemException
 	 */
+	
+	/**
+	* <p>Метод возвращает информацию о товаре из каталога. Метод статический.</p>
+	*
+	*
+	* @param integer $productId  Идентификатор товара.
+	*
+	* @param integer $quantity  Количество товара.
+	*
+	* @param string $siteId  Идентификатор сайта.
+	*
+	* @return \Bitrix\Sale\TradingPlatform\array. 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/helper/getproductbyid.php
+	* @author Bitrix
+	*/
 	public static function getProductById($productId, $quantity, $siteId)
 	{
 		$result = array();

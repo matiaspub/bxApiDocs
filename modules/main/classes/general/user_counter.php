@@ -1,4 +1,15 @@
 <?
+
+/**
+ * <p>Для мобильной версии:</p> <pre class="syntax">BX.addCustomEvent("onPull", BX.delegate(function(data){    if (data.module_id == "main" &amp;&amp; data.command == 'user_counter' &amp;&amp; data.params[BX.message('SITE_ID')] &amp;&amp; data.params[BX.message('SITE_ID')]['__НАЗВАНИЕ_ВАШЕГО_СЧЕТЧИКА__'])       {       // вызвать код для обновления счетчика       // в data.params[BX.message('SITE_ID')]['__НАЗВАНИЕ_ВАШЕГО_СЧЕТЧИКА__'] будет новое значение счетчика    } }, this));</pre>
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/index.php
+ * @author Bitrix
+ */
 class CAllUserCounter
 {
 	const ALL_SITES = '**';
@@ -8,21 +19,16 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод предназначена для получения определенного счетчика пользователя. Статичный метод.</p>
+	* <p>Метод предназначена для получения определенного счетчика пользователя. Статический метод.</p>
 	*
 	*
-	* @param user_i $d  Идентификатор пользователя
+	* @param  $site_id = SITE_ID Идентификатор пользователя
 	*
-	* @param cod $e  Код счётчика
-	*
-	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	* подставляется текущий сайт.
-	*
-	* @return mixed <p>Возвращаются данные определенного счетчика пользователя.</p> <a
+	* @return mixed <p>Возвращаются данные определенного счетчика пользователя.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* echo $code = CUserCounter::GetValue($USER-&gt;GetID(), 'code1');
 	* </pre>
 	*
@@ -47,19 +53,16 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод позволяет получить список всех счетчиков пользователя. Статичный метод.</p>
+	* <p>Метод позволяет получить список всех счетчиков пользователя. Статический метод.</p>
 	*
 	*
-	* @param mixed $user_id  Идентификатор пользователя, обязательный параметр.
+	* @param  $site_id = SITE_ID Идентификатор пользователя, обязательный параметр.
 	*
-	* @param mixed $site_id = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	* принимает значение текущего сайта.
-	*
-	* @return mixed <p>Список счётчиков конкретного пользователя на сайте.</p> <a
+	* @return mixed <p>Список счётчиков конкретного пользователя на сайте.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $codes = CUserCounter::GetValues($USER-&gt;GetID(), SITE_ID);
 	* echo '&lt;pre&gt;'.print_r($codes, 1).'&lt;/pre&gt;';
 	* </pre>
@@ -175,12 +178,12 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод позволяет получить все значения для всех доступных сайтов. Статичный метод.</p>
+	* <p>Метод позволяет получить все значения для всех доступных сайтов. Статический метод.</p>
 	*
 	*
-	* @param mixed $user_id  Идентификатор пользователя, обязательный параметр.
+	* @param  $user_id  Идентификатор пользователя, обязательный параметр.
 	*
-	* @return mixed <p>Возвращает все значения для всех доступных сайтов.</p> <br><br>
+	* @return mixed <p>Возвращает все значения для всех доступных сайтов.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/getallvalues.php
@@ -270,23 +273,16 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод позволяет обнулить все счётчики пользователя. Статичный метод.</p>
+	* <p>Метод позволяет обнулить все счётчики пользователя. Нестатический метод.</p>
 	*
 	*
-	* @param user_i $d  Идентификатор пользователя
+	* @param user_id, $sendPull = true Идентификатор пользователя
 	*
-	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
-	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
-	* установке модуля и активации работы с "Сервером очередей", без
-	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
-	* данный счетчик не требуется пробрасывать, необходимо указать
-	* <i>false</i>. По умолчанию <i>true</i>.
-	*
-	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter::ClearAll($user_id)
 	* </pre>
 	*
@@ -331,27 +327,27 @@ class CAllUserCounter
 
 	
 	/**
-	* <p>Метод производит удаление счетчиков по тегу. Статичный метод.</p>
+	* <p>Метод производит удаление счетчиков по тегу. Статический метод.</p>
 	*
 	*
-	* @param ta $g  Тег, по которому будут удалены счётчики.
+	* @param mixed $tag  Тег, по которому будут удалены счётчики.
 	*
-	* @param cod $e  Код удаляемого счётчика. </htm
+	* @param ta $code  Код удаляемого счётчика.
 	*
-	* @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	* @param cod $site_id = SITE_ID Необязательный. По умолчанию равен SITE_ID.
 	*
-	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* @param mixed $sendPull = true Необязательный. Отправлять ли мгновенно данные в модуль
 	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
 	* установке модуля и активации работы с "Сервером очередей", без
 	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
 	* данный счетчик не требуется пробрасывать, необходимо указать
 	* <i>false</i>. По умолчанию <i>true</i>.
 	*
-	* @return mixed <p>Возвращает <i>true</i> если успешно, <i>false</i> если какая то ошибка.</p> <a
+	* @return mixed <p>Возвращает <i>true</i> если успешно, <i>false</i> если какая то ошибка.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter:: ClearByTag("task_11", "task");
 	* </pre>
 	*
@@ -426,6 +422,7 @@ class CAllUserCounter
 				CPullStack::AddByChannel($channelId, Array(
 					'module_id' => 'main',
 					'command'   => 'user_counter',
+					'expiry' 	=> 3600,
 					'params'    => $arMessage,
 				));
 			}
@@ -434,7 +431,7 @@ class CAllUserCounter
 		return true;
 	}
 
-	protected static function CheckLiveMode()
+	public static function CheckLiveMode()
 	{
 		return CModule::IncludeModule('pull') && CPullOptions::GetNginxStatus();
 	}
@@ -503,6 +500,7 @@ class CAllUserCounter
 				CPullStack::AddByChannel($channelId, Array(
 					'module_id' => 'main',
 					'command'   => 'user_counter',
+					'expiry' 	=> 3600,
 					'params'    => $arMessage,
 				));
 			}
@@ -562,6 +560,91 @@ class CAllUserCounter
 	public static function GetLastDateByUserAndCode($user_id, $site_id = SITE_ID, $code = self::ALL_SITES)
 	{
 		return self::GetLastDate($user_id, $code, $site_id);
+	}
+
+	public static function DeleteOld()
+	{
+		global $DB;
+
+		$days = intval(\Bitrix\Main\Config\Option::get('main', 'user_counter_days', 20));
+
+		$time = $DB->CharToDateFunction(GetTime(time()- $days*60*60*24, "FULL"));
+		$DB->Query("DELETE FROM b_user_counter WHERE TIMESTAMP_X <= ".$time);
+
+		return "CUserCounter::DeleteOld();";
+	}
+}
+
+class CAllUserCounterPage
+{
+	protected static function setUserIdOption($value = false)
+	{
+//		\Bitrix\Main\Config\Option::set('main', 'user_counter_pull_page_start', $value);
+	}
+
+	protected static function getUserIdOption()
+	{
+//		return \Bitrix\Main\Config\Option::get('main', 'user_counter_pull_page_start', false);
+	}
+
+	public static function getPageSizeOption($defaultValue = 100)
+	{
+		$value = intval(\Bitrix\Main\Config\Option::get('main', 'user_counter_pull_page_size', $defaultValue));
+		if ($value <= 0)
+		{
+			$value = $defaultValue;
+		}
+
+		return $value;
+	}
+
+	public static function setNewEvent()
+	{
+		self::setUserIdOption(0);
+	}
+
+	protected static function getMinMax($prevMax = 0)
+	{
+		global $DB;
+
+		$pageSize = self::getPageSizeOption(100);
+
+		$strSQL = "
+				SELECT USER_ID
+				FROM b_user_counter uc
+				WHERE SENT = '0' AND USER_ID > ".intval($prevMax)."
+				GROUP BY USER_ID
+				ORDER BY USER_ID ASC
+				LIMIT ".$pageSize."
+			";
+
+		$res = $DB->query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+		$i = 0;
+		while($row = $res->fetch())
+		{
+			if (!$i)
+			{
+				$minValue = $row["USER_ID"];
+			}
+			else
+			{
+				$maxValue = $row["USER_ID"];
+			}
+			$i++;
+		}
+
+		if ($i)
+		{
+			return array(
+				"MIN" => intval($minValue),
+				"MAX" => intval($maxValue)
+			);
+		}
+		else
+		{
+			return false;
+		}
 	}
 }
 ?>

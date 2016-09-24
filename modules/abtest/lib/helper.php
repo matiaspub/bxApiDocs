@@ -12,6 +12,17 @@ class Helper
 	 *
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает текущее A/B-тестирование.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/getactivetest.php
+	* @author Bitrix
+	*/
 	public static function getActiveTest()
 	{
 		static $abtest;
@@ -111,6 +122,17 @@ class Helper
 	 *
 	 * @return array|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает контекст текущего А/В-тестирования.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/getcontext.php
+	* @author Bitrix
+	*/
 	public static function getContext()
 	{
 		global $USER, $APPLICATION;
@@ -194,6 +216,21 @@ class Helper
 	 * @param string $value Test original value.
 	 * @return string|null
 	 */
+	
+	/**
+	* <p>Статический метод возвращает значения альтернативного варианта для текущего контекста A/B-тестирования.</p>
+	*
+	*
+	* @param string $type  Тип тестирования.
+	*
+	* @param string $value  Значение оригинального варианта.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/getalternative.php
+	* @author Bitrix
+	*/
 	public static function getAlternative($type, $value)
 	{
 		$result = null;
@@ -219,6 +256,19 @@ class Helper
 	 * @param int $id A/B-test ID.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Статический метод запускает A/B-тестирование.</p>
+	*
+	*
+	* @param integer $id  Идентификатор A/B-теста.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/starttest.php
+	* @author Bitrix
+	*/
 	public static function startTest($id)
 	{
 		global $USER;
@@ -259,6 +309,21 @@ class Helper
 	 * @param bool $auto Auto-stop flag.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Статический метод останавливает A/B-тестирование.</p>
+	*
+	*
+	* @param integer $id  Идентификатор A/B-теста.
+	*
+	* @param boolean $auto = false Флаг авто-остановки.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/stoptest.php
+	* @author Bitrix
+	*/
 	public static function stopTest($id, $auto = false)
 	{
 		global $USER;
@@ -292,6 +357,19 @@ class Helper
 	 * @param int $id A/B-test ID.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Статический метод удаляет A/B-тестирование.</p>
+	*
+	*
+	* @param integer $id  Идентификатор A/B-теста.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/deletetest.php
+	* @author Bitrix
+	*/
 	public static function deleteTest($id)
 	{
 		if ($abtest = ABTestTable::getById($id)->fetch())
@@ -316,6 +394,19 @@ class Helper
 	 * @param int $siteId Site ID.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Статический метод очищает кеш активного A/B-теста.</p>
+	*
+	*
+	* @param integer $siteId  Идентификатор сайта.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/helper/clearcache.php
+	* @author Bitrix
+	*/
 	public static function clearCache($siteId)
 	{
 		$cache = new \CPHPCache();

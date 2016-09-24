@@ -82,6 +82,31 @@ class Length extends Base
 	 * @param Entity\Field $field Field metadata.
 	 * @return boolean|string
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет минимальную и/или максимальную длину (как строку) значения. Возвращает <i>true</i> если проверка успешна или, в противном случае, <i>string</i> с текстом ошибки.</p>
+	*
+	*
+	* @param mixed $value  Значение для проверки.
+	*
+	* @param array $primary  <b>Не использовать в этой функции</b>.
+	*
+	* @param array $row  <b>Не использовать в этой функции</b>.
+	*
+	* @param array $Bitrix  Поле метаданных.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Field $field  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/validator/length/validate.php
+	* @author Bitrix
+	*/
 	public function validate($value, $primary, array $row, Entity\Field $field)
 	{
 		if ($this->min !== null)
@@ -111,6 +136,17 @@ class Length extends Base
 	 *
 	 * @return integer|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает минимально возможную длину. Если значение не установлено, вернётся <i>null</i>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/validator/length/getmin.php
+	* @author Bitrix
+	*/
 	public function getMin()
 	{
 		return $this->min;
@@ -122,6 +158,17 @@ class Length extends Base
 	 *
 	 * @return integer|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает максимально возможную длину. Если значение не установлено, вернётся <i>null</i>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/validator/length/getmax.php
+	* @author Bitrix
+	*/
 	public function getMax()
 	{
 		return $this->max;

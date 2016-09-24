@@ -74,6 +74,17 @@ class GroupTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Возвращает валидатор для поля <b>DESCRIPTION</b> - описание группы адресов для рассылки. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/grouptable/validatedescription.php
+	* @author Bitrix
+	*/
 	public static function validateDescription()
 	{
 		return array(

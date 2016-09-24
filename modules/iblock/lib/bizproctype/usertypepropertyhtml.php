@@ -26,21 +26,6 @@ class UserTypePropertyHtml extends UserTypeProperty
 	}
 
 	/**
-	 * @param FieldType $fieldType
-	 * @param $value
-	 * @return string
-	 */
-	protected static function formatValuePrintable(FieldType $fieldType, $value)
-	{
-		if (is_array($value) && isset($value['VALUE']))
-			$value = $value['VALUE'];
-		if (is_array($value) && isset($value['TEXT']))
-			$value = $value['TEXT'];
-
-		return HTMLToTxt(htmlspecialcharsback((string)$value));
-	}
-
-	/**
 	 * @param FieldType $fieldType Document field object.
 	 * @param mixed $value Field value.
 	 * @param string $fromTypeClass Type class manager name.
@@ -72,6 +57,56 @@ class UserTypePropertyHtml extends UserTypeProperty
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Return conversion map for current type.
+	 * @return array Map.
+	 */
+	
+	/**
+	* <p>Метод возвращает карту конвертации для полей типа <b>HTML/текст</b>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/bizproctype/usertypepropertyhtml/getconversionmap.php
+	* @author Bitrix
+	*/
+	public static function getConversionMap()
+	{
+		$parentMap = parent::getConversionMap();
+		return array(
+			$parentMap[0],
+			array(
+				FieldType::BOOL,
+				FieldType::DATE,
+				FieldType::DATETIME,
+				FieldType::DOUBLE,
+				FieldType::INT,
+				FieldType::INTERNALSELECT,
+				FieldType::SELECT,
+				FieldType::STRING,
+				FieldType::TEXT,
+				FieldType::USER
+			)
+		);
+	}
+
+	/**
+	 * @param FieldType $fieldType
+	 * @param $value
+	 * @return string
+	 */
+	protected static function formatValuePrintable(FieldType $fieldType, $value)
+	{
+		if (is_array($value) && isset($value['VALUE']))
+			$value = $value['VALUE'];
+		if (is_array($value) && isset($value['TEXT']))
+			$value = $value['TEXT'];
+
+		return HTMLToTxt(htmlspecialcharsback((string)$value));
 	}
 
 	/**
@@ -117,7 +152,7 @@ class UserTypePropertyHtml extends UserTypeProperty
 
 		if ($allowSelection)
 		{
-			$renderResult .= static::renderControlSelector($field, $selectorValue, true);
+			$renderResult .= static::renderControlSelector($field, $selectorValue, true, '', $fieldType);
 		}
 
 		return $renderResult;
@@ -168,7 +203,7 @@ class UserTypePropertyHtml extends UserTypeProperty
 
 		if ($allowSelection)
 		{
-			$renderResult .= static::renderControlSelector($field, $selectorValue, true);
+			$renderResult .= static::renderControlSelector($field, $selectorValue, true, '', $fieldType);
 		}
 
 		return $renderResult;

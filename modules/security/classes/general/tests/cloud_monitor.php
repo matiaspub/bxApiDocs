@@ -14,8 +14,8 @@ class CSecurityCloudMonitorTest
 	extends CSecurityBaseTest
 {
 	const DEFAULT_RECEIVE_RESULTS_TIME = 15;
-	const MAX_CHECKING_REQUEST_REPEATE_COUNT = 5;
-	const MAX_RESULTS_REQUEST_REPEATE_COUNT = 50;
+	const MAX_CHECKING_REQUEST_REPEAT_COUNT = 5;
+	const MAX_RESULTS_REQUEST_REPEAT_COUNT = 50;
 
 	protected $internalName = 'CloudMonitor';
 	/** @var CSecurityTemporaryStorage */
@@ -80,7 +80,7 @@ class CSecurityCloudMonitorTest
 	 */
 	protected function receiveResults()
 	{
-		if($this->sessionData->getInt('results_repeat_count') > self::MAX_RESULTS_REQUEST_REPEATE_COUNT)
+		if($this->sessionData->getInt('results_repeat_count') > self::MAX_RESULTS_REQUEST_REPEAT_COUNT)
 			$this->stopChecking(GetMessage('SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE'));
 
 		$response = new CSecurityCloudMonitorRequest('get_results', $this->protocolVersion, $this->getCheckingToken());
@@ -145,7 +145,7 @@ class CSecurityCloudMonitorTest
 		{
 			if($this->sessionData->getBool('repeat_request'))
 			{
-				if($this->sessionData->getInt('check_repeat_count') > self::MAX_CHECKING_REQUEST_REPEATE_COUNT)
+				if($this->sessionData->getInt('check_repeat_count') > self::MAX_CHECKING_REQUEST_REPEAT_COUNT)
 				{
 					$this->stopChecking(GetMessage('SECURITY_SITE_CHECKER_CLOUD_UNAVAILABLE'));
 				}

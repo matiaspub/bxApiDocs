@@ -632,7 +632,7 @@ abstract class CDatabaseMysql extends CAllDatabase
 		return $rows;
 	}
 
-	public static function Add($tablename, $arFields, $arCLOBFields = Array(), $strFileDir="", $ignore_errors=false, $error_position="", $arOptions=array())
+	static public function Add($tablename, $arFields, $arCLOBFields = Array(), $strFileDir="", $ignore_errors=false, $error_position="", $arOptions=array())
 	{
 		global $DB;
 
@@ -741,11 +741,6 @@ abstract class CDatabaseMysql extends CAllDatabase
 			return False;
 	}
 
-	public function IndexExists($tableName, $arColumns)
-	{
-		return $this->GetIndexName($tableName, $arColumns) !== "";
-	}
-
 	public function GetIndexName($tableName, $arColumns, $bStrict = false)
 	{
 		if(!is_array($arColumns) || count($arColumns) <= 0)
@@ -789,9 +784,15 @@ abstract class CDatabaseMysql extends CAllDatabase
 
 abstract class CDBResultMysql extends CAllDBResult
 {
-	public static function CDBResultMysql($res = null)
+	static public function __construct($res = null)
 	{
-		parent::CAllDBResult($res);
+		parent::__construct($res);
+	}
+
+	/** @deprecated */
+	static public function CDBResultMysql($res = null)
+	{
+		self::__construct($res);
 	}
 
 	/**
@@ -806,9 +807,13 @@ abstract class CDBResultMysql extends CAllDBResult
 		if($this->bNavStart || $this->bFromArray)
 		{
 			if(!is_array($this->arResult))
+			{
 				$res = false;
+			}
 			elseif($res = current($this->arResult))
+			{
 				next($this->arResult);
+			}
 		}
 		else
 		{

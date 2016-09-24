@@ -33,6 +33,17 @@ class ConnectionPool
 	/**
 	 * Creates connection pool object
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести  при создании объекта какие-то действия.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/__construct.php
+	* @author Bitrix
+	*/
 	static public function __construct()
 	{
 	}
@@ -65,6 +76,19 @@ class ConnectionPool
 	 * @param string $name Connection name.
 	 * @return Connection|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает соединение с БД по его имени. Создаёт новое соединение, если необходимо.</p>
+	*
+	*
+	* @param string $name = "" Имя соединения.
+	*
+	* @return \Bitrix\Main\Data\Connection|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/getconnection.php
+	* @author Bitrix
+	*/
 	public function getConnection($name = "")
 	{
 		if ($name === "")
@@ -100,26 +124,43 @@ class ConnectionPool
 	protected function getConnectionParameters($name)
 	{
 		if (!is_string($name))
-			throw new Main\ArgumentTypeException("name", "string");
-
-		if ($name === "")
-			throw new Main\ArgumentNullException("name");
-
-		if (isset($this->connectionParameters[$name]) && !empty($this->connectionParameters[$name]))
-			return $this->connectionParameters[$name];
-
-		$params = Config\Configuration::getValue('connections');
-		if (isset($params[$name]) && !empty($params[$name]))
-			return $params[$name];
-
-		if ($name === static::DEFAULT_CONNECTION_NAME)
 		{
-			$params = $this->getDbConnConnectionParameters();
-			if (!empty($params))
-				return $params;
+			throw new Main\ArgumentTypeException("name", "string");
 		}
 
-		return null;
+		if ($name === "")
+		{
+			throw new Main\ArgumentNullException("name");
+		}
+
+		$params = null;
+		if (isset($this->connectionParameters[$name]) && !empty($this->connectionParameters[$name]))
+		{
+			$params = $this->connectionParameters[$name];
+		}
+		else
+		{
+			$configParams = Config\Configuration::getValue('connections');
+			if (isset($configParams[$name]) && !empty($configParams[$name]))
+			{
+				$params = $configParams[$name];
+			}
+			elseif ($name === static::DEFAULT_CONNECTION_NAME)
+			{
+				$dbconnParams = $this->getDbConnConnectionParameters();
+				if (!empty($dbconnParams))
+				{
+					$params = $dbconnParams;
+				}
+			}
+		}
+
+		if ($params !== null && $name === static::DEFAULT_CONNECTION_NAME && !isset($params["include_after_connected"]))
+		{
+			$params["include_after_connected"] = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php");
+		}
+
+		return $params;
 	}
 
 	/**
@@ -129,9 +170,29 @@ class ConnectionPool
 	 * @param array $parameters Parameters values.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает параметры названного соединения.</p>
+	*
+	*
+	* @param string $name  Имя соединения.
+	*
+	* @param array $parameters  Значения параметров.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/setconnectionparameters.php
+	* @author Bitrix
+	*/
 	public function setConnectionParameters($name, $parameters)
 	{
 		$this->connectionParameters[$name] = $parameters;
+
+		if(isset($this->connections[$name]))
+		{
+			unset($this->connections[$name]);
+		}
 	}
 
 	/**
@@ -142,6 +203,17 @@ class ConnectionPool
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает тип соединяемой БД</p> <ul> <li>MYSQL</li> <li>ORACLE</li>  <li>MSSQL</li>   </ul> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/getdefaultconnectiontype.php
+	* @author Bitrix
+	*/
 	static public function getDefaultConnectionType()
 	{
 		$params = Config\Configuration::getValue('connections');
@@ -163,7 +235,7 @@ class ConnectionPool
 	{
 		/* Old kernel code for compatibility */
 
-		global $DBType, $DBDebug, $DBDebugToFile, $DBHost, $DBName, $DBLogin, $DBPassword, $DBSQLServerType;
+		global $DBType, $DBDebug, $DBDebugToFile, $DBHost, $DBName, $DBLogin, $DBPassword;
 
 		require_once(
 			Main\Application::getDocumentRoot().
@@ -171,13 +243,20 @@ class ConnectionPool
 			"/php_interface/dbconn.php"
 		);
 
-		$DBType = strtolower($DBType);
-		if ($DBType == 'mysql')
+		$className = null;
+		$type = strtolower($DBType);
+		if($type == 'mysql')
+		{
 			$className = "\\Bitrix\\Main\\DB\\MysqlConnection";
-		elseif ($DBType == 'mssql')
+		}
+		elseif($type == 'mssql')
+		{
 			$className = "\\Bitrix\\Main\\DB\\MssqlConnection";
-		else
+		}
+		elseif($type == 'oracle')
+		{
 			$className = "\\Bitrix\\Main\\DB\\OracleConnection";
+		}
 
 		return array(
 			'className' => $className,
@@ -195,6 +274,19 @@ class ConnectionPool
 	 * @param string $sql A SQL string. Only SELECT will go to a slave.
 	 * @return Main\DB\Connection|null
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает соединение <i>slave</i>. Или <i>null</i> если запрос должен быть отправлен только к мастеру.</p>
+	*
+	*
+	* @param string $sql  Строка SQL. Только SELECT будет отправлен на <i>slave</i>.
+	*
+	* @return \Bitrix\Main\DB\Connection|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/getslaveconnection.php
+	* @author Bitrix
+	*/
 	public function getSlaveConnection($sql)
 	{
 		if($this->masterOnly > 0)
@@ -233,6 +325,19 @@ class ConnectionPool
 	 * @param bool $mode True starts the mode and false ends.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод задаёт работу в только мастер-режиме. В этом режиме все запросы будут идти только к мастеру.</p>
+	*
+	*
+	* @param boolean $mode  <i>True</i> запускает мастер-режим, <i>false</i> - завершает.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/usemasteronly.php
+	* @author Bitrix
+	*/
 	public function useMasterOnly($mode)
 	{
 		if($mode)
@@ -248,9 +353,22 @@ class ConnectionPool
 	/**
 	 * In the ignore DML mode a data modification command will not stop next queries going to a slave.
 	 *
-	 * @param bool $mode Whenever to ignore subsequent DML or not.
+	 * @param bool $mode Ignore subsequent DML or not.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод. При игнорировании DML режима команда модификации данных не остановит запросы к <i>slave</i>.</p>
+	*
+	*
+	* @param boolean $mode  Игнорировать или нет следующий DML.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/ignoredml.php
+	* @author Bitrix
+	*/
 	public function ignoreDml($mode)
 	{
 		if($mode)
@@ -312,6 +430,23 @@ class ConnectionPool
 	 * @throws \Bitrix\Main\Config\ConfigurationException
 	 * @return Main\DB\Connection
 	 */
+	
+	/**
+	* <p>Нестатический метод создаёт новое соединение основанное на уже используемом.</p>
+	*
+	*
+	* @param string $name  Источник копирования.
+	*
+	* @param string $newName  Цель копирования.
+	*
+	* @param array $parameters = array() Параметры, полученные от метода <code>ConnectionPool::createConnection</code>.
+	*
+	* @return \Bitrix\Main\DB\Connection 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/cloneconnection.php
+	* @author Bitrix
+	*/
 	public function cloneConnection($name, $newName, array $parameters=array())
 	{
 		$defParameters = $this->getConnectionParameters($name);
@@ -331,6 +466,17 @@ class ConnectionPool
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает состояние запросов балансировки (если возможно использование <i>slave</i>).</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/isslavepossible.php
+	* @author Bitrix
+	*/
 	public function isSlavePossible()
 	{
 		return $this->slavePossible;
@@ -341,6 +487,17 @@ class ConnectionPool
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает состояние запросов балансировки (если будет использован только мастер).</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/connectionpool/ismasteronly.php
+	* @author Bitrix
+	*/
 	public function isMasterOnly()
 	{
 		return ($this->masterOnly > 0);

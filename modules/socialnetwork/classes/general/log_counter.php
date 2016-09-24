@@ -13,6 +13,9 @@ class CAllSocNetLogCounter
 				"FOR_ALL_ACCESS_ONLY" => (is_array($arParams) && $arParams["FOR_ALL_ACCESS_ONLY"]),
 				"TAG_SET" => (is_array($arParams) && !empty($arParams["TAG_SET"]) ? $arParams["TAG_SET"] : false),
 				"MULTIPLE" => (is_array($arParams) && !empty($arParams["MULTIPLE"]) && $arParams["MULTIPLE"] == "Y" ? "Y" : "N"),
+				"SET_TIMESTAMP" => (is_array($arParams) && !empty($arParams["SET_TIMESTAMP"]) && $arParams["SET_TIMESTAMP"] == "Y" ? "Y" : "N"),
+				"SEND_TO_AUTHOR" => (!is_array($arParams) || !isset($arParams["SEND_TO_AUTHOR"]) || $arParams["SEND_TO_AUTHOR"] != "Y" ? "N" : "Y"),
+				"USER_ID" => (isset($arParams["USER_ID"]) && is_array($arParams["USER_ID"]) ? $arParams["USER_ID"] : array())
 			)
 		);
 	}
@@ -41,6 +44,7 @@ class CAllSocNetLogCounter
 			$params  = (isset($arFields["PARAMS"]) ? $arFields["PARAMS"] : array());
 			$bDecrement = (isset($arFields["DECREMENT"]) ? $arFields["DECREMENT"] : false);
 			$bMultiple = (isset($arFields["MULTIPLE"]) && $arFields["MULTIPLE"] == "Y");
+			$bSetTimestamp = (isset($arFields["SET_TIMESTAMP"]) && $arFields["SET_TIMESTAMP"] == "Y");
 
 			$IsForAllAccessOnly = false;
 			if (isset($arFields["FOR_ALL_ACCESS_ONLY"]))
@@ -53,6 +57,18 @@ class CAllSocNetLogCounter
 					: (isset($arFields["FOR_ALL_ACCESS"]) ? $arFields["FOR_ALL_ACCESS"] : false)
 			);
 			$tagSet  = (isset($arFields["TAG_SET"]) ? $arFields["TAG_SET"] : false);
+			$bSendToAuthor = (
+				!isset($arFields["SEND_TO_AUTHOR"])
+				|| $arFields["SEND_TO_AUTHOR"] != 'Y'
+					? false
+					: true
+			);
+			$arUserIdToIncrement = (isset($arFields["USER_ID"]) && is_array($arFields["USER_ID"]) ? $arFields["USER_ID"] : array());
+		}
+		else
+		{
+			$bSendToAuthor = $IsForAllAccessOnly = $bMultiple = $tagSet = $code = $bSetTimestamp = false;
+			$arUserIdToIncrement = array();
 		}
 
 		if (intval($entityId) <= 0)
@@ -105,6 +121,7 @@ class CAllSocNetLogCounter
 		else
 		{
 			$logId = $entityId;
+			$log_user_id = 0;
 		}
 
 		if (
@@ -175,6 +192,8 @@ class CAllSocNetLogCounter
 			}
 		}
 
+		$followJoin = $followWhere = "";
+
 		if (
 			$type == "LC" 
 			&& (
@@ -202,6 +221,9 @@ class CAllSocNetLogCounter
 			}
 		}
 
+		$viewJoin = " LEFT JOIN b_sonet_log_view LFV ON LFV.USER_ID = U.ID AND LFV.EVENT_ID = '".$DB->ForSql($event_id)."'";
+		$viewWhere = "AND (LFV.USER_ID IS NULL OR LFV.TYPE = 'Y')";
+
 		$strOfEntities = (
 			is_array($arOfEntities)
 			&& count($arOfEntities) > 0
@@ -209,62 +231,30 @@ class CAllSocNetLogCounter
 				: ""
 		);
 
-		$strSQL = "
-		SELECT DISTINCT
-			U.ID as ID
-			,".($bDecrement ? "-1" : "1")." as CNT
-			,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
-			,".$params['CODE']." as CODE,
-			0 as SENT
-			".($tagSet ? ", '".$DB->ForSQL($tagSet)."' as TAG" : "")."
-		FROM
-			b_user U 
-			INNER JOIN b_sonet_log_right SLR ON SLR.LOG_ID = ".$logId."
-			".($bGroupCounters ? "INNER JOIN b_sonet_log_right SLR0 ON SLR0.LOG_ID = SLR.LOG_ID ": "")."
-			".(
-				!$bForAllAccess
-					? "INNER JOIN b_user_access UA ON UA.USER_ID = U.ID"
-					: ""
-			)."
-			LEFT JOIN b_sonet_log_site SLS ON SLS.LOG_ID = SLR.LOG_ID
-			".(strlen($followJoin) > 0 ? $followJoin : "")."
-			".(!$bGroupCounters && !IsModuleInstalled("intranet") ? "LEFT JOIN b_sonet_log_smartfilter SLSF ON SLSF.USER_ID = U.ID " : "")."
-			
-		WHERE
-			U.ACTIVE = 'Y'
-			AND U.LAST_ACTIVITY_DATE IS NOT NULL
-			AND	U.LAST_ACTIVITY_DATE > ".CSocNetLogCounter::dbWeeksAgo(2)."
-			".(
-				(
-					$type == "LC"
-					||
-					(	array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]) 
-						&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y" 
-					)
-				)
-				&& intval($created_by_id) > 0 
-					? "AND U.ID <> ".$created_by_id 
-					: ""
-			)."
-			".($bGroupCounters ? "AND (SLR0.GROUP_CODE like 'SG%' AND SLR0.GROUP_CODE NOT LIKE 'SG%\_%')": "").
-			(
-				!$bGroupCounters 
+		if (!empty($arUserIdToIncrement))
+		{
+			$userWhere = "AND U.ID IN (".implode(",", $arUserIdToIncrement).")";
+		}
+		else
+		{
+			$userWhere = (
+				!$bGroupCounters
 				&& !IsModuleInstalled("intranet")
 					? (
 						COption::GetOptionString("socialnetwork", "sonet_log_smart_filter", "N") == "Y"
 							? "
 								AND (
-									0=1 
+									0=1
 									OR (
 										(
-											SLSF.USER_ID IS NULL 
+											SLSF.USER_ID IS NULL
 											OR SLSF.TYPE = 'Y'
-										) 
+										)
 										".(!$bForAllAccess ? "AND (UA.ACCESS_CODE = SLR.GROUP_CODE)" : "")."
 										AND (
 											SLR.GROUP_CODE LIKE 'SG%'
-											OR SLR.GROUP_CODE = 'U".$log_user_id."' 
-											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))." 
+											OR SLR.GROUP_CODE = 'U".$log_user_id."'
+											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))."
 										)
 									)
 									OR (
@@ -275,27 +265,27 @@ class CAllSocNetLogCounter
 										)
 									)
 								)
-							"
+								"
 							: "
 								AND (
-									0=1 
+									0=1
 									OR (
 										(
-											SLSF.USER_ID IS NULL 
+											SLSF.USER_ID IS NULL
 											OR SLSF.TYPE <> 'Y'
-										) 
+										)
 										AND (
 											SLR.GROUP_CODE IN ('AU', 'G2')
 											".($bForAllAccess ? "" : " OR (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										)
 									)
 									OR (
-										SLSF.TYPE = 'Y' 
+										SLSF.TYPE = 'Y'
 										".($bForAllAccess ? "" : "AND (UA.ACCESS_CODE = SLR.GROUP_CODE)")."
 										AND (
 											SLR.GROUP_CODE LIKE 'SG%'
 											OR SLR.GROUP_CODE = 'U".$log_user_id."'
-											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))." 
+											OR SLR.GROUP_CODE = ".$DB->Concat("'U'", ($DB->type == "MSSQL" ? "CAST(U.ID as varchar(17))" : "U.ID"))."
 										)
 									)
 								)
@@ -305,19 +295,65 @@ class CAllSocNetLogCounter
 						AND (
 							0=1
 							".(
-									$IsForAllAccessOnly != "N" || $bForAllAccess
+								$IsForAllAccessOnly != "N" || $bForAllAccess
 									? "OR (SLR.GROUP_CODE IN ('AU', 'G2'))"
 									: ""
-							)."
-							".(
+								)."
+										".(
 								!$bForAllAccess && $IsForAllAccessOnly != "Y"
 									? " OR (UA.ACCESS_CODE = SLR.GROUP_CODE) "
 									: ""
-							)."
+								)."
+							)
+						"
+			);
+		}
+
+		$strSQL = "
+			SELECT DISTINCT
+				U.ID as ID
+				,".($bDecrement ? "-1" : "1")." as CNT
+				,".$DB->IsNull("SLS.SITE_ID", "'**'")." as SITE_ID
+				,".$params['CODE']." as CODE,
+				0 as SENT
+				".($tagSet ? ", '".$DB->ForSQL($tagSet)."' as TAG" : "")."
+				".($bSetTimestamp ? ", ".$DB->CurrentTimeFunction()." as TIMESTAMP_X" : "")."
+			FROM
+				b_user U
+				INNER JOIN b_sonet_log_right SLR ON SLR.LOG_ID = ".$logId."
+				".($bGroupCounters ? "INNER JOIN b_sonet_log_right SLR0 ON SLR0.LOG_ID = SLR.LOG_ID ": "")."
+				".(
+					!$bForAllAccess
+						? "INNER JOIN b_user_access UA ON UA.USER_ID = U.ID"
+						: ""
+				)."
+				LEFT JOIN b_sonet_log_site SLS ON SLS.LOG_ID = SLR.LOG_ID
+				".(strlen($followJoin) > 0 ? $followJoin : "")."
+				".(strlen($viewJoin) > 0 ? $viewJoin : "")."
+				".(!$bGroupCounters && !IsModuleInstalled("intranet") ? "LEFT JOIN b_sonet_log_smartfilter SLSF ON SLSF.USER_ID = U.ID " : "")."
+
+			WHERE
+				U.ACTIVE = 'Y'
+				AND U.LAST_ACTIVITY_DATE IS NOT NULL
+				AND	U.LAST_ACTIVITY_DATE > ".CSocNetLogCounter::dbWeeksAgo(2)."
+				".(
+					(
+						$type == "LC"
+						||
+						(	array_key_exists("USE_CB_FILTER", $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type])
+							&& $arSocNetAllowedSubscribeEntityTypesDesc[$entity_type]["USE_CB_FILTER"] == "Y"
 						)
-					"
-			)." ".
-			(strlen($followWhere) > 0 ? $followWhere : "")."
+					)
+					&& intval($created_by_id) > 0
+					&& !$bSendToAuthor
+						? "AND U.ID <> ".$created_by_id
+						: ""
+				)."
+				".($bGroupCounters ? "AND (SLR0.GROUP_CODE like 'SG%' AND SLR0.GROUP_CODE NOT LIKE 'SG%\_%')": "").
+				$userWhere."
+				".
+				(strlen($followWhere) > 0 ? $followWhere : "").
+				(strlen($viewWhere) > 0 ? $viewWhere : "")."
 		";
 
 		if($bGroupCounters)

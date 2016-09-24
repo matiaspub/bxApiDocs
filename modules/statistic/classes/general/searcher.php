@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>. 
+ * <b>CSearcher</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковыми системами</a>.
  *
  *
  * @return mixed 
@@ -105,27 +105,30 @@ class CAllSearcher
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">доменов поисковых систем</a>.</p>
 	*
 	*
-	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID домена;
-	* </li> <li> <b>s_domain</b> - домен; </li> <li> <b>s_variable</b> - имя переменной (или группа
-	* имен переменных разделенных запятой) в которых хранится
-	* поисковая фраза. </li> </ul>
+	* @param string &$by = "s_id" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID
+	* домена; </li>                    <li> <b>s_domain</b> - домен; </li>                    <li>
+	* <b>s_variable</b> - имя переменной (или группа имен переменных
+	* разделенных запятой) в которых хранится поисковая фраза. </li>        
+	* </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID домена; </li> <li>
-	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	* будет искаться вхождение; </li> <li> <b>SEARCHER_ID</b>* - ID поисковой системы;
-	* </li> <li> <b>SEARCHER_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации
-	* по <b>SEARCHER_ID</b> будет искаться вхождение; </li> <li> <b>DOMAIN</b>* - домен; </li>
-	* <li> <b>DOMAIN_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>DOMAIN</b> будет искаться точное совпадение; </li> <li> <b>VARIABLE</b>* - имя
-	* переменной (или группа имен переменных разделенных запятой) в
-	* которых хранится поисковая фраза; </li> <li> <b>VARIABLE_EXACT_MATCH</b> - если
-	* значение равно "Y", то при фильтрации по <b>VARIABLE</b> будет искаться
-	* точное совпадение. </li> </ul> * - допускается <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID домена; </li>                
+	*    <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>ID</b> будет искаться вхождение; </li>                    <li> <b>SEARCHER_ID</b>* - ID
+	* поисковой системы; </li>                    <li> <b>SEARCHER_ID_EXACT_MATCH</b> - если
+	* значение равно "N", то при фильтрации по <b>SEARCHER_ID</b> будет искаться
+	* вхождение; </li>                    <li> <b>DOMAIN</b>* - домен; </li>                    <li>
+	* <b>DOMAIN_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>DOMAIN</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>VARIABLE</b>* - имя переменной (или группа имен переменных разделенных
+	* запятой) в которых хранится поисковая фраза; </li>                    <li>
+	* <b>VARIABLE_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>VARIABLE</b> будет искаться точное совпадение. </li>         </ul>       * -
+	* допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
+	* логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
 	* равно "true", то список был отфильтрован.
@@ -133,7 +136,7 @@ class CAllSearcher
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем домены поисковой системы #20
 	* $arFilter = array(
@@ -159,8 +162,8 @@ class CAllSearcher
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getbyid.php">CSearcher::GetByID</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">Термин "Домен
-	* поисковой системы"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search_domain">Термин "Домен
+	* поисковой системы"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -242,12 +245,12 @@ class CAllSearcher
 	* <p>Возвращает данные по указанной <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">поисковой системе</a>.</p>
 	*
 	*
-	* @param int $searcher_id  ID поисковой системы. </ht
+	* @param int $searcher_id  ID поисковой системы.
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $searcher_id = 1;
 	* if ($rs = <b>CSearcher::GetByID</b>($searcher_id))
@@ -262,9 +265,9 @@ class CAllSearcher
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getdomainlist.php">CSearcher::GetDomainList</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин "Поисковая
-	* система"</a> </li> </ul> <a name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/csearcher/getdomainlist.php">CSearcher::GetDomainList</a>
+	* 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин "Поисковая
+	* система"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static

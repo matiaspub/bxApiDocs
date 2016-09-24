@@ -29,6 +29,17 @@ class UserTable
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает имя таблицы в базе данных, соответствующей сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/usertable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sec_user';
@@ -39,6 +50,17 @@ class UserTable
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p> 	Статический метод возвращает список полей с типами. </p> <p> 	 Без параметров </p>  <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/usertable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -93,6 +115,25 @@ class UserTable
 	 * @return void
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Статический метод очищает резервные коды после удаления пользователя.</p>
+	*
+	*
+	* @param mixed $Bitrix  Событие.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/usertable/onafterdelete.php
+	* @author Bitrix
+	*/
 	public static function onAfterDelete(Entity\Event $event)
 	{
 		$primary = $event->getParameter('primary');

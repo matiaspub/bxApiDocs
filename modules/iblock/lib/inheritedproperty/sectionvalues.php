@@ -25,6 +25,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы, в которой будут сохранены значения наследуемых вычисляемых свойств. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/getvaluetablename.php
+	* @author Bitrix
+	*/
 	static public function getValueTableName()
 	{
 		return "b_iblock_section_iprop";
@@ -35,6 +46,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает тип сущности, который будет храниться в базе данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "S";
@@ -45,6 +67,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Метод возвращает уникальный идентификатор раздела. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/getid.php
+	* @author Bitrix
+	*/
 	public function getId()
 	{
 		return $this->sectionId;
@@ -66,6 +99,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return array[]\Bitrix\Iblock\InheritedProperty\BaseValues
 	 */
+	
+	/**
+	* <p>Метод возвращает массив всех родителей секции, где в качестве значений массива выступает родительская секция или инфоблок. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[]\Bitrix\Iblock\InheritedProperty\BaseValues 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/getparents.php
+	* @author Bitrix
+	*/
 	public function getParents()
 	{
 		$parents = array();
@@ -87,6 +131,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return array[string]string
 	 */
+	
+	/**
+	* <p>Метод возвращает все вычисленные значения наследуемых свойств для секции. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[string]string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/queryvalues.php
+	* @author Bitrix
+	*/
 	public function queryValues()
 	{
 		$result = array();
@@ -116,15 +171,31 @@ class SectionValues extends BaseValues
 
 			if (empty($result))
 			{
+				$sqlHelper = $connection->getSqlHelper();
 				$result = parent::queryValues();
 				foreach ($result as $row)
 				{
-					$connection->add("b_iblock_section_iprop", array(
-						"IBLOCK_ID" => $this->iblockId,
-						"SECTION_ID" => $this->sectionId,
-						"IPROP_ID" => $row["ID"],
-						"VALUE" => $row["VALUE"],
-					), null);
+					$mergeSql = $sqlHelper->prepareMerge(
+						"b_iblock_section_iprop",
+						array(
+							"SECTION_ID",
+							"IPROP_ID",
+						),
+						array(
+							"IBLOCK_ID" => $this->iblockId,
+							"SECTION_ID" => $this->sectionId,
+							"IPROP_ID" => $row["ID"],
+							"VALUE" => $row["VALUE"],
+						),
+						array(
+							"IBLOCK_ID" => $this->iblockId,
+							"VALUE" => $row["VALUE"],
+						)
+					);
+					foreach ($mergeSql as $sql)
+					{
+						$connection->query($sql);
+					}
 				}
 			}
 		}
@@ -136,6 +207,17 @@ class SectionValues extends BaseValues
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает значения свойств для разделов из кеша базы данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/sectionvalues/clearvalues.php
+	* @author Bitrix
+	*/
 	public function clearValues()
 	{
 		$connection = \Bitrix\Main\Application::getConnection();

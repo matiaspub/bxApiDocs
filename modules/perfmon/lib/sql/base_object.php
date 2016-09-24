@@ -30,6 +30,19 @@ abstract class BaseObject
 	 *
 	 * @return BaseObject
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает исходный код для объекта.</p>
+	*
+	*
+	* @param string $body  Код для <code>body</code>.
+	*
+	* @return \Bitrix\Perfmon\Sql\BaseObject 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/setbody.php
+	* @author Bitrix
+	*/
 	public function setBody($body)
 	{
 		$this->body = trim($body);
@@ -45,6 +58,25 @@ abstract class BaseObject
 	 *
 	 * @return BaseObject
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает "родителя" для объекта. Например: таблицу или колонку таблицы.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Родительский объект.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param BaseObject $parent = null 
+	*
+	* @return \Bitrix\Perfmon\Sql\BaseObject 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/setparent.php
+	* @author Bitrix
+	*/
 	public function setParent(BaseObject $parent = null)
 	{
 		$this->parent = $parent;
@@ -78,6 +110,19 @@ abstract class BaseObject
 	 * @param string $name Table name.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает "нормализованное" название таблицы. Если название не в кавычках, то оно будет передано в верхнем регистре.</p> <br>
+	*
+	*
+	* @param string $name  Название таблицы.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/getcomparename.php
+	* @author Bitrix
+	*/
 	final public static function getCompareName($name)
 	{
 		if ($name[0] == '`')
@@ -99,6 +144,19 @@ abstract class BaseObject
 	 * @return int
 	 * @see strcmp
 	 */
+	
+	/**
+	* <p>Нестатический метод сравнивает имя таблицы с данным. Если название не взято в кавычки, то регистр не учитывается.</p> <br>
+	*
+	*
+	* @param string $name  Имя сравниваемой таблицы.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/comparename.php
+	* @author Bitrix
+	*/
 	final public function compareName($name)
 	{
 		return strcmp($this->ciName, $this->getCompareName($name));
@@ -111,6 +169,19 @@ abstract class BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL или комментарий для создания объекта.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/getcreateddl.php
+	* @author Bitrix
+	*/
 	static public function getCreateDdl($dbType = '')
 	{
 		return "// ".get_class($this).":getCreateDdl not implemented";
@@ -123,6 +194,19 @@ abstract class BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL или комментарий для удаления объекта.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/getdropddl.php
+	* @author Bitrix
+	*/
 	static public function getDropDdl($dbType = '')
 	{
 		return "// ".get_class($this).":getDropDdl not implemented";
@@ -136,6 +220,27 @@ abstract class BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL или комментарий для изменения объекта.</p>
+	*
+	*
+	* @param mixed $Bitrix  Целевой объект.
+	*
+	* @param Bitri $Perfmon  Тип базы данных.
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param BaseObject $target  
+	*
+	* @param string $dbType = '' 
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/baseobject/getmodifyddl.php
+	* @author Bitrix
+	*/
 	static public function getModifyDdl(BaseObject $target, $dbType = '')
 	{
 		return "// ".get_class($this).":getModifyDdl not implemented";

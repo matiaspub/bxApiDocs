@@ -47,26 +47,49 @@ class Menu
 		return $result;
 	}
 
-	protected function getChildren($parentId = 0)
+	protected function getChildren(array $parentIds = array(0))
 	{
+		if(empty($parentIds))
+			return array();
+
 		$result = array();
 
 		$dbRes = \Bitrix\Sale\Delivery\Services\Table::getList(array(
 			"filter" => array(
-				"PARENT_ID" => $parentId
+				"=PARENT_ID" => $parentIds
 			),
 			"select" => array(
 				"ID", "NAME", "DESCRIPTION", "CLASS_NAME"
 			),
 			"order" => array(
+				"SORT" =>"ASC",
 				"NAME" => "ASC"
 			)
 		));
 
+		$services = array();
+		$parents = array();
+
 		while($service = $dbRes->fetch())
 		{
-			$canHasChildren = is_callable($service["CLASS_NAME"].'::canHasChildren') ? $service["CLASS_NAME"]::canHasChildren() : false;
-			$children = $canHasChildren ? $this->getChildren($service["ID"]) : array();
+			$services[$service["ID"]] = $service;
+			$result[$service["ID"]] = array();
+
+			if(is_callable($service["CLASS_NAME"].'::canHasChildren') &&  $service["CLASS_NAME"]::canHasChildren())
+				$parents[] =  $service["ID"];
+		}
+
+		if(!empty($parents))
+			$childrenList = $this->getChildren($parents);
+
+		foreach($services as $serviceId => $service)
+		{
+			$canHasChildren = in_array($serviceId, $parents);
+
+			if($canHasChildren && !empty($childrenList[$serviceId]))
+				$children = $childrenList[$serviceId];
+			else
+				$children =array();
 
 			foreach($children as $key => $child)
 				if(!$child["can_has_children"])
@@ -75,12 +98,12 @@ class Menu
 			$item = array(
 				"text" => htmlspecialcharsbx($service["NAME"]),
 				"title" => htmlspecialcharsbx($service["DESCRIPTION"]),
-				"url" => "sale_delivery_service_list.php?lang=".LANGUAGE_ID."&filter_group=".$service["ID"],
+				"url" => "sale_delivery_service_list.php?lang=".LANGUAGE_ID."&filter_group=".$serviceId.'&set_filter=y',
 				"page_icon" => "sale_page_icon",
 				//"icon" => $canHasChildren ? "sale_section_icon" : "",
 				"can_has_children" => $canHasChildren,
 				"more_url" => array(
-					"sale_delivery_service_edit.php?lang=".LANGUAGE_ID."&PARENT_ID=".$service["ID"]
+					"sale_delivery_service_edit.php?lang=".LANGUAGE_ID."&PARENT_ID=".$serviceId
 				)
 			);
 
@@ -88,10 +111,10 @@ class Menu
 			{
 				$item["items"] = $children;
 				$item["dynamic"] = true;
-				$item["items_id"] = "menu_sale_delivery_".$service["ID"];
+				$item["items_id"] = "menu_sale_delivery_".$serviceId;
 			}
 
-			$result[] = $item;
+			$result[$serviceId] = $item;
 		}
 
 		return $result;

@@ -13,8 +13,6 @@ class CSocServBitrixOAuth extends CSocServAuth
 	protected $portalURI = '';
 	protected $redirectURI = '';
 
-	protected $userId = null;
-
 	protected $signature = null;
 
 	public function __construct($appID, $appSecret, $portalURI, $redirectURI, $userId = null)
@@ -23,7 +21,8 @@ class CSocServBitrixOAuth extends CSocServAuth
 		$this->appSecret = $appSecret;
 		$this->portalURI = $portalURI;
 		$this->redirectURI = $redirectURI;
-		$this->userId = $userId == null ? $GLOBALS["USER"]->GetID() : $userId;
+
+		return parent::__construct($userId);
 	}
 
 	public function getEntityOAuth($code = false)
@@ -105,7 +104,7 @@ class CSocServBitrixOAuth extends CSocServAuth
 		$APPLICATION->RestartBuffer();
 		if((isset($_REQUEST["code"]) && $_REQUEST["code"] <> '') && CSocServAuthManager::CheckUniqueKey())
 		{
-			$redirect_uri = CSocServUtil::ServerName().'/bitrix/tools/oauth/bitrix24.php';
+			$redirect_uri = \CHTTP::URN2URI('/bitrix/tools/oauth/bitrix24.php');
 			$userId = intval($_REQUEST['uid']);
 			$appID = trim(COption::GetOptionString("socialservices", "bitrix24_gadget_appid", ''));
 			$appSecret = trim(COption::GetOptionString("socialservices", "bitrix24_gadget_appsecret", ''));
@@ -121,7 +120,7 @@ class CSocServBitrixOAuth extends CSocServAuth
 				$gAuth->saveDataDB();
 			}
 		}
-		$url = CSocServUtil::ServerName().BX_ROOT;
+		$url = \CHTTP::URN2URI(BX_ROOT);
 		$mode = 'opener';
 		$url = CUtil::JSEscape($url);
 		$location = ($mode == "opener") ? 'if(window.opener) window.opener.location = \''.$url.'\'; window.close();' : ' window.location = \''.$url.'\';';
@@ -146,7 +145,7 @@ class CSocServBitrixOAuth extends CSocServAuth
 			CUserOptions::SetOption('socialservices', 'bitrix24_task_planer_gadget_code', $_REQUEST["code"]);
 		}
 
-		$url = CSocServUtil::ServerName().BX_ROOT;
+		$url = \CHTTP::URN2URI(BX_ROOT);
 		$mode = 'opener';
 		$url = CUtil::JSEscape($url);
 		$location = ($mode == "opener") ? 'if(window.opener) window.opener.location = \''.$url.'\'; window.close();' : ' window.location = \''.$url.'\';';
@@ -177,10 +176,7 @@ class CBitrixOAuthInterface extends CSocServOAuthTransport
 	protected $accessTokenExpires = 0;
 	protected $refresh_token = '';
 	protected $portalURI = '';
-	protected $scope = array(
-		'user',
-		'entity',
-	);
+	protected $scope = array();
 
 	public function __construct($appID, $appSecret, $portalURI, $code = false)
 	{
@@ -192,11 +188,6 @@ class CBitrixOAuthInterface extends CSocServOAuthTransport
 	public function getMemberId()
 	{
 		return $this->member_id;
-	}
-
-	public function getScopeEncode()
-	{
-		return implode(',', array_map('urlencode', array_unique($this->getScope())));
 	}
 
 	public function GetAuthUrl($redirect_uri, $state = '')

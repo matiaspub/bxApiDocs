@@ -152,7 +152,7 @@ class CBitrixCloudCDN
 				throw $e;
 			}
 		}
-		catch (exception $e)
+		catch (Exception $e)
 		{
 			if ($delayExpiration)
 			{
@@ -213,7 +213,7 @@ class CBitrixCloudCDN
 	 * @return void
 	 *
 	 */
-	static public function OnEndBufferContent(&$content)
+	public static function OnEndBufferContent(&$content)
 	{
 		if (isset($_GET["nocdn"]))
 			return;
@@ -257,8 +257,8 @@ class CBitrixCloudCDN
 			$extension_regex = "(?i:".implode("|", $arExtensions).")";
 			$regex = "/
 				((?i:
-					href=
-					|src=
+					(?<!;)href=
+					|(?<!;)src=
 					|BX\\.loadCSS\\(
 					|BX\\.loadScript\\(
 					|BX\\.getCDNPath\\(
@@ -349,8 +349,10 @@ class CBitrixCloudCDN
 	 *
 	 * @return void
 	 */
-	static public function OnAdminInformerInsertItems()
+	public static function OnAdminInformerInsertItems()
 	{
+		global $USER;
+
 		if (IsModuleInstalled('intranet'))
 			return;
 
@@ -361,7 +363,10 @@ class CBitrixCloudCDN
 
 		if (self::IsActive())
 		{
-			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/bitrixcloud_cdn.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_CDN_AI_SETT").'</a>';
+			if ($USER->CanDoOperation("bitrixcloud_cdn"))
+			{
+				$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/bitrixcloud_cdn.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_CDN_AI_SETT").'</a>';
+			}
 
 			$cdn_config = CBitrixCloudCDNConfig::getInstance()->loadFromOptions();
 			$cdn_quota = $cdn_config->getQuota();
@@ -415,7 +420,10 @@ class CBitrixCloudCDN
 				</div>
 			';
 			$CDNAIParams["ALERT"] = true;
-			$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/bitrixcloud_cdn.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_CDN_AI_TURN_ON").'</a>';
+			if ($USER->CanDoOperation("bitrixcloud_cdn"))
+			{
+				$CDNAIParams["FOOTER"] = '<a href="/bitrix/admin/bitrixcloud_cdn.php?lang='.LANGUAGE_ID.'">'.GetMessage("BCL_CDN_AI_TURN_ON").'</a>';
+			}
 		}
 
 		CAdminInformer::AddItem($CDNAIParams);

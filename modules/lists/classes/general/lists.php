@@ -1,4 +1,9 @@
 <?
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Loader;
+
+Loc::loadMessages(__FILE__);
+
 class CLists
 {
 	public static function SetPermission($iblock_type_id, $arGroups)
@@ -415,5 +420,573 @@ class CLists
 		}
 		return $code;
 	}
+
+	static public function OnAfterIBlockElementDelete($fields)
+	{
+		if(CModule::includeModule('bizproc'))
+		{
+			$errors = array();
+
+			$iblockType = COption::getOptionString("lists", "livefeed_iblock_type_id");
+
+			$iblockQuery = CIBlock::getList(array(), array('ID' => $fields['IBLOCK_ID']));
+			if($iblock = $iblockQuery->fetch())
+			{
+				$iblockType = $iblock["IBLOCK_TYPE_ID"];
+			}
+
+			$states = CBPStateService::getDocumentStates(BizprocDocument::getDocumentComplexId($iblockType, $fields['ID']));
+			$listWorkflowId = array();
+			foreach ($states as $workflowId => $state)
+			{
+				$listWorkflowId[] = $workflowId;
+			}
+
+			self::deleteSocnetLog($listWorkflowId);
+
+			CBPDocument::onDocumentDelete(BizprocDocument::getDocumentComplexId($iblockType, $fields['ID']), $errors);
+		}
+
+		$propertyQuery = CIBlockElement::getProperty(
+			$fields['IBLOCK_ID'], $fields['ID'], 'sort', 'asc', array('ACTIVE'=>'Y'));
+		while($property = $propertyQuery->fetch())
+		{
+			$userType = \CIBlockProperty::getUserType($property['USER_TYPE']);
+			if (array_key_exists('DeleteAllAttachedFiles', $userType))
+			{
+				call_user_func_array($userType['DeleteAllAttachedFiles'], array($fields['ID']));
+			}
+		}
+	}
+
+	/**
+	 * @param string $workflowId
+	 * @param string $iblockType
+	 * @param int $elementId
+	 * @param int $iblockId
+	 * @param string $action Action stop or delete
+	 * @return string error
+	 */
+	public static function completeWorkflow($workflowId, $iblockType, $elementId, $iblockId, $action)
+	{
+		if(!Loader::includeModule('bizproc'))
+		{
+			return Loc::getMessage('LISTS_MODULE_BIZPROC_NOT_INSTALLED');
+		}
+
+		global $USER;
+		$userId = $USER->getID();
+
+		$documentType = BizprocDocument::generateDocumentComplexType($iblockType, $iblockId);
+		$documentId = BizprocDocument::getDocumentComplexId($iblockType, $elementId);
+		$documentStates = CBPDocument::getDocumentStates($documentType, $documentId);
+
+		$permission = CBPDocument::canUserOperateDocument(
+			($action == 'stop') ? CBPCanUserOperateOperation::StartWorkflow :
+				CBPCanUserOperateOperation::CreateWorkflow,
+			$userId,
+			$documentId,
+			array("DocumentStates" => $documentStates)
+		);
+
+		if(!$permission)
+		{
+			return Loc::getMessage('LISTS_ACCESS_DENIED');
+		}
+
+		$stringError = '';
+
+		if($action == 'stop')
+		{
+			$errors = array();
+			CBPDocument::terminateWorkflow(
+				$workflowId,
+				$documentId,
+				$errors
+			);
+
+			if (!empty($errors))
+			{
+				$stringError = '';
+				foreach ($errors as $error)
+					$stringError .= $error['message'];
+				$listError[] = array('id' => 'stopBizproc', 'text' => $stringError);
+			}
+		}
+		else
+		{
+			$errors = array();
+			if (isset($documentStates[$workflowId]['WORKFLOW_STATUS']) &&
+				$documentStates[$workflowId]['WORKFLOW_STATUS'] !== null)
+			{
+				CBPDocument::terminateWorkflow(
+					$workflowId,
+					$documentId,
+					$errors
+				);
+			}
+
+			if (!empty($errors))
+			{
+				$stringError = '';
+				foreach ($errors as $error)
+					$stringError .= $error['message'];
+				$listError[] = array('id' => 'stopBizproc', 'text' => $stringError);
+			}
+			else
+			{
+				CBPTaskService::deleteByWorkflow($workflowId);
+				CBPTrackingService::deleteByWorkflow($workflowId);
+				CBPStateService::deleteWorkflow($workflowId);
+			}
+		}
+
+		if(empty($listError) && Loader::includeModule('socialnetwork') &&
+			$iblockType == COption::getOptionString("lists", "livefeed_iblock_type_id"))
+		{
+			$sourceId = CBPStateService::getWorkflowIntegerId($workflowId);
+			$resultQuery = CSocNetLog::getList(
+				array(),
+				array('EVENT_ID' => 'lists_new_element', 'SOURCE_ID' => $sourceId),
+				false,
+				false,
+				array('ID')
+			);
+			while ($log = $resultQuery->fetch())
+			{
+				CSocNetLog::delete($log['ID']);
+			}
+		}
+
+		if (!empty($listError))
+		{
+			$errorObject = new CAdminException($listError);
+			$stringError = $errorObject->getString();
+		}
+
+		return $stringError;
+	}
+
+	public static function deleteSocnetLog(array $listWorkflowId)
+	{
+		if(CModule::includeModule('socialnetwork'))
+		{
+			foreach ($listWorkflowId as $workflowId)
+			{
+				$sourceId = CBPStateService::getWorkflowIntegerId($workflowId);
+				$resultQuery = CSocNetLog::getList(
+					array(),
+					array('EVENT_ID' => 'lists_new_element', 'SOURCE_ID' => $sourceId),
+					false,
+					false,
+					array('ID')
+				);
+				while ($log = $resultQuery->fetch())
+				{
+					CSocNetLog::delete($log['ID']);
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param $iblockId
+	 * @param array $errors - an array of errors that occurred array(0 => 'error message')
+	 * @return bool
+	 */
+	public static function copyIblock($iblockId, array &$errors)
+	{
+		$iblockId = (int)$iblockId;
+		if(!$iblockId)
+		{
+			$errors[] = Loc::getMessage('LISTS_REQUIRED_PARAMETER', array('#parameter#' => 'iblockId'));
+			return false;
+		}
+
+		/* We obtain data on old iblock and add a new iblock */
+		$query = CIBlock::getList(array(), array('ID' => $iblockId), true);
+		$iblock = $query->fetch();
+		if(!$iblock)
+		{
+			$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_GET_DATA');
+			return false;
+		}
+		$iblockMessage = CIBlock::getMessages($iblockId);
+		$iblock = array_merge($iblock, $iblockMessage);
+
+		$iblock['NAME'] = $iblock['NAME'].Loc::getMessage('LISTS_COPY_IBLOCK_NAME_TITLE');
+		if(!empty($iblock['PICTURE']))
+		{
+			$iblock['PICTURE'] = CFile::makeFileArray($iblock['PICTURE']);
+		}
+		$iblockObject = new CIBlock;
+		if(!$iblockObject)
+		{
+			$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_GET_DATA');
+			return false;
+		}
+		$copyIblockId = $iblockObject->add($iblock);
+		if(!$copyIblockId)
+		{
+			$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_GET_DATA');
+			return false;
+		}
+
+		/* Set right */
+		$rights = array();
+		if($iblock['RIGHTS_MODE'] == 'E')
+		{
+			$rightObject = new CIBlockRights($iblockId);
+			$i = 0;
+			foreach($rightObject->getRights() as $right)
+			{
+				$rights['n'.($i++)] = array(
+					'GROUP_CODE' => $right['GROUP_CODE'],
+					'DO_CLEAN' => 'N',
+					'TASK_ID' => $right['TASK_ID'],
+				);
+			}
+		}
+		else
+		{
+			$i = 0;
+			if(!empty($iblock['SOCNET_GROUP_ID']))
+			{
+				$socnetPerm = self::getSocnetPermission($iblockId);
+				foreach($socnetPerm as $role => $permission)
+				{
+					if($permission > "W")
+						$permission = "W";
+					switch($role)
+					{
+						case "A":
+						case "E":
+						case "K":
+							$rights['n'.($i++)] = array(
+								"GROUP_CODE" => "SG".$iblock['SOCNET_GROUP_ID']."_".$role,
+								"IS_INHERITED" => "N",
+								"TASK_ID" => CIBlockRights::letterToTask($permission),
+							);
+							break;
+						case "L":
+							$rights['n'.($i++)] = array(
+								"GROUP_CODE" => "AU",
+								"IS_INHERITED" => "N",
+								"TASK_ID" => CIBlockRights::letterToTask($permission),
+							);
+							break;
+						case "N":
+							$rights['n'.($i++)] = array(
+								"GROUP_CODE" => "G2",
+								"IS_INHERITED" => "N",
+								"TASK_ID" => CIBlockRights::letterToTask($permission),
+							);
+							break;
+					}
+				}
+			}
+			else
+			{
+				$groupPermissions = CIBlock::getGroupPermissions($iblockId);
+				foreach($groupPermissions as $groupId => $permission)
+				{
+					if($permission > 'W')
+						$rights['n'.($i++)] = array(
+							'GROUP_CODE' => 'G'.$groupId,
+							'IS_INHERITED' => 'N',
+							'TASK_ID' => CIBlockRights::letterToTask($permission),
+						);
+				}
+			}
+
+		}
+		$iblock['RIGHTS'] = $rights;
+		$resultIblock = $iblockObject->update($copyIblockId, $iblock);
+		if(!$resultIblock)
+			$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_SET_RIGHT');
+
+		/* Add fields */
+		$listObject = new CList($iblockId);
+		$fields = $listObject->getFields();
+		$copyListObject = new CList($copyIblockId);
+		foreach($fields as $fieldId => $field)
+		{
+			$copyFields = array(
+				'NAME' => $field['NAME'],
+				'SORT' => $field['SORT'],
+				'MULTIPLE' => $field['MULTIPLE'],
+				'IS_REQUIRED' => $field['IS_REQUIRED'],
+				'IBLOCK_ID' => $copyIblockId,
+				'SETTINGS' => $field['SETTINGS'],
+				'DEFAULT_VALUE' => $field['DEFAULT_VALUE'],
+				'TYPE' => $field['TYPE'],
+				'PROPERTY_TYPE' => $field['PROPERTY_TYPE'],
+			);
+
+			if(!$listObject->is_field($fieldId))
+			{
+				if($field['TYPE'] == 'L')
+				{
+					$enum = CIBlockPropertyEnum::getList(array(), array('PROPERTY_ID' => $field['ID']));
+					while($listData = $enum->fetch())
+					{
+						$copyFields['VALUES'][] = array(
+							'XML_ID' => $listData['XML_ID'],
+							'VALUE' => $listData['VALUE'],
+							'DEF' => $listData['DEF'],
+							'SORT' => $listData['SORT']
+						);
+					}
+				}
+
+				$copyFields['CODE'] = $field['CODE'];
+				$copyFields['LINK_IBLOCK_ID'] = $field['LINK_IBLOCK_ID'];
+				if(!empty($field['PROPERTY_USER_TYPE']['USER_TYPE']))
+					$copyFields['USER_TYPE'] = $field['PROPERTY_USER_TYPE']['USER_TYPE'];
+				if(!empty($field['ROW_COUNT']))
+					$copyFields['ROW_COUNT'] = $field['ROW_COUNT'];
+				if(!empty($field['COL_COUNT']))
+					$copyFields['COL_COUNT'] = $field['COL_COUNT'];
+				if(!empty($field['USER_TYPE_SETTINGS']))
+					$copyFields['USER_TYPE_SETTINGS'] = $field['USER_TYPE_SETTINGS'];
+			}
+
+			if($fieldId == 'NAME')
+			{
+				$resultUpdateField = $copyListObject->updateField("NAME", $copyFields);
+				if($resultUpdateField)
+					$copyListObject->save();
+				else
+					$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_ADD_FIELD',
+						array('#field#' => $field['NAME']));
+
+				continue;
+			}
+
+			$copyFieldId = $copyListObject->addField($copyFields);
+			if($copyFieldId)
+				$copyListObject->save();
+			else
+				$errors[] = Loc::getMessage('LISTS_COPY_IBLOCK_ERROR_ADD_FIELD',
+					array('#field#' => $field['NAME']));
+		}
+
+		/* Copy Workflow Template */
+		// Make a copy workflow templates
+
+		return true;
+	}
+
+	public static function checkChangedFields($iblockId, $elementId, array $select, array $elementFields, array $elementProperty)
+	{
+		$changedFields = array();
+		/* We get the new data element. */
+		$elementNewData = array();
+		$elementQuery = CIBlockElement::getList(
+			array(), array('IBLOCK_ID' => $iblockId, '=ID' => $elementId), false, false, $select);
+		$elementObject = $elementQuery->getNextElement();
+
+		if(is_object($elementObject))
+			$elementNewData = $elementObject->getFields();
+
+		$elementOldData = $elementFields;
+		unset($elementNewData["TIMESTAMP_X"]);
+		unset($elementOldData["TIMESTAMP_X"]);
+
+		$elementNewData["PROPERTY_VALUES"] = array();
+		if(is_object($elementObject))
+		{
+			$propertyQuery = CIBlockElement::getProperty(
+				$iblockId,
+				$elementId,
+				array("sort"=>"asc", "id"=>"asc", "enum_sort"=>"asc", "value_id"=>"asc"),
+				array("ACTIVE"=>"Y", "EMPTY"=>"N")
+			);
+			while($property = $propertyQuery->fetch())
+			{
+				$propertyId = $property["ID"];
+				if(!array_key_exists($propertyId, $elementNewData["PROPERTY_VALUES"]))
+				{
+					$elementNewData["PROPERTY_VALUES"][$propertyId] = $property;
+					unset($elementNewData["PROPERTY_VALUES"][$propertyId]["DESCRIPTION"]);
+					unset($elementNewData["PROPERTY_VALUES"][$propertyId]["VALUE_ENUM_ID"]);
+					unset($elementNewData["PROPERTY_VALUES"][$propertyId]["VALUE_ENUM"]);
+					unset($elementNewData["PROPERTY_VALUES"][$propertyId]["VALUE_XML_ID"]);
+					$elementNewData["PROPERTY_VALUES"][$propertyId]["FULL_VALUES"] = array();
+					$elementNewData["PROPERTY_VALUES"][$propertyId]["VALUES_LIST"] = array();
+				}
+
+				$elementNewData["PROPERTY_VALUES"][$propertyId]["FULL_VALUES"][$property["PROPERTY_VALUE_ID"]] = array(
+					"VALUE" => $property["VALUE"],
+					"DESCRIPTION" => $property["DESCRIPTION"],
+				);
+				$elementNewData["PROPERTY_VALUES"][$propertyId]["VALUES_LIST"][$property["PROPERTY_VALUE_ID"]] = $property["VALUE"];
+			}
+		}
+
+		$elementOldData["PROPERTY_VALUES"] = $elementProperty;
+
+		/* Check added or deleted fields. */
+		$listNewFieldIdToDelete = array();
+		$listOldFieldIdToDelete = array();
+		$differences = array_diff_key($elementNewData, $elementOldData);
+		foreach(array_keys($differences) as $fieldId)
+		{
+			if($fieldId[0] === '~')
+				continue;
+			$changedFields[] = $fieldId;
+			$listNewFieldIdToDelete["FIELD"][] = $fieldId;
+		}
+		$differences = array_diff_key($elementOldData, $elementNewData);
+		foreach(array_keys($differences) as $fieldId)
+		{
+			if($fieldId[0] === '~')
+				continue;
+			$changedFields[] = $fieldId;
+			$listOldFieldIdToDelete["FIELD"][] = $fieldId;
+		}
+
+		$differences = array_diff_key(
+			$elementNewData["PROPERTY_VALUES"],
+			$elementOldData["PROPERTY_VALUES"]
+		);
+		foreach(array_keys($differences) as $fieldId)
+		{
+			$listNewFieldIdToDelete["PROPERTY"][] = $fieldId;
+
+			if(!empty($elementNewData["PROPERTY_VALUES"][$fieldId]["CODE"]))
+				$fieldId = "PROPERTY_".$elementNewData["PROPERTY_VALUES"][$fieldId]["CODE"];
+			else
+				$fieldId = "PROPERTY_".$fieldId;
+			$changedFields[] = $fieldId;
+		}
+		$differences = array_diff_key(
+			$elementOldData["PROPERTY_VALUES"],
+			$elementNewData["PROPERTY_VALUES"]
+		);
+		foreach(array_keys($differences) as $fieldId)
+		{
+			$listOldFieldIdToDelete["PROPERTY"][] = $fieldId;
+
+			if(!empty($elementOldData["PROPERTY_VALUES"][$fieldId]["CODE"]))
+				$fieldId = "PROPERTY_".$elementOldData["PROPERTY_VALUES"][$fieldId]["CODE"];
+			else
+				$fieldId = "PROPERTY_".$fieldId;
+			$changedFields[] = $fieldId;
+		}
+
+		foreach($listNewFieldIdToDelete as $typeField => $listField)
+		{
+			if($typeField == "FIELD")
+				foreach($listField as $fieldId)
+					unset($elementNewData[$fieldId]);
+			elseif($typeField == "PROPERTY")
+				foreach($listField as $fieldId)
+					unset($elementNewData["PROPERTY_VALUES"][$fieldId]);
+		}
+		foreach($listOldFieldIdToDelete as $typeField => $listField)
+		{
+			if($typeField == "FIELD")
+				foreach($listField as $fieldId)
+					unset($elementOldData[$fieldId]);
+			elseif($typeField == "PROPERTY")
+				foreach($listField as $fieldId)
+					unset($elementOldData["PROPERTY_VALUES"][$fieldId]);
+		}
+
+		/* Preparing arrays to compare */
+		$listObject = new CList($iblockId);
+		foreach($elementNewData as $fieldId => $fieldValue)
+		{
+			if(!$listObject->is_field($fieldId) && $fieldId != "PROPERTY_VALUES")
+			{
+				unset($elementNewData[$fieldId]);
+			}
+			elseif($fieldId == "PROPERTY_VALUES")
+			{
+				foreach($fieldValue as $propertyId => $propertyData)
+				{
+					if(!empty($propertyData["CODE"]))
+						$elementNewData["PROPERTY_".$propertyData["CODE"]] = $propertyData["VALUES_LIST"];
+					else
+						$elementNewData["PROPERTY_".$propertyData["ID"]] = $propertyData["VALUES_LIST"];
+
+					unset($elementNewData["PROPERTY_VALUES"][$propertyId]);
+				}
+				unset($elementNewData["PROPERTY_VALUES"]);
+			}
+		}
+		foreach($elementOldData as $fieldId => $fieldValue)
+		{
+			if(!$listObject->is_field($fieldId) && $fieldId != "PROPERTY_VALUES")
+			{
+				unset($elementOldData[$fieldId]);
+			}
+			elseif($fieldId == "PROPERTY_VALUES")
+			{
+				foreach($fieldValue as $propertyId => $propertyData)
+				{
+					if(!empty($propertyData["CODE"]))
+						$elementOldData["PROPERTY_".$propertyData["CODE"]] = $propertyData["VALUES_LIST"];
+					else
+						$elementOldData["PROPERTY_".$propertyData["ID"]] = $propertyData["VALUES_LIST"];
+
+					unset($elementOldData["PROPERTY_VALUES"][$propertyId]);
+				}
+				unset($elementOldData["PROPERTY_VALUES"]);
+			}
+		}
+
+		/* Compares the value */
+		foreach($elementNewData as $fieldName => $fieldValue)
+		{
+			if(is_array($fieldValue))
+			{
+				if(is_array(current($fieldValue)))
+				{
+					$firstValues = array();
+					$secondValues = array();
+					foreach($fieldValue as $values)
+						$firstValues = $values;
+					foreach($elementOldData[$fieldName] as $values)
+						$secondValues = $values;
+
+					if(array_key_exists("TEXT", $firstValues))
+					{
+						$differences = array_diff($firstValues, $secondValues);
+						if(!empty($differences))
+							$changedFields[] = $fieldName;
+					}
+					else
+					{
+						if(count($firstValues) != count($secondValues))
+							$changedFields[] = $fieldName;
+					}
+				}
+				else
+				{
+					$differences = array_diff($fieldValue, $elementOldData[$fieldName]);
+					if(!empty($differences))
+						$changedFields[] = $fieldName;
+				}
+			}
+			else
+			{
+				if(strcmp((string)$fieldValue, (string)$elementOldData[$fieldName]) !== 0)
+					$changedFields[] = $fieldName;
+			}
+		}
+
+		return $changedFields;
+	}
+
+	public static function deleteListsUrl($iblockId)
+	{
+		global $DB;
+		$iblockId = intval($iblockId);
+		$DB->Query("delete from b_lists_url where IBLOCK_ID="
+			.$iblockId, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+	}
+
 }
 ?>

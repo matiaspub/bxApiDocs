@@ -4,7 +4,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialservices/classes/g
 class CSocServAuthDB
 	extends CSocServAuth
 {
-	static function Add($arFields)
+	public static function Add($arFields)
 	{
 		global $DB;
 		if(!self::CheckFields('ADD', $arFields))
@@ -61,8 +61,7 @@ class CSocServAuthDB
 			"SITE_ID" => array("FIELD" => "SU.SITE_ID", "TYPE" => "string"),
 			"OATOKEN_EXPIRES" => array("FIELD" => "SU.OATOKEN_EXPIRES", "TYPE" => "int"),
 			"INITIALIZED" => array("FIELD" => "SU.INITIALIZED", "TYPE" => "char"),
-			"ACTIVE" => array("FIELD" => "BU.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_user BU ON (SU.USER_ID
-			 = BU.ID)"),
+			"ACTIVE" => array("FIELD" => "BU.ACTIVE", "TYPE" => "char", "FROM" => "INNER JOIN b_user BU ON (SU.USER_ID = BU.ID)"),
 		);
 		$arSqls = CGroup::PrepareSql($arFields, $arOrder, $arFilter, $arGroupBy, $arSelectFields);
 		$arSqls["SELECT"] = str_replace("%%_DISTINCT_%%", "", $arSqls["SELECT"]);

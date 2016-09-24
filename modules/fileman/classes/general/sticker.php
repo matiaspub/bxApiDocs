@@ -495,7 +495,7 @@ class CSticker
 	public static function InitJS($Params)
 	{
 		global $APPLICATION, $USER;
-		CUtil::InitJSCore(array('window', 'ajax'));
+		CUtil::InitJSCore(array('window', 'ajax', 'date'));
 		$APPLICATION->AddHeadScript('/bitrix/js/fileman/sticker.js', true);
 		$APPLICATION->SetAdditionalCSS('/bitrix/js/fileman/sticker.css', true);
 
@@ -783,4 +783,3 @@ class CSticker
 		return $result;
 	}
 }
-?>

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков. 
+ * <b>CIBlockSection</b> - класс для работы с разделами (группами) информационных блоков.
  *
  *
  * @return mixed 
@@ -17,136 +17,144 @@ class CIBlockSection extends CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>. Метод динамичный.</p>
+	* <p>Возвращает список разделов, отсортированных в порядке<span class="syntax"><i> arOrder</i></span> по фильтру <i>arFilter</i>. Нестатический метод.</p>
 	*
 	*
 	* @param array $arOrder = Array("SORT"=>"ASC") Массив для сортировки, имеющий вид <i>by1</i>=&gt;<i>order1</i>[,
 	* <i>by2</i>=&gt;<i>order2</i> [, ..]], где <i> by1, ... </i> - поле сортировки, может
-	* принимать значения: <ul> <li> <b>id</b> - код группы;</li> <li> <b>section</b> - код
-	* родительской группы;</li> <li> <b>name</b> - название группы;</li> <li> <b>code</b> -
-	* символьный код группы;</li> <li> <b>active</b> - активности группы;</li> <li>
-	* <b>left_margin</b> - левая граница;</li> <li> <b>depth_level</b> - глубина вложенности
-	* (начинается с 1);</li> <li> <b>sort</b> - индекс сортировки;</li> <li> <b>created</b> - по
-	* времени создания группы;</li> <li> <b>created_by</b> - по идентификатору
-	* создателя группы;</li> <li> <b>modified_by</b> - по идентификатору
-	* пользователя изменившего группу;</li> <li> <b>element_cnt</b> - количество
-	* элементов в группе, работает только если <b>bIncCnt</b> = true;</li> <li>
-	* <b>timestamp_x</b> - по времени последнего изменения.</li> </ul> <i>order1, ... </i> -
-	* порядок сортировки, может принимать значения: <ul> <li> <b>asc</b> - по
-	* возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> <br> Кроме того,
-	* сортировка возможна и по пользовательским свойствам UF_XXX. <br><br>
-	* Значение по умолчанию Array("SORT"=&gt;"ASC") означает, что результат
-	* выборки будет отсортирован по возрастанию. Если задать пустой
-	* массив Array(), то результат отсортирован не будет.
+	* принимать значения:          <ul> <li> <b>id</b> - код группы;</li>          	            <li>
+	* <b>section</b> - код родительской группы;</li>          	            <li> <b>name</b> -
+	* название группы;</li>                     <li> <b>code</b> - символьный код
+	* группы;</li>          	            <li> <b>active</b> - активности группы;</li>          	        
+	*    <li> <b>left_margin</b> - левая граница;</li>          	            <li> <b>depth_level</b> -
+	* глубина вложенности (начинается с 1);</li>          	            <li> <b>sort</b> -
+	* индекс сортировки;</li>                     <li> <b>created</b> - по времени создания
+	* группы;</li>                     <li> <b>created_by</b> - по идентификатору создателя
+	* группы;</li>                     <li> <b>modified_by</b> - по идентификатору
+	* пользователя изменившего группу;</li>          	            <li> <b>element_cnt</b> -
+	* количество элементов в группе, работает только если <b>bIncCnt</b> =
+	* true;</li>          	            <li> <b>timestamp_x</b> - по времени последнего
+	* изменения.</li>          </ul> <i>order1, ... </i> - порядок сортировки, может
+	* принимать значения:          <ul> <li> <b>asc</b> - по возрастанию;</li>          	       
+	*     <li> <b>desc</b> - по убыванию.</li>          </ul> <br> Кроме того, сортировка
+	* возможна и по пользовательским свойствам UF_XXX. <br><br> Значение по
+	* умолчанию Array("SORT"=&gt;"ASC") означает, что результат выборки будет
+	* отсортирован по возрастанию. Если задать пустой массив Array(), то
+	* результат отсортирован не будет.
 	*
-	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). <i>Фильтруемое
-	* поле</i> может принимать значения: <ul> <li> <b>ACTIVE</b> - фильтр по
-	* активности (Y|N);</li> <li> <b>GLOBAL_ACTIVE</b> - фильтр по активности, учитывая
-	* активность вышележащих разделов (Y|N);</li> <li> <b>NAME</b> - по названию
-	* (можно искать по шаблону [%_]);</li> <li> <b>CODE</b> - по символьному коду (по
-	* шаблону [%_]);</li> <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему коду (по
-	* шаблону [%_]);</li> <li> <b>SECTION_ID</b> - по коду раздела-родителя (если
-	* указать false, то будут возвращены корневые разделы);</li> <li>
-	* <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li> <li> <b>LEFT_BORDER</b>,
-	* <b> RIGHT_BORDER</b> - по левой и правой границе (используется, когда
-	* необходимо выбрать некий диапазон разделов, см. <a href="#ex4">пример
-	* №4</a>);</li> <li> <b>LEFT_MARGIN</b>, <b>RIGHT_MARGIN</b> - по положению в дереве
-	* (используется, когда необходима выборка дерева подразделов, см. <a
-	* href="#ex4">пример №4</a>);</li> <li> <b>ID</b> - по коду раздела;</li> <li> <b>IBLOCK_ID</b> -
-	* по коду родительского информационного блока;</li> <li> <b>IBLOCK_ACTIVE</b> -
-	* по активности родительского информационного блока;</li> <li>
-	* <b>IBLOCK_NAME</b> - по названию информационного блока (по шаблону [%_]);</li>
-	* <li> <b>IBLOCK_TYPE</b> - по типу информационного блока (по шаблону [%_]);</li> <li>
-	* <b>IBLOCK_CODE </b><i> - </i>по символьному коду информационного блока (по
-	* шаблону [%_]);</li> <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему коду
-	* информационного блока (по шаблону [%_]);</li> <li> <span style="font-weight: bold;
-	* ">TIMESTAMP_X</span> - по времени последнего изменения;</li> <li> <span style="font-weight:
-	* bold; ">DATE_CREATE</span> - по времени создания;</li> <li> <span style="font-weight: bold;
-	* ">MODIFIED_BY </span>- по коду пользователя изменившему раздел; <br> </li> <li> <span
-	* style="font-weight: bold; ">CREATED_BY</span> - по содателю; <br> </li> <li> <span style="font-weight: bold;
-	* ">SOCNET_GROUP_ID</span> - по привязке к группе Социальной сети;</li> <li>
-	* <b>MIN_PERMISSION</b> - фильтр по правам доступа, по умолчанию принимает
-	* <i>R</i> (уровень доступа <i>Чтение</i>);</li> <li> <b>CHECK_PERMISSIONS</b> - если
-	* установлено значение "N", то проверки прав не происходит; </li> <li>
-	* <b>PROPERTY </b><i> - </i>по значениям свойств внутрилежащих элементов, PROPERTY
-	* - массив вида Array("код свойства"=&gt;"значение", ...).</li> </ul> Все
-	* фильтруемые поля могут содержать перед названием <a
+	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]).
+	* 	<i>Фильтруемое поле</i> может принимать значения:          <ul> <li> <b>ACTIVE</b>
+	* - фильтр по активности (Y|N);</li>          	            <li> <b>GLOBAL_ACTIVE</b> - фильтр по
+	* активности, учитывая активность вышележащих разделов (Y|N);</li>         
+	* 	            <li> <b>NAME</b> - по названию (можно искать по шаблону [%_]);</li>         
+	* 	            <li> <b>CODE</b> - по символьному коду (по шаблону [%_]);</li>          	      
+	*      <li> <b>XML_ID</b> или <b>EXTERNAL_ID</b> - по внешнему коду (по шаблону [%_]);</li>   
+	*       	            <li> <b>SECTION_ID</b> - по коду раздела-родителя (если указать
+	* false, то будут возвращены корневые разделы);</li>          	            <li>
+	* <b>DEPTH_LEVEL</b> - по уровню вложенности (начинается с 1);</li>          	           
+	* <li> <b>LEFT_BORDER</b>, <b> RIGHT_BORDER</b> - по левой и правой границе
+	* (используется, когда необходимо выбрать некий диапазон разделов,
+	* см. <a href="#ex4">пример №4</a>);</li>                     <li> <b>LEFT_MARGIN</b>, <b>RIGHT_MARGIN</b> -
+	* по положению в дереве (используется, когда необходима выборка
+	* дерева подразделов, см. <a href="#ex4">пример №4</a>);</li>          	            <li>
+	* <b>ID</b> - по коду раздела;</li>          	            <li> <b>IBLOCK_ID</b> - по коду
+	* родительского информационного блока;</li>          	            <li>
+	* <b>IBLOCK_ACTIVE</b> - по активности родительского информационного
+	* блока;</li>          	            <li> <b>IBLOCK_NAME</b> - по названию информационного
+	* блока (по шаблону [%_]);</li>          	            <li> <b>IBLOCK_TYPE</b> - по типу
+	* информационного блока (по шаблону [%_]);</li>          	            <li> <b>IBLOCK_CODE
+	* </b><i> - </i>по символьному коду информационного блока (по шаблону
+	* [%_]);</li>          	            <li> <b>IBLOCK_XML_ID</b> или <b>IBLOCK_EXTERNAL_ID</b> - по внешнему
+	* коду информационного блока (по шаблону [%_]);</li>                     <li> <span
+	* style="font-weight: bold; ">TIMESTAMP_X</span> - по времени последнего изменения;</li>      
+	*               <li> <span style="font-weight: bold; ">DATE_CREATE</span> - по времени создания;</li>    
+	*                 <li> <span style="font-weight: bold; ">MODIFIED_BY </span>- по коду пользователя
+	* изменившему раздел;              <br> </li>                     <li> <span style="font-weight: bold;
+	* ">CREATED_BY</span> - по содателю;              <br> </li>                     <li> <span style="font-weight:
+	* bold; ">SOCNET_GROUP_ID</span> - по привязке к группе Социальной сети;</li>              
+	*       <li> <b>MIN_PERMISSION</b> - фильтр по правам доступа, по умолчанию
+	* принимает <i>R</i> (уровень доступа <i>Чтение</i>);</li>                     <li>
+	* <b>CHECK_PERMISSIONS</b> - если установлено значение "N", то проверки прав не
+	* происходит; </li>          	            <li> <b>PROPERTY </b><i> - </i>по значениям свойств
+	* внутрилежащих элементов, PROPERTY - массив вида Array("код
+	* свойства"=&gt;"значение", ...).</li>          </ul>        Все фильтруемые поля
+	* могут содержать перед названием <a
 	* href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
-	* фильтра</a>. <br><br><b><i>Значения фильтра</i></b> одиночное значение или
-	* массив. <br><br><div class="note"> <b>Важно!</b> Чтобы фильтрация выполнялась по
-	* пользовательским свойствам, необходимо обязательно передавать в
-	* фильтр <i>IBLOCK_ID</i>. Само свойство надо указывать в виде UF_... </div> <br>
-	* Необязательное. По умолчанию записи не фильтруются.
+	* фильтра</a>.          <br><br><b><i>Значения фильтра</i></b> одиночное значение
+	* или массив.          <br><br><div class="note"> <b>Важно!</b> Чтобы фильтрация
+	* выполнялась по пользовательским свойствам, необходимо
+	* обязательно передавать в фильтр <i>IBLOCK_ID</i>. Само свойство надо
+	* указывать в виде UF_... </div> <br>        Необязательное. По умолчанию
+	* записи не фильтруются.
 	*
 	* @param bool $bIncCnt = false Возвращать ли поле <i>ELEMENT_CNT</i> - количество элементов в разделе.
 	* При этом arFilter дополнительно обрабатывает следующие фильтруемые
-	* поля:<b> <br></b> <ul> <li> <b>ELEMENT_SUBSECTIONS</b> - подсчитывать элементы
-	* вложенных подразделов или нет (Y|N). По умолчанию Y;</li> <li> <b>CNT_ALL</b> -
-	* подсчитывать еще неопубликованные элементы (Y|N). По умолчанию N.
-	* Актуально при установленном модуле документооборота;</li> <li>
-	* <b>CNT_ACTIVE</b> - при подсчете учитывать активность элементов (Y|N). По
-	* умолчанию N. Учитывается флаг активности элемента ACTIVE и даты
-	* начала и окончания активности. <br> </li> </ul> Необязательный параметр,
-	* по умолчанию равен false.
+	* поля:<b>            <br></b>          <ul> <li> <b>ELEMENT_SUBSECTIONS</b> - подсчитывать
+	* элементы вложенных подразделов или нет (Y|N). По умолчанию Y;</li>         
+	*            <li> <b>CNT_ALL</b> - подсчитывать еще неопубликованные элементы
+	* (Y|N). По умолчанию N. Актуально при установленном модуле
+	* документооборота;</li>                     <li> <b>CNT_ACTIVE</b> - при подсчете
+	* учитывать активность элементов (Y|N). По умолчанию N. Учитывается
+	* флаг активности элемента ACTIVE и даты начала и окончания
+	* активности.              <br> </li>          </ul>        Необязательный параметр, по
+	* умолчанию равен false.
 	*
 	* @param array $Select = Array() Массив для выборки. <ul> <li> <b>ID</b> - ID группы информационного
-	* блока.</li> <li> <b>CODE</b> - Символьный идентификатор.</li> <li> <b>EXTERNAL_ID или
+	* блока.</li>	 <li> <b>CODE</b> - Символьный идентификатор.</li>   <li> <b>EXTERNAL_ID или
 	* XML_ID</b> - Внешний код.</li> <li> <b>IBLOCK_ID</b> - ID информационного блока. </li>
 	* <li> <b>IBLOCK_SECTION_ID</b> - ID группы родителя, если не задан то группа
-	* корневая. </li> <li> <b>TIMESTAMP_X</b> - Дата последнего изменения параметров
+	* корневая. </li>  <li> <b>TIMESTAMP_X</b> - Дата последнего изменения параметров
 	* группы. </li> <li> <b>SORT</b> - Порядок сортировки (среди групп внутри
-	* одной группы-родителя).</li> <li> <b>NAME</b> - Наименование группы.</li> <li>
+	* одной группы-родителя).</li> <li> <b>NAME</b> - Наименование группы.</li>  <li>
 	* <b>ACTIVE</b> - Флаг активности (Y|N)</li> <li> <b>GLOBAL_ACTIVE</b> - Флаг активности,
 	* учитывая активность вышележащих (родительских) групп (Y|N).
 	* Вычисляется автоматически (не может быть изменен вручную).</li> <li>
-	* <b>PICTURE</b> - Код картинки в таблице файлов.</li> <li> <b>DESCRIPTION</b> - Описание
-	* группы. </li> <li> <b>DESCRIPTION_TYPE</b> - Тип описания группы (text/html).</li> <li>
-	* <b>LEFT_MARGIN</b> - Левая граница группы. Вычисляется автоматически (не
-	* устанавливается вручную). </li> <li> <b>RIGHT_MARGIN</b> - Правая граница
-	* группы. Вычисляется автоматически (не устанавливается вручную).
-	* </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности группы. Начинается с 1.
-	* Вычисляется автоматически (не устанавливается вручную). </li> <li>
-	* <b>SEARCHABLE_CONTENT</b> Содержимое для поиска при фильтрации групп.
-	* Вычисляется автоматически. Складывается из полей <b>NAME</b> и
-	* <b>DESCRIPTION</b> (без html тэгов, если <b>DESCRIPTION_TYPE</b> установлен в html).</li> <li>
-	* <b>SECTION_PAGE_URL</b> - Шаблон URL-а к странице для детального просмотра
-	* раздела. Определяется из параметров информационного блока.
-	* Изменяется автоматически.</li> <li> <b>MODIFIED_BY</b> - Код пользователя, в
-	* последний раз изменившего элемент.</li> <li> <b>DATE_CREATE</b> - Дата
-	* создания элемента.</li> <li> <b>CREATED_BY</b> - Код пользователя, создавшего
-	* элемент.</li> <li> <b>DETAIL_PICTURE</b> - Код картинки в таблице файлов для
-	* детального просмотра.</li> </ul> Кроме того, можно вывести
-	* пользовательские свойства, если задать их код (см. примечание
-	* ниже).
+	* <b>PICTURE</b> - Код картинки в таблице файлов.</li>  <li> <b>DESCRIPTION</b> -
+	* Описание группы. </li>  <li> <b>DESCRIPTION_TYPE</b> - Тип описания группы
+	* (text/html).</li> <li> <b>LEFT_MARGIN</b> - Левая граница группы. Вычисляется
+	* автоматически (не устанавливается вручную). </li>  <li> <b>RIGHT_MARGIN</b> -
+	* Правая граница группы. Вычисляется автоматически (не
+	* устанавливается вручную). </li> <li> <b>DEPTH_LEVEL</b> - Уровень вложенности
+	* группы. Начинается с 1. Вычисляется автоматически (не
+	* устанавливается вручную). </li> <li> <b>SEARCHABLE_CONTENT</b> Содержимое для
+	* поиска при фильтрации групп. Вычисляется автоматически.
+	* Складывается из полей <b>NAME</b> и <b>DESCRIPTION</b> (без html тэгов, если
+	* <b>DESCRIPTION_TYPE</b> установлен в html).</li>  <li> <b>SECTION_PAGE_URL</b> - Шаблон URL-а к
+	* странице для детального просмотра раздела. Определяется из
+	* параметров информационного блока. Изменяется автоматически.</li>
+	* <li> <b>MODIFIED_BY</b> - Код пользователя, в последний раз изменившего
+	* элемент.</li> <li> <b>DATE_CREATE</b> - Дата создания элемента.</li> <li> <b>CREATED_BY</b> -
+	* Код пользователя, создавшего элемент.</li>  <li> <b>DETAIL_PICTURE</b> - Код
+	* картинки в таблице файлов для детального просмотра.</li>  </ul> Кроме
+	* того, можно вывести пользовательские свойства, если задать их код
+	* (см. примечание ниже).
 	*
 	* @param array $NavStartParams = false Массив для постраничной навигации. Может содержать следующие
-	* ключи: <ul> <li> <b>bShowAll</b> - разрешить вывести все элементы при
+	* ключи: 	 <ul> <li> <b>bShowAll</b> - разрешить вывести все элементы при
 	* постраничной навигации;</li> <li> <b>iNumPage</b> - номер страницы при
-	* постраничной навигации;</li> <li> <b>nPageSize</b> - количество элементов на
-	* странице при постраничной навигации;</li> <li> <b>nTopCount</b> - ограничить
+	* постраничной навигации;</li>  <li> <b>nPageSize</b> - количество элементов на
+	* странице при постраничной навигации;</li>  <li> <b>nTopCount</b> - ограничить
 	* количество возвращаемых методом записей сверху значением этого
-	* ключа (ключ доступен с версии <b>15.5.5 </b>).</li> </ul>
+	* ключа (ключ доступен с версии <b>15.5.5 </b>).</li>   </ul>
 	*
 	* @return CIBlockResult <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a><p></p><div
 	* class="note"> <b>Примечание №1:</b> для вывода пользовательских свойств
 	* обязательно должен быть передан <i>IBLOCK_ID</i> и в arSelect код
 	* необходимых свойств <i>UF_XXX</i>. Если необходимо вывести все
 	* пользовательские свойства, то в arSelect необходимо передать
-	* <i>UF_*</i>.</div> <p></p><div class="note"> <b>Примечание №2:</b> поле для сортировки
+	* <i>UF_*</i>.</div><p></p><div class="note"> <b>Примечание №2:</b> поле для сортировки
 	* <i>left_margin</i>, так называемая "сквозная" сортировка, высчитывается на
 	* основании поля <i>sort</i>, уровня вложенности и сортировкой верхнего
 	* уровня. Отличие полей <i>sort</i> и <i>left_margin</i> в том, что <i>sort</i>
 	* указывается пользователем, для сортировки разделов между собой в
 	* пределах одного раздела-родителя, а вычисляемое <i>left_margin</i>
-	* предназначено для сортировки во всем информационном блоке. </div>
-	* <p></p><div class="note"> <b>Примечание №3:</b> нет возможности фильтровать
-	* разделы в выборке по количеству элементов.</div>
+	* предназначено для сортировки во всем информационном блоке.
+	* </div><p></p><div class="note"> <b>Примечание №3:</b> нет возможности фильтровать
+	* разделы в выборке  по количеству элементов.</div>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arIBTYPE = CIBlockType::GetByIDLang($type, LANGUAGE_ID);<br>if($arIBTYPE!==false)<br>{<br>  // выборка только активных разделов из инфоблока $IBLOCK_ID, в которых есть элементы <br>  // со значением свойства SRC, начинающееся с https://<br>  $arFilter = Array('IBLOCK_ID'=&gt;$IBLOCK_ID, 'GLOBAL_ACTIVE'=&gt;'Y', 'PROPERTY'=&gt;Array('SRC'=&gt;'https://%'));<br>  $db_list = CIBlockSection::GetList(Array($by=&gt;$order), $arFilter, true);<br>  $db_list-&gt;NavStart(20);<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>  while($ar_result = $db_list-&gt;GetNext())<br>  {<br>    echo $ar_result['ID'].' '.$ar_result['NAME'].': '.$ar_result['ELEMENT_CNT'].'&lt;br&gt;';<br>  }<br>  echo $db_list-&gt;NavPrint($arIBTYPE["SECTION_NAME"]);<br>}<br>?&gt;<br>
-	* 
-	* 
 	* 
 	* //пример выборки дерева подразделов для раздела 
 	* $rsParentSection = CIBlockSection::GetByID(ID_необходимой_секции);
@@ -159,8 +167,6 @@ class CIBlockSection extends CAllIBlockSection
 	*        // получаем подразделы
 	*    }
 	* }
-	* 
-	* 
 	* 
 	* //в шаблоне меню, построенного по структуре инфоблока, менять ссылку на элемент, если заполнено пользовательское поле 
 	* 
@@ -181,8 +187,6 @@ class CIBlockSection extends CAllIBlockSection
 	* endif;
 	* ?&gt; 
 	* 
-	* 
-	* 
 	* //рассмотрим разницу использования фильтра по LEFT_MARGIN, RIGHT_MARGIN и LEFT_BORDER, RIGHT_BORDER
 	* //допустим, что у некоторого раздела LEFT_MARGIN (значение в базе) = 10, RIGHT_MARGIN (значение в базе) = 40
 	* 
@@ -194,7 +198,7 @@ class CIBlockSection extends CAllIBlockSection
 	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
 	* while ($arSection = $rsSections-&gt;Fetch())
 	* {
-	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&amp;ltbr&gt;';
+	*     echo htmlspecialcharsbx($arSection['NAME']).' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&amp;ltbr&gt;';
 	* }
 	* 
 	* //во втором примере кода будет возвращена только одна запись - сам раздел
@@ -203,10 +207,8 @@ class CIBlockSection extends CAllIBlockSection
 	* $rsSections = CIBlockSection::GetList(array('LEFT_MARGIN' =&gt; 'ASC'), $arFilter);
 	* while ($arSction = $rsSections-&gt;Fetch())
 	* {
-	*     echo $arSection['NAME'].' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&lt;br&gt;';
+	*     echo htmlspecialcharsbx($arSection['NAME']).' LEFT_MARGIN: '.$arSection['LEFT_MARGIN'].' RIGHT_MARGIN: '.$arSection['RIGHT_MARGIN'].'&lt;br&gt;';
 	* }
-	* 
-	* 
 	* 
 	* 		<!--
 	* 		imgID = 'img-7308';
@@ -269,8 +271,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 	"Yu", "Ya",
 	* 	"E", "CH", "SH", "YO", "JO", "ZH", "YU", "JU", "YA", "JA", "A", "B", "V", "G", "D", "E", "Z", "I", "J", "K", "L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "C", "W", "~", "Y", "'");
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -279,7 +279,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-315789-1451244916',
+	* 			'FORUM_POST-315789-1474649860',
 	* 			'FORUM_POST',
 	* 			'315789',
 	* 			'N',
@@ -303,8 +303,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -313,7 +311,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-319631-1451244366',
+	* 			'FORUM_POST-319631-1474650311',
 	* 			'FORUM_POST',
 	* 			'319631',
 	* 			'N',
@@ -337,8 +335,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -347,7 +343,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-320394-1451244539',
+	* 			'FORUM_POST-320394-1474649488',
 	* 			'FORUM_POST',
 	* 			'320394',
 	* 			'N',
@@ -371,8 +367,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -381,7 +375,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-320627-1451244986',
+	* 			'FORUM_POST-320627-1474649671',
 	* 			'FORUM_POST',
 	* 			'320627',
 	* 			'N',
@@ -405,8 +399,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -415,7 +407,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-331219-1451244897',
+	* 			'FORUM_POST-331219-1474649576',
 	* 			'FORUM_POST',
 	* 			'331219',
 	* 			'N',
@@ -439,8 +431,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -449,7 +439,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-342695-1451244893',
+	* 			'FORUM_POST-342695-1474650022',
 	* 			'FORUM_POST',
 	* 			'342695',
 	* 			'N',
@@ -473,8 +463,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -483,7 +471,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-351621-1451244718',
+	* 			'FORUM_POST-351621-1474649667',
 	* 			'FORUM_POST',
 	* 			'351621',
 	* 			'N',
@@ -507,8 +495,6 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
-	* 
-	* 
 	* BX.ready(function() {
 	* 		if (!window.RatingLike && top.RatingLike)
 	* 			RatingLike = top.RatingLike;
@@ -517,7 +503,7 @@ class CIBlockSection extends CAllIBlockSection
 	* 			return false;
 	* 
 	* 		RatingLike.Set(
-	* 			'FORUM_POST-355817-1451244607',
+	* 			'FORUM_POST-355817-1474650411',
 	* 			'FORUM_POST',
 	* 			'355817',
 	* 			'N',
@@ -541,7 +527,69 @@ class CIBlockSection extends CAllIBlockSection
 	* 
 	* });
 	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
 	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-388818-1474650047',
+	* 			'FORUM_POST',
+	* 			'388818',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
+	* 
+	* BX.ready(function() {
+	* 		if (!window.RatingLike && top.RatingLike)
+	* 			RatingLike = top.RatingLike;
+	* 
+	* 		if (typeof(RatingLike) == 'undefined')
+	* 			return false;
+	* 
+	* 		RatingLike.Set(
+	* 			'FORUM_POST-432155-1474650221',
+	* 			'FORUM_POST',
+	* 			'432155',
+	* 			'N',
+	* 			'',
+	* 			{'LIKE_Y' : 'Больше не нравится', 'LIKE_N' : 'Мне нравится', 'LIKE_D' : 'Это нравится'},
+	* 			'light',
+	* 			''
+	* 		);
+	* 
+	* 		if (typeof(RatingLikePullInit) == 'undefined')
+	* 		{
+	* 			RatingLikePullInit = true;
+	* 			BX.addCustomEvent("onPullEvent-main", function(command,params) {
+	* 				if (command == 'rating_vote')
+	* 				{
+	* 					RatingLike.LiveUpdate(params);
+	* 				}
+	* 			});
+	* 		}
+	* 
+	* 
+	* });
 	* 
 	* 			DocSwitchTab('DocGeneral')
 	* 		
@@ -561,9 +609,9 @@ class CIBlockSection extends CAllIBlockSection
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
-	* информационного блока </a> </li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
+	* информационного блока </a> </li>  </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -687,7 +735,7 @@ class CIBlockSection extends CAllIBlockSection
 			$i = $db_prop["iPropCnt"];
 			$strProp1 .= "
 				LEFT JOIN b_iblock_property FP".$i." ON FP".$i.".IBLOCK_ID=B.ID AND
-				".(IntVal($propID)>0?" FP".$i.".ID=".IntVal($propID)." ":" FP".$i.".CODE='".$DB->ForSQL($propID, 200)."' ")."
+				".((int)$propID>0?" FP".$i.".ID=".(int)$propID." ":" FP".$i.".CODE='".$DB->ForSQL($propID, 200)."' ")."
 				LEFT JOIN ".$strTable." FPV".$i." ON FP".$i.".ID=FPV".$i.".IBLOCK_PROPERTY_ID AND FPV".$i.".IBLOCK_ELEMENT_ID=BE.ID ";
 		}
 		if($bJoinFlatProp)
@@ -752,6 +800,86 @@ class CIBlockSection extends CAllIBlockSection
 			$arSqlSelect["IBLOCK_EXTERNAL_ID"] = $arFields["IBLOCK_EXTERNAL_ID"]." AS IBLOCK_EXTERNAL_ID";
 			$arSqlSelect["GLOBAL_ACTIVE"] = $arFields["GLOBAL_ACTIVE"]." AS GLOBAL_ACTIVE";
 			//$arr["LANG_DIR"],
+		}
+
+		$additionalSelect = array();
+		$arSqlOrder = array();
+		foreach($arOrder as $by=>$order)
+		{
+			$by = strtolower($by);
+			if(isset($arSqlOrder[$by]))
+				continue;
+			$order = strtolower($order);
+			if($order!="asc")
+				$order = "desc";
+
+			switch ($by)
+			{
+				case "id":
+					$arSqlOrder[$by] = " BS.ID ".$order." ";
+					$additionalSelect["ID"] = $arFields["ID"]." AS ID";
+					break;
+				case "section":
+					$arSqlOrder[$by] = " BS.IBLOCK_SECTION_ID ".$order." ";
+					$additionalSelect["IBLOCK_SECTION_ID"] = $arFields["IBLOCK_SECTION_ID"]." AS IBLOCK_SECTION_ID";
+					break;
+				case "name":
+					$arSqlOrder[$by] = " BS.NAME ".$order." ";
+					$additionalSelect["NAME"] = $arFields["NAME"]." AS NAME";
+					break;
+				case "code":
+					$arSqlOrder[$by] = " BS.CODE ".$order." ";
+					$additionalSelect["CODE"] = $arFields["CODE"]." AS CODE";
+					break;
+				case "active":
+					$arSqlOrder[$by] = " BS.ACTIVE ".$order." ";
+					$additionalSelect["ACTIVE"] = $arFields["ACTIVE"]." AS ACTIVE";
+					break;
+				case "left_margin":
+					$arSqlOrder[$by] = " BS.LEFT_MARGIN ".$order." ";
+					$additionalSelect["LEFT_MARGIN"] = $arFields["LEFT_MARGIN"]." AS LEFT_MARGIN";
+					break;
+				case "depth_level":
+					$arSqlOrder[$by] = " BS.DEPTH_LEVEL ".$order." ";
+					$additionalSelect["DEPTH_LEVEL"] = $arFields["DEPTH_LEVEL"]." AS DEPTH_LEVEL";
+					break;
+				case "sort":
+					$arSqlOrder[$by] = " BS.SORT ".$order." ";
+					$additionalSelect["SORT"] = $arFields["SORT"]." AS SORT";
+					break;
+				case "created":
+					$arSqlOrder[$by] = " BS.DATE_CREATE ".$order." ";
+					$additionalSelect["DATE_CREATE"] = $arFields["DATE_CREATE"]." AS DATE_CREATE";
+					break;
+				case "created_by":
+					$arSqlOrder[$by] = " BS.CREATED_BY ".$order." ";
+					$additionalSelect["CREATED_BY"] = $arFields["CREATED_BY"]." AS CREATED_BY";
+					break;
+				case "modified_by":
+					$arSqlOrder[$by] = " BS.MODIFIED_BY ".$order." ";
+					$additionalSelect["MODIFIED_BY"] = $arFields["MODIFIED_BY"]." AS MODIFIED_BY";
+					break;
+				default:
+					if ($bIncCnt && $by == "element_cnt")
+					{
+						$arSqlOrder[$by] = " ELEMENT_CNT ".$order." ";
+					}
+					elseif (isset($obUserFieldsSql) && $s = $obUserFieldsSql->GetOrder($by))
+					{
+						$arSqlOrder[$by] = " ".$s." ".$order." ";
+					}
+					else
+					{
+						$by = "timestamp_x";
+						$arSqlOrder[$by] = " BS.TIMESTAMP_X ".$order." ";
+						$additionalSelect["TIMESTAMP_X"] = $arFields["TIMESTAMP_X"]." AS TIMESTAMP_X";
+					}
+			}
+		}
+		if (!empty($additionalSelect) && !empty($arSqlSelect))
+		{
+			foreach ($additionalSelect as $key => $value)
+				$arSqlSelect[$key] = $value;
 		}
 
 		if(count($arSqlSelect))
@@ -830,41 +958,13 @@ class CIBlockSection extends CAllIBlockSection
 				:
 					"	AND BSTEMP.IBLOCK_ID = BS.IBLOCK_ID
 						AND BSTEMP.LEFT_MARGIN >= BS.LEFT_MARGIN
-						AND BSTEMP.RIGHT_MARGIN <= BS.RIGHT_MARGIN "
+						AND BSTEMP.RIGHT_MARGIN <= BS.RIGHT_MARGIN
+						".($arFilter["CNT_ACTIVE"]=="Y"? "AND BSTEMP.GLOBAL_ACTIVE = 'Y'": "")."
+					"
 				)."
 				".$strSqlSearch."
 			";
 			$strGroupBy = "GROUP BY BS.ID, B.ID";
-		}
-
-		$arSqlOrder = array();
-		foreach($arOrder as $by=>$order)
-		{
-			$by = strtolower($by);
-			if(isset($arSqlOrder[$by]))
-				continue;
-			$order = strtolower($order);
-			if($order!="asc")
-				$order = "desc";
-
-			if($by == "id") $arSqlOrder[$by] = " BS.ID ".$order." ";
-			elseif($by == "section") $arSqlOrder[$by] = " BS.IBLOCK_SECTION_ID ".$order." ";
-			elseif($by == "name") $arSqlOrder[$by] = " BS.NAME ".$order." ";
-			elseif($by == "code") $arSqlOrder[$by] = " BS.CODE ".$order." ";
-			elseif($by == "active") $arSqlOrder[$by] = " BS.ACTIVE ".$order." ";
-			elseif($by == "left_margin") $arSqlOrder[$by] = " BS.LEFT_MARGIN ".$order." ";
-			elseif($by == "depth_level") $arSqlOrder[$by] = " BS.DEPTH_LEVEL ".$order." ";
-			elseif($by == "sort") $arSqlOrder[$by] = " BS.SORT ".$order." ";
-			elseif($by == "created") $arSqlOrder[$by] = " BS.DATE_CREATE ".$order." ";
-			elseif($by == "created_by") $arSqlOrder[$by] = " BS.CREATED_BY ".$order." ";
-			elseif($by == "modified_by") $arSqlOrder[$by] = " BS.MODIFIED_BY ".$order." ";
-			elseif($bIncCnt && $by == "element_cnt")  $arSqlOrder[$by] = " ELEMENT_CNT ".$order." ";
-			elseif(isset($obUserFieldsSql) && $s = $obUserFieldsSql->GetOrder($by))  $arSqlOrder[$by] = " ".$s." ".$order." ";
-			else
-			{
-				$by = "timestamp_x";
-				$arSqlOrder[$by] = " BS.TIMESTAMP_X ".$order." ";
-			}
 		}
 
 		if(count($arSqlOrder) > 0)
@@ -909,7 +1009,7 @@ class CIBlockSection extends CAllIBlockSection
 	///////////////////////////////////////////////////////////////////
 	protected function UpdateList($arFields, $arFilter = array())
 	{
-		global $DB, $USER, $USER_FIELD_MANAGER;
+		global $DB, $USER;
 
 		$strUpdate = $DB->PrepareUpdate("b_iblock_section", $arFields, "iblock", false, "BS");
 		if ($strUpdate == "")
@@ -1023,7 +1123,7 @@ class CIBlockSection extends CAllIBlockSection
 			$i = $db_prop["iPropCnt"];
 			$strProp1 .= "
 				LEFT JOIN b_iblock_property FP".$i." ON FP".$i.".IBLOCK_ID=B.ID AND
-				".(IntVal($propID)>0?" FP".$i.".ID=".IntVal($propID)." ":" FP".$i.".CODE='".$DB->ForSQL($propID, 200)."' ")."
+				".((int)$propID>0?" FP".$i.".ID=".(int)$propID." ":" FP".$i.".CODE='".$DB->ForSQL($propID, 200)."' ")."
 				LEFT JOIN ".$strTable." FPV".$i." ON FP".$i.".ID=FPV".$i.".IBLOCK_PROPERTY_ID AND FPV".$i.".IBLOCK_ELEMENT_ID=BE.ID ";
 		}
 		if($bJoinFlatProp)
@@ -1063,4 +1163,3 @@ class CIBlockSection extends CAllIBlockSection
 		return $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 	}
 }
-?>

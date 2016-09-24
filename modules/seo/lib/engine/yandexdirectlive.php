@@ -13,11 +13,11 @@ use Bitrix\Seo\IEngine;
 use Bitrix\Main\Text;
 
 // to use Yandex.Direct Sandbox
-define('YANDEX_DIRECT_LIVE_API_URL', "https://api-sandbox.direct.yandex.ru/live/v4/json/");
+// define('YANDEX_DIRECT_LIVE_API_URL', "https://api-sandbox.direct.yandex.ru/live/v4/json/");
 
 if(!defined('YANDEX_DIRECT_LIVE_API_URL'))
 {
-	// define('YANDEX_DIRECT_LIVE_API_URL', 'https://api.direct.yandex.ru/live/v4/json/');
+	define('YANDEX_DIRECT_LIVE_API_URL', 'https://api.direct.yandex.ru/live/v4/json/');
 }
 
 /**
@@ -48,9 +48,26 @@ class YandexDirectLive extends Engine\YandexDirect implements IEngine
 	 *
 	 * @see https://tech.yandex.ru/direct/doc/dg-v4/live/GetBannersStat-docpage/
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на выдачу статистики по баннеру. Метод нестатический.</p>
+	*
+	*
+	* @param array $params  Параметры запроса статистики.
+	*
+	* @return array 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>https://tech.yandex.ru/direct/doc/dg-v4/live/GetBannersStat-docpage/</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirectlive/getbannerstats.php
+	* @author Bitrix
+	*/
 	public function getBannerStats(array $params)
 	{
-		$result = $this->query(static::METHOD_STAT_BANNER, $params);
+		$result = $this->query("", static::METHOD_STAT_BANNER, $params);
 		$result = YandexJson::decode($result->getResult());
 
 		if(!empty($result['error_code']))

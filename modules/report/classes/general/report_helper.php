@@ -114,6 +114,10 @@ abstract class CReportHelper
 		/** @var Entity\Field $field*/
 		$dataType = $field->getDataType();
 
+		// until the date type is not supported
+		if ($dataType === 'date')
+			$dataType = 'datetime';
+
 		$ufInfo = null;
 		if ($field instanceof Entity\ExpressionField && is_array(self::$ufInfo) && count(self::$ufInfo) > 0)
 		{
@@ -140,6 +144,9 @@ abstract class CReportHelper
 					break;
 				case 'boolean':
 					$dataType = 'boolean';
+					break;
+				case 'date':
+					$dataType = 'datetime';
 					break;
 				case 'datetime':
 					$dataType = 'datetime';
@@ -998,7 +1005,7 @@ abstract class CReportHelper
 		return true;
 	}
 
-	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options)
+	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime = null)
 	{
 	}
 
@@ -1692,7 +1699,7 @@ abstract class CReportHelper
 		{
 			$v = ($v instanceof \Bitrix\Main\Type\DateTime || $v instanceof \Bitrix\Main\Type\Date) ? ConvertTimeStamp($v->getTimestamp(), 'SHORT') : '';
 		}
-		elseif ($dataType == 'float' && !empty($v) && !$isUF)
+		elseif ($dataType == 'float' && !empty($v) && !$isUF && !strlen($cInfo['prcnt']))
 		{
 			$v = round($v, 1);
 		}
@@ -1827,6 +1834,62 @@ abstract class CReportHelper
 		}
 
 		return self::$userNameFormat;
+	}
+
+	public static function renderUserSearch($id, $searchInputId, $dataInputId, $componentName, $siteId = '', $nameFormat = '', $delay = 0)
+	{
+		$id = strval($id);
+		$searchInputId = strval($searchInputId);
+		$dataInputId = strval($dataInputId);
+		$componentName = strval($componentName);
+
+		$siteId = strval($siteId);
+		if($siteId === '')
+		{
+			$siteId = SITE_ID;
+		}
+
+		$nameFormat = strval($nameFormat);
+		if($nameFormat === '')
+		{
+			$nameFormat = CSite::getNameFormat(false);
+		}
+
+		$delay = intval($delay);
+		if($delay < 0)
+		{
+			$delay = 0;
+		}
+
+		echo '<input type="text" id="', htmlspecialcharsbx($searchInputId) ,'" style="width:200px;">',
+		'<input type="hidden" id="', htmlspecialcharsbx($dataInputId),'" name="',
+			htmlspecialcharsbx($dataInputId),'" value="">';
+
+		echo '<script type="text/javascript">',
+		'BX.ready(function(){',
+		'BX.ReportUserSearchPopup.deletePopup("', $id, '");',
+		'BX.ReportUserSearchPopup.create("', $id, '", { searchInput: BX("',
+			CUtil::jSEscape($searchInputId), '"), dataInput: BX("',
+			CUtil::jSEscape($dataInputId),'"), componentName: "',
+			CUtil::jSEscape($componentName),'", user: {} }, ', $delay,');',
+		'});</script>';
+
+		$GLOBALS['APPLICATION']->includeComponent(
+			'bitrix:intranet.user.selector.new',
+			'',
+			array(
+				'MULTIPLE' => 'N',
+				'NAME' => $componentName,
+				'INPUT_NAME' => $searchInputId,
+				'SHOW_EXTRANET_USERS' => 'NONE',
+				'POPUP' => 'Y',
+				'SITE_ID' => $siteId,
+				'NAME_TEMPLATE' => $nameFormat,
+				'ON_CHANGE' => 'reports.onResponsiblesChange',
+			),
+			null,
+			array('HIDE_ICONS' => 'Y')
+		);
 	}
 }
 

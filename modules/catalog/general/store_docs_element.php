@@ -63,7 +63,7 @@ class CCatalogStoreDocsElementAll
 		return false;
 	}
 
-	static function OnDocumentBarcodeDelete($id)
+	public static function OnDocumentBarcodeDelete($id)
 	{
 		global $DB;
 		$id = intval($id);
@@ -72,5 +72,6 @@ class CCatalogStoreDocsElementAll
 
 		foreach(GetModuleEvents("catalog", "OnDocumentElementDelete", true) as $event)
 			ExecuteModuleEventEx($event, array($id));
+		return true;
 	}
 }

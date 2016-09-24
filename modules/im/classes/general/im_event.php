@@ -7,14 +7,14 @@ class CIMEvent
 {
 	public static function OnFileDelete($params)
 	{
-		$result = IM\ChatTable::getList(Array(
+		$result = IM\Model\ChatTable::getList(Array(
 			'select' => Array('ID', 'AUTHOR_ID'),
 			'filter' => Array('=AVATAR' => $params['ID'])
 		));
 		while ($row = $result->fetch())
 		{
-			IM\ChatTable::update($row['ID'], Array('AVATAR' => ''));
-			
+			IM\Model\ChatTable::update($row['ID'], Array('AVATAR' => ''));
+
 			$obCache = new CPHPCache();
 			$arRel = CIMChat::GetRelationById($row['ID']);
 			foreach ($arRel as $rel)
@@ -24,13 +24,55 @@ class CIMEvent
 		}
 	}
 
+	public static function OnBeforeUserSendPassword($params)
+	{
+		$bots = IM\Bot::getListCache();
+		if (empty($bots))
+			return true;
+
+		if (isset($params['LOGIN']) && !empty($params['LOGIN']))
+		{
+			if (substr($params['LOGIN'], 0, strlen(IM\Bot::LOGIN_START)) == IM\Bot::LOGIN_START)
+			{
+				$orm = \Bitrix\Main\UserTable::getList(Array(
+					'filter' => Array(
+						'=LOGIN' => $params['LOGIN'],
+						'=EXTERNAL_AUTH_ID' => IM\Bot::EXTERNAL_AUTH_ID
+					)
+				));
+				if ($orm->fetch())
+				{
+					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_EVENT_ERROR_CHANGE_PASSWORD_FOR_BOT"), "ERROR_CHANGE_PASSWORD_FOR_BOT");
+					return false;
+				}
+			}
+		}
+
+		if (isset($params['EMAIL']) && !empty($params['EMAIL']))
+		{
+			$orm = \Bitrix\Main\UserTable::getList(Array(
+				'filter' => Array(
+					'=EMAIL' => $params['EMAIL'],
+					'=EXTERNAL_AUTH_ID' => IM\Bot::EXTERNAL_AUTH_ID
+				)
+			));
+			if ($orm->fetch())
+			{
+				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("IM_EVENT_ERROR_CHANGE_PASSWORD_FOR_BOT"), "ERROR_CHANGE_PASSWORD_FOR_BOT");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	public static function OnAddRatingVote($id, $arParams)
 	{
 		$bSocialnetworkInstalled = CModule::IncludeModule("socialnetwork");
 
 		if (
 			$arParams['ENTITY_TYPE_ID'] == 'LISTS_NEW_ELEMENT'
-			&& CModule::IncludeModule("socialnetwork")
+			&& $bSocialnetworkInstalled
 		) // BP
 		{
 			$rsLog = CSocNetLog::GetList(
@@ -92,6 +134,21 @@ class CIMEvent
 					&& array_key_exists("METHOD_FORMAT", $arEventTmp)
 				)
 				{
+					$arComment["MESSAGE"] = preg_replace(
+						array(
+							'|\[DISK\sFILE\sID=[n]*\d+\]|',
+							'|\[DOCUMENT\sID=[n]*\d+\]|'
+						),
+						'',
+						$arComment["MESSAGE"]
+					);
+
+					$arComment["MESSAGE"] = preg_replace(
+						'|\[QUOTE\](.+?)\[\/QUOTE\]|is'.BX_UTF_PCRE_MODIFIER,
+						'&quot;\\1&quot;',
+						$arComment["MESSAGE"]
+					);
+
 					$arFIELDS_FORMATTED = call_user_func(array($arEventTmp["CLASS_FORMAT"], $arEventTmp["METHOD_FORMAT"]), $arComment, array("IM" => "Y"));
 
 					$CCTP = new CTextParser();
@@ -105,8 +162,8 @@ class CIMEvent
 					array(
 						'|\[DISK\sFILE\sID=[n]*\d+\]|',
 						'|\[DOCUMENT\sID=[n]*\d+\]|'
-					), 
-					'', 
+					),
+					'',
 					$arComment["MESSAGE"]
 				);
 
@@ -163,6 +220,7 @@ class CIMEvent
 							"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
 							"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
 						);
+
 						CIMNotify::Add($arMessageFields);
 					}
 				}
@@ -196,8 +254,8 @@ class CIMEvent
 							{
 								$arParams['ENTITY_LINK'] = self::GetMessageRatingLogCommentURL(
 									$arComment,
-									intval($mentioned_user_id), 
-									$arSites, 
+									intval($mentioned_user_id),
+									$arSites,
 									$intranet_site_id,
 									$extranet_site_id
 								);
@@ -224,7 +282,28 @@ class CIMEvent
 		else // with source
 		{
 			if (
-				!CModule::IncludeModule("search") 
+				false &&
+				$arParams['OWNER_ID'] != $arParams['USER_ID']
+				&& $bSocialnetworkInstalled
+				&& $arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT'
+				&& CModule::IncludeModule('blog')
+				&& ($arBlogComment = CBlogComment::GetByID($arParams['ENTITY_ID']))
+			) // AUX
+			{
+				$handlerManager = new Bitrix\Socialnetwork\CommentAux\HandlerManager();
+				/** @var bool|object $handler */
+				if($handler = $handlerManager->getHandlerByPostText($arBlogComment["POST_TEXT"]))
+				{
+					$handler->setOptions(array(
+						'im' => true
+					));
+					$handler->sendRatingNotification($arBlogComment, $arParams);
+					return true;
+				}
+			}
+
+			if (
+				!CModule::IncludeModule("search")
 				|| BX_SEARCH_VERSION <= 1
 			)
 			{
@@ -232,10 +311,10 @@ class CIMEvent
 			}
 
 			$CSI = new CSearchItem;
-			
+
 			$arFSearch = Array('=ENTITY_TYPE_ID' => $arParams['ENTITY_TYPE_ID'], '=ENTITY_ID' => $arParams['ENTITY_ID']);
 			if (
-				defined("SITE_ID") 
+				defined("SITE_ID")
 				&& strlen(SITE_ID) > 0
 			)
 			{
@@ -246,6 +325,7 @@ class CIMEvent
 			if ($arItem = $res->GetNext(true, false))
 			{
 				// notify mentioned users
+				$arMentionedUserID = array();
 				$arSearchItemParams = CSearch::GetContentItemParams($arItem['ID'], 'mentioned_user_id');
 				if (
 					is_array($arSearchItemParams)
@@ -259,19 +339,21 @@ class CIMEvent
 				// send to author
 				if (
 					$arParams['OWNER_ID'] != $arParams['USER_ID']
-					|| $arMentionedUserID
+					|| !empty($arMentionedUserID)
 				)
 				{
 					$arParams["ENTITY_LINK"] = $arItem['URL'];
 					$arParams["ENTITY_PARAM"] = $arItem['PARAM1'];
-					$arParams["ENTITY_TITLE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['TITLE']))));
-					$arParams["ENTITY_MESSAGE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', htmlspecialcharsback($arItem['BODY']))));
+					$arParams["ENTITY_TITLE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', $arItem['TITLE'])));
+					$arParams["ENTITY_MESSAGE"] = trim(strip_tags(str_replace(array("\r\n","\n","\r"), ' ', $arItem['BODY'])));
+
+					$arParams["ENTITY_BODY"] = preg_replace('/(.+?)(\r|\n)+.*/is'.BX_UTF_PCRE_MODIFIER,'\\1',$arItem['BODY']);
 
 					if (
 						(
-							strlen($arParams["ENTITY_TITLE"]) > 0 
+							strlen($arParams["ENTITY_TITLE"]) > 0
 							|| strlen($arParams["ENTITY_MESSAGE"]) > 0
-						) 
+						)
 						&& strlen($arParams["ENTITY_LINK"]) > 0
 					)
 					{
@@ -292,7 +374,7 @@ class CIMEvent
 								);
 							}
 						}
-
+						$bSentToOwner = false;
 						if ($arParams['OWNER_ID'] != $arParams['USER_ID'])
 						{
 							$followValue = "Y";
@@ -309,9 +391,9 @@ class CIMEvent
 							if ($followValue != "N")
 							{
 								$arParams['ENTITY_LINK'] = self::GetMessageRatingEntityURL(
-									$originalLink, 
-									intval($arParams['OWNER_ID']), 
-									$arSites, 
+									$originalLink,
+									intval($arParams['OWNER_ID']),
+									$arSites,
 									$intranet_site_id,
 									$extranet_site_id
 								);
@@ -327,7 +409,7 @@ class CIMEvent
 									"NOTIFY_MESSAGE" => self::GetMessageRatingVote($arParams),
 									"NOTIFY_MESSAGE_OUT" => self::GetMessageRatingVote($arParams, true)
 								);
-								CIMNotify::Add($arMessageFields);
+								$bSentToOwner = CIMNotify::Add($arMessageFields);
 							}
 						}
 
@@ -379,6 +461,7 @@ class CIMEvent
 								{
 									if (
 										$mentioned_user_id != $arParams['USER_ID']
+										&& ($mentioned_user_id != $arParams['OWNER_ID'] || !$bSentToOwner)
 										&& CSocNetLogRights::CheckForUserOnly($log_id, $mentioned_user_id)
 									)
 									{
@@ -396,9 +479,9 @@ class CIMEvent
 										if ($followValue != "N")
 										{
 											$arParams['ENTITY_LINK'] = self::GetMessageRatingEntityURL(
-												$originalLink, 
-												intval($mentioned_user_id), 
-												$arSites, 
+												$originalLink,
+												intval($mentioned_user_id),
+												$arSites,
 												$intranet_site_id,
 												$extranet_site_id
 											);
@@ -432,7 +515,7 @@ class CIMEvent
 		CIMNotify::DeleteByTag("RATING|".$arParams['ENTITY_TYPE_ID']."|".$arParams['ENTITY_ID'], $arParams['USER_ID']);
 	}
 
-	private static function GetMessageRatingVote($arParams, $bForMail = false)
+	public static function GetMessageRatingVote($arParams, $bForMail = false)
 	{
 		$like = $arParams['VALUE'] >= 0? '_LIKE': '_DISLIKE';
 
@@ -447,7 +530,7 @@ class CIMEvent
 		}
 
 		if (
-			$arParams['ENTITY_TYPE_ID'] == 'FORUM_POST' 
+			$arParams['ENTITY_TYPE_ID'] == 'FORUM_POST'
 			|| $arParams['ENTITY_TYPE_ID'] == 'BLOG_COMMENT'
 		)
 		{
@@ -490,7 +573,11 @@ class CIMEvent
 				&& $arParams['ENTITY_PARAM'] == 'photos'
 			)
 			{
-				if (is_numeric($arParams["ENTITY_TITLE"]))
+				if (isset($arParams["ENTITY_BODY"]))
+				{
+					$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_BODY"], '', ''), GetMessage('IM_EVENT_RATING_PHOTO'.$like).' ('.$arParams['ENTITY_LINK'].')');
+				}
+				elseif (is_numeric($arParams["ENTITY_TITLE"]))
 				{
 					$message = str_replace(Array('#A_START#', '#A_END#'), Array('', ''), GetMessage('IM_EVENT_RATING_PHOTO1'.$like).' ('.$arParams['ENTITY_LINK'].')');
 				}
@@ -554,7 +641,11 @@ class CIMEvent
 				&& $arParams['ENTITY_PARAM'] == 'photos'
 			)
 			{
-				if (is_numeric($arParams["ENTITY_TITLE"]))
+				if (isset($arParams["ENTITY_BODY"]))
+				{
+					$message = str_replace(Array('#TITLE#', '#A_START#', '#A_END#'), Array($arParams["ENTITY_BODY"], '<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_PHOTO'.$like));
+				}
+				elseif (is_numeric($arParams["ENTITY_TITLE"]))
 				{
 					$message = str_replace(Array('#A_START#', '#A_END#'), Array('<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">', '</a>'), GetMessage('IM_EVENT_RATING_PHOTO1'.$like));
 				}
@@ -588,11 +679,10 @@ class CIMEvent
 				$message = str_replace('#LINK#', strlen($arParams['ENTITY_LINK'])>0?'<a href="'.$arParams['ENTITY_LINK'].'" class="bx-notifier-item-action">'.$arParams["ENTITY_TITLE"].'</a>': '<i>'.$arParams["ENTITY_TITLE"].'</i>', GetMessage('IM_EVENT_RATING_ELSE'.$like));
 			}
 		}
-
 		return $message;
 	}
 
-	private static function GetMessageRatingEntityURL($url, $user_id = false, $arSites = false, $intranet_site_id = false, $extranet_site_id = false)
+	public static function GetMessageRatingEntityURL($url, $user_id = false, $arSites = false, $intranet_site_id = false, $extranet_site_id = false)
 	{
 		static $arSiteData = false;
 
@@ -693,11 +783,11 @@ class CIMEvent
 
 		return $url;
 	}
-	
+
 	private static function GetMessageRatingLogCommentURL($arComment, $user_id = false, $arSites = false, $intranet_site_id = false, $extranet_site_id = false)
 	{
 		$url = false;
-		
+
 		if (
 			!is_array($arComment)
 			|| !isset($arComment["ENTITY_TYPE"]) || strlen($arComment["ENTITY_TYPE"]) <= 0
@@ -750,7 +840,75 @@ class CIMEvent
 		}
 
 		return $url;
-	}	
+	}
+
+	public static function OnAfterUserAdd($arParams)
+	{
+		if($arParams["ID"] <= 0)
+			return false;
+
+		if ($arParams['ACTIVE'] == 'N')
+			return false;
+
+		if (!CIMContactList::IsExtranet($arParams))
+		{
+			$commonChatId = CIMChat::GetGeneralChatId();
+			if ($commonChatId <= 0)
+				return true;
+
+			if (\Bitrix\Im\User::getInstance($arParams["ID"])->isBot())
+				return true;
+
+			if (!CIMChat::CanJoinGeneralChatId($arParams["ID"]))
+				return true;
+
+			$CIMChat = new CIMChat(0);
+			$CIMChat->AddUser($commonChatId, Array($arParams["ID"]));
+		}
+
+		return true;
+	}
+
+	public static function OnAfterUserUpdate($arParams)
+	{
+		$commonChatId = CIMChat::GetGeneralChatId();
+		if ($commonChatId > 0 && (isset($arParams['ACTIVE']) || isset($arParams['UF_DEPARTMENT'])))
+		{
+			if ($arParams['ACTIVE'] == 'N')
+			{
+				CIMMessage::SetReadMessageAll($arParams['ID']);
+
+				if ($commonChatId && CIMChat::GetRelationById($commonChatId, $arParams["ID"]))
+				{
+					$CIMChat = new CIMChat($arParams["ID"]);
+					$CIMChat->DeleteUser($commonChatId, $arParams["ID"]);
+				}
+			}
+			else
+			{
+				$commonChatId = CIMChat::GetGeneralChatId();
+				if ($commonChatId)
+				{
+					if (\Bitrix\Im\User::getInstance($arParams["ID"])->isBot())
+						return true;
+
+					$userInChat = CIMChat::GetRelationById($commonChatId, $arParams["ID"]);
+					$userCanJoin = CIMChat::CanJoinGeneralChatId($arParams["ID"]);
+
+					if ($userInChat && !$userCanJoin)
+					{
+						$CIMChat = new CIMChat($arParams["ID"]);
+						$CIMChat->DeleteUser($commonChatId, $arParams["ID"]);
+					}
+					else if (!$userInChat && $userCanJoin)
+					{
+						$CIMChat = new CIMChat(0);
+						$CIMChat->AddUser($commonChatId, Array($arParams["ID"]));
+					}
+				}
+			}
+		}
+	}
 
 	public static function OnUserDelete($ID)
 	{
@@ -776,6 +934,8 @@ class CIMEvent
 			$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 		}
 
+		\Bitrix\Im\Bot::unRegister(Array('BOT_ID' => $ID));
+
 		$strSQL = "DELETE FROM b_im_message WHERE AUTHOR_ID = ".$ID;
 		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 
@@ -785,22 +945,33 @@ class CIMEvent
 		$strSQL = "DELETE FROM b_im_recent WHERE USER_ID = ".$ID;
 		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 
-		$strSQL = "DELETE FROM b_im_recent WHERE ITEM_TYPE = 'P' and ITEM_ID = ".$ID;
-		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
-
 		$strSQL = "DELETE FROM b_im_status WHERE USER_ID = ".$ID;
 		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		$obCache = new CPHPCache();
-		$obCache->CleanDir('/bx/imc/recent');
+		if (IsModuleInstalled('bitrix24'))
+		{
+			$relationList = IM\Model\RecentTable::getList(array(
+				"select" => array("USER_ID"),
+				"filter" => array(
+					"=ITEM_TYPE" => 'P',
+					"=ITEM_ID" => $ID,
+				),
+			));
+			while ($relation = $relationList->fetch())
+			{
+				$obCache->CleanDir('/bx/imc/recent'.CIMMessenger::GetCachePath($relation['USER_ID']));
+			}
+		}
+		else
+		{
+			$obCache->CleanDir('/bx/imc/recent');
+		}
+
+		$strSQL = "DELETE FROM b_im_recent WHERE ITEM_TYPE = 'P' and ITEM_ID = ".$ID;
+		$DB->Query($strSQL, true, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		return true;
-	}
-
-	public static function OnAfterUserUpdate($arParams)
-	{
-		if ($arParams['ACTIVE'] == 'N')
-			CIMMessage::SetReadMessageAll($arParams['ID']);
 	}
 
 	public static function OnGetDependentModule()
@@ -816,6 +987,7 @@ class DesktopApplication extends Bitrix\Main\Authentication\Application
 {
 	protected $validUrls = array(
 		"/desktop_app/",
+		"/online/",
 		"/bitrix/tools/disk/",
 		"/bitrix/services/disk/index.php"
 	);

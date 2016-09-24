@@ -36,6 +36,19 @@ class ShellAdapter
 	 * @param $command
 	 * @return true;
 	 */
+	
+	/**
+	* <p>Выполняет команду в консоли. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $command  Консольная команда.
+	*
+	* @return \Bitrix\Scale\true; 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/shelladapter/asyncexec.php
+	* @author Bitrix
+	*/
 	public function asyncExec($command)
 	{
 		$outputPath = "/dev/null";
@@ -65,6 +78,19 @@ class ShellAdapter
 	 * @param string $command
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Выполняет консольную команду и возвращает результат выполнения консольной команды. Метод нестатический.</p>
+	*
+	*
+	* @param string $command  Консольная команда.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/shelladapter/syncexec.php
+	* @author Bitrix
+	*/
 	public function syncExec($command)
 	{
 		$command = $this->prepareExecution($command);

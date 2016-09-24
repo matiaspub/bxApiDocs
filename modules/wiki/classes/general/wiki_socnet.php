@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть». 
+ * <b>CWikiSocnet</b> - Класс интеграции с модулем «Социальная сеть».
  *
  *
  * @return mixed 
@@ -26,7 +26,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод инициализирует интеграцию. Статичный метод.</p>
+	* <p>Метод инициализирует интеграцию. Статический метод.</p>
 	*
 	*
 	* @param int $SOCNET_GROUP_ID  Идентификатор рабочей группы соц. сети
@@ -36,7 +36,7 @@ class CWikiSocnet
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>// Инициализируем интеграцию<br>$SOCNET_GROUP_ID = 14;<br>$IBLOCK_ID = 3;<br><br>if (!CWikiSocnet::Init($SOCNET_GROUP_ID, $IBLOCK_ID))<br>	echo 'Ошибка. Не удалось инициализировать интеграцию.';<br>?&gt;
 	* </pre>
 	*
@@ -106,7 +106,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод проверяет включена ли интеграция. Статичный метод.</p> <br><br>
+	* <p>Метод проверяет включена ли интеграция. Статический метод.</p>  <br><br>
 	*
 	*
 	* @return bool 
@@ -136,7 +136,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод проверяет находится ли модуль в режиме интеграции. Статичный метод.</p> <br><br>
+	* <p>Метод проверяет находится ли модуль в режиме интеграции. Статический метод.</p>  <br><br>
 	*
 	*
 	* @return bool 
@@ -152,7 +152,7 @@ class CWikiSocnet
 
 	
 	/**
-	* <p>Метод инициализирует интеграцию. Статичный метод.</p>
+	* <p>Метод инициализирует интеграцию. Нестатический метод.</p>
 	*
 	*
 	* @param bool $bActive  true – включает интеграцию, false – отключает интеграцию
@@ -226,7 +226,8 @@ class CWikiSocnet
 						"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
 						"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
 						"CLASS_FORMAT" => "CWikiSocnet",
-						"METHOD_FORMAT" => "FormatComment_Wiki"
+						"METHOD_FORMAT" => "FormatComment_Wiki",
+						"RATING_TYPE_ID" => "FORUM_POST"
 					)
 				),
 				'wiki_del' => array(

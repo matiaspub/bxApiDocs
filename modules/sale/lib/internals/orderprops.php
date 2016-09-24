@@ -43,6 +43,7 @@ class OrderPropsTable extends DataManager
 				'required' => true,
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'getNameValidators'),
+				'title' => Loc::getMessage('ORDER_PROPS_ENTITY_NAME_FIELD'),
 			),
 			'TYPE' => array(
 				'required' => true,
@@ -59,10 +60,12 @@ class OrderPropsTable extends DataManager
 				'validation'              => array(__CLASS__, 'getValueValidators'),
 				'save_data_modification'  => array(__CLASS__, 'getValueSaveModifiers'),
 				'fetch_data_modification' => array(__CLASS__, 'getValueFetchModifiers'),
+				'title' => Loc::getMessage('ORDER_PROPS_ENTITY_DEFAULT_VALUE_FIELD'),
 			),
 			'SORT' => array(
 				'data_type' => 'integer',
 				'format' => '/^[0-9]{1,11}$/',
+				'title' => Loc::getMessage('ORDER_PROPS_ENTITY_SORT_FIELD'),
 			),
 			'USER_PROPS' => array(
 				'data_type' => 'boolean',
@@ -80,6 +83,7 @@ class OrderPropsTable extends DataManager
 			'DESCRIPTION' => array(
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'getDescriptionValidators'),
+				'title' => Loc::getMessage('ORDER_PROPS_ENTITY_DESCRIPTION_FIELD'),
 			),
 			'IS_EMAIL' => array(
 				'data_type' => 'boolean',
@@ -105,6 +109,7 @@ class OrderPropsTable extends DataManager
 			'CODE' => array(
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'getCodeValidators'),
+				'title' => Loc::getMessage('ORDER_PROPS_ENTITY_CODE_FIELD'),
 			),
 			'IS_ZIP' => array(
 				'data_type' => 'boolean',
@@ -259,7 +264,6 @@ class OrderPropsTable extends DataManager
 	public static function modifyRequiredForSave ($value, array $property)
 	{
 		return ($value == 'Y'
-			|| $property['IS_EMAIL'       ] == 'Y'
 			|| $property['IS_PROFILE_NAME'] == 'Y'
 			|| $property['IS_LOCATION'    ] == 'Y'
 			|| $property['IS_LOCATION4TAX'] == 'Y'

@@ -277,13 +277,20 @@ class CIBlockSectionPropertyLink
 		");
 		while ($ar = $rs->Fetch())
 		{
+			$displayTypesAvailable = self::getDisplayTypes($ar["PROPERTY_TYPE"], $ar["USER_TYPE"]);
+			if (isset($displayTypesAvailable[$ar["DISPLAY_TYPE"]]))
+				$DISPLAY_TYPE = $ar["DISPLAY_TYPE"];
+			else
+				$DISPLAY_TYPE = key($displayTypesAvailable);
+
 			if ($ar["SECTION_PROPERTY"] === "Y")
 			{
 				if (strlen($ar["LINK_ID"]))
+				{
 					$result[$ar["PROPERTY_ID"]] = array(
 						"PROPERTY_ID" => $ar["PROPERTY_ID"],
 						"SMART_FILTER" => $ar["SMART_FILTER"],
-						"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+						"DISPLAY_TYPE" => $DISPLAY_TYPE,
 						"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
 						"FILTER_HINT" => $ar["FILTER_HINT"],
 						"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
@@ -294,13 +301,14 @@ class CIBlockSectionPropertyLink
 						"PROPERTY_TYPE" => $ar["PROPERTY_TYPE"],
 						"USER_TYPE" => $ar["USER_TYPE"],
 					);
+				}
 			}
 			else
 			{
 				$result[$ar["PROPERTY_ID"]] = array(
 					"PROPERTY_ID" => $ar["PROPERTY_ID"],
 					"SMART_FILTER" => "N",
-					"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+					"DISPLAY_TYPE" => $DISPLAY_TYPE,
 					"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
 					"INHERITED" => $SECTION_ID == 0 && !$bNewSection? "N" : "Y",
 					"INHERITED_FROM" => 0,
@@ -344,10 +352,16 @@ class CIBlockSectionPropertyLink
 			");
 			while ($ar = $rs->Fetch())
 			{
+				$displayTypesAvailable = self::getDisplayTypes($ar["PROPERTY_TYPE"], $ar["USER_TYPE"]);
+				if (isset($displayTypesAvailable[$ar["DISPLAY_TYPE"]]))
+					$DISPLAY_TYPE = $ar["DISPLAY_TYPE"];
+				else
+					$DISPLAY_TYPE = key($displayTypesAvailable);
+
 				$result[$ar["PROPERTY_ID"]] = array(
 					"PROPERTY_ID" => $ar["PROPERTY_ID"],
 					"SMART_FILTER" => $ar["SMART_FILTER"],
-					"DISPLAY_TYPE" => $ar["DISPLAY_TYPE"],
+					"DISPLAY_TYPE" => $DISPLAY_TYPE,
 					"DISPLAY_EXPANDED" => $ar["DISPLAY_EXPANDED"],
 					"FILTER_HINT" => $ar["FILTER_HINT"],
 					"INHERITED" => $SECTION_ID == $ar["LINK_ID"] ? "N" : "Y",
@@ -446,7 +460,7 @@ class CIBlockSectionPropertyLink
 		//PQRST - for drop down
 		//UWXYZ - reserved
 		$js = '
-		public static function getDisplayTypes(property_type, user_type)
+		function getDisplayTypes(property_type, user_type)
 		{
 			if (
 				property_type == "S"

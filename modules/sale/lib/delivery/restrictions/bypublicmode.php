@@ -4,6 +4,7 @@ namespace Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Main\Application;
 use Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Internals\CollectableEntity;
 
 Loc::loadMessages(__FILE__);
 
@@ -24,7 +25,7 @@ class ByPublicMode extends Restrictions\Base
 		return Loc::getMessage("SALE_DLVR_RSTR_BY_PUBLIC_MODE_DESCRIPT");
 	}
 
-	static public function check($dummy, array $restrictionParams, $deliveryId = 0)
+	public static function check($dummy, array $restrictionParams, $deliveryId = 0)
 	{
 		$context = Application::getInstance()->getContext();
 		$request = $context->getRequest();
@@ -35,12 +36,12 @@ class ByPublicMode extends Restrictions\Base
 		return $restrictionParams["PUBLIC_SHOW"] == 'Y';
 	}
 
-	public function checkByShipment(\Bitrix\Sale\Shipment $shipment, array $restrictionParams, $deliveryId = 0)
+	protected static function extractParams(CollectableEntity $shipment)
 	{
-		return $this->check("", $restrictionParams, $deliveryId);
+		return null;
 	}
 
-	public static function getParamsStructure()
+	public static function getParamsStructure($entityId = 0)
 	{
 		return array(
 			"PUBLIC_SHOW" => array(

@@ -2,8 +2,10 @@
 
 namespace Bitrix\Sale\Delivery\Services;
 
+use Bitrix\Main\IO\File;
 use Bitrix\Sale\Order;
 use Bitrix\Main\Loader;
+use Bitrix\Sale\Result;
 use Bitrix\Sale\Shipment;
 use Bitrix\Sale\Internals\Input;
 use Bitrix\Sale\Delivery\Helper;
@@ -13,6 +15,7 @@ use Bitrix\Sale\ShipmentCollection;
 use Bitrix\Main\Entity\EntityError;
 use Bitrix\Currency\CurrencyManager;
 use Bitrix\Main\ArgumentNullException;
+use Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Sale\Delivery\CalculationResult;
 use Bitrix\Sale\Delivery\Inputs\MultiControlString;
 
@@ -29,6 +32,8 @@ class Automatic extends Base
 	protected $oldConfig = array();
 	protected $handlerInitParams = array();
 
+	protected static $canHasProfiles = true;
+
 	public function __construct(array $initParams)
 	{
 		parent::__construct($initParams);
@@ -44,6 +49,9 @@ class Automatic extends Base
 
 			$this->sid = $this->code = $this->config["MAIN"]["SID"];
 			$this->handlerInitParams = $this->getHandlerInitParams($this->sid);
+
+			if(!empty($this->handlerInitParams["TRACKING_CLASS_NAME"]))
+				$this->setTrackingClass($this->handlerInitParams["TRACKING_CLASS_NAME"]);
 
 			if($this->handlerInitParams == false)
 				throw new SystemException("Can't get delivery services init params. Delivery id: ".$this->id.", sid: ".$this->sid);
@@ -76,6 +84,7 @@ class Automatic extends Base
 	protected function getConfigStructure()
 	{
 		static $handlers = null;
+		static $jsData = array();
 
 		$initedHandlers = self::getRegisteredHandlers("SID");
 		sortByColumn($initedHandlers, array(strtoupper("NAME") => SORT_ASC));
@@ -85,7 +94,14 @@ class Automatic extends Base
 			$handlers = array("" => "");
 
 			foreach($initedHandlers as $handler)
+			{
 				$handlers[$handler["SID"]] = $handler["NAME"]." [".$handler["SID"]."]";
+				$jsData[$handler["SID"]] = array(
+					htmlspecialcharsbx($handler["NAME"]),
+					htmlspecialcharsbx($handler["DESCRIPTION"]),
+					htmlspecialcharsbx($handler["DESCRIPTION_INNER"])
+				);
+			}
 		}
 
 		if(strlen($this->handlerInitParams["SID"]) <= 0 || $this->id <=0)
@@ -99,8 +115,14 @@ class Automatic extends Base
 							"TYPE" => "ENUM",
 							"NAME" => Loc::getMessage("SALE_DLVR_HANDL_AUT_HANDLER_CHOOSE"),
 							"OPTIONS" => $handlers,
-							"ONCHANGE" => "top.BX.showWait(); if(this.form.elements['NAME'].value == '') this.form.elements['NAME'].value = this.selectedOptions[0].innerHTML.replace(/\s*\[.*\]/g,''); this.form.submit();"
-						)
+							"ONCHANGE" => "var data=".\CUtil::PhpToJSObject($jsData)."; BX.onCustomEvent('onDeliveryServiceNameChange',[{name: data[this.value][0], description: data[this.value][1]}]); BX('adm-sale-delivery-auto-description_inner_view').innerHTML=data[this.value][2]; //this.form.submit();"
+						),
+						"DESCRIPTION_INNER" => array(
+								"TYPE" => "DELIVERY_READ_ONLY",
+								"NAME" => Loc::getMessage("SALE_DLVR_HANDL_AUT_DESCRIPTION_INNER"),
+								"ID" => "adm-sale-delivery-auto-description_inner",
+								"DEFAULT" => ""
+						),
 					)
 				)
 			);
@@ -342,6 +364,11 @@ class Automatic extends Base
 					$result["TYPE"] = 'ENUM';
 					break;
 
+				case 'RADIO':
+					$result["TYPE"] = 'ENUM';
+					$result["MULTIELEMENT"] = 'Y';
+					break;
+
 				case 'CHECKBOX':
 					$result["TYPE"] = 'Y/N';
 					break;
@@ -381,53 +408,7 @@ class Automatic extends Base
 
 	protected static function convertNewOrderToOld(\Bitrix\Sale\Shipment $shipment)
 	{
-		/** @var ShipmentCollection $shipmentCollection */
-		$shipmentCollection = $shipment->getCollection();
-		/** @var Order $newOrder */
-		$newOrder = $shipmentCollection->getOrder();
-		$props = $newOrder->getPropertyCollection();
-		$oldOrder = array();
-
-		/** @var \Bitrix\Sale\Basket  $basket */
-		if($collection = $shipment->getShipmentItemCollection())
-			$oldOrder["PRICE"] = $collection->getPrice();
-
-		$oldOrder["WEIGHT"] = 0;
-		$oldOrder["LOCATION_FROM"] = \Bitrix\Main\Config\Option::get(
-			'sale',
-			'location',
-			"",
-			$newOrder->getSiteId());
-		$oldOrder["SITE_ID"] = $newOrder->getSiteId();
-		$oldOrder["PERSON_TYPE_ID"] = $newOrder->getPersonTypeId();
-		$oldOrder["CURRENCY"] = $newOrder->getCurrency();
-
-		$loc = $props->getDeliveryLocation();
-		$oldOrder["LOCATION_TO"] = !!$loc ? $loc->getValue() : "";
-
-		$loc = $props->getDeliveryLocationZip();
-		$oldOrder["LOCATION_ZIP"] = !!$loc ? $loc->getValue() : "";
-
-		$oldOrder["ITEMS"] = array();
-
-		/** @var \Bitrix\Sale\ShipmentItem $shipmentItem */
-		foreach($shipment->getShipmentItemCollection() as $shipmentItem)
-		{
-			$basketItem = $shipmentItem->getBasketItem();
-			$itemFieldValues = $basketItem->getFieldValues();
-			$itemFieldValues["QUANTITY"] = $shipmentItem->getField("QUANTITY");
-
-			if(!empty($itemFieldValues["DIMENSIONS"]) && is_string($itemFieldValues["DIMENSIONS"]))
-				$itemFieldValues["DIMENSIONS"] = unserialize($itemFieldValues["DIMENSIONS"]);
-
-			$oldOrder["ITEMS"][] = $itemFieldValues;
-			$itemWeight = floatval($basketItem->getField("WEIGHT"));
-
-			if($itemWeight > 0)
-				$oldOrder["WEIGHT"] += $itemWeight*floatval($basketItem->getField("QUANTITY"));
-		}
-
-		return $oldOrder;
+		return \CSaleDelivery::convertOrderNewToOld($shipment);
 	}
 
 	public static function getHandlerInitParams($sid)
@@ -466,9 +447,11 @@ class Automatic extends Base
 
 					if (!is_dir($_SERVER["DOCUMENT_ROOT"].$basePath."/".$filename) && substr($filename, 0, 9) == "delivery_")
 					{
-						$arLoadedHandlers[] = $filename;
-
-						require_once($_SERVER["DOCUMENT_ROOT"].$basePath."/".$filename);
+						if(\Bitrix\Main\IO\Path::getExtension($filename) == 'php')
+						{
+							$arLoadedHandlers[] = $filename;
+							require_once($_SERVER["DOCUMENT_ROOT"].$basePath."/".$filename);
+						}
 					}
 				}
 				@closedir($handle);
@@ -505,8 +488,8 @@ class Automatic extends Base
 
 	public static function convertNewServiceToOld($service, $sid = false)
 	{
-		if(!isset($service["CONFIG"]["MAIN"]["SID"]))
-			return false;
+		if(!$sid && !isset($service["CONFIG"]["MAIN"]["SID"]))
+			return array();
 
 		self::initHandlers();
 		$handlers = self::getRegisteredHandlers("SID");
@@ -530,7 +513,7 @@ class Automatic extends Base
 
 		if(isset($service["ID"]) && intval($service["ID"]) > 0)
 		{
-			$restrictions = \Bitrix\Sale\Delivery\Services\Manager::getRestrictionsByDeliveryId($service["ID"]);
+			$restrictions = \Bitrix\Sale\Delivery\Restrictions\Manager::getRestrictionsList($service["ID"]);
 
 			foreach($restrictions as $restriction)
 			{
@@ -570,7 +553,7 @@ class Automatic extends Base
 					"ACTIVE" =>  $profile["ACTIVE"]
 				);
 
-				$restrictions = Manager::getRestrictionsByDeliveryId($profile["ID"]);
+				$restrictions = Restrictions\Manager::getRestrictionsList($profile["ID"]);
 
 				foreach($restrictions as $restriction)
 				{
@@ -667,11 +650,6 @@ class Automatic extends Base
 		}
 
 		return $result;
-	}
-
-	public static function canHasProfiles()
-	{
-		return true;
 	}
 
 	protected function getCalcultor()
@@ -855,8 +833,10 @@ class Automatic extends Base
 			}
 		}
 
+		$price = $result->getPrice();
+
 		$result->setDeliveryPrice(
-			$result->getPrice() + $this->getMarginPrice($shipment)
+			$price + $this->getMarginPrice($price)
 		);
 
 		return $result;
@@ -874,22 +854,12 @@ class Automatic extends Base
 		return $this->config;
 	}
 
-	protected function getMarginPrice($shipment)
+	protected function getMarginPrice($price)
 	{
-		$marginPrice = 0;
-
-		if(floatval($this->config["MAIN"]["MARGIN_VALUE"]) > 0)
-		{
-			if($this->config["MAIN"]["MARGIN_TYPE"] == "%")
-			{
-				$shipmentPrice = (($shipment !== null) ? self::calculateShipmentPrice($shipment) : 0);
-				$marginPrice = $shipmentPrice * floatval($this->config["MAIN"]["MARGIN_VALUE"]) / 100;
-			}
-			else
-			{
-				$marginPrice = floatval($this->config["MAIN"]["MARGIN_VALUE"]);
-			}
-		}
+		if($this->config["MAIN"]["MARGIN_TYPE"] == "%")
+			$marginPrice = $price * floatval($this->config["MAIN"]["MARGIN_VALUE"]) / 100;
+		else
+			$marginPrice = floatval($this->config["MAIN"]["MARGIN_VALUE"]);
 
 		return $marginPrice;
 	}
@@ -944,7 +914,7 @@ class Automatic extends Base
 
 		foreach($profiles as $profile)
 		{
-			$res = Table::add($profile);
+			$res = Manager::add($profile);
 			$result = $result && $res->isSuccess();
 		}
 
@@ -967,5 +937,83 @@ class Automatic extends Base
 		return $result;
 	}
 
+	public static function canHasProfiles()
+	{
+		return self::$canHasProfiles;
+	}
 
+	public function getAdminMessage()
+	{
+		$result = array();
+
+		if(isset($this->handlerInitParams["GET_ADMIN_MESSAGE"]) && is_callable($this->handlerInitParams["GET_ADMIN_MESSAGE"]))
+			$result = call_user_func($this->handlerInitParams["GET_ADMIN_MESSAGE"]);
+
+		return $result;
+	}
+
+	public function execAdminAction()
+	{
+		$result = new Result();
+
+		if(isset($this->handlerInitParams["EXEC_ADMIN_ACTION"]) && is_callable($this->handlerInitParams["EXEC_ADMIN_ACTION"]))
+			$result = call_user_func($this->handlerInitParams["EXEC_ADMIN_ACTION"]);
+
+		return $result;
+	}
+
+	public function getAdditionalInfoShipmentEdit(Shipment $shipment)
+	{
+		$result = '';
+
+		if(isset($this->handlerInitParams["GET_ADD_INFO_SHIPMENT_EDIT"]) && is_callable($this->handlerInitParams["GET_ADD_INFO_SHIPMENT_EDIT"]))
+		{
+			$result = call_user_func(
+				$this->handlerInitParams["GET_ADD_INFO_SHIPMENT_EDIT"],
+				$shipment
+			);
+
+			if(!is_array($result))
+				throw new SystemException('GET_ADD_INFO_SHIPMENT_EDIT return value must be array!');
+		}
+
+		return $result;
+	}
+
+	public function processAdditionalInfoShipmentEdit(Shipment $shipment, array $requestData)
+	{
+		$result = '';
+
+		if(isset($this->handlerInitParams["PROCESS_ADD_INFO_SHIPMENT_EDIT"]) && is_callable($this->handlerInitParams["PROCESS_ADD_INFO_SHIPMENT_EDIT"]))
+		{
+			$result = call_user_func(
+				$this->handlerInitParams["PROCESS_ADD_INFO_SHIPMENT_EDIT"],
+				$shipment,
+				$requestData
+			);
+
+			if($result && get_class($result) != 'Bitrix\Sale\Shipment')
+				throw new SystemException('PROCESS_ADD_INFO_SHIPMENT_EDIT return value myst be of type "Bitrix\Sale\Result" !');
+		}
+
+		return $result;
+	}
+
+	public function getAdditionalInfoShipmentView(Shipment $shipment)
+	{
+		$result = '';
+
+		if(isset($this->handlerInitParams["GET_ADD_INFO_SHIPMENT_VIEW"]) && is_callable($this->handlerInitParams["GET_ADD_INFO_SHIPMENT_VIEW"]))
+		{
+			$result = call_user_func(
+				$this->handlerInitParams["GET_ADD_INFO_SHIPMENT_VIEW"],
+				$shipment
+			);
+
+			if(!is_array($result))
+				throw new SystemException('GET_ADD_INFO_SHIPMENT_VIEW return value must be array!');
+		}
+
+		return $result;
+	}
 }

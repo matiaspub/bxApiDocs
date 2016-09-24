@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>. 
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.
  *
  *
  * @return mixed 
@@ -18,15 +18,15 @@ class CAllStatEvent
 	///////////////////////////////////////////////////////////////////
 	
 	/**
-	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> в методах <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p>Значение данного параметра формируется на основе нижеследующих данных текущего <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>: </p> <ul> <li>краткий идентификатор портала (из настроек модуля "Статистика"); </li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li> <li>ID посетителя; </li> <li>двухсимвольный идентификатор страны; </li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>; </li> <li>флаг <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямого захода</a>, либо <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврата</a> по рекламной кампании; </li> <li>двухсимвольный идентификатор сайта. </li> </ul> В зависимости от значения настройки "Кодировать дополнительный параметр #EVENT_GID# для событий" модуля "Статистика" возвращаемый параметр может быть как в открытом виде, так и в base64-кодированном виде.
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальный параметр</a> используемый при создании <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">события</a> в методах <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a>, <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>.</p> <p>Значение данного параметра формируется на основе нижеследующих данных текущего <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>: </p> <ul> <li>краткий идентификатор портала (из настроек модуля "Статистика"); 	</li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; 	</li> <li>ID посетителя; 	</li> <li>двухсимвольный идентификатор страны; 	</li> <li>ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>; 	</li> <li>флаг <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямого захода</a>, либо <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврата</a> по рекламной кампании; 	</li> <li>двухсимвольный идентификатор сайта. </li> </ul> В зависимости от значения настройки "Кодировать дополнительный параметр #EVENT_GID# для событий" модуля "Статистика" возвращаемый параметр может быть как в открытом виде, так и в base64-кодированном виде.
 	*
 	*
-	* @param mixed $site_id = false ID сайта.</bod
+	* @param mixed $site_id = false ID сайта.
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // страница, на которую посетитель будет перенаправлен
 	* // после фиксации события.
@@ -48,9 +48,9 @@ class CAllStatEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/decodegid.php">CStatEvent::DecodeGID</a> </li> <li>
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/decodegid.php">CStatEvent::DecodeGID</a> 	</li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный параметр
-	* события"</a> </li> </ul> <a name="examples"></a>
+	* события"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -110,22 +110,20 @@ class CAllStatEvent
 	*
 	* @param string $chargeback = "N" Флаг отрицательной суммы. Используется когда необходимо
 	* зафиксировать событие о возврате денег (chargeback). Возможные
-	* значения: <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li> <li> <b>N</b> -
-	* денежная сумма положительная. </li> </ul>
+	* значения:          <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li>           
+	*         <li> <b>N</b> - денежная сумма положительная. </li>         </ul>
 	*
 	* @param mixed $site_id = false ID сайта к которому будет привязано будущее событие.
 	*
-	* @return array <p>Метод возвращает массив вида: <br><br></p> <pre class="syntax">Array ( [TYPE_ID] =&gt; ID
-	* типа события [EID] =&gt; ID добавленного события )</pre> <p></p>
+	* @return array <p>Метод возвращает массив вида:    <br><br></p><pre class="syntax">Array (     [TYPE_ID] =&gt;
+	* ID типа события     [EID] =&gt; ID добавленного события )</pre><p></p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // зафиксируем событие типа "Просмотр спец. страницы" (view/special_page)
 	* <b>CStatEvent::AddCurrent</b>("softkey", "out", $GLOBALS["APPLICATION"]-&gt;GetCurPage());
-	* ?&gt;
-	* 
-	* &lt;?
+	* ?&gt;&lt;?
 	* // зафиксируем событие типа "Уход на оплату заказа на Софткее" (softkey/out)
 	* // если такого типа не существует, то он будет автоматически создан
 	* // событие будет фиксироваться по параметрам текущего посетителя сайта
@@ -134,9 +132,7 @@ class CAllStatEvent
 	* $goto = "http://www.softkey.ru/catalog/basket.php?prodid=902&amp;quantity=1&amp;referer1=ritlabs_site&amp;referer2=BITRIX_SM.OTk1LjgyLk4wLjI1Lk4ucnU%3D";
 	* 
 	* <b>CStatEvent::AddCurrent</b>("softkey", "out", "", "", "", $goto);
-	* ?&gt;
-	* 
-	* &lt;?
+	* ?&gt;&lt;?
 	* // зафиксируем событие типа "Скачивание файла manual.chm" (download/manual)
 	* // если такого типа не существует, то он будет автоматически создан
 	* // событие будет фиксироваться по параметрам текущего посетителя сайта
@@ -164,11 +160,11 @@ class CAllStatEvent
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин "Дополнительный
-	* параметр события (event3)"</a> </li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li>  
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
+	* "Дополнительный параметр события (event3)"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -499,14 +495,14 @@ class CAllStatEvent
 	*
 	* @param string $chargeback = "N" Флаг отрицательной суммы. Используется когда необходимо
 	* зафиксировать событие о возврате денег (chargeback). Возможные
-	* значения: <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li> <li> <b>N</b> -
-	* денежная сумма положительная. </li> </ul>
+	* значения:          <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li>           
+	*         <li> <b>N</b> - денежная сумма положительная. </li>         </ul>
 	*
 	* @return int <p>Метод возвращает ID добавленного события в случае успеха, и 0,
 	* если событие не было добавлено по каким либо причинам.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // добавим событие по типу softkey/buy
 	* // если такого типа нет, то он автоматически будет создан
@@ -519,8 +515,6 @@ class CAllStatEvent
 	* 
 	* <b>CStatEvent::AddByEvents</b>("softkey", "buy", "", $date, $gid, "899", "USD");
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // добавим событие по типу regnow/buy
 	* // если такого типа нет, то он автоматически будет создан
@@ -537,14 +531,14 @@ class CAllStatEvent
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addcurrent.php">CStatEvent::AddCurrent</a> </li>
-	* <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка событий</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин "Дополнительный
-	* параметр события (event3)"</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li>  
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addcurrent.php">CStatEvent::AddCurrent</a>
+	* </li>   <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
+	* событий</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	* "Событие"</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
+	* "Дополнительный параметр события (event3)"</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный параметр
-	* события"</a> </li> </ul> <a name="examples"></a>
+	* события"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -566,18 +560,18 @@ class CAllStatEvent
 	*
 	*
 	* @param array &$handlers  Данная переменная после отработки метода будет содержать в себе
-	* массив путей относительно корня к <i>пользовательским</i>
-	* обработчикам. Пример данного массива: <pre class="syntax">Array ( [0] =&gt;
-	* /bitrix/php_interface/include/statistic/regnow_alawar.php [1] =&gt;
-	* /bitrix/php_interface/include/statistic/regnow_editable.php [2] =&gt;
-	* /bitrix/php_interface/include/statistic/regsoft_editable.php [3] =&gt;
-	* /bitrix/php_interface/include/statistic/shareit_editable.php [4] =&gt;
+	* массив путей относительно корня  к <i>пользовательским</i>
+	* обработчикам. Пример данного массива:          <pre class="syntax">Array (     [0] =&gt;
+	* /bitrix/php_interface/include/statistic/regnow_alawar.php     [1] =&gt;
+	* /bitrix/php_interface/include/statistic/regnow_editable.php     [2] =&gt;
+	* /bitrix/php_interface/include/statistic/regsoft_editable.php     [3] =&gt;
+	* /bitrix/php_interface/include/statistic/shareit_editable.php     [4] =&gt;
 	* /bitrix/php_interface/include/statistic/softkey_editable.php )</pre>
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Array
 	* (
 	*     [reference] =&gt; Array
@@ -619,11 +613,11 @@ class CAllStatEvent
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
-	* </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
-	* событий</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
-	* "Событие"</a> </li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/add.php">CStatEvent::Add</a> </li>  
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a>
+	* </li>   <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
+	* событий</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	* "Событие"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -686,15 +680,15 @@ class CAllStatEvent
 	*
 	* @param string $gid  Специальный параметр события.
 	*
-	* @return array <p>Метод возвращает массив вида: </p> <br><pre class="syntax">Array ( [SESSION_ID] =&gt; ID
-	* сессии [GUEST_ID] =&gt; ID посетителя [COUNTRY_ID] =&gt; ID страны [ADV_ID] =&gt; ID
-	* рекламной кампании [ADV_BACK] =&gt; Y - <a
+	* @return array <p>Метод возвращает массив вида: </p><br><pre class="syntax">Array (     [SESSION_ID] =&gt; ID
+	* сессии     [GUEST_ID] =&gt; ID посетителя     [COUNTRY_ID] =&gt; ID страны     [ADV_ID] =&gt; ID
+	* рекламной кампании     [ADV_BACK] =&gt; Y - <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по рекламной
 	* кампании; N - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой
-	* заход</a> [SITE_ID] =&gt; ID сайта )</pre> <p></p>
+	* заход</a>     [SITE_ID] =&gt; ID сайта )</pre><p></p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // раскодируем специальный параметр события
 	* $arr = <b>CStatEvent::DecodeGID</b>("BITRIX_SM.OTk1LjgyLk4wLjI1Lk4ucnU%3D");
@@ -707,8 +701,8 @@ class CAllStatEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getgid.php">CStatEvent::GetGID</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный
-	* параметр события"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный
+	* параметр события"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -749,9 +743,20 @@ class CAllStatEvent
 	}
 
 	// compatibility
-	public static function SetEventType($event1, $event2, &$arEventType) { return CStatEventType::ConditionSet($event1, $event2, $arEventType); }
-	public static function GetByEvents($event1, $event2) { return CStatEventType::GetByEvents($event1, $event2); }
-	public static function GetEventsByGuest($GUEST_ID, $EVENT_ID=false, $EVENT3=false, $SEC=false) { return CStatEvent::GetListByGuest($GUEST_ID, $EVENT_ID, $EVENT3, $SEC); }
+	public static function SetEventType($event1, $event2, &$arEventType)
+	{
+		return CStatEventType::ConditionSet($event1, $event2, $arEventType);
+	}
+
+	public static function GetByEvents($event1, $event2)
+	{
+		return CStatEventType::GetByEvents($event1, $event2);
+	}
+
+	public static function GetEventsByGuest($GUEST_ID, $EVENT_ID=false, $EVENT3=false, $SEC=false)
+	{
+		return CStatEvent::GetListByGuest($GUEST_ID, $EVENT_ID, $EVENT3, $SEC);
+	}
 
 	public static function GetListUniqueCheck($arFilter=Array(), $LIMIT=1)
 	{
@@ -814,4 +819,3 @@ class CAllStatEvent
 		return $res;
 	}
 }
-?>

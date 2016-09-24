@@ -21,25 +21,15 @@ $GLOBALS["FORUM_TOPICS_PER_PAGE"] = intVal(COption::GetOptionString("forum", "TO
 $GLOBALS["FORUM_MESSAGES_PER_PAGE"] = intVal(COption::GetOptionString("forum", "MESSAGES_PER_PAGE", "10"));
 
 $arNameStatuses = @unserialize(COption::GetOptionString("forum", "statuses_name"));
+$arNameStatuses = is_array($arNameStatuses) ? $arNameStatuses : array();
+$arNameStatuses[LANGUAGE_ID] = is_array($arNameStatuses[LANGUAGE_ID]) ? $arNameStatuses[LANGUAGE_ID] : array();
 $name = array("guest" => "Guest", "user" => "User", "moderator" => "Moderator", "editor" => "Editor", "administrator" => "Administrator");
 foreach ($name as $k => $v):
-	$name[$k] = (!empty($arMess["F_".strToUpper($k)]) ? $arMess["F_".strToUpper($k)] : $name[$k]);
+	$name[$k] = trim(!empty($arMess["F_".strToUpper($k)]) ? $arMess["F_".strToUpper($k)] : $name[$k]);
+	$arNameStatuses[LANGUAGE_ID][$k] = htmlspecialcharsEx(empty($arNameStatuses[LANGUAGE_ID][$k]) ? $name[$k] : $arNameStatuses[LANGUAGE_ID][$k]);
 endforeach;
-if (!is_array($arNameStatuses) || empty($arNameStatuses)):
-	if (!is_array($arNameStatuses[LANGUAGE_ID])):
-		$arNameStatuses[LANGUAGE_ID] = $name;
-	else:
-		foreach ($name as $k => $v):
-			$n = trim($arNameStatuses[LANGUAGE_ID][$k]);
-			$arNameStatuses[LANGUAGE_ID][$k] = (empty($n) ? $v : $n);
-		endforeach;
-	endif;
-endif;
 
-foreach ($arNameStatuses[LANGUAGE_ID] as $k => $v)
-	$arNameStatuses[LANGUAGE_ID][$k] = htmlspecialcharsEx($v);
 $GLOBALS["FORUM_STATUS_NAME"] = $arNameStatuses[LANGUAGE_ID];
-
 $GLOBALS["SHOW_FORUM_DEBUG_INFO"] = false;
 $GLOBALS["FORUM_CACHE"] = array(
 	"FORUM" => array(),
@@ -77,6 +67,8 @@ if(!defined("CACHED_b_forum_user"))
 CModule::AddAutoloadClasses(
 	"forum",
 	array(
+		"bitrix\\forum\\internals\\basetable" => "lib/internals/basetable.php",
+
 		"textParser" => "classes/general/functions.php",
 		"forumTextParser" => "classes/general/functions.php",
 
@@ -945,13 +937,12 @@ function ForumOpenCloseTopic($topic, $TYPE, &$strErrorMessage, &$strOKMessage, $
 				else
 				{
 					$arTopic["SORT"] = $arFields["SORT"];
-					$res = serialize($res);
 					if ($TYPE=="OPEN"):
 						$arOk[] = GetMessage("OCTOP_SUCCESS_OPEN")." (TID=".intVal($res["ID"]).")";
-						CForumEventLog::Log("topic", "open", $ID, $res);
+						CForumEventLog::Log("topic", "open", $ID, serialize($res));
 					else:
 						$arOk[] = GetMessage("OCTOP_SUCCESS_CLOSE")." (TID=".intVal($res["ID"]).")";
-						CForumEventLog::Log("topic", "close", $ID, $res);
+						CForumEventLog::Log("topic", "close", $ID, serialize($res));
 					endif;
 				}
 			}while ($res = $db_res->Fetch());
@@ -2184,37 +2175,35 @@ function ForumSetReadTopic($FID, $TID)
 
 function ForumSetLastVisit($FID = false, $TID = false, $arAddParams = array())
 {
-	global $DB;
+	global $DB, $USER;
 	// For custom components
 	$GLOBALS["FID"] = $FID = ($FID === false && intVal($GLOBALS["FID"]) > 0 ? intVal($GLOBALS["FID"]) : $FID);
 
-	if ($GLOBALS["USER"]->IsAuthorized())
+	if ($USER->isAuthorized())
 	{
 		$GLOBALS["SHOW_FORUM_ICON"] = true; // out-of-date param
-		$USER_ID = $GLOBALS["USER"]->GetID();
-		$arUserFields = array("=LAST_VISIT" => $DB->GetNowFunction());
+		$USER_ID = $USER->getID();
+		$update = true;
 
-		if (!is_array($_SESSION["FORUM"]["USER"]) || $_SESSION["FORUM"]["USER"]["USER_ID"] != $GLOBALS["USER"]->GetID())
+		if (!is_array($_SESSION["FORUM"]["USER"]) || $_SESSION["FORUM"]["USER"]["USER_ID"] != $USER->getID())
 		{
 			$_SESSION["FORUM"]["USER"] = CForumUser::GetByUSER_ID($USER_ID);
 			if (!$_SESSION["FORUM"]["USER"])
 			{
-				$arUserFields["USER_ID"] = $USER_ID;
-				CForumUser::Add($arUserFields);
+				$update = false; ;
+				CForumUser::Add(array("USER_ID" => $USER_ID));
 				$_SESSION["FORUM"]["USER"] = CForumUser::GetByUSER_ID($USER_ID);
 			}
 			$_SESSION["FORUM"]["SHOW_NAME"] = $_SESSION["FORUM"]["USER"]["SHOW_NAME"];
 		}
-		if (!is_set($arUserFields, "USER_ID")):
-			CForumUser::Update($USER_ID, $arUserFields, false, true);
+		if ($update):
+			CForumUser::Update($USER_ID, array("=LAST_VISIT" => $DB->GetNowFunction()), false, true);
 		endif;
 	}
 
 	ForumInitParams();
 
-	if ($_SESSION["SESS_SEARCHER_ID"] > 0 && CModule::IncludeModule("statistic"))
-		return;
-	else
+	if (!($_SESSION["SESS_SEARCHER_ID"] > 0 && CModule::IncludeModule("statistic")))
 		CForumStat::RegisterUSER(array("SITE_ID" => SITE_ID, "FORUM_ID" => $FID, "TOPIC_ID" => $TID));
 	return true;
 }

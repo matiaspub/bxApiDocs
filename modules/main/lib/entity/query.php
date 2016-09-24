@@ -117,6 +117,17 @@ class Query
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив полей для оператора SELECT.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getselect.php
+	* @author Bitrix
+	*/
 	public function getSelect()
 	{
 		return $this->select;
@@ -128,6 +139,19 @@ class Query
 	 * @param array $select
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод составляет список полей для оператора SELECT.</p>
+	*
+	*
+	* @param array $select  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setselect.php
+	* @author Bitrix
+	*/
 	public function setSelect(array $select)
 	{
 		$this->select = $select;
@@ -141,6 +165,21 @@ class Query
 	 * @param string $alias Field alias like SELECT field AS alias
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод создаёт поле для оператора SELECT.</p>
+	*
+	*
+	* @param mixed $definition  Поле
+	*
+	* @param string $alias = '' Алиас поля по аналогии как задается в SQL.
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/addselect.php
+	* @author Bitrix
+	*/
 	public function addSelect($definition, $alias = '')
 	{
 		if (strlen($alias))
@@ -160,6 +199,17 @@ class Query
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив полей оператора WHERE.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getfilter.php
+	* @author Bitrix
+	*/
 	public function getFilter()
 	{
 		return $this->filter;
@@ -171,6 +221,19 @@ class Query
 	 * @param array $filter
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает список фильтров для оператора WHERE.</p>
+	*
+	*
+	* @param array $filter  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setfilter.php
+	* @author Bitrix
+	*/
 	public function setFilter(array $filter)
 	{
 		$this->filter = $filter;
@@ -184,6 +247,21 @@ class Query
 	 * @param mixed $value
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет фильтр оператору WHERE.</p>
+	*
+	*
+	* @param string $key  
+	*
+	* @param mixed $value  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/addfilter.php
+	* @author Bitrix
+	*/
 	public function addFilter($key, $value)
 	{
 		if (is_null($key) && is_array($value))
@@ -203,6 +281,17 @@ class Query
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив полей оператора GROUP BY.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getgroup.php
+	* @author Bitrix
+	*/
 	public function getGroup()
 	{
 		return $this->group;
@@ -214,6 +303,19 @@ class Query
 	 * @param mixed $group
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает список полей для оператора GROUP BY.</p>
+	*
+	*
+	* @param mixed $group  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setgroup.php
+	* @author Bitrix
+	*/
 	public function setGroup($group)
 	{
 		$group = !is_array($group) ? array($group) : $group;
@@ -228,6 +330,19 @@ class Query
 	 * @param $group
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет поле в список полей оператора GROUP BY.</p>
+	*
+	*
+	* @param mixed $group  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/addgroup.php
+	* @author Bitrix
+	*/
 	public function addGroup($group)
 	{
 		$this->group[] = $group;
@@ -239,6 +354,17 @@ class Query
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив полей оператора ORDER BY.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getorder.php
+	* @author Bitrix
+	*/
 	public function getOrder()
 	{
 		return $this->order;
@@ -250,6 +376,19 @@ class Query
 	 * @param mixed $order
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает список полей для оператора ORDER BY.</p>
+	*
+	*
+	* @param mixed $order  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setorder.php
+	* @author Bitrix
+	*/
 	public function setOrder($order)
 	{
 		$this->order = array();
@@ -282,6 +421,21 @@ class Query
 	 * @return Query
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет поле в список полей оператора ORDER BY.</p>
+	*
+	*
+	* @param string $definition  
+	*
+	* @param string $order = 'ASC' 
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/addorder.php
+	* @author Bitrix
+	*/
 	public function addOrder($definition, $order = 'ASC')
 	{
 		$order = strtoupper($order);
@@ -313,6 +467,17 @@ class Query
 	 *
 	 * @return null|int
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает лимит.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getlimit.php
+	* @author Bitrix
+	*/
 	public function getLimit()
 	{
 		return $this->limit;
@@ -324,6 +489,19 @@ class Query
 	 * @param int $limit
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает лимит для оператора LIMIT n.</p>
+	*
+	*
+	* @param integer $limit  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setlimit.php
+	* @author Bitrix
+	*/
 	public function setLimit($limit)
 	{
 		$this->limit = $limit;
@@ -335,6 +513,17 @@ class Query
 	 *
 	 * @return null|int
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает смещение.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getoffset.php
+	* @author Bitrix
+	*/
 	public function getOffset()
 	{
 		return $this->offset;
@@ -346,6 +535,19 @@ class Query
 	 * @param int $offset
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает смещение оператора LIMIT n, m.</p>
+	*
+	*
+	* @param integer $offset  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/setoffset.php
+	* @author Bitrix
+	*/
 	public function setOffset($offset)
 	{
 		$this->offset = $offset;
@@ -381,6 +583,17 @@ class Query
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод заменяет все связи 1:N в фильтре к ID IN (подзапрос SELECT ID FROM ).  Доступно для объектов только с 1 первичным полем.</p> <p class="note">MSSQL <a href="http://connect.microsoft.com/SQLServer/feedback/details/299231/add-support-for-ansi-standard-row-value-constructors" >не поддерживает</a> конструкции <code>WHERE (col1, col2) IN (SELECT col1, col2 FROM SomeOtherTable)</code>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/disabledatadoubling.php
+	* @author Bitrix
+	*/
 	public function disableDataDoubling()
 	{
 		if (count($this->init_entity->getPrimaryArray()) !== 1)
@@ -408,6 +621,31 @@ class Query
 	 *
 	 * @return Query
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет поле во время выполнения запроса. Создаётся динамически, в противном случае описывается статически в карте.</p>
+	*
+	*
+	* @param mixed $string  
+	*
+	* @param null $name  
+	*
+	* @param null $array  
+	*
+	* @param arra $Bitrix  
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Field $fieldInfo  
+	*
+	* @return \Bitrix\Main\Entity\Query 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/registerruntimefield.php
+	* @author Bitrix
+	*/
 	public function registerRuntimeField($name, $fieldInfo)
 	{
 		if ((empty($name) || is_numeric($name)) && $fieldInfo instanceof Field)
@@ -445,6 +683,17 @@ class Query
 	 *
 	 * @return \Bitrix\Main\DB\Result
 	 */
+	
+	/**
+	* <p>Нестатический метод выстраивает и выполняет запрос и возвращает результат.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/exec.php
+	* @author Bitrix
+	*/
 	public function exec()
 	{
 		$this->is_executing = true;
@@ -608,7 +857,8 @@ class Query
 
 			if (!is_numeric($filter_def))
 			{
-				$csw_result = \CSQLWhere::makeOperation($filter_def);
+				$sqlWhere = new \CSQLWhere();
+				$csw_result = $sqlWhere->makeOperation($filter_def);
 				list($definition, ) = array_values($csw_result);
 
 				// do not register it in global chain registry - get it in a smuggled way
@@ -706,8 +956,7 @@ class Query
 					$this->getRegisteredChain($this->init_entity->getPrimary(), true);
 				}
 			}
-
-			if (is_array($filter_match))
+			elseif (is_array($filter_match))
 			{
 				$this->setFilterChains($filter_match, $section);
 			}
@@ -790,7 +1039,8 @@ class Query
 			$is_having = false;
 			if (!is_numeric($filter_def))
 			{
-				$csw_result = \CSQLWhere::makeOperation($filter_def);
+				$sqlWhere = new \CSQLWhere();
+				$csw_result = $sqlWhere->makeOperation($filter_def);
 				list($definition, ) = array_values($csw_result);
 
 				$chain = $this->filter_chains[$definition];
@@ -1141,7 +1391,23 @@ class Query
 
 		foreach ($this->group_chains as $chain)
 		{
-			$sql[] = $chain->getSqlDefinition();
+			$connection = $this->init_entity->getConnection();
+			$sqlDefinition = $chain->getSqlDefinition();
+			$valueField = $chain->getLastElement()->getValue();
+
+			if ($valueField instanceof ExpressionField)
+			{
+				$valueField = $valueField->getValueField();
+			}
+
+			if (($connection instanceof Main\DB\OracleConnection || $connection instanceof Main\DB\MssqlConnection)
+				&& $valueField instanceof TextField)
+			{
+				// softTextCast
+				$sqlDefinition = $connection->getSqlHelper()->softCastTextToChar($sqlDefinition);
+			}
+
+			$sql[] = $sqlDefinition;
 		}
 
 		return join(', ', $sql);
@@ -1169,7 +1435,23 @@ class Query
 				? $this->order[$chain->getDefinition()]
 				: $this->order[$chain->getAlias()];
 
-			$sql[] = $chain->getSqlDefinition() . ' ' . $sort;
+			$connection = $this->init_entity->getConnection();
+			$sqlDefinition = $chain->getSqlDefinition();
+			$valueField = $chain->getLastElement()->getValue();
+
+			if ($valueField instanceof ExpressionField)
+			{
+				$valueField = $valueField->getValueField();
+			}
+
+			if (($connection instanceof Main\DB\OracleConnection || $connection instanceof Main\DB\MssqlConnection)
+				&& $valueField instanceof TextField)
+			{
+				// softTextCast
+				$sqlDefinition = $connection->getSqlHelper()->softCastTextToChar($sqlDefinition);
+			}
+
+			$sql[] = $sqlDefinition. ' ' . $sort;
 		}
 
 		return join(', ', $sql);
@@ -1258,14 +1540,16 @@ class Query
 
 			if (!is_numeric($filter_def))
 			{
-				$csw_result = \CSQLWhere::makeOperation($filter_def);
-				list($definition, ) = array_values($csw_result);
+				$sqlWhere = new \CSQLWhere();
+				$csw_result = $sqlWhere->makeOperation($filter_def);
+				list($definition, $operation) = array_values($csw_result);
 
 				$chain = $this->filter_chains[$definition];
 				$last = $chain->getLastElement();
 
 				// need to create an alternative of CSQLWhere in D7.Entity
 				$field_type = $last->getValue()->getDataType();
+				$callback = null;
 
 				// rewrite type & value for CSQLWhere
 				if ($field_type == 'integer')
@@ -1274,20 +1558,31 @@ class Query
 				}
 				elseif ($field_type == 'boolean')
 				{
-					$field_type = 'string';
 
-					/** @var BooleanField $field */
-					$field = $last->getValue();
-					$values = $field->getValues();
-
-					if (is_numeric($values[0]) && is_numeric($values[1]))
+					if ($operation == 'SE')
 					{
-						$field_type = 'int';
+						// just boolean expression, without operator
+						// e.g. WHERE EXISTS(...)
+						$field_type = 'callback';
+						$callback = array($this, 'booleanStrongEqualityCallback');
 					}
-
-					if (is_scalar($filter_match))
+					else
 					{
-						$filter_match = $field->normalizeValue($filter_match);
+						$field_type = 'string';
+
+						/** @var BooleanField $field */
+						$field = $last->getValue();
+						$values = $field->getValues();
+
+						if (is_numeric($values[0]) && is_numeric($values[1]))
+						{
+							$field_type = 'int';
+						}
+
+						if (is_scalar($filter_match))
+						{
+							$filter_match = $field->normalizeValue($filter_match);
+						}
 					}
 				}
 				elseif ($field_type == 'float')
@@ -1300,8 +1595,6 @@ class Query
 				}
 
 				$sqlDefinition = $chain->getSqlDefinition();
-
-				$callback = null;
 
 				// data-doubling-off mode
 				/** @see disableDataDoubling */
@@ -1326,6 +1619,12 @@ class Query
 					// change sql definition
 					$idChain = $this->getRegisteredChain($primaryName);
 					$sqlDefinition = $idChain->getSqlDefinition();
+				}
+
+				// set entity connection to the sql expressions
+				if ($filter_match instanceof Main\DB\SqlExpression)
+				{
+					$filter_match->setConnection($this->init_entity->getConnection());
 				}
 
 				//$is_having = $last->getValue() instanceof ExpressionField && $last->getValue()->isAggregated();
@@ -1374,8 +1673,7 @@ class Query
 					'CALLBACK' => $callback
 				);
 			}
-
-			if (is_array($filter_match))
+			elseif (is_array($filter_match))
 			{
 				$fields = array_merge($fields, $this->getFilterCswFields($filter_match));
 			}
@@ -1404,7 +1702,8 @@ class Query
 			else
 			{
 				// key
-				$csw_result = \CSQLWhere::makeOperation($k);
+				$sqlWhere = new \CSQLWhere();
+				$csw_result = $sqlWhere->makeOperation($k);
 				list($field, $operation) = array_values($csw_result);
 
 				if (strpos($field, 'this.') === 0)
@@ -1473,7 +1772,8 @@ class Query
 				}
 				elseif ($v instanceof Main\DB\SqlExpression)
 				{
-					// it's ok, nothing to do
+					// set entity connection
+					$v->setConnection($this->init_entity->getConnection());
 				}
 				elseif (!is_object($v))
 				{
@@ -1568,7 +1868,8 @@ class Query
 			else
 			{
 				// key
-				$csw_result = \CSQLWhere::makeOperation($k);
+				$sqlWhere = new \CSQLWhere();
+				$csw_result = $sqlWhere->makeOperation($k);
 				list($field, ) = array_values($csw_result);
 
 				$fields[$field] = array(
@@ -1705,6 +2006,11 @@ class Query
 		return false;
 	}
 
+	static public function booleanStrongEqualityCallback($field, $operation, $value)
+	{
+		return ($value ? '' : 'NOT ') . $field;
+	}
+
 	static public function dataDoublingCallback($field, $operation, $value)
 	{
 		return $field.' IN ('.$value.')';
@@ -1716,8 +2022,12 @@ class Query
 		$connection = $this->init_entity->getConnection();
 		$configuration = $connection->getConfiguration();
 
+		/** @var Main\DB\Result $result */
+		$result = null;
+
 		if (isset($configuration['handlersocket']['read']))
 		{
+			// optimize through nosql
 			$nosqlConnectionName = $configuration['handlersocket']['read'];
 
 			$nosqlConnection = Main\Application::getInstance()->getConnectionPool()->getConnection($nosqlConnectionName);
@@ -1726,48 +2036,52 @@ class Query
 			if ($isNosqlCapable)
 			{
 				$nosqlResult = NosqlPrimarySelector::relayQuery($nosqlConnection, $this);
-
-				return new Main\DB\ArrayResult($nosqlResult);
+				$result = new Main\DB\ArrayResult($nosqlResult);
 			}
 		}
 
-		$cnt = null;
-		if ($this->count_total)
+		if ($result === null)
 		{
-			$buildParts = $this->query_build_parts;
+			// regular SQL query
+			$cnt = null;
 
-			//remove order
-			unset($buildParts['ORDER BY']);
-
-			//remove select
-			$buildParts['SELECT'] = "1";
-
-			foreach ($buildParts as $k => &$v)
+			if ($this->count_total)
 			{
-				$v = $k . ' ' . $v;
+				$buildParts = $this->query_build_parts;
+
+				//remove order
+				unset($buildParts['ORDER BY']);
+
+				//remove select
+				$buildParts['SELECT'] = "1 cntholder";
+
+				foreach ($buildParts as $k => &$v)
+				{
+					$v = $k . ' ' . $v;
+				}
+
+				$cntQuery = join("\n", $buildParts);
+
+				// select count
+				$cntQuery = 'SELECT COUNT(cntholder) AS TMP_ROWS_CNT FROM ('.$cntQuery.') xxx';
+				$cnt = $connection->queryScalar($cntQuery);
 			}
 
-			$cntQuery = join("\n", $buildParts);
+			$result = $connection->query($query);
+			$result->setReplacedAliases($this->replaced_aliases);
 
-			// select count
-			$cntQuery = 'SELECT COUNT(1) AS TMP_ROWS_CNT FROM ('.$cntQuery.') xxx';
-			$cnt = $connection->queryScalar($cntQuery);
-		}
+			if($this->count_total)
+			{
+				$result->setCount($cnt);
+			}
 
-		$result = $connection->query($query);
-		$result->setReplacedAliases($this->replaced_aliases);
-
-		if($this->count_total)
-		{
-			$result->setCount($cnt);
+			static::$last_query = $query;
 		}
 
 		if ($this->isFetchModificationRequired())
 		{
 			$result->addFetchDataModifier(array($this, 'fetchDataModificationCallback'));
 		}
-
-		static::$last_query = $query;
 
 		return $result;
 	}
@@ -1776,6 +2090,19 @@ class Query
 	 * Being called in Db\Result as a data fetch modifier
 	 * @param $data
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается в <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/result/index.php">DB\Result</a> как модификатор данных выборки.</p>
+	*
+	*
+	* @param mixed $data  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/fetchdatamodificationcallback.php
+	* @author Bitrix
+	*/
 	public function fetchDataModificationCallback(&$data)
 	{
 		// entity-defined callbacks
@@ -1792,6 +2119,17 @@ class Query
 	 * Check if fetch data modification reqired, also caches modifier-callbacks
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет требуется ли модификация данных, также кеширует модификатор.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/isfetchmodificationrequired.php
+	* @author Bitrix
+	*/
 	public function isFetchModificationRequired()
 	{
 		$this->selectFetchModifiers = array();
@@ -1939,6 +2277,17 @@ class Query
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод выстраивает и возвращает строки SQL запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getquery.php
+	* @author Bitrix
+	*/
 	public function getQuery()
 	{
 		return $this->buildQuery();
@@ -1949,6 +2298,17 @@ class Query
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает строку последнего выполненного запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/query/getlastquery.php
+	* @author Bitrix
+	*/
 	public static function getLastQuery()
 	{
 		return static::$last_query;

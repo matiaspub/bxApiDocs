@@ -2,12 +2,17 @@
 /**
  * IM_REVISION
  */
-define('IM_REVISION', 61);
+define('IM_REVISION', 76);
 
 /**
  * IM_MOBILE_REVISION
  */
-define('IM_MOBILE_REVISION', 3);
+define('IM_MOBILE_REVISION', 6);
+
+/**
+ * IM_MOBILE_CACHE_VERSION
+ */
+define('IM_MOBILE_CACHE_VERSION', 1);
 
 /**
  * IM_MESSAGE_SYSTEM

@@ -19,6 +19,7 @@ class CSecurityCloudMonitorRequest
 	const TIMEOUT = 10;
 
 	private static $validActions = array("check", "get_results");
+	protected static $trustedHosts = array("www.1c-bitrix.ru", "www.bitrixsoft.com", "www.bitrix.de");
 	protected $response = array();
 	protected $checkingToken = "";
 	protected $protocolVersion = 2;
@@ -181,15 +182,24 @@ class CSecurityCloudMonitorRequest
 	}
 
 	/**
-	 * Return Bitrix WebService Url for Cloud Security Monitor
+	 * Return Bitrix Cloud Security web service url
+	 *
+	 * @param string $host Bitrix security scanner host.
 	 * @return string
 	 */
-	protected static function getCheckerUrl()
+	protected static function buildCheckerUrl($host)
 	{
-		$result = COption::GetOptionString('security', 'security_scanner_secure_connection') !== 'Y' ? 'http://' : 'https://';
-		$result .= COption::GetOptionString("main", "update_site", "www.bitrixsoft.com");
-		$result .= self::BITRIX_CHECKER_URL_PATH;
-		return $result;
+		return sprintf('https://%s%s', $host, self::BITRIX_CHECKER_URL_PATH);
+	}
+
+	/**
+	 * Return Bitrix Cloud Security host
+	 *
+	 * @return string
+	 */
+	protected static function getServiceHost()
+	{
+		return COption::GetOptionString("main", "update_site", "www.bitrixsoft.com");
 	}
 
 	/**
@@ -199,11 +209,16 @@ class CSecurityCloudMonitorRequest
 	 */
 	protected static function sendRequest(array $payload)
 	{
-		$httpClient = new \Bitrix\Main\Web\HttpClient;
-		$httpClient->setRedirect(true);
-		$httpClient->setStreamTimeout(static::TIMEOUT);
-		$response = $httpClient->post(self::getCheckerUrl(), $payload);
-		if($response && $httpClient->getStatus() == 200)
+		$targetHost = static::getServiceHost();
+		// Trusted host *must* have a valid SSL certificate
+		$skipSslValidation = !in_array($targetHost, static::$trustedHosts, true);
+		$httpClient = new \Bitrix\Main\Web\HttpClient(array(
+			'disableSslVerification' => $skipSslValidation,
+			'streamTimeout' => static::TIMEOUT
+		));
+
+		$response = $httpClient->post(self::buildCheckerUrl($targetHost), $payload);
+		if ($response && $httpClient->getStatus() == 200)
 		{
 			return self::decodeResponse($response);
 		}

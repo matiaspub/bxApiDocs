@@ -1,41 +1,39 @@
 <?php
 namespace Bitrix\Sale\Internals;
 
-use Bitrix\Sale\Order;
-
 class EventsPool
 {
 	protected static $events = array();
 
 
-	public static function getEvents(Order $order)
+	public static function getEvents($code)
 	{
-		if (isset(static::$events[$order->getInternalId()]))
+		if (isset(static::$events[$code]))
 		{
-			return static::$events[$order->getInternalId()];
+			return static::$events[$code];
 		}
 
 		return null;
 	}
 
 	/**
-	 * @param Order $order
+	 * @param $code
 	 * @param $type
 	 * @param $event
 	 */
-	public static function addEvent(Order $order, $type, $event)
+	public static function addEvent($code, $type, $event)
 	{
-		static::$events[$order->getInternalId()][$type] = $event;
+		static::$events[$code][$type] = $event;
 	}
 
 	/**
-	 * @param Order $order
+	 * @param $code
 	 */
-	public static function resetEvents(Order $order = null)
+	public static function resetEvents($code = null)
 	{
-		if ($order !== null)
+		if ($code !== null)
 		{
-			unset(static::$events[$order->getInternalId()]);
+			unset(static::$events[$code]);
 		}
 		else
 		{

@@ -29,7 +29,7 @@ class CBPWorkflowPersister
 		return self::$instance;
 	}
 
-	protected function RetrieveWorkflow($instanceId)
+	protected function RetrieveWorkflow($instanceId, $silent = false)
 	{
 		global $DB;
 
@@ -43,7 +43,7 @@ class CBPWorkflowPersister
 		);
 		if ($arResult = $dbResult->Fetch())
 		{
-			if ($arResult["UPDATEABLE"] == "Y")
+			if ($arResult["UPDATEABLE"] == "Y" && !$silent)
 			{
 				$DB->Query(
 					"UPDATE b_bp_workflow_instance SET ".
@@ -51,13 +51,12 @@ class CBPWorkflowPersister
 					"	OWNED_UNTIL = ".$DB->CharToDateFunction(date($GLOBALS["DB"]->DateFormatToPHP(FORMAT_DATETIME), $this->GetOwnershipTimeout()))." ".
 					"WHERE ID = '".$DB->ForSql($instanceId)."'"
 				);
-
-				$buffer = $arResult["WORKFLOW"];
 			}
-			else
+			elseif (!$silent)
 			{
 				throw new Exception(GetMessage("BPCGWP_WF_LOCKED"));
 			}
+			$buffer = $arResult["WORKFLOW"];
 		}
 		else
 		{
@@ -77,8 +76,7 @@ class CBPWorkflowPersister
 		{
 			$DB->Query(
 				"DELETE FROM b_bp_workflow_instance ".
-				"WHERE ID = '".$DB->ForSql($id)."' ".
-				"	AND ".$queryCondition." "
+				"WHERE ID = '".$DB->ForSql($id)."'"
 			);
 		}
 		else

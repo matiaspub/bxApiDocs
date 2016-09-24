@@ -175,7 +175,7 @@ class CUserTypeHlblock extends CUserTypeEnum
 
 		if(CModule::IncludeModule('highloadblock'))
 		{
-			$rows = static::getHlRows($arUserField);
+			$rows = static::getHlRows($arUserField, true);
 
 			$rs = new CDBResult();
 			$rs->InitFromArray($rows);
@@ -193,7 +193,14 @@ class CUserTypeHlblock extends CUserTypeEnum
 
 			if ($hlblock)
 			{
-				$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlblock);
+				if (class_exists($hlblock['NAME'].'Table'))
+				{
+					$hlentity = \Bitrix\Main\Entity\Base::getInstance($hlblock['NAME']);
+				}
+				else
+				{
+					$hlentity = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity($hlblock);
+				}
 
 				return array(
 					new \Bitrix\Main\Entity\ReferenceField(
@@ -208,7 +215,7 @@ class CUserTypeHlblock extends CUserTypeEnum
 		return array();
 	}
 
-	public static function getHlRows($userfield)
+	public static function getHlRows($userfield, $clearValues = false)
 	{
 		global $USER_FIELD_MANAGER;
 
@@ -261,7 +268,14 @@ class CUserTypeHlblock extends CUserTypeEnum
 					}
 					else
 					{
-						$row['VALUE'] = $USER_FIELD_MANAGER->getListView($userfield, $row[$userfield['FIELD_NAME']]);
+						if ($clearValues)
+						{
+							$row['VALUE'] = $row[$userfield['FIELD_NAME']];
+						}
+						else
+						{
+							$row['VALUE'] = $USER_FIELD_MANAGER->getListView($userfield, $row[$userfield['FIELD_NAME']]);
+						}
 						$row['VALUE'] .= ' ['.$row['ID'].']';
 					}
 				}

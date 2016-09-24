@@ -59,7 +59,7 @@ final class WordStatTable extends Entity\DataManager
 		'АЛЛЕЯ' => true
 	);
 
-public static 	public static function parseQuery($query)
+	public static function parseQuery($query)
 	{
 		$words = explode(' ', $query);
 
@@ -81,7 +81,7 @@ public static 	public static function parseQuery($query)
 		return $result;
 	}
 
-public static 	public static function reInitData()
+	public static function reInitData()
 	{
 		static::cleanUp();
 
@@ -149,7 +149,7 @@ public static 	public static function reInitData()
 		_print_r($stat);
 	}
 
-	pupublic static blic static function getMap()
+	public static function getMap()
 	{
 		return array(
 

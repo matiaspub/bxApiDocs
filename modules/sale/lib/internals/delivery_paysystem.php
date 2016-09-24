@@ -6,6 +6,7 @@ use Bitrix\Main\ArgumentOutOfRangeException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Sale\Delivery\Services;
+use Bitrix\Sale\Services\PaySystem\Restrictions\Manager;
 
 Loc::loadMessages(__FILE__);
 
@@ -68,7 +69,7 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 				'title' => Loc::getMessage('DELIVERY_PAYSYSTEM_ENTITY_PAYSYSTEM_ID_FIELD'),
 			),
 			'PAYSYSTEM' => array(
-				'data_type' => '\Bitrix\Sale\Internals\PaySystemTable',
+				'data_type' => '\Bitrix\Sale\Internals\PaySystemActionTable',
 				'reference' => array(
 					'=this.PAYSYSTEM_ID' => 'ref.ID'
 				)
@@ -178,7 +179,10 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 		}
 
 		if($actualizeRestrictions)
+		{
 			self::actualizeDeliveriesRestrictionByPS();
+			self::actualizePaySystemRestrictionByDelivery();
+		}
 
 		return $result;
 	}
@@ -189,15 +193,15 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 		$sqlHelper = $con->getSqlHelper();
 
 		$restrictions = array();
-		$dbR = Restrictions\Table::getList(array(
+		$dbR = \Bitrix\Sale\Internals\ServiceRestrictionTable::getList(array(
 			'filter' => array(
 				'=CLASS_NAME' => '\Bitrix\Sale\Delivery\Restrictions\ByPaySystem'
 			),
-			'select' => array('DELIVERY_ID')
+			'select' => array('SERVICE_ID')
 		));
 
 		while($restr = $dbR->fetch())
-			$restrictions[] = $restr['DELIVERY_ID'];
+			$restrictions[] = $restr['SERVICE_ID'];
 
 		$deliveryList = self::getEntityItemsFullList(self::ENTITY_TYPE_DELIVERY);
 		$dLinkedToP = array();
@@ -257,9 +261,9 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 			$sql = "";
 
 			foreach($notNeedRestriction as $deliveryId)
-				$sql .= " ".($sql == "" ? "WHERE CLASS_NAME='".$sqlHelper->forSql('\Bitrix\Sale\Delivery\Restrictions\ByPaySystem')."' AND (" : "OR " )."DELIVERY_ID=".$sqlHelper->forSql($deliveryId);
+				$sql .= " ".($sql == "" ? "WHERE CLASS_NAME='".$sqlHelper->forSql('\Bitrix\Sale\Delivery\Restrictions\ByPaySystem')."' AND (" : "OR " )."SERVICE_ID=".$sqlHelper->forSql($deliveryId)." AND SERVICE_TYPE=".Restrictions\Manager::SERVICE_TYPE_SHIPMENT;
 
-			$sql = "DELETE FROM ".Restrictions\Table::getTableName().$sql.")";
+			$sql = "DELETE FROM ".\Bitrix\Sale\Internals\ServiceRestrictionTable::getTableName().$sql.")";
 			$con->queryExecute($sql);
 		}
 
@@ -271,9 +275,104 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 			$sql = "";
 
 			foreach($needRestriction as $deliveryId)
-				$sql .= ($sql == "" ? " " : ", ")."(".$sqlHelper->forSql($deliveryId).", '".$sqlHelper->forSql('\Bitrix\Sale\Delivery\Restrictions\ByPaySystem')."')";
+				$sql .= ($sql == "" ? " " : ", ")."(".$sqlHelper->forSql($deliveryId).", '".$sqlHelper->forSql('\Bitrix\Sale\Delivery\Restrictions\ByPaySystem')."', ".Restrictions\Manager::SERVICE_TYPE_SHIPMENT.")";
 
-			$sql = "INSERT INTO ".Restrictions\Table::getTableName()."(DELIVERY_ID, CLASS_NAME) VALUES".$sql;
+			$sql = "INSERT INTO ".\Bitrix\Sale\Internals\ServiceRestrictionTable::getTableName()."(SERVICE_ID, CLASS_NAME, SERVICE_TYPE) VALUES".$sql;
+			$con->queryExecute($sql);
+		}
+	}
+
+	protected static function actualizePaySystemRestrictionByDelivery()
+	{
+		$con = \Bitrix\Main\Application::getConnection();
+		$sqlHelper = $con->getSqlHelper();
+
+		$restrictions = array();
+		$dbR = \Bitrix\Sale\Internals\ServiceRestrictionTable::getList(array(
+			'filter' => array(
+				'=CLASS_NAME' => '\Bitrix\Sale\Services\PaySystem\Restrictions\Delivery'
+			),
+			'select' => array('SERVICE_ID')
+		));
+
+		while($restr = $dbR->fetch())
+			$restrictions[] = $restr['SERVICE_ID'];
+
+		$deliveryList = self::getEntityItemsFullList(self::ENTITY_TYPE_PAYSYSTEM);
+		$dLinkedToP = array();
+		$deliveriesToPs = array();
+		$linkedPS = array();
+
+		$dbP2S = DeliveryPaySystemTable::getList();
+
+		while($d2p = $dbP2S->fetch())
+		{
+			if($d2p["LINK_DIRECTION"] == self::LINK_DIRECTION_PAYSYSTEM_DELIVERY && !in_array($d2p["PAYSYSTEM_ID"], $dLinkedToP))
+				$dLinkedToP[] = $d2p["PAYSYSTEM_ID"];
+
+			if($d2p["LINK_DIRECTION"] == self::LINK_DIRECTION_DELIVERY_PAYSYSTEM)
+			{
+				if(!isset($deliveriesToPs[$d2p["PAYSYSTEM_ID"]]))
+					$deliveriesToPs[$d2p["PAYSYSTEM_ID"]] = array();
+
+				$linkedPS[] = $d2p["DELIVERY_ID"];
+				$deliveriesToPs[$d2p["PAYSYSTEM_ID"]][] = $d2p["DELIVERY_ID"];
+			}
+		}
+
+		$notLinkedToPS = array_diff($deliveryList, $dLinkedToP);
+		$existLinkedPs = !empty($linkedPS);
+		$notNeedRestriction = array();
+		$needRestriction = array();
+
+		foreach($deliveryList as $id)
+		{
+			$need = true;
+
+			//DS not linked to PS and (All PS having links linked to current DS
+			if(in_array($id, $notLinkedToPS))
+			{
+				if(isset($deliveriesToPs[$id]))
+					$diff = array_diff($linkedPS, $deliveriesToPs[$id]);
+				else
+					$diff = $linkedPS;
+
+				if(!$existLinkedPs || empty($diff))
+				{
+					$notNeedRestriction[] = $id;
+					$need = false;
+				}
+			}
+
+			// DS linked to PS or exist linked PS but not linked to current DS
+			if($need)
+				$needRestriction[] = $id;
+		}
+
+		$notNeedRestriction = array_intersect($notNeedRestriction, $restrictions);
+
+		if(!empty($notNeedRestriction))
+		{
+			$sql = "";
+
+			foreach($notNeedRestriction as $deliveryId)
+				$sql .= " ".($sql == "" ? "WHERE CLASS_NAME='".$sqlHelper->forSql('\Bitrix\Sale\Services\PaySystem\Restrictions\Delivery')."' AND (" : "OR " )."SERVICE_ID=".$sqlHelper->forSql($deliveryId)." AND SERVICE_TYPE=".Manager::SERVICE_TYPE_PAYMENT;
+
+			$sql = "DELETE FROM ".\Bitrix\Sale\Internals\ServiceRestrictionTable::getTableName().$sql.")";
+			$con->queryExecute($sql);
+		}
+
+		$needRestriction = array_diff($needRestriction, $restrictions);
+
+		//let's... add missing
+		if(!empty($needRestriction))
+		{
+			$sql = "";
+
+			foreach($needRestriction as $deliveryId)
+				$sql .= ($sql == "" ? " " : ", ")."(".$sqlHelper->forSql($deliveryId).", '".$sqlHelper->forSql('\Bitrix\Sale\Services\PaySystem\Restrictions\Delivery')."', ".Manager::SERVICE_TYPE_PAYMENT.")";
+
+			$sql = "INSERT INTO ".\Bitrix\Sale\Internals\ServiceRestrictionTable::getTableName()."(SERVICE_ID, CLASS_NAME, SERVICE_TYPE) VALUES".$sql;
 			$con->queryExecute($sql);
 		}
 	}
@@ -436,17 +535,19 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 
 		if($entityType == self::ENTITY_TYPE_DELIVERY)
 		{
-			$dbRes = Services\Table::getList(array(
-				'filter' => array("ACTIVE" =>  "Y"),
-				'select' => array("ID")
-			));
+			foreach(\Bitrix\Sale\Delivery\Services\Manager::getActiveList() as $dsrv)
+			{
+				$obj = Services\Manager::createObject($dsrv);
 
-			while($dsrv = $dbRes->fetch())
+				if ($obj && ($obj->canHasChildren() || $obj->canHasProfiles()))
+					continue;
+
 				$result[$entityType][] = $dsrv["ID"];
+			}
 		}
 		else
 		{
-			$dbRes = PaySystemServiceTable::getList(array(
+			$dbRes = PaySystemActionTable::getList(array(
 				'filter' => array("ACTIVE" =>  "Y"),
 				'select' => array("ID")
 			));
@@ -510,6 +611,6 @@ class DeliveryPaySystemTable extends \Bitrix\Main\Entity\DataManager
 				$preparedData[$entityType][$rec[$entityType]]["REVERSE"][] = $rec[$reverseEntityType];
 		}
 
-		return array_intersect_key($preparedData[$entityType], $entityIds);
+		return $preparedData[$entityType];
 	}
 }

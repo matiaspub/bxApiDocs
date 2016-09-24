@@ -78,20 +78,20 @@ class CTestResult
 
 	
 	/**
-	* <p>Метод добавляет новый вопрос плана тестирования.</p>
+	* <p>Метод добавляет новый вопрос плана тестирования. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	* href="../../fields.php#test_result">всех полей</a> плана тестирования.
-	* Обязательные поля должны быть заполнены. <br>
+	* href="../../fields.php#test_result">всех полей</a> плана        тестирования.
+	* Обязательные поля должны быть заполнены.  <br>
 	*
 	* @return int <p>Метод возвращает идентификатор добавленного вопроса плана
-	* тестирования, если добавление прошло успешно. При возникновении
-	* ошибки метод вернёт <i>false</i>, а в исключениях будут содержаться
+	* тестирования, если  добавление прошло успешно. При возникновении
+	* ошибки метод вернёт <i>false</i>, а  в исключениях будут содержаться
 	* ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -124,10 +124,10 @@ class CTestResult
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="../ctestattempt/index.php">CTestAttempt</a>::<a
-	* href="../ctestattempt/createattemptquestions.php">CreateAttemptQuestions</a> </li> <li> <a
-	* href="index.php">CTestResult</a>::<a href="update.php">Update</a> </li> <li> <a href="index.php">CTestResult</a>::<a
-	* href="addresponse.php">AddResponse</a> </li> <li><a href="../../fields.php#test_result">Поля плана
-	* тестирования</a></li> </ul> <a name="examples"></a>
+	* href="../ctestattempt/createattemptquestions.php">CreateAttemptQuestions</a>  	</li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="update.php">Update</a>  	</li> <li> <a href="index.php">CTestResult</a>::<a
+	* href="addresponse.php">AddResponse</a>  	</li> <li><a href="../../fields.php#test_result">Поля плана
+	* тестирования</a></li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -153,20 +153,20 @@ class CTestResult
 
 	
 	/**
-	* <p>Сохраняет ответ учащегося и устанавливает, дан ли на вопрос правильный ответ.</p>
+	* <p>Сохраняет ответ учащегося и устанавливает, дан ли на вопрос правильный ответ. Метод нестатический.</p>
 	*
 	*
 	* @param int $TEST_RESULT_ID  Идентификатор вопроса в плане тестирования.
 	*
 	* @param mixed $RESPONSE  Идентификатор или массив идентификаторов <a
-	* href="../../fields.php#answer">ответов на вопрос</a>.
+	* href="../../fields.php#answer">ответов на  вопрос</a>.
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернёт <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (CModule::IncludeModule("learning"))
 	* {
 	*     $TEST_TESULT_ID = 2962;
@@ -271,21 +271,21 @@ class CTestResult
 
 	
 	/**
-	* <p>Метод изменяет параметры вопроса плана тестирования с идентификатором ID.</p>
+	* <p>Метод изменяет параметры вопроса плана тестирования с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	* @param int $intID  Идентификатор вопроса в плане тестирования.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	* href="../../fields.php#test_result">всех полей</a> плана тестирования.
-	* Обязательные поля должны быть заполнены. <br>
+	* href="../../fields.php#test_result">всех полей</a> плана        тестирования.
+	* Обязательные поля должны быть заполнены.  <br>
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метгод вернёт <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -315,9 +315,9 @@ class CTestResult
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="../../fields.php#test_result">Поля плана тестирования</a></li> <li> <a
-	* href="index.php">CTestResult</a>::<a href="add.php">Add</a> </li> <li> <a href="index.php">CTestResult</a>::<a
-	* href="addresponse.php">AddResponse</a> </li> </ul> <a name="examples"></a>
+	* <ul> <li><a href="../../fields.php#test_result">Поля плана    тестирования</a></li> 	<li> <a
+	* href="index.php">CTestResult</a>::<a href="add.php">Add</a> </li> 	<li> <a href="index.php">CTestResult</a>::<a
+	* href="addresponse.php">AddResponse</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -353,17 +353,17 @@ class CTestResult
 
 	
 	/**
-	* <p>Метод удаляет вопрос плана тестирования с идентификатором ID.</p>
+	* <p>Метод удаляет вопрос плана тестирования с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	* @param int $intID  Идентификатор вопроса в плане тестирования.
 	*
-	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления результата
-	* тестирования, в противном случае возвращает <i>false</i>.</p> <a
+	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления результата 
+	* тестирования, в противном случае возвращает <i>false</i>.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -406,41 +406,42 @@ class CTestResult
 
 	
 	/**
-	* <p>Возвращает список вопросов плана тестирования по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>.</p>
+	* <p>Возвращает список вопросов плана тестирования по фильтру <b>arFilter</b>,  отсортированный в порядке <b>arOrder</b>. Метод нестатический.</p>
 	*
 	*
-	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> - идентификатор
-	* попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса; </li> <li> <b>POINT</b> -
-	* количество баллов; </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N); </li> <li>
-	* <b>CORRECT</b> - вопрос правильно отвечен (Y|N); </li> <li> <b>QUESTION_NAME</b> -
-	* название вопроса; </li> <li> <b>RAND</b> - случайный порядок. </li>
-	* </ul>Направление сортировки может принимать значения: <ul> <li> <b>asc</b> -
-	* по возрастанию; </li> <li> <b>desc</b> - по убыванию; </li> </ul>Необязательный.
-	* По умолчанию сортируется по убыванию идентификатора вопроса в
-	* плане тестирования.
+	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле       
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для       
+	* сортировки может принимать значения:  			<ul> <li> <b>ID</b> -
+	* идентификатор вопроса в плане тестирования;  				</li> <li> <b>ATTEMPT_ID</b> -
+	* идентификатор попытки;  				</li> <li> <b>QUESTION_ID</b> - идентификатор
+	* вопроса;  				</li> <li> <b>POINT</b> - количество баллов;  				</li> <li> <b>ANSWERED</b> -
+	* вопрос отвечен (Y|N);  				</li> <li> <b>CORRECT</b> - вопрос правильно отвечен
+	* (Y|N);  				</li> <li> <b>QUESTION_NAME</b> - название вопроса;  				</li> <li> <b>RAND</b> -
+	* случайный порядок. </li> </ul>Направление сортировки        может
+	* принимать значения:  			<ul> <li> <b>asc</b> - по возрастанию;  				</li> <li> <b>desc</b>
+	* - по убыванию; </li> </ul>Необязательный. По умолчанию        сортируется
+	* по убыванию идентификатора вопроса в плане тестирования.
 	*
-	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	* идентификатор вопроса в плане тестирования; </li> <li> <b>ATTEMPT_ID</b> -
-	* идентификатор попытки; </li> <li> <b>QUESTION_ID</b> - идентификатор вопроса;
-	* </li> <li> <b>POINT</b> - количество баллов; </li> <li> <b>RESPONSE</b> - ответ учащегося
-	* (можно искать по шаблону [%_]); </li> <li> <b>QUESTION_NAME</b> - название вопроса
-	* (можно искать по шаблону [%_]); </li> <li> <b>ANSWERED</b> - вопрос отвечен (Y|N);
-	* </li> <li> <b>CORRECT</b> - вопрос правильно отвечен (Y|N). </li> </ul>Перед
-	* названием фильтруемого поля может указать тип фильтрации: <ul> <li>"!"
-	* - не равно </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;"
-	* - больше </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения
-	* фильтра</i>" - одиночное значение или массив.<br><br>Необязательный. По
-	* умолчанию записи не фильтруются.
+	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [,       
+	* ...])</i>. Фильтруемое поле может принимать значения:  			<ul> <li> <b>ID</b> -
+	* идентификатор вопроса в плане тестирования;  				</li> <li> <b>ATTEMPT_ID</b> -
+	* идентификатор попытки;  				</li> <li> <b>QUESTION_ID</b> - идентификатор
+	* вопроса;  				</li> <li> <b>POINT</b> - количество баллов;  				</li> <li> <b>RESPONSE</b> -
+	* ответ учащегося (можно искать по шаблону [%_]);  				</li> <li> <b>QUESTION_NAME</b> -
+	* название вопроса (можно искать по шаблону          [%_]);  				</li> <li>
+	* <b>ANSWERED</b> - вопрос отвечен (Y|N);  				</li> <li> <b>CORRECT</b> - вопрос правильно
+	* отвечен (Y|N). </li> </ul>Перед        названием фильтруемого поля может
+	* указать тип фильтрации:  			<ul> <li>"!" - не равно  				</li> <li>"&lt;" - меньше 
+	* 				</li> <li>"&lt;=" - меньше либо равно  				</li> <li>"&gt;" - больше  				</li> <li>"&gt;=" -
+	* больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" -        одиночное
+	* значение или массив.<br><br>Необязательный. По умолчанию записи       
+	* не фильтруются.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -452,14 +453,17 @@ class CTestResult
 	* 
 	*     while ($arQuestionPlan = $res-&gt;GetNext())
 	*     {
-	*         echo "Question ID: ".$arQuestionPlan["QUESTION_ID"].<br>             "; Correct answer: ".$arQuestionPlan["CORRECT"].<br>             "; Question name:".$arQuestionPlan["QUESTION_NAME"]."&lt;b
+	*         echo "Question ID: ".$arQuestionPlan["QUESTION_ID"].<br>             "; Correct answer: ".$arQuestionPlan["CORRECT"].<br>             "; Question name:".$arQuestionPlan["QUESTION_NAME"]."&lt;br&gt;";
+	*     }
+	* }
+	* ?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="index.php">CTestResult</a>::<a href="getbyid.php">GetByID</a> </li> <li><a
-	* href="../../fields.php#test_result">Поля плана тестирования</a></li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  	</li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="getbyid.php">GetByID</a>  	</li> <li><a
+	* href="../../fields.php#test_result">Поля плана тестирования</a></li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -570,16 +574,16 @@ class CTestResult
 
 	
 	/**
-	* <p>Возвращает вопрос плана тестирования по идентификатору ID.</p>
+	* <p>Возвращает вопрос плана тестирования по идентификатору ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор вопроса в плане тестирования.
+	* @param int $intID  Идентификатор вопроса в плане тестирования.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -599,9 +603,9 @@ class CTestResult
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
-	* href="../../fields.php#test_result">Поля плана тестирования</a> </li> <li> <a
-	* href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul> <a name="examples"></a>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  	</li> <li> <a
+	* href="../../fields.php#test_result">Поля плана тестирования</a>  	</li> <li> <a
+	* href="index.php">CTestResult</a>::<a href="getlist.php">GetList</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -698,17 +702,17 @@ class CTestResult
 
 	
 	/**
-	* <p>Возвращает количество отвеченных и неотвеченных вопросов плана тестирования.</p>
+	* <p>Возвращает количество отвеченных и неотвеченных вопросов плана  тестирования. Метод нестатический.</p>
 	*
 	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
 	*
-	* @return array <p>Метод возвращает ассоциативный массив с ключами:</p> <ul> <li> <b>DONE</b>
-	* - количество отвеченных вопросов теста.</li> <li> <b>TODO</b> - количество
+	* @return array <p>Метод возвращает ассоциативный массив с ключами:</p><ul> <li> <b>DONE</b> -
+	* количество отвеченных вопросов теста.</li> 	<li> <b>TODO</b> - количество
 	* неотвеченных вопросов теста.</li> </ul>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -754,7 +758,7 @@ class CTestResult
 
 	
 	/**
-	* <p>Возвращает количество вопросов плана тестирования для указанной попытки.</p>
+	* <p>Возвращает количество вопросов плана тестирования для указанной попытки. Метод нестатический.</p>
 	*
 	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
@@ -762,7 +766,7 @@ class CTestResult
 	* @return int <p>Число - количество вопросов плана тестирования.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

@@ -1,4 +1,11 @@
 <?
+global $DB,$APPLICATION,$USE,$USER_FIELD_MANAGER,$CACHE_MANAGER;
+
+/* @var $DB CDatabase */
+/* @var $GLOBALS['DB'] CDatabase */
+/* @var $GLOBALS["DB"] CDatabase */
+$DB = $GLOBALS['DB'] = $GLOBALS["DB"] = new CDatabase();
+
 /* @var $APPLICATION CMain */
 /* @var $GLOBALS['APPLICATION'] CMain */
 /* @var $GLOBALS["APPLICATION"] CMain */
@@ -19,8 +26,4 @@ $USER_FIELD_MANAGER = $GLOBALS['USER_FIELD_MANAGER'] = $GLOBALS["USER_FIELD_MANA
 /* @var $GLOBALS["CACHE_MANAGER"] CCacheManager */
 $CACHE_MANAGER = $GLOBALS['CACHE_MANAGER'] = $GLOBALS["CACHE_MANAGER"] = new CCacheManager;
 
-/* @var $DB CDatabase */
-/* @var $GLOBALS['DB'] CDatabase */
-/* @var $GLOBALS["DB"] CDatabase */
-$DB = $GLOBALS['DB'] = $GLOBALS["DB"] = new CDatabase();
 ?>

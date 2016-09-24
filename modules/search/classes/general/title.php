@@ -1,4 +1,5 @@
-<?
+<?php
+
 class CAllSearchTitle extends CDBResult
 {
 	var $_arPhrase = array();
@@ -14,13 +15,13 @@ class CAllSearchTitle extends CDBResult
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$this->_arPhrase = stemming_split($phrase, LANGUAGE_ID);
-		if(!empty($this->_arPhrase))
+		if (!empty($this->_arPhrase))
 		{
 			$nTopCount = intval($nTopCount);
-			if($nTopCount <= 0)
+			if ($nTopCount <= 0)
 				$nTopCount = 5;
 
-			$arId = CSearchFullText::GetInstance()->searchTitle($phrase, $this->_arPhrase, $nTopCount, $arParams, $bNotFilter, $order);
+			$arId = CSearchFullText::getInstance()->searchTitle($phrase, $this->_arPhrase, $nTopCount, $arParams, $bNotFilter, $order);
 			if (!is_array($arId))
 			{
 				return $this->searchTitle($phrase, $nTopCount, $arParams, $bNotFilter, $order);
@@ -49,10 +50,10 @@ class CAllSearchTitle extends CDBResult
 					WHERE
 						sc.ID in (".implode(",", $arId).")
 						and scsite.SITE_ID = '".SITE_ID."'
-					ORDER BY ".$this->getSqlOrder($bOrderByRank)."
+					ORDER BY ".$this->getSqlOrder($order == "rank")."
 				";
 
-				$r = $DB->Query($DB->TopSql($strSql, $nTopCount+1));
+				$r = $DB->Query($DB->TopSql($strSql, $nTopCount + 1));
 				parent::CDBResult($r);
 				return true;
 			}
@@ -79,12 +80,12 @@ class CAllSearchTitle extends CDBResult
 	{
 		$r = parent::Fetch();
 
-		if($r)
+		if ($r)
 		{
-			if(strlen($r["SITE_URL"])>0)
+			if (strlen($r["SITE_URL"]) > 0)
 				$r["URL"] = $r["SITE_URL"];
 
-			if(substr($r["URL"], 0, 1)=="=")
+			if (substr($r["URL"], 0, 1) == "=")
 			{
 				foreach (GetModuleEvents("search", "OnSearchGetURL", true) as $arEvent)
 					$r["URL"] = ExecuteModuleEventEx($arEvent, array($r));
@@ -97,29 +98,29 @@ class CAllSearchTitle extends CDBResult
 			);
 			$r["URL"] = preg_replace("'(?<!:)/+'s", "/", $r["URL"]);
 
-			$r["NAME"] = htmlspecialcharsex($r["TITLE"]);
+			$r["NAME"] = htmlspecialcharsEx($r["TITLE"]);
 
 			$preg_template = "/(^|[^".$this->_arStemFunc["pcre_letters"]."])(".str_replace("/", "\\/", implode("|", array_map('preg_quote', array_keys($this->_arPhrase)))).")/i".BX_UTF_PCRE_MODIFIER;
-			if(preg_match_all($preg_template, ToUpper($r["NAME"]), $arMatches, PREG_OFFSET_CAPTURE))
+			if (preg_match_all($preg_template, ToUpper($r["NAME"]), $arMatches, PREG_OFFSET_CAPTURE))
 			{
 				$c = count($arMatches[2]);
-				if(defined("BX_UTF"))
+				if (defined("BX_UTF"))
 				{
-					for($j = $c-1; $j >= 0; $j--)
+					for ($j = $c - 1; $j >= 0; $j--)
 					{
 						$prefix = mb_substr($r["NAME"], 0, $arMatches[2][$j][1], 'latin1');
-						$instr  = mb_substr($r["NAME"], $arMatches[2][$j][1], mb_strlen($arMatches[2][$j][0], 'latin1'), 'latin1');
+						$instr = mb_substr($r["NAME"], $arMatches[2][$j][1], mb_strlen($arMatches[2][$j][0], 'latin1'), 'latin1');
 						$suffix = mb_substr($r["NAME"], $arMatches[2][$j][1] + mb_strlen($arMatches[2][$j][0], 'latin1'), mb_strlen($r["NAME"], 'latin1'), 'latin1');
 						$r["NAME"] = $prefix."<b>".$instr."</b>".$suffix;
 					}
 				}
 				else
 				{
-					for($j = $c-1; $j >= 0; $j--)
+					for ($j = $c - 1; $j >= 0; $j--)
 					{
 						$prefix = substr($r["NAME"], 0, $arMatches[2][$j][1]);
-						$instr  = substr($r["NAME"], $arMatches[2][$j][1], strlen($arMatches[2][$j][0]));
-						$suffix = substr($r["NAME"], $arMatches[2][$j][1]+strlen($arMatches[2][$j][0]));
+						$instr = substr($r["NAME"], $arMatches[2][$j][1], strlen($arMatches[2][$j][0]));
+						$suffix = substr($r["NAME"], $arMatches[2][$j][1] + strlen($arMatches[2][$j][0]));
 						$r["NAME"] = $prefix."<b>".$instr."</b>".$suffix;
 					}
 				}
@@ -131,19 +132,23 @@ class CAllSearchTitle extends CDBResult
 
 	public static function MakeFilterUrl($prefix, $arFilter)
 	{
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 		{
 			return "&".urlencode($prefix)."=".urlencode($arFilter);
 		}
 		else
 		{
 			$url = "";
-			foreach($arFilter as $key => $value)
+			foreach ($arFilter as $key => $value)
 			{
 				$url .= CSearchTitle::MakeFilterUrl($prefix."[".$key."]", $value);
 			}
 			return $url;
 		}
 	}
+
+	public static function searchTitle($phrase = "", $nTopCount = 5, $arParams = array(), $bNotFilter = false, $order = "")
+	{
+		return false;
+	}
 }
-?>

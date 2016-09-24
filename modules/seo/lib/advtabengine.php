@@ -3,6 +3,7 @@ namespace Bitrix\Seo;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Option;
+use Bitrix\Main\Context;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\IO;
@@ -42,7 +43,9 @@ class AdvTabEngine
 	{
 		$showTab = false;
 
-		if($iblockElementInfo["ID"] > 0)
+		$request = Context::getCurrent()->getRequest();
+
+		if($iblockElementInfo["ID"] > 0 && (!isset($request['action']) || $request['action'] != 'copy'))
 		{
 			$showTab = true;
 			if(Loader::includeModule('catalog'))
@@ -60,7 +63,7 @@ class AdvTabEngine
 					$showTab = false;
 				}
 */
-				if(\CCatalogSku::GetInfoByOfferIBlock($iblockElementInfo["IBLOCK"]["ID"]) !== false)
+				if(\CCatalogSku::getInfoByOfferIBlock($iblockElementInfo["IBLOCK"]["ID"]) !== false)
 				{
 					$showTab = false;
 				}

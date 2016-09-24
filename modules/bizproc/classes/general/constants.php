@@ -227,6 +227,7 @@ class CBPTaskStatus
 	const CompleteNo = 2;
 	const CompleteOk = 3;
 	const Timeout = 4;
+	const CompleteCancel = 5;
 }
 
 class CBPTaskUserStatus
@@ -235,6 +236,7 @@ class CBPTaskUserStatus
 	const Yes = 1;
 	const No = 2;
 	const Ok = 3;
+	const Cancel = 4;
 }
 
 class CBPTaskChangedStatus

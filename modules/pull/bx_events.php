@@ -9,40 +9,34 @@ class _CEventsPush_pull {
  * <br><br>
  *
  *
- * @param onPullOnlineEven $t  
+ * @param mixed $onPullOnlineEvent  
  *
- * @param  $function  
+ * @param function $(command  
  *
- * @param (comman $d  
+ * @param (comman $params  
  *
- * @param param $s  
+ * @param param $paramif  
  *
- * @param  $if  
+ * @param if $(command = = 
  *
- * @param (comman $d = = 
+ * @param mixed $user_authorize  
  *
- * @param user_authoriz $e  
+ * @param else $elseif  
  *
- * @param  $else  
+ * @param i $(command = = 
  *
- * @param i $f  
+ * @param mixed $user_logout  
  *
- * @param (comman $d = = 
+ * @param else $elseif  
  *
- * @param user_logou $t  
+ * @param i $(command = = 
  *
- * @param  $else  
- *
- * @param i $f  
- *
- * @param (comman $d = = 
- *
- * @param online_lis $t  
+ * @param mixed $online_list  
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * BX.addCustomEvent("onPullOnlineEvent", function(command,params) {
  *    if (command == 'user_authorize')   
  *    {
@@ -61,7 +55,7 @@ class _CEventsPush_pull {
  * @link http://dev.1c-bitrix.ru/api_help/push_pull/events/onpullonlineevent.php
  * @author Bitrix
  */
-	public static function onPullOnlineEvent($t, $function, $d, $s, $if, $d==, $e, $else, $f, $d==, $t, $else, $f, $d==, $t){}
+	public static function onPullOnlineEvent($onPullOnlineEvent, $(command, $params, $paramif, $(command==, $user_authorize, $elseif, $(command==, $user_logout, $elseif, $(command==, $online_list){}
 
 
 }

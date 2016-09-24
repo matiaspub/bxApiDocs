@@ -28,6 +28,27 @@ class Sftp
 	 * @param int $port Sftp port.
 	 * @param string $fingerprint Hostkey hash.
 	 */
+	
+	/**
+	* <p>Создает объект данного типа. Метод нестатический.</p>
+	*
+	*
+	* @param string $login  Логин SFTP.
+	*
+	* @param string $pass  Пароль SFTP.
+	*
+	* @param string $host = "mip.ebay.com" Хост SFTP.
+	*
+	* @param integer $port = 22 Порт SFTP.
+	*
+	* @param string $fingerprint = "A9429730355B91EC642AE6E6186DA3DC" Хэш, по которому можно удостовериться, что подключен нужный хост.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/sftp/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($login, $pass, $host="mip.ebay.com" , $port=22, $fingerprint="A9429730355B91EC642AE6E6186DA3DC")
 	{
 		$this->host = $host;
@@ -42,6 +63,17 @@ class Sftp
 	 * @return bool.
 	 * @throws \Bitrix\Main\SystemException
 	 */
+	
+	/**
+	* <p>Устанавливает соединение с помощью SFTP. Метод нестатический.</p> <p>Без параметров</p>
+	*
+	*
+	* @return \Bitrix\Sale\TradingPlatform\bool. 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/sftp/connect.php
+	* @author Bitrix
+	*/
 	public function connect()
 	{
 		$this->connection = @ssh2_connect($this->host, $this->port);

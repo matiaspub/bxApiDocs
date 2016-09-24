@@ -10,6 +10,17 @@ require_once(substr(__FILE__, 0, strlen(__FILE__) - strlen("/classes/mysql/main.
 
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/main.php");
 
+
+/**
+ * <b>CMain</b> - главный класс страницы.    <br><br>  При создании каждой страницы создаётся глобальный объект этого класса с именем $APPLICATION.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php
+ * @author Bitrix
+ */
 class CMain extends CAllMain
 {
 	/** @deprecated */
@@ -18,7 +29,7 @@ class CMain extends CAllMain
 		return "`CONDITION`";
 	}
 
-	static function FileAction()
+	public static function FileAction()
 	{
 	}
 
@@ -246,6 +257,17 @@ class CMain extends CAllMain
 	}
 }
 
+
+/**
+ * <b>CSite</b> - класс для работы с сайтами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php
+ * @author Bitrix
+ */
 class CSite extends CAllSite
 {
 }

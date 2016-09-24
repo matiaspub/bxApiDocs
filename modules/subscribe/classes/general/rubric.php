@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CRubric</b> - класс для работы с рубриками подписки. 
+ * <b>CRubric</b> - класс для работы с рубриками подписки.
  *
  *
  * @return mixed 
@@ -19,36 +19,37 @@ class CRubric
 	//Get list
 	
 	/**
-	* <p>Метод возвращает список рассылок по фильтру.</p>
+	* <p>Метод возвращает список рассылок по фильтру. Метод статический.</p>
 	*
 	*
 	* @param array $arrayaSort = Array() Массив, содержащий признак сортировки в виде наборов "название
-	* поля"=&gt;"направление". <br><br> Название поля может принимать
-	* значение:<br><ul> <li> <b>NAME</b> - название рассылки;</li> <li> <b>LID</b> -
-	* идентификатор сайта;</li> <li> <b>ACT</b> - активность рассылки;</li> <li>
-	* <b>SORT</b> - сортировка в списке;</li> <li> <b>ID</b> - идентификатор
-	* рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> - публичность
-	* рассылки;</li> <li> <b>LAST_EXECUTED</b> - время последней генерации.</li> </ul>
-	* Направление сортировки может принимать значение: <ul> <li> <b>ASC</b> - по
-	* возрастанию;</li> <li> <b>DESC</b> - по убыванию.</li> </ul> Пример: <pre
-	* class="syntax"><code>array("LID"=&gt;"ASC", "NAME"=&gt;"DESC")</code></pre>
+	* поля"=&gt;"направление". <br><br> 	Название поля может принимать
+	* значение:<br><ul> <li> <b>NAME</b> - название рассылки;</li> 	<li> <b>LID</b> -
+	* идентификатор сайта;</li> 	<li> <b>ACT</b> - активность рассылки;</li> 	<li>
+	* <b>SORT</b> - сортировка в списке;</li> 	<li> <b>ID</b> - идентификатор
+	* рассылки;</li> 	<li> <b>AUTO</b> - флаг генерации;</li> 	<li> <b>VISIBLE</b> -
+	* публичность рассылки;</li> 	<li> <b>LAST_EXECUTED</b> - время последней
+	* генерации.</li> </ul> 	Направление сортировки может принимать
+	* значение: <ul> <li> <b>ASC</b> - по возрастанию;</li> 	<li> <b>DESC</b> - по
+	* убыванию.</li> </ul> 	Пример: 	<pre class="syntax"><code>array("LID"=&gt;"ASC",
+	* "NAME"=&gt;"DESC")</code></pre>
 	*
 	* @param array $arrayaFilter = Array() Массив, содержащий фильтр в виде наборов "название
-	* поля"=&gt;"значение фильтра". <br><br> Название поля может принимать
-	* значение:<br><ul> <li> <b>LID</b> - идентификатор сайта;</li> <li> <b>ACTIVE</b> -
-	* активность рассылки;</li> <li> <b>AUTO</b> - флаг генерации;</li> <li> <b>VISIBLE</b> -
-	* публичность рассылки;</li> <li> <b>ID</b> - идентификатор рассылки.</li> <li>
-	* <b>NAME</b> - название рассылки.</li> </ul> Пример: <pre
+	* поля"=&gt;"значение фильтра". <br><br> 	Название поля может принимать
+	* значение:<br><ul> <li> <b>LID</b> - идентификатор сайта;</li> 	<li> <b>ACTIVE</b> -
+	* активность рассылки;</li> 	<li> <b>AUTO</b> - флаг генерации;</li> 	<li> <b>VISIBLE</b> -
+	* публичность рассылки;</li> 	<li> <b>ID</b> - идентификатор рассылки.</li> 	<li>
+	* <b>NAME</b> - название рассылки.</li> </ul> 	Пример: 	<pre
 	* class="syntax"><code>array("LID"=&gt;SITE_ID, "ACTIVE"=&gt;"Y")</code></pre>
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны <a
 	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
-	* "Рассылка"</a>.</p> <a name="examples"></a>
+	* "Рассылка"</a>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* //get site's newsletter categories
 	* $rub = <b>CRubric::GetList</b>(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
@@ -163,19 +164,19 @@ class CRubric
 	//Get by ID
 	
 	/**
-	* <p>Метод выбирает одну рассылку по ее идентификатору.</p>
+	* <p>Метод выбирает одну рассылку по ее идентификатору. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рассылки.
+	* @param mixed $intID  Идентификатор рассылки.
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступны <a
 	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
-	* "Рассылка"</a>.</p> <a name="examples"></a>
+	* "Рассылка"</a>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if($ID&gt;0)
 	* {
 	*     $rubric = <b>CRubric::GetByID</b>($ID);
@@ -208,17 +209,17 @@ class CRubric
 	//Count of subscribers
 	
 	/**
-	* <p>Метод возвращает количество подписчиков на указанную рассылку. Учитываются как подтвержденные, так и неподтвержденные подписчики.</p>
+	* <p>Метод возвращает количество подписчиков на указанную рассылку. Учитываются как подтвержденные, так и неподтвержденные подписчики. Метод статический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рассылки.
+	* @param mixed $intID  Идентификатор рассылки.
 	*
 	* @return int <p>целое число, равное количеству подписчиков рассылки. Если
 	* подписка с заданным идентификатором не существует, то
-	* возвращается 0.</p> <a name="examples"></a>
+	* возвращается 0.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* //get site's newsletter categories
 	* $rub = CRubric::GetList(array("SORT"=&gt;"ASC", "NAME"=&gt;"ASC"), array("ACTIVE"=&gt;"Y", "LID"=&gt;LANG));
@@ -258,17 +259,17 @@ class CRubric
 	// delete
 	
 	/**
-	* <p>Метод удаляет рассылку.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	* <p>Метод удаляет рассылку. Метод нестатический.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рассылки.
+	* @param mixed $intID  Идентификатор рассылки.
 	*
 	* @return mixed <p>В случае успешного удаления возвращается результат типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
-	* случает возвращается false.</p> <a name="examples"></a>
+	* случает возвращается false.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (($res = <b>CRubric::Delete</b>($ID)) &amp;&amp;
 	*      $res-&gt;AffectedRowsCount() &lt; 1 ||
 	*      $res == false)
@@ -438,7 +439,7 @@ class CRubric
 	//add
 	
 	/**
-	* <p>Метод добавляет рассылку. При этом если рассылка активна и является автоматической, то в случае соответствующей настроки модуля (метод генерации не cron) добляется агент для генерации выпусков.</p>
+	* <p>Метод добавляет рассылку. При этом если рассылка активна и является автоматической, то в случае соответствующей настроки модуля (метод генерации не cron) добляется агент для генерации выпусков. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив со значениями <a
@@ -447,10 +448,10 @@ class CRubric
 	*
 	* @return int <p>В случае успешного добавления возвращается ID рассылки. В
 	* противном случает возвращается false, и переменная класса LAST_ERROR
-	* содержит сообщение об ошибке.</p> <a name="examples"></a>
+	* содержит сообщение об ошибке.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $rubric = new CRubric;
 	* $arFields = Array(
 	*     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),
@@ -486,10 +487,10 @@ class CRubric
 	//update
 	
 	/**
-	* <p>Метод модифицирует рассылку.</p>
+	* <p>Метод модифицирует рассылку. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор рассылки.
+	* @param mixed $intID  Идентификатор рассылки.
 	*
 	* @param array $arFields  Массив со значениями <a
 	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">полей объекта
@@ -497,10 +498,10 @@ class CRubric
 	*
 	* @return bool <p>В случае успешного изменения возвращается true. В противном
 	* случает возвращается false, и переменная класса LAST_ERROR содержит
-	* сообщение об ошибке.</p> <a name="examples"></a>
+	* сообщение об ошибке.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $rubric = new CRubric;
 	* $arFields = Array(
 	*     "ACTIVE" =&gt; ($ACTIVE &lt;&gt; "Y"? "N":"Y"),

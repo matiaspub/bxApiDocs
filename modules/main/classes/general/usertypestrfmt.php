@@ -147,4 +147,3 @@ class CUserTypeStringFormatted extends CUserTypeString
 		return $val;
 	}
 }
-?>

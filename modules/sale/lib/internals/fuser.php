@@ -19,6 +19,17 @@ class FuserTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы владельцев корзин. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/fusertable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sale_fuser';
@@ -29,6 +40,17 @@ class FuserTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы владельцев корзин. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/fusertable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		global $DB;
@@ -57,9 +79,10 @@ class FuserTable extends Main\Entity\DataManager
 					$DB->DatetimeToDateFunction('%s'), 'DATE_UPDATE'
 				)
 			),
-			'USER_ID' => array(
-				'data_type' => 'integer'
+			new Main\Entity\IntegerField(
+				"USER_ID"
 			),
+
 			'USER' => array(
 				'data_type' => 'Bitrix\Main\User',
 				'reference' => array('=this.USER_ID' => 'ref.ID')
@@ -80,6 +103,19 @@ class FuserTable extends Main\Entity\DataManager
 	 * @return bool|int
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод возвращает идентификатор пользователя по его внутреннему коду владельца корзины или <i>false</i>, если идентификатор не найден. Метод статический.</p>
+	*
+	*
+	* @param integer $id  Внутренний код владельца корзины.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/fusertable/getuserbyid.php
+	* @author Bitrix
+	*/
 	public static function getUserById($id)
 	{
 		$id = (int)$id;

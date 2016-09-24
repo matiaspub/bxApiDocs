@@ -9,7 +9,6 @@
 namespace Bitrix\Main\Mail;
 
 use Bitrix\Main\Config as Config;
-use Bitrix\Main\Event;
 use Bitrix\Main\EventResult;
 use Bitrix\Main\Security\Sign\Signer;
 
@@ -124,7 +123,7 @@ class Tracking
 
 		if(!is_array($arData['FIELDS'])) return false;
 
-		$event = new Event("main", "OnMailEventSubscriptionList", array($arData['FIELDS']), $filter);
+		$event = new \Bitrix\Main\Event("main", "OnMailEventSubscriptionList", array($arData['FIELDS']), $filter);
 		$event->send();
 		foreach ($event->getResults() as $eventResult)
 		{
@@ -157,7 +156,7 @@ class Tracking
 	{
 		if(!is_array($arData['FIELDS'])) return false;
 
-		$event = new Event("main", "OnMailEventSubscriptionEnable", array($arData['FIELDS']), array($arData['MODULE_ID']));
+		$event = new \Bitrix\Main\Event("main", "OnMailEventSubscriptionEnable", array($arData['FIELDS']), array($arData['MODULE_ID']));
 		$event->send();
 		foreach ($event->getResults() as $eventResult)
 		{
@@ -178,7 +177,7 @@ class Tracking
 	{
 		if(!is_array($arData['FIELDS'])) return false;
 
-		$event = new Event("main", "OnMailEventSubscriptionDisable", array($arData['FIELDS']), array($arData['MODULE_ID']));
+		$event = new \Bitrix\Main\Event("main", "OnMailEventSubscriptionDisable", array($arData['FIELDS']), array($arData['MODULE_ID']));
 		$event->send();
 		foreach ($event->getResults() as $eventResult)
 		{

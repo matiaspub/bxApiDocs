@@ -1,7 +1,8 @@
-<?
+<?php
+
 
 /**
- * Класс для работы со статистикой поиска. 
+ * Класс для работы со статистикой поиска.
  *
  *
  * @return mixed 
@@ -21,18 +22,13 @@ class CSearchStatistic
 
 	public function __construct($phrase = "", $tags = "")
 	{
-		return $this->CSearchStatistic($phrase, $tags);
-	}
-
-	public function CSearchStatistic($phrase = "", $tags = "")
-	{
 		$phrase = ToLower(trim($phrase, " \t\n\r"));
-		if($l = strlen($phrase))
+		if ($l = strlen($phrase))
 		{
-			if($l > 250)
+			if ($l > 250)
 			{
 				$p = strrpos($phrase, ' ');
-				if($p === false)
+				if ($p === false)
 					$this->_phrase = substr($phrase, 0, 250);
 				else
 					$this->_phrase = substr($phrase, 0, $p);
@@ -48,7 +44,7 @@ class CSearchStatistic
 		}
 
 		$arTags = tags_prepare($tags);
-		if(count($arTags))
+		if (count($arTags))
 		{
 			asort($arTags);
 			$this->_tags = implode(", ", $arTags);
@@ -60,7 +56,7 @@ class CSearchStatistic
 
 		$this->_session_id = bitrix_sessid();
 
-		if(isset($_SESSION["SESS_SESSION_ID"]))
+		if (isset($_SESSION["SESS_SESSION_ID"]))
 			$this->_stat_sess_id = intval($_SESSION["SESS_SESSION_ID"]);
 	}
 
@@ -75,14 +71,14 @@ class CSearchStatistic
 			SELECT *
 			FROM b_search_phrase
 			WHERE SESSION_ID = '".$DB->ForSQL($this->_session_id)."'
-			AND ".($this->_phrase===false? "PHRASE IS NULL": "PHRASE = '".$DB->ForSQL($this->_phrase)."'")."
-			AND ".($this->_tags===false? "TAGS IS NULL": "TAGS = '".$DB->ForSQL($this->_tags)."'")."
+			AND ".($this->_phrase === false? "PHRASE IS NULL": "PHRASE = '".$DB->ForSQL($this->_phrase)."'")."
+			AND ".($this->_tags === false? "TAGS IS NULL": "TAGS = '".$DB->ForSQL($this->_tags)."'")."
 		";
 		$rs = $DB->Query($strSql);
-		if($ar = $rs->Fetch())
+		if ($ar = $rs->Fetch())
 		{
 			$this->phrase_id = $ar["ID"];
-			if($page_num > $ar["PAGES"])
+			if ($page_num > $ar["PAGES"])
 				$DB->Query("UPDATE b_search_phrase SET PAGES = ".$page_num." WHERE ID = ".$ar["ID"]);
 		}
 		else
@@ -104,19 +100,19 @@ class CSearchStatistic
 
 	
 	/**
-	* <p>Метод возвращает список поисковых фраз. Метод динамичный.</p>
+	* <p>Метод возвращает список поисковых фраз. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = false Массив, содержащий признак сортировки в виде наборов "название
 	* поля"=&gt;"направление". Название поля может принимать значение
 	* названия любого из полей <a
 	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
-	* статистики</a>. Необязательный параметр. <br><br> Значение по
+	* статистики</a>. Необязательный параметр. 	<br><br> 	Значение по
 	* умолчанию - <i>false</i> - означает, что результат отсортирован не
 	* будет.
 	*
 	* @param array $arFilter = false Массив, содержащий поля для выборки. Можно указать только те поля,
-	* которые необходимы. Необязательный параметр. <br><br> Значение по
+	* которые необходимы. Необязательный параметр. <br><br> 	Значение по
 	* умолчанию - <i>false</i> - означает, что будут возвращены все поля
 	* основной таблицы запроса.
 	*
@@ -124,24 +120,24 @@ class CSearchStatistic
 	* поля"=&gt;"значение фильтра". Название поля может принимать
 	* значение названия любого из полей <a
 	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
-	* статистики</a>. Необязательный параметр. <br><br> Значение по
+	* статистики</a>. Необязательный параметр. 	<br><br> 	Значение по
 	* умолчанию - <i>false</i> - означает, что результат отфильтрован не
 	* будет.
 	*
 	* @param array $bGroup = false Массив полей, по которым группируются поисковые фразы. Массив
-	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
-	* качестве "название_поля<i>N</i>" может стоять любое поле <a
+	* имеет вид: 		<pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre>
+	* 	В качестве "название_поля<i>N</i>" может стоять любое поле <a
 	* href="http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/fields.php">объекта поисковой
-	* статистики</a>. Необязательный параметр. <br> Если массив пустой, то
+	* статистики</a>. Необязательный параметр. <br> 	Если массив пустой, то
 	* метод вернет число записей, удовлетворяющих фильтру. При <i>bGroup =
 	* true</i> в <i>arOrder</i> можно передать <i>COUNT</i> для сортировки по
-	* количеству.<br><br> Значение по умолчанию - <i>false</i> - означает, что
+	* количеству.<br><br> 	Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
 	* @return CDBResult <p>Возвращается результат запроса типа <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
 	* результата методами класса CDBResult становятся доступными поля,
-	* перечисленные в параметре arSelect.</p> <br><br>
+	* перечисленные в параметре arSelect.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/search/classes/csearchstatistic/getlist.php
@@ -165,32 +161,32 @@ class CSearchStatistic
 			"STAT_SESS_ID",
 		);
 
-		if(!is_array($arSelect))
+		if (!is_array($arSelect))
 			$arSelect = array();
-		if(count($arSelect) < 1)
-			$arSelect =$arDefSelect;
+		if (count($arSelect) < 1)
+			$arSelect = $arDefSelect;
 
-		if(!is_array($arOrder))
+		if (!is_array($arOrder))
 			$arOrder = array();
-		if(count($arOrder) < 1)
+		if (count($arOrder) < 1)
 			$arOrder = array(
 				"ID" => "DESC",
 			);
 
 		$arQueryOrder = array();
-		foreach($arOrder as $strColumn => $strDirection)
+		foreach ($arOrder as $strColumn => $strDirection)
 		{
 			$strColumn = strtoupper($strColumn);
-			$strDirection = strtoupper($strDirection)=="ASC"? "ASC": "DESC";
-			if(in_array($strColumn, $arDefSelect))
+			$strDirection = strtoupper($strDirection) == "ASC"? "ASC": "DESC";
+			if (in_array($strColumn, $arDefSelect))
 			{
 				$arSelect[] = $strColumn;
-				if($strColumn == "TIMESTAMP_X")
+				if ($strColumn == "TIMESTAMP_X")
 					$arQueryOrder[$strColumn] = "TMP_TS ".$strDirection;
 				else
 					$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
 			}
-			elseif($strColumn == "COUNT" && $bGroup)
+			elseif ($strColumn == "COUNT" && $bGroup)
 			{
 				$arSelect[] = $strColumn;
 				$arQueryOrder[$strColumn] = $strColumn." ".$strDirection;
@@ -199,12 +195,12 @@ class CSearchStatistic
 
 		$arQueryGroup = array();
 		$arQuerySelect = array();
-		foreach($arSelect as $strColumn)
+		foreach ($arSelect as $strColumn)
 		{
 			$strColumn = strtoupper($strColumn);
-			if(in_array($strColumn, $arDefSelect))
+			if (in_array($strColumn, $arDefSelect))
 			{
-				if($strColumn == "TIMESTAMP_X")
+				if ($strColumn == "TIMESTAMP_X")
 				{
 					$arQuerySelect["TMP_TS"] = "sph.".$strColumn." TMP_TS";
 					$arQuerySelect[$strColumn] = $DB->DateToCharFunction("sph.".$strColumn, "FULL")." ".$strColumn;
@@ -214,10 +210,10 @@ class CSearchStatistic
 					$arQuerySelect[$strColumn] = "sph.".$strColumn;
 				}
 
-				if($bGroup)
+				if ($bGroup)
 					$arQueryGroup[$strColumn] = "sph.".$strColumn;
 			}
-			elseif($strColumn == "COUNT" && $bGroup)
+			elseif ($strColumn == "COUNT" && $bGroup)
 			{
 				$arQuerySelect[$strColumn] = "count(*) ".$strColumn;
 			}
@@ -281,8 +277,8 @@ class CSearchStatistic
 			),
 		));
 
-		if(count($arQuerySelect) < 1)
-			$arQuerySelect = array("ID"=>"sph.ID");
+		if (count($arQuerySelect) < 1)
+			$arQuerySelect = array("ID" => "sph.ID");
 
 		$strSql = "
 			SELECT
@@ -291,9 +287,9 @@ class CSearchStatistic
 				b_search_phrase sph
 		";
 
-		if(!is_array($arFilter))
+		if (!is_array($arFilter))
 			$arFilter = array();
-		if($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
+		if ($strQueryWhere = $obQueryWhere->GetQuery($arFilter))
 		{
 			$strSql .= "
 				WHERE
@@ -301,7 +297,7 @@ class CSearchStatistic
 			";
 		}
 
-		if($bGroup && count($arQueryGroup) > 0)
+		if ($bGroup && count($arQueryGroup) > 0)
 		{
 			$strSql .= "
 				GROUP BY
@@ -309,7 +305,7 @@ class CSearchStatistic
 			";
 		}
 
-		if(count($arQueryOrder) > 0)
+		if (count($arQueryOrder) > 0)
 		{
 			$strSql .= "
 				ORDER BY
@@ -324,10 +320,10 @@ class CSearchStatistic
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$cleanup_days = COption::GetOptionInt("search", "stat_phrase_save_days");
-		if($cleanup_days > 0)
+		if ($cleanup_days > 0)
 		{
 			$arDate = localtime(time());
-			$date = mktime(0, 0, 0, $arDate[4]+1, $arDate[3]-$cleanup_days, 1900+$arDate[5]);
+			$date = mktime(0, 0, 0, $arDate[4] + 1, $arDate[3] - $cleanup_days, 1900 + $arDate[5]);
 			$DB->Query("DELETE FROM b_search_phrase WHERE TIMESTAMP_X <= ".$DB->CharToDateFunction(ConvertTimeStamp($date, "FULL")));
 		}
 		return "CSearchStatistic::CleanUpAgent();";
@@ -338,7 +334,7 @@ class CSearchStatistic
 		$bActive = false;
 		foreach (GetModuleEvents("main", "OnEpilog", true) as $arEvent)
 		{
-			if(
+			if (
 				$arEvent["TO_MODULE_ID"] == "search"
 				&& $arEvent["TO_CLASS"] == "CSearchStatistic"
 			)
@@ -352,32 +348,32 @@ class CSearchStatistic
 
 	public static function SetActive($bActive = false)
 	{
-		if($bActive)
+		if ($bActive)
 		{
-			if(!CSearchStatistic::IsActive())
+			if (!CSearchStatistic::IsActive())
 				RegisterModuleDependences("main", "OnEpilog", "search", "CSearchStatistic", "OnEpilog", "90");
 		}
 		else
 		{
-			if(CSearchStatistic::IsActive())
+			if (CSearchStatistic::IsActive())
 				UnRegisterModuleDependences("main", "OnEpilog", "search", "CSearchStatistic", "OnEpilog");
 		}
 	}
 
 	public static function GetCurrentURL()
 	{
-		$res = (CMain::IsHTTPS() ? "https" : "http")."://";
+		$res = (CMain::IsHTTPS()? "https": "http")."://";
 
 		$host = $_SERVER["HTTP_HOST"];
 		$res .= $host;
 
 		$port = intval($_SERVER["SERVER_PORT"]);
-		if($port > 0 && $port != 80 && $port != 443 && strpos($host, ":")===false)
+		if ($port > 0 && $port != 80 && $port != 443 && strpos($host, ":") === false)
 			$res .= ":".$port;
 
-		$url = preg_replace("/\\?sphrase_id=\d+&/", "?", $_SERVER["REQUEST_URI"]);
-		$url = preg_replace("/\\?sphrase_id=\d+/", "", $url);
-		$url = preg_replace("/&sphrase_id=\d+/", "", $url);
+		$url = preg_replace("/\\?sphrase_id=\\d+&/", "?", $_SERVER["REQUEST_URI"]);
+		$url = preg_replace("/\\?sphrase_id=\\d+/", "", $url);
+		$url = preg_replace("/&sphrase_id=\\d+/", "", $url);
 
 		$res .= $url;
 
@@ -386,10 +382,10 @@ class CSearchStatistic
 
 	public static function OnEpilog()
 	{
-		if(isset($_REQUEST["sphrase_id"]))
+		if (isset($_REQUEST["sphrase_id"]))
 		{
 			$phrase_id = intval($_REQUEST["sphrase_id"]);
-			if($phrase_id)
+			if ($phrase_id)
 			{
 				$DB = CDatabase::GetModuleConnection('search');
 
@@ -400,7 +396,7 @@ class CSearchStatistic
 					AND SESSION_ID = '".$DB->ForSQL(bitrix_sessid())."'
 					AND URL_TO IS NULL
 				");
-				if($ar = $rs->Fetch())
+				if ($ar = $rs->Fetch())
 				{
 					$URL_TO = $DB->ForSQL(CSearchStatistic::GetCurrentURL(), 2000);
 					$DB->Query("
@@ -415,4 +411,3 @@ class CSearchStatistic
 		}
 	}
 }
-?>

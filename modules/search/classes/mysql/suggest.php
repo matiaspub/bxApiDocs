@@ -1,4 +1,5 @@
-<?
+<?php
+
 class CSearchSuggest
 {
 	var $_filter_md5 = "";
@@ -12,16 +13,16 @@ class CSearchSuggest
 	public function CSearchSuggest($strFilterMD5 = "", $phrase = "")
 	{
 		$strFilterMD5 = strtolower($strFilterMD5);
-		if(preg_match("/^[0-9a-f]{32}$/", $strFilterMD5))
+		if (preg_match("/^[0-9a-f]{32}$/", $strFilterMD5))
 			$this->_filter_md5 = $strFilterMD5;
 
 		$phrase = ToLower(trim($phrase, " \t\n\r"));
-		if($l = strlen($phrase))
+		if ($l = strlen($phrase))
 		{
-			if($l > 250)
+			if ($l > 250)
 			{
 				$p = strrpos($phrase, ' ');
-				if($p === false)
+				if ($p === false)
 					$phrase = substr($phrase, 0, 250);
 				else
 					$phrase = substr($phrase, 0, $p);
@@ -33,7 +34,7 @@ class CSearchSuggest
 	public function SetResultCount($result_count)
 	{
 		$DB = CDatabase::GetModuleConnection('search');
-		if(strlen($this->_filter_md5) && strlen($this->_phrase))
+		if (strlen($this->_filter_md5) && strlen($this->_phrase))
 		{
 			$result_count = intval($result_count);
 			$filter_md5 = $DB->ForSQL($this->_filter_md5);
@@ -48,7 +49,7 @@ class CSearchSuggest
 			");
 
 			$arQueryStat = $rsQueryStat->Fetch();
-			if(!$arQueryStat)
+			if (!$arQueryStat)
 			{
 				$DB->Add("b_search_suggest", array(
 					"SITE_ID" => SITE_ID,
@@ -64,15 +65,15 @@ class CSearchSuggest
 				$bUpdate = $result_count != $arQueryStat["RESULT_COUNT"];
 
 				$suggest_save_days = COption::GetOptionInt("search", "suggest_save_days");
-				if($suggest_save_days <= 0)
+				if ($suggest_save_days <= 0)
 					$suggest_save_days = 360;
 
-				if($arQueryStat["DAYS"] <= 0)
+				if ($arQueryStat["DAYS"] <= 0)
 				{
 					$rate = $arQueryStat["RATE"];
 					$bUpdate = $bUpdate || false;
 				}
-				elseif($arQueryStat["DAYS"] >= $suggest_save_days)
+				elseif ($arQueryStat["DAYS"] >= $suggest_save_days)
 				{
 					$rate = 1.0;
 					$bUpdate = $bUpdate || true;
@@ -83,7 +84,7 @@ class CSearchSuggest
 					$bUpdate = $bUpdate || true;
 				}
 
-				if($bUpdate)
+				if ($bUpdate)
 				{
 					$DB->Query("
 						UPDATE
@@ -98,7 +99,7 @@ class CSearchSuggest
 				}
 			}
 
-			while($arQueryStat = $rsQueryStat->Fetch())
+			while ($arQueryStat = $rsQueryStat->Fetch())
 			{
 				$DB->Query("DELETE FROM b_search_suggest WHERE ID = ".$arQueryStat["ID"]);
 			}
@@ -111,16 +112,16 @@ class CSearchSuggest
 		if (!isset($site_id))
 			$site_id = SITE_ID;
 
-		if(strlen($this->_phrase))
+		if (strlen($this->_phrase))
 		{
 			$nTopCount = intval($nTopCount);
-			if($nTopCount <= 0)
+			if ($nTopCount <= 0)
 				$nTopCount = 10;
 
 			$phrase = $DB->ForSQL($this->_phrase);
 			$site_id = $DB->ForSQL($site_id);
 
-			if(strlen($this->_filter_md5))
+			if (strlen($this->_filter_md5))
 			{
 				$filter_md5 = $DB->ForSQL($this->_filter_md5, 32);
 				return $DB->Query($DB->TopSql("
@@ -155,13 +156,12 @@ class CSearchSuggest
 	{
 		$DB = CDatabase::GetModuleConnection('search');
 		$cleanup_days = COption::GetOptionInt("search", "suggest_save_days");
-		if($cleanup_days > 0)
+		if ($cleanup_days > 0)
 		{
 			$arDate = localtime(time());
-			$date = mktime(0, 0, 0, $arDate[4]+1, $arDate[3]-$cleanup_days, 1900+$arDate[5]);
+			$date = mktime(0, 0, 0, $arDate[4] + 1, $arDate[3] - $cleanup_days, 1900 + $arDate[5]);
 			$DB->Query("DELETE FROM b_search_suggest WHERE TIMESTAMP_X <= ".$DB->CharToDateFunction(ConvertTimeStamp($date, "FULL")));
 		}
 		return "CSearchSuggest::CleanUpAgent();";
 	}
 }
-?>

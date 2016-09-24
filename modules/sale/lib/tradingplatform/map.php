@@ -83,6 +83,19 @@ class MapTable extends Entity\DataManager
 	 * Deletes all records with mapEntityId.
 	 * @param string $mapEntityId Map entity id.
 	 */
+	
+	/**
+	* <p>Удаляет все записи с соответствующим идентификатором таблицы соответствий. Метод статический.</p>
+	*
+	*
+	* @param string $mapEntityId  Идентификатор таблицы соответствий.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/maptable/deletebymapentityid.php
+	* @author Bitrix
+	*/
 	public static function deleteByMapEntityId($mapEntityId)
 	{
 		$con = \Bitrix\Main\Application::getConnection();

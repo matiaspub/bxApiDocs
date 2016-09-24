@@ -34,6 +34,12 @@ class EventAttachmentTable extends Entity\DataManager
 			'FILE_ID' => array(
 				'data_type' => 'integer',
 			),
+			'IS_FILE_COPIED' => array(
+				'data_type' => 'boolean',
+				'required' => true,
+				'values' => array('N', 'Y'),
+				'default_value' => 'Y'
+			),
 		);
 	}
 

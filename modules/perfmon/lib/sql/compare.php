@@ -18,6 +18,33 @@ class Compare
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод сравнивает две схемы баз данных и возвращает массив пар.</p> <p>Парой будет массив из двух элементов:</p> <p>-Первый элемент с индексом <code>"0"</code> это объект из исходного содержания.</p> <p>-Второй элемент с индексом <code>"1"</code> это объект из <code>$targetList</code>. Парный объект может быть пустым, если такой элемент найден не был.</p>
+	*
+	*
+	* @param mixed $Bitrix  Исходная схема.
+	*
+	* @param Bitri $Perfmon  Целевая схема.
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Schema $source  
+	*
+	* @param Schema $Bitrix  
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Schema $target  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/compare/diff.php
+	* @author Bitrix
+	*/
 	public static function diff(Schema $source, Schema $target)
 	{
 		$compare = new Compare;

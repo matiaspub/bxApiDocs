@@ -265,6 +265,16 @@ define('BX_SECURITY_SHOW_MESSAGE', true);
 define('CATALOG_NEW_OFFERS_IBLOCK_NEED', '-1');
 
 /**
+ * B_ADMIN_IBLOCK_CATALOGS
+ */
+define('B_ADMIN_IBLOCK_CATALOGS', 1);
+
+/**
+ * B_ADMIN_IBLOCK_CATALOGS_LIST
+ */
+define('B_ADMIN_IBLOCK_CATALOGS_LIST', false);
+
+/**
  * ADMIN_MODULE_NAME
  */
 define('ADMIN_MODULE_NAME', "catalog");

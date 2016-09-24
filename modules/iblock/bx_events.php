@@ -16,7 +16,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -40,10 +40,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockadd.php">Событие
- * "OnAfterIBlockAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> </li> <li> <a
+ * "OnAfterIBlockAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -66,7 +66,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -88,10 +88,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockadd.php">Событие
- * "OnBeforeIBlockAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a> </li> <li> <a
+ * "OnBeforeIBlockAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/add.php">CIBlock::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -112,7 +112,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -136,10 +136,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockupdate.php">Событие
- * "OnAfterIBlockUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a> </li> <li> <a
+ * "OnAfterIBlockUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -162,7 +162,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -184,10 +184,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockupdate.php">Событие
- * "OnBeforeIBlockUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a> </li> <li> <a
+ * "OnBeforeIBlockUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblock/update.php">CIBlock::Update</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -200,12 +200,12 @@ class _CEventsIblock {
  * <p>Вызывается перед удалением информационного блока.</p>
  *
  *
- * @param int $ID  ID информационного блока.
+ * @param mixed $intID  ID информационного блока.
  *
  * @return bool <a name="examples"></a>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // Подключаем к событию обработчик
  * RegisterModuleDependences("iblock", 
@@ -234,18 +234,18 @@ class _CEventsIblock {
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeIBlockDelete($ID){}
+	public static function OnBeforeIBlockDelete($intID){}
 
 /**
  * <p>Вызывается в момент удаления информационного блока.</p>
  *
  *
- * @param int $ID  ID информационного блока.
+ * @param mixed $intID  ID информационного блока.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // Подключаем к событию обработчик
  * RegisterModuleDependences("iblock", 
@@ -274,7 +274,7 @@ class _CEventsIblock {
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/oniblockdelete.php
  * @author Bitrix
  */
-	public static function OnIBlockDelete($ID){}
+	public static function OnIBlockDelete($intID){}
 
 /**
  * Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a> до вставки свойства в инфоблок, и может быть использовано для отмены вставки или переопределения некоторых полей.
@@ -288,7 +288,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -312,10 +312,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyadd.php">Событие
- * "OnAfterIBlockPropertyAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a> </li> <li> <a
+ * "OnAfterIBlockPropertyAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -339,7 +339,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -361,10 +361,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyadd.php">Событие
- * "OnBeforeIBlockPropertyAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a> </li> <li> <a
+ * "OnBeforeIBlockPropertyAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/add.php">CIBlockProperty::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -385,7 +385,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -409,10 +409,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockpropertyupdate.php">Событие
- * "OnAfterIBlockPropertyUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * "OnAfterIBlockPropertyUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a>   </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -422,8 +422,7 @@ class _CEventsIblock {
 	public static function OnBeforeIBlockPropertyUpdate(&$arParams){}
 
 /**
- * Вызывается при удалении свойства.
- * </html
+ * при удалении свойства.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">Delete</a><br><br>
  * 
@@ -448,7 +447,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -470,10 +469,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertyupdate.php">Событие
- * "OnBeforeIBlockPropertyUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * "OnBeforeIBlockPropertyUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/update.php">CIBlockProperty::Update</a>   </li>
+ * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -486,14 +485,14 @@ class _CEventsIblock {
  * Событие "OnBeforeIBlockPropertyDelete" вызывается перед удалением свойства методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">CIBlockProperty::Delete</a>. Как правило задачи обработчика данного события - разрешить или запретить удаление.
  *
  *
- * @param int $ID  ID удаляемого свойства. </htm
+ * @param mixed $intID  ID удаляемого свойства.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">CIBlockProperty::Delete</a><nobr></nobr><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -519,27 +518,27 @@ class _CEventsIblock {
  * <ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockproperty/delete.php">CIBlockProperty::Delete</a> </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> </htm<a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockpropertydelete.php
  * @author Bitrix
  */
-	public static function OnBeforeIBlockPropertyDelete($ID){}
+	public static function OnBeforeIBlockPropertyDelete($intID){}
 
 /**
- * <p>Событие вызывается при построении списка <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/index.php">пользовательских свойств</a>. Обработчик этого события должен вернуть массив описывающий пользовательское свойство. Содержимое этого массива описано в методе <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/GetUserTypeDescription.php">GetUserTypeDescription</a>. <br></p>
+ * <p>Событие вызывается при построении списка <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/index.php">пользовательских свойств</a>. Обработчик этого события должен вернуть массив описывающий пользовательское свойство. Содержимое этого массива описано в методе <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/GetUserTypeDescription.php">GetUserTypeDescription</a>.    <br></p>
  *
  *
- * @return array <p>Массив.</p></bo
+ * @return array <p>Массив.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/index.php">Пользовательские
- * свойства</a></li> <li> <a
+ * свойства</a></li>     <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/user_properties/GetUserTypeDescription.php">GetUserTypeDescription</a> 
- * </li> </ul> <br>
+ * </li>  </ul><br>
  *
  *
  * @static
@@ -560,7 +559,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -587,10 +586,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionadd.php">Событие
- * "OnAfterIBlockSectionAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a> </li> <li> <a
+ * "OnAfterIBlockSectionAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -614,7 +613,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -636,10 +635,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionadd.php">Событие
- * "OnBeforeIBlockSectionAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a> </li> <li> <a
+ * "OnBeforeIBlockSectionAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/add.php">CIBlockSection::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -660,7 +659,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -684,10 +683,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblocksectionupdate.php">Событие
- * "OnAfterIBlockSectionUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a> </li> <li>
+ * "OnAfterIBlockSectionUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a>   </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -711,7 +710,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -733,10 +732,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectionupdate.php">Событие
- * "OnBeforeIBlockSectionUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a> </li> <li>
+ * "OnBeforeIBlockSectionUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/update.php">CIBlockSection::Update</a>   </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -749,14 +748,14 @@ class _CEventsIblock {
  * Событие "OnBeforeIBlockSectionDelete" вызывается перед удалением раздела методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">CIBlockSection::Delete</a>. Как правило задачи обработчика данного события - разрешить или запретить удаление.
  *
  *
- * @param int $ID  ID удаляемого раздела. </ht
+ * @param mixed $intID  ID удаляемого раздела.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">CIBlockSection::Delete</a><nobr></nobr><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -781,18 +780,17 @@ class _CEventsIblock {
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">CIBlockSection::Delete</a>
  * </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * >Обработка событий</a> </li> </ul> </htm<a name="examples"></a>
+ * >Обработка событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblocksectiondelete.php
  * @author Bitrix
  */
-	public static function OnBeforeIBlockSectionDelete($ID){}
+	public static function OnBeforeIBlockSectionDelete($intID){}
 
 /**
- * Вызывается после удаления раздела.
- * </html
+ * после удаления раздела.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblocksection/delete.php">Delete</a><br><br>
  * 
@@ -814,7 +812,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -833,8 +831,6 @@ class _CEventsIblock {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * //пример обработчика, который при сохранении элемента переводит в транслит его заголовок, добавляет к заголовку текущую дату (для уникальности) и передает в поле "Символьный код"
  * 
  * // файл /bitrix/php_interface/init.php 
@@ -888,8 +884,6 @@ class _CEventsIblock {
  *  } 
  * }
  * 
- * 
- * 
  * //пропорциональное изменение размеров изображений, добавленных как пользовательское свойство: 
  * AddEventHandler("iblock", "OnBeforeIBlockElementAdd", Array("MyClass", "OnBeforeIBlockElementAddHandler"));
  * 
@@ -910,10 +904,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementadd.php">Событие
- * "OnAfterIBlockElementAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a> </li> <li> <a
+ * "OnAfterIBlockElementAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -932,9 +926,9 @@ class _CEventsIblock {
  * @return bool 
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> </htm<br><br>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a>  
+ * </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
+ * >Обработка событий</a> </li> </ul><br><br>
  *
  *
  * @static
@@ -958,7 +952,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -980,10 +974,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementadd.php">Событие
- * "OnBeforeIBlockElementAdd"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a> </li> <li> <a
+ * "OnBeforeIBlockElementAdd"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a>   </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1004,7 +998,7 @@ class _CEventsIblock {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1028,10 +1022,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onafteriblockelementupdate.php">Событие
- * "OnAfterIBlockElementUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a> </li> <li>
+ * "OnAfterIBlockElementUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>   </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1041,20 +1035,19 @@ class _CEventsIblock {
 	public static function OnBeforeIBlockElementUpdate(&$arParams){}
 
 /**
- * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a> до изменения элемента информационного блока перед проверкой правильности заполнения полей, и может быть использовано для отмены изменения или для переопределения некоторых полей.</p>
+ * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a> до изменения элемента информационного блока перед проверкой правильности заполнения полей, и может быть использовано для переопределения некоторых полей.</p>
  *
  *
  * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Массив полей</a> изменяемого
  * элемента информационного блока.
  *
- * @return bool <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a><nobr>$APPLICATION-&gt;<a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
+ * @return bool <i>OnStartIBlockElementUpdate</i><i>false</i><a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a><br>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
- * </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * >Обработка событий</a> </li> </ul> </htm<br><br>
+ *   </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
+ * >Обработка событий</a> </li> </ul><br><br>
  *
  *
  * @static
@@ -1079,7 +1072,7 @@ class _CEventsIblock {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1101,10 +1094,10 @@ class _CEventsIblock {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementupdate.php">Событие
- * "OnBeforeIBlockElementUpdate"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a> </li> <li>
+ * "OnBeforeIBlockElementUpdate"</a>   </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>   </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >Обработка
- * событий</a> </li> </ul> <a name="examples"></a>
+ * событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1117,14 +1110,14 @@ class _CEventsIblock {
  * Событие "OnBeforeIBlockElementDelete" вызывается перед удалением элемента методом <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">CIBlockElement::Delete</a>. Как правило задачи обработчика данного события - разрешить или запретить удаление.
  *
  *
- * @param int $ID  ID удаляемого элемента. </htm
+ * @param mixed $intID  ID удаляемого элемента.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">CIBlockElement::Delete</a><nobr></nobr><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1149,14 +1142,14 @@ class _CEventsIblock {
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/delete.php">CIBlockElement::Delete</a>
  * </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * >Обработка событий</a> </li> </ul> </htm<a name="examples"></a>
+ * >Обработка событий</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/onbeforeiblockelementdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeIBlockElementDelete($ID){}
+	public static function OnBeforeIBlockElementDelete($intID){}
 
 /**
  * <p>Событие "OnAfterIBlockElementDelete" вызывается после того, как элемент и вся связанная с ним информация были удалены из базы данных.</p>
@@ -1168,7 +1161,7 @@ class _CEventsIblock {
  * @return mixed <p>Отсутствует.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
  * AddEventHandler("iblock", "OnAfterIBlockElementDelete", Array("MyClass", "OnAfterIBlockElementDeleteHandler"));
@@ -1191,15 +1184,15 @@ class _CEventsIblock {
 	public static function OnAfterIBlockElementDelete(&$arFields){}
 
 /**
- * <p>Вызывается в момент удаления элемента информационного блока.</p> <p></p> <div class="note"> <b>Примечание:</b> начиная с версии 15.5.12, событие вызывается до удаления из таблиц любых данных, связанных с элементом.</div>
+ * <p>Вызывается в момент удаления элемента информационного блока.</p> <p></p> <div class="note"> <b>Примечание:</b> начиная с версии 15.5.12,  событие вызывается до удаления из таблиц любых данных, связанных с элементом.</div>
  *
  *
- * @param int $ID  ID элемента информационного блока.
+ * @param mixed $intID  ID элемента информационного блока.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // Подключаем к событию обработчик
  * RegisterModuleDependences("iblock", 
@@ -1230,12 +1223,10 @@ class _CEventsIblock {
  * @link http://dev.1c-bitrix.ru/api_help/iblock/events/oniblockelementdelete.php
  * @author Bitrix
  */
-	public static function OnIBlockElementDelete($ID){}
+	public static function OnIBlockElementDelete($intID){}
 
 /**
- * Вызывается перед внесением записи в лог.
- * 
- * 
+ * перед внесением записи в лог.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">Update</a><br><br>
  * 
@@ -1246,8 +1237,7 @@ class _CEventsIblock {
 	public static function OnBeforeEventLog(){}
 
 /**
- * Вызывается при поиске файла.
- * </ht
+ * при поиске файла.
  * <i>Вызывается в методе:</i><br>
  * CIBlockElement::__GetFileContent<br><br>
  * 
@@ -1258,9 +1248,7 @@ class _CEventsIblock {
 	public static function OnSearchGetFileContent(){}
 
 /**
- * Вызывается при возвращении описания журналу событий
- * 
- * 
+ * при возвращении описания журналу событий
  * <i>Вызывается в методе:</i><br>
  * CEventIBlock::GetAuditTypes<br><br>
  * 
@@ -1271,8 +1259,7 @@ class _CEventsIblock {
 	public static function GetAuditTypesIblock(){}
 
 /**
- * Вызывается аналог <a href="/api_help/main/events/onadmincontextmenushow.php">OnAdminContextMenuShow</a> для списка SKU
- * </h
+ * аналог <a href="/api_help/main/events/onadmincontextmenushow.php">OnAdminContextMenuShow</a> для списка SKU
  * <i>Вызывается в методе:</i><br>
  * CAdminSubContextMenu::Show<br><br>
  * 
@@ -1283,8 +1270,7 @@ class _CEventsIblock {
 	public static function OnAdminSubContextMenuShow(){}
 
 /**
- * Вызывается аналог <a href="/api_help/main/events/onadminlistdisplay.php">OnAdminListDisplay</a> для списка SKU
- * </h
+ * аналог <a href="/api_help/main/events/onadminlistdisplay.php">OnAdminListDisplay</a> для списка SKU
  * <i>Вызывается в методе:</i><br>
  * CAdminSubList::Display<br><br>
  * 
@@ -1307,7 +1293,7 @@ class _CEventsIblock {
  *
  * @param string $PROPERTY_CODE  Код изменяемого свойства.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1333,12 +1319,13 @@ class _CEventsIblock {
  * соответствие значение свойства.
  *
  * @param array $FLAGS  Массив параметров для оптимизации запросов к БД. Может содержать
- * следующие ключи: <ul> <li>NewElement - можно указать если заведомо
+ * следующие ключи: 	<ul> <li>NewElement - можно указать если заведомо
  * известно, что значений свойств у данного элемента нет. Экономит
- * один запрос к БД.</li> <li>DoNotValidateLists - для свойств типа "список"
- * отключает проверку наличия значений в метаданных свойства.</li> </ul>
+ * один запрос к БД.</li>           <li>DoNotValidateLists - для свойств типа "список"
+ * отключает проверку наличия значений в метаданных свойства.</li>      
+ *    </ul>
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1353,13 +1340,13 @@ class _CEventsIblock {
 	public static function OnAfterIBlockElementSetPropertyValuesEx($ELEMENT_ID, $IBLOCK_ID, $PROPERTY_VALUES, $FLAGS){}
 
 /**
- * <p>Событие <i>OnIBlockElementAdd</i> вызывается в момент добавления элемента информационного блока.</p>
+ * <p>Событие <i>OnIBlockElementAdd</i> вызывается в момент добавления элемента информационного блока.</p> <p>Событие вызывается в момент, когда уже отработали все обработчики, изменяющие данные, а также уже произошла проверка данных и идет запись в базу. Изменять данные событие не позволяет. Основной сценарий использования - выполнить некий код перед работой с базой, будучи уверенным, что данные в базе будут изменены. </p>
  *
  *
  * @param array $arFields  <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">Массив значений
  * полей</a> элемента инфоблока.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/add.php">CIBlockElement::Add</a> </li>
@@ -1373,7 +1360,7 @@ class _CEventsIblock {
 	public static function OnIBlockElementAdd($arFields){}
 
 /**
- * <p>Событие <i>OnIBlockElementUpdate</i> вызывается в момент изменения элемента информационного блока.</p>
+ * <p>Событие <i>OnIBlockElementUpdate</i> вызывается в момент изменения элемента информационного блока.</p> <p>Событие вызывается в момент, когда уже отработали все обработчики, изменяющие данные, а также уже произошла проверка данных и идет запись в базу. Изменять данные событие не позволяет. Основной сценарий использования - выполнить некий код перед работой с базой, будучи уверенным, что данные в базе будут изменены. </p>
  *
  *
  * @param array $newFields  Массив обновляемых полей и свойств элемента инфоблока.
@@ -1381,7 +1368,7 @@ class _CEventsIblock {
  * @param array $ar_wf_element  Текущие значения обновляемых полей, а также свойств элемента,
  * если инфоблок участвует в документообороте.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/update.php">CIBlockElement::Update</a>
@@ -1395,7 +1382,7 @@ class _CEventsIblock {
 	public static function OnIBlockElementUpdate($newFields, $ar_wf_element){}
 
 /**
- * <p>Событие <i>OnIBlockElementSetPropertyValues</i> вызывается в момент сохранения значений свойств элемента инфоблока.</p>
+ * <p>Событие <i>OnIBlockElementSetPropertyValues</i> вызывается в момент сохранения значений свойств элемента инфоблока.</p> <p>Событие вызывается в момент, когда уже отработали все обработчики, изменяющие данные, а также уже произошла проверка данных и идет запись в базу. Изменять данные событие не позволяет. Основной сценарий использования - выполнить некий код перед работой с базой, будучи уверенным, что данные в базе будут изменены. </p>
  *
  *
  * @param int $ELEMENT_ID  Идентификатор элемента инфоблока.
@@ -1412,7 +1399,7 @@ class _CEventsIblock {
  *
  * @param array $arDBProps  Текущие значения свойств элемента.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a

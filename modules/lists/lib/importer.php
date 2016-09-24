@@ -53,7 +53,7 @@ class Importer
 	 * @throws Main\ArgumentNullException
 	 * @throws Main\ArgumentOutOfRangeException
 	 */
-public static 	public static function export($iblockId)
+	public static function export($iblockId)
 	{
 		$iblockId = intval($iblockId);
 		if ($iblockId <= 0)
@@ -85,7 +85,7 @@ public static 	public static function export($iblockId)
 
 		$iblockUtf8 = Main\Text\Encoding::convertEncodingArray($iblock, LANG_CHARSET, "UTF-8");
 		$iblockUtf8 = serialize($iblockUtf8);
-		$iblockUtf8Length = Main\Text\String::getBinaryLength($iblockUtf8);
+		$iblockUtf8Length = Main\Text\BinaryString::getLength($iblockUtf8);
 		$datum = str_pad($iblockUtf8Length, 10, "0", STR_PAD_LEFT).$iblockUtf8;
 
 		if (intval($iblock["PICTURE"]) > 0)
@@ -97,8 +97,8 @@ public static 	public static function export($iblockId)
 				$pictureData = fread($f, filesize($picture["tmp_name"]));
 				fclose($f);
 
-				$pictureTypeLength = Main\Text\String::getBinaryLength($picture["type"]);
-				$pictureLength = Main\Text\String::getBinaryLength($pictureData);
+				$pictureTypeLength = Main\Text\BinaryString::getLength($picture["type"]);
+				$pictureLength = Main\Text\BinaryString::getLength($pictureData);
 				$datum .= "P".str_pad($pictureTypeLength, 10, "0", STR_PAD_LEFT).$picture["type"].str_pad($pictureLength, 10, "0", STR_PAD_LEFT).$pictureData;
 			}
 		}
@@ -116,11 +116,11 @@ public static 	public static function export($iblockId)
 		{
 			$bpDescrUtf8 = Main\Text\Encoding::convertEncodingArray($templatesListItem, LANG_CHARSET, "UTF-8");
 			$bpDescrUtf8 = serialize($bpDescrUtf8);
-			$bpDescrUtf8Length = Main\Text\String::getBinaryLength($bpDescrUtf8);
+			$bpDescrUtf8Length = Main\Text\BinaryString::getLength($bpDescrUtf8);
 			$datum .= "B".str_pad($bpDescrUtf8Length, 10, "0", STR_PAD_LEFT).$bpDescrUtf8;
 
 			$bp = \CBPWorkflowTemplateLoader::ExportTemplate($templatesListItem["ID"], false);
-			$bpLength = Main\Text\String::getBinaryLength($bp);
+			$bpLength = Main\Text\BinaryString::getLength($bp);
 			$datum .= str_pad($bpLength, 10, "0", STR_PAD_LEFT).$bp;
 		}
 
@@ -134,17 +134,17 @@ public static 	public static function export($iblockId)
 	 * @param string $filePath This variable is the path to the file to get the data.
 	 * @return array
 	 */
-public static 	public static function getDataProcess($filePath)
+	public static function getDataProcess($filePath)
 	{
 		$f = fopen($filePath, "rb");
 		$datum = fread($f, filesize($filePath));
 		fclose($f);
 
 		if (substr($datum, 0, 10) === "compressed")
-			$datum = gzuncompress(Main\Text\String::getBinarySubstring($datum, 10));
+			$datum = gzuncompress(Main\Text\BinaryString::getSubstring($datum, 10));
 
-		$len = intval(Main\Text\String::getBinarySubstring($datum, 0, 10));
-		$dataSerialized = Main\Text\String::getBinarySubstring($datum, 10, $len);
+		$len = intval(Main\Text\BinaryString::getSubstring($datum, 0, 10));
+		$dataSerialized = Main\Text\BinaryString::getSubstring($datum, 10, $len);
 
 		$data = CheckSerializedData($dataSerialized) ? unserialize($dataSerialized) : array();
 		$data = Main\Text\Encoding::convertEncodingArray($data, "UTF-8", LANG_CHARSET);
@@ -158,32 +158,32 @@ public static 	public static function getDataProcess($filePath)
 	 * @param null $siteId This variable is the id current site.
 	 * @throws Main\ArgumentNullException
 	 */
-public static 	public static function import($iblockType, $datum, $siteId = null)
+	public static function import($iblockType, $datum, $siteId = null)
 	{
 		if (empty($datum))
 			throw new Main\ArgumentNullException("datum");
 
 		if (substr($datum, 0, 10) === "compressed")
-			$datum = gzuncompress(Main\Text\String::getBinarySubstring($datum, 10));
+			$datum = gzuncompress(Main\Text\BinaryString::getSubstring($datum, 10));
 
-		$len = intval(Main\Text\String::getBinarySubstring($datum, 0, 10));
-		$iblockSerialized = Main\Text\String::getBinarySubstring($datum, 10, $len);
-		$datum = Main\Text\String::getBinarySubstring($datum, $len + 10);
+		$len = intval(Main\Text\BinaryString::getSubstring($datum, 0, 10));
+		$iblockSerialized = Main\Text\BinaryString::getSubstring($datum, 10, $len);
+		$datum = Main\Text\BinaryString::getSubstring($datum, $len + 10);
 
-		$marker = Main\Text\String::getBinarySubstring($datum, 0, 1);
+		$marker = Main\Text\BinaryString::getSubstring($datum, 0, 1);
 		$picture = null;
 		$pictureType = null;
 		if ($marker == "P")
 		{
-			$len = intval(Main\Text\String::getBinarySubstring($datum, 1, 10));
-			$pictureType = Main\Text\String::getBinarySubstring($datum, 11, $len);
-			$datum = Main\Text\String::getBinarySubstring($datum, $len + 11);
+			$len = intval(Main\Text\BinaryString::getSubstring($datum, 1, 10));
+			$pictureType = Main\Text\BinaryString::getSubstring($datum, 11, $len);
+			$datum = Main\Text\BinaryString::getSubstring($datum, $len + 11);
 
-			$len = intval(Main\Text\String::getBinarySubstring($datum, 0, 10));
-			$picture = Main\Text\String::getBinarySubstring($datum, 10, $len);
-			$datum = Main\Text\String::getBinarySubstring($datum, $len + 10);
+			$len = intval(Main\Text\BinaryString::getSubstring($datum, 0, 10));
+			$picture = Main\Text\BinaryString::getSubstring($datum, 10, $len);
+			$datum = Main\Text\BinaryString::getSubstring($datum, $len + 10);
 
-			$marker = Main\Text\String::getBinarySubstring($datum, 0, 1);
+			$marker = Main\Text\BinaryString::getSubstring($datum, 0, 1);
 		}
 
 		$iblock = CheckSerializedData($iblockSerialized) ? unserialize($iblockSerialized) : array();
@@ -198,16 +198,16 @@ public static 	public static function import($iblockType, $datum, $siteId = null
 			{
 				if ($marker == "B")
 				{
-					$len = intval(Main\Text\String::getBinarySubstring($datum, 1, 10));
-					$bpDescr = Main\Text\String::getBinarySubstring($datum, 11, $len);
-					$datum = Main\Text\String::getBinarySubstring($datum, $len + 11);
+					$len = intval(Main\Text\BinaryString::getSubstring($datum, 1, 10));
+					$bpDescr = Main\Text\BinaryString::getSubstring($datum, 11, $len);
+					$datum = Main\Text\BinaryString::getSubstring($datum, $len + 11);
 
 					$bpDescr = CheckSerializedData($bpDescr) ? unserialize($bpDescr) : array();
 					$bpDescr = Main\Text\Encoding::convertEncodingArray($bpDescr, "UTF-8", LANG_CHARSET);
 
-					$len = intval(Main\Text\String::getBinarySubstring($datum, 0, 10));
-					$bp = Main\Text\String::getBinarySubstring($datum, 10, $len);
-					$datum = Main\Text\String::getBinarySubstring($datum, $len + 10);
+					$len = intval(Main\Text\BinaryString::getSubstring($datum, 0, 10));
+					$bp = Main\Text\BinaryString::getSubstring($datum, 10, $len);
+					$datum = Main\Text\BinaryString::getSubstring($datum, $len + 10);
 
 					static::importTemplate($documentType, $bpDescr, $bp);
 				}
@@ -219,7 +219,7 @@ public static 	public static function import($iblockType, $datum, $siteId = null
 				if (empty($datum))
 					break;
 
-				$marker = Main\Text\String::getBinarySubstring($datum, 0, 1);
+				$marker = Main\Text\BinaryString::getSubstring($datum, 0, 1);
 			}
 		}
 	}
@@ -352,7 +352,7 @@ public static 	public static function import($iblockType, $datum, $siteId = null
 		if ($iblockType == static::getIBlockType())
 			$documentType = array('lists', 'BizprocDocument', 'iblock_'.$iblockId);
 		else
-			$documentType = array('iblock', 'CIBlockDocument', 'iblock_'.$iblockId);
+			$documentType = array('lists', 'Bitrix\Lists\BizprocDocumentLists', 'iblock_'.$iblockId);
 
 		return $documentType;
 	}
@@ -385,7 +385,7 @@ public static 	public static function import($iblockType, $datum, $siteId = null
 	 * @throws Main\ArgumentNullException
 	 * @throws Main\IO\FileNotFoundException
 	 */
-public static 	public static function installProcesses($lang, $siteId = null)
+	public static function installProcesses($lang, $siteId = null)
 	{
 		if (empty($lang))
 			throw new Main\ArgumentNullException("lang");
@@ -421,7 +421,7 @@ public static 	public static function installProcesses($lang, $siteId = null)
 	 * @throws Main\ArgumentNullException
 	 * @throws Main\IO\FileNotFoundException
 	 */
-public static 	public static function installProcess($path, $siteId = null)
+	public static function installProcess($path, $siteId = null)
 	{
 		if (empty($path))
 			throw new Main\ArgumentNullException("path");
@@ -452,7 +452,7 @@ public static 	public static function installProcess($path, $siteId = null)
 	 * @throws Main\ArgumentNullException
 	 * @throws Main\IO\FileNotFoundException
 	 */
-public static 	public static function loadDataProcesses($lang, $systemProcesses = true, &$fileData, $path = null)
+	public static function loadDataProcesses($lang, $systemProcesses = true, &$fileData, $path = null)
 	{
 		if (empty($lang))
 			throw new Main\ArgumentNullException("lang");
@@ -545,13 +545,13 @@ public static 	public static function loadDataProcesses($lang, $systemProcesses 
 	 * @return string
 	 * @throws Main\ArgumentNullException
 	 */
-public static 	public static function onAgent($lang)
+	public static function onAgent($lang)
 	{
 		self::installProcesses($lang);
 		return "";
 	}
 
-public static 	public static function migrateList($id)
+	public static function migrateList($id)
 	{
 		$id = intval($id);
 		if ($id <= 0)
@@ -575,7 +575,7 @@ public static 	public static function migrateList($id)
 		}
 
 		\CBPDocument::MigrateDocumentType(
-			array("iblock", "CIBlockDocument", "iblock_".$id),
+			array("lists", 'Bitrix\Lists\BizprocDocumentLists', "iblock_".$id),
 			array("lists", "BizprocDocument", "iblock_".$id)
 		);
 	}

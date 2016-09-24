@@ -349,7 +349,6 @@ class CGlobalCondCtrl
 	public static function Check($arOneCondition, $arParams, $arControl, $boolShow)
 	{
 		$boolShow = ($boolShow === true);
-		$arResult = array();
 		$boolError = false;
 		$boolFatalError = false;
 		$arMsg = array();
@@ -1117,8 +1116,6 @@ class CGlobalCondCtrl
 
 	public static function CheckAtoms($arOneCondition, $arParams, $arControl, $boolShow)
 	{
-		$arResult = array();
-
 		$boolShow = (true === $boolShow);
 		$boolError = false;
 		$boolFatalError = false;
@@ -2336,20 +2333,149 @@ class CGlobalCondCtrlComplex extends CGlobalCondCtrl
 	}
 }
 
+class CGlobalCondCtrlAtoms extends CGlobalCondCtrl
+{
+	/**
+	 * @return array|bool
+	 */
+	public static function GetControlDescr()
+	{
+		$className = get_called_class();
+		$controls = static::GetControls();
+		if (empty($controls) || !is_array($controls))
+			return false;
+		$result = array();
+		foreach ($controls as &$oneControl)
+		{
+			unset($oneControl['ATOMS']);
+			$row = $oneControl;
+			$row['GetControlShow'] = array($className, 'GetControlShow');
+			$row['GetConditionShow'] = array($className, 'GetConditionShow');
+			$row['IsGroup'] = array($className, 'IsGroup');
+			$row['Parse'] = array($className, 'Parse');
+			$row['Generate'] = array($className, 'Generate');
+			$row['ApplyValues'] = array($className, 'ApplyValues');
+			$row['InitParams'] = array($className, 'InitParams');
+
+			$result[] = $row;
+			unset($row);
+		}
+		unset($oneControl, $controls, $className);
+		return $result;
+	}
+
+	public static function GetConditionShow($params)
+	{
+		if (!isset($params['ID']))
+			return false;
+		$atoms = static::GetAtomsEx($params['ID'], true);
+		if (empty($atoms))
+			return false;
+		$control = array(
+			'ID' => $params['ID'],
+			'ATOMS' => $atoms
+		);
+		unset($atoms);
+		return static::CheckAtoms($params['DATA'], $params, $control, true);
+	}
+
+	public static function Parse($condition)
+	{
+		if (!isset($condition['controlId']))
+			return false;
+		$atoms = static::GetAtomsEx($condition['controlId'], true);
+		if (empty($atoms))
+			return false;
+		$control = array(
+			'ID' => $condition['controlId'],
+			'ATOMS' => $atoms
+		);
+		unset($atoms);
+		return static::CheckAtoms($condition, $condition, $control, false);
+	}
+
+	public static function Generate($condition, $params, $control, $childrens = false)
+	{
+		return '';
+	}
+
+	public static function GetAtomsEx($controlId = false, $extendedMode = false)
+	{
+		return array();
+	}
+
+	public static function GetAtoms()
+	{
+		return static::GetAtomsEx(false, false);
+	}
+
+	/**
+	 * @return string|array
+	 */
+	public static function GetControlID()
+	{
+		$atoms = static::GetAtomsEx(false, true);
+		return (empty($atoms) ? array() : array_keys($atoms));
+	}
+
+	/**
+	 * @param bool|string $strControlID
+	 * @return array|bool
+	 */
+	public static function GetControls($strControlID = false)
+	{
+		return array();
+	}
+
+	public static function GetControlShow($params)
+	{
+		$controls = static::GetControls();
+		if (empty($controls) || !is_array($controls))
+			return array();
+		$result = array();
+		foreach ($controls as $controlId => $data)
+		{
+			$row = array(
+				'controlId' => $data['ID'],
+				'group' => false,
+				'label' => $data['LABEL'],
+				'showIn' => static::GetShowIn($params['SHOW_IN_GROUPS']),
+				'control' => array()
+			);
+			if (isset($data['PREFIX']))
+				$row['control'][] = $data['PREFIX'];
+			if (empty($row['control']))
+			{
+				$row['control'] = array_values($data['ATOMS']);
+			}
+			else
+			{
+				foreach ($data['ATOMS'] as &$atom)
+					$row['control'][] = $atom;
+				unset($atom);
+			}
+
+			$result[] = $row;
+		}
+		unset($controlId, $data, $controls);
+		return $result;
+	}
+}
+
 class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 {
 	public static function GetControlDescr()
 	{
-		$strClassName = get_called_class();
+		$className = get_called_class();
 		return array(
 			'ID' => static::GetControlID(),
 			'GROUP' => 'Y',
-			'GetControlShow' => array($strClassName, 'GetControlShow'),
-			'GetConditionShow' => array($strClassName, 'GetConditionShow'),
-			'IsGroup' => array($strClassName, 'IsGroup'),
-			'Parse' => array($strClassName, 'Parse'),
-			'Generate' => array($strClassName, 'Generate'),
-			'ApplyValues' => array($strClassName, 'ApplyValues')
+			'GetControlShow' => array($className, 'GetControlShow'),
+			'GetConditionShow' => array($className, 'GetConditionShow'),
+			'IsGroup' => array($className, 'IsGroup'),
+			'Parse' => array($className, 'Parse'),
+			'Generate' => array($className, 'Generate'),
+			'ApplyValues' => array($className, 'ApplyValues')
 		);
 	}
 
@@ -2368,40 +2494,31 @@ class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 
 	public static function GetConditionShow($arParams)
 	{
-		$boolError = false;
-		$arAtoms = static::GetAtoms();
-		$arValues = array();
-		foreach ($arAtoms as &$arOneAtom)
+		$error = false;
+		$values = array();
+		foreach (static::GetAtoms() as $atom)
 		{
 			if (
-				!isset($arParams['DATA'][$arOneAtom['id']])
-				|| !is_string($arParams['DATA'][$arOneAtom['id']])
-				|| !isset($arOneAtom['values'][$arParams['DATA'][$arOneAtom['id']]])
+				!isset($arParams['DATA'][$atom['id']])
+				|| !is_string($arParams['DATA'][$atom['id']])
+				|| !isset($atom['values'][$arParams['DATA'][$atom['id']]])
 			)
-			{
-				$boolError = true;
-			}
-			if (!$boolError)
-			{
-				$arValues[$arOneAtom['id']] = $arParams['DATA'][$arOneAtom['id']];
-			}
-			else
-			{
-				$arValues[$arOneAtom['id']] = '';
-			}
-		}
-		if (isset($arOneAtoms))
-			unset($arOneAtom);
+				$error = true;
 
-		$arResult = array(
+			$values[$atom['id']] = ($error ? '' : $arParams['DATA'][$atom['id']]);
+		}
+		unset($atom);
+
+		$result = array(
 			'id' => $arParams['COND_NUM'],
 			'controlId' => static::GetControlID(),
-			'values' => $arValues
+			'values' => $values
 		);
-		if ($boolError)
-			$arResult['err_cond'] = 'Y';
+		if ($error)
+			$result['err_cond'] = 'Y';
+		unset($values);
 
-		return $arResult;
+		return $result;
 	}
 
 	/**
@@ -2495,94 +2612,82 @@ class CGlobalCondCtrlGroup extends CGlobalCondCtrl
 
 	public static function Parse($arOneCondition)
 	{
-		$boolError = false;
-		$arResult = array();
-		$arAtoms = static::GetAtoms();
-		foreach ($arAtoms as &$arOneAtom)
+		$error = false;
+		$result = array();
+		foreach (static::GetAtoms() as $atom)
 		{
 			if (
-				!isset($arOneCondition[$arOneAtom['name']])
-				|| !is_string($arOneCondition[$arOneAtom['name']])
-				|| !isset($arOneAtom['values'][$arOneCondition[$arOneAtom['name']]])
+				!isset($arOneCondition[$atom['name']])
+				|| !is_string($arOneCondition[$atom['name']])
+				|| !isset($atom['values'][$arOneCondition[$atom['name']]])
 			)
 			{
-				$boolError = true;
+				$error = true;
+				break;
 			}
-			if (!$boolError)
-			{
-				$arResult[$arOneAtom['id']] = $arOneCondition[$arOneAtom['name']];
-			}
+			$result[$atom['id']] = $arOneCondition[$atom['name']];
 		}
-		if (isset($arOneAtom))
-			unset($arOneAtom);
+		unset($atom);
 
-		return (!$boolError ? $arResult : false);
+		return (!$error ? $result : false);
 	}
 
 	public static function Generate($arOneCondition, $arParams, $arControl, $arSubs = false)
 	{
-		$mxResult = '';
-		$boolError = false;
+		$result = '';
+		$error = false;
 
-		$arAtoms = static::GetAtoms();
-
-		foreach ($arAtoms as &$arOneAtom)
+		foreach (static::GetAtoms() as $atom)
 		{
 			if (
-				!isset($arOneCondition[$arOneAtom['id']])
-				|| !is_string($arOneCondition[$arOneAtom['id']])
-				|| !isset($arOneAtom['values'][$arOneCondition[$arOneAtom['id']]])
+				!isset($arOneCondition[$atom['id']])
+				|| !is_string($arOneCondition[$atom['id']])
+				|| !isset($atom['values'][$arOneCondition[$atom['id']]])
 			)
-			{
-				$boolError = true;
-			}
+				$error = true;
 		}
-		if (isset($arOneAtom))
-			unset($arOneAtom);
+		unset($atom);
 
 		if (!isset($arSubs) || !is_array($arSubs))
 		{
-			$boolError = true;
+			$error = true;
 		}
 		elseif (empty($arSubs))
 		{
 			return '(1 == 1)';
 		}
 
-		if (!$boolError)
+		if (!$error)
 		{
-			$strPrefix = '';
-			$strLogic = '';
-			$strItemPrefix = '';
-
 			if ('AND' == $arOneCondition['All'])
 			{
-				$strPrefix = '';
-				$strLogic = ' && ';
-				$strItemPrefix = ($arOneCondition['True'] == 'True' ? '' : '!');
+				$prefix = '';
+				$logic = ' && ';
+				$itemPrefix = ($arOneCondition['True'] == 'True' ? '' : '!');
 			}
 			else
 			{
-				$strItemPrefix = '';
+				$itemPrefix = '';
 				if ($arOneCondition['True'] == 'True')
 				{
-					$strPrefix = '';
-					$strLogic = ' || ';
+					$prefix = '';
+					$logic = ' || ';
 				}
 				else
 				{
-					$strPrefix = '!';
-					$strLogic = ' && ';
+					$prefix = '!';
+					$logic = ' && ';
 				}
 			}
 
-			$strEval = $strItemPrefix.implode($strLogic.$strItemPrefix, $arSubs);
-			if ($strPrefix != '')
-				$strEval = $strPrefix.'('.$strEval.')';
-			$mxResult = $strEval;
+			$commandLine = $itemPrefix.implode($logic.$itemPrefix, $arSubs);
+			if ($prefix != '')
+				$commandLine = $prefix.'('.$commandLine.')';
+			$result = $commandLine;
+			unset($commandLine);
 		}
 
-		return $mxResult;
+		return $result;
 	}
 
 	public static function ApplyValues($arOneCondition, $arControl)
@@ -2663,8 +2768,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 				)
 			);
 		}
-		if (isset($arOneControl))
-			unset($arOneControl);
+		unset($arOneControl);
 
 		return $arResult;
 	}
@@ -2676,7 +2780,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 	public static function GetControls($strControlID = false)
 	{
 		$vatList = array();
-		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME'), 'order' => array('SORT' => 'ASC')));
+		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME', 'SORT'), 'order' => array('SORT' => 'ASC')));
 		while ($vat = $vatIterator->fetch())
 		{
 			$vat['ID'] = (int)$vat['ID'];
@@ -2693,7 +2797,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
-					'type' => 'dialog',
+					'type' => 'multiDialog',
 					'popup_url' =>  '/bitrix/admin/cat_product_search_dialog.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
@@ -3094,7 +3198,7 @@ class CCatalogCondCtrlIBlockFields extends CCatalogCondCtrlComplex
 							}
 							else
 							{
-								foreach ($arValues['value'] as &$value)
+								foreach ($arValues['value'] as $value)
 								{
 									if ($useParent)
 										$parentResultValues[] = str_replace(
@@ -3290,6 +3394,15 @@ class CCatalogCondCtrlIBlockProps extends CCatalogCondCtrlComplex
 									$arValue = array(
 										'type' => 'datetime',
 										'format' => 'datetime'
+									);
+									$boolUserType = true;
+									break;
+								case 'Date':
+									$strFieldType = 'date';
+									$arLogic = static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS));
+									$arValue = array(
+										'type' => 'datetime',
+										'format' => 'date'
 									);
 									$boolUserType = true;
 									break;
@@ -4760,4 +4873,3 @@ class CCatalogCondTree extends CGlobalCondTree
 		parent::__destruct();
 	}
 }
-?>

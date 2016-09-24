@@ -28,6 +28,19 @@ class EventResult extends \Bitrix\Main\EventResult
 	 * Sets the errors array and changes the event type to ERROR
 	 * @param EntityError[] $errors
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает массив ошибок и изменяет тип события ERROR.</p>
+	*
+	*
+	* @param array $arrayerrors  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/eventresult/seterrors.php
+	* @author Bitrix
+	*/
 	public function setErrors(array $errors)
 	{
 		$this->errors = $errors;
@@ -55,6 +68,19 @@ class EventResult extends \Bitrix\Main\EventResult
 	 * Sets the array of fields to modify data in the Bitrix\Main\Entity\Event
 	 * @param array $fields
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает устанавливает массив полей для модификации данных в <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/event/index.php">\Bitrix\Main\Entity\Event</a>.</p>
+	*
+	*
+	* @param array $fields  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/eventresult/modifyfields.php
+	* @author Bitrix
+	*/
 	public function modifyFields(array $fields)
 	{
 		$this->modified = $fields;
@@ -69,6 +95,19 @@ class EventResult extends \Bitrix\Main\EventResult
 	 * Sets the array of fields names to unset data in the Bitrix\Main\Entity\Event
 	 * @param array $fields
 	 */
+	
+	/**
+	* <p>Нестатический метод составляет массив имён полей для отключения в <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/event/index.php">Bitrix\Main\Entity\Event</a>.</p>
+	*
+	*
+	* @param array $fields  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/eventresult/unsetfields.php
+	* @author Bitrix
+	*/
 	public function unsetFields(array $fields)
 	{
 		$this->unset = $fields;

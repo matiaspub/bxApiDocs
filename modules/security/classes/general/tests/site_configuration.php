@@ -95,9 +95,14 @@ class CSecuritySiteConfigurationTest
 			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_REDIRECT_OFF", CSecurityCriticalLevel::MIDDLE);
 			$isFailed = true;
 		}
-		if(self::AdminPolicyLevel() != "high")
+
+		$adminPolicy = self::AdminPolicyLevel();
+		if($adminPolicy != "high")
 		{
-			$this->addUnformattedDetailError("SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL", CSecurityCriticalLevel::HIGHT);
+			$this->addUnformattedDetailError(
+				"SECURITY_SITE_CHECKER_ADMIN_SECURITY_LEVEL",
+				$adminPolicy == "middle" ? CSecurityCriticalLevel::LOW : CSecurityCriticalLevel::HIGHT
+			);
 			$isFailed = true;
 		}
 

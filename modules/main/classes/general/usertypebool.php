@@ -89,21 +89,21 @@ class CUserTypeBoolean
 			case "DROPDOWN":
 				$arHtmlControl["VALIGN"] = "middle";
 				return '
-					<select name="'.$arHtmlControl["NAME"].'">
+					<select name="'.$arHtmlControl["NAME"].'"'.($arUserField["EDIT_IN_LIST"]!="Y"? ' disabled="disabled"': '').'>
 					<option value="1"'.($arHtmlControl["VALUE"]? ' selected': '').'>'.GetMessage("MAIN_YES").'</option>
 					<option value="0"'.(!$arHtmlControl["VALUE"]? ' selected': '').'>'.GetMessage("MAIN_NO").'</option>
 					</select>
 				';
 			case "RADIO":
 				return '
-					<label><input type="radio" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').'>'.GetMessage("MAIN_YES").'</label><br>
-					<label><input type="radio" value="0" name="'.$arHtmlControl["NAME"].'"'.(!$arHtmlControl["VALUE"]? ' checked': '').'>'.GetMessage("MAIN_NO").'</label>
+					<label><input type="radio" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').($arUserField["EDIT_IN_LIST"]!="Y"? ' disabled="disabled"': '').'>'.GetMessage("MAIN_YES").'</label><br>
+					<label><input type="radio" value="0" name="'.$arHtmlControl["NAME"].'"'.(!$arHtmlControl["VALUE"]? ' checked': '').($arUserField["EDIT_IN_LIST"]!="Y"? ' disabled="disabled"': '').'>'.GetMessage("MAIN_NO").'</label>
 				';
 			default:
 				$arHtmlControl["VALIGN"] = "middle";
 				return '
 					<input type="hidden" value="0" name="'.$arHtmlControl["NAME"].'">
-					<input type="checkbox" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').' id="'.$arHtmlControl["NAME"].'">
+					<input type="checkbox" value="1" name="'.$arHtmlControl["NAME"].'"'.($arHtmlControl["VALUE"]? ' checked': '').' id="'.$arHtmlControl["NAME"].'"'.($arUserField["EDIT_IN_LIST"]!="Y"? ' disabled="disabled"': '').'>
 				';
 		}
 	}

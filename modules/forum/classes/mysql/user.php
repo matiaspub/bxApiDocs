@@ -848,4 +848,3 @@ class CForumStat extends CALLForumStat
 		return $db_res;
 	}
 }
-?>

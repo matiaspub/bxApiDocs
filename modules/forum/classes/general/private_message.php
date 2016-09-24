@@ -6,50 +6,6 @@ IncludeModuleLangFile(__FILE__);
 //************************************!****************************************************************************
 class CAllForumPrivateMessage
 {
-	
-	/**
-	* <p>Создает новое сообщение с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданного сообщения.</p>
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля; <br><i>value</i> - значение поля. <br><br> Поля
-	* перечислены в списке полей таблицы <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a>. Обязательные поля должны быть заполнены.
-	*
-	* @return int 
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = Array(
-	* 	"AUTHOR_ID"    =&gt; $AUTHOR_ID,
-	* 	"POST_DATE"    =&gt; $POST_DATE,   
-	* 	"POST_SUBJ"    =&gt; $POST_SUBJ,   
-	* 	"POST_MESSAGE" =&gt; $POST_MESSAGE,
-	* 	"USER_ID"      =&gt; $USER_ID,     
-	* 	"FOLDER_ID"    =&gt; 1,   
-	* 	"IS_READ"      =&gt; "N",     
-	* 	"USE_SMILES"   =&gt; ($USE_SMILES=="Y") ? "Y" : "N",
-	* 	"AUTHOR_NAME"  =&gt; $AUTHOR_NAME 
-	* );
-	* $ID = CForumPrivateMessage::Send($arFields);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li>таблица <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumprivatemessage">"Приватное
-	* сообщение"</a> </li> </ul> <a name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumprivatemessage/send.php
-	* @author Bitrix
-	*/
 	public static function Send($arFields = array())
 	{
 		global $DB;
@@ -287,7 +243,7 @@ class CAllForumPrivateMessage
 		return true;
 	}
 
-	function GetByID($ID)
+	public static function GetByID($ID)
 	{
 		global $DB;
 		static $arMessage = array();
@@ -609,4 +565,3 @@ class CALLForumPMFolder
 		return $DB->Query("DELETE FROM b_forum_pm_folder WHERE ID=".$ID);
 	}
 }
-?>

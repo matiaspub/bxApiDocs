@@ -499,13 +499,16 @@ function _ShowUserPropertyField($name, $property_fields, $values, $bInitDef = fa
 		}
 	}
 
-	if(!$bVarsFromForm && !$bMultiple)
+	if(
+		(!$bVarsFromForm && !$bMultiple)
+		|| ($bVarsFromForm && !$bMultiple && count($values) == 0) //Was not displayed
+	)
 	{
 		$bDefaultValue = is_array($property_fields["DEFAULT_VALUE"]) || strlen($property_fields["DEFAULT_VALUE"]);
 
 		if($property_fields["MULTIPLE"]=="Y")
 		{
-			$cnt = IntVal($property_fields["MULTIPLE_CNT"]);
+			$cnt = (int)$property_fields["MULTIPLE_CNT"];
 			if($cnt <= 0 || $cnt > 30)
 				$cnt = 5;
 
@@ -675,7 +678,7 @@ if(
 		$arOverwrited = $obRights->GetUserOperations($_GET["id"], $_REQUEST["info"]);
 	}
 
-	echo CUtil::PHPToJSObject($arOverwrited);
+	echo CUtil::PhpToJSObject($arOverwrited);
 
 	require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin_js.php");
 }
@@ -985,13 +988,12 @@ class CEditorPopupControl
 
 	public function getControlHtml($name, $value, $maxLength = 255)
 	{
-		global $APPLICATION;
 		$result = '';
 		if (!$this->initHtml)
 		{
 			$this->initHtml = true;
 
-			$APPLICATION->AddHeadScript('/bitrix/js/iblock/iblock_edit.js');
+			Main\Page\Asset::getInstance()->addJs('/bitrix/js/iblock/iblock_edit.js');
 
 			$result .= '<div id="popup_editor_start" style="display: none">';
 			ob_start();
@@ -1047,4 +1049,3 @@ class CEditorPopupControl
 		return $result;
 	}
 }
-?>

@@ -14,18 +14,48 @@ class Subscription
 	const MODULE_ID = 'sender';
 
 	/**
+	 * Return link to unsubsribe page for subscriber
+	 *
 	 * @param array $fields
 	 * @return string
 	 */
+	
+	/**
+	* <p>Возвращает ссылку на страницу для отписки от подписки пользователем. Метод статический. </p>
+	*
+	*
+	* @param array $fields  Массив с данными ссылки на отписку от рассылки.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/getlinkunsub.php
+	* @author Bitrix
+	*/
 	public static function getLinkUnsub(array $fields)
 	{
 		return \Bitrix\Main\Mail\Tracking::getLinkUnsub(static::MODULE_ID, $fields, \Bitrix\Main\Config\Option::get('sender', 'unsub_link'));
 	}
 
 	/**
+	 * Return link to confirmation subscription page for subscriber
+	 *
 	 * @param array $fields
 	 * @return string
 	 */
+	
+	/**
+	* <p>Возвращает ссылку на страницу подтверждения подписки на рассылку пользователем. Метод статический. </p>
+	*
+	*
+	* @param array $fields  Массив с данными ссылки на страницу подписки на рассылку.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/getlinksub.php
+	* @author Bitrix
+	*/
 	public static function getLinkSub(array $fields)
 	{
 		$tag = \Bitrix\Main\Mail\Tracking::getSignedTag(static::MODULE_ID, $fields);
@@ -44,9 +74,24 @@ class Subscription
 	}
 
 	/**
+	 * Event handler
+	 *
 	 * @param $data
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\Subscription::List</code>. Метод статический. </p>
+	*
+	*
+	* @param mixed $data  Данные события.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/onmaileventsubscriptionlist.php
+	* @author Bitrix
+	*/
 	public static function onMailEventSubscriptionList($data)
 	{
 		$data['LIST'] = static::getList($data);
@@ -55,9 +100,24 @@ class Subscription
 	}
 
 	/**
+	 * Event handler
+	 *
 	 * @param $data
 	 * @return EventResult
 	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\Subscription::Enable</code>. Метод статический. </p>
+	*
+	*
+	* @param mixed $data  Данные события.
+	*
+	* @return \Bitrix\Main\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/onmaileventsubscriptionenable.php
+	* @author Bitrix
+	*/
 	public static function onMailEventSubscriptionEnable($data)
 	{
 		$data['SUCCESS'] = static::subscribe($data);
@@ -70,9 +130,24 @@ class Subscription
 	}
 
 	/**
+	 * Event handler
+	 *
 	 * @param $data
 	 * @return EventResult
 	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\Subscription::Disable</code>. Метод статический. </p>
+	*
+	*
+	* @param mixed $data  Данные события
+	*
+	* @return \Bitrix\Main\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/onmaileventsubscriptiondisable.php
+	* @author Bitrix
+	*/
 	public static function onMailEventSubscriptionDisable($data)
 	{
 		$data['SUCCESS'] = static::unsubscribe($data);
@@ -85,37 +160,52 @@ class Subscription
 	}
 
 	/**
+	 * Return list of subscriptions on mailings for subscriber
+	 *
 	 * @param $data
 	 * @return array
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Возвращает список всех подписок на рассылки для подписчика. Метод статический.</p>
+	*
+	*
+	* @param mixed $data  Данные списка всех подписок на рассылки для подписчика.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/getlist.php
+	* @author Bitrix
+	*/
 	public static function getList($data)
 	{
 		$resultMailingList = array();
 
+		$mailing = MailingTable::getRowById(array('ID' => $data['MAILING_ID']));
 		if(isset($data['TEST']) && $data['TEST'] == 'Y')
 		{
-			$mailing = MailingTable::getRowById(array('ID' => $data['MAILING_ID']));
-			if($mailing)
-			{
-				$resultMailingList[] = array(
-					'ID' => $mailing['ID'],
-					'NAME' => $mailing['NAME'],
-					'DESC' => $mailing['DESCRIPTION'],
-					'SELECTED' => true,
-				);
-			}
+			$resultMailingList[] = array(
+				'ID' => $mailing['ID'],
+				'NAME' => $mailing['NAME'],
+				'DESC' => $mailing['DESCRIPTION'],
+				'SELECTED' => true,
+			);
 
 			return $resultMailingList;
 		}
 
 		$mailingUnsub = array();
-		$recipientUnsubDb = PostingUnsubTable::getList(array(
-			'select' => array('MAILING_ID' => 'POSTING.MAILING_ID'),
-			'filter' => array('=POSTING_RECIPIENT.EMAIL' => trim(strtolower($data['EMAIL'])))
+		$unSubDb = MailingSubscriptionTable::getUnSubscriptionList(array(
+			'select' => array('MAILING_ID'),
+			'filter' => array(
+				'=CONTACT.EMAIL' => trim(strtolower($data['EMAIL'])),
+				'=MAILING.SITE_ID' => $mailing['SITE_ID']
+			)
 		));
-		while($recipientUnsub = $recipientUnsubDb->fetch())
-			$mailingUnsub[] = $recipientUnsub['MAILING_ID'];
+		while($unSub = $unSubDb->fetch())
+			$mailingUnsub[] = $unSub['MAILING_ID'];
 
 		$mailingList = array();
 		// all receives mailings
@@ -124,6 +214,7 @@ class Subscription
 			'filter' => array(
 				'=EMAIL' => trim(strtolower($data['EMAIL'])),
 				'=POSTING.MAILING.ACTIVE' => 'Y',
+				'=POSTING.MAILING.SITE_ID' => $mailing['SITE_ID']
 			),
 			'group' => array('MAILING_ID')
 		));
@@ -133,11 +224,12 @@ class Subscription
 		}
 
 		// all subscribed mailings
-		$mailingDb = MailingSubscriptionTable::getList(array(
+		$mailingDb = MailingSubscriptionTable::getSubscriptionList(array(
 			'select' => array('MAILING_ID'),
 			'filter' => array(
 				'=CONTACT.EMAIL' => trim(strtolower($data['EMAIL'])),
 				'=MAILING.ACTIVE' => 'Y',
+				'=MAILING.SITE_ID' => $mailing['SITE_ID']
 			)
 		));
 		while ($mailing = $mailingDb->fetch())
@@ -167,9 +259,24 @@ class Subscription
 	}
 
 	/**
+	 * Subscribe email for mailings
+	 *
 	 * @param $data
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Подписывает email на рассылку. Метод статический.</p>
+	*
+	*
+	* @param mixed $data  Данные подписки.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/subscribe.php
+	* @author Bitrix
+	*/
 	public static function subscribe($data)
 	{
 		$id = static::add($data['EMAIL'], $data['SUBSCRIBE_LIST']);
@@ -182,10 +289,25 @@ class Subscription
 	}
 
 	/**
-	 * @param $data
+	 * Unsubscribe email from mailing
+	 *
+	 * @param array $data
 	 * @return bool
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Отписывает e-mail от рассылки. Метод статический.</p>
+	*
+	*
+	* @param array $data  Данные подписки.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/unsubscribe.php
+	* @author Bitrix
+	*/
 	public static function unsubscribe($data)
 	{
 		$result = false;
@@ -232,6 +354,7 @@ class Subscription
 				}
 			}
 
+			// add mark in statistic if there is no previous mark
 			if(!empty($unsub))
 			{
 				$unsubExists = PostingUnsubTable::getRowById($unsub);
@@ -253,13 +376,11 @@ class Subscription
 				$result = true;
 			}
 
-			$contactDb = ContactTable::getList(array(
-				'select' => array('ID'),
-				'filter' => array('=EMAIL' => $data['EMAIL'])
-			));
-			while($contact = $contactDb->fetch())
+			// add row to unsubscribe list
+			$contactId = ContactTable::addIfNotExist(array('EMAIL' => $data['EMAIL']));
+			if($contactId)
 			{
-				MailingSubscriptionTable::delete(array('MAILING_ID' => $mailing['ID'], 'CONTACT_ID' => $contact['ID']));
+				MailingSubscriptionTable::addUnSubscription(array('MAILING_ID' => $mailing['ID'], 'CONTACT_ID' => $contactId));
 				$result = true;
 			}
 		}
@@ -268,12 +389,28 @@ class Subscription
 	}
 
 	/**
+	 * Subscribe email for mailings and returns subscription id
+	 *
 	 * @param string $email
-	 * @param array $mailingList
-	 * @param string $siteId
-	 * @return int $contactId
-	 * //add subscription and returns subscription id
+	 * @param array $mailingIdList
+	 * @return integer|null
 	 */
+	
+	/**
+	* <p>Создает подписку в соответствии с e-mail подписчика и возвращает массив со списком подписок. Метод статический.</p>
+	*
+	*
+	* @param string $email  Email подписчика
+	*
+	* @param array $mailingIdList  Массив со списком подписок. Ключи массива: <ul> <li> <b>MAILING_ID</b> - ID
+	* подписки;</li> <li> <b>CONTACT_ID</b> - ID подписчика.</li> </ul>
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/add.php
+	* @author Bitrix
+	*/
 	public static function add($email,  array $mailingIdList)
 	{
 		$contactId = null;
@@ -295,9 +432,9 @@ class Subscription
 		{
 			foreach ($mailingIdList as $mailingId)
 			{
-				$primary = array('MAILING_ID' => $mailingId, 'CONTACT_ID' => $contactId);
-				$existSub = MailingSubscriptionTable::getRowById($primary);
-				if (!$existSub) MailingSubscriptionTable::add($primary);
+				MailingSubscriptionTable::addSubscription(array(
+					'MAILING_ID' => $mailingId, 'CONTACT_ID' => $contactId
+				));
 			}
 		}
 		else
@@ -309,10 +446,24 @@ class Subscription
 	}
 
 	/**
+	 * Get mailing list allowed for subscription
+	 *
 	 * @param array $params
 	 * @return array
-	 * // get mailing list
 	 */
+	
+	/**
+	* <p>Возвращает список рассылок, доступных для подписки. Метод статический. </p>
+	*
+	*
+	* @param array $params  Массив с данными.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/getmailinglist.php
+	* @author Bitrix
+	*/
 	public static function getMailingList($params)
 	{
 		$filter = array("ACTIVE" => "Y", "IS_TRIGGER" => "N");
@@ -340,12 +491,31 @@ class Subscription
 	}
 
 	/**
+	 * Send email with link for confirmation of subscription
+	 *
 	 * @param string $email
 	 * @param array $mailingList
 	 * @param string $siteId
 	 * @return void
 	 * //send email with url to confirmation of subscription
 	 */
+	
+	/**
+	* <p>Отправляет письмо на e-mail с ссылкой подтверждения подписки на рассылку. Метод статический. </p>
+	*
+	*
+	* @param string $email  E-mail подписчика.
+	*
+	* @param array $mailingList  Массив со списком ID подписок.
+	*
+	* @param string $siteId  ID сайта с рассылкой.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/sendeventconfirm.php
+	* @author Bitrix
+	*/
 	public static function sendEventConfirm($email, array $mailingIdList, $siteId)
 	{
 		$mailingNameList = array();
@@ -376,22 +546,38 @@ class Subscription
 	}
 
 	/**
+	 * Return true if email address was unsubscribed
+	 *
 	 * @param int $mailingId
 	 * @param string $email
 	 * @return bool
-	 * //is email address was unsubscribed
 	 */
+	
+	/**
+	* <p>Возвращает <code>true</code>, если e-mail адрес был отписан от рассылки. Метод статический.</p>
+	*
+	*
+	* @param integer $mailingId  ID рассылки
+	*
+	* @param string $email  E-mail подписчика
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/subscription/isunsubscibed.php
+	* @author Bitrix
+	*/
 	public static function isUnsubscibed($mailingId, $email)
 	{
 		$email = strtolower($email);
-		$recipientUnsubDb = PostingUnsubTable::getList(array(
-			'select' => array('ID'),
+		$unSubDb = MailingSubscriptionTable::getUnSubscriptionList(array(
+			'select' => array('MAILING_ID'),
 			'filter' => array(
-				'=POSTING.MAILING_ID' => $mailingId,
-				'=POSTING_RECIPIENT.EMAIL' => $email
+				'=MAILING_ID' => $mailingId,
+				'=CONTACT.EMAIL' => $email
 			)
 		));
-		if($recipientUnsubDb->fetch())
+		if($unSubDb->fetch())
 		{
 			return true;
 		}

@@ -1,8 +1,9 @@
 <?
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/statevent.php");
 
+
 /**
- * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>. 
+ * <b>CStatEvent</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событиями</a>.
  *
  *
  * @return mixed 
@@ -33,7 +34,7 @@ class CStatEvent extends CAllStatEvent
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // зафиксируем событие типа
 	* // "Скачивание файла manual.chm" (download/manual)
@@ -67,9 +68,9 @@ class CStatEvent extends CAllStatEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getlist.php">CStatEvent::GetList</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин "Дополнительный
-	* параметр события (event3)"</a> </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
+	* "Дополнительный параметр события (event3)"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -105,7 +106,7 @@ class CStatEvent extends CAllStatEvent
 
 	
 	/**
-	* <p>Добавляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу</a> и <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальному параметру</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	* <p>Добавляет <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типу</a> и <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">специальному параметру</a>.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
 	*
 	*
 	* @param int $type_id  ID типа события.
@@ -127,14 +128,14 @@ class CStatEvent extends CAllStatEvent
 	*
 	* @param string $chargeback = "N" Флаг отрицательной суммы. Используется, когда необходимо
 	* зафиксировать событие о возврате денег (chargeback). Возможные
-	* значения: <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li> <li> <b>N</b> -
-	* денежная сумма положительная. </li> </ul>
+	* значения:          <ul> <li> <b>Y</b> - денежная сумма отрицательная; </li>           
+	*         <li> <b>N</b> - денежная сумма положительная. </li>         </ul>
 	*
 	* @return int <p>Функция возвращает ID добавленного события в случае успеха и 0
 	* если событие не было добавлено по каким либо причинам.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // добавим событие по типу события #1
 	* // данный тип должен быть заранее создан
@@ -146,9 +147,7 @@ class CStatEvent extends CAllStatEvent
 	* $date = "23.12.2005 18:15:10";
 	* 
 	* <b>CStatEvent::Add</b>(1, "", $date, $gid, 99, "USD");
-	* ?&gt;
-	* 
-	* &lt;?
+	* ?&gt;&lt;?
 	* // добавим событие по типу события #2
 	* // данный тип должен быть заранее создан
 	* 
@@ -165,14 +164,14 @@ class CStatEvent extends CAllStatEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addbyevents.php">CStatEvent::AddByEvents</a> </li>  
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/addcurrent.php">CStatEvent::AddCurrent</a>
-	* </li> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
-	* событий</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
-	* "Событие"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
-	* "Дополнительный параметр события (event3)"</a> </li> <li> <a
+	* </li>   <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/events/event_edit.php">Загрузка
+	* событий</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	* "Событие"</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">Термин
+	* "Дополнительный параметр события (event3)"</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#gid">Термин "Специальный параметр
-	* события"</a> </li> </ul> <a name="examples"></a>
+	* события"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -409,86 +408,96 @@ class CStatEvent extends CAllStatEvent
 		return intval($EVENT_LIST_ID);
 	}
 
-
+	
 	/**
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a>.</p>
 	*
 	*
-	* @param string &$by = "s_id" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID события;
-	* </li> <li> <b>s_site_id</b> - ID сайта; </li> <li> <b>s_type_id</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a>; </li> <li>
-	* <b>s_event3</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">дополнительный
-	* параметр event3</a> события; </li> <li> <b>s_date_enter</b> - время создания события;
-	* </li> <li> <b>s_adv_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной
-	* кампании</a>; </li> <li> <b>s_adv_back</b> - флаг <a
+	* @param string &$by = "s_id" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID
+	* события; </li>                    <li> <b>s_site_id</b> - ID сайта; </li>                    <li>
+	* <b>s_type_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа
+	* события</a>; </li>                    <li> <b>s_event3</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event3">дополнительный параметр
+	* event3</a> события; </li>                    <li> <b>s_date_enter</b> - время создания
+	* события; </li>                    <li> <b>s_adv_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>; </li>          
+	*          <li> <b>s_adv_back</b> - флаг <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврата</a> либо <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямого захода</a> по
-	* рекламной кампании; </li> <li> <b>s_session_id</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li> <li> <b>s_guest_id</b> - ID
-	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>; </li> <li>
-	* <b>s_hit_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хита</a>; </li> <li>
-	* <b>s_url</b> - страница где зафиксированно событие; </li> <li> <b>s_referer_url</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающаяся страница</a>; </li>
-	* <li> <b>s_redirect_url</b> - страница куда был перенаправлен посетитель после
-	* фиксации события; </li> <li> <b>s_country_id</b> - ID страны посетителя; </li> <li>
-	* <b>s_money</b> - денежная сумма. </li> </ul>
+	* рекламной кампании; </li>                    <li> <b>s_session_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>; </li>                    <li>
+	* <b>s_guest_id</b> - ID <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителя</a>;
+	* </li>                    <li> <b>s_hit_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хита</a>; </li>                    <li> <b>s_url</b>
+	* - страница где зафиксированно событие; </li>                    <li>
+	* <b>s_referer_url</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающаяся
+	* страница</a>; </li>                    <li> <b>s_redirect_url</b> - страница куда был
+	* перенаправлен посетитель после фиксации события; </li>                   
+	* <li> <b>s_country_id</b> - ID страны посетителя; </li>                    <li> <b>s_money</b> -
+	* денежная сумма. </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID события; </li> <li>
-	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	* будет искаться вхождение; </li> <li> <b>EVENT_ID</b>* - ID типа события; </li> <li>
-	* <b>EVENT_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>EVENT_ID</b> будет искаться вхождение; </li> <li> <b>EVENT_NAME</b>* - название
-	* типа события; </li> <li> <b>EVENT_NAME_EXACT_MATCH</b> - если значение равно "Y", то
-	* при фильтрации по <b>EVENT_NAME</b> будет искаться точное совпадение; </li>
-	* <li> <b>EVENT1</b>* - <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event1</a> типа
-	* события; </li> <li> <b>EVENT1_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>EVENT1</b> будет искаться точное совпадение; </li> <li>
-	* <b>EVENT2</b>* - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор
-	* event2</a> типа события; </li> <li> <b>EVENT2_EXACT_MATCH</b> - если значение равно "Y",
-	* то при фильтрации по <b>EVENT2</b> будет искаться точное совпадение; </li>
-	* <li> <b>EVENT3</b>* - дополнительный параметр event3 события; </li> <li>
-	* <b>EVENT3_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>EVENT3</b> будет искаться точное совпадение; </li> <li> <b>DATE</b> - время
-	* события (точное совпадение); </li> <li> <b>DATE1</b> - начальное значение
-	* интервала для поля "дата события"; </li> <li> <b>DATE2</b> - начальное
-	* значение интервала для поля "дата события"; </li> <li> <b>MONEY</b> -
-	* денежная сумма события (точное совпадение); </li> <li> <b>MONEY1</b> -
-	* начальное значение интервала для поля "денежная сумма"; </li> <li>
-	* <b>MONEY2</b> - конечное значение интервала для поля "денежная сумма";
-	* </li> <li> <b>CURRENCY</b> - трехсимвольный идентификатор валюты для
-	* денежной суммы; </li> <li> <b>SESSION_ID</b>* - ID сессии; </li> <li> <b>SESSION_ID_EXACT_MATCH</b> -
-	* если значение равно "N", то при фильтрации по <b>SESSION_ID</b> будет
-	* искаться вхождение; </li> <li> <b>GUEST_ID</b>* - ID посетителя; </li> <li>
-	* <b>GUEST_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>GUEST_ID</b> будет искаться вхождение; </li> <li> <b>ADV_ID</b>* - ID рекламной
-	* кампании; </li> <li> <b>ADV_ID_EXACT_MATCH</b> - если значение равно "N", то при
-	* фильтрации по <b>ADV_ID</b> будет искаться вхождение; </li> <li> <b>ADV_BACK</b> -
-	* флаг "возврат по рекламной кампании", возможные значения: <ul> <li>
-	* <b>Y</b> - был возврат; </li> <li> <b>N</b> - был прямой заход. </li> </ul> </li> <li>
-	* <b>HIT_ID</b>* - ID хита; </li> <li> <b>HIT_ID_EXACT_MATCH</b> - если значение равно "N", то
-	* при фильтрации по <b>HIT_ID</b> будет искаться вхождение; </li> <li>
-	* <b>COUNTRY_ID</b>* - ID страны посетителя сгенерировавшего событие; </li> <li>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID события; </li>              
+	*      <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>ID</b> будет искаться вхождение; </li>                    <li> <b>EVENT_ID</b>* - ID типа
+	* события; </li>                    <li> <b>EVENT_ID_EXACT_MATCH</b> - если значение равно "N",
+	* то при фильтрации по <b>EVENT_ID</b> будет искаться вхождение; </li>             
+	*       <li> <b>EVENT_NAME</b>* - название типа события; </li>                    <li>
+	* <b>EVENT_NAME_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>EVENT_NAME</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>EVENT1</b>* - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор
+	* event1</a> типа события; </li>                    <li> <b>EVENT1_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>EVENT1</b> будет искаться точное
+	* совпадение; </li>                    <li> <b>EVENT2</b>* - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор event2</a> типа
+	* события; </li>                    <li> <b>EVENT2_EXACT_MATCH</b> - если значение равно "Y", то
+	* при фильтрации по <b>EVENT2</b> будет искаться точное совпадение; </li>     
+	*               <li> <b>EVENT3</b>* - дополнительный параметр event3 события; </li>          
+	*          <li> <b>EVENT3_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации
+	* по <b>EVENT3</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>DATE</b> - время события (точное совпадение); </li>                    <li> <b>DATE1</b>
+	* - начальное значение интервала для поля "дата события"; </li>               
+	*     <li> <b>DATE2</b> - начальное значение интервала для поля "дата
+	* события"; </li>                    <li> <b>MONEY</b> - денежная сумма события (точное
+	* совпадение); </li>                    <li> <b>MONEY1</b> - начальное значение
+	* интервала для поля "денежная сумма"; </li>                    <li> <b>MONEY2</b> -
+	* конечное значение интервала для поля "денежная сумма"; </li>               
+	*     <li> <b>CURRENCY</b> - трехсимвольный идентификатор валюты для денежной
+	* суммы; </li>                    <li> <b>SESSION_ID</b>* - ID сессии; </li>                    <li>
+	* <b>SESSION_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>SESSION_ID</b> будет искаться вхождение; </li>                    <li> <b>GUEST_ID</b>* - ID
+	* посетителя; </li>                    <li> <b>GUEST_ID_EXACT_MATCH</b> - если значение равно
+	* "N", то при фильтрации по <b>GUEST_ID</b> будет искаться вхождение; </li>        
+	*            <li> <b>ADV_ID</b>* - ID рекламной кампании; </li>                    <li>
+	* <b>ADV_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>ADV_ID</b> будет искаться вхождение; </li>                    <li> <b>ADV_BACK</b> - флаг
+	* "возврат по рекламной кампании", возможные значения:              <ul> <li>
+	* <b>Y</b> - был возврат; </li>                            <li> <b>N</b> - был прямой заход. </li>
+	*             </ul> </li>                    <li> <b>HIT_ID</b>* - ID хита; </li>                    <li>
+	* <b>HIT_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>HIT_ID</b> будет искаться вхождение; </li>                    <li> <b>COUNTRY_ID</b>* - ID
+	* страны посетителя сгенерировавшего событие; </li>                    <li>
 	* <b>COUNTRY_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>COUNTRY_ID</b> будет искаться вхождение; </li> <li> <b>COUNTRY</b>* - название
-	* страны посетителя сгенерировавшего событие; </li> <li> <b>COUNTRY_EXACT_MATCH</b>
-	* - если значение равно "Y", то при фильтрации по <b>COUNTRY</b> будет
-	* искаться точное совпадение; </li> <li> <b>REFERER_URL</b>* - ссылающаяся
-	* страница; </li> <li> <b>REFERER_URL_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>REFERER_URL</b> будет искаться точное совпадение; </li> <li>
-	* <b>REFERER_SITE_ID</b> - ID сайта для ссылающейся страницы; </li> <li> <b>URL</b>* -
-	* страница на которой было зафиксировано событие; </li> <li>
-	* <b>URL_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по <b>URL</b>
-	* будет искаться точное совпадение; </li> <li> <b>SITE_ID</b> - ID сайта для
-	* страницы на которой было зафиксировано событие; </li> <li> <b>REDIRECT_URL</b>*
-	* - страница куда был перенаправлен посетитель после фиксации
-	* события; </li> <li> <b>REDIRECT_URL_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>REDIRECT_URL</b> будет искаться точное совпадение. </li> </ul>
-	* * - допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
+	* <b>COUNTRY_ID</b> будет искаться вхождение; </li>                    <li> <b>COUNTRY</b>* -
+	* название страны посетителя сгенерировавшего событие; </li>               
+	*     <li> <b>COUNTRY_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>COUNTRY</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>REFERER_URL</b>* - ссылающаяся страница; </li>                    <li>
+	* <b>REFERER_URL_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>REFERER_URL</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>REFERER_SITE_ID</b> - ID сайта для ссылающейся страницы; </li>                    <li>
+	* <b>URL</b>* - страница на которой было зафиксировано событие; </li>            
+	*        <li> <b>URL_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>URL</b> будет искаться точное совпадение; </li>                    <li> <b>SITE_ID</b> -
+	* ID сайта для страницы на которой было зафиксировано событие; </li>     
+	*               <li> <b>REDIRECT_URL</b>* - страница куда был перенаправлен
+	* посетитель после фиксации события; </li>                    <li>
+	* <b>REDIRECT_URL_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>REDIRECT_URL</b> будет искаться точное совпадение. </li>         </ul>       * -
+	* допускается <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная
 	* логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
@@ -497,7 +506,7 @@ class CStatEvent extends CAllStatEvent
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем все неудаленные события посетителя #1025
 	* $arFilter = array(
@@ -524,15 +533,15 @@ class CStatEvent extends CAllStatEvent
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getlistbyguest.php">CStatEvent::GetListByGuest</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a> </li>
-	* </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/getlist.php
 	* @author Bitrix
 	*/
-	public static 	function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered)
+	public static function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -732,18 +741,18 @@ class CStatEvent extends CAllStatEvent
 		return $res;
 	}
 
-
+	
 	/**
 	* <p>Удаляет указанное <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событие</a>.</p>
 	*
 	*
-	* @param int $event_id  ID удаляемого события. </htm
+	* @param int $event_id  ID удаляемого события.
 	*
 	* @return bool <p>Метод возвращает "true" в случае успешного удаления и "false" в случае
 	* неудачи.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $event_id = 1;
 	* if (<b>CStatEvent::Delete</b>($event_id)) 
@@ -754,14 +763,14 @@ class CStatEvent extends CAllStatEvent
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин "Событие"</a>
-	* </li></ul> <a name="examples"></a>
+	* </li></ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/statistic/classes/cstatevent/delete.php
 	* @author Bitrix
 	*/
-	public static 	function Delete($ID)
+	public static function Delete($ID)
 	{
 		$err_mess = "File: ".__FILE__."<br>Line: ";
 		$DB = CDatabase::GetModuleConnection('statistic');
@@ -893,4 +902,3 @@ class CStatEvent extends CAllStatEvent
 		return false;
 	}
 }
-?>

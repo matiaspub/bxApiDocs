@@ -397,7 +397,7 @@ class CSupportTimetableCache
 		return $res;
 	}
 
-public static 	static function InsertDefaultValues()
+	static function InsertDefaultValues()
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: InsertDefaultValues<br>Line: ";
@@ -445,7 +445,7 @@ public static 	static function InsertDefaultValues()
 
 	}
 
-public static 	static function GetShedule($arFilter)
+	static function GetShedule($arFilter)
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: getShedule<br>Line: ";
@@ -544,7 +544,7 @@ public static 	static function GetShedule($arFilter)
 		return $res;
 	}
 			
-public static 	static function MergeIntervals($arr)
+	static function MergeIntervals($arr)
 	{
 		if(count($arr) <= 0)
 		{
@@ -566,7 +566,7 @@ public static 	static function MergeIntervals($arr)
 		return  $r;
 	}
 	
-public static 	static function TimeToStr($t)
+	static function TimeToStr($t)
 	{
 		$s = intval(fmod($t, 60));
 		$m = ($t - $s) / 60;
@@ -574,7 +574,7 @@ public static 	static function TimeToStr($t)
 		return date("H:i", mktime($h, $m, 0, 1, 1, 2000));
 	}
 	
-public static 	static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDate = null)
+	static function ToCache($arFilter = array(), $RSD = true, $arFromGetEndDate = null)
 	{
 		/*
 		$arFilter(
@@ -735,13 +735,13 @@ public static 	static function ToCache($arFilter = array(), $RSD = true, $arFrom
 		return null;
 	}
 
-	function UpdateDiscardedTickets()
+	public static function UpdateDiscardedTickets()
 	{
 		return "";
 	}
 	
 	//$dateFrom - время сервера с часовым поясом из настроек текущего пользователя
-public static 	static function getEndDate($sla, $periodMin0, $dateFrom, $secondTry = false)
+	static function getEndDate($sla, $periodMin0, $dateFrom, $secondTry = false)
 	{
 		global $DB;
 		$err_mess = (self::err_mess())."<br>Function: getEndDate<br>Line: ";
@@ -824,7 +824,7 @@ public static 	static function getEndDate($sla, $periodMin0, $dateFrom, $secondT
 		return null;
 	}
 	
-public static 	function StartAgent()
+	public static function StartAgent()
 	{
 		CAgent::RemoveAgent("CSupportTimetableCache::toCache();", "support");
 		$NOTIFY_AGENT_ID = CAgent::AddAgent("CSupportTimetableCache::toCache();", "support", "N", 7*86400);

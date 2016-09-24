@@ -72,6 +72,14 @@ $arClasses = array(
 	'\Bitrix\Iblock\SiteTable' => "lib/site.php",
 	'\Bitrix\Iblock\TypeTable' => "lib/type.php",
 	'\Bitrix\Iblock\TypeLanguageTable' => "lib/typelanguage.php",
+	'\Bitrix\Iblock\BizprocType\UserTypeProperty' => "lib/bizproctype/usertypeproperty.php",
+	'\Bitrix\Iblock\BizprocType\UserTypePropertyDiskFile' => "lib/bizproctype/usertypepropertydiskfile.php",
+	'\Bitrix\Iblock\BizprocType\UserTypePropertyElist' => "lib/bizproctype/usertypepropertyelist.php",
+	'\Bitrix\Iblock\BizprocType\UserTypePropertyEmployee' => "lib/bizproctype/usertypepropertyemployee.php",
+	'\Bitrix\Iblock\BizprocType\UserTypePropertyHtml' => "lib/bizproctype/usertypepropertyhtml.php",
+	'\Bitrix\Iblock\Component\Filters' => "lib/component/filters.php",
+	'\Bitrix\Iblock\Component\Tools' => "lib/component/tools.php",
+	'\Bitrix\Iblock\Helpers\Admin\Property' => "lib/helpers/admin/property.php",
 	'\Bitrix\Iblock\InheritedProperty\BaseTemplate' => "lib/inheritedproperty/basetemplate.php",
 	'\Bitrix\Iblock\InheritedProperty\BaseValues' => "lib/inheritedproperty/basevalues.php",
 	'\Bitrix\Iblock\InheritedProperty\ElementTemplates' => "lib/inheritedproperty/elementtemplates.php",
@@ -80,6 +88,7 @@ $arClasses = array(
 	'\Bitrix\Iblock\InheritedProperty\IblockValues' => "lib/inheritedproperty/iblockvalues.php",
 	'\Bitrix\Iblock\InheritedProperty\SectionTemplates' => "lib/inheritedproperty/sectiontemplates.php",
 	'\Bitrix\Iblock\InheritedProperty\SectionValues' => "lib/inheritedproperty/sectionvalues.php",
+	'\Bitrix\Iblock\Model\Section' => "lib/model/section.php",
 	'\Bitrix\Iblock\PropertyIndex\Dictionary' => "lib/propertyindex/dictionary.php",
 	'\Bitrix\Iblock\PropertyIndex\Element' => "lib/propertyindex/element.php",
 	'\Bitrix\Iblock\PropertyIndex\Facet' => "lib/propertyindex/facet.php",
@@ -127,11 +136,10 @@ $arClasses = array(
 	'\Bitrix\Iblock\SenderEventHandler' => "lib/senderconnector.php",
 	'\Bitrix\Iblock\SenderConnectorIblock' => "lib/senderconnector.php",
 );
-if(IsModuleInstalled('bizproc'))
-{
+if (\Bitrix\Main\ModuleManager::isModuleInstalled('bizproc'))
 	$arClasses["CIBlockDocument"] = "classes/general/iblockdocument.php";
-}
-CModule::AddAutoloadClasses("iblock", $arClasses);
+
+\Bitrix\Main\Loader::registerAutoLoadClasses("iblock", $arClasses);
 
 /**
  * Returns list of the information blocks of specified $type linked to the current site
@@ -252,30 +260,31 @@ function GetIBlockListLang($lang, $type, $arTypesInc = array(), $arTypesExc = ar
  */
 
 /**
- * <p>Функция возвращает информационный блок по коду <i>ID</i>, но только если он активен (ACTIVE равно Y) и имеет привязку к текущему сайту. <br></p>
+ * <p>Функция возвращает информационный блок по коду <i>ID</i>, но только если он активен (ACTIVE равно Y) и имеет привязку к текущему сайту.    <br></p>
  *
  *
- * @param string $ID  ID информационного блока.
+ * @param string $stringID  ID информационного блока.
  *
- * @param typ $e = "" Тип информационного блока. Устанавливается в настройках модуля.
+ * @param  $type = "" Тип информационного блока. Устанавливается в настройках модуля.
  * Если задан, то при выборке проверяется чтобы информационный блок
- * соответствовал этому типу. <br> Необязательный. По умолчанию на
- * информационный блок не накладываются ограничения по типу.
+ * соответствовал этому типу.          <br>        Необязательный. По
+ * умолчанию на информационный блок не накладываются ограничения
+ * по типу.
  *
  * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">полей информационного
- * блока</a> <code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><p></p><div class="note"> <b>Примечание:</b>
+ * блока</a><code>#SITE_DIR#</code><code>#IBLOCK_ID#</code><br><p></p><div class="note"> <b>Примечание:</b>
  * функция вернет поля информационного блока только в том случае,
  * если информационный блок активен и привязан к текущему сайту.</div>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");<br><br>$APPLICATION-&gt;SetTitle("Продукты");<br><br>// проверим установлен ли модуль и получим блок с кодом $BID и типом catalog<br>if(CModule::IncludeModule("iblock") &amp;&amp; ($arIBlock = GetIBlock($_GET["BID"], "catalog")))<br>{<br>   // сделаем заголовок страницы таким же как название инф. блока<br>   $APPLICATION-&gt;SetTitle($arIBlock["NAME"]);<br>   //добавим название в навигационную цепочку<br>   $APPLICATION-&gt;AddChainItem($arIBlock["NAME"], $arIBlock["LIST_PAGE_URL"]);<br><br>   //работаем дальше с информационным блоком<br>   // ....<br>}<br>else<br>   ShowError("Информационный блок не найден.");<br><br>require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fiblock">Поля информационных
- * блоков</a></li> </ul> <a name="examples"></a>
+ * блоков</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -522,99 +531,104 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  *
  * @param int $iblock_id  ID информационного блока из которого будут выбраны элементы.
  *
- * @param int $section_id = false ID раздела, из которой требуется получить элементы. Для получения
- * элементов из корня информационного блока (не привязанные ни к
- * одному разделу) установите параметр <i>section_id</i> =
- * 0.<br><br>Необязательный. По умолчанию (false) выбираются все записи без
- * ограничения по папкам.
+ * @param int $section_id = false ID раздела, из которой требуется получить элементы. Для получения  
+ *      элементов из корня информационного блока (не привязанные ни к
+ * одному        разделу) установите параметр <i>section_id</i> =
+ * 0.<br><br>Необязательный.        По умолчанию (false) выбираются все записи
+ * без ограничения по  папкам.
  *
- * @param array $order = Array("SORT"=>"ASC") Порядок сортировки - массив вида Array(<i>by1</i>=&gt;<i>order1</i>[,
- * <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> - поле для сортировки, может
- * принимать значения: <ul> <li> <b>sort</b> - индекс сортировки; </li> <li>
- * <b>timestamp_x</b> - дата изменения; </li> <li> <b>name</b> - название; </li> <li> <b>id</b> - ID
- * элемента; </li> <li> <b>active_from</b> - начало периода действия элемента; </li>
- * <li> <b>active_to</b> - окончание периода действия элемента; </li> <li> <b>order</b> -
- * порядок сортировки сортировки, может принимать значения: <ul> <li>
- * <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию. </li>
- * </ul>Необязательный. По умолчанию равен <i>Array("sort"=&gt;"asc")</i> </li>
- * </ul>Полный список полей сортировки и дополнительную информацию <a
+ * @param array $order = Array("SORT"=>"ASC") Порядок сортировки - массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, 
+ * 			<i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> - поле для        сортировки, может
+ * принимать значения:  			<ul> <li> <b>sort</b> - индекс сортировки;  				</li> <li>
+ * <b>timestamp_x</b> - дата изменения;  				</li> <li> <b>name</b> - название;  				</li> <li>
+ * <b>id</b> - ID элемента;  				</li> <li> <b>active_from</b> - начало периода действия
+ * элемента;  				</li> <li> <b>active_to</b> - окончание периода действия
+ * элемента;  				</li> <li> <b>order</b> - порядок сортировки сортировки, может
+ * принимать          значения:  				<ul> <li> <b>asc</b> - по возрастанию;  					</li> <li>
+ * <b>desc</b> - по убыванию. </li> </ul>Необязательный. По умолчанию         
+ * равен <i>Array("sort"=&gt;"asc")</i> </li> </ul>Полный список полей        сортировки и
+ * дополнительную информацию <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">смотрите</a> в <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>
  *
- * @param int $cnt = 0 Максимальное количество записей, которые вернет функция.
- * <br>Необязательный. По умолчанию выбираются все записи.
+ * @param int $cnt = 0 Максимальное количество записей, которые вернет функция. 
+ * 			<br>Необязательный. По умолчанию выбираются все записи.
  *
  * @param array $arFilter = Array() Дополнительный фильтр по произвольным полям вида
- * Array("Фильтруемое поле"=&gt;"Значение", ...). <br><i>Фильтруемое поле</i>
- * может принимать значения: <ul> <li> <b>ID</b> - по коду; </li> <li> <b>ACTIVE</b> -
- * фильтр по активности (Y|N); передача пустого значения (<i>"ACTIVE"=&gt;""</i>)
- * выводит все элементы без учета их состояния; </li> <li> <b>NAME</b> - по
- * имени и фамилии (можно искать по шаблону [%_]); </li> <li> <b>PREVIEW_TEXT</b> - по
- * имени и фамилии (можно искать по шаблону [%_]); </li> <li> <b>DETAIL_TEXT</b> - по
- * детальному описанию (можно искать по шаблону [%_]); </li> <li>
- * <b>SEARCHABLE_CONTENT</b> - по содержимому для поиска. Включает в себя
- * название, описание для анонса и детальное описание (можно искать
- * по шаблону [%_]); </li> <li> <b>CODE</b> - по символьному идентификатору (можно
- * искать по шаблону [%_]); </li> <li> <b>SORT</b> - по сортировке; </li> <li>
- * <b>EXTERNAL_ID</b> - по внешнему коду (можно искать по шаблону [%_]); </li> <li>
- * <b>TIMESTAMP_X</b> - по времени изменения; </li> <li> <b>DATE_CREATE</b> - по времени
- * создания; </li> <li> <b>DATE_ACTIVE_FROM</b> - по дате начала активности; </li> <li>
- * <b>DATE_ACTIVE_TO</b> - по дате окончанию активности; </li> <li> <b>ACTIVE_DATE</b> -
- * непустое значение задействует фильтр по датам активности
- * (<i>DATE_ACTIVE_FROM</i> и <i>DATE_ACTIVE_TO</i>). Если значение не установлено (<i>""</i>),
- * фильтрация по датам активности не производится; </li> <li> <b>IBLOCK_ID</b> -
- * по коду информационного блока; </li> <li> <b>IBLOCK_CODE</b> - по символьному
- * коду информационного блока (можно искать по шаблону [%_]); </li> <li>
- * <b>IBLOCK_LID</b> - по языку (можно искать по шаблону [%_]); </li> <li> <b>IBLOCK_TYPE</b> -
- * по типу блока (можно искать по шаблону [%_]); </li> <li> <b>IBLOCK_ACTIVE</b> - по
- * активности блока (можно искать по шаблону [%_]); </li> <li> <b>SECTION_ID</b> - по
- * родительскому разделу; </li> <li> <b>PROPERTY_&lt;код свойства&gt;</b> - фильтр
- * по значениям свойств (можно искать по шаблону [%_]), для свойств
- * типа "список", поиск будет осуществляться не по значению
- * перечисления, а по его идентификатору; </li> <li> <b>PROPERTY_&lt;код
- * свойства&gt;_VALUE</b> - фильтр по значениям списка для свойств типа
- * "список" (можно искать по шаблону [%_]), поиск будет осуществляться
- * по строковому значению списка, а не по идентификатору; </li> <li>
- * <b>CATALOG_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю <i>CATALOG_FIELD </i>из цены типа
- * <i>PRICE_TYPE </i>(ID типа цены), где <i>CATALOG_FIELD </i>может быть: <i>PRICE </i>- цена,
- * <i>CURRENCY </i>- валюта. </li> </ul>Все фильтруемые поля (кроме <i>SECTION_ID </i>и
- * <i>ACTIVE_DATE</i>)<i> </i>могут содержать перед названием <a
+ * Array("Фильтруемое        поле"=&gt;"Значение", ...). <br><i>Фильтруемое поле</i>
+ * может принимать        значения:  			<ul> <li> <b>ID</b> - по коду;  				</li> <li>
+ * <b>ACTIVE</b> - фильтр по активности (Y|N); передача пустого          значения
+ * (<i>"ACTIVE"=&gt;""</i>) выводит все элементы без учета их          состояния; 
+ * 				</li> <li> <b>NAME</b> - по имени и фамилии (можно искать по шаблону [%_]); 
+ * 				</li> <li> <b>PREVIEW_TEXT</b> - по имени и фамилии (можно искать по шаблону     
+ *     [%_]);  				</li> <li> <b>DETAIL_TEXT</b> - по детальному описанию (можно искать по
+ * шаблону          [%_]);  				</li> <li> <b>SEARCHABLE_CONTENT</b> - по содержимому для
+ * поиска. Включает в          себя название, описание для анонса и
+ * детальное описание (можно искать по          шаблону [%_]);  				</li> <li>
+ * <b>CODE</b> - по символьному идентификатору (можно искать по         
+ * шаблону [%_]);  				</li> <li> <b>SORT</b> - по сортировке;  				</li> <li> <b>EXTERNAL_ID</b> - по
+ * внешнему коду (можно искать по шаблону          [%_]);  				</li> <li>
+ * <b>TIMESTAMP_X</b> - по времени изменения;  				</li> <li> <b>DATE_CREATE</b> - по времени
+ * создания;  				</li> <li> <b>DATE_ACTIVE_FROM</b> - по дате начала активности;  				</li>
+ * <li> <b>DATE_ACTIVE_TO</b> - по дате окончанию активности;  				</li> <li> <b>ACTIVE_DATE</b> -
+ * непустое значение задействует фильтр по датам          активности
+ * (<i>DATE_ACTIVE_FROM</i> и <i>DATE_ACTIVE_TO</i>). Если          значение не установлено
+ * (<i>""</i>), фильтрация по датам активности не          производится; 
+ * 				</li> <li> <b>IBLOCK_ID</b> - по коду информационного блока;  				</li> <li>
+ * <b>IBLOCK_CODE</b> - по символьному коду информационного блока          (можно
+ * искать по шаблону [%_]);  				</li> <li> <b>IBLOCK_LID</b> - по языку (можно искать
+ * по шаблону [%_]);  				</li> <li> <b>IBLOCK_TYPE</b> - по типу блока (можно искать по
+ * шаблону [%_]);  				</li> <li> <b>IBLOCK_ACTIVE</b> - по активности блока (можно
+ * искать по шаблону          [%_]);  				</li> <li> <b>SECTION_ID</b> - по родительскому
+ * разделу;  				</li> <li> <b>PROPERTY_&lt;код свойства&gt;</b> - фильтр по значениям
+ * свойств          (можно искать по шаблону [%_]), для свойств типа
+ * "список", поиск будет          осуществляться не по значению
+ * перечисления, а по его идентификатору;  				</li> <li> <b>PROPERTY_&lt;код
+ * свойства&gt;_VALUE</b> - фильтр по значениям          списка для свойств
+ * типа "список" (можно искать по шаблону [%_]), поиск          будет
+ * осуществляться по строковому значению списка, а не по         
+ * идентификатору;  				</li> <li> <b>CATALOG_&lt;CATALOG_FIELD&gt;_&lt;PRICE_TYPE&gt;</b> - по полю 
+ * 				<i>CATALOG_FIELD </i>из цены типа <i>PRICE_TYPE </i>(ID типа цены), где  				<i>CATALOG_FIELD
+ * </i>может быть: <i>PRICE </i>- цена, <i>CURRENCY </i>-          валюта. </li> </ul>Все
+ * фильтруемые поля (кроме <i>SECTION_ID </i>и  			<i>ACTIVE_DATE</i>)<i> </i>могут
+ * содержать перед названием <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2683" >тип проверки
- * фильтра</a>, а поля <i>SECTION_ID </i>и <i>ACTIVE_DATE </i>могут содержать перед
- * названием тип проверки фильтра "!" - не равно.<br><br><i>Значения
- * фильтра</i> - одиночное значение или массив.<br><br>Необязательный. По
- * умолчанию - пустой массив.<br>Полный список полей фильтра и
- * дополнительную информацию <a
+ * фильтра</a>, а поля <i>SECTION_ID  			</i>и <i>ACTIVE_DATE </i>могут содержать перед
+ * названием тип проверки        фильтра "!" - не равно.<br><br><i>Значения
+ * фильтра</i> - одиночное        значение или
+ * массив.<br><br>Необязательный. По умолчанию - пустой       
+ * массив.<br>Полный список полей фильтра и дополнительную
+ * информацию <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">смотрите</a> в <b><a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a>.</b>
  *
  * @return CIBlockResult <p>Функция возвращает объект класса <a
- * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> с активными
+ * href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a> с активными 
  * элементами (у которых установлен флаг "Активен", выполняется
- * условие периода активности и находящиеся в активных
- * информационных блоках для текущего сайта).</p> <p></p><div class="note">
+ * условие периода  активности и находящиеся в активных
+ * информационных блоках для текущего  сайта).</p><p></p><div class="note">
  * <b>Примечание:</b> при работе с результатом рекомендуется применять
  * метод класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>, результатом
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>,  результатом
  * которого будет массив с полями элемента информационного блока.
- * Все поля при этом будут преобразованы в "HTML безопасный" вид, а в
- * полях с шаблонами URL-ов к страницам (LIST_PAGE_URL - списка элементов и
- * DETAIL_PAGE_URL - детального просмотра) будут заменены параметры
- * <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. Если
+ * Все  поля при этом будут преобразованы в "HTML безопасный" вид, а в
+ * полях с шаблонами  URL-ов к страницам (LIST_PAGE_URL - списка элементов и
+ * DETAIL_PAGE_URL -  детального просмотра) будут заменены параметры
+ * <code>#SITE_DIR#</code>,  <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. Если 
  * результат пуст или достигнут конец выборки <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>::<a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a> вернет false.
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">GetNext()</a>  вернет false.
  * Также можно воспользоваться любыми другими методами класса <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, но при этом в
- * полях LIST_PAGE_URL и DETAIL_PAGE_URL будут оригинальные (как они введены в
- * форме редактирования информационного блока) шаблоны URL-ов, а не с
- * замененными параметрами <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>,
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>,  но при этом в
+ * полях LIST_PAGE_URL и DETAIL_PAGE_URL будут оригинальные (как они  введены в
+ * форме редактирования информационного блока) шаблоны URL-ов, а не с 
+ * замененными параметрами <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, 
  * <code>#EXTERNAL_ID#</code> и <code>#ID#</code>. </div>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * if(CModule::IncludeModule("iblock"))
  * {
@@ -634,9 +648,9 @@ function GetIBlockElementCount($IBLOCK, $SECTION_ID = false, $arOrder = array("s
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элементов
- * информационного блока</a> </li> <li> <a
+ * информационного  блока</a>  </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/functions/getiblockelementlistex.php">Функция
- * GetIBlockElementListEx</a> </li> </ul> <a name="examples"></a>
+ * GetIBlockElementListEx</a> </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -679,43 +693,43 @@ function GetIBlockElementList($IBLOCK, $SECTION_ID = false, $arOrder = array("so
  * <p>Функция возвращает информационный элемент с кодом <i>ID</i>. Функция-помошник, которая выбирает все базовые поля элемента, его свойства и информацию об инфоблоке. Использует <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>. </p> <p></p> <div class="note"> <b>Примечание:</b> функция является устаревшей, оставлена для обратной совместимости. Рекомендуется использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList</a>.</div>
  *
  *
- * @param int $ID  ID элемента.
+ * @param mixed $intID  ID элемента.
  *
  * @param string $type = "" Тип информационного блока. Устанавливается в настройках модуля.
  * Если задан, то при выборке проверяется чтобы элемент
- * соответствовал этому типу. <br> Необязательный. По умолчанию на
- * элемент не накладываются ограничения по типу.
+ * соответствовал этому типу.          <br>        Необязательный. По
+ * умолчанию на элемент не накладываются ограничения по типу.
  *
  * @return array <p>Функция возвращает массив <a
  * href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полей информационного
- * элемента</a> и дополнительно следующие поля: </p> <table width="100%"
+ * элемента</a> и дополнительно следующие поля: </p><table width="100%"
  * class="tnormal"><tbody> <tr> <th width="15%">Поле</th> <th>Значение</th> </tr> <tr> <td>IBLOCK_NAME</td>
- * <td>Название информационного блока.</td> </tr> <tr> <td>PROPERTIES</td> <td>Массив
+ * 	<td>Название информационного блока.</td> </tr> <tr> <td>PROPERTIES</td> <td>Массив
  * значений свойств, имеющий в качестве индексов "Символьный код
  * свойства" (задается в настройках информационного блока) или, если
  * код не задан, то уникальное ID свойства. Значением каждого
- * свойства будет массив вида: <pre class="syntax">Array( "NAME"=&gt;"название
- * свойства", "DEFAULT_VALUE"=&gt;"значение свойства по умолчанию",
- * "VALUE"=&gt;"значение свойства или массив значений свойств, если
- * свойство множественное", "VALUE_ENUM_ID"=&gt;"Код значения свойства типа
- * &lt;Список&gt;" )</pre> </td> </tr> </tbody></table> <p> Если заданным параметрам не
- * найден элемент, функция вернет <i>false</i>. <br> Выборка элемента
+ * свойства будет массив вида: <pre class="syntax">Array(   	"NAME"=&gt;"название
+ * свойства",   	"DEFAULT_VALUE"=&gt;"значение свойства по умолчанию",  
+ * 	"VALUE"=&gt;"значение свойства или массив значений свойств, если
+ * свойство множественное",   	"VALUE_ENUM_ID"=&gt;"Код значения свойства типа
+ * &lt;Список&gt;"   	)</pre> </td> </tr> </tbody></table><p> Если заданным параметрам не
+ * найден элемент, функция вернет <i>false</i>.    <br>  Выборка элемента
  * происходит только из активных элементов инфоблока, неактивный
- * элемент выбран быть не может. </p> <p></p><div class="note"> <b>Примечание:</b> все
+ * элемент выбран быть не может. </p><p></p><div class="note"> <b>Примечание:</b> все
  * возвращаемые поля преобразованы в "HTML безопасный" вид, а в полях
  * (LIST_PAGE_URL - списка элементов и DETAIL_PAGE_URL - детального просмотра) с
  * шаблонами URL-ов к страницам будут заменены параметры
  * <code>#SITE_DIR#</code>, <code>#IBLOCK_ID#</code>, <code>#EXTERNAL_ID#</code> и <code>#ID#</code>.</div>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>require($_SERVER['DOCUMENT_ROOT'].'/bitrix/header.php');<br><br>$APPLICATION-&gt;SetTitle('Карточка товара');<br><br>// подключим модуль и выберем элемент ID типа product<br>$arIBlockElement = false;<br>if(CModule::IncludeModule('iblock') &amp;&amp; ($arIBlockElement = GetIBlockElement($ID, 'product')))<br>{<br>   // В заголовок страницы вставим название элемента<br>   $APPLICATION-&gt;SetTitle($arIBlockElement['NAME']);<br>   // В навигационную цепочку вставим название и ссылку на текущий информационный блок<br>   $APPLICATION-&gt;AddChainItem($arIBlockElement['IBLOCK_NAME'], 'products.php?ID='.$arIBlockElement['IBLOCK_ID']);<br><br>   // выведем детальную картинку<br>   echo ShowImage($arIBlockElement['DETAIL_PICTURE'], 150, 150, 'border="0"', '', true);<br>   // выведем детальное описание<br>   echo $arIBlockElement['DETAIL_TEXT'].'&lt;br&gt;';<br>   // выведем значение свойства с кодом PRICE<br>   echo $arIBlockElement['PROPERTIES']['PRICE']['VALUE'].'&lt;br&gt;';<br><br>   // вывeдем оставшиеся свойсва<br>   $arProps = $arIBlockElement['PROPERTIES'];<br>   foreach($arProps as $property_code=&gt;$arValue)<br>   {<br>      // если это свойство с кодом PRICE или значение свойства не введено - пропустим<br>      if($property_code=='PRICE' <br>			|| (!is_array($arValue['VALUE']) &amp;&amp; strlen($arValue['VALUE'])&lt;=0) <br>			|| (is_array($arValue['VALUE']) &amp;&amp; count($arValue['VALUE'])&lt;=0)<br>			)<br>         continue;<br><br>      // выведем пару "Название: значение"<br>      if(!is_array($arValue['VALUE']))<br>         echo $arValue['NAME'].": ".$arValue['VALUE'];<br>      else<br>      {<br>         echo $arValue['NAME'].': ';<br>         foreach($arValue['VALUE'] as $val)<br>         {<br>            echo $val.'&lt;br&gt;';<br>         }<br>      }<br>   }<br>}<br>else<br>   echo ShowError('Новость не найдена');<br><br>require($_SERVER["DOCUMENT_ROOT"].'/bitrix/footer.php");<br>?&gt;<br>
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля информационного
- * элемента</a></li> </ul> <a name="examples"></a>
+ * элемента</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -825,7 +839,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * <p>Функция возвращает раздел информационного блока. </p>
  *
  *
- * @param int $ID  ID раздела.</bod
+ * @param int $intID  ID раздела.
  *
  * @param string $type = "" Тип информационного блока, в котором размещён раздел.
  * Устанавливается в настройках модуля. Если задан, то при выборке
@@ -833,14 +847,14 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  * <br>Необязательный. По умолчанию на раздел не накладываются
  * ограничения по типу.
  *
- * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей раздела</a>
- * <i>IBLOCK_NAME</i><br><p></p><div class="note"> <b>Примечание:</b> функция вернет поля
- * раздела информационного блока только в том случае, если раздел
- * "активен" и находится в информационный блоке, который также
- * "активен" и привязан к текущему сайту. </div>
+ * @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">полей
+ * раздела</a><i>IBLOCK_NAME</i><br><p></p><div class="note"> <b>Примечание:</b> функция
+ * вернет поля раздела информационного блока только в том случае,
+ * если    раздел "активен" и находится в информационный блоке,
+ * который также    "активен" и привязан к текущему сайту. </div>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
  * 
@@ -868,7 +882,7 @@ function GetIBlockSectionList($IBLOCK, $SECT_ID = false, $arOrder = array("left_
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fsection">Поля раздела
- * информационного блока</a></li> </ul> <a name="examples"></a>
+ * информационного блока</a></li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1180,7 +1194,7 @@ function GetIBlockDropDownList($IBLOCK_ID, $strTypeName, $strIBlockName, $arFilt
  * инфоблока (нового или обновлённого).
  *
  * @return mixed <p>Возвращает <i>true</i> в случае успешного импорта или строку с
- * сообщением об ошибке.</p> <br><br>
+ * сообщением об ошибке.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/iblock/functions/importxmlfile.php

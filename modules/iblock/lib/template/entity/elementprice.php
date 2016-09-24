@@ -23,6 +23,19 @@ class ElementPrice extends Base
 	 *
 	 * @return \Bitrix\Iblock\Template\Entity\Base
 	 */
+	
+	/**
+	* <p>Метод используется для поиска сущности для обработки шаблона. Нестатический метод.</p>
+	*
+	*
+	* @param string $entity  Сущность, которую необходимо найти.
+	*
+	* @return \Bitrix\Iblock\Template\Entity\Base 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/elementprice/resolve.php
+	* @author Bitrix
+	*/
 	static public function resolve($entity)
 	{
 		return parent::resolve($entity);
@@ -35,6 +48,19 @@ class ElementPrice extends Base
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Используется для инициализации полей сущности из некоторого внешнего источника. Нестатический метод.</p>
+	*
+	*
+	* @param array $fields  Массив полей сущности.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/elementprice/setfields.php
+	* @author Bitrix
+	*/
 	public function setFields(array $fields)
 	{
 		parent::setFields($fields);

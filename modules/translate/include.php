@@ -1,8 +1,11 @@
 <?
-use Bitrix\Main\Localization\LanguageTable;
+use Bitrix\Main,
+	Bitrix\Main\Localization\LanguageTable;
 
 global $DBType, $MESS, $APPLICATION;
 IncludeModuleLangFile(__FILE__);
+
+// define('TRANSLATE_DEFAULT_PATH', '/bitrix/');
 
 $arrTransEncoding = array(
 	'windows-1250' => 'windows-1250 (ISO 8859-2)',
@@ -117,21 +120,21 @@ class CTranslateUtils
 
 	
 	/**
-	* <p>Метод копирует фразу по четырём языкам: de, en, ru, ua.</p>
+	* <p>Метод копирует фразу по четырём языкам: de, en, ru, ua. Метод нестатический.</p>
 	*
 	*
 	* @param mixed $code  Код фразы, которую нужно копировать.
 	*
-	* @param mixed $fileFrom  Путь к исходному файлу, где расположена фраза.
+	* @param $cod $fileFrom  Путь к исходному файлу, где расположена фраза.
 	*
-	* @param mixed $fileTo  Путь к файлу куда копируется фраза.
+	* @param $fileFro $fileTo  Путь к файлу куда копируется фраза.
 	*
-	* @param mixed $newCode = '' Новый код фразы.
+	* @param $fileT $newCode = '' Новый код фразы.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CTranslateUtils::CopyMessage("AD_INSTALL_MODULE_NAME", "C:/Projects/local/bitrix/modules/advertising/install/install.php", "C:/Projects/local/bitrix/modules/advertising/install/index.php");
 	* </pre>
 	*
@@ -189,6 +192,10 @@ class CTranslateUtils
 							{
 								include($langDirTo."/".$lang.$fileNameTo);
 							}
+							else
+							{
+								@mkdir(dirname($langDirTo."/".$lang.$fileNameTo), 0777, true);
+							}
 							$MESS[$newCode] = $message;
 							$s = "<?\n";
 							foreach($MESS as $c => $m)
@@ -203,4 +210,134 @@ class CTranslateUtils
 			}
 		}
 	}
+
+	public static function FindAndCopy($sourceDir, $lang, $pattern, $destinationFile)
+	{
+		$insideLangDir = (strpos($sourceDir."/", "/lang/".$lang."/") !== false);
+
+		foreach(scandir($sourceDir) as $file)
+		{
+			if($file == "." || $file == "..")
+			{
+				continue;
+			}
+
+			if($file == ".description.php" || $file == ".parameters.php")
+			{
+				continue;
+			}
+
+			if($sourceDir."/".$file == $destinationFile)
+			{
+				continue;
+			}
+
+			if(is_dir($sourceDir."/".$file))
+			{
+				self::FindAndCopy($sourceDir."/".$file, $lang, $pattern, $destinationFile);
+			}
+			elseif($insideLangDir)
+			{
+				$MESS = array();
+				include($sourceDir."/".$file);
+
+				$copyMess = array();
+				foreach($MESS as $code => $val)
+				{
+					if(preg_match($pattern, $val))
+					{
+						$copyMess[$code] = $val;
+					}
+				}
+
+				if(!empty($copyMess))
+				{
+					foreach(self::$languageList as $destLang)
+					{
+						if($destLang <> $lang)
+						{
+							$MESS = array();
+							$sourceFile = str_replace("/lang/".$lang."/", "/lang/".$destLang."/", $sourceDir."/".$file);
+							if(file_exists($sourceFile))
+							{
+								include($sourceFile);
+							}
+
+							$destMess = array();
+							foreach($MESS as $code => $val)
+							{
+								if(isset($copyMess[$code]))
+								{
+									$destMess[$code] = $val;
+								}
+							}
+							$destFile = str_replace("/lang/".$lang."/", "/lang/".$destLang."/", $destinationFile);
+						}
+						else
+						{
+							$destMess = $copyMess;
+							$destFile = $destinationFile;
+						}
+
+						$MESS = array();
+						if(file_exists($destFile))
+						{
+							include($destFile);
+						}
+						else
+						{
+							@mkdir(dirname($destFile), 0777, true);
+						}
+
+						foreach($destMess as $code => $val)
+						{
+							if(isset($MESS[$code]) && $MESS[$code] <> $val)
+							{
+								echo $sourceDir."/".$file.": ".$code." already exists in the destination file.\n";
+							}
+							else
+							{
+								$MESS[$code] = $val;
+							}
+						}
+
+						$s = "<?\n";
+						foreach($MESS as $c => $m)
+						{
+							$s .= "\$MESS[\"".EscapePHPString($c)."\"] = \"".EscapePHPString($m)."\";\n";
+						}
+						$s .= "?>";
+						file_put_contents($destFile, $s);
+					}
+				}
+			}
+		}
+	}
+}
+
+function isAllowPath($path)
+{
+	static $initFolders = null;
+	if ($initFolders === null)
+	{
+		$initFolders = trim((string)Main\Config\Option::get('translate', 'INIT_FOLDERS'));
+		if ($initFolders == '')
+			$initFolders = '/bitrix/';
+		$initFolders = explode(',', $initFolders);
+		foreach ($initFolders as &$oneFolder)
+			$oneFolder = trim($oneFolder);
+		unset($oneFolder);
+	}
+	$path = (string)$path;
+	$allowPath = false;
+	foreach ($initFolders as &$oneFolder)
+	{
+		if (strpos($path, $oneFolder) === 0)
+		{
+			$allowPath = true;
+			break;
+		}
+	}
+	unset($oneFolder);
+	return $allowPath;
 }

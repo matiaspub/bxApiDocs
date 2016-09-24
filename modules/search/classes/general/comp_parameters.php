@@ -1,4 +1,4 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CSearchParameters
@@ -7,20 +7,20 @@ class CSearchParameters
 	{
 		$exFILTER = array();
 
-		if(!is_array($arParams[$strFilterParamName]) && strlen($arParams[$strFilterParamName]) > 0)
+		if (!is_array($arParams[$strFilterParamName]) && strlen($arParams[$strFilterParamName]) > 0)
 			$arParams[$strFilterParamName] = array($arParams[$strFilterParamName]);
 
-		if(is_array($arParams[$strFilterParamName]))
+		if (is_array($arParams[$strFilterParamName]))
 		{
-			foreach($arParams[$strFilterParamName] as $strFILTER)
+			foreach ($arParams[$strFilterParamName] as $strFILTER)
 			{
-				switch($strFILTER)
+				switch ($strFILTER)
 				{
 				case "main":
 					$exFILTER[] = CSearchParameters::_main($arParams[$strFilterParamName."_main"]);
 					break;
 				case "forum":
-					if(IsModuleInstalled("forum"))
+					if (IsModuleInstalled("forum"))
 						$exFILTER[] = CSearchParameters::_forum($arParams[$strFilterParamName."_forum"]);
 					break;
 				case "blog":
@@ -48,10 +48,15 @@ class CSearchParameters
 						"=MODULE_ID" => "crm",
 					);
 					break;
+				case "disk":
+					$exFILTER[] = array(
+						"=MODULE_ID" => "disk",
+					);
+					break;
 				case "no":
 					break;
 				default:
-					if(strpos($strFILTER, "iblock_") === 0)
+					if (strpos($strFILTER, "iblock_") === 0)
 						$exFILTER[] = CSearchParameters::_iblock($arParams[$strFilterParamName."_".$strFILTER], $strFILTER);
 					else
 						$exFILTER[] = array(
@@ -67,7 +72,7 @@ class CSearchParameters
 
 	public static function GetFilterDropDown($bFilter = false)
 	{
-		if($bFilter)
+		if ($bFilter)
 			$arrDropdown = array(
 				"no" => GetMessage("SEARCH_CP_NO_LIMIT"),
 				"main" => "[main] ".GetMessage("SEARCH_CP_STATIC"),
@@ -75,37 +80,46 @@ class CSearchParameters
 		else
 			$arrDropdown = array();
 
-		if(IsModuleInstalled("forum"))
+		if (IsModuleInstalled("forum"))
 			$arrDropdown["forum"] = "[forum] ".GetMessage("SEARCH_CP_FORUM");
 
-		if(CModule::IncludeModule("iblock"))
+		if (CModule::IncludeModule("iblock"))
 		{
-			$rsType = CIBlockType::GetList(array("sort"=>"asc"), array("ACTIVE"=>"Y"));
-			while ($arr=$rsType->Fetch())
+			$rsType = CIBlockType::GetList(array("sort" => "asc"), array("ACTIVE" => "Y"));
+			while ($arr = $rsType->Fetch())
 			{
-				if($ar=CIBlockType::GetByIDLang($arr["ID"], LANGUAGE_ID))
+				if ($ar = CIBlockType::GetByIDLang($arr["ID"], LANGUAGE_ID))
 					$arrDropdown["iblock_".$arr["ID"]] = "[iblock_".$arr["ID"]."] ".$ar["~NAME"];
 			}
 		}
 
-		if(IsModuleInstalled("blog"))
+		if (IsModuleInstalled("blog"))
 		{
 			$arrDropdown["blog"] = "[blog] ".GetMessage("SEARCH_CP_BLOG");
-			if($bFilter)
+			if ($bFilter)
 				$arrDropdown["microblog"] = "[microblog] ".GetMessage("SEARCH_CP_MICROBLOG");
 		}
 
-		if(IsModuleInstalled("socialnetwork"))
+		if (IsModuleInstalled("socialnetwork"))
 		{
 			$arrDropdown["socialnetwork"] = "[socialnetwork] ".GetMessage("SEARCH_CP_SOCNET");
 			$arrDropdown["socialnetwork_user"] = "[socialnetwork_user] ".GetMessage("SEARCH_CP_SOCNET_USER");
 		}
 
-		if(IsModuleInstalled("intranet"))
+		if (IsModuleInstalled("intranet"))
+		{
 			$arrDropdown["intranet"] = "[intranet] ".GetMessage("SEARCH_CP_INTRANET_USERS");
+		}
 
-		if(IsModuleInstalled("crm"))
+		if (IsModuleInstalled("crm"))
+		{
 			$arrDropdown["crm"] = "[crm] ".GetMessage("SEARCH_CP_CRM");
+		}
+
+		if (IsModuleInstalled("disk"))
+		{
+			$arrDropdown["disk"] = "[disk] ".GetMessage("SEARCH_CP_DISK");
+		}
 
 		return $arrDropdown;
 	}
@@ -113,24 +127,17 @@ class CSearchParameters
 	public static function GetModulesList()
 	{
 		$result = array();
-		foreach(GetModuleEvents("search", "OnReindex", true) as $arEvent)
+		foreach (GetModuleEvents("search", "OnReindex", true) as $arEvent)
 		{
-			if(!array_key_exists($arEvent["TO_MODULE_ID"], $result))
+			if (!array_key_exists($arEvent["TO_MODULE_ID"], $result))
 			{
 				$module = $arEvent["TO_MODULE_ID"];
 
-				if(IsModuleInstalled($module))
+				if (IsModuleInstalled($module))
 				{
-					if(!class_exists($module))
+					$obModule = CModule::CreateModuleObject($module);
+					if ($obModule)
 					{
-						$install = $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module."/install/index.php";
-						if(file_exists($install) && is_file($install))
-							include_once($install);
-					}
-
-					if(class_exists($module))
-					{
-						$obModule = new $module;
 						$result[$module] = "[".$module."] ".$obModule->MODULE_NAME;
 					}
 				}
@@ -141,7 +148,7 @@ class CSearchParameters
 		return $result;
 	}
 
-	public static function AddFilterParams(&$arComponentParameters, $arCurrentValues, $name, $parent, $MULTIPLE="Y")
+	public static function AddFilterParams(&$arComponentParameters, $arCurrentValues, $name, $parent, $MULTIPLE = "Y")
 	{
 		$arComponentParameters["PARAMETERS"][$name] = array(
 			"PARENT" => $parent,
@@ -153,16 +160,18 @@ class CSearchParameters
 			"REFRESH" => "Y",
 		);
 
-		if(!is_array($arCurrentValues[$name]) && strlen($arCurrentValues[$name]) > 0)
-			$arCurrentValues[$name] = array($arCurrentValues[$name]);
-
-		if(is_array($arCurrentValues[$name]))
+		if (!is_array($arCurrentValues[$name]) && strlen($arCurrentValues[$name]) > 0)
 		{
-			foreach($arCurrentValues[$name] as $strFILTER)
+			$arCurrentValues[$name] = array($arCurrentValues[$name]);
+		}
+
+		if (is_array($arCurrentValues[$name]))
+		{
+			foreach ($arCurrentValues[$name] as $strFILTER)
 			{
-				if($strFILTER=="main")
+				if ($strFILTER == "main")
 				{
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => $parent,
 						"NAME" => GetMessage("SEARCH_CP_URL"),
 						"TYPE" => "STRING",
@@ -171,18 +180,18 @@ class CSearchParameters
 						"DEFAULT" => "",
 					);
 				}
-				elseif($strFILTER=="forum")
+				elseif ($strFILTER == "forum")
 				{
 					$arrFILTER = array();
-					if(CModule::IncludeModule("forum"))
+					if (CModule::IncludeModule("forum"))
 					{
 						$arrFILTER["all"] = GetMessage("SEARCH_CP_ALL");
 						$rsForum = CForumNew::GetList();
-						while($arForum = $rsForum->Fetch())
+						while ($arForum = $rsForum->Fetch())
 							$arrFILTER[$arForum["ID"]] = $arForum["NAME"];
 					}
 
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => $parent,
 						"NAME" => GetMessage("SEARCH_CP_FORUM"),
 						"TYPE" => "LIST",
@@ -192,20 +201,20 @@ class CSearchParameters
 						"DEFAULT" => "all",
 					);
 				}
-				elseif(strpos($strFILTER,"iblock_")===0)
+				elseif (strpos($strFILTER, "iblock_") === 0)
 				{
 					$arrFILTER = array();
-					if(CModule::IncludeModule("iblock"))
+					if (CModule::IncludeModule("iblock"))
 					{
 						$arrFILTER["all"] = GetMessage("SEARCH_CP_ALL");
-						$rsIBlock = CIBlock::GetList(array("SORT"=>"ASC"), array("TYPE"=>substr($strFILTER, 7)));
-						while($arIBlock = $rsIBlock->Fetch())
+						$rsIBlock = CIBlock::GetList(array("SORT" => "ASC"), array("TYPE" => substr($strFILTER, 7)));
+						while ($arIBlock = $rsIBlock->Fetch())
 							$arrFILTER[$arIBlock["ID"]] = $arIBlock["NAME"];
 					}
 
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => $parent,
-						"NAME" => GetMessage("SEARCH_CP_IBLOCK_TYPE" , array("#TYPE_ID#" => $strFILTER)),
+						"NAME" => GetMessage("SEARCH_CP_IBLOCK_TYPE", array("#TYPE_ID#" => $strFILTER)),
 						"TYPE" => "LIST",
 						"MULTIPLE" => $MULTIPLE,
 						"VALUES" => $arrFILTER,
@@ -213,18 +222,18 @@ class CSearchParameters
 						"DEFAULT" => "all",
 					);
 				}
-				elseif($strFILTER=="blog")
+				elseif ($strFILTER == "blog")
 				{
 					$arrFILTER = array();
-					if(CModule::IncludeModule("blog"))
+					if (CModule::IncludeModule("blog"))
 					{
 						$arrFILTER["all"] = GetMessage("SEARCH_CP_ALL");
 						$rsBlog = CBlog::GetList();
-						while($arBlog = $rsBlog->Fetch())
+						while ($arBlog = $rsBlog->Fetch())
 							$arrFILTER[$arBlog["ID"]] = $arBlog["NAME"];
 					}
 
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => $parent,
 						"NAME" => GetMessage("SEARCH_CP_BLOG"),
 						"TYPE" => "LIST",
@@ -234,18 +243,18 @@ class CSearchParameters
 						"DEFAULT" => "all",
 					);
 				}
-				elseif($strFILTER=="socialnetwork")
+				elseif ($strFILTER == "socialnetwork")
 				{
 					$arrFILTER = array();
-					if(CModule::IncludeModule("socialnetwork"))
+					if (CModule::IncludeModule("socialnetwork"))
 					{
 						$arrFILTER["all"] = GetMessage("SEARCH_CP_ALL");
 						$rsGroup = CSocNetGroup::GetList(array("ID" => "DESC"), array(), false, false, array("ID", "NAME"));
-						while($arGroup = $rsGroup->Fetch())
+						while ($arGroup = $rsGroup->Fetch())
 							$arrFILTER[$arGroup["ID"]] = $arGroup["NAME"];
 					}
 
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => $parent,
 						"NAME" => GetMessage("SEARCH_CP_SOCIALNETWORK_GROUPS"),
 						"TYPE" => "LIST",
@@ -255,9 +264,9 @@ class CSearchParameters
 						"DEFAULT" => "all",
 					);
 				}
-				elseif($strFILTER=="socialnetwork_user")
+				elseif ($strFILTER == "socialnetwork_user")
 				{
-					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER]=array(
+					$arComponentParameters["PARAMETERS"][$name."_".$strFILTER] = array(
 						"PARENT" => "DATA_SOURCE",
 						"NAME" => GetMessage("SEARCH_CP_SOCIALNETWORK_USER"),
 						"TYPE" => "STRING",
@@ -268,26 +277,25 @@ class CSearchParameters
 		}
 	}
 
-
-	public static function _main($arParam)
+	protected static function _main($arParam)
 	{
-		if(is_array($arParam))
+		if (is_array($arParam))
 		{
 			$arURL = array();
-			foreach($arParam as $strURL)
+			foreach ($arParam as $strURL)
 			{
 				$strURL = trim($strURL);
-				if($strURL)
+				if ($strURL)
 					$arURL[] = $strURL."%";
 			}
 
-			if(count($arURL) > 0)
+			if (count($arURL) > 0)
 				return array(
 					"=MODULE_ID" => "main",
 					"URL" => $arURL,
 				);
 		}
-		elseif(strlen($arParam))
+		elseif (strlen($arParam))
 		{
 			return array(
 				"=MODULE_ID" => "main",
@@ -301,16 +309,16 @@ class CSearchParameters
 		);
 	}
 
-	public static function _forum($arParam)
+	protected static function _forum($arParam)
 	{
-		if(is_array($arParam))
+		if (is_array($arParam))
 		{
 			$arForum = array();
-			foreach($arParam as $strForum)
-				if($strForum != "all")
+			foreach ($arParam as $strForum)
+				if ($strForum != "all")
 					$arForum[] = intval($strForum);
 
-			if(count($arForum) > 0)
+			if (count($arForum) > 0)
 			{
 				return array(
 					"=MODULE_ID" => "forum",
@@ -318,7 +326,7 @@ class CSearchParameters
 				);
 			}
 		}
-		elseif($arParam > 0)
+		elseif ($arParam > 0)
 		{
 			return array(
 				"=MODULE_ID" => "forum",
@@ -331,16 +339,16 @@ class CSearchParameters
 		);
 	}
 
-	public static function _iblock($arParam, $strFILTER)
+	protected static function _iblock($arParam, $strFILTER)
 	{
-		if(is_array($arParam))
+		if (is_array($arParam))
 		{
 			$arIBlock = array();
-			foreach($arParam as $strIBlock)
-				if($strIBlock != "all")
+			foreach ($arParam as $strIBlock)
+				if ($strIBlock != "all")
 					$arIBlock[] = intval($strIBlock);
 
-			if(count($arIBlock) > 0)
+			if (count($arIBlock) > 0)
 			{
 				return array(
 					"=MODULE_ID" => "iblock",
@@ -349,7 +357,7 @@ class CSearchParameters
 				);
 			}
 		}
-		elseif($arParam > 0)
+		elseif ($arParam > 0)
 		{
 			return array(
 				"=MODULE_ID" => "iblock",
@@ -364,16 +372,16 @@ class CSearchParameters
 		);
 	}
 
-	public static function _blog($arParam)
+	protected static function _blog($arParam)
 	{
-		if(is_array($arParam))
+		if (is_array($arParam))
 		{
 			$arBlog = array();
-			foreach($arParam as $strBlog)
-				if($strBlog != "all")
+			foreach ($arParam as $strBlog)
+				if ($strBlog != "all")
 					$arBlog[] = intval($strBlog);
 
-			if(count($arBlog) > 0)
+			if (count($arBlog) > 0)
 			{
 				return array(
 					"=MODULE_ID" => "blog",
@@ -382,7 +390,7 @@ class CSearchParameters
 				);
 			}
 		}
-		elseif($arParam > 0)
+		elseif ($arParam > 0)
 		{
 			return array(
 				"=MODULE_ID" => "blog",
@@ -397,16 +405,16 @@ class CSearchParameters
 		);
 	}
 
-	public static function _socialnetwork($arParam)
+	protected static function _socialnetwork($arParam)
 	{
-		if(is_array($arParam))
+		if (is_array($arParam))
 		{
 			$arSCGroups = array();
-			foreach($arParam as $strSCGroup)
-				if($strSCGroup != "all")
+			foreach ($arParam as $strSCGroup)
+				if ($strSCGroup != "all")
 					$arSCGroups[] = intval($strSCGroup);
 
-			if(count($arSCGroups) > 0)
+			if (count($arSCGroups) > 0)
 			{
 				return array(
 					"PARAMS" => array("socnet_group" => $arSCGroups),
@@ -414,7 +422,7 @@ class CSearchParameters
 				);
 			}
 		}
-		elseif($arParam > 0)
+		elseif ($arParam > 0)
 		{
 			return array(
 				"PARAMS" => array("socnet_group" => intval($arParam)),
@@ -427,10 +435,10 @@ class CSearchParameters
 		);
 	}
 
-	public static function _socialnetwork_user($arParam)
+	protected static function _socialnetwork_user($arParam)
 	{
 		$intSCUser = intval($arParam);
-		if($intSCUser > 0)
+		if ($intSCUser > 0)
 			return array(
 				"PARAMS" => array("socnet_user" => $intSCUser),
 				"USE_TF_FILTER" => false,
@@ -441,4 +449,3 @@ class CSearchParameters
 			);
 	}
 }
-?>

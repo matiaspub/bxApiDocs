@@ -2,12 +2,12 @@
 /**
  * B24NETWORK_URL
  */
-define('B24NETWORK_URL', 'https://www.bitrix24.net');
+define('B24NETWORK_URL', $defaultValue);
 
 /**
  * BITRIX_CLOUD_ADV_URL
  */
-define('BITRIX_CLOUD_ADV_URL', 'http://cloud-adv.bitrix.info');
+define('BITRIX_CLOUD_ADV_URL', 'https://cloud-adv.bitrix.info');
 
 /**
  * BITRIXSEO_URL

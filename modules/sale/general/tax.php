@@ -14,9 +14,25 @@ IncludeModuleLangFile(__FILE__);
  */
 class CAllSaleTax
 {
-	static function DoProcessOrderBasket(&$arOrder, $arOptions, &$arErrors)
+	public static function DoProcessOrderBasket(&$arOrder, $arOptions, &$arErrors)
 	{
 		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
+			return;
+
+		$arOrder["TAX_LOCATION"] = \CSaleLocation::tryTranslateIDToCode($arOrder["TAX_LOCATION"]);
+
+		static::calculateTax($arOrder, $arOptions, $arErrors);
+	}
+
+	/**
+	 * @internal
+	 * @param $arOrder
+	 * @param $arOptions
+	 * @param $arErrors
+	 */
+	public static function calculateTax(&$arOrder, $arOptions, &$arErrors)
+	{
+		if ((!array_key_exists("TAX_LOCATION", $arOrder) || strval(trim($arOrder["TAX_LOCATION"])) == "") && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
 			return;
 
 		if (!$arOrder["USE_VAT"])
@@ -52,7 +68,7 @@ class CAllSaleTax
 							"LID" => $arOrder["SITE_ID"],
 							"PERSON_TYPE_ID" => $arOrder["PERSON_TYPE_ID"],
 							"ACTIVE" => "Y",
-							"LOCATION" => $arOrder["TAX_LOCATION"],
+							"LOCATION_CODE" => $arOrder["TAX_LOCATION"],
 						)
 					);
 					while ($arTaxRate = $dbTaxRate->GetNext())
@@ -61,7 +77,7 @@ class CAllSaleTax
 						{
 							if ($arTaxRate["IS_PERCENT"] != "Y")
 							{
-								$arTaxRate["VALUE"] = RoundEx(CCurrencyRates::ConvertCurrency($arTaxRate["VALUE"], $arTaxRate["CURRENCY"], $arOrder["CURRENCY"]), SALE_VALUE_PRECISION);
+								$arTaxRate["VALUE"] = \Bitrix\Sale\PriceMaths::roundPrecision(CCurrencyRates::ConvertCurrency($arTaxRate["VALUE"], $arTaxRate["CURRENCY"], $arOrder["CURRENCY"]));
 								$arTaxRate["CURRENCY"] = $arOrder["CURRENCY"];
 							}
 							$arOrder["TAX_LIST"][] = $arTaxRate;
@@ -106,8 +122,11 @@ class CAllSaleTax
 
 					foreach ($arOrder["TAX_LIST"] as $arTax)
 					{
-						if ($arTax["IS_IN_PRICE"] != "Y")
+						if ($arTax["IS_IN_PRICE"] != "Y"
+							|| (!empty($arOptions['ENABLE_INCLUSIVE_TAX']) && $arOptions['ENABLE_INCLUSIVE_TAX'] == "Y"))
+						{
 							$arOrder["TAX_PRICE"] += $arTax["VALUE_MONEY"];
+						}
 					}
 				}
 				else
@@ -137,13 +156,28 @@ class CAllSaleTax
 			}
 		}
 
-		$arOrder["TAX_PRICE"] = roundEx($arOrder["TAX_PRICE"], SALE_VALUE_PRECISION);
-
+		$arOrder["TAX_PRICE"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["TAX_PRICE"]);
 	}
 
-	static function DoProcessOrderDelivery(&$arOrder, $arOptions, &$arErrors)
+	public static function DoProcessOrderDelivery(&$arOrder, $arOptions, &$arErrors)
 	{
 		if ((!array_key_exists("TAX_LOCATION", $arOrder) || intval($arOrder["TAX_LOCATION"]) <= 0) && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
+			return;
+
+		$arOrder["TAX_LOCATION"] = \CSaleLocation::tryTranslateIDToCode($arOrder["TAX_LOCATION"]);
+
+		static::calculateDeliveryTax($arOrder, $arOptions, $arErrors);
+	}
+
+	/**
+	 * @internal
+	 * @param $arOrder
+	 * @param $arOptions
+	 * @param $arErrors
+	 */
+	public static function calculateDeliveryTax(&$arOrder, $arOptions, &$arErrors)
+	{
+		if ((!array_key_exists("TAX_LOCATION", $arOrder) || strval(trim($arOrder["TAX_LOCATION"])) == "") && (!$arOrder["USE_VAT"] || $arOrder["USE_VAT"]!="Y"))
 			return;
 
 		if (!array_key_exists("COUNT_DELIVERY_TAX", $arOptions))
@@ -176,32 +210,20 @@ class CAllSaleTax
 						"LID" => $arOrder["SITE_ID"],
 						"PERSON_TYPE_ID" => $arOrder["PERSON_TYPE_ID"],
 						"ACTIVE" => "Y",
-						"LOCATION" => $arOrder["TAX_LOCATION"],
+						"LOCATION_CODE" => $arOrder["TAX_LOCATION"],
 					)
 				);
 				while ($arTaxRate = $dbTaxRate->GetNext())
 				{
-					if (!in_array(intval($arTaxRate["TAX_ID"]), $arOrder["TAX_EXEMPT"]))
+					if (is_array($arOrder["TAX_EXEMPT"]) && !in_array(intval($arTaxRate["TAX_ID"]), $arOrder["TAX_EXEMPT"]))
 					{
 						if ($arTaxRate["IS_PERCENT"] != "Y")
 						{
-							$arTaxRate["VALUE"] = RoundEx(CCurrencyRates::ConvertCurrency($arTaxRate["VALUE"], $arTaxRate["CURRENCY"], $arOrder["CURRENCY"]), SALE_VALUE_PRECISION);
+							$arTaxRate["VALUE"] = \Bitrix\Sale\PriceMaths::roundPrecision(CurrencyRates::ConvertCurrency($arTaxRate["VALUE"], $arTaxRate["CURRENCY"], $arOrder["CURRENCY"]));
 							$arTaxRate["CURRENCY"] = $arOrder["CURRENCY"];
 						}
 						$arOrder["TAX_LIST"][] = $arTaxRate;
 					}
-				}
-			}
-			else
-			{
-				if (!empty($arOrder["TAX_LIST"]) && is_array($arOrder["TAX_LIST"]))
-				{
-					foreach ($arOrder["TAX_LIST"] as &$taxValue)
-					{
-						if (isset($taxValue['VALUE_MONEY']))
-							unset($taxValue['VALUE_MONEY']);
-					}
-					unset($taxValue);
 				}
 			}
 
@@ -216,13 +238,14 @@ class CAllSaleTax
 				$arOrder["TAX_PRICE"] = 0;
 				foreach ($arOrder["TAX_LIST"] as &$arTax)
 				{
-					$arTax["VALUE_MONEY"] += roundEx($arTax["TAX_VAL"], SALE_VALUE_PRECISION);
-					$arTax["TAX_VAL"] += roundEx($arTax["TAX_VAL"], SALE_VALUE_PRECISION);
-
+					$arTax["VALUE_MONEY"] += \Bitrix\Sale\PriceMaths::roundPrecision($arTax["TAX_VAL"]);
 					$arTax['VALUE_MONEY_FORMATED'] = SaleFormatCurrency($arTax["VALUE_MONEY"], $arOrder["CURRENCY"]);
 
-					if ($arTax["IS_IN_PRICE"] != "Y")
+					if ($arTax["IS_IN_PRICE"] != "Y"
+						|| (!empty($arOptions['ENABLE_INCLUSIVE_TAX']) && $arOptions['ENABLE_INCLUSIVE_TAX'] == "Y"))
+					{
 						$arOrder["TAX_PRICE"] += $arTax["VALUE_MONEY"];
+					}
 
 				}
 				unset($arTax);
@@ -253,9 +276,9 @@ class CAllSaleTax
 			//}
 		}
 
-		$arOrder["TAX_PRICE"] = roundEx($arOrder["TAX_PRICE"], SALE_VALUE_PRECISION);
-		$arOrder["VAT_SUM"] = roundEx($arOrder["VAT_SUM"], SALE_VALUE_PRECISION);
-		$arOrder["VAT_DELIVERY"] = roundEx($arOrder["VAT_DELIVERY"], SALE_VALUE_PRECISION);
+		$arOrder["TAX_PRICE"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["TAX_PRICE"]);
+		$arOrder["VAT_SUM"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["VAT_SUM"]);
+		$arOrder["VAT_DELIVERY"] = \Bitrix\Sale\PriceMaths::roundPrecision($arOrder["VAT_DELIVERY"]);
 
 	}
 
@@ -283,6 +306,8 @@ class CAllSaleTax
 			}
 		}
 
+		$isChanged = false;
+
 		if (is_array($taxList))
 		{
 			foreach ($taxList as $itemData)
@@ -299,15 +324,27 @@ class CAllSaleTax
 				);
 
 				$hash = $itemData["NAME"]."|".$itemData["CODE"];
+				$isNew = false;
 
 				if (array_key_exists($hash, $idList))
 				{
-					CSaleOrderTax::Update($idList[$hash], $fields);
+					$taxId = CSaleOrderTax::Update($idList[$hash], $fields);
 					unset($idList[$hash]);
 				}
 				elseif (!array_key_exists($hash, $duplicateList))
 				{
-					CSaleOrderTax::Add($fields);
+					$isNew = true;
+					$taxId = CSaleOrderTax::Add($fields);
+				}
+
+				if ($orderId > 0)
+				{
+					\Bitrix\Sale\OrderHistory::addLog('TAX', $orderId, $isNew ? 'TAX_ADD' : 'TAX_UPDATE', $taxId, null, array(
+						"NAME" => $itemData["NAME"],
+						"CODE" => $itemData["CODE"]
+					), \Bitrix\Sale\OrderHistory::SALE_ORDER_HISTORY_LOG_LEVEL_1);
+
+					$isChanged = true;
 				}
 			}
 		}
@@ -315,6 +352,10 @@ class CAllSaleTax
 		foreach ($idList as $code => $id)
 		{
 			CSaleOrderTax::Delete($id);
+			if ($orderId > 0)
+			{
+				\Bitrix\Sale\OrderHistory::addLog('TAX', $orderId, 'TAX_DELETED', $id, null, array(), \Bitrix\Sale\OrderHistory::SALE_ORDER_HISTORY_LOG_LEVEL_1);
+			}
 		}
 
 		if (!empty($duplicateList))
@@ -322,7 +363,17 @@ class CAllSaleTax
 			foreach ($duplicateList as $hash => $id)
 			{
 				CSaleOrderTax::Delete($id);
+				\Bitrix\Sale\OrderHistory::addLog('TAX', $orderId, 'TAX_DUPLICATE_DELETED', $id, null, array(), \Bitrix\Sale\OrderHistory::SALE_ORDER_HISTORY_LOG_LEVEL_1);
 			}
+		}
+
+		if ($isChanged)
+		{
+			\Bitrix\Sale\OrderHistory::addAction(
+				'TAX',
+				$orderId,
+				"TAX_SAVED"
+			);
 		}
 	}
 
@@ -359,19 +410,19 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод обновляет параметры налога с кодом ID. Метод динамичный.</p>
+	* <p>Метод обновляет параметры налога с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код налога.
+	* @param mixed $intID  Код налога.
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров налога, ключами в котором
 	* являются названия параметров, а значениями - соответствующие
-	* значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> <li> <b>NAME</b>
-	* - название налога;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li> <b>CODE</b> -
+	* значения.<br><br> Допустимые параметры:<ul> <li> <b>LID</b> - сайт;</li> 	<li>
+	* <b>NAME</b> - название налога;</li> 	<li> <b>DESCRIPTION</b> - описание;</li> 	<li> <b>CODE</b> -
 	* символьный код.</li> </ul>
 	*
 	* @return int <p>Метод возвращает код измененного налога или <i>false</i> в случае
-	* ошибки.</p> <br><br>
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__update.6e2c0ff3.php
@@ -396,13 +447,13 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод удаляет налог с кодом ID. Также удаляются ставки этого налога и освобождения от уплаты налога, относящиеся к этому налогу. Метод динамичный.</p>
+	* <p>Метод удаляет налог с кодом ID. Также удаляются ставки этого налога и освобождения от уплаты налога, относящиеся к этому налогу. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код налога.
+	* @param mixed $intID  Код налога.
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__delete.6efc76a6.php
@@ -425,20 +476,21 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод возвращает параметры налога с кодом ID. Метод динамичный.</p>
+	* <p>Метод возвращает параметры налога с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код налога.
+	* @param mixed $intID  Код налога.
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров налога с
-	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	* </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr> <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td>
-	* <td>Название налога.</td> </tr> <tr> <td>CODE</td> <td>Символьный код налога.</td>
-	* </tr> <tr> <td>DESCRIPTION</td> <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата
-	* последнего изменения записи.</td> </tr> </table> <p>  </p<a name="examples"></a>
+	* ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>     <th>Описание</th>
+	*   </tr> <tr> <td>ID</td>     <td>Код налога.</td> </tr> <tr> <td>LID</td>     <td>Сайт.</td> </tr> <tr>
+	* <td>NAME</td>     <td>Название налога.</td> </tr> <tr> <td>CODE</td>     <td>Символьный код
+	* налога.</td> </tr> <tr> <td>DESCRIPTION</td>     <td>Описание налога.</td> </tr> <tr>
+	* <td>TIMESTAMP_X</td>     <td>Дата последнего изменения записи.</td> </tr> </table><p> 
+	* </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Выведем параметры налога с кодом $TAX_ID
 	* if ($arTax = CSaleTax::GetByID($TAX_ID))
@@ -475,30 +527,30 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод возвращает набор налогов, удовлетворяющих фильтру arFilter. Результирующий набор упорядочен в соответствии с массивом arOrder. Метод динамичный.</p>
+	* <p>Метод возвращает набор налогов, удовлетворяющих фильтру arFilter. Результирующий набор упорядочен в соответствии с массивом arOrder. Нестатический метод.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("NAME"=>"ASC") Ассоциативный массив условий сортировки. Каждая пара
 	* ключ-значение массива применяется последовательно. Ключами
 	* являются названия параметров, по значениям которых
 	* осуществляется сортировка, а значениями - направления
-	* сортировки.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название
-	* налога;</li> <li> <b>ID</b> - код налога;</li> <li> <b>LID</b> - сайт;</li> <li> <b>CODE</b> -
-	* символьный код налога;</li> <li> <b>TIMESTAMP_X</b> - дата последнего
+	* сортировки.<br><br> 	Допустимые ключи:<ul> <li> <b>NAME</b> - название
+	* налога;</li> 	<li> <b>ID</b> - код налога;</li> 	<li> <b>LID</b> - сайт;</li> 	<li> <b>CODE</b> -
+	* символьный код налога;</li> 	<li> <b>TIMESTAMP_X</b> - дата последнего
 	* изменения записи.</li> </ul>
 	*
 	* @param array $arrayarFilter = Array() Ассоциативный массив для фильтрации налогов. Ключами являются
 	* названия фильтруемых параметров, а значениями - условия на
-	* значения.<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код налога;</li> <li>
-	* <b>LID</b> - сайт;</li> <li> <b>CODE</b> - символьный код налога.</li> </ul>
+	* значения.<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код налога;</li> 	<li>
+	* <b>LID</b> - сайт;</li> 	<li> <b>CODE</b> - символьный код налога.</li> </ul>
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	* массивы параметров налогов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код налога.</td> </tr> <tr>
-	* <td>LID</td> <td>Сайт.</td> </tr> <tr> <td>NAME</td> <td>Название налога.</td> </tr> <tr>
-	* <td>CODE</td> <td>Символьный код налога.</td> </tr> <tr> <td>DESCRIPTION</td> <td>Описание
-	* налога.</td> </tr> <tr> <td>TIMESTAMP_X</td> <td>Дата последнего изменения
-	* записи.</td> </tr> </table> <br><br>
+	* массивы параметров налогов с ключами:</p><table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th>     <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код налога.</td> </tr>
+	* <tr> <td>LID</td>     <td>Сайт.</td> </tr> <tr> <td>NAME</td>     <td>Название налога.</td> </tr> <tr>
+	* <td>CODE</td>     <td>Символьный код налога.</td> </tr> <tr> <td>DESCRIPTION</td>    
+	* <td>Описание налога.</td> </tr> <tr> <td>TIMESTAMP_X</td>     <td>Дата последнего
+	* изменения записи.</td> </tr> </table><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__getlist.726e1309.php
@@ -594,25 +646,25 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод возвращает набор записей из таблицы освобождений от уплаты налогов, удовлетворяющих фильтру arFilter. Метод динамичный.</p>
+	* <p>Метод возвращает набор записей из таблицы освобождений от уплаты налогов, удовлетворяющих фильтру arFilter. Нестатический метод.</p>
 	*
 	*
 	* @param array $arrayarFilter = array() Ассоциативный массив для фильтрации записей. Ключами являются
 	* названия фильтруемых параметров, а значениями - условия на
 	* значения.<br><br> Допустимые ключи: <ul> <li> <b>GROUP_ID</b> - код группы
-	* пользователей, которая освобождается от уплаты налога;</li> <li>
+	* пользователей, которая освобождается от уплаты налога;</li> 	<li>
 	* <b>TAX_ID</b> - код налога, от уплаты которого освобождается группа
 	* пользователей.</li> </ul>
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	* массивы параметров налогов с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>GROUP_ID</td> <td>Код группы
+	* массивы параметров налогов с ключами:</p><table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th>     <th>Описание</th>   </tr> <tr> <td>GROUP_ID</td>     <td>Код группы
 	* пользователей, которая освобождается от уплаты налога.</td> </tr> <tr>
-	* <td>TAX_ID</td> <td>Код налога, от уплаты которого освобождается группа
-	* пользователей.</td> </tr> </table> <a name="examples"></a>
+	* <td>TAX_ID</td>     <td>Код налога, от уплаты которого освобождается группа
+	* пользователей.</td> </tr> </table><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Заполним массив налогов, от уплаты которых освобожден текущий пользователь
 	* $arTaxExempt = array();
@@ -719,16 +771,16 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод добавляет новую запись в таблицу освобождения от налогов. Метод динамичный.</p>
+	* <p>Метод добавляет новую запись в таблицу освобождения от налогов. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров новой записи с ключами:<ul> <li>
 	* <b>GROUP_ID</b> - код группы пользователей, которая освобождается от
-	* уплаты налога;</li> <li> <b>TAX_ID</b> - код налога, от уплаты которого
+	* уплаты налога;</li> 	<li> <b>TAX_ID</b> - код налога, от уплаты которого
 	* освобождается группа пользователей.</li> </ul>
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного добавления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__addexempt.a94a2922.php
@@ -754,18 +806,18 @@ class CAllSaleTax
 
 	
 	/**
-	* <p>Метод удаляет записи, удовлетворяющие фильтру arFilter, из таблицы освобождений от уплаты налогов. Метод динамичный.</p>
+	* <p>Метод удаляет записи, удовлетворяющие фильтру arFilter, из таблицы освобождений от уплаты налогов. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив условий для удаления записей. Ключами в
-	* массиве могут быть: <ul> <li> <b>GROUP_ID</b> - код группы пользователей,
-	* члены которой освобождены от уплаты налога;</li> <li> <b>TAX_ID</b> - код
+	* массиве могут быть: 	<ul> <li> <b>GROUP_ID</b> - код группы пользователей,
+	* члены которой освобождены от уплаты налога;</li> 	<li> <b>TAX_ID</b> - код
 	* налога, от уплаты которого освобождается группа
-	* пользователей.</li> </ul> В массиве должен присутствовать хотя бы
+	* пользователей.</li> 	</ul> В массиве должен присутствовать хотя бы
 	* один ключ.
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaletax/csaletax__deleteexempt.071034ae.php

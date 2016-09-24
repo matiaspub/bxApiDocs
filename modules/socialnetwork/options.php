@@ -178,7 +178,7 @@ if (!function_exists('set_valign'))
 			|| in_array($ctrlType, array("checkbox", "text"))
 		)
 		{
-			return;
+			return '';
 		}
 		else
 		{
@@ -192,6 +192,7 @@ $arAllOptionsCommon = array(
 	array("allow_livefeed_toall", GetMessage("SONET_LOG_ALLOW_TOALL"), "Y", Array("checkbox")),
 	array("livefeed_toall_rights", GetMessage("SONET_LOG_TOALL_RIGHTS"), 'a:1:{i:0;s:2:"AU";}', Array("hidden")),
 	array("default_livefeed_toall", GetMessage("SONET_LOG_DEFAULT_TOALL"), "Y", Array("checkbox")),
+	array("email_users_all", GetMessage("SONET_LOG_EMAIL_USERS_ALL"), "N", Array("checkbox")),
 );
 
 if (!IsModuleInstalled("intranet"))
@@ -526,7 +527,7 @@ if (
 			{
 				$name = $arAllOptionsUsersGender[$gender][$i][0]."_".$arSite["ID"];
 
-				$arPICTURE = $HTTP_POST_FILES[$name];
+				$arPICTURE = $_FILES[$name];
 				$arPICTURE["del"] = ${$name."_del"};
 				$arPICTURE["MODULE_ID"] = "socialnetwork";
 
@@ -538,7 +539,7 @@ if (
 				if (strlen($checkRes) <= 0)
 				{
 					$fid = CFile::SaveFile($arPICTURE, "socialnetwork");
-					if ($arPICTURE["del"] == "Y" || strlen($HTTP_POST_FILES[$name]["name"]) > 0)
+					if ($arPICTURE["del"] == "Y" || strlen($_FILES[$name]["name"]) > 0)
 						COption::SetOptionInt("socialnetwork", $arAllOptionsUsersGender[$gender][$i][0], intval($fid), $arAllOptionsUsersGender[$gender][$i][1], $arSite["ID"]);
 				}
 				else
@@ -592,7 +593,7 @@ if (
 		{
 			$name = $arAllOptionsGroupsGender[$i][0]."_".$arSite["ID"];
 
-			$arPICTURE = $HTTP_POST_FILES[$name];
+			$arPICTURE = $_FILES[$name];
 			$arPICTURE["del"] = ${$name."_del"};
 			$arPICTURE["MODULE_ID"] = "socialnetwork";
 
@@ -604,7 +605,7 @@ if (
 			if (strlen($checkRes) <= 0)
 			{
 				$fid = CFile::SaveFile($arPICTURE, "socialnetwork");
-				if ($arPICTURE["del"] == "Y" || strlen($HTTP_POST_FILES[$name]["name"]) > 0)
+				if ($arPICTURE["del"] == "Y" || strlen($_FILES[$name]["name"]) > 0)
 					COption::SetOptionInt("socialnetwork", $arAllOptionsGroupsGender[$i][0], intval($fid), $arAllOptionsGroupsGender[$i][1], $arSite["ID"]);
 			}
 			else

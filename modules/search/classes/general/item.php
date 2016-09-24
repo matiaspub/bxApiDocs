@@ -1,4 +1,5 @@
-<?
+<?php
+
 class CSearchItem extends CDBResult
 {
 	public static function GetList($arOrder = array(), $arFilter = array(), $arSelect = array())
@@ -10,21 +11,21 @@ class CSearchItem extends CDBResult
 		$sqlOrder = array();
 		$sqlWhere = "";
 
-		if(!is_array($arSelect))
+		if (!is_array($arSelect))
 			$arSelect = array();
 
-		if(is_array($arOrder))
+		if (is_array($arOrder))
 		{
-			foreach($arOrder as $key => $ord)
+			foreach ($arOrder as $key => $ord)
 			{
 				$ord = strtoupper($ord) <> "ASC"? "DESC": "ASC";
 				$key = strtoupper($key);
-				switch($key)
+				switch ($key)
 				{
-					case "ID":
-						$sqlOrder[$key] = $strSearchContentAlias.".".$key." ".$ord;
-						$arSelect[] = "ID";
-						break;
+				case "ID":
+					$sqlOrder[$key] = $strSearchContentAlias.".".$key." ".$ord;
+					$arSelect[] = "ID";
+					break;
 				}
 			}
 		}
@@ -36,36 +37,36 @@ class CSearchItem extends CDBResult
 		$arSelect[] = "PARAM1";
 		$arSelect[] = "PARAM2";
 
-		foreach($arSelect as $field)
+		foreach ($arSelect as $field)
 		{
 			$field = strtoupper($field);
-			switch($field)
+			switch ($field)
 			{
-				case "ID":
-				case "MODULE_ID":
-				case "ITEM_ID":
-				case "BODY":
-				case "PARAM1":
-				case "PARAM2":
-				case "CUSTOM_RANK":
-				case "USER_ID":
-				case "ENTITY_TYPE_ID":
-				case "ENTITY_ID":
-				case "TITLE":
-				case "TAGS":
-					$sqlSelect[$field] = $strSearchContentAlias.".".$field;
-					break;
-				case "URL":
-					$sqlSelect[$field] = $strSearchContentAlias.".".$field;
-					$sqlSelect["SITE_URL"] = "scsite.".$field." SITE_URL";
-					break;
-				case "SITE_ID":
-					$sqlSelect["SITE_ID"] = "scsite.".$field;
-					break;
+			case "ID":
+			case "MODULE_ID":
+			case "ITEM_ID":
+			case "BODY":
+			case "PARAM1":
+			case "PARAM2":
+			case "CUSTOM_RANK":
+			case "USER_ID":
+			case "ENTITY_TYPE_ID":
+			case "ENTITY_ID":
+			case "TITLE":
+			case "TAGS":
+				$sqlSelect[$field] = $strSearchContentAlias.".".$field;
+				break;
+			case "URL":
+				$sqlSelect[$field] = $strSearchContentAlias.".".$field;
+				$sqlSelect["SITE_URL"] = "scsite.".$field." SITE_URL";
+				break;
+			case "SITE_ID":
+				$sqlSelect["SITE_ID"] = "scsite.".$field;
+				break;
 			}
 		}
 
-		if(is_array($arFilter))
+		if (is_array($arFilter))
 		{
 			$obQueryWhere = new CSQLWhere;
 			$obQueryWhere->SetFields(array(
@@ -169,23 +170,23 @@ class CSearchItem extends CDBResult
 		static $arSite = array();
 
 		$r = parent::Fetch();
-		if($r)
+		if ($r)
 		{
 			$site_id = $r["SITE_ID"];
-			if(!isset($arSite[$site_id]))
+			if (!isset($arSite[$site_id]))
 			{
-				$rsSite = CSite::GetList($b, $o, array("ID"=>$site_id));
+				$rsSite = CSite::GetList($b, $o, array("ID" => $site_id));
 				$arSite[$site_id] = $rsSite->Fetch();
 			}
 			$r["DIR"] = $arSite[$site_id]["DIR"];
 			$r["SERVER_NAME"] = $arSite[$site_id]["SERVER_NAME"];
 
-			if(strlen($r["SITE_URL"])>0)
+			if (strlen($r["SITE_URL"]) > 0)
 				$r["URL"] = $r["SITE_URL"];
 
-			if(substr($r["URL"], 0, 1)=="=")
+			if (substr($r["URL"], 0, 1) == "=")
 			{
-				foreach(GetModuleEvents("search", "OnSearchGetURL", true) as $arEvent)
+				foreach (GetModuleEvents("search", "OnSearchGetURL", true) as $arEvent)
 					$r["URL"] = ExecuteModuleEventEx($arEvent, array($r));
 			}
 
@@ -203,4 +204,3 @@ class CSearchItem extends CDBResult
 	}
 
 }
-?>

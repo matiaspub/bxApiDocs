@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей. 
+ * <b>CSocNetFeaturesPerms</b> - класс для управления правами на доступ к дополнительному функционалу групп и пользователей.
  *
  *
  * @return mixed 
@@ -19,18 +19,19 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	* <p>Создает новое право.</p> <p><b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</p>
+	* <p>Создает новое право. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: для установки параметров права может так же использоваться метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a>.</div>
 	*
 	*
-	* @param array $arFields  Массив значений параметров. Допустимые ключи:<br> FEATURE_ID - код
-	* дополнительного функционала,<br> OPERATION_ID - код операции,<br> ROLE - роль.
+	* @param array $arFields  Массив значений параметров. Допустимые ключи:<br><b>FEATURE_ID</b> - код
+	* дополнительного функционала,<br><b>OPERATION_ID</b> - код операции,<br><b>ROLE</b>
+	* - роль.
 	*
 	* @return int <p>Код вставленной записи.</p>
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/SetPerm.php">CSocNetFeaturesPerms::SetPerm</a></li>
-	* <li><a
+	*   <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/Update.php">CSocNetFeaturesPerms::Update</a></li>
 	* </ul><br><br>
 	*
@@ -103,7 +104,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	/***************************************/
 	
 	/**
-	* <p>Возвращает список прав.</p>
+	* <p>Возвращает список прав. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
@@ -112,7 +113,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	* <b>FEATURE_ID</b>, <b>OPERATION_ID, ROLE</b>, <b>FEATURE_ENTITY_TYPE</b>, <b>FEATURE_ENTITY_ID</b>,
 	* <b>FEATURE_FEATURE</b>, <b>FEATURE_FEATURE_NAME</b>,<b> FEATURE_ACTIVE</b>.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля:<b>ID</b>, <b>FEATURE_ID</b>, <b>OPERATION_ID, ROLE</b>, <b>FEATURE_ENTITY_TYPE</b>, <b>FEATURE_ENTITY_ID</b>,
 	* <b>FEATURE_FEATURE</b>, <b>FEATURE_FEATURE_NAME</b>,<b> FEATURE_ACTIVE</b>.
@@ -137,7 +138,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 	* удовлетворяющие условию выборки.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeaturesperms/GetByID.php">CSocNetFeaturesPerms::GetById</a>
 	* </li> </ul><br><br>
 	*
@@ -246,7 +247,7 @@ class CSocNetFeaturesPerms extends CAllSocNetFeaturesPerms
 		return $dbRes;
 	}
 	
-public static 	function GetAvaibleEntity($entityType, $feature, $role, $operation, $active, $visible, $siteID)
+	public static function GetAvaibleEntity($entityType, $feature, $role, $operation, $active, $visible, $siteID)
 	{
 		global $DB;
 		
@@ -292,4 +293,3 @@ public static 	function GetAvaibleEntity($entityType, $feature, $role, $operatio
 		return $dbRes;
 	}
 }
-?>

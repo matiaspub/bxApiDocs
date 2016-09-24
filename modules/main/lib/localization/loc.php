@@ -23,6 +23,25 @@ final class Loc
 	 * @param string $language
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает по коду соответствующее сообщение на текущем языке. Массивы соответствий кодов и сообщений задаются в языковых файлах. Перед использованием этой функции необходимо подключить соответствующий языковой файл ( <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/loadmessages.php">Loc::loadMessages(__FILE__)</a>).</p> <p>Аналог в старом ядре: <a href="https://forums.bitrix24.ru/forum17/topic11067/" >GetMessage</a></p>
+	*
+	*
+	* @param string $code  Код сообщения. Код должен быть уникальным в рамках всего
+	* продукта.
+	*
+	* @param array $replace = null Массив пар "шаблон" =&gt; "замена". Позволяет организовать замену по
+	* шаблону. Например, array("#NUM#"=&gt;5).
+	*
+	* @param string $language = null ID языка.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/getmessage.php
+	* @author Bitrix
+	*/
 	public static function getMessage($code, $replace = null, $language = null)
 	{
 		if($language === null)
@@ -57,6 +76,19 @@ final class Loc
 	 *
 	 * @param string $file
 	 */
+	
+	/**
+	* <p>Статический vетод загружает языковые сообщения для указанного файла, ищет первую папку <code>/lang</code> в пути наверх относительно переданного файла.</p> <p>Аналог методов <a href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includemodulelangfile.php" >IncludeModuleLangFile</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php" >IncludeTemplateLangFile</a> старого ядра.</p>
+	*
+	*
+	* @param string $file  Файл.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/loadmessages.php
+	* @author Bitrix
+	*/
 	public static function loadMessages($file)
 	{
 		if(($realPath = realpath($file)) !== false)
@@ -152,11 +184,31 @@ final class Loc
 	 * @param string $language
 	 * @return array
 	 */
-	public static function loadLanguageFile($file, $language = null)
+	
+	/**
+	* <p>Статический метод возвращает языковые сообщения для указанного файла.</p>
+	*
+	*
+	* @param string $file  Файл
+	*
+	* @param string $language = null ID языка
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/loadlanguagefile.php
+	* @author Bitrix
+	*/
+	public static function loadLanguageFile($file, $language = null, $normalize = true)
 	{
 		if($language === null)
 		{
 			$language = self::getCurrentLang();
+		}
+
+		if($normalize)
+		{
+			$file = Path::normalize($file);
 		}
 
 		if(!isset(self::$messages[$language]))
@@ -194,6 +246,21 @@ final class Loc
 	 * @param $file
 	 * @param null $language
 	 */
+	
+	/**
+	* <p>Статический метод загружает изменённые фразы из файла для перезаписи сообщений по их ID.</p>
+	*
+	*
+	* @param mixed $file  Файл с фразами
+	*
+	* @param null $language = null ID языка
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/loadcustommessages.php
+	* @author Bitrix
+	*/
 	public static function loadCustomMessages($file, $language = null)
 	{
 		if($language === null)
@@ -237,7 +304,7 @@ final class Loc
 		if($currentFile !== null && isset(self::$lazyLoadFiles[$currentFile]))
 		{
 			//in most cases we know the file containing the "code" - load it directly
-			self::loadLanguageFile($currentFile, $language);
+			self::loadLanguageFile($currentFile, $language, false);
 			unset(self::$lazyLoadFiles[$currentFile]);
 		}
 
@@ -249,7 +316,7 @@ final class Loc
 			{
 				do
 				{
-					self::loadLanguageFile($file, $language);
+					self::loadLanguageFile($file, $language, false);
 					$unset[] = $file;
 					if(isset(self::$messages[$language][$code]))
 					{
@@ -328,6 +395,19 @@ final class Loc
 	 * @param string $lang
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает язык-замену по умолчанию для других языков. Сообщение на языке по умолчанию используется если сообщение на выбранном языке не найдено.</p>
+	*
+	*
+	* @param string $lang  Сообщение на выбранном языке.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/localization/loc/getdefaultlang.php
+	* @author Bitrix
+	*/
 	public static function getDefaultLang($lang)
 	{
 		static $subst = array('ua'=>'ru', 'kz'=>'ru', 'ru'=>'ru');

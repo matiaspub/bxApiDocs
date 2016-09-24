@@ -1,30 +1,33 @@
-<?
+<?php
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/user_counter.php");
 
+
+/**
+ * <p>Для мобильной версии:</p> <pre class="syntax">BX.addCustomEvent("onPull", BX.delegate(function(data){    if (data.module_id == "main" &amp;&amp; data.command == 'user_counter' &amp;&amp; data.params[BX.message('SITE_ID')] &amp;&amp; data.params[BX.message('SITE_ID')]['__НАЗВАНИЕ_ВАШЕГО_СЧЕТЧИКА__'])       {       // вызвать код для обновления счетчика       // в data.params[BX.message('SITE_ID')]['__НАЗВАНИЕ_ВАШЕГО_СЧЕТЧИКА__'] будет новое значение счетчика    } }, this));</pre>
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusercounter/index.php
+ * @author Bitrix
+ */
 class CUserCounter extends CAllUserCounter
 {
 	
 	/**
-	* <p>Метод позволяет задать для счётчика произвольное число. Статичный метод.</p>
+	* <p>Метод позволяет задать для счётчика произвольное число. Статический метод.</p>
 	*
 	*
-	* @param user_i $d  Идентификатор пользователя
+	* @param  $site_id = SITE_ID Идентификатор пользователя
 	*
-	* @param cod $e  Код счётчика
+	* @param mixed $tag = "" Код счётчика
 	*
-	* @param valu $e  Устанавливаемое значение
-	*
-	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	* подставляется текущий сайт.
-	*
-	* @param ta $g = "" Необязательный. Используется для удаления сразу группы похожих
-	* счетчиков.
-	*
-	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter::Set($USER-&gt;GetID(), 'code2', 100500);
 	* </pre>
 	*
@@ -101,30 +104,21 @@ class CUserCounter extends CAllUserCounter
 
 	
 	/**
-	* <p>Метод позволяет увеличить счётчик пользователя на нужное значение. Статичный метод.</p>
+	* <p>Метод позволяет увеличить счётчик пользователя на нужное значение. Статический метод.</p>
 	*
 	*
-	* @param user_i $d  Идентификатор пользователя
+	* @param  $site_id = SITE_ID Идентификатор пользователя
 	*
-	* @param cod $e  Код счётчика
+	* @param  $sendPull = true Код счётчика
 	*
-	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
+	* @param  $increment = 1 Идентификатор сайта, необязательный параметр. По умолчанию
 	* подставляется текущий сайт.
 	*
-	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
-	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
-	* установке модуля и активации работы с "Сервером очередей", без
-	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
-	* данный счетчик не требуется пробрасывать, необходимо указать
-	* <i>false</i>. По умолчанию <i>true</i>.
-	*
-	* @param incremen $t = 1 Значение, на которое нужно увеличить счетчик.
-	*
-	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter::Increment($USER-&gt;GetID(), 'code1');
 	* </pre>
 	*
@@ -181,33 +175,39 @@ class CUserCounter extends CAllUserCounter
 	}
 
 	/**
-	* @deprecated
-	*/
+	 * @deprecated
+	 * @param $user_id
+	 * @param $code
+	 * @param string $site_id
+	 * @param bool $sendPull
+	 * @param int $decrement
+	 * @return bool
+	 */
 	
 	/**
-	* <p>Метод осуществляет уменьшение счетчика на нужное значение. Статичный метод.</p>
+	* <p>Метод осуществляет уменьшение счетчика на нужное значение. Статический метод.</p>
 	*
 	*
-	* @param user_i $d  Описание параметра </ht
+	* @param mixed $user_id  Описание параметра
 	*
-	* @param cod $e  Описание необязательного параметра
+	* @param user_i $code  Описание необязательного параметра
 	*
-	* @param site_i $d = SITE_ID Необязательный. По умолчанию равен SITE_ID.
+	* @param cod $site_id = SITE_ID Необязательный. По умолчанию равен SITE_ID.
 	*
-	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
+	* @param mixed $sendPull = true Необязательный. Отправлять ли мгновенно данные в модуль
 	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
 	* установке модуля и активации работы с "Сервером очередей", без
 	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
 	* данный счетчик не требуется пробрасывать, необходимо указать
 	* <i>false</i>. По умолчанию <i>true</i>.
 	*
-	* @param decremen $t = 1 Значение, на которое нужно уменьшить счетчик.
+	* @param mixed $decrement = 1 Значение, на которое нужно уменьшить счетчик.
 	*
-	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter::Decrement($USER-&gt;GetID(), 'code1');
 	* </pre>
 	*
@@ -271,7 +271,10 @@ class CUserCounter extends CAllUserCounter
 
 		if (strlen($sub_select) > 0)
 		{
-			$pullInclude = $sendPull && self::CheckLiveMode();
+			$pullInclude = (
+				$sendPull
+				&& self::CheckLiveMode()
+			);
 
 			if (
 				is_array($arParams)
@@ -279,7 +282,7 @@ class CUserCounter extends CAllUserCounter
 			)
 			{
 				$strSQL = "
-					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT, TAG) (".$sub_select.")
+					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT, TAG".(is_array($arParams) && isset($arParams["SET_TIMESTAMP"]) ? ", TIMESTAMP_X" : "").") (".$sub_select.")
 					ON DUPLICATE KEY UPDATE CNT = CNT + VALUES(CNT), SENT = VALUES(SENT), TAG = '".$DB->ForSQL($arParams["TAG_SET"])."'
 				";
 			}
@@ -289,7 +292,7 @@ class CUserCounter extends CAllUserCounter
 			)
 			{
 				$strSQL = "
-					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT) (".$sub_select.")
+					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT".(is_array($arParams) && isset($arParams["SET_TIMESTAMP"]) ? ", TIMESTAMP_X" : "").") (".$sub_select.")
 					ON DUPLICATE KEY UPDATE CNT = CASE
 						WHEN
 							TAG = '".$DB->ForSQL($arParams["TAG_CHECK"])."'
@@ -312,7 +315,7 @@ class CUserCounter extends CAllUserCounter
 			else
 			{
 				$strSQL = "
-					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT) (".$sub_select.")
+					INSERT INTO b_user_counter (USER_ID, CNT, SITE_ID, CODE, SENT".(is_array($arParams) && isset($arParams["SET_TIMESTAMP"]) ? ", TIMESTAMP_X" : "").") (".$sub_select.")
 					ON DUPLICATE KEY UPDATE CNT = CNT + VALUES(CNT), SENT = VALUES(SENT)
 				";
 			}
@@ -321,7 +324,13 @@ class CUserCounter extends CAllUserCounter
 
 			if (
 				!is_array($arParams)
-				|| !isset($arParams["TAG_SET"])
+				|| (
+					!isset($arParams["TAG_SET"])
+					&& (
+						!isset($arParams["CLEAN_CACHE"])
+						|| $arParams["CLEAN_CACHE"] != "N"
+					)
+				)
 			)
 			{
 				self::$counters = false;
@@ -330,43 +339,53 @@ class CUserCounter extends CAllUserCounter
 
 			if ($pullInclude)
 			{
-				$db_lock = $DB->Query("SELECT GET_LOCK('".$APPLICATION->GetServerUniqID()."_pull', 0) as L");
-				$ar_lock = $db_lock->Fetch();
-				if($ar_lock["L"] > 0)
+				$arSites = Array();
+				$res = CSite::GetList($b = "", $o = "", Array("ACTIVE" => "Y"));
+				while($row = $res->Fetch())
 				{
-					$arSites = Array();
-					$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
-					while($row = $res->Fetch())
-					{
-						$arSites[] = $row['ID'];
-					}
+					$arSites[] = $row['ID'];
+				}
 
-					$strSQL = "
-						SELECT distinct pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				if (
+					!empty($arParams["USERS_TO_PUSH"])
+					&& is_array($arParams["USERS_TO_PUSH"])
+				)
+				{
+					$db_lock = $DB->Query("SELECT GET_LOCK('".$APPLICATION->GetServerUniqID()."_pull', 0) as L");
+					$ar_lock = $db_lock->Fetch();
+					if($ar_lock["L"] > 0)
+					{
+						$strSQL = "
+						SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
 						FROM b_user_counter uc
 						INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
-						WHERE uc.SENT = '0'
+						WHERE uc.SENT = '0' AND uc.USER_ID IN (".implode(", ", $arParams["USERS_TO_PUSH"]).")
 					";
 
-					$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+						$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 
-					$pullMessage = Array();
-					while($row = $res->Fetch())
-					{
-						CUserCounter::addValueToPullMessage($row, $arSites, $pullMessage);
+						$pullMessage = Array();
+						while($row = $res->Fetch())
+						{
+							CUserCounter::addValueToPullMessage($row, $arSites, $pullMessage);
+						}
+
+						$DB->Query("UPDATE b_user_counter SET SENT = '1' WHERE SENT = '0' AND CODE NOT LIKE '**L%'");
+						$DB->Query("SELECT RELEASE_LOCK('".$APPLICATION->GetServerUniqID()."_pull')");
+						foreach ($pullMessage as $channelId => $arMessage)
+						{
+							CPullStack::AddByChannel($channelId, Array(
+								'module_id' => 'main',
+								'command' => 'user_counter',
+								'expiry' => 3600,
+								'params' => $arMessage,
+							));
+						}
 					}
-
-					$DB->Query("UPDATE b_user_counter SET SENT = '1' WHERE SENT = '0' AND CODE NOT LIKE '**L%'");
-					$DB->Query("SELECT RELEASE_LOCK('".$APPLICATION->GetServerUniqID()."_pull')");
-
-					foreach ($pullMessage as $channelId => $arMessage)
-					{
-						CPullStack::AddByChannel($channelId, Array(
-							'module_id' => 'main',
-							'command' => 'user_counter',
-							'params' => $arMessage,
-						));
-					}
+				}
+				else
+				{
+					CUserCounterPage::setNewEvent();
 				}
 			}
 		}
@@ -374,28 +393,18 @@ class CUserCounter extends CAllUserCounter
 
 	
 	/**
-	* <p>Метод обнуляет данные счётчика. Статичный метод.</p>
+	* <p>Метод обнуляет данные счётчика. Нестатический метод.</p>
 	*
 	*
-	* @param user_i $d  Идентификатор пользователя
+	* @param  $site_id = SITE_ID Идентификатор пользователя
 	*
-	* @param cod $e  Код счётчика
+	* @param mixed $sendPull = true Код счётчика
 	*
-	* @param site_i $d = SITE_ID Идентификатор сайта, необязательный параметр. По умолчанию
-	* подставляется текущий сайт.
-	*
-	* @param sendPul $l = true Необязательный. Отправлять ли мгновенно данные в модуль
-	* <b>Push&amp;Pull</b>, для работы "живых счетчиков" (отправка доступна при
-	* установке модуля и активации работы с "Сервером очередей", без
-	* сервера очередей работает с версии модуля <b>Push&amp;Pull</b> 12.5.4) Если
-	* данный счетчик не требуется пробрасывать, необходимо указать
-	* <i>false</i>. По умолчанию <i>true</i>.
-	*
-	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p> <a
+	* @return mixed <p>Возвращает <i>true</i>, если действие успешно, <i>false</i> - если нет.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CUserCounter::Clear($USER-&gt;GetID(), "code3");
 	* </pre>
 	*
@@ -406,7 +415,7 @@ class CUserCounter extends CAllUserCounter
 	*/
 	public static function Clear($user_id, $code, $site_id = SITE_ID, $sendPull = true, $bMultiple = false)
 	{
-		global $DB, $CACHE_MANAGER;
+		global $DB, $CACHE_MANAGER, $APPLICATION;
 
 		$user_id = intval($user_id);
 		if (
@@ -453,8 +462,15 @@ class CUserCounter extends CAllUserCounter
 					AND CODE LIKE '".$DB->ForSQL($code)."L%'
 				";
 
-			$DB->Query($strDeleteSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-			$DB->Query($strUpsertSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			$db_lock = $DB->Query("SELECT GET_LOCK('".$APPLICATION->GetServerUniqID()."_counter_delete', 25) as L");
+			$ar_lock = $db_lock->Fetch();
+			if($ar_lock["L"] > 0)
+			{
+				$DB->Query($strDeleteSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+				$DB->Query($strUpsertSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+				$DB->Query("SELECT RELEASE_LOCK('".$APPLICATION->GetServerUniqID()."_counter_delete')");
+			}
 		}
 		else
 		{
@@ -470,7 +486,7 @@ class CUserCounter extends CAllUserCounter
 
 			$strSQL .= " ON DUPLICATE KEY UPDATE CNT = 0, LAST_DATE = ".$DB->CurrentTimeFunction();
 
-			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			$DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		}
 
 		if (self::$counters && self::$counters[$user_id])
@@ -500,7 +516,6 @@ class CUserCounter extends CAllUserCounter
 		return true;
 	}
 
-
 	public static function DeleteByCode($code)
 	{
 		global $DB, $APPLICATION, $CACHE_MANAGER;
@@ -521,15 +536,15 @@ class CUserCounter extends CAllUserCounter
 			{
 				$bPullEnabled = true;
 
-				$arSites = Array();
-				$res = CSite::GetList(($b = ""), ($o = ""), Array("ACTIVE" => "Y"));
+				$arSites = array();
+				$res = CSite::GetList($b = "", $o = "", array("ACTIVE" => "Y"));
 				while($row = $res->Fetch())
 				{
 					$arSites[] = $row['ID'];
 				}
 
 				$strSQL = "
-					SELECT distinct pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+					SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
 					FROM b_user_counter uc
 					INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
 					WHERE uc.CODE LIKE '**%'
@@ -564,9 +579,12 @@ class CUserCounter extends CAllUserCounter
 			CPullStack::AddByChannel($channelId, Array(
 				'module_id' => 'main',
 				'command' => 'user_counter',
+				'expiry' 	=> 3600,
 				'params' => $arMessage,
 			));
 		}
+
+		return null;
 	}
 
 	protected static function dbIF($condition, $yes, $no)
@@ -580,4 +598,80 @@ class CUserCounter extends CAllUserCounter
 		return self::Clear($user_id, $code, $site_id, true, $bMultiple);
 	}
 }
-?>
+
+class CUserCounterPage extends CAllUserCounterPage
+{
+	public static function checkSendCounter()
+	{
+		global $DB;
+
+		$uniq = CMain::GetServerUniqID();
+		$db_lock = $DB->Query("SELECT GET_LOCK('".$uniq."_counterpull', 0) as L");
+		$ar_lock = $db_lock->Fetch();
+		if($ar_lock["L"] == "0")
+		{
+			return;
+		}
+
+		$arSites = array();
+		$res = CSite::GetList($b = "", $o = "", array("ACTIVE" => "Y"));
+		while($row = $res->Fetch())
+		{
+			$arSites[] = $row['ID'];
+		}
+
+		$userSQL = "SELECT USER_ID FROM b_user_counter WHERE SENT='0' GROUP BY USER_ID LIMIT ".intval(CAllUserCounterPage::getPageSizeOption(100));
+		$res = $DB->Query($userSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+		$userString = '';
+		$pullMessage = array();
+
+		while($row = $res->Fetch())
+		{
+			$userString .= ($userString <> ''? ', ' : '').intval($row["USER_ID"]);
+		}
+
+		if ($userString <> '')
+		{
+			$strSQL = "
+				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				FROM b_user_counter uc
+				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+				WHERE uc.USER_ID IN (".$userString.") AND uc.CODE NOT LIKE '**L%' AND uc.SENT = '0'
+			";
+
+			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			while($row = $res->Fetch())
+			{
+				CUserCounter::addValueToPullMessage($row, $arSites, $pullMessage);
+			}
+
+			$strSQL = "
+				SELECT pc.CHANNEL_ID, uc.USER_ID, uc.SITE_ID, uc.CODE, uc.CNT
+				FROM b_user_counter uc
+				INNER JOIN b_pull_channel pc ON pc.USER_ID = uc.USER_ID
+				WHERE uc.USER_ID IN (".$userString.") AND uc.CODE LIKE '**L%'
+			";
+
+			$res = $DB->Query($strSQL, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+			while($row = $res->Fetch())
+			{
+				CUserCounter::addValueToPullMessage($row, $arSites, $pullMessage);
+			}
+
+			$DB->Query("UPDATE b_user_counter SET SENT = '1' WHERE SENT = '0' AND USER_ID IN (".$userString.")");
+		}
+
+		$DB->Query("SELECT RELEASE_LOCK('".$uniq."_counterpull')");
+
+		foreach ($pullMessage as $channelId => $arMessage)
+		{
+			CPullStack::AddByChannel($channelId, Array(
+				'module_id' => 'main',
+				'command' => 'user_counter',
+				'expiry' => 3600,
+				'params' => $arMessage,
+			));
+		}
+	}
+}

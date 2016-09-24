@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети. 
+ * <b>CSocNetSmile</b> - класс для работы со смайлами социальной сети.
  *
  *
  * @return mixed 
@@ -116,13 +116,13 @@ class CAllSocNetSmile
 
 	
 	/**
-	* <p>Метод удаляет смайл.</p>
+	* <p>Метод удаляет смайл. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код смайла
+	* @param int $intid  Код смайла
 	*
-	* @return bool <p>True в случае успешного выполнения и false - в противном случае.</p>
-	* <br><br>
+	* @return bool <p>True в случае успешного выполнения и false - в противном
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/Delete.php
@@ -142,16 +142,16 @@ class CAllSocNetSmile
 
 	
 	/**
-	* <p>Возвращает массив языконезависимых параметров смайла.</p>
+	* <p>Возвращает массив языконезависимых параметров смайла. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код смайла.
+	* @param int $intid  Код смайла.
 	*
 	* @return array <p>Массив с ключами:<br><b>ID</b> - код смайла,<br><b>SORT</b> - индекс
 	* сортировки,<br><b>SMILE_TYPE</b> - тип смайла,<br><b>TYPING</b> - написание
 	* смайла,<br><b>IMAGE</b> - изображение,<br><b>IMAGE_WIDTH</b> - ширина
 	* изображения,<br><b>IMAGE_HEIGHT</b> - высота изображения,<br><b>DESCRIPTION</b> -
-	* описание.</p> <br><br>
+	* описание.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/getbyid.php
@@ -178,10 +178,10 @@ class CAllSocNetSmile
 
 	
 	/**
-	* <p>Возвращает параметры смайла.</p>
+	* <p>Возвращает параметры смайла. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Код смайла.
+	* @param int $intid  Код смайла.
 	*
 	* @param string $strLang  Код языка.
 	*
@@ -190,7 +190,7 @@ class CAllSocNetSmile
 	* смайла,<br><b>TYPING</b> - написание смайла,<br><b>IMAGE</b> - изображение
 	* смайла,<br><b>IMAGE_WIDTH</b> - ширина изображения,<br><b>IMAGE_HEIGHT</b> - высота
 	* изображения,<br><b>NAME</b> - название смайла,<br><b>DESCRIPTION</b> - описание
-	* смайла.</p> <br><br>
+	* смайла.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/GetByIDEx.php
@@ -218,15 +218,15 @@ class CAllSocNetSmile
 
 	
 	/**
-	* <p>Возвращает языкозависимые параметры смайла.</p>
+	* <p>Возвращает языкозависимые параметры смайла. Метод нестатический.</p>
 	*
 	*
-	* @param int $id  Идентификатор смайла.
+	* @param int $intid  Идентификатор смайла.
 	*
 	* @param string $strLang  Код языка.
 	*
 	* @return array <p>Массив языкозависимых параметров смайлов с ключами:<br> ID - код,<br>
-	* NAME - название. </p> <br><br>
+	* NAME - название. </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetsmile/getlangbyid.php

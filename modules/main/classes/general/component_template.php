@@ -12,12 +12,24 @@ global $arBXRuntimeTemplateEngines;
 $arBXAvailableTemplateEngines = array(
 	"php" => array(
 		"templateExt" => array("php"),
-		"function" => ""
+		"function" => "",
+		"sort" => 100
 	)
 );
 
 $arBXRuntimeTemplateEngines = false;
 
+
+/**
+ * <p>С версии 15.5.1 стало возможным использования внешних файлов css без дополнительных манипуляций с кодом. Для этого достаточно в файле <b>template.php</b> нужного компонента прописать:</p> <pre class="syntax">$this-&gt;addExternalCss("/local/styles.css"); $this-&gt;addExternalJS("/local/liba.js");</pre> <br><table width="100%" class="tnormal"><tbody> <tr> <th width="25%">Метод</th> 	<th>Описание</th> <th>С версии</th> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getsitetemplate.php">GetSiteTemplate</a></td> <td>Метод возвращает шаблон сайта, в котором лежит шаблон компонента. </td> <td></td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getname.php">GetName</a></td> <td>Метод возвращает имя шаблона компонента. </td> <td></td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfolder.php">GetFolder</a></td> <td>Метод возвращает путь к папке шаблона относительно корня сайта.</td> <td></td> </tr> <tr> <td><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/getfile.php">GetFile</a></td> <td>Метод возвращает путь к файлу шаблона относительно корня сайта.</td> <td></td> </tr> <tr> <td>addExternalCss</td> <td>Метод для подключения стороннего css.</td> <td>15.5.1</td> </tr> <tr> <td>addExternalJs</td> <td>Метод для подключения стороннего JS.</td> <td>15.5.1</td> </tr> </tbody></table> <br><br>
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbitrixcomponenttemplate/index.php
+ * @author Bitrix
+ */
 class CBitrixComponentTemplate
 {
 	public $__name = "";
@@ -39,7 +51,7 @@ class CBitrixComponentTemplate
 	public $__bInited = false;
 	private $__view = array();
 	private $frames = array();
-	private $frameMode = false;
+	private $frameMode = null;
 
 	private $languageId = false;
 	private $externalCss = array();
@@ -68,17 +80,16 @@ class CBitrixComponentTemplate
 	 */
 	
 	/**
-	* <p>Метод возвращает имя шаблона компонента. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Метод возвращает имя шаблона компонента. Нестатический метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* // В коде компонента
 	* $template = &amp; $this-&gt;GetTemplate();
 	* $templateName = $template-&gt;GetName();
-	* </h
 	* </pre>
 	*
 	*
@@ -122,18 +133,16 @@ class CBitrixComponentTemplate
 	 */
 	
 	/**
-	* <p>Метод возвращает путь к файлу шаблона относительно корня сайта. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Метод возвращает путь к файлу шаблона относительно корня сайта. Нестатический метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* // В коде компонента
 	* $template = &amp; $this-&gt;GetTemplate();
 	* $templateFile = $template-&gt;GetFile();
-	* 
-	* </h
 	* </pre>
 	*
 	*
@@ -160,18 +169,16 @@ class CBitrixComponentTemplate
 	 */
 	
 	/**
-	* <p>Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Метод возвращает путь к папке шаблона относительно корня сайта, если шаблон лежит в папке. Если шаблон представляет собой самостоятельный файл, то метод возвращает пустую строку. Нестатический метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* // В коде компонента
 	* $template = &amp; $this-&gt;GetTemplate();
 	* $templateFolder = $template-&gt;GetFolder();
-	* 
-	* </h
 	* </pre>
 	*
 	*
@@ -198,17 +205,16 @@ class CBitrixComponentTemplate
 	 */
 	
 	/**
-	* <p>Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Метод возвращает шаблон сайта, в котором лежит шаблон компонента. Если это системный шаблон компонента (т.е. лежит в папке компонента), то возвращается пустая строка. Нестатический метод.</p> <a name="examples"></a>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* // В коде компонента
 	* $template = &amp; $this-&gt;GetTemplate();
 	* $siteTemplate = $template-&gt;GetSiteTemplate();
-	* </h
 	* </pre>
 	*
 	*
@@ -357,14 +363,20 @@ class CBitrixComponentTemplate
 			{
 				foreach($arData["frames"] as $frameState)
 				{
-					\Bitrix\Main\Page\FrameHelper::applyCachedData($frameState);
+					\Bitrix\Main\Page\FrameStatic::applyCachedData($frameState);
 				}
 			}
 
-			if (array_key_exists("frameMode", $arData) && $arData["frameMode"] === false)
+			if (array_key_exists("frameMode", $arData))
 			{
-				$context = isset($arData["frameModeCtx"]) ? "(from component cache) ".$arData["frameModeCtx"] : "";
-				\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($context);
+				$this->setFrameMode($arData["frameMode"]);
+
+				if ($this->getFrameMode() === false)
+				{
+					$context = isset($arData["frameModeCtx"]) ? "(from component cache) ".$arData["frameModeCtx"] : "";
+					\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($context);
+				}
+
 			}
 
 			if (isset($arData["externalCss"]))
@@ -415,6 +427,8 @@ class CBitrixComponentTemplate
 		{
 			$arBXAvailableTemplateEngines = $arBXAvailableTemplateEngines + $arTemplateEngines;
 		}
+
+		\Bitrix\Main\Type\Collection::sortByColumn($arBXAvailableTemplateEngines, "sort", "", 200);
 
 		$arBXRuntimeTemplateEngines = array();
 
@@ -474,7 +488,7 @@ class CBitrixComponentTemplate
 		$this->__name = preg_replace("'[\\\\/]+'", "/", $this->__name);
 		$this->__name = trim($this->__name, "/");
 
-		if (!$this->CheckName($this->__name))
+		if (!self::CheckName($this->__name))
 			$this->__name = ".default";
 
 		$this->__page = $this->__component->GetTemplatePage();
@@ -499,7 +513,7 @@ class CBitrixComponentTemplate
 	 *
 	 * @return boolean
 	 */
-	static public function CheckName($name)
+	public static function CheckName($name)
 	{
 		return preg_match("#^([A-Za-z0-9_.-]+)(/[A-Za-z0-9_.-]+)?$#i", $name) > 0;
 	}
@@ -520,7 +534,7 @@ class CBitrixComponentTemplate
 			$this->InitTemplateEngines();
 
 		$filePath = $_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".php";
-		if (file_exists($filePath) && is_file($filePath))
+		if (count($arBXRuntimeTemplateEngines) === 1 && file_exists($filePath) && is_file($filePath))
 		{
 			return $fileName.".php";
 		}
@@ -528,9 +542,6 @@ class CBitrixComponentTemplate
 		{
 			foreach ($arBXRuntimeTemplateEngines as $templateExt => $engineID)
 			{
-				if ($templateExt == "php")
-					continue;
-
 				$filePath = $_SERVER["DOCUMENT_ROOT"].$path."/".$fileName.".".$templateExt;
 				if (file_exists($filePath) && is_file($filePath))
 				{
@@ -796,7 +807,7 @@ class CBitrixComponentTemplate
 				$frame->end();
 		}
 
-		if (!$this->frameMode)
+		if (!$this->getFrameMode())
 		{
 			\Bitrix\Main\Data\StaticHtmlCache::applyComponentFrameMode($this->__file);
 		}
@@ -1172,7 +1183,41 @@ class CBitrixComponentTemplate
 	 */
 	public function setFrameMode($mode)
 	{
-		$this->frameMode = ($mode === true);
+		if (in_array($mode, array(true, false, null), true))
+		{
+			$this->frameMode = $mode;
+		}
+	}
+
+	/**
+	 * Returns frame mode
+	 * @return bool
+	 */
+	public function getFrameMode()
+	{
+		if ($this->frameMode !== null)
+		{
+			return $this->frameMode;
+		}
+
+		if (!$this->__component)
+		{
+			//somebody has stolen the instance of component
+			return false;
+		}
+
+		$frameMode = $this->__component->getDefaultFrameMode();
+		if ($frameMode === null)
+		{
+			$frameMode = false;
+		}
+
+		return $frameMode;
+	}
+
+	public function getRealFrameMode()
+	{
+		return $this->frameMode;
 	}
 
 	/**
@@ -1195,7 +1240,7 @@ class CBitrixComponentTemplate
 		$this->frameMode = true;
 		if ($id === null)
 			$id = $this->randString();
-		$frame = new Bitrix\Main\Page\FrameHelper($id, $autoContainer);
+		$frame = new Bitrix\Main\Page\FrameBuffered($id, $autoContainer);
 		array_unshift($this->frames, $frame);
 		return $frame;
 	}

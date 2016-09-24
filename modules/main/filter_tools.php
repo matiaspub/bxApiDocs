@@ -30,7 +30,7 @@ IncludeModuleLangFile(__FILE__);
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * <b>CheckFilterDates</b>("10.01.2003", "15.02.2004", $date1_wrong, $date2_wrong, $date2_less);
  * if ($date1_wrong=="Y") echo "Неверный формат первой даты!";
@@ -70,7 +70,7 @@ function CheckFilterDates($date1, $date2, &$date1_wrong, &$date2_wrong, &$date2_
  *
  * @param array $vars  Массив имен переменных фильтра.
  *
- * @param string $id  Идентификатор фильтра. Строка идентифицирующая данный фильтр в
+ * @param array $stringid  Идентификатор фильтра. Строка идентифицирующая данный фильтр в
  * сессионном массиве: $_SESSION["SESS_ADMIN"][<i>id</i>]
  *
  * @param string $action = "set" Что необходимо сделать: запомнить значения или получить значения
@@ -88,7 +88,7 @@ function CheckFilterDates($date1, $date2, &$date1_wrong, &$date2_wrong, &$date2_
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * $FilterArr = Array(
  *     "find_id",
@@ -200,7 +200,7 @@ function InitFilterEx($arName, $varName, $action="set", $session=true, $FilterLo
  *
  * @param array $vars  Массив имен переменных фильтра.
  *
- * @param string $id  Идентификатор фильтра. Строка идентифицирующая данный фильтр в
+ * @param array $stringid  Идентификатор фильтра. Строка идентифицирующая данный фильтр в
  * сессионном массиве: $_SESSION["SESS_ADMIN"][<i>id</i>]
  *
  * @param bool $session = true Использовать ли сессию. Если значение данного параметра равно
@@ -210,7 +210,7 @@ function InitFilterEx($arName, $varName, $action="set", $session=true, $FilterLo
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * $FilterArr = Array(
  *     "find_id",
@@ -314,20 +314,20 @@ function DelFilter($arName)
  *
  * @param array $button = array("filter"=>"Y" В данном параметре можно передать массив, представляющий из себя
  * имя и значение произвольных переменных, которые будут добавлены
- * в результат. Структура данного массива: <pre>array("ИМЯ_ПЕРЕМЕННОЙ" =&gt;
- * "ЗНАЧЕНИЕ_ПЕРЕМЕННОЙ")</pre> Как правило данный параметр используют
+ * в результат. Структура данного массива: <pre bgcolor="#323232" style="padding:5px;">array("ИМЯ_ПЕРЕМЕННОЙ" =&gt;
+ * "ЗНАЧЕНИЕ_ПЕРЕМЕННОЙ")</pre> 	Как правило данный параметр используют
  * для передачи имени и значения кнопки "Установить фильтр".<br>
- * Параметр необязательный. По умолчанию - array("filter" =&gt; "Y", "set_filter" =&gt;
+ * 	Параметр необязательный. По умолчанию - array("filter" =&gt; "Y", "set_filter" =&gt;
  * "Y").
  *
- * @param set_filte $r  
+ * @param mixed $set_filter  
  *
- * @param  $Y  
+ * @param set_filte $set_filteY  
  *
  * @return string 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;form method="GET"&gt;
  *     &lt;?
  *     // добавим набор тэгов hidden имена которых будут начинаться с префикса "filter_"
@@ -417,20 +417,20 @@ function GetFilterHiddens($var = "filter_", $button = array("filter" => "Y", "se
  *
  * @param array $button = array("filter"=>"Y" В данном параметре можно передать массив, представляющий из себя
  * имя и значение произвольных переменных, которые будут добавлены
- * в результат. Структура данного массива: <pre>array("ИМЯ_ПЕРЕМЕННОЙ" =&gt;
- * "ЗНАЧЕНИЕ_ПЕРЕМЕННОЙ")</pre> Как правило данный параметр используют
+ * в результат. Структура данного массива: <pre bgcolor="#323232" style="padding:5px;">array("ИМЯ_ПЕРЕМЕННОЙ" =&gt;
+ * "ЗНАЧЕНИЕ_ПЕРЕМЕННОЙ")</pre> 	Как правило данный параметр используют
  * для передачи имени и значения кнопки "Установить фильтр".<br>
- * Параметр необязательный. По умолчанию - array("filter" =&gt; "Y", "set_filter" =&gt;
+ * 	Параметр необязательный. По умолчанию - array("filter" =&gt; "Y", "set_filter" =&gt;
  * "Y").
  *
- * @param set_filte $r  
+ * @param mixed $set_filter  
  *
- * @param  $Y  
+ * @param set_filte $set_filteY  
  *
  * @return string 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // Данный код строит ссылку, при переходе по которой пользователь 
  * // попадет на страницу adv.php с теми же переменными, 
@@ -913,7 +913,7 @@ return $s;
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // если переменные $by и $order явно заданы, то их значения запоминаются в сессии
  * // иначе они инициализируется значениями хранимыми в сессии
@@ -967,7 +967,7 @@ function InitSorting($Path=false, $sByVar="by", $sOrderVar="order")
  * <p>Возвращает HTML, представляющий из себя "стрелки" сортировки. Функция как правило используется в шапке таблиц.</p>
  *
  *
- * @param string $by  Значение которое будет передано в переменную <i>by_var</i>. Как правило
+ * @param mixed $stringby  Значение которое будет передано в переменную <i>by_var</i>. Как правило
  * в данном параметре указывается идентификатор поля для
  * сортировки.
  *
@@ -989,7 +989,7 @@ function InitSorting($Path=false, $sByVar="by", $sOrderVar="order")
  * @return string 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;table&gt;
  *     &lt;tr&gt; 
  *         &lt;td&gt;ID&lt;br&gt;&lt;?=<b>SortingEx</b>("s_id")?&gt;&lt;/td&gt;

@@ -12,10 +12,10 @@ class CBPRestActivity
 	implements IBPEventActivity, IBPActivityExternalEventListener
 {
 	const TOKEN_SALT = 'bizproc';
+	const PROPERTY_NAME_PREFIX = 'property_';
 	const REST_ACTIVITY_ID = 0;
 	protected static $restActivityData = array();
 
-	protected $isInEventActivityMode = false;
 	protected $subscriptionId = 0;
 	protected $eventId;
 
@@ -37,9 +37,9 @@ class CBPRestActivity
 		$activityData = self::getRestActivityData();
 		$this->arProperties = array(
 			'Title' => '',
-			'UseSubscription' => $activityData['USE_SUBSCRIPTION'] == 'Y' ? 'Y' : 'N',
+			'UseSubscription' => isset($activityData['USE_SUBSCRIPTION']) && $activityData['USE_SUBSCRIPTION'] == 'Y' ? 'Y' : 'N',
 			'IsTimeout' => 0,
-			'AuthUserId' => $activityData['AUTH_USER_ID'],
+			'AuthUserId' => isset($activityData['AUTH_USER_ID']) ? 'user_'.$activityData['AUTH_USER_ID'] : null,
 			'SetStatusMessage' => 'Y',
 			'StatusMessage' => '',
 			'TimeoutDuration' => 0,
@@ -96,7 +96,9 @@ class CBPRestActivity
 	public function Execute()
 	{
 		$activityData = $this->getRestActivityData();
-		if (!$activityData || !Loader::includeModule('rest'))
+		if (!$activityData)
+			throw new Exception(Loc::getMessage('BPRA_NOT_FOUND_ERROR'));
+		if (!Loader::includeModule('rest') || !\Bitrix\Rest\OAuthService::getEngine()->isRegistered())
 			return CBPActivityExecutionStatus::Closed;
 
 		$propertiesData = array();
@@ -108,38 +110,62 @@ class CBPRestActivity
 			}
 		}
 
-		$auth = null;
-		$userId = $this->AuthUserId;
-
-		if ($userId > 0)
+		$session = \Bitrix\Rest\Event\Session::get();
+		if(!$session)
 		{
-			$auth = CRestUtil::getAuthForEvent(
-				$activityData['APP_ID'],
-				$userId,
-				array(
-					'WORKFLOW_ID' => $this->getWorkflowInstanceId(),
-					'ACTIVITY_NAME' => $this->name,
-					'CODE' => $activityData['CODE'],
-				)
-			);
+			throw new Exception('Rest session error');
 		}
+
+		$dbRes = \Bitrix\Rest\AppTable::getList(array(
+			'filter' => array(
+				'=CLIENT_ID' => $activityData['APP_ID'],
+			)
+		));
+		$application = $dbRes->fetch();
+
+		$appStatus = \Bitrix\Rest\AppTable::getAppStatusInfo($application, '');
+		if($appStatus['PAYMENT_ALLOW'] === 'N')
+		{
+			throw new Exception('Rest application status error: payment required');
+		}
+
+		$userId = CBPHelper::ExtractUsers($this->AuthUserId, $this->GetDocumentId(), true);
+
+		$auth = array(
+			'WORKFLOW_ID' => $this->getWorkflowInstanceId(),
+			'ACTIVITY_NAME' => $this->name,
+			'CODE' => $activityData['CODE'],
+			\Bitrix\Rest\Event\Session::PARAM_SESSION => $session,
+			\Bitrix\Rest\OAuth\Auth::PARAM_LOCAL_USER => $userId,
+			"application_token" => \CRestUtil::getApplicationToken($application),
+		);
 
 		$this->eventId = \Bitrix\Main\Security\Random::getString(32, true);
 
 		$queryItems = array(
-			Sqs::queryItem($activityData['HANDLER'],
+			Sqs::queryItem(
+				$activityData['APP_ID'],
+				$activityData['HANDLER'],
 				array(
 					'workflow_id' => $this->getWorkflowInstanceId(),
 					'code' => $activityData['CODE'],
+					'document_id' => $this->GetDocumentId(),
 					'event_token' => self::generateToken($this->getWorkflowInstanceId(), $this->name, $this->eventId),
 					'properties' => $propertiesData,
-					'auth' => $auth,
+					'use_subscription' => $this->UseSubscription,
+					'timeout_duration' => $this->CalculateTimeoutDuration(),
 					'ts' => time(),
+				),
+				$auth,
+				array(
+					"sendAuth" => true,
+					"sendRefreshToken" => false,
+					"category" => Sqs::CATEGORY_BIZPROC,
 				)
 			),
 		);
 
-		Sqs::query($queryItems);
+		\Bitrix\Rest\OAuthService::getEngine()->getClient()->sendEvent($queryItems);
 
 		if ($this->SetStatusMessage == 'Y')
 		{
@@ -149,11 +175,10 @@ class CBPRestActivity
 			$this->SetStatusTitle($message);
 		}
 
-		if ($this->isInEventActivityMode || $this->UseSubscription != 'Y')
+		if ($this->UseSubscription != 'Y')
 			return CBPActivityExecutionStatus::Closed;
 
 		$this->Subscribe($this);
-		$this->isInEventActivityMode = false;
 
 		return CBPActivityExecutionStatus::Executing;
 	}
@@ -163,8 +188,6 @@ class CBPRestActivity
 	{
 		if ($eventHandler == null)
 			throw new Exception('eventHandler');
-
-		$this->isInEventActivityMode = true;
 
 		$timeoutDuration = $this->CalculateTimeoutDuration();
 		if ($timeoutDuration > 0)
@@ -197,23 +220,20 @@ class CBPRestActivity
 
 	public function OnExternalEvent($eventParameters = array())
 	{
-		if (
-			$this->executionStatus == CBPActivityExecutionStatus::Closed
-			|| $this->eventId !== (string) $eventParameters['EVENT_ID']
-		)
+		if ($this->executionStatus == CBPActivityExecutionStatus::Closed)
 			return;
 
-		$timeoutDuration = $this->CalculateTimeoutDuration();
-		if ($timeoutDuration > 0)
+		$onAgent = (array_key_exists('SchedulerService', $eventParameters) && $eventParameters['SchedulerService'] == 'OnAgent');
+		if ($onAgent)
 		{
-			if (array_key_exists('SchedulerService', $eventParameters) && $eventParameters['SchedulerService'] == 'OnAgent')
-			{
-				$this->IsTimeout = 1;
-				$this->Unsubscribe($this);
-				$this->workflow->CloseActivity($this);
-				return;
-			}
+			$this->IsTimeout = 1;
+			$this->Unsubscribe($this);
+			$this->workflow->CloseActivity($this);
+			return;
 		}
+
+		if ($this->eventId !== (string) $eventParameters['EVENT_ID'])
+			return;
 
 		if (!empty($eventParameters['RETURN_VALUES']))
 		{
@@ -249,7 +269,7 @@ class CBPRestActivity
 
 	public function Cancel()
 	{
-		if (!$this->isInEventActivityMode && $this->UseSubscription == 'Y')
+		if ($this->UseSubscription == 'Y')
 			$this->Unsubscribe($this);
 
 		return CBPActivityExecutionStatus::Closed;
@@ -298,19 +318,11 @@ class CBPRestActivity
 				{
 					if (array_key_exists($k, $currentActivity['Properties']))
 					{
-						if ($k == 'AuthUserId')
-						{
-							$currentValues[strtolower($k)] = CBPHelper::UsersArrayToString('user_'.$currentActivity['Properties'][$k], $workflowTemplate, $documentType);
-						}
-						else
-						{
-							$currentValues[strtolower($k)] = $currentActivity['Properties'][$k];
-						}
+						$currentValues[strtolower($k)] = $currentActivity['Properties'][$k];
 					}
 					else
 					{
-						if (!is_array($currentValues) || !array_key_exists($map[$k], $currentValues))
-							$currentValues[strtolower($k)] = "";
+						$currentValues[strtolower($k)] = "";
 					}
 				}
 			}
@@ -325,8 +337,10 @@ class CBPRestActivity
 			$currentValues['statusmessage'] = Loc::getMessage('BPRA_DEFAULT_STATUS_MESSAGE');
 		if (strlen($currentValues["timeoutdurationtype"]) <= 0)
 			$currentValues["timeoutdurationtype"] = "s";
-		if ((int)$currentValues["authuserid"] <= 0)
-			$currentValues["authuserid"] = CBPHelper::UsersArrayToString('user_'.$activityData['AUTH_USER_ID'], $workflowTemplate, $documentType);
+		if (empty($currentValues["authuserid"]))
+			$currentValues["authuserid"] = 'user_'.$activityData['AUTH_USER_ID'];
+
+		$currentValues["authuserid"] = CBPHelper::UsersArrayToString($currentValues["authuserid"], $workflowTemplate, $documentType);
 
 		if (!empty($activityData['USE_SUBSCRIPTION']))
 			$currentValues['usesubscription'] = $activityData['USE_SUBSCRIPTION'];
@@ -337,7 +351,8 @@ class CBPRestActivity
 
 		foreach ($properties as $name => $property):
 			$required = CBPHelper::getBool($property['REQUIRED']);
-			$value = !CBPHelper::isEmptyValue($currentValues[strtolower($name)]) ? $currentValues[strtolower($name)] : $property['DEFAULT'];
+			$name = strtolower($name);
+			$value = !CBPHelper::isEmptyValue($currentValues[$name]) ? $currentValues[$name] : $property['DEFAULT'];
 		?>
 			<tr>
 				<td align="right" width="40%" valign="top">
@@ -352,7 +367,7 @@ class CBPRestActivity
 					<?=$documentService->getFieldInputControl(
 						$activityDocumentType,
 						$property,
-						array('Field' => strtolower($name), 'Form' => $formName),
+						array('Field' => static::PROPERTY_NAME_PREFIX.$name, 'Form' => $formName),
 						$value,
 						true,
 						false
@@ -397,14 +412,21 @@ class CBPRestActivity
 			<tr>
 				<td align="right"><?= Loc::getMessage("BPRA_PD_TIMEOUT_DURATION") ?>:<br/><?= Loc::getMessage("BPRA_PD_TIMEOUT_DURATION_HINT") ?></td>
 				<td valign="top">
-					<input type="text" name="timeoutduration" id="id_timeoutduration" value="<?= htmlspecialcharsbx($currentValues["timeoutduration"]) ?>" size="20" />
-					<input type="button" value="..." onclick="BPAShowSelector('id_timeoutduration', 'int');" />
+					<?=CBPDocument::ShowParameterField('int', 'timeoutduration', $currentValues["timeoutduration"], array('size' => 20))?>
 					<select name="timeoutdurationtype">
 						<option value="s"<?= ($currentValues["timeoutdurationtype"] == "s") ? " selected" : "" ?>><?= Loc::getMessage("BPRA_PD_TIME_S") ?></option>
 						<option value="m"<?= ($currentValues["timeoutdurationtype"] == "m") ? " selected" : "" ?>><?= Loc::getMessage("BPRA_PD_TIME_M") ?></option>
 						<option value="h"<?= ($currentValues["timeoutdurationtype"] == "h") ? " selected" : "" ?>><?= Loc::getMessage("BPRA_PD_TIME_H") ?></option>
 						<option value="d"<?= ($currentValues["timeoutdurationtype"] == "d") ? " selected" : "" ?>><?= Loc::getMessage("BPRA_PD_TIME_D") ?></option>
 					</select>
+					<?
+					$delayMinLimit = CBPSchedulerService::getDelayMinLimit();
+					if ($delayMinLimit):
+						?>
+						<p style="color: red;">* <?= Loc::getMessage("BPRA_PD_TIMEOUT_LIMIT") ?>: <?=CBPHelper::FormatTimePeriod($delayMinLimit)?></p>
+						<?
+					endif;
+					?>
 				</td>
 			</tr>
 			<?endif;
@@ -437,7 +459,7 @@ class CBPRestActivity
 
 		foreach ($activityProperties as $name => $property)
 		{
-			$requestName = strtolower($name);
+			$requestName = static::PROPERTY_NAME_PREFIX.strtolower($name);
 
 			if (isset($properties[$requestName]))
 				continue;
@@ -485,6 +507,16 @@ class CBPRestActivity
 		$errors = array();
 
 		$activityData = self::getRestActivityData();
+
+		if (!$activityData)
+		{
+			$errors[] = array(
+				'code' => 'NoActivity',
+				'parameter' => 'ActivityData',
+				'message' => Loc::getMessage('BPRA_NOT_FOUND_ERROR')
+			);
+		}
+
 		$properties = isset($activityData['PROPERTIES']) && is_array($activityData['PROPERTIES']) ? $activityData['PROPERTIES'] : array();
 		foreach ($properties as $name => $property)
 		{
@@ -508,6 +540,7 @@ class CBPRestActivity
 
 		if (
 			isset($testProperties['AuthUserId'])
+			&& isset($activityData['AUTH_USER_ID'])
 			&& (string) $testProperties['AuthUserId'] !== $activityData['AUTH_USER_ID']
 			&& !static::checkAdminPermissions()
 		)

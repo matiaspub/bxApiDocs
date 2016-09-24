@@ -6,9 +6,7 @@
  */
 class _CEventsSocialservices {
 /**
- * Вызывается после добавления пользователя через соцсерсис
- * 
- * 
+ * после добавления пользователя через соцсерсис
  * <i>Вызывается в методе:</i><br>
  * CSocServAuthDB::Add<br><br>
  * 
@@ -19,9 +17,7 @@ class _CEventsSocialservices {
 	public static function OnAfterSocServUserAdd(){}
 
 /**
- * Вызывается после обновления данных пользователя 
- * 
- * 
+ * после обновления данных пользователя 
  * <i>Вызывается в методе:</i><br>
  * CSocServAuth::Update<br><br>
  * 
@@ -32,9 +28,7 @@ class _CEventsSocialservices {
 	public static function OnAfterSocServUserUpdate(){}
 
 /**
- * Вызывается при построении списка сервисов авторизации
- * 
- * 
+ * при построении списка сервисов авторизации
  * <i>Вызывается в методе:</i><br>
  * CSocServAuthManager::__construct<br><br>
  * 
@@ -45,9 +39,7 @@ class _CEventsSocialservices {
 	public static function OnAuthServicesBuildList(){}
 
 /**
- * Вызывается перед редиректом на сайт авторизованного через соцсервис пользователя 
- * 
- * 
+ * перед редиректом на сайт авторизованного через соцсервис пользователя 
  * <i>Вызывается в методе:</i><br>
  * COpenIDClient::Authorize<br><br>
  * 
@@ -58,9 +50,7 @@ class _CEventsSocialservices {
 	public static function OnBeforeOpenIDAuthFinalRedirect(){}
 
 /**
- * Вызывается перед добавлением пользователя через OpenID авторизацию 
- * 
- * 
+ * перед добавлением пользователя через OpenID авторизацию 
  * <i>Вызывается в методе:</i><br>
  * COpenIDClient::Authorize<br><br>
  * 
@@ -71,9 +61,7 @@ class _CEventsSocialservices {
 	public static function OnBeforeOpenIDUserAdd(){}
 
 /**
- * Вызывается перед удалением пользователя 
- * 
- * 
+ * перед удалением пользователя 
  * <i>Вызывается в методе:</i><br>
  * CSocServAuth::Delete<br><br>
  * 
@@ -84,9 +72,7 @@ class _CEventsSocialservices {
 	public static function OnBeforeSocServUserDelete(){}
 
 /**
- * Вызывается при публикации сообщения соцсервиса  
- * 
- * 
+ * при публикации сообщения соцсервиса  
  * <i>Вызывается в методе:</i><br>
  * CSocServAuthManager::PostIntoBuzz<br><br>
  * 

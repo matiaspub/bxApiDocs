@@ -9,9 +9,6 @@ namespace Bitrix\Sale;
 
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Entity\UpdateResult;
-use Bitrix\Sale\Order;
-use Bitrix\Sale\PaySystemService;
 
 Loc::loadMessages(__FILE__);
 

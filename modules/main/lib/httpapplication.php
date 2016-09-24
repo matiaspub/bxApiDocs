@@ -57,6 +57,17 @@ class HttpApplication extends Application
 	/**
 	 * Starts request execution. Should be called after initialize.
 	 */
+	
+	/**
+	* <p>Нестатический метод запускает выполнение запроса. Вызывается после инициализации.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/httpapplication/start.php
+	* @author Bitrix
+	*/
 	static public function start()
 	{
 		//register_shutdown_function(array($this, "finish"));
@@ -66,6 +77,17 @@ class HttpApplication extends Application
 	 * Finishes request execution.
 	 * It is registered in start() and called automatically on script shutdown.
 	 */
+	
+	/**
+	* <p>Нестатический метод завершает выполнение запроса.</p> <p>Метод регистрируется в <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/httpapplication/start.php">start</a> и вызывается автоматически при выполнении скрипта.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/httpapplication/finish.php
+	* @author Bitrix
+	*/
 	public function finish()
 	{
 		//$this->managedCache->finalize();

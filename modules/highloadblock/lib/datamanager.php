@@ -18,6 +18,17 @@ abstract class DataManager extends Entity\DataManager
 	 * Being redefined in HL classes
 	 * @return null
 	 */
+	
+	/**
+	* <p>Метод возвращает информацию о highload-блоке. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/highloadblock/datamanager/gethighloadblock.php
+	* @author Bitrix
+	*/
 	public static function getHighloadBlock()
 	{
 		return null;
@@ -431,7 +442,7 @@ abstract class DataManager extends Entity\DataManager
 			else
 			{
 				// remove empty (false) values
-				$tmpValue = array_filter($tmpValue, 'strlen');
+				$tmpValue = array_filter($tmpValue, array('static', 'isNotNull'));
 
 				$data[$k] = $tmpValue;
 				$multiValues[$k] = $tmpValue;
@@ -450,11 +461,18 @@ abstract class DataManager extends Entity\DataManager
 			);
 		}
 
-		if(strlen($value)<=0)
+		if(static::isNotNull($value))
 		{
-			$value = false;
+			return $value;
 		}
+		else
+		{
+			return false;
+		}
+	}
 
-		return $value;
+	protected function isNotNull($value)
+	{
+		return !($value === null || $value === false || $value === '');
 	}
 }

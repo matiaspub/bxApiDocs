@@ -1,12 +1,13 @@
 <?php
 namespace Bitrix\Sale\Delivery\Restrictions;
 
-use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Sale\Delivery\DeliveryLocationTable;
+use Bitrix\Sale\Internals\CollectableEntity;
 use Bitrix\Sale\Location\Connector;
+use Bitrix\Sale\Location\GroupLocationTable;
 use Bitrix\Sale\Location\LocationTable;
-use Bitrix\Sale\Location\Admin\LocationHelper;
+use Bitrix\Sale\Shipment;
 
 Loc::loadMessages(__FILE__);
 
@@ -17,7 +18,6 @@ Loc::loadMessages(__FILE__);
  */
 class ByLocation extends Base
 {
-	const CONN_ENTITY_NAME = 'Bitrix\Sale\Delivery\DeliveryLocation';
 	public static $easeSort = 200;
 
 	public static function getClassTitle()
@@ -33,8 +33,31 @@ class ByLocation extends Base
 	/**
 	 * This function should accept only location CODE, not ID, being a part of modern API
 	 */
-	static public function check($locationCode, array $restrictionParams, $deliveryId = 0)
+	
+	/**
+	* <p>Метод проверяет, подходит ли служба доставки для данного местоположения. Метод статический.</p>
+	*
+	*
+	* @param integer $locationCode  Код местоположения.
+	*
+	* @param array $restrictionParams  Параметры ограничения.
+	*
+	* @param integer $deliveryId = 0 Идентификатор доставки.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/delivery/restrictions/bylocation/check.php
+	* @author Bitrix
+	*/
+	public static function check($locationCode, array $restrictionParams, $deliveryId = 0)
 	{
+		if(intval($deliveryId) <= 0)
+			return true;
+
+		if(strlen($locationCode) <= 0)
+			return false;
+
 		try
 		{
 			return DeliveryLocationTable::checkConnectionExists(
@@ -51,24 +74,21 @@ class ByLocation extends Base
 		}
 	}
 
-	public function checkByShipment(\Bitrix\Sale\Shipment $shipment, array $restrictionParams, $deliveryId = 0)
+	protected static function extractParams(CollectableEntity $shipment)
 	{
-		if(intval($deliveryId) <= 0)
-			return true;
-
 		/** @var \Bitrix\Sale\Order $order */
 		$order = $shipment->getCollection()->getOrder();
 
 		if(!$props = $order->getPropertyCollection())
-			return true;
+			return '';
 
 		if(!$locationProp = $props->getDeliveryLocation())
-			return true;
+			return '';
 
 		if(!$locationCode = $locationProp->getValue())
-			return true;
+			return '';
 
-		return $this->check($locationCode, $restrictionParams, $deliveryId);
+		return $locationCode;
 	}
 
 	protected static function prepareParamsForSaving(array $params = array(), $deliveryId = 0)
@@ -129,23 +149,132 @@ class ByLocation extends Base
 		return $result;
 	}
 
-	public function save(array $fields, $restrictionId = 0)
+	public static function save(array $fields, $restrictionId = 0)
 	{
-		$fields["PARAMS"] = $this->prepareParamsForSaving($fields["PARAMS"], $fields["DELIVERY_ID"]);
+		$fields["PARAMS"] = self::prepareParamsForSaving($fields["PARAMS"], $fields["SERVICE_ID"]);
 		return parent::save($fields, $restrictionId);
 	}
 
-	static public function delete($restrictionId)
+	public static function delete($restrictionId, $deliveryId = 0)
 	{
-		$dbRes = Table::getList(array(
+		DeliveryLocationTable::resetMultipleForOwner($deliveryId);
+		return parent::delete($restrictionId);
+	}
+
+	/**
+	 * @param Shipment $shipment
+	 * @param array $restrictionFields
+	 * @return array
+	 */
+	public static function filterServicesArray(Shipment $shipment, array $restrictionFields)
+	{
+		if(empty($restrictionFields))
+			return array();
+
+		$shpLocCode = self::extractParams($shipment);
+
+		//if location not defined in shipment
+		if(strlen($shpLocCode) < 0)
+			return array_keys($restrictionFields);
+
+		$res = LocationTable::getList(array(
+			'filter' => array('=CODE' => $shpLocCode),
+			'select' => array('CODE', 'LEFT_MARGIN', 'RIGHT_MARGIN')
+		));
+
+		//if location doesn't exists
+		if(!$shpLocParams = $res->fetch())
+			return array_keys($restrictionFields);
+
+		$result = array();
+		$srvLocCodesCompat = self::getLocationsCompat($restrictionFields, $shpLocParams['LEFT_MARGIN'], $shpLocParams['RIGHT_MARGIN']);
+
+		foreach($srvLocCodesCompat as $locCode => $deliveries)
+			foreach($deliveries as $deliveryId)
+				if(!in_array($deliveryId, $result))
+					$result[] = $deliveryId;
+
+		return $result;
+	}
+
+	/**
+	 * @param array $restrictionFields
+	 * @param $leftMargin
+	 * @param $rightMargin
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	protected static function getLocationsCompat(array $restrictionFields, $leftMargin, $rightMargin)
+	{
+		$result = array();
+		$groups = array();
+
+		$res = DeliveryLocationTable::getList(array(
 			'filter' => array(
-				'ID' => $restrictionId
+				'=DELIVERY_ID' => array_keys($restrictionFields),
+				array(
+					'LOGIC' => 'OR',
+					array(
+						'LOGIC' => 'AND',
+						'=LOCATION_TYPE' => Connector::DB_LOCATION_FLAG,
+						'<=LOCATION.LEFT_MARGIN' => $leftMargin,
+						'>=LOCATION.RIGHT_MARGIN' => $rightMargin
+					),
+					array(
+						'LOGIC' => 'AND',
+						'=LOCATION_TYPE' => Connector::DB_GROUP_FLAG
+					)
+				)
 			)
 		));
 
-		if($fields = $dbRes->fetch())
-			DeliveryLocationTable::resetMultipleForOwner($fields["DELIVERY_ID"]);
+		while($d2l = $res->fetch())
+		{
+			if($d2l['LOCATION_TYPE'] == Connector::DB_LOCATION_FLAG)
+			{
+				if(!is_array($result[$d2l['LOCATION_CODE']]))
+					$result[$d2l['LOCATION_CODE']] = array();
 
-		return parent::delete($restrictionId);
+				if(!in_array($d2l['DELIVERY_ID'] ,$result[$d2l['LOCATION_CODE']]))
+					$result[$d2l['LOCATION_CODE']][] = $d2l['DELIVERY_ID'];
+			}
+			else
+			{
+				if(!is_array($groups[$d2l['LOCATION_CODE']]))
+					$groups[$d2l['LOCATION_CODE']] = array();
+
+				if(!in_array($d2l['DELIVERY_ID'] ,$groups[$d2l['LOCATION_CODE']]))
+					$groups[$d2l['LOCATION_CODE']][] = $d2l['DELIVERY_ID'];
+			}
+		}
+
+		//groups
+		if(!empty($groups))
+		{
+			$res = GroupLocationTable::getList(array(
+				'filter' => array(
+					'=GROUP.CODE' => array_keys($groups),
+					'<=LOCATION.LEFT_MARGIN' => $leftMargin,
+					'>=LOCATION.RIGHT_MARGIN' => $rightMargin
+				),
+				'select' => array(
+					'LOCATION_ID', 'LOCATION_GROUP_ID',
+					'LOCATION_CODE' => 'LOCATION.CODE',
+					'GROUP_CODE' => 'GROUP.CODE'
+				)
+			));
+
+			while($loc = $res->fetch())
+			{
+				if(!is_array($result[$loc['LOCATION_CODE']]))
+					$result[$loc['LOCATION_CODE']] = array();
+
+				foreach($groups[$loc['GROUP_CODE']] as $srvId)
+					if(!in_array($srvId, $result[$loc['LOCATION_CODE']]))
+						$result[$loc['LOCATION_CODE']][] = $srvId;
+			}
+		}
+
+		return $result;
 	}
 }

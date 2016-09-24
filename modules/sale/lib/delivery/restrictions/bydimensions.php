@@ -3,6 +3,7 @@ namespace Bitrix\Sale\Delivery\Restrictions;
 
 use Bitrix\Sale\Delivery\Restrictions;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Internals\CollectableEntity;
 
 Loc::loadMessages(__FILE__);
 
@@ -28,31 +29,37 @@ class ByDimensions extends Restrictions\Base
 	 * @param array $restrictionParams
 	 * @param int $deliveryId
 	 * @return bool
+	 * @internal
 	 */
-	static public function check($dimensions, array $restrictionParams, $deliveryId = 0)
+	public static function check($dimensionsList, array $restrictionParams, $deliveryId = 0)
 	{
-		foreach($restrictionParams as $name => $value) //LENGTH, WIDTH, HEIGHT
+		if(empty($restrictionParams))
+			return true;
+
+		foreach($dimensionsList as $dimensions)
 		{
-			if($value <=0)
-				continue;
+			foreach($restrictionParams as $name => $value) //LENGTH, WIDTH, HEIGHT
+			{
+				if($value <=0)
+					continue;
 
-			if(!isset($dimensions[$name]))
-				continue;
+				if(!isset($dimensions[$name]))
+					continue;
 
-			if(intval($dimensions[$name]) <= 0)
-				continue;
+				if(intval($dimensions[$name]) <= 0)
+					continue;
 
-			if(intval($dimensions[$name]) > intval($value))
-				return false;
+				if(intval($dimensions[$name]) > intval($value))
+					return false;
+			}
 		}
 
 		return true;
 	}
 
-	public function checkByShipment(\Bitrix\Sale\Shipment $shipment, array $restrictionParams, $deliveryId = 0)
+	protected static function extractParams(CollectableEntity $shipment)
 	{
-		if(empty($restrictionParams))
-			return true;
+		$paramsToCheck = array();
 
 		foreach($shipment->getShipmentItemCollection() as $shipmentItem)
 		{
@@ -63,16 +70,15 @@ class ByDimensions extends Restrictions\Base
 				$dimensions = unserialize($dimensions);
 
 			if(!is_array($dimensions) || empty($dimensions))
-				return true;
+				continue;
 
-			if(!$this->check($dimensions, $restrictionParams, $deliveryId))
-				return false;
+			$paramsToCheck[] = $dimensions;
 		}
 
-		return true;
+		return $paramsToCheck;
 	}
 
-	public static function getParamsStructure()
+	public static function getParamsStructure($entityId = 0)
 	{
 		return array(
 			"LENGTH" => array(

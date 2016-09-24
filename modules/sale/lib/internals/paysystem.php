@@ -77,6 +77,10 @@ class PaySystemTable extends Main\Entity\DataManager
 				'validation' => array(__CLASS__, 'validateDescription'),
 				'title' => Loc::getMessage('PAY_SYSTEM_ENTITY_DESCRIPTION_FIELD'),
 			),
+			'ALLOW_EDIT_PAYMENT' => array(
+				'data_type' => 'string',
+				'title' => Loc::getMessage('PAY_SYSTEM_ENTITY_ALLOW_EDIT_PAYMENT_FIELD')
+			)
 		);
 	}
 	public static function validateLid()

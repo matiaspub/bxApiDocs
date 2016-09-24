@@ -6,9 +6,7 @@
  */
 class _CEventsForm {
 /**
- * Вызывается после добавления сервера CRM, с которым можно связать форму.
- * 
- * 
+ * после добавления сервера CRM, с которым можно связать форму.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Add<br><br>
  * 
@@ -19,9 +17,7 @@ class _CEventsForm {
 	public static function OnAfterFormCrmAdd(){}
 
 /**
- * Вызывается после удаления сервера CRM, с которым может быть связана форма.
- * 
- * 
+ * после удаления сервера CRM, с которым может быть связана форма.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Delete<br><br>
  * 
@@ -32,9 +28,7 @@ class _CEventsForm {
 	public static function OnAfterFormCrmDelete(){}
 
 /**
- * Вызывается после обновления сервера CRM, с которым может быть связана форма.
- * 
- * 
+ * после обновления сервера CRM, с которым может быть связана форма.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Update<br><br>
  * 
@@ -45,9 +39,7 @@ class _CEventsForm {
 	public static function OnAfterFormCrmUpdate(){}
 
 /**
- * Вызывается перед добавлением сервера CRM, с которым может быть связана форма.
- * 
- * 
+ * перед добавлением сервера CRM, с которым может быть связана форма.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Add<br><br>
  * 
@@ -58,9 +50,7 @@ class _CEventsForm {
 	public static function OnBeforeFormCrmAdd(){}
 
 /**
- * Вызывается перед удалением сервера CRM, с которым может быть связана форма.
- * 
- * 
+ * перед удалением сервера CRM, с которым может быть связана форма.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Delete<br><br>
  * 
@@ -71,9 +61,7 @@ class _CEventsForm {
 	public static function OnBeforeFormCrmDelete(){}
 
 /**
- * Вызывается перед обновлением сервера CRM, с которым может быть связана форма.
- * 
- * 
+ * перед обновлением сервера CRM, с которым может быть связана форма.
  * <i>Вызывается в методе:</i><br>
  * CFormCrm::Update<br><br>
  * 
@@ -87,7 +75,7 @@ class _CEventsForm {
  * Обработчики события вызываются перед добавлением нового результата веб-формы. Может быть использовано для каких-либо дополнительных проверок или изменения значения полей результата веб-формы. Возврат обработчиком каких-либо значений не предполагается. Ошибки нужно возвращать посредством $APPLICATION-&gt;ThrowException().
  *
  *
- * @param int $WEB_FORM_ID  ID веб-формы.</bod
+ * @param int $WEB_FORM_ID  ID веб-формы.
  *
  * @param array &$arFields  Массив полей результата для записи в БД.
  *
@@ -96,7 +84,7 @@ class _CEventsForm {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onBeforeResultAdd($WEB_FORM_ID, &amp;$arFields, &amp;$arrVALUES)
  * {
  *   global $APPLICATION;
@@ -121,7 +109,7 @@ class _CEventsForm {
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultadd.php">Событие
  * "onAfterResultAdd"</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/form/events/onbeforeresultupdate.php">Событие "onBeforeResultUpdate"</a>
- * </li> </ul> <a name="examples"></a>
+ * </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -134,14 +122,14 @@ class _CEventsForm {
  * Обработчики события вызываются после добавления нового результата веб-формы. Может быть использовано для совершения каких-либо дополнительных операций с результатом веб-формы, например, для рассылки дополнительных уведомлений посредством электронной почты. Для изменения полей результата веб-формы стоит использовать CFormResult::SetField(). Возврат обработчиком каких-либо значений не предполагается.
  *
  *
- * @param int $WEB_FORM_ID  ID веб-формы.</bod
+ * @param int $WEB_FORM_ID  ID веб-формы.
  *
  * @param int $RESULT_ID  ID результата.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * //обработчик должен быть зарегистрирован в файле /bitrix/php_interface/init.php
  * 
  * function my_onAfterResultAddUpdate($WEB_FORM_ID, $RESULT_ID)
@@ -164,7 +152,7 @@ class _CEventsForm {
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onbeforeresultadd.php">Событие
  * "onBeforeResultAdd"</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultupdate.php">Событие "onAfterResultUpdate"</a>
- * </li> </ul> <a name="examples"></a>
+ * </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -177,7 +165,7 @@ class _CEventsForm {
  * Обработчики события вызываются перед сохранением изменений существующего результата веб-формы. Может быть использовано для каких-либо дополнительных проверок или изменения значения полей результата веб-формы. Возврат обработчиком каких-либо значений не предполагается. Ошибки можно возвращать посредством $APPLICATION-&gt;ThrowException().
  *
  *
- * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
+ * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
  *
  * @param int $RESULT_ID  <span class="syntax">ID результата</span>.
  *
@@ -185,12 +173,12 @@ class _CEventsForm {
  *
  * @param array &$arrVALUES  <span class="syntax">Массив значений ответов результата веб-формы</span>.
  *
- * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span> </htm
+ * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onBeforeResultUpdate($WEB_FORM_ID, $RESULT_ID, $arFields, $arrVALUES)
  * {
  *   global $APPLICATION;
@@ -213,7 +201,7 @@ class _CEventsForm {
  *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultupdate.php">Событие
- * "onAfterResultUpdate"</a> </li></ul></bod<a name="examples"></a>
+ * "onAfterResultUpdate"</a> </li></ul><a name="examples"></a>
  *
  *
  * @static
@@ -226,16 +214,16 @@ class _CEventsForm {
  * Обработчики события вызываются после сохранения изменений результата веб-формы. Может быть использовано для совершения каких-либо дополнительных операций с результатом веб-формы, например, для рассылки дополнительных уведомлений посредством электронной почты. Возврат обработчиком каких-либо значений не предполагается. Для изменения полей результата веб-формы стоит использовать CFormResult::SetField().
  *
  *
- * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
+ * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
  *
  * @param int $RESULT_ID  <span class="syntax">ID результата</span>.
  *
- * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span> </htm
+ * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onAfterResultAddUpdate($WEB_FORM_ID, $RESULT_ID)
  * {
  *   // действие обработчика распространяется только на форму с ID=6
@@ -256,7 +244,7 @@ class _CEventsForm {
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onbeforeresultupdate.php">Событие
  * "onBeforeResultUpdate"</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultadd.php">Событие "onAfterResultAdd"</a> </li>
- * </ul> <a name="examples"></a>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -266,19 +254,19 @@ class _CEventsForm {
 	public static function onAfterResultUpdate($WEB_FORM_ID, $RESULT_ID, $CHECK_RIGHTS){}
 
 /**
- * Обработчики события вызываются перед удалением результата веб-формы. Может быть использовано, например, для рассылки дополнительных уведомлений посредством электронной почты или для запрета удаления результата. Возврат обработчиком каких-либо значений не предполагается. Ошибки можно возвращать посредством $APPLICATION-&gt;ThrowException().
+ * Обработчики события вызываются перед удалением результата веб-формы. Может быть использовано, например, для рассылки дополнительных уведомлений посредством электронной почты или для запрета удаления результата. Возврат обработчиком каких-либо значений не предполагается. Ошибки можно возвращать посредством  $APPLICATION-&gt;ThrowException().
  *
  *
- * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
+ * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
  *
  * @param int $RESULT_ID  <span class="syntax">ID результата</span>.
  *
- * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span> </htm
+ * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onBeforeResultDelete($WEB_FORM_ID, $RESULT_ID, $CHECK_RIGHTS)
  * {
  *   global $APPLICATION;
@@ -305,18 +293,18 @@ class _CEventsForm {
  * Обработчики события вызываются перед изменением статуса результата веб-формы. Может быть использовано для каких-либо дополнительных проверок или даже для изменения нового статуса, а также, как замена обработчика статуса веб-формы. Возврат обработчиком каких-либо значений не предполагается. Ошибки можно возвращать посредством $APPLICATION-&gt;ThrowException().
  *
  *
- * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
+ * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
  *
  * @param int $RESULT_ID  <span class="syntax">ID результата</span>.
  *
  * @param int &$NEW_STATUS_ID  ID статуса.
  *
- * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span> </htm
+ * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onBeforeResultStatusChange($WEB_FORM_ID, $RESULT_ID, $NEW_STATUS_ID, $CHECK_RIGHTS)
  * {
  *   global $USER;
@@ -339,7 +327,7 @@ class _CEventsForm {
  *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onafterresultstatuschange.php">Событие
- * "onAfterResultStatusChange"</a> </li></ul></bod<a name="examples"></a>
+ * "onAfterResultStatusChange"</a> </li></ul><a name="examples"></a>
  *
  *
  * @static
@@ -352,18 +340,18 @@ class _CEventsForm {
  * Обработчики события вызываются после изменения статуса результата веб-формы. Может быть использовано, например, для каких-либо дополнительных уведомлений посредством электронной почты, а также, как замена обработчика статуса веб-формы. Возврат обработчиком каких-либо значений не предполагается. Для изменения полей результата веб-формы стоит использовать CFormResult::SetField().
  *
  *
- * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.</bod
+ * @param int $WEB_FORM_ID  <span class="syntax">ID веб-формы</span>.
  *
  * @param int $RESULT_ID  <span class="syntax">ID результата</span>.
  *
  * @param int $NEW_STATUS_ID  ID статуса.
  *
- * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span> </htm
+ * @param string(1) $CHECK_RIGHTS  <span class="syntax">Флаг "Проверять права" (Y|N).</span>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function my_onAfterResultStatusChange($WEB_FORM_ID, $RESULT_ID, $NEW_STATUS_ID, $CHECK_RIGHTS)
  * {
  *   global $USER;
@@ -386,7 +374,7 @@ class _CEventsForm {
  *
  * <h4>See Also</h4> 
  * <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/form/events/onbeforeresultstatuschange.php">Событие
- * "onBeforeResultStatusChange"</a> </li></ul></bod<a name="examples"></a>
+ * "onBeforeResultStatusChange"</a> </li></ul><a name="examples"></a>
  *
  *
  * @static
@@ -396,9 +384,7 @@ class _CEventsForm {
 	public static function onAfterResultStatusChange($WEB_FORM_ID, $RESULT_ID, $NEW_STATUS_ID, $CHECK_RIGHTS){}
 
 /**
- * Вызывается при сборе списка кастомных валидаторов полей формы.
- * 
- * 
+ * при сборе списка кастомных валидаторов полей формы.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getalllist.php">CFormValidator::GetAllList</a><br><br>
  * 

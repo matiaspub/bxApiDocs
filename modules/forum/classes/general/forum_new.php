@@ -29,31 +29,6 @@ class CAllForumNew
 		return ($strPerms < "E" ? false : true);
 	}
 
-	
-	/**
-	* <p>Всесторонне проверяет, может ли пользователь с кодом <i>iUserID</i>, входящий в группы <i>arUserGroups</i>, добавить новый форум.</p>
-	*
-	*
-	* @param array $arUserGroups  Массив групп, в которые входит пользователь. Для текущего
-	* пользователя он возвращается методом $USER-&gt;GetUserGroupArray()
-	*
-	* @param int $iUserID  Код пользователя. Для текущего пользователя он возвращается
-	* методом $USER-&gt;GetID()
-	*
-	* @return bool 
-	*
-	* <h4>See Also</h4> 
-	* <ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CForumNew::CanUserUpdateForum</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserdeleteforum.php">CForumNew::CanUserDeleteForum</a>
-	* </li> </ul><br><br>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuseraddforum.php
-	* @author Bitrix
-	*/
 	public static function CanUserAddForum($arUserGroups, $iUserID = 0)
 	{
 		$arUserGroups = (!is_array($arUserGroups) ? array($arUserGroups) : $arUserGroups);
@@ -233,6 +208,47 @@ class CAllForumNew
 		return true;
 	}
 
+	
+	/**
+	* <p>Изменяет параметры существующего форума с кодом <i>ID</i> на параметры, указанные в массиве <i>arFields</i>. Возвращает код изменяемого форума. Метод статический.</p>
+	*
+	*
+	* @param int $intID  Код форума, параметры которого необходимо изменить.
+	*
+	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]),  		где
+	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> 		Поля
+	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">списке полей
+	* форума</a>.
+	*
+	* @param bool $bReindex = true Необязательный. По умолчанию равен True.
+	*
+	* @return int 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* &lt;?
+	* // Этот код привязывает сайт с кодом $site_code к форуму $FORUM_ID и прописывает "Шаблон пути к сообщению на сайте" в виде $FORUM_PATH
+	* 
+	* $arFields = array("ACTIVE" =&gt; "Y", "SITES" =&gt; CForumNew::GetSites($FORUM_ID));
+	* $arFields["SITES"][$site_code] = str_replace("#SITE_PATH#", $site_path, $FORUM_PATH);
+	* CForumNew::Update($FORUM_ID, $arFields);
+	* 
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumnew">Поля форума</a> </li>
+	* <li>Перед изменением форума следует проверить возможность
+	* изменения методом <a
+	* href="http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/canuserupdateforum.php">CanUserUpdateForum</a> </li>
+	* </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/update.php
+	* @author Bitrix
+	*/
 	public static function Update($ID, $arFields, $bReindex = true)
 	{
 		global $DB;
@@ -434,38 +450,6 @@ class CAllForumNew
 	}
 
 	//---------------> Array of sites (langs) where forum is available
-	
-	/**
-	* <p>Функция возвращает ассоциативный массив, в котором ключами являются сайты, к которым привязан форум с кодом ID, а значениями - шаблоны пути к сообщению форума в соответствующем сайте. </p>
-	*
-	*
-	* @param int $ID  Код форума.
-	*
-	* @return array 
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* // Для форума с кодом $FID получим массив реальных путей к сообщению
-	* // с кодом $MID из темы с кодом $TID
-	* 
-	* $arForumPaths = CForumNew::GetSites($FID);
-	* $arForumPathsCodes = array_keys($arForumPaths);
-	* for ($i = 0; $i &lt; count($arForumPathsCodes); $i++)
-	* {
-	*     $arForumPaths[$arForumPathsCodes[$i]] = 
-	*         CForumNew::PreparePath2Message($arForumPaths[$arForumPathsCodes[$i]],
-	*                                        array("FORUM_ID"=&gt;$FID,
-	*                                              "TOPIC_ID"=&gt;$TID,
-	*                                              "MESSAGE_ID"=&gt;$MID)
-	*                                        );
-	* }
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumnew/getsites.php
-	* @author Bitrix
-	*/
 	public static function GetSites($ID)
 	{
 		global $DB, $CACHE_MANAGER;
@@ -2382,7 +2366,7 @@ class CForumSmile
 	static $smiles = array();
 	static $sets = array();
 
-	static function Add()
+	public static function Add()
 	{
 		return false;
 	}
@@ -2397,20 +2381,7 @@ class CForumSmile
 		return false;
 	}
 
-	
-	/**
-	* <p>Удаляет смайл с кодом <i>ID</i>.</p>
-	*
-	*
-	* @param int $ID  Код смайла, который необходимо удалить.
-	*
-	* @return bool <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumsmile/delete.php
-	* @author Bitrix
-	*/
-	static function Delete()
+	public static function Delete()
 	{
 		return false;
 	}
@@ -2427,7 +2398,7 @@ class CForumSmile
 		return $DB->Query("", false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	static function GetByID()
+	public static function GetByID()
 	{
 		return false;
 	}
@@ -2448,7 +2419,7 @@ class CForumSmile
 	 * @param $lang
 	 * @return mixed
 	 */
-	static function GetByType($type, $lang)
+	public static function GetByType($type, $lang)
 	{
 		if (COption::GetOptionInt("forum", "smile_native_gallery_id", 0) <= 0)
 			return self::getSmiles($type, $lang);
@@ -2484,7 +2455,7 @@ class CForumSmile
 		return self::$smiles[$key];
 	}
 
-	static function getSmiles($type, $lang)
+	public static function getSmiles($type, $lang)
 	{
 		$type = ($type == "I" ? CSmile::TYPE_ICON : CSmile::TYPE_SMILE);
 		$key = "new_".$type."_".$lang;
@@ -2511,7 +2482,7 @@ class CForumSmile
 		return self::$smiles[$key];
 	}
 
-	static function getSetsByType($type, $lang)
+	public static function getSetsByType($type, $lang)
 	{
 		$type = ($type == CSmile::TYPE_ICON ? CSmile::TYPE_ICON : CSmile::TYPE_SMILE);
 		$key = $type."_".$lang;
@@ -2599,4 +2570,3 @@ class _CForumDBResult extends CDBResult
 		return $res;
 	}
 }
-?>

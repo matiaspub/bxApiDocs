@@ -27,6 +27,30 @@ class SitesData
 	}
 
 	/**
+	 * @return string
+	 */
+	public static function getKernelSite()
+	{
+		foreach(self::getList() as $siteId => $siteParams)
+			if($siteParams['SiteInstall'] == 'kernel')
+				return $siteId;
+
+		return '';
+	}
+
+	/**
+	 * @return string
+	 */
+	public static function getKernelRoot()
+	{
+		foreach(self::getList() as $siteId => $siteParams)
+			if($siteParams['SiteInstall'] == 'kernel')
+				return $siteParams['DocumentRoot'];
+
+		return '';
+	}
+
+	/**
 	 * @param string $dbName
 	 * @return array List of all sites & their params
 	 */
@@ -35,41 +59,48 @@ class SitesData
 		if(!$dbName)
 		{
 			$connection = \Bitrix\Main\Application::getConnection();
-			$dbName = $connection->getDbName();
+			$dbName = $connection->getDatabase();
 		}
 
-		$result = array();
-		$shellAdapter = new ShellAdapter();
-		$execRes = $shellAdapter->syncExec("sudo -u root /opt/webdir/bin/bx-sites -o json -a list -d ".$dbName);
-		$sitesData = $shellAdapter->getLastOutput();
+		static $result = array();
 
-		if($execRes)
+		if(!isset($result[$dbName]))
 		{
-			$arData = json_decode($sitesData, true);
+			$resSite = array();
+			$shellAdapter = new ShellAdapter();
+			$execRes = $shellAdapter->syncExec("sudo -u root /opt/webdir/bin/bx-sites -o json -a list -d ".$dbName);
+			$sitesData = $shellAdapter->getLastOutput();
 
-			if(isset($arData["params"]))
-				$result = $arData["params"];
-
-			$rsSite = \Bitrix\Main\SiteTable::getList();
-
-			while ($site = $rsSite->fetch())
+			if($execRes)
 			{
-				foreach($result as $siteId => $siteInfo)
-				{
-					$docRoot = strlen($site["DOC_ROOT"]) > 0 ? $site["DOC_ROOT"] : \Bitrix\Main\Application::getDocumentRoot();
+				$arData = json_decode($sitesData, true);
 
-					if($siteInfo["DocumentRoot"] == $docRoot)
+				if(isset($arData["params"]))
+					$resSite = $arData["params"];
+
+				$rsSite = \Bitrix\Main\SiteTable::getList();
+
+				while ($site = $rsSite->fetch())
+				{
+					foreach($resSite as $siteId => $siteInfo)
 					{
-						$result[$siteId]["NAME"] = $site["NAME"]." (".$site["LID"].") ";
-					}
-					else
-					{
-						$result[$siteId]["NAME"] = $siteId;
+						$docRoot = strlen($site["DOC_ROOT"]) > 0 ? $site["DOC_ROOT"] : \Bitrix\Main\Application::getDocumentRoot();
+
+						if($siteInfo["DocumentRoot"] == $docRoot)
+						{
+							$resSite[$siteId]["NAME"] = $site["NAME"]." (".$site["LID"].") ";
+						}
+						else
+						{
+							$resSite[$siteId]["NAME"] = $siteId;
+						}
 					}
 				}
 			}
+
+			$result[$dbName] = $resSite;
 		}
 
-		return $result;
+		return $result[$dbName];
 	}
 }

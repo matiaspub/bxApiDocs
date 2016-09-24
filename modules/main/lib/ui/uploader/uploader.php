@@ -460,6 +460,21 @@ class Uploader
 	 * @param $res2
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод соединяет два массива с несколькими вложенными ключами: <code>array_merge</code> перемещает ключи на второй уровень и вложенный <code>array_merge_recursive</code> подобных умноженных ключей.</p>
+	*
+	*
+	* @param mixed $res  
+	*
+	* @param $re $res2  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/ui/uploader/uploader/merge.php
+	* @author Bitrix
+	*/
 	static function merge($res, $res2)
 	{
 		$res = is_array($res) ? $res : array();
@@ -545,6 +560,23 @@ class Uploader
 	 * @param bool $watermark
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает все сохранённые данные для хеша этого файла.</p>
+	*
+	*
+	* @param mixed $hash  
+	*
+	* @param boolean $copies = false 
+	*
+	* @param boolean $watermark = false 
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/ui/uploader/uploader/getfile.php
+	* @author Bitrix
+	*/
 	public function getFile($hash, $copies = false, $watermark = false)
 	{
 		if ($copies === false && array_key_exists("copies", $this->params))
@@ -787,8 +819,8 @@ class Uploader
 							"~name" => $fileName,
 							"tmp_name" => $uploadedFiles[self::FILE_NAME]["tmp_name"][$fileID][$fileName],
 							"type" => $uploadedFiles[self::FILE_NAME]["type"][$fileID][$fileName],
-							"size" => $uploadedFiles[self::FILE_NAME]["size"][$fileID][$fileName],
-							"error" => $uploadedFiles[self::FILE_NAME]["error"][$fileID][$fileName]
+							"size" => intval($uploadedFiles[self::FILE_NAME]["size"][$fileID][$fileName]),
+							"error" => intval($uploadedFiles[self::FILE_NAME]["error"][$fileID][$fileName])
 						);
 						if ($file["type"] == "application/octet-stream" && array_key_exists("type", $arFile))
 							$file["type"] = $arFile["type"];
@@ -807,8 +839,8 @@ class Uploader
 						"~name" => $fileName,
 						"tmp_name" => $uploadedFiles[self::FILE_NAME]["tmp_name"][$fileID],
 						"type" => $uploadedFiles[self::FILE_NAME]["type"][$fileID],
-						"size" => $uploadedFiles[self::FILE_NAME]["size"][$fileID],
-						"error" => $uploadedFiles[self::FILE_NAME]["error"][$fileID]
+						"size" => intval($uploadedFiles[self::FILE_NAME]["size"][$fileID]),
+						"error" => intval($uploadedFiles[self::FILE_NAME]["error"][$fileID])
 					);
 					$files[$fileID][] = array_merge($postData, $file);
 				}
@@ -842,6 +874,17 @@ class Uploader
 	/**
 	 * Main function for uploading data
 	 */
+	
+	/**
+	* <p>Нестатический метод. Главный метод для загрузки данных.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/ui/uploader/uploader/uploaddata.php
+	* @author Bitrix
+	*/
 	public function uploadData()
 	{
 		$request = \Bitrix\Main\Context::getCurrent()->getRequest();

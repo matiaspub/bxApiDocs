@@ -4,6 +4,7 @@ namespace Bitrix\Sale\Helpers\Admin\Blocks;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\DeliveryStatus;
 use Bitrix\Sale\Internals\StatusTable;
 use Bitrix\Sale\Order;
 
@@ -29,7 +30,7 @@ class OrderShipmentStatus
 							<td class="adm-detail-content-cell-r">'.
 							\Bitrix\Sale\Helpers\Admin\OrderEdit::makeSelectHtml(
 								"SHIPMENT[".$index."][STATUS_ID]",
-								self::getShipmentStatusList(),
+								self::getShipmentStatusList($data['STATUS_ID']),
 								$data['STATUS_ID'],
 								false,
 								array(
@@ -44,25 +45,31 @@ class OrderShipmentStatus
 			</div>';
 	}
 
-	public static function getShipmentStatusList()
+	/**
+	 * @param $status
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getShipmentStatusList($status)
 	{
-		static $shipmentStatuses = array();
+		global $USER;
 
-		if (empty($shipmentStatuses))
+		$shipmentStatuses = array();
+
+		$allStatusList = DeliveryStatus::getAllStatusesNames();
+		if (array_key_exists($status, $allStatusList))
 		{
-			$context = Application::getInstance()->getContext();
-			$lang = $context->getLanguage();
-			$params = array(
-				'select' => array('ID', 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
-				'filter' => array(
-					'=Bitrix\Sale\Internals\StatusLangTable:STATUS.LID' => $lang,
-					'=TYPE' => 'D'
-				),
-			);
-			$dbRes = StatusTable::getList($params);
+			$shipmentStatuses[$status] = $allStatusList[$status] . " [" . $status . "]";
+		}
 
-			while ($shipmentStatus = $dbRes->fetch())
-				$shipmentStatuses[$shipmentStatus["ID"]] = $shipmentStatus["SALE_INTERNALS_STATUS_SALE_INTERNALS_STATUS_LANG_STATUS_NAME"] . " [" . $shipmentStatus["ID"] . "]";
+		$statusList = DeliveryStatus::getAllowedUserStatuses($USER->GetID(), $status);
+		if (!empty($statusList) && is_array($statusList))
+		{
+			foreach ($statusList as $code => $title)
+			{
+				$shipmentStatuses[$code] = $title . " [" . $code . "]";
+			}
 		}
 		return $shipmentStatuses;
 	}

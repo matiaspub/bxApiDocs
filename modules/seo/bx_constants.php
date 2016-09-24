@@ -2,7 +2,7 @@
 /**
  * BITRIX_CLOUD_ADV_URL
  */
-define('BITRIX_CLOUD_ADV_URL', 'http://cloud-adv.bitrix.info');
+define('BITRIX_CLOUD_ADV_URL', 'https://cloud-adv.bitrix.info');
 
 /**
  * SEO_BITRIX_API_URL

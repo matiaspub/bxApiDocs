@@ -80,29 +80,68 @@ class Path
 		return $pathTmp;
 	}
 
+	
+	/**
+	* <p>Статический метод принимает путь и возвращает расширение файла.</p>
+	*
+	*
+	* @param string $path  Путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/path/getextension.php
+	* @author Bitrix
+	*/
 	public static function getExtension($path)
 	{
 		$path = self::getName($path);
 		if ($path != '')
 		{
-			$pos = Text\String::strrpos($path, '.');
+			$pos = Text\UtfSafeString::getLastPosition($path, '.');
 			if ($pos !== false)
 				return substr($path, $pos + 1);
 		}
 		return '';
 	}
 
+	
+	/**
+	* <p>Статический метод принимает путь и возвращает имя файла, включая расширение.</p>
+	*
+	*
+	* @param string $path  Путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/path/getname.php
+	* @author Bitrix
+	*/
 	public static function getName($path)
 	{
 		//$path = self::normalize($path);
 
-		$p = Text\String::strrpos($path, self::DIRECTORY_SEPARATOR);
+		$p = Text\UtfSafeString::getLastPosition($path, self::DIRECTORY_SEPARATOR);
 		if ($p !== false)
 			return substr($path, $p + 1);
 
 		return $path;
 	}
 
+	
+	/**
+	* <p>Статический метод принимает путь и возвращает путь без имени файла.</p>
+	*
+	*
+	* @param string $path  Путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/path/getdirectory.php
+	* @author Bitrix
+	*/
 	public static function getDirectory($path)
 	{
 		return substr($path, 0, -strlen(self::getName($path)) - 1);
@@ -263,6 +302,19 @@ class Path
 		return self::combine($basePath, $relativePath);
 	}
 
+	
+	/**
+	* <p>Статический метод проверяет валиден ли путь.</p>
+	*
+	*
+	* @param string $path  Путь к файлу
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/path/validate.php
+	* @author Bitrix
+	*/
 	public static function validate($path)
 	{
 		if (!is_string($path))
@@ -278,6 +330,19 @@ class Path
 		return (preg_match("#^([a-z]:)?/([^\x01-\x1F".preg_quote(self::INVALID_FILENAME_CHARS, "#")."]+/?)*$#isD", $path) > 0);
 	}
 
+	
+	/**
+	* <p>Статический метод проверяет правильно ли имя файла.</p>
+	*
+	*
+	* @param string $filename  Имя файла.
+	*
+	* @return resource 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/io/path/validatefilename.php
+	* @author Bitrix
+	*/
 	public static function validateFilename($filename)
 	{
 		if (!is_string($filename))

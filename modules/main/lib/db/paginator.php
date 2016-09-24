@@ -21,6 +21,35 @@ class Paginator
 	 * @return Result
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Статический метод задаёт смещение и ограничение вычислений и выполняет ограниченный запрос к БД.</p>
+	*
+	*
+	* @param string $sql  Sql запрос.
+	*
+	* @param string $Bitrix  Соединение с БД для запроса.
+	*
+	* @param Bitri $Main  Общий номер записи, возвращаемой запросом.
+	*
+	* @param Mai $MaiDB  СТраница для отображения.
+	*
+	* @param Connection $connection  Размер страницы.
+	*
+	* @param integer $numberOfRecords  Использование обратной пагинации.
+	*
+	* @param integer $pageNumber  
+	*
+	* @param integer $numberOfRecordsPerPage  
+	*
+	* @param boolean $backward = false 
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/paginator/query.php
+	* @author Bitrix
+	*/
 	public static function query($sql, Connection $connection, $numberOfRecords, $pageNumber, $numberOfRecordsPerPage, $backward = false)
 	{
 		list($offset, $limit) = self::calculateQueryLimits(
@@ -40,6 +69,25 @@ class Paginator
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод возвращает массив из двух элементов со смещением и ограничением, основанном на параметрах пагинации.</p>
+	*
+	*
+	* @param integer $numberOfRecords  Общий номер записи возвращённый Sql запросом.
+	*
+	* @param integer $pageNumber  страница для отображения.
+	*
+	* @param integer $numberOfRecordsPerPage  Размер страницы.
+	*
+	* @param boolean $backward  Использовать обратную пагинацию.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/paginator/calculatequerylimits.php
+	* @author Bitrix
+	*/
 	public static function calculateQueryLimits($numberOfRecords, $pageNumber, $numberOfRecordsPerPage, $backward)
 	{
 		$pageNumber = intval($pageNumber);

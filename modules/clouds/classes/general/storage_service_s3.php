@@ -280,12 +280,12 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		if(isset($additional_headers["Content-Type"]))
 		{
 			$ContentType = $additional_headers["Content-Type"];
-			unset($additional_headers["Content-Type"]);
 		}
 		else
 		{
 			$ContentType = $content != ""? 'text/plain': '';
 		}
+		unset($additional_headers["Content-Type"]);
 
 		foreach($this->set_headers as $key => $value)
 		{
@@ -539,9 +539,34 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 	*/
 	public static function GetFileSRC($arBucket, $arFile)
 	{
+		$proto = CMain::IsHTTPS()? "https": "http";
+
 		if($arBucket["CNAME"] != "")
 		{
 			$host = $arBucket["CNAME"];
+			$pref = "";
+		}
+		elseif ($proto === "https" && strpos($arBucket["BUCKET"], ".") !== false)
+		{
+			switch($arBucket["LOCATION"])
+			{
+			case "us-west-1":
+				$host = "s3-us-west-1.amazonaws.com";
+				break;
+			case "eu-west-1":
+				$host = "s3-eu-west-1.amazonaws.com";
+				break;
+			case "ap-southeast-1":
+				$host = "s3-ap-southeast-1.amazonaws.com";
+				break;
+			case "ap-northeast-1":
+				$host = "s3-ap-northeast-1.amazonaws.com";
+				break;
+			default:
+				$host = "s3.amazonaws.com";
+				break;
+			}
+			$pref = $arBucket["BUCKET"];
 		}
 		else
 		{
@@ -563,6 +588,7 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 				$host = $arBucket["BUCKET"].".s3.amazonaws.com";
 				break;
 			}
+			$pref = "";
 		}
 
 		if(is_array($arFile))
@@ -570,13 +596,16 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		else
 			$URI = ltrim($arFile, "/");
 
-		if($arBucket["PREFIX"] != "")
+		if ($arBucket["PREFIX"] != "")
 		{
 			if(substr($URI, 0, strlen($arBucket["PREFIX"])+1) !== $arBucket["PREFIX"]."/")
 				$URI = $arBucket["PREFIX"]."/".$URI;
 		}
 
-		$proto = CMain::IsHTTPS()? "https": "http";
+		if ($pref !== "")
+		{
+			$URI = $pref."/".$URI;
+		}
 
 		return $proto."://$host/".CCloudUtil::URLEncode($URI, "UTF-8");
 	}
@@ -734,10 +763,12 @@ class CCloudStorageService_AmazonS3 extends CCloudStorageService
 		}
 		elseif($this->status == 403)
 		{
+			AddMessage2Log($this);
 			return false;
 		}
 		else
 		{
+			AddMessage2Log($this);
 			$APPLICATION->ResetException();
 			return false;
 		}

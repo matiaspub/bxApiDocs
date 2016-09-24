@@ -28,6 +28,17 @@ class TimeIsOverException extends SystemException
 	 * Returns position from witch next step must be started.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Возвращает позицию, с которой должен начинаться следующий шаг. Метод нестатический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/timeisoverexception/getendposition.php
+	* @author Bitrix
+	*/
 	public function getEndPosition()
 	{
 		return $this->endPosition;

@@ -214,49 +214,6 @@ class CForumNew extends CAllForumNew
 /**********************************************************************/
 class CForumGroup extends CAllForumGroup
 {
-	
-	/**
-	* <p>Создает новую группу с параметрами, указанными в массиве <i>arFields</i>. Возвращает код созданной группы. На добавление нового звания параметры посетителей форума не пересчитываются. Пересчет будт происходить постепенно по мере общения посетителей на форуме.</p>
-	*
-	*
-	* @param array $arFields  Массив вида Array(<i>field1</i>=&gt;<i>value1</i>[, <i>field2</i>=&gt;<i>value2</i> [, ..]]), где
-	* <br><br><i>field</i> - название поля;<br><i>value</i> - значение поля.<br><br> Поля
-	* перечислены в <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">списке
-	* полей групп</a>. В специальное поле "LANG" заносится массив массивов
-	* полей языковых параметров групп, которые имеют аналогичную
-	* структуру.
-	*
-	* @return int 
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* $arFields = array("SORT" =&gt; $SORT);
-	* $arSysLangs = array("ru", "en");
-	* for ($i = 0; $i&lt;count($arSysLangs); $i++)
-	* {
-	*   $arFields["LANG"][] = array(
-	*     "LID" =&gt; $arSysLangs[$i],
-	*     "NAME" =&gt; ${"NAME_".$arSysLangs[$i]},
-	*     "DESCRIPTION" =&gt; ${"DESCRIPTION_".$arSysLangs[$i]}
-	*     );
-	* }
-	* $ID = CForumGroup::Add($arFields);
-	* if (IntVal($ID)&lt;=0)
-	*   echo "Error!";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* <h4>See Also</h4> 
-	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/forum/fields.php#cforumgroup">Поля группы</a> </li></ul><a
-	* name="examples"></a>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumgroup/add.php
-	* @author Bitrix
-	*/
 	public static function Add($arFields)
 	{
 		global $DB;

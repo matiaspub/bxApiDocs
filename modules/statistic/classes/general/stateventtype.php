@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>. 
+ * <b>CStatEventType</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типами событий</a>.
  *
  *
  * @return mixed 
@@ -25,7 +25,7 @@ class CAllStatEventType
 	* либо "false" в противном случае.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $type_id = 1;
 	* if (<b>CStatEventType::Delete</b>($type_id)) 
@@ -36,7 +36,7 @@ class CAllStatEventType
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
-	* события"</a> </li></ul> </ht<a name="examples"></a>
+	* события"</a> </li></ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -154,17 +154,18 @@ class CAllStatEventType
 	* @param string $event2  Идентификатор event2 типа события.
 	*
 	* @param array &$type  Ссылка на массив описывающий найденный, либо созданный тип
-	* события. Структура данного массива: <pre style="font-size:95%"> Array ( [TYPE_ID] =&gt; ID
-	* типа события [DYNAMIC_KEEP_DAYS] =&gt; количество дней, отведенное для
-	* хранения статистики по данному типу события в разрезе по дням
-	* [KEEP_DAYS] =&gt; количество дней, отведенное для хранения событий
-	* данного типа [DATE_ENTER_STR] =&gt; дата создания события )</pre>
+	* события. Структура данного массива: 		<pre style="font-size:95%"> Array (     [TYPE_ID]
+	* =&gt; ID типа события     [DYNAMIC_KEEP_DAYS] =&gt; количество дней, отведенное
+	* для                             хранения статистики по данному                           
+	* типу события в разрезе по дням     [KEEP_DAYS] =&gt; количество дней,
+	* отведенное для хранения                    событий данного типа    
+	* [DATE_ENTER_STR] =&gt; дата создания события )</pre>
 	*
 	* @return int <p>Метод возвращает ID найденного типа события, либо вновь
 	* созданного.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим ID типа события "softkey/order"
 	* // либо создадим новый тип события
@@ -176,10 +177,10 @@ class CAllStatEventType
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyevents.php">CStatEventType::GetByEvents</a>
-	* </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> </li>
+	* 	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/getbyid.php">CStatEventType::GetByID</a> 	</li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип события"</a>
-	* </li> </ul> </ht<a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -222,7 +223,7 @@ class CAllStatEventType
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // зафиксируем событие типа "Скачивание файла manual.chm" (download/manual)
 	* // если такого типа не существует, он будет автоматически создан
@@ -254,8 +255,8 @@ class CAllStatEventType
 	* <h4>See Also</h4> 
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cstateventtype/conditionset.php">CStatEventType::ConditionSet</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
-	* события"</a> </li> </ul> </ht<a name="examples"></a>
+	* 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">Термин "Тип
+	* события"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static

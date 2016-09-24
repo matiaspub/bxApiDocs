@@ -5,10 +5,15 @@ use Bitrix\Main;
 
 Main\Localization\Loc::loadMessages(__FILE__);
 
-class HttpExceptionHandlerOutput
-	implements IExceptionHandlerOutput
+class HttpExceptionHandlerOutput implements IExceptionHandlerOutput
 {
-	public static function renderExceptionMessage(\Exception $exception, $debug = false)
+	/**
+	 * @param \Error|\Exception $exception
+	 * @param bool $debug
+	 * @throws Main\ArgumentNullException
+	 * @throws Main\ArgumentTypeException
+	 */
+	static public function renderExceptionMessage($exception, $debug = false)
 	{
 		if ($debug)
 		{

@@ -66,12 +66,7 @@ class MssqlConnection extends Connection
 		// hide cautions
 		sqlsrv_configure("WarningsReturnAsErrors", 0);
 
-		/** @noinspection PhpUnusedLocalVariableInspection */
-		global $DB, $USER, $APPLICATION;
-		if ($fn = \Bitrix\Main\Loader::getPersonal("php_interface/after_connect_d7.php"))
-		{
-			include($fn);
-		}
+		$this->afterConnected();
 	}
 
 	/**
@@ -153,6 +148,17 @@ class MssqlConnection extends Connection
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает количество поражённых строк из последнего невыполненного запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/getaffectedrowscount.php
+	* @author Bitrix
+	*/
 	public function getAffectedRowsCount()
 	{
 		return sqlsrv_rows_affected($this->lastQueryResult);
@@ -165,6 +171,19 @@ class MssqlConnection extends Connection
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет существование таблицы.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/istableexists.php
+	* @author Bitrix
+	*/
 	public function isTableExists($tableName)
 	{
 		$tableName = preg_replace("/[^A-Za-z0-9%_]+/i", "", $tableName);
@@ -192,6 +211,21 @@ class MssqlConnection extends Connection
 	 * @return boolean
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет существование индекса.</p> <p>Актуально содержание колонок в индексе может отличаться от запрошенных. В <code>$columns</code> можно использовать префикс столбцов актуального индекса.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы.
+	*
+	* @param array $columns  Массив столбцов в индексе.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/isindexexists.php
+	* @author Bitrix
+	*/
 	public function isIndexExists($tableName, array $columns)
 	{
 		return $this->getIndexName($tableName, $columns) !== null;
@@ -207,6 +241,24 @@ class MssqlConnection extends Connection
 	 * @return string|null Name of the index or null if the index doesn't exist.
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает имя индекса.</p>
+	*
+	*
+	* @param string $tableName  Название таблицы.
+	*
+	* @param array $columns  Массив колонок индекса.
+	*
+	* @param boolean $strict = false Флаг, устанавливающий, что колонки в индексе должны точно
+	* соответствовать колонкам в параметре $Columns.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/getindexname.php
+	* @author Bitrix
+	*/
 	public function getIndexName($tableName, array $columns, $strict = false)
 	{
 		if (!is_array($columns) || count($columns) <= 0)
@@ -259,6 +311,19 @@ class MssqlConnection extends Connection
 	 * @return Entity\ScalarField[] An array of objects with columns information.
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает объекты полей соответствующие колонкам таблицы. Таблица должна существовать.</p>
+	*
+	*
+	* @param string $tableName  Имя таблицы
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/gettablefields.php
+	* @author Bitrix
+	*/
 	public function getTableFields($tableName)
 	{
 		if (!isset($this->tableColumnsCache[$tableName]))
@@ -334,6 +399,21 @@ class MssqlConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод переименовывает таблицу. Таблица обязательно должна существовать и новое имя не должно встречаться в БД.</p>
+	*
+	*
+	* @param string $currentName  Старое имя таблицы
+	*
+	* @param string $newName  Новое имя таблицы
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/renametable.php
+	* @author Bitrix
+	*/
 	public function renameTable($currentName, $newName)
 	{
 		$this->query('EXEC sp_rename '.$this->getSqlHelper()->quote($currentName).', '.$this->getSqlHelper()->quote($newName));
@@ -347,6 +427,19 @@ class MssqlConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод удаляет таблицу.</p>
+	*
+	*
+	* @param string $tableName  Имя удаляемой таблицы
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/droptable.php
+	* @author Bitrix
+	*/
 	public function dropTable($tableName)
 	{
 		$this->query('DROP TABLE '.$this->getSqlHelper()->quote($tableName));
@@ -362,6 +455,17 @@ class MssqlConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод производит запуск новой транзакции базы данных.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/starttransaction.php
+	* @author Bitrix
+	*/
 	public function startTransaction()
 	{
 		$this->connectInternal();
@@ -374,6 +478,17 @@ class MssqlConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический  метод останавливает начатую транзакцию Базы данных.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/committransaction.php
+	* @author Bitrix
+	*/
 	public function commitTransaction()
 	{
 		$this->connectInternal();
@@ -386,6 +501,17 @@ class MssqlConnection extends Connection
 	 * @return void
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод откатывает начатую транзакцию.</p> <p>Без параметров</p>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/rollbacktransaction.php
+	* @author Bitrix
+	*/
 	public function rollbackTransaction()
 	{
 		$this->connectInternal();
@@ -405,6 +531,23 @@ class MssqlConnection extends Connection
 	 * @return string
 	 * @see \Bitrix\Main\DB\Connection::getType
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает тип БД.</p> <ul><li> mssql </li></ul> <p>Без параметров</p>
+	*
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/gettype.php">\Bitrix\Main\DB\Connection::getType</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "mssql";
@@ -419,6 +562,17 @@ class MssqlConnection extends Connection
 	 * @return array
 	 * @throws \Bitrix\Main\Db\SqlQueryException
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает версию подключённой БД.</p> <p>Версия представляется в виде массива из двух элементов:</p> - Первый (с индексом 0) - версия БД.<br> - Второй (с индексом 1) выводится, если используется light или express версия БД.<br><p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlconnection/getversion.php
+	* @author Bitrix
+	*/
 	public function getVersion()
 	{
 		if ($this->version == null)

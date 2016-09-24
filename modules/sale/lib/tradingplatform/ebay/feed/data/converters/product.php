@@ -150,17 +150,20 @@ class Product extends DataConverter
 
 	protected function getAttributesItem($attributesList, $data)
 	{
+		if(!is_array($data["PROPERTIES"]))
+			return array();
+
 		$result = array();
 
 		foreach($attributesList as $ebayCategoryAttrId => $bitrixAttr)
 		{
 			$value = $this->getBitrixItemPropValue($bitrixAttr, $data["PROPERTIES"]);
-
 			$name = $this->getEbayCategoryAttrName($ebayCategoryAttrId);
 
 			if($value !== false)
 				$result[$name] = $value;
 		}
+
 		return $result;
 	}
 

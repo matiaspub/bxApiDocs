@@ -25,6 +25,17 @@ $BX_CACHE_DOCROOT = array();
 global $MODULE_PERMISSIONS;
 $MODULE_PERMISSIONS = array();
 
+
+/**
+ * <b>CMain</b> - главный класс страницы.    <br><br>  При создании каждой страницы создаётся глобальный объект этого класса с именем $APPLICATION.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php
+ * @author Bitrix
+ */
 abstract class CAllMain
 {
 	var $ma, $mapos;
@@ -93,11 +104,6 @@ abstract class CAllMain
 
 	public function __construct()
 	{
-		$this->CMain();
-	}
-
-	public function CMain()
-	{
 		global $QUERY_STRING;
 		$this->sDocPath2 = GetPagePath(false, true);
 		$this->sDirPath = GetDirPath($this->sDocPath2);
@@ -114,7 +120,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает путь к текущей странице относительно корня. Динамичный метод.</p> <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	* <p>Возвращает путь к текущей странице относительно корня. Нестатический метод.</p>   <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
 	*
 	*
 	* @param bool $get_index_page = null Параметр указывает, нужно ли для индексной страницы раздела
@@ -125,29 +131,26 @@ abstract class CAllMain
 	* <b>BX_DISABLE_INDEX_PAGE</b>. Если значение константы <i>true</i>, то значение
 	* параметра по умолчанию get_index_page=false. </li> <li> <b>false</b>, из
 	* возвращаемого url страницы будет удалено index.php (вернется подстрока
-	* от 0-й позиции до первого встретившегося "/index.php")</li> <li> <b>true</b>, url
-	* вернется без изменений</li> </ul>
+	* от 0-й позиции до первого встретившегося "/index.php")</li>  <li> <b>true</b>, url
+	* вернется без изменений</li>   </ul>
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // текущая страница: /ru/?id=3&amp;s=5
 	* $page = <b>$APPLICATION-&gt;GetCurPage</b>(); // результат - /ru/index.php
-	* ?&gt;
-	* 
-	* Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/69300/blog/7597/">Как проверить на главной ли странице мы находимся</a></li>
+	* ?&gt;Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/69300/blog/7597/">Как проверить на главной ли странице мы находимся</a></li>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li>  
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php">CMain::GetCurPageParam</a> </li>   <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setcurpage.php">CMain::SetCurPage</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
 	* name="examples"></a>
 	*
@@ -179,10 +182,10 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает в объекте класса CMain текущую страницу и ее параметры. Динамичный метод.</p>
+	* <p>Устанавливает в объекте класса CMain текущую страницу и ее параметры. Нестатический метод.</p>
 	*
 	*
-	* @param string $page  Адрес страницы. Например, "/ru/index.php". </htm
+	* @param string $page  Адрес страницы. Например, "/ru/index.php".
 	*
 	* @param mixed $param = false Строка параметров. Например, "id=2&amp;s=3&amp;t=4". Параметр
 	* необязательный. Если его не задавать, то параметры страницы в
@@ -191,7 +194,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;SetCurPage</b>("/ru/index.php", "id=2&amp;s=3");
 	* ?&gt;
@@ -220,7 +223,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает путь к текущей странице относительно корня вместе с параметрами. Динамичный метод.</p> <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	* <p>Возвращает путь к текущей странице относительно корня вместе с параметрами. Нестатический метод.</p> <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции  <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
 	*
 	*
 	* @param string $add_params = "" Строка параметров добавляемая к возвращаемому
@@ -234,13 +237,13 @@ abstract class CAllMain
 	* <b>BX_DISABLE_INDEX_PAGE</b>. Если значение константы <i>true</i>, то значение
 	* параметра по умолчанию get_index_page=false. </li> <li> <b>false</b>, из
 	* возвращаемого url страницы будет удалено index.php (вернется подстрока
-	* от 0-й позиции до первого встретившегося "/index.php")</li> <li> <b>true</b>, url
-	* вернется без изменений</li> </ul>
+	* от 0-й позиции до первого встретившегося "/index.php")</li>  <li> <b>true</b>, url
+	* вернется без изменений</li>   </ul>
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // текущая страница: /ru/?id=3&amp;s=5
 	* $uri = <b>$APPLICATION-&gt;GetCurUri</b>("r=1&amp;t=2"); // результат - /ru/index.php?id=3&amp;s=5&amp;r=1&amp;t=2
@@ -275,14 +278,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает путь к текущей странице относительно корня c добавленными новыми и(или) удаленными текущими параметрами. Динамичный метод.</p> <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p>
+	* <p>Возвращает путь к текущей странице относительно корня c добавленными новыми и(или) удаленными текущими параметрами. Нестатический метод.</p>   <p>Если файл текущей страницы явно не определён, то определение индексного файла каталога будет проходить по алгоритму представленному в описании функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirindex.php">GetDirIndex</a>.</p> <p>Функции метода в новом ядре выполняют:</p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/addparams.php" >Bitrix\Main\Web\Uri::addParams</a>,</li> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/deleteparams.php" >Bitrix\Main\Web\Uri::deleteParams</a>,</li>  <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/geturi.php" >Bitrix\Main\Web\Uri::getUri</a>.</li>   </ul>
 	*
 	*
 	* @param string $add_params = "" Строка с параметрами которые нужно добавить к возвращаемому
-	* значению. <br> Необязательный. По умолчанию "".
+	* значению.             <br>           Необязательный. По умолчанию "".
 	*
-	* @param array $remove_params = array() Массив параметров, которые необходимо удалить из URL-а страницы. <br>
-	* Необязательный. По умолчанию - пустой массив.
+	* @param array $remove_params = array() Массив параметров, которые необходимо удалить из URL-а страницы.     
+	*        <br>           Необязательный. По умолчанию - пустой массив.
 	*
 	* @param bool $get_index_page = null Параметр указывает, нужно ли для индексной страницы раздела
 	* возвращать путь, заканчивающийся на "index.php". Если значение
@@ -292,20 +295,18 @@ abstract class CAllMain
 	* <b>BX_DISABLE_INDEX_PAGE</b>. Если значение константы <i>true</i>, то значение
 	* параметра по умолчанию get_index_page=false. </li> <li> <b>false</b>, из
 	* возвращаемого url страницы будет удалено index.php (вернется подстрока
-	* от 0-й позиции до первого встретившегося "/index.php")</li> <li> <b>true</b>, url
-	* вернется без изменений</li> </ul>
+	* от 0-й позиции до первого встретившегося "/index.php")</li>  <li> <b>true</b>, url
+	* вернется без изменений</li>   </ul>
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // текущая страница: /ru/?id=3&amp;s=5&amp;d=34
 	* $page = <b>$APPLICATION-&gt;GetCurPageParam</b>("id=45", array("id", "d")); 
 	* // результат - /ru/index.php?id=45&amp;s=5
-	* ?&gt;
-	* 
-	* // пример формирование ссылок "Logout" и "Регистрация"
+	* ?&gt;// пример формирование ссылок "Logout" и "Регистрация"
 	* 
 	* &lt;?if ($USER-&gt;IsAuthorized()):?&gt;
 	* 
@@ -329,12 +330,12 @@ abstract class CAllMain
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/deleteparam.php">DeleteParam</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a> </li> </ul><a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/deleteparam.php">DeleteParam</a>  </li>      
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpage.php">CMain::GetCurPage</a>  </li>    
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcururi.php">CMain::GetCurUri</a>  </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurdir.php">CMain::GetCurDir</a>  </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getpagepath.php">GetPagePath</a>  </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/getdirpath.php">GetDirPath</a>  </li>    </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -361,22 +362,19 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает каталог текущей страницы относительно корня. Динамичный метод.</p>
+	* <p>Возвращает каталог текущей страницы относительно корня. Нестатический метод.</p>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // текущая страница: /ru/support/index.php?id=3&amp;s=5
 	* global $APPLICATION;
 	* $dir = <b>$APPLICATION-&gt;GetCurDir</b>();
 	* // в $dir будет значение "/ru/support/"
-	* ?&gt;
-	* 
-	* Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum7/topic55566/message292619/#message292619">Как исключить индексную страницу из показа</a></li>
+	* ?&gt;Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum7/topic55566/message292619/#message292619">Как исключить индексную страницу из показа</a></li>
 	* </pre>
 	*
 	*
@@ -401,7 +399,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Ищет файл с заданным именем последовательно вверх по иерархии папок. Если файл найден - возвращает путь к найденному файлу относительно корня, в противном случае возвращает "false". Динамичный метод.</p>
+	* <p>Ищет файл с заданным именем последовательно вверх по иерархии папок. Если файл найден - возвращает путь к найденному файлу относительно корня, в противном случае возвращает "false". Нестатический метод.</p>
 	*
 	*
 	* @param string $FileName  Имя файла.
@@ -413,7 +411,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // ищем файл params.php вверх по иерархии разделов начиная с текущего каталога
 	* // если файл найден то подключаем его как PHP код
@@ -451,17 +449,17 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Подключает скрипт с административным прологом и эпилогом. Динамичный метод.</p>
+	* <p>Подключает скрипт с административным прологом и эпилогом. Нестатический метод.</p>
 	*
 	*
-	* @param string $title  Заголовок страницы. </ht
+	* @param string $title  Заголовок страницы.
 	*
 	* @param string $abs_path  Абсолютный путь к подключаемому файлу.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function DoInstall()
 	* {
@@ -484,14 +482,14 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2824" >Описание
-	* модуля</a> </li></ul> <a name="examples"></a>
+	* модуля</a> </li></ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includeadminfile.php
 	* @author Bitrix
 	*/
-	public static function IncludeAdminFile($strTitle, $filepath)
+	public function IncludeAdminFile($strTitle, $filepath)
 	{
 		//define all global vars
 		$keys = array_keys($GLOBALS);
@@ -501,8 +499,7 @@ abstract class CAllMain
 				global ${$keys[$i]};
 
 		//title
-		/** @global CMain $APPLICATION */
-		$APPLICATION->SetTitle($strTitle);
+		$this->SetTitle($strTitle);
 
 		include($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/include/prolog_admin_after.php");
 		include($filepath);
@@ -517,7 +514,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод подключает ряд компонентов в зависимости от параметров пришедших на страницу: </p> <table class="tnormal" width="100%"><tbody> <tr> <th width="25%">Параметр</th> <th width="25%">Значение</th> <th width="50%">Название компонента</th> </tr> <tr> <td>forgot_password</td> <td>yes</td> <td>Форма отправки контрольного слова для смены пароля (<b>system.auth.forgotpasswd</b>)</td> </tr> <tr> <td>change_password</td> <td>yes</td> <td>(Форма смены забытого пароля (<b>system.auth.changepasswd</b>)</td> </tr> <tr> <td>register</td> <td>yes</td> <td>Форма регистрации (<b>system.auth.registration</b>)</td> </tr> <tr> <td>authorize_registration</td> <td>yes</td> <td>Форма авторизации (<b>system.auth.authorize</b>)</td> </tr> </tbody></table> <p>Если не указан ни один из параметров, то по умолчанию метод подключит компонент "Форма авторизации".</p> <p class="note"><b>Примечание</b>. После вывода соответствующего компонента метод завершает выполнение страницы.</p> <p>Динамичный метод.</p>
+	* <p>Метод подключает ряд компонентов в зависимости от параметров пришедших на страницу: </p>      <table class="tnormal" width="100%"><tbody> <tr> <th width="25%">Параметр</th> <th width="25%">Значение</th> <th width="50%">Название компонента</th> </tr> <tr> <td>forgot_password</td> <td>yes</td> <td>Форма отправки контрольного слова для смены пароля (<b>system.auth.forgotpasswd</b>)</td> </tr> <tr> <td>change_password</td> <td>yes</td> <td>(Форма смены забытого пароля (<b>system.auth.changepasswd</b>)</td> </tr> <tr> <td>register</td> <td>yes</td> <td>Форма регистрации (<b>system.auth.registration</b>)</td> </tr> <tr> <td>authorize_registration</td> <td>yes</td> <td>Форма авторизации (<b>system.auth.authorize</b>)</td> </tr> </tbody></table> <p>Если не указан ни один из параметров, то по умолчанию метод подключит компонент "Форма авторизации".</p>    <p class="note"><b>Примечание</b>. После вывода соответствующего компонента метод завершает выполнение страницы.</p> <p>Нестатический метод.</p>
 	*
 	*
 	* @param mixed $mess  yes
@@ -533,7 +530,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // определим право чтения на файл "/download/document.doc" у текущего пользователя
 	* $FILE_PERM = $APPLICATION-&gt;GetFileAccessPermission("/download/document.doc");
@@ -546,10 +543,10 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04565"
-	* >Компоненты</a></li> <li> <a
+	* >Компоненты</a></li>   <li> <a
 	* href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >Права доступа</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> </li> </ul>
-	* <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> </li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -654,14 +651,12 @@ abstract class CAllMain
 			die();
 	}
 
-	public static function ShowAuthForm($message)
+	public function ShowAuthForm($message)
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-		$APPLICATION->AuthForm($message, false, false, "N", false);
+		$this->AuthForm($message, false, false, "N", false);
 	}
 
-	public static function NeedCAPTHAForLogin($login)
+	static public function NeedCAPTHAForLogin($login)
 	{
 		//When last login was failed then ask for CAPTCHA
 		if(isset($_SESSION["BX_LOGIN_NEED_CAPTCHA"]) && $_SESSION["BX_LOGIN_NEED_CAPTCHA"])
@@ -735,7 +730,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает HTML-код для отображения меню заданного типа. В отличии от метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> шаблон меню будет подключаться на каждый пункт меню. Динамичный метод.</p>
+	* <p>Возвращает HTML-код для отображения меню заданного типа. В отличии от метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> шаблон меню будет подключаться на каждый пункт меню. Нестатический метод.</p>
 	*
 	*
 	* @param string $type = "left" Тип меню.<br>Необязателен. По умолчанию "left".
@@ -758,20 +753,17 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Вывод меню в файле <code>/bitrix/templates/demo/header.php</code>:
-	* </h
 	* &lt;?
 	* echo <b>$APPLICATION-&gt;GetMenuHtml</b>("left", true);
-	* ?&gt;Файл <code>/.left.menu.php</code>:</b
+	* ?&gt;Файл <code>/.left.menu.php</code>:
 	* &lt;?
 	* // основной файл меню
 	* // данный файл может редактироваться в редакторе меню
 	* $aMenuLinks = Array(
 	* );
-	* ?&gt;
-	* 
-	* Файл <code>/.left.menu_ext.php</code>:</b
+	* ?&gt;Файл <code>/.left.menu_ext.php</code>:
 	* &lt;?
 	* // дополнительный файл меню
 	* // добавляет в основной массив меню разделы каталога телефонов
@@ -821,9 +813,7 @@ abstract class CAllMain
 	*     $aMenuLinks = array_merge($aMenuLinksNew, $aMenuLinks);
 	* 
 	* endif;
-	* ?&gt;
-	* 
-	* Шаблон меню <code>/bitrix/templates/demo/left.menu_template.php</code>:
+	* ?&gt;Шаблон меню <code>/bitrix/templates/demo/left.menu_template.php</code>:
 	* &lt;?
 	* // This file is the template for one menu item iteration
 	* 
@@ -831,21 +821,21 @@ abstract class CAllMain
 	* if ($ITEM_TYPE=="D")
 	* {
 	*     if ($SELECTED)
-	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_folder_open.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_folder_open.gif' width='17' border='0'&gt;&lt;/td&gt;";
 	*     else
-	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_folder.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_folder.gif' width='17' border='0'&gt;&lt;/td&gt;";
 	* }
 	* else
 	* {
 	*     if ($SELECTED)
 	*     {
-	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
-	*         $strDir_d = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir_d = "&lt;td width='0%' bgcolor='#A0C4E0' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
 	*     }
 	*     else
 	*     {
-	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
-	*         $strDir_d = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
+	*         $strDir = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet.gif' width='17' border='0'&gt;&lt;/td&gt;";
+	*         $strDir_d = "&lt;td width='0%' bgcolor='#CCDFEE' valign='middle' align='center'&gt;&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/left_bullet_d.gif' width='17' border='0' alt='Закрытый раздел'&gt;&lt;/td&gt;";
 	*     }
 	* }
 	* 
@@ -860,7 +850,7 @@ abstract class CAllMain
 	* if ($PARAMS["SEPARATOR"]=="Y")
 	* {
 	*     $strstyle = " style='background-color: #D5ECE6; border-top: 1px solid #A6D0D7; border-bottom: 1px solid #A6D0D7; padding:8;'";
-	*     $strDir = "&lt;img height='13' src='/bitrix/templates/demo/images/1.gif' width='17' border='0'&gt;";
+	*     $strDir = "&lt;img height='13' src='//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif' width='17' border='0'&gt;";
 	*     $strtext = "leftmenu";
 	* }
 	* else
@@ -870,16 +860,16 @@ abstract class CAllMain
 	* // Content of variable $sMenuProlog is typed just before all menu items iterations
 	* // Content of variable $sMenuEpilog is typed just after all menu items iterations
 	* $sMenuProlog = "&lt;table border='0' cellpadding='0' cellspacing='0' width='100%'&gt;";
-	* $sMenuEpilog = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
+	* $sMenuEpilog = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
 	* 
 	* // if $PERMISSION &gt; "D" then current user can access this page
 	* if ($PERMISSION &gt; "D")
 	* {
-	*     $sMenuBody = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir.'&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class="'.$strtext.'"&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
+	*     $sMenuBody = '&lt;tr&gt;&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir.'&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class="'.$strtext.'"&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
 	* }
 	* else
 	* {
-	*     $sMenuBody = '&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir_d.'&lt;/td&gt;&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class='.$strtext.'&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
+	*     $sMenuBody = '&lt;td colspan=2 background="/bitrix/templates/demo/images/l_menu_border.gif"&gt;&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="1"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;'.$strDir_d.'&lt;/td&gt;&lt;td valign="top"'.$strstyle.' width="100%"&gt;&lt;a href="'.$LINK.'" class='.$strtext.'&gt;'.$TEXT.'&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;';
 	* 
 	* }
 	* ?&gt;
@@ -907,7 +897,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает HTML-код для отображения меню заданного типа. В отличие от метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> шаблон меню будет подключаться только один раз. Динамичный метод.</p> <p class="note"><b>Примечание</b>. В шаблоне меню, используемом данным методом, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
+	* <p>Возвращает HTML-код для отображения меню заданного типа. В отличие от метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> шаблон меню будет подключаться только один раз. Нестатический метод.</p> <p class="note"><b>Примечание</b>. В шаблоне меню, используемом данным методом, в обязательном порядке необходимо инициализировать переменную <b>$sMenu</b>, в которой должен храниться HTML представляющий из себя все меню целиком.</p>
 	*
 	*
 	* @param string $type = "left" Тип меню.<br>Необязателен. По умолчанию "left".
@@ -930,11 +920,10 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Вывод меню в файле <code>/bitrix/templates/demo/header.php</code>:
-	* </h
-	* &lt;script language="JavaScript1.2" src="/bitrix/templates/demo/js/ddnmenu.js"&gt;&lt;/script&gt;
-	* &lt;?echo <b>$APPLICATION-&gt;GetMenuHtmlEx</b>("top");?&gt;Файл <code>/.top.menu.php</code>:</b&lt;?
+	* &lt;script language="JavaScript1.2" src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/js/ddnmenu.js"&gt;&lt;/script&gt;
+	* &lt;?echo <b>$APPLICATION-&gt;GetMenuHtmlEx</b>("top");?&gt;Файл <code>/.top.menu.php</code>:&lt;?
 	* // основной файл меню
 	* // данный файл может редактироваться в редакторе меню
 	* $aMenuLinks = Array(
@@ -974,12 +963,10 @@ abstract class CAllMain
 	*         "" 
 	*     )
 	* );
-	* ?&gt;
-	* 
-	* Файл <code>/bitrix/templates/demo/top.menu_template.php</code>:</b
+	* ?&gt;Файл <code>/bitrix/templates/demo/top.menu_template.php</code>:
 	* &lt;?
 	* // шаблон меню
-	* $sMenu = '&lt;table width="100%" border="0" cellspacing="0" cellpadding="0"&gt;&lt;tr&gt;&lt;td width="0%"&gt;&lt;img src="/bitrix/templates/demo/images/top_menu_corner.gif" alt="" width="15" height="19"&gt;&lt;/td&gt;';
+	* $sMenu = '&lt;table width="100%" border="0" cellspacing="0" cellpadding="0"&gt;&lt;tr&gt;&lt;td width="0%"&gt;&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/top_menu_corner.gif" alt="" width="15" height="19"&gt;&lt;/td&gt;';
 	* 
 	* for($i=0; $i&lt;count($arMENU); $i++)
 	* {
@@ -997,9 +984,9 @@ abstract class CAllMain
 	*     $sMenu .= '&lt;td width="0%" bgcolor="#7B9DBB"&gt;';
 	* 
 	*     if($i&lt;count($arMENU)-1) //add vertical divider after all items but not after the last one
-	*         $sMenu .= '&lt;img src="/bitrix/templates/demo/images/top_menu_divider.gif" width="15" height="19" alt=""&gt;';
+	*         $sMenu .= '&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/top_menu_divider.gif" width="15" height="19" alt=""&gt;';
 	*     else
-	*         $sMenu .= '&lt;img src="/bitrix/templates/demo/images/1.gif" width="1" height="19" alt=""&gt;';
+	*         $sMenu .= '&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="1" height="19" alt=""&gt;';
 	* 
 	*     $sMenu .= '&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
 	* 
@@ -1017,8 +1004,8 @@ abstract class CAllMain
 	*     }
 	*     $sMenu .= '&lt;/td&gt;';
 	* }
-	* $sMenu .= '&lt;td width="100%" bgcolor="#7B9DBB"&gt;&lt;img src="/bitrix/templates/demo/images/1.gif" width="50" height="1" alt=""&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
-	* ?&gt;</boФайл <code>/bitrix/templates/demo/popup.menu_template.php</code>:</b
+	* $sMenu .= '&lt;td width="100%" bgcolor="#7B9DBB"&gt;&lt;img src="//opt-560835.ssl.1c-bitrix-cdn.ru/bitrix/templates/demo/images/1.gif" width="50" height="1" alt=""&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
+	* ?&gt;Файл <code>/bitrix/templates/demo/popup.menu_template.php</code>:
 	* &lt;?
 	* $sMenu =
 	*     '&lt;table border="0" cellspacing="0" cellpadding="0" width="110"&gt;'.
@@ -1045,7 +1032,7 @@ abstract class CAllMain
 	*     }
 	* }
 	* $sMenu .= '&lt;/table&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;';
-	* ?&gt;Файл <code>/bitrix/templates/demo/js/ddnmenu.js</code>:</b
+	* ?&gt;Файл <code>/bitrix/templates/demo/js/ddnmenu.js</code>:
 	* var brname=navigator.appName, BrVer='';
 	* if(brname.substring(0,2)=="Mi")
 	*     BrVer='E';
@@ -1140,7 +1127,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">CMenu</a>, инициализированный методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a>. Если произошла ошибка, то текст ошибки будет содержаться в свойстве LAST_ERROR данного объекта. Динамичный метод.</p>
+	* <p>Возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">CMenu</a>, инициализированный методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a>. Если произошла ошибка, то текст ошибки будет содержаться в свойстве LAST_ERROR данного объекта. Нестатический метод.</p>
 	*
 	*
 	* @param string $type = "left" Тип меню.<br>Необязателен. По умолчанию "left".
@@ -1161,7 +1148,7 @@ abstract class CAllMain
 	* @return CMenu 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выводим меню типа "left"
 	* // с поддержкой файлов .<i>тип меню</i>.menu_ext.php
@@ -1185,7 +1172,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/index.php">Класс CMenu</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmenu/init.php">CMenu::Init</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtml.php">CMain::GetMenuHtml</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmenuhtmlex.php">CMain::GetMenuHtmlEx</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1205,13 +1192,13 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Определяет является ли текущий протокол защищенным (HTTPS). Статичный метод.</p>
+	* <p>Определяет является ли текущий протокол защищенным (HTTPS). Статический  метод.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* global $APPLICATION;
 	* // получим полный URI текущий страницы
@@ -1230,20 +1217,12 @@ abstract class CAllMain
 	*/
 	public static function IsHTTPS()
 	{
-		if($_SERVER["SERVER_PORT"] == 443)
-			return true;
-
-		// 'HTTPS' Set to a non-empty value if the script was queried through the HTTPS protocol.
-		// Note that when using ISAPI with IIS, the value will be "off" if the request was not made through the HTTPS protocol.
-		if(isset($_SERVER["HTTPS"]) && !empty($_SERVER["HTTPS"]) && strtolower($_SERVER["HTTPS"]) <> "off")
-			return true;
-
-		return false;
+		return \Bitrix\Main\Context::getCurrent()->getRequest()->isHttps();
 	}
 
 	
 	/**
-	* <p>Возвращает заголовок страницы. Динамичный метод.</p>
+	* <p>Возвращает заголовок страницы. Нестатический метод.</p>
 	*
 	*
 	* @param mixed $property_name = false Если указано значение "false", то будет возвращен заголовок
@@ -1281,17 +1260,17 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает заголовок страницы. Если заголовок страницы у вас выводится с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a>, то устанавливать его вы можете уже после того как у вас будет выведен пролог сайта. Динамичный метод.</p>
+	* <p>Устанавливает заголовок страницы. Если заголовок страницы у вас выводится с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a>, то устанавливать его вы можете уже после того как у вас будет выведен пролог сайта. Нестатический метод.</p>
 	*
 	*
-	* @param string $title  Заголовок страницы. </ht
+	* @param string $title  Заголовок страницы.
 	*
 	* @param arrray $Options = null Необязательный. По умолчанию - "null".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;SetTitle</b>("Page title");
 	* ?&gt;
@@ -1338,9 +1317,10 @@ abstract class CAllMain
 			}
 		}
 	}
+
 	
 	/**
-	* <p>Отображает заголовок страницы.<br><br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать заголовок страницы (например, внутри компонента) уже после того как был выведен пролог сайта. Динамичный метод.</p>
+	* <p>Отображает заголовок страницы.<br><br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать заголовок страницы (например, внутри компонента) уже после того как был выведен пролог сайта. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_name = "title" Идентификатор свойства страницы, значение которого будет
@@ -1355,7 +1335,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -1375,7 +1355,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
 	* >Отложенные функции</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettitle.php">CMain::GetTitle</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul> </ht<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settitle.php">CMain::SetTitle</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1390,19 +1370,19 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> для текущей страницы. Динамичный метод.</p>
+	* <p>Устанавливает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> для текущей страницы. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
 	*
-	* @param string $property_value  Значение свойства. </h
+	* @param string $property_value  Значение свойства.
 	*
 	* @param array $Options = null Необязательный. По умолчанию "null".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;SetPageProperty</b>("keywords", "веб, разработка, программирование");
 	* ?&gt;
@@ -1436,7 +1416,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущей страницы. Динамичный метод.</p>
+	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущей страницы. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
@@ -1470,7 +1450,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a>, учитывая свойства раздела.<br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать свойство страницы (например, внутри компонента) и использовать его в прологе уже после того как он был выведен. Динамичный метод.</p>
+	* <p>Отображает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a>, учитывая свойства раздела.<br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать свойство страницы (например, внутри компонента) и использовать его в прологе уже после того как он был выведен. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
@@ -1481,7 +1461,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -1508,7 +1488,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
-	* </li> </ul> </ht<a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1522,7 +1502,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущей страницы или раздела. Если на самой странице свойство не задано, то будет возвращено значение свойства вышестоящего раздела (рекурсивно до корня сайта). Динамичный метод.</p>
+	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущей страницы или раздела. Если на самой странице свойство не задано, то будет возвращено значение свойства вышестоящего раздела (рекурсивно до корня сайта). Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
@@ -1533,7 +1513,7 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $keywords = <b>$APPLICATION-&gt;GetProperty</b>("keywords");
 	* if (strlen($keywords)&gt;0) echo $keywords;
@@ -1552,7 +1532,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getdirpropertylist.php">CMain::GetDirPropertyList</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1574,7 +1554,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает массив всех <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойств страницы</a>. Динамичный метод.</p>
+	* <p>Возвращает массив всех <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойств страницы</a>. Нестатический метод.</p>
 	*
 	*
 	* @return array 
@@ -1611,12 +1591,12 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> для текущего раздела. Динамичный метод.</p>
+	* <p>Устанавливает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> для текущего раздела. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
 	*
-	* @param string $property_value  Значение свойства. </h
+	* @param string $property_value  Значение свойства.
 	*
 	* @param string $path = false Путь до страницы. Необязательный. По умолчанию - "false", то есть
 	* текущий.
@@ -1624,7 +1604,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;SetDirProperty</b>("keywords", "дизайн, веб, сайт");
 	* ?&gt;
@@ -1717,7 +1697,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущего раздела. Динамичный метод.</p>
+	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство</a> текущего раздела. Нестатический метод.</p>
 	*
 	*
 	* @param string $property_id  Идентификатор свойства.
@@ -1725,7 +1705,7 @@ abstract class CAllMain
 	* @param mixed $path = false Путь к каталогу. В случае многосайтовой версии, если DOCUMENT_ROOT у
 	* сайтов разный (задается в поле "Путь к корневой папке веб-сервера"
 	* в настройках сайта), то в данном параметре необходимо передавать
-	* массив вида:<pre>array("ID сайта", "путь")</pre>Необязателен. По умолчанию -
+	* массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "путь")</pre>Необязателен. По умолчанию -
 	* "false" - текущий каталог.
 	*
 	* @param mixed $default_value = false Значение свойства по умолчанию.<br>Необязательный. По умолчанию -
@@ -1769,13 +1749,13 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает массив <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойств раздела</a>, собранных рекурсивно до корня сайта. Динамичный метод.</p>
+	* <p>Возвращает массив <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойств раздела</a>, собранных рекурсивно до корня сайта. Нестатический метод.</p>
 	*
 	*
 	* @param string $path = false Путь к каталогу. В случае многосайтовой версии, если DOCUMENT_ROOT у
 	* сайтов разный (задается в поле "Путь к корневой папке веб-сервера"
 	* в настройках сайта), то в данном параметре необходимо передавать
-	* массив вида:<pre>array("ID сайта", "путь")</pre>Необязателен. По умолчанию -
+	* массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "путь")</pre>Необязателен. По умолчанию -
 	* "false" - текущий каталог.
 	*
 	* @return array 
@@ -1814,14 +1794,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a> обрамленное тегом &lt;meta&gt;. Если на самой страницы свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если свойство не задано, то метод вернет пустую строку. Динамичный метод.</p>
+	* <p>Возвращает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a> обрамленное тегом &lt;meta&gt;. Если на самой страницы свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если свойство не задано, то метод вернет пустую строку. Нестатический метод.</p>
 	*
 	*
-	* @param string $id  Идентификатор свойства страницы или раздела, значение которого
-	* (<i>value</i>) будет выведено в аттрибуте "content" мета-тега: <br> &lt;meta
-	* content="<i>value</i>" ...&gt;
+	* @param mixed $stringid  Идентификатор свойства страницы или раздела, значение которого
+	* (<i>value</i>) будет выведено в аттрибуте "content" мета-тега:          <br>    
+	* 	&lt;meta content="<i>value</i>" ...&gt;
 	*
-	* @param string $meta_name = false Атрибут "name" мета-тега: <br> &lt;meta name="<i>meta_name</i>" ...&gt; <br>
+	* @param string $meta_name = false Атрибут "name" мета-тега:          <br>  	&lt;meta name="<i>meta_name</i>" ...&gt;         <br>        
 	* Необязательный. По умолчанию равен идентификатору свойства
 	* <i>property_id</i>.
 	*
@@ -1833,7 +1813,7 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $meta_keywords = <b>$APPLICATION-&gt;GetMeta</b>("keywords_prop", "keywords");
 	* if (strlen($meta_keywords)&gt;0) echo $meta_keywords;
@@ -1842,10 +1822,10 @@ abstract class CAllMain
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a></li> </ul><a
-	* name="examples"></a>
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a></li>   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a></li>  
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a></li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1878,7 +1858,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Подключает модуль рекламы и отображает баннер заданного типа. Динамичный метод.</p>
+	* <p>Подключает модуль рекламы и отображает баннер заданного типа. Нестатический метод.</p>
 	*
 	*
 	* @param string $type  Тип баннера (административный пункт меню "Реклама" &gt; "Типы
@@ -1891,14 +1871,14 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>// подключим модуль рекламы и выведем баннер типа "LEFT"<br><b>$APPLICATION-&gt;ShowBanner</b>("LEFT", "&lt;div align=\"center\"&gt;", "&lt;br&gt;&lt;/div&gt;&lt;br&gt;");<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <p><a href="http://dev.1c-bitrix.ru/api_help/advertising/classes/index.php">Классы модуля
-	* Реклама</a></p> </htm<a name="examples"></a>
+	* Реклама</a></p><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1917,14 +1897,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a> в виде мета-тега. Метод допускает использование специальных символов (html entities) в значениях свойств.</p> <p>Если на самой странице свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если значение свойства не определено, то метод отобразит пустую строку.</p> <p>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать значения мета-тегов через свойства страницы или раздела (с помощью методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>) уже после того как был выведен пролог сайта.</p> <p>Динамичный метод.</p>
+	* <p>Отображает <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2814#properties" >свойство страницы</a> в виде мета-тега. Метод допускает использование специальных символов (html entities) в значениях свойств.</p>   <p>Если на самой странице свойство не задано, то будет взято значение свойства вышестоящего раздела (рекурсивно до корня сайта). Если значение свойства не определено, то метод отобразит пустую строку.</p>   <p>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать значения мета-тегов через свойства страницы или раздела (с помощью методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a>) уже после того как был выведен пролог сайта.</p> <p>Нестатический метод.</p>
 	*
 	*
-	* @param string $id  Идентификатор свойства страницы или раздела, значение которого
-	* (<i>value</i>) будет выведено в аттрибуте "content" мета-тега: <br> &lt;meta
-	* content="<i>value</i>" ...&gt;
+	* @param mixed $stringid  Идентификатор свойства страницы или раздела, значение которого
+	* (<i>value</i>) будет выведено в аттрибуте "content" мета-тега:           <br>       
+	* 	&lt;meta content="<i>value</i>" ...&gt;
 	*
-	* @param string $meta_name = false Аттрибут "name" мета-тега: <br> &lt;meta name="<i>meta_name</i>" ...&gt; <br>
+	* @param string $meta_name = false Аттрибут "name" мета-тега:          <br>  	&lt;meta name="<i>meta_name</i>" ...&gt;          <br>  
 	* Необязательный. По умолчанию равен идентификатору свойства
 	* <i>property_id</i>.
 	*
@@ -1936,7 +1916,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -1954,11 +1934,11 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
-	* >Отложенные функции</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php">CMain::GetMeta</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li> </ul>
-	* </ht<a name="examples"></a>
+	* >Отложенные функции</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getmeta.php">CMain::GetMeta</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setpageproperty.php">CMain::SetPageProperty</a> </li>   <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setdirproperty.php">CMain::SetDirProperty</a> </li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1977,17 +1957,17 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает CSS стиль для страницы. Динамичный метод.</p>
+	* <p>Устанавливает CSS стиль для страницы. Нестатический метод.</p> <p>В ядре D7 имеется аналог этого метода: <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addcss.php" >\Bitrix\Main\Page\Asset::addCss</a>.</p>
 	*
 	*
 	* @param string $Path2css  Путь относительно корня к файлу с CSS стилями.
 	*
-	* @param additiona $l = false Необязательный. По умолчанию "false".
+	* @param string $additional = false Необязательный. По умолчанию "false".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;SetAdditionalCSS</b>("/bitrix/templates/demo/additional.css");
 	* ?&gt;
@@ -2034,17 +2014,18 @@ abstract class CAllMain
 	/** @deprecated use Asset::getInstance()->getCss() */
 	
 	/**
-	* <p>Возвращает CSS страницы. CSS страницы может быть задан с помощью методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>. Помимо заданных CSS стилей, всегда возвращается CSS текущего шаблона сайта, задаваемого в файле <b>/bitrix/templates/</b><i>ID шаблона</i><b>/styles.css</b>. Динамичный метод.</p>
+	* <p>Возвращает CSS страницы. CSS страницы может быть задан с помощью методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>. Помимо заданных CSS стилей, всегда возвращается CSS текущего шаблона сайта, задаваемого в файле <b>/bitrix/templates/</b><i>ID шаблона</i><b>/styles.css</b>. Нестатический метод.</p>
 	*
 	*
 	* @param bool $external = true Если значение - "true", то выводится HTML представляющий из себя ссылку
-	* на внешний CSS, например: <br><pre>&lt;LINK
-	* href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
-	* значение "false", то выводится HTML представляющий из себя внутренний
-	* CSS, например: <pre>&lt;style type="text/css"&gt; body { margin: 0px; padding:0px; background-color: #FFFFFF}
-	* ... &lt;/style&gt;</pre> Исключение составляет CSS стили лежащие в каталоге
-	* /bitrix/modules/, они всегда подключаются как внутренний CSS (как правило
-	* это используется в стандартных компонентах).
+	* на внешний CSS, например:          <br><pre bgcolor="#323232" style="padding:5px;">&lt;LINK
+	* href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre>       
+	* Если значение "false", то выводится HTML представляющий из себя
+	* внутренний CSS, например:           <pre bgcolor="#323232" style="padding:5px;">&lt;style type="text/css"&gt; body { margin: 0px;
+	* padding:0px; background-color: #FFFFFF} ... &lt;/style&gt;</pre>        Исключение составляет CSS
+	* стили лежащие в каталоге /bitrix/modules/, они всегда подключаются как
+	* внутренний CSS (как правило это используется в стандартных
+	* компонентах).
 	*
 	* @param bool $bXhtmlStyle = true Параметр, устанавливающий, по какому стандарту оформляются
 	* HTML-теги. Если значение <i>true</i>, то теги выводятся по стандарту XHTML
@@ -2054,9 +2035,10 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a>  </li>      
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a>  </li>
+	*       <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a>    </li> 
 	* </ul><br><br>
 	*
 	*
@@ -2065,7 +2047,7 @@ abstract class CAllMain
 	* @author Bitrix
 	* @deprecated use Asset::getInstance()->getCss()
 	*/
-	public function GetCSS($cMaxStylesCnt = true, $bXhtmlStyle = true)
+	public function GetCSS($cMaxStylesCnt = true, $bXhtmlStyle = true, $assetTargetType = Main\Page\AssetShowTargetType::ALL)
 	{
 		if($cMaxStylesCnt === true)
 		{
@@ -2073,26 +2055,26 @@ abstract class CAllMain
 		}
 		$this->oAsset->setMaxCss($cMaxStylesCnt);
 		$this->oAsset->setXhtml($bXhtmlStyle);
-		$res = $this->oAsset->getCss();
+		$res = $this->oAsset->getCss($assetTargetType);
 		return $res;
 	}
 
 	
 	/**
-	* <p>Отображает CSS страницы. <br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать CSS страницы (например, внутри компонента) уже после того как был выведен пролог сайта. Динамичный метод.</p>
+	* <p>Отображает CSS страницы.     <br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, задавать CSS страницы (например, внутри компонента) уже после того как был выведен пролог сайта. Нестатический метод.</p>
 	*
 	*
-	* @param cMaxStylesCn $t = true Если значение - "true", то выводится HTML представляющий из себя ссылку
-	* на внешний CSS, например: <br><pre>&lt;LINK
-	* href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre> Если
-	* значение "false", то выводится HTML представляющий из себя внутренний
-	* CSS, например: <pre>&lt;style type="text/css"&gt; body { margin: 0px; padding:0px; background-color: #FFFFFF}
-	* ... &lt;/style&gt;</pre> Исключение составляет CSS стили лежащие в каталоге
-	* /bitrix/modules/, они всегда подключаются как внутренний CSS (как правило
-	* это используется в стандартных компонентах).<br> До версии 8.5.3
-	* назывался <i>bExternal</i>.
+	* @param mixed $cMaxStylesCnt = true Если значение - "true", то выводится HTML представляющий из себя ссылку
+	* на внешний CSS, например:           <br><pre bgcolor="#323232" style="padding:5px;">&lt;LINK
+	* href="http://dev.1c-bitrix.ru/bitrix/templates/demo/styles.css" type="text/css" rel="stylesheet"&gt;</pre>       
+	* Если значение "false", то выводится HTML представляющий из себя
+	* внутренний CSS, например:           <pre bgcolor="#323232" style="padding:5px;">&lt;style type="text/css"&gt; body { margin: 0px;
+	* padding:0px; background-color: #FFFFFF} ... &lt;/style&gt;</pre>        Исключение составляет CSS
+	* стили лежащие в каталоге /bitrix/modules/, они всегда подключаются как
+	* внутренний CSS (как правило это используется в стандартных
+	* компонентах).<br> До версии 8.5.3 назывался <i>bExternal</i>.
 	*
-	* @param bXhtmlStyl $e = true Параметр, устанавливающий, по какому стандарту оформляются
+	* @param mixed $bXhtmlStyle = true Параметр, устанавливающий, по какому стандарту оформляются
 	* HTML-теги. Если значение <i>true</i>, то теги выводятся по стандарту XHTML
 	* (&lt;link /&gt;), иначе по стандарту HTML 4 (&lt;link&gt;). Параметр появился в
 	* версии 8.5.3 ядра. Необязательный, по умолчанию <i>true</i>.
@@ -2100,7 +2082,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -2118,18 +2100,18 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
-	* >Отложенные функции</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li>
-	* </ul> </ht<a name="examples"></a>
+	* >Отложенные функции</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcss.php">CMain::GetCSS</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/settemplatecss.php">CMain::SetTemplateCSS</a> </li>   <li>
+	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setadditionalcss.php">CMain::SetAdditionalCSS</a> </li> 
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php
 	* @author Bitrix
 	*/
-	public function ShowCSS($cMaxStylesCnt=true, $bXhtmlStyle=true)
+	public function ShowCSS($cMaxStylesCnt = true, $bXhtmlStyle = true)
 	{
 		$this->AddBufferContent(array(&$this, "GetHeadStrings"), 'BEFORE_CSS');
 		$this->AddBufferContent(array(&$this, "GetCSS"), $cMaxStylesCnt, $bXhtmlStyle);
@@ -2138,27 +2120,25 @@ abstract class CAllMain
 	/** @deprecated $Asset::getInstance->addString($str, $bUnique, $location); */
 	
 	/**
-	* <p>Метод добавляет строку в секцию &lt;head&gt;…&lt;/head&gt; сайта. Динамичный метод.</p>
+	* <p>Метод добавляет строку в секцию &lt;head&gt;…&lt;/head&gt; сайта. Нестатический метод.</p> <p>Аналог метода <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addstring.php" >\Bitrix\Main\Page\Asset::addString</a> в ядре D7.</p>
 	*
 	*
-	* @param st $r  строка, которая будет добавлена в секцию …
+	* @param mixed $str  строка, которая будет добавлена в секцию …
 	*
 	* @param bool $Unique = false если <b>true</b> и такая строка уже добавлена в секцию <i>&lt;head&gt;</i>, то
 	* она не будет продублирована. Если <b>false</b>, то строка будет
-	* добавлена в секцию <i>&lt;head&gt;</i> без проверки на уникальность.
+	* добавлена в секцию <i>&lt;head&gt;</i> без проверки на уникальность. 
 	* <p>Проверка уникальности (при установленном параметре $bUnique = true)
 	* производится путем вычисления md5-хеша от строки в
 	* <code>/bitrix/modules/main/classes/general/main.php</code>.</p>
 	*
-	* @param additiona $l = false Необязательный. По умолчанию <i>false</i>.
+	* @param mixed $additional = false Необязательный. По умолчанию <i>false</i>.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* Добавим файл стилей <b>style.css</b> из текущего каталога.
-	* 
-	* &lt;?$APPLICATION-&gt;AddHeadString('&lt;link href="'.$APPLICATION-&gt;GetCurDir().'"style.css";  type="text/css" rel="stylesheet" /&gt;',true)?&gt;
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Добавим файл стилей <b>style.css</b> из текущего каталога.&lt;?$APPLICATION-&gt;AddHeadString('&lt;link href="'.$APPLICATION-&gt;GetCurDir().'"style.css";  type="text/css" rel="stylesheet" /&gt;',true)?&gt;
 	* </pre>
 	*
 	*
@@ -2190,15 +2170,15 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает специальные стили, JavaScript либо произвольный html-код. <br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a> и используется в шаблоне сайта для вывода произвольного кода. Такой код задается, например, в компонентах с помощью CMain::AddHeadString().</p> <p>ShowHeadStrings - аналог методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">ShowMeta</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">ShowTitle</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">ShowCSS</a>, только более универсальный. Динамичный метод.</p>
+	* <p>Отображает специальные стили, JavaScript либо произвольный html-код.    <br><br> Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a> и используется в шаблоне сайта для вывода произвольного кода. Такой код задается, например, в компонентах с помощью CMain::AddHeadString().</p>   <p>ShowHeadStrings - аналог методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">ShowMeta</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">ShowTitle</a>, <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">ShowCSS</a>, только более универсальный. Нестатический метод.</p>
 	*
 	*
-	* @param additiona $l = false 
+	* @param mixed $additional = false 
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -2213,9 +2193,7 @@ abstract class CAllMain
 	* &lt;/head&gt;
 	* &lt;body&gt;
 	* ...
-	* Рассмотрим пример использования CMain::AddHeadString(). В файле <code>\bitrix\modules\main\include\epilog_after.php</code> используется код: 
-	* 
-	* ...
+	* Рассмотрим пример использования CMain::AddHeadString(). В файле <code>\bitrix\modules\main\include\epilog_after.php</code> используется код: ...
 	* if($bShowStat &amp;&amp; !$USER-&gt;IsAuthorized())
 	* {
 	* require_once($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/interface/init_admin.php");
@@ -2224,16 +2202,15 @@ abstract class CAllMain
 	* $GLOBALS["APPLICATION"]-&gt;AddHeadString('&lt;link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/pubstyles.css" /&gt;');
 	* }
 	* ...
-	* Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/10078/">ShowHeadStrings и ShowHeadScripts - какой порядок следования правильный?</a></li>
+	* Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/10078/">ShowHeadStrings и ShowHeadScripts - какой порядок следования правильный?</a></li>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
-	* >Отложенные функции</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php">CMain::AddHeadScript</a></li> </ul>
-	* </ht<a name="examples"></a>
+	* >Отложенные функции</a></li>     <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php">CMain::AddHeadScript</a></li>  </ul><a
+	* name="examples"></a>
 	*
 	*
 	* @static
@@ -2252,22 +2229,18 @@ abstract class CAllMain
 	/** @deprecated use Asset::getInstance()->addJs($src, $additional) */
 	
 	/**
-	* <p>Подключает java скрипты в шаблоне сайта и в шаблоне компонентов. Порядок их включения в страницу и порядок при объединении - соответствует порядку вызовов API. Исключение: в случае объединения вначале сгруппируются скрипты от ядра, а потом выведутся скрипты шаблона и страницы. Динамичный метод.</p>
+	* <p>Подключает java скрипты в шаблоне сайта и в шаблоне компонентов. Порядок их включения в страницу и порядок при объединении - соответствует порядку вызовов API. Исключение: в случае объединения вначале сгруппируются скрипты от ядра, а потом выведутся скрипты шаблона и страницы. Нестатический метод.</p> <p>В новом ядре  тому методу аналогичен <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/asset/addjs.php" >\Bitrix\Main\Page\Asset::addJs</a></p>
 	*
 	*
 	* @param mixed $src  путь к скрипту от корня сайта
 	*
-	* @param mixed $additional = false 
+	* @param $sr $additional = false 
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* Если необходимо добавить ссылку на скрипт в тело тега <b>head</b> (<b>scr</b> - ссылка на скрипт):
-	* 
-	* &lt;?$APPLICATION-&gt;AddHeadScript('scr');&gt;Для добавления в <b>head</b> дополнительных файлов можно использовать:
-	* 
-	* &lt;?
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Если необходимо добавить ссылку на скрипт в тело тега <b>head</b> (<b>scr</b> - ссылка на скрипт):&lt;?$APPLICATION-&gt;AddHeadScript('scr');?&gt;Для добавления в <b>head</b> дополнительных файлов можно использовать:&lt;?
 	* // для js-файлов
 	* $APPLICATION-&gt;AddHeadScript('/bitrix/templates/.default/additional.js');
 	* 
@@ -2311,7 +2284,7 @@ abstract class CAllMain
 		$this->oAsset->addString($content, false, AssetLocation::AFTER_JS);
 	}
 
-	static function IsExternalLink($src)
+	public static function IsExternalLink($src)
 	{
 		return (strncmp($src, 'http://', 7) == 0 || strncmp($src, 'https://', 8) == 0 || strncmp($src, '//', 2) == 0);
 	}
@@ -2355,7 +2328,7 @@ abstract class CAllMain
 	}
 
 	/** @deprecated */
-	public static function SetUniqueJS($id = '', $jsType = 'page')
+	static public function SetUniqueJS($id = '', $jsType = 'page')
 	{
 		return true;
 	}
@@ -2368,16 +2341,15 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Динамичный метод.</p>
+	* <p>Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <br><br>
-	* Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/10078/">ShowHeadStrings и ShowHeadScripts - какой порядок следования правильный?</a></li>
+	* Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/10078/">ShowHeadStrings и ShowHeadScripts - какой порядок следования правильный?</a></li>
 	* </pre>
 	*
 	*
@@ -2399,7 +2371,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод предназначен для вывода в шаблоне сайта основных полей тега &lt;head&gt;: мета-теги Content-Type, robots, keywords, description; стили CSS; скрипты, заданные через <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php">CMain::AddHeadScript</a>. Динамичный метод.</p>
+	* <p>Метод предназначен для вывода в шаблоне сайта основных полей тега &lt;head&gt;: мета-теги Content-Type, robots, keywords, description; стили CSS; скрипты, заданные через <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addheadscript.php">CMain::AddHeadScript</a>. Нестатический метод.</p>
 	*
 	*
 	* @param bool $bXhtmlStyle = true Параметр, устанавливающий, по какому стандарту оформляются
@@ -2410,7 +2382,7 @@ abstract class CAllMain
 	* @return mixed <a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;head&gt;
 	* &lt;?<strong>$APPLICATION-&gt;ShowHead();</strong>?&gt;
 	* &lt;title&gt;&lt;?$APPLICATION-&gt;ShowTitle()?&gt;&lt;/title&gt;
@@ -2463,20 +2435,20 @@ abstract class CAllMain
 		}
 	}
 
-	public static function SetShowIncludeAreas($bShow=true)
+	static public function SetShowIncludeAreas($bShow=true)
 	{
 		$_SESSION["SESS_INCLUDE_AREAS"] = $bShow;
 	}
 
 	
 	/**
-	* <p>Возвращает "true", если кнопка "Показать включаемые области" на <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a> нажата, в противном случае - "false". Динамичный метод.</p>
+	* <p>Возвращает "true", если кнопка "Показать включаемые области" на <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a> нажата, в противном случае - "false". Нестатический метод.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $text = "Произвольный HTML";
 	* 
@@ -2509,8 +2481,6 @@ abstract class CAllMain
 	*     echo $text;
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // файл /bitrix/modules/advertising/classes/general/advertising.php 
 	* // класс CAdvBanner
@@ -2564,7 +2534,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getshowincludeareas.php
 	* @author Bitrix
 	*/
-	public static function GetShowIncludeAreas()
+	static public function GetShowIncludeAreas()
 	{
 		global $USER;
 
@@ -2588,12 +2558,12 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод возвращает текущий режим отображения административной панели. Динамичный метод.</p>
+	* <p>Метод возвращает текущий режим отображения административной панели. Нестатический метод.</p>
 	*
 	*
-	* @return string <p>Одно из следующих зачений:</p> <ul> <li>view - просмотр (по умолчанию) <br>
-	* </li> <li>edit - редактирование <br> </li> <li>configure - редактирование <br> </li> </ul>
-	* <br>
+	* @return string <p>Одно из следующих зачений:</p><ul> <li>view - просмотр (по умолчанию)    
+	* <br> </li>   <li>edit - редактирование     <br> </li>   <li>configure - редактирование    
+	* <br> </li> </ul><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/GetPublicShowMode.php
@@ -2629,20 +2599,20 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Выводит произвольную строку (HTML код) обрамленную рамкой, в правом верхнем углу которой выводятся заданные иконки. Динамичный метод.</p>
+	* <p>Выводит произвольную строку (HTML код) обрамленную рамкой, в правом верхнем углу которой выводятся заданные иконки. Нестатический метод.</p>
 	*
 	*
 	* @param string $text  Произвольный текст (HTML код).
 	*
 	* @param array $icons = array() Массив иконок, каждый элемент которого представляет из себя
-	* массив описывающий одну иконку, его ключами являются: <ul> <li> <b>URL</b>
-	* - ссылка на иконке </li> <li> <b>SRC</b> - путь к изображению иконки </li> <li>
-	* <b>ALT</b> - текст всплывающей подсказки на иконке </li> </ul>
+	* массив описывающий одну иконку, его ключами являются: 		<ul> <li>
+	* <b>URL</b> - ссылка на иконке 			</li> <li> <b>SRC</b> - путь к изображению иконки
+	* 			</li> <li> <b>ALT</b> - текст всплывающей подсказки на иконке 		</li> </ul>
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $text = "Произвольный HTML";
 	* 
@@ -2675,8 +2645,6 @@ abstract class CAllMain
 	*     echo $text;
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // файл /bitrix/modules/advertising/classes/general/advertising.php 
 	* // класс CAdvBanner
@@ -2738,22 +2706,22 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает путь от корня сайта к файлу по пути задаваемому для компонента. Динамичный метод.</p>
+	* <p>Возвращает путь от корня сайта к файлу по пути задаваемому для компонента. Нестатический метод.</p>
 	*
 	*
 	* @param string $rel_path  Путь к компоненту.<br><br>Алгоритм поиска пути от корня сайта
-	* следующий: <ol> <li>Сначала файл будет искаться в каталоге
-	* <br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b><i>component_path</i> </li>
-	* <li>Если файл не найден, он будет искаться в каталоге
-	* <br><b>/bitrix/templates/.default/</b><i>component_path</i> </li> <li>Затем если файл не найден,
-	* он будет искаться в каталоге <br><b>/bitrix/modules/</b><i>ID
+	* следующий: 	<ol> <li>Сначала файл будет искаться в каталоге
+	* 		<br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b><i>component_path</i> </li>
+	* 		<li>Если файл не найден, он будет искаться в каталоге
+	* 		<br><b>/bitrix/templates/.default/</b><i>component_path</i> </li> 		<li>Затем если файл не
+	* найден, он будет искаться в каталоге 		<br><b>/bitrix/modules/</b><i>ID
 	* модуля</i><b>/install/templates/</b><i>component_path</i><br> здесь <i>ID модуля</i> - это
-	* первый подкаталог в <i>component_path</i> </li> </ol>
+	* первый подкаталог в <i>component_path</i> </li> 	</ol>
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим реальный путь к компоненту
 	* $path = <b>$APPLICATION-&gt;GetTemplatePath</b>("iblock/catalog/element.php");
@@ -2766,7 +2734,7 @@ abstract class CAllMain
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04565"
 	* >Компоненты</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includefile.php">CMain::IncludeFile</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -2774,7 +2742,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/gettemplatepath.php
 	* @author Bitrix
 	*/
-	public static function GetTemplatePath($rel_path)
+	static public function GetTemplatePath($rel_path)
 	{
 		if(substr($rel_path, 0, 1)!="/")
 		{
@@ -2803,7 +2771,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает CSS стиль для компонента. Динамичный метод.</p>
+	* <p>Устанавливает CSS стиль для компонента. Нестатический метод.</p>
 	*
 	*
 	* @param string $rel_path  Относительный путь к CSS стилю компонента.
@@ -2811,7 +2779,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <b>$APPLICATION-&gt;SetTemplateCSS</b>("form/form.css");
 	* </pre>
 	*
@@ -2837,30 +2805,31 @@ abstract class CAllMain
 	// COMPONENTS 2.0 >>>>>
 	
 	/**
-	* <p>Метод подключает компонент 2.0. Динамичный метод.</p>
+	* <p>Метод подключает компонент 2.0. Нестатический метод.</p>
 	*
 	*
 	* @param string $componentName  Имя компонента. Например: "bitrix:news.detail".
 	*
-	* @param string $componentTemplate  Имя шаблона компонента. Если имя пустое, то подразумевается имя
+	* @param string $componentTemplate  Имя шаблона компонента. Если имя пустое, то подразумевается имя 
 	* ".default".
 	*
 	* @param array $arParams = array() Массив входных параметров компонента.
 	*
 	* @param object $parentComponent = null Объект родительского комплексного компонента, если компонент
 	* подключается из шаблона комплексного компонента. В шаблоне
-	* комплексного компонента определена переменная <b>$component</b>,
+	* комплексного компонента определена переменная  <b>$component</b>,
 	* которая содержит объект этого комплексного компонента.
 	*
 	* @param array $arFunctionParams = array() Массив, содержащий дополнительные параметры отображения
-	* компонента: <br> "HIDE_ICONS"=&gt;"Y" - не показывать панель настройки
-	* компонента в режиме редактировани/разработки; <br> "ACTIVE_COMPONENT"=&gt;"N" -
-	* отключить компонент (код компонента не подключается). <br>
+	* компонента:           <br>         "HIDE_ICONS"=&gt;"Y" - не показывать панель
+	* настройки компонента в режиме редактировани/разработки;           <br> 
+	*        "ACTIVE_COMPONENT"=&gt;"N" - отключить компонент (код компонента не
+	* подключается).           <br>
 	*
-	* @return mixed <p>Возвращает код компонента.</p> <a name="examples"></a>
+	* @return mixed <p>Возвращает код компонента.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* // Подключим компонент каталога с шаблоном "по-умолчанию" на публичной странице сайта
 	* $APPLICATION-&gt;IncludeComponent(
 	*     "bitrix:catalog",
@@ -2873,8 +2842,6 @@ abstract class CAllMain
 	*         "BASKET_PAGE_TEMPLATE" =&gt; "/personal/basket.php",
 	*     )
 	* );
-	* 
-	* 
 	* // Подключим компонент карточки фотографии с шаблоном "по-умолчанию" в шаблоне 
 	* // комплексного компонента "фотогалерея"
 	* $APPLICATION-&gt;IncludeComponent(
@@ -2996,18 +2963,27 @@ abstract class CAllMain
 		return end($this->__componentStack);
 	}
 
+	/**
+	 * Returns a current component stack.
+	 * @return array
+	 */
+	public function getComponentStack()
+	{
+		return $this->__componentStack;
+	}
+
 	
 	/**
-	* <p>Обёртка над методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addbuffercontent.php">AddBufferContent</a>. Метод позволяет указать место вывода контента, создаваемого ниже по коду с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showviewcontent.php">ShowViewContent</a>. Динамичный метод.</p>
+	* <p>Обёртка над методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addbuffercontent.php">AddBufferContent</a>. Метод позволяет указать место вывода контента, создаваемого ниже по коду с помощью метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showviewcontent.php">ShowViewContent</a>. Нестатический метод.</p>
 	*
 	*
-	* @param vie $w  Идентификатор буферизируемой области. Идентификатору может
+	* @param mixed $view  Идентификатор буферизируемой области. Идентификатору может
 	* соответствовать несколько буферов. Последовательность вывода
 	* контента определяется сортировкой pos.
 	*
-	* @param conten $t  Буферизируемый контент
+	* @param vie $content  Буферизируемый контент
 	*
-	* @param po $s = 500 Сортировка вывода контента
+	* @param conten $pos = 500 Сортировка вывода контента
 	*
 	* @return mixed 
 	*
@@ -3025,21 +3001,17 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку и передать в <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов. Динамичный метод.</p>
+	* <p>Метод позволяет установить выводимый контент для функции <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>. Применение этих методов позволяет, например, в шаблоне сайта вывести даты отображенных в контентой части новостей. (Для этого достаточно в цикле вывода новостей собрать даты новостей, соединить в одну строку и передать в <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addviewcontent.php">AddViewContent</a>). Прежде всего позволяет избежать дублирование компонент и лишних циклов. Нестатический метод.</p>
 	*
 	*
-	* @param vie $w  идентификатор буферизируемой области
+	* @param mixed $view  идентификатор буферизируемой области
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Добавляем ссылку в h1 в шаблоне компонента <b>header.php:</b>
-	* 
-	* 
-	* &lt;h1&gt;&lt;?=$APPLICATION-&gt;ShowTitle();?&gt;&lt;?$APPLICATION-&gt;ShowViewContent('news_detail');?&gt;&lt;/h1&gt;Добавляем в шаблон компонента:
-	* 
-	* &lt;?$this-&gt;SetViewTarget('news_detail');?&gt;
+	* &lt;h1&gt;&lt;?=$APPLICATION-&gt;ShowTitle();?&gt;&lt;?$APPLICATION-&gt;ShowViewContent('news_detail');?&gt;&lt;/h1&gt;Добавляем в шаблон компонента:&lt;?$this-&gt;SetViewTarget('news_detail');?&gt;
 	*    &lt;noindex&gt;&lt;a rel="nofollow" class="h1-head fancy" href="/develop/change_cover_type.php"&gt;&lt;?=$arDataFilter["NAME"]?&gt;&lt;/a&gt;&lt;/noindex&gt;
 	* &lt;?$this-&gt;EndViewTarget();?&gt;
 	* </pre>
@@ -3151,69 +3123,73 @@ abstract class CAllMain
 	// $arParams - do not change!
 	
 	/**
-	* <p>Метод является основной для подключения каких либо файлов в теле страницы, в прологе или в эпилоге и единственной для подключения компонентов. Визуальное содержимое подключенного файла представляет из себя включаемую область. Динамичный метод.</p>
+	* <p>Метод является основой для подключения каких либо файлов в теле страницы, в прологе или в эпилоге и единственной для подключения компонентов. Визуальное содержимое подключенного файла представляет из себя включаемую область. Нестатический метод.</p>
 	*
 	*
-	* @param string $path  Путь к подключаемому файлу. <br><br> Если в данном параметре задан
-	* путь к файлу от корня сайта, то этот файл и будет подключен. Если
-	* такого файла не существует, то при нажатии на панели управления
-	* кнопки "Показать включаемые области", в месте, где указана данный
-	* метод, будет показана голубая иконка, ссылка с которой ведет на
-	* административную страницу создания нового файла по указанному
-	* пути. <br><br> Если в данном параметре будет задан относительный путь
-	* к подключаемому файлу, то система будет воспринимать этот файл
-	* как компонент и будет выводиться кнопка редактирования
-	* параметров компонента в режиме правки. <br><br> Если же в данном
-	* параметре задан путь к основному файлу компонента, то он будет
-	* найден и подключен по следующему алгоритму: <ol> <li>Сначала файл
-	* будет искаться в каталоге <br><b>/bitrix/templates/</b><i>ID текущего шаблона
-	* сайта</i><b>/</b><i>path</i> </li> <li>Если файл не найден, он будет искаться в
-	* каталоге <br><b>/bitrix/templates/.default/</b><i>path</i> </li> <li>Затем если файл не
+	* @param string $path  Путь к подключаемому файлу. 	         <br><br>        	Если в данном
+	* параметре задан путь к файлу от корня сайта, то этот файл и будет
+	* подключен. Если такого файла не существует, то при нажатии на
+	* панели управления кнопки "Показать включаемые области", в месте,
+	* где указан данный метод, будет показана голубая иконка, ссылка с
+	* которой ведет на административную страницу создания нового
+	* файла по указанному пути. 	         <br><br> Если в данном параметре будет
+	* задан относительный путь к подключаемому файлу, то система будет
+	* воспринимать этот файл как компонент и будет выводиться кнопка
+	* редактирования параметров компонента в режиме правки.  <br><br>       
+	* 	Если же в данном параметре задан путь к основному файлу
+	* компонента, то он будет найден и подключен по следующему
+	* алгоритму: 	         <ol> <li>Сначала файл будет искаться в каталоге 		       
+	*      <br><b>/bitrix/templates/</b><i>ID текущего шаблона сайта</i><b>/</b><i>path</i> </li>         
+	* 		           <li>Если файл не найден, он будет искаться в каталоге 		           
+	*  <br><b>/bitrix/templates/.default/</b><i>path</i> </li>          		           <li>Затем если файл не
 	* найден, он будет искаться дистрибутиве модуля, т.е. в следующем
-	* каталоге: <br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/</b><i>path</i>, <br>
-	* здесь <i>ID модуля</i> - это первый подкаталог в <i>path</i> </li> </ol>
+	* каталоге: 		             <br><b>/bitrix/modules/</b><i>ID модуля</i><b>/install/templates/</b><i>path</i>,
+	*             <br>            здесь <i>ID модуля</i> - это первый подкаталог в <i>path</i>
+	* </li>          	</ol>
 	*
 	* @param array $params = array() Массив параметров для подключаемого файла. Структура данного
-	* массива: <pre>array( "ИМЯ_ПАРАМЕТРА_1" =&gt; "ЗНАЧЕНИЕ_ПАРАМЕТРА_1",
-	* "ИМЯ_ПАРАМЕТРА_2" =&gt; "ЗНАЧЕНИЕ_ПАРАМЕТРА_2", ...)</pre> В подключаемом
-	* файле будут инициализированы переменные, имена которых - ключи
-	* данного массива, а значения - соответствующие значения данного
-	* массива. Данная операция выполняется стандартной PHP функцией
-	* extract(<i>params</i>).
+	* массива: 	         <pre bgcolor="#323232" style="padding:5px;">array(  "ИМЯ_ПАРАМЕТРА_1" =&gt; "ЗНАЧЕНИЕ_ПАРАМЕТРА_1",  
+	* "ИМЯ_ПАРАМЕТРА_2" =&gt; "ЗНАЧЕНИЕ_ПАРАМЕТРА_2",   ...)</pre>        В
+	* подключаемом файле будут инициализированы переменные, имена
+	* которых - ключи данного массива, а значения - соответствующие
+	* значения данного массива. Данная операция выполняется
+	* стандартной PHP функцией extract(<i>params</i>).
 	*
-	* @param array $function_params = array() Массив настроек данного метода, с ключами: <ul> <li> <b>SHOW_BORDER</b> -
+	* @param array $function_params = array() Массив настроек данного метода, с ключами: 	         <ul> <li> <b>SHOW_BORDER</b> -
 	* показывать ли рамку и иконки для редактирования, допустимы
-	* следующие значения: <ul> <li> <b>true</b> - показать рамку при нажатии на
-	* панели кнопки "Показать включаемые области" (значение по
-	* умолчанию)</li> <li> <b>false</b> - не показывать рамки</li> </ul> </li> <li> <b>NAME</b> -
-	* текст всплывающей подсказки на иконке редактирования </li> <li>
-	* <b>LANG</b> - двухсимвольный идентификатор языка в котором будет
-	* открыт административный раздел в момент редактирования файла (по
-	* умолчанию - язык текущего сайта) </li> <li> <b>BACK_URL</b> - куда вернуться
-	* после редактирования (по умолчанию - текущая публичная страница)
-	* </li> <li> <b>WORKFLOW</b> - участвует ли подключаемый файл в
-	* документооборте, возможны следующие значения: <ul> <li> <b>true</b> -
+	* следующие значения: 			             <ul> <li> <b>true</b> - показать рамку при
+	* нажатии на панели кнопки "Показать включаемые области" (значение
+	* по умолчанию)</li>              				               <li> <b>false</b> - не показывать
+	* рамки</li>              			</ul> </li>          		           <li> <b>NAME</b> - текст всплывающей
+	* подсказки на иконке редактирования 		</li>                    <li> <b>LANG</b> -
+	* двухсимвольный идентификатор языка в котором будет открыт
+	* административный раздел в момент редактирования файла (по
+	* умолчанию - язык текущего сайта) 		</li>                    <li> <b>BACK_URL</b> - куда
+	* вернуться после редактирования (по умолчанию - текущая публичная
+	* страница) 		</li>                    <li> <b>WORKFLOW</b> - участвует ли подключаемый
+	* файл в документооборте, возможны следующие значения: 			             <ul>
+	* <li> <b>true</b> - ссылка ведущая на редактирование будет указывать на
+	* страницу модуля документооборота 				</li>                            <li> <b>false</b> -
 	* ссылка ведущая на редактирование будет указывать на страницу
-	* модуля документооборота </li> <li> <b>false</b> - ссылка ведущая на
-	* редактирование будет указывать на страницу модуля управления
-	* статикой (значение по умолчанию) </li> </ul> </li> <li> <b>MODE</b> - режим
-	* редактирования, допустимы следующие значения: <ul> <li> <b>text</b> - файл
-	* будет редактироваться как текст (ссылка на страницу
-	* редактирования файла в режиме текста) </li> <li> <b>html</b> - файл будет
+	* модуля управления статикой (значение по умолчанию) 			</li>             </ul>
+	* </li>                    <li> <b>MODE</b> - режим редактирования, допустимы
+	* следующие значения: 			             <ul> <li> <b>text</b> - файл будет
+	* редактироваться как текст (ссылка на страницу редактирования
+	* файла в режиме текста) 				</li>                            <li> <b>html</b> - файл будет
 	* редактироваться как HTML (ссылка на веб-редактор)(значение по
-	* умолчанию)</li> <li> <b>php</b> - файл будет редактироваться как PHP (ссылка
-	* на страницу редактирования исходников файла) </li> </ul> </li> <li>
-	* <b>TEMPLATE</b> - если в параметре <i>path</i> указан абсолютный путь к
-	* несуществующему файлу, то здесь необходимо указать имя
-	* файла-шаблона для создания нового файла (по умолчанию - первый
-	* шаблон в порядке сортировки задаваемой в файле:
-	* <nobr><b>/bitrix/templates/</b><i>ID текущего шаблона
-	* сайта</i><b>/page_templates/.content.php</b></nobr>) </li> </ul>
+	* умолчанию)</li>                            <li> <b>php</b> - файл будет редактироваться
+	* как PHP (ссылка на страницу редактирования исходников файла) </li>     
+	*        </ul> </li>                    <li> <b>TEMPLATE</b> - если в параметре <i>path</i> указан
+	* абсолютный путь к несуществующему файлу, то здесь необходимо
+	* указать имя файла-шаблона для создания нового файла (по умолчанию
+	* - первый шаблон в порядке сортировки задаваемой в файле:
+	* 		<nobr><b>/bitrix/templates/</b><i>ID текущего шаблона
+	* сайта</i><b>/page_templates/.content.php</b></nobr>) 	</li>         </ul>
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // компонент выводящий детально элемент инфо-блока
 	* <b>$APPLICATION-&gt;IncludeFile</b>("iblock/catalog/element.php", Array(
@@ -3245,9 +3221,7 @@ abstract class CAllMain
 	*          "MANUAL"),
 	*     "CACHE_TIME"        =&gt; "3600",                              // Время кэширования (сек.)
 	*     ));
-	* ?&gt;
-	* 
-	* &lt;?
+	* ?&gt;&lt;?
 	* // включаемая область для раздела
 	* <b>$APPLICATION-&gt;IncludeFile</b>($APPLICATION-&gt;GetCurDir()."sect_inc.php", Array(), Array(
 	*     "MODE"      =&gt; "html",                                           // будет редактировать в веб-редакторе
@@ -3260,10 +3234,10 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04565"
-	* >Компоненты</a></li> <li> <a
+	* >Компоненты</a></li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/functions/localization/includetemplatelangfile.php">IncludeTemplateLangFile</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/includestring.php">CMain::IncludeString</a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -3526,7 +3500,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Добавляет пункт в конец <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927" >навигационной цепочки</a>. Динамичный метод.</p>
+	* <p>Добавляет пункт в конец <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927" >навигационной цепочки</a>. Нестатический метод.</p>
 	*
 	*
 	* @param string $title  Заголовок добавляемого пункта навигационной цепочки.
@@ -3535,16 +3509,16 @@ abstract class CAllMain
 	* цепочки.
 	*
 	* @param bool $convert_html_entity = true Если значение - "true", то в <i>title</i> будут произведены следующие
-	* замены: <ul> <li> <b>&amp;amp;</b> заменяется на <b>&amp;</b> </li> <li> <b>&amp;quot;</b>
-	* заменяется на <b>"</b> </li> <li> <b>&amp;#039;</b> заменяется на <b>'</b> </li> <li>
-	* <b>&amp;lt;</b> заменяется на <b>&lt;</b> </li> <li> <b>&amp;gt;</b> заменяется на <b>&gt;</b>
-	* </li> </ul> В противном случае замены не будут производиться.
-	* <br>Необязательный. По умолчанию - "true".
+	* замены: 	<ul> <li> <b>&amp;amp;</b> заменяется на <b>&amp;</b> 		</li> <li> <b>&amp;quot;</b>
+	* заменяется на <b>"</b> 		</li> <li> <b>&amp;#039;</b> заменяется на <b>'</b>		 		</li> <li>
+	* <b>&amp;lt;</b> заменяется на <b>&lt;</b> 		</li> <li> <b>&amp;gt;</b> заменяется на <b>&gt;</b>
+	* 	</li> </ul> 	В противном случае замены не будут производиться.
+	* 	<br>Необязательный. По умолчанию - "true".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;AddChainItem</b>("Форум &amp;quot;Отзывы&amp;quot;", "/ru/forum/list.php?FID=3");
 	* ?&gt;
@@ -3555,7 +3529,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927"
 	* >Навигационная цепочка</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul> </htm<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -3572,14 +3546,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает HTML представляющий из себя навигационную цепочку. <br><br>Если вам не нужно показывать навигационную цепочку на какой либо странице, вам достаточно вставить в теле страницы код, инициализирующий свойство страницы "NOT_SHOW_NAV_CHAIN" значением "Y": </p> <pre>$APPLICATION-&gt;SetPageProperty("NOT_SHOW_NAV_CHAIN", "Y");</pre> Поддержка этого свойства встроена в данный метод. <p>Динамичный метод.</p>
+	* <p>Возвращает HTML представляющий из себя навигационную цепочку. <br><br>Если вам не нужно показывать навигационную цепочку на какой либо странице, вам достаточно вставить в теле страницы код, инициализирующий свойство страницы "NOT_SHOW_NAV_CHAIN" значением "Y": </p> <pre bgcolor="#323232" style="padding:5px;">$APPLICATION-&gt;SetPageProperty("NOT_SHOW_NAV_CHAIN", "Y");</pre> Поддержка этого свойства встроена в данный метод. <p>Нестатический метод.</p>
 	*
 	*
 	* @param mixed $path = false Путь для которого будет построена навигационная цепочка. В
 	* случае многосайтовой версии, если DOCUMENT_ROOT у сайтов разный
 	* (задается в поле "Путь к корневой папке веб-сервера" в настройках
 	* сайта), то в данном параметре необходимо передавать массив
-	* вида:<pre>array("ID сайта", "путь")</pre>Необязателен. По умолчанию - "false" -
+	* вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "путь")</pre>Необязателен. По умолчанию - "false" -
 	* текущий путь.
 	*
 	* @param int $NumFrom = 0 Начиная от какого пункта будет построена навигационная
@@ -3602,8 +3576,8 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;CHAPTER_ID=04927"
 	* >Навигационная цепочка</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> </ul>
-	* </htm<br><br>
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li>
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -3612,9 +3586,7 @@ abstract class CAllMain
 	*/
 	public function GetNavChain($path=false, $iNumFrom=0, $sNavChainPath=false, $bIncludeOnce=false, $bShowIcons = true)
 	{
-		/** @global CMain $APPLICATION */
-		global $APPLICATION;
-		if($APPLICATION->GetProperty("NOT_SHOW_NAV_CHAIN")=="Y")
+		if($this->GetProperty("NOT_SHOW_NAV_CHAIN") == "Y")
 			return "";
 
 		CMain::InitPathVars($site, $path);
@@ -3626,7 +3598,12 @@ abstract class CAllMain
 		$arChain = array();
 		$strChainTemplate = $DOC_ROOT.SITE_TEMPLATE_PATH."/chain_template.php";
 		if(!file_exists($strChainTemplate))
-			$strChainTemplate = $DOC_ROOT.BX_PERSONAL_ROOT."/templates/.default/chain_template.php";
+		{
+			if(($template = getLocalPath("templates/.default/chain_template.php", BX_PERSONAL_ROOT)) !== false)
+			{
+				$strChainTemplate = $DOC_ROOT.$template;
+			}
+		}
 
 		$io = CBXVirtualIo::GetInstance();
 
@@ -3674,7 +3651,7 @@ abstract class CAllMain
 		return $this->_mkchain($arChain, $strChainTemplate, $bIncludeOnce, $bShowIcons);
 	}
 
-	public static function _mkchain($arChain, $strChainTemplate, $bIncludeOnce=false, $bShowIcons = true)
+	public function _mkchain($arChain, $strChainTemplate, $bIncludeOnce=false, $bShowIcons = true)
 	{
 		$strChain = $sChainProlog = $sChainEpilog = "";
 		if(file_exists($strChainTemplate))
@@ -3706,8 +3683,8 @@ abstract class CAllMain
 		}
 
 		/** @global CMain $APPLICATION */
-		global $APPLICATION, $USER;
-		if($APPLICATION->GetShowIncludeAreas() && $USER->CanDoOperation('edit_php') && $bShowIcons)
+		global $USER;
+		if($this->GetShowIncludeAreas() && $USER->CanDoOperation('edit_php') && $bShowIcons)
 		{
 			$site = CSite::GetSiteByFullPath($strChainTemplate);
 			$DOC_ROOT = CSite::GetSiteDocRoot($site);
@@ -3716,7 +3693,7 @@ abstract class CAllMain
 			{
 				$path = substr($strChainTemplate, strlen($DOC_ROOT));
 
-				$templ_perm = $APPLICATION->GetFileAccessPermission($path);
+				$templ_perm = $this->GetFileAccessPermission($path);
 				if((!defined("ADMIN_SECTION") || ADMIN_SECTION!==true) && $templ_perm>="W")
 				{
 					$arIcons = array();
@@ -3726,7 +3703,7 @@ abstract class CAllMain
 						"TITLE"=>GetMessage("MAIN_INC_ED_NAV")
 					);
 
-					$strChain = $APPLICATION->IncludeString($strChain, $arIcons);
+					$strChain = $this->IncludeString($strChain, $arIcons);
 				}
 			}
 		}
@@ -3735,14 +3712,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает навигационную цепочку.<br><br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять пункты в навигационную цепочку (например, внутри компонента) уже после того как был выведен пролог сайта. <br><br>Если вам не нужно показывать навигационную цепочку на какой либо странице, вам достаточно вставить в теле страницы код, инициализирующий свойство страницы "NOT_SHOW_NAV_CHAIN" значением "Y": </p> <pre>$APPLICATION-&gt;SetPageProperty("NOT_SHOW_NAV_CHAIN", "Y");</pre> Поддержка этого свойства встроена в данный метод. <p>Динамичный метод.</p>
+	* <p>Отображает навигационную цепочку.<br><br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять пункты в навигационную цепочку (например, внутри компонента) уже после того как был выведен пролог сайта. <br><br>Если вам не нужно показывать навигационную цепочку на какой либо странице, вам достаточно вставить в теле страницы код, инициализирующий свойство страницы "NOT_SHOW_NAV_CHAIN" значением "Y": </p> <pre bgcolor="#323232" style="padding:5px;">$APPLICATION-&gt;SetPageProperty("NOT_SHOW_NAV_CHAIN", "Y");</pre> Поддержка этого свойства встроена в данный метод. <p>Нестатический метод.</p>
 	*
 	*
 	* @param mixed $path = false Путь для которого будет построена навигационная цепочка. В
 	* случае многосайтовой версии, если DOCUMENT_ROOT у сайтов разный
 	* (задается в поле "Путь к корневой папке веб-сервера" в настройках
 	* сайта), то в данном параметре необходимо передавать массив
-	* вида:<pre>array("ID сайта", "путь")</pre>Необязателен. По умолчанию - "false" -
+	* вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "путь")</pre>Необязателен. По умолчанию - "false" -
 	* текущий путь.
 	*
 	* @param int $NumFrom = 0 Номер пункта начиная с которого будет построена навигационная
@@ -3758,23 +3735,19 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выведем цепочку навигации для текущей страницы начиная 
-	* // со первого пункта по шаблону "chain_template.php"
+	* // с первого пункта по шаблону "chain_template.php"
 	* // лежащему либо в каталоге "/bitrix/templates/&lt;текущий шаблон сайта&gt;/", 
 	* // либо в каталоге "/bitrix/templates/.default/".
 	* <b>$APPLICATION-&gt;ShowNavChain</b>();
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // выведем цепочку навигации для текущей страницы начиная 
 	* // со 2-го пункта по шаблону chain_template_bottom.php
 	* <b>$APPLICATION-&gt;ShowNavChain</b>(false, 2, "/bitrix/templates/.default/chain_template_bottom.php");
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // файл /bitrix/templates/.default/chain_template.php
 	* 
@@ -3807,7 +3780,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные
 	* функции</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addchainitem.php">CMain::AddChainItem</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getnavchain.php">CMain::GetNavChain</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -3829,23 +3802,23 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Устанавливает права доступа к файлу или каталогу. Возвращает "true" - если установка прав произведена успешно и "false" - в случае ошибки. Динамичный метод.</p>
+	* <p>Устанавливает права доступа к файлу или каталогу. Возвращает "true" - если установка прав произведена успешно и "false" - в случае ошибки. Нестатический метод.</p>
 	*
 	*
 	* @param string $path  Путь к файлу или папке относительно корня. В случае многосайтовой
 	* версии, если <b>корневой каталог у сайтов</b> разный, то в данном
-	* параметре необходимо передавать массив вида:<pre>array("ID сайта", "Путь
+	* параметре необходимо передавать массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "Путь
 	* к файлу или папке относительно корня")</pre>
 	*
 	* @param array $permissions  Массив с правами доступа вида Array("ID группы
 	* пользователей"=&gt;"право доступа" [, ...]). В качестве "право доступа"
-	* возможны следующие значения: <ul> <li> <b>D</b> - доступ запрещён </li> <li>
-	* <b>R</b> - чтение (право просмотра содержимого файла) </li> <li> <b>U</b> -
+	* возможны следующие значения: 	<ul> <li> <b>D</b> - доступ запрещён 		</li> <li>
+	* <b>R</b> - чтение (право просмотра содержимого файла) 		</li> <li> <b>U</b> -
 	* документооборот (право на редактирование файла в режиме
-	* документооборота) </li> <li> <b>W</b> - запись (право на прямое
-	* редактирование) </li> <li> <b>X</b> - полный доступ (право на прямое
+	* документооборота) 		</li> <li> <b>W</b> - запись (право на прямое
+	* редактирование) 		</li> <li> <b>X</b> - полный доступ (право на прямое
 	* редактирование файла и право на изменение прав доступа на данных
-	* файл) </li> </ul> В качестве "ID группы пользователей" также может быть
+	* файл) 	</li> </ul> 	В качестве "ID группы пользователей" также может быть
 	* задан символ "*", что означает - "для всех групп пользователей".
 	*
 	* @param bool $overwrite = true Если значение - "true", то существующие права будут
@@ -3854,7 +3827,7 @@ abstract class CAllMain
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // установим на файл /ru/index.php следующие права:
 	* // для группы # 23 - право чтения файла
@@ -3876,7 +3849,7 @@ abstract class CAllMain
 	* </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onchangepermissions.php">Событие
-	* "OnChangePermissions"</a> </li> </ul> </htm<a name="examples"></a>
+	* "OnChangePermissions"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -3986,12 +3959,12 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Удаляет права доступа для файла или каталога. Возвращает "true" - если удаление произведено успешно и "false" - в случае ошибки. Динамичный метод.</p>
+	* <p>Удаляет права доступа для файла или каталога. Возвращает "true" - если удаление произведено успешно и "false" - в случае ошибки. Нестатический метод.</p>
 	*
 	*
 	* @param string $path  Путь к файлу или папке относительно корня. В случае многосайтовой
 	* версии, если <b>корневой каталог у сайтов</b> разный, то в данном
-	* параметре необходимо передавать массив вида:<pre>array("ID сайта", "Путь
+	* параметре необходимо передавать массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "Путь
 	* к файлу или папке относительно корня")</pre>
 	*
 	* @param mixed $groups = false Массив групп для которых удалить права доступа. Если значение -
@@ -4001,7 +3974,7 @@ abstract class CAllMain
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // удалим права на файл /ru/index.php для групп пользователей #5 и #23
 	* if (<b>$APPLICATION-&gt;RemoveFileAccessPermission</b>("/ru/index.php", array(5, 23)))
@@ -4018,7 +3991,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
 	* </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -4090,19 +4063,19 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Копирует <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >права доступа</a> одного файла (каталогу) другому файлу (каталогу). Возвращает "true" - если права скопированы успешно и "false" - в случае ошибки. Динамичный метод.</p>
+	* <p>Копирует <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >права доступа</a> одного файла (каталогу) другому файлу (каталогу). Возвращает "true" - если права скопированы успешно и "false" - в случае ошибки. Нестатический метод.</p>
 	*
 	*
 	* @param string $path_from  Путь <em>откуда</em> копировать. В случае многосайтовой версии, если
 	* DOCUMENT_ROOT у сайтов разный (задается в поле "Путь к корневой папке
 	* веб-сервера" в настройках сайта), то в данном параметре необходимо
-	* передавать массив вида:<pre>array("ID сайта", "Путь <em>откуда</em>
+	* передавать массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "Путь <em>откуда</em>
 	* копировать")</pre>
 	*
 	* @param string $path_to  Путь <em>куда</em> копировать. В случае многосайтовой версии, если
 	* DOCUMENT_ROOT у сайтов разный (задается в поле "Путь к корневой папке
 	* веб-сервера" в настройках сайта), то в данном параметре необходимо
-	* передавать массив вида:<pre>array("ID сайта", "Путь <em>куда</em>
+	* передавать массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "Путь <em>куда</em>
 	* копировать")</pre>
 	*
 	* @param bool $overwrite = false Если значение - "true", то существующие права будут
@@ -4111,7 +4084,7 @@ abstract class CAllMain
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // установим на файл /ru/index.php следующие права:
 	* // для группы # 23 - право чтения файла
@@ -4137,7 +4110,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
 	* </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -4178,25 +4151,25 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Определяет <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >права доступа к файлу или каталогу</a>. Возвращает символ обозначающий то или иное право: </p> <ul> <li> <b>D</b> - доступ запрещён </li> <li> <b>R</b> - чтение (право просмотра содержимого файла) </li> <li> <b>U</b> - документооборот (право на редактирование файла в режиме документооборота) </li> <li> <b>W</b> - запись (право на прямое редактирование) </li> <li> <b>X</b> - полный доступ (право на прямое редактирование файла и право на изменение прав доступа на данных файл) </li> </ul> <p> Динамичный метод.</p>
+	* <p>Определяет <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=2819" >права доступа к файлу или каталогу</a>. Возвращает символ обозначающий то или иное право: </p> <ul> <li> <b>D</b> - доступ запрещён 	</li> <li> <b>R</b> - чтение (право просмотра содержимого файла) 	</li> <li> <b>U</b> - документооборот (право на редактирование файла в режиме документооборота) 	</li> <li> <b>W</b> - запись (право на прямое редактирование) 	</li> <li> <b>X</b> - полный доступ (право на прямое редактирование файла и право на изменение прав доступа на данных файл) </li> </ul> <p>Нестатический метод.</p>
 	*
 	*
 	* @param mixed $path  Путь к файлу или папке относительно корня. В случае многосайтовой
 	* версии, если корневой каталог у сайтов разный, то в данном
-	* параметре необходимо передавать массив вида:<pre>array("ID сайта", "Путь
+	* параметре необходимо передавать массив вида:<pre bgcolor="#323232" style="padding:5px;">array("ID сайта", "Путь
 	* к файлу или папке относительно корня")</pre>
 	*
 	* @param array $groups  Массив ID групп пользователей, для которых необходимо определить
 	* права доступа. Если false, то определять группу прав для текущего
 	* пользователя.<br>Необязателен. По умолчанию - <i>false</i>.
 	*
-	* @param task_mod $e = false Необходим для работы с пользовательскими уровнями доступа. По
+	* @param array $task_mode = false Необходим для работы с пользовательскими уровнями доступа. По
 	* умолчанию - <i>false</i>.
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (<b>$APPLICATION-&gt;GetFileAccessPermission</b>("/ru/index.php") &lt;= "D")
 	*    ShowError("Доступ к файлу запрещён.");
@@ -4212,7 +4185,7 @@ abstract class CAllMain
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/copyfileaccesspermission.php">CMain::CopyFileAccessPermission</a>
 	* </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/removefileaccesspermission.php">CMain::RemoveFileAccessPermission</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -4570,17 +4543,17 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Сохраняет страницу на диске. Возвращает "true" - если сохранение произведено успешно и "false" - в случае ошибки. Метод инициализирует событие "OnChangeFile". Динамичный метод.</p>
+	* <p>Сохраняет страницу на диске. Возвращает "true" - если сохранение произведено успешно и "false" - в случае ошибки. Метод инициализирует событие "OnChangeFile". Нестатический метод.</p>
 	*
 	*
 	* @param string $abs_path  Полный путь к файлу на диске.
 	*
-	* @param string $content  Содержимое файла. </ht
+	* @param string $content  Содержимое файла.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $file_content = '
 	*     &lt;?
@@ -4602,7 +4575,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfilecontent.php">CMain::GetFileContent</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforechangefile.php">Событие
 	* "OnChangeFile"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul></bod<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/file/rewritefile.php">RewriteFile</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -4695,7 +4668,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Возвращает содержимое файла. Если файл не существует - вернет "false". Динамичный метод.</p>
+	* <p>Возвращает содержимое файла. Если файл не существует - вернет "false". Нестатический метод.</p>
 	*
 	*
 	* @param string $path  Абсолютный путь к файлу на диске.
@@ -4703,7 +4676,7 @@ abstract class CAllMain
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* <b>$APPLICATION-&gt;GetFileContent</b>($_SERVER["DOCUMENT_ROOT"]."/ru/index.php");
 	* ?&gt;
@@ -4719,7 +4692,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getfilecontent.php
 	* @author Bitrix
 	*/
-	public static function GetFileContent($path)
+	static public function GetFileContent($path)
 	{
 		clearstatcache();
 
@@ -4755,9 +4728,9 @@ abstract class CAllMain
 		return preg_replace("/[^a-zA-Z0-9_:\\.!\$\\-;@\\^\\~]/is", "", $str);
 	}
 
-	public static function GetLangSwitcherArray()
+	public function GetLangSwitcherArray()
 	{
-		return CMain::GetSiteSwitcherArray();
+		return $this->GetSiteSwitcherArray();
 	}
 
 	public function GetSiteSwitcherArray()
@@ -4822,10 +4795,10 @@ abstract class CAllMain
 	*/
 	
 	/**
-	* <p>Возвращает массив ролей в рамках логики модуля для определённого набора групп (по умолчанию - это группы текущего пользователя). <br><br> Как правило в каждом модуле определены свои символы означающие ту или иную роль. Установка своего уникального набора ролей для каждого модуля осуществляется методом GetModuleRightList класса с именем равным ID модуля. Например, для модуля техподдержки, это будет метод <b>support::GetModuleRightList()</b>, описанный в файле <b>/bitrix/modules/support/install/index.php</b>. Администрирование ролей обычно осуществляется в настройках соответствующего модуля. </p> <p class="note"><b>Примечание</b>. Для любого модуля роль с максимальными правами (администратор модуля) всегда обозначается символом "W", с минимальным правами - символом "D" (доступ к модулю закрыт).</p> <p>Динамичный метод.</p>
+	* <p>Возвращает массив ролей в рамках логики модуля для определённого набора групп (по умолчанию - это группы текущего пользователя). <br><br> Как правило в каждом модуле определены свои символы означающие ту или иную роль. Установка своего уникального набора ролей для каждого модуля осуществляется методом GetModuleRightList класса с именем равным ID модуля. Например, для модуля техподдержки, это будет метод <b>support::GetModuleRightList()</b>, описанный в файле <b>/bitrix/modules/support/install/index.php</b>. Администрирование ролей обычно осуществляется в настройках соответствующего модуля.  </p> <p class="note"><b>Примечание</b>. Для любого модуля роль с максимальными правами (администратор модуля) всегда обозначается символом "W", с минимальным правами - символом "D" (доступ к модулю закрыт).</p> <p>Нестатический метод.</p>
 	*
 	*
-	* @param string $module_id  ID модуля.</bod
+	* @param string $module_id  ID модуля.
 	*
 	* @param mixed $groups = false Массив групп для которых необходимо определить их роли. Если
 	* значение - "false", то будет взят массив групп текущего пользователя.
@@ -4845,7 +4818,7 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим массив ролей текущего пользователя в модуле "Техподдержка"
 	* $arRoles = <b>$APPLICATION-&gt;GetUserRoles</b>("support");
@@ -4875,7 +4848,7 @@ abstract class CAllMain
 	* доступа</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getuserright.php">CMain::GetUserRight</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -4969,10 +4942,10 @@ abstract class CAllMain
 	*/
 	
 	/**
-	* <p>Возвращает право в рамках логики модуля установленное для определённого набора групп (по умолчанию - это группы текущего пользователя). <br><br> Как правило в каждом модуле определены свои символы означающие то или иной право, в противном случае используются значения по умолчанию: </p> <ul> <li> <b>D</b> - доступ к модулю запрещён </li> <li> <b>R</b> - право на просмотр страниц модуля (без права модификации) </li> <li> <b>W</b> - право на модификацию данных модуля </li> </ul> Установка своего уникального набора прав для каждого модуля осуществляется методом GetModuleRightList класса с именем равным ID модуля. Например для модуля веб-форм, это будет метод <b>form::GetModuleRightList</b>() описаный в файле <b>/bitrix/modules/form/install/index.php</b>. Администрирование прав обычно осуществляется в настройках соответствующего модуля. <br><br>Для некоторых модулей (например, "информационные блоки") права устанавливаются индивидуально и к ним данный метод не применим, некоторые модули (например, "компрессия") вовсе не имеют прав доступа. <p class="note"><b>Примечание</b>. Для любого модуля максимальное право (полный доступ к модулю) всегда обозначается символом "W", минимальное право - символом "D" (доступ к модулю закрыт).</p> <p>Динамичный метод.</p>
+	* <p>Возвращает право в рамках логики модуля установленное для определённого набора групп (по умолчанию - это группы текущего пользователя). <br><br> Как правило в каждом модуле определены свои символы означающие то или иной право, в противном случае используются значения по умолчанию: 	</p> <ul> <li> <b>D</b> - доступ к модулю запрещён 		</li> <li> <b>R</b> - право на просмотр страниц модуля (без права модификации) 		</li> <li> <b>W</b> - право на модификацию данных модуля 	</li> </ul> Установка своего уникального набора прав для каждого модуля осуществляется методом GetModuleRightList класса с именем равным ID модуля. Например для модуля веб-форм, это будет метод <b>form::GetModuleRightList</b>() описаный в файле <b>/bitrix/modules/form/install/index.php</b>. Администрирование прав обычно осуществляется в настройках соответствующего модуля.  <br><br>Для некоторых модулей (например, "информационные блоки") права устанавливаются индивидуально и к ним данный метод не применим, некоторые модули (например, "компрессия") вовсе не имеют прав доступа. <p class="note"><b>Примечание</b>. Для любого модуля максимальное право (полный доступ к модулю) всегда обозначается символом "W", минимальное право - символом "D"  (доступ к модулю закрыт).</p> <p>Нестатический метод.</p>
 	*
 	*
-	* @param string $module_id  ID модуля.</bod
+	* @param string $module_id  ID модуля.
 	*
 	* @param mixed $groups = false Массив групп для которых необходимо определить максимальное
 	* право. Если значение - "false", то будет взят массив групп текущего
@@ -4993,7 +4966,7 @@ abstract class CAllMain
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим максимальное право доступа к модулю "Веб-формы" для текущего пользователя
 	* if(<b>$APPLICATION-&gt;GetUserRight</b>("form") &lt;= "D") 
@@ -5007,7 +4980,7 @@ abstract class CAllMain
 	* доступа</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getuserroles.php">CMain::GetUserRoles</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/getmodulerightlist.php">CModule::GetModuleRightList</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -5365,7 +5338,7 @@ abstract class CAllMain
 	*/
 	
 	/**
-	* <p>Возвращает значение cookie. Динамичный метод.</p>
+	* <p>Возвращает значение cookie. Нестатический метод.</p> <p>Анаолг в новом ядре D7: <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/httprequest/getcookie.php" >Bitrix\Main\HttpRequest::getCookie </a>.</p>
 	*
 	*
 	* @param string $name  Имя cookie переменной.
@@ -5373,12 +5346,12 @@ abstract class CAllMain
 	* @param mixed $name_prefix = false Префикс имени переменной cookie.<br>Необязательный. По умолчанию -
 	* значение параметра "Имя префикса для названия cookies" в настройках
 	* главного модуля (значение данного параметра можно получить с
-	* помощью метода: <pre>COption::GetOptionString("main", "cookie_name", "BITRIX_SM")</pre>
+	* помощью метода: <pre bgcolor="#323232" style="padding:5px;">COption::GetOptionString("main", "cookie_name", "BITRIX_SM")</pre>
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* global $APPLICATION;
 	* $VISITOR_ID = <b>$APPLICATION-&gt;get_cookie</b>("VISITOR_ID");
@@ -5391,14 +5364,14 @@ abstract class CAllMain
 	* >Технология переноса посетителей</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php
 	* @author Bitrix
 	*/
-	public static function get_cookie($name, $name_prefix=false)
+	static public function get_cookie($name, $name_prefix=false)
 	{
 		if($name_prefix===false)
 			$name = COption::GetOptionString("main", "cookie_name", "BITRIX_SM")."_".$name;
@@ -5421,12 +5394,12 @@ abstract class CAllMain
 	*/
 	
 	/**
-	* <p>Устанавливает cookie и при необходимости запоминает параметры установленного cookie для дальнейшего распространения по сайтам с разными доменными именами. Динамичный метод.</p>
+	* <p>Устанавливает cookie и при необходимости запоминает параметры установленного cookie для дальнейшего распространения по сайтам с разными доменными именами. Нестатический метод.</p>
 	*
 	*
 	* @param string $name  Имя cookie переменной.
 	*
-	* @param string $value  Значение cookie переменной. </htm
+	* @param string $value  Значение cookie переменной.
 	*
 	* @param mixed $time = false Дата в Unix-формате после которой cookie будет считаться истекшим и
 	* его значение не будет передаваться от посетителя на
@@ -5452,14 +5425,14 @@ abstract class CAllMain
 	* @param mixed $name_prefix = false Префикс имени переменной cookie.<br>Необязательный. По умолчанию -
 	* значение параметра "Имя префикса для названия cookies" в настройках
 	* главного модуля (значение данного параметра можно получить с
-	* помощью метода: <pre>COption::GetOptionString("main", "cookie_name", "BITRIX_SM")</pre>
+	* помощью метода: <pre bgcolor="#323232" style="padding:5px;">COption::GetOptionString("main", "cookie_name", "BITRIX_SM")</pre>
 	*
-	* @param httpOnl $y = false Необязательный. По умолчанию - "false".
+	* @param mixed $httpOnly = false Необязательный. По умолчанию - "false".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* global $APPLICATION;
 	* // устновим cookie на 2 года, действительного только для каталога /ru/
@@ -5473,7 +5446,7 @@ abstract class CAllMain
 	* >Технология переноса посетителей</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showspreadcookiehtml.php">CMain::ShowSpreadCookieHTML</a>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -5508,7 +5481,7 @@ abstract class CAllMain
 			$this->arrSPREAD_COOKIE[$name] = array("V" => $value, "T" => $time, "F" => $folder, "D" => $domain, "S" => $secure, "H" => $httpOnly);
 	}
 
-	function GetCookieDomain()
+	public function GetCookieDomain()
 	{
 		static $bCache = false;
 		static $cache  = false;
@@ -5582,7 +5555,7 @@ abstract class CAllMain
 		$this->HoldSpreadCookieHTML(true);
 	}
 
-	public static function HoldSpreadCookieHTML($bSet = false)
+	static public function HoldSpreadCookieHTML($bSet = false)
 	{
 		static $showed_already = false;
 		$result = $showed_already;
@@ -5696,7 +5669,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает HTML представляющий из себя набор IFRAME'ов предназначенный для распространения cookie по доменам. Метод используется в <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285" >Технологии переноса посетителей</a> между разными сайтами. Она стандартно включена в визуальную часть эпилога. Динамичный метод.</p>
+	* <p>Отображает HTML представляющий из себя набор IFRAME'ов предназначенный для распространения cookie по доменам. Метод используется в <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285" >Технологии переноса посетителей</a> между разными сайтами. Она стандартно включена в визуальную часть эпилога. Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
@@ -5705,7 +5678,7 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=285"
 	* >Технология переноса посетителей</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/set_cookie.php">CMain::set_cookie</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> </ul> <br><br>
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/get_cookie.php">CMain::get_cookie</a> </li> </ul><br><br>
 	*
 	*
 	* @static
@@ -5719,32 +5692,33 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Добавляет в <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панель управления</a> кнопку. Динамичный метод.</p>
+	* <p>Добавляет в <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панель управления</a> кнопку. Нестатический метод.</p>
 	*
 	*
 	* @param array $button  Массив описывающий добавляемую кнопку. Ключи массива:<br><ul> <li>
-	* <b>HREF</b> - ссылка на кнопке </li> <li> <b>SRC</b> - путь от корня сайта к
-	* картинке которая будет выведена на кнопке </li> <li> <b>ALT</b> - текст
-	* всплывающей подсказки на кнопке </li> <li> <b>MAIN_SORT</b> - индекс
+	* <b>HREF</b> - ссылка на кнопке 		</li> <li> <b>SRC</b> - путь от корня сайта к
+	* картинке которая будет выведена на кнопке 		</li> <li> <b>ALT</b> - текст
+	* всплывающей подсказки на кнопке  		</li> <li> <b>MAIN_SORT</b> - индекс
 	* сортировки для группы кнопок, для стандартных групп иконок
-	* данный параметр имеет следующие значения: <ul> <li>100 - группа иконок
-	* модуля управления статикой </li> <li>200 - группа иконок модуля
-	* документооборота </li> <li>300 - группа иконок модуля информационных
-	* блоков </li> </ul> </li> <li> <b>SORT</b> - индекс сортировки внутри группы
-	* кнопок </li> <li> <b>TYPE</b> - (BIG/SMALL) размер иконки. (По умолчанию "SMALL".) </li>
-	* <li> <b>HINT</b> - Массив с ключами: <ul> <li> <b>TITLE</b> - Заголовок всплывающей
-	* подсказки;</li> <li> <b>TEXT</b> - Текст всплывающей подсказки.</li> </ul> </li> <li>
-	* <b>ICON</b> - CSS иконки. </li> <li> <b>TEXT</b> - Текст кнопки. </li> </ul> Если у
-	* пользователя не хватает прав на ту или иную операцию и вы хотите в
-	* любом случае вывести кнопку, то необходимо <b>HREF</b> оставлять
-	* пустым, при этом кнопка будет выведена черно-белой и без ссылки.
+	* данный параметр имеет следующие значения: 		<ul> <li>100 - группа иконок
+	* модуля управления статикой 			</li> <li>200 - группа иконок модуля
+	* документооборота 			</li> <li>300 - группа иконок модуля информационных
+	* блоков 		</li> </ul> </li> <li> <b>SORT</b> - индекс сортировки внутри группы
+	* кнопок 		</li> <li> <b>TYPE</b> - (BIG/SMALL) размер иконки. (По умолчанию "SMALL".)
+	* 		</li> <li> <b>HINT</b> - Массив с ключами: 	 	 <ul> <li> <b>TITLE</b> - Заголовок
+	* всплывающей подсказки;</li> 		  <li> <b>TEXT</b> - Текст всплывающей
+	* подсказки.</li>  		 </ul> </li> <li> <b>ICON</b> - CSS иконки. 		</li> <li> <b>TEXT</b> - Текст
+	* кнопки. 	</li> </ul> 	Если у пользователя не хватает прав на ту или иную
+	* операцию и вы хотите в любом случае вывести кнопку, то необходимо
+	* <b>HREF</b> оставлять пустым, при этом кнопка будет выведена
+	* черно-белой и без ссылки.
 	*
 	* @param array $MenuItem  Массив меню
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим уровень доступа к модулю "Веб-формы"
 	* $FORM_RIGHT = $APPLICATION-&gt;GetUserRight("form");
@@ -5759,11 +5733,7 @@ abstract class CAllMain
 	*         "SORT"      =&gt; 100
 	*     ));
 	* endif;
-	* ?&gt;
-	* 
-	* Подменю кнопки (на примере кнопки стикеров):
-	* 
-	* MENU =&gt; Array(
+	* ?&gt;Подменю кнопки (на примере кнопки стикеров):MENU =&gt; Array(
 	*  [0] =&gt; Array(
 	*   [TEXT] =&gt; &lt;div style="float: left; margin: 0 50px 0 0;"&gt;Наклеить стикер&lt;/div&gt;
 	*   [TITLE] =&gt; Наклеить новый стикер на страницу
@@ -5782,7 +5752,7 @@ abstract class CAllMain
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">Панель управления</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -5859,7 +5829,7 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Выводит HTML представляющий из себя панель управления публичной частью. Динамичный метод.</p>
+	* <p>Выводит HTML представляющий из себя панель управления публичной частью. Нестатический метод.</p>
 	*
 	*
 	* @return string 
@@ -5874,7 +5844,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getpanel.php
 	* @author Bitrix
 	*/
-	public static function GetPanel()
+	static public function GetPanel()
 	{
 		global $USER;
 
@@ -5887,13 +5857,13 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Отображает <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панель управления</a> в публичной части сайта. <br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять кнопку в панель управления уже после того как будет выведен пролог сайта.<br><br> Если у пользователя не хватает прав ни на одну операцию задаваемую кнопками <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a>, то панель выведена не будет. Если вам необходимо вывести панель в обязательном порядке, необходимо задать в теле страницы: </p> <pre>$APPLICATION-&gt;ShowPanel = true;</pre> <p>Динамичный метод.</p>
+	* <p>Отображает <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панель управления</a> в публичной части сайта. <br>Метод использует технологию <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >отложенных функций</a>, позволяющую, помимо всего прочего, добавлять кнопку в панель управления уже после того как будет выведен пролог сайта.<br><br> Если у пользователя не хватает прав ни на одну операцию задаваемую кнопками <a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">панели управления</a>, то панель выведена не будет. Если вам необходимо вывести панель в обязательном порядке, необходимо задать в теле страницы: </p> <pre bgcolor="#323232" style="padding:5px;">$APPLICATION-&gt;ShowPanel = true;</pre> <p>Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"&gt;
 	* &lt;html&gt;
 	* &lt;head&gt;
@@ -5915,7 +5885,7 @@ abstract class CAllMain
 	* <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные
 	* функции</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/events/onpanelcreate.php">Событие "OnPanelCreate"</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -5951,11 +5921,11 @@ abstract class CAllMain
 		return CHotKeys::GetInstance()->PrintGlobalUrlVar();
 	}
 
-	abstract function GetLang($cur_dir=false, $cur_host=false);
+	abstract public function GetLang($cur_dir=false, $cur_host=false);
 
 	
 	/**
-	* <p>Возвращает массив описывающий сайт, определяемый по указанному пути и домену. Описание ключей данного массива вы можете найти на странице <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a>. Алгоритм работы метода следующий: </p> <ol> <li>Ищем сайты для которых удовлетворяют <i>path</i> и <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>path</i>, если нашли, то возвращаем, иначе </li> <li>Ищем сайты для которых удовлетворяет <i>host</i>, если нашли, то возвращаем, иначе </li> <li>Возвращаем сайт с установленным флагом "Сайт по умолчанию" </li> </ol> <p>Динамичный метод.</p>
+	* <p>Возвращает массив описывающий сайт, определяемый по указанному пути и домену. Описание ключей данного массива вы можете найти на странице <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a>. Алгоритм работы метода следующий: </p> <ol> <li>Ищем сайты для которых удовлетворяют <i>path</i> и <i>host</i>, если нашли, то возвращаем, иначе 	</li> <li>Ищем сайты для которых удовлетворяет <i>path</i>, если нашли, то возвращаем, иначе 	</li> <li>Ищем сайты для которых удовлетворяет <i>host</i>, если нашли, то возвращаем, иначе 	</li> <li>Возвращаем сайт с установленным флагом "Сайт по умолчанию" </li> </ol> <p>Нестатический метод.</p>
 	*
 	*
 	* @param mixed $cur_dir = false Путь относительно корня.<br>Необязательный. По умолчанию - путь к
@@ -5966,7 +5936,7 @@ abstract class CAllMain
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим ссылающийся URL, либо последний URL в текущей сессии
 	* if (strlen($_SERVER["HTTP_REFERER"]) &lt;= 0)
@@ -6038,7 +6008,7 @@ abstract class CAllMain
 	
 	
 	/**
-	* <p>Позволяет создавать <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные функции</a>. Динамичный метод.</p>
+	* <p>Позволяет создавать <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489" >Отложенные функции</a>. Нестатический метод.</p>
 	*
 	*
 	* @param callback $function  Имя функции выполнение которой необходимо <i>отложить</i>. Если это
@@ -6052,14 +6022,12 @@ abstract class CAllMain
 	*
 	* @param mixed $parameter_2  
 	*
-	* @param  $mixed  
-	*
-	* @param parameter_ $N  
+	* @param mixed $parameter_N  
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;? <br>function myShowProperty($property_id, $default_value=false) <br>{ <br>    global $APPLICATION; <br>    $APPLICATION-&gt;AddBufferContent(Array(&amp;$APPLICATION, "GetProperty"), $property_id, $default_value); <br>} <br>?&gt;&lt;?
 	* function myShowTitle($property_name="title", $strip_tags = true)
 	* {
@@ -6084,20 +6052,19 @@ abstract class CAllMain
 	*    global $my_title;
 	*    return $my_title;
 	* }
-	* ?&gt;Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum6/topic57638/message301982/#message301982">Как с помощью отложенных функций вывести разные данные в разных местах страницы</a></li>
+	* ?&gt;Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum6/topic57638/message301982/#message301982">Как с помощью отложенных функций вывести разные данные в разных местах страницы</a></li>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3489"
-	* >Отложенные функции</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li> </ul> </ht<a
+	* >Отложенные функции</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showtitle.php">CMain::ShowTitle</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showcss.php">CMain::ShowCSS</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/shownavchain.php">CMain::ShowNavChain</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showproperty.php">CMain::ShowProperty</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showmeta.php">CMain::ShowMeta</a> </li>     <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a> </li>  </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -6151,7 +6118,7 @@ abstract class CAllMain
 		ob_start(array(&$this, "EndBufferContent"));
 	}
 
-	function &EndBufferContentMan()
+	public function &EndBufferContentMan()
 	{
 		if(!$this->buffered)
 			return null;
@@ -6189,15 +6156,8 @@ abstract class CAllMain
 		}
 
 		$asset = Asset::getInstance();
-		if (Frame::getUseAppCache())
-		{
-			$asset->addString(CJSCore::GetCoreMessagesScript(), false, AssetLocation::AFTER_CSS, AssetMode::ALL);
-		}
-		else
-		{
-			$asset->addString(CJSCore::GetCoreMessagesScript(), false, AssetLocation::AFTER_CSS, AssetMode::STANDARD);
-			$asset->addString(CJSCore::GetCoreMessagesScript(true), false, AssetLocation::AFTER_CSS, AssetMode::COMPOSITE);
-		}
+		$asset->addString(CJSCore::GetCoreMessagesScript(), false, AssetLocation::AFTER_CSS, AssetMode::STANDARD);
+		$asset->addString(CJSCore::GetCoreMessagesScript(true), false, AssetLocation::AFTER_CSS, AssetMode::COMPOSITE);
 
 		$asset->addString($this->GetSpreadCookieHTML(), false, AssetLocation::AFTER_JS, AssetMode::STANDARD);
 		if ($asset->canMoveJsToBody() && \CJSCore::IsCoreLoaded())
@@ -6237,13 +6197,13 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод очищает последнее исключение. Динамичный метод.</p>
+	* <p>Метод очищает последнее исключение. Нестатический метод.</p> <p>Аналог в новом ядре D7: <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/systemexception/index.php" >SystemException</a>.</p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $events = GetModuleEvents("main", "OnAfterUserLogin");<br>while($arEvent = $events-&gt;Fetch())<br>{<br>   $APPLICATION-&gt;ResetException();<br>   ExecuteModuleEvent($arEvent, $login, $password, $remember, $USER_ID);<br>   if($err = $APPLICATION-&gt;GetException())<br>      $RESULT_MESSAGE = Array("MESSAGE"=&gt;$err-&gt;GetString()."&lt;br&gt;", "TYPE"=&gt;"ERROR");<br>}<br>?&gt;
 	* </pre>
@@ -6253,8 +6213,8 @@ abstract class CAllMain
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
 	* CApplicationException</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::GetException</a> </li> </ul></b<a
-	* name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::GetException</a>     </li>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -6270,18 +6230,18 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод фиксирует исключение <i>msg</i> c кодом <i>id</i>. Получить последнее исключение можно методом $APPLICATION-&gt;<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">GetException()</a>. Динамичный метод.</p>
+	* <p>Метод фиксирует исключение  <i>msg</i> c кодом <i>id</i>. Получить последнее исключение можно методом $APPLICATION-&gt;<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">GetException()</a>. Нестатический метод.</p> <p>Аналог в новом ядре D7: <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/systemexception/index.php" >SystemException</a>.</p>
 	*
 	*
 	* @param mixed $msg  Текст ошибки или объект класса, наследованного от <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/index.php">CApplicationException</a>.
 	*
-	* @param mixed $id = false Идентификатор ошибки. </htm
+	* @param mixed $mixedid = false Идентификатор ошибки.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if($login=='')
 	* {
@@ -6295,8 +6255,8 @@ abstract class CAllMain
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/resetexception.php">CMain::ResetException</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">CMain::GetException</a>
-	* </li> </ul><a name="examples"></a>
+	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getexception.php">CMain::GetException</a>     
+	*  </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -6314,13 +6274,13 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">CApplicationException</a>, содержащий последнее исключение. Динамичный метод.</p>
+	* <p>Метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">CApplicationException</a>, содержащий последнее исключение. Нестатический метод.</p> <p>Аналог в новом ядре D7: <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/systemexception/index.php" >SystemException</a>.</p>
 	*
 	*
 	* @return CApplicationException 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if(!$langs-&gt;Delete($del_id))<br>{<br>   if($ex = $APPLICATION-&gt;GetException())<br>      $strError = $ex-&gt;GetString();
 	* }<br>?&gt;
@@ -6330,8 +6290,8 @@ abstract class CAllMain
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
 	* CApplicationException</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a> </li>
-	* </ul></b<a name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>   </li>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -6345,22 +6305,18 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод используется для конвертирования строк из разных <a href="http://dev.1c-bitrix.ru/api_help/main/general/lang/code.php">кодировок</a>. Динамичный метод.</p> <p class="note"><b>Примечание</b>: метод - обертка для iconv, если iconv`а нет, то метод обходится и без неё (с ущербом производительности).</p>
+	* <p>Метод используется для конвертирования строк из разных <a href="http://dev.1c-bitrix.ru/api_help/main/general/lang/code.php">кодировок</a>. Нестатический метод.</p>   <p class="note"><b>Примечание</b>: метод - обертка для iconv, если iconv`а нет, то метод обходится и без неё (с ущербом производительности).</p>
 	*
 	*
-	* @param strin $g  Строка для конвертации
+	* @param string $charset_in  Строка для конвертации
 	*
-	* @param string $charset_in  Исходная кодировка </h
-	*
-	* @param string $charset_out  Конечная кодировка </h
+	* @param string $charset_out  Исходная кодировка
 	*
 	* @return string <p>Возвращает строку в нужной кодировке.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* Конвертация строки $str из юникода в cp1251.
-	* 
-	* $str = $APPLICATION-&gt;ConvertCharset($str, "Unicode", "windows-1251");$str = iconv('CP1251', 'UTF-8', $str);
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Конвертация строки $str из юникода в cp1251.$str = $APPLICATION-&gt;ConvertCharset($str, "Unicode", "windows-1251");$str = iconv('CP1251', 'UTF-8', $str);
 	* </pre>
 	*
 	*
@@ -6373,7 +6329,7 @@ abstract class CAllMain
 		$this->ResetException();
 
 		$error = "";
-		$result = CharsetConverter::ConvertCharset($string, $charset_in, $charset_out, $error);
+		$result = \Bitrix\Main\Text\Encoding::convertEncoding($string, $charset_in, $charset_out, $error);
 		if (!$result && !empty($error))
 			$this->ThrowException($error, "ERR_CHAR_BX_CONVERT");
 
@@ -6382,14 +6338,14 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод используется для конвертирования данных из разных <a href="http://dev.1c-bitrix.ru/api_help/main/general/lang/code.php">кодировок</a>. Динамичный метод.</p> <p class="note"><b>Примечание</b>: метод - обертка для iconv, если iconv`а нет, то метод обходится и без неё (с ущербом производительности).</p>
+	* <p>Метод используется для конвертирования данных из разных <a href="http://dev.1c-bitrix.ru/api_help/main/general/lang/code.php">кодировок</a>. Нестатический метод.</p>   <p class="note"><b>Примечание</b>: метод - обертка для iconv, если iconv`а нет, то метод обходится и без неё (с ущербом производительности).</p>
 	*
 	*
 	* @param array $Data  Массив для конвертации
 	*
-	* @param string $charset_from  Исходная кодировка </h
+	* @param string $charset_from  Исходная кодировка
 	*
-	* @param string $charset_to  Конечная кодировка </h
+	* @param string $charset_to  Конечная кодировка
 	*
 	* @return array <p>Возвращает данные в нужной кодировке.</p>
 	*
@@ -6417,36 +6373,23 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод создает объект типа <b>CCaptcha</b>, и возвращает сгенерированный код. Динамичный метод.</p>
+	* <p>Метод создает объект типа <b>CCaptcha</b>, и возвращает сгенерированный код. Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* $code=$APPLICATION-&gt;CaptchaGetCode();Код затем передается в HTML для создания картинки. Картинка создается с помощью скрипта <code>/bitrix/tools/captcha.php</code>.
-	* 
-	* &lt;input type="hidden" name="captcha_sid" value="&lt;?=$code;?&gt;" /&gt;
-	* &lt;img src="/bitrix/tools/captcha.php?captcha_sid=&lt;?=$code;?&gt;" alt="CAPTCHA" /&gt;При обращении к скрипту генерируется картинка, а также добавляется запись в базу данных. При обработке формы вызывается метод <a href="/api_help/main/reference/cmain/captchacheckcode.php">CaptchaCheckCode</a>: 
-	* 
-	* if (!$APPLICATION-&gt;CaptchaCheckCode($_POST["captcha_word"], $_POST["captcha_sid"]))
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $code=$APPLICATION-&gt;CaptchaGetCode();Код затем передается в HTML для создания картинки. Картинка создается с помощью скрипта <code>/bitrix/tools/captcha.php</code>.&lt;input type="hidden" name="captcha_sid" value="&lt;?=$code;?&gt;" /&gt;
+	* &lt;img src="/bitrix/tools/captcha.php?captcha_sid=&lt;?=$code;?&gt;" alt="CAPTCHA" /&gt;При обращении к скрипту генерируется картинка, а также добавляется запись в базу данных. При обработке формы вызывается метод <a href="/api_help/main/reference/cmain/captchacheckcode.php">CaptchaCheckCode</a>: if (!$APPLICATION-&gt;CaptchaCheckCode($_POST["captcha_word"], $_POST["captcha_sid"]))
 	* {
 	*    echo 'wrong captcha code';
-	* }Чтобы изменить CAPTCHA под ваш сайт можно обращаться к классу CCaptcha напрямую при генерации кода, и картинки. Для этого:
-	* 
-	* include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/captcha.php");
+	* }Чтобы изменить CAPTCHA под ваш сайт можно обращаться к классу CCaptcha напрямую при генерации кода, и картинки. Для этого:include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/captcha.php");
 	* $cpt = new CCaptcha();
 	* $cpt-&gt;SetCodeLength(6);  //устанавливаем длину кода на картинке
 	* $cpt-&gt;SetCode();
-	* $code=$cpt-&gt;GetSID();
-	* 
-	* Изменяем ссылку в HTML:
-	* </ht&lt;input type="hidden" name="captcha_sid" value="&lt;?=$code;?&gt;" /&gt;
-	* &lt;img src="[b]/bitrix/tools/captcha2.php[/b]?captcha_sid=&lt;?=$code;?&gt;" alt="CAPTCHA" /&gt;Создаем вышеуказанный <b>captcha2.php</b> и копируем в него содержимое <b>captcha.php</b>.
-	* 
-	* Изменяем отображение картинки:
-	* 
-	* $cpt = new CCaptcha();
+	* $code=$cpt-&gt;GetSID();Изменяем ссылку в HTML:&lt;input type="hidden" name="captcha_sid" value="&lt;?=$code;?&gt;" /&gt;
+	* &lt;img src="[b]/bitrix/tools/captcha2.php[/b]?captcha_sid=&lt;?=$code;?&gt;" alt="CAPTCHA" /&gt;Создаем вышеуказанный <b>captcha2.php</b> и копируем в него содержимое <b>captcha.php</b>.Изменяем отображение картинки:$cpt = new CCaptcha();
 	* $cpt-&gt;SetImageSize(90,30); //размер картинки на выходе
 	* //отключил фон из кружочков, и линии поверх изображения
 	* $cpt-&gt;SetEllipsesNumber(0); 
@@ -6455,10 +6398,7 @@ abstract class CAllMain
 	* $cpt-&gt;SetWaveTransformation(true);
 	* //переопределил вывод текста
 	* //углы разворота оставил по умолчанию, начальную позицию, дистанции и размер шрифта поменял
-	* $cpt-&gt;SetTextWriting($cpt-&gt;angleFrom, $cpt-&gt;angleTo, 5, 10, 16, 18);
-	* 
-	* Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление капчи без перезагрузки страницы</a></li>
+	* $cpt-&gt;SetTextWriting($cpt-&gt;angleFrom, $cpt-&gt;angleTo, 5, 10, 16, 18);Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление капчи без перезагрузки страницы</a></li>
 	* </pre>
 	*
 	*
@@ -6466,7 +6406,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/captchagetcode.php
 	* @author Bitrix
 	*/
-	public static function CaptchaGetCode()
+	static public function CaptchaGetCode()
 	{
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/captcha.php");
 
@@ -6478,23 +6418,22 @@ abstract class CAllMain
 
 	
 	/**
-	* <p>Метод для работы с captcha. Динамичный метод.</p>
+	* <p>Метод для работы с captcha. Нестатический метод.</p>
 	*
 	*
-	* @param captcha_wor $d  Слово с капчи
+	* @param mixed $captcha_word  Слово с капчи
 	*
-	* @param captcha_si $d  сессия капчи
+	* @param captcha_wor $captcha_sid  сессия капчи
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if ( $APPLICATION-&gt;CaptchaCheckCode($captcha_word, $captcha_sid) ) {
 	*   print 'Captcha valid';
 	* } else {
 	*   print 'Wrong captcha';
-	* }Смотрите также
-	* <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление капчи без перезагрузки страницы</a></li>
+	* }Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/61475/blog/updated-without-a-page-reload-captcha/">Обновление капчи без перезагрузки страницы</a></li>
 	* </pre>
 	*
 	*
@@ -6502,7 +6441,7 @@ abstract class CAllMain
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cmain/captchacheckcode.php
 	* @author Bitrix
 	*/
-	public static function CaptchaCheckCode($captcha_word, $captcha_sid)
+	static public function CaptchaCheckCode($captcha_word, $captcha_sid)
 	{
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/captcha.php");
 
@@ -6513,7 +6452,7 @@ abstract class CAllMain
 			return False;
 	}
 
-	public static function UnJSEscape($str)
+	static public function UnJSEscape($str)
 	{
 		if(strpos($str, "%u")!==false)
 		{
@@ -6547,7 +6486,7 @@ abstract class CAllMain
 		"PARAMS"=> array('param' => 'value') - additional params, 2nd argument of jsPopup.ShowDialog()
 	),
 	*/
-	public static function GetPopupLink($arUrl)
+	static public function GetPopupLink($arUrl)
 	{
 		CUtil::InitJSCore(array('window', 'ajax'));
 
@@ -6743,18 +6682,27 @@ abstract class CAllMain
 	public static function EpilogActions()
 	{
 		global $DB;
+
+		$DB->StartUsingMasterOnly();
+
 		//send email events
 		if(COption::GetOptionString("main", "check_events", "Y") !== "N")
 		{
-			$DB->StartUsingMasterOnly();
 			CEvent::CheckEvents();
-			$DB->StopUsingMasterOnly();
 		}
+
 		//files cleanup
 		CMain::FileAction();
+
+		if (CUserCounter::CheckLiveMode())
+		{
+			CUserCounterPage::checkSendCounter();
+		}
+
+		$DB->StopUsingMasterOnly();
 	}
 
-	static function ForkActions($func = false, $args = array())
+	public static function ForkActions($func = false, $args = array())
 	{
 		if(
 			!defined("BX_FORK_AGENTS_AND_EVENTS_FUNCTION")
@@ -6831,28 +6779,35 @@ global $MAIN_LANGS_ADMIN_CACHE;
 $MAIN_LANGS_ADMIN_CACHE = array();
 
 
+
+/**
+ * <b>CSite</b> - класс для работы с сайтами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php
+ * @author Bitrix
+ */
 class CAllSite
 {
 	var $LAST_ERROR;
 
 	
 	/**
-	* <p>Метод проверяет, находимся ли мы в данной папке. Статичный метод.</p>
+	* <p>Метод проверяет, находимся ли мы в данной папке. Cтатический  метод.</p>
 	*
 	*
-	* @param strIng $Dir  Директория сайта </h
+	* @param strIng $Dir  Директория сайта
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if(CSite::InDir('/about/')) {
 	* // выполнение условия для каталога /about/ и всех его подкаталогов, например /about/contancs/
-	* }
-	* 
-	* Чтобы проверка осуществлялась только для раздела about нужно:
-	* 
-	*  if(CSite::InDir('/about/index.php')) { 
+	* }Чтобы проверка осуществлялась только для раздела <code>/about</code> нужно: if(CSite::InDir('/about/index.php')) { 
 	*    // выполнение условия для каталога /about/, а именно страницы index.php в каталоге about
 	* }
 	* </pre>
@@ -6881,16 +6836,16 @@ class CAllSite
 
 	
 	/**
-	* <p>Метод проверяет, состоит ли текущий пользователь в указанных группах. Статичный метод.</p>
+	* <p>Метод проверяет, состоит ли текущий пользователь в указанных группах. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $arGroups  Массив, в котором указываются ИД групп.
+	* @param array $arGroups  Массив, в котором указываются ИД групп.
 	*
 	* @return mixed <p>Возвращает <i>true</i>, если пользователь состоит в указанных
-	* группах.</p> <a name="examples"></a>
+	* группах.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Не выводим детальную картинку и описание если пользователь принадлежит группе с ИД=3
 	* $arIBlockElement = false;
@@ -6900,20 +6855,14 @@ class CAllSite
 	* echo $arIBlockElement['DETAIL_TEXT'].'<br>';
 	* echo ShowImage($arIBlockElement['DETAIL_PICTURE'], 150, 150, 'border="0"', '', true);
 	* endif;
-	* ?&gt;
-	* 
-	* &lt;?
+	* ?&gt;&lt;?
 	* // Покажем название ИБ, только если пользователь принадлежит группам с ИД = 4 и 5
 	* if ( CSite::InGroup( array(4,5) ) ):
 	* $res = CIBlock::GetByID($_GET["BID"]);
 	* if($ar_res = $res-&gt;GetNext())
 	* echo $ar_res['NAME'];
 	* endif;
-	* ?&gt;
-	* 
-	* Проверка идет на соответствие группам с оператором <b>ИЛИ</b>, т.е. согласно приведенному примеру:
-	* 
-	* if ( CSite::InGroup( array(4,5) ) ):Под выборку попадут пользователи с группой "4" или "5", в том числе пользователи, состоящие в обеих группах.
+	* ?&gt;Проверка идет на соответствие группам с оператором <b>ИЛИ</b>, т.е. согласно приведенному примеру:if ( CSite::InGroup( array(4,5) ) ):Под выборку попадут пользователи с группой "4" или "5", в том числе пользователи, состоящие в обеих группах.
 	* </pre>
 	*
 	*
@@ -6930,7 +6879,7 @@ class CAllSite
 		return false;
 	}
 
-	function GetWeekStart()
+	public static function GetWeekStart()
 	{
 		static $weekStart = -1;
 
@@ -6982,24 +6931,24 @@ class CAllSite
 
 	
 	/**
-	* <p>Возвращает формат даты (времени) сайта. Статичный метод.</p>
+	* <p>Возвращает формат даты (времени) сайта. Cтатический метод.</p>
 	*
 	*
-	* @param string $type = "FULL" Тип формата. Допустимы следующие значения: <ul> <li> <b>FULL</b> - для
-	* дата-время </li> <li> <b>SHORT</b> - для даты </li> </ul> Необязательный. По
+	* @param string $type = "FULL" Тип формата. Допустимы следующие значения:  	<ul> <li> <b>FULL</b> - для
+	* дата-время 		</li> <li> <b>SHORT</b> - для даты 	</li> </ul> 	Необязательный. По
 	* умолчанию "FULL".
 	*
 	* @param mixed $lang = false ID сайта.<br>Необязательный. По умолчанию используется ID текущего
 	* сайта.
 	*
 	* @param bool $SearchInSitesOnly = false Необязательный. Если переменная определена в <i>true</i>, то в
-	* административной части будет использован не формат языка
+	* административной части  будет использован не формат языка
 	* административной части, а сайта по умолчанию.
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выводит текущую дату в формате текущего сайта
 	* echo date($DB-&gt;DateFormatToPHP(<b>CSite::GetDateFormat</b>("SHORT")), time());
@@ -7011,7 +6960,7 @@ class CAllSite
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/index.php#date">Методы класса
 	* CDataBase для работы с датой и временем</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с датой
-	* и временем</a> </li> </ul> <a name="examples"></a>
+	* и временем</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -7079,26 +7028,24 @@ class CAllSite
 
 	
 	/**
-	* <p>Метод предназначен для работы с форматом даты. Статичный метод.</p>
+	* <p>Метод предназначен для работы с форматом даты. Cтатический метод.</p>
 	*
 	*
-	* @param lan $g = false Язык сайта.<br>Необязательный. По умолчанию используется язык
+	* @param  $lang = false Язык сайта.<br>Необязательный. По умолчанию используется язык
 	* текущего сайта.
 	*
 	* @param bool $SearchInSitesOnly = false Необязательный. Если переменная определена в <i>true</i>, то в
-	* административной части будет использован не формат языка
+	* административной части  будет использован не формат языка
 	* административной части, а сайта по умолчанию.
 	*
-	* @param forma $t = false Формат времени. Значение по умолчанию - "false".
+	* @param mixed $format = false Формат времени. Значение по умолчанию - "false".
 	*
-	* @return string <p>Возвращает формат времени, указанный в настройках сайта.</p> <a
+	* @return string <p>Возвращает формат времени, указанный в настройках сайта.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* Вернет формат времени в формате php:
-	* 
-	* echo $GLOBALS["DB"]-&gt;DateFormatToPHP( CSite::GetTimeFormat() );
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Вернет формат времени в формате php:echo $GLOBALS["DB"]-&gt;DateFormatToPHP( CSite::GetTimeFormat() );
 	* </pre>
 	*
 	*
@@ -7278,7 +7225,7 @@ class CAllSite
 
 	
 	/**
-	* <p>Метод добавляет новый сайт. Возвращает ID вставленного сайта. При возникновении ошибки метод вернет false, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод. </p>
+	* <p>Метод добавляет новый сайт. Возвращает ID вставленного сайта. При возникновении ошибки метод вернет false, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Нестатический метод. </p>
 	*
 	*
 	* @param array $fields  Массив значений <a
@@ -7288,7 +7235,7 @@ class CAllSite
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = Array(
 	*   "LID"              =&gt; "ru",
@@ -7310,9 +7257,7 @@ class CAllSite
 	* $obSite = new CSite;
 	* <b>$obSite-&gt;Add</b>($arFields);
 	* if (strlen($obSite-&gt;LAST_ERROR)&gt;0) $strError .= $obSite-&gt;LAST_ERROR;
-	* ?&gt;Как менять шаблон сайта:
-	* 
-	* if (strlen($site_id)) {
+	* ?&gt;Как менять шаблон сайта:if (strlen($site_id)) {
 	*    $obSite = new CSite();
 	*    $t = $obSite-&gt;Update($site_id, array(
 	*       'ACTIVE' =&gt; "Y",
@@ -7331,7 +7276,7 @@ class CAllSite
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -7396,10 +7341,10 @@ class CAllSite
 
 	
 	/**
-	* <p>Метод изменяет параметры сайта. Возвращает "true", если изменение прошло успешно, при возникновении ошибки метод вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод. </p>
+	* <p>Метод изменяет параметры сайта. Возвращает "true", если изменение прошло успешно, при возникновении ошибки метод вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Нестатический метод. </p>
 	*
 	*
-	* @param int $id  ID сайта.</bod
+	* @param mixed $intid  ID сайта.
 	*
 	* @param array $fields  Массив значений <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">полей</a> вида
@@ -7408,7 +7353,7 @@ class CAllSite
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = Array(
 	*   "ACTIVE"           =&gt; "Y",
@@ -7429,9 +7374,7 @@ class CAllSite
 	* $obSite = new CSite;
 	* <b>$obSite-&gt;Update</b>("ru", $arFields);
 	* if (strlen($obSite-&gt;LAST_ERROR)&gt;0) $strError .= $obSite-&gt;LAST_ERROR;
-	* ?&gt;Как менять шаблон сайта:
-	* 
-	* if (strlen($site_id)) {
+	* ?&gt;Как менять шаблон сайта:if (strlen($site_id)) {
 	*    $obSite = new CSite();
 	*    $t = $obSite-&gt;Update($site_id, array(
 	*       'ACTIVE' =&gt; "Y",
@@ -7450,7 +7393,7 @@ class CAllSite
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/index.php#flds">Поля CSite</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/add.php">CSite::Add</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -7521,15 +7464,15 @@ class CAllSite
 
 	
 	/**
-	* <p>Метод удаляет сайт. Если удаление успешно, то возвращает объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, иначе "false". Статичный метод.</p>
+	* <p>Метод удаляет сайт. Если удаление успешно, то возвращает объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>, иначе "false". Cтатический метод.</p>
 	*
 	*
-	* @param string $id  ID удаляемого сайта. </ht
+	* @param mixed $stringid  ID удаляемого сайта.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (<b>CSite::Delete</b>("ru")===false) 
 	*   echo "Сайт удалить нельзя т.к. найдены связанные записи.";
@@ -7542,7 +7485,7 @@ class CAllSite
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/update.php">CSite::Update</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforesitedelete.php">Событие "OnBeforeSiteDelete"</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onsitedelete.php">Событие "OnSiteDelete"</a> </li>
-	* </ul> <a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -7612,15 +7555,15 @@ class CAllSite
 
 	
 	/**
-	* <p>Получение списка шаблонов конкретного сайта. Статичный метод.</p>
+	* <p>Получение списка шаблонов конкретного сайта. Cтатический  метод.</p>
 	*
 	*
-	* @param site_i $d  Идентификатор сайта, список шаблонов которого нужно получить.
+	* @param  $site_id  Идентификатор сайта, список шаблонов которого нужно получить.
 	*
 	* @return result_type <p>Возвращается массив ID шаблонов сайта.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $rsTemplates = CSite::GetTemplateList("s1");
 	* while($arTemplate = $rsTemplates-&gt;Fetch())
 	* {
@@ -7715,33 +7658,33 @@ class CAllSite
 
 	
 	/**
-	* <p>Возвращает список сайтов в виде объекта класса <b>_CLangDBResult</b>. Статичный метод.</p>
+	* <p>Возвращает список сайтов в виде объекта класса <b>_CLangDBResult</b>. Cтатический метод.</p>
 	*
 	*
-	* @param string &$by = "sort" По какому полю сортируем. Допустимы следующие значения: <ul> <li>
-	* <b>id</b> - по ID сайта </li> <li> <b>active</b> - по флагу активности </li> <li> <b>name</b> -
-	* по краткому названию сайта </li> <li> <b>dir</b> - по каталогу от которого
-	* начинается содержимое сайта </li> <li> <b>lendir</b> - по длине имени
-	* каталога от которого начинается содержимое сайта </li> <li> <b>def</b> - по
-	* флагу "Сайт по умолчанию" </li> <li> <b>sort</b> - по индексу сортировки </li>
-	* </ul>Параметр необязательный. По умолчанию - "sort".
+	* @param string &$by = "sort" По какому полю сортируем. Допустимы следующие значения: 	<ul> <li>
+	* <b>id</b> - по ID сайта 		</li> <li> <b>active</b> - по флагу активности 		</li> <li>
+	* <b>name</b> - по краткому названию сайта 		</li> <li> <b>dir</b> - по каталогу от
+	* которого начинается содержимое сайта 		</li> <li> <b>lendir</b> - по длине
+	* имени каталога от которого начинается содержимое сайта 		</li> <li>
+	* <b>def</b> - по флагу "Сайт по умолчанию" 		</li> <li> <b>sort</b> - по индексу
+	* сортировки 	</li> </ul>Параметр необязательный. По умолчанию - "sort".
 	*
-	* @param string &$order = "asc" Порядок сортировки. Допустимы следующие значения: <ul> <li> <b>asc</b> - по
-	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul> Параметр
+	* @param string &$order = "asc" Порядок сортировки. Допустимы следующие значения: 	<ul> <li> <b>asc</b> -
+	* по возрастанию 		</li> <li> <b>desc</b> - по убыванию 	</li> </ul> 	Параметр
 	* необязательный. По умолчанию - "asc".
 	*
 	* @param array $filter = array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). "Фильтруемое
-	* поле" может принимать следующие значения: <ul> <li> <b>ID</b> - ID сайта </li>
-	* <li> <b>NAME</b> - поле "Название" из настроек сайта </li> <li> <b>DOMAIN</b> - поле
-	* "Доменное имя" из настроек сайта </li> <li> <b>IN_DIR</b> - префикс для поля
-	* "Папка сайта" из настроек сайта </li> <li> <b>LANGUAGE_ID</b> - двухсимвольный ID
-	* языка сайта </li> <li> <b>ACTIVE</b> - флаг активности (Y|N) </li> <li> <b>DEFAULT</b> -
-	* сайт по умолчанию (Y|N) </li> </ul>
+	* поле" может принимать следующие значения: 	<ul> <li> <b>ID</b> - ID сайта
+	* 		</li> <li> <b>NAME</b> - поле "Название" из настроек сайта 		</li> <li> <b>DOMAIN</b> -
+	* поле "Доменное имя" из настроек сайта 		</li> <li> <b>IN_DIR</b> - префикс для
+	* поля "Папка сайта" из настроек сайта 		</li> <li> <b>LANGUAGE_ID</b> -
+	* двухсимвольный ID языка сайта 		</li> <li> <b>ACTIVE</b> - флаг активности (Y|N)
+	* 		</li> <li> <b>DEFAULT</b> - сайт по умолчанию (Y|N) 	</li> </ul>
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsSites = <b>CSite::GetList</b>($by="sort", $order="desc", Array("NAME" =&gt; "www.mysite.ru"));
 	* while ($arSite = $rsSites-&gt;Fetch())
@@ -7879,15 +7822,15 @@ class CAllSite
 
 	
 	/**
-	* <p>Возвращает информацию по сайту в виде объекта класса _CLangDBResult. Статичный метод.</p>
+	* <p>Возвращает информацию по сайту в виде объекта класса _CLangDBResult. Cтатический метод.</p>
 	*
 	*
-	* @param string $id  ID сайта.</bod
+	* @param mixed $stringid  ID сайта.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsSites = <b>CSite::GetByID</b>("ru");
 	* $arSite = $rsSites-&gt;Fetch();
@@ -8215,13 +8158,12 @@ class CAllSite
 
 class _CLangDBResult extends CDBResult
 {
-
-	public static function _CLangDBResult($res)
+	static public function __construct($res)
 	{
-		parent::CDBResult($res);
+		parent::__construct($res);
 	}
 
-	public function Fetch()
+	public static function Fetch()
 	{
 		if($res = parent::Fetch())
 		{
@@ -8292,31 +8234,43 @@ class _CLangDBResult extends CDBResult
 
 }
 
+
+/**
+ * <b>CLanguage</b> - класс для работы с языками системы.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php
+ * @author Bitrix
+ */
 class CAllLanguage
 {
 	var $LAST_ERROR;
 
 	
 	/**
-	* <p>Возвращает список языков в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Статичный метод.</p>
+	* <p>Возвращает список языков в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Нестатический метод.</p>
 	*
 	*
-	* @param string &$by = "lid" По какому полю сортируем. Допустимы следующие значения: <ul> <li>
-	* <b>lid</b> - по ID языка </li> <li> <b>active</b> - по флагу активности </li> <li> <b>name</b> -
-	* по названию </li> <li> <b>def</b> - по флагу "Язык по умолчанию" </li> </ul>
+	* @param string &$by = "lid" По какому полю сортируем. Допустимы следующие значения: 	<ul> <li>
+	* <b>lid</b> - по ID языка 		</li> <li> <b>active</b> - по флагу активности 		</li> <li>
+	* <b>name</b> - по названию 		</li> <li> <b>def</b> - по флагу "Язык по умолчанию" 	</li>
+	* </ul>
 	*
-	* @param string &$order = "asc" Порядок сортировки. Допустимы следующие значения: <ul> <li> <b>asc</b> - по
-	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul>
+	* @param string &$order = "asc" Порядок сортировки. Допустимы следующие значения: 	<ul> <li> <b>asc</b> -
+	* по возрастанию 		</li> <li> <b>desc</b> - по убыванию 	</li> </ul>
 	*
 	* @param array $filter = array() Массив вида array("фильтруемое поле"=&gt;"значение" [, ...]). "Фильтруемое
-	* поле" может принимать следующие значения: <ul> <li> <b>LID</b> -
-	* двухсимвольный ID языка </li> <li> <b>NAME</b> - название языка </li> <li> <b>ACTIVE</b>
-	* - флаг активности (Y|N) </li> </ul>
+	* поле" может принимать следующие значения: 	<ul> <li> <b>LID</b> -
+	* двухсимвольный ID языка 		</li> <li> <b>NAME</b> - название языка 		</li> <li>
+	* <b>ACTIVE</b> - флаг активности (Y|N) 	</li> </ul>
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsLang = <b>CLanguage::GetList</b>($by="lid", $order="desc", Array("NAME" =&gt; "russian"));
 	* while ($arLang = $rsLang-&gt;Fetch())
@@ -8330,7 +8284,7 @@ class CAllLanguage
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/getbyid.php">CLanguage::GetByID</a> </li>
-	* </ul></b<a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -8405,15 +8359,15 @@ class CAllLanguage
 
 	
 	/**
-	* <p>Возвращает язык по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
+	* <p>Возвращает язык по его коду <i>id</i> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Нестатический метод.</p>
 	*
 	*
-	* @param string $id  Двухсимвольный ID языка.
+	* @param mixed $stringid  Двухсимвольный ID языка.
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsLang = <b>CLanguage::GetByID</b>("en");
 	* $arLang = $rsLang-&gt;Fetch();
@@ -8426,7 +8380,7 @@ class CAllLanguage
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/getlist.php">CLanguage::GetList</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/selectbox.php">CLanguage::SelectBox</a> </li>
-	* </ul></b<a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -8501,7 +8455,7 @@ class CAllLanguage
 
 	
 	/**
-	* <p>Метод добавляет новый язык. Возвращает ID вставленного языка. При возникновении ошибки метод вернет false, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод.</p>
+	* <p>Метод добавляет новый язык. Возвращает ID вставленного языка. При возникновении ошибки метод вернет false, а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Нестатический метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений <a
@@ -8511,7 +8465,7 @@ class CAllLanguage
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = Array(
 	*   "LID"              =&gt; "en",
@@ -8533,8 +8487,8 @@ class CAllLanguage
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/update.php">CLanguage::Update</a> </li>
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li>
-	* </ul></b<a name="examples"></a>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
+	* name="examples"></a>
 	*
 	*
 	* @static
@@ -8571,10 +8525,10 @@ class CAllLanguage
 
 	
 	/**
-	* <p>Метод изменяет настройки языка. Возвращает "true" если изменение прошло успешно, при возникновении ошибки метод вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Динамичный метод.</p>
+	* <p>Метод изменяет настройки языка. Возвращает "true" если изменение прошло успешно, при возникновении ошибки метод вернет "false", а в свойстве LAST_ERROR объекта будет содержаться текст ошибки. Нестатический метод.</p>
 	*
 	*
-	* @param int $id  Двухсимвольный ID языка.
+	* @param mixed $intid  Двухсимвольный ID языка.
 	*
 	* @param array $fields  Массив значений <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">полей</a> вида
@@ -8583,7 +8537,7 @@ class CAllLanguage
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = Array(
 	*   "ACTIVE"           =&gt; "Y",
@@ -8604,7 +8558,7 @@ class CAllLanguage
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/index.php#flds">Поля CLanguage</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/add.php">CLanguage::Add</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -8642,20 +8596,19 @@ class CAllLanguage
 
 	
 	/**
-	* <p>Метод удаляет язык. Возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Динамичный метод.</p>
+	* <p>Метод удаляет язык. Возвращается объект <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Нестатический метод.</p>
 	*
 	*
-	* @param string $id  Двухсимвольный ID языка.
+	* @param mixed $stringid  Двухсимвольный ID языка.
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (<b>CLanguage::Delete</b>("en")) 
 	*   echo "Язык успешно удален.";
 	* ?&gt;
-	* </htm
 	* </pre>
 	*
 	*
@@ -8665,7 +8618,7 @@ class CAllLanguage
 	* href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforelanguagedelete.php">Событие
 	* "OnBeforeLanguageDelete"</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/events/onlanguagedelete.php">Событие "OnLanguageDelete"</a> </li>
-	* </ul> <a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -8703,35 +8656,35 @@ class CAllLanguage
 
 	
 	/**
-	* <p>Возвращает HTML, представляющий из себя выпадающий список языков (тэг "select"). Динамичный метод.</p>
+	* <p>Возвращает HTML, представляющий из себя выпадающий список языков (тэг "select"). Нестатический метод.</p>
 	*
 	*
-	* @param string $name  Имя выпадающего списка:<br> &lt;select name="<i>name</i>" ...&gt; </ht
+	* @param string $name  Имя выпадающего списка:<br> 	&lt;select name="<i>name</i>" ...&gt;
 	*
 	* @param string $value  Текущее значение (для инициализации выбранного значения).
 	*
 	* @param string $default_value = "" Если задан, то будет выводиться первым пунктом списка (например,
-	* фраза "выберите язык"). <br>Не обязательный. По умолчанию "".
+	* фраза "выберите язык"). 	<br>Не обязательный. По умолчанию "".
 	*
 	* @param string $js_function = "" Имя JS функции которая будет вызываться при выборе в выпадающем
-	* списке какого либо значения:<br> &lt;select OnChange="<i>js_function</i>" ...&gt; <br>Не
+	* списке какого либо значения:<br> 	&lt;select OnChange="<i>js_function</i>" ...&gt; 	<br>Не
 	* обязательный. По умолчанию "".
 	*
-	* @param string $add_to_select = "class=typeselect" Произвольный HTML который будет добавлен в тэг "select":<br> &lt;select
-	* <i>add_to_select</i> ...&gt;<br> Не обязательный. По умолчанию задан
+	* @param string $add_to_select = "class=typeselect" Произвольный HTML который будет добавлен в тэг "select":<br> 	&lt;select
+	* <i>add_to_select</i> ...&gt;<br> 	Не обязательный. По умолчанию задан
 	* стандартный CSS класс для выпадающих списков административной
 	* части.
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;table&gt;
 	*   &lt;tr&gt;
 	*     &lt;td&gt;Язык:&lt;/td&gt;
 	*     &lt;td&gt;&lt;?=<b>CLanguage::SelectBox</b>("LANGUAGE", LANGUAGE_ID)?&gt;&lt;/td&gt;
 	*   &lt;/tr&gt;
-	* &lt;/table&gt;</b
+	* &lt;/table&gt;
 	* </pre>
 	*
 	*
@@ -8813,19 +8766,12 @@ abstract class CAllFilterQuery
 	var $clob_upper;
 	var $errorno;
 
-	public function __construct($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
-	{
-		$this->CFilterQuery($default_query_type, $rus_bool_lang, $procent, $ex_sep, $clob, $div_fields, $clob_upper);
-	}
-
-	abstract function BuildWhereClause($word);
-
 	/*
 	$default_query_type - logic for spaces
 	$rus_bool_lang - use russian logic words
 	$ex_sep - array with exceptions for delimiters
 	*/
-	public function CFilterQuery($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
+	public function __construct($default_query_type = "and", $rus_bool_lang = "yes", $procent="Y", $ex_sep = array(), $clob="N", $div_fields="Y", $clob_upper="N")
 	{
 		$this->m_query  = "";
 		$this->m_fields = "";
@@ -8839,6 +8785,8 @@ abstract class CAllFilterQuery
 		$this->clob_upper = $clob_upper;
 		$this->div_fields = $div_fields;
 	}
+
+	abstract public function BuildWhereClause($word);
 
 	public function GetQueryString($fields, $query)
 	{
@@ -9062,24 +9010,41 @@ class CAllLang extends CAllSite
 {
 }
 
+
+/**
+ * <b>CApplicationException</b> - класс для работы с исключениями.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php
+ * @author Bitrix
+ */
 class CApplicationException
 {
 	var $msg, $id;
-	public function CApplicationException($msg, $id = false)
+	public function __construct($msg, $id = false)
 	{
 		$this->msg = $msg;
 		$this->id = $id;
 	}
 
+	/** @deprecated */
+	static public function CApplicationException($msg, $id = false)
+	{
+		self::__construct($msg, $id);
+	}
+
 	
 	/**
-	* <p>Метод возвращает текст исключения. Динамичный метод.</p>
+	* <p>Метод возвращает текст исключения. Нестатический метод.</p>
 	*
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $DB-&gt;StartTransaction();<br>if(!$langs-&gt;Delete($del_id))<br>{
 	*   $DB-&gt;Rollback();
@@ -9116,14 +9081,15 @@ class CApplicationException
 class CAdminException extends CApplicationException
 {
 	var $messages;
-	public function CAdminException($messages, $id = false)
+
+	public function __construct($messages, $id = false)
 	{
 		//array("id"=>"", "text"=>""), array(...), ...
 		$this->messages = $messages;
 		$s = "";
 		foreach($this->messages as $msg)
 			$s .= $msg["text"]."<br>";
-		parent::CApplicationException($s, $id);
+		parent::__construct($s, $id);
 	}
 
 	public function GetMessages()

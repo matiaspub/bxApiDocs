@@ -575,7 +575,7 @@ class CLdapServer
 
 class __CLDAPServerDBResult extends CDBResult
 {
-public static 	function Fetch()
+	public static function Fetch()
 	{
 		if($res = parent::Fetch())
 		{
@@ -588,7 +588,7 @@ public static 	function Fetch()
 		return $res;
 	}
 
-public 	function GetNextServer()
+	public function GetNextServer()
 	{
 		if(!($r = $this->GetNext()))
 			return $r;

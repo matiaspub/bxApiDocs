@@ -1,6 +1,17 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * <b>CPostingGeneral</b> - класс для работы с выпусками новостей подписки.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/index.php
+ * @author Bitrix
+ */
 class CPostingGeneral
 {
 	var $LAST_ERROR="";
@@ -8,6 +19,34 @@ class CPostingGeneral
 	static $current_emails_per_hit = 0;
 
 	//get by ID
+	
+	/**
+	* <p>Метод возвращает выпуск по его идентификатору. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">поля объекта
+	* "Выпуск"</a>.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $rsPosting = <b>CPosting::GetByID</b>($ID);
+	* $arPosting = $rsPosting-&gt;Fetch();
+	* if($arPosting)
+	*     echo htmlspecialchars(print_r($arPosting, true));
+	* else
+	*     echo "Not found";
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostinggetbyid.php
+	* @author Bitrix
+	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -27,6 +66,33 @@ class CPostingGeneral
 	}
 
 	//list of categories linked with message
+	
+	/**
+	* <p>Метод возвращает выборку рассылок, на которые будет отправлен выпуск. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	* "Рассылка"</a>: ID, NAME, SORT, LID, ACTIVE.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //в какие рубрики отправлять
+	* $aPostRub = array();
+	* $post_rub = <b>CPosting::GetRubricList</b>($post_arr["ID"]);
+	* while($post_rub_arr = $post_rub-&gt;Fetch())
+	*     $aPostRub[] = $post_rub_arr["ID"];
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostinggetrubriclist.php
+	* @author Bitrix
+	*/
 	public static function GetRubricList($ID)
 	{
 		global $DB;
@@ -53,6 +119,44 @@ class CPostingGeneral
 	}
 
 	//list of user group linked with message
+	
+	/**
+	* <p>Метод возвращает выборку групп пользователей, на которые будет отправлен выпуск. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны поля
+	* объекта "Группа": ID, NAME.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* &lt;?
+	* //show user groups and check selected for the issue
+	* $aPostGrp = array();
+	* if($ID&gt;0)
+	* {
+	*     $post_grp = <b>CPosting::GetGroupList</b>($ID);
+	*     while($post_grp_arr = $post_grp-&gt;Fetch())
+	*         $aPostGrp[] = $post_grp_arr["ID"];
+	* }
+	* $group = CGroup::GetList(($by="name"), ($order="asc"));
+	* while($group-&gt;ExtractFields("g_")):
+	* ?&gt;
+	* &lt;input type="checkbox" name="GROUP_ID[]" value="&lt;?echo $g_ID?&gt;"&lt;?if(in_array($g_ID, $aPostGrp)) echo " checked"?&gt;&gt;
+	* &lt;?echo $g_NAME?&gt;&lt;br&gt;
+	* &lt;?
+	* endwhile;
+	* ?&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostinggetgrouplist.php
+	* @author Bitrix
+	*/
 	public static function GetGroupList($ID)
 	{
 		global $DB;
@@ -76,6 +180,33 @@ class CPostingGeneral
 	}
 
 	// delete by ID
+	
+	/**
+	* <p>Метод удаляет выпуск по его идентификатору. Метод статический.</p> <p><b>Примечание</b>. Метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @return mixed <p>В случае успешного удаления возвращается результат типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. В противном
+	* случает возвращается false.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $res = <b>CPosting::Delete</b>($ID);
+	* if(!$res)
+	*     echo "Cannot delete the issue.";
+	* elseif($res-&gt;AffectedRowsCount() &lt; 1)
+	*     echo "Already deleted.";
+	* else
+	*     echo "Deleted successfylly.";
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingdelete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -109,6 +240,30 @@ class CPostingGeneral
 		return $DB->Query("DELETE FROM b_posting_group WHERE GROUP_ID=".$group_id, true);
 	}
 
+	
+	/**
+	* <p>Метод удаляет одно или все вложения выпуска. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param int $file_id = false Идентификатор вложения. Если параметр не указан или равен false, то
+	* удаляются все вложения выпуска.
+	*
+	* @return mixed <p>Нет.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* if(is_array($FILE_ID))
+	*         foreach($FILE_ID as $file_id)
+	*             <b>CPosting::DeleteFile</b>($ID, $file_id);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingdeletefile.php
+	* @author Bitrix
+	*/
 	public static function DeleteFile($ID, $file_id=false)
 	{
 		global $DB;
@@ -116,7 +271,7 @@ class CPostingGeneral
 		$rsFile = CPosting::GetFileList($ID, $file_id);
 		while($arFile = $rsFile->Fetch())
 		{
-			$rs = $DB->Query("DELETE FROM b_posting_file where POSTING_ID=".intval($ID)." AND FILE_ID=".intval($arFile["ID"]), false, "File: ".__FILE__."<br>Line: ".__LINE__);
+			$DB->Query("DELETE FROM b_posting_file where POSTING_ID=".intval($ID)." AND FILE_ID=".intval($arFile["ID"]), false, "File: ".__FILE__."<br>Line: ".__LINE__);
 			CFile::Delete(intval($arFile["ID"]));
 		}
 	}
@@ -155,6 +310,39 @@ class CPostingGeneral
 		return array($fname, $fext, $index);
 	}
 
+	
+	/**
+	* <p>Метод добавляет вложение к выпуску сохраняя и регистрируя его в таблице файлов (b_file). Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param array $file  Массив с данными файла формата:<br><pre bgcolor="#323232" style="padding:5px;">Array(     "name" =&gt; "название файла",
+	*     "size" =&gt; "размер",     "tmp_name" =&gt; "временный путь на сервере",     "type"
+	* =&gt; "тип загружаемого файла");</pre> Массив такого вида может быть
+	* взят прямо из $_FILES[имя поля]
+	*
+	* @return bool <p>В случае успешного сохранения вложения возвращается ID
+	* зарегистрированного файла. В противном случает возвращается false,
+	* и переменная класса LAST_ERROR содержит сообщение об ошибке.</p><a
+	* name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* if (strlen($save)&gt;0 &amp;&amp; $REQUEST_METHOD=="POST")
+	* {
+	*     $cPosting=new CPosting;
+	* $file_id = $cPosting-&gt;SaveFile($ID, $_FILES["FILE_TO_ATTACH"]);
+	* if($file_id===false)
+	*     strError .= "Ошибка при сохранении вложения."."<br>";
+	* }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingsavefile.php
+	* @author Bitrix
+	*/
 	public function SaveFile($ID, $file)
 	{
 		global $DB, $APPLICATION;
@@ -212,6 +400,36 @@ class CPostingGeneral
 		}
 	}
 
+	
+	/**
+	* <p>Метод возвращает выборку вложений выпуска. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param int $file_id = false Идентификатор вложения. Если параметр не указан или равен false, то
+	* выбираются все вложения выпуска.
+	*
+	* @return CDBResult <p>Возвращается результат запроса типа <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. При выборке из
+	* результата методами класса CDBResult становятся доступны <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php">поля объекта "Файл"</a>: ID,
+	* FILE_SIZE, ORIGINAL_NAME, SUBDIR, FILE_NAME, CONTENT_TYPE.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* //размер всех вложений
+	* $attach_size = 0;
+	* $rsFile = <b>CPosting::GetFileList</b>($ID);
+	* while($arFile = $rsFile-&gt;Fetch())
+	*     $attach_size += $arFile["FILE_SIZE"];
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostinggetfilelist.php
+	* @author Bitrix
+	*/
 	public static function GetFileList($ID, $file_id=false)
 	{
 		global $DB;
@@ -283,9 +501,12 @@ class CPostingGeneral
 
 		if(array_key_exists("CHARSET", $arFields))
 		{
-			$aCharset = explode(",", COption::GetOptionString("subscribe", "posting_charset"));
-			if(!in_array($arFields["CHARSET"], $aCharset))
+			$sCharset = COption::GetOptionString("subscribe", "posting_charset");
+			$aCharset = explode(",", ToLower($sCharset));
+			if (!in_array(ToLower($arFields["CHARSET"]), $aCharset))
+			{
 				$aMsg[] = array("id"=>"CHARSET", "text"=>GetMessage("class_post_err_charset"));
+			}
 		}
 
 		if(!empty($aMsg))
@@ -300,6 +521,28 @@ class CPostingGeneral
 	}
 
 	//relation with categories
+	
+	/**
+	* <p>Метод изменяет информацию о привязке выпуска к рубрикам подписки. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param array $aRubric  Массив идентификаторов рассылок.
+	*
+	* @return void 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $posting = new CPosting;
+	* $posting-&gt;<b>UpdateRubrics</b>($ID, array(1, 2, 3));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingupdaterubrics.php
+	* @author Bitrix
+	*/
 	public static function UpdateRubrics($ID, $aRubric)
 	{
 		global $DB;
@@ -321,6 +564,28 @@ class CPostingGeneral
 	}
 
 	//relation with user groups
+	
+	/**
+	* <p>Метод изменяет информацию о привязке выпуска к группам пользователей. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param array $aGroup  Массив идентификаторов групп пользователей.
+	*
+	* @return void 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $posting = new CPosting;
+	* $posting-&gt;<b>UpdateGroups</b>($ID, array(1));
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingupdategroups.php
+	* @author Bitrix
+	*/
 	public static function UpdateGroups($ID, $aGroup)
 	{
 		global $DB;
@@ -342,6 +607,82 @@ class CPostingGeneral
 	}
 
 	//Addition
+	
+	/**
+	* <p>Метод добавляет выпуск. Метод нестатический.</p>
+	*
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">полей объекта
+	* "Выпуск"</a><br> 	Дополнительно могут быть указаны поля:<br> 	RUB_ID -
+	* массив идентификаторов рассылок;<br> 	GROUP_ID - массив
+	* идентификаторов групп пользователей.
+	*
+	* @return int <p>В случае успешного добавления возвращается ID выпуска. В
+	* противном случает возвращается false, и переменная класса LAST_ERROR
+	* содержит сообщение об ошибке (так же возбуждается исключение <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">CMain::ThrowException</a>).</p><p>При
+	* указании статуса в поле <b>STATUS</b> следует учитывать, что при
+	* переводе из одного статуса в другой могут выполняться
+	* определенные действия. Так, например, при переводе из статуса
+	* "Черновик" ("D") в статус "В процессе" ("P") формируется список адресов,
+	* по которым будет происходить отправка. А именно, адреса, на
+	* которые требуется отправить выпуск, попадают в таблицу
+	* <b>b_posting_email</b> со статусом "Y". Если при добавлении выпуска сразу
+	* указать статус "В процессе" ("Р"), то процесс добавления адресов в
+	* таблицу <b>b_posting_email</b> не произойдет, и выпуск никому не отправится.
+	* При этом статус выпуска сменится на "S" (отправлен успешно).
+	* Выпуски хранятся в таблице <b>b_posting</b>.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $posting = new CPosting;
+	* $arFields = Array(
+	*     "FROM_FIELD" =&gt; $FROM_FIELD,
+	*     "TO_FIELD" =&gt; $TO_FIELD,
+	*     "BCC_FIELD" =&gt; $BCC_FIELD,
+	*     "EMAIL_FILTER" =&gt; $EMAIL_FILTER,
+	*     "SUBJECT" =&gt; $SUBJECT,
+	*     "BODY_TYPE" =&gt; ($BODY_TYPE &lt;&gt; "html"? "text":"html"),
+	*     "BODY" =&gt; $BODY,
+	*     "DIRECT_SEND" =&gt; ($DIRECT_SEND &lt;&gt; "Y"? "N":"Y"),
+	*     "CHARSET" =&gt; $CHARSET,
+	*     "SUBSCR_FORMAT" =&gt; ($SUBSCR_FORMAT&lt;&gt;"html" &amp;&amp; $SUBSCR_FORMAT&lt;&gt;"text"?
+	*         false:$SUBSCR_FORMAT),
+	*     "RUB_ID" =&gt; $RUB_ID,
+	*     "GROUP_ID" =&gt; $GROUP_ID
+	* );
+	* if($STATUS &lt;&gt; "")
+	* {
+	*     if($STATUS&lt;&gt;"S" &amp;&amp; $STATUS&lt;&gt;"E" &amp;&amp; $STATUS&lt;&gt;"P")
+	*         $STATUS = "D";
+	*     $arFields["STATUS"] = $STATUS;
+	*     if($STATUS == "D")
+	*     {
+	*         $arFields["DATE_SENT"] = false;
+	*         $arFields["SENT_BCC"] = "";
+	*         $arFields["ERROR_EMAIL"] = "";
+	*     }
+	* }
+	* $ID = <b>$posting-&gt;Add</b>($arFields);
+	* if($ID == false)
+	*     echo $posting-&gt;LAST_ERROR;
+	* 
+	* // Полностью схема генерации выпуска из скрипта выглядит так:
+	*     $cPosting = new CPosting;
+	*     $ID = $cPosting-&gt;Add($arFields);
+	*     if($ID)
+	*     {
+	*     $cPosting-&gt;ChangeStatus($ID, "P");
+	*     $cPosting-&gt;AutoSend($ID);
+	*     }
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingadd.php
+	* @author Bitrix
+	*/
 	public function Add($arFields)
 	{
 		global $DB;
@@ -363,6 +704,61 @@ class CPostingGeneral
 	}
 
 	//Update
+	
+	/**
+	* <p>Метод изменяет информацию о выпуске по его идентификатору. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param array $arFields  Массив со значениями <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">полей объекта
+	* "Выпуск"</a>. 	Дополнительно могут быть указаны поля:<br> 	RUB_ID - массив
+	* идентификаторов рассылок;<br> 	GROUP_ID - массив идентификаторов групп
+	* пользователей.
+	*
+	* @return bool <p>В случае успешного изменения возвращается true. В противном
+	* случает возвращается false, и переменная класса LAST_ERROR содержит
+	* сообщение об ошибке.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $posting = new CPosting;
+	* $arFields = Array(
+	*     "FROM_FIELD" =&gt; $FROM_FIELD,
+	*     "TO_FIELD" =&gt; $TO_FIELD,
+	*     "BCC_FIELD" =&gt; $BCC_FIELD,
+	*     "EMAIL_FILTER" =&gt; $EMAIL_FILTER,
+	*     "SUBJECT" =&gt; $SUBJECT,
+	*     "BODY_TYPE" =&gt; ($BODY_TYPE &lt;&gt; "html"? "text":"html"),
+	*     "BODY" =&gt; $BODY,
+	*     "DIRECT_SEND" =&gt; ($DIRECT_SEND &lt;&gt; "Y"? "N":"Y"),
+	*     "CHARSET" =&gt; $CHARSET,
+	*     "SUBSCR_FORMAT" =&gt; ($SUBSCR_FORMAT&lt;&gt;"html" &amp;&amp; $SUBSCR_FORMAT&lt;&gt;"text"? false:$SUBSCR_FORMAT),
+	*     "RUB_ID" =&gt; $RUB_ID,
+	*     "GROUP_ID" =&gt; $GROUP_ID
+	* );
+	* if($STATUS &lt;&gt; "")
+	* {
+	*     if($STATUS&lt;&gt;"S" &amp;&amp; $STATUS&lt;&gt;"E" &amp;&amp; $STATUS&lt;&gt;"P")
+	*         $STATUS = "D";
+	*     $arFields["STATUS"] = $STATUS;
+	*     if($STATUS == "D")
+	*     {
+	*         $arFields["DATE_SENT"] = false;
+	*         $arFields["SENT_BCC"] = "";
+	*         $arFields["ERROR_EMAIL"] = "";
+	*     }
+	* }
+	* if(!<b>$posting-&gt;Update</b>($ID, $arFields))
+	*     $strError = $posting-&gt;LAST_ERROR;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingupdate.php
+	* @author Bitrix
+	*/
 	public function Update($ID, $arFields)
 	{
 		global $DB;
@@ -393,6 +789,34 @@ class CPostingGeneral
 		return true;
 	}
 
+	
+	/**
+	* <p>Метод возвращает массив адресов, по которым выпуск будет отправлен. Метод нестатический.</p>
+	*
+	*
+	* @param array $post_arr  Массив всех <a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">полей объекта
+	* "Выпуск"</a> в виде наборов "название поля" =&gt; "значение".
+	*
+	* @return array <p>Возвращает массив уникальных e-mail адресов. В который входят</p><ul>
+	* <li>Адреса подписчиков из рубрик выпуска, подписка которых активна
+	* и подтверждена с учетом формата подписки и фильтра адресов.</li>
+	* <li>Адреса зарегистрированных и активных пользователей
+	* принадлежащих тем группам к которым привязан выпуск.</li> <li>Адреса
+	* перечисленные в поле BCC_FIELD.</li> </ul><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $post = CPosting::GetByID($ID);
+	* if(($post_arr = $post-&gt;Fetch()))
+	*     $aEmail = <b>CPosting::GetEmails</b>($post_arr);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostinggetemails.php
+	* @author Bitrix
+	*/
 	public static function GetEmails($post_arr)
 	{
 		$aEmail = array();
@@ -449,6 +873,66 @@ class CPostingGeneral
 		return $aEmail;
 	}
 
+	
+	/**
+	* <p>Метод для отправки выпуска с помощью cron'а или агента. Метод статический.</p>
+	*
+	*
+	* @param mixed $intID = false Идентификатор выпуска. Если параметр не указан или равен false, то
+	* будут отсылаться все выпуски в статусе "В процессе" время
+	* отправки которых меньше или равно текущему. В порядке
+	* возрастания времени отправки.
+	*
+	* @param bool $limit = false Флажок ограничения количества отправляемых писем за один вызов.
+	* Если этот параметр указан и равен true количество писем
+	* отправляемых за один вызов данной функции ограничивается
+	* параметром "Количество писем для автоматической рассылки
+	* агентом за один запуск" в настройках модуля. При отправке выпуска
+	* с помощью агента (задан параметр ID) дополнительно ограничивается
+	* продолжительность отправки, которая определяется параметром в
+	* настройках модуля.
+	*
+	* @param string $site_id = false Идентификатор сайта. Используется при отправке автоматически
+	* сгенерированных выпусков с помощью агентов. Если этот параметр
+	* указан, то его значение сравнивается с текущим значением
+	* константы SITE_ID. Таким образом агент по отправке выполняется
+	* только в контексте сайта к которому привязана рубрика породившая
+	* выпуск. Это позволяет избежать проблемы пропуска картинок в html
+	* выпусках в случае многосайтовости организованной по второму
+	* варианту.
+	*
+	* @return mixed <p>Нет.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* #!/usr/bin/php
+	* &lt;?php
+	* //Здесь необходимо указать ваш DOCUMENT_ROOT!
+	* $_SERVER["DOCUMENT_ROOT"] = "/opt/www/html";
+	* $DOCUMENT_ROOT = $_SERVER["DOCUMENT_ROOT"];
+	* define("NO_KEEP_STATISTIC", true);
+	* define("NOT_CHECK_PERMISSIONS", true);
+	* set_time_limit(0);
+	* require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
+	* if (CModule::IncludeModule("subscribe"))
+	* {
+	*     $cPosting = new CPosting;
+	*     $cPosting-&gt;<b>AutoSend</b>();
+	* }
+	* require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_after.php");
+	* ?&gt;
+	* 
+	* &lt;?
+	*     CAgent::AddAgent("CPosting::<b>AutoSend</b>(".$ID.",true);", "subscribe", "N", 0, $post_arr["AUTO_SEND_TIME"], "Y", $post_arr["AUTO_SEND_TIME"]);
+	* ?&gt;
+	* &lt;p class="notetext"&gt;Для отправки выпуска был создан агент.&lt;/p&gt;
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingautosend.php
+	* @author Bitrix
+	*/
 	public static function AutoSend($ID=false, $limit=false, $site_id=false)
 	{
 		if($ID===false)
@@ -502,11 +986,49 @@ class CPostingGeneral
 	}
 
 	//Send message
+	
+	/**
+	* <p>Нестатический метод отправляет выпуск в почтовую рассылку по адресам, указанным в таблице <b>b_posting_email</b> с соответствующим идентификатором выпуска. При этом обновляя статусы:  </p> <ul> <li>Y - еще не отправлялось </li> <li>N - отправлено </li> <li>Е - с ошибками</li> </ul>    Выпуски со статусом "Успешно отправлен" повторно не отправляются. Если у выпуска установлен статус "Частично отправлен", то выпуск отправляется по оставшимся адресам.   <p>Сначала выполняется попытка получения блокировки выпуска (см. <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostinglock.php">CPosting::Lock</a>). Если блокировку получить не удалось, то отправка считается частичной и возвращается "CONTINUE". Затем формируется тело письма для отправки и в цикле по адресам подписчиков осуществляется отправка выпуска с использованием функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a>.</p>   <p>В режиме отправки "Персонально каждому получателю" перед вызовом <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a> вызываются обработчики события BeforePostingSendMail. </p>   <p>В цикле отправки в очереди адресов делаются отметки об успешной отправке или ошибке.</p>   <p>С выпуска снимается блокировка(см. <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cposting/cpostingunlock.php">CPosting::UnLock</a>).</p>
+	*
+	*
+	* @param mixed $intID  Идентификатор выпуска.
+	*
+	* @param int $timeout = 0 Максимальное время отправки в секундах. При превышении этого
+	* времени прерывается работа 	и устанавливается статус выпуска
+	* "Частично отправлен". Параметр имеет значение только при методе
+	* 	отправки "Персонально каждому получателю". 	Если timeout=0, то
+	* отправка производится за один шаг.
+	*
+	* @param int $maxcount = 0 Максимальное количество писем для отправки. При превышении этого
+	* количества прерывается работа 	и устанавливается статус выпуска
+	* "Частично отправлен". Параметр имеет значение только при методе
+	* 	отправки "Персонально каждому получателю". 	Если maxcount=0, то
+	* отправка производится за один шаг.
+	*
+	* @return mixed <p>Функция возвращает true при успешной отправке, false при неуспешной,
+	* "CONTINUE" при частичной отправке. При неуспешной отправке переменная
+	* LAST_ERROR класса содержит сообщение об ошибке.</p>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* &lt;?<br>if($action=="send" &amp;&amp; $ID&gt;0):<br>    if(($res = <b>$cPosting-&gt;SendMessage</b>($ID, COption::GetOptionString("subscribe", "posting_interval"))) !== false):<br>        if($res === "CONTINUE"):<br>?&gt;<br>&lt;script language="JavaScript" type="text/javascript"&gt;<br>&lt;!--<br>function DoNext(){window.location="&lt;?echo $APPLICATION-&gt;GetCurPage()."?ID=".$ID."&amp;action=send&amp;lang=".LANG."&amp;rnd=".rand();?&gt;";}<br>setTimeout('DoNext()', 2500);<br>//--&gt;<br>&lt;/script&gt;<br>&lt;?<br>        else:<br>            $strOk = "Sent successfully.";<br>        endif; //$res === "CONTINUE"<br>    endif; //$cPosting-&gt;SendMessage<br>    $strError .= $cPosting-&gt;LAST_ERROR;<br>endif; //$action=="send"<br>
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/bxmail.php">bxmail</a></li><br><a
+	* name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingsendmessage.php
+	* @author Bitrix
+	*/
 	public function SendMessage($ID, $timeout=0, $maxcount=0, $check_charset=false)
 	{
 		global $DB, $APPLICATION;
 
-		$eol = CEvent::GetMailEOL();
+		$eol = \Bitrix\Main\Mail\Mail::getMailEol();
 		$ID = intval($ID);
 		$timeout = intval($timeout);
 		$start_time = getmicrotime();
@@ -623,6 +1145,9 @@ class CPostingGeneral
 		}
 
 		$bHasAttachments = false;
+		$sHeader = "";
+		$sBoundary = "";
+
 		if(count($tools->aMatches) > 0)
 		{
 			$bHasAttachments = true;
@@ -772,7 +1297,8 @@ class CPostingGeneral
 
 				if(is_array($arFields))
 				{
-					$result = bxmail($arFields["EMAIL"], $arFields["SUBJECT"], $arFields["BODY"], $arFields["HEADER"], $mail_additional_parameters);
+					$to = CMailTools::EncodeHeaderFrom($arFields["EMAIL"], $post_arr["CHARSET"]);
+					$result = bxmail($to, $arFields["SUBJECT"], $arFields["BODY"], $arFields["HEADER"], $mail_additional_parameters);
 				}
 				else
 				{
@@ -841,6 +1367,35 @@ class CPostingGeneral
 		return ($STATUS=="P"? "CONTINUE": true);
 	}
 
+	
+	/**
+	* <p>Метод возвращает массив статусов в очереди выпуска на отправку. Ключами массива являются статусы, а значениями количество подписчиков в соответствующих статусах. Метод статический.</p>
+	*
+	*
+	* @param int $intID  Идентификатор выпуска
+	*
+	* @return array <p>Массив распределения получателей выпуска по статусам. Если
+	* получатели в каком-то из статусов отсутствуют, то и
+	* соответствующий элемента массива будет отсутствовать. 
+	* </p><p>Допустимыми значениями ключей являются:</p><ul> <li>"N" - письмо
+	* отправлено успешно;</li>     <li>"E" - отправлено с ошибкой;</li>     <li>"Y" -
+	* ожидает отправки.</li>  </ul>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* &lt;?<br>$arStatuses = CPosting::GetEmailStatuses($ID);<br>if(!isset($arStatuses["Y"]))<br>  echo "Выпуск отправлен.";<br>?&gt;
+	* </pre>
+	*
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">Поля
+	* CPosting</a> </li>  </ul><a name="examples"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/GetEmailStatuses.php
+	* @author Bitrix
+	*/
 	public static function GetEmailStatuses($ID)
 	{
 		global $DB;
@@ -856,6 +1411,31 @@ class CPostingGeneral
 		return $arStatuses;
 	}
 
+	
+	/**
+	* <p>Метод возвращает выборку из очереди на отправку. Метод статический.</p>
+	*
+	*
+	* @param int $intID  Идентификатор выпуска
+	*
+	* @param char $STATUS  Статус получателя в очереди.          <p>Допустимыми значениями
+	* являются:</p>                 <ul> <li>"N" письмо отправлено успешно;</li>               
+	*      <li>"E" - отправлено с ошибкой;</li>                     <li>"Y" - ожидает
+	* отправки.</li>          </ul>
+	*
+	* @return array <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a><a
+	* href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/crubric/crubric.fields.php">поля объекта
+	* "Очередь отправки"</a>
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingfields.php">Поля
+	* CPosting</a> </li>  </ul><br><br>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/GetEmailsByStatus.php
+	* @author Bitrix
+	*/
 	public static function GetEmailsByStatus($ID, $STATUS)
 	{
 		global $DB;
@@ -869,6 +1449,29 @@ class CPostingGeneral
 		");
 	}
 
+	
+	/**
+	* <p>Метод изменяет статус выпуска и производит действия в соответствии с приведенной ниже таблицей. Метод нестатический.</p>   <table width="100%" class="tnormal"><tbody> <tr> <th width="15%">Текущий статус</th> <th>Новый статус</th> <th>Действия</th> </tr> <tr> <td>Черновик</td> 	<td>В процессе</td> 	<td>Формируется список адресов по которым будет происходить отправка.</td> </tr> <tr> <td>В процессе</td> 	<td>Остановлен</td> 	<td>Нет.</td> </tr> <tr> <td>Остановлен</td> 	<td>В процессе</td> 	<td>Нет.</td> </tr> <tr> <td>В процессе</td> 	<td>Отправлен с ошибками</td> 	<td>Нет.</td> </tr> <tr> <td>В процессе</td> 	<td>Отправлен</td> 	<td>Нет.</td> </tr> <tr> <td>Отправлен с ошибками</td> 	<td>В процессе</td> 	<td>Адреса в очереди отправки помеченные как ошибочные помечаются на отправку.</td> </tr> <tr> <td>Отправлен с ошибками,         <br>       Отправлен,         <br>       Остановлен</td> 	<td>Черновик</td> 	<td>Очередь отправки очищается.</td> </tr> </tbody></table>
+	*
+	*
+	* @param mixed $intID  В процессе
+	*
+	* @param string $status  Остановлен
+	*
+	* @return bool <p>true при успешной смене статуса и false при неуспешной. При
+	* неуспешной смене статуса переменная LAST_ERROR класса содержит
+	* сообщение об ошибке.</p><a name="examples"></a>
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* ///<*****************************<br>// Stop sending the message<br>///<*****************************<br>if($action=="stop" &amp;&amp; $ID&gt;0 &amp;&amp; $POST_RIGHT=="W")<br>{<br>	$cPosting-&gt;<b>ChangeStatus</b>($ID, "W");<br>}<br>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/subscribe/classes/cpostinggeneral/cpostingchangestatus.php
+	* @author Bitrix
+	*/
 	public function ChangeStatus($ID, $status)
 	{
 		global $DB;
@@ -1049,10 +1652,10 @@ class CMailTools
 		if(!CMailTools::IsEightBit($text))
 			return $text;
 
-		$maxl = IntVal((76 - strlen($charset) + 7)*0.4);
+		$maxl = intval((76 - strlen($charset) + 7)*0.4);
 
 		$res = "";
-		$eol = CEvent::GetMailEOL();
+		$eol = \Bitrix\Main\Mail\Mail::getMailEol();
 		$len = strlen($text);
 		for($i=0; $i<$len; $i=$i+$maxl)
 		{
@@ -1192,7 +1795,7 @@ class CMailTools
 
 	public static function ImageTypeToMimeType($type)
 	{
-		$aTypes = array(
+		static $aTypes = array(
 			1 => "image/gif",
 			2 => "image/jpeg",
 			3 => "image/png",
@@ -1210,7 +1813,7 @@ class CMailTools
 			15 => "image/vnd.wap.wbmp",
 			16 => "image/xbm",
 		);
-		if(!empty($aTypes[$type]))
+		if (isset($aTypes[$type]))
 			return $aTypes[$type];
 		else
 			return "application/octet-stream";

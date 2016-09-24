@@ -130,10 +130,10 @@ class CCalendarType
 						'add' => self::CanDo('calendar_type_add', $typeXmlId),
 						'edit' => self::CanDo('calendar_type_edit', $typeXmlId),
 						'edit_section' => self::CanDo('calendar_type_edit_section', $typeXmlId),
-						'access' => self::CanDo('calendar_type_access', $typeXmlId)
+						'access' => self::CanDo('calendar_type_edit_access', $typeXmlId)
 					);
 
-					if (self::CanDo('calendar_type_access', $typeXmlId))
+					if (self::CanDo('calendar_type_edit_access', $typeXmlId))
 					{
 						$type['ACCESS'] = array();
 						if (count($arPerm[$typeXmlId]) > 0)
@@ -146,6 +146,7 @@ class CCalendarType
 					$res[] = $type;
 				}
 			}
+
 			CCalendar::PushAccessNames($arAccessCodes);
 			$arResult = $res;
 		}
@@ -172,7 +173,7 @@ class CCalendarType
 			if ($Params['NEW']) // Add
 			{
 				$strSql = "SELECT * FROM b_calendar_type WHERE XML_ID='".$DB->ForSql($XML_ID)."'";
-				$res = $DB->Query($strSql, false, $err_mess.__LINE__);
+				$res = $DB->Query($strSql, false, __LINE__);
 				if (!($arRes = $res->Fetch()))
 					CDatabase::Add("b_calendar_type", $arFields, array('DESCRIPTION'));
 				else
@@ -194,7 +195,7 @@ class CCalendarType
 		}
 
 		//SaveAccess
-		if (self::CanDo('calendar_type_access', $XML_ID) && is_array($access))
+		if (self::CanDo('calendar_type_edit_access', $XML_ID) && is_array($access))
 			self::SavePermissions($XML_ID, $access);
 
 		CCalendar::ClearCache('type_list');
@@ -269,7 +270,7 @@ class CCalendarType
 		if ((!$USER || !is_object($USER)) || $USER->CanDoOperation('edit_php'))
 			return true;
 
-		if (($xmlId == 'group' || $xmlId == 'user') && CCalendar::IsSocNet() && CCalendar::IsSocnetAdmin())
+		if (($xmlId == 'group' || $xmlId == 'user' || CCalendar::IsBitrix24()) && CCalendar::IsSocNet() && CCalendar::IsSocnetAdmin())
 			return true;
 
 		return in_array($operation, self::GetOperations($xmlId, $userId));
@@ -305,6 +306,7 @@ class CCalendarType
 				}
 			}
 		}
+
 		return self::$arOp[$key];
 	}
 

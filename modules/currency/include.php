@@ -10,20 +10,24 @@ Loader::registerAutoLoadClasses(
 		'CCurrency' => 'general/currency.php',
 		'CCurrencyLang' => 'general/currency_lang.php',
 		'CCurrencyRates' => $strDBType.'/currency_rate.php',
+		'\Bitrix\Currency\Compatible\Tools' => 'lib/compatible/tools.php',
+		'\Bitrix\Currency\Helpers\Admin\Tools' => 'lib/helpers/admin/tools.php',
+		'\Bitrix\Currency\Price\Rounding' => 'lib/price/rounding.php',
+		'\Bitrix\Currency\CurrencyManager' => 'lib/currencymanager.php',
 		'\Bitrix\Currency\CurrencyTable' => 'lib/currency.php',
 		'\Bitrix\Currency\CurrencyLangTable' => 'lib/currencylang.php',
-		'\Bitrix\Currency\CurrencyRateTable' => 'lib/currencyrate.php',
-		'\Bitrix\Currency\CurrencyManager' => 'lib/currencymanager.php'
+		'\Bitrix\Currency\CurrencyRateTable' => 'lib/currencyrate.php'
 	)
 );
 unset($strDBType);
 
-$jsCurrencyDescr = array(
-	'js' => '/bitrix/js/currency/core_currency.js',
-	'rel' => array('core')
+CJSCore::RegisterExt(
+	'currency',
+	array(
+		'js' => '/bitrix/js/currency/core_currency.js',
+		'rel' => array('core')
+	)
 );
-CJSCore::RegisterExt('currency', $jsCurrencyDescr);
-unset($jsCurrencyDescr);
 
 // define('CURRENCY_CACHE_DEFAULT_TIME', 10800);
 // define('CURRENCY_ISO_STANDART_URL', 'http://www.iso.org/iso/home/standards/currency_codes.htm');
@@ -41,10 +45,10 @@ unset($jsCurrencyDescr);
  *
  * @param string $currency  Валюта, по правилам которой нужно производить форматирование.
  *
- * @return string <p>Возвращает сформатированую строку.</p> <a name="examples"></a>
+ * @return string <p>Возвращает сформатированую строку.</p><a name="examples"></a>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * echo CurrencyFormat(11800.95, "USD");
  * ?&gt;
@@ -87,7 +91,7 @@ function CurrencyFormat($price, $currency)
  * @param string $currency  Валюта, по правилам которой нужно производить форматирование.
  *
  * @return string <p>Возвращает строку с величиной суммы, отформатированной
- * согласно настройкам без шаблона.</p> <br><br>
+ * согласно настройкам без шаблона.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformatnumber.php

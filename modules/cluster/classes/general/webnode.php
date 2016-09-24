@@ -3,6 +3,9 @@ IncludeModuleLangFile(__FILE__);
 
 class CClusterWebnode
 {
+	public static $errno = 0;
+	public static $errstr = '';
+
 	public function Add($arFields)
 	{
 		global $DB;
@@ -213,9 +216,9 @@ class CClusterWebnode
 
 	public static function GetStatus($host, $port, $url)
 	{
-		$errno = 0;
-		$errstr = "";
-		$FP = fsockopen($host, $port, $errno, $errstr, 2);
+		self::$errno = 0;
+		self::$errstr = '';
+		$FP = @fsockopen($host, $port, self::$errno, self::$errstr, 2);
 		if($FP)
 		{
 			$strVars = $url;

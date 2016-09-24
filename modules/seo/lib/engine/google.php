@@ -7,6 +7,7 @@
  */
 namespace Bitrix\Seo\Engine;
 
+use Bitrix\Main\Web\HttpClient;
 use Bitrix\Seo\Engine;
 use Bitrix\Seo\IEngine;
 use Bitrix\Main\Text\Converter;
@@ -15,24 +16,28 @@ use Bitrix\Main\Web\Json;
 class Google extends Engine implements IEngine
 {
 	const ENGINE_ID = 'google';
-	const SCOPE_BASE = 'https://www.google.com/webmasters/tools/feeds/';
+	const SCOPE_BASE = 'https://www.googleapis.com/auth/webmasters';
 	const SCOPE_USER = 'https://www.googleapis.com/auth/userinfo.profile';
 	const SCOPE_VERIFY = 'https://www.googleapis.com/auth/siteverification.verify_only';
 
-	const SCOPE_FEED_SITES = 'sites/';
+	const SCOPE_FEED_SITES = 'sites';
 	const SCOPE_FEED_CRAWLISSUES = 'crawlissues/';
 	const SCOPE_FEED_MESSAGES = 'messages/';
 
 	const SCOPE_DOMAIN_PROTOCOL = 'http://';
 
+	const QUERY_BASE = 'https://www.googleapis.com/webmasters/v3/';
+
 	const QUERY_USER = 'https://www.googleapis.com/oauth2/v3/userinfo';
 	const QUERY_VERIFY = 'https://www.googleapis.com/siteVerification/v1/webResource?verificationMethod=FILE';
+	const QUERY_VERIFY_TOKEN = 'https://www.googleapis.com/siteVerification/v1/token';
 
 	protected $engineId = 'google';
 	protected $scope = null;
 
 	public function getScope()
 	{
+/*
 		if(!is_array($this->scope))
 		{
 			$arDomains = \CSeoUtils::getDomainsList();
@@ -47,8 +52,13 @@ class Google extends Engine implements IEngine
 				$this->scope[] = $this->getSiteId($arDomain['DOMAIN'], $arDomain['SITE_ID']);
 			}
 		}
+*/
 
-		return $this->scope;
+		return array(
+			self::SCOPE_USER,
+			self::SCOPE_BASE,
+			self::SCOPE_VERIFY,
+		);
 	}
 
 	public function getAuthUrl()
@@ -114,8 +124,6 @@ class Google extends Engine implements IEngine
 		}
 
 		throw new \Exception($ob->getError());
-
-		return false;
 	}
 
 	public function getAuth($code)
@@ -132,8 +140,6 @@ class Google extends Engine implements IEngine
 		}
 
 		throw new \Exception($ob->getError());
-
-		return false;
 	}
 
 	public function getCurrentUser()
@@ -142,10 +148,16 @@ class Google extends Engine implements IEngine
 
 		if(!isset($this->engineSettings['AUTH_USER']) || !is_array($this->engineSettings['AUTH_USER']))
 		{
-			$queryResult = $this->queryXml(self::QUERY_USER);
-			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
+			$queryResult = $this->queryJson(self::QUERY_USER);
+
+			if(!$queryResult)
 			{
-				$res = json_decode($queryResult->result, true);
+				return false;
+			}
+
+			if($queryResult->getStatus() == self::HTTP_STATUS_OK && strlen($queryResult->getResult()) > 0)
+			{
+				$res = Json::decode($queryResult->getResult());
 				if(is_array($res))
 				{
 					$this->engineSettings['AUTH_USER'] = $APPLICATION->convertCharsetArray($res, 'utf-8', LANG_CHARSET);
@@ -155,7 +167,7 @@ class Google extends Engine implements IEngine
 				}
 			}
 
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
+			throw new \Exception('Query error! '.$queryResult->getStatus().': '.$queryResult->getResult());
 		}
 		else
 		{
@@ -165,339 +177,121 @@ class Google extends Engine implements IEngine
 
 	public function getFeeds()
 	{
-		$queryResult = $this->queryXml(self::SCOPE_BASE.self::SCOPE_FEED_SITES);
-		if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
+		$queryResult = $this->queryJson(self::QUERY_BASE.self::SCOPE_FEED_SITES);
+		if($queryResult->getStatus() == self::HTTP_STATUS_OK && strlen($queryResult->getResult()) > 0)
 		{
-			return $this->processResult($queryResult->result);
-		}
-		else
-		{
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
-		}
-	}
-
-	public function getSitemapsFeed($domain, $dir = '/')
-	{
-		$url = $this->engineSettings['SITES'][$domain]['entryLink']['sitemaps'];
-		if($url)
-		{
-			$queryResult = $this->queryXml($url);
-			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
+			$result = Json::decode($queryResult->getResult());
+			$response = array();
+			if(is_array($result))
 			{
-				$obXml = new \CDataXML();
-
-				if($obXml->loadString($queryResult->result))
+				foreach($result['siteEntry'] as $key => $siteInfo)
 				{
-					$arFeeds = $obXml->getTree()->elementsByName('feed');
-					foreach($arFeeds as $feed)
+					$siteUrlInfo = parse_url($siteInfo['siteUrl']);
+					if($siteUrlInfo)
 					{
-						$feedChildren = $feed->children();
-					}
-
-					return $feedData;
-				}
-				else
-				{
-					throw new \Exception('Unexpected query result! '.$queryResult->status.': '.$queryResult->result);
-				}
-			}
-			else
-			{
-				throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
-			}
-		}
-	}
-
-	public function getCrawlIssuesFeed($domain, $dir = '/')
-	{
-		$url = self::SCOPE_BASE.urlencode(self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir).'/'.self::SCOPE_FEED_CRAWLISSUES;
-		$queryResult = $this->queryXml($url);
-		if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
-		{
-			$obXml = new \CDataXML();
-
-			if($obXml->loadString($queryResult->result))
-			{
-				$arEntries = $obXml->getTree()->elementsByName('entry');
-				$arEntriesData = array();
-				foreach($arEntries as $entry)
-				{
-					$feedChildren = $entry->children();
-					$entryData = array();
-
-					foreach ($feedChildren as $child)
-					{
-						$tag = $child->name();
-
-						switch($tag)
+						$errors = array();
+						$hostKey = \CBXPunycode::toASCII($siteUrlInfo["host"], $errors);
+						if(count($errors) > 0)
 						{
-							case 'link':
-								if(!isset($entryData[$tag]))
-									$entryData[$tag] = array();
-
-								$entryData[$tag][$child->getAttribute('rel')] = $child->getAttribute('href');
-							break;
-							default: $entryData[$tag] = $child->textContent();
+							$hostKey = $siteUrlInfo["host"];
 						}
-					}
-					$arEntriesData[] = $entryData;
-				}
 
-				return $arEntriesData;
-			}
-			else
-			{
-				throw new \Exception('Unexpected query result! '.$queryResult->status.': '.$queryResult->result);
-			}
-		}
-		else
-		{
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
-		}
-	}
-
-	public function getKeywordsFeed($domain, $dir = '/')
-	{
-		$url = $this->engineSettings['SITES'][$domain]['entryLink']['keywords'];
-		if($url)
-		{
-			$queryResult = $this->queryXml($url);
-			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
-			{
-				$obXml = new \CDataXML();
-
-				if($obXml->loadString($queryResult->result))
-				{
-					$arFeeds = $obXml->getTree()->elementsByName('feed');
-					foreach($arFeeds as $feed)
-					{
-						$feedChildren = $feed->children();
-						$feedData = array(
-							'etag' => $feed->getAttribute('etag'),
-							'keyword' => array(
-								'internal' => array(),
-								'external' => array(),
-							),
+						$response[$hostKey] = array(
+							'binded' => $siteInfo["permissionLevel"] !== "siteRestrictedUser",
+							'verified' => $siteInfo["permissionLevel"] !== "siteRestrictedUser"
+								&& $siteInfo["permissionLevel"] !== "siteUnverifiedUser",
 						);
-
-						foreach ($feedChildren as $child)
-						{
-							$tag = $child->name();
-
-							switch($tag)
-							{
-								case 'category': break;
-
-								case 'link':
-									if(!isset($feedData[$tag]))
-										$feedData[$tag] = array();
-
-									$feedData[$tag][$child->getAttribute('rel')] = $child->getAttribute('href');
-								break;
-
-								case 'keyword':
-									$feedData['keyword'][$child->getAttribute('source')][] = $child->textContent();
-								break;
-
-								default: $feedData[$tag] = $child->textContent();
-							}
-						}
 					}
-
-					return $feedData;
-				}
-				else
-				{
-					throw new \Exception('Unexpected query result! '.$queryResult->status.': '.$queryResult->result);
 				}
 			}
-			else
-			{
-				throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
-			}
-		}
-	}
 
-	public function getSiteInfo($domain, $dir = '/')
-	{
-		$queryResult = $this->queryXml($this->getSiteId($domain, $dir));
-		if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
-		{
-			$res = $this->processResult($queryResult->result);
-			$res['_domain'] = $domain;
-			$res['_path'] = $path;
-
-			return $res;
+			return $response;
 		}
 		else
 		{
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
+			throw new \Exception('Query error! '.$queryResult->getStatus().': '.$queryResult->getResult());
 		}
-	}
-
-	public function setSiteInfo($domain, $dir = '/', $arFields)
-	{
-		$str = <<<EOT
-<atom:entry xmlns:atom='http://www.w3.org/2005/Atom' xmlns:wt="http://schemas.google.com/webmasters/tools/2007"
-><atom:id>%s</atom:id>%s
-</atom:entry>
-EOT;
-
-		if(count($arFields) > 0)
-		{
-			$str1 = '';
-			foreach($arFields as $field=>$value)
-			{
-				$str1 .= '<wt:'.$field.'>'.Converter::getXmlConverter()->encode($value).'</wt:'.$field.'>';
-			}
-
-			$queryResult = $this->queryXml(
-				$this->engineSettings['SITES'][$domain]['link']['edit'],
-				"PUT",
-				sprintf(
-					$str,
-					Converter::getXmlConverter()->encode(self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir),
-					$str1
-				)
-			);
-
-			if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
-			{
-				return $this->processResult($queryResult->result);
-			}
-			else
-			{
-				throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
-			}
-		}
-
 	}
 
 	public function addSite($domain, $dir = '/')
 	{
-		$str = <<<EOT
-<atom:entry xmlns:atom='http://www.w3.org/2005/Atom'><atom:content src="%s" /></atom:entry>
-EOT;
+		$queryResult = $this->queryJson(self::QUERY_BASE.self::SCOPE_FEED_SITES."/".$domain, "PUT");
 
-		$queryResult = $this->queryXml(
-			self::SCOPE_BASE.self::SCOPE_FEED_SITES,
-			"POST",
-			sprintf($str, Converter::getXmlConverter()->encode(self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir))
-		);
-
-		if($queryResult->status == self::HTTP_STATUS_CREATED && strlen($queryResult->result) > 0)
+		if(!$queryResult)
 		{
-			return $this->processResult($queryResult->result);
+			return false;
+		}
+
+		if($queryResult->getStatus() == self::HTTP_STATUS_NO_CONTENT)
+		{
+			return $this->getFeeds();
 		}
 		else
 		{
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
+			throw new \Exception('Query error! '.$queryResult->getStatus().': '.$queryResult->getResult());
+		}
+	}
+
+	public function verifyGetToken($domain, $dir)
+	{
+		$data = array(
+			"verificationMethod" => "FILE",
+			"site" => array(
+				"identifier" => self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir,
+				"type" => "SITE"
+			)
+		);
+
+		$queryResult = $this->queryJson(
+			static::QUERY_VERIFY_TOKEN,
+			"POST",
+			Json::encode($data)
+		);
+
+		if(!$queryResult)
+		{
+			return false;
+		}
+
+		if($queryResult->getStatus() == self::HTTP_STATUS_OK && strlen($queryResult->getResult()) > 0)
+		{
+			$result = Json::decode($queryResult->getResult());
+			return $result["token"];
+		}
+		else
+		{
+			throw new \Exception('Query error! '.$queryResult->getStatus().': '.$queryResult->getResult());
 		}
 	}
 
 	public function verifySite($domain, $dir)
 	{
-		$data = array("site" => array("identifier" => self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir, "type" => "SITE"));
+		$data = array(
+			"site" => array(
+				"identifier" => self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir,
+				"type" => "SITE"
+			)
+		);
+
 		$queryResult = $this->queryJson(
 			self::QUERY_VERIFY,
 			"POST",
 			Json::encode($data)
 		);
 
-		if($queryResult->status == self::HTTP_STATUS_OK && strlen($queryResult->result) > 0)
+		if(!$queryResult)
+		{
+			return false;
+		}
+
+		if($queryResult->getStatus() == self::HTTP_STATUS_OK && strlen($queryResult->getResult()) > 0)
 		{
 			return true;
 		}
 		else
 		{
-			throw new \Exception('Query error! '.$queryResult->status.': '.$queryResult->result);
+			throw new \Exception('Query error! '.$queryResult->getStatus().': '.$queryResult->getResult());
 		}
-	}
-
-	protected function processResult($res)
-	{
-		$obXml = new \CDataXML();
-		if($obXml->loadString($res))
-		{
-			$arEntries = $obXml->getTree()->elementsByName('entry');
-
-			$arDomains = array();
-			foreach($arEntries as $entry)
-			{
-				$entryChildren = $entry->children();
-				$entryData = array(
-					'etag' => $entry->getAttribute('etag')
-				);
-
-				foreach ($entryChildren as $child)
-				{
-					$tag = $child->name();
-					switch($tag)
-					{
-						case 'category': break;
-						case 'content':
-							$entryData[$tag] = $child->getAttribute('src');
-						break;
-						case 'link':
-							if(!isset($entryData[$tag]))
-								$entryData[$tag] = array();
-
-							$entryData[$tag][$child->getAttribute('rel')] = $child->getAttribute('href');
-						break;
-						case 'entryLink':
-							if(!isset($entryData[$tag]))
-								$entryData[$tag] = array();
-
-							$rel = preg_replace("/^[^#]+#/", "", $child->getAttribute('rel'));
-							$entryData[$tag][$rel] = $child->getAttribute('href');
-						break;
-						case 'verification-method':
-							if($child->getAttribute('type') == 'htmlpage')
-							{
-								$entryData[$tag] = array(
-									'in-use' => $child->getAttribute('in-use'),
-									'file-name' => $child->textContent(),
-									'file-content' => $child->getAttribute('file-content')
-								);
-							}
-						break;
-						default: $entryData[$tag] = $child->textContent();
-					}
-				}
-
-				$url = $entryData['content'];
-				if(strlen($url) > 0)
-				{
-					$urlData = parse_url($url);
-					if(isset($urlData['port']) && strlen($urlData['port']) > 0)
-						$urlData['host'] .= ':'.$urlData['port'];
-
-					if(!isset($arDomains[$urlData['host']]))
-					{
-						$arDomains[$urlData['host']] = $entryData;
-					}
-				}
-			}
-
-			$arExistedDomains = \CSeoUtils::getDomainsList();
-			foreach($arExistedDomains as $domain)
-			{
-				if(isset($arDomains[$domain['DOMAIN']]))
-				{
-					if(!is_array($this->engineSettings['SITES']))
-						$this->engineSettings['SITES'] = array();
-
-					$this->engineSettings['SITES'][$domain['DOMAIN']] = $arDomains[$domain['DOMAIN']];
-				}
-			}
-
-			$this->saveSettings();
-
-			return $arDomains;
-		}
-
-		throw new \Exception('Unexpected query result! '.$res);
-		return false;
 	}
 
 
@@ -506,23 +300,21 @@ EOT;
 		return $this->query($scope, $method, $data, $bSkipRefreshAuth, 'application/json');
 	}
 
-	protected function queryXml($scope, $method = "GET", $data = null, $bSkipRefreshAuth = false)
-	{
-		return $this->query($scope, $method, $data, $bSkipRefreshAuth, 'application/atom+xml');
-	}
-
-
-	protected function query($scope, $method = "GET", $data = null, $bSkipRefreshAuth = false, $contentType = 'application/atom+xml')
+	protected function query($scope, $method = "GET", $data = null, $bSkipRefreshAuth = false, $contentType = 'application/json')
 	{
 		if($this->engineSettings['AUTH'])
 		{
-			$http = new \CHTTP();
+			$http = new HttpClient();
+			$http->setHeader("Authorization", 'Bearer '.$this->engineSettings['AUTH']['access_token']);
+
+/*
 			$http->setAdditionalHeaders(
 				array(
-					'Authorization' => 'Bearer '.$this->engineSettings['AUTH']['access_token'],
+					'Authorization' => ,
 					'GData-Version' => '2'
 				)
 			);
+*/
 
 			switch($method)
 			{
@@ -531,15 +323,22 @@ EOT;
 				break;
 				case 'POST':
 				case 'PUT':
-					$arUrl = $http->parseURL($scope);
-					$result = $http->query($method, $arUrl['host'], $arUrl['port'], $arUrl['path_query'], $data, $arUrl['proto'], $contentType);
+					$http->setHeader("Content-Type", $contentType);
+
+					if(!$data)
+					{
+						$http->setHeader("Content-Length", 0);
+					}
+
+					$result = $http->query($method, $scope, $data);
+
 				break;
 				case 'DELETE':
 
 				break;
 			}
 
-			if($http->status == 401 && !$bSkipRefreshAuth)
+			if($http->getStatus() == 401 && !$bSkipRefreshAuth)
 			{
 				if($this->checkAuthExpired(true))
 				{
@@ -549,13 +348,6 @@ EOT;
 
 			return $http;
 		}
-	}
-
-	protected function getSiteId($domain, $dir = '/')
-	{
-		return isset($this->engineSettings['SITES'][$domain])
-			? $this->engineSettings['SITES'][$domain]['id']
-			: self::SCOPE_BASE.self::SCOPE_FEED_SITES.urlencode(self::SCOPE_DOMAIN_PROTOCOL.$domain.$dir);
 	}
 }
 ?>

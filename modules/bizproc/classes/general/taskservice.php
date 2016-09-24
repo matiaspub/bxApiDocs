@@ -38,7 +38,7 @@ class CBPAllTaskService
 			'USERS_STATUSES' => array($userId => $status)
 		), CBPTaskChangedStatus::Update);
 		foreach (GetModuleEvents("bizproc", "OnTaskMarkCompleted", true) as $arEvent)
-			ExecuteModuleEventEx($arEvent, array($taskId, $userId));
+			ExecuteModuleEventEx($arEvent, array($taskId, $userId, $status));
 	}
 
 	public static function getTaskUsers($taskId)
@@ -140,6 +140,10 @@ class CBPAllTaskService
 			'USERS' => array($toUserId),
 			'USERS_REMOVED' => array($fromUserId)
 		), CBPTaskChangedStatus::Delegate);
+		foreach (GetModuleEvents("bizproc", "OnTaskDelegate", true) as $arEvent)
+		{
+			ExecuteModuleEventEx($arEvent, array($taskId, $fromUserId, $toUserId));
+		}
 		return true;
 	}
 
@@ -341,7 +345,7 @@ class CBPAllTaskService
 			}
 
 			if (count($arFields["USERS"]) <= 0)
-				throw new Exception("arUsers");
+				throw new Exception(GetMessage("BPTS_AI_AR_USERS"));
 		}
 
 		if (is_set($arFields, "WORKFLOW_ID") || $addMode)
@@ -446,9 +450,9 @@ class CBPTaskResult extends CDBResult
 		return $res;
 	}
 
-	public function GetNext()
+	public function GetNext($bTextHtmlAuto=true, $use_tilda=true)
 	{
-		$res = parent::GetNext();
+		$res = parent::GetNext($bTextHtmlAuto, $use_tilda);
 
 		if ($res)
 		{

@@ -262,7 +262,10 @@ class Order extends DataProcessor
 
 			/** @var \Bitrix\Sale\Basket $basket */
 			if(!$basket)
-				$basket = \Bitrix\Sale\Basket::create($this->siteId, $fUserId);
+			{
+				$basket = \Bitrix\Sale\Basket::create($this->siteId);
+				$basket->setFUserId($fUserId);
+			}
 
 			$items = array();
 			$isVariation = false;
@@ -405,7 +408,7 @@ class Order extends DataProcessor
 				"EBAY_DATA_PROCESSOR_ORDER_SHIPPING_ERROR",
 				$orderEbay["ExtendedOrderID"],
 				Loc::getMessage(
-					"SALE_TP_EBAY_FDPO_NOT_MAPPED_SHIPPINGs",
+					"SALE_TP_EBAY_FDPO_NOT_MAPPED_SHIPPING",
 					array(
 						"#ORDER_ID#" => $orderEbay["ExtendedOrderID"],
 						"#EBAY_SHIPPING#" => $orderEbay["ShippingServiceSelected"]["ShippingService"]

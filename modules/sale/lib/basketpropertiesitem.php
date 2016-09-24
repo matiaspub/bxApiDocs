@@ -17,6 +17,8 @@ Loc::loadMessages(__FILE__);
 class BasketPropertyItem
 	extends Internals\CollectableEntity
 {
+	protected static $mapFields = array();
+
 	protected function __construct(array $fields = array())
 	{
 		parent::__construct($fields);
@@ -27,7 +29,12 @@ class BasketPropertyItem
 	 */
 	public static function getAvailableFields()
 	{
-		return static::getAllFields();
+		return array(
+			'NAME',
+			'VALUE',
+			'CODE',
+			'SORT',
+		);
 	}
 
 	/**
@@ -43,10 +50,11 @@ class BasketPropertyItem
 	 */
 	public static function getAllFields()
 	{
-		static $fields = null;
-		if ($fields == null)
-			$fields = array_keys(Internals\BasketPropertyTable::getMap());
-		return $fields;
+		if (empty(static::$mapFields))
+		{
+			static::$mapFields = parent::getAllFieldsByMap(Internals\BasketPropertyTable::getMap());
+		}
+		return static::$mapFields;
 	}
 
 	/**
@@ -74,41 +82,183 @@ class BasketPropertyItem
 	 */
 	public function save()
 	{
+		$result = new Result();
+		static $map = array();
 
 		$id = $this->getId();
-		$fields = $this->fields->getValues();
+
+		if (empty($map))
+		{
+			$map = Internals\BasketPropertyTable::getMap();
+		}
 
 		if ($id > 0)
 		{
 			$fields = $this->fields->getChangedValues();
+		}
+		else
+		{
+			$fields = $this->fields->getValues();
+		}
 
+		if (!empty($fields) && is_array($fields))
+		{
+			foreach ($map as $key => $value)
+			{
+				if ($value instanceof Entity\StringField)
+				{
+					$fieldName = $value->getName();
+					if (array_key_exists($fieldName, $fields))
+					{
+						if (!empty($fields[$fieldName]) && strlen($fields[$fieldName]) > $value->getSize())
+						{
+							$fields[$fieldName] = substr($fields[$fieldName], 0, $value->getSize());
+						}
+					}
+				}
+			}
+		}
+
+		if ($id > 0)
+		{
 			if (!empty($fields) && is_array($fields))
 			{
 				$r = Internals\BasketPropertyTable::update($id, $fields);
 				if (!$r->isSuccess())
-					return $r;
-			}
+				{
+					$result->addErrors($r->getErrors());
+					return $result;
+				}
 
-			$result = new Entity\UpdateResult();
+				if ($resultData = $r->getData())
+					$result->setData($resultData);
+			}
 
 		}
 		else
 		{
 
 			$fields['BASKET_ID'] = $this->getCollection()->getBasketId();
+			$this->setFieldNoDemand('BASKET_ID', $fields['BASKET_ID']);
 
 			$r = Internals\BasketPropertyTable::add($fields);
 			if (!$r->isSuccess())
-				return $r;
+			{
+				$result->addErrors($r->getErrors());
+				return $result;
+			}
+
+			if ($resultData = $r->getData())
+				$result->setData($resultData);
 
 			$id = $r->getId();
 			$this->setFieldNoDemand('ID', $id);
 
-			$result = new Entity\AddResult();
+		}
 
+		if ($id > 0)
+		{
+			$result->setId($id);
 		}
 
 		return $result;
 
 	}
+
+
+	/**
+	 * @internal
+	 * @param \SplObjectStorage $cloneEntity
+	 *
+	 * @return Basket
+	 */
+	public function createClone(\SplObjectStorage $cloneEntity)
+	{
+		if ($this->isClone() && $cloneEntity->contains($this))
+		{
+			return $cloneEntity[$this];
+		}
+
+		$basketPropertyItemClone = clone $this;
+		$basketPropertyItemClone->isClone = true;
+
+		/** @var Internals\Fields $fields */
+		if ($fields = $this->fields)
+		{
+			$basketPropertyItemClone->fields = $fields->createClone($cloneEntity);
+		}
+
+		if (!$cloneEntity->contains($this))
+		{
+			$cloneEntity[$this] = $basketPropertyItemClone;
+		}
+
+		if ($collection = $this->getCollection())
+		{
+			if (!$cloneEntity->contains($collection))
+			{
+				$cloneEntity[$collection] = $collection->createClone($cloneEntity);
+			}
+
+			if ($cloneEntity->contains($collection))
+			{
+				$basketPropertyItemClone->collection = $cloneEntity[$collection];
+			}
+		}
+
+		return $basketPropertyItemClone;
+	}
+
+
+	/**
+	 * @return Result
+	 */
+	public function verify()
+	{
+
+		$result = new Result();
+
+		static $map = array();
+
+		if (empty($map))
+		{
+			$map = Internals\BasketPropertyTable::getMap();
+		}
+
+		$fieldValues = $fields = $this->fields->getValues();
+
+		$propertyName = (!empty($fieldValues['NAME'])) ? $fieldValues['NAME'] : "";
+		if ($this->getId() > 0)
+		{
+			$fields = $this->fields->getChangedValues();
+		}
+
+		foreach ($map as $key => $value)
+		{
+			if ($value instanceof Entity\StringField)
+			{
+				$fieldName = $value->getName();
+				if (array_key_exists($fieldName, $fields))
+				{
+					if (array_key_exists($fieldName, $fields))
+					{
+						if (!empty($fields[$fieldName]) && strlen($fields[$fieldName]) > $value->getSize())
+						{
+							if ($fieldName === 'NAME')
+							{
+								$propertyName = substr($propertyName, 0, 50)."...";
+							}
+
+							$result->addError(new ResultWarning(Loc::getMessage("SALE_BASKET_ITEM_PROPERTY_MAX_LENGTH_ERROR", array("#PROPERTY_NAME#" => $propertyName, "#FIELD_TITLE#" => $fieldName, "#MAX_LENGTH#" => $value->getSize()))));
+						}
+					}
+
+
+				}
+			}
+		}
+
+		return $result;
+	}
+
 }

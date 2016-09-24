@@ -18,6 +18,25 @@ class Collection
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет объект в конец коллекции.</p>
+	*
+	*
+	* @param mixed $Bitrix  Добавляемый объект.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param BaseObject $object  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/collection/add.php
+	* @author Bitrix
+	*/
 	public function add(BaseObject $object)
 	{
 		$this->list[] = $object;
@@ -30,6 +49,19 @@ class Collection
 	 *
 	 * @return BaseObject|null
 	 */
+	
+	/**
+	* <p>Нестатический метод ищет объект в коллекции. Поиск производится по имени объекта.</p>
+	*
+	*
+	* @param string $name  Имя объекта.
+	*
+	* @return \Bitrix\Perfmon\Sql\BaseObject|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/collection/search.php
+	* @author Bitrix
+	*/
 	public function search($name)
 	{
 		/** @var BaseObject $object */
@@ -46,6 +78,17 @@ class Collection
 	 *
 	 * @return array[BaseObject]
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает все объекты коллекции.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Perfmon\Sql\array[BaseObject] 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/collection/getlist.php
+	* @author Bitrix
+	*/
 	public function getList()
 	{
 		return $this->list;
@@ -64,6 +107,27 @@ class Collection
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод сравнивает две коллекции объектов и возвращает массив пар:</p> <p></p> <p> Каждая пара является массивом из двух элементов:</p> <ol> <li>Первый объект, с индексом <code>"0"</code> это объект из исходного набора.</li> <li>Второй объект с индексом <code>"1"</code> это объект  из <code>$targetList</code>. В случае если элемент отсутствует, значит имя такого элемента не было найдено в коллекции.</li> </ol>
+	*
+	*
+	* @param mixed $Bitrix  Сравниваемая коллекция.
+	*
+	* @param Bitri $Perfmon  Необходимо ли сравнивать исходный код (<code>body</code>).
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Collection $targetList  
+	*
+	* @param boolean $compareBody = true 
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/collection/compare.php
+	* @author Bitrix
+	*/
 	public function compare(Collection $targetList, $compareBody = true)
 	{
 		$difference = array();

@@ -260,6 +260,17 @@ final class Handlers
 		);
 	}
 
+	static public function onSetDayContextAttributes(DayContext $dayContext)
+	{
+		foreach (self::onGetAttributeTypes() as $name => $type)
+		{
+			if ($setDayContext = $type['SET_DAY_CONTEXT'])
+			{
+				$setDayContext($dayContext);
+			}
+		}
+	}
+
 	public static function onGetAttributeGroupTypes()
 	{
 		return array(
@@ -272,17 +283,6 @@ final class Handlers
 				'SORT' => 200,
 			),
 		);
-	}
-
-	static public function onSetDayContextAttributes(DayContext $dayContext)
-	{
-		foreach (self::onGetAttributeTypes() as $name => $type)
-		{
-			if ($setDayContext = $type['SET_DAY_CONTEXT'])
-			{
-				$setDayContext($dayContext);
-			}
-		}
 	}
 
 	static public function onProlog()

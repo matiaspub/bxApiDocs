@@ -34,6 +34,26 @@ class FrameBuffered extends FrameStatic
 	 * @return \Bitrix\Main\Page\FrameHelper
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Нестатический метод запускает создание динамической зоны. Возвращает собственный экземпляр объекта.</p>
+	*
+	*
+	* @param mixed $null  
+	*
+	* @param string $stub = null 
+	*
+	* @return \Bitrix\Main\Page\FrameHelper 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><code>\Bitrix\Main\Page\FrameHelper</code></li> <li><code>\Bitrix\Main\Page\FrameHelper::end</code></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/begin.php
+	* @author Bitrix
+	*/
 	public function begin($stub = null)
 	{
 		if ($this->started)
@@ -60,6 +80,22 @@ class FrameBuffered extends FrameStatic
 	 * @return \Bitrix\Main\Page\FrameHelper
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Нестатический метод запускает статическую часть динамической зоны, которая будет показана пользователю. Метод <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/begin.php">begin</a> должен быть вызван перед использованием данного метода. Возвращает собственный экземпляр объекта.</p> <p>Без параметров</p>
+	*
+	*
+	* @return \Bitrix\Main\Page\FrameHelper 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><code>\Bitrix\Main\Page\FrameHelper</code></li> <li><code>\Bitrix\Main\Page\FrameHelper::begin</code></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/beginstub.php
+	* @author Bitrix
+	*/
 	public function beginStub()
 	{
 		if (!$this->started)
@@ -84,6 +120,22 @@ class FrameBuffered extends FrameStatic
 	 * @return \Bitrix\Main\Page\FrameHelper
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Нестатический метод завершает динамическую часть контента. Возвращает собственный экземпляр объекта.</p> <p>Перед вызовом данного метода должен быть вызван метод <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/begin.php">begin</a>.</p> <p>Без параметров</p>
+	*
+	*
+	* @return \Bitrix\Main\Page\FrameHelper 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><code>\Bitrix\Main\Page\FrameHelper</code></li> <li><code>\Bitrix\Main\Page\FrameHelper::begin</code></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/end.php
+	* @author Bitrix
+	*/
 	public function end()
 	{
 		if (!$this->started)
@@ -130,6 +182,17 @@ class FrameBuffered extends FrameStatic
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>true</i> если динамическая область была запущена.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/isstarted.php
+	* @author Bitrix
+	*/
 	public function isStarted()
 	{
 		return $this->started;
@@ -140,6 +203,17 @@ class FrameBuffered extends FrameStatic
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>true</i> если динамическая область была завершена.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/page/framebuffered/isended.php
+	* @author Bitrix
+	*/
 	public function isEnded()
 	{
 		return $this->ended;

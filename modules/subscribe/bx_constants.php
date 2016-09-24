@@ -1,10 +1,5 @@
 <?
 /**
- * POSTING_TEMPLATE_DIR
- */
-define('POSTING_TEMPLATE_DIR', substr(BX_PERSONAL_ROOT, 1)."/php_interface/subscribe/templates");
-
-/**
  * ADMIN_MODULE_NAME
  */
 define('ADMIN_MODULE_NAME', "subscribe");

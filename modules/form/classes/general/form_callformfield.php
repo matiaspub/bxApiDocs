@@ -6,7 +6,7 @@
 
 
 /**
- * <b>CFormField</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a>. 
+ * <b>CFormField</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросами</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полями</a>.
  *
  *
  * @return mixed 
@@ -17,7 +17,7 @@
  */
 class CAllFormField
 {
-public static 	function err_mess()
+	public static function err_mess()
 	{
 		$module_id = "form";
 		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
@@ -25,65 +25,66 @@ public static 	function err_mess()
 	}
 
 	// список вопросов/полей
-
+	
 	/**
-	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей</a> веб-формы в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Метод нестатический.</p>
 	*
 	*
-	* @param int $form_id  ID веб-формы.</bod
+	* @param int $form_id  ID веб-формы.
 	*
-	* @param string $get_only_fields  Может принимать следующие значения: <ul> <li> <b>Y</b> - возвращаемый
+	* @param string $get_only_fields  Может принимать следующие значения: 	<ul> <li> <b>Y</b> - возвращаемый
 	* список должен содержать только <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li> <b>N</b> -
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; 		</li> <li> <b>N</b> -
 	* возвращаемый список должен содержать только <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы; </li> <li>
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> веб-формы; 		</li> <li>
 	* <b>ALL</b> - возвращаемый список должен содержать и <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросы</a> и <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы. </li> </ul>
 	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
-	* списка, может принимать значения: <ul> <li> <b>s_id</b> - ID; </li> <li> <b>s_active</b> -
-	* флаг активности; </li> <li> <b>s_sid</b> - символьный идентификатор; </li> <li>
-	* <b>s_sort</b> - индекс сортировки; </li> <li> <b>s_title</b> - текст <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или заголовок <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы; </li> <li>
-	* <b>s_comments</b> - служебный комментарий; </li> <li> <b>s_required</b> - флаг
+	* списка, может принимать значения: 		<ul> <li> <b>s_id</b> - ID; 			</li> <li>
+	* <b>s_active</b> - флаг активности; 			</li> <li> <b>s_sid</b> - символьный
+	* идентификатор; 			</li> <li> <b>s_sort</b> - индекс сортировки; 			</li> <li>
+	* <b>s_title</b> - текст <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> или
+	* заголовок <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы;
+	* 			</li> <li> <b>s_comments</b> - служебный комментарий; 			</li> <li> <b>s_required</b> - флаг
 	* обязательности ответа на <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы; </li> <li>
-	* <b>s_in_results_table</b> - флаг включения в HTML таблицу результатов; </li> <li>
-	* <b>s_in_excel_table</b> - флаг включения в Excel таблицу результатов; </li> <li>
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы; 			</li> <li>
+	* <b>s_in_results_table</b> - флаг включения в HTML таблицу результатов; 			</li> <li>
+	* <b>s_in_excel_table</b> - флаг включения в Excel таблицу результатов; 			</li> <li>
 	* <b>s_field_type</b> - тип <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>
 	* веб-формы. </li> </ul>
 	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки, может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
-	* </li> </ul>
+	* значения: 		<ul> <li> <b>asc</b> - по возрастанию; 			</li> <li> <b>desc</b> - по
+	* убыванию. </li> </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации. Необязательный параметр. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID <a
+	* допустимы следующие ключи: 		<ul> <li> <b>ID</b>* - ID <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> (по умолчанию будет
-	* искаться точное совпадение); </li> <li> <b>ID_EXACT_MATCH</b> - если значение
-	* равно "N", то при фильтрации по <b>ID</b> будет искаться вхождение; </li>
+	* искаться точное совпадение); 			</li> <li> <b>ID_EXACT_MATCH</b> - если значение
+	* равно "N", то при фильтрации по <b>ID</b> будет искаться вхождение; 			</li>
 	* <li> <b>SID</b>* - символьный идентификатор <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> (по умолчанию будет
-	* искаться точное совпадение); </li> <li> <b>SID_EXACT_MATCH</b> - если значение
-	* равно "N", то при фильтрации по <b>SID</b> будет искаться вхождение; </li>
-	* <li> <b>TITLE</b>* - текст <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>
-	* или заголовок <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы
-	* (по умолчанию будет искаться вхождение); </li> <li> <b>TITLE_EXACT_MATCH</b> - если
-	* значение равно "Y", то при фильтрации по <b>TITLE</b> будет искаться
-	* точное совпадение; </li> <li> <b>COMMENTS</b>* - служебный комментарий (по
-	* умолчанию будет искаться вхождение); </li> <li> <b>COMMENTS_EXACT_MATCH</b> - если
+	* искаться точное совпадение); 			</li> <li> <b>SID_EXACT_MATCH</b> - если значение
+	* равно "N", то при фильтрации по <b>SID</b> будет искаться вхождение;
+	* 			</li> <li> <b>TITLE</b>* - текст <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> или заголовок <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы (по умолчанию
+	* будет искаться вхождение); 			</li> <li> <b>TITLE_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>TITLE</b> будет искаться точное
+	* совпадение; 			</li> <li> <b>COMMENTS</b>* - служебный комментарий (по
+	* умолчанию будет искаться вхождение); 			</li> <li> <b>COMMENTS_EXACT_MATCH</b> - если
 	* значение равно "Y", то при фильтрации по <b>COMMENTS</b> будет искаться
-	* точное совпадение; </li> <li> <b>ACTIVE</b> - флаг активности [Y|N] </li> <li>
-	* <b>IN_RESULTS_TABLE</b> - флаг включения в HTML таблицу результатов [Y|N]; </li> <li>
-	* <b>IN_EXCEL_TABLE</b> - флаг включения в Excel таблицу результатов [Y|N]; </li> <li>
-	* <b>IN_FILTER</b> - флаг включения в HTML таблицу результатов [Y|N]; </li> <li>
+	* точное совпадение; 			</li> <li> <b>ACTIVE</b> - флаг активности [Y|N] 			</li> <li>
+	* <b>IN_RESULTS_TABLE</b> - флаг включения в HTML таблицу результатов [Y|N]; 			</li> <li>
+	* <b>IN_EXCEL_TABLE</b> - флаг включения в Excel таблицу результатов [Y|N]; 			</li> <li>
+	* <b>IN_FILTER</b> - флаг включения в HTML таблицу результатов [Y|N]; 			</li> <li>
 	* <b>REQUIRED</b> - флаг обязательности ответа на <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы [Y|N]. </li> </ul> *
-	* - допускается сложная логика
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> веб-формы [Y|N]. </li> </ul>
+	* 		* - допускается сложная логика
 	*
 	* @param bool &$is_filtered  Ссылка на переменную, хранящую флаг отфильтрованности
 	* результирующего списка. Если значение равно "true", то список был
@@ -92,7 +93,7 @@ public static 	function err_mess()
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FORM_ID = 4; // ID веб-формы
 	* 
@@ -132,14 +133,14 @@ public static 	function err_mess()
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">Поля CFormField</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbyid.php">CFormField::GetByID</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbysid.php">CFormField::GetBySID</a> <br> </li>
-	* </ul></b<a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php
 	* @author Bitrix
 	*/
-	public static 	function GetList($WEB_FORM_ID, $get_fields, &$by, &$order, $arFilter=Array(), &$is_filtered)
+	public static function GetList($WEB_FORM_ID, $get_fields, &$by, &$order, $arFilter=Array(), &$is_filtered)
 	{
 		$err_mess = (CAllFormField::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $strError;
@@ -241,9 +242,9 @@ public static 	function err_mess()
 		return $res;
 	}
 
-
+	
 	/**
-	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">поля</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">поля</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.  Метод нестатический.</p>
 	*
 	*
 	* @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">вопроса</a>/<a
@@ -252,7 +253,7 @@ public static 	function err_mess()
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FIELD_ID = 140; // ID вопроса или поля веб-формы
 	* $rsField = <b>CFormField::GetByID</b>($FIELD_ID);
@@ -265,7 +266,7 @@ public static 	function err_mess()
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">Поля CFormField</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbysid.php">CFormField::GetBySID</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> </ul></b<a
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -273,7 +274,7 @@ public static 	function err_mess()
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbyid.php
 	* @author Bitrix
 	*/
-	public static 	function GetByID($ID)
+	public static function GetByID($ID)
 	{
 		$err_mess = (CAllFormField::err_mess())."<br>Function: GetByID<br>Line: ";
 		global $DB;
@@ -290,9 +291,9 @@ public static 	function err_mess()
 		return $res;
 	}
 
-
+	
 	/**
-	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">поля</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">параметры</a> <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">поля</a> в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Метод нестатический.</p>
 	*
 	*
 	* @param int $field_sid  Символьный идентификатор <a
@@ -302,7 +303,7 @@ public static 	function err_mess()
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FIELD_SID = "VS_INTEREST"; // символьный идентификатор вопроса или поля веб-формы
 	* $rsField = <b>CFormField::GetBySID</b>($FIELD_SID);
@@ -315,7 +316,7 @@ public static 	function err_mess()
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">Поля CFormField</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbyid.php">CFormField::GetByID</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> </ul></b<a
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getlist.php">CFormField::GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -323,7 +324,7 @@ public static 	function err_mess()
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/getbysid.php
 	* @author Bitrix
 	*/
-	public static 	function GetBySID($SID, $FORM_ID = false)
+	public static function GetBySID($SID, $FORM_ID = false)
 	{
 		$FORM_ID = intval($FORM_ID);
 
@@ -345,7 +346,7 @@ public static 	function err_mess()
 		return $res;
 	}
 
-public static 	function GetNextSort($WEB_FORM_ID)
+	public static function GetNextSort($WEB_FORM_ID)
 	{
 		global $DB;
 		$err_mess = (CAllFormField::err_mess())."<br>Function: GetNextSort<br>Line: ";
@@ -358,9 +359,9 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	}
 
 	// копирует вопрос/поле
-
+	
 	/**
-	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> веб-формы. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> в случае положительного результата, в противном случае - "false".</p>
+	* <p>Копирует <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> или <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> веб-формы. Возвращает ID нового <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> в случае положительного результата, в противном случае - "false". Метод нестатический.</p>
 	*
 	*
 	* @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
@@ -369,27 +370,27 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	*
 	* @param string $check_rights = "Y" Флаг необходимости проверки <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	* </ul> Для копирования <a
+	* пользователя. Возможны следующие значения: 	<ul> <li> <b>Y</b> - права
+	* необходимо проверить; 		</li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> 	Для копирования <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> необходимо обладать
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> необходимо обладать 
 	* нижеследующими <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#module">правами</a>: <ol> <li> <b>[25]
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#module">правами</a>: 	<ol> <li> <b>[25]
 	* просмотр параметров веб-формы</b> на веб-форму, из которой идет
-	* копирование; </li> <li> <b>[30] полный доступ</b> на веб-форму, в которую
-	* копируется </li> </ol> Параметр необязательный. По умолчанию - "Y"
+	* копирование; 		</li> <li> <b>[30] полный доступ</b> на веб-форму, в которую
+	* копируется </li> </ol> 	Параметр необязательный. По умолчанию - "Y"
 	* (права необходимо проверить).
 	*
 	* @param mixed $form_id = false ID веб-формы, в которую необходимо скопировать <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a>.<br><br> Необязательный
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a>.<br><br> 	Необязательный
 	* параметр. По умолчанию - "false" (текущая веб-форма).
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FIELD_ID = 140; // ID вопроса
 	* // скопируем вопрос
@@ -418,7 +419,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/copy.php
 	* @author Bitrix
 	*/
-	public static 	function Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
+	public static function Copy($ID, $CHECK_RIGHTS="Y", $NEW_FORM_ID=false)
 	{
 		global $DB, $strError;
 		$err_mess = (CAllFormField::err_mess())."<br>Function: Copy<br>Line: ";
@@ -541,9 +542,9 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	}
 
 	// удаляет вопрос/поле
-
+	
 	/**
-	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> и все ответы на него из <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	* <p>Удаляет <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> и все ответы на него из <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае. Метод нестатический.</p>
 	*
 	*
 	* @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
@@ -551,10 +552,10 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	*
 	* @param string $check_rights = "Y" Флаг необходимости проверки <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	* </ul> Для успешного выполнения данной операции необходимо иметь <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	* пользователя. Возможны следующие значения: 	<ul> <li> <b>Y</b> - права
+	* необходимо проверить; 		</li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> 	Для успешного выполнения данной операции необходимо иметь <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a>  <b>[30] Полный
 	* доступ</b> на веб-форму, к которой принадлежит
 	* <i>field_id</i>.<br><br>Параметр необязательный. По умолчанию - "Y" (права
 	* необходимо проверить).
@@ -562,7 +563,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FIELD_ID = 140;
 	* // удалим вопрос #140
@@ -592,7 +593,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/delete.php
 	* @author Bitrix
 	*/
-	public static 	function Delete($ID, $CHECK_RIGHTS="Y")
+	public static function Delete($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $strError;
 		$err_mess = (CAllFormField::err_mess())."<br>Function: Delete<br>Line: ";
@@ -635,9 +636,9 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	}
 
 	// обнуляем результаты по вопросу/полю
-
+	
 	/**
-	* <p>Удаляет все значения ответов из <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросу</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полю</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае.</p>
+	* <p>Удаляет все значения ответов из <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> по заданному <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросу</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полю</a>. Возвращает "true" в случае положительного результата, и "false" - в противном случае. Метод нестатический.</p>
 	*
 	*
 	* @param int $field_id  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
@@ -645,10 +646,10 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	*
 	* @param string $check_rights = "Y" Флаг необходимости проверки <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions">прав</a> текущего
-	* пользователя. Возможны следующие значения: <ul> <li> <b>Y</b> - права
-	* необходимо проверить; </li> <li> <b>N</b> - право не нужно проверять. </li>
-	* </ul> Для успешного выполнения данной операции необходимо иметь <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a> <b>[30] Полный
+	* пользователя. Возможны следующие значения: 	<ul> <li> <b>Y</b> - права
+	* необходимо проверить; 		</li> <li> <b>N</b> - право не нужно проверять. </li>
+	* </ul> 	Для успешного выполнения данной операции необходимо иметь <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#permissions#form">право</a>  <b>[30] Полный
 	* доступ</b> на веб-форму, к которой принадлежит
 	* <i>field_id</i>.<br><br>Параметр необязательный. По умолчанию - "Y" (права
 	* необходимо проверить).
@@ -656,7 +657,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FIELD_ID = 4;
 	* // удалим все ответы из результатов на вопрос с ID=140
@@ -684,7 +685,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/reset.php
 	* @author Bitrix
 	*/
-	public static 	function Reset($ID, $CHECK_RIGHTS="Y")
+	public static function Reset($ID, $CHECK_RIGHTS="Y")
 	{
 		global $DB, $strError;
 		$err_mess = (CAllFormField::err_mess())."<br>Function: Reset<br>Line: ";
@@ -769,7 +770,7 @@ public static 	function GetNextSort($WEB_FORM_ID)
 			);
 	}
 
-public static 	function GetTypeList()
+	public static function GetTypeList()
 	{
 		$arr = array(
 			"reference_id" => array(
@@ -785,7 +786,7 @@ public static 	function GetTypeList()
 		return $arr;
 	}
 
-public static 	function GetFilterList($WEB_FORM_ID, $arFilter=Array())
+	public static function GetFilterList($WEB_FORM_ID, $arFilter=Array())
 	{
 		$err_mess = (CAllFormField::err_mess())."<br>Function: GetFilterList<br>Line: ";
 		global $DB;
@@ -850,7 +851,7 @@ public static 	function GetFilterList($WEB_FORM_ID, $arFilter=Array())
 	}
 
 	// проверка вопроса/поля
-public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
+	public static function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAllFormField::err_mess())."<br>Function: CheckFields<br>Line: ";
 		global $DB, $strError;
@@ -916,137 +917,141 @@ public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	}
 
 	// добавление/обновление вопроса/поля
-
+	
 	/**
-	* <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> в случае положительного результата, в противном случае - "false".</p>
+	* <p>Добавляет новый <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> или обновляет существующий. Возвращает ID обновленного или добавленного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> в случае положительного результата, в противном случае - "false". Метод нестатический.</p>
 	*
 	*
-	* @param array $fields  Массив значений, в качестве ключей массива допустимы: <ul> <li>
+	* @param array $fields  Массив значений, в качестве ключей массива допустимы: 	<ul> <li>
 	* <b>SID</b><font color="red">*</font> - символьный идентификатор <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>; </li> <li> <b>FORM_ID</b><font
-	* color="red">*</font> - ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; </li>
-	* <li> <b>ACTIVE</b> - флаг активности; допустимы следующие значения: <ul> <li>
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>; 		</li> <li> <b>FORM_ID</b><font
+	* color="red">*</font> - ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>; 		</li>
+	* <li> <b>ACTIVE</b> - флаг активности; допустимы следующие значения: 			<ul> <li>
 	* <b>Y</b> - <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> активен; </li> <li> <b>N</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> активен; 				</li> <li> <b>N</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>/<a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поле</a> не активен (по умолчанию).
-	* </li> </ul> </li> <li> <b>ADDITIONAL</b> - допустимы следующие значения: <ul> <li> <b>Y</b> -
-	* данная запись является <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полем</a> веб-формы; </li> <li> <b>N</b> -
+	* </li> </ul> </li> <li> <b>ADDITIONAL</b> - допустимы следующие значения: 			<ul> <li> <b>Y</b>
+	* - данная запись является <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полем</a> веб-формы; 				</li> <li> <b>N</b> -
 	* данная запись является <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросом</a> веб-формы (по
 	* умолчанию). </li> </ul> </li> <li> <b>FIELD_TYPE</b><font color="green">*</font> - тип <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>, допустимые следующие
-	* значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>integer</b> - число; </li> <li> <b>date</b> -
-	* дата. </li> </ul> </li> <li> <b>TITLE</b> - текст <a
+	* значения: 			<ul> <li> <b>text</b> - текст; 				</li> <li> <b>integer</b> - число; 				</li> <li>
+	* <b>date</b> - дата. </li> </ul> </li> <li> <b>TITLE</b> - текст <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a> либо заголовок <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>. </li> <li> <b>TITLE_TYPE</b><font
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>. 		</li> <li> <b>TITLE_TYPE</b><font
 	* color="green">*</font> - тип <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>;
-	* допустимы следующие значения: <ul> <li> <b>text</b> - текст; </li> <li> <b>html</b> -
-	* HTML код. </li> </ul> </li> <li> <b>C_SORT</b> - порядок сортировки; </li> <li> <b>REQUIRED</b><font
-	* color="green">*</font> - флаг обязательности ответа на <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>: <ul> <li> <b>Y</b> - ответ на
-	* данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> обязателен;
-	* </li> <li> <b>N</b> - ответ на данный <a
+	* допустимы следующие значения: 			<ul> <li> <b>text</b> - текст; 				</li> <li>
+	* <b>html</b> - HTML код. </li> </ul> </li> <li> <b>C_SORT</b> - порядок сортировки; 		</li> <li>
+	* <b>REQUIRED</b><font color="green">*</font> - флаг обязательности ответа на <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>: 			<ul> <li> <b>Y</b> - ответ
+	* на данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>
+	* обязателен; 				</li> <li> <b>N</b> - ответ на данный <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> обязателен (по
-	* умолчанию). </li> </ul> </li> <li> <b>FILTER_TITLE</b> - подпись к полю фильтра; </li> <li>
-	* <b>IN_RESULTS_TABLE</b> - флаг вхождения в HTML таблицу результатов: <ul> <li> <b>Y</b>
-	* - ответ на данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>
-	* либо значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы
-	* отражены в HTML таблице результатов; </li> <li> <b>N</b> - ответ на данный <a
+	* умолчанию). </li> </ul> </li> <li> <b>FILTER_TITLE</b> - подпись к полю фильтра; 		</li>
+	* <li> <b>IN_RESULTS_TABLE</b> - флаг вхождения в HTML таблицу результатов: 			<ul> <li>
+	* <b>Y</b> - ответ на данный <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> либо значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы отражены в HTML
+	* таблице результатов; 				</li> <li> <b>N</b> - ответ на данный <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a> либо значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы отражены в HTML
 	* таблице результатов (по умолчанию). </li> </ul> </li> <li> <b>IN_EXCEL_TABLE</b> - флаг
 	* вхождения в Excel таблицу <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>: <ul> <li> <b>Y</b> -
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a>: 			<ul> <li> <b>Y</b> -
 	* ответ на данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>
 	* либо значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы
 	* отражены в Excel таблице <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> </li> <li> <b>N</b> -
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> 				</li> <li> <b>N</b> -
 	* ответ на данный <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>
 	* либо значения <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> веб-формы
 	* отражены в Excel таблице <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#result">результатов</a> (по умолчанию).
 	* </li> </ul> </li> <li> <b>RESULTS_TABLE_TITLE</b> - заголовок столбца в таблицах
-	* результатов; </li> <li> <b>COMMENTS</b> - служебный комментарий; </li> <li>
+	* результатов; 		</li> <li> <b>COMMENTS</b> - служебный комментарий; 		</li> <li>
 	* <b>arIMAGE</b><font color="green">**</font> - массив, описывающий изображение <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>, допустимы
-	* следующие ключи этого массива: <ul> <li> <b>name</b> - имя файла; </li> <li>
-	* <b>size</b> - размер файла; </li> <li> <b>tmp_name</b> - временный путь на сервере;
-	* </li> <li> <b>type</b> - тип загружаемого файла; </li> <li> <b>del</b> - если значение
-	* равно "Y", то изображение будет удалено; </li> <li> <b>MODULE_ID</b> -
-	* идентификатор модуля "Веб-формы" - <b>form</b> </li> </ul> </li> <li> <b>arANSWER</b><font
+	* следующие ключи этого массива: 			<ul> <li> <b>name</b> - имя файла; 				</li> <li>
+	* <b>size</b> - размер файла; 				</li> <li> <b>tmp_name</b> - временный путь на сервере;
+	* 				</li> <li> <b>type</b> - тип загружаемого файла; 				</li> <li> <b>del</b> - если
+	* значение равно "Y", то изображение будет удалено; 				</li> <li> <b>MODULE_ID</b>
+	* - идентификатор модуля "Веб-формы" - <b>form</b> </li> </ul> </li> <li> <b>arANSWER</b><font
 	* color="green">**</font> - массив, описывающий <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответы</a> на <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопрос</a>, со следующей
-	* структурой: <pre>Array ( [0] =&gt; Array ( [ID] =&gt; ID [DELETE] =&gt; флаг необходимости
-	* удаления [Y|N] [MESSAGE] =&gt; параметр <font color="green">ANSWER_TEXT</font> [VALUE] =&gt;
-	* параметр <font color="red">ANSWER_VALUE</font> [C_SORT] =&gt; порядок сортировки [ACTIVE] =&gt;
-	* флаг активности [Y|N] [FIELD_TYPE] =&gt; тип, допустимы следующие значения:
-	* <b>text</b> - однострочное текстовое поле <b>textarea</b> - многострочное
-	* текстовое поле <b>radio</b>* - переключатель одиночного выбора
-	* (radio-кнопка) <b>checkbox</b>* - флаг множественного выбора (checkbox) <b>dropdown</b>* -
-	* элемент выпадающего списка одиночного выбора <b>multiselect</b>* -
-	* элемент списка множественного выбора <b>date</b> - поле для ввода даты
-	* <b>image</b> - поле для загрузки изображения <b>file</b> - поле для загрузки
-	* произвольного файла <b>password</b> - поле для ввода пароля [FIELD_WIDTH] =&gt;
-	* ширина поля ввода [FIELD_HEIGHT] =&gt; высота поля ввода [FIELD_PARAM] =&gt;
-	* дополнительные параметры; допустимо использование любого HTML
-	* кода; для типов помеченных символом * допустимо использование
-	* следующих зарезервированных строк: <b>checked</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> будет выбран (отмечен)
-	* по умолчанию (синоним - <b>selected</b>) <b>not_answer</b> - выбор данного <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> не означает, что был
-	* дан ответ на вопрос (как правило это первый элемент выпадающего
-	* списка и важно при <b>REQUIRED</b>="Y") ) [1] =&gt; массив описывающий
-	* следующий <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> ... )</pre> </li>
-	* <li> <b>arFILTER_USER</b><font color="green">**</font> - массив полей фильтра для
-	* фильтрации по значению <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>, введенному с
-	* клавиатуры пользователем при заполнении веб-формы; в данном
-	* массиве допустимы следующие значения: <ul> <li> <b>text</b> - <a
+	* структурой: <pre bgcolor="#323232" style="padding:5px;">Array (     [0] =&gt; Array         (             [ID] =&gt; ID             [DELETE] =&gt;
+	* флаг необходимости удаления [Y|N]             [MESSAGE] =&gt; параметр <font
+	* color="green">ANSWER_TEXT</font>             [VALUE] =&gt; параметр <font color="red">ANSWER_VALUE</font>       
+	*      [C_SORT] =&gt; порядок сортировки             [ACTIVE] =&gt; флаг активности [Y|N]  
+	*           [FIELD_TYPE] =&gt; тип, допустимы следующие значения:                 <b>text</b>
+	* - однострочное текстовое поле                 <b>textarea</b> - многострочное
+	* текстовое поле                 <b>radio</b>* - переключатель одиночного выбора
+	* (radio-кнопка)                 <b>checkbox</b>* - флаг множественного выбора (checkbox)   
+	*              <b>dropdown</b>* - элемент выпадающего списка одиночного выбора    
+	*             <b>multiselect</b>* - элемент списка множественного выбора                
+	* <b>date</b> - поле для ввода даты                 <b>image</b> - поле для загрузки
+	* изображения                 <b>file</b> - поле для загрузки произвольного
+	* файла                 <b>password</b> - поле для ввода пароля             [FIELD_WIDTH] =&gt;
+	* ширина поля ввода             [FIELD_HEIGHT] =&gt; высота поля ввода            
+	* [FIELD_PARAM] =&gt; дополнительные параметры;                  допустимо
+	* использование любого HTML кода;                  для типов помеченных
+	* символом * допустимо использование                  следующих
+	* зарезервированных строк:                 <b>checked</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a> будет выбран (отмечен)   
+	*                         по умолчанию (синоним - <b>selected</b>)                 <b>not_answer</b> -
+	* выбор данного <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> не
+	* означает,                           что был дан ответ на вопрос                           
+	* (как правило это первый элемент выпадающего списка и                        
+	*   важно при <b>REQUIRED</b>="Y")         )     [1] =&gt; массив описывающий следующий
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответ</a>     ... )</pre> 		</li> <li>
+	* <b>arFILTER_USER</b><font color="green">**</font> - массив полей фильтра для фильтрации
+	* по значению <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a>,
+	* введенному с клавиатуры пользователем при заполнении веб-формы;
+	* в данном массиве допустимы следующие значения: 			<ul> <li> <b>text</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">текстовое поле</a>
-	* фильтра; </li> <li> <b>integer</b> - поля фильтра для <a
+	* фильтра; 				</li> <li> <b>integer</b> - поля фильтра для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">числового
-	* интервала</a>; </li> <li> <b>date</b> - поля фильтра для <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">интервала дат</a>; </li> <li>
-	* <b>exist</b> - поле для фильтрации по <a
+	* интервала</a>; 				</li> <li> <b>date</b> - поля фильтра для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">интервала дат</a>; 				</li>
+	* <li> <b>exist</b> - поле для фильтрации по <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">факту
 	* существования</a> введенного ответа. </li> </ul> </li> <li>
 	* <b>arFILTER_ANSWER_TEXT</b><font color="green">**</font> - массив полей фильтра для
 	* фильтрации по параметру <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> <font color="green">ANSWER_TEXT</font>;
-	* в данном массиве допустимы следующие значения: <ul> <li> <b>text</b> - <a
+	* в данном массиве допустимы следующие значения: 			<ul> <li> <b>text</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">текстовое поле</a>
-	* фильтра; </li> <li> <b>integer</b> - поля фильтра для <a
+	* фильтра; 				</li> <li> <b>integer</b> - поля фильтра для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">числового
-	* интервала</a>; </li> <li> <b>dropdown</b> - <a
+	* интервала</a>; 				</li> <li> <b>dropdown</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">выпадающий список
-	* одиночного выбора</a>; </li> <li> <b>exist</b> - поле для фильтрации по <a
+	* одиночного выбора</a>; 				</li> <li> <b>exist</b> - поле для фильтрации по <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">факту
 	* существования</a>. </li> </ul> </li> <li> <b>arFILTER_ANSWER_VALUE</b><font color="green">**</font> -
 	* массив полей фильтра для фильтрации по параметру <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#answer">ответа</a> <font color="red">ANSWER_VALUE</font>; в
-	* данном массиве допустимы следующие значения: <ul> <li> <b>text</b> - <a
+	* данном массиве допустимы следующие значения: 			<ul> <li> <b>text</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">текстовое поле</a>
-	* фильтра; </li> <li> <b>integer</b> - поля фильтра для <a
+	* фильтра; 				</li> <li> <b>integer</b> - поля фильтра для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">числового
-	* интервала</a>; </li> <li> <b>dropdown</b> - <a
+	* интервала</a>; 				</li> <li> <b>dropdown</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdropdownfilter.php">выпадающий список
-	* одиночного выбора</a>; </li> <li> <b>exist</b> - поле для фильтрации по <a
+	* одиночного выбора</a>; 				</li> <li> <b>exist</b> - поле для фильтрации по <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getexistflagfilter.php">факту
 	* существования</a>. </li> </ul> </li> <li> <b>arFILTER_FIELD</b><font color="green">*</font> - массив
 	* полей фильтра для фильтрации по значению <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля веб-формы</a>: <ul> <li> <b>text</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">текстовое поле</a>
-	* фильтра; </li> <li> <b>integer</b> - поля фильтра для <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля веб-формы</a>: 			<ul> <li> <b>text</b> -
+	* <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/gettextfilter.php">текстовое поле</a>
+	* фильтра; 				</li> <li> <b>integer</b> - поля фильтра для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getnumberfilter.php">числового
-	* интервала</a>; </li> <li> <b>date</b> - поля фильтра для <a
+	* интервала</a>; 				</li> <li> <b>date</b> - поля фильтра для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/classes/cform/getdatefilter.php">интервала дат</a>. </li> </ul>
-	* </li> </ul> <br><font color="red">*</font> - обязательно к заполнению; <br><font
+	* </li> </ul> <br><font color="red">*</font> - обязательно к заполнению; 	<br><font
 	* color="green">*</font> - заполняется <b>только</b> для <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей веб-формы</a>; <br><font
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">полей веб-формы</a>; 	<br><font
 	* color="green">**</font> - заполняется <b>только</b> для <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопросов веб-формы</a>.
 	*
@@ -1057,8 +1062,8 @@ public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a>).
 	*
 	* @param string $check_rights = "Y" Флаг необходимости проверки прав текущего пользователя.
-	* Возможны следующие значения: <ul> <li> <b>Y</b> - права необходимо
-	* проверить; </li> <li> <b>N</b> - право не нужно проверять. </li> </ul> Для
+	* Возможны следующие значения: 	<ul> <li> <b>Y</b> - права необходимо
+	* проверить; 		</li> <li> <b>N</b> - право не нужно проверять. </li> </ul> 	Для
 	* добавления нового <a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>/<a
 	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#field">поля</a> или обновления их
@@ -1069,7 +1074,7 @@ public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* //<************************************************
 	*          Добавление <a href="/api_help/form/terms.php#question">вопроса</a> веб-формы
@@ -1127,8 +1132,6 @@ public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	*     echo $strError;
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* //<************************************************
 	*           Добавление <a href="/api_help/form/terms.php#field">поля</a> веб-формы
@@ -1166,14 +1169,14 @@ public static 	function CheckFields(&$arFields, $FIELD_ID, $CHECK_RIGHTS="Y")
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/index.php">Поля CFormField</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/form/permissions.php#form">Права на веб-форму</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/makefilearray.php">CFile::MakeFileArray</a> <br>
-	* </li> </ul> <a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/form/classes/cformfield/set.php
 	* @author Bitrix
 	*/
-	public static 	function Set($arFields, $FIELD_ID=false, $CHECK_RIGHTS="Y", $UPDATE_FILTER="Y")
+	public static function Set($arFields, $FIELD_ID=false, $CHECK_RIGHTS="Y", $UPDATE_FILTER="Y")
 	{
 		$err_mess = (CAllFormField::err_mess())."<br>Function: Set<br>Line: ";
 		global $DB;

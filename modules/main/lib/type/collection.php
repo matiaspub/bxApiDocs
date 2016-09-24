@@ -17,6 +17,72 @@ class Collection
 	 * @param bool         $preserveKeys If false numeric keys will be re-indexed. If true - preserve.
 	 * @throws \Bitrix\Main\ArgumentOutOfRangeException
 	 */
+	
+	/**
+	* <p>Статический метод сортирует массив по колонкам.</p> <p>Можно использовать короткий вид записи. Например, запись <code>Collection::sortByColumn($arr, 'value');</code> эквивалентна записи <code>Collection::sortByColumn($arr, array('value' =&gt; SORT_ASC))</code></p> <p><b>Пример</b>:</p> <pre class="syntax">Collection::sortByColumn($arr, array('value' =&gt; array(SORT_NUMERIC, SORT_ASC), 'attr' =&gt; SORT_DESC), array('attr' =&gt; 'strlen'), 'www');</pre>
+	*
+	*
+	* @param array $array  
+	*
+	* @param array $string  
+	*
+	* @param array $columns  
+	*
+	* @param array $string  Если значение не установлено, используется <code>$defaultValueIfNotSetValue (any
+	* cols)</code>
+	*
+	* @param array $callbacks = '' Если <i>false</i> числовые ключи переиндексируются. Если <i>true</i> -
+	* значения будут сохранены.
+	*
+	* @param null $defaultValueIfNotSetValue = null 
+	*
+	* @param boolean $preserveKeys = false 
+	*
+	* @return public 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* Collection::sortByColumn($arr, array('value' =&gt; array(SORT_NUMERIC, SORT_ASC), 'attr' =&gt; SORT_DESC), array('attr' =&gt; 'strlen'), 'www');Параметры<tbody>
+	* <tr>
+	* <th width="15%">Параметр</th>
+	* <th>Описание</th>
+	* <th width="10%">Версия</th>
+	* </tr>
+	* <tr>
+	* <td>$array</td>
+	* <td></td>
+	* <td></td>
+	* </tr>
+	* <tr>
+	* <td>$columns</td>
+	* <td></td>
+	* <td></td>
+	* </tr>
+	* <tr>
+	* <td>$callbacks</td>
+	* <td></td>
+	* <td></td>
+	* </tr>
+	* <tr>
+	* <td>$defaultValueIfNotSetValue</td>
+	* <td>Если значение не установлено, используется <code>$defaultValueIfNotSetValue (any cols)</code>
+	* </td>
+	* <td></td>
+	* </tr>
+	* <tr>
+	* <td>$preserveKeys</td>
+	* <td>Если <i>false</i> числовые ключи переиндексируются. Если <i>true</i> - значения будут сохранены.</td>
+	* <td></td>
+	* </tr>
+	* </tbody>Исключения
+	* <li><a href="/api_d7/bitrix/main/argumentoutofrangeexception/index.php">\Bitrix\Main\ArgumentOutOfRangeException</a></li>
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/collection/sortbycolumn.php
+	* @author Bitrix
+	*/
 	public static function sortByColumn(array &$array, $columns, $callbacks = '', $defaultValueIfNotSetValue = null, $preserveKeys = false)
 	{
 		//by default: sort by ASC
@@ -92,7 +158,7 @@ class Collection
 	/**
 	 * Takes all arguments by pairs..
 	 * Odd arguments are arrays.
-	 * Even arguments ere keys to lookup in these arrays.
+	 * Even arguments are keys to lookup in these arrays.
 	 * Keys may be arrays. In this case function will try to dig deeper.
 	 * Returns first not empty element of a[k] pair.
 	 *
@@ -101,6 +167,25 @@ class Collection
 	 * @param mixed $a,... unlimited array/key pairs to go through
 	 * @return mixed|string
 	 */
+	
+	/**
+	* <p>Статический метод размещает все аргументы и ключи по парам.</p> <p>Нечетные аргументы - массивы, четные - ключи, по которым искать в массивах.</p> <p>Ключи могут быть массивами. В этом случае поиск происходит во вложенных массивах. Возвращает первый не пустой элемент пары аргумент/ключ.</p>
+	*
+	*
+	* @param array $arraya  массив для анализа
+	*
+	* @param array $string  Ключи поиска
+	*
+	* @param strin $integerk  Неограниченные последовательно проверяемые пары массив\ключ
+	*
+	* @param integer $mixeda  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/collection/firstnotempty.php
+	* @author Bitrix
+	*/
 	public static function firstNotEmpty()
 	{
 		$argCount = func_num_args();
@@ -143,6 +228,21 @@ class Collection
 	 * @param bool $sorted - if sorted true, result array will be sorted
 	 * @return null
 	 */
+	
+	/**
+	* <p>Статический метод конвертирует значения массива в целые числа, возвращает уникальные значения &gt; 0. Дополнительно: сортирует массив.</p>
+	*
+	*
+	* @param array $map  массив для нормализации
+	*
+	* @param boolean $sorted = true Если <i>true</i>, результат будет отсортирован
+	*
+	* @return null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/collection/normalizearrayvaluesbyint.php
+	* @author Bitrix
+	*/
 	public static function normalizeArrayValuesByInt(&$map, $sorted = true)
 	{
 		if (empty($map) || !is_array($map))
@@ -162,5 +262,31 @@ class Collection
 			if ($sorted)
 				sort($map);
 		}
+	}
+
+	/**
+	 * Check array is associative.
+	 *
+	 * @param $array - Array for check.
+	 * @return bool
+	 */
+	
+	/**
+	* <p>Статический метод проверяет является ли массив ассоциативным.</p>
+	*
+	*
+	* @param array $array  Массив для проверки
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/collection/isassociative.php
+	* @author Bitrix
+	*/
+	public static function isAssociative(array $array)
+	{
+		$array = array_keys($array);
+
+		return ($array !== array_keys($array));
 	}
 }

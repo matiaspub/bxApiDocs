@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/guest.php");
 
 /**
- * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителям</a> сайта. 
+ * <b>CGuest</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителям</a> сайта.
  *
  *
  * @return mixed 

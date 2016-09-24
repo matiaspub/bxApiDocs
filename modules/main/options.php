@@ -176,23 +176,13 @@ $arAllOptions = array(
 	),
 );
 
-if(CTimeZone::Possible())
-{
-	$aZones = CTimeZone::GetZones();
-	$arAllOptions["main"][] = array("use_time_zones", GetMessage("MAIN_OPT_USE_TIMEZONES"), "N", array("checkbox", "Y", 'onclick="this.form.default_time_zone.disabled = this.form.auto_time_zone.disabled = !this.checked;"'));
-	$arAllOptions["main"][] = array("default_time_zone", GetMessage("MAIN_OPT_TIME_ZONE_DEF"), "", array("selectbox", $aZones));
-	$arAllOptions["main"][] = array("auto_time_zone", GetMessage("MAIN_OPT_TIME_ZONE_AUTO"), "N", array("checkbox", "Y"));
-}
-else
-{
-	$arAllOptions["main"][] = array('note'=>GetMessage("MAIN_OPT_TIME_ZONE_NOTE"));
-}
+$aZones = CTimeZone::GetZones();
+$arAllOptions["main"][] = array("use_time_zones", GetMessage("MAIN_OPT_USE_TIMEZONES"), "N", array("checkbox", "Y", 'onclick="this.form.default_time_zone.disabled = this.form.auto_time_zone.disabled = !this.checked;"'));
+$arAllOptions["main"][] = array("default_time_zone", GetMessage("MAIN_OPT_TIME_ZONE_DEF"), "", array("selectbox", $aZones));
+$arAllOptions["main"][] = array("auto_time_zone", GetMessage("MAIN_OPT_TIME_ZONE_AUTO"), "N", array("checkbox", "Y"));
 
 if (\Bitrix\Main\Analytics\SiteSpeed::isLicenseAccepted())
 {
-	$arAllOptions["main"][] = GetMessage("MAIN_SITE_SPEED_SETTINGS");
-	$arAllOptions["main"][] = array("gather_user_stat", GetMessage("MAIN_GATHER_USER_STAT"), "Y", Array("checkbox", "Y"));
-
 	$arAllOptions["main"][] = GetMessage("MAIN_CATALOG_STAT_SETTINGS");
 	$arAllOptions["main"][] = array("gather_catalog_stat", GetMessage("MAIN_GATHER_CATALOG_STAT"), "Y", Array("checkbox", "Y"));
 }
@@ -201,32 +191,31 @@ $arAllOptions["main"][] = GetMessage("main_options_map");
 $arAllOptions["main"][] = Array("map_top_menu_type", GetMessage("MAIN_TOP_MENU_TYPE"), "top", Array("text", 30));
 $arAllOptions["main"][] = Array("map_left_menu_type", GetMessage("MAIN_LEFT_MENU_TYPE"), "left", Array("text", 30));
 
-//show public panel for users
+$arAllOptions["main"][] = GetMessage("MAIN_OPTIONS_URL_PREVIEW");
+$arAllOptions["main"][] = Array("url_preview_enable", GetMessage("MAIN_OPTION_URL_PREVIEW_ENABLE"), "N", array("checkbox", "Y"));
+$arAllOptions["main"][] = Array("url_preview_save_images", GetMessage("MAIN_OPTION_URL_PREVIEW_SAVE_IMAGES"), "N", array("checkbox", "Y"));
+
 CJSCore::Init(array('access'));
 
+//show the public panel for users
 $arCodes = unserialize(COption::GetOptionString("main", "show_panel_for_users"));
 if(!is_array($arCodes))
 	$arCodes = array();
 
-$access = new CAccess();
-$arNames = $access->GetNames($arCodes);
+//hide the public panel for users
+$arHideCodes = unserialize(COption::GetOptionString("main", "hide_panel_for_users"));
+if(!is_array($arHideCodes))
+	$arHideCodes = array();
 
-$arSel = array();
-foreach($arCodes as $code)
-	$arSel[$code] = true;
+$access = new CAccess();
+$arNames = $access->GetNames(array_merge($arCodes, $arHideCodes));
 
 $panel = "
 <script type=\"text/javascript\">
 
-BX.Access.Init({
-	other: {disabled:true}
-});
-
-BX.Access.SetSelected(".CUtil::PhpToJSObject($arSel).");
-
-function InsertAccess(arRights)
+function InsertAccess(arRights, divId, hiddenName)
 {
-	var div = BX('bx_access_div');
+	var div = BX(divId);
 	for(var provider in arRights)
 	{
 		for(var id in arRights[provider])
@@ -234,7 +223,7 @@ function InsertAccess(arRights)
 			var pr = BX.Access.GetProviderPrefix(provider, id);
 			var newDiv = document.createElement('DIV');
 			newDiv.style.marginBottom = '4px';
-			newDiv.innerHTML = '<input type=\"hidden\" name=\"show_panel_for_users[]\" value=\"'+id+'\">' + (pr? pr+': ':'') + arRights[provider][id].name + '&nbsp;<a href=\"javascript:void(0);\" onclick=\"DeleteAccess(this, \\''+id+'\\')\" class=\"access-delete\"></a>';
+			newDiv.innerHTML = '<input type=\"hidden\" name=\"'+hiddenName+'\" value=\"'+id+'\">' + (pr? pr+': ':'') + arRights[provider][id].name + '&nbsp;<a href=\"javascript:void(0);\" onclick=\"DeleteAccess(this, \\''+id+'\\')\" class=\"access-delete\"></a>';
 			div.appendChild(newDiv);
 		}
 	}
@@ -244,7 +233,32 @@ function DeleteAccess(ob, id)
 {
 	var div = BX.findParent(ob, {'tag':'div'});
 	div.parentNode.removeChild(div);
-	BX.Access.DeleteSelected(id);
+}
+
+function ShowPanelFor()
+{
+	BX.Access.Init({
+		other: {disabled:true}
+	});
+	BX.Access.SetSelected({});
+	BX.Access.ShowForm({
+		callback: function(obSelected)
+		{
+			InsertAccess(obSelected, 'bx_access_div', 'show_panel_for_users[]');
+		}
+	});
+}
+
+function HidePanelFor()
+{
+	BX.Access.Init();
+	BX.Access.SetSelected({});
+	BX.Access.ShowForm({
+		callback: function(obSelected)
+		{
+			InsertAccess(obSelected, 'bx_access_hide_div', 'hide_panel_for_users[]');
+		}
+	});
 }
 </script>
 
@@ -254,10 +268,20 @@ function DeleteAccess(ob, id)
 foreach($arCodes as $code)
 	$panel .= '<div style="margin-bottom:4px"><input type="hidden" name="show_panel_for_users[]" value="'.$code.'">'.($arNames[$code]["provider"] <> ''? $arNames[$code]["provider"].': ':'').$arNames[$code]["name"].'&nbsp;<a href="javascript:void(0);" onclick="DeleteAccess(this, \''.$code.'\')" class="access-delete"></a></div>';
 
-$panel .= '</div><a href="javascript:void(0)" class="bx-action-href" onclick="BX.Access.ShowForm({callback:function(obSelected){InsertAccess(obSelected)}})">'.GetMessage("main_sett_add_users").'</a>';
+$panel .= '</div><a href="javascript:void(0)" class="bx-action-href" onclick="ShowPanelFor()">'.GetMessage("main_sett_add_users").'</a>';
+
+$panelHide = "
+<div id=\"bx_access_hide_div\">
+";
+
+foreach($arHideCodes as $code)
+	$panelHide .= '<div style="margin-bottom:4px"><input type="hidden" name="hide_panel_for_users[]" value="'.$code.'">'.($arNames[$code]["provider"] <> ''? $arNames[$code]["provider"].': ':'').$arNames[$code]["name"].'&nbsp;<a href="javascript:void(0);" onclick="DeleteAccess(this, \''.$code.'\')" class="access-delete"></a></div>';
+
+$panelHide .= '</div><a href="javascript:void(0)" class="bx-action-href" onclick="HidePanelFor()">'.GetMessage("main_sett_add_users").'</a>';
 
 $arAllOptions["main"][] = GetMessage("main_sett_public_panel");
 $arAllOptions["main"][] = Array("", GetMessage("main_sett_public_panel_show"), $panel, Array("statichtml"));
+$arAllOptions["main"][] = Array("", GetMessage("main_sett_public_panel_hide"), $panelHide, Array("statichtml"));
 
 if(CRsaSecurity::Possible())
 {
@@ -323,6 +347,7 @@ if($_SERVER["REQUEST_METHOD"]=="POST" && strlen($_POST["Update"])>0 && ($USER->C
 	}
 	COption::SetOptionString("main", "admin_lid", $_POST["admin_lid"]);
 	COption::SetOptionString("main", "show_panel_for_users", serialize($_POST["show_panel_for_users"]));
+	COption::SetOptionString("main", "hide_panel_for_users", serialize($_POST["hide_panel_for_users"]));
 
 	$cleanup_days = COption::GetOptionInt("main", "new_user_registration_cleanup_days", 7);
 	if($cleanup_days > 0 && COption::GetOptionString("main", "new_user_registration_email_confirmation", "N") === "Y")

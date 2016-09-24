@@ -14,7 +14,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 			array("odnoklassniki_appid", GetMessage("socserv_odnoklassniki_client_id"), "", Array("text", 40)),
 			array("odnoklassniki_appkey", GetMessage("socserv_odnoklassniki_client_key"), "", Array("text", 40)),
 			array("odnoklassniki_appsecret", GetMessage("socserv_odnoklassniki_client_secret"), "", Array("text", 40)),
-			array("note"=>GetMessage("socserv_odnoklassniki_form_note", array('#URL#'=>CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php"))),
+			array("note"=>GetMessage("socserv_odnoklassniki_form_note", array('#URL#'=>\CHTTP::URN2URI("/bitrix/tools/oauth/odnoklassniki.php")))),
 		);
 	}
 
@@ -49,7 +49,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php?state=";
+			$state = \CHTTP::URN2URI("/bitrix/tools/oauth/odnoklassniki.php")."?state=";
 			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location;
 			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
@@ -59,7 +59,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 				'check_key='.$_SESSION["UNIQUE_KEY"],
 				array("logout", "auth_service_error", "auth_service_id", "backurl")
 			);
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php";
+			$redirect_uri = \CHTTP::URN2URI("/bitrix/tools/oauth/odnoklassniki.php");
 			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($backurl).(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '').'&mode='.$location;
 		}
 
@@ -81,7 +81,7 @@ class CSocServOdnoklassniki extends CSocServAuth
 			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 			else
-				$redirect_uri= CSocServUtil::ServerName()."/bitrix/tools/oauth/odnoklassniki.php";
+				$redirect_uri= \CHTTP::URN2URI("/bitrix/tools/oauth/odnoklassniki.php");
 
 			$appID = trim(self::GetOption("odnoklassniki_appid"));
 			$appSecret = trim(self::GetOption("odnoklassniki_appsecret"));

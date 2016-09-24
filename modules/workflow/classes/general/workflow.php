@@ -1,13 +1,11 @@
-<?
+<?php
 IncludeModuleLangFile(__FILE__);
 
 class CAllWorkflow
 {
 	public static function err_mess()
 	{
-		$module_id = "workflow";
-		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CAllWorkflow<br>File: ".__FILE__;
+		return "<br>Module: workflow<br>Class: CAllWorkflow<br>File: ".__FILE__;
 	}
 
 	public static function OnPanelCreate()
@@ -110,7 +108,6 @@ class CAllWorkflow
 		if($BX_WORKFLOW_PUBLISHED_PATH == $path && $BX_WORKFLOW_PUBLISHED_SITE == $site)
 			return ;
 
-		$err_mess = (CWorkflow::err_mess())."<br>Function: OnChangeFile<br>Line: ";
 		global $DB, $USER, $APPLICATION;
 		$HISTORY_SIMPLE_EDITING = COption::GetOptionString("workflow","HISTORY_SIMPLE_EDITING","N");
 		if ($HISTORY_SIMPLE_EDITING=="Y")
@@ -126,7 +123,7 @@ class CAllWorkflow
 				$BODY = $arContent["CONTENT"];
 				$arFields = array(
 					"DOCUMENT_ID" => 0,
-					"MODIFIED_BY" => $USER->GetID(),
+					"MODIFIED_BY" => $USER? $USER->GetID(): 1,
 					"TITLE" => $TITLE,
 					"FILENAME" => $path,
 					"SITE_ID" => $site,
@@ -142,8 +139,9 @@ class CAllWorkflow
 
 	public static function SetHistory($DOCUMENT_ID)
 	{
-		$err_mess = (CWorkflow::err_mess())."<br>Function: SetHistory<br>Line: ";
 		global $DB;
+
+		$LOG_ID = false;
 		$DOCUMENT_ID = intval($DOCUMENT_ID);
 		$HISTORY_COPIES = intval(COption::GetOptionString("workflow","HISTORY_COPIES","10"));
 		$z = CWorkflow::GetByID($DOCUMENT_ID);
@@ -175,12 +173,22 @@ class CAllWorkflow
 	{
 		$err_mess = (CAllWorkflow::err_mess())."<br>Function: CleanUpHistoryCopies<br>Line: ";
 		global $DB;
+
 		if($HISTORY_COPIES===false)
 		{
 			$HISTORY_COPIES = intval(COption::GetOptionString("workflow","HISTORY_COPIES","10"));
 		}
+
 		$DOCUMENT_ID = intval($DOCUMENT_ID);
-		if ($DOCUMENT_ID>0) $strSqlSearch = " and ID = $DOCUMENT_ID ";
+		if ($DOCUMENT_ID > 0)
+		{
+			$strSqlSearch = " and ID = $DOCUMENT_ID ";
+		}
+		else
+		{
+			$strSqlSearch = "";
+		}
+
 		$strSql = "SELECT ID FROM b_workflow_document WHERE 1=1 ".$strSqlSearch;
 		$z = $DB->Query($strSql, false, $err_mess.__LINE__);
 		while ($zr=$z->Fetch())
@@ -197,11 +205,15 @@ class CAllWorkflow
 					ID desc
 				";
 			$t = $DB->Query($strSql, false, $err_mess.__LINE__);
+			$i = 0;
 			$str_id = "0";
 			while ($tr = $t->Fetch())
 			{
 				$i++;
-				if ($i>$HISTORY_COPIES) $str_id .= ",".$tr["ID"];
+				if ($i > $HISTORY_COPIES)
+				{
+					$str_id .= ",".$tr["ID"];
+				}
 			}
 			$strSql = "DELETE FROM b_workflow_log WHERE ID in ($str_id)";
 			$DB->Query($strSql, false, $err_mess.__LINE__);
@@ -229,11 +241,15 @@ class CAllWorkflow
 				ID desc
 			";
 		$t = $DB->Query($strSql, false, $err_mess.__LINE__);
+		$i = 0;
 		$str_id = "0";
 		while ($tr = $t->Fetch())
 		{
 			$i++;
-			if ($i>$HISTORY_COPIES) $str_id .= ",".$tr["ID"];
+			if ($i > $HISTORY_COPIES)
+			{
+				$str_id .= ",".$tr["ID"];
+			}
 		}
 		$strSql = "DELETE FROM b_workflow_log WHERE ID in ($str_id)";
 		$DB->Query($strSql, false, $err_mess.__LINE__);
@@ -434,33 +450,50 @@ class CAllWorkflow
 
 	public static function IsAdmin()
 	{
-		$err_mess = (CAllWorkflow::err_mess())."<br>Function: IsAdmin<br>Line: ";
-		global $DB, $USER;
-		$USER_ID = $USER->GetID();
-		if ($USER->IsAdmin()) return true;
+		global $USER;
+
+		if ($USER->IsAdmin())
+		{
+			return true;
+		}
 		else
 		{
 			$WORKFLOW_ADMIN_GROUP_ID = COption::GetOptionString("workflow", "WORKFLOW_ADMIN_GROUP_ID");
-			if (in_array($WORKFLOW_ADMIN_GROUP_ID, $USER->GetUserGroupArray())) return true;
-			else return false;
+			if (in_array($WORKFLOW_ADMIN_GROUP_ID, $USER->GetUserGroupArray()))
+			{
+				return true;
+			}
 		}
+		return false;
 	}
 
 	// check edit rights for the document
 	// depending on it's status and lock
 	public static function IsAllowEdit($DOCUMENT_ID, &$locked_by, &$date_lock, $CHECK_RIGHTS="Y")
 	{
-		$err_mess = (CAllWorkflow::err_mess())."<br>Function: IsAllowEdit<br>Line: ";
-		global $DB, $USER;
+
 		$DOCUMENT_ID = intval($DOCUMENT_ID);
 		$LOCK_STATUS = CWorkflow::GetLockStatus($DOCUMENT_ID, $locked_by, $date_lock);
-		if ($LOCK_STATUS=="red") return false;
-		elseif ($LOCK_STATUS=="yellow") return true;
+		if ($LOCK_STATUS=="red")
+		{
+			return false;
+		}
+		elseif ($LOCK_STATUS=="yellow")
+		{
+			return true;
+		}
 		elseif ($LOCK_STATUS=="green")
 		{
-			if ($CHECK_RIGHTS=="Y") return CWorkflow::IsHaveEditRights($DOCUMENT_ID);
-			else return true;
+			if ($CHECK_RIGHTS=="Y")
+			{
+				return CWorkflow::IsHaveEditRights($DOCUMENT_ID);
+			}
+			else
+			{
+				return true;
+			}
 		}
+		return false;
 	}
 
 	public static function GetStatus($DOCUMENT_ID)
@@ -557,8 +590,7 @@ class CAllWorkflow
 	// return edit link depending on rights and status
 	public static function GetEditLink($FILENAME, &$status_id, &$status_title, $template="", $lang=LANGUAGE_ID, $return_url="")
 	{
-		$err_mess = (CAllWorkflow::err_mess())."<br>Function: GetEditLink<br>Line: ";
-		global $DB, $APPLICATION, $USER;
+		global $USER;
 
 		$link = '';
 		CMain::InitPathVars($SITE_ID, $FILENAME);
@@ -1003,4 +1035,3 @@ class CAllWorkflow
 		return $site;
 	}
 }
-?>

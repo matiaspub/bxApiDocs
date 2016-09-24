@@ -1,4 +1,5 @@
 <?
+
 IncludeModuleLangFile(__FILE__);
 //Never increase caching time here. There were cache clenup problems noticed.
 if(!defined("CACHED_b_cluster_dbnode")) // define("CACHED_b_cluster_dbnode", 3600);
@@ -24,7 +25,7 @@ if(defined("BX_CLUSTER_GROUP"))
 
 class CCluster
 {
-	static public function checkForServers($toBeAddedCount = 0)
+	public static function checkForServers($toBeAddedCount = 0)
 	{
 		$countLimit = intval(COption::GetOptionString('main', '~PARAM_MAX_SERVERS', 0));
 		if ($countLimit > 0)
@@ -37,7 +38,7 @@ class CCluster
 		}
 	}
 
-	public function getServersCount()
+	public static function getServersCount()
 	{
 		static $cache = null;
 		if ($cache === null)
@@ -53,7 +54,7 @@ class CCluster
 		return $cache;
 	}
 
-	static public function getServerList()
+	public static function getServerList()
 	{
 		$servers = array_merge(
 			CClusterDBNode::getServerList()
@@ -72,4 +73,3 @@ class CCluster
 		return $servers;
 	}
 }
-?>

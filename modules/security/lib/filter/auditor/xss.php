@@ -35,6 +35,27 @@ class Xss
 	 * @param string $value
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод обрабатывает и сохраняет отфильтрованное значение. Возвращает <code>true</code>, если значение было отфильтровано аудитором. Для использования отфильтрованного значения используется <i>Xss::getFilteredValue</i>.</p>
+	*
+	*
+	* @param string $value  Фильтрумое значение.
+	*
+	* @return boolean 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $ob = new Xss();
+	* if ($ob-&gt;process($someValue))
+	*     $someValue = $ob-&gt;getFilteredValue();
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/xss/process.php
+	* @author Bitrix
+	*/
 	public function process($value)
 	{
 		if (!preg_match('#[(){}\[\]=+&%<>]?#', $value))
@@ -157,6 +178,9 @@ class Xss
 							(\\s*[a-z-]+\\s*:\\s*(([0-9a-z\\s%,.#!\-'\"\\/]+|&quot;)*|rgb\\s*\\([0-9,\\s]+\\))\\s*(?:!important)?;?)*
 							\\s*
 							(?P=quot)
+						)
+						(?!\\s*
+							[a-z]+;
 						)
 					/xis",
 					"/{$_Al}(f{$_M}o{$_M}r{$_M})(m{$_M}a{$_M}c{$_M}t{$_M}i{$_M}o{$_M}n{$_WS_OPT}=)/is",

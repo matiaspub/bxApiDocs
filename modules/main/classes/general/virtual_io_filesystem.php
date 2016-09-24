@@ -46,9 +46,9 @@ class CBXVirtualIoFileSystem
 
 		include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/charset_converter.php");
 		if ($direction == self::directionEncode)
-			$result = CharsetConverter::ConvertCharset($string, self::$serverEncoding, self::$systemEncoding);
+			$result = \Bitrix\Main\Text\Encoding::convertEncoding($string, self::$serverEncoding, self::$systemEncoding);
 		else
-			$result = CharsetConverter::ConvertCharset($string, self::$systemEncoding, self::$serverEncoding);
+			$result = \Bitrix\Main\Text\Encoding::convertEncoding($string, self::$systemEncoding, self::$serverEncoding);
 
 		if (
 			defined('BX_IO_Compartible')

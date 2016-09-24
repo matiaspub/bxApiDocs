@@ -7,6 +7,7 @@
  */
 namespace Bitrix\Seo\Engine;
 
+use Bitrix\Main\Context;
 use Bitrix\Seo\Engine;
 use Bitrix\Seo\IEngine;
 use Bitrix\Main\Text;
@@ -381,6 +382,8 @@ EOT;
 	public function addSite($domain, $dir = '/')
 	{
 		$domain = ToLower($domain);
+		$queryDomain = Context::getCurrent()->getRequest()->isHttps() ? 'https://'.$domain : $domain;
+
 		if(!isset($this->arServiceList[self::HOSTS_SERVICE]))
 		{
 			$this->getServiceDocument();
@@ -394,7 +397,7 @@ EOT;
 			$queryResult = $this->queryOld(
 				$this->arServiceList[self::HOSTS_SERVICE],
 				"POST",
-				sprintf($str, Converter::getXmlConverter()->encode($domain))
+				sprintf($str, Converter::getXmlConverter()->encode($queryDomain))
 			);
 
 			if($queryResult->status == self::HTTP_STATUS_CREATED && strlen($queryResult->result) > 0)
@@ -417,6 +420,7 @@ EOT;
 			$this->getSiteFeeds($domain);
 		}
 
+		$queryDomain = Context::getCurrent()->getRequest()->isHttps() ? 'https://'.$domain : $domain;
 		if(isset($this->engineSettings['SITES'][$domain]['SERVICES']))
 		{
 			if(!$bCheck)
@@ -516,7 +520,15 @@ EOT;
 					switch($tag)
 					{
 						case 'name':
-							$entryData[$tag] = \CBXPunycode::toASCII(ToLower($child->textContent()), $e = null);
+							$value = \CBXPunycode::toASCII(ToLower($child->textContent()), $e = null);
+							if(preg_match("/^https:\/\//", $value))
+							{
+								$value = substr($value, 8);
+								$entryData['https'] = 1;
+							}
+
+							$entryData[$tag] = $value;
+
 						break;
 
 						case 'verification':
@@ -580,6 +592,11 @@ EOT;
 			$hostName = $obXml->getTree()->elementsByName('name');
 			$hostName = \CBXPunycode::toASCII(ToLower($hostName[0]->textContent()), $e = null);
 
+			if(preg_match("/^https:\/\//", $hostName))
+			{
+				$hostName = substr($hostName, 8);
+			}
+
 			$this->engineSettings['SITES'][$hostName]['SERVICES'] = array();
 
 			$arLinks = $obXml->getTree()->elementsByName('link');
@@ -627,7 +644,7 @@ EOT;
 
 			if($http->status == 401 && !$skipRefreshAuth)
 			{
-				if($this->checkAuthExpired(false))
+				if($this->checkAuthExpired())
 				{
 					$this->queryOld($scope, $method, $data, true);
 				}

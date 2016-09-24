@@ -63,6 +63,17 @@ class Uri
 	 * Return the URI without a fragment.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает URI без фрагмента.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getlocator.php
+	* @author Bitrix
+	*/
 	public function getLocator()
 	{
 		$url = "";
@@ -85,6 +96,17 @@ class Uri
 	 * Return the URI with a fragment, if any.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает URI с фрагментом, если он имеется.</p> <p>Выполняет функции методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php" >CMain::GetCurPageParam</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/deleteparam.ph" >DeleteParam</a> в старом ядре.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/geturi.php
+	* @author Bitrix
+	*/
 	public function getUri()
 	{
 		$url = $this->getLocator();
@@ -101,6 +123,17 @@ class Uri
 	 * Returns the fragment.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает фрагмент.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getfragment.php
+	* @author Bitrix
+	*/
 	public function getFragment()
 	{
 		return $this->fragment;
@@ -110,15 +143,61 @@ class Uri
 	 * Returns the host.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает хост.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/gethost.php
+	* @author Bitrix
+	*/
 	public function getHost()
 	{
 		return $this->host;
 	}
 
 	/**
+	 * Sets the host
+	 * @param string $host Host name.
+	 * @return $this
+	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает хост.</p>
+	*
+	*
+	* @param string $host  Host name.
+	*
+	* @return \Bitrix\Main\Web\Uri 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/sethost.php
+	* @author Bitrix
+	*/
+	public function setHost($host)
+	{
+		$this->host = $host;
+		return $this;
+	}
+
+	/**
 	 * Returns the password.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает пароль.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getpass.php
+	* @author Bitrix
+	*/
 	public function getPass()
 	{
 		return $this->pass;
@@ -128,6 +207,17 @@ class Uri
 	 * Returns the path.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает путь.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getpath.php
+	* @author Bitrix
+	*/
 	public function getPath()
 	{
 		return $this->path;
@@ -138,6 +228,19 @@ class Uri
 	 * @param string $path
 	 * @return $this
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает путь.</p>
+	*
+	*
+	* @param string $path  
+	*
+	* @return \Bitrix\Main\Web\Uri 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/setpath.php
+	* @author Bitrix
+	*/
 	public function setPath($path)
 	{
 		$this->path = $path;
@@ -148,6 +251,17 @@ class Uri
 	 * Returns the path with the query.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает путь с запросом.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getpathquery.php
+	* @author Bitrix
+	*/
 	public function getPathQuery()
 	{
 		$pathQuery = $this->path;
@@ -162,6 +276,17 @@ class Uri
 	 * Returns the port number.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает номер порта.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getport.php
+	* @author Bitrix
+	*/
 	public function getPort()
 	{
 		return $this->port;
@@ -171,6 +296,17 @@ class Uri
 	 * Returns the query.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает запрос.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getquery.php
+	* @author Bitrix
+	*/
 	public function getQuery()
 	{
 		return $this->query;
@@ -180,6 +316,17 @@ class Uri
 	 * Returns the scheme.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает схему.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getscheme.php
+	* @author Bitrix
+	*/
 	public function getScheme()
 	{
 		return $this->scheme;
@@ -189,6 +336,17 @@ class Uri
 	 * Returns the user.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает пользователя.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/getuser.php
+	* @author Bitrix
+	*/
 	public function getUser()
 	{
 		return $this->user;
@@ -199,6 +357,19 @@ class Uri
 	 * @param array $params Parameters to delete.
 	 * @return $this
 	 */
+	
+	/**
+	* <p>Нестатический метод удаляет параметры из запроса.</p> <p>Выполняет функции методов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php" >CMain::GetCurPageParam </a> и <a href="http://dev.1c-bitrix.ru/api_help/main/functions/other/deleteparam.ph" >DeleteParam</a> в старом ядре.</p>
+	*
+	*
+	* @param array $params  Удаляемые параметры.
+	*
+	* @return \Bitrix\Main\Web\Uri 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/deleteparams.php
+	* @author Bitrix
+	*/
 	public function deleteParams(array $params)
 	{
 		if($this->query <> '')
@@ -221,6 +392,19 @@ class Uri
 	 * @param array $params Parameters to add.
 	 * @return $this
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет параметры в запрос или заменяет существующие параметры.</p> <p>Выполняет функции метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/getcurpageparam.php" >CMain::GetCurPageParam </a> в старом ядре.</p>
+	*
+	*
+	* @param array $params  Параметры для добавления.
+	*
+	* @return \Bitrix\Main\Web\Uri 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/web/uri/addparams.php
+	* @author Bitrix
+	*/
 	public function addParams(array $params)
 	{
 		$currentParams = array();
@@ -229,7 +413,7 @@ class Uri
 			parse_str($this->query, $currentParams);
 		}
 
-		$currentParams = array_merge($currentParams, $params);
+		$currentParams = array_replace($currentParams, $params);
 
 		$this->query = http_build_query($currentParams, "", "&");
 

@@ -30,6 +30,7 @@ class EventHandler
 			'\Bitrix\Sale\Sender\TriggerOrderPaid',
 			'\Bitrix\Sale\Sender\TriggerBasketForgotten',
 			'\Bitrix\Sale\Sender\TriggerDontBuy',
+			'\Bitrix\Sale\Sender\TriggerOrderStatusChange',
 		);
 
 		return $data;

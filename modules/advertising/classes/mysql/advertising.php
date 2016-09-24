@@ -7,7 +7,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/advertising/classes/gene
 
 
 /**
- * Класс для работы с рекламными контрактами. 
+ * Класс для работы с рекламными контрактами.
  *
  *
  * @return mixed 
@@ -18,61 +18,61 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/advertising/classes/gene
  */
 class CAdvContract extends CAdvContract_all
 {
-public static 	function err_mess()
+	public static function err_mess()
 	{
 		$module_id = "advertising";
 		return "<br>Module: ".$module_id."<br>Class: CAdvContract<br>File: ".__FILE__;
 	}
 
 	// получаем список контрактов
-
+	
 	/**
-	* <p>Метод предназначен для получения списка контрактов.</p>
+	* <p>Метод предназначен для получения списка контрактов. Метод нестатический.</p>
 	*
 	*
 	* @param varchar &$by  Идентификатор, позволяющий задать имя поля для сортировки.
-	* Допустимы следующие значения: <ul> <li>s_id - по ID </li> <li>s_lamp - по
-	* индикатору контракта </li> <li>s_name - по заголовку контракта </li>
-	* <li>s_description - по описанию контракта </li> <li>s_active - по флагу активности
-	* </li> <li>s_weight - по весу </li> <li>s_sort - по сортировке </li> <li>s_date_modify - по дате
-	* модификации </li> <li>s_modified_by - по ID пользователя, изменившего
-	* контракт </li> <li>s_banner_count - по числу баннеров, приписанных к
-	* контракту </li> <li>s_ctr - по отклику (CTR) контракта </li> <li>s_show_count - по
-	* суммарному числу показов баннеров контракта </li> <li>s_max_show_count - по
+	* Допустимы следующие значения: <ul> <li>s_id - по ID 	</li> <li>s_lamp - по
+	* индикатору контракта 	</li> <li>s_name - по заголовку контракта 	</li>
+	* <li>s_description - по описанию контракта 	</li> <li>s_active - по флагу активности
+	* 	</li> <li>s_weight - по весу 	</li> <li>s_sort - по сортировке 	</li> <li>s_date_modify - по
+	* дате модификации 	</li> <li>s_modified_by - по ID пользователя, изменившего
+	* контракт 	</li> <li>s_banner_count - по числу баннеров, приписанных к
+	* контракту 	</li> <li>s_ctr - по отклику (CTR) контракта 	</li> <li>s_show_count - по
+	* суммарному числу показов баннеров контракта 	</li> <li>s_max_show_count - по
 	* максимальному суммарному числу всех показов баннеров контракта
-	* </li> <li>s_click_count - по суммарному числу кликов на баннеры контракта </li>
-	* <li>s_max_click_count - по максимальному суммарному числу кликов на баннеры
-	* контракта</li> </ul>
+	* 	</li> <li>s_click_count - по суммарному числу кликов на баннеры контракта
+	* 	</li> <li>s_max_click_count - по максимальному суммарному числу кликов на
+	* баннеры контракта</li> </ul>
 	*
 	* @param varchar &$order  Массив для фильтрации значений. Необязательный параметр. В
 	* массиве допустимы следующие индексы: <ul> <li>ID - ID контракта
-	* (допускается сложная логика) </li> <li>- "Y" - при фильтрации по ID
+	* (допускается сложная логика) 	</li> <li>- "Y" - при фильтрации по ID
 	* контракта будет искаться точное совпадение (по умолчанию); "N" - в
-	* противном случае будет искаться вхождение </li> <li>LAMP - значение
-	* индикатора: "red", "green" </li> <li>DATE_MODIFY_1 - левая часть интервала для даты
-	* модификации контракта </li> <li>DATE_MODIFY_2 - правая часть интервала для
-	* даты модификации контракта </li> <li>NAME - имя контракта (допускается
-	* сложная логика) </li> <li>NAME_EXACT_MATCH - "Y" - при фильтрации по имени
+	* противном случае будет искаться вхождение 	</li> <li>LAMP - значение
+	* индикатора: "red", "green" 	</li> <li>DATE_MODIFY_1 - левая часть интервала для даты
+	* модификации контракта 	</li> <li>DATE_MODIFY_2 - правая часть интервала для
+	* даты модификации контракта 	</li> <li>NAME - имя контракта  (допускается
+	* сложная логика) 	</li> <li>NAME_EXACT_MATCH - "Y" - при фильтрации по имени
 	* контракта будет искаться точное совпадение; "N" - в противном
-	* случае будет искаться вхождение (по умолчанию) </li> <li>DESCRIPTION -
-	* описание контракта (допускается сложная логика) </li>
+	* случае будет искаться вхождение (по умолчанию) 	</li> <li>DESCRIPTION -
+	* описание контракта  (допускается сложная логика) 	</li>
 	* <li>DESCRIPTION_EXACT_MATCH - "Y" - при фильтрации по описанию контракта будет
 	* искаться точное совпадение; "N" - в противном случае будет искаться
-	* вхождение (по умолчанию) </li> <li>OWNER - ID, ФИО, логин владельца
-	* контракта (допускается сложная логика) </li> <li>OWNER_EXACT_MATCH - "Y" - при
+	* вхождение (по умолчанию) 	</li> <li>OWNER - ID, ФИО, логин владельца
+	* контракта  (допускается сложная логика) 	</li> <li>OWNER_EXACT_MATCH - "Y" - при
 	* фильтрации по ID, ФИО, логину владельца контракта будет искаться
 	* точное совпадение; "N" - в противном случае будет искаться
-	* вхождение (по умолчанию) </li> <li>BANNER_COUNT_1 - левая часть интервала для
-	* числа баннеров контракта </li> <li>BANNER_COUNT_2 - правая часть интервала
-	* для числа баннеров контракта </li> <li>SHOW_COUNT_1 - левая часть интервала
-	* для суммарного числа показов баннеров контракта </li> <li>SHOW_COUNT_2 -
+	* вхождение (по умолчанию) 	</li> <li>BANNER_COUNT_1 - левая часть интервала для
+	* числа баннеров контракта 	</li> <li>BANNER_COUNT_2 - правая часть интервала
+	* для числа баннеров контракта 	</li> <li>SHOW_COUNT_1 - левая часть интервала
+	* для суммарного числа показов баннеров контракта 	</li> <li>SHOW_COUNT_2 -
 	* правая часть интервала для суммарного числа показов баннеров
-	* контракта </li> <li>CLICK_COUNT_1 - левая часть интервала для суммарного
-	* числа кликов по баннерам контракта </li> <li>CLICK_COUNT_2 - правая часть
-	* интервала для суммарного числа кликов по баннерам контракта </li>
-	* <li>CTR_1 - левая часть интервала для CTR контракта </li> <li>CTR_2 - правая
-	* часть интервала для CTR контракта </li> <li>ADMIN_COMMENTS - административный
-	* комментарий к контракту (допускается сложная логика) </li>
+	* контракта 	</li> <li>CLICK_COUNT_1 - левая часть интервала для суммарного
+	* числа кликов по баннерам контракта 	</li> <li>CLICK_COUNT_2 - правая часть
+	* интервала для суммарного числа кликов по баннерам контракта 	</li>
+	* <li>CTR_1 - левая часть интервала для CTR контракта 	</li> <li>CTR_2 - правая
+	* часть интервала для CTR контракта 	</li> <li>ADMIN_COMMENTS - административный
+	* комментарий к контракту  (допускается сложная логика) 	</li>
 	* <li>ADMIN_COMMENTS_EXACT_MATCH - "Y" - при фильтрации по административному
 	* комментарию к контракту будет искаться точное совпадение; "N" - в
 	* противном случае будет искаться вхождение (по умолчанию)</li> </ul>
@@ -87,12 +87,12 @@ public static 	function err_mess()
 	*
 	* @param boolean &$is_filtered  
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" 
+	* @param (1) $CHECK_RIGHTS = "Y" 
 	*
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // фильтр
 	* $FilterArr = Array(
@@ -186,7 +186,7 @@ public static 	function err_mess()
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvcontract/getlist.php
 	* @author Bitrix
 	*/
-	public static 	function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered, $CHECK_RIGHTS="Y")
+	public static function GetList(&$by, &$order, $arFilter=Array(), &$is_filtered, $CHECK_RIGHTS="Y")
 	{
 		$err_mess = (CAdvContract::err_mess())."<br>Function: GetList<br>Line: ";
 		global $DB, $USER, $APPLICATION, $strError;
@@ -415,7 +415,7 @@ public static 	function err_mess()
 
 
 /**
- * Класс для работы с рекламными баннерами. 
+ * Класс для работы с рекламными баннерами.
  *
  *
  * @return mixed 
@@ -426,13 +426,13 @@ public static 	function err_mess()
  */
 class CAdvBanner extends CAdvBanner_all
 {
-public static 	function err_mess()
+	public static function err_mess()
 	{
 		$module_id = "advertising";
 		return "<br>Module: ".$module_id."<br>Class: CAdvBanner<br>File: ".__FILE__;
 	}
 
-public static 	function Update($arFields, $BANNER_ID)
+	public static function Update($arFields, $BANNER_ID)
 	{
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: Update<br>Line: ";
 		global $DB;
@@ -444,12 +444,27 @@ public static 	function Update($arFields, $BANNER_ID)
 		$DB->Update("b_adv_banner",$arFields,"WHERE ID='".intval($BANNER_ID)."'",$err_mess.__LINE__);
 	}
 
-public static 	function getCTRSQL()
+	public static function getCTRSQL()
 	{
 		return 'IF (SUM(D.SHOW_COUNT) > 0, round((SUM(D.CLICK_COUNT)*100)/SUM(D.SHOW_COUNT),2), 0)	CTR';
 	}
 
-public static 	function Add($arFields)
+	public static function addBindField($field, $bannerField, &$modifyStatus)
+	{
+		global $DB;
+		
+		$field = "'".$DB->ForSql($field)."'";
+		$bannerField = "'".$DB->ForSql($bannerField)."'";
+		
+		if ($bannerField != $field)
+		{
+			$modify_status = "Y";
+		}
+
+		return $field;
+	}
+
+	public static function Add($arFields)
 	{
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: Add<br>Line: ";
 		global $DB;
@@ -464,21 +479,21 @@ public static 	function Add($arFields)
 
 	
 	/**
-	* <p>Метод предназначен для получения списка баннеров.</p>
+	* <p>Метод предназначен для получения списка баннеров. Метод нестатический.</p>
 	*
 	*
 	* @param varchar &$by  Идентификатор, позволяющий задать имя поля для сортировки.
-	* Допустимы следующие значения: <ul> <li>s_id - по ID </li> <li>s_lamp - по
-	* индикатору </li> <li>s_name - по имени баннера </li> <li>s_type_sid - по типу
-	* баннера </li> <li>s_contract_id - по ID контракта </li> <li>s_group_sid - по имени группы
-	* </li> <li>s_show_count - по количеству показов </li> <li>s_max_show_count - по
-	* максимальному количеству показов </li> <li>s_date_last_show - по дате
-	* последнего показа </li> <li>s_click_count - по количеству кликов на баннер
-	* </li> <li>s_max_click_count - по максимальному количеству кликов </li>
-	* <li>s_date_last_click - по дате последнего клика </li> <li>s_active - по флагу
-	* активности </li> <li>s_weight - по весу баннера </li> <li>s_status_sid - по статусу
-	* баннера </li> <li>s_date_show_from - по дате начала показов </li> <li>s_date_show_to - по
-	* дате окончания показов </li> <li>s_ctr - по CTR баннера</li> </ul>
+	* Допустимы следующие значения: <ul> <li>s_id - по ID 	</li> <li>s_lamp - по
+	* индикатору 	</li> <li>s_name - по имени баннера 	</li> <li>s_type_sid - по типу
+	* баннера 	</li> <li>s_contract_id - по ID контракта 	</li> <li>s_group_sid - по имени
+	* группы 	</li> <li>s_show_count - по количеству показов 	</li> <li>s_max_show_count - по
+	* максимальному количеству показов 	</li> <li>s_date_last_show - по дате
+	* последнего показа 	</li> <li>s_click_count - по количеству кликов на баннер
+	* 	</li> <li>s_max_click_count - по максимальному количеству кликов 	</li>
+	* <li>s_date_last_click - по дате последнего клика 	</li> <li>s_active - по флагу
+	* активности 	</li> <li>s_weight - по весу баннера 	</li> <li>s_status_sid - по статусу
+	* баннера 	</li> <li>s_date_show_from - по дате начала показов 	</li> <li>s_date_show_to - по
+	* дате окончания показов 	</li> <li>s_ctr - по CTR баннера</li> </ul>
 	*
 	* @param varchar &$order  Порядок сортировки. Допустимы следующие значения: <ul> <li>desc - по
 	* убыванию (значение по умолчанию) </li> <li>asc - по возрастанию</li> </ul>
@@ -486,47 +501,47 @@ public static 	function Add($arFields)
 	* @param array $arFilter = array() Массив для фильтрации значений. Необязательный параметр. В
 	* массиве допустимы следующие индексы: <ul> <li>ID - ID баннера
 	* (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>)
-	* </li> <li>ID_EXACT_MATCH - "Y" - при фильтрации по ID баннера будет искаться
+	* 	 </li> <li>ID_EXACT_MATCH - "Y" - при фильтрации по ID баннера будет искаться
 	* точное совпадение (по умолчанию); "N" - в противном случае будет
-	* искаться вхождение </li> <li>ACTIVE - активность, значения Y/N</li> <li>LAMP -
-	* значение индикатора: "red", "green" </li> <li>LANG - двухсимвольный
+	* искаться вхождение 	 </li> <li>ACTIVE - активность, значения Y/N</li> <li>LAMP -
+	* значение индикатора: "red", "green"  </li> <li>LANG - двухсимвольный
 	* идентификатор языковой части сайта в которой будет показываться
-	* баннер </li> <li>SHOW_COUNT_1 - левая часть интервала для числа показов </li>
-	* <li>SHOW_COUNT_2 - правая часть интервала для числа показов </li> <li>CLICK_COUNT_1 -
-	* левая часть интервала для числа кликов </li> <li>CLICK_COUNT_2 - правая
-	* часть интервала для числа кликов </li> <li>CTR_1 - левая часть интервала
-	* для CTR баннера </li> <li>CTR_2 - правая часть интервала для CTR баннера </li>
+	* баннер 	</li> <li>SHOW_COUNT_1 - левая часть интервала для числа показов 	</li>
+	* <li>SHOW_COUNT_2 - правая часть интервала для числа показов 	</li> <li>CLICK_COUNT_1
+	* - левая часть интервала для числа кликов 	</li> <li>CLICK_COUNT_2 - правая
+	* часть интервала для числа кликов 	</li> <li>CTR_1 - левая часть интервала
+	* для CTR баннера 	</li> <li>CTR_2 - правая часть интервала для CTR баннера 	</li>
 	* <li>GROUP - имя группы баннера (допускается <a
-	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) </li> <li>GROUP_EXACT_MATCH
-	* - "Y" - при фильтрации по имени группы будет искаться точное
-	* совпадение; "N" - в противном случае будет искаться вхождение (по
-	* умолчанию) </li> <li>STATUS_SID - символьный код статуса (допускается <a
-	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>); символьный
-	* код статуса может принимать следующие значения: <ul> <li>PUBLISHED -
-	* баннер подтвержден и опубликован</li> <li>READY - баннер на
-	* рассмотрении</li> <li>REJECTED - баннер отклонен</li> </ul> </li> <li>CONTRACT_ID - ID
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) 	</li>
+	* <li>GROUP_EXACT_MATCH - "Y" - при фильтрации по имени группы будет искаться
+	* точное совпадение; "N" - в противном случае будет искаться
+	* вхождение (по умолчанию) 	</li> <li>STATUS_SID - символьный код статуса
+	* (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>);
+	* символьный код статуса может принимать следующие значения: 		<ul>
+	* <li>PUBLISHED - баннер подтвержден и опубликован</li> 			<li>READY - баннер на
+	* рассмотрении</li> 			<li>REJECTED - баннер отклонен</li> </ul> </li> <li>CONTRACT_ID - ID
 	* контракта (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
-	* логика</a>) </li> <li>CONTRACT_ID_EXACT_MATCH - "Y" - при фильтрации по ID контракта
+	* логика</a>) 	</li> <li>CONTRACT_ID_EXACT_MATCH - "Y" - при фильтрации по ID контракта
 	* будет искаться точное совпадение (по умолчанию); "N" - в противном
-	* случае будет искаться вхождение </li> <li>CONTRACT - ID, имя, описание
+	* случае будет искаться вхождение 	</li> <li>CONTRACT - ID, имя, описание
 	* контракта (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная
-	* логика</a>) </li> <li>CONTRACT_EXACT_MATCH - "Y" - при фильтрации по ID, имени,
+	* логика</a>) 	</li> <li>CONTRACT_EXACT_MATCH - "Y" - при фильтрации по ID, имени,
 	* описанию контракта будет искаться точное совпадение; "N" - в
-	* противном случае будет искаться вхождение (по умолчанию) </li>
+	* противном случае будет искаться вхождение (по умолчанию) 	</li>
 	* <li>TYPE_SID - символьный код типа баннера (допускается <a
-	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) </li>
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) 	</li>
 	* <li>TYPE_SID_EXACT_MATCH - "Y" - при фильтрации по символьному коду типа
 	* баннера будет искаться точное совпадение (по умолчанию); "N" - в
-	* противном случае будет искаться вхождение </li> <li>NAME - имя баннера
+	* противном случае будет искаться вхождение 	</li> <li>NAME - имя баннера
 	* (допускается <a href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>)
-	* </li> <li>NAME_EXACT_MATCH - "Y" - при фильтрации по имени баннера будет
+	* 	</li> <li>NAME_EXACT_MATCH - "Y" - при фильтрации по имени баннера будет
 	* искаться точное совпадение; "N" - в противном случае будет искаться
-	* вхождение (по умолчанию) </li> <li>CODE - код баннера (допускается <a
-	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) </li> <li>CODE_EXACT_MATCH
+	* вхождение (по умолчанию) 	</li> <li>CODE - код баннера (допускается <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) 	</li> <li>CODE_EXACT_MATCH
 	* - "Y" - при фильтрации по коду баннера будет искаться точное
 	* совпадение; "N" - в противном случае будет искаться вхождение (по
-	* умолчанию) </li> <li>COMMENTS - комментарий к баннеру (допускается <a
-	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) </li>
+	* умолчанию) 	</li> <li>COMMENTS - комментарий к баннеру (допускается <a
+	* href="http://dev.1c-bitrix.ru/user_help/general/filter.php">сложная логика</a>) 	</li>
 	* <li>COMMENTS_EXACT_MATCH - "Y" - при фильтрации по комментарию к баннеру будет
 	* искаться точное совпадение; "N" - в противном случае будет искаться
 	* вхождение (по умолчанию) </li> <li>SITE - для фильтрации по сайтам.</li> </ul>
@@ -534,7 +549,7 @@ public static 	function Add($arFields)
 	* @param boolean &$is_filtered  Переменная, возвращающая true в том случае, если список баннеров
 	* отфильтрован по какому-либо критерию; либо false в противном случае.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
+	* @param (1) $CHECK_RIGHTS = "Y" Параметр проверяет уровень доступа к модулю Реклама
 	* (администратор рекламы, рекламодатель и т.д.). Если параметр
 	* определён как "N", то считается, что текущий пользователь обладает
 	* административными правами доступа к модулю Реклама. Если
@@ -544,7 +559,7 @@ public static 	function Add($arFields)
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $FilterArr = Array(
 	* 	"find_id",
@@ -619,7 +634,7 @@ public static 	function Add($arFields)
 	* 	echo "&lt;pre&gt;"; print_r($arBanner); echo "&lt;/pre&gt;";
 	* }
 	* ?&gt;
-	* </bo
+	* 
 	* &lt;?
 	* Array
 	* (
@@ -658,7 +673,7 @@ public static 	function Add($arFields)
 	* &lt;TD vAlign=bottom&gt;
 	* &lt;DIV align=center&gt;
 	* &lt;A href="/ru/partners/partnership.php"&gt;
-	* &lt;IMG height=95 src="/images/advert/free.gif" width=100 border=0&gt;&lt;/A&gt;
+	* &lt;IMG height=95 src="//opt-560835.ssl.1c-bitrix-cdn.ru/images/advert/free.gif?10739178917822" width=100 border=0&gt;&lt;/A&gt;
 	* &lt;/DIV&gt;&lt;/TD&gt;&lt;/TR&gt;
 	* &lt;TR&gt;
 	* &lt;TD&gt;&lt;/TD&gt;
@@ -667,11 +682,11 @@ public static 	function Add($arFields)
 	* &lt;TD&gt;&lt;/TD&gt;
 	* &lt;TD&gt;Разработчики сайтов и интеграторы получают:&lt;BR&gt;
 	* &lt;B&gt;&lt;FONT class=smalltext&gt;
-	* &lt;IMG height=8 src="/images/list_bullet.gif" width=8&gt;
+	* &lt;IMG height=8 src="//opt-560835.ssl.1c-bitrix-cdn.ru/images/list_bullet.gif?107356411851" width=8&gt;
 	* &lt;/FONT&gt;&lt;/B&gt; 
 	* &lt;FONT color=#ff5a31&gt;скидки до 50%&lt;/FONT&gt; &lt;BR&gt;
 	* &lt;B&gt;&lt;FONT class=smalltext&gt;
-	* &lt;IMG height=8 src="/images/list_bullet.gif" width=8&gt;
+	* &lt;IMG height=8 src="//opt-560835.ssl.1c-bitrix-cdn.ru/images/list_bullet.gif?107356411851" width=8&gt;
 	* &lt;/FONT&gt;&lt;/B&gt; 
 	* &lt;FONT color=#ff5a31&gt;бесплатную копиию&lt;/FONT&gt;
 	* &lt;/TD&gt;&lt;/TR&gt;
@@ -683,7 +698,7 @@ public static 	function Add($arFields)
 	* &lt;TD&gt;
 	* &lt;DIV align=right&gt;
 	* &lt;A class=bottomlinks href="/ru/partners/partnership.php"&gt;Подробнее&lt;/A&gt;
-	* &lt;IMG height=7 src="/images/main_button_more_3.gif" width=7&gt;
+	* &lt;IMG height=7 src="//opt-560835.ssl.1c-bitrix-cdn.ru/images/main_button_more_3.gif?1070721859824" width=7&gt;
 	* &lt;/DIV&gt;&lt;/TD&gt;&lt;/TR&gt;&lt;/TABLE&gt;
 	* 	[CODE_TYPE] =&gt; html
 	* 	[STAT_EVENT_1] =&gt; 
@@ -1033,9 +1048,9 @@ public static 	function Add($arFields)
 	}
 
 	// фиксируем клик по изображению баннера
-
+	
 	/**
-	* <p>Метод фиксирует клик по баннеру в базе данных.</p>
+	* <p>Метод фиксирует клик по баннеру в базе данных. Метод нестатический.</p>
 	*
 	*
 	* @param int $BANNER_ID  ID баннера.
@@ -1050,7 +1065,7 @@ public static 	function Add($arFields)
 	* @link http://dev.1c-bitrix.ru/api_help/advertising/classes/cadvbanner/click.php
 	* @author Bitrix
 	*/
-	public static 	function Click($BANNER_ID)
+	public static function Click($BANNER_ID)
 	{
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: Click<br>Line: ";
 		global $DB;
@@ -1139,7 +1154,7 @@ public static 	function Add($arFields)
 	}
 
 	// формирует массив весов всех возможных баннеров для текущей страницы
-public static 	function GetPageWeights_RS()
+	public static function GetPageWeights_RS()
 	{
 		$err_mess = (CAdvBanner::err_mess())."<br>Function: GetPageWeights_RS<br>Line: ";
 		global $APPLICATION, $DB, $USER;
@@ -1379,7 +1394,7 @@ public static 	function GetPageWeights_RS()
 	}
 
 	// периодически вызываемая функция очищающая устаревшие данные по динамике баннера по дням
-public static 	function CleanUpDynamics()
+	public static function CleanUpDynamics()
 	{
 		set_time_limit(0);
 		ignore_user_abort(true);
@@ -1393,7 +1408,7 @@ public static 	function CleanUpDynamics()
 		return "CAdvBanner::CleanUpDynamics();";
 	}
 
-public static 	function GetDynamicList_SQL($strSqlSearch)
+	public static function GetDynamicList_SQL($strSqlSearch)
 	{
 		global $DB;
 		$strSql = "
@@ -1431,7 +1446,7 @@ public static 	function GetDynamicList_SQL($strSqlSearch)
 
 
 /**
- * Класс для работы с типами баннеров. 
+ * Класс для работы с типами баннеров.
  *
  *
  * @return mixed 
@@ -1442,7 +1457,7 @@ public static 	function GetDynamicList_SQL($strSqlSearch)
  */
 class CAdvType extends CAdvType_all
 {
-public static 	function err_mess()
+	public static function err_mess()
 	{
 		$module_id = "advertising";
 		return "<br>Module: ".$module_id."<br>Class: CAdvType<br>File: ".__FILE__;

@@ -116,4 +116,3 @@ class CFavorites extends CAllFavorites
 		return $res;
 	}
 }
-?>

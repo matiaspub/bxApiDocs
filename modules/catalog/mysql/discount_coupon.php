@@ -5,7 +5,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/discount
 
 
 /**
- * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок. 
+ * <b>CCatalogDiscountCoupon</b> - класс для работы с купонами скидок.
  *
  *
  * @return mixed 
@@ -18,20 +18,20 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 {
 	
 	/**
-	* <p>Метод добавляет купон для выбранной скидки. Метод динамичный.</p>
+	* <p>Метод добавляет купон для выбранной скидки. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив параметров нового купона, ключами в котором
 	* являются названия параметров, а значениями - соответствующие
-	* значения: <ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки (обязательный)</li> <li>
+	* значения: 		<ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки (обязательный)</li> 			<li>
 	* <b>ACTIVE</b> - активность купона (Y|N) (необязательный), по умолчанию - Y</li>
-	* <li> <b>ONE_TIME</b> - флаг одноразовости купона (необязательный). Может
+	* 			<li> <b>ONE_TIME</b> - флаг одноразовости купона (необязательный). Может
 	* принимать одно из трёх значений: <b>Y</b> - на одну позицию заказа,
-	* <b>O</b> - на весь заказ, <b>N</b> - многоразовый, по умолчанию - <b>Y</b>.</li> <li>
-	* <b>COUPON</b> - код купона (обязательный)</li> <li> <b>DATE_APPLY</b> - дата
+	* <b>O</b> - на весь заказ, <b>N</b> - многоразовый, по умолчанию - <b>Y</b>.</li>
+	* 			<li> <b>COUPON</b> - код купона (обязательный)</li> 			<li> <b>DATE_APPLY</b> - дата
 	* применения купона (необязательный), если указать - одноразовый
-	* купон будет считаться использованным</li> <li> <b>DESCRIPTION</b> -
-	* комментарий (необязательный)</li> </ul> Необязательные ключи,
+	* купон будет считаться использованным</li> 			<li> <b>DESCRIPTION</b> -
+	* комментарий (необязательный)</li> 		</ul> 		Необязательные ключи,
 	* отсутствующие в массиве, получат значения по умолчанию.
 	*
 	* @param boolean $bAffectDataFile = True Необязательный параметр, указывающий на необходимость
@@ -42,13 +42,13 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*
 	* @return mixed <p>Метод возвращает код (ID) купона в случае успешного создания и
 	* <i>false</i>, если произошла ошибка. Для получения детальной
-	* информации об ошибке следует вызвать $APPLICATION-&gt;GetException().</p> <p>Перед
+	* информации об ошибке следует вызвать $APPLICATION-&gt;GetException().</p><p>Перед
 	* добавлением записи в таблицу осуществляется проверка параметров
 	* привязки методом CCatalogDiscountCoupon::CheckFields. Если проверка прошла
 	* успешно, производится запись в базу.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (CModule::IncludeModule("catalog"))
 	* {
 	* 	$COUPON = CatalogGenerateCoupon();
@@ -74,19 +74,20 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a></li>
-	* <li><a
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php">CCatalogDiscountCoupon::Update</a></li>
-	* </ul> </ht<p>Перед использованием метода необходимо сгенерировать код
-	* купона функцией <b>CatalogGenerateCoupon()</b>.</p> <a name="examples"></a>
+	* </ul><p>Перед использованием метода необходимо сгенерировать код
+	* купона функцией <b>CatalogGenerateCoupon()</b>.</p><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php
 	* @author Bitrix
 	*/
-	static public function Add($arFields, $bAffectDataFile = true)
+	public static function Add($arFields, $bAffectDataFile = true)
 	{
 		static $eventOnBeforeAddExists = null;
 		static $eventOnAddExists = null;
@@ -132,23 +133,23 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод обновляет информацию о купоне. Метод динамичный.</p>
+	* <p>Метод обновляет информацию о купоне. Нестатический метод.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
 	*
 	* @param array $arFields  Ассоциативный массив параметров купона. Может содержать
-	* следующие ключи: <ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки;</li> <li> <b>ACTIVE</b> -
-	* активность купона (Y|N);</li> <li> <b>ONE_TIME</b> - флаг одноразовости купона
-	* (Y|N);</li> <li> <b>COUPON</b> - код купона;</li> <li> <b>DATE_APPLY</b> - дата применения
-	* купона;</li> <li> <b>DESCRIPTION</b> - комментарий.</li> </ul> Ключи, не указанные в
-	* массиве, изменяться не будут.<br> Если массив пустой, обращения к
-	* базе не будет.
+	* следующие ключи: 		<ul> <li> <b>DISCOUNT_ID</b> - код (ID) скидки;</li> 			<li> <b>ACTIVE</b> -
+	* активность купона (Y|N);</li> 			<li> <b>ONE_TIME</b> - флаг одноразовости купона
+	* (Y|N);</li> 			<li> <b>COUPON</b> - код купона;</li> 			<li> <b>DATE_APPLY</b> - дата применения
+	* купона;</li> 			<li> <b>DESCRIPTION</b> - комментарий.</li> 		</ul> 		Ключи, не
+	* указанные в массиве, изменяться не будут.<br> 		Если массив пустой,
+	* обращения к базе не будет.
 	*
 	* @return mixed <p>Метод возвращает код (ID) купона, если запись существует, была
 	* успешно изменена либо не изменялась (пустой массив) и <i>false</i> -
 	* если произошла ошибка. Для получения детальной информации об
-	* ошибке следует вызвать $APPLICATION-&gt;GetException().</p> <p>Перед изменением
+	* ошибке следует вызвать $APPLICATION-&gt;GetException().</p><p>Перед изменением
 	* записи в таблице осуществляется проверка параметров привязки
 	* методом <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a>.
@@ -156,18 +157,19 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* изменяется.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a></li>
-	* <li><a
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a></li>
-	* </ul> </ht<br><br>
+	* </ul><br><br>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php
 	* @author Bitrix
 	*/
-	static public function Update($ID, $arFields)
+	public static function Update($ID, $arFields)
 	{
 		static $eventOnBeforeUpdateExists = null;
 		static $eventOnUpdateExists = null;
@@ -215,7 +217,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод удаляет купон. Метод динамичный.</p>
+	* <p>Метод удаляет купон. Нестатический метод.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
@@ -227,13 +229,13 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* файловый кеш скидок.
 	*
 	* @return mixed <p>Метод возвращает true в случае успешного удаления и false, если
-	* произошла ошибка.</p> <br><br>
+	* произошла ошибка.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/delete.php
 	* @author Bitrix
 	*/
-	static public function Delete($ID, $bAffectDataFile = true)
+	public static function Delete($ID, $bAffectDataFile = true)
 	{
 		static $eventOnBeforeDeleteExists = null;
 		static $eventOnDeleteExists = null;
@@ -275,7 +277,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод удаляет все купоны для выбранной скидки и перегенерирует файл скидок и купонов. Метод динамичный.</p>
+	* <p>Метод удаляет все купоны для выбранной скидки и перегенерирует файл скидок и купонов. Нестатический метод.</p>
 	*
 	*
 	* @param int $ID  Код (ID) скидки.
@@ -288,13 +290,13 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* скидок.</div>
 	*
 	* @return boolean <p>Возвращает <i>true</i> в случае успеха и <i>false</i>, если произошла
-	* ошибка.</p> <br><br>
+	* ошибка.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/deletebydiscountid.php
 	* @author Bitrix
 	*/
-	static public function DeleteByDiscountID($ID, $bAffectDataFile = true)
+	public static function DeleteByDiscountID($ID, $bAffectDataFile = true)
 	{
 		global $DB;
 
@@ -310,7 +312,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 
 	
 	/**
-	* <p>Метод возвращает информацию о купоне с заданным ID. Метод динамичный.</p>
+	* <p>Метод возвращает информацию о купоне с заданным ID. Нестатический метод.</p>
 	*
 	*
 	* @param int $ID  Код (ID) купона.
@@ -319,7 +321,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* купон с таким ID не найден.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* <b>Выбор купона</b>
 	* $ID = 40;
 	* $arCoupon = CCatalogDiscountCoupon::GetByID($ID);
@@ -335,16 +337,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getlist.php">CCatalogDiscountCoupon::GetList</a></li>
-	* </ul> </ht
+	* </ul>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getbyid.php
 	* @author Bitrix
 	*/
-	static public function GetByID($ID)
+	public static function GetByID($ID)
 	{
 		global $DB;
 
@@ -376,74 +379,74 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	 */
 	
 	/**
-	* <p>Метод выбирает купоны, соответствующие условиям. Метод динамичный.</p>
+	* <p>Метод выбирает купоны, соответствующие условиям. Нестатический метод.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив вида array(by1=&gt;order1[, by2=&gt;order2 [, ..]]), где by - поле для сортировки,
-	* может принимать значения: <ul> <li> <b>ID</b> - код (ID) купона;</li> <li>
-	* <b>DISCOUNT_ID</b> - код (ID) скидки;</li> <li> <b>ACTIVE</b> - активность купона;</li> <li>
-	* <b>ONE_TIME</b> - флаг однократного использования купона;</li> <li> <b>COUPON</b> -
-	* код купона;</li> <li> <b>DATE_APPLY</b> - дата применения купона;</li> </ul> поле order
-	* - направление сортировки, может принимать значения: <ul> <li> <b>asc</b> -
-	* по возрастанию;</li> <li> <b>desc</b> - по убыванию.</li> </ul> Необязательный.
-	* По умолчанию купоны не сортируются.
+	* может принимать значения: 		<ul> <li> <b>ID</b> - код (ID) купона;</li> 			<li>
+	* <b>DISCOUNT_ID</b> - код (ID) скидки;</li> 			<li> <b>ACTIVE</b> - активность купона;</li>
+	* 			<li> <b>ONE_TIME</b> - флаг однократного использования купона;</li> 			<li>
+	* <b>COUPON</b> - код купона;</li> 			<li> <b>DATE_APPLY</b> - дата применения купона;</li>
+	* 		</ul> 		поле order - направление сортировки, может принимать значения:
+	* 		<ul> <li> <b>asc</b> - по возрастанию;</li> 		<li> <b>desc</b> - по убыванию.</li> 		</ul>
+	* 		Необязательный. По умолчанию купоны не сортируются.
 	*
 	* @param array $arFilter = array() Массив параметров, по которым строится фильтр выборки. Имеет вид:
-	* <pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
+	* 		<pre class="syntax">array( "[модификатор1][оператор1]название_поля1" =&gt;
 	* "значение1", "[модификатор2][оператор2]название_поля2" =&gt; "значение2",
-	* . . . )</pre> Удовлетворяющие фильтру записи возвращаются в
+	* . . . )</pre> 		Удовлетворяющие фильтру записи возвращаются в
 	* результате, а записи, которые не удовлетворяют условиям фильтра,
-	* отбрасываются.<br> Допустимыми являются следующие модификаторы:
-	* <ul> <li> <b>!</b> - отрицание;</li> <li> <b>+</b> - значения null, 0 и пустая строка
-	* так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
-	* являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
-	* или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	* поля строго больше передаваемой в фильтр величины;</li> <li> <b>&lt;=</b> -
-	* значение поля меньше или равно передаваемой в фильтр величины;</li>
-	* <li> <b>&lt;</b> - значение поля строго меньше передаваемой в фильтр
-	* величины;</li> <li> <b>@</b> - оператор может использоваться для
-	* целочисленных и вещественных данных при передаче набора
-	* значений (массива). В этом случае при генерации sql-запроса будет
-	* использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
-	* <li> <b>~</b> - значение поля проверяется на соответствие
-	* передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
-	* проверяется на соответствие передаваемой в фильтр строке в
-	* соответствии с языком запросов.</li> </ul> "название поля" может
-	* принимать значения: <ul> <li> <b>ID</b> - код (ID) купона (число);</li> <li>
-	* <b>DISCOUNT_ID</b> - код (ID) скидки (число);</li> <li> <b>ACTIVE</b> - фильтр по
+	* отбрасываются.<br> 		Допустимыми являются следующие модификаторы:
+	* 		<ul> <li> <b>!</b>  - отрицание;</li> 			<li> <b>+</b>  - значения null, 0 и пустая
+	* строка так же удовлетворяют условиям фильтра.</li> 		</ul>
+	* 		Допустимыми являются следующие операторы: 		<ul> <li> <b>&gt;=</b> -
+	* значение поля больше или равно передаваемой в фильтр величины;</li>
+	* 			<li> <b>&gt;</b>  - значение поля строго больше передаваемой в фильтр
+	* величины;</li> 			<li> <b>&lt;=</b> - значение поля меньше или равно
+	* передаваемой в фильтр величины;</li> 			<li> <b>&lt;</b> - значение поля
+	* строго меньше передаваемой в фильтр величины;</li> 			<li> <b>@</b>  -
+	* оператор может использоваться для целочисленных и вещественных
+	* данных при передаче набора значений (массива). В этом случае при
+	* генерации sql-запроса будет использован sql-оператор <b>IN</b>, дающий
+	* компактную форму записи;</li> 			<li> <b>~</b>  - значение поля проверяется
+	* на соответствие передаваемому в фильтр шаблону;</li> 			<li> <b>%</b>  -
+	* значение поля проверяется на соответствие передаваемой в фильтр
+	* строке в соответствии с языком запросов.</li> 		</ul> 		"название поля"
+	* может принимать значения: 		<ul> <li> <b>ID</b> - код (ID) купона (число);</li>
+	* 		<li> <b>DISCOUNT_ID</b> - код (ID) скидки (число);</li> 		<li> <b>ACTIVE</b> - фильтр по
 	* активности (Y|N); передача пустого значения ("ACTIVE"=&gt;"") выводит
-	* купоны без учета их состояния (строка);</li> <li> <b>ONE_TIME</b> - флаг
+	* купоны без учета их состояния (строка);</li> 		<li> <b>ONE_TIME</b> - флаг
 	* однократного использования купона (Y|N); передача пустого значения
-	* ("ONE_TIME"=&gt;"") выводит купоны без учета их типа (строка);</li> <li> <b>COUPON</b>
-	* - код купона (маска);</li> <li> <b>DATE_APPLY</b> - дата применения купона
-	* (дата);</li> <li> <b>DESCRIPTION</b> - комментарий (маска);</li> </ul> Значения
-	* фильтра - одиночное значение или массив значений.<br>
-	* Необязательное. По умолчанию купоны не фильтруются.
+	* ("ONE_TIME"=&gt;"") выводит купоны без учета их типа (строка);</li> 		<li>
+	* <b>COUPON</b> - код купона (маска);</li> 		<li> <b>DATE_APPLY</b> - дата применения
+	* купона (дата);</li> 		<li> <b>DESCRIPTION</b> - комментарий (маска);</li> 		</ul>
+	* 		Значения фильтра - одиночное значение или массив значений.<br>
+	* 		Необязательное. По умолчанию купоны не фильтруются.
 	*
-	* @param mixed $arGroupBy = false Массив полей для группировки купонов. имеет вид: <pre
-	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В качестве
-	* "название_поля<i>N</i>" может стоять любое поле каталога. <br><br> Если
+	* @param mixed $arGroupBy = false Массив полей для группировки купонов. имеет вид: 		<pre
+	* class="syntax">array("название_поля1", "название_поля2", . . .)</pre> 		В качестве
+	* "название_поля<i>N</i>" может стоять любое поле каталога. <br><br> 		Если
 	* массив пустой, то метод вернет число записей, удовлетворяющих
-	* фильтру. <br> Значение по умолчанию - <i>false</i> - означает, что
+	* фильтру. 		<br> 		Значение по умолчанию - <i>false</i> - означает, что
 	* результат группироваться не будет.
 	*
-	* @param mixed $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* @param mixed $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: 			<ul>
 	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
-	* ограничено сверху значением этого ключа;</li> <li>любой ключ,
+	* ограничено сверху значением этого ключа;</li> 			<li>любой ключ,
 	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	* параметра.</li> </ul> Необязательный. По умолчанию false - купоны не
+	* параметра.</li> 			</ul> 			Необязательный. По умолчанию false - купоны не
 	* ограничиваются.
 	*
 	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать следующие поля <i>ID</i>, <i>DISCOUNT_ID</i>, <i>ACTIVE</i>, <i>ONE_TIME</i>, <i>COUPON</i>,
 	* <i>DATE_APPLY</i>, <i>DISCOUNT_NAME</i> и <i>DESCRIPTION</i>.<br> Если в массиве присутствует
 	* значение "*", то будут возвращены все доступные поля.<br>
-	* Необязательный. По умолчанию выводятся все поля.
+	* 		Необязательный. По умолчанию выводятся все поля.
 	*
 	* @return CDBResult <p>Метод возвращает объект класса CDBResult.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (CModule::IncludeModule("catalog"))
 	* { 
 	*    $arFilter = array('COUPON' =&gt; 'CP-R8RFW-5YGGPZJ'); 
@@ -463,16 +466,17 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	* 	<li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getbyid.php">CCatalogDiscountCoupon::GetByID</a></li>
-	* </ul> </ht
+	* </ul>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/getlist.php
 	* @author Bitrix
 	*/
-	static public function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
+	public static function GetList($arOrder = array(), $arFilter = array(), $arGroupBy = false, $arNavStartParams = false, $arSelectFields = array())
 	{
 		global $DB;
 
@@ -564,7 +568,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* @deprecated deprecated since catalog 15.0.4
 	* @see \Bitrix\Sale\DiscountCouponsManager
 	*/
-	static public function CouponApply($intUserID, $strCoupon)
+	public static function CouponApply($intUserID, $strCoupon)
 	{
 		if (self::$existCouponsManager === null)
 			self::initCouponManager();
@@ -654,7 +658,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* @deprecated deprecated since catalog 12.5.6
 	* @see CCatalogDiscountCoupon::CouponOneOrderDisable()
 	*/
-	static public function __CouponOneOrderDisable($arCoupons)
+	public static function __CouponOneOrderDisable($arCoupons)
 	{
 		global $DB;
 		if (!is_array($arCoupons))
@@ -670,7 +674,7 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	* @deprecated deprecated since catalog 15.0.4
 	* @see \Bitrix\Sale\DiscountCouponsManager::saveApplied
 	*/
-	static public function CouponOneOrderDisable($intOrderID = 0)
+	public static function CouponOneOrderDisable($intOrderID = 0)
 	{
 		if (self::$existCouponsManager === null)
 			self::initCouponManager();
@@ -711,19 +715,19 @@ class CCatalogDiscountCoupon extends CAllCatalogDiscountCoupon
 	*/
 	
 	/**
-	* <p>Метод проверяет существование купона. Метод динамичный.</p>
+	* <p>Метод проверяет существование купона. Нестатический метод.</p>
 	*
 	*
 	* @param string $strCoupon  Код купона.
 	*
-	* @return bool <p> В случае наличия купона возвращает true, иначе - false.</p> <br><br>
+	* @return bool <p> В случае наличия купона возвращает true, иначе - false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/isexistcoupon.php
 	* @author Bitrix
 	* @deprecated deprecated since catalog 15.0.4  ->  \Bitrix\Sale\DiscountCouponsManager::isExist
 	*/
-	static public function IsExistCoupon($strCoupon)
+	public static function IsExistCoupon($strCoupon)
 	{
 		if (self::$existCouponsManager === null)
 			self::initCouponManager();

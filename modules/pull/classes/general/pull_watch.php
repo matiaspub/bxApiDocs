@@ -35,7 +35,7 @@ class CAllPullWatch
 		}
 		if ($arResult && $arResult[$tag])
 		{
-			if ($arResult[$tag]['DATE_CREATE']+1800 > time())
+			if ($arResult[$tag]['DATE_CREATE']+1860 > time())
 			{
 				self::$arUpdate[intval($arResult[$tag]['ID'])] = intval($arResult[$tag]['ID']);
 				return true;
@@ -65,12 +65,17 @@ class CAllPullWatch
 			return false;
 
 		if (defined('PULL_USER_ID'))
+		{
 			$userId = PULL_USER_ID;
-
-		$userId = intval($userId);
-
-		if ($userId === 0)
-			$userId = $USER->GetId();
+		}
+		else if ($GLOBALS['USER'] && $GLOBALS['USER']->GetID() > 0)
+		{
+			$userId = $GLOBALS['USER']->GetId();
+		}
+		else if (IsModuleInstalled('statistic') && intval($_SESSION["SESS_SEARCHER_ID"]) <= 0 && intval($_SESSION["SESS_GUEST_ID"]) > 0 && COption::GetOptionString("pull", "guest") == 'Y')
+		{
+			$userId = intval($_SESSION["SESS_GUEST_ID"])*-1;
+		}
 
 		if ($userId === 0)
 			return false;
@@ -142,6 +147,7 @@ class CAllPullWatch
 		if (intval($userId) == 0 || strlen($tag) <= 0)
 			return false;
 
+		$result = false;
 		$strSql = "SELECT ID FROM b_pull_watch WHERE USER_ID = ".intval($userId)." AND TAG = '".$DB->ForSQL($tag)."'";
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		if ($arRes = $dbRes->Fetch())
@@ -150,17 +156,26 @@ class CAllPullWatch
 			$arChannel = CPullChannel::Get($userId);
 			$DB->Query("UPDATE b_pull_watch SET DATE_CREATE = ".$DB->CurrentTimeFunction().", CHANNEL_ID = '".$DB->ForSQL($arChannel['CHANNEL_ID'])."' WHERE ID = ".$ID);
 			$CACHE_MANAGER->Clean("b_pw_".$userId, "b_pull_watch");
+			$result = true;
 		}
-		return false;
+		return $result;
+
 	}
 
 	public static function AddToStack($tag, $arMessage)
 	{
 		global $DB;
 
-		$arChannels = Array();
+		$arPush = Array();
+		if (isset($arMessage['push']))
+		{
+			$arPush = $arMessage['push'];
+			unset($arMessage['push']);
+		}
+
+		$channels = Array();
 		$strSql = "
-				SELECT pc.CHANNEL_ID
+				SELECT pc.CHANNEL_ID, pc.USER_ID
 				FROM b_pull_watch pw
 				LEFT JOIN b_pull_channel pc ON pw.USER_ID = pc.USER_ID
 				WHERE pw.TAG = '".$DB->ForSQL($tag)."'
@@ -168,12 +183,36 @@ class CAllPullWatch
 		$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 		while ($arRes = $dbRes->Fetch())
 		{
-			$arChannels[] = $arRes['CHANNEL_ID'];
+			$channels[$arRes['USER_ID']] = $arRes['CHANNEL_ID'];
 		}
 
-		$result = CPullStack::AddByChannel($arChannels, $arMessage);
-		if (!$result)
-			return false;
+		$result = CPullStack::AddByChannel($channels, $arMessage);
+		if ($result && !empty($arPush) && (isset($arPush['advanced_params']) || isset($arPush['message']) && strlen($arPush['message']) > 0))
+		{
+			$CPushManager = new CPushManager();
+
+			$pushUsers = Array();
+			foreach ($channels as $userId => $channelId)
+			{
+				if (isset($arPush['skip_users']) && in_array($userId, $arPush['skip_users']))
+					continue;
+
+				$pushUsers[] = $userId;
+			}
+
+			$CPushManager->AddQueue(Array(
+				'USER_ID' => $pushUsers,
+				'MESSAGE' => str_replace("\n", " ", $arPush['message']),
+				'PARAMS' => $arPush['params'],
+				'ADVANCED_PARAMS' => isset($arPush['advanced_params'])? $arPush['advanced_params']: Array(),
+				'BADGE' => isset($arPush['badge'])? intval($arPush['badge']): '',
+				'SOUND' => isset($arPush['sound'])? $arPush['sound']: '',
+				'TAG' => isset($arPush['tag'])? $arPush['tag']: '',
+				'SUB_TAG' => isset($arPush['sub_tag'])? $arPush['sub_tag']: '',
+				'APP_ID' => isset($arPush['app_id'])? $arPush['app_id']: '',
+				'SEND_IMMEDIATELY' => isset($arPush['send_immediately']) && $arPush['send_immediately'] == 'Y'? 'Y': 'N',
+			));
+		}
 
 		return true;
 	}

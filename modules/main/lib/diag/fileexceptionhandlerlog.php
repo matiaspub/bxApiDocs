@@ -35,7 +35,11 @@ class FileExceptionHandlerLog
 			$this->level = intval($options["level"]);
 	}
 
-	public function write(\Exception $exception, $logType)
+	/**
+	 * @param \Error|\Exception $exception
+	 * @param int $logType
+	 */
+	public function write($exception, $logType)
 	{
 		$text = ExceptionHandlerFormatter::format($exception, false, $this->level);
 		$this->writeToLog(date("Y-m-d H:i:s")." - Host: ".$_SERVER["HTTP_HOST"]." - ".static::logTypeToString($logType)." - ".$text."\n");

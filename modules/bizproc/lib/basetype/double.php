@@ -23,6 +23,42 @@ class Double extends Base
 	}
 
 	/**
+	 * Normalize single value.
+	 *
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @return mixed Normalized value
+	 */
+	
+	/**
+	* <p>Статический метод нормализует одиночное значение.</p>
+	*
+	*
+	* @param mixed $Bitrix  Тип поля документа.
+	*
+	* @param Bitri $Bizproc  Значение поля.
+	*
+	* @param FieldType $fieldType  
+	*
+	* @param mixed $value  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/double/tosinglevalue.php
+	* @author Bitrix
+	*/
+	public static function toSingleValue(FieldType $fieldType, $value)
+	{
+		if (is_array($value))
+		{
+			reset($value);
+			$value = current($value);
+		}
+		return $value;
+	}
+
+	/**
 	 * @param FieldType $fieldType Document field type.
 	 * @param mixed $value Field value.
 	 * @param string $toTypeClass Type class name.
@@ -64,6 +100,37 @@ class Double extends Base
 	}
 
 	/**
+	 * Return conversion map for current type.
+	 * @return array Map.
+	 */
+	
+	/**
+	* <p>Статический метод возвращает таблицу преобразования для текущего типа.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/double/getconversionmap.php
+	* @author Bitrix
+	*/
+	public static function getConversionMap()
+	{
+		return array(
+			array(
+				FieldType::BOOL,
+				FieldType::DATE,
+				FieldType::DATETIME,
+				FieldType::DOUBLE,
+				FieldType::INT,
+				FieldType::STRING,
+				FieldType::TEXT,
+				FieldType::USER
+			)
+		);
+	}
+
+	/**
 	 * @param FieldType $fieldType
 	 * @param array $field
 	 * @param mixed $value
@@ -76,11 +143,11 @@ class Double extends Base
 		$name = static::generateControlName($field);
 		$controlId = static::generateControlId($field);
 		$renderResult = '<input type="text" size="10" id="'.htmlspecialcharsbx($controlId).'" name="'
-			.htmlspecialcharsbx($name).'" value="'.htmlspecialcharsbx((string) $value).'">';
+			.htmlspecialcharsbx($name).'" value="'.htmlspecialcharsbx((string) $value).'"/>';
 
 		if ($allowSelection)
 		{
-			$renderResult .= static::renderControlSelector($field);
+			$renderResult .= static::renderControlSelector($field, null, false, '', $fieldType);
 		}
 		return $renderResult;
 	}
@@ -104,6 +171,7 @@ class Double extends Base
 	 */
 	public static function renderControlSingle(FieldType $fieldType, array $field, $value, $allowSelection, $renderMode)
 	{
+		$value = static::toSingleValue($fieldType, $value);
 		return static::renderControl($fieldType, $field, $value, $allowSelection, $renderMode);
 	}
 

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CCountry</b> - класс для получения данных по трафику в разрезе по странами. 
+ * <b>CCountry</b> - класс для получения данных по трафику в разрезе по странами.
  *
  *
  * @return mixed 
@@ -17,42 +17,44 @@ class CCountry
 	* <p>Возвращает список стран, определённых в модуле "Статистика". Загрузка списка стран осуществляется при переиндексации базы IP адресов в настройках модуля "Статистика".</p>
 	*
 	*
-	* @param string &$by = "s_name" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> -
-	* двухсимвольный идентификатор страны; </li> <li> <b>s_short_name</b> -
-	* трехсимвольный идентификатор страны; </li> <li> <b>s_name</b> -
-	* наименование страны; </li> <li> <b>s_sessions</b> - суммарное кол-во <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> по данной стране;
-	* </li> <li> <b>s_new_guests</b> - суммарное кол-во <a
+	* @param string &$by = "s_name" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> -
+	* двухсимвольный идентификатор страны; </li>                    <li> <b>s_short_name</b>
+	* - трехсимвольный идентификатор страны; </li>                    <li> <b>s_name</b> -
+	* наименование страны; </li>                    <li> <b>s_sessions</b> - суммарное кол-во
+	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> по данной стране;
+	* </li>                    <li> <b>s_new_guests</b> - суммарное кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> по
-	* данной стране; </li> <li> <b>s_hits</b> - суммарное кол-во <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> по данной стране; </li>
-	* <li> <b>s_events</b> - суммарное кол-во <a
+	* данной стране; </li>                    <li> <b>s_hits</b> - суммарное кол-во <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> по данной стране; </li>    
+	*                <li> <b>s_events</b> - суммарное кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> по данной стране.
-	* </li> </ul>
+	* </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - двухсимвольный
-	* идентификатор страны; </li> <li> <b>ID_EXACT_MATCH</b> - если значение равно "N",
-	* то при фильтрации по <b>ID</b> будет искаться вхождение; </li> <li>
-	* <b>SHORT_NAME</b>* - трехсимвольный идентификатор страны; </li> <li>
-	* <b>SHORT_NAME_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>SHORT_NAME</b> будет искаться точное совпадение; </li> <li> <b>NAME</b>* -
-	* наименование страны; </li> <li> <b>NAME_EXACT_MATCH</b> - если значение равно "Y",
-	* то при фильтрации по <b>NAME_EXACT_MATCH</b> будет искаться точное
-	* совпадение; </li> <li> <b>SESSIONS1</b> - начальное значение интервала для
-	* поля "кол-во сессий"; </li> <li> <b>SESSIONS2</b> - конечное значение интервала
-	* для поля "кол-во сессий"; </li> <li> <b>NEW_GUESTS1</b> - начальное значение
-	* интервала для поля "кол-во новых посетителей"; </li> <li> <b>NEW_GUESTS2</b> -
-	* конечное значение интервала для поля "кол-во новых посетителей";
-	* </li> <li> <b>HITS1</b> - начальное значение интервала для поля "кол-во
-	* хитов"; </li> <li> <b>HITS2</b> - конечное значение интервала для поля "кол-во
-	* хитов"; </li> <li> <b>EVENTS1</b> - начальное значение интервала для поля
-	* "кол-во событий"; </li> <li> <b>EVENTS2</b> - конечное значение интервала для
-	* поля "кол-во событий". <br><br> * - допускается <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a> </li> </ul>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - двухсимвольный
+	* идентификатор страны; </li>                    <li> <b>ID_EXACT_MATCH</b> - если значение
+	* равно "N", то при фильтрации по <b>ID</b> будет искаться вхождение; </li>   
+	*                 <li> <b>SHORT_NAME</b>* - трехсимвольный идентификатор страны; </li>   
+	*                 <li> <b>SHORT_NAME_EXACT_MATCH</b> - если значение равно "Y", то при
+	* фильтрации по <b>SHORT_NAME</b> будет искаться точное совпадение; </li>        
+	*            <li> <b>NAME</b>* - наименование страны; </li>                    <li>
+	* <b>NAME_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>NAME_EXACT_MATCH</b> будет искаться точное совпадение; </li>                    <li>
+	* <b>SESSIONS1</b> - начальное значение интервала для поля "кол-во сессий";
+	* </li>                    <li> <b>SESSIONS2</b> - конечное значение интервала для поля
+	* "кол-во сессий"; </li>                    <li> <b>NEW_GUESTS1</b> - начальное значение
+	* интервала для поля "кол-во новых посетителей"; </li>                    <li>
+	* <b>NEW_GUESTS2</b> - конечное значение интервала для поля "кол-во новых
+	* посетителей"; </li>                    <li> <b>HITS1</b> - начальное значение
+	* интервала для поля "кол-во хитов"; </li>                    <li> <b>HITS2</b> -
+	* конечное значение интервала для поля "кол-во хитов"; </li>                   
+	* <li> <b>EVENTS1</b> - начальное значение интервала для поля "кол-во
+	* событий"; </li>                    <li> <b>EVENTS2</b> - конечное значение интервала
+	* для поля "кол-во событий".              <br><br>           * - допускается <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a> </li>         </ul>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка UserAgent'ов. Если значение равно "true",
 	* то список был отфильтрован.
@@ -60,7 +62,7 @@ class CCountry
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем только те страны из которых было не менее 100 заходов на сайт
 	* $arFilter = array(
@@ -81,8 +83,6 @@ class CCountry
 	*     echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // выпадающий список с одиночным выбором
 	* echo SelectBox("COUNTRY_ID", <b>CCountry::GetList</b>(), "", intval($COUNTRY_ID));
@@ -96,9 +96,9 @@ class CCountry
 	* <h4>See Also</h4> 
 	* <ul> <li>Пользовательскую документацию, <a
 	* href="http://www.1c-bitrix.ru/user_help/statistic/settings.php">настройки модуля
-	* "Статистика"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectbox.php">SelectBox</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li> </ul> <a
+	* "Статистика"</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectbox.php">SelectBox</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/html/selectboxm.php">SelectBoxM</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -219,30 +219,32 @@ class CCountry
 	*
 	*
 	* @param array $filter  Массив для фильтрации стран. В массиве допустимы следующие ключи:
-	* <ul> <li> <b>COUNTRY_ID</b> - двухсимвольный идентификатор страны; </li> <li>
-	* <b>DATE1</b> - начальное значение <i>интервала времени</i>; </li> <li> <b>DATE2</b> -
-	* конечное значение <i>интервала времени</i>. </li> </ul>
+	*          <ul> <li> <b>COUNTRY_ID</b> - двухсимвольный идентификатор страны; </li>      
+	*               <li> <b>DATE1</b> - начальное значение <i>интервала времени</i>; </li>   
+	*                  <li> <b>DATE2</b> - конечное значение <i>интервала времени</i>. </li>  
+	*        </ul>
 	*
 	* @param array &$legend  Массив содержащий суммарные показатели по каждой стране, а также
 	* цвет линии графика и сектора круговой диаграммы для каждой
-	* страны. Структура данного массива: <pre>Array<br>(<br> [<i>ID страны</i>] =&gt;
-	* Array<br> (<br> [NAME] =&gt; название страны<br> [SESSIONS] =&gt; кол-во <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> за <i>интервал
-	* времени</i><br> [NEW_GUESTS] =&gt; кол-во <a
+	* страны. Структура данного массива:          <pre bgcolor="#323232" style="padding:5px;">Array<br>(<br>    [<i>ID страны</i>]
+	* =&gt; Array<br>        (<br>            [NAME] =&gt; название страны<br>            [SESSIONS] =&gt;
+	* кол-во <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессий</a> за
+	* <i>интервал времени</i><br>            [NEW_GUESTS] =&gt; кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> за
-	* <i>интервал времени</i><br> [HITS] =&gt; кол-во <a
+	* <i>интервал времени</i><br>            [HITS] =&gt; кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> за <i>интервал
-	* времени</i><br> [C_EVENTS] =&gt; кол-во <a
+	* времени</i><br>            [C_EVENTS] =&gt; кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">событий</a> за <i>интервал
-	* времени</i><br> [TOTAL_SESSIONS] =&gt; суммарное кол-во сессий<br> [TOTAL_NEW_GUESTS] =&gt;
-	* суммарное кол-во новых посетителей<br> [TOTAL_HITS] =&gt; суммарное кол-во
-	* хитов<br> [TOTAL_C_EVENTS] =&gt; суммарное кол-во событий<br> [COLOR] =&gt; цвет
-	* линии графика и сектора круговой диаграммы<br> )<br> ...<br>)<br></pre>
+	* времени</i><br>            [TOTAL_SESSIONS] =&gt; суммарное кол-во сессий<br>           
+	* [TOTAL_NEW_GUESTS] =&gt; суммарное кол-во новых посетителей<br>            [TOTAL_HITS]
+	* =&gt; суммарное кол-во хитов<br>            [TOTAL_C_EVENTS] =&gt; суммарное кол-во
+	* событий<br>            [COLOR] =&gt; цвет линии графика и сектора круговой
+	* диаграммы<br>        )<br>    ...<br>)<br></pre>
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/colors.php");<br>// отфильтруем данные только по России на декабрь 2007 года<br>$arFilter = Array(<br>    "COUNTRY_ID" =&gt; "ru",<br>    "DATE1"      =&gt; "01.12.2007",<br>    "DATE2"      =&gt; "31.12.2007"<br>    );<br><br>// получим массив данных в разрезе по дням<br>$arDays = <b>CCountry::GetGraphArray</b>($arFilter, $arLegend);<br><br>// выведем полученные данные по России за декабрь 2007 года<br>while (list($date, $arr) = each($arDays))<br>{<br>    echo "Дата: ".$date."&lt;br&gt;";<br>    echo "Данные на эту дату: &lt;pre&gt;"; print_r($arr); echo "&lt;/pre&gt;";    <br>}<br>?&gt;<br>
 	* </pre>
 	*
@@ -250,7 +252,7 @@ class CCountry
 	* <h4>See Also</h4> 
 	* <ul> <li>Пользовательскую документацию, <a
 	* href="http://www.1c-bitrix.ru/user_help/statistic/site_traffic/country_list.php">"География по
-	* странам"</a> </li> </ul> <a name="examples"></a>
+	* странам"</a> </li>  </ul><a name="examples"></a>
 	*
 	*
 	* @static

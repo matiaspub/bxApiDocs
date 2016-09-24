@@ -14,18 +14,18 @@ class CAllSaleOrderUserPropsValue
 {
 	
 	/**
-	* <p>Метод возвращает параметры свойства с кодом ID профиля покупателя. Метод динамичный.</p>
+	* <p>Метод возвращает параметры свойства с кодом ID профиля покупателя. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код свойства профиля покупателя.
+	* @param mixed $intID  Код свойства профиля покупателя.
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров свойства с
-	* ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th>
-	* </tr> <tr> <td>ID</td> <td>Код свойства профиля покупателя.</td> </tr> <tr>
-	* <td>USER_PROPS_ID</td> <td>Код профиля покупателя.</td> </tr> <tr> <td>ORDER_PROPS_ID</td>
-	* <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td> <td>Название свойства
-	* заказа.</td> </tr> <tr> <td>VALUE</td> <td>Значение свойства заказа, сохраненное
-	* в профиле покупателя.</td> </tr> </table> <p>  </p
+	* ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>     <th>Описание</th>
+	*   </tr> <tr> <td>ID</td>     <td>Код свойства профиля покупателя.</td> </tr> <tr>
+	* <td>USER_PROPS_ID</td>     <td>Код профиля покупателя.</td> </tr> <tr> <td>ORDER_PROPS_ID</td>    
+	* <td>Код свойства заказа.</td> </tr> <tr> <td>NAME</td>     <td>Название свойства
+	* заказа.</td> </tr> <tr> <td>VALUE</td>     <td>Значение свойства заказа,
+	* сохраненное в профиле покупателя.</td> </tr> </table><p>  </p>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserpropsvalue/csaleorderuserpropsvalue__getbyid.51200d18.php
@@ -65,16 +65,16 @@ class CAllSaleOrderUserPropsValue
 
 	
 	/**
-	* <p>Метод удаляет свойство с кодом ID профиля покупателя. Метод динамичный.</p>
+	* <p>Метод удаляет свойство с кодом ID профиля покупателя. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код свойства профиля покупателя.
+	* @param mixed $intID  Код свойства профиля покупателя.
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае. </p> <a name="examples"></a>
+	* противном случае. </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* CSaleOrderUserPropsValue::Delete(17);
 	* ?&gt;
@@ -94,13 +94,13 @@ class CAllSaleOrderUserPropsValue
 
 	
 	/**
-	* <p>Метод удаляет все свойства профиля покупателя для профиля с кодом ID. Метод динамичный. </p>
+	* <p>Метод удаляет все свойства профиля покупателя для профиля с кодом ID. Нестатический метод. </p>
 	*
 	*
-	* @param int $ID  Код профиля покупателя.
+	* @param mixed $intID  Код профиля покупателя.
 	*
 	* @return bool <p>Возвращается <i>true</i> в случае успешного удаления и <i>false</i> - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserpropsvalue/csaleorderuserpropsvalue__deleteall.96a04722.php
@@ -115,12 +115,12 @@ class CAllSaleOrderUserPropsValue
 	
 	
 	/**
-	* <p>Метод обновляет свойство профиля покупателя в соответствии с массивом параметров arFields. Метод динамичный.</p>
+	* <p>Метод обновляет свойство профиля покупателя в соответствии с массивом параметров arFields. Нестатический метод.</p>
 	*
 	*
-	* @param mixed $ID  Код значения свойства профиля покупателя.
+	* @param int $ID  Код значения свойства профиля покупателя.
 	*
-	* @param mixed $arFields  Массив значений свойств.
+	* @param $I $arFields  Массив значений свойств.
 	*
 	* @return array 
 	*

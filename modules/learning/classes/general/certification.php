@@ -105,19 +105,19 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод добавляет новый сертификат.</p>
+	* <p>Метод добавляет новый сертификат. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит        значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>       
 	* сертификата. Обязательные поля должны быть заполнены.
 	*
 	* @return int <p>Метод возвращает идентификатор добавленного сертификата, если
-	* добавление прошло успешно. При возникновении ошибки метод вернет
-	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	* добавление  прошло успешно. При возникновении ошибки метод
+	* вернет <i>false</i>, а в  исключениях будут содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -152,8 +152,8 @@ class CAllCertification
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a>  	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -190,21 +190,21 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод изменяет параметры сертификата с идентификатором ID.</p>
+	* <p>Метод изменяет параметры сертификата с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор сертификата.
+	* @param int $intID  Идентификатор сертификата.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">всех полей</a>
-	* сертификата. Обязательные поля должны быть заполнены.
+	* сертификата.        Обязательные поля должны быть заполнены.
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки функция вернет <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки</p>
+	* ошибки в  исключениях будет содержаться текст ошибки</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -234,9 +234,9 @@ class CAllCertification
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#certification">Поля</a>  	</li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> </ul></b<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -283,16 +283,16 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод удаляет сертификат с идентификатором ID.</p>
+	* <p>Метод удаляет сертификат с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор сертификата.
+	* @param int $intID  Идентификатор сертификата.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления
-	* сертификата, в противном случае возвращает <i>false</i>.</p>
+	* сертификата, в  противном случае возвращает <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -413,25 +413,25 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает сертификат по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает сертификат по идентификатору ID. Учитываются права доступа текущего пользователя. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор сертификата.
+	* @param mixed $intID  Идентификатор сертификата.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $CERTIFICATE_ID = 13;<br><br>    $res = CCertification::GetByID($CERTIFICATE_ID);<br><br>    if ($arCertificate = $res-&gt;GetNext())<br>    {<br>        echo "Course: ".$arCertificate["COURSE_NAME"].<br>             " User: ".$arCertificate["USER_NAME"].<br>             " Score: ".$arCertificate["SUMMARY"];<br>    }<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> <li> <a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li>  	   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li>  	   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul> </ht<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -448,7 +448,7 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Проверяет, пройден ли курс. Курс считается пройденным, если пройдены все его тесты.</p>
+	* <p>Проверяет, пройден ли курс. Курс считается пройденным, если пройдены все его тесты. Метод статический.</p>
 	*
 	*
 	* @param int $STUDENT_ID  Идентификатор студента.
@@ -458,7 +458,7 @@ class CAllCertification
 	* @return bool <p>Метод возвращает <i>true</i>, если курс пройден, иначе - <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -479,7 +479,7 @@ class CAllCertification
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a>  	</li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
@@ -552,7 +552,7 @@ class CAllCertification
 	// 2012-04-10 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Добавляет или изменяет сертификат, если курс был пройден.</p>
+	* <p>Добавляет или изменяет сертификат, если курс был пройден. Метод нестатический.</p>
 	*
 	*
 	* @param int $STUDENT_ID  Идентификатор студента.
@@ -563,18 +563,18 @@ class CAllCertification
 	* иначе - <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $STUDENT_ID = 1;<br>    $COURSE_ID = 92;<br><br>    $done = CCertification::Certificate($STUDENT_ID, $COURSE_ID);<br><br>    if ($done)<br>        echo "Success!";<br>    else<br>        echo "Course is not completed";<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/add.php">Add</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/update.php">Update</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/index.php">CTest</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctest/getlist.php">GetList</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>

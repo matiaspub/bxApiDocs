@@ -40,36 +40,34 @@ class SenderConnectorRecipient extends \Bitrix\Sender\Connector
 		$unsub = $this->getFieldValue('UNSUB', null);
 
 		$filter = array(
-			'POSTING.MAILING_ID' => $mailingId,
+			'=POSTING.MAILING_ID' => $mailingId,
 		);
 
 		if($send=='Y')
 			$filter['!STATUS'] = PostingRecipientTable::SEND_RESULT_NONE;
 		elseif($send=='N')
-			$filter['STATUS'] = PostingRecipientTable::SEND_RESULT_NONE;
+			$filter['=STATUS'] = PostingRecipientTable::SEND_RESULT_NONE;
 
 		if($read=='Y')
-			$filter['!POSTING_READ.ID'] = null;
+			$filter['=IS_READ'] = 'Y';
 		elseif($read=='N')
-			$filter['POSTING_READ.ID'] = null;
+			$filter['=IS_READ'] = 'N';
 
 		if($click=='Y')
-			$filter['!POSTING_CLICK.ID'] = null;
+			$filter['=IS_CLICK'] = 'Y';
 		elseif($click=='N')
-			$filter['POSTING_CLICK.ID'] = null;
+			$filter['=IS_CLICK'] = 'N';
 			
 		if($unsub=='Y')
-			$filter['!POSTING_UNSUB.ID'] = null;
+			$filter['=IS_UNSUB'] = 'Y';
 		elseif($unsub=='N')
-			$filter['POSTING_UNSUB.ID'] = null;
+			$filter['=IS_UNSUB'] = 'N';
 
-		$recipientDb = PostingRecipientTable::getList(array(
+		return PostingRecipientTable::getList(array(
 			'select' => array('NAME', 'EMAIL'),
 			'filter' => $filter,
 			'group' => array('NAME', 'EMAIL'),
 		));
-
-		return new \CDBResult($recipientDb);
 	}
 
 	/**

@@ -124,7 +124,7 @@ final class LocationHelper extends NameHelper
 	##############################################
 
 	// high-level validators used when accepting data typed in form. There can be some misspelling, etc, so additional buisness-logic required
-	public static function validateUpdateRequest(&$data)
+	public static function validateUpdateRequest($data)
 	{
 		$errors = parent::validateUpdateRequest($data);
 
@@ -242,7 +242,7 @@ final class LocationHelper extends NameHelper
 		$errors = array();
 		$entityClass = static::getEntityClass();
 
-		$res = $entityClass::delete($primary, array('RESET_LEGACY' => !$batch));
+		$res = $entityClass::deleteExtended($primary, array('RESET_LEGACY' => !$batch));
 		if(!$res->isSuccess())
 		{
 			$success = false;

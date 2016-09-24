@@ -206,19 +206,19 @@ class CSaleDeliveryHelper
 
 			foreach ($arItems as $itemId => $item)
 			{
-				$arTmpItems[$item["ID"]]["VOLUME"] = self::calcItemVolume($item);
-				$arTmpItems[$item["ID"]]["WEIGHT"] = $item["WEIGHT"];
-				$arTmpItems[$item["ID"]]["PRICE"] = $item["PRICE"];
+				$arTmpItems[$item["PRODUCT_ID"]]["VOLUME"] = self::calcItemVolume($item);
+				$arTmpItems[$item["PRODUCT_ID"]]["WEIGHT"] = $item["WEIGHT"];
+				$arTmpItems[$item["PRODUCT_ID"]]["PRICE"] = $item["PRICE"];
 
 				// set items parameters
-				$arTmpItems[$item["ID"]]["SET_PARENT_ID"] = $item["SET_PARENT_ID"];
-				$arTmpItems[$item["ID"]]["TYPE"] = $item["TYPE"];
+				$arTmpItems[$item["PRODUCT_ID"]]["SET_PARENT_ID"] = $item["SET_PARENT_ID"];
+				$arTmpItems[$item["PRODUCT_ID"]]["TYPE"] = $item["TYPE"];
 
 				if($item["QUANTITY"] > 1)
 				{
 					for ($i=$item["QUANTITY"]; $i > 1 ; $i--)
 					{
-						$arTmpItems[$item["ID"]."_".$i] = $arTmpItems[$item["ID"]];
+						$arTmpItems[$item["PRODUCT_ID"]."_".$i] = $arTmpItems[$item["PRODUCT_ID"]];
 					}
 				}
 			}
@@ -264,7 +264,7 @@ class CSaleDeliveryHelper
 						)
 					)
 					{
-						return false;
+						return array();
 					}
 
 					$correctCoeff = $tmpPackageVolume > 0 ? (1 - $reservedSpace) : 1;
@@ -486,7 +486,7 @@ class CSaleDeliveryHelper
 		}
 
 		$dt = new \Bitrix\Main\Type\DateTime();
-		$depList = \Bitrix\Sale\Delivery\OrderDeliveryTable::getList(array(
+		$depList = \Bitrix\Sale\Internals\OrderDeliveryReqTable::getList(array(
 			'filter'=>array('=ORDER_ID' => $orderId),
 		));
 
@@ -527,7 +527,7 @@ class CSaleDeliveryHelper
 				{
 					if($dep)
 					{
-						\Bitrix\Sale\Delivery\OrderDeliveryTable::update(
+						\Bitrix\Sale\Internals\OrderDeliveryReqTable::update(
 							$dep["ID"],
 							array(
 								"DATE_REQUEST" => $dt
@@ -536,7 +536,7 @@ class CSaleDeliveryHelper
 					}
 					else
 					{
-						\Bitrix\Sale\Delivery\OrderDeliveryTable::add(
+						\Bitrix\Sale\Internals\OrderDeliveryReqTable::add(
 							array(
 								"ORDER_ID" => $orderId,
 								"DATE_REQUEST" => $dt

@@ -49,12 +49,12 @@ class OrderBasketSettings
 		$arAvailableColumnsHTML = "";
 
 		foreach ($availableColumns as $key => $value)
-			$arAvailableColumnsHTML .= "<option value=".$key.">".$value."</option>";
+			$arAvailableColumnsHTML .= "<option value=".$key.">".htmlspecialcharsbx($value)."</option>";
 
 		$arUserColumnsHTML = "";
 
 		foreach ($this->visibleColumns as $key => $value)
-			$arUserColumnsHTML .= "<option value=".$key.">".$value."</option>";
+			$arUserColumnsHTML .= "<option value=".$key.">".htmlspecialcharsbx($value)."</option>";
 
 		$settingsTemplate = '
 			<div id="'.$this->idPrefix.'columns_form">
@@ -65,18 +65,18 @@ class OrderBasketSettings
 								<tr>
 									<td style="background-image:none" nowrap>
 										<div style="margin-bottom:5px">'.Loc::getMessage("SALE_ORDER_BASKET_SETTINGS_AVAILABLE_COLUMNS").'</div>
-											<div class="scrollable">
-												<select
-													name="allColumns"
-													class="settings_select"
-													multiple
-													size="'.count($this->allColumns).'"
-													ondblclick="this.form.add_btn.onclick()"
-													onchange="'.$this->settingsDlgObjectName.'.onAvailableChange(this);"
-												>
-												'.$arAvailableColumnsHTML.'
-												</select>
-											</div>
+										<div class="scrollable">
+											<select
+												id="adm-sale-basket-sett-all-cols"
+												name="allColumns"
+												class="settings_select"
+												multiple
+												size="'.(count($this->allColumns) - count($this->visibleColumns)).'"
+												ondblclick="this.form.add_btn.onclick()"
+												onchange="'.$this->settingsDlgObjectName.'.onAvailableChange(this);"
+											>
+											'.$arAvailableColumnsHTML.'
+											</select>
 										</div>
 									</td>
 									<td style="background-image:none">
@@ -89,18 +89,17 @@ class OrderBasketSettings
 									</td>
 									<td style="background-image:none" nowrap>
 										<div style="margin-bottom:5px">'.Loc::getMessage("SALE_ORDER_BASKET_SETTINGS_SELECTED_COLUMNS").'</div>
-											<div class="scrollable">
-												<select
-													class="settings_select"
-													name="columns"
-													multiple
-													size="'.count($this->visibleColumns).'"
-													ondblclick="this.form.del_btn.onclick()"
-													onchange="'.$this->settingsDlgObjectName.'.onSelectedChange(this);"
-													>
-												'.$arUserColumnsHTML.'
-												</select>
-											</div>
+										<div class="scrollable">
+											<select
+												class="settings_select"
+												name="columns"
+												multiple
+												size="'.count($this->visibleColumns).'"
+												ondblclick="this.form.del_btn.onclick()"
+												onchange="'.$this->settingsDlgObjectName.'.onSelectedChange(this);"
+												>
+											'.$arUserColumnsHTML.'
+											</select>
 										</div>
 									</td>
 									<td style="background-image:none">

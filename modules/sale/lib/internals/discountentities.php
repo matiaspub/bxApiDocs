@@ -29,6 +29,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы сущностей, необходимых для работы правил корзины. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sale_discount_entities';
@@ -39,6 +50,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы сущностей, необходимых для работы правил корзины. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -78,6 +100,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>MODULE_ID</code> (идентификатор модуля). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/validatemoduleid.php
+	* @author Bitrix
+	*/
 	public static function validateModuleId()
 	{
 		return array(
@@ -89,6 +122,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>ENTITY</code>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/validateentity.php
+	* @author Bitrix
+	*/
 	public static function validateEntity()
 	{
 		return array(
@@ -100,6 +144,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>FIELD_ENTITY</code>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/validatefieldentity.php
+	* @author Bitrix
+	*/
 	public static function validateFieldEntity()
 	{
 		return array(
@@ -111,6 +166,17 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>FIELD_TABLE</code>. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/validatefieldtable.php
+	* @author Bitrix
+	*/
 	public static function validateFieldTable()
 	{
 		return array(
@@ -124,6 +190,19 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 * @param int $discount			Discount id.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод удаляет список сущностей, необходимых для правила с кодом <code>$discount</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $discount  Идентификатор правила.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/deletebydiscount.php
+	* @author Bitrix
+	*/
 	public static function deleteByDiscount($discount)
 	{
 		$discount = (int)$discount;
@@ -144,6 +223,23 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 * @param bool $clear				Clear old values.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод обновляет параметры списка сущностей в соответствии с правилом, имеющим код <code>$discount</code>. Метод статический.</p>
+	*
+	*
+	* @param integer $discount  Идентификатор правила.
+	*
+	* @param array $entityList  Массив сущностей.
+	*
+	* @param boolean $clear  Если параметр принимает <i>true</i>, то будут очищены старые значения.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/updatebydiscount.php
+	* @author Bitrix
+	*/
 	public static function updateByDiscount($discount, $entityList, $clear)
 	{
 		$discount = (int)$discount;
@@ -196,6 +292,24 @@ class DiscountEntitiesTable extends Main\Entity\DataManager
 	 * @param bool $groupModule			Group by modules.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает массив сущностей в соответствии с массивом правил корзины <code>$discountList</code>. Метод статический.</p>
+	*
+	*
+	* @param array $discountList  Массив идентификаторов правил.
+	*
+	* @param array $filter = array() Массив дополнительной фильтрации.
+	*
+	* @param boolean $groupModule = true Если параметр принимает <i>true</i>, то будет выполнена группировка по
+	* модулям.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/internals/discountentitiestable/getbydiscount.php
+	* @author Bitrix
+	*/
 	public static function getByDiscount($discountList, $filter = array(), $groupModule = true)
 	{
 		$groupModule = ($groupModule === true);

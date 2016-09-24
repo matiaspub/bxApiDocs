@@ -27,6 +27,27 @@ class Agent
 	 * @throws ArgumentOutOfRangeException
 	 */
 
+	
+	/**
+	* <p>Начинает обмен данными. Метод статический.</p>
+	*
+	*
+	* @param mixed $feedType  Тип обмена информацией.
+	*
+	* @param $feedTyp $siteId  Идентификатор сайта.
+	*
+	* @param string $startPosition = "" Позиция, с которой будет начат обмен.
+	*
+	* @param mixed $boolean  Запускать агент один раз или постоянно.
+	*
+	* @param false $once = false 
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/ebay/agent/start.php
+	* @author Bitrix
+	*/
 	public static function start($feedType, $siteId, $startPosition="", $once = false)
 	{
 		if(empty($siteId))
@@ -34,7 +55,7 @@ class Agent
 
 		$siteId = \EscapePHPString($siteId);
 
-		if(!in_array($feedType, array("ORDER", "PRODUCT", "INVENTORY", "IMAGE")))
+		if(!in_array($feedType, array("ORDER", "PRODUCT", "INVENTORY", "IMAGE", "PROCESS_RESULT", "RESULTS", "ORDER_ACK")))
 			throw new ArgumentOutOfRangeException('feedType');
 
 		$result = "";
@@ -91,9 +112,9 @@ class Agent
 
 		if($feedType == "ORDER")
 			$sort = 50;
-		elseif($feedType == "PRODUCT")
+		elseif($feedType == "PRODUCT" || $feedType == "PROCESS_RESULT" || $feedType ==  "RESULTS")
 			$sort = 100;
-		elseif($feedType == "INVENTORY" || $feedType == "IMAGE")
+		elseif($feedType == "INVENTORY" || $feedType == "IMAGE" || $feedType == "ORDER_ACK" )
 			$sort = 150;
 		else
 			throw new ArgumentOutOfRangeException('feedType');
@@ -128,6 +149,21 @@ class Agent
 	 * @param array $feedSettings Feed settings.
 	 * @return array Feed settings with renew agents ids.
 	 */
+	
+	/**
+	* <p>Метод обновляет параметры агента. Метод статический</p>
+	*
+	*
+	* @param string $siteId  Идентификатор сайта.
+	*
+	* @param array $feedSettings  Настройки обмена информации.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/ebay/agent/update.php
+	* @author Bitrix
+	*/
 	public static function update($siteId, array $feedSettings)
 	{
 		foreach($feedSettings as $feedType => $feedParams)

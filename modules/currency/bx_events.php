@@ -38,7 +38,7 @@ class _CEventsCurrency {
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__add.17dc7357.php">CCurrency::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -87,7 +87,7 @@ class _CEventsCurrency {
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrency/ccurrency__update.16586d51.php">CCurrency::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -129,7 +129,7 @@ class _CEventsCurrency {
  * @param string $currency  Код валюты.
  *
  * @return mixed <h4>Параметры</h4><table class="tnormal" width="100%"> <tr> <th width="15%">Параметр</th>
- * <th>Описание</th> </tr> <tr> <td>currency</td> <td>Код валюты.</td> </tr> </table> <p>Нет.</p></bo
+ * 		<th>Описание</th> 	</tr> <tr> <td>currency</td> 		<td>Код валюты.</td> 	</tr> </table><p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -194,13 +194,13 @@ class _CEventsCurrency {
  * <p>OnCurrencyRateAdd - событие, вызываемое в случае успешного добавления нового курса валюты.</p>
  *
  *
- * @param int $ID  Код курса валюты. </h
+ * @param mixed $intID  Код курса валюты.
  *
  * @param array $arFields  Ассоциативный массив параметров курса валюты. Перечень
  * допустимых ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__add.a9ea23d5.php">CCurrencyRates::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -212,13 +212,13 @@ class _CEventsCurrency {
  * @link http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencyrateadd.php
  * @author Bitrix
  */
-	public static function OnCurrencyRateAdd($ID, $arFields){}
+	public static function OnCurrencyRateAdd($intID, $arFields){}
 
 /**
  * <p>OnBeforeCurrencyRateUpdate - событие, вызываемое перед обновлением существующего курса валюты. Позволяет изменить вносимые данные.</p>
  *
  *
- * @param int $ID  Код курса валюты. </h
+ * @param mixed $intID  Код курса валюты.
  *
  * @param array $arFields  Ассоциативный массив параметров курса валюты. Перечень
  * допустимых ключей массива смотрите в <a
@@ -237,19 +237,19 @@ class _CEventsCurrency {
  * @link http://dev.1c-bitrix.ru/api_help/currency/events/onbeforecurrencyrateupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeCurrencyRateUpdate($ID, $arFields){}
+	public static function OnBeforeCurrencyRateUpdate($intID, $arFields){}
 
 /**
  * <p>OnCurrencyRateUpdate - событие, вызываемое в случае успешного изменения курса валюты.</p>
  *
  *
- * @param int $ID  Код курса валюты. </h
+ * @param mixed $intID  Код курса валюты.
  *
  * @param array $arFields  Ассоциативный массив параметров курса валюты. Перечень
  * допустимых ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__update.1f36666f.php">CCurrencyRates::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -261,13 +261,13 @@ class _CEventsCurrency {
  * @link http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencyrateupdate.php
  * @author Bitrix
  */
-	public static function OnCurrencyRateUpdate($ID, $arFields){}
+	public static function OnCurrencyRateUpdate($intID, $arFields){}
 
 /**
  * <p>OnBeforeCurrencyRateDelete - событие, вызываемое перед удалением курса валюты в методе <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__delete.28de3643.php">CCurrencyRates::Delete</a>.</p>
  *
  *
- * @param int $ID  Код курса валюты. </h
+ * @param mixed $intID  Код курса валюты.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
  * отменено.</li> </ul>
@@ -282,15 +282,15 @@ class _CEventsCurrency {
  * @link http://dev.1c-bitrix.ru/api_help/currency/events/onbeforecurrencyratedelete.php
  * @author Bitrix
  */
-	public static function OnBeforeCurrencyRateDelete($ID){}
+	public static function OnBeforeCurrencyRateDelete($intID){}
 
 /**
  * <p>OnCurrencyRateDelete - событие, вызываемое при удалении существующего курса валюты в методе <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencyrates/ccurrencyrates__delete.28de3643.php">CCurrencyRates::Delete</a>. Может быть использовано для выполнения каких-либо действий при удалении курса валюты.</p>
  *
  *
- * @param int $ID  Код курса валюты. </h
+ * @param mixed $intID  Код курса валюты.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -302,7 +302,7 @@ class _CEventsCurrency {
  * @link http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencyratedelete.php
  * @author Bitrix
  */
-	public static function OnCurrencyRateDelete($ID){}
+	public static function OnCurrencyRateDelete($intID){}
 
 
 }

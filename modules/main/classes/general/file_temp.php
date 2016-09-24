@@ -9,7 +9,7 @@ class CTempFile
 
 		if(defined('BX_TEMPORARY_FILES_DIRECTORY'))
 		{
-			return BX_TEMPORARY_FILES_DIRECTORY;
+			return rtrim(BX_TEMPORARY_FILES_DIRECTORY, '/');
 		}
 		else
 		{

@@ -13,10 +13,10 @@ class CIMConvert
 	{
 		global $DB, $USER;
 
-		$arRecent = CUserOptions::GetOption('IM', 'recentList2', null);
+		$arRecent = CUserOptions::GetOption('im', 'recentList2', null);
 		if (is_null($arRecent))
 		{
-			$arResult = CUserOptions::GetOption('IM', 'recentList', null);
+			$arResult = CUserOptions::GetOption('im', 'recentList', null);
 			if (!is_null($arResult))
 			{
 				unset($arResult[$GLOBALS['USER']->GetID()]);
@@ -109,11 +109,11 @@ class CIMConvert
 				foreach ($arInsert as $arAdd)
 					$DB->Add('b_im_recent', $arAdd);
 			}
-			CUserOptions::SetOption('IM', 'recentList2', Array());
+			CUserOptions::SetOption('im', 'recentList2', Array());
 		}
 		else
 		{
-			CUserOptions::SetOption('IM', 'recentList2', Array());
+			CUserOptions::SetOption('im', 'recentList2', Array());
 		}
 
 		return true;
@@ -164,7 +164,6 @@ class CIMConvert
 		else
 			self::$nextConvertPerStep = $step;
 	}
-
 
 	public static function UndeliveredMessageAgent()
 	{

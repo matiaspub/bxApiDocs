@@ -57,11 +57,11 @@ class CCatalogStoreProductAll
 	public static function OnIBlockElementDelete($productId)
 	{
 		global $DB;
-		$productId = IntVal($productId);
-		if($productId > 0)
-		{
-			return $DB->Query("DELETE FROM b_catalog_store_product WHERE PRODUCT_ID = ".$productId." ", true);
-		}
+		$productId = (int)$productId;
+		if($productId <= 0)
+			return false;
+
+		return $DB->Query("DELETE FROM b_catalog_store_product WHERE PRODUCT_ID = ".$productId." ", true);
 	}
 
 	public static function Delete($id)

@@ -1,4 +1,4 @@
-<?
+<?php
 class CCompress
 {
 	public static function OnPageStart()
@@ -95,4 +95,3 @@ class CCompress
 		return 0;
 	}
 }
-?>

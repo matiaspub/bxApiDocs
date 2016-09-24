@@ -59,12 +59,12 @@ if(!is_object($DB_test))
 	return false;
 
 if(COption::GetOptionString("search", "version", "") === "v2.0")
-	define("BX_SEARCH_VERSION", 2);
+	// define("BX_SEARCH_VERSION", 2);
 elseif($DB->TableExists("b_search_stem"))
 {
 	define("BX_SEARCH_VERSION", 2);
 	COption::SetOptionString("search", "version", "v2.0");
 }
 else
-	// define("BX_SEARCH_VERSION", 1);
+	define("BX_SEARCH_VERSION", 1);
 ?>

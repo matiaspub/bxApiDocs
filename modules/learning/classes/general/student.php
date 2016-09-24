@@ -61,15 +61,15 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает случайный числовой идентификатор.</p>
+	* <p>Возвращает случайный числовой идентификатор. Метод нестатический.</p>
 	*
 	*
-	* @param int $TranscriptLength = 8 Длина числового идентификатора. По умолчанию равна 8.
+	* @param int $TranscriptLength = 8 Длина числового идентификатора. По умолчанию равна  8.
 	*
 	* @return int <p>Случайное число.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -107,21 +107,21 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод добавляет новую учетную запись студента.</p>
+	* <p>Метод добавляет новую учетную запись студента. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">всех полей</a> учётной записи
-	* студента. Обязательные поля должны быть заполнены. <br>
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">всех полей</a> учётной записи 
+	*       студента. Обязательные поля должны быть заполнены.  <br>
 	*
 	* @return int <p>Метод возвращает идентификатор добавленной учетной записи
-	* студента (равный <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">коду
+	* студента (равный <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">коду 
 	* пользователя</a>), если добавление прошло успешно. При
-	* возникновении ошибки метод вернёт <i>false</i>, а в исключениях будут
+	* возникновении ошибки  метод вернёт <i>false</i>, а в исключениях будут
 	* содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -151,9 +151,9 @@ class CStudent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/index.php">CStudent</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/update.php">Update</a> </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/update.php">Update</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">Поля учетной записи
-	* студента</a> </li> </ul> <a name="examples"></a>
+	* студента</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -192,21 +192,21 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод изменяет параметры учётной записи студента с идентификатором ID.</p>
+	* <p>Метод изменяет параметры учётной записи студента с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $USER_ID  Код пользователя. </h
+	* @param int $USER_ID  Код пользователя.
 	*
-	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">всех полей</a> учетной записи
-	* студента. Обязательные поля должны быть заполнены. <br>
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит        значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">всех полей</a> учетной       
+	* записи студента. Обязательные поля должны быть заполнены.  	<br>
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернёт <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки</p>
+	* ошибки в  исключениях будет содержаться текст ошибки</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -237,9 +237,9 @@ class CStudent
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">Поля учетной записи
-	* студента</a> </li> <li> <a
+	* студента</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/index.php">CStudent</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/add.php">Add</a> </li> </ul> <a name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/add.php">Add</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -280,16 +280,16 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод удаляет учётную запись студента с кодом пользователя USER_ID.</p>
+	* <p>Метод удаляет учётную запись студента с кодом пользователя USER_ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $USER_ID  Код пользователя. </h
+	* @param int $USER_ID  Код пользователя.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления учётной
-	* записи студента, в противном случае возвращает <i>false</i>.</p>
+	* записи  студента, в противном случае возвращает <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -351,16 +351,16 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает учётную запись студента по коду пользователя USER_ID.</p>
+	* <p>Возвращает учётную запись студента по коду пользователя USER_ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $USER_ID  Код пользователя. </h
+	* @param int $USER_ID  Код пользователя.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -378,11 +378,11 @@ class CStudent
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">Поля учетной записи
-	* студента</a> </li> <li> <a
+	* студента</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/index.php">CStudent</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/getlist.php">GetList</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -438,35 +438,37 @@ class CStudent
 	// 2012-04-16 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список учётных записей студентов по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>.</p>
+	* <p>Возвращает список учётных записей студентов по фильтру  <b>arFilter</b>, отсортированный в порядке  <b>arOrder</b>. Метод нестатический.</p>
 	*
 	*
-	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	* сортировки может принимать значения: <ul> <li> <b>USER_ID</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Код пользователя</a>; </li> <li>
-	* <b>PUBLIC_PROFILE</b> - профиль доступен публично (Y/N); </li> </ul>Направление
-	* сортировки может принимать значения: <ul> <li> <b>asc</b> - по возрастанию;
-	* </li> <li> <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
-	* сортируется по убыванию кода пользователя.
+	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле       
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для       
+	* сортировки может принимать значения:  			<ul> <li> <b>USER_ID</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Код          пользователя</a>; 
+	* 				</li> <li> <b>PUBLIC_PROFILE</b> - профиль доступен публично (Y/N);  			</li>
+	* </ul>Направление сортировки может принимать значения:  			<ul> <li>
+	* <b>asc</b> - по возрастанию;  				</li> <li> <b>desc</b> - по убыванию; </li>
+	* </ul>Необязательный. По умолчанию        сортируется по убыванию кода
+	* пользователя.
 	*
-	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>USER_ID</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Код пользователя</a>; </li> <li>
-	* <b>PUBLIC_PROFILE</b> - профиль доступен публично (Y/N); </li> <li> <b>TRANSCRIPT</b> -
-	* числовой случайный идентификатор; </li> <li> <b>RESUME</b> - резюме студента
-	* (можно искать по шаблону [%_]); </li> </ul>Перед названием фильтруемого
-	* поля можно указать тип фильтрации: <ul> <li>"!" - не равно </li> <li>"&lt;" -
-	* меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше </li> <li>"&gt;=" -
-	* больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" - одиночное
-	* значение или массив.<br><br>Необязательный. По умолчанию записи не
+	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [,       
+	* ...])</i>. Фильтруемое поле может принимать значения:  			<ul> <li> <b>USER_ID</b>
+	* - <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">Код         
+	* пользователя</a>;  				</li> <li> <b>PUBLIC_PROFILE</b> - профиль доступен публично
+	* (Y/N);  				</li> <li> <b>TRANSCRIPT</b> - числовой случайный идентификатор;  				</li>
+	* <li> <b>RESUME</b> - резюме студента (можно искать по шаблону [%_]);  			</li>
+	* </ul>Перед названием фильтруемого поля можно указать тип
+	* фильтрации:  			<ul> <li>"!" - не равно  				</li> <li>"&lt;" - меньше  				</li> <li>"&lt;=" -
+	* меньше либо равно  				</li> <li>"&gt;" - больше  				</li> <li>"&gt;=" - больше либо
+	* равно </li> </ul> <br>"<i>значения фильтра</i>" -        одиночное значение или
+	* массив.<br><br>Необязательный. По умолчанию записи        не
 	* фильтруются.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -483,10 +485,10 @@ class CStudent
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/index.php">CStudent</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/getbyid.php">GetByID</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">Поля студента</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cstudent/getbyid.php">GetByID</a>  </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#student">Поля студента</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*

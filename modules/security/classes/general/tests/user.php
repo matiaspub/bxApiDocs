@@ -101,7 +101,7 @@ class CSecurityUserTest
 						'critical' => CSecurityCriticalLevel::HIGHT,
 						'detail' => GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_DETAIL'),
 						'recommendation' => $result = GetMessage('SECURITY_SITE_CHECKER_ADMIN_WEAK_PASSWORD_RECOMMENDATIONS'),
-						'additional_info' => static::formatRecommendation($weakUsers)
+						'additional_info' => !empty($weakUsers) ? static::formatRecommendation($weakUsers): ''
 					)
 				),
 				'status' => empty($weakUsers)
@@ -207,6 +207,9 @@ class CSecurityUserTest
 	 */
 	protected static function getUsersLogins(array $ids)
 	{
+		if (empty($ids))
+			return array();
+
 		$dbUser = CUser::GetList(
 			$by = 'ID',
 			$order = 'ASC',

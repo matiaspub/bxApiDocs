@@ -13,13 +13,6 @@ class CSocServBoxAuth extends CSocServAuth
 	/** @var CBoxOAuthInterface null  */
 	protected $entityOAuth = null;
 
-	protected $userId = null;
-
-	public function __construct($userId = null)
-	{
-		$this->userId = $userId;
-	}
-
 	/**
 	 * @param string $code=false
 	 * @return CBoxOAuthInterface
@@ -325,7 +318,7 @@ class CBoxOAuthInterface extends CSocServOAuthTransport
 
 	static public function GetRedirectURI()
 	{
-		return CSocServUtil::ServerName(true)."/bitrix/tools/oauth/box.php";
+		return \CHTTP::URN2URI("/bitrix/tools/oauth/box.php");
 	}
 
 	public function GetAuthUrl($redirect_uri, $state = '')

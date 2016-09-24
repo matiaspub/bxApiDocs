@@ -53,6 +53,19 @@ final class Loader
 	 * @return bool Returns true if module was included successfully, otherwise returns false
 	 * @throws LoaderException
 	 */
+	
+	/**
+	* <p>Статический метод подключает модуль по его имени. Возвращает <i>true</i> если подключение успешно и <i>false</i> в обратном случае.</p> <p>Аналог метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmodule/includemodule.php" >CModule::IncludeModule</a> в старом ядре.</p>
+	*
+	*
+	* @param string $moduleName  Имя подключаемого модуля.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/includemodule.php
+	* @author Bitrix
+	*/
 	public static function includeModule($moduleName)
 	{
 		if (!is_string($moduleName) || $moduleName == "")
@@ -118,6 +131,19 @@ final class Loader
 	 * @param string $moduleName Name of the included module
 	 * @return int One of the following constant: Loader::MODULE_NOT_FOUND, Loader::MODULE_INSTALLED, Loader::MODULE_DEMO, Loader::MODULE_DEMO_EXPIRED
 	 */
+	
+	/**
+	* <p>Статический метод подключает партнёрский модуль по его имени.</p> <p>Модуль должен инициировать константу <code>&lt;module name&gt;_DEMO = Y</code> в файле <b>include.php</b> для определения деморежима. Файл <b>include.php</b> должен возвращать <i>false</i> для опредения истёкшего триал-периода.</p> <p>Возвращает одну из следующих констант:<br><code>Loader::MODULE_NOT_FOUND</code>, <br><code>Loader::MODULE_INSTALLED</code>, <br><code>Loader::MODULE_DEMO</code>, <br><code>Loader::MODULE_DEMO_EXPIRED</code>.</p> <p>Константы используются в силу того, что их легче подвергать обфускации.</p> <p>Аналог метода <b>CModule::IncludeModuleEx</b> в старом ядре.</p>
+	*
+	*
+	* @param string $moduleName  Имя подключаемого модуля.
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/includesharewaremodule.php
+	* @author Bitrix
+	*/
 	public static function includeSharewareModule($moduleName)
 	{
 		if (isset(self::$arSharewareModules[$moduleName]))
@@ -161,6 +187,17 @@ final class Loader
 	 *
 	 * @return string Document root
 	 */
+	
+	/**
+	* <p>Статический метод возвращает <i>document root</i>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/getdocumentroot.php
+	* @author Bitrix
+	*/
 	public static function getDocumentRoot()
 	{
 		static $documentRoot = null;
@@ -183,6 +220,23 @@ final class Loader
 	 * @param array $arClasses Array of classes with class names as keys and paths as values.
 	 * @throws LoaderException
 	 */
+	
+	/**
+	* <p>Статический метод регистрирует классы для автозагрузки.</p> <p>Все часто используемые классы должны быть зарегистрированы для автозагрузки. Для редкоиспользуемых классов можно регистрацией пренебречь, они должны быть найдены и подключены динамически.</p>
+	*
+	*
+	* @param string $moduleName  Имя модуля. Может быть <i>null</i> если классы не являются часть
+	* какого-либо модуля.
+	*
+	* @param array $arClasses  Массив классов с именами классов как ключами и пути как значения
+	* ключей.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/registerautoloadclasses.php
+	* @author Bitrix
+	*/
 	public static function registerAutoLoadClasses($moduleName, array $arClasses)
 	{
 		if (empty($arClasses))
@@ -249,6 +303,19 @@ final class Loader
 	 *
 	 * @param $className
 	 */
+	
+	/**
+	* <p>Статический метод производит загрузку зарегистрированных для автозагрузки методов из следующих файлов:</p> <p><code>\Bitrix\Main\IO\File</code> - файл <b>/main/lib/io/file.php</b>,<br><code>\Bitrix\IBlock\Type</code> - файл <b>/iblock/lib/type.php</b>,<br><code>\Bitrix\IBlock\Section\Type</code> - файл <b>/iblock/lib/section/type.php</b>,<br><code>\QSoft\Catalog\Tools\File</code> - файл <b>/qsoft.catalog/lib/tools/file.php</b>.</p>
+	*
+	*
+	* @param mixed $className  Имя класса для загрузки.
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/autoload.php
+	* @author Bitrix
+	*/
 	public static function autoLoad($className)
 	{
 		$file = ltrim($className, "\\");    // fix web env
@@ -320,6 +387,21 @@ final class Loader
 	 * @param string $root Server document root, default static::getDocumentRoot()
 	 * @return string|bool Returns combined path or false if the file does not exist in both dirs
 	 */
+	
+	/**
+	* <p>Статический метод проверяет существование файла в <code>/local</code> или <code>/bitrix</code> директориях.</p>
+	*
+	*
+	* @param string $path  Путь к файлу относительно <code>/local/</code> или <code>/bitrix/</code>
+	*
+	* @param string $root = null Document root сервера, по умолчанию: static::getDocumentRoot()
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/getlocal.php
+	* @author Bitrix
+	*/
 	public static function getLocal($path, $root = null)
 	{
 		if ($root === null)
@@ -340,6 +422,19 @@ final class Loader
 	 * @param string $path File path relative to personal directory
 	 * @return string|bool Returns combined path or false if the file does not exist
 	 */
+	
+	/**
+	* <p>Статический метод проверяет существование файла в персональной директории.</p> <p>Если <code>$_SERVER["BX_PERSONAL_ROOT"]</code> не установлена как персональная директория, то переменная равна <code>/bitrix/</code>.</p>
+	*
+	*
+	* @param string $path  Путь к файлу относительно персональной директории.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/loader/getpersonal.php
+	* @author Bitrix
+	*/
 	public static function getPersonal($path)
 	{
 		$root = static::getDocumentRoot();
@@ -352,8 +447,7 @@ final class Loader
 	}
 }
 
-class LoaderException
-	extends \Exception
+class LoaderException extends \Exception
 {
 	static public function __construct($message = "", $code = 0, \Exception $previous = null)
 	{

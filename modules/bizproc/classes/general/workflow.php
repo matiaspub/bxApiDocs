@@ -45,7 +45,7 @@ class CBPWorkflow
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a>  </li>
-	* </ul<br><br>
+	*  </ul><br><br>
 	*
 	*
 	* @static
@@ -62,12 +62,12 @@ class CBPWorkflow
 	* <p>Метод возвращает текущий статус выполнения бизнес-процесса.</p>
 	*
 	*
-	* @return int <ul> <li> <b>CBPActivityExecutionStatus::Initialized</b> - бизнес-процесс создан, </li> <li>
-	* <b>CBPActivityExecutionStatus::Executing</b> - бизнес-процесс выполняется, </li> <li>
-	* <b>CBPActivityExecutionStatus::Canceling</b> - бизнес-процесс отменен, </li> <li>
-	* <b>CBPActivityExecutionStatus::Closed</b> - бизнес-процесс завершен, </li> <li>
-	* <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li>
-	* </ul> <br><br>
+	* @return int <ul> <li> <b>CBPActivityExecutionStatus::Initialized</b> - бизнес-процесс создан, </li>     <li>
+	* <b>CBPActivityExecutionStatus::Executing</b> - бизнес-процесс выполняется, </li>     <li>
+	* <b>CBPActivityExecutionStatus::Canceling</b> - бизнес-процесс отменен, </li>     <li>
+	* <b>CBPActivityExecutionStatus::Closed</b> - бизнес-процесс завершен, </li>     <li>
+	* <b>CBPActivityExecutionStatus::Faulting</b> - бизнес-процесс остановлен по ошибке. </li> 
+	* </ul><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPWorkflow/GetExecutionStatus.php
@@ -84,15 +84,15 @@ class CBPWorkflow
 	*
 	*
 	* @return int <ul> <li> <b>CBPActivityExecutionResult::None</b> - результат выполнения
-	* бизнес-процесса не установлен, </li> <li> <b>CBPActivityExecutionResult::Succeeded</b> -
-	* бизнес-процесс завершен успешно, </li> <li> <b>CBPActivityExecutionResult::Canceled</b> -
-	* бизнес-процесс отменен, </li> <li> <b>CBPActivityExecutionResult::Faulted</b> -
-	* бизнес-процесс остановлен по ошибке, </li> <li>
+	* бизнес-процесса не установлен, </li>     <li> <b>CBPActivityExecutionResult::Succeeded</b> -
+	* бизнес-процесс завершен успешно, </li>     <li> <b>CBPActivityExecutionResult::Canceled</b>
+	* - бизнес-процесс отменен, </li>     <li> <b>CBPActivityExecutionResult::Faulted</b> -
+	* бизнес-процесс остановлен по ошибке, </li>     <li>
 	* <b>CBPActivityExecutionResult::Uninitialized</b> - бизнес-процесс не инициализирован.
-	* </li> </ul> <a name="examples"></a>
+	* </li>  </ul><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$runtime = CBPRuntime::GetRuntime();<br>try<br>{<br>   $workflow = $runtime-&gt;GetWorkflow($workflowId);<br>}<br>catch (Exception $e)<br>{<br>   //<br>}<br><br>$executionResult = $workflow-&gt;GetExecutionResult();<br>switch ($executionResult)<br>{<br>   case CBPActivityExecutionResult::None:<br>      echo "Нет";<br>      break;<br>   case CBPActivityExecutionResult::Succeeded:<br>      echo "Успешно";<br>      break;<br>   case CBPActivityExecutionResult::Canceled:<br>      echo "Отменено";<br>      break;<br>   case CBPActivityExecutionResult::Faulted:<br>      echo "Ошибка";<br>      break;<br>   case CBPActivityExecutionResult::Uninitialized:<br>      echo "Не инициализировано";<br>      break;<br>   default:<br>      echo "Не определено";<br>}<br>?&gt;
 	* </pre>
 	*
@@ -142,12 +142,12 @@ class CBPWorkflow
 	*
 	* @param string $instanceId  Идентификатор бизнес-процесса
 	*
-	* @param CBPRuntime $runtime  Исполняющая среда </ht
+	* @param CBPRuntime $runtime  Исполняющая среда
 	*
 	* @return public 
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/bizproc/bizproc_classes/CBPRuntime/index.php">CBPRuntime</a> </li> 
 	* </ul><br><br>
 	*
 	*
@@ -575,7 +575,7 @@ class CBPWorkflow
 				try
 				{
 					$trackingService = $this->GetService("TrackingService");
-					$trackingService->Write($this->GetInstanceId(), CBPTrackingType::FaultActivity, $activity->GetName(), $activity->executionStatus, $activity->executionResult, ($activity->IsPropertyExists("Title") ? $activity->Title : ""), ($exception != null ? "[".$exception->getCode()."] ".$exception->getMessage() : ""));
+					$trackingService->Write($this->GetInstanceId(), CBPTrackingType::FaultActivity, $activity->GetName(), $activity->executionStatus, $activity->executionResult, ($activity->IsPropertyExists("Title") ? $activity->Title : ""), ($exception != null ? ($exception->getCode()? "[".$exception->getCode()."] " : '').$exception->getMessage() : ""));
 
 					$newStatus = $activity->HandleFault($exception);
 
@@ -592,8 +592,9 @@ class CBPWorkflow
 		}
 	}
 
-	public function Terminate(Exception $e = null)
+	public function Terminate(Exception $e = null, $stateTitle = '')
 	{
+		/** @var CBPTaskService $taskService */
 		$taskService = $this->GetService("TaskService");
 		$taskService->DeleteAllWorkflowTasks($this->GetInstanceId());
 
@@ -602,12 +603,13 @@ class CBPWorkflow
 		$persister = CBPWorkflowPersister::GetPersister();
 		$persister->SaveWorkflow($this->rootActivity, true);
 
+		/** @var CBPStateService $stateService */
 		$stateService = $this->GetService("StateService");
 		$stateService->SetState(
 			$this->instanceId,
 			array(
 				"STATE" => "Terminated",
-				"TITLE" => GetMessage("BPCGWF_TERMINATED"),
+				"TITLE" => $stateTitle ? $stateTitle : GetMessage("BPCGWF_TERMINATED"),
 				"PARAMETERS" => array()
 			),
 			false//array()
@@ -616,7 +618,7 @@ class CBPWorkflow
 		if ($e != null)
 		{
 			$trackingService = $this->GetService("TrackingService");
-			$trackingService->Write($this->instanceId, CBPTrackingType::FaultActivity, "none", CBPActivityExecutionStatus::Faulting, CBPActivityExecutionResult::Faulted, "Exception", "[".$e->getCode()."] ".$e->getMessage());
+			$trackingService->Write($this->instanceId, CBPTrackingType::FaultActivity, "none", CBPActivityExecutionStatus::Faulting, CBPActivityExecutionResult::Faulted, "Exception", ($e->getCode()? "[".$e->getCode()."] " : '').$e->getMessage());
 		}
 	}
 

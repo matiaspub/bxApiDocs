@@ -7,9 +7,9 @@
  */
 namespace Bitrix\Sale;
 
-use Bitrix\Sale\Internals\OrderUserPropertiesTable;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Internals\UserPropsTable;
 
 Loc::loadMessages(__FILE__);
 
@@ -43,7 +43,7 @@ class OrderUserProperties
 	 */
 	public static function getList(array $parameters)
 	{
-		return OrderUserPropertiesTable::getList($parameters);
+		return UserPropsTable::getList($parameters);
 	}
 
 	/**

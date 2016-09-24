@@ -160,6 +160,7 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 					if(preg_match("#^http://(.*?)(|:\d+)(/.*)\$#", $obRequest->headers["X-Storage-Url"], $arStorage))
 					{
 						$result = $obRequest->headers;
+						$result["X-Storage-NoProtoUrl"] = $arStorage[1].$arStorage[2].$arStorage[3];
 						$result["X-Storage-Host"] = $arStorage[1];
 						$result["X-Storage-Port"] = $arStorage[2]? substr($arStorage[2], 1): 80;
 						$result["X-Storage-Urn"] = $arStorage[3];
@@ -340,9 +341,16 @@ class CCloudStorageService_OpenStackStorage extends CCloudStorageService
 			);
 
 			if(is_array($arToken))
-				$host = $arToken["X-Storage-Url"]."/".$arBucket["BUCKET"];
+			{
+				if ($arToken["X-Storage-NoProtoUrl"])
+					$host = $proto."://".$arToken["X-Storage-NoProtoUrl"]."/".$arBucket["BUCKET"];
+				else
+					$host = $arToken["X-Storage-Url"]."/".$arBucket["BUCKET"];
+			}
 			else
+			{
 				return "/404.php";
+			}
 		}
 
 		if(is_array($arFile))

@@ -22,10 +22,10 @@ use Bitrix\Main\Text;
 use Bitrix\Seo\Service;
 
 // to use Yandex.Direct Sandbox
-define('YANDEX_DIRECT_API_URL', "https://api-sandbox.direct.yandex.ru/v4/json/");
+// define('YANDEX_DIRECT_API_URL', "https://api-sandbox.direct.yandex.ru/v4/json/");
 if(!defined('YANDEX_DIRECT_API_URL'))
 {
-	// define('YANDEX_DIRECT_API_URL', 'https://api.direct.yandex.ru/v4/json/');
+	define('YANDEX_DIRECT_API_URL', 'https://api.direct.yandex.ru/v4/json/');
 }
 
 class YandexDirect extends Engine\YandexBase implements IEngine
@@ -86,6 +86,7 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	const ERROR_NO_STATS = 2;
 
 	const MAX_STAT_DAYS_DELTA = 7;
+	const CAMPAIGN_LIMIT = 100;
 
 	const ERROR_WRONG_CURRENCY = 245;
 
@@ -103,7 +104,7 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 
 	public function getCurrentUser()
 	{
-		if(Service::isAuthorized($this->getCode()))
+		if(Service::isRegistered())
 		{
 			$currentAuth = Service::getAuth($this->getCode());
 			return $currentAuth['user'];
@@ -124,6 +125,23 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws YandexDirectException
 	 * @see YandexCampaignTable::createParam
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на создание новой кампании. Метод нестатический.</p>
+	*
+	*
+	* @param array $campaignParam  Параметры кампании.
+	*
+	* @return public 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>\Bitrix\Seo\Adv\YandexCampaignTable::createParam</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/addcampaign.php
+	* @author Bitrix
+	*/
 	public function addCampaign(array $campaignParam)
 	{
 		$result = $this->getProxy()->getInterface()->addCampaign(static::ENGINE_ID, $campaignParam);
@@ -146,6 +164,23 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws YandexDirectException
 	 * @see YandexCampaignTable::createParam
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на обновление существующей кампании. Метод нестатический.</p>
+	*
+	*
+	* @param array $campaignParam  Параметры кампании.
+	*
+	* @return public 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>\Bitrix\Seo\Adv\YandexCampaignTable::createParam</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/updatecampaign.php
+	* @author Bitrix
+	*/
 	public function updateCampaign(array $campaignParam)
 	{
 		$result = $this->getProxy()->getInterface()->updateCampaign(static::ENGINE_ID, $campaignParam);
@@ -167,6 +202,19 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws SystemException
 	 * @throws YandexDirectException
 	 */
+	
+	/**
+	* <p>Метод возвращает параметры кампании, полученные от Яндекса. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $campaignId  Внешний код кампании или массив внешних кодов.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/getcampaign.php
+	* @author Bitrix
+	*/
 	public function getCampaign($campaignId)
 	{
 		if(empty($campaignId))
@@ -179,11 +227,24 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 			$campaignId = array($campaignId);
 		}
 
-		$result = $this->getProxy()->getInterface()->getCampaign(static::ENGINE_ID, $campaignId);
+		$offset = 0;
 
-		if(!empty($result['error']))
+		$result = array();
+
+		while($offset < count($campaignId))
 		{
-			throw new YandexDirectException($result);
+			$currentCampaigns = array_slice($campaignId, $offset, static::CAMPAIGN_LIMIT);
+
+			$currentResult = $this->getProxy()->getInterface()->getCampaign(static::ENGINE_ID, $currentCampaigns);
+
+			if(!empty($currentResult['error']))
+			{
+				throw new YandexDirectException($currentResult);
+			}
+
+			$result = array_merge($result, $currentResult);
+
+			$offset += static::CAMPAIGN_LIMIT;
 		}
 
 		return $result;
@@ -296,6 +357,23 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws YandexDirectException
 	 * @see YandexBannerTable::createParam
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на создание нового баннера. Метод нестатический.</p>
+	*
+	*
+	* @param array $bannerParam  Параметры баннера.
+	*
+	* @return public 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>\Bitrix\Seo\Adv\YandexBannerTable::createParam</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/addbanner.php
+	* @author Bitrix
+	*/
 	public function addBanner(array $bannerParam)
 	{
 		$result = $this->getProxy()->getInterface()->addBanner(static::ENGINE_ID, $bannerParam);
@@ -318,6 +396,23 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws YandexDirectException
 	 * @see YandexBannerTable::createParam
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на обновление существующего баннера. Метод нестатический.</p>
+	*
+	*
+	* @param array $bannerParam  Параметры баннера.
+	*
+	* @return public 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>\Bitrix\Seo\Adv\YandexBannerTable::createParam</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/updatebanner.php
+	* @author Bitrix
+	*/
 	public function updateBanner(array $bannerParam)
 	{
 		$result = $this->getProxy()->getInterface()->updateBanner(static::ENGINE_ID, $bannerParam);
@@ -391,7 +486,7 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 		);
 
 		$result = $this->getProxy()->getInterface()->moderateBanners(static::ENGINE_ID, $queryData);
-		AddMessage2Log($result);
+
 		if(!empty($result['error']))
 		{
 			throw new YandexDirectException($result);
@@ -518,6 +613,21 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 * @throws SystemException
 	 * @see https://tech.yandex.ru/direct/doc/dg-v4/reference/GetRegions-docpage/
 	 */
+	
+	/**
+	* <p>Метод возвращает список местоположений Яндекса. Метод нестатический.</p> <p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>https://tech.yandex.ru/direct/doc/dg-v4/reference/GetRegions-docpage/</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/getregions.php
+	* @author Bitrix
+	*/
 	public function getRegions()
 	{
 		$result = $this->getProxy()->getInterface()->getRegions(static::ENGINE_ID);
@@ -654,6 +764,23 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	 *
 	 * @see https://tech.yandex.ru/direct/doc/dg-v4/live/GetBannersStat-docpage/
 	 */
+	
+	/**
+	* <p>Метод посылает запрос на выдачу статистики по баннеру. Метод нестатический.</p>
+	*
+	*
+	* @param array $params  Параметры запроса о статистике.
+	*
+	* @return array 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li>https://tech.yandex.ru/direct/doc/dg-v4/live/GetBannersStat-docpage/</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/getbannerstats.php
+	* @author Bitrix
+	*/
 	public function getBannerStats(array $params)
 	{
 		$result = $this->getProxy()->getInterface()->getBannerStats(static::ENGINE_ID, $params);
@@ -669,15 +796,21 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 	/**
 	 * Returns HttpClient object with query result
 	 *
+	 * @param string $scope
 	 * @param string $method Method
 	 * @param array $param array of query data
 	 * @param bool $skipRefreshAuth Skip authorization refresh. Doesn't work with Yandex.
-	 *
-	 * @returns \Bitrix\Main\Web\HttpClient
+	 * @return HttpClient
 	 * @throws SystemException
+	 * @throws \Exception
 	 */
-	protected function query($method, $param = array(), $skipRefreshAuth = false)
+	protected function query($scope, $method = "GET", $param = null, $skipRefreshAuth = false)
 	{
+		if($param === null)
+		{
+			$param = array();
+		}
+
 		if($this->engineSettings['AUTH'])
 		{
 			$http = new HttpClient();
@@ -711,9 +844,9 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 
 			if($http->getStatus() == 401 && !$skipRefreshAuth)
 			{
-				if($this->checkAuthExpired(false))
+				if($this->checkAuthExpired())
 				{
-					$this->query($method, $param, true);
+					$this->query($scope, $method, $param, true);
 				}
 			}
 
@@ -758,9 +891,9 @@ class YandexDirect extends Engine\YandexBase implements IEngine
 
 			if($http->getStatus() == 401 && !$skipRefreshAuth)
 			{
-				if($this->checkAuthExpired(false))
+				if($this->checkAuthExpired())
 				{
-					$this->query($method, $param, true);
+					$this->query("", $method, $param, true);
 				}
 			}
 

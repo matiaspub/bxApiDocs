@@ -6,7 +6,7 @@ Loc::loadMessages(__FILE__);
 
 class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 {
-	static public function GetUserTypeDescription()
+	public static function GetUserTypeDescription()
 	{
 		return array(
 			"PROPERTY_TYPE" => "E",
@@ -15,6 +15,7 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 			"GetPropertyFieldHtml" => array(__CLASS__, "GetPropertyFieldHtml"),
 			"GetPropertyFieldHtmlMulty" => array(__CLASS__, "GetPropertyFieldHtml"),
 			"GetPublicViewHTML" => array(__CLASS__, "GetPublicViewHTML"),
+			"GetPublicEditHTML" => array(__CLASS__, "GetPublicEditHTML"),
 			"GetAdminListViewHTML" => array(__CLASS__,"GetAdminListViewHTML"),
 			"GetAdminFilterHTML" => array(__CLASS__,'GetAdminFilterHTML'),
 			"GetSettingsHTML" => array(__CLASS__,'GetSettingsHTML'),
@@ -23,22 +24,7 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		);
 	}
 
-	static public function GetPropertyFieldHtml($arProperty, $arValue, $strHTMLControlName)
-	{
-		return parent::GetPropertyFieldHtml($arProperty, $arValue, $strHTMLControlName);
-	}
-
-	static public function GetAdminListViewHTML($arProperty, $arValue, $strHTMLControlName)
-	{
-		return parent::GetAdminListViewHTML($arProperty, $arValue, $strHTMLControlName);
-	}
-
-	static public function GetPublicViewHTML($arProperty, $arValue, $strHTMLControlName)
-	{
-		return parent::GetPublicViewHTML($arProperty, $arValue, $strHTMLControlName);
-	}
-
-	static public function PrepareSettings($arFields)
+	public static function PrepareSettings($arFields)
 	{
 		/*
 		 * VIEW				- view type
@@ -60,7 +46,7 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		return $arFields;
 	}
 
-	static public function GetSettingsHTML($arFields,$strHTMLControlName, &$arPropertyFields)
+	public static function GetSettingsHTML($arFields,$strHTMLControlName, &$arPropertyFields)
 	{
 		$arPropertyFields = array(
 			"HIDE" => array("ROW_COUNT", "COL_COUNT", "MULTIPLE_CNT", "MULTIPLE"),
@@ -68,13 +54,13 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 			'USER_TYPE_SETTINGS_TITLE' => Loc::getMessage('BT_UT_SKU_SETTING_TITLE'),
 		);
 
-		$arSettings = self::PrepareSettings($arFields);
+		$arSettings = static::PrepareSettings($arFields);
 		if (isset($arSettings['USER_TYPE_SETTINGS']))
 			$arSettings = $arSettings['USER_TYPE_SETTINGS'];
 
 		$strResult = '<tr>
 		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_VIEW').'</td>
-		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[VIEW]',self::GetPropertyViewsList(true),htmlspecialcharsbx($arSettings['VIEW'])).'</td>
+		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[VIEW]', static::GetPropertyViewsList(true),htmlspecialcharsbx($arSettings['VIEW'])).'</td>
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_MAX_WIDTH').'</td>
@@ -94,20 +80,9 @@ class CIBlockPropertySKU extends CIBlockPropertyElementAutoComplete
 		</tr>
 		<tr>
 		<td>'.Loc::getMessage('BT_UT_SKU_SETTING_REP_SYMBOL').'</td>
-		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[REP_SYM]',parent::GetReplaceSymList(true),htmlspecialcharsbx($arSettings['REP_SYM'])).'&nbsp;<input type="text" name="'.$strHTMLControlName["NAME"].'[OTHER_REP_SYM]" size="1" maxlength="1" value="'.$arSettings['OTHER_REP_SYM'].'"></td>
+		<td>'.SelectBoxFromArray($strHTMLControlName["NAME"].'[REP_SYM]', static::GetReplaceSymList(true),htmlspecialcharsbx($arSettings['REP_SYM'])).'&nbsp;<input type="text" name="'.$strHTMLControlName["NAME"].'[OTHER_REP_SYM]" size="1" maxlength="1" value="'.$arSettings['OTHER_REP_SYM'].'"></td>
 		</tr>';
 
 		return $strResult;
 	}
-
-	static public function GetAdminFilterHTML($arProperty, $strHTMLControlName)
-	{
-		return parent::GetAdminFilterHTML($arProperty, $strHTMLControlName);
-	}
-
-	static public function AddFilterFields($arProperty, $strHTMLControlName, &$arFilter, &$filtered)
-	{
-		parent::AddFilterFields($arProperty, $strHTMLControlName, $arFilter, $filtered);
-	}
 }
-?>

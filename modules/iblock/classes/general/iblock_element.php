@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков. 
+ * <b>_CIBElement</b> - вспомогательный класс для работы с объектами, которые возвращает <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/index.php">CIBlockResult</a>::<a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockresult/getnextelement.php">GetNextElement</a>. Для получения различных характеристик элемента рекомендуется использовать именно этот класс, т.к. использование методов этого объекта позволяет более гибко и эффективно работать с элементами информационных блоков.
  *
  *
  * @return mixed 
@@ -17,14 +17,14 @@ class _CIBElement
 
 	
 	/**
-	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. Метод динамичный.</p>
+	* <p>Возвращает массив значений полей приведенный в HTML безопасный вид. Также в полях <i>DETAIL_PAGE_URL</i> и <i>LIST_PAGE_URL</i> заменяются шаблоны вида #IBLOCK_ID# и т.п. на их реальные значения, в результате чего в этих полях будут ссылки на страницу детального просмотра и страницу списка элементов. Нестатический метод.</p>
 	*
 	*
 	* @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">полями элемента
 	* информационного блока</a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $res = CIBlockElement::GetByID($_GET["PID"]);
 	* if($obRes = $res-&gt;GetNextElement())
@@ -42,7 +42,7 @@ class _CIBElement
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#felement">Поля элемента
 	* информационного блока </a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/index.php">CIBlockElement</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">GetList()</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -62,29 +62,31 @@ class _CIBElement
 	 */
 	
 	/**
-	* <p>Метод возвращает значения свойств текущего элемента информационного блока. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> данный метод не работает, если в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a> в <b>arSelectFields</b> не указаны <i>ID</i> и <i>IBLOCK_ID</i>, а в <b>arFilter</b> не задан <i>IBLOCK_ID</i>. Должно быть, например, так: <pre class="syntax"> $dbEl = CIBlockElement::GetList( Array(), Array("IBLOCK_TYPE"=&gt;"catalog", "IBLOCK_ID"=&gt;11), false, false, array("ID" , "IBLOCK_ID", ......) ); </pre> </div>
+	* <p>Метод возвращает значения свойств текущего элемента информационного блока. Нестатический метод.</p> <p></p> <div class="note"> <b>Примечание:</b> данный метод не работает, если в <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a> в <b>arSelectFields</b> не указаны <i>ID</i> и <i>IBLOCK_ID</i>, а в <b>arFilter</b> не задан <i>IBLOCK_ID</i>. Должно быть, например, так: <pre class="syntax"> $dbEl = CIBlockElement::GetList( 		Array(),  		Array("IBLOCK_TYPE"=&gt;"catalog", "IBLOCK_ID"=&gt;11),  		false,  		false,  		array("ID" , "IBLOCK_ID", ......) ); </pre> </div>
 	*
 	*
-	* @param arOrde $r = false Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, <i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> -
-	* поле для сортировки, может принимать значения: <ul> <li> <b>id</b> - код
-	* свойства; </li> <li> <b>sort</b> - индекс сортировки; </li> <li> <b>name</b> - имя
-	* свойства; </li> <li> <span style="font-weight: bold;">active</span> - активность
-	* свойства;</li> <li> <span style="font-weight: bold;">value_id</span> - код значения
-	* свойства;</li> <li> <span style="font-weight: bold;">enum_sort</span> - индекс сортировки
-	* варианта списочного свойства; </li> </ul> <i>order</i> - порядок сортировки,
-	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
-	* <b>desc</b> - по убыванию; </li> </ul>
+	* @param array $arOrder = false Массив вида Array(<i>by1</i>=&gt;<i>order1</i>[, 			<i>by2</i>=&gt;<i>order2</i> [, ..]]), где <i>by</i> -
+	* поле для сортировки, может принимать значения: 			          <ul> <li> <b>id</b> -
+	* код свойства; 				</li>                     <li> <b>sort</b> - индекс сортировки; 				</li>  
+	*                   <li> <b>name</b> - имя свойства; 				</li>                     <li> <span
+	* style="font-weight: bold;">active</span> - активность свойства;</li>                     <li> <span
+	* style="font-weight: bold;">value_id</span> - код значения свойства;</li>                     <li>
+	* <span style="font-weight: bold;">enum_sort</span> - индекс сортировки варианта
+	* списочного свойства; </li>          </ul> <i>order</i> - порядок сортировки,
+	* может принимать значения: 				          <ul> <li> <b>asc</b> - по возрастанию;
+	* 					</li>                     <li> <b>desc</b> - по убыванию; </li>          </ul>
 	*
-	* @param arFilte $r = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...]) <br>
-	* "фильтруемое поле" может принимать значения: <br>     <i>NAME</i> -
-	* название свойства; <br>     <i>ID</i> - код свойства; <br>     <i>ACTIVE</i> -
-	* активность свойства (Y|N), по умолчанию выводятся только активные
-	* свойства, если необходимо вывести все значения, то установите
-	* <i>ACTIVE</i> в пустое значение; <br>     <i>SEARCHABLE</i> - участвует в поиске
-	* или нет (Y|N); <br>     <i>PROPERTY_TYPE</i> - тип свойства; <br>     <i>CODE</i> -
-	* символьный код свойства; <br>     <i>EMPTY</i> - пустота значения
-	* свойства (Y|N). По умолчанию выводятся все свойства и имеющие
-	* непустые значения и без значений. <br> Не обязательный параметр, по
+	* @param array $arFilter = Array() Массив вида array("фильтруемое поле"=&gt;"значения фильтра" [, ...])         
+	* <br>        "фильтруемое поле" может принимать значения:          <br>       
+	*     <i>NAME</i> - название свойства;          <br>            <i>ID</i> - код
+	* свойства;          <br>            <i>ACTIVE</i> - активность свойства (Y|N), по
+	* умолчанию выводятся только активные свойства, если необходимо
+	* вывести все значения, то установите <i>ACTIVE</i> в пустое значение;       
+	*   <br>            <i>SEARCHABLE</i> - участвует в поиске или нет (Y|N);          <br>       
+	*     <i>PROPERTY_TYPE</i> - тип свойства;          <br>            <i>CODE</i> - символьный
+	* код свойства;          <br>            <i>EMPTY</i> - пустота значения свойства
+	* (Y|N). По умолчанию выводятся все свойства и имеющие непустые
+	* значения и без значений.          <br>        Не обязательный параметр, по
 	* умолчанию равен array().
 	*
 	* @return array <li>в качестве индексов массива "Символьный код свойства" (задается
@@ -106,6 +108,7 @@ class _CIBElement
 		if (count($arFilter)==0 && is_array($this->props))
 		{
 			$arAllProps = array();
+			/** @noinspection PhpWrongForeachArgumentTypeInspection */
 			foreach($this->props as $arProp)
 			{
 				if(strlen(trim($arProp["CODE"]))>0)
@@ -125,11 +128,11 @@ class _CIBElement
 						{
 							$arProp["~VALUE"] = $arEnum["VALUE"];
 							if(is_array($arProp["VALUE"]) || preg_match("/[;&<>\"]/", $arProp["VALUE"]))
-								$arProp["VALUE"]  = htmlspecialcharsex($arEnum["VALUE"]);
+								$arProp["VALUE"]  = htmlspecialcharsEx($arEnum["VALUE"]);
 							else
 								$arProp["VALUE"]  = $arEnum["VALUE"];
 							$arProp["VALUE_ENUM"] = $arProp["VALUE"];
-							$arProp["VALUE_XML_ID"]  = htmlspecialcharsex($arEnum["XML_ID"]);
+							$arProp["VALUE_XML_ID"]  = htmlspecialcharsEx($arEnum["XML_ID"]);
 							$arProp["VALUE_SORT"] = $arEnum["SORT"];
 						}
 						else
@@ -141,7 +144,7 @@ class _CIBElement
 					elseif(is_array($arProp["VALUE"]) || strlen($arProp["VALUE"]))
 					{
 						if($arProp["PROPERTY_TYPE"]=="N")
-							$arProp["VALUE"] = htmlspecialcharsex(CIBlock::NumberFormat($arProp["VALUE"]));
+							$arProp["VALUE"] = htmlspecialcharsEx(CIBlock::NumberFormat($arProp["VALUE"]));
 						$arProp["~VALUE"] = $this->fields["~PROPERTY_".$arProp["ID"]];
 						$arProp["~DESCRIPTION"] = $this->fields["~DESCRIPTION_".$arProp["ID"]];
 					}
@@ -166,7 +169,7 @@ class _CIBElement
 								$arEnum = CIBlockPropertyEnum::GetByID($key);
 								if($arEnum!==false)
 								{
-									$xml_id = htmlspecialcharsex($arEnum["XML_ID"]);
+									$xml_id = htmlspecialcharsEx($arEnum["XML_ID"]);
 									$sort = $arEnum["SORT"];
 								}
 								else
@@ -181,7 +184,7 @@ class _CIBElement
 									$arProp["VALUE_ENUM_ID"][] = $key;
 									$arProp["~VALUE"][] = $val;
 									if(is_array($val) || preg_match("/[;&<>\"]/", $val))
-										$arProp["VALUE"][] = htmlspecialcharsex($val);
+										$arProp["VALUE"][] = htmlspecialcharsEx($val);
 									else
 										$arProp["VALUE"][] = $val;
 									$arProp["VALUE_XML_ID"][] = $xml_id;
@@ -192,7 +195,7 @@ class _CIBElement
 									$arProp["VALUE_ENUM_ID"] = array($key);
 									$arProp["~VALUE"] = array($val);
 									if(is_array($val) || preg_match("/[;&<>\"]/", $val))
-										$arProp["VALUE"] = array(htmlspecialcharsex($val));
+										$arProp["VALUE"] = array(htmlspecialcharsEx($val));
 									else
 										$arProp["VALUE"] = array($val);
 									$arProp["VALUE_XML_ID"] = array($xml_id);
@@ -217,7 +220,7 @@ class _CIBElement
 								{
 									$arProp["~VALUE"][] = $arListTilda[$key];
 									if($arProp["PROPERTY_TYPE"]=="N")
-										$val = htmlspecialcharsex(CIBlock::NumberFormat($val));
+										$val = htmlspecialcharsEx(CIBlock::NumberFormat($val));
 									$arProp["VALUE"][] = $val;
 									$arProp["~DESCRIPTION"][] = $arDescTilda[$key];
 									$arProp["DESCRIPTION"][] = $arDesc[$key];
@@ -226,7 +229,7 @@ class _CIBElement
 								{
 									$arProp["~VALUE"] = array($arListTilda[$key]);
 									if($arProp["PROPERTY_TYPE"]=="N")
-										$val = htmlspecialcharsex(CIBlock::NumberFormat($val));
+										$val = htmlspecialcharsEx(CIBlock::NumberFormat($val));
 									$arProp["VALUE"] = array($val);
 									$arProp["~DESCRIPTION"] = array($arDescTilda[$key]);
 									$arProp["DESCRIPTION"] = array($arDesc[$key]);
@@ -272,10 +275,10 @@ class _CIBElement
 			{
 				$arProp["~VALUE"] = $arProp["VALUE"];
 				if(is_array($arProp["VALUE"]) || preg_match("/[;&<>\"]/", $arProp["VALUE"]))
-					$arProp["VALUE"] = htmlspecialcharsex($arProp["VALUE"]);
+					$arProp["VALUE"] = htmlspecialcharsEx($arProp["VALUE"]);
 				$arProp["~DESCRIPTION"] = $arProp["DESCRIPTION"];
 				if(preg_match("/[;&<>\"]/", $arProp["DESCRIPTION"]))
-					$arProp["DESCRIPTION"] = htmlspecialcharsex($arProp["DESCRIPTION"]);
+					$arProp["DESCRIPTION"] = htmlspecialcharsEx($arProp["DESCRIPTION"]);
 			}
 			else
 			{
@@ -326,10 +329,10 @@ class _CIBElement
 				{
 					$arProp["~NAME"] = $arProp["NAME"];
 					if(preg_match("/[;&<>\"]/", $arProp["NAME"]))
-						$arProp["NAME"] = htmlspecialcharsex($arProp["NAME"]);
+						$arProp["NAME"] = htmlspecialcharsEx($arProp["NAME"]);
 					$arProp["~DEFAULT_VALUE"] = $arProp["DEFAULT_VALUE"];
 					if(is_array($arProp["DEFAULT_VALUE"]) || preg_match("/[;&<>\"]/", $arProp["DEFAULT_VALUE"]))
-						$arProp["DEFAULT_VALUE"] = htmlspecialcharsex($arProp["DEFAULT_VALUE"]);
+						$arProp["DEFAULT_VALUE"] = htmlspecialcharsEx($arProp["DEFAULT_VALUE"]);
 					if($arProp["VALUE"]!=="")
 					{
 						$arProp["VALUE"] = array($arProp["VALUE"]);
@@ -367,10 +370,10 @@ class _CIBElement
 			{
 				$arProp["~NAME"] = $arProp["NAME"];
 				if(preg_match("/[;&<>\"]/", $arProp["NAME"]))
-					$arProp["NAME"] = htmlspecialcharsex($arProp["NAME"]);
+					$arProp["NAME"] = htmlspecialcharsEx($arProp["NAME"]);
 				$arProp["~DEFAULT_VALUE"] = $arProp["DEFAULT_VALUE"];
 				if(is_array($arProp["DEFAULT_VALUE"]) || preg_match("/[;&<>\"]/", $arProp["DEFAULT_VALUE"]))
-					$arProp["DEFAULT_VALUE"] = htmlspecialcharsex($arProp["DEFAULT_VALUE"]);
+					$arProp["DEFAULT_VALUE"] = htmlspecialcharsEx($arProp["DEFAULT_VALUE"]);
 				$arAllProps[$PIND] = $arProp;
 			}
 		}
@@ -380,20 +383,21 @@ class _CIBElement
 
 	
 	/**
-	* <p>Метод возвращает параметры свойства <i>ID</i> и его значения для текущего элемента информационного блока. Метод динамичный.</p>
+	* <p>Метод возвращает параметры свойства <i>ID</i> и его значения для текущего элемента информационного блока. Нестатический метод.</p>
 	*
 	*
-	* @param mixed $ID  Числовой или символьный код свойства.
+	* @param mixed $mixedID  Числовой или символьный код свойства.
 	*
-	* @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">полей свойства</a>
-	* <br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i><br><p></p><div class="note">
-	* <b>Примечание:</b> если <b>GetProperty</b> применяется к результату работы <a
+	* @return array <a href="http://dev.1c-bitrix.ru/api_help/iblock/fields.php#fproperty">полей
+	* свойства</a><br><i>VALUE</i><br><i>VALUE_ENUM_ID</i><br><i>DESCRIPTION</i><br><i>PROPERTY_VALUE_ID</i><br><p></p><div
+	* class="note"> <b>Примечание:</b> если <b>GetProperty</b> применяется к результату
+	* работы <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getlist.php">CIBlockElement::GetList</a>, то в
 	* <b>arSelectFields</b> необходимо <b>обязательно</b> указать <i>IBLOCK_ID</i>, иначе
 	* результат будет пустым.</div>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $res = CIBlockElement::GetByID($_GET["PID"]);
 	* if($obRes = $res-&gt;GetNextElement())
@@ -479,19 +483,19 @@ class _CIBElement
 
 	
 	/**
-	* <p>Возвращает группы, которым принадлежит текущий элемент и значения свойств типа "привязка к разделам" заданные для данного элемента. Метод динамичный. <br></p>
+	* <p>Возвращает группы, которым принадлежит текущий элемент и значения свойств типа "привязка к разделам" заданные для данного элемента. Нестатический метод.   <br></p>
 	*
 	*
 	* @return CDBResult <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$res = CIBlockElement::GetByID($_GET["PID"]);<br>if($obRes = $res-&gt;GetNextElement())<br>{<br>  $ar_res = $obRes-&gt;GetGroups();<br>  print_r($ar_res);<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>    <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockelement/getelementgroups.php">CIBlockElement::GetElementGroups</a>
 	* </li> </ul><a name="examples"></a>
 	*
@@ -502,8 +506,6 @@ class _CIBElement
 	*/
 	public function GetGroups()
 	{
-		$res = CIBlockElement::GetElementGroups($this->fields["ID"]);
-		return $res;
+		return CIBlockElement::GetElementGroups($this->fields["ID"]);
 	}
 }
-?>

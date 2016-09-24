@@ -8,7 +8,7 @@ $s=<<<EOT
 Place tested html here
 
 EOT;
-cmodule::includemodule('security');
+CModule::IncludeModule('security');
 $Antivirus = new CSecurityAntiVirus("pre");
 $Antivirus->replace=1;
 $Antivirus->Analyze($s);
@@ -47,7 +47,7 @@ class CSecurityAntiVirus
 
 	private $quotes = array();
 
-public static 	function __construct($place = "body")
+	public function __construct($place = "body")
 	{
 		$this->place = $place;
 		global $BX_SECURITY_AV_ACTION;
@@ -55,7 +55,7 @@ public static 	function __construct($place = "body")
 			$this->replace = false;
 	}
 
-public static 	public static function IsActive()
+	public static function IsActive()
 	{
 		$bActive = false;
 		foreach(GetModuleEvents("main", "OnPageStart", true) as $event)
@@ -72,7 +72,7 @@ public static 	public static function IsActive()
 		return $bActive;
 	}
 
-	public static public static function SetActive($bActive = false)
+	public static function SetActive($bActive = false)
 	{
 		if($bActive)
 		{
@@ -96,14 +96,14 @@ public static 	public static function IsActive()
 		}
 	}
 
-public static 	function GetAuditTypes()
+	public static function GetAuditTypes()
 	{
 		return array(
 			"SECURITY_VIRUS" => "[SECURITY_VIRUS] ".GetMessage("SECURITY_VIRUS"),
 		);
 	}
 
-public static 	function OnPageStart()
+	public static function OnPageStart()
 	{
 		if (CSecuritySystemInformation::isCliMode())
 			return;
@@ -187,7 +187,7 @@ public static 	function OnPageStart()
 		}
 	}
 
-public static 	function OnEndBufferContent(&$content)
+	public static function OnEndBufferContent(&$content)
 	{
 		if (self::isSafetyRequest()) //Check only GET and POST request
 			return;
@@ -197,7 +197,7 @@ public static 	function OnEndBufferContent(&$content)
 		$Antivirus->Analyze($content);
 	}
 
-public static 	function OnAfterEpilog()
+	public static function OnAfterEpilog()
 	{
 		if (self::isSafetyRequest()) //Check only GET and POST request
 			return;
@@ -207,7 +207,7 @@ public static 	function OnAfterEpilog()
 		// define("BX_SECURITY_AV_AFTER_EPILOG", true);
 	}
 
-public static 	function PHPShutdown()
+	public static function PHPShutdown()
 	{
 		if(defined("BX_SECURITY_AV_AFTER_EPILOG"))
 		{
@@ -227,17 +227,18 @@ public static 	function PHPShutdown()
 		}
 	}
 
-public static 	public static function GetWhiteList()
+	public static function GetWhiteList()
 	{
 		global $DB;
 		$res = $DB->Query("SELECT * FROM b_sec_white_list ORDER BY ID", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		return $res;
 	}
 
-public 	public static function UpdateWhiteList($arWhiteList)
+	public static function UpdateWhiteList($arWhiteList)
 	{
 		global $DB, $CACHE_MANAGER;
-		$res = $DB->Query("DELETE FROM b_sec_white_list", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
+
+		$DB->Query("DELETE FROM b_sec_white_list", false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
 		$i = 1;
 		foreach($arWhiteList as $white_str)
 		{
@@ -249,7 +250,7 @@ public 	public static function UpdateWhiteList($arWhiteList)
 	}
 
 	// function returns 1, if current block is in white list and needs not processing.
-public 	function isInWhiteList()
+	public function isInWhiteList()
 	{
 		if(strpos($this->atributes, 'src="/bitrix/') !== false)
 			return 1;
@@ -293,7 +294,7 @@ public 	function isInWhiteList()
 		if(preg_match('/(iblock_element_edit|iblock_element_search|posting_admin|fileman_file_view|sale_print|get_message|user_edit)\.php/', $this->body))
 			return 14;
 
-		if(preg_match('/BX\.(WindowManager|reload|message|browser|ready|tooltip|admin|hint_replace|CDebugDialog|adjust|ajax|bind|loadScript|addCustomEvent|timeman|Finder|Access|loadCSS|CrmProductEditor|COpener|file_input|setKernelJS|TreeConditions|PULL|runSitemap)/', $this->body))
+		if(preg_match('/BX\.(WindowManager|reload|message|browser|ready|tooltip|admin|hint_replace|CDebugDialog|adjust|ajax|bind|loadScript|addCustomEvent|timeman|Finder|Access|loadCSS|CrmProductEditor|COpener|file_input|setKernelJS|TreeConditions|PULL|runSitemap|setCSSList|setJSList)/', $this->body))
 			return 15;
 
 		if(preg_match('/window\.parent\.(InitActionProps|Tree|buildNoMenu)/', $this->body))
@@ -355,7 +356,10 @@ public 	function isInWhiteList()
 
 		if(preg_match('/^window\.open\(/', $this->body))
 			return 44;
-		
+
+		if(preg_match('/^\s*window\.__bxResult\[\'\d+\'\]\s*=\s*\{/', $this->body))
+			return 46;
+
 		if(strpos($this->body, 'showFLVPlayer') !== false)
 			return 37;
 
@@ -381,6 +385,9 @@ public 	function isInWhiteList()
 		//Voximplant document uploader
 		if($this->type == 'iframe' && preg_match('#\s*src=[\'"]https://verify.voximplant.com/#i', $this->atributes))
 			return 45;
+
+		if(preg_match('#function\s+bizvalChange#', $this->body))
+			return 46;
 
 		if($this->type === "script")
 		{
@@ -410,21 +417,21 @@ public 	function isInWhiteList()
 
 	//заглушка. Возщвращает рейтинг опасности текущего блока из кеша, или FALSE
 	// кешируются только составляющся рейтинга, вложденная внутренними правилами.
-	function returnfromcache()
+	public function returnfromcache()
 	{
 		// тут можно вставить кеширование. Для кеширование вычислять и сохранять кеш от $this->data
 		return false;
 	}
 
 	//заглушка. Добавляет рейтинг опасности для текущего блока в кеш.
-public static 	function addtocache()
+	public function addtocache()
 	{
 		// тут можно вставить кеширование. Для кеширование вычислять и сохранять кеш от $this->data
 		return true;
 	}
 
 	//механизм для вывода сообщения об обнаруженном подозрительном текущем блоке
-public 	function dolog()
+	public function dolog()
 	{
 		global $BX_SECURITY_AV_TIMEOUT;
 		if(defined("ANTIVIRUS_CREATE_TRACE"))
@@ -487,19 +494,19 @@ public 	function dolog()
 
 	// вызывается каждый раз, когда обработка блока закончена и блок признан нормальным.
 	// функция должна возвратить содержимое блока.
-public 	function end_okblock()
+	public function end_okblock()
 	{
 		return $this->data;
 	}
 
-public 	function end_whiteblock()
+	public function end_whiteblock()
 	{
 		return $this->data;
 	}
 
 	// вызывается каждый раз, когда обработка блока закончена и блок признан опасным.
 	// функция должна возвратить содержимое блока.
-public 	function end_blkblock()
+	public function end_blkblock()
 	{
 		if($this->replace)
 			return $this->replacement;
@@ -507,7 +514,7 @@ public 	function end_blkblock()
 			return $this->data;
 	}
 
-public 	function CreateTrace()
+	public function CreateTrace()
 	{
 		$cache_id = md5($this->data);
 		$fn = $_SERVER["DOCUMENT_ROOT"]."/bitrix/cache/virus.db/".$cache_id.".vir";
@@ -532,7 +539,7 @@ public 	function CreateTrace()
 		}
 	}
 
-public 	function Analyze(&$content)
+	function Analyze(&$content)
 	{
 		static $arLocalCache = array();
 
@@ -609,7 +616,7 @@ public 	function Analyze(&$content)
 	Возвращает рейтинг опасности блока (ифрейм или скрипт)
 	входные параметры класса должны быть заполнеы.
 	*/
-public 	function returnblockrating()
+	public function returnblockrating()
 	{
 		if($this->type=='iframe')
 		{
@@ -647,7 +654,7 @@ public 	function returnblockrating()
 
 	// ПРАВИЛА
 	// надбавки и скидки действующие для каждого скрипта (возможно с некоторыми условиями)
-public 	function rulescriptglobals()
+	public function rulescriptglobals()
 	{
 		return 0;
 		$r = 0;
@@ -682,7 +689,7 @@ public 	function rulescriptglobals()
 	}
 
 	//правила, учитывающие окружение скрипта
-public 	function rulescriptblocks()
+	public function rulescriptblocks()
 	{
 		$r = 0;
 		$strp = preg_replace('/<!\-\-.*?\-\->$/', '', $this->prev);
@@ -748,7 +755,7 @@ public 	function rulescriptblocks()
 	}
 
 	//правила, отлавливающие "невидимость" блока
-public 	function ruleframevisiblity()
+	public function ruleframevisiblity()
 	{
 		$r = 0;
 		if(
@@ -781,7 +788,7 @@ public 	function ruleframevisiblity()
 	}
 
 	//правила, отлавливающие потенциально опасныеключевые слова в скрипте
-public 	function rulescriptbasics()
+	public function rulescriptbasics()
 	{
 		$r = 0;
 		if(preg_match("/\<iframe/is", $this->body))
@@ -868,7 +875,7 @@ public 	function rulescriptbasics()
 	}
 
 	//правила, отлавливающие vbscript
-public 	function rulescriptvbscript()
+	public function rulescriptvbscript()
 	{
 		$r = 0;
 		if(preg_match('/vbscript/is', $this->atributes))
@@ -881,7 +888,7 @@ public 	function rulescriptvbscript()
 	}
 
 	//правила, отлавливающие опасные места загрузки блоков
-public 	function ruleallsources()
+	function ruleallsources()
 	{
 		$r = 0;
 		static $bl = array(
@@ -1003,6 +1010,7 @@ public 	function ruleallsources()
 		}
 		else
 		{
+			$ll = 0;
 			$mxl = 0;
 			foreach($this->bodylines as $str)
 			{
@@ -1038,7 +1046,7 @@ public 	function ruleallsources()
 	}
 
 	// Анализ частотных вхождений символов...
-	funpublic ction rulescriptfrequensy()
+	public function rulescriptfrequensy()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1446,7 +1454,7 @@ public 	function ruleallsources()
 	}
 
 	// признаки, уменьшающие рейтинг опасности скрипта
-public 	function rulescriptwhiterules()
+	public function rulescriptwhiterules()
 	{
 		if(!$this->bodylines)
 			$this->bodylines = explode("\n", $this->body);
@@ -1525,7 +1533,7 @@ public 	function rulescriptwhiterules()
 	}
 
 	//анализ признаков в именах функций и переменных
-	fupublic nction rulescriptnamerules()
+	public function rulescriptnamerules()
 	{
 
 		$rr = $this->getnames($this->body);
@@ -1628,7 +1636,7 @@ public 	function rulescriptwhiterules()
 	// вспомогательные функции..
 
 	// возвращает частотные содержания символов в строке
-public static 	function getstatchars(&$str)
+	function getstatchars(&$str)
 	{
 		static $arCharClasses = false;
 		if(!$arCharClasses)
@@ -1689,13 +1697,13 @@ public static 	function getstatchars(&$str)
 		return $out;
 	}
 
-public static 	function getnames_cb($m)
+	public function getnames_cb($m)
 	{
 		$this->quotes[] = ($m[2]);
 		return $m[1].$m[3];
 	}
 
-public static 	function getnames($str)
+	public function getnames($str)
 	{
 		$flt = new CSecurityXSSDetect(array("action" => "none", "log" => "N"));
 		$flt->removeQuotedStrings($str);
@@ -1725,7 +1733,7 @@ public static 	function getnames($str)
 		return $r;
 	}
 
-public static 	function isnormalname($nm, &$l)
+	public static function isnormalname($nm, &$l)
 	{
 		$lnm = strtolower($nm);
 		if($lnm == 'ac_fl_runcontent')
@@ -1781,14 +1789,14 @@ public static 	function isnormalname($nm, &$l)
 		return $cache[$nm];
 	}
 
-public static 	function returnscriptbody($str)
+	public static function returnscriptbody($str)
 	{
 		if(preg_match("/<script.*?>((\s*<!\-\-)|(<!\[CDATA\[))?\s*(.*?)\s*((\/\/\s*\-\->\s*)|(\/\/\s*\]\s*\]\s*))?<\/script.*>/is", $str, $ret))
 			return $ret[4];
 		return $str;
 	}
 
-public static 	function isSafetyRequest()
+	public static function isSafetyRequest()
 	{
 		return (!in_array($_SERVER['REQUEST_METHOD'],array('GET','POST')));
 	}

@@ -625,4 +625,3 @@ class CForumTopic extends CAllForumTopic
 		return new _CTopicDBResult($db_res, $arAddParams);
 	}
 }
-?>

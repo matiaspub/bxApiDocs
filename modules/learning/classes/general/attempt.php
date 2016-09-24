@@ -89,19 +89,19 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Метод добавляет новую попытку.</p>
+	* <p>Метод добавляет новую попытку. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит        значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.       
 	* Обязательные поля должны быть заполнены. <br>
 	*
 	* @return int <p>Метод возвращает идентификатор добавленной попытки, если
-	* добавление прошло успешно. При возникновении ошибки метод вернёт
-	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	* добавление прошло  успешно. При возникновении ошибки метод
+	* вернёт <i>false</i>, а в исключениях  будут содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -136,7 +136,7 @@ abstract class CAllTestAttempt
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/update.php">Update</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -174,21 +174,21 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Метод изменяет параметры попытки с идентификатором ID.</p>
+	* <p>Метод изменяет параметры попытки с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор попытки
+	* @param int $intID  Идентификатор попытки
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">всех полей</a> попытки.
-	* Обязательные поля должны быть заполнены. <br>
+	* Обязательные        поля должны быть заполнены. <br>
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернёт <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -219,10 +219,9 @@ abstract class CAllTestAttempt
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> <li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a>  </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul> <a
-	* name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/add.php">Add</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -264,16 +263,16 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Метод удаляет попытку с идентификатором ID.</p>
+	* <p>Метод удаляет попытку с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор попытки.
+	* @param int $intID  Идентификатор попытки.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления попытки, в
-	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	* противном  случае возвращает <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -377,17 +376,17 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает попытку по идентификатору ID. Учитываются права доступа текущего  пользователя. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор попытки.
+	* @param int $intID  Идентификатор попытки.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>See Also</h4> 
-	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li><li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  </li><li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a>  </li>
 	*
 	*
 	* @static
@@ -405,7 +404,7 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Возвращает количество попыток студента для указанного теста.</p>
+	* <p>Возвращает количество попыток студента для указанного теста. Метод нестатический.</p>
 	*
 	*
 	* @param int $TEST_ID  Идентификатор теста.
@@ -436,17 +435,17 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Проверяет, пройден ли тест.</p>
+	* <p>Проверяет, пройден ли тест. Метод нестатический.</p>
 	*
 	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
 	*
-	* @param int $PERCENT  Количество процентов, необходимых для прохождения теста.
+	* @param int $PERCENT  Количество процентов, необходимых для прохождения  теста.
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если тест пройден, иначе - <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -603,16 +602,16 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы.</p>
+	* <p>Переводит попытку в статус "Закончена" и пересчитывает набранные баллы. Метод нестатический.</p>
 	*
 	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если операция выполнилась успешно,
-	* иначе <i>false</i>.</p>
+	* иначе  <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (CModule::IncludeModule("learning"))
 	* {
 	*     $ATTEMPT_ID = 23;
@@ -759,43 +758,46 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Возвращает список попыток по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает список попыток по фильтру <b>arFilter</b>,  отсортированный в порядке <b>arOrder</b>. Учитываются права доступа  текущего пользователя. Метод статический.</p>
 	*
 	*
-	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li> <b>STUDENT_ID</b> -
-	* идентификатор студента ; </li> <li> <b>DATE_START</b> - дата начала попытки; </li>
-	* <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>STATUS</b> - статус
-	* попытки; </li> <li> <b>SCORE</b> - количество баллов; </li> <li> <b>MAX_SCORE</b> -
-	* максимальное количество баллов; </li> <li> <b>COMPLETED</b> - тест пройден; </li>
-	* <li> <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>USER_NAME</b> - имя студента ;
-	* </li> <li> <b>TEST_NAME</b> - название теста. </li> </ul>Направление сортировки
-	* может принимать значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li>
-	* <b>desc</b> - по убыванию; </li> </ul>Необязательный. По умолчанию
-	* сортируется по убыванию идентификатора попытки.
+	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле       
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br>Поле для       
+	* сортировки может принимать значения:  			<ul> <li> <b>ID</b> -
+	* идентификатор попытки;  				</li> <li> <b>TEST_ID</b> - идентификатор теста; 
+	* 				</li> <li> <b>STUDENT_ID</b> - идентификатор студента ;  				</li> <li> <b>DATE_START</b> -
+	* дата начала попытки;  				</li> <li> <b>DATE_END</b> - дата окончания попытки; 
+	* 				</li> <li> <b>STATUS</b> - статус попытки;  				</li> <li> <b>SCORE</b> - количество
+	* баллов;  				</li> <li> <b>MAX_SCORE</b> - максимальное количество баллов;  				</li>
+	* <li> <b>COMPLETED</b> - тест пройден;  				</li> <li> <b>QUESTIONS</b> - количество
+	* вопросов;  				</li> <li> <b>USER_NAME</b> - имя студента ;  				</li> <li> <b>TEST_NAME</b> -
+	* название теста. </li> </ul>Направление сортировки        может принимать
+	* значения:  			<ul> <li> <b>asc</b> - по возрастанию;  				</li> <li> <b>desc</b> - по
+	* убыванию; </li> </ul>Необязательный. По умолчанию        сортируется по
+	* убыванию идентификатора попытки.
 	*
-	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	* идентификатор попытки; </li> <li> <b>TEST_ID</b> - идентификатор теста; </li> <li>
-	* <b>STUDENT_ID</b> - идентификатор студента; </li> <li> <b>SCORE</b> - количество
-	* баллов; </li> <li> <b>MAX_SCORE</b> - максимальное количество баллов; </li> <li>
-	* <b>QUESTIONS</b> - количество вопросов; </li> <li> <b>STATUS</b> - статус попытки (B -
-	* тестирование началось, D - тест прерван, F - тест закончен.); </li> <li>
-	* <b>COMPLETED</b> - тест пройден (Y|N); </li> <li> <b>DATE_START</b> - дата начала попытки;
-	* </li> <li> <b>DATE_END</b> - дата окончания попытки; </li> <li> <b>USER</b> -
-	* пользователь (возможны сложные условия по полям пользователя ID,
-	* LOGIN, NAME, LAST_NAME); </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По
-	* умолчанию "R". Список прав доступа см. в <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li>
-	* <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
-	* значение "N" - права доступа не проверяются. </li> </ul>Перед названием
-	* фильтруемого поля может указать тип фильтрации: <ul> <li>"!" - не равно
-	* </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
-	* </li> <li>"&gt;=" - больше либо равно </li> </ul> <br>"<i>значения фильтра</i>" -
-	* одиночное значение или массив.<br><br>Необязательный. По умолчанию
-	* записи не фильтруются.
+	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [,       
+	* ...])</i>. Фильтруемое поле может принимать значения:  			<ul> <li> <b>ID</b> -
+	* идентификатор попытки;  				</li> <li> <b>TEST_ID</b> - идентификатор теста; 
+	* 				</li> <li> <b>STUDENT_ID</b> - идентификатор студента;  				</li> <li> <b>SCORE</b> -
+	* количество баллов;  				</li> <li> <b>MAX_SCORE</b> - максимальное количество
+	* баллов;  				</li> <li> <b>QUESTIONS</b> - количество вопросов;  				</li> <li> <b>STATUS</b> -
+	* статус попытки (B - тестирование началось, D - тест          прерван, F -
+	* тест закончен.);  				</li> <li> <b>COMPLETED</b> - тест пройден (Y|N);  				</li> <li>
+	* <b>DATE_START</b> - дата начала попытки;  				</li> <li> <b>DATE_END</b> - дата окончания
+	* попытки;  				</li> <li> <b>USER</b> - пользователь (возможны сложные условия
+	* по полям          пользователя ID, LOGIN, NAME, LAST_NAME);  				</li> <li> <b>MIN_PERMISSION</b> -
+	* минимальный уровень доcтупа. По умолчанию          "R". Список прав
+	* доступа см. в <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. 
+	* 				</li> <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если         
+	* установлено значение "N" - права доступа не проверяются. </li>
+	* </ul>Перед        названием фильтруемого поля может указать тип
+	* фильтрации:  			<ul> <li>"!" - не равно  				</li> <li>"&lt;" - меньше  				</li> <li>"&lt;=" -
+	* меньше либо равно  				</li> <li>"&gt;" - больше  				</li> <li>"&gt;=" - больше либо
+	* равно </li> </ul> <br>"<i>значения фильтра</i>" -        одиночное значение или
+	* массив.<br><br>Необязательный. По умолчанию записи        не
+	* фильтруются.
 	*
 	* @param array $arrayarSelect = Array() Массив полей записей, которые будут возвращены методом.<br><br>
 	* Значение по умолчанию - пустой массив array() - означает, что будут
@@ -804,10 +806,10 @@ abstract class CAllTestAttempt
 	* @param array $arrayarNavParams = Array() Массив настроек постраничной навигации.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -848,10 +850,10 @@ abstract class CAllTestAttempt
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/index.php">CTestAttempt</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php">GetByID</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ctestattempt/getbyid.php">GetByID</a>  </li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#attempt">Поля попытки</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1035,17 +1037,17 @@ abstract class CAllTestAttempt
 
 	
 	/**
-	* <p>Создаёт план вопросов для указанной попытки.</p>
+	* <p>Создаёт план вопросов для указанной попытки. Метод статический.</p>
 	*
 	*
 	* @param int $ATTEMPT_ID  Идентификатор попытки.
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если создание плана вопросов прошло
-	* успешно. При возникновении ошибки метод вернёт <i>false</i>, а в
-	* исключениях будут содержаться ошибки.</p>
+	* успешно.  При возникновении ошибки метод вернёт <i>false</i>, а в
+	* исключениях будут  содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

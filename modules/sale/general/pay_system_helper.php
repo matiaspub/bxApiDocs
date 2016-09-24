@@ -37,7 +37,7 @@ class CSalePaySystemsHelper
 		return $arResult;
 	}
 
-	public static function getPaySystemTarif($actionFile, $psId, $persId)
+	public static function getPaySystemTarif($actionFile, $psId, $persId = 0)
 	{
 		$arTarif = array();
 		$PSTarifClassName = self::getTarifClassName($actionFile);
@@ -51,6 +51,12 @@ class CSalePaySystemsHelper
 	public static function getPSPrice($arPaySystem, $orderPrice, $deliveryPrice, $buyerLocationId)
 	{
 		$result = 0;
+
+		$map = CSalePaySystemAction::getOldToNewHandlersMap();
+		$oldHandler = array_search($arPaySystem["PSA_ACTION_FILE"], $map);
+		if ($oldHandler !== false)
+			$arPaySystem["PSA_ACTION_FILE"] = $oldHandler;
+
 		$PSTarifClassName = self::getTarifClassName($arPaySystem["PSA_ACTION_FILE"]);
 
 		if(strlen($PSTarifClassName) > 0 && is_callable($PSTarifClassName.'::getPrice'))

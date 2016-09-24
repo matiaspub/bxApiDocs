@@ -18,8 +18,8 @@ interface ILearnLesson
 	 * WARNING: this method terminates (by die()/exit()) current execution flow
 	 * when SQL server error occured. It's due to bug in CDatabase::Insert() in main
 	 * module (version info:
-	 *    define("SM_VERSION","11.0.12");
-	 *    define("SM_VERSION_DATE","2012-02-21 17:00:00"); // YYYY-MM-DD HH:MI:SS
+	 *    // define("SM_VERSION","11.0.12");
+	 *    // define("SM_VERSION_DATE","2012-02-21 17:00:00"); // YYYY-MM-DD HH:MI:SS
 	 * )
 	 *
 	 * @param array of pairs field => value for new lesson. Allowed fields are ACTIVE,
@@ -1377,8 +1377,8 @@ class CLearnLesson implements ILearnLesson
 	 * WARNING: this method terminates (by die()/exit()) current execution flow
 	 * when SQL server error occured. It's due to bug in CDatabase::Update() in main
 	 * module (version info:
-	 *    // define("SM_VERSION","11.0.12");
-	 *    // define("SM_VERSION_DATE","2012-02-21 17:00:00"); // YYYY-MM-DD HH:MI:SS
+	 *    define("SM_VERSION","11.0.12");
+	 *    define("SM_VERSION_DATE","2012-02-21 17:00:00"); // YYYY-MM-DD HH:MI:SS
 	 * )
 	 *
 	 * @param int $courseId (returned by GetLinkedCourse($lessonId) )

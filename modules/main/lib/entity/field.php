@@ -136,6 +136,11 @@ abstract class Field
 		$this->entity = $entity;
 	}
 
+	public function resetEntity()
+	{
+		$this->entity = null;
+	}
+
 	/**
 	 * @param        $value
 	 * @param        $primary
@@ -406,6 +411,11 @@ abstract class Field
 		return $this->name;
 	}
 
+	public function setName($name)
+	{
+		$this->name = $name;
+	}
+
 	public function getTitle()
 	{
 		if($this->title !== null)
@@ -493,7 +503,12 @@ abstract class Field
 
 	public function getLangCode()
 	{
-		return $this->getEntity()->getLangCode().'_'.$this->getName().'_FIELD';
+		$entity = $this->getEntity();
+		if($entity !== null)
+		{
+			return $entity->getLangCode().'_'.$this->getName().'_FIELD';
+		}
+		return null;
 	}
 
 	static public function serialize($value)

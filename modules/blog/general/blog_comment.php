@@ -7,10 +7,11 @@ class CAllBlogComment
 	/*************** ADD, UPDATE, DELETE *****************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB;
+		global $DB, $APPLICATION;
+
 		if ((is_set($arFields, "BLOG_ID") || $ACTION=="ADD") && IntVal($arFields["BLOG_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_EMPTY_BLOG_ID"), "EMPTY_BLOG_ID");
+			$APPLICATION->ThrowException(GetMessage("BLG_GCM_EMPTY_BLOG_ID"), "EMPTY_BLOG_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "BLOG_ID"))
@@ -18,14 +19,14 @@ class CAllBlogComment
 			$arResult = CBlog::GetByID($arFields["BLOG_ID"]);
 			if (!$arResult)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["BLOG_ID"], GetMessage("BLG_GCM_ERROR_NO_BLOG")), "ERROR_NO_BLOG");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["BLOG_ID"], GetMessage("BLG_GCM_ERROR_NO_BLOG")), "ERROR_NO_BLOG");
 				return false;
 			}
 		}
 
 		if ((is_set($arFields, "POST_ID") || $ACTION=="ADD") && IntVal($arFields["POST_ID"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_EMPTY_POST_ID"), "EMPTY_POST_ID");
+			$APPLICATION->ThrowException(GetMessage("BLG_GCM_EMPTY_POST_ID"), "EMPTY_POST_ID");
 			return false;
 		}
 		elseif (is_set($arFields, "POST_ID"))
@@ -33,7 +34,7 @@ class CAllBlogComment
 			$arResult = CBlogPost::GetByID($arFields["POST_ID"]);
 			if (!$arResult)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["POST_ID"], GetMessage("BLG_GCM_ERROR_NO_POST")), "ERROR_NO_POST");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["POST_ID"], GetMessage("BLG_GCM_ERROR_NO_POST")), "ERROR_NO_POST");
 				return false;
 			}
 		}
@@ -43,7 +44,7 @@ class CAllBlogComment
 			$arResult = CBlogComment::GetByID($arFields["PARENT_ID"]);
 			if (!$arResult)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(str_replace("#ID#", $arFields["PARENT_ID"], GetMessage("BLG_GCM_ERROR_NO_COMMENT")), "ERROR_NO_COMMENT");
+				$APPLICATION->ThrowException(str_replace("#ID#", $arFields["PARENT_ID"], GetMessage("BLG_GCM_ERROR_NO_COMMENT")), "ERROR_NO_COMMENT");
 				return false;
 			}
 		}
@@ -52,7 +53,7 @@ class CAllBlogComment
 		{
 			if (IntVal($arFields["AUTHOR_ID"]) <= 0)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_EMPTY_AUTHOR_ID"), "EMPTY_AUTHOR_ID");
+				$APPLICATION->ThrowException(GetMessage("BLG_GCM_EMPTY_AUTHOR_ID"), "EMPTY_AUTHOR_ID");
 				return false;
 			}
 			else
@@ -60,7 +61,7 @@ class CAllBlogComment
 				$dbResult = CUser::GetByID($arFields["AUTHOR_ID"]);
 				if (!$dbResult->Fetch())
 				{
-					$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_ERROR_NO_AUTHOR_ID"), "ERROR_NO_AUTHOR_ID");
+					$APPLICATION->ThrowException(GetMessage("BLG_GCM_ERROR_NO_AUTHOR_ID"), "ERROR_NO_AUTHOR_ID");
 					return false;
 				}
 			}
@@ -69,7 +70,7 @@ class CAllBlogComment
 		{
 			if ((is_set($arFields, "AUTHOR_NAME") || $ACTION=="ADD") && strlen($arFields["AUTHOR_NAME"]) <= 0)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_EMPTY_AUTHOR_NAME"), "EMPTY_AUTHOR_NAME");
+				$APPLICATION->ThrowException(GetMessage("BLG_GCM_EMPTY_AUTHOR_NAME"), "EMPTY_AUTHOR_NAME");
 				return false;
 			}
 		}
@@ -78,20 +79,20 @@ class CAllBlogComment
 		{
 			if (!check_email($arFields["AUTHOR_EMAIL"]))
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_ERROR_AUTHOR_EMAIL"), "ERROR_AUTHOR_EMAIL");
+				$APPLICATION->ThrowException(GetMessage("BLG_GCM_ERROR_AUTHOR_EMAIL"), "ERROR_AUTHOR_EMAIL");
 				return false;
 			}
 		}
 
 		if ((is_set($arFields, "DATE_CREATE") || $ACTION=="ADD") && (!$DB->IsDate($arFields["DATE_CREATE"], false, LANG, "FULL")))
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_ERROR_DATE_CREATE"), "ERROR_DATE_CREATE");
+			$APPLICATION->ThrowException(GetMessage("BLG_GCM_ERROR_DATE_CREATE"), "ERROR_DATE_CREATE");
 			return false;
 		}
 
 		if ((is_set($arFields, "POST_TEXT") || $ACTION=="ADD") && strlen($arFields["POST_TEXT"]) <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("BLG_GCM_EMPTY_POST_TEXT"), "EMPTY_POST_TEXT");
+			$APPLICATION->ThrowException(GetMessage("BLG_GCM_EMPTY_POST_TEXT"), "EMPTY_POST_TEXT");
 			return false;
 		}
 
@@ -108,7 +109,7 @@ class CAllBlogComment
 
 	public static function Delete($ID)
 	{
-		global $DB;
+		global $DB, $USER_FIELD_MANAGER;
 
 		$ID = IntVal($ID);
 
@@ -138,7 +139,7 @@ class CAllBlogComment
 			while($aImg = $res->Fetch())
 				CBlogImage::Delete($aImg['ID']);
 
-			$GLOBALS["USER_FIELD_MANAGER"]->Delete("BLOG_COMMENT", $ID);
+			$USER_FIELD_MANAGER->Delete("BLOG_COMMENT", $ID);
 		}
 
 		unset($GLOBALS["BLOG_COMMENT"]["BLOG_COMMENT_CACHE_".$ID]);
@@ -192,6 +193,8 @@ class CAllBlogComment
 
 	public static function BuildRSS($postID, $blogID, $type = "RSS2.0", $numPosts = 10, $arPathTemplate = Array())
 	{
+		global $USER;
+
 		$blogID = IntVal($blogID);
 		$postID = IntVal($postID);
 		if($blogID <= 0)
@@ -320,7 +323,7 @@ class CAllBlogComment
 						$rssText .= "\n";
 					}
 
-					$user_id = $GLOBALS["USER"]->GetID();
+					$user_id = $USER->GetID();
 					if($arPathTemplate["USE_SOCNET"] == "Y")
 					{
 						$postPerm = CBlogPost::GetSocNetPostPerms($postID);
@@ -365,7 +368,7 @@ class CAllBlogComment
 								$url1 = $url."&amp;";
 							else
 								$url1 = $url."?";
-							$url1 .= "commentId=".$arComments["ID"]."#".$arComments["ID"];
+							$url1 .= "commentId=".$arComments["ID"]."#com".$arComments["ID"];
 
 							$authorURL = "";
 							if(IntVal($arComments["AUTHOR_ID"]) > 0)
@@ -461,6 +464,7 @@ class CAllBlogComment
 
 		return $rssText;
 	}
+
 	public static function _IndexPostComments($arParams = Array())
 	{
 		if(IntVal($arParams["BLOG_ID"]) <= 0 || IntVal($arParams["POST_ID"]) <= 0 || !CModule::IncludeModule("search"))
@@ -533,6 +537,8 @@ class CAllBlogComment
 
 			CSearch::Index("blog", "C".$arComment["ID"], $arSearchIndex, True);
 		}
+
+		return true;
 	}
 
 	public static function UpdateLog($commentID, $arBlogUser, $arUser, $arComment, $arPost, $arParams)
@@ -639,22 +645,43 @@ class CAllBlogComment
 		return $arSp;
 	}
 
-	public static function GetSocNetUserPerms($postId = 0, $authorId = 0)
+	public static function GetSocNetUserPerms($postId = 0, $authorId = 0, $userId = 0)
 	{
 		global $APPLICATION, $USER, $AR_BLOG_PERMS;
 
-		$userId = IntVal($USER->GetID());
+		$bCurrent = false;
+
+		if (
+			!isset($userId)
+			|| intval($userId) <= 0
+		)
+		{
+			$userId = IntVal($USER->GetID());
+			$bCurrent = true;
+		}
+
 		$postId = IntVal($postId);
 		$authorId = IntVal($authorId);
-		if($postId <= 0)
+		if ($postId <= 0)
+		{
 			return false;
+		}
 
 		$perms = BLOG_PERMS_DENY;
 
-		$blogModulePermissions = $APPLICATION->GetGroupRight("blog");
-		if($authorId > 0 && $userId == $authorId)
+		$blogModulePermissions = $APPLICATION->GetGroupRight("blog", ($bCurrent ? false : CUser::GetUserGroup($userId)));
+		if (
+			$authorId > 0
+			&& $userId == $authorId
+		)
+		{
 			$perms = BLOG_PERMS_FULL;
-		elseif ($blogModulePermissions >= "W" || CSocNetUser::IsCurrentUserModuleAdmin())
+		}
+
+		elseif (
+			$blogModulePermissions >= "W"
+			|| ($bCurrent ? CSocNetUser::IsCurrentUserModuleAdmin() : CSocNetUser::IsUserModuleAdmin($userId))
+		)
 		{
 			end($AR_BLOG_PERMS);
 			$perms = key($AR_BLOG_PERMS);
@@ -673,7 +700,7 @@ class CAllBlogComment
 			else
 			{
 				$arCodes = CAccess::GetUserCodesArray($userId);
-				foreach($arCodes as $code)
+				foreach ($arCodes as $code)
 				{
 					if (
 						preg_match('/^DR([0-9]+)/', $code, $match)
@@ -691,7 +718,7 @@ class CAllBlogComment
 				CBlogPost::$arUACCache[$userId] = $arEntities;
 			}
 
-			if(!empty($arEntities["DR"]) && !empty($arPerms["DR"]))
+			if (!empty($arEntities["DR"]) && !empty($arPerms["DR"]))
 			{
 				foreach($arPerms["DR"] as $id => $val)
 				{
@@ -702,8 +729,19 @@ class CAllBlogComment
 					}
 				}
 			}
-			if((!empty($arPerms["U"][$userId]) && in_array("US".$userId, $arPerms["U"][$userId])) || ($authorId >0 && $userId == $authorId)) // if author
+			if (
+				(
+					!empty($arPerms["U"][$userId])
+					&& in_array("US".$userId, $arPerms["U"][$userId])
+				)
+				|| (
+					$authorId > 0
+					&& $userId == $authorId
+				)
+			) // if author
+			{
 				$perms = BLOG_PERMS_FULL;
+			}
 			else
 			{
 				if($authorId <= 0)
@@ -718,20 +756,33 @@ class CAllBlogComment
 					}
 				}
 
-				if(!empty($arPerms["U"][$userId]) || (!empty($arPerms["U"][$authorId]) && in_array("US".$authorId, $arPerms["U"][$authorId])) || $perms == BLOG_PERMS_READ)
+				if (
+					!empty($arPerms["U"][$userId])
+					|| (
+						!empty($arPerms["U"][$authorId])
+						&& in_array("US".$authorId, $arPerms["U"][$authorId])
+					)
+					|| $perms == BLOG_PERMS_READ
+				)
 				{
 					if (CSocNetFeaturesPerms::CanPerformOperation($userId, SONET_ENTITY_USER, $authorId, "blog", "write_comment"))
+					{
 						$perms = BLOG_PERMS_WRITE;
+					}
 					elseif (CSocNetFeaturesPerms::CanPerformOperation($userId, SONET_ENTITY_USER, $authorId, "blog", "premoderate_comment"))
+					{
 						$perms = BLOG_PERMS_PREMODERATE;
+					}
 					elseif (CSocNetFeaturesPerms::CanPerformOperation($userId, SONET_ENTITY_USER, $authorId, "blog", "view_comment"))
+					{
 						$perms = BLOG_PERMS_READ;
+					}
 				}
 			}
 
-			if($perms <= BLOG_PERMS_FULL)
+			if ($perms <= BLOG_PERMS_FULL)
 			{
-				$arGroupsId = Array();
+				$arGroupsId = $operation = Array();
 
 				if(!empty($arPerms["SG"]))
 				{
@@ -740,23 +791,39 @@ class CAllBlogComment
 						//if(!empty($arEntities["SG"][$gid]))
 						$arGroupsId[] = $gid;
 					}
+
 					$operation = Array("full_comment", "moderate_comment", "write_comment", "premoderate_comment");
-					if($perms < BLOG_PERMS_READ)
+					if ($perms < BLOG_PERMS_READ)
+					{
 						$operation[] = "view_comment";
+					}
 				}
 
-				if(!empty($arGroupsId))
+				if (!empty($arGroupsId))
 				{
-					foreach($operation as $v)
+					foreach ($operation as $v)
 					{
-						if($perms <= BLOG_PERMS_READ)
+						if ($perms <= BLOG_PERMS_READ)
 						{
 							$f = CSocNetFeaturesPerms::GetOperationPerm(SONET_ENTITY_GROUP, $arGroupsId, "blog", $v);
-							if(!empty($f))
+							if (
+								is_array($f)
+								&& !empty($f)
+							)
 							{
 								foreach($f as $gid => $val)
 								{
-									if((!empty($arEntities["SG"][$gid]) && in_array($val, $arEntities["SG"][$gid])) || $val == SONET_ROLES_ALL || ($userId > 0 && $val == SONET_ROLES_AUTHORIZED))
+									if (
+										(
+											!empty($arEntities["SG"][$gid])
+											&& in_array($val, $arEntities["SG"][$gid])
+										)
+										|| $val == SONET_ROLES_ALL
+										|| (
+											$userId > 0
+											&& $val == SONET_ROLES_AUTHORIZED
+										)
+									)
 									{
 										switch($v)
 										{
@@ -791,7 +858,7 @@ class CAllBlogComment
 	public static function GetMentionedUserID($arFields)
 	{
 		$arMentionedUserID = array();
-								
+
 		if (isset($arFields["POST_TEXT"]))
 		{
 			preg_match_all("/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER, $arFields["POST_TEXT"], $arMention);
@@ -812,11 +879,11 @@ class CAllBlogComment
 	 */
 	public static function addLiveComment($commentId = 0, $arParams = array())
 	{
+		global $USER_FIELD_MANAGER;
+
 		$res = "";
 		if(
-			$commentId > 0 &&
-			CModule::IncludeModule("pull")
-			&& \CPullOptions::GetNginxStatus()
+			$commentId > 0
 			&& ($comment = CBlogComment::GetByID($commentId))
 			&& ($arPost = CBlogPost::GetByID($comment["POST_ID"]))
 		)
@@ -831,7 +898,6 @@ class CAllBlogComment
 			$arParams["NAME_TEMPLATE"] = isset($arParams["NAME_TEMPLATE"]) ? $arParams["NAME_TEMPLATE"] : CSite::GetNameFormat();
 			$arParams["SHOW_LOGIN"] = ($arParams["SHOW_LOGIN"] == "N" ? "N" : "Y");
 
-
 			$comment["DateFormated"] = FormatDateFromDB($comment["DATE_CREATE"], $arParams["DATE_TIME_FORMAT"], true);
 			$timestamp = MakeTimeStamp($comment["DATE_CREATE"]);
 
@@ -843,7 +909,7 @@ class CAllBlogComment
 				$comment["DateFormated"] = ToLower($comment["DateFormated"]);
 			}
 
-			$comment["UF"] = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFields("BLOG_COMMENT", $commentId, LANGUAGE_ID);
+			$comment["UF"] = $USER_FIELD_MANAGER->GetUserFields("BLOG_COMMENT", $commentId, LANGUAGE_ID);
 
 			$arAuthor = CBlogUser::GetUserInfo(
 				$comment["AUTHOR_ID"],
@@ -852,7 +918,6 @@ class CAllBlogComment
 					"AVATAR_SIZE_COMMENT" => $arParams["AVATAR_SIZE_COMMENT"]
 				)
 			);
-
 
 			if (intval($arAuthor["PERSONAL_PHOTO"]) > 0)
 			{
@@ -879,13 +944,41 @@ class CAllBlogComment
 			$arParserParams = Array(
 				"imageWidth" => 800,
 				"imageHeight" => 800,
+				"pathToUser" => $arParams["PATH_TO_USER"]
 			);
+			if (!empty($arParams["LOG_ID"]))
+			{
+				$arParserParams["pathToUserEntityType"] = 'LOG_ENTRY';
+				$arParserParams["pathToUserEntityId"] = intval($arParams["LOG_ID"]);
+			}
 			$comment["TextFormated"] = $p->convert($comment["POST_TEXT"], false, array(), $arAllow, $arParserParams);
 
 			$p->bMobile = true;
 			$comment["TextFormatedMobile"] = $p->convert($comment["POST_TEXT"], false, array(), $arAllow, $arParserParams);
 			$comment["TextFormatedJS"] = CUtil::JSEscape(htmlspecialcharsBack($comment["POST_TEXT"]));
 			$comment["TITLE"] = CUtil::JSEscape(htmlspecialcharsBack($comment["TITLE"]));
+
+			$authorType = false;
+			if (
+				isset($arAuthor["EXTERNAL_AUTH_ID"])
+				&& $arAuthor["EXTERNAL_AUTH_ID"] == 'email'
+			)
+			{
+				$authorType = 'EMAIL';
+			}
+			elseif (
+				IsModuleInstalled('extranet')
+				&& (
+					empty($arAuthor["UF_DEPARTMENT"])
+					|| (
+						is_array($arAuthor["UF_DEPARTMENT"])
+						&& empty($arAuthor["UF_DEPARTMENT"][0])
+					)
+				)
+			)
+			{
+				$authorType = 'EXTRANET';
+			}
 
 			$eventHandlerID = AddEventHandler("main", "system.field.view.file", Array("CSocNetLogTools", "logUFfileShow"));
 			$res = $APPLICATION->IncludeComponent(
@@ -908,7 +1001,10 @@ class CAllBlogComment
 								"NAME" => $arAuthor["~NAME"],
 								"LAST_NAME" => $arAuthor["~LAST_NAME"],
 								"SECOND_NAME" => $arAuthor["~SECOND_NAME"],
-								"AVATAR" => $arAuthor["PERSONAL_PHOTO_resized"]["src"]
+								"LOGIN" => $arAuthor["~LOGIN"],
+								"AVATAR" => $arAuthor["PERSONAL_PHOTO_resized"]["src"],
+								"EXTERNAL_AUTH_ID" => (isset($arAuthor["EXTERNAL_AUTH_ID"]) ? $arAuthor["EXTERNAL_AUTH_ID"] : ''),
+								"TYPE" => $authorType
 							),
 							"FILES" => false,
 							"UF" => $comment["UF"],
@@ -945,9 +1041,14 @@ HTML
 					"RESULT" => $commentId,
 					"PUSH&PULL" => array(
 						"ACTION" => "REPLY",
-						"ID" => $commentId
+						"ID" => $commentId,
+						"AUTHOR_ID" => $arAuthor["ID"]
 					),
-					"MODE" => "PULL_MESSAGE",
+					"MODE" => (
+						is_array($arParams) && isset($arParams["MODE"])
+							? $arParams["MODE"]
+							: "PLAIN"
+					),
 					"VIEW_URL" => "",
 					"EDIT_URL" => "",
 					"MODERATE_URL" => "",
@@ -985,6 +1086,8 @@ HTML
 
 	public static function BuildUFFields($arUF)
 	{
+		global $APPLICATION;
+
 		$arResult = array(
 			"AFTER" => "",
 			"AFTER_MOBILE" => ""
@@ -1003,7 +1106,7 @@ HTML
 			{
 				if(!empty($arUserField["VALUE"]))
 				{
-					$GLOBALS["APPLICATION"]->IncludeComponent(
+					$APPLICATION->IncludeComponent(
 						"bitrix:system.field.view",
 						$arUserField["USER_TYPE"]["USER_TYPE_ID"],
 						array(
@@ -1033,7 +1136,7 @@ HTML
 			{
 				if(!empty($arUserField["VALUE"]))
 				{
-					$GLOBALS["APPLICATION"]->IncludeComponent(
+					$APPLICATION->IncludeComponent(
 						"bitrix:system.field.view",
 						$arUserField["USER_TYPE"]["USER_TYPE_ID"],
 						array(

@@ -14,6 +14,25 @@ class Trigger extends BaseObject
 	 *
 	 * @return Trigger
 	 */
+	
+	/**
+	* <p>Статический метод создает триггер из токенов. Текущая позиция должна указывать на имя триггера.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Набор токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return \Bitrix\Perfmon\Sql\Trigger 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/trigger/create.php
+	* @author Bitrix
+	*/
 	public static function create(Tokenizer $tokenizer)
 	{
 		$name = $tokenizer->getCurrentToken()->text;
@@ -42,6 +61,25 @@ class Trigger extends BaseObject
 	 * @return void
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Статический метод проверяет набор токенов на наличие ключевого слова <code>'ON'</code>. Текущая позиция продвигается к следующему токену, пропуская пробелы.</p> <br>
+	*
+	*
+	* @param mixed $Bitrix  Набор токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/trigger/searchtablename.php
+	* @author Bitrix
+	*/
 	public static function searchTableName(Tokenizer $tokenizer)
 	{
 		$lineToken = $tokenizer->getCurrentToken();
@@ -65,6 +103,19 @@ class Trigger extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для создания триггера.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/trigger/getcreateddl.php
+	* @author Bitrix
+	*/
 	public function getCreateDdl($dbType = '')
 	{
 		return $this->body;
@@ -77,6 +128,19 @@ class Trigger extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для удаления триггера.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/trigger/getdropddl.php
+	* @author Bitrix
+	*/
 	public function getDropDdl($dbType = '')
 	{
 		switch ($dbType)
@@ -100,6 +164,27 @@ class Trigger extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для модификации триггера (сначала удаляется старая, затем создается новая версия).</p>
+	*
+	*
+	* @param mixed $Bitrix  Целевой объект.
+	*
+	* @param Bitri $Perfmon  Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param BaseObject $target  
+	*
+	* @param string $dbType = '' 
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/trigger/getmodifyddl.php
+	* @author Bitrix
+	*/
 	public function getModifyDdl(BaseObject $target, $dbType = '')
 	{
 		return array(

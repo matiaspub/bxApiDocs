@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetFeatures</b> - класс для работы с дополнительным функционалом групп и пользователей социальной сети. 
+ * <b>CSocNetFeatures</b> - класс для работы с дополнительным функционалом групп и пользователей социальной сети.
  *
  *
  * @return mixed 
@@ -19,13 +19,13 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	/***************************************/
 	
 	/**
-	* <p>Сохраняет в базу запись о новом дополнительном функционале пользователя или группы.</p>
+	* <p>Сохраняет в базу запись о новом дополнительном функционале пользователя или группы. Метод статический.</p>
 	*
 	*
 	* @param array $arFields  Параметры дополнительного функционала.
 	*
 	* @return int <p>Код записи, если сохранение прошло успешно. False - в противном
-	* случае.</p> <br><br>
+	* случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetfeatures/csocnetfeatures.add.php
@@ -99,7 +99,7 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	/***************************************/
 	
 	/**
-	* <p>Выбирает список дополнительного функционала в соответствии с фильтром.</p>
+	* <p>Выбирает список дополнительного функционала в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
@@ -108,7 +108,7 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	* <b>ENTITY_TYPE</b>, <b>ENTITY_ID</b>, <b>FEATURE</b>, <b>FEATURE_NAME</b>, <b>ACTIVE</b>, <b>DATE_CREATE</b>,
 	* <b>DATE_UPDATE</b>.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимае
 	* поля: <b>ID</b>, <b>ENTITY_TYPE</b>, <b>ENTITY_ID</b>, <b>FEATURE</b>, <b>FEATURE_NAME</b>, <b>ACTIVE</b>,
 	* <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>.
@@ -134,7 +134,7 @@ class CSocNetFeatures extends CAllSocNetFeatures
 	* удовлетворяющие условию выборки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Выберем в массив весь дополнительный функционал группы с идентификатором $ID
 	* $arFeaturesTmp = array(); 
@@ -257,4 +257,3 @@ class CSocNetFeatures extends CAllSocNetFeatures
 		return $dbRes;
 	}
 }
-?>

@@ -7,10 +7,11 @@ class CAllBlogImage
 	/*************** ADD, UPDATE, DELETE *****************/
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
-		global $DB;
-		
+		global $APPLICATION;
+
 		if (is_set($arFields, "FILE_ID"))
 		{
+			$arFile = null;
 			if (is_array($arFields['FILE_ID']))
 			{
 				if (strlen($arFields["FILE_ID"]["name"]) <= 0 && strlen($arFields["FILE_ID"]["del"]) <= 0)
@@ -23,25 +24,32 @@ class CAllBlogImage
 			else
 			{
 				$arFields['FILE_ID'] = intval($arFields['FILE_ID']);
-				if (
-					($arFields['FILE_ID'] > 0) &&
-					( $arFile = CFile::GetFileArray($arFields['FILE_ID']) )
-				)
+				if ($arFields['FILE_ID'] > 0)
 				{
-					$res = CFile::CheckImageFile($arFile, 0, 0, 0);
-					if (strlen($res) > 0)
-					{
-						$GLOBALS["APPLICATION"]->ThrowException($res, "ERROR_ATTACH_IMG");
-						return false;
-					}
+					$arFile = CFile::GetFileArray($arFields['FILE_ID']);
 				}
 			}
-					
-			if($arFields["IMAGE_SIZE_CHECK"] != "N" &&IntVal($arFields["IMAGE_SIZE"]) > 0 && IntVal($arFields["IMAGE_SIZE"]) > COption::GetOptionString("blog", "image_max_size", 5000000))
+
+			if ($arFile)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException(GetMessage("ERROR_ATTACH_IMG_SIZE", Array("#SIZE#" => DoubleVal(COption::GetOptionString("blog", "image_max_size", 5000000)/1000000))), "ERROR_ATTACH_IMG_SIZE");
+				$res = CFile::CheckImageFile($arFile, 0, 0, 0);
+				if (strlen($res) > 0)
+				{
+					$APPLICATION->ThrowException($res, "ERROR_ATTACH_IMG");
+					return false;
+				}
+			}
+
+			if(
+				$arFields["IMAGE_SIZE_CHECK"] != "N"
+				&& IntVal($arFields["IMAGE_SIZE"]) > 0
+				&& IntVal($arFields["IMAGE_SIZE"]) > COption::GetOptionString("blog", "image_max_size", 5000000)
+			)
+			{
+				$APPLICATION->ThrowException(GetMessage("ERROR_ATTACH_IMG_SIZE", Array("#SIZE#" => DoubleVal(COption::GetOptionString("blog", "image_max_size", 5000000)/1000000))), "ERROR_ATTACH_IMG_SIZE");
 				return false;
 			}
+
 			unset($arFields["IMAGE_SIZE_CHECK"]);
 		}
 
@@ -51,7 +59,7 @@ class CAllBlogImage
 	public static function ImageFixSize($aFile)
 	{
 		$file = $aFile['tmp_name'];
-		preg_match("#/([a-z]+)#ies", $aFile['type'], $regs);
+		preg_match("#/([a-z]+)#is", $aFile['type'], $regs);
 		$ext_tmp = $regs[1];
 
 		$sizeX = COption::GetOptionString("blog", "image_max_width", 600);

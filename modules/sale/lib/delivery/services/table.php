@@ -2,8 +2,10 @@
 
 namespace Bitrix\Sale\Delivery\Services;
 
+use Bitrix\Main\Application;
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Sale\Delivery\Services;
 
 Loc::loadMessages(__FILE__);
 
@@ -104,6 +106,17 @@ class Table extends Entity\DataManager
 				'data_type' => 'string',
 				'validation' => array(__CLASS__, 'validateCurrency'),
 				'title' => Loc::getMessage('DELIVERY_SERVICE_ENTITY_CURRENCY_FIELD'),
+			),
+			'TRACKING_PARAMS' => array(
+				'data_type' => 'text',
+				'serialized' => true,
+				'title' => Loc::getMessage('DELIVERY_SERVICE_ENTITY_TRACKING_PARAMS_FIELD'),
+			),
+			'ALLOW_EDIT_SHIPMENT' => array(
+				'data_type' => 'boolean',
+				'values' => array('N', 'Y'),
+				'default' => 'Y',
+				'title' => Loc::getMessage('DELIVERY_SERVICE_ENTITY_ALLOW_EDIT_SHIPMENT_FIELD')
 			)
 		);
 	}
@@ -133,230 +146,37 @@ class Table extends Entity\DataManager
 		);
 	}
 
+	/* Deprecated methods moved to manager. Will be removed in future versions. */
+
+	/**
+	 * @deprecated use Services\Manager::getIdByCode()
+	 */
 	public static function getIdByCode($code)
 	{
-		$result = self::getIdCodeCached($code, "code");
-
-		if($result !== false)
-			return $result;
-
-		$res = self::getList(array(
-			'filter' => array(
-				'=CODE' => $code
-			),
-		    'select' => array("ID")
-		));
-
-		if($handler = $res->fetch())
-		{
-			self::setIdCodeCached($handler["ID"], $code);
-			return $handler["ID"];
-		}
-
-		return false;
+		return Services\Manager::getIdByCode($code);
 	}
 
+	/**
+	 * @deprecated use Services\Manager::getCodeById()
+	 */
 	public static function getCodeById($id)
 	{
-		$result = self::getIdCodeCached($id, "id");
+		return Services\Manager::getCodeById($id);
+	}
 
-		if($result !== false)
-			return $result;
-
-		$res = self::getList(array(
-			'filter' => array(
-				'=ID' => $id
-			),
-			'select' => array("CODE")
-		));
-
-		if($handler = $res->fetch())
+	/**
+	 * @param mixed $primary
+	 * @return Entity\DeleteResult
+	 * @throws \Exception
+	 */
+	public static function delete($primary)
+	{
+		if ($primary == EmptyDeliveryService::getEmptyDeliveryServiceId())
 		{
-			self::setIdCodeCached($id, $handler["CODE"]);
-			return $handler["CODE"];
+			$cacheManager = Application::getInstance()->getManagedCache();
+			$cacheManager->clean(EmptyDeliveryService::CACHE_ID);
 		}
 
-		return false;
-	}
-
-	protected static function getIdCodeCached($value, $type)
-	{
-		$result = false;
-		$ttl = 315360000;
-		$cacheId = "SALE_DELIVERY_ID_CODE_MAP_".($type == "id" ? "I" : "C")."_".$value;
-		$cacheManager = \Bitrix\Main\Application::getInstance()->getManagedCache();
-
-		if($cacheManager->read($ttl, $cacheId))
-			$result = $cacheManager->get($cacheId);
-
-		return $result;
-	}
-
-	protected static function setIdCodeCached($id, $code)
-	{
-		$cacheManager = \Bitrix\Main\Application::getInstance()->getManagedCache();
-		$cacheManager->set("SALE_DELIVERY_ID_CODE_MAP_I_".$id, $code);
-		$cacheManager->set("SALE_DELIVERY_ID_CODE_MAP_C_".$code, $id);
-	}
-
-	protected static function cleanIdCodeCached($id)
-	{
-		$cacheManager = \Bitrix\Main\Application::getInstance()->getManagedCache();
-		$code = self::getIdCodeCached($id, "id");
-		$cacheManager->clean("SALE_DELIVERY_ID_CODE_MAP_I_".$id);
-
-		if(strlen($code) > 0)
-			$cacheManager->clean("SALE_DELIVERY_ID_CODE_MAP_C_".$code);
-	}
-
-	protected static function isDeliveryInOrders($deliveryId)
-	{
-		$dbOrders = \CSaleOrder::GetList(
-			array(),
-			array("DELIVERY_ID" => $deliveryId),
-			false,
-			false,
-			array("ID")
-		);
-
-		if($dbOrders->Fetch())
-			$result = true;
-		else
-			$result = false;
-
-		return $result;
-	}
-
-	public static function onBeforeDelete(Entity\Event $event)
-	{
-		$result = new Entity\EventResult;
-		$primary = $event->getParameter("primary");
-
-		if(self::isDeliveryInOrders($primary["ID"]))
-		{
-			$result->addError(new Entity\FieldError(
-				$event->getEntity()->getField('ID'),
-				Loc::getMessage('DELIVERY_SERVICE_ENTITY_ERROR_DELETE_IN_ORDERS_EXIST')
-			));
-		}
-		else
-		{
-			$dbRes = self::getList(array(
-				'filter' => array(
-					"PARENT_ID" => $primary["ID"]
-				),
-				'select' => array("ID")
-			));
-
-			while($child = $dbRes->fetch())
-			{
-				if(self::isDeliveryInOrders($child["ID"]))
-				{
-					$result->addError(new Entity\FieldError(
-						$event->getEntity()->getField('ID'),
-						Loc::getMessage('DELIVERY_SERVICE_ENTITY_ERROR_DELETE_IN_ORDERS_EXIST_CHLD')
-					));
-
-					break;
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	public static function onAfterDelete(Entity\Event $event)
-	{
-		$result = new Entity\EventResult;
-		$primary = $event->getParameter("primary");
-
-		$tablesToDelete= array(
-			'b_sale_delivery2location',
-			'b_sale_delivery2paysystem',
-			'b_sale_delivery_rstr',
-			'b_sale_delivery_es'
-		);
-
-		$con = \Bitrix\Main\Application::getConnection();
-		$sqlHelper = $con->getSqlHelper();
-
-		foreach($tablesToDelete as $table)
-			$con->queryExecute("DELETE FROM ".$table." WHERE DELIVERY_ID=".$sqlHelper->forSql($primary["ID"]));
-
-		$dbRes = self::getList(array(
-			'filter' => array(
-				"PARENT_ID" => $primary["ID"]
-			),
-			'select' => array("ID")
-		));
-
-		while($child = $dbRes->fetch())
-			self::delete($child["ID"]);
-
-		self::cleanIdCodeCached($primary["ID"]);
-		return $result;
-	}
-
-	public static function onAfterAdd(Entity\Event $event)
-	{
-		$primary = $event->getParameter('primary');
-		$fields = $event->getParameter('fields');
-
-		if(!empty($fields['CODE']))
-			self::setIdCodeCached($primary['ID'], $fields['CODE']);
-	}
-
-	public static function onAfterUpdate(Entity\Event $event)
-	{
-		$primary = $event->getParameter('primary');
-		$fields = $event->getParameter('fields');
-
-		if(!empty($fields['CODE']))
-			self::cleanIdCodeCached($primary['ID']);
-	}
-
-	public static function setChildrenFieldsValues($id, array $data)
-	{
-		if(empty($data))
-			return 0;
-
-		$counter = 0;
-
-		$res = self::getList(array(
-			'filter' => array('PARENT_ID' => $id),
-			'select' => array('ID')
-		));
-
-		while($child = $res->fetch())
-		{
-			$ures = self::update($child['ID'], $data);
-
-			if($ures->isSuccess())
-				$counter++;
-
-			$counter += self::setChildrenFieldsValues($child['ID'], $data);
-		}
-
-		return $counter;
-	}
-
-	public static function getTopGroups()
-	{
-		$result = array();
-
-		$res = self::getList(array(
-			'order' => array('NAME' => 'ASC'),
-			'select' => array('ID', 'NAME'),
-			'filter' => array(
-				'=PARENT_ID' => 0,
-				'=CLASS_NAME' => '\Bitrix\Sale\Delivery\Services\Group',
-				'=ACTIVE' => 'Y'
-			)
-		));
-
-		while($group = $res->fetch())
-			$result[$group["ID"]] = $group["NAME"];
-
-		return $result;
+		return parent::delete($primary);
 	}
 }

@@ -98,7 +98,7 @@ class CUserTypeIBlockElement extends CUserTypeEnum
 				$arFilter["ACTIVE"] = "Y";
 
 			$rs = CIBlockElement::GetList(
-				array("SORT" => "DESC", "NAME"=>"ASC"),
+				array("NAME" => "ASC", "ID" => "ASC"),
 				$arFilter,
 				false,
 				false,
@@ -194,7 +194,7 @@ class CUserTypeIBlockElement extends CUserTypeEnum
 		if(count($val) && CModule::IncludeModule('iblock'))
 		{
 			$ob = new CIBlockElement;
-			$rs = $ob->GetList(array("sort" => "asc", "id" => "asc"), array(
+			$rs = $ob->GetList(array(), array(
 				"=ID" => $val
 			), false, false, array("NAME"));
 
@@ -218,7 +218,7 @@ class CIBlockElementEnum extends CDBResult
 				$arFilter["ACTIVE"] = "Y";
 
 			$rs = CIBlockElement::GetList(
-				array("SORT" => "DESC", "NAME"=>"ASC"),
+				array("NAME" => "ASC", "ID" => "ASC"),
 				$arFilter,
 				false,
 				false,

@@ -1,4 +1,4 @@
-<?
+<?php
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/search/classes/general/title.php");
 
 class CSearchTitle extends CAllSearchTitle
@@ -10,12 +10,12 @@ class CSearchTitle extends CAllSearchTitle
 
 		$sqlHaving = array();
 		$sqlWords = array();
-		if(!empty($this->_arPhrase))
+		if (!empty($this->_arPhrase))
 		{
 			$last = true;
-			foreach(array_reverse($this->_arPhrase, true) as $word => $pos)
+			foreach (array_reverse($this->_arPhrase, true) as $word => $pos)
 			{
-				if($last && !preg_match("/[\\n\\r \\t]$/", $phrase))
+				if ($last && !preg_match("/[\\n\\r \\t]$/", $phrase))
 				{
 					$last = false;
 					if (strlen($word) >= $this->minLength)
@@ -37,9 +37,9 @@ class CSearchTitle extends CAllSearchTitle
 		{
 			$bIncSites = false;
 			$strSqlWhere = CSearch::__PrepareFilter($arParams, $bIncSites);
-			if($bNotFilter)
+			if ($bNotFilter)
 			{
-				if(!empty($strSqlWhere))
+				if (!empty($strSqlWhere))
 					$strSqlWhere = "NOT (".$strSqlWhere.")";
 				else
 					$strSqlWhere = "1=0";
@@ -76,11 +76,11 @@ class CSearchTitle extends CAllSearchTitle
 					ID, MODULE_ID, ITEM_ID, TITLE, PARAM1, PARAM2, DATE_CHANGE, DIR, SERVER_NAME, URL, SITE_URL, SITE_ID
 				".(count($sqlHaving) > 1? "HAVING ".implode(" AND ", $sqlHaving): "")."
 				ORDER BY ".(
-					$bOrderByRank?
-						"RANK1 DESC, RANK2 DESC, RANK3 ASC, TITLE":
-						"DATE_CHANGE DESC, RANK1 DESC, RANK2 DESC, RANK3 ASC, TITLE"
+				$bOrderByRank?
+					"RANK1 DESC, RANK2 DESC, RANK3 ASC, TITLE":
+					"DATE_CHANGE DESC, RANK1 DESC, RANK2 DESC, RANK3 ASC, TITLE"
 				)."
-				LIMIT 0, ".($nTopCount+1)."
+				LIMIT 0, ".($nTopCount + 1)."
 			";
 
 			$r = $DB->Query($strSql);
@@ -107,4 +107,3 @@ class CSearchTitle extends CAllSearchTitle
 			return "DATE_CHANGE DESC, RANK1 DESC, TITLE";
 	}
 }
-?>

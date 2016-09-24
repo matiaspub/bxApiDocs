@@ -8,6 +8,17 @@
 ##############################################
 */
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/quota.php");
+
+/**
+ * <b>CDiskQuota</b> - класс для работы с дисковыми квотами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdiskquota/index.php
+ * @author Bitrix
+ */
 class CDiskQuota extends CAllDiskQuota
 {
 	public static function SetDBSize()

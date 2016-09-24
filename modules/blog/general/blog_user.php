@@ -600,7 +600,8 @@ class CAllBlogUser
 			$result = CUser::FormatName(
 						$arParams["NAME_TEMPLATE"], 
 						$arUser, 
-						$bUseLogin
+						$bUseLogin,
+						false
 					);
 		}
 
@@ -680,7 +681,23 @@ class CAllBlogUser
 			if (intval($arParams["AVATAR_SIZE_COMMENT"]) <= 0)
 				$arParams["AVATAR_SIZE_COMMENT"] = 30;
 
-			$dbUser = CUser::GetList(($sort_by = Array('ID'=>'desc')), ($dummy=''), Array("ID" => $id), Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER")));
+			$bResizeImmediate = (isset($arParams["RESIZE_IMMEDIATE"]) && $arParams["RESIZE_IMMEDIATE"] == "Y");
+
+			$arSelect = Array(
+				"FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER", "EXTERNAL_AUTH_ID")
+			);
+
+			if (IsModuleInstalled('extranet'))
+			{
+				$arSelect["SELECT"] = array('UF_DEPARTMENT');
+			}
+
+			$dbUser = CUser::GetList(
+				($sort_by = Array('ID'=>'desc')),
+				($dummy=''),
+				Array("ID" => $id),
+				$arSelect
+			);
 			if($arResult["arUser"] = $dbUser->GetNext())
 			{
 				if(IntVal($arResult["arUser"]["PERSONAL_PHOTO"]) > 0)
@@ -690,7 +707,9 @@ class CAllBlogUser
 						$arResult["arUser"]["PERSONAL_PHOTO_file"],
 						array("width" => $arParams["AVATAR_SIZE"], "height" => $arParams["AVATAR_SIZE"]),
 						BX_RESIZE_IMAGE_EXACT,
-						false
+						false,
+						false,
+						$bResizeImmediate
 					);
 					if ($arResult["arUser"]["PERSONAL_PHOTO_resized"] !== false)
 						$arResult["arUser"]["PERSONAL_PHOTO_img"] = CFile::ShowImage($arResult["arUser"]["PERSONAL_PHOTO_resized"]["src"], $arParams["AVATAR_SIZE"], $arParams["AVATAR_SIZE"], "border=0 align='right'");
@@ -698,7 +717,9 @@ class CAllBlogUser
 						$arResult["arUser"]["PERSONAL_PHOTO_file"],
 						array("width" => $arParams["AVATAR_SIZE_COMMENT"], "height" => $arParams["AVATAR_SIZE_COMMENT"]),
 						BX_RESIZE_IMAGE_EXACT,
-						false
+						false,
+						false,
+						$bResizeImmediate
 					);
 					if ($arResult["arUser"]["PERSONAL_PHOTO_resized_30"] !== false)
 						$arResult["arUser"]["PERSONAL_PHOTO_img_30"] = CFile::ShowImage($arResult["arUser"]["PERSONAL_PHOTO_resized_30"]["src"], $arParams["AVATAR_SIZE_COMMENT"], $arParams["AVATAR_SIZE_COMMENT"], "border=0 align='right'");
@@ -756,7 +777,7 @@ class CAllBlogUser
 				($sort_by = Array('ID'=>'desc')),
 				($dummy=''),
 				Array("ID" => implode(" | ", $arIdToGet)),
-				Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER"))
+				Array("FIELDS" => Array("ID", "LAST_NAME", "NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO", "PERSONAL_GENDER", "EXTERNAL_AUTH_ID"))
 			);
 			while ($arUser = $dbUser->GetNext())
 			{

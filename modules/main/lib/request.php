@@ -89,6 +89,17 @@ abstract class Request
 	 * Returns true if current request is AJAX
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает <i>true</i> если текущий запрос - AJAX.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/request/isajaxrequest.php
+	* @author Bitrix
+	*/
 	public function isAjaxRequest()
 	{
 		return

@@ -23,62 +23,69 @@ class CCertification extends CAllCertification
 {
 	
 	/**
-	* <p>Возвращает список сертификатов по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает список сертификатов по фильтру <b>arFilter</b>, отсортированный в порядке <b>arOrder</b>. Учитываются права доступа текущего пользователя. Метод статический.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>. <br> Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* сертификата; </li> <li> <b>STUDENT_ID</b> - идентификатор студента ; </li> <li>
-	* <b>COURSE_ID</b> - идентификатор курса; </li> <li> <b>SUMMARY</b> - cумма баллов,
-	* набранных за прохождение всех тестов курса; </li> <li> <b>MAX_SUMMARY</b> -
-	* максимально возможная сумма баллов за прохождение всех тестов
-	* курса; </li> <li> <b>SORT</b> - индекс сортировки; </li> <li> <b>ACTIVE</b> - фильтр по
-	* активности (Y|N); </li> <li> <b>FROM_ONLINE</b> - сертификат получен через
-	* online-обучение (Y/N); </li> <li> <b>PUBLIC_PROFILE</b> - публиковать сертификат в
-	* профиле (Y/N); </li> <li> <b>DATE_CREATE</b> - дата создания сертификата; </li> <li>
-	* <b>TIMESTAMP_X</b> - дата изменения студента. </li> </ul> Направление
-	* сортировки может принимать значения: <ul> <li> <b>asc</b> - по возрастанию;
-	* </li> <li> <b>desc</b> - по убыванию; </li> </ul> Необязательный. По умолчанию
-	* фильтруется по убыванию идентификатора сертификата.
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.         <br>       Поле для
+	* сортировки может принимать значения: 			         <ul> <li> <b>ID</b> -
+	* идентификатор сертификата; 				</li>                    <li> <b>STUDENT_ID</b> -
+	* идентификатор студента ; 				</li>                    <li> <b>COURSE_ID</b> -
+	* идентификатор курса; 				</li>                    <li> <b>SUMMARY</b> - cумма баллов,
+	* набранных за прохождение всех тестов курса; 				</li>                    <li>
+	* <b>MAX_SUMMARY</b> - максимально возможная сумма баллов за прохождение
+	* всех тестов курса; 				</li>                    <li> <b>SORT</b> - индекс сортировки;
+	* 				</li>                    <li> <b>ACTIVE</b> - фильтр по активности (Y|N); 				</li>               
+	*     <li> <b>FROM_ONLINE</b> - сертификат получен через online-обучение (Y/N); 				</li>   
+	*                 <li> <b>PUBLIC_PROFILE</b> - публиковать сертификат в профиле (Y/N);
+	* 				</li>                    <li> <b>DATE_CREATE</b> - дата создания сертификата; 				</li>      
+	*              <li> <b>TIMESTAMP_X</b> - дата изменения студента. </li>         </ul>      
+	* Направление сортировки может принимать значения: 			         <ul> <li>
+	* <b>asc</b> - по возрастанию; 				</li>                    <li> <b>desc</b> - по убыванию; </li>  
+	*       </ul>       Необязательный. По умолчанию фильтруется по убыванию
+	* идентификатора сертификата.
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i>array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	* идентификатор сертификата; </li> <li> <b>STUDENT_ID</b> - идентификатор
-	* студента ; </li> <li> <b>COURSE_ID</b> - идентификатор курса; </li> <li> <b>SUMMARY</b> -
-	* cумма баллов, набранных за прохождение всех тестов курса; </li> <li>
+	* Фильтруемое поле может принимать значения: 			         <ul> <li> <b>ID</b> -
+	* идентификатор сертификата; 				</li>                    <li> <b>STUDENT_ID</b> -
+	* идентификатор студента ; 				</li>                    <li> <b>COURSE_ID</b> -
+	* идентификатор курса; 				</li>                    <li> <b>SUMMARY</b> - cумма баллов,
+	* набранных за прохождение всех тестов курса; 				</li>                    <li>
 	* <b>MAX_SUMMARY</b> - максимально возможная сумма баллов за прохождение
-	* всех тестов курса; </li> <li> <b>SORT</b> - индекс сортировки; </li> <li> <b>ACTIVE</b> -
-	* фильтр по активности (Y|N); </li> <li> <b>FROM_ONLINE</b> - сертификат получен
-	* через online-обучение (Y/N); </li> <li> <b>PUBLIC_PROFILE</b> - публиковать сертификат
-	* в профиле (Y/N); </li> <li> <b>DATE_CREATE</b> - дата создания сертификата; </li> <li>
-	* <b>TIMESTAMP_X</b> - дата изменения студента. </li> <li> <b>USER</b> - пользователь
-	* (возможны сложные условия по полям пользователя ID, LOGIN, NAME, LAST_NAME);
-	* </li> <li> <b>MIN_PERMISSION</b> - минимальный уровень доступа. По умолчанию "R".
-	* Список прав доступа см. в <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. </li>
-	* <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
-	* значение "N" - права доступа не проверяются. </li> </ul> Перед названием
-	* фильтруемого поля можно указать тип фильтрации: <ul> <li>"!" - не равно
-	* </li> <li>"&lt;" - меньше </li> <li>"&lt;=" - меньше либо равно </li> <li>"&gt;" - больше
-	* </li> <li>"&gt;=" - больше либо равно </li> </ul> <br> "<i>значения фильтра</i>" -
-	* одиночное значение или массив. <br><br> Необязательный. По умолчанию
-	* записи не фильтруются.
+	* всех тестов курса; 				</li>                    <li> <b>SORT</b> - индекс сортировки;
+	* 				</li>                    <li> <b>ACTIVE</b> - фильтр по активности (Y|N); 				</li>               
+	*     <li> <b>FROM_ONLINE</b> - сертификат получен через online-обучение (Y/N); 				</li>   
+	*                 <li> <b>PUBLIC_PROFILE</b> - публиковать сертификат в профиле (Y/N);
+	* 				</li>                    <li> <b>DATE_CREATE</b> - дата создания сертификата; 				</li>      
+	*              <li> <b>TIMESTAMP_X</b> - дата изменения студента. 				</li>                    <li>
+	* <b>USER</b> - пользователь (возможны сложные условия по полям
+	* пользователя ID, LOGIN, NAME, LAST_NAME); 				</li>                    <li> <b>MIN_PERMISSION</b> -
+	* минимальный уровень доступа. По умолчанию "R". Список прав доступа
+	* см. в <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>. 				</li>
+	*                    <li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если
+	* установлено значение "N" - права доступа не проверяются. </li>         </ul>
+	*       Перед названием фильтруемого поля можно указать тип
+	* фильтрации: 			         <ul> <li>"!" - не равно 				</li>                    <li>"&lt;" - меньше
+	* 				</li>                    <li>"&lt;=" - меньше либо равно 				</li>                    <li>"&gt;" -
+	* больше 				</li>                    <li>"&gt;=" - больше либо равно </li>         </ul> <br>      
+	* "<i>значения фильтра</i>" - одиночное значение или массив.         <br><br>    
+	*   Необязательный. По умолчанию записи не фильтруются.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $COURSE_ID = 100;<br>    $res = CCertification::GetList(<br>        Array("SUMMARY" =&gt; "DESC", "SORT"=&gt;"ASC"), <br>        Array("ACTIVE" =&gt; "Y", "COURSE_ID" =&gt; $COURSE_ID)<br>    );<br><br>    while ($arCertification = $res-&gt;GetNext())<br>    {<br>        echo "User:".$arCertification["USER_NAME"].<br>             "; Course name: ".$arCertification["COURSE_NAME"]."&lt;br&gt;";<br>    }<br>}<br>?&gt;&lt;?<br>if (CModule::IncludeModule("learning"))<br>{<br>    $COURSE_ID = 100;<br>    $res = CCertification::GetList(<br>        Array("SUMMARY" =&gt; "DESC", "SORT"=&gt;"ASC"), <br>        Array("ACTIVE" =&gt; "Y", "CHECK_PERMISSIONS" =&gt; "N")<br>    );<br><br>    while ($arCertification = $res-&gt;GetNext())<br>    {<br>        echo "User:".$arCertification["USER_NAME"].<br>             "; Course name: ".$arCertification["COURSE_NAME"]."&lt;br&gt;";<br>    }<br>}<br>?&gt;
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li> <a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li>  	   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/index.php">CCertification</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getbyid.php">GetByID</a> </li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> </ul> </ht<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccertification/getbyid.php">GetByID</a> </li>  	   <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php">Поля сертификата</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*

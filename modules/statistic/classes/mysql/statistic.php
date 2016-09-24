@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/genera
 
 
 /**
- * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика". 
+ * <b>CStatistics</b> - класс содержащий общие методы работы с модулем "Статистика".
  *
  *
  * @return mixed 

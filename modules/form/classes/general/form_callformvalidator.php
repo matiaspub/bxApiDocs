@@ -5,7 +5,7 @@
 
 
 /**
- * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидаторами</a>. 
+ * <b>CFormValidator</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидаторами</a>.
  *
  *
  * @return mixed 
@@ -32,23 +32,23 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Возвращает список заданных для поля валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает список заданных для поля валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Метод нестатический.</p>
 	*
 	*
-	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.</bod
+	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	*
 	* @param mixed $arFilter = array() Массив для фильтрации. Необязательный параметр. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ACTIVE</b> - флаг активности
-	* валидатора;</li> <li> <b>NAME</b> - идентификатор валидатора;</li> </ul>
+	* допустимы следующие ключи: 		<ul> <li> <b>ACTIVE</b> - флаг активности
+	* валидатора;</li> 			<li> <b>NAME</b> - идентификатор валидатора;</li> 		</ul>
 	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
-	* списка. Может принимать значения: <ul> <li> <b>VALIDATOR_SID</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
+	* списка. Может принимать значения: 		<ul> <li> <b>VALIDATOR_SID</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; 			</li> <li> <b>C_SORT</b> -
 	* индекс сортировки. </li> </ul>
 	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки. Может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
-	* </li> </ul>
+	* значения: 		<ul> <li> <b>asc</b> - по возрастанию; 			</li> <li> <b>desc</b> - по
+	* убыванию. </li> </ul>
 	*
 	* @return CDBResult 
 	*
@@ -71,25 +71,25 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Возвращает список валидаторов, заданных для полей формы, в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает список валидаторов, заданных для полей формы, в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Метод нестатический.</p>
 	*
 	*
-	* @param int $FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
+	* @param int $FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	*
 	* @param mixed $arFilter = array() Массив для фильтрации. Необязательный параметр. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>FIELD_ID</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>;</li> <li> <b>ACTIVE</b> - флаг
-	* активности валидатора;</li> <li> <b>NAME</b> - идентификатор валидатора;</li>
-	* </ul>
+	* допустимы следующие ключи: 		<ul> <li> <b>FIELD_ID</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>;</li> 			<li> <b>ACTIVE</b> -
+	* флаг активности валидатора;</li> 			<li> <b>NAME</b> - идентификатор
+	* валидатора;</li> 		</ul>
 	*
 	* @param string &$by = "s_sort" Ссылка на переменную с полем для сортировки результирующего
-	* списка. Может принимать значения: <ul> <li> <b>VALIDATOR_SID</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; </li> <li> <b>C_SORT</b> -
+	* списка. Может принимать значения: 		<ul> <li> <b>VALIDATOR_SID</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/form/terms.php#validator">валидатора</a>; 			</li> <li> <b>C_SORT</b> -
 	* индекс сортировки. </li> </ul>
 	*
 	* @param string &$order = "asc" Ссылка на переменную с порядком сортировки. Может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию; </li> <li> <b>desc</b> - по убыванию.
-	* </li> </ul>
+	* значения: 		<ul> <li> <b>asc</b> - по возрастанию; 			</li> <li> <b>desc</b> - по
+	* убыванию. </li> </ul>
 	*
 	* @return CDBResult 
 	*
@@ -184,16 +184,17 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Возвращает список зарегистрированных валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
+	* <p>Возвращает список зарегистрированных валидаторов в виде объекта класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. Метод нестатический.</p>
 	*
 	*
 	* @param array $mixedarFilter = array() Массив для фильтрации. Необязательный параметр. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>TYPE</b> - список типов полей;</li> </ul>
+	* допустимы следующие ключи: 		<ul> <li> <b>TYPE</b> - список типов полей;</li>
+	* 		</ul>
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if (CModule::IncludeModule("form"))
 	* {
 	*   $arFilter = array("TYPE" =&gt; array("text", "textarea"));
@@ -288,13 +289,13 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Выполняет валидатор для заданных значений ответов в применении к вопросу.</p>
+	* <p>Выполняет валидатор для заданных значений ответов в применении к вопросу. Метод нестатический.</p>
 	*
 	*
 	* @param array $arValidator  Описательный массив валидатора, один из элементов массива,
 	* возвращаемого методом CFormValidator::GetList. Должен содержать следующие
-	* параметры: <ul> <li> <b>NAME</b> - идентификатор валидатора</li> <li> <b>PARAMS</b> -
-	* массив значений настроек валидатора</li> </ul>
+	* параметры: 		<ul> <li> <b>NAME</b> - идентификатор валидатора</li> 			<li> <b>PARAMS</b>
+	* - массив значений настроек валидатора</li> 		</ul>
 	*
 	* @param array $arQuestion  Описание вопроса. Во входящих в поставку валидаторах не
 	* используется, но может быть использован в собственных
@@ -344,12 +345,12 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Прикрепляет валидатор с заданными настройками к полю формы. Возвращает true в случае успеха операции и false в случае ошибки (валидатора с таким ID не существует, ошибка в валидаторе и т.д.)</p>
+	* <p>Прикрепляет валидатор с заданными настройками к полю формы. Возвращает true в случае успеха операции и false в случае ошибки (валидатора с таким ID не существует, ошибка в валидаторе и т.д.).  Метод нестатический.</p>
 	*
 	*
-	* @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
+	* @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	*
-	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.</bod
+	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	*
 	* @param string $VALIDATOR_SID  Идентификатор валидатора.
 	*
@@ -401,16 +402,17 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Прикрепляет группу валидаторов с заданными настройками к полю формы. Аналогична вызову <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/set.php">CFormValidator::Set</a> для каждого валидатора группы.</p>
+	* <p>Прикрепляет группу валидаторов с заданными настройками к полю формы. Аналогична вызову <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/set.php">CFormValidator::Set</a> для каждого валидатора группы.  Метод нестатический.</p>
 	*
 	*
-	* @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.</bod
+	* @param int $WEB_FORM_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#form">веб-формы</a>.
 	*
-	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.</bod
+	* @param int $FIELD_ID  ID <a href="http://dev.1c-bitrix.ru/api_help/form/terms.php#question">вопроса</a>.
 	*
 	* @param array $arValidators = array() Массив валидаторов. Каждый элемент массива должен представлять
-	* собой ассоциативный массив с ключами: <ul> <li> <b>NAME</b> - идентификатор
-	* валидатора;</li> <li> <b>PARAMS</b> - массив параметрова валидатора.</li> </ul>
+	* собой ассоциативный массив с ключами:  		<ul> <li> <b>NAME</b> -
+	* идентификатор валидатора;</li> 			<li> <b>PARAMS</b> - массив параметрова
+	* валидатора.</li> 		</ul>
 	*
 	* @return mixed 
 	*
@@ -466,7 +468,7 @@ class CAllFormValidator
 
 	
 	/**
-	* <p>Возвращает список настроек валидатора со значениями, преобразованный для занесения в базу. Аналогичен прямому вызову метода преобразования настроек (<code>CONVERT_TO_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::Set</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::SetBatch</a> вызывается автоматически.</p>
+	* <p>Возвращает список настроек валидатора со значениями, преобразованный для занесения в базу. Аналогичен прямому вызову метода преобразования настроек (<code>CONVERT_TO_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::Set</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::SetBatch</a> вызывается автоматически. Метод нестатический.</p>
 	*
 	*
 	* @param array $arValidator  Описательный массив валидатора (например, полученный из
@@ -491,7 +493,7 @@ class CAllFormValidator
 	
 	
 	/**
-	* <p>Возвращает список настроек валидатора со значениями после обратного преобразования строки, занесенной в базу. Аналогичен прямому вызову метода обратного преобразования (<code>CONVERT_FROM_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::GetList</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::GetListForm</a> вызывается автоматически.</p>
+	* <p>Возвращает список настроек валидатора со значениями после обратного преобразования строки, занесенной в базу. Аналогичен прямому вызову метода обратного преобразования (<code>CONVERT_FROM_DB</code>) валидатора. При вызове методов <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlist.php">CFormValidator::GetList</a> и <a href="http://dev.1c-bitrix.ru/api_help/form/classes/cformvalidator/getlistform.php">CFormValidator::GetListForm</a> вызывается автоматически. Метод нестатический.</p>
 	*
 	*
 	* @param array $arValidator  Описательный массив валидатора (например, полученный из
@@ -516,7 +518,7 @@ class CAllFormValidator
 	
 	
 	/**
-	* <p>Возвращает список настроек валидатора. Аналогично прямому вызову метода возврата настроек валидатора.</p>
+	* <p>Возвращает список настроек валидатора. Аналогично прямому вызову метода возврата настроек валидатора. Метод нестатический.</p>
 	*
 	*
 	* @param array $arValidator  Описательный массив валидатора (например, полученный из
@@ -544,7 +546,7 @@ class CAllFormValidator
 	 */
 	
 	/**
-	* <p>Удаляет все валидаторы, назначенные данному вопросу/полю.</p>
+	* <p>Удаляет все валидаторы, назначенные данному вопросу/полю. Метод нестатический.</p>
 	*
 	*
 	* @param int $FIELD_ID  ID поля.

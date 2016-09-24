@@ -47,6 +47,9 @@ abstract class OrderBase
 	const SALE_ORDER_CALC_TYPE_CHANGE = 'C';
 	const SALE_ORDER_CALC_TYPE_REFRESH = 'R';
 
+
+	protected static $mapFields = array();
+
 	public function getInternalId()
 	{
 		static $idPool = 0;
@@ -98,6 +101,7 @@ abstract class OrderBase
 			'VAT_RATE',
 			'VAT_VALUE',
 			'VAT_SUM',
+			'VAT_DELIVERY',
 			'USE_VAT',
 		);
 	}
@@ -115,10 +119,11 @@ abstract class OrderBase
 	 */
 	public static function getAllFields()
 	{
-		static $fields = null;
-		if ($fields == null)
-			$fields = array_keys(Internals\OrderTable::getMap());
-		return $fields;
+		if (empty(static::$mapFields))
+		{
+			static::$mapFields = Internals\CollectableEntity::getAllFieldsByMap(Internals\OrderTable::getMap());
+		}
+		return static::$mapFields;
 	}
 
 	protected function __construct(array $fields = array())
@@ -161,7 +166,12 @@ abstract class OrderBase
 		if (intval($id) <= 0)
 			throw new Main\ArgumentNullException("id");
 
-		if ($orderDat = static::loadFromDb($id))
+		$filter = array(
+			'filter' => array('ID' => $id),
+			'select' => array('*'),
+		);
+
+		if ($orderDat = static::loadFromDb($filter))
 		{
 			$order = new static($orderDat);
 
@@ -174,11 +184,11 @@ abstract class OrderBase
 	}
 
 	/**
-	 * @param $id
+	 * @param array $filter
 	 * @return array
 	 * @throws Main\NotImplementedException
 	 */
-	static protected function loadFromDb($id)
+	static protected function loadFromDb(array $filter)
 	{
 		throw new Main\NotImplementedException();
 	}
@@ -234,6 +244,17 @@ abstract class OrderBase
 	 *
 	 * @return Basket
 	 */
+	
+	/**
+	* <p>Метод возвращает корзину заказа. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Sale\Basket 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/orderbase/getbasket.php
+	* @author Bitrix
+	*/
 	public function getBasket()
 	{
 		if (!isset($this->basketCollection) || empty($this->basketCollection))
@@ -246,6 +267,17 @@ abstract class OrderBase
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод возвращает <i>true</i>, если корзина не пуста. В противном случае - <i>false</i>. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/orderbase/isnotemptybasket.php
+	* @author Bitrix
+	*/
 	public function isNotEmptyBasket()
 	{
 		if (!isset($this->basketCollection) || empty($this->basketCollection))
@@ -273,6 +305,10 @@ abstract class OrderBase
 			return new Result();
 		}
 
+		$fields = $this->fields->getChangedValues();
+		if (!array_key_exists("UPDATED_1C", $fields))
+			parent::setField("UPDATED_1C", "N");
+
 		return parent::setField($name, $value);
 	}
 
@@ -290,6 +326,10 @@ abstract class OrderBase
 			$this->calculatedFields->set($name, $value);
 			return;
 		}
+
+		$fields = $this->fields->getChangedValues();
+		if (!array_key_exists("UPDATED_1C", $fields))
+			parent::setField("UPDATED_1C", "N");
 
 		parent::setFieldNoDemand($name, $value);
 	}
@@ -355,7 +395,7 @@ abstract class OrderBase
 		return $this->propertyCollection;
 	}
 
-	abstract protected function loadPropertyCollection();
+	abstract public function loadPropertyCollection();
 
 
 	/**
@@ -511,6 +551,14 @@ abstract class OrderBase
 	}
 
 	/**
+	 * @return null|string
+	 */
+	public function isMarked()
+	{
+		return ($this->getField('MARKED') == "Y");
+	}
+
+	/**
 	 * @throws Main\ArgumentOutOfRangeException
 	 */
 	protected function resetVat()
@@ -599,16 +647,7 @@ abstract class OrderBase
 	 */
 	abstract public function save();
 
-
-
-	private static function setStatus($value)
-	{
-
-	}
-
-
-
-
+	
 	/**
 	 * @param $price
 	 */

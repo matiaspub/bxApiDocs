@@ -10,7 +10,7 @@ This class is used to parse and load an xml file into database table.
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br><span> </span>$obXMLFile = new CIBlockXMLFile;<br><span> </span>// Удаляем результат предыдущей загрузки<br><span> </span>$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/droptemporarytables.php">DropTemporaryTables</a>();<br><span> </span>// Подготавливаем БД<br><span> </span>if(!$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/createtemporarytables.php">CreateTemporaryTables</a>())<br><span> </span>	return "Ошибка создания БД.";<br><span> </span><br><span> </span>if($fp = fopen($FILE_NAME, "rb"))<br><span> </span>{<br><span> </span>	// Чтение содержимого файла за один шаг<br><span> </span>	$obXMLFile-&gt;<a href="/api_help/iblock/classes/ciblockxmlfile/readxmltodatabase.php">ReadXMLToDatabase</a>($fp, $NS, 0);<br><span> </span>	fclose($fp);<br><span> </span>}<br><span> </span>else<br><span> </span>{<br><span> </span>	// Файл открыть не удалось<br><span> </span>	return "Ошибка открытия файла";<br><span> </span>}<br><span> </span><br><span> </span>// Индексируем загруженные данные для ускорения доступа<br><span> </span>if(!CIBlockXMLFile::<a href="/api_help/iblock/classes/ciblockxmlfile/indextemporarytables.php">IndexTemporaryTables</a>())<br><span> </span>	return "Ошибка созния индексов БД.";<br><span> </span><br><span> </span>?&gt;
  * </pre>
  *
@@ -119,13 +119,13 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Удаляет таблицы, содержащие ранее загруженный файл. Необходимо вызывать метод перед началом загрузки XML. Метод динамичный. <br></p>
+	* <p>Удаляет таблицы, содержащие ранее загруженный файл. Необходимо вызывать метод перед началом загрузки XML. Нестатический метод.   <br></p>
 	*
 	*
 	* @return bool <p>В случае возникновения ошибки метожд возвращает false.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li> 
 	* </ul><br><br>
 	*
 	*
@@ -152,7 +152,7 @@ class CIBlockXMLFile
 
 	
 	/**
-	* <p>Создает таблицы для загрузки XML. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа.</div>
+	* <p>Создает таблицы для загрузки XML. Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание:</b> для MySQL если определена константа MYSQL_TABLE_TYPE (<a href="http://dev.1c-bitrix.ru/api_help/main/general/constants.php#mysql_table_type">Специальные константы</a>), то таблицы будут созданы заданного ей типа.</div>
 	*
 	*
 	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
@@ -163,7 +163,7 @@ class CIBlockXMLFile
 	* false.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li> 
 	* </ul><br>
 	*
 	*
@@ -250,7 +250,7 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. Метод динамичный. <br></p>
+	* <p>Индексация таблиц для ускорения доступа. Необходимо вызвать после загрузки данных из файла в таблицы БД, но до обработки этих данных. Нестатический метод.   <br></p>
 	*
 	*
 	* @param bool $with_sess_id = false Если значение <i>true</i>, то будут создаваться временные таблицы с
@@ -261,7 +261,7 @@ class CIBlockXMLFile
 	* вернет false.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li>
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a></li> 
 	* </ul><br>
 	*
 	*
@@ -334,20 +334,18 @@ class CIBlockXMLFile
 
 	
 	/**
-	* <p>Метод возвращает объем прочитанных байт. Метод динамичный.</p>
+	* <p>Метод возвращает объем прочитанных байт. Нестатический метод.</p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* if ($obXMLFile-&gt;ReadXMLToDatabase($fp, $NS, 10, 1024) ) {
 	*     echo '<br>Файл прочитан полностью.';
 	* } else {
 	*     echo '<br>Файл прочитан не полностью: '.round($obXMLFile-&gt;GetFilePosition()/$total*100, 2).'%.';
 	* }
-	* 
-	* 
 	* 
 	* //пример пошагового разбора файла: 
 	*  echo '<br>Парсим файл';
@@ -370,7 +368,7 @@ class CIBlockXMLFile
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li> 
 	* </ul><br><br>
 	*
 	*
@@ -398,17 +396,17 @@ class CIBlockXMLFile
 	*/
 	
 	/**
-	* <p>Метод загружает данные из файла в таблицы БД. Когда весь файл прочитан, он возвращает true. Если методу не удалось уложиться в time_limit секунд, он вернет false и в параметре NS данные, необходимые для продолжения работы на следующем шаге. Метод динамичный. <br></p> <p></p> <div class="note"> <b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</div>
+	* <p>Метод загружает данные из файла в таблицы БД. Когда весь файл прочитан, он возвращает true. Если методу не удалось уложиться в time_limit секунд, он вернет false и в параметре NS данные, необходимые для продолжения работы на следующем шаге. Нестатический метод.   <br></p>   <p></p> <div class="note"> <b>Примечание</b>: Если кодировка файла отличается от текущей (LANG_CHARSET), то будет выполнена перекодировка.</div>
 	*
 	*
-	* @param resource $fp  Дескриптор открытого файла. Файл рекомендуется открывать в
-	* режиме "rb". <br>
+	* @param resource $resourcefp  Дескриптор открытого файла. Файл рекомендуется открывать в
+	* режиме "rb".         <br>
 	*
 	* @param array &$NS  Массив с данными для продолжения работы метода, прерванного на
 	* предыдущем шаге.
 	*
 	* @param int $time_limit = 0 Ограничение работы метода по времени. В секундах. Если не задан
-	* или равен нулю, то метод будет работать без ограничений. <br>
+	* или равен нулю, то метод будет работать без ограничений.         <br>
 	*
 	* @param int $read_size = 1024 Сколько байт считывать за одну операцию чтения файла. Большие
 	* значения увеличивают производительность при большем
@@ -418,7 +416,7 @@ class CIBlockXMLFile
 	* противном случае.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/iblock/classes/ciblockxmlfile/index.php">CIBlockXMLFile</a> </li> 
 	* </ul><br>
 	*
 	*

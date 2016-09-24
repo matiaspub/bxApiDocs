@@ -17,6 +17,17 @@ final class ConversionHandlers
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает типы счетчиков конверсии. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/blog/internals/conversionhandlers/ongetcountertypes.php
+	* @author Bitrix
+	*/
 	public static function onGetCounterTypes()
 	{
 		return array(
@@ -29,6 +40,17 @@ final class ConversionHandlers
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает типы конверсии. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/blog/internals/conversionhandlers/ongetratetypes.php
+	* @author Bitrix
+	*/
 	public static function onGetRateTypes()
 	{
 		$scale = array(0.5, 1, 1.5, 2, 5);
@@ -62,6 +84,21 @@ final class ConversionHandlers
 	 * @param array $fields Post fields.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод увеличивает значение счетчика при добавлении поста. Метод статический.</p>
+	*
+	*
+	* @param integer $id  Идентификатор поста.
+	*
+	* @param array $fields  Массив полей поста.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/blog/internals/conversionhandlers/onpostadd.php
+	* @author Bitrix
+	*/
 	public static function onPostAdd($id, $fields)
 	{
 		if (Loader::includeModule('conversion'))

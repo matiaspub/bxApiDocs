@@ -26,6 +26,17 @@ class DataManagerEvent extends \Bitrix\Main\Event
 	/**
 	 * Returns entity
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает объект.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanagerevent/getentity.php
+	* @author Bitrix
+	*/
 	public function getEntity()
 	{
 		return $this->entity;
@@ -38,6 +49,25 @@ class DataManagerEvent extends \Bitrix\Main\Event
 	 * @param Result $result
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод проверяет результат событий на ошибки, наполняет объект <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/result/index.php">\Bitrix\Main\Result</a>. Возвращает <i>true</i> в случае ошибки и <i>false</i> в противном случае.</p>
+	*
+	*
+	* @param mixed $Bitrix  
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Result $result  
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanagerevent/geterrors.php
+	* @author Bitrix
+	*/
 	public function getErrors(Result $result)
 	{
 		$hasErrors = false;
@@ -62,6 +92,19 @@ class DataManagerEvent extends \Bitrix\Main\Event
 	 * @param array $data
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод объединяет поля данных, установленные в обработчиках событий с полями источника. </p> <p>Возвращает объединённый массив полей данных из всех обработчиков событий.</p>
+	*
+	*
+	* @param array $data  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/datamanagerevent/mergefields.php
+	* @author Bitrix
+	*/
 	public function mergeFields(array $data)
 	{
 		if ($this->getResults() != null)

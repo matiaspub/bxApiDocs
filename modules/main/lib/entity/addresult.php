@@ -27,6 +27,17 @@ class AddResult extends Result
 	 * Returns id of added record
 	 * @return int
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает ID добавленной записи.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/addresult/getid.php
+	* @author Bitrix
+	*/
 	public function getId()
 	{
 		return $this->id;

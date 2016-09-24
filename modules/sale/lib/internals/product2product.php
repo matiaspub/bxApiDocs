@@ -36,10 +36,13 @@ class Product2ProductTable extends Main\Entity\DataManager
 	}
 
 	/**
+	 *
 	 * Remove old products from b_sale_product2product table.
 	 * Used in agents.
 	 *
 	 * @param int $liveTime in days
+	 *
+	 * @return string
 	 */
 	public static function deleteOldProducts($liveTime = 10)
 	{
@@ -103,6 +106,8 @@ class Product2ProductTable extends Main\Entity\DataManager
 		// Delete
 		$deleteSql = "DELETE FROM b_sale_product2product WHERE CNT <= 0";
 		$connection->query($deleteSql);
+
+		return "\\Bitrix\\Sale\\Product2ProductTable::deleteOldProducts(".intval($liveTime).");";
 	}
 
 	/**
@@ -178,6 +183,186 @@ class Product2ProductTable extends Main\Entity\DataManager
 			$app = Main\Application::getInstance();
 			$app->getTaggedCache()->clearByTag('sale_product_buy');
 		}
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSaleOrderAddEvent(Main\Event $event)
+	{
+		$order = $event->getParameter('ENTITY');
+		$isNew = $event->getParameter('IS_NEW');
+		if ((!$order instanceof Sale\Order))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_ORDER_ADD_WRONG_ORDER'),
+				'sale'
+			);
+		}
+
+		$basket = $order->getBasket();
+
+		if ($isNew && ($basket && count($basket) > 0))
+		{
+			static::onSaleOrderAdd($order->getId());
+		}
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSaleStatusOrderHandlerEvent(Main\Event $event)
+	{
+		$order = $event->getParameter('ENTITY');
+		$value = $event->getParameter('VALUE');
+		if ((!$order instanceof Sale\Order))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_ORDER_STATUS_WRONG_ORDER'),
+				'sale'
+			);
+		}
+
+		static::onSaleStatusOrderHandler($order->getId(), $value);
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSaleDeliveryOrderHandlerEvent(Main\Event $event)
+	{
+		$shipment = $event->getParameter('ENTITY');
+		if ((!$shipment instanceof Sale\Shipment))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_SHIPMENT'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DELIVERY_ORDER_WRONG_SHIPMENT'),
+				'sale'
+			);
+		}
+
+		if (!$shipmentCollection = $shipment->getCollection())
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_SHIPMENTCOLLECTION'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DELIVERY_ORDER_WRONG_SHIPMENTCOLLECTION'),
+				'sale'
+			);
+
+		}
+
+		if (!$order = $shipmentCollection->getOrder())
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DELIVERY_ORDER_WRONG_ORDER'),
+				'sale'
+			);
+
+		}
+
+		static::onSaleDeliveryOrderHandler($order->getId(), $order->isAllowDelivery() ? 'Y' : 'N');
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSaleDeductOrderHandlerEvent(Main\Event $event)
+	{
+		$shipment = $event->getParameter('ENTITY');
+		if ((!$shipment instanceof Sale\Shipment))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_SHIPMENT'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DEDUCT_ORDER_WRONG_SHIPMENT'),
+				'sale'
+			);
+		}
+
+		if (!$shipmentCollection = $shipment->getCollection())
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_SHIPMENTCOLLECTION'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DEDUCT_ORDER_WRONG_SHIPMENTCOLLECTION'),
+				'sale'
+			);
+
+		}
+
+		if (!$order = $shipmentCollection->getOrder())
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_DEDUCT_ORDER_WRONG_ORDER'),
+				'sale'
+			);
+
+		}
+
+
+		static::onSaleDeductOrderHandler($order->getId(), $order->isShipped() ? 'Y' : 'N');
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSaleCancelOrderHandlerEvent(Main\Event $event)
+	{
+		$order = $event->getParameter('ENTITY');
+		if ((!$order instanceof Sale\Order))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_CANCELED_ORDER_WRONG_ORDER'),
+				'sale'
+			);
+		}
+
+		static::onSaleCancelOrderHandler($order->getId(), $order->isCanceled() ? 'Y' : 'N');
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
+	}
+
+	/**
+	 * @param Main\Event $event
+	 *
+	 * @return Main\EventResult
+	 */
+	public static function onSalePayOrderHandlerEvent(Main\Event $event)
+	{
+		$order = $event->getParameter('ENTITY');
+		if ((!$order instanceof Sale\Order))
+		{
+			return new Main\EventResult(
+				Main\EventResult::ERROR,
+				new Sale\ResultError(Main\Localization\Loc::getMessage('SALE_EVENT_PRODUCT2PRODUCT_WRONG_ORDER'), 'SALE_EVENT_PRODUCT2PRODUCT_ON_SALE_PAID_ORDER_WRONG_ORDER'),
+				'sale'
+			);
+		}
+
+		static::onSaleCancelOrderHandler($order->getId(), $order->isPaid() ? 'Y' : 'N');
+
+		return new Main\EventResult( Main\EventResult::SUCCESS, null, 'sale');
 	}
 
 	/**

@@ -8,6 +8,17 @@
 
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * Класс для работы со смайлами. Смайлы во всех модулях системы вызываются из Главного модуля. Поддерживаются смайлы в высоком разрешении (retina) и возможность парсинга смайлов в тех модулях, в которых нет собственной реализации смайлов.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/csmile/index.php
+ * @author Bitrix
+ */
 class CSmile
 {
 	const TYPE_ALL = '';
@@ -512,14 +523,14 @@ class CSmile
 
 	
 	/**
-	* <p> Получение данных о смайлах или иконках по ID набора. Статичный метод.</p>
+	* <p> Получение данных о смайлах или иконках по ID набора. Cтатический  метод.</p>
 	*
 	*
-	* @param mixed $type = self::TYPE_ALL константа типа
+	* @param  $type = self::TYPE_ALL константа типа
 	*
-	* @param mixed $setId = CSmileSet::SET_ID_BY_CONFIG идентификатор набора (по умолчанию CSmileSet::SET_ID_ALL - все наборы)
+	* @param  $setId = CSmileSet::SET_ID_BY_CONFIG идентификатор набора (по умолчанию CSmileSet::SET_ID_ALL - все наборы)
 	*
-	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
+	* @param  $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
 	* LANGUAGE_ID
 	*
 	* @return mixed 
@@ -575,14 +586,14 @@ class CSmile
 
 	
 	/**
-	* <p>Вывод информации о смайлах и иконках по ID галереи. Статичный метод.</p>
+	* <p>Вывод информации о смайлах и иконках по ID галереи. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $type = self::TYPE_ALL константа типа
+	* @param  $type = self::TYPE_ALL константа типа
 	*
-	* @param mixed $galleryId = CSmileGallery::GALLERY_DEFAULT идентификатор галереи (по умолчанию CSmileGallery::GALLERY_DEFAULT - все наборы)
+	* @param  $galleryId = CSmileGallery::GALLERY_DEFAULT идентификатор галереи (по умолчанию CSmileGallery::GALLERY_DEFAULT - все наборы)
 	*
-	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
+	* @param  $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
 	* LANGUAGE_ID
 	*
 	* @return mixed 
@@ -847,6 +858,17 @@ class CSmile
 	}
 }
 
+
+/**
+ * Класс для работы с галереями
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/index.php
+ * @author Bitrix
+ */
 class CSmileGallery
 {
 	const GALLERY_DEFAULT = 0;
@@ -854,33 +876,29 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Добавление галереи смайлов. Статичный метод.</p>
+	* <p>Добавление галереи смайлов. Cтатический метод.</p>
 	*
 	*
-	* @param Arra $y  Строковый ключ, для поиска и импорта
+	* @param mixed $Array  Строковый ключ, для поиска и импорта
 	*
-	* @param STRING_I $D  Сортировка
+	* @param Arra $STRING_ID  Сортировка
 	*
-	* @param new_categor $y  Название смайла
+	* @param STRING_I $new_category  Название смайла
 	*
-	* @param SOR $T  
+	* @param new_categor $SORT  
 	*
-	* @param  $300  
+	* @param 300, $LANG  
 	*
-	* @param LAN $G  
+	* @param Array $Arrayru  
 	*
-	* @param  $Array  
-	*
-	* @param r $u  
-	*
-	* @param e $n  
+	* @param r $ren  
 	*
 	* @param New $category  
 	*
 	* @return mixed <p>Возвращает $ID в случае удачного добавления и <i>false</i> в случае
 	* возникновения ошибки (создается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
-	* CApplicationException</a>) </p> <br><br>
+	* CApplicationException</a>) </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/add.php
@@ -894,35 +912,31 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Обновление данных галереи смайлов. Статичный метод.</p>
+	* <p>Обновление данных галереи смайлов. Cтатический метод.</p>
 	*
 	*
-	* @param i $d  идентификатор смайла
+	* @param mixed $mixedid  идентификатор смайла
 	*
-	* @param Arra $y  
+	* @param i $Array  
 	*
-	* @param STRING_I $D  
+	* @param Arra $STRING_ID  
 	*
-	* @param new_categor $y  Строковый ключ, для поиска и импорта
+	* @param STRING_I $new_category  Строковый ключ, для поиска и импорта
 	*
-	* @param SOR $T  Сортировка
+	* @param new_categor $SORT  Сортировка
 	*
-	* @param  $300  Название смайла
+	* @param 300, $LANG  Название смайла
 	*
-	* @param LAN $G  
+	* @param Array $Arrayru  
 	*
-	* @param  $Array  
-	*
-	* @param r $u  
-	*
-	* @param e $n  
+	* @param r $ren  
 	*
 	* @param New $category  
 	*
 	* @return mixed <p>Возвращает <i>true</i> в случае удачного добавления и <i>false</i> в
 	* случае возникновения ошибки (создается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/capplicationexception/index.php">Класс
-	* CApplicationException</a>) </p> <br><br>
+	* CApplicationException</a>) </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/update.php
@@ -935,15 +949,15 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Метод удаляет галерею вместе с наборами и смайлами (записи в базе и сами файлы). Статичный метод.</p>
+	* <p>Метод  удаляет галерею вместе с наборами и смайлами (записи в базе и сами файлы). Cтатический  метод.</p>
 	*
 	*
-	* @param mixed $id  Идентификатор галереи, обязательный параметр.
+	* @param  $id  Идентификатор галереи, обязательный параметр.
 	*
-	* @param mixed $removeFile  По умолчанию true, удаляет файл.
+	* @param  $removeFile  По умолчанию true, удаляет файл.
 	*
 	* @return mixed <p>Возвращает <i>true</i> в случае удачного удаления и <i>false</i> в случае
-	* возникновения ошибки </p> <br><br>
+	* возникновения ошибки </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/delete.php
@@ -971,16 +985,12 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Получение данных о галереях по ID. Статичный метод.</p>
+	* <p>Получение данных о галереях по ID. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $id  идентификатор галереи
+	* @param  $lang = LANGUAGE_ID идентификатор галереи
 	*
-	* @param mixed $lang = LANGUAGE_ID Идентификатор языка для получения локализации, по умолчанию
-	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
-	* всех локализаций)
-	*
-	* @return mixed <p>Возвращает массив с данными о галерее. </p> <br><br>
+	* @return mixed <p>Возвращает массив с данными о галерее.  </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getbyid.php
@@ -993,16 +1003,12 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Получение данных о галереях по STRING_ID. Статичный метод.</p>
+	* <p>Получение данных о галереях по STRING_ID. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $stringId  строковый идентификатор идентификатор галереи
+	* @param  $lang = LANGUAGE_ID строковый идентификатор идентификатор галереи
 	*
-	* @param mixed $lang = LANGUAGE_ID идентификатор языка для получения локализации, по умолчанию
-	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
-	* всех локализаций
-	*
-	* @return mixed <p>Возвращает массив с данными о галерее. </p> <br><br>
+	* @return mixed <p>Возвращает массив с данными о галерее. </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getbystringid.php
@@ -1015,56 +1021,46 @@ class CSmileGallery
 
 	
 	/**
-	* <p> Получение данных о галереях смайлов. Все параметры являются не обязательными. Статичный метод.</p>
+	* <p> Получение данных о галереях смайлов. Все параметры являются не обязательными. Cтатический метод.</p>
 	*
 	*
-	* @param Arra $y  Поля выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
-	* <b>STRING_ID</b> - строковый идентификатор галереи</li> <li> <b>SORT</b> -
-	* сортировка;</li> <li> <b>NAME</b> - имя галереи;</li> <li> <b>SMILE_COUNT</b> - число
-	* смайлов.</li> </ul>
+	* @param mixed $Array  Поля выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
+	* <b>STRING_ID</b> - строковый идентификатор галереи</li>   <li> <b>SORT</b> -
+	* сортировка;</li>  <li> <b>NAME</b> - имя галереи;</li> <li> <b>SMILE_COUNT</b> - число
+	* смайлов.</li>   </ul>
 	*
-	* @param SELEC $T  Фильтр выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
-	* <b>STRING_ID</b> - строковый идентификатор галереи</li> </ul> Могут быть
+	* @param Arra $SELECT  Фильтр выборки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li> <li>
+	* <b>STRING_ID</b> - строковый идентификатор галереи</li>    </ul> Могут быть
 	* множественным, представленным массивом идентификаторов.
 	*
-	* @param  $Array  Поля сортировки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li>
-	* <li> <b>SORT</b> - сортировка;</li> </ul> по умолчанию сортировка ID =&gt; DESC.
+	* @param Array $ArrayID  Поля сортировки, доступны: <ul> <li> <b>ID</b> - идентификатор смайла;</li>
+	* <li> <b>SORT</b> - сортировка;</li>   </ul> по умолчанию сортировка ID =&gt; DESC.
 	*
-	* @param I $D  Передаются параметры массива для CDBResult::NavQuery.
+	* @param I $FILTER  Передаются параметры массива для CDBResult::NavQuery.
 	*
-	* @param FILTE $R  Может быть Y или N - метод вернет в виде результата сформированный
+	* @param Array $SET_ID  Может быть Y или N - метод вернет в виде результата сформированный
 	* запрос.
 	*
-	* @param  $Array  Может быть Y или N - метод вернет в виде результата ресурс на
+	* @param $id $ORDER  Может быть Y или N - метод вернет в виде результата ресурс на
 	* отработанный запрос.
 	*
-	* @param SET_I $D  Значения языка, хранимое в константе LANGUAGE_ID.
+	* @param Array $ArrayID  Значения языка, хранимое в константе LANGUAGE_ID.
 	*
-	* @param  $id  
+	* @param I $DESC  
 	*
-	* @param ORDE $R  
+	* @param DES $NAV_PARAMS  
 	*
-	* @param  $Array  
+	* @param Array $RETURN_SQL  
 	*
-	* @param I $D  
+	* @param RETURN_SQ $RETURN_SQN  
 	*
-	* @param DES $C  
+	* @param N $RETURN_RES  
 	*
-	* @param NAV_PARAM $S  
-	*
-	* @param  $Array  
-	*
-	* @param RETURN_SQ $L  
-	*
-	* @param  $N  
-	*
-	* @param RETURN_RE $S  
-	*
-	* @param  $N  
+	* @param RETURN_RE $RETURN_REN  
 	*
 	* @param  $lang = LANGUAGE_ID 
 	*
-	* @return mixed <p>Если не заданы RETURN_SQL или RETURN_RES метод возвращает массив.</p> <br><br>
+	* @return mixed <p>Если не заданы RETURN_SQL или RETURN_RES метод возвращает массив.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getlist.php
@@ -1078,7 +1074,7 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Производит выборку всех галерей (с использованием кеша). Статичный метод.</p>
+	* <p>Производит выборку всех галерей (с использованием кеша). Cтатический метод.</p>
 	*
 	*
 	* @param mixed $lang = LANGUAGE_ID Значения языка, хранимое в константе LANGUAGE_ID.
@@ -1113,7 +1109,7 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Производит выборку всех галерей для построения списка. Статичный метод.</p>
+	* <p>Производит выборку всех галерей для построения списка. Cтатический метод.</p>
 	*
 	*
 	* @param mixed $lang = LANGUAGE_ID Значения языка, хранимое в константе LANGUAGE_ID.
@@ -1135,7 +1131,7 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Позволяет получить идентификатор галереи по умолчанию. Статичный метод.</p>
+	* <p>Позволяет получить идентификатор галереи по умолчанию. Cтатический метод.</p>
 	*
 	*
 	* @return mixed 
@@ -1167,10 +1163,10 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Устанавливает галерею по умолчанию. Статичный метод.</p>
+	* <p>Устанавливает галерею по умолчанию. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $id  Идентификатор галереи
+	* @param  $id  Идентификатор галереи
 	*
 	* @return result_type <p></p><br><br>
 	*
@@ -1185,12 +1181,12 @@ class CSmileGallery
 
 	
 	/**
-	* <p>Возвращает смайлы и наборы на основе галереи для последующего использования в модулях при построении списка доступных смайлов. Статичный метод.</p>
+	* <p>Возвращает смайлы и наборы на основе галереи для последующего использования в модулях при построении списка доступных смайлов. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $galleryId = self::GALLERY_DEFAULT по умолчанию CSmileGallery::GALLERY_DEFAULT
+	* @param  $galleryId = self::GALLERY_DEFAULT по умолчанию CSmileGallery::GALLERY_DEFAULT
 	*
-	* @return result_type <p>Возвращает массив Array('SMILE' =&gt; Array(...), 'SMILE_SET' =&gt; Array(...)) </p> </ht<br><br>
+	* @return result_type <p>Возвращает массив Array('SMILE' =&gt; Array(...), 'SMILE_SET' =&gt; Array(...)) </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmilegallery/getsmileswithsets.php
@@ -1430,6 +1426,17 @@ class CSmileGallery
 	}
 }
 
+
+/**
+ * Класс для работы с наборами смайлов.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/index.php
+ * @author Bitrix
+ */
 class CSmileSet
 {
 	const TYPE_SET = 'G';
@@ -1830,17 +1837,13 @@ class CSmileSet
 
 	
 	/**
-	* <p>Получение списка наборов. Использовать вместо <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/getformlist.php">CSmileSet::getFormList</a>. Статичный метод.</p>
+	* <p>Получение списка наборов. Использовать вместо <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/getformlist.php">CSmileSet::getFormList</a>. Cтатический метод.</p>
 	*
 	*
-	* @param mixed $galleryId = 0 Идентификатор галереи. Не обязательный, по умолчанию использует
+	* @param mixed $lang = LANGUAGE_ID Идентификатор галереи. Не обязательный, по умолчанию использует
 	* настройку главного модуля.
 	*
-	* @param mixed $lang = LANGUAGE_ID Идентификатор языка для получения локализации, по умолчанию
-	* LANGUAGE_ID (можно передать константу CSmileSet::GET_ALL_LANGUAGE для получения
-	* всех локализаций).
-	*
-	* @return mixed <p>Возвращает массив с данными о наборе.</p> <br><br>
+	* @return mixed <p>Возвращает массив с данными о наборе.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/csmileset/getlistforform.php

@@ -52,7 +52,7 @@ class CCatalogMenu extends CAdminMenu
 			? '<span class="adm-submenu-item-link-icon '.$aMenu["icon"].'"></span>'
 			//			: ($level < 1 ? '<span class="adm-submenu-item-link-icon" id="default_menu_icon"></span>' : '');
 			: '';
-		$id = 'menu_item_'.RandString(10);
+		$id = 'menu_item_'.randString(10);
 		?><div class="adm-sub-submenu-block<?=$level > 0 ? ' adm-submenu-level-'.($level+1) : ''?><?=$bSectionActive && isset($aMenu["items"]) && is_array($aMenu["items"]) && count($aMenu['items']) > 0 ? ' adm-sub-submenu-open' : ''?><?=$aMenu["_active"] ? ' adm-submenu-item-active' : ''?>"><?
 		?><div class="adm-submenu-item-name<?=!$bSubmenu ? ' adm-submenu-no-children' : ''?>" id="<?=$id?>" <?=isset($aMenu['fav_id']) ? ' data-fav-id="'.intval($aMenu['fav_id']).'"' : ''?>><?
 		$onclick = '';

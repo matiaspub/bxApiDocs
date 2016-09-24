@@ -9,6 +9,7 @@ namespace Bitrix\Socialnetwork;
 
 use Bitrix\Main\Entity;
 use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\NotImplementedException;
 
 Loc::loadMessages(__FILE__);
 
@@ -40,7 +41,7 @@ class WorkgroupTable extends Entity\DataManager
 			'WORKGROUP_SUBJECT' => array(
 				'data_type' => '\Bitrix\Socialnetwork\WorkgroupSubject',
 				'reference' => array('=this.SUBJECT_ID' => 'ref.ID')
-			),			
+			),
 			'NAME' => array(
 				'data_type' => 'string'
 			),
@@ -78,5 +79,20 @@ class WorkgroupTable extends Entity\DataManager
 		);
 
 		return $fieldsMap;
+	}
+
+	public static function add(array $data)
+	{
+		throw new NotImplementedException("Use CSocNetGroup class.");
+	}
+
+	public static function update($primary, array $data)
+	{
+		throw new NotImplementedException("Use CSocNetGroup class.");
+	}
+
+	public static function delete($primary)
+	{
+		throw new NotImplementedException("Use CSocNetGroup class.");
 	}
 }

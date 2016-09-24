@@ -8,10 +8,9 @@ class AppCacheManifest
 {
 
 	const MANIFEST_CHECK_FILE = "/bitrix/tools/check_appcache.php";
+	const DEBUG_HOLDER = "//__APP_CACHE_DEBUG_HOLDER__";
 	private static $debug;
-
 	private static $instance;
-
 	private static $isEnabled = false;
 	private static $customCheckFile = null;
 	private $files = Array();
@@ -19,16 +18,16 @@ class AppCacheManifest
 	private $network = Array();
 	private $fallbackPages = Array();
 	private $params = Array();
-
 	private $isSided = false;
 	private $isModified = false;
 	private $receivedManifest = "";
+	private $excludeImagePatterns= array();
 
 	private $receivedCacheParams = Array();
 
 	private function __construct()
 	{
-		//use CAppCacheManifest::getInstance();
+		//use \Bitrix\Main\Data\AppCacheManifest::getInstance();
 	}
 
 	/**
@@ -45,6 +44,48 @@ class AppCacheManifest
 	static public function isEnabled()
 	{
 		return self::$isEnabled;
+	}
+
+	/**
+	 * Sets the array of path patterns to exclude unused images from the manifest file
+	 * @return array
+	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает массив паттернов путей для исключения неиспользуемых изображений из файла манифеста.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/getexcludeimagepatterns.php
+	* @author Bitrix
+	*/
+	public function getExcludeImagePatterns()
+	{
+		return $this->excludeImagePatterns;
+	}
+
+	/**
+	 * Returns the array of path patters
+	 * @param array $excludeImagePatterns
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив паттернов путей.</p>
+	*
+	*
+	* @param array $excludeImagePatterns  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/setexcludeimagepatterns.php
+	* @author Bitrix
+	*/
+	public function setExcludeImagePatterns($excludeImagePatterns)
+	{
+		$this->excludeImagePatterns = $excludeImagePatterns;
 	}
 
 
@@ -68,10 +109,21 @@ class AppCacheManifest
 	/**
 	 * Creates or updates the manifest file for the page with usage its content.
 	 *
-	 * @param bool $isEnable
-	 *
-	 * @internal param $content
+	 * @param bool $isEnabled
 	 */
+	
+	/**
+	* <p>Статический метод включает <i>Application Cache</i> на странице.</p>
+	*
+	*
+	* @param boolean $isEnabled = true 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/setenabled.php
+	* @author Bitrix
+	*/
 	public static function setEnabled($isEnabled = true)
 	{
 		self::$isEnabled = (bool)$isEnabled;
@@ -95,7 +147,7 @@ class AppCacheManifest
 			}
 		}
 
-		$currentHashSum = md5(serialize($files["FULL_FILE_LIST"]) . serialize($this->fallbackPages) . serialize($this->network));
+		$currentHashSum = md5(serialize($files["FULL_FILE_LIST"]) . serialize($this->fallbackPages) . serialize($this->network) . serialize($this->excludeImagePatterns));
 		$manifestCache = $this->readManifestCache($manifestId);
 		if (!$manifestCache || $manifestCache["FILE_HASH"] != $currentHashSum || self::$debug)
 		{
@@ -106,6 +158,7 @@ class AppCacheManifest
 				"ID" => $manifestId,
 				"TEXT" => $this->getManifestContent(),
 				"FILE_HASH" => $currentHashSum,
+				"EXCLUDE_PATTERNS_HASH"=> md5(serialize($this->excludeImagePatterns)),
 				"FILE_DATA" => Array(
 					"FILE_TIMESTAMPS" => $files["FILE_TIMESTAMPS"],
 					"CSS_FILE_IMAGES" => $files["CSS_FILE_IMAGES"]
@@ -121,7 +174,6 @@ class AppCacheManifest
 				$jsFields = json_encode($arFields);
 				$fileCount = count($this->files);
 				$params = json_encode($this->params);
-				$detailInfo = json_encode($arFields["FILE_DATA"]);
 				$fileCountImages = 0;
 				foreach ($arFields["FILE_DATA"]["CSS_FILE_IMAGES"] as $file=>$images)
 				{
@@ -140,7 +192,7 @@ class AppCacheManifest
 JS;
 
 				$jsContent = str_replace(array("\n", "\t"), "", $debugOutput);
-				$content = str_replace("__DEBUG_HOLDER__", $jsContent, $content);
+				$content = str_replace(self::DEBUG_HOLDER, $jsContent, $content);
 			}
 		}
 
@@ -186,7 +238,7 @@ JS;
 			}
 			else
 			{
-				Asset::getInstance()->addString("<script type=\"text/javascript\">__DEBUG_HOLDER__</script>");
+				Asset::getInstance()->addString("<script type=\"text/javascript\">".self::DEBUG_HOLDER."</script>");
 			}
 
 			$params = Array(
@@ -199,9 +251,21 @@ JS;
 		return (is_array($params) ? $params : array());
 	}
 
-	/**Gets file for getting of manifest content
+	/**
+	 * Gets file path for getting of manifest content
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод получает путь к файлу для получения содержания манифеста.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/getmanifestcheckfile.php
+	* @author Bitrix
+	*/
 	static public function getManifestCheckFile()
 	{
 		$checkFile = self::MANIFEST_CHECK_FILE;
@@ -215,6 +279,19 @@ JS;
 	 * self::MANIFEST_CHECK_FILE uses by default
 	 *@param string $customManifestCheckFile
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает путь к пользовательскому файлу для получения содержания манифеста. Файл <code>self::MANIFEST_CHECK_FILE</code> используется по умолчанию. </p>
+	*
+	*
+	* @param string $customManifestCheckFile  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/setmanifestcheckfile.php
+	* @author Bitrix
+	*/
 	static public function setManifestCheckFile($customManifestCheckFile)
 	{
 		self::$customCheckFile = $customManifestCheckFile;
@@ -229,9 +306,20 @@ JS;
 	}
 
 	/**
-	 * Creates, rewrites the manifest file
-	 * @return bool|string
+	 * Returns content of the manifest
+	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает содержание манифеста.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/getmanifestcontent.php
+	* @author Bitrix
+	*/
 	public function getManifestContent()
 	{
 		$manifestText = "CACHE MANIFEST\n\n";
@@ -257,13 +345,26 @@ JS;
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод парсит пришедший контент, находит файлы <b>css</b>, <b>js</b> и <b>images</b> и возвращает массив файлов.</p>
+	*
+	*
+	* @param mixed $content  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/getfilesfromcontent.php
+	* @author Bitrix
+	*/
 	public function getFilesFromContent($content)
 	{
 		$files = Array();
 		$arFilesByType = Array();
 		$arExtensions = Array("js", "css");
 		$extension_regex = "(?:" . implode("|", $arExtensions) . ")";
-		$regex = "/
+		$findImageRegexp = "/
 				((?i:
 					href=
 					|src=
@@ -279,7 +380,7 @@ JS;
 				(\\2)                                                #close_quote
 			/x";
 		$match = Array();
-		preg_match_all($regex, $content, $match);
+		preg_match_all($findImageRegexp, $content, $match);
 
 		$link = $match[3];
 		$extension = $match[4];
@@ -298,14 +399,23 @@ JS;
 		}
 
 		$manifestCache = $this->readManifestCache($this->getCurrentManifestID());
+		$excludePatternsHash = md5(serialize($this->excludeImagePatterns));
 
 		if (array_key_exists("css", $arFilesByType))
 		{
+			$findImageRegexp = '#([;\s:]*(?:url|@import)\s*\(\s*)(\'|"|)(.+?)(\2)\s*\)#si';
+			if(count($this->excludeImagePatterns) > 0)
+			{
+				$findImageRegexp = '#([;\s:]*(?:url|@import)\s*\(\s*)(\'|"|)((?:(?!'.implode("|",$this->excludeImagePatterns).').)+?)(\2)\s*\)#si';
+			}
+
 			$cssCount = count($arFilesByType["css"]);
 			for ($j = 0; $j < $cssCount; $j++)
 			{
 				$cssFilePath = $arFilesByType["css"][$j];
-				if ($manifestCache["FILE_DATA"]["FILE_TIMESTAMPS"][$cssFilePath] != $fileData["FILE_TIMESTAMPS"][$cssFilePath])
+				if ($manifestCache["FILE_DATA"]["FILE_TIMESTAMPS"][$cssFilePath] != $fileData["FILE_TIMESTAMPS"][$cssFilePath]
+					||$excludePatternsHash != $manifestCache["EXCLUDE_PATTERNS_HASH"]
+				)
 				{
 
 					$fileContent = false;
@@ -325,14 +435,15 @@ JS;
 
 					if ($fileContent != false)
 					{
-						$regex = '#([;\s:]*(?:url|@import)\s*\(\s*)(\'|"|)(.+?)(\2)\s*\)#si';
 						$cssFileRelative = new \Bitrix\Main\IO\File($cssFilePath);
 						$cssPath = $cssFileRelative->getDirectoryName();
-						preg_match_all($regex, $fileContent, $match);
+						preg_match_all($findImageRegexp, $fileContent, $match);
 						$matchCount = count($match[3]);
 						for ($k = 0; $k < $matchCount; $k++)
 						{
+
 							$file = self::replaceUrlCSS($match[3][$k], addslashes($cssPath));
+
 							if (!in_array($file, $files) && !strpos($file, ";base64"))
 							{
 								$fileData["FULL_FILE_LIST"][] = $files[] = $file;
@@ -353,12 +464,11 @@ JS;
 			}
 		}
 
-
 		return $fileData;
 	}
 
 	/**
-	 * Replaces url to css-file with absolute path.
+	 * Replaces url in css-file with absolute path.
 	 *
 	 * @param $url
 	 * @param $cssPath
@@ -382,9 +492,21 @@ JS;
 
 	/**
 	 * Sets received cache params
-	 *
 	 * @param $receivedCacheParams
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает полученные параметры кеша.</p>
+	*
+	*
+	* @param mixed $receivedCacheParams  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/setreceivedcacheparams.php
+	* @author Bitrix
+	*/
 	public function setReceivedCacheParams($receivedCacheParams)
 	{
 		$this->receivedCacheParams = $receivedCacheParams;
@@ -394,6 +516,17 @@ JS;
 	 * Gets received cache parameters
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод получает параметры кеша.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/appcachemanifest/getreceivedcacheparams.php
+	* @author Bitrix
+	*/
 	public function getReceivedCacheParams()
 	{
 		return $this->receivedCacheParams;
@@ -511,6 +644,7 @@ JS;
 		$desc .= "#Page: " . $this->pageURI . "\n";
 		$desc .= "#Count: " . count($this->files) . "\n";
 		$desc .= "#Params: \n" . $manifestParams . "\n\n";
+		$desc .= "#Exclude patterns: \n" . "#".implode("\n#",$this->getExcludeImagePatterns()) . "\n\n";
 
 		return $desc;
 	}

@@ -32,7 +32,7 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Конструктор класса CCoursePackage инициализирует экспортируемый курс.</p>
+	* <p>Конструктор класса CCoursePackage инициализирует экспортируемый курс. Метод нестатический.</p>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
@@ -40,7 +40,7 @@ class CCoursePackage
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -158,18 +158,18 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Создает архив с учебным курсом.</p>
+	* <p>Создает архив с учебным курсом. Метод нестатический.</p>
 	*
 	*
 	* @param int $PACKAGE_DIR  Путь (относительно корня сайта) к директории, куда будет
-	* скопирован архив курса.
+	* скопирован        архив курса.
 	*
 	* @return bool <p>Метод возвращает <i>true</i>, если создание архива прошло успешно.
-	* При возникновении ошибки метод вернет false, а в свойстве объекта
-	* LAST_ERROR будет содержаться текст ошибки.</p>
+	* При  возникновении ошибки метод вернет false, а в свойстве объекта
+	* LAST_ERROR будет  содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -203,8 +203,8 @@ class CCoursePackage
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a> </li> <li>
-	* <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/ccoursepackage.php">CCoursePackage</a>  </li>
+	* <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/index.php">CCoursePackage</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccoursepackage/createmanifest.php">CreateManifest</a> </li>
 	* </ul><a name="examples"></a>
 	*
@@ -272,14 +272,14 @@ class CCoursePackage
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает манифест (в xml-формате) архива учебного курса.</p>
+	* <p>Возвращает манифест (в xml-формате) архива учебного курса. Метод нестатический.</p>
 	*
 	*
 	* @return string <p>Метод возвращает строку - содержимое файла imsmanifest.xml архива
 	* учебного курса.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {

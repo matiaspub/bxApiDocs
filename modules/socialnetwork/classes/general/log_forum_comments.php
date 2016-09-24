@@ -44,44 +44,37 @@ class CSocNetForumComments
 
 	public static function onAfterCommentAdd($entityType, $entityId, $arData)
 	{
+		global $APPLICATION, $DB, $USER_FIELD_MANAGER;
+
 		$log_event_id = CSocNetForumComments::FindLogEventIDByForumEntityID($entityType);
 		if (!$log_event_id)
+		{
 			return false;
+		}
 
 		$arLogCommentEvent = CSocNetLogTools::FindLogCommentEventByLogEventID($log_event_id);
 		if (!$arLogCommentEvent)
+		{
 			return false;
-
-		$arLogEvent = CSocNetLogTools::FindLogEventByID($log_event_id);
+		}
 
 		$entityId = intval($entityId);
 		if ($entityId <= 0)
 		{
-			return;
+			return false;
 		}
 
 		$messageId = $arData['MESSAGE_ID'];
 		if ($messageId <= 0)
 		{
-			return;
+			return false;
 		}
 
 		$arMessage = CForumMessage::GetByID($messageId);
 		if (!$arMessage)
 		{
-			return;
+			return false;
 		}
-
-		$strURL = $GLOBALS['APPLICATION']->GetCurPageParam("", array("IFRAME", "MID", "SEF_APPLICATION_CUR_PAGE_URL", BX_AJAX_PARAM_ID, "result", "sessid"));
-		$strURL = ForumAddPageParams(
-			$strURL,
-			array(
-				"MID" => $messageId,
-				"result" => "reply"
-			),
-			false,
-			false
-		);
 
 		$sText = (COption::GetOptionString("forum", "FILTER", "Y") == "Y" ? $arMessage["POST_MESSAGE_FILTER"] : $arMessage["POST_MESSAGE"]);
 
@@ -93,7 +86,7 @@ class CSocNetForumComments
 			),
 			false,
 			false,
-			array("ID", "ENTITY_TYPE", "ENTITY_ID")
+			array("ID", "ENTITY_TYPE", "ENTITY_ID", "SOURCE_ID", "USER_ID")
 		);
 
 		if ($arRes = $dbRes->Fetch())
@@ -101,6 +94,19 @@ class CSocNetForumComments
 			$log_id = $arRes["ID"];
 			$entity_type = $arRes["ENTITY_TYPE"];
 			$entity_id = $arRes["ENTITY_ID"];
+			$strURL = '';
+
+			if (
+				isset($arLogCommentEvent["METHOD_GET_URL"])
+				&& is_callable($arLogCommentEvent["METHOD_GET_URL"])
+			)
+			{
+				$strURL = call_user_func_array($arLogCommentEvent["METHOD_GET_URL"], array(array(
+					"ENTRY_ID" => $arRes["SOURCE_ID"],
+					"ENTRY_USER_ID" => $arRes["USER_ID"],
+					"COMMENT_ID" => $messageId
+				)));
+			}
 
 			$parser = new CTextParser();
 			$parser->allow = array("HTML" => 'N',"ANCHOR" => 'Y',"BIU" => 'Y',"IMG" => "Y","VIDEO" => "Y","LIST" => 'N',"QUOTE" => 'Y',"CODE" => 'Y',"FONT" => 'Y',"SMILES" => "N","UPLOAD" => 'N',"NL2BR" => 'N',"TABLE" => "Y");
@@ -109,11 +115,11 @@ class CSocNetForumComments
 				"ENTITY_TYPE" => $entity_type,
 				"ENTITY_ID" => $entity_id,
 				"EVENT_ID" => $arLogCommentEvent["EVENT_ID"],
-				"=LOG_DATE" => $GLOBALS['DB']->CurrentTimeFunction(),
+				"=LOG_DATE" => $DB->CurrentTimeFunction(),
 				"USER_ID" => $arMessage["AUTHOR_ID"],
 				"MESSAGE" => $sText,
 				"TEXT_MESSAGE" => $parser->convert4mail($sText),
-				"URL" => str_replace("?IFRAME=Y", "", str_replace("&IFRAME=Y", "", str_replace("IFRAME=Y&", "", $strURL))),
+				"URL" => $strURL,
 				"MODULE_ID" => (array_key_exists("MODULE_ID", $arLogCommentEvent) && strlen($arLogCommentEvent["MODULE_ID"]) > 0 ? $arLogCommentEvent["MODULE_ID"] : ""),
 				"SOURCE_ID" => $messageId,
 				"LOG_ID" => $log_id
@@ -121,9 +127,10 @@ class CSocNetForumComments
 
 			if (
 				!array_key_exists("RATING_TYPE_ID", $arLogCommentEvent)
-				|| $arLogCommentEvent == "FORUM_POST"
+				|| $arLogCommentEvent["RATING_TYPE_ID"] == "FORUM_POST"
 			)
 			{
+
 				$arFieldsForSocnet["RATING_TYPE_ID"] = "FORUM_POST";
 				$arFieldsForSocnet["RATING_ENTITY_ID"] = $messageId;
 			}
@@ -140,10 +147,16 @@ class CSocNetForumComments
 				$arFieldsForSocnet["UF_SONET_COM_FILE"] = $ufFileID;
 			}
 
-			$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $messageId, LANGUAGE_ID);
+			$ufDocID = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", $messageId, LANGUAGE_ID);
 			if ($ufDocID)
 			{
 				$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
+			}
+
+			$ufUrlPreview = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MES_URL_PRV", $messageId, LANGUAGE_ID);
+			if ($ufUrlPreview)
+			{
+				$arFieldsForSocnet["UF_SONET_COM_URL_PRV"] = $ufUrlPreview;
 			}
 
 			$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
@@ -165,6 +178,7 @@ class CSocNetForumComments
 			));
 
 		foreach (GetModuleEvents("socialnetwork", "OnForumCommentIMNotify", true) as $arModuleEvent) // send notification
+		{
 			ExecuteModuleEventEx($arModuleEvent, array(
 				$entityType,
 				$entityId,
@@ -176,26 +190,37 @@ class CSocNetForumComments
 					"URL" => $strURL
 				)
 			));
+		}
+
+		return false;
 	}
 
 	public static function onAfterCommentUpdate($entityType, $entityId, $arData)
 	{
+		global $APPLICATION, $DB, $USER_FIELD_MANAGER;
+
 		$log_event_id = CSocNetForumComments::FindLogEventIDByForumEntityID($entityType);
 		if (!$log_event_id)
+		{
 			return false;
+		}
 
 		$arLogCommentEvent = CSocNetLogTools::FindLogCommentEventByLogEventID($log_event_id);
 		if (!$arLogCommentEvent)
+		{
 			return false;
-
-		$arLogEvent = CSocNetLogTools::FindLogEventByID($log_event_id);
+		}
 
 		$entityId = intval($entityId);
 		if ($entityId <= 0)
-			return;	
+		{
+			return false;
+		}
 
 		if (empty($arData["MESSAGE_ID"]))
-			return;
+		{
+			return false;
+		}
 
 		$parser = new CTextParser();
 		$parser->allow = array("HTML" => 'N',"ANCHOR" => 'Y',"BIU" => 'Y',"IMG" => "Y","VIDEO" => "Y","LIST" => 'N',"QUOTE" => 'Y',"CODE" => 'Y',"FONT" => 'Y',"SMILES" => "N","UPLOAD" => 'N',"NL2BR" => 'N',"TABLE" => "Y");
@@ -252,7 +277,7 @@ class CSocNetForumComments
 							$entity_id = $arLog["ENTITY_ID"];
 
 							$sText = (COption::GetOptionString("forum", "FILTER", "Y") == "Y" ? $arMessage["POST_MESSAGE_FILTER"] : $arMessage["POST_MESSAGE"]);
-							$strURL = $GLOBALS['APPLICATION']->GetCurPageParam("", array("IFRAME", "MID", "SEF_APPLICATION_CUR_PAGE_URL", BX_AJAX_PARAM_ID, "result"));
+							$strURL = $APPLICATION->GetCurPageParam("", array("IFRAME", "MID", "SEF_APPLICATION_CUR_PAGE_URL", BX_AJAX_PARAM_ID, "result"));
 							$strURL = ForumAddPageParams(
 								$strURL,
 								array(
@@ -278,7 +303,7 @@ class CSocNetForumComments
 							);
 
 							$arFieldsForSocnet["USER_ID"] = $arMessage["AUTHOR_ID"];
-							$arFieldsForSocnet["=LOG_DATE"] = $GLOBALS["DB"]->CurrentTimeFunction();
+							$arFieldsForSocnet["=LOG_DATE"] = $DB->CurrentTimeFunction();
 
 							$ufFileID = array();
 							$dbAddedMessageFiles = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => intval($arData["MESSAGE_ID"])));
@@ -288,9 +313,15 @@ class CSocNetForumComments
 							if (count($ufFileID) > 0)
 								$arFieldsForSocnet["UF_SONET_COM_FILE"] = $ufFileID;
 
-							$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
+							$ufDocID = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
 							if ($ufDocID)
 								$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
+
+							$ufUrlPreview = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MES_URL_PRV", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
+							if ($ufUrlPreview)
+							{
+								$arFieldsForSocnet["UF_SONET_COM_URL_PRV"] = $ufUrlPreview;
+							}
 
 							$comment_id = CSocNetLogComments::Add($arFieldsForSocnet, false, false);
 							CSocNetLog::CounterIncrement(
@@ -335,9 +366,15 @@ class CSocNetForumComments
 						if (count($ufFileID) > 0)
 							$arFieldsForSocnet["UF_SONET_COM_FILE"] = $ufFileID;
 
-						$ufDocID = $GLOBALS["USER_FIELD_MANAGER"]->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
+						$ufDocID = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MESSAGE_DOC", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
 						if ($ufDocID)
 							$arFieldsForSocnet["UF_SONET_COM_DOC"] = $ufDocID;
+
+						$ufUrlPreview = $USER_FIELD_MANAGER->GetUserFieldValue("FORUM_MESSAGE", "UF_FORUM_MES_URL_PRV", intval($arData["MESSAGE_ID"]), LANGUAGE_ID);
+						if ($ufUrlPreview)
+						{
+							$arFieldsForSocnet["UF_SONET_COM_URL_PRV"] = $ufUrlPreview;
+						}
 
 						CSocNetLogComments::Update($arLogComment["ID"], $arFieldsForSocnet);
 					}
@@ -347,12 +384,14 @@ class CSocNetForumComments
 		}
 
 		foreach (GetModuleEvents("socialnetwork", "onAfterCommentUpdateAfter", true) as $arModuleEvent)
+		{
 			ExecuteModuleEventEx($arModuleEvent, array(
 				$entityType,
 				$entityId,
 				$arData,
 				$log_id
 			));
+		}
 	}
 }
 ?>

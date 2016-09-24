@@ -78,29 +78,29 @@ class CAllSaleRecurring
 
 	
 	/**
-	* <p>Метод изменяет параметры записи на продление подписки в соответствии с параметрами из массива arFields. Метод динамичный.</p>
+	* <p>Метод изменяет параметры записи на продление подписки в соответствии с параметрами из массива arFields. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код изменяемой записи на продление подписки.
+	* @param mixed $intID  Код изменяемой записи на продление подписки.
 	*
-	* @param array $arFields  Ассоциативный массив новых параметров новой записи продления
-	* подписки с ключами: <ul> <li> <b>USER_ID</b> - код пользователя;</li> <li> <b>MODULE</b>
-	* - модуль, товар которого продлевается;</li> <li> <b>PRODUCT_ID</b> - код
-	* продлеваемого товара;</li> <li> <b>PRODUCT_NAME</b> - название продлеваемого
-	* товара;</li> <li> <b>PRODUCT_URL</b> - ссылка на продлеваемый товар;</li> <li>
-	* <b>RECUR_SCHEME_TYPE</b> - тип периода оплаты;</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
-	* периода оплаты;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Без оформления заказа";</li>
-	* <li> <b>ORDER_ID</b> - код базового заказа для продления;</li> <li> <b>CANCELED</b> -
-	* флаг отмены продления;</li> <li> <b>DESCRIPTION</b> - описание;</li> <li>
+	* @param array $arFields  Ассоциативный массив новых параметров новой записи 		продления
+	* подписки с ключами: <ul> <li> <b>USER_ID</b> - код пользователя;</li> 	<li> <b>MODULE</b>
+	* - модуль, товар которого продлевается;</li> 	<li> <b>PRODUCT_ID</b> - код
+	* продлеваемого товара;</li> 	<li> <b>PRODUCT_NAME</b> - название продлеваемого
+	* товара;</li> 	<li> <b>PRODUCT_URL</b> - ссылка на продлеваемый товар;</li> 	<li>
+	* <b>RECUR_SCHEME_TYPE</b> - тип периода оплаты;</li> 	<li> <b>RECUR_SCHEME_LENGTH</b> - длина
+	* периода оплаты;</li> 	<li> <b>WITHOUT_ORDER</b> - флаг "Без оформления заказа";</li>
+	* 	<li> <b>ORDER_ID</b> - код базового заказа для продления;</li> 	<li> <b>CANCELED</b> -
+	* флаг отмены продления;</li> 	<li> <b>DESCRIPTION</b> - описание;</li> 	<li>
 	* <b>CALLBACK_FUNC</b> - функция обратного вызова для обновления параметров
-	* продления;</li> <li> <b>REMAINING_ATTEMPTS</b> - количество оставшихся попыток
-	* осуществления продления;</li> <li> <b>SUCCESS_PAYMENT</b> - успешное
-	* осуществление продления;</li> <li> <b>CANCELED_REASON</b> - причина отмены;</li> <li>
-	* <b>DATE_CANCELED</b> - дата отмены;</li> <li> <b>PRIOR_DATE</b> - дата последнего
-	* продления;</li> <li> <b>NEXT_DATE</b> - дата очередного продления.</li> </ul>
+	* продления;</li> 	<li> <b>REMAINING_ATTEMPTS</b> - количество оставшихся попыток
+	* осуществления продления;</li> 	<li> <b>SUCCESS_PAYMENT</b> - успешное
+	* осуществление продления;</li> 	<li> <b>CANCELED_REASON</b> - причина отмены;</li>
+	* 	<li> <b>DATE_CANCELED</b> - дата отмены;</li> 	<li> <b>PRIOR_DATE</b> - дата последнего
+	* продления;</li> 	<li> <b>NEXT_DATE</b> - дата очередного продления.</li> </ul>
 	*
 	* @return int <p>Метод возвращает код измененной записи или False в случае
-	* ошибки.</p> <br><br>
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.update.php
@@ -128,13 +128,13 @@ class CAllSaleRecurring
 
 	
 	/**
-	* <p>Метод удаляет запись на продление подписки с кодом ID. Метод динамичный.</p>
+	* <p>Метод удаляет запись на продление подписки с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код удаляемой записи.
+	* @param mixed $intID  Код удаляемой записи.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления или <i>false</i>
-	* в случае ошибки.</p> <br><br>
+	* в случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.delete.php
@@ -179,10 +179,10 @@ class CAllSaleRecurring
 
 	
 	/**
-	* <p>Метод ищет подписки, которые пора продлить, и пытается осуществить продление. За раз осуществляется продление не более трех подписок. Этот метод можно вызывать из агентов или cron'а для автоматического продления подписки. Метод динамичный.</p>
+	* <p>Метод ищет подписки, которые пора продлить, и пытается осуществить продление. За раз осуществляется продление не более трех подписок. Этот метод можно вызывать из агентов или cron'а для автоматического продления подписки. Нестатический метод.</p>
 	*
 	*
-	* @return void <p>Метод не возвращает значений.</p> <br><br>
+	* @return void <p>Метод не возвращает значений.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.checkrecurring.php
@@ -218,13 +218,13 @@ class CAllSaleRecurring
 
 	
 	/**
-	* <p>Метод осуществляет продление подписки с кодом ID. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание:</b> метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
+	* <p>Метод осуществляет продление подписки с кодом ID. Нестатический метод.</p> <p></p> <div class="note"> <b>Примечание:</b> метод использует внутреннюю транзакцию. Если у вас используется <b>MySQL</b> и <b>InnoDB</b>, и  ранее была открыта транзакция, то ее необходимо закрыть до подключения метода.</div>
 	*
 	*
-	* @param int $ID  Код записи с информацией о продлении.
+	* @param mixed $intID  Код записи с информацией о продлении.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного продления или <i>false</i>
-	* в случае ошибки.</p> <br><br>
+	* в случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.nextpayment.php
@@ -288,7 +288,7 @@ class CAllSaleRecurring
 		if ($arProduct["WITHOUT_ORDER"] == "Y" || $arRecur["SUCCESS_PAYMENT"] == "Y")
 		{
 			$baseSiteCurrency = CSaleLang::GetLangCurrency($arOrder["LID"]);
-			$productPrice = roundEx(CCurrencyRates::ConvertCurrency($arProduct["PRICE"], $arProduct["CURRENCY"], $baseSiteCurrency), SALE_VALUE_PRECISION);
+			$productPrice = \Bitrix\Sale\PriceMaths::roundPrecision(CCurrencyRates::ConvertCurrency($arProduct["PRICE"], $arProduct["CURRENCY"], $baseSiteCurrency));
 
 			// Delivery
 			$deliveryPrice = 0;
@@ -322,7 +322,7 @@ class CAllSaleRecurring
 					);
 				while ($arDelivery = $dbDelivery->Fetch())
 				{
-					$deliveryPriceTmp = roundEx(CCurrencyRates::ConvertCurrency($arDelivery["PRICE"], $arDelivery["CURRENCY"], $baseSiteCurrency), SALE_VALUE_PRECISION);
+					$deliveryPriceTmp = \Bitrix\Sale\PriceMaths::roundPrecision(CCurrencyRates::ConvertCurrency($arDelivery["PRICE"], $arDelivery["CURRENCY"], $baseSiteCurrency));
 					if (IntVal($arDelivery["ID"]) == $arOrder["DELIVERY_ID"])
 					{
 						$deliveryID = IntVal($arDelivery["ID"]);
@@ -333,6 +333,16 @@ class CAllSaleRecurring
 					{
 						$deliveryID = IntVal($arDelivery["ID"]);
 						$deliveryPrice = $deliveryPriceTmp;
+					}
+				}
+
+				if ($deliveryID <= 0)
+				{
+					$deliveryID = \Bitrix\Sale\Delivery\Services\EmptyDeliveryService::getEmptyDeliveryServiceId();
+
+					if ($deliveryID > 0)
+					{
+						$deliveryID = \CSaleDelivery::getCodeById($deliveryID);
 					}
 				}
 
@@ -363,17 +373,17 @@ class CAllSaleRecurring
 			{
 				if ($arDiscount["DISCOUNT_TYPE"] == "P")
 				{
-					$discountProduct = roundEx($productPrice * $arDiscount["DISCOUNT_VALUE"] / 100, SALE_VALUE_PRECISION);
-					$discount = roundEx($discountProduct * DoubleVal($arProduct["QUANTITY"]), SALE_VALUE_PRECISION); // Changed by Sigurd, 2007-08-16
+					$discountProduct = \Bitrix\Sale\PriceMaths::roundPrecision($productPrice * $arDiscount["DISCOUNT_VALUE"] / 100);
+					$discount = \Bitrix\Sale\PriceMaths::roundPrecision($discountProduct * DoubleVal($arProduct["QUANTITY"])); // Changed by Sigurd, 2007-08-16
 					$discountPrice = $productPrice - $discountProduct;
 				}
 				else
 				{
 					$discountValue = CCurrencyRates::ConvertCurrency($arDiscount["DISCOUNT_VALUE"], $arDiscount["CURRENCY"], $baseSiteCurrency);
-					$discountValue = roundEx($discountValue, SALE_VALUE_PRECISION);
+					$discountValue = \Bitrix\Sale\PriceMaths::roundPrecision($discountValue);
 
-					$discountProduct = roundEx(1.0 * $discountValue / DoubleVal($arProduct["QUANTITY"]), SALE_VALUE_PRECISION);// Changed by Sigurd, 2007-08-16
-					$discount = roundEx($curDiscount * DoubleVal($arProduct["QUANTITY"]), SALE_VALUE_PRECISION);
+					$discountProduct = \Bitrix\Sale\PriceMaths::roundPrecision(1.0 * $discountValue / DoubleVal($arProduct["QUANTITY"]));// Changed by Sigurd, 2007-08-16
+					$discount = \Bitrix\Sale\PriceMaths::roundPrecision($curDiscount * DoubleVal($arProduct["QUANTITY"]));
 					$discountPrice = $productPrice - $discountProduct;
 				}
 			}
@@ -480,7 +490,7 @@ class CAllSaleRecurring
 				}
 				else
 				{
-					$arTaxList[0]["VALUE_MONEY"] = (($discountPrice / ($vatRate +1)) * $vatRate) * DoubleVal($arProduct["QUANTITY"]);
+					$arTaxList[0]["VALUE_MONEY"] = \Bitrix\Sale\PriceMaths::roundPrecision((($discountPrice / ($vatRate +1)) * $vatRate) * DoubleVal($arProduct["QUANTITY"]));
 					$taxVatPrice = $arTaxList[0]["VALUE_MONEY"];
 				}
 			}
@@ -780,20 +790,18 @@ class CAllSaleRecurring
 
 	
 	/**
-	* <p>Метод осуществляет отмену продления подписки с кодом ID. Метод динамичный.</p>
+	* <p>Метод осуществляет отмену продления подписки с кодом ID. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код записи с информацией о продлении.
+	* @param mixed $intID  Код записи с информацией о продлении.
 	*
 	* @param string $val  "Y", если подписка отменяется, и "N", если подписка
 	* восстанавливается.
 	*
-	* @param  $string  Причина отмены подписки.
-	*
-	* @param descriptio $n = ""] 
+	* @param string $description = ""] Причина отмены подписки.
 	*
 	* @return bool <p>Метод возвращает код отменяемой записи или <i>false</i> в случае
-	* ошибки.</p> <br><br>
+	* ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalerecurring/csalerecurring.cancelrecurring.php

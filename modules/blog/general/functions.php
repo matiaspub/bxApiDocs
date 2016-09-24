@@ -2,7 +2,11 @@
 IncludeModuleLangFile(__FILE__);
 class blogTextParser extends CTextParser
 {
-	public function blogTextParser($strLang = False, $pathToSmile = false)
+	public $bPublic = false;
+	public $pathToUserEntityId = false;
+	public $pathToUserEntityType = false;
+
+	public function blogTextParser($strLang = False, $pathToSmile = false, $arParams = array())
 	{
 		$this->CTextParser();
 		global $CACHE_MANAGER;
@@ -18,6 +22,8 @@ class blogTextParser extends CTextParser
 		$this->ajaxPage = $GLOBALS["APPLICATION"]->GetCurPageParam("", array("bxajaxid", "logout"));
 		$this->blogImageSizeEvents = GetModuleEvents("blog", "BlogImageSize", true);
 		$this->arUserfields = array();
+		$this->bPublic = (is_array($arParams) && $arParams["bPublic"]);
+
 		$arSmiles = array();
 
 		$this->smiles = array();
@@ -61,6 +67,11 @@ class blogTextParser extends CTextParser
 			$CACHE_MANAGER->Set("b_blog_smile", $arSmiles);
 		}
 		$this->smiles = $arSmiles[$strLang];
+
+		if (empty($this->smiles))
+		{
+			$this->pathToSmile = '';
+		}
 	}
 
 	public function convert($text, $bPreview = True, $arImages = array(), $allow = array("HTML" => "N", "ANCHOR" => "Y", "BIU" => "Y", "IMG" => "Y", "QUOTE" => "Y", "CODE" => "Y", "FONT" => "Y", "LIST" => "Y", "SMILES" => "Y", "NL2BR" => "N", "VIDEO" => "Y", "TABLE" => "Y", "CUT_ANCHOR" => "N", "SHORT_ANCHOR" => "N"), $arParams = Array())
@@ -69,13 +80,16 @@ class blogTextParser extends CTextParser
 			$type = $arParams;
 		elseif(is_array($arParams))
 			$type = $arParams["type"];
-
 		if(IntVal($arParams["imageWidth"]) > 0)
 			$this->imageWidth = IntVal($arParams["imageWidth"]);
 		if(IntVal($arParams["imageHeight"]) > 0)
 			$this->imageHeight = IntVal($arParams["imageHeight"]);
 		if(strlen($arParams["pathToUser"]) > 0)
 			$this->pathToUser = $arParams["pathToUser"];
+		if(!empty($arParams["pathToUserEntityType"]) && strlen($arParams["pathToUserEntityType"]) > 0)
+			$this->pathToUserEntityType = $arParams["pathToUserEntityType"];
+		if(intval($arParams["pathToUserEntityId"]) > 0)
+			$this->pathToUserEntityId = intval($arParams["pathToUserEntityId"]);
 		$this->parser_nofollow = COption::GetOptionString("blog", "parser_nofollow", "N");
 
 		$this->type = ($type == "rss" ? "rss" : "html");
@@ -114,7 +128,6 @@ class blogTextParser extends CTextParser
 			AddEventHandler("main", "TextParserBefore", Array("blogTextParser", "ParserCut"));
 			AddEventHandler("main", "TextParserBefore", Array("blogTextParser", "ParserBlogImageBefore"));
 			AddEventHandler("main", "TextParserAfterTags", Array("blogTextParser", "ParserBlogImage"));
-			AddEventHandler("main", "TextParserAfterTags", Array("blogTextParser", "ParserUser"));
 			AddEventHandler("main", "TextParserAfterTags", Array("blogTextParser", "ParserTag"));
 			AddEventHandler("main", "TextParserAfter", Array("blogTextParser", "ParserCutAfter"));
 			AddEventHandler("main", "TextParserVideoConvert", Array("blogTextParser", "blogConvertVideo"));
@@ -171,23 +184,6 @@ class blogTextParser extends CTextParser
 		return $this->convert_blog_image('', $matches[2], '', 'mail');
 	}
 
-	public static function ParserUser(&$text, &$obj)
-	{
-		if($obj->allow["USER"] != "N" && is_callable(array($obj, 'convert_blog_user')))
-		{
-			$text = preg_replace_callback(
-				"/\[user\s*=\s*([^\]]*)\](.+?)\[\/user\]/is".BX_UTF_PCRE_MODIFIER,
-				array($obj, "convertBlogUser"),
-				$text
-			);
-		}
-	}
-
-	public function convertBlogUser($matches)
-	{
-		return $this->convert_blog_user($matches[1], $matches[2]);
-	}
-
 	public static function ParserTag(&$text, &$obj)
 	{
 		if($obj->allow["TAG"] != "N" && is_callable(array($obj, 'convert_blog_tag')))
@@ -205,21 +201,6 @@ class blogTextParser extends CTextParser
 		return $this->convert_blog_tag($matches[1]);
 	}
 
-	public function convert_blog_user($userId = 0, $name = "")
-	{
-		$userId = IntVal($userId);
-		if($userId <= 0)
-		{
-			return;
-		}
-		$anchor_id = RandString(8);
-		return '<a class="blog-p-user-name'.(is_array($GLOBALS["arExtranetUserID"]) && in_array($userId, $GLOBALS["arExtranetUserID"]) ? ' feed-extranet-mention' : '').'" id="bp_'.$anchor_id.'" href="'.CComponentEngine::MakePathFromTemplate($this->pathToUser, array("user_id" => $userId)).'">'.$name.'</a>'.
-			(
-				!$this->bMobile
-					? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchor_id.'", "'.CUtil::JSEscape($this->ajaxPage).'");</script>'
-					: ''
-			);
-	}
 	public static function convert_blog_tag($name = "")
 	{
 		if(strlen($name) <= 0)
@@ -554,6 +535,45 @@ class blogTextParser extends CTextParser
 		return $text;
 	}
 
+	public function render_user($fields)
+	{
+		$classAdditional = (!empty($fields['CLASS_ADDITIONAL']) ? $fields['CLASS_ADDITIONAL'] : '');
+		$pathToUser = (!empty($fields['PATH_TO_USER']) ? $fields['PATH_TO_USER'] : '');
+		$userId = (!empty($fields['USER_ID']) ? $fields['USER_ID'] : '');
+		$userName = (!empty($fields['USER_NAME']) ? $fields['USER_NAME'] : '');
+
+		$ajaxPage = $this->ajaxPage;
+
+		if (
+			$this->pathToUserEntityType && strlen($this->pathToUserEntityType) > 0
+			&& intval($this->pathToUserEntityId) > 0
+		)
+		{
+			$ajaxPage = $ajaxPage.(strpos($pathToUser, '?') === false ? '?' : '&').'entityType='.$this->pathToUserEntityType.'&entityId='.intval($this->pathToUserEntityId);
+		}
+
+		$anchorId = RandString(8);
+
+		$res = (
+			!$this->bPublic
+				? '<a class="blog-p-user-name'.$classAdditional.'" id="bp_'.$anchorId.'" href="'.CComponentEngine::MakePathFromTemplate($pathToUser, array("user_id" => $userId)).'">'.
+				(
+					!$this->bMobile
+					&& $ajaxPage
+						? '<script type="text/javascript">BX.tooltip(\''.$userId.'\', "bp_'.$anchorId.'", "'.CUtil::JSEscape($ajaxPage).'");</script>'
+						: ''
+				)
+				: ''
+			).
+			$userName.
+			(
+				!$this->bPublic
+					? '</a>'
+					: ''
+			);
+
+		return $res;
+	}
 }
 class CBlogTools
 {

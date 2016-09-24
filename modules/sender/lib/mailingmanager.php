@@ -11,6 +11,7 @@ use Bitrix\Main\Application;
 use Bitrix\Main\DB\Exception;
 use Bitrix\Sender;
 use \Bitrix\Main\Type;
+use \Bitrix\Main\Config\Option;
 
 class MailingManager
 {
@@ -104,13 +105,13 @@ class MailingManager
 		{
 			if(\COption::GetOptionString("sender", "auto_method") === 'cron')
 			{
-				$maxMailCount = 0;
+				$maxMailCount = intval(Option::get('sender', 'max_emails_per_cron'));
 				$timeout = 0;
 			}
 			else
 			{
-				$maxMailCount = \COption::GetOptionInt("sender", "max_emails_per_hit");
-				$timeout = \COption::GetOptionInt("sender", "interval");
+				$maxMailCount = intval(Option::get('sender', 'max_emails_per_hit'));
+				$timeout = intval(Option::get('sender', 'interval'));
 			}
 
 			$postingSendStatus = '';

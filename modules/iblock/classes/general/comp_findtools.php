@@ -65,7 +65,7 @@ class CIBlockFindTools
 		static $aSearch = array("&lt;", "&gt;", "&quot;", "&#039;");
 		static $aReplace = array("<", ">", "\"", "'");
 
-		$component = $engine->GetComponent();
+		$component = $engine->getComponent();
 		if ($component)
 			$iblock_id = intval($component->arParams["IBLOCK_ID"]);
 		else
@@ -83,9 +83,9 @@ class CIBlockFindTools
 
 		$requestURL = $APPLICATION->GetCurPage(true);
 
-		$cacheId = $requestURL.implode("|", array_keys($pageCandidates))."|".SITE_ID;
+		$cacheId = $requestURL.implode("|", array_keys($pageCandidates))."|".SITE_ID."|".$iblock_id;
 		$cache = new CPHPCache;
-		if ($cache->startDataCache(3600, $cacheId, "iblock_find"))
+		if ($cache->StartDataCache(3600, $cacheId, "iblock_find"))
 		{
 			if (defined("BX_COMP_MANAGED_CACHE"))
 			{
@@ -105,7 +105,7 @@ class CIBlockFindTools
 						$arVariables = $arVariablesTmp;
 						if (defined("BX_COMP_MANAGED_CACHE"))
 							$CACHE_MANAGER->EndTagCache();
-						$cache->endDataCache(array($pageID, $arVariablesTmp));
+						$cache->EndDataCache(array($pageID, $arVariablesTmp));
 						return $pageID;
 					}
 				}
@@ -123,7 +123,7 @@ class CIBlockFindTools
 						$arVariables = $arVariablesTmp;
 						if (defined("BX_COMP_MANAGED_CACHE"))
 							$CACHE_MANAGER->EndTagCache();
-						$cache->endDataCache(array($pageID, $arVariablesTmp));
+						$cache->EndDataCache(array($pageID, $arVariablesTmp));
 						return $pageID;
 					}
 				}
@@ -131,11 +131,11 @@ class CIBlockFindTools
 
 			if (defined("BX_COMP_MANAGED_CACHE"))
 				$CACHE_MANAGER->AbortTagCache();
-			$cache->abortDataCache();
+			$cache->AbortDataCache();
 		}
 		else
 		{
-			$vars = $cache->getVars();
+			$vars = $cache->GetVars();
 			$pageID = $vars[0];
 			$arVariables = $vars[1];
 			return $pageID;

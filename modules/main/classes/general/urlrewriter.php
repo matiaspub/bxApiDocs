@@ -111,7 +111,6 @@ class CUrlRewriter
 		return $arResult;
 	}
 
-
 	public static function printArray($arr)
 	{
 		$output = "\$arUrlRewrite = array(\n";
@@ -437,8 +436,14 @@ class CUrlRewriter
 
 			if(is_dir($abs_path."/".$file))
 			{
-				if($full_path == "/bitrix" || $full_path == "/".COption::GetOptionString("main", "upload_dir", "upload"))
+				if(
+					$full_path == "/bitrix"
+					|| $full_path == "/".COption::GetOptionString("main", "upload_dir", "upload")
+					|| $full_path == "/local"
+				)
+				{
 					continue;
+				}
 
 				//this is not first step and we had stopped here, so go on to reindex
 				if($max_execution_time<=0 || strlen($NS["FLG"])<=0 || (strlen($NS["FLG"]) > 0 && substr($NS["ID"]."/", 0, strlen($site."|".$full_path."/")) == $site."|".$full_path."/"))
@@ -448,7 +453,9 @@ class CUrlRewriter
 						return false;
 				}
 				else //all done
+				{
 					continue;
+				}
 			}
 			else
 			{
@@ -533,7 +540,7 @@ class CUrlRewriter
 		return true;
 	}
 
-	function CheckPath($path)
+	public static function CheckPath($path)
 	{
 		static $SEARCH_MASKS_CACHE = false;
 		if(is_array($SEARCH_MASKS_CACHE))

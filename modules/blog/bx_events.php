@@ -9,13 +9,13 @@ class _CEventsBlogs {
  * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a> до вставки блога, и может быть использовано для отмены вставки или переопределения некоторых полей.</p>
  *
  *
- * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога. </ht
+ * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога.
  *
  * @return bool <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -43,7 +43,7 @@ class _CEventsBlogs {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onblogadd.php">Событие "OnBlogAdd"</a></li>
- * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a></li> </ul></bod<a
+ * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -57,14 +57,14 @@ class _CEventsBlogs {
  * <p>Событие вызывается в момент добавления блога.</p>
  *
  *
- * @param int $ID  Идентификатор добавленного блога.
+ * @param int $intID  Идентификатор добавленного блога.
  *
- * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога. </ht
+ * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога.
  *
  * @return bool 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -88,29 +88,28 @@ class _CEventsBlogs {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onbeforeblogadd.php">Событие
  * "OnBeforeBlogAdd"</a></li> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a></li> </ul></bod<a
- * name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/add.php">CBlog::Add</a></li> </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/blogs/events/onblogadd.php
  * @author Bitrix
  */
-	public static function OnBlogAdd($ID, &$arParams){}
+	public static function OnBlogAdd($intID, &$arParams){}
 
 /**
  * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a> до изменения блога и может быть использовано для отмены изменения или переопределения некоторых полей.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемого блога.
+ * @param int $intID  Идентификатор изменяемого блога.
  *
- * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога. </ht
+ * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога.
  *
  * @return bool <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -138,7 +137,7 @@ class _CEventsBlogs {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onblogupdate.php">Событие "OnBlogUpdate"</a></li>
- * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a></li> </ul></bod<a
+ * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -146,20 +145,20 @@ class _CEventsBlogs {
  * @link http://dev.1c-bitrix.ru/api_help/blogs/events/onbeforeblogupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeBlogUpdate($ID, &$arParams){}
+	public static function OnBeforeBlogUpdate($intID, &$arParams){}
 
 /**
  * <p>Событие вызывается в момент изменения блога.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемого блога.
+ * @param int $intID  Идентификатор изменяемого блога.
  *
- * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога. </ht
+ * @param array &$arParams  <a href="http://dev.1c-bitrix.ru/api_help/blogs/fields.php#blog">Массив полей</a> блога.
  *
  * @return bool 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -183,7 +182,7 @@ class _CEventsBlogs {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onbeforeblogupdate.php">Событие
  * "OnBeforeBlogUpdate"</a></li> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a></li> </ul></bod<a
+ * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/update.php">CBlog::Update</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -191,19 +190,19 @@ class _CEventsBlogs {
  * @link http://dev.1c-bitrix.ru/api_help/blogs/events/onblogupdate.php
  * @author Bitrix
  */
-	public static function OnBlogUpdate($ID, &$arParams){}
+	public static function OnBlogUpdate($intID, &$arParams){}
 
 /**
  * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a> до удаления блога и может быть использовано для отмены удаления.</p>
  *
  *
- * @param int $ID  Идентификатор удаляемого блога.
+ * @param int $intID  Идентификатор удаляемого блога.
  *
  * @return bool <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -231,7 +230,7 @@ class _CEventsBlogs {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onblogdelete.php">Событие "OnBlogDelete"</a></li>
- * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a></li> </ul></bod<a
+ * <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -239,18 +238,18 @@ class _CEventsBlogs {
  * @link http://dev.1c-bitrix.ru/api_help/blogs/events/onbeforeblogdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeBlogDelete($ID){}
+	public static function OnBeforeBlogDelete($intID){}
 
 /**
  * <p>Событие вызывается в момент удаления блога.</p>
  *
  *
- * @param int $ID  Идентификатор удаляемого блога.
+ * @param int $intID  Идентификатор удаляемого блога.
  *
  * @return bool 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -274,7 +273,7 @@ class _CEventsBlogs {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/blogs/events/onbeforeblogdelete.php">Событие
  * "OnBeforeBlogDelete"</a></li> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a></li> </ul></bod<a
+ * href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblog/delete.php">CBlog::Delete</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -282,12 +281,10 @@ class _CEventsBlogs {
  * @link http://dev.1c-bitrix.ru/api_help/blogs/events/onblogdelete.php
  * @author Bitrix
  */
-	public static function OnBlogDelete($ID){}
+	public static function OnBlogDelete($intID){}
 
 /**
- * Вызывается перед добавлением комментария.
- * 
- * 
+ * перед добавлением комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/add.php">CBlogComment::Add</a><br><br>
  * 
@@ -298,9 +295,7 @@ class _CEventsBlogs {
 	public static function OnBeforeCommentAdd(){}
 
 /**
- * Вызывается перед удалением комментария.
- * 
- * 
+ * перед удалением комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/delete.php">CBlogComment::Delete</a><br><br>
  * 
@@ -311,9 +306,7 @@ class _CEventsBlogs {
 	public static function OnBeforeCommentDelete(){}
 
 /**
- * Вызывается перед изменением комментария.
- * 
- * 
+ * перед изменением комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/update.php">CBlogComment::Update</a><br><br>
  * 
@@ -324,9 +317,7 @@ class _CEventsBlogs {
 	public static function OnBeforeCommentUpdate(){}
 
 /**
- * Вызывается перед добавлением сообщения.
- * 
- * 
+ * перед добавлением сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/add.php">CBlogPost::Add</a><br><br>
  * 
@@ -337,9 +328,7 @@ class _CEventsBlogs {
 	public static function OnBeforePostAdd(){}
 
 /**
- * Вызывается перед удалением сообщения.
- * 
- * 
+ * перед удалением сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/delete.php">CBlogPost::Delete</a><br><br>
  * 
@@ -350,9 +339,7 @@ class _CEventsBlogs {
 	public static function OnBeforePostDelete(){}
 
 /**
- * Вызывается перед изменением сообщения.
- * 
- * 
+ * перед изменением сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/update.php">CBlogPost::Update</a><br><br>
  * 
@@ -363,9 +350,7 @@ class _CEventsBlogs {
 	public static function OnBeforePostUpdate(){}
 
 /**
- * Вызывается при добавлении комментария.
- * 
- * 
+ * при добавлении комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/add.php">CBlogComment::Add</a><br><br>
  * 
@@ -376,8 +361,7 @@ class _CEventsBlogs {
 	public static function OnCommentAdd(){}
 
 /**
- * Вызывается при удалении комментария.
- * 
+ * при удалении комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/delete.php">CBlogComment::Delete</a><br><br>
  * 
@@ -388,8 +372,7 @@ class _CEventsBlogs {
 	public static function OnCommentDelete(){}
 
 /**
- * Вызывается при изменении комментария.
- * 
+ * при изменении комментария.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogcomment/update.php">CBlogComment::Update</a><br><br>
  * 
@@ -400,8 +383,7 @@ class _CEventsBlogs {
 	public static function OnCommentUpdate(){}
 
 /**
- * Вызывается при добавлении сообщения.
- * </html
+ * при добавлении сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/add.php">CBlogPost::Add</a><br><br>
  * 
@@ -412,8 +394,7 @@ class _CEventsBlogs {
 	public static function OnPostAdd(){}
 
 /**
- * Вызывается при удалении сообщения.
- * </htm
+ * при удалении сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/delete.php">CBlogPost::Delete</a><br><br>
  * 
@@ -424,8 +405,7 @@ class _CEventsBlogs {
 	public static function OnPostDelete(){}
 
 /**
- * Вызывается при изменении сообщения.
- * </htm
+ * при изменении сообщения.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/update.php">CBlogPost::Update</a><br><br>
  * 
@@ -436,8 +416,7 @@ class _CEventsBlogs {
 	public static function OnPostUpdate(){}
 
 /**
- * Вызывается при конвертации видео.
- * 
+ * при конвертации видео.
  * <i>Вызывается в методе:</i><br>
  * blogTextParser::blogConvertVideo<br><br>
  * 
@@ -448,9 +427,7 @@ class _CEventsBlogs {
 	public static function videoConvert(){}
 
 /**
- * Вызывается при конвертировании тега типа <pre class="code">[IMG ID=12345]</pre> в строку типа <i>&amp;ltimg .../&gt;</i>
- * 
- * 
+ * при конвертировании тега типа <pre class="code">[IMG ID=12345]</pre> в строку типа <i>&amp;ltimg .../&gt;</i>
  * 
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/blogtextparser/index.php">blogTextParser::blogTextParser</a><br><br>
@@ -462,9 +439,7 @@ class _CEventsBlogs {
 	public static function BlogImageSize(){}
 
 /**
- * Вызывается после изменения\добавления сообщения в блог, но перед обновлением пользовательских свойств.
- * 
- * 
+ * после изменения\добавления сообщения в блог, но перед обновлением пользовательских свойств.
  * <i>Вызывается в методе:</i><br>
  * <a href="http://dev.1c-bitrix.ru/api_help/blogs/classes/cblogpost/update.php">CBlogPost::Update</a><br><br>
  * 
@@ -475,9 +450,7 @@ class _CEventsBlogs {
 	public static function OnBeforePostUserFieldUpdate(){}
 
 /**
- * Вызывается после отправки уведомления об упоминании в сообщении\комментарии.
- * 
- * 
+ * после отправки уведомления об упоминании в сообщении\комментарии.
  * <i>Вызывается в методе:</i><br>
  * CBlogPost::NotifyIm<br><br>
  * 

@@ -309,7 +309,7 @@ class CAllBlogTrackback
 
 	public static function SendPingResponce($error = 0, $text = "")
 	{
-		header("Content-type: text/xml");
+		header("Content-type: text/xml; charset=".LANG_CHARSET);
 		echo "<"."?xml version=\"1.0\" encoding=\"".SITE_CHARSET."\"?".">\n";
 		echo "<response>\n";
 		echo "<error>".htmlspecialcharsbx($error)."</error>\n";

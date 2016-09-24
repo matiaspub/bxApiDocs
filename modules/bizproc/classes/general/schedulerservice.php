@@ -4,12 +4,72 @@ include_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/bizproc/classes/general/
 class CBPSchedulerService
 	extends CBPRuntimeService
 {
+	/**
+	 * @param bool $withType Return as array [value, type].
+	 * @return int|array
+	 * @throws \Bitrix\Main\ArgumentNullException
+	 */
+	public static function getDelayMinLimit($withType = false)
+	{
+		$result = (int) \Bitrix\Main\Config\Option::get('bizproc', 'delay_min_limit', 0);
+		if (!$withType)
+			return $result;
+		$type = 's';
+		if ($result > 0)
+		{
+			if ($result % (3600 * 24) == 0)
+			{
+				$result = $result / (3600 * 24);
+				$type = 'd';
+			}
+			elseif ($result % 3600 == 0)
+			{
+				$result = $result / 3600;
+				$type = 'h';
+			}
+			elseif ($result % 60 == 0)
+			{
+				$result = $result / 60;
+				$type = 'm';
+			}
+		}
+		return array($result, $type);
+	}
+
+	public static function setDelayMinLimit($limit, $type = 's')
+	{
+		$limit = (int)$limit;
+		switch ($type)
+		{
+			case 'd':
+				$limit *= 3600 * 24;
+				break;
+			case 'h':
+				$limit *= 3600;
+				break;
+			case 'm':
+				$limit *= 60;
+				break;
+			default:
+				break;
+		}
+		\Bitrix\Main\Config\Option::set('bizproc', 'delay_min_limit', $limit);
+	}
+
 	static public function SubscribeOnTime($workflowId, $eventName, $expiresAt)
 	{
 		CTimeZone::Disable();
 
 		$workflowId = preg_replace('#[^a-z0-9.]#i', '', $workflowId);
 		$eventName = preg_replace('#[^a-z0-9._-]#i', '', $eventName);
+
+		$minLimit = static::getDelayMinLimit(false);
+		if ($minLimit > 0)
+		{
+			$minExpiresAt = time() + $minLimit;
+			if ($minExpiresAt > $expiresAt)
+				$expiresAt = $minExpiresAt;
+		}
 
 		$result = CAgent::AddAgent(
 			"CBPSchedulerService::OnAgent('".$workflowId."', '".$eventName."', array('SchedulerService' => 'OnAgent'));",
@@ -77,7 +137,15 @@ class CBPSchedulerService
 				$arEventParameters[] = func_get_arg($i);
 		}
 
-		if ($arEventParameters["EntityId"] != null && $arEventParameters["EntityId"] != $arEventParameters[0])
+		if (is_array($arEventParameters["EntityId"]))
+		{
+			foreach ($arEventParameters["EntityId"] as $key => $value)
+			{
+				if (!isset($arEventParameters[0][$key]) || $arEventParameters[0][$key] != $value)
+					return;
+			}
+		}
+		elseif ($arEventParameters["EntityId"] != null && $arEventParameters["EntityId"] != $arEventParameters[0])
 			return;
 
 		try

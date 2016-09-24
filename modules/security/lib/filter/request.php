@@ -77,6 +77,19 @@ class Request
 	 * @param Auditor\Base[] $auditors
 	 * @return $this
 	 */
+	
+	/**
+	* <p>Нестатический метод назначает аудиторов для использования в фильтрации.</p>
+	*
+	*
+	* @param array $arrayauditors  Аудиторы.
+	*
+	* @return \Bitrix\Security\Filter\Request 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/request/setauditors.php
+	* @author Bitrix
+	*/
 	public function setAuditors(array $auditors)
 	{
 		$this->auditors = $auditors;
@@ -88,6 +101,17 @@ class Request
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает все измененные переменные. Может быть полезно для логирования.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/request/getchangedvars.php
+	* @author Bitrix
+	*/
 	public function getChangedVars()
 	{
 		return $this->changedVars;
@@ -126,6 +150,49 @@ class Request
 	 * @param bool $isReturnChangedOnly if true - return values only if it changed by some auditors
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив отфильтрованных значений.</p>
+	*
+	*
+	* @param array $values  Значения. Массив типа: <code>array("get" =&gt; $_GET, "post" =&gt; $_POST, "files" =&gt; $_FILES,
+	* "cookie" =&gt; $_COOKIE)</code>.
+	*
+	* @param boolean $isReturnChangedOnly = true Если значение <code>true</code>, то возвращаются значения, если они были
+	* изменены некоторым аудитором.
+	*
+	* @return array 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $ob = new Request();
+	* $ob-&gt;setAuditors([
+	*  'SQL' =&gt; new Auditor\Sql()
+	* ]);
+	* print_r(
+	*  $ob-&gt;filter([
+	*      'get' =&gt; ['safe bar'],
+	*      'post' =&gt; ['select * from foo']
+	*  ])
+	* );
+	* //output: Array ( [post] =&gt; Array ( [0] =&gt; sel ect * fr om foo ) )
+	* 
+	* print_r(
+	*  $ob-&gt;filter([
+	*          'get' =&gt; ['safe bar'],
+	*          'post' =&gt; ['select * from foo']
+	*      ],
+	*      false
+	*  )
+	* );
+	* //output: Array ( [get] =&gt; Array ( [0] =&gt; safe bar ) [post] =&gt; Array ( [0] =&gt; sel ect * fr om foo ) )
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/request/filter.php
+	* @author Bitrix
+	*/
 	public function filter(array $values, $isReturnChangedOnly = true)
 	{
 		$this->onFilterStarted();

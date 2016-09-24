@@ -258,7 +258,7 @@ abstract class Helper
 	##############################################
 	##############################################
 
-	public static function validateUpdateRequest()
+	public static function validateUpdateRequest($data)
 	{
 		return array();
 	}

@@ -40,7 +40,7 @@ class CGlobalCounter
 
 	public static function IncrementWithSelect($sub_select, $sendPull = true, $arParams = array())
 	{
-		return CUserCounter::IncrementWithSelect($sub_select, $sendPull, $arParams);
+		CUserCounter::IncrementWithSelect($sub_select, $sendPull, $arParams);
 	}
 
 	public static function Clear($code, $site_id = SITE_ID, $sendPull = true)

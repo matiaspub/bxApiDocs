@@ -15,6 +15,7 @@ class CIBlockPropertyDirectory
 	protected static $arItemCache = array();
 	protected static $directoryMap = array();
 	protected static $hlblockCache = array();
+	protected static $hlblockClassNameCache = array();
 
 	/**
 	 * Returns property type description.
@@ -33,6 +34,7 @@ class CIBlockPropertyDirectory
 			'PrepareSettings' => array(__CLASS__, 'PrepareSettings'),
 			'GetAdminListViewHTML' => array(__CLASS__, 'GetAdminListViewHTML'),
 			'GetPublicViewHTML' => array(__CLASS__, 'GetPublicViewHTML'),
+			'GetPublicEditHTML' => array(__CLASS__, 'GetPublicEditHTML'),
 			'GetAdminFilterHTML' => array(__CLASS__, 'GetAdminFilterHTML'),
 			'GetExtendedValue' => array(__CLASS__, 'GetExtendedValue'),
 			'GetSearchContent' => array(__CLASS__, 'GetSearchContent'),
@@ -115,7 +117,7 @@ class CIBlockPropertyDirectory
 		while($arData = $rsData->fetch())
 		{
 			$selected = ($settings["TABLE_NAME"] == $arData['TABLE_NAME']) ? ' selected' : '';
-			$cellOption .= '<option '.$selected.' value="'.htmlspecialcharsbx($arData["TABLE_NAME"]).'">'.htmlspecialcharsex($arData["NAME"].' ('.$arData["TABLE_NAME"].')').'</option>';
+			$cellOption .= '<option '.$selected.' value="'.htmlspecialcharsbx($arData["TABLE_NAME"]).'">'.htmlspecialcharsEx($arData["NAME"].' ('.$arData["TABLE_NAME"].')').'</option>';
 		}
 
 		$tablePrefix = self::TABLE_PREFIX;
@@ -237,7 +239,6 @@ function getDirectoryTableHead(e)
 		'max_len' : 35,
 		'change_case' : 'L',
 		'replace_space' : '',
-		'replace_other' : '',
 		'delete_repeat_replace' : true
 	});
 
@@ -381,6 +382,29 @@ HIBSELECT;
 	}
 
 	/**
+	 * Return html for public edit value.
+	 *
+	 * @param array $property			Property description.
+	 * @param array $value				Current value.
+	 * @param array $control			Control description.
+	 * @return string
+	 */
+	public static function GetPublicEditHTML($property, $value, $control)
+	{
+		$settings = CIBlockPropertyDirectory::PrepareSettings($property);
+		$size = ($settings['size'] > 1 ? ' size="'.$settings['size'].'"' : '');
+		$width = ($settings['width'] > 0 ? ' style="width:'.$settings['width'].'px"' : ' style="margin-bottom:3px"');
+
+		$multi = (isset($property['MULTIPLE']) && $property['MULTIPLE'] == 'Y');
+
+		$html = '<select multiple name="'.$control['VALUE'].($multi ? '[]' : '').'"'.$size.$width.'>';
+		$html .= CIBlockPropertyDirectory::GetOptionsHtml($property, $value);
+		$html .= '</select>';
+
+		return $html;
+	}
+
+	/**
 	 * Returns list values.
 	 *
 	 * @param array $arProperty			Property description.
@@ -412,7 +436,7 @@ HIBSELECT;
 					$options = ' selected';
 					$selectedValue = true;
 				}
-				$cellOption .= '<option '.$options.' value="'.htmlspecialcharsbx($data['UF_XML_ID']).'">'.htmlspecialcharsex($data["UF_NAME"].' ['.$data["ID"]).']</option>';
+				$cellOption .= '<option '.$options.' value="'.htmlspecialcharsbx($data['UF_XML_ID']).'">'.htmlspecialcharsEx($data["UF_NAME"].' ['.$data["ID"]).']</option>';
 			}
 			$defaultOption = '<option value=""'.($selectedValue ? '' : ' selected').'>'.Loc::getMessage('HIBLOCK_PROP_DIRECTORY_EMPTY_VALUE').'</option>';
 		}
@@ -478,7 +502,11 @@ HIBSELECT;
 	 * @param array $strHTMLControlName		Control description.
 	 * @return string
 	 */
-	public static function GetAdminListViewHTML($arProperty, $value, $strHTMLControlName)
+	public static function GetAdminListViewHTML(
+		$arProperty,
+		$value,
+		/** @noinspection PhpUnusedParameterInspection */$strHTMLControlName
+	)
 	{
 		$dataValue = self::GetExtendedValue($arProperty, $value);
 		if ($dataValue)
@@ -548,7 +576,11 @@ HIBSELECT;
 	 * @param array $strHTMLControlName		Control description.
 	 * @return string
 	 */
-	public static function GetSearchContent($arProperty, $value, $strHTMLControlName)
+	public static function GetSearchContent(
+		$arProperty,
+		$value,
+		/** @noinspection PhpUnusedParameterInspection */$strHTMLControlName
+	)
 	{
 		$dataValue = self::GetExtendedValue($arProperty, $value);
 		if ($dataValue)
@@ -639,13 +671,16 @@ HIBSELECT;
 			}
 			if (!empty(self::$hlblockCache[$tableName]))
 			{
-				$entity = HL\HighloadBlockTable::compileEntity(self::$hlblockCache[$tableName]);
-				$entityDataClass = $entity->getDataClass();
 				if (!isset(self::$directoryMap[$tableName]))
-					self::$directoryMap[$tableName] = $entityDataClass::getEntity()->getFields();
-
+				{
+					$entity = HL\HighloadBlockTable::compileEntity(self::$hlblockCache[$tableName]);
+					self::$hlblockClassNameCache[$tableName] = $entity->getDataClass();
+					self::$directoryMap[$tableName] = $entity->getFields();
+					unset($entity);
+				}
 				if (!isset(self::$directoryMap[$tableName]['UF_XML_ID']))
 					return $arResult;
+				$entityDataClass = self::$hlblockClassNameCache[$tableName];
 
 				$nameExist = isset(self::$directoryMap[$tableName]['UF_NAME']);
 				if (!$nameExist)
@@ -666,7 +701,7 @@ HIBSELECT;
 				else
 					$listDescr['order']['UF_XML_ID'] = 'ASC';
 				$listDescr['order']['ID'] = 'ASC';
-
+				/** @var \Bitrix\Main\DB\Result $rsData */
 				$rsData = $entityDataClass::getList($listDescr);
 				while($arData = $rsData->fetch())
 				{

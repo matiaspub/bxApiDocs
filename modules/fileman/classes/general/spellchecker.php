@@ -69,7 +69,7 @@ class CSpellchecker
 		return (in_array($letter, $this->letters) && $letter != 'ы' && $letter != 'ь' && $letter != 'ъ') ? ord($letter) : 'def';
 	}
 
-public 	function loadDic($letter)
+	public function loadDic($letter)
 	{
 		$path = $this->custom_dics_path.$letter.'.dic';
 		if (is_readable($path))
@@ -84,7 +84,7 @@ public 	function loadDic($letter)
 			$this->dic[$letter] = array();
 	}
 
-public 	function checkWord($word)
+	public function checkWord($word)
 	{
 		//pspell
 		if ($this->pspell)
@@ -120,7 +120,7 @@ public 	function checkWord($word)
 	}
 
 
-public 	function checkWords($words)
+	public function checkWords($words)
 	{
 		$this->wrongWords = array();
 
@@ -138,7 +138,7 @@ public 	function checkWords($words)
 		return $this->wrongWords;
 	}
 
-public 	function suggest($word)
+	public function suggest($word)
 	{
 		$suggestions = array();
 		//pspell
@@ -204,7 +204,7 @@ public 	function suggest($word)
 		return array_unique($suggestions);
 	}
 
-public 	function addWord($word = '')
+	public function addWord($word = '')
 	{
 		//pspell
 		if ($this->pspell)

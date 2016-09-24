@@ -10,7 +10,7 @@ class CSocServTwitter extends CSocServAuth
 		return array(
 			array("twitter_key", GetMessage("socserv_tw_key"), "", Array("text", 40)),
 			array("twitter_secret", GetMessage("socserv_tw_secret"), "", Array("text", 40)),
-			array("note"=>GetMessage("socserv_tw_sett_note", array('#URL#'=>CSocServUtil::ServerName()))),
+			array("note"=>GetMessage("socserv_tw_sett_note", array('#URL#'=>\CHTTP::URN2URI("/")))),
 		);
 	}
 
@@ -100,13 +100,14 @@ class CSocServTwitter extends CSocServAuth
 
 		if($bSuccess)
 		{
-			CSocServUtil::checkOAuthProxyParams();
-
 			$aRemove = array("logout", "auth_service_error", "auth_service_id", "oauth_token", "oauth_verifier", "check_key", "current_fieldset", "ncc");
 
 			$url = isset($_REQUEST['backurl']) ? $_REQUEST['backurl'] : $GLOBALS['APPLICATION']->GetCurPageParam(($bSuccess === true ? '' : 'auth_service_id='.self::ID.'&auth_service_error='.$bSuccess), $aRemove);
 			if(CModule::IncludeModule("socialnetwork") && strpos($url, "current_fieldset=") === false)
 				$url = (preg_match("/\?/", $url)) ? $url."&current_fieldset=SOCSERV" : $url."?current_fieldset=SOCSERV";
+
+			$url .= (preg_match("/\?/", $url) ? '&' : '?').CSocServUtil::getOAuthProxyString();
+
 			echo '
 <script type="text/javascript">
 if(window.opener)
@@ -147,12 +148,24 @@ window.close();
 		return $result;
 	}
 
-	static public function getFriendsList($limit, &$next)
+
+	public function setUser($userId)
+	{
+		$this->userId = $userId;
+	}
+
+	public function getFriendsList($limit, &$next)
 	{
 		global $USER;
 
+		$currentUser = $this->userId;
+		if(!$currentUser)
+		{
+			$currentUser = $USER->GetID();
+		}
+
 		$tw = new CTwitterInterface();
-		$userId = self::TwitterUserId($USER->GetID());
+		$userId = self::TwitterUserId($currentUser);
 
 		if($userId > 0)
 		{

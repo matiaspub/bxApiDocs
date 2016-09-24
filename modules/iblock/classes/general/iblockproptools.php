@@ -60,26 +60,41 @@ class CIBlockPropertyTools
 		$propertyCode = (string)$propertyCode;
 		if ($iblockID <= 0 || $propertyCode === '')
 			return false;
+
 		$iblockIterator = Iblock\IblockTable::getList(array(
 			'select' => array('ID'),
 			'filter' => array('=ID' => $iblockID)
 		));
 		if (!($iblock = $iblockIterator->fetch()))
 			return false;
+
 		unset($iblock, $iblockIterator);
-		$propertyIterator = Iblock\PropertyTable::getList(array(
-			'select' => array('ID'),
-			'filter' => array('=IBLOCK_ID' => $iblockID, '=CODE' => $propertyCode)
-		));
-		if ($property = $propertyIterator->fetch())
-			return (int)$property['ID'];
-		unset($propertyIterator);
-		$propertyDescription = self::getPropertyDescription($propertyCode, $propertyParams);
+		$propertyDescription = static::getPropertyDescription($propertyCode, $propertyParams);
 		if ($propertyDescription === false)
 			return false;
+
 		$propertyDescription['IBLOCK_ID'] = $iblockID;
-		if (!self::validatePropertyDescription($propertyDescription))
+		if (!static::validatePropertyDescription($propertyDescription))
 			return false;
+
+		$propertyId = 0;
+		$getListParams = array(
+			'select' => array('ID'),
+			'filter' => array('=IBLOCK_ID' => $iblockID, '=CODE' => $propertyCode, '=ACTIVE' => 'Y')
+		);
+		static::modifyGetListParams($getListParams, $propertyCode, $propertyDescription);
+		$property = Iblock\PropertyTable::getList($getListParams)->fetch();
+		if (!empty($property))
+		{
+			if (static::validateExistProperty($propertyCode, $property))
+				$propertyId = (int)$property['ID'];
+		}
+		unset($property);
+		if (!empty(self::$errors))
+			return false;
+		if ($propertyId > 0)
+			return $propertyId;
+		unset($propertyId);
 		$propertyResult = Iblock\PropertyTable::add($propertyDescription);
 		if ($propertyResult->isSuccess())
 		{
@@ -112,7 +127,7 @@ class CIBlockPropertyTools
 				$propertyDescription = array(
 					'PROPERTY_TYPE' => Iblock\PropertyTable::TYPE_FILE,
 					'USER_TYPE' => null,
-					'NAME' => loc::getMessage('IBPT_PROP_TITLE_MORE_PHOTO'),
+					'NAME' => Loc::getMessage('IBPT_PROP_TITLE_MORE_PHOTO'),
 					'CODE' => self::CODE_MORE_PHOTO,
 					'MULTIPLE' => 'Y',
 					'FILE_TYPE' => 'jpg, gif, bmp, png, jpeg',
@@ -266,7 +281,7 @@ class CIBlockPropertyTools
 		$iblockID = (int)$iblockID;
 		if ($iblockID <= 0)
 			return false;
-		$propertyCodes = self::clearPropertyList($propertyCodes);
+		$propertyCodes = static::clearPropertyList($propertyCodes);
 		if (empty($propertyCodes))
 			return false;
 
@@ -349,7 +364,7 @@ class CIBlockPropertyTools
 		if (empty($propertyCodes))
 			return $result;
 
-		$currentList = self::getPropertyCodes(true);
+		$currentList = static::getPropertyCodes(true);
 		foreach ($propertyCodes as &$code)
 		{
 			$code = (string)$code;
@@ -357,6 +372,66 @@ class CIBlockPropertyTools
 				$result = $code;
 		}
 		unset($code);
+
+		return $result;
+	}
+
+	/**
+	 * Modify getList params for property search.
+	 *
+	 * @param array &$getListParams			\Bitrix\Main\Entity\DataManager::getList params.
+	 * @param string $propertyCode			Property code.
+	 * @param array $propertyDescription	Property description.
+	 * @return void
+	 */
+	protected static function modifyGetListParams(&$getListParams, $propertyCode, $propertyDescription)
+	{
+		switch ($propertyCode)
+		{
+			case self::CODE_SKU_LINK:
+				$getListParams['select'][] = 'XML_ID';
+				$getListParams['select'][] = 'USER_TYPE';
+
+				$getListParams['filter']['=LINK_IBLOCK_ID'] = $propertyDescription['LINK_IBLOCK_ID'];
+				$getListParams['filter']['=PROPERTY_TYPE'] = Iblock\PropertyTable::TYPE_ELEMENT;
+				$getListParams['filter']['=ACTIVE'] = 'Y';
+				$getListParams['filter']['=MULTIPLE'] = 'N';
+				break;
+		}
+	}
+
+	/**
+	 * Validate and modify exist property.
+	 *
+	 * @param string $propertyCode			Property code.
+	 * @param array $property				Current property data.
+	 * @return bool
+	 * @throws Exception
+	 */
+	protected static function validateExistProperty($propertyCode, $property)
+	{
+		$result = true;
+		switch ($propertyCode)
+		{
+			case self::CODE_SKU_LINK:
+				$fields = array();
+				if ($property['USER_TYPE'] != self::USER_TYPE_SKU_LINK)
+					$fields['USER_TYPE'] = self::USER_TYPE_SKU_LINK;
+				if ($property['XML_ID'] != self::XML_SKU_LINK)
+					$fields['XML_ID'] = self::XML_SKU_LINK;
+				if (!empty($fields))
+				{
+					$propertyResult = Iblock\PropertyTable::update($property['ID'], $fields);
+					if (!$propertyResult->isSuccess())
+					{
+						self::$errors = $propertyResult->getErrorMessages();
+						$result = false;
+					}
+					unset($propertyResult);
+				}
+				unset($fields);
+				break;
+		}
 
 		return $result;
 	}

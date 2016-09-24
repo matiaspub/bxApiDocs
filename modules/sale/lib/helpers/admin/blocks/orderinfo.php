@@ -2,9 +2,12 @@
 
 namespace Bitrix\Sale\Helpers\Admin\Blocks;
 
-use Bitrix\Main\Localization\Loc;
-use Bitrix\Sale\Helpers\Admin\OrderEdit;
+use Bitrix\Main\Event;
 use Bitrix\Sale\Order;
+use Bitrix\Main\EventResult;
+use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\ArgumentNullException;
+use Bitrix\Sale\Helpers\Admin\OrderEdit;
 
 Loc::loadMessages(__FILE__);
 
@@ -44,7 +47,7 @@ class OrderInfo
 			if(!$id || !$ptId)
 				continue;
 
-			$params = OrderPayment::getPaySystemParams($id, $ptId);
+			$params = OrderPayment::getPaySystemParams($id);
 
 			if(!$params)
 				continue;
@@ -108,6 +111,28 @@ class OrderInfo
 
 		$totalPrices = OrderEdit::getTotalPrices($order,  $orderBasket, false);
 
+		//Here we can receive custom data
+		$event = new Event('sale', 'onSaleAdminOrderInfoBlockShow', array('ORDER' => $order, 'ORDER_BASKET' => $orderBasket));
+		$event->send();
+		$resultList = $event->getResults();
+		$customData = array();
+
+		if (is_array($resultList) && !empty($resultList))
+		{
+			foreach ($resultList as $eventResult)
+			{
+				/** @var  EventResult $eventResult*/
+				if ($eventResult->getType() != EventResult::SUCCESS)
+					continue;
+
+				$params = $eventResult->getParameters();
+
+				if(!empty($params) && is_array($params))
+					$customData = $params;
+			}
+		}
+		///
+
 		$result = '
 			<div class="adm-bus-orderinfoblock adm-detail-tabs-block-pin" id="sale-order-edit-block-order-info">
 				<div class="adm-bus-orderinfoblock-container">
@@ -132,8 +157,32 @@ class OrderInfo
 							</li>
 							<li>
 								<span class="adm-bus-orderinfoblock-content-customer-info-param">'.Loc::getMessage("SALE_ORDER_INFO_PHONE").':</span>
-								<span class="adm-bus-orderinfoblock-content-customer-info-value" id="order_info_buyer_phone">'.$phone.'</span>
-							</li>
+								<span class="adm-bus-orderinfoblock-content-customer-info-value" id="order_info_buyer_phone">
+									<a href="javascript:void(0)" onclick="BX.Sale.Admin.OrderEditPage.desktopMakeCall(\''.$phone.'\');">'.
+										htmlspecialcharsbx($phone).
+									'</a>
+								</span>
+							</li>';
+
+		if(!empty($customData))
+		{
+			foreach($customData as $custom)
+			{
+				if(empty($custom['TITLE']))
+					throw new ArgumentNullException("customData['TITLE']");
+
+				if(empty($custom['VALUE']))
+					throw new ArgumentNullException("customData['VALUE']");
+
+				$result .='
+					<li>
+						<span class="adm-bus-orderinfoblock-content-customer-info-param">'.$custom['TITLE'].'</span>
+						<span class="adm-bus-orderinfoblock-content-customer-info-value"'.(!empty($custom['ID']) ? ' id="'.$custom['ID'].'"' : '' ).'>'.$custom['VALUE'].'</span>
+					</li>';
+			}
+		}
+
+		$result .= '
 						</ul>
 					</div>
 					<div class="adm-bus-orderinfoblock-content-block-order">

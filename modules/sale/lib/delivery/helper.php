@@ -18,6 +18,17 @@ class Helper
 	 * @throws SystemException
 	 * @throws \Bitrix\Main\LoaderException
 	 */
+	
+	/**
+	* <p>Метод возвращает список валют. Метод статический.</p> <p>Без параметров</p>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/delivery/helper/getcurrencieslist.php
+	* @author Bitrix
+	*/
 	public static function getCurrenciesList()
 	{
 		static $currencies = null;
@@ -72,6 +83,27 @@ class Helper
 	 * @param bool $anyGroup						Allowed select any group.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает HTML (элемент <code>&lt;select&gt;....&lt;/select&gt;</code>) для выбора группы служб доставок из списка. Метод статический.</p>
+	*
+	*
+	* @param mixed $integer  Выбранная группа.
+	*
+	* @param string $selectedGroupId  Название группы.
+	*
+	* @param string $name  Дополнительные параметры для выбора тега.
+	*
+	* @param string $addParams = "" Позволяет выбрать только одну группу.
+	*
+	* @param boolean $anyGroup = false 
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/delivery/helper/getgroupchoosecontrol.php
+	* @author Bitrix
+	*/
 	public static function getGroupChooseControl($selectedGroupId, $name, $addParams = "", $anyGroup = false)
 	{
 		$groups = array();

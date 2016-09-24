@@ -32,6 +32,9 @@ $arClasses = array(
 	"CSocServGooglePlusOAuth" => "classes/general/googleplus.php",
 	"CGooglePlusOAuthInterface" => "classes/general/googleplus.php",
 	"CSocServLiveIDOAuth" => "classes/general/liveidoauth.php",
+	"CSocServOffice365OAuth" => "classes/general/office365.php",
+	"COffice365OAuthInterface" => "classes/general/office365.php",
+	"COffice365OAuthInterfaceBeta" => "classes/general/office365.php",
 	"CSocServOdnoklassniki" => "classes/general/odnoklassniki.php",
 	"COpenIDClient" => "classes/general/openidclient.php",
 	"CSocServMessage" => "classes/".$DBType."/authmanager.php",
@@ -43,6 +46,8 @@ $arClasses = array(
 	"CSocServDropboxAuth" => "classes/general/dropbox.php",
 	"CSocServBoxAuth" => "classes/general/box.php",
 	"CBoxOAuthInterface" => "classes/general/box.php",
+	"CBitrixServiceOAuthInterface" => "classes/general/bitrixservice.php",
+	"CBitrixServiceTransport" => "classes/general/bitrixservice.php",
 	"CBitrixSeoOAuthInterface" => "classes/general/bitrixseo.php",
 	"CBitrixSeoTransport" => "classes/general/bitrixseo.php",
 );
@@ -84,7 +89,8 @@ class CSocServEventHandlers
 			"COMMENT_EVENT" => array(
 				"EVENT_ID" => "data_comment",
 				"CLASS_FORMAT" => "CSocServEventHandlers",
-				"METHOD_FORMAT"	=> "FormatComment_Data"
+				"METHOD_FORMAT"	=> "FormatComment_Data",
+				"RATING_TYPE_ID" => "LOG_COMMENT"
 			)
 		);
 	}

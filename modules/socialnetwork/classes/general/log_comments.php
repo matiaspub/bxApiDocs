@@ -141,12 +141,12 @@ class CAllSocNetLogComments
 
 	public static function Delete($ID, $bSetSource = false)
 	{
-		global $DB;
+		global $DB, $APPLICATION, $USER_FIELD_MANAGER;
 
 		$ID = IntVal($ID);
 		if ($ID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GLC_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GLC_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
 			return false;
 		}
 
@@ -195,7 +195,7 @@ class CAllSocNetLogComments
 
 				if ($bSuccess)
 				{
-					$GLOBALS["USER_FIELD_MANAGER"]->Delete("SONET_COMMENT", $ID);
+					$USER_FIELD_MANAGER->Delete("SONET_COMMENT", $ID);
 
 					$db_events = GetModuleEvents("socialnetwork", "OnSocNetLogCommentDelete");
 					while ($arEvent = $db_events->Fetch())
@@ -220,7 +220,7 @@ class CAllSocNetLogComments
 				&& !empty($arSource["ERROR"])
 			)
 			{
-				$GLOBALS["APPLICATION"]->ThrowException($arSource["ERROR"], "ERROR_DELETE_SOURCE");
+				$APPLICATION->ThrowException($arSource["ERROR"], "ERROR_DELETE_SOURCE");
 				$bSuccess = false;
 			}
 		}
@@ -246,12 +246,12 @@ class CAllSocNetLogComments
 	/***************************************/
 	public static function GetByID($ID)
 	{
-		global $DB;
+		global $APPLICATION;
 
 		$ID = IntVal($ID);
 		if ($ID <= 0)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_GLC_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
+			$APPLICATION->ThrowException(GetMessage("SONET_GLC_WRONG_PARAMETER_ID"), "ERROR_NO_ID");
 			return false;
 		}
 
@@ -738,7 +738,7 @@ class CAllSocNetLogComments
 			if(!empty($arMention))
 			{
 				$arMention = $arMention[1];
-				$arExcludeUsers = array();
+				$arExcludeUsers = array($arCommentFields["USER_ID"]);
 
 				if (!empty($arCommentFields["LOG_ID"]))
 				{
@@ -766,7 +766,14 @@ class CAllSocNetLogComments
 
 				foreach ($arMention as $mentionUserID)
 				{
-					$bHaveRights = CSocNetLogRights::CheckForUserOnly($arCommentFields["LOG_ID"], $mentionUserID);
+					$bHaveRights = (
+						$arTitleRes["IS_CRM"] != "Y"
+						|| COption::GetOptionString("crm", "enable_livefeed_merge", "N") == "Y"
+							? CSocNetLogRights::CheckForUserOnly($arCommentFields["LOG_ID"], $mentionUserID)
+							: false
+					);
+					$bHaveCrmRights = false;
+
 					if (
 						!$bHaveRights
 						&& $arTitleRes["IS_CRM"] == "Y"
@@ -816,7 +823,7 @@ class CAllSocNetLogComments
 
 						if (
 							$arTitleRes["IS_CRM"] == "Y" 
-							&& !$bHaveRights 
+							&& $bHaveCrmRights
 							&& !empty($arTmp["URLS"]["CRM_URL"])
 						)
 						{

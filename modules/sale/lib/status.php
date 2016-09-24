@@ -12,6 +12,12 @@ Loc::loadMessages(__FILE__);
 
 abstract class StatusBase
 {
+	/**
+	 * @param $userId
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
 	protected static function getUserGroups($userId)
 	{
 		global $USER;
@@ -22,11 +28,11 @@ abstract class StatusBase
 		}
 		else
 		{
-			static $cache;
+			static $cacheGroups;
 
-			if (isset($cache[$userId]))
+			if (isset($cacheGroups[$userId]))
 			{
-				$groups = $cache[$userId];
+				$groups = $cacheGroups[$userId];
 			}
 			else
 			{
@@ -37,7 +43,7 @@ abstract class StatusBase
 				while ($row = $result->fetch())
 					$groups []= $row['GROUP_ID'];
 
-				$cache[$userId] = $groups;
+				$cacheGroups[$userId] = $groups;
 			}
 		}
 
@@ -51,11 +57,40 @@ abstract class StatusBase
 	 * @return bool             - true if user allowed to do all the operations, false otherwise
 	 * @throws SystemException  - if no operations provided
 	 */
-	static function canUserDoOperations($userId, $fromStatus, array $operations)
+	
+	/**
+	* <p>Проверяет, может ли пользователь выполнять определенные операции. Метод статический.</p>
+	*
+	*
+	* @param mixed $string  Идентификатор пользователя.
+	*
+	* @param integer $userId  Текущий статус.
+	*
+	* @param string $fromStatus  Список операций. Массив вида: <code>array('update', 'cancel').</code>
+	*
+	* @param array $operations  
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/statusbase/canuserdooperations.php
+	* @author Bitrix
+	*/
+	public static function canUserDoOperations($userId, $fromStatus, array $operations)
 	{
 		return self::canGroupDoOperations(self::getUserGroups($userId), $fromStatus, $operations);
 	}
-	static function canGroupDoOperations($groupId, $fromStatus, array $operations)
+
+	/**
+	 * @param $groupId
+	 * @param $fromStatus
+	 * @param array $operations
+	 *
+	 * @return bool
+	 * @throws SystemException
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function canGroupDoOperations($groupId, $fromStatus, array $operations)
 	{
 		if (! $operations)
 			throw new SystemException('provide at least one operation', 0, __FILE__, __LINE__);
@@ -93,52 +128,104 @@ abstract class StatusBase
 	 * @param string         $fromStatus - current status
 	 * @return array - ["status ID"] => "status localized NAME"
 	 */
-	static function getAllowedUserStatuses($userId, $fromStatus)
+	
+	/**
+	* <p>Возвращает статусы, на которые пользователь может изменить свой текущий статус. Метод статический.</p>
+	*
+	*
+	* @param mixed $integer  Идентификатор пользователя.
+	*
+	* @param string $userId  Текущий статус пользователя.
+	*
+	* @param string $fromStatus  
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/statusbase/getalloweduserstatuses.php
+	* @author Bitrix
+	*/
+	public static function getAllowedUserStatuses($userId, $fromStatus)
 	{
 		return self::getAllowedGroupStatuses(self::getUserGroups($userId), $fromStatus);
 	}
-	static function getAllowedGroupStatuses($groupId, $fromStatus)
+
+	/**
+	 * @param $groupId
+	 * @param $fromStatus
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getAllowedGroupStatuses($groupId, $fromStatus)
 	{
 		$statuses = array();
 
 		if (! is_array($groupId))
 			$groupId = array($groupId);
 
+		$cacheKey = md5($groupId."_".(is_array($fromStatus) ? join('|', $fromStatus) : $fromStatus));
+
 		if (in_array('1', $groupId, true) || \CMain::GetUserRight('sale', $groupId) >= 'W') // Admin
 		{
-			$result = StatusTable::getList(array(
-				'select' => array('ID', 'NAME' => 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
-				'filter' => array('=TYPE' => static::TYPE, '=Bitrix\Sale\Internals\StatusLangTable:STATUS.LID' => LANGUAGE_ID),
-				'order'  => array('SORT'),
-			));
+			if (!array_key_exists($cacheKey, static::$cacheAllowStatuses))
+			{
+				$result = StatusTable::getList(array(
+					'select' => array('ID', 'NAME' => 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
+					'filter' => array('=TYPE' => static::TYPE, '=Bitrix\Sale\Internals\StatusLangTable:STATUS.LID' => LANGUAGE_ID),
+					'order'  => array('SORT'),
+				));
 
-			while ($row = $result->fetch())
-				$statuses[$row['ID']] = $row['NAME'];
+				while ($row = $result->fetch())
+					$statuses[$row['ID']] = $row['NAME'];
+
+				static::$cacheAllowStatuses[$cacheKey] = $statuses;
+			}
+			else
+			{
+				$statuses = static::$cacheAllowStatuses[$cacheKey];
+			}
 		}
-		elseif (StatusTable::getList(array( // check if group can change from status
-			'select' => array('ID'),
-			'filter' => array(
-				'=ID' => $fromStatus,
-				'=TYPE' => static::TYPE,
-				'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
-				'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME' => 'sale_status_from',
-			),
-			'limit' => 1,
-		))->fetch())
+		else
 		{
-			$result = StatusTable::getList(array(
-				'select' => array('ID', 'NAME' => 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
-				'filter' => array(
-					'=TYPE' => static::TYPE,
-					'=Bitrix\Sale\Internals\StatusLangTable:STATUS.LID' => LANGUAGE_ID,
-					'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
-					'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME' => 'sale_status_to',
-				),
-				'order' => array('SORT'),
-			));
+			if (!array_key_exists($cacheKey, static::$cacheAllowStatuses))
+			{
+				if (StatusTable::getList(array( // check if group can change from status
+											 'select' => array('ID'),
+											 'filter' => array(
+												 '=ID' => $fromStatus,
+												 '=TYPE' => static::TYPE,
+												 '=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
+												 '=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME' => 'sale_status_from',
+											 ),
+											 'limit' => 1,
+										 ))->fetch())
+				{
+					$result = StatusTable::getList(array(
+													   'select' => array('ID', 'NAME' => 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
+													   'filter' => array(
+														   '=TYPE' => static::TYPE,
+														   '=Bitrix\Sale\Internals\StatusLangTable:STATUS.LID' => LANGUAGE_ID,
+														   '=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
+														   '=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME' => 'sale_status_to',
+													   ),
+													   'order' => array('SORT'),
+												   ));
 
-			while ($row = $result->fetch())
-				$statuses[$row['ID']] = $row['NAME'];
+					while ($row = $result->fetch())
+						$statuses[$row['ID']] = $row['NAME'];
+
+					static::$cacheAllowStatuses[$cacheKey] = $statuses;
+				}
+				else
+				{
+					static::$cacheAllowStatuses[$cacheKey] = array();
+				}
+			}
+			else
+			{
+				$statuses = static::$cacheAllowStatuses[$cacheKey];
+			}
 		}
 
 		return $statuses;
@@ -156,16 +243,33 @@ abstract class StatusBase
 		return $operations;
 	}
 
-	/** Get all statuses for current class type.
-	 * @return array - statuses ids
+	/**
+	 * Get all statuses for current class type.
+	 *
+	 * @param bool $withName
+	 *
+	 * @return mixed
+	 * @throws \Bitrix\Main\ArgumentException
 	 */
-	static function getAllStatuses()
+	
+	/**
+	* <p>Базовый метод для доставок и заказов. Возвращает список статусов, в зависимости от класса-наследника. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/statusbase/getallstatuses.php
+	* @author Bitrix
+	*/
+	public static function getAllStatuses($withName = false)
 	{
 		if (empty(static::$allStatuses))
 		{
 			$result = StatusTable::getList(array(
 				'select' => array('ID'),
 				'filter' => array('=TYPE' => static::TYPE),
+				'order'  => array('SORT')
 			));
 			while ($row = $result->fetch())
 				static::$allStatuses[] = $row['ID'];
@@ -174,87 +278,217 @@ abstract class StatusBase
 		return static::$allStatuses;
 	}
 
+
+	/**
+	 * Get all statuses names for current class type.
+	 *
+	 * @return mixed
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getAllStatusesNames()
+	{
+		if (empty(static::$allStatusesNames))
+		{
+			$result = StatusTable::getList(array(
+											   'select' => array("ID", "NAME" => 'Bitrix\Sale\Internals\StatusLangTable:STATUS.NAME'),
+											   'filter' => array('=TYPE' => static::TYPE),
+										   ));
+			while ($row = $result->fetch())
+				static::$allStatusesNames[$row['ID']] = $row['NAME'];
+
+			if (empty(static::$allStatuses))
+				static::$allStatuses = array_keys(static::$allStatusesNames);
+		}
+
+		return static::$allStatusesNames;
+	}
+
+
 	/** Get statuses user can do operations within
 	 * @param integer $userId - user id
 	 * @param array $operations - array of operation names
 	 * @return array - statuses ids
 	 */
-	static function getStatusesUserCanDoOperations($userId, array $operations)
+	
+	/**
+	* <p>Метод возвращает список операций, которые может выполнять пользователь. Метод статический.</p>
+	*
+	*
+	* @param integer $userId  Идентификатор пользователя.
+	*
+	* @param array $operations  Массив названий операций.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/statusbase/getstatusesusercandooperations.php
+	* @author Bitrix
+	*/
+	public static function getStatusesUserCanDoOperations($userId, array $operations)
 	{
 		return self::getStatusesGroupCanDoOperations(self::getUserGroups($userId), $operations);
 	}
-	static function getStatusesGroupCanDoOperations($groupId, array $operations)
+
+	/**
+	 * @param $groupId
+	 * @param array $operations
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	public static function getStatusesGroupCanDoOperations($groupId, array $operations)
 	{
 		$statuses = array();
+
+		static $cacheStatuses = array();
 
 		if (! is_array($groupId))
 			$groupId = array($groupId);
 
-		if (in_array('1', $groupId, true) || \CMain::GetUserRight('sale', $groupId) >= 'W') // Admin
+		$cacheHash = md5(static::TYPE."|".join($groupId, '_')."|".join($operations, '_'));
+
+		if (!empty($cacheStatuses[$cacheHash]))
 		{
-			$statuses = self::getAllStatuses();
+			return $cacheStatuses[$cacheHash];
 		}
 		else
 		{
-			$operations = self::convertNamesToOperations($operations);
-
-			$result = StatusTable::getList(array(
-				'select' => array(
-					'ID',
-					'OPERATION' => 'Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME',
-				),
-				'filter' => array(
-					'=TYPE' => static::TYPE,
-					'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
-					'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME' => $operations,
-				),
-				'order'  => array('SORT'),
-			));
-
-			while ($row = $result->fetch())
+			if (in_array('1', $groupId, true) || \CMain::GetUserRight('sale', $groupId) >= 'W') // Admin
 			{
-				if ($status = &$statuses[$row['ID']])
-					$status []= $row['OPERATION'];
-				else
-					$status = array($row['OPERATION']);
+				$statuses = self::getAllStatuses();
+			}
+			else
+			{
+				$statusesList = static::getStatusesByGroupId($groupId, $operations);
+				if (!empty($statusesList) && is_array($statusesList))
+				{
+					$statuses = array_keys($statusesList);
+				}
+
 			}
 
-			unset($status);
-
-			foreach ($statuses as $id => $ops)
-				if (array_diff($operations, $ops))
-					unset($statuses[$id]);
-
-			$statuses = array_keys($statuses);
+			$cacheStatuses[$cacheHash] = $statuses;
 		}
 
 		return $statuses;
 	}
 
-	static function getInitialStatus()
+	/**
+	 * @param $userId
+	 * @param array $operations
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	protected static function getStatusesByUserId($userId, array $operations = array())
+	{
+		return static::getStatusesByGroupId(static::getUserGroups($userId), $operations);
+	}
+
+	/**
+	 * @param $groupId
+	 * @param array $operations
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	protected static function getStatusesByGroupId($groupId, array $operations = array())
+	{
+		if (! is_array($groupId))
+			$groupId = array($groupId);
+
+		$operations = self::convertNamesToOperations($operations);
+
+		$filter = array(
+			'select' => array(
+				'ID',
+				'OPERATION' => 'Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME',
+			),
+			'filter' => array(
+				'=TYPE' => static::TYPE,
+				'=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.GROUP_ID' => $groupId,
+			),
+			'order'  => array('SORT'),
+		);
+
+
+		if (!empty($operations))
+		{
+			$filter['filter']['=Bitrix\Sale\Internals\StatusGroupTaskTable:STATUS.TASK.Bitrix\Main\TaskOperation:TASK.OPERATION.NAME'] = $operations;
+		}
+
+		return static::getStatusListByFilter($filter);
+	}
+
+	/**
+	 * @param array $filter
+	 *
+	 * @return array
+	 * @throws \Bitrix\Main\ArgumentException
+	 */
+	protected static function getStatusListByFilter(array $filter)
+	{
+		$statuses = array();
+		$result = StatusTable::getList($filter);
+		while ($row = $result->fetch())
+		{
+			if ($status = &$statuses[$row['ID']])
+				$status []= $row['OPERATION'];
+			else
+				$status = array($row['OPERATION']);
+		}
+		unset($status);
+
+		foreach ($statuses as $statusId => $operationsList)
+		{
+			if (!empty($operations) && array_diff($operations, $operationsList))
+			{
+				unset($statuses[$statusId]);
+			}
+			else
+			{
+				foreach ($operationsList as $key => $operationData)
+				{
+					if (strval($operationData) === '')
+					{
+						unset($statuses[$statusId][$key]);
+					}
+				}
+
+				if (empty($statuses[$statusId]))
+				{
+					unset($statuses[$statusId]);
+				}
+			}
+		}
+
+		return $statuses;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public static function getInitialStatus()
 	{
 		return reset(static::$initial);
 	}
 
-	static function isInitialStatus($status)
+	public static function isInitialStatus($status)
 	{
 		return in_array($status, static::$initial, true);
 	}
 
-	static function getFinalStatus()
+	public static function getFinalStatus()
 	{
 		return reset(static::$final);
 	}
 
-	static function isFinalStatus($status)
+	public static function isFinalStatus($status)
 	{
 		return in_array($status, static::$final, true);
 	}
 
-	/*
-	 *
-	 */
-	static function install(array $data)
+	public static function install(array $data)
 	{
 		if (! ($statusId = $data['ID']) || ! is_string($statusId))
 		{
@@ -316,6 +550,8 @@ class OrderStatus extends StatusBase
 	protected static $initial = array('N');
 	protected static $final = array('F');
 	protected static $allStatuses = array();
+	protected static $allStatusesNames = array();
+	protected static $cacheAllowStatuses = array();
 }
 
 class DeliveryStatus extends StatusBase
@@ -324,4 +560,6 @@ class DeliveryStatus extends StatusBase
 	protected static $initial = array('DN');
 	protected static $final = array('DF');
 	protected static $allStatuses = array();
+	protected static $allStatusesNames = array();
+	protected static $cacheAllowStatuses = array();
 }

@@ -64,12 +64,51 @@ class CMailRegru
 		return false;
 	}
 
+	// https://api.reg.ru/api/regru2/service/get_info
+	public static function checkDomainInfo($user, $password, $domain, &$error)
+	{
+		$result = self::post('https://api.reg.ru/api/regru2/service/get_info', array(
+			'username'     => $user,
+			'password'     => $password,
+			'domain_name'  => $domain,
+			'input_format' => 'json',
+			'input_data'   => json_encode(array('servtype' => 'domain'))
+		));
+
+		if (isset($result['result']) && $result['result'] == 'success')
+			return $result['answer']['services'][0];
+
+		self::setError($result, $error);
+		return false;
+	}
+
+	// https://api.reg.ru/api/regru2/service/renew
+	public static function renewDomain($user, $password, $domain, $params, &$error)
+	{
+		$result = self::post('https://api.reg.ru/api/regru2/service/renew', array(
+			'username'     => $user,
+			'password'     => $password,
+			'domain_name'  => $domain,
+			'input_format' => 'json',
+			'input_data'   => json_encode(array_merge(
+				$params,
+				array('servtype' => 'domain')
+			))
+		));
+
+		if (isset($result['result']) && $result['result'] == 'success')
+			return $result['answer'];
+
+		self::setError($result, $error);
+		return false;
+	}
+
 	public static function updateDns($user, $password, $domain, $params, &$error)
 	{
 		$result = self::post('https://api.reg.ru/api/regru2/zone/update_records', array(
 			'username'     => $user,
 			'password'     => $password,
-			'domain_name' => $domain,
+			'domain_name'  => $domain,
 			'input_format' => 'json',
 			'input_data'   => json_encode(array(
 				'action_list' => $params
@@ -78,6 +117,25 @@ class CMailRegru
 
 		if (isset($result['result']) && $result['result'] == 'success')
 			return $result['answer']['domains'][0];
+
+		self::setError($result, $error);
+		return false;
+	}
+
+	// https://api.reg.ru/api/regru2/service/get_list
+	public static function getDomainsList($user, $password, &$error)
+	{
+		$result = self::post('https://api.reg.ru/api/regru2/service/get_list', array(
+			'username'     => $user,
+			'password'     => $password,
+			'input_format' => 'json',
+			'input_data'   => json_encode(array(
+				'servtype' => 'domain'
+			))
+		));
+
+		if (isset($result['result']) && $result['result'] == 'success')
+			return $result['answer']['services'];
 
 		self::setError($result, $error);
 		return false;

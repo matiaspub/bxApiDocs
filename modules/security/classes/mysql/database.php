@@ -3,6 +3,9 @@
 global $SECURITY_SESSION_DBH;
 $SECURITY_SESSION_DBH = false;
 
+/**
+ * @deprecated since 16.0.0
+ */
 class CSecurityDB
 {
 	public static function Init($bDoConnect = false)
@@ -131,7 +134,7 @@ class CSecurityDB
 			return false;
 	}
 
-	function Lock($id, $timeout = 60)
+	public static function Lock($id, $timeout = 60)
 	{
 		static $lock_id = "";
 

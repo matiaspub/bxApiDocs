@@ -28,6 +28,19 @@ class ElementSkuProperty extends Base
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод устанавливает информационный блок элементов. Нестатический метод.</p>
+	*
+	*
+	* @param integer $iblockId  Идентификатор инфоблока.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/elementskuproperty/setiblockid.php
+	* @author Bitrix
+	*/
 	public function setIblockId($iblockId)
 	{
 		$this->iblockId = intval($iblockId);

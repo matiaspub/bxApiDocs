@@ -42,6 +42,27 @@ abstract class Base
 	 * @param string $value
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод обрабатывает и сохраняет отфильтрованное значение. Возвращает <code>true</code>, если значение было отфильтровано аудитором. Для использования отфильтрованного значения используется <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/base/getfilteredvalue.php">Base::getFilteredValue</a> (<code>\Bitrix\Security\Filter\Auditor\Base::getFilteredValue</code>).</p>
+	*
+	*
+	* @param string $value  Обрабатываемое значение.
+	*
+	* @return boolean 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $ob = new Base();
+	* if ($ob-&gt;process($someValue))
+	*     $someValue = $ob-&gt;getFilteredValue();
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/base/process.php
+	* @author Bitrix
+	*/
 	public function process($value)
 	{
 		$this->initializeFilters();
@@ -71,6 +92,22 @@ abstract class Base
 	 * @see Base::process
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает отфильтрованное значение после последней обработки значений.</p> <p>Без параметров</p>
+	*
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/base/process.php">Base::process</a>
+	* (<code>\Bitrix\Security\Filter\Auditor\Base::process</code>)</li> </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/base/getfilteredvalue.php
+	* @author Bitrix
+	*/
 	public function getFilteredValue()
 	{
 		return $this->filteredValue;
@@ -82,6 +119,17 @@ abstract class Base
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает имя аудитора.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/filter/auditor/base/getname.php
+	* @author Bitrix
+	*/
 	public function getName()
 	{
 		return $this->name;

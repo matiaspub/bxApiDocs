@@ -1034,7 +1034,7 @@ class CAutoCheck
 		global $DBPassword;
 		$err = 0;
 		$arMessage = "";
-		$sign = ",.#!*%$:-";
+		$sign = ",.#!*%$:-^@{}[]()'\"-+=<>?`&;";
 		$dit = "1234567890";
 		$have_sign = false;
 		$have_dit = false;

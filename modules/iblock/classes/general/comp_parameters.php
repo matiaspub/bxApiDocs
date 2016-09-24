@@ -1,6 +1,8 @@
 <?
-use Bitrix\Main\Loader;
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Main\Loader,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Main,
+	Bitrix\Catalog;
 
 Loc::loadMessages(__FILE__);
 
@@ -34,16 +36,18 @@ class CIBlockParameters
 			if (self::$catalogIncluded)
 			{
 				$storeCount = 0;
-				$maxStores = (int)COption::GetOptionString("iblock", "seo_max_stores");
-				$rsStore = CCatalogStore::GetList(array('SORT' => 'ASC'), array(), false, false, array('ID', 'TITLE', 'ADDRESS'));
-				while ($store = $rsStore->Fetch())
+				$maxStores = (int)Main\Config\Option::get('iblock', 'seo_max_stores');
+				$getListParams = array(
+					'select' => array('ID', 'TITLE', 'ADDRESS', 'SORT'),
+					'order' => array('SORT' => 'ASC')
+				);
+				if ($maxStores > 0)
+					$getListParams['limit'] = $maxStores;
+				$storeIterator = Catalog\StoreTable::getList($getListParams);
+				while ($store = $storeIterator->fetch())
 				{
 					self::$catalogStoreCache[$storeCount] = $store;
 					$storeCount++;
-					if ($maxStores > 0 && $storeCount >= $maxStores)
-					{
-						break;
-					}
 				}
 			}
 		}
@@ -59,13 +63,7 @@ class CIBlockParameters
 			if (self::$catalogIncluded === null)
 				self::$catalogIncluded = Loader::includeModule('catalog');
 			if (self::$catalogIncluded)
-			{
-				$rsPrice = CCatalogGroup::GetListEx(array("SORT"=>"ASC"), array(), false, false, array("ID", "NAME"));
-				while ($price = $rsPrice->Fetch())
-				{
-					self::$catalogPriceCache[] = $price;
-				}
-			}
+				self::$catalogPriceCache = CCatalogGroup::GetListArray();
 		}
 		return self::$catalogPriceCache;
 	}
@@ -118,7 +116,7 @@ class CIBlockParameters
 		return $result;
 	}
 
-	public static function GetSectionFieldCode($name, $parent, $options = array())
+	public static function GetSectionFieldCode($name, $parent, /** @noinspection PhpUnusedParameterInspection */ $options = array())
 	{
 		//Common use in components
 		$result = array(
@@ -451,8 +449,8 @@ class CIBlockParameters
 		if (self::$catalogIncluded)
 		{
 			if ($iblock_id > 0)
-				$catalog = CCatalogSKU::GetInfoByIBlock($iblock_id);
-			$showCatalogSeo = (is_array($catalog) && $catalog['CATALOG_TYPE'] != \CCatalogSKU::TYPE_PRODUCT);
+				$catalog = CCatalogSku::GetInfoByIBlock($iblock_id);
+			$showCatalogSeo = (is_array($catalog) && $catalog['CATALOG_TYPE'] != CCatalogSku::TYPE_PRODUCT);
 			if ($showCatalogSeo)
 			{
 				$result["store"] = array(
@@ -584,11 +582,11 @@ class CIBlockParameters
 		if (self::$catalogIncluded)
 		{
 			if ($iblock_id > 0)
-				$arCatalog = \CCatalogSKU::GetInfoByIBlock($iblock_id);
+				$arCatalog = CCatalogSku::GetInfoByIBlock($iblock_id);
 			if (is_array($arCatalog))
 			{
-				$showCatalogSeo = ($arCatalog['CATALOG_TYPE'] != \CCatalogSKU::TYPE_PRODUCT);
-				if ($arCatalog['CATALOG_TYPE'] == \CCatalogSKU::TYPE_PRODUCT || $arCatalog['CATALOG_TYPE'] == \CCatalogSKU::TYPE_FULL)
+				$showCatalogSeo = ($arCatalog['CATALOG_TYPE'] != CCatalogSku::TYPE_PRODUCT);
+				if ($arCatalog['CATALOG_TYPE'] == CCatalogSku::TYPE_PRODUCT || $arCatalog['CATALOG_TYPE'] == CCatalogSku::TYPE_FULL)
 				{
 					$result["sku_properties"] = array(
 						"TEXT" => Loc::getMessage("IB_COMPLIB_POPUP_SKU_PROPERTIES"),
@@ -967,22 +965,19 @@ class CIBlockParameters
 		);
 		if (!empty($arFields))
 		{
-			foreach ($arFields as &$strFieldName)
+			foreach ($arFields as $strFieldName)
 			{
 				if (isset($arSortFields[$strFieldName]))
 					$arResult[$strFieldName] = $arSortFields[$strFieldName];
 			}
-			if (isset($strFieldName))
-				unset($strFieldName);
+			unset($strFieldName);
 		}
 		else
 		{
 			$arResult = $arSortFields;
 		}
 		if ($boolLowerCase)
-		{
 			$arResult = array_change_key_case($arResult, CASE_LOWER);
-		}
 		return $arResult;
 	}
 
@@ -1003,22 +998,19 @@ class CIBlockParameters
 		);
 		if (!empty($arFields))
 		{
-			foreach ($arFields as &$strFieldName)
+			foreach ($arFields as $strFieldName)
 			{
 				if (isset($arSortFields[$strFieldName]))
 					$arResult[$strFieldName] = $arSortFields[$strFieldName];
 			}
-			if (isset($strFieldName))
-				unset($strFieldName);
+			unset($strFieldName);
 		}
 		else
 		{
 			$arResult = $arSortFields;
 		}
 		if ($boolLowerCase)
-		{
 			$arResult = array_change_key_case($arResult, CASE_LOWER);
-		}
 		return $arResult;
 	}
 
@@ -1033,11 +1025,9 @@ class CIBlockParameters
 	* <i>false</i>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $arCodes = array('', 0, 'ARTICUL');
-	* $arCodes = array_filter($arCodes, 'CIBlockParameters::checkParamValues');После этого в $arCodes будет выглядеть так:
-	* 
-	* $arCodes = array(2 =&gt; 'ARTICUL');
+	* $arCodes = array_filter($arCodes, 'CIBlockParameters::checkParamValues');После этого в $arCodes будет выглядеть так:$arCodes = array(2 =&gt; 'ARTICUL');
 	* </pre>
 	*
 	*
@@ -1050,5 +1040,3 @@ class CIBlockParameters
 		return ($value !== null && $value !== '' && $value !== false);
 	}
 }
-
-?>

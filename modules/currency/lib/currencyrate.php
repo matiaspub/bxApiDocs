@@ -1,8 +1,9 @@
 <?php
 namespace Bitrix\Currency;
 
-use Bitrix\Main\Entity;
-use Bitrix\Main\Localization\Loc;
+use Bitrix\Main,
+	Bitrix\Main\Localization\Loc;
+
 Loc::loadMessages(__FILE__);
 
 /**
@@ -26,13 +27,24 @@ Loc::loadMessages(__FILE__);
  * @package Bitrix\Currency
  **/
 
-class CurrencyRateTable extends Entity\DataManager
+class CurrencyRateTable extends Main\Entity\DataManager
 {
 	/**
 	 * Returns DB table name for entity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы в базе данных для курсов валют. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencyratetable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_catalog_currency_rate';
@@ -43,60 +55,70 @@ class CurrencyRateTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы курсов валют. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencyratetable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
-			'ID' => array(
-				'data_type' => 'integer',
+			'ID' => new Main\Entity\IntegerField('ID', array(
 				'primary' => true,
 				'autocomplete' => true,
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_ID_FIELD'),
-			),
-			'CURRENCY' => array(
-				'data_type' => 'string',
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_ID_FIELD')
+			)),
+			'CURRENCY' => new Main\Entity\StringField('CURRENCY', array(
 				'primary' => true,
 				'validation' => array(__CLASS__, 'validateCurrency'),
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_CURRENCY_FIELD'),
-			),
-			'DATE_RATE' => array(
-				'data_type' => 'date',
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_CURRENCY_FIELD')
+			)),
+			'BASE_CURRENCY' => new Main\Entity\StringField('BASE_CURRENCY', array(
 				'primary' => true,
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_DATE_RATE_FIELD'),
-			),
-			'RATE_CNT' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_RATE_CNT_FIELD'),
-			),
-			'RATE' => array(
-				'data_type' => 'float',
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_BASE_CURRENCY_FIELD')
+			)),
+			'DATE_RATE' => new Main\Entity\DateField('DATE_RATE', array(
+				'primary' => true,
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_DATE_RATE_FIELD')
+			)),
+			'RATE_CNT' => new Main\Entity\IntegerField('RATE_CNT', array(
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_RATE_CNT_FIELD')
+			)),
+			'RATE' => new Main\Entity\FloatField('RATE', array(
 				'required' => true,
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_RATE_FIELD'),
-			),
-			'CREATED_BY' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_CREATED_BY_FIELD'),
-			),
-			'DATE_CREATE' => array(
-				'data_type' => 'datetime',
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_DATE_CREATE_FIELD'),
-			),
-			'MODIFIED_BY' => array(
-				'data_type' => 'integer',
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_MODIFIED_BY_FIELD'),
-			),
-			'TIMESTAMP_X' => array(
-				'data_type' => 'datetime',
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_RATE_FIELD')
+			)),
+			'CREATED_BY' => new Main\Entity\IntegerField('CREATED_BY', array(
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_CREATED_BY_FIELD')
+			)),
+			'DATE_CREATE' => new Main\Entity\DatetimeField('DATE_CREATE', array(
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_DATE_CREATE_FIELD')
+			)),
+			'MODIFIED_BY' => new Main\Entity\IntegerField('MODIFIED_BY', array(
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_MODIFIED_BY_FIELD')
+			)),
+			'TIMESTAMP_X' => new Main\Entity\DatetimeField('TIMESTAMP_X', array(
 				'required' => true,
-				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_TIMESTAMP_X_FIELD'),
+				'title' => Loc::getMessage('CURRENCY_RATE_ENTITY_TIMESTAMP_X_FIELD')
+			)),
+			'CREATED_BY_USER' => new Main\Entity\ReferenceField(
+				'CREATED_BY_USER',
+				'Bitrix\Main\User',
+				array('=this.CREATED_BY' => 'ref.ID'),
+				array('join_type' => 'LEFT')
 			),
-			'CREATED_BY_USER' => array(
-				'data_type' => 'Bitrix\Main\User',
-				'reference' => array('=this.CREATED_BY' => 'ref.ID'),
-			),
-			'MODIFIED_BY_USER' => array(
-				'data_type' => 'Bitrix\Main\User',
-				'reference' => array('=this.MODIFIED_BY' => 'ref.ID'),
-			),
+			'MODIFIED_BY_USER' => new Main\Entity\ReferenceField(
+				'MODIFIED_BY_USER',
+				'Bitrix\Main\User',
+				array('=this.MODIFIED_BY' => 'ref.ID'),
+				array('join_type' => 'LEFT')
+			)
 		);
 	}
 
@@ -105,10 +127,21 @@ class CurrencyRateTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CURRENCY</code> (код валюты). Метод статический и используется для валидации новых значений полей при добавлении курса валюты или изменении параметров уже существующего.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/currency/currencyratetable/validatecurrency.php
+	* @author Bitrix
+	*/
 	public static function validateCurrency()
 	{
 		return array(
-			new Entity\Validator\Length(null, 3),
+			new Main\Entity\Validator\Length(null, 3),
 		);
 	}
 }

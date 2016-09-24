@@ -101,7 +101,7 @@ class CAllPerfomanceTable
 	public function NavQuery($arNavParams, $arQuerySelect, $strTableName, $strQueryWhere, $arQueryOrder)
 	{
 		global $DB;
-		if (IntVal($arNavParams["nTopCount"]) <= 0)
+		if (intval($arNavParams["nTopCount"]) <= 0)
 		{
 			$strSql = "
 				SELECT

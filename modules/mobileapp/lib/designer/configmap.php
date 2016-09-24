@@ -18,7 +18,7 @@ Loc::loadMessages(__FILE__);
 
 class ConfigMap
 {
-	const VERSION = 1.0;
+	const VERSION = 1.1;
 	private static $configMap;
 	private static $configDescription;
 
@@ -31,7 +31,7 @@ class ConfigMap
 		$this->createMap();
 	}
 
-	private  function createMap()
+	private function createMap()
 	{
 		$mapFilePath = Application::getDocumentRoot() . "/bitrix/modules/mobileapp/maps/config.php";
 		$file = new File($mapFilePath);
@@ -51,9 +51,9 @@ class ConfigMap
 		self::$configMap["groups"] = array();
 		$groupTypes = array(ParameterType::GROUP, ParameterType::GROUP_BACKGROUND, ParameterType::GROUP_BACKGROUND_LIGHT);
 
-		foreach($map["types"] as $paramName=>$intType)
+		foreach ($map["types"] as $paramName => $intType)
 		{
-			if(in_array($intType,$groupTypes))
+			if (in_array($intType, $groupTypes))
 			{
 				self::$configMap["groups"][] = $paramName;
 			}
@@ -78,7 +78,7 @@ class ConfigMap
 	 */
 	public function getDescriptionConfig()
 	{
-		if(self::$configDescription)
+		if (self::$configDescription)
 		{
 			return self::$configDescription;
 		}
@@ -117,7 +117,7 @@ class ConfigMap
 	{
 		$map = $this->getDescriptionConfig();
 		$groups = array();
-		foreach ($map as $key=>$desc)
+		foreach ($map as $key => $desc)
 		{
 			$path = explode("/", $key);
 			$groups[$path[0]][$key] = $desc;
@@ -173,9 +173,9 @@ class ConfigMap
 	}
 
 	/**
-	 * Checks if the parameter with passed $paramName is group
+	 * Checks if parameter with passed $paramName is group
 	 * @param $paramName
-     * @return bool
+	 * @return bool
 	 * @throws \Bitrix\Main\SystemException
 	 */
 	public function isGroup($paramName)
@@ -195,7 +195,7 @@ class ConfigMap
 	{
 		$groups = $this->getGroupParams();
 
-		if(is_array($groups))
+		if (is_array($groups))
 		{
 			foreach ($groups as $group)
 			{
@@ -219,7 +219,7 @@ class ConfigMap
 	}
 
 	/**
-	 * Checks if parameters with passed name is exists in the map
+	 * Checks if parameter with passed name is exists in the map
 	 * @param $paramName
 	 * @return bool
 	 */
@@ -229,7 +229,7 @@ class ConfigMap
 	}
 
 	/**
-	 * Gets
+	 * Gets list of values for parameter
 	 * @param $paramName
 	 * @return mixed
 	 * @throws \Bitrix\Main\SystemException
@@ -244,8 +244,10 @@ class ConfigMap
 	{
 		$map = $this->getMap();
 		$limits = $map["limits"][$paramName];
-		if(!is_array($limits))
+		if (!is_array($limits))
+		{
 			$limits = array();
+		}
 		return $limits;
 	}
 

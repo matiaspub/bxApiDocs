@@ -121,7 +121,7 @@ class CUserOptions
 						$strSql = "
 							SELECT CATEGORY, NAME, VALUE, COMMON
 							FROM b_user_option
-							WHERE (USER_ID=".$user_id." OR USER_ID IS NULL AND COMMON='Y')
+							WHERE (USER_ID=".$user_id." OR USER_ID=0 AND COMMON='Y')
 								AND CATEGORY='".$DB->ForSql($category)."'
 						";
 
@@ -149,7 +149,7 @@ class CUserOptions
 					$strSql = "
 						SELECT CATEGORY, NAME, VALUE, COMMON
 						FROM b_user_option
-						WHERE (USER_ID=".$user_id." OR USER_ID IS NULL AND COMMON='Y')
+						WHERE (USER_ID=".$user_id." OR USER_ID=0 AND COMMON='Y')
 							AND CATEGORY='".$DB->ForSql($category)."'
 					";
 
@@ -175,39 +175,64 @@ class CUserOptions
 	{
 		global $DB, $USER, $CACHE_MANAGER;
 
-		if ($user_id === false && $bCommon === false)
+		if($bCommon == true)
+		{
+			$user_id = 0;
+		}
+		elseif($user_id === false)
+		{
+			if(!is_object($USER))
+			{
+				return false;
+			}
 			$user_id = $USER->GetID();
+		}
 
 		$user_id = intval($user_id);
 		$arFields = array(
-			"USER_ID" => ($bCommon ? false : $user_id),
+			"USER_ID" => $user_id,
 			"CATEGORY" => $category,
 			"NAME" => $name,
 			"VALUE" => serialize($value),
 			"COMMON" => ($bCommon ? "Y" : "N"),
 		);
-		$res = $DB->Query("
-			SELECT ID FROM b_user_option
-			WHERE
-			".($bCommon ? "USER_ID IS NULL AND COMMON='Y' " : "USER_ID=".$user_id)."
-				AND CATEGORY='".$DB->ForSql($category, 50)."'
-				AND NAME='".$DB->ForSql($name, 255)."'
-		");
 
-		if ($res_array = $res->Fetch())
+		if($DB->type == "ORACLE")
 		{
-			$strUpdate = $DB->PrepareUpdate("b_user_option", $arFields);
-			if ($strUpdate != "")
+			//old way because MERGE doesn't support bindings
+			$res = $DB->Query("
+				SELECT ID FROM b_user_option
+				WHERE
+				".($bCommon ? "USER_ID=0 AND COMMON='Y' " : "USER_ID=".$user_id)."
+					AND CATEGORY='".$DB->ForSql($category, 50)."'
+					AND NAME='".$DB->ForSql($name, 255)."'
+			");
+
+			if ($res_array = $res->Fetch())
 			{
-				$strSql = "UPDATE b_user_option SET ".$strUpdate." WHERE ID=".$res_array["ID"];
-				if (!$DB->QueryBind($strSql, array("VALUE" => $arFields["VALUE"])))
+				$strUpdate = $DB->PrepareUpdate("b_user_option", $arFields);
+				if ($strUpdate != "")
+				{
+					$strSql = "UPDATE b_user_option SET ".$strUpdate." WHERE ID=".$res_array["ID"];
+					if (!$DB->QueryBind($strSql, array("VALUE" => $arFields["VALUE"])))
+						return false;
+				}
+			}
+			else
+			{
+				if (!$DB->Add("b_user_option", $arFields, array("VALUE")))
 					return false;
 			}
 		}
 		else
 		{
-			if (!$DB->Add("b_user_option", $arFields, array("VALUE")))
+			$helper = \Bitrix\Main\Application::getConnection()->getSqlHelper();
+			$sql = $helper->prepareMerge("b_user_option", array("USER_ID", "CATEGORY", "NAME"), $arFields, $arFields);
+
+			if(!$DB->Query(current($sql)))
+			{
 				return false;
+			}
 		}
 
 		if($bCommon)
@@ -240,6 +265,10 @@ class CUserOptions
 						foreach ($opt["v"] as $k => $v)
 							$val[$k] = $v;
 					}
+					else
+					{
+						$val = $opt["v"];
+					}
 				}
 				CUserOptions::SetOption($opt["c"], $opt["n"], $val);
 				if ($opt["d"] == "Y" && $USER->CanDoOperation('edit_other_settings'))
@@ -258,7 +287,7 @@ class CUserOptions
 		$user_id = intval($user_id);
 		$strSql = "
 			DELETE FROM b_user_option
-			WHERE ".($bCommon ? "USER_ID IS NULL AND COMMON='Y' " : "USER_ID=".$user_id)."
+			WHERE ".($bCommon ? "USER_ID=0 AND COMMON='Y' " : "USER_ID=".$user_id)."
 			AND CATEGORY='".$DB->ForSql($category, 50)."'
 			AND NAME='".$DB->ForSql($name, 255)."'
 		";
@@ -296,7 +325,7 @@ class CUserOptions
 	{
 		global $DB, $CACHE_MANAGER;
 
-		if ($DB->Query("DELETE FROM b_user_option WHERE USER_ID IS NOT NULL AND NAME NOT LIKE '~%'  ".($user_id <> false? " AND USER_ID=".intval($user_id):""), false, "File: ".__FILE__."<br>Line: ".__LINE__))
+		if ($DB->Query("DELETE FROM b_user_option WHERE USER_ID<>0 AND NAME NOT LIKE '~%'  ".($user_id <> false? " AND USER_ID=".intval($user_id):""), false, "File: ".__FILE__."<br>Line: ".__LINE__))
 		{
 			$CACHE_MANAGER->cleanDir("user_option");
 			self::$cache = array();

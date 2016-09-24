@@ -6,13 +6,13 @@
  */
 class _CEventsMain {
 /**
- * Событие "OnPageStart" вызывается в начале выполняемой части пролога сайта, после подключения всех библиотек и отработки <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>.
+ * Событие "OnPageStart" вызывается в начале выполняемой части пролога сайта, после подключения всех библиотек и отработки <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агентов</a>.
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * RegisterModuleDependences("main", "<b>OnPageStart</b>", "statistic", "CStatistic", "Stoplist", "100");
  * ?&gt;
@@ -24,8 +24,8 @@ class _CEventsMain {
  * "OnBeforeProlog"</a></li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы
  * выполнения страницы и доступные на каждом этапе переменные и
  * константы </a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -41,7 +41,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * AddEventHandler("main", "<b>OnBeforeProlog</b>", "MyOnBeforePrologHandler", 50);<br>
@@ -51,8 +51,7 @@ class _CEventsMain {
  *    if(SITE_TEMPLATE_ID=='mynewtemplate' &amp;&amp; $_SERVER['REMOTE_ADDR']!='127.0.0.1' &amp;&amp; !$USER-&gt;IsAdmin())
  *       die('This template temporary unavailable.');
  * }
- * ?&gt;</bСмотрите также
- * <li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum6/topic17229/message95191/#message95191">Как посчитать количество пользователей онлайн</a></li>
+ * ?&gt;Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/forums/messages/forum6/topic17229/message95191/#message95191">Как посчитать количество пользователей онлайн</a></li>
  * </pre>
  *
  *
@@ -61,7 +60,7 @@ class _CEventsMain {
  * <li><a href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы выполнения
  * страницы и доступные на каждом этапе переменные и константы </a></li>
  * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul> <a name="examples"></a>
+ * ></a>События</li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -71,13 +70,13 @@ class _CEventsMain {
 	public static function OnBeforeProlog(){}
 
 /**
- * Событие "OnProlog" вызывается в начале визуальной части пролога сайта.
+ * Событие "OnProlog"  вызывается в начале визуальной части пролога сайта.
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  *     RegisterModuleDependences("main", 
  *                               "<b>OnProlog</b>",
@@ -90,10 +89,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeprolog.php">Событие "OnBeforeProlog"</a>
- * </li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы выполнения
- * страницы и доступные на каждом этапе переменные и константы </a></li>
- * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul> <a name="examples"></a>
+ * </li> 	<li><a href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы выполнения
+ * страницы и  доступные на каждом этапе переменные и константы
+ * </a></li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
+ * ></a>События</li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -109,9 +108,9 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
- * RegisterModuleDependences("main", "<b>OnEpilog</b>", "statistic", "CStatistic", "Set404", "100");
+ * AddEventHandler("main", "<b>OnEpilog</b>", "statistic", "CStatistic", "Set404", "100");
  * ?&gt;
  * </pre>
  *
@@ -121,7 +120,7 @@ class _CEventsMain {
  * </li> <li><a href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы выполнения
  * страницы и доступные на каждом этапе переменные и константы </a></li>
  * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul> <a name="examples"></a>
+ * ></a>События</li>   </ul><a name="examples"></a>
  *
  *
  * @static
@@ -131,13 +130,13 @@ class _CEventsMain {
 	public static function OnEpilog(){}
 
 /**
- * <p>Событие "OnAfterEpilog" возникает в конце выполняемой части эпилога сайта (после события <a href="http://dev.1c-bitrix.ru/api_help/main/events/onepilog.php">OnEpilog</a>). </p>
+ * <p>Событие "OnAfterEpilog" возникает в конце выполняемой части эпилога сайта (после события <a href="http://dev.1c-bitrix.ru/api_help/main/events/onepilog.php">OnEpilog</a>).  </p>
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * RegisterModuleDependences("main", 
  *                           "<b>OnAfterEpilog</b>", 
@@ -152,8 +151,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onepilog.php">Событие "OnEpilog"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/general/pageplan.php">Этапы выполнения страницы и
  * доступные на каждом этапе переменные и константы </a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -163,9 +162,7 @@ class _CEventsMain {
 	public static function OnAfterEpilog(){}
 
 /**
- * Вызывается перед выводом буферизированного контента
- * 
- * 
+ * перед выводом буферизированного контента
  * <i>Вызывается в методе:</i><br>
  * CAllMain::EndBufferContent<br><br>
  * 
@@ -176,9 +173,7 @@ class _CEventsMain {
 	public static function OnBeforeEndBufferContent(){}
 
 /**
- * Вызывается перед сбросом буфера контента
- * 
- * 
+ * перед сбросом буфера контента
  * <i>Вызывается в методе:</i><br>
  * CAllMain::RestartBuffer<br><br>
  * 
@@ -192,9 +187,9 @@ class _CEventsMain {
  * <p>Вызывается при выводе буферизированного контента.</p>
  *
  *
- * @param Fram $e  
+ * @param mixed $Frame  
  *
- * @param endBufferin $g  
+ * @param Fram $endBuffering  
  *
  * @return mixed 
  *
@@ -202,7 +197,7 @@ class _CEventsMain {
  * @link http://dev.1c-bitrix.ru/api_help/main/events/onendbuffercontent.php
  * @author Bitrix
  */
-	public static function OnEndBufferContent($e, $g){}
+	public static function OnEndBufferContent($Frame, $endBuffering){}
 
 /**
  * <p>Событие OnAdminContextMenuShow вызывается в функции <a href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadmincontextmenu/show.php">CAdminContextMenu::Show()</a> при выводе в административном разделе панели кнопок. Событие позволяет модифицировать или добавить собственные кнопки на панель.</p>
@@ -216,16 +211,16 @@ class _CEventsMain {
  * @return void 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnAdminContextMenuShow", "MyOnAdminContextMenuShow");<br>function MyOnAdminContextMenuShow(&amp;$items)<br>{<br>	//add custom button to the index page toolbar<br>	if($GLOBALS["APPLICATION"]-&gt;GetCurPage(true) == "/bitrix/admin/index.php")<br>		$items[] = array("TEXT"=&gt;"Настройки модулей", "ICON"=&gt;"", "TITLE"=&gt;"Страница настроек модулей", "LINK"=&gt;"settings.php?lang=".LANGUAGE_ID);<br>}<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> <li><a
+ * ></a>События</li>     <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadmincontextmenu/index.php">Класс
- * CAdminContextMenu</a></li> </ul> <a name="examples"></a>
+ * CAdminContextMenu</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -239,22 +234,21 @@ class _CEventsMain {
  *
  *
  * @param object &$list  Ссылка на объект класса <a
- * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminlist/index.php">CAdminList</a>. </htm
+ * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminlist/index.php">CAdminList</a>.
  *
  * @return void 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnAdminListDisplay", "MyOnAdminListDisplay");<br>function MyOnAdminListDisplay(&amp;$list)<br>{<br>	//add custom group action<br>	if($list-&gt;table_id == "tbl_posting")<br>		$list-&gt;arActions["status_draft"] = "Статус: Черновик";<br>}<br>//process custom action<br>AddEventHandler("main", "OnBeforeProlog", "MyOnBeforeProlog");<br>function MyOnBeforeProlog()<br>{<br>	if($_SERVER["REQUEST_METHOD"] == "POST" &amp;&amp; $_POST["action"] == "status_draft" &amp;&amp; is_array($_POST["ID"]) &amp;&amp; $GLOBALS["APPLICATION"]-&gt;GetCurPage() == "/bitrix/admin/posting_admin.php")<br>	{<br>		if($GLOBALS["APPLICATION"]-&gt;GetGroupRight("subscribe") == "W" &amp;&amp; check_bitrix_sessid())<br>		{<br>			if(CModule::IncludeModule("subscribe"))<br>			{<br>				$cPosting = new CPosting;<br>				foreach($_POST["ID"] as $ID)<br>					if(($ID = intval($ID)) &gt; 0)<br>						$cPosting-&gt;ChangeStatus($ID, "D");<br>			}<br>		}<br>	}<br>}<br>?&gt;
- * </ht
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> <li><a
+ * ></a>События</li>    <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/classes/cadminlistrow/index.php">Класс
- * CAdminListRow</a></li> </ul> <a name="examples"></a>
+ * CAdminListRow</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -278,16 +272,16 @@ class _CEventsMain {
  * @return void 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnAdminTabControlBegin", "MyOnAdminTabControlBegin");<br>function MyOnAdminTabControlBegin(&amp;$form)<br>{<br>	if($GLOBALS["APPLICATION"]-&gt;GetCurPage() == "/bitrix/admin/posting_edit.php")<br>	{<br>		$form-&gt;tabs[] = array("DIV" =&gt; "my_edit", "TAB" =&gt; "Дополнительно", "ICON"=&gt;"main_user_edit", "TITLE"=&gt;"Дополнительные параметры", "CONTENT"=&gt;<br>			'&lt;tr valign="top"&gt;<br>				&lt;td&gt;Дополнительные заголовки письма:&lt;/td&gt;<br>				&lt;td&gt;<br>					&lt;input type="text" name="MY_HEADERS[]" value="" size="30"&gt;&lt;br&gt;<br>					&lt;input type="text" name="MY_HEADERS[]" value="" size="30"&gt;&lt;br&gt;<br>					&lt;input type="text" name="MY_HEADERS[]" value="" size="30"&gt;&lt;br&gt;<br>				&lt;/td&gt;<br>			&lt;/tr&gt;'<br>		);<br>	}<br>}<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> <li><a
+ * ></a>События</li>   <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/general/admin.section/rubric_edit.php">Создание формы
- * редактирования</a></li> </ul> <a name="examples"></a>
+ * редактирования</a></li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -303,7 +297,7 @@ class _CEventsMain {
  * @return mixed <p></p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * <br><br>
  * </pre>
  *
@@ -319,7 +313,7 @@ class _CEventsMain {
 	public static function onAfterAjaxResponse(){}
 
 /**
- * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> после добавления группы, и может быть использовано для действий, связанных с группой.</p>
+ * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> после добавления группы,  и может быть использовано для действий, связанных с группой.</p>
  *
  *
  * @param array &$arFields  Список полей (<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">класс
@@ -329,15 +323,15 @@ class _CEventsMain {
  * @return bool <p>Не используется.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnAfterGroupAdd", "MyOnAfterGroupAdd");<br>function MyOnAfterGroupAdd(&amp;$arFields)<br>{<br>	AddMessage2Log(print_r($arFields, true));<br>}?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
- * </ul></bod<a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -347,10 +341,10 @@ class _CEventsMain {
 	public static function OnAfterGroupAdd(&$arFields){}
 
 /**
- * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> после изменения полей группы, и может быть использовано для дополнительных действий, связанных с группой.</p>
+ * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> после изменения полей группы,  и может быть использовано для дополнительных действий, связанных с группой.</p>
  *
  *
- * @param int $ID  Идентификатор измененной группы пользователей.
+ * @param int $intID  Идентификатор измененной группы пользователей.
  *
  * @param array &$arFields  Список полей (<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">класс
  * CGroup</a>) измененной группы пользователей.
@@ -358,22 +352,22 @@ class _CEventsMain {
  * @return void <p>Не используется.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnAfterGroupUpdate", "MyOnAfterGroupUpdate");<br>function MyOnAfterGroupUpdate($ID, &amp;$arFields)<br>{<br>	if($ID == 1)<br>		AddMessage2Log(print_r($arFields, true));<br>}<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
- * </ul></bod<a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/main/events/onaftergroupupdate.php
  * @author Bitrix
  */
-	public static function OnAfterGroupUpdate($ID, &$arFields){}
+	public static function OnAfterGroupUpdate($intID, &$arFields){}
 
 /**
  * Событие "OnAfterUserAdd" вызывается после попытки добавления нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a>.
@@ -388,7 +382,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -410,10 +404,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuseradd.php">Событие
- * "OnBeforeUserAdd"</a></li> <li><a
+ * "OnBeforeUserAdd"</a></li>   <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -432,7 +426,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -454,7 +448,7 @@ class _CEventsMain {
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/authorize.php">CUser::Authorize</a> </li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
  * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574"
- * ></a>Внешняя авторизация </li> </ul> <a name="examples"></a>
+ * ></a>Внешняя авторизация </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -467,27 +461,27 @@ class _CEventsMain {
  * <p>Событие "OnAfterUserLogin" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> после попытки авторизовать пользователя, проверив имя входа <i><span class="syntax"><i>arParams</i></span>['LOGIN']</i> и пароль <i><span class="syntax"><i>arParams</i></span>['PASSWORD']</i>.</p>
  *
  *
- * @param array &$arParams  Массив полей проверки имени входа и пароля: <ul> <li> <b>USER_ID</b> - в
+ * @param array &$arParams  Массив полей проверки имени входа и пароля:       <ul> <li> <b>USER_ID</b> - в
  * случае если авторизация прошла успешно содержит код
- * пользователя </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным текстом,
- * описывающий результат проверки пользователя, в дальнейшем
- * используется функцией <a
+ * пользователя 	      </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным
+ * текстом, описывающий результат проверки пользователя, в
+ * дальнейшем используется функцией <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> для вывода
- * сообщения. </li> <li> <b>LOGIN</b> - Логин пользователя</li> <li> <b>PASSWORD</b> -
- * Пароль. Если параметр <b>PASSWORD_ORIGINAL</b> равен"Y", то в данном параметре
- * был передан оригинальный пароль, в противном случае был передан
- * хеш (md5) от оригинального пароля. </li> <li> <b>REMEMBER</b> - Если значение
- * равно "Y", то авторизация пользователя должна быть сохранена в
- * куках.</li> <li> <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y", то это означает
- * что <b>PASSWORD</b> не был сконвертирован в MD5 (т.е. в параметре <b>PASSWORD</b>
- * был передан реальный пароль вводимый пользователем с
- * клавиатуры), если значение равно "N", то это означает что <b>PASSWORD</b>
- * уже сконвертирован в MD5.</li> </ul>
+ * сообщения. </li>         <li> <b>LOGIN</b> - Логин пользователя</li>         <li>
+ * <b>PASSWORD</b> - Пароль. Если параметр <b>PASSWORD_ORIGINAL</b> равен"Y", то в данном
+ * параметре был передан оригинальный пароль, в противном случае
+ * был передан хеш (md5) от оригинального пароля. </li>         <li> <b>REMEMBER</b> -
+ * Если значение равно "Y", то авторизация пользователя должна быть
+ * сохранена в куках.</li>         <li> <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y",
+ * то это означает что <b>PASSWORD</b> не был сконвертирован в MD5 (т.е. в
+ * параметре <b>PASSWORD</b> был передан реальный пароль вводимый
+ * пользователем с клавиатуры), если значение равно "N", то это
+ * означает что <b>PASSWORD</b> уже сконвертирован в MD5.</li>     </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * AddEventHandler("main", "<b>OnAfterUserLogin</b>", Array("MyClass", "OnAfterUserLoginHandler"));<br>
  * class MyClass
@@ -527,10 +521,10 @@ class _CEventsMain {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogin.php">Событие
  * "OnBeforeUserLogin"</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li>  <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574" ></a>Внешняя
- * авторизация </li> </ul> <a name="examples"></a>
+ * авторизация </li>     </ul><a name="examples"></a>
  *
  *
  * @static
@@ -543,20 +537,20 @@ class _CEventsMain {
  * Событие "OnAfterUserLoginByHash" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash()</a> после проверки имени входа <i><span class="syntax"><i>arParams</i><b></b></span>['LOGIN']</i> и хеша от пароля <span class="syntax"><i>arParams</i></span><i>['HASH']</i> и попытки авторизовать пользователя. В параметре <span class="syntax"><i>arParams</i></span><i>['USER_ID']</i> будет передан код пользователя которого удалось авторизовать, а также массив с сообщением об ошибке <i><span class="syntax"><i>arParams</i><b></b></span>['RESULT_MESSAGE']</i>.
  *
  *
- * @param array &$arParams  Массив полей проверки имени входа и пароля: <ul> <li> <b>USER_ID</b> - в
+ * @param array &$arParams  Массив полей проверки имени входа и пароля:       <ul> <li> <b>USER_ID</b> - в
  * случае, если авторизация прошла успешно, содержит код
- * пользователя </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным текстом,
- * описывающий результат проверки пользователя, в дальнейшем
- * используется функцией <a
+ * пользователя           </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным
+ * текстом, описывающий результат проверки пользователя, в
+ * дальнейшем используется функцией <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> для вывода
- * сообщения. </li> <li> <b>LOGIN</b> - Логин пользователя</li> <li> <b>HASH</b> - Пароль.
- * Специальный хеш от пароля пользователя. Данный хеш как правило
- * хранится в куках пользователя.</li> </ul>
+ * сообщения. </li> 	            <li> <b>LOGIN</b> - Логин пользователя</li> 	            <li>
+ * <b>HASH</b> - Пароль. Специальный хеш от пароля пользователя. Данный
+ * хеш как правило хранится в куках пользователя.</li>       </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
  * AddEventHandler("main", "<b>OnAfterUserLoginByHash</b>", Array("MyClass", "OnAfterUserLoginByHashHandler"));<br>
@@ -578,11 +572,11 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserloginbyhash.php">Событие
- * "OnBeforeUserLoginByHash"</a></li> <li> <a
+ * "OnBeforeUserLoginByHash"</a></li>   <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574" ></a>Внешняя
- * авторизация </li> </ul> <a name="examples"></a>
+ * авторизация </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -595,15 +589,16 @@ class _CEventsMain {
  * Событие "OnAfterUserLogout" вызывается после <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">завершения авторизации</a> пользователя.
  *
  *
- * @param array &$arParams  Массив параметров: <ul> <li> <b>USER_ID</b> - код пользователя</li> <li> <b>SUCCESS </b>-
- * результат операции: true, если авторизация завершена, false - в случае
- * ошибки или отмены завершения авторзации обработчиком события <a
- * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogout.php">OnBeforeUserLogout</a>.</li> </ul>
+ * @param array &$arParams  Массив параметров:          <ul> <li> <b>USER_ID</b> - код пользователя</li>             
+ *        <li> <b>SUCCESS </b>- результат операции: true, если авторизация
+ * завершена, false - в случае ошибки или отмены завершения авторзации
+ * обработчиком события <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogout.php">OnBeforeUserLogout</a>.</li>          </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -615,9 +610,7 @@ class _CEventsMain {
  *         ...
  *     }
  * }
- * ?&gt;
- * 
- * &lt;?
+ * ?&gt;&lt;?
  * // регистрируем обработчик события "OnAfterUserLogout"
  * RegisterModuleDependences("main", "<b>OnAfterUserLogout</b>", 
  * "my_module_id", "MyClass", "OnAfterUserLogoutHandler");?&gt;
@@ -626,10 +619,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogout.php">Событие
- * "OnBeforeUserLogout"</a> </li> <li> <a
+ * "OnBeforeUserLogout"</a> </li>   <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">CUser::Logout</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -642,38 +635,38 @@ class _CEventsMain {
  * Событие "OnAfterUserRegister" вызывается после попытки регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a>.
  *
  *
- * @param array &$arFields  Массив полей регистрации нового пользователя: <ul> <li> <b>USER_ID</b> - в
- * случае если регистрация прошла успешно содержит код нового
- * пользователя </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным текстом,
- * описывающий результат регистрации пользователя, в дальнейшем
- * используется функцией <a
+ * @param array &$arFields  Массив полей регистрации нового пользователя:          <ul> <li> <b>USER_ID</b>
+ * - в случае если регистрация прошла успешно содержит код нового
+ * пользователя </li>                     <li> <b>RESULT_MESSAGE</b> - массив с
+ * информационным текстом, описывающий результат регистрации
+ * пользователя, в дальнейшем используется функцией <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> для вывода
- * сообщения. </li> <li> <b>LOGIN</b> - имя входа пользователя </li> <li> <b>NAME</b> - имя
- * пользователя </li> <li> <b>LAST_NAME</b> - фамилия пользователя </li> <li>
- * <b>PASSWORD</b> - пароль </li> <li> <b>CONFIRM_PASSWORD</b> - подтверждение пароля </li> <li>
- * <b>CHECKWORD</b> - новое контрольное слово для смены пароля </li> <li> <b>EMAIL</b> -
- * EMail пользователя </li> <li> <b>ACTIVE</b> - флаг активности [Y|N] </li> <li> <b>SITE_ID</b>
- * - ID сайта по умолчанию для уведомлений </li> <li> <b>GROUP_ID</b> - массив ID
- * групп пользователя </li> <li> <b>USER_IP</b> - IP адрес пользователя </li> <li>
- * <b>USER_HOST</b> - хост пользователя </li> </ul>
+ * сообщения. </li>                     <li> <b>LOGIN</b> - имя входа пользователя </li>      
+ *               <li> <b>NAME</b> - имя пользователя 	 </li>                     <li> <b>LAST_NAME</b> -
+ * фамилия пользователя 	 </li>                     <li> <b>PASSWORD</b> - пароль 	 </li>         
+ *            <li> <b>CONFIRM_PASSWORD</b> - подтверждение пароля 	 </li>                     <li>
+ * <b>CHECKWORD</b> - новое контрольное слово для смены пароля 	 </li>                  
+ *   <li> <b>EMAIL</b> - EMail пользователя 	 </li>                     <li> <b>ACTIVE</b> - флаг
+ * активности [Y|N] 	 </li>                     <li> <b>SITE_ID</b> - ID сайта по умолчанию
+ * для уведомлений 	 </li>                     <li> <b>GROUP_ID</b> - массив ID групп
+ * пользователя </li>                     <li> <b>USER_IP</b> - IP адрес пользователя </li>   
+ *                  <li> <b>USER_HOST</b> - хост пользователя </li>          </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
- * &lt;?<br>// файл /bitrix/modules/my_module_id/include.php<br>class MyClass<br>{<br>    // создаем обработчик события "OnAfterUserRegister"<br>    function OnAfterUserRegisterHandler(&amp;$arFields)<br>    {<br>        // если регистрация успешна то<br>        if($arFields["USER_ID"]&gt;0)<br>        {<br>            // если текущий сайт - r1, то<br>            if(SITE_ID=="r1")<br>            {<br>                // зададим сообщение об успешной регистрации на сайте r1<br>                $arFields["RESULT_MESSAGE"]["MESSAGE"] = "Вы успешно зарегистрировались на сайте \"Мой любимый сайт 1\"";<br>            }<br>            elseif(SITE_ID=="r2")<br>            {<br>                // зададим сообщение об успешной регистрации на сайте r2<br>                $arFields["RESULT_MESSAGE"]["MESSAGE"] = "Вы успешно зарегистрировались на сайте \"Мой любимый сайт 2\"";<br><br>            }<br>        }<br>        return $arFields;<br>    }<br>}<br>?&gt;
- * 
- * &lt;?<br>// регистрируем обработчик события "OnAfterUserRegister"<br>RegisterModuleDependences("main", "<b>OnAfterUserRegister</b>", "my_module_id", "MyClass", "OnAfterUserRegisterHandler");<br>?&gt;
+ * <pre bgcolor="#323232" style="padding:5px;">
+ * &lt;?<br>// файл /bitrix/modules/my_module_id/include.php<br>class MyClass<br>{<br>    // создаем обработчик события "OnAfterUserRegister"<br>    function OnAfterUserRegisterHandler(&amp;$arFields)<br>    {<br>        // если регистрация успешна то<br>        if($arFields["USER_ID"]&gt;0)<br>        {<br>            // если текущий сайт - r1, то<br>            if(SITE_ID=="r1")<br>            {<br>                // зададим сообщение об успешной регистрации на сайте r1<br>                $arFields["RESULT_MESSAGE"]["MESSAGE"] = "Вы успешно зарегистрировались на сайте \"Мой любимый сайт 1\"";<br>            }<br>            elseif(SITE_ID=="r2")<br>            {<br>                // зададим сообщение об успешной регистрации на сайте r2<br>                $arFields["RESULT_MESSAGE"]["MESSAGE"] = "Вы успешно зарегистрировались на сайте \"Мой любимый сайт 2\"";<br><br>            }<br>        }<br>        return $arFields;<br>    }<br>}<br>?&gt;&lt;?<br>// регистрируем обработчик события "OnAfterUserRegister"<br>RegisterModuleDependences("main", "<b>OnAfterUserRegister</b>", "my_module_id", "MyClass", "OnAfterUserRegisterHandler");<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserregister.php">Событие
- * "OnBeforeUserRegister"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a> <br> </li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" > </a> <li> <a
+ * "OnBeforeUserRegister"</a> </li>     <li> <a
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>     <br> </li> <a
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" > </a>   <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a><a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul></bod<a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li>  </ul><a
  * name="examples"></a>
  *
  *
@@ -687,30 +680,28 @@ class _CEventsMain {
  * Событие "OnAfterUserSimpleRegister" вызывается после попытки упрощённой регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a>.
  *
  *
- * @param array &$arFields  Массив полей регистрации нового пользователя: <ul> <li> <b>USER_ID</b> - в
+ * @param array &$arFields  Массив полей  регистрации нового пользователя: 	  <ul> <li> <b>USER_ID</b> - в
  * случае если регистрация прошла успешно содержит код нового
- * пользователя </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным текстом,
- * описывающий результат регистрации пользователя, в дальнейшем
- * используется функцией <a
+ * пользователя    		  </li> <li> <b>RESULT_MESSAGE</b> - массив с информационным
+ * текстом, описывающий результат регистрации пользователя, в
+ * дальнейшем используется функцией <a
  * href="http://dev.1c-bitrix.ru/api_help/main/functions/other/showmessage.php">ShowMessage</a> для вывода
- * сообщения. </li> <li> <b>PASSWORD</b> - пароль </li> <li> <b>CONFIRM_PASSWORD</b> -
- * подтверждение пароля </li> <li> <b>CHECKWORD</b> - контрольное слово для
- * смены пароля </li> <li> <b>EMAIL</b> - EMail пользователя </li> <li> <b>ACTIVE</b> - флаг
- * активности [Y|N] </li> <li> <b>SITE_ID</b> - ID сайта по умолчанию для
- * уведомлений </li> <li> <b>GROUP_ID</b> - массив ID групп пользователя </li> <li>
- * <b>USER_IP</b> - IP адрес пользователя </li> <li> <b>USER_HOST</b> - хост пользователя
- * </li> </ul>
+ * сообщения.         </li> <li> <b>PASSWORD</b> - пароль 	      </li> <li> <b>CONFIRM_PASSWORD</b> -
+ * подтверждение пароля 		  </li> <li> <b>CHECKWORD</b> - контрольное слово для
+ * смены пароля 		  </li> <li> <b>EMAIL</b> - EMail пользователя 		  </li> <li> <b>ACTIVE</b> -
+ * флаг активности [Y|N] 		  </li> <li> <b>SITE_ID</b> - ID сайта по умолчанию для
+ * уведомлений 		  </li> <li> <b>GROUP_ID</b> - массив ID групп пользователя         	   
+ *   </li> <li> <b>USER_IP</b> - IP адрес пользователя          	      </li> <li> <b>USER_HOST</b> -
+ * хост пользователя         </li> </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // регистрируем обработчик события "OnAfterUserSimpleRegister"
  * RegisterModuleDependences("main", "<b>OnAfterUserSimpleRegister</b>", "my_module_id", "MyClass", "OnAfterUserSimpleRegisterHandler");
  * ?&gt;
- * 
- * 
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -734,7 +725,7 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeusersimpleregister.php">Событие
  * "OnBeforeUserSimpleRegister"</a></li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a></li> </ul> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a></li> </ul><a
  * name="examples"></a>
  *
  *
@@ -760,7 +751,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -782,10 +773,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserupdate.php">Событие
- * "OnBeforeUserUpdate"</a></li> <li><a
+ * "OnBeforeUserUpdate"</a></li>   <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -805,7 +796,7 @@ class _CEventsMain {
  * сохранением.
  *
  * @return bool <p>При возврате true поизводится сохранение файла. При возврате false
- * сохранение файла отменяется.</p> <h4>Параметры</h4><table class="tnormal"
+ * сохранение файла отменяется.</p><h4>Параметры</h4><table class="tnormal"
  * width="100%"><tbody> <tr> <th>Параметр</th> <th>Описание</th> </tr> <tr> <td><i>abs_path</i></td>
  * <td>Абсолютный путь к файлу (включая document_root).</td> </tr> <tr>
  * <td><i>strContent</i></td> <td>Новое содержимое файла. Значение передается по
@@ -813,7 +804,7 @@ class _CEventsMain {
  * файла перед его сохранением.</td> </tr> </tbody></table>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * // файл /bitrix/php_interface/init.php
  * AddEventHandler("main", "OnBeforeChangeFile", "MyBeforeChangeFile");
  * 
@@ -831,10 +822,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onchangepermissions.php">Событие
- * "OnChangePermissions"</a> </li> <li> <a
+ * "OnChangePermissions"</a> </li>   <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/savefilecontent.php">CMain::SaveFileContent</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
- * </ul> <a name="examples"></a>
+ * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -851,27 +842,34 @@ class _CEventsMain {
  *
  * @param string &$lid  ID сайта, на котором был вызов метода CEvent::Send()
  *
- * @param array &$arFields  Массив параметров, которые передаются в обработчик события. <br>
- * Пример массива: <br><span class="Apple-style-span" style="color: rgb(51, 51, 51); font-family: Tahoma,
- * Verdana, Helvetica, sans-serif; font-size: 13px; "> <pre>Array ( [RS_FORM_ID] =&gt; 1 [RS_FORM_NAME] =&gt; Анкета
- * посетителя сайта [RS_FORM_VARNAME] =&gt; ANKETA [RS_FORM_SID] =&gt; ANKETA [RS_RESULT_ID] =&gt; 11
- * [RS_DATE_CREATE] =&gt; 24.07.2011 16:59:55 [RS_USER_ID] =&gt; 1 [RS_USER_EMAIL] =&gt; my@email.com [RS_USER_NAME] =&gt;
- * [RS_USER_AUTH] =&gt; [RS_STAT_GUEST_ID] =&gt; 1 [RS_STAT_SESSION_ID] =&gt; 1 [VS_NAME] =&gt; sfdsf [VS_NAME_RAW] =&gt;
- * sfdsf [VS_BIRTHDAY] =&gt; 21.07.2011 [VS_BIRTHDAY_RAW] =&gt; 21.07.2011 [VS_ADDRESS] =&gt; sdfdsf [VS_ADDRESS_RAW] =&gt;
- * sdfdsf [VS_MARRIED] =&gt; Да [4] [VS_MARRIED_RAW] =&gt; Да [VS_INTEREST] =&gt; физика (2) [7]
- * программирование (5) [10] [VS_INTEREST_RAW] =&gt; физика,программирование [VS_AGE]
- * =&gt; 30-39 (30) [13] [VS_AGE_RAW] =&gt; 30-39 [VS_EDUCATION] =&gt; высшее (3) [19] [VS_EDUCATION_RAW] =&gt;
- * высшее [VS_INCOME] =&gt; [VS_INCOME_RAW] =&gt; [VS_PHOTO] =&gt; [VS_PHOTO_RAW] =&gt; )</pre> </span>
+ * @param array &$arFields  Массив параметров, которые передаются в обработчик события.         
+ * <br>        Пример массива:          <br><span class="Apple-style-span" style="color: rgb(51, 51, 51);
+ * font-family: Tahoma, Verdana, Helvetica, sans-serif; font-size: 13px; ">            <pre bgcolor="#323232" style="padding:5px;">Array         (            
+ * [RS_FORM_ID] =&gt; 1             [RS_FORM_NAME] =&gt; Анкета посетителя сайта            
+ * [RS_FORM_VARNAME] =&gt; ANKETA             [RS_FORM_SID] =&gt; ANKETA             [RS_RESULT_ID] =&gt; 11            
+ * [RS_DATE_CREATE] =&gt; 24.07.2011 16:59:55             [RS_USER_ID] =&gt; 1             [RS_USER_EMAIL] =&gt;
+ * my@email.com             [RS_USER_NAME] =&gt;               [RS_USER_AUTH] =&gt;               [RS_STAT_GUEST_ID] =&gt;
+ * 1             [RS_STAT_SESSION_ID] =&gt; 1             [VS_NAME] =&gt; sfdsf             [VS_NAME_RAW] =&gt; sfdsf      
+ *       [VS_BIRTHDAY] =&gt; 21.07.2011             [VS_BIRTHDAY_RAW] =&gt; 21.07.2011             [VS_ADDRESS] =&gt;
+ * sdfdsf             [VS_ADDRESS_RAW] =&gt; sdfdsf             [VS_MARRIED] =&gt; Да [4]             [VS_MARRIED_RAW]
+ * =&gt; Да             [VS_INTEREST] =&gt; физика (2) [7]                             
+ * программирование (5) [10]             [VS_INTEREST_RAW] =&gt;
+ * физика,программирование             [VS_AGE] =&gt; 30-39 (30) [13]             [VS_AGE_RAW] =&gt;
+ * 30-39             [VS_EDUCATION] =&gt; высшее (3) [19]             [VS_EDUCATION_RAW] =&gt; высшее          
+ *   [VS_INCOME] =&gt;               [VS_INCOME_RAW] =&gt;               [VS_PHOTO] =&gt;               [VS_PHOTO_RAW]
+ * =&gt;           )</pre>          </span>
  *
- * @param string &$message_id  Идентификатор почтового шаблона (если указан).
+ * @param string &$message_id  Идентификатор почтового шаблона (если указан). Если переменная
+ * определена в обработчике, то среди нескольких почтовых шаблонов
+ * по одному типу будет отправлен только с этим ID, а не все.
  *
- * @param string &$files  Файл</b
+ * @param string &$files  Файл
  *
  * @return mixed <div>Нет. Начиная с версии ядра 11.0.16 при возврате <em>false</em> добавление
  * почтового события отменяется.</div>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * //Обработчик в файле /bitrix/php_interface/init.php
  * AddEventHandler("main", "OnBeforeEventAdd", array("MyClass", "OnBeforeEventAddHandler"));
@@ -890,10 +888,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeeventsend.php">Событие
- * "OnBeforeEventSend"</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cevent/send.php">CEvent::Send</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * "OnBeforeEventSend"</a> </li>     <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cevent/send.php">CEvent::Send</a> </li>   <li> <a
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -913,7 +911,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -936,8 +934,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnBeforeEventMessageDelete"
  * RegisterModuleDependences("main", "<b>OnBeforeEventMessageDelete</b>", 
@@ -950,8 +946,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/oneventmessagedelete.php">Событие
  * "OnEventMessageDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/delete.php">CEventMessage::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -967,7 +963,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * AddEventHandler('main', 'OnBeforeEventSend', Array("MyForm", "my_OnBeforeEventSend"));
  * class MyForm
  * {
@@ -990,7 +986,7 @@ class _CEventsMain {
 	public static function OnBeforeEventSend(){}
 
 /**
- * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> до добавления группы, и может быть использовано для отмены добавления или переопределения некоторых полей.</p>
+ * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/add.php">CGroup::Add</a> до добавления группы,  и может быть использовано для отмены добавления или переопределения некоторых полей.</p>
  *
  *
  * @param array &$arFields  Список полей (<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">класс
@@ -1004,15 +1000,15 @@ class _CEventsMain {
  * <i>false</i>.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnBeforeGroupAdd", "MyOnBeforeGroupAdd");<br>function MyOnBeforeGroupAdd(&amp;$arFields)<br>{<br>	if($arFields["DESCRIPTION"] == '')<br>		$arFields["DESCRIPTION"] = "Описание группы";<br>}<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
- * </ul></bod<a name="examples"></a>
+ * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li>  <li> <a
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1031,7 +1027,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1055,8 +1051,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnBeforeGroupDelete" для модуля my_module_id
  * RegisterModuleDependences("main", "<b>OnBeforeGroupDelete</b>", 
@@ -1069,8 +1063,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/ongroupdelete.php">Событие
  * "OnGroupDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php">CGroup::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1080,10 +1074,10 @@ class _CEventsMain {
 	public static function OnBeforeGroupDelete($group_id){}
 
 /**
- * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> до изменения полей группы, и может быть использовано для отмены изменения или переопределения некоторых полей.</p>
+ * <p>Событие вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/update.php">CGroup::Update</a> до изменения полей группы,  и может быть использовано для отмены изменения или переопределения некоторых полей.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемой группы пользователей.
+ * @param int $intID  Идентификатор изменяемой группы пользователей.
  *
  * @param array &$arFields  Список полей (<a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">класс
  * CGroup</a>) изменяемой группы пользователей.
@@ -1096,35 +1090,35 @@ class _CEventsMain {
  * <i>false</i>.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnBeforeGroupUpdate", "MyOnBeforeGroupUpdate");<br>function MyOnBeforeGroupUpdate($ID, &amp;$arFields)<br>{<br>	if($ID == 1)<br>		$arFields["DESCRIPTION"] = "Главная группа админов.";<br>}<br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/index.php">CGroup</a> </li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
- * </ul></bod<a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> 
+ * </ul><a name="examples"></a>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/main/events/onbeforegroupupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeGroupUpdate($ID, &$arFields){}
+	public static function OnBeforeGroupUpdate($intID, &$arFields){}
 
 /**
  * Событие "OnBeforeLanguageDelete" вызывается перед <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">удалением языка</a>. Как правило задачи обработчика данного события - разрешить или запретить удаление языка.
  *
  *
- * @param string $language_id  ID удаляемого языка. </h
+ * @param string $language_id  ID удаляемого языка.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -1147,8 +1141,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnBeforeLanguageDelete"
  * RegisterModuleDependences("main", "<b>OnBeforeLanguageDelete</b>", 
@@ -1174,13 +1166,13 @@ class _CEventsMain {
  * Событие "OnBeforeSiteDelete" вызывается перед <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">удалением сайта</a>. Как правило задачи обработчика данного события - разрешить или запретить удаление сайта.
  *
  *
- * @param string $site_id  ID удаляемого сайта. </ht
+ * @param string $site_id  ID удаляемого сайта.
  *
  * @return bool <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CSite::Delete</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -1203,8 +1195,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnBeforeSiteDelete"
  * RegisterModuleDependences("main", "<b>OnBeforeSiteDelete</b>", 
@@ -1216,8 +1206,8 @@ class _CEventsMain {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onsitedelete.php">Событие "OnSiteDelete"</a></li>
  * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">CSite::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1237,7 +1227,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1261,10 +1251,10 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruseradd.php">Событие
- * "OnAfterUserAdd"</a></li> <li><a
+ * "OnAfterUserAdd"</a></li>   <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/add.php">CUser::Add</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1283,7 +1273,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1313,8 +1303,8 @@ class _CEventsMain {
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onuserdelete.php">Событие "OnUserDelete"</a></li>
  * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1327,23 +1317,23 @@ class _CEventsMain {
  * Событие "OnBeforeUserLogin" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> до проверки имени входа <i><span class="syntax"><i>arParams</i></span>['LOGIN']</i> и пароля <i><span class="syntax"><i>arParams</i></span>['PASSWORD'] </i> и попытки авторизовать пользователя, и может быть использовано для прекращения процесса проверки или переопределения некоторых полей.
  *
  *
- * @param array &$arParams  Массив полей для проверки имени входа и пароля: <ul> <li> <b>LOGIN</b> -
- * Логин пользователя</li> <li> <b>PASSWORD</b> - Пароль. Если параметр
+ * @param array &$arParams  Массив полей для проверки имени входа и пароля: 	      <ul> <li> <b>LOGIN</b> -
+ * Логин пользователя</li> 	      <li> <b>PASSWORD</b> - Пароль. Если параметр
  * <b>PASSWORD_ORIGINAL</b> равен"Y", то в данном параметре был передан
  * оригинальный пароль, в противном случае был передан хеш (md5) от
- * оригинального пароля. </li> <li> <b>REMEMBER</b> - Если значение равно "Y", то
- * авторизация пользователя должна быть сохранена в куках.</li> <li>
- * <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y", то это означает что <b>PASSWORD</b>
- * не был сконвертирован в MD5 (т.е. в параметре <b>PASSWORD</b> был передан
- * реальный пароль вводимый пользователем с клавиатуры), если
- * значение равно "N", то это означает что <b>PASSWORD</b> уже сконвертирован
- * в MD5.</li> </ul>
+ * оригинального пароля. </li>           <li> <b>REMEMBER</b> - Если значение равно
+ * "Y", то авторизация пользователя должна быть сохранена в куках.</li>  
+ *         <li> <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y", то это означает что
+ * <b>PASSWORD</b> не был сконвертирован в MD5 (т.е. в параметре <b>PASSWORD</b> был
+ * передан реальный пароль вводимый пользователем с клавиатуры),
+ * если значение равно "N", то это означает что <b>PASSWORD</b> уже
+ * сконвертирован в MD5.</li>         </ul>
  *
  * @return bool <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1368,11 +1358,11 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogin.php">Событие
- * "OnAfterUserLogin"</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+ * "OnAfterUserLogin"</a></li>   <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a>  </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574" ></a>Внешняя
- * авторизация </li> </ul> <a name="examples"></a>
+ * авторизация </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1382,20 +1372,20 @@ class _CEventsMain {
 	public static function OnBeforeUserLogin(&$arParams){}
 
 /**
- * <p>Событие "OnBeforeUserLoginByHash" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash()</a> до проверки имени входа <i><span class="syntax"><i>arParams</i><b></b></span>['LOGIN']</i>, хеша от пароля <i><span class="syntax"><i>arParams</i><b></b></span>['HASH']</i> и попытки авторизовать пользователя. </p>
+ * <p>Событие "OnBeforeUserLoginByHash" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash()</a> до проверки имени входа <i><span class="syntax"><i>arParams</i><b></b></span>['LOGIN']</i>,  хеша от пароля <i><span class="syntax"><i>arParams</i><b></b></span>['HASH']</i> и попытки авторизовать пользователя.      </p>
  *
  *
- * @param array &$arParams  Массив полей для проверки имени входа и пароля: <ul> <li> <b>LOGIN</b> - Имя
- * входа пользователя.</li> <li> <b>HASH</b> - Специальный хеш от пароля
- * пользователя. Данный хеш как правило хранится в куках
- * пользователя.</li> </ul>
+ * @param array &$arParams  Массив полей для проверки имени входа и пароля:       <ul> <li> <b>LOGIN</b> -
+ * Имя входа  пользователя.</li>         <li> <b>HASH</b> - Специальный хеш от
+ * пароля пользователя. Данный хеш как правило хранится в куках
+ * пользователя.</li>       </ul>
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1424,7 +1414,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/loginbyhash.php">CUser::LoginByHash</a></li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574" ></a>Внешняя
- * авторизация </li> </ul> <a name="examples"></a>
+ * авторизация </li>   </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1437,12 +1427,12 @@ class _CEventsMain {
  * <p>Вызывается перед завершением сеанса авторизации пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">CUser::Logout</a> и может быть использовано для отмены завершения сеанса. </p>
  *
  *
- * @param array &$arParams  Массив параметров: <ul> <li> <b>USER_ID</b> - код пользователя</li> </ul>
+ * @param array &$arParams  Массив параметров: 	  <ul> <li> <b>USER_ID</b> - код пользователя</li> 	</ul>
  *
  * @return bool 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1455,8 +1445,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnBeforeUserLogout"
  * RegisterModuleDependences("main", "<b>OnBeforeUserLogout</b>", 
@@ -1468,8 +1456,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogout.php">Событие
  * "OnAfterUserLogout"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/logout.php">CUser::Logout</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1479,26 +1467,28 @@ class _CEventsMain {
 	public static function OnBeforeUserLogout(&$arParams){}
 
 /**
- * Событие "OnBeforeUserRegister" вызывается до попытки регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> и может быть использовано для прекращения процесса регистрации или переопределения некоторых полей. <p class="note"><b>Примечание</b>: функция будет вызываться также при подтверждении регистрации (событие <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserupdate.php">OnBeforeUserUpdate</a>), где ключа LOGIN нет.</p>
+ * Событие "OnBeforeUserRegister" вызывается до попытки регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> и может быть использовано для прекращения процесса регистрации или переопределения некоторых полей.  <p class="note"><b>Примечание</b>: функция будет вызываться также при подтверждении регистрации (событие <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserupdate.php">OnBeforeUserUpdate</a>), где ключа LOGIN нет.</p>
  *
  *
- * @param array &$arArgs  Массив полей регистрации нового пользователя: <ul> <li> <b>LOGIN</b> - имя
- * входа пользователя </li> <li> <b>NAME</b> - имя пользователя </li> <li> <b>LAST_NAME</b>
- * - фамилия пользователя </li> <li> <b>PASSWORD</b> - пароль </li> <li> <b>CONFIRM_PASSWORD</b> -
- * подтверждение пароля </li> <li> <b>CHECKWORD</b> - новое контрольное слово
- * для смены пароля </li> <li> <b>EMAIL</b> - EMail пользователя </li> <li> <b>ACTIVE</b> -
- * флаг активности [Y|N] </li> <li> <b>SITE_ID</b> - ID сайта по умолчанию для
- * уведомлений </li> <li> <b>GROUP_ID</b> - массив ID групп пользователя </li> <li>
- * <b>USER_IP</b> - IP адресс пользователя </li> <li> <b>USER_HOST</b> - хост
- * пользователя </li> </ul> На основании массива полей происходит
- * добавление пользователя и отсылка почтового события NEW_USER.
+ * @param array &$arArgs  Массив полей регистрации нового пользователя: 	         <ul> <li> <b>LOGIN</b> -
+ * имя входа пользователя 		</li>                    <li> <b>NAME</b> - имя пользователя
+ * 		</li>                    <li> <b>LAST_NAME</b> - фамилия пользователя 		</li>                   
+ * <li> <b>PASSWORD</b> - пароль 		</li>                    <li> <b>CONFIRM_PASSWORD</b> - подтверждение
+ * пароля 		</li>                    <li> <b>CHECKWORD</b> - новое контрольное слово для
+ * смены пароля 		</li>                    <li> <b>EMAIL</b> - EMail пользователя 		</li>           
+ *         <li> <b>ACTIVE</b> - флаг активности [Y|N] 		</li>                    <li> <b>SITE_ID</b> - ID
+ * сайта по умолчанию для уведомлений 		</li>                    <li> <b>GROUP_ID</b> -
+ * массив ID групп пользователя 	 </li>                    <li> <b>USER_IP</b> - IP адресс
+ * пользователя 	 </li>                    <li> <b>USER_HOST</b> - хост пользователя 	</li>    
+ *     </ul>        На основании массива полей происходит добавление
+ * пользователя и отсылка почтового события NEW_USER.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -1522,9 +1512,7 @@ class _CEventsMain {
  *         }
  *     }
  * }
- * ?&gt;
- * 
- * &lt;?
+ * ?&gt;&lt;?
  * // регистрируем обработчик события "OnBeforeUserRegister"
  * RegisterModuleDependences("main", "<b>OnBeforeUserRegister</b>", "my_module_id", "MyClass", "OnBeforeUserRegisterHandler");
  * ?&gt;
@@ -1533,9 +1521,9 @@ class _CEventsMain {
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserregister.php">Событие
- * "OnAfterUserRegister"</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >События</a> </li> <li>
- * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul> <a
+ * "OnAfterUserRegister"</a></li>    <li> <a
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" >События</a>  </li>  
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li>  </ul><a
  * name="examples"></a>
  *
  *
@@ -1546,24 +1534,25 @@ class _CEventsMain {
 	public static function OnBeforeUserRegister(&$arArgs){}
 
 /**
- * Событие "OnBeforeUserSimpleRegister" вызывается до попытки упрощённой регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a> и может быть использовано для прекращения процесса регистрации или переопределения некоторых полей.
+ * Событие "OnBeforeUserSimpleRegister" вызывается до попытки упрощённой регистрации нового пользователя методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a>  и может быть использовано для прекращения процесса регистрации или переопределения некоторых полей.
  *
  *
  * @param array &$arFields  Массив полей упрощённой регистрации нового пользователя:<ul> <li>
- * <b>PASSWORD</b> - пароль </li> <li> <b>CONFIRM_PASSWORD</b> - подтверждение пароля </li> <li>
- * <b>CHECKWORD</b> - контрольное слово для смены пароля </li> <li> <b>EMAIL</b> - EMail
- * пользователя </li> <li> <b>ACTIVE</b> - флаг активности [Y|N] </li> <li> <b>SITE_ID</b> - ID
- * сайта по умолчанию для уведомлений </li> <li> <b>GROUP_ID</b> - массив ID групп
- * пользователя </li> <li> <b>USER_IP</b> - IP адрес пользователя </li> <li> <b>USER_HOST</b>
- * - хост пользователя </li> </ul> На основании массива полей происходит
- * добавление пользователя и отсылка почтового события NEW_USER.
+ * <b>PASSWORD</b> - пароль 		</li> <li> <b>CONFIRM_PASSWORD</b> - подтверждение пароля 		</li>
+ * <li> <b>CHECKWORD</b> - контрольное слово для смены пароля 		</li> <li> <b>EMAIL</b> -
+ * EMail пользователя 		</li> <li> <b>ACTIVE</b> - флаг активности [Y|N] 		</li> <li>
+ * <b>SITE_ID</b> - ID сайта по умолчанию для уведомлений 		</li> <li> <b>GROUP_ID</b> -
+ * массив ID групп пользователя         	    </li> <li> <b>USER_IP</b> - IP адрес
+ * пользователя          	    </li> <li> <b>USER_HOST</b> - хост пользователя         </li>
+ * </ul> 	На основании массива полей происходит добавление
+ * пользователя и отсылка почтового события NEW_USER.
  *
  * @return bool <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/simpleregister.php">CUser::SimpleRegister</a><nobr>$APPLICATION-&gt;<a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * AddEventHandler(
@@ -1597,7 +1586,7 @@ class _CEventsMain {
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafterusersimpleregister.php">Событие
  * "OnAfterUserSimpleRegister"</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
- * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul> <a
+ * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/register.php">CUser::Register</a> </li> </ul><a
  * name="examples"></a>
  *
  *
@@ -1618,7 +1607,7 @@ class _CEventsMain {
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/throwexception.php">ThrowException()</a></nobr><i>false</i><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -1636,19 +1625,16 @@ class _CEventsMain {
  *         }
  *     }
  * }
- * ?&gt;
- * 
- * Смотрите также
- * <li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/11321/">Как измененить пароль пользователя с подтверждением старого</a></li>
+ * ?&gt;Смотрите также<li><a href="http://dev.1c-bitrix.ru/community/webdev/user/11948/blog/11321/">Как измененить пароль пользователя с подтверждением старого</a></li>
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserupdate.php">Событие
- * "OnAfterUserUpdate"</a> </li> <li><a
+ * "OnAfterUserUpdate"</a>   </li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/update.php">CUser::Update</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1664,7 +1650,7 @@ class _CEventsMain {
  * @return mixed <p></p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * function OnBuildGlobalMenu(&amp;$aGlobalMenu, &amp;$aModuleMenu)
  *     {
  *      global $USER;
@@ -1719,18 +1705,18 @@ class _CEventsMain {
 	public static function OnBuildGlobalMenu(){}
 
 /**
- * Событие "OnChangePermissions" вызывается при изменении прав доступа к файлу или папке методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">$APPLICATION-&gt;SetFileAccessPermission</a>.
+ * Событие "OnChangePermissions" вызывается при изменении прав доступа  к файлу или папке методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">$APPLICATION-&gt;SetFileAccessPermission</a>.
  *
  *
  * @param array $site_path  Массив вида: array("идентификатор сайта", "путь к файлу относительно
  * корня этого сайта").
  *
- * @param array $permissions  Массив прав доступа. </htm
+ * @param array $permissions  Массив прав доступа.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/search/classes/mysql/search.php
  * class CSearch extends CAllSearch
@@ -1797,8 +1783,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnChangePermissions"
  * RegisterModuleDependences("main", "<b>OnChangePermissions</b>", "search", "CSearch", "OnChangeFilePermissions");
@@ -1811,7 +1795,7 @@ class _CEventsMain {
  * "OnChangeFile"</a> </li> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/setfileaccesspermission.php">CMain::SetFileAccessPermission</a>
  * </li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul> <a name="examples"></a>
+ * ></a>События</li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1829,7 +1813,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -1843,8 +1827,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnEventMessageDelete"
  * RegisterModuleDependences("main", "<b>OnEventMessageDelete</b>", 
@@ -1857,8 +1839,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeeventmessagedelete.php">Событие
  * "OnBeforeEventMessageDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/ceventmessage/delete.php">CEventMessage::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1872,10 +1854,10 @@ class _CEventsMain {
  *
  *
  * @return array <code>Array(Array("ID"=&gt;"Код источника 1", "NAME"=&gt;"Название источника 1"),
- * ...)</code> <br>
+ * ...)</code><br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * AddEventHandler("main", "OnExternalAuthList", Array("__IPBAuth", "OnExternalAuthList"));<br>class __IPBAuth<br>{<br>  function OnExternalAuthList()<br>  {<br>     return Array(
  *       Array("ID"=&gt;"IPB", "NAME"=&gt;"Invision Power Board")<br>      );<br> }<br>}
@@ -1888,7 +1870,7 @@ class _CEventsMain {
  * ></a>События</li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/getexternalauthlist.php">CUser::GetExternalAuthList
  * </a></li> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574"
- * ></a>Внешняя авторизация </li> </ul> <a name="examples"></a>
+ * ></a>Внешняя авторизация </li>     </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1901,21 +1883,21 @@ class _CEventsMain {
  * <p>Событие "OnFileDelete" вызывается после удаления файла в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cfile/delete.php">CFile::Delete</a>. Событие может использоваться для удаления производной от файла информации (созданных при загрузке картинки эскизов и т.п.).</p>
  *
  *
- * @param array $arFile  Массив с информацией об удаленном файле, содержащий ключи: <br> SUBDIR
- * - подпапка в папке для загрузки файлов (обычно в /upload); <br> FILE_NAME - имя
- * удаленного файла. <br>
+ * @param array $arFile  Массив с информацией об удаленном файле, содержащий ключи:         <br>
+ *  SUBDIR - подпапка в папке для загрузки файлов (обычно в /upload);         <br> 
+ * FILE_NAME - имя удаленного файла.         <br>
  *
  * @return void <p>Не используется.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>AddEventHandler("main", "OnFileDelete", "MyOnFileDelete");<br>function MyOnFileDelete($arFile)<br>{<br>	$fname = $_SERVER["DOCUMENT_ROOT"]."/upload/resize/".$arFile["SUBDIR"]."/small_".$arFile["FILE_NAME"];<br>	if(file_exists($fname))<br>		unlink($fname);<br><br>}<br><br>?&gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul></bod<a name="examples"></a>
+ * ></a>События</li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1933,7 +1915,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * AddEventHandler("main", "<b>OnGroupDelete</b>", Array("MyClass", "OnGroupDeleteHandler"));<br>class MyClass
@@ -1954,8 +1936,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforegroupdelete.php">Событие
  * "OnBeforeGroupDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cgroup/delete.php">CGroup::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -1968,12 +1950,12 @@ class _CEventsMain {
  * Событие "OnLanguageDelete" вызывается во время <a href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">удаления языка</a>. Как правило задачи обработчика данного события - очистить базу данных от записей связанных с удаляемым языком.
  *
  *
- * @param int $language_id  ID удаляемого языка. </h
+ * @param int $language_id  ID удаляемого языка.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -1987,8 +1969,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnLanguageDelete"
  * RegisterModuleDependences("main", "<b>OnLanguageDelete</b>", 
@@ -2001,8 +1981,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforelanguagedelete.php">Событие
  * "OnBeforeLanguageDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/clanguage/delete.php">CLanguage::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -2018,7 +1998,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/php_interface/init.php
  * // регистрируем обработчик
@@ -2049,8 +2029,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/general/panel.php">Панель управления</a></li>
  * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/addpanelbutton.php">CMain::AddPanelButton</a></li>
  * <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cmain/showpanel.php">CMain::ShowPanel</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -2063,32 +2043,33 @@ class _CEventsMain {
  * Событие "OnSendUserInfo" вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> и предназначено для возможности переопределения параметров для <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">отправки почтового события</a> USER_INFO.
  *
  *
- * @param array &$arParams  Массив полей для проверки имени входа и пароля: <ul> <li> <b>FIELDS</b> -
- * Массив, содержащий набор полей вида Array("поле 1"=&gt;"значение 1", ...).
+ * @param array &$arParams  Массив полей для проверки имени входа и пароля:          <ul> <li> <b>FIELDS</b>
+ * - Массив, содержащий набор полей вида Array("поле 1"=&gt;"значение 1", ...).
  * При отправке все поля передаются в обработку шаблона USER_INFO.
- * Содержит по умолчанию след. поля:</li> <ul> <li>"USER_ID" - код пользователя,
- * </li> <li>"STATUS" - текст статуса активности, </li> <li>"MESSAGE" - текст
- * сообщения, </li> <li>"LOGIN" - имя входа, </li> <li>"CHECKWORD" - контрольная строка,
- * </li> <li>"NAME" - имя пользователя, </li> <li>"LAST_NAME" - фамилия, </li> <li>"EMAIL" - E-Mail
- * адрес </li> </ul> <li> <b>USER_FIELDS</b> - Все <a
- * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">поля пользователя</a>,
- * информация о котором будет высылаться. </li> <li> <b>SITE_ID</b> - код сайта,
- * используется для определения шаблона почтового события USER_INFO.</li>
- * </ul>
+ * Содержит по умолчанию след. поля:</li>                     <ul> <li>"USER_ID" - код
+ * пользователя, </li>                         <li>"STATUS" - текст статуса активности,
+ * </li>                         <li>"MESSAGE" - текст сообщения, </li>                         <li>"LOGIN" -
+ * имя входа, </li>                         <li>"CHECKWORD" - контрольная строка, </li>           
+ *              <li>"NAME" - имя пользователя, </li>                         <li>"LAST_NAME" -
+ * фамилия, </li>                         <li>"EMAIL" - E-Mail адрес 		</li>            </ul> <li>
+ * <b>USER_FIELDS</b> - Все <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/index.php">поля
+ * пользователя</a>, информация о котором будет высылаться. </li>             
+ *        <li> <b>SITE_ID</b> - код сайта, используется для определения шаблона
+ * почтового события USER_INFO.</li>          </ul>
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;? <br>// файл /bitrix/php_interface/init.php <br>AddEventHandler("main", "OnSendUserInfo", "MyOnSendUserInfoHandler"); <br>function MyOnSendUserInfoHandler(&amp;$arParams) <br>{ <br>   if(strlen($arParams['USER_FIELDS']['LAST_NAME'])&lt;=0) <br>       $arParams['FIELDS']['CUSTOM_NAME'] = $arParams['USER_FIELDS']['LAST_NAME']; <br>   else <br>       $arParams['FIELDS']['CUSTOM_NAME'] = $arParams['USER_FIELDS']['LOGIN']; <br>   // теперь в шаблоне USER_INFO можно использовать макрос #CUSTOM_NAME# <br>} <br>? &gt;
  * </pre>
  *
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/senduserinfo.php">CUser::SendUserInfo</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовые события</a> </li>
- * <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
- * ></a>События</li> </ul> <a name="examples"></a>
+ *     <li> <a href="http://dev.1c-bitrix.ru/api_help/main/general/mailevents.php">Почтовые события</a>
+ * </li>   <li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493"
+ * ></a>События</li>  </ul><a name="examples"></a>
  *
  *
  * @static
@@ -2101,12 +2082,12 @@ class _CEventsMain {
  * Событие "OnSiteDelete" вызывается во время <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/delete.php">удаления сайта</a>. Как правило задачи обработчика данного события - очистить базу данных от записей связанных с удаляемым сайтом.
  *
  *
- * @param int $site_id  ID удаляемого сайта. </ht
+ * @param int $site_id  ID удаляемого сайта.
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -2120,8 +2101,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnSiteDelete"
  * RegisterModuleDependences("main", "<b>OnSiteDelete</b>", 
@@ -2152,7 +2131,7 @@ class _CEventsMain {
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // файл /bitrix/modules/my_module_id/include.php
  * class MyClass
@@ -2167,8 +2146,6 @@ class _CEventsMain {
  *     }
  * }
  * ?&gt;
- * 
- * 
  * &lt;?
  * // регистрируем обработчик события "OnUserDelete"
  * RegisterModuleDependences("main", "<b>OnUserDelete</b>", 
@@ -2181,8 +2158,8 @@ class _CEventsMain {
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserdelete.php">Событие
  * "OnBeforeUserDelete"</a></li> <li><a
  * href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/delete.php">CUser::Delete</a></li> <li> <a
- * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> </ul>
- * <a name="examples"></a>
+ * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li>
+ * </ul><a name="examples"></a>
  *
  *
  * @static
@@ -2192,25 +2169,25 @@ class _CEventsMain {
 	public static function OnUserDelete($user_id){}
 
 /**
- * <p>Событие <b>OnUserLoginExternal</b> предназначено для возможности проверки имени входа и пароля во внешнем источнике. Обработчики этого события вызываются в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a>, если ни один обработчик события <b> OnBegoreUserLogin</b> не вернул <i>false</i>, перед стандартной проверкой имени входа <span class="syntax"><i>arParams</i></span><i>['LOGIN']</i>, пароля <span class="syntax"><i>arParams</i></span><i>['PASSWORD']</i> и попытки авторизовать пользователя.</p>
+ * <p>Событие <b>OnUserLoginExternal</b> предназначено для возможности проверки имени входа и пароля во внешнем источнике. Обработчики этого события вызываются в методе <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a>, если ни один обработчик события <b> OnBegoreUserLogin</b> не вернул <i>false</i>,  перед стандартной проверкой имени входа <span class="syntax"><i>arParams</i></span><i>['LOGIN']</i>, пароля <span class="syntax"><i>arParams</i></span><i>['PASSWORD']</i> и попытки авторизовать пользователя.</p>
  *
  *
- * @param array &$arParams  Массив полей для проверки имени входа и пароля: <ul> <li> <b>LOGIN</b> -
- * Логин пользователя</li> <li> <b>PASSWORD</b> - Пароль. Если параметр
+ * @param array &$arParams  Массив полей для проверки имени входа и пароля:       <ul> <li> <b>LOGIN</b> -
+ * Логин пользователя</li>         <li> <b>PASSWORD</b> - Пароль. Если параметр
  * <b>PASSWORD_ORIGINAL</b> равен"Y", то в данном параметре был передан
  * оригинальный пароль, в противном случае был передан хеш (md5) от
- * оригинального пароля. </li> <li> <b>REMEMBER</b> - Если значение равно "Y", то
- * авторизация пользователя должна быть сохранена в куках.</li> <li>
- * <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y", то это означает что <b>PASSWORD</b>
- * не был сконвертирован в MD5 (т.е. в параметре <b>PASSWORD</b> был передан
- * реальный пароль вводимый пользователем с клавиатуры), если
- * значение равно "N", то это означает что <b>PASSWORD</b> уже сконвертирован
- * в MD5.</li> </ul>
+ * оригинального пароля. </li>         <li> <b>REMEMBER</b> - Если значение равно "Y",
+ * то авторизация пользователя должна быть сохранена в куках.</li>       
+ *  <li> <b>PASSWORD_ORIGINAL</b> - Если значение равно "Y", то это означает что
+ * <b>PASSWORD</b> не был сконвертирован в MD5 (т.е. в параметре <b>PASSWORD</b> был
+ * передан реальный пароль вводимый пользователем с клавиатуры),
+ * если значение равно "N", то это означает что <b>PASSWORD</b> уже
+ * сконвертирован в MD5.</li>     </ul>
  *
  * @return mixed <br>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?
  * // пример авторизации пользователя из таблиц форума Innovision Power Board
  * 
@@ -2311,13 +2288,13 @@ class _CEventsMain {
  *
  *
  * <h4>See Also</h4> 
- * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogin.php">Событие
- * "OnBeforeUserLogin"</a> </li> <li><a
- * href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogin.php">Событие "OnAfterUserLogin"</a></li> <li>
- * <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a> </li> <li> <a
+ * <ul> <li>  <a href="http://dev.1c-bitrix.ru/api_help/main/events/onbeforeuserlogin.php">Событие
+ * "OnBeforeUserLogin"</a> </li>   <li><a
+ * href="http://dev.1c-bitrix.ru/api_help/main/events/onafteruserlogin.php">Событие "OnAfterUserLogin"</a></li>  
+ * <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cuser/login.php">CUser::Login</a>  </li> <li> <a
  * href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3493" ></a>События</li> <li>
  * <a href="http://dev.1c-bitrix.ru/learning/course/index.php?&amp;COURSE_ID=43&amp;LESSON_ID=3574" ></a>Внешняя
- * авторизация </li> </ul> <a name="examples"></a>
+ * авторизация </li> </ul><a name="examples"></a>
  *
  *
  * @static
@@ -2328,8 +2305,6 @@ class _CEventsMain {
 
 /**
  * Аналогично дополнительной обработке onsuccess.
- * 
- * 
  * <i>Вызывается в методе:</i><br>
  * <br><br>
  * 
@@ -2341,8 +2316,6 @@ class _CEventsMain {
 
 /**
  * Аналогично дополнительной обработке onfailure.
- * 
- * 
  * <i>Вызывается в методе:</i><br>
  * <br><br>
  * 

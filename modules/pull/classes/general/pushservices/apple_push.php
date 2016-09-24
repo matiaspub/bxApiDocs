@@ -2,17 +2,19 @@
 
 class CAppleMessage extends CPushMessage
 {
-	const PAYLOAD_MAXIMUM_SIZE = 2048;
+	const DEFAULT_PAYLOAD_MAXIMUM_SIZE = 2048;
 	const APPLE_RESERVED_NAMESPACE = 'aps';
 
 	protected $_bAutoAdjustLongPayload = true;
 
-	public function __construct($sDeviceToken = null)
+	public function __construct($sDeviceToken = null, $maxPayloadSize = 2048)
 	{
 		if (isset($sDeviceToken))
 		{
 			$this->addRecipient($sDeviceToken);
 		}
+
+		$this->payloadMaxSize = (intval($maxPayloadSize)>0 ? intval($maxPayloadSize): self::DEFAULT_PAYLOAD_MAXIMUM_SIZE);
 	}
 
 	public function setAutoAdjustLongPayload($bAutoAdjust)
@@ -67,12 +69,11 @@ class CAppleMessage extends CPushMessage
 			CPushManager::_MakeJson($this->_getPayload(), "", false)
 		);
 		$nJSONPayloadLen = CUtil::BinStrlen($sJSONPayload);
-
-		if ($nJSONPayloadLen > self::PAYLOAD_MAXIMUM_SIZE)
+		if ($nJSONPayloadLen > $this->payloadMaxSize)
 		{
 			if ($this->_bAutoAdjustLongPayload)
 			{
-				$nMaxTextLen = $nTextLen = CUtil::BinStrlen($this->text) - ($nJSONPayloadLen - self::PAYLOAD_MAXIMUM_SIZE);
+				$nMaxTextLen = $nTextLen = CUtil::BinStrlen($this->text) - ($nJSONPayloadLen - $this->payloadMaxSize);
 				if ($nMaxTextLen > 0)
 				{
 					while (CUtil::BinStrlen($this->text = CUtil::BinSubstr($this->text, 0, --$nTextLen)) > $nMaxTextLen) ;
@@ -81,18 +82,12 @@ class CAppleMessage extends CPushMessage
 				}
 				else
 				{
-					throw new Exception(
-						"JSON Payload is too long: {$nJSONPayloadLen} bytes. Maximum size is " .
-							self::PAYLOAD_MAXIMUM_SIZE . " bytes. The message text can not be auto-adjusted."
-					);
+					return false;
 				}
 			}
 			else
 			{
-				throw new Exception(
-					"JSON Payload is too long: {$nJSONPayloadLen} bytes. Maximum size is " .
-						self::PAYLOAD_MAXIMUM_SIZE . " bytes"
-				);
+				return false;
 			}
 		}
 
@@ -103,6 +98,12 @@ class CAppleMessage extends CPushMessage
 	{
 		$arTokens = $this->getRecipients();
 		$sPayload = $this->getPayload();
+
+		if (!$sPayload)
+		{
+			return false;
+		}
+
 		$nPayloadLength = CUtil::BinStrlen($sPayload);
 		$totalBatch = "";
 		for ($i = 0; $i < count($arTokens); $i++)
@@ -114,7 +115,9 @@ class CAppleMessage extends CPushMessage
 			$sRet .= pack('n', $nPayloadLength);
 			$sRet .= $sPayload;
 			if (strlen($totalBatch) > 0)
+			{
 				$totalBatch .= ";";
+			}
 			$totalBatch .= base64_encode($sRet);
 		}
 
@@ -124,6 +127,19 @@ class CAppleMessage extends CPushMessage
 
 class CApplePush extends CPushService
 {
+
+	protected $sandboxModifier;
+	protected $productionModifier;
+
+	/**
+	 * CApplePush constructor.
+	 */
+	public function __construct()
+	{
+		$this->sandboxModifier = 1;
+		$this->productionModifier = 2;
+	}
+
 	/**
 	 * Gets the batch for Apple push notification service
 	 *
@@ -135,13 +151,17 @@ class CApplePush extends CPushService
 	{
 		$arGroupedMessages = self::getGroupedByServiceMode($messageData);
 		if (is_array($arGroupedMessages) && count($arGroupedMessages) <= 0)
+		{
 			return false;
+		}
 
 		$batch = $this->getProductionBatch($arGroupedMessages["PRODUCTION"]);
 		$batch .= $this->getSandboxBatch($arGroupedMessages["SANDBOX"]);
 
 		if (strlen($batch) == 0)
+		{
 			return $batch;
+		}
 
 		return $batch;
 	}
@@ -155,7 +175,7 @@ class CApplePush extends CPushService
 	 */
 	public static function getMessageInstance($token)
 	{
-		return new CAppleMessage($token);
+		return new CAppleMessage($token, 2048);
 	}
 
 	/**
@@ -167,7 +187,7 @@ class CApplePush extends CPushService
 	 */
 	public function getSandboxBatch($appMessages)
 	{
-		return $this->getBatchWithModifier($appMessages, ";1;");
+		return $this->getBatchWithModifier($appMessages, ";" . $this->sandboxModifier . ";");
 	}
 
 	/**
@@ -179,7 +199,36 @@ class CApplePush extends CPushService
 	 */
 	public function getProductionBatch($appMessages)
 	{
-		return $this->getBatchWithModifier($appMessages, ";2;");
+		return $this->getBatchWithModifier($appMessages, ";" . $this->productionModifier . ";");
+	}
+
+
+}
+
+class CApplePushVoip extends CApplePush
+{
+
+	/**
+	 * CApplePushVoip constructor.
+	 */
+	public function __construct()
+	{
+		parent::__construct();
+		$this->sandboxModifier = 4;
+		$this->productionModifier = 5;
+
+	}
+
+	/**
+	 * Returns message instance
+	 *
+	 * @param $token
+	 *
+	 * @return CAppleMessage
+	 */
+	public static function getMessageInstance($token)
+	{
+		return new CAppleMessage($token, 4096);
 	}
 
 

@@ -8,7 +8,7 @@
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * // пример пересчета журнала
  * $gradebook = new CGradeBook; 
  * $gradebook-&gt;RecountAttempts($STUDENT_ID,$TEST_ID);
@@ -90,19 +90,19 @@ class CAllGradeBook
 
 	
 	/**
-	* <p>Метод добавляет новую запись в журнал.</p>
+	* <p>Метод добавляет новую запись в журнал. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
+	* @param array $arFields  Массив <b>Array("поле"=&gt;"значение", ...)</b>. Содержит        значения <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.       
 	* Обязательные поля должны быть заполнены. <br>
 	*
 	* @return int <p>Метод возвращает идентификатор добавленной записи в журнал,
-	* если добавление прошло успешно. При возникновении ошибки метод
-	* вернёт <i>false</i>, а в исключениях будут содержаться ошибки.</p>
+	* если добавление  прошло успешно. При возникновении ошибки метод
+	* вернёт <i>false</i>, а в  исключениях будут содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -138,7 +138,7 @@ class CAllGradeBook
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/update.php">Update</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -165,21 +165,21 @@ class CAllGradeBook
 
 	
 	/**
-	* <p>Метод изменяет параметры записи в журнале с идентификатором ID.</p>
+	* <p>Метод изменяет параметры записи в журнале с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор записи в журнале.
+	* @param int $intID  Идентификатор записи в журнале.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">всех полей</a> журнала.       
 	* Обязательные поля должны быть заполнены. <br>
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернет <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -208,9 +208,9 @@ class CAllGradeBook
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a>  </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/add.php">Add</a> </li> </ul> <a name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/add.php">Add</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -245,16 +245,16 @@ class CAllGradeBook
 
 	
 	/**
-	* <p>Метод удаляет запись в журнале с идентификатором ID.</p>
+	* <p>Метод удаляет запись в журнале с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор записи. </htm
+	* @param int $intID  Идентификатор записи.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления записи, в
-	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	* противном  случае возвращает <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -347,16 +347,16 @@ class CAllGradeBook
 
 	
 	/**
-	* <p>Возвращает запись журнала по идентификатору ID. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает запись журнала по идентификатору ID. Учитываются права доступа текущего пользователя. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор записи в журнале.
+	* @param int $intID  Идентификатор записи в журнале.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -378,7 +378,7 @@ class CAllGradeBook
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -501,44 +501,44 @@ class CAllGradeBook
 
 	
 	/**
-	* <p>Возвращает список записей журнала по фильтру arFilter, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает список записей журнала по фильтру arFilter, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя. Метод статический.</p>
 	*
 	*
 	* @param array $arrayarOrder = Array("ID"=>"DESC") Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* записи;</li> <li> <b>TEST_ID</b> - идентификатор теста;</li> <li> <b>STUDENT_ID</b> -
-	* идентификатор студента ;</li> <li> <b>RESULT</b> - количество баллов;</li> <li>
-	* <b>MAX_RESULT</b> - максимальное количество баллов;</li> <li> <b>COMPLETED</b> - тест
-	* пройден;</li> <li> <b>USER_NAME</b> - имя студента;</li> <li> <b>TEST_NAME</b> - название
-	* теста.</li> </ul> Направление сортировки может принимать значения: <ul>
-	* <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по убыванию;</li> </ul>
-	* Необязательный. По умолчанию фильтруется по убыванию
-	* идентификатора записи журнала.
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> 		Поле для
+	* сортировки может принимать значения: 		<ul> <li> <b>ID</b> - идентификатор
+	* записи;</li> 			<li> <b>TEST_ID</b> - идентификатор теста;</li> 			<li> <b>STUDENT_ID</b> -
+	* идентификатор студента ;</li> 			<li> <b>RESULT</b> - количество баллов;</li>
+	* 			<li> <b>MAX_RESULT</b> - максимальное количество баллов;</li> 			<li> <b>COMPLETED</b> -
+	* тест пройден;</li> 			<li> <b>USER_NAME</b> - имя студента;</li> 			<li> <b>TEST_NAME</b> -
+	* название теста.</li> 		</ul> 		Направление сортировки может принимать
+	* значения: 		<ul> <li> <b>asc</b> - по возрастанию;</li> 		<li> <b>desc</b> - по
+	* убыванию;</li> 		</ul> 	Необязательный. По умолчанию фильтруется по
+	* убыванию идентификатора записи журнала.
 	*
 	* @param array $arrayarFilter = Array() Массив вида <i> array("фильтруемое поле"=&gt;"значение фильтра" [, ...])</i>.
-	* Фильтруемое поле может принимать значения: <ul> <li> <b>ID</b> -
-	* идентификатор записи;</li> <li> <b>TEST_ID</b> - идентификатор теста;</li> <li>
-	* <b>STUDENT_ID</b> - идентификатор студента;</li> <li> <b>RESULT</b> - количество
-	* баллов;</li> <li> <b>MAX_RESULT</b> - максимальное количество баллов;</li> <li>
-	* <b>COMPLETED</b> - тест пройден (Y|N);</li> <li> <b>USER</b> - пользователь (возможны
-	* сложные условия по полям пользователя ID, LOGIN, NAME, LAST_NAME);</li> <li>
+	* 		Фильтруемое поле может принимать значения: 		<ul> <li> <b>ID</b> -
+	* идентификатор записи;</li> 		<li> <b>TEST_ID</b> - идентификатор теста;</li> 		<li>
+	* <b>STUDENT_ID</b> - идентификатор студента;</li> 		<li> <b>RESULT</b> - количество
+	* баллов;</li> 		<li> <b>MAX_RESULT</b> - максимальное количество баллов;</li> 		<li>
+	* <b>COMPLETED</b> - тест пройден (Y|N);</li> 		<li> <b>USER</b> - пользователь (возможны
+	* сложные условия по полям пользователя ID, LOGIN, NAME, LAST_NAME);</li> 		<li>
 	* <b>MIN_PERMISSION</b> - минимальный уровень доcтупа. По умолчанию "R". Список
 	* прав доступа см. в <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li> <li>
-	* <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
-	* значение "N" - права доступа не проверяются.</li> </ul> Перед названием
-	* фильтруемого поля можно указать тип фильтрации: <ul> <li>"!" - не
-	* равно</li> <li>"&lt;" - меньше</li> <li>"&lt;=" - меньше либо равно</li> <li>"&gt;" -
-	* больше</li> <li>"&gt;=" - больше либо равно</li> </ul> <br> "<i>значения
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">CCourse::SetPermission</a>.</li>
+	* 		<li> <b>CHECK_PERMISSIONS</b> - проверять уровень доступа. Если установлено
+	* значение "N" - права доступа не проверяются.</li> 		</ul> 		Перед
+	* названием фильтруемого поля можно указать тип фильтрации: 		<ul>
+	* <li>"!" - не равно</li> 		<li>"&lt;" - меньше</li> 		<li>"&lt;=" - меньше либо равно</li>
+	* 		<li>"&gt;" - больше</li> 		<li>"&gt;=" - больше либо равно</li> 		</ul> <br> "<i>значения
 	* фильтра</i>" - одиночное значение или массив.<br><br> Необязательный.
 	* По умолчанию записи не фильтруются.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -583,7 +583,7 @@ class CAllGradeBook
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/index.php">CGradeBook</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cgradebook/getbyid.php">GetByID</a> </li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a></li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#gradebook">Поля журнала</a></li> </ul><a
 	* name="examples"></a>
 	*
 	*

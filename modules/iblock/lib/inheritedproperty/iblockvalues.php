@@ -21,6 +21,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы, в которой будут сохранены значения наследуемых вычисляемых свойств. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/getvaluetablename.php
+	* @author Bitrix
+	*/
 	static public function getValueTableName()
 	{
 		return "b_iblock_iblock_iprop";
@@ -31,6 +42,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает тип сущности, который будет храниться в базе данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/gettype.php
+	* @author Bitrix
+	*/
 	static public function getType()
 	{
 		return "B";
@@ -41,6 +63,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Метод возвращает уникальный идентификатор инфоблока. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/getid.php
+	* @author Bitrix
+	*/
 	public function getId()
 	{
 		return $this->iblockId;
@@ -61,6 +94,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return array[]\Bitrix\Iblock\InheritedProperty\BaseValues
 	 */
+	
+	/**
+	* <p>Метод возвращает пустой массив родителей инфоблока. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[]\Bitrix\Iblock\InheritedProperty\BaseValues 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/getparents.php
+	* @author Bitrix
+	*/
 	static public function getParents()
 	{
 		return array();
@@ -72,6 +116,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return array[string]string
 	 */
+	
+	/**
+	* <p>Метод возвращает все вычисленные значения наследуемых свойств для инфоблока. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Iblock\InheritedProperty\array[string]string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/queryvalues.php
+	* @author Bitrix
+	*/
 	public function queryValues()
 	{
 		$result = array();
@@ -119,6 +174,17 @@ class IblockValues extends BaseValues
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает значения свойств для инфоблока из кеша базы данных. Нестатический метод.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/inheritedproperty/iblockvalues/clearvalues.php
+	* @author Bitrix
+	*/
 	public function clearValues()
 	{
 		$connection = \Bitrix\Main\Application::getConnection();

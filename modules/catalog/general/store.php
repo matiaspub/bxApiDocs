@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CCatalogStore</b> - класс для работы со складами. 
+ * <b>CCatalogStore</b> - класс для работы со складами.
  *
  *
  * @return mixed 
@@ -16,32 +16,34 @@ class CAllCatalogStore
 {
 	
 	/**
-	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>. Метод динамичный.</p>
+	* <p>Метод служит для проверки параметров, переданных в методы <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>. Нестатический метод.</p>
 	*
 	*
-	* @param string $action  Указывает, для какого метода идет проверка. Возможные значения:
-	* <br><ul> <li> <b>ADD</b> - для метода <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>;</li> <li>
+	* @param string $action  Указывает, для какого метода идет проверка. Возможные значения: 
+	* 			<br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>;</li> 				<li>
 	* <b>UPDATE</b> - для метода <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</li> </ul>
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.</li>
+	* 			</ul>
 	*
-	* @param array &$arFields  Ассоциативный массив параметров склада. Допустимые ключи: <ul>
-	* <li>TITLE - название склада;</li> <li>ACTIVE - активность склада('Y' - активен, 'N'
-	* - не активен);</li> <li>ADDRESS - адрес склада;</li> <li>DESCRIPTION - описание
-	* склада;</li> <li>GPS_N - GPS координата(широта);</li> <li>GPS_S - GPS
-	* координата(долгота);</li> <li>IMAGE_ID - ID картинки склада;</li> <li>PHONE -
-	* телефон;</li> <li>SCHEDULE - расписание работы склада;</li> <li>XML_ID - XML_ID
-	* склада для экспорта\импорта из 1С;</li> </ul>
+	* @param array &$arFields  Ассоциативный массив параметров склада. Допустимые ключи:  			        
+	* <ul> <li>TITLE - название склада;</li>           <li>ACTIVE - активность склада('Y' -
+	* активен, 'N' - не активен);</li> 		  <li>ADDRESS - адрес склада;</li> 		  <li>DESCRIPTION -
+	* описание склада;</li> 		  <li>GPS_N - GPS координата(широта);</li> 		  <li>GPS_S - GPS
+	* координата(долгота);</li> 		  <li>IMAGE_ID - ID картинки склада;</li> 		  <li>PHONE -
+	* телефон;</li> 		  <li>SCHEDULE - расписание работы склада;</li> 		  <li>XML_ID - XML_ID
+	* склада для экспорта\импорта из 1С;</li> 		   		  <li>ISSUING_CENTER - пункт выдачи
+	* (Y/N);</li> 		   		  <li>SHIPPING_CENTER - для отгрузки (Y/N).</li>                  </ul>
 	*
 	* @return bool <p> В случае корректности переданных параметров возвращает true,
 	* иначе - false. Если функция вернула false, с помощью $APPLICATION-&gt;GetException()
 	* можно получить текст ошибок.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a></li> </ul>
-	* </ht<br><br>
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>
+	* 	<li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li>
+	* 	<li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a></li>
+	* </ul><br><br>
 	*
 	*
 	* @static
@@ -93,22 +95,25 @@ class CAllCatalogStore
 	* <p>Метод изменяет параметры склада с кодом ID, в соответствии с данными из массива arFields. Метод статический.</p>
 	*
 	*
-	* @param int $Id  Код склада для изменения.
+	* @param mixed $intId  Код склада для изменения.
 	*
 	* @param array $arFields  Ассоциативный массив параметров склада, ключами в котором
 	* являются названия параметров, а значениями - соответствующие
-	* значения. Допустимые ключи: <br><ul> <li>TITLE - название склада;</li> <li>ACTIVE -
-	* активность склада('Y' - активен, 'N' - не активен);</li> <li>ADDRESS - адрес
-	* склада;</li> <li>DESCRIPTION - описание склада;</li> <li>GPS_N - GPS
-	* координата(широта);</li> <li>GPS_S - GPS координата(долгота);</li> <li>IMAGE_ID - ID
-	* картинки склада;</li> <li>PHONE - телефон;</li> <li>SCHEDULE - расписание работы
-	* склада;</li> <li>XML_ID - XML_ID склада для экспорта\импорта из 1С;</li> </ul>
+	* значения. Допустимые ключи:         <br><ul> <li>TITLE - название склада;</li>     
+	*               <li>ACTIVE - активность склада('Y' - активен, 'N' - не активен);</li> 		  
+	* 		  <li>ADDRESS - адрес склада;</li> 		   		  <li>DESCRIPTION - описание склада;</li> 		   		 
+	* <li>GPS_N - GPS координата(широта);</li> 		   		  <li>GPS_S - GPS
+	* координата(долгота);</li> 		   		  <li>IMAGE_ID - ID картинки склада;</li> 		   		 
+	* <li>PHONE - телефон;</li> 		   		  <li>SCHEDULE - расписание работы склада;</li> 		   		 
+	* <li>XML_ID - XML_ID склада для экспорта\импорта из 1С;</li> 		   		  <li>ISSUING_CENTER -
+	* пункт выдачи (Y/N);</li> 		   		  <li>SHIPPING_CENTER - для отгрузки (Y/N).</li>                  
+	*         </ul>
 	*
 	* @return int <p>Возвращает <i>ID</i> измененного склада, если операция прошла
-	* успешно, в противном случае - <i>false</i>.</p> <a name="examples"></a>
+	* успешно, в противном случае - <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $arFields = Array(
 	* 		"TITLE" =&gt; $TITLE,
 	* 		"ACTIVE" =&gt; $ACTIVE,
@@ -189,13 +194,13 @@ class CAllCatalogStore
 	* <p>Метод удаляет склад с кодом ID. При этом удаляются так же все остатки товаров, относящиеся к этому складу. Метод статический.</p>
 	*
 	*
-	* @param int $Id  Код склада для удаления.
+	* @param mixed $intId  Код склада для удаления.
 	*
 	* @return bool <p>Возвращает <i>true</i>, если операция прошла успешно, в противном
-	* случае - <i>false</i>.</p> <a name="examples"></a>
+	* случае - <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $result = CCatalogStore::Delete($id);
 	* </pre>
 	*

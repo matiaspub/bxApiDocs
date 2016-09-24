@@ -3,13 +3,13 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <p>Непосредственно от абстрактного класса CBPActivity наследуются действия, которые не могут содержать внутри себя другие действия. Этот класс определяет набор базовых методов, которые необходимы любому действию. Некоторые методы, определенные в классе CBPActivity могут или должны быть переопределены в классе-наследнике.</p> <p>Составные действия наследуются от абстрактного класса <b>CBPCompositeActivity</b>, который в свою очередь наследуется от класса CBPActivity. Класс <b>CBPCompositeActivity</b> обеспечивает поддержку возможности включать внутрь действия дочерние действия. Например, составным действием является стандартное действие <b>CBPParallelActivity</b> (параллельное выполнение), которое содержит в себе дочерние действия, соответствующие веткам параллельного выполнения.</p> <p>Класс <b>CBPCompositeActivity</b> содержит член <b>arActivities</b>, с помощью которого можно обращаться к дочерним действиям.</p> <p>Класс <b>CBPActivity</b> содержит следующие члены, которые можно применять в действиях-наследниках:</p> <ul> <li> <b>workflow</b> – содержит объект-оболочку типа CBPWorkflow для данного бизнес-процесса,</li> <li> <b>parent</b> – содержит родительское действие,</li> <li> <b>executionStatus</b> – статус выполнения действия,</li> <li> <b>executionResult</b> – результат выполнения действия.</li> </ul> <br>
+ * <p>Непосредственно от абстрактного класса CBPActivity наследуются действия, которые не могут содержать внутри себя другие действия. Этот класс определяет набор базовых методов, которые необходимы любому действию. Некоторые методы, определенные в классе CBPActivity могут или должны быть переопределены в классе-наследнике.</p>   <p>Составные действия наследуются от абстрактного класса <b>CBPCompositeActivity</b>, который в свою очередь наследуется от класса CBPActivity. Класс <b>CBPCompositeActivity</b> обеспечивает поддержку возможности включать внутрь действия дочерние действия. Например, составным действием является стандартное действие <b>CBPParallelActivity</b> (параллельное выполнение), которое содержит в себе дочерние действия, соответствующие веткам параллельного выполнения.</p>   <p>Класс <b>CBPCompositeActivity</b> содержит член <b>arActivities</b>, с помощью которого можно обращаться к дочерним действиям.</p> <p>Класс <b>CBPActivity</b> содержит следующие члены, которые можно применять в действиях-наследниках:</p> <ul> <li> <b>workflow</b> – содержит объект-оболочку типа CBPWorkflow для данного бизнес-процесса,</li> <li> <b>parent</b> – содержит родительское действие,</li>  <li> <b>executionStatus</b> – статус выполнения действия,</li>  <li> <b>executionResult</b> – результат выполнения действия.</li>  </ul> <br>
  *
  *
  * @return mixed 
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * &lt;?<br>// Код класса действия, которое создаст файл с указанным в свойствах действия именем<br>class CBPMyActivity<br>	extends CBPActivity<br>{<br>	public function __construct($name)<br>	{<br>		parent::__construct($name);<br>		// Определим свойство FileName, в котором будет содержаться имя файла<br>		$this-&gt;arProperties = array("Title" =&gt; "", "FileName" =&gt; "");<br>	}<br><br>	// Исполняемый метод действия<br>	public function Execute()<br>	{<br>		// Если свойство с именем файла задано, осуществим в него запись<br>		// Обратите внимание, что для упрощения кода здесь не добавлены<br>		// необходимые проверки безопасности <br>		if (strlen($this-&gt;FileName) &gt; 0)<br>		{<br>			$f = fopen($this-&gt;FileName, "w");<br>			fwrite($f, "Какой-то текст");<br>			fclose($f);<br>		}<br><br>		// Вернем указание исполняющей среде, что действие завершено<br>		return CBPActivityExecutionStatus::Closed;<br>	}<br>}<br>?&gt;
  * </pre>
  *
@@ -144,6 +144,12 @@ abstract class CBPActivity
 		return $rootActivity->arFieldTypes[$rootActivity->arPropertiesTypes[$propertyName]["Type"]]["BaseType"];
 	}
 
+	public function getTemplatePropertyType($propertyName)
+	{
+		$rootActivity = $this->GetRootActivity();
+		return $rootActivity->arPropertiesTypes[$propertyName];
+	}
+
 	public function SetProperties($arProperties = array())
 	{
 		if (count($arProperties) > 0)
@@ -178,14 +184,17 @@ abstract class CBPActivity
 			{
 				if ($rootActivity->arFieldTypes[$value["Type"]]["BaseType"] == "file")
 				{
-					if (is_array($rootActivity->arVariables[$key]))
+					foreach ((array) $rootActivity->arVariables[$key] as $v)
 					{
-						foreach ($rootActivity->arVariables[$key] as $v)
-							CFile::Delete($v);
-					}
-					else
-					{
-						CFile::Delete($rootActivity->arVariables[$key]);
+						if (intval($v) > 0)
+						{
+							$iterator = \CFile::getByID($v);
+							if ($file = $iterator->fetch())
+							{
+								if ($file['MODULE_ID'] === 'bizproc')
+									CFile::Delete($v);
+							}
+						}
 					}
 				}
 				if ($fieldTypeObject = $documentService->getFieldTypeObject($documentType, $value))
@@ -315,6 +324,7 @@ abstract class CBPActivity
 			$arState = $stateService->GetWorkflowState($this->GetWorkflowInstanceId());
 
 			$arActivities = $rootActivity->CollectNestedActivities();
+			/** @var CBPActivity $activity */
 			foreach ($arActivities as $activity)
 				if ($activity->GetName() == $arState["STATE_NAME"])
 					break;
@@ -491,7 +501,7 @@ abstract class CBPActivity
 						$r = $calc->Calculate($matches[1]);
 						if (is_array($r))
 							$r = implode(', ', $r);
-						return $r !== null? $r : $matches[0];
+						return $r !== null? $r.$matches[2] : $matches[0];
 					},
 					$val
 				);
@@ -527,6 +537,20 @@ abstract class CBPActivity
 			/** @var CBPDocumentService $documentService */
 			$documentService = $this->workflow->GetService("DocumentService");
 			$document = $documentService->GetDocument($documentId);
+			$documentType = $this->GetDocumentType();
+			$documentFields = $documentService->GetDocumentFields($documentType);
+			//check aliases
+			$documentFieldsAliasesMap = CBPDocument::getDocumentFieldsAliasesMap($documentFields);
+			if (!isset($document[$fieldName]) && strtoupper(substr($fieldName, -strlen('_PRINTABLE'))) == '_PRINTABLE')
+			{
+				$fieldName = substr($fieldName, 0, -strlen('_PRINTABLE'));
+				if (!in_array('printable', $modifiers))
+					$modifiers[] = 'printable';
+			}
+			if (!isset($document[$fieldName]) && isset($documentFieldsAliasesMap[$fieldName]))
+			{
+				$fieldName = $documentFieldsAliasesMap[$fieldName];
+			}
 
 			$result = '';
 
@@ -538,9 +562,7 @@ abstract class CBPActivity
 
 				if (!empty($modifiers))
 				{
-					$documentType = $this->GetDocumentType();
-					$fields = $documentService->GetDocumentFields($documentType);
-					$property = isset($fields[$fieldName]) ? $fields[$fieldName] : null;
+					$property = isset($documentFields[$fieldName]) ? $documentFields[$fieldName] : null;
 				}
 			}
 		}
@@ -558,7 +580,7 @@ abstract class CBPActivity
 			{
 				case 'Variable':
 					$result = $rootActivity->GetVariable($fieldName);
-					$property = $rootActivity->arVariablesTypes[$fieldName];
+					$property = $rootActivity->getVariableType($fieldName);
 					break;
 				case 'Constant':
 					$result = $rootActivity->GetConstant($fieldName);
@@ -566,7 +588,7 @@ abstract class CBPActivity
 					break;
 				default:
 					$result = $rootActivity->{$fieldName};
-					$property = $rootActivity->arPropertiesTypes[$fieldName];
+					$property = $rootActivity->getTemplatePropertyType($fieldName);
 			}
 		}
 		elseif ($objectName == "Workflow")
@@ -587,16 +609,17 @@ abstract class CBPActivity
 
 			$result = null;
 			$property = array('Type' => 'datetime');
-			if ($fieldName == "Now")
+			$systemField = strtolower($fieldName);
+			if ($systemField === 'now')
 				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")));
-			elseif ($fieldName == "NowLocal")
+			elseif ($systemField === 'nowlocal')
 			{
 				$result = time();
 				if (CTimeZone::Enabled())
 					$result += CTimeZone::GetOffset();
 				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), $result);
 			}
-			elseif ($fieldName == "Date")
+			elseif ($systemField == 'date')
 			{
 				$result = date($DB->DateFormatToPHP(CSite::GetDateFormat("SHORT")));
 				$property = array('Type' => 'date');
@@ -800,6 +823,7 @@ abstract class CBPActivity
 
 		if (is_subclass_of($this, "CBPCompositeActivity"))
 		{
+			/** @var CBPActivity $activity */
 			foreach ($this->arActivities as $activity)
 				$result .= $activity->Dump($level + 1);
 		}
@@ -1065,6 +1089,7 @@ abstract class CBPActivity
 
 	protected function WriteToTrackingService($message = "", $modifiedBy = 0, $trackingType = -1)
 	{
+		/** @var CBPTrackingService $trackingService */
 		$trackingService = $this->workflow->GetService("TrackingService");
 		if ($trackingType < 0)
 			$trackingType = CBPTrackingType::Custom;

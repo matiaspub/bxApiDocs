@@ -1,6 +1,17 @@
 <?
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/usertype.php");
 
+
+/**
+ * Класс CUserTypeEntity расширяет класс CAllUserTypeEntity.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cusertypeentity/index.php
+ * @author Bitrix
+ */
 class CUserTypeEntity extends CAllUserTypeEntity
 {
 	public static function CreatePropertyTables($entity_id)
@@ -11,7 +22,7 @@ class CUserTypeEntity extends CAllUserTypeEntity
 			if(defined("MYSQL_TABLE_TYPE"))
 				$DB->Query("SET storage_engine = '".MYSQL_TABLE_TYPE."'", true);
 			$rs = $DB->Query("
-				create table b_utm_".strtolower($entity_id)." (
+				create table IF NOT EXISTS b_utm_".strtolower($entity_id)." (
 					ID int(11) not null auto_increment,
 					VALUE_ID int(11) not null,
 					FIELD_ID int(11) not null,
@@ -38,7 +49,7 @@ class CUserTypeEntity extends CAllUserTypeEntity
 				$DB->Query("SET storage_engine = '".MYSQL_TABLE_TYPE."'", true);
 
 			$rs = $DB->Query("
-				create table b_uts_".strtolower($entity_id)." (
+				create table IF NOT EXISTS b_uts_".strtolower($entity_id)." (
 					VALUE_ID int(11) not null,
 					PRIMARY KEY (VALUE_ID)
 				)

@@ -43,7 +43,7 @@
 
 
 /************************************************************************************/
-/************   Crypography   *******************************************************/
+/************   Cryptography   *******************************************************/
 /************************************************************************************/
 
 // CRYPT_MODE_ECB (electronic codebook) is suitable for random data, such as 
@@ -62,11 +62,12 @@ class CCrypt
 	var $blockCipherMode = CRYPT_MODE_CBC;
 	var $key = "";
 	var $iv = "";
+	/** @var CCryptblowfish|CCryptrc4 */
 	var $cipher = null;
 	var $errorMessage = "";
 
 
-	public function CCrypt($blockCipherMode = CRYPT_MODE_CBC, $cipher = "blowfish", $key = "", $iv = "")
+	public function __construct($blockCipherMode = CRYPT_MODE_CBC, $cipher = "blowfish", $key = "", $iv = "")
 	{
 		$cipher = strtolower($cipher);
 
@@ -304,7 +305,7 @@ class CSteganos
 	var $offset;
 
 
-	static function CSteganos()
+	static public function __construct()
 	{
 	}
 
@@ -364,6 +365,8 @@ class CSteganos
 		$this->__HideData();
 
 		$this->__SaveResult();
+
+		return null;
 	}
 
 
@@ -492,7 +495,7 @@ class CSteganos
 
 			$data = sprintf("BSAW%08x", strlen($this->data)).$this->data;
 
-			for ($i = 0, $j = 55; $i < strlen($data); $i++, $j += $levelBase)
+			for ($i = 0, $j = 55, $len = strlen($data); $i < $len; $i++, $j += $levelBase)
 			{  
 				$temp = sprintf("%08s", decbin(ord(substr($data, $i, 1))));
 				for ($k = 0; $k < $levelBase; $k++)
@@ -511,8 +514,10 @@ class CSteganos
 		elseif ($this->containerType == "txt")
 		{
 			$data = "";
-			for ($i = 0; $i < strlen($this->data); $i++)
+			for ($i = 0, $n = strlen($this->data); $i < $n; $i++)
+			{
 				$data .= $this->__ConvertToBitString(ord($this->data[$i]));
+			}
 
 			$containerDataLength = sprintf("%08X", strlen($this->containerData));
 			for ($i = 6; $i >= 0; $i -= 2)
@@ -708,7 +713,7 @@ class CSteganos
 		$b = 0;
 		$j = 0;
 		$binStr = "";
-		for ($i = 0; $i < strlen($bitStr); $i++)
+		for ($i = 0, $n = strlen($bitStr); $i < $n; $i++)
 		{
 			if ($j == 0)
 			{
@@ -954,7 +959,7 @@ class CCryptblowfish
 	var $blockSize = 8;
 
 
-	public function CCryptblowfish($key)
+	public function __construct($key)
 	{
 		$this->arSubkeys = array(
 			"P" => $this->arrP,
@@ -1121,7 +1126,7 @@ class CCryptrc4
 	var $blockSize = 0;
 
 
-	public function CCryptrc4($key)
+	public function __construct($key)
 	{
 		$this->__Init($key);
 	}
@@ -1171,15 +1176,14 @@ class CCryptrc4
 	}
 
 
-	public static function __Encrypt($block)
+	public function __Encrypt($block)
 	{
-		return __Process($block);
+		return $this->__Process($block);
 	}
 
 
-	public static function __Decrypt($block)
+	public function __Decrypt($block)
 	{
-		return __Process($block);
+		return $this->__Process($block);
 	}
 }
-?>

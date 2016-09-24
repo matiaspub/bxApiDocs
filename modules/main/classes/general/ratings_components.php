@@ -143,5 +143,3 @@ class CAllRatingsComponentsMain
 		return $arParams['SHOW_RATING'];
 	}
 }
-
-?>

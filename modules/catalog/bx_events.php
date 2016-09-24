@@ -19,7 +19,7 @@ class _CEventsCatalog {
  * <h4>See Also</h4> 
  * <ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount_add.php">CCatalogDiscount::Add</a>
- * </li> </ul><br><br>
+ * </li>  </ul><br><br>
  *
  *
  * @static
@@ -32,7 +32,7 @@ class _CEventsCatalog {
  * <p>OnBeforeDiscountUpdate - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.update.php">CCatalogDiscount::Update</a> перед обновлением существующей скидки. Позволяет изменить данные до вызова <b>CCatalogDiscount::CheckFields</b> или отменить обновление.</p>
  *
  *
- * @param int $ID  Код скидки.
+ * @param mixed $intID  Код скидки.
  *
  * @param array &$arFields  Ассоциативный массив параметров. Перечень допустимых ключей
  * массива смотрите в <a
@@ -44,14 +44,14 @@ class _CEventsCatalog {
  * <h4>See Also</h4> 
  * <ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.update.php">CCatalogDiscount::Update</a>
- * </li> </ul><br><br>
+ * </li>  </ul><br><br>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforediscountupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeDiscountUpdate($ID, &$arFields){}
+	public static function OnBeforeDiscountUpdate($intID, &$arFields){}
 
 /**
  * <p>OnBeforeCouponAdd - событие, вызываемое перед добавлением нового купона в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a> или отменить запись.</p>
@@ -65,7 +65,7 @@ class _CEventsCatalog {
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>,
  * указывающий на необходимость перегенерировать файл скидок и
  * купонов (эти действия осуществляет метод <b>CCatalogDiscount::GenerateDataFile</b>).
- * Параметр может принимать значения true/false. <br><br> Параметр является
+ * Параметр может принимать значения true/false. 	<br><br> 	Параметр является
  * устаревшим с версии 12.0 и передается только для совместимости.
  *
  * @return bool <p>Возвращает <i>false</i> при отказе, возвращает <i>true</i> при успешном
@@ -87,13 +87,13 @@ class _CEventsCatalog {
  * <p>OnBeforeCouponDelete - событие, вызываемое перед удалением купона в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/delete.php">CCatalogDiscountCoupon::Delete</a>.</p>
  *
  *
- * @param int $ID  Идентификатор удаляемого купона.
+ * @param mixed $intID  Идентификатор удаляемого купона.
  *
  * @param bool &$bAffectDataFile  Параметр метода <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>,
  * указывающий на необходимость перегенерировать файл скидок и
  * купонов (эти действия осуществляет метод <b>CCatalogDiscount::GenerateDataFile</b>).
- * Параметр может принимать значения true/false. <br><br> Параметр является
+ * Параметр может принимать значения true/false. 	<br><br> 	Параметр является
  * устаревшим с версии 12.0 и передается только для совместимости.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
@@ -109,13 +109,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecoupondelete.php
  * @author Bitrix
  */
-	public static function OnBeforeCouponDelete($ID, &$bAffectDataFile){}
+	public static function OnBeforeCouponDelete($intID, &$bAffectDataFile){}
 
 /**
  * <p>OnBeforeCouponUpdate - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a> перед обновлением параметров купона. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/checkfields.php">CCatalogDiscountCoupon::CheckFields</a> или отменить обновление.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемого купона.
+ * @param mixed $intID  Идентификатор изменяемого купона.
  *
  * @param array &$arFields  Ассоциативный массив параметров купона. Перечень допустимых
  * ключей массива смотрите в <a
@@ -134,13 +134,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecouponupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeCouponUpdate($ID, &$arFields){}
+	public static function OnBeforeCouponUpdate($intID, &$arFields){}
 
 /**
  * <p>OnBeforeDiscountDelete - событие, вызываемое перед удалением скидки в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.delete.php">CCatalogDiscount::Delete</a>.</p>
  *
  *
- * @param int $ID  Идентификатор удаляемой скидки.
+ * @param mixed $intID  Идентификатор удаляемой скидки.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
  * отменено.</li> </ul>
@@ -155,12 +155,10 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforediscountdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeDiscountDelete($ID){}
+	public static function OnBeforeDiscountDelete($intID){}
 
 /**
- * Вызывается перед удалением документа.
- * 
- * 
+ * перед удалением документа.
  * <i>Вызывается в методе:</i><br>
  * CCatalogDocs::delete<br><br>
  * 
@@ -171,9 +169,7 @@ class _CEventsCatalog {
 	public static function OnBeforeDocumentDelete(){}
 
 /**
- * Вызывается перед удалением элемента.
- * 
- * 
+ * перед удалением элемента.
  * <i>Вызывается в методе:</i><br>
  * CCatalog::OnBeforeIBlockElementDelete<br><br>
  * 
@@ -187,13 +183,13 @@ class _CEventsCatalog {
  * <p>OnCouponAdd - событие, вызываемое в случае успешного добавления купона.</p>
  *
  *
- * @param int $ID  Идентификатор добавленного купона.
+ * @param mixed $intID  Идентификатор добавленного купона.
  *
  * @param array $arFields  Ассоциативный массив параметров купона. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/add.php">CCatalogDiscountCoupon::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -205,15 +201,15 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncouponadd.php
  * @author Bitrix
  */
-	public static function OnCouponAdd($ID, $arFields){}
+	public static function OnCouponAdd($intID, $arFields){}
 
 /**
  * <p>OnCouponDelete - событие, вызываемое при удалении существующего купона в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/delete.php">CCatalogDiscountCoupon::Delete</a>. Может быть использовано для выполнения каких-либо действий при удалении купона.</p>
  *
  *
- * @param int $ID  Идентификатор купона. </htm
+ * @param mixed $intID  Идентификатор купона.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -225,19 +221,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncoupondelete.php
  * @author Bitrix
  */
-	public static function OnCouponDelete($ID){}
+	public static function OnCouponDelete($intID){}
 
 /**
  * <p>OnCouponUpdate - событие, вызываемое в случае успешного изменения информации о купоне.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемого купона.
+ * @param mixed $intID  Идентификатор изменяемого купона.
  *
  * @param array $arFields  Ассоциативный массив параметров купона. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscountcoupon/update.php">CCatalogDiscountCoupon::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -249,19 +245,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncouponupdate.php
  * @author Bitrix
  */
-	public static function OnCouponUpdate($ID, $arFields){}
+	public static function OnCouponUpdate($intID, $arFields){}
 
 /**
  * <p>OnDiscountAdd - событие, вызываемое в случае успешного добавления скидки.</p>
  *
  *
- * @param int $ID  Идентификатор добавленной скидки.
+ * @param mixed $intID  Идентификатор добавленной скидки.
  *
  * @param array $arFields  Ассоциативный массив параметров скидки. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount_add.php">CCatalogDiscount::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -273,15 +269,15 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ondiscountadd.php
  * @author Bitrix
  */
-	public static function OnDiscountAdd($ID, $arFields){}
+	public static function OnDiscountAdd($intID, $arFields){}
 
 /**
  * <p>OnDiscountDelete - событие, вызываемое при удалении существующей скидки в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.delete.php">CCatalogDiscount::Delete</a>. Может быть использовано для выполнения каких-либо действий при удалении скидки.</p>
  *
  *
- * @param int $ID  Идентификатор скидки.
+ * @param mixed $intID  Идентификатор скидки.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -293,19 +289,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ondiscountdelete.php
  * @author Bitrix
  */
-	public static function OnDiscountDelete($ID){}
+	public static function OnDiscountDelete($intID){}
 
 /**
  * <p>OnDiscountUpdate - событие, вызываемое в случае успешного изменения параметров скидки.</p>
  *
  *
- * @param int $ID  Идентификатор изменяемой скидки.
+ * @param mixed $intID  Идентификатор изменяемой скидки.
  *
  * @param array $arFields  Ассоциативный массив параметров скидки. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.update.php">CCatalogDiscount::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -317,11 +313,10 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ondiscountupdate.php
  * @author Bitrix
  */
-	public static function OnDiscountUpdate($ID, $arFields){}
+	public static function OnDiscountUpdate($intID, $arFields){}
 
 /**
- * Вызывается после OnBeforeDocumentDelete в методе CCatalogStoreDocsBarcodeAll::OnBeforeDocumentDelete.
- * </
+ * после OnBeforeDocumentDelete в методе CCatalogStoreDocsBarcodeAll::OnBeforeDocumentDelete.
  * <i>Вызывается в методе:</i><br>
  * CCatalogStoreDocsBarcodeAll::OnBeforeDocumentDelete<br><br>
  * 
@@ -332,8 +327,7 @@ class _CEventsCatalog {
 	public static function OnDocumentBarcodeDelete(){}
 
 /**
- * Вызывается после OnDocumentBarcodeDelete в методе CCatalogStoreDocsElementAll::OnDocumentBarcodeDelete.
- * </
+ * после OnDocumentBarcodeDelete в методе CCatalogStoreDocsElementAll::OnDocumentBarcodeDelete.
  * <i>Вызывается в методе:</i><br>
  * CCatalogStoreDocsElementAll::OnDocumentBarcodeDelete<br><br>
  * 
@@ -347,7 +341,7 @@ class _CEventsCatalog {
  * <p>OnGenerateCoupon - событие, вызываемое в функции <b>CatalogGenerateCoupon()</b>. Позволяет заменить стандартный метод генерации кода купона.</p> <p></p> <div class="note"> <b>Примечание:</b> длина купона не может быть больше 32 символов.</div>
  *
  *
- * @return string <p>Сгенерированный код купона.</p> <br><br>
+ * @return string <p>Сгенерированный код купона.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ongeneratecoupon.php
@@ -361,7 +355,7 @@ class _CEventsCatalog {
  *
  * @param array &$arResult  Массив выбранных скидок.
  *
- * @return mixed <p>Нет.</p></bo<br><br>
+ * @return mixed <p>Нет.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ongetdiscountresult.php
@@ -370,8 +364,7 @@ class _CEventsCatalog {
 	public static function OnGetDiscountResult(&$arResult){}
 
 /**
- * Вызывается в начале метода CCatalogDiscSave::GetDiscount.
- * </
+ * в начале метода CCatalogDiscSave::GetDiscount.
  * <i>Вызывается в методе:</i><br>
  * CCatalogDiscountSave::GetDiscount<br><br>
  * 
@@ -393,7 +386,7 @@ class _CEventsCatalog {
  * необходимо найти.
  *
  * @return mixed <p>В результате работы обработчика могут быть возвращены
- * следующие значения:</p> <ul> <li> <i>true</i> - обработчик ничего не сделал,
+ * следующие значения:</p><ul> <li> <i>true</i> - обработчик ничего не сделал,
  * будет выполнена работа метода <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getnearestquantityprice.3c16046d.php">CCatalogProduct::GetNearestQuantityPrice</a>;</li>
  * <li> <i>false</i> - доступное для покупки количество найдено не было,
@@ -419,7 +412,7 @@ class _CEventsCatalog {
  * @param int &$nearestQuantity  Количество товара (результат работы метода <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getnearestquantityprice.3c16046d.php">CCatalogProduct::GetNearestQuantityPrice</a>).
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -441,7 +434,7 @@ class _CEventsCatalog {
  *
  * @param int $quantity  
  *
- * @param array $arUserGroups  Количество товара. </htm
+ * @param array $arUserGroups  Количество товара.
  *
  * @param string $renewal  Массив групп, которым принадлежит пользователь.
  *
@@ -452,7 +445,7 @@ class _CEventsCatalog {
  * @param array $arDiscountCoupons  Идентификатор сайта, для которого производится вычисление.
  *
  * @return mixed <p>В результате работы обработчика могут быть возвращены
- * следующие значения:</p> <ul> <li> <i>true</i> - обработчик ничего не сделал,
+ * следующие значения:</p><ul> <li> <i>true</i> - обработчик ничего не сделал,
  * будет выполнена работа метода <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__getoptimalprice.7c16046d.php">CCatalogProduct::GetOptimalPrice</a>;</li>
  * <li> <i>false</i> - возникла ошибка, работа метода прерывается;</li>
@@ -476,7 +469,7 @@ class _CEventsCatalog {
  *
  * @param array &$arResult  Массив, описывающий наименьшую цену для товара.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -494,7 +487,7 @@ class _CEventsCatalog {
  * <p>OnCountPriceWithDiscount - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__countpricewithdiscount.9c16046d.php">CCatalogProduct::CountPriceWithDiscount</a>. Позволяет заменить стандартный метод вычисления цены, получающейся после применения цепочки скидок.</p>
  *
  *
- * @param double $price  Цена.</b
+ * @param double $price  Цена.
  *
  * @param string $currency  Валюта цены.
  *
@@ -502,7 +495,7 @@ class _CEventsCatalog {
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__countpricewithdiscount.9c16046d.php">CCatalogProduct::CountPriceWithDiscount</a>.
  *
  * @return mixed <p>В результате работы обработчика могут быть возвращены
- * следующие значения:</p> <ul> <li> <i>true</i> - обработчик ничего не сделал,
+ * следующие значения:</p><ul> <li> <i>true</i> - обработчик ничего не сделал,
  * будет выполнена работа метода <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__countpricewithdiscount.9c16046d.php">CCatalogProduct::CountPriceWithDiscount</a>;</li>
  * <li> <i>false</i> - возникла ошибка, работа метода прерывается;</li>
@@ -526,7 +519,7 @@ class _CEventsCatalog {
  *
  * @param double &$currentPrice_min  Цена после применения цепочки скидок.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -541,9 +534,7 @@ class _CEventsCatalog {
 	public static function OnCountPriceWithDiscountResult(&$currentPrice_min){}
 
 /**
- * Вызывается при вычислении накопительной скидки.
- * 
- * 
+ * при вычислении накопительной скидки.
  * <i>Вызывается в методе:</i><br>
  * CCatalogDiscountSave::__SaleOrderSumm<br><br>
  * 
@@ -558,20 +549,22 @@ class _CEventsCatalog {
  *
  *
  * @param array &$arFields  Ассоциативный массив параметров ценового предложения.
- * Допустимые параметры: <ul> <li> <b>PRODUCT_ID </b> - код товара;</li> <li> <b>EXTRA_ID</b> -
- * код наценки;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li> <b>PRICE</b> -
- * цена;</li> <li> <b>CURRENCY</b> - валюта цены;</li> <li> <b>QUANTITY_FROM</b> - количество
- * товара, начиная с приобретения которого действует эта цена;</li> <li>
- * <b>QUANTITY_TO</b> - количество товара, при приобретении которого
- * заканчивает действие эта цена. <p></p> <div class="note"> <b>Примечание:</b>
- * если необходимо, чтобы значения параметров <b>QUANTITY_FROM</b> и
- * <b>QUANTITY_TO</b> не были заданы, необходимо указать у них в качестве
- * значения false либо не задавать поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в
- * измененном массиве. </div> </li> </ul> Если установлен код наценки, то
- * появляется возможность автоматически пересчитывать эту цену при
- * изменении базовой цены или процента наценки.
+ * Допустимые параметры:          <ul> <li> <b>PRODUCT_ID </b> - код товара;</li>          	   
+ *         <li> <b>EXTRA_ID</b> - код наценки;</li>          	            <li> <b>CATALOG_GROUP_ID</b> - код
+ * типа цены;</li>          	            <li> <b>PRICE</b> - цена;</li>          	            <li>
+ * <b>CURRENCY</b> - валюта цены;</li>          	            <li> <b>QUANTITY_FROM</b> - количество
+ * товара, начиная с приобретения которого действует эта цена;</li>      
+ *    	            <li> <b>QUANTITY_TO</b> - количество товара, при приобретении
+ * которого заканчивает действие эта цена. 	              <p></p> <div class="note">
+ * <b>Примечание:</b> если необходимо, чтобы значения параметров
+ * <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были 	 заданы, необходимо указать у них
+ * в качестве значения false либо не задавать поля <b>QUANTITY_FROM</b> и
+ * <b>QUANTITY_TO</b> в измененном массиве. </div>            	</li>          	 	 </ul>        Если
+ * установлен код наценки, то появляется возможность автоматически
+ * пересчитывать эту цену при изменении базовой цены или процента
+ * наценки.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add </a> </li> </ul><br><br>
@@ -587,27 +580,29 @@ class _CEventsCatalog {
  * OnBeforePriceUpdate - событие, вызываемое перед обновлением существующей цены. На входе получает ID цены и ссылку на массив полей.
  *
  *
- * @param int $ID  Идентификатор цены. </h
+ * @param mixed $intID  Идентификатор цены.
  *
  * @param array &$arFields  Ассоциативный массив параметров ценового предложения.
- * Допустимые параметры: <ul> <li> <b>PRODUCT_ID </b> - код товара;</li> <li> <b>EXTRA_ID</b> -
- * код наценки;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li> <b>PRICE</b> -
- * цена;</li> <li> <b>CURRENCY</b> - валюта цены;</li> <li> <b>QUANTITY_FROM</b> - количество
- * товара, начиная с приобретения которого действует эта цена;</li> <li>
- * <b>QUANTITY_TO</b> - количество товара, при приобретении которого
- * заканчивает действие эта цена. <p></p> <div class="note"> <b>Примечание:</b>
- * если необходимо, чтобы значения параметров <b>QUANTITY_FROM</b> и
- * <b>QUANTITY_TO</b> не были заданы, необходимо указать у них в качестве
- * значения false либо не задавать поля <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в
- * измененном массиве. </div> </li> </ul> Если установлен код наценки, то
- * появляется возможность автоматически пересчитывать эту цену при
- * изменении базовой цены или процента наценки.
+ * Допустимые параметры:          <ul> <li> <b>PRODUCT_ID </b> - код товара;</li>          	   
+ *         <li> <b>EXTRA_ID</b> - код наценки;</li>          	            <li> <b>CATALOG_GROUP_ID</b> - код
+ * типа цены;</li>          	            <li> <b>PRICE</b> - цена;</li>          	            <li>
+ * <b>CURRENCY</b> - валюта цены;</li>          	            <li> <b>QUANTITY_FROM</b> - количество
+ * товара, начиная с приобретения которого действует эта цена;</li>      
+ *    	            <li> <b>QUANTITY_TO</b> - количество товара, при приобретении
+ * которого заканчивает действие эта цена. 	              <p></p> <div class="note">
+ * <b>Примечание:</b> если необходимо, чтобы значения параметров
+ * <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы, необходимо указать у них в
+ * качестве значения false либо не задавать поля <b>QUANTITY_FROM</b> и
+ * <b>QUANTITY_TO</b> в измененном массиве. </div>            	</li>          	 	 </ul>        Если
+ * установлен код наценки, то появляется возможность автоматически
+ * пересчитывать эту цену при изменении базовой цены или процента
+ * наценки.
  *
  * @return bool <p>Может вернуть <i>false</i>, если нужно воспрепятствовать обновлению.
  * В противном случае нужно вернуть значение <i>true</i>.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * //Обработчик запрещает менять валюту цен на любую, кроме рублей
  * function NationalCurrency(ID, &amp;arFields)  
  * {  
@@ -632,7 +627,7 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php
  * @author Bitrix
  */
-	public static function OnBeforePriceUpdate($ID, &$arFields){}
+	public static function OnBeforePriceUpdate($intID, &$arFields){}
 
 /**
  * <b>OnBeforePriceDelete</b> - событие, вызываемое перед удалением существующей цены товара в методе CPrice::Delete(). На вход получает ID цены товара (см. <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete </a>). Если обработчик возвращает false, удаление будет отменено.
@@ -640,14 +635,12 @@ class _CEventsCatalog {
  *
  * @param int $ID  код цены товара (ценового предложения)
  *
- * @return OnBeforePriceDelete <ul> <li> <i>true</i>, если удаление разрешено </li> <li> <i>false</i>, если удаление
+ * @return OnBeforePriceDelete <ul> <li> <i>true</i>, если удаление разрешено </li>   <li> <i>false</i>, если удаление
  * запрещено </li> </ul>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * В процессе выгрузки после обновления цены товара все ценовые предложения, которых нет в файле выгрузки, удаляются. Для предотвращения удаления цены можно использовать обработчик (пример рабочий, но замедляющий работу системы):
- * 
- * 
  * AddEventHandler("catalog", "OnBeforePriceDelete", "BXOnBeforePriceDelete"); 
  *  
  * function BXOnBeforePriceDelete($ID) { 
@@ -697,25 +690,21 @@ class _CEventsCatalog {
  *
  * @param array &$arExceptionIDs  Массив, содержащий ID цен, которые необходимо оставить (не удалять)
  *
- * @return mixed <ul> <li> <i>true</i>, если удаление разрешено </li> <li> <i>false</i>, если удаление
+ * @return mixed <ul> <li> <i>true</i>, если удаление разрешено </li>   <li> <i>false</i>, если удаление
  * запрещено </li> </ul>
  *
  * <h4>Example</h4> 
- * <pre>
- * <b>Запрет на удаление цен для товаров</b> (обработчик в файле <i>/bitrix/php_interface/init.php</i>)
- * 
- * function DeleteProductPriceStop ($intID,&amp;$arExceptionIDs)<br>{<br>   return false;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStop");<br>
- * <b>Запрет на удаление рублевых цен для товаров</b>
- * 
- * function DeleteProductPriceStopRub ($intID,&amp;$arExceptionIDs)<br>{<br>   if (CModule::IncludeModule('catalog'))<br>   {<br>      $rsPrices = CPrice::GetList(array(),array('PRODUCT_ID' =&gt; $intID,'CURRENCY' =&gt; 'RUB'));<br>      while ($arPrice = $rsPrices-&gt;Fetch())<br>      {<br>         $arExceptionIDs[] = $arPrice['ID'];<br>      }<br>   }<br>   return true;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStopRub");<br>
+ * <pre bgcolor="#323232" style="padding:5px;">
+ * <b>Запрет на удаление цен для товаров</b> (обработчик в файле <i>/bitrix/php_interface/init.php</i>)function DeleteProductPriceStop ($intID,&amp;$arExceptionIDs)<br>{<br>   return false;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStop");<br>
+ * <b>Запрет на удаление рублевых цен для товаров</b>function DeleteProductPriceStopRub ($intID,&amp;$arExceptionIDs)<br>{<br>   if (CModule::IncludeModule('catalog'))<br>   {<br>      $rsPrices = CPrice::GetList(array(),array('PRODUCT_ID' =&gt; $intID,'CURRENCY' =&gt; 'RUB'));<br>      while ($arPrice = $rsPrices-&gt;Fetch())<br>      {<br>         $arExceptionIDs[] = $arPrice['ID'];<br>      }<br>   }<br>   return true;<br>}<br>AddEventHandler("catalog", "OnBeforeProductPriceDelete", "DeleteProductPriceStopRub");<br>
  * </pre>
  *
  *
  * <h4>See Also</h4> 
- * <p><b>Методы</b></p></bo<ul> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
+ * <p><b>Методы</b></p><ul> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>    
  * <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
- * </li> </ul><p><b>События</b></p></bod<ul> <li> <a
+ * </li>  </ul><p><b>События</b></p><ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a> </li> </ul><a
  * name="examples"></a>
  *
@@ -737,10 +726,10 @@ class _CEventsCatalog {
  * @return mixed 
  *
  * <h4>See Also</h4> 
- * <p><b>Методы</b></p></bo<ul> <li> <a
- * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
+ * <p><b>Методы</b></p><ul> <li> <a
+ * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>  
  * <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a>
- * </li> </ul><p><b>События</b></p></bod<ul><li> <a
+ * </li> </ul><p><b>События</b></p><ul><li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
  * </li></ul><br><br>
  *
@@ -756,11 +745,11 @@ class _CEventsCatalog {
  *
  *
  * @param array &$arFields  Ассоциативный массив, ключами которого являются названия
- * параметров товара, а значениями - новые значения параметров.<br>
+ * параметров товара, а значениями - новые значения параметров.<br> 	 
  * Допустимые ключи: <ul> <li> <b>ID</b> - код товара (элемента каталога -
- * обязательный);</li> <li> <b>QUANTITY</b> - количество товара на складе;</li> <li>
- * <b>QUANTITY_TRACE</b> - флаг (Y/N) "уменьшать ли количество при заказе";</li> <li>
- * <b>WEIGHT</b> - вес единицы товара;</li> <li> <b>PRICE_TYPE</b> - тип цены (S -
+ * обязательный);</li> 	<li> <b>QUANTITY</b> - количество товара на складе;</li> 	<li>
+ * <b>QUANTITY_TRACE</b> - флаг (Y/N) "уменьшать ли количество при заказе";</li> 	<li>
+ * <b>WEIGHT</b> - вес единицы товара;</li> 	<li> <b>PRICE_TYPE</b> - тип цены (S -
  * одноразовый платеж, R - регулярные платежи, T - пробная подписка;)</li>
  * <li> <b>RECUR_SCHEME_TYPE</b> - тип периода подписки ("H" - час, "D" - сутки, "W" -
  * неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год);</li> <li>
@@ -771,10 +760,10 @@ class _CEventsCatalog {
  * цену.</li> </ul>
  *
  * @return bool <p>Возвращает <i>false</i> при отказе, возвращает <i>true</i> при успешном
- * разрешении на добавление.</p> <a name="examples"></a>
+ * разрешении на добавление.</p><a name="examples"></a>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * AddEventHandler("catalog", "OnBeforeProductAdd", Array("My_Class", "OnBeforeProductAdd"));   
  *   
  * class My_Class  
@@ -798,7 +787,7 @@ class _CEventsCatalog {
  * <p>OnBeforeCatalogDelete - событие, вызываемое перед удалением записи о том, что инфоблок является торговым каталогом. Вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__delete.b8b22efb.php">CCatalog::Delete</a>.</p>
  *
  *
- * @param int $ID  Код информационного блока - каталога.
+ * @param mixed $intID  Код информационного блока - каталога.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
  * отменено.</li> </ul>
@@ -813,7 +802,7 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeCatalogDelete($ID){}
+	public static function OnBeforeCatalogDelete($intID){}
 
 /**
  * <p>OnBeforeGroupAdd - событие, вызываемое перед добавлением нового типа цены в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/checkfields.php">CCatalogGroup::CheckFields</a> или отменить создание.</p>
@@ -842,7 +831,7 @@ class _CEventsCatalog {
  * <p>OnBeforeGroupDelete - событие, вызываемое перед удалением типа цены в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__delete.dbdc5f0d.php">CCatalogGroup::Delete</a>. Событие будет вызвано только в том случае, если тип цены реально существует и не является базовым.</p>
  *
  *
- * @param int $ID  Код удаляемого типа цены.
+ * @param mixed $intID  Код удаляемого типа цены.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
  * отменено.</li> </ul>
@@ -857,13 +846,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforegroupdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeGroupDelete($ID){}
+	public static function OnBeforeGroupDelete($intID){}
 
 /**
  * <p>OnBeforeGroupUpdate - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a> перед обновлением типа цены. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/checkfields.php">CCatalogGroup::CheckFields</a> или отменить обновление.</p>
  *
  *
- * @param int $ID  Код изменяемого типа цены.
+ * @param mixed $intID  Код изменяемого типа цены.
  *
  * @param array &$arFields  Ассоциативный массив параметров типа цены. Перечень допустимых
  * ключей массива смотрите в <a
@@ -873,7 +862,7 @@ class _CEventsCatalog {
  * В противном случае нужно вернуть значение <i>true</i>.</p>
  *
  * <h4>Example</h4> 
- * <pre>
+ * <pre bgcolor="#323232" style="padding:5px;">
  * AddEventHandler("catalog", "OnBeforeGroupUpdate", Array("My_Class", "OnBeforeGroupUpdate"));
  * 
  * class My_Class
@@ -914,13 +903,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforegroupupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeGroupUpdate($ID, &$arFields){}
+	public static function OnBeforeGroupUpdate($intID, &$arFields){}
 
 /**
  * <p>OnBeforeProductUpdate - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php">CCatalogProduct::Update</a> перед обновлением параметров товара. Позволяет изменить данные до вызова <b>CCatalogProduct::CheckFields</b> либо отменить обновление.</p>
  *
  *
- * @param int $ID  Идентификатор товара.
+ * @param mixed $intID  Идентификатор товара.
  *
  * @param array &$arFields  Ассоциативный массив параметров товара. Перечень допустимых
  * ключей массива смотрите в <a
@@ -939,15 +928,15 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeProductUpdate($ID, &$arFields){}
+	public static function OnBeforeProductUpdate($intID, &$arFields){}
 
 /**
  * <p>OnCatalogDelete - событие, вызываемое при удалении записи о том, что инфоблок является торговым каталогом. Вызывается в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalog/ccatalog__delete.b8b22efb.php">CCatalog::Delete</a> и может быть использовано для выполнения каких-либо действий при удалении.</p>
  *
  *
- * @param int $ID  Идентификатор информационного блока - каталога.
+ * @param mixed $intID  Идентификатор информационного блока - каталога.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -959,7 +948,7 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncatalogdelete.php
  * @author Bitrix
  */
-	public static function OnCatalogDelete($ID){}
+	public static function OnCatalogDelete($intID){}
 
 /**
  * <p>OnGetDiscount - событие, вызываемое в методе <b>CCatalogDiscount::GetDiscount</b>. Позволяет заменить стандартный метод выбора скидок.</p>
@@ -993,25 +982,26 @@ class _CEventsCatalog {
  * или полную информацию по скидкам (false).
  *
  * @return mixed <p>В результате работы обработчика могут быть возвращены
- * следующие значения:</p> <ul> <li> <i>true</i> - обработчик ничего не сделал,
+ * следующие значения:</p><ul> <li> <i>true</i> - обработчик ничего не сделал,
  * будет выполнена работа метода <b>CCatalogDiscount::GetDiscount</b>;</li> <li> <i>false</i> -
  * возникла ошибка, работа метода прерывается;</li> <li>массив, где
  * каждый элемент - это идентификатор скидки (если <i>boolGetIDS</i> равен
  * <i>true</i>) или ассоциативный массив (<i>boolGetIDS</i> принимает значение
- * <i>false</i>) с ключами: <ul> <li> <b>ID</b> - код записи;</li> <li> <b>TYPE</b> - тип
- * записи;</li> <li> <b>SITE_ID</b> - сайт;</li> <li> <b>ACTIVE</b> - флаг активности;</li> <li>
- * <b>ACTIVE_FROM</b> - дата начала действия скидки;</li> <li> <b>ACTIVE_TO</b> - дата
- * окончания действия скидки;</li> <li> <b>RENEWAL</b> - флаг "Скидка на
- * продление";</li> <li> <b>NAME</b> - название скидки;</li> <li> <b>SORT</b> - индекс
- * сортировки;</li> <li> <b>MAX_DISCOUNT</b> - максимальная величина скидки;</li> <li>
- * <b>VALUE_TYPE</b> - тип скидки (P - в процентах, F - фиксированая величина);</li>
- * <li> <b>VALUE</b> - величина скидки;</li> <li> <b>CURRENCY</b> - валюта;</li> <li> <b>PRIORITY</b> -
- * приоритет применимости;</li> <li> <b>LAST_DISCOUNT</b> - флаг "Прекратить
- * дальнейшее применение скидок";</li> <li> <b>COUPON</b> - код купона;</li> <li>
- * <b>COUPON_ONE_TIME</b> - тип купона (Y - купон на 1 позицию заказа, O - купон на 1
- * заказ, N - многоразовый купон);</li> <li> <b>COUPON_ACTIVE</b> - флаг активности
- * купона;</li> <li> <b>UNPACK</b> - строка фильтра, который проверяет
- * попадание товара под скидку.</li> </ul> </li> </ul> <br><br>
+ * <i>false</i>) с ключами: <ul> <li> <b>ID</b> - код записи;</li> 	<li> <b>TYPE</b> - тип
+ * записи;</li> 	<li> <b>SITE_ID</b> - сайт;</li> 	<li> <b>ACTIVE</b> - флаг активности;</li> 	<li>
+ * <b>ACTIVE_FROM</b> - дата начала действия скидки;</li> 	<li> <b>ACTIVE_TO</b> - дата
+ * окончания действия скидки;</li> 	<li> <b>RENEWAL</b> - флаг "Скидка на
+ * продление";</li> 	<li> <b>NAME</b> - название скидки;</li> 	<li> <b>SORT</b> - индекс
+ * сортировки;</li> 	<li> <b>MAX_DISCOUNT</b> - максимальная величина скидки;</li>
+ * 	<li> <b>VALUE_TYPE</b> - тип скидки (P - в процентах, F - фиксированая
+ * величина);</li> 	<li> <b>VALUE</b> - величина скидки;</li> 	<li> <b>CURRENCY</b> -
+ * валюта;</li> 	<li> <b>PRIORITY</b> - приоритет применимости;</li> 	<li> <b>LAST_DISCOUNT</b>
+ * - флаг "Прекратить дальнейшее применение скидок";</li> 	<li> <b>COUPON</b> -
+ * код купона;</li> 	<li> <b>COUPON_ONE_TIME</b> - тип купона (Y - купон на 1 позицию
+ * заказа, O - купон на 1 заказ, N - многоразовый купон);</li> 	<li>
+ * <b>COUPON_ACTIVE</b> - флаг активности купона;</li> 	<li> <b>UNPACK</b> - строка
+ * фильтра, который проверяет попадание товара под скидку.</li> </ul> </li>
+ * </ul><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ongetdiscount.php
@@ -1029,7 +1019,7 @@ class _CEventsCatalog {
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__add.c71829a2.php">CCatalogGroup::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1047,9 +1037,9 @@ class _CEventsCatalog {
  * <p>OnGroupDelete - событие, вызываемое при удалении существующего типа цены в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__delete.dbdc5f0d.php">CCatalogGroup::Delete</a>. Может быть использовано для выполнения каких-либо действий при удалении типа цены.</p> <p></p> <div class="note"> <b>Примечание:</b> событие может быть вызвано, если тип цены не является базовым.</div>
  *
  *
- * @param int $ID  Идентификатор типа цены.
+ * @param mixed $intID  Идентификатор типа цены.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1061,19 +1051,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ongroupdelete.php
  * @author Bitrix
  */
-	public static function OnGroupDelete($ID){}
+	public static function OnGroupDelete($intID){}
 
 /**
  * <p>OnGroupUpdate - событие, вызываемое в случае успешного изменения типа цены.</p>
  *
  *
- * @param int $ID  Код изменяемого типа цены.
+ * @param mixed $intID  Код изменяемого типа цены.
  *
  * @param array $arFields  Ассоциативный массив параметров типа цены. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccataloggroup/ccataloggroup__update.a6d06df4.php">CCatalogGroup::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1085,19 +1075,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/ongroupupdate.php
  * @author Bitrix
  */
-	public static function OnGroupUpdate($ID, $arFields){}
+	public static function OnGroupUpdate($intID, $arFields){}
 
 /**
  * <p>OnPriceAdd - событие, вызываемое в случае успешного создания нового ценового предложения (новой цены) для товара.</p>
  *
  *
- * @param int $ID  Идентификатор добавленного ценового предложения.
+ * @param mixed $intID  Идентификатор добавленного ценового предложения.
  *
  * @param array $arFields  Ассоциативный массив параметров ценового предложения. Перечень
  * допустимых ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li> </ul><br><br>
@@ -1107,19 +1097,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceadd.php
  * @author Bitrix
  */
-	public static function OnPriceAdd($ID, $arFields){}
+	public static function OnPriceAdd($intID, $arFields){}
 
 /**
  * <p>OnPriceUpdate - событие, вызываемое в случае успешного изменения ценового предложения (цены) товара.</p>
  *
  *
- * @param int $ID  Код изменяемого ценового предложения.
+ * @param mixed $intID  Код изменяемого ценового предложения.
  *
  * @param array $arFields  Ассоциативный массив параметров ценового предложения. Перечень
  * допустимых ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a></li>
@@ -1130,19 +1120,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php
  * @author Bitrix
  */
-	public static function OnPriceUpdate($ID, $arFields){}
+	public static function OnPriceUpdate($intID, $arFields){}
 
 /**
  * <p>OnProductAdd - событие, вызываемое в случае успешного добавления параметров товара к элементу каталога.</p>
  *
  *
- * @param int $ID  Идентификатор товара.
+ * @param mixed $intID  Идентификатор товара.
  *
  * @param array $arFields  Ассоциативный массив параметров товара. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__add.933e0eb4.php">CCatalogProduct::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1154,19 +1144,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onproductadd.php
  * @author Bitrix
  */
-	public static function OnProductAdd($ID, $arFields){}
+	public static function OnProductAdd($intID, $arFields){}
 
 /**
  * <p>OnProductUpdate - событие, вызываемое в случае успешного изменения параметров товара.</p>
  *
  *
- * @param int $ID  Идентификатор товара.
+ * @param mixed $intID  Идентификатор товара.
  *
  * @param array $arFields  Ассоциативный массив параметров товара. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__update.bc9a623b.php">CCatalogProduct::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1178,13 +1168,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onproductupdate.php
  * @author Bitrix
  */
-	public static function OnProductUpdate($ID, $arFields){}
+	public static function OnProductUpdate($intID, $arFields){}
 
 /**
  * <p>OnGetDiscountByPrice - событие, вызываемое при вычислении скидки на цену с кодом <i>productPriceID</i> товара для пользователя, принадлежащего к группам пользователей <i>arUserGroups</i>. Позволяет изменить логику работы метода <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogdiscount/ccatalogdiscount.getdiscountbyprice.php">CCatalogDiscount::GetDiscountByPrice</a>.</p>
  *
  *
- * @param int $productPriceID  Код цены.</bod
+ * @param int $productPriceID  Код цены.
  *
  * @param array $arUserGroups  Массив групп, которым принадлежит пользователь.
  *
@@ -1257,7 +1247,7 @@ class _CEventsCatalog {
  * @param string $ABS_FILE_NAME  Полный путь к XML-файлу обмена.
  *
  * @return string <p>Если возвращает непустую строку, то обмен завершается с
- * сообщением об ошибке равным этой строке.</p> <br><br>
+ * сообщением об ошибке равным этой строке.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogimport1c.php
@@ -1273,7 +1263,7 @@ class _CEventsCatalog {
  *
  * @param string $ABS_FILE_NAME  Полный путь к XML-файлу обмена.
  *
- * @return void <p>Нет.</p></bo<br><br>
+ * @return void <p>Нет.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onsuccesscatalogimport1c.php
@@ -1285,15 +1275,16 @@ class _CEventsCatalog {
  * <p>OnBeforeStoreProductAdd - событие, вызываемое перед созданием новой записи о добавлении товара на склад. Позволяет изменить данные до вызова <b>CCatalogStoreProduct::CheckFields</b> или отменить запись.</p>
  *
  *
- * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: <ul> <li>PRODUCT_ID - ID
- * товара;</li> <li>STORE_ID - ID склада;</li> <li>AMOUNT - количество товара.</li> </ul>
+ * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи:          <ul>
+ * <li>PRODUCT_ID - ID товара;</li>                    <li>STORE_ID - ID склада;</li> 		   		  <li>AMOUNT -
+ * количество товара.</li>                  </ul>
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstoreproduct/add.php">CCatalogStoreProduct::Add</a> </li>
- * </ul><br><br>
+ *  </ul><br><br>
  *
  *
  * @static
@@ -1306,62 +1297,64 @@ class _CEventsCatalog {
  * <p>OnBeforeStoreProductDelete - событие, вызываемое перед удалением записи из таблицы остатков товара с кодом ID в методе <b>CCatalogStoreProductAll::Delete</b>. Если обработчик возвращает <i>false</i>, то удаление будет отменено. </p>
  *
  *
- * @param int $ID  Код записи для удаления.
+ * @param mixed $intID  Код записи для удаления.
  *
- * @return mixed <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
- * отменено.</li> </ul> <br><br>
+ * @return mixed <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> -  удаление
+ * отменено.</li> </ul><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforestoreproductdelete.php
  * @author Bitrix
  */
-	public static function OnBeforeStoreProductDelete($ID){}
+	public static function OnBeforeStoreProductDelete($intID){}
 
 /**
  * <p>OnBeforeStoreProductUpdate - событие, вызываемое перед изменением записи в таблице остатков товара. Позволяет изменить данные до вызова <b>CCatalogStoreProduct::CheckFields</b> или отменить обновление.</p>
  *
  *
- * @param intI $D  
+ * @param mixed $intID  
  *
- * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: <ul> <li>PRODUCT_ID - ID
- * товара;</li> <li>STORE_ID - ID склада;</li> <li>AMOUNT - количество товара.</li> </ul>
+ * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: 	    <ul> <li>PRODUCT_ID
+ * - ID товара;</li>                    <li>STORE_ID - ID склада;</li> 		   		  <li>AMOUNT -
+ * количество товара.</li> 		  </ul>
  *
- * @return mixed <p>Нет.</p></bo<br><br>
+ * @return mixed <p>Нет.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforestoreproductupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeStoreProductUpdate($D, $arFields){}
+	public static function OnBeforeStoreProductUpdate($intID, $arFields){}
 
 /**
  * <p>OnStoreProductAdd - событие, вызываемое в случае успешного создания новой записи о добавлении товара на склад.</p>
  *
  *
- * @param int $ID  Код записи.
+ * @param mixed $intID  Код записи.
  *
- * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: <ul> <li>PRODUCT_ID - ID
- * товара;</li> <li>STORE_ID - ID склада;</li> <li>AMOUNT - количество товара.</li> </ul>
+ * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи:          <ul>
+ * <li>PRODUCT_ID - ID товара;</li>                    <li>STORE_ID - ID склада;</li> 		   		  <li>AMOUNT -
+ * количество товара.</li>                  </ul>
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li> <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstoreproduct/add.php">CCatalogStoreProduct::Add</a> </li>
- * </ul><br><br>
+ *  </ul><br><br>
  *
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onstoreproductadd.php
  * @author Bitrix
  */
-	public static function OnStoreProductAdd($ID, $arFields){}
+	public static function OnStoreProductAdd($intID, $arFields){}
 
 /**
  * <p>OnStoreProductDelete - событие, вызываемое в случае успешного удаления записи из таблицы остатков товара на складе (метод <b>CCatalogStoreProductAll::Delete</b>).</p>
  *
  *
- * @return mixed <p>Нет.</p></bo<br><br>
+ * @return mixed <p>Нет.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onstoreproductdelete.php
@@ -1373,24 +1366,25 @@ class _CEventsCatalog {
  * <p>OnStoreProductUpdate - событие, вызываемое в случае успешного изменения записи в таблице остатков товара с кодом ID в методе <b>CCatalogStoreProductAll::Update</b>. </p>
  *
  *
- * @param int $ID  Код записи для изменения.
+ * @param mixed $intID  Код записи для изменения.
  *
- * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: <ul> <li>PRODUCT_ID - ID
- * товара;</li> <li>STORE_ID - ID склада;</li> <li>AMOUNT - количество товара.</li> </ul>
+ * @param array $arFields  Ассоциативный массив параметров. Допустимые ключи: 	    <ul> <li>PRODUCT_ID
+ * - ID товара;</li>                    <li>STORE_ID - ID склада;</li> 		   		  <li>AMOUNT -
+ * количество товара.</li> 		  </ul>
  *
- * @return mixed <p>Нет.</p></bo<br><br>
+ * @return mixed <p>Нет.</p><br><br>
  *
  * @static
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onstoreproductupdate.php
  * @author Bitrix
  */
-	public static function OnStoreProductUpdate($ID, $arFields){}
+	public static function OnStoreProductUpdate($intID, $arFields){}
 
 /**
  * <p>OnBeforeCatalogStoreUpdate - событие, вызываемое в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a> перед обновлением параметров склада. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/checkfields.php">CCatalogStore::CheckFields</a> или отменить обновление.</p>
  *
  *
- * @param int $id  Идентификатор изменяемого склада.
+ * @param mixed $intid  Идентификатор изменяемого склада.
  *
  * @param array &$arFields  Ассоциативный массив параметров склада. Перечень допустимых
  * ключей массива смотрите в <a
@@ -1409,19 +1403,19 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogstoreupdate.php
  * @author Bitrix
  */
-	public static function OnBeforeCatalogStoreUpdate($id, &$arFields){}
+	public static function OnBeforeCatalogStoreUpdate($intid, &$arFields){}
 
 /**
  * <p>OnCatalogStoreUpdate - событие, вызываемое в случае успешного изменения параметров склада.</p>
  *
  *
- * @param int $id  Идентификатор изменяемого склада.
+ * @param mixed $intid  Идентификатор изменяемого склада.
  *
  * @param array $arFields  Ассоциативный массив параметров склада. Перечень допустимых
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/update.php">CCatalogStore::Update</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1433,13 +1427,13 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncatalogstoreupdate.php
  * @author Bitrix
  */
-	public static function OnCatalogStoreUpdate($id, $arFields){}
+	public static function OnCatalogStoreUpdate($intid, $arFields){}
 
 /**
  * <p>OnBeforeCatalogStoreDelete - событие, вызываемое перед удалением склада в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/delete.php">CCatalogStore::Delete</a>.</p>
  *
  *
- * @param int $id  Идентификатор удаляемого склада.
+ * @param mixed $intid  Идентификатор удаляемого склада.
  *
  * @return bool <ul> <li> <i>true</i> - удаление разрешено;</li> <li> <i>false</i> - удаление
  * отменено.</li> </ul>
@@ -1454,15 +1448,15 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforecatalogstoredelete.php
  * @author Bitrix
  */
-	public static function OnBeforeCatalogStoreDelete($id){}
+	public static function OnBeforeCatalogStoreDelete($intid){}
 
 /**
  * <p>OnCatalogStoreDelete - событие, вызываемое при удалении существующего склада в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/delete.php">CCatalogStore::Delete</a>. Может быть использовано для выполнения каких-либо действий при удалении склада.</p>
  *
  *
- * @param int $id  Идентификатор склада.
+ * @param mixed $intid  Идентификатор склада.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a
@@ -1474,7 +1468,7 @@ class _CEventsCatalog {
  * @link http://dev.1c-bitrix.ru/api_help/catalog/events/oncatalogstoredelete.php
  * @author Bitrix
  */
-	public static function OnCatalogStoreDelete($id){}
+	public static function OnCatalogStoreDelete($intid){}
 
 /**
  * <p>OnBeforeCatalogStoreAdd - событие, вызываемое перед добавлением нового склада в методе <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>. Позволяет изменить данные до вызова <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/checkfields.php">CCatalogStore::CheckFields</a> или отменить создание.</p>
@@ -1508,7 +1502,7 @@ class _CEventsCatalog {
  * ключей массива смотрите в <a
  * href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a>.
  *
- * @return mixed <p>Нет.</p></bo
+ * @return mixed <p>Нет.</p>
  *
  * <h4>See Also</h4> 
  * <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogstore/add.php">CCatalogStore::Add</a></li>

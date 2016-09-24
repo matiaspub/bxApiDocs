@@ -75,6 +75,19 @@ class Column extends BaseObject
 	 *
 	 * @return boolean
 	 */
+	
+	/**
+	* <p>Статический метод сверяет тип колонки со списком типов:</p> <p>- INT</p> <p>- INTEGER</p> <p>- TINYINT</p> <p>- NUMERIC</p> <p>- NUMBER</p> <p>- FLOAT</p> <p>- DOUBLE</p> <p>- DECIMAL</p> <p>- BIGINT</p> <p>- SMALLINT</p> <p>- MEDIUMINT</p> <p>- VARCHAR</p> <p>- VARCHAR2</p> <p>- CHAR</p> <p>- TIMESTAMP</p> <p>- DATETIME</p> <p>- DATE</p> <p>- TIME</p> <p>- TEXT</p> <p>- LONGTEXT</p> <p>- MEDIUMTEXT</p> <p>- CLOB</p> <p>- BLOB</p> <p>- MEDIUMBLOB</p> <p>- LONGBLOB</p> <p>- VARBINARY</p> <p>- IMAGE</p> <p>- ENUM</p>
+	*
+	*
+	* @param string $type  Тип колонки.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/checktype.php
+	* @author Bitrix
+	*/
 	public static function checkType($type)
 	{
 		return isset(self::$types[$type]);
@@ -90,6 +103,25 @@ class Column extends BaseObject
 	 * @return Column
 	 * @throws NotSupportedException
 	 */
+	
+	/**
+	* <p>Статический метод создает колонку из токенов. Текущая позиция должна указывать на название колонки.</p> <p> </p>
+	*
+	*
+	* @param mixed $Bitrix  Набор токенов.
+	*
+	* @param Bitri $Perfmon  
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Tokenizer $tokenizer  
+	*
+	* @return \Bitrix\Perfmon\Sql\Column 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/create.php
+	* @author Bitrix
+	*/
 	public static function create(Tokenizer $tokenizer)
 	{
 		$columnName = $tokenizer->getCurrentToken()->text;
@@ -172,6 +204,19 @@ class Column extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для создания колонки таблицы.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/getcreateddl.php
+	* @author Bitrix
+	*/
 	public function getCreateDdl($dbType = '')
 	{
 		switch ($dbType)
@@ -194,6 +239,19 @@ class Column extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для удаления колонки таблицы.</p>
+	*
+	*
+	* @param string $dbType = '' Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL</i>).
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/getdropddl.php
+	* @author Bitrix
+	*/
 	public function getDropDdl($dbType = '')
 	{
 		switch ($dbType)
@@ -219,6 +277,27 @@ class Column extends BaseObject
 	 *
 	 * @return array|string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает DDL для модификации объекта. Данная функция выполняется только для <i>MySQL</i>. Для <i>Oracle</i> or <i>MS SQL</i> будет возвращен комментарий.</p> <p> </p>
+	*
+	*
+	* @param mixed $Bitrix  Целевой объект.
+	*
+	* @param Bitri $Perfmon  Тип базы данных (<i>MYSQL</i>, <i>ORACLE</i> или <i>MSSQL<i></i>).</i>
+	*
+	* @param Perfmo $Sql  
+	*
+	* @param Column $target  
+	*
+	* @param string $dbType = '' 
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/sql/column/getmodifyddl.php
+	* @author Bitrix
+	*/
 	public function getModifyDdl(Column $target, $dbType = '')
 	{
 		switch ($dbType)
@@ -238,10 +317,32 @@ class Column extends BaseObject
 			if (
 				$this->type === $target->type
 				&& $this->default === $target->default
-				&& intval($this->length) < intval($target->length)
+				&& (
+					intval($this->length) < intval($target->length)
+					|| (
+						intval($target->length) < intval($this->length)
+						&& strtoupper($this->type) === "CHAR"
+					)
+				)
 			)
 			{
-				return "ALTER TABLE ".$this->parent->name." ALTER COLUMN ".$this->name." ".$target->body.$nullDdl;
+				$sql = array();
+				foreach ($this->parent->indexes->getList() as $index)
+				{
+					if (in_array($this->name, $index->columns))
+					{
+						$sql[] = $index->getDropDdl($dbType);
+					}
+				}
+				$sql[] = "ALTER TABLE ".$this->parent->name." ALTER COLUMN ".$this->name." ".$target->body.$nullDdl;
+				foreach ($this->parent->indexes->getList() as $index)
+				{
+					if (in_array($this->name, $index->columns))
+					{
+						$sql[] = $index->getCreateDdl($dbType);
+					}
+				}
+				return $sql;
 			}
 			elseif (
 				$this->type === $target->type
@@ -260,7 +361,13 @@ class Column extends BaseObject
 			if (
 				$this->type === $target->type
 				&& $this->default === $target->default
-				&& intval($this->length) < intval($target->length)
+				&& (
+					intval($this->length) < intval($target->length)
+					|| (
+						intval($target->length) < intval($this->length)
+						&& strtoupper($this->type) === "CHAR"
+					)
+				)
 			)
 			{
 				return "ALTER TABLE ".$this->parent->name." MODIFY (".$this->name." ".$target->type."(".$target->length.")".")";

@@ -31,6 +31,19 @@ class Iblock extends Base
 	 *
 	 * @return \Bitrix\Iblock\Template\Entity\Base
 	 */
+	
+	/**
+	* <p>Метод используется для поиска инфоблока для обработки шаблона. Нестатический метод.</p>
+	*
+	*
+	* @param string $entity  Инфоблок, который необходимо найти.
+	*
+	* @return \Bitrix\Iblock\Template\Entity\Base 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/template/entity/iblock/resolve.php
+	* @author Bitrix
+	*/
 	public function resolve($entity)
 	{
 		if ($entity === "catalog")

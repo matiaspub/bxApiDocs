@@ -1,7 +1,7 @@
 <?
-use Bitrix\Main\Loader;
-use Bitrix\Main\Config\Option;
-use Bitrix\Catalog;
+use Bitrix\Main\Loader,
+	Bitrix\Main\Config\Option,
+	Bitrix\Catalog;
 
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/catalog/general/product.php");
 
@@ -20,26 +20,27 @@ class CCatalogProduct extends CAllCatalogProduct
 {
 	
 	/**
-	* <p>Метод добавляет (или обновляет) параметры товара к элементу каталога. Метод динамичный.</p>
+	* <p>Метод добавляет (или обновляет) параметры товара к элементу каталога. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  Ассоциативный массив, ключами которого являются названия
 	* параметров товара, а значениями - новые значения параметров.
 	* Допустимые ключи: <br><br> ключи, независящие от вида товаров: <ul> <li>
-	* <b>ID</b> - код товара (элемента каталога - обязательный);</li> <li> <b>VAT_ID</b>
-	* - код НДС;</li> <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в цену;</li> <li>
-	* <b>QUANTITY</b> - количество товара на складе;</li> <li> <b>QUANTITY_RESERVED</b> -
-	* зарезервированное количество;</li> <li> <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b>
-	* "включить количественный учет" (до версии 12.5.0 параметр назывался
-	* "уменьшать ли количество при заказе");</li> </ul> <br> ключи для обычных
-	* товаров: <ul> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить покупку при
-	* отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b>
-	* "разрешить отрицательное количество товара";</li> <li> <b>SUBSCRIBE</b> - флаг
-	* (Y/N/D)<b>*</b> "разрешить подписку при отсутствии товара"; <br><br> </li> <li>
-	* <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> - валюта
-	* закупочной цены;<br><br> </li> <li> <b>WEIGHT</b> - вес единицы товара;<br><br> </li> <li>
-	* <b>WIDTH</b> - ширина товара (в мм);</li> <li> <b>LENGTH</b> - длина товара (в мм);</li>
-	* <li> <b>HEIGHT</b> - высота товара (в мм);</li> <li> <b>MEASURE</b> - ID единицы
+	* <b>ID</b> - код товара (элемента каталога - обязательный);</li>         <li>
+	* <b>VAT_ID</b> - код НДС;</li>         <li> <b>VAT_INCLUDED</b> - флаг (Y/N) включен ли НДС в
+	* цену;</li>         <li> <b>QUANTITY</b> - количество товара на складе;</li>        <li>
+	* <b>QUANTITY_RESERVED</b> - зарезервированное количество;</li>         <li>
+	* <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b> "включить количественный учет" (до
+	* версии 12.5.0 параметр назывался "уменьшать ли количество при
+	* заказе");</li> </ul> <br> ключи для обычных товаров: <ul> <li> <b>CAN_BUY_ZERO</b> -
+	* флаг (Y/N/D)<b>*</b> "разрешить покупку при отсутствии товара";</li> <li>
+	* <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b> "разрешить отрицательное
+	* количество товара";</li> <li> <b>SUBSCRIBE</b> - флаг (Y/N/D)<b>*</b> "разрешить
+	* подписку при отсутствии товара"; <br><br> </li> <li> <b>PURCHASING_PRICE</b> -
+	* закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> - валюта закупочной
+	* цены;<br><br> </li> <li> <b>WEIGHT</b> - вес единицы товара;<br><br> </li> <li> <b>WIDTH</b> -
+	* ширина товара (в мм);</li> <li> <b>LENGTH</b> - длина товара (в мм);</li> <li>
+	* <b>HEIGHT</b> - высота товара (в мм);</li> <li> <b>MEASURE</b> - ID единицы
 	* измерения;<br><br> </li> <li> <b>BARCODE_MULTI</b> - (Y/N) определяет каждый ли
 	* экземпляр товара имеет собственный штрихкод;</li> </ul> <br> ключи для
 	* продажи контента: <ul> <li> <b>PRICE_TYPE</b> - тип цены (S - одноразовый платеж,
@@ -57,7 +58,7 @@ class CCatalogProduct extends CAllCatalogProduct
 	* <i>false</i> в противном случае. </p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $arFields = array(
 	*                   "ID" =&gt; $PRODUCT_ID, 
 	*                   "VAT_ID" =&gt; 1, //выставляем тип ндс (задается в админке)  
@@ -117,6 +118,8 @@ class CCatalogProduct extends CAllCatalogProduct
 			// strange copy-paste bug
 			foreach (GetModuleEvents("sale", "OnProductAdd", true) as $arEvent)
 				ExecuteModuleEventEx($arEvent, array($arFields["ID"], $arFields));
+
+			Catalog\Product\Sku::updateAvailable($arFields['ID'], 0, $arFields);
 		}
 
 		return true;
@@ -124,44 +127,43 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	* <p>Метод обновляет параметры товара, относящиеся к товару как к таковому. Метод динамичный.</p>
+	* <p>Метод обновляет параметры товара, относящиеся к товару как к таковому. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код товара.
+	* @param mixed $intID  Код товара.
 	*
 	* @param array $arFields  Ассоциативный массив, ключами которого являются названия
 	* параметров товара, а значениями - новые значения параметров.
 	* Допустимые ключи: <br><br> ключи, независящие от типа товаров: <ul> <li>
-	* <b>QUANTITY</b> - количество товара на складе;</li> <li> <b>QUANTITY_RESERVED</b> -
-	* зарезервированное количество;</li> <li> <b>QUANTITY_TRACE</b> - флаг (Y/N/D)<b>*</b>
-	* "включить количественный учет" (до версии 12.5.0 параметр назывался
-	* "уменьшать ли количество при заказе");</li> </ul> <br> ключи для обычных
-	* товаров: <ul> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить покупку при
-	* отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг (Y/N/D)<b>*</b>
-	* "разрешить отрицательное количество товара";</li> <li> <b>SUBSCRIBE</b> - флаг
-	* (Y/N/D)<b>*</b> "разрешить подписку при отсутствии товара"; <br><br> </li> <li>
-	* <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li> <b>PURCHASING_CURRENCY</b> - валюта
-	* закупочной цены;<br><br> </li> <li> <b>WEIGHT</b> - вес единицы товара;<br><br> </li> <li>
-	* <b>WIDTH</b> - ширина товара (в мм);</li> <li> <b>LENGTH</b> - длина товара (в мм);</li>
-	* <li> <b>HEIGHT</b> - высота товара (в мм);</li> <li> <b>MEASURE</b> - ID единицы
-	* измерения;<br><br> </li> <li> <b>BARCODE_MULTI</b> - (Y/N) определяет каждый ли
-	* экземпляр товара имеет собственный штрихкод;</li> </ul> <br> ключи для
-	* продажи контента: <ul> <li> <b>PRICE_TYPE</b> - тип цены (S - одноразовый платеж,
-	* R - регулярные платежи, T - пробная подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> -
-	* тип периода подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" -
-	* квартал, "S" - полугодие, "Y" - год);</li> <li> <b>RECUR_SCHEME_LENGTH</b> - длина
-	* периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код товара, для которого
-	* данный товар является пробным;</li> <li> <b>WITHOUT_ORDER</b> - флаг "Продление
-	* подписки без оформления заказа".</li> </ul>
+	* <b>QUANTITY</b> - доступное количество товара;</li>        <li> <b>QUANTITY_RESERVED</b> -
+	* зарезервированное количество;</li>         <li> <b>QUANTITY_TRACE</b> - флаг
+	* (Y/N/D)<b>*</b> "включить количественный учет" (до версии 12.5.0 параметр
+	* назывался "уменьшать ли количество при заказе");</li> </ul> <br> ключи
+	* для обычных товаров: <ul> <li> <b>CAN_BUY_ZERO</b> - флаг (Y/N/D)<b>*</b> "разрешить
+	* покупку при отсутствии товара";</li> <li> <b>NEGATIVE_AMOUNT_TRACE</b> - флаг
+	* (Y/N/D)<b>*</b> "разрешить отрицательное количество товара";</li> <li>
+	* <b>SUBSCRIBE</b> - флаг (Y/N/D)<b>*</b> "разрешить подписку при отсутствии
+	* товара"; <br><br> </li> <li> <b>PURCHASING_PRICE</b> - закупочная цена;</li> <li>
+	* <b>PURCHASING_CURRENCY</b> - валюта закупочной цены;<br><br> </li> <li> <b>WEIGHT</b> - вес
+	* единицы товара;<br><br> </li> <li> <b>WIDTH</b> - ширина товара (в мм);</li> <li>
+	* <b>LENGTH</b> - длина товара (в мм);</li> <li> <b>HEIGHT</b> - высота товара (в мм);</li>
+	* <li> <b>MEASURE</b> - ID единицы измерения;<br><br> </li> <li> <b>BARCODE_MULTI</b> - (Y/N)
+	* определяет каждый ли экземпляр товара имеет собственный
+	* штрихкод;</li> </ul> <br> ключи для продажи контента: <ul> <li> <b>PRICE_TYPE</b> -
+	* тип цены (S - одноразовый платеж, R - регулярные платежи, T - пробная
+	* подписка);</li> <li> <b>RECUR_SCHEME_TYPE</b> - тип периода подписки ("H" - час, "D" -
+	* сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" - полугодие, "Y" - год);</li>
+	* <li> <b>RECUR_SCHEME_LENGTH</b> - длина периода подписки;</li> <li> <b>TRIAL_PRICE_ID</b> - код
+	* товара, для которого данный товар является пробным;</li> <li>
+	* <b>WITHOUT_ORDER</b> - флаг "Продление подписки без оформления заказа".</li>
+	* </ul>
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного обновления параметров и
 	* <i>false</i> в противном случае.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Обновление зарезервированного количества товара
-	* 
-	* 
 	* Cmodule::IncludeModule('catalog');
 	* $PRODUCT_ID = 51; // id товара
 	* $arFields = array('QUANTITY_RESERVED' =&gt; 11);// зарезервированное количество
@@ -198,16 +200,14 @@ class CCatalogProduct extends CAllCatalogProduct
 		$boolSubscribe = false;
 		if (!empty($strUpdate))
 		{
-			if (isset($arFields["QUANTITY"]) && $arFields["QUANTITY"] > 0)
+			if(Catalog\SubscribeTable::checkPermissionSubscribe($arFields['SUBSCRIBE']))
 			{
-				if (!isset($arFields["OLD_QUANTITY"]))
+				$strQuery = 'select ID, QUANTITY, AVAILABLE from b_catalog_product where ID = '.$ID;
+				$rsProducts = $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+				if ($arProduct = $rsProducts->Fetch())
 				{
-					$strQuery = 'select ID, QUANTITY from b_catalog_product where ID = '.$ID;
-					$rsProducts = $DB->Query($strQuery, false, "File: ".__FILE__."<br>Line: ".__LINE__);
-					if ($arProduct = $rsProducts->Fetch())
-					{
-						$arFields["OLD_QUANTITY"] = doubleval($arProduct['QUANTITY']);
-					}
+					$arFields["OLD_QUANTITY"] = doubleval($arProduct['QUANTITY']);
+					Catalog\SubscribeTable::setOldProductAvailable($ID, $arProduct['AVAILABLE']);
 				}
 				if (isset($arFields["OLD_QUANTITY"]))
 				{
@@ -228,6 +228,8 @@ class CCatalogProduct extends CAllCatalogProduct
 				CCatalogProductSet::recalculateSetsByProduct($ID);
 			}
 
+			Catalog\Product\Sku::updateAvailable($ID, 0, $arFields);
+
 			if (isset(self::$arProductCache[$ID]))
 			{
 				unset(self::$arProductCache[$ID]);
@@ -241,9 +243,7 @@ class CCatalogProduct extends CAllCatalogProduct
 		}
 
 		foreach (GetModuleEvents("catalog", "OnProductUpdate", true) as $arEvent)
-		{
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
-		}
 
 		//call subscribe
 		if ($boolSubscribe)
@@ -259,13 +259,13 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	* <p>Метод удаляет из элемента каталога свойства, относящиеся к товару. Метод динамичный.</p>
+	* <p>Метод удаляет из элемента каталога свойства, относящиеся к товару. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код товара (элемента каталога).
+	* @param mixed $intID  Код товара (элемента каталога).
 	*
 	* @return bool <p>Возвращает <i>true</i> в случае успешного удаления и <i>false</i> в
-	* противном случае. </p> <br><br>
+	* противном случае. </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/ccatalogproduct/ccatalogproduct__delete.ed301fc8.php
@@ -300,6 +300,7 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	public static function GetQueryBuildArrays($arOrder, $arFilter, $arSelect)
 	{
+		/** @var CStackCacheManager $stackCacheManager */
 		global $DB, $USER, $stackCacheManager;
 
 		$strDefQuantityTrace = ((string)Option::get('catalog', 'default_quantity_trace') == 'Y' ? 'Y' : 'N');
@@ -322,7 +323,8 @@ class CCatalogProduct extends CAllCatalogProduct
 			'CURRENCY' => true,
 			'SHOP_QUANTITY' => true,
 			'PRICE' => true,
-			'STORE_AMOUNT' => true
+			'STORE_AMOUNT' => true,
+			'PRICE_SCALE' => true
 		);
 
 		$arOrderTmp = array();
@@ -343,7 +345,8 @@ class CCatalogProduct extends CAllCatalogProduct
 					switch ($by)
 					{
 						case 'PRICE':
-							$res = " ".CIBlock::_Order("CAT_P".$inum.".PRICE", $order, "asc")." ";
+						case 'PRICE_SCALE':
+							$res = " ".CIBlock::_Order("CAT_P".$inum.".PRICE_SCALE", $order, "asc")." ";
 							break;
 						case 'CURRENCY':
 							$res = " ".CIBlock::_Order("CAT_P".$inum.".CURRENCY", $order, "asc")." ";
@@ -357,11 +360,15 @@ class CCatalogProduct extends CAllCatalogProduct
 							$join = false;
 							break;
 						case 'AVAILABLE':
-							$arResOrder[$key] = " ".CIBlock::_Order("CATALOG_AVAILABLE", $order, "desc", false)." ";
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.AVAILABLE", $order, "desc", false)." ";
 							$join = false;
 							break;
 						case 'TYPE':
 							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.TYPE", $order, "asc", false)." ";
+							$join = false;
+							break;
+						case 'BUNDLE':
+							$arResOrder[$key] = " ".CIBlock::_Order("CAT_PR.BUNDLE", $order, "asc", false)." ";
 							$join = false;
 							break;
 						case 'PURCHASING_PRICE':
@@ -439,6 +446,19 @@ class CCatalogProduct extends CAllCatalogProduct
 							" ((CAT_P".$inum.".QUANTITY_FROM <= ".$val." OR CAT_P".$inum.".QUANTITY_FROM IS NULL) AND (CAT_P".$inum.".QUANTITY_TO >= ".$val." OR CAT_P".$inum.".QUANTITY_TO IS NULL)) ";
 						break;
 					case "PRICE":
+						$scale = static::getQueryBuildCurrencyScale($arFilter, $inum);
+						if (empty($scale))
+						{
+							$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE", $val, "number", $cOperationType);
+						}
+						else
+						{
+							$val = static::getQueryBuildPriceScaled($val, $scale['BASE_RATE']);
+							$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE_SCALE", $val, "number", $cOperationType);
+						}
+						unset($scale);
+						break;
+					case "PRICE_SCALE":
 						$res = CIBlock::FilterCreate("CAT_P".$inum.".PRICE", $val, "number", $cOperationType);
 						break;
 					case "QUANTITY":
@@ -448,13 +468,7 @@ class CCatalogProduct extends CAllCatalogProduct
 					case "AVAILABLE":
 						if ('N' !== $val)
 							$val = 'Y';
-						$res =
-							" (IF (
-					CAT_PR.QUANTITY > 0 OR
-					IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
-					IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
-					'Y', 'N'
-					) ".(($cOperationType=="N") ? "<>" : "=")." '".$val."') ";
+						$res = CIBlock::FilterCreate("CAT_PR.AVAILABLE", $val, "string_equal", $cOperationType);
 						$join = false;
 						break;
 					case "WEIGHT":
@@ -463,6 +477,12 @@ class CCatalogProduct extends CAllCatalogProduct
 						break;
 					case 'TYPE':
 						$res = CIBlock::FilterCreate("CAT_PR.TYPE", $val, "number", $cOperationType);
+						$join = false;
+						break;
+					case "BUNDLE":
+						if ('N' !== $val)
+							$val = 'Y';
+						$res = CIBlock::FilterCreate("CAT_PR.BUNDLE", $val, "string_equal", $cOperationType);
 						$join = false;
 						break;
 					case 'PURCHASING_PRICE':
@@ -531,7 +551,7 @@ class CCatalogProduct extends CAllCatalogProduct
 
 			$cacheTime = CATALOG_CACHE_DEFAULT_TIME;
 			if (defined("CATALOG_CACHE_TIME"))
-				$cacheTime = intval(CATALOG_CACHE_TIME);
+				$cacheTime = (int)CATALOG_CACHE_TIME;
 
 			$stackCacheManager->SetLength("catalog_GetQueryBuildArrays", 50);
 			$stackCacheManager->SetTTL("catalog_GetQueryBuildArrays", $cacheTime);
@@ -541,20 +561,43 @@ class CCatalogProduct extends CAllCatalogProduct
 			}
 			else
 			{
-				$strSql = "SELECT CAT_CG.ID, CAT_CGL.NAME as CATALOG_GROUP_NAME, ".
-					"	IF(CAT_CGG.ID IS NULL, 'N', 'Y') as CATALOG_CAN_ACCESS, ".
-					"	IF(CAT_CGG1.ID IS NULL, 'N', 'Y') as CATALOG_CAN_BUY ".
-					"FROM b_catalog_group CAT_CG ".
-					"	LEFT JOIN b_catalog_group2group CAT_CGG ON (CAT_CG.ID = CAT_CGG.CATALOG_GROUP_ID AND CAT_CGG.GROUP_ID IN (".$strUserGroups.") AND CAT_CGG.BUY <> 'Y') ".
-					"	LEFT JOIN b_catalog_group2group CAT_CGG1 ON (CAT_CG.ID = CAT_CGG1.CATALOG_GROUP_ID AND CAT_CGG1.GROUP_ID IN (".$strUserGroups.") AND CAT_CGG1.BUY = 'Y') ".
-					"	LEFT JOIN b_catalog_group_lang CAT_CGL ON (CAT_CG.ID = CAT_CGL.CATALOG_GROUP_ID AND CAT_CGL.LANG = '".LANGUAGE_ID."') ".
-					" WHERE CAT_CG.ID IN (".$strSubWhere.") ".
-					" GROUP BY CAT_CG.ID ";
-				$dbRes = $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 				$arResult = array();
-				while ($arRes = $dbRes->Fetch())
-					$arResult[] = $arRes;
-
+				$fullPriceTypeList = CCatalogGroup::GetListArray();
+				if (!empty($fullPriceTypeList))
+				{
+					$priceTypeList = array();
+					$idList = array_keys($fullPriceTypeList);
+					foreach ($idList as $priceId)
+					{
+						if (!isset($arJoinGroup[$priceId]))
+							continue;
+						$priceTypeList[$priceId] = array(
+							'ID' => $fullPriceTypeList[$priceId]['ID'],
+							'CATALOG_GROUP_NAME' => $fullPriceTypeList[$priceId]['NAME_LANG'],
+							'CATALOG_CAN_ACCESS' => 'N',
+							'CATALOG_CAN_BUY' => 'N'
+						);
+					}
+					unset($priceId, $idList);
+					$query = 'select CATALOG_GROUP_ID, BUY from b_catalog_group2group where GROUP_ID in ('.$strUserGroups.') and CATALOG_GROUP_ID in ('.$strSubWhere.')';
+					$rightsIterator = $DB->Query($query, false, "File: ".__FILE__."<br>Line: ".__LINE__);
+					while ($rights = $rightsIterator->Fetch())
+					{
+						$priceId = (int)$rights['CATALOG_GROUP_ID'];
+						if (isset($priceTypeList[$priceId]))
+						{
+							if ($rights['BUY'] == 'Y')
+								$priceTypeList[$priceId]['CATALOG_CAN_BUY'] = 'Y';
+							else
+								$priceTypeList[$priceId]['CATALOG_CAN_ACCESS'] = 'Y';
+						}
+						unset($priceId);
+					}
+					unset($rights, $rightsIterator);
+					$arResult = array_values($priceTypeList);
+					unset($priceTypeList);
+				}
+				unset($fullPriceTypeList);
 				$stackCacheManager->Set("catalog_GetQueryBuildArrays", $strCacheKey, $arResult);
 			}
 
@@ -563,14 +606,13 @@ class CCatalogProduct extends CAllCatalogProduct
 				$i = (int)$row["ID"];
 
 				if (!empty($arWhereTmp[$i]) && is_array($arWhereTmp[$i]))
-				{
 					$sResWhere .= ' AND '.implode(' AND ', $arWhereTmp[$i]);
-				}
 
 				if (!empty($arOrderTmp[$i]) && is_array($arOrderTmp[$i]))
 				{
 					foreach($arOrderTmp[$i] as $k=>$v)
 						$arResOrder[$k] = $v;
+					unset($k, $v);
 				}
 
 				$sResSelect .= ", CAT_P".$i.".ID as CATALOG_PRICE_ID_".$i.", ".
@@ -602,28 +644,22 @@ class CCatalogProduct extends CAllCatalogProduct
 			" CAT_PR.NEGATIVE_AMOUNT_TRACE as CATALOG_NEGATIVE_AMOUNT_ORIG, ".
 			" IF (CAT_PR.SUBSCRIBE = 'D', '".$strSubscribe."', CAT_PR.SUBSCRIBE) as CATALOG_SUBSCRIBE, ".
 			" CAT_PR.SUBSCRIBE as CATALOG_SUBSCRIBE_ORIG, ".
-			" IF (
-				CAT_PR.QUANTITY > 0 OR
-				IF (CAT_PR.QUANTITY_TRACE = 'D', '".$strDefQuantityTrace."', CAT_PR.QUANTITY_TRACE) = 'N' OR
-				IF (CAT_PR.CAN_BUY_ZERO = 'D', '".$strDefCanBuyZero."', CAT_PR.CAN_BUY_ZERO) = 'Y',
-				'Y', 'N'
-			) as CATALOG_AVAILABLE, ".
+			" CAT_PR.AVAILABLE as CATALOG_AVAILABLE, ".
 			" CAT_PR.WEIGHT as CATALOG_WEIGHT, CAT_PR.WIDTH as CATALOG_WIDTH, CAT_PR.LENGTH as CATALOG_LENGTH, CAT_PR.HEIGHT as CATALOG_HEIGHT, ".
 			" CAT_PR.MEASURE as CATALOG_MEASURE, ".
 			" CAT_VAT.RATE as CATALOG_VAT, CAT_PR.VAT_INCLUDED as CATALOG_VAT_INCLUDED, ".
 			" CAT_PR.PRICE_TYPE as CATALOG_PRICE_TYPE, CAT_PR.RECUR_SCHEME_TYPE as CATALOG_RECUR_SCHEME_TYPE, ".
 			" CAT_PR.RECUR_SCHEME_LENGTH as CATALOG_RECUR_SCHEME_LENGTH, CAT_PR.TRIAL_PRICE_ID as CATALOG_TRIAL_PRICE_ID, ".
 			" CAT_PR.WITHOUT_ORDER as CATALOG_WITHOUT_ORDER, CAT_PR.SELECT_BEST_PRICE as CATALOG_SELECT_BEST_PRICE, ".
-			" CAT_PR.PURCHASING_PRICE as CATALOG_PURCHASING_PRICE, CAT_PR.PURCHASING_CURRENCY as CATALOG_PURCHASING_CURRENCY, CAT_PR.TYPE as CATALOG_TYPE ";
+			" CAT_PR.PURCHASING_PRICE as CATALOG_PURCHASING_PRICE, CAT_PR.PURCHASING_CURRENCY as CATALOG_PURCHASING_CURRENCY, ".
+			" CAT_PR.TYPE as CATALOG_TYPE, CAT_PR.BUNDLE as CATALOG_BUNDLE ";
 
 		$sResFrom .= " left join b_catalog_product CAT_PR on (CAT_PR.ID = BE.ID) ";
 		$sResFrom .= " left join b_catalog_iblock CAT_IB on ((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0) AND CAT_IB.IBLOCK_ID = BE.IBLOCK_ID) ";
 		$sResFrom .= " left join b_catalog_vat CAT_VAT on (CAT_VAT.ID = IF((CAT_PR.VAT_ID IS NULL OR CAT_PR.VAT_ID = 0), CAT_IB.VAT_ID, CAT_PR.VAT_ID)) ";
 
 		if (!empty($productWhere))
-		{
 			$sResWhere .= ' and '.implode(' and ', $productWhere);
-		}
 		unset($productWhere);
 
 		if (!empty($arStore))
@@ -633,6 +669,7 @@ class CCatalogProduct extends CAllCatalogProduct
 				$sResFrom .= " left join b_catalog_store_product CAT_SP".$inum." on (CAT_SP".$inum.".PRODUCT_ID = BE.ID and CAT_SP".$inum.".STORE_ID = ".$inum.") ";
 				$sResSelect  .= ", CAT_SP".$inum.".AMOUNT as CATALOG_STORE_AMOUNT_".$inum." ";
 			}
+			unset($inum);
 
 			if (!empty($arStoreOrder))
 			{
@@ -665,117 +702,122 @@ class CCatalogProduct extends CAllCatalogProduct
 
 	
 	/**
-	* <p>Метод возвращает результат выборки записей товаров в соответствии со своими параметрами. Метод динамичный.</p>
+	* <p>Метод возвращает результат выборки записей товаров в соответствии со своими параметрами. Нестатический метод.</p>
 	*
 	*
 	* @param array $arOrder = array() Массив, в соответствии с которым сортируются результирующие
-	* записи. Массив имеет вид: <pre class="syntax">array( "название_поля1" =&gt;
+	* записи. Массив имеет вид: 		<pre class="syntax">array( "название_поля1" =&gt;
 	* "направление_сортировки1", "название_поля2" =&gt;
-	* "направление_сортировки2", . . . )</pre> В качестве "название_поля<i>N</i>"
-	* может стоять любое поле товара, а в качестве
+	* "направление_сортировки2", . . . )</pre> 		В качестве "название_поля<i>N</i>"
+	* может стоять любое поле 		товара, а в качестве
 	* "направление_сортировки<i>X</i>" могут быть значения "<i>ASC</i>" (по
-	* возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> Если массив сортировки
-	* имеет несколько элементов, то результирующий набор сортируется
+	* возрастанию) и "<i>DESC</i>" (по убыванию).<br><br> 		Если массив сортировки
+	* имеет несколько элементов, то 		результирующий набор сортируется
 	* последовательно по каждому элементу (т.е. сначала сортируется по
 	* первому элементу, потом результат сортируется по второму и
-	* т.д.). <br><br> Значение по умолчанию - пустой массив array() - означает,
+	* т.д.). <br><br>  Значение по умолчанию - пустой массив array() - означает,
 	* что результат отсортирован не будет.
 	*
-	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются записи товара.
-	* Массив имеет вид: <pre class="syntax">array(
+	* @param array $arFilter = array() Массив, в соответствии с которым фильтруются 		записи товара.
+	* Массив имеет вид: 		<pre class="syntax">array(
 	* "[модификатор1][оператор1]название_поля1" =&gt; "значение1",
 	* "[модификатор2][оператор2]название_поля2" =&gt; "значение2", . . . )</pre>
 	* Удовлетворяющие фильтру записи возвращаются в результате, а
 	* записи, которые не удовлетворяют условиям фильтра,
-	* отбрасываются.<br><br> Допустимыми являются следующие модификаторы:
-	* <ul> <li> <b> !</b> - отрицание;</li> <li> <b> +</b> - значения null, 0 и пустая строка
-	* так же удовлетворяют условиям фильтра.</li> </ul> Допустимыми
-	* являются следующие операторы: <ul> <li> <b>&gt;=</b> - значение поля больше
-	* или равно передаваемой в фильтр величины;</li> <li> <b>&gt;</b> - значение
-	* поля строго больше передаваемой в фильтр величины;</li> <li><b> -
-	* значение поля меньше или равно передаваемой в фильтр
-	* величины;</b></li> <li><b> - значение поля строго меньше передаваемой в
-	* фильтр величины;</b></li> <li> <b>@</b> - оператор может использоваться для
-	* целочисленных и вещественных данных при передаче набора
-	* значений (массива). В этом случае при генерации sql-запроса будет
-	* использован sql-оператор <b>IN</b>, дающий компактную форму записи;</li>
-	* <li> <b>~</b> - значение поля проверяется на соответствие
-	* передаваемому в фильтр шаблону;</li> <li> <b>%</b> - значение поля
-	* проверяется на соответствие передаваемой в фильтр строке в
-	* соответствии с языком запросов.</li> </ul> В качестве "название_поляX"
-	* может стоять любое поле товара.<br><br> Пример фильтра: <pre
-	* class="syntax">array("QUANTITY_TRACE" =&gt; "Y")</pre> Этот фильтр означает "выбрать все
-	* записи, в которых значение в поле QUANTITY_TRACE (т.е. ведется
-	* количественный учет) равно Y".<br><br> Значение по умолчанию - пустой
-	* массив array() - означает, что результат отфильтрован не будет.
+	* отбрасываются.<br><br> 	Допустимыми являются следующие
+	* модификаторы: 		<ul> <li> <b> 	!</b>  - отрицание;</li> 			<li> <b> 	+</b>  - значения
+	* null, 0 и пустая строка так же удовлетворяют условиям фильтра.</li>
+	* 		</ul> 	Допустимыми являются следующие операторы: 	<ul> <li> <b>&gt;=</b> -
+	* значение поля больше или равно передаваемой в фильтр величины;</li>
+	* 			<li> <b>&gt;</b>  - значение поля строго больше передаваемой в фильтр
+	* величины;</li> 			<li><b> - значение поля меньше или равно передаваемой в
+	* фильтр величины;</b></li> 			<li><b> - значение поля строго меньше
+	* передаваемой в фильтр величины;</b></li> 			<li> <b>@</b>  - оператор может
+	* использоваться для целочисленных и вещественных данных при
+	* передаче набора значений (массива). В этом случае при генерации
+	* sql-запроса будет использован sql-оператор <b>IN</b>, дающий компактную
+	* форму записи;</li> 			<li> <b>~</b>  - значение поля проверяется на
+	* соответствие передаваемому в фильтр шаблону;</li> 			<li> <b>%</b>  -
+	* значение поля проверяется на соответствие передаваемой в фильтр
+	* строке в соответствии с языком запросов.</li> 	</ul> В качестве
+	* "название_поляX" может стоять любое поле 		товара.<br><br> 		Пример
+	* фильтра: 		<pre class="syntax">array("QUANTITY_TRACE" =&gt; "Y")</pre> 		Этот фильтр означает
+	* "выбрать все записи, в которых значение в поле QUANTITY_TRACE (т.е.
+	* ведется количественный учет) равно Y".<br><br> 	Значение по умолчанию -
+	* пустой массив array() - означает, что результат отфильтрован не
+	* будет.
 	*
-	* @param array $arGroupBy = false Массив полей, по которым группируются записи типов товара. Массив
-	* имеет вид: <pre class="syntax">array("название_поля1", "название_поля2", . . .)</pre> В
-	* качестве "название_поля<i>N</i>" может стоять любое поле типов
-	* товара. <br><br> Если массив пустой, то метод вернет число записей,
-	* удовлетворяющих фильтру.<br><br> Значение по умолчанию - <i>false</i> -
-	* означает, что результат группироваться не будет.
+	* @param array $arGroupBy = false Массив полей, по которым группируются записи 		типов товара.
+	* Массив имеет вид: 		<pre class="syntax">array("название_поля1", "название_поля2",
+	* . . .)</pre> 	В качестве "название_поля<i>N</i>" может стоять любое поле
+	* 		типов товара. <br><br> 	Если массив пустой, то метод вернет число
+	* записей, удовлетворяющих фильтру.<br><br> 		Значение по умолчанию -
+	* <i>false</i> - означает, что результат группироваться не будет.
 	*
-	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: <ul>
+	* @param array $arNavStartParams = false Массив параметров выборки. Может содержать следующие ключи: 		<ul>
 	* <li>"<b>nTopCount</b>" - количество возвращаемых методом записей будет
-	* ограничено сверху значением этого ключа;</li> <li> любой ключ,
-	* принимаемый методом <b> CDBResult::NavQuery</b> в качестве третьего
-	* параметра.</li> </ul> Значение по умолчанию - <i>false</i> - означает, что
+	* ограничено сверху значением этого ключа;</li> 			<li> 	любой ключ,
+	* принимаемый методом <b> CDBResult::NavQuery</b> 				в качестве третьего
+	* параметра.</li> 		</ul> Значение по умолчанию - <i>false</i> - означает, что
 	* параметров выборки нет.
 	*
 	* @param array $arSelectFields = array() Массив полей записей, которые будут возвращены методом. Можно
 	* указать только те поля, которые необходимы. Если в массиве
-	* присутствует значение "*", то будут возвращены все доступные
-	* поля.<br><br> Значение по умолчанию - пустой массив array() - означает,
+	* присутствует значение 		"*", то будут возвращены все доступные
+	* поля.<br><br> 		Значение по умолчанию - пустой массив 		array() - означает,
 	* что будут возвращены все поля основной таблицы запроса.
 	*
 	* @return CDBResult <p>Объект класса CDBResult, содержащий записи в виде ассоциативных
-	* массивов параметров товара с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="15%">Ключ</th> <th>Описание</th> <th width="10%">С версии</th> </tr> <tr> <td>ID</td>
-	* <td>Код товара.</td> <td></td> </tr> <tr> <td>QUANTITY</td> <td>Количество на складе.</td>
-	* <td></td> </tr> <tr> <td>QUANTITY_RESERVED</td> <td>Зарезервированное количество.</td>
-	* <td>12.5.0</td> </tr> <tr> <td>QUANTITY_TRACE</td> <td>Определяет ведется ли
-	* количественный учет (Y/N). До версии 12.5.0 параметр назывался
-	* "уменьшать количество при оформлении заказа". Оригинальное
-	* значение доступно в ключе QUANTITY_TRACE_ORIG.</td> <td></td> </tr> <tr>
-	* <td>QUANTITY_TRACE_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "включить количественный учет".</td>
-	* <td>12.0.0</td> </tr> <tr> <td>SUBSCRIBE</td> <td>Разрешение/запрет подписки при
-	* отсутствии товара (Y/N/D<b>*</b>).</td> <td>14.0.0</td> </tr> <tr> <td>WEIGHT</td> <td>Вес
-	* единицы товара.</td> <td>14.0.0</td> </tr> <tr> <td>WIDTH</td> <td>Ширина товара (в
-	* мм).</td> <td>14.0.0</td> </tr> <tr> <td>LENGTH</td> <td>Длина товара (в мм).</td> <td>14.0.0</td> </tr>
-	* <tr> <td>HEIGHT</td> <td>Высота товара (в мм).</td> <td>14.0.0</td> </tr> <tr> <td>PRICE_TYPE</td>
-	* <td>Тип цены (S - одноразовый платеж, R - регулярные платежи, T -
-	* пробная подписка)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип периода
-	* подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" - квартал, "S" -
-	* полугодие, "Y" - год)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_LENGTH</td> <td>Длина периода
-	* подписки.</td> <td></td> </tr> <tr> <td>TRIAL_PRICE_ID</td> <td>Код товара, для которого
-	* данный товар является пробным.</td> <td></td> </tr> <tr> <td>WITHOUT_ORDER</td> <td>Флаг
-	* "Продление подписки без оформления заказа"</td> <td></td> </tr> <tr>
-	* <td>TIMESTAMP_X</td> <td>Дата последнего изменения записи. Задается в
-	* формате сайта.</td> <td></td> </tr> <tr> <td>VAT_ID</td> <td>Идентификатор ставки
-	* НДС.</td> <td></td> </tr> <tr> <td>VAT_INCLUDED</td> <td>Признак включённости НДС в цену
-	* (Y/N).</td> <td></td> </tr> <tr> <td>PURCHASING_PRICE</td> <td>Величина закупочной цены.</td>
-	* <td>12.5.0</td> </tr> <tr> <td>PURCHASING_CURRENCY</td> <td>Валюта закупочной цены.</td>
-	* <td>12.5.0</td> </tr> <tr> <td>CAN_BUY_ZERO</td> <td>Разрешена ли покупка при отсутствии
-	* товара (Y/N). Оригинальное значение доступно в ключе CAN_BUY_ZERO_ORIG.</td>
-	* <td>12.0.0</td> </tr> <tr> <td>CAN_BUY_ZERO_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "разрешить покупку
-	* при отсутствии товара".</td> <td>12.0.0</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td>
-	* <td>Разрешено ли отрицательное количество товара (Y/N). Оригинальное
-	* значение доступно в ключе NEGATIVE_AMOUNT_TRACE_ORIG.</td> <td>12.0.0</td> </tr> <tr>
+	* массивов параметров товара с ключами:</p><table class="tnormal" width="100%"> <tr> <th
+	* width="15%">Ключ</th>     <th>Описание</th> <th width="10%">С версии</th>   </tr> <tr> <td>ID</td>   
+	*  <td>Код товара.</td> <td></td> </tr> <tr> <td>QUANTITY</td>     <td>Количество на
+	* складе.</td> <td></td> </tr> <tr> <td>QUANTITY_RESERVED</td>     <td>Зарезервированное
+	* количество.</td> <td>12.5.0</td> </tr> <tr> <td>QUANTITY_TRACE</td>     <td>Определяет
+	* ведется ли количественный учет (Y/N). До версии 12.5.0 параметр
+	* назывался "уменьшать количество при оформлении заказа".
+	* Оригинальное значение доступно в ключе QUANTITY_TRACE_ORIG.</td> <td></td>   </tr>
+	* <tr> <td>QUANTITY_TRACE_ORIG</td>     <td>Флаг (Y/N/D<b>*</b>) "включить количественный
+	* учет".</td> <td>12.0.0</td>   </tr> <tr> <td>SUBSCRIBE</td> <td>Разрешение/запрет подписки
+	* при отсутствии товара (Y/N/D<b>*</b>).</td> <td>14.0.0</td> </tr> <tr> <td>WEIGHT</td>     <td>Вес
+	* единицы товара.</td> <td>14.0.0</td> </tr> <tr> <td>WIDTH</td>     <td>Ширина товара (в
+	* мм).</td> <td>14.0.0</td> </tr> <tr> <td>LENGTH</td>     <td>Длина товара (в мм).</td> <td>14.0.0</td>
+	* </tr> <tr> <td>HEIGHT</td>     <td>Высота товара (в мм).</td> <td>14.0.0</td> </tr> <tr>
+	* <td>PRICE_TYPE</td> <td>Тип цены (S - одноразовый платеж, R - регулярные
+	* платежи, T - пробная подписка)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_TYPE</td> <td>Тип
+	* периода подписки ("H" - час, "D" - сутки, "W" - неделя, "M" - месяц, "Q" -
+	* квартал, "S" - полугодие, "Y" - год)</td> <td></td> </tr> <tr> <td>RECUR_SCHEME_LENGTH</td>
+	* <td>Длина периода подписки.</td> <td></td> </tr> <tr> <td>TRIAL_PRICE_ID</td> <td>Код
+	* товара, для которого данный товар является пробным.</td> <td></td> </tr> <tr>
+	* <td>WITHOUT_ORDER</td> <td>Флаг "Продление подписки без оформления заказа"</td>
+	* <td></td> </tr> <tr> <td>TIMESTAMP_X</td>     <td>Дата последнего изменения записи.
+	* Задается в формате сайта.</td> <td></td>   </tr> <tr> <td>VAT_ID</td>
+	* <td>Идентификатор ставки НДС.</td> <td></td> </tr> <tr> <td>VAT_INCLUDED</td> <td>Признак
+	* включённости НДС в цену (Y/N).</td> <td></td> </tr> <tr> <td>PURCHASING_PRICE</td>
+	* <td>Величина закупочной цены.</td> <td>12.5.0</td> </tr> <tr> <td>PURCHASING_CURRENCY</td>
+	* <td>Валюта закупочной цены.</td> <td>12.5.0</td> </tr> <tr> <td>CAN_BUY_ZERO</td>
+	* <td>Разрешена ли покупка при отсутствии товара (Y/N). Оригинальное
+	* значение доступно в ключе CAN_BUY_ZERO_ORIG.</td> <td>12.0.0</td> </tr> <tr>
+	* <td>CAN_BUY_ZERO_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "разрешить покупку при отсутствии
+	* товара".</td> <td>12.0.0</td> </tr> <tr> <td>NEGATIVE_AMOUNT_TRACE</td> <td>Разрешено ли
+	* отрицательное количество товара (Y/N). Оригинальное значение
+	* доступно в ключе NEGATIVE_AMOUNT_TRACE_ORIG.</td> <td>12.0.0</td> </tr> <tr>
 	* <td>NEGATIVE_AMOUNT_TRACE_ORIG</td> <td>Флаг (Y/N/D<b>*</b>) "разрешить отрицательное
 	* количество товара".</td> <td>12.0.0</td> </tr> <tr> <td>TMP_ID</td> <td>Временный
 	* строковый идентификатор, используемый для служебных целей.</td>
 	* <td></td> </tr> <tr> <td>BARCODE_MULTI</td> <td>(Y/N) Определяет каждый ли экземпляр
-	* товара имеет собственный штрихкод.</td> <td>12.5.0</td> </tr> <tr> <td>MEASURE</td> <td>ID
-	* единицы измерения.</td> <td>14.0.0</td> </tr> <tr> <td>TYPE</td> <td>Тип товара (для
-	* типа товара "комплект" значение равно "2", во всех других случаях -
-	* "1").</td> <td>14.0.0</td> </tr> <tr> <td>ELEMENT_IBLOCK_ID</td> <td>Код инфоблока товара.</td>
-	* <td></td> </tr> <tr> <td>ELEMENT_XML_ID</td> <td>Внешний код товара.</td> <td></td> </tr> <tr>
-	* <td>ELEMENT_NAME </td> <td>Название товара.</td> <td></td> </tr> <tr><td colspan="3"> <b>*</b> -
-	* значение берется из настроек модуля.</td></tr> </table> <a name="examples"></a>
+	* товара имеет собственный штрихкод.</td> <td>12.5.0</td> </tr> <tr> <td>MEASURE</td>    
+	* <td>ID единицы измерения.</td> <td>14.0.0</td> </tr> <tr> <td>TYPE</td> <td>Тип товара.
+	* Возможные значения: "1" - "простой товар", "2" - "комплект", "3" - "товар с
+	* торговыми предложениями", "4" - "торговое предложение".<br><br> До
+	* версии 16.0.3 для типа товара "комплект" значение равно "2", во всех
+	* других случаях - "1".</td> <td>14.0.0</td> </tr> <tr> <td>ELEMENT_IBLOCK_ID</td> <td>Код
+	* инфоблока товара.</td> <td></td> </tr> <tr> <td>ELEMENT_XML_ID</td> <td>Внешний код
+	* товара.</td> <td></td> </tr> <tr> <td>ELEMENT_NAME </td> <td>Название товара.</td> <td></td> </tr>
+	* <tr><td colspan="3"> <b>*</b> - значение берется из настроек модуля.</td></tr> </table><a
+	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Выведем коды 10 товаров с самым большим количеством на складе
 	* // из тех, количество которых при заказе должно уменьшаться
@@ -829,12 +871,8 @@ class CCatalogProduct extends CAllCatalogProduct
 			"NEGATIVE_AMOUNT_TRACE" => array("FIELD" => "IF (CP.NEGATIVE_AMOUNT_TRACE = 'D', '".$defaultNegativeAmount."', CP.NEGATIVE_AMOUNT_TRACE)", "TYPE" => "char"),
 			"SUBSCRIBE_ORIG" => array("FIELD" => "CP.SUBSCRIBE", "TYPE" => "char"),
 			"SUBSCRIBE" => array("FIELD" => "IF (CP.SUBSCRIBE = 'D', '".$defaultSubscribe."', CP.SUBSCRIBE)", "TYPE" => "char"),
-			"AVAILABLE" => array("FIELD" => "IF (
-				CP.QUANTITY <= 0 AND
-				IF (CP.QUANTITY_TRACE = 'D', '".$defaultQuantityTrace."', CP.QUANTITY_TRACE) = 'Y' AND
-				IF (CP.CAN_BUY_ZERO = 'D', '".$defaultCanBuyZero."', CP.CAN_BUY_ZERO) = 'N',
-				'N', 'Y'
-			)", "TYPE" => "char"),
+			"AVAILABLE" => array("FIELD" => "CP.AVAILABLE", "TYPE" => "char"),
+			"BUNDLE" => array("FIELD" => "CP.BUNDLE", "TYPE" => "char"),
 			"WEIGHT" => array("FIELD" => "CP.WEIGHT", "TYPE" => "double"),
 			"WIDTH" => array("FIELD" => "CP.WIDTH", "TYPE" => "double"),
 			"LENGTH" => array("FIELD" => "CP.LENGTH", "TYPE" => "double"),
@@ -952,7 +990,7 @@ AND CAT_VAT.ACTIVE='Y'
 		return $DB->Query($query);
 	}
 
-	static public function SetProductType($intID, $intTypeID)
+	public static function SetProductType($intID, $intTypeID)
 	{
 		global $DB;
 		$intID = intval($intID);

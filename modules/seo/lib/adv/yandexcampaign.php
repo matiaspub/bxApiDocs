@@ -92,6 +92,17 @@ class YandexCampaignTable extends AdvEntity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает путь к файлу, содержащему определение класса. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/getfilepath.php
+	* @author Bitrix
+	*/
 	public static function getFilePath()
 	{
 		return __FILE__;
@@ -102,6 +113,17 @@ class YandexCampaignTable extends AdvEntity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы, содержащей локальную копию кампаний в Яндекс.Директ. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_seo_adv_campaign';
@@ -112,6 +134,17 @@ class YandexCampaignTable extends AdvEntity
 	 *
 	 * @return Engine\YandexDirect|null
 	 */
+	
+	/**
+	* <p>Метод возвращает ссылку на экземпляр класса <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/seo/engine/yandexdirect/index.php">\Bitrix\Seo\Engine\YandexDirect</a>, отвечающего за подготовку и отправку запросов к Яндекс.Директ. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return \Bitrix\Seo\Engine\YandexDirect|null 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/getengine.php
+	* @author Bitrix
+	*/
 	public static function getEngine()
 	{
 		if(!self::$engine)
@@ -132,6 +165,25 @@ class YandexCampaignTable extends AdvEntity
 	 * @throws Main\ArgumentException
 	 * @throws Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Метод выполняет проверку полей и добавляет новую кампания Яндекс.Директ. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Добавляемые данные.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/onbeforeadd.php
+	* @author Bitrix
+	*/
 	public static function onBeforeAdd(Entity\Event $event)
 	{
 		$result = new Entity\EventResult();
@@ -199,6 +251,25 @@ class YandexCampaignTable extends AdvEntity
 	 * @throws Main\ArgumentException
 	 * @throws Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Makes fields validation and updates Yandex.Direct campaign.</p>
+	*
+	*
+	* @param mixed $Bitrix  Event data.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/onbeforeupdate.php
+	* @author Bitrix
+	*/
 	public static function onBeforeUpdate(Entity\Event $event)
 	{
 		$result = new Entity\EventResult();
@@ -283,6 +354,25 @@ class YandexCampaignTable extends AdvEntity
 	 * @throws Engine\YandexException
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод удаляет кампанию из Яндекс.Директ. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Удаляемые данные.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/ondelete.php
+	* @author Bitrix
+	*/
 	public static function onDelete(Entity\Event $event)
 	{
 		$primary = $event->getParameter("primary");
@@ -310,6 +400,25 @@ class YandexCampaignTable extends AdvEntity
 	 *
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод удаляет все баннеры кампании. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Удаляемые данные.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/adv/yandexcampaigntable/onafterdelete.php
+	* @author Bitrix
+	*/
 	public static function onAfterDelete(Entity\Event $event)
 	{
 		$primary = $event->getParameter("primary");

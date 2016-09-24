@@ -47,30 +47,49 @@ Loc::loadMessages(__FILE__);
  */
 class IblockTable extends Entity\DataManager
 {
-	const SELECT = 'L';
-	const DROPDOWNS = 'D';
-	const PATH = 'P';
-	const SEPARATE = 'S';
-	const COMBINED = 'C';
-	const SIMPLE = 'S';
-	const EXTENDED = 'E';
-	const INVALID = 'I';
+	const PROPERTY_STORAGE_COMMON = 1;
+	const PROPERTY_STORAGE_SEPARATE = 2;
 
-	/**
-	 * Returns path to the file which contains definition of the class.
-	 *
-	 * @return string
-	 */
-	public static function getFilePath()
-	{
-		return __FILE__;
-	}
+	const RIGHTS_SIMPLE = 'S';
+	const RIGHTS_EXTENDED = 'E';
+
+	const PROPERTY_INDEX_DISABLE = 'N';
+	const PROPERTY_INDEX_ENABLE = 'Y';
+	const PROPERTY_INDEX_INVALID = 'I';
+
+	const LIST_MODE_SEPARATE = 'S';
+	const LIST_MODE_COMBINED = 'C';
+
+	const SECTION_CHOOSER_SELECT = 'L';
+	const SECTION_CHOOSER_DROPDOWNS = 'D';
+	const SECTION_CHOOSER_PATH = 'P';
+
+	/* deprecated constants */
+	const SELECT = self::SECTION_CHOOSER_SELECT;
+	const DROPDOWNS = self::SECTION_CHOOSER_DROPDOWNS;
+	const PATH = self::SECTION_CHOOSER_PATH;
+	const SIMPLE = self::RIGHTS_SIMPLE;
+	const EXTENDED = self::RIGHTS_EXTENDED;
+	const SEPARATE = self::LIST_MODE_SEPARATE;
+	const COMBINED = self::LIST_MODE_COMBINED;
+	const INVALID = self::PROPERTY_INDEX_INVALID;
 
 	/**
 	 * Returns DB table name for entity
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы информационных блоков в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock';
@@ -81,6 +100,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы информационных блоков. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -185,17 +215,24 @@ class IblockTable extends Entity\DataManager
 			),
 			'SECTION_CHOOSER' => array(
 				'data_type' => 'enum',
-				'values' => array(self::SELECT, self::DROPDOWNS, self::PATH),
+				'values' => array(
+					self::SECTION_CHOOSER_SELECT,
+					self::SECTION_CHOOSER_DROPDOWNS,
+					self::SECTION_CHOOSER_PATH
+				),
+				'default_value' => self::SECTION_CHOOSER_SELECT,
 				'title' => Loc::getMessage('IBLOCK_ENTITY_SECTION_CHOOSER_FIELD'),
 			),
 			'LIST_MODE' => array(
 				'data_type' => 'enum',
-				'values' => array(self::SEPARATE, self::COMBINED),
+				'values' => array(self::LIST_MODE_COMBINED, self::LIST_MODE_SEPARATE),
+				'default_value' => self::LIST_MODE_COMBINED,
 				'title' => Loc::getMessage('IBLOCK_ENTITY_LIST_MODE_FIELD'),
 			),
 			'RIGHTS_MODE' => array(
 				'data_type' => 'enum',
-				'values' => array(self::SIMPLE, self::EXTENDED),
+				'values' => array(self::RIGHTS_SIMPLE, self::RIGHTS_EXTENDED),
+				'default_value' => self::RIGHTS_SIMPLE,
 				'title' => Loc::getMessage('IBLOCK_ENTITY_RIGHTS_MODE_FIELD'),
 			),
 			'SECTION_PROPERTY' => array(
@@ -205,12 +242,14 @@ class IblockTable extends Entity\DataManager
 			),
 			'PROPERTY_INDEX' => array(
 				'data_type' => 'enum',
-				'values' => array('N', 'Y', self::INVALID),
+				'values' => array(self::PROPERTY_INDEX_DISABLE, self::PROPERTY_INDEX_ENABLE, self::PROPERTY_INDEX_INVALID),
+				'default' => self::PROPERTY_INDEX_DISABLE,
 				'title' => Loc::getMessage('IBLOCK_ENTITY_SECTION_PROPERTY_FIELD'),
 			),
 			'VERSION' => array(
 				'data_type' => 'enum',
-				'values' => array(1, 2),
+				'values' => array(self::PROPERTY_STORAGE_COMMON, self::PROPERTY_STORAGE_SEPARATE),
+				'default_value' => self::PROPERTY_STORAGE_COMMON,
 				'title' => Loc::getMessage('IBLOCK_ENTITY_VERSION_FIELD'),
 			),
 			'LAST_CONV_ELEMENT' => array(
@@ -243,6 +282,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>IBLOCK_TYPE_ID</code> (код типа информационных блоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validateiblocktypeid.php
+	* @author Bitrix
+	*/
 	public static function validateIblockTypeId()
 	{
 		return array(
@@ -255,6 +305,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CODE</code> (символьный идентификатор инфоблока). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatecode.php
+	* @author Bitrix
+	*/
 	public static function validateCode()
 	{
 		return array(
@@ -267,6 +328,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (название инфоблока). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -279,6 +351,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>LIST_PAGE_URL</code> (шаблон URL-а к странице для публичного просмотра списка элементов информационного блока). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatelistpageurl.php
+	* @author Bitrix
+	*/
 	public static function validateListPageUrl()
 	{
 		return array(
@@ -291,6 +374,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>DETAIL_PAGE_URL</code> (шаблон URL-а странице для детального просмотра элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatedetailpageurl.php
+	* @author Bitrix
+	*/
 	public static function validateDetailPageUrl()
 	{
 		return array(
@@ -303,6 +397,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>SECTION_PAGE_URL</code> (шаблон URL-а к странице для просмотра раздела). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatesectionpageurl.php
+	* @author Bitrix
+	*/
 	public static function validateSectionPageUrl()
 	{
 		return array(
@@ -315,6 +420,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>CANONICAL_PAGE_URL</code> (канонический URL элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatecanonicalpageurl.php
+	* @author Bitrix
+	*/
 	public static function validateCanonicalPageUrl()
 	{
 		return array(
@@ -327,6 +443,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>XML_ID</code> (внешний код инфоблока). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatexmlid.php
+	* @author Bitrix
+	*/
 	public static function validateXmlId()
 	{
 		return array(
@@ -339,6 +466,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>TMP_ID</code> (временный символьный идентификатор, используемый для служебных целей).</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validatetmpid.php
+	* @author Bitrix
+	*/
 	public static function validateTmpId()
 	{
 		return array(
@@ -351,6 +489,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>EDIT_FILE_BEFORE</code> (полный путь к файлу-обработчику массива полей элемента перед сохранением на странице редактирования элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validateeditfilebefore.php
+	* @author Bitrix
+	*/
 	public static function validateEditFileBefore()
 	{
 		return array(
@@ -363,6 +512,17 @@ class IblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>EDIT_FILE_AFTER</code> (полный путь к файлу-обработчику вывода интерфейса редактирования элемента). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/iblocktable/validateeditfileafter.php
+	* @author Bitrix
+	*/
 	public static function validateEditFileAfter()
 	{
 		return array(

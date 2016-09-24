@@ -113,7 +113,7 @@ class DefaultSiteHelper extends Helper
 	}
 
 	// block add handle, nothing to add
-	public static function add()
+	public static function add($data)
 	{
 		throw new Main\NotSupportedException(Loc::getMessage('SALE_LOCATION_ADMIN_DEFAULT_SITE_HELPER_ADD_OP_UNSUPPORTED'));
 	}
@@ -138,13 +138,13 @@ class DefaultSiteHelper extends Helper
 	}
 
 	// block delete handle, nothing to delete
-	public static function delete()
+	public static function delete($primary)
 	{
 		throw new Main\NotSupportedException(Loc::getMessage('SALE_LOCATION_ADMIN_DEFAULT_SITE_HELPER_DELETE_OP_UNSUPPORTED'));
 	}
 
 	// avoid paging here, kz its based on ID which is absent for this table
-	public static function getList($parameters = array(), $tableId = false)
+	public static function getList($parameters = array(), $tableId = false, $navigation = 20)
 	{
 		$entityClass = static::getEntityClass();
 

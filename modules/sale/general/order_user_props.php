@@ -104,18 +104,37 @@ class CAllSaleOrderUserProps
 		}
 		*/
 
+		$utilPropertyList = array();
+
+
 		$dbOrderProperties = CSaleOrderProps::GetList(
 			array(),
-			array("PERSON_TYPE_ID" => $personTypeId, "ACTIVE" => "Y", "UTIL" => "N", "USER_PROPS" => "Y"),
+			array("PERSON_TYPE_ID" => $personTypeId, "ACTIVE" => "Y", "USER_PROPS" => "Y"),
 			false,
 			false,
-			array("ID", "TYPE", "NAME", "CODE")
+			array("ID", "TYPE", "NAME", "CODE", "UTIL")
 		);
 		while ($arOrderProperty = $dbOrderProperties->Fetch())
 		{
+			if ($arOrderProperty['UTIL'] == "Y")
+			{
+				$utilPropertyList[] = $arIDs[$arOrderProperty["ID"]];
+				continue;
+			}
+
 			$curVal = $orderProps[$arOrderProperty["ID"]];
 			if (($arOrderProperty["TYPE"] == "MULTISELECT") && is_array($curVal))
 				$curVal = implode(",", $curVal);
+
+			if (($arOrderProperty["TYPE"] == "FILE") && is_array($curVal))
+			{
+				$fileList = array();
+				foreach ($curVal as $fileDat)
+				{
+					$fileList[] = $fileDat['ID'];
+				}
+				$curVal = serialize($fileList);
+			}
 
 			if (strlen($curVal) > 0)
 			{
@@ -155,7 +174,12 @@ class CAllSaleOrderUserProps
 		}
 
 		foreach ($arIDs as $id)
+		{
+			if (!empty($utilPropertyList) && in_array($id, $utilPropertyList))
+				continue;
+
 			CSaleOrderUserPropsValue::Delete($id);
+		}
 	}
 
 	public static function DoLoadProfiles($userId, $personTypeId = null)
@@ -213,21 +237,21 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Метод возвращает параметры профиля покупателя с кодом ID. Метод динамичный. </p>
+	* <p>Метод возвращает параметры профиля покупателя с кодом ID. Нестатический метод. </p>
 	*
 	*
-	* @param int $ID  Код профиля покупателя.
+	* @param mixed $intID  Код профиля покупателя.
 	*
 	* @return array <p>Возвращается ассоциативный массив параметров профиля
-	* покупателя с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код профиля покупателя.</td> </tr> <tr>
-	* <td>NAME</td> <td>Название профиля.</td> </tr> <tr> <td>USER_ID</td> <td>Код пользователя,
-	* которому принадлежит профиль.</td> </tr> <tr> <td>PERSON_TYPE_ID</td> <td>Тип
-	* плательщика.</td> </tr> <tr> <td>DATE_UPDATE</td> <td>Дата последнего изменения
-	* профиля.</td> </tr> </table> <p>  </p<a name="examples"></a>
+	* покупателя с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>    
+	* <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код профиля покупателя.</td> </tr> <tr>
+	* <td>NAME</td>     <td>Название профиля.</td> </tr> <tr> <td>USER_ID</td>     <td>Код
+	* пользователя, которому принадлежит профиль.</td> </tr> <tr>
+	* <td>PERSON_TYPE_ID</td>     <td>Тип плательщика.</td> </tr> <tr> <td>DATE_UPDATE</td>     <td>Дата
+	* последнего изменения профиля.</td> </tr> </table><p>  </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if ($ar = CSaleOrderUserProps::GetByID(12))
 	* {
@@ -291,23 +315,23 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Метод обновляет параметры профиля покупателя с кодом ID на значения из массива arFields. Метод динамичный.</p>
+	* <p>Метод обновляет параметры профиля покупателя с кодом ID на значения из массива arFields. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код профиля покупателя.
+	* @param mixed $intID  Код профиля покупателя.
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров профиля. Ключами являются
 	* названия параметров, а значениями - соответствующие
 	* значения.<br><br> Допустимые ключи:<ul> <li> <b>NAME</b> - название профиля
-	* покупателя;</li> <li> <b>USER_ID</b> - код пользователя, которому
-	* принадлежит профиль;</li> <li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> <li>
+	* покупателя;</li> 	<li> <b>USER_ID</b> - код пользователя, которому
+	* принадлежит профиль;</li> 	<li> <b>PERSON_TYPE_ID</b> - тип плательщика;</li> 	<li>
 	* <b>DATE_UPDATE</b> - дата последнего изменения.</li> </ul>
 	*
 	* @return int <p>Возвращается код измененного профиля или <i>false</i> в случае
-	* ошибки.</p> <a name="examples"></a>
+	* ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Изменим название профиля покупателя
 	* $arFields = array(
@@ -345,7 +369,7 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Метод удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). Метод динамичный.</p> <br><br>
+	* <p>Метод удаляет все пустые профили из базы (т.е. профили, в которых нет свойств). Нестатический метод.</p> <br><br>
 	*
 	*
 	* @return mixed 
@@ -371,22 +395,14 @@ class CAllSaleOrderUserProps
 
 	
 	/**
-	* <p>Метод удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. Метод динамичный.</p>
+	* <p>Метод удаляет профиль покупателя с кодом ID. Вместе с профилем удаляются все его свойства. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код профиля покупателя.
+	* @param mixed $intID  Код профиля покупателя.
 	*
 	* @return bool <p>Возвращается объект <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> в случае
-	* успешного удаления и <i>false</i> - в противном случае.</p> <a name="examples"></a>
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* CSaleOrderUserProps::Delete(12);
-	* ?&gt;
-	* </pre>
-	*
+	* успешного удаления и <i>false</i> - в противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csaleorderuserprops/csaleorderuserprops__delete.118435cf.php

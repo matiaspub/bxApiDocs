@@ -828,7 +828,7 @@ class CSocNetLogComments extends CAllSocNetLogComments
 		return $dbRes;
 	}
 
-public static 	function OnBlogDelete($blog_id)
+	public static function OnBlogDelete($blog_id)
 	{
 		return $GLOBALS["DB"]->Query("DELETE SLC FROM b_sonet_log_comment SLC INNER JOIN b_blog_comment BC ON SLC.SOURCE_ID = BC.ID AND BC.BLOG_ID = ".intval($blog_id)." WHERE SLC.EVENT_ID = 'blog_comment_micro' OR SLC.EVENT_ID = 'blog_comment'", true);
 	}

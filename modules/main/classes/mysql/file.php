@@ -1,17 +1,28 @@
 <?
+
+/**
+ * Класс для работы с файлами и изображениями.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cfile/index.php
+ * @author Bitrix
+ */
 class CFile extends CAllFile
 {
 	
 	/**
-	* <p>Метод удаляет файл из таблицы зарегистрированных файлов (b_file) и с диска. Статичный метод.</p>
+	* <p>Метод удаляет файл из таблицы зарегистрированных файлов (b_file) и с диска. Статический метод.</p>
 	*
 	*
-	* @param int $id  Цифровой идентификатор файла.
+	* @param mixed $intid  Цифровой идентификатор файла.
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // удаляем изображение формы
 	* $arFilter = array("ID" =&gt; 1, "ID_EXACT_MATCH" =&gt; "Y");

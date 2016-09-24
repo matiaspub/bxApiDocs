@@ -57,6 +57,7 @@ class SenderTriggerUserDontAuth extends \Bitrix\Sender\TriggerConnectorClosed
 			);
 		}
 
+		$filter['=ACTIVE'] = true;
 		$userListDb = \Bitrix\Main\UserTable::getList(array(
 			'select' => array('EMAIL', 'ID', 'NAME'),
 			'filter' => $filter,

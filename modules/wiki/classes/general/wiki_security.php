@@ -4,7 +4,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов. Динамичный метод. 
+ * <b>CWikiSecurity</b> - Класс защищающий вики-страницу от потенциально опасных элементов. Динамичный метод.
  *
  *
  * @return mixed 
@@ -274,12 +274,12 @@ class CWikiSecurity
 	* <p>Метод обрабатывает содержимое Wiki-страницы.</p>
 	*
 	*
-	* @param string &$str  Содержимое Wiki-страницы </ht
+	* @param string &$str  Содержимое Wiki-страницы
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>
 	* $IBLOCK_ID = 2;
 	* $NAME = 'Тестовая страница';
@@ -293,12 +293,11 @@ class CWikiSecurity
 	* $CWikiSecurity = new CWikiSecurity ();
 	* $CWikiSecurity-&gt;clear($arElement['~DETAIL_TEXT']);
 	* echo $arElement['~DETAIL_TEXT'];<br>?&gt;
-	* </htm
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php">CWikiParser::Parse</a> </li>
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/wiki/classes/cwikiparser/parse.php">CWikiParser::Parse</a> </li> 
 	* </ul><a name="examples"></a>
 	*
 	*

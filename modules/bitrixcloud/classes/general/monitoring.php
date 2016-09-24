@@ -123,7 +123,8 @@ class CBitrixCloudMonitoring
 	 */
 	static public function startMonitoring($domain, $is_https, $language_id, $emails, $tests)
 	{
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudMonitoringWebService();
 			$web_service->actionStart($domain, $is_https, $language_id, $emails, $tests);
 			CBitrixCloudMonitoringResult::setExpirationTime(0);
@@ -143,7 +144,8 @@ class CBitrixCloudMonitoring
 	 */
 	static public function stopMonitoring($domain)
 	{
-		try {
+		try
+		{
 			$web_service = new CBitrixCloudMonitoringWebService();
 			$web_service->actionStop($domain);
 			CBitrixCloudMonitoringResult::setExpirationTime(0);
@@ -191,7 +193,8 @@ class CBitrixCloudMonitoring
 
 		if ($this->result === null)
 		{
-			try {
+			try
+			{
 				if (CBitrixCloudMonitoringResult::isExpired())
 				{
 					$web_service = new CBitrixCloudMonitoringWebService();

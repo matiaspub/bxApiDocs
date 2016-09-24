@@ -19,6 +19,7 @@ class PostingTable extends Entity\DataManager
 	const STATUS_PART = 'P';
 	const STATUS_SENT = 'S';
 	const STATUS_SENT_WITH_ERRORS = 'E';
+	const STATUS_ABORT = 'A';
 
 	/**
 	 * @return string
@@ -66,6 +67,38 @@ class PostingTable extends Entity\DataManager
 			),
 			'DATE_SENT' => array(
 				'data_type' => 'datetime',
+			),
+			'COUNT_READ' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_CLICK' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_UNSUB' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_SEND_ALL' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_SEND_NONE' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_SEND_ERROR' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_SEND_SUCCESS' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
+			),
+			'COUNT_SEND_DENY' => array(
+				'data_type' => 'integer',
+				'default_value' => 0
 			),
 			'MAILING' => array(
 				'data_type' => 'Bitrix\Sender\MailingTable',
@@ -191,12 +224,12 @@ class PostingTable extends Entity\DataManager
 
 		// fetch all unsubscribed emails of current mailing for excluding from recipients
 		$emailNotSendList = array();
-		$recipientUnsubDb = \Bitrix\Sender\PostingUnsubTable::getList(array(
-			'select' => array('EMAIL' => 'POSTING_RECIPIENT.EMAIL'),
-			'filter' => array('POSTING.MAILING_ID' => $posting['MAILING_ID'])
+		$unSubEmailDb = \Bitrix\Sender\MailingSubscriptionTable::getUnSubscriptionList(array(
+			'select' => array('EMAIL' => 'CONTACT.EMAIL'),
+			'filter' => array('=MAILING_ID' => $posting['MAILING_ID'])
 		));
-		while($recipientUnsub = $recipientUnsubDb->fetch())
-			$emailNotSendList[] = $recipientUnsub['EMAIL'];
+		while($unSubEmail = $unSubEmailDb->fetch())
+			$emailNotSendList[] = $unSubEmail['EMAIL'];
 
 		$groupConnectorsDataCount = array();
 
@@ -244,14 +277,14 @@ class PostingTable extends Entity\DataManager
 
 			$connectorDataCount = 0;
 			$connector->setFieldValues($group['CONNECTOR_ENDPOINT']['FIELDS']);
-			$connectorDataDb = $connector->getData();
+			$connectorDataDb = $connector->getResult();
 			while(true)
 			{
 				$emailList = array();
 				$connectorDataList = array();
 
 				$maxPart = 200;
-				while ($connectorData = $connectorDataDb->Fetch())
+				while ($connectorData = $connectorDataDb->fetch())
 				{
 					// collect connectors counter of addresses
 					$connectorDataCount++;
@@ -289,13 +322,17 @@ class PostingTable extends Entity\DataManager
 
 					if(!empty($connectorDataList))
 					{
+						$insertDataList = array();
+						$insertColumnNamesString = array();
 						foreach($connectorDataList as $email => $connectorData)
 						{
 							$recipientInsert = array(
 								'NAME' => "'" . $conHelper->forSql($connectorData['NAME']) . "'",
 								'EMAIL' => "'" . $conHelper->forSql($connectorData['EMAIL']) . "'",
 								'STATUS' => "'" . $statusRecipientNone . "'",
-								'POSTING_ID' => intval($postingId)
+								'POSTING_ID' => intval($postingId),
+								'USER_ID' => "NULL",
+								'FIELDS' => "NULL"
 							);
 
 							if (array_key_exists('USER_ID', $connectorData) && intval($connectorData['USER_ID']) > 0)
@@ -303,9 +340,20 @@ class PostingTable extends Entity\DataManager
 								$recipientInsert['USER_ID'] = intval($connectorData['USER_ID']);
 							}
 
+							if (array_key_exists('FIELDS', $connectorData) && count($connectorData['FIELDS']) > 0)
+							{
+								$recipientInsert['FIELDS'] =  "'" . $conHelper->forSql(serialize($connectorData['FIELDS'])) . "'";
+							}
+
 							$insertColumnNamesString = implode(", ", array_keys($recipientInsert));
 							$insertColumnValuesString = implode(", ", array_values($recipientInsert));
-							$connection->query("insert into b_sender_posting_recipient(" . $insertColumnNamesString . ") values(" . $insertColumnValuesString . ")");
+							$insertDataList[] = $insertColumnValuesString;
+						}
+
+						if($insertDataList && $insertColumnNamesString)
+						{
+							$insertDataListString =  implode('),(', $insertDataList);
+							$connection->query("insert into b_sender_posting_recipient(" . $insertColumnNamesString . ") values(" . $insertDataListString . ")");
 						}
 					}
 				}
@@ -379,6 +427,50 @@ class PostingTable extends Entity\DataManager
 
 		return $count;
 	}
+
+	/**
+	 * Return send status of posting in percents by posting id.
+	 *
+	 * @param $id
+	 * @return int
+	 */
+	public static function getSendPercent($id)
+	{
+		$ar = static::getRecipientCountByStatus($id);
+		$count = 0;
+		foreach ($ar as $k => $v)
+		{
+			$count += $v;
+		}
+
+		$countNew = 0;
+		if(isset($ar[PostingRecipientTable::SEND_RESULT_NONE]))
+		{
+			$countNew = $ar[PostingRecipientTable::SEND_RESULT_NONE];
+		}
+
+		if($count > 0 && $countNew > 0)
+		{
+			return round(($count - $countNew) / $count, 2) * 100;
+		}
+		else
+		{
+			return 100;
+		}
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getRecipientStatusToPostingFieldMap()
+	{
+		return array(
+			PostingRecipientTable::SEND_RESULT_NONE => 'COUNT_SEND_NONE',
+			PostingRecipientTable::SEND_RESULT_ERROR => 'COUNT_SEND_ERROR',
+			PostingRecipientTable::SEND_RESULT_SUCCESS => 'COUNT_SEND_SUCCESS',
+			PostingRecipientTable::SEND_RESULT_DENY => 'COUNT_SEND_DENY',
+		);
+	}
 }
 
 
@@ -417,6 +509,54 @@ class PostingReadTable extends Entity\DataManager
 				'default_value' => new Type\DateTime(),
 			),
 		);
+	}
+
+	/**
+	 * Handler of after add event
+	 *
+	 * @param Entity\Event $event
+	 * @return Entity\EventResult
+	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\PostingRead::add</code>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Объект <code>\Bitrix\<a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/index.php">Main</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/index.php">Entity</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/event/index.php">Event</a></code>
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/postingreadtable/onafteradd.php
+	* @author Bitrix
+	*/
+	public static function onAfterAdd(Entity\Event $event)
+	{
+		$result = new Entity\EventResult;
+		$data = $event->getParameters();
+		$data = $data['fields'];
+
+		// update read flag of recipient
+		PostingRecipientTable::update(array('ID' => $data['RECIPIENT_ID']), array('IS_READ' => 'Y'));
+
+		// update read counter of posting
+		$resultDb = static::getList(array('filter' => array('RECIPIENT_ID' => $data['RECIPIENT_ID'])));
+		if($resultDb->getSelectedRowsCount() == 1)
+		{
+			PostingTable::update(array('ID' => $data['POSTING_ID']), array(
+				'COUNT_READ' => new \Bitrix\Main\DB\SqlExpression('?# + 1', 'COUNT_READ')
+			));
+		}
+
+		return $result;
 	}
 }
 
@@ -463,6 +603,54 @@ class PostingClickTable extends Entity\DataManager
 			),
 		);
 	}
+
+	/**
+	 * Handler of after add event
+	 *
+	 * @param Entity\Event $event
+	 * @return Entity\EventResult
+	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\PostingClick::add</code>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Объект <code>\Bitrix\<a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/index.php">Main</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/index.php">Entity</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/event/index.php">Event</a></code>
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/postingclicktable/onafteradd.php
+	* @author Bitrix
+	*/
+	public static function onAfterAdd(Entity\Event $event)
+	{
+		$result = new Entity\EventResult;
+		$data = $event->getParameters();
+		$data = $data['fields'];
+
+		// update click flag of recipient
+		PostingRecipientTable::update(array('ID' => $data['RECIPIENT_ID']), array('IS_CLICK' => 'Y'));
+
+		// update click counter of posting
+		$resultDb = static::getList(array('filter' => array('RECIPIENT_ID' => $data['RECIPIENT_ID'])));
+		if($resultDb->getSelectedRowsCount() == 1)
+		{
+			PostingTable::update(array('ID' => $data['POSTING_ID']), array(
+				'COUNT_CLICK' => new \Bitrix\Main\DB\SqlExpression('?# + 1', 'COUNT_CLICK')
+			));
+		}
+
+		return $result;
+	}
 }
 
 class PostingUnsubTable extends Entity\DataManager
@@ -507,6 +695,54 @@ class PostingUnsubTable extends Entity\DataManager
 				'reference' => array('=this.RECIPIENT_ID' => 'ref.ID'),
 			),
 		);
+	}
+
+	/**
+	 * Handler of after add event
+	 *
+	 * @param Entity\Event $event
+	 * @return Entity\EventResult
+	 */
+	
+	/**
+	* <p>Обработчик события <code>\Bitrix\Sender\PostingUnsub::add</code>.</p>
+	*
+	*
+	* @param mixed $Bitrix  Объект <code>\Bitrix\<a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/index.php">Main</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/index.php">Entity</a>\<a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/event/index.php">Event</a></code>
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/postingunsubtable/onafteradd.php
+	* @author Bitrix
+	*/
+	public static function onAfterAdd(Entity\Event $event)
+	{
+		$result = new Entity\EventResult;
+		$data = $event->getParameters();
+		$data = $data['fields'];
+
+		// update unsub flag of recipient
+		PostingRecipientTable::update(array('ID' => $data['RECIPIENT_ID']), array('IS_UNSUB' => 'Y'));
+
+		// update unsub counter of posting
+		$resultDb = static::getList(array('filter' => array('RECIPIENT_ID' => $data['RECIPIENT_ID'])));
+		if($resultDb->getSelectedRowsCount() == 1)
+		{
+			PostingTable::update(array('ID' => $data['POSTING_ID']), array(
+				'COUNT_UNSUB' => new \Bitrix\Main\DB\SqlExpression('?# + 1', 'COUNT_UNSUB')
+			));
+		}
+
+		return $result;
 	}
 }
 
@@ -576,6 +812,15 @@ class PostingRecipientTable extends Entity\DataManager
 			),
 			'ROOT_ID' => array(
 				'data_type' => 'integer',
+			),
+			'IS_READ' => array(
+				'data_type' => 'string',
+			),
+			'IS_CLICK' => array(
+				'data_type' => 'string',
+			),
+			'IS_UNSUB' => array(
+				'data_type' => 'string',
 			),
 			'POSTING' => array(
 				'data_type' => 'Bitrix\Sender\PostingTable',

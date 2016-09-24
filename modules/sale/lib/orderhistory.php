@@ -4,8 +4,7 @@
 namespace Bitrix\Sale;
 
 
-use Bitrix\Main\Type\Date;
-use Bitrix\Main\Type\DateTime;
+use Bitrix\Main;
 use Bitrix\Sale\Internals\Entity;
 
 class OrderHistory
@@ -17,9 +16,13 @@ class OrderHistory
 
 	const SALE_ORDER_HISTORY_RECORD_TYPE_ACTION = 'ACTION';
 	const SALE_ORDER_HISTORY_RECORD_TYPE_FIELD = 'FIELD';
+	const SALE_ORDER_HISTORY_RECORD_TYPE_DEBUG = 'DEBUG';
 
 	const FIELD_TYPE_NAME = 'NAME';
 	const FIELD_TYPE_TYPE = 'TYPE';
+
+	const SALE_ORDER_HISTORY_LOG_LEVEL_0 = 0;
+	const SALE_ORDER_HISTORY_LOG_LEVEL_1 = 1;
 
 	protected function __construct()
 	{
@@ -40,6 +43,28 @@ class OrderHistory
 	{
 		if ($field == "ID")
 			return;
+
+		if ($value !== null && static::isDate($value))
+		{
+			$value = $value->toString();
+		}
+
+		if ($oldValue !== null && static::isDate($oldValue))
+		{
+			$oldValue = $oldValue->toString();
+		}
+
+		if (!empty($fields))
+		{
+			foreach($fields as $fieldName => $fieldValue)
+			{
+				if (static::isDate($fieldValue))
+				{
+					$fields[$fieldName] = $fieldValue->toString();
+				}
+			}
+		}
+
 		static::$pool[$entityName][$orderId][$id][$field][] = array(
 			'RECORD_TYPE' => static::SALE_ORDER_HISTORY_RECORD_TYPE_FIELD,
 			'ENTITY_NAME' => $entityName,
@@ -117,7 +142,8 @@ class OrderHistory
 			{
 				foreach ($dataList as $key => $data)
 				{
-					if ($data['RECORD_TYPE'] == static::SALE_ORDER_HISTORY_RECORD_TYPE_ACTION)
+					if ($data['RECORD_TYPE'] == static::SALE_ORDER_HISTORY_RECORD_TYPE_ACTION
+						|| $data['RECORD_TYPE'] == static::SALE_ORDER_HISTORY_RECORD_TYPE_DEBUG)
 					{
 						static::addRecord($entityName, $orderId, $data['TYPE'], $data['ID'], $data['ENTITY'], $data['DATA']);
 						unset(static::$pool[$entityName][$orderId][$data['ID']][$data['TYPE']][$key]);
@@ -253,7 +279,7 @@ class OrderHistory
 	 */
 	private static function isDate($value)
 	{
-		return ($value instanceof DateTime) || ($value instanceof Date);
+		return ($value instanceof Main\Type\DateTime) || ($value instanceof Main\Type\Date);
 	}
 
 	/**
@@ -262,13 +288,151 @@ class OrderHistory
 	 */
 	private static function convertDateField($value)
 	{
-		if (($value instanceof DateTime)
-			|| ($value instanceof Date))
+		if (($value instanceof Main\Type\DateTime)
+			|| ($value instanceof Main\Type\Date))
 		{
 			return $value->toString();
 		}
 
 		return $value;
+	}
+
+	/**
+	 * @param $id
+	 *
+	 * @return bool|\CDBResult
+	 */
+	public static function deleteByOrderId($id)
+	{
+		if (intval($id) <= 0)
+			return false;
+
+		return \CSaleOrderChange::deleteByOrderId($id);
+	}
+
+	/**
+	 * @param $entityName
+	 * @param $orderId
+	 * @param $type
+	 * @param null $id
+	 * @param null $entity
+	 * @param array $fields
+	 * @param null $level
+	 */
+	public static function addLog($entityName, $orderId, $type, $id = null, $entity = null, array $fields = array(), $level = null)
+	{
+		if ($level === null)
+		{
+			$level = static::SALE_ORDER_HISTORY_LOG_LEVEL_0;
+		}
+
+		if (!static::checkLogLevel($level))
+			return;
+
+		if (!empty($fields))
+		{
+			foreach($fields as $fieldName => $fieldValue)
+			{
+				if (static::isDate($fieldValue))
+				{
+					$fields[$fieldName] = $fieldValue->toString();
+				}
+			}
+		}
+
+		static::$pool[$entityName][$orderId][$id][$type][] = array(
+			'RECORD_TYPE' => static::SALE_ORDER_HISTORY_RECORD_TYPE_DEBUG,
+			'ENTITY_NAME' => $entityName,
+			'ENTITY' => $entity,
+			'ID' => $id,
+			'TYPE' => $type,
+			'DATA' => $fields,
+			'LEVEL' => $level
+		);
+	}
+
+	/**
+	 * @param $level
+	 *
+	 * @return bool
+	 * @throws Main\ArgumentNullException
+	 */
+	public static function checkLogLevel($level)
+	{
+		$orderHistoryLogLevel = Main\Config\Option::get('sale', 'order_history_log_level', static::SALE_ORDER_HISTORY_LOG_LEVEL_0);
+
+		if ($level > $orderHistoryLogLevel)
+			return false;
+
+		return true;
+	}
+
+	/**
+	 * @return array
+	 */
+	public static function getManagerLogItems()
+	{
+		return array(
+			"ORDER_ADDED",
+			"ORDER_DEDUCTED",
+			"ORDER_MARKED",
+			"ORDER_RESERVED",
+			"ORDER_CANCELED",
+			"ORDER_COMMENTED",
+			"ORDER_STATUS_CHANGED",
+			"ORDER_DELIVERY_ALLOWED",
+			"ORDER_DELIVERY_DOC_CHANGED",
+			"ORDER_PAYMENT_SYSTEM_CHANGED",
+			"ORDER_PAYMENT_VOUCHER_CHANGED",
+			"ORDER_DELIVERY_SYSTEM_CHANGED",
+			"ORDER_PERSON_TYPE_CHANGED",
+			"ORDER_PAYED",
+			"ORDER_TRACKING_NUMBER_CHANGED",
+			"ORDER_USER_DESCRIPTION_CHANGED",
+			"ORDER_PRICE_DELIVERY_CHANGED",
+			"ORDER_PRICE_CHANGED",
+			"ORDER_RESPONSIBLE_CHANGE",
+
+			"BASKET_ADDED",
+			"BASKET_REMOVED",
+			"BASKET_QUANTITY_CHANGED",
+			"BASKET_PRICE_CHANGED",
+			"PAYMENT_ADDED",
+			"PAYMENT_REMOVED",
+			"PAYMENT_PAID",
+			"PAYMENT_SYSTEM_CHANGED",
+			"PAYMENT_VOUCHER_CHANGED",
+			"PAYMENT_PRICE_CHANGED",
+
+			"SHIPMENT_ADDED",
+			"SHIPMENT_REMOVED",
+			"SHIPMENT_ITEM_BASKET_ADDED",
+			"SHIPMENT_ITEM_BASKET_REMOVED",
+			"SHIPMENT_DELIVERY_ALLOWED",
+			"SHIPMENT_SHIPPED",
+			"SHIPMENT_MARKED",
+			"SHIPMENT_RESERVED",
+			"SHIPMENT_CANCELED",
+			"SHIPMENT_STATUS_CHANGED",
+			"SHIPMENT_DELIVERY_DOC_CHANGED",
+			"SHIPMENT_TRACKING_NUMBER_CHANGED",
+			"SHIPMENT_PRICE_DELIVERY_CHANGED",
+			"SHIPMENT_AMOUNT_CHANGED",
+			"SHIPMENT_QUANTITY_CHANGED",
+			"SHIPMENT_RESPONSIBLE_CHANGE",
+
+			"ORDER_UPDATE_ERROR",
+			"BASKET_ITEM_ADD_ERROR",
+			"BASKET_ITEM_UPDATE_ERROR",
+			"SHIPMENT_ADD_ERROR",
+			"SHIPMENT_UPDATE_ERROR",
+			"SHIPMENT_ITEM_ADD_ERROR",
+			"SHIPMENT_ITEM_UPDATE_ERROR",
+			"SHIPMENT_ITEM_STORE_ADD_ERROR",
+			"SHIPMENT_ITEM_STORE_UPDATE_ERROR",
+			"SHIPMENT_ITEM_BASKET_ITEM_EMPTY_ERROR",
+			
+		);
 	}
 
 }

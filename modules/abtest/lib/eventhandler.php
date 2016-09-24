@@ -15,6 +15,17 @@ class EventHandler
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Статический метод сохраняет параметр запроса <b>Режим А/Б-теста</b> в сессию.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/onpagestart.php
+	* @author Bitrix
+	*/
 	public static function onPageStart()
 	{
 		$applicationContext = Application::getInstance()->getContext();
@@ -29,6 +40,23 @@ class EventHandler
 	 * @param \Bitrix\Main\Event $event Event.
 	 * @return string|null
 	 */
+	
+	/**
+	* <p>Статический метод определяет, должен ли быть переопределен шаблон сайта.</p>
+	*
+	*
+	* @param mixed $Bitrix  Событие.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Event $event  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/ongetcurrentsitetemplate.php
+	* @author Bitrix
+	*/
 	public static function onGetCurrentSiteTemplate(\Bitrix\Main\Event $event)
 	{
 		$template = $event->getParameter('template');
@@ -49,6 +77,23 @@ class EventHandler
 	 * @param \Bitrix\Main\Event $event Event.
 	 * @return string|null
 	 */
+	
+	/**
+	* <p>Статический метод определяет, должен ли быть переопределен файл страницы.</p>
+	*
+	*
+	* @param mixed $Bitrix  Событие.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Event $event  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/onfilerewrite.php
+	* @author Bitrix
+	*/
 	public static function onFileRewrite(\Bitrix\Main\Event $event)
 	{
 		$path   = $event->getParameter('path');
@@ -68,6 +113,17 @@ class EventHandler
 	 * 
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод возвращает относящиеся к A/B-тестированию группы атрибутов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/ongetattributetypes.php
+	* @author Bitrix
+	*/
 	public static function onGetAttributeTypes()
 	{
 		$sections = array(
@@ -127,6 +183,23 @@ class EventHandler
 	 * @param \Bitrix\Conversion\DayContext $conversionContext Conversion context.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Статический метод устанавливает относящиеся к A/B-тестированию атрибуты к контексту конверсии.</p>
+	*
+	*
+	* @param mixed $Bitrix  Контекст конверсии.
+	*
+	* @param Bitri $Conversion  
+	*
+	* @param DayContext $conversionContext  
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/onconversionsetcontextattributes.php
+	* @author Bitrix
+	*/
 	public static function onConversionSetContextAttributes(\Bitrix\Conversion\DayContext $conversionContext)
 	{
 		if ($abtest = Helper::getActiveTest())
@@ -150,6 +223,17 @@ class EventHandler
 	 * 
 	 * @return void
 	 */
+	
+	/**
+	* <p>Статический метод добавляет относящиеся к A/B-тестированию кнопки в панель управления.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/abtest/eventhandler/onpanelcreate.php
+	* @author Bitrix
+	*/
 	public static function onPanelCreate()
 	{
 		global $USER, $APPLICATION;

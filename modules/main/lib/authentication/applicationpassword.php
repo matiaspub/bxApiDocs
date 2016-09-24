@@ -88,6 +88,17 @@ class ApplicationPasswordTable extends Entity\DataManager
 	 * Generates a random password.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод создаёт случайный пароль.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/authentication/applicationpasswordtable/generatepassword.php
+	* @author Bitrix
+	*/
 	public static function generatePassword()
 	{
 		return \randString(16, "qwertyuiopasdfghjklzxcvbnm");
@@ -101,6 +112,23 @@ class ApplicationPasswordTable extends Entity\DataManager
 	 * @param bool $passwordOriginal
 	 * @return array|false
 	 */
+	
+	/**
+	* <p>Статический метод находит приложение по паролю пользователя. Возвращает массив с данными, либо <i>false</i>, если приложение не найдено.</p>
+	*
+	*
+	* @param integer $userId  id пользователя
+	*
+	* @param string $password  пароль
+	*
+	* @param boolean $passwordOriginal = true 
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/authentication/applicationpasswordtable/findpassword.php
+	* @author Bitrix
+	*/
 	public static function findPassword($userId, $password, $passwordOriginal = true)
 	{
 		$encodedPassword = substr($password, 32);
@@ -140,6 +168,21 @@ class ApplicationPasswordTable extends Entity\DataManager
 	 * @param array $digest See CHTTP::ParseDigest() for the array structure.
 	 * @return array|false
 	 */
+	
+	/**
+	* <p>Статический метод определяет приложение по digest авторизации пользователя.</p>
+	*
+	*
+	* @param integer $userId  id пользователя
+	*
+	* @param array $digest  массив параметра идентичен массиву <i>CHTTP::ParseDigest</i>.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/authentication/applicationpasswordtable/finddigestpassword.php
+	* @author Bitrix
+	*/
 	public static function findDigestPassword($userId, array $digest)
 	{
 		$appPasswords = static::getList(array(

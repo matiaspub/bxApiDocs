@@ -8,18 +8,29 @@
 
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/agent.php");
 
+
+/**
+ * <b>CAgent</b> - класс для работы с функциями-агентами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cagent/index.php
+ * @author Bitrix
+ */
 class CAgent extends CAllAgent
 {
 	
 	/**
-	* <p>Выполняет функцию-агента, время запуска которой наступило. Метод автоматически вызывается вначале каждой страницы и не требует ручного запуска. Динамичный метод. </p> <p> </p>
+	* <p>Выполняет функцию-агента, время запуска которой наступило. Метод автоматически вызывается вначале каждой страницы и не требует ручного запуска. Нестатический метод. </p> <p> </p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=43&amp;LESSON_ID=3436" >Агенты</a>
-	* </li></ul></bod<br><br>
+	* </li></ul><br><br>
 	*
 	*
 	* @static
@@ -171,8 +182,21 @@ class CAgent extends CAllAgent
 
 			global $USER;
 			unset($USER);
-			$eval_result = "";
-			$e = eval("\$eval_result=".$arAgent["NAME"]);
+			try
+			{
+				$eval_result = "";
+				$e = eval("\$eval_result=".$arAgent["NAME"]);
+			}
+			catch (Exception $e)
+			{
+				CTimeZone::Enable();
+
+				$application = \Bitrix\Main\Application::getInstance();
+				$exceptionHandler = $application->getExceptionHandler();
+				$exceptionHandler->writeToLog($e);
+
+				continue;
+			}
 			unset($USER);
 
 			CTimeZone::Enable();

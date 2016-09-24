@@ -2,6 +2,7 @@
 namespace Bitrix\Main\Data;
 
 use Bitrix\Main;
+use Bitrix\Main\IO\File;
 
 final class StaticHtmlFileStorage extends StaticHtmlStorage
 {
@@ -20,27 +21,44 @@ final class StaticHtmlFileStorage extends StaticHtmlStorage
 
 	public function write($content, $md5)
 	{
-		$success = false;
+		$written = false;
+		
 		if ($this->cacheFile)
 		{
+			$tempFile = new File($this->cacheFile->getPhysicalPath().".tmp");
+
 			try
 			{
-				$success = $this->cacheFile->putContents($content);
-			}
-			catch(\Exception $exception)
-			{
+				$written = $tempFile->putContents($content);
 				$this->cacheFile->delete();
+				if (!$tempFile->rename($this->cacheFile->getPhysicalPath()))
+				{
+					$written = false;
+				}
+			}
+			catch (\Exception $exception)
+			{
+				$written = false;
+				$this->cacheFile->delete();
+				$tempFile->delete();
 			}
 		}
 
-		return $success;
+		return $written;
 	}
 
 	public function read()
 	{
 		if ($this->exists())
 		{
-			return $this->cacheFile->getContents();
+			try
+			{
+				return $this->cacheFile->getContents();
+			}
+			catch (\Exception $exception)
+			{
+
+			}
 		}
 
 		return false;
@@ -60,23 +78,29 @@ final class StaticHtmlFileStorage extends StaticHtmlStorage
 
 	public function delete()
 	{
+		$fileSize = false;
 		if ($this->cacheFile && $this->cacheFile->isExists())
 		{
-			$cacheDirectory = $this->cacheFile->getDirectory();
-			$fileSize = $this->cacheFile->getSize();
-			$this->cacheFile->delete();
-
-			//Try to cleanup directory
-			$children = $cacheDirectory->getChildren();
-			if (empty($children))
+			try
 			{
-				$cacheDirectory->delete();
-			}
+				$cacheDirectory = $this->cacheFile->getDirectory();
+				$fileSize = $this->cacheFile->getSize();
+				$this->cacheFile->delete();
 
-			return $fileSize;
+				//Try to cleanup directory
+				$children = $cacheDirectory->getChildren();
+				if (empty($children))
+				{
+					$cacheDirectory->delete();
+				}
+			}
+			catch (\Exception $exception)
+			{
+
+			}
 		}
 
-		return false;
+		return $fileSize;
 	}
 
 	static public function deleteAll()
@@ -88,7 +112,8 @@ final class StaticHtmlFileStorage extends StaticHtmlStorage
 	{
 		if ($this->exists())
 		{
-			return substr($this->read(), -35, 32);
+			$content = $this->read();
+			return $content !== false ? substr($content, -35, 32) : false;
 		}
 
 		return false;
@@ -98,9 +123,69 @@ final class StaticHtmlFileStorage extends StaticHtmlStorage
 	 * Should we count a quota limit
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает должен ли считаться лимит квот.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlfilestorage/shouldcountquota.php
+	* @author Bitrix
+	*/
 	static public function shouldCountQuota()
 	{
 		return true;
+	}
+
+	public function getLastModified()
+	{
+		if ($this->exists())
+		{
+			try
+			{
+				return $this->cacheFile->getModificationTime();
+			}
+			catch (\Exception $exception)
+			{
+
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns cache size
+	 * @return int|false
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает размер кеша.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlfilestorage/getsize.php
+	* @author Bitrix
+	*/
+	public function getSize()
+	{
+		if ($this->cacheFile && $this->cacheFile->isExists())
+		{
+			try
+			{
+				return $this->cacheFile->getSize();
+			}
+			catch (\Exception $exception)
+			{
+
+			}
+		}
+
+		return false;
 	}
 
 	public function getCacheFile()
@@ -114,6 +199,21 @@ final class StaticHtmlFileStorage extends StaticHtmlStorage
 	 * @param int $validTime [optional] unix timestamp
 	 * @return float
 	 */
+	
+	/**
+	* <p>Статический метод удаляет все html страницы созданные ранее указанной в параметрах даты.</p>
+	*
+	*
+	* @param string $relativePath = "" [optional]
+	*
+	* @param integer $validTime  [optional] Метка времени в unix формате
+	*
+	* @return float 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/data/statichtmlfilestorage/deleterecursive.php
+	* @author Bitrix
+	*/
 	public static function deleteRecursive($relativePath = "", $validTime = 0)
 	{
 		$bytes = 0.0;

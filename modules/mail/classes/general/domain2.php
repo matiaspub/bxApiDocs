@@ -7,6 +7,17 @@ class CMailDomain2
 	{
 	}
 
+	public static function getImapData()
+	{
+		$result = CMailYandex2::getImapData();
+
+		return array(
+			'server' => $result['server'],
+			'port'   => $result['port'],
+			'secure' => $result['secure'] ? 'Y' : 'N',
+		);
+	}
+
 	public static function addDomain($token, $domain, &$error)
 	{
 		$result = CMailYandex2::addDomain($token, $domain, $error);

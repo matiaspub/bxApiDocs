@@ -31,11 +31,6 @@ class CSocNetNotifySchema
 
 		if (CSocNetUser::IsFriendsAllowed())
 		{
-/*
-			$arResult["socialnetwork"]["invite_user"] = Array(
-				"NAME" => GetMessage("SONET_NS_INVITE_USER")
-			);
-*/
 			$arResult["socialnetwork"]["inout_user"] = Array(
 				"NAME" => GetMessage("SONET_NS_FRIEND")
 			);

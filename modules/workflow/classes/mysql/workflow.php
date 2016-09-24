@@ -1,13 +1,11 @@
-<?
+<?php
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/workflow/classes/general/workflow.php");
 
 class CWorkflow extends CAllWorkflow
 {
 	public static function err_mess()
 	{
-		$module_id = "workflow";
-		@include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/install/version.php");
-		return "<br>Module: ".$module_id." (".$arModuleVersion["VERSION"].")<br>Class: CWorkflow<br>File: ".__FILE__;
+		return "<br>Module: workflow<br>Class: CAllWorkflow<br>File: ".__FILE__;
 	}
 
 	public static function Insert($arFields)
@@ -527,4 +525,3 @@ class CWorkflow extends CAllWorkflow
 		return $z;
 	}
 }
-?>

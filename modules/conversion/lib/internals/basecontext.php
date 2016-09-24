@@ -26,6 +26,31 @@ class BaseContext
 	 * @throws ArgumentTypeException
 	 * @throws SystemException
 	 */
+	
+	/**
+	* <p>Нестатический метод добавляет значение к счетчику. Если счетчик не создан, то создает и устанавливает значение. Сохраняет в базу данных.</p>
+	*
+	*
+	* @param mixed $Bitrix  Дата.
+	*
+	* @param Bitri $Main  Имя счетчика
+	*
+	* @param Mai $Type  Добавляемое значение.
+	*
+	* @param Date $day  
+	*
+	* @param string $name  
+	*
+	* @param string $integer  
+	*
+	* @param float $value  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/basecontext/addcounter.php
+	* @author Bitrix
+	*/
 	public function addCounter(Date $day, $name, $value)
 	{
 		if (! is_string($name))
@@ -44,7 +69,7 @@ class BaseContext
 		}
 
 		if (! $type = $types[$name])
-			throw new SystemException('Undefined counter type!');
+			throw new SystemException("Undefined counter '$name' type!");
 
 		if (! $type['ACTIVE'])
 			return;
@@ -82,6 +107,27 @@ class BaseContext
 	 * @throws ArgumentTypeException
 	 * @throws SystemException
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает атрибут со значением.</p>
+	*
+	*
+	* @param string $name  Имя атрибута.
+	*
+	* @param string $string  Значение атрибута.
+	*
+	* @param strin $integer  
+	*
+	* @param intege $float  
+	*
+	* @param null $value = null 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/conversion/basecontext/setattribute.php
+	* @author Bitrix
+	*/
 	public function setAttribute($name, $value = null)
 	{
 		if (! is_string($name))
@@ -93,14 +139,14 @@ class BaseContext
 		if ($this->id !== null)
 			throw new SystemException('Cannot set attribute for existent context!');
 
-		// TODO uncomment after seo 15.5.2 released
-//		static $types;
-//		if (! $types)
-//		{
-//			$types = AttributeManager::getTypes();
-//		}
-//		if (! $type = $types[$name])
-//			throw new SystemException('Undefined attribute: "'.$name.'"!');
+		static $types;
+		if (! $types)
+		{
+			$types = AttributeManager::getTypes();
+		}
+
+		if (! $type = $types[$name])
+			throw new SystemException("Undefined attribute '$name' type!");
 
 		// set attribute
 

@@ -18,6 +18,21 @@ final class Configuration
 	const CONFIGURATION_FILE_PATH = "/bitrix/.settings.php";
 	const CONFIGURATION_FILE_PATH_EXTRA = "/bitrix/.settings_extra.php";
 
+	
+	/**
+	* <p>Статический метод получает значение одного параметра. Обертка над <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/get.php">Configuration::get</a>. </p>
+	*
+	*
+	* @param mixed $name)(string  Название параметра.
+	*
+	* @param $name)( $name  
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/getvalue.php
+	* @author Bitrix
+	*/
 	public static function getValue($name)
 	{
 		$configuration = Configuration::getInstance();
@@ -83,6 +98,23 @@ final class Configuration
 		$this->isLoaded = true;
 	}
 
+	
+	/**
+	* <p>Нестатический метод сохраняет изменение конфигурации.</p>
+	*
+	*
+	* @return mixed 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $configuration-&gt;saveConfiguration();
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/saveconfiguration.php
+	* @author Bitrix
+	*/
 	public function saveConfiguration()
 	{
 		if (!$this->isLoaded)
@@ -98,6 +130,27 @@ final class Configuration
 		file_put_contents($path, "<"."?php\nreturn ".$data.";\n");
 	}
 
+	
+	/**
+	* <p>Нестатический метод добавляет/изменяет конкретный параметр.</p>
+	*
+	*
+	* @param string $name  Добавляемый параметр
+	*
+	* @param array $value  Значение параметра
+	*
+	* @return public 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $configuration-&gt;add('cache', $cache);
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/add.php
+	* @author Bitrix
+	*/
 	public function add($name, $value)
 	{
 		if (!$this->isLoaded)
@@ -117,6 +170,21 @@ final class Configuration
 	 * @param array $value
 	 * @return void
 	 */
+	
+	/**
+	* <p>Нестатический метод изменяет параметры "только для чтения".</p> <p class="note"><b>Внимание!</b> Данный метод следует использовать с осторожностью и только в том случае если вы понимаете что делаете!</p>
+	*
+	*
+	* @param string $name  Изменяемый параметр
+	*
+	* @param array $value  Новое значение параметра
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/addreadonly.php
+	* @author Bitrix
+	*/
 	public function addReadonly($name, $value)
 	{
 		if (!$this->isLoaded)
@@ -138,6 +206,30 @@ final class Configuration
 			unset($this->storedData[$name]);
 	}
 
+	
+	/**
+	* <p>Нестатический метод возвращает значения параметров.</p>
+	*
+	*
+	* @param string $name  Имя параметра.
+	*
+	* @return public 
+	*
+	* <h4>Example</h4> 
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* $exception_handling = $configuration-&gt;get('exception_handling');
+	* $ac_reset = $configuration-&gt;get('no_accelerator_reset');
+	* $status = $configuration-&gt;get('http_status');
+	* $cache = $configuration-&gt;get('cache');
+	* $cachettl = $configuration-&gt;get('cache_flags');
+	* $cookies = $configuration-&gt;get('cookies');
+	* </pre>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/config/configuration/get.php
+	* @author Bitrix
+	*/
 	public function get($name)
 	{
 		if (!$this->isLoaded)

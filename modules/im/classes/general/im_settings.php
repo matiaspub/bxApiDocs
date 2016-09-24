@@ -181,6 +181,7 @@ class CIMSettings
 				'status' => 'online',
 				'bxdNotify' => true,
 				'sshNotify' => true,
+				'generalNotify' => true,
 				'trackStatus' => '',
 				'nativeNotify' => true,
 				'viewOffline' => COption::GetOptionString("im", "view_offline"),

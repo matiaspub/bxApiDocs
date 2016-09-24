@@ -13,6 +13,21 @@ class MysqliSqlHelper extends MysqlCommonSqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод выводит специальные символы в строке для использования в SQL операторе</p>
+	*
+	*
+	* @param string $value  Значение для вывода
+	*
+	* @param integer $maxLength  Лимит длины строки, если существует.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlisqlhelper/forsql.php
+	* @author Bitrix
+	*/
 	public function forSql($value, $maxLength = 0)
 	{
 		if ($maxLength > 0)
@@ -34,6 +49,23 @@ class MysqliSqlHelper extends MysqlCommonSqlHelper
 	 *
 	 * @return Entity\ScalarField
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает экземпляр потомка <code>Entity\ScalarField</code>, соответствующий типу БД.</p>
+	*
+	*
+	* @param string $name  Имя колонки БД.
+	*
+	* @param mixed $type  Тип БД.
+	*
+	* @param array $parameters = null Дополнительная информация.
+	*
+	* @return \Bitrix\Main\Entity\ScalarField 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqlisqlhelper/getfieldbycolumntype.php
+	* @author Bitrix
+	*/
 	static public function getFieldByColumnType($name, $type, array $parameters = null)
 	{
 		switch($type)

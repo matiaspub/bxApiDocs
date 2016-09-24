@@ -98,9 +98,10 @@ abstract class Entity
 
 						if ($eventResultData = $eventResult->getParameters())
 						{
-							if (isset($eventResultData['ERROR']) && $eventResultData['ERROR'] instanceof ResultError)
+							if (isset($eventResultData) && $eventResultData instanceof ResultError)
 							{
-								$errorMsg = $eventResultData['ERROR'];
+								/** @var ResultError $errorMsg */
+								$errorMsg = $eventResultData;
 							}
 						}
 
@@ -122,7 +123,7 @@ abstract class Entity
 			throw new Main\ArgumentOutOfRangeException("name=$name");
 
 		$oldValue = $this->fields->get($name);
-		if ($oldValue != $value)
+		if ($oldValue != $value || ($oldValue === null && $value !== null))
 		{
 			if ($eventName = static::getEntityEventName())
 			{
@@ -308,9 +309,10 @@ abstract class Entity
 
 						if ($eventResultData = $eventResult->getParameters())
 						{
-							if (isset($eventResultData['ERROR']) && $eventResultData['ERROR'] instanceof ResultError)
+							if (isset($eventResultData) && $eventResultData instanceof ResultError)
 							{
-								$errorMsg = $eventResultData['ERROR'];
+								/** @var ResultError $errorMsg */
+								$errorMsg = $eventResultData;
 							}
 						}
 
@@ -356,13 +358,11 @@ abstract class Entity
 			{
 				$result->addErrors($r->getErrors());
 			}
-			else
+
+			if (($data = $r->getData())
+				&& !empty($data) && is_array($data))
 			{
-				if (($data = $r->getData())
-					&& !empty($data) && is_array($data))
-				{
-					$result->setData($result->getData() + $data);
-				}
+				$result->setData(array_merge($result->getData(), $data));
 			}
 		}
 
@@ -466,9 +466,11 @@ abstract class Entity
 	}
 
 	/**
+	 * @internal
+	 *
 	 * @return null|string
 	 */
-	protected static function getEntityEventName()
+	public static function getEntityEventName()
 	{
 		$eventName = null;
 		$className = static::getClassName();
@@ -503,6 +505,14 @@ abstract class Entity
 	public function isChanged()
 	{
 		return (($changed = $this->fields->getChangedValues()) && !empty($changed));
+	}
+
+	/**
+	 * @return Result
+	 */
+	static public function verify()
+	{
+		return new Result();
 	}
 
 }

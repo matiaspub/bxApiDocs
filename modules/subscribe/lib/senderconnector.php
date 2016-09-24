@@ -80,7 +80,7 @@ class SenderConnectorSubscriber extends \Bitrix\Sender\Connector
 
 		$subscriberList = \CSubscription::GetList(array('ID' => 'ASC'), $filter);
 
-		return $subscriberList;
+		return new CDBResultSenderConnectorIBlock($subscriberList);
 	}
 
 	/**
@@ -102,7 +102,7 @@ class SenderConnectorSubscriber extends \Bitrix\Sender\Connector
 		{
 			$inputSelected = ($rubric['ID'] == $this->getFieldValue('RUBRIC')? 'selected': '');
 			$rubricInput .= '<option value="'.$rubric['ID'].'" '.$inputSelected.'>';
-			$rubricInput .= htmlspecialcharsEx($rubric['NAME']);
+			$rubricInput .= htmlspecialcharsEx('[' . $rubric['ID'] . '] ' . $rubric['NAME']);
 			$rubricInput .= '</option>';
 		}
 		$rubricInput .= '</select>';
@@ -155,5 +155,31 @@ class SenderConnectorSubscriber extends \Bitrix\Sender\Connector
 				</tr>
 			</table>
 		';
+	}
+}
+
+class CDBResultSenderConnectorIBlock extends \CDBResult
+{
+	/**
+	 * Fetch fields from database resource
+	 * @return array|null
+	 */
+	static public function Fetch()
+	{
+		$fields = parent::Fetch();
+		if($fields && !$fields['NAME'])
+		{
+			if(isset($fields['USER_NAME']))
+			{
+				$fields['NAME'] = $fields['USER_NAME'];
+			}
+
+			if(!$fields['NAME'] && isset($fields['USER_LAST_NAME']))
+			{
+				$fields['NAME'] = $fields['USER_LAST_NAME'];
+			}
+		}
+
+		return $fields;
 	}
 }

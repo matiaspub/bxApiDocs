@@ -191,8 +191,8 @@ class CBlogSearch
 				$Result = Array(
 					"ID"		=> "P".$ar["ID"],
 					"LAST_MODIFIED"	=> $ar["DATE_PUBLISH"],
-					"TITLE"		=> blogTextParser::killAllTags($ar["TITLE"]),
-					"BODY"		=> blogTextParser::killAllTags($ar["DETAIL_TEXT"]),
+					"TITLE"		=> CSearch::KillTags(blogTextParser::killAllTags($ar["TITLE"])),
+					"BODY"		=> CSearch::KillTags(blogTextParser::killAllTags($ar["DETAIL_TEXT"])),
 					"SITE_ID"	=> $arSite,
 					"PARAM1"	=> "POST",
 					"PARAM2"	=> $ar["BLOG_ID"],
@@ -411,7 +411,7 @@ class CBlogSearch
 										"BLOG_ID" => $arF["BLOG_ID"],
 										"POST_ID" => $ar["ID"],
 										"SITE_ID" => $ar["SITE_ID"],
-										"PATH" => $arPostSite[$arGroup["SITE_ID"]]."?commentId=#comment_id###comment_id#",
+										"PATH" => $arPostSite[$arGroup["SITE_ID"]]."?commentId=#comment_id##com#comment_id#",
 										"USE_SOCNET" => "Y",
 									);
 									CBlogComment::_IndexPostComments($arParamsComment);
@@ -461,6 +461,8 @@ class CBlogSearch
 							}
 							$Result["PARAMS"]["mentioned_user_id"] = $arMentionedUserID;
 						}
+
+						$socnetPerms = false;
 
 						if(IntVal($ar["SLID"]) <= 0)
 						{
@@ -535,7 +537,7 @@ class CBlogSearch
 							}
 
 							CSocNetLogRights::DeleteByLogID($logID);
-							CSocNetLogRights::Add($logID, $socnetPerms);
+							CSocNetLogRights::Add($logID, $socnetPerms, false, false);
 						}
 					}
 				}
@@ -622,8 +624,8 @@ class CBlogSearch
 					"PARAM1" => "COMMENT",
 					"PARAM2" => $ar["BLOG_ID"]."|".$ar["POST_ID"],
 					"PERMISSIONS" => array(2),
-					"TITLE" => $ar["TITLE"],
-					"BODY" => blogTextParser::killAllTags($ar["POST_TEXT"]),
+					"TITLE" => CSearch::KillTags($ar["TITLE"]),
+					"BODY" => CSearch::KillTags(blogTextParser::killAllTags($ar["POST_TEXT"])),
 					"INDEX_TITLE" => false,
 					"USER_ID" => (IntVal($ar["AUTHOR_ID"]) > 0) ? $ar["AUTHOR_ID"] : false,
 					"ENTITY_TYPE_ID" => "BLOG_COMMENT",

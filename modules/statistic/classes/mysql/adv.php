@@ -2,7 +2,7 @@
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/statistic/classes/general/adv.php");
 
 /**
- * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>. 
+ * <b>CAdv</b> - класс для работы с <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламными кампаниями</a>.
  *
  *
  * @return mixed 
@@ -87,194 +87,199 @@ class CAdv extends CAllAdv
 
 	
 	/**
-	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК) с рассчитанными статистическими показателями и со всеми данными по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a>.</p>
+	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК) с рассчитанными статистическими  показателями и со всеми данными по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a>.</p>
 	*
 	*
-	* @param string &$by = "SESSIONS" Поле для сортировки. Возможные значения: <ul> <li> <b>ID</b> - ID РК; </li> <li>
-	* <b>PRIORITY</b> - приоритет; </li> <li> <b>REFERER1</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a> referer1 РК; </li>
-	* <li> <b>REFERER2</b> - идентификатор referer2 РК; </li> <li> <b>C_TIME_FIRST</b> - время
-	* начала РК (первый <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой
-	* заход</a>); </li> <li> <b>C_TIME_LAST</b> - последний прямой заход или <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по РК; </li> <li>
-	* <b>ADV_TIME</b> - длительность РК (разница <b>C_TIME_LAST</b> - <b>C_TIME_FIRST</b>); </li> <li>
-	* <b>ATTENT</b> - коэфициент <a
+	* @param string &$by = "SESSIONS" Поле для сортировки. Возможные значения: 			<ul> <li> <b>ID</b> - ID РК; 				</li>
+	* <li> <b>PRIORITY</b> - приоритет; 				</li> <li> <b>REFERER1</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a> referer1 РК;
+	* 				</li> <li> <b>REFERER2</b> - идентификатор referer2 РК; 				</li> <li> <b>C_TIME_FIRST</b> -
+	* время начала РК (первый <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямой заход</a>); 				</li> <li>
+	* <b>C_TIME_LAST</b> - последний прямой заход или <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврат</a> по РК; 				</li> <li>
+	* <b>ADV_TIME</b> - длительность РК (разница <b>C_TIME_LAST</b> - <b>C_TIME_FIRST</b>); 				</li>
+	* <li> <b>ATTENT</b> - коэфициент <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_attent">внимательности</a> <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителей</a> на прямом
-	* заходе по РК; </li> <li> <b>ATTENT_BACK</b> - коэфициент <a
+	* заходе по РК; 				</li> <li> <b>ATTENT_BACK</b> - коэфициент <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_attent">внимательности</a>
-	* посетителей на возврате по РК; </li> <li> <b>NEW_VISITORS</b> - процент
+	* посетителей на возврате по РК; 				</li> <li> <b>NEW_VISITORS</b> - процент
 	* посетителей впервые пришедших на сайт по данной РК от общего
-	* количества посетителей пришедших по данной РК; </li> <li>
+	* количества посетителей пришедших по данной РК; 				</li> <li>
 	* <b>RETURNED_VISITORS</b> - процент посетителей возвратившихся на сайт после
-	* прямого захода по данной РК; </li> <li> <b>VISITORS_PER_DAY</b> - среднее
-	* количество посетителей за день; </li> <li> <b>COST</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_cost">затраты</a> на РК; </li> <li>
+	* прямого захода по данной РК; 				</li> <li> <b>VISITORS_PER_DAY</b> - среднее
+	* количество посетителей за день; 				</li> <li> <b>COST</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_cost">затраты</a> на РК; 				</li> <li>
 	* <b>REVENUE</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_revenue">доходы</a> с РК;
-	* </li> <li> <b>BENEFIT</b> - <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_benefit">прибыль</a> РК; </li> <li> <b>ROI</b> -
-	* <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_roi">рентабельность</a> РК; </li> <li>
-	* <b>SESSION_COST</b> - средняя стоимость <a
+	* 				</li> <li> <b>BENEFIT</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_benefit">прибыль</a> РК; 				</li> <li>
+	* <b>ROI</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_roi">рентабельность</a>
+	* РК; 				</li> <li> <b>SESSION_COST</b> - средняя стоимость <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a> (затраты/кол-во
-	* сессий на прямом заходе); </li> <li> <b>VISITOR_COST</b> - средняя стоимость
-	* посетителя (затраты/кол-во посетителей на прямых заходах); </li> <li>
-	* <b>GUESTS</b> - суммарное кол-во посетителей на прямых заходах; </li> <li>
-	* <b>GUESTS_BACK</b> - суммарное кол-во посетителей на возвратах; </li> <li>
+	* сессий на прямом заходе); 				</li> <li> <b>VISITOR_COST</b> - средняя стоимость
+	* посетителя (затраты/кол-во посетителей на прямых заходах); 				</li>
+	* <li> <b>GUESTS</b> - суммарное кол-во посетителей на прямых заходах; 				</li>
+	* <li> <b>GUESTS_BACK</b> - суммарное кол-во посетителей на возвратах; 				</li> <li>
 	* <b>NEW_GUESTS</b> - суммарное кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#new_guest">новых посетителей</a> по
-	* данной РК; </li> <li> <b>FAVORITES</b> - суммарное кол-во посетителей,
+	* данной РК; 				</li> <li> <b>FAVORITES</b> - суммарное кол-во посетителей,
 	* добавивших сайт в "<a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#favorites">Избранное</a>" на прямом
-	* заходе по РК; </li> <li> <b>FAVORITES_BACK</b> - суммарное кол-во посетителей,
-	* добавивших сайт в "Избранное" на возврате по РК; </li> <li> <b>C_HOSTS</b> -
+	* заходе по РК; 				</li> <li> <b>FAVORITES_BACK</b> - суммарное кол-во посетителей,
+	* добавивших сайт в "Избранное" на возврате по РК; 				</li> <li> <b>C_HOSTS</b> -
 	* суммарное кол-во <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#host">хостов</a> на
-	* прямом заходе по РК; </li> <li> <b>HOSTS_BACK</b> - суммарное кол-во хостов на
-	* возврате по РК; </li> <li> <b>SESSIONS</b> - суммарное кол-во сессий на прямом
-	* заходе по РК; </li> <li> <b>SESSIONS_BACK</b> - суммарное кол-во сессий на
-	* возврате по РК; </li> <li> <b>HITS</b> - суммарное кол-во <a
+	* прямом заходе по РК; 				</li> <li> <b>HOSTS_BACK</b> - суммарное кол-во хостов на
+	* возврате по РК; 				</li> <li> <b>SESSIONS</b> - суммарное кол-во сессий на
+	* прямом заходе по РК; 				</li> <li> <b>SESSIONS_BACK</b> - суммарное кол-во сессий
+	* на возврате по РК; 				</li> <li> <b>HITS</b> - суммарное кол-во <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> на прямом заходе по РК;
-	* </li> <li> <b>HITS_BACK</b> - суммарное кол-во хитов на возврате по РК; </li> <li>
-	* <b>GUESTS_TODAY</b> - кол-во посетителей на прямом заходе за сегодня; </li> <li>
-	* <b>GUESTS_BACK_TODAY</b> - кол-во посетителей на возврате за сегодня; </li> <li>
-	* <b>NEW_GUESTS_TODAY</b> - кол-во новых посетителей за сегодня; </li> <li>
-	* <b>FAVORITES_TODAY</b> - кол-во посетителей, добавивших сайт в "Избранное" на
-	* прямом заходе за сегодня; </li> <li> <b>FAVORITES_BACK_TODAY</b> - кол-во
+	* 				</li> <li> <b>HITS_BACK</b> - суммарное кол-во хитов на возврате по РК; 				</li>
+	* <li> <b>GUESTS_TODAY</b> - кол-во посетителей на прямом заходе за сегодня;
+	* 				</li> <li> <b>GUESTS_BACK_TODAY</b> - кол-во посетителей на возврате за сегодня;
+	* 				</li> <li> <b>NEW_GUESTS_TODAY</b> - кол-во новых посетителей за сегодня; 				</li>
+	* <li> <b>FAVORITES_TODAY</b> - кол-во посетителей, добавивших сайт в "Избранное"
+	* на прямом заходе за сегодня; 				</li> <li> <b>FAVORITES_BACK_TODAY</b> - кол-во
 	* посетителей, добавивших сайт в "Избранное" на возврате за сегодня;
-	* </li> <li> <b>C_HOSTS_TODAY</b> - кол-во хостов на прямом заходе за сегодня; </li>
-	* <li> <b>HOSTS_BACK_TODAY</b> - кол-во хостов на возврате за сегодня; </li> <li>
-	* <b>SESSIONS_TODAY</b> - кол-во сессий на прямом заходе за сегодня; </li> <li>
-	* <b>SESSIONS_BACK_TODAY</b> - кол-во сессий на возврате за сегодня; </li> <li>
-	* <b>HITS_TODAY</b> - кол-во хитов на прямом заходе за сегодня; </li> <li>
-	* <b>HITS_BACK_TODAY</b> - кол-во хитов на возврате за сегодня; </li> <li>
-	* <b>GUESTS_YESTERDAY</b> - кол-во посетителей на прямом заходе за вчера; </li> <li>
-	* <b>GUESTS_BACK_YESTERDAY</b> - кол-во посетителей на возврате за вчера; </li> <li>
-	* <b>NEW_GUESTS_YESTERDAY</b> - кол-во новых посетителей за вчера; </li> <li>
+	* 				</li> <li> <b>C_HOSTS_TODAY</b> - кол-во хостов на прямом заходе за сегодня;
+	* 				</li> <li> <b>HOSTS_BACK_TODAY</b> - кол-во хостов на возврате за сегодня; 				</li>
+	* <li> <b>SESSIONS_TODAY</b> - кол-во сессий на прямом заходе за сегодня; 				</li> <li>
+	* <b>SESSIONS_BACK_TODAY</b> - кол-во сессий на возврате за сегодня; 				</li> <li>
+	* <b>HITS_TODAY</b> - кол-во хитов на прямом заходе за сегодня; 				</li> <li>
+	* <b>HITS_BACK_TODAY</b> - кол-во хитов на возврате за сегодня; 				</li> <li>
+	* <b>GUESTS_YESTERDAY</b> - кол-во посетителей на прямом заходе за вчера; 				</li>
+	* <li> <b>GUESTS_BACK_YESTERDAY</b> - кол-во посетителей на возврате за вчера; 				</li>
+	* <li> <b>NEW_GUESTS_YESTERDAY</b> - кол-во новых посетителей за вчера; 				</li> <li>
 	* <b>FAVORITES_YESTERDAY</b> - кол-во посетителей, добавивших сайт в "Избранное"
-	* на прямом заходе за вчера; </li> <li> <b>FAVORITES_BACK_YESTERDAY</b> - кол-во
+	* на прямом заходе за вчера; 				</li> <li> <b>FAVORITES_BACK_YESTERDAY</b> - кол-во
 	* посетителей, добавивших сайт в "Избранное" на возврате за вчера;
-	* </li> <li> <b>C_HOSTS_YESTERDAY</b> - кол-во хостов на прямом заходе за вчера; </li>
-	* <li> <b>HOSTS_BACK_YESTERDAY</b> - кол-во хостов на возврате за вчера; </li> <li>
-	* <b>SESSIONS_YESTERDAY</b> - кол-во сессий на прямом заходе за вчера; </li> <li>
-	* <b>SESSIONS_BACK_YESTERDAY</b> - кол-во сессий на возврате за вчера; </li> <li>
-	* <b>HITS_YESTERDAY</b> - кол-во хитов на прямом заходе за вчера; </li> <li>
-	* <b>HITS_BACK_YESTERDAY</b> - кол-во хитов на возврате за вчера; </li> <li>
+	* 				</li> <li> <b>C_HOSTS_YESTERDAY</b> - кол-во хостов на прямом заходе за вчера;
+	* 				</li> <li> <b>HOSTS_BACK_YESTERDAY</b> - кол-во хостов на возврате за вчера; 				</li>
+	* <li> <b>SESSIONS_YESTERDAY</b> - кол-во сессий на прямом заходе за вчера; 				</li> <li>
+	* <b>SESSIONS_BACK_YESTERDAY</b> - кол-во сессий на возврате за вчера; 				</li> <li>
+	* <b>HITS_YESTERDAY</b> - кол-во хитов на прямом заходе за вчера; 				</li> <li>
+	* <b>HITS_BACK_YESTERDAY</b> - кол-во хитов на возврате за вчера; 				</li> <li>
 	* <b>GUESTS_BEF_YESTERDAY</b> - кол-во посетителей на прямом заходе за позавчера;
-	* </li> <li> <b>GUESTS_BACK_BEF_YESTERDAY</b> - кол-во посетителей на возврате за
-	* позавчера; </li> <li> <b>NEW_GUESTS_BEF_YESTERDAY</b> - кол-во новых посетителей за
-	* позавчера; </li> <li> <b>FAVORITES_BEF_YESTERDAY</b> - кол-во посетителей, добавивших
-	* сайт в "Избранное" на прямом заходе за позавчера; </li> <li>
-	* <b>FAVORITES_BACK_BEF_YESTERDAY</b> - кол-во посетителей, добавивших сайт в
-	* "Избранное" на возврате за позавчера; </li> <li> <b>C_HOSTS_BEF_YESTERDAY</b> -
-	* кол-во хостов на прямом заходе за позавчера; </li> <li>
-	* <b>HOSTS_BACK_BEF_YESTERDAY</b> - кол-во хостов на возврате за позавчера; </li> <li>
-	* <b>SESSIONS_BEF_YESTERDAY</b> - кол-во сессий на прямом заходе за позавчера; </li>
-	* <li> <b>SESSIONS_BACK_BEF_YESTERDAY</b> - кол-во сессий на возврате за позавчера; </li>
-	* <li> <b>HITS_BEF_YESTERDAY</b> - кол-во хитов на прямом заходе за позавчера; </li>
-	* <li> <b>HITS_BACK_BEF_YESTERDAY</b> - кол-во хитов на возврате за позавчера; </li> <li>
-	* <b>GUESTS_PERIOD</b> - кол-во посетителей на прямом заходе за установленный
-	* в фильтре (<i>filter</i>) интервал времени; </li> <li> <b>GUESTS_BACK_PERIOD</b> - кол-во
-	* посетителей на возврате за установленный в фильтре интервал
-	* времени; </li> <li> <b>NEW_GUESTS_PERIOD</b> - кол-во новых посетителей за
-	* установленный в фильтре интервал времени; </li> <li> <b>FAVORITES_PERIOD</b> -
-	* кол-во посетителей, добавивших сайт в "Избранное" на прямом заходе
-	* за установленный в фильтре интервал времени; </li> <li>
-	* <b>FAVORITES_BACK_PERIOD</b> - кол-во посетителей, добавивших сайт в "Избранное"
-	* на возврате за установленный в фильтре интервал времени; </li> <li>
-	* <b>C_HOSTS_PERIOD</b> - кол-во хостов на прямом заходе за установленный в
-	* фильтре интервал времени; </li> <li> <b>HOSTS_BACK_PERIOD</b> - кол-во хостов на
-	* возврате за установленный в фильтре интервал времени; </li> <li>
-	* <b>SESSIONS_PERIOD</b> - кол-во сессий на прямом заходе за установленный в
-	* фильтре интервал времени; </li> <li> <b>SESSIONS_BACK_PERIOD</b> - кол-во сессий на
-	* возврате за установленный в фильтре интервал времени; </li> <li>
-	* <b>HITS_PERIOD</b> - кол-во хитов на прямом заходе за установленный в
-	* фильтре интервал времени; </li> <li> <b>HITS_BACK_PERIOD</b> - кол-во хитов на
-	* возврате за установленный в фильтре интервал времени. </li> </ul>
+	* 				</li> <li> <b>GUESTS_BACK_BEF_YESTERDAY</b> - кол-во посетителей на возврате за
+	* позавчера; 				</li> <li> <b>NEW_GUESTS_BEF_YESTERDAY</b> - кол-во новых посетителей за
+	* позавчера; 				</li> <li> <b>FAVORITES_BEF_YESTERDAY</b> - кол-во посетителей,
+	* добавивших сайт в "Избранное" на прямом заходе за позавчера; 				</li>
+	* <li> <b>FAVORITES_BACK_BEF_YESTERDAY</b> - кол-во посетителей, добавивших сайт в
+	* "Избранное" на возврате за позавчера; 				</li> <li> <b>C_HOSTS_BEF_YESTERDAY</b> -
+	* кол-во хостов на прямом заходе за позавчера; 				</li> <li>
+	* <b>HOSTS_BACK_BEF_YESTERDAY</b> - кол-во хостов на возврате за позавчера; 				</li> <li>
+	* <b>SESSIONS_BEF_YESTERDAY</b> - кол-во сессий на прямом заходе за позавчера;
+	* 				</li> <li> <b>SESSIONS_BACK_BEF_YESTERDAY</b> - кол-во сессий на возврате за
+	* позавчера; 				</li> <li> <b>HITS_BEF_YESTERDAY</b> - кол-во хитов на прямом заходе
+	* за позавчера; 				</li> <li> <b>HITS_BACK_BEF_YESTERDAY</b> - кол-во хитов на возврате
+	* за позавчера; 				</li> <li> <b>GUESTS_PERIOD</b> - кол-во посетителей на прямом
+	* заходе за установленный в фильтре (<i>filter</i>) интервал времени;
+	* 				</li> <li> <b>GUESTS_BACK_PERIOD</b> - кол-во посетителей на возврате за
+	* установленный в фильтре интервал времени; 				</li> <li> <b>NEW_GUESTS_PERIOD</b> -
+	* кол-во новых посетителей за установленный в фильтре интервал
+	* времени; 				</li> <li> <b>FAVORITES_PERIOD</b> - кол-во посетителей, добавивших
+	* сайт в "Избранное" на прямом заходе за установленный в фильтре
+	* интервал времени; 				</li> <li> <b>FAVORITES_BACK_PERIOD</b> - кол-во посетителей,
+	* добавивших сайт в "Избранное" на возврате за установленный в
+	* фильтре интервал времени; 				</li> <li> <b>C_HOSTS_PERIOD</b> - кол-во хостов на
+	* прямом заходе за установленный в фильтре интервал времени; 				</li>
+	* <li> <b>HOSTS_BACK_PERIOD</b> - кол-во хостов на возврате за установленный в
+	* фильтре интервал времени; 				</li> <li> <b>SESSIONS_PERIOD</b> - кол-во сессий на
+	* прямом заходе за установленный в фильтре интервал времени; 				</li>
+	* <li> <b>SESSIONS_BACK_PERIOD</b> - кол-во сессий на возврате за установленный в
+	* фильтре интервал времени; 				</li> <li> <b>HITS_PERIOD</b> - кол-во хитов на
+	* прямом заходе за установленный в фильтре интервал времени; 				</li>
+	* <li> <b>HITS_BACK_PERIOD</b> - кол-во хитов на возврате за установленный в
+	* фильтре интервал времени. 			</li> </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения: 			<ul> <li> <b>asc</b> - по
+	* возрастанию; 				</li> <li> <b>desc</b> - по убыванию. 			</li> </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>GROUP</b> - список возможных
-	* значений: <ul> <li> <b>referer1</b> - список РК будет сгруппирован по <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer1 РК; </li>
-	* <li> <b>referer2</b> - список РК будет сгруппирован по <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer2 РК. </li>
-	* </ul> </li> <li> <b>ID</b>* - ID РК; </li> <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то
-	* при фильтрации по <b>ID</b> будет искаться вхождение; </li> <li>
-	* <b>DATE1_PERIOD</b> - начальное значение <i>периода</i> за который необходимо
-	* получить данные; </li> <li> <b>DATE2_PERIOD</b> - конечное значение <i>периода</i>
-	* за который необходимо получить данные; </li> <li> <b>DATE1_FIRST</b> -
-	* начальное значение интервала для поля "время начала РК"; </li> <li>
-	* <b>DATE2_FIRST</b> - конечное значение интервала для поля "время начала
-	* РК"; </li> <li> <b>DATE1_LAST</b> - начальное значение интервала для поля "время
-	* окончания РК"; </li> <li> <b>DATE2_LAST</b> - конечное значение интервала для
-	* поля "время окончания РК"; </li> <li> <b>REFERER1</b>* - идентификатор referer1 РК;
-	* </li> <li> <b>REFERER1_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>REFERER1</b> будет искаться точное совпадение; </li> <li> <b>REFERER2</b>* -
-	* идентификатор referer2 РК; </li> <li> <b>REFERER2_EXACT_MATCH</b> - если значение равно
-	* "Y", то при фильтрации по <b>REFERER2</b> будет искаться точное
-	* совпадение; </li> <li> <b>PRIORITY1</b> - начальное значение интервала для
-	* поля "приоритет РК"; </li> <li> <b>PRIORITY2</b> - конечное значение интервала
-	* для поля "приоритет РК"; </li> <li> <b>NEW_GUESTS1</b> - начальное значение
-	* интервала для поля "новые посетители РК"; </li> <li> <b>NEW_GUESTS2</b> -
-	* конечное значение интервала для поля "новые посетители РК"; </li> <li>
-	* <b>GUESTS_BACK</b> - флаг означающий по какому полю фильтровать
-	* посетителей, список возможных значений: <ul> <li> <b>N</b> - на прямом
-	* заходе; </li> <li> <b>Y</b> - на возврате. </li> </ul> </li> <li> <b>GUESTS1</b> - начальное
+	* допустимы следующие ключи: 			<ul> <li> <b>GROUP</b> - список возможных
+	* значений: 					<ul> <li> <b>referer1</b> - список РК будет сгруппирован по <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer1 РК;
+	* 						</li> <li> <b>referer2</b> - список РК будет сгруппирован по <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатору</a> referer2 РК.
+	* 					</li> </ul> </li> <li> <b>ID</b>* - ID РК; 				</li> <li> <b>ID_EXACT_MATCH</b> - если значение
+	* равно "N", то при фильтрации по <b>ID</b> будет искаться вхождение;
+	* 				</li> <li> <b>DATE1_PERIOD</b> - начальное значение <i>периода</i> за который
+	* необходимо получить данные; 				</li> <li> <b>DATE2_PERIOD</b> - конечное
+	* значение <i>периода</i> за который необходимо получить данные; 				</li>
+	* <li> <b>DATE1_FIRST</b> - начальное значение интервала для поля "время
+	* начала РК"; 				</li> <li> <b>DATE2_FIRST</b> - конечное значение интервала для
+	* поля "время начала РК"; 				</li> <li> <b>DATE1_LAST</b> - начальное значение
+	* интервала для поля "время окончания РК"; 				</li> <li> <b>DATE2_LAST</b> -
+	* конечное значение интервала для поля "время окончания РК"; 				</li>
+	* <li> <b>REFERER1</b>* - идентификатор referer1 РК; 				</li> <li> <b>REFERER1_EXACT_MATCH</b> - если
+	* значение равно "Y", то при фильтрации по <b>REFERER1</b> будет искаться
+	* точное совпадение; 				</li> <li> <b>REFERER2</b>* - идентификатор referer2 РК; 				</li>
+	* <li> <b>REFERER2_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
+	* <b>REFERER2</b> будет искаться точное совпадение; 				</li> <li> <b>PRIORITY1</b> -
+	* начальное значение интервала для поля "приоритет РК"; 				</li> <li>
+	* <b>PRIORITY2</b> - конечное значение интервала для поля "приоритет РК";
+	* 				</li> <li> <b>NEW_GUESTS1</b> - начальное значение интервала для поля "новые
+	* посетители РК"; 				</li> <li> <b>NEW_GUESTS2</b> - конечное значение интервала
+	* для поля "новые посетители РК"; 				</li> <li> <b>GUESTS_BACK</b> - флаг
+	* означающий по какому полю фильтровать посетителей, список
+	* возможных значений: 					<ul> <li> <b>N</b> - на прямом заходе; 						</li> <li> <b>Y</b>
+	* - на возврате. 					</li> </ul> </li> <li> <b>GUESTS1</b> - начальное значение
+	* интервала для поля "посетители на прямом заходе или на возврате"
+	* (в зависимости от флага <b>GUESTS_BACK</b>); 				</li> <li> <b>GUESTS2</b> - конечное
 	* значение интервала для поля "посетители на прямом заходе или на
-	* возврате" (в зависимости от флага <b>GUESTS_BACK</b>); </li> <li> <b>GUESTS2</b> -
-	* конечное значение интервала для поля "посетители на прямом
-	* заходе или на возврате" (в зависимости от флага <b>GUESTS_BACK</b>); </li> <li>
-	* <b>FAVORITES_BACK</b> - флаг означающий по какому полю фильтровать
-	* посетителей, добавившие сайт в "Избранное", список возможных
-	* значений: <ul> <li> <b>N</b> - на прямом заходе; </li> <li> <b>Y</b> - на возврате.
-	* </li> </ul> </li> <li> <b>FAVORITES1</b> - начальное значение интервала для поля
-	* "посетители, добавившие сайт в Избранное на прямом заходе или
-	* возврате" (в зависимости от флага <b>FAVORITES_BACK</b>); </li> <li> <b>FAVORITES2</b> -
-	* конечное значение интервала для поля "посетители, добавившие
-	* сайт в Избранное на прямом заходе или возврате" (в зависимости от
-	* флага <b>FAVORITES_BACK</b>); </li> <li> <b>HOSTS_BACK</b> - флаг означающий по какому
-	* полю фильтровать хосты, список возможных значений: <ul> <li> <b>N</b> - на
-	* прямом заходе; </li> <li> <b>Y</b> - на возврате. </li> </ul> </li> <li> <b>HOSTS1</b> -
-	* начальное значение интервала для поля "хосты на прямом заходе или
-	* возврате" (в зависимости от флага <b>HOSTS_BACK</b>); </li> <li> <b>HOSTS2</b> -
+	* возврате" (в зависимости от флага <b>GUESTS_BACK</b>); 				</li> <li> <b>FAVORITES_BACK</b> -
+	* флаг означающий по какому полю фильтровать посетителей,
+	* добавившие сайт в "Избранное", список возможных значений: 					<ul> <li>
+	* <b>N</b> - на прямом заходе; 						</li> <li> <b>Y</b> - на возврате. 					</li> </ul> </li>
+	* <li> <b>FAVORITES1</b> - начальное значение интервала для поля "посетители,
+	* добавившие сайт в Избранное на прямом заходе или возврате" (в
+	* зависимости от флага <b>FAVORITES_BACK</b>); 				</li> <li> <b>FAVORITES2</b> - конечное
+	* значение интервала для поля "посетители, добавившие сайт в
+	* Избранное на прямом заходе или возврате" (в зависимости от флага
+	* <b>FAVORITES_BACK</b>); 				</li> <li> <b>HOSTS_BACK</b> - флаг означающий по какому полю
+	* фильтровать хосты, список возможных значений: 					<ul> <li> <b>N</b> - на
+	* прямом заходе; 						</li> <li> <b>Y</b> - на возврате. 					</li> </ul> </li> <li> <b>HOSTS1</b>
+	* - начальное значение интервала для поля "хосты на прямом заходе
+	* или возврате" (в зависимости от флага <b>HOSTS_BACK</b>); 				</li> <li> <b>HOSTS2</b> -
 	* конечное значение интервала для поля "хосты на прямом заходе или
-	* возврате" (в зависимости от флага <b>HOSTS_BACK</b>); </li> <li> <b>SESSIONS_BACK</b> -
+	* возврате" (в зависимости от флага <b>HOSTS_BACK</b>); 				</li> <li> <b>SESSIONS_BACK</b> -
 	* флаг означающий по какому полю фильтровать сессии, список
-	* возможных значений: <ul> <li> <b>N</b> - на прямом заходе; </li> <li> <b>Y</b> - на
-	* возврате. </li> </ul> </li> <li> <b>SESSIONS1</b> - начальное значение интервала
-	* для поля "сессии на прямом заходе или возврате" (в зависимости от
-	* флага <b>SESSIONS_BACK</b>); </li> <li> <b>SESSIONS2</b> - конечное значение интервала
-	* для поля "сессии на прямом заходе или возврате" (в зависимости от
-	* флага <b>SESSIONS_BACK</b>); </li> <li> <b>HITS_BACK</b> - флаг означающий по какому полю
-	* фильтровать хиты, список возможных значений: <ul> <li> <b>N</b> - на
-	* прямом заходе; </li> <li> <b>Y</b> - на возврате. </li> </ul> </li> <li> <b>HITS1</b> -
-	* начальное значение интервала для поля "хиты на прямом заходе или
-	* возврате" (в зависимости от флага <b>HITS_BACK</b>); </li> <li> <b>HITS2</b> -
-	* конечное значение интервала для поля "хиты на прямом заходе или
-	* возврате" (в зависимости от флага <b>HITS_BACK</b>); </li> <li> <b>COST1</b> -
-	* начальное значение интервала для поля "затраты на РК"; </li> <li>
-	* <b>COST2</b> - конечное значение интервала для поля "затраты на РК"; </li>
-	* <li> <b>REVENUE1</b> - начальное значение интервала для поля "доходы с РК";
-	* </li> <li> <b>REVENUE2</b> - конечное значение интервала для поля "доходы с
-	* РК"; </li> <li> <b>BENEFIT1</b> - начальное значение интервала для поля
-	* "прибыль с РК"; </li> <li> <b>BENEFIT2</b> - конечное значение интервала для
-	* поля "прибыль с РК"; </li> <li> <b>ROI1</b> - начальное значение интервала
-	* для поля "рентабельность РК"; </li> <li> <b>ROI2</b> - конечное значение
-	* интервала для поля "рентабельность РК"; </li> <li> <b>ATTENT1</b> - начальное
+	* возможных значений: 					<ul> <li> <b>N</b> - на прямом заходе; 						</li> <li> <b>Y</b>
+	* - на возврате. 					</li> </ul> </li> <li> <b>SESSIONS1</b> - начальное значение
+	* интервала для поля "сессии на прямом заходе или возврате" (в
+	* зависимости от флага <b>SESSIONS_BACK</b>); 				</li> <li> <b>SESSIONS2</b> - конечное
+	* значение интервала для поля "сессии на прямом заходе или
+	* возврате" (в зависимости от флага <b>SESSIONS_BACK</b>); 				</li> <li> <b>HITS_BACK</b> -
+	* флаг означающий по какому полю фильтровать хиты, список
+	* возможных значений: 					<ul> <li> <b>N</b> - на прямом заходе; 						</li> <li> <b>Y</b>
+	* - на возврате. 					</li> </ul> </li> <li> <b>HITS1</b> - начальное значение
+	* интервала для поля "хиты на прямом заходе или возврате" (в
+	* зависимости от флага <b>HITS_BACK</b>); 				</li> <li> <b>HITS2</b> - конечное
+	* значение интервала для поля "хиты на прямом заходе или возврате"
+	* (в зависимости от флага <b>HITS_BACK</b>); 				</li> <li> <b>COST1</b> - начальное
+	* значение интервала для поля "затраты на РК"; 				</li> <li> <b>COST2</b> -
+	* конечное значение интервала для поля "затраты на РК"; 				</li> <li>
+	* <b>REVENUE1</b> - начальное значение интервала для поля "доходы с РК";
+	* 				</li> <li> <b>REVENUE2</b> - конечное значение интервала для поля "доходы с
+	* РК"; 				</li> <li> <b>BENEFIT1</b> - начальное значение интервала для поля
+	* "прибыль с РК"; 				</li> <li> <b>BENEFIT2</b> - конечное значение интервала для
+	* поля "прибыль с РК"; 				</li> <li> <b>ROI1</b> - начальное значение интервала
+	* для поля "рентабельность РК"; 				</li> <li> <b>ROI2</b> - конечное значение
+	* интервала для поля "рентабельность РК"; 				</li> <li> <b>ATTENT1</b> -
+	* начальное значение интервала для поля "коэфициент
+	* внимательности посетителей РК"; 				</li> <li> <b>ATTENT2</b> - конечное
 	* значение интервала для поля "коэфициент внимательности
-	* посетителей РК"; </li> <li> <b>ATTENT2</b> - конечное значение интервала для
-	* поля "коэфициент внимательности посетителей РК"; </li> <li>
-	* <b>VISITORS_PER_DAY1</b> - начальное значение интервала для поля "среднее
-	* кол-во посетителей в день"; </li> <li> <b>VISITORS_PER_DAY2</b> - конечное значение
-	* интервала для поля "среднее кол-во посетителей в день"; </li> <li>
-	* <b>DURATION1</b> - начальное значение интервала для поля "длительность
-	* РК"; </li> <li> <b>DURATION2</b> - конечное значение интервала для поля
-	* "длительность РК"; </li> <li> <b>CURRENCY</b> - валюта в которой заданы
-	* финансовые показатели РК; </li> <li> <b>DESCRIPTION</b>* - описание РК; </li> <li>
-	* <b>DESCRIPTION_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>DESCRIPTION</b> будет искаться точное совпадение. </li> </ul> * - допускается
-	* <a href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
+	* посетителей РК"; 				</li> <li> <b>VISITORS_PER_DAY1</b> - начальное значение
+	* интервала для поля "среднее кол-во посетителей в день"; 				</li> <li>
+	* <b>VISITORS_PER_DAY2</b> - конечное значение интервала для поля "среднее
+	* кол-во посетителей в день"; 				</li> <li> <b>DURATION1</b> - начальное значение
+	* интервала для поля "длительность РК"; 				</li> <li> <b>DURATION2</b> - конечное
+	* значение интервала для поля "длительность РК"; 				</li> <li> <b>CURRENCY</b> -
+	* валюта в которой заданы финансовые показатели РК; 				</li> <li>
+	* <b>DESCRIPTION</b>* - описание РК; 				</li> <li> <b>DESCRIPTION_EXACT_MATCH</b> - если значение
+	* равно "Y", то при фильтрации по <b>DESCRIPTION</b> будет искаться точное
+	* совпадение. 			</li> </ul>			 			* - допускается <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка рекламных кампаний. Если значение
 	* равно "true", то список был отфильтрован.
@@ -286,51 +291,54 @@ class CAdv extends CAllAdv
 	*
 	* @param array &$referer_group  Ссылка на массив инициализируемый только при установленной
 	* группировке по referer1 или referer2 (если <i>filter</i>["GROUP"]="referer1" или
-	* <i>filter</i>["GROUP"]="referer2"). Структура данного массива: <pre> [<i>referer1</i> или
-	* <i>referer2</i>] =&gt; Array ( [REFERER1] =&gt; <i>referer1</i> или [REFERER2] =&gt; <i>referer2</i> [GUESTS_TODAY]
-	* =&gt; посетителей на прямом заходе за сегодня [GUESTS_BACK_TODAY] =&gt;
-	* посетителей на возврате за сегодня [NEW_GUESTS_TODAY] =&gt; новых
-	* посетителей за сегодня [FAVORITES_TODAY] =&gt; посетителей, добавивших сайт
-	* в "Избранное" на прямом заходе за сегодня [FAVORITES_BACK_TODAY] =&gt;
-	* посетителей, добавившие сайт в "Избранное" на возврате за сегодня
-	* [C_HOSTS_TODAY] =&gt; хостов на прямом заходе за сегодня [HOSTS_BACK_TODAY] =&gt;
-	* хостов на возврате за сегодня [SESSIONS_TODAY] =&gt; сессий на прямом
-	* заходе за сегодня [SESSIONS_BACK_TODAY] =&gt; сессий на возврате за сегодня
-	* [HITS_TODAY] =&gt; хитов на прямом заходе за сегодня [HITS_BACK_TODAY] =&gt; хитов на
-	* возврате за сегодня [GUESTS_YESTERDAY] =&gt; посетителей на возврате за
-	* вчера [GUESTS_BACK_YESTERDAY] =&gt; посетителей на возврате за вчера
-	* [NEW_GUESTS_YESTERDAY] =&gt; новых посетителей за вчера [FAVORITES_YESTERDAY] =&gt;
-	* посетителей, добавившие сайт в "Избранное" на прямом заходе за
-	* вчера [FAVORITES_BACK_YESTERDAY] =&gt; посетителей, добавившие сайт в
-	* "Избранное" на возврате за вчера [C_HOSTS_YESTERDAY] =&gt; хостов на прямом
-	* заходе за вчера [HOSTS_BACK_YESTERDAY] =&gt; хостов на возврате за вчера
-	* [SESSIONS_YESTERDAY] =&gt; сессий на прямом заходе за вчера [SESSIONS_BACK_YESTERDAY] =&gt;
-	* сессий на возврате за вчера [HITS_YESTERDAY] =&gt; хитов на прямом заходе за
-	* вчера [HITS_BACK_YESTERDAY] =&gt; хитов на возврате за вчера [GUESTS_BEF_YESTERDAY] =&gt;
-	* посетителей на прямом заходе за позавчера [NEW_GUESTS_BEF_YESTERDAY] =&gt;
-	* новых посетителей за позавчера [FAVORITES_BEF_YESTERDAY] =&gt; посетителей,
-	* добавившие сайт в "Избранное" на прямом заходе за позавчера
-	* [C_HOSTS_BEF_YESTERDAY] =&gt; хостов на прямом заходе за позавчера
-	* [SESSIONS_BEF_YESTERDAY] =&gt; сессий на прямом заходе за позавчера [HITS_BEF_YESTERDAY]
-	* =&gt; хитов на прямом заходе за позавчера [GUESTS_BACK_BEF_YESTERDAY] =&gt;
-	* посетителей на возврате за позавчера [FAVORITES_BACK_BEF_YESTERDAY] =&gt;
-	* посетителей, добавившие сайт в "Избранное" на возврате за
-	* позавчера [HOSTS_BACK_BEF_YESTERDAY] =&gt; хостов на возврате за позавчера
-	* [SESSIONS_BACK_BEF_YESTERDAY] =&gt; сессий на возврате за позавчера [HITS_BACK_BEF_YESTERDAY]
-	* =&gt; хитов на возврате за позавчера [GUESTS_PERIOD] =&gt; посетителей на
-	* прямом заходе за период времени (установка периода времени
-	* осушествляется инициализацией <i>filter</i>["DATE1_PERIOD"] и/или
-	* <i>filter</i>["DATE2_PERIOD"]) [GUESTS_BACK_PERIOD] =&gt; посетителей на возврате за период
-	* времени [NEW_GUESTS_PERIOD] =&gt; новые посетители на прямом заходе за
-	* период времени [C_HOSTS_PERIOD] =&gt; хосты на прямом заходе за период
-	* времени [HOSTS_BACK_PERIOD] =&gt; хостов на возврате за период времени
-	* [FAVORITES_PERIOD] =&gt; посетителей, добавившие сайт в "Избранное" на прямом
-	* заходе за период времени [FAVORITES_BACK_PERIOD] =&gt; посетителей, добавившие
-	* сайт в "Избранное" на возврате за период времени [SESSIONS_PERIOD] =&gt;
-	* сессий на прямом заходе за период времени [SESSIONS_BACK_PERIOD] =&gt; сессий
-	* на возврате за период времени [HITS_PERIOD] =&gt; хитов на прямом заходе
-	* за период времени [HITS_BACK_PERIOD] =&gt; хитов на возврате за период
-	* времени ) </pre>
+	* <i>filter</i>["GROUP"]="referer2"). Структура данного массива: <pre bgcolor="#323232" style="padding:5px;"> [<i>referer1</i> или
+	* <i>referer2</i>] =&gt; Array     (         [REFERER1] =&gt; <i>referer1</i> или         [REFERER2] =&gt;
+	* <i>referer2</i>                  [GUESTS_TODAY] =&gt; посетителей на прямом заходе за
+	* сегодня         [GUESTS_BACK_TODAY] =&gt; посетителей на возврате за сегодня       
+	*  [NEW_GUESTS_TODAY] =&gt; новых посетителей за сегодня         [FAVORITES_TODAY] =&gt;
+	* посетителей, добавивших сайт в "Избранное"             на прямом заходе
+	* за сегодня         [FAVORITES_BACK_TODAY] =&gt; посетителей, добавившие сайт в
+	* "Избранное"             на возврате за сегодня         [C_HOSTS_TODAY] =&gt; хостов
+	* на прямом заходе за сегодня         [HOSTS_BACK_TODAY] =&gt; хостов на возврате
+	* за сегодня         [SESSIONS_TODAY] =&gt; сессий на прямом заходе за сегодня      
+	*   [SESSIONS_BACK_TODAY] =&gt; сессий на возврате за сегодня         [HITS_TODAY] =&gt;
+	* хитов на прямом заходе за сегодня         [HITS_BACK_TODAY] =&gt; хитов на
+	* возврате за сегодня         [GUESTS_YESTERDAY] =&gt; посетителей на возврате за
+	* вчера         [GUESTS_BACK_YESTERDAY] =&gt; посетителей на возврате за вчера        
+	* [NEW_GUESTS_YESTERDAY] =&gt; новых посетителей за вчера         [FAVORITES_YESTERDAY] =&gt;
+	* посетителей, добавившие сайт в              "Избранное" на прямом
+	* заходе за вчера         [FAVORITES_BACK_YESTERDAY] =&gt; посетителей, добавившие
+	* сайт в              "Избранное" на возврате за вчера          [C_HOSTS_YESTERDAY] =&gt;
+	* хостов на прямом заходе за вчера         [HOSTS_BACK_YESTERDAY] =&gt; хостов на
+	* возврате за вчера         [SESSIONS_YESTERDAY] =&gt; сессий на прямом заходе за
+	* вчера         [SESSIONS_BACK_YESTERDAY] =&gt; сессий на возврате за вчера        
+	* [HITS_YESTERDAY] =&gt; хитов на прямом заходе за вчера         [HITS_BACK_YESTERDAY] =&gt;
+	* хитов на возврате за вчера         [GUESTS_BEF_YESTERDAY] =&gt; посетителей на
+	* прямом заходе за позавчера         [NEW_GUESTS_BEF_YESTERDAY] =&gt; новых
+	* посетителей за позавчера         [FAVORITES_BEF_YESTERDAY] =&gt; посетителей,
+	* добавившие сайт в              "Избранное" на прямом заходе за
+	* позавчера         [C_HOSTS_BEF_YESTERDAY] =&gt; хостов на прямом заходе за
+	* позавчера         [SESSIONS_BEF_YESTERDAY] =&gt; сессий на прямом заходе за
+	* позавчера         [HITS_BEF_YESTERDAY] =&gt; хитов на прямом заходе за позавчера 
+	*        [GUESTS_BACK_BEF_YESTERDAY] =&gt; посетителей на возврате за позавчера        
+	* [FAVORITES_BACK_BEF_YESTERDAY] =&gt; посетителей, добавившие сайт в            
+	* "Избранное" на возврате за позавчера         [HOSTS_BACK_BEF_YESTERDAY] =&gt; хостов
+	* на возврате за позавчера         [SESSIONS_BACK_BEF_YESTERDAY] =&gt; сессий на
+	* возврате за позавчера         [HITS_BACK_BEF_YESTERDAY] =&gt; хитов на возврате за
+	* позавчера         [GUESTS_PERIOD] =&gt; посетителей на прямом заходе за период
+	* времени              (установка периода времени осушествляется
+	* инициализацией              <i>filter</i>["DATE1_PERIOD"] и/или <i>filter</i>["DATE2_PERIOD"])        
+	* [GUESTS_BACK_PERIOD] =&gt; посетителей на возврате за период времени        
+	* [NEW_GUESTS_PERIOD] =&gt; новые посетители на прямом заходе за               период
+	* времени         [C_HOSTS_PERIOD] =&gt; хосты на прямом заходе за период времени
+	*         [HOSTS_BACK_PERIOD] =&gt; хостов на возврате за период времени        
+	* [FAVORITES_PERIOD] =&gt; посетителей, добавившие сайт в              "Избранное" на
+	* прямом заходе за период времени         [FAVORITES_BACK_PERIOD] =&gt; посетителей,
+	* добавившие сайт в              "Избранное" на возврате за период
+	* времени         [SESSIONS_PERIOD] =&gt; сессий на прямом заходе за период
+	* времени         [SESSIONS_BACK_PERIOD] =&gt; сессий на возврате за период времени 
+	*        [HITS_PERIOD] =&gt; хитов на прямом заходе за период времени        
+	* [HITS_BACK_PERIOD] =&gt; хитов на возврате за период времени     )         </pre>
 	*
 	* @param string &$sql  Ссылка на результирующий SQL запрос по которому будет выбран
 	* список РК.
@@ -338,7 +346,7 @@ class CAdv extends CAllAdv
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // отфильтруем по рекламным кампаниям в referer1 которых входит "google"
 	* // а также получим дополнительные данные за декабрь 2005 года
@@ -370,10 +378,10 @@ class CAdv extends CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getsimplelist.php">CAdv::GetSimpleList</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li> </ul>
-	* <a name="examples"></a>
+	* кампания"</a> 	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getsimplelist.php">CAdv::GetSimpleList</a> 	</li> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -880,12 +888,12 @@ class CAdv extends CAllAdv
 	* <p>Возвращает настройки <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a>.</p>
 	*
 	*
-	* @param int $adv_id  ID рекламной кампании. </htm
+	* @param int $adv_id  ID рекламной кампании.
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $adv_id = 1;
 	* if ($rs = <b>CAdv::GetByID</b>($adv_id))
@@ -900,7 +908,7 @@ class CAdv extends CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li></ul> <a name="examples"></a>
+	* кампания"</a> </li></ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -933,62 +941,66 @@ class CAdv extends CAllAdv
 	* <p>Возвращает список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типов событий</a>, инициализированных <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителями</a>, зашедшими по определённой <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> (РК).</p>
 	*
 	*
-	* @param int $adv_id  ID рекламной кампании. </htm
+	* @param int $adv_id  ID рекламной кампании.
 	*
-	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a> </li> <li>
-	* <b>s_event1</b> - <a
+	* @param string &$by = "s_counter" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type">типа события</a> </li>                
+	*    <li> <b>s_event1</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор</a> event1 типа
-	* события </li> <li> <b>s_event2</b> - <a
+	* события </li>                    <li> <b>s_event2</b> - <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event_type_id">идентификатор</a> event2 типа
-	* события </li> <li> <b>s_sort</b> - индекс сортировки типа события </li> <li>
-	* <b>s_name</b> - наименование типа события </li> <li> <b>s_counter</b> - количество
-	* событий инициализированных посетителями на <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямом заходе</a> по
-	* рекламной кампании <i>adv_id</i> </li> <li> <b>s_counter_back</b> - количество событий
-	* инициализированных посетителями на <a
+	* события </li>                    <li> <b>s_sort</b> - индекс сортировки типа события
+	* </li>                    <li> <b>s_name</b> - наименование типа события </li>                   
+	* <li> <b>s_counter</b> - количество событий инициализированных
+	* посетителями на <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_first">прямом
+	* заходе</a> по рекламной кампании <i>adv_id</i> </li>                    <li>
+	* <b>s_counter_back</b> - количество событий инициализированных
+	* посетителями на <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_back">возврате</a> по рекламной
-	* кампании <i>adv_id</i> </li> <li> <b>s_def</b> - сортировка по умолчанию (для
-	* вывода в соответствующей таблице) </li> </ul>
+	* кампании <i>adv_id</i> </li>                    <li> <b>s_def</b> - сортировка по умолчанию
+	* (для вывода в соответствующей таблице) </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию </li>                    <li> <b>desc</b> - по убыванию </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID типа события </li> <li>
-	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	* будет искаться вхождение </li> <li> <b>EVENT1</b>* - идентификатор event1 типа
-	* события </li> <li> <b>EVENT1_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>EVENT1</b> будет искаться точное совпадение </li> <li>
-	* <b>EVENT2</b>* - идентификатор event2 типа события </li> <li> <b>EVENT2_EXACT_MATCH</b> -
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID типа события </li>      
+	*              <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации
+	* по <b>ID</b> будет искаться вхождение </li>                    <li> <b>EVENT1</b>* -
+	* идентификатор event1 типа события </li>                    <li> <b>EVENT1_EXACT_MATCH</b> -
+	* если значение равно "Y", то при фильтрации по <b>EVENT1</b> будет
+	* искаться точное совпадение </li>                    <li> <b>EVENT2</b>* -
+	* идентификатор event2 типа события </li>                    <li> <b>EVENT2_EXACT_MATCH</b> -
 	* если значение равно "Y", то при фильтрации по <b>EVENT2</b> будет
-	* искаться точное совпадение </li> <li> <b>KEYWORDS</b>* - имя и описание типа
-	* события </li> <li> <b>KEYWORDS_EXACT_MATCH</b> - если значение равно "Y", то при
-	* фильтрации по <b>KEYWORDS</b> будет искаться точное совпадение </li> <li>
-	* <b>DATE1_PERIOD</b> - начальная дата <i>периода</i> </li> <li> <b>DATE2_PERIOD</b> -
-	* конечная дата <i>периода</i> </li> <li> <b>COUNTER_PERIOD_1</b> - если установлены
+	* искаться точное совпадение </li>                    <li> <b>KEYWORDS</b>* - имя и
+	* описание типа события </li>                    <li> <b>KEYWORDS_EXACT_MATCH</b> - если
+	* значение равно "Y", то при фильтрации по <b>KEYWORDS</b> будет искаться
+	* точное совпадение </li>                    <li> <b>DATE1_PERIOD</b> - начальная дата
+	* <i>периода</i> </li>                    <li> <b>DATE2_PERIOD</b> - конечная дата
+	* <i>периода</i> </li>                    <li> <b>COUNTER_PERIOD_1</b> - если установлены
 	* <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в данном поле можно указать
 	* начальное значение интервала количества событий
 	* инициализированных посетителями на прямом заходе по рекламной
-	* кампании <i>adv_id</i> </li> <li> <b>COUNTER_PERIOD_2</b> - если установлены <b>DATE1_PERIOD</b>
-	* или <b>DATE2_PERIOD</b>, то в данном поле можно указать конечное значение
+	* кампании <i>adv_id</i> </li>                    <li> <b>COUNTER_PERIOD_2</b> - если установлены
+	* <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в данном поле можно указать конечное
+	* значение интервала количества событий инициализированных
+	* посетителями на прямом заходе по рекламной кампании <i>adv_id</i> </li>    
+	*                <li> <b>COUNTER_BACK_PERIOD_1</b> - если установлены <b>DATE1_PERIOD</b> или
+	* <b>DATE2_PERIOD</b>, то в данном поле можно указать начальное значение
 	* интервала количества событий инициализированных посетителями
-	* на прямом заходе по рекламной кампании <i>adv_id</i> </li> <li>
-	* <b>COUNTER_BACK_PERIOD_1</b> - если установлены <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в
-	* данном поле можно указать начальное значение интервала
+	* на возврате по рекламной кампании <i>adv_id</i> </li>                    <li>
+	* <b>COUNTER_BACK_PERIOD_2</b> - если установлены <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в
+	* данном поле можно указать конечное значение интервала
 	* количества событий инициализированных посетителями на возврате
-	* по рекламной кампании <i>adv_id</i> </li> <li> <b>COUNTER_BACK_PERIOD_2</b> - если
+	* по рекламной кампании <i>adv_id</i> </li>                    <li> <b>MONEY_PERIOD_1</b> - если
 	* установлены <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в данном поле можно
-	* указать конечное значение интервала количества событий
-	* инициализированных посетителями на возврате по рекламной
-	* кампании <i>adv_id</i> </li> <li> <b>MONEY_PERIOD_1</b> - если установлены <b>DATE1_PERIOD</b>
-	* или <b>DATE2_PERIOD</b>, то в данном поле можно указать начальное значение
-	* интервала количество денег инициализированных посетителями на
-	* прямом заходе по рекламной кампании <i>adv_id</i> </li> <li> <b>MONEY_PERIOD_2</b> -
-	* если установлены <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в данном поле можно
-	* указать конечное значение интервала количества денег
+	* указать начальное значение интервала количество денег
 	* инициализированных посетителями на прямом заходе по рекламной
-	* кампании <i>adv_id</i> </li> </ul> * - допускается <a
+	* кампании <i>adv_id</i> </li>                    <li> <b>MONEY_PERIOD_2</b> - если установлены
+	* <b>DATE1_PERIOD</b> или <b>DATE2_PERIOD</b>, то в данном поле можно указать конечное
+	* значение интервала количества денег инициализированных
+	* посетителями на прямом заходе по рекламной кампании <i>adv_id</i> </li>    
+	*     </ul>       * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка типов событий. Если значение равно
@@ -997,7 +1009,7 @@ class CAdv extends CAllAdv
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $adv_id = 1;
 	* 
@@ -1030,8 +1042,8 @@ class CAdv extends CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
-	* "Событие"</a> </li> </ul> <a name="examples"></a>
+	* кампания"</a> </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#event">Термин
+	* "Событие"</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1378,29 +1390,30 @@ class CAdv extends CAllAdv
 	* <p>Возвращает данные по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_traffic">трафику</a> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламной кампании</a> в разрезе по датам.</p>
 	*
 	*
-	* @param int $adv_id  ID рекламной кампании. </htm
+	* @param int $adv_id  ID рекламной кампании.
 	*
-	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: <ul><li> <b>s_date</b> - дата </li></ul>
+	* @param string &$by = "s_date" Поле для сортировки. Возможные значения: 			<ul><li> <b>s_date</b> - дата
+	* 			</li></ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию </li> <li> <b>desc</b> - по убыванию </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения: 			<ul> <li> <b>asc</b> - по
+	* возрастанию 				</li> <li> <b>desc</b> - по убыванию 			</li> </ul>
 	*
 	* @param array &$max_min  Ссылка на массив содержащий максимальную и минимальную даты
-	* результирующего списка. Структура данного массива: <pre> Array (
-	* [DATE_FIRST] =&gt; минимальная дата [MIN_DAY] =&gt; день минимальной даты (1-31)
-	* [MIN_MONTH] =&gt; месяц минимальной даты (1-12) [MIN_YEAR] =&gt; год минимальной
-	* даты [DATE_LAST] =&gt; максимальная дата [MAX_DAY] =&gt; день максимальной даты
-	* (1-31) [MAX_MONTH] =&gt; месяц максимальной даты (1-12) [MAX_YEAR] =&gt; год
-	* максимальной даты ) </pre>
+	* результирующего списка. Структура данного массива: 	<pre bgcolor="#323232" style="padding:5px;"> Array (    
+	* [DATE_FIRST] =&gt; минимальная дата     [MIN_DAY] =&gt; день минимальной даты (1-31)  
+	*   [MIN_MONTH] =&gt; месяц минимальной даты (1-12)     [MIN_YEAR] =&gt; год минимальной
+	* даты     [DATE_LAST] =&gt; максимальная дата     [MAX_DAY] =&gt; день максимальной
+	* даты (1-31)     [MAX_MONTH] =&gt; месяц максимальной даты (1-12)     [MAX_YEAR] =&gt; год
+	* максимальной даты  )     </pre>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>DATE_1</b> - дата "с" </li> <li> <b>DATE_2</b> -
-	* дата "по" </li> </ul>
+	* допустимы следующие ключи: 			<ul> <li> <b>DATE_1</b> - дата "с" 				</li> <li>
+	* <b>DATE_2</b> - дата "по" 			</li> </ul>
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $adv_id = 1;
 	* 
@@ -1434,7 +1447,7 @@ class CAdv extends CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul><li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li></ul> <a name="examples"></a>
+	* кампания"</a> </li></ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1573,25 +1586,27 @@ class CAdv extends CAllAdv
 	* <p>Возвращает упрощённый список <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">рекламных кампаний</a> (РК).</p>
 	*
 	*
-	* @param string &$by = "s_referer1" Поле для сортировки. Возможные значения: <ul> <li> <b>s_id</b> - ID РК; </li> <li>
-	* <b>s_referer1</b> - <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a>
-	* referer1 РК; </li> <li> <b>s_referer2</b> - идентификатор referer2 РК; </li> <li> <b>s_description</b>
-	* - описание РК. </li> </ul>
+	* @param string &$by = "s_referer1" Поле для сортировки. Возможные значения:          <ul> <li> <b>s_id</b> - ID РК;
+	* </li>                    <li> <b>s_referer1</b> - <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv_id">идентификатор</a> referer1 РК; </li>  
+	*                  <li> <b>s_referer2</b> - идентификатор referer2 РК; </li>                    <li>
+	* <b>s_description</b> - описание РК. </li>         </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                    <li> <b>desc</b> - по убыванию. </li>         </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b>* - ID РК; </li> <li> <b>ID_EXACT_MATCH</b> -
-	* если значение равно "N", то при фильтрации по <b>ID</b> будет искаться
-	* вхождение; </li> <li> <b>REFERER1</b>* - идентификатор referer1 РК; </li> <li>
-	* <b>REFERER1_EXACT_MATCH</b> - если значение равно "Y", то при фильтрации по
-	* <b>REFERER1</b> будет искаться точное совпадение; </li> <li> <b>REFERER2</b>* -
-	* идентификатор referer2 РК; </li> <li> <b>REFERER2_EXACT_MATCH</b> - если значение равно
-	* "Y", то при фильтрации по <b>REFERER2</b> будет искаться точное
-	* совпадение; </li> <li> <b>DESCRIPTION</b>* - описание РК; </li> <li> <b>DESCRIPTION_EXACT_MATCH</b>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b>* - ID РК; </li>                    <li>
+	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
+	* будет искаться вхождение; </li>                    <li> <b>REFERER1</b>* -
+	* идентификатор referer1 РК; </li>                    <li> <b>REFERER1_EXACT_MATCH</b> - если
+	* значение равно "Y", то при фильтрации по <b>REFERER1</b> будет искаться
+	* точное совпадение; </li>                    <li> <b>REFERER2</b>* - идентификатор referer2
+	* РК; </li>                    <li> <b>REFERER2_EXACT_MATCH</b> - если значение равно "Y", то при
+	* фильтрации по <b>REFERER2</b> будет искаться точное совпадение; </li>          
+	*          <li> <b>DESCRIPTION</b>* - описание РК; </li>                    <li> <b>DESCRIPTION_EXACT_MATCH</b>
 	* - если значение равно "Y", то при фильтрации по <b>DESCRIPTION</b> будет
-	* искаться точное совпадение. </li> </ul> * - допускается <a
+	* искаться точное совпадение. </li>         </ul>       * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности списка рекламных кампаний. Если значение
@@ -1600,7 +1615,7 @@ class CAdv extends CAllAdv
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // выберем только те рекламные кампании у которых в referer1 входит "google"
 	* $arFilter = array(
@@ -1626,10 +1641,10 @@ class CAdv extends CAllAdv
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#adv">Термин "Рекламная
-	* кампания"</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getlist.php">CAdv::GetList</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li> </ul>
-	* <a name="examples"></a>
+	* кампания"</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getlist.php">CAdv::GetList</a> </li>   <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/classes/cadv/getdropdownlist.php">CAdv::GetDropdownList</a> </li>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static

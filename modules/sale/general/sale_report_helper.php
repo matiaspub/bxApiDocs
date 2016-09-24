@@ -5,7 +5,6 @@ if (!CModule::IncludeModule('currency'))
 	return;
 
 use Bitrix\Main\Entity;
-use Bitrix\Main\Text\String;
 
 abstract class CBaseSaleReportHelper extends CReportHelper
 {
@@ -424,9 +423,9 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 						's:13:"SUMMARY_PRICE";s:5:"alias";s:5:"xxxxx";s:4:"aggr";s:3:"SUM";}}s:6:"filter";a:1:{i:0;'.
 						'a:6:{i:0;a:5:{s:4:"type";s:5:"field";s:4:"name";s:11:"ORDER.PAYED";s:7:"compare";s:5:"EQUAL";'.
 						's:5:"value";s:4:"true";s:10:"changeable";s:1:"0";}i:1;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-						's:24:"ORDER.DATE_INSERT_FORMAT";s:7:"compare";s:16:"GREATER_OR_EQUAL";s:5:"value";s:8:"-29 days";'.
+						's:23:"ORDER.DATE_INSERT_SHORT";s:7:"compare";s:16:"GREATER_OR_EQUAL";s:5:"value";s:8:"-29 days";'.
 						's:10:"changeable";s:1:"1";}i:2;a:5:{s:4:"type";s:5:"field";s:4:"name";'.
-						's:24:"ORDER.DATE_INSERT_FORMAT";s:7:"compare";s:13:"LESS_OR_EQUAL";s:5:"value";s:5:"1 day";'.
+						's:23:"ORDER.DATE_INSERT_SHORT";s:7:"compare";s:13:"LESS_OR_EQUAL";s:5:"value";s:5:"1 day";'.
 						's:10:"changeable";s:1:"1";}i:3;a:5:{s:4:"type";s:5:"field";s:4:"name";s:4:"NAME";'.
 						's:7:"compare";s:8:"CONTAINS";s:5:"value";s:0:"";s:10:"changeable";s:1:"1";}i:4;'.
 						'a:5:{s:4:"type";s:5:"field";s:4:"name";s:33:"PRODUCT.GoodsSection:PRODUCT.SECT";'.
@@ -513,7 +512,7 @@ abstract class CBaseSaleReportHelper extends CReportHelper
 					'description' => GetMessage('SALE_REPORT_DEFAULT_SALES_DESCR'),
 					'mark_default' => 6,
 					'settings' => unserialize('a:7:{s:6:"entity";s:9:"SaleOrder";s:6:"period";a:2:{s:4:"type";'.
-							's:5:"month";s:5:"value";N;}s:6:"select";a:8:{i:1;a:2:{s:4:"name";s:18:"DATE_INSERT_FORMAT";'.
+							's:5:"month";s:5:"value";N;}s:6:"select";a:8:{i:1;a:2:{s:4:"name";s:17:"DATE_INSERT_SHORT";'.
 							's:5:"alias";s:4:"xxxx";}i:0;a:3:{s:4:"name";s:2:"ID";s:5:"alias";s:14:"xxxxxxxxxxxxxx";'.
 							's:4:"aggr";s:14:"COUNT_DISTINCT";}i:13;a:3:{s:4:"name";s:14:"PRODUCTS_QUANT";s:5:"alias";'.
 							's:13:"xxxxxxxxxxxxx";s:4:"aggr";s:3:"SUM";}i:2;a:3:{s:4:"name";s:9:"TAX_VALUE";'.
@@ -1050,7 +1049,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 
 		return array(
 			'ID',
-			'DATE_INSERT_FORMAT',
+			'DATE_INSERT_SHORT',
 			'DATE_UPDATE_SHORT',
 			'STATUS' => array(
 				'STATUS_ID',
@@ -1176,7 +1175,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 	{
 		return array(
 			array('name' => 'ID'),
-			array('name' => 'DATE_INSERT_FORMAT')
+			array('name' => 'DATE_INSERT_SHORT')
 		);
 	}
 
@@ -1245,8 +1244,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		{
 			$filter[] = array(
 				'LOGIC' => 'OR',
-				'<=DATE_INSERT_FORMAT' => $date_to,
-				'=DATE_INSERT_FORMAT' => null
+				'<=DATE_INSERT_SHORT' => $date_to,
+				'=DATE_INSERT_SHORT' => null
 			);
 		}
 
@@ -1254,8 +1253,8 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 		{
 			$filter[] = array(
 				'LOGIC' => 'OR',
-				'>=DATE_INSERT_FORMAT' => $date_from,
-				'=DATE_INSERT_FORMAT' => null
+				'>=DATE_INSERT_SHORT' => $date_from,
+				'=DATE_INSERT_SHORT' => null
 			);
 		}
 
@@ -1348,7 +1347,7 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 	}
 	/* \remove it */
 
-	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
+	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total, &$customChartValue = null)
 	{
 		$dataType = self::getFieldDataType($cInfo['field']);
 
@@ -1439,10 +1438,11 @@ class CSaleReportSaleOrderHelper extends CBaseSaleReportHelper
 	{
 		$paramTotal = array('TOTAL_'.$params['k'] => &$params['v']);
 		$viewColumns = array($params['k'] => &$params['cInfo']);
-		static::formatResultsTotal($paramTotal, $viewColumns, true);
+		$bFormatOnly = true;
+		static::formatResultsTotal($paramTotal, $viewColumns, $bFormatOnly);
 	}
 
-	public static function formatResultsTotal(&$total, &$columnInfo, $bFormatOnly = false)
+	public static function formatResultsTotal(&$total, &$columnInfo, &$bFormatOnly = null)
 	{
 		parent::formatResultsTotal($total, $columnInfo);
 
@@ -1620,7 +1620,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 			'EMAIL',
 			'PERSONAL_PHONE',
 			'Bitrix\Sale\Internals\Order:USER' => array(
-				'DATE_INSERT_FORMAT',
+				'DATE_INSERT_SHORT',
 				'DATE_UPDATE_SHORT',
 				'STATUS' => array(
 					'STATUS_ID',
@@ -1845,7 +1845,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 		return $bResult;
 	}
 
-	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
+	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime = null)
 	{
 		global $DB;
 
@@ -1911,7 +1911,7 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 	}
 	/* \remove it */
 
-	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
+	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total, &$customChartValue = null)
 	{
 		$dataType = self::getFieldDataType($cInfo['field']);
 
@@ -1993,10 +1993,11 @@ class CSaleReportUserHelper extends CBaseSaleReportHelper
 	{
 		$paramTotal = array('TOTAL_'.$params['k'] => &$params['v']);
 		$viewColumns = array($params['k'] => &$params['cInfo']);
-		static::formatResultsTotal($paramTotal, $viewColumns, true);
+		$bFormatOnly = true;
+		static::formatResultsTotal($paramTotal, $viewColumns, $bFormatOnly);
 	}
 
-	public static function formatResultsTotal(&$total, &$columnInfo, $bFormatOnly = false)
+	public static function formatResultsTotal(&$total, &$columnInfo, &$bFormatOnly = null)
 	{
 		parent::formatResultsTotal($total, $columnInfo);
 
@@ -2167,7 +2168,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 			'DELAY',
 			'ORDER_ID',
 			'ORDER' => array(
-				'DATE_INSERT_FORMAT',
+				'DATE_INSERT_SHORT',
 				'DATE_UPDATE_SHORT',
 				'STATUS' => array(
 					'STATUS_ID',
@@ -2483,7 +2484,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 		// </editor-fold>
 	}
 
-	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
+	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime = null)
 	{
 		if (self::$currentIblockFilter['value'])
 		{
@@ -2577,7 +2578,7 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 	}
 	/* \remove it */
 
-	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
+	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total, &$customChartValue = null)
 	{
 		$dataType = self::getFieldDataType($cInfo['field']);
 
@@ -2682,10 +2683,11 @@ class CSaleReportSaleBasketHelper extends CBaseSaleReportHelper
 	{
 		$paramTotal = array('TOTAL_'.$params['k'] => &$params['v']);
 		$viewColumns = array($params['k'] => &$params['cInfo']);
-		static::formatResultsTotal($paramTotal, $viewColumns, true);
+		$bFormatOnly = true;
+		static::formatResultsTotal($paramTotal, $viewColumns, $bFormatOnly);
 	}
 
-	public static function formatResultsTotal(&$total, &$columnInfo, $bFormatOnly = false)
+	public static function formatResultsTotal(&$total, &$columnInfo, &$bFormatOnly = null)
 	{
 		parent::formatResultsTotal($total, $columnInfo);
 
@@ -3206,7 +3208,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 		// </editor-fold>
 	}
 
-	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime)
+	public static function beforeViewDataQuery(&$select, &$filter, &$group, &$order, &$limit, &$options, &$runtime = null)
 	{
 		global $DB, $DBType;
 
@@ -3308,7 +3310,7 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 		static::formatResultValue($k, $v, $row, $cInfo, array());
 	}*/
 
-	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total)
+	public static function formatResultValue($k, &$v, &$row, &$cInfo, $total, &$customChartValue = null)
 	{
 		$dataType = self::getFieldDataType($cInfo['field']);
 
@@ -3385,10 +3387,11 @@ class CSaleReportSaleProductHelper extends CBaseSaleReportHelper
 	{
 		$paramTotal = array('TOTAL_'.$params['k'] => &$params['v']);
 		$viewColumns = array($params['k'] => &$params['cInfo']);
-		static::formatResultsTotal($paramTotal, $viewColumns, true);
+		$bFormatOnly = true;
+		static::formatResultsTotal($paramTotal, $viewColumns, $bFormatOnly);
 	}
 
-	public static function formatResultsTotal(&$total, &$columnInfo, $bFormatOnly = false)
+	public static function formatResultsTotal(&$total, &$columnInfo, &$bFormatOnly = null)
 	{
 		parent::formatResultsTotal($total, $columnInfo);
 

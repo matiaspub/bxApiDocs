@@ -16,6 +16,35 @@ class HmacAlgorithm
 	// Default hashing algorithm used by HMAC
 	protected $hashAlgorithm = 'sha256';
 
+
+	/**
+	 * Creates signing algorithm based on HMAC.
+	 *
+	 * @since 16.0.0
+	 * @param string|null $hashAlgorithm Hashing algorithm (optional). See registered algorithms in hash_algos().
+	 */
+	
+	/**
+	* <p>Нестатический метод создаёт алгоритм подписи на основе <a href="https://ru.wikipedia.org/wiki/HMAC" >HMAC</a>.</p>
+	*
+	*
+	* @param mixed $string  Алгоритм хэширования. Сморти зарегистрированные алгоритмы в <a
+	* href="http://php.net/manual/pl/function.hash-algos.php" >hash_algos()</a>.
+	*
+	* @param null $hashAlgorithm = null 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/hmacalgorithm/__construct.php
+	* @author Bitrix
+	*/
+	public function __construct($hashAlgorithm = null)
+	{
+		if ($hashAlgorithm)
+			$this->setHashAlgorithm($hashAlgorithm);
+	}
+
 	/**
 	 * Set hashing algorithm for using in HMAC
 	 *
@@ -23,6 +52,20 @@ class HmacAlgorithm
 	 * @return $this
 	 * @throws \Bitrix\Main\ArgumentOutOfRangeException
 	 */
+	
+	/**
+	* <p>Нестатический метод устанавливает алгоритм хеширования для использования в HMAC</p>
+	*
+	*
+	* @param string $hashAlgorithm  Алгоритм хеширования. Смотри зарегистрированные алгоритмы в <a
+	* href="http://php.net/manual/pl/function.hash-algos.php" >hash_algos()</a>.
+	*
+	* @return \Bitrix\Main\Security\Sign\HmacAlgorithm 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/hmacalgorithm/sethashalgorithm.php
+	* @author Bitrix
+	*/
 	public function setHashAlgorithm($hashAlgorithm)
 	{
 		if (!in_array($hashAlgorithm, hash_algos()))
@@ -37,6 +80,17 @@ class HmacAlgorithm
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает текущий используемый алгоритм хеширования.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/hmacalgorithm/gethashalgorithm.php
+	* @author Bitrix
+	*/
 	public function getHashAlgorithm()
 	{
 		return $this->hashAlgorithm;
@@ -49,6 +103,21 @@ class HmacAlgorithm
 	 * @param string $key Secret password for HMAC.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает подпись сообщения.</p>
+	*
+	*
+	* @param string $value  Сообщение
+	*
+	* @param string $key  Секретный пароль для HMAC.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/hmacalgorithm/getsignature.php
+	* @author Bitrix
+	*/
 	public function getSignature($value, $key)
 	{
 		return hash_hmac($this->hashAlgorithm, $value, $key, true);
@@ -62,6 +131,23 @@ class HmacAlgorithm
 	 * @param string $sig Message signature password for HMAC.
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод верифицирует подпись сообщения.</p>
+	*
+	*
+	* @param string $value  Сообщение
+	*
+	* @param string $key  Секретный пароль используемый для подписи.
+	*
+	* @param string $sig  Пароль подписи сообщения для HMAC.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/security/sign/hmacalgorithm/verify.php
+	* @author Bitrix
+	*/
 	public function verify($value, $key, $sig)
 	{
 		return $this->compareStrings(

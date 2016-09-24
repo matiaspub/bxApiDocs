@@ -110,6 +110,17 @@ class MailingTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Возвращает валидатор для поля <b>DESCRIPTION</b> - описание рассылки. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/mailingtable/validatedescription.php
+	* @author Bitrix
+	*/
 	public static function validateDescription()
 	{
 		return array(
@@ -253,6 +264,8 @@ class MailingTable extends Entity\DataManager
 				'EMAIL_FROM' => $item['EMAIL_FROM'],
 				'SUBJECT' => $item['SUBJECT'],
 				'MESSAGE' => $item['MESSAGE'],
+				'TEMPLATE_TYPE' => $item['TEMPLATE_TYPE'],
+				'TEMPLATE_TYPE' => $item['TEMPLATE_ID'],
 				'TIME_SHIFT' => intval($item['TIME_SHIFT']),
 			);
 
@@ -403,7 +416,8 @@ class MailingTable extends Entity\DataManager
 			$chainDb = MailingChainTable::getList(array(
 				'select' => array(
 					'ID', 'SUBJECT', 'EMAIL_FROM', 'MESSAGE', 'TIME_SHIFT', 'PARENT_ID',
-					'DATE_INSERT', 'CREATED_BY', 'CREATED_BY_NAME' => 'CREATED_BY_USER.NAME', 'CREATED_BY_LAST_NAME' => 'CREATED_BY_USER.LAST_NAME'
+					'DATE_INSERT', 'PRIORITY', 'LINK_PARAMS', 'TEMPLATE_TYPE', 'TEMPLATE_ID',
+					'CREATED_BY', 'CREATED_BY_NAME' => 'CREATED_BY_USER.NAME', 'CREATED_BY_LAST_NAME' => 'CREATED_BY_USER.LAST_NAME'
 				),
 				'filter' => array('=MAILING_ID' => $id, '=PARENT_ID' => $parentId),
 			));
@@ -541,6 +555,41 @@ class MailingTable extends Entity\DataManager
 		}
 	}
 
+	public static function getPersonalizeList($id)
+	{
+		$result = array();
+
+		// fetch all connectors for getting emails
+		$groupConnectorDb = \Bitrix\Sender\MailingGroupTable::getList(array(
+			'select' => array(
+				'CONNECTOR_ENDPOINT' => 'GROUP.GROUP_CONNECTOR.ENDPOINT',
+				'GROUP_ID'
+			),
+			'filter' => array(
+				'MAILING_ID' => $id,
+				'INCLUDE' => true,
+			),
+			'order' => array('GROUP_ID' => 'ASC')
+		));
+		while($groupConnector = $groupConnectorDb->fetch())
+		{
+			$connector = null;
+			if(is_array($groupConnector['CONNECTOR_ENDPOINT']))
+			{
+				$connector = \Bitrix\Sender\ConnectorManager::getConnector($groupConnector['CONNECTOR_ENDPOINT']);
+			}
+
+			if(!$connector)
+			{
+				continue;
+			}
+
+			$result = array_merge($result, $connector->getPersonalizeList());
+		}
+
+		return $result;
+	}
+
 	public static function getChainPersonalizeList($id)
 	{
 		$result = array();
@@ -670,6 +719,10 @@ class MailingSubscriptionTable extends Entity\DataManager
 				'data_type' => 'datetime',
 				'default_value' => new Type\DateTime(),
 			),
+			'IS_UNSUB' => array(
+				'data_type' => 'string',
+				'primary' => true,
+			),
 			'MAILING' => array(
 				'data_type' => 'Bitrix\Sender\MailingTable',
 				'reference' => array('=this.MAILING_ID' => 'ref.ID'),
@@ -679,5 +732,132 @@ class MailingSubscriptionTable extends Entity\DataManager
 				'reference' => array('=this.CONTACT_ID' => 'ref.ID'),
 			),
 		);
+	}
+
+	/**
+	 * Get subscription list
+	 *
+	 * @param array $parameters
+	 * @return \Bitrix\Main\DB\Result
+	 */
+	
+	/**
+	* <p>Возвращает список подписок на рассылки. Метод статический.</p>
+	*
+	*
+	* @param array $arrayparameters = array() Массив списка подписок.
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/mailingsubscriptiontable/getsubscriptionlist.php
+	* @author Bitrix
+	*/
+	public static function getSubscriptionList(array $parameters = array())
+	{
+		$parameters['filter'] = array('=IS_UNSUB' => 'N') + (!isset($parameters['filter']) ? array() : $parameters['filter']);
+		return parent::getList($parameters);
+	}
+
+	/**
+	 * Get un subscription list
+	 *
+	 * @param array $parameters
+	 * @return \Bitrix\Main\DB\Result
+	 */
+	
+	/**
+	* <p>Возвращает список отписок от рассылок. Метод статический.</p>
+	*
+	*
+	* @param array $arrayparameters = array() Массив отписок от подписок.
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/mailingsubscriptiontable/getunsubscriptionlist.php
+	* @author Bitrix
+	*/
+	public static function getUnSubscriptionList(array $parameters = array())
+	{
+		$parameters['filter'] = array('=IS_UNSUB' => 'Y') + (!isset($parameters['filter']) ? array() : $parameters['filter']);
+		return parent::getList($parameters);
+	}
+
+
+	/**
+	 * Ad subscription row
+	 *
+	 * @param array $parameters
+	 * @return \Bitrix\Main\DB\Result
+	 */
+	
+	/**
+	* <p>Создает объект подписки на рассылку по параметрам. Метод статический.</p>
+	*
+	*
+	* @param array $arrayparameters = array() Массив со списком коннекторов. Ключи массива: <ul> <li> <b>MAILING_ID</b> - ID
+	* рассылки;</li> <li> <b>CONTACT_ID</b> - ID контакта;</li> <li> <b>IS_UNSUB</b> - флаг отписки
+	* от рассылки - <code>N<code>|<code>Y</code>.</code></code> </li> </ul>
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/mailingsubscriptiontable/addsubscription.php
+	* @author Bitrix
+	*/
+	public static function addSubscription(array $parameters = array())
+	{
+		$primary = array('MAILING_ID' => $parameters['MAILING_ID'], 'CONTACT_ID' => $parameters['CONTACT_ID']);
+		$fields = array('IS_UNSUB' => 'N');
+		$row = static::getRowById($primary);
+		if($row)
+		{
+			$result = parent::update($primary, array('IS_UNSUB' => 'N'));
+			return $result->isSuccess();
+		}
+		else
+		{
+			$result = parent::add($fields + $parameters);
+			return $result->isSuccess();
+		}
+	}
+
+	/**
+	 * Ad subscription row
+	 *
+	 * @param array $parameters
+	 * @return \Bitrix\Main\DB\Result
+	 */
+	
+	/**
+	* <p>Создает объект отписки от рассылки по параметрам. Метод статический.</p>
+	*
+	*
+	* @param array $arrayparameters = array() Массив со списком коннекторов. Ключи массива: <ul> <li> <b>MAILING_ID</b> - ID
+	* рассылки;</li> <li> <b>CONTACT_ID</b> - ID контакта;</li> <li> <b>IS_UNSUB</b> - флаг отписки
+	* от рассылки - <code>N<code>|<code>Y</code>.</code></code> </li> </ul>
+	*
+	* @return \Bitrix\Main\DB\Result 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sender/mailingsubscriptiontable/addunsubscription.php
+	* @author Bitrix
+	*/
+	public static function addUnSubscription(array $parameters = array())
+	{
+		$primary = array('MAILING_ID' => $parameters['MAILING_ID'], 'CONTACT_ID' => $parameters['CONTACT_ID']);
+		$fields = array('IS_UNSUB' => 'Y');
+		$row = static::getRowById($primary);
+		if($row)
+		{
+			$result = parent::update($primary, $fields);
+			return $result->isSuccess();
+		}
+		else
+		{
+			$result = parent::add($fields + $parameters);
+			return $result->isSuccess();
+		}
 	}
 }

@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CIBlockRSS</b> - класс для работы с RSS лентами. <br> 
+ * <b>CIBlockRSS</b> - класс для работы с RSS лентами.    <br>
  *
  *
  * @return mixed 
@@ -99,13 +99,37 @@ class CIBlockRSS extends CAllIBlockRSS
 			else
 				$strImage = $db_img_arr["SRC"];
 
-			$strRes .= "<image>\n";
-			$strRes .= "<title>".htmlspecialcharsbx($arIBLOCK["NAME"])."</title>\n";
-			$strRes .= "<url>".$strImage."</url>\n";
-			$strRes .= "<link>http://".$serverName."</link>\n";
-			$strRes .= "<width>".$db_img_arr["WIDTH"]."</width>\n";
-			$strRes .= "<height>".$db_img_arr["HEIGHT"]."</height>\n";
-			$strRes .= "</image>\n";
+			if ($yandex)
+			{
+				$strRes .= "<yandex:logo>".$strImage."</yandex:logo>\n";
+				$squareSize = min($db_img_arr["WIDTH"], $db_img_arr["HEIGHT"]);
+				if ($squareSize > 0)
+				{
+					$squarePicture = CFile::ResizeImageGet(
+						$db_img_arr,
+						array("width" => $squareSize, "height" => $squareSize),
+						BX_RESIZE_IMAGE_EXACT
+					);
+					if ($squarePicture)
+					{
+						if(substr($squarePicture["src"], 0, 1) == "/")
+							$squareImage = "http://".$serverName.$squarePicture["src"];
+						else
+							$squareImage = $squarePicture["src"];
+						$strRes .= "<yandex:logo type=\"square\">".$squareImage."</yandex:logo>\n";
+					}
+				}
+			}
+			else
+			{
+				$strRes .= "<image>\n";
+				$strRes .= "<title>".htmlspecialcharsbx($arIBLOCK["NAME"])."</title>\n";
+				$strRes .= "<url>".$strImage."</url>\n";
+				$strRes .= "<link>http://".$serverName."</link>\n";
+				$strRes .= "<width>".$db_img_arr["WIDTH"]."</width>\n";
+				$strRes .= "<height>".$db_img_arr["HEIGHT"]."</height>\n";
+				$strRes .= "</image>\n";
+			}
 		}
 
 		$arNodes = array();

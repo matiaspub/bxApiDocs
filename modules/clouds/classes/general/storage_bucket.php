@@ -285,7 +285,15 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	*/
 	public function SaveFile($filePath, $arFile)
 	{
-		return $this->service->SaveFile($this->arBucket, $filePath, $arFile);
+		$result = $this->service->SaveFile($this->arBucket, $filePath, $arFile);
+		if ($result)
+		{
+			foreach(GetModuleEvents("clouds", "OnAfterSaveFile", true) as $arEvent)
+			{
+				ExecuteModuleEventEx($arEvent, array($this, $arFile, $filePath));
+			}
+		}
+		return $result;
 	}
 	/**
 	 * @param string $filePath
@@ -293,7 +301,15 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	*/
 	public function DeleteFile($filePath)
 	{
-		return $this->service->DeleteFile($this->arBucket, $filePath);
+		$result = $this->service->DeleteFile($this->arBucket, $filePath);
+		if ($result)
+		{
+			foreach(GetModuleEvents("clouds", "OnAfterDeleteFile", true) as $arEvent)
+			{
+				ExecuteModuleEventEx($arEvent, array($this, array('del' => 'Y'), $filePath));
+			}
+		}
+		return $result;
 	}
 	/**
 	 * @param mixed $arFile
@@ -302,7 +318,33 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	*/
 	public function FileCopy($arFile, $filePath)
 	{
-		return $this->service->FileCopy($this->arBucket, $arFile, $filePath);
+		$result = $this->service->FileCopy($this->arBucket, $arFile, $filePath);
+		if ($result)
+		{
+			foreach(GetModuleEvents("clouds", "OnAfterCopyFile", true) as $arEvent)
+			{
+				ExecuteModuleEventEx($arEvent, array($this, $arFile, $filePath));
+			}
+		}
+		return $result;
+	}
+	/**
+	 * @param string $sourcePath
+	 * @param string $targetPath
+	 * @param bool $overwrite
+	 * @return bool
+	*/
+	public function FileRename($sourcePath, $targetPath, $overwrite = true)
+	{
+		$result = $this->service->FileRename($this->arBucket, $sourcePath, $targetPath, $overwrite);
+		if ($result)
+		{
+			foreach(GetModuleEvents("clouds", "OnAfterRenameFile", true) as $arEvent)
+			{
+				ExecuteModuleEventEx($arEvent, array($this, $sourcePath, $targetFile));
+			}
+		}
+		return $result;
 	}
 	/**
 	 * @param string $filePath
@@ -715,7 +757,7 @@ class CCloudStorageBucket extends CAllCloudStorageBucket
 	 * @param array[string][int]string $arPOST
 	 * @return array[int][string]string
 	*/
-	public static function ConvertPOST($arPOST)
+	static function ConvertPOST($arPOST)
 	{
 		$arRules =/*.(array[int][string]string).*/array();
 

@@ -2,6 +2,17 @@
 require($_SERVER["DOCUMENT_ROOT"].BX_ROOT."/modules/main/classes/general/ratings.php");
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * <b>CRatings</b> - класс для работы с рейтингами.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cratings/index.php
+ * @author Bitrix
+ */
 class CRatings extends CAllRatings
 {
 	public static function err_mess()
@@ -19,7 +30,8 @@ class CRatings extends CAllRatings
 
 		$resRating = CRatings::GetByID($ID);
 		$arRating = $resRating->Fetch();
-		if ($arRating && $arRating['ACTIVE'] == 'Y') {
+		if ($arRating && $arRating['ACTIVE'] == 'Y')
+		{
 			$DB->Query("UPDATE b_rating SET CALCULATED = 'C' WHERE id = ".$ID, false, $err_mess.__LINE__);
 
 			// Insert new results
@@ -160,7 +172,6 @@ class CRatings extends CAllRatings
 							and	RU.ENTITY_ID = RP.ENTITY_ID
 					";
 					$res = $DB->Query($strSql, false, $err_mess.__LINE__);
-
 				}
 				else
 				{
@@ -189,7 +200,6 @@ class CRatings extends CAllRatings
 					";
 					$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 				}
-
 			}
 			global $CACHE_MANAGER;
 			$CACHE_MANAGER->CleanDir("b_rating_user");
@@ -274,19 +284,19 @@ class CRatings extends CAllRatings
 	// insert result calculate rating-components
 	
 	/**
-	* <p>Обновляет дату следующего подсчета критерия рейтингования. Динамичный метод.</p>
+	* <p>Обновляет дату следующего подсчета критерия рейтингования.  Нестатический метод.</p>
 	*
 	*
 	* @param array $fields  Массив значений параметров. В качестве ключей данного массива
 	* допустимо использовать: <ul> <li> <b>RATING_ID</b> – идентификатор
-	* рейтинга</li> <li> <b>COMPLEX_NAME</b> – комплексное имя критерия</li> <li>
+	* рейтинга</li>     <li> <b>COMPLEX_NAME</b> – комплексное имя критерия</li>     <li>
 	* <b>REFRESH_INTERVAL</b> – периодичность перерасчета критерия (в минутах)</li>
 	* </ul> Все поля являются обязательными.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // обновляем дату следующего расчета критерия рейтингования
 	* $arConfigs = array(
@@ -527,7 +537,6 @@ class CRatings extends CAllRatings
 					$cacheVoteSize = $_SESSION['RATING_VOTE_COUNT'] = $countVote['VOTE'];
 
 					$cacheUserVote[$userId] = $_SESSION['RATING_USER_VOTE_COUNT'] = $arAuthorityUserProp['VOTE_COUNT'];
-
 					if ($cacheVoteSize >= $cacheUserVote[$userId])
 					{
 						$arInfo = $cacheAllowVote[$userId] = array(
@@ -669,178 +678,52 @@ class CRatings extends CAllRatings
 		return true;
 	}
 
-	public static function GetRatingVoteList($arParam)
+	public static function GetRatingVoteListSQL($arParam, $bplus, $bIntranetInstalled)
 	{
 		global $DB, $USER;
 
-		$bplus = true;
-		if (strtoupper($arParam['LIST_TYPE']) == 'MINUS')
-			$bplus = false;
-
-		$sqlStr = "
+		return "
 			SELECT
-				COUNT(RV.ID) as CNT
+				U.ID,
+				U.NAME,
+				U.LAST_NAME,
+				U.SECOND_NAME,
+				U.LOGIN,
+				U.PERSONAL_PHOTO,
+				RV.VALUE AS VOTE_VALUE,
+				RV.USER_ID,
+				SUM(case when RV0.ID is not null then 1 else 0 end) RANK
 			FROM
-				b_rating_vote RV
+				b_rating_vote RV LEFT JOIN b_rating_vote RV0 ON RV0.USER_ID = ".intval($USER->GetId())." and RV0.OWNER_ID = RV.USER_ID,
+				b_user U
 			WHERE
 				RV.ENTITY_TYPE_ID = '".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."'
-			and RV.ENTITY_ID = ".intval($arParam['ENTITY_ID'])."
-			".($bplus? " and RV.VALUE > 0 ": " and RV.VALUE < 0 ");
-		$res_cnt = $DB->Query($sqlStr);
-		$res_cnt = $res_cnt->Fetch();
-		$cnt = $res_cnt["CNT"];
-
-		$bIntranetInstalled = IsModuleInstalled("intranet");
-
-		if (
-			(
-				array_key_exists("USER_FIELDS", $arParam)
-				&& is_array($arParam["USER_FIELDS"])
-			)
-			|| (
-				array_key_exists("USER_SELECT", $arParam)
-				&& is_array($arParam["USER_SELECT"])
-			)
-		)
-		{
-			$bExtended = true;
-			$arUserID = array();
-
-			$sqlStr = "
-				SELECT
-					U.ID,
-					RV.VALUE AS VOTE_VALUE,
-					RV.USER_ID,
-					SUM(case when RV0.ID is not null then 1 else 0 end) RANK
-				FROM
-					b_rating_vote RV LEFT JOIN b_rating_vote RV0 ON RV0.USER_ID = ".IntVal($USER->GetId())." and RV0.OWNER_ID = RV.USER_ID,
-					b_user U
-				WHERE
-					RV.ENTITY_TYPE_ID = '".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."'
-					and RV.ENTITY_ID =  ".intval($arParam['ENTITY_ID'])."
-					and RV.USER_ID = U.ID
+				and RV.ENTITY_ID =  ".intval($arParam['ENTITY_ID'])."
+				and RV.USER_ID = U.ID
 				".($bplus? " and RV.VALUE > 0 ": " and RV.VALUE < 0 ")."
-				GROUP BY RV.USER_ID
-				ORDER BY ".($bIntranetInstalled? "RV.VALUE DESC, RANK DESC, RV.ID DESC": "RANK DESC, RV.VALUE DESC, RV.ID DESC");
-		}
-		else
-		{
-			$sqlStr = "
-				SELECT
-					U.ID,
-					U.NAME,
-					U.LAST_NAME,
-					U.SECOND_NAME,
-					U.LOGIN,
-					U.PERSONAL_PHOTO,
-					RV.VALUE AS VOTE_VALUE,
-					RV.USER_ID,
-					SUM(case when RV0.ID is not null then 1 else 0 end) RANK
-				FROM
-					b_rating_vote RV LEFT JOIN b_rating_vote RV0 ON RV0.USER_ID = ".IntVal($USER->GetId())." and RV0.OWNER_ID = RV.USER_ID,
-					b_user U
-				WHERE
-					RV.ENTITY_TYPE_ID = '".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."'
-					and RV.ENTITY_ID =  ".intval($arParam['ENTITY_ID'])."
-					and RV.USER_ID = U.ID
+			GROUP BY RV.USER_ID
+			ORDER BY ".($bIntranetInstalled? "RV.VALUE DESC, RANK DESC, RV.ID DESC": "RANK DESC, RV.VALUE DESC, RV.ID DESC");
+	}
+
+	public static function GetRatingVoteListSQLExtended($arParam, $bplus, $bIntranetInstalled)
+	{
+		global $DB, $USER;
+
+		return "
+			SELECT
+				U.ID,
+				RV.VALUE AS VOTE_VALUE,
+				RV.USER_ID,
+				SUM(case when RV0.ID is not null then 1 else 0 end) RANK
+			FROM
+				b_rating_vote RV LEFT JOIN b_rating_vote RV0 ON RV0.USER_ID = ".intval($USER->GetId())." and RV0.OWNER_ID = RV.USER_ID,
+				b_user U
+			WHERE
+				RV.ENTITY_TYPE_ID = '".$DB->ForSql($arParam['ENTITY_TYPE_ID'])."'
+				and RV.ENTITY_ID =  ".intval($arParam['ENTITY_ID'])."
+				and RV.USER_ID = U.ID
 				".($bplus? " and RV.VALUE > 0 ": " and RV.VALUE < 0 ")."
-				GROUP BY RV.USER_ID
-				ORDER BY ".($bIntranetInstalled? "RV.VALUE DESC, RANK DESC, RV.ID DESC": "RANK DESC, RV.VALUE DESC, RV.ID DESC");
-		}
-
-		$arList = Array();
-		$arVoteList = Array();
-		if ($arParam['LIST_LIMIT'] != 0 && ceil($cnt/intval($arParam['LIST_LIMIT'])) >= intval($arParam['LIST_PAGE']))
-		{
-			$res = new CDBResult();
-			$res->NavQuery($sqlStr, $cnt, Array('iNumPage' => intval($arParam['LIST_PAGE']), 'nPageSize' => intval($arParam['LIST_LIMIT'])));
-
-			while ($row = $res->Fetch())
-			{
-				$ar = $row;
-
-				if (!$bExtended)
-				{
-					$arFileTmp = CFile::ResizeImageGet(
-						$row["PERSONAL_PHOTO"],
-						array('width' => 58, 'height' => 58),
-						BX_RESIZE_IMAGE_EXACT,
-						false
-					);
-					$ar['PHOTO'] = CFile::ShowImage($arFileTmp['src'], 21, 21, 'border=0');
-					$ar['FULL_NAME'] = CUser::FormatName(CSite::GetNameFormat(false), $row);
-				}
-				else
-					$arUserID[] = $row["ID"];
-
-				if ($ar['ID'] != $USER->GetId())
-					$arList[$ar['ID']] = $ar;
-				else
-					$arVoteList[$ar['ID']] = $ar;
-			}
-			foreach ($arList as $ar)
-				$arVoteList[$ar['ID']] = $ar;
-
-			if (
-				$bExtended
-				&& count($arUserID) > 0
-			)
-			{
-				$arUserListParams = array();
-				$arUsers = array();
-
-				if (
-					array_key_exists("USER_FIELDS", $arParam)
-					&& is_array($arParam["USER_FIELDS"])
-				)
-					$arUserListParams["FIELDS"] = $arParam["USER_FIELDS"];
-				else
-					$arUserListParams["FIELDS"] = array("NAME", "LAST_NAME", "SECOND_NAME", "LOGIN", "PERSONAL_PHOTO");
-
-				$arUserListParams["FIELDS"] = array_unique(array_merge(array("ID"), $arUserListParams["FIELDS"]));
-
-				if (
-					array_key_exists("USER_SELECT", $arParam)
-					&& is_array($arParam["USER_SELECT"])
-				)
-					$arUserListParams["SELECT"] = $arParam["USER_SELECT"];
-
-				$rsUser = CUser::GetList(
-					($by = "ID"),
-					($order = "ASC"),
-					array("ID" => implode("|", $arUserID)),
-					$arUserListParams
-				);
-
-				while ($arUser = $rsUser->Fetch())
-				{
-					if (array_key_exists("PERSONAL_PHOTO", $arUser))
-					{
-						$arFileTmp = CFile::ResizeImageGet(
-							$arUser["PERSONAL_PHOTO"],
-							array("width" => 58, "height" => 58),
-							BX_RESIZE_IMAGE_EXACT,
-							false
-						);
-						$arUser["PHOTO"] = CFile::ShowImage($arFileTmp["src"], 21, 21, "border=0");
-					}
-					$arUser["FULL_NAME"] = CUser::FormatName(CSite::GetNameFormat(false), $arUser);
-					$arUsers[$arUser["ID"]] = $arUser;
-				}
-
-				foreach($arVoteList as $i => $arVoteUser)
-					if (array_key_exists($arVoteUser["ID"], $arUsers))
-						foreach($arUsers[$arVoteUser["ID"]] as $key => $value)
-							$arVoteList[$i][$key] = $value;
-
-			}
-		}
-
-		return Array(
-			'items_all' => $cnt,
-			'items_page' => count($arVoteList),
-			'items' => $arVoteList
-		);
+			GROUP BY RV.USER_ID
+			ORDER BY ".($bIntranetInstalled? "RV.VALUE DESC, RANK DESC, RV.ID DESC": "RANK DESC, RV.VALUE DESC, RV.ID DESC");
 	}
 }
-?>

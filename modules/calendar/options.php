@@ -123,12 +123,17 @@ if($REQUEST_METHOD=="POST" && strlen($Update.$Apply.$RestoreDefaults)>0 && check
 			'pathes_for_sites' => isset($_REQUEST['pathes_for_sites']),
 			'pathes' => $_REQUEST['pathes'],
 			'dep_manager_sub' => isset($_REQUEST['dep_manager_sub']),
-
-			'forum_id' => intVal($_REQUEST['calendar_forum_id']),
-			//'comment_allow_edit' =>  isset($_REQUEST['calendar_comment_allow_edit']),
-			//'comment_allow_remove' =>  isset($_REQUEST['calendar_comment_allow_remove']),
-			//'max_upload_files_in_comments' =>  isset($_REQUEST['calendar_max_upload_files_in_comments'])
+			'forum_id' => intVal($_REQUEST['calendar_forum_id'])
 		);
+
+		foreach($arTypes as $type)
+		{
+			$pathType = 'path_to_type_'.$type['XML_ID'];
+			if (isset($_REQUEST[$pathType]))
+			{
+				$SET[$pathType] = $_REQUEST[$pathType];
+			}
+		}
 
 		if (CModule::IncludeModule("video"))
 		{
@@ -279,7 +284,6 @@ $tabControl->BeginNextTab();
 
 	<?
 	$arPathes = CCalendar::GetPathesList();
-
 	$commonForSites = $SET['pathes_for_sites'];
 	if (count($arSites) > 1):?>
 	<tr>
@@ -313,18 +317,33 @@ BX.ready(function(){
 		<?$arChildTabControlUserCommon->BeginNextTab();?>
 			<table>
 			<?
-			foreach($arPathes as $pathName):
+			foreach($arPathes as $pathName)
+			{
 				$val = $SET['pathes'][$siteId][$pathName];
 				if (!isset($val) || empty($val))
 					$val = $SET[$pathName];
+
+				$title = GetMessage("CAL_".strtoupper($pathName));
+				if($title == '' && substr($pathName, 0, strlen('path_to_type_')) == 'path_to_type_')
+				{
+					$typeXmlId = substr($pathName, strlen('path_to_type_'));
+					foreach($arTypes as $type)
+					{
+						if ($type['XML_ID'] == $typeXmlId)
+						{
+							$title = GetMessage("CAL_PATH_TO_CAL_TYPE", array("#CALENDAR_TYPE#" => $type['NAME']));
+							break;
+						}
+					}
+				}
 				?>
 				<tr>
-					<td class="field-name"><label for="cal_<?= $pathName?>"><?= GetMessage("CAL_".strtoupper($pathName))?>:</label></td>
+					<td class="field-name"><label for="cal_<?= $pathName?>"><?= $title?>:</label></td>
 					<td>
 						<input name="pathes[<?= $siteId?>][<?= $pathName?>]" type="text" value="<?= htmlspecialcharsbx($val)?>" id="cal_<?= $pathName?>" size="60"/>
 					</td>
 				</tr>
-			<?endforeach;?>
+			<?}?>
 			</table>
 		<?endforeach;?>
 		<?$arChildTabControlUserCommon->End();?>
@@ -337,14 +356,30 @@ BX.ready(function(){
 	if (count($arSites) <= 1)
 		$commonForSites = true;
 
-	foreach($arPathes as $pathName):?>
+	foreach($arPathes as $pathName)
+	{
+		$title = GetMessage("CAL_".strtoupper($pathName));
+		if($title == '' && substr($pathName, 0, strlen('path_to_type_')) == 'path_to_type_')
+		{
+			$typeXmlId = substr($pathName, strlen('path_to_type_'));
+			foreach($arTypes as $type)
+			{
+				if ($type['XML_ID'] == $typeXmlId)
+				{
+					$title = GetMessage("CAL_PATH_TO_CAL_TYPE", array("#CALENDAR_TYPE#" => $type['NAME']));
+					break;
+				}
+			}
+		}
+
+		?>
 	<tr id="bx-cal-opt-path-<?= $pathName?>"  <?if(!$commonForSites){echo'style="display:none;"';}?>>
-		<td><label for="cal_<?=$pathName?>"><?= GetMessage("CAL_".strtoupper($pathName))?>:</label></td>
+		<td><label for="cal_<?=$pathName?>"><?= $title?>:</label></td>
 		<td>
 			<input name="<?= $pathName?>" type="text" value="<?= htmlspecialcharsbx($SET[$pathName])?>" id="cal_<?= $pathName?>" size="60"/>
 		</td>
 	</tr>
-	<?endforeach;?>
+	<?}?>
 
 	<!-- Reserve meetings and video reserve meetings -->
 	<tr class="heading"><td colSpan="2"><?= GetMessage('CAL_RESERVE_MEETING')?></td></tr>
@@ -541,7 +576,7 @@ function addType(oType)
 			draggable: true,
 			bindOnResize: false,
 			closeByEsc : true,
-			titleBar: {content: BX.create("span", {html: '<?= GetMessage("CAL_EDIT_TYPE_DIALOG")?>'})},
+			titleBar: '<?= GetMessage("CAL_EDIT_TYPE_DIALOG")?>',
 			closeIcon: { right : "12px", top : "10px"},
 			className: 'bxc-popup-window',
 			buttons: [

@@ -6,7 +6,7 @@ $SUPPORT_CACHE_USER_ROLES  = Array();
 
 
 /**
- * <b>CTicket</b> - класс для работы с обращениями. 
+ * <b>CTicket</b> - класс для работы с обращениями.
  *
  *
  * @return mixed 
@@ -46,33 +46,33 @@ class CAllTicket
 
 	*****************************************************************/
 
-static 	function GetDeniedRoleID()
+	public static function GetDeniedRoleID()
 	{
 		return "D";
 	}
 
-static 	function GetSupportClientRoleID()
+	public static function GetSupportClientRoleID()
 	{
 		return "R";
 	}
 
-public static 	function GetSupportTeamRoleID()
+	public static function GetSupportTeamRoleID()
 	{
 		return "T";
 	}
 
-public static 	function GetDemoRoleID()
+	public static function GetDemoRoleID()
 	{
 		return "V";
 	}
 
-public static 	function GetAdminRoleID()
+	public static function GetAdminRoleID()
 	{
 		return "W";
 	}
 
 	// возвращает true если заданный пользователь имеет заданную роль на модуль
-public static 	function HaveRole($role, $userID=false)
+	public static function HaveRole($role, $userID=false)
 	{
 		global $DB, $USER, $APPLICATION, $SUPPORT_CACHE_USER_ROLES;
 		if (!is_object($USER)) $USER = new CUser;
@@ -109,7 +109,7 @@ public static 	function HaveRole($role, $userID=false)
 
 	// true - если пользователь имеет роль "администратор техподдержки"
 	// false - в противном случае
-	function IsAdmin($userID=false)
+	public static function IsAdmin($userID=false)
 	{
 		global $USER;
 
@@ -122,21 +122,21 @@ public static 	function HaveRole($role, $userID=false)
 
 	// true - если пользователь имеет роль "демо-доступ"
 	// false - в противном случае
-public static 	function IsDemo($userID=false)
+	public static function IsDemo($userID=false)
 	{
 		return CTicket::HaveRole(CTicket::GetDemoRoleID(), $userID);
 	}
 
 	// true - если пользователь имеет роль "сотрудник техподдержки"
 	// false - в противном случае
-public static 	function IsSupportTeam($userID=false)
+	public static function IsSupportTeam($userID=false)
 	{
 		return CTicket::HaveRole(CTicket::GetSupportTeamRoleID(), $userID);
 	}
 
 	// true - если пользователь имеет роль "сотрудник техподдержки"
 	// false - в противном случае
-public static 	function IsSupportClient($userID=false)
+	public static function IsSupportClient($userID=false)
 	{
 		return CTicket::HaveRole(CTicket::GetSupportClientRoleID(), $userID);
 	}
@@ -158,7 +158,7 @@ public static 	function IsSupportClient($userID=false)
 	}
 
 	// возвращает роли заданного пользователя
-	funpublic static ction GetRoles(&$isDemo, &$isSupportClient, &$isSupportTeam, &$isAdmin, &$isAccess, &$userID, $checkRights=true)
+	public static function GetRoles(&$isDemo, &$isSupportClient, &$isSupportTeam, &$isAdmin, &$isAccess, &$userID, $checkRights=true)
 	{
 		global $DB, $USER, $APPLICATION;
 		static $arTicketUserRoles;
@@ -197,7 +197,7 @@ public static 	function IsSupportClient($userID=false)
 
 	// возвращает массив ID групп для которых задана роль
 	// $role - идентификатор роли
-	fpublic static unction GetGroupsByRole($role)
+	public static function GetGroupsByRole($role)
 	{
 		//Todo: определиться с доступом по умолчанию
 
@@ -240,19 +240,19 @@ public static 	function IsSupportClient($userID=false)
 	}
 
 	// возвращает массив групп с ролью "администратор техподдержки"
-public static 	function GetAdminGroups()
+	public static function GetAdminGroups()
 	{
 		return CTicket::GetGroupsByRole(CTicket::GetAdminRoleID());
 	}
 
 	// возвращает массив групп с ролью "сотрудник техподдержки"
-public static 	function GetSupportTeamGroups()
+	public static function GetSupportTeamGroups()
 	{
 		return CTicket::GetGroupsByRole(CTicket::GetSupportTeamRoleID());
 	}
 
 	// возвращает массив EMail адресов всех пользователей имеющих заданную роль
-	function GetEmailsByRole($role)
+	public static function GetEmailsByRole($role)
 	{
 		global $DB, $APPLICATION, $USER;
 		if (!is_object($USER)) $USER = new CUser;
@@ -267,18 +267,18 @@ public static 	function GetSupportTeamGroups()
 	}
 
 	// возвращает массив EMail'ов всех пользователей имеющих роль "администратор"
-public static 	function GetAdminEmails()
+	public static function GetAdminEmails()
 	{
 		return CTicket::GetEmailsByRole(CTicket::GetAdminRoleID());
 	}
 
 	// возвращает массив EMail'ов всех пользователей имеющих роль "сотрудник техподдержки"
-public static 	function GetSupportTeamEmails()
+	public static function GetSupportTeamEmails()
 	{
 		return CTicket::GetEmailsByRole(CTicket::GetSupportTeamRoleID());
 	}
 	
-public static 	function GetSupportTeamAndAdminUsers()
+	public static function GetSupportTeamAndAdminUsers()
 	{
 		$arUser = array();
 		$stg = CTicket::GetGroupsByRole(CTicket::GetSupportTeamRoleID());
@@ -312,7 +312,7 @@ public static 	function GetSupportTeamAndAdminUsers()
 	*****************************************************************/
 
 	// проверка полей фильтра
-public static 	function CheckFilter($arFilter)
+	public static function CheckFilter($arFilter)
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: CheckFilter<br>Line: ";
 		global $DB, $USER, $APPLICATION;
@@ -343,7 +343,7 @@ public static 	function CheckFilter($arFilter)
 	}
 
 	// проверка полей перед вставкой в базу данных
-public static 	function CheckFields($arFields, $id, $arRequired)
+	public static function CheckFields($arFields, $id, $arRequired)
 	{
 		global $DB, $USER, $APPLICATION, $MESS;
 
@@ -405,7 +405,7 @@ public static 	function CheckFields($arFields, $id, $arRequired)
 	}
 
 	// предварительно обрабатывает массив значений для вставки в базу данных
-public static 	function PrepareFields($arFields, $table, $id)
+	public static function PrepareFields($arFields, $table, $id)
 	{
 		global $DB, $USER, $APPLICATION;
 
@@ -620,7 +620,7 @@ public static 	function PrepareFields($arFields, $table, $id)
 		return $arFields_i;
 	}
 
-public static 	function SplitTicket($arParam)
+	public static function SplitTicket($arParam)
 	{
 		global $DB;
 		$err_mess = (CAllTicket::err_mess())."<br>Function: SplitTicket<br>Line: ";
@@ -707,7 +707,7 @@ public static 	function SplitTicket($arParam)
 					Группа функций по работе со спамом
 	*****************************************************************/
 
-	fupublic static nction MarkMessageAsSpam($messageID, $exactly="Y", $checkRights="Y")
+	public static function MarkMessageAsSpam($messageID, $exactly="Y", $checkRights="Y")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: MarkMessageAsSpam<br>Line: ";
 		global $DB, $USER;
@@ -757,7 +757,7 @@ public static 	function SplitTicket($arParam)
 		}
 	}
 
-public static 	function UnMarkMessageAsSpam($messageID, $checkRights="Y")
+	public static function UnMarkMessageAsSpam($messageID, $checkRights="Y")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UnMarkMessageAsSpam<br>Line: ";
 		global $DB, $USER;
@@ -840,7 +840,7 @@ public static 	function UnMarkMessageAsSpam($messageID, $checkRights="Y")
 		}
 	}
 
-public static 	function UnMarkAsSpam($ticketID, $checkRights="Y")
+	public static function UnMarkAsSpam($ticketID, $checkRights="Y")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UnMarkAsSpam<br>Line: ";
 		global $DB, $USER;
@@ -958,7 +958,7 @@ public static 	function UnMarkAsSpam($ticketID, $checkRights="Y")
 	}
 	
 	//$dateType = CTicket::ADD, CTicket::DELETE, CTicket::CURRENT_DATE
-public static 	function UpdateLastParams2($ticketID, $dateType)
+	public static function UpdateLastParams2($ticketID, $dateType)
 	{
 		global $DB;
 		$strUsers = implode(",", CTicket::GetSupportTeamAndAdminUsers());
@@ -1084,7 +1084,7 @@ public static 	function UpdateLastParams2($ticketID, $dateType)
 				
 	}*/
 
-public static 	function UpdateLastParamsN($ticketID, $dateType, $recalculateSupportDeadline = true, $setReopenDefault = true)
+	public static function UpdateLastParamsN($ticketID, $dateType, $recalculateSupportDeadline = true, $setReopenDefault = true)
 	{	
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UpdateLastParamsN<br>Line: ";
 		global $DB, $USER;
@@ -1270,7 +1270,7 @@ public static 	function UpdateLastParamsN($ticketID, $dateType, $recalculateSupp
 	
 	}
 
-public static 	function UpdateMessages($ticketID)
+	public static function UpdateMessages($ticketID)
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UpdateMessages<br>Line: ";
 		global $DB;
@@ -1299,7 +1299,7 @@ public static 	function UpdateMessages($ticketID)
 		$DB->Update("b_ticket",$arFields,"WHERE ID='".$ticketID."'",$err_mess.__LINE__);
 	}
 
-public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRights = 'N')
+	public static function GetFileList(&$by, &$order, $arFilter=array(), $checkRights = 'N')
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: GetFileList<br>Line: ";
 		global $DB, $USER;
@@ -1446,21 +1446,21 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 		return $res;
 	}
 
-
+	
 	/**
-	* <p>Метод возвращает данные по одному сообщению.</p>
+	* <p>Метод возвращает данные по одному сообщению. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  ID сообщения.</bod
+	* @param int $intID  ID сообщения.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - сообщение будет выбрано только в том случае если у
+	* @param (1) $CHECK_RIGHTS = "Y" "Y" - сообщение будет выбрано только в том случае если у
 	* пользователя есть права на это сообщение (по умолчанию); "N" -
 	* сообщение будет выбрано независимо от прав текущего
 	* пользователя. Необязательный параметр. Изменен на <b>checkRights</b> с
 	* версии 12.0.0
 	*
-	* @param char(1) $get_user_name = "Y" "Y" - при выборке сообщения будут также выбраны такие поля как
-	* OWNER_EMAIL, OWNER_LOGIN, OWNER_NAME, CREATED_EMAIL, CREATED_LOGIN, CREATED_NAME, MODIFIED_EMAIL, MODIFIED_LOGIN,
+	* @param (1) $get_user_name = "Y" "Y" - при выборке сообщения будут также выбраны такие поля как
+	* 		OWNER_EMAIL, OWNER_LOGIN, OWNER_NAME, CREATED_EMAIL, CREATED_LOGIN, CREATED_NAME, MODIFIED_EMAIL, MODIFIED_LOGIN,
 	* MODIFIED_NAME, описывающие параметры пользователей имевших отношение к
 	* данному сообщению (по умолчанию); "N" - вышеперечисленные поля не
 	* будут выбраны, но зато это ускорит работу метода. Необязательный
@@ -1469,7 +1469,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Array
 	* (
 	*     [ID] =&gt; 3585
@@ -1510,38 +1510,38 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/getmessagebyid.php
 	* @author Bitrix
 	*/
-	public static 	function GetMessageByID($id, $checkRights="Y", $get_user_name="Y")
+	public static function GetMessageByID($id, $checkRights="Y", $get_user_name="Y")
 	{
 		$by = $order = $is_filtered = null;
 		return CTicket::GetMessageList($by, $order, array("ID" => $id, "ID_EXACT_MATCH" => "Y"), $is_filtered, $checkRights, $get_user_name);
 	}
 
-
+	
 	/**
-	* <p>Метод возвращает данные по одному обращению.</p>
+	* <p>Метод возвращает данные по одному обращению. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  ID обращения.
+	* @param int $intID  ID обращения.
 	*
-	* @param char(2) $lang = LANG Двухсимвольный код языка в формате которого необходимо выбрать
+	* @param (2) $lang = LANG Двухсимвольный код языка в формате которого необходимо выбрать
 	* временные параметры обращения (время создания, изменения,
 	* закрытия); необязательный параметр, по умолчанию - код текущего
 	* сайта.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Необязательный параметр. "Y" - будут выбраны только те обращения
+	* @param (1) $CHECK_RIGHTS = "Y" Необязательный параметр. "Y" - будут выбраны только те обращения
 	* которые текущий пользователь может просматривать (по умолчанию);
 	* "N" - выбирать все обращения независимо от прав текущего
 	* пользователя. Изменен на <b>checkRights</b> c 12.0.0
 	*
-	* @param char(1) $get_user_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
+	* @param (1) $get_user_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
 	* выбраны такие поля как OWNER_LOGIN, OWNER_NAME, RESPONSIBLE_LOGIN, RESPONSIBLE_NAME, MODIFIED_LOGIN,
 	* MODIFIED_NAME, LAST_MESSAGE_LOGIN, LAST_MESSAGE_NAME, CREATED_LOGIN, CREATED_EMAIL, CREATED_NAME, описывающие
 	* параметры пользователей имевших отношение к данному обращению
 	* (по умолчанию); "N" - вышеперечисленные поля не будут выбраны, но
 	* зато это ускорит работу метода.
 	*
-	* @param char(1) $get_dictionary_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
-	* выбраны такие поля как CATEGORY_NAME, CATEGORY_SID, CRITICALITY_NAME, CRITICALITY_SID, STATUS_NAME,
+	* @param (1) $get_dictionary_name = "Y" Необязательный параметр. "Y" - при выборке обращений будут также
+	* выбраны такие поля как 	CATEGORY_NAME, CATEGORY_SID, CRITICALITY_NAME, CRITICALITY_SID, STATUS_NAME,
 	* STATUS_SID, MARK_NAME, MARK_SID, SOURCE_NAME, SOURCE_SID, описывающие поля из справочника
 	* техподдержки (по умолчанию); "N" - вышеперечисленные поля не будут
 	* выбраны, но зато это ускорит работу метода. Удален с 4.0.6
@@ -1549,7 +1549,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 	* @return record 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* Array
 	* (
 	*     [ID] =&gt; 647
@@ -1619,13 +1619,13 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/getbyid.php
 	* @author Bitrix
 	*/
-	public static 	function GetByID($id, $lang=LANG, $checkRights="Y", $get_user_name="Y", $get_extra_names="Y", $arParams = Array())
+	public static function GetByID($id, $lang=LANG, $checkRights="Y", $get_user_name="Y", $get_extra_names="Y", $arParams = Array())
 	{
 		$by = $order = $is_filtered = null;
 		return CTicket::GetList($by, $order, array("ID" => $id, "ID_EXACT_MATCH" => "Y"), $is_filtered, $checkRights, $get_user_name, $get_extra_names, $lang, $arParams);
 	}
 
-	funpublic static ction getMaxId()
+	public static function getMaxId()
 	{
 		global $DB;
 
@@ -1641,14 +1641,14 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 		return $id;
 	}
 
-
+	
 	/**
-	* <p>Метод удаляет обращение.</p>
+	* <p>Метод удаляет обращение. Метод нестатический.</p>
 	*
 	*
 	* @param int $TICKET_ID  ID обращения. С версии 12.0.0 изменен на <b>ticketID</b>.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
+	* @param (1) $CHECK_RIGHTS = "Y" "Y" - необходимо проверить право на удаление у текущего
 	* пользователя (по умолчанию); "N" - прав проверять не надо.
 	* Необязательный параметр. С версии 12.0.0 изменен на <b>checkRights</b>.
 	*
@@ -1658,7 +1658,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/delete.php
 	* @author Bitrix
 	*/
-	public static 	function Delete($ticketID, $checkRights="Y")
+	public static function Delete($ticketID, $checkRights="Y")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: Delete<br>Line: ";
 		global $DB, $USER;
@@ -1705,7 +1705,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 		}
 	}
 
-	function UpdateOnline($ticketID, $userID=false, $currentMode="")
+	public static function UpdateOnline($ticketID, $userID=false, $currentMode="")
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: UpdateOnline<br>Line: ";
 		global $DB, $USER;
@@ -1729,7 +1729,7 @@ public static 	function GetFileList(&$by, &$order, $arFilter=array(), $checkRigh
 		}
 	}
 
-public static 	function SetTicket($arFields, $ticketID="", $checkRights="Y", $sendEmailToAuthor="Y", $sendEmailToTechsupport="Y")
+	public static function SetTicket($arFields, $ticketID="", $checkRights="Y", $sendEmailToAuthor="Y", $sendEmailToTechsupport="Y")
 	{
 		//global $DB;
 		//$DB->DebugToFile = true;
@@ -1743,13 +1743,13 @@ public static 	function SetTicket($arFields, $ticketID="", $checkRights="Y", $se
 									SET
 	*****************************************************************/
 	
-public static 	static function addSupportText($cn)
+	public static function addSupportText($cn)
 	{
 		if($cn > 0 && (CTicket::IsSupportTeam($cn) || CTicket::IsAdmin($cn))) return " " . GetMessage("SUP_TECHSUPPORT_HINT");
 		return "";
 	}
 	
-public static 	static function EmailsFromStringToArray($emails, $res = null)
+	public static function EmailsFromStringToArray($emails, $res = null)
 	{
 		if(!is_array($res)) $res = array();
 		$arEmails = explode(",", $emails);
@@ -1783,7 +1783,7 @@ public static 	static function EmailsFromStringToArray($emails, $res = null)
 		return $res;
 	}
 	
-public static 	static function GetCSupportTableFields($name, $arrOrTable = CSupportTableFields::C_Array)
+	public static function GetCSupportTableFields($name, $arrOrTable = CSupportTableFields::C_Array)
 	{
 		$n = CSupportTableFields::VT_NUMBER;
 		$s = CSupportTableFields::VT_STRING;
@@ -1895,6 +1895,7 @@ public static 	static function GetCSupportTableFields($name, $arrOrTable = CSupp
 				"MESSAGE_HEADER" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"MESSAGE_BODY" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"MESSAGE_FOOTER" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
+				"FILES" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"FILES_LINKS" =>					array("TYPE" => $s,	"DEF_VAL" => null	),
 				"IMAGE_LINK" =>						array("TYPE" => $s,	"DEF_VAL" => null	),
 				"SUPPORT_COMMENTS" =>				array("TYPE" => $s,	"DEF_VAL" => null	),
@@ -1907,7 +1908,7 @@ public static 	static function GetCSupportTableFields($name, $arrOrTable = CSupp
 		return new CSupportTableFields($tables[$name], $arrOrTable);
 	}
 		
-public static 	function Set_getFilesLinks($arFiles, $lID)
+	public static function Set_getFilesLinks($arFiles, $lID)
 	{
 		// сформируем ссылки на прикрепленые файлы
 		$fl = null;
@@ -1923,7 +1924,7 @@ public static 	function Set_getFilesLinks($arFiles, $lID)
 		return $fl;
 	}
 	
-public static 	function Set_WriteLog($nf, $v, $mf)
+	public static function Set_WriteLog($nf, $v, $mf)
 	{
 		
 		$change_log = "";
@@ -2026,7 +2027,7 @@ public static 	function Set_WriteLog($nf, $v, $mf)
 			
 	}
 	
-public static 	function Set_sendMails($nf, $v, $arFields)
+	public static function Set_sendMails($nf, $v, $arFields)
 	{
 		$I_Email = null;
 		$U_Email = null;
@@ -2113,6 +2114,7 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 			}
 		}
 
+		$mf->FILES = $v->arrFILES;
 		$mf->FILES_LINKS = self::Set_getFilesLinks($v->arrFILES, $v->arrSite["LANGUAGE_ID"]);
 		$mf->IMAGE_LINK = $mf->FILES_LINKS;
 		
@@ -2418,7 +2420,7 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 		
 	}
 	
-	fupublic static nction Set_getResponsibleUser($v, $f, &$arFields)
+	public static function Set_getResponsibleUser($v, $f, &$arFields)
 	{
 		global $DB;
 		$err_mess = (CAllTicket::err_mess()) . "<br>Function: Set_getResponsibleUser<br>Line: ";
@@ -2492,7 +2494,7 @@ public static 	function Set_sendMails($nf, $v, $arFields)
 		}
 	}
 	
-public static 	function Set_getCOUPONandSLA($v, $f, $arFields)
+	public static function Set_getCOUPONandSLA($v, $f, $arFields)
 	{
 		global $APPLICATION;
 		$slaID = 0;
@@ -2538,7 +2540,7 @@ public static 	function Set_getCOUPONandSLA($v, $f, $arFields)
 		return true;			
 	}
 	
-public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToAuthor, $sendEmailToTechsupport)
+	public static function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToAuthor, $sendEmailToTechsupport)
 	{
 		global $APPLICATION, $USER, $DB;
 				
@@ -2653,54 +2655,55 @@ public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToA
 		return array("v" => $v, "f" => $f);
 	}
 	
-
+	
 	/**
-	* <p>Метод создает новое обращение, либо модифицирует существующее в случае указания во втором параметре ID сообщения. Возвращает ID созданного обращения, либо ID модифицированного обращения.</p>
+	* <p>Метод создает новое обращение, либо модифицирует существующее в случае указания во втором параметре ID сообщения. Возвращает ID созданного обращения, либо ID модифицированного обращения. Метод нестатический.</p>
 	*
 	*
 	* @param array $arFields  Массив параметров обращения. В массиве допустимы следующие
-	* индексы: <ul> <li>*TITLE - заголовок обращения (обязательное поле при
-	* создании нового обращения) </li> <li>MESSAGE - тело сообщения
-	* (обязательное поле при создании нового обращения) </li> <li>IMAGE -
+	* индексы: 	<ul> <li>*TITLE - заголовок обращения (обязательное поле при
+	* создании нового обращения) 		</li> <li>MESSAGE - тело сообщения
+	* (обязательное поле при создании нового обращения) 		</li> <li>IMAGE -
 	* массив описывающий загружаемое изображение; в массиве
-	* допустимые следующие индексы: <ul> <li>name - исходное имя загружаемого
-	* файла</li> <li>type - тип загружаемого файла (например: "image/gif")</li> <li>tmp_name
-	* - имя временного файла на сервере</li> <li>error - код ошибки ("0" - нет
-	* ошибок)</li> <li>size - размер загружаемого файла</li> <li>MODULE_ID -
-	* идентификатор модуля ("support")</li> </ul> </li> <li>*OWNER_SID - символьный код
-	* автора обращения; можно указать любое значение идентифицирующее
-	* автора обращения - email, телефон, адрес и т.п. </li> <li>*OWNER_USER_ID - ID автора
-	* обращения (по умолчанию - ID текущего пользователя) </li> <li>*SOURCE_SID -
-	* символьный код источника обращения (по умолчанию - "web") </li>
-	* <li>*CREATED_MODULE_NAME - идентификатор модуля из которого создаётся
-	* обращение (по умолчанию - "support") </li> <li>**MESSAGE_AUTHOR_SID - символьный код
-	* автора сообщения (можно указать любое значение идентифицирующее
-	* автора сообщения - email, телефон, адрес и т.п.) </li> <li>**MESSAGE_AUTHOR_USER_ID - ID
-	* пользователя - автора сообщения (по умолчанию - ID текущего
-	* пользователя) </li> <li>**MESSAGE_SOURCE_SID - символьный код источника
-	* сообщения (по умолчанию - "web") </li> <li>**MODIFIED_MODULE_NAME - идентификатор
-	* модуля из которого обращение модифицируется (по умолчанию - "support")
-	* </li> <li>**HIDDEN - "Y" - сообщение будет добавлено как скрытое и будет
-	* видимо только сотрудникам техподдержки; "N" - сообщение будет
-	* добавлено видимым как для автора обращения так и для сотрудников
-	* техподдержки (по умолчанию) </li> <li>CATEGORY_SID - символьный код
-	* категории </li> <li>CATEGORY_ID - ID категории.</li> <li>CRITICALITY_SID - символьный код
-	* критичности </li> <li>STATUS_SID - символьный код статуса </li> <li>MARK_ID - ID
-	* оценки ответов </li> <li>RESPONSIBLE_USER_ID - ID пользователя ответственного
-	* за обращение </li> <li>SUPPORT_COMMENTS - комментарий видимый только
-	* пользователям входящим в группу техподдержки </li> <li>CLOSE - "Y" -
-	* обращение закрыть; "N" - обращение открыть </li> <li>AUTO_CLOSE_DAYS -
+	* допустимые следующие индексы: 			<ul> <li>name - исходное имя
+	* загружаемого файла</li> 				<li>type - тип загружаемого файла (например:
+	* "image/gif")</li> 				<li>tmp_name - имя временного файла на сервере</li> 				<li>error -
+	* код ошибки ("0" - нет ошибок)</li> 				<li>size - размер загружаемого
+	* файла</li> 				<li>MODULE_ID - идентификатор модуля ("support")</li>				 			</ul> </li>
+	* <li>*OWNER_SID - символьный код автора обращения; можно указать любое
+	* значение идентифицирующее автора обращения - email, телефон, адрес и
+	* т.п. 		</li> <li>*OWNER_USER_ID - ID автора обращения (по умолчанию - ID текущего
+	* пользователя) 		</li> <li>*SOURCE_SID - символьный код источника обращения
+	* (по умолчанию - "web") 		</li> <li>*CREATED_MODULE_NAME - идентификатор модуля из
+	* которого создаётся обращение (по умолчанию - "support") 		</li>
+	* <li>**MESSAGE_AUTHOR_SID - символьный код автора сообщения (можно указать
+	* любое значение идентифицирующее автора сообщения - email, телефон,
+	* адрес и т.п.) 		</li> <li>**MESSAGE_AUTHOR_USER_ID - ID пользователя - автора
+	* сообщения (по умолчанию - ID текущего пользователя) 		</li>
+	* <li>**MESSAGE_SOURCE_SID - символьный код источника сообщения (по умолчанию -
+	* "web") 		</li> <li>**MODIFIED_MODULE_NAME - идентификатор модуля из которого
+	* обращение модифицируется (по умолчанию - "support") 		</li> <li>**HIDDEN - "Y" -
+	* сообщение будет добавлено как скрытое и будет видимо только
+	* сотрудникам техподдержки; "N" - сообщение будет добавлено видимым
+	* как для автора обращения так и для сотрудников техподдержки (по
+	* умолчанию) 		</li> <li>CATEGORY_SID - символьный код категории                 </li>
+	* <li>CATEGORY_ID - ID категории.</li>  		<li>CRITICALITY_SID - символьный код
+	* критичности 		</li> <li>STATUS_SID - символьный код статуса 		</li> <li>MARK_ID - ID
+	* оценки ответов 		</li> <li>RESPONSIBLE_USER_ID - ID пользователя ответственного
+	* за обращение 		</li> <li>SUPPORT_COMMENTS - комментарий видимый только
+	* пользователям входящим в группу техподдержки 		</li> <li>CLOSE - "Y" -
+	* обращение закрыть; "N" - обращение открыть 		</li> <li>AUTO_CLOSE_DAYS -
 	* количество дней по истечении которых автоматически закрыть
-	* обращение если за это время от автора не поступило сообщения </li>
-	* </ul> * - данное поле может быть использовано для создания новых
-	* обращений <br> ** - данное поле используется только при модификации
+	* обращение если за это время от автора не поступило сообщения 	</li>
+	* </ul> 	* - данное поле может быть использовано для создания новых
+	* обращений 	<br>	** - данное поле используется только при модификации
 	* существующих обращений.
 	*
 	* @param int &$MESSAGE_ID  ID добавленного сообщения. Необязательный параметр.
 	*
 	* @param int $TICKET_ID = "" ID модифицируемого обращения.
 	*
-	* @param char(1) $CHECK_RIGHTS = "Y" Флаг необходимости проверки прав текущего пользователя: "Y" -
+	* @param (1) $CHECK_RIGHTS = "Y" Флаг необходимости проверки прав текущего пользователя: "Y" -
 	* необходимо проверить права текущего пользователя под которым
 	* создаётся обращение либо модифицируется; "N" - обращения создавать
 	* и модифицировать независимо от прав текущего пользователя.
@@ -2712,7 +2715,7 @@ public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToA
 	* @link http://dev.1c-bitrix.ru/api_help/support/classes/cticket/set.php
 	* @author Bitrix
 	*/
-	public static 	function Set($arFields, &$MID, $id="", $checkRights="Y", $sendEmailToAuthor="Y", $sendEmailToTechsupport="Y")
+	public static function Set($arFields, &$MID, $id="", $checkRights="Y", $sendEmailToAuthor="Y", $sendEmailToTechsupport="Y")
 	{						
 		global $DB, $APPLICATION, $USER;
 		
@@ -2847,7 +2850,8 @@ public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToA
 			elseif($v->bOwner || $v->bSupportClient)
 			{
 				$arFields_i = $f->ToArray("TIMESTAMP_X,DATE_CLOSE,CRITICALITY_ID,MODIFIED_USER_ID,MODIFIED_GUEST_ID,MODIFIED_MODULE_NAME,REOPEN", array(CSupportTableFields::ONLY_CHANGED), true);
-				$arFields_i["MARK_ID"] = intval($arFields["MARK_ID"]);
+                                if (isset($arFields['MARK_ID']))
+        				$arFields_i["MARK_ID"] = intval($arFields["MARK_ID"]);
 				if(count($arFields_i) > 0)
 				{
 					$v->SupportClientUpdateRes = $DB->Update("b_ticket",
@@ -3006,6 +3010,7 @@ public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToA
 						//if ($v->arChange['SLA_ID'] == 'Y' || $v->arChange['OPEN'] == 'Y') CTicketReminder::Update($nf->ID, true);
 					}
 				}
+				$arFields['MID'] = $MID;
 				CTicket::ExecuteEvents('OnAfterTicketUpdate', $arFields, false);
 			}
 		}
@@ -3140,7 +3145,7 @@ public static 	function Set_InitVar(&$arFields, $id, $checkRights, $sendEmailToA
 			Старые функции для совместимости
 	***********************************************/
 
-public static 	function GetFUA($site_id)
+	public static function GetFUA($site_id)
 	{
 		$err_mess = (CAllTicket::err_mess())."<br>Function: GetFUA<br>Line: ";
 		global $DB;
@@ -3162,7 +3167,7 @@ public static 	function GetFUA($site_id)
 		return $rs;
 	}
 
-public static 	function GetMessages($ticketID, $arFilter=array(), $checkRights="Y")
+	public static function GetMessages($ticketID, $arFilter=array(), $checkRights="Y")
 	{
 		$arFilter["TICKET_ID"] = $ticketID;
 		$arFilter["TICKET_ID_EXACT_MATCH"] = "Y";
@@ -3170,17 +3175,17 @@ public static 	function GetMessages($ticketID, $arFilter=array(), $checkRights="
 		return CTicket::GetMessageList($by, $order, $arFilter, $is_filtered, $checkRights, "Y");
 	}
 
-public static 	function GetResponsible()
+	public static function GetResponsible()
 	{
 		return CTicket::GetSupportTeamList();
 	}
 
-public static 	function IsResponsible($userID=false)
+	public static function IsResponsible($userID=false)
 	{
 		return CTicket::IsSupportTeam($userID);
 	}
 
-public static 	function ExecuteEvents($message, $arFields, $isNew, &$eventType = false)
+	public static function ExecuteEvents($message, $arFields, $isNew, &$eventType = false)
 	{
 		foreach(GetModuleEvents('support', $message, true) as $arr)
 		{
@@ -3190,7 +3195,7 @@ public static 	function ExecuteEvents($message, $arFields, $isNew, &$eventType =
 		return $arFields;
 	}
 	
-public static 	function GetResponsibleList($userID, $CMGM = null, $CMUGM = null, $SG = null)
+	public static function GetResponsibleList($userID, $CMGM = null, $CMUGM = null, $SG = null)
 	{
 				
 		$condition = "";
@@ -3236,7 +3241,7 @@ public static 	function GetResponsibleList($userID, $CMGM = null, $CMUGM = null,
 		return $res;
 	}
 
-public static 	static function GetUsersPropertiesArray($arUserIDs = array(), $arGuestIDs = array())
+	public static function GetUsersPropertiesArray($arUserIDs = array(), $arGuestIDs = array())
 	{
 		$arGuestUserIDs = array();
 		$arResUsers = array();
@@ -3317,10 +3322,4 @@ public static 	static function GetUsersPropertiesArray($arUserIDs = array(), $ar
 
 		return array("arUsers" => $arResUsers, "arGuests" => $arResGuests);
 	}
-
-
-	
-	
 }
-
-?>

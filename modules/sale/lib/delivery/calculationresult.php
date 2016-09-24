@@ -1,9 +1,10 @@
 <?php
 namespace Bitrix\Sale\Delivery;
 
-use Bitrix\Main\Entity;
+use Bitrix\Main\Error;
+use Bitrix\Sale;
 
-class CalculationResult extends Entity\Result
+class CalculationResult extends Sale\ResultSerializable
 {
 	/** @var string */
 	protected $description = "";
@@ -19,7 +20,6 @@ class CalculationResult extends Entity\Result
 	protected $deliveryPrice = 0;
 	/** @var string $tmpData */
 	protected $tmpData = "";
-
 
 	static public function __construct() { parent::__construct(); }
 

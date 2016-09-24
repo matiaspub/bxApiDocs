@@ -1,6 +1,17 @@
 <?
 IncludeModuleLangFile(__FILE__);
 
+
+/**
+ * <b>CAdminNotify</b> - класс для работы с системными уведомлениями.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cadminnotify/index.php
+ * @author Bitrix
+ */
 class CAdminNotify
 {
 	const TYPE_NORMAL = 'NORMAL';
@@ -22,28 +33,28 @@ class CAdminNotify
 
 	
 	/**
-	* <p>Метод служит для добавления уведомления. Статичный метод.</p>
+	* <p>Метод служит для добавления уведомления. Нестатический метод.</p>
 	*
 	*
-	* @param MESSAG $E  Произвольный текст, поддерживает работу со следующим тэгами
+	* @param mixed $MESSAGE  Произвольный текст, поддерживает работу со следующим тэгами
 	* <b>BR</b>, <b>B</b>, <b>U</b>, <b>I</b>, <b>SPAN</b> <b>A</b>. (В последних двух можно
 	* использовать <b>style</b>).
 	*
-	* @param TA $G  Метка уведомления, для его легкого удаления (не обязательное
-	* поле). <p></p> <div class="note"> <b>Примечание</b>: Если добавить два
+	* @param MESSAG $TAG  Метка уведомления, для его легкого удаления (не обязательное
+	* поле).  <p></p> <div class="note"> <b>Примечание</b>: Если добавить два
 	* уведомления с одинаковым тэгом (пустой тэг не считается)
 	* останется только последнее уведомление.</div>
 	*
-	* @param MODULE_I $D  Модуль отправивший уведомление (не обязательное поле).
+	* @param TA $MODULE_ID  Модуль отправивший уведомление (не обязательное поле).
 	*
-	* @param ENABLE_CLOS $E  Может ли администратор закрыть уведомление сам из интерфейса,
+	* @param MODULE_I $ENABLE_CLOSE  Может ли администратор закрыть уведомление сам из интерфейса,
 	* или будет требоваться удаление через API (не обязательное, по
 	* умолчанию может).
 	*
-	* @return mixed <p>Взвращается ID созданного уведомления.</p> <a name="examples"></a>
+	* @return mixed <p>Взвращается ID созданного уведомления.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $ar = Array(
 	*    "MESSAGE" =&gt; 'Вы обновили модуль "Веб-мессенджер", для работы с историей сообщений вам необходимо произвести &lt;a href="#"&gt;конвертацию данных&lt;/a&gt;.',
 	*    "TAG" =&gt; "IM_CONVERT",
@@ -137,16 +148,16 @@ class CAdminNotify
 
 	
 	/**
-	* <p>Метод удаляет уведомление по идентификатору. Статичный метод.</p>
+	* <p>Метод удаляет уведомление по идентификатору. Статический метод.</p>
 	*
 	*
-	* @param I $D  Идентификатор уведомления
+	* @param mixed $intID  Идентификатор уведомления
 	*
 	* @return mixed <p>Возвращает <i>true</i>, если удаление совершено, в противном случае -
-	* <i>false</i>.</p> <a name="examples"></a>
+	* <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CAdminNotify::Delete(1)
 	* </pre>
 	*
@@ -175,16 +186,16 @@ class CAdminNotify
 
 	
 	/**
-	* <p>Метод удаляет уведомление по идентификатору модуля. Статичный метод.</p>
+	* <p>Метод удаляет уведомление по идентификатору модуля. Статический метод.</p>
 	*
 	*
-	* @param moduleI $d  Идентификатор модуля
+	* @param mixed $moduleId  Идентификатор модуля
 	*
 	* @return mixed <p>Возвращает <i>true</i>, если удаление совершено, в противном случае -
-	* <i>false</i>.</p> <a name="examples"></a>
+	* <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CAdminNotify::DeleteByModule("xmpp")
 	* </pre>
 	*
@@ -210,16 +221,16 @@ class CAdminNotify
 
 	
 	/**
-	* <p>Метод удаляет уведомление по тегу. Статичный метод.</p>
+	* <p>Метод удаляет уведомление по тегу. Статический метод.</p>
 	*
 	*
-	* @param ta $g  Идентификатор тега </ht
+	* @param mixed $tag  Идентификатор тега
 	*
 	* @return mixed <p>Возвращает <i>true</i>, если удаление совершено, в противном случае -
-	* <i>false</i>.</p> <a name="examples"></a>
+	* <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CAdminNotify::DeleteByTag("IM_CONVERT")
 	* </pre>
 	*
@@ -232,6 +243,10 @@ class CAdminNotify
 	{
 		global $DB;
 		$err_mess = (self::err_mess()).'<br />Function: DeleteByTag<br />Line: ';
+
+		$tagId = (string)$tagId;
+		if ($tagId == '')
+			return false;
 
 		$strSql = "DELETE FROM b_admin_notify_lang WHERE NOTIFY_ID IN (SELECT ID FROM b_admin_notify WHERE TAG like '%".$DB->ForSQL($tagId)."%')";
 		$DB->Query($strSql, false, $err_mess.__LINE__);
@@ -281,24 +296,24 @@ class CAdminNotify
 
 	
 	/**
-	* <p>Метод производит выборку уведомлений с сортировкой и фильтрацией. Статичный метод.</p>
+	* <p>Метод производит выборку уведомлений с сортировкой и фильтрацией. Статический метод.</p>
 	*
 	*
 	* @param array $arSort = array() Сортировка осуществляется по: <ul> <li> <b>ID</b> - идентификатору
 	* сообщения;</li> <li> <b>MODULE_ID</b> - идентификатору модуля, к которому
-	* относится сообщение.</li> </ul>
+	* относится сообщение.</li>   </ul>
 	*
 	* @param array $arFilter = array() Фильтрация осуществляется по: <ul> <li> <b>ID</b> - идентификатору
 	* сообщения;</li> <li> <b>MODULE_ID</b> - идентификатору модуля, к которому
-	* относится сообщение;</li> <li> <b>TAG</b> - тегу;</li> <li> <b>ENABLE_CLOSE</b>-
-	* разрешению на ручное закрытие.</li> </ul>
+	* относится сообщение;</li>  <li> <b>TAG</b> - тегу;</li>  <li> <b>ENABLE_CLOSE</b>-
+	* разрешению на ручное закрытие.</li>  </ul>
 	*
 	* @return mixed <p>Возвращается экземляр класса <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> для дальней
 	* обработки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CAdminNotify::GetList(array('ID' =&gt; 'DESC'), array('MODULE_ID'=&gt;'main'));
 	* </pre>
 	*
@@ -393,5 +408,3 @@ class CAdminNotify
 		return '<br />Class: CAdminNotify<br />File: '.__FILE__;
 	}
 }
-
-?>

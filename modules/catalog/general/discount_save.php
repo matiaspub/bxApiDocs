@@ -29,6 +29,7 @@ class CAllCatalogDiscountSave
 	static protected $intDiscountUserID = 0;
 	static protected $userGroups = array();
 	static protected $discountFilterCache = array();
+	static protected $discountResultCache = array();
 
 	public static function Enable()
 	{
@@ -96,7 +97,7 @@ class CAllCatalogDiscountSave
 		);
 	}
 
-	static public function CheckFields($strAction, &$arFields, $intID = 0)
+	public static function CheckFields($strAction, &$arFields, $intID = 0)
 	{
 		global $APPLICATION;
 		global $DB;
@@ -147,7 +148,7 @@ class CAllCatalogDiscountSave
 		$arFields['TYPE'] = self::ENTITY_ID;
 		$arFields["RENEWAL"] = 'N';
 		$arFields['PRIORITY'] = 1;
-		$arFields['LAST_DISCOUNT'] = 'Y';
+		$arFields['LAST_DISCOUNT'] = 'N';
 		$arFields['VERSION'] = Catalog\DiscountTable::ACTUAL_VERSION;
 
 		if ((is_set($arFields, "SITE_ID") || $strAction=="ADD") && empty($arFields["SITE_ID"]))
@@ -356,7 +357,7 @@ class CAllCatalogDiscountSave
 		return $boolResult;
 	}
 
-	static public function GetByID($intID)
+	public static function GetByID($intID)
 	{
 		$intID = (int)$intID;
 		if ($intID <= 0)
@@ -365,7 +366,7 @@ class CAllCatalogDiscountSave
 		return CCatalogDiscountSave::GetList(array(), array('ID' => $intID), false, false, array());
 	}
 
-	static public function GetArrayByID($intID)
+	public static function GetArrayByID($intID)
 	{
 		$intID = (int)$intID;
 		if ($intID <= 0)
@@ -373,13 +374,12 @@ class CAllCatalogDiscountSave
 
 		$rsDiscounts = CCatalogDiscountSave::GetList(array(), array('ID' => $intID), false, false, array());
 		if ($arDiscount = $rsDiscounts->Fetch())
-		{
 			return $arDiscount;
-		}
+
 		return false;
 	}
 
-	static public function Delete($intID)
+	public static function Delete($intID)
 	{
 		global $DB;
 
@@ -397,7 +397,7 @@ class CAllCatalogDiscountSave
 /*
 * @deprecated deprecated since catalog 14.5.3
 */
-	protected function __ClearGroupsCache($intID = 0)
+	protected static function __ClearGroupsCache($intID = 0)
 	{
 		return true;
 	}
@@ -405,7 +405,7 @@ class CAllCatalogDiscountSave
 /*
 * @deprecated deprecated since catalog 14.5.3
 */
-	protected function __AddGroupsCache($intID, $arGroups = array())
+	protected static function __AddGroupsCache($intID, $arGroups = array())
 	{
 		return true;
 	}
@@ -413,12 +413,12 @@ class CAllCatalogDiscountSave
 /*
 * @deprecated deprecated since catalog 14.5.3
 */
-	protected function __UpdateGroupsCache($intID, $arGroups = array())
+	protected static function __UpdateGroupsCache($intID, $arGroups = array())
 	{
 		return true;
 	}
 
-	static public function ChangeActive($intID, $boolActive = true)
+	public static function ChangeActive($intID, $boolActive = true)
 	{
 		$intID = (int)$intID;
 		if ($intID <= 0)
@@ -427,7 +427,7 @@ class CAllCatalogDiscountSave
 		return CCatalogDiscountSave::Update($intID, array('ACTIVE' => ($boolActive === true ? 'Y' : 'N')), false);
 	}
 
-	static public function UserDiscountCalc($intID,$arFields = array(),$boolNew = false)
+	public static function UserDiscountCalc($intID,$arFields = array(),$boolNew = false)
 	{
 
 	}
@@ -435,12 +435,12 @@ class CAllCatalogDiscountSave
 /*
 * @deprecated deprecated since catalog 14.5.3
 */
-	protected function __GetDiscountGroups($arUserGroups)
+	protected static function __GetDiscountGroups($arUserGroups)
 	{
 		return array();
 	}
 
-	static public function GetDiscount($arParams = array(), $getAll = false)
+	public static function GetDiscount($arParams = array(), $getAll = false)
 	{
 		global $DB, $USER;
 
@@ -506,6 +506,7 @@ class CAllCatalogDiscountSave
 			return $arResult;
 
 		$arCurrentDiscountID = self::$discountFilterCache[$cacheKey];
+		unset($cacheKey);
 		if (isset($arParams['ID']))
 		{
 			Main\Type\Collection::normalizeArrayValuesByInt($arUserGroups, true);
@@ -516,30 +517,47 @@ class CAllCatalogDiscountSave
 		if (!empty($arCurrentDiscountID))
 		{
 			$getAll = ($getAll === true);
-			$intCurrentTime = getmicrotime();
-			$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), $intCurrentTime);
-			$arFilter = array(
-				'ID' => $arCurrentDiscountID,
-				'SITE_ID' => $strSiteID,
-				'TYPE' => self::ENTITY_ID,
-				'ACTIVE' => 'Y',
-				'+<=ACTIVE_FROM' => $strDate,
-				'+>=ACTIVE_TO' => $strDate
-			);
-			CTimeZone::Disable();
-			$rsDiscSaves = CCatalogDiscountSave::GetList(array(),$arFilter);
-			CTimeZone::Enable();
-			while ($arDiscSave = $rsDiscSaves->Fetch())
+			$cacheKey = 'DS'.implode('_', $arCurrentDiscountID).'|'.$strSiteID;
+			if (!isset(self::$discountResultCache[$cacheKey]))
 			{
-				$arDiscSave['ACTION_SIZE'] = (int)$arDiscSave['ACTION_SIZE'];
-				$arDiscSave['COUNT_SIZE'] = (int)$arDiscSave['COUNT_SIZE'];
-				$arDiscSave['ACTIVE_FROM_UT'] = false;
-				$arDiscSave['ACTIVE_TO_UT'] = false;
-				$arDiscSave['COUNT_FROM_UT'] = false;
-				$arDiscSave['COUNT_TO_UT'] = false;
-				$arDiscSave['TYPE'] = (int)$arDiscSave['TYPE'];
-				$arDiscSave['MODULE_ID'] = 'catalog';
+				self::$discountResultCache[$cacheKey] = array();
 
+				$intCurrentTime = getmicrotime();
+				$strDate = date($DB->DateFormatToPHP(CSite::GetDateFormat("FULL")), $intCurrentTime);
+				$arFilter = array(
+					'ID' => $arCurrentDiscountID,
+					'SITE_ID' => $strSiteID,
+					'TYPE' => self::ENTITY_ID,
+					'ACTIVE' => 'Y',
+					'+<=ACTIVE_FROM' => $strDate,
+					'+>=ACTIVE_TO' => $strDate
+				);
+				CTimeZone::Disable();
+				$rsDiscSaves = CCatalogDiscountSave::GetList(array(), $arFilter);
+				CTimeZone::Enable();
+				while ($arDiscSave = $rsDiscSaves->Fetch())
+				{
+					$arDiscSave['ACTION_SIZE'] = (int)$arDiscSave['ACTION_SIZE'];
+					$arDiscSave['COUNT_SIZE'] = (int)$arDiscSave['COUNT_SIZE'];
+					$arDiscSave['ACTIVE_FROM_UT'] = false;
+					$arDiscSave['ACTIVE_TO_UT'] = false;
+					$arDiscSave['COUNT_FROM_UT'] = false;
+					$arDiscSave['COUNT_TO_UT'] = false;
+					$arDiscSave['TYPE'] = (int)$arDiscSave['TYPE'];
+					$arDiscSave['MODULE_ID'] = 'catalog';
+					$arDiscSave['MICROTIME'] = $intCurrentTime;
+					$arDiscSave['LAST_DISCOUNT'] = 'N';
+					$arDiscSave['PRIORITY'] = 1;
+
+					self::$discountResultCache[$cacheKey][] = $arDiscSave;
+				}
+				unset($arDiscSave, $rsDiscSaves);
+				unset($intCurrentTime);
+			}
+			$discountList = self::$discountResultCache[$cacheKey];
+			unset($cacheKey);
+			foreach ($discountList as $arDiscSave)
+			{
 				$strCountPeriod = self::COUNT_TIME_ALL;
 				$strActionPeriod = self::ACTION_TIME_ALL;
 				$arCountPeriodBack = array();
@@ -551,7 +569,7 @@ class CAllCatalogDiscountSave
 				$arOrderSumm = false;
 				$boolPeriodInsert = true;
 
-				$intCountTime = $intCurrentTime;
+				$intCountTime = $arDiscSave['MICROTIME'];
 				$arOrderFilter = array(
 					'USER_ID' => $intUserID,
 					'LID' => $arDiscSave['SITE_ID'],
@@ -738,6 +756,7 @@ class CAllCatalogDiscountSave
 					}
 
 					unset($arDiscSave['ACTIVE_FROM_UT'], $arDiscSave['ACTIVE_TO_UT'], $arDiscSave['COUNT_FROM_UT'], $arDiscSave['COUNT_TO_UT']);
+					unset($arDiscSave['MICROTIME']);
 
 					$arOneResult = $arDiscSave;
 					if (!empty($arRange))
@@ -774,7 +793,7 @@ class CAllCatalogDiscountSave
 		return $arResult;
 	}
 
-	static public function GetPeriodTypeList($boolFull = true)
+	public static function GetPeriodTypeList($boolFull = true)
 	{
 		$boolFull = ($boolFull === true);
 		if ($boolFull)
@@ -792,7 +811,7 @@ class CAllCatalogDiscountSave
 		return $arResult;
 	}
 
-	protected function __SaleOrderSumm($arOrderFilter, $strCurrency)
+	protected static function __SaleOrderSumm($arOrderFilter, $strCurrency)
 	{
 		$arOrderSumm = array(
 			'ORDER_FILTER' => $arOrderFilter,
@@ -829,7 +848,7 @@ class CAllCatalogDiscountSave
 		return $arOrderSumm;
 	}
 
-	protected function __GetTimeStampArray($intSize, $strType, $boolDir = false)
+	protected static function __GetTimeStampArray($intSize, $strType, $boolDir = false)
 	{
 		if ('D' == $strType)
 			$arTimeStamp = array('DD' => ($boolDir ? $intSize : -$intSize));

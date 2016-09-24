@@ -8,51 +8,46 @@ class Pool
 	/** @var array */
 	protected $quantities = array();
 
-	/** @var Sale\BasketItem[] */
+	/** @var array */
 	protected $items = array();
 
 	static public function __construct()
 	{
 	}
 
-	public function dump()
-	{
-		$s = '';
-		foreach ($this->quantities as $k => $v)
-		{
-			if ($s != '')
-				$s .= ", ";
-			$s .= $k."=".$v;
-		}
-		return $s;
-	}
-
 	/**
 	 * Returns any variable by its name. Null if variable is not set.
 	 *
-	 * @param Sale\BasketItem $basketItem
+	 * @param $code
 	 * @return float | null
 	 */
-	public function get(Sale\BasketItem $basketItem)
+	public function get($code)
 	{
-		$basketCode = $basketItem->getBasketCode();
-
-		if (isset($this->quantities[$basketCode]) || array_key_exists($basketCode, $this->quantities))
-			return $this->quantities[$basketCode];
+		if (isset($this->quantities[$code]) || array_key_exists($code, $this->quantities))
+			return $this->quantities[$code];
 
 		return null;
 	}
 
 	/**
-	 * @param Sale\BasketItem $basketItem
+	 * @param $code
 	 * @param $quantity
 	 */
-	public function set(Sale\BasketItem $basketItem, $quantity)
+	public function set($code, $quantity)
 	{
-		$this->quantities[$basketItem->getBasketCode()] = $quantity;
-		$this->items[$basketItem->getBasketCode()] = $basketItem;
+		$this->quantities[$code] = $quantity;
+
 	}
 
+	/**
+	 * @param $code
+	 * @param $item
+	 */
+	public function addItem($code, $item)
+	{
+		if (!array_key_exists($code, $this->items))
+			$this->items[$code] = $item;
+	}
 	/**
 	 * @return array
 	 */
@@ -61,6 +56,9 @@ class Pool
 		return $this->quantities;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function getItems()
 	{
 		return $this->items;

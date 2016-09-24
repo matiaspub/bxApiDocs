@@ -5,19 +5,15 @@ class CIBlockOffersTmp extends CAllIBlockOffersTmp
 	{
 		global $DB;
 
-		$intProductIBlockID = intval($intProductIBlockID);
-		$intOffersIBlockID = intval($intOffersIBlockID);
-		$intInterval = intval($intInterval);
+		$intProductIBlockID = (int)$intProductIBlockID;
+		$intOffersIBlockID = (int)$intOffersIBlockID;
+		$intInterval = (int)$intInterval;
 
-		if ((0 >= $intProductIBlockID) || (0 >= $intOffersIBlockID))
-		{
+		if ($intProductIBlockID <= 0 || $intOffersIBlockID <= 0)
 			return false;
-		}
 
-		if (0 >= $intInterval)
-		{
+		if ($intInterval <= 0)
 			$intInterval = 1800;
-		}
 
 		$strQuery = '
 			select ID
@@ -33,19 +29,15 @@ class CIBlockOffersTmp extends CAllIBlockOffersTmp
 	{
 		global $DB;
 
-		$intProductIBlockID = intval($intProductIBlockID);
-		$intOffersIBlockID = intval($intOffersIBlockID);
-		$intInterval = intval($intInterval);
+		$intProductIBlockID = (int)$intProductIBlockID;
+		$intOffersIBlockID = (int)$intOffersIBlockID;
+		$intInterval = (int)$intInterval;
 
-		if (0 >= $intProductIBlockID)
-		{
+		if ($intProductIBlockID <= 0)
 			return false;
-		}
 
-		if (0 >= $intInterval)
-		{
+		if ($intInterval <= 0)
 			$intInterval = 86400;
-		}
 
 		$strQuery = '
 			delete from b_iblock_offers_tmp
@@ -56,4 +48,3 @@ class CIBlockOffersTmp extends CAllIBlockOffersTmp
 		return is_object($DB->Query($strQuery));
 	}
 }
-?>

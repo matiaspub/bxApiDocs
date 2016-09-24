@@ -25,7 +25,9 @@ class CCalendarLiveFeed
 					"UPDATE_CALLBACK" => array("CSocNetLogTools", "UpdateComment_Forum"),
 					"DELETE_CALLBACK" => array("CSocNetLogTools", "DeleteComment_Forum"),
 					"CLASS_FORMAT" => "CSocNetLogTools",
-					"METHOD_FORMAT" => "FormatComment_Forum"
+					"METHOD_FORMAT" => "FormatComment_Forum",
+					"METHOD_GET_URL" => array("CCalendarLiveFeed", "GetCommentUrl"),
+					"RATING_TYPE_ID" => "FORUM_POST"
 				)
 			)
 		);
@@ -209,8 +211,11 @@ class CCalendarLiveFeed
 					// get UF DOC value and FILE_ID there
 					if ($messageID > 0)
 					{
-						$messageUrl = CCalendar::GetPath("user", $arCalendarEvent["OWNER_ID"]);
-						$messageUrl = $messageUrl.((strpos($messageUrl, "?") === false) ? "?" : "&")."EVENT_ID=".$arCalendarEvent["ID"]."&MID=".$messageID;
+						$messageUrl = self::GetCommentUrl(array(
+							"ENTRY_ID" => $arCalendarEvent["ID"],
+							"ENTRY_USER_ID" => $arCalendarEvent["OWNER_ID"],
+							"COMMENT_ID" => $messageID
+						));
 
 						$dbAddedMessageFiles = CForumFiles::GetList(array("ID" => "ASC"), array("MESSAGE_ID" => $messageID));
 						while ($arAddedMessageFiles = $dbAddedMessageFiles->Fetch())
@@ -238,6 +243,28 @@ class CCalendarLiveFeed
 			),
 			"URL" => $messageUrl
 		);
+	}
+
+	public static function GetCommentUrl($arFields = array())
+	{
+		$messageUrl = '';
+
+		if (
+			is_array($arFields)
+			&& !empty($arFields["ENTRY_ID"])
+			&& !empty($arFields["ENTRY_USER_ID"])
+		)
+		{
+			$messageUrl = CCalendar::GetPath("user", $arFields["ENTRY_USER_ID"]);
+			$messageUrl = $messageUrl.((strpos($messageUrl, "?") === false) ? "?" : "&")."EVENT_ID=".$arFields["ENTRY_ID"]."&MID=#ID#";
+
+			if (!empty($arFields["COMMENT_ID"]))
+			{
+				$messageUrl = str_replace('#ID#', intval($arFields["COMMENT_ID"]), $messageUrl);
+			}
+		}
+
+		return $messageUrl;
 	}
 
 	public static function OnAfterSonetLogEntryAddComment($arSonetLogComment)
@@ -352,60 +379,81 @@ class CCalendarLiveFeed
 			return;
 		}
 
+		$userId = intval($arComment["USER_ID"]);
+
 		if ($arCalendarEvent = CCalendarEvent::GetById($eventID))
 		{
 			$rsUser = CUser::GetList(
 				$by = 'id',
 				$order = 'asc',
-				array('ID_EQUAL_EXACT' => intval($arComment["USER_ID"])),
+				array('ID_EQUAL_EXACT' => $userId),
 				array('FIELDS' => array('PERSONAL_GENDER'))
 			);
 
-			$strMsgAddComment  = GetMessage("EC_LF_COMMENT_MESSAGE_ADD");
-			$strMsgEditComment = GetMessage("EC_LF_COMMENT_MESSAGE_ADD");
-
+			$strMsgAddComment = GetMessage('EC_LF_COMMENT_MESSAGE_ADD');
+			$strMsgAddComment_Q = GetMessage('EC_LF_COMMENT_MESSAGE_ADD_Q');
 			if ($arUser = $rsUser->fetch())
 			{
 				switch ($arUser['PERSONAL_GENDER'])
 				{
 					case "F":
 					case "M":
-						$strMsgAddComment = GetMessage("EC_LF_COMMENT_MESSAGE_ADD" . '_' . $arUser['PERSONAL_GENDER']);
+						$strMsgAddComment = GetMessage('EC_LF_COMMENT_MESSAGE_ADD_'.$arUser['PERSONAL_GENDER']);
+						$strMsgAddComment_Q = GetMessage('EC_LF_COMMENT_MESSAGE_ADD_Q_'.$arUser['PERSONAL_GENDER']);
 						break;
 					default:
 						break;
 				}
 			}
 
-			$url = CCalendar::GetPathForCalendarEx($arComment["USER_ID"]);
-			$url = $url.((strpos($url, "?") === false) ? '?' : '&').'EVENT_ID='.$eventID.'&EVENT_DATE='.$arCalendarEvent['DT_FROM'];
-
 			$arMessageFields = array(
-				"FROM_USER_ID" => $arComment["USER_ID"],
+				"FROM_USER_ID" => $userId,
 				"NOTIFY_TYPE" => IM_NOTIFY_FROM,
 				"NOTIFY_MODULE" => "calendar",
-				"NOTIFY_EVENT" => "event_comment",
-				"NOTIFY_MESSAGE" => str_replace(
-					array("#EVENT_TITLE#"),
-					array(strlen($url) > 0 ? "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".$arCalendarEvent["NAME"]."</a>" : $arCalendarEvent["NAME"]),
-					$strMsgAddComment
-				),
-				"NOTIFY_MESSAGE_OUT" => str_replace(
-					array("#EVENT_TITLE#"),
-					array($arCalendarEvent["NAME"]),
-					$strMsgAddComment
-				).(strlen($url) > 0 ? " (".$url.")" : "")."#BR##BR#".$arComment["MESSAGE"]
+				"NOTIFY_EVENT" => "event_comment"
 			);
 
-			if (is_array($arCalendarEvent["~ATTENDEES"]))
+			$aId = isset($arCalendarEvent['PARENT_ID']) ? $arCalendarEvent['PARENT_ID'] : $arCalendarEvent['ID'];
+			$attendees = CCalendarEvent::GetAttendees($aId);
+			if (is_array($attendees) && is_array($attendees[$aId]))
 			{
-				foreach($arCalendarEvent["~ATTENDEES"] as $arAttendee)
+				$attendees = $attendees[$aId];
+				foreach($attendees as $attendee)
 				{
-					if ($arAttendee["USER_ID"] != $arComment["USER_ID"] && $arAttendee["STATUS"] != 'N')
+					$url = CCalendar::GetPathForCalendarEx($attendee["USER_ID"]);
+					$url = $url.((strpos($url, "?") === false) ? '?' : '&').'EVENT_ID='.$eventID.'&EVENT_DATE='.$arCalendarEvent['DT_FROM'];
+
+					if ($attendee["USER_ID"] != $userId && $attendee["STATUS"] != 'N')
 					{
-						$arMessageFields1 = array_merge($arMessageFields, array(
-							"TO_USER_ID" => $arAttendee["USER_ID"]
-						));
+						$arMessageFields1 = array_merge($arMessageFields, array("TO_USER_ID" => $attendee["USER_ID"]));
+
+						if ($attendee["STATUS"] == 'Q')
+						{
+							$arMessageFields1["NOTIFY_MESSAGE"] = str_replace(
+								array("#EVENT_TITLE#"),
+								array(strlen($url) > 0 ? "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".$arCalendarEvent["NAME"]."</a>" : $arCalendarEvent["NAME"]),
+								$strMsgAddComment_Q
+							);
+							$arMessageFields1["NOTIFY_MESSAGE_OUT"] = str_replace(
+									array("#EVENT_TITLE#"),
+									array($arCalendarEvent["NAME"]),
+									$strMsgAddComment_Q
+								).(strlen($url) > 0 ? " (".$url.")" : "")."#BR##BR#".$arComment["MESSAGE"];
+						}
+						else
+						{
+							$arMessageFields1["NOTIFY_MESSAGE"] = str_replace(
+								array("#EVENT_TITLE#"),
+								array(strlen($url) > 0 ? "<a href=\"".$url."\" class=\"bx-notifier-item-action\">".$arCalendarEvent["NAME"]."</a>" : $arCalendarEvent["NAME"]),
+								$strMsgAddComment
+							);
+							$arMessageFields1["NOTIFY_MESSAGE_OUT"] = str_replace(
+									array("#EVENT_TITLE#"),
+									array($arCalendarEvent["NAME"]),
+									$strMsgAddComment
+								).(strlen($url) > 0 ? " (".$url.")" : "")."#BR##BR#".$arComment["MESSAGE"];
+						}
+						$arMessageFields1["NOTIFY_TAG"] = "CALENDAR|COMMENT|".$aId."|".$attendee["USER_ID"];
 						CIMNotify::Add($arMessageFields1);
 					}
 				}
@@ -416,6 +464,27 @@ class CCalendarLiveFeed
 	public static function EditCalendarEventEntry($arFields = array(), $arUFFields = array(), $arAccessCodes = array(), $params = array())
 	{
 		global $DB;
+
+		if (!$arFields['SKIP_TIME'])
+		{
+			$arFields['DATE_FROM'] .= ' '.$arFields['TIME_FROM'];
+			$arFields['DATE_TO'] .= ' '.$arFields['TIME_TO'];
+		}
+
+		// Timezone
+		if (!$arFields['TZ_FROM'] && isset($arFields['DEFAULT_TZ']))
+		{
+			$arFields['TZ_FROM'] = $arFields['DEFAULT_TZ'];
+		}
+		if (!$arFields['TZ_TO'] && isset($arFields['DEFAULT_TZ']))
+		{
+			$arFields['TZ_TO'] = $arFields['DEFAULT_TZ'];
+		}
+
+		if (isset($arFields['DEFAULT_TZ']) && $arFields['DEFAULT_TZ'] != '')
+		{
+			CCalendar::SaveUserTimezoneName($params["userId"], $arFields['DEFAULT_TZ']);
+		}
 
 		if ($arFields['SECTION'])
 			$arFields['SECTIONS'] = array($arFields['SECTION']);

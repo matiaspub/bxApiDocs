@@ -201,11 +201,11 @@ class CSaleBasketHelper
 
 		if (isset($basketItemData['VAT_INCLUDED']) && $basketItemData['VAT_INCLUDED'] === 'N')
 		{
-			$vat = roundEx(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE']), SALE_VALUE_PRECISION);
+			$vat = \Bitrix\Sale\PriceMaths::roundPrecision(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE']));
 		}
 		else
 		{
-			$vat = roundEx(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE'] / ($basketItemData['VAT_RATE'] + 1)), SALE_VALUE_PRECISION);
+			$vat = \Bitrix\Sale\PriceMaths::roundPrecision(($basketItemData['PRICE'] * $basketItemData['QUANTITY'] * $basketItemData['VAT_RATE'] / ($basketItemData['VAT_RATE'] + 1)));
 		}
 
 		return $vat;
@@ -224,6 +224,24 @@ class CSaleBasketHelper
 			$price += static::getVat($basketItemData);
 		}
 		return $price;
+	}
+
+	/**
+	 * @param $quantity
+	 *
+	 * @return float
+	 * @throws \Bitrix\Main\ArgumentNullException
+	 */
+	public static function formatQuantity($quantity)
+	{
+		$isOrderConverted = \Bitrix\Main\Config\Option::get("main", "~sale_converted_15", 'N');
+
+		if ($isOrderConverted == "Y")
+		{
+			return \Bitrix\Sale\BasketItem::formatQuantity($quantity);
+		}
+
+		return roundEx($quantity, SALE_VALUE_PRECISION);
 	}
 
 }

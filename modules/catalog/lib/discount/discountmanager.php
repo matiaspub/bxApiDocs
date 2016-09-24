@@ -1,13 +1,12 @@
 <?php
 namespace Bitrix\Catalog\Discount;
 
-use Bitrix\Main;
-use Bitrix\Main\Localization\Loc;
-use Bitrix\Main\Loader;
-use Bitrix\Currency;
-use Bitrix\Catalog;
-use Bitrix\Iblock;
-use Bitrix\Sale;
+use Bitrix\Main,
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Main\Loader,
+	Bitrix\Catalog,
+	Bitrix\Iblock,
+	Bitrix\Sale;
 
 Loc::loadMessages(__FILE__);
 
@@ -16,6 +15,7 @@ class DiscountManager
 	protected static $discountCache = array();
 	protected static $typeCache = array();
 	protected static $editUrlTemplate = array();
+	protected static $saleIncluded = null;
 
 	/**
 	 * Return methods for prepare discount.
@@ -23,13 +23,32 @@ class DiscountManager
 	 * @param Main\Event $event					Event data from discount manager.
 	 * @return Main\EventResult
 	 */
-	public static function catalogDiscountManager(Main\Event $event)
+	
+	/**
+	* <p>Возвращает методы, необходимые для работы со скидками на товары в рамках заказа. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные события.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/catalogdiscountmanager.php
+	* @author Bitrix
+	*/
+	public static function catalogDiscountManager(/** @noinspection PhpUnusedParameterInspection */Main\Event $event)
 	{
 		$result = new Main\EventResult(
 			Main\EventResult::SUCCESS,
 			array(
-				'prepareData' => array('\Bitrix\Catalog\Discount\DiscountManager', 'prepareData'),
-				'getEditUrl' => array('\Bitrix\Catalog\Discount\DiscountManager', 'getEditUrl')
+				'prepareData' => array(__CLASS__, 'prepareData'),
+				'getEditUrl' => array(__CLASS__, 'getEditUrl'),
+				'calculateApplyCoupons' => array(__CLASS__, 'calculateApplyCoupons'),
+				'roundPrice' => array(__CLASS__, 'roundPrice')
 			),
 			'catalog'
 		);
@@ -43,6 +62,21 @@ class DiscountManager
 	 * @param array $params					Params.
 	 * @return array|bool
 	 */
+	
+	/**
+	* <p>Метод возвращает информацию о скидке, необходимую для ее дальнейшего использования в рамках созданного заказа. Метод статический.</p>
+	*
+	*
+	* @param array $discount  Массив параметров скидки.
+	*
+	* @param array $params = array() Дополнительные параметры.
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/preparedata.php
+	* @author Bitrix
+	*/
 	public static function prepareData($discount, $params = array())
 	{
 		if (empty($discount) || empty($discount['ID']))
@@ -83,6 +117,19 @@ class DiscountManager
 	 * @param array $discount			Discount data.
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает адрес страницы редактирования скидки на товар в административном разделе сайта. Метод статический.</p>
+	*
+	*
+	* @param array $discount  Массив параметров скидки.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/getediturl.php
+	* @author Bitrix
+	*/
 	public static function getEditUrl($discount)
 	{
 		if (empty(self::$editUrlTemplate))
@@ -129,12 +176,258 @@ class DiscountManager
 	}
 
 	/**
+	 * Check apply coupons.
+	 *
+	 * @param array $couponsList		Coupons.
+	 * @param array $basket				Basket data.
+	 * @param array $params				Calculate params.
+	 * @return array
+	 * @throws Main\ArgumentException
+	 */
+	
+	/**
+	* <p>Метод применяет к товарам корзины скидки, чьи купоны были переданы. Предназначен для расчета скидок купонов, добавленных к уже существующему заказу. Метод статический.</p>
+	*
+	*
+	* @param array $couponsList  Массив купонов.
+	*
+	* @param array $basket  Массив параметров корзины.
+	*
+	* @param array $params  Массив параметров расчета.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/calculateapplycoupons.php
+	* @author Bitrix
+	*/
+	public static function calculateApplyCoupons(array $couponsList, array $basket, array $params)
+	{
+		$result = array();
+
+		if (empty($couponsList))
+			return $result;
+		if (empty($basket))
+			return $result;
+		$filteredBasket = array_filter($basket, '\Bitrix\Catalog\Discount\DiscountManager::basketFilter');
+		if (empty($filteredBasket))
+			return $result;
+		$filteredBasket = array_filter($filteredBasket, '\Bitrix\Catalog\Discount\DiscountManager::lastDiscountFilter');
+		if (empty($filteredBasket))
+			return $result;
+
+		$filteredCoupons = array();
+		foreach ($couponsList as $coupon)
+		{
+			if (!isset($coupon['COUPON']) || $coupon['COUPON'] == '')
+				continue;
+			if (!isset($coupon['DISCOUNT_ID']) || (int)$coupon['DISCOUNT_ID'] <= 0)
+				continue;
+			$filteredCoupons[] = $coupon['COUPON'];
+		}
+		unset($coupon);
+		if (empty($filteredCoupons))
+			return $result;
+
+		$discountIds = array();
+		$discountCoupons = array();
+		$oneRowCoupons = array();
+		$couponsIterator = Catalog\DiscountCouponTable::getList(array(
+			'select' => array('ID', 'COUPON', 'DISCOUNT_ID', 'TYPE'),
+			'filter' => array('@COUPON' => $filteredCoupons, 'ACTIVE' => 'Y')
+		));
+		while ($coupon = $couponsIterator->fetch())
+		{
+			$discountIds[$coupon['DISCOUNT_ID']] = true;
+			$discountCoupons[$coupon['COUPON']] = $coupon['COUPON'];
+			if ($coupon['TYPE'] == Catalog\DiscountCouponTable::TYPE_ONE_ROW)
+				$oneRowCoupons[$coupon['COUPON']] = true;
+		}
+		unset($coupon, $couponsIterator);
+		if (empty($discountCoupons))
+			return $result;
+
+		$userId = (isset($params['USER_ID']) ? (int)$params['USER_ID'] : 0);
+		if ($userId <= 0)
+			return $result;
+		$userGroups = Main\UserTable::getUserGroupIds($userId);
+		$userGroups[] = -1;
+
+		$iblockList = array();
+		$product2Iblock = array();
+		$itemIds = array();
+		foreach ($filteredBasket as $basketItem)
+		{
+			$productId = (int)$basketItem['PRODUCT_ID'];
+			$itemIds[$productId] = $productId;
+		}
+		unset($basketItem);
+
+		$itemIterator = Iblock\ElementTable::getList(array(
+			'select' => array('ID', 'IBLOCK_ID'),
+			'filter' => array('@ID' => $itemIds, 'ACTIVE' => 'Y')
+		));
+		while ($item = $itemIterator->fetch())
+		{
+			$id = (int)$item['ID'];
+			$iblockId = (int)$item['IBLOCK_ID'];
+			if (!isset($iblockList[$iblockId]))
+				$iblockList[$iblockId] = array();
+			$iblockList[$iblockId][$id] = $id;
+			$product2Iblock[$id] = $iblockId;
+			unset($iblockId, $id);
+		}
+		unset($item, $itemIterator);
+		unset($itemIds);
+
+		if (empty($iblockList))
+			return $result;
+
+		foreach($iblockList as $iblockId => $elements)
+		{
+			/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
+			\CCatalogDiscount::setProductSectionsCache($elements);
+			/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
+			\CCatalogDiscount::setDiscountProductCache($elements, array('IBLOCK_ID' => $iblockId, 'GET_BY_ID' => 'Y'));
+		}
+		unset($iblockId, $elements);
+
+		$discountPercentMode = \CCatalogDiscount::getUseBasePrice();
+		if (isset($params['USE_BASE_PRICE']))
+			\CCatalogDiscount::setUseBasePrice($params['USE_BASE_PRICE'] == 'Y');
+
+		Main\Type\Collection::sortByColumn($filteredBasket, array('PRICE' => SORT_DESC), '', null, true);
+		foreach ($filteredBasket as $basketCode => $basketItem)
+		{
+			$productId = (int)$basketItem['PRODUCT_ID'];
+			if (!isset($product2Iblock[$productId]))
+				continue;
+			if (empty($discountCoupons))
+				break;
+
+			/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
+			$discountList = \CCatalogDiscount::getDiscount(
+				$productId,
+				$product2Iblock[$productId],
+				array(-1),
+				$userGroups,
+				'N',
+				$params['SITE_ID'],
+				$discountCoupons
+			);
+
+			if (empty($discountList))
+				continue;
+
+			$itemDiscounts = array();
+			foreach ($discountList as $discount)
+			{
+				if (!isset($discountIds[$discount['ID']]))
+					continue;
+				$itemDiscounts[] = $discount;
+			}
+			unset($discount, $discountList);
+			if (empty($itemDiscounts))
+				continue;
+
+			$itemsDiscountResult = \CCatalogDiscount::applyDiscountList($basketItem['PRICE'], $basketItem['CURRENCY'], $itemDiscounts);
+			unset($itemDiscounts);
+			if (!empty($itemsDiscountResult['DISCOUNT_LIST']))
+			{
+				$result[$basketCode] = array();
+				foreach ($itemsDiscountResult['DISCOUNT_LIST'] as $discount)
+				{
+					$result[$basketCode][] = \CCatalogDiscount::getDiscountDescription($discount);
+					if (!empty($discount['COUPON']) && isset($oneRowCoupons[$discount['COUPON']]))
+						unset($discountCoupons[$discount['COUPON']]);
+				}
+				unset($discount);
+			}
+			unset($itemsDiscountResult);
+		}
+		unset($basketCode, $basketItem, $basketItem);
+
+		\CCatalogDiscount::setUseBasePrice($discountPercentMode);
+		unset($discountPercentMode);
+
+		return $result;
+	}
+
+	/**
+	 * Round basket item price.
+	 *
+	 * @param array $basketItem		Basket item data.
+	 * @param array $roundData		Round rule.
+	 * @return array
+	 */
+	public static function roundPrice(array $basketItem, array $roundData = array())
+	{
+		if (empty($basketItem))
+			return array();
+		if (empty($roundData))
+		{
+			$priceTypeId = 0;
+			if (isset($basketItem['CATALOG_GROUP_ID']))
+				$priceTypeId = (int)$basketItem['CATALOG_GROUP_ID'];
+			if ($priceTypeId <= 0 && isset($basketItem['PRODUCT_PRICE_ID']))
+			{
+				$priceId = (int)$basketItem['PRODUCT_PRICE_ID'];
+				if ($priceId > 0)
+				{
+					$row = Catalog\PriceTable::getList(array(
+						'select' => array('ID', 'CATALOG_GROUP_ID'),
+						'filter' => array('=ID' => $priceId)
+					))->fetch();
+					if (!empty($row))
+						$priceTypeId = (int)$row['CATALOG_GROUP_ID'];
+					unset($row);
+				}
+				unset($priceId);
+			}
+			if ($priceTypeId > 0)
+				$roundData = Catalog\Product\Price::searchRoundRule($priceTypeId, $basketItem['PRICE'], $basketItem['CURRENCY']);
+			unset($priceTypeId);
+		}
+		if (empty($roundData))
+			return array();
+		$result = array(
+			'ROUND_RULE' => $roundData
+		);
+		$result['PRICE'] = Catalog\Product\Price::roundValue($basketItem['PRICE'], $roundData['ROUND_PRECISION'], $roundData['ROUND_TYPE']);
+
+		if (isset($basketItem['BASE_PRICE']))
+			$result['DISCOUNT_PRICE'] = $basketItem['BASE_PRICE'] - $result['PRICE'];
+		else
+			$result['DISCOUNT_PRICE'] += ($basketItem['PRICE'] - $result['PRICE']);
+
+		if ($result['DISCOUNT_PRICE'] < 0)
+			$result['DISCOUNT_PRICE'] = 0;
+
+		return $result;
+	}
+
+	/**
 	 * Apply catalog discount by basket item.
 	 *
 	 * @param array &$product			Product data.
 	 * @param array $discount			Discount data.
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод используется для расчета скидок на товары при оформлении и редактировании заказа. Метод статический.</p>
+	*
+	*
+	* @param array &$product  Параметры товара.
+	*
+	* @param array $discount  Массив параметров скидки.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/applydiscount.php
+	* @author Bitrix
+	*/
 	public static function applyDiscount(&$product, $discount)
 	{
 		if (empty($product) || !is_array($product))
@@ -196,6 +489,23 @@ class DiscountManager
 	 * @param Main\Event $event			Event.
 	 * @return Main\EventResult
 	 */
+	
+	/**
+	* <p>Метод дополняет товары корзины данными, необходимыми для применения правил корзины. Метод статический.</p>
+	*
+	*
+	* @param mixed $Bitrix  Данные события.
+	*
+	* @param Bitri $Main  
+	*
+	* @param Event $event  
+	*
+	* @return \Bitrix\Main\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/catalog/discount/discountmanager/extendorderdata.php
+	* @author Bitrix
+	*/
 	public static function extendOrderData(Main\Event $event)
 	{
 		$process = true;
@@ -296,6 +606,20 @@ class DiscountManager
 	}
 
 	/**
+	 * Filter for stop discount calculate for basket item.
+	 *
+	 * @param array $basketItem			Basket item data.
+	 * @return bool
+	 */
+	protected static function lastDiscountFilter($basketItem)
+	{
+		return (
+			!isset($basketItem['LAST_DISCOUNT'])
+			|| $basketItem['LAST_DISCOUNT'] != 'Y'
+		);
+	}
+
+	/**
 	 * Load discount data from db.
 	 * @param int $id					Discount id.
 	 * @param array $discount			Exist discount data.
@@ -379,6 +703,7 @@ class DiscountManager
 
 			$conn = Main\Application::getConnection();
 			$helper = $conn->getSqlHelper();
+			/** @noinspection SqlResolve */
 			$moduleIterator = $conn->query(
 				'select MODULE_ID from '.$helper->quote('b_catalog_discount_module').' where '.$helper->quote('DISCOUNT_ID').' = '.$id
 			);
@@ -863,6 +1188,7 @@ class DiscountManager
 					if ($elementSection['ADDITIONAL_PROPERTY_ID'] > 0)
 						continue;
 					$productSection[$elementSection['IBLOCK_ELEMENT_ID']][$elementSection['IBLOCK_SECTION_ID']] = true;
+					/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
 					$parentSectionIterator = \CIBlockSection::getNavChain(0, $elementSection['IBLOCK_SECTION_ID'], array('ID'));
 					while ($parentSection = $parentSectionIterator->fetch())
 					{
@@ -887,8 +1213,11 @@ class DiscountManager
 						'ID' => $iblockData['iblockElement'][$iblock],
 						'IBLOCK_ID' => $iblock
 					);
+					/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
 					\CTimeZone::disable();
+					/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
 					\CIBlockElement::getPropertyValuesArray($propertyValues, $iblock, $filter, array('ID' => $propertyList));
+					/** @noinspection PhpMethodOrClassCallIsNotCaseSensitiveInspection */
 					\CTimeZone::enable();
 				}
 				unset($filter, $iblock, $propertyList);
@@ -943,56 +1272,57 @@ class DiscountManager
 		$action = '\Bitrix\Catalog\Discount\DiscountManager::applyDiscount('.$params['BASKET_ITEM'].', '.var_export($data, true).');';
 		$discount['APPLICATION'] = 'function (&'.$params['BASKET_ITEM'].'){'.$action.'};';
 		$discount['ACTIONS'] = $data;
-
-		if (Loader::includeModule('sale'))
-		{
-			$type = '';
-			$descr = array(
-				'VALUE_ACTION' => (
-					$discount['TYPE'] == Catalog\DiscountTable::TYPE_DISCOUNT_SAVE
-					? Sale\OrderDiscountManager::DESCR_VALUE_ACTION_ACCUMULATE
-					: Sale\OrderDiscountManager::DESCR_VALUE_ACTION_DISCOUNT
-				),
-				'VALUE' => $discount['VALUE']
-			);
-			switch ($discount['VALUE_TYPE'])
-			{
-				case Catalog\DiscountTable::VALUE_TYPE_PERCENT:
-					$type = (
-						$discount['MAX_VALUE'] > 0
-						? Sale\OrderDiscountManager::DESCR_TYPE_LIMIT_VALUE
-						: Sale\OrderDiscountManager::DESCR_TYPE_VALUE
-					);
-					$descr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_PERCENT;
-					if ($discount['MAX_VALUE'] > 0)
-					{
-						$descr['LIMIT_TYPE'] = Sale\OrderDiscountManager::DESCR_LIMIT_MAX;
-						$descr['LIMIT_UNIT'] = $discount['CURRENCY'];
-						$descr['LIMIT_VALUE'] = $discount['MAX_VALUE'];
-					}
-					break;
-				case Catalog\DiscountTable::VALUE_TYPE_FIX:
-					$type = Sale\OrderDiscountManager::DESCR_TYPE_VALUE;
-					$descr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_CURRENCY;
-					$descr['VALUE_UNIT'] = $discount['CURRENCY'];
-					break;
-				case Catalog\DiscountTable::VALUE_TYPE_SALE:
-					$type = Sale\OrderDiscountManager::DESCR_TYPE_FIXED;
-					$descr['VALUE_UNIT'] = $discount['CURRENCY'];
-					break;
-			}
-			$descrResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $descr);
-			if ($descrResult->isSuccess())
-			{
-				$discount['ACTIONS_DESCR'] = array(
-					'BASKET' => array(
-						0 => $descrResult->getData()
-					)
-				);
-			}
-			unset($descrResult, $descr, $type);
-		}
-
 		unset($action, $data);
+
+		if (self::$saleIncluded === null)
+			self::$saleIncluded = Loader::includeModule('sale');
+		if (!self::$saleIncluded)
+			return;
+
+		$type = '';
+		$descr = array(
+			'VALUE_ACTION' => (
+				$discount['TYPE'] == Catalog\DiscountTable::TYPE_DISCOUNT_SAVE
+				? Sale\OrderDiscountManager::DESCR_VALUE_ACTION_ACCUMULATE
+				: Sale\OrderDiscountManager::DESCR_VALUE_ACTION_DISCOUNT
+			),
+			'VALUE' => $discount['VALUE']
+		);
+		switch ($discount['VALUE_TYPE'])
+		{
+			case Catalog\DiscountTable::VALUE_TYPE_PERCENT:
+				$type = (
+					$discount['MAX_VALUE'] > 0
+					? Sale\OrderDiscountManager::DESCR_TYPE_LIMIT_VALUE
+					: Sale\OrderDiscountManager::DESCR_TYPE_VALUE
+				);
+				$descr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_PERCENT;
+				if ($discount['MAX_VALUE'] > 0)
+				{
+					$descr['LIMIT_TYPE'] = Sale\OrderDiscountManager::DESCR_LIMIT_MAX;
+					$descr['LIMIT_UNIT'] = $discount['CURRENCY'];
+					$descr['LIMIT_VALUE'] = $discount['MAX_VALUE'];
+				}
+				break;
+			case Catalog\DiscountTable::VALUE_TYPE_FIX:
+				$type = Sale\OrderDiscountManager::DESCR_TYPE_VALUE;
+				$descr['VALUE_TYPE'] = Sale\OrderDiscountManager::DESCR_VALUE_TYPE_CURRENCY;
+				$descr['VALUE_UNIT'] = $discount['CURRENCY'];
+				break;
+			case Catalog\DiscountTable::VALUE_TYPE_SALE:
+				$type = Sale\OrderDiscountManager::DESCR_TYPE_FIXED;
+				$descr['VALUE_UNIT'] = $discount['CURRENCY'];
+				break;
+		}
+		$descrResult = Sale\OrderDiscountManager::prepareDiscountDescription($type, $descr);
+		if ($descrResult->isSuccess())
+		{
+			$discount['ACTIONS_DESCR'] = array(
+				'BASKET' => array(
+					0 => $descrResult->getData()
+				)
+			);
+		}
+		unset($descrResult, $descr, $type);
 	}
 }

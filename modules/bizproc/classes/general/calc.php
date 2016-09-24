@@ -4,8 +4,14 @@ class CBPCalc
 	private $activity;
 	private $arErrorsList = array();
 
+	private static $weekHolidays;
+	private static $yearHolidays;
+	private static $startWorkDay;
+	private static $endWorkDay;
+
 	public function __construct($activity)
 	{
+		/** @var CBPActivity activity */
 		$this->activity = $activity;
 	}
 
@@ -377,25 +383,8 @@ class CBPCalc
 		$date = array_shift($ar);
 		$interval = array_shift($ar);
 
-		if ($date == null)
+		if (($date = $this->makeTimestamp($date)) === false)
 			return null;
-
-		if (intval($date)."!" != $date."!")
-		{
-			if (($dateTmp = MakeTimeStamp($date, FORMAT_DATETIME)) === false)
-			{
-				if (($dateTmp = MakeTimeStamp($date, FORMAT_DATE)) === false)
-				{
-					if (($dateTmp = MakeTimeStamp($date, "YYYY-MM-DD HH:MI:SS")) === false)
-					{
-						if (($dateTmp = MakeTimeStamp($date, "YYYY-MM-DD")) === false)
-							return null;
-					}
-				}
-			}
-
-			$date = $dateTmp;
-		}
 
 		if (($interval == null) || (strlen($interval) <= 0))
 			return $date;
@@ -432,6 +421,296 @@ class CBPCalc
 		$newDate = AddToTimeStamp($arInterval, $date);
 
 		return ConvertTimeStamp($newDate, "FULL");
+	}
+
+	private function FunctionWorkDateAdd($args)
+	{
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$date = array_shift($ar);
+		$paramInterval = array_shift($ar);
+
+		if (($date = $this->makeTimestamp($date)) === false)
+			return null;
+
+		if (($paramInterval == null) || (strlen($paramInterval) <= 0) || !CModule::IncludeModule('calendar'))
+			return $date;
+
+		$paramInterval = trim($paramInterval);
+		$multiplier = 1;
+		if (substr($paramInterval, 0, 1) === "-")
+		{
+			$paramInterval = substr($paramInterval, 1);
+			$multiplier = -1;
+		}
+
+		$workDayInterval = $this->getWorkDayInterval();
+		$intervalMap = array("d" => $workDayInterval, "day" => $workDayInterval, "days" => $workDayInterval,
+							"h" => 3600, "hour" => 3600, "hours" => 3600,
+							"i" => 60, "min" => 60, "minute" => 60, "minutes" => 60,
+		);
+
+		$interval = 0;
+		while (preg_match('/\s*([\d]+)\s*([a-z]+)\s*/i', $paramInterval, $match))
+		{
+			$match2 = strtolower($match[2]);
+			if (array_key_exists($match2, $intervalMap))
+				$interval += intval($match[1]) * $intervalMap[$match2];
+
+			$p = strpos($paramInterval, $match[0]);
+			$paramInterval = substr($paramInterval, $p + strlen($match[0]));
+		}
+
+		$date = $this->getNearestWorkTime($date, $multiplier);
+		if ($interval)
+		{
+			$days = (int) floor($interval / $workDayInterval);
+			$hours = $interval % $workDayInterval;
+
+			$remainTimestamp = $this->getWorkDayRemainTimestamp($date, $multiplier);
+
+			if ($days)
+				$date = $this->addWorkDay($date, $days * $multiplier);
+
+			if ($hours > $remainTimestamp)
+			{
+				$date += $multiplier < 0 ? -$remainTimestamp -60 : $remainTimestamp + 60;
+				$date = $this->getNearestWorkTime($date, $multiplier) + (($hours - $remainTimestamp) * $multiplier);
+			}
+			else
+				$date += $multiplier * $hours;
+		}
+
+		return ConvertTimeStamp($date, "FULL");
+	}
+
+	private function makeTimestamp($date)
+	{
+		if (!$date)
+			return false;
+		if (intval($date)."!" === $date."!")
+			return $date;
+
+		if (($result = MakeTimeStamp($date, FORMAT_DATETIME)) === false)
+		{
+			if (($result = MakeTimeStamp($date, FORMAT_DATE)) === false)
+			{
+				if (($result = MakeTimeStamp($date, "YYYY-MM-DD HH:MI:SS")) === false)
+				{
+					$result = MakeTimeStamp($date, "YYYY-MM-DD");
+				}
+			}
+		}
+		return $result;
+	}
+
+	private function getWorkDayTimestamp($date)
+	{
+		return date('H', $date) * 3600 + date('i', $date) * 60;
+	}
+
+	private function getWorkDayRemainTimestamp($date, $multiplier = 1)
+	{
+		$dayTs = $this->getWorkDayTimestamp($date);
+		list ($startSeconds, $endSeconds) = $this->getCalendarWorkTime();
+		return $multiplier < 0 ? $dayTs - $startSeconds :$endSeconds - $dayTs;
+	}
+
+	private function getWorkDayInterval()
+	{
+		list ($startSeconds, $endSeconds) = $this->getCalendarWorkTime();
+		return $endSeconds - $startSeconds;
+	}
+
+	private function isHoliday($date)
+	{
+		list($weekHolidays, $yearHolidays) = $this->getCalendarHolidays();
+
+		$dayOfWeek = date('w', $date);
+		if (in_array($dayOfWeek, $weekHolidays))
+				return true;
+		$dayOfYear = date('j.n', $date);
+		if (in_array($dayOfYear, $yearHolidays))
+			return true;
+
+		return false;
+	}
+
+	private function isWorkTime($date)
+	{
+		$dayTs = $this->getWorkDayTimestamp($date);
+		list ($startSeconds, $endSeconds) = $this->getCalendarWorkTime();
+		return ($dayTs >= $startSeconds && $dayTs <= $endSeconds);
+	}
+
+	private function getNearestWorkTime($date, $multiplier = 1)
+	{
+		$reverse = $multiplier < 0;
+		list ($startSeconds, $endSeconds) = $this->getCalendarWorkTime();
+		$dayTimeStamp = $this->getWorkDayTimestamp($date);
+
+		if ($this->isHoliday($date))
+		{
+			$date -= $dayTimeStamp;
+			$date += $reverse? -86400 + $endSeconds : $startSeconds;
+			$dayTimeStamp = $reverse? $endSeconds : $startSeconds;
+		}
+
+		if (!$this->isWorkTime($date))
+		{
+			$date -= $dayTimeStamp;
+
+			if ($dayTimeStamp < $startSeconds)
+			{
+				$date += $reverse? -86400 + $endSeconds : $startSeconds;
+			}
+			else
+			{
+				$date += $reverse? $endSeconds : 86400 + $startSeconds;
+			}
+		}
+
+		if ($this->isHoliday($date))
+			$date = $this->addWorkDay($date, $reverse? -1 : 1);
+
+		return $date;
+	}
+
+	private function addWorkDay($date, $days)
+	{
+		$delta = 86400;
+		if ($days < 0)
+			$delta *= -1;
+
+		$days = abs($days);
+
+		while ($days > 0)
+		{
+			$date += $delta;
+
+			if ($this->isHoliday($date))
+				continue;
+			--$days;
+		}
+
+		return $date;
+	}
+
+	private function getCalendarHolidays()
+	{
+		if (static::$yearHolidays === null)
+		{
+			$calendarSettings = CCalendar::GetSettings();
+			$weekHolidays = array(0, 6);
+			$yearHolidays = array();
+
+			if (isset($calendarSettings['week_holidays']))
+			{
+				$weekDays = array('SU' => 0, 'MO' => 1, 'TU' => 2, 'WE' => 3, 'TH' => 4, 'FR' => 5, 'SA' => 6);
+				$weekHolidays = array();
+				foreach ($calendarSettings['week_holidays'] as $day)
+					$weekHolidays[] = $weekDays[$day];
+			}
+
+			if (isset($calendarSettings['year_holidays']))
+			{
+				foreach (explode(',', $calendarSettings['year_holidays']) as $yearHoliday)
+				{
+					$ardate = explode('.', trim($yearHoliday));
+					if (count($ardate) == 2 && $ardate[0] && $ardate[1])
+						$yearHolidays[] = (int)$ardate[0].'.'.(int)$ardate[1];
+				}
+			}
+			static::$weekHolidays = $weekHolidays;
+			static::$yearHolidays = $yearHolidays;
+		}
+
+		return array(static::$weekHolidays, static::$yearHolidays);
+	}
+
+	private function getCalendarWorkTime()
+	{
+		if (static::$startWorkDay === null)
+		{
+			$startSeconds = 0;
+			$endSeconds = 24 * 3600 - 1;
+
+			$calendarSettings = CCalendar::GetSettings();
+			if (!empty($calendarSettings['work_time_start']))
+			{
+				$time = explode('.', $calendarSettings['work_time_start']);
+				$startSeconds = $time[0] * 3600;
+				if (!empty($time[1]))
+					$startSeconds += $time[1] * 60;
+			}
+
+			if (!empty($calendarSettings['work_time_end']))
+			{
+				$time = explode('.', $calendarSettings['work_time_end']);
+				$endSeconds = $time[0] * 3600;
+				if (!empty($time[1]))
+					$endSeconds += $time[1] * 60;
+			}
+			static::$startWorkDay = $startSeconds;
+			static::$endWorkDay = $endSeconds;
+		}
+		return array(static::$startWorkDay, static::$endWorkDay);
+	}
+
+	private function FunctionAddWorkDays($args)
+	{
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$date = array_shift($ar);
+		$days = (int) array_shift($ar);
+
+		if (($date = $this->makeTimestamp($date)) === false)
+			return null;
+
+		if ($days === 0 || !CModule::IncludeModule('calendar'))
+			return $date;
+
+		$date = $this->addWorkDay($date, $days);
+
+		return ConvertTimeStamp($date, "FULL");
+	}
+
+	private function FunctionIsWorkDay($args)
+	{
+		if (!CModule::IncludeModule('calendar'))
+			return null;
+
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$date = array_shift($ar);
+
+		if (($date = $this->makeTimestamp($date)) === false)
+			return null;
+
+		return !$this->isHoliday($date);
+	}
+
+	private function FunctionIsWorkTime($args)
+	{
+		if (!CModule::IncludeModule('calendar'))
+			return null;
+
+		if (!is_array($args))
+			$args = array($args);
+
+		$ar = $this->ArrgsToArray($args);
+		$date = array_shift($ar);
+
+		if (($date = $this->makeTimestamp($date)) === false)
+			return null;
+
+		return !$this->isHoliday($date) && $this->isWorkTime($date);
 	}
 
 	private function FunctionDateDiff($args)
@@ -494,6 +773,18 @@ class CBPCalc
 
 		$args = $this->ArrgsToArray($args);
 		return min($args);
+	}
+
+	private function FunctionMax($args)
+	{
+		if (!is_array($args))
+			return (float) $args;
+
+		foreach ($args as &$arg)
+			$arg = (float) $arg;
+
+		$args = $this->ArrgsToArray($args);
+		return max($args);
 	}
 
 	private function FunctionNot($arg)
@@ -631,12 +922,17 @@ class CBPCalc
 		'if' => array('args' => true, 'func' => 'FunctionIf'),
 		'intval' => array('args' => true, 'func' => 'FunctionIntval'),
 		'min' => array('args' => true, 'func' => 'FunctionMin'),
+		'max' => array('args' => true, 'func' => 'FunctionMax'),
 		'not' => array('args' => true, 'func' => 'FunctionNot'),
 		'or' => array('args' => true, 'func' => 'FunctionOr'),
 		'substr' => array('args' => true, 'func' => 'FunctionSubstr'),
 		'true' => array('args' => false, 'func' => 'FunctionTrue'),
 		'convert' => array('args' => true, 'func' => 'FunctionConvert'),
 		'merge' => array('args' => true, 'func' => 'FunctionMerge'),
+		'addworkdays' => array('args' => true, 'func' => 'FunctionAddWorkDays'),
+		'workdateadd' => array('args' => true, 'func' => 'FunctionWorkDateAdd'),
+		'isworkday' => array('args' => true, 'func' => 'FunctionIsWorkDay'),
+		'isworktime' => array('args' => true, 'func' => 'FunctionIsWorkTime'),
 	);
 
 	// Allowable errors

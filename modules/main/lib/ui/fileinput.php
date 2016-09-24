@@ -166,8 +166,7 @@ HTML
 		$replace = array(
 			"#input_name#" => $inputs["name"],
 			"#input_value#" => "",
-			"#description_name#" => self::getInputName($inputs["name"], "_descr"),
-			"#description#" => ""
+			"#description_name#" => self::getInputName($inputs["name"], "_descr")
 		);
 		$this->templates["new"] = str_replace(array_keys($replace), array_values($replace), $this->templates["new"]);
 		$inputs = array_merge($this->uploadSetts, $params);

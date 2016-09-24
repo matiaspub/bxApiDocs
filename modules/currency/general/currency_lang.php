@@ -4,6 +4,17 @@ use Bitrix\Currency;
 
 Loc::loadMessages(__FILE__);
 
+
+/**
+ * <b>CCurrencyLang</b> - класс для работы с языкозависимыми параметрами валют (название, формат и пр.)
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/index.php
+ * @author Bitrix
+ */
 class CAllCurrencyLang
 {
 	const SEP_EMPTY = 'N';
@@ -38,7 +49,7 @@ class CAllCurrencyLang
 	* <p>Метод служит для возвращения после вызова метода <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/disableusehidezero.php">CurrencyLang::disableUseHideZero</a> в исходное состояние использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Метод статический.</p>
 	*
 	*
-	* @return mixed <p>Нет.</p></bo<br><br>
+	* @return mixed <p>Нет.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/enableusehidezero.php
@@ -56,7 +67,7 @@ class CAllCurrencyLang
 	* <p>Метод служит для временного отключения использования настройки <b>В публичной части не показывать незначащие нули в дробной части цены</b>. Для возвращения в исходное состояние необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/enableusehidezero.php">CCurrencyLang::enableUseHideZero</a>. Метод статический.</p>
 	*
 	*
-	* @return mixed <p>Нет.</p></bo<br><br>
+	* @return mixed <p>Нет.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/disableusehidezero.php
@@ -75,7 +86,7 @@ class CAllCurrencyLang
 	*
 	*
 	* @return bool <p>Если флаг снят, то метод возвращает <i>true</i>, в противном случае -
-	* <i>false</i>.</p> <br><br>
+	* <i>false</i>.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/isallowusehidezero.php
@@ -227,28 +238,29 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Метод добавляет новые языкозависимые параметры валюты. Метод динамичный.</p>
+	* <p>Метод добавляет новые языкозависимые параметры валюты. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  <p>Ассоциативный массив параметров валюты, ключами которого
 	* являются названия параметров, а значениями - значения
-	* параметров.</p> <p>Допустимые ключи: <br> CURRENCY - код валюты, для которой
-	* добавляются языкозависимые параметры (обязательно должен
-	* присутствовать); <br> LID - код языка (обязательный); <br> FORMAT_STRING -
-	* строка формата, в соответствии с которой выводится суммы в этой
-	* валюте на этом языке (обязательный); <br> FULL_NAME - полное название
-	* валюты; <br> DEC_POINT - символ, являющийся десятичной точкой при выводе
-	* сумм (обязательный); <br> THOUSANDS_SEP - разделитель тысяч при выводе; <br>
-	* DECIMALS - количество знаков после запятой при выводе (обязательный);
-	* <br> HIDE_ZERO - (Y|N) определяет скрывать или показывать незначащие нули
-	* в дробной части (результат будет виден только в публичной
-	* части).</p>
+	* параметров.</p>        	          <p>Допустимые ключи:            <br>          CURRENCY -
+	* код валюты, для которой добавляются языкозависимые параметры
+	* (обязательно должен присутствовать);            <br>          LID - код языка
+	* (обязательный);            <br>          FORMAT_STRING - строка формата, в
+	* соответствии с которой выводится суммы в этой валюте на этом
+	* языке (обязательный);           <br>          FULL_NAME - полное название валюты;  
+	*          <br>          DEC_POINT - символ, являющийся десятичной точкой при
+	* выводе сумм (обязательный);            <br>          THOUSANDS_SEP - разделитель
+	* тысяч при выводе;           <br>          DECIMALS - количество знаков после
+	* запятой при выводе (обязательный); <br> HIDE_ZERO - (Y|N) определяет
+	* скрывать или показывать незначащие нули в дробной части
+	* (результат будет виден только в публичной части).</p>
 	*
 	* @return bool <p>Возвращает значение True в случае успешного добавления и False - в
-	* противном случае </p> <a name="examples"></a>
+	* противном случае </p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arFields = array(<br>    "FORMAT_STRING" =&gt; "# руб", // символ # будет заменен<br>                                // реальной суммой при выводе<br>    "FULL_NAME" =&gt; "Рубль",<br>    "DEC_POINT" =&gt; ".",<br>    "THOUSANDS_SEP" =&gt; "\xA0",  // неразрывный пробел<br>    "DECIMALS" =&gt; 2,<br>    "CURRENCY" =&gt; "RUB",<br>    "LID" =&gt; "ru"<br>);<br><br>// Если запись существует, обновляем,<br>// иначе добавляем новую<br>$db_result_lang = CCurrencyLang::GetByID("RUB", "ru");<br>if ($db_result_lang)<br>    CCurrencyLang::Update("RUB", "ru", $arFields);<br>else<br>    CCurrencyLang::Add($arFields);<br>?&gt;
 	* </pre>
 	*
@@ -257,7 +269,7 @@ class CAllCurrencyLang
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__add.7ce2349e.php
 	* @author Bitrix
 	*/
-	static public function Add($arFields)
+	public static function Add($arFields)
 	{
 		global $DB;
 
@@ -276,7 +288,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Метод обновляет языкозависимые параметры валюты currency для языка lang. Метод динамичный.</p>
+	* <p>Метод обновляет языкозависимые параметры валюты currency для языка lang. Нестатический метод.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужно обновить.
@@ -286,20 +298,22 @@ class CAllCurrencyLang
 	*
 	* @param array $arFields  <p>Ассоциативный массив новых параметров валюты, ключами которого
 	* являются названия параметров, а значениями - значения
-	* параметров.</p> <p>Допустимые ключи: <br> CURRENCY - код валюты; <br> LID - код
-	* языка; <br> FORMAT_STRING - строка формата, в соответствии с которой
-	* выводится суммы в этой валюте на этом языке; <br> FULL_NAME - полное
-	* название валюты; <br> DEC_POINT - символ, являющийся десятичной точкой
-	* при выводе сумм; <br> THOUSANDS_SEP - разделитель тысяч при выводе; <br> DECIMALS
-	* - количество знаков после запятой при выводе; <br> HIDE_ZERO - (Y|N)
-	* определяет скрывать или показывать незначащие нули в дробной
-	* части (результат будет виден только в публичной части). </p>
+	* параметров.</p>        	          <p>Допустимые ключи:           <br>          CURRENCY -
+	* код валюты;           <br>          LID - код языка;           <br>          FORMAT_STRING -
+	* строка формата, в соответствии с которой выводится суммы в этой
+	* валюте на этом языке;           <br>          FULL_NAME - полное название валюты;  
+	*         <br>          DEC_POINT - символ, являющийся десятичной точкой при
+	* выводе сумм;            <br>          THOUSANDS_SEP - разделитель тысяч при выводе;  
+	*         <br>          DECIMALS - количество знаков после запятой при выводе;       
+	*    <br> HIDE_ZERO - (Y|N) определяет скрывать или показывать незначащие
+	* нули в дробной части (результат будет виден только в публичной
+	* части). </p>
 	*
 	* @return bool <p>Возвращает значение True в случае успешного добавления и False - в
-	* противном случае</p> <a name="examples"></a>
+	* противном случае</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arFields = array(<br>    "FORMAT_STRING" =&gt; "# руб", // символ # будет заменен<br>                                // реальной суммой при выводе<br>    "FULL_NAME" =&gt; "Рубль",<br>    "DEC_POINT" =&gt; ".",<br>    "THOUSANDS_SEP" =&gt; "\xA0",  // неразрывный пробел<br>    "DECIMALS" =&gt; 2,<br>    "CURRENCY" =&gt; "RUB",<br>    "LID" =&gt; "ru"<br>);<br><br>// Если запись существует, то обновляем, иначе добавляем новую<br>$db_result_lang = CCurrencyLang::GetByID("RUB", "ru");<br>if ($db_result_lang)<br>    CCurrencyLang::Update("RUB", "ru", $arFields);<br>else<br>    CCurrencyLang::Add($arFields);<br>?&gt;<br>
 	* </pre>
 	*
@@ -308,7 +322,7 @@ class CAllCurrencyLang
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__update.8a1e7a7b.php
 	* @author Bitrix
 	*/
-	static public function Update($currency, $lang, $arFields)
+	public static function Update($currency, $lang, $arFields)
 	{
 		global $DB;
 
@@ -334,7 +348,7 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Метод удаляет языкозависимые свойства валюты currency для языка lang. Метод динамичный.</p>
+	* <p>Метод удаляет языкозависимые свойства валюты currency для языка lang. Нестатический метод.</p>
 	*
 	*
 	* @param string $currency  Код валюты для удаления.
@@ -342,13 +356,13 @@ class CAllCurrencyLang
 	* @param string $lang  Код языка.
 	*
 	* @return bool <p>Метод возвращает True в случае успешного удаления и False - в
-	* противном случае.</p> <br><br>
+	* противном случае.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__delete.819c044d.php
 	* @author Bitrix
 	*/
-	static public function Delete($currency, $lang)
+	public static function Delete($currency, $lang)
 	{
 		global $DB;
 
@@ -367,26 +381,15 @@ class CAllCurrencyLang
 
 	
 	/**
-	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang. Метод динамичный.</p>
+	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang. Нестатический метод.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужны.
 	*
 	* @param string $lang  Код языка.
 	*
-	* @return array <p>Ассоциативный массив с ключами</p> <table width="100%" class="tnormal"><tbody> <tr> <th
-	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENC
-/**
- * <b>CCurrencyLang</b> - класс для работы с языкозависимыми параметрами валют (название, формат и пр.) 
- *
- *
- * @return mixed 
- *
- * @static
- * @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/index.php
- * @author Bitrix
- */
-Y</td> <td>Код валюты
+	* @return array <p>Ассоциативный массив с ключами</p><table width="100%" class="tnormal"><tbody> <tr> <th
+	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENCY</td> <td>Код валюты
 	* (трехсимвольный).</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr>
 	* <td>FORMAT_STRING</td> <td>Строка формата, в соответствии с которой выводится
 	* суммы в этой валюте на этом языке.</td> </tr> <tr> <td>FULL_NAME</td> <td>Полное
@@ -396,10 +399,10 @@ Y</td> <td>Код валюты
 	* знаков после запятой при выводе.</td> </tr> <tr> <td>HIDE_ZERO</td> <td>(Y|N)
 	* Определяет скрывать или показывать незначащие нули в дробной
 	* части (результат будет виден только в публичной части).</td> </tr>
-	* </tbody></table> <p></p><a name="examples"></a>
+	* </tbody></table><p></p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arFields = array(<br>    "FORMAT_STRING" =&gt; "# руб", // символ # будет заменен<br>                                // реальной суммой при выводе<br>    "FULL_NAME" =&gt; "Рубль",<br>    "DEC_POINT" =&gt; ".",<br>    "THOUSANDS_SEP" =&gt; "\xA0",  // неразрывный пробел<br>    "DECIMALS" =&gt; 2,<br>    "CURRENCY" =&gt; "RUB",<br>    "LID" =&gt; "ru"<br>);<br><br>// Если запись существует, то обновляем, иначе добавляем новую<br>$db_result_lang = CCurrencyLang::GetByID("RUB", "ru");<br>if ($db_result_lang)<br>    CCurrencyLang::Update("RUB", "ru", $arFields);<br>else<br>    CCurrencyLang::Add($arFields);<br>?&gt;
 	* </pre>
 	*
@@ -408,7 +411,7 @@ Y</td> <td>Код валюты
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php
 	* @author Bitrix
 	*/
-	static public function GetByID($currency, $lang)
+	public static function GetByID($currency, $lang)
 	{
 		global $DB;
 
@@ -428,28 +431,28 @@ Y</td> <td>Код валюты
 
 	
 	/**
-	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Метод аналогичен методу <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в методе CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов метода с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. Метод динамичный.</p>
+	* <p>Метод возвращает массив языкозависимых параметров валюты currency для языка lang.</p> <p>Метод аналогичен методу <a href="http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getbyid.9828270a.php">CCurrencyLang::GetByID</a>, за исключение того, что возвращаемый результат в методе CCurrencyLang::GetCurrencyFormat кешируется. Поэтому повторный вызов метода с теми же кодами валюты и языка в рамках одной страницы не приводит к дополнительному запросу к базе данных. Нестатический метод.</p>
 	*
 	*
 	* @param string $currency  Код валюты, языкозависимые параметры которой нужны.
 	*
 	* @param string $lang = LANGUAGE_ID Код языка. Необязательный параметр.
 	*
-	* @return array <p>Ассоциативный массив с ключами:</p> <table class="tnormal" width="100%"> <tr> <th
-	* width="20%">Ключ</th> <th>Описание</th> </tr> <tr> <td>CURRENCY</td> <td>Код валюты
-	* (трехсимвольный)</td> </tr> <tr> <td>LID</td> <td>Код языка.</td> </tr> <tr>
-	* <td>FORMAT_STRING</td> <td>Строка формата, в соответствии с которой выводится
-	* суммы в этой валюте на этом языке.</td> </tr> <tr> <td>FULL_NAME</td> <td>Полное
-	* название валюты.</td> </tr> <tr> <td>DEC_POINT</td> <td>Символ, являющийся
-	* десятичной точкой при выводе сумм.</td> </tr> <tr> <td>THOUSANDS_SEP</td>
-	* <td>Разделитель тысяч при выводе.</td> </tr> <tr> <td>DECIMALS</td> <td>Количество
-	* знаков после запятой при выводе.</td> </tr> <tr> <td>HIDE_ZERO</td> <td>(Y|N)
-	* Определяет скрывать или показывать незначащие нули в дробной
-	* части (результат будет виден только в публичной части).</td> </tr> </table>
-	* <p></p><a name="examples"></a>
+	* @return array <p>Ассоциативный массив с ключами:</p><table class="tnormal" width="100%"> <tr> <th
+	* width="20%">Ключ</th>     <th>Описание</th>   </tr> <tr> <td>CURRENCY</td>     <td>Код валюты
+	* (трехсимвольный)</td>   </tr> <tr> <td>LID</td>     <td>Код языка.</td> </tr> <tr>
+	* <td>FORMAT_STRING</td>     <td>Строка формата, в соответствии с которой
+	* выводится суммы в этой валюте на этом языке.</td> </tr> <tr> <td>FULL_NAME</td>    
+	* <td>Полное название валюты.</td> </tr> <tr> <td>DEC_POINT</td>     <td>Символ,
+	* являющийся десятичной точкой при выводе сумм.</td> </tr> <tr>
+	* <td>THOUSANDS_SEP</td>     <td>Разделитель тысяч при выводе.</td> </tr> <tr> <td>DECIMALS</td> 
+	*    <td>Количество знаков после запятой при выводе.</td> </tr> <tr>
+	* <td>HIDE_ZERO</td> <td>(Y|N) Определяет скрывать или показывать незначащие
+	* нули в дробной части (результат будет виден только в публичной
+	* части).</td> </tr> </table><p></p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function MyFormatCurrency($fSum, $strCurrency)
 	* {
@@ -496,8 +499,9 @@ Y</td> <td>Код валюты
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/ccurrencylang__getcurrencyformat.2a96359c.php
 	* @author Bitrix
 	*/
-	static public function GetCurrencyFormat($currency, $lang = LANGUAGE_ID)
+	public static function GetCurrencyFormat($currency, $lang = LANGUAGE_ID)
 	{
+		/** @global CStackCacheManager $stackCacheManager */
 		global $stackCacheManager;
 
 		if (defined("CURRENCY_SKIP_CACHE") && CURRENCY_SKIP_CACHE)
@@ -508,7 +512,7 @@ Y</td> <td>Код валюты
 		{
 			$cacheTime = CURRENCY_CACHE_DEFAULT_TIME;
 			if (defined("CURRENCY_CACHE_TIME"))
-				$cacheTime = intval(CURRENCY_CACHE_TIME);
+				$cacheTime = (int)CURRENCY_CACHE_TIME;
 
 			$strCacheKey = $currency."_".$lang;
 
@@ -528,16 +532,14 @@ Y</td> <td>Код валюты
 		return $arCurrencyLang;
 	}
 
-	static public function GetList(&$by, &$order, $currency = "")
+	public static function GetList(&$by, &$order, $currency = "")
 	{
 		global $DB;
 
 		$strSql = "select CURL.* from b_catalog_currency_lang CURL ";
 
 		if ('' != $currency)
-		{
 			$strSql .= "where CURL.CURRENCY = '".$DB->ForSql($currency, 3)."' ";
-		}
 
 		if (strtolower($by) == "currency") $strSqlOrder = " order by CURL.CURRENCY ";
 		elseif (strtolower($by) == "name") $strSqlOrder = " order by CURL.FULL_NAME ";
@@ -738,7 +740,7 @@ Y</td> <td>Код валюты
 	* Если задано <i>false</i>, то работает как <a
 	* href="http://dev.1c-bitrix.ru/api_help/currency/functions/currencyformatnumber.php">CurrencyFormatNumber</a>.
 	*
-	* @return string <p>Возвращает отформатированную строку.</p> <br><br>
+	* @return string <p>Возвращает отформатированную строку.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/currency/developer/ccurrencylang/currencyformat.php
@@ -748,7 +750,6 @@ Y</td> <td>Код валюты
 	{
 		static $eventExists = null;
 
-		$result = '';
 		$useTemplate = !!$useTemplate;
 		if ($useTemplate)
 		{
@@ -773,6 +774,7 @@ Y</td> <td>Код валюты
 		if ($currency === false)
 			return '';
 
+		$price = (float)$price;
 		$arCurFormat = (isset(self::$arCurrencyFormat[$currency]) ? self::$arCurrencyFormat[$currency] : self::GetFormatDescription($currency));
 		$intDecimals = $arCurFormat['DECIMALS'];
 		if (self::isAllowUseHideZero() && $arCurFormat['HIDE_ZERO'] == 'Y')
@@ -786,7 +788,7 @@ Y</td> <td>Код валюты
 
 		return (
 			$useTemplate
-			? str_replace('#', $price, $arCurFormat['FORMAT_STRING'])
+			? preg_replace('/(^|[^&])#/', '${1}'.$price, $arCurFormat['FORMAT_STRING'])
 			: $price
 		);
 	}
@@ -821,4 +823,3 @@ Y</td> <td>Код валюты
 class CCurrencyLang extends CAllCurrencyLang
 {
 }
-?>

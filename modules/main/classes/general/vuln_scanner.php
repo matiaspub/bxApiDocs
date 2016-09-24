@@ -1679,33 +1679,33 @@ class CVulnScanner
 
 class CQAACheckListTests
 {
-	static private function getFiles($path, $skip_preg, $filetypes, $doc_root)
+	static private function getFiles($path, $skip_preg, $file_types, $doc_root, &$files, &$dirs)
 	{
-		$arResult = Array();
 		$handle = opendir($path);
-		if($handle)
+		if ($handle)
 		{
-
-			while (false !== ($file = readdir($handle)))
+			while (($file = readdir($handle)) !== false)
 			{
-				if($file !== '.' && $file !== '..')
-				{
-					$name = $path.'/'.str_replace("\\", "/", $file);
+				if($file === '.' || $file === '..')
+					continue;
 
-					if(!preg_match($skip_preg, str_replace($doc_root, "", $name)))
-						if(is_dir($name))
-						{
-							$arResult = array_merge($arResult, self::getFiles($name, $skip_preg, $filetypes, $doc_root));
-						}
-						elseif(in_array(substr($name, -4), $filetypes))
-						{
-							$arResult[] = $name;
-						}
+				$name = $path.'/'.str_replace("\\", "/", $file);
+				if (preg_match($skip_preg, str_replace($doc_root, "", $name)))
+				{
+					continue;
+				}
+
+				if (is_dir($name))
+				{
+					$dirs[] = $name;
+				}
+				elseif(in_array(substr($name, -4), $file_types))
+				{
+					$files[] = $name;
 				}
 			}
 		}
 		closedir($handle);
-		return $arResult;
 	}
 
 	static private function defineScanParams()
@@ -2043,11 +2043,12 @@ class CQAACheckListTests
 				'ereg' => Array(Array(2), Array()),
 				'eregi' => Array(Array(2), Array()),
 				'sleep' => Array(Array(1), Array()),
+				// It's too difficult to validate, maybe in future versions
 				//'unserialize' => Array(Array(1), Array()),
 				//'extract' => Array(Array(1), Array()),
 				//'mb_parse_str' => Array(Array(1), Array()),
 				//'parse_str' => Array(Array(1), Array()),
-				'define' => Array(Array(1), Array())
+				//'define' => Array(Array(1), Array())
 			),
 			'POP' => Array(
 				'unserialize' => Array(Array(1), Array()),
@@ -2207,13 +2208,44 @@ class CQAACheckListTests
 			$NS = Array();
 
 			$NS['CUR_FILE_ID'] = 0;
-			$NS['FILE_LIST'] = self::getFiles($arScanParams['path'], $arScanParams['PREG_FOR_SKIP_SCAN'], $arScanParams['FILE_TYPES'], $arScanParams['path']);
+			$NS['FILE_LIST'] = array();
+			$NS['DIR_LIST'] = array();
+			self::getFiles(
+				$arScanParams['path'],
+				$arScanParams['PREG_FOR_SKIP_SCAN'],
+				$arScanParams['FILE_TYPES'],
+				$arScanParams['path'],
+				$NS['FILE_LIST'],
+				$NS['DIR_LIST']
+			);
 			$NS['VULN_COUNT'] = 0;
 			$NS['STUCK_FILE'] = -1;
 			$NS['MESSAGE'] = Array();
 		}
-		$result=true;
 
+		$time_end = $arScanParams['time_start'] + $arScanParams['time_out'];
+		while ($NS['DIR_LIST'] && $time_end > time())
+		{
+			$dir = array_shift($NS['DIR_LIST']);
+			self::getFiles(
+				$dir,
+				$arScanParams['PREG_FOR_SKIP_SCAN'],
+				$arScanParams['FILE_TYPES'],
+				$arScanParams['path'],
+				$NS['FILE_LIST'],
+				$NS['DIR_LIST']
+			);
+		}
+
+		if ($NS['DIR_LIST'])
+		{
+			return Array(
+				'IN_PROGRESS' => 'Y',
+				'PERCENT' => 0,
+			);
+		}
+
+		$result=true;
 		do
 		{
 			if(is_file($file = $NS['FILE_LIST'][$NS['CUR_FILE_ID']]))

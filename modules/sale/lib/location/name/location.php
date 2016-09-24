@@ -26,7 +26,7 @@ class LocationTable extends NameEntity
 		return 'b_sale_loc_name';
 	}
 
-	public static function add($data = array())
+	public static function add(array $data)
 	{
 		if(strlen($data['NAME']))
 			$data['NAME_UPPER'] = ToUpper($data['NAME']); // bitrix to upper
@@ -34,7 +34,7 @@ class LocationTable extends NameEntity
 		return parent::add($data);
 	}
 
-	public static function update($primary, $data = array())
+	public static function update($primary, array $data)
 	{
 		if(strlen($data['NAME']))
 			$data['NAME_UPPER'] = ToUpper($data['NAME']); // bitrix to upper

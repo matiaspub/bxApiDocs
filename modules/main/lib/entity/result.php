@@ -26,6 +26,19 @@ class Result extends \Bitrix\Main\Result
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает статус результата. В ядре и событиях должен вызываться с флагом <code>internalCall</code>.</p>
+	*
+	*
+	* @param boolean $internalCall = false 
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/result/issuccess.php
+	* @author Bitrix
+	*/
 	public function isSuccess($internalCall = false)
 	{
 		if (!$internalCall && !$this->wereErrorsChecked)
@@ -41,6 +54,17 @@ class Result extends \Bitrix\Main\Result
 	 *
 	 * @return EntityError[]|FieldError[]
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив объектов <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/error/index.php">\Main\Error</a>.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/result/geterrors.php
+	* @author Bitrix
+	*/
 	public function getErrors()
 	{
 		$this->wereErrorsChecked = true;
@@ -53,6 +77,17 @@ class Result extends \Bitrix\Main\Result
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив строк с сообщениями об ошибках.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/result/geterrormessages.php
+	* @author Bitrix
+	*/
 	public function getErrorMessages()
 	{
 		$this->wereErrorsChecked = true;

@@ -14,7 +14,7 @@ Loc::loadMessages(__FILE__);
  * <li> LANGUAGE_ID char(2) mandatory
  * <li> NAME string(100) mandatory
  * <li> SECTIONS_NAME string(100) optional
- * <li> ELEMENTS_NAME string(100) mandatory
+ * <li> ELEMENTS_NAME string(100) optional
  * <li> LANGUAGE reference to {@link \Bitrix\Main\Localization\LanguageTable}
  * </ul>
  *
@@ -27,6 +27,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает путь к файлу, содержащему определение класса. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/getfilepath.php
+	* @author Bitrix
+	*/
 	public static function getFilePath()
 	{
 		return __FILE__;
@@ -37,6 +48,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы языковых параметров типов инфоблоков в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_iblock_type_lang';
@@ -47,6 +69,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает список полей для таблицы языковых параметров типов инфоблоков. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -77,7 +110,6 @@ class TypeLanguageTable extends Entity\DataManager
 			),
 			'ELEMENTS_NAME' => array(
 				'data_type' => 'string',
-				'required' => true,
 				'column_name' => 'ELEMENT_NAME',
 				'validation' => array(__CLASS__, 'validateElementsName'),
 				'title' => Loc::getMessage('IBLOCK_TYPE_LANG_ENTITY_ELEMENT_NAME_FIELD'),
@@ -94,6 +126,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>IBLOCK_TYPE_ID</code> (идентификатор типа инфоблоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/validateiblocktypeid.php
+	* @author Bitrix
+	*/
 	public static function validateIblockTypeId()
 	{
 		return array(
@@ -106,6 +149,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>LANGUAGE_ID</code> (код языка параметров). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/validatelanguageid.php
+	* @author Bitrix
+	*/
 	public static function validateLanguageId()
 	{
 		return array(
@@ -118,6 +172,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>NAME</code> (название типа информационных блоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/validatename.php
+	* @author Bitrix
+	*/
 	public static function validateName()
 	{
 		return array(
@@ -130,6 +195,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>SECTIONS_NAME</code> (название разделов информационных блоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/validatesectionsname.php
+	* @author Bitrix
+	*/
 	public static function validateSectionsName()
 	{
 		return array(
@@ -142,6 +218,17 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает валидатор для поля <code>ELEMENTS_NAME</code> (название элементов информационных блоков). Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/validateelementsname.php
+	* @author Bitrix
+	*/
 	public static function validateElementsName()
 	{
 		return array(
@@ -157,6 +244,19 @@ class TypeLanguageTable extends Entity\DataManager
 	 *
 	 * @return \Bitrix\Main\Entity\EventResult
 	 */
+	
+	/**
+	* <p>Метод удаляет языковые сообщения для типа инфоблоков из базы данных. Метод статический.</p>
+	*
+	*
+	* @param string $iblockTypeId  Идентификатор типа инфоблоков.
+	*
+	* @return \Bitrix\Main\Entity\EventResult 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/typelanguagetable/deletebyiblocktypeid.php
+	* @author Bitrix
+	*/
 	public static function deleteByIblockTypeId($iblockTypeId)
 	{
 		$connection = \Bitrix\Main\Application::getConnection();

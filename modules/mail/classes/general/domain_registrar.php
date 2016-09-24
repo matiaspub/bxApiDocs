@@ -95,6 +95,42 @@ class CMailDomainRegistrar
 		return null;
 	}
 
+	public static function checkDomain($user, $password, $domain, &$error)
+	{
+		$domain = CharsetConverter::convertCharset($domain, SITE_CHARSET, 'UTF-8');
+
+		$result = CMailRegru::checkDomainInfo($user, $password, $domain, $error);
+
+		if ($result !== false)
+		{
+			if (isset($result['dname']) && strtolower($result['dname']) == strtolower($domain))
+				return $result;
+			else
+				$error = 'unknown';
+		}
+
+		$error = self::getErrorCode($result['error_code']);
+		return null;
+	}
+
+	public static function renewDomain($user, $password, $domain, &$error)
+	{
+		$domain = CharsetConverter::convertCharset($domain, SITE_CHARSET, 'UTF-8');
+
+		$result = CMailRegru::renewDomain($user, $password, $domain, array('period' => 1), $error);
+
+		if ($result !== false)
+		{
+			if (isset($result['dname']) && strtolower($result['dname']) == strtolower($domain))
+				return true;
+			else
+				$error = 'unknown';
+		}
+
+		$error = self::getErrorCode($result['error_code']);
+		return null;
+	}
+
 	public static function updateDns($user, $password, $domain, $params, &$error)
 	{
 		foreach ($params as &$record)
@@ -134,6 +170,32 @@ class CMailDomainRegistrar
 			{
 				$error = 'unknown';
 			}
+		}
+
+		$error = self::getErrorCode($result['error_code']);
+		return null;
+	}
+
+	public static function getDomainsList($user, $password, $filter = array(), &$error)
+	{
+		$result = CMailRegru::getDomainsList($user, $password, $error);
+
+		if ($result !== false)
+		{
+			$list = array();
+			foreach ($result as $domain)
+			{
+				if (!empty($domain['dname']))
+				{
+					$list[$domain['dname']] = array(
+						'creation_date'   => $domain['creation_date'],
+						'expiration_date' => $domain['expiration_date'],
+						'status'          => $domain['state'],
+					);
+				}
+			}
+
+			return $list;
 		}
 
 		$error = self::getErrorCode($result['error_code']);

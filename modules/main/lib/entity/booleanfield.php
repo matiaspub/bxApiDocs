@@ -41,6 +41,23 @@ class BooleanField extends ScalarField
 	 * @param boolean|integer|string $value
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод конвертирует значения <i>true/false</i> в актуальные значения полей.</p>
+	*
+	*
+	* @param mixed $boolean  
+	*
+	* @param boolea $integer  
+	*
+	* @param string $value  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/booleanfield/normalizevalue.php
+	* @author Bitrix
+	*/
 	public function normalizeValue($value)
 	{
 		if (

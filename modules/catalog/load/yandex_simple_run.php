@@ -24,9 +24,11 @@ if (!CCatalog::IsUserExists())
 }
 
 CCatalogDiscountSave::Disable();
+/** @noinspection PhpDeprecationInspection */
 CCatalogDiscountCoupon::ClearCoupon();
 if ($USER->IsAuthorized())
 {
+	/** @noinspection PhpDeprecationInspection */
 	CCatalogDiscountCoupon::ClearCouponsByManage($USER->GetID());
 }
 
@@ -108,13 +110,14 @@ if ($strExportErrorMessage == '')
 	fwrite($fp, '<? header("Content-Type: text/xml; charset=windows-1251");?>');
 	fwrite($fp, '<? echo "<"."?xml version=\"1.0\" encoding=\"windows-1251\"?".">"?>');
 	fwrite($fp, "\n<!DOCTYPE yml_catalog SYSTEM \"shops.dtd\">\n");
-	fwrite($fp, "<yml_catalog date=\"".Date("Y-m-d H:i")."\">\n");
+	fwrite($fp, "<yml_catalog date=\"".date("Y-m-d H:i")."\">\n");
 	fwrite($fp, "<shop>\n");
 	fwrite($fp, "<name>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</name>\n");
 	fwrite($fp, "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n");
 	fwrite($fp, "<url>".$usedProtocol.htmlspecialcharsbx(strlen($SETUP_SERVER_NAME) > 0 ? $SETUP_SERVER_NAME : COption::GetOptionString("main", "server_name", ""))."</url>\n");
 	fwrite($fp, "<platform>1C-Bitrix</platform>\n");
 
+	$BASE_CURRENCY = Currency\CurrencyManager::getBaseCurrency();
 	$RUR = 'RUB';
 	$currencyIterator = Currency\CurrencyTable::getList(array(
 		'select' => array('CURRENCY'),
@@ -124,10 +127,10 @@ if ($strExportErrorMessage == '')
 		$RUR = 'RUR';
 	unset($currency, $currencyIterator);
 
-	$allowedCurrency = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'KZT');
+	$allowedCurrency = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'BYN', 'KZT');
 	$strTmp = "<currencies>\n";
 	$currencyIterator = Currency\CurrencyTable::getList(array(
-		'select' => array('CURRENCY'),
+		'select' => array('CURRENCY', 'SORT'),
 		'filter' => array('@CURRENCY' => $allowedCurrency),
 		'order' => array('SORT' => 'ASC', 'CURRENCY' => 'ASC')
 	));
@@ -142,17 +145,10 @@ if ($strExportErrorMessage == '')
 
 	//*****************************************//
 
-	$arSelect = array("ID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "DETAIL_PAGE_URL", 'CATALOG_AVAILABLE');
-	$db_res = CCatalogGroup::GetGroupsList(array("GROUP_ID" => 2));
-	$arPTypes = array();
-	while ($ar_res = $db_res->Fetch())
-	{
-		if (!in_array($ar_res["CATALOG_GROUP_ID"], $arPTypes))
-		{
-			$arPTypes[] = $ar_res["CATALOG_GROUP_ID"];
-			$arSelect[] = "CATALOG_GROUP_".$ar_res["CATALOG_GROUP_ID"];
-		}
-	}
+	$arSelect = array(
+		"ID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE",
+		"DETAIL_PICTURE", "DETAIL_PAGE_URL", 'CATALOG_AVAILABLE'
+	);
 
 	$strTmpCat = "";
 	$strTmpOff = "";
@@ -179,6 +175,28 @@ if ($strExportErrorMessage == '')
 
 			$yvalue = (int)$yvalue;
 			if ($yvalue <= 0)
+				continue;
+
+			$arIBlock = CIBlock::GetArrayByID($yvalue);
+			if (empty($arIBlock) || !is_array($arIBlock))
+				continue;
+			if ('Y' != $arIBlock['ACTIVE'])
+				continue;
+			$boolRights = false;
+			if ('E' != $arIBlock['RIGHTS_MODE'])
+			{
+				$arRights = CIBlock::GetGroupPermissions($yvalue);
+				if (!empty($arRights) && isset($arRights[2]) && 'R' <= $arRights[2])
+					$boolRights = true;
+			}
+			else
+			{
+				$obRights = new CIBlockRights($yvalue);
+				$arRights = $obRights->GetGroups(array('section_read', 'element_read'));
+				if (!empty($arRights) && in_array('G2',$arRights))
+					$boolRights = true;
+			}
+			if (!$boolRights)
 				continue;
 
 			$filter = array("IBLOCK_ID" => $yvalue, "ACTIVE" => "Y", "IBLOCK_ACTIVE" => "Y", "GLOBAL_ACTIVE" => "Y");
@@ -234,26 +252,21 @@ if ($strExportErrorMessage == '')
 				$str_AVAILABLE = ($arAcc['CATALOG_AVAILABLE'] == 'Y' ? ' available="true"' : ' available="false"');
 
 				$minPrice = 0;
-				$minPriceRUR = 0;
-				$minPriceGroup = 0;
 				$minPriceCurrency = "";
-				for ($i = 0, $intCount = count($arPTypes); $i < $intCount; $i++)
+				if ($arPrice = CCatalogProduct::GetOptimalPrice(
+					$arAcc['ID'],
+					1,
+					array(2), // anonymous
+					'N',
+					array(),
+					$arIBlock['LID'],
+					array()
+				))
 				{
-					if (strlen($arAcc["CATALOG_CURRENCY_".$arPTypes[$i]])<=0) continue;
-
-					$tmpPrice = CCurrencyRates::ConvertCurrency($arAcc["CATALOG_PRICE_".$arPTypes[$i]], $arAcc["CATALOG_CURRENCY_".$arPTypes[$i]], $RUR);
-					if ($minPriceRUR<=0 || $minPriceRUR>$tmpPrice)
-					{
-						$minPriceRUR = $tmpPrice;
-						$minPrice = $arAcc["CATALOG_PRICE_".$arPTypes[$i]];
-						$minPriceGroup = $arPTypes[$i];
-						$minPriceCurrency = $arAcc["CATALOG_CURRENCY_".$arPTypes[$i]];
-						if ($minPriceCurrency!="USD" && $minPriceCurrency!=$RUR)
-						{
-							$minPriceCurrency = $RUR;
-							$minPrice = $tmpPrice;
-						}
-					}
+					$minPrice = $arPrice['DISCOUNT_PRICE'];
+					if ($BASE_CURRENCY != $RUR)
+						$minPrice = CCurrencyRates::ConvertCurrency($minPrice, $BASE_CURRENCY, $RUR);
+					$minPriceCurrency = $RUR;
 				}
 
 				if ($minPrice <= 0) continue;

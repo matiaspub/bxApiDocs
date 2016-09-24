@@ -22,6 +22,19 @@ class CodeTree
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает php-код.</p>
+	*
+	*
+	* @param integer $level  Уровень выравнивания.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/perfmon/php/codetree/getcode.php
+	* @author Bitrix
+	*/
 	public function getCode($level)
 	{
 		$tree = $this->getCodeTree();

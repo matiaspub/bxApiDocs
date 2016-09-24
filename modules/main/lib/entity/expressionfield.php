@@ -79,6 +79,29 @@ class ExpressionField extends Field
 	 * @param array|string|null $buildFrom
 	 * @param array             $parameters
 	 */
+	
+	/**
+	* <p>Нестатический метод вызывается при создании экземпляра класса и позволяет в нем произвести  при создании объекта какие-то действия. Все поля в выражении следует указывать как проценты (или как другой плейсхолдер для <a href="http://www.php.su/sprintf" >sprintf</a>), и реальное имя поля должны храниться в <code>$buildFrom array (= args for sprintf)</code>.</p>
+	*
+	*
+	* @param string $name  
+	*
+	* @param string $expression  
+	*
+	* @param string $array  
+	*
+	* @param arra $string  
+	*
+	* @param null $buildFrom = null 
+	*
+	* @param array $parameters = array() 
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/entity/expressionfield/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($name, $expression, $buildFrom = null, $parameters = array())
 	{
 		if (!isset($parameters['data_type']))
@@ -313,6 +336,14 @@ class ExpressionField extends Field
 	public function getDataType()
 	{
 		return $this->valueField->getDataType();
+	}
+
+	/**
+	 * @return ScalarField
+	 */
+	public function getValueField()
+	{
+		return $this->valueField;
 	}
 
 	public function __clone()

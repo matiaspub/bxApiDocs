@@ -23,6 +23,23 @@ class Logger
 	 * Constructor
 	 * @param int $logLevel Log level..
 	 */
+	
+	/**
+	* <p>Создает объект данного типа. Метод нестатический.</p>
+	*
+	*
+	* @param integer $logLevel = self::LOG_LEVEL_ERROR Степень детализации записей в лог. Доступные значения: <ol> <li>
+	* <code>const LOG_LEVEL_DISABLE = 0;</code> - журнал не ведется;</li> <li> <code>const LOG_LEVEL_ERROR =
+	* 10;</code> - логируются только ошибки;</li> <li> <code>const LOG_LEVEL_INFO = 20;</code> -
+	* минимум записей в лог;</li> <li> <code>const LOG_LEVEL_DEBUG = 30;</code> - логируется
+	* максимум информации.</li> </ol>
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/logger/__construct.php
+	* @author Bitrix
+	*/
 	public function __construct($logLevel = self::LOG_LEVEL_ERROR)
 	{
 		$this->setLevel($logLevel);
@@ -66,6 +83,23 @@ class Logger
 	 * Sets log level
 	 * @param int $logLevel Log level.
 	 */
+	
+	/**
+	* <p>Устанавливает степень детализации записей в лог. Метод нестатический.</p>
+	*
+	*
+	* @param integer $logLevel  Степень детализации записей в лог. Доступные значения:<ol> <li>
+	* <code>const LOG_LEVEL_DISABLE = 0;</code> - журнал не ведется;</li> <li> <code>const LOG_LEVEL_ERROR =
+	* 10;</code> - логируются только ошибки;</li> <li> <code>const LOG_LEVEL_INFO = 20;</code> -
+	* минимум записей в лог;</li> <li> <code>const LOG_LEVEL_DEBUG = 30;</code> - логируется
+	* максимум информации.</li> </ol>
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/sale/tradingplatform/logger/setlevel.php
+	* @author Bitrix
+	*/
 	public function setLevel($logLevel)
 	{
 		$this->logLevel = $logLevel;

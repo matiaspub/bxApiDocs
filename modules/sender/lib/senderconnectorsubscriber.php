@@ -31,7 +31,7 @@ class SenderConnectorSubscriber extends \Bitrix\Sender\Connector
 	{
 		$mailingId = $this->getFieldValue('MAILING_ID', 0);
 
-		$mailingDb = MailingSubscriptionTable::getList(array(
+		$mailingDb = MailingSubscriptionTable::getSubscriptionList(array(
 			'select' => array('NAME' => 'CONTACT.NAME', 'EMAIL' => 'CONTACT.EMAIL', 'USER_ID' => 'CONTACT.USER_ID'),
 			'filter' => array(
 				'MAILING_ID' => $mailingId,

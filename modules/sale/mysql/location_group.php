@@ -18,34 +18,34 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 {
 	
 	/**
-	* <p>Метод возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder. Метод динамичный.</p>
+	* <p>Метод возвращает набор групп местоположений, удовлетворяющих фильтру arFilter. Группы отсортированы в соответствии с массивом arOrder. Нестатический метод.</p>
 	*
 	*
 	* @param array $arOrder = Array("NAME"=>"ASC") Ассоциативный массив для указания сортировки результирующего
 	* набора групп. Каждая пара ключ-значение массива применяется
 	* последовательно. Ключами являются названия полей для сортировки,
 	* а значениями - направления сортировки.<br><br> Допустимые ключи: <ul>
-	* <li> <b>ID</b> - код группы местоположений;</li> <li> <b>NAME</b> - название
-	* группы;</li> <li> <b>SORT</b> - индекс сортировки.</li> </ul> Допустимые
-	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> <li> <b>DESC</b> - по
+	* <li> <b>ID</b> - код группы местоположений;</li> 	<li> <b>NAME</b> - название
+	* группы;</li> 	<li> <b>SORT</b> - индекс сортировки.</li> </ul> Допустимые
+	* значения: <ul> <li> <b>ASC</b> - по возрастанию;</li> 	<li> <b>DESC</b> - по
 	* убыванию.</li> </ul>
 	*
 	* @param array $arFilter = Array() Фильтр представляет собой ассоциативный массив, в котором
 	* ключами являются названия параметров группы, а значениями -
-	* условия на значения<br><br> Допустимые ключи: <ul> <li> <b>ID</b> - код группы
-	* местоположения.</li> </ul>
+	* условия на значения<br><br> 	  Допустимые ключи: <ul> <li> <b>ID</b> - код
+	* группы местоположения.</li> </ul>
 	*
 	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
 	* текущему языку.
 	*
 	* @return CDBResult <p>Возвращается объект класса CDBResult, содержащий ассоциативные
-	* массивы с ключами:</p> <table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>
-	* <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код группы местоположений.</td> </tr> <tr>
-	* <td>SORT</td> <td>Индекс сортировки.</td> </tr> <tr> <td>NAME</td> <td>Название
-	* группы.</td> </tr> <tr> <td>LID</td> <td>Язык названия.</td> </tr> </table> <a name="examples"></a>
+	* массивы с ключами:</p><table class="tnormal" width="100%"> <tr> <th width="15%">Ключ</th>    
+	* <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код группы местоположений.</td> </tr>
+	* <tr> <td>SORT</td>     <td>Индекс сортировки.</td> </tr> <tr> <td>NAME</td>     <td>Название
+	* группы.</td> </tr> <tr> <td>LID</td>     <td>Язык названия.</td> </tr> </table><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;select name="LOCATION2" size="5" multiple&gt;
 	*    &lt;?
 	*    $db_vars = CSaleLocationGroup::GetList(Array("NAME"=&gt;"ASC"), array(), LANGUAGE_ID);
@@ -176,19 +176,19 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Метод возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang. Метод динамичный. </p>
+	* <p>Метод возвращает параметры группы местоположений с кодом ID. Языкозависимые параметры возвращаются для языка с кодом strLang. Нестатический метод. </p>
 	*
 	*
-	* @param int $ID  Код группы местоположений.
+	* @param mixed $intID  Код группы местоположений.
 	*
 	* @param string $strLang = LANGUAGE_ID Код языка для языкозависимых параметров. По умолчанию равен
 	* текущему языку.
 	*
-	* @return array <p>Возвращается ассоциативный массив с ключами:</p> <table class="tnormal"
-	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	* группы местоположений.</td> </tr> <tr> <td>SORT</td> <td>Индекс сортировки.</td>
-	* </tr> <tr> <td>NAME</td> <td>Название группы.</td> </tr> <tr> <td>LID</td> <td>Язык
-	* названия.</td> </tr> </table> <br><br>
+	* @return array <p>Возвращается ассоциативный массив с ключами:</p><table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Ключ</th>     <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код
+	* группы местоположений.</td> </tr> <tr> <td>SORT</td>     <td>Индекс сортировки.</td>
+	* </tr> <tr> <td>NAME</td>     <td>Название группы.</td> </tr> <tr> <td>LID</td>     <td>Язык
+	* названия.</td> </tr> </table><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/sale/classes/csalelocationgroup/csalelocationgroup__getbyid.33dc4ad9.php
@@ -215,22 +215,22 @@ class CSaleLocationGroup extends CAllSaleLocationGroup
 
 	
 	/**
-	* <p>Метод добавляет новую группу местоположений с параметрами из массива arFields. Метод динамичный.</p>
+	* <p>Метод добавляет новую группу местоположений с параметрами из массива arFields. Нестатический метод.</p>
 	*
 	*
 	* @param array $arFields  Массив значений параметров группы местоположений, ключами в
 	* котором являются имена параметров.<br><br> Допустимые ключи: <ul> <li>
-	* <b>SORT</b> - индекс сортировки;</li> <li> <b>LOCATION_ID</b> - массив кодов
-	* местоположений, которые входят в эту группу;</li> <li> <b>LANG</b> - массив
+	* <b>SORT</b> - индекс сортировки;</li> 	<li> <b>LOCATION_ID</b> - массив кодов
+	* местоположений, которые входят в эту группу;</li> 	<li> <b>LANG</b> - массив
 	* языкозависимых параметров группы, каждый элемент которого имеет
-	* вид <pre class="syntax"> array("LID"=&gt;"язык параметров", "NAME"=&gt;"Название
+	* вид <pre class="syntax"> array("LID"=&gt;"язык параметров",       "NAME"=&gt;"Название
 	* группы")</pre> </li> </ul>
 	*
 	* @return int <p>Возвращается код добавленной группы или <i>false</i> в случае
-	* ошибки.</p> <a name="examples"></a>
+	* ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = array(
 	*    "SORT" =&gt; 150,

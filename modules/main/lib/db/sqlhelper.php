@@ -19,20 +19,42 @@ abstract class SqlHelper
 	}
 
 	/**
-	 * Identificator escaping - left char
+	 * Returns an identificator escaping left character.
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод. Экранирование идентификаторов - левый символ</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getleftquote.php
+	* @author Bitrix
+	*/
 	static public function getLeftQuote()
 	{
 		return '';
 	}
 
 	/**
-	 * Identificator escaping - left char
+	 * Returns an identificator escaping right character.
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод. Экранирование идентификатора - правый символ</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getrightquote.php
+	* @author Bitrix
+	*/
 	static public function getRightQuote()
 	{
 		return '';
@@ -43,6 +65,17 @@ abstract class SqlHelper
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает значение максимальной длины алиаса в выбранном операторе.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getaliaslength.php
+	* @author Bitrix
+	*/
 	abstract public function getAliasLength();
 
 	/**
@@ -59,6 +92,27 @@ abstract class SqlHelper
 	 * @see \Bitrix\Main\DB\SqlHelper::getLeftQuote
 	 * @see \Bitrix\Main\DB\SqlHelper::getRightQuote
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает идентификатор в кавычках.</p> <p>Например, Title станет:<br> `Title` для MySQL<br> "TITLE" для Oracle<br> [Title] для Ms SQL </p>
+	*
+	*
+	* @param string $identifier  Название таблицы или колонки.
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getleftquote.php">\Bitrix\Main\DB\SqlHelper::getLeftQuote</a></li>
+	* <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getrightquote.php">\Bitrix\Main\DB\SqlHelper::getRightQuote</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/quote.php
+	* @author Bitrix
+	*/
 	public function quote($identifier)
 	{
 		// security unshielding
@@ -79,6 +133,17 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает специальный разделитель запроса для пакетной обработки.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getquerydelimiter.php
+	* @author Bitrix
+	*/
 	abstract public function getQueryDelimiter();
 
 	/**
@@ -89,6 +154,21 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод выводит специальные символы в строке для использования в SQL операторе.</p>
+	*
+	*
+	* @param string $value  Значение для вывода
+	*
+	* @param integer $maxLength  Лимит длины строки, если существует.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/forsql.php
+	* @author Bitrix
+	*/
 	abstract public function forSql($value, $maxLength = 0);
 
 	/**
@@ -96,6 +176,17 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для получения текущей даты и времени.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getcurrentdatetimefunction.php
+	* @author Bitrix
+	*/
 	abstract public function getCurrentDateTimeFunction();
 
 	/**
@@ -103,6 +194,17 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для получения даты без времени.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getcurrentdatefunction.php
+	* @author Bitrix
+	*/
 	abstract public function getCurrentDateFunction();
 
 	/**
@@ -117,6 +219,21 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для добавления секунд к интервалу, указанному в параметре <code>$from</code>. Если значение параметра <code>$from</code> равно нулю или прошло, то используется текущее время.</p> <p>Параметры метода не будут приведены к SQL безопасному виду.</p>
+	*
+	*
+	* @param integer $seconds  Сколько секунд нужно добавить.
+	*
+	* @param integer $from = null Дата и время базы данных.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/addsecondstodatetime.php
+	* @author Bitrix
+	*/
 	abstract public function addSecondsToDateTime($seconds, $from = null);
 
 	/**
@@ -128,6 +245,19 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию передающую значение <code>$value</code> в тип <code>Дата/Время</code> базы данных.</p> <p>Параметр <code>$value</code> не приводится к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $value  Поле и оператор базы данных для передачи.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getdatetimetodatefunction.php
+	* @author Bitrix
+	*/
 	abstract public function getDatetimeToDateFunction($value);
 
 	/**
@@ -141,10 +271,10 @@ abstract class SqlHelper
 	 * - M      A short textual representation of a month, three letters
 	 * - DD     Day of the month, 2 digits with leading zeros
 	 * - HH     24-hour format of an hour with leading zeros
-	 * - H      12-hour format of an hour with leading zeros
-	 * - GG     24-hour format of an hour with leading zeros
-	 * - G      12-hour format of an hour with leading zeros
-	 * - SS     Minutes with leading zeros
+	 * - H      24-hour format of an hour without leading zeros
+	 * - GG     12-hour format of an hour with leading zeros
+	 * - G      12-hour format of an hour without leading zeros
+	 * - SS     Seconds with leading zeros
 	 * - TT     AM or PM
 	 * - T      AM or PM
 	 * <p>
@@ -155,6 +285,21 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает оператор Базы данных для конвертации значения <code>$field</code> в соответствии с значением <code>$format</code>.</p> <p>Будут конвертированы:</p> <ul> <li>YYYY - Полное числовое представление года, 4 цифры.</li> <li>MMMM - Полное текстовое представление месяца, например: Январь или Март.</li>  <li>MM Числовое представление месяца с ведущим нулём.</li>  <li>MI - Минуты с начального нуля.</li> <li>M - короткое текстовое представление месяца, три буквы.</li>  <li>DD - День месяца, две цифры с ведущим нулём.</li>  <li>HH - 24-ичасовой формат времени часов с ведущим нулём.</li> <li>H - 24-ичасовой формат часов без ведущего нуля.</li>  <li>GG - 12-ичасовой формат с ведущим нулём.</li>  <li>G - 12-ичасовой формат без ведущего нуля.</li> <li>SS - Минуты с ведущим нулём.</li>  <li>TT - AM или PM</li>  <li>T - am/pm.</li>  </ul> <p>Параметр <code>$field</code> не приводится к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $format  Формат.
+	*
+	* @param string $field = null Область базы данных или выражение.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/formatdate.php
+	* @author Bitrix
+	*/
 	abstract public function formatDate($format, $field = null);
 
 	/**
@@ -171,6 +316,23 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для получения части строки.</p> <p>Если длина равна нулю или пустая, то будет возвращена строка от начала и до конца.</p> <p>Параметры <code>$str</code> и <code>$from</code> не приводятся к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $str  Поле или оператор базы данных.
+	*
+	* @param integer $from  Стартовая позиция.
+	*
+	* @param integer $length = null Максимальная длина.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getsubstrfunction.php
+	* @author Bitrix
+	*/
 	static public function getSubstrFunction($str, $from, $length = null)
 	{
 		$sql = 'SUBSTR('.$str.', '.$from;
@@ -190,6 +352,19 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для конкатенации полей и операторов базы данных.</p> <p>Параметры не сводятся к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $field  Поля и операторы базы данных.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getconcatfunction.php
+	* @author Bitrix
+	*/
 	abstract public function getConcatFunction();
 
 	/**
@@ -203,6 +378,22 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для проверки полей и операторов базы данных на значение <i>NULL</i>. Если равно <i>NULL</i>, то будет возвращён <code>$result</code>.</p> <p></p> <p>Все параметры не приводятся к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $expression  Поле или оператор базы данных для проверки на <i>NULL</i>.
+	*
+	* @param string $result  Поле или оператор базы данных, которые будут возвращены если
+	* <code>$expression</code> будет равно <i>NULL</i>.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getisnullfunction.php
+	* @author Bitrix
+	*/
 	abstract public function getIsNullFunction($expression, $result);
 
 	/**
@@ -214,6 +405,19 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для получения длины поля или оператора базы данных.</p> <p>Параметр <code>$field</code> не приводится к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $field  Поле или оператор базы данных.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getlengthfunction.php
+	* @author Bitrix
+	*/
 	abstract public function getLengthFunction($field);
 
 	/**
@@ -227,6 +431,25 @@ abstract class SqlHelper
 	 * @return string
 	 * @see \Bitrix\Main\DB\MssqlSqlHelper::formatDate
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для конвертации строкового значения в тип <code>Дата/время</code>.</p> <p>Значение параметра <code>$value</code> не приводится к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $value  Строка в формате YYYY-MM-DD HH:MI:SS.
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlsqlhelper/formatdate.php">\Bitrix\Main\DB\MssqlSqlHelper::formatDate</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getchartodatefunction.php
+	* @author Bitrix
+	*/
 	abstract public function getCharToDateFunction($value);
 
 	/**
@@ -241,7 +464,59 @@ abstract class SqlHelper
 	 * @return string
 	 * @see \Bitrix\Main\DB\MssqlSqlHelper::formatDate
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает sql-функцию для конвертации полей и операторов базы данных в строку.</p> <p>Результирующая строка будет в формате: YYYY-MM-DD HH:MI:SS.</p> <p>Параметр <code>$fieldName</code> не приводится к SQL безопасному виду.</p>
+	*
+	*
+	* @param string $fieldName  Поле или оператор базы данных.
+	*
+	* @return string 
+	*
+	* <h4>See Also</h4> 
+	* <ul> <li><a
+	* href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mssqlsqlhelper/formatdate.php">\Bitrix\Main\DB\MssqlSqlHelper::formatDate</a></li>
+	* </ul><a name="example"></a>
+	*
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getdatetocharfunction.php
+	* @author Bitrix
+	*/
 	abstract public function getDateToCharFunction($fieldName);
+
+	/**
+	 * Returns CAST expression for converting field or expression into string
+	 *
+	 * @param string $fieldName
+	 *
+	 * @return string
+	 */
+	
+	/**
+	* <p>Нестатический метод возвращает CAST выражение для конвертируемого поля или строчного выражения.</p>
+	*
+	*
+	* @param string $fieldName  Имя поля
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/casttochar.php
+	* @author Bitrix
+	*/
+	abstract public function castToChar($fieldName);
+
+	/**
+	 * Returns expression for text field being used in group or order
+	 * @see \Bitrix\Main\Entity\Query::buildGroup
+	 * @see \Bitrix\Main\Entity\Query::buildOrder
+	 *
+	 * @param string $fieldName
+	 *
+	 * @return string
+	 */
+	abstract public function softCastTextToChar($fieldName);
 
 	/**
 	 * Transforms Sql according to $limit and $offset limitations.
@@ -250,11 +525,28 @@ abstract class SqlHelper
 	 *
 	 * @param string $sql Sql text.
 	 * @param integer $limit Maximum number of rows to return.
-	 * @param integer $offset Offset of the first row to return.
+	 * @param integer $offset Offset of the first row to return, starting from 0.
 	 *
 	 * @return string
 	 * @throws Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Нестатический метод трансформирует Sql запрос в соответствии со значениями параметров <code>$limit</code> и <code>$offset</code>.</p> <p>Параметр <code>$limit</code> должен быть определён к моменту задания <code>$offset</code>.</p>
+	*
+	*
+	* @param string $sql  Sql text.
+	*
+	* @param integer $limit  Максимальное число строк для возврата.
+	*
+	* @param integer $offset  Смещение первой строки для возврата, начинается с 0.
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/gettopsql.php
+	* @author Bitrix
+	*/
 	abstract public function getTopSql($sql, $limit, $offset = 0);
 
 	/**
@@ -265,6 +557,21 @@ abstract class SqlHelper
 	 *
 	 * @return array (columnList, valueList, binds)
 	 */
+	
+	/**
+	* <p>Нестатический метод простраивает строку для sql-команды INSERT для указанной таблицы.</p>
+	*
+	*
+	* @param string $tableName  Имя таблийы.
+	*
+	* @param array $fields  Массив вида: <pre class="syntax">Array("column" =&gt; $value)[]</pre>
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/prepareinsert.php
+	* @author Bitrix
+	*/
 	public function prepareInsert($tableName, array $fields)
 	{
 		$columns = array();
@@ -272,12 +579,16 @@ abstract class SqlHelper
 
 		$tableFields = $this->connection->getTableFields($tableName);
 
-		foreach($tableFields as $columnName => $tableField)
+		foreach ($fields as $columnName => $value)
 		{
-			if(isset($fields[$columnName]) || array_key_exists($columnName, $fields))
+			if (isset($tableFields[$columnName]))
 			{
 				$columns[] = $this->quote($columnName);
-				$values[] = $this->convertToDb($fields[$columnName], $tableField);
+				$values[] = $this->convertToDb($value, $tableFields[$columnName]);
+			}
+			else
+			{
+				trigger_error("Column `{$columnName}` is not found in the `{$tableName}` table", E_USER_WARNING);
 			}
 		}
 
@@ -298,17 +609,36 @@ abstract class SqlHelper
 	 *
 	 * @return array (update, binds)
 	 */
+	
+	/**
+	* <p>Нестатический метод выстраивает строку для SQL-команды UPDATE для указанной таблицы.</p>
+	*
+	*
+	* @param string $tableName  AНазвание таблицы
+	*
+	* @param array $fields  Массив вида: <pre class="syntax">Array("column" =&gt; $value)[]</pre>
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/prepareupdate.php
+	* @author Bitrix
+	*/
 	public function prepareUpdate($tableName, array $fields)
 	{
 		$update = array();
 
 		$tableFields = $this->connection->getTableFields($tableName);
 
-		foreach($tableFields as $columnName => $tableField)
+		foreach ($fields as $columnName => $value)
 		{
-			if(isset($fields[$columnName]) || array_key_exists($columnName, $fields))
+			if (isset($tableFields[$columnName]))
 			{
-				$update[] = $this->quote($columnName).' = '.$this->convertToDb($fields[$columnName], $tableField);
+				$update[] = $this->quote($columnName).' = '.$this->convertToDb($value, $tableFields[$columnName]);
+			}
+			else
+			{
+				trigger_error("Column `{$columnName}` is not found in the `{$tableName}` table", E_USER_WARNING);
 			}
 		}
 
@@ -330,7 +660,27 @@ abstract class SqlHelper
 	 *
 	 * @return array (merge)
 	 */
-	protected function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
+	
+	/**
+	* <p>Нестатический метод выстраивает строку для SQL-команды MERGE для указанной таблицы.</p>
+	*
+	*
+	* @param string $tableName  Название таблицы
+	*
+	* @param array $primaryFields  Массив первичных ключей списка колонок вида: <pre
+	* class="syntax">Array("column")[]</pre>
+	*
+	* @param array $insertFields  Массив вставки вида: <pre class="syntax">Array("column" =&gt; $value)[]</pre>
+	*
+	* @param array $updateFields  Массив обновлений вида: <pre class="syntax">Array("column" =&gt; $value)[]</pre>
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/preparemerge.php
+	* @author Bitrix
+	*/
+	static public function prepareMerge($tableName, array $primaryFields, array $insertFields, array $updateFields)
 	{
 		return array();
 	}
@@ -357,6 +707,23 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод выстраивает строку для присвоения SQL оператора указанной колонке.</p>
+	*
+	*
+	* @param string $tableName  Название таблицы
+	*
+	* @param string $columnName  Название колонки.
+	*
+	* @param string $value  Присвоенное значение
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/prepareassignment.php
+	* @author Bitrix
+	*/
 	public function prepareAssignment($tableName, $columnName, $value)
 	{
 		$tableField = $this->connection->getTableField($tableName, $columnName);
@@ -373,6 +740,27 @@ abstract class SqlHelper
 	 * @return string Value to write to column.
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Нетатический метод конвертирует значение в строку, соответствующую типу колонки используемой в SQL запросе.</p>
+	*
+	*
+	* @param mixed $value  Значение для конвертации
+	*
+	* @param mixed $Bitrix  Тип "источника".
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param ScalarField $field  
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/converttodb.php
+	* @author Bitrix
+	*/
 	public function convertToDb($value, Entity\ScalarField $field)
 	{
 		if ($value === null)
@@ -457,6 +845,27 @@ abstract class SqlHelper
 	 *
 	 * @return mixed
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает значение параметра <code>$value</code> сконвертированное в тип, соответствующий типу параметра <code>$field</code>.</p> <p>Например, если поле <code>$field</code> имеет тип <code>Entity\DatetimeField</code>, то возвращено будет значение в типе, установленном в <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/type/datetime/index.php">\Main\Type\DateTime</a>.</p>
+	*
+	*
+	* @param mixed $value  Значение для конвертации
+	*
+	* @param mixed $Bitrix  Тип "источника".
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param ScalarField $field  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/convertfromdb.php
+	* @author Bitrix
+	*/
 	public function convertFromDb($value, Entity\ScalarField $field)
 	{
 		if($value !== null)
@@ -478,6 +887,25 @@ abstract class SqlHelper
 	 *
 	 * @return false|callback
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает ответ запрошенный для значения поля в выборке.</p>
+	*
+	*
+	* @param mixed $Bitrix  Тип "источника".
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param ScalarField $field  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getconverter.php
+	* @author Bitrix
+	*/
 	static public function getConverter(Entity\ScalarField $field)
 	{
 		return false;
@@ -490,6 +918,25 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает тип колонки в соответствии с объектом скалярного поля.</p>
+	*
+	*
+	* @param mixed $Bitrix  Tип "источника".
+	*
+	* @param Bitri $Main  
+	*
+	* @param Mai $Entity  
+	*
+	* @param ScalarField $field  
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getcolumntypebyfield.php
+	* @author Bitrix
+	*/
 	abstract public function getColumnTypeByField(Entity\ScalarField $field);
 
 	/**
@@ -502,6 +949,23 @@ abstract class SqlHelper
 	 *
 	 * @return Entity\ScalarField
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает исключение потомка из <code>Entity\ScalarField</code>, который соответствует типу базы данных.</p>
+	*
+	*
+	* @param string $name  Название колонки Базы данных.
+	*
+	* @param mixed $type  Тип характерный для Базы данных.
+	*
+	* @param array $parameters = null Дополнительная информация.
+	*
+	* @return \Bitrix\Main\Entity\ScalarField 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getfieldbycolumntype.php
+	* @author Bitrix
+	*/
 	abstract public function getFieldByColumnType($name, $type, array $parameters = null);
 
 	/**
@@ -509,6 +973,17 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает возрастающий порядок в соответствии с ORDER BY.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getascendingorder.php
+	* @author Bitrix
+	*/
 	static public function getAscendingOrder()
 	{
 		return 'ASC';
@@ -519,6 +994,17 @@ abstract class SqlHelper
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает убывающий порядок установленный для ORDER BY.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/sqlhelper/getdescendingorder.php
+	* @author Bitrix
+	*/
 	static public function getDescendingOrder()
 	{
 		return 'DESC';

@@ -48,6 +48,8 @@ class Cache
 	private static $clearCache = null;
 	private static $clearCacheSession = null;
 
+	protected $forceRewriting = false;
+
 	public static function createCacheEngine()
 	{
 		static $cacheEngine = null;
@@ -87,10 +89,6 @@ class Cache
 				case "memcache":
 					if (extension_loaded('memcache'))
 						$cacheEngine = new CacheEngineMemcache();
-					break;
-				case "eaccelerator":
-					if (extension_loaded('eaccelerator'))
-						$cacheEngine = new CacheEngineEAccelerator();
 					break;
 				case "apc":
 					if (extension_loaded('apc'))
@@ -159,13 +157,19 @@ class Cache
 		return static::$showCacheStat;
 	}
 
+	/**
+	 * A privileged user wants to skip cache on this hit.
+	 * @param bool $clearCache
+	 */
 	public static function setClearCache($clearCache)
 	{
-		$prevValue = static::$clearCache;
 		static::$clearCache = $clearCache;
-		return $prevValue;
 	}
 
+	/**
+	 * A privileged user wants to skip cache on this session.
+	 * @param bool $clearCacheSession
+	 */
 	public static function setClearCacheSession($clearCacheSession)
 	{
 		static::$clearCacheSession = $clearCacheSession;
@@ -188,11 +192,17 @@ class Cache
 		return "/".substr(md5($scriptName), 0, 3);
 	}
 
+	/**
+	 * Returns true if a privileged user wants to skip reading from cache (on this hit or session).
+	 * @return bool
+	 */
 	public static function shouldClearCache()
 	{
+		global $USER;
+
 		if (isset(static::$clearCacheSession) || isset(static::$clearCache))
 		{
-			if (is_object($GLOBALS["USER"]) && $GLOBALS["USER"]->CanDoOperation('cache_control'))
+			if (is_object($USER) && $USER->CanDoOperation('cache_control'))
 			{
 				if (isset(static::$clearCacheSession))
 				{
@@ -263,6 +273,9 @@ class Cache
 		$this->vars = false;
 
 		if ($TTL <= 0)
+			return false;
+
+		if ($this->forceRewriting)
 			return false;
 
 		if (static::shouldClearCache())
@@ -460,5 +473,14 @@ class Cache
 		}
 
 		return $res;
+	}
+
+	/**
+	 * Sets the forced mode to ignore TTL and rewrite the cache.
+	 * @param bool $mode
+	 */
+	public function forceRewriting($mode)
+	{
+		$this->forceRewriting = (bool)$mode;
 	}
 }

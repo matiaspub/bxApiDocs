@@ -65,7 +65,7 @@ $strAll .= '<? $strReferer2 = htmlspecialchars($_GET["referer2"]); ?>';
 $strAll .= '<? header("Content-Type: text/xml; charset=windows-1251");?>';
 $strAll.= '<?echo "<?xml version=\"1.0\" encoding=\"windows-1251\"?>"?>';
 $strAll.= "\n<!DOCTYPE yml_catalog SYSTEM \"shops.dtd\">\n";
-$strAll.= "<yml_catalog date=\"".Date("Y-m-d H:i")."\">\n";
+$strAll.= "<yml_catalog date=\"".date("Y-m-d H:i")."\">\n";
 $strAll.= "<shop>\n";
 $strAll.= "<name>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</name>\n";
 $strAll.= "<company>".$APPLICATION->ConvertCharset(htmlspecialcharsbx(COption::GetOptionString("main", "site_name", "")), LANG_CHARSET, 'windows-1251')."</company>\n";
@@ -83,10 +83,10 @@ $currencyIterator = Currency\CurrencyTable::getList(array(
 if ($currency = $currencyIterator->fetch())
 	$RUR = 'RUR';
 unset($currency, $currencyIterator);
-$arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'KZT');
+$arCurrencyAllowed = array('RUR', 'RUB', 'USD', 'EUR', 'UAH', 'BYR', 'BYN', 'KZT');
 $strTmp = "<currencies>\n";
 $currencyIterator = Currency\CurrencyTable::getList(array(
-	'select' => array('CURRENCY'),
+	'select' => array('CURRENCY', 'SORT'),
 	'filter' => array('@CURRENCY' => $arCurrencyAllowed),
 	'order' => array('SORT' => 'ASC')
 ));
@@ -100,7 +100,12 @@ unset($strTmp);
 
 //*****************************************//
 
-$arSelect = array("ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "ACTIVE", "NAME", "PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE", "DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL");
+$arSelect = array(
+	"ID", "LID", "IBLOCK_ID", "IBLOCK_SECTION_ID", "ACTIVE", "NAME",
+	"PREVIEW_PICTURE", "PREVIEW_TEXT", "PREVIEW_TEXT_TYPE",
+	"DETAIL_PICTURE", "LANG_DIR", "DETAIL_PAGE_URL",
+	"CATALOG_AVAILABLE"
+);
 
 $strTmpCat = "";
 $strTmpOff = "";
@@ -139,8 +144,8 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 	$arAvailGroups = array();
 	while ($arAcc = $db_acc->Fetch())
 	{
-		$strTmpCat.= "<category id=\"".$arAcc["ID"]."\"".(IntVal($arAcc["IBLOCK_SECTION_ID"])>0?" parentId=\"".$arAcc["IBLOCK_SECTION_ID"]."\"":"").">".yandex_text2xml($arAcc["NAME"], true)."</category>\n";
-		$arAvailGroups[] = IntVal($arAcc["ID"]);
+		$strTmpCat.= "<category id=\"".$arAcc["ID"]."\"".(intval($arAcc["IBLOCK_SECTION_ID"])>0?" parentId=\"".$arAcc["IBLOCK_SECTION_ID"]."\"":"").">".yandex_text2xml($arAcc["NAME"], true)."</category>\n";
+		$arAvailGroups[] = intval($arAcc["ID"]);
 	}
 
 	//*****************************************//
@@ -173,28 +178,7 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 		{
 			$arAcc['SERVER_NAME'] = $arSiteServers[$arAcc['LID']];
 		}
-		$arAcc['CATALOG_QUANTITY'] = '';
-		$arAcc['CATALOG_QUANTITY_TRACE'] = 'N';
-		$rsProducts = CCatalogProduct::GetList(
-			array(),
-			array('ID' => $arAcc['ID']),
-			false,
-			false,
-			array('ID', 'QUANTITY', 'QUANTITY_TRACE', 'CAN_BUY_ZERO')
-		);
-		if ($arProduct = $rsProducts->Fetch())
-		{
-			$arAcc['CATALOG_QUANTITY'] = $arProduct['QUANTITY'];
-			$arAcc['CATALOG_QUANTITY_TRACE'] = $arProduct['QUANTITY_TRACE'];
-		}
-
-		$str_QUANTITY = doubleval($arAcc["CATALOG_QUANTITY"]);
-		$str_QUANTITY_TRACE = $arAcc["CATALOG_QUANTITY_TRACE"];
-		if (($str_QUANTITY <= 0) && ($str_QUANTITY_TRACE == "Y"))
-			$str_AVAILABLE = ' available="false"';
-		else
-			$str_AVAILABLE = ' available="true"';
-
+		$str_AVAILABLE = ' available="'.($arAcc['CATALOG_AVAILABLE'] == 'Y' ? 'true' : 'false').'"';
 
 		$minPrice = 0;
 		$minPriceRUR = 0;
@@ -266,10 +250,10 @@ while ($arCatalog_list = $db_catalog_list->Fetch())
 
 		$strTmpOff.= $strTmpOff_tmp;
 
-		if (IntVal($arAcc["DETAIL_PICTURE"])>0 || IntVal($arAcc["PREVIEW_PICTURE"])>0)
+		if (intval($arAcc["DETAIL_PICTURE"])>0 || intval($arAcc["PREVIEW_PICTURE"])>0)
 		{
-			$pictNo = IntVal($arAcc["DETAIL_PICTURE"]);
-			if ($pictNo<=0) $pictNo = IntVal($arAcc["PREVIEW_PICTURE"]);
+			$pictNo = intval($arAcc["DETAIL_PICTURE"]);
+			if ($pictNo<=0) $pictNo = intval($arAcc["PREVIEW_PICTURE"]);
 
 			$arPictInfo = CFile::GetFileArray($pictNo);
 			if (is_array($arPictInfo))

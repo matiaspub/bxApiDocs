@@ -18,6 +18,8 @@ abstract class BaseObject
 	const ERROR_PARAMS_ENTITY_ID = 'params0003';
 	private static $topics = array();
 	private static $users = array();
+	/* @var \Bitrix\Forum\Comments\User */
+	protected $user;
 	/* @var \Bitrix\Forum\Comments\Entity */
 	protected $entity;
 	/** @var array */
@@ -27,9 +29,13 @@ abstract class BaseObject
 	/** @var  ErrorCollection */
 	protected $errorCollection;
 
-	public function __construct($forumId, $entity)
+
+
+	public function __construct($forumId, $entity, $userId = 0)
 	{
+		global $USER;
 		$this->errorCollection = new ErrorCollection();
+		$this->setUser($userId ?: $USER->getId());
 		$this->setForum($forumId);
 		$this->setEntity($entity);
 		$this->setTopic();
@@ -223,12 +229,20 @@ abstract class BaseObject
 	}
 
 	/**
-	 * @return \CUser
+	 * @param $userId
+	 * @return User
 	 */
-	static public function getUser()
+	protected function setUser($userId)
 	{
-		global $USER;
-		return $USER;
+		$this->user = new \Bitrix\Forum\Comments\User($userId);
+		return $this->user;
+	}
+	/**
+	 * @return User
+	 */
+	public function getUser()
+	{
+		return $this->user;
 	}
 
 	/**

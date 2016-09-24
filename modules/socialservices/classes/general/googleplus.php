@@ -27,20 +27,9 @@ class CSocServGooglePlusOAuth extends CSocServGoogleOAuth
 
 	public function getFriendsList($limit, &$next)
 	{
-		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
+		if($this->getEntityOAuth()->GetAccessToken() !== false)
 		{
-			$redirect_uri = static::CONTROLLER_URL."/redirect.php";
-		}
-		else
-		{
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php";
-		}
-
-		$ob = $this->getEntityOAuth();
-
-		if($ob->GetAccessToken($redirect_uri) !== false)
-		{
-			$res = $ob->getCurrentUserFriends($limit, $next);
+			$res = $this->getEntityOAuth()->getCurrentUserFriends($limit, $next);
 
 			foreach($res["items"] as $key => $contact)
 			{

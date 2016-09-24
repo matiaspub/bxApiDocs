@@ -1,133 +1,128 @@
 <?php
 namespace Bitrix\Main\Text;
 
+use Bitrix\Main\Loader;
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Configuration;
+use Bitrix\Main\ErrorCollection;
+use Bitrix\Main\Error;
 
 class Encoding
 {
 	const PATH_TO_CONVERT_TABLES = "/bitrix/modules/main/cvtables/";
 
-	private static $instance;
+	/** @var ErrorCollection */
+	protected $errors;
 
-	private $arErrors = array();
-
-	public static function convertEncoding($string, $charsetFrom, $charsetTo, &$errorMessage = "")
+	protected function __construct()
 	{
-		$string = strval($string);
-
-		if (strcasecmp($charsetFrom, $charsetTo) == 0)
-			return $string;
-
-		$errorMessage = '';
-
-		if ($string == '')
-			return '';
-
-		if (extension_loaded("mbstring") && mb_encoding_aliases($charsetFrom) && mb_encoding_aliases($charsetTo))
-		{
-			//For UTF-16 we have to detect the order of bytes
-			//Default for mbstring extension is Big endian
-			//Little endian have to pointed explicitly
-			if (strtoupper($charsetFrom) == "UTF-16")
-			{
-				$ch = substr($string, 0, 1);
-				//If Little endian found - cutoff BOF bytes and point mbstring to this fact explicitly
-				if ($ch == "\xFF" && substr($string, 1, 1) == "\xFE")
-					return mb_convert_encoding(substr($string, 2), $charsetTo, "UTF-16LE");
-				//If it is Big endian, just remove BOF bytes
-				elseif ($ch == "\xFE" && substr($string, 1, 1) == "\xFF")
-					return mb_convert_encoding(substr($string, 2), $charsetTo, $charsetFrom);
-				//Otherwise assime Little endian without BOF
-				else
-					return mb_convert_encoding($string, $charsetTo, "UTF-16LE");
-			}
-			else
-			{
-				$res = mb_convert_encoding($string, $charsetTo, $charsetFrom);
-				if (strlen($res) > 0)
-					return $res;
-			}
-		}
-
-		if (!defined("BX_ICONV_DISABLE") || BX_ICONV_DISABLE !== true)
-		{
-			$utf_string = false;
-			if (strtoupper($charsetFrom) == "UTF-16")
-			{
-				$ch = substr($string, 0, 1);
-				if (($ch != "\xFF") || ($ch != "\xFE"))
-					$utf_string = "\xFF\xFE".$string;
-			}
-			if (function_exists('iconv'))
-			{
-				if ($utf_string)
-					$res = iconv($charsetFrom, $charsetTo."//IGNORE", $utf_string);
-				else
-					$res = iconv($charsetFrom, $charsetTo."//IGNORE", $string);
-
-				if (!$res)
-					$errorMessage .= "Iconv reported failure while converting string to requested character encoding. ";
-
-				return $res;
-			}
-			elseif (function_exists('libiconv'))
-			{
-				if ($utf_string)
-					$res = libiconv($charsetFrom, $charsetTo, $utf_string);
-				else
-					$res = libiconv($charsetFrom, $charsetTo, $string);
-
-				if (!$res)
-					$errorMessage .= "Libiconv reported failure while converting string to requested character encoding. ";
-
-				return $res;
-			}
-		}
-
-		$cvt = self::getInstance();
-		$res = $cvt->convert($string, $charsetFrom, $charsetTo);
-		if (!$res)
-		{
-			$arErrors = $cvt->getErrors();
-			if (count($arErrors) > 0)
-				$errorMessage = implode("\n", $arErrors);
-		}
-
-		return $res;
+		$this->errors = new ErrorCollection();
 	}
 
-	public static function convertEncodingArray($arData, $charsetFrom, $charsetTo, &$errorMessage = "")
+	/**
+	 * Converts data from a source encoding to a target encoding.
+	 *
+	 * @param string|array|\SplFixedArray $data The data to convert. From main 16.0.10 data can be an array.
+	 * @param string $charsetFrom The source encoding.
+	 * @param string $charsetTo The target encoding.
+	 * @param string $errorMessage Reference to a variable containing error messages.
+	 * @return string|array|\SplFixedArray|bool Returns converted data or false on error.
+	 */
+	
+	/**
+	* <p>Статический метод конвертирует данные из кодировки источника в целевую кодировку. Возвращает сконвертированные данные или <i>false</i> в случае ошибки.</p>
+	*
+	*
+	* @param mixed $string  Данные для конвертации. С версии 16.0.10 данные могут быть массивом.
+	*
+	* @param strin $array  Кодировка источника
+	*
+	* @param SplFixedArray $data  Целевая кодировка
+	*
+	* @param string $charsetFrom  Ссылка на переменную, содержащую сообщения об ошибках.
+	*
+	* @param string $charsetTo  
+	*
+	* @param string $errorMessage = "" 
+	*
+	* @return string|array|\SplFixedArray|boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/text/encoding/convertencoding.php
+	* @author Bitrix
+	*/
+	public static function convertEncoding($data, $charsetFrom, $charsetTo, &$errorMessage = "")
 	{
-		if (!is_array($arData))
+		if(strcasecmp($charsetFrom, $charsetTo) == 0)
 		{
-			if (is_string($arData))
-			{
-				$arData = self::convertEncoding($arData, $charsetFrom, $charsetTo, $errorMessage);
-			}
+			//no need to convert
+			return $data;
 		}
-		else
-		{
-			foreach ($arData as $key => $value)
-			{
-				$s = '';
 
-				$newKey = self::convertEncoding($key, $charsetFrom, $charsetTo, $s);
-				$arData[$newKey] = self::convertEncodingArray($value, $charsetFrom, $charsetTo, $s);
+		if(is_array($data) || $data instanceof \SplFixedArray)
+		{
+			//let's do a recursion
+			foreach($data as $key => $value)
+			{
+				$newKey = self::convertEncoding($key, $charsetFrom, $charsetTo, $errorMessage);
+				$newValue = self::convertEncoding($value, $charsetFrom, $charsetTo, $errorMessage);
+
+				$data[$newKey] = $newValue;
 
 				if($newKey != $key)
-					unset($arData[$key]);
-
-				if($s!=='')
 				{
-					$errorMessage .= ($errorMessage == "" ? "" : "\n").$s;
+					unset($data[$key]);
 				}
 			}
+			return $data;
 		}
+		elseif(is_string($data))
+		{
+			if($data == '')
+			{
+				return '';
+			}
 
-		return $arData;
+			$cvt = new static;
+
+			$res = $cvt->convertByMbstring($data, $charsetFrom, $charsetTo);
+			if($res === '')
+			{
+				$res = $cvt->convertByIconv($data, $charsetFrom, $charsetTo);
+				if($res === '')
+				{
+					$res = $cvt->convertByTables($data, $charsetFrom, $charsetTo);
+				}
+			}
+
+			$errors = $cvt->getErrors();
+			if (!empty($errors))
+			{
+				$errorMessage .= implode("\n", $errors);
+			}
+
+			return $res;
+		}
+		return $data;
 	}
 
+	/**
+	 * @deprecated Deprecated in main 16.0.10. Use Encoding::convertEncoding().
+	 * @param $data
+	 * @param $charsetFrom
+	 * @param $charsetTo
+	 * @param string $errorMessage
+	 * @return mixed
+	 */
+	public static function convertEncodingArray($data, $charsetFrom, $charsetTo, &$errorMessage = "")
+	{
+		return self::convertEncoding($data, $charsetFrom, $charsetTo, $errorMessage);
+	}
+
+	/**
+	 * @param string $string
+	 * @return bool|string
+	 */
 	public static function convertEncodingToCurrent($string)
 	{
 		$isUtf8String = self::detectUtf8($string);
@@ -168,6 +163,10 @@ class Encoding
 		return $string;
 	}
 
+	/**
+	 * @param string $string
+	 * @return bool
+	 */
 	public static function detectUtf8($string)
 	{
 		//http://mail.nl.linux.org/linux-utf8/1999-09/msg00110.html
@@ -204,19 +203,146 @@ class Encoding
 		return ($isUtf > 0);
 	}
 
-	/**
-	 * @static
-	 * @return Encoding
-	 */
-	public static function getInstance()
+	protected function convertByMbstring($data, $charsetFrom, $charsetTo)
 	{
-		if (!isset(self::$instance))
+		$res = '';
+		if (extension_loaded("mbstring") && mb_encoding_aliases($charsetFrom) !== false && mb_encoding_aliases($charsetTo) !== false)
 		{
-			$c = __CLASS__;
-			self::$instance = new $c;
+			//For UTF-16 we have to detect the order of bytes
+			//Default for mbstring extension is Big endian
+			//Little endian have to pointed explicitly
+			if (strtoupper($charsetFrom) == "UTF-16")
+			{
+				$ch = substr($data, 0, 1);
+				if ($ch == "\xFF" && substr($data, 1, 1) == "\xFE")
+				{
+					//If Little endian found - cutoff BOF bytes and point mbstring to this fact explicitly
+					$res = mb_convert_encoding(substr($data, 2), $charsetTo, "UTF-16LE");
+				}
+				elseif ($ch == "\xFE" && substr($data, 1, 1) == "\xFF")
+				{
+					//If it is Big endian, just remove BOF bytes
+					$res = mb_convert_encoding(substr($data, 2), $charsetTo, $charsetFrom);
+				}
+				else
+				{
+					//Otherwise assime Little endian without BOF
+					$res = mb_convert_encoding($data, $charsetTo, "UTF-16LE");
+				}
+			}
+			else
+			{
+				$res = mb_convert_encoding($data, $charsetTo, $charsetFrom);
+			}
+		}
+		return $res;
+	}
+
+	protected function convertByIconv($data, $charsetFrom, $charsetTo)
+	{
+		$res = '';
+		if (Configuration::getValue("disable_iconv") !== true)
+		{
+			$utfString = false;
+			if (strtoupper($charsetFrom) == "UTF-16")
+			{
+				$ch = substr($data, 0, 1);
+				if (($ch != "\xFF") || ($ch != "\xFE"))
+				{
+					$utfString = "\xFF\xFE".$data;
+				}
+			}
+			if (function_exists('iconv'))
+			{
+				if ($utfString)
+				{
+					$res = iconv($charsetFrom, $charsetTo."//IGNORE", $utfString);
+				}
+				else
+				{
+					$res = iconv($charsetFrom, $charsetTo."//IGNORE", $data);
+				}
+
+				if (!$res)
+				{
+					$this->errors[] = new Error("Iconv reported failure while converting string to requested character encoding.");
+				}
+			}
+			elseif (function_exists('libiconv'))
+			{
+				if ($utfString)
+				{
+					$res = libiconv($charsetFrom, $charsetTo, $utfString);
+				}
+				else
+				{
+					$res = libiconv($charsetFrom, $charsetTo, $data);
+				}
+
+				if (!$res)
+				{
+					$this->errors[] = new Error("Libiconv reported failure while converting string to requested character encoding.");
+				}
+			}
+		}
+		return $res;
+	}
+
+	protected function buildConvertTable()
+	{
+		static $cvTables = array();
+
+		for($i = 0, $cnt = func_num_args(); $i < $cnt; $i++)
+		{
+			$fileName = func_get_arg($i);
+
+			if(isset($cvTables[$fileName]))
+			{
+				continue;
+			}
+
+			$pathToTable = Loader::getDocumentRoot().self::PATH_TO_CONVERT_TABLES.$fileName;
+			if (!file_exists($pathToTable))
+			{
+				$this->errors[] = new Error(str_replace("#FILE#", $pathToTable, "File #FILE# is not found."));
+				return false;
+			}
+
+			if (!is_file($pathToTable))
+			{
+				$this->errors[] = new Error(str_replace("#FILE#", $pathToTable, "File #FILE# is not a file."));
+				return false;
+			}
+
+			if (!($hFile = fopen($pathToTable, "r")))
+			{
+				$this->errors[] = new Error(str_replace("#FILE#", $pathToTable, "Can not open file #FILE# for reading."));
+				return false;
+			}
+
+			$cvTables[$fileName] = array();
+
+			while (!feof($hFile))
+			{
+				if ($line = trim(fgets($hFile, 1024)))
+				{
+					if (substr($line, 0, 1) != "#")
+					{
+						$hexValue = preg_split("/[\\s,]+/", $line, 3);
+						if (substr($hexValue[1], 0, 1) != "#")
+						{
+							$key = strtoupper(str_replace("0x", "", $hexValue[1]));
+							$value = strtoupper(str_replace("0x", "", $hexValue[0]));
+							$cvTables[$fileName][$key] = $value;
+						}
+					}
+				}
+			}
+
+			fclose($hFile);
 		}
 
-		return self::$instance;
+		return $cvTables;
 	}
 
 	protected function hexToUtf($utfCharInHex)
@@ -236,141 +362,106 @@ class Encoding
 		return $result;
 	}
 
-	protected function buildConvertTable()
+	/**
+	 * @param string $sourceString
+	 * @param string $charsetFrom
+	 * @param string $charsetTo
+	 * @return bool|string
+	 */
+	protected function convertByTables($sourceString, $charsetFrom, $charsetTo)
 	{
-		static $arCvTables = array();
-
-		for ($i = 0, $cnt = func_num_args(); $i < $cnt; $i++)
+		if($charsetFrom == '')
 		{
-			$fileName = func_get_arg($i);
-
-			if (isset($arCvTables[$fileName]))
-				continue;
-
-			$arCvTables[$fileName] = array();
-
-			$pathToTable = $_SERVER["DOCUMENT_ROOT"].self::PATH_TO_CONVERT_TABLES.$fileName;
-			if (!file_exists($pathToTable))
-			{
-				$this->addError(str_replace("#FILE#", $pathToTable, "File #FILE# is not found."));
-				continue;
-			}
-
-			if (!is_file($pathToTable))
-			{
-				$this->addError(str_replace("#FILE#", $pathToTable, "File #FILE# is not a file."));
-				continue;
-			}
-
-			if (!($hFile = fopen($pathToTable, "r")))
-			{
-				$this->addError(str_replace("#FILE#", $pathToTable, "Can not open file #FILE# for reading."));
-				continue;
-			}
-
-			while (!feof($hFile))
-			{
-				if ($line = trim(fgets($hFile, 1024)))
-				{
-					if (substr($line, 0, 1) != "#")
-					{
-						$hexValue = preg_split("/[\s,]+/", $line, 3);
-						if (substr($hexValue[1], 0, 1) != "#")
-						{
-							$key = strtoupper(str_replace("0x", "", $hexValue[1]));
-							$value = strtoupper(str_replace("0x", "", $hexValue[0]));
-							$arCvTables[func_get_arg($i)][$key] = $value;
-						}
-					}
-				}
-			}
-
-			fclose($hFile);
-		}
-
-		return $arCvTables;
-	}
-
-	public function convert($sourceString, $charsetFrom, $charsetTo)
-	{
-		$this->clearErrors();
-
-		if (strlen($sourceString) <= 0)
-		{
-			$this->addError("Nothing to convert.");
+			$this->errors[] = new Error("Source charset is not set.");
 			return false;
 		}
 
-		if (strlen($charsetFrom) <= 0)
+		if($charsetTo == '')
 		{
-			$this->addError("Source charset is not set.");
-			return false;
-		}
-
-		if (strlen($charsetTo) <= 0)
-		{
-			$this->addError("Destination charset is not set.");
+			$this->errors[] = new Error("Destination charset is not set.");
 			return false;
 		}
 
 		$charsetFrom = strtolower($charsetFrom);
 		$charsetTo = strtolower($charsetTo);
 
-		if($charsetFrom == $charsetTo)
-			return $sourceString;
-
 		$resultString = "";
 		if($charsetFrom == "ucs-2")
 		{
-			$arConvertTable = $this->buildConvertTable($charsetTo);
-			$l = strlen($sourceString);
-			for($i = 0; $i < $l; $i+=2)
+			$convertTable = $this->buildConvertTable($charsetTo);
+			if(!$convertTable)
+			{
+				return false;
+			}
+			$len = strlen($sourceString);
+			for($i = 0; $i < $len; $i+=2)
 			{
 				$hexChar = strtoupper(dechex(ord($sourceString[$i])).dechex(ord($sourceString[$i+1])));
 				$hexChar = str_pad($hexChar, 4, "0", STR_PAD_LEFT);
-				if($arConvertTable[$charsetTo][$hexChar])
+				if($convertTable[$charsetTo][$hexChar])
 				{
 					if($charsetTo != "utf-8")
-						$resultString .= chr(hexdec($arConvertTable[$charsetTo][$hexChar]));
+					{
+						$resultString .= chr(hexdec($convertTable[$charsetTo][$hexChar]));
+					}
 					else
-						$resultString .= $this->hexToUtf($arConvertTable[$charsetTo][$hexChar]);
+					{
+						$resultString .= $this->hexToUtf($convertTable[$charsetTo][$hexChar]);
+					}
 				}
 			}
 		}
 		elseif($charsetFrom == "utf-16")
 		{
-			$arConvertTable = $this->buildConvertTable($charsetTo);
-			$l = strlen($sourceString);
-			for($i = 0; $i < $l; $i+=2)
+			$convertTable = $this->buildConvertTable($charsetTo);
+			if(!$convertTable)
+			{
+				return false;
+			}
+
+			$len = strlen($sourceString);
+			for($i = 0; $i < $len; $i+=2)
 			{
 				$hexChar = sprintf("%02X%02X", ord($sourceString[$i+1]), ord($sourceString[$i]));
-				if($arConvertTable[$charsetTo][$hexChar])
+				if($convertTable[$charsetTo][$hexChar])
 				{
 					if($charsetTo != "utf-8")
-						$resultString .= chr(hexdec($arConvertTable[$charsetTo][$hexChar]));
+					{
+						$resultString .= chr(hexdec($convertTable[$charsetTo][$hexChar]));
+					}
 					else
-						$resultString .= $this->hexToUtf($arConvertTable[$charsetTo][$hexChar]);
+					{
+						$resultString .= $this->hexToUtf($convertTable[$charsetTo][$hexChar]);
+					}
 				}
 			}
 		}
 		elseif($charsetFrom != "utf-8")
 		{
 			if($charsetTo != "utf-8")
-				$arConvertTable = $this->buildConvertTable($charsetFrom, $charsetTo);
+			{
+				$convertTable = $this->buildConvertTable($charsetFrom, $charsetTo);
+			}
 			else
-				$arConvertTable = $this->buildConvertTable($charsetFrom);
+			{
+				$convertTable = $this->buildConvertTable($charsetFrom);
+			}
 
-			if(!$arConvertTable)
+			if(!$convertTable)
+			{
 				return false;
+			}
 
-			$stringLength = function_exists('mb_strlen') ? mb_strlen($sourceString, '8bit') : strlen($sourceString);
+			$stringLength = BinaryString::getLength($sourceString);
 
 			for ($i = 0; $i < $stringLength; $i++)
 			{
 				$hexChar = strtoupper(dechex(ord($sourceString[$i])));
 
 				if(strlen($hexChar) == 1)
+				{
 					$hexChar = "0".$hexChar;
+				}
 
 				if(($charsetFrom == "gsm0338") && ($hexChar == '1B'))
 				{
@@ -380,44 +471,56 @@ class Encoding
 
 				if($charsetTo != "utf-8")
 				{
-					if(in_array($hexChar, $arConvertTable[$charsetFrom]))
+					if(in_array($hexChar, $convertTable[$charsetFrom]))
 					{
-						$unicodeHexChar = array_search($hexChar, $arConvertTable[$charsetFrom]);
+						$unicodeHexChar = array_search($hexChar, $convertTable[$charsetFrom]);
 						$arUnicodeHexChar = explode("+", $unicodeHexChar);
-						$l = count($arUnicodeHexChar);
-						for ($j = 0; $j < $l; $j++)
+						$len = count($arUnicodeHexChar);
+						for ($j = 0; $j < $len; $j++)
 						{
-							if (array_key_exists($arUnicodeHexChar[$j], $arConvertTable[$charsetTo]))
-								$resultString .= chr(hexdec($arConvertTable[$charsetTo][$arUnicodeHexChar[$j]]));
+							if (array_key_exists($arUnicodeHexChar[$j], $convertTable[$charsetTo]))
+							{
+								$resultString .= chr(hexdec($convertTable[$charsetTo][$arUnicodeHexChar[$j]]));
+							}
 							else
-								$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in destination encoding table."));
+							{
+								$this->errors[] = new Error(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in destination encoding table."));
+							}
 						}
 					}
 					else
-						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
+					{
+						$this->errors[] =  new Error(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
+					}
 				}
 				else
 				{
-					if(in_array("$hexChar", $arConvertTable[$charsetFrom]))
+					if(in_array($hexChar, $convertTable[$charsetFrom]))
 					{
-						$unicodeHexChar = array_search($hexChar, $arConvertTable[$charsetFrom]);
+						$unicodeHexChar = array_search($hexChar, $convertTable[$charsetFrom]);
 						$arUnicodeHexChar = explode("+", $unicodeHexChar);
-						$l = count($arUnicodeHexChar);
-						for ($j = 0; $j < $l; $j++)
+						$len = count($arUnicodeHexChar);
+						for ($j = 0; $j < $len; $j++)
+						{
 							$resultString .= $this->hexToUtf($arUnicodeHexChar[$j]);
+						}
 					}
 					else
-						$this->addError(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
+					{
+						$this->errors[] = new Error(str_replace("#CHAR#", $sourceString[$i], "Cannot find matching char \"#CHAR#\" in source encoding table."));
+					}
 				}
 			}
 		}
 		else
 		{
-			$arConvertTable = $this->buildConvertTable($charsetTo);
-			if(!$arConvertTable)
+			$convertTable = $this->buildConvertTable($charsetTo);
+			if(!$convertTable)
+			{
 				return false;
+			}
 
-			foreach($arConvertTable[$charsetTo] as $unicodeHexChar => $hexChar)
+			foreach($convertTable[$charsetTo] as $unicodeHexChar => $hexChar)
 			{
 				$EntitieOrChar = chr(hexdec($hexChar));
 				$sourceString = str_replace($this->hexToUtf($unicodeHexChar), $EntitieOrChar, $sourceString);
@@ -430,21 +533,6 @@ class Encoding
 
 	public function getErrors()
 	{
-		return $this->arErrors;
-	}
-
-	protected function addError($error, $errorCode = "")
-	{
-		if (empty($error))
-			return;
-
-		$fs = (empty($errorCode) ? "%s" : "[%s] %s");
-		$this->arErrors[] = sprintf($fs, $error, $errorCode);
-	}
-
-	protected function clearErrors()
-	{
-		$this->arErrors = array();
+		return $this->errors->toArray();
 	}
 }
-?>

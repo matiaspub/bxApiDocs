@@ -4,6 +4,9 @@
  * @package bitrix
  * @subpackage sale
  * @copyright 2001-2012 Bitrix
+ * 
+ * @ignore
+ * @see \Bitrix\Catalog\ProductTable
  */
 namespace Bitrix\Sale\Internals;
 

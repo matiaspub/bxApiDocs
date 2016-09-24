@@ -35,6 +35,17 @@ abstract class CBXVirtualFileBase
 	public abstract function GetLastAccessTime();
 }
 
+
+/**
+ * <p><b>Примечание</b>:</p>   <p>Класс считается устаревшим. Рекомендуется использовать класс нового ядра D7, расположенный <code>/bitrix/modules/main/lib/io/file.php</code>.</p>
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualfile/index.php
+ * @author Bitrix
+ */
 abstract class CBXVirtualFile
 	extends CBXVirtualFileBase
 {
@@ -62,6 +73,17 @@ abstract class CBXVirtualFile
 	public abstract function ReadFile();
 }
 
+
+/**
+ * <b>CBXVirtualDirectory</b> - класс папки.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualdirectory/index.php
+ * @author Bitrix
+ */
 abstract class CBXVirtualDirectory
 	extends CBXVirtualFileBase
 {
@@ -75,13 +97,13 @@ abstract class CBXVirtualDirectory
 	 */
 	
 	/**
-	* <p>Метод возвращает содержимое папки в виде массива. Элементами массива являются экземпляры классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualdirectory/index.php">CBXVirtualDirectory</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualfile/index.php">CBXVirtualFile</a>. Динамичный метод.</p> <a name="examples"></a>
+	* <p>Метод возвращает содержимое папки в виде массива. Элементами массива являются экземпляры классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualdirectory/index.php">CBXVirtualDirectory</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cbxvirtualfile/index.php">CBXVirtualFile</a>. Нестатический метод.</p>   <a name="examples"></a>
 	*
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* $dir = $io-&gt;GetDirectory($io-&gt;RelativeToAbsolutePath("/папка1/папка2"));
 	* $arChildren = $dir-&gt;GetChildren();
 	* foreach ($arChildren as $child)

@@ -18,17 +18,67 @@ class User extends Base
 		return FieldType::USER;
 	}
 
-	/** @var array $formats	 */
-	protected static $formats = array(
-		'printable' => 	array(
-			'callable' =>'formatValuePrintable',
-			'separator' => ', ',
-		),
-		'friendly' => array(
+	/**
+	 * Get formats list.
+	 * @return array
+	 */
+	
+	/**
+	* <p>Статический метод возвращает список форматов.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/user/getformats.php
+	* @author Bitrix
+	*/
+	public static function getFormats()
+	{
+		$formats = parent::getFormats();
+		$formats['friendly'] = array(
 			'callable' =>'formatValueFriendly',
 			'separator' => ', ',
-		)
-	);
+		);
+		return $formats;
+	}
+
+	/**
+	 * Normalize single value.
+	 *
+	 * @param FieldType $fieldType Document field type.
+	 * @param mixed $value Field value.
+	 * @return mixed Normalized value
+	 */
+	
+	/**
+	* <p>Статический метод нормализует одиночное значение.</p>
+	*
+	*
+	* @param mixed $Bitrix  Тип поля документа.
+	*
+	* @param Bitri $Bizproc  Значение поля.
+	*
+	* @param FieldType $fieldType  
+	*
+	* @param mixed $value  
+	*
+	* @return mixed 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/user/tosinglevalue.php
+	* @author Bitrix
+	*/
+	public static function toSingleValue(FieldType $fieldType, $value)
+	{
+		if (is_array($value))
+		{
+			reset($value);
+			$value = current($value);
+		}
+
+		return $value;
+	}
 
 	/**
 	 * @param FieldType $fieldType
@@ -71,12 +121,13 @@ class User extends Base
 			case FieldType::DOUBLE:
 			case FieldType::INT:
 				$value = (string)$value;
-				if (strpos($value, 'user_'))
+				if (strpos($value, 'user_') === 0)
 					$value = substr($value, strlen('user_'));
 				$value = (int)$value;
 				break;
 			case FieldType::STRING:
 			case FieldType::TEXT:
+			case FieldType::USER:
 				$value = (string)$value;
 				break;
 			default:
@@ -84,6 +135,34 @@ class User extends Base
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Return conversion map for current type.
+	 * @return array Map.
+	 */
+	
+	/**
+	* <p>Статический метод возвращает таблицу преобразования для текущего типа.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/bizproc/basetype/user/getconversionmap.php
+	* @author Bitrix
+	*/
+	public static function getConversionMap()
+	{
+		return array(
+			array(
+				FieldType::DOUBLE,
+				FieldType::INT,
+				FieldType::STRING,
+				FieldType::TEXT,
+				FieldType::USER
+			)
+		);
 	}
 
 	/**
@@ -101,7 +180,7 @@ class User extends Base
 
 		$value = \CBPHelper::usersArrayToString($value, null, $fieldType->getDocumentType());
 		$renderResult = parent::renderControl($fieldType, $field, $value, $allowSelection, $renderMode);
-		$renderResult .= static::renderControlSelector($field);
+		$renderResult .= static::renderControlSelector($field, null, false, '', $fieldType);
 		return $renderResult;
 	}
 

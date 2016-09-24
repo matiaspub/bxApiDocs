@@ -494,20 +494,6 @@ class CAllTicketSLA
 							AND ( SC.CATEGORY_ID = 0 OR SC.CATEGORY_ID = $categoryID )";
 		}
 
-		if ($userID === 0)
-		{
-			// guest: default site sla for usergroup #2
-			$groupJoin = "UG.GROUP_ID = 2";
-		}
-		else
-		{
-			// sla for this user
-			$groupJoin = "((UG.USER_ID = $userID ";
-			$groupJoin .= " AND ((UG.DATE_ACTIVE_FROM IS NULL) OR (UG.DATE_ACTIVE_FROM <= ".$DB->CurrentTimeFunction().")) ";
-			$groupJoin .= " AND ((UG.DATE_ACTIVE_TO IS NULL) OR (UG.DATE_ACTIVE_TO >= ".$DB->CurrentTimeFunction().")) ";
-			$groupJoin .= ") OR UG.GROUP_ID = 2)";
-		}
-
 		$strSql = "
 			SELECT
 				PZ.SLA_ID
@@ -524,10 +510,17 @@ class CAllTicketSLA
 							AND ( SS.SITE_ID = 'ALL' OR SS.SITE_ID = '$siteID' ) 
 					INNER JOIN b_ticket_sla_2_user_group SG
 						ON S.ID = SG.SLA_ID
-					INNER JOIN b_user_group UG
-						ON SG.GROUP_ID = UG.GROUP_ID
-							AND $groupJoin
+
 					$JOIN
+
+					WHERE SG.GROUP_ID IN (
+						SELECT UG.GROUP_ID FROM b_user_group UG
+						WHERE 
+							UG.USER_ID = $userID
+							AND (UG.DATE_ACTIVE_FROM IS NULL OR UG.DATE_ACTIVE_FROM <= ".$DB->CurrentTimeFunction().")  
+							AND (UG.DATE_ACTIVE_TO IS NULL OR UG.DATE_ACTIVE_TO >= ".$DB->CurrentTimeFunction().") 
+						) 
+					OR SG.GROUP_ID = 2
 			) PZ
 			GROUP BY
 				PZ.SLA_ID, PZ.PRIORITY1, PZ.PRIORITY2

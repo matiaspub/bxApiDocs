@@ -90,6 +90,26 @@ define('GF_TWOBYTWO', (1 << 7));
 define('SALE_TIME_LOCK_USER', 600);
 
 /**
+ * NO_KEEP_STATISTIC
+ */
+define('NO_KEEP_STATISTIC', true);
+
+/**
+ * NO_AGENT_STATISTIC
+ */
+define('NO_AGENT_STATISTIC', true);
+
+/**
+ * NO_AGENT_CHECK
+ */
+define('NO_AGENT_CHECK', true);
+
+/**
+ * NOT_CHECK_PERMISSIONS
+ */
+define('NOT_CHECK_PERMISSIONS', true);
+
+/**
  * SALE_DEBUG
  */
 define('SALE_DEBUG', false);
@@ -127,7 +147,7 @@ define('CACHED_b_sale_order', 3600*24);
 /**
  * SALE_VALUE_PRECISION
  */
-define('SALE_VALUE_PRECISION', 2);
+define('SALE_VALUE_PRECISION', 4);
 
 /**
  * SALE_WEIGHT_PRECISION
@@ -138,6 +158,11 @@ define('SALE_WEIGHT_PRECISION', 3);
  * BX_SALE_MENU_CATALOG_CLEAR
  */
 define('BX_SALE_MENU_CATALOG_CLEAR', 'Y');
+
+/**
+ * BX_SALE_ENCODING
+ */
+define('BX_SALE_ENCODING', $this->service->getField('ENCODING'));
 
 /**
  * ADMIN_MODULE_NAME

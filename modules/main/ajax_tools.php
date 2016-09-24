@@ -130,17 +130,20 @@ class CAjax
 		return $url;
 	}
 
-	// $text = htmlspecialchar
-	static function GetLinkEx($real_url, $public_url, $text, $container_id, $additional = '')
+	// $text = htmlspecialcharred
+	public static function GetLinkEx($real_url, $public_url, $text, $container_id, $additional = '')
 	{
-		if (!$public_url) $public_url = $real_url;
+		if (!$public_url)
+		{
+			$public_url = $real_url;
+		}
 
 		return sprintf(
 			'<a href="%s" onclick="BX.ajax.insertToNode(\'%s\', \'%s\'); return false;" %s>%s</a>',
 
-			$public_url,
-			$real_url,
-			$container_id,
+			htmlspecialcharsbx($public_url),
+			CUtil::JSEscape(htmlspecialcharsbx($real_url)),
+			CUtil::JSEscape(htmlspecialcharsbx($container_id)),
 			$additional,
 			$text
 		);

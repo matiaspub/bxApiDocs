@@ -26,6 +26,17 @@ class SitemapIblockTable extends Entity\DataManager
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Метод возвращает название таблицы карты сайта в базе данных. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblocktable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_seo_sitemap_iblock';
@@ -36,6 +47,17 @@ class SitemapIblockTable extends Entity\DataManager
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод возвращает описание сущностей карты сайта. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblocktable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		$fieldsMap = array(
@@ -72,6 +94,19 @@ class SitemapIblockTable extends Entity\DataManager
 	 *
 	 * @return void
 	 */
+	
+	/**
+	* <p>Метод очищает все ссылки инфоблоков на удаление настроек карты сайта. Метод статический. </p>
+	*
+	*
+	* @param integer $sitemapId  Идентификатор настроек карты сайта.
+	*
+	* @return void 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblocktable/clearbysitemap.php
+	* @author Bitrix
+	*/
 	public static function clearBySitemap($sitemapId)
 	{
 		$connection = \Bitrix\Main\Application::getConnection();
@@ -91,6 +126,21 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 	 * @return array Array of sitemap settings
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Метод возвращает массив данных для обновления карты сайта в связи с некоторыми действиями инфоблоков. Метод статический. </p>
+	*
+	*
+	* @param array $fields  Элемент инфоблока или раздел полей массива.
+	*
+	* @param string $itemType  SitemapIblockTable::TYPE_ELEMENT || SitemapIblockTable::TYPE_SECTION.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblocktable/getbyiblock.php
+	* @author Bitrix
+	*/
 	public static function getByIblock($fields, $itemType)
 	{
 		$sitemaps = array();
@@ -185,6 +235,23 @@ WHERE SITEMAP_ID='".intval($sitemapId)."'
 	 *
 	 * @return bool
 	 */
+	
+	/**
+	* <p>Метод проверяет, следует ли добавить раздел $sectionId в файл карты сайта. Метод статический.</p>
+	*
+	*
+	* @param integer $sectionId  Идентификатор раздела.
+	*
+	* @param array $sectionSettings  Массив настроек секции карты сайта.
+	*
+	* @param boolean $defaultValue  Значение по умолчанию при отсутствии настроек.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblocktable/checksection.php
+	* @author Bitrix
+	*/
 	public static function checkSection($sectionId, $sectionSettings, $defaultValue)
 	{
 		$value = $defaultValue;
@@ -222,6 +289,17 @@ class SitemapIblock
 	/**
 	 * Event handler for multiple IBlock events
 	 */
+	
+	/**
+	* <p>Обработчик для множественных событий инфоблока. Метод статический.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return public 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/seo/sitemapiblock/__callstatic.php
+	* @author Bitrix
+	*/
 	public static function __callStatic($name, $arguments)
 	{
 		$name = ToUpper($name);
@@ -397,7 +475,11 @@ class SitemapIblock
 
 			$sitemapFile = new SitemapFile($fileName, $sitemap);
 			$sitemapFile->removeEntry($data['URL']);
-			$sitemapFile->appendIblockEntry($rule['url'], $rule['lastmod']);
+
+			if($newFields["ACTIVE"] !== "N")
+			{
+				$sitemapFile->appendIblockEntry($rule['url'], $rule['lastmod']);
+			}
 
 			$sitemapIndex = new SitemapIndex($sitemap['SITEMAP_FILE'], $sitemap);
 			$sitemapIndex->appendIndexEntry($sitemapFile);

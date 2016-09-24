@@ -19,7 +19,7 @@ function saleLocationLoadFile($arParams)
 	// define('DLPORT', $arParams['DLPORT']);
 	// define('DLPATH', $arParams['DLPATH']);
 	// define('DLMETHOD', $arParams['DLMETHOD']);
-	define('DLZIPFILE', $arParams['DLZIPFILE']);
+	// define('DLZIPFILE', $arParams['DLZIPFILE']);
 
 	if(isset($arParams['TMP_PATH']))
 		$sTmpFilePath = $arParams['TMP_PATH'];
@@ -148,7 +148,7 @@ function saleLocationImport($arParams)
 		$step_length = 10;
 
 	// define('ZIP_STEP_LENGTH', $step_length);
-	// define('LOC_STEP_LENGTH', $step_leng// th);
+	// define('LOC_STEP_LENGTH', $step_length);
 	define('DLZIPFILE', $arParams["DLZIPFILE"]);
 
 	$STEP = intval($arParams['STEP']);

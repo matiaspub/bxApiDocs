@@ -28,6 +28,12 @@ class Bind
 
 		$eventManager->addEventHandler("socialservices", "OnAfterRegisterUserByNetwork", array(self::$statusHandler, "OnStartUserReplication"), false, 200);
 		\Bitrix\Replica\Server\Event::registerOperation("im_status_bind", array(self::$statusHandler, "handleStatusBindOperation"));
+
+		$eventManager->addEventHandler("im", "OnAfterRecentDelete", array(self::$statusHandler, "OnAfterRecentDelete"));
+		\Bitrix\Replica\Server\Event::registerOperation("im_status_unbind", array(self::$statusHandler, "handleStatusUnbindOperation"));
+
+		$eventManager->addEventHandler("im", "OnAfterRecentAdd", array(self::$statusHandler, "OnAfterRecentAdd"));
+		\Bitrix\Replica\Server\Event::registerOperation("im_status_rebind", array(self::$statusHandler, "handleStatusRebindOperation"));
 	}
 
 }

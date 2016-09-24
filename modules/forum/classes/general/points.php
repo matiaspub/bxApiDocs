@@ -282,34 +282,6 @@ class CAllForumPoints
 		return $DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров звания (рейтинга) форума по его коду </p>
-	*
-	*
-	* @param int $ID  Код звания.
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами</p> <table class="tnormal"
-	* width="100%"> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	* звания.</td> </tr> <tr> <td>MIN_POINTS</td> <td>Количество баллов, необходимое для
-	* получения этого звания.</td> </tr> <tr> <td>CODE</td> <td>Символьный код.</td> </tr>
-	* <tr> <td>VOTES</td> <td>Количество голосов, которое имеет пользователь с
-	* этим званием.</td> </tr> </table> <p>  </p<a name="examples"></a>
-	*
-	* <h4>Example</h4> 
-	* <pre>
-	* &lt;?
-	* 
-	* $ar_res = CForumPoints::GetByID(3);
-	* echo "Пользователь с этим званием может отдать ".$ar_res["VOTES"]." голос(ов)";
-	* ?&gt;
-	* </pre>
-	*
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID)
 	{
 		global $DB;
@@ -465,6 +437,19 @@ class CAllForumPoints2Post
 	}
 
 	// User points is not recount.
+	
+	/**
+	* <p>Удаляет запись с кодом ID из таблицы соответствий между количеством сообщений пользователя на форуме и количеством баллов за одно сообщение. Метод нестатический.</p>
+	*
+	*
+	* @param mixed $intID  Код записи.
+	*
+	* @return bool <p>Функция возвращает значение True.</p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/delete.php
+	* @author Bitrix
+	*/
 	public static function Delete($ID)
 	{
 		global $DB;
@@ -533,26 +518,6 @@ class CAllForumPoints2Post
 		return $db_res;
 	}
 
-	
-	/**
-	* <p>Возвращает массив параметров записи в таблицу соответствий между количеством сообщений пользователя на форуме и количеством балов за одно сообщение по ее коду.</p>
-	*
-	*
-	* @param int $ID  Код записи.
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами.</p> <table class="tnormal"
-	* width="100%"><tbody> <tr> <th width="15%">Ключ</th> <th>Значение</th> </tr> <tr> <td>ID</td> <td>Код
-	* записи.</td> </tr> <tr> <td>MIN_NUM_POSTS</td> <td>Количество сообщений, которое
-	* пользователь должен написать на форуме для получения этого
-	* количества балов за одно сообщение.</td> </tr> <tr> <td>POINTS_PER_POST</td>
-	* <td>Количество балов за одно сообщение. Может иметь как целое
-	* значение, так и дробное: <br> 2 - два бала за каждое сообщение <br> 0.1 -
-	* одна десятая бала за каждое сообщение.</td> </tr> </tbody></table> <br><br>
-	*
-	* @static
-	* @link http://dev.1c-bitrix.ru/api_help/forum/developer/cforumpoints2post/getbyid.php
-	* @author Bitrix
-	*/
 	public static function GetByID($ID)
 	{
 		global $DB;

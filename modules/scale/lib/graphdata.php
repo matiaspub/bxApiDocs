@@ -13,6 +13,19 @@ class GraphData
 	 * @return array
 	 * @throws \Bitrix\Main\ArgumentNullException
 	 */
+	
+	/**
+	* <p>Возвращает информацию, необходимую для получения данных для вывода графиков. Метод статический.</p>
+	*
+	*
+	* @param string $graphCategory  Категория графика.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/graphdata/getgraphs.php
+	* @author Bitrix
+	*/
 	public static function getGraphs($graphCategory)
 	{
 		if(strlen($graphCategory) <= 0)

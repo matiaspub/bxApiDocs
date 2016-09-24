@@ -24,6 +24,9 @@ abstract class TriggerConnectorClosed extends TriggerConnector
 		return 'sender';
 	}
 
+	/**
+	 * @return string
+	 */
 	final public function getEventType()
 	{
 		return $this->getModuleId().'_'.$this->getCode();

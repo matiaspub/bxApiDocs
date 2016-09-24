@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети. 
+ * <b>CSocNetMessages</b> - класс для работы с сообщениями социальной сети.
  *
  *
  * @return mixed 
@@ -19,7 +19,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	* <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным.</p> <p><b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</p>
+	* <p>Метод добавляет новое сообщение пользователю. Сообщение может быть как персональным, так и системным. Метод нестатический.</p> <p></p> <div class="note"> <b>Примечание</b>: Для добавления нового персонального сообщения рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/CreateMessage.php">CSocNetMessages::CreateMessage</a>.<br> При работе метода вызываются события: <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetMessagesAdd.php">OnBeforeSocNetMessagesAdd</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetMessagesAdd.php">OnSocNetMessagesAdd</a>.</div>
 	*
 	*
 	* @param array $arFields  Массив параметров нового сообщения. Может содержать
@@ -29,10 +29,10 @@ class CSocNetMessages extends CAllSocNetMessages
 	* поле),<br><b>MESSAGE_TYPE</b> - тип сообщения: P - персональное, S - системное.
 	*
 	* @return int <p>Метод возвращает ID созданного сообщения в случае успешного
-	* завершения или false в случае ошибки.</p> <a name="examples"></a>
+	* завершения или false в случае ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = array( 
 	*    "FROM_USER_ID" =&gt; 1, 
@@ -124,10 +124,10 @@ class CSocNetMessages extends CAllSocNetMessages
 
 	
 	/**
-	* <p>Метод изменяет параметры сообщения.</p>
+	* <p>Метод изменяет параметры сообщения. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Код сообщения.
+	* @param int $intID  Код сообщения.
 	*
 	* @param array $arFields  Массив измененных параметров сообщения. Может содержать
 	* ключи:<br><b>FROM_USER_ID</b> - от кого,<br><b>TO_USER_ID</b> - кому,<br><b>MESSAGE</b> -
@@ -137,7 +137,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* почте.
 	*
 	* @return int <p>Метод возвращает ID сообщения в случае успешного завершения или
-	* false в случае ошибки.</p> <br><br>
+	* false в случае ошибки.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/Update.php
@@ -204,7 +204,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	/***************************************/
 	
 	/**
-	* <p>Метод возвращает список сообщений в соответствии с фильтром.</p>
+	* <p>Метод возвращает список сообщений в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
@@ -215,7 +215,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* <b>FROM_USER_LOGIN</b>, <b>FROM_USER_LID</b>, <b>TO_USER_NAME</b>, <b>TO_USER_LAST_NAME</b>, <b>TO_USER_LOGIN</b>,
 	* <b>TO_USER_EMAIL</b>, <b>TO_USER_LID</b>.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля: <b>ID</b>, <b>FROM_USER_ID</b>, <b>TO_USER_ID</b>, <b>DATE_CREATE</b>, <b>DATE_VIEW</b>, <b>MESSAGE_TYPE</b>,
 	* <b>FROM_DELETED</b>, <b>TO_DELETED</b>, <b>SEND_MAIL</b>, <b>EMAIL_TEMPLATE</b>, <b>FROM_USER_NAME</b>,
@@ -243,7 +243,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* удовлетворяющие условию выборки.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getbyid.php">CSocNetMessages::GetById</a>
 	* </li> </ul><br><br>
 	*
@@ -393,25 +393,25 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-
+	
 	/**
-	* <p>Возвращает дату последнего сообщения в переписке между пользователями.</p>
+	* <p>Возвращает дату последнего сообщения в переписке между пользователями. Метод нестатический.</p>
 	*
 	*
-	* @param int $userID1  Первый пользователь. </ht
+	* @param int $userID1  Первый пользователь.
 	*
-	* @param int $userID2  Второй пользователь. </htm
+	* @param int $userID2  Второй пользователь.
 	*
 	* @return string <p>Строка, содержащая дату последнего сообщения между
 	* пользователями в формате YYYY-MM-DD 00:00:00. Если сообщений между
 	* пользователями нет, то возвращается текущая дата в указанном
-	* формате.</p> <br><br>
+	* формате.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getchatlastdate.php
 	* @author Bitrix
 	*/
-	public static 	function GetChatLastDate($currentUserID, $userID)
+	public static function GetChatLastDate($currentUserID, $userID)
 	{
 		global $DB;
 
@@ -448,9 +448,9 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $date;
 	}
 
-
+	
 	/**
-	* <p>Возвращает сообщения переписки между пользователями.</p>
+	* <p>Возвращает сообщения переписки между пользователями. Метод нестатический.</p>
 	*
 	*
 	* @param int $currentUserID  Код текущего пользователя.
@@ -480,7 +480,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/GetMessagesForChat.php
 	* @author Bitrix
 	*/
-	public static 	function GetMessagesForChat($currentUserID, $userID, $date = false, $arNavStartParams = false, $replyMessId=false)
+	public static function GetMessagesForChat($currentUserID, $userID, $date = false, $arNavStartParams = false, $replyMessId=false)
 	{
 		global $DB;
 
@@ -571,12 +571,12 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-
+	
 	/**
-	* <p>Возвращает список пользователей, имеющих переписку с данным пользователем.</p>
+	* <p>Возвращает список пользователей, имеющих переписку с данным пользователем. Метод нестатический.</p>
 	*
 	*
-	* @param int $userID  Код пользователя. </h
+	* @param int $userID  Код пользователя.
 	*
 	* @param array $arNavStartParams = false Параметры постраничной навигации.
 	*
@@ -592,7 +592,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* сообщений. </p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Выберем пользователей, имеющих переписку с текущим пользователем для постраничной навигации в 20 записей
 	* $arNavParams = array("nPageSize" =&gt; 20, "bDescPageNumbering" =&gt; false);
@@ -614,7 +614,7 @@ class CSocNetMessages extends CAllSocNetMessages
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetmessages/getmessagesusers.php
 	* @author Bitrix
 	*/
-	public static 	function GetMessagesUsers($userID, $arNavStartParams = false, $online_interval = 120)
+	public static function GetMessagesUsers($userID, $arNavStartParams = false, $online_interval = 120)
 	{
 		global $DB;
 
@@ -680,7 +680,7 @@ class CSocNetMessages extends CAllSocNetMessages
 		return $dbRes;
 	}
 
-public static 	function Now()
+	public static function Now()
 	{
 		global $DB;
 

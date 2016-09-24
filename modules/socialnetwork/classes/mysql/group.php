@@ -3,7 +3,7 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/socialnetwork/classes/ge
 
 
 /**
- * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети. 
+ * <b>CSocNetGroup</b> - класс для работы с рабочими группами социальной сети.
  *
  *
  * @return mixed 
@@ -183,10 +183,10 @@ class CSocNetGroup extends CAllSocNetGroup
 
 	
 	/**
-	* <p>Метод изменяет параметры группы с заданным идентификатором.</p> <p><b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</p>
+	* <p>Метод изменяет параметры группы с заданным идентификатором. Метод статический.</p> <p></p> <div class="note"> <b>Примечание</b>: при работе метода вызываются события <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnBeforeSocNetGroupUpdate.php">OnBeforeSocNetGroupUpdate</a> и <a href="http://dev.1c-bitrix.ru/api_help/socialnetwork/events/OnSocNetGroupUpdate.php">OnSocNetGroupUpdate</a>.</div>
 	*
 	*
-	* @param int $ID  Идентификатор группы </htm
+	* @param int $intID  Идентификатор группы
 	*
 	* @param array $arFields  Массив параметров группы, которые должны быть изменены. Ключами в
 	* массиве являются названия параметров, а значениями - новые
@@ -208,10 +208,10 @@ class CSocNetGroup extends CAllSocNetGroup
 	* @param bool $bClearCommonTag = true Необязательный. По умолчанию равен true.
 	*
 	* @return int <p>Метод возвращает код изменяемой группы или false в случае
-	* ошибки.</p> <a name="examples"></a>
+	* ошибки.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arFields = array(
 	* 	"NAME" =&gt; $_POST["GROUP_NAME"],
@@ -232,7 +232,7 @@ class CSocNetGroup extends CAllSocNetGroup
 	*/
 	public static function Update($ID, $arFields, $bAutoSubscribe = true, $bClearCommonTag = true)
 	{
-		global $DB;
+		global $DB, $APPLICATION, $CACHE_MANAGER, $USER_FIELD_MANAGER;
 
 		if (!CSocNetGroup::__ValidateID($ID))
 			return false;
@@ -242,7 +242,7 @@ class CSocNetGroup extends CAllSocNetGroup
 		$arGroupOld = CSocNetGroup::GetByID($ID);
 		if (!$arGroupOld)
 		{
-			$GLOBALS["APPLICATION"]->ThrowException(GetMessage("SONET_NO_GROUP"), "ERROR_NO_GROUP");
+			$APPLICATION->ThrowException(GetMessage("SONET_NO_GROUP"), "ERROR_NO_GROUP");
 			return false;
 		}
 
@@ -378,14 +378,14 @@ class CSocNetGroup extends CAllSocNetGroup
 			{
 				if ($bClearCommonTag)
 				{
-					$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
+					$CACHE_MANAGER->ClearByTag("sonet_group");
 				}
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group_G".$ID);
-				$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_user2group");
+				$CACHE_MANAGER->ClearByTag("sonet_group_".$ID);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group_G".$ID);
+				$CACHE_MANAGER->ClearByTag("sonet_user2group");
 			}
 
-			$GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_GROUP", $ID, $arFields);
+			$USER_FIELD_MANAGER->Update("SONET_GROUP", $ID, $arFields);
 
 			$events = GetModuleEvents("socialnetwork", "OnSocNetGroupUpdate");
 			while ($arEvent = $events->Fetch())
@@ -401,7 +401,7 @@ class CSocNetGroup extends CAllSocNetGroup
 					elseif ($arGroupNew["ACTIVE"] == "Y")
 					{
 						$BODY = CSocNetTextParser::killAllTags($arGroupNew["~DESCRIPTION"]);
-						$BODY .= $GLOBALS["USER_FIELD_MANAGER"]->OnSearchIndex("SONET_GROUP", $ID);
+						$BODY .= $USER_FIELD_MANAGER->OnSearchIndex("SONET_GROUP", $ID);
 
 						$arSearchIndexSiteID = array();
 						$rsGroupSite = CSocNetGroup::GetSite($ID);
@@ -462,15 +462,15 @@ class CSocNetGroup extends CAllSocNetGroup
 		}
 		else
 		{
-			if($GLOBALS["USER_FIELD_MANAGER"]->Update("SONET_GROUP", $ID, $arFields))
+			if($USER_FIELD_MANAGER->Update("SONET_GROUP", $ID, $arFields))
 			{
 				if(defined("BX_COMP_MANAGED_CACHE"))
 				{
 					if ($bClearCommonTag)
 					{
-						$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group");
+						$CACHE_MANAGER->ClearByTag("sonet_group");
 					}
-					$GLOBALS["CACHE_MANAGER"]->ClearByTag("sonet_group_".$ID);
+					$CACHE_MANAGER->ClearByTag("sonet_group_".$ID);
 				}
 			}
 			else
@@ -487,7 +487,7 @@ class CSocNetGroup extends CAllSocNetGroup
 	/***************************************/
 	
 	/**
-	* <p>Возвращает список групп в соответствии с фильтром.</p>
+	* <p>Возвращает список групп в соответствии с фильтром. Метод статический.</p>
 	*
 	*
 	* @param array $arOrder = array("ID" Порядок сортировки возвращаемого списка, заданный в виде
@@ -498,7 +498,7 @@ class CSocNetGroup extends CAllSocNetGroup
 	* <b>INITIATE_PERMS</b>, <b>SPAM_PERMS</b>, <b>SUBJECT_NAME</b>, <b>OWNER_NAME</b>, <b>OWNER_LAST_NAME</b>,
 	* <b>OWNER_LOGIN</b>.
 	*
-	* @param DES $C  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
+	* @param mixed $DESC  Массив, задающий фильтр на возвращаемый список. Ключами в массиве
 	* являются названия полей, а значениями - их значения. Допустимые
 	* поля:<b>ID</b>, <b>SITE_ID</b>, <b>NAME</b>, <b>DATE_CREATE</b>, <b>DATE_UPDATE</b>, <b>DATE_ACTIVITY</b>,
 	* <b>ACTIVE</b>, <b>VISIBLE</b>, <b>OPENED</b>, <b>CLOSED</b>, <b>SUBJECT_ID</b>, <b>OWNER_ID</b>,
@@ -527,7 +527,7 @@ class CSocNetGroup extends CAllSocNetGroup
 	* удовлетворяющие условию выборки.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnetgroup/getbyid.php">CSocNetGroup::GetById</a> </li>
 	* </ul><br><br>
 	*
@@ -731,4 +731,3 @@ class CSocNetGroup extends CAllSocNetGroup
 		return $dbRes;
 	}
 }
-?>

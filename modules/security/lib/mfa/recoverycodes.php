@@ -31,6 +31,17 @@ class RecoveryCodesTable
 	 *
 	 * @return string
 	 */
+	
+	/**
+	* <p>Статический метод возвращает имя таблицы в базе данных, соответствующей сущности.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return string 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/recoverycodestable/gettablename.php
+	* @author Bitrix
+	*/
 	public static function getTableName()
 	{
 		return 'b_sec_recovery_codes';
@@ -41,6 +52,17 @@ class RecoveryCodesTable
 	 *
 	 * @return array
 	 */
+	
+	/**
+	* <p>Статический метод возвращает список полей с типами.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/recoverycodestable/getmap.php
+	* @author Bitrix
+	*/
 	public static function getMap()
 	{
 		return array(
@@ -78,6 +100,19 @@ class RecoveryCodesTable
 	 * @throws ArgumentTypeException
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Статический метод удаляет все сохраненные резервные коды для указанных пользователей.</p>
+	*
+	*
+	* @param integer $userId  ID пользователя.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/recoverycodestable/clearbyuser.php
+	* @author Bitrix
+	*/
 	public static function clearByUser($userId)
 	{
 		$userId = (int) $userId;
@@ -105,6 +140,19 @@ class RecoveryCodesTable
 	 * @return bool Returns true if successful
 	 * @throws ArgumentTypeException
 	 */
+	
+	/**
+	* <p>Статический метод генерирует новые резервные коды для указанного пользователя. Предыдущие резервные коды будут удалены.</p>
+	*
+	*
+	* @param integer $userId  ID пользователя.
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/recoverycodestable/regeneratecodes.php
+	* @author Bitrix
+	*/
 	public static function regenerateCodes($userId)
 	{
 		$userId = (int) $userId;
@@ -138,6 +186,21 @@ class RecoveryCodesTable
 	 * @throws ArgumentTypeException
 	 * @throws \Bitrix\Main\ArgumentException
 	 */
+	
+	/**
+	* <p>Статический метод "использует" резервный код для пользователя.</p>
+	*
+	*
+	* @param integer $userId  ID пользователя.
+	*
+	* @param string $searchCode  Резервный код в приемлемом формате (см. <code>RecoveryCodesTable::CODE_PATTERN</code>).
+	*
+	* @return boolean 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/security/mfa/recoverycodestable/usecode.php
+	* @author Bitrix
+	*/
 	public static function useCode($userId, $searchCode)
 	{
 		$userId = (int) $userId;

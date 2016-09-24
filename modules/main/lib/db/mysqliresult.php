@@ -24,6 +24,17 @@ class MysqliResult extends Result
 	 *
 	 * @return integer
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает число строк в результате запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqliresult/getselectedrowscount.php
+	* @author Bitrix
+	*/
 	public function getSelectedRowsCount()
 	{
 		return $this->resource->num_rows;
@@ -34,6 +45,17 @@ class MysqliResult extends Result
 	 *
 	 * @return \Bitrix\Main\Entity\ScalarField[]
 	 */
+	
+	/**
+	* <p>Нестатический метод возвращает массив полей, связанный с колонками в результате запроса.</p> <p>Без параметров</p> <a name="example"></a>
+	*
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/mysqliresult/getfields.php
+	* @author Bitrix
+	*/
 	public function getFields()
 	{
 		if ($this->resultFields == null)

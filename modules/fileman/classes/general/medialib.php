@@ -7,7 +7,7 @@ class CMedialib
 		$cacheTime = 360000,
 		$cachePath = "medialib/";
 
-	function Init(){}
+	public static function Init(){}
 	public static function GetOperations($collectionId, $menu = false)
 	{
 		global $USER;
@@ -259,7 +259,7 @@ class CMedialib
 		}
 	}
 
-	static function AttachJSScripts()
+	public static function AttachJSScripts()
 	{
 		if(!defined("BX_B_MEDIALIB_SCRIPT_LOADED"))
 		{
@@ -1555,7 +1555,7 @@ window.MLSearchResult = [
 			if ($arFields['NEW']) // Add
 			{
 				unset($arFields['NEW']);
-				CDatabase::Add("b_medialib_type", $arFields, array("DESCRIPTION"));
+				$DB->Add("b_medialib_type", $arFields, array("DESCRIPTION"));
 			}
 			else // Update
 			{
@@ -1768,6 +1768,58 @@ window.bx_req_res = {
 					$cache->CleanDir(self::$cachePath.$path);
 		}
 	}
+
+	public static function AutosaveImage($file = false)
+	{
+		$res = CMedialibCollection::GetList(array(
+			'arFilter' => array(
+				'ACTIVE' => 'Y',
+				'NAME' => GetMessage('ML_AUTOSAVE_DEFAULT_COL')
+			)
+		));
+		$result = false;
+
+		if (!$res || count($res) == 0)
+		{
+			$colId = CMedialibCollection::Edit(array(
+				'arFields' => array(
+					'NAME' => GetMessage('ML_AUTOSAVE_DEFAULT_COL'),
+					'DESCRIPTION' => GetMessage('ML_AUTOSAVE_DEFAULT_COL_DEF'),
+					'OWNER_ID' => $GLOBALS['USER']->GetId(),
+					'KEYWORDS' => '',
+					'ACTIVE' => "Y",
+					'ML_TYPE' => 'image'
+				)
+			));
+		}
+		else
+		{
+			$colId = $res[0]['ID'];
+		}
+
+		if ($colId && $file)
+		{
+			$res = CMedialibItem::Edit(array(
+				'file' => $file,
+				'path' => '',
+				'arFields' => array(
+					'NAME' => $file['name']
+				),
+				'arCollections' => array($colId)
+			));
+
+			if ($res && $res['ID'] > 0)
+			{
+				$item = CMedialibItem::GetList(array('id' => $res['ID']));
+				if (is_array($item) && count($item) > 0)
+				{
+					$result = $item[0];
+				}
+			}
+		}
+
+		return $result;
+	}
 }
 
 class CMedialibCollection
@@ -1838,7 +1890,7 @@ class CMedialibCollection
 		$res = $DB->Query($strSql, false, $err_mess.__LINE__);
 		$arResult = Array();
 		while($arRes = $res->Fetch())
-			$arResult[]=$arRes;
+			$arResult[] = $arRes;
 
 		return $arResult;
 	}
@@ -1880,7 +1932,7 @@ class CMedialibCollection
 		if ($bNew) // Add
 		{
 			unset($arFields['ID']);
-			$ID = CDatabase::Add("b_medialib_collection", $arFields, array("DESCRIPTION"));
+			$ID = $DB->Add("b_medialib_collection", $arFields, array("DESCRIPTION"));
 		}
 		else // Update
 		{
@@ -2152,7 +2204,7 @@ class CMedialibItem
 			$arFields['SOURCE_ID'] = $source_id;
 			$arFields['~DATE_CREATE'] = $arFields['~DATE_UPDATE'];
 			$arFields['ITEM_TYPE'] = '';
-			$ID = CDatabase::Add("b_medialib_item", $arFields, array("DESCRIPTION","SEARCHABLE_CONTENT"));
+			$ID = $DB->Add("b_medialib_item", $arFields, array("DESCRIPTION","SEARCHABLE_CONTENT"));
 		}
 		else // Update
 		{

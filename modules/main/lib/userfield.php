@@ -229,9 +229,22 @@ class UserFieldTable extends Entity\DataManager
 		);
 
 		// initialize entity
-		$entity = Entity\Base::compileEntity($utsClass, $fieldsMap, array(
-			'namespace' => $utsNamespace, 'table_name' => $utsTable
-		));
+		if (class_exists($utsNamespace."\\".$utsClass))
+		{
+			Entity\Base::destroy($utsNamespace."\\".$utsClass);
+			$entity = Entity\Base::getInstance($utsNamespace."\\".$utsClass);
+
+			foreach ($fieldsMap as $fieldName => $field)
+			{
+				$entity->addField($field, $fieldName);
+			}
+		}
+		else
+		{
+			$entity = Entity\Base::compileEntity($utsClass, $fieldsMap, array(
+				'namespace' => $utsNamespace, 'table_name' => $utsTable
+			));
+		}
 
 		foreach ($utsFields as $utsField)
 		{
@@ -328,7 +341,7 @@ class UserFieldTable extends Entity\DataManager
 		// get table name
 		$utmTable = static::getUtmEntityTableNameBySrcEntity($srcEntity);
 
-		// coolect fields
+		// collect fields
 		$fieldsMap = array(
 			'ID' => array(
 				'data_type' => 'integer',
@@ -365,9 +378,22 @@ class UserFieldTable extends Entity\DataManager
 		);
 
 		// initialize entity
-		$entity = Entity\Base::compileEntity($utmClass, $fieldsMap, array(
-			'namespace' => $utmNamespace, 'table_name' => $utmTable
-		));
+		if (class_exists($utmNamespace."\\".$utmClass))
+		{
+			Entity\Base::destroy($utmNamespace."\\".$utmClass);
+			$entity = Entity\Base::getInstance($utmNamespace."\\".$utmClass);
+
+			foreach ($fieldsMap as $fieldName => $field)
+			{
+				$entity->addField($field, $fieldName);
+			}
+		}
+		else
+		{
+			$entity = Entity\Base::compileEntity($utmClass, $fieldsMap, array(
+				'namespace' => $utmNamespace, 'table_name' => $utmTable
+			));
+		}
 
 		// add utm fields being mapped on real column name
 		foreach ($utmFields as $utmField)

@@ -27,7 +27,7 @@ class CSVUserImport
 	var $arSectionCache = Array();
 	var $isUserPropertyCreate = false;
 
-	public function CSVUserImport($csvFilePath, $delimiter)
+	public function __construct($csvFilePath, $delimiter)
 	{
 		require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/classes/general/csv_data.php");
 

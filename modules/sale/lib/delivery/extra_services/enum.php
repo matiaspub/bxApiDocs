@@ -41,7 +41,7 @@ class Enum extends Base
 		return $this->convertToOperatingCurrency($result);
 	}
 
-	public static function prepareParamsToSave($params)
+	public static function prepareParamsToSave(array $params)
 	{
 		if(!isset($params["PARAMS"]["PRICES"]) || !is_array($params["PARAMS"]["PRICES"]))
 			return $params;
@@ -85,10 +85,13 @@ class Enum extends Base
 
 	protected static function getValueHtml($name, $id, $title = "", $price = "", $currency = "")
 	{
+		$price = roundEx(floatval($price), SALE_VALUE_PRECISION);
+		$currency = htmlspecialcharsbx($currency);
+
 		return Loc::getMessage("DELIVERY_EXTRA_SERVICE_ENUM_NAME").
-			':&nbsp;<input name="'.$name.'[PARAMS][PRICES]['.$id.'][TITLE]" value="'.$title.'">&nbsp;&nbsp;'.
+			':&nbsp;<input name="'.$name.'[PARAMS][PRICES]['.$id.'][TITLE]" value="'.htmlspecialcharsbx($title).'">&nbsp;&nbsp;'.
 			Loc::getMessage("DELIVERY_EXTRA_SERVICE_ENUM_PRICE").
-			':&nbsp;<input name="'.$name.'[PARAMS][PRICES]['.$id.'][PRICE]" value="'.$price.'">'.(strlen($currency) > 0 ? " (".$currency.")" : "");
+			':&nbsp;<input name="'.$name.'[PARAMS][PRICES]['.$id.'][PRICE]" value="'.$price.'">'.(strlen($currency) > 0 ? " (".htmlspecialcharsbx($currency).")" : "");
 	}
 
 	protected static function getJSPrice(array $prices)
@@ -96,7 +99,10 @@ class Enum extends Base
 		if(empty($prices))
 			return "";
 
-		return '(function(value){var prices='.\CUtil::PhpToJSObject($prices).'; return prices[value]["PRICE"];})(this.value)';
+		foreach($prices as $id => $price)
+			$prices[$id] = roundEx(floatval($price), SALE_VALUE_PRECISION);
+
+		return "(function(value){var prices=".\CUtil::PhpToJSObject($prices)."; return prices[value]['PRICE'];})(this.value)";
 	}
 
 	public function setOperatingCurrency($currency)
@@ -127,13 +133,14 @@ class Enum extends Base
 			if(strlen($price["TITLE"]) <= 0)
 				continue;
 
+			$priceVal = floatval($price["PRICE"]);
 			$this->params["OPTIONS"][$key] =
 				$price["TITLE"].
 				" (".
 				SaleFormatCurrency(
-					$this->convertToOperatingCurrency($price["PRICE"]),
+					$this->convertToOperatingCurrency($priceVal),
 					$this->operatingCurrency,
-					true
+					false
 				).
 				")";
 		}
@@ -153,7 +160,7 @@ class Enum extends Base
 
 	protected function createJSOnchange($id, array $prices)
 	{
-		return 'BX.onCustomEvent("onDeliveryExtraServiceValueChange", [{"id" : "'.$id.'", "value": this.value, "price": '.$this->getJSPrice($prices).'}]);';
+		return "BX.onCustomEvent('onDeliveryExtraServiceValueChange', [{'id' : '".$id."', 'value': this.value, 'price': ".$this->getJSPrice($prices)."}]);";
 	}
 
 }

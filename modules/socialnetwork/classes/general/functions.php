@@ -3,7 +3,7 @@ IncludeModuleLangFile(__FILE__);
 
 
 /**
- * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов. 
+ * <b>CSocNetTextParser</b> - класс, предназначенный для форматирования сообщений социальной сети. Осуществляет замену спецсимволов и заказных тегов на реальные HTML-теги, обработку ссылок, отображение смайлов.
  *
  *
  * @return mixed 
@@ -100,34 +100,36 @@ class CSocNetTextParser
 
 	
 	/**
-	* <p>Метод форматирования сообщения.</p>
+	* <p>Метод форматирования сообщения. Метод нестатический.</p>
 	*
 	*
-	* @param string $text  Исходное сообщение. </ht
+	* @param string $text  Исходное сообщение.
 	*
 	* @param bool $bPreview = true Необязательный параметр. По умолчанию равен true.
 	*
 	* @param array $arImages = array() Массив картинок сообщения.
 	*
 	* @param array $allow = array() Массив параметров для форматирования сообщения, со значениями
-	* <i>Y</i> или <i>N</i>: <ul> <li> <b>HTML</b> - в тексте могут содержаться любые HTML
-	* теги, </li> <li> <b>ANCHOR</b> - разрешен тег &lt;a&gt;, </li> <li> <b>BIU</b> - разрешены
-	* теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li> <li> <b>IMG</b> - разрешен тег &lt;img&gt;, </li> <li>
-	* <b>QUOTE</b> - разрешен тег цитирования &lt;quote&gt;, </li> <li> <b>CODE</b> - разрешен
-	* тег показа кода &lt;code&gt;, </li> <li> <b>FONT</b> - разрешен тег &lt;font&gt;, </li> <li>
-	* <b>LIST</b> - разрешены теги &lt;ul&gt;, &lt;li&gt;, </li> <li> <b>SMILES</b> - показ
-	* смайликов в виде картинок, </li> <li> <b>NL2BR</b> - заменять переводы
-	* каретки на тег &lt;br&gt; при разрешении принимать любые HTML теги, </li>
-	* <li> <b>VIDEO</b> - разрешена вставка видео, </li> </ul>
+	* <i>Y</i> или <i>N</i>:          <ul> <li> <b>HTML</b> - в тексте могут содержаться любые
+	* HTML теги, </li>                  <li> <b>ANCHOR</b> - разрешен тег &lt;a&gt;, </li>                  
+	* <li> <b>BIU</b> - разрешены теги &lt;b&gt;, &lt;i&gt;, &lt;u&gt;, </li>                   <li> <b>IMG</b> -
+	* разрешен тег &lt;img&gt;, </li>                  <li> <b>QUOTE</b> - разрешен тег
+	* цитирования &lt;quote&gt;, </li>                   <li> <b>CODE</b> - разрешен тег показа
+	* кода &lt;code&gt;, </li>                   <li> <b>FONT</b> - разрешен тег &lt;font&gt;, </li>           
+	*        <li> <b>LIST</b> - разрешены теги &lt;ul&gt;, &lt;li&gt;, </li>                   <li> <b>SMILES</b>
+	* - показ смайликов в виде картинок, </li>                  <li> <b>NL2BR</b> -
+	* заменять переводы каретки на тег &lt;br&gt; при разрешении принимать
+	* любые HTML теги, </li>           <li> <b>VIDEO</b> - разрешена вставка видео, </li>       
+	*  </ul>
 	*
 	* @param string $type = html Тип сообщения. Необязательный параметр. По умолчанию принимает
 	* значение html.
 	*
-	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <a
+	* @return string <p>Метод возвращает отформатированную строку сообщения.</p><a
 	* name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $parser = new CSocNetTextParser(LANGUAGE_ID, "/bitrix/images/socialnetwork/smile/");
 	* $parser-&gt;MaxStringLen = 20;
@@ -487,12 +489,12 @@ class CSocNetTextParser
 
 	
 	/**
-	* <p>Метод форматирования сообщения для отправки по электронной почте.</p>
+	* <p>Метод форматирования сообщения для отправки по электронной почте. Метод нестатический.</p>
 	*
 	*
 	* @param string $text  Текст сообщения.
 	*
-	* @return string <p>Метод возвращает отформатированную строку сообщения.</p> <br><br>
+	* @return string <p>Метод возвращает отформатированную строку сообщения.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettextparser/convert4mail.php
@@ -1104,7 +1106,7 @@ class CSocNetTextParser
 
 
 /**
- * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети. 
+ * <b>CSocNetTools</b> - вспомогательный класс модуля социальной сети.
  *
  *
  * @return mixed 
@@ -1117,7 +1119,7 @@ class CSocNetTools
 {
 	
 	/**
-	* <p>Метод возвращает параметры изображения, заданного его идентификатором. При необходимости осуществляется масштабирование изображения. В случае отсутствия изображения возвращается изображение заданное как изображение по-умолчанию.</p>
+	* <p>Метод возвращает параметры изображения, заданного его идентификатором. При необходимости осуществляется масштабирование изображения. В случае отсутствия изображения возвращается изображение заданное как изображение по-умолчанию. Метод нестатический.</p>
 	*
 	*
 	* @param int $imageID  Идентификатор изображения.
@@ -1142,10 +1144,10 @@ class CSocNetTools
 	* @return array <p>Метод возвращает массив с ключами FILE и IMG. В ключе FILE содержится
 	* массив, описывающий изображение (аналогичен массиву,
 	* возвращаемому метолом CFile::GetFileArray). В ключе IMG содержится готовая
-	* для вывода строка HTML, показывающая изображение.</p> <a name="examples"></a>
+	* для вывода строка HTML, показывающая изображение.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>$arImage = CSocNetTools::InitImage($personalPhoto, 150, "/bitrix/images/socialnetwork/nopic_user_150.gif", 150, "", false);<br>?&gt;
 	* </pre>
 	*
@@ -1220,7 +1222,7 @@ class CSocNetTools
 
 	
 	/**
-	* <p>Метод осуществляет масштабирование изображения, заданного в виде идентификатора или в виде массива, совпадающего по структуре с массивом, возвращаемым методом CFile::GetByID. Если размеры изображения превышают заданные, то осуществляется масштабирование.</p> <p><b>Примечание</b>: возможное примечание.</p>
+	* <p>Метод осуществляет масштабирование изображения, заданного в виде идентификатора или в виде массива, совпадающего по структуре с массивом, возвращаемым методом CFile::GetByID. Если размеры изображения превышают заданные, то осуществляется масштабирование. Метод нестатический.</p> <p><b>Примечание</b>: возможное примечание.</p>
 	*
 	*
 	* @param mixed $aFile  Идентификатор изображения или в массив, совпадающий по структуре
@@ -1231,8 +1233,7 @@ class CSocNetTools
 	* @param int $sizeY  Масштабируемый размер по вертикали.
 	*
 	* @return string <p>Метод возвращает путь к масштабируемому изображению
-	* относительно корня сайта. В случае ошибки возвращается false.</p>
-	* <br><br>
+	* относительно корня сайта. В случае ошибки возвращается false.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/csocnettools_resizeimage.php
@@ -1268,7 +1269,7 @@ class CSocNetTools
 
 	
 	/**
-	* <p>Подготавливает день рождения для вывода.</p>
+	* <p>Подготавливает день рождения для вывода. Метод нестатический.</p>
 	*
 	*
 	* @param date $datetime  Дата рождения
@@ -1279,7 +1280,7 @@ class CSocNetTools
 	* показывать только для мужского пола, N - не показывать.
 	*
 	* @return array <p>Метод возвращает массив с ключами: DATE - отформатированный день
-	* рождения, MONTH - месяц рождения, DAY - день в месяце.</p> <br><br>
+	* рождения, MONTH - месяц рождения, DAY - день в месяце.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/socialnetwork/classes/csocnettools/csocnettools_birthday.php
@@ -1472,83 +1473,8 @@ class CSocNetTools
 
 			if($GLOBALS["USER"]->IsAuthorized())
 			{
-				$ttl = (defined("BX_COMP_MANAGED_CACHE") ? 2592000 : 600);
-				$cache_id = 'sonet_ex_gr_'.$SITE_ID;
-				$obCache = new CPHPCache;
-				$cache_dir = '/bitrix/sonet_log_sg';
-
-				if($obCache->InitCache($ttl, $cache_id, $cache_dir))
-				{
-					$tmpVal = $obCache->GetVars();
-					$GLOBALS["arExtranetGroupID"] = $tmpVal['EX_GROUP_ID'];
-					$GLOBALS["arExtranetUserID"] = $tmpVal['EX_USER_ID'];
-					unset($tmpVal);
-				}
-				elseif (CModule::IncludeModule("extranet"))
-				{
-					global $CACHE_MANAGER;
-					if (defined("BX_COMP_MANAGED_CACHE"))
-					{
-						$CACHE_MANAGER->StartTagCache($cache_dir);
-					}
-
-					if (!CExtranet::IsExtranetSite())
-					{
-						$dbGroupTmp = CSocNetGroup::GetList(
-							array(),
-							array(
-								"SITE_ID" => CExtranet::GetExtranetSiteID()
-							),
-							false,
-							false,
-							array("ID")
-						);
-						while($arGroupTmp = $dbGroupTmp->Fetch())
-						{
-							$GLOBALS["arExtranetGroupID"][] = $arGroupTmp["ID"];
-							if (defined("BX_COMP_MANAGED_CACHE"))
-							{
-								$CACHE_MANAGER->RegisterTag('sonet_group_'.$arGroupTmp["ID"]);
-							}
-						}
-
-						if (defined("BX_COMP_MANAGED_CACHE"))
-						{
-							$CACHE_MANAGER->RegisterTag('sonet_group');
-						}
-					}
-
-					$rsUsers = CUser::GetList(
-						($by="ID"),
-						($order="asc"),
-						array(
-							"GROUPS_ID" => array(CExtranet::GetExtranetUserGroupID()),
-							"UF_DEPARTMENT" => false
-						),
-						array("FIELDS" => array("ID"))
-					);
-					while($arUser = $rsUsers->Fetch())
-					{
-						$GLOBALS["arExtranetUserID"][] = $arUser["ID"];
-						if (defined("BX_COMP_MANAGED_CACHE"))
-						{
-							$CACHE_MANAGER->RegisterTag('sonet_user2group');
-						}
-					}
-
-					if (defined("BX_COMP_MANAGED_CACHE"))
-					{
-						$CACHE_MANAGER->EndTagCache();
-					}
-
-					if($obCache->StartDataCache())
-					{
-						$obCache->EndDataCache(array(
-							'EX_GROUP_ID' => $GLOBALS["arExtranetGroupID"],
-							'EX_USER_ID' => $GLOBALS["arExtranetUserID"]
-						));
-					}
-				}
+				$GLOBALS["arExtranetGroupID"] = \Bitrix\Socialnetwork\ComponentHelper::getExtranetSonetGroupIdList();
+				$GLOBALS["arExtranetUserID"] = \Bitrix\Socialnetwork\ComponentHelper::getExtranetUserIdList();
 			}
 		}
 	}

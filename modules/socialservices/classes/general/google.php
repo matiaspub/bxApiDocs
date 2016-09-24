@@ -12,13 +12,6 @@ class CSocServGoogleOAuth extends CSocServAuth
 	/** @var CGoogleOAuthInterface null  */
 	protected $entityOAuth = null;
 
-	protected $userId = null;
-
-	public function __construct($userId = null)
-	{
-		$this->userId = $userId;
-	}
-
 	/**
 	 * @param string $code=false
 	 * @return CGoogleOAuthInterface
@@ -38,12 +31,12 @@ class CSocServGoogleOAuth extends CSocServAuth
 		return $this->entityOAuth;
 	}
 
-	static public function GetSettings()
+	public function GetSettings()
 	{
 		return array(
 			array("google_appid", GetMessage("socserv_google_client_id"), "", Array("text", 40)),
 			array("google_appsecret", GetMessage("socserv_google_client_secret"), "", Array("text", 40)),
-			array("note"=>GetMessage("socserv_google_note", array('#URL#'=>CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php"))),
+			array("note"=>GetMessage("socserv_google_note", array('#URL#'=>$this->getEntityOAuth()->getRedirectUri()))),
 		);
 	}
 
@@ -86,14 +79,14 @@ class CSocServGoogleOAuth extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = static::CONTROLLER_URL."/redirect.php";
-			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php?check_key=".$_SESSION["UNIQUE_KEY"]."&state=";
+			$state = $this->getEntityOAuth()->getRedirectUri()."?check_key=".$_SESSION["UNIQUE_KEY"]."&state=";
 			$backurl = $GLOBALS["APPLICATION"]->GetCurPageParam('', array("logout", "auth_service_error", "auth_service_id", "backurl"));
 			$state .= urlencode('provider='.static::ID. "&state=".urlencode("backurl=".urlencode($backurl).'&mode='.$location.(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '')));
 		}
 		else
 		{
 			$state = 'provider='.static::ID.'&site_id='.SITE_ID.'&backurl='.urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).'&mode='.$location.(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '');
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php";
+			$redirect_uri = $this->getEntityOAuth()->getRedirectUri();
 		}
 
 		return $this->entityOAuth->GetAuthUrl($redirect_uri, $state);
@@ -113,9 +106,14 @@ class CSocServGoogleOAuth extends CSocServAuth
 				if(empty($accessToken) || ((intval($arOauth["OATOKEN_EXPIRES"]) > 0) && (intval($arOauth["OATOKEN_EXPIRES"] < intval(time())))))
 				{
 					if(isset($arOauth['REFRESH_TOKEN']))
-						$this->entityOAuth->getNewAccessToken($arOauth['REFRESH_TOKEN'], $userId, true);
-					if(($accessToken = $this->entityOAuth->getToken()) === false)
+					{
+						$this->getEntityOAuth()->getNewAccessToken($arOauth['REFRESH_TOKEN'], $userId, true);
+					}
+
+					if(($accessToken = $this->getEntityOAuth()->getToken()) === false)
+					{
 						return null;
+					}
 				}
 			}
 		}
@@ -218,33 +216,26 @@ class CSocServGoogleOAuth extends CSocServAuth
 
 		$bSuccess = false;
 		$bProcessState = false;
+
 		$authError = SOCSERV_AUTHORISATION_ERROR;
 
 		if(
-			isset($_REQUEST["code"]) && $_REQUEST["code"] <> '' && CSocServAuthManager::CheckUniqueKey()
+			isset($_REQUEST["code"]) && $_REQUEST["code"] <> ''
+			&& CSocServAuthManager::CheckUniqueKey()
 		)
 		{
-			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
-			{
-				$redirect_uri = static::CONTROLLER_URL."/redirect.php";
-			}
-			else
-			{
-				$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php";
-			}
+			$this->getEntityOAuth()->setCode($_REQUEST["code"]);
 
 			$bProcessState = true;
 
-			$this->entityOAuth = $this->getEntityOAuth($_REQUEST['code']);
-			if($this->entityOAuth->GetAccessToken($redirect_uri) !== false)
+			if($this->getEntityOAuth()->GetAccessToken() !== false)
 			{
-				$arGoogleUser = $this->entityOAuth->GetCurrentUser();
+				$arGoogleUser = $this->getEntityOAuth()->GetCurrentUser();
 
 				if(is_array($arGoogleUser) && !isset($arGoogleUser["error"]))
 				{
 					$arFields = self::prepareUser($arGoogleUser);
 					$authError = $this->AuthorizeUser($arFields);
-					$bSuccess = $authError === true;
 				}
 			}
 		}
@@ -254,49 +245,56 @@ class CSocServGoogleOAuth extends CSocServAuth
 			unset($_REQUEST["state"]);
 		}
 
-		$url = ($APPLICATION->GetCurDir() == "/login/") ? "" : $APPLICATION->GetCurDir();
-		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset", "state");
+		$bSuccess = $authError === true;
 
-		$mode = 'opener';
-		$addParams = true;
-		if(isset($_REQUEST["state"]))
+		$aRemove = array("logout", "auth_service_error", "auth_service_id", "code", "error_reason", "error", "error_description", "check_key", "current_fieldset");
+
+		if($bSuccess)
 		{
-			$arState = array();
-			parse_str($_REQUEST["state"], $arState);
+			CSocServUtil::checkOAuthProxyParams();
 
-			if(isset($arState['backurl']) || isset($arState['redirect_url']))
+			$url = ($APPLICATION->GetCurDir() == "/login/") ? "" : $APPLICATION->GetCurDir();
+			$mode = 'opener';
+			$addParams = true;
+			if(isset($_REQUEST["state"]))
 			{
-				$url = !empty($arState['redirect_url']) ? $arState['redirect_url'] : $arState['backurl'];
-				if(substr($url, 0, 1) !== "#")
+				$arState = array();
+				parse_str($_REQUEST["state"], $arState);
+
+				if(isset($arState['backurl']) || isset($arState['redirect_url']))
 				{
-					$parseUrl = parse_url($url);
-
-					$urlPath = $parseUrl["path"];
-					$arUrlQuery = explode('&', $parseUrl["query"]);
-
-					foreach($arUrlQuery as $key => $value)
+					$url = !empty($arState['redirect_url']) ? $arState['redirect_url'] : $arState['backurl'];
+					if(substr($url, 0, 1) !== "#")
 					{
-						foreach($aRemove as $param)
+						$parseUrl = parse_url($url);
+
+						$urlPath = $parseUrl["path"];
+						$arUrlQuery = explode('&', $parseUrl["query"]);
+
+						foreach($arUrlQuery as $key => $value)
 						{
-							if(strpos($value, $param . "=") === 0)
+							foreach($aRemove as $param)
 							{
-								unset($arUrlQuery[$key]);
-								break;
+								if(strpos($value, $param . "=") === 0)
+								{
+									unset($arUrlQuery[$key]);
+									break;
+								}
 							}
 						}
+
+						$url = (!empty($arUrlQuery)) ? $urlPath . '?' . implode("&", $arUrlQuery) : $urlPath;
 					}
-
-					$url = (!empty($arUrlQuery)) ? $urlPath . '?' . implode("&", $arUrlQuery) : $urlPath;
+					else
+					{
+						$addParams = false;
+					}
 				}
-				else
+
+				if(isset($arState['mode']))
 				{
-					$addParams = false;
+					$mode = $arState['mode'];
 				}
-			}
-
-			if(isset($arState['mode']))
-			{
-				$mode = $arState['mode'];
 			}
 		}
 
@@ -338,21 +336,18 @@ class CSocServGoogleOAuth extends CSocServAuth
 		die();
 	}
 
+	public function setUser($userId)
+	{
+		$this->getEntityOAuth()->setUser($userId);
+	}
+
 	public function getFriendsList($limit, &$next)
 	{
-		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
-		{
-			$redirect_uri = static::CONTROLLER_URL."/redirect.php";
-		}
-		else
-		{
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/google.php";
-		}
+		$res = array();
 
-		$ob = $this->getEntityOAuth();
-		if($ob->GetAccessToken($redirect_uri) !== false)
+		if($this->getEntityOAuth()->GetAccessToken() !== false)
 		{
-			$res = $ob->getCurrentUserFriends($limit, $next);
+			$res = $this->getEntityOAuth()->getCurrentUserFriends($limit, $next);
 
 			foreach($res as $key => $contact)
 			{
@@ -386,6 +381,8 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 	const CONTACTS_URL = "https://www.googleapis.com/oauth2/v1/userinfo";
 	const FRIENDS_URL = "https://www.google.com/m8/feeds/contacts/default/full";
 	const TOKENINFO_URL = "https://www.googleapis.com/oauth2/v2/tokeninfo";
+
+	const REDIRECT_URI = "/bitrix/tools/oauth/google.php";
 
 	protected $scope = array(
 		'https://www.googleapis.com/auth/userinfo.email',
@@ -439,7 +436,7 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 			($state <> '' ? '&state='.urlencode($state) : '');
 	}
 
-	public function GetAccessToken($redirect_uri)
+	public function GetAccessToken($redirect_uri = false)
 	{
 		$tokens = $this->getStorageTokens();
 
@@ -456,7 +453,7 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 				}
 				elseif(isset($tokens["REFRESH_TOKEN"]))
 				{
-					if($this->getNewAccessToken($tokens["REFRESH_TOKEN"]))
+					if($this->getNewAccessToken($tokens["REFRESH_TOKEN"], $this->userId, true))
 					{
 						return true;
 					}
@@ -466,18 +463,43 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 			$this->deleteStorageTokens();
 		}
 
-
 		if($this->code === false)
+		{
 			return false;
+		}
 
-		$result = CHTTP::sPostHeader(static::TOKEN_URL, array(
+		if($redirect_uri === false)
+		{
+			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
+			{
+				$redirect_uri = \CSocServGoogleOAuth::CONTROLLER_URL."/redirect.php";
+			}
+			else
+			{
+				$redirect_uri = $this->getRedirectUri();
+			}
+		}
+
+		$http = new HttpClient(array(
+			"socketTimeout" => $this->httpTimeout
+		));
+
+		$result = $http->post(static::TOKEN_URL, array(
 			"code"=>$this->code,
 			"client_id"=>$this->appID,
 			"client_secret"=>$this->appSecret,
 			"redirect_uri"=>$redirect_uri,
 			"grant_type"=>"authorization_code",
-		), array(), $this->httpTimeout);
-		$this->arResult = CUtil::JsObjectToPhp($result);
+		));
+
+		try
+		{
+			$this->arResult = \Bitrix\Main\Web\Json::decode($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$this->arResult = array();
+		}
 
 		if(isset($this->arResult["access_token"]) && $this->arResult["access_token"] <> '')
 		{
@@ -528,7 +550,7 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 		$h = new \Bitrix\Main\Web\HttpClient();
 		$h->setTimeout($this->httpTimeout);
 
-		$result = $h->post(static::TOKENINFO_URL.'?access_token='.urlencode($this->access_token));
+		$result = $h->get(static::TOKENINFO_URL.'?access_token='.urlencode($this->access_token));
 
 		$result = \Bitrix\Main\Web\Json::decode($result);
 
@@ -672,16 +694,28 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 			return false;
 
 		if($refreshToken == false)
+		{
 			$refreshToken = $this->refresh_token;
+		}
 
-		$result = CHTTP::sPostHeader(static::TOKEN_URL, array(
+		$http = new HttpClient(
+			array("socketTimeout" => $this->httpTimeout)
+		);
+		$result = $http->post(static::TOKEN_URL, array(
 			"refresh_token"=>$refreshToken,
 			"client_id"=>$this->appID,
 			"client_secret"=>$this->appSecret,
 			"grant_type"=>"refresh_token",
-		), array(), $this->httpTimeout);
+		));
 
-		$this->arResult = CUtil::JsObjectToPhp($result);
+		try
+		{
+			$this->arResult = \Bitrix\Main\Web\Json::decode($result);
+		}
+		catch(\Bitrix\Main\ArgumentException $e)
+		{
+			$this->arResult = array();
+		}
 
 		if(isset($this->arResult["access_token"]) && $this->arResult["access_token"] <> '')
 		{
@@ -689,12 +723,28 @@ class CGoogleOAuthInterface extends CSocServOAuthTransport
 			$this->accessTokenExpires = $this->arResult["expires_in"] + time();
 			if($save && intval($userId) > 0)
 			{
-				$dbSocservUser = CSocServAuthDB::GetList(array(), array('USER_ID' => intval($userId), "EXTERNAL_AUTH_ID" => static::SERVICE_ID), false, false, array("ID"));
+				$dbSocservUser = \Bitrix\Socialservices\UserTable::getList(array(
+					'filter' => array(
+						'=EXTERNAL_AUTH_ID' => static::SERVICE_ID,
+						'=USER_ID' => $userId,
+					),
+					'select' => array("ID")
+				));
 				if($arOauth = $dbSocservUser->Fetch())
-					CSocServAuthDB::Update($arOauth["ID"], array("OATOKEN" => $this->access_token,"OATOKEN_EXPIRES" => $this->accessTokenExpires));
+				{
+					\Bitrix\Socialservices\UserTable::update($arOauth["ID"], array(
+						"OATOKEN" => $this->access_token,
+						"OATOKEN_EXPIRES" => $this->accessTokenExpires)
+					);
+				}
 			}
 			return true;
 		}
 		return false;
+	}
+
+	static public function getRedirectUri()
+	{
+		return \CHTTP::URN2URI(static::REDIRECT_URI);
 	}
 }

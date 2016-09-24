@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>. 
+ * <b>CUserOnline</b> - класс для получения данных о недавних <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#guest">посетителях</a> сайта и их <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессиях</a>.
  *
  *
  * @return mixed 
@@ -20,7 +20,7 @@ class CUserOnline
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* echo "Сейчас на сайте посетителей: ".<b>CUserOnline::GetGuestCount</b>();
 	* ?&gt;
@@ -66,19 +66,19 @@ class CUserOnline
 	* содержать количество <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#online">посетителей в online</a>.
 	*
-	* @param (&$guest_coun $t  Ссылка на переменную, которая после выполнения метода будет
+	* @param function &$(guest_count  Ссылка на переменную, которая после выполнения метода будет
 	* содержать количество сессий посетителей в online.
 	*
-	* @param &$session_coun $t  
+	* @param (&$guest_coun &$session_count  
 	*
-	* @param mixed $arOrder = Array() 
+	* @param &$session_coun $arOrder = Array() 
 	*
-	* @param mixed $arFilter = Array()) 
+	* @param array $arFilter = Array()) 
 	*
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // получим список записей
 	* $rs = <b>CUserOnline::GetList</b>($guest_counter, $session_counter);
@@ -97,7 +97,7 @@ class CUserOnline
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://www.1c-bitrix.ru/user_help/statistic/users_online.php">Отчет "Кто на сайте"</a>
-	* </li> </ul> </ht<a name="examples"></a>
+	* </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static

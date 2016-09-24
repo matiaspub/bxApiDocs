@@ -1088,7 +1088,7 @@ echo '<html>
 		}
 	}
 
-public static 	function RestoreSession()
+	public static function RestoreSession()
 	{
 		global $APPLICATION;
 		// if there is no session ID
@@ -1120,7 +1120,7 @@ public static 	function RestoreSession()
 	}
 
 	// обновляем счетчики сессий и новых посетителей у страны
-public static 	function UpdateCountry($COUNTRY_ID, $arFields, $DATE=false, $DATE_FORMAT="SHORT", $SIGN="+")
+	public static function UpdateCountry($COUNTRY_ID, $arFields, $DATE=false, $DATE_FORMAT="SHORT", $SIGN="+")
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$COUNTRY_ID = $DB->ForSql($COUNTRY_ID, 2);
@@ -1156,7 +1156,7 @@ public static 	function UpdateCountry($COUNTRY_ID, $arFields, $DATE=false, $DATE
 		}
 	}
 
-public static 	function UpdateCity($CITY_ID, $arFields, $DATE=false, $DATE_FORMAT="SHORT", $SIGN="+")
+	public static function UpdateCity($CITY_ID, $arFields, $DATE=false, $DATE_FORMAT="SHORT", $SIGN="+")
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$CITY_ID = intval($CITY_ID);
@@ -1192,7 +1192,7 @@ public static 	function UpdateCity($CITY_ID, $arFields, $DATE=false, $DATE_FORMA
 		}
 	}
 
-public static 	function SavePathData($SITE_ID, $CURRENT_PAGE, $ERROR_404)
+	public static function SavePathData($SITE_ID, $CURRENT_PAGE, $ERROR_404)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$DB_now = $DB->GetNowFunction();
@@ -1439,7 +1439,7 @@ public static 	function SavePathData($SITE_ID, $CURRENT_PAGE, $ERROR_404)
 		}
 	}
 
-public static 	function SaveVisits($sql_site, $SESSION_NEW, $CURRENT_DIR, $CURRENT_PAGE, $ERROR_404)
+	public static function SaveVisits($sql_site, $SESSION_NEW, $CURRENT_DIR, $CURRENT_PAGE, $ERROR_404)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$DB_now_date = $DB->GetNowDate();
@@ -1668,7 +1668,7 @@ public static 	function SaveVisits($sql_site, $SESSION_NEW, $CURRENT_DIR, $CURRE
 	/************************************************
 			Referring sites
 	************************************************/
-public static 	function GetRefererListID($PROT, $SN, $PAGE_FROM, $CURRENT_URI, $ERROR_404, $sql_site)
+	public static function GetRefererListID($PROT, $SN, $PAGE_FROM, $CURRENT_URI, $ERROR_404, $sql_site)
 	{
 		$DB = CDatabase::GetModuleConnection('statistic');
 		$DB_now = $DB->GetNowFunction();

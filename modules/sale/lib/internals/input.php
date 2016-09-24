@@ -2,9 +2,12 @@
 
 namespace Bitrix\Sale\Internals\Input;
 
+use Bitrix\Main\Event;
 use	Bitrix\Main\EventManager,
 	Bitrix\Main\SystemException,
 	Bitrix\Main\Localization\Loc;
+use Bitrix\Main\EventResult;
+use Bitrix\Sale\ResultError;
 
 Loc::loadMessages(__FILE__);
 
@@ -121,6 +124,28 @@ class Manager
 			throw new SystemException('invalid input type in '.print_r($input, true), 0, __FILE__, __LINE__);
 	}
 
+	/**
+	 * @param array $input
+	 * @param $value
+	 *
+	 * @return mixed
+	 * @throws SystemException
+	 */
+	static function getRequiredError(array $input, $value)
+	{
+		if (! static::$initialized)
+			static::initialize();
+
+		if ($type = static::$types[$input['TYPE']])
+		{
+			return call_user_func(array($type['CLASS'], __FUNCTION__), $input, $value);
+		}
+		else
+		{
+			throw new SystemException('invalid input type in '.print_r($input, true), 0, __FILE__, __LINE__);
+		}
+	}
+
 	/** Get normalized user input value (for example to save to database).
 	 * Before saving to database check value for errors with Manager::getError!
 	 * @param array $input - input settings values
@@ -235,8 +260,26 @@ class Manager
 	{
 		static::$initialized = true;
 
-		foreach (EventManager::getInstance()->findEventHandlers('sale', 'registerInputTypes') as $handler)
-			ExecuteModuleEventEx($handler);
+		/** @var Event $event */
+		$event = new Event('sale', 'registerInputTypes', static::$types);
+		$event->send();
+
+		if ($event->getResults())
+		{
+			foreach($event->getResults() as $eventResult)
+			{
+				if ($eventResult->getType() != EventResult::SUCCESS)
+					continue;
+
+				if ($params = $eventResult->getParameters())
+				{
+					if(!empty($params) && is_array($params))
+					{
+						static::$types = array_merge(static::$types, $params);
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -287,7 +330,7 @@ abstract class Base
 		}
 	}
 
-	static function getViewHtml(array $input, $value = null)
+	public static function getViewHtml(array $input, $value = null)
 	{
 		if ($value === null)
 			$value = $input['VALUE'];
@@ -310,12 +353,18 @@ abstract class Base
 		}
 	}
 
-	protected static function getViewHtmlSingle(array $input, $value)
+	public static function getViewHtmlSingle(array $input, $value)
 	{
-		return htmlspecialcharsbx($value);
+		$output = $valueText = htmlspecialcharsbx($value);
+		if ($input['IS_EMAIL'] == 'Y')
+		{
+			$output = '<a href="mailto:'.$valueText.'">'.$valueText.'</a>';
+		}
+
+		return $output;
 	}
 
-	static function getEditHtml($name, array $input, $value = null)
+	public static function getEditHtml($name, array $input, $value = null)
 	{
 		$name = htmlspecialcharsbx($name);
 
@@ -361,12 +410,12 @@ abstract class Base
 	}
 
 	/** @return string */
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		throw new SystemException("you must implement [getEditHtmlSingle] or override [getEditHtml] in yor class", 0, __FILE__, __LINE__);
 	}
 
-	protected static function getEditHtmlSingleDelete($name, array $input)
+	public static function getEditHtmlSingleDelete($name, array $input)
 	{
 		return '<label> '.Loc::getMessage('INPUT_DELETE').' <input type="checkbox" onclick="'
 
@@ -375,7 +424,7 @@ abstract class Base
 			.'"> </label>';
 	}
 
-	protected static function getEditHtmlInsert($tag, $replace, $name, $sample, $after)
+	public static function getEditHtmlInsert($tag, $replace, $name, $sample, $after)
 	{
 		$name = \CUtil::JSEscape($name);
 		$sample = \CUtil::JSEscape(htmlspecialcharsbx($sample));
@@ -390,22 +439,59 @@ abstract class Base
 			.$after.'">';
 	}
 
-	protected static function getEditHtmlSingleAfterInsert()
+	public static function getEditHtmlSingleAfterInsert()
 	{
 		return "container.firstChild.focus();";
 	}
 
-	static function getError(array $input, $value)
+	public static function getError(array $input, $value)
 	{
+		$errors = array();
 		if ($value === null)
 			$value = $input['VALUE'];
 
 		if ($input['MULTIPLE'] == 'Y')
 		{
-			$errors = array();
 
 			$index = -1;
 
+			foreach (static::asMultiple($value) as $value)
+			{
+				if (($value !== '' && $value !== null) && ($error = static::getErrorSingle($input, $value)))
+				{
+					$errors[++$index] = $error;
+				}
+			}
+		}
+		else
+		{
+			$value = static::asSingle($value);
+
+			if ($value !== '' && $value !== null)
+			{
+				return static::getErrorSingle($input, $value);
+			}
+		}
+
+		return $errors;
+	}
+
+	/**
+	 * @param array $input
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public static function getRequiredError(array $input, $value)
+	{
+		$errors = array();
+
+		if ($value === null)
+			$value = $input['VALUE'];
+
+		if ($input['MULTIPLE'] == 'Y')
+		{
+			$index = -1;
 			foreach (static::asMultiple($value) as $value)
 			{
 				if ($value === '' || $value === null)
@@ -413,13 +499,7 @@ abstract class Base
 					if ($input['REQUIRED'] == 'Y')
 						$errors[++$index] = array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'));
 				}
-				elseif ($error = static::getErrorSingle($input, $value))
-				{
-					$errors[++$index] = $error;
-				}
 			}
-
-			return $errors;
 		}
 		else
 		{
@@ -427,24 +507,27 @@ abstract class Base
 
 			if ($value === '' || $value === null)
 			{
-				return $input['REQUIRED'] == 'Y'
+				return ($input['REQUIRED'] == 'Y')
 					? array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'))
 					: array();
 			}
-			else
-			{
-				return static::getErrorSingle($input, $value);
-			}
 		}
+
+		return $errors;
 	}
 
-	/** @return string */
-	protected static function getErrorSingle(array $input, $value)
+	/**
+	 * @param array $input
+	 * @param $value
+	 *
+	 * @throws SystemException
+	 */
+	public static function getErrorSingle(array $input, $value)
 	{
 		throw new SystemException("you must implement [getErrorSingle] or override [getError] in yor class", 0, __FILE__, __LINE__);
 	}
 
-	static function getValue(array $input, $value)
+	public static function getValue(array $input, $value)
 	{
 		if ($input['DISABLED'] == 'Y')
 			return null; // TODO maybe??
@@ -471,12 +554,12 @@ abstract class Base
 		}
 	}
 
-	protected static function getValueSingle(array $input, $value)
+	public static function getValueSingle(array $input, $value)
 	{
 		return $value;
 	}
 
-	static function getSettings(array $input, $reload)
+	public static function getSettings(array $input, $reload)
 	{
 		return array(); // no settings
 	}
@@ -500,6 +583,7 @@ abstract class Base
 		}
 	}
 
+	/** @deprecated */
 	protected static function extractAttributes(array $input, array $boolean, array $other, $withGlobal = true)
 	{
 		$string = '';
@@ -517,20 +601,34 @@ abstract class Base
 			if ($v === 'Y' || $v === true)
 				$string .= ' '.strtolower($k).($boolean[$k] ? '="'.$boolean[$k].'"' : '');
 
+		// add event attributes with values
+		if ($withGlobal)
+		{
+			static $globalEvents = array(
+				'ONABORT'=>1, 'ONBLUR'=>1, 'ONCANPLAY'=>1, 'ONCANPLAYTHROUGH'=>1, 'ONCHANGE'=>1, 'ONCLICK'=>1,
+				'ONCONTEXTMENU'=>1, 'ONDBLCLICK'=>1, 'ONDRAG'=>1, 'ONDRAGEND'=>1, 'ONDRAGENTER'=>1, 'ONDRAGLEAVE'=>1,
+				'ONDRAGOVER'=>1, 'ONDRAGSTART'=>1, 'ONDROP'=>1, 'ONDURATIONCHANGE'=>1, 'ONEMPTIED'=>1, 'ONENDED'=>1,
+				'ONERROR'=>1, 'ONFOCUS'=>1, 'ONINPUT'=>1, 'ONINVALID'=>1, 'ONKEYDOWN'=>1, 'ONKEYPRESS'=>1, 'ONKEYUP'=>1,
+				'ONLOAD'=>1, 'ONLOADEDDATA'=>1, 'ONLOADEDMETADATA'=>1, 'ONLOADSTART'=>1, 'ONMOUSEDOWN'=>1, 'ONMOUSEMOVE'=>1,
+				'ONMOUSEOUT'=>1, 'ONMOUSEOVER'=>1, 'ONMOUSEUP'=>1, 'ONMOUSEWHEEL'=>1, 'ONPAUSE'=>1, 'ONPLAY'=>1,
+				'ONPLAYING'=>1, 'ONPROGRESS'=>1, 'ONRATECHANGE'=>1, 'ONREADYSTATECHANGE'=>1, 'ONRESET'=>1, 'ONSCROLL'=>1,
+				'ONSEEKED'=>1, 'ONSEEKING'=>1, 'ONSELECT'=>1, 'ONSHOW'=>1, 'ONSTALLED'=>1, 'ONSUBMIT'=>1, 'ONSUSPEND'=>1,
+				'ONTIMEUPDATE'=>1, 'ONVOLUMECHANGE'=>1, 'ONWAITING'=>1,
+			);
+
+			$events = array_intersect_key($input, $globalEvents);
+			$other = array_diff_key($other, $events);
+
+			foreach ($events as $k => $v)
+				if ($v)
+					$string .= ' '.strtolower($k).'="'.$v.'"';
+		}
+
 		// add other attributes with values
 
 		static $globalOther = array(
 			'ACCESSKEY'=>1, 'CLASS'=>1, 'CONTEXTMENU'=>1, 'DIR'=>1, 'DROPZONE'=>1, 'LANG'=>1, 'STYLE'=>1, 'TABINDEX'=>1,
-			'TITLE'=>1,
-			'ONABORT'=>1, 'ONBLUR'=>1, 'ONCANPLAY'=>1, 'ONCANPLAYTHROUGH'=>1, 'ONCHANGE'=>1, 'ONCLICK'=>1,
-			'ONCONTEXTMENU'=>1, 'ONDBLCLICK'=>1, 'ONDRAG'=>1, 'ONDRAGEND'=>1, 'ONDRAGENTER'=>1, 'ONDRAGLEAVE'=>1,
-			'ONDRAGOVER'=>1, 'ONDRAGSTART'=>1, 'ONDROP'=>1, 'ONDURATIONCHANGE'=>1, 'ONEMPTIED'=>1, 'ONENDED'=>1,
-			'ONERROR'=>1, 'ONFOCUS'=>1, 'ONINPUT'=>1, 'ONINVALID'=>1, 'ONKEYDOWN'=>1, 'ONKEYPRESS'=>1, 'ONKEYUP'=>1,
-			'ONLOAD'=>1, 'ONLOADEDDATA'=>1, 'ONLOADEDMETADATA'=>1, 'ONLOADSTART'=>1, 'ONMOUSEDOWN'=>1, 'ONMOUSEMOVE'=>1,
-			'ONMOUSEOUT'=>1, 'ONMOUSEOVER'=>1, 'ONMOUSEUP'=>1, 'ONMOUSEWHEEL'=>1, 'ONPAUSE'=>1, 'ONPLAY'=>1,
-			'ONPLAYING'=>1, 'ONPROGRESS'=>1, 'ONRATECHANGE'=>1, 'ONREADYSTATECHANGE'=>1, 'ONRESET'=>1, 'ONSCROLL'=>1,
-			'ONSEEKED'=>1, 'ONSEEKING'=>1, 'ONSELECT'=>1, 'ONSHOW'=>1, 'ONSTALLED'=>1, 'ONSUBMIT'=>1, 'ONSUSPEND'=>1,
-			'ONTIMEUPDATE'=>1, 'ONVOLUMECHANGE'=>1, 'ONWAITING'=>1,
+			'TITLE'=>1, 'ID' => 1,
 			'XML:LANG'=>1, 'XML:SPACE'=>1, 'XML:BASE'=>1
 		);
 
@@ -541,6 +639,13 @@ abstract class Base
 			if ($v)
 				$string .= ' '.strtolower($k).'="'.htmlspecialcharsbx($v).'"';
 
+		// add data attributes
+		if ($withGlobal && is_array($input['DATA']))
+		{
+			foreach ($input['DATA'] as $k => $v)
+				$string .= ' data-'.htmlspecialcharsbx($k).'="'.htmlspecialcharsbx($v).'"';
+		}
+
 		return $string;
 	}
 }
@@ -548,9 +653,9 @@ abstract class Base
 /**
  * String
  */
-class String extends Base
+class StringInput extends Base // String reserved in php 7
 {
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		if ($input['MULTILINE'] == 'Y')
 		{
@@ -581,7 +686,7 @@ class String extends Base
 		return static::getEditHtmlSingle($name, $input, $value);
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
 		$errors = array();
 
@@ -620,10 +725,21 @@ class String extends Base
 
 		return $settings;
 	}
+
+	/**
+	 * @param $value
+	 *
+	 * @return bool
+	 */
+	public static function isDeletedSingle($value)
+	{
+		return is_array($value) && $value['DELETE'];
+	}
+
 }
 
 Manager::register('STRING', array(
-	'CLASS' => __NAMESPACE__.'\String',
+	'CLASS' => __NAMESPACE__.'\StringInput',
 	'NAME' => Loc::getMessage('INPUT_STRING'),
 ));
 
@@ -632,7 +748,7 @@ Manager::register('STRING', array(
  */
 class Number extends Base
 {
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		// TODO HTML5 from IE10: remove SIZE; Add MIN, MAX, STEP; Change type="number"
 
@@ -667,7 +783,7 @@ class Number extends Base
 		return static::getEditHtmlSingle($name, $input, $value);
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
 		$errors = array();
 
@@ -690,9 +806,9 @@ class Number extends Base
 				if (! ($value / pow(2.0, 53) > $step))
 				{
 					$remainder = (double) abs($value - $step * round($value / $step));
-					$acceptable_error = (double) ($step / pow(2.0, 24));
+					$acceptableError = (double) ($step / pow(2.0, 24));
 
-					if ($acceptable_error < $remainder && ($step - $acceptable_error) > $remainder)
+					if ($acceptableError < $remainder && ($step - $acceptableError) > $remainder)
 						$errors['STEP'] = Loc::getMessage('INPUT_NUMBER_STEP_ERROR', array("#NUM#" => $input['STEP']));
 				}
 			}
@@ -705,7 +821,7 @@ class Number extends Base
 		return $errors;
 	}
 
-	static function getSettings(array $input, $reload)
+	public static function getSettings(array $input, $reload)
 	{
 		return array(
 			'MIN'  => array('TYPE' => 'NUMBER', 'LABEL' => Loc::getMessage('INPUT_NUMBER_MIN' )),
@@ -725,12 +841,12 @@ Manager::register('NUMBER', array(
  */
 class EitherYN extends Base
 {
-	protected static function getViewHtmlSingle(array $input, $value)
+	public static function getViewHtmlSingle(array $input, $value)
 	{
 		return $value == 'Y' ? Loc::getMessage('INPUT_EITHERYN_Y') : Loc::getMessage('INPUT_EITHERYN_N');
 	}
 
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		$hiddenAttributes = static::extractAttributes($input, array('DISABLED'=>''), array('FORM'=>1), false);
 
@@ -759,14 +875,17 @@ class EitherYN extends Base
 				</select>';
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
+		if ($input['REQUIRED'] == 'Y' && ($value === '' || $value === null))
+			return array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'));
+
 		return ($value == 'N' || $value == 'Y')
 			? array()
 			: array('INVALID' => Loc::getMessage('INPUT_INVALID_ERROR'));
 	}
 
-	protected static function getValueSingle(array $input, $value)
+	public static function getValueSingle(array $input, $value)
 	{
 		return $value == 'Y' ? 'Y' : 'N';
 	}
@@ -797,7 +916,7 @@ class Enum extends Base
 		return $result;
 	}
 
-	protected static function getViewHtmlSingle(array $input, $value) // TODO optimize to getViewHtml
+	public static function getViewHtmlSingle(array $input, $value) // TODO optimize to getViewHtml
 	{
 		$options = $input['OPTIONS'];
 
@@ -823,7 +942,7 @@ class Enum extends Base
 		return static::getEditHtml($name, $input, $value);
 	}
 
-	static function getEditHtml($name, array $input, $value = null)
+	public static function getEditHtml($name, array $input, $value = null)
 	{
 		$options = $input['OPTIONS'];
 
@@ -834,7 +953,7 @@ class Enum extends Base
 
 		$name = htmlspecialcharsbx($name);
 
-		if ($value === null)
+		if ($value === null && isset($input['VALUE']))
 			$value = $input['VALUE'];
 
 		if ($input['HIDDEN'] == 'Y')
@@ -842,7 +961,7 @@ class Enum extends Base
 				, $multiple ? static::asMultiple($value) : static::asSingle($value)
 				, static::extractAttributes($input, array('DISABLED'=>''), array('FORM'=>1), false));
 
-		if (empty($value))
+		if ($value === null)
 			$value = array();
 		else
 			$value = $multiple ? array_flip(static::asMultiple($value)) : array(static::asSingle($value) => true);
@@ -906,7 +1025,7 @@ class Enum extends Base
 					array(
 						htmlspecialcharsbx($key),
 						isset($selected[$key]) ? $selector : '',
-						htmlspecialcharsbx($value),
+						htmlspecialcharsbx($value) ?: htmlspecialcharsbx($key),
 					),
 					$option
 				);
@@ -915,7 +1034,7 @@ class Enum extends Base
 		return $result;
 	}
 
-	protected static function getErrorSingle(array $input, $value)  // TODO optimize to getError
+	public static function getErrorSingle(array $input, $value)  // TODO optimize to getError
 	{
 		$options = $input['OPTIONS'];
 
@@ -1027,7 +1146,8 @@ class File extends Base
 		}
 	}
 
-	/** Load file array from database.
+	/** @deprecated
+	 * Load file array from database.
 	 * @param $value
 	 * @return array - file array
 	 */
@@ -1042,6 +1162,7 @@ class File extends Base
 		return $multiple ? $value : reset($value);
 	}
 
+	/** deprecated */
 	static function loadInfoSingle($file)
 	{
 		if (is_array($file))
@@ -1079,7 +1200,7 @@ class File extends Base
 	 */
 	static function isUploadedSingle($value)
 	{
-		return is_array($value) && $value['error'] == UPLOAD_ERR_OK;
+		return is_array($value) && $value['error'] == UPLOAD_ERR_OK && is_uploaded_file($value['tmp_name']);
 	}
 
 	// input methods ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1089,7 +1210,7 @@ class File extends Base
 		return is_array($value) && ! isset($value['ID']);
 	}
 
-	protected static function getViewHtmlSingle(array $input, $value)
+	public static function getViewHtmlSingle(array $input, $value)
 	{
 		if (! is_array($value))
 			$value = array('ID' => $value);
@@ -1128,7 +1249,7 @@ class File extends Base
 		return static::getEditHtmlSingle($name, $input, $value);
 	}
 
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		if (! is_array($value))
 		{
@@ -1140,6 +1261,12 @@ class File extends Base
 			unset($value['ID']);
 		}
 
+		$input['ONCHANGE'] =
+			"var anchor = this.previousSibling.previousSibling;".
+			"if (anchor.firstChild) anchor.removeChild(anchor.firstChild);".
+			"anchor.appendChild(document.createTextNode(this.value.split(/(\\\\|\\/)/g).pop()));".
+			$input['ONCHANGE'];
+
 		// TODO HTML5 add MULTIPLE
 		$fileAttributes = static::extractAttributes($input,
 			array('DISABLED'=>'', 'AUTOFOCUS'=>'', 'REQUIRED'=>''),
@@ -1149,65 +1276,70 @@ class File extends Base
 
 		return static::getViewHtmlSingle($input, $value)
 			.'<input type="hidden" name="'.$name.'[ID]" value="'.htmlspecialcharsbx($value['ID']).'"'.$otherAttributes.'>'
-			.'<input type="file" name="'.$name.'" style="position:absolute; visibility:hidden"'.$fileAttributes.' onchange="'
+			.'<input type="file" name="'.$name.'" style="position:absolute; visibility:hidden"'.$fileAttributes.'>'
+			.'<input type="button" value="'.Loc::getMessage('INPUT_FILE_BROWSE').'" onclick="this.previousSibling.click()">'
+			.(
+				$input['NO_DELETE']
+					? ''
+					: '<label> '.Loc::getMessage('INPUT_DELETE').' <input type="checkbox" name="'.$name.'[DELETE]" onclick="'
 
-			."var anchor = this.previousSibling.previousSibling;"
-			."if (anchor.firstChild) anchor.removeChild(anchor.firstChild);"
-			."anchor.appendChild(document.createTextNode(this.value.split(/(\\\\|\\/)/g).pop()));"
+						."var button = this.parentNode.previousSibling, file = button.previousSibling;"
+						."button.disabled = file.disabled = this.checked;"
 
-			.'">'
-			.'<input type="button" value="'.Loc::getMessage('INPUT_FILE_BROWSE').'" onclick="'
-
-			."this.previousSibling.click();"
-
-			.'">'
-			.'<label> '.Loc::getMessage('INPUT_DELETE').' <input type="checkbox" name="'.$name.'[DELETE]" onclick="'
-
-			."var button = this.parentNode.previousSibling, file = button.previousSibling;"
-			."button.disabled = file.disabled = this.checked;"
-
-			.'"'.$otherAttributes.'> </label>';
+						.'"'.$otherAttributes.'> </label>'
+			);
 	}
 
-	protected static function getEditHtmlSingleDelete($name, array $input)
+	public static function getEditHtmlSingleDelete($name, array $input)
 	{
 		return '';
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
 		if (is_array($value))
 		{
-			switch ($value['error'])
+			if ($value['DELETE'])
 			{
-				case UPLOAD_ERR_OK: // success
+				return $input['REQUIRED'] == 'Y'
+					? array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'))
+					: array();
+			}
+			elseif (is_uploaded_file($value['tmp_name']))
+			{
+				$errors = array();
 
-					$errors = array();
+				if ($input['MAXSIZE'] && $value['size'] > $input['MAXSIZE'])
+					$errors['MAXSIZE'] = Loc::getMessage('INPUT_FILE_MAXSIZE_ERROR');
 
-					if ($input['MAXSIZE'] && $value['size'] > $input['MAXSIZE'])
-						$errors['MAXSIZE'] = Loc::getMessage('INPUT_FILE_MAXSIZE_ERROR');
+				// TODO check: file name, mime type, extension
+				//$info = pathinfo($value['name']);
 
-					// TODO check: file name, mime type, extension
-					//$info = pathinfo($value['name']);
+				if ($error = \CFile::CheckFile($value, 0, false, $input['ACCEPT']))
+					$errors['CFILE'] = $error;
 
-					if ($error = \CFile::CheckFile($value, 0, false, $input['ACCEPT']))
-						$errors['CFILE'] = $error;
+				return $errors;
+			}
+			else
+			{
+				switch ($value['error'])
+				{
+					case UPLOAD_ERR_OK: return array();	//file uploaded successfully
 
-					return $errors;
+					case UPLOAD_ERR_INI_SIZE:
+					case UPLOAD_ERR_FORM_SIZE: return array('MAXSIZE' => Loc::getMessage('INPUT_FILE_MAXSIZE_ERROR'));
 
-				case UPLOAD_ERR_INI_SIZE :
-				case UPLOAD_ERR_FORM_SIZE: return array('MAXSIZE' => Loc::getMessage('INPUT_FILE_MAXSIZE_ERROR'));
+					case UPLOAD_ERR_PARTIAL: return array('PARTIAL' => Loc::getMessage('INPUT_FILE_PARTIAL_ERROR'));
 
-				case UPLOAD_ERR_PARTIAL: return array('PARTIAL' => Loc::getMessage('INPUT_FILE_PARTIAL_ERROR'));
+					case UPLOAD_ERR_NO_FILE:
 
-				case UPLOAD_ERR_NO_FILE:
+						return $input['REQUIRED'] == 'Y' && (! is_numeric($value['ID']) || $value['DELETE'])
+							? array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'))
+							: array();
 
-					return $input['REQUIRED'] == 'Y' && (! is_numeric($value['ID']) || $value['DELETE'])
-						? array('REQUIRED' => Loc::getMessage('INPUT_REQUIRED_ERROR'))
-						: array();
-
-				// TODO case UPLOAD_ERR_NO_TMP_DIR  UPLOAD_ERR_CANT_WRITE  UPLOAD_ERR_EXTENSION
-				default: return array('INVALID' => Loc::getMessage('INPUT_INVALID_ERROR'));
+					// TODO case UPLOAD_ERR_NO_TMP_DIR  UPLOAD_ERR_CANT_WRITE  UPLOAD_ERR_EXTENSION
+					default: return array('INVALID' => Loc::getMessage('INPUT_INVALID_ERROR'));
+				}
 			}
 		}
 		elseif (is_numeric($value))
@@ -1221,7 +1353,7 @@ class File extends Base
 		}
 	}
 
-	protected static function getValueSingle(array $input, $value)
+	public static function getValueSingle(array $input, $value)
 	{
 		if (is_array($value))
 		{
@@ -1234,7 +1366,7 @@ class File extends Base
 		return is_numeric($value) ? $value : null;
 	}
 
-	static function getSettings(array $input, $reload)
+	public static function getSettings(array $input, $reload)
 	{
 		return array(
 			'MAXSIZE' => array('TYPE' => 'NUMBER', 'LABEL' => Loc::getMessage('INPUT_FILE_MAXSIZE'), 'MIN' => 0, 'STEP' => 1),
@@ -1253,7 +1385,7 @@ Manager::register('FILE', array(
  */
 class Date extends Base
 {
-	protected static function getEditHtmlSingle($name, array $input, $value)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		$showTime = $input['TIME'] == 'Y';
 
@@ -1282,7 +1414,7 @@ class Date extends Base
 		return static::getEditHtmlSingle($name, $input, $value);
 	}
 
-	protected static function getEditHtmlSingleDelete($name, array $input)
+	public static function getEditHtmlSingleDelete($name, array $input)
 	{
 		return '<label> '.Loc::getMessage('INPUT_DELETE').' <input type="checkbox" onclick="'
 
@@ -1294,7 +1426,7 @@ class Date extends Base
 		.'"> </label>';
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
 		return CheckDateTime($value, FORMAT_DATE)
 			? array()
@@ -1320,7 +1452,7 @@ Manager::register('DATE', array(
  */
 class Location extends Base
 {
-	protected static function getViewHtmlSingle(array $input, $value)
+	public static function getViewHtmlSingle(array $input, $value)
 	{
 		if((string) $value == '')
 			return '';
@@ -1356,7 +1488,7 @@ class Location extends Base
 		return static::getEditHtml($name, $input, $value);
 	}
 
-	static function getEditHtml($name, array $input, $value = null)
+	public static function getEditHtml($name, array $input, $value = null)
 	{
 		$name = htmlspecialcharsbx($name);
 
@@ -1371,6 +1503,7 @@ class Location extends Base
 		$html = '';
 
 		$selector = md5("location input selector $name");
+		$input["LOCATION_SELECTOR"] = $selector;
 
 		if ($onChange = $input['ONCHANGE'])
 		{
@@ -1392,14 +1525,14 @@ class Location extends Base
 
 			foreach (static::asMultiple($value) as $value)
 				$html .= $startTag
-					.static::getEditHtmlSingle($name.'['.(++$index).']', $input, $value, $selector)
+					.static::getEditHtmlSingle($name.'['.(++$index).']', $input, $value)
 					.$endTag;
 
 			$replace = '##INPUT##NAME##';
 
 			if ($input['DISABLED'] !== 'Y') // TODO
 				$html .= static::getEditHtmlInsert($tag, $replace, $name
-					, static::getEditHtmlSingle($replace, $input, null, $selector)
+					, static::getEditHtmlSingle($replace, $input, null)
 					, "var location = BX.locationSelectors['$selector'].spawn(container, {selectedItem: false, useSpawn: false});"
 					."location.clearSelected();"
 					//."location.focus();" // TODO
@@ -1407,13 +1540,13 @@ class Location extends Base
 		}
 		else
 		{
-			$html .= static::getEditHtmlSingle($name, $input, static::asSingle($value), $selector);
+			$html .= static::getEditHtmlSingle($name, $input, static::asSingle($value));
 		}
 
 		return $html;
 	}
 
-	protected static function getEditHtmlSingle($name, array $input, $value, $selector)
+	public static function getEditHtmlSingle($name, array $input, $value)
 	{
 		$filterMode = isset($input['IS_FILTER_FIELD']) && $input['IS_FILTER_FIELD'] === true;
 		$parameters = array(
@@ -1424,7 +1557,7 @@ class Location extends Base
 			'FILTER_BY_SITE' => 'N',
 			'SHOW_DEFAULT_LOCATIONS' => 'N',
 			'SEARCH_BY_PRIMARY' => 'N',
-			'JS_CONTROL_GLOBAL_ID' => $selector,
+			'JS_CONTROL_GLOBAL_ID' => $input["LOCATION_SELECTOR"],
 			'JS_CALLBACK' => $input['JS_CALLBACK']
 		);
 
@@ -1455,7 +1588,7 @@ class Location extends Base
 		return $html;
 	}
 
-	protected static function getErrorSingle(array $input, $value)
+	public static function getErrorSingle(array $input, $value)
 	{
 		return \Bitrix\Sale\Location\LocationTable::getByCode($value)->fetch()
 			? array()

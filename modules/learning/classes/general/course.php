@@ -16,27 +16,27 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список курсов, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает список курсов, отсортированный в порядке arOrder. Учитываются права доступа текущего пользователя. Метод статический.</p>
 	*
 	*
 	* @param array $arrayarOrder = array() Массив для сортировки результата. Массив вида <i>array("поле
-	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> Поле для
-	* сортировки может принимать значения: <ul> <li> <b>ID</b> - идентификатор
-	* курса;</li> <li> <b>NAME</b> - название курса;</li> <li> <b>ACTIVE</b> - активность
-	* курса;</li> <li> <b>SORT</b> - индекс сортировки;</li> <li> <b>TIMESTAMP_X</b> - дата
-	* изменения курса.</li> </ul> Направление сортировки может принимать
-	* значения: <ul> <li> <b>asc</b> - по возрастанию;</li> <li> <b>desc</b> - по
-	* убыванию;</li> </ul>
+	* сортировки"=&gt;"направление сортировки" [, ...])</i>.<br> 		Поле для
+	* сортировки может принимать значения: 		<ul> <li> <b>ID</b> - идентификатор
+	* курса;</li> 			<li> <b>NAME</b> - название курса;</li> 			<li> <b>ACTIVE</b> - активность
+	* курса;</li> 			<li> <b>SORT</b> - индекс сортировки;</li> 			<li> <b>TIMESTAMP_X</b> - дата
+	* изменения курса.</li> 		</ul> 		Направление сортировки может принимать
+	* значения: 		<ul> <li> <b>asc</b> - по возрастанию;</li> 		<li> <b>desc</b> - по
+	* убыванию;</li> 		</ul>
 	*
 	* @param array $arrayarFields = array() Массив из полей курса для фильтрации результирующего списка.
 	*
 	* @param array $arrayarNavParams = array() Массив настроек постраничной навигации.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -121,7 +121,7 @@ class CCourse
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/getbyid.php">GetByID</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -261,17 +261,18 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод добавляет новый курс.</p>
+	* <p>Метод добавляет новый курс. Метод нестатический.</p>
 	*
 	*
-	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
+	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). 	Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">всех полей</a> курса.
-	* Обязательные поля должны быть заполнены. <br> Дополнительно в поле
-	* SITE_ID должен находиться массив идентификаторов сайтов, к которым
-	* привязан добавляемый курс. <br> Кроме того, с помощью поля "GROUP_ID",
-	* значением которого должен быть массив соответствий кодов групп
-	* правам доступа, можно установить права для разных групп на доступ
-	* к курсу (см. <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
+	* Обязательные поля должны быть заполнены. 	<br> 	Дополнительно в
+	* поле SITE_ID должен находиться массив идентификаторов сайтов, к
+	* которым привязан добавляемый курс. <br> 	Кроме того, с помощью поля
+	* "GROUP_ID", значением которого должен быть массив соответствий кодов
+	* групп правам доступа, можно установить права для разных групп на
+	* доступ к курсу (см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">SetPermission</a>).
 	*
 	* @return int <p>Метод возвращает идентификатор добавленного курса, если
@@ -279,7 +280,7 @@ class CCourse
 	* <i>false</i>, а в исключениях будут содержаться ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* 
 	* if (CModule::IncludeModule("learning"))
@@ -317,7 +318,7 @@ class CCourse
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/update.php">Update</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -443,27 +444,28 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Метод изменяет параметры курса с идентификатором ID.</p>
+	* <p>Метод изменяет параметры курса с идентификатором ID. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор изменяемого курса.
+	* @param int $intID  Идентификатор изменяемого курса.
 	*
 	* @param array $arFields  Массив Array("поле"=&gt;"значение", ...). Содержит значения <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">всех полей</a> курса.
-	* Обязательные поля должны быть заполнены. <br>Дополнительно в поле
-	* SITE_ID должен находиться массив идентификаторов сайтов, к которым
-	* привязан добавляемый курс. <br>Кроме того, с помощью поля "GROUP_ID",
-	* значением которого должен быть массив соответствий кодов групп
-	* правам доступа, можно установить права для разных групп на доступ
-	* к курсу (см. <a href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
+	* Обязательные        поля должны быть заполнены. <br>Дополнительно в
+	* поле SITE_ID должен        находиться массив идентификаторов сайтов, к
+	* которым привязан добавляемый        курс. <br>Кроме того, с помощью
+	* поля "GROUP_ID", значением которого должен        быть массив
+	* соответствий кодов групп правам доступа, можно установить       
+	* права для разных групп на доступ к курсу (см. <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/setpermission.php">SetPermission</a>).
 	*
-	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при
+	* @return bool <p>Метод возвращает <i>true</i>, если изменение прошло успешно, при 
 	* возникновении ошибки метод вернет <i>false</i>. При возникновении
-	* ошибки в исключениях будет содержаться текст ошибки.</p>
+	* ошибки в  исключениях будет содержаться текст ошибки.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -495,9 +497,9 @@ class CCourse
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a> </li> <li> <a
+	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a>  </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/add.php">Add</a> </li> </ul> <a name="examples"></a>
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/add.php">Add</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -634,16 +636,16 @@ class CCourse
 	 */
 	
 	/**
-	* <p>Метод удаляет курс с идентификатором ID.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Если есть сертификаты, полученные за указанный курс, метод возвратит <i>false</i>.</p> </div>
+	* <p>Метод удаляет курс с идентификатором ID. Метод нестатический.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Если есть сертификаты, полученные за указанный курс, метод возвратит <i>false</i>.</p> </div>
 	*
 	*
-	* @param int $ID  Идентификатор курса.
+	* @param int $intID  Идентификатор курса.
 	*
 	* @return bool <p>Метод возвращает <i>true</i> в случае успешного удаления курса, в
-	* противном случае возвращает <i>false</i>.</p> <a name="examples"></a>
+	* противном случае возвращает <i>false</i>.</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* 
 	* if (CModule::IncludeModule("learning"))
@@ -705,16 +707,16 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает поля курса по его коду ID. Учитываются права доступа текущего пользователя.</p>
+	* <p>Возвращает поля курса по его коду ID. Учитываются права доступа текущего пользователя. Метод нестатический.</p>
 	*
 	*
-	* @param int $ID  Идентификатор курса.
+	* @param int $intID  Идентификатор курса.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -729,10 +731,10 @@ class CCourse
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a></li> <li> <a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a></li>     <li><a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/fields.php#course">Поля курса</a></li>     <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/index.php">CCourse</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/getlist.php">GetList</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/ccourse/getlist.php">GetList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -749,7 +751,7 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает права доступа к учебному курсу с идентификатором COURSE_ID для всех групп пользователей.</p>
+	* <p>Возвращает права доступа к учебному курсу с идентификатором COURSE_ID для всех групп пользователей. Метод нестатический.</p>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
@@ -760,7 +762,7 @@ class CCourse
 	* доступа).</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -803,16 +805,16 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список сайтов для учебного курса с идентификатором COURSE_ID.</p>
+	* <p>Возвращает список сайтов для учебного курса с идентификатором COURSE_ID. Метод нестатический.</p>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* 
 	* if (CModule::IncludeModule("learning"))
@@ -921,29 +923,29 @@ class CCourse
 	// 2012-04-18 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает список активных глав и уроков, отсортированный по возрастанию индекса сортировки.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Возвращаемый список содержит одноименные поля глав и уроков. Обязательные поля списка: ID - идентификатор урока или главы; NAME - название; CHAPTER_ID - идентификатор родительской главы; SORT - индекс сортировки; DEPTH_LEVEL - уровень вложенности; TYPE - тип ("LE" - урок, "CH" - глава). Для вывода остальных полей используйте массив <i>arAddSelectFileds</i>. Метод предназначен для вывода "дерева" курса. Если поля "DETAIL_TEXT", "DETAIL_TEXT_TYPE", "DETAIL_PICTURE" не используются - рекомендуется <i>arAddSelectFileds</i> оставлять пустым (arAddSelectFileds = Array()). </p> </div>
+	* <p>Возвращает список активных глав и уроков, отсортированный по возрастанию индекса сортировки. Метод нестатический.</p> <p> </p> <div class="note"> <b>Примечание</b> <p>Возвращаемый список содержит одноименные поля глав и уроков. Обязательные поля списка: ID - идентификатор урока или главы; NAME - название; CHAPTER_ID - идентификатор родительской главы; SORT - индекс сортировки; DEPTH_LEVEL - уровень вложенности; TYPE - тип ("LE" - урок, "CH" - глава). Для вывода остальных полей используйте массив <i>arAddSelectFileds</i>. Метод предназначен для вывода "дерева" курса. Если поля "DETAIL_TEXT", "DETAIL_TEXT_TYPE", "DETAIL_PICTURE" не используются - рекомендуется <i>arAddSelectFileds</i> оставлять пустым (arAddSelectFileds = Array()). </p> </div>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
-	* @param array $arAddSelectFileds = Array("DETAIL_TEXT" Массив дополнительных полей. Допустимые поля:<br><i>PREVIEW_TEXT</i> -
+	* @param array $arAddSelectFileds = Array("DETAIL_TEXT" Массив дополнительных полей. 	Допустимые поля:<br><i>PREVIEW_TEXT</i> -
 	* Предварительное описание (анонс);<br><i>PREVIEW_TEXT_TYPE</i> - Тип
 	* предварительного описания (text/html);<br><i>PREVIEW_PICTURE</i> - Код картинки в
 	* таблице файлов для предварительного просмотра
 	* (анонса);<br><i>DETAIL_TEXT_TYPE</i> - Тип детального описания
 	* (text/html);<br><i>DETAIL_PICTURE</i> - Код картинки в таблице файлов для
-	* детального просмотра;<br><i>DETAIL_TEXT</i> - Детальное описание;<br> По
+	* детального просмотра;<br><i>DETAIL_TEXT</i> - Детальное описание;<br> 	По
 	* умолчанию массив arAddSelectFileds = Array("DETAIL_TEXT", "DETAIL_TEXT_TYPE", "DETAIL_PICTURE");
 	*
-	* @param DETAIL_TEXT_TYP $E  
+	* @param mixed $DETAIL_TEXT_TYPE  
 	*
-	* @param DETAIL_PICTUR $E  
+	* @param DETAIL_TEXT_TYP $DETAIL_PICTURE  
 	*
 	* @return CDBResult <p>Возвращается объект <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p> </h
+	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (CModule::IncludeModule("learning"))
 	* {
@@ -987,7 +989,7 @@ class CCourse
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cchapter/index.php">CChapter</a>::<a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cchapter/getlist.php">GetList</a> </li> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cchapter/index.php">CChapter</a>::<a
-	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cchapter/gettreelist.php">GetTreeList</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/learning/classes/cchapter/gettreelist.php">GetTreeList</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1082,16 +1084,15 @@ class CCourse
 	// 2012-04-17 Checked/modified for compatibility with new data model
 	
 	/**
-	* <p>Возвращает количество дней, часов, минут и секунд в виде строки, содержащихся в <i>seconds</i>.</p>
+	* <p>Возвращает количество дней, часов, минут и секунд в виде строки, содержащихся в <i>seconds</i>. Метод нестатический.</p>
 	*
 	*
-	* @param int $seconds  Количество секунд. </ht
+	* @param int $seconds  Количество секунд.
 	*
-	* @return string <p>Метод возвращает строку вида "DDдн. HHч. MMмин. SSсек.".</p> <a
-	* name="examples"></a>
+	* @return string <p>Метод возвращает строку вида "DDдн. HHч. MMмин. SSсек.".</p><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* 
 	* if (CModule::IncludeModule("learning"))
@@ -1102,7 +1103,6 @@ class CCourse
 	* }
 	* 
 	* ?&gt;
-	* </bod
 	* </pre>
 	*
 	*
@@ -1390,20 +1390,20 @@ class CCourse
 	 */
 	
 	/**
-	* <p>Метод устанавливает права доступа <i>arPERMISSIONS</i> для учебного курса с идентификатором <i>COURSE_ID</i>.</p>
+	* <p>Метод устанавливает права доступа <i>arPERMISSIONS</i> для учебного курса с идентификатором <i>COURSE_ID</i>. Метод статический.</p>
 	*
 	*
 	* @param int $COURSE_ID  Идентификатор курса.
 	*
 	* @param array $arPERMISSIONS  массив вида Array("код группы"=&gt;"право доступа", ....),<br>где <i>право
-	* доступа</i>: <ul> <li>D - доступ запрещён;</li> <li>R - чтение;</li> <li>W -
-	* запись;</li> <li>X - полный доступ (запись + назначение прав доступа на
-	* данный курс).</li> </ul>
+	* доступа</i>: 	<ul> <li>D - доступ запрещён;</li> 	<li>R - чтение;</li> 	<li>W -
+	* запись;</li> 	<li>X - полный доступ (запись + назначение прав доступа на
+	* данный курс).</li> 	</ul>
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* CCourse::SetPermission($COURSE_ID, Array("2"=&gt;"R", "3"=&gt;"W"));
 	* ?&gt;
@@ -1437,7 +1437,7 @@ class CCourse
 	 */
 	
 	/**
-	* <p>Возвращает право доступа к учебному курсу с идентификатором <i>courseId</i> для текущего пользователя.</p>
+	* <p>Возвращает право доступа к учебному курсу с идентификатором <i>courseId</i> для текущего пользователя. Метод статический.</p>
 	*
 	*
 	* @param int $courseId  Идентификатор курса. <br><br> До версии 12.0.0 параметр назывался COURSE_ID.
@@ -1446,7 +1446,7 @@ class CCourse
 	* полный доступ (изменение + право изменять права доступа). </p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $permission = CCourse::GetPermission($id);
 	* if ($permission&lt;"X")

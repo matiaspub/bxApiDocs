@@ -1,6 +1,7 @@
 <?
 use Bitrix\Main,
-	Bitrix\Main\Localization\Loc;
+	Bitrix\Main\Localization\Loc,
+	Bitrix\Catalog;
 
 Loc::loadMessages(__FILE__);
 
@@ -19,21 +20,22 @@ class CAllPrice
 {
 	
 	/**
-	* <p>Метод проверяет (и модифицирует) массив данных цены перед его записью в таблицу или обновлением. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>. Метод динамичный.</p>
+	* <p>Метод проверяет (и модифицирует) массив данных цены перед его записью в таблицу или обновлением. Вызывается в методах <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>. Нестатический метод.</p>
 	*
 	*
 	* @param string $ACTION  Указывает, для какого метода идет проверка. Возможные значения
-	* (регистр важен): <br><ul> <li> <b>ADD</b> - для метода <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a>;</li> <li> <b>UPDATE</b> - для
-	* метода <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>.</li> </ul>
+	* (регистр важен):  			<br><ul> <li> <b>ADD</b> - для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a>;</li> 				<li> <b>UPDATE</b> -
+	* для метода <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a>.</li> 			</ul>
 	*
 	* @param array &$arFields  Ассоциативный массив параметров ценового предложения.
 	* Передается по ссылке, после вызова метода содержимое массива
-	* может измениться. Допустимые ключи: <ul> <li> <b>PRODUCT_ID </b> - код
-	* товара;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li> <b>CURRENCY</b> - валюта
-	* цены.</li> </ul>
+	* может измениться. Допустимые ключи:          <ul> <li> <b>PRODUCT_ID </b> - код
+	* товара;</li>          	           <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li>          	        
+	*   <li> <b>CURRENCY</b> - валюта цены.</li>         </ul>
 	*
-	* @param int $ID = 0 Идентификатор ценового предложения. Параметр является
+	* @param array $intID = 0 Идентификатор ценового предложения. Параметр является
 	* необязательным и имеет смысл только для $ACTION = 'UPDATE'.
 	*
 	* @return bool <p>В случае корректности переданных параметров возвращает <i>true</i>,
@@ -42,7 +44,7 @@ class CAllPrice
 	* получить текст ошибок.</p>
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li>   <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a></li> </ul><br><br>
 	*
 	*
@@ -53,6 +55,9 @@ class CAllPrice
 	public static function CheckFields($ACTION, &$arFields, $ID = 0)
 	{
 		global $APPLICATION;
+
+		$currency = false;
+
 		if ((is_set($arFields, "PRODUCT_ID") || $ACTION=="ADD") && intval($arFields["PRODUCT_ID"]) <= 0)
 		{
 			$APPLICATION->ThrowException(Loc::getMessage("KGP_EMPTY_PRODUCT"), "EMPTY_PRODUCT_ID");
@@ -70,7 +75,8 @@ class CAllPrice
 		}
 		if (isset($arFields['CURRENCY']))
 		{
-			if (!($arCurrency = CCurrency::GetByID($arFields["CURRENCY"])))
+			$currency = CCurrency::GetByID($arFields['CURRENCY']);
+			if (empty($currency))
 			{
 				$APPLICATION->ThrowException(Loc::getMessage("KGP_NO_CURRENCY", array('#ID#' => $arFields["CURRENCY"])), "CURRENCY");
 				return false;
@@ -80,7 +86,7 @@ class CAllPrice
 		if (is_set($arFields, "PRICE") || $ACTION=="ADD")
 		{
 			$arFields["PRICE"] = str_replace(",", ".", $arFields["PRICE"]);
-			$arFields["PRICE"] = DoubleVal($arFields["PRICE"]);
+			$arFields["PRICE"] = (float)$arFields["PRICE"];
 		}
 
 		if ((is_set($arFields, "QUANTITY_FROM") || $ACTION=="ADD") && intval($arFields["QUANTITY_FROM"]) <= 0)
@@ -88,56 +94,84 @@ class CAllPrice
 		if ((is_set($arFields, "QUANTITY_TO") || $ACTION=="ADD") && intval($arFields["QUANTITY_TO"]) <= 0)
 			$arFields["QUANTITY_TO"] = false;
 
+		$priceExist = isset($arFields['PRICE']);
+		$currencyExist = isset($arFields['CURRENCY']);
+		if ($priceExist != $currencyExist)
+		{
+			$currentValues = Catalog\PriceTable::getList(array(
+				'select' => array('PRICE', 'CURRENCY'),
+				'filter' => array('=ID' => $ID)
+			))->fetch();
+			if (!empty($currentValues))
+			{
+				$currentPrice = ($priceExist ? $arFields['PRICE'] : (float)$currentValues['PRICE']);
+				$currentCurrency = ($currencyExist ? $arFields['CURRENCY'] : $currentValues['CURRENCY']);
+				$currency = CCurrency::GetByID($currentCurrency);
+				if (!empty($currency))
+					$arFields['PRICE_SCALE'] = $currentPrice*$currency['CURRENT_BASE_RATE'];
+				unset($currentCurrency, $currentPrice);
+			}
+			unset($currentValues);
+		}
+		elseif ($priceExist && $currencyExist)
+		{
+			$arFields['PRICE_SCALE'] = $arFields['PRICE']*$currency['CURRENT_BASE_RATE'];
+		}
+		unset($currencyExist, $priceExist, $currency);
+
 		return true;
 	}
 
 	
 	/**
-	* <p>Метод изменяет параметры ценового предложения (цены) для товара с кодом ID на значения из массива arFields. Метод динамичный.</p>
+	* <p>Метод изменяет параметры ценового предложения (цены) для товара с кодом ID на значения из массива arFields. Нестатический метод.</p>
 	*
 	*
-	* @param int $ID  Код ценового предложения.
+	* @param mixed $intID  Код ценового предложения.
 	*
 	* @param array $arFields  Ассоциативный массив новых параметров ценового предложения,
 	* ключами в котором являются названия полей предложения, а
-	* значениями - новые значения. <br> Допустимые ключи: <ul> <li> <b>PRODUCT_ID</b> -
-	* код товара или торгового предложения (ID элемента инфоблока);</li> <li>
-	* <b>EXTRA_ID</b> - код наценки;</li> <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li> <li>
-	* <b>PRICE </b>- цена;</li> <li> <b>CURRENCY</b> - валюта цены</li> <li> <b>QUANTITY_FROM</b> -
+	* значениями - новые значения.          <br>        	 Допустимые ключи:         
+	* <ul> <li> <b>PRODUCT_ID</b> - код товара или торгового предложения (ID элемента
+	* инфоблока);</li>          	            <li> <b>EXTRA_ID</b> - код наценки;</li>          	           
+	* <li> <b>CATALOG_GROUP_ID</b> - код типа цены;</li>          	            <li> <b>PRICE </b>- цена;</li>  
+	*        	            <li> <b>CURRENCY</b> - валюта цены</li>          	            <li> <b>QUANTITY_FROM</b> -
 	* количество товара, начиная с приобретения которого действует эта
-	* цена.</li> <li> <b>QUANTITY_TO</b> - количество товара, при приобретении
-	* которого заканчивает действие эта цена. <p></p> <div class="note">
-	* <b>Примечание:</b> если необходимо, чтобы значения параметров
-	* <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были заданы, необходимо указать у них в
-	* качестве значения <i>false</i> либо не задавать поля <b>QUANTITY_FROM</b> и
-	* <b>QUANTITY_TO</b> в <b>Update</b> вообще.</div> </li> </ul> Если установлен код наценки,
-	* то появляется возможность автоматически пересчитывать эту цену
-	* при изменении базовой цены или процента наценки.
+	* цена.</li>          	            <li> <b>QUANTITY_TO</b> - количество товара, при
+	* приобретении которого заканчивает действие эта цена. 		             
+	* <p></p> <div class="note"> <b>Примечание:</b> если необходимо, чтобы значения
+	* параметров <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> не были 	 заданы, необходимо
+	* указать у них в качестве значения <i>false</i> либо не задавать поля
+	* <b>QUANTITY_FROM</b> и <b>QUANTITY_TO</b> в <b>Update</b> вообще.</div>             	</li>          </ul>       
+	* Если установлен код наценки, то появляется возможность
+	* автоматически пересчитывать эту цену при изменении базовой цены
+	* или процента наценки.
 	*
 	* @param boolean $boolRecalc = false Пересчитать цены. Если передать <i>true</i>, то включается механизм
-	* пересчета цен. <br> Если обновляется базовая цена (в <b>CATALOG_GROUP_ID</b>
-	* задан тип цен, являющийся базовым), будут пересчитаны все
-	* остальные типы цен для товара, если у них задан код наценки. <br>
-	* Если обновляется иная цена (не базовая), для нее задан код наценки
-	* и уже существует базовая - значения <b>PRICE</b> и <b>CURRENCY</b> буду
-	* пересчитаны. <br> Необязательный параметр. По умолчанию - <i>false</i>.
+	* пересчета цен.          <br>        	Если обновляется базовая цена (в
+	* <b>CATALOG_GROUP_ID</b> задан тип цен, являющийся базовым), будут
+	* пересчитаны все остальные типы цен для товара, если у них задан
+	* код наценки.          <br>        	Если обновляется иная цена (не базовая),
+	* для нее задан код наценки и уже существует базовая - значения
+	* <b>PRICE</b> и <b>CURRENCY</b> буду пересчитаны.          <br>        	Необязательный
+	* параметр. По умолчанию - <i>false</i>.
 	*
 	* @return bool <p>Возвращает ID обновляемой цены в случае успешного сохранения
 	* цены и <i>false</i> - в противном случае. Для получения детальной
-	* информации об ошибке следует вызвать <b>$APPLICATION-&gt;GetException()</b>.</p>
-	* <h4>События</h4></bod<p>Метод работает с событиями <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">OnBeforePriceUpdate</a> и <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php">OnPriceUpdate</a>.</p> <p></p><div
-	* class="note"> <b>Примечания:</b> <ul> <li>Если параметр $boolRecalc = true, все равно
+	* информации об ошибке следует вызвать
+	* <b>$APPLICATION-&gt;GetException()</b>.</p><h4>События</h4><p>Метод работает с событиями
+	* <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">OnBeforePriceUpdate</a> и <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php">OnPriceUpdate</a>.</p><p></p><div class="note">
+	* <b>Примечания:</b> <ul> <li>Если параметр $boolRecalc = true, все равно
 	* необходимо указывать цену и валюту (в том случае, когда тип цены -
 	* не базовый). Если существует базовая цена, значения цены и валюты
-	* будут изменены, если нет - код наценки будет изменен на ноль.</li>
+	* будут изменены, если нет - код наценки будет изменен на ноль.</li>  
 	* <li>В обработчиках события OnBeforePriceUpdate можно запретить или,
 	* наоборот, включить пересчет цены. За это отвечает ключ RECALC
 	* массива данных, передаваемых в обработчик.</li> </ul> </div>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // Установим для товара с кодом 15 цену типа 2 в значение 29.95 USD
 	* $PRODUCT_ID = 15;
@@ -173,12 +207,12 @@ class CAllPrice
 	*
 	*
 	* <h4>See Also</h4> 
-	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/checkfields.php">CPrice::CheckFields</a></li> <li><a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li> <li><a
+	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/fields.php">Структура таблицы</a></li>  	   
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/checkfields.php">CPrice::CheckFields</a></li>  	   
+	* <li><a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a></li>  	    <li><a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepriceupdate.php">Событие
-	* OnBeforePriceUpdate</a></li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php">Событие OnPriceUpdate</a> </li> </ul> <a
+	* OnBeforePriceUpdate</a></li>  	    <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpriceupdate.php">Событие OnPriceUpdate</a> </li>  </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -186,7 +220,7 @@ class CAllPrice
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php
 	* @author Bitrix
 	*/
-	public static function Update($ID, $arFields,$boolRecalc = false)
+	public static function Update($ID, $arFields, $boolRecalc = false)
 	{
 		global $DB;
 
@@ -224,35 +258,32 @@ class CAllPrice
 			CPrice::ReCountForBase($arFields);
 
 		foreach (GetModuleEvents("catalog", "OnPriceUpdate", true) as $arEvent)
-		{
 			ExecuteModuleEventEx($arEvent, array($ID, $arFields));
-		}
 
 		return $ID;
 	}
 
 	
 	/**
-	* <p>Метод удаляет ценовое предложение с кодом ID. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: метод работает с двумя событиями: OnBeforePriceDelete и OnPriceDelete. Событие OnBeforePriceDelete позволяет отменить удаление ценового предложения. Событие OnPriceDelete дает возможность провести какие-то операции одновременно с удалением цены.</div>
+	* <p>Метод удаляет ценовое предложение с кодом ID. Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание</b>: метод работает с двумя событиями: OnBeforePriceDelete и OnPriceDelete. Событие OnBeforePriceDelete позволяет отменить удаление ценового предложения. Событие OnPriceDelete дает возможность провести какие-то операции одновременно с удалением цены.</div>
 	*
 	*
-	* @param int $ID  Код ценового предложения.
+	* @param mixed $intID  Код ценового предложения.
 	*
 	* @return bool <p>Возвращает значение <i>true</i> в случае успешного удаления и <i>false</i>
 	* - в противном случае.</p>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>// Удалим цену с кодом 11<br>CPrice::Delete(11);<br>?&gt;
-	* </ht
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <p><b>Методы</b></p></bo<ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li>
-	* </ul><p><b>События</b></p></bod<ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepricedelete.php">OnProductPriceDelete</a> </li> <li> <a
+	* <p><b>Методы</b></p><ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/deletebyproduct.php">CPrice::DeleteByProduct</a> </li> 
+	* </ul><p><b>События</b></p><ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforepricedelete.php">OnProductPriceDelete</a> </li>   <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onpricedelete.php">OnPriceDelete</a> </li> </ul><a
 	* name="examples"></a>
 	*
@@ -277,42 +308,38 @@ class CAllPrice
 		$mxRes = $DB->Query("DELETE FROM b_catalog_price WHERE ID = ".$ID, true);
 
 		foreach (GetModuleEvents("catalog", "OnPriceDelete", true) as $arEvent)
-		{
 			ExecuteModuleEventEx($arEvent, array($ID));
-		}
 
 		return $mxRes;
 	}
 
 	
 	/**
-	* <p>Метод возвращает базовую цену товара с кодом PRODUCT_ID. Базовая цена - это цена базового типа цен. Метод динамичный.</p>
+	* <p>Метод возвращает базовую цену товара с кодом PRODUCT_ID. Базовая цена - это цена базового типа цен. Нестатический метод.</p>
 	*
 	*
 	* @param int $productID  Код товара или торгового предложения (ID элемента инфоблока). <br><br>
 	* До версии <b>4.0.4</b> параметр назывался <b>PRODUCT_ID</b>.
 	*
-	* @param  $int  Количество товара, начиная с приобретения которого действует эта
+	* @param int $quantityFrom = false[ Количество товара, начиная с приобретения которого действует эта
 	* цена.
 	*
-	* @param quantityFro $m = false[ Количество товара, при приобретении которого заканчивает
+	* @param int $quantityTo = false]] Количество товара, при приобретении которого заканчивает
 	* действие эта цена.
 	*
-	* @param int $quantityTo = false]] 
-	*
-	* @return array <p>Возвращает ассоциативный массив с ключами: </p> <table class="tnormal"
-	* width="100%"> <tr> <th width="15%">Код</th> <th>Описание</th> </tr> <tr> <td>ID</td> <td>Код
-	* ценового предложения.</td> </tr> <tr> <td>PRODUCT_ID</td> <td>Код товара или
-	* торгового предложения (ID элемента инфоблока).</td> </tr> <tr> <td>EXTRA_ID</td>
-	* <td>Код наценки.</td> </tr> <tr> <td>CATALOG_GROUP_ID</td> <td>Код типа цены.</td> </tr> <tr>
-	* <td>PRICE</td> <td>Базовая цена.</td> </tr> <tr> <td>CURRENCY</td> <td>Валюта базовой
-	* цены.</td> </tr> <tr> <td>QUANTITY_FROM</td> <td>Количество товара, начиная с
-	* приобретения которого действует эта цена.</td> </tr> <tr> <td>QUANTITY_TO</td>
+	* @return array <p>Возвращает ассоциативный массив с ключами: </p><table class="tnormal"
+	* width="100%"> <tr> <th width="15%">Код</th>     <th>Описание</th>   </tr> <tr> <td>ID</td>     <td>Код
+	* ценового предложения.</td> </tr> <tr> <td>PRODUCT_ID</td>     <td>Код товара или
+	* торгового предложения (ID элемента инфоблока).</td> </tr> <tr> <td>EXTRA_ID</td>   
+	*  <td>Код наценки.</td> </tr> <tr> <td>CATALOG_GROUP_ID</td>     <td>Код типа цены.</td> </tr> <tr>
+	* <td>PRICE</td>     <td>Базовая цена.</td> </tr> <tr> <td>CURRENCY</td>     <td>Валюта базовой
+	* цены.</td> </tr> <tr> <td>QUANTITY_FROM</td>     <td>Количество товара, начиная с
+	* приобретения которого действует эта цена.</td> </tr> <tr> <td>QUANTITY_TO</td>    
 	* <td>Количество товара, при приобретении которого заканчивает
-	* действие эта цена.</td> </tr> </table> <a name="examples"></a>
+	* действие эта цена.</td> </tr> </table><a name="examples"></a>
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $ar_res = CPrice::GetBasePrice(11, 1, 10);
 	* echo "Базовая цена товара с кодом 11 (при приобретении от ".
@@ -383,7 +410,7 @@ class CAllPrice
 
 	
 	/**
-	* <p>Метод устанавливает базовую цену товара с кодом <i>ProductID</i>. Базовая цена - это цена базового типа цен. Метод динамичный.</p> <p></p> <div class="note"><b>Важно! Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a> взамен данного.</b></div>
+	* <p>Метод устанавливает базовую цену товара с кодом <i>ProductID</i>. Базовая цена - это цена базового типа цен. Нестатический метод.</p> <p></p> <div class="note"><b>Важно! Рекомендуется использовать метод <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a> взамен данного.</b></div>
 	*
 	*
 	* @param int $ProductID  Код товара или торгового предложения (ID элемента инфоблока). <br><br>
@@ -394,9 +421,9 @@ class CAllPrice
 	* @param string $Currency  Валюта новой базовой цены. <br><br> До версии 4.0.4 параметр назывался
 	* CURRENCY.
 	*
-	* @param  $int  Количество товара, начиная с приобретения которого действует эта
+	* @param boolean $quantityFrom = false[ Количество товара, начиная с приобретения которого действует эта
 	* цена. <br><br> Значение по умолчанию, начиная с версии <b>14.5.0</b>, равно
-	* <b>false</b>. <br><br> До версии <b>14.5.0</b> значение по умолчанию было равно
+	* <b>false</b>.  <br><br> До версии <b>14.5.0</b> значение по умолчанию было равно
 	* <b>0</b>, но его использование приводило к ошибке. Поэтому при
 	* использовании функции на установках, где версия модуля ниже
 	* <b>14.5.0</b>, необходимо явно указывать значение <b>false</b>. <br><br> Цифровое
@@ -404,9 +431,9 @@ class CAllPrice
 	* цена создается в расширенном режиме цен (зависимости цены от
 	* количества).
 	*
-	* @param boolean $quantityFrom = false[ Количество товара, при приобретении которого заканчивает
+	* @param mixed $int  Количество товара, при приобретении которого заканчивает
 	* действие эта цена. <br><br> Значение по умолчанию, начиная с версии
-	* <b>14.5.0</b>, равно <b>false</b>. <br><br> До версии <b>14.5.0</b> значение по
+	* <b>14.5.0</b>, равно <b>false</b>.  <br><br> До версии <b>14.5.0</b> значение по
 	* умолчанию было равно <b>0</b>, но его использование приводило к
 	* ошибке. Поэтому при использовании функции на установках, где
 	* версия модуля ниже <b>14.5.0</b>, необходимо явно указывать значение
@@ -414,15 +441,13 @@ class CAllPrice
 	* случае, если базовая цена создается в расширенном режиме цен
 	* (зависимости цены от количества).
 	*
-	* @param in $t  Если задано значение <i>false</i>, то будет возвращено <i>true</i> после
+	* @param boolean $quantityTo = false[ Если задано значение <i>false</i>, то будет возвращено <i>true</i> после
 	* установки цены. Иначе задается код записи в таблице.
-	*
-	* @param boolean $quantityTo = false[ 
 	*
 	* @param boolean $bGetID = false]]] 
 	*
 	* @return bool <p>Возвращает значение <i>true</i> в случае успешного сохранения цены и
-	* <i>false</i> - в противном случае. </p> <br><br>
+	* <i>false</i> - в противном случае. </p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__setbaseprice.a8de1fcf.php
@@ -459,22 +484,22 @@ class CAllPrice
 
 	
 	/**
-	* <p>Метод выполняет пересчет всех цен товара или пересчет всех цен, имеющих определенный <i>ID</i> наценки. Метод динамичный.</p>
+	* <p>Метод выполняет пересчет всех цен товара или пересчет всех цен, имеющих определенный <i>ID</i> наценки. Нестатический метод.</p>
 	*
 	*
 	* @param string $TYPE  Параметр определяет, что передается в параметре <b>ID</b>:
-	* идентификатор товара или идентификатор наценки. <br><br> Если
+	* идентификатор товара или идентификатор наценки. 	<br><br> 	Если
 	* принимает значение <b>EXTRA</b> (регистр важен), то будет выполняться
 	* пересчет всех цен с определенной наценкой. При любом другом
 	* значении будет выполняться пересчет всех цен конкретного товара.
 	*
-	* @param int $ID  Идентификатор товара или идентификатор наценки.
+	* @param string $intID  Идентификатор товара или идентификатор наценки.
 	*
 	* @param int $VAL  Новое значение процента наценки, если параметр <b>TYPE</b> принимает
 	* значение <b>EXTRA</b>. В противном случае - новая базовая цена, от
 	* которой будут рассчитываться наценки.
 	*
-	* @return mixed <p>Нет.</p></bo<br><br>
+	* @return mixed <p>Нет.</p><br><br>
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/recalculate.php
@@ -569,7 +594,7 @@ class CAllPrice
 
 	
 	/**
-	* <p>Метод удаляет все цены в валюте <i>Currency</i>. Является обработчиком события <a href="http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencydelete.php">OnCurrencyDelete</a> модуля <b>Валюты</b>. Метод динамичный.</p>
+	* <p>Метод удаляет все цены в валюте <i>Currency</i>. Является обработчиком события <a href="http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencydelete.php">OnCurrencyDelete</a> модуля <b>Валюты</b>. Нестатический метод.</p>
 	*
 	*
 	* @param string $Currency  Идентификатор удаляемой валюты.
@@ -580,7 +605,7 @@ class CAllPrice
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/currency/events/oncurrencydelete.php">Событие
-	* OnCurrencyDelete</a></li> </ul></bod<br><br>
+	* OnCurrencyDelete</a></li>  </ul><br><br>
 	*
 	*
 	* @static
@@ -599,7 +624,7 @@ class CAllPrice
 
 	
 	/**
-	* <p>Метод удаляет все цены для элемента с идентификатором <i>ProductID</i>. Метод динамичный. Является обработчиком события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/oniblockelementdelete.php">OnIBlockElementDelete</a> модуля <b>Информационные блоки</b>.</p>
+	* <p>Метод удаляет все цены для элемента с идентификатором <i>ProductID</i>. Нестатический метод. Является обработчиком события <a href="http://dev.1c-bitrix.ru/api_help/iblock/events/oniblockelementdelete.php">OnIBlockElementDelete</a> модуля <b>Информационные блоки</b>.</p>
 	*
 	*
 	* @param int $ProductID  Идентификатор удаляемого элемента.
@@ -610,7 +635,7 @@ class CAllPrice
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li><a href="http://dev.1c-bitrix.ru/api_help/iblock/events/oniblockelementdelete.php">Событие
-	* OnIBlockElementDelete</a></li> </ul></bod<br><br>
+	* OnIBlockElementDelete</a></li>  </ul><br><br>
 	*
 	*
 	* @static
@@ -628,7 +653,7 @@ class CAllPrice
 
 	
 	/**
-	* <p>Метод удаляет цены для товара. В качестве аргументов методу передаются код (ID) товара и, опционально, массив кодов (ID) цен, которые необходимо оставить. Если второй аргумент - пустой, удаляются все цены. Метод динамичный.</p> <p></p> <div class="note"> <b>Примечание</b>: метод работает с двумя событиями: <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>. Событие <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a> позволяет отменить удаление либо изменить перечень цен, которые будут оставлены. Событие <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a> дает возможность провести какие-то операции одновременно с удалением цен.</div>
+	* <p>Метод удаляет цены для товара. В качестве аргументов методу передаются код (ID) товара и, опционально, массив кодов (ID) цен, которые необходимо оставить. Если второй аргумент - пустой, удаляются все цены. Нестатический метод.</p>   <p></p> <div class="note"> <b>Примечание</b>: метод работает с двумя событиями: <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a> и <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>. Событие <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a> позволяет отменить удаление либо изменить перечень цен, которые будут оставлены. Событие <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a> дает возможность провести какие-то операции одновременно с удалением цен.</div>
 	*
 	*
 	* @param int $ProductID  Код товара или торгового предложения (ID элемента инфоблока), у
@@ -637,25 +662,22 @@ class CAllPrice
 	* @param array $arExceptionIDs = array() Массив кодов (ID) цен, которые будут оставлены. Если массив пуст,
 	* будут удалены все цены товара.
 	*
-	* @return boolean <ul> <li> <i>true</i> в случае успеха </li> <li> <i>false</i>, если произошла ошибка
+	* @return boolean <ul> <li> <i>true</i> в случае успеха </li>   <li> <i>false</i>, если произошла ошибка
 	* или удаление было отменено. </li> </ul>
 	*
 	* <h4>Example</h4> 
-	* <pre>
-	* <b>Удаление всех цен товара</b>
-	* $boolResult = CPrice::DeleteByProduct(241);<br>
-	* <b>Удаление всех цен товара, кроме двух</b>
-	* 
-	* $boolResult = CPrice::DeleteByProduct(241,array(426,456));<br>
+	* <pre bgcolor="#323232" style="padding:5px;">
+	* <b>Удаление всех цен товара</b>$boolResult = CPrice::DeleteByProduct(241);<br>
+	* <b>Удаление всех цен товара, кроме двух</b>$boolResult = CPrice::DeleteByProduct(241,array(426,456));<br>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
-	* <p><b>Методы</b></p></bo<ul> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li>
-	* </ul><p><b>События</b></p></bod<ul> <li> <a
+	* <p><b>Методы</b></p><ul> <li> <a
+	* href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/cprice__delete.9afc6f2b.php">CPrice::Delete</a> </li> 
+	* </ul><p><b>События</b></p><ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/catalog/events/onbeforeproductpricedelete.php">OnBeforeProductPriceDelete</a>
-	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>
+	* </li>   <li> <a href="http://dev.1c-bitrix.ru/api_help/catalog/events/onproductpricedelete.php">OnProductPriceDelete</a>
 	* </li> </ul><a name="examples"></a>
 	*
 	*
@@ -677,7 +699,7 @@ class CAllPrice
 		}
 
 		if (!empty($arExceptionIDs))
-			CatalogClearArray($arExceptionIDs, false);
+			Main\Type\Collection::normalizeArrayValuesByInt($arExceptionIDs);
 
 		if (!empty($arExceptionIDs))
 		{
@@ -691,17 +713,37 @@ class CAllPrice
 		$mxRes = $DB->Query($strSql, true);
 
 		foreach (GetModuleEvents("catalog", "OnProductPriceDelete", true) as $arEvent)
-		{
 			ExecuteModuleEventEx($arEvent, array($ProductID,$arExceptionIDs));
-		}
 
 		return $mxRes;
 	}
 
-	function ReCountForBase(&$arFields)
+	
+	/**
+	* <p>Метод позволяет пересчитать цены товара, заданные как наценка к базовой. Метод внутренний, используется в методах <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/add.php">CPrice::Add</a> (со вторым параметром, равным true) и <a href="http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/update.php">CPrice::Update</a> (с третьим параметром, равным true).</p>
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров цены. Передается по ссылке,
+	* после вызова метода содержимое массива может измениться.
+	* Допустимые ключи: 	<ul> <li> <b>PRODUCT_ID</b> - идентификатор товара;</li> 	<li>
+	* <b>CATALOG_GROUP_ID</b> - идентификатор базового типа цены;</li> 	<li> <b>PRICE</b> -
+	* значение базовой цены;</li> 	<li> <b>CURRENCY</b> - валюта базовой цены;</li> 	<li>
+	* <b>QUANTITY_FROM</b> - количество товара, начиная с приобретения которого
+	* действует цена (указывается в случае, когда используется
+	* расширенный режим управления ценами);</li> 	<li> <b>QUANTITY_TO</b> -
+	* количество товара, при приобретении которого заканчивает
+	* действие цена (указывается в случае, когда используется
+	* расширенный режим управления ценами).</li> 	</ul>
+	*
+	* @return mixed <p>Нет.</p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/recountforbase.php
+	* @author Bitrix
+	*/
+	public static function ReCountForBase(&$arFields)
 	{
 		static $arExtraList = array();
-		$boolSearch = false;
 
 		$arFilter = array('PRODUCT_ID' => $arFields['PRODUCT_ID'],'!CATALOG_GROUP_ID' => $arFields['CATALOG_GROUP_ID']);
 		if (isset($arFields['QUANTITY_FROM']))
@@ -739,10 +781,40 @@ class CAllPrice
 					);
 					CPrice::Update($arPrice['ID'],$arNewPrice,false);
 				}
+				unset($boolSearch);
 			}
 		}
 	}
 
+	
+	/**
+	* <p>Метод позволяет пересчитать цену с наценкой на основе базовой.</p>
+	*
+	*
+	* @param array &$arFields  Ассоциативный массив параметров цены. Передается по ссылке,
+	* после вызова метода содержимое массива может измениться.
+	* Допустимые ключи: 	<ul> <li> <b>PRODUCT_ID</b> - идентификатор товара;</li> 	<li>
+	* <b>CATALOG_GROUP_ID</b> - идентификатор типа цены;</li> 	<li> <b>EXTRA_ID</b> -
+	* идентификатор наценки (ключ обнуляется в случае неудачи при
+	* пересчете цены);</li> 	<li> <b>PRICE</b> - новое значение цены (ключ
+	* появляется в массиве в случае успешного пересчета цены);</li> 	<li>
+	* <b>CURRENCY</b> - валюта новой цены (ключ появляется в массиве в случае
+	* успешного пересчета цены);</li> 	<li> <b>QUANTITY_FROM</b> - количество товара,
+	* начиная с приобретения которого действует цена. Указывается в
+	* случае, когда используется расширенный режим управления
+	* ценами.</li> 	<li> <b>QUANTITY_TO</b> - количество товара, при приобретении
+	* которого заканчивает действие цена. Указывается в случае, когда
+	* используется расширенный режим управления ценами.</li> 	</ul>
+	*
+	* @param bool &$boolBase  Передается по ссылке. Принимает значение <i>true</i>, если передана
+	* цена базового типа, в противном случае -  <i>false</i>.
+	*
+	* @return mixed <p>Нет.</p><br><br>
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_help/catalog/classes/cprice/recountfrombase.php
+	* @author Bitrix
+	*/
 	public static function ReCountFromBase(&$arFields, &$boolBase)
 	{
 		$arBaseGroup = CCatalogGroup::GetBaseGroup();

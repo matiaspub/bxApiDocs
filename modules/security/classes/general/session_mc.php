@@ -118,7 +118,12 @@ class CSecuritySessionMC
 			return false;
 
 		if (self::$isReadOnly)
-			return true;
+		{
+			if (!CSecuritySession::isOldSessionIdExist())
+			{
+				return true;
+			}
+		}
 
 		$sid = self::getPrefix();
 		$maxLifetime = intval(ini_get("session.gc_maxlifetime"));
@@ -219,13 +224,47 @@ class CSecuritySessionMC
 	 */
 	protected static function newConnection()
 	{
-		if(!extension_loaded('memcache') || !self::isStorageEnabled())
-			return false;
+		$result = false;
+		$exception = null;
 
-		$port = defined("BX_SECURITY_SESSION_MEMCACHE_PORT")? intval(BX_SECURITY_SESSION_MEMCACHE_PORT): 11211;
+		if (!extension_loaded('memcache'))
+		{
+			$result = false;
+			$exception = new \ErrorException("memcache extention not loaded.", 0, E_USER_ERROR, __FILE__, __LINE__);
+		}
 
-		self::$connection = new Memcache;
-		return self::$connection->connect(BX_SECURITY_SESSION_MEMCACHE_HOST, $port);
+		if (!$exception)
+		{
+			if (!self::isStorageEnabled())
+			{
+				$result = false;
+				$exception = new \ErrorException("BX_SECURITY_SESSION_MEMCACHE_HOST constant is not defined.", 0, E_USER_ERROR, __FILE__, __LINE__);
+			}
+		}
+
+		if (!$exception)
+		{
+			$port = defined("BX_SECURITY_SESSION_MEMCACHE_PORT")? intval(BX_SECURITY_SESSION_MEMCACHE_PORT): 11211;
+			self::$connection = new Memcache;
+			$result = self::$connection->connect(BX_SECURITY_SESSION_MEMCACHE_HOST, $port);
+			if (!$result)
+			{
+				$error = error_get_last();
+				if ($error && $error["type"] == E_WARNING)
+				{
+					$exception = new \ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+				}
+			}
+		}
+
+		if ($exception)
+		{
+			$application = \Bitrix\Main\Application::getInstance();
+			$exceptionHandler = $application->getExceptionHandler();
+			$exceptionHandler->writeToLog($exception);
+		}
+
+		return $result;
 	}
 
 	protected static function closeConnection()

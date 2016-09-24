@@ -196,7 +196,7 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 	public static function GetControls($strControlID = false)
 	{
 		$vatList = array();
-		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME'), 'order' => array('SORT' => 'ASC')));
+		$vatIterator = Catalog\VatTable::getList(array('select' => array('ID', 'NAME', 'SORT'), 'order' => array('SORT' => 'ASC')));
 		while ($vat = $vatIterator->fetch())
 		{
 			$vat['ID'] = (int)$vat['ID'];
@@ -213,7 +213,7 @@ class CCatalogCondCtrlBasketProductFields extends CGlobalCondCtrlComplex
 				'PREFIX' => Loc::getMessage('BT_MOD_CATALOG_COND_CMP_IBLOCK_ELEMENT_ID_PREFIX'),
 				'LOGIC' => static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ)),
 				'JS_VALUE' => array(
-					'type' => 'dialog',
+					'type' => 'multiDialog',
 					'popup_url' =>  '/bitrix/admin/cat_product_search_dialog.php',
 					'popup_params' => array(
 						'lang' => LANGUAGE_ID,
@@ -776,6 +776,15 @@ class CCatalogCondCtrlBasketProductProps extends CGlobalCondCtrlComplex
 									);
 									$boolUserType = true;
 									break;
+								case 'Date':
+									$strFieldType = 'date';
+									$arLogic = static::GetLogic(array(BT_COND_LOGIC_EQ, BT_COND_LOGIC_NOT_EQ, BT_COND_LOGIC_GR, BT_COND_LOGIC_LS, BT_COND_LOGIC_EGR, BT_COND_LOGIC_ELS));
+									$arValue = array(
+										'type' => 'datetime',
+										'format' => 'date'
+									);
+									$boolUserType = true;
+									break;
 								default:
 									$boolUserType = false;
 									break;
@@ -1004,7 +1013,7 @@ class CCatalogCondCtrlCatalogSettings extends CGlobalCondCtrlComplex
 			-1 => Loc::getMessage('BX_COND_CATALOG_PRICE_TYPE_ALL')
 		);
 		$priceTypeIterator = Catalog\GroupTable::getList(array(
-			'select' => array('ID', 'NAME', 'LANG_NAME' => 'CURRENT_LANG.NAME'),
+			'select' => array('ID', 'NAME', 'SORT', 'LANG_NAME' => 'CURRENT_LANG.NAME'),
 			'order' => array('SORT' => 'ASC', 'ID' => 'ASC')
 		));
 		while ($priceType = $priceTypeIterator->fetch())

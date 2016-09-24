@@ -1,4 +1,6 @@
 <?
+use Bitrix\Main\Page\Asset;
+
 class CPullOptions
 {
 	public static function CheckNeedRun($bGetSectionStatus = true)
@@ -129,12 +131,12 @@ class CPullOptions
 		COption::SetOptionString("pull", "nginx_headers", $flag=='Y'?'Y':'N');
 		return true;
 	}
+
 	public static function GetPushStatus()
 	{
 		$result = COption::GetOptionString("pull", "push");
 		return $result == 'N'? false: true;
 	}
-
 	public static function SetPushStatus($flag = "N")
 	{
 		COption::SetOptionString("pull", "push", $flag=='Y'?'Y':'N');
@@ -142,6 +144,17 @@ class CPullOptions
 			CAgent::AddAgent("CPushManager::SendAgent();", "pull", "N", 30);
 		else
 			CAgent::RemoveAgent("CPushManager::SendAgent();", "pull");
+
+		return true;
+	}
+
+	public static function GetGuestStatus()
+	{
+		return IsModuleInstalled('statistic') && COption::GetOptionString("pull", "guest") == 'Y';
+	}
+	public static function SetGuestStatus($flag = "N")
+	{
+		COption::SetOptionString("pull", "guest", IsModuleInstalled('statistic') && $flag=='Y'?'Y':'N');
 
 		return true;
 	}
@@ -390,6 +403,10 @@ class CPullOptions
 		{
 			$userId = intval($GLOBALS['USER']->GetID());
 		}
+		else if (IsModuleInstalled('statistic') && intval($_SESSION["SESS_SEARCHER_ID"]) <= 0 && intval($_SESSION["SESS_GUEST_ID"]) > 0 && COption::GetOptionString("pull", "guest") == 'Y')
+		{
+			$userId = intval($_SESSION["SESS_GUEST_ID"])*-1;
+		}
 
 		if (!defined('BX_PULL_SKIP_INIT') && !(isset($_REQUEST['AJAX_CALL']) && $_REQUEST['AJAX_CALL'] == 'Y') && $userId != 0 && CModule::IncludeModule('pull'))
 		{
@@ -399,10 +416,42 @@ class CPullOptions
 			{
 				CJSCore::Init(array('pull'));
 
-				$pullConfig = CPullChannel::GetConfig($userId);
-
 				global $APPLICATION;
-				$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
+
+				if(\Bitrix\Main\Page\Frame::getInstance()->getUseAppCache())
+				{
+					$pullInitJs = <<<JS
+					
+					var pullInited = false;
+					BX.bind(window, "load", function(){
+						var config = BX.frameCache.getPullConfig();
+						if(config != null)
+						{
+							pullInited = true;
+							BX.PULL.start(config);
+						}
+					});
+					
+					BX.addCustomEvent("pullConfigHasBeenChanged",function(config){
+						if(pullInited)
+						{
+							BX.PULL.updateChannelID(config);
+							BX.PULL.tryConnect();
+							return;
+						}
+						
+						BX.PULL.start(config);
+						
+					});
+JS;
+					Asset::getInstance()->addString('<script type="text/javascript">'.$pullInitJs.'</script>');
+				}
+				else
+				{
+					$pullConfig = CPullChannel::GetConfig($userId);
+					$APPLICATION->AddAdditionalJS('<script type="text/javascript">BX.bind(window, "load", function() { BX.PULL.start('.(empty($pullConfig)? '': CUtil::PhpToJsObject($pullConfig)).'); });</script>');
+
+				}
 			}
 		}
 	}

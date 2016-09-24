@@ -60,7 +60,7 @@ class CReport
 		self::clearViewParams($ID);
 
 		// post-events
-		foreach (GetModuleEvents("report", "OnBeforeReportAdd", true) as $arEvent)
+		foreach (GetModuleEvents("report", "OnReportAdd", true) as $arEvent)
 		{
 			ExecuteModuleEventEx($arEvent, array($ID, &$fields));
 		}
@@ -88,7 +88,7 @@ class CReport
 		);
 
 		// pre-events
-		foreach (GetModuleEvents("report", "OnBeforeReportAdd", true) as $arEvent)
+		foreach (GetModuleEvents("report", "OnBeforeReportUpdate", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array($ID, &$fields)) === false)
 			{
@@ -108,7 +108,7 @@ class CReport
 		// post-events
 		if ($result)
 		{
-			foreach (GetModuleEvents("report", "OnBeforeReportAdd", true) as $arEvent)
+			foreach (GetModuleEvents("report", "OnReportUpdate", true) as $arEvent)
 			{
 				ExecuteModuleEventEx($arEvent, array($ID, &$fields));
 			}
@@ -127,7 +127,7 @@ class CReport
 		$strSql = "DELETE FROM b_report WHERE ID = ".intval($ID);
 
 		// pre-events
-		foreach (GetModuleEvents("report", "OnBeforeReportAdd", true) as $arEvent)
+		foreach (GetModuleEvents("report", "OnBeforeReportDelete", true) as $arEvent)
 		{
 			if (ExecuteModuleEventEx($arEvent, array($ID)) === false)
 			{
@@ -139,7 +139,7 @@ class CReport
 		$DB->Query($strSql, false, "File: ".__FILE__."<br>Line: ".__LINE__);
 
 		// post-events
-		foreach (GetModuleEvents("report", "OnBeforeReportAdd", true) as $arEvent)
+		foreach (GetModuleEvents("report", "OnReportDelete", true) as $arEvent)
 		{
 			ExecuteModuleEventEx($arEvent, array($ID));
 		}

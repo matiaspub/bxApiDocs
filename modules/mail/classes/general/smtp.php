@@ -561,7 +561,7 @@ class CSMTPConnection
 	}
 
 	//обработчик команд
-public 	function __ProcessCommand($command, $arg = '')
+	public function __ProcessCommand($command, $arg = '')
 	{
 		switch(strtoupper($command))
 		{
@@ -732,7 +732,7 @@ public 	function __ProcessCommand($command, $arg = '')
 		return true;
 	}
 
-public 	function Authorize($login, $password)
+	public function Authorize($login, $password)
 	{
 		$authResult = $GLOBALS["USER"]->Login($login, $password, "N");
 
@@ -750,7 +750,7 @@ public 	function Authorize($login, $password)
 		return false;
 	}
 
-public 	function __AuthLoginHandler()
+	public function __AuthLoginHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -780,7 +780,7 @@ public 	function __AuthLoginHandler()
 		return true;
 	}
 
-public 	function __AuthPlainHandler()
+	public function __AuthPlainHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n")===false)
 			return false;
@@ -804,12 +804,12 @@ public 	function __AuthPlainHandler()
 		return true;
 	}
 
-public 	function __DataHandler()
+	public function __DataHandler()
 	{
 		if(strpos($this->readBuffer, "\r\n.\r\n")===false)
 			return false;
 
-		$this->readBuffer = substr($this->readBuffer, 0, -5);
+		$this->readBuffer = substr($this->readBuffer, 0, -3);
 
 		$this->readBuffer = str_replace("\r\n..", "\r\n.", $this->readBuffer);
 

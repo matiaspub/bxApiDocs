@@ -119,7 +119,7 @@ abstract class NameHelper extends Helper
 	##############################################
 	##############################################
 
-	public static function validateUpdateRequest(&$data)
+	public static function validateUpdateRequest($data)
 	{
 		$errors = parent::validateUpdateRequest($data);
 

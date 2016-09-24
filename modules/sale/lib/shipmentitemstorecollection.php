@@ -70,10 +70,10 @@ class ShipmentItemStoreCollection
 	}
 
 	/**
-	 * @param ShipmentItemStore $shipmentItemStore
+	 * @param Internals\CollectableEntity $shipmentItemStore
 	 * @return bool|void
 	 */
-	static public function addItem(ShipmentItemStore $shipmentItemStore)
+	static public function addItem(Internals\CollectableEntity $shipmentItemStore)
 	{
 		parent::addItem($shipmentItemStore);
 	}
@@ -119,14 +119,116 @@ class ShipmentItemStoreCollection
 		return $this->shipmentItem;
 	}
 
+
+	public function onShipmentItemModify($action, ShipmentItem $shipmentItem, $name = null, $oldValue = null, $value = null)
+	{
+		if ($action !== EventActions::UPDATE)
+			return new Result();
+
+		if ($name == "QUANTITY")
+		{
+			return $this->syncQuantityAfterModify($shipmentItem, $oldValue, $value);
+		}
+
+		return new Result();
+	}
+
 	/**
-	 * @param ShipmentItemStore $item
+	 * @param ShipmentItem $shipmentItem
+	 * @param null $oldValue
+	 * @param null $value
+	 *
+	 * @return Result
+	 */
+	protected function syncQuantityAfterModify(ShipmentItem $shipmentItem, $oldValue = null, $value = null)
+	{
+		if (!($basketItem = $shipmentItem->getBasketItem()) || $basketItem->getId() == 0)
+			return new Result();
+
+		$result = new Result();
+
+		$deltaQuantity = $value - $oldValue;
+
+		if ($deltaQuantity >= 0)
+			return $result;
+
+		$barcodeList = array();
+		/** @var ShipmentItemStore $shipmentItemStore */
+		foreach($this->collection as $shipmentItemStore)
+		{
+			if ($shipmentItemStore->getBasketCode() == $basketItem->getBasketCode())
+			{
+				if (strval($shipmentItemStore->getBarcode()) == "")
+				{
+					$barcodeList[$shipmentItemStore->getId()] = $shipmentItemStore;
+				}
+			}
+		}
+
+		if ($basketItem->isBarcodeMulti())
+		{
+			if (count($barcodeList) < $oldValue)
+				return $result;
+
+			$oldItemsList = array();
+
+			/** @var ShipmentItemStore $shipmentItemStore */
+			foreach ($this->collection as $shipmentItemStore)
+			{
+				if ($shipmentItemStore->getBasketCode() == $basketItem->getBasketCode())
+				{
+					$oldItemsList[$shipmentItemStore->getId()] = $shipmentItemStore;
+				}
+			}
+
+			$cutBarcodeList = array_slice($barcodeList, 0, $deltaQuantity, true);
+			if (!empty($oldItemsList) && is_array($oldItemsList))
+			{
+				/**
+				 * @var int $oldItemId
+				 * @var ShipmentItemStore $oldItem
+				 */
+				foreach($oldItemsList as $oldItemId => $oldItem)
+				{
+					if (!isset($cutBarcodeList[$oldItemId]))
+					{
+						$oldItem->delete();
+					}
+				}
+			}
+		}
+		elseif (count($barcodeList) == 1)
+		{
+			/** @var ShipmentItemStore $barcodeItem */
+			$barcodeItem = reset($barcodeList);
+
+			if ($barcodeItem->getQuantity() < $oldValue)
+				return new Result();
+
+			/** @var Result $r */
+			$r = $barcodeItem->setField(
+					"QUANTITY",
+					$barcodeItem->getField("QUANTITY") + $deltaQuantity
+			);
+
+			if (!$r->isSuccess())
+			{
+				$result->addErrors($r->getErrors());
+				return $result;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param Internals\CollectableEntity $item
 	 * @param null $name
 	 * @param null $oldValue
 	 * @param null $value
 	 * @return bool
 	 */
-	public function onItemModify(ShipmentItemStore $item, $name = null, $oldValue = null, $value = null)
+	public function onItemModify(Internals\CollectableEntity $item, $name = null, $oldValue = null, $value = null)
 	{
 //		$shipmentItem = $this->getShipmentItem();
 
@@ -139,11 +241,11 @@ class ShipmentItemStoreCollection
 	}
 
 	/**
-	 * @param ShipmentItemStore $item
+	 * @param Internals\CollectableEntity $item
 	 * @return Result
 	 * @throws \Exception
 	 */
-	public function checkAvailableQuantity(ShipmentItemStore $item)
+	public function checkAvailableQuantity(Internals\CollectableEntity $item)
 	{
 		$result = new Result();
 		$shipmentItem = $this->getShipmentItem();
@@ -194,11 +296,11 @@ class ShipmentItemStoreCollection
 			$itemsFromDbList = Internals\ShipmentItemStoreTable::getList(
 				array(
 					"filter" => array("ORDER_DELIVERY_BASKET_ID" => $this->getShipmentItem()->getId()),
-					"select" => array("*")
+					"select" => ShipmentItemStore::getAllFields()
 				)
 			);
 			while ($itemsFromDbItem = $itemsFromDbList->fetch())
-				$itemsFromDb[$itemsFromDbItem["ID"]] = true;
+				$itemsFromDb[$itemsFromDbItem["ID"]] = $itemsFromDbItem;
 		}
 
 		/** @var ShipmentItemStore $shipmentItemStore */
@@ -212,8 +314,24 @@ class ShipmentItemStoreCollection
 				unset($itemsFromDb[$shipmentItemStore->getId()]);
 		}
 
+		$itemEventName = ShipmentItemStore::getEntityEventName();
+
 		foreach ($itemsFromDb as $k => $v)
+		{
+			/** @var Main\Event $event */
+			$event = new Main\Event('sale', "OnBefore".$itemEventName."Deleted", array(
+					'VALUES' => $v,
+			));
+			$event->send();
+
 			Internals\ShipmentItemStoreTable::delete($k);
+
+			/** @var Main\Event $event */
+			$event = new Main\Event('sale', "On".$itemEventName."Deleted", array(
+					'VALUES' => $v,
+			));
+			$event->send();
+		}
 
 		return $result;
 	}
@@ -265,6 +383,9 @@ class ShipmentItemStoreCollection
 
 		foreach ($plusList as $barcode)
 		{
+			if ($barcode['ID'] <= 0)
+				continue;
+
 			$item = $this->getItemById($barcode['ID']);
 			if ($item)
 			{
@@ -375,6 +496,60 @@ class ShipmentItemStoreCollection
 		}
 
 		return null;
+	}
+
+	/**
+	 * @internal
+	 * @param \SplObjectStorage $cloneEntity
+	 *
+	 * @return ShipmentItemStoreCollection
+	 */
+	public function createClone(\SplObjectStorage $cloneEntity)
+	{
+		if ($this->isClone() && $cloneEntity->contains($this))
+		{
+			return $cloneEntity[$this];
+		}
+
+		$shipmentItemStoreCollectionClone = clone $this;
+		$shipmentItemStoreCollectionClone->isClone = true;
+
+		/** @var ShipmentItem $shipmentItem */
+		if ($shipmentItem = $this->shipmentItem)
+		{
+			if (!$cloneEntity->contains($shipmentItem))
+			{
+				$cloneEntity[$shipmentItem] = $shipmentItem->createClone($cloneEntity);
+			}
+
+			if ($cloneEntity->contains($shipmentItem))
+			{
+				$shipmentItemStoreCollectionClone->shipmentItem = $cloneEntity[$shipmentItem];
+			}
+			
+		}
+
+		if (!$cloneEntity->contains($this))
+		{
+			$cloneEntity[$this] = $shipmentItemStoreCollectionClone;
+		}
+
+
+		/**
+		 * @var int key
+		 * @var ShipmentItemStore $shipmentItemStore
+		 */
+		foreach ($shipmentItemStoreCollectionClone->collection as $key => $shipmentItemStore)
+		{
+			if (!$cloneEntity->contains($shipmentItemStore))
+			{
+				$cloneEntity[$shipmentItemStore] = $shipmentItemStore->createClone($cloneEntity);
+			}
+
+			$shipmentItemStoreCollectionClone->collection[$key] = $cloneEntity[$shipmentItemStore];
+		}
+
+		return $shipmentItemStoreCollectionClone;
 	}
 
 } 

@@ -1,6 +1,9 @@
 <?php
 namespace Bitrix\Main\Text;
 
+/**
+ * @deprecated PHP7 reserved word
+ */
 class String
 {
 	public static function strrpos($haystack, $needle)

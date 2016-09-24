@@ -1,7 +1,7 @@
 <?
 
 /**
- * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>. 
+ * <b>CPhrase</b> - класс для получения данных по <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">поисковым фразам</a>.
  *
  *
  * @return mixed 
@@ -18,53 +18,62 @@ class CPhrase
 	*
 	*
 	* @param string &$by = "s_id" Поле для сортировки. В зависимости от группировки списка, набор
-	* доступных значений данной переменной может быть различным. <ul>
-	* <li>при группировке по поисковой фразе (<i>filter</i>["<b>GROUP</b>"]="P"): <ul> <li>
-	* <b>s_phrase</b> - поисковая фраза; </li> <li> <b>s_quantity</b> - количество заходов с
-	* той или иной поисковой фразой. </li> </ul> </li> <li>при группировке по
-	* поисковой системе (<i>filter</i>["<b>GROUP</b>"]="S"): <ul> <li> <b>s_name</b> - поисковая
-	* система; </li> <li> <b>s_quantity</b> - количество заходов с данной поисковой
-	* системы; </li> <li> <b>s_average_hits</b> - среднее количество <a
+	* доступных значений данной переменной может быть различным.         
+	* <ul> <li>при группировке по поисковой фразе (<i>filter</i>["<b>GROUP</b>"]="P"):          
+	*    <ul> <li> <b>s_phrase</b> - поисковая фраза; </li>                             <li> <b>s_quantity</b> -
+	* количество заходов с той или иной поисковой фразой. </li>              </ul>
+	* </li>                     <li>при группировке по поисковой системе
+	* (<i>filter</i>["<b>GROUP</b>"]="S"):              <ul> <li> <b>s_name</b> - поисковая система; </li>    
+	*                         <li> <b>s_quantity</b> - количество заходов с данной поисковой
+	* системы; </li>                             <li> <b>s_average_hits</b> - среднее количество <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#hit">хитов</a> производимое
-	* посетителями заходящим с той или иной поисковой системы. </li> </ul>
-	* </li> <li>когда группировка не установлена: <ul> <li> <b>s_id</b> - ID записи; </li>
-	* <li> <b>s_counter</b> - счетчик; </li> <li> <b>s_site_id</b> - ID сайта на который пришли;
-	* </li> <li> <b>s_phrase</b> - поисковая фраза; </li> <li> <b>s_searcher_id</b> - ID поисковой
-	* системы; </li> <li> <b>s_referer_id</b> - ID записи из таблицы <a
+	* посетителями заходящим с той или иной поисковой системы. </li>          
+	*    </ul> </li>                     <li>когда группировка не установлена:              <ul>
+	* <li> <b>s_id</b> - ID записи; </li>                             <li> <b>s_counter</b> - счетчик; </li>     
+	*                        <li> <b>s_site_id</b> - ID сайта на который пришли; </li>                    
+	*         <li> <b>s_phrase</b> - поисковая фраза; </li>                             <li>
+	* <b>s_searcher_id</b> - ID поисковой системы; </li>                             <li> <b>s_referer_id</b>
+	* - ID записи из таблицы <a
 	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#referer">ссылающихся сайтов
-	* (страниц)</a>; </li> <li> <b>s_date_hit</b> - дата захода; </li> <li> <b>s_url_to</b> -
-	* страница на которую пришли; </li> <li> <b>s_session_id</b> - ID <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>. </li> </ul> </li> </ul>
+	* (страниц)</a>; </li>                             <li> <b>s_date_hit</b> - дата захода; </li>           
+	*                  <li> <b>s_url_to</b> - страница на которую пришли; </li>                        
+	*     <li> <b>s_session_id</b> - ID <a
+	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#session">сессии</a>. </li>              </ul> </li>    
+	*      </ul>
 	*
-	* @param string &$order = "desc" Порядок сортировки. Возможные значения: <ul> <li> <b>asc</b> - по
-	* возрастанию; </li> <li> <b>desc</b> - по убыванию. </li> </ul>
+	* @param string &$order = "desc" Порядок сортировки. Возможные значения:          <ul> <li> <b>asc</b> - по
+	* возрастанию; </li>                     <li> <b>desc</b> - по убыванию. </li>          </ul>
 	*
 	* @param array $filter = array() Массив для фильтрации результирующего списка. В массиве
-	* допустимы следующие ключи: <ul> <li> <b>ID</b> - ID записи; </li> <li>
-	* <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по <b>ID</b>
-	* будет искаться вхождение; </li> <li> <b>SESSION_ID</b> - ID сессии; </li> <li>
-	* <b>SESSION_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>SESSION_ID</b> будет искаться вхождение; </li> <li> <b>SEARCHER_ID</b> - ID поисковой
-	* системы; </li> <li> <b>SEARCHER_ID_EXACT_MATCH</b> - если значение равно "N", то при
-	* фильтрации по <b>SEARCHER_ID</b> будет искаться вхождение; </li> <li>
-	* <b>REFERER_ID</b> - ID записи из таблицы ссылающихся сайтов (страниц); </li> <li>
+	* допустимы следующие ключи:          <ul> <li> <b>ID</b> - ID записи; </li>                 
+	*    <li> <b>ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>ID</b> будет искаться вхождение; </li>                     <li> <b>SESSION_ID</b> - ID
+	* сессии; </li>                     <li> <b>SESSION_ID_EXACT_MATCH</b> - если значение равно "N",
+	* то при фильтрации по <b>SESSION_ID</b> будет искаться вхождение; </li>           
+	*          <li> <b>SEARCHER_ID</b> - ID поисковой системы; </li>                     <li>
+	* <b>SEARCHER_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
+	* <b>SEARCHER_ID</b> будет искаться вхождение; </li>                     <li> <b>REFERER_ID</b> - ID
+	* записи из таблицы ссылающихся сайтов (страниц); </li>                     <li>
 	* <b>REFERER_ID_EXACT_MATCH</b> - если значение равно "N", то при фильтрации по
-	* <b>REFERER_ID</b> будет искаться вхождение; </li> <li> <b>SEARCHER</b>* - название
-	* поисковой системы; </li> <li> <b>SEARCHER_EXACT_MATCH</b> - если значение равно "Y",
-	* то при фильтрации по <b>SEARCHER</b> будет искаться точное совпадение;
-	* </li> <li> <b>DATE1</b> - начальное значение интервала для поля "дата"; </li> <li>
-	* <b>DATE2</b> - конечно значение интервала для поля "дата"; </li> <li> <b>PHRASE</b>*
-	* - поисковая фраза; </li> <li> <b>PHRASE_EXACT_MATCH</b> - если значение равно "Y", то
-	* при фильтрации по <b>PHRASE</b> будет искаться точное совпадение; </li> <li>
-	* <b>TO</b>* - страница на которую пришли; </li> <li> <b>TO_EXACT_MATCH</b> - если
-	* значение равно "Y", то при фильтрации по <b>TO</b> будет искаться
-	* точное совпадение; </li> <li> <b>TO_404</b> - была ли <a
-	* href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404 ошибка</a> на странице на
-	* которую пришли, возможные значения: <ul> <li> <b>Y</b> - была; </li> <li> <b>N</b> -
-	* не была. </li> </ul> </li> <li> <b>SITE_ID</b> - ID сайта, на который пришли; </li> <li>
-	* <b>GROUP</b> - группировка результирующего списка, возможные значения:
-	* <ul> <li> <b>P</b> - группировка по поисковой фразе; </li> <li> <b>S</b> -
-	* группировка по поисковой системе. </li> </ul> </li> </ul> * - допускается <a
+	* <b>REFERER_ID</b> будет искаться вхождение; </li>                     <li> <b>SEARCHER</b>* -
+	* название поисковой системы; </li>                     <li> <b>SEARCHER_EXACT_MATCH</b> -
+	* если значение равно "Y", то при фильтрации по <b>SEARCHER</b> будет
+	* искаться точное совпадение; </li>                     <li> <b>DATE1</b> - начальное
+	* значение интервала для поля "дата"; </li>                     <li> <b>DATE2</b> -
+	* конечно значение интервала для поля "дата"; </li>                     <li>
+	* <b>PHRASE</b>* - поисковая фраза; </li>                     <li> <b>PHRASE_EXACT_MATCH</b> - если
+	* значение равно "Y", то при фильтрации по <b>PHRASE</b> будет искаться
+	* точное совпадение; </li>                     <li> <b>TO</b>* - страница на которую
+	* пришли; </li>                     <li> <b>TO_EXACT_MATCH</b> - если значение равно "Y", то
+	* при фильтрации по <b>TO</b> будет искаться точное совпадение; </li>         
+	*            <li> <b>TO_404</b> - была ли <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#404">404
+	* ошибка</a> на странице на которую пришли, возможные значения:           
+	*   <ul> <li> <b>Y</b> - была; </li>                             <li> <b>N</b> - не была. </li>             
+	* </ul> </li>                     <li> <b>SITE_ID</b> - ID сайта, на который пришли; </li>            
+	*         <li> <b>GROUP</b> - группировка результирующего списка, возможные
+	* значения:              <ul> <li> <b>P</b> - группировка по поисковой фразе; </li>    
+	*                         <li> <b>S</b> - группировка по поисковой системе. </li>            
+	*  </ul> </li>          </ul>        * - допускается <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/general/filter.php">сложная логика</a>
 	*
 	* @param bool &$is_filtered  Флаг отфильтрованности результирующего списка. Если значение
@@ -73,9 +82,9 @@ class CPhrase
 	* @param int &$total  Суммарное количество поисковых фраз. Принимает значение только
 	* при установленной группировке.
 	*
-	* @param string &$group_by  Группировка списка поисковых фраз. Возможные значения: <ul> <li> <b>P</b>
-	* - группировка по поисковой фразе; </li> <li> <b>S</b> - группировка по
-	* поисковой системе. </li> </ul>
+	* @param string &$group_by  Группировка списка поисковых фраз. Возможные значения:          <ul> <li>
+	* <b>P</b> - группировка по поисковой фразе; </li>                     <li> <b>S</b> -
+	* группировка по поисковой системе. </li>          </ul>
 	*
 	* @param int &$max  Количество заходов по самой популярной поисковой фразе.
 	* Принимает значение только при установленной группировке.
@@ -83,15 +92,15 @@ class CPhrase
 	* @return CDBResult 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?<br>// отфильтруем только те поисковые фразы<br>// которые искали на сайте с помощью внутреннего поиска<br>$arFilter = array(<br>    "SEARCHER_ID"  =&gt; 1<br>    );<br><br>// получим список записей<br>$rs = <b>CPhrase::GetList</b>(<br>    ($by = "s_id"), <br>    ($order = "desc"), <br>    $arFilter, <br>    $is_filtered,<br>    $total,<br>    $group_by,<br>    $max<br>    );<br><br>// выведем все записи<br>while ($ar = $rs-&gt;Fetch())<br>{<br>    echo "&lt;pre&gt;"; print_r($ar); echo "&lt;/pre&gt;";    <br>}<br>?&gt;<br>
 	* </pre>
 	*
 	*
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#phrase">Термин "Поисковая
-	* фраза"</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин
-	* "Поисковая система"</a> </li> </ul> <a name="examples"></a>
+	* фраза"</a> </li>     <li> <a href="http://dev.1c-bitrix.ru/api_help/statistic/terms.php#search">Термин
+	* "Поисковая система"</a> </li>  </ul><a name="examples"></a>
 	*
 	*
 	* @static

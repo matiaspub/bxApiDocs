@@ -9,13 +9,6 @@ class CSocServLiveIDOAuth extends CSocServAuth
 	/** @var CLiveIDOAuthInterface null  */
 	protected $entityOAuth = null;
 
-	protected $userId = null;
-
-	public function __construct($userId = null)
-	{
-		$this->userId = $userId;
-	}
-
 	public function getEntityOAuth()
 	{
 		return $this->entityOAuth;
@@ -26,7 +19,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		return array(
 			array("liveid_appid", GetMessage("socserv_liveid_client_id"), "", Array("text", 40)),
 			array("liveid_appsecret", GetMessage("socserv_liveid_client_secret"), "", Array("text", 40)),
-			array("note"=>GetMessage("socserv_liveid_form_note", array('#URL#'=>CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php"))),
+			array("note"=>GetMessage("socserv_liveid_form_note", array('#URL#'=>\CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php")))),
 		);
 	}
 
@@ -58,7 +51,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 		{
 			$redirect_uri = self::CONTROLLER_URL."/redirect.php";
-			$state = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php?state=";
+			$state = \CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php")."?state=";
 			$backurl = urlencode($GLOBALS["APPLICATION"]->GetCurPageParam('check_key='.$_SESSION["UNIQUE_KEY"], array("logout", "auth_service_error", "auth_service_id", "backurl"))).(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '').'&mode='.$location;
 			$state .= urlencode(urlencode("backurl=".$backurl));
 		}
@@ -69,7 +62,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 				array("logout", "auth_service_error", "auth_service_id", "backurl")
 			);
 
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php";
+			$redirect_uri = \CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php");
 			$state = 'site_id='.SITE_ID.'&backurl='.urlencode($backurl).(isset($arParams['BACKURL']) ? '&redirect_url='.urlencode($arParams['BACKURL']) : '').'&mode='.$location;
 		}
 
@@ -114,7 +107,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 			if(IsModuleInstalled('bitrix24') && defined('BX24_HOST_NAME'))
 				$redirect_uri = self::CONTROLLER_URL."/redirect.php";
 			else
-				$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php";
+				$redirect_uri = \CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php");
 
 			$appID = trim(self::GetOption("liveid_appid"));
 			$appSecret = trim(self::GetOption("liveid_appsecret"));
@@ -264,7 +257,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 		}
 		else
 		{
-			$redirect_uri = CSocServUtil::ServerName()."/bitrix/tools/oauth/liveid.php";
+			$redirect_uri = \CHTTP::URN2URI("/bitrix/tools/oauth/liveid.php");
 		}
 
 		if($li->GetAccessToken($redirect_uri) !== false)
@@ -287,8 +280,7 @@ class CSocServLiveIDOAuth extends CSocServAuth
 
 	static public function getProfileUrl($id)
 	{
-		$id = preg_replace("/^.*?\./", '', $id);
-		return 'https://people.live.com/?contact_id='.substr($id, 0, 8).'-'.substr($id, 8, 4).'-'.substr($id, 12, 4).'-'.substr($id, 16, 4).'-'.substr($id, 20).'&action=details';
+		return 'https://people.live.com/';
 	}
 }
 
@@ -557,17 +549,17 @@ class CLiveIDOAuthInterface
 
 		if(is_object($USER) && $USER->IsAuthorized())
 		{
-			$dbSocservUser = CSocServAuthDB::GetList(
-				array(),
-				array(
-					'USER_ID' => $USER->GetID(),
-					"EXTERNAL_AUTH_ID" => static::SERVICE_ID
-				), false, false, array("ID")
-			);
+			$dbSocservUser = \Bitrix\Socialservices\UserTable::getList(array(
+				'filter' => array(
+					'=USER_ID' => $USER->GetID(),
+					"=EXTERNAL_AUTH_ID" => static::SERVICE_ID
+				),
+				'select' => array("ID")
+			));
 
-			while($accessToken = $dbSocservUser->Fetch())
+			while($accessToken = $dbSocservUser->fetch())
 			{
-				CSocServAuthDB::Delete($accessToken['ID']);
+				\Bitrix\Socialservices\UserTable::delete($accessToken['ID']);
 			}
 		}
 	}

@@ -9,6 +9,17 @@
 use Bitrix\Main;
 use Bitrix\Main\Data\ConnectionPool;
 
+
+/**
+ * <b>CDatabase</b> - класс для работы с базой данной.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/index.php
+ * @author Bitrix
+ */
 abstract class CAllDatabase
 {
 	var $DBName;
@@ -181,21 +192,21 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Открывает соединение с базой данных. Метод возвращает "true" при успешном открытии соединения или "false" при ошибке. Динамичный метод.</p> <p> </p>
+	* <p>Открывает соединение с базой данных. Метод возвращает "true" при успешном открытии соединения или "false" при ошибке. Нестатический метод.</p> <p> </p>
 	*
 	*
-	* @param string $host  Сервер (хост) базы данных. </ht
+	* @param string $host  Сервер (хост) базы данных.
 	*
-	* @param string $db  Имя базы данных.
+	* @param string $stringdb  Имя базы данных.
 	*
-	* @param string $login  Логин.</b
+	* @param string $login  Логин.
 	*
-	* @param string $password  Пароль.</bo
+	* @param string $password  Пароль.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if(!(<b>$DB-&gt;Connect</b>($DBHost, $DBName, $DBLogin, $DBPassword)))
 	* {
@@ -325,13 +336,13 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=2071#local_settings" >Региональных настройках</a>.<br> Динамичный метод.</p> <p> </p>
+	* <p>Возвращает для MySQL строку DATE_FORMAT, для Oracle - TO_CHAR с нужными параметрами.<br> Форматы даты устанавливается в <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=2071#local_settings" >Региональных настройках</a>.<br> Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $value  Значение даты для формата текущего сайта.
 	*
 	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	* времени) <br>Необязательный. По умолчанию "FULL".
+	* времени) 		<br>Необязательный. По умолчанию "FULL".
 	*
 	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
 	* умолчанию текущий. Отсутствовал в версях с 3.0.11 до 3.3.21.
@@ -341,7 +352,7 @@ abstract class CAllDatabase
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $strSql = "
 	*     SELECT 
@@ -359,7 +370,7 @@ abstract class CAllDatabase
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/chartodatefunction.php">CDatabase::CharToDateFunction</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	* с датой и временем</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -370,7 +381,7 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - метод вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=2071" >Региональных настройках</a> сайта. Динамичный метод.</p>
+	* <p>Возвращает для MySQL значение сконвертированное в формат YYYY-MM-DD [HH:MI:SS], для Oracle - метод вернет строку TO_DATE с нужными параметрами.<br>Форматы даты устанавливается в <a href="https://dev.1c-bitrix.ru/learning/course/index.php?COURSE_ID=35&amp;LESSON_ID=2071" >Региональных настройках</a> сайта. Нестатический метод.</p>
 	*
 	*
 	* @param string $value  Если функция вызывается в публичной части сайта, то это - значение
@@ -379,7 +390,7 @@ abstract class CAllDatabase
 	* текущего языка.
 	*
 	* @param string $type = "FULL" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	* времени) <br>Необязательный. По умолчанию "FULL".
+	* времени) 		<br>Необязательный. По умолчанию "FULL".
 	*
 	* @param string $lang = false Код языка для административной части.<br>Необязательный. По
 	* умолчанию текущий. Отсутствовал в версиях с 3.0.11 по 3.3.21.
@@ -387,7 +398,7 @@ abstract class CAllDatabase
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arr = getdate();
 	* $ndate = mktime(9,0,0,$arr["mon"],$arr["mday"],$arr["year"]);
@@ -412,7 +423,7 @@ abstract class CAllDatabase
 	* <ul> <li> <a
 	* href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/datetocharfunction.php">CDatabase::DateToCharFunction</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	* с датой и временем</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -447,7 +458,7 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Метод конвертирует любой формат времени допустимый в настройках сайта в формат принятый в PHP. Динамичный метод.</p> <p>Правила конвертации:</p> <p> </p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> <th width="20%">После конвертации</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Y</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>m</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>d</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>H</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>i</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>s</td> <td>Секунды (00 - 59)</td> </tr> </table>
+	* <p>Метод конвертирует любой формат времени допустимый в настройках сайта в формат принятый в PHP. Нестатический метод.</p> <p>Правила конвертации:</p> <p> </p> <table class="tnormal" width="100%"> <tr> <th width="20%">Исходные символы</th> 		<th width="20%">После конвертации</th> 		<th width="60%">Описание</th> 	</tr> <tr> <td>YYYY</td> 		<td>Y</td> 		<td>Год (0001 - 9999)</td> 	</tr> <tr> <td>MM</td> 		<td>m</td> 		<td>Месяц (01 - 12)</td> 	</tr> <tr> <td>DD</td> 		<td>d</td> 		<td>День (01 - 31)</td> 	</tr> <tr> <td>HH</td> 		<td>H</td> 		<td>Часы (00 - 24)</td> 	</tr> <tr> <td>MI</td> 		<td>i</td> 		<td>Минуты (00 - 59)</td> 	</tr> <tr> <td>SS</td> 		<td>s</td> 		<td>Секунды (00 - 59)</td> 	</tr> </table>
 	*
 	*
 	* @param string $format  Y
@@ -455,7 +466,7 @@ abstract class CAllDatabase
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // исходный формат
 	* $format = "DD.MM.YYYY HH:MI:SS";
@@ -463,8 +474,6 @@ abstract class CAllDatabase
 	* // переведем в PHP формат
 	* $php_format = <b>$DB-&gt;DateFormatToPHP</b>($format); // d.m.Y H:i:s
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // вывод текущей даты в формате текущего сайта
 	* 
@@ -477,8 +486,6 @@ abstract class CAllDatabase
 	* // выведем текущую дату в формате текущего сайта
 	* echo date($php_format, time());
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // вывод вчерашне даты в формате текущего сайта
 	* 
@@ -498,14 +505,14 @@ abstract class CAllDatabase
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/formatdate.php">CDatabase::FormatDate</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы
-	* с датой и временем</a> </li> </ul> <a name="examples"></a>
+	* с датой и временем</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/dateformattophp.php
 	* @author Bitrix
 	*/
-	function DateFormatToPHP($format)
+	public static function DateFormatToPHP($format)
 	{
 		static $cache = array();
 		if (!isset($cache[$format]))
@@ -517,34 +524,32 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Преобразует дату из одного заданного формата в другой заданный формат. В формате допустимы следующие обозначения:</p> <p> </p> <table width="100%" class="tnormal"> <tr> <th width="40%">Обозначение</th> <th width="60%">Описание</th> </tr> <tr> <td>YYYY</td> <td>Год (0001 - 9999)</td> </tr> <tr> <td>MM</td> <td>Месяц (01 - 12)</td> </tr> <tr> <td>DD</td> <td>День (01 - 31)</td> </tr> <tr> <td>HH</td> <td>Часы (00 - 24)</td> </tr> <tr> <td>MI</td> <td>Минуты (00 - 59)</td> </tr> <tr> <td>SS</td> <td>Секунды (00 - 59)</td> </tr> </table> <p>Динамичный метод.</p>
+	* <p>Преобразует дату из одного заданного формата в другой заданный формат. В формате допустимы следующие обозначения:</p> <p> </p> <table width="100%" class="tnormal"> <tr> <th width="40%">Обозначение</th> 		<th width="60%">Описание</th> 	</tr> <tr> <td>YYYY</td> 		<td>Год (0001 - 9999)</td> 	</tr> <tr> <td>MM</td> 		<td>Месяц (01 - 12)</td> 	</tr> <tr> <td>DD</td> 		<td>День (01 - 31)</td> 	</tr> <tr> <td>HH</td> 		<td>Часы (00 - 24)</td> 	</tr> <tr> <td>MI</td> 		<td>Минуты (00 - 59)</td> 	</tr> <tr> <td>SS</td> 		<td>Секунды (00 - 59)</td> 	</tr> </table> <p>Нестатический метод.</p>
 	*
 	*
-	* @param string $date  Год (0001 - 9999)</b
+	* @param string $date  Год (0001 - 9999)
 	*
-	* @param string $format = "DD.MM.YYYY Месяц (01 - 12)</bo
+	* @param string $format = "DD.MM.YYYY Месяц (01 - 12)
 	*
-	* @param H $H  День (01 - 31)</b
+	* @param mixed $mixedHH  День (01 - 31)
 	*
-	* @param M $I  Часы (00 - 24)</bo
+	* @param H $HMI  Часы (00 - 24)
 	*
-	* @param S $S  Минуты (00 - 59)</b
+	* @param M $MSS  Минуты (00 - 59)
 	*
-	* @param  $string  Секунды (00 - 59)</bod
+	* @param string $new_format = "DD.MM.YYYY Секунды (00 - 59)
 	*
-	* @param new_forma $t = "DD.MM.YYYY 
+	* @param mixed $mixedHH  
 	*
-	* @param H $H  Дата для конвертации.
+	* @param H $HMI  Дата для конвертации.
 	*
-	* @param M $I  Текущий формат даты. <br>Необязательный. По умолчанию - "DD.MM.YYYY HH:MI:SS".
-	*
-	* @param S $S  В какой формат необходимо преобразовать. <br>Необязательный. По
-	* умолчанию - "DD.MM.YYYY HH:MI:SS".
+	* @param M $MSS  Текущий формат даты. 		<br>Необязательный. По умолчанию - "DD.MM.YYYY
+	* HH:MI:SS".
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // зададим дату
 	* $date = "31.12.2007";
@@ -561,8 +566,6 @@ abstract class CAllDatabase
 	* // в результате получим дату в новом формате
 	* echo $new_date; // 2007-12-31
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // конвертация даты из формата одного сайта в формат другого
 	* 
@@ -587,7 +590,7 @@ abstract class CAllDatabase
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/csite/getdateformat.php">CSite::GetDateFormat</a>
 	* </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/convertdatetime.php">ConvertDateTime</a> </li>
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
-	* датой и временем</a> </li> </ul> <a name="examples"></a>
+	* датой и временем</a> </li> </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -642,17 +645,19 @@ abstract class CAllDatabase
 	/**
 	 * @param string $strSql
 	 * @param bool $bIgnoreErrors
+	 * @param string $error_position
+	 * @param array $arOptions
 	 * @return CDBResult
 	 */
 	
 	/**
-	* <p>Метод выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. <br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то метод вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то метод прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p> <p>Динамичный метод.</p>
+	* <p>Метод выполняет запрос к базе данных и если не произошло ошибки возвращает результат. В случае успешного выполнения метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>. <br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то метод вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то метод прерывает выполнение страницы, выполняя перед этим  следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. 	</li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. 	</li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol> <br><p class="note"><b>Примечания для Oracle версии</b>: <br>1. При возникновении ошибки, если была открыта транзакция, то выполняется <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/rollback.php">CDataBase::Rollback</a>.<br>2. Для вставки текстовых полей типа BLOB, CLOB, LONG и т.п. (длинною больше 4000 символов), воспользуйтесь методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybind.php">CDatabase::QueryBind</a>.<br>3. Если при выполнении SQL-запроса типа "SELECT" требуется связывание переменных, то воспользуйтесь методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/querybindselect.php">CDatabase::QueryBindSelect</a>.</p> <p> </p> <p>Нестатический метод.</p> <p>Аналог метода в новом ядре D7 - <a href="http://dev.1c-bitrix.ru/api_d7/bitrix/main/db/connection/query.php" >Bitrix\Main\DB\Connection::query </a>.</p>
 	*
 	*
-	* @param string $sql  SQL запрос.</bod
+	* @param string $sql  SQL запрос.
 	*
 	* @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки функция
-	* возвращает "false". Если параметр <i>ignore_errors</i> равен "false", то в случае
+	* возвращает "false".	 	Если параметр <i>ignore_errors</i> равен "false", то в случае
 	* ошибки функция прекращает выполнение всей
 	* страницы.<br>Необязательный. По умолчанию - "false".
 	*
@@ -667,7 +672,7 @@ abstract class CAllDatabase
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function GetByID($ID, $GET_BY_SID="N")
 	* {
@@ -714,22 +719,22 @@ abstract class CAllDatabase
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php
 	* @author Bitrix
 	*/
-	abstract function Query($strSql, $bIgnoreErrors=false);
+	abstract function Query($strSql, $bIgnoreErrors=false, $error_position="", $arOptions=array());
 
 	//query with CLOB
 	
 	/**
-	* <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.). Динамичный метод.</p> <p>В случае успешного выполнения метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то метод вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то метод прерывает выполнение страницы, выполняя перед этим следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. </li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. </li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol>
+	* <p>Выполняет SQL-запросы типа "UPDATE", "INSERT", в которых есть необходимость связывания переменных (как правило для полей типа BLOB, CLOB, LONG и т.п.). Нестатический метод.</p> <p>В случае успешного выполнения метод возвращает объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a>.<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "true", то метод вернет "false".<br> Если произошла ошибка и параметр <i>ignore_errors</i> равен "false", то метод прерывает выполнение страницы, выполняя перед этим  следующие действия: </p> <ol> <li>Вызов функции <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/addmessage2log.php">AddMessage2Log</a>. 	</li> <li>Если текущий пользователь является администратором сайта, либо в файле <b>/bitrix/php_interface/dbconn.php</b> была инициализирована переменная <b>$DBDebug=true;</b>, то на экран будет выведен полный текст ошибки, в противном случае будет вызвана функция <a href="http://dev.1c-bitrix.ru/api_help/main/functions/debug/senderror.php">SendError</a>. 	</li> <li>Будет подключен файл <b>/bitrix/php_interface/dbquery_error.php</b>, если он не существует, то будет подключен файл <b>/bitrix/modules/main/include/dbquery_error.php</b> </li> </ol>
 	*
 	*
-	* @param string $sql  SQL запрос.</bod
+	* @param string $sql  SQL запрос.
 	*
 	* @param array $binds  Массив полей типа BLOB, CLOB, LONG и т.п. в формате array("имя поля" =&gt;
 	* "значение" [, ...]).
 	*
 	* @param bool $ignore_errors = false Игнорировать ошибки. Если true, то в случае ошибки метод возвращает
-	* "false". Если параметр <i>ignore_errors</i> равен "false", то в случае ошибки метод
-	* прекращает выполнение всей страницы.<br>Необязательный. По
+	* "false".	 	Если параметр <i>ignore_errors</i> равен "false", то в случае ошибки
+	* метод прекращает выполнение всей страницы.<br>Необязательный. По
 	* умолчанию - "false".
 	*
 	* @param string $error_position = "" Строка идентифицирующая позицию в коде, откуда был вызван данный
@@ -740,7 +745,7 @@ abstract class CAllDatabase
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 	* $APPLICATION-&gt;SetTitle("TEST CLOB");
@@ -796,18 +801,18 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>. Динамичный метод.</p> <p> </p>
+	* <p>Подготавливает строку (заменяет кавычки и прочее) для вставки в SQL запрос. Если задан параметр <i>max_length</i>, то также обрезает строку до длины <i>max_length</i>. Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $value  Исходная строка.
 	*
-	* @param int $max_length = 0 Максимальная длина. <br>Необязательный. По умолчанию - "0" (строка не
-	* обрезается).
+	* @param int $max_length = 0 Максимальная длина. 		<br>Необязательный. По умолчанию - "0" (строка
+	* не обрезается).
 	*
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $strSql = "
 	*     SELECT 
@@ -838,26 +843,26 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Метод подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом метод сам преобразует все значение в SQL вид в зависимости от типа поля. Динамичный метод.</p> <p></p>
+	* <p>Метод подготавливает массив из двух строк для SQL запроса вставки записи в базу данных. Возвращает массив из двух элементов, где элемент с ключом 0 строка список полей вида "имя поля1, имя поля2[, ...]", а элемент с ключом 1 строка значений вида "значение1, значение2[, ...]". При этом метод сам преобразует все значение в SQL вид в зависимости от типа поля. Нестатический метод.</p> <p></p>
 	*
 	*
 	* @param string $TableName  Имя таблицы для вставки записи.
 	*
 	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо вставить значение NULL,
-	* то значение должно быть равно false.
+	* поля2"=&gt;"значение2" [, ...].          <br>       Если необходимо вставить
+	* значение NULL, то значение должно быть равно false.
 	*
 	* @param string $FileDir = "" Не используется.
 	*
 	* @param string $lang = false Код сайта для публичной части, либо код языка для
 	* административной части. Используется для определения формата
-	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	* умолчанию false.
+	* даты, для вставки полей типа date или datetime.          <br>      
+	* Необязательный. По умолчанию false.
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function AddResultAnswer($arFields)
 	* {
@@ -886,28 +891,28 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Метод подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом метод сам преобразует все значение в SQL вид в зависимости от типа поля. Динамичный метод.</p>
+	* <p>Метод подготавливает строку для SQL запроса изменения записи в базе данных. Возвращает строку вида "имя поля1 = значение1", имя поля2 = значение2[, ...]". При этом метод сам преобразует все значение в SQL вид в зависимости от типа поля. Нестатический метод.</p>
 	*
 	*
 	* @param string $TableName  Имя таблицы.
 	*
 	* @param array $fields  Массив значений полей в формате "имя поля1"=&gt;"значение1", "имя
-	* поля2"=&gt;"значение2" [, ...]. <br> Если необходимо изменить значение на
-	* NULL, то значение в массиве должно быть равно false.
+	* поля2"=&gt;"значение2" [, ...].          <br>       Если необходимо изменить
+	* значение на NULL, то значение в массиве должно быть равно false.
 	*
 	* @param string $FileDir = "" Не используется.
 	*
 	* @param string $lang = false Код сайта для публичной части, либо код языка для
 	* административной части. Используется для определения формата
-	* даты, для вставки полей типа date или datetime. <br> Необязательный. По
-	* умолчанию false.
+	* даты, для вставки полей типа date или datetime.          <br>      
+	* Необязательный. По умолчанию false.
 	*
 	* @param string $TableAlias = "" Необязательный.
 	*
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function UpdateResultField($arFields, $RESULT_ID, $FIELD_ID)
 	* {
@@ -937,7 +942,7 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Метод разбирает строку из пакета запросов на массив запросов и возвращает этот массив. Динамичный метод.</p> <p> </p>
+	* <p>Метод разбирает строку из пакета запросов на массив запросов и возвращает этот массив. Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $sql  Строка с пакетом запросов, разделенных символом ";" для MySQL версии
@@ -948,7 +953,7 @@ abstract class CAllDatabase
 	* @return array 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* function RunSqlBatch($filepath)
 	* {
@@ -1132,12 +1137,12 @@ abstract class CAllDatabase
 
 	
 	/**
-	* <p>Проверяет дату на корректность и возвращает "true" если дата корректна, в противном случае - "false". Динамичный метод.</p> <p> </p>
+	* <p>Проверяет дату на корректность и возвращает "true" если дата корректна, в противном случае - "false". Нестатический метод.</p> <p> </p>
 	*
 	*
 	* @param string $date  Строка с проверяемой датой.
 	*
-	* @param string $format = false Формат даты.<br> Необязательный. По умолчанию - "false" - определять
+	* @param string $format = false Формат даты.<br> 	Необязательный. По умолчанию - "false" - определять
 	* формат по текущему сайту, либо языку (если административная
 	* часть).
 	*
@@ -1147,13 +1152,13 @@ abstract class CAllDatabase
 	* текущий язык (если административная часть).
 	*
 	* @param string $format_type = "SHORT" Тип формата даты: "FULL" - для даты со временем, "SHORT" - для даты (без
-	* времени) <br>Необязательный. По умолчанию "SHORT". С версии 3.3.7 до
+	* времени) 		<br>Необязательный. По умолчанию "SHORT". С версии 3.3.7 до
 	* версии 4.1.0 назывался Type.
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* if (!<b>$DB-&gt;IsDate</b>("12.10.2005 22:34:15", "DD.MM.YYYY HH:MI:SS"))
 	*   echo "Ошибка. Неверный формат даты.";
@@ -1164,7 +1169,7 @@ abstract class CAllDatabase
 	* <h4>See Also</h4> 
 	* <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/functions/date/index.php">Функции для работы с
 	* датой и временем</a> </li> <li> <a
-	* href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul> <a
+	* href="http://dev.1c-bitrix.ru/api_help/main/functions/filter/checkfilterdates.php">CheckFilterDates</a> </li> </ul><a
 	* name="examples"></a>
 	*
 	*
@@ -1228,8 +1233,26 @@ abstract class CAllDatabase
 			$this->arQueryDebug[$index]->addTime($exec_time);
 		}
 	}
+
+	abstract public function GetIndexName($tableName, $arColumns, $bStrict = false);
+
+	public function IndexExists($tableName, $arColumns, $bStrict = false)
+	{
+		return $this->GetIndexName($tableName, $arColumns, $bStrict) !== "";
+	}
 }
 
+
+/**
+ * <b>CDBResult</b> - класс результата выполнения запроса.<br><br>Содержит в  себе методы для постраничной навигации и работы с результатом запроса.  Автоматически создаётся как результат работы метода <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdatabase/query.php">CDatabase::Query</a>.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php
+ * @author Bitrix
+ */
 abstract class CAllDBResult
 {
 	var $result;
@@ -1266,7 +1289,7 @@ abstract class CAllDBResult
 	var $resultObject = null;
 
 	/** @param CDBResult $res */
-	public function CAllDBResult($res = null)
+	public function __construct($res = null)
 	{
 		$obj = is_object($res);
 		if($obj && is_subclass_of($res, "CAllDBResult"))
@@ -1288,7 +1311,6 @@ abstract class CAllDBResult
 			$this->SIZEN = $res->SIZEN;
 			$this->bFromArray = $res->bFromArray;
 			$this->bFromLimited = $res->bFromLimited;
-			$this->sSessInitAdd = $res->sSessInitAdd;
 			$this->nPageWindow = $res->nPageWindow;
 			$this->bDescPageNumbering = $res->bDescPageNumbering;
 			$this->SqlTraceIndex = $res->SqlTraceIndex;
@@ -1312,6 +1334,12 @@ abstract class CAllDBResult
 		{
 			$this->result = $res;
 		}
+	}
+
+	/** @deprecated */
+	static public function CAllDBResult($res = null)
+	{
+		self::__construct($res);
 	}
 
 	static public function __sleep()
@@ -1350,13 +1378,13 @@ abstract class CAllDBResult
 	 */
 	
 	/**
-	* <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - метод вернет "false". Динамичный метод.</p>
+	* <p>Делает выборку значений полей в массив. Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи) - метод вернет "false". Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsUser = CUser::GetByID($USER_ID);
 	* $arUser = <b>$rsUser-&gt;Fetch</b>();
@@ -1375,7 +1403,7 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php
 	* @author Bitrix
 	*/
-	abstract function Fetch();
+	abstract public function Fetch();
 
 	/**
 	 * @return array
@@ -1384,13 +1412,13 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Метод возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ..."). Динамичный метод.</p> <p class="note"><b>Примечание</b>. Для Oracle версии данный метод будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
+	* <p>Метод возвращает количество выбранных записей (выборка записей осуществляется с помощью SQL-команды "SELECT ..."). Нестатический метод.</p> <p class="note"><b>Примечание</b>. Для Oracle версии данный метод будет корректно работать только после вызова <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>, либо если достигнут конец (последняя запись) выборки.</p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
 	* $rsBanners-&gt;NavStart(20);
@@ -1415,17 +1443,17 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/selectedrowscount.php
 	* @author Bitrix
 	*/
-	abstract function SelectedRowsCount();
+	abstract public function SelectedRowsCount();
 
 	
 	/**
-	* <p>Метод возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>. Динамичный метод.</p> <br>
+	* <p>Метод возвращает количество записей, измененных SQL-командами <b>INSERT</b>, <b>UPDATE</b> или <b>DELETE</b>. Нестатический метод.</p> <br>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $strSql = "
 	* 	INSERT INTO b_stat_day(
@@ -1467,17 +1495,17 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/affectedrowscount.php
 	* @author Bitrix
 	*/
-	abstract function AffectedRowsCount();
+	abstract public function AffectedRowsCount();
 
 	
 	/**
-	* <p>Метод возвращает количество полей результата выборки. Динамичный метод.</p>
+	* <p>Метод возвращает количество полей результата выборки. Нестатический метод.</p>
 	*
 	*
 	* @return int 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rs = $DB-&gt;Query($query,true);
 	* $intNumFields = <b>$rs-&gt;FieldsCount</b>();
@@ -1500,11 +1528,11 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldscount.php
 	* @author Bitrix
 	*/
-	abstract function FieldsCount();
+	abstract public function FieldsCount();
 
 	
 	/**
-	* <p>Метод возвращает название поля по его номеру. Динамичный метод.</p>
+	* <p>Метод возвращает название поля по его номеру. Нестатический метод.</p>
 	*
 	*
 	* @param int $column  
@@ -1512,7 +1540,7 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rs = $DB-&gt;Query($query,true);
 	* $intNumFields = $rs-&gt;FieldsCount();
@@ -1535,7 +1563,7 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fieldname.php
 	* @author Bitrix
 	*/
-	abstract function FieldName($iCol);
+	abstract public function FieldName($iCol);
 
 	public function NavContinue()
 	{
@@ -1550,13 +1578,13 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Метод возвращает <i>false</i>, если все записи умещаются в одну страницу. В противном случае <i>true</i>. Динамичный метод.</p> <p class="note"><b>Внимание!</b> Перед использованием данного метода необходимо вызвать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
+	* <p>Метод возвращает <i>false</i>, если все записи умещаются в одну страницу. В противном случае <i>true</i>. Нестатический метод.</p> <p class="note"><b>Внимание!</b> Перед использованием данного метода необходимо вызвать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>.</p>
 	*
 	*
 	* @return bool 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arDirContent = array_merge($arDirs, $arFiles);
 	* $rsDirContent = new CDBResult;
@@ -1568,7 +1596,7 @@ abstract class CAllDBResult
 	* 	$rsDirContent-&gt;NavPrint("Файлы");
 	* 	echo "&lt;/p&gt;";
 	* }
-	* ?&gt;</b
+	* ?&gt;
 	* </pre>
 	*
 	*
@@ -1593,7 +1621,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Метод выводит ссылки для постраничной навигации. Перед использованием данного метода необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова етода необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre> <p> Динамичный метод.</p>
+	* <p>Метод выводит ссылки для постраничной навигации. Перед использованием данного метода необходимо вызвать метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">NavStart</a>.<br><br>По умолчанию в сессии запоминается последняя открытая страница постраничной навигации. Если вы хотите изменить такое поведение для данной текущей страницы, то до вызова етода необходимо воспользоваться следующим кодом: </p> <pre class="syntax" id="xmp27BC3DDD"> CPageOption::SetOptionString("main", "nav_page_in_session", "N");</pre> <p>Нестатический метод.</p>
 	*
 	*
 	* @param string $title  Названия выводимых элементов.
@@ -1612,12 +1640,12 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsEvents = CAdv::GetEventList($f_ID,($by="s_def"),($order="desc"), $arF, $is_filtered);
 	* <b>$rsEvents-&gt;NavPrint</b>("События", false, "tablebodytext", 
 	* "/bitrix/modules/statistic/admin/adv_navprint.php");
-	* ?&gt;</bod
+	* ?&gt;
 	* &lt;?
 	* echo('&lt;font class="'.$StyleText.'"&gt;('.$title.' ');
 	* echo(($this-&gt;NavPageNomer-1)*$this-&gt;NavPageSize+1);
@@ -1674,7 +1702,8 @@ abstract class CAllDBResult
 	*   $this-&gt;NavNum.'=1'.$strNavQueryString.
 	*   '#nav_start'.$add_anchor.'"&gt;'.$sAll.'&lt;/a&gt; ');
 	* 
-	* echo('&lt;
+	* echo('&lt;/font&gt;');
+	* ?&gt;
 	* </pre>
 	*
 	*
@@ -1683,7 +1712,7 @@ abstract class CAllDBResult
 	* <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> <li>
 	* <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/isnavprint.php">CDBResult::IsNavPrint</a> </li>
 	* <li><a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpageoption/index.php">Класс CPageOption</a></li>
-	* </ul></b<a name="examples"></a>
+	* </ul><a name="examples"></a>
 	*
 	*
 	* @static
@@ -1899,19 +1928,19 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Объявляет глобальные переменные с именами вида ${<i>prefix</i>."имя поля"} и значениями соответствующими именам полей, приведенных в HTML-безопасный вид.<br>Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи), то метод вернет "false". Динамичный метод.</p>
+	* <p>Объявляет глобальные переменные с именами вида ${<i>prefix</i>."имя поля"} и значениями соответствующими именам полей, приведенных в HTML-безопасный вид.<br>Возвращает массив вида Array("поле"=&gt;"значение" [, ...]) и передвигает курсор на следующую запись. Если достигнута последняя запись (или в результате нет ни одной записи), то метод вернет "false". Нестатический метод.</p>
 	*
 	*
-	* @param string $prefix = "str_" Префикс глобальных переменных. <br>Необязательный. По умолчанию
+	* @param string $prefix = "str_" Префикс глобальных переменных. 		<br>Необязательный. По умолчанию
 	* "str_".
 	*
 	* @param bool $encode = true Приводить глобальные переменные в HTML-безопасный вид.
-	* <br>Необязательный. По умолчанию - "true".
+	* 		<br>Необязательный. По умолчанию - "true".
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;select&gt;
 	* &lt;?
 	* $rs = CGroup::GetList($order="ID", $by="ASC");
@@ -1948,7 +1977,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки метод вернет <i>false</i>. Динамичный метод.</p>
+	* <p>Возвращает массив значений полей приведенный в HTML-безопасный вид. Если достигнут конец результата выборки метод вернет <i>false</i>. Нестатический метод.</p>
 	*
 	*
 	* @param bool $TextHtmlAuto = true Если значение данного параметра - "true", то метод будет
@@ -1964,7 +1993,7 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;select&gt;
 	* &lt;?
 	* $rs = CGroup::GetList($order="ID", $by="ASC");
@@ -2034,7 +2063,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данного метода применяется как правило для составления идентификатора кэша, который в свою очередь используется в методах классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">CPHPCache</a>. Динамичный метод.</p>
+	* <p>Возвращает уникальную строку идентифицирующую текущее состояние постраничной навигации (номер текущей страницы, нажата ли ссылка "Все"). Результат данного метода применяется как правило для составления идентификатора кэша, который в свою очередь используется в методах классов <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cpagecache/index.php">CPageCache</a> и <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cphpcache/index.php">CPHPCache</a>. Нестатический метод.</p>
 	*
 	*
 	* @param int $page_size = 10 Размер страницы постраничной навигации (от 1 и более).
@@ -2050,7 +2079,7 @@ abstract class CAllDBResult
 	* @return string 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* // создаем объект
 	* $obCache = new CPageCache; 
@@ -2121,13 +2150,19 @@ abstract class CAllDBResult
 
 		if(is_array($nPageSize))
 		{
-			//$iNumPage
-			//$nPageSize
-			//$bDescPageNumbering
-			//$bShowAll
-			//$NavShowAll
-			//$sNavID
-			extract($nPageSize);
+			$params = $nPageSize;
+			if(isset($params["iNumPage"]))
+				$iNumPage = $params["iNumPage"];
+			if(isset($params["nPageSize"]))
+				$nPageSize = $params["nPageSize"];
+			if(isset($params["bDescPageNumbering"]))
+				$bDescPageNumbering = $params["bDescPageNumbering"];
+			if(isset($params["bShowAll"]))
+				$bShowAll = $params["bShowAll"];
+			if(isset($params["NavShowAll"]))
+				$NavShowAll = $params["NavShowAll"];
+			if(isset($params["sNavID"]))
+				$sNavID = $params["sNavID"];
 		}
 
 		$nPageSize = intval($nPageSize);
@@ -2137,10 +2172,7 @@ abstract class CAllDBResult
 		$SHOWALL_NAME = "SHOWALL_".($NavNum+1);
 
 		global ${$PAGEN_NAME}, ${$SHOWALL_NAME};
-		$md5Path = md5(
-			(isset($sNavID)? $sNavID: $APPLICATION->GetCurPage())
-			.(is_object($this) && isset($this->sSessInitAdd)? $this->sSessInitAdd: "")
-		);
+		$md5Path = md5((isset($sNavID)? $sNavID: $APPLICATION->GetCurPage()));
 
 		if($iNumPage === false)
 			$PAGEN = ${$PAGEN_NAME};
@@ -2196,7 +2228,7 @@ abstract class CAllDBResult
 
 		$this->bNavStart = true;
 
-		$arParams = $this->GetNavParams($nPageSize, $bShowAll, $iNumPage);
+		$arParams = self::GetNavParams($nPageSize, $bShowAll, $iNumPage);
 
 		$this->PAGEN = $arParams["PAGEN"];
 		$this->SIZEN = $arParams["SIZEN"];
@@ -2221,7 +2253,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Метод разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данный метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> </li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a> </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>. <p> Динамичный метод.</p>
+	* <p>Метод разбивает результат выборки на страницы.</p> <p> Для встраивания системы автоматической постраничной навигации необходимо сначала вызвать данный метод <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navstart.php">CDBResult::NavStart</a>. После ее вызова, методы  </p> <ul> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/fetch.php">CDBResult::Fetch</a> 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a> 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/extractfields.php">CDBResult::ExtractFields</a> 	</li> <li> <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navnext.php">CDBResult::NavNext</a>  </li> </ul> будут ограничены только текущей страницей (а не всей выборкой). Для вывода ссылок постраничной навигации необходимо воспользоваться методом <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/navprint.php">CDBResult::NavPrint</a>. <p>Нестатический метод.</p>
 	*
 	*
 	* @param int $page_size = 10 Размер страницы (от 1 и более). Необязательный. По умолчанию 10.
@@ -2232,7 +2264,7 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
 	* <b>$rsBanners-&gt;NavStart(20)</b>;
@@ -2308,11 +2340,11 @@ abstract class CAllDBResult
 		}
 	}
 
-	abstract function DBNavStart();
+	abstract public function DBNavStart();
 
 	
 	/**
-	* <p>Метод инициализирует объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива. Динамичный метод.</p>
+	* <p>Метод инициализирует объект класса <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/index.php">CDBResult</a> значениями из массива. Нестатический метод.</p>
 	*
 	*
 	* @param array $values  
@@ -2320,7 +2352,7 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $arr = array();
 	* $arr[] = array("ID" =&gt; 1, "NAME" =&gt; "Заголовок 1");
@@ -2337,8 +2369,6 @@ abstract class CAllDBResult
 	*      echo "&lt;p&gt;"; $rs-&gt;NavPrint("Элементы"); echo "&lt;/p&gt;";
 	* }
 	* ?&gt;
-	* 
-	* 
 	* &lt;?
 	* // получим список файлов и каталогов
 	* CFileMan::GetDirList(Array($site_id, $path), $arDirs, $arFiles, $arFilter, Array($by=&gt;$order), "DF");
@@ -2388,7 +2418,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то метод вернет "false". Динамичный метод.</p> <p></p> <div class="note"> <b>Примечания</b>: <br><ul> <li>Метод работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</li> <li>Когда явно не требуются возможности NavNext лучше использовать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.</li> </ul> </div>
+	* <p>Возвращает массив значений полей. Если установлен флаг <i>init_globals</i>, то объявляет глобальные переменные с именами <i>prefix</i>.имя_поля. Если достигнут конец результата выборки, то метод вернет "false". Нестатический метод.</p> <p></p> <div class="note"> <b>Примечания</b>: <br><ul> <li>Метод работает с переменными из глобальной области видимости, это необходимо учитывать при создании основных файлов компонентов.</li> <li>Когда явно не требуются возможности NavNext лучше использовать <a href="http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getnext.php">CDBResult::GetNext</a>.</li>   </ul> </div>
 	*
 	*
 	* @param bool $SetGlobalVars = true Если "true", то метод будет объявлять глобальные переменные
@@ -2406,7 +2436,7 @@ abstract class CAllDBResult
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* &lt;?
 	* $rsBanners = CAdvBanner::GetList($by, $order, $arFilter, $is_filtered);
 	* $rsBanners-&gt;NavStart(20);
@@ -2459,7 +2489,7 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p> Динамичный метод.</p>
+	* <p>Нестатический метод.</p>
 	*
 	*
 	* @return mixed 
@@ -2475,23 +2505,23 @@ abstract class CAllDBResult
 
 	
 	/**
-	* <p>Возвращает панель постраничной навигации в HTML виде. Формирует ее на основе параметров. Динамичный метод.</p>
+	* <p>Возвращает панель постраничной навигации в HTML виде. Формирует ее на основе параметров. Нестатический метод.</p>
 	*
 	*
-	* @param navComponentObjec $t  Использовать обратную навигацию
+	* @param mixed $navComponentObject  Использовать обратную навигацию
 	*
-	* @param navigationTitl $e  Название категорий </ht
+	* @param navComponentObjec $navigationTitle  Название категорий
 	*
-	* @param templateNam $e = "" Название шаблона
+	* @param navigationTitl $templateName = "" Название шаблона
 	*
-	* @param showAlway $s = false Выводить всегда
+	* @param mixed $showAlways = false Выводить всегда
 	*
-	* @param parentComponen $t = nul Время кеширования страниц для обратной навигации
+	* @param array $parentComponent = nul Время кеширования страниц для обратной навигации
 	*
 	* @return mixed 
 	*
 	* <h4>Example</h4> 
-	* <pre>
+	* <pre bgcolor="#323232" style="padding:5px;">
 	* CModule::IncludeModule('iblock');
 	* $arSort = array();
 	* $arFilter = array('IBLOCK_ID'=&gt; '1');
@@ -2509,16 +2539,9 @@ abstract class CAllDBResult
 	* {
 	*    echo $arElem['ID']."__".$arElem["NAME"]."<br>";
 	* }
-	* echo $NAV_STRING;
-	* </ht$rsElements = CIBlockElement::GetList($arSort, $arFilter, false, array("nPageSize" =&gt; $arParams["PAGE_COUNT"], "bShowAll" =&gt; false), $arSelect);
+	* echo $NAV_STRING;$rsElements = CIBlockElement::GetList($arSort, $arFilter, false, array("nPageSize" =&gt; $arParams["PAGE_COUNT"], "bShowAll" =&gt; false), $arSelect);
 	* ....
-	* $arResult["NAV_STRING"] = $rsElements-&gt;GetPageNavStringEx($navComponentObject, "", $arParams["PAGER_TEMPLATE"]);Теперь в $arResult["NAV_STRING"] у нас полная постраничная навигация, обернутая в шаблон $arParams["PAGER_TEMPLATE"]. Если $arParams["PAGER_TEMPLATE"] пуст, то берется .default.
-	* 
-	* Иногда надо чтобы не выводилось много страниц (1....11, 12, 13, 14, 15, 16, 17...100) а, например 3 (1....14, 15, 16...100). 
-	* 
-	* В примере выше перед вызовом <b>GetPageNavStringEx</b> надо поставить:
-	* 
-	* $rsElements-&gt;nPageWindow = 3;
+	* $arResult["NAV_STRING"] = $rsElements-&gt;GetPageNavStringEx($navComponentObject, "", $arParams["PAGER_TEMPLATE"]);Теперь в $arResult["NAV_STRING"] у нас полная постраничная навигация, обернутая в шаблон $arParams["PAGER_TEMPLATE"]. Если $arParams["PAGER_TEMPLATE"] пуст, то берется .default.Иногда надо чтобы не выводилось много страниц (1....11, 12, 13, 14, 15, 16, 17...100) а, например 3 (1....14, 15, 16...100). В примере выше перед вызовом <b>GetPageNavStringEx</b> надо поставить:$rsElements-&gt;nPageWindow = 3;
 	* </pre>
 	*
 	*
@@ -2526,7 +2549,7 @@ abstract class CAllDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cdbresult/getpagenavstringex.php
 	* @author Bitrix
 	*/
-	public static function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null, $componentParams = array())
+	static public function GetPageNavStringEx(&$navComponentObject, $navigationTitle, $templateName = "", $showAlways=false, $parentComponent=null, $componentParams = array())
 	{
 		/** @global CMain $APPLICATION */
 		global $APPLICATION;

@@ -20,6 +20,19 @@ class SenderEventHandler
 	 * @param array $data		Connector data.
 	 * @return array
 	 */
+	
+	/**
+	* <p>Метод для сообщения модулю <b>Email-маркетинг</b> списка коннекторов. Метод статический.</p>
+	*
+	*
+	* @param array $data  Данные коннекторов.
+	*
+	* @return array 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/iblock/sendereventhandler/onconnectorlistiblock.php
+	* @author Bitrix
+	*/
 	public static function onConnectorListIblock($data)
 	{
 		$data['CONNECTOR'] = 'Bitrix\Iblock\SenderConnectorIblock';

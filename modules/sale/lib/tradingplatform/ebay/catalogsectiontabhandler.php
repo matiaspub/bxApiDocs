@@ -25,11 +25,10 @@ class CatalogSectionTabHandler extends TabHandler
 
 	static public function Action($arArgs)
 	{
-		$propsRes = true;
-
 		if(!isset($_POST["SALE"]["EBAY"]))
-			return false;
+			return true;
 
+		$propsRes = true;
 		$ebayCategoryId = isset($_POST["SALE"]["EBAY"]["EBAY_CATEGORY_ID"]) ? $_POST["SALE"]["EBAY"]["EBAY_CATEGORY_ID"] : "";
 		$params = array();
 
@@ -278,45 +277,81 @@ class CatalogSectionTabHandler extends TabHandler
 			<tr></tr><td colspan="2" style="border-top: 2px solid #e0e8ea;">&nbsp;</td></tr>
 			<tr>
 				<td>'.Loc::getMessage("SALE_EBAY_CSTH_POLICY_RETURN").':</span></td>
-				<td>
-					<select name="SALE[EBAY][POLICY][RETURN]">';
+				<td>';
 
 		if($policy)
+			$names = $policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_RETURN);
+		else
+			$names = array();
+
+		if($policy && !empty($names))
 		{
-			foreach($policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_RETURN) as $policyId => $policyName)
+			$resultHtml .= '<select name="SALE[EBAY][POLICY][RETURN]">';
+
+			foreach($names as $policyId => $policyName)
 				$resultHtml .= '<option value="'.htmlspecialcharsbx($policyId).'"'.($policyReturn == $policyId ? " selected" : "").'>'.$policyName.'</option>';
+
+			$resultHtml .= '</select>';
+		}
+		else
+		{
+			$resultHtml .= Loc::getMessage("SALE_EBAY_CSTH_NO_POLICY");
 		}
 
 		$resultHtml .= '
-					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>'.Loc::getMessage("SALE_EBAY_CSTH_POLICY_SHIPMENT").':</td>
-				<td>
-					<select name="SALE[EBAY][POLICY][SHIPPING]">';
+				<td>';
+
 		if($policy)
+			$names = $policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_SHIPPING);
+		else
+			$names = array();
+
+
+		if($policy && !empty($names))
 		{
-			foreach($policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_SHIPPING) as $policyId => $policyName)
+			$resultHtml .= '<select name="SALE[EBAY][POLICY][SHIPPING]">';
+
+			foreach($names as $policyId => $policyName)
 				$resultHtml .= '<option value="'.htmlspecialcharsbx($policyId).'"'.($policyShipping == $policyId ? " selected" : "").'>'.$policyName.'</option>';
+
+			$resultHtml .= '</select>';
+		}
+		else
+		{
+			$resultHtml .= Loc::getMessage("SALE_EBAY_CSTH_NO_POLICY");
 		}
 
 		$resultHtml .='
-					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>'.Loc::getMessage("SALE_EBAY_CSTH_POLICY_PAYMENT").':</td>
-				<td>
-					<select name="SALE[EBAY][POLICY][PAYMENT]">';
+				<td>';
 
 		if($policy)
+			$names = $policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_PAYMENT);
+		else
+			$names = array();
+
+		if($policy && !empty($names))
 		{
+			$resultHtml .= '<select name="SALE[EBAY][POLICY][PAYMENT]">';
+
 			foreach($policy->getPoliciesNames(\Bitrix\Sale\TradingPlatform\Ebay\Policy::TYPE_PAYMENT) as $policyId => $policyName)
 				$resultHtml .= '<option value="'.htmlspecialcharsbx($policyId).'"'.($policyPayment == $policyId ? " selected" : "").'>'.$policyName.'</option>';
+
+			$resultHtml .= '</select>';
+		}
+		else
+		{
+			$resultHtml .= Loc::getMessage("SALE_EBAY_CSTH_NO_POLICY");
 		}
 
-		$resultHtml .='	</select>
+		$resultHtml .='
 				</td>
 			</tr>
 			<tr>

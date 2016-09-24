@@ -6,6 +6,17 @@
  * @copyright 2001-2013 Bitrix
  */
 
+
+/**
+ * Класс <b> CComponentEngine </b>инкапсулирует вспомогательные методы, полезные при разработке компонентов.
+ *
+ *
+ * @return mixed 
+ *
+ * @static
+ * @link http://dev.1c-bitrix.ru/api_help/main/reference/ccomponentengine/index.php
+ * @author Bitrix
+ */
 class CComponentEngine
 {
 	private $component = null;

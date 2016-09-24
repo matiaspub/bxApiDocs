@@ -33,7 +33,7 @@ class CSecurityRedirect
 
 		//In case of absolute url will check if server to be redirected is our
 		$bSkipCheck = false;
-		if(preg_match('~^(?:http|https)://(.*?)(?:/|\?|#|$)~iD', $url_l, $arMatch))
+		if(preg_match('~^(?:http|https)://(.*?)(?:\\\\|/|\?|#|$|%252f|%2f)~iD', $url_l, $arMatch))
 		{
 			if(defined("BX24_HOST_NAME"))
 			{
@@ -119,11 +119,16 @@ class CSecurityRedirect
 							$url
 					);
 
-				if(COption::GetOptionString("security", "redirect_action") == "show_message")
+				if(
+					COption::GetOptionString("security", "redirect_action") == "show_message"
+					|| COption::GetOptionString("security", "redirect_action") == "show_message_and_stay"
+				)
 				{
-					$timeout = intval(COption::GetOptionString("security", "redirect_message_timeout"));
-					if($timeout <= 0)
-						$timeout = 30;
+					if (COption::GetOptionString("security", "redirect_action") == "show_message")
+						$timeout = intval(COption::GetOptionString("security",
+						"redirect_message_timeout"));
+					else
+						$timeout = 0;
 
 					$mess = COption::GetOptionString("security", "redirect_message_warning_".LANGUAGE_ID);
 					if(strlen($mess) <= 0)
@@ -136,8 +141,28 @@ class CSecurityRedirect
 					}
 					$html_mess = str_replace("+", "&#43;", htmlspecialcharsbx($mess));
 
+					//Convert to site encoding
+					if (!defined("BX_UTF") && defined("LANG_CHARSET"))
+					{
+						$url_c = \Bitrix\Main\Text\Encoding::convertEncoding($url, "UTF-8", LANG_CHARSET);
+					}
+					else
+					{
+						$url_c = $url;
+					}
+
+					if (preg_match('~^(http|https)(://)(.*?)(?:\\\\|/|\?|#|$)~iD', $url_c, $arMatch))
+					{
+						$converter = CBXPunycode::GetConverter();
+						$url_e = $arMatch[1].$arMatch[2].$converter->Encode($arMatch[3]).substr($url_c, strlen($arMatch[1].$arMatch[2].$arMatch[3]));
+					}
+					else
+					{
+						$url_e = $url;
+					}
+
 					$url = htmlspecialcharsbx($url);
-					$html_url = '<nobr><a href="'.$url.'">'.$url.'</a></nobr>';
+					$html_url = '<nobr><a href="'.htmlspecialcharsbx($url_e).'">'.htmlspecialcharsEx($url_c).'</a></nobr>';
 					$html_mess = str_replace("#URL#", $html_url, $html_mess);
 					header('X-Frame-Options: DENY');
 					header('X-Robots-Tag: noindex, nofollow');
@@ -145,7 +170,9 @@ class CSecurityRedirect
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?echo $charset?>" />
-<meta http-equiv="Refresh" content="<?=$timeout?>; URL=<?=$url?>">
+<?if ($timeout > 0):?>
+<meta http-equiv="Refresh" content="<?=$timeout?>; URL=<?=htmlspecialcharsbx($url_e)?>">
+<?endif?>
 <meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/adminstyles.css" />
 <link rel="stylesheet" type="text/css" href="/bitrix/themes/.default/404.css" />

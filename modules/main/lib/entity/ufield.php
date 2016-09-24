@@ -60,7 +60,7 @@ class UField extends Field
 		$this->field_id = $info['ID'];
 	}
 
-	static public function validateValue($value, $row, Result $result)
+	static public function validateValue($value, $primary, $row, Result $result)
 	{
 		return true;
 	}

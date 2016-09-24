@@ -118,6 +118,23 @@ class Action
 	 * @throws \Bitrix\Main\ArgumentTypeException
 	 * @throws \Exception
 	 */
+	
+	/**
+	* <p>Возвращает результат запуска задания <i>BitrixVM</i>. Метод нестатический.</p>
+	*
+	*
+	* @param array $arrayinputParams = array() Массив параметров предыдущих запусков. Ключи массива: <ul> <li>
+	* <b>NAME</b> - название задания; </li> <li> <b>RESULT</b> - статус: <code>OK</code> или
+	* <code>ERROR</code>,</li> <li> <b>OUTPUT</b> -  результат на выходе задания:  <ul> <li>
+	* <b>TEXT</b> - текст задания, </li> <li> <b>DATA</b> - данные задания.</li> </ul> </li> <li>
+	* <b>ERROR</b> - ошибка.</li> </ul>
+	*
+	* @return integer 
+	*
+	* @static
+	* @link http://dev.1c-bitrix.ru/api_d7/bitrix/scale/action/start.php
+	* @author Bitrix
+	*/
 	public function start(array $inputParams = array())
 	{
 		if(!is_array($inputParams))
