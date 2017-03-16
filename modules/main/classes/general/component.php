@@ -79,7 +79,7 @@ class CBitrixComponent
 	 * @return array[string]mixed
 	 *
 	 */
-	static public function onPrepareComponentParams($arParams)
+	public function onPrepareComponentParams($arParams)
 	{
 		return $arParams;
 	}
