@@ -2539,7 +2539,7 @@ abstract class CAllUser extends CDBResult
 	* @link http://dev.1c-bitrix.ru/api_help/main/reference/cuser/isauthorized.php
 	* @author Bitrix
 	*/
-	static public function IsAuthorized()
+	public function IsAuthorized()
 	{
 		return ($_SESSION["SESS_AUTH"]["AUTHORIZED"]=="Y");
 	}
