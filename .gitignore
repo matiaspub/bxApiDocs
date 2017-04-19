@@ -1,6 +1,11 @@
-.git
+# editors:
 .idea
+.vscode
+
+# files:
 *.rar
 *.zip
+
+# dir:
 /vendor/
 modules_*
