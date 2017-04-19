@@ -2,7 +2,8 @@
 
 ## bxApiDocs призван упростить, не самую сладкую, жизнь Bitrix разработчику
 
-Это сама по себе папка с модулями /bitrix/modules/, Битрикс "Управление сайтом", [дистрибутива](http://www.1c-bitrix.ru/download/cms.php#tab-php-link) “Бизнес”, но с убранными лишними файлами и папками (не `.php`, без классов методов, констант и т.д.), добавленными константами, событиями и хелпами phpDocs.
+
+Это сама по себе папка с модулями `/bitrix/modules/`, [1С-Битрикс: Управление сайтом](https://www.1c-bitrix.ru/products/cms/) - **[Бизнес](http://www.1c-bitrix.ru/download/cms.php#tab-php-link)**, но с убранными лишними файлами и папками (не `.php`, без классов методов, констант и т.д.), добавленными константами, событиями и хелпами phpDocs.
 
 ## Что умеет
 
@@ -32,19 +33,19 @@
 
 ### Основные синглтоны $APPLICATION, $DB, $USER, $USER_FIELD_MANAGER с подсказками
 
-![Синглтоны: $APPLICATION](//monosnap.com/image/dplrjSLmBXtK3A8Rv3nXJIj6g.png)
+![Синглтоны: $APPLICATION](https://monosnap.com/image/dplrjSLmBXtK3A8Rv3nXJIj6g.png)
 
 ### Максимально полные доки по методам и классам
 
-![Доки по методам и классам](//monosnap.com/image/9oRa5bZj9qbLVeNk3R6NYu44u.png)
+![Доки по методам и классам](https://monosnap.com/image/9oRa5bZj9qbLVeNk3R6NYu44u.png)
 
 ### Посмотреть события модуля и почитать как его использовать можно так
 
-![События модуля с доками](//monosnap.com/image/9pIhjhvYbK56RumvtVfoRgDls.png)
+![События модуля с доками](https://monosnap.com/image/9pIhjhvYbK56RumvtVfoRgDls.png)
 
 ### Константы с доками
 
-![Константы с доками](//monosnap.com/image/FbBLw677cEfUrOMcuGOjH9j3H.png)
+![Константы с доками](https://monosnap.com/image/FbBLw677cEfUrOMcuGOjH9j3H.png)
 
 ## Да, согласен
 
