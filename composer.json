@@ -1,0 +1,22 @@
+{
+  "name": "matiaspub/bx-api-docs",
+  "description": "phpDoc for bitrix framework",
+  "license": "MIT",
+  "keywords": [
+    "bitrix",
+    "api",
+    "phpDoc",
+    "autocomplete",
+    "ide-helper"
+  ],
+  "support": {
+    "issues": "https://github.com/matiaspub/bxApiDocs/issues",
+    "source": "https://github.com/matiaspub/bxApiDocs"
+  },
+  "authors": [
+    {
+      "name": "Sergius",
+      "email": "matiaspub@gmail.com"
+    }
+  ]
+}
