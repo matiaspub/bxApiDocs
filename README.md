@@ -18,11 +18,11 @@
 
 ## Как использовать
 
-Добавляем в индексацию любимого IDE или в composer и все. Счастье!
+Добавляем в индексацию любимого IDE или в Composer и все. Счастье!
 
 ### Composer
 
-`composer require-dev matiaspub/bx-api-docs`
+`composer require matiaspub/bx-api-docs --dev`
 
 Composer скачает все доки в папку vendor, IDE проиндексирует изменения. Вам останется наслаждаться результатом.
 
